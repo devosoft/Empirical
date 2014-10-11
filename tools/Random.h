@@ -16,8 +16,9 @@
 //  Constructor:
 //    Random(int _seed=-1)
 //      _seed is the random number seed that will produce a unique pseudo-random sequence.
-//      (a value of -1 indicates that the seed should be bassed off of a combination of time and the
-//      memory position of the random number generator in case multiple ones start at the same time.)
+//      (a value of -1 indicates that the seed should be bassed off of a combination of time
+//      and the memory position of the random number generator in case multiple ones start at
+//      the same time.)
 //
 //  Other useful functions:
 //    double GetDouble()
@@ -35,7 +36,8 @@
 //      Tests a random value [0,1) against a given probability p, and returns true of false.
 //
 //    bool Choose(int N, int K, std::vector<int> & choices)
-//      Chooses K random entries from N possibilities and returns the selections in the choices vector.
+//      Chooses K random entries from N possibilities and returns the selections in the choices
+//      vector.
 //
 //    double GetRandNormal(const double mean, const double std)
 //    unsigned int GetRandPoisson(const double n, double p)
