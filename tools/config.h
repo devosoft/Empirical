@@ -13,20 +13,13 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <unordered_set>
 #include <vector>
 
 #include "string_utils.h"
 
 namespace emp {
 
-  // If EMP_CONFIG_FILE is set at compile time, the filename given will be used to define
-  // configuration options.  Otherwise "config_opts.h" must exist.
-#ifndef EMP_CONFIG_FILE
-#define EMP_CONFIG_FILE "config_opts.h"
-#endif
-  
-#define EMP_CONFIG_GROUP(NAME, DESC)
-  
   // Master configuration class.
   class cConfig {
   private:
@@ -36,6 +29,8 @@ namespace emp {
       std::string type;
       std::string default_val;
       std::string desc;
+
+      std::unordered_set<std::string> alias_set;
     public:
       cConfigEntry(const std::string _name, const std::string _type,
                    const std::string _d_val, const std::string _desc)
@@ -52,8 +47,12 @@ namespace emp {
       cConfigEntry & SetType(const std::string & _in) { type = _in; return *this; }
       cConfigEntry & SetDefault(const std::string & _in) { default_val = _in; return *this; }
       cConfigEntry & SetDescription(const std::string & _in) { desc = _in; return *this; }
+
+      cConfigEntry & AddAlias(const std::string & _in) { alias_set.insert(_in); return *this; }
+      bool HasAlias(const std::string & _in) { return alias_set.find(_in) != alias_set.end(); }
+      bool IsMatch(const std::string & _in) { return name == _in || HasAlias(_in); }
       
-      virtual std::string GetValue() = 0;
+      virtual std::string GetValue() const = 0;
       virtual cConfigEntry & SetValue(const std::string & in_val) = 0;
     };
     
@@ -68,9 +67,25 @@ namespace emp {
         : cConfigEntry(_name, _type, _d_val, _desc), entry_ref(_ref) { ; }
       ~tConfigEntry() { ; }
       
-      std::string GetValue() { std::stringstream ss; ss << entry_ref; return ss.str(); }
+      std::string GetValue() const { std::stringstream ss; ss << entry_ref; return ss.str(); }
       cConfigEntry & SetValue(const std::string & in_val) {
         std::stringstream ss; ss << in_val; ss >> entry_ref; return *this;
+      }
+    };
+    
+    // We need a special entry type to represent constant values.
+    template <class VAR_TYPE> class tConfigConstEntry : public cConfigEntry {
+    public:
+      tConfigConstEntry(const std::string _name, const std::string _type,
+                   const std::string _d_val, const std::string _desc)
+        : cConfigEntry(_name, _type, _d_val, _desc) { ; }
+      ~tConfigConstEntry() { ; }
+      
+      std::string GetValue() const { return default_val; }
+      cConfigEntry & SetValue(const std::string & in_val) {
+        std::cerr << "WARNING: Trying to dynamically set constant '" 
+                  << name << "'. Ignoring." << std::endl;
+        return *this;
       }
     };
     
@@ -85,7 +100,12 @@ namespace emp {
       { ; }
       ~cConfigGroup() { ; }
       
+      int GetSize() const { return (int) entry_set.size(); }
+      cConfigEntry * GetEntry(int id) { return entry_set[id]; }
+      cConfigEntry * GetLastEntry() { return entry_set.back(); }
+
       void Add(cConfigEntry * new_entry) { entry_set.push_back(new_entry); }
+
       void Save(std::ostream & out) {
         // Print header information with the group name.
         out << "### " << m_name << " ###" << std::endl;
@@ -128,27 +148,29 @@ namespace emp {
     std::string m_version_id;
     std::vector<cConfigGroup *> group_set;
     
-  public:
-    // Place all of the config variables here.
-#define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC) TYPE NAME;
-#include EMP_CONFIG_FILE
-#undef EMP_CONFIG_VAR
+    // Place all of the config private member variables here.
+#define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC) TYPE m_ ## NAME;
+#include "config_include.h"
     
+  public:
     cConfig(const std::string & in_version = "")
       : m_version_id(in_version)
         // Setup inital values for all variables.
-#define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC) , NAME(DEFAULT)
-#include EMP_CONFIG_FILE
-#undef EMP_CONFIG_VAR
+#define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC) , m_ ## NAME(DEFAULT)
+#include "config_include.h"
     { 
       group_set.push_back(new cConfigGroup("Default", "Default group"));
       
       // Build a map to information about each variable.
-#define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC)                       \
-      m_var_map[#NAME] = new tConfigEntry<TYPE>(#NAME, #TYPE, #DEFAULT, DESC, NAME); \
+#define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC)                                          \
+      m_var_map[#NAME] = new tConfigEntry<TYPE>(#NAME, #TYPE, #DEFAULT, DESC, m_ ## NAME); \
       group_set.back()->Add(m_var_map[#NAME]);
-#include EMP_CONFIG_FILE
-#undef EMP_CONFIG_VAR
+#define EMP_CONFIG_CONST(NAME, TYPE, VALUE, DESC)                                          \
+      m_var_map[#NAME] = new tConfigConstEntry<TYPE>(#NAME, #TYPE, #VALUE, DESC);          \
+      group_set.back()->Add(m_var_map[#NAME]);
+#define EMP_CONFIG_GROUP(NAME, DESC) \
+      group_set.push_back(new cConfigGroup(#NAME, #DESC));
+#include "config_include.h"
     }
     
     ~cConfig() {
@@ -173,19 +195,24 @@ namespace emp {
       out.close();
     }
     
-    // @CAO Don't think we need accessors anymore...
-    /*
-    // Build Get Accessors
-    #define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC) const TYPE & Get_ ## NAME() const { return NAME; }
-    #include EMP_CONFIG_FILE
-    #undef EMP_CONFIG_VAR
-    
-    // Build Set Accessors (doesn't use references, so could be faster...)
-    #define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC) cConfig & Set_ ## NAME(TYPE _in) { NAME = _in; return *this; }
-    #include EMP_CONFIG_FILE
-    #undef EMP_CONFIG_VAR
-    */
+    // Build Get and Set Accessors, as well as const check
+#define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC)                                 \
+    const TYPE & NAME() const { return m_ ## NAME; }                              \
+    const TYPE & NAME(const TYPE & _in) { m_ ## NAME = _in; return m_ ## NAME; }  \
+    bool NAME ## _is_const() const { return false; }
+#define EMP_CONFIG_CONST(NAME, TYPE, VALUE, DESC)                                 \
+    TYPE NAME() const { return VALUE; }                                           \
+    TYPE NAME(const TYPE & _in) {                                                 \
+      std::cerr << "WARNING: Trying to set const '" << #NAME                      \
+                << "'.  Ignoring." << std::endl;                                  \
+      return VALUE;                                                               \
+    }                                                                             \
+    bool NAME ## _is_const() const { return true; }
+#include "config_include.h"
 
+
+    // Build quick way to test if a variable is const.
+#include "config_include.h"
   };
 };
 

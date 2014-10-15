@@ -21,5 +21,10 @@
 //  allow broader optimizations in the code.
 
 EMP_CONFIG_GROUP(DEFAULT_GROUP, "General Settings")
-EMP_CONFIG_VAR(DEBUG_MODE, bool, false, "Should we output debug information?\nAnd what happens\n  ...if we have multiple\n    lines?")
+EMP_CONFIG_VAR(DEBUG_MODE, bool, false, "Should we output debug information?")
 EMP_CONFIG_VAR(RANDOM_SEED, int, 0, "Random number seed (0 for based on time)")
+
+EMP_CONFIG_GROUP(TEST_GROUP, "These are settings with the sole purpose of testing cConfig.\nFor example, are multi-line descriptions okay?")
+EMP_CONFIG_VAR(TEST_BOOL, bool, false, "This is a bool value.\nAnd what happens\n  ...if we have multiple\n    lines?")
+EMP_CONFIG_VAR(TEST_STRING, std::string, "default", "This is a string!")
+EMP_CONFIG_CONST(TEST_CONST, int, 91, "This is an unchanging const!")
