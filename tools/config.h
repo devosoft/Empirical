@@ -194,6 +194,33 @@ namespace emp {
       Save(out);
       out.close();
     }
+
+    // Read in from a text representation (typically a file) to set the state of cConfig.
+    // Return success state.
+    bool Load(std::istream & input) {
+      // Load in the file one line at a time and process each line.
+      std::string cur_line;
+
+      // Loop through the file until eof is hit (does this work for other streams?)
+      while (!input.eof()) {
+        std::getline(input, cur_line);
+        // cur_line.erase(cur_line.begin() + cur_line.find('#'), cur_line.end()); // Remove comments.
+        std::cout << cur_line << std::endl;
+        // @CAO CONTINUE HERE!
+      }
+      return true;
+    }
+
+    bool Load(std::string filename) {
+      std::ifstream in_file(filename);
+      if (in_file.fail()) {
+        std::cerr << "ERROR: Unable to open config file '" << filename << "'." << std::endl;
+        return false;
+      }
+      bool success = Load(in_file);
+      in_file.close();
+      return success;
+    }
     
     // Build Get and Set Accessors, as well as const check
 #define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC)                                 \
