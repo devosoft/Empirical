@@ -6,7 +6,19 @@
 //  This file defines a master configuration option cConfig, whose values can be loaded
 //  at runtime or else set as constant values throughout the code.
 //
-
+//  Assuming you have an emp::cConfig object called config, you can:
+//
+//  access a setting value:           config.SETTING_NAME()
+//  adjust a setting value:           config.SETTING_NAME(new_value)
+//  determine if a setting is locked: config.SETTING_NAME_is_const()
+//  lookup a setting dynamically:     config("SETTING_NAME")
+//  adjust a setting dynamically:     config("SETTING_NAME", "new_value")
+//
+//  load settings from a stream:      config.Read(stream);
+//  load settings from a file:        config.Read(filename);
+//  save settings to a stream:        config.Write(stream);
+//  save settings to a file:          config.Write(filename);
+//
 
 #include <map>
 #include <ostream>
@@ -83,8 +95,12 @@ namespace emp {
       
       std::string GetValue() const { return default_val; }
       cConfigEntry & SetValue(const std::string & in_val) {
-        std::cerr << "WARNING: Trying to dynamically set constant '" 
-                  << name << "'. Ignoring." << std::endl;
+        // This is a constant setting.  If we are actually trying to change it, give a warning.
+        if (in_val != GetValue()) {
+          std::cerr << "WARNING: Trying to adjust locked setting '" 
+                    << name << "' from '" << GetValue()
+                    << "' to '" << in_val << "'. Ignoring." << std::endl;
+        }
         return *this;
       }
     };
@@ -106,10 +122,16 @@ namespace emp {
 
       void Add(cConfigEntry * new_entry) { entry_set.push_back(new_entry); }
 
-      void Save(std::ostream & out) {
+      void Write(std::ostream & out) {
         // Print header information with the group name.
         out << "### " << m_name << " ###" << std::endl;
-        // @CAO Print group description.
+        // Print group description.
+        std::vector<std::string> desc_lines;
+        slice_string(m_desc, desc_lines);
+        for (int comment_line = 0; comment_line < (int) desc_lines.size(); comment_line++) {
+          out << "# " << desc_lines[comment_line] << std::endl;
+        }
+        out << std::endl;
         
         const int entry_count = entry_set.size();
         std::vector<std::string> setting_info(entry_count);
@@ -129,7 +151,7 @@ namespace emp {
 
           // Break the description up over multiple lines.
           std::vector<std::string> desc_lines;
-          slice_string(entry_set[i]->GetDescription(), desc_lines);
+          emp::slice_string(entry_set[i]->GetDescription(), desc_lines);
 
           int start_col = (int) setting_info[i].size();
           for (int comment_line = 0; comment_line < (int) desc_lines.size(); comment_line++) {
@@ -159,8 +181,6 @@ namespace emp {
 #define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC) , m_ ## NAME(DEFAULT)
 #include "config_include.h"
     { 
-      group_set.push_back(new cConfigGroup("Default", "Default group"));
-      
       // Build a map to information about each variable.
 #define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC)                                          \
       m_var_map[#NAME] = new tConfigEntry<TYPE>(#NAME, #TYPE, #DEFAULT, DESC, m_ ## NAME); \
@@ -169,7 +189,7 @@ namespace emp {
       m_var_map[#NAME] = new tConfigConstEntry<TYPE>(#NAME, #TYPE, #VALUE, DESC);          \
       group_set.back()->Add(m_var_map[#NAME]);
 #define EMP_CONFIG_GROUP(NAME, DESC) \
-      group_set.push_back(new cConfigGroup(#NAME, #DESC));
+      group_set.push_back(new cConfigGroup(#NAME, DESC));
 #include "config_include.h"
     }
     
@@ -178,57 +198,80 @@ namespace emp {
       ;
     }
 
+    std::string operator()(const std::string & setting_name) {
+      return m_var_map[setting_name]->GetValue();
+    }
+
+    cConfig & operator()(const std::string & setting_name, const std::string & new_value) {
+      m_var_map[setting_name]->SetValue(new_value);
+      return *this;
+    }
+
+    std::string Get(const std::string & setting_name) {
+      return m_var_map[setting_name]->GetValue();
+    }
+
+    cConfig & Set(const std::string & setting_name, const std::string & new_value) {
+      m_var_map[setting_name]->SetValue(new_value);
+      return *this;
+    }
+
     // Generate a text representation (typically a file) for the state of cConfig
-    void Save(std::ostream & out) {
+    void Write(std::ostream & out) {
       // @CAO Start by printing some header information.
       
       // Next print each group and it's information.
       for (auto it = group_set.begin(); it != group_set.end(); it++) {
-        (*it)->Save(out);
+        (*it)->Write(out);
       }
     }
     
-    // If a string is passed into Save, treat it as a filename.
-    void Save(std::string filename) {
+    // If a string is passed into Write, treat it as a filename.
+    void Write(std::string filename) {
       std::ofstream out(filename);
-      Save(out);
+      Write(out);
       out.close();
     }
 
     // Read in from a text representation (typically a file) to set the state of cConfig.
     // Return success state.
-    bool Load(std::istream & input) {
+    bool Read(std::istream & input) {
       // Load in the file one line at a time and process each line.
       std::string cur_line;
 
       // Loop through the file until eof is hit (does this work for other streams?)
       while (!input.eof()) {
-        std::getline(input, cur_line);
-        // cur_line.erase(cur_line.begin() + cur_line.find('#'), cur_line.end()); // Remove comments.
-        std::cout << cur_line << std::endl;
-        // @CAO CONTINUE HERE!
+        std::getline(input, cur_line);             // Get the current input line.
+        cur_line = emp::string_pop(cur_line, '#'); // Deal with commments.
+        emp::left_justify(cur_line);               // Clear out leading whitespace.
+        if (cur_line == "") continue;              // Skip empty lines.
+
+        std::string setting_name = emp::string_pop_word(cur_line);
+        emp::right_justify(cur_line);
+
+        Set(setting_name, cur_line);
       }
       return true;
     }
 
-    bool Load(std::string filename) {
+    bool Read(std::string filename) {
       std::ifstream in_file(filename);
       if (in_file.fail()) {
         std::cerr << "ERROR: Unable to open config file '" << filename << "'." << std::endl;
         return false;
       }
-      bool success = Load(in_file);
+      bool success = Read(in_file);
       in_file.close();
       return success;
     }
     
     // Build Get and Set Accessors, as well as const check
 #define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC)                                 \
-    const TYPE & NAME() const { return m_ ## NAME; }                              \
+    inline const TYPE & NAME() const { return m_ ## NAME; }                       \
     const TYPE & NAME(const TYPE & _in) { m_ ## NAME = _in; return m_ ## NAME; }  \
     bool NAME ## _is_const() const { return false; }
 #define EMP_CONFIG_CONST(NAME, TYPE, VALUE, DESC)                                 \
-    TYPE NAME() const { return VALUE; }                                           \
+    inline TYPE NAME() const { return VALUE; }                                    \
     TYPE NAME(const TYPE & _in) {                                                 \
       std::cerr << "WARNING: Trying to set const '" << #NAME                      \
                 << "'.  Ignoring." << std::endl;                                  \

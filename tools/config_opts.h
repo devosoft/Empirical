@@ -28,3 +28,4 @@ EMP_CONFIG_GROUP(TEST_GROUP, "These are settings with the sole purpose of testin
 EMP_CONFIG_VAR(TEST_BOOL, bool, false, "This is a bool value.\nAnd what happens\n  ...if we have multiple\n    lines?")
 EMP_CONFIG_VAR(TEST_STRING, std::string, "default", "This is a string!")
 EMP_CONFIG_CONST(TEST_CONST, int, 91, "This is an unchanging const!")
+EMP_CONFIG_VAR(TEST_STRING_SPACE, std::string, "abc def   ghi", "This is a string with spaces.")

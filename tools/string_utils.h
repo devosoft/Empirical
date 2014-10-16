@@ -31,26 +31,27 @@ namespace emp {
   }
 
   // Pop a segment from the beginning of a string as another string, shortening original.
-  std::string string_pop(std::string & in_string, std::size_t end_pos) {
+  std::string string_pop(std::string & in_string, std::size_t end_pos, int delim_size=0) {
     std::string out_string = "";
-    if (end_pos == std::string::npos) {
+    if (end_pos == 0);                        // Not popping anything!
+    else if (end_pos == std::string::npos) {  // Popping whole string.
       out_string = in_string;
       in_string = "";
     }
     else {
       out_string = in_string.substr(0, end_pos);  // Copy up to the deliminator for ouput
-      in_string.erase(0, end_pos+1);              // Delete output string AND deliminator
+      in_string.erase(0, end_pos + delim_size);   // Delete output string AND deliminator
     }
 
     return out_string;
   }
 
   std::string string_pop(std::string & in_string, const char delim) {
-    return string_pop(in_string, in_string.find(delim));
+    return string_pop(in_string, in_string.find(delim), 1);
   }
 
   std::string string_pop(std::string & in_string, const std::string & delim_set) {
-    return string_pop(in_string, in_string.find_first_of(delim_set));
+    return string_pop(in_string, in_string.find_first_of(delim_set), 1);
   }
 
   std::string string_pop_word(std::string & in_string) {
