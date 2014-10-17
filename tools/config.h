@@ -104,7 +104,20 @@ namespace emp {
         return *this;
       }
     };
-    
+
+    // A special entry for settings created during the run (only accissibly dynamically)
+    class cConfigLiveEntry : public cConfigEntry {
+    public:
+      cConfigLiveEntry(const std::string _name, const std::string _type,
+                       const std::string _d_val, const std::string _desc)
+        : cConfigEntry(_name, _type, _d_val, _desc) { ; }
+      ~cConfigLiveEntry() { ; }
+      
+      std::string GetValue() const { return default_val; }
+      cConfigEntry & SetValue(const std::string & in_val) { default_val = in_val; return *this; }
+    };
+      
+    // Entrys should be divided into groups
     class cConfigGroup {
     private:
       std::string m_name;
@@ -194,31 +207,42 @@ namespace emp {
     }
     
     ~cConfig() {
-      // @CAO Delete all entries in the var_map
-      ;
-    }
-
-    std::string operator()(const std::string & setting_name) {
-      return m_var_map[setting_name]->GetValue();
-    }
-
-    cConfig & operator()(const std::string & setting_name, const std::string & new_value) {
-      m_var_map[setting_name]->SetValue(new_value);
-      return *this;
+      // Delete all entries in the var_map
+      for (auto it = m_var_map.begin(); it != m_var_map.end(); it++) {
+        delete it->second;
+      }
     }
 
     std::string Get(const std::string & setting_name) {
+      if (m_var_map.find(setting_name) == m_var_map.end()) {
+        // This setting is not currently in the map!
+        // @CAO Print warning?
+        return "";
+      }
       return m_var_map[setting_name]->GetValue();
     }
 
-    cConfig & Set(const std::string & setting_name, const std::string & new_value) {
+    cConfig & Set(const std::string & setting_name, const std::string & new_value,
+                  const std::string & in_desc="") {
+      if (m_var_map.find(setting_name) == m_var_map.end()) {
+        // This setting is not currently in the map!  We should put it in.
+        m_var_map[setting_name] =
+          new cConfigLiveEntry(setting_name, "std::string", new_value, in_desc);
+        group_set.back()->Add(m_var_map[setting_name]);
+      }
       m_var_map[setting_name]->SetValue(new_value);
       return *this;
+    }
+
+    std::string operator()(const std::string & setting_name) { return Get(setting_name); }
+
+    cConfig & operator()(const std::string & setting_name, const std::string & new_value) {      
+      return Set(setting_name, new_value);
     }
 
     // Generate a text representation (typically a file) for the state of cConfig
     void Write(std::ostream & out) {
-      // @CAO Start by printing some header information.
+      // @CAO Start by printing some header information?
       
       // Next print each group and it's information.
       for (auto it = group_set.begin(); it != group_set.end(); it++) {
