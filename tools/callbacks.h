@@ -7,6 +7,7 @@
 //
 //  Classes:
 //  emp::Callback - abstract base class that defines a few key methods:
+//    operator() - allows for a callback without any arguments
 //    DoCallback(int *) - allows for a generic callback with a pointer as an argument.
 //    IsDisposible() - Should this callback be deleted automatically after a single use?
 //    SetDisposible() - Mark a callback as being disposible.
@@ -21,11 +22,12 @@
 namespace emp {
   class Callback {
   private:
-    bool is_disposible;
+    bool is_disposible;  // Can this callback be deleted immediately after use?
   public:
     Callback() : is_disposible(false) { ; }
     virtual ~Callback() { ; }
     
+    // virtual void operator() = 0;
     virtual void DoCallback(int * arg_ptr=NULL) = 0;
     
     bool IsDisposible() const { return is_disposible; }
@@ -33,6 +35,27 @@ namespace emp {
     void SetDisposible(bool _in=true) { is_disposible = _in; }
   };
   
+
+//   template<typename Arg1, typename... Args>
+//   int func(const Arg1& arg1, const Args&... args)
+//   {
+//     process( arg1 );
+//     func(args...); // note: arg1 does not appear here!
+//   };
+
+  template <typename RETURN, typename... Args> class FunctionCallback : public Callback {
+  private:
+    RETURN (*function_ptr)(Args...);
+      public:
+    FunctionCallback(RETURN (*_fun_ptr)(Args...))
+      : function_ptr(_fun_ptr)
+    { ; } 
+    ~FunctionCallback() { ; }
+
+    void DoCallback(int * arg_ptr) { ; }
+  
+    RETURN operator()(Args... args) { return function_ptr(args...); }
+};
   
   template <class T> class MethodCallback : public Callback {
   private:
@@ -45,6 +68,7 @@ namespace emp {
     { ; }
     ~MethodCallback() { ; }
     
+    // void operator()() { (target->*(method_ptr))(); }
     void DoCallback(int * arg_ptr) { (void) arg_ptr; (target->*(method_ptr))(); }
   };
   
@@ -112,8 +136,8 @@ namespace emp {
 
 extern "C" void empJSDoCallback(int cb_ptr, int arg_ptr)
 {
-  emp::Callback * const cb_obj = (emp::Callback *) cb_ptr;
-  cb_obj->DoCallback((int *) arg_ptr);
+  emp::Callback * const cb_obj = (emp::Callback *) (long long) cb_ptr;
+  cb_obj->DoCallback((int *) (long long) arg_ptr);
   
   if (cb_obj->IsDisposible()) {
     delete cb_obj;
