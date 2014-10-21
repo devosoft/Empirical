@@ -1,6 +1,8 @@
 #ifndef EMP_CALLBACKS_H
 #define EMP_CALLBACKS_H
 
+#include <tuple>
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  A set of callback objects (functors) to manage interactions across subsystems 
@@ -36,15 +38,11 @@ namespace emp {
   };
   
 
-//   template<typename Arg1, typename... Args>
-//   int func(const Arg1& arg1, const Args&... args)
-//   {
-//     process( arg1 );
-//     func(args...); // note: arg1 does not appear here!
-//   };
-
   template <typename RETURN, typename... Args> class FunctionCallback : public Callback {
   private:
+    std::tuple<Args...> default_args;
+
+  public:
     RETURN (*function_ptr)(Args...);
       public:
     FunctionCallback(RETURN (*_fun_ptr)(Args...))
@@ -52,7 +50,10 @@ namespace emp {
     { ; } 
     ~FunctionCallback() { ; }
 
-    void DoCallback(int * arg_ptr) { ; }
+    void DoCallback(int * arg_ptr) {
+      // For the moment, ignore arg_ptr
+      // function_ptr(default_args);
+    }
   
     RETURN operator()(Args... args) { return function_ptr(args...); }
 };
