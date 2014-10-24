@@ -22,6 +22,9 @@ namespace emp {
     const Point & GetCenter() const { return center; }
     double GetRadius() const { return radius; }
 
+    Circle & SetCenter(const Point & new_center) { center = new_center; return *this; }
+    Circle & SetRadius(int new_radius) { radius = new_radius; return *this; }
+
     bool HasOverlap(const Circle & other) const {
       const double min_dist = radius + other.radius;
       return center.SquareDistance(other.center) < min_dist * min_dist;
