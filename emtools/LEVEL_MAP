@@ -1,0 +1,4 @@
+The emtools/ directory depends on tools/, but not in the other direction
+
+== Level 0 (no dependencies outside of tools/) ==
+functions.h (includes ../tools/callbacks.h)

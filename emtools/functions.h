@@ -1,7 +1,7 @@
 #ifndef EMP_FUNCTIONS_H
 #define EMP_FUNCTIONS_H
 
-#include "callbacks.h"
+#include "../tools/callbacks.h"
 
 namespace emp {
 

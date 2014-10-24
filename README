@@ -3,6 +3,7 @@ A library of tools for scientific software development, with emphasis on also be
 (planned) Directory structure:
 
 tools/    - Basic tools that are generally useful for scientific software.
+physics/  - Basic physics-based tools for implementing simple virtual worlds
 emtools/  - Basic tools that make use of being compiled with emscripten.
 kinetic/  - A C++ wrapper for KineticJS, (requires Emscripten.)
 kintools/ - Tools that build off of KineticJS.

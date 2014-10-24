@@ -9,4 +9,3 @@ string_utils.h
 == Level 1 ==
 Circle.h (includes Point.h)
 confg.h (includes string_utils.h ; also requires config_utils.h and config_opts.h as sub-components)
-functions.h (includes callbacks.h)
