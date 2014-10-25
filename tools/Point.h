@@ -30,9 +30,9 @@ namespace emp {
 
     // Determine a new point, but don't change this one
     Point GetMidpoint(const Point & p2) const { return Point((x+p2.x)/2, (y+p2.y)/2); }
-    Point & GetRot90() const { return Point(y, -x); }
-    Point & GetRot180() const { return Point(-x, -y); }
-    Point & GetRot270() const { return Point(-y, x); }
+    Point GetRot90() const { return Point(y, -x); }
+    Point GetRot180() const { return Point(-x, -y); }
+    Point GetRot270() const { return Point(-y, x); }
 
     Point operator+(const Point & _in) const { return Point(x + _in.x , y + _in.y); }
     Point operator-(const Point & _in) const { return Point(x - _in.x , y - _in.y); }
@@ -48,7 +48,7 @@ namespace emp {
     Point & operator+=(const Point & _in) { x += _in.x; y += _in.y; return *this; }
     Point & operator-=(const Point & _in) { x -= _in.x; y -= _in.y; return *this; }
     Point & operator*=(double mult) { x *= mult; y *= mult; return *this; }
-    Point & operator/=(double mult) { x /= div;  y /= div; return *this; }
+    Point & operator/=(double val) { if (val != 0.0) { x /= val;  y /= val; }; return *this; }
 
     Point & Rot90() { return Set(y, -x); }
     Point & Rot180() { return Set(-x, -y); }
@@ -62,7 +62,7 @@ namespace emp {
       return x_dist*x_dist + y_dist*y_dist;
     }
 
-    double Distance(const Point & _in) { return sqrt( SquareDisatance(_in) ); }
+    double Distance(const Point & _in) { return sqrt( SquareDistance(_in) ); }
   };
 
 };

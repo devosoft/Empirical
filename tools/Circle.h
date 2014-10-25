@@ -29,7 +29,7 @@ namespace emp {
       const double min_dist = radius + other.radius;
       return center.SquareDistance(other.center) < min_dist * min_dist;
     }
-  }
+  };
 };
 
 #endif
