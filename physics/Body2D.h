@@ -23,8 +23,8 @@ namespace emp {
 
   template <typename BODY_INFO> class CircleBody2D {
   private:
-    Circle perimeter;
-    BODY_INFO * info;
+    Circle perimeter;                                       // Includes position and size.
+    BODY_INFO * info;                                       // External information about individual
     Sector2D<CircleBody2D<BODY_INFO>, BODY_INFO> * sector;  // What sector is this body in?
   public:
     CircleBody2D(const Circle & _p, BODY_INFO * _i) : perimeter(_p), info(_i) { ; }
@@ -37,6 +37,10 @@ namespace emp {
     Sector2D<CircleBody2D<BODY_INFO>, BODY_INFO> * GetSector() { return sector; }
 
     CircleBody2D<BODY_INFO> & MoveTo(const Point & new_pos) { perimeter.SetCenter(new_pos); return *this; }
+    CircleBody2D<BODY_INFO> & SetSector(Sector2D<CircleBody2D<BODY_INFO>, BODY_INFO> * new_sector) {
+      sector = new_sector;
+      return *this;
+    }
   };
 
 };

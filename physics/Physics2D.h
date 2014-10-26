@@ -17,14 +17,17 @@ namespace emp {
 
   template <typename BODY_TYPE, typename BODY_INFO> class Physics2D {
   private:
-    Surface2D<BODY_TYPE, BODY_INFO> surface;
+    Surface2D<BODY_TYPE, BODY_INFO> passive_surface; // Contains bodies only external acted upon
+    Surface2D<BODY_TYPE, BODY_INFO> active_surface;  // Contains bodies that can initate actions
 
   public:
     Physics2D(double width, double height, double max_org_diameter=1.0) 
-      : surface(width, height, width / max_org_diameter, height / max_org_diameter)
+      : passive_surface(width, height, width / max_org_diameter, height / max_org_diameter)
+      , active_surface(width, height, width / max_org_diameter, height / max_org_diameter)
     { ; }
     ~Physics2D() { ; }
 
+    Physics2D & AddActiveBody(BODY_TYPE * in_body) { active_surface.AddBody(in_body); return *this; }
   };
 
 };
