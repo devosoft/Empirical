@@ -1,12 +1,12 @@
-#ifndef EMP_CIRCLE_H
-#define EMP_CIRCLE_H
+#ifndef EMP_CIRCLE_2D_H
+#define EMP_CIRCLE_2D_H
 
 ////////////////////////////////////////////////////////////////
 //
 //  A class to manage circles in a 2D plane.
 //
 
-#include "Point.h"
+#include "Point2D.h"
 
 namespace emp {
 

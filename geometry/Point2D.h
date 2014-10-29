@@ -1,5 +1,5 @@
-#ifndef EMP_POINT_H
-#define EMP_POINT_H
+#ifndef EMP_POINT_2D_H
+#define EMP_POINT_2D_H
 
 #include <cmath>
 
