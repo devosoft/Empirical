@@ -1,0 +1,15 @@
+== Level 0 (No dependencies) ==
+Angle2D.h  (../tools/const.h>
+Point2D.h
+
+== Level 1 ==
+Circle2D.h (includes Point.h)
+
+== Level 2 ==
+Body2D.h (include Circle2D.h)
+
+== Level 3 ==
+Surface2D.h (include Body2D.h)
+
+== Level 4 ==
+Physics2D.h (include Surface2D.h)
