@@ -15,13 +15,13 @@
 
 namespace emp {
 
-  template <typename BODY_TYPE, typename BODY_INFO> class Physics2D {
+  template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE> class Physics2D {
   private:
-    Surface2D<BODY_TYPE, BODY_INFO> passive_surface; // Contains bodies only external acted upon
-    Surface2D<BODY_TYPE, BODY_INFO> active_surface;  // Contains bodies that can initate actions
+    Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> passive_surface; // Contains bodies only external acted upon
+    Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> active_surface;  // Contains bodies that can initate actions
 
   public:
-    Physics2D(double width, double height, double max_org_diameter=1.0) 
+    Physics2D(BASE_TYPE width, BASE_TYPE height, BASE_TYPE max_org_diameter=100) 
       : passive_surface(width, height, width / max_org_diameter, height / max_org_diameter)
       , active_surface(width, height, width / max_org_diameter, height / max_org_diameter)
     { ; }

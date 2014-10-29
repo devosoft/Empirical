@@ -19,25 +19,29 @@
 
 namespace emp {
 
-  template <typename BODY_TYPE, typename BODY_INFO> class Sector2D;
+  template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE> class Sector2D;
 
-  template <typename BODY_INFO> class CircleBody2D {
+  template <typename BODY_INFO, typename BASE_TYPE> class CircleBody2D {
   private:
-    Circle perimeter;                                       // Includes position and size.
-    BODY_INFO * info;                                       // External information about individual
-    Sector2D<CircleBody2D<BODY_INFO>, BODY_INFO> * sector;  // What sector is this body in?
+    Circle<BASE_TYPE> perimeter;     // Includes position and size.
+    BODY_INFO * info;                // External information about individual
+    Sector2D<CircleBody2D<BODY_INFO, BASE_TYPE>, BODY_INFO, BASE_TYPE> * sector;  // Track location
   public:
-    CircleBody2D(const Circle & _p, BODY_INFO * _i) : perimeter(_p), info(_i) { ; }
+    CircleBody2D(const Circle<BASE_TYPE> & _p, BODY_INFO * _i) : perimeter(_p), info(_i) { ; }
     ~CircleBody2D() { ; }
 
-    const Circle & GetPerimeter() const { return perimeter; }
-    const Point & GetAnchor() const { return perimeter.GetCenter(); }
-    const Point & GetCenter() const { return perimeter.GetCenter(); }
+    const Circle<BASE_TYPE> & GetPerimeter() const { return perimeter; }
+    const Point<BASE_TYPE> & GetAnchor() const { return perimeter.GetCenter(); }
+    const Point<BASE_TYPE> & GetCenter() const { return perimeter.GetCenter(); }
     BODY_INFO * GetInfo() { return info; }
-    Sector2D<CircleBody2D<BODY_INFO>, BODY_INFO> * GetSector() { return sector; }
+    Sector2D<CircleBody2D<BODY_INFO, BASE_TYPE>, BODY_INFO, BASE_TYPE> * GetSector() { return sector; }
 
-    CircleBody2D<BODY_INFO> & MoveTo(const Point & new_pos) { perimeter.SetCenter(new_pos); return *this; }
-    CircleBody2D<BODY_INFO> & SetSector(Sector2D<CircleBody2D<BODY_INFO>, BODY_INFO> * new_sector) {
+    CircleBody2D<BODY_INFO, BASE_TYPE> & MoveTo(const Point<BASE_TYPE> & new_pos) {
+      perimeter.SetCenter(new_pos); 
+      return *this;
+    }
+    CircleBody2D<BODY_INFO, BASE_TYPE> &
+    SetSector(Sector2D<CircleBody2D<BODY_INFO, BASE_TYPE>, BODY_INFO, BASE_TYPE> * new_sector) {
       sector = new_sector;
       return *this;
     }

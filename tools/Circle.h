@@ -10,24 +10,24 @@
 
 namespace emp {
 
-  class Circle {
+  template <typename TYPE> class Circle {
   private:
-    Point center;
-    double radius;
+    Point<TYPE> center;
+    TYPE radius;
 
   public:
-    Circle(const Point & _c, double _r=0.0) : center(_c), radius(_r) { ; }
-    Circle(double _r=0.0) : center(0.0, 0.0), radius(_r) { ; }
+    Circle(const Point<TYPE> & _c, TYPE _r=0) : center(_c), radius(_r) { ; }
+    Circle(TYPE _r=0) : center(0.0, 0.0), radius(_r) { ; }
 
-    const Point & GetCenter() const { return center; }
-    double GetRadius() const { return radius; }
+    const Point<TYPE> & GetCenter() const { return center; }
+    TYPE GetRadius() const { return radius; }
 
-    Circle & SetCenter(const Point & new_center) { center = new_center; return *this; }
-    Circle & SetRadius(int new_radius) { radius = new_radius; return *this; }
+    Circle<TYPE> & SetCenter(const Point<TYPE> & new_center) { center = new_center; return *this; }
+    Circle<TYPE> & SetRadius(TYPE new_radius) { radius = new_radius; return *this; }
 
-    bool HasOverlap(const Circle & other) const {
-      const double min_dist = radius + other.radius;
-      return center.SquareDistance(other.center) < min_dist * min_dist;
+    bool HasOverlap(const Circle<TYPE> & other) const {
+      const TYPE min_dist = radius + other.radius;
+      return center.SquareDistance(other.center) < (min_dist * min_dist);
     }
   };
 };
