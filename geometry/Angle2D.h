@@ -12,7 +12,8 @@
 
 #include <cmath>
 
-#include "const.h"
+#include "../tools/const.h"
+#include "Point2D.h"
 
 namespace emp {
 
@@ -80,10 +81,10 @@ namespace emp {
 
     Angle operator+(const Angle & _in) const { return Angle(angle + _in.angle, true); }
     Angle operator-(const Angle & _in) const { return Angle(angle - _in.angle, true); }
-    Angle operator*(double _in)          const { return Angle(angle * _in, true); }
-    Angle operator*(int _in)             const { return Angle(angle * _in, true); }
-    Angle operator/(double _in)          const { return Angle(angle / _in, true); }
-    Angle operator/(int _in)             const { return Angle(angle / _in, true); }
+    Angle operator*(double _in)        const { return Angle(angle * _in, true); }
+    Angle operator*(int _in)           const { return Angle(angle * _in, true); }
+    Angle operator/(double _in)        const { return Angle(angle / _in, true); }
+    Angle operator/(int _in)           const { return Angle(angle / _in, true); }
 
     Angle & operator+=(const Angle & _in) { angle += _in.angle; return *this; }
     Angle & operator-=(const Angle & _in) { angle -= _in.angle; return *this; }
@@ -94,7 +95,11 @@ namespace emp {
 
     double Sin() const { return sin(AsRadians()); } 
     double Cos() const { return cos(AsRadians()); } 
-    double Tan() const { return tan(AsRadians()); } 
+    double Tan() const { return tan(AsRadians()); }
+
+    template <typename BASE_TYPE> Point<BASE_TYPE> GetPoint(BASE_TYPE distance) const {
+      return Point<BASE_TYPE>(Sin() * distance, Cos() * distance);
+    }
   }
 
 };

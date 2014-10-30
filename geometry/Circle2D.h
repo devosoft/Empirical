@@ -23,7 +23,11 @@ namespace emp {
     TYPE GetRadius() const { return radius; }
 
     Circle<TYPE> & SetCenter(const Point<TYPE> & new_center) { center = new_center; return *this; }
+    Circle<TYPE> & SetCenterX(TYPE new_x) { center.SetX(new_x); return *this; }
+    Circle<TYPE> & SetCenterY(TYPE new_y) { center.SetY(new_y); return *this; }
     Circle<TYPE> & SetRadius(TYPE new_radius) { radius = new_radius; return *this; }
+
+    Circle<TYPE> & Translate(Point<TYPE> shift) { center += shift; return *this; }
 
     bool HasOverlap(const Circle<TYPE> & other) const {
       const TYPE min_dist = radius + other.radius;

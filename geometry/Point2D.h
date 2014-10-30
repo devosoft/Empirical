@@ -14,11 +14,17 @@ namespace emp {
   private:
     TYPE x;
     TYPE y;
+    // @CAO store magnitude?  Lazy eval?
 
   public:
+    Point() : x(0.0), y(0.0) { ; }                      // Default = 0,0
     Point(const Point & _in) : x(_in.x), y(_in.y) { ; } // Copy constructor
     Point(TYPE _x, TYPE _y) : x(_x), y(_y) { ; }        // Two ints -> x and y
-    Point() : x(0.0), y(0.0) { ; }                      // Default = 0,0
+    Point(const Point & _in, TYPE new_magnitude) {
+      const double mag_shift = ((double) new_magnitude) / ((double) _in.Magnitude());
+      x = _in.x * mag_shift;
+      y = _in.y * mag_shift;
+    }
     ~Point() { ; }
 
     const Point & operator=(const Point & _in) { x = _in.x; y = _in.y; return *this; }
@@ -27,6 +33,8 @@ namespace emp {
     inline TYPE GetY() const { return y; }
 
     double Magnitude() const { return sqrt( x*x + y*y ); }
+    bool AtOrigin() { return x == 0 && y == 0; }
+    bool NonZero() { return x != 0 || y != 0; }
 
     // Determine a new point, but don't change this one
     Point GetMidpoint(const Point & p2) const { return Point((x+p2.x)/2, (y+p2.y)/2); }
@@ -46,7 +54,10 @@ namespace emp {
     Point & Translate(TYPE shift_x, TYPE shift_y) { x += shift_x; y += shift_y; return *this; }
     Point & TranslateX(TYPE shift) { x += shift; return *this; }
     Point & TranslateY(TYPE shift) { y += shift; return *this; }
-
+    Point & ToOrigin() { x = 0; y = 0; return *this; }
+    Point & NegateX() { x = -x; return *this; }
+    Point & NegateY() { y = -y; return *this; }
+    
     Point & operator+=(const Point & _in) { x += _in.x; y += _in.y; return *this; }
     Point & operator-=(const Point & _in) { x -= _in.x; y -= _in.y; return *this; }
     Point & operator*=(double mult) { x *= mult; y *= mult; return *this; }

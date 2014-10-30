@@ -1,0 +1,4 @@
+-= Optimizations to Explore =-
+
+* Angle can have a lookup table for Sin, Cos, and Tan.
+  In many cases it can even be low-resolution using only a single byte to reprent angle.
