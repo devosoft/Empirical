@@ -15,6 +15,7 @@
 //    CircleBody2D - One individual circular object in the 2D world.
 //
 
+#include "Angle2D.h"
 #include "Circle2D.h"
 
 namespace emp {
@@ -50,6 +51,12 @@ namespace emp {
       perimeter.SetCenter(new_pos); 
       return *this;
     }
+    
+    CircleBody2D<BODY_INFO, BASE_TYPE> & SetRadius(BASE_TYPE new_radius) {
+      perimeter.SetRadius(new_radius); 
+      return *this;
+    }
+    
     CircleBody2D<BODY_INFO, BASE_TYPE> &
     SetSector(Sector2D<CircleBody2D<BODY_INFO, BASE_TYPE>, BODY_INFO, BASE_TYPE> * new_sector) {
       sector = new_sector;
@@ -57,8 +64,8 @@ namespace emp {
     }
 
     CircleBody2D<BODY_INFO, BASE_TYPE> & BodyUpdate(BASE_TYPE grow_factor=1) {
-      if ((int) grow_radius > (int) radius) radius += grow_factor;
-      else if ((int) grow_radius < (int) radius) radius -= grow_factor;
+      if ((int) target_radius > (int) GetRadius()) SetRadius(GetRadius() + grow_factor);
+      else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - grow_factor);
       return *this;
     }
 
