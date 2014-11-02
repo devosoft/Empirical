@@ -1,5 +1,5 @@
-#ifndef EMP_FUNCTIONS_H
-#define EMP_FUNCTIONS_H
+#ifndef EMP_EM_FUNCTIONS_H
+#define EMP_EM_FUNCTIONS_H
 
 #include "../tools/callbacks.h"
 
