@@ -1,4 +1,16 @@
--= Optimizations to Explore =-
+-= Next Steps =-
+Get Kinetic working, ported from KinEmAtic
+Build a viewport for a Surface2D object
 
-* Angle can have a lookup table for Sin, Cos, and Tan.
-  In many cases it can even be low-resolution using only a single byte to reprent angle.
+
+-= Near Future =-
+Build a test system
+Move scheduler over to Empirical
+
+
+-= Optimizations to Explore =-
+Explore if quick-looking up for sin, cos, tan should be at higher resolution (no it's 256 entires).
+
+
+-= Other TODOs =-
+Come up with a cleaner method to time functions?  Current macro is pretty ugly.
