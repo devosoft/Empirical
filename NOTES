@@ -14,3 +14,11 @@ Explore if quick-looking up for sin, cos, tan should be at higher resolution (no
 
 -= Other TODOs =-
 Come up with a cleaner method to time functions?  Current macro is pretty ugly.
+
+
+-= Useful Tools =-
+A simple-to-modify and fast phenotype object
+A genotype manager (for organisms with identical genomes)
+A phenotype summary to include in the genotype
+A phylogeny/lineage manager with multiple modes of purgeing (and link to phenotypes?)
+A clade manager that will mark into phenotypes which clade they are
