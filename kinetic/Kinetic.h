@@ -7,14 +7,14 @@
 #include <string>
 #include <vector>
 
-#include "../tools/assert.h"
-#include "../tools/callbacks.h"
-#include "../tools/Point.h"
+#include "tools/callbacks.h"
+#include "geometry/Point2D.h"
 
-#include "../emtools/emfunctions.h"
-#include "../emtools/Color.h"
-#include "../emtools/Font.h"
-#include "../emtools/RawImage.h"
+#include "emtools/assert.h"
+#include "emtools/emfunctions.h"
+#include "emtools/Color.h"
+#include "emtools/Font.h"
+#include "emtools/RawImage.h"
 
 extern "C" {
   extern int EMP_Tween_Build(int target_id, double seconds);
@@ -63,18 +63,18 @@ namespace emp {
     // Retrieve info from JS Kinetic::Node objects
     int GetX() const { return EM_ASM_INT({return emp_info.objs[$0].x();}, obj_id); }
     int GetY() const { return EM_ASM_INT({return emp_info.objs[$0].y();}, obj_id); }
-    Point<int> GetPos() const { return Point(GetX(), GetY()); }
+    Point<int> GetPos() const { return Point<int>(GetX(), GetY()); }
     int GetWidth() const { return EM_ASM_INT({return emp_info.objs[$0].width();}, obj_id); }
     int GetHeight() const { return EM_ASM_INT({return emp_info.objs[$0].height();}, obj_id); }
-    Point<int> GetUL(int x_offset=0, int y_offset=0) const { return Point(GetX()+x_offset,              GetY()+y_offset); }
-    Point<int> GetUM(int x_offset=0, int y_offset=0) const { return Point(GetX()+GetWidth()/2+x_offset, GetY()+y_offset); }
-    Point<int> GetUR(int x_offset=0, int y_offset=0) const { return Point(GetX()+GetWidth()+x_offset,   GetY()+y_offset); }
-    Point<int> GetML(int x_offset=0, int y_offset=0) const { return Point(GetX()+x_offset,              GetY()+GetHeight()/2+y_offset); }
-    Point<int> GetMM(int x_offset=0, int y_offset=0) const { return Point(GetX()+GetWidth()/2+x_offset, GetY()+GetHeight()/2+y_offset); }
-    Point<int> GetMR(int x_offset=0, int y_offset=0) const { return Point(GetX()+GetWidth()+x_offset,   GetY()+GetHeight()/2+y_offset); }
-    Point<int> GetLL(int x_offset=0, int y_offset=0) const { return Point(GetX()+x_offset,              GetY()+GetHeight()+y_offset); }
-    Point<int> GetLM(int x_offset=0, int y_offset=0) const { return Point(GetX()+GetWidth()/2+x_offset, GetY()+GetHeight()+y_offset); }
-    Point<int> GetLR(int x_offset=0, int y_offset=0) const { return Point(GetX()+GetWidth()+x_offset,   GetY()+GetHeight()+y_offset); }
+    Point<int> GetUL(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+x_offset,              GetY()+y_offset); }
+    Point<int> GetUM(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+GetWidth()/2+x_offset, GetY()+y_offset); }
+    Point<int> GetUR(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+GetWidth()+x_offset,   GetY()+y_offset); }
+    Point<int> GetML(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+x_offset,              GetY()+GetHeight()/2+y_offset); }
+    Point<int> GetMM(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+GetWidth()/2+x_offset, GetY()+GetHeight()/2+y_offset); }
+    Point<int> GetMR(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+GetWidth()+x_offset,   GetY()+GetHeight()/2+y_offset); }
+    Point<int> GetLL(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+x_offset,              GetY()+GetHeight()+y_offset); }
+    Point<int> GetLM(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+GetWidth()/2+x_offset, GetY()+GetHeight()+y_offset); }
+    Point<int> GetLR(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+GetWidth()+x_offset,   GetY()+GetHeight()+y_offset); }
     Point<int> GetCenter(int x_offset=0, int y_offset=0) const { return GetMM(x_offset, y_offset); }
     bool GetVisible() const { return EM_ASM_INT({return emp_info.objs[$0].visible();}, obj_id); }
     double GetOpacity() const { return EM_ASM_DOUBLE({return emp_info.objs[$0].opacity();}, obj_id); }
@@ -199,7 +199,7 @@ namespace emp {
       settings_id = EMP_Tween_Clone(_in.settings_id);
       obj_id = settings_id + 1;
     }
-    ~Tween() {
+    virtual ~Tween() {
       EM_ASM_ARGS({
           if ($0 >= 0) delete emp_info.objs[$0];  // Remove the tween settings from memory.
       }, settings_id);
@@ -301,7 +301,9 @@ namespace emp {
       raw_image.AddLoadCallback(this, &Image::ImageLoaded);
     }
 
-    virtual std::string GetType() const { return "empImage"; }
+    virtual ~Image() { ; }
+
+    std::string GetType() const { return "empImage"; }
     
     int GetX() const { return x; }
     int GetY() const { return y; }
@@ -309,10 +311,10 @@ namespace emp {
     int GetHeight() const { return height; }
     double GetScaleX() const { return scale_x; }
     double GetScaleY() const { return scale_y; }
-    Point<int> GetUL(int x_offset=0, int y_offset=0) const { return Point(GetX()+x_offset, GetY()+y_offset); }
-    Point<int> GetUR(int x_offset=0, int y_offset=0) const { return Point(GetX()+GetWidth()+x_offset, GetY()+y_offset); }
-    Point<int> GetLR(int x_offset=0, int y_offset=0) const { return Point(GetX()+GetWidth()+x_offset, GetY()+GetHeight()+y_offset); }
-    Point<int> GetLL(int x_offset=0, int y_offset=0) const { return Point(GetX()+x_offset, GetY()+GetHeight()+y_offset); }
+    Point<int> GetUL(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+x_offset, GetY()+y_offset); }
+    Point<int> GetUR(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+GetWidth()+x_offset, GetY()+y_offset); }
+    Point<int> GetLR(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+GetWidth()+x_offset, GetY()+GetHeight()+y_offset); }
+    Point<int> GetLL(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+x_offset, GetY()+GetHeight()+y_offset); }
     const RawImage & GetRawImage() const { return raw_image; }
 
     bool HasLoaded() const { return raw_image.HasLoaded(); }
@@ -678,9 +680,9 @@ namespace emp {
           return obj_id;                                       // Return the Kinetic object id.
       });
     }
-    ~Layer() { ; }
+    virtual ~Layer() { ; }
     
-    virtual std::string GetType() const { return "empLayer"; }
+    std::string GetType() const { return "empLayer"; }
 
     Layer & Add(Shape & _obj) {
       _obj.SetLayer(this);    // Track what layer this shape is in.
@@ -743,9 +745,9 @@ namespace emp {
       // If we are lockig the aspect ratio, determine it now!
       if (lock_aspect) aspect_ratio = ((double) scaled_width) / (double) scaled_height;
     }
-    ~Stage() { ; }
+    virtual ~Stage() { ; }
 
-    virtual std::string GetType() const { return "empStage"; }
+    std::string GetType() const { return "empStage"; }
 
     // Sizing
     int GetScaledWidth() const { return scaled_width; }

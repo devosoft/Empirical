@@ -4,7 +4,7 @@
 #include <string>
 #include <sstream>
 
-#include "Colors.h"
+#include "Color.h"
 
 namespace emp {
   class Font {
