@@ -16,6 +16,11 @@ Explore if quick-looking up for sin, cos, tan should be at higher resolution (no
 Come up with a cleaner method to time functions?  Current macro is pretty ugly.
 
 
+-= Improvements =-
+Config: Should be able to output its own config header.
+Config: Build links into variable setting to trigger function calls
+
+
 -= Useful Tools =-
 A simple-to-modify and fast phenotype object
 A genotype manager (for organisms with identical genomes)

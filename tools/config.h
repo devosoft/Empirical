@@ -304,9 +304,6 @@ namespace emp {
     bool NAME ## _is_const() const { return true; }
 #include "config_include.h"
 
-
-    // Build quick way to test if a variable is const.
-#include "config_include.h"
   };
 };
 
