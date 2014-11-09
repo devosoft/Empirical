@@ -1,5 +1,5 @@
-#ifndef EMK_GRID_H
-#define EMK_GRID_H
+#ifndef EMP_GRID_H
+#define EMP_GRID_H
 
 #include "Kinetic.h"
 #include "../emtools/Color.h"

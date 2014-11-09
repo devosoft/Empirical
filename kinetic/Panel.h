@@ -1,5 +1,5 @@
-#ifndef EMK_PANEL_H
-#define EMK_PANEL_H
+#ifndef EMP_PANEL_H
+#define EMP_PANEL_H
 
 #include "Kinetic.h"
 

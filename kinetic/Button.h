@@ -1,5 +1,5 @@
-#ifndef EMK_BUTTON_H
-#define EMK_BUTTON_H
+#ifndef EMP_BUTTON_H
+#define EMP_BUTTON_H
 
 #include <string>
 

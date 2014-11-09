@@ -1,5 +1,5 @@
-#ifndef EMK_PROB_SCHEDULE_H
-#define EMK_PROB_SCHEDULE_H
+#ifndef EMP_PROB_SCHEDULE_H
+#define EMP_PROB_SCHEDULE_H
 
 #include <vector>
 

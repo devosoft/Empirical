@@ -1,10 +1,10 @@
-#ifndef EMK_PROGRESS_BAR_H
-#define EMK_PROGRESS_BAR_H
+#ifndef EMP_PROGRESS_BAR_H
+#define EMP_PROGRESS_BAR_H
 
 #include "../libs/Kinetic.h"
 #include "canvas_tools.h"
 
-namespace emk {
+namespace emp {
 
   class ProgressBar : public CustomShape {
   private:

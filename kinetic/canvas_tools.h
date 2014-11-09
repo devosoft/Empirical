@@ -1,5 +1,5 @@
-#ifndef EMK_CANVAS_TOOLS_H
-#define EMK_CANVAS_TOOLS_H
+#ifndef EMP_CANVAS_TOOLS_H
+#define EMP_CANVAS_TOOLS_H
 
 #include "../kinetic/Kinetic.h"
 

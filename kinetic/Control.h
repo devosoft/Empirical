@@ -1,5 +1,5 @@
-#ifndef EMK_CONTROL_H
-#define EMK_CONTROL_H
+#ifndef EMP_CONTROL_H
+#define EMP_CONTROL_H
 
 #include <map>
 #include <unordered_set>
