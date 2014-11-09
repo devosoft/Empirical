@@ -94,7 +94,7 @@ namespace emp {
       , default_point(10, height/2)
     {
       BuildStage(name, width, height); // Build the default stage.
-      Stage().ResizeMax();
+      // Stage().ResizeMax();
     }
     ~Control() {
       // Delete all objects created as part of this contoller.
