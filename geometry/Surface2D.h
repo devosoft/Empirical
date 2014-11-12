@@ -10,6 +10,9 @@
 //  Sector2D represents a small, subset of a surface.
 //  Surface2D tracks all of the sectors and represents and entire surface.
 //
+//  BODY_TYPE is the class that represents the body geometry.
+//  BODY_INFO represents the internal infomation about the body, including the controller.
+//  BASE_TYPE indicates if the physics should be calculated as integer or floating point.
 
 #include "Body2D.h"
 
@@ -38,7 +41,7 @@ namespace emp {
       return *this;
     }
 
-    const std::unordered_set<BODY_TYPE> & GetBodySet() const { return body_set; }
+    const std::unordered_set<BODY_TYPE *> & GetBodySet() const { return body_set; }
   };
 
   template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE> class Surface2D {
@@ -80,6 +83,8 @@ namespace emp {
       for (int i = 0; i < num_sectors; i++) sector_matrix[i].SetID(i);
     }
     ~Surface2D() { ; }
+
+    const std::unordered_set<BODY_TYPE *> & GetBodySet() const { return body_set; }
 
     Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> & AddBody(BODY_TYPE * new_body) {
       auto & sector = GetSector(new_body->GetAnchor());  // Determine which sector this body is in

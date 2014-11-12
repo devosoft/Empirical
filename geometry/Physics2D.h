@@ -5,8 +5,6 @@
 //
 //  Physics2D - handles movement and collissions in a simple 2D world.
 //
-//  Sector2D - One section of a Physics world; shapes are recorded in each sector they occupy.
-//
 
 #include <vector>
 #include <unordered_set>
@@ -28,6 +26,14 @@ namespace emp {
     ~Physics2D() { ; }
 
     Physics2D & AddActiveBody(BODY_TYPE * in_body) { active_surface.AddBody(in_body); return *this; }
+    Physics2D & AddPassiveBody(BODY_TYPE * in_body) { passive_surface.AddBody(in_body); return *this; }
+
+    const std::unordered_set<BODY_TYPE *> & GetActiveBodySet() const {
+      return active_surface.GetBodySet();
+    }
+    const std::unordered_set<BODY_TYPE *> & GetPassiveBodySet() const {
+      return passive_surface.GetBodySet();
+    }
   };
 
 };
