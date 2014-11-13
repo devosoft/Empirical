@@ -8,6 +8,8 @@
 #include <vector>
 
 #include "tools/callbacks.h"
+#include "tools/const.h"
+#include "geometry/Circle2D.h"
 #include "geometry/Point2D.h"
 
 #include "emtools/assert.h"
@@ -401,6 +403,16 @@ namespace emp {
     inline static void Arc(const Point<int> & point, int radius, double start, double end, bool cclockwise=false) {
       Arc(point.GetX(), point.GetY(), radius, start, end, cclockwise);
     }
+    inline static void Circle(const Point<int> & point, int radius) {
+      Arc(point.GetX(), point.GetY(), radius, 0.0, 2.0 * emp::PI);
+    }
+    inline static void Circle(const emp::Circle<int> & circle) {
+      Arc(circle.GetCenter(), circle.GetRadius(), 0.0, 2.0 * emp::PI);
+    }
+
+    // Functions to draw shapes where the input type determines the specific shape.
+    // (These are useful with templates so the right draw shape is picked).
+    inline static void DrawShape(const emp::Circle<int> & circle) { Circle(circle); }
 
     inline static void DrawImage(const Image & image, int x, int y) {
       // @CAO Do something different if the image hasn't loaded yet?  Maybe draw a placeholder rectangle?
