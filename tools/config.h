@@ -199,8 +199,11 @@ namespace emp {
               << "\"" << cur_entry->GetDescription() << "\")"
               << std::endl;
 
-          // @CAO Output aliases.
-          // cur_entry->GetAliases()
+          // Output aliases.
+          const std::unordered_set<std::string> & alias_set = cur_entry->GetAliases();
+          for (const std::string & cur_alias : alias_set) {
+            out << "EMP_CONFIG_ALIAS(" << cur_alias << ")" << std::endl;
+          }
         }
 
         out << std::endl; // Skip a line after each group.
