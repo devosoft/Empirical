@@ -8,16 +8,19 @@
 //
 //  Assuming you have an emp::cConfig object called config, you can:
 //
-//  access a setting value:           config.SETTING_NAME()
-//  adjust a setting value:           config.SETTING_NAME(new_value)
-//  determine if a setting is locked: config.SETTING_NAME_is_const()
-//  lookup a setting dynamically:     config("SETTING_NAME")
-//  adjust a setting dynamically:     config("SETTING_NAME", "new_value")
+//  access a setting value:            config.SETTING_NAME()
+//  adjust a setting value:            config.SETTING_NAME(new_value)
+//  determine if a setting is locked:  config.SETTING_NAME_is_const()
+//  lookup a setting dynamically:      config("SETTING_NAME")
+//  adjust a setting dynamically:      config("SETTING_NAME", "new_value")
 //
-//  load settings from a stream:      config.Read(stream);
-//  load settings from a file:        config.Read(filename);
-//  save settings to a stream:        config.Write(stream);
-//  save settings to a file:          config.Write(filename);
+//  load settings from a stream:       config.Read(stream);
+//  load settings from a file:         config.Read(filename);
+//  save settings to a stream:         config.Write(stream);
+//  save settings to a file:           config.Write(filename);
+//
+//  write settings macros to a stream: config.WriteMacros(stream);
+//  write settings macros to a file:   config.WriteMacros(filename);
 //
 
 #include <map>
@@ -63,9 +66,11 @@ namespace emp {
       cConfigEntry & AddAlias(const std::string & _in) { alias_set.insert(_in); return *this; }
       bool HasAlias(const std::string & _in) { return alias_set.find(_in) != alias_set.end(); }
       bool IsMatch(const std::string & _in) { return name == _in || HasAlias(_in); }
+      const std::unordered_set<std::string> & GetAliases() { return alias_set; }
       
       virtual std::string GetValue() const = 0;
       virtual cConfigEntry & SetValue(const std::string & in_val) = 0;
+      virtual bool IsConst() const = 0;
     };
     
     // We need type-specific versions on this class to manage variables
@@ -83,6 +88,7 @@ namespace emp {
       cConfigEntry & SetValue(const std::string & in_val) {
         std::stringstream ss; ss << in_val; ss >> entry_ref; return *this;
       }
+      bool IsConst() const { return false; }
     };
     
     // We need a special entry type to represent constant values.
@@ -103,6 +109,7 @@ namespace emp {
         }
         return *this;
       }
+      bool IsConst() const { return true; }
     };
 
     // A special entry for settings created during the run (only accissibly dynamically)
@@ -115,6 +122,7 @@ namespace emp {
       
       std::string GetValue() const { return default_val; }
       cConfigEntry & SetValue(const std::string & in_val) { default_val = in_val; return *this; }
+      bool IsConst() const { return false; }
     };
       
     // Entrys should be divided into groups
@@ -172,6 +180,27 @@ namespace emp {
             out << "# " << desc_lines[comment_line] << std::endl;
             start_col = 0;
           }
+        }
+
+        out << std::endl; // Skip a line after each group.
+      }
+
+      void WriteMacros(std::ostream & out) {
+        // Print header information to register group.
+        out << "EMP_CONFIG_GROUP(" << m_name << ", \"" << m_desc << "\")" << std::endl;
+
+        // Loop through once to figure out non-comment output
+        for (cConfigEntry * cur_entry : entry_set) {
+          if (cur_entry->IsConst()) { out << "EMP_CONFIG_CONST("; }
+          else { out << "EMP_CONFIG_VAR("; }
+          out << cur_entry->GetName() << ", "
+              << cur_entry->GetType() << ", "
+              << cur_entry->GetDefault() << ", "
+              << "\"" << cur_entry->GetDescription() << "\")"
+              << std::endl;
+
+          // @CAO Output aliases.
+          // cur_entry->GetAliases()
         }
 
         out << std::endl; // Skip a line after each group.
@@ -242,7 +271,7 @@ namespace emp {
 
     // Generate a text representation (typically a file) for the state of cConfig
     void Write(std::ostream & out) {
-      // @CAO Start by printing some header information?
+      // @CAO Start by printing some file header information?
       
       // Next print each group and it's information.
       for (auto it = group_set.begin(); it != group_set.end(); it++) {
@@ -254,6 +283,44 @@ namespace emp {
     void Write(std::string filename) {
       std::ofstream out(filename);
       Write(out);
+      out.close();
+    }
+
+    // Generate a text representation (typically a file) for the state of cConfig
+    void WriteMacros(std::ostream & out) {
+      out << "/////////////////////////////////////////////////////////////////////////////////\n"
+          << "//  This is an auto-generated file that defines a set of configuration options.\n"
+          << "//  This file is read in mulitple times from config.h, each with different macro\n"
+          << "//  definitions to generate correct, effecient code for the command below.\n"
+          << "//\n"
+          << "//  The available commands are:\n"
+          << "//\n"
+          << "//  EMP_CONFIG_GROUP(group name, group description string)\n"
+          << "//   Start a new group of configuration options.  Group structure is preserved\n"
+          << "//   when user-accessible configuration options are generated.\n"
+          << "//\n"
+          << "//  EMP_CONFIG_VAR(variable name, type, default value, description string)\n"
+          << "//   Create a new setting in the cConfig object that can be easily accessed.\n"
+          << "//\n"
+          << "//  EMP_CONFIG_ALIAS(alias name)\n"
+          << "//   Include an alias for the previous setting.  This command is useful to\n"
+          << "//   maintain backward compatibility if names change in newer software versions.\n"
+          << "//\n"
+          << "//  EMP_CONFIG_CONST(variable name, type, fixed value, description string)\n"
+          << "//   Create a new configuration constant that cannot be changed.  In practice,\n"
+          << "//   allows broader optimizations in the code.\n"
+          << std::endl;
+      
+      // Next print each group and it's information.
+      for (auto it = group_set.begin(); it != group_set.end(); it++) {
+        (*it)->WriteMacros(out);
+      }
+    }
+    
+    // If a string is passed into Write, treat it as a filename.
+    void WriteMacros(std::string filename) {
+      std::ofstream out(filename);
+      WriteMacros(out);
       out.close();
     }
 
