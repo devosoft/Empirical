@@ -9,7 +9,7 @@ Move scheduler over to Empirical
 
 
 -= Optimizations to Explore =-
-Explore if quick-looking up for sin, cos, tan should be at higher resolution (no it's 256 entires).
+Explore if quick-looking up for sin, cos, tan should be at higher resolution (now it's 256 entires).
 
 
 -= Other TODOs =-
@@ -19,6 +19,7 @@ Come up with a cleaner method to time functions?  Current macro is pretty ugly.
 -= Improvements =-
 Config: Should be able to output its own config header.
 Config: Build links into variable setting to trigger function calls
+Config: Warn more gracefully if a variable/const name is used more than once?
 
 
 -= Useful Tools =-
@@ -27,3 +28,9 @@ A genotype manager (for organisms with identical genomes)
 A phenotype summary to include in the genotype
 A phylogeny/lineage manager with multiple modes of purgeing (and link to phenotypes?)
 A clade manager that will mark into phenotypes which clade they are
+
+A data management system that can track data by:
+  - Temporal series (values over time)
+  - Batch (where a batch reset occurs periodicall)
+  - Log (tracking particular events when they occur)
+All output files should have headers that allow them to be read back in more easily.
