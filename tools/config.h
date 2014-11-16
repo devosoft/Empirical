@@ -32,6 +32,7 @@
 #include <vector>
 
 #include "string_utils.h"
+#include "functions.h"
 
 namespace emp {
 
@@ -69,6 +70,7 @@ namespace emp {
       const std::unordered_set<std::string> & GetAliases() { return alias_set; }
       
       virtual std::string GetValue() const = 0;
+      virtual std::string GetLiteralValue() const = 0;
       virtual cConfigEntry & SetValue(const std::string & in_val) = 0;
       virtual bool IsConst() const = 0;
     };
@@ -85,6 +87,7 @@ namespace emp {
       ~tConfigEntry() { ; }
       
       std::string GetValue() const { std::stringstream ss; ss << entry_ref; return ss.str(); }
+      std::string GetLiteralValue() const { return to_literal(entry_ref); }
       cConfigEntry & SetValue(const std::string & in_val) {
         std::stringstream ss; ss << in_val; ss >> entry_ref; return *this;
       }
@@ -100,6 +103,7 @@ namespace emp {
       ~tConfigConstEntry() { ; }
       
       std::string GetValue() const { return default_val; }
+      std::string GetLiteralValue() const { return to_literal(default_val); }
       cConfigEntry & SetValue(const std::string & in_val) {
         // This is a constant setting.  If we are actually trying to change it, give a warning.
         if (in_val != GetValue()) {
@@ -121,6 +125,7 @@ namespace emp {
       ~cConfigLiveEntry() { ; }
       
       std::string GetValue() const { return default_val; }
+      std::string GetLiteralValue() const { return to_literal(default_val); }
       cConfigEntry & SetValue(const std::string & in_val) { default_val = in_val; return *this; }
       bool IsConst() const { return false; }
     };
@@ -195,7 +200,9 @@ namespace emp {
           else { out << "EMP_CONFIG_VAR("; }
           out << cur_entry->GetName() << ", "
               << cur_entry->GetType() << ", "
-              << cur_entry->GetDefault() << ", "
+            // << cur_entry->GetDefault() << ", "
+            // << to_literal(cur_entry->GetValue()) << ", "
+              << cur_entry->GetLiteralValue() << ", "
               << "\"" << cur_entry->GetDescription() << "\")"
               << std::endl;
 

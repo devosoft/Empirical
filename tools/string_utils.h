@@ -10,6 +10,66 @@
 
 namespace emp {
 
+  std::string to_escaped_string(char value) {
+    // Start by quickly returning a string if it's easy.
+    std::stringstream ss;
+    if ( (value >= 40 && value < 91) || value > 96) {
+      ss << value;
+      return ss.str();
+    }
+    switch (value) {
+    case '\\':
+      return "\\\\";
+      break;
+    case '\'':
+      return "\\\'";
+      break;
+    case '\"':
+      return "\\\"";
+      break;
+    case '\n':
+      return "\\n";
+      break;
+    case '\r':
+      return "\\r";
+      break;
+    case '\t':
+      return "\\t";
+      break;
+    default:
+      ss << value;
+      return ss.str();
+    };
+  }
+  std::string to_escaped_string(std::string value) {
+    std::stringstream ss;
+    for (char c : value) { ss << to_escaped_string(c); }
+    return ss.str();
+  }
+
+
+
+  // The to_literal function set will take a value and convert it to a C++ literal.
+  template <typename LIT_TYPE> std::string to_literal(const LIT_TYPE & value) {
+    return std::to_string(value);
+  }
+  std::string to_literal(char value) {
+    std::stringstream ss;
+    ss << "'" << to_escaped_string(value) << "'";
+    return ss.str();
+  }
+  std::string to_literal(const std::string & value) {
+    // Add quotes to the ends and convert each character.
+    std::stringstream ss;
+    ss << "\"";
+    for (char c : value) {
+      ss << to_escaped_string(c);
+    }
+    ss << "\"";
+    return ss.str();
+  }
+
+
   bool is_whitespace(char test_char) {
     return (test_char == ' ' || test_char == '\n' || test_char == '\r' || test_char == '\t');
   }

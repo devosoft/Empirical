@@ -2,6 +2,8 @@
 #define EMP_FUNCTIONS_H
 
 #include <ctime>
+#include <string>
+#include <sstream>
 
 #define EMP_FUNCTION_TIMER(TEST_FUN) {                                  \
     std::clock_t emp_start_time = std::clock();                         \
@@ -14,8 +16,6 @@
   }
 
 namespace emp {
-
-  // Generally useful functions here...  
 
 };
 

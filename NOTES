@@ -3,6 +3,11 @@ Get Kinetic working, ported from KinEmAtic
 Build a viewport for a Surface2D object
 
 
+-= Questions =-
+Why is to_string not working on char's?
+Best way to convert to a c++ literal independent of type?
+
+
 -= Near Future =-
 Build a test system
 Move scheduler over to Empirical
@@ -34,3 +39,5 @@ A data management system that can track data by:
   - Batch (where a batch reset occurs periodicall)
   - Log (tracking particular events when they occur)
 All output files should have headers that allow them to be read back in more easily.
+
+A reference tool? Useful for pointing people to appropriate references to learn more about a component.
