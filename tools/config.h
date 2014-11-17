@@ -205,7 +205,8 @@ namespace emp {
           out << cur_entry->GetName() << ", "
               << cur_entry->GetType() << ", "
               << cur_entry->GetLiteralValue() << ", "
-              << "\"" << cur_entry->GetDescription() << "\")"
+              << to_literal( cur_entry->GetDescription() )
+            //              << "\"" << cur_entry->GetDescription() << "\")"
               << std::endl;
 
           // Output aliases.
