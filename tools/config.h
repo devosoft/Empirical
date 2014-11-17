@@ -96,14 +96,17 @@ namespace emp {
     
     // We need a special entry type to represent constant values.
     template <class VAR_TYPE> class tConfigConstEntry : public cConfigEntry {
+    private:
+      const VAR_TYPE literal_val;
     public:
       tConfigConstEntry(const std::string _name, const std::string _type,
-                   const std::string _d_val, const std::string _desc)
-        : cConfigEntry(_name, _type, _d_val, _desc) { ; }
+                        const std::string _d_val, const std::string _desc,
+                        const VAR_TYPE & _literal_val)
+        : cConfigEntry(_name, _type, _d_val, _desc), literal_val(_literal_val) { ; }
       ~tConfigConstEntry() { ; }
       
       std::string GetValue() const { return default_val; }
-      std::string GetLiteralValue() const { return to_literal(default_val); }
+      std::string GetLiteralValue() const { return to_literal(literal_val); }
       cConfigEntry & SetValue(const std::string & in_val) {
         // This is a constant setting.  If we are actually trying to change it, give a warning.
         if (in_val != GetValue()) {
@@ -198,10 +201,9 @@ namespace emp {
         for (cConfigEntry * cur_entry : entry_set) {
           if (cur_entry->IsConst()) { out << "EMP_CONFIG_CONST("; }
           else { out << "EMP_CONFIG_VAR("; }
+
           out << cur_entry->GetName() << ", "
               << cur_entry->GetType() << ", "
-            // << cur_entry->GetDefault() << ", "
-            // << to_literal(cur_entry->GetValue()) << ", "
               << cur_entry->GetLiteralValue() << ", "
               << "\"" << cur_entry->GetDescription() << "\")"
               << std::endl;
@@ -238,7 +240,7 @@ namespace emp {
       m_var_map[#NAME] = new tConfigEntry<TYPE>(#NAME, #TYPE, #DEFAULT, DESC, m_ ## NAME); \
       group_set.back()->Add(m_var_map[#NAME]);
 #define EMP_CONFIG_CONST(NAME, TYPE, VALUE, DESC)                                          \
-      m_var_map[#NAME] = new tConfigConstEntry<TYPE>(#NAME, #TYPE, #VALUE, DESC);          \
+      m_var_map[#NAME] = new tConfigConstEntry<TYPE>(#NAME, #TYPE, #VALUE, DESC, VALUE); \
       group_set.back()->Add(m_var_map[#NAME]);
 #define EMP_CONFIG_GROUP(NAME, DESC) \
       group_set.push_back(new cConfigGroup(#NAME, DESC));
