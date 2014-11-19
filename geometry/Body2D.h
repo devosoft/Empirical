@@ -32,6 +32,8 @@ namespace emp {
     Point<BASE_TYPE> velocity;       // Speed and direction of movement
     BASE_TYPE mass;                  // "Weight" of this object
 
+    Point<BASE_TYPE> shift;          // How should this body be updated to minimize overlap.
+
   public:
     CircleBody2D(const Circle<BASE_TYPE> & _p, BODY_INFO * _i) : perimeter(_p), info(_i) { ; }
     ~CircleBody2D() { ; }
@@ -73,7 +75,7 @@ namespace emp {
       if (velocity.NonZero()) {
         perimeter.Translate(velocity);
         const double velocity_mag = velocity.Magnitude();
-        if (velocity_mag > friction) { velocity.ToOrigin(); }
+        if (velocity_mag < friction) { velocity.ToOrigin(); }
         else { velocity *= 1.0 - friction / velocity_mag; }
       }   
       return *this;
@@ -104,6 +106,57 @@ namespace emp {
       return *this;
     }
     
+    bool CollisionTest(CircleBody2D<BODY_INFO, BASE_TYPE> & object2)
+    {
+      const Point<BASE_TYPE> dist = GetCenter() - object2.GetCenter();
+      const BASE_TYPE sq_pair_dist = dist.SquareMagnitude();
+      const BASE_TYPE radius_sum = GetRadius() + object2.GetRadius();
+      const BASE_TYPE sq_min_dist = radius_sum * radius_sum;
+  
+      // If there was no collision, return.
+      if (sq_pair_dist >= sq_min_dist) { return false; }
+
+      // @CAO If objects can phase or explode, identify that here.
+      
+      // Re-adjust position to remove overlap.
+      const double true_dist = sqrt(sq_pair_dist);
+      const double overlap_frac = ((double) radius_sum) / true_dist - 1.0;
+      const Point<BASE_TYPE> cur_shift = dist * (overlap_frac / 2.0);
+      shift += cur_shift;
+      object2.shift -= cur_shift;
+
+      // @CAO if we have inelastic collisions, we just take the weighted average of velocites
+      // and let the move together.
+      
+
+      // Assume elastic: Re-adjust velocity to reflect bounce.
+      const Point<BASE_TYPE> rel_velocity(object2.velocity - velocity);
+  
+      double x1, x2, y1, y2;
+  
+      if (dist.GetX() == 0) {
+        y1 = rel_velocity.GetY();
+        x1 = 0; x2 = 0; y2 = 0;
+      }
+      else if (dist.GetY() == 0) {
+        x1 = rel_velocity.GetX();
+        y1 = 0; x2 = 0; y2 = 0;
+      }
+      else {
+        double normal_a = dist.GetY() / dist.GetX();
+        x1 = ( rel_velocity.GetX() + normal_a * rel_velocity.GetY() )
+          / ( normal_a * normal_a + 1 );
+        y1 = normal_a * x1;
+        x2 = rel_velocity.GetX() - x1;
+        y2 = - (1 / normal_a) * x2;
+      }
+  
+      object2.velocity = velocity + Point<BASE_TYPE>(x2, y2);
+      velocity = velocity + Point<BASE_TYPE>(x1, y1);
+    }
+
+
+
   };
 
 };

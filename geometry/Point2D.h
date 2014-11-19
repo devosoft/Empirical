@@ -32,6 +32,7 @@ namespace emp {
     inline TYPE GetX() const { return x; }
     inline TYPE GetY() const { return y; }
 
+    double SquareMagnitude() const { return x*x + y*y; }
     double Magnitude() const { return sqrt( x*x + y*y ); }
     bool AtOrigin() { return x == 0 && y == 0; }
     bool NonZero() { return x != 0 || y != 0; }
