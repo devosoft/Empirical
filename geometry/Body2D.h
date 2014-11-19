@@ -112,6 +112,11 @@ namespace emp {
       const BASE_TYPE sq_pair_dist = dist.SquareMagnitude();
       const BASE_TYPE radius_sum = GetRadius() + object2.GetRadius();
       const BASE_TYPE sq_min_dist = radius_sum * radius_sum;
+
+      // std::cerr << "Object 1: " << GetCenter() << " ; radius=" << GetRadius() << std::endl;
+      // std::cerr << "Object 2: " << object2.GetCenter() << " ; radius=" << object2.GetRadius() << std::endl;
+      // std::cerr << "dist: " << dist << std::endl;
+
   
       // If there was no collision, return.
       if (sq_pair_dist >= sq_min_dist) { return false; }
@@ -153,12 +158,18 @@ namespace emp {
   
       object2.velocity = velocity + Point<BASE_TYPE>(x2, y2);
       velocity = velocity + Point<BASE_TYPE>(x1, y1);
+
+      return true;
     }
 
-
+    // After all collisions are accounted for, we should shift this object into its final place.
+    void FinalizePosition()
+    {
+      perimeter.Translate(shift);
+      shift.ToOrigin();
+    }
 
   };
-
 };
 
 #endif
