@@ -81,6 +81,10 @@ namespace emp {
     TYPE Distance(const Point & _in) { return sqrt( SquareDistance(_in) ); }
   };
 
+  // Overload ostream to work with points.
+  template <typename TYPE> std::ostream & operator<<(std::ostream & os, const Point<TYPE> & point) { 
+    return os << "(" << point.GetX() << "," << point.GetY() << ")";
+  }
 };
 
 #endif
