@@ -15,24 +15,37 @@ namespace emp {
 
   template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE> class Physics2D {
   private:
-    Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> passive_surface; // Contains bodies only external acted upon
-    Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> active_surface;  // Contains bodies that can initate actions
+    Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> surface;    // Contains bodies that can collide.
+    Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> background; // Contains bodies that can't collide.
 
   public:
     Physics2D(BASE_TYPE width, BASE_TYPE height, BASE_TYPE max_org_diameter=100) 
-      : passive_surface(width, height, width / max_org_diameter, height / max_org_diameter)
-      , active_surface(width, height, width / max_org_diameter, height / max_org_diameter)
+      : surface(width, height, width / max_org_diameter, height / max_org_diameter)
+      , background(width, height, width / max_org_diameter, height / max_org_diameter)
     { ; }
     ~Physics2D() { ; }
 
-    Physics2D & AddActiveBody(BODY_TYPE * in_body) { active_surface.AddBody(in_body); return *this; }
-    Physics2D & AddPassiveBody(BODY_TYPE * in_body) { passive_surface.AddBody(in_body); return *this; }
+    Physics2D & AddBody(BODY_TYPE * in_body) { surface.AddBody(in_body); return *this; }
+    Physics2D & AddBackground(BODY_TYPE * in_body) { background.AddBody(in_body); return *this; }
 
-    const std::unordered_set<BODY_TYPE *> & GetActiveBodySet() const {
-      return active_surface.GetBodySet();
+    void Update_DoMovement() {
+      auto body_set = surface.GetBodySet();
     }
-    const std::unordered_set<BODY_TYPE *> & GetPassiveBodySet() const {
-      return passive_surface.GetBodySet();
+
+    void Update_DoCollisions() {
+      // @CAO run through all pairs of bodies that might collide and test to see if they did.
+    }
+
+    void Update() {
+      Update_DoMovement();
+      Update_DoCollisions();
+    }
+
+    const std::unordered_set<BODY_TYPE *> & GetBodySet() const {
+      return surface.GetBodySet();
+    }
+    const std::unordered_set<BODY_TYPE *> & GetBackgroundSet() const {
+      return background.GetBodySet();
     }
   };
 
