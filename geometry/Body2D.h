@@ -35,7 +35,8 @@ namespace emp {
     Point<BASE_TYPE> shift;          // How should this body be updated to minimize overlap.
 
   public:
-    CircleBody2D(const Circle<BASE_TYPE> & _p, BODY_INFO * _i) : perimeter(_p), info(_i) { ; }
+    CircleBody2D(const Circle<BASE_TYPE> & _p, BODY_INFO * _i)
+      : perimeter(_p), target_radius(-1), info(_i) { ; }
     ~CircleBody2D() { ; }
 
     const Circle<BASE_TYPE> & GetPerimeter() const { return perimeter; }
@@ -53,30 +54,38 @@ namespace emp {
       perimeter.SetCenter(new_pos); 
       return *this;
     }
-    
     CircleBody2D<BODY_INFO, BASE_TYPE> & SetRadius(BASE_TYPE new_radius) {
       perimeter.SetRadius(new_radius); 
       return *this;
     }
-    
     CircleBody2D<BODY_INFO, BASE_TYPE> &
     SetSector(Sector2D<CircleBody2D<BODY_INFO, BASE_TYPE>, BODY_INFO, BASE_TYPE> * new_sector) {
       sector = new_sector;
       return *this;
     }
+    CircleBody2D<BODY_INFO, BASE_TYPE> &
+    SetVelocity(BASE_TYPE _x, BASE_TYPE _y) { velocity.Set(_x, _y); return *this; }
 
+    // If a body is not at its target radius, grow it or shrink it, as needed.
     CircleBody2D<BODY_INFO, BASE_TYPE> & BodyUpdate(BASE_TYPE grow_factor=1) {
+      if (target_radius == -1) return *this;
       if ((int) target_radius > (int) GetRadius()) SetRadius(GetRadius() + grow_factor);
       else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - grow_factor);
+      else target_radius = -1;  // We're at the target size, so stop!
       return *this;
     }
 
-    CircleBody2D<BODY_INFO, BASE_TYPE> & ProcessStep(BASE_TYPE friction) {
+    // Move this body by its velocity and reduce velocity based on friction.
+    CircleBody2D<BODY_INFO, BASE_TYPE> & ProcessStep(BASE_TYPE friction=0) {
       if (velocity.NonZero()) {
         perimeter.Translate(velocity);
         const double velocity_mag = velocity.Magnitude();
-        if (velocity_mag < friction) { velocity.ToOrigin(); }
-        else { velocity *= 1.0 - friction / velocity_mag; }
+
+        // If body is close to stopping stop it!
+        if (friction > velocity_mag) { velocity.ToOrigin(); }
+
+        // Otherwise slow it down proportionately in the x and y directions.
+        else { velocity *= 1.0 - ((double) friction) / ((double) velocity_mag); }
       }   
       return *this;
     }

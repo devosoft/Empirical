@@ -30,10 +30,27 @@ namespace emp {
 
     void Update_DoMovement() {
       auto body_set = surface.GetBodySet();
+      for (BODY_TYPE * cur_body : body_set) {
+        cur_body->BodyUpdate();   // Let a body change size or shape, as needed.
+        cur_body->ProcessStep();  // Update position and velocity.
+      }
     }
 
     void Update_DoCollisions() {
-      // @CAO run through all pairs of bodies that might collide and test to see if they did.
+      auto body_set = surface.GetBodySet();
+
+      // @CAO Run through all pairs of bodies that might collide and test to see if they did.
+      for (auto body_it1 = body_set.begin(); body_it1 != body_set.end(); body_it1++) {
+        for (auto body_it2 = body_it1; ++body_it2 != body_set.end();) {
+          (*body_it1)->CollisionTest(*(*body_it2));
+        }
+      }
+
+      // Make sure all bodies are in a legal position on the surface.
+      for (BODY_TYPE * cur_body : body_set) {
+        cur_body->FinalizePosition();
+        cur_body->AdjustPosition(surface.GetMaxPosition());
+      }
     }
 
     void Update() {

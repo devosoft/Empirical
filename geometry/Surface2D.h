@@ -46,13 +46,12 @@ namespace emp {
 
   template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE> class Surface2D {
   private:
-    const BASE_TYPE width;       // How wide is the overall surface?
-    const BASE_TYPE height;      // How tall is the overall surface?
-    const int sector_cols;    // Number of sectors in the x-dimension.
-    const int sector_rows;    // Number of sectors in the y-dimension.
-    const int num_sectors;    // Total number of sectors on this surface.
-    const BASE_TYPE col_width;   // How wide is each individual sector?
-    const BASE_TYPE row_height;  // How tall is each individual sector?
+    const Point<BASE_TYPE> max_pos; // Lower-left corner of the surface.
+    const int sector_cols;          // Number of sectors in the x-dimension.
+    const int sector_rows;          // Number of sectors in the y-dimension.
+    const int num_sectors;          // Total number of sectors on this surface.
+    const BASE_TYPE col_width;      // How wide is each individual sector?
+    const BASE_TYPE row_height;     // How tall is each individual sector?
 
     std::vector<Sector2D<BODY_TYPE, BODY_INFO, BASE_TYPE> > sector_matrix; // Flattend matrix of sectors;
     std::unordered_set<BODY_TYPE *> body_set;                              // Set of all bodies on surface
@@ -73,10 +72,10 @@ namespace emp {
 
   public:
     Surface2D(BASE_TYPE _width, BASE_TYPE _height, int _cols=100, int _rows=100) 
-      : width(_width), height(_height)
+      : max_pos(_width, _height)
       , sector_cols(_cols), sector_rows(_rows)
       , num_sectors(sector_cols * sector_rows)
-      , col_width(width / (double) sector_cols), row_height(height / (double) sector_rows)
+      , col_width(_width / (double) sector_cols), row_height(_height / (double) sector_rows)
       , sector_matrix(num_sectors)
     {
       // Let each sector know its ID.
@@ -84,6 +83,7 @@ namespace emp {
     }
     ~Surface2D() { ; }
 
+    const Point<BASE_TYPE> & GetMaxPosition() const { return max_pos; }
     const std::unordered_set<BODY_TYPE *> & GetBodySet() const { return body_set; }
 
     Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> & AddBody(BODY_TYPE * new_body) {
