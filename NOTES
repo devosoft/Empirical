@@ -4,7 +4,7 @@ Build a viewport for a Surface2D object
 
 
 -= Questions =-
-Why is to_string not working on char's?
+Why is to_string not working on char's?  Is there a better way to do this?
 Best way to convert to a c++ literal independent of type?
 
 
@@ -15,7 +15,11 @@ Move scheduler over to Empirical
 
 -= Optimizations to Explore =-
 Explore if quick-looking up for sin, cos, tan should be at higher resolution (now it's 256 entires).
-
+Currently doing all-pairs comparisons to detect collisions.  Other options:
+* Sort by X first, stop second loop when x-distance > diameter
+* Put circles into sectors; only check same or neighboring sectors
+* Put circles into strips that we use the x-sorting technique on.
+* Keep list of nearby circles updating only occasionally (base on velocity?) (using one of above methods?)
 
 -= Other TODOs =-
 Come up with a cleaner method to time functions?  Current macro is pretty ugly.
