@@ -31,6 +31,9 @@ namespace emp {
 
     inline TYPE GetX() const { return x; }
     inline TYPE GetY() const { return y; }
+    inline Point & SetX(TYPE in_x) { x = in_x; return *this; }
+    inline Point & SetY(TYPE in_y) { y = in_y; return *this; }
+    Point & Set(TYPE _x, TYPE _y) { x=_x; y=_y; return *this; }
 
     double SquareMagnitude() const { return x*x + y*y; }
     double Magnitude() const { return sqrt( x*x + y*y ); }
@@ -51,7 +54,6 @@ namespace emp {
     Point operator/(int div) const { return Point(x / div, y / div); }
 
     // Modify this point.
-    Point & Set(TYPE _x, TYPE _y) { x=_x; y=_y; return *this; }
     Point & Translate(TYPE shift_x, TYPE shift_y) { x += shift_x; y += shift_y; return *this; }
     Point & TranslateX(TYPE shift) { x += shift; return *this; }
     Point & TranslateY(TYPE shift) { y += shift; return *this; }
