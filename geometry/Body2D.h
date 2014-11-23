@@ -146,15 +146,15 @@ namespace emp {
       // Assume elastic: Re-adjust velocity to reflect bounce.
       const Point<BASE_TYPE> rel_velocity(object2.velocity - velocity);
   
-      double x1, x2, y1, y2;
+      double x1, y1, x2, y2;
   
       if (dist.GetX() == 0) {
-        y1 = rel_velocity.GetY();
-        x1 = 0; x2 = 0; y2 = 0;
+        x1 = 0;  y1 = rel_velocity.GetY();
+        x2 = 0;  y2 = 0;
       }
       else if (dist.GetY() == 0) {
-        x1 = rel_velocity.GetX();
-        y1 = 0; x2 = 0; y2 = 0;
+        x1 = rel_velocity.GetX();  y1 = 0;
+        x2 = 0;                    y2 = 0;
       }
       else {
         double normal_a = dist.GetY() / dist.GetX();

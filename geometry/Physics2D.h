@@ -19,7 +19,7 @@ namespace emp {
     Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> background; // Contains bodies that can't collide.
 
   public:
-    Physics2D(BASE_TYPE width, BASE_TYPE height, BASE_TYPE max_org_diameter=100) 
+    Physics2D(BASE_TYPE width, BASE_TYPE height, BASE_TYPE max_org_diameter=20) 
       : surface(width, height, width / max_org_diameter, height / max_org_diameter)
       , background(width, height, width / max_org_diameter, height / max_org_diameter)
     { ; }

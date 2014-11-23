@@ -1,5 +1,5 @@
 mergeInto(LibraryManager.library, {
-    $emp_info: { objs:[], images:[], image_load_count:0, image_error_count:0 },
+    $emp_info: { objs:[], images:[], image_load_count:0, image_error_count:0, callbacks:{} },
 
     // Below are a functions that weren't as easy to inline in the C++
 
