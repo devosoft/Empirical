@@ -37,14 +37,51 @@ namespace emp {
     }
 
     void Update_DoCollisions() {
-      auto body_set = surface.GetBodySet();
+      const auto & body_set = surface.GetBodySet();
+      int hit_count = 0;
+      
+      const int cols = 20;
+      const int rows = 20;
+      const int num_sectors = rows * cols;
+      const int max_x = 600;
+      const int max_y = 600;
+      const int sector_width = max_x / cols;
+      const int sector_height = max_y / rows;
+      // const int max_diameter = 20;
 
+      std::vector< std::unordered_set<BODY_TYPE *> > sector_set(num_sectors);
+
+      for (auto body : body_set) {
+        const int cur_col = body->GetCenter().GetX() / sector_width;
+        const int cur_row = body->GetCenter().GetY() / sector_height;
+        const int cur_sector = cur_col + cur_row * cols;
+
+        for (int i = std::max(0, cur_col-1); i <= std::min(cur_col+1, cols-1); i++) {
+          for (int j = std::max(0, cur_row-1); j <= std::min(cur_row+1, rows-1); j++) {
+            const int sector_id = i + cols * j;
+
+            for (auto body2 : sector_set[sector_id]) {
+              if (body->CollisionTest(*body2)) hit_count++;
+            }            
+
+          }
+        }
+
+        sector_set[cur_sector].insert(body);
+      }
+      
+      /*
       // @CAO Run through all pairs of bodies that might collide and test to see if they did.
       for (auto body_it1 = body_set.begin(); body_it1 != body_set.end(); body_it1++) {
         for (auto body_it2 = body_it1; ++body_it2 != body_set.end();) {
-          (*body_it1)->CollisionTest(*(*body_it2));
+          if ((*body_it1)->CollisionTest(*(*body_it2))) hit_count++;
         }
       }
+      */
+      
+      static int counter = 0;
+      counter++;
+      std::cout << counter << " : " << hit_count << std::endl;
 
       // Make sure all bodies are in a legal position on the surface.
       for (BODY_TYPE * cur_body : body_set) {
