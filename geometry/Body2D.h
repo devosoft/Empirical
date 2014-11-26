@@ -31,12 +31,13 @@ namespace emp {
     Sector2D<CircleBody2D<BODY_INFO, BASE_TYPE>, BODY_INFO, BASE_TYPE> * sector;  // Track location
     Point<BASE_TYPE> velocity;       // Speed and direction of movement
     BASE_TYPE mass;                  // "Weight" of this object
+    int color_id;                    // Which color should this body appear?
 
     Point<BASE_TYPE> shift;          // How should this body be updated to minimize overlap.
 
   public:
     CircleBody2D(const Circle<BASE_TYPE> & _p, BODY_INFO * _i)
-      : perimeter(_p), target_radius(-1), info(_i) { ; }
+      : perimeter(_p), target_radius(-1), info(_i), mass(1), color_id(0) { ; }
     ~CircleBody2D() { ; }
 
     const Circle<BASE_TYPE> & GetPerimeter() const { return perimeter; }
@@ -49,6 +50,7 @@ namespace emp {
     Sector2D<CircleBody2D<BODY_INFO, BASE_TYPE>, BODY_INFO, BASE_TYPE> * GetSector() { return sector; }
     const Point<BASE_TYPE> & GetVelocity() const { return velocity; }
     BASE_TYPE GetMass() const { return mass; }
+    int GetColorID() const { return color_id; }
 
     CircleBody2D<BODY_INFO, BASE_TYPE> & SetPosition(const Point<BASE_TYPE> & new_pos) {
       perimeter.SetCenter(new_pos); 
@@ -65,6 +67,8 @@ namespace emp {
     }
     CircleBody2D<BODY_INFO, BASE_TYPE> &
     SetVelocity(BASE_TYPE _x, BASE_TYPE _y) { velocity.Set(_x, _y); return *this; }
+    CircleBody2D<BODY_INFO, BASE_TYPE> &
+    SetColorID(int in_id) { color_id = in_id; return *this; }
 
     // If a body is not at its target radius, grow it or shrink it, as needed.
     CircleBody2D<BODY_INFO, BASE_TYPE> & BodyUpdate(BASE_TYPE grow_factor=1) {
@@ -144,29 +148,36 @@ namespace emp {
       
 
       // Assume elastic: Re-adjust velocity to reflect bounce.
-      const Point<BASE_TYPE> rel_velocity(object2.velocity - velocity);
   
       double x1, y1, x2, y2;
   
       if (dist.GetX() == 0) {
-        x1 = 0;  y1 = rel_velocity.GetY();
-        x2 = 0;  y2 = 0;
+        x1 = velocity.GetX();          y1 = object2.velocity.GetY();
+        x2 = object2.velocity.GetX();  y2 = velocity.GetY();
+
+        velocity = Point<BASE_TYPE>(x1, y1);
+        object2.velocity = Point<BASE_TYPE>(x2, y2);
       }
       else if (dist.GetY() == 0) {
-        x1 = rel_velocity.GetX();  y1 = 0;
-        x2 = 0;                    y2 = 0;
+        x1 = object2.velocity.GetX();  y1 = velocity.GetY();
+        x2 = velocity.GetX();          y2 = object2.velocity.GetY();
+
+        velocity = Point<BASE_TYPE>(x1, y1);
+        object2.velocity = Point<BASE_TYPE>(x2, y2);
       }
       else {
+        const Point<BASE_TYPE> rel_velocity(object2.velocity - velocity);
         double normal_a = dist.GetY() / dist.GetX();
         x1 = ( rel_velocity.GetX() + normal_a * rel_velocity.GetY() )
           / ( normal_a * normal_a + 1 );
         y1 = normal_a * x1;
         x2 = rel_velocity.GetX() - x1;
         y2 = - (1 / normal_a) * x2;
+
+        object2.velocity = velocity + Point<BASE_TYPE>(x2, y2);
+        velocity = velocity + Point<BASE_TYPE>(x1, y1);
       }
   
-      object2.velocity = velocity + Point<BASE_TYPE>(x2, y2);
-      velocity = velocity + Point<BASE_TYPE>(x1, y1);
 
       return true;
     }
