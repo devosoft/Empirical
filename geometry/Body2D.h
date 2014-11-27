@@ -61,6 +61,8 @@ namespace emp {
       return *this;
     }
     CircleBody2D<BODY_INFO, BASE_TYPE> &
+    SetTargetRadius(BASE_TYPE _target) { target_radius = _target; return *this; }
+    CircleBody2D<BODY_INFO, BASE_TYPE> &
     SetSector(Sector2D<CircleBody2D<BODY_INFO, BASE_TYPE>, BODY_INFO, BASE_TYPE> * new_sector) {
       sector = new_sector;
       return *this;
