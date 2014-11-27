@@ -29,6 +29,9 @@ namespace emp {
 
     Circle<TYPE> & Translate(Point<TYPE> shift) { center += shift; return *this; }
 
+    bool Contains(const Point<TYPE> & point) const {
+      return center.SquareDistance(point) < radius * radius;
+    }
     bool HasOverlap(const Circle<TYPE> & other) const {
       const TYPE min_dist = radius + other.radius;
       return center.SquareDistance(other.center) < (min_dist * min_dist);
