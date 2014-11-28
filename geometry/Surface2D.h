@@ -21,7 +21,8 @@ namespace emp {
   template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE> class Sector2D {
   private:
     int id;
-    std::unordered_set<BODY_TYPE *> body_set;
+    // std::unordered_set<BODY_TYPE *> body_set;
+    std::vector<BODY_TYPE *> body_set;
 
   public:
     Sector2D() { ; }
@@ -33,15 +34,19 @@ namespace emp {
     bool HasBody(BODY_TYPE * test_body) const { return body_set.count(test_body); }
 
     Sector2D<BODY_TYPE, BODY_INFO, BASE_TYPE> & AddBody(BODY_TYPE * in_body) {
+      body_set.push_back(in_body);
       body_set.insert(in_body);
       return *this;
     }
     Sector2D<BODY_TYPE, BODY_INFO, BASE_TYPE> & RemoveBody(BODY_TYPE * out_body) {
-      body_set.erase(out_body);
+      // @CAO FIX THIS!!!
+      assert(false);
+      // body_set.erase(out_body);
       return *this;
     }
 
-    const std::unordered_set<BODY_TYPE *> & GetBodySet() const { return body_set; }
+    // const std::unordered_set<BODY_TYPE *> & GetBodySet() const { return body_set; }
+    const std::vector<BODY_TYPE *> & GetBodySet() const { return body_set; }
   };
 
   template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE> class Surface2D {
@@ -54,7 +59,8 @@ namespace emp {
     const BASE_TYPE row_height;     // How tall is each individual sector?
 
     std::vector<Sector2D<BODY_TYPE, BODY_INFO, BASE_TYPE> > sector_matrix; // Flattend matrix of sectors;
-    std::unordered_set<BODY_TYPE *> body_set;                              // Set of all bodies on surface
+    // std::unordered_set<BODY_TYPE *> body_set;                              // Set of all bodies on surface
+    std::vector<BODY_TYPE *> body_set;                              // Set of all bodies on surface
 
     int GetSectorID(int row, int col) const { return row * sector_cols + col; }
     int GetSectorID(const Point<BASE_TYPE> & point) const {
@@ -84,12 +90,14 @@ namespace emp {
     ~Surface2D() { ; }
 
     const Point<BASE_TYPE> & GetMaxPosition() const { return max_pos; }
-    const std::unordered_set<BODY_TYPE *> & GetBodySet() const { return body_set; }
+    // const std::unordered_set<BODY_TYPE *> & GetBodySet() const { return body_set; }
+    const std::vector<BODY_TYPE *> & GetBodySet() const { return body_set; }
 
     Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> & AddBody(BODY_TYPE * new_body) {
       auto & sector = GetSector(new_body->GetAnchor());  // Determine which sector this body is in
-      body_set.insert(new_body);                         // Add body to master list
-      sector.AddBody(new_body);                          // Add body to the sector it's in
+      // body_set.insert(new_body);                         // Add body to master list
+      body_set.push_back(new_body);                         // Add body to master list
+      // sector.AddBody(new_body);                          // Add body to the sector it's in
       new_body->SetSector(&sector);                      // Track sector in body
       return *this;
     }
