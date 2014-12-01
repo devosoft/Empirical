@@ -52,6 +52,7 @@ namespace emp {
     Point operator/(double div) const { return Point(((double) x) / div, ((double) y) / div); }
     Point operator*(int mult) const { return Point(x * mult, y * mult); }
     Point operator/(int div) const { return Point(x / div, y / div); }
+    Point operator-() const { return Point(-x, -y); } // Unary minus
 
     // Modify this point.
     Point & Translate(TYPE shift_x, TYPE shift_y) { x += shift_x; y += shift_y; return *this; }
