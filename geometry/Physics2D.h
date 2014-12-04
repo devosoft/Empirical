@@ -8,6 +8,8 @@
 
 #include <vector>
 #include <unordered_set>
+#include <functional>
+using namespace std::placeholders;
 
 #include "Surface2D.h"
 
@@ -20,104 +22,82 @@ namespace emp {
 
   public:
     Physics2D(BASE_TYPE width, BASE_TYPE height, BASE_TYPE max_org_diameter=20) 
-      : surface(width, height, width / max_org_diameter, height / max_org_diameter)
-      , background(width, height, width / max_org_diameter, height / max_org_diameter)
+      : surface(width, height)
+      , background(width, height)
     { ; }
     ~Physics2D() { ; }
 
     Physics2D & AddBody(BODY_TYPE * in_body) { surface.AddBody(in_body); return *this; }
     Physics2D & AddBackground(BODY_TYPE * in_body) { background.AddBody(in_body); return *this; }
 
-    void Update_DoMovement() {
+    bool TestPairCollision(BODY_TYPE & body1, BODY_TYPE & body2) {
+      const Point<BASE_TYPE> dist = body1.GetCenter() - body2.GetCenter();
+      const BASE_TYPE sq_pair_dist = dist.SquareMagnitude();
+      const BASE_TYPE radius_sum = body1.GetRadius() + body2.GetRadius();
+      const BASE_TYPE sq_min_dist = radius_sum * radius_sum;
+
+      // If there was no collision, return false.
+      if (sq_pair_dist >= sq_min_dist) { return false; }
+
+      // @CAO If objects can phase or explode, identify that here.
+      
+      // Re-adjust position to remove overlap.
+      const double true_dist = sqrt(sq_pair_dist);
+      const double overlap_frac = ((double) radius_sum) / true_dist - 1.0;
+      const Point<BASE_TYPE> cur_shift = dist * (overlap_frac / 2.0);
+      body1.AddShift(cur_shift);
+      body2.AddShift(-cur_shift);
+
+      // @CAO if we have inelastic collisions, we just take the weighted average of velocites
+      // and let the move together.
+      
+      // Assume elastic: Re-adjust velocity to reflect bounce.
+      double x1, y1, x2, y2;
+  
+      if (dist.GetX() == 0) {
+        x1 = body1.GetVelocity().GetX();  y1 = body2.GetVelocity().GetY();
+        x2 = body2.GetVelocity().GetX();  y2 = body1.GetVelocity().GetY();
+
+        body1.SetVelocity(Point<BASE_TYPE>(x1, y1));
+        body2.SetVelocity(Point<BASE_TYPE>(x2, y2));
+      }
+      else if (dist.GetY() == 0) {
+        x1 = body2.GetVelocity().GetX();  y1 = body1.GetVelocity().GetY();
+        x2 = body1.GetVelocity().GetX();  y2 = body2.GetVelocity().GetY();
+
+        body1.SetVelocity(Point<BASE_TYPE>(x1, y1));
+        body2.SetVelocity(Point<BASE_TYPE>(x2, y2));
+      }
+      else {
+        const Point<BASE_TYPE> rel_velocity(body2.GetVelocity() - body1.GetVelocity());
+        double normal_a = dist.GetY() / dist.GetX();
+        x1 = ( rel_velocity.GetX() + normal_a * rel_velocity.GetY() )
+          / ( normal_a * normal_a + 1 );
+        y1 = normal_a * x1;
+        x2 = rel_velocity.GetX() - x1;
+        y2 = - (1 / normal_a) * x2;
+
+        body2.SetVelocity(body1.GetVelocity() + Point<BASE_TYPE>(x2, y2));
+        body1.SetVelocity(body1.GetVelocity() + Point<BASE_TYPE>(x1, y1));
+      }
+  
+
+      return true;      
+    }
+
+    void Update() {
+      // Handle movement of bodies
       auto body_set = surface.GetBodySet();
       for (BODY_TYPE * cur_body : body_set) {
         cur_body->BodyUpdate();   // Let a body change size or shape, as needed.
         cur_body->ProcessStep();  // Update position and velocity.
       }
+
+      // Handle collisions
+      auto collide_fun = std::bind(std::mem_fn(&Physics2D::TestPairCollision), *this, _1, _2);
+      surface.TestCollisions(collide_fun);
     }
 
-    void Update_DoCollisions() {
-      const auto & body_set = surface.GetBodySet();
-      int hit_count = 0;
-      int test_count = 0;
-      
-      // const int cols = 32;
-      // const int rows = 32;
-      const int cols = 2;
-      const int rows = 2;
-      const int num_sectors = rows * cols;
-      const int max_x = surface.GetMaxPosition().GetX();
-      const int max_y = surface.GetMaxPosition().GetY();
-      const int sector_width = max_x / cols;
-      const int sector_height = max_y / rows;
-      // const int max_diameter = 16;
-
-      // std::vector< std::unordered_set<BODY_TYPE *> > sector_set(num_sectors);
-      std::vector< std::vector<BODY_TYPE *> > sector_set(num_sectors);
-
-      for (auto body : body_set) {
-        const int cur_col = body->GetCenter().GetX() / sector_width;
-        const int cur_row = body->GetCenter().GetY() / sector_height;
-
-        for (int i = std::max(0, cur_col-1); i <= std::min(cur_col+1, cols-1); i++) {
-          for (int j = std::max(0, cur_row-1); j <= std::min(cur_row+1, rows-1); j++) {
-            const int sector_id = i + cols * j;
-            if (sector_set[sector_id].size() == 0) continue;
-
-            for (auto body2 : sector_set[sector_id]) {
-              test_count++;
-              if (body->CollisionTest(*body2)) hit_count++;
-
-              // @CAO -- tag comparisons!
-              if (body->GetColorID() == 1) body2->SetColorID(2);
-              else if (body2->GetColorID() == 1) body->SetColorID(2);
-            }            
-
-          }
-        }
-
-        const int cur_sector = cur_col + cur_row * cols;
-        // sector_set[cur_sector].insert(body);
-        sector_set[cur_sector].push_back(body);
-      }
-
-      /*
-      for (std::unordered_set<BODY_TYPE *> & cur_sector : sector_set) {
-        cur_sector.clear();
-      }
-      */
-      
-      /*
-      // @CAO Run through all pairs of bodies that might collide and test to see if they did.
-      for (auto body_it1 = body_set.begin(); body_it1 != body_set.end(); body_it1++) {
-        for (auto body_it2 = body_it1; ++body_it2 != body_set.end();) {
-          if ((*body_it1)->CollisionTest(*(*body_it2))) hit_count++;
-        }
-      }
-      */
-
-      static int counter = 0;
-      counter++;
-      std::cout << counter << " : " << hit_count << " / " << test_count << std::endl;
-
-      // Make sure all bodies are in a legal position on the surface.
-      for (BODY_TYPE * cur_body : body_set) {
-        cur_body->FinalizePosition();
-        cur_body->AdjustPosition(surface.GetMaxPosition());
-      }
-    }
-
-    void Update() {
-      Update_DoMovement();
-      Update_DoCollisions();
-    }
-
-    // const std::unordered_set<BODY_TYPE *> & GetBodySet() const {
-    //   return surface.GetBodySet();
-    // }
-    // const std::unordered_set<BODY_TYPE *> & GetBackgroundSet() const {
-    //   return background.GetBodySet();
-    // }
     const std::vector<BODY_TYPE *> & GetBodySet() const {
       return surface.GetBodySet();
     }

@@ -3,118 +3,104 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  This file defines templated classes to represent a 2D suface capable of maintaining data
+//  This file defines a templated class to represent a 2D suface capable of maintaining data
 //  about which 2D bodies are currently on that surface and rapidly identifying if they are 
 //  overlapping.
-//
-//  Sector2D represents a small, subset of a surface.
-//  Surface2D tracks all of the sectors and represents and entire surface.
 //
 //  BODY_TYPE is the class that represents the body geometry.
 //  BODY_INFO represents the internal infomation about the body, including the controller.
 //  BASE_TYPE indicates if the physics should be calculated as integer or floating point.
 
 #include "Body2D.h"
+#include <functional>
 
 namespace emp {
 
-  template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE> class Sector2D {
-  private:
-    int id;
-    // std::unordered_set<BODY_TYPE *> body_set;
-    std::vector<BODY_TYPE *> body_set;
-
-  public:
-    Sector2D() { ; }
-    ~Sector2D() { ; }
-
-    int GetID() const { return id; }
-    Sector2D<BODY_TYPE, BODY_INFO, BASE_TYPE> & SetID(int _id) { id = _id; return *this; }
-
-    bool HasBody(BODY_TYPE * test_body) const { return body_set.count(test_body); }
-
-    Sector2D<BODY_TYPE, BODY_INFO, BASE_TYPE> & AddBody(BODY_TYPE * in_body) {
-      body_set.push_back(in_body);
-      body_set.insert(in_body);
-      return *this;
-    }
-    Sector2D<BODY_TYPE, BODY_INFO, BASE_TYPE> & RemoveBody(BODY_TYPE * out_body) {
-      // @CAO FIX THIS!!!
-      assert(false);
-      // body_set.erase(out_body);
-      return *this;
-    }
-
-    // const std::unordered_set<BODY_TYPE *> & GetBodySet() const { return body_set; }
-    const std::vector<BODY_TYPE *> & GetBodySet() const { return body_set; }
-  };
-
   template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE> class Surface2D {
   private:
-    const Point<BASE_TYPE> max_pos; // Lower-left corner of the surface.
-    const int sector_cols;          // Number of sectors in the x-dimension.
-    const int sector_rows;          // Number of sectors in the y-dimension.
-    const int num_sectors;          // Total number of sectors on this surface.
-    const BASE_TYPE col_width;      // How wide is each individual sector?
-    const BASE_TYPE row_height;     // How tall is each individual sector?
-
-    std::vector<Sector2D<BODY_TYPE, BODY_INFO, BASE_TYPE> > sector_matrix; // Flattend matrix of sectors;
-    // std::unordered_set<BODY_TYPE *> body_set;                              // Set of all bodies on surface
-    std::vector<BODY_TYPE *> body_set;                              // Set of all bodies on surface
-
-    int GetSectorID(int row, int col) const { return row * sector_cols + col; }
-    int GetSectorID(const Point<BASE_TYPE> & point) const {
-      return GetSectorID(point.GetX() / col_width, point.GetY() / row_height);
-    }
-    Sector2D<BODY_TYPE, BODY_INFO, BASE_TYPE> & GetSector(int row, int col) {
-      return sector_matrix[row*sector_cols+col];
-    }
-    Sector2D<BODY_TYPE, BODY_INFO, BASE_TYPE> & GetSector(const Point<BASE_TYPE> & pos) {
-      return sector_matrix[GetSectorID(pos)];
-    }
-    Sector2D<BODY_TYPE, BODY_INFO, BASE_TYPE> & GetSector(int id) {
-      return sector_matrix[id];
-    }
+    const Point<BASE_TYPE> max_pos;     // Lower-left corner of the surface.
+    std::vector<BODY_TYPE *> body_set;  // Set of all bodies on surface
 
   public:
-    Surface2D(BASE_TYPE _width, BASE_TYPE _height, int _cols=100, int _rows=100) 
+    Surface2D(BASE_TYPE _width, BASE_TYPE _height) 
       : max_pos(_width, _height)
-      , sector_cols(_cols), sector_rows(_rows)
-      , num_sectors(sector_cols * sector_rows)
-      , col_width(_width / (double) sector_cols), row_height(_height / (double) sector_rows)
-      , sector_matrix(num_sectors)
     {
-      // Let each sector know its ID.
-      for (int i = 0; i < num_sectors; i++) sector_matrix[i].SetID(i);
     }
     ~Surface2D() { ; }
 
     const Point<BASE_TYPE> & GetMaxPosition() const { return max_pos; }
-    // const std::unordered_set<BODY_TYPE *> & GetBodySet() const { return body_set; }
     const std::vector<BODY_TYPE *> & GetBodySet() const { return body_set; }
 
     Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> & AddBody(BODY_TYPE * new_body) {
-      auto & sector = GetSector(new_body->GetAnchor());  // Determine which sector this body is in
-      // body_set.insert(new_body);                         // Add body to master list
       body_set.push_back(new_body);                         // Add body to master list
-      // sector.AddBody(new_body);                          // Add body to the sector it's in
-      new_body->SetSector(&sector);                      // Track sector in body
       return *this;
     }
 
-    Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> & MoveBody(BODY_TYPE * body, const Point<BASE_TYPE> & new_pos) {
-      // Determine if the sector is changing; if so do some more work.
-      const int start_id = body->GetSector()->GetID();
-      const int end_id = GetSectorID(new_pos);
-      if (start_id != end_id) {
-        body->GetSector()->RemoveBody(body);    // Remove body from old sector
-        auto & new_sector = GetSector(end_id);  // Determine which sector this body is in
-        new_sector.AddBody(body);               // Add body to the sector it's in
-        body->SetSector(&new_sector);           // Track sector in body
+
+    // The following function will test pairs of collisions and run the passed-in function on pairs of
+    // objects that *may* collide.
+
+    void TestCollisions(std::function<bool(BODY_TYPE &, BODY_TYPE &)> collide_fun) {
+      int hit_count = 0;
+      int test_count = 0;
+      
+      const int cols = 32;
+      const int rows = 32;
+      const int num_sectors = rows * cols;
+      const int sector_width = max_pos.GetX() / cols;
+      const int sector_height = max_pos.GetY() / rows;
+
+      std::vector< std::vector<BODY_TYPE *> > sector_set(num_sectors);
+
+      // Loop through all of the bodies on this surface.
+      for (auto body : body_set) {
+        // Determine which sector the current body is in.
+        const int cur_col = body->GetCenter().GetX() / sector_width;
+        const int cur_row = body->GetCenter().GetY() / sector_height;
+
+        // See if this body may collide with any of the bodies previously put into sectors.
+        for (int i = std::max(0, cur_col-1); i <= std::min(cur_col+1, cols-1); i++) {
+          for (int j = std::max(0, cur_row-1); j <= std::min(cur_row+1, rows-1); j++) {
+            const int sector_id = i + cols * j;
+            if (sector_set[sector_id].size() == 0) continue;
+
+            for (auto body2 : sector_set[sector_id]) {
+              test_count++;
+              if (collide_fun(*body, *body2)) hit_count++;
+                  
+              // @CAO -- tag comparisons!
+              if (body->GetColorID() == 1) body2->SetColorID(2);
+              else if (body2->GetColorID() == 1) body->SetColorID(2);
+            }            
+
+          }
+        }
+
+        // Add this body to the current sector for future tests to compare with.
+        const int cur_sector = cur_col + cur_row * cols;
+        sector_set[cur_sector].push_back(body);
       }
-      body->MoveTo(new_pos);                    // Update the position of the body
-      return *this;
+
+      /*
+      // @CAO Run through all pairs of bodies that might collide and test to see if they did.
+      for (auto body_it1 = body_set.begin(); body_it1 != body_set.end(); body_it1++) {
+        for (auto body_it2 = body_it1; ++body_it2 != body_set.end();) {
+          if ((*body_it1)->CollisionTest(*(*body_it2))) hit_count++;
+        }
+      }
+      */
+
+      static int counter = 0;
+      counter++;
+      std::cout << counter << " : " << hit_count << " / " << test_count << std::endl;
+
+      // Make sure all bodies are in a legal position on the surface.
+      for (BODY_TYPE * cur_body : body_set) {
+        cur_body->FinalizePosition();
+        cur_body->AdjustPosition(max_pos);
+      }
     }
+
   };
 
 
