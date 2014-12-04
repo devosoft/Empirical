@@ -38,43 +38,58 @@ namespace emp {
     fixed & operator=(int other) { value = other << FRAC_BITS; return *this; }
     fixed & operator=(double other) { value = other * (1 << FRAC_BITS); return *this; }
 
+    fixed & operator+=(const fixed & rhs) { value += rhs.value; return *this; }
+    fixed & operator-=(const fixed & rhs) { value -= rhs.value; return *this; }
+    fixed & operator*=(const fixed & rhs) {
+      // Take advantage of (a+b)*(c+d) = ac+ad+bc+bd.  Since bd is too low precision: b*c + a*(c+d)
+      const int frac_mask = (1 << FRAC_BITS) - 1;
+      value = (value & frac_mask) * (rhs.value >> FRAC_BITS) + (value >> FRAC_BITS) * rhs.value
+        + ((value & frac_mask) * (rhs.value & frac_mask) >> FRAC_BITS);
+      return *this;
+    }
+    fixed & operator/=(const fixed & rhs) {
+      // @CAO can we take advantage of (a+b)/c = a/c + b/c
+      value = (((long) value) << FRAC_BITS) / rhs.value;
+      return *this;
+    }
+    
     fixed & operator++() { value += (1 << FRAC_BITS); }
     fixed operator++(int) { int old_val = value; operator++(); return fixed(old_val); }
     fixed & operator--() { value -= (1 << FRAC_BITS); }
     fixed operator--(int) { int old_val = value; operator--(); return fixed(old_val); }
 
-    friend fixed<FRAC_BITS> operator+(const fixed<FRAC_BITS> & lhs, const fixed<FRAC_BITS> & rhs) {
-      return fixed<FRAC_BITS>(lhs.bits() + rhs.bits(), true);
+    friend fixed operator+(const fixed & lhs, const fixed & rhs) {
+      return fixed(lhs.value + rhs.value, true);
     }
-    friend fixed<FRAC_BITS> operator-(const fixed<FRAC_BITS> & lhs, const fixed<FRAC_BITS> & rhs) {
-      return fixed<FRAC_BITS>(lhs.bits() - rhs.bits(), true);
+    friend fixed operator-(const fixed & lhs, const fixed & rhs) {
+      return fixed(lhs.value - rhs.value, true);
     }
-    friend fixed<FRAC_BITS> operator*(const fixed<FRAC_BITS> & lhs, const fixed<FRAC_BITS> & rhs) {
+    friend fixed operator*(const fixed & lhs, const fixed & rhs) {
       // Take advantage of (a+b)*(c+d) = ac+ad+bc+bd.  Since bd is too low precision: b*c + a*(c+d)
       const int frac_mask = (1 << FRAC_BITS) - 1;
-      const int new_value = (lhs.bits() & frac_mask) * (rhs.bits() >> FRAC_BITS)
-        + (lhs.bits() >> FRAC_BITS) * rhs.bits()
-        + ((lhs.bits() & frac_mask) * (rhs.bits() & frac_mask) >> FRAC_BITS);
-      return fixed<FRAC_BITS>(new_value, true);
+      const int new_value = (lhs.value & frac_mask) * (rhs.value >> FRAC_BITS)
+        + (lhs.value >> FRAC_BITS) * rhs.value
+        + ((lhs.value & frac_mask) * (rhs.value & frac_mask) >> FRAC_BITS);
+      return fixed(new_value, true);
     }
-    friend fixed<FRAC_BITS> operator/(const fixed<FRAC_BITS> & lhs, const fixed<FRAC_BITS> & rhs) {
+    friend fixed operator/(const fixed & lhs, const fixed & rhs) {
       // @CAO can we take advantage of (a+b)/c = a/c + b/c
-      const int new_value = (((long) lhs.bits()) << FRAC_BITS) / rhs.bits();
-      return fixed<FRAC_BITS>(new_value, true);
+      const int new_value = (((long) lhs.value) << FRAC_BITS) / rhs.value;
+      return fixed(new_value, true);
     }
     
-    friend bool operator==(const fixed<FRAC_BITS> & lhs, const fixed<FRAC_BITS> & rhs)
-    { return lhs.bits() == rhs.bits(); }
-    friend bool operator!=(const fixed<FRAC_BITS> & lhs, const fixed<FRAC_BITS> & rhs)
-    { return lhs.bits() != rhs.bits(); }
-    friend bool operator< (const fixed<FRAC_BITS> & lhs, const fixed<FRAC_BITS> & rhs)
-    { return lhs.bits() <  rhs.bits(); }
-    friend bool operator<=(const fixed<FRAC_BITS> & lhs, const fixed<FRAC_BITS> & rhs)
-    { return lhs.bits() <= rhs.bits(); }
-    friend bool operator> (const fixed<FRAC_BITS> & lhs, const fixed<FRAC_BITS> & rhs)
-    { return lhs.bits() >  rhs.bits(); }
-    friend bool operator>=(const fixed<FRAC_BITS> & lhs, const fixed<FRAC_BITS> & rhs)
-    { return lhs.bits() >= rhs.bits(); }
+    friend bool operator==(const fixed & lhs, const fixed & rhs)
+    { return lhs.value == rhs.value; }
+    friend bool operator!=(const fixed & lhs, const fixed & rhs)
+    { return lhs.value != rhs.value; }
+    friend bool operator< (const fixed & lhs, const fixed & rhs)
+    { return lhs.value <  rhs.value; }
+    friend bool operator<=(const fixed & lhs, const fixed & rhs)
+    { return lhs.value <= rhs.value; }
+    friend bool operator> (const fixed & lhs, const fixed & rhs)
+    { return lhs.value >  rhs.value; }
+    friend bool operator>=(const fixed & lhs, const fixed & rhs)
+    { return lhs.value >= rhs.value; }
   
   };
 
