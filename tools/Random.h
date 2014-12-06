@@ -1,14 +1,6 @@
 #ifndef EMP_RANDOM_H
 #define EMP_RANDOM_H
 
-#include <algorithm>
-#include <ctime>
-#include <climits>
-#include <cmath>
-#include <iterator>
-#include <unistd.h>
-#include <vector>
-
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  A versatile and non-patterned pseudo-random-number generator.
@@ -46,6 +38,13 @@
 //      Draw a value from the given distributions
 //
 
+#include <algorithm>
+#include <ctime>
+#include <climits>
+#include <cmath>
+#include <iterator>
+#include <unistd.h>
+#include <vector>
 
 namespace emp {
   class Random {

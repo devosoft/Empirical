@@ -5,8 +5,8 @@
 #include <map>
 #include <string>
 
-#include "tools/callbacks.h"
-#include "emtools/emfunctions.h"
+#include "../tools/callbacks.h"
+#include "emfunctions.h"
 
 namespace emp {
 

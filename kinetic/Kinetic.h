@@ -7,16 +7,16 @@
 #include <string>
 #include <vector>
 
-#include "tools/callbacks.h"
-#include "tools/const.h"
-#include "geometry/Circle2D.h"
-#include "geometry/Point2D.h"
+#include "../tools/callbacks.h"
+#include "../tools/const.h"
+#include "../geometry/Circle2D.h"
+#include "../geometry/Point2D.h"
 
-#include "emtools/assert.h"
-#include "emtools/emfunctions.h"
-#include "emtools/Color.h"
-#include "emtools/Font.h"
-#include "emtools/RawImage.h"
+#include "../emtools/assert.h"
+#include "../emtools/emfunctions.h"
+#include "../emtools/Color.h"
+#include "../emtools/Font.h"
+#include "../emtools/RawImage.h"
 
 extern "C" {
   extern int EMP_Tween_Build(int target_id, double seconds);
