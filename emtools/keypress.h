@@ -7,7 +7,7 @@
 //
 
 #include <functional>
-// #include <map>
+#include <map>
 #include "../tools/callbacks.h"
 
 namespace emp {
@@ -16,22 +16,20 @@ namespace emp {
 
   class KeypressManager {
   private:
-    //std::map<int, std::function<bool(const EventInfo &)> > fun_map;
-    std::function<bool(const EventInfo &)> fun_cb;
+    std::map<int, std::function<bool(const EventInfo &)> > fun_map;
     int next_order;  // Ordering to use if not specified (always last)
 
     void DoCallback(const EventInfo & evt_info) {
-      fun_cb(evt_info);
-      // bool handled = false;
-      // for (auto fun_entry : fun_map) {
-      //   if (fun_entry.second(evt_info) == true) {
-      //     handled = true;
-      //     break;
-      //   }
-      // }
+      bool handled = false;
+      for (auto fun_entry : fun_map) {
+        if (fun_entry.second(evt_info) == true) {
+          handled = true;
+          break;
+        }
+      }
 
-      // // If an event has been handled, don't pass it on!
-      // if (handled) { ; }
+      // @CAO If an event has been handled, don't pass it on!
+      if (handled) { ; }
     };
 
 
@@ -65,13 +63,11 @@ namespace emp {
       // pass it back in to trigger the removal.
     }
 
-    template <class T>
-    void AddKeydownCallback(T & obj, bool (T::*_method_ptr)(const EventInfo &), int order=-1) {
+    void AddKeydownCallback(std::function<bool(const EventInfo &)> cb_fun, int order=-1) {
       if (order == -1) order = next_order;
       if (order >= next_order) next_order = order+1;
 
-      // fun_map[order] = std::bind( std::mem_fn(_method_ptr), obj, _1);
-      fun_cb = std::bind( std::mem_fn(_method_ptr), obj, _1);
+      fun_map[order] = cb_fun;
     }
   };
 
