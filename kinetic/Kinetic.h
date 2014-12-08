@@ -439,9 +439,9 @@ namespace emp {
     inline static void ClosePath() { EM_ASM( emp_info.ctx.closePath() ); }
     inline static void Fill() { EM_ASM( emp_info.ctx.fill() ); }
     inline static void LineTo(int x, int y) { EM_ASM_ARGS({ emp_info.ctx.lineTo($0, $1); }, x, y); }
-    inline static void LineTo(const Point<int> & point) { LineTo(point.GetX(), point.GetY()); }
+    template <typename T> static void LineTo(const Point<T> & point) { LineTo(point.GetX(), point.GetY()); }
     inline static void MoveTo(int x, int y) { EM_ASM_ARGS({ emp_info.ctx.moveTo($0, $1); }, x, y); }
-    inline static void MoveTo(const Point<int> & point) { MoveTo(point.GetX(), point.GetY()); }
+    template <typename T> static void MoveTo(const Point<T> & point) { MoveTo(point.GetX(), point.GetY()); }
 
     // Transformations
     inline static void Restore() { EM_ASM( emp_info.ctx.restore() ); }
