@@ -67,6 +67,18 @@ namespace emp {
     CircleBody2D<BODY_INFO, BASE_TYPE> &
     AddShift(const Point<BASE_TYPE> & inc_val) { shift += inc_val; return *this; }
 
+    CircleBody2D<BODY_INFO, BASE_TYPE> &
+    TurnLeft(int steps=1) { orientation.RotateDegrees(45); return *this; }
+    CircleBody2D<BODY_INFO, BASE_TYPE> &
+    TurnRight(int steps=1) { orientation.RotateDegrees(-45); return *this; }
+    CircleBody2D<BODY_INFO, BASE_TYPE> &
+    IncSpeed(double steps=1.0) {
+      velocity += Point<BASE_TYPE>(orientation.Sin(), orientation.Cos());
+      return *this;
+    }
+    CircleBody2D<BODY_INFO, BASE_TYPE> &
+    DecSpeed(double steps=1.0) { return *this; }
+
     // If a body is not at its target radius, grow it or shrink it, as needed.
     CircleBody2D<BODY_INFO, BASE_TYPE> & BodyUpdate(BASE_TYPE grow_factor=1) {
       if (target_radius == -1) return *this;
