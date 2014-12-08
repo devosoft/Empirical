@@ -90,7 +90,7 @@ namespace emp {
       auto body_set = surface.GetBodySet();
       for (BODY_TYPE * cur_body : body_set) {
         cur_body->BodyUpdate();   // Let a body change size or shape, as needed.
-        cur_body->ProcessStep();  // Update position and velocity.
+        cur_body->ProcessStep(0.0125);  // Update position and velocity.
       }
 
       // Handle collisions
