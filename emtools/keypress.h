@@ -52,7 +52,7 @@ namespace emp {
 
               empJSDoCallback($0, ptr);
               Module._free(ptr);
-              evt.preventDefault();
+              if (!evt.metaKey) evt.preventDefault();
             }, false);
 
         }, (int) keypress_callback);
