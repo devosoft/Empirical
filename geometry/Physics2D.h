@@ -94,7 +94,7 @@ namespace emp {
       }
 
       // Handle collisions
-      auto collide_fun = std::bind(std::mem_fn(&Physics2D::TestPairCollision), *this, _1, _2);
+      auto collide_fun = std::bind(&Physics2D::TestPairCollision, this, _1, _2);
       surface.TestCollisions(collide_fun);
     }
 
