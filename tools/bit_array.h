@@ -1,15 +1,15 @@
 #ifndef EMP_BIT_ARRAY_H
 #define EMP_BIT_ARRAY_H
 
-#include <assert>
+#include <assert.h>
 #include <iostream>
 #include <vector>
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Class: cBitArray and cBitMatrix
-// Desc: These classes handle an arbitrarily large array or matrix of bits,
-//       and optimizes the operations on those bits to be as fast as possible.
+// Class: cBitArray
+// Desc: This class handles an arbitrarily large array of bits,
+//       and optimizes operations on those bits to be as fast as possible.
 //
 //
 // Constructors:
@@ -81,463 +81,463 @@
 //  cBitArray & operator++(int)  // postfix ++
 
 
+namespace emp {
 
+  // The following is an internal class used by cBitArray (and will be used in
+  // cBitMatrix eventually....).  It does not keep track of size, so this value
+  // must be passed in.
 
-// The following is an internal class used by cBitArray (and will be used in
-// cBitMatrix eventually....).  It does not keep track of size, so this value
-// must be passed in.
-
-class cRawBitArray {
-private:
-  unsigned int * bit_fields;
+  class cRawBitArray {
+  private:
+    unsigned int * bit_fields;
   
-  // Disallow default copy constructor and operator=
-  // (we need to know the number of bits we're working with!)
-  cRawBitArray(const cRawBitArray&);
-  const cRawBitArray & operator=(const cRawBitArray&);
+    // Disallow default copy constructor and operator=
+    // (we need to know the number of bits we're working with!)
+    cRawBitArray(const cRawBitArray&);
+    const cRawBitArray & operator=(const cRawBitArray&);
 
-  static int GetNumFields(const int num_bits) const { return 1 + ((num_bits - 1) >> 5); }
-  static int GetField(const int index) const { return index >> 5; }
-  static int GetFieldPos(const int index) const { return index & 31; }
-public:
-  cRawBitArray() : bit_fields(NULL) { ; }
-  ~cRawBitArray() {  if (bit_fields) delete [] bit_fields; }
+    static int GetNumFields(const int num_bits) { return 1 + ((num_bits - 1) >> 5); }
+    static int GetField(const int index) { return index >> 5; }
+    static int GetFieldPos(const int index) { return index & 31; }
+  public:
+    cRawBitArray() : bit_fields(NULL) { ; }
+    ~cRawBitArray() {  if (bit_fields) delete [] bit_fields; }
 
-  void Zero(const int num_bits) {
-    const int num_fields = GetNumFields(num_bits);
-    for (int i = 0; i < num_fields; i++) {
-      bit_fields[i] = 0;
-    }    
-  }
-
-  void Ones(const int num_bits) {
-    const int num_fields = GetNumFields(num_bits);
-    const int last_bit = GetFieldPos(num_bits);
-    for (int i = 0; i < num_fields; i++) { bit_fields[i] = ~0; }    
-    if (last_bit > 0) { bit_fields[num_fields - 1] &= (1 << last_bit) - 1; }
-  }
-
-  cRawBitArray(const int num_bits) {
-    bit_fields = new unsigned int[ GetNumFields(num_bits) ];
-    Zero(num_bits);
-  }
-
-  // The Copy() method and the Copy Constructor must both be told how many
-  // bits they are working with.
-  void Copy(const cRawBitArray & in_array, const int num_bits) {
-    const int num_fields = GetNumFields(num_bits);
-    if (bit_fields) delete [] bit_fields;
-    bit_fields = new unsigned int[num_fields];
-    for (int i = 0; i < num_fields; i++) {
-      bit_fields[i] = in_array.bit_fields[i];
-    }
-  }
-
-  cRawBitArray(const cRawBitArray & in_array, const int num_bits)
-    : bit_fields(NULL)
-  {
-    Copy(in_array, num_bits);
-  }
-
-  // For fast bit operations, we're not going to setup operator[]; instead
-  // we're going to have a GetBit and a SetBit commamd.  For this raw version
-  // we're also going to assume that the index is within range w/o any special
-  // checks.
-  bool GetBit(const int index) const{
-    const int field_id = GetField(index);
-    const int pos_id = GetFieldPos(index);
-    return (bit_fields[field_id] & (1 << pos_id)) != 0;
-  }
-
-  void SetBit(const int index, const bool value) {
-    const int field_id = GetField(index);
-    const int pos_id = GetFieldPos(index);
-    const int pos_mask = 1 << pos_id;
-
-    if (value) bit_fields[field_id] |= pos_mask;
-    else       bit_fields[field_id] &= ~pos_mask;
-  }
-
-  bool IsEqual(const cRawBitArray & in_array, int num_bits) const {
-    const int num_fields = GetNumFields(num_bits);
-    for (int i = 0; i < num_fields; i++) {
-      if (bit_fields[i] != in_array.bit_fields[i]) return false;
-    }
-    return true;
-  }
-
-  void Resize(const int old_bits, const int new_bits) {
-    const int num_old_fields = GetNumFields(old_bits);
-    const int num_new_fields = GetNumFields(new_bits);
-    if (num_old_fields == num_new_fields) {
-      // Clear all bits past the new end and stop (in case new_bits is slightly less than old_bits)
-      unsigned int & last_field = bit_fields[num_new_fields - 1];
-      for (int i = new_bits; i < old_bits; i++) {
-        const unsigned int clear_bit = i & 31;
-        last_field &= ~(1 << clear_bit);
-      }
-      return;
-    }
-
-    // If we made it here, we must change the number of fields.
-    // Create the new bit array and copy the old one into it.
-    unsigned int * new_bit_fields = new unsigned int[ num_new_fields ];
-    const int min_fields = std::min(num_new_fields, num_old_fields);
-    for (int i = 0; i < min_fields; i++) {
-      new_bit_fields[i] = bit_fields[i];
-    }
-  
-    // If the old bits are longer, we must clear the end of the last bit field.
-    if (num_old_fields > num_new_fields) {
-      unsigned int & last_field = new_bit_fields[num_new_fields - 1];
-      // @CAO Speed this up!
-      for (int clear_bit=GetFieldPos(new_bits); clear_bit < 32; clear_bit++) {
-        last_field &= ~(1 << clear_bit);
-      }
-    }
-  
-    // If the new bits are longer, clear fields past the end of the old bits.
-    for (int i = num_old_fields; i < num_new_fields; i++) {
-      new_bit_fields[i] = 0;
-    }
-
-    if (bit_fields != NULL) {
-      delete [] bit_fields;
-    }
-    bit_fields = new_bit_fields;
-  }
-  
-  // Resize, but don't copy anything into the new space.
-  void ResizeSloppy(const int new_bits) {
-    const int new_fields = GetNumFields(new_bits);
-    if (bit_fields) delete [] bit_fields;
-    bit_fields = new unsigned int[ new_fields ];
-  }
-
-  // Resize and copy zeroes into the new space.
-  void ResizeClear(const int new_bits) {
-    ResizeSloppy(new_bits);
-    Zero(new_bits);
-  }
-
-
-  // Count 1 bits by looping through once for each bit equal to 1; fast for sparse arrays.
-  int CountBits(const int num_bits) const { 
-    const int num_fields = GetNumFields(num_bits);
-    int bit_count = 0;
-    
-    for (int i = 0; i < num_fields; i++) {
-      int temp = bit_fields[i];
-      while (temp) {
-        temp = temp & (temp - 1);
-        bit_count++;
-      }
-    }
-    return bit_count;
-  }
-
-  // Count 1 bits in semi-parallel; fast for dense arrays.
-  int CountBits2(const int num_bits) const {
-    const int num_fields = GetNumFields(num_bits);
-    int bit_count = 0;
-    
-    for (int i = 0; i < num_fields; i++) {
-      const int  v = bit_fields[i];
-      unsigned int const t1 = v - ((v >> 1) & 0x55555555);
-      unsigned int const t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
-      bit_count += ((t2 + (t2 >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
-    }
-    return bit_count;
-  }
-
-  // Other bit-play
-  int FindBit1(const int num_bits, const int start_pos=0) const {
-    // @CAO -- There are better ways to do this with bit tricks.
-    for (int i = start_pos; i < num_bits; i++) {
-      if (GetBit(i)) return i;
-    }
-    return -1;
-  }
-
-  vector<int> GetOnes(const int num_bits) const {
-    // @CAO -- There are probably better ways to do this with bit tricks.
-    vector<int> out_array(CountBits2(num_bits));
-    int cur_pos = 0;
-    for (int i = 0; i < num_bits; i++) {
-      if (GetBit(i)) out_array[cur_pos++] = i;
-    }
-    return out_array;
-  }
-
-
-  // Helper: call SHIFT with positive number instead
-  // NOTE: This does NOT change the number of bits in the array.
-  void ShiftLeft(const int num_bits, const int shift_size) {
-    assert(shift_size > 0);
-    int num_fields = GetNumFields(num_bits);
-    int field_shift = shift_size / 32;
-    int bit_shift = shift_size % 32;
-    
-    // account for field_shift
-    if (field_shift) {
-      for (int i = num_fields - 1; i >= field_shift; i--) {
-        bit_fields[i] = bit_fields[i - field_shift];
-      }
-      for (int i = field_shift - 1; i >= 0; i--) {
+    void Zero(const int num_bits) {
+      const int num_fields = GetNumFields(num_bits);
+      for (int i = 0; i < num_fields; i++) {
         bit_fields[i] = 0;
+      }    
+    }
+
+    void Ones(const int num_bits) {
+      const int num_fields = GetNumFields(num_bits);
+      const int last_bit = GetFieldPos(num_bits);
+      for (int i = 0; i < num_fields; i++) { bit_fields[i] = ~0; }    
+      if (last_bit > 0) { bit_fields[num_fields - 1] &= (1 << last_bit) - 1; }
+    }
+
+    cRawBitArray(const int num_bits) {
+      bit_fields = new unsigned int[ GetNumFields(num_bits) ];
+      Zero(num_bits);
+    }
+
+    // The Copy() method and the Copy Constructor must both be told how many
+    // bits they are working with.
+    void Copy(const cRawBitArray & in_array, const int num_bits) {
+      const int num_fields = GetNumFields(num_bits);
+      if (bit_fields) delete [] bit_fields;
+      bit_fields = new unsigned int[num_fields];
+      for (int i = 0; i < num_fields; i++) {
+        bit_fields[i] = in_array.bit_fields[i];
       }
     }
-    
-    // account for bit_shift
-    int temp = 0;
-    for (int i = 0; i < num_fields; i++) {
-      temp = bit_fields[i] >> (32 - bit_shift);
-      bit_fields[i] <<= bit_shift;
-      if (i > 0) bit_fields[i - 1] |= temp;  // lower bits of bit_fields[i - 1] are all 0
-    }
-    
-    // mask out any bits that have left-shifted away, allowing CountBits and CountBits2 to work
-    // blw: if CountBits/CountBits2 are fixed, this code should be removed as it will be redundant
-    unsigned int shift_mask = 0xFFFFFFFF >> ((32 - (num_bits % 32)) & 0x1F);
-    bit_fields[num_fields - 1] &= shift_mask;    
-  }
 
-  
-  // Helper for calling SHIFT with negative number
-  void ShiftRight(const int num_bits, const int shift_size) {
-    assert(shift_size > 0);
-    int num_fields = GetNumFields(num_bits);
-    int field_shift = shift_size / 32;
-    int bit_shift = shift_size % 32;
-  
-    // account for field_shift
-    if (field_shift) {
-      for (int i = 0; i < num_fields - field_shift; i++) {
-        bit_fields[i] = bit_fields[i + field_shift];
+    cRawBitArray(const cRawBitArray & in_array, const int num_bits)
+      : bit_fields(NULL)
+    {
+      Copy(in_array, num_bits);
+    }
+
+    // For fast bit operations, we're not going to setup operator[]; instead
+    // we're going to have a GetBit and a SetBit commamd.  For this raw version
+    // we're also going to assume that the index is within range w/o any special
+    // checks.
+    bool GetBit(const int index) const{
+      const int field_id = GetField(index);
+      const int pos_id = GetFieldPos(index);
+      return (bit_fields[field_id] & (1 << pos_id)) != 0;
+    }
+
+    void SetBit(const int index, const bool value) {
+      const int field_id = GetField(index);
+      const int pos_id = GetFieldPos(index);
+      const int pos_mask = 1 << pos_id;
+
+      if (value) bit_fields[field_id] |= pos_mask;
+      else       bit_fields[field_id] &= ~pos_mask;
+    }
+
+    bool IsEqual(const cRawBitArray & in_array, int num_bits) const {
+      const int num_fields = GetNumFields(num_bits);
+      for (int i = 0; i < num_fields; i++) {
+        if (bit_fields[i] != in_array.bit_fields[i]) return false;
       }
-      for(int i = num_fields - field_shift; i < num_fields; i++) {
-        bit_fields[i] = 0;
+      return true;
+    }
+
+    void Resize(const int old_bits, const int new_bits) {
+      const int num_old_fields = GetNumFields(old_bits);
+      const int num_new_fields = GetNumFields(new_bits);
+      if (num_old_fields == num_new_fields) {
+        // Clear all bits past the new end and stop (in case new_bits is slightly less than old_bits)
+        unsigned int & last_field = bit_fields[num_new_fields - 1];
+        for (int i = new_bits; i < old_bits; i++) {
+          const unsigned int clear_bit = i & 31;
+          last_field &= ~(1 << clear_bit);
+        }
+        return;
+      }
+
+      // If we made it here, we must change the number of fields.
+      // Create the new bit array and copy the old one into it.
+      unsigned int * new_bit_fields = new unsigned int[ num_new_fields ];
+      const int min_fields = std::min(num_new_fields, num_old_fields);
+      for (int i = 0; i < min_fields; i++) {
+        new_bit_fields[i] = bit_fields[i];
+      }
+  
+      // If the old bits are longer, we must clear the end of the last bit field.
+      if (num_old_fields > num_new_fields) {
+        unsigned int & last_field = new_bit_fields[num_new_fields - 1];
+        // @CAO Speed this up!
+        for (int clear_bit=GetFieldPos(new_bits); clear_bit < 32; clear_bit++) {
+          last_field &= ~(1 << clear_bit);
+        }
+      }
+  
+      // If the new bits are longer, clear fields past the end of the old bits.
+      for (int i = num_old_fields; i < num_new_fields; i++) {
+        new_bit_fields[i] = 0;
+      }
+
+      if (bit_fields != NULL) {
+        delete [] bit_fields;
+      }
+      bit_fields = new_bit_fields;
+    }
+  
+    // Resize, but don't copy anything into the new space.
+    void ResizeSloppy(const int new_bits) {
+      const int new_fields = GetNumFields(new_bits);
+      if (bit_fields) delete [] bit_fields;
+      bit_fields = new unsigned int[ new_fields ];
+    }
+
+    // Resize and copy zeroes into the new space.
+    void ResizeClear(const int new_bits) {
+      ResizeSloppy(new_bits);
+      Zero(new_bits);
+    }
+
+
+    // Count 1 bits by looping through once for each bit equal to 1; fast for sparse arrays.
+    int CountBits(const int num_bits) const { 
+      const int num_fields = GetNumFields(num_bits);
+      int bit_count = 0;
+    
+      for (int i = 0; i < num_fields; i++) {
+        int temp = bit_fields[i];
+        while (temp) {
+          temp = temp & (temp - 1);
+          bit_count++;
+        }
+      }
+      return bit_count;
+    }
+
+    // Count 1 bits in semi-parallel; fast for dense arrays.
+    int CountBits2(const int num_bits) const {
+      const int num_fields = GetNumFields(num_bits);
+      int bit_count = 0;
+    
+      for (int i = 0; i < num_fields; i++) {
+        const int  v = bit_fields[i];
+        unsigned int const t1 = v - ((v >> 1) & 0x55555555);
+        unsigned int const t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
+        bit_count += ((t2 + (t2 >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
+      }
+      return bit_count;
+    }
+
+    // Other bit-play
+    int FindBit1(const int num_bits, const int start_pos=0) const {
+      // @CAO -- There are better ways to do this with bit tricks.
+      for (int i = start_pos; i < num_bits; i++) {
+        if (GetBit(i)) return i;
+      }
+      return -1;
+    }
+
+    std::vector<int> GetOnes(const int num_bits) const {
+      // @CAO -- There are probably better ways to do this with bit tricks.
+      std::vector<int> out_array(CountBits2(num_bits));
+      int cur_pos = 0;
+      for (int i = 0; i < num_bits; i++) {
+        if (GetBit(i)) out_array[cur_pos++] = i;
+      }
+      return out_array;
+    }
+
+
+    // Helper: call SHIFT with positive number instead
+    // NOTE: This does NOT change the number of bits in the array.
+    void ShiftLeft(const int num_bits, const int shift_size) {
+      assert(shift_size > 0);
+      int num_fields = GetNumFields(num_bits);
+      int field_shift = shift_size / 32;
+      int bit_shift = shift_size % 32;
+    
+      // account for field_shift
+      if (field_shift) {
+        for (int i = num_fields - 1; i >= field_shift; i--) {
+          bit_fields[i] = bit_fields[i - field_shift];
+        }
+        for (int i = field_shift - 1; i >= 0; i--) {
+          bit_fields[i] = 0;
+        }
+      }
+    
+      // account for bit_shift
+      int temp = 0;
+      for (int i = 0; i < num_fields; i++) {
+        temp = bit_fields[i] >> (32 - bit_shift);
+        bit_fields[i] <<= bit_shift;
+        if (i > 0) bit_fields[i - 1] |= temp;  // lower bits of bit_fields[i - 1] are all 0
+      }
+    
+      // mask out any bits that have left-shifted away, allowing CountBits and CountBits2 to work
+      // blw: if CountBits/CountBits2 are fixed, this code should be removed as it will be redundant
+      unsigned int shift_mask = 0xFFFFFFFF >> ((32 - (num_bits % 32)) & 0x1F);
+      bit_fields[num_fields - 1] &= shift_mask;    
+    }
+
+  
+    // Helper for calling SHIFT with negative number
+    void ShiftRight(const int num_bits, const int shift_size) {
+      assert(shift_size > 0);
+      int num_fields = GetNumFields(num_bits);
+      int field_shift = shift_size / 32;
+      int bit_shift = shift_size % 32;
+  
+      // account for field_shift
+      if (field_shift) {
+        for (int i = 0; i < num_fields - field_shift; i++) {
+          bit_fields[i] = bit_fields[i + field_shift];
+        }
+        for(int i = num_fields - field_shift; i < num_fields; i++) {
+          bit_fields[i] = 0;
+        }
+      }
+  
+      // account for bit_shift
+      bit_fields[num_fields - 1] >>= bit_shift;  // drops off right end, may shift in ones if sign bit was set
+      int temp = 0;
+      for (int i = num_fields - 2; i >= 0; i--) {
+        temp = bit_fields[i] << (32 - bit_shift);
+        bit_fields[i] >>= bit_shift;
+        bit_fields[i + 1] |= temp;
+      }
+    }
+
+    void Print(const int num_bits, std::ostream & out=std::cout) const {
+      for (int i = 0; i < num_bits; i++) {
+        out << GetBit(i);
       }
     }
   
-    // account for bit_shift
-    bit_fields[num_fields - 1] >>= bit_shift;  // drops off right end, may shift in ones if sign bit was set
-    int temp = 0;
-    for (int i = num_fields - 2; i >= 0; i--) {
-      temp = bit_fields[i] << (32 - bit_shift);
-      bit_fields[i] >>= bit_shift;
-      bit_fields[i + 1] |= temp;
+    // prints in the accepted human readable low-to-hight = right-to-left format, taking bit 0 as low bit
+    void PrintRightToLeft(const int num_bits, std::ostream & out=std::cout) const {
+      for (int i = num_bits - 1; i >= 0; i--) {
+        out << GetBit(i);
+      }
     }
-  }
 
-  void Print(const int num_bits, ostream & out=cout) const {
-    for (int i = 0; i < num_bits; i++) {
-      out << GetBit(i);
+    void PrintOneIDs(const int num_bits, std::ostream & out=std::cout) const {
+      for (int i = 0; i < num_bits; i++) {
+        if (GetBit(i)) out << i << " ";
+      }
     }
-  }
+
+    // Fast bool operators: use this bit array as one input and for storing the result.
+    void NOT(const int num_bits) {
+      const int num_fields = GetNumFields(num_bits);
+      for (int i = 0; i < num_fields; i++) {
+        bit_fields[i] = ~bit_fields[i];
+      }
+    
+      const int last_bit = GetFieldPos(num_bits);
+      if (last_bit > 0) {
+        bit_fields[num_fields - 1] &= (1 << last_bit) - 1;
+      }
+    }
+
+    void AND(const cRawBitArray & array2, const int num_bits) {
+      const int num_fields = GetNumFields(num_bits);
+      for (int i = 0; i < num_fields; i++) {
+        bit_fields[i] &= array2.bit_fields[i];
+      }
+    }
+
+    void OR(const cRawBitArray & array2, const int num_bits) {
+      const int num_fields = GetNumFields(num_bits);
+      for (int i = 0; i < num_fields; i++) {
+        bit_fields[i] |= array2.bit_fields[i];
+      }
+    }
+
+    void NAND(const cRawBitArray & array2, const int num_bits) {
+      const int num_fields = GetNumFields(num_bits);
+      for (int i = 0; i < num_fields; i++) {
+        bit_fields[i] = ~(bit_fields[i] & array2.bit_fields[i]);
+      }
+    
+      const int last_bit = GetFieldPos(num_bits);
+      if (last_bit > 0) {
+        bit_fields[num_fields - 1] &= (1 << last_bit) - 1;
+      }
+    }
+
+    void NOR(const cRawBitArray & array2, const int num_bits) {
+      const int num_fields = GetNumFields(num_bits);
+      for (int i = 0; i < num_fields; i++) {
+        bit_fields[i] = ~(bit_fields[i] | array2.bit_fields[i]);
+      }
+    
+      const int last_bit = GetFieldPos(num_bits);
+      if (last_bit > 0) {
+        bit_fields[num_fields - 1] &= (1 << last_bit) - 1;
+      }
+    }
+
+    void XOR(const cRawBitArray & array2, const int num_bits) {
+      const int num_fields = GetNumFields(num_bits);
+      for (int i = 0; i < num_fields; i++) {
+        bit_fields[i] ^= array2.bit_fields[i];
+      }
+    }
+
+    void EQU(const cRawBitArray & array2, const int num_bits) {
+      const int num_fields = GetNumFields(num_bits);
+      for (int i = 0; i < num_fields; i++) {
+        bit_fields[i] = ~(bit_fields[i] ^ array2.bit_fields[i]);
+      }
+    
+      const int last_bit = GetFieldPos(num_bits);
+      if (last_bit > 0) {
+        bit_fields[num_fields - 1] &= (1 << last_bit) - 1;
+      }
+    }
+
+    // Positive shifts go left and negative go right (0 does nothing)
+    void SHIFT(const int num_bits, const int shift_size) {
+      if (shift_size == 0) return;
+      if (shift_size > 0) { ShiftLeft(num_bits, shift_size); return; }
+      if (shift_size < 0) { ShiftRight(num_bits, -shift_size); return; }
+      assert(false); // Should never get here.
+    }
+
+    void INCREMENT(const int num_bits){
+      const int num_fields = GetNumFields(num_bits);
+      int i = 0;
+      for (i = 0; i < num_fields; i++) {
+        bit_fields[i]++;
+        if (bit_fields[i] != 0) break;  // no overflow, do not need to increment higher fields
+      }
+    
+      // If highest bit field was incremented, mask out any unused portions of the field
+      if (i == num_fields - 1) {
+        unsigned int shift_mask = 0xffffffff >> (32 - num_bits % 32);
+        bit_fields[num_fields - 1] &= shift_mask;
+      }
+    }
+
+    // Fast bool operators: load inputs and store the results here.
+    void NOT(const cRawBitArray & array1, const int num_bits) {
+      ResizeSloppy(num_bits);
+    
+      const int num_fields = GetNumFields(num_bits);
+      for (int i = 0; i < num_fields; i++) {
+        bit_fields[i] = ~array1.bit_fields[i];
+      }
+    
+      const int last_bit = GetFieldPos(num_bits);
+      if (last_bit > 0) {
+        bit_fields[num_fields - 1] &= (1 << last_bit) - 1;
+      }
+    }
+
+    void AND(const cRawBitArray & array1, const cRawBitArray & array2, const int num_bits) {
+      ResizeSloppy(num_bits);
+    
+      const int num_fields = GetNumFields(num_bits);
+      for (int i = 0; i < num_fields; i++) {
+        bit_fields[i] = array1.bit_fields[i] & array2.bit_fields[i];
+      }
+    }
   
-  // prints in the accepted human readable low-to-hight = right-to-left format, taking bit 0 as low bit
-  void PrintRightToLeft(const int num_bits, ostream & out=std::cout) const {
-    for (int i = num_bits - 1; i >= 0; i--) {
-      out << GetBit(i);
-    }
-  }
-
-  void PrintOneIDs(const int num_bits, ostream & out=std::cout) const {
-    for (int i = 0; i < num_bits; i++) {
-      if (GetBit(i)) out << i << " ";
-    }
-  }
-
-  // Fast bool operators: use this bit array as one input and for storing the result.
-  void NOT(const int num_bits) {
-    const int num_fields = GetNumFields(num_bits);
-    for (int i = 0; i < num_fields; i++) {
-      bit_fields[i] = ~bit_fields[i];
-    }
+    void OR(const cRawBitArray & array1, const cRawBitArray & array2, const int num_bits) {
+      ResizeSloppy(num_bits);
     
-    const int last_bit = GetFieldPos(num_bits);
-    if (last_bit > 0) {
-      bit_fields[num_fields - 1] &= (1 << last_bit) - 1;
+      const int num_fields = GetNumFields(num_bits);
+      for (int i = 0; i < num_fields; i++) {
+        bit_fields[i] = array1.bit_fields[i] | array2.bit_fields[i];
+      }
     }
-  }
 
-  void AND(const cRawBitArray & array2, const int num_bits) {
-    const int num_fields = GetNumFields(num_bits);
-    for (int i = 0; i < num_fields; i++) {
-      bit_fields[i] &= array2.bit_fields[i];
-    }
-  }
-
-  void OR(const cRawBitArray & array2, const int num_bits) {
-    const int num_fields = GetNumFields(num_bits);
-    for (int i = 0; i < num_fields; i++) {
-      bit_fields[i] |= array2.bit_fields[i];
-    }
-  }
-
-  void NAND(const cRawBitArray & array2, const int num_bits) {
-    const int num_fields = GetNumFields(num_bits);
-    for (int i = 0; i < num_fields; i++) {
-      bit_fields[i] = ~(bit_fields[i] & array2.bit_fields[i]);
-    }
+    void NAND(const cRawBitArray & array1, const cRawBitArray & array2, const int num_bits) {
+      ResizeSloppy(num_bits);
     
-    const int last_bit = GetFieldPos(num_bits);
-    if (last_bit > 0) {
-      bit_fields[num_fields - 1] &= (1 << last_bit) - 1;
-    }
-  }
+      const int num_fields = GetNumFields(num_bits);
+      for (int i = 0; i < num_fields; i++) {
+        bit_fields[i] = ~(array1.bit_fields[i] & array2.bit_fields[i]);
+      }
 
-  void NOR(const cRawBitArray & array2, const int num_bits) {
-    const int num_fields = GetNumFields(num_bits);
-    for (int i = 0; i < num_fields; i++) {
-      bit_fields[i] = ~(bit_fields[i] | array2.bit_fields[i]);
+      const int last_bit = GetFieldPos(num_bits);
+      if (last_bit > 0) {
+        bit_fields[num_fields - 1] &= (1 << last_bit) - 1;
+      }
     }
+
+    void NOR(const cRawBitArray & array1, const cRawBitArray & array2, const int num_bits) {
+      ResizeSloppy(num_bits);
     
-    const int last_bit = GetFieldPos(num_bits);
-    if (last_bit > 0) {
-      bit_fields[num_fields - 1] &= (1 << last_bit) - 1;
-    }
-  }
-
-  void XOR(const cRawBitArray & array2, const int num_bits) {
-    const int num_fields = GetNumFields(num_bits);
-    for (int i = 0; i < num_fields; i++) {
-      bit_fields[i] ^= array2.bit_fields[i];
-    }
-  }
-
-  void EQU(const cRawBitArray & array2, const int num_bits) {
-    const int num_fields = GetNumFields(num_bits);
-    for (int i = 0; i < num_fields; i++) {
-      bit_fields[i] = ~(bit_fields[i] ^ array2.bit_fields[i]);
-    }
+      const int num_fields = GetNumFields(num_bits);
+      for (int i = 0; i < num_fields; i++) {
+        bit_fields[i] = ~(array1.bit_fields[i] | array2.bit_fields[i]);
+      }
     
-    const int last_bit = GetFieldPos(num_bits);
-    if (last_bit > 0) {
-      bit_fields[num_fields - 1] &= (1 << last_bit) - 1;
+      const int last_bit = GetFieldPos(num_bits);
+      if (last_bit > 0) {
+        bit_fields[num_fields - 1] &= (1 << last_bit) - 1;
+      }
     }
-  }
 
-  // Positive shifts go left and negative go right (0 does nothing)
-  void SHIFT(const int num_bits, const int shift_size) {
-    if (shift_size == 0) return;
-    if (shift_size > 0) { ShiftLeft(num_bits, shift_size); return; }
-    if (shift_size < 0) { ShiftRight(num_bits, -shift_size); return; }
-    assert(false); // Should never get here.
-  }
+    void XOR(const cRawBitArray & array1, const cRawBitArray & array2, const int num_bits) {
+      ResizeSloppy(num_bits);
+    
+      const int num_fields = GetNumFields(num_bits);
+      for (int i = 0; i < num_fields; i++) {
+        bit_fields[i] = array1.bit_fields[i] ^ array2.bit_fields[i];
+      }
+    }
 
-  void INCREMENT(const int num_bits){
-    const int num_fields = GetNumFields(num_bits);
-    int i = 0;
-    for (i = 0; i < num_fields; i++) {
-      bit_fields[i]++;
-      if (bit_fields[i] != 0) break;  // no overflow, do not need to increment higher fields
-    }
+    void EQU(const cRawBitArray & array1, const cRawBitArray & array2, const int num_bits) {
+      ResizeSloppy(num_bits);
     
-    // If highest bit field was incremented, mask out any unused portions of the field
-    if (i == num_fields - 1) {
-      unsigned int shift_mask = 0xffffffff >> (32 - num_bits % 32);
-      bit_fields[num_fields - 1] &= shift_mask;
+      const int num_fields = GetNumFields(num_bits);
+      for (int i = 0; i < num_fields; i++) {
+        bit_fields[i] = ~(array1.bit_fields[i] ^ array2.bit_fields[i]);
+      }
+    
+      const int last_bit = GetFieldPos(num_bits);
+      if (last_bit > 0) {
+        bit_fields[num_fields - 1] &= (1 << last_bit) - 1;
+      }
     }
-  }
 
-  // Fast bool operators: load inputs and store the results here.
-  void NOT(const cRawBitArray & array1, const int num_bits) {
-    ResizeSloppy(num_bits);
-    
-    const int num_fields = GetNumFields(num_bits);
-    for (int i = 0; i < num_fields; i++) {
-      bit_fields[i] = ~array1.bit_fields[i];
-    }
-    
-    const int last_bit = GetFieldPos(num_bits);
-    if (last_bit > 0) {
-      bit_fields[num_fields - 1] &= (1 << last_bit) - 1;
-    }
-  }
-
-  void AND(const cRawBitArray & array1, const cRawBitArray & array2, const int num_bits) {
-    ResizeSloppy(num_bits);
-    
-    const int num_fields = GetNumFields(num_bits);
-    for (int i = 0; i < num_fields; i++) {
-      bit_fields[i] = array1.bit_fields[i] & array2.bit_fields[i];
-    }
-  }
+    void SHIFT(const cRawBitArray & array1, const int num_bits, const int shift_size) {
+      if (shift_size == 0) return;
   
-  void OR(const cRawBitArray & array1, const cRawBitArray & array2, const int num_bits) {
-    ResizeSloppy(num_bits);
-    
-    const int num_fields = GetNumFields(num_bits);
-    for (int i = 0; i < num_fields; i++) {
-      bit_fields[i] = array1.bit_fields[i] | array2.bit_fields[i];
-    }
-  }
-
-  void NAND(const cRawBitArray & array1, const cRawBitArray & array2, const int num_bits) {
-    ResizeSloppy(num_bits);
-    
-    const int num_fields = GetNumFields(num_bits);
-    for (int i = 0; i < num_fields; i++) {
-      bit_fields[i] = ~(array1.bit_fields[i] & array2.bit_fields[i]);
+      Copy(array1, num_bits);
+      SHIFT(num_bits, shift_size);
     }
 
-    const int last_bit = GetFieldPos(num_bits);
-    if (last_bit > 0) {
-      bit_fields[num_fields - 1] &= (1 << last_bit) - 1;
+    void INCREMENT(const cRawBitArray & array1, const int num_bits) {
+      Copy(array1, num_bits);
+      INCREMENT(num_bits);
     }
-  }
-
-  void NOR(const cRawBitArray & array1, const cRawBitArray & array2, const int num_bits) {
-    ResizeSloppy(num_bits);
-    
-    const int num_fields = GetNumFields(num_bits);
-    for (int i = 0; i < num_fields; i++) {
-      bit_fields[i] = ~(array1.bit_fields[i] | array2.bit_fields[i]);
-    }
-    
-    const int last_bit = GetFieldPos(num_bits);
-    if (last_bit > 0) {
-      bit_fields[num_fields - 1] &= (1 << last_bit) - 1;
-    }
-  }
-
-  void XOR(const cRawBitArray & array1, const cRawBitArray & array2, const int num_bits) {
-    ResizeSloppy(num_bits);
-    
-    const int num_fields = GetNumFields(num_bits);
-    for (int i = 0; i < num_fields; i++) {
-      bit_fields[i] = array1.bit_fields[i] ^ array2.bit_fields[i];
-    }
-  }
-
-  void EQU(const cRawBitArray & array1, const cRawBitArray & array2, const int num_bits) {
-    ResizeSloppy(num_bits);
-    
-    const int num_fields = GetNumFields(num_bits);
-    for (int i = 0; i < num_fields; i++) {
-      bit_fields[i] = ~(array1.bit_fields[i] ^ array2.bit_fields[i]);
-    }
-    
-    const int last_bit = GetFieldPos(num_bits);
-    if (last_bit > 0) {
-      bit_fields[num_fields - 1] &= (1 << last_bit) - 1;
-    }
-  }
-
-  void SHIFT(const cRawBitArray & array1, const int num_bits, const int shift_size) {
-    if (shift_size == 0) return;
-  
-    Copy(array1, num_bits);
-    SHIFT(num_bits, shift_size);
-  }
-
-  void INCREMENT(const cRawBitArray & array1, const int num_bits) {
-    Copy(array1, num_bits);
-    INCREMENT(num_bits);
-  }
-
+  };
 
 
   class cBitArray {
@@ -597,9 +597,9 @@ public:
     void SetAll() { bit_array.Ones(array_size); }
   
 
-    void Print(ostream & out=cout) const { bit_array.Print(array_size, out); }
-    void PrintRightToLeft(ostream & out=cout) const { bit_array.PrintRightToLeft(array_size, out); }
-    void PrintOneIDs(ostream & out=cout) const { bit_array.PrintOneIDs(array_size, out); }
+    void Print(std::ostream & out=std::cout) const { bit_array.Print(array_size, out); }
+    void PrintRightToLeft(std::ostream & out=std::cout) const { bit_array.PrintRightToLeft(array_size, out); }
+    void PrintOneIDs(std::ostream & out=std::cout) const { bit_array.PrintOneIDs(array_size, out); }
     void Resize(const int new_size) {
       bit_array.Resize(array_size, new_size);
       array_size = new_size;
@@ -611,9 +611,8 @@ public:
     int CountBits() const { return bit_array.CountBits(array_size); }
     int CountBits2() const { return bit_array.CountBits2(array_size); }
 
-    int FindBit1(int start_bit=0) const
-    { return bit_array.FindBit1(array_size, start_bit); }
-    tArray<int> GetOnes() const { return bit_array.GetOnes(array_size); }
+    int FindBit1(int start_bit=0) const { return bit_array.FindBit1(array_size, start_bit); }
+    std::vector<int> GetOnes() const { return bit_array.GetOnes(array_size); }
     
     // Boolean math functions...
     cBitArray NOT() const {
