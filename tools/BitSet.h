@@ -100,8 +100,8 @@ namespace emp {
     static const int NUM_FIELDS = 1 + ((NUM_BITS - 1) >> 5);
     static const int LAST_BIT = NUM_BITS & 31;
 
-    inline static int FieldID(const int index) { index >> 5; }
-    inline static int FieldPos(const int index) { index & 31; }
+    inline static int FieldID(const int index) { return index >> 5; }
+    inline static int FieldPos(const int index) { return index & 31; }
 
     inline static unsigned int * Duplicate(unsigned int * in_set) {
       unsigned int * out_set = new unsigned int[NUM_FIELDS];
@@ -165,8 +165,12 @@ namespace emp {
     }
 
   public:
-    BitSet() : bit_set(new unsigned int [NUM_FIELDS]) { ; }
+    BitSet() : bit_set(new unsigned int [NUM_FIELDS]) { Clear(); }
     BitSet(const BitSet & in_set) : bit_set(Duplicate(in_set.bit_set)) { ; }
+
+    void TestPrint() {
+      std::cout << *bit_set << std::endl;
+    }
     
     BitSet & operator=(const BitSet & in_set) {
       if (bit_set) delete [] bit_set;
@@ -353,7 +357,7 @@ namespace emp {
     }
   
     // Positive shifts go left and negative go right (0 does nothing)
-    BitSet SHIFT(const int shift_size) {
+    BitSet SHIFT(const int shift_size) const {
       BitSet out_set(*this);
       if (shift_size > 0) out_set.ShiftLeft(shift_size);
       else if (shift_size < 0) out_set.ShiftRight(-shift_size);
