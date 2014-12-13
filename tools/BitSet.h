@@ -100,7 +100,10 @@ namespace emp {
     static const int NUM_FIELDS = 1 + ((NUM_BITS - 1) >> 5);
     static const int LAST_BIT = NUM_BITS & 31;
 
-    inline static int FieldID(const int index) { return index >> 5; }
+    inline static int FieldID(const int index) {
+      assert((index >> 5) >= 0 && (index >> 5) < NUM_FIELDS);
+      return index >> 5;
+    }
     inline static int FieldPos(const int index) { return index & 31; }
 
     inline static unsigned int * Duplicate(unsigned int * in_set) {
@@ -317,40 +320,40 @@ namespace emp {
   
 
     // Boolean math functions...
-    BitSet & NOT_SELF() const {
+    BitSet & NOT_SELF() {
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
       if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= (1 << LAST_BIT) - 1;
       return *this;
     }
 
-    BitSet & AND_SELF(const BitSet & set2) const {
+    BitSet & AND_SELF(const BitSet & set2) {
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] & set2.bit_set[i];
       return *this;
     }
 
-    BitSet & OR_SELF(const BitSet & set2) const {
+    BitSet & OR_SELF(const BitSet & set2) {
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] | set2.bit_set[i];
       return *this;
     }
 
-    BitSet & NAND_SELF(const BitSet & set2) const {
+    BitSet & NAND_SELF(const BitSet & set2) {
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
       if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= (1 << LAST_BIT) - 1;
       return *this;
     }
 
-    BitSet & NOR_SELF(const BitSet & set2) const {
+    BitSet & NOR_SELF(const BitSet & set2) {
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
       if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= (1 << LAST_BIT) - 1;
       return *this;
     }
 
-    BitSet & XOR_SELF(const BitSet & set2) const {
+    BitSet & XOR_SELF(const BitSet & set2) {
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] ^ set2.bit_set[i];
       return *this;
     }
 
-    BitSet & EQU_SELF(const BitSet & set2) const {
+    BitSet & EQU_SELF(const BitSet & set2) {
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
       if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= (1 << LAST_BIT) - 1;
       return *this;
@@ -376,13 +379,13 @@ namespace emp {
     BitSet operator&(const BitSet & ar2) const { return AND(ar2); }
     BitSet operator|(const BitSet & ar2) const { return OR(ar2); }
     BitSet operator^(const BitSet & ar2) const { return XOR(ar2); }
-    BitSet operator<<(const int shift_size) const { return SHIFT(shift_size); }
-    BitSet operator>>(const int shift_size) const { return SHIFT(-shift_size); }
+    BitSet operator<<(const int shift_size) const { return SHIFT(-shift_size); }
+    BitSet operator>>(const int shift_size) const { return SHIFT(shift_size); }
     const BitSet & operator&=(const BitSet & ar2) { return AND_SELF(ar2); }
     const BitSet & operator|=(const BitSet & ar2) { return OR_SELF(ar2); }
     const BitSet & operator^=(const BitSet & ar2) { return XOR_SELF(ar2); }
-    const BitSet & operator<<=(const int shift_size) { return SHIFT_SELF(shift_size); }
-    const BitSet & operator>>=(const int shift_size) { return SHIFT_SELF(-shift_size); }
+    const BitSet & operator<<=(const int shift_size) { return SHIFT_SELF(-shift_size); }
+    const BitSet & operator>>=(const int shift_size) { return SHIFT_SELF(shift_size); }
   };
 
   template <int NUM_BITS> std::ostream & operator<<(std::ostream & out, const BitSet<NUM_BITS> & _bit_set) {
