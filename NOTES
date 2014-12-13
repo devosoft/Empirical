@@ -1,16 +1,22 @@
 -= Next Steps =-
-Get Kinetic working, ported from KinEmAtic
-Build a viewport for a Surface2D object
-
+Fix how sectors are handled in surfaces to be more dynamic based on sizes of organisms.
+- Consider sorting organisms by size and processing smallest first?
+  Then any particular comparison is only up against as small or smaller.
 
 -= Questions =-
-Why is to_string not working on char's?  Is there a better way to do this?
 Best way to convert to a c++ literal independent of type?
 
 
 -= Near Future =-
 Build a test system
 Move scheduler over to Empirical
+Build (find?) a logging system?
+Consider new serialization options
+- Option 1: Use only emp-specific types in classes that can be easily saved?
+            (Makes coding harder)
+- Option 2: #define overrides for types?  (tricky to get right, especially for STL types)
+- Option 3: Require manual save a load functions?  (Requires all programmers to always keep updated,
+            but might be possible with good automated test system.)
 
 
 -= Optimizations to Explore =-
