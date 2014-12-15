@@ -29,11 +29,16 @@ namespace emp {
     BASE_TYPE mass;                  // "Weight" of this object
     int color_id;                    // Which color should this body appear?
 
+    // @CAO Technically, we should allow any number of links.
+    CircleBody2D * pair_link;        // Is this body linked to another (typically part of reproduction)
+    BASE_TYPE pair_dist;             // How far away should the linked body be kept?
+
     Point<BASE_TYPE> shift;          // How should this body be updated to minimize overlap.
 
   public:
     CircleBody2D(const Circle<BASE_TYPE> & _p, BODY_INFO * _i)
-      : perimeter(_p), target_radius(-1), info(_i), mass(1), color_id(0) { ; }
+      : perimeter(_p), target_radius(-1), info(_i), mass(1), color_id(0)
+      , pair_link(NULL), pair_dist(0) { ; }
     ~CircleBody2D() { ; }
 
     const Circle<BASE_TYPE> & GetPerimeter() const { return perimeter; }
@@ -46,6 +51,20 @@ namespace emp {
     const Point<BASE_TYPE> & GetVelocity() const { return velocity; }
     BASE_TYPE GetMass() const { return mass; }
     int GetColorID() const { return color_id; }
+
+    // Creating, testing, and unlinking other organisms (used for gestation & reproduction)
+    bool IsLinked(CircleBody2D * link_test) { return pair_link == link_test; }
+    BASE_TYPE GetLinkDist() { return pair_dist; }
+    CircleBody2D * BuildOffspring() {
+      pair_link = new CircleBody2D(perimeter, new BODY_INFO(*info));
+      pair_dist = 0;
+      return pair_link;
+    }
+    void BreakLink(CircleBody2D * old_link) {
+      assert(pair_link == old_link);
+      pair_link = NULL;
+      pair_dist = 0;
+    }
 
     CircleBody2D<BODY_INFO, BASE_TYPE> & SetPosition(const Point<BASE_TYPE> & new_pos) {
       perimeter.SetCenter(new_pos); 
