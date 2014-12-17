@@ -29,6 +29,8 @@ namespace emp {
     ~Point() { ; }
 
     const Point & operator=(const Point & _in) { x = _in.x; y = _in.y; return *this; }
+    bool operator==(const Point & _in) const { return (x == _in.x) && (y == _in.y); }
+    bool operator!=(const Point & _in) const { return (x != _in.x) || (y != _in.y); }
 
     inline TYPE GetX() const { return x; }
     inline TYPE GetY() const { return y; }
@@ -82,7 +84,7 @@ namespace emp {
       return x_dist*x_dist + y_dist*y_dist;
     }
 
-    TYPE Distance(const Point & _in) { return sqrt( SquareDistance(_in) ); }
+    TYPE Distance(const Point & _in) const { return sqrt( SquareDistance(_in) ); }
   };
 
   // Overload ostream to work with points.
