@@ -99,6 +99,9 @@ namespace emp {
         cur_body->FinalizePosition();
         cur_body->AdjustPosition(max_pos);
       }
+      for (BODY_TYPE * cur_body : body_set) {
+        cur_body->EnforceLinks();
+      }
     }
 
   };

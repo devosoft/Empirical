@@ -31,6 +31,8 @@ namespace emp {
     Physics2D & AddBackground(BODY_TYPE * in_body) { background.AddBody(in_body); return *this; }
 
     bool TestPairCollision(BODY_TYPE & body1, BODY_TYPE & body2) {
+      if (body1.IsLinked(body2)) return false;  // Linked bodies can overlap.
+
       const Point<BASE_TYPE> dist = body1.GetCenter() - body2.GetCenter();
       const BASE_TYPE sq_pair_dist = dist.SquareMagnitude();
       const BASE_TYPE radius_sum = body1.GetRadius() + body2.GetRadius();

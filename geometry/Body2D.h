@@ -32,13 +32,14 @@ namespace emp {
     // @CAO Technically, we should allow any number of links.
     CircleBody2D * pair_link;        // Is this body linked to another (typically part of reproduction)
     BASE_TYPE pair_dist;             // How far away should the linked body be kept?
+    BASE_TYPE target_pair_dist;      // How far out should the pair get before splitting?
 
     Point<BASE_TYPE> shift;          // How should this body be updated to minimize overlap.
 
   public:
     CircleBody2D(const Circle<BASE_TYPE> & _p, BODY_INFO * _i)
       : perimeter(_p), target_radius(-1), info(_i), mass(1), color_id(0)
-      , pair_link(NULL), pair_dist(0) { ; }
+      , pair_link(NULL), pair_dist(0), target_pair_dist(0) { ; }
     ~CircleBody2D() { ; }
 
     const Circle<BASE_TYPE> & GetPerimeter() const { return perimeter; }
@@ -51,20 +52,6 @@ namespace emp {
     const Point<BASE_TYPE> & GetVelocity() const { return velocity; }
     BASE_TYPE GetMass() const { return mass; }
     int GetColorID() const { return color_id; }
-
-    // Creating, testing, and unlinking other organisms (used for gestation & reproduction)
-    bool IsLinked(CircleBody2D * link_test) { return pair_link == link_test; }
-    BASE_TYPE GetLinkDist() { return pair_dist; }
-    CircleBody2D * BuildOffspring() {
-      pair_link = new CircleBody2D(perimeter, new BODY_INFO(*info));
-      pair_dist = 0;
-      return pair_link;
-    }
-    void BreakLink(CircleBody2D * old_link) {
-      assert(pair_link == old_link);
-      pair_link = NULL;
-      pair_dist = 0;
-    }
 
     CircleBody2D<BODY_INFO, BASE_TYPE> & SetPosition(const Point<BASE_TYPE> & new_pos) {
       perimeter.SetCenter(new_pos); 
@@ -83,8 +70,31 @@ namespace emp {
     CircleBody2D<BODY_INFO, BASE_TYPE> &
     SetColorID(int in_id) { color_id = in_id; return *this; }
 
+    // Shift at end of next update.
     CircleBody2D<BODY_INFO, BASE_TYPE> &
     AddShift(const Point<BASE_TYPE> & inc_val) { shift += inc_val; return *this; }
+
+    // Translate immediately.
+    CircleBody2D<BODY_INFO, BASE_TYPE> &
+    Translate(const Point<BASE_TYPE> & inc_val) { perimeter.Translate(inc_val); return *this; }
+
+    // Creating, testing, and unlinking other organisms (used for gestation & reproduction)
+    bool IsLinked(const CircleBody2D & link_test) const {
+      return pair_link == &link_test || link_test.pair_link == this;
+    }
+    BASE_TYPE GetLinkDist() const { return pair_dist; }
+    BASE_TYPE GetTargetLinkDist() const { return target_pair_dist; }
+    void ShiftLinkDist(BASE_TYPE change) { pair_dist += change; }
+    CircleBody2D * BuildOffspring() {
+      pair_link = new CircleBody2D(perimeter, new BODY_INFO(*info));
+      pair_dist = 0;
+      return pair_link;
+    }
+    void BreakLink(CircleBody2D * old_link) {
+      assert(pair_link == old_link);
+      pair_link = NULL;
+      pair_dist = 0;
+    }
 
     CircleBody2D<BODY_INFO, BASE_TYPE> &
     TurnLeft(int steps=1) { orientation.RotateDegrees(45); return *this; }
@@ -99,11 +109,20 @@ namespace emp {
     DecSpeed(double steps=1.0) { return *this; }
 
     // If a body is not at its target radius, grow it or shrink it, as needed.
-    CircleBody2D<BODY_INFO, BASE_TYPE> & BodyUpdate(BASE_TYPE grow_factor=1) {
-      if (target_radius == -1) return *this;
-      if ((int) target_radius > (int) GetRadius()) SetRadius(GetRadius() + grow_factor);
-      else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - grow_factor);
-      else target_radius = -1;  // We're at the target size, so stop!
+    CircleBody2D<BODY_INFO, BASE_TYPE> & BodyUpdate(BASE_TYPE change_factor=1) {
+      // Test if this body needs to grow or shrink.
+      if (target_radius != -1) {
+        if ((int) target_radius > (int) GetRadius()) SetRadius(GetRadius() + change_factor);
+        else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - change_factor);
+        else target_radius = -1;  // We're at the target size, so stop!
+      }
+
+      // Test if the link distance for this body needs to be updated
+      if (pair_dist != target_pair_dist) {
+        if ((int) pair_dist < (int) target_pair_dist) pair_dist += change_factor;
+        else pair_dist -= change_factor;
+      }
+
       return *this;
     }
 
@@ -150,9 +169,30 @@ namespace emp {
     // After all collisions are accounted for, we should shift this object into its final place.
     void FinalizePosition()
     {
-      perimeter.Translate(shift);
-      shift.ToOrigin();
+      perimeter.Translate(shift); // Act on the accumulated shifts.
+      shift.ToOrigin();           // Clear out the shift for the next round.
     }
+
+    // If two organisms are linked, make sure that they are the appropriate distance apart.
+    void EnforceLinks()
+    {
+      if (pair_link == NULL) return;
+
+      emp::Alert("Here!");
+
+      if (GetAnchor() == pair_link->GetAnchor()) {
+        Translate(emp::Point<BASE_TYPE>(0.01, 0.01));
+      }
+
+      const BASE_TYPE start_dist = GetAnchor().Distance(pair_link->GetAnchor());
+      const BASE_TYPE link_dist = GetLinkDist();
+      const double frac_change = ((double) link_dist) / ((double) start_dist) / 2.0;
+
+      emp::Point<BASE_TYPE> dist_move = (GetAnchor() - pair_link->GetAnchor()) * frac_change;
+      perimeter.Translate(dist_move);
+      perimeter.Translate(-dist_move);
+    }
+
 
   };
 };
