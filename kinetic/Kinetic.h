@@ -400,7 +400,7 @@ namespace emp {
     template <typename BASE_TYPE>
     inline static void Arc(BASE_TYPE x, BASE_TYPE y, BASE_TYPE radius, double start, double end, bool cclockwise=false) {
       EM_ASM_ARGS({emp_info.ctx.arc($0, $1, $2, $3, $4, $5);},
-                  (int) x, (int) y, (int) radius, start, end, cclockwise);
+                  x, y, radius, start, end, cclockwise);
     }
     template <typename BASE_TYPE>
     inline static void Arc(const Point<BASE_TYPE> & point, BASE_TYPE radius, double start, double end, bool cclockwise=false) {
@@ -408,7 +408,7 @@ namespace emp {
     }
     template <typename BASE_TYPE>
     inline static void Circle(const Point<BASE_TYPE> & point, BASE_TYPE radius) {
-      Arc((int) point.GetX(), (int) point.GetY(), (int) radius, 0.0, 2.0 * emp::PI);
+      Arc(point.GetX(), point.GetY(), radius, 0.0, 2.0 * emp::PI);
     }
     template <typename BASE_TYPE>
     inline static void Circle(const emp::Circle<BASE_TYPE> & circle) {
