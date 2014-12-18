@@ -34,7 +34,7 @@ namespace emp {
   public:
     Angle() : angle(0) { ; }
     Angle(const Angle & in_angle) : angle(in_angle.angle) { ; }
-    Angle(double radians) : angle(radians * ANGLE_CAP / (2*PI)) { ; }
+    Angle(double radians) : angle(radians * ANGLE_CAP / (2.0*PI)) { ; }
     Angle(int in_angle, bool okay) : angle(in_angle) { (void) okay; } // directly set internal value
 
     double AsRadians() const { return ((double) angle) * 2.0 * PI / ((double) ANGLE_CAP); }
@@ -106,7 +106,7 @@ namespace emp {
     int Cos_Quick1K() const { return emp::cos_chart_1K[ (angle >> 8) & 255 ]; }
     int Tan_Quick1K() const { return emp::tan_chart_1K[ (angle >> 8) & 255 ]; }
 
-    template <typename BASE_TYPE> Point<BASE_TYPE> GetPoint(BASE_TYPE distance) const {
+    template <typename BASE_TYPE> Point<BASE_TYPE> GetPoint(BASE_TYPE distance=1.0) const {
       return Point<BASE_TYPE>(Sin() * distance, Cos() * distance);
     }
   };

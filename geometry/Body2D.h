@@ -85,9 +85,11 @@ namespace emp {
     BASE_TYPE GetLinkDist() const { return pair_dist; }
     BASE_TYPE GetTargetLinkDist() const { return target_pair_dist; }
     void ShiftLinkDist(BASE_TYPE change) { pair_dist += change; }
-    CircleBody2D * BuildOffspring() {
+    CircleBody2D * BuildOffspring(emp::Point<BASE_TYPE> offset=emp::Point<BASE_TYPE>(0,0)) {
       pair_link = new CircleBody2D(perimeter, new BODY_INFO(*info));
+      pair_link->Translate(offset);
       pair_dist = 0;
+      target_pair_dist = perimeter.GetRadius() * 2.0;
       return pair_link;
     }
     void BreakLink(CircleBody2D * old_link) {
@@ -178,19 +180,27 @@ namespace emp {
     {
       if (pair_link == NULL) return;
 
-      emp::Alert("Here!");
-
       if (GetAnchor() == pair_link->GetAnchor()) {
+        // In rare cases two organisms may be on top of each other... shift one.
         Translate(emp::Point<BASE_TYPE>(0.01, 0.01));
       }
 
       const BASE_TYPE start_dist = GetAnchor().Distance(pair_link->GetAnchor());
       const BASE_TYPE link_dist = GetLinkDist();
-      const double frac_change = ((double) link_dist) / ((double) start_dist) / 2.0;
+      const double frac_change = (1.0 - ((double) link_dist) / ((double) start_dist)) / 2.0;
 
       emp::Point<BASE_TYPE> dist_move = (GetAnchor() - pair_link->GetAnchor()) * frac_change;
-      perimeter.Translate(dist_move);
+
+      // std::stringstream ss;
+      // ss
+      //   << "start_dist=" << start_dist
+      //   << "   link_dist=" << link_dist
+      //   << "   frac_change=" << frac_change
+      //   << "   dist_move=" << dist_move;
+      // emp::Alert(ss.str());
+
       perimeter.Translate(-dist_move);
+      pair_link->perimeter.Translate(dist_move);
     }
 
 
