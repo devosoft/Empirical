@@ -144,10 +144,30 @@ namespace emp {
     }
 
 
-    // Force a circle to be within a bounding box.
-    CircleBody2D<BODY_INFO, BASE_TYPE> & AdjustPosition(const Point<BASE_TYPE> & max_coords) {
+    // Determine where the circle will end up and force it to be within a bounding box.
+    CircleBody2D<BODY_INFO, BASE_TYPE> & FinalizePosition(const Point<BASE_TYPE> & max_coords) {
       const BASE_TYPE max_x = max_coords.GetX() - GetRadius();
       const BASE_TYPE max_y = max_coords.GetY() - GetRadius();
+
+      perimeter.Translate(shift); // Act on the accumulated shifts.
+      shift.ToOrigin();           // Clear out the shift for the next round.
+
+      // If this body is linked to another, enforce the distance between them.
+      if (pair_link != NULL) {
+        if (GetAnchor() == pair_link->GetAnchor()) {
+          // If two organisms may be on top of each other... shift one.
+          Translate(emp::Point<BASE_TYPE>(0.01, 0.01));
+        }
+        
+        const BASE_TYPE start_dist = GetAnchor().Distance(pair_link->GetAnchor());
+        const BASE_TYPE link_dist = GetLinkDist();
+        const double frac_change = (1.0 - ((double) link_dist) / ((double) start_dist)) / 2.0;
+        
+        emp::Point<BASE_TYPE> dist_move = (GetAnchor() - pair_link->GetAnchor()) * frac_change;
+        
+        perimeter.Translate(-dist_move);
+        pair_link->perimeter.Translate(dist_move);
+      }
 
       if (GetCenter().GetX() < GetRadius()) { 
         perimeter.SetCenterX(GetRadius());     // Put back in range...
@@ -168,42 +188,6 @@ namespace emp {
       return *this;
     }
     
-    // After all collisions are accounted for, we should shift this object into its final place.
-    void FinalizePosition()
-    {
-      perimeter.Translate(shift); // Act on the accumulated shifts.
-      shift.ToOrigin();           // Clear out the shift for the next round.
-    }
-
-    // If two organisms are linked, make sure that they are the appropriate distance apart.
-    void EnforceLinks()
-    {
-      if (pair_link == NULL) return;
-
-      if (GetAnchor() == pair_link->GetAnchor()) {
-        // In rare cases two organisms may be on top of each other... shift one.
-        Translate(emp::Point<BASE_TYPE>(0.01, 0.01));
-      }
-
-      const BASE_TYPE start_dist = GetAnchor().Distance(pair_link->GetAnchor());
-      const BASE_TYPE link_dist = GetLinkDist();
-      const double frac_change = (1.0 - ((double) link_dist) / ((double) start_dist)) / 2.0;
-
-      emp::Point<BASE_TYPE> dist_move = (GetAnchor() - pair_link->GetAnchor()) * frac_change;
-
-      // std::stringstream ss;
-      // ss
-      //   << "start_dist=" << start_dist
-      //   << "   link_dist=" << link_dist
-      //   << "   frac_change=" << frac_change
-      //   << "   dist_move=" << dist_move;
-      // emp::Alert(ss.str());
-
-      perimeter.Translate(-dist_move);
-      pair_link->perimeter.Translate(dist_move);
-    }
-
-
   };
 };
 

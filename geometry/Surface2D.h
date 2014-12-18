@@ -67,10 +67,6 @@ namespace emp {
             for (auto body2 : sector_set[sector_id]) {
               test_count++;
               if (collide_fun(*body, *body2)) hit_count++;
-                  
-              // @CAO -- tag comparisons!
-              if (body->GetColorID() == 1) body2->SetColorID(2);
-              else if (body2->GetColorID() == 1) body->SetColorID(2);
             }            
 
           }
@@ -81,26 +77,10 @@ namespace emp {
         sector_set[cur_sector].push_back(body);
       }
 
-      /*
-      // @CAO Run through all pairs of bodies that might collide and test to see if they did.
-      for (auto body_it1 = body_set.begin(); body_it1 != body_set.end(); body_it1++) {
-        for (auto body_it2 = body_it1; ++body_it2 != body_set.end();) {
-          if ((*body_it1)->CollisionTest(*(*body_it2))) hit_count++;
-        }
-      }
-      */
-
-      static int counter = 0;
-      counter++;
-      std::cout << counter << " : " << hit_count << " / " << test_count << std::endl;
 
       // Make sure all bodies are in a legal position on the surface.
       for (BODY_TYPE * cur_body : body_set) {
-        cur_body->FinalizePosition();
-        cur_body->AdjustPosition(max_pos);
-      }
-      for (BODY_TYPE * cur_body : body_set) {
-        cur_body->EnforceLinks();
+        cur_body->FinalizePosition(max_pos);
       }
     }
 
