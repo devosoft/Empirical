@@ -17,7 +17,13 @@ Consider new serialization options
 - Option 2: #define overrides for types?  (tricky to get right, especially for STL types)
 - Option 3: Require manual save a load functions?  (Requires all programmers to always keep updated,
             but might be possible with good automated test system.)
-
+Explore Box2D to handle physics instead of my current scheme.
+A data management system that can track data by:
+  - Temporal series (values over time)
+  - Batch (where a batch reset occurs periodicall)
+  - Log (tracking particular events when they occur)
+  All output files should have headers that allow them to be read back in more easily.
+A citation tool? Useful for pointing people to appropriate references to learn more about a component.
 
 -= Optimizations to Explore =-
 Explore if quick-looking up for sin, cos, tan should be at higher resolution (now it's 256 entires).
@@ -30,24 +36,18 @@ Currently doing all-pairs comparisons to detect collisions.  Other options:
 -= Other TODOs =-
 Come up with a cleaner method to time functions?  Current macro is pretty ugly.
 
+@RELenski and @ctitusbrown finally convinced me to tweet & blog.  So, first tweet about first blog post: http://devolab.msu.edu/2014/12/09/10-tips-to-better-manage-your-time-in-academia
 
 -= Improvements =-
 Config: Should be able to output its own config header.
 Config: Build links into variable setting to trigger function calls
 Config: Warn more gracefully if a variable/const name is used more than once?
+Congig: Build an HTML object to automatically allow adjustment of settings.
 
-
--= Useful Tools =-
+-= Useful Evolution Tools =-
 A simple-to-modify and fast phenotype object
 A genotype manager (for organisms with identical genomes)
 A phenotype summary to include in the genotype
 A phylogeny/lineage manager with multiple modes of purgeing (and link to phenotypes?)
 A clade manager that will mark into phenotypes which clade they are
 
-A data management system that can track data by:
-  - Temporal series (values over time)
-  - Batch (where a batch reset occurs periodicall)
-  - Log (tracking particular events when they occur)
-All output files should have headers that allow them to be read back in more easily.
-
-A reference tool? Useful for pointing people to appropriate references to learn more about a component.

@@ -9,8 +9,8 @@
 //    Random(int _seed=-1)
 //      _seed is the random number seed that will produce a unique pseudo-random sequence.
 //      (a value of -1 indicates that the seed should be bassed off of a combination of time
-//      and the memory position of the random number generator in case multiple ones start at
-//      the same time.)
+//      and the memory position of the random number generator, in case multiple generators
+//      start at the same time.)
 //
 //  Other useful functions:
 //    double GetDouble()
