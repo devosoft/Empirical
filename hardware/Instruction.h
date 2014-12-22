@@ -45,7 +45,7 @@ namespace emp {
     }
 
     Instruction & SetID(int new_id) {
-      assert(new_id & ID_MASK == new_id);
+      assert((new_id & ID_MASK) == new_id);
       info = (unsigned int) new_id;
     }
     Instruction & SetFlag(int id, bool value=true) {
