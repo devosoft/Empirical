@@ -38,7 +38,7 @@ namespace emp {
 
   public:
     CircleBody2D(const Circle<BASE_TYPE> & _p, BODY_INFO * _i)
-      : perimeter(_p), target_radius(-1), info(_i), mass(1), color_id(0)
+      : perimeter(_p), target_radius(_p.GetRadius()), info(_i), mass(1), color_id(0)
       , pair_link(NULL), pair_dist(0), target_pair_dist(0) { ; }
     ~CircleBody2D() { ; }
 
@@ -113,11 +113,8 @@ namespace emp {
     // If a body is not at its target radius, grow it or shrink it, as needed.
     CircleBody2D<BODY_INFO, BASE_TYPE> & BodyUpdate(BASE_TYPE change_factor=1) {
       // Test if this body needs to grow or shrink.
-      if (target_radius != -1) {
-        if ((int) target_radius > (int) GetRadius()) SetRadius(GetRadius() + change_factor);
-        else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - change_factor);
-        else target_radius = -1;  // We're at the target size, so stop!
-      }
+      if ((int) target_radius > (int) GetRadius()) SetRadius(GetRadius() + change_factor);
+      else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - change_factor);
 
       // Test if the link distance for this body needs to be updated
       if (pair_dist != target_pair_dist) {
