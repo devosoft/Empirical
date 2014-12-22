@@ -7,6 +7,8 @@
 // instruction we are working with as well as any relevant flags about that instruction.
 //
 
+#include <assert.h>
+
 namespace emp {
 
   class Instruction {
@@ -16,11 +18,11 @@ namespace emp {
     static const unsigned int FLAG_BITS = 32 - ID_BITS;      // Number of bits leftover for flags.
 
   private:
-    unsigned int info;
+    unsigned int info;  // Full information about this instruction; both ID and flags.
 
   public:
     Instruction(unsigned int id=0) : info(id) { ; }
-    Instruction(const Instruction * in_inst) : info(in_inst.info & ID_MASK) { ; }
+    Instruction(const Instruction & in_inst) : info(in_inst.info & ID_MASK) { ; }
     ~Instruction() { ; }
 
     Instruction & operator=(const Instruction & _in) {
@@ -28,6 +30,7 @@ namespace emp {
       return *this;
     }
 
+    // Comparison operators ignore flags.
     bool operator==(const Instruction & _in) const { return GetID() == _in.GetID(); }
     bool operator!=(const Instruction & _in) const { return GetID() != _in.GetID(); }
     bool operator< (const Instruction & _in) const { return GetID() <  _in.GetID(); }
@@ -38,7 +41,7 @@ namespace emp {
     int GetID() const { return (int) info & ID_MASK; }
     bool GetFlag(int id) const {
       assert(id < FLAG_BITS);
-      return info & (1 << (id + ID_BITS)) != 0;
+      return (info & (1 << (id + ID_BITS))) != 0;
     }
 
     Instruction & SetID(int new_id) {
