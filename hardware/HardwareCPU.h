@@ -12,7 +12,10 @@
 //   MAX_ARGS = Maximum number of arguments needed by any instruction.
 //
 
+#include <functional>
+
 #include "HardwareCPU_Base.h"
+#include "Instruction.h"
 
 namespace emp {
 
@@ -25,13 +28,17 @@ namespace emp {
     HardwareCPU() { ; }
     ~HardwareCPU() { ; }
 
+    // Examines the nops following (?) the IP to test if they override the default arguments.
+    int ChooseStack(int default_stack) { return default_stack; }
+
     // Instruction Definitions
     // NOTE: Any arguments need to be bound during instruction library construction.
     bool Inst_Nop() { return true; }
 
     // -------- Single-argument Math Instructions --------
 
-    bool Inst_ShiftL(const int shift, const int default_in, const int default_out) {
+    // Positive shift is left, negative shift is right.  I.e., value = value * 2^shift
+    bool Inst_Shift(const int shift, const int default_in, const int default_out) {
       const int in_stack = ChooseStack(default_in);
       const int out_stack = ChooseStack(default_out);
       const int result = (shift > 0) ? stacks[in_stack].Top() << shift : stacks[in_stack].Top() >> -shift;
@@ -41,8 +48,7 @@ namespace emp {
 
     // -------- Two-argument Math Instructions --------
 
-    template <std::function<int(int,int)> MATH2_FUN>
-    bool Inst_2I_Math(const int default_in1, const int default_in2, const int default_out) {
+    bool Inst_2I_Math(std::function<int(int,int)> math2_fun, const int default_in1, const int default_in2, const int default_out) {
       const int in1_stack = ChooseStack(default_in1);
       const int in2_stack = ChooseStack(default_in2);
       const int out_stack = ChooseStack(default_out);
@@ -52,24 +58,24 @@ namespace emp {
     }
 
     bool Inst_Nand(const int default_in1, const int default_in2, const int default_out) {
-      return Inst_2I_Math<[](int a, int b) { return ~(a&b); }>(default_in1, default_in2, default_out);
+      return Inst_2I_Math([](int a, int b) { return ~(a&b); }, default_in1, default_in2, default_out);
     }
     bool Inst_Add(const int default_in1, const int default_in2, const int default_out) {
-      return Inst_2I_Math<[](int a, int b) { return a+b; }>(default_in1, default_in2, default_out);
+      return Inst_2I_Math([](int a, int b) { return a+b; }, default_in1, default_in2, default_out);
     }
     bool Inst_Sub(const int default_in1, const int default_in2, const int default_out) {
-      return Inst_2I_Math<[](int a, int b) { return a-b; }>(default_in1, default_in2, default_out);
+      return Inst_2I_Math([](int a, int b) { return a-b; }, default_in1, default_in2, default_out);
     }
     bool Inst_Mult(const int default_in1, const int default_in2, const int default_out) {
-      return Inst_2I_Math<[](int a, int b) { return a*b; }>(default_in1, default_in2, default_out);
+      return Inst_2I_Math([](int a, int b) { return a*b; }, default_in1, default_in2, default_out);
     }
     bool Inst_Div(const int default_in1, const int default_in2, const int default_out) {
-      if (b == 0) return false;
-      return Inst_2I_Math<[](int a, int b) { return a/b; }>(default_in1, default_in2, default_out);
+      // @CAO Ideally if b==0, we should return false...
+      return Inst_2I_Math([](int a, int b) { return (b==0)?0:a/b; }, default_in1, default_in2, default_out);
     }
     bool Inst_Mod(const int default_in1, const int default_in2, const int default_out) {
-      if (b == 0) return false;
-      return Inst_2I_Math<[](int a, int b) { return a%b; }>(default_in1, default_in2, default_out);
+      // @CAO Ideally if b==0, we should return false...
+      return Inst_2I_Math([](int a, int b) { return (b==0)?0:a%b; }, default_in1, default_in2, default_out);
     }
 
   };
