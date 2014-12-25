@@ -27,7 +27,7 @@ namespace emp {
       int stack_info[STACK_SIZE];  // All info on stack (loops around)
       int top;                     // Top, active position on stack.
     public:
-      CPUStack() : top(0), stack_info(STACK_SIZE) { ; }
+      CPUStack() : top(0) { Clear(); }
       ~CPUStack() { ; }
 
       CPUStack & Push(int value) {

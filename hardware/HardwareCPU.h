@@ -28,6 +28,11 @@ namespace emp {
     HardwareCPU() { ; }
     ~HardwareCPU() { ; }
 
+    CPUStack<STACK_SIZE> & GetStack(int stack_id) {
+      assert(stack_id >= 0 && stack_id < NUM_STACKS);
+      return stacks[stack_id];
+    }
+
     // Examines the nops following (?) the IP to test if they override the default arguments.
     int ChooseStack(int default_stack) { return default_stack; }
 
@@ -37,11 +42,29 @@ namespace emp {
 
     // -------- Single-argument Math Instructions --------
 
+    // Build a 1-input math instruction on the fly.  See two-input math for examples.
+    bool Inst_1I_Math(std::function<int(int)> math1_fun, const int default_in, const int default_out) {
+      const int in_stack = ChooseStack(default_in);
+      const int out_stack = ChooseStack(default_out);
+      const int result = math1_fun(stacks[in_stack].Pop());
+      stacks[out_stack].Push(result);
+      return true;
+    }
+
+    // Add or subtract a value; use +1 and -1 for Inc and Dec instructions.
+    bool Inst_AddConst(const int value, const int default_in, const int default_out) {
+      const int in_stack = ChooseStack(default_in);
+      const int out_stack = ChooseStack(default_out);
+      const int result = stacks[in_stack].Pop() + value;
+      stacks[out_stack].Push(result);
+      return true;
+    }
+
     // Positive shift is left, negative shift is right.  I.e., value = value * 2^shift
     bool Inst_Shift(const int shift, const int default_in, const int default_out) {
       const int in_stack = ChooseStack(default_in);
       const int out_stack = ChooseStack(default_out);
-      const int result = (shift > 0) ? stacks[in_stack].Top() << shift : stacks[in_stack].Top() >> -shift;
+      const int result = (shift > 0) ? stacks[in_stack].Pop() << shift : stacks[in_stack].Pop() >> -shift;
       stacks[out_stack].Push(result);
       return true;
     }
