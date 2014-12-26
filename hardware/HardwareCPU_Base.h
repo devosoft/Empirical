@@ -67,7 +67,7 @@ namespace emp {
 
     // Heads point to a position in memory; since they can be assoicated with multiple memories,
     // they must also track *which* memory they are currently working in.
-    template <typename INST_TYPE> class CPUHead {
+    class CPUHead {
     private:
       std::vector<INST_TYPE> * memory;
       int position;
@@ -101,8 +101,8 @@ namespace emp {
       bool operator!=(const CPUHead & _in) const { return !operator==(_in); }
 
       CPUHead & Set(int _pos) { position = _pos; return *this; }
-      CPUHead & Set(std::vector<INST_TYPE> * _mem, int pos=0) {
-        memory = _mem; posision = _pos; return *this;
+      CPUHead & Set(std::vector<INST_TYPE> * _mem, int _pos=0) {
+        memory = _mem; position = _pos; return *this;
       }
 
       CPUHead & operator++() { if (++position >= memory.size()) position = 0; return *this; }
@@ -110,7 +110,7 @@ namespace emp {
 
       CPUHead & operator+=(int shift) { position += shift; Adjust(); return *this; }
       CPUHead & operator-=(int shift) { position -= shift; Adjust(); return *this; }
-    }
+    };
 
 
   };
