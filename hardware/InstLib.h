@@ -44,7 +44,7 @@ namespace emp {
   private:
     // All of the info for the functions is below.
     // The functions pointers are separated out for improved (?) cache performance.
-    std::vector< std::function<bool(HARDWARE_TYPE&)> inst_calls;
+    std::vector< std::function<bool(HARDWARE_TYPE&)> > inst_calls;
     std::vector<InstInfo> inst_info;
 
     std::map<std::string, int> name_map;
@@ -56,6 +56,11 @@ namespace emp {
 
     int GetSize() const { return (int) inst_info.size(); }
 
+    bool RunInst(HARDWARE_TYPE & hw, int inst_id) {
+      std::cout << "Ping!" << std::endl;
+      return inst_calls[inst_id](hw);
+    }
+
     // Add a new instruction to this library.
     InstLib & AddInst(const std::string & _name, std::function<bool(HARDWARE_TYPE&)> _call,
                       int _cost=1, int _arg=-1) {
@@ -64,8 +69,8 @@ namespace emp {
       const char next_char = inst_char_chart[char_id];
       inst_calls.push_back(_call);
       inst_info.push_back( InstInfo(_name, _cost, _arg, next_char, next_id) );
-      name_map.insert(_name, next_id);
-      if (next_id == char_id) short_name_map(next_char, next_id);
+      name_map[_name] = next_id;
+      if (next_id == char_id) short_name_map[next_char] = next_id;
       return *this;
     }
 
