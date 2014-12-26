@@ -64,6 +64,55 @@ namespace emp {
 
     };
 
+
+    // Heads point to a position in memory; since they can be assoicated with multiple memories,
+    // they must also track *which* memory they are currently working in.
+    template <typename INST_TYPE> class CPUHead {
+    private:
+      std::vector<INST_TYPE> * memory;
+      int position;
+
+      void Adjust() {
+        const int mem_size = memory->size();
+        if (position < 0) position = (position % mem_size) + mem_size;
+        else if (position > mem_size) position %= mem_size;
+        // Note, % only happens if out of range.
+      }
+    public:
+      CPUHead(std::vector<INST_TYPE> _mem, int _pos=0) : memory(_mem), position(_pos) { ; }
+      CPUHead(const CPUHead & _in) : memory(_in.memory), position(_in.position) { ; }
+      ~CPUHead() { ; }
+
+      std::vector<INST_TYPE> * GetMemory() { return memory; }
+      int GetPosition() const { return position; }
+
+      const INST_TYPE & GetInst() const { return (*memory)[position]; }
+      INST_TYPE & GetInst() { return (*memory)[position]; }
+
+      CPUHead & operator=(const CPUHead & _in) {
+        memory = _in.memory;
+        position = _in.position;
+        return *this;
+      }
+
+      bool operator==(const CPUHead & _in) const {
+        return (memory == _in.memory && position == _in.position);
+      }
+      bool operator!=(const CPUHead & _in) const { return !operator==(_in); }
+
+      CPUHead & Set(int _pos) { position = _pos; return *this; }
+      CPUHead & Set(std::vector<INST_TYPE> * _mem, int pos=0) {
+        memory = _mem; posision = _pos; return *this;
+      }
+
+      CPUHead & operator++() { if (++position >= memory.size()) position = 0; return *this; }
+      CPUHead & operator--() { if (--position < 0) position = memory.size() - 1; return *this; }      
+
+      CPUHead & operator+=(int shift) { position += shift; Adjust(); return *this; }
+      CPUHead & operator-=(int shift) { position -= shift; Adjust(); return *this; }
+    }
+
+
   };
 
 };
