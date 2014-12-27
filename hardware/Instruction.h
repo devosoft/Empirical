@@ -25,7 +25,6 @@ namespace emp {
     static ctype ARG_MASK = ((1<<ARG_BITS)-1) << ID_BITS; // Mask to extract the argument info.
 
     // We have 32 bits left.  We can either specify them, as below, or keep them flexible.
-    static ctype FLAG_BITS = 16;                          // Total number of bits available for flags
     static ctype CYCLE_COST_BIT = 16;                     // Does this inst cost more than 1 cycle?
     static ctype COPY_COST_BIT = 17;                      // Does this inst have extra copy costs?
 
@@ -40,9 +39,14 @@ namespace emp {
     unsigned int info;  // Full information about this instruction; both ID and flags.
 
   public:
-    Instruction(unsigned int id=0, unsigned int arg=0) : info(id + arg<<ID_BITS) {
+    Instruction(unsigned int id=0, unsigned int arg=0,
+                bool extra_cycle_cost=false, bool extra_copy_cost=false)
+      : info(id + (arg<<ID_BITS))
+    {
       assert((id >> ID_BITS)   == 0 && "Too many bits in id!");
       assert((arg >> ARG_BITS) == 0 && "Too many bits is arg!");
+      if (extra_cycle_cost) SetCycleCost();
+      if (extra_copy_cost) SetCopyCost();
     }
     Instruction(const Instruction & in_inst) : info(in_inst.info & FIXED_BIT_MASK) { ; }
     ~Instruction() { ; }

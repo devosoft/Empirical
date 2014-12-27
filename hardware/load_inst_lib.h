@@ -21,7 +21,7 @@ namespace emp {
     for (int i = 0; i < NUM_ARG_NOPS; i++) {
       std::string inst_name = "Nop-";
       inst_name += std::to_string(i);
-      inst_lib.AddInst(inst_name, std::bind(&HardwareCPU<>::Inst_Nop, _1), 1, i);
+      inst_lib.AddInst(inst_name, std::bind(&HardwareCPU<>::Inst_Nop, _1), i, 1);
     }
 
     // Load in single-argument math operations.
@@ -38,7 +38,7 @@ namespace emp {
     inst_lib.AddInst("Div",  std::bind(&HardwareCPU<>::Inst_Div,  _1, 1, 2, 3));
     inst_lib.AddInst("Mod",  std::bind(&HardwareCPU<>::Inst_Mod,  _1, 1, 2, 3));
 
-    // Load in Jump operations  [we neeed to do better...  push an pop heads?]
+    // Load in Jump operations  [we neeed to do better...  push and pop heads?]
     // "Set-Memory" - Jumps the flow head (?2) to memory space 1 (?1).
     // "Find-Label" - Jumps the flow head to a complement label (?...) in its current memory.
     // "Jump-Head"  - Jumps the IP (?1) to the position of the flow head (?2)
@@ -60,8 +60,8 @@ namespace emp {
     // "Inst-Read"
     // "Inst-Write"
     // "Inst-Copy"
-    // "IO"
-    // "Inject" ??
+    // "IO"         - Needs callback
+    // "Inject" ??  - Needs callback
   }
 
 };
