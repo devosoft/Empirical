@@ -17,30 +17,34 @@
 namespace emp {
 
   class Instruction {
-  public:
-    typedef const unsigned int ctype;                    // Type for all constants in definition...
-    static ctype ID_BITS = 10;                           // # of bits to track instruction ID.
-    static ctype ID_MASK = (1 << ID_BITS) - 1;           // Mask to extract the ID (also, ID max)
-    static ctype FIXED_FLAG_BITS = 6;                    // Bits to store fixed inst info.
-    static ctype FIXED_FLAG_MASK =
-                ((1 << FIXED_FLAG_BITS)-1) << ID_BITS;   // Mask to extract just fixed flags.
-    static ctype COPY_BITS = ID_BITS + FIXED_FLAG_BITS;  // How many bits need to be copied?
-    static ctype COPY_MASK = (1 << COPY_BITS)-1;         // Mask to extract the copiable bits
-    static ctype VAR_FLAG_BITS = 32 - ID_BITS;           // Number of bits leftover for flags
-    static ctype VAR_FLAG_MASK = ~COPY_MASK;             // Mask to extract run-time varuable bits
-    static ctype FLAG_BITS = 32 - ID_BITS;               // Total of all flags
-
-    static ctype ARG_BIT = 10;                           // Can this instruction be an argument?
-    static ctype CYCLE_COST_BIT = 11;                    // Does this inst cost more than 1 cycle?
-    static ctype COPY_COST_BIT = 12;                     // Does this inst have extra copy costs?
-
-
   private:
+    typedef const unsigned int ctype;                     // Type for all constants in definition.
+    static ctype ID_BITS = 10;                            // # of bits to track instruction ID.
+    static ctype ID_MASK = (1 << ID_BITS) - 1;            // Mask to extract the ID (also, ID max)
+    static ctype ARG_BITS = 6;                            // Allows for 64 distinct arguments.
+    static ctype ARG_MASK = ((1<<ARG_BITS)-1) << ID_BITS; // Mask to extract the argument info.
+
+    // We have 32 bits left.  We can either specify them, as below, or keep them flexible.
+    static ctype FLAG_BITS = 16;                          // Total number of bits available for flags
+    static ctype CYCLE_COST_BIT = 16;                     // Does this inst cost more than 1 cycle?
+    static ctype COPY_COST_BIT = 17;                      // Does this inst have extra copy costs?
+
+    static ctype FIXED_BIT_COUNT = 18;                    // How many bits to be copied w/ instruction?
+    static ctype FIXED_BIT_MASK = (1<<FIXED_BIT_COUNT)-1; // Mask for copying instructions
+
+
+    bool GetFlag(int id) const { return (info >> id) & 1; }
+    void SetFlag(int id) { info |= (1 << id); }
+    void ClearFlag(int id) { info &= ~(1 << id); }
+
     unsigned int info;  // Full information about this instruction; both ID and flags.
 
   public:
-    Instruction(unsigned int id=0) : info(id) { ; }
-    Instruction(const Instruction & in_inst) : info(in_inst.info & ID_MASK) { ; }
+    Instruction(unsigned int id=0, unsigned int arg=0) : info(id + arg<<ID_BITS) {
+      assert((id >> ID_BITS)   == 0 && "Too many bits in id!");
+      assert((arg >> ARG_BITS) == 0 && "Too many bits is arg!");
+    }
+    Instruction(const Instruction & in_inst) : info(in_inst.info & FIXED_BIT_MASK) { ; }
     ~Instruction() { ; }
 
     Instruction & operator=(const Instruction & _in) {
@@ -57,22 +61,28 @@ namespace emp {
     bool operator>=(const Instruction & _in) const { return GetID() >= _in.GetID(); }
 
     int GetID() const { return (int) info & ID_MASK; }
-    bool GetFlag(int id) const {
-      assert(id < FLAG_BITS);
-      return (info & (1 << (id + ID_BITS))) != 0;
-    }
+    int GetArgValue() const { return (int) ((info & ARG_MASK) >> ID_BITS); }
+
+    bool HasCycleCost() const { return GetFlag(CYCLE_COST_BIT); }
+    bool HasCopyCost() const { return GetFlag(COPY_COST_BIT); }
 
     Instruction & SetID(int new_id) {
       assert((new_id & ID_MASK) == new_id);
       info = (unsigned int) new_id;
       return *this;
     }
-    Instruction & SetFlag(int id, bool value=true) {
-      assert(id >= 0 && id < FLAG_BITS);
-      if (value) info |= 1 << (id + ID_BITS);
-      else info &= ~(1 << (id + ID_BITS));
+    Instruction & SetArgValue(int arg_value) {
+      assert((arg_value >> ARG_BITS) == 0 && "Argument too large to store in Instruction");
+      info &= ~ARG_MASK;               // Clear out current arg contenst of instruction.
+      info |= (arg_value << ID_BITS);  // Set new arg contents of instruction.
       return *this;
     }
+
+    Instruction & SetCycleCost() { SetFlag(CYCLE_COST_BIT); return *this; }
+    Instruction & SetCopyCost() { SetFlag(COPY_COST_BIT); return *this; }
+
+    Instruction & ClearCycleCost() { ClearFlag(CYCLE_COST_BIT); return *this; }
+    Instruction & ClearCopyCost() { ClearFlag(COPY_COST_BIT); return *this; }
   };
 
 };
