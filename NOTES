@@ -38,10 +38,6 @@ If insturction functions are stored in a fixed array (rather than vector), one f
 Come up with a cleaner method to time functions?  Current macro is pretty ugly.
 
 -= Improvements =-
-Config: Should be able to output its own config header.
-Config: Build links into variable setting to trigger function calls
-Config: Warn more gracefully if a variable/const name is used more than once?
-Congig: Build an HTML object to automatically allow adjustment of settings.
 InstLib: Can we lock in a set of instruction as compile time?  Or at least put them in a fixed array?
 
 -= Useful Evolution Tools =-
@@ -52,3 +48,11 @@ Simple-to-modify and fast phenotype object (similar to config)
 Phenotype summary to include in the genotype
 Phylogeny/lineage manager with multiple modes of purging (and link to phenotypes?)
 Clade manager that will mark into phenotypes which clades they are associated with
+
+-= Specific ideas for Configurtion tools =-
+* Should be able to output its own config header for basic settings. (test more?)
+* Build links into setting variables that will trigger function calls
+* Warn more gracefully if a variable/const name is used more than once?
+* Build an HTML object to automatically allow adjustment of settings in a running ap.
+* Require a "set" command before each setting.  This allows for other types of commands.
+* Allow other commands to redirect the rest of the line to a specific object for processing.
