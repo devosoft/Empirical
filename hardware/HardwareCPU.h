@@ -9,7 +9,6 @@
 //   NUM_STACKS = how many stacks are available in the hardware?  (default = 8)
 //   STACK_SIZE = maximum number of entries that are allowed in a stack (default=16)
 //   NUM_ARG_NOPS = How many nop instructions can be used as arguments? (typically = NUM_STACKS)
-//   MAX_ARGS = Maximum number of arguments needed by any instruction.
 //
 
 #include <functional>
@@ -19,19 +18,44 @@
 
 namespace emp {
 
-  template <int NUM_STACKS=8, int STACK_SIZE=16, int NUM_ARG_NOPS=8, int MAX_ARGS=3> class HardwareCPU
+  template <int NUM_STACKS=8, int STACK_SIZE=16, int NUM_ARG_NOPS=8> class HardwareCPU
     : public HardwareCPU_Base<Instruction> {
   protected:
     // Hardware components...
     CPUStack<STACK_SIZE> stacks[NUM_STACKS];
+    CPUHead heads[NUM_STACKS];
+
+    typedef std::vector<emp::Instruction> mem_type;
+    mem_type memory[NUM_STACKS];
   public:
-    HardwareCPU() { ; }
+    HardwareCPU() {
+      assert(NUM_STACKS >= 4 && "Minimum 4 heads needed");
+      // Initialize all of the heads to the beginning of the code.
+      for (int i=0; i < NUM_STACKS; i++) heads[i].Set(memory[0], 0);
+    }
     ~HardwareCPU() { ; }
+
+    // Do a full factory-reset on the virtual hardware.
+    void Clear() {
+      for (int i = 0; i < NUM_STACKS; i++) {
+        stacks[i].Clear();
+        heads[i].Set(memory[i], 0);
+        memory[i].resize(0);
+      }
+    }
 
     CPUStack<STACK_SIZE> & GetStack(int stack_id) {
       assert(stack_id >= 0 && stack_id < NUM_STACKS);
       return stacks[stack_id];
     }
+
+    static int GetNumStacks()  { return NUM_STACKS; }
+    static int GetStackSize()  { return STACK_SIZE; }
+    static int GetNumArgNops() { return NUM_ARG_NOPS; }
+
+    mem_type & GetMemory(int mem_id=0) { return memory[mem_id]; }
+    
+    void LoadMemory(const std::vector<emp::Instruction> & in_memory) { memory[0] = in_memory; }
 
     // Examines the nops following (?) the IP to test if they override the default arguments.
     int ChooseStack(int default_stack) { return default_stack; }
