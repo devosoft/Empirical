@@ -8,6 +8,11 @@
 //
 //  Note: all components are protected so they can only be used internally in derived classes.
 //
+//  These include:
+//    CPUStack<STACK_SIZE> - a templated class that builds a fast, roll-over integer stack.
+//    CPUHead - a class that points to a position in a vector of instructions
+//
+
 
 #include <vector>
 
@@ -15,8 +20,6 @@ namespace emp {
 
   template <typename INST_TYPE> class HardwareCPU_Base {
   protected:
-    std::vector<INST_TYPE> code;
-
     HardwareCPU_Base() { ; }
     ~HardwareCPU_Base() { ; }
 
@@ -79,11 +82,12 @@ namespace emp {
         // Note, % only happens if out of range.
       }
     public:
-      CPUHead(std::vector<INST_TYPE> _mem, int _pos=0) : memory(_mem), position(_pos) { ; }
+      CPUHead() : memory(NULL), position(0) { ; }
+      CPUHead(std::vector<INST_TYPE> & _mem, int _pos=0) : memory(&_mem), position(_pos) { ; }
       CPUHead(const CPUHead & _in) : memory(_in.memory), position(_in.position) { ; }
       ~CPUHead() { ; }
 
-      std::vector<INST_TYPE> * GetMemory() { return memory; }
+      std::vector<INST_TYPE> & GetMemory() { return *memory; }
       int GetPosition() const { return position; }
 
       const INST_TYPE & GetInst() const { return (*memory)[position]; }
@@ -101,8 +105,8 @@ namespace emp {
       bool operator!=(const CPUHead & _in) const { return !operator==(_in); }
 
       CPUHead & Set(int _pos) { position = _pos; return *this; }
-      CPUHead & Set(std::vector<INST_TYPE> * _mem, int _pos=0) {
-        memory = _mem; position = _pos; return *this;
+      CPUHead & Set(std::vector<INST_TYPE> & _mem, int _pos=0) {
+        memory = &_mem; position = _pos; return *this;
       }
 
       CPUHead & operator++() { if (++position >= memory.size()) position = 0; return *this; }
