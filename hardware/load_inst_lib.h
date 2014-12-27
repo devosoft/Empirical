@@ -37,6 +37,31 @@ namespace emp {
     inst_lib.AddInst("Mult", std::bind(&HardwareCPU<>::Inst_Mult, _1, 1, 2, 3));
     inst_lib.AddInst("Div",  std::bind(&HardwareCPU<>::Inst_Div,  _1, 1, 2, 3));
     inst_lib.AddInst("Mod",  std::bind(&HardwareCPU<>::Inst_Mod,  _1, 1, 2, 3));
+
+    // Load in Jump operations  [we neeed to do better...  push an pop heads?]
+    // "Set-Memory" - Jumps the flow head (?2) to memory space 1 (?1).
+    // "Find-Label" - Jumps the flow head to a complement label (?...) in its current memory.
+    // "Jump-Head"  - Jumps the IP (?1) to the position of the flow head (?2)
+    // "Bookmark"   - Moves the flow head (?1) to the position of the IP (?2)
+
+    // Conditionals
+    // "If-Equal"
+    // "If-NEqual"
+    // "If-Less"
+    // "If-Label"
+
+    // Juggle stack contents
+    // "Val-Move"
+    // "Val-Delete"
+    // "Val-Copy"
+
+    // Load in "Biological" instructions
+    // "Divide"     - Moves memory space 1 (?1) into its own organism.  Needs callback!
+    // "Inst-Read"
+    // "Inst-Write"
+    // "Inst-Copy"
+    // "IO"
+    // "Inject" ??
   }
 
 };

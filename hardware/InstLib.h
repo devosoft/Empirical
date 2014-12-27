@@ -56,8 +56,8 @@ namespace emp {
 
     int GetSize() const { return (int) inst_info.size(); }
 
-    bool RunInst(HARDWARE_TYPE & hw, int inst_id) {
-      std::cout << "Ping!" << std::endl;
+    inline bool RunInst(HARDWARE_TYPE & hw, int inst_id) {
+      assert(inst_id >= 0 && inst_id < inst_calls.size());
       return inst_calls[inst_id](hw);
     }
 
