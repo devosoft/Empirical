@@ -52,7 +52,7 @@ namespace emp {
     ~Instruction() { ; }
 
     Instruction & operator=(const Instruction & _in) {
-      SetID(_in.GetID());
+      info = _in.info & FIXED_BIT_MASK;
       return *this;
     }
 
