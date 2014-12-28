@@ -25,18 +25,18 @@ namespace emp {
     }
 
     // Load in single-argument math operations.
-    inst_lib.AddInst("Inc", std::bind(&HardwareCPU<>::Inst_AddConst, _1, 1, 1, 1));
-    inst_lib.AddInst("Dec", std::bind(&HardwareCPU<>::Inst_AddConst, _1, -1, 1, 1));
-    inst_lib.AddInst("Shift-L", std::bind(&HardwareCPU<>::Inst_Shift, _1, 1, 1, 1));
-    inst_lib.AddInst("Shift-R", std::bind(&HardwareCPU<>::Inst_Shift, _1, -1, 1, 1));
+    inst_lib.AddInst("Inc", std::bind(&HardwareCPU<>::Inst_AddConst, _1, 1, 1, 0));
+    inst_lib.AddInst("Dec", std::bind(&HardwareCPU<>::Inst_AddConst, _1, -1, 1, 0));
+    inst_lib.AddInst("Shift-L", std::bind(&HardwareCPU<>::Inst_Shift, _1, 1, 1, 0));
+    inst_lib.AddInst("Shift-R", std::bind(&HardwareCPU<>::Inst_Shift, _1, -1, 1, 0));
 
     // Load in double-argument math operations.
-    inst_lib.AddInst("Nand", std::bind(&HardwareCPU<>::Inst_Nand, _1, 1, 2, 3));
-    inst_lib.AddInst("Add",  std::bind(&HardwareCPU<>::Inst_Add,  _1, 1, 2, 3));
-    inst_lib.AddInst("Sub",  std::bind(&HardwareCPU<>::Inst_Sub,  _1, 1, 2, 3));
-    inst_lib.AddInst("Mult", std::bind(&HardwareCPU<>::Inst_Mult, _1, 1, 2, 3));
-    inst_lib.AddInst("Div",  std::bind(&HardwareCPU<>::Inst_Div,  _1, 1, 2, 3));
-    inst_lib.AddInst("Mod",  std::bind(&HardwareCPU<>::Inst_Mod,  _1, 1, 2, 3));
+    inst_lib.AddInst("Nand", std::bind(&HardwareCPU<>::Inst_Nand, _1, 1, 1, 3));
+    inst_lib.AddInst("Add",  std::bind(&HardwareCPU<>::Inst_Add,  _1, 1, 1, 3));
+    inst_lib.AddInst("Sub",  std::bind(&HardwareCPU<>::Inst_Sub,  _1, 1, 1, 3));
+    inst_lib.AddInst("Mult", std::bind(&HardwareCPU<>::Inst_Mult, _1, 1, 1, 3));
+    inst_lib.AddInst("Div",  std::bind(&HardwareCPU<>::Inst_Div,  _1, 1, 1, 3));
+    inst_lib.AddInst("Mod",  std::bind(&HardwareCPU<>::Inst_Mod,  _1, 1, 1, 3));
 
     // Load in Jump operations  [we neeed to do better...  push and pop heads?]
     // "Set-Memory" - Jumps the flow head (?2) to memory space 1 (?1).

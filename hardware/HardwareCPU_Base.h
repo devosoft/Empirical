@@ -109,11 +109,13 @@ namespace emp {
         memory = &_mem; position = _pos; return *this;
       }
 
-      CPUHead & operator++() { if (++position >= memory.size()) position = 0; return *this; }
-      CPUHead & operator--() { if (--position < 0) position = memory.size() - 1; return *this; }      
+      CPUHead & operator++() { if (++position >= (int) memory->size()) position = 0; return *this; }
+      CPUHead & operator--() { if (--position < 0) position = memory->size() - 1; return *this; }      
 
       CPUHead & operator+=(int shift) { position += shift; Adjust(); return *this; }
       CPUHead & operator-=(int shift) { position -= shift; Adjust(); return *this; }
+
+      bool IsValid() { return (memory != NULL) && (position >= 0) && (position < (int) memory->size()); }
     };
 
 
