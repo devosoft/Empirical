@@ -25,24 +25,24 @@ namespace emp {
     }
 
     // Load in single-argument math operations.
-    inst_lib.AddInst("Inc", std::bind(&HardwareCPU<>::Inst_AddConst, _1, 1, 1, 0));
-    inst_lib.AddInst("Dec", std::bind(&HardwareCPU<>::Inst_AddConst, _1, -1, 1, 0));
-    inst_lib.AddInst("Shift-L", std::bind(&HardwareCPU<>::Inst_Shift, _1, 1, 1, 0));
-    inst_lib.AddInst("Shift-R", std::bind(&HardwareCPU<>::Inst_Shift, _1, -1, 1, 0));
+    inst_lib.AddInst("Inc", std::mem_fn(&HardwareCPU<>::Inst_AddConst<1, 1, 0>));
+    inst_lib.AddInst("Dec", std::mem_fn(&HardwareCPU<>::Inst_AddConst<-1, 1, 0>));
+    inst_lib.AddInst("Shift-L", std::mem_fn(&HardwareCPU<>::Inst_Shift<1, 1, 0>));
+    inst_lib.AddInst("Shift-R", std::mem_fn(&HardwareCPU<>::Inst_Shift<-1, 1, 0>));
 
     // Load in double-argument math operations.
-    inst_lib.AddInst("Nand", std::bind(&HardwareCPU<>::Inst_Nand, _1, 1, 1, 3));
-    inst_lib.AddInst("Add",  std::bind(&HardwareCPU<>::Inst_Add,  _1, 1, 1, 3));
-    inst_lib.AddInst("Sub",  std::bind(&HardwareCPU<>::Inst_Sub,  _1, 1, 1, 3));
-    inst_lib.AddInst("Mult", std::bind(&HardwareCPU<>::Inst_Mult, _1, 1, 1, 3));
-    inst_lib.AddInst("Div",  std::bind(&HardwareCPU<>::Inst_Div,  _1, 1, 1, 3));
-    inst_lib.AddInst("Mod",  std::bind(&HardwareCPU<>::Inst_Mod,  _1, 1, 1, 3));
+    inst_lib.AddInst("Nand", std::mem_fn(&HardwareCPU<>::Inst_Nand<1,1,3>));
+    inst_lib.AddInst("Add",  std::mem_fn(&HardwareCPU<>::Inst_Add<1,1,3>));
+    inst_lib.AddInst("Sub",  std::mem_fn(&HardwareCPU<>::Inst_Sub<1,1,3>));
+    inst_lib.AddInst("Mult", std::mem_fn(&HardwareCPU<>::Inst_Mult<1,1,3>));
+    inst_lib.AddInst("Div",  std::mem_fn(&HardwareCPU<>::Inst_Div<1,1,3>));
+    inst_lib.AddInst("Mod",  std::mem_fn(&HardwareCPU<>::Inst_Mod<1,1,3>));
 
     // Load in Jump operations  [we neeed to do better...  push and pop heads?]
+    inst_lib.AddInst("Jump",     std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToHead<0, 3>));
+    inst_lib.AddInst("Bookmark", std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToHead<3, 0>));
     // "Set-Memory" - Jumps the flow head (?2) to memory space 1 (?1).
-    // "Find-Label" - Jumps the flow head to a complement label (?...) in its current memory.
-    // "Jump-Head"  - Jumps the IP (?1) to the position of the flow head (?2)
-    // "Bookmark"   - Moves the flow head (?1) to the position of the IP (?2)
+    // "Find-Label" - Jumps the flow head to a complement label (?...) in its current memory.    
 
     // Conditionals
     // "If-Equal"
