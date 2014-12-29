@@ -15,10 +15,10 @@ using namespace std::placeholders;
 namespace emp {
 
   // void Load4StackDefault(InstLib<HardwareCPU<>, Instruction> & inst_lib) {
-  template <int NUM_STACKS=8, int STACK_SIZE=16, int NUM_ARG_NOPS=8>
-  void Load4StackDefault(InstLib<HardwareCPU<NUM_STACKS, STACK_SIZE, NUM_ARG_NOPS>, Instruction> & inst_lib) {
+  template <int CPU_SCALE=8, int STACK_SIZE=16>
+  void Load4StackDefault(InstLib<HardwareCPU<CPU_SCALE, STACK_SIZE>, Instruction> & inst_lib) {
     // Load as many nops as we need.  This we be called Nop-0, Nop-1, Nop-2, etc.
-    for (int i = 0; i < NUM_ARG_NOPS; i++) {
+    for (int i = 0; i < CPU_SCALE; i++) {
       std::string inst_name = "Nop-";
       inst_name += std::to_string(i);
       inst_lib.AddInst(inst_name, std::bind(&HardwareCPU<>::Inst_Nop, _1), i, 1);
@@ -31,7 +31,11 @@ namespace emp {
     inst_lib.AddInst("Shift-R", std::mem_fn(&HardwareCPU<>::Inst_Shift<-1, 1, 0>));
 
     // Load in double-argument math operations.
-    inst_lib.AddInst("Nand", std::mem_fn(&HardwareCPU<>::Inst_Nand<1,1,3>));
+    // inst_lib.AddInst("Nand", std::mem_fn(&HardwareCPU<>::Inst_Nand<1,1,3>));
+    inst_lib.AddInst("Nand", std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
+                                       [](int a, int b) { return ~(a&b); }));
+
+
     inst_lib.AddInst("Add",  std::mem_fn(&HardwareCPU<>::Inst_Add<1,1,3>));
     inst_lib.AddInst("Sub",  std::mem_fn(&HardwareCPU<>::Inst_Sub<1,1,3>));
     inst_lib.AddInst("Mult", std::mem_fn(&HardwareCPU<>::Inst_Mult<1,1,3>));

@@ -6,9 +6,8 @@
 //  HardwareCPU is a basic, CPU-style virtual hardware object.
 //
 //  This is a templated type that allows compile-time configuration of properties.
-//   NUM_STACKS = how many stacks are available in the hardware?  (default = 8)
-//   STACK_SIZE = maximum number of entries that are allowed in a stack (default=16)
-//   NUM_ARG_NOPS = How many nop instructions can be used as arguments? (typically = NUM_STACKS)
+//   CPU_SCALE = How many components of each type (stacks, heads, memory, nops) are available?
+//   STACK_SIZE = Maximum number of entries that are allowed in a stack (default=16)
 //
 
 #include <functional>
@@ -19,14 +18,14 @@
 
 namespace emp {
 
-  template <int NUM_STACKS=8, int STACK_SIZE=16, int NUM_ARG_NOPS=8> class HardwareCPU
+  template <int CPU_SCALE=8, int STACK_SIZE=16> class HardwareCPU
     : public HardwareCPU_Base<Instruction> {
   protected:
     // Hardware components...
     typedef std::vector<emp::Instruction> mem_type;
-    mem_type memory[NUM_STACKS];
-    CPUStack<STACK_SIZE> stacks[NUM_STACKS];
-    CPUHead heads[NUM_STACKS];
+    mem_type memory[CPU_SCALE];
+    CPUStack<STACK_SIZE> stacks[CPU_SCALE];
+    CPUHead heads[CPU_SCALE];
 
     const InstLib<HardwareCPU, Instruction> & inst_lib;
 
@@ -38,15 +37,15 @@ namespace emp {
     static const int HEAD_FLOW  = 3;
 
     HardwareCPU(const InstLib<HardwareCPU, Instruction> & _inst_lib) : inst_lib(_inst_lib) {
-      assert(NUM_STACKS >= 4 && "Minimum 4 heads needed");
+      assert(CPU_SCALE >= 4 && "Minimum 4 heads needed");
       // Initialize all of the heads to the beginning of the code.
-      for (int i=0; i < NUM_STACKS; i++) heads[i].Set(memory[0], 0);
+      for (int i=0; i < CPU_SCALE; i++) heads[i].Set(memory[0], 0);
     }
     ~HardwareCPU() { ; }
 
     // Do a full factory-reset on the virtual hardware.
     void Clear() {
-      for (int i = 0; i < NUM_STACKS; i++) {
+      for (int i = 0; i < CPU_SCALE; i++) {
         stacks[i].Clear();
         heads[i].Set(memory[i], 0);
         memory[i].resize(0);
@@ -54,13 +53,13 @@ namespace emp {
     }
 
     CPUStack<STACK_SIZE> & GetStack(int stack_id) {
-      assert(stack_id >= 0 && stack_id < NUM_STACKS);
+      assert(stack_id >= 0 && stack_id < CPU_SCALE);
       return stacks[stack_id];
     }
 
-    static int GetNumStacks()  { return NUM_STACKS; }
+    static int GetNumStacks()  { return CPU_SCALE; }
     static int GetStackSize()  { return STACK_SIZE; }
-    static int GetNumArgNops() { return NUM_ARG_NOPS; }
+    static int GetNumArgNops() { return CPU_SCALE; }
 
     mem_type & GetMemory(int mem_id=0) { return memory[mem_id]; }
     
@@ -103,7 +102,7 @@ namespace emp {
     template <int default_in, int default_out_offset>
     bool Inst_1I_Math(std::function<int(int)> math1_fun) {
       const int in_stack = ChooseTarget(default_in);
-      const int out_stack = ChooseTarget((in_stack + default_out_offset) % NUM_ARG_NOPS);
+      const int out_stack = ChooseTarget((in_stack + default_out_offset) % CPU_SCALE);
       const int result = math1_fun(stacks[in_stack].Pop());
       stacks[out_stack].Push(result);
       return true;
@@ -112,7 +111,7 @@ namespace emp {
     // Add or subtract a value; use +1 and -1 for Inc and Dec instructions.
     template <int value, int default_in, int default_out_offset> bool Inst_AddConst() {
       const int in_stack = ChooseTarget(default_in);
-      const int out_stack = ChooseTarget((in_stack + default_out_offset) % NUM_ARG_NOPS);
+      const int out_stack = ChooseTarget((in_stack + default_out_offset) % CPU_SCALE);
       const int result = stacks[in_stack].Pop() + value;
       stacks[out_stack].Push(result);
       return true;
@@ -121,7 +120,7 @@ namespace emp {
     // Positive shift is left, negative shift is right.  I.e., value = value * 2^shift
     template <int shift, int default_in, int default_out_offset> bool Inst_Shift() {
       const int in_stack = ChooseTarget(default_in);
-      const int out_stack = ChooseTarget((in_stack + default_out_offset) % NUM_ARG_NOPS);
+      const int out_stack = ChooseTarget((in_stack + default_out_offset) % CPU_SCALE);
       const int result = (shift > 0) ? stacks[in_stack].Pop() << shift : stacks[in_stack].Pop() >> -shift;
       stacks[out_stack].Push(result);
       return true;
@@ -133,7 +132,7 @@ namespace emp {
     bool Inst_2I_Math(std::function<int(int,int)> math2_fun) {
       const int out_stack = ChooseTarget(default_out);
       const int in1_stack = ChooseTarget(default_in1);
-      const int in2_stack = ChooseTarget((in1_stack + default_in2_offset) % NUM_ARG_NOPS);
+      const int in2_stack = ChooseTarget((in1_stack + default_in2_offset) % CPU_SCALE);
       const int result = math2_fun(stacks[in1_stack].Top(), stacks[in2_stack].Top());
       stacks[out_stack].Push(result);
       return true;
