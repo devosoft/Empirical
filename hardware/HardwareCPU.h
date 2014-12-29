@@ -108,23 +108,6 @@ namespace emp {
       return true;
     }
 
-    // Add or subtract a value; use +1 and -1 for Inc and Dec instructions.
-    template <int value, int default_in, int default_out_offset> bool Inst_AddConst() {
-      const int in_stack = ChooseTarget(default_in);
-      const int out_stack = ChooseTarget((in_stack + default_out_offset) % CPU_SCALE);
-      const int result = stacks[in_stack].Pop() + value;
-      stacks[out_stack].Push(result);
-      return true;
-    }
-
-    // Positive shift is left, negative shift is right.  I.e., value = value * 2^shift
-    template <int shift, int default_in, int default_out_offset> bool Inst_Shift() {
-      const int in_stack = ChooseTarget(default_in);
-      const int out_stack = ChooseTarget((in_stack + default_out_offset) % CPU_SCALE);
-      const int result = (shift > 0) ? stacks[in_stack].Pop() << shift : stacks[in_stack].Pop() >> -shift;
-      stacks[out_stack].Push(result);
-      return true;
-    }
 
     // -------- Two-argument Math Instructions --------
 

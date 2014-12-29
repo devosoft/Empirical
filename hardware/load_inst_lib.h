@@ -25,10 +25,10 @@ namespace emp {
     }
 
     // Load in single-argument math operations.
-    inst_lib.AddInst("Inc", std::mem_fn(&HardwareCPU<>::Inst_AddConst<1, 1, 0>));
-    inst_lib.AddInst("Dec", std::mem_fn(&HardwareCPU<>::Inst_AddConst<-1, 1, 0>));
-    inst_lib.AddInst("Shift-L", std::mem_fn(&HardwareCPU<>::Inst_Shift<1, 1, 0>));
-    inst_lib.AddInst("Shift-R", std::mem_fn(&HardwareCPU<>::Inst_Shift<-1, 1, 0>));
+    inst_lib.AddInst("Inc", std::bind(&HardwareCPU<>::Inst_1I_Math<1,0>, _1, [](int a){return a+1;}));
+    inst_lib.AddInst("Dec", std::bind(&HardwareCPU<>::Inst_1I_Math<1,0>, _1, [](int a){return a-1;}));
+    inst_lib.AddInst("Shift-L", std::bind(&HardwareCPU<>::Inst_1I_Math<1,0>, _1, [](int a){return a<<1;}));
+    inst_lib.AddInst("Shift-R", std::bind(&HardwareCPU<>::Inst_1I_Math<1,0>, _1, [](int a){return a>>1;}));
 
     // Load in double-argument math operations.
     inst_lib.AddInst("Nand", std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
