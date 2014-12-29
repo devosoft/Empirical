@@ -138,27 +138,6 @@ namespace emp {
       return true;
     }
 
-    template <int d_in1, int d_in2_offset, int d_out> bool Inst_Nand() {
-      return Inst_2I_Math<d_in1, d_in2_offset, d_out>([](int a, int b) { return ~(a&b); });
-    }
-    template <int d_in1, int d_in2_offset, int d_out> bool Inst_Add() {
-      return Inst_2I_Math<d_in1, d_in2_offset, d_out>([](int a, int b) { return a+b; });
-    }
-    template <int d_in1, int d_in2_offset, int d_out> bool Inst_Sub() {
-      return Inst_2I_Math<d_in1, d_in2_offset, d_out>([](int a, int b) { return a-b; });
-    }
-    template <int d_in1, int d_in2_offset, int d_out> bool Inst_Mult() {
-      return Inst_2I_Math<d_in1, d_in2_offset, d_out>([](int a, int b) { return a*b; });
-    }
-    template <int d_in1, int d_in2_offset, int d_out> bool Inst_Div() {
-      // @CAO Ideally if b==0, we should return false...
-      return Inst_2I_Math<d_in1, d_in2_offset, d_out>([](int a, int b) { return (b==0)?0:a/b; });
-    }
-    template <int d_in1, int d_in2_offset, int d_out> bool Inst_Mod() {
-      // @CAO Ideally if b==0, we should return false...
-      return Inst_2I_Math<d_in1, d_in2_offset, d_out>([](int a, int b) { return (b==0)?0:a%b; });
-    }
-
     
     // --------  Jump Operations  --------
 

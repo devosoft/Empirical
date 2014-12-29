@@ -31,16 +31,20 @@ namespace emp {
     inst_lib.AddInst("Shift-R", std::mem_fn(&HardwareCPU<>::Inst_Shift<-1, 1, 0>));
 
     // Load in double-argument math operations.
-    // inst_lib.AddInst("Nand", std::mem_fn(&HardwareCPU<>::Inst_Nand<1,1,3>));
     inst_lib.AddInst("Nand", std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
                                        [](int a, int b) { return ~(a&b); }));
+    inst_lib.AddInst("Add",  std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
+                                       [](int a, int b) { return a+b; }));
+    inst_lib.AddInst("Sub",  std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
+                                       [](int a, int b) { return a-b; }));
+    inst_lib.AddInst("Mult", std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
+                                       [](int a, int b) { return a*b; }));
 
-
-    inst_lib.AddInst("Add",  std::mem_fn(&HardwareCPU<>::Inst_Add<1,1,3>));
-    inst_lib.AddInst("Sub",  std::mem_fn(&HardwareCPU<>::Inst_Sub<1,1,3>));
-    inst_lib.AddInst("Mult", std::mem_fn(&HardwareCPU<>::Inst_Mult<1,1,3>));
-    inst_lib.AddInst("Div",  std::mem_fn(&HardwareCPU<>::Inst_Div<1,1,3>));
-    inst_lib.AddInst("Mod",  std::mem_fn(&HardwareCPU<>::Inst_Mod<1,1,3>));
+    // @CAO For the next two, ideally if b==0, we should have the instruction return false...
+    inst_lib.AddInst("Div",  std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
+                                       [](int a, int b) { return (b==0)?0:a/b; }));
+    inst_lib.AddInst("Mod",  std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
+                                       [](int a, int b) { return (b==0)?0:a%b; }));
 
     // Load in Jump operations  [we neeed to do better...  push and pop heads?]
     inst_lib.AddInst("Jump",     std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToHead<0, 3>));
