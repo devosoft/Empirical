@@ -99,11 +99,12 @@ namespace emp {
     // -------- Single-argument Math Instructions --------
 
     // Build a 1-input math instruction on the fly.  See two-input math for examples.
-    template <int default_in, int default_out_offset>
+    template <int default_in, int default_out_offset, bool pop_input=true>
     bool Inst_1I_Math(std::function<int(int)> math1_fun) {
       const int in_stack = ChooseTarget(default_in);
       const int out_stack = ChooseTarget((in_stack + default_out_offset) % CPU_SCALE);
-      const int result = math1_fun(stacks[in_stack].Pop());
+      const int in_value = pop_input ? stacks[in_stack].Pop() : stacks[in_stack].Top();
+      const int result = math1_fun(in_value);
       stacks[out_stack].Push(result);
       return true;
     }
@@ -111,12 +112,16 @@ namespace emp {
 
     // -------- Two-argument Math Instructions --------
 
-    template <int default_in1, int default_in2_offset, int default_out>
+    template <int default_in1, int default_in2_offset, int default_out, 
+              bool pop_input1=false, bool pop_input2=false>
     bool Inst_2I_Math(std::function<int(int,int)> math2_fun) {
       const int in1_stack = ChooseTarget(default_in1);
       const int in2_stack = ChooseTarget((in1_stack + default_in2_offset) % CPU_SCALE);
       const int out_stack = ChooseTarget(default_out);
-      const int result = math2_fun(stacks[in1_stack].Top(), stacks[in2_stack].Top());
+
+      const int in_value1 = pop_input1 ? stacks[in1_stack].Pop() : stacks[in1_stack].Top();
+      const int in_value2 = pop_input2 ? stacks[in2_stack].Pop() : stacks[in2_stack].Top();
+      const int result = math2_fun(in_value1, in_value2);
       stacks[out_stack].Push(result);
       return true;
     }
