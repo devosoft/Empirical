@@ -41,10 +41,19 @@ namespace emp {
                                        [](int a, int b) { return a*b; }));
 
     // @CAO For the next two, ideally if b==0, we should have the instruction return false...
-    inst_lib.AddInst("Div",  std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
-                                       [](int a, int b) { return (b==0)?0:a/b; }));
-    inst_lib.AddInst("Mod",  std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
-                                       [](int a, int b) { return (b==0)?0:a%b; }));
+    inst_lib.AddInst("Div", std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
+                                      [](int a, int b) { return (b==0)?0:a/b; }));
+    inst_lib.AddInst("Mod", std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
+                                      [](int a, int b) { return (b==0)?0:a%b; }));
+
+    // Conditionals
+    inst_lib.AddInst("Test-Equal",  std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,7>, _1,
+                                              [](int a, int b) { return a == b; }));
+    inst_lib.AddInst("Test-NEqual", std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,7>, _1,
+                                              [](int a, int b) { return a != b; }));
+    inst_lib.AddInst("Test-Less",   std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,7>, _1,
+                                              [](int a, int b) { return a < b; }));
+    // "Test-Start" **********
 
     // Load in Jump operations  [we neeed to do better...  push and pop heads?]
     inst_lib.AddInst("Jump",       std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToHead<0, 3>));
@@ -54,24 +63,17 @@ namespace emp {
     // "Jump-If0"
     // "Jump-IfN0"
 
-    // Conditionals
-    // "Test-Equal"
-    // "Test-NEqual"
-    // "Test-Less"
-    // "Test-Label"
-
     // Juggle stack contents
     // "Val-Move"
     // "Val-Delete"
     // "Val-Copy"
 
     // Load in "Biological" instructions
-    // "Divide"     - Moves memory space 1 (?1) into its own organism.  Needs callback!
-    // "Inst-Read"
-    // "Inst-Write"
-    // "Inst-Copy"
-    // "IO"         - Needs callback
-    // "Inject" ??  - Needs callback
+    // "Divide"      - Moves memory space 1 (?1) into its own organism.  Needs callback!
+    // "Copy"
+    // "Get-Input"   - Needs callback
+    // "Get-Output"  - Needs callback
+    // "Inject" ??   - Needs callback
   }
 
 };
