@@ -142,6 +142,16 @@ namespace emp {
       return true;
     }
 
+    template <int default_head_to_move, int default_head_target, int default_stack_test>
+    bool Inst_MoveHeadToHeadIf(std::function<bool(int)> test_fun) {
+      const int head_move = ChooseTarget(default_head_to_move);
+      const int head_target = ChooseTarget(default_head_target);
+      const int stack_test = ChooseTarget(default_stack_test);
+      const bool test_result = test_fun( stacks[stack_test].Pop() );
+      if (test_result) heads[head_move] = heads[head_target];
+      return true;
+    }
+
     template <int default_head_to_move, int default_mem_target> bool Inst_MoveHeadToMem() {
       const int head_move = ChooseTarget(default_head_to_move);
       const int mem_target = ChooseTarget(default_mem_target);

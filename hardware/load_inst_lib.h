@@ -57,11 +57,13 @@ namespace emp {
 
     // Load in Jump operations  [we neeed to do better...  push and pop heads?]
     inst_lib.AddInst("Jump",       std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToHead<0, 3>));
+    inst_lib.AddInst("Jump-If0",   std::bind(&HardwareCPU<>::Inst_MoveHeadToHeadIf<0,3,7>, _1,
+                                             [](int a) { return a==0; }));
+    inst_lib.AddInst("Jump-IfN0",   std::bind(&HardwareCPU<>::Inst_MoveHeadToHeadIf<0,3,7>, _1,
+                                              [](int a) { return a!=0; }));
     inst_lib.AddInst("Bookmark",   std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToHead<3, 0>));
     inst_lib.AddInst("Set-Memory", std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToMem<2, 1>));
     // "Find-Label" ********** - Jumps the flow head to a complement label (?...) in its current memory.    
-    // "Jump-If0" **********
-    // "Jump-IfN0" **********
 
     // Juggle stack contents
     inst_lib.AddInst("Val-Move", std::bind(&HardwareCPU<>::Inst_1I_Math<1,1>, _1, [](int a){return a;}));
@@ -71,7 +73,7 @@ namespace emp {
 
     // Load in "Biological" instructions
     // "Divide" **********      - Moves memory space 1 (?1) into its own organism.  Needs callback!
-    // "Push-Inst" **********
+    // "Build-Inst" **********  - Works like copy, but pushes instruction to end of memory space.
     // "Get-Input" **********   - Needs callback
     // "Get-Output" **********  - Needs callback
     // "Inject" ?? **********   - Needs callback
