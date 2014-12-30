@@ -47,16 +47,18 @@ namespace emp {
                                        [](int a, int b) { return (b==0)?0:a%b; }));
 
     // Load in Jump operations  [we neeed to do better...  push and pop heads?]
-    inst_lib.AddInst("Jump",     std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToHead<0, 3>));
-    inst_lib.AddInst("Bookmark", std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToHead<3, 0>));
-    // "Set-Memory" - Jumps the flow head (?2) to memory space 1 (?1).
+    inst_lib.AddInst("Jump",       std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToHead<0, 3>));
+    inst_lib.AddInst("Bookmark",   std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToHead<3, 0>));
+    inst_lib.AddInst("Set-Memory", std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToMem<2, 1>));
     // "Find-Label" - Jumps the flow head to a complement label (?...) in its current memory.    
+    // "Jump-If0"
+    // "Jump-IfN0"
 
     // Conditionals
-    // "If-Equal"
-    // "If-NEqual"
-    // "If-Less"
-    // "If-Label"
+    // "Test-Equal"
+    // "Test-NEqual"
+    // "Test-Less"
+    // "Test-Label"
 
     // Juggle stack contents
     // "Val-Move"

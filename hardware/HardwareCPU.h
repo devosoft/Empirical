@@ -113,9 +113,9 @@ namespace emp {
 
     template <int default_in1, int default_in2_offset, int default_out>
     bool Inst_2I_Math(std::function<int(int,int)> math2_fun) {
-      const int out_stack = ChooseTarget(default_out);
       const int in1_stack = ChooseTarget(default_in1);
       const int in2_stack = ChooseTarget((in1_stack + default_in2_offset) % CPU_SCALE);
+      const int out_stack = ChooseTarget(default_out);
       const int result = math2_fun(stacks[in1_stack].Top(), stacks[in2_stack].Top());
       stacks[out_stack].Push(result);
       return true;
@@ -128,6 +128,15 @@ namespace emp {
       const int head_move = ChooseTarget(default_head_to_move);
       const int head_target = ChooseTarget(default_head_target);
       heads[head_move] = heads[head_target];
+      return true;
+    }
+
+    template <int default_head_to_move, int default_mem_target> bool Inst_MoveHeadToMem() {
+      const int head_move = ChooseTarget(default_head_to_move);
+      const int mem_target = ChooseTarget(default_mem_target);
+      if (memory[mem_target].size() == 0) return false; // Memory spaces must exist before jump.
+      heads[head_move].Set(memory[mem_target], 0);
+      return true;
     }
   };
 
