@@ -31,19 +31,19 @@ namespace emp {
     inst_lib.AddInst("Shift-R", std::bind(&HardwareCPU<>::Inst_1I_Math<1,0>, _1, [](int a){return a>>1;}));
 
     // Load in double-argument math operations.
-    inst_lib.AddInst("Nand", std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
+    inst_lib.AddInst("Nand", std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,1>, _1,
                                        [](int a, int b) { return ~(a&b); }));
-    inst_lib.AddInst("Add",  std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
+    inst_lib.AddInst("Add",  std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,1>, _1,
                                        [](int a, int b) { return a+b; }));
-    inst_lib.AddInst("Sub",  std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
+    inst_lib.AddInst("Sub",  std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,1>, _1,
                                        [](int a, int b) { return a-b; }));
-    inst_lib.AddInst("Mult", std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
+    inst_lib.AddInst("Mult", std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,1>, _1,
                                        [](int a, int b) { return a*b; }));
 
     // @CAO For the next two, ideally if b==0, we should have the instruction return false...
-    inst_lib.AddInst("Div", std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
+    inst_lib.AddInst("Div", std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,1>, _1,
                                       [](int a, int b) { return (b==0)?0:a/b; }));
-    inst_lib.AddInst("Mod", std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1,
+    inst_lib.AddInst("Mod", std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,1>, _1,
                                       [](int a, int b) { return (b==0)?0:a%b; }));
 
     // Conditionals
@@ -53,7 +53,7 @@ namespace emp {
                                               [](int a, int b) { return a != b; }));
     inst_lib.AddInst("Test-Less",   std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,7>, _1,
                                               [](int a, int b) { return a < b; }));
-    // "Test-AtStart" **********
+    inst_lib.AddInst("Test-AtStart", std::mem_fn(&HardwareCPU<>::Inst_TestAtStart));
 
     // Load in Jump operations  [we neeed to do better...  push and pop heads?]
     inst_lib.AddInst("Jump",       std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToHead<0, 3>));
@@ -67,11 +67,11 @@ namespace emp {
     inst_lib.AddInst("Val-Move", std::bind(&HardwareCPU<>::Inst_1I_Math<1,1>, _1, [](int a){return a;}));
     inst_lib.AddInst("Val-Copy", std::bind(&HardwareCPU<>::Inst_1I_Math<1,1,false>, _1,
                                            [](int a){return a;}));
-    // "Val-Delete" **********
+    inst_lib.AddInst("Val-Delete", std::mem_fn(&HardwareCPU<>::Inst_ValDelete));
 
     // Load in "Biological" instructions
     // "Divide" **********      - Moves memory space 1 (?1) into its own organism.  Needs callback!
-    // "Copy" **********
+    // "Push-Inst" **********
     // "Get-Input" **********   - Needs callback
     // "Get-Output" **********  - Needs callback
     // "Inject" ?? **********   - Needs callback

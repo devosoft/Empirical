@@ -33,8 +33,15 @@ namespace emp {
     // Track the default positions of various heads.
     static const int HEAD_IP    = 0;
     static const int HEAD_READ  = 1;
-    static const int HEAD_WRITE = 2;
+    static const int HEAD_WRITE = 2;  // Not used yet?
     static const int HEAD_FLOW  = 3;
+    
+    // Track the contents of stacks;
+    static const int STACK_BIO          = 0;  // Not used yet?
+    static const int STACK_IN1          = 1;
+    static const int STACK_IN2          = 2;
+    static const int STACK_OUT          = 1;  // Same as IN1 for now.
+    static const int STACK_TEST_RESULTS = 7;
 
     HardwareCPU(const InstLib<HardwareCPU, Instruction> & _inst_lib) : inst_lib(_inst_lib) {
       assert(CPU_SCALE >= 4 && "Minimum 4 heads needed");
@@ -96,7 +103,7 @@ namespace emp {
 
     bool Inst_Nop() { return true; }
 
-    // -------- Single-argument Math Instructions --------
+    // -------- Generic Single-argument Math Instructions --------
 
     // Build a 1-input math instruction on the fly.  See two-input math for examples.
     template <int default_in, int default_out_offset, bool pop_input=true>
@@ -110,7 +117,7 @@ namespace emp {
     }
 
 
-    // -------- Two-argument Math Instructions --------
+    // -------- Generic Two-argument Math Instructions --------
 
     template <int default_in1, int default_in2_offset, int default_out, 
               bool pop_input1=false, bool pop_input2=false>
@@ -118,7 +125,6 @@ namespace emp {
       const int in1_stack = ChooseTarget(default_in1);
       const int in2_stack = ChooseTarget((in1_stack + default_in2_offset) % CPU_SCALE);
       const int out_stack = ChooseTarget(default_out);
-
       const int in_value1 = pop_input1 ? stacks[in1_stack].Pop() : stacks[in1_stack].Top();
       const int in_value2 = pop_input2 ? stacks[in2_stack].Pop() : stacks[in2_stack].Top();
       const int result = math2_fun(in_value1, in_value2);
@@ -127,7 +133,7 @@ namespace emp {
     }
 
     
-    // --------  Jump Operations  --------
+    // --------  Generic Jump Operations  --------
 
     template <int default_head_to_move, int default_head_target> bool Inst_MoveHeadToHead() {
       const int head_move = ChooseTarget(default_head_to_move);
@@ -143,6 +149,25 @@ namespace emp {
       heads[head_move].Set(memory[mem_target], 0);
       return true;
     }
+
+
+    // --------  Instruction-specific Operations ---------
+
+    // Test if a head (default: read-head) is at the start of its current memory space (save default=7)
+    bool Inst_TestAtStart() {
+      const int head_test = ChooseTarget(HEAD_READ);
+      const int out_stack = ChooseTarget(STACK_TEST_RESULTS);
+      stacks[out_stack].Push(heads[head_test].GetPosition() == 0);
+      return true;
+    }
+
+    // Delete the top of a stack and discard it.
+    bool Inst_ValDelete() {
+      const int delete_stack = ChooseTarget(STACK_OUT);
+      stacks[delete_stack].Pop();
+      return true;
+    }
+    
   };
 
 };
