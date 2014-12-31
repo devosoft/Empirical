@@ -72,8 +72,8 @@ namespace emp {
     inst_lib.AddInst("Val-Delete", std::mem_fn(&HardwareCPU<>::Inst_ValDelete));
 
     // Load in "Biological" instructions
+    inst_lib.AddInst("Build-Inst", std::mem_fn(&HardwareCPU<>::Inst_BuildInst));
     // "Divide" **********      - Moves memory space 1 (?1) into its own organism.  Needs callback!
-    // "Build-Inst" **********  - Works like copy, but pushes instruction to end of memory space.
     // "Get-Input" **********   - Needs callback
     // "Get-Output" **********  - Needs callback
     // "Inject" ?? **********   - Needs callback

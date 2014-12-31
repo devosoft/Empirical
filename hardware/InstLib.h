@@ -80,13 +80,21 @@ namespace emp {
     // Add a new instruction to this library.
     InstLib & AddInst(const std::string & name, std::function<bool(HARDWARE_TYPE&)> call,
                       int arg=-1, int cycle_cost=1) {
+      // Generate ID information for this new instruction.
       const int next_id = (int) inst_info.size();  // The ID number of this new instruction.
       const int char_id = std::min(next_id, 72);   // We only have 72 chars, so additional are "+"
       const char next_char = inst_char_chart[char_id];
+
+      // Save this function call separately from everything else for fast lookup.
       inst_calls.push_back(call);
+
+      // Save all of the other information
       inst_info.push_back( InstInfo<INST_TYPE>(name, cycle_cost, arg, next_char, next_id) );
+
+      // Make sure we can look up this instruction quickly by name or char ID.
       name_map[name] = next_id;
       if (next_id == char_id) short_name_map[next_char] = next_id;
+
       return *this;
     }
 

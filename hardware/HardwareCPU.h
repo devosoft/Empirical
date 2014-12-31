@@ -178,6 +178,14 @@ namespace emp {
       return true;
     }
     
+    bool Inst_BuildInst() {
+      const int mem_target = ChooseTarget(1);
+      const int head_from = ChooseTarget(HEAD_READ);
+      memory[mem_target].push_back(heads[head_from].GetInst());
+      ++heads[head_from];  // Advance the head that was read from.
+      return true;
+    }
+
   };
 
 };
