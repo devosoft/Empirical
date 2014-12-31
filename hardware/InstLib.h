@@ -29,8 +29,8 @@ namespace emp {
     int id;              // Unique ID indicating position of this instruction in the set.
     INST_TYPE prototype; // example of this instruction to be handed out.
 
-    InstInfo(const std::string & _name, int _cycle_cost, int _arg, char _sname, int _id)
-      : name(_name), cycle_cost(_cycle_cost), arg_value(_arg), short_name(_sname), id(_id)
+    InstInfo(const std::string & _name, const std::string & _desc, int _cycle_cost, int _arg, char _sname, int _id)
+      : name(_name), desc(_desc), cycle_cost(_cycle_cost), arg_value(_arg), short_name(_sname), id(_id)
       , prototype(_id, _arg+1, _cycle_cost != 1)
     {
       // std::cout << "New entry: "
@@ -78,8 +78,8 @@ namespace emp {
     }
 
     // Add a new instruction to this library.
-    InstLib & AddInst(const std::string & name, std::function<bool(HARDWARE_TYPE&)> call,
-                      int arg=-1, int cycle_cost=1) {
+    InstLib & Add(const std::string & name, const std::string & desc,
+                  std::function<bool(HARDWARE_TYPE&)> call, int arg=-1, int cycle_cost=1) {
       // Generate ID information for this new instruction.
       const int next_id = (int) inst_info.size();  // The ID number of this new instruction.
       const int char_id = std::min(next_id, 72);   // We only have 72 chars, so additional are "+"
@@ -89,7 +89,7 @@ namespace emp {
       inst_calls.push_back(call);
 
       // Save all of the other information
-      inst_info.push_back( InstInfo<INST_TYPE>(name, cycle_cost, arg, next_char, next_id) );
+      inst_info.push_back( InstInfo<INST_TYPE>(name, desc, cycle_cost, arg, next_char, next_id) );
 
       // Make sure we can look up this instruction quickly by name or char ID.
       name_map[name] = next_id;

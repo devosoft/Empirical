@@ -36,12 +36,12 @@ namespace emp {
     static const int HEAD_WRITE = 2;  // Not used yet?
     static const int HEAD_FLOW  = 3;
     
-    // Track the contents of stacks;
+    // Track the contents of stacks.
     static const int STACK_BIO          = 0;  // Not used yet?
     static const int STACK_IN1          = 1;
     static const int STACK_IN2          = 2;
     static const int STACK_OUT          = 1;  // Same as IN1 for now.
-    static const int STACK_TEST_RESULTS = 7;
+    static const int STACK_TEST_RESULTS = 3;
 
     HardwareCPU(const InstLib<HardwareCPU, Instruction> & _inst_lib) : inst_lib(_inst_lib) {
       assert(CPU_SCALE >= 4 && "Minimum 4 heads needed");
@@ -106,7 +106,7 @@ namespace emp {
     // -------- Generic Single-argument Math Instructions --------
 
     // Build a 1-input math instruction on the fly.  See two-input math for examples.
-    template <int default_in, int default_out_offset, bool pop_input=true>
+    template <int default_in=STACK_IN1, int default_out_offset=0, bool pop_input=true>
     bool Inst_1I_Math(std::function<int(int)> math1_fun) {
       const int in_stack = ChooseTarget(default_in);
       const int out_stack = ChooseTarget((in_stack + default_out_offset) % CPU_SCALE);
@@ -119,7 +119,7 @@ namespace emp {
 
     // -------- Generic Two-argument Math Instructions --------
 
-    template <int default_in1, int default_in2_offset, int default_out, 
+    template <int default_in1=STACK_IN1, int default_in2_offset=1, int default_out=STACK_OUT,
               bool pop_input1=false, bool pop_input2=false>
     bool Inst_2I_Math(std::function<int(int,int)> math2_fun) {
       const int in1_stack = ChooseTarget(default_in1);
