@@ -15,6 +15,7 @@
 #include "HardwareCPU_Base.h"
 #include "Instruction.h"
 #include "InstLib.h"
+#include "../emtools/assert.h"
 
 namespace emp {
 
@@ -44,7 +45,7 @@ namespace emp {
     static const int STACK_TEST_RESULTS = 3;
 
     HardwareCPU(const InstLib<HardwareCPU, Instruction> & _inst_lib) : inst_lib(_inst_lib) {
-      assert(CPU_SCALE >= 4 && "Minimum 4 heads needed");
+      EMPassert(CPU_SCALE >= 4 && "Minimum 4 heads needed");
       // Initialize all of the heads to the beginning of the code.
       for (int i=0; i < CPU_SCALE; i++) heads[i].Set(memory[0], 0);
     }
@@ -60,7 +61,7 @@ namespace emp {
     }
 
     CPUStack<STACK_SIZE> & GetStack(int stack_id) {
-      assert(stack_id >= 0 && stack_id < CPU_SCALE);
+      EMPassert(stack_id >= 0 && stack_id < CPU_SCALE);
       return stacks[stack_id];
     }
 
@@ -87,7 +88,7 @@ namespace emp {
     // The following function drives the execution of the virtual hardware -- it executes the
     // next instruction pointed to by the IP.
     void SingleProcess() {
-      assert(heads[HEAD_IP].IsValid());
+      EMPassert(heads[HEAD_IP].IsValid());
 
       const Instruction & inst = heads[HEAD_IP].GetInst();
       ++heads[HEAD_IP];

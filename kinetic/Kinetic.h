@@ -948,12 +948,12 @@ namespace emp {
     }
     
     void Start() {
-      assert(obj_id >= 0); // Make sure we've setup this animation before starting it.
+      EMPassert(obj_id >= 0); // Make sure we've setup this animation before starting it.
       EM_ASM_ARGS({emp_info.objs[$0].start();}, obj_id);
       is_running = true;
     }
     void Stop() {
-      assert(obj_id >= 0); // Make sure we've setup this animation before stopping it.
+      EMPassert(obj_id >= 0); // Make sure we've setup this animation before stopping it.
       EM_ASM_ARGS({emp_info.objs[$0].stop();}, obj_id);
       is_running = false;
     }

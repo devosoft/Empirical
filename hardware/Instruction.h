@@ -12,7 +12,7 @@
 // tracking run-time information (has this site been mutated?  If recombined, which parent is it
 // from, etc.)
 
-#include <assert.h>
+#include "../emtools/assert.h"
 
 namespace emp {
 
@@ -43,8 +43,8 @@ namespace emp {
                 bool extra_cycle_cost=false, bool extra_copy_cost=false)
       : info(id + (arg<<ID_BITS))
     {
-      assert((id >> ID_BITS)   == 0 && "Too many bits in id!");
-      assert((arg >> ARG_BITS) == 0 && "Too many bits is arg!");
+      EMPassert((id >> ID_BITS)   == 0 && "Too many bits in id!");
+      EMPassert((arg >> ARG_BITS) == 0 && "Too many bits is arg!");
       if (extra_cycle_cost) SetCycleCost();
       if (extra_copy_cost) SetCopyCost();
     }
@@ -71,12 +71,12 @@ namespace emp {
     bool HasCopyCost() const { return GetFlag(COPY_COST_BIT); }
 
     Instruction & SetID(int new_id) {
-      assert((new_id & ID_MASK) == new_id);
+      EMPassert((new_id & ID_MASK) == new_id);
       info = (unsigned int) new_id;
       return *this;
     }
     Instruction & SetArgValue(int arg_value) {
-      assert((arg_value >> ARG_BITS) == 0 && "Argument too large to store in Instruction");
+      EMPassert((arg_value >> ARG_BITS) == 0 && "Argument too large to store in Instruction");
       info &= ~ARG_MASK;               // Clear out current arg contenst of instruction.
       info |= (arg_value << ID_BITS);  // Set new arg contents of instruction.
       return *this;
