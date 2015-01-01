@@ -1,11 +1,26 @@
 #ifndef EMP_ASSERT_H
 #define EMP_ASSERT_H
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  This file is a replacement for the system-level assert.h.  It behaves nearly identically,
+//  but provide pop-up alerts when working in a web browser.
+//
+
+
 #include <iostream>
 #include <string>
 
-///////////////////// Debug
-#ifdef EMP_DEBUG
+#ifdef NDEBUG
+namespace emp {
+  bool assert_on = false;
+}
+
+#define EMPassert(EXPR) ((void) sizeof(EXPR) )
+
+
+#elif EMSCRIPTEN       // NDEBUG not set
 
 namespace emp {
   int assert_trip_count = 0;
@@ -20,18 +35,8 @@ namespace emp {
         abort();                                                        \
   } while (0)
 
-///////////////////// NOT EMP Debug -- use normal assert rules...
-#else // EMP_DEBUG
 
-#ifdef NDEBUG
-namespace emp {
-  bool assert_on = false;
-}
-
-#define EMPassert(EXPR) ((void) sizeof(EXPR) )
-
-
-#else // NDEBUG
+#else // We ARE in DEBUG, but NOT in EMSCRIPTEN
 
 #define EMPassert(EXPR)                            \
   do { if ( !(EXPR) )                              \
@@ -43,7 +48,6 @@ namespace emp {
 
 #endif // NDEBUG
 
-#endif // EMP_DEBUG
 
 
 #endif // EMP_DEBUG_H
