@@ -73,7 +73,7 @@ namespace emp {
     }
 
     template <class T> EventChain & First(T & _in) {
-      EMPassert(is_running == false);
+      emp_assert(is_running == false);
       if (first != NULL) Clear();      // Since we're starting over, clear any existing events.
       first = last = BuildEvent(_in);
       length = 1;
@@ -81,23 +81,23 @@ namespace emp {
     }
 
     template <class T> EventChain & Then(T & _in) {
-      EMPassert(first != NULL && last != NULL);
-      EMPassert(is_running == false);
+      emp_assert(first != NULL && last != NULL);
+      emp_assert(is_running == false);
       last = last->Then( BuildEvent(_in) );
       length++;
       return *this;
     }
 
     template <class T> EventChain & With(T & _in) {
-      EMPassert(first != NULL && last != NULL);
-      EMPassert(is_running == false);
+      emp_assert(first != NULL && last != NULL);
+      emp_assert(is_running == false);
       last = last->With( BuildEvent(_in) );
       length++;
       return *this;
     }
 
     void Trigger() {
-      EMPassert(is_running == false);
+      emp_assert(is_running == false);
       is_running = true;
       if (first) first->Trigger(this);
     }

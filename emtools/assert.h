@@ -17,7 +17,7 @@ namespace emp {
   bool assert_on = false;
 }
 
-#define EMPassert(EXPR) ((void) sizeof(EXPR) )
+#define emp_assert(EXPR) ((void) sizeof(EXPR) )
 
 
 #elif EMSCRIPTEN       // NDEBUG not set
@@ -27,7 +27,7 @@ namespace emp {
   bool assert_on = true;
 }
 
-#define EMPassert(EXPR)                                                 \
+#define emp_assert(EXPR)                                                 \
   do { if ( !(EXPR) && emp::assert_trip_count++ < 3 )                   \
       emp::Alert(std::string("Assert Error (In ") + std::string(__FILE__) \
                  + std::string(" line ") + std::to_string(__LINE__)     \
@@ -38,7 +38,7 @@ namespace emp {
 
 #else // We ARE in DEBUG, but NOT in EMSCRIPTEN
 
-#define EMPassert(EXPR)                            \
+#define emp_assert(EXPR)                            \
   do { if ( !(EXPR) )                              \
     std::cerr << "Assert Error (In " << __FILE__   \
               << " line " << __LINE__              \

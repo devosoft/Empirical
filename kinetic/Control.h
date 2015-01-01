@@ -118,13 +118,13 @@ namespace emp {
     }
 
     inline double ScaleX(double x_frac) const {
-      EMPassert(cur_stage != NULL);
-      EMPassert(x_frac >= 0.0 && x_frac <= 1.0);
+      emp_assert(cur_stage != NULL);
+      emp_assert(x_frac >= 0.0 && x_frac <= 1.0);
       return cur_stage->ScaleX(x_frac);
     }
     inline double ScaleY(double y_frac) const {
-      EMPassert(cur_stage != NULL);
-      EMPassert(y_frac >= 0.0 && y_frac <= 1.0);
+      emp_assert(cur_stage != NULL);
+      emp_assert(y_frac >= 0.0 && y_frac <= 1.0);
       return cur_stage->ScaleY(y_frac);
     }
     inline emp::Point<int> ScaleXY(double x_frac, double y_frac) { return emp::Point<int>( ScaleX(x_frac), ScaleY(y_frac) ); }
@@ -242,67 +242,67 @@ namespace emp {
 
     emp::Stage & Stage(const std::string & name="") {
       if (name != "") cur_stage = stage_map[name];
-      EMPassert(cur_stage != NULL);
+      emp_assert(cur_stage != NULL);
       return *cur_stage;
     }
     emp::Layer & Layer(const std::string & name="") {
       if (name != "") cur_layer = layer_map[name];
-      EMPassert(cur_layer != NULL);
+      emp_assert(cur_layer != NULL);
       return *cur_layer;
     }
     emp::Color & Color(const std::string & name="") {
       if (name != "") cur_color = color_map[name];
-      EMPassert(cur_color != NULL);
+      emp_assert(cur_color != NULL);
       return *cur_color;
     }
     emp::Font & Font(const std::string & name="") {
       if (name != "") cur_font = font_map[name];
-      EMPassert(cur_font != NULL);
+      emp_assert(cur_font != NULL);
       return *cur_font;
     }
     emp::Point<int> & Point(const std::string & name="") {
       if (name != "") cur_point = point_map[name];
-      EMPassert(cur_point != NULL);
+      emp_assert(cur_point != NULL);
       return *cur_point;
     }
     emp::Image & Image(const std::string & name="") {
       if (name != "") cur_image = image_map[name];
-      EMPassert(cur_image != NULL);
+      emp_assert(cur_image != NULL);
       return *cur_image;
     }
     emp::Rect & Rect(const std::string & name="") {
       if (name != "") cur_rect = rect_map[name];
-      EMPassert(cur_rect != NULL);
+      emp_assert(cur_rect != NULL);
       return *cur_rect;
     }
     emp::TextBox & TextBox(const std::string & name="") {
       if (name != "") cur_text = text_map[name];
-      EMPassert(cur_text != NULL);
+      emp_assert(cur_text != NULL);
       return *cur_text;
     }
     emp::Button & Button(const std::string & name="") {
       if (name != "") cur_button = button_map[name];
-      EMPassert(cur_button != NULL);
+      emp_assert(cur_button != NULL);
       return *cur_button;
     }
     emp::ButtonGrid & ButtonGrid(const std::string & name="") {
       if (name != "") cur_buttonset = buttonset_map[name];
-      EMPassert(cur_buttonset != NULL);
+      emp_assert(cur_buttonset != NULL);
       return *cur_buttonset;
     }
     emp::Grid & Grid(const std::string & name="") {
       if (name != "") cur_grid = grid_map[name];
-      EMPassert(cur_grid != NULL);
+      emp_assert(cur_grid != NULL);
       return *cur_grid;
     }
     emp::EventChain & EventChain(const std::string & name="") {
       if (name != "") cur_eventchain = eventchain_map[name];
-      EMPassert(cur_eventchain != NULL);
+      emp_assert(cur_eventchain != NULL);
       return *cur_eventchain;
     }
     emp::Tween & Tween(const std::string & name="") {
       if (name != "") cur_tween = tween_map[name];
-      EMPassert(cur_tween != NULL);
+      emp_assert(cur_tween != NULL);
       return *cur_tween;
     }
 

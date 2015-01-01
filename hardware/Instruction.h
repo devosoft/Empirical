@@ -43,8 +43,8 @@ namespace emp {
                 bool extra_cycle_cost=false, bool extra_copy_cost=false)
       : info(id + (arg<<ID_BITS))
     {
-      EMPassert((id >> ID_BITS)   == 0 && "Too many bits in id!");
-      EMPassert((arg >> ARG_BITS) == 0 && "Too many bits is arg!");
+      emp_assert((id >> ID_BITS)   == 0 && "Too many bits in id!");
+      emp_assert((arg >> ARG_BITS) == 0 && "Too many bits is arg!");
       if (extra_cycle_cost) SetCycleCost();
       if (extra_copy_cost) SetCopyCost();
     }
@@ -71,12 +71,12 @@ namespace emp {
     bool HasCopyCost() const { return GetFlag(COPY_COST_BIT); }
 
     Instruction & SetID(int new_id) {
-      EMPassert((new_id & ID_MASK) == new_id);
+      emp_assert((new_id & ID_MASK) == new_id);
       info = (unsigned int) new_id;
       return *this;
     }
     Instruction & SetArgValue(int arg_value) {
-      EMPassert((arg_value >> ARG_BITS) == 0 && "Argument too large to store in Instruction");
+      emp_assert((arg_value >> ARG_BITS) == 0 && "Argument too large to store in Instruction");
       info &= ~ARG_MASK;               // Clear out current arg contenst of instruction.
       info |= (arg_value << ID_BITS);  // Set new arg contents of instruction.
       return *this;

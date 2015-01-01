@@ -56,7 +56,7 @@ namespace emp {
       , color_bg("rgb(255,250,245)"), color_bg_toggled("rgb(255,255,100)"), color_bg_mouseover("rgb(240,240,255)")
       , color_bg_toggled_mouseover("rgb(250,250,200)"), color_bg_mousedown("blue")
     {
-      EMPassert(_target && _method_ptr);
+      emp_assert(_target && _method_ptr);
       trigger_cb = new emp::MethodCallback<T>(_target, _method_ptr);
       On("mousedown", this, &Button::Default_OnMouseDown);
       On("mouseup", this, &Button::Default_OnMouseUp);

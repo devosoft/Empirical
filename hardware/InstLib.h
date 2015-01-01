@@ -75,7 +75,7 @@ namespace emp {
     const INST_TYPE & operator[](char symbol) { return inst_info[short_name_map[symbol]].prototype; }
 
     inline bool RunInst(HARDWARE_TYPE & hw, int inst_id) const {
-      EMPassert(inst_id >= 0 && inst_id < inst_calls.size());
+      emp_assert(inst_id >= 0 && inst_id < inst_calls.size());
       return inst_calls[inst_id](hw);
     }
 

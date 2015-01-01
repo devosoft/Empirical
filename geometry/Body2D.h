@@ -93,7 +93,7 @@ namespace emp {
       return pair_link;
     }
     void BreakLink(CircleBody2D * old_link) {
-      EMPassert(pair_link == old_link);
+      emp_assert(pair_link == old_link);
       pair_link = NULL;
       pair_dist = 0;
     }
