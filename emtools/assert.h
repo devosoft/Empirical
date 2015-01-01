@@ -27,23 +27,23 @@ namespace emp {
   bool assert_on = true;
 }
 
-#define emp_assert(EXPR)                                                 \
-  do { if ( !(EXPR) && emp::assert_trip_count++ < 3 )                   \
+#define emp_assert(EXPR)                                                \
+  do { if ( !(EXPR) && emp::assert_trip_count++ < 3 ) {                 \
       emp::Alert(std::string("Assert Error (In ") + std::string(__FILE__) \
                  + std::string(" line ") + std::to_string(__LINE__)     \
                  + std::string("): ") + std::string(#EXPR)),            \
-        abort();                                                        \
+        abort(); }                                                      \
   } while (0)
 
 
 #else // We ARE in DEBUG, but NOT in EMSCRIPTEN
 
-#define emp_assert(EXPR)                            \
-  do { if ( !(EXPR) )                              \
+#define emp_assert(EXPR)                           \
+  do { if ( !(EXPR) ) {                            \
     std::cerr << "Assert Error (In " << __FILE__   \
               << " line " << __LINE__              \
               << "): " << #EXPR << std::endl;      \
-    abort();                                       \
+    abort(); }                                     \
   } while (0)
 
 #endif // NDEBUG
