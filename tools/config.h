@@ -3,10 +3,10 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
-//  This file defines a master configuration option cConfig, whose values can be loaded
+//  This file defines a master configuration option Config, whose values can be loaded
 //  at runtime or else set as constant values throughout the code.
 //
-//  Assuming you have an emp::cConfig object called config, you can:
+//  Assuming you have an emp::Config object called config, you can:
 //
 //  access a setting value:            config.SETTING_NAME()
 //  adjust a setting value:            config.SETTING_NAME(new_value)
@@ -38,9 +38,9 @@
 namespace emp {
 
   // Master configuration class.
-  class cConfig {
+  class Config {
   private:
-    class cConfigEntry {
+    class ConfigEntry {
     protected:
       std::string name;
       std::string type;
@@ -49,47 +49,47 @@ namespace emp {
 
       std::unordered_set<std::string> alias_set;
     public:
-      cConfigEntry(const std::string _name, const std::string _type,
+      ConfigEntry(const std::string _name, const std::string _type,
                    const std::string _d_val, const std::string _desc)
         : name(_name), type(_type), default_val(_d_val), desc(_desc)
       { ; }
-      virtual ~cConfigEntry() { ; }
+      virtual ~ConfigEntry() { ; }
       
       const std::string & GetName() const { return name; }
       const std::string & GetType() const { return type; }
       const std::string & GetDefault() const { return default_val; }
       const std::string & GetDescription() const { return desc; }
       
-      cConfigEntry & SetName(const std::string & _in) { name = _in; return *this; }
-      cConfigEntry & SetType(const std::string & _in) { type = _in; return *this; }
-      cConfigEntry & SetDefault(const std::string & _in) { default_val = _in; return *this; }
-      cConfigEntry & SetDescription(const std::string & _in) { desc = _in; return *this; }
+      ConfigEntry & SetName(const std::string & _in) { name = _in; return *this; }
+      ConfigEntry & SetType(const std::string & _in) { type = _in; return *this; }
+      ConfigEntry & SetDefault(const std::string & _in) { default_val = _in; return *this; }
+      ConfigEntry & SetDescription(const std::string & _in) { desc = _in; return *this; }
 
-      cConfigEntry & AddAlias(const std::string & _in) { alias_set.insert(_in); return *this; }
+      ConfigEntry & AddAlias(const std::string & _in) { alias_set.insert(_in); return *this; }
       bool HasAlias(const std::string & _in) { return alias_set.find(_in) != alias_set.end(); }
       bool IsMatch(const std::string & _in) { return name == _in || HasAlias(_in); }
       const std::unordered_set<std::string> & GetAliases() { return alias_set; }
       
       virtual std::string GetValue() const = 0;
       virtual std::string GetLiteralValue() const = 0;
-      virtual cConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) = 0;
+      virtual ConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) = 0;
       virtual bool IsConst() const = 0;
     };
     
     // We need type-specific versions on this class to manage variables
-    template <class VAR_TYPE> class tConfigEntry : public cConfigEntry {
+    template <class VAR_TYPE> class tConfigEntry : public ConfigEntry {
     private:
       VAR_TYPE & entry_ref;
     public:
       tConfigEntry(const std::string _name, const std::string _type,
                    const std::string _d_val, const std::string _desc,
                    VAR_TYPE & _ref)
-        : cConfigEntry(_name, _type, _d_val, _desc), entry_ref(_ref) { ; }
+        : ConfigEntry(_name, _type, _d_val, _desc), entry_ref(_ref) { ; }
       ~tConfigEntry() { ; }
       
       std::string GetValue() const { std::stringstream ss; ss << entry_ref; return ss.str(); }
       std::string GetLiteralValue() const { return to_literal(entry_ref); }
-      cConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) {
+      ConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) {
         (void) warnings;
         std::stringstream ss; ss << in_val; ss >> entry_ref; return *this;
       }
@@ -97,19 +97,19 @@ namespace emp {
     };
     
     // We need a special entry type to represent constant values.
-    template <class VAR_TYPE> class tConfigConstEntry : public cConfigEntry {
+    template <class VAR_TYPE> class tConfigConstEntry : public ConfigEntry {
     private:
       const VAR_TYPE literal_val;
     public:
       tConfigConstEntry(const std::string _name, const std::string _type,
                         const std::string _d_val, const std::string _desc,
                         const VAR_TYPE & _literal_val)
-        : cConfigEntry(_name, _type, _d_val, _desc), literal_val(_literal_val) { ; }
+        : ConfigEntry(_name, _type, _d_val, _desc), literal_val(_literal_val) { ; }
       ~tConfigConstEntry() { ; }
       
       std::string GetValue() const { return default_val; }
       std::string GetLiteralValue() const { return to_literal(literal_val); }
-      cConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) {
+      ConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) {
         // This is a constant setting.  If we are actually trying to change it, give a warning.
         if (in_val != GetValue()) {
           warnings << "Trying to adjust locked setting '" 
@@ -122,16 +122,16 @@ namespace emp {
     };
 
     // A special entry for settings created during the run (only accissibly dynamically)
-    class cConfigLiveEntry : public cConfigEntry {
+    class ConfigLiveEntry : public ConfigEntry {
     public:
-      cConfigLiveEntry(const std::string _name, const std::string _type,
+      ConfigLiveEntry(const std::string _name, const std::string _type,
                        const std::string _d_val, const std::string _desc)
-        : cConfigEntry(_name, _type, _d_val, _desc) { ; }
-      ~cConfigLiveEntry() { ; }
+        : ConfigEntry(_name, _type, _d_val, _desc) { ; }
+      ~ConfigLiveEntry() { ; }
       
       std::string GetValue() const { return default_val; }
       std::string GetLiteralValue() const { return to_literal(default_val); }
-      cConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) {
+      ConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) {
         (void) warnings;
         default_val = in_val;
         return *this;
@@ -140,22 +140,22 @@ namespace emp {
     };
       
     // Entrys should be divided into groups
-    class cConfigGroup {
+    class ConfigGroup {
     private:
       std::string m_name;
       std::string m_desc;
-      std::vector<cConfigEntry *> entry_set;
+      std::vector<ConfigEntry *> entry_set;
     public:
-      cConfigGroup(const std::string & _name, const std::string & _desc)
+      ConfigGroup(const std::string & _name, const std::string & _desc)
         : m_name(_name), m_desc(_desc)
       { ; }
-      ~cConfigGroup() { ; }
+      ~ConfigGroup() { ; }
       
       int GetSize() const { return (int) entry_set.size(); }
-      cConfigEntry * GetEntry(int id) { return entry_set[id]; }
-      cConfigEntry * GetLastEntry() { return entry_set.back(); }
+      ConfigEntry * GetEntry(int id) { return entry_set[id]; }
+      ConfigEntry * GetLastEntry() { return entry_set.back(); }
 
-      void Add(cConfigEntry * new_entry) { entry_set.push_back(new_entry); }
+      void Add(ConfigEntry * new_entry) { entry_set.push_back(new_entry); }
 
       void Write(std::ostream & out) {
         // Print header information with the group name.
@@ -204,7 +204,7 @@ namespace emp {
         out << "EMP_CONFIG_GROUP(" << m_name << ", \"" << m_desc << "\")" << std::endl;
 
         // Loop through once to figure out non-comment output
-        for (cConfigEntry * cur_entry : entry_set) {
+        for (ConfigEntry * cur_entry : entry_set) {
           if (cur_entry->IsConst()) { out << "EMP_CONFIG_CONST("; }
           else { out << "EMP_CONFIG_VAR("; }
 
@@ -226,9 +226,9 @@ namespace emp {
     };
     
     // Private member variables
-    std::map<std::string, cConfigEntry *> m_var_map; // All variables across groups.
+    std::map<std::string, ConfigEntry *> m_var_map; // All variables across groups.
     std::string m_version_id;                        // Unique version ID to ensure synced config.
-    std::vector<cConfigGroup *> group_set;           // All of the config groups.
+    std::vector<ConfigGroup *> group_set;           // All of the config groups.
     std::stringstream warnings;                      // Aggrigate warnings for combined display.
     bool delay_warnings;                             // Delay printing of warnings for collection.
     
@@ -237,7 +237,7 @@ namespace emp {
 #include "config_include.h"
     
   public:
-    cConfig(const std::string & in_version = "")
+    Config(const std::string & in_version = "")
       : m_version_id(in_version)
       , delay_warnings(false)
         // Setup inital values for all variables.
@@ -252,11 +252,11 @@ namespace emp {
       m_var_map[#NAME] = new tConfigConstEntry<TYPE>(#NAME, #TYPE, #VALUE, DESC, VALUE); \
       group_set.back()->Add(m_var_map[#NAME]);
 #define EMP_CONFIG_GROUP(NAME, DESC) \
-      group_set.push_back(new cConfigGroup(#NAME, DESC));
+      group_set.push_back(new ConfigGroup(#NAME, DESC));
 #include "config_include.h"
     }
     
-    ~cConfig() {
+    ~Config() {
       // Delete all entries in the var_map
       for (auto it = m_var_map.begin(); it != m_var_map.end(); it++) {
         delete it->second;
@@ -272,12 +272,12 @@ namespace emp {
       return m_var_map[setting_name]->GetValue();
     }
 
-    cConfig & Set(const std::string & setting_name, const std::string & new_value,
+    Config & Set(const std::string & setting_name, const std::string & new_value,
                   const std::string & in_desc="") {
       if (m_var_map.find(setting_name) == m_var_map.end()) {
         // This setting is not currently in the map!  We should put it in, but let user know.
         warnings << "Unknown setting '" << setting_name << "'.  Creating." << std::endl;
-        m_var_map[setting_name] = new cConfigLiveEntry(setting_name, "std::string", new_value, in_desc);
+        m_var_map[setting_name] = new ConfigLiveEntry(setting_name, "std::string", new_value, in_desc);
         group_set.back()->Add(m_var_map[setting_name]);
       }
       m_var_map[setting_name]->SetValue(new_value, warnings);
@@ -290,11 +290,11 @@ namespace emp {
 
     std::string operator()(const std::string & setting_name) { return Get(setting_name); }
 
-    cConfig & operator()(const std::string & setting_name, const std::string & new_value) {      
+    Config & operator()(const std::string & setting_name, const std::string & new_value) {      
       return Set(setting_name, new_value);
     }
 
-    // Generate a text representation (typically a file) for the state of cConfig
+    // Generate a text representation (typically a file) for the state of Config
     void Write(std::ostream & out) {
       // @CAO Start by printing some file header information?
       
@@ -311,7 +311,7 @@ namespace emp {
       out.close();
     }
 
-    // Generate a text representation (typically a file) for the state of cConfig
+    // Generate a text representation (typically a file) for the state of Config
     void WriteMacros(std::ostream & out) {
       out << "/////////////////////////////////////////////////////////////////////////////////\n"
           << "//  This is an auto-generated file that defines a set of configuration options.\n"
@@ -325,7 +325,7 @@ namespace emp {
           << "//   when user-accessible configuration options are generated.\n"
           << "//\n"
           << "//  EMP_CONFIG_VAR(variable name, type, default value, description string)\n"
-          << "//   Create a new setting in the cConfig object that can be easily accessed.\n"
+          << "//   Create a new setting in the emp::Config object that can be easily accessed.\n"
           << "//\n"
           << "//  EMP_CONFIG_ALIAS(alias name)\n"
           << "//   Include an alias for the previous setting.  This command is useful to\n"
@@ -349,7 +349,7 @@ namespace emp {
       out.close();
     }
 
-    // Read in from a text representation (typically a file) to set the state of cConfig.
+    // Read in from a text representation (typically a file) to set the state of Config.
     // Return success state.
     bool Read(std::istream & input) {
       // Load in the file one line at a time and process each line.
