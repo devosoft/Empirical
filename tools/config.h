@@ -174,7 +174,8 @@ namespace emp {
 
         // Loop through once to figure out non-comment output
         for (int i = 0; i < entry_count; i++) {
-          setting_info[i] = entry_set[i]->GetName();
+          setting_info[i] = "set ";
+          setting_info[i] += entry_set[i]->GetName();
           setting_info[i] += " ";
           setting_info[i] += entry_set[i]->GetValue();
           if (max_length < (int) setting_info[i].size()) max_length = (int) setting_info[i].size();
@@ -363,10 +364,18 @@ namespace emp {
         emp::left_justify(cur_line);               // Clear out leading whitespace.
         if (cur_line == "") continue;              // Skip empty lines.
 
-        std::string setting_name = emp::string_pop_word(cur_line);
-        emp::right_justify(cur_line);
+        std::string command = emp::string_pop_word(cur_line);
 
-        Set(setting_name, cur_line);
+        if (command == "set") {
+          std::string setting_name = emp::string_pop_word(cur_line);
+          emp::right_justify(cur_line);
+          Set(setting_name, cur_line);
+        }
+        else {
+          std::stringstream ss;
+          ss << "Unknown configuration command '" << command << "'. Ignoring." << std::endl;
+          emp::NotifyError(ss.str());
+        }
       }
 
       // Print out all accumulated warnings (if any).
