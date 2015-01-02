@@ -276,8 +276,8 @@ namespace emp {
                   const std::string & in_desc="") {
       if (m_var_map.find(setting_name) == m_var_map.end()) {
         // This setting is not currently in the map!  We should put it in, but let user know.
-        m_var_map[setting_name] =
-          new cConfigLiveEntry(setting_name, "std::string", new_value, in_desc);
+        warnings << "Unknown setting '" << setting_name << "'.  Creating." << std::endl;
+        m_var_map[setting_name] = new cConfigLiveEntry(setting_name, "std::string", new_value, in_desc);
         group_set.back()->Add(m_var_map[setting_name]);
       }
       m_var_map[setting_name]->SetValue(new_value, warnings);
@@ -382,7 +382,9 @@ namespace emp {
     bool Read(std::string filename) {
       std::ifstream in_file(filename);
       if (in_file.fail()) {
-        std::cerr << "ERROR: Unable to open config file '" << filename << "'." << std::endl;
+        std::stringstream ss;
+        ss << "Unable to open config file '" << filename << "'. Ignoring." << std::endl;
+        emp::NotifyError(ss.str());
         return false;
       }
       bool success = Read(in_file);
@@ -391,17 +393,18 @@ namespace emp {
     }
     
     // Build Get and Set Accessors, as well as const check
-#define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC)                                 \
-    inline const TYPE & NAME() const { return m_ ## NAME; }                       \
-    const TYPE & NAME(const TYPE & _in) { m_ ## NAME = _in; return m_ ## NAME; }  \
+#define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC)                       \
+    inline const TYPE & NAME() const { return m_ ## NAME; }             \
+    const TYPE & NAME(const TYPE & _in) { m_ ## NAME = _in; return m_ ## NAME; } \
     bool NAME ## _is_const() const { return false; }
-#define EMP_CONFIG_CONST(NAME, TYPE, VALUE, DESC)                                 \
-    inline TYPE NAME() const { return VALUE; }                                    \
-    TYPE NAME(const TYPE & _in) {                                                 \
-      std::cerr << "WARNING: Trying to set const '" << #NAME                      \
-                << "'.  Ignoring." << std::endl;                                  \
-      return VALUE;                                                               \
-    }                                                                             \
+#define EMP_CONFIG_CONST(NAME, TYPE, VALUE, DESC)                       \
+    inline TYPE NAME() const { return VALUE; }                          \
+    TYPE NAME(const TYPE & _in) {                                       \
+      std::stringstream ss;                                             \
+      ss << "Trying to set const '" << #NAME << "'. Ignoring." << std::endl; \
+      emp::NotifyWarning(ss.str());                                     \
+      return VALUE;                                                     \
+    }                                                                   \
     bool NAME ## _is_const() const { return true; }
 #include "config_include.h"
 
