@@ -15,7 +15,7 @@
 #include "HardwareCPU_Base.h"
 #include "Instruction.h"
 #include "InstLib.h"
-#include "../emtools/assert.h"
+#include "../tools/assert.h"
 
 namespace emp {
 

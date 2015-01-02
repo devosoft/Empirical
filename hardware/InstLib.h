@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-#include "../emtools/assert.h"
+#include "../tools/assert.h"
 
 namespace emp {
   template <typename INST_TYPE> struct InstInfo {

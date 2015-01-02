@@ -12,7 +12,7 @@
 // tracking run-time information (has this site been mutated?  If recombined, which parent is it
 // from, etc.)
 
-#include "../emtools/assert.h"
+#include "../tools/assert.h"
 
 namespace emp {
 

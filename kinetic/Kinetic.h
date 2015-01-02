@@ -7,12 +7,12 @@
 #include <string>
 #include <vector>
 
+#include "../tools/assert.h"
 #include "../tools/callbacks.h"
 #include "../tools/const.h"
 #include "../geometry/Circle2D.h"
 #include "../geometry/Point2D.h"
 
-#include "../emtools/assert.h"
 #include "../emtools/emfunctions.h"
 #include "../emtools/Color.h"
 #include "../emtools/Font.h"
