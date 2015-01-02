@@ -228,10 +228,10 @@ namespace emp {
     
     // Private member variables
     std::map<std::string, ConfigEntry *> m_var_map; // All variables across groups.
-    std::string m_version_id;                        // Unique version ID to ensure synced config.
+    std::string m_version_id;                       // Unique version ID to ensure synced config.
     std::vector<ConfigGroup *> group_set;           // All of the config groups.
-    std::stringstream warnings;                      // Aggrigate warnings for combined display.
-    bool delay_warnings;                             // Delay printing of warnings for collection.
+    std::stringstream warnings;                     // Aggrigate warnings for combined display.
+    int delay_warnings;                             // Count of delays to collect warnings for printing.
     
     // Place all of the config private member variables here.
 #define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC) TYPE m_ ## NAME;
@@ -240,7 +240,7 @@ namespace emp {
   public:
     Config(const std::string & in_version = "")
       : m_version_id(in_version)
-      , delay_warnings(false)
+      , delay_warnings(0)
         // Setup inital values for all variables.
 #define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC) , m_ ## NAME(DEFAULT)
 #include "config_include.h"
@@ -355,7 +355,7 @@ namespace emp {
     bool Read(std::istream & input) {
       // Load in the file one line at a time and process each line.
       std::string cur_line;
-      delay_warnings = true;
+      delay_warnings++;
 
       // Loop through the file until eof is hit (does this work for other streams?)
       while (!input.eof()) {
@@ -366,12 +366,19 @@ namespace emp {
 
         std::string command = emp::string_pop_word(cur_line);
 
-        if (command == "set") {
+        if (command == "include") {
+          // Recursively include another configuration file.
+          std::string filename = emp::string_pop_word(cur_line);
+          Read(filename);
+        }
+        else if (command == "set") {
+          // Set a specific value.
           std::string setting_name = emp::string_pop_word(cur_line);
           emp::right_justify(cur_line);
           Set(setting_name, cur_line);
         }
         else {
+          // We don't know this command... give an error and move on.
           std::stringstream ss;
           ss << "Unknown configuration command '" << command << "'. Ignoring." << std::endl;
           emp::NotifyError(ss.str());
@@ -383,7 +390,7 @@ namespace emp {
         emp::NotifyWarning(warnings.str());
         warnings.str(std::string()); // Clear the warnings.
       }
-      delay_warnings = false;
+      delay_warnings--;
 
       return true;
     }
