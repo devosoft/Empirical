@@ -31,8 +31,9 @@
 #include <unordered_set>
 #include <vector>
 
-#include "string_utils.h"
+#include "errors.h"
 #include "functions.h"
+#include "string_utils.h"
 
 namespace emp {
 
@@ -71,7 +72,7 @@ namespace emp {
       
       virtual std::string GetValue() const = 0;
       virtual std::string GetLiteralValue() const = 0;
-      virtual cConfigEntry & SetValue(const std::string & in_val) = 0;
+      virtual cConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) = 0;
       virtual bool IsConst() const = 0;
     };
     
@@ -88,7 +89,8 @@ namespace emp {
       
       std::string GetValue() const { std::stringstream ss; ss << entry_ref; return ss.str(); }
       std::string GetLiteralValue() const { return to_literal(entry_ref); }
-      cConfigEntry & SetValue(const std::string & in_val) {
+      cConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) {
+        (void) warnings;
         std::stringstream ss; ss << in_val; ss >> entry_ref; return *this;
       }
       bool IsConst() const { return false; }
@@ -107,12 +109,12 @@ namespace emp {
       
       std::string GetValue() const { return default_val; }
       std::string GetLiteralValue() const { return to_literal(literal_val); }
-      cConfigEntry & SetValue(const std::string & in_val) {
+      cConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) {
         // This is a constant setting.  If we are actually trying to change it, give a warning.
         if (in_val != GetValue()) {
-          std::cerr << "WARNING: Trying to adjust locked setting '" 
-                    << name << "' from '" << GetValue()
-                    << "' to '" << in_val << "'. Ignoring." << std::endl;
+          warnings << "Trying to adjust locked setting '" 
+                   << name << "' from '" << GetValue()
+                   << "' to '" << in_val << "'. Ignoring." << std::endl;
         }
         return *this;
       }
@@ -129,7 +131,11 @@ namespace emp {
       
       std::string GetValue() const { return default_val; }
       std::string GetLiteralValue() const { return to_literal(default_val); }
-      cConfigEntry & SetValue(const std::string & in_val) { default_val = in_val; return *this; }
+      cConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) {
+        (void) warnings;
+        default_val = in_val;
+        return *this;
+      }
       bool IsConst() const { return false; }
     };
       
@@ -220,9 +226,11 @@ namespace emp {
     };
     
     // Private member variables
-    std::map<std::string, cConfigEntry *> m_var_map;
-    std::string m_version_id;
-    std::vector<cConfigGroup *> group_set;
+    std::map<std::string, cConfigEntry *> m_var_map; // All variables across groups.
+    std::string m_version_id;                        // Unique version ID to ensure synced config.
+    std::vector<cConfigGroup *> group_set;           // All of the config groups.
+    std::stringstream warnings;                      // Aggrigate warnings for combined display.
+    bool delay_warnings;                             // Delay printing of warnings for collection.
     
     // Place all of the config private member variables here.
 #define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC) TYPE m_ ## NAME;
@@ -231,6 +239,7 @@ namespace emp {
   public:
     cConfig(const std::string & in_version = "")
       : m_version_id(in_version)
+      , delay_warnings(false)
         // Setup inital values for all variables.
 #define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC) , m_ ## NAME(DEFAULT)
 #include "config_include.h"
@@ -266,12 +275,16 @@ namespace emp {
     cConfig & Set(const std::string & setting_name, const std::string & new_value,
                   const std::string & in_desc="") {
       if (m_var_map.find(setting_name) == m_var_map.end()) {
-        // This setting is not currently in the map!  We should put it in.
+        // This setting is not currently in the map!  We should put it in, but let user know.
         m_var_map[setting_name] =
           new cConfigLiveEntry(setting_name, "std::string", new_value, in_desc);
         group_set.back()->Add(m_var_map[setting_name]);
       }
-      m_var_map[setting_name]->SetValue(new_value);
+      m_var_map[setting_name]->SetValue(new_value, warnings);
+      if (!delay_warnings && warnings.rdbuf()->in_avail()) {
+        emp::NotifyWarning(warnings.str());
+        warnings.str(std::string()); // Clear the warnings.
+      }
       return *this;
     }
 
@@ -341,6 +354,7 @@ namespace emp {
     bool Read(std::istream & input) {
       // Load in the file one line at a time and process each line.
       std::string cur_line;
+      delay_warnings = true;
 
       // Loop through the file until eof is hit (does this work for other streams?)
       while (!input.eof()) {
@@ -354,6 +368,14 @@ namespace emp {
 
         Set(setting_name, cur_line);
       }
+
+      // Print out all accumulated warnings (if any).
+      if (warnings.rdbuf()->in_avail()) {
+        emp::NotifyWarning(warnings.str());
+        warnings.str(std::string()); // Clear the warnings.
+      }
+      delay_warnings = false;
+
       return true;
     }
 
