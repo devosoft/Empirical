@@ -22,6 +22,15 @@
 //  write settings macros to a stream: config.WriteMacros(stream);
 //  write settings macros to a file:   config.WriteMacros(filename);
 //
+//
+//  The configuration files generated can use the following keywords in order to
+//  configure this object:
+//   include OTHER_FILENAME         -- Load in all data from another file.
+//   set SETTING_NAME VALUE         -- Set a basic configuration setting.
+//   new OBJECT_TYPE OBJECT_NAME    -- Create a new config object of a managed class.
+//   use OBJECT_TYPE OBJECT_NAME    -- Use a previouly create configuration object.
+//
+
 
 #include <map>
 #include <ostream>
@@ -369,6 +378,7 @@ namespace emp {
         if (cur_line == "") continue;              // Skip empty lines.
 
         std::string command = emp::string_pop_word(cur_line);
+        emp::right_justify(cur_line);
 
         if (command == "include") {
           // Recursively include another configuration file.
@@ -378,8 +388,11 @@ namespace emp {
         else if (command == "set") {
           // Set a specific value.
           std::string setting_name = emp::string_pop_word(cur_line);
-          emp::right_justify(cur_line);
           Set(setting_name, cur_line);
+        }
+        else if (command_map.find(command_name) != command_map.end()) {
+          // Run this custom command.
+          command_map[command_name](cur_line);
         }
         else {
           // We don't know this command... give an error and move on.
