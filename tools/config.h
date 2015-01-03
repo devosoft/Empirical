@@ -26,6 +26,7 @@
 #include <map>
 #include <ostream>
 #include <fstream>
+#include <functional>
 #include <string>
 #include <sstream>
 #include <unordered_set>
@@ -232,6 +233,9 @@ namespace emp {
     std::vector<ConfigGroup *> group_set;           // All of the config groups.
     std::stringstream warnings;                     // Aggrigate warnings for combined display.
     int delay_warnings;                             // Count of delays to collect warnings for printing.
+
+    // Build a map of extra input commands to the function that they should call if triggered.
+    std::map<std::string, std::function<bool(std::string)> > command_map;
     
     // Place all of the config private member variables here.
 #define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC) TYPE m_ ## NAME;
@@ -407,6 +411,20 @@ namespace emp {
       in_file.close();
       return success;
     }
+
+
+    void AddCommand(const std::string & command_name, std::function<bool(std::string)> command_fun) {
+      // Give a warning if we are re-defining an existing command.
+      if (command_map.find(command_name) != command_map.end()) {
+        warnings << "Re-defining command '" << command_name << "'. Allowing." << std::endl;
+        if (!delay_warnings) {
+          emp::NotifyWarning(warnings.str());
+          warnings.str(std::string()); // Clear the warnings.
+        }
+      }
+      command_map[command_name] = command_fun;
+    }
+
     
     // Build Get and Set Accessors, as well as const check
 #define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC)                       \
