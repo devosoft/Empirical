@@ -390,9 +390,9 @@ namespace emp {
           std::string setting_name = emp::string_pop_word(cur_line);
           Set(setting_name, cur_line);
         }
-        else if (command_map.find(command_name) != command_map.end()) {
+        else if (command_map.find(command) != command_map.end()) {
           // Run this custom command.
-          command_map[command_name](cur_line);
+          command_map[command](cur_line);
         }
         else {
           // We don't know this command... give an error and move on.
