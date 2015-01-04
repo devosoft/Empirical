@@ -245,6 +245,8 @@ namespace emp {
 
     // Build a map of extra input commands to the function that they should call if triggered.
     std::map<std::string, std::function<bool(std::string)> > command_map;
+    std::map<std::string, std::function<bool(std::string)> > new_map;
+    std::map<std::string, std::function<bool(std::string)> > use_map;
     
     // Place all of the config private member variables here.
 #define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC) TYPE m_ ## NAME;
@@ -385,10 +387,20 @@ namespace emp {
           std::string filename = emp::string_pop_word(cur_line);
           Read(filename);
         }
+        else if (command == "new") {
+          std::string type_name = emp::string_pop_word(cur_line);
+          // @CAO Make sure type exists!
+          new_map[type_name](cur_line);
+        }
         else if (command == "set") {
           // Set a specific value.
           std::string setting_name = emp::string_pop_word(cur_line);
           Set(setting_name, cur_line);
+        }
+        else if (command == "use") {
+          std::string type_name = emp::string_pop_word(cur_line);
+          // @CAO Make sure type exists!
+          use_map[type_name](cur_line);
         }
         else if (command_map.find(command) != command_map.end()) {
           // Run this custom command.
@@ -436,6 +448,30 @@ namespace emp {
         }
       }
       command_map[command_name] = command_fun;
+    }
+
+    void AddNewCallback(const std::string & type_name, std::function<bool(std::string)> new_fun) {
+      // Give a warning if we are re-defining an existing command.
+      if (new_map.find(type_name) != new_map.end()) {
+        warnings << "Re-defining config type '" << type_name << "'. Allowing." << std::endl;
+        if (!delay_warnings) {
+          emp::NotifyWarning(warnings.str());
+          warnings.str(std::string()); // Clear the warnings.
+        }
+      }
+      new_map[type_name] = new_fun;
+    }
+
+    void AddUseCallback(const std::string & type_name, std::function<bool(std::string)> use_fun) {
+      // Give a warning if we are re-defining an existing command.
+      if (use_map.find(type_name) != use_map.end()) {
+        warnings << "Re-defining config type '" << type_name << "'. Allowing." << std::endl;
+        if (!delay_warnings) {
+          emp::NotifyWarning(warnings.str());
+          warnings.str(std::string()); // Clear the warnings.
+        }
+      }
+      use_map[type_name] = use_fun;
     }
 
     

@@ -21,9 +21,13 @@
 //    bool CommandCallback(std::string)
 //  to handle configuation commands.
 
+#include <functional>
+#include <iostream>
 #include <map>
 #include <string>
-#include <sstring>
+#include <sstream>
+
+#include "config.h"
 
 namespace emp {
 
@@ -33,18 +37,27 @@ namespace emp {
     MANAGED_TYPE * cur_obj;
     const std::string type_keyword;
     const std::string command_keyword;
+    Config & config;
 
   public:
-    ConfigManager(const std::string & _type, const std::string & _command)
-      : cur_obj(NULL), type_keyword(_type), command_keyword(_command) { ; }
+    ConfigManager(const std::string & _type, const std::string & _command, Config & _config)
+      : cur_obj(NULL), type_keyword(_type), command_keyword(_command), config(_config)
+    {
+      config.AddCommand(command_keyword,
+                        std::bind(&ConfigManager<MANAGED_TYPE>::CommandCallback, this, _1) );
+      config.AddNewCallback(type_keyword,
+                            std::bind(&ConfigManager<MANAGED_TYPE>::NewObject, this, _1) );
+      config.AddUseCallback(type_keyword,
+                            std::bind(&ConfigManager<MANAGED_TYPE>::UseObject, this, _1) );
+    }
     ~ConfigManager() { ; }
 
     void NewObject(const std::string & obj_name) {
       if (name_map.find(obj_name) != name_map.end()) {
         std::stringstream ss;
-        ss << "Build new object of type '" << type_keyword
-           << "' named '" << obj_name < "' when one already exists. Replacing."
-           << std::endl;
+        ss << "Building new object of type '" << type_keyword
+           << "' named '" << obj_name < "' when one already exists. Replacing.";
+        ss << std::endl;
         NotifyError(ss.str());
         delete name_map[obj_name];
       }
@@ -56,8 +69,8 @@ namespace emp {
       if (name_map.find(obj_name) == name_map.end()) {
         std::stringstream ss;
         ss << "Trying to use object of type '" << type_keyword
-           << "' named '" << obj_name < "', but does not exist. Ignoring."
-           << std::endl;
+           << "' named '" << obj_name < "', but does not exist. Ignoring.";
+        ss << std::endl;
         NotifyError(ss.str());
         return;
       }
@@ -68,8 +81,8 @@ namespace emp {
       if (cur_obj == NULL) {
         std::stringstream ss;
         ss << "Must build new object of type '" << type_keyword
-           << "' before using command '" << command_keyword < "'.  Ignoring."
-           << std::endl;
+           << "' before using command '" << command_keyword < "'.  Ignoring.";
+        ss << std::endl;
         NotifyError(ss.str());
         return false;
       }
