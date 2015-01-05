@@ -25,19 +25,16 @@
 #include <string>
 #include <sstream>
 
-#include "config.h"
-
 namespace emp {
 
   class ConfigManager_Base {
   protected:
     const std::string type_keyword;
     const std::string command_keyword;
-    Config & config;
 
   public:
-    ConfigManager_Base(const std::string & _type, const std::string & _command, Config & _config)
-      : type_keyword(_type), command_keyword(_command), config(_config) { ; }
+    ConfigManager_Base(const std::string & _type, const std::string & _command)
+      : type_keyword(_type), command_keyword(_command) { ; }
     virtual ~ConfigManager_Base() { ; }
 
     const std::string & GetTypeKeyword() const { return type_keyword; }
@@ -55,18 +52,12 @@ namespace emp {
     std::function<bool(MANAGED_TYPE &, std::string)> callback_fun;
 
   public:
-    ConfigManager(const std::string & _type, const std::string & _command, Config & _config,
+    ConfigManager(const std::string & _type, const std::string & _command,
                   std::function<bool(MANAGED_TYPE &, std::string)> _fun)
-      : ConfigManager_Base(_type, _command, _config)
+      : ConfigManager_Base(_type, _command)
       , cur_obj(NULL)
       , callback_fun(_fun)
     {
-      config.AddCommand(command_keyword,
-                        std::bind(&ConfigManager<MANAGED_TYPE>::CommandCallback, this, _1) );
-      config.AddNewCallback(type_keyword,
-                            std::bind(&ConfigManager<MANAGED_TYPE>::NewObject, this, _1) );
-      config.AddUseCallback(type_keyword,
-                            std::bind(&ConfigManager<MANAGED_TYPE>::UseObject, this, _1) );
     }
     ~ConfigManager() { ; }
 
