@@ -15,11 +15,9 @@
 //     new inst_lib 4stack
 //     inst nopA
 //     inst inc
+//     inst divide cycle_cost=10
 //     ...
 //
-//  Note: The class being managed must also have a member function:
-//    bool CommandCallback(std::string)
-//  to handle configuation commands.
 
 #include <functional>
 #include <iostream>
@@ -38,10 +36,13 @@ namespace emp {
     const std::string type_keyword;
     const std::string command_keyword;
     Config & config;
+    std::function<bool(MANAGED_TYPE &, std::string)> callback_fun;
 
   public:
-    ConfigManager(const std::string & _type, const std::string & _command, Config & _config)
+    ConfigManager(const std::string & _type, const std::string & _command, Config & _config,
+                  std::function<bool(MANAGED_TYPE &, std::string)> _fun)
       : cur_obj(NULL), type_keyword(_type), command_keyword(_command), config(_config)
+      , callback_fun(_fun)
     {
       config.AddCommand(command_keyword,
                         std::bind(&ConfigManager<MANAGED_TYPE>::CommandCallback, this, _1) );
@@ -87,7 +88,7 @@ namespace emp {
         return false;
       }
 
-      return cur_obj->CommandCallback(command);
+      return callback_fun(*cur_obj, command);
     }
   };
 
