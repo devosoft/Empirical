@@ -29,19 +29,36 @@
 
 namespace emp {
 
-  template <class MANAGED_TYPE> class ConfigManager {
-  private:
-    std::map<std::string, MANAGED_TYPE *> name_map;
-    MANAGED_TYPE * cur_obj;
+  class ConfigManager_Base {
+  protected:
     const std::string type_keyword;
     const std::string command_keyword;
     Config & config;
+
+  public:
+    ConfigManager_Base(const std::string & _type, const std::string & _command, Config & _config)
+      : type_keyword(_type), command_keyword(_command), config(_config) { ; }
+    virtual ~ConfigManager_Base() { ; }
+
+    const std::string & GetTypeKeyword() const { return type_keyword; }
+    const std::string & GetCommandKeyword() const { return command_keyword; }
+
+    virtual void NewObject(const std::string & obj_name) = 0;
+    virtual void UseObject(const std::string & obj_name) = 0;
+    virtual bool CommandCallback(const std::string & command) = 0;
+  };
+
+  template <class MANAGED_TYPE> class ConfigManager : public ConfigManager_Base {
+  private:
+    std::map<std::string, MANAGED_TYPE *> name_map;
+    MANAGED_TYPE * cur_obj;
     std::function<bool(MANAGED_TYPE &, std::string)> callback_fun;
 
   public:
     ConfigManager(const std::string & _type, const std::string & _command, Config & _config,
                   std::function<bool(MANAGED_TYPE &, std::string)> _fun)
-      : cur_obj(NULL), type_keyword(_type), command_keyword(_command), config(_config)
+      : ConfigManager_Base(_type, _command, _config)
+      , cur_obj(NULL)
       , callback_fun(_fun)
     {
       config.AddCommand(command_keyword,
