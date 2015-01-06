@@ -4,8 +4,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  This file is a replacement for the system-level assert.h.  It behaves nearly identically,
-//  but provide pop-up alerts when working in a web browser.
+//  This file is a replacement for the system-level assert.h, called "emp_assert"
+//  It behaves nearly identically, but provide pop-up alerts when working in a web browser.
 //
 
 
@@ -17,6 +17,8 @@ namespace emp {
   bool assert_on = false;
 }
 
+// This assert uses the expression (to prevent compiler error), but should not
+// generate any assembly code.
 #define emp_assert(EXPR) ((void) sizeof(EXPR) )
 
 
@@ -27,6 +29,7 @@ namespace emp {
   bool assert_on = true;
 }
 
+// Generate a pop-up alert in a web browser if an assert it tripped.
 #define emp_assert(EXPR)                                                \
   do { if ( !(EXPR) && emp::assert_trip_count++ < 3 ) {                 \
       emp::Alert(std::string("Assert Error (In ") + std::string(__FILE__) \
@@ -38,6 +41,7 @@ namespace emp {
 
 #else // We ARE in DEBUG, but NOT in EMSCRIPTEN
 
+// Generating an output to standard error is an assert is tripped.
 #define emp_assert(EXPR)                           \
   do { if ( !(EXPR) ) {                            \
     std::cerr << "Assert Error (In " << __FILE__   \

@@ -151,7 +151,7 @@ namespace emp {
     
       if (_seed <= 0) {
         int seed_time = (int) time(NULL);
-        int seed_mem = (int) this;
+        int seed_mem = (int) ((long long) this);
         seed = seed_time ^ seed_mem;
       } else {
         seed = _seed;
@@ -355,18 +355,6 @@ namespace emp {
   }
 
 
-  /*! Convenience function to assign increasing values to a range.
-   */
-  template <typename ForwardIterator, typename T>
-  void iota(ForwardIterator first, ForwardIterator last, T value) {
-    while(first != last) {
-      *first = value;
-      ++first;
-      ++value;
-    }
-  }
-
-
   /*! Draw a sample (without replacement) from an input range, copying to the output range.
    */
   template <typename ForwardIterator, typename OutputIterator, typename RNG>
@@ -381,7 +369,8 @@ namespace emp {
     }
 	
     std::vector<std::size_t> rmap(range);
-    iota(rmap.begin(), rmap.end(), 0);
+    int next_val = 0;
+    for (std::size_t & entry : rmap) entry = next_val++;
     std::random_shuffle(rmap.begin(), rmap.end());
   
     while(ofirst != olast) {
@@ -397,7 +386,8 @@ namespace emp {
   void sample_range_without_replacement(T min, T max, OutputIterator ofirst, OutputIterator olast, RNG rng) {
     std::size_t range = static_cast<std::size_t>(max - min);
     std::vector<T> input(range);
-    iota(input.begin(), input.end(), min);
+    int next_val = min;
+    for (T & entry : input) entry = next_val++;
     sample_without_replacement(input.begin(), input.end(), ofirst, olast, rng);
   }
 
