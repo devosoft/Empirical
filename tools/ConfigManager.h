@@ -61,12 +61,15 @@ namespace emp {
     }
     ~ConfigManager() { ; }
 
+    bool HasObject(const std::string & obj_name) {
+      return (name_map.find(obj_name) != name_map.end());
+    }
+
     void NewObject(const std::string & obj_name) {
-      if (name_map.find(obj_name) != name_map.end()) {
+      if (HasObject(obj_name) == true) {
         std::stringstream ss;
-        ss << "Building new object of type '" << type_keyword
-           << "' named '" << obj_name < "' when one already exists. Replacing.";
-        ss << std::endl;
+        ss << "Building new object of type '" << type_keyword << "' named '"
+           << obj_name << "' when one already exists. Replacing." << std::endl;
         NotifyError(ss.str());
         delete name_map[obj_name];
       }
@@ -75,11 +78,10 @@ namespace emp {
     }
 
     void UseObject(const std::string & obj_name) {
-      if (name_map.find(obj_name) == name_map.end()) {
+      if (HasObject(obj_name) == false) {
         std::stringstream ss;
-        ss << "Trying to use object of type '" << type_keyword
-           << "' named '" << obj_name < "', but does not exist. Ignoring.";
-        ss << std::endl;
+        ss << "Trying to use object of type '" << type_keyword << "' named '"
+           << obj_name << "', but does not exist. Ignoring." << std::endl;
         NotifyError(ss.str());
         return;
       }
@@ -89,9 +91,8 @@ namespace emp {
     bool CommandCallback(const std::string & command) {
       if (cur_obj == NULL) {
         std::stringstream ss;
-        ss << "Must build new object of type '" << type_keyword
-           << "' before using command '" << command_keyword < "'.  Ignoring.";
-        ss << std::endl;
+        ss << "Must build new '" << type_keyword << "' object before using command '"
+           << command_keyword << "'.  Ignoring." << std::endl;
         NotifyError(ss.str());
         return false;
       }
