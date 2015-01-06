@@ -5,6 +5,7 @@
 //  This file contains a set of simple functions to 
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -106,12 +107,27 @@ namespace emp {
     return out_string;
   }
 
+  // Get a segment from the beginning of a string as another string, leaving original untouched.
+  std::string string_get_range(const std::string & in_string, std::size_t start_pos,
+                               std::size_t end_pos) {
+    if (end_pos == std::string::npos) end_pos = in_string.size() - start_pos;
+    return in_string.substr(start_pos, end_pos);
+  }
+
   std::string string_pop(std::string & in_string, const char delim) {
     return string_pop(in_string, in_string.find(delim), 1);
   }
 
+  std::string string_get(const std::string & in_string, const char delim, int start_pos=0) {
+    return string_get_range(in_string, start_pos, in_string.find(delim, start_pos));
+  }
+
   std::string string_pop(std::string & in_string, const std::string & delim_set) {
     return string_pop(in_string, in_string.find_first_of(delim_set), 1);
+  }
+
+  std::string string_get(const std::string & in_string, const std::string & delim_set, int start_pos=0) {
+    return string_get_range(in_string, start_pos, in_string.find_first_of(delim_set, start_pos));
   }
 
   std::string string_pop_word(std::string & in_string) {
@@ -119,8 +135,17 @@ namespace emp {
     return string_pop(in_string, " \n\r\t");
   }
 
+  std::string string_get_word(const std::string & in_string, int start_pos=0) {
+    // Whitespace = ' ' '\n' '\r' or '\t'
+    return string_get(in_string, " \n\r\t", start_pos);
+  }
+
   std::string string_pop_line(std::string & in_string) {
     return string_pop(in_string, '\n');
+  }
+
+  std::string string_get_line(const std::string & in_string, int start_pos=0) {
+    return string_get(in_string, '\n', start_pos);
   }
 
   // Tricks for dealing with whitespace.
