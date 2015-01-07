@@ -1,8 +1,10 @@
 #ifndef EMP_STRING_UTILS_H
 #define EMP_STRING_UTILS_H
 
-////////////////////////////////////////////////////////////////////
-//  This file contains a set of simple functions to 
+//////////////////////////////////////////////////////////////////////////////
+//
+//  This file contains a set of simple functions to manipulate strings.
+//
 
 #include <iostream>
 #include <sstream>
@@ -92,7 +94,7 @@ namespace emp {
   }
 
   // Pop a segment from the beginning of a string as another string, shortening original.
-  std::string string_pop(std::string & in_string, std::size_t end_pos, int delim_size=0) {
+  std::string string_pop_fixed(std::string & in_string, std::size_t end_pos, int delim_size=0) {
     std::string out_string = "";
     if (end_pos == 0);                        // Not popping anything!
     else if (end_pos == std::string::npos) {  // Popping whole string.
@@ -115,7 +117,7 @@ namespace emp {
   }
 
   std::string string_pop(std::string & in_string, const char delim) {
-    return string_pop(in_string, in_string.find(delim), 1);
+    return string_pop_fixed(in_string, in_string.find(delim), 1);
   }
 
   std::string string_get(const std::string & in_string, const char delim, int start_pos=0) {
@@ -123,7 +125,7 @@ namespace emp {
   }
 
   std::string string_pop(std::string & in_string, const std::string & delim_set) {
-    return string_pop(in_string, in_string.find_first_of(delim_set), 1);
+    return string_pop_fixed(in_string, in_string.find_first_of(delim_set), 1);
   }
 
   std::string string_get(const std::string & in_string, const std::string & delim_set, int start_pos=0) {
