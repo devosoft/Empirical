@@ -119,6 +119,22 @@ namespace emp {
       return *this;
     }
 
+    InstLib & AddMath(const std::string & name, const std::string & desc,
+                      const std::function<int(int)> & math_fun, int arg=-1, int cycle_cost=1) {
+      Add(name, desc, [math_fun](HARDWARE_TYPE & hw){ return hw.Inst_1I_Math(math_fun); },
+          arg, cycle_cost);
+      return *this;
+    }
+    
+    InstLib & AddMath(const std::string & name, const std::string & desc,
+                      const std::function<int(int,int)> & math_fun, int arg=-1, int cycle_cost=1) {
+      Add(name, desc, [math_fun](HARDWARE_TYPE & hw){ return hw.Inst_2I_Math(math_fun); },
+          arg, cycle_cost);
+      return *this;
+    }
+
+
+
     // Retrieve information about each instruction.
     const std::string & GetName(const INST_TYPE & inst) const { return inst_info[inst.GetID()].name; }
     char GetShortName(const INST_TYPE & inst) const { return inst_info[inst.GetID()].short_name; }

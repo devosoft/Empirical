@@ -16,22 +16,6 @@ using namespace std::placeholders;
 
 namespace emp {
 
-  template <class HARDWARE_TYPE>
-  void AddInst(InstLib<HARDWARE_TYPE, Instruction> & lib,
-               const std::string & inst_name,
-               const std::string & inst_desc,
-               const std::function<int(int)> & math_fun) {
-    lib.Add(inst_name, inst_desc, [math_fun](HARDWARE_TYPE & hw){ return hw.Inst_1I_Math(math_fun); });
-  }
-
-  template <class HARDWARE_TYPE>
-  void AddInst(InstLib<HARDWARE_TYPE, Instruction> & lib,
-               const std::string & inst_name,
-               const std::string & inst_desc,
-               const std::function<int(int,int)> & math_fun) {
-    lib.Add(inst_name, inst_desc, [math_fun](HARDWARE_TYPE & hw){ return hw.Inst_2I_Math(math_fun); });
-  }
-
 
   template <int CPU_SCALE=8, int STACK_SIZE=16>
   bool LoadInst(InstLib<HardwareCPU<CPU_SCALE, STACK_SIZE>, Instruction> & lib,
@@ -73,44 +57,44 @@ namespace emp {
 
     // Check for single-argument math operations.
     else if (name_base == "Inc") {
-      AddInst(lib, "Inc", "Increment top of ?Stack-B? by one", [](int a){return a+1;});
+      lib.AddMath("Inc", "Increment top of ?Stack-B? by one", [](int a){return a+1;});
     }
     else if (name_base == "Dec") {
-      AddInst(lib, "Dec", "Decrement top of ?Stack-B? by one", [](int a){return a-1;});
+      lib.AddMath("Dec", "Decrement top of ?Stack-B? by one", [](int a){return a-1;});
     }
     else if (name_base == "Shift-L") {
-      AddInst(lib, "Shift-L", "Shift bits of top of ?Stack-B? left by one", [](int a){return a<<1;});
+      lib.AddMath("Shift-L", "Shift bits of top of ?Stack-B? left by one", [](int a){return a<<1;});
     }
     else if (name_base == "Shift-R") {
-      AddInst(lib, "Shift-R", "Shift bits of top of ?Stack-B? right by one", [](int a){return a>>1;});
+      lib.AddMath("Shift-R", "Shift bits of top of ?Stack-B? right by one", [](int a){return a>>1;});
     }
 
     // Load in double-argument math operations.
     else if (name_base == "Nand") {
-      AddInst(lib, "Nand", "Compute: ?Stack-B?-top nand ?Stack-C?-top and push result to ?Stack-B?",
-              [](int a, int b){ return ~(a&b); });
+      lib.AddMath("Nand", "Compute: ?Stack-B?-top nand ?Stack-C?-top and push result to ?Stack-B?",
+                  [](int a, int b){ return ~(a&b); });
     }
     else if (name_base == "Add") {
-      AddInst(lib, "Add", "Compute: ?Stack-B?-top plus ?Stack-C?-top and push result to ?Stack-B?",
-              [](int a, int b){ return a+b; });
+      lib.AddMath("Add", "Compute: ?Stack-B?-top plus ?Stack-C?-top and push result to ?Stack-B?",
+                  [](int a, int b){ return a+b; });
     }
     else if (name_base == "Sub") {
-      AddInst(lib, "Sub", "Compute: ?Stack-B?-top minus ?Stack-C?-top and push result to ?Stack-B?",
-              [](int a, int b){ return a-b; });
+      lib.AddMath("Sub", "Compute: ?Stack-B?-top minus ?Stack-C?-top and push result to ?Stack-B?",
+                  [](int a, int b){ return a-b; });
     }
     else if (name_base == "Mult") {
-      AddInst(lib, "Mult", "Compute: ?Stack-B?-top times ?Stack-C?-top and push result to ?Stack-B?",
-              [](int a, int b){ return a*b; });
+      lib.AddMath("Mult", "Compute: ?Stack-B?-top times ?Stack-C?-top and push result to ?Stack-B?",
+                  [](int a, int b){ return a*b; });
     }
 
     // @CAO For the next two, ideally if b==0, we should have the instruction return false...
     else if (name_base == "Div") {
-      AddInst(lib, "Div", "Compute: ?Stack-B?-top div ?Stack-C?-top and push result to ?Stack-B?",
-              [](int a, int b){ return b?a/b:0; });
+      lib.AddMath("Div", "Compute: ?Stack-B?-top div ?Stack-C?-top and push result to ?Stack-B?",
+                  [](int a, int b){ return b?a/b:0; });
     }
     else if (name_base == "Mod") {
-      AddInst(lib, "Mod", "Compute: ?Stack-B?-top mod ?Stack-C?-top and push result to ?Stack-B?",
-              [](int a, int b){ return b?a%b:0; });
+      lib.AddMath("Mod", "Compute: ?Stack-B?-top mod ?Stack-C?-top and push result to ?Stack-B?",
+                  [](int a, int b){ return b?a%b:0; });
     }
 
     // Conditionals
