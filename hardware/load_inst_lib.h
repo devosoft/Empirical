@@ -16,6 +16,13 @@ using namespace std::placeholders;
 
 namespace emp {
 
+  // The following function will load an instruction specification into an instruction library.
+  // The library and the descriptor string should be passed in.  Some instructions can have a
+  // more detailed specification as part of the name.  For example, "Nop:3" is a No-operation
+  // instruction that is associated with component 3 when used as an argument.  All instructions
+  // can also have additional information placed after a ':' that is ignored, but attached to
+  // the name.  So "Inc:MyFavoriteInst" will behave the same as "Inc".  Likewise "Nop:3:v2" will
+  // behave the same as "Nop:3".
 
   template <int CPU_SCALE=8, int STACK_SIZE=16>
   bool LoadInst(InstLib<HardwareCPU<CPU_SCALE, STACK_SIZE>, Instruction> & lib,
@@ -23,9 +30,10 @@ namespace emp {
   {
     // Determine the instruction name.
     compress_whitespace(inst_info);
-    std::string full_name = string_pop_word(inst_info);  // Full name of instruction;  eg: Nop:0
-    std::string name_info = full_name;                   // Extra info at end of name; eg: 0 
-    std::string name_base = string_pop(name_info, ':');  // Base name of instruction;  eg: Nop
+    std::string full_name = string_pop_word(inst_info);  // Full name of instruction  eg: Nop:3:v2
+    std::string name_info = full_name;                   // Extra info at end of name eg: 3:v2
+    std::string name_base = string_pop(name_info, ':');  // Base name of instruction  eg: Nop
+    std::string name_spec = string_get(name_info, ':');  // First info after ':'      eg: 3
 
     // Collect additional arguments.
     left_justify(inst_info);
@@ -49,7 +57,7 @@ namespace emp {
 
     // Start with Nop:0, etc, instructions.
     if (name_base == "Nop") {
-      int mod_id = std::stoi(name_info) % CPU_SCALE;
+      int mod_id = std::stoi(name_spec) % CPU_SCALE;
       if (mod_id < 0) mod_id += CPU_SCALE;
       lib.Add(full_name, "No-operation instruction; usable as modifier.",
               std::bind(&HardwareCPU<>::Inst_Nop, _1), mod_id, 1);
