@@ -81,5 +81,25 @@ int main(int argc, char* argv[])
     emp_assert(mean_value > min_threshold && mean_value < max_threshold);
   }
 
+
+  // Test P
+  double flip_prob = 0.56789;
+  int hit_count = 0;
+  for (int i = 0; i < num_tests; i++) {
+    if (rng.P(flip_prob)) hit_count++;
+  }
+
+  double actual_prob = ((double) hit_count) / (double) num_tests;
+
+  if (verbose == true) {
+    std::cout << std::endl
+              << "Target prob = " << flip_prob
+              << "   actual_prob = " << actual_prob
+              << std::endl;
+  }
+   
+  emp_assert(actual_prob < flip_prob + 0.005);
+  emp_assert(actual_prob > flip_prob - 0.005);
+ 
   return 0;
 }
