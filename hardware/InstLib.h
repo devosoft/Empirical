@@ -13,10 +13,12 @@
 
 #include <functional>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 
 #include "../tools/assert.h"
+#include "../tools/errors.h"
 
 namespace emp {
   template <typename INST_TYPE> struct InstInfo {
@@ -70,9 +72,26 @@ namespace emp {
     int GetSize() const { return (int) inst_info.size(); }
 
     // Indexing into an InstLib (by id, name, or symbol) will return  an example instruction 
-    const INST_TYPE & operator[](int index) { return inst_info[index].prototype; }
-    const INST_TYPE & operator[](std::string name) { return inst_info[name_map[name]].prototype; }
-    const INST_TYPE & operator[](char symbol) { return inst_info[short_name_map[symbol]].prototype; }
+    const INST_TYPE & operator[](int index) {
+      emp_assert(index >= 0 && index < (int) inst_info.size());
+      return inst_info[index].prototype;
+    }
+    const INST_TYPE & operator[](std::string name) {
+      if (name_map.find(name) == name_map.end()) {
+        std::stringstream ss;
+        ss << "Trying to access unknown instruction '" << name << "'.  Using default.";
+        NotifyError(ss.str());
+      }
+      return inst_info[name_map[name]].prototype;
+    }
+    const INST_TYPE & operator[](char symbol) {
+      if (short_name_map.find(symbol) == short_name_map.end()) {
+        std::stringstream ss;
+        ss << "No known instruction associated with symbol '" << symbol << "'.  Using default.";
+        NotifyError(ss.str());
+      }
+      return inst_info[short_name_map[symbol]].prototype;
+    }
 
     inline bool RunInst(HARDWARE_TYPE & hw, int inst_id) const {
       emp_assert(inst_id >= 0 && inst_id < inst_calls.size());
