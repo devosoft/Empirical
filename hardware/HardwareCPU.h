@@ -114,6 +114,11 @@ namespace emp {
       const int in_value = pop_input ? stacks[in_stack].Pop() : stacks[in_stack].Top();
       const int result = math1_fun(in_value);
       stacks[out_stack].Push(result);
+      // std::cout << "Ping! in_stack=" << in_stack
+      //           << "  out_stack=" << out_stack
+      //           << "  in_value=" << in_value
+      //           << "  result=" << result
+      //           << std::endl;
       return true;
     }
 
