@@ -11,6 +11,7 @@
 //
 
 #include <functional>
+using namespace std::placeholders;
 
 #include "HardwareCPU_Base.h"
 #include "Instruction.h"
@@ -204,6 +205,160 @@ namespace emp {
       memory[mem_target].push_back(heads[head_from].GetInst());
       ++heads[head_from];  // Advance the head that was read from.
       return true;
+    }
+
+
+    // The following function generates a map of known instruction names to their definitions.
+
+    static const std::map<std::string, InstDefinition<HARDWARE_TYPE> > & GetInstDefs()
+    {
+      // This function will produce a unique defs map.  If we already have it, just return it.
+      static std::map<std::string, InstDefinition<HARDWARE_TYPE> > defs;
+      if (defs.size()) return defs;
+
+      defs["Nop"]        = { "No-operation instruction; usable as modifier.",
+                             std::bind(&HARDWARE_TYPE::Inst_Nop, _1) };
+      
+      // Add single-argument math operations.
+      defs["Inc"]        = { "Increment top of ?Stack-B? by one",
+                             HARDWARE_TYPE::BuildMathInst([](int a){return a+1;}) };
+      
+      defs["Dec"]        = { "Decrement top of ?Stack-B? by one",
+                             HARDWARE_TYPE::BuildMathInst([](int a){return a-1;}) };
+      
+      defs["Shift-L"]    = { "Shift bits of top of ?Stack-B? left by one",
+                             HARDWARE_TYPE::BuildMathInst([](int a){return a<<1;}) };
+      
+      defs["Shift-R"]    = { "Shift bits of top of ?Stack-B? right by one",
+                             HARDWARE_TYPE::BuildMathInst([](int a){return a>>1;}) };
+      
+      // Add double-argument math operations.
+      defs["Nand"]       = { "Compute: ?Stack-B?-top nand ?Stack-C?-top and push result to ?Stack-B?",
+                             HARDWARE_TYPE::BuildMathInst([](int a, int b){ return ~(a&b); }) };
+      
+      defs["Add"]        = { "Compute: ?Stack-B?-top plus ?Stack-C?-top and push result to ?Stack-B?",
+                             HARDWARE_TYPE::BuildMathInst([](int a, int b){ return a+b; }) };
+      
+      defs["Sub"]        = { "Compute: ?Stack-B?-top minus ?Stack-C?-top and push result to ?Stack-B?",
+                             HARDWARE_TYPE::BuildMathInst([](int a, int b){ return a-b; }) };
+      
+      defs["Mult"]       = { "Compute: ?Stack-B?-top times ?Stack-C?-top and push result to ?Stack-B?",
+                             HARDWARE_TYPE::BuildMathInst([](int a, int b){ return a*b; }) };
+      
+      // @CAO For the next two, ideally if b==0, we should have the instruction return false...
+      defs["Div"]        = { "Compute: ?Stack-B?-top div ?Stack-C?-top and push result to ?Stack-B?",
+                             HARDWARE_TYPE::BuildMathInst([](int a, int b){ return b?a/b:0; }) };
+      
+      defs["Mod"]        = { "Compute: ?Stack-B?-top mod ?Stack-C?-top and push result to ?Stack-B?",
+                             HARDWARE_TYPE::BuildMathInst([](int a, int b){ return b?a%b:0; }) };
+      
+      // Conditionals
+      defs["Test-Equal"] = { "Test if ?Stack-B?-top == ?Stack-C?-top and push result to ?Stack-D?",
+                             HARDWARE_TYPE::BuildTestInst([](int a, int b){ return a==b; }) };
+      
+      defs["Test-NEqual"] = { "Test if ?Stack-B?-top != ?Stack-C?-top and push result to ?Stack-D?",
+                              HARDWARE_TYPE::BuildTestInst([](int a, int b){ return a!=b; }) };
+      
+      defs["Test-Less"]  = { "Test if ?Stack-B?-top < ?Stack-C?-top and push result to ?Stack-D?",
+                             HARDWARE_TYPE::BuildTestInst([](int a, int b){ return a<b; }) };
+      
+      defs["Test-AtStart"] = { "Test if ?Head-Read? is at mem position 0 and push result to ?Stack-D?",
+                               std::mem_fn(&HARDWARE_TYPE::Inst_TestAtStart) };
+      
+      // Load in Jump operations  [we neeed to do better...  push and pop heads?]
+      defs["Jump"]       = { "Move ?Head-IP? to position of ?Head-Flow?",
+                             std::mem_fn(&HARDWARE_TYPE::template Inst_MoveHeadToHead<0, 3>) };
+      defs["Jump-If0"]   = { "Move ?Head-IP? to position of ?Head-Flow? only if ?Stack-D?-top == 0",
+                             std::bind(&HARDWARE_TYPE::template Inst_MoveHeadToHeadIf<0,3,3>,
+                                       _1, [](int a){ return a==0; }) };
+      defs["Jump-IfN0"]  = { "Move ?Head-IP? to position of ?Head-Flow? only if ?Stack-D?-top != 0",
+                             std::bind(&HARDWARE_TYPE::template Inst_MoveHeadToHeadIf<0,3,3>,
+                                       _1, [](int a){ return a!=0; }) };
+      defs["Bookmark"]   = { "Move ?Head-Flow? to position of ?Head-IP?",
+                             std::mem_fn(&HARDWARE_TYPE::template Inst_MoveHeadToHead<3, 0>) };
+      defs["Set-Memory"] = { "Move ?Head-Write? to position 0 in ?Memory-1?",
+                             std::mem_fn(&HARDWARE_TYPE::template Inst_MoveHeadToMem<2, 1>) };
+      // "Find-Label" ********** - Jumps the flow head to a complement label (?...) in current memory.
+      
+      // Juggle stack contents
+      defs["Val-Move"]   = { "Pop ?Stack-B? and push value onto ?Stack-C?",
+                             std::bind(&HARDWARE_TYPE::template Inst_1I_Math<1,1>,
+                                       _1, [](int a){return a;}) };
+      defs["Val-Copy"]   = { "Copy top of ?Stack-B? onto ?Stack-C?",
+                             std::bind(&HARDWARE_TYPE::template Inst_1I_Math<1,1,false>,
+                                       _1, [](int a){return a;}) };
+      defs["Val-Delete"] = { "Pop ?Stack-B? and discard value",
+                             std::mem_fn(&HARDWARE_TYPE::Inst_ValDelete) };
+      
+      // Check for "Biological" instructions
+      defs["Build-Inst"] = { "Add new instruction to end of ?Memory-1? copied from ?Head-Read?",
+                             std::mem_fn(&HARDWARE_TYPE::Inst_BuildInst) };
+      // "Divide" **********      - Moves memory space 1 (?1) into its own hardware.  Needs callback!
+      // "Get-Input" **********   - Needs callback
+      // "Get-Output" **********  - Needs callback
+      // "Inject" ?? **********   - Needs callback
+      
+      return defs;
+    }
+
+
+    // The following function returns a list of default instruction names.
+
+    static const std::vector<std::string> & GetDefaultInstructions()
+    {
+      // If we've already generated this list, just return it.
+      static std::vector<std::string> default_insts;
+      if (default_insts.size() > 0) return default_insts;
+
+      // Include as many nops as we need.  This we be called Nop:0, Nop:1, Nop:2, etc.
+      for (int i = 0; i < CPU_SCALE; i++) {
+        std::string inst_name = "Nop:";
+        inst_name += std::to_string(i);
+        default_insts.push_back(inst_name);
+      }
+
+      // Load in single-argument math operations.
+      default_insts.push_back("Inc");
+      default_insts.push_back("Dec");
+      default_insts.push_back("Shift-L");
+      default_insts.push_back("Shift-R");
+
+      // Load in double-argument math operations.
+      default_insts.push_back("Nand");
+      default_insts.push_back("Add");
+      default_insts.push_back("Sub");
+      default_insts.push_back("Mult");
+
+      // @CAO For the next two, ideally if b==0, we should have the instruction return false...
+      default_insts.push_back("Div");
+      default_insts.push_back("Mod");
+
+      // Conditionals
+      default_insts.push_back("Test-Equal");
+      default_insts.push_back("Test-NEqual");
+      default_insts.push_back("Test-Less");
+      default_insts.push_back("Test-AtStart");
+
+      // Load in Jump operations  [we neeed to do better...  push and pop heads?]
+      default_insts.push_back("Jump");
+      default_insts.push_back("Jump-If0");
+      default_insts.push_back("Jump-IfN0");
+      default_insts.push_back("Bookmark");
+      default_insts.push_back("Set-Memory");
+      // "Find-Label" ********** - Jumps the flow head to a complement label (?...) in its current memory.    
+
+      // Juggle stack contents
+      default_insts.push_back("Val-Move");
+      default_insts.push_back("Val-Copy");
+      default_insts.push_back("Val-Delete");
+
+      // Load in "Biological" instructions
+      default_insts.push_back("Build-Inst");
+      // "Divide" **********      - Moves memory space 1 (?1) into its own hardware.  Needs callback!
+      // "Get-Input" **********   - Needs callback
+      // "Get-Output" **********  - Needs callback
+
+      return default_insts;
     }
 
   };

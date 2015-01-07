@@ -19,6 +19,7 @@
 
 #include "../tools/assert.h"
 #include "../tools/errors.h"
+#include "../tools/string_utils.h"
 
 namespace emp {
 
@@ -152,6 +153,66 @@ namespace emp {
       // @CAO Should we do something here to facilitate move sematics?
       return out_string;
     }
+
+    // The following function will load an instruction specification into an instruction library.
+    // The library and the descriptor string should be passed in.  Some instructions can have a
+    // more detailed specification as part of the name.  For example, "Nop:3" is a No-operation
+    // instruction that is associated with component 3 when used as an argument.  All instructions
+    // can also have additional information placed after a ':' that is ignored, but attached to
+    // the name.  So "Inc:MyFavoriteInst" will behave the same as "Inc".  Likewise "Nop:3:v2" will
+    // behave the same as "Nop:3".
+
+    bool LoadInst(std::string inst_info)
+    {
+      // Determine the instruction name.
+      compress_whitespace(inst_info);
+      std::string full_name = string_pop_word(inst_info);  // Full name of instruction  eg: Nop:3:v2
+      std::string name_info = full_name;                   // Extra info at end of name eg: 3:v2
+      std::string name_base = string_pop(name_info, ':');  // Base name of instruction  eg: Nop
+      std::string name_spec = string_get(name_info, ':');  // First info after ':'      eg: 3
+      int mod_id = name_spec.size() ? std::stoi(name_spec) : -1;
+
+      // Collect additional arguments.
+      left_justify(inst_info);
+      while(inst_info.size() > 0) {
+        std::string arg_info = string_pop_word(inst_info);
+        std::string arg_name = string_pop(arg_info, '=');
+        
+        if (arg_name == "cycle_cost") {
+          // @CAO Continue here...
+        }
+        else if (arg_name == "weight") {
+          // @CAO Continue here...
+        }
+        else {
+          // @CAO Continue here... (With an error!)
+        }
+      }
+
+      auto inst_defs = HARDWARE_TYPE::GetInstDefs();
+      if (inst_defs.find(name_base) == inst_defs.end()) {
+        std::stringstream ss;
+        ss << "Failed to find instruction '" << name_base << "'.  Ignoring.";
+        NotifyError(ss.str());
+        
+        return false;
+      }
+    
+      auto cur_def = inst_defs[name_base];
+
+      Add(full_name, cur_def.desc, cur_def.call, mod_id);
+
+      return true;
+    }
+
+    void LoadDefaults() {
+      auto default_insts = HARDWARE_TYPE::GetDefaultInstructions();
+      for (const std::string & inst_name : default_insts) {
+        LoadInst(inst_name);
+      }
+    }
+    
+
   };
 };
 
