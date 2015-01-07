@@ -7,14 +7,115 @@
 //
 
 #include <functional>
+#include <map>
+#include <string>
+
 using namespace std::placeholders;
 
 #include "../tools/errors.h"
+#include "../tools/functions.h"
 #include "../tools/string_utils.h"
 #include "HardwareCPU.h"
 #include "InstLib.h"
 
 namespace emp {
+
+  template <int CPU_SCALE=8, int STACK_SIZE=16>
+  const std::map<std::string, InstDefinition<HardwareCPU<CPU_SCALE, STACK_SIZE> > > &
+  GetInstDefs(InstLib<HardwareCPU<CPU_SCALE, STACK_SIZE>, Instruction> & lib)
+  {
+    (void) lib;  // Used to auto-fill tempaltes (and handle overloading in the future)
+    typedef HardwareCPU<CPU_SCALE, STACK_SIZE> HARDWARE_TYPE;
+
+    // This function will produce a unique defs map.  If we already have it, just return it.
+    static std::map<std::string, InstDefinition<HARDWARE_TYPE> > defs;
+    if (defs.size()) return defs;
+
+    defs["Nop"]        = { "No-operation instruction; usable as modifier.",
+                           std::bind(&HARDWARE_TYPE::Inst_Nop, _1) };
+
+    // Add single-argument math operations.
+    defs["Inc"]        = { "Increment top of ?Stack-B? by one",
+                           HARDWARE_TYPE::BuildMathInst([](int a){return a+1;}) };
+
+    defs["Dec"]        = { "Decrement top of ?Stack-B? by one",
+                           HARDWARE_TYPE::BuildMathInst([](int a){return a-1;}) };
+
+    defs["Shift-L"]    = { "Shift bits of top of ?Stack-B? left by one",
+                           HARDWARE_TYPE::BuildMathInst([](int a){return a<<1;}) };
+
+    defs["Shift-R"]    = { "Shift bits of top of ?Stack-B? right by one",
+                           HARDWARE_TYPE::BuildMathInst([](int a){return a>>1;}) };
+    
+    // Add double-argument math operations.
+    defs["Nand"]       = { "Compute: ?Stack-B?-top nand ?Stack-C?-top and push result to ?Stack-B?",
+                           HARDWARE_TYPE::BuildMathInst([](int a, int b){ return ~(a&b); }) };
+
+    defs["Add"]        = { "Compute: ?Stack-B?-top plus ?Stack-C?-top and push result to ?Stack-B?",
+                           HARDWARE_TYPE::BuildMathInst([](int a, int b){ return a+b; }) };
+
+    defs["Sub"]        = { "Compute: ?Stack-B?-top minus ?Stack-C?-top and push result to ?Stack-B?",
+                           HARDWARE_TYPE::BuildMathInst([](int a, int b){ return a-b; }) };
+
+    defs["Mult"]       = { "Compute: ?Stack-B?-top times ?Stack-C?-top and push result to ?Stack-B?",
+                           HARDWARE_TYPE::BuildMathInst([](int a, int b){ return a*b; }) };
+    
+    // @CAO For the next two, ideally if b==0, we should have the instruction return false...
+    defs["Div"]        = { "Compute: ?Stack-B?-top div ?Stack-C?-top and push result to ?Stack-B?",
+                           HARDWARE_TYPE::BuildMathInst([](int a, int b){ return b?a/b:0; }) };
+
+    defs["Mod"]        = { "Compute: ?Stack-B?-top mod ?Stack-C?-top and push result to ?Stack-B?",
+                           HARDWARE_TYPE::BuildMathInst([](int a, int b){ return b?a%b:0; }) };
+
+    // Conditionals
+    defs["Test-Equal"] = { "Test if ?Stack-B?-top == ?Stack-C?-top and push result to ?Stack-D?",
+                           HARDWARE_TYPE::BuildTestInst([](int a, int b){ return a==b; }) };
+
+    defs["Test-NEqual"] = { "Test if ?Stack-B?-top != ?Stack-C?-top and push result to ?Stack-D?",
+                            HARDWARE_TYPE::BuildTestInst([](int a, int b){ return a!=b; }) };
+
+    defs["Test-Less"]  = { "Test if ?Stack-B?-top < ?Stack-C?-top and push result to ?Stack-D?",
+                           HARDWARE_TYPE::BuildTestInst([](int a, int b){ return a<b; }) };
+
+    defs["Test-AtStart"] = { "Test if ?Head-Read? is at mem position 0 and push result to ?Stack-D?",
+                             std::mem_fn(&HARDWARE_TYPE::Inst_TestAtStart) };
+    
+    // Load in Jump operations  [we neeed to do better...  push and pop heads?]
+    defs["Jump"]       = { "Move ?Head-IP? to position of ?Head-Flow?",
+                             std::mem_fn(&HARDWARE_TYPE::template Inst_MoveHeadToHead<0, 3>) };
+    defs["Jump-If0"]   = { "Move ?Head-IP? to position of ?Head-Flow? only if ?Stack-D?-top == 0",
+                           std::bind(&HARDWARE_TYPE::template Inst_MoveHeadToHeadIf<0,3,3>,
+                                     _1, [](int a){ return a==0; }) };
+    defs["Jump-IfN0"]  = { "Move ?Head-IP? to position of ?Head-Flow? only if ?Stack-D?-top != 0",
+                           std::bind(&HARDWARE_TYPE::template Inst_MoveHeadToHeadIf<0,3,3>,
+                                     _1, [](int a){ return a!=0; }) };
+    defs["Bookmark"]   = { "Move ?Head-Flow? to position of ?Head-IP?",
+                           std::mem_fn(&HARDWARE_TYPE::template Inst_MoveHeadToHead<3, 0>) };
+    defs["Set-Memory"] = { "Move ?Head-Write? to position 0 in ?Memory-1?",
+                           std::mem_fn(&HARDWARE_TYPE::template Inst_MoveHeadToMem<2, 1>) };
+    // "Find-Label" ********** - Jumps the flow head to a complement label (?...) in current memory.
+      
+    // Juggle stack contents
+    defs["Val-Move"]   = { "Pop ?Stack-B? and push value onto ?Stack-C?",
+                           std::bind(&HARDWARE_TYPE::template Inst_1I_Math<1,1>, _1, [](int a){return a;}) };
+    defs["Val-Copy"]   = { "Copy top of ?Stack-B? onto ?Stack-C?",
+                           std::bind(&HARDWARE_TYPE::template Inst_1I_Math<1,1,false>, _1, [](int a){return a;}) };
+    defs["Val-Delete"] = { "Pop ?Stack-B? and discard value",
+                           std::mem_fn(&HARDWARE_TYPE::Inst_ValDelete) };
+
+      // Check for "Biological" instructions
+    defs["Build-Inst"] = { "Add new instruction to end of ?Memory-1? copied from ?Head-Read?",
+                           std::mem_fn(&HARDWARE_TYPE::Inst_BuildInst) };
+    // "Divide" **********      - Moves memory space 1 (?1) into its own hardware.  Needs callback!
+    // "Get-Input" **********   - Needs callback
+    // "Get-Output" **********  - Needs callback
+    // "Inject" ?? **********   - Needs callback
+
+    return defs;
+  }
+                 
+
+  
 
   // The following function will load an instruction specification into an instruction library.
   // The library and the descriptor string should be passed in.  Some instructions can have a
@@ -28,12 +129,15 @@ namespace emp {
   bool LoadInst(InstLib<HardwareCPU<CPU_SCALE, STACK_SIZE>, Instruction> & lib,
                 std::string inst_info)
   {
+    typedef HardwareCPU<CPU_SCALE, STACK_SIZE> HARDWARE_TYPE;
+
     // Determine the instruction name.
     compress_whitespace(inst_info);
     std::string full_name = string_pop_word(inst_info);  // Full name of instruction  eg: Nop:3:v2
     std::string name_info = full_name;                   // Extra info at end of name eg: 3:v2
     std::string name_base = string_pop(name_info, ':');  // Base name of instruction  eg: Nop
     std::string name_spec = string_get(name_info, ':');  // First info after ':'      eg: 3
+    int mod_id = name_spec.size() ? emp::mod( std::stoi(name_spec), CPU_SCALE ) : -1;
 
     // Collect additional arguments.
     left_justify(inst_info);
@@ -51,137 +155,19 @@ namespace emp {
         // @CAO Continue here... (With an error!)
       }
     }
-    
 
-    // Determine which argument we have and load it!
-
-    // Start with Nop:0, etc, instructions.
-    if (name_base == "Nop") {
-      int mod_id = std::stoi(name_spec) % CPU_SCALE;
-      if (mod_id < 0) mod_id += CPU_SCALE;
-      lib.Add(full_name, "No-operation instruction; usable as modifier.",
-              std::bind(&HardwareCPU<>::Inst_Nop, _1), mod_id, 1);
-    }
-
-    // Check for single-argument math operations.
-    else if (name_base == "Inc") {
-      lib.AddMath(full_name, "Increment top of ?Stack-B? by one", [](int a){return a+1;});
-    }
-    else if (name_base == "Dec") {
-      lib.AddMath(full_name, "Decrement top of ?Stack-B? by one", [](int a){return a-1;});
-    }
-    else if (name_base == "Shift-L") {
-      lib.AddMath(full_name, "Shift bits of top of ?Stack-B? left by one", [](int a){return a<<1;});
-    }
-    else if (name_base == "Shift-R") {
-      lib.AddMath(full_name, "Shift bits of top of ?Stack-B? right by one", [](int a){return a>>1;});
-    }
-
-    // Load in double-argument math operations.
-    else if (name_base == "Nand") {
-      lib.AddMath(full_name, "Compute: ?Stack-B?-top nand ?Stack-C?-top and push result to ?Stack-B?",
-                  [](int a, int b){ return ~(a&b); });
-    }
-    else if (name_base == "Add") {
-      lib.AddMath(full_name, "Compute: ?Stack-B?-top plus ?Stack-C?-top and push result to ?Stack-B?",
-                  [](int a, int b){ return a+b; });
-    }
-    else if (name_base == "Sub") {
-      lib.AddMath(full_name, "Compute: ?Stack-B?-top minus ?Stack-C?-top and push result to ?Stack-B?",
-                  [](int a, int b){ return a-b; });
-    }
-    else if (name_base == "Mult") {
-      lib.AddMath(full_name, "Compute: ?Stack-B?-top times ?Stack-C?-top and push result to ?Stack-B?",
-                  [](int a, int b){ return a*b; });
-    }
-
-    // @CAO For the next two, ideally if b==0, we should have the instruction return false...
-    else if (name_base == "Div") {
-      lib.AddMath(full_name, "Compute: ?Stack-B?-top div ?Stack-C?-top and push result to ?Stack-B?",
-                  [](int a, int b){ return b?a/b:0; });
-    }
-    else if (name_base == "Mod") {
-      lib.AddMath(full_name, "Compute: ?Stack-B?-top mod ?Stack-C?-top and push result to ?Stack-B?",
-                  [](int a, int b){ return b?a%b:0; });
-    }
-
-    // Conditionals
-    else if (name_base == "Test-Equal") {
-      lib.AddTest(full_name,
-                  "Test if ?Stack-B?-top == ?Stack-C?-top and push result to ?Stack-D?",
-                  [](int a, int b){ return a==b; });
-    }
-    else if (name_base == "Test-NEqual") {
-      lib.AddTest(full_name,
-                  "Test if ?Stack-B?-top != ?Stack-C?-top and push result to ?Stack-D?",
-                  [](int a, int b){ return a!=b; });
-    }
-    else if (name_base == "Test-Less") {
-      lib.AddTest(full_name,
-                  "Test if ?Stack-B?-top < ?Stack-C?-top and push result to ?Stack-D?",
-                  [](int a, int b){ return a<b; });
-    }
-    else if (name_base == "Test-AtStart") {
-      lib.Add(full_name, "Test if ?Head-Read? is at mem position 0 and push result to ?Stack-D?",
-              std::mem_fn(&HardwareCPU<>::Inst_TestAtStart));
-    }
-
-    // Load in Jump operations  [we neeed to do better...  push and pop heads?]
-    else if (name_base == "Jump") {
-      lib.Add(full_name, "Move ?Head-IP? to position of ?Head-Flow?",
-              std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToHead<0, 3>));
-    }
-    else if (name_base == "Jump-If0") {
-      lib.Add(full_name, "Move ?Head-IP? to position of ?Head-Flow? only if ?Stack-D?-top == 0",
-              std::bind(&HardwareCPU<>::Inst_MoveHeadToHeadIf<0,3,3>, _1, [](int a){ return a==0; }));
-    }
-    else if (name_base == "Jump-IfN0") {
-      lib.Add(full_name, "Move ?Head-IP? to position of ?Head-Flow? only if ?Stack-D?-top != 0",
-              std::bind(&HardwareCPU<>::Inst_MoveHeadToHeadIf<0,3,3>, _1, [](int a){ return a!=0; }));
-    }
-    else if (name_base == "Bookmark") {
-      lib.Add(full_name, "Move ?Head-Flow? to position of ?Head-IP?",
-              std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToHead<3, 0>));
-    }
-    else if (name_base == "Set-Memory") {
-      lib.Add(full_name, "Move ?Head-Write? to position 0 in ?Memory-1?",
-              std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToMem<2, 1>));
-    }
-    // "Find-Label" ********** - Jumps the flow head to a complement label (?...) in its current memory.    
-
-    // Juggle stack contents
-    else if (name_base == "Val-Move") {
-      lib.Add(full_name, "Pop ?Stack-B? and push value onto ?Stack-C?",
-              std::bind(&HardwareCPU<>::Inst_1I_Math<1,1>, _1, [](int a){return a;}));
-    }
-    else if (name_base == "Val-Copy") {
-      lib.Add(full_name, "Copy top of ?Stack-B? onto ?Stack-C?",
-              std::bind(&HardwareCPU<>::Inst_1I_Math<1,1,false>, _1, [](int a){return a;}));
-    }
-    else if (name_base == "Val-Delete") {
-      lib.Add(full_name, "Pop ?Stack-B? and discard value",
-              std::mem_fn(&HardwareCPU<>::Inst_ValDelete));
-    }
-
-    // Check for "Biological" instructions
-    else if (name_base == "Build-Inst") {
-      lib.Add(full_name, "Add new instruction to end of ?Memory-1? copied from ?Head-Read?",
-              std::mem_fn(&HardwareCPU<>::Inst_BuildInst));
-    }
-    // "Divide" **********      - Moves memory space 1 (?1) into its own hardware.  Needs callback!
-    // "Get-Input" **********   - Needs callback
-    // "Get-Output" **********  - Needs callback
-    // "Inject" ?? **********   - Needs callback
-
-
-    // If we made it this far, we FAILED to find this instruction!
-    else {
+    auto inst_defs = GetInstDefs(lib);
+    if (inst_defs.find(name_base) == inst_defs.end()) {
       std::stringstream ss;
-      ss << "Failed to load instruction '" << name_base << "'.  Ignoring.";
+      ss << "Failed to find instruction '" << name_base << "'.  Ignoring.";
       NotifyError(ss.str());
 
       return false;
     }
+    
+    auto cur_def = inst_defs[name_base];
+
+    lib.Add(full_name, cur_def.desc, cur_def.call, mod_id);
 
     return true;
   }
@@ -197,8 +183,6 @@ namespace emp {
 
     // Load in single-argument math operations.
     LoadInst(lib, "Inc");
-    LoadInst(lib, "Inc");
-    LoadInst(lib, "Inc:v2");
     LoadInst(lib, "Dec");
     LoadInst(lib, "Shift-L");
     LoadInst(lib, "Shift-R");

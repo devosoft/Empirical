@@ -21,6 +21,19 @@
 #include "../tools/errors.h"
 
 namespace emp {
+
+  // The InstDefinition struct provides the core definition for a possible instruction, linking
+  // a name to its description and associate function call.
+
+  template <class HARDWARE_TYPE> struct InstDefinition {
+    std::string desc;
+    std::function<bool(HARDWARE_TYPE&)> call;    
+  };
+
+
+  // The InstInfo struct provides detailed information for an instruction implementation
+  // active in this instruction set.
+
   template <typename INST_TYPE> struct InstInfo {
     // User-specified data for each instruction
     std::string name;    // Name of this instruction
@@ -36,15 +49,7 @@ namespace emp {
     InstInfo(const std::string & _name, const std::string & _desc, int _cycle_cost, int _arg, char _sname, int _id)
       : name(_name), desc(_desc), cycle_cost(_cycle_cost), arg_value(_arg), short_name(_sname), id(_id)
       , prototype(_id, _arg+1, _cycle_cost != 1)
-    {
-      // std::cout << "New entry: "
-      //           << "name=" << name << "  "
-      //           << "ccost=" << cycle_cost << "  "
-      //           << "arg=" << arg_value << "  "
-      //           << "sname=" << short_name << "  "
-      //           << "id=" << id << "  "
-      //           << std::endl;
-    }
+    { ; }
   };
 
   const char inst_char_chart[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 
@@ -57,8 +62,8 @@ namespace emp {
 
   template <typename HARDWARE_TYPE, typename INST_TYPE> class InstLib {
   private:
-    // All of the info for the functions is below.
-    // The functions pointers are separated out for improved (?) cache performance.
+    // Information of the Instructions associated with this InstLib
+    // Instruction function pointers are separated out for improved (?) cache performance.
     std::vector< std::function<bool(HARDWARE_TYPE&)> > inst_calls;
     std::vector<InstInfo<INST_TYPE> > inst_info;
 
@@ -126,29 +131,6 @@ namespace emp {
 
       return *this;
     }
-
-    InstLib & AddMath(const std::string & name, const std::string & desc,
-                      const std::function<int(int)> & math_fun, int arg=-1, int cycle_cost=1) {
-      Add(name, desc, [math_fun](HARDWARE_TYPE & hw){ return hw.Inst_1I_Math(math_fun); },
-          arg, cycle_cost);
-      return *this;
-    }
-    
-    InstLib & AddMath(const std::string & name, const std::string & desc,
-                      const std::function<int(int,int)> & math_fun, int arg=-1, int cycle_cost=1) {
-      Add(name, desc, [math_fun](HARDWARE_TYPE & hw){ return hw.Inst_2I_Math(math_fun); },
-          arg, cycle_cost);
-      return *this;
-    }
-
-    InstLib & AddTest(const std::string & name, const std::string & desc,
-                      const std::function<int(int,int)> & test_fun, int arg=-1, int cycle_cost=1) {
-      Add(name, desc,
-          [test_fun](HARDWARE_TYPE & hw){ return hw.template Inst_2I_Math<1,1,3>(test_fun); },
-          arg, cycle_cost);
-      return *this;
-    }
-
 
 
     // Retrieve information about each instruction.

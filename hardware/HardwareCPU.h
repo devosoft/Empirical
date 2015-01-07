@@ -24,6 +24,7 @@ namespace emp {
   protected:
     // Hardware components...
     typedef std::vector<emp::Instruction> mem_type;
+    typedef HardwareCPU<CPU_SCALE, STACK_SIZE> HARDWARE_TYPE;
     mem_type memory[CPU_SCALE];
     CPUStack<STACK_SIZE> stacks[CPU_SCALE];
     CPUHead heads[CPU_SCALE];
@@ -114,14 +115,14 @@ namespace emp {
       const int in_value = pop_input ? stacks[in_stack].Pop() : stacks[in_stack].Top();
       const int result = math1_fun(in_value);
       stacks[out_stack].Push(result);
-      // std::cout << "Ping! in_stack=" << in_stack
-      //           << "  out_stack=" << out_stack
-      //           << "  in_value=" << in_value
-      //           << "  result=" << result
-      //           << std::endl;
       return true;
     }
 
+    static std::function<bool(HARDWARE_TYPE &)> BuildMathInst(const std::function<int(int)> & math_fun)
+    {
+      return [math_fun](HARDWARE_TYPE & hw){ return hw.Inst_1I_Math(math_fun); };
+    }
+    
 
     // -------- Generic Two-argument Math Instructions --------
 
@@ -137,6 +138,19 @@ namespace emp {
       stacks[out_stack].Push(result);
       return true;
     }
+
+    static std::function<bool(HARDWARE_TYPE&)>
+    BuildMathInst(const std::function<int(int,int)> & math_fun)
+    {
+      return [math_fun](HARDWARE_TYPE & hw){ return hw.Inst_2I_Math(math_fun); };
+    }
+
+    static std::function<bool(HARDWARE_TYPE&)>
+    BuildTestInst(const std::function<int(int,int)> & test_fun)
+    {
+      return [test_fun](HARDWARE_TYPE & hw){ return hw.template Inst_2I_Math<1,1,3>(test_fun); };
+    }
+
 
     
     // --------  Generic Jump Operations  --------
