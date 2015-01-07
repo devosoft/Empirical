@@ -101,6 +101,14 @@ namespace emp {
     // Add a new instruction to this library.
     InstLib & Add(const std::string & name, const std::string & desc,
                   std::function<bool(HARDWARE_TYPE&)> call, int arg=-1, int cycle_cost=1) {
+      // Make sure we don't have another instruction by this exact name already.
+      if (name_map.find(name) != name_map.end()) {
+        std::stringstream ss;
+        ss << "Adding duplicate instruction name '" << name << "' to instruction library.  Ignoring.";
+        NotifyWarning(ss.str());
+        return *this;
+      }
+
       // Generate ID information for this new instruction.
       const int next_id = (int) inst_info.size();  // The ID number of this new instruction.
       const int char_id = std::min(next_id, 72);   // We only have 72 chars, so additional are "+"
@@ -129,6 +137,14 @@ namespace emp {
     InstLib & AddMath(const std::string & name, const std::string & desc,
                       const std::function<int(int,int)> & math_fun, int arg=-1, int cycle_cost=1) {
       Add(name, desc, [math_fun](HARDWARE_TYPE & hw){ return hw.Inst_2I_Math(math_fun); },
+          arg, cycle_cost);
+      return *this;
+    }
+
+    InstLib & AddTest(const std::string & name, const std::string & desc,
+                      const std::function<int(int,int)> & test_fun, int arg=-1, int cycle_cost=1) {
+      Add(name, desc,
+          [test_fun](HARDWARE_TYPE & hw){ return hw.template Inst_2I_Math<1,1,3>(test_fun); },
           arg, cycle_cost);
       return *this;
     }

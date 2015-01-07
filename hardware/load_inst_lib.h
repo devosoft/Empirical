@@ -57,104 +57,107 @@ namespace emp {
 
     // Check for single-argument math operations.
     else if (name_base == "Inc") {
-      lib.AddMath("Inc", "Increment top of ?Stack-B? by one", [](int a){return a+1;});
+      lib.AddMath(full_name, "Increment top of ?Stack-B? by one", [](int a){return a+1;});
     }
     else if (name_base == "Dec") {
-      lib.AddMath("Dec", "Decrement top of ?Stack-B? by one", [](int a){return a-1;});
+      lib.AddMath(full_name, "Decrement top of ?Stack-B? by one", [](int a){return a-1;});
     }
     else if (name_base == "Shift-L") {
-      lib.AddMath("Shift-L", "Shift bits of top of ?Stack-B? left by one", [](int a){return a<<1;});
+      lib.AddMath(full_name, "Shift bits of top of ?Stack-B? left by one", [](int a){return a<<1;});
     }
     else if (name_base == "Shift-R") {
-      lib.AddMath("Shift-R", "Shift bits of top of ?Stack-B? right by one", [](int a){return a>>1;});
+      lib.AddMath(full_name, "Shift bits of top of ?Stack-B? right by one", [](int a){return a>>1;});
     }
 
     // Load in double-argument math operations.
     else if (name_base == "Nand") {
-      lib.AddMath("Nand", "Compute: ?Stack-B?-top nand ?Stack-C?-top and push result to ?Stack-B?",
+      lib.AddMath(full_name, "Compute: ?Stack-B?-top nand ?Stack-C?-top and push result to ?Stack-B?",
                   [](int a, int b){ return ~(a&b); });
     }
     else if (name_base == "Add") {
-      lib.AddMath("Add", "Compute: ?Stack-B?-top plus ?Stack-C?-top and push result to ?Stack-B?",
+      lib.AddMath(full_name, "Compute: ?Stack-B?-top plus ?Stack-C?-top and push result to ?Stack-B?",
                   [](int a, int b){ return a+b; });
     }
     else if (name_base == "Sub") {
-      lib.AddMath("Sub", "Compute: ?Stack-B?-top minus ?Stack-C?-top and push result to ?Stack-B?",
+      lib.AddMath(full_name, "Compute: ?Stack-B?-top minus ?Stack-C?-top and push result to ?Stack-B?",
                   [](int a, int b){ return a-b; });
     }
     else if (name_base == "Mult") {
-      lib.AddMath("Mult", "Compute: ?Stack-B?-top times ?Stack-C?-top and push result to ?Stack-B?",
+      lib.AddMath(full_name, "Compute: ?Stack-B?-top times ?Stack-C?-top and push result to ?Stack-B?",
                   [](int a, int b){ return a*b; });
     }
 
     // @CAO For the next two, ideally if b==0, we should have the instruction return false...
     else if (name_base == "Div") {
-      lib.AddMath("Div", "Compute: ?Stack-B?-top div ?Stack-C?-top and push result to ?Stack-B?",
+      lib.AddMath(full_name, "Compute: ?Stack-B?-top div ?Stack-C?-top and push result to ?Stack-B?",
                   [](int a, int b){ return b?a/b:0; });
     }
     else if (name_base == "Mod") {
-      lib.AddMath("Mod", "Compute: ?Stack-B?-top mod ?Stack-C?-top and push result to ?Stack-B?",
+      lib.AddMath(full_name, "Compute: ?Stack-B?-top mod ?Stack-C?-top and push result to ?Stack-B?",
                   [](int a, int b){ return b?a%b:0; });
     }
 
     // Conditionals
     else if (name_base == "Test-Equal") {
-      lib.Add("Test-Equal", "Test if ?Stack-B?-top == ?Stack-C?-top and push result to ?Stack-D?",
-              std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1, [](int a, int b){ return a==b; }));
+      lib.AddTest(full_name,
+                  "Test if ?Stack-B?-top == ?Stack-C?-top and push result to ?Stack-D?",
+                  [](int a, int b){ return a==b; });
     }
     else if (name_base == "Test-NEqual") {
-      lib.Add("Test-NEqual", "Test if ?Stack-B?-top != ?Stack-C?-top and push result to ?Stack-D?",
-              std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1, [](int a, int b){ return a!=b; }));
+      lib.AddTest(full_name,
+                  "Test if ?Stack-B?-top != ?Stack-C?-top and push result to ?Stack-D?",
+                  [](int a, int b){ return a!=b; });
     }
     else if (name_base == "Test-Less") {
-      lib.Add("Test-Less", "Test if ?Stack-B?-top < ?Stack-C?-top and push result to ?Stack-D?",
-              std::bind(&HardwareCPU<>::Inst_2I_Math<1,1,3>, _1, [](int a, int b){ return a<b; }));
+      lib.AddTest(full_name,
+                  "Test if ?Stack-B?-top < ?Stack-C?-top and push result to ?Stack-D?",
+                  [](int a, int b){ return a<b; });
     }
     else if (name_base == "Test-AtStart") {
-      lib.Add("Test-AtStart", "Test if ?Head-Read? is at mem position 0 and push result to ?Stack-D?",
+      lib.Add(full_name, "Test if ?Head-Read? is at mem position 0 and push result to ?Stack-D?",
               std::mem_fn(&HardwareCPU<>::Inst_TestAtStart));
     }
 
     // Load in Jump operations  [we neeed to do better...  push and pop heads?]
     else if (name_base == "Jump") {
-      lib.Add("Jump", "Move ?Head-IP? to position of ?Head-Flow?",
+      lib.Add(full_name, "Move ?Head-IP? to position of ?Head-Flow?",
               std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToHead<0, 3>));
     }
     else if (name_base == "Jump-If0") {
-      lib.Add("Jump-If0", "Move ?Head-IP? to position of ?Head-Flow? only if ?Stack-D?-top == 0",
+      lib.Add(full_name, "Move ?Head-IP? to position of ?Head-Flow? only if ?Stack-D?-top == 0",
               std::bind(&HardwareCPU<>::Inst_MoveHeadToHeadIf<0,3,3>, _1, [](int a){ return a==0; }));
     }
     else if (name_base == "Jump-IfN0") {
-      lib.Add("Jump-IfN0", "Move ?Head-IP? to position of ?Head-Flow? only if ?Stack-D?-top != 0",
+      lib.Add(full_name, "Move ?Head-IP? to position of ?Head-Flow? only if ?Stack-D?-top != 0",
               std::bind(&HardwareCPU<>::Inst_MoveHeadToHeadIf<0,3,3>, _1, [](int a){ return a!=0; }));
     }
     else if (name_base == "Bookmark") {
-      lib.Add("Bookmark", "Move ?Head-Flow? to position of ?Head-IP?",
+      lib.Add(full_name, "Move ?Head-Flow? to position of ?Head-IP?",
               std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToHead<3, 0>));
     }
     else if (name_base == "Set-Memory") {
-      lib.Add("Set-Memory", "Move ?Head-Write? to position 0 in ?Memory-1?",
+      lib.Add(full_name, "Move ?Head-Write? to position 0 in ?Memory-1?",
               std::mem_fn(&HardwareCPU<>::Inst_MoveHeadToMem<2, 1>));
     }
     // "Find-Label" ********** - Jumps the flow head to a complement label (?...) in its current memory.    
 
     // Juggle stack contents
     else if (name_base == "Val-Move") {
-      lib.Add("Val-Move", "Pop ?Stack-B? and push value onto ?Stack-C?",
+      lib.Add(full_name, "Pop ?Stack-B? and push value onto ?Stack-C?",
               std::bind(&HardwareCPU<>::Inst_1I_Math<1,1>, _1, [](int a){return a;}));
     }
     else if (name_base == "Val-Copy") {
-      lib.Add("Val-Copy", "Copy top of ?Stack-B? onto ?Stack-C?",
+      lib.Add(full_name, "Copy top of ?Stack-B? onto ?Stack-C?",
               std::bind(&HardwareCPU<>::Inst_1I_Math<1,1,false>, _1, [](int a){return a;}));
     }
     else if (name_base == "Val-Delete") {
-      lib.Add("Val-Delete", "Pop ?Stack-B? and discard value",
+      lib.Add(full_name, "Pop ?Stack-B? and discard value",
               std::mem_fn(&HardwareCPU<>::Inst_ValDelete));
     }
 
     // Check for "Biological" instructions
     else if (name_base == "Build-Inst") {
-      lib.Add("Build-Inst", "Add new instruction to end of ?Memory-1? copied from ?Head-Read?",
+      lib.Add(full_name, "Add new instruction to end of ?Memory-1? copied from ?Head-Read?",
               std::mem_fn(&HardwareCPU<>::Inst_BuildInst));
     }
     // "Divide" **********      - Moves memory space 1 (?1) into its own hardware.  Needs callback!
@@ -186,6 +189,8 @@ namespace emp {
 
     // Load in single-argument math operations.
     LoadInst(lib, "Inc");
+    LoadInst(lib, "Inc");
+    LoadInst(lib, "Inc:v2");
     LoadInst(lib, "Dec");
     LoadInst(lib, "Shift-L");
     LoadInst(lib, "Shift-R");
