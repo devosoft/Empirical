@@ -198,6 +198,7 @@ namespace emp {
       std::string name_info = full_name;                   // Extra info at end of name eg: 3:v2
       std::string name_base = string_pop(name_info, ':');  // Base name of instruction  eg: Nop
       std::string name_spec = string_get(name_info, ':');  // First info after ':'      eg: 3
+      std::string name_final = full_name;                  // Name inst should be stored under
       int mod_id = name_spec.size() ? std::stoi(name_spec) : -1;
 
       // Set all of the arguments to their defaults.
@@ -206,7 +207,6 @@ namespace emp {
       double weight = 1.0;
 
       // Collect additional arguments.
-      left_justify(inst_info);
       while(inst_info.size() > 0) {
         std::string arg_info = string_pop_word(inst_info);  // Value assigned to (rhs)
         std::string arg_name = string_pop(arg_info, '=');   // Variable name.
@@ -219,6 +219,16 @@ namespace emp {
                << ". Using minimum of 1 instead.";
             NotifyError(ss.str());
             cycle_cost = 1;
+          }
+        }
+        else if (arg_name == "name") {
+          if (arg_info.size() == 0) {
+            std::stringstream ss;
+            ss << "Trying to set '" << full_name << "' to have no name.  Ignoring.";
+            NotifyError(ss.str());
+          }
+          else {
+            name_final = arg_info;
           }
         }
         else if (arg_name == "stability") {
@@ -259,7 +269,7 @@ namespace emp {
     
       auto cur_def = inst_defs[name_base];
 
-      Add(full_name, cur_def.desc, cur_def.call, mod_id, cycle_cost, stability, weight);
+      Add(name_final, cur_def.desc, cur_def.call, mod_id, cycle_cost, stability, weight);
 
       return true;
     }
