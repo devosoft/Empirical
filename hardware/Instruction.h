@@ -26,7 +26,7 @@ namespace emp {
 
     // We have 32 bits left.  We can either specify them, as below, or keep them flexible.
     static ctype CYCLE_COST_BIT = 16;                     // Does this inst cost more than 1 cycle?
-    static ctype COPY_COST_BIT = 17;                      // Does this inst have extra copy costs?
+    static ctype EXTRA_STABILITY_BIT = 17;                // Is this inst less likely to be mutated?
 
     static ctype FIXED_BIT_COUNT = 18;                    // How many bits to be copied w/ instruction?
     static ctype FIXED_BIT_MASK = (1<<FIXED_BIT_COUNT)-1; // Mask for copying instructions
@@ -40,13 +40,13 @@ namespace emp {
 
   public:
     Instruction(unsigned int id=0, unsigned int arg=0,
-                bool extra_cycle_cost=false, bool extra_copy_cost=false)
+                bool extra_cycle_cost=false, bool extra_stability=false)
       : info(id + (arg<<ID_BITS))
     {
       emp_assert((id >> ID_BITS)   == 0 && "Too many bits in id!");
-      emp_assert((arg >> ARG_BITS) == 0 && "Too many bits is arg!");
+      emp_assert((arg >> ARG_BITS) == 0 && "Too many bits in arg!");
       if (extra_cycle_cost) SetCycleCost();
-      if (extra_copy_cost) SetCopyCost();
+      if (extra_stability) SetStability();
     }
     Instruction(const Instruction & in_inst) : info(in_inst.info & FIXED_BIT_MASK) { ; }
     ~Instruction() { ; }
@@ -68,7 +68,7 @@ namespace emp {
     int GetArgValue() const { return (int) ((info & ARG_MASK) >> ID_BITS); }
 
     bool HasCycleCost() const { return GetFlag(CYCLE_COST_BIT); }
-    bool HasCopyCost() const { return GetFlag(COPY_COST_BIT); }
+    bool HasStability() const { return GetFlag(EXTRA_STABILITY_BIT); }
 
     Instruction & SetID(int new_id) {
       emp_assert((new_id & ID_MASK) == new_id);
@@ -83,10 +83,10 @@ namespace emp {
     }
 
     Instruction & SetCycleCost() { SetFlag(CYCLE_COST_BIT); return *this; }
-    Instruction & SetCopyCost() { SetFlag(COPY_COST_BIT); return *this; }
+    Instruction & SetStability() { SetFlag(EXTRA_STABILITY_BIT); return *this; }
 
     Instruction & ClearCycleCost() { ClearFlag(CYCLE_COST_BIT); return *this; }
-    Instruction & ClearCopyCost() { ClearFlag(COPY_COST_BIT); return *this; }
+    Instruction & ClearStability() { ClearFlag(EXTRA_STABILITY_BIT); return *this; }
   };
 
 };
