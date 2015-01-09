@@ -152,10 +152,11 @@ namespace emp {
 
   // Tricks for dealing with whitespace.
   std::string left_justify(std::string & in_string) {
-    return string_pop(in_string, in_string.find_first_not_of(" \n\r\t"));
+    return string_pop_fixed(in_string, in_string.find_first_not_of(" \n\r\t"));
   }
 
   void right_justify(std::string & in_string) {
+    // @CAO *very* inefficient at the moment.
     while (is_whitespace(in_string.back())) in_string.pop_back();
   }
 
