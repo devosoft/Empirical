@@ -217,7 +217,7 @@ namespace emp {
       if (defs.size()) return defs;
 
       defs["Nop"]        = { "No-operation instruction; usable as modifier.",
-                             std::bind(&HARDWARE_TYPE::Inst_Nop, _1) };
+                             [](HARDWARE_TYPE & hw){return hw.template Inst_Nop(); } };
       
       // Add single-argument math operations.
       defs["Inc"]        = { "Increment top of ?Stack-B? by one",
@@ -269,11 +269,9 @@ namespace emp {
       defs["Jump"]       = { "Move ?Head-IP? to position of ?Head-Flow?",
                              std::mem_fn(&HARDWARE_TYPE::template Inst_MoveHeadToHead<0, 3>) };
       defs["Jump-If0"]   = { "Move ?Head-IP? to position of ?Head-Flow? only if ?Stack-D?-top == 0",
-                             std::bind(&HARDWARE_TYPE::template Inst_MoveHeadToHeadIf<0,3,3>,
-                                       _1, [](int a){ return a==0; }) };
+                             [](HARDWARE_TYPE & hw){return hw.template Inst_MoveHeadToHeadIf<0,3,3>([](int a){ return a==0; }); } };
       defs["Jump-IfN0"]  = { "Move ?Head-IP? to position of ?Head-Flow? only if ?Stack-D?-top != 0",
-                             std::bind(&HARDWARE_TYPE::template Inst_MoveHeadToHeadIf<0,3,3>,
-                                       _1, [](int a){ return a!=0; }) };
+                             [](HARDWARE_TYPE & hw){return hw.template Inst_MoveHeadToHeadIf<0,3,3>([](int a){ return a!= 0; }); } };
       defs["Bookmark"]   = { "Move ?Head-Flow? to position of ?Head-IP?",
                              std::mem_fn(&HARDWARE_TYPE::template Inst_MoveHeadToHead<3, 0>) };
       defs["Set-Memory"] = { "Move ?Head-Write? to position 0 in ?Memory-1?",
@@ -282,11 +280,9 @@ namespace emp {
       
       // Juggle stack contents
       defs["Val-Move"]   = { "Pop ?Stack-B? and push value onto ?Stack-C?",
-                             std::bind(&HARDWARE_TYPE::template Inst_1I_Math<1,1>,
-                                       _1, [](int a){return a;}) };
+                             [](HARDWARE_TYPE & hw){return hw.template Inst_1I_Math<1,1>([](int a){ return a; }); } };
       defs["Val-Copy"]   = { "Copy top of ?Stack-B? onto ?Stack-C?",
-                             std::bind(&HARDWARE_TYPE::template Inst_1I_Math<1,1,false>,
-                                       _1, [](int a){return a;}) };
+                             [](HARDWARE_TYPE & hw){return hw.template Inst_1I_Math<1,1,false>([](int a){ return a; }); } };
       defs["Val-Delete"] = { "Pop ?Stack-B? and discard value",
                              std::mem_fn(&HARDWARE_TYPE::Inst_ValDelete) };
       

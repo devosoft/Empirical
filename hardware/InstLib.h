@@ -27,9 +27,52 @@ namespace emp {
   // The InstDefinition struct provides the core definition for a possible instruction, linking
   // a name to its description and associate function call.
 
-  template <class HARDWARE_TYPE> struct InstDefinition {
+  template <class HARDWARE_TYPE> class InstDefinition {
+  private:
     std::string desc;
-    std::function<bool(HARDWARE_TYPE&)> call;    
+    
+    union {
+      std::function<bool(HARDWARE_TYPE&)>         call_base;
+      std::function<bool(HARDWARE_TYPE&, int)>    call_int;
+      std::function<bool(HARDWARE_TYPE&, double)> call_double;
+    };
+    
+    enum {CALL_NULL, CALL_BASE, CALL_INT, CALL_DOUBLE} call_type;
+
+  public:
+    InstDefinition() : call_type(CALL_NULL) { ; }
+    InstDefinition(const std::string & in_desc, std::function<bool(HARDWARE_TYPE&)> in_fun)
+      : desc(in_desc), call_base(in_fun),   call_type(CALL_BASE) { ; }
+    InstDefinition(const std::string & in_desc, std::function<bool(HARDWARE_TYPE&,int)> in_fun)
+      : desc(in_desc), call_int(in_fun),    call_type(CALL_INT) { ; }
+    InstDefinition(const std::string & in_desc, std::function<bool(HARDWARE_TYPE&,double)> in_fun)
+      : desc(in_desc), call_double(in_fun), call_type(CALL_DOUBLE) { ; }
+    InstDefinition(const InstDefinition & in_def) : desc(in_def.desc), call_type(in_def.call_type) {
+      switch (call_type) {
+      case CALL_BASE:   call_base   = in_def.call_base;   break;
+      case CALL_INT:    call_int    = in_def.call_int;    break;
+      case CALL_DOUBLE: call_double = in_def.call_double; break;
+      };
+    }
+    ~InstDefinition() { ; }
+
+    const InstDefinition & operator=(const InstDefinition & in_def) {
+      desc = in_def.desc;
+      call_type = in_def.call_type;
+      switch (call_type) {
+      case CALL_BASE:   call_base   = in_def.call_base;   break;
+      case CALL_INT:    call_int    = in_def.call_int;    break;
+      case CALL_DOUBLE: call_double = in_def.call_double; break;
+      };
+    }
+
+    const std::string & GetDesc() const { emp_assert(call_type != CALL_NULL); return desc; }
+    std::function<bool(HARDWARE_TYPE&)> GetCall(const std::string & in_arg="") const {
+      emp_assert(call_type != CALL_NULL);
+      if (call_type == CALL_BASE)        return call_base;
+      else if (call_type == CALL_INT)    return std::bind(call_int, _1, std::stoi(in_arg));
+      else if (call_type == CALL_DOUBLE) return std::bind(call_int, _1, std::stod(in_arg));
+    }
   };
 
 
@@ -184,6 +227,7 @@ namespace emp {
     // instruction should behave in non-standard ways.  They include:
     //   cycle_cost - The number of CPU cycles that must be spent to execute this instruction.
     //       (type=int; range=1+; default=1)
+    //   name - Have this instruction be referred to by a custom name.
     //   stability - The additional probability of this instruction "resisting" a mutation.
     //       (type=double; range=0.0-1.0; default = 0.0)
     //   weight - The relative probability of mutating to this instruction during a mutation.
@@ -258,7 +302,7 @@ namespace emp {
         }
       }
 
-      auto inst_defs = HARDWARE_TYPE::GetInstDefs();
+      const auto & inst_defs = HARDWARE_TYPE::GetInstDefs();
       if (inst_defs.find(name_base) == inst_defs.end()) {
         std::stringstream ss;
         ss << "Failed to find instruction '" << name_base << "'.  Ignoring.";
@@ -267,9 +311,9 @@ namespace emp {
         return false;
       }
     
-      auto cur_def = inst_defs[name_base];
+      const auto & cur_def = inst_defs.at(name_base);
 
-      Add(name_final, cur_def.desc, cur_def.call, mod_id, cycle_cost, stability, weight);
+      Add(name_final, cur_def.GetDesc(), cur_def.GetCall(), mod_id, cycle_cost, stability, weight);
 
       return true;
     }
