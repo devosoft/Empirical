@@ -43,10 +43,10 @@ namespace emp {
     InstDefinition() : call_type(CALL_NULL) { ; }
     InstDefinition(const std::string & in_desc, std::function<bool(HARDWARE_TYPE&)> in_fun)
       : desc(in_desc), call_base(in_fun),   call_type(CALL_BASE) { ; }
-    InstDefinition(const std::string & in_desc, std::function<bool(HARDWARE_TYPE&,int)> in_fun)
-      : desc(in_desc), call_int(in_fun),    call_type(CALL_INT) { ; }
-    // InstDefinition(const std::string & in_desc, std::function<bool(HARDWARE_TYPE&,double)> in_fun)
-    //   : desc(in_desc), call_double(in_fun), call_type(CALL_DOUBLE) { ; }
+    // InstDefinition(const std::string & in_desc, std::function<bool(HARDWARE_TYPE&,int)> in_fun)
+    //   : desc(in_desc), call_int(in_fun),    call_type(CALL_INT) { ; }
+    InstDefinition(const std::string & in_desc, std::function<bool(HARDWARE_TYPE&,double)> in_fun)
+      : desc(in_desc), call_double(in_fun), call_type(CALL_DOUBLE) { ; }
     InstDefinition(const InstDefinition & in_def) : desc(in_def.desc), call_type(in_def.call_type) {
       switch (call_type) {
       case CALL_BASE:   call_base   = in_def.call_base;   break;
