@@ -182,6 +182,15 @@ namespace emp {
     }
 
 
+    // --------  Other Generic operations ---------
+
+    template <int default_stack=STACK_IN1> bool Inst_PushConst(int value) {
+      const int stack_used = ChooseTarget(default_stack);
+      stacks[stack_used].Push(value);
+      return true;
+    }
+
+
     // --------  Instruction-specific Operations ---------
 
     // Test if a head (default: read-head) is at the start of its current memory space (save default=7)
@@ -285,6 +294,8 @@ namespace emp {
                              [](HARDWARE_TYPE & hw){return hw.template Inst_1I_Math<1,1,false>([](int a){ return a; }); } };
       defs["Val-Delete"] = { "Pop ?Stack-B? and discard value",
                              std::mem_fn(&HARDWARE_TYPE::Inst_ValDelete) };
+      defs["PushConst"]  = { "Push a specified value onto ?Stack-B?",
+                             [](HARDWARE_TYPE & hw, int value){ return hw.Inst_PushConst(value); } };
       
       // Check for "Biological" instructions
       defs["Build-Inst"] = { "Add new instruction to end of ?Memory-1? copied from ?Head-Read?",
@@ -306,7 +317,7 @@ namespace emp {
       static std::vector<std::string> default_insts;
       if (default_insts.size() > 0) return default_insts;
 
-      // Include as many nops as we need.  This we be called Nop:0, Nop:1, Nop:2, etc.
+      // Include as many nops as we need.  These will be called Nop-0, Nop-1, Nop-2, etc.
       for (int i = 0; i < CPU_SCALE; i++) {
         std::stringstream ss;
         ss << "Nop mod_id=" << i << " name=Nop-" << i;
@@ -324,10 +335,11 @@ namespace emp {
       default_insts.push_back("Add");
       default_insts.push_back("Sub");
       default_insts.push_back("Mult");
-
-      // @CAO For the next two, ideally if b==0, we should have the instruction return false...
       default_insts.push_back("Div");
       default_insts.push_back("Mod");
+
+      // Constants
+      default_insts.push_back("PushConst:0 name=Push-Zero");
 
       // Conditionals
       default_insts.push_back("Test-Equal");

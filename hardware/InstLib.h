@@ -45,8 +45,8 @@ namespace emp {
       : desc(in_desc), call_base(in_fun),   call_type(CALL_BASE) { ; }
     InstDefinition(const std::string & in_desc, std::function<bool(HARDWARE_TYPE&,int)> in_fun)
       : desc(in_desc), call_int(in_fun),    call_type(CALL_INT) { ; }
-    InstDefinition(const std::string & in_desc, std::function<bool(HARDWARE_TYPE&,double)> in_fun)
-      : desc(in_desc), call_double(in_fun), call_type(CALL_DOUBLE) { ; }
+    // InstDefinition(const std::string & in_desc, std::function<bool(HARDWARE_TYPE&,double)> in_fun)
+    //   : desc(in_desc), call_double(in_fun), call_type(CALL_DOUBLE) { ; }
     InstDefinition(const InstDefinition & in_def) : desc(in_def.desc), call_type(in_def.call_type) {
       switch (call_type) {
       case CALL_BASE:   call_base   = in_def.call_base;   break;
@@ -227,14 +227,23 @@ namespace emp {
     //   weight - The relative probability of errors shifting to this instruction.
     //       (type=double; range=0.0+; default = 1.0)
     // 
+    // For example...
+    //
+    //    PushValue:3 name=Push-3 stability=1.0 weight=0.01
+    //
+    // ...would create an instruction called "Push-3" that pushes the value 3 onto the top of
+    // a stack.  It would also be unlikely to mutate to (low weight), but impossible to mutate
+    // away from once it was in place (max stability).  It would cost 1 CPU cycle to execute
+    // and not modify other instructions since neither of those values were set.
+   
 
     bool LoadInst(std::string inst_info)
     {
       // Determine the instruction name.
       compress_whitespace(inst_info);
-      std::string full_name = string_pop_word(inst_info);  // Full name of inst     eg: SetValue:3
+      std::string full_name = string_pop_word(inst_info);  // Full name of inst     eg: PushValue:3
       std::string name_spec = full_name;                   // Specs at end of name  eg: 3
-      std::string name_base = string_pop(name_spec, ':');  // Base name of inst     eg: SetValue
+      std::string name_base = string_pop(name_spec, ':');  // Base name of inst     eg: PushValue
 
       // Set all of the arguments to their defaults.
       int cycle_cost = 1;                  // How many CPU cycles should this instruction cost?
