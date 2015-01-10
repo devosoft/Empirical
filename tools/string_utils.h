@@ -44,7 +44,7 @@ namespace emp {
       return ss.str();
     };
   }
-  std::string to_escaped_string(std::string value) {
+  std::string to_escaped_string(const std::string & value) {
     std::stringstream ss;
     for (char c : value) { ss << to_escaped_string(c); }
     return ss.str();
@@ -91,6 +91,10 @@ namespace emp {
 
   bool is_digit(char test_char) {
     return (test_char >= '0' && test_char <= '9');
+  }
+
+  bool is_alphanumeric(char test_char) {
+    return is_letter(test_char) || is_digit(test_char);
   }
 
   // Pop a segment from the beginning of a string as another string, shortening original.
