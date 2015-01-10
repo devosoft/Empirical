@@ -24,9 +24,9 @@ namespace emp {
     : public HardwareCPU_Base<Instruction> {
   protected:
     // Hardware components...
-    typedef std::vector<emp::Instruction> mem_type;
+    typedef std::vector<emp::Instruction> MEMORY_TYPE;
     typedef HardwareCPU<CPU_SCALE, STACK_SIZE> HARDWARE_TYPE;
-    mem_type memory[CPU_SCALE];
+    MEMORY_TYPE memory[CPU_SCALE];
     CPUStack<STACK_SIZE> stacks[CPU_SCALE];
     CPUHead heads[CPU_SCALE];
 
@@ -71,7 +71,7 @@ namespace emp {
     static int GetStackSize()  { return STACK_SIZE; }
     static int GetNumArgNops() { return CPU_SCALE; }
 
-    mem_type & GetMemory(int mem_id=0) { return memory[mem_id]; }
+    MEMORY_TYPE & GetMemory(int mem_id=0) { return memory[mem_id]; }
     
     void LoadMemory(const std::vector<emp::Instruction> & in_memory) { memory[0] = in_memory; }
 
@@ -308,9 +308,9 @@ namespace emp {
 
       // Include as many nops as we need.  This we be called Nop:0, Nop:1, Nop:2, etc.
       for (int i = 0; i < CPU_SCALE; i++) {
-        std::string inst_name = "Nop:";
-        inst_name += std::to_string(i);
-        default_insts.push_back(inst_name);
+        std::stringstream ss;
+        ss << "Nop mod_id=" << i << " name=Nop-" << i;
+        default_insts.push_back(ss.str());
       }
 
       // Load in single-argument math operations.

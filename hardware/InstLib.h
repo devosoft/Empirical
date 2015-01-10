@@ -67,7 +67,7 @@ namespace emp {
     }
 
     const std::string & GetDesc() const { emp_assert(call_type != CALL_NULL); return desc; }
-    std::function<bool(HARDWARE_TYPE&)> GetCall(const std::string & in_arg="") const {
+    std::function<bool(HARDWARE_TYPE&)> GetCall(const std::string & in_arg) const {
       emp_assert(call_type != CALL_NULL);
       if (call_type == CALL_BASE)        return call_base;
       else if (call_type == CALL_INT)    return std::bind(call_int, _1, std::stoi(in_arg));
@@ -209,28 +209,22 @@ namespace emp {
     // The following function will load a specified instruction into this instruction library.
     //
     // The incoming string should look like:
-    //  inst_name:spec_id:custom_name arg1=value arg2=value ...
+    //  inst_name:inst_specs arg1=value arg2=value ...
     //
-    // The instruction name has up to three components:
-    //   inst_name is the built-in name for the instruction (i.e., "Nop", "Inc", or "Divide")
-    //   spec_id is the component number this instruction should be associated with if it
-    //       is used as an argument (usually just nops are treated this way, such as Nop:3)
-    //   custom_name is anything the user would like it to be; it allows otherwise identical
-    //       instructions to be distinct and treated as such.
-    //
-    // For example, "Nop:3" is a No-operation instruction that is associated with component 3
-    // when used as an argument.  Instructions can have additional information placed after a
-    // second ':' that is ignored, but attached to the name.  So "Inc::MyFavoriteInst" will
-    // behave the same as "Inc".  Likewise "Nop:3:v2" will behave the same as "Nop:3".
+    // The instruction name (inst_name) is the built-in name for the instruction (i.e., "Nop",
+    // "Inc", or "Divide") and can be followed by a colon and any specifications needed for the
+    // instruction.
     //
     // Other arguments in an instruction definition specify additional details for how this
     // instruction should behave in non-standard ways.  They include:
     //   cycle_cost - The number of CPU cycles that must be spent to execute this instruction.
     //       (type=int; range=1+; default=1)
+    //   mod_id - Mark this instruction as a modifier for other instructions
+    //       (type=int; range=0+; default=non-modifier)
     //   name - Have this instruction be referred to by a custom name.
-    //   stability - The additional probability of this instruction "resisting" a mutation.
+    //   stability - The additional probability of this instruction "resisting" an error.
     //       (type=double; range=0.0-1.0; default = 0.0)
-    //   weight - The relative probability of mutating to this instruction during a mutation.
+    //   weight - The relative probability of errors shifting to this instruction.
     //       (type=double; range=0.0+; default = 1.0)
     // 
 
@@ -238,17 +232,16 @@ namespace emp {
     {
       // Determine the instruction name.
       compress_whitespace(inst_info);
-      std::string full_name = string_pop_word(inst_info);  // Full name of instruction  eg: Nop:3:v2
-      std::string name_info = full_name;                   // Extra info at end of name eg: 3:v2
-      std::string name_base = string_pop(name_info, ':');  // Base name of instruction  eg: Nop
-      std::string name_spec = string_get(name_info, ':');  // First info after ':'      eg: 3
-      std::string name_final = full_name;                  // Name inst should be stored under
-      int mod_id = name_spec.size() ? std::stoi(name_spec) : -1;
+      std::string full_name = string_pop_word(inst_info);  // Full name of inst     eg: SetValue:3
+      std::string name_spec = full_name;                   // Specs at end of name  eg: 3
+      std::string name_base = string_pop(name_spec, ':');  // Base name of inst     eg: SetValue
 
       // Set all of the arguments to their defaults.
-      int cycle_cost = 1;
-      double stability = 0.0;
-      double weight = 1.0;
+      int cycle_cost = 1;                  // How many CPU cycles should this instruction cost?
+      int mod_id = -1;                     // Should this instruction modify others?
+      std::string name_final = full_name;  // What name should this inst be stored under?
+      double stability = 0.0;              // How resistant is this instruction to errors?
+      double weight = 1.0;                 // How likely will an error change to this instruction?
 
       // Collect additional arguments.
       while(inst_info.size() > 0) {
@@ -264,6 +257,9 @@ namespace emp {
             NotifyError(ss.str());
             cycle_cost = 1;
           }
+        }
+        else if (arg_name == "mod_id") {
+          mod_id = std::stoi(arg_info);
         }
         else if (arg_name == "name") {
           if (arg_info.size() == 0) {
@@ -313,7 +309,8 @@ namespace emp {
     
       const auto & cur_def = inst_defs.at(name_base);
 
-      Add(name_final, cur_def.GetDesc(), cur_def.GetCall(), mod_id, cycle_cost, stability, weight);
+      Add(name_final, cur_def.GetDesc(), cur_def.GetCall(name_spec),
+          mod_id, cycle_cost, stability, weight);
 
       return true;
     }
