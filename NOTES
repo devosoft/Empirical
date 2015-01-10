@@ -27,21 +27,15 @@ A citation tool? Useful for pointing people to appropriate references to learn m
 
 -= Optimizations to Explore =-
 Explore if quick-looking up for sin, cos, tan should be at higher resolution (now it's 256 entires).
-Currently doing all-pairs comparisons to detect collisions.  Other options:
-* Sort by X first, stop second loop when x-distance > diameter
-* Put circles into sectors; only check same or neighboring sectors
-* Put circles into strips that we use the x-sorting technique on.
-* Keep list of nearby circles updating only occasionally (base on velocity?) (using one of above methods?)
-If insturction functions are stored in a fixed array (rather than vector), one fewer indirection would be need to look them up.
 
 -= Other TODOs =-
 Come up with a cleaner method to time functions?  Current macro is pretty ugly.
 
 -= Improvements =-
-InstLib: Can we lock in a set of instruction as compile time?  Or at least put them in a fixed array?
+InstLib: Can we lock in a set of instruction at compile time?  Or at least put them in a fixed array?
+Change HardwareCPU to something linke Hardware_SimpleCPU and Instruction to Instruction_SimpleCPU
 
 -= Useful Evolution Tools =-
-Virtual Hardware Object - processes a genome using virtual hardware.
 Organism Object (Contains Genome and templated on virtual hardware type)
 Genotype manager (for organisms with identical genomes)
 Simple-to-modify and fast phenotype object (similar to config)
@@ -50,9 +44,8 @@ Phylogeny/lineage manager with multiple modes of purging (and link to phenotypes
 Clade manager that will mark into phenotypes which clades they are associated with
 
 -= Specific ideas for Configurtion tools =-
-* Should be able to output its own config header for basic settings. (test more?)
 * Build links into setting variables that will trigger function calls
 * Warn more gracefully if a variable/const name is used more than once?
 * Build an HTML object to automatically allow adjustment of settings in a running ap.
-* Require a "set" command before each setting.  This allows for other types of commands.
 * Allow other commands to redirect the rest of the line to a specific object for processing.
+* Auto-generation of config file entries beyond just "set"
