@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "../../tools/assert.h"
 #include "../../tools/command_line.h"
@@ -63,8 +64,108 @@ int main(int argc, char* argv[])
   emp_assert(num_alphanum == 25);
   emp_assert(num_other == 5);
 
-  std::string base_string = "  This is   -MY-    string!!!!   ";
+  std::string base_string = "This is an okay string.\n  \tThis\nis   -MY-    very best string!!!!   ";
+
+  std::string first_line = emp::string_pop_line(base_string);
+
+  if (verbose) {
+    std::cout << "First Line: " << std::endl
+              << "\"" << first_line << "\"" << std::endl;
+  }
+
+  emp_assert(first_line == "This is an okay string.");
+  emp_assert(emp::string_get_word(first_line) == "This");
+
+  emp::string_pop_word(first_line);
+
+  if (verbose) {
+    std::cout << "Post-Pop first Line: " << std::endl
+              << "\"" << first_line << "\"" << std::endl;
+  }
+
+  emp_assert(first_line == "is an okay string.");
+
+  emp::remove_whitespace(first_line);
   
+  if (verbose) {
+    std::cout << "Post-remove whitespace: " << std::endl
+              << "\"" << first_line << "\"" << std::endl;
+  }
+
+  emp_assert(first_line == "isanokaystring.");
+
+  std::string popped_str = emp::string_pop(first_line, "ns");
+
+  if (verbose) {
+    std::cout << "Popped \"ns\": "
+              << "\"" << popped_str << "\"" << std::endl;
+  }
+
+  emp_assert(popped_str == "i");
+  emp_assert(first_line == "anokaystring.");
+
+
+
+  popped_str = emp::string_pop(first_line, "ns");
+
+  if (verbose) {
+    std::cout << "Popped \"ns\": "
+              << "\"" << popped_str << "\"" << std::endl;
+  }
+
+  emp_assert(popped_str == "a");
+  emp_assert(first_line == "okaystring.");
+
+  
+
+  popped_str = emp::string_pop(first_line, 'y');
+
+  if (verbose) {
+    std::cout << "Popped 'y': "
+              << "\"" << popped_str << "\"" << std::endl;
+  }
+
+  emp_assert(popped_str == "oka");
+  emp_assert(first_line == "string.");
+
+  
+
+  
+  if (verbose) {
+    std::cout << "Second Line: " << std::endl
+              << "\"" << base_string << "\"" << std::endl;
+  }
+  
+  emp::left_justify(base_string);
+  emp_assert(base_string == "This\nis   -MY-    very best string!!!!   ");
+
+  emp::right_justify(base_string);
+  emp_assert(base_string == "This\nis   -MY-    very best string!!!!");
+
+  if (verbose) {
+    std::cout << "Post-justification: " << std::endl
+              << "\"" << base_string << "\"" << std::endl;
+  }
+
+  emp::compress_whitespace(base_string);
+  emp_assert(base_string == "This is -MY- very best string!!!!");  
+
+  if (verbose) {
+    std::cout << "Post-compress: " << std::endl
+              << "\"" << base_string << "\"" << std::endl;
+  }
+
+  std::vector<std::string> slices;
+  emp::slice_string(base_string, slices, 's');
+
+  std::cout << "Slices:" << std::endl;
+  for (std::string & cur_slice : slices) {
+    std::cout << "- " << cur_slice << std::endl;
+  }
+
+  emp_assert(slices.size() == 5);
+  emp_assert(slices[1] == " i");
+  emp_assert(slices[3] == "t ");
 
   return 0;
 }

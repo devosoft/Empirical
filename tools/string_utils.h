@@ -120,6 +120,7 @@ namespace emp {
     return in_string.substr(start_pos, end_pos);
   }
 
+
   std::string string_pop(std::string & in_string, const char delim) {
     return string_pop_fixed(in_string, in_string.find(delim), 1);
   }
