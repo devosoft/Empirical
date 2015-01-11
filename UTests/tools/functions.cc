@@ -29,5 +29,28 @@ int main(int argc, char* argv[])
 
   if (verbose) std::cout << "emp::pow() passed test." << std::endl;
 
+  int a = 123, b = 456;
+  emp::swap(a,b);
+  emp_assert(a == 456 && b == 123);
+
+  std::string s1 = "string1", s2 = "string2";
+  emp::swap(s1, s2);
+  emp_assert(s1 == "string2" && s2 == "string1");
+
+  if (verbose) std::cout << "emp::swap() passed test." << std::endl;
+
+  emp_assert(emp::to_range(-10000, 10, 20) == 10);
+  emp_assert(emp::to_range(9, 10, 20) == 10);
+  emp_assert(emp::to_range(10, 10, 20) == 10);
+  emp_assert(emp::to_range(11, 10, 20) == 11);
+  emp_assert(emp::to_range(17, 10, 20) == 17);
+  emp_assert(emp::to_range(20, 10, 20) == 20);
+  emp_assert(emp::to_range(21, 10, 20) == 20);
+  emp_assert(emp::to_range(12345678, 10, 20) == 20);
+  emp_assert(emp::to_range<double>(12345678, 10, 20.1) == 20.1);
+  emp_assert(emp::to_range(12345678.0, 10.7, 20.1) == 20.1);
+
+  if (verbose) std::cout << "emp::to_range() passed test." << std::endl;
+
   return 0;
 }
