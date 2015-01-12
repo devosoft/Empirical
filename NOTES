@@ -38,7 +38,7 @@ Change HardwareCPU to something linke Hardware_SimpleCPU and Instruction to Inst
 -= Useful Evolution Tools =-
 Organism Object (Contains Genome and templated on virtual hardware type)
 Genotype manager (for organisms with identical genomes)
-Simple-to-modify and fast phenotype object (similar to config)
+Simple-to-modify and fast phenotype object (similar to config)  InfoSet
 Phenotype summary to include in the genotype
 Phylogeny/lineage manager with multiple modes of purging (and link to phenotypes?)
 Clade manager that will mark into phenotypes which clades they are associated with
