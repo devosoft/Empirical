@@ -4,34 +4,34 @@
 
 
 // This is the default macro for all phenotypic traits.
-#ifndef EMP_ADD_PTRAIT
-#define EMP_ADD_PTRAIT(VAR_NAME, TYPE, DEFAULT, DESC)
+#ifndef EMP_ADD_PHENO_TRAIT
+#define EMP_ADD_PHENO_TRAIT(VAR_NAME, TYPE, DEFAULT, DESC)
 #endif
 
 
-// Traits that are accrued, with the last value saved at each divide.
-#ifndef EMP_ADD_PTRAIT_BASIC
-#define EMP_ADD_PTRAIT_BASIC (VAR_NAME, TYPE, DEFAULT, DESC)    \
-  EMP_ADD_PTRAIT(cur_ ## VAR_NAME, TYPE, DEFAULT, DESC)         \
-  EMP_ADD_PTRAIT(last_ ## VAR_NAME, TYPE, DEFAULT, DESC)
+// Traits that are accrued, with the last value saved at each divide
+#ifndef EMP_ADD_PHENO_TRAIT_LOGGED
+#define EMP_ADD_PHENO_TRAIT_BASIC (VAR_NAME, TYPE, DEFAULT, DESC)    \
+  EMP_ADD_PHENO_TRAIT(cur_ ## VAR_NAME, TYPE, DEFAULT, DESC)         \
+  EMP_ADD_PHENO_TRAIT(last_ ## VAR_NAME, TYPE, DEFAULT, DESC)
+#endif
+
+// Traits that are updated throughout an organisms' lifetime
+#ifndef EMP_ADD_PHENO_TRAIT_BASIC
+#define EMP_ADD_PHENO_TRAIT_DIVIDE (VAR_NAME, TYPE, DEFAULT, DESC)    \
+  EMP_ADD_PHENO_TRAIT(VAR_NAME, TYPE, DEFAULT, DESC)
 #endif
 
 // Traits that are calculated on divide
-#ifndef EMP_ADD_PTRAIT_DIVIDE
-#define EMP_ADD_PTRAIT_DIVIDE (VAR_NAME, TYPE, DEFAULT, DESC)    \
-  EMP_ADD_PTRAIT(VAR_NAME, TYPE, DEFAULT, DESC)
+#ifndef EMP_ADD_PHENO_TRAIT_DIVIDE
+#define EMP_ADD_PHENO_TRAIT_BIRTH (VAR_NAME, TYPE, DEFAULT, DESC)    \
+  EMP_ADD_PHENO_TRAIT(VAR_NAME, TYPE, DEFAULT, DESC)
 #endif
 
-// Traits that are calculated on birth
-#ifndef EMP_ADD_PTRAIT_BIRTH
-#define EMP_ADD_PTRAIT_BIRTH (VAR_NAME, TYPE, DEFAULT, DESC)    \
-  EMP_ADD_PTRAIT(VAR_NAME, TYPE, DEFAULT, DESC)
-#endif
-
-// Traits that are calculated about an offspring
-#ifndef EMP_ADD_PTRAIT_OFFSPRING
-#define EMP_ADD_PTRAIT_OFFSPRING (VAR_NAME, TYPE, DEFAULT, DESC)    \
-  EMP_ADD_PTRAIT(VAR_NAME, TYPE, DEFAULT, DESC)
+// Traits that are calculated on birth and never changed
+#ifndef EMP_ADD_PHENO_TRAIT_LOCKED
+#define EMP_ADD_PHENO_TRAIT_OFFSPRING (VAR_NAME, TYPE, DEFAULT, DESC)    \
+  EMP_ADD_PHENO_TRAIT(VAR_NAME, TYPE, DEFAULT, DESC)
 #endif
 
 
@@ -44,9 +44,9 @@
 
 
 // Remove all macros for next cycle.
-#undef EMP_ADD_PTRAIT
-#undef EMP_ADD_PTRAIT_BASIC
-#undef EMP_ADD_PTRAIT_DIVIDE
-#undef EMP_ADD_PTRAIT_BIRTH
-#undef EMP_ADD_PTRAIT_OFFSPRING
+#undef EMP_ADD_PHENO_TRAIT
+#undef EMP_ADD_PHENO_TRAIT_TRACKED
+#undef EMP_ADD_PHENO_TRAIT_ASSESSED
+#undef EMP_ADD_PHENO_TRAIT_INHERETED
+#undef EMP_ADD_PHENO_TRAIT_OFFSPRING
 
