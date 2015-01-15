@@ -45,6 +45,16 @@ namespace emp {
 
       return best_found;
     }
+
+    RETURN_TYPE FindMax(ARG_TYPES... params, RETURN_TYPE default_val=0) {
+      return Run(params..., [](double i1, double i2){ return std::max(i1,i2); }, default_val);
+    }
+    RETURN_TYPE FindMin(ARG_TYPES... params, RETURN_TYPE default_val=0) {
+      return Run(params..., [](double i1, double i2){ return std::min(i1,i2); }, default_val);
+    }
+    RETURN_TYPE FindSum(ARG_TYPES... params, RETURN_TYPE default_val=0) {
+      return Run(params..., [](double i1, double i2){ return i1 + i2; }, default_val);
+    }
   };
 
 
