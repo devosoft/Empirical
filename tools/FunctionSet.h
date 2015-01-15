@@ -6,7 +6,51 @@
 
 namespace emp {
   
-  template <typename... ARG_TYPES> class FunctionSet {
+  template <typename RETURN_TYPE, typename... ARG_TYPES> class FunctionSet {
+  private:
+    std::vector<std::function<RETURN_TYPE(ARG_TYPES...)> > fun_set;
+    std::vector<RETURN_TYPE> return_vals;
+
+  public:
+    FunctionSet() { ; }
+    ~FunctionSet() { ; }
+
+    int GetSize() const { return (int) fun_set.size(); }
+
+    void Add(const std::function<RETURN_TYPE(ARG_TYPES...)> & in_fun) {
+      fun_set.push_back(in_fun);
+    }
+
+    const std::vector<RETURN_TYPE> & Run(ARG_TYPES... params) {
+      const int num_tests = (int) fun_set.size();
+      return_vals.resize(num_tests);
+      for (int i = 0; i < num_tests; i++) {
+        return_vals[i] = (fun_set[i])(params...);
+      }
+      return return_vals;
+    }
+
+    // If you want to provide a filter function, you can retrieve a specific return value.
+    // The filter should take in two return values and indicate which is "better".
+    RETURN_TYPE Run(ARG_TYPES... params, std::function<RETURN_TYPE(RETURN_TYPE, RETURN_TYPE)> comp_fun,
+                    RETURN_TYPE default_val=0) {
+      if (fun_set.size() == 0) return default_val;  // If we have no entries, return the default.
+
+      Run(params...);
+
+      RETURN_TYPE best_found = return_vals[0];
+      for (int i = 1; i < return_vals.size(); i++) {
+        best_found = comp_fun(best_found, return_vals[i]);
+      }
+
+      return best_found;
+    }
+  };
+
+
+  // A specialized version for void functions.
+
+  template <typename... ARG_TYPES> class FunctionSet<void, ARG_TYPES...> {
   private:
     std::vector<std::function<void(ARG_TYPES...)> > fun_set;
 
