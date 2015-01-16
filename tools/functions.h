@@ -4,6 +4,7 @@
 #include <ctime>
 #include <string>
 #include <sstream>
+#include <type_traits>
 
 #define EMP_FUNCTION_TIMER(TEST_FUN) {                                       \
     std::clock_t emp_start_time = std::clock();                              \
@@ -44,6 +45,23 @@ namespace emp {
   // Run both min and max on a value to put it into a desired range.
   template <typename TYPE> TYPE to_range(const TYPE & value, const TYPE & in_min, const TYPE & in_max) {
     return (value < in_min) ? in_min : ((value > in_max) ? in_max : value);
+  }
+
+
+  //  ----- Variadic Template Helpers! -----
+
+  // The following functions take in a test type and a list of types and return the index that
+  // matches the test type in question.
+  template <typename TEST_TYPE>
+  constexpr int get_type_index() {
+    // @CAO We don't have a type that matches, so ideally trigger a compile time error.
+    // Given we need this to be constexpr, even run-time errors aren't easy.
+    // emp_assert(false && "trying to find index of non-existant type");
+    return -1000000;
+  }
+  template <typename TEST_TYPE, typename FIRST_TYPE, typename... TYPE_LIST>
+  constexpr int get_type_index() {
+    return (std::is_same<TEST_TYPE, FIRST_TYPE>()) ? 0 : (get_type_index<TEST_TYPE,TYPE_LIST...>() + 1);
   }
 };
 
