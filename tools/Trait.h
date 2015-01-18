@@ -78,6 +78,7 @@ namespace emp {
     // A group of trait definitions must be created for each type handled.
     std::tuple< std::vector< TraitDef<TRAIT_TYPES> >... > trait_groups;
     int num_traits;
+    TraitSet<TRAIT_TYPES...> default_trait_set;
 
     static const int num_types = sizeof...(TRAIT_TYPES);
 
@@ -91,33 +92,40 @@ namespace emp {
 
     // Return the vector of traits for the given type.
     template <typename IN_TYPE>
+    const std::vector< TraitDef<IN_TYPE> > & GetTraitGroup() const {
+      return std::get< GetTraitID<IN_TYPE>() >(trait_groups);
+    }
+
+    // Return the vector of traits for the given type.
+    template <typename IN_TYPE>
     std::vector< TraitDef<IN_TYPE> > & GetTraitGroup() {
       return std::get< GetTraitID<IN_TYPE>() >(trait_groups);
     }
 
-    template <typename FIRST_TYPE, typename... OTHER_TYPES>
+    // Base Case...
+    template <typename CUR_TYPE>
     void SetDefaultsByType(TraitSet<TRAIT_TYPES...> & trait_set) const {
       // Get the relevant vectors for the current type.
-      std::vector< TraitDef<FIRST_TYPE> > & cur_group = GetTraitGroup<FIRST_TYPE>();
-      std::vector<FIRST_TYPE> & type_set = trait_set.template GetTypeSet<FIRST_TYPE>();
+      const std::vector< TraitDef<CUR_TYPE> > & cur_group = GetTraitGroup<CUR_TYPE>();
+      std::vector<CUR_TYPE> & type_set = trait_set.template GetTypeSet<CUR_TYPE>();
 
       // Set all of the values in type_set
       type_set.resize(0);
-      for (TraitDef<FIRST_TYPE> & cur_def : cur_group) {
-        type_set.push_back(cur_group.GetDefault());
+      for (const TraitDef<CUR_TYPE> & cur_def : cur_group) {
+        type_set.push_back(cur_def.GetDefault());
       }
-
-      // And recurse through the other types.
-      SetDefaultsByType<OTHER_TYPES...>(trait_set);
     }
 
-    // template <>
+    template <typename FIRST_TYPE, typename SECOND_TYPE, typename... OTHER_TYPES>
     void SetDefaultsByType(TraitSet<TRAIT_TYPES...> & trait_set) const {
-      return;
+      SetDefaultsByType<FIRST_TYPE>(trait_set);
+
+      // And recurse through the other types.
+      SetDefaultsByType<SECOND_TYPE, OTHER_TYPES...>(trait_set);
     }
 
   public:
-    TraitManager() : num_traits(0) { ; }
+    TraitManager() : num_traits(0), default_trait_set(*this) { ; }
     ~TraitManager() { ; }
 
     static int GetNumTypes() { return num_types; }
