@@ -34,21 +34,49 @@ namespace emp {
     { ; }
     ~TraitDef() { ; }
 
-    const std::string & GetName() { return name; }
-    const std::string & GetDesc() { return desc; }
-    const TRAIT_TYPE & GetDefault() { return default_val; }
+    const std::string & GetName() const { return name; }
+    const std::string & GetDesc() const { return desc; }
+    const TRAIT_TYPE & GetDefault() const { return default_val; }
+    int GetIndex() const { return index; }
   };
+
+  template <typename... TRAIT_TYPES> class TraitManager;
 
   template <typename... TRAIT_TYPES>
   class TraitSet {
+    friend class TraitManager<TRAIT_TYPES...>;
   private:
+    std::tuple< std::vector<TRAIT_TYPES>... > type_sets;
+
+    template <typename IN_TYPE>
+    void PushTrait(const IN_TYPE & in_trait) {
+      constexpr int type_id = emp::get_type_index<IN_TYPE, TRAIT_TYPES...>();
+      std::get<type_id>(type_sets).push_back(in_trait);
+    }
+
+    template <typename IN_TYPE>
+    std::vector<IN_TYPE> & GetTypeSet() {
+      constexpr int trait_id = emp::get_type_index<IN_TYPE, TRAIT_TYPES...>();
+      return std::get< trait_id >(type_sets);
+    }
+
   public:
+    TraitSet(const TraitManager<TRAIT_TYPES...> & tm); // Defined after TraitManager.
+
+    // Access a specific trait value by passing in its definition.
+    template <typename IN_TYPE>
+    IN_TYPE & Get(const TraitDef<IN_TYPE> & in_def) {
+      constexpr int type_id = emp::get_type_index<IN_TYPE, TRAIT_TYPES...>();
+      return std::get<type_id>(type_sets)[in_def.GetIndex()];
+    }
   };
 
   template <typename... TRAIT_TYPES>
   class TraitManager {
+    friend class TraitSet<TRAIT_TYPES...>;
   private:
-    std::tuple< std::vector< TraitDef<TRAIT_TYPES> >... > trait_sets;
+    // A group of trait definitions must be created for each type handled.
+    std::tuple< std::vector< TraitDef<TRAIT_TYPES> >... > trait_groups;
     int num_traits;
 
     static const int num_types = sizeof...(TRAIT_TYPES);
@@ -63,9 +91,31 @@ namespace emp {
 
     // Return the vector of traits for the given type.
     template <typename IN_TYPE>
-    std::vector< TraitDef<IN_TYPE> > & GetTraitSet() {
-      return std::get< GetTraitID<IN_TYPE>() >(trait_sets);
+    std::vector< TraitDef<IN_TYPE> > & GetTraitGroup() {
+      return std::get< GetTraitID<IN_TYPE>() >(trait_groups);
     }
+
+    template <typename FIRST_TYPE, typename... OTHER_TYPES>
+    void SetDefaultsByType(TraitSet<TRAIT_TYPES...> & trait_set) const {
+      // Get the relevant vectors for the current type.
+      std::vector< TraitDef<FIRST_TYPE> > & cur_group = GetTraitGroup<FIRST_TYPE>();
+      std::vector<FIRST_TYPE> & type_set = trait_set.template GetTypeSet<FIRST_TYPE>();
+
+      // Set all of the values in type_set
+      type_set.resize(0);
+      for (TraitDef<FIRST_TYPE> & cur_def : cur_group) {
+        type_set.push_back(cur_group.GetDefault());
+      }
+
+      // And recurse through the other types.
+      SetDefaultsByType<OTHER_TYPES...>(trait_set);
+    }
+
+    // template <>
+    void SetDefaultsByType(TraitSet<TRAIT_TYPES...> & trait_set) const {
+      return;
+    }
+
   public:
     TraitManager() : num_traits(0) { ; }
     ~TraitManager() { ; }
@@ -74,28 +124,38 @@ namespace emp {
 
     int GetNumTraits() const { return num_traits; }
     template <typename IN_TYPE> int GetNumTraitsOfType() const {
-      return (int) GetTraitSet<IN_TYPE>().size();
+      return (int) GetTraitGroup<IN_TYPE>().size();
     }
 
     // Lookup a trait by its type and index.
     template <typename IN_TYPE>
     const TraitDef<IN_TYPE> & GetTrait(int index) {
-      std::vector< TraitDef<IN_TYPE> > & cur_set = GetTraitSet<IN_TYPE>();      
-      emp_assert(index >= 0 && index < (int) cur_set.size());
-      return cur_set[index];
+      std::vector< TraitDef<IN_TYPE> > & cur_group = GetTraitGroup<IN_TYPE>();      
+      emp_assert(index >= 0 && index < (int) cur_group.size());
+      return cur_group[index];
     }
 
     template <typename IN_TYPE>
     const TraitDef<IN_TYPE> & AddTrait(const std::string & _name, const std::string & _desc,
                               const IN_TYPE & _default_val) {
-      std::vector< TraitDef<IN_TYPE> > & cur_set = GetTraitSet<IN_TYPE>();
-      const int trait_index = (int) cur_set.size();
-      cur_set.push_back( TraitDef<IN_TYPE>(_name, _desc, _default_val, trait_index) );
+      std::vector< TraitDef<IN_TYPE> > & cur_group = GetTraitGroup<IN_TYPE>();
+      const int trait_index = (int) cur_group.size();
+      cur_group.push_back( TraitDef<IN_TYPE>(_name, _desc, _default_val, trait_index) );
       num_traits++;
-      return cur_set[trait_index];
+      return cur_group[trait_index];
     }
 
+    void SetDefaults(TraitSet<TRAIT_TYPES...> & trait_set) const {
+      SetDefaultsByType<TRAIT_TYPES...>(trait_set);
+    }
   };
+
+
+  template <typename... TRAIT_TYPES>
+  TraitSet<TRAIT_TYPES...>::TraitSet(const TraitManager<TRAIT_TYPES...> & tm) {
+    tm.SetDefaults(*this);
+  }
+
 };
 
 #endif
