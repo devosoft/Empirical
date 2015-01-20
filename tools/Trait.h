@@ -19,6 +19,11 @@
 
 namespace emp {
 
+  template <typename TRAIT_TYPE> struct TraitKey {
+    int index;
+    TraitKey(int _index) : index(_index) { ; }
+  };
+
   template <typename TRAIT_TYPE>
   class TraitDef {
   private:
@@ -38,6 +43,7 @@ namespace emp {
     const std::string & GetDesc() const { return desc; }
     const TRAIT_TYPE & GetDefault() const { return default_val; }
     int GetIndex() const { return index; }
+    TraitKey<TRAIT_TYPE> GetKey() const { return index; }
   };
 
   template <typename... TRAIT_TYPES> class TraitManager;
@@ -48,12 +54,14 @@ namespace emp {
   private:
     std::tuple< std::vector<TRAIT_TYPES>... > type_sets;
 
+    // Add in a new trait (with value) to the appropriate type set.
     template <typename IN_TYPE>
     void PushTrait(const IN_TYPE & in_trait) {
       constexpr int type_id = emp::get_type_index<IN_TYPE, TRAIT_TYPES...>();
       std::get<type_id>(type_sets).push_back(in_trait);
     }
 
+    // Get set (vector of entries) associated with the given type.
     template <typename IN_TYPE>
     std::vector<IN_TYPE> & GetTypeSet() {
       constexpr int trait_id = emp::get_type_index<IN_TYPE, TRAIT_TYPES...>();
@@ -65,9 +73,15 @@ namespace emp {
 
     // Access a specific trait value by passing in its definition.
     template <typename IN_TYPE>
-    IN_TYPE & Get(const TraitDef<IN_TYPE> & in_def) {
+    const IN_TYPE & Get(const TraitKey<IN_TYPE> & in_key) const {
       constexpr int type_id = emp::get_type_index<IN_TYPE, TRAIT_TYPES...>();
-      return std::get<type_id>(type_sets)[in_def.GetIndex()];
+      return std::get<type_id>(type_sets)[in_key.GetIndex()];
+    }
+
+    template <typename IN_TYPE>
+    IN_TYPE & Get(const TraitKey<IN_TYPE> & in_key) {
+      constexpr int type_id = emp::get_type_index<IN_TYPE, TRAIT_TYPES...>();
+      return std::get<type_id>(type_sets)[in_key.GetIndex()];
     }
   };
 
@@ -90,7 +104,7 @@ namespace emp {
       return emp::get_type_index<BASE_TYPE, TRAIT_TYPES...>();
     }
 
-    // Return the vector of traits for the given type.
+    // Return the vector of traits for the given type (const version).
     template <typename IN_TYPE>
     const std::vector< TraitDef<IN_TYPE> > & GetTraitGroup() const {
       return std::get< GetTraitID<IN_TYPE>() >(trait_groups);
@@ -137,10 +151,17 @@ namespace emp {
 
     // Lookup a trait by its type and index.
     template <typename IN_TYPE>
-    const TraitDef<IN_TYPE> & GetTrait(int index) {
+    const TraitDef<IN_TYPE> & GetTraitDef(int index) {
       std::vector< TraitDef<IN_TYPE> > & cur_group = GetTraitGroup<IN_TYPE>();      
       emp_assert(index >= 0 && index < (int) cur_group.size());
       return cur_group[index];
+    }
+
+    // Lookup a trait by its type and index.
+    template <typename IN_TYPE>
+    const TraitDef<IN_TYPE> & GetTraitDef(TraitKey<IN_TYPE> key) {
+      std::vector< TraitDef<IN_TYPE> > & cur_group = GetTraitGroup<IN_TYPE>();      
+      return cur_group[key.GetIndex()];
     }
 
     template <typename IN_TYPE>
