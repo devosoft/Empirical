@@ -1,23 +1,21 @@
 -= Next Steps =-
-Fix how sectors are handled in surfaces to be more dynamic based on sizes of organisms.
-- Consider sorting organisms by size and processing smallest first?
-  Then any particular comparison is only up against as small or smaller.
+(work on applications of library and see what needs to be fixed/added)
+Write some documentation outside of the code!
 
 -= Questions =-
 Best way to convert to a c++ literal independent of type?
+How to dynamically change an include file?
+How does boost::static_assert work?
 
-
--= Near Future =-
-Build a test system
-Move scheduler over to Empirical
-Build (find?) a logging system?
-Consider new serialization options
+-= General tools to build =-
+A more automated test system
+Serialization helpers
 - Option 1: Use only emp-specific types in classes that can be easily saved?
             (Makes coding harder)
 - Option 2: #define overrides for types?  (tricky to get right, especially for STL types)
 - Option 3: Require manual save a load functions?  (Requires all programmers to always keep updated,
             but might be possible with good automated test system.)
-Explore Box2D to handle physics instead of my current scheme.
+Interface around Box2D to handle physics instead of my current scheme?
 A data management system that can track data by:
   - Temporal series (values over time)
   - Batch (where a batch reset occurs periodicall)
@@ -25,23 +23,23 @@ A data management system that can track data by:
   All output files should have headers that allow them to be read back in more easily.
 A citation tool? Useful for pointing people to appropriate references to learn more about a component.
 
--= Optimizations to Explore =-
-Explore if quick-looking up for sin, cos, tan should be at higher resolution (now it's 256 entires).
-
--= Other TODOs =-
-Come up with a cleaner method to time functions?  Current macro is pretty ugly.
-
--= Improvements =-
-InstLib: Can we lock in a set of instruction at compile time?  Or at least put them in a fixed array?
-Change HardwareCPU to something linke Hardware_SimpleCPU and Instruction to Instruction_SimpleCPU
-
--= Useful Evolution Tools =-
+-= Evolution-specific Tools =-
 Organism Object (Contains Genome and templated on virtual hardware type)
 Genotype manager (for organisms with identical genomes)
-Simple-to-modify and fast phenotype object (similar to config)  InfoSet
 Phenotype summary to include in the genotype
 Phylogeny/lineage manager with multiple modes of purging (and link to phenotypes?)
 Clade manager that will mark into phenotypes which clades they are associated with
+
+-= Optimizations to Explore =-
+Explore if quick-looking up for sin, cos, tan should be at higher resolution (now it's 256 entires).
+Fix how sectors are handled in surfaces to be more dynamic based on sizes of organisms.
+- Consider sorting organisms by size and processing smallest first?
+  Then any particular comparison is only up against as small or smaller.
+
+-= Improvements (that rquire some thought...) =-
+InstLib: Can we lock in a set of instruction at compile time?  Or at least put them in a fixed array?
+Change HardwareCPU to something linke Hardware_SimpleCPU and Instruction to Instruction_SimpleCPU
+Come up with a cleaner method to time functions?  Current macro is pretty ugly.
 
 -= Specific ideas for Configurtion tools =-
 * Build links into setting variables that will trigger function calls
@@ -49,3 +47,10 @@ Clade manager that will mark into phenotypes which clades they are associated wi
 * Build an HTML object to automatically allow adjustment of settings in a running ap.
 * Allow other commands to redirect the rest of the line to a specific object for processing.
 * Auto-generation of config file entries beyond just "set"
+
+-= Documentation =-
+* Getting started -- an overview of the code layout and what you'll find.
+* Simple, useful tools.
+* How to setup and use the config tools.
+* Basic idea of Kinetic Wrappers and how to use them.
+
