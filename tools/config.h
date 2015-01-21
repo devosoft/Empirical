@@ -46,6 +46,8 @@
 #include "string_utils.h"
 #include "ConfigManager.h"
 
+using namespace std::placeholders;
+
 namespace emp {
 
   // Master configuration class.
@@ -504,7 +506,7 @@ namespace emp {
     const TYPE & NAME(const TYPE & _in) { m_ ## NAME = _in; return m_ ## NAME; } \
     bool NAME ## _is_const() const { return false; }
 #define EMP_CONFIG_CONST(NAME, TYPE, VALUE, DESC)                       \
-    inline TYPE NAME() const { return VALUE; }                          \
+    constexpr static TYPE NAME() { return VALUE; }                      \
     TYPE NAME(const TYPE & _in) {                                       \
       std::stringstream ss;                                             \
       ss << "Trying to set const '" << #NAME << "'. Ignoring." << std::endl; \
