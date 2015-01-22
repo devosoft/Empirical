@@ -52,5 +52,16 @@ int main(int argc, char* argv[])
 
   if (verbose) std::cout << "emp::to_range() passed test." << std::endl;
 
+  
+  // TEST FOR VARIADIC HELPER FUNCTIONS:
+
+  emp_assert((emp::get_type_index<char, char, bool, int, double>()) == 0);
+  emp_assert((emp::get_type_index<int, char, bool, int, double>()) == 2);
+  emp_assert((emp::get_type_index<double, char, bool, int, double>()) == 3);
+  emp_assert((emp::get_type_index<std::string, char, bool, int, double>()) < 0);
+
+  if (verbose) std::cout << "emp::get_type_index() passed test." << std::endl;
+
+
   return 0;
 }
