@@ -55,14 +55,33 @@ namespace emp {
   template <typename TEST_TYPE>
   constexpr int get_type_index() {
     // @CAO We don't have a type that matches, so ideally trigger a compile time error.
-    // Given we need this to be constexpr, even run-time errors aren't easy.
-    // emp_assert(false && "trying to find index of non-existant type");
+    // Given we need this to be constexpr, we can't easily put even a static assert here until C++14
+    // static_assert(false && "trying to find index of non-existant type");
     return -1000000;
   }
   template <typename TEST_TYPE, typename FIRST_TYPE, typename... TYPE_LIST>
   constexpr int get_type_index() {
     return (std::is_same<TEST_TYPE, FIRST_TYPE>()) ? 0 : (get_type_index<TEST_TYPE,TYPE_LIST...>() + 1);
   }
+
+
+  // These functions can be used to test if a type-set has all unique types or not.
+
+  // Base cases...
+  template <typename TYPE1> constexpr bool has_unique_first_type() { return true; }
+  template <typename TYPE1> constexpr bool has_unique_types() { return true; }
+
+  template <typename TYPE1, typename TYPE2, typename... TYPE_LIST>
+  constexpr bool has_unique_first_type() {
+    return (!std::is_same<TYPE1, TYPE2>()) && emp::has_unique_first_type<TYPE1, TYPE_LIST...>();
+  }
+
+  template <typename TYPE1, typename TYPE2, typename... TYPE_LIST>
+  constexpr bool has_unique_types() {
+    return has_unique_first_type<TYPE1, TYPE2, TYPE_LIST...>()  // Check first against all others...
+      && has_unique_types<TYPE2, TYPE_LIST...>();               // Recurse through other types.
+  }
+
 };
 
 #endif
