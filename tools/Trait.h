@@ -58,14 +58,16 @@ namespace emp {
     template <typename IN_TYPE>
     void PushTrait(const IN_TYPE & in_trait) {
       constexpr int type_id = emp::get_type_index<IN_TYPE, TRAIT_TYPES...>();
+      static_assert(type_id >= 0, "Unhandled type provided to TraitSet::PushTrait()");
       std::get<type_id>(type_sets).push_back(in_trait);
     }
 
     // Get set (vector of entries) associated with the given type.
     template <typename IN_TYPE>
     std::vector<IN_TYPE> & GetTypeSet() {
-      constexpr int trait_id = emp::get_type_index<IN_TYPE, TRAIT_TYPES...>();
-      return std::get< trait_id >(type_sets);
+      constexpr int type_id = emp::get_type_index<IN_TYPE, TRAIT_TYPES...>();
+      static_assert(type_id >= 0, "Unknown type provided to TraitSet::GetTypeSet()");
+      return std::get< type_id >(type_sets);
     }
 
   public:
@@ -75,12 +77,14 @@ namespace emp {
     template <typename IN_TYPE>
     const IN_TYPE & Get(const TraitKey<IN_TYPE> & in_key) const {
       constexpr int type_id = emp::get_type_index<IN_TYPE, TRAIT_TYPES...>();
+      static_assert(type_id >= 0, "Unknown type provided to TraitSet::Get() const");
       return std::get<type_id>(type_sets)[in_key.GetIndex()];
     }
 
     template <typename IN_TYPE>
     IN_TYPE & Get(const TraitKey<IN_TYPE> & in_key) {
       constexpr int type_id = emp::get_type_index<IN_TYPE, TRAIT_TYPES...>();
+      static_assert(type_id >= 0, "Unknown type provided to TraitSet::Get()");
       return std::get<type_id>(type_sets)[in_key.GetIndex()];
     }
   };
@@ -107,12 +111,16 @@ namespace emp {
     // Return the vector of traits for the given type (const version).
     template <typename IN_TYPE>
     const std::vector< TraitDef<IN_TYPE> > & GetTraitGroup() const {
+      static_assert(GetTraitID<IN_TYPE>() >= 0,
+                    "Unknown type provided to TraitManager::GetTraitGroup() const");
       return std::get< GetTraitID<IN_TYPE>() >(trait_groups);
     }
 
     // Return the vector of traits for the given type.
     template <typename IN_TYPE>
     std::vector< TraitDef<IN_TYPE> > & GetTraitGroup() {
+      static_assert(GetTraitID<IN_TYPE>() >= 0,
+                    "Unknown type provided to TraitManager::GetTraitGroup()");
       return std::get< GetTraitID<IN_TYPE>() >(trait_groups);
     }
 
