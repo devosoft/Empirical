@@ -30,12 +30,13 @@ namespace emp {
 }
 
 // Generate a pop-up alert in a web browser if an assert it tripped.
-#define emp_assert(EXPR)                                                \
-  do { if ( !(EXPR) && emp::assert_trip_count++ < 3 ) {                 \
-      emp::Alert(std::string("Assert Error (In ") + std::string(__FILE__) \
-                 + std::string(" line ") + std::to_string(__LINE__)     \
-                 + std::string("): ") + std::string(#EXPR)),            \
-        abort(); }                                                      \
+#define emp_assert(EXPR)                                                    \
+  do { if ( !(EXPR) && emp::assert_trip_count++ < 3 ) {                     \
+    std::string msg = std::string("Assert Error (In ") + std::string(__FILE__) \
+      + std::string(" line ") + std::to_string(__LINE__)               \
+      + std::string("): ") + std::string(#EXPR);                             \
+    EM_ASM_ARGS({ msg = Pointer_stringify($0); alert(msg); }, msg.c_str()); \
+    abort(); }                                                          \
   } while (0)
 
 

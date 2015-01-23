@@ -15,6 +15,7 @@
 #include <type_traits>
 #include <vector>
 
+#include "assert.h"
 #include "functions.h"
 
 namespace emp {
