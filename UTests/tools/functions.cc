@@ -62,6 +62,12 @@ int main(int argc, char* argv[])
 
   if (verbose) std::cout << "emp::get_type_index() passed test." << std::endl;
 
+  emp_assert((emp::has_unique_first_type<int, bool, std::string, bool, char>()) == true);
+  emp_assert((emp::has_unique_first_type<bool, int, std::string, bool, char>()) == false);
+  emp_assert((emp::has_unique_types<bool, int, std::string, std::vector<bool>, char>()) == true);
+  emp_assert((emp::has_unique_types<int, bool, std::string, bool, char>()) == false);
+
+  if (verbose) std::cout << "emp::has_unique*() passed test." << std::endl;
 
   return 0;
 }
