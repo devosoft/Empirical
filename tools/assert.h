@@ -55,4 +55,4 @@ namespace emp {
 
 
 
-#endif // EMP_DEBUG_H
+#endif // Include guard

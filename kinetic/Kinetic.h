@@ -34,6 +34,7 @@ extern "C" {
 
 
 namespace emp {
+namespace Kinetic {
 
   // Pre-declarations of some classes...
   class Layer;
@@ -991,6 +992,7 @@ namespace emp {
     }
   }
 
-};
+}; // namespace Kinetic
+}; // namespace emp
 
 #endif
