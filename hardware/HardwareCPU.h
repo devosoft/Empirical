@@ -51,6 +51,7 @@ namespace emp {
       // Initialize all of the heads to the beginning of the code.
       for (int i=0; i < CPU_SCALE; i++) heads[i].Set(memory[0], 0);
     }
+    HardwareCPU(const HardwareCPU & prototype) : HardwareCPU(prototype.inst_lib) { ; }
     ~HardwareCPU() { ; }
 
     // Do a full factory-reset on the virtual hardware.
@@ -226,20 +227,20 @@ namespace emp {
       if (defs.size()) return defs;
 
       defs["Nop"]        = { "No-operation instruction; usable as modifier.",
-                             [](HARDWARE_TYPE & hw){return hw.template Inst_Nop(); } };
+                             [](HARDWARE_TYPE & hw){ return hw.Inst_Nop(); } };
       
       // Add single-argument math operations.
       defs["Inc"]        = { "Increment top of ?Stack-B? by one",
-                             HARDWARE_TYPE::BuildMathInst([](int a){return a+1;}) };
+                             HARDWARE_TYPE::BuildMathInst([](int a){ return a+1;}) };
       
       defs["Dec"]        = { "Decrement top of ?Stack-B? by one",
-                             HARDWARE_TYPE::BuildMathInst([](int a){return a-1;}) };
+                             HARDWARE_TYPE::BuildMathInst([](int a){ return a-1;}) };
       
       defs["Shift-L"]    = { "Shift bits of top of ?Stack-B? left by one",
-                             HARDWARE_TYPE::BuildMathInst([](int a){return a<<1;}) };
+                             HARDWARE_TYPE::BuildMathInst([](int a){ return a<<1;}) };
       
       defs["Shift-R"]    = { "Shift bits of top of ?Stack-B? right by one",
-                             HARDWARE_TYPE::BuildMathInst([](int a){return a>>1;}) };
+                             HARDWARE_TYPE::BuildMathInst([](int a){ return a>>1;}) };
       
       // Add double-argument math operations.
       defs["Nand"]       = { "Compute: ?Stack-B?-top nand ?Stack-C?-top and push result to ?Stack-B?",
