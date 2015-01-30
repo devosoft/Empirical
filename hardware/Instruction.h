@@ -70,9 +70,9 @@ namespace emp {
     bool HasCycleCost() const { return GetFlag(CYCLE_COST_BIT); }
     bool HasStability() const { return GetFlag(EXTRA_STABILITY_BIT); }
 
-    Instruction & SetID(int new_id) {
+    Instruction & SetID(unsigned int new_id) {
       emp_assert((new_id & ID_MASK) == new_id);
-      info = (unsigned int) new_id;
+      info = new_id;
       return *this;
     }
     Instruction & SetArgValue(int arg_value) {
