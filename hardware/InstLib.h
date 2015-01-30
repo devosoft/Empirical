@@ -197,8 +197,8 @@ namespace emp {
     
     //Convert an instruction vector into a series of characters.
     std::string AsString(const std::vector<INST_TYPE> & inst_vector) const {
-      const int vector_size= inst_vector.GetSize();
-      std::string out_string(vector_size);
+      const int vector_size = inst_vector.GetSize();
+      std::string out_string(vector_size, ' ');
       for (int i = 0; i < vector_size; i++) {
         out_string[i] = ToChar(inst_vector[i]);
       }
