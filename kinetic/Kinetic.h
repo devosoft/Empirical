@@ -42,18 +42,18 @@ namespace Kinetic {
 
 
   // All emscripten-wrapped Kinetic objects should be derived from this base class.
-  class Object {
+  class Node {
   protected:
     int obj_id;
-    Object * layer;
+    Node * layer;
     std::string name;
 
-    Object(const std::string & _name="") : obj_id(-1), layer(NULL), name(_name) {;}  // Protected so that you can't make a direct Object.
+    Node(const std::string & _name="") : obj_id(-1), layer(NULL), name(_name) {;}  // Protected so that you can't make a direct Node.
   private:
-    Object(const Object &); // Never allowed.
-    Object & operator=(Object & _in);  // Never allowed.
+    Node(const Node &); // Never allowed.
+    Node & operator=(Node & _in);  // Never allowed.
   public:
-    ~Object() {
+    ~Node() {
       EM_ASM_ARGS({
           if ($0 >= 0 && emp_info.objs[$0] != 0) emp_info.objs[$0].destroy();
         }, obj_id);
@@ -61,7 +61,7 @@ namespace Kinetic {
     int GetID() const { return obj_id; }
     const std::string & GetName() const { return name; }
 
-    virtual std::string GetType() const { return "empObject"; }
+    virtual std::string GetType() const { return "empNode"; }
 
     // Retrieve info from JS Kinetic::Node objects
     int GetX() const { return EM_ASM_INT({return emp_info.objs[$0].x();}, obj_id); }
@@ -90,48 +90,48 @@ namespace Kinetic {
     int GetDraggable() const { return EM_ASM_INT({return emp_info.objs[$0].draggable();}, obj_id); }
     int GetZIndex() const { return EM_ASM_INT({return emp_info.objs[$0].getZIndex();}, obj_id); }
 
-    Object & SetName(const std::string & _name) { name = _name; return *this; }
-    Object & SetX(int _in) { EM_ASM_ARGS({emp_info.objs[$0].x($1);}, obj_id, _in); return *this; }
-    Object & SetY(int _in) { EM_ASM_ARGS({emp_info.objs[$0].y($1);}, obj_id, _in); return *this; }
-    Object & SetWidth(int _in) { EM_ASM_ARGS({emp_info.objs[$0].width($1);}, obj_id, _in); return *this; }
-    Object & SetHeight(int _in) { EM_ASM_ARGS({emp_info.objs[$0].height($1);}, obj_id, _in); return *this; }
-    Object & SetVisible(int _in) { EM_ASM_ARGS({emp_info.objs[$0].visible($1);}, obj_id, _in); return *this; }
-    Object & SetOpacity(double _in) { EM_ASM_ARGS({emp_info.objs[$0].opacity($1);}, obj_id, _in); return *this; }
-    Object & SetListening(int _in) { EM_ASM_ARGS({emp_info.objs[$0].listening($1);}, obj_id, _in); return *this; }
-    Object & SetScaleX(double _in) { EM_ASM_ARGS({emp_info.objs[$0].scaleX($1);}, obj_id, _in); return *this; }
-    Object & SetScaleY(double _in) { EM_ASM_ARGS({emp_info.objs[$0].scaleY($1);}, obj_id, _in); return *this; }    
-    Object & SetOffsetX(int _in) { EM_ASM_ARGS({emp_info.objs[$0].offsetX($1);}, obj_id, _in); return *this; }
-    Object & SetOffsetY(int _in) { EM_ASM_ARGS({emp_info.objs[$0].offsetY($1);}, obj_id, _in); return *this; }
-    Object & SetRotation(int _in) { EM_ASM_ARGS({emp_info.objs[$0].rotation($1);}, obj_id, _in); return *this; }
-    Object & SetDraggable(int _in) { EM_ASM_ARGS({emp_info.objs[$0].draggable($1);}, obj_id, _in); return *this; }
-    Object & SetZIndex(int _in) { EM_ASM_ARGS({emp_info.objs[$0].setZIndex($1);}, obj_id, _in); return *this; }
-    Object & SetZBottom() { EM_ASM_ARGS({emp_info.objs[$0].moveToBottom();}, obj_id); return *this; }
-    Object & SetZTop() { EM_ASM_ARGS({emp_info.objs[$0].moveToTop();}, obj_id); return *this; }
+    Node & SetName(const std::string & _name) { name = _name; return *this; }
+    Node & SetX(int _in) { EM_ASM_ARGS({emp_info.objs[$0].x($1);}, obj_id, _in); return *this; }
+    Node & SetY(int _in) { EM_ASM_ARGS({emp_info.objs[$0].y($1);}, obj_id, _in); return *this; }
+    Node & SetWidth(int _in) { EM_ASM_ARGS({emp_info.objs[$0].width($1);}, obj_id, _in); return *this; }
+    Node & SetHeight(int _in) { EM_ASM_ARGS({emp_info.objs[$0].height($1);}, obj_id, _in); return *this; }
+    Node & SetVisible(int _in) { EM_ASM_ARGS({emp_info.objs[$0].visible($1);}, obj_id, _in); return *this; }
+    Node & SetOpacity(double _in) { EM_ASM_ARGS({emp_info.objs[$0].opacity($1);}, obj_id, _in); return *this; }
+    Node & SetListening(int _in) { EM_ASM_ARGS({emp_info.objs[$0].listening($1);}, obj_id, _in); return *this; }
+    Node & SetScaleX(double _in) { EM_ASM_ARGS({emp_info.objs[$0].scaleX($1);}, obj_id, _in); return *this; }
+    Node & SetScaleY(double _in) { EM_ASM_ARGS({emp_info.objs[$0].scaleY($1);}, obj_id, _in); return *this; }    
+    Node & SetOffsetX(int _in) { EM_ASM_ARGS({emp_info.objs[$0].offsetX($1);}, obj_id, _in); return *this; }
+    Node & SetOffsetY(int _in) { EM_ASM_ARGS({emp_info.objs[$0].offsetY($1);}, obj_id, _in); return *this; }
+    Node & SetRotation(int _in) { EM_ASM_ARGS({emp_info.objs[$0].rotation($1);}, obj_id, _in); return *this; }
+    Node & SetDraggable(int _in) { EM_ASM_ARGS({emp_info.objs[$0].draggable($1);}, obj_id, _in); return *this; }
+    Node & SetZIndex(int _in) { EM_ASM_ARGS({emp_info.objs[$0].setZIndex($1);}, obj_id, _in); return *this; }
+    Node & SetZBottom() { EM_ASM_ARGS({emp_info.objs[$0].moveToBottom();}, obj_id); return *this; }
+    Node & SetZTop() { EM_ASM_ARGS({emp_info.objs[$0].moveToTop();}, obj_id); return *this; }
 
-    inline Object & SetXY(int x, int y) { SetX(x); SetY(y); return *this; }
-    inline Object & SetXY(const Point<int> & point) { SetX(point.GetX()); SetY(point.GetY()); return *this; }
-    inline Object & SetSize(int w, int h) { SetWidth(w); SetHeight(h); return *this; }
-    inline Object & SetLayout(int x, int y, int w, int h) { SetX(x); SetY(y); SetWidth(w); SetHeight(h); return *this; }
-    inline Object & SetLayout(const Point<int> & point, int w, int h) { SetXY(point); SetWidth(w); SetHeight(h); return *this; }
-    inline Object & SetScale(double _x, double _y) { SetScaleX(_x); SetScaleY(_y); return *this; }
-    inline Object & SetScale(double _in) { SetScaleX(_in); SetScaleY(_in); return *this; }
-    inline Object & SetOffset(int _x, int _y) { SetOffsetX(_x); SetOffsetY(_y); return *this; }
-    inline Object & SetOffset(const Point<int> & point) { SetOffsetX(point.GetX()); SetOffsetY(point.GetY()); return *this; }
+    inline Node & SetXY(int x, int y) { SetX(x); SetY(y); return *this; }
+    inline Node & SetXY(const Point<int> & point) { SetX(point.GetX()); SetY(point.GetY()); return *this; }
+    inline Node & SetSize(int w, int h) { SetWidth(w); SetHeight(h); return *this; }
+    inline Node & SetLayout(int x, int y, int w, int h) { SetX(x); SetY(y); SetWidth(w); SetHeight(h); return *this; }
+    inline Node & SetLayout(const Point<int> & point, int w, int h) { SetXY(point); SetWidth(w); SetHeight(h); return *this; }
+    inline Node & SetScale(double _x, double _y) { SetScaleX(_x); SetScaleY(_y); return *this; }
+    inline Node & SetScale(double _in) { SetScaleX(_in); SetScaleY(_in); return *this; }
+    inline Node & SetOffset(int _x, int _y) { SetOffsetX(_x); SetOffsetY(_y); return *this; }
+    inline Node & SetOffset(const Point<int> & point) { SetOffsetX(point.GetX()); SetOffsetY(point.GetY()); return *this; }
 
-    inline Object & SetUL(const Point<int> & point) { return SetXY(point); }
-    inline Object & SetUM(const Point<int> & point) { return SetXY(point.GetX()-GetWidth()/2, point.GetY()); }
-    inline Object & SetUR(const Point<int> & point) { return SetXY(point.GetX()-GetWidth(),   point.GetY()); }
-    inline Object & SetML(const Point<int> & point) { return SetXY(point.GetX(),              point.GetY()-GetHeight()/2); }
-    inline Object & SetMM(const Point<int> & point) { return SetXY(point.GetX()-GetWidth()/2, point.GetY()-GetHeight()/2); }
-    inline Object & SetMR(const Point<int> & point) { return SetXY(point.GetX()-GetWidth(),   point.GetY()-GetHeight()/2); }
-    inline Object & SetLL(const Point<int> & point) { return SetXY(point.GetX(),              point.GetY()-GetHeight()); }
-    inline Object & SetLM(const Point<int> & point) { return SetXY(point.GetX()-GetWidth()/2, point.GetY()-GetHeight()); }
-    inline Object & SetLR(const Point<int> & point) { return SetXY(point.GetX()-GetWidth(),   point.GetY()-GetHeight()); }
+    inline Node & SetUL(const Point<int> & point) { return SetXY(point); }
+    inline Node & SetUM(const Point<int> & point) { return SetXY(point.GetX()-GetWidth()/2, point.GetY()); }
+    inline Node & SetUR(const Point<int> & point) { return SetXY(point.GetX()-GetWidth(),   point.GetY()); }
+    inline Node & SetML(const Point<int> & point) { return SetXY(point.GetX(),              point.GetY()-GetHeight()/2); }
+    inline Node & SetMM(const Point<int> & point) { return SetXY(point.GetX()-GetWidth()/2, point.GetY()-GetHeight()/2); }
+    inline Node & SetMR(const Point<int> & point) { return SetXY(point.GetX()-GetWidth(),   point.GetY()-GetHeight()/2); }
+    inline Node & SetLL(const Point<int> & point) { return SetXY(point.GetX(),              point.GetY()-GetHeight()); }
+    inline Node & SetLM(const Point<int> & point) { return SetXY(point.GetX()-GetWidth()/2, point.GetY()-GetHeight()); }
+    inline Node & SetLR(const Point<int> & point) { return SetXY(point.GetX()-GetWidth(),   point.GetY()-GetHeight()); }
 
-    inline Object & SetCenter(const Point<int> & point) { return SetXY(point.GetX()-GetWidth()/2, point.GetY()-GetHeight()/2); }
+    inline Node & SetCenter(const Point<int> & point) { return SetXY(point.GetX()-GetWidth()/2, point.GetY()-GetHeight()/2); }
 
     Layer * GetLayer() { return (Layer *) layer; }
-    void SetLayer(Layer * _layer) { layer = (Object *) _layer; }
+    void SetLayer(Layer * _layer) { layer = (Node *) _layer; }
 
     // Draw either this object or objects in contains.
     void Draw() { EM_ASM_ARGS({emp_info.objs[$0].draw();}, obj_id); }
@@ -149,8 +149,8 @@ namespace Kinetic {
 
 
   // This is a base class for other classes that contain a whole set of objects
-  // @CAO Should this be an Object itself?
-  template <class T> class ObjectGrid { // : public Object {
+  // @CAO Should this be an Node itself?
+  template <class T> class NodeGrid { // : public Node {
   protected:
     int cols;
     int rows;
@@ -161,27 +161,27 @@ namespace Kinetic {
     int set_size;
     std::vector<T *> object_set;
 
-    // Protected to prevent ObjectGrids from being directly created or destroyed.
-    ObjectGrid(int _cols, int _rows, int _x, int _y, int _spacing) 
+    // Protected to prevent NodeGrids from being directly created or destroyed.
+    NodeGrid(int _cols, int _rows, int _x, int _y, int _spacing) 
       : cols(_cols), rows(_rows), x(_x), y(_y), spacing(_spacing), set_size(cols * rows), object_set(set_size)
     { ; }     
-    ~ObjectGrid() { ; }
+    ~NodeGrid() { ; }
   public:
     int GetCols() const { return cols; }
     int GetRows() const { return rows; }
     int GetX() const { return x; }
     int GetY() const { return y; }
     int GetSpacing() const { return spacing; }
-    int GetSetSize() const { return set_size; }  // @CAO Move to ObjectSet base class when we build it.
+    int GetSetSize() const { return set_size; }  // @CAO Move to NodeSet base class when we build it.
 
     T & Get(int pos) { return *(object_set[pos]); }
     T & Get(int col, int row) { return *(object_set[col + row*cols]); }
     T & operator[](int pos) { return *(object_set[pos]); }
   };
 
-  class Tween : public Object {
+  class Tween : public Node {
   private:
-    Object * target;   // What object is this tween associated with?
+    Node * target;   // What object is this tween associated with?
 
     int settings_id;   // JS memory position where the tween settings should go.
     bool needs_config; // Does the Tween need to be reconfigured?
@@ -194,7 +194,7 @@ namespace Kinetic {
       needs_config = false;
     }
   public:
-    Tween(Object & _target, double _seconds) : target(&_target), needs_config(true) {
+    Tween(Node & _target, double _seconds) : target(&_target), needs_config(true) {
       settings_id = EMP_Tween_Build(target->GetID(), _seconds);
       obj_id = settings_id + 1;
     }
@@ -217,7 +217,7 @@ namespace Kinetic {
       StrongEaseIn, StrongEaseOut, StrongEaseInOut
     };
 
-    Tween & SetTarget(Object & _target) { target = &_target; needs_config=true; return *this; }
+    Tween & SetTarget(Node & _target) { target = &_target; needs_config=true; return *this; }
     Tween & SetTime(double _in) { EM_ASM_ARGS({ emp_info.objs[$0].duration = $1; }, settings_id, _in); needs_config=true; return *this; }
     Tween & SetX(int _in) { EM_ASM_ARGS({ emp_info.objs[$0].x = $1; }, settings_id, _in); needs_config=true; return *this; }
     Tween & SetY(int _in) { EM_ASM_ARGS({ emp_info.objs[$0].y = $1; }, settings_id, _in); needs_config=true; return *this; }
@@ -274,7 +274,7 @@ namespace Kinetic {
   };
 
 
-  class Image : public Object {
+  class Image : public Node {
   private:
     RawImage & raw_image;
     mutable std::list<Layer *> layers_waiting;
@@ -323,11 +323,11 @@ namespace Kinetic {
     bool HasLoaded() const { return raw_image.HasLoaded(); }
     bool HasError() const { return raw_image.HasError(); }
 
-    Image & SetWidth(int _in) { width = _in; if (HasLoaded()) Object::SetWidth(_in); return *this; }
-    Image & SetHeight(int _in) { height = _in; if (HasLoaded()) Object::SetHeight(_in); return *this; }
+    Image & SetWidth(int _in) { width = _in; if (HasLoaded()) Node::SetWidth(_in); return *this; }
+    Image & SetHeight(int _in) { height = _in; if (HasLoaded()) Node::SetHeight(_in); return *this; }
     Image & SetLayout(int _w, int _h) { SetWidth(_w); return SetHeight(_h); }
-    Image & SetScaleX(double _in) { scale_x = _in; if (HasLoaded()) Object::SetScaleX(_in); return *this; }
-    Image & SetScaleY(double _in) { scale_y = _in; if (HasLoaded()) Object::SetScaleY(_in); return *this; }
+    Image & SetScaleX(double _in) { scale_x = _in; if (HasLoaded()) Node::SetScaleX(_in); return *this; }
+    Image & SetScaleY(double _in) { scale_y = _in; if (HasLoaded()) Node::SetScaleY(_in); return *this; }
     Image & SetScale(double _x, double _y) { SetScaleX(_x); return SetScaleY(_y); }
     Image & SetScale(double _in) { return SetScale(_in, _in); }
 
@@ -456,7 +456,7 @@ namespace Kinetic {
 
     // Finsihing
     inline static void Stroke() { EM_ASM( emp_info.ctx.stroke() ); }
-    inline static void SetupTarget(const Object & obj) {
+    inline static void SetupTarget(const Node & obj) {
       EM_ASM_ARGS({emp_info.canvas.fillStrokeShape(emp_info.objs[$0])}, obj.GetID());
     }
   };
@@ -482,7 +482,7 @@ namespace Kinetic {
   };
 
 
-  template<class T> void Object::On(const std::string & trigger, T * target,
+  template<class T> void Node::On(const std::string & trigger, T * target,
                                        void (T::*method_ptr)())
   {
     // @CAO Technically we should track these callbacks to make sure we delete them properly.
@@ -495,7 +495,7 @@ namespace Kinetic {
     }, obj_id, trigger.c_str(), (int) new_callback);
   }
 
-  template<class T> void Object::On(const std::string & trigger, T * target,
+  template<class T> void Node::On(const std::string & trigger, T * target,
                                        void (T::*method_ptr)(const EventInfo &))
   {
     // @CAO Technically we should track these callbacks to make sure we delete them properly.
@@ -522,7 +522,7 @@ namespace Kinetic {
 
 
   // The subclass of object that may be placed in a layer.
-  class Shape : public Object {
+  class Shape : public Node {
   protected:
     const Image * image;  // If we are drawing an image, keep track of it to make sure it loads.
     Callback * draw_callback; // If we override the draw callback, keep track of it here.
@@ -689,7 +689,7 @@ namespace Kinetic {
 
 
   // Manager for stage layers
-  class Layer : public Object {
+  class Layer : public Node {
   public:
     Layer() {
       obj_id = EM_ASM_INT_V({
@@ -720,12 +720,12 @@ namespace Kinetic {
       return *this;
     }
 
-    template <class T> Layer & Add(ObjectGrid<T> & obj_set) {
+    template <class T> Layer & Add(NodeGrid<T> & obj_set) {
       for (int i = 0; i < obj_set.GetSetSize(); i++) {  Add(obj_set[i]);  }
       return *this;
     }
 
-    Layer & Remove(Object & _obj) {
+    Layer & Remove(Node & _obj) {
       EM_ASM_ARGS({emp_info.objs[$0].remove();}, _obj.GetID());
       _obj.SetLayer(NULL);
       return *this;
@@ -737,7 +737,7 @@ namespace Kinetic {
 
 
   // The main Stage object from Kinetic
-  class Stage : public Object {
+  class Stage : public Node {
   private:
     std::string m_container;      // Name of this stage.
 
@@ -787,7 +787,7 @@ namespace Kinetic {
       SetScale(1.0/x_scale, 1.0/y_scale);
     }
 
-    inline Object & SetSize(int w, int h) {
+    inline Node & SetSize(int w, int h) {
       // If the aspect ratio is locked, adjust the new size to fit inside the dimensions provided.
       if (aspect_ratio > 0) {
         if (h * aspect_ratio < w) w = h * aspect_ratio;
@@ -907,7 +907,7 @@ namespace Kinetic {
   };
 
 
-  template <class T> class Animation : public Callback, public Object {
+  template <class T> class Animation : public Callback, public Node {
   private:
     T * target;
     void (T::*method_ptr)(const AnimationFrame &);
