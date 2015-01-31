@@ -158,9 +158,11 @@ int main(int argc, char* argv[])
   std::vector<std::string> slices;
   emp::slice_string(base_string, slices, 's');
 
-  std::cout << "Slices:" << std::endl;
-  for (std::string & cur_slice : slices) {
-    std::cout << "- " << cur_slice << std::endl;
+  if (verbose) {
+    std::cout << "Slices:" << std::endl;
+    for (std::string & cur_slice : slices) {
+      std::cout << "- " << cur_slice << std::endl;
+    }
   }
 
   emp_assert(slices.size() == 5);
