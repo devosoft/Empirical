@@ -169,5 +169,19 @@ int main(int argc, char* argv[])
   emp_assert(slices[1] == " i");
   emp_assert(slices[3] == "t ");
 
+
+  std::string cat_a = "ABC";
+  bool cat_b = true;
+  char cat_c = '2';
+  int cat_d = 3;
+
+  std::string cat_full = emp::to_string(cat_a, cat_b, cat_c, cat_d);
+
+  if (verbose) {
+    std::cout << "Cat string: " << cat_full << std::endl;
+  }
+
+  emp_assert(cat_full == "ABC123");
+
   return 0;
 }

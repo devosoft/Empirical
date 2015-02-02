@@ -227,6 +227,24 @@ namespace emp {
 
   }
 
+
+  // The next functions are not efficient, but they will take any number of inputs and
+  // dynamically convert them all into a single, concatanated strings or stringstreams.
+
+  void append_sstream(std::stringstream & ss) { (void) ss; }
+
+  template <typename TYPE, typename... OTHER_TYPES>
+  void append_sstream(std::stringstream & ss, TYPE value, OTHER_TYPES... other_values) {
+    ss << value;
+    append_sstream(ss, other_values...);
+  }
+
+  template <typename... ALL_TYPES>
+  std::string to_string(ALL_TYPES... all_values) {
+    std::stringstream ss;
+    append_sstream(ss, all_values...);
+    return ss.str();
+  }
 };
 
 #endif
