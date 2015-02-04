@@ -5,9 +5,12 @@
 
 namespace emp {
 
-  inline void Alert(const std::string & msg) { EM_ASM_ARGS({ msg = Pointer_stringify($0); alert(msg); }, msg.c_str()); }
-  void Alert(int val) { Alert(std::to_string(val)); }
-  void Alert(double val) { Alert(std::to_string(val)); }
+  void Alert(const std::string & msg) { EM_ASM_ARGS({ msg = Pointer_stringify($0); alert(msg); }, msg.c_str()); }
+  template <typename... TYPE_SET>
+  void Alert(TYPE_SET... inputs) { Alert(std::to_string(inputs...)); }
+
+  // void Alert(int val) { Alert(std::to_string(val)); }
+  // void Alert(double val) { Alert(std::to_string(val)); }
 
 #define AlertVar(VAR) emp::Alert(std::string(#VAR) + std::string("=") + std::to_string(VAR))
 
