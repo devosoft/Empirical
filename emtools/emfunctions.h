@@ -7,7 +7,7 @@ namespace emp {
 
   void Alert(const std::string & msg) { EM_ASM_ARGS({ msg = Pointer_stringify($0); alert(msg); }, msg.c_str()); }
   template <typename... TYPE_SET>
-  void Alert(TYPE_SET... inputs) { Alert(std::to_string(inputs...)); }
+  void Alert(TYPE_SET... inputs) { Alert(emp::to_string(inputs...)); }
 
   // void Alert(int val) { Alert(std::to_string(val)); }
   // void Alert(double val) { Alert(std::to_string(val)); }
