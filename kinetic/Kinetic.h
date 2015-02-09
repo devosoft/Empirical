@@ -61,8 +61,6 @@ namespace Kinetic {
     int GetID() const { return obj_id; }
     const std::string & GetName() const { return name; }
 
-    virtual std::string GetType() const { return "empNode"; }
-
     // Retrieve info from JS Kinetic::Node objects
     int GetX() const { return EM_ASM_INT({return emp_info.objs[$0].x();}, obj_id); }
     int GetY() const { return EM_ASM_INT({return emp_info.objs[$0].y();}, obj_id); }
@@ -306,8 +304,6 @@ namespace Kinetic {
 
     virtual ~Image() { ; }
 
-    std::string GetType() const { return "empImage"; }
-    
     int GetX() const { return x; }
     int GetY() const { return y; }
     int GetWidth() const { return width; }
@@ -474,8 +470,6 @@ namespace Kinetic {
 
     ~Callback_Canvas() { ; }
 
-    virtual std::string GetType() const { return "empCallback_Canvas"; }
-
     void DoCallback(int * arg_ptr) {
       Canvas canvas; // @CAO For now, all canvas objects are alike; we should allow them to coexist.
       (target->*(method_ptr))(canvas); }
@@ -530,8 +524,6 @@ namespace Kinetic {
     Shape() : image(NULL), draw_callback(NULL) { obj_id = -3; } // The default Shape constructor should only be called from derived classes.
   public:
     virtual ~Shape() { ; }
-
-    virtual std::string GetType() const { return "empShape"; }
 
     virtual Shape & SetFillPatternImage(const Image & _image) {
       image = &_image;
@@ -682,8 +674,6 @@ namespace Kinetic {
       obj_id = EMP_Custom_Shape_Build(_x, _y, _w, _h, (int) draw_callback);
     }
     virtual ~CustomShape() { ; }
-
-    virtual std::string GetType() const { return "empCustomShape"; }
   };
 
 
@@ -700,8 +690,6 @@ namespace Kinetic {
     }
     virtual ~Layer() { ; }
     
-    std::string GetType() const { return "empLayer"; }
-
     Layer & Add(Shape & _obj) {
       _obj.SetLayer(this);    // Track what layer this shape is in.
 
@@ -760,12 +748,10 @@ namespace Kinetic {
         return obj_id;
       }, _w, _h, m_container.c_str());
 
-      // If we are lockig the aspect ratio, determine it now!
+      // Determine if we are lockig the aspect ratio (to keep it constant is size changes).
       if (lock_aspect) aspect_ratio = ((double) scaled_width) / (double) scaled_height;
     }
     virtual ~Stage() { ; }
-
-    std::string GetType() const { return "empStage"; }
 
     // Sizing
     int GetScaledWidth() const { return scaled_width; }
@@ -853,8 +839,6 @@ namespace Kinetic {
       : TextBox(point.GetX(), point.GetY(), text, font.GetSize(), font.GetFamily(), font.GetColor()) { ; }
     ~TextBox() { ; }
 
-    virtual std::string GetType() const { return "empTextBox"; }
-
     TextBox & SetText(const std::string & _text) {
       EM_ASM_ARGS({var _text = Pointer_stringify($1); emp_info.objs[$0].text(_text);}, obj_id, _text.c_str());
       return *this;
@@ -873,7 +857,6 @@ namespace Kinetic {
       obj_id = EMP_Rect_Build(point.GetX(), point.GetY(), w, h, fill.c_str(), stroke.c_str(), stroke_width, draggable);
     }
 
-    virtual std::string GetType() const { return "empRect"; }
   };
 
   // The regular polygon object from Kinetic...
@@ -889,7 +872,6 @@ namespace Kinetic {
       obj_id = EMP_RegularPolygon_Build(point.GetX(), point.GetY(), sides, radius, fill.c_str(), stroke.c_str(), stroke_width, draggable);
     }
 
-    virtual std::string GetType() const { return "empRegularPolygon"; }
   };
 
 
@@ -919,8 +901,6 @@ namespace Kinetic {
     }
     Animation() : target(NULL), method_ptr(NULL), method_ptr_nf(NULL), is_running(false) { ; }
     ~Animation() { ; }
-
-    std::string GetType() const { return "empAnimation"; }
 
     bool IsRunning() const { return is_running; }
 
