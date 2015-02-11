@@ -48,25 +48,41 @@ namespace Kinetic {
     Node * layer;
     std::string name;
 
+    // Helpers...
+    static int GetNumObjs() { return EM_ASM_INT_V({ return emp_info.objs.length; }); }
+
     Node(const std::string & _name="") : obj_id(-1), layer(NULL), name(_name) {;}  // Protected so that you can't make a direct Node.
   private:
     Node(const Node &); // Never allowed.
     Node & operator=(Node & _in);  // Never allowed.
+
   public:
     ~Node() {
       EM_ASM_ARGS({
           if ($0 >= 0 && emp_info.objs[$0] != 0) emp_info.objs[$0].destroy();
         }, obj_id);
     }
-    int GetID() const { return obj_id; }
+    int GetID() const { emp_assert(obj_id >= 0 && obj_id < GetNumObjs()); return obj_id; }
     const std::string & GetName() const { return name; }
 
     // Retrieve info from JS Kinetic::Node objects
-    int GetX() const { return EM_ASM_INT({return emp_info.objs[$0].x();}, obj_id); }
-    int GetY() const { return EM_ASM_INT({return emp_info.objs[$0].y();}, obj_id); }
+    int GetX() const {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      return EM_ASM_INT({return emp_info.objs[$0].x();}, obj_id);
+    }
+    int GetY() const {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      return EM_ASM_INT({return emp_info.objs[$0].y();}, obj_id);
+    }
     Point<int> GetPos() const { return Point<int>(GetX(), GetY()); }
-    int GetWidth() const { return EM_ASM_INT({return emp_info.objs[$0].width();}, obj_id); }
-    int GetHeight() const { return EM_ASM_INT({return emp_info.objs[$0].height();}, obj_id); }
+    int GetWidth() const {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      return EM_ASM_INT({return emp_info.objs[$0].width();}, obj_id);
+    }
+    int GetHeight() const {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      return EM_ASM_INT({return emp_info.objs[$0].height();}, obj_id);
+    }
     Point<int> GetUL(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+x_offset,              GetY()+y_offset); }
     Point<int> GetUM(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+GetWidth()/2+x_offset, GetY()+y_offset); }
     Point<int> GetUR(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+GetWidth()+x_offset,   GetY()+y_offset); }
@@ -77,34 +93,112 @@ namespace Kinetic {
     Point<int> GetLM(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+GetWidth()/2+x_offset, GetY()+GetHeight()+y_offset); }
     Point<int> GetLR(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+GetWidth()+x_offset,   GetY()+GetHeight()+y_offset); }
     Point<int> GetCenter(int x_offset=0, int y_offset=0) const { return GetMM(x_offset, y_offset); }
-    bool GetVisible() const { return EM_ASM_INT({return emp_info.objs[$0].visible();}, obj_id); }
-    double GetOpacity() const { return EM_ASM_DOUBLE({return emp_info.objs[$0].opacity();}, obj_id); }
-    bool GetListening() const { return EM_ASM_INT({return emp_info.objs[$0].listening();}, obj_id); }
-    double GetScaleX() const { return EM_ASM_DOUBLE({return emp_info.objs[$0].scaleX();}, obj_id); }
-    double GetScaleY() const { return EM_ASM_DOUBLE({return emp_info.objs[$0].scaleY();}, obj_id); }
-    int GetOffsetX() const { return EM_ASM_INT({return emp_info.objs[$0].offsetX();}, obj_id); }
-    int GetOffsetY() const { return EM_ASM_INT({return emp_info.objs[$0].offsetY();}, obj_id); }
-    int GetRotation() const { return EM_ASM_INT({return emp_info.objs[$0].rotation();}, obj_id); }
-    int GetDraggable() const { return EM_ASM_INT({return emp_info.objs[$0].draggable();}, obj_id); }
-    int GetZIndex() const { return EM_ASM_INT({return emp_info.objs[$0].getZIndex();}, obj_id); }
+    bool GetVisible() const {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      return EM_ASM_INT({return emp_info.objs[$0].visible();}, obj_id);
+    }
+    double GetOpacity() const {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      return EM_ASM_DOUBLE({return emp_info.objs[$0].opacity();}, obj_id);
+    }
+    bool GetListening() const {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      return EM_ASM_INT({return emp_info.objs[$0].listening();}, obj_id);
+    }
+    double GetScaleX() const {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      return EM_ASM_DOUBLE({return emp_info.objs[$0].scaleX();}, obj_id);
+    }
+    double GetScaleY() const {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      return EM_ASM_DOUBLE({return emp_info.objs[$0].scaleY();}, obj_id);
+    }
+    int GetOffsetX() const {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      return EM_ASM_INT({return emp_info.objs[$0].offsetX();}, obj_id);
+    }
+    int GetOffsetY() const {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      return EM_ASM_INT({return emp_info.objs[$0].offsetY();}, obj_id);
+    }
+    int GetRotation() const {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      return EM_ASM_INT({return emp_info.objs[$0].rotation();}, obj_id);
+    }
+    int GetDraggable() const {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      return EM_ASM_INT({return emp_info.objs[$0].draggable();}, obj_id);
+    }
+    int GetZIndex() const {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      return EM_ASM_INT({return emp_info.objs[$0].getZIndex();}, obj_id);
+    }
 
     Node & SetName(const std::string & _name) { name = _name; return *this; }
-    Node & SetX(int _in) { EM_ASM_ARGS({emp_info.objs[$0].x($1);}, obj_id, _in); return *this; }
-    Node & SetY(int _in) { EM_ASM_ARGS({emp_info.objs[$0].y($1);}, obj_id, _in); return *this; }
-    Node & SetWidth(int _in) { EM_ASM_ARGS({emp_info.objs[$0].width($1);}, obj_id, _in); return *this; }
-    Node & SetHeight(int _in) { EM_ASM_ARGS({emp_info.objs[$0].height($1);}, obj_id, _in); return *this; }
-    Node & SetVisible(int _in) { EM_ASM_ARGS({emp_info.objs[$0].visible($1);}, obj_id, _in); return *this; }
-    Node & SetOpacity(double _in) { EM_ASM_ARGS({emp_info.objs[$0].opacity($1);}, obj_id, _in); return *this; }
-    Node & SetListening(int _in) { EM_ASM_ARGS({emp_info.objs[$0].listening($1);}, obj_id, _in); return *this; }
-    Node & SetScaleX(double _in) { EM_ASM_ARGS({emp_info.objs[$0].scaleX($1);}, obj_id, _in); return *this; }
-    Node & SetScaleY(double _in) { EM_ASM_ARGS({emp_info.objs[$0].scaleY($1);}, obj_id, _in); return *this; }    
-    Node & SetOffsetX(int _in) { EM_ASM_ARGS({emp_info.objs[$0].offsetX($1);}, obj_id, _in); return *this; }
-    Node & SetOffsetY(int _in) { EM_ASM_ARGS({emp_info.objs[$0].offsetY($1);}, obj_id, _in); return *this; }
-    Node & SetRotation(int _in) { EM_ASM_ARGS({emp_info.objs[$0].rotation($1);}, obj_id, _in); return *this; }
-    Node & SetDraggable(int _in) { EM_ASM_ARGS({emp_info.objs[$0].draggable($1);}, obj_id, _in); return *this; }
-    Node & SetZIndex(int _in) { EM_ASM_ARGS({emp_info.objs[$0].setZIndex($1);}, obj_id, _in); return *this; }
-    Node & SetZBottom() { EM_ASM_ARGS({emp_info.objs[$0].moveToBottom();}, obj_id); return *this; }
-    Node & SetZTop() { EM_ASM_ARGS({emp_info.objs[$0].moveToTop();}, obj_id); return *this; }
+    Node & SetX(int _in) {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].x($1);}, obj_id, _in); return *this;
+    }
+    Node & SetY(int _in) {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].y($1);}, obj_id, _in); return *this;
+    }
+    Node & SetWidth(int _in) {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].width($1);}, obj_id, _in); return *this;
+    }
+    Node & SetHeight(int _in) {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].height($1);}, obj_id, _in); return *this;
+    }
+    Node & SetVisible(int _in) {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].visible($1);}, obj_id, _in); return *this;
+    }
+    Node & SetOpacity(double _in) {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].opacity($1);}, obj_id, _in); return *this;
+    }
+    Node & SetListening(int _in) {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].listening($1);}, obj_id, _in); return *this;
+    }
+    Node & SetScaleX(double _in) {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].scaleX($1);}, obj_id, _in); return *this;
+    }
+    Node & SetScaleY(double _in) {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].scaleY($1);}, obj_id, _in); return *this;
+    }
+    Node & SetOffsetX(int _in) {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].offsetX($1);}, obj_id, _in); return *this;
+    }
+    Node & SetOffsetY(int _in) {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].offsetY($1);}, obj_id, _in); return *this;
+    }
+    Node & SetRotation(int _in) {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].rotation($1);}, obj_id, _in); return *this;
+    }
+    Node & SetDraggable(int _in) {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].draggable($1);}, obj_id, _in); return *this;
+    }
+    Node & SetZIndex(int _in) {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].setZIndex($1);}, obj_id, _in); return *this;
+    }
+    Node & SetZBottom() {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].moveToBottom();}, obj_id); return *this;
+    }
+    Node & SetZTop() {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].moveToTop();}, obj_id); return *this;
+    }
 
     inline Node & SetXY(int x, int y) { SetX(x); SetY(y); return *this; }
     inline Node & SetXY(const Point<int> & point) { SetX(point.GetX()); SetY(point.GetY()); return *this; }
@@ -132,14 +226,19 @@ namespace Kinetic {
     void SetLayer(Layer * _layer) { layer = (Node *) _layer; }
 
     // Draw either this object or objects in contains.
-    void Draw() { EM_ASM_ARGS({emp_info.objs[$0].draw();}, obj_id); }
+    void Draw() {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].draw();}, obj_id);
+    }
 
     // Draw all objects in this layer.
     void DrawLayer() { if (layer) layer->Draw(); }
 
     // Move this object to the top of the current layer.
-    void MoveToTop() { EM_ASM_ARGS({emp_info.objs[$0].moveToTop();}, obj_id); }
-
+    void MoveToTop() {
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].moveToTop();}, obj_id);
+    }
 
     template<class T> void On(const std::string & _trigger, T * _target, void (T::*_method_ptr)());
     template<class T> void On(const std::string & _trigger, T * _target, void (T::*_method_ptr)(const EventInfo &));
@@ -929,12 +1028,12 @@ namespace Kinetic {
     }
     
     void Start() {
-      emp_assert(obj_id >= 0); // Make sure we've setup this animation before starting it.
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
       EM_ASM_ARGS({emp_info.objs[$0].start();}, obj_id);
       is_running = true;
     }
     void Stop() {
-      emp_assert(obj_id >= 0); // Make sure we've setup this animation before stopping it.
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
       EM_ASM_ARGS({emp_info.objs[$0].stop();}, obj_id);
       is_running = false;
     }

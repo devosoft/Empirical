@@ -2,6 +2,7 @@
 #define EMP_EM_FUNCTIONS_H
 
 #include "../tools/callbacks.h"
+#include "../tools/string_utils.h"
 
 namespace emp {
 
