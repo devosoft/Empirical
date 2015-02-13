@@ -82,6 +82,32 @@ namespace emp {
       && has_unique_types<TYPE2, TYPE_LIST...>();               // Recurse through other types.
   }
 
+
+
+  // Dealing with bits in unsigned long long variables
+  const int ByteCount[256] = {
+    0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+    3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
+  };
+
+  int count_bits(unsigned long long val) {
+    return ByteCount[ val >> 56 ] +
+      ByteCount[ (val >> 48) & 0xFF ] +
+      ByteCount[ (val >> 40) & 0xFF ] +
+      ByteCount[ (val >> 32) & 0xFF ] +
+      ByteCount[ (val >> 24) & 0xFF ] +
+      ByteCount[ (val >> 16) & 0xFF ] +
+      ByteCount[ (val >>  8) & 0xFF ] +
+      ByteCount[  val        & 0xFF ];
+  }
+
+  int find_bit(unsigned long long val) { return count_bits( ~val & (val-1) ); }
 };
 
 #endif
