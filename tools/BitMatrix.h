@@ -17,78 +17,92 @@
 #include <bitset>
 #include <iostream>
 
+#include "functions.h"
+
 namespace emp {
   template <int COLS, int ROWS>
   class BitMatrix {
   private:
-    std::bitset<COLS * ROWS> bits;
+    std::bitset<COLS*ROWS> bits;
 
-    inline static int id2col(int id) { return id % COLS; }
-    inline static int id2row(int id) { return id / COLS; }
-    inline static int get_id(int col, int row) { return row * COLS + col; }
-
-    int get_bit(int col, int row) const { return bits[get_id(col,row)]; }
-    void set_bit(int col, int row) const { bits[get_id(col,row)] = 1; }
-    void unset_bit(int col, int row) const { bits[get_id(col,row)] = 0; }
-
-    static bool static_init = false;
-    static std::bitset<COLS*ROWS> col1_mask;
-    static std::bitset<COLS*ROWS> row1_mask;
-    static std::bitset<COLS*ROWS> outer_mask;  // Outer ring mask
-
-    void StaticInit() {
-      // Initialize static masks used in various functions.
-      if (static_init) return; // Only run initialization once.
-
-      // Setup the column one mask (to be used for any column with shifting.
-      for (int i = 0; i < ROWS; i++) col1_mask[i*COLS] = 1;
-
-      // Setup the row one mask
-      for (int i = 0; i < COLS; i++) row1_mask[i] = 1;
-
-      // Setup the mask for the outer ring
-      outer_mask = col1_mask | row1_mask | (col1_mask << (COLS-1)) | (row1_mask << COLS * (ROWS-1));
+    template <int COL_ID> static const std::bitset<COLS*ROWS> & MaskCol() {
+      static bool init = false;
+      static std::bitset<COLS*ROWS> mask;
+      if (!init) {
+        for (int i = 0; i < ROWS; i++) mask[i*COLS + COL_ID] = 1;
+        init = true;
+      }
+      return mask;
     }
+      
+    template <int ROW_ID> static const std::bitset<COLS*ROWS> & MaskRow() {
+      static bool init = false;
+      static std::bitset<COLS*ROWS> mask;
+      if (!init) {
+        for (int i = 0; i < COLS; i++) mask[ROW_ID * COLS + i] = 1;
+        init = true;
+      }
+      return mask;
+    }
+      
   public:
     BitMatrix() { ; }
-    BitMatrix(BitMatrix & in_matrix) : bits(in_matrix.bits) { ; }
+    BitMatrix(const std::bitset<COLS*ROWS> & in_bits) : bits(in_bits) { ; }
+    BitMatrix(const BitMatrix & in_matrix) : bits(in_matrix.bits) { ; }
     ~BitMatrix() { ; }
 
     constexpr int NumRows() { return ROWS; }
     constexpr int NumCols() { return COLS; }
     constexpr int GetSize() { return ROWS * COLS; }
 
+    inline static int GetCol(int id) { return id % COLS; }
+    inline static int GetRow(int id) { return id / COLS; }
+    inline static int GetID(int col, int row) { return row * COLS + col; }
+
     bool Any() const { return bits.any(); }
     bool None() const { return bits.none(); }
     bool All() const { return bits.all(); }
 
-    bool Get(int col, int row) { return bits[get_id(col,row)]; }
+    bool Get(int col, int row) { return bits[GetID(col,row)]; }
     bool Get(int id) { return bits[id]; }
     
-    void Set(int col, int row, bool val=true) { bits[get_id(col, row)] = val; }
+    void Set(int col, int row, bool val=true) { bits[GetID(col, row)] = val; }
     void Set(int id) { bits[id] = true; }
-    void Unset(int col, int row) { bits[get_id(col, row)] = false; }
+    void Unset(int col, int row) { bits[GetID(col, row)] = false; }
     void Unset(int id) { bits[id] = false; }
-    void Flip(int col, int row) { bits.flip(get_id(col, row)); }
+    void Flip(int col, int row) { bits.flip(GetID(col, row)); }
     void Flip(int id) { bits.flip(id); }
+
     void SetAll() { bits.set(); }
+    void SetCol(int col) { bits |= (MaskCol<0> << col); }
+    void SetRow(int row) { bits |= (MaskRow<0> << (row * COLS)); }
     void Clear() { bits.clear(); }
+    void ClearCol(int col) { bits &= ~(MaskCol<0> << col); }
+    void ClearRow(int row) { bits &= ~(MaskRow<0> << (row * COLS)); }
 
     // Count the number of set bits in the matrix.
     int CountOnes() const { return bits.count(); }
 
     // Find the position of the first non-zero bit.
-    int FindBit() const { return (~bits & (bits - 1)).count(); }
+    // int FindBit() const { return (~bits & (bits - 1)).count(); }
+    int FindBit() const {
+      int offset = 0;
+      unsigned long long tmp_bits = 0ULL;
+      while (offset < GetSize() && ((tmp_bits = (bits >> offset).to_ullong()) == 0ULL)) {
+        offset += 64;
+      }
+      return find_bit(tmp_bits) + offset;
+    }
 
     // Shift the whole matrix in the specified direction.
-    BitMatrix LeftShift() const { return ((bits & ~col1_mask) >> 1); }
-    BitMatrix RightShift() const { return ((bits << 1) & ~col1_mask); }
+    BitMatrix LeftShift() const { return ((bits & ~MaskCol<0>()) >> 1); }
+    BitMatrix RightShift() const { return ((bits << 1) & ~MaskCol<0>()); }
     BitMatrix UpShift() const { return bits >> COLS; } 
     BitMatrix DownShift() const { return bits << COLS; }
-    BitMatrix ULShift() const { return ((bits & ~col1_mask) >> (COLS+1)); }    
-    BitMatrix DLShift() const { return ((bits & ~col1_mask) << (COLS-1)); }
-    BitMatrix URShift() const { return ((bits >> (COLS-1)) & ~col1_mask); }
-    BitMatrix DRShift() const { return ((bits << (COLS+1)) & ~col1_mask); }
+    BitMatrix ULShift() const { return ((bits & ~MaskCol<0>()) >> (COLS+1)); }    
+    BitMatrix DLShift() const { return ((bits & ~MaskCol<0>()) << (COLS-1)); }
+    BitMatrix URShift() const { return ((bits >> (COLS-1)) & ~MaskCol<0>()); }
+    BitMatrix DRShift() const { return ((bits << (COLS+1)) & ~MaskCol<0>()); }
 
     // Find all points within one step of the ones on this bit matrix.
     BitMatrix GetReach() const { return *this | LeftShift() | RightShift() | UpShift() | DownShift(); }
@@ -108,7 +122,7 @@ namespace emp {
 
       return cur_region;
     }
-    BitMatrix GetRegion(int col, int row) const { return GetRegion(get_id(col,row)); }
+    BitMatrix GetRegion(int col, int row) const { return GetRegion(GetID(col,row)); }
 
     // Does this bit matrix represent a connected set of ones?
     bool IsConnected() const { return GetRegion(FindBit()) == *this; }
@@ -119,9 +133,9 @@ namespace emp {
     void Print(std::ostream & os = std::cout) const {
       for (int y = 0; y < ROWS; y++) {
         for (int x = 0; x < COLS; x++) {
-          os << bits[get_id(x,y)];
+          os << bits[GetID(x,y)];
         }
-        os << endl;
+        os << std::endl;
       }
     }
 
@@ -140,6 +154,9 @@ namespace emp {
     BitMatrix operator&(const BitMatrix & in) const { return bits & in.bits; }
     BitMatrix operator|(const BitMatrix & in) const { return bits | in.bits; }
     BitMatrix operator^(const BitMatrix & in) const { return bits ^ in.bits; }
+
+    // Conversions
+    const std::bitset<COLS*ROWS> & to_bitset() { return bits; }
   };
 };
 
