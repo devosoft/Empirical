@@ -50,6 +50,13 @@ int main(int argc, char* argv[])
 
   if (verbose) std::cout << "Single bit tests passed." << std::endl;
 
+  bm45 = bm45.GetReach().GetReach();
+  if (verbose) {
+    std::cout << std::endl << "Extend to double-reach: " << std::endl;
+    bm45.Print();
+    std::cout << std::endl;
+  }
+  
   bm45 = bm45.DownShift();
 
   if (verbose) {
@@ -113,5 +120,17 @@ int main(int argc, char* argv[])
     bm45.Print();
     std::cout << std::endl;
   }
+
+  emp::BitMatrix<4,5>(bm45.Mask<10,5,40>()).Print();
+
+  emp::BitMatrix<10,10> bm100;
+  bm100.Set(9,9);
+
   
+  if (verbose) {
+    std::cout << "10x10 bit matrix:" << std::endl;
+    bm100.Print();
+  }
+
+  std::cout << bm100.FindBit() << std::endl;
 }

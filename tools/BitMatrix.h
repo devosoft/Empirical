@@ -17,6 +17,7 @@
 #include <bitset>
 #include <iostream>
 
+#include "bitset_utils.h"
 #include "functions.h"
 
 namespace emp {
@@ -24,6 +25,12 @@ namespace emp {
   class BitMatrix {
   private:
     std::bitset<COLS*ROWS> bits;
+
+  public:
+    template <int START_POS, int STEP_POS, int END_POS>
+    constexpr std::bitset<COLS*ROWS> Mask() {
+      return std::bitset<COLS*ROWS>();
+    }
 
     template <int COL_ID> static const std::bitset<COLS*ROWS> & MaskCol() {
       static bool init = false;
@@ -33,6 +40,7 @@ namespace emp {
         init = true;
       }
       return mask;
+      // return mask_pattern<COLS*ROWS, COL_ID, COLS, COLS*ROWS-1>();
     }
       
     template <int ROW_ID> static const std::bitset<COLS*ROWS> & MaskRow() {
@@ -85,14 +93,8 @@ namespace emp {
 
     // Find the position of the first non-zero bit.
     // int FindBit() const { return (~bits & (bits - 1)).count(); }
-    int FindBit() const {
-      int offset = 0;
-      unsigned long long tmp_bits = 0ULL;
-      while (offset < GetSize() && ((tmp_bits = (bits >> offset).to_ullong()) == 0ULL)) {
-        offset += 64;
-      }
-      return find_bit(tmp_bits) + offset;
-    }
+
+    int FindBit() const { return find_bit(bits); }
 
     // Shift the whole matrix in the specified direction.
     BitMatrix LeftShift() const { return ((bits & ~MaskCol<0>()) >> 1); }
