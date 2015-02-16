@@ -10,6 +10,8 @@
 // Class: template <int NUM_BITS> emp::BitSet
 // Desc: This class handles a fixed-sized (but arbitrarily large) array of bits,
 //       and optimizes operations on those bits to be as fast as possible.
+// Note: Unlike std::bitset, emp::BitSet gives access to bit fields for implementation
+//       new bit-magic tricks.
 //
 //
 // Constructors:
@@ -71,6 +73,7 @@
 //  const BitSet & operator^=(const BitSet & ar2)
 //  const BitSet & operator>>=(const int)
 //  const BitSet & operator<<=(const int)
+//
 
 
 namespace emp {
