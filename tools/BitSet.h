@@ -80,7 +80,10 @@ namespace emp {
 
   template <int NUM_BITS> class BitSet {
   private:
-    unsigned int * bit_set;
+    static const int NUM_FIELDS = 1 + ((NUM_BITS - 1) >> 5);
+    static const int LAST_BIT = NUM_BITS & 31;
+
+    unsigned int bit_set[NUM_FIELDS];
     
     // Setup a bit proxy so that we can use operator[] on bit sets as a lvalue.
     class cBitProxy {
@@ -100,19 +103,14 @@ namespace emp {
     };
     friend class cBitProxy;
 
-    static const int NUM_FIELDS = 1 + ((NUM_BITS - 1) >> 5);
-    static const int LAST_BIT = NUM_BITS & 31;
-
     inline static int FieldID(const int index) {
       assert((index >> 5) >= 0 && (index >> 5) < NUM_FIELDS);
       return index >> 5;
     }
     inline static int FieldPos(const int index) { return index & 31; }
 
-    inline static unsigned int * Duplicate(unsigned int * in_set) {
-      unsigned int * out_set = new unsigned int[NUM_FIELDS];
-      for (int i = 0; i < NUM_BITS; i++) out_set[i] = in_set[i];
-      return out_set;
+    inline void Copy(const unsigned int in_set[NUM_FIELDS]) {
+      for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
     }
 
     // Helper: call SHIFT with positive number instead
@@ -147,8 +145,8 @@ namespace emp {
     // Helper for calling SHIFT with negative number
     void ShiftRight(const int shift_size) {
       assert(shift_size > 0);
-      int field_shift = shift_size / 32;
-      int bit_shift = shift_size % 32;
+      const int field_shift = shift_size / 32;
+      const int bit_shift = shift_size % 32;
   
       // account for field_shift
       if (field_shift) {
@@ -162,8 +160,8 @@ namespace emp {
   
       // account for bit_shift
       bit_set[NUM_FIELDS - 1] >>= bit_shift;  // drops off right end, may shift in ones if sign bit was set
-      int temp = 0;
-      for (int i = NUM_FIELDS - 2; i >= 0; i--) {
+      unsigned int temp = 0;
+      for (int i = NUM_FIELDS - 2; i >= 0; --i) {
         temp = bit_set[i] << (32 - bit_shift);
         bit_set[i] >>= bit_shift;
         bit_set[i + 1] |= temp;
@@ -171,16 +169,12 @@ namespace emp {
     }
 
   public:
-    BitSet() : bit_set(new unsigned int [NUM_FIELDS]) { Clear(); }
-    BitSet(const BitSet & in_set) : bit_set(Duplicate(in_set.bit_set)) { ; }
+    BitSet() { Clear(); }
+    BitSet(const BitSet & in_set) { Copy(in_set.bit_set); }
+    ~BitSet() { ; }
 
-    void TestPrint() {
-      std::cout << *bit_set << std::endl;
-    }
-    
     BitSet & operator=(const BitSet & in_set) {
-      if (bit_set) delete [] bit_set;
-      bit_set = Duplicate(in_set.bit_set);
+      Copy(in_set.bit_set);
       return *this;
     }
 
