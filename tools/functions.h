@@ -237,17 +237,55 @@ namespace emp {
         // numbers to the left, upper, or upper left in the chart plus one.
         else {
           cur_row[col] = emp::min(prev_row[col], prev_row[col-1], cur_row[col-1]) + 1;
-          int match_count = 0;
-          if (cur_row[col] == prev_row[col]) { edit_info[row][col] == 'd'; match_count++; }
-          if (cur_row[col] == prev_row[col-1]) { edit_info[row][col] == 's'; match_count++; }
-          if (cur_row[col] == cur_row[col-1]) { edit_info[row][col] == 'i'; match_count++; }
-          if (match_count > 1) { multi = true; }
+          if (cur_row[col] == prev_row[col]+1)   { edit_info[row][col] = 'd'; }
+          if (cur_row[col] == prev_row[col-1]+1) { edit_info[row][col] = 's'; }
+          if (cur_row[col] == cur_row[col-1]+1)  { edit_info[row][col] = 'i'; }
         }
       }
 
       // Swap cur_row and prev_row (keep cur vals in prev row, recycle vector cur_row)
       std::swap(cur_row, prev_row);
     }
+
+    // Fill in gaps in the sequences to make them align!
+    
+    int c = size1-1;
+    int r = size2-1;
+    int length = 0;
+
+    while (c >= 0 || r >= 0) {
+      if (c < 0) { ++length; --r; continue; }
+      else if (r < 0) { ++length; --c; continue; }
+
+      char cur_move = edit_info[r][c];
+      switch(cur_move) {
+      case 's': --c; --r; ++length; break;
+      case 'd': --r; ++length; break;
+      case 'i': --c; ++length; break;
+      };
+    }
+      
+    c = size1-1;
+    r = size2-1;
+
+    TYPE out1(length, gap);
+    TYPE out2(length, gap);
+
+    int pos = length - 1;
+
+    while (c >= 0 && r >= 0) {
+      switch(edit_info[r][c]) {
+      case 's': out1[pos] = in1[c]; out2[pos] = in2[r]; --c; --r; break;
+      case 'd': out1[pos] = gap;    out2[pos] = in2[r];      --r; break;
+      case 'i': out1[pos] = in1[c]; out2[pos] = gap;    --c;      break;
+      };
+      --pos;
+    }
+    while (c >= 0) { out1[pos] = in1[c]; --c; --pos; }
+    while (r >= 0) { out2[pos] = in2[r]; --r; --pos; }
+
+    in1 = out1;
+    in2 = out2;
 
     // Now that we are done, return the bottom-right corner of the chart.
     return prev_row[size1 - 1];
