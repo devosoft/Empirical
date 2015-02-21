@@ -34,8 +34,9 @@
 //  void SetAll()
 //
 // Printing:
-//  void Print(ostream & out=cout) const
-//  void PrintOneIDs(ostream & out=cout) const
+//  void Print(ostream & out=cout) const          -- Print bitset (least significant on right)
+//  void PrintArray(ostream & out=cout) const     -- Print as array (index zero on left)
+//  void PrintOneIDs(ostream & out=cout) const    -- Just print the IDs of the set bits.
 //
 // Bit play:
 //  int CountOnes()
@@ -116,25 +117,28 @@ namespace emp {
     // Helper: call SHIFT with positive number instead
     void ShiftLeft(const int shift_size) {
       assert(shift_size > 0);
-      int field_shift = shift_size / 32;
-      int bit_shift = shift_size % 32;
-    
-      // account for field_shift
+      const int field_shift = shift_size / 32;
+      const int bit_shift = shift_size % 32;
+      const int bit_overflow = 32 - bit_shift;
+
+      // Loop through each field, from L to R, and update it.
       if (field_shift) {
-        for (int i = NUM_FIELDS - 1; i >= field_shift; i--) {
+        for (int i = NUM_FIELDS - 1; i >= field_shift; --i) {
           bit_set[i] = bit_set[i - field_shift];
         }
         for (int i = field_shift - 1; i >= 0; i--) bit_set[i] = 0;
       }
     
       // account for bit_shift
-      int temp = 0;
-      for (int i = 0; i < NUM_FIELDS; i++) {
-        temp = bit_set[i] >> (32 - bit_shift);
-        bit_set[i] <<= bit_shift;
-        if (i > 0) bit_set[i - 1] |= temp;  // lower bits of bit_set[i - 1] are all 0
+      if (bit_shift) {
+        for (int i = NUM_FIELDS - 1; i > field_shift; --i) {
+          bit_set[i] <<= bit_shift;
+          bit_set[i] |= (bit_set[i-1] >> bit_overflow);
+        }
+        // Handle final field (field_shift position)
+        bit_set[field_shift] <<= bit_shift;
       }
-    
+
       // mask out any bits that have left-shifted away, allowing CountBits and CountBits2 to work
       // blw: if CountBits/CountBits2 are fixed, this code should be removed as it will be redundant
       unsigned int shift_mask = 0xFFFFFFFF >> ((32 - (NUM_BITS % 32)) & 0x1F);
@@ -147,24 +151,23 @@ namespace emp {
       assert(shift_size > 0);
       const int field_shift = shift_size / 32;
       const int bit_shift = shift_size % 32;
+      const int bit_overflow = 32 - bit_shift;
   
       // account for field_shift
       if (field_shift) {
-        for (int i = 0; i < NUM_FIELDS - field_shift; i++) {
+        for (int i = 0; i < (NUM_FIELDS - field_shift); ++i) {
           bit_set[i] = bit_set[i + field_shift];
         }
-        for(int i = NUM_FIELDS - field_shift; i < NUM_FIELDS; i++) {
-          bit_set[i] = 0;
-        }
+        for(int i = NUM_FIELDS - field_shift; i < NUM_FIELDS; i++) bit_set[i] = 0;
       }
   
       // account for bit_shift
-      bit_set[NUM_FIELDS - 1] >>= bit_shift;  // drops off right end, may shift in ones if sign bit was set
-      unsigned int temp = 0;
-      for (int i = NUM_FIELDS - 2; i >= 0; --i) {
-        temp = bit_set[i] << (32 - bit_shift);
-        bit_set[i] >>= bit_shift;
-        bit_set[i + 1] |= temp;
+      if (bit_shift) {
+        for (int i = 0; i < (NUM_FIELDS - 1 - field_shift); ++i) {
+          bit_set[i] >>= bit_shift;
+          bit_set[i] |= (bit_set[i+1] << bit_overflow);
+        }
+        bit_set[NUM_FIELDS - 1 - field_shift] >>= bit_shift;
       }
     }
 
@@ -213,11 +216,17 @@ namespace emp {
       if (LAST_BIT > 0) { bit_set[NUM_FIELDS - 1] &= (1 << LAST_BIT) - 1; }
     }
   
+    // void Print(std::ostream & out=std::cout) const {
+    //   for (int i = NUM_BITS - 1; i >= 0; i--) out << Get(i);
+    // }
     void Print(std::ostream & out=std::cout) const {
-      for (int i = 0; i < NUM_BITS; i++) out << Get(i);
+      for (int i = NUM_BITS - 1; i >= 0; i--) {
+        out << Get(i);
+        if (i % 32 == 0) out << ' ';
+      }
     }
-    void PrintRightToLeft(std::ostream & out=std::cout) const {
-      for (int i = NUM_BITS - 1; i >= 0; i--) out << Get(i);
+    void PrintArray(std::ostream & out=std::cout) const {
+      for (int i = 0; i < NUM_BITS; i++) out << Get(i);
     }
     void PrintOneIDs(std::ostream & out=std::cout, char spacer=' ') const {
       for (int i = 0; i < NUM_BITS; i++) { if (Get(i)) out << i << spacer; }
@@ -359,14 +368,14 @@ namespace emp {
     // Positive shifts go left and negative go right (0 does nothing)
     BitSet SHIFT(const int shift_size) const {
       BitSet out_set(*this);
-      if (shift_size > 0) out_set.ShiftLeft(shift_size);
-      else if (shift_size < 0) out_set.ShiftRight(-shift_size);
+      if (shift_size > 0) out_set.ShiftRight(shift_size);
+      else if (shift_size < 0) out_set.ShiftLeft(-shift_size);
       return out_set;
     }
 
     BitSet & SHIFT_SELF(const int shift_size) {
-      if (shift_size > 0) ShiftLeft(shift_size);
-      else if (shift_size < 0) ShiftRight(-shift_size);
+      if (shift_size > 0) ShiftRight(shift_size);
+      else if (shift_size < 0) ShiftLeft(-shift_size);
       return *this;
     }
 
