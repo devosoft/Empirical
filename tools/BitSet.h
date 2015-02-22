@@ -10,8 +10,8 @@
 // Class: template <int NUM_BITS> emp::BitSet
 // Desc: This class handles a fixed-sized (but arbitrarily large) array of bits,
 //       and optimizes operations on those bits to be as fast as possible.
-// Note: Unlike std::bitset, emp::BitSet gives access to bit fields for implementation
-//       new bit-magic tricks.
+// Note: Unlike std::bitset, emp::BitSet gives access to bit fields for easy access to different
+//       sized chucnk of bits and implementation new bit-magic tricks.
 //
 //
 // Constructors:
@@ -19,26 +19,34 @@
 //  BitSet(const BitSet & in_set)   -- Copy Constructor
 //
 // Assignment and equality test:
-//  BitSet & operator=(const BitSet & in_set)
-//  bool operator==(const BitSet & in_set) const
+//  BitSet & operator=(const BitSet & in_set)     -- Copy over a BitSet of the same size
+//  BitSet & Import(const BitSet & in_set)        -- Copy over a BitSet of a different size
+//  BitSet Export<NEW_SIZE>()                     -- Convert this BitSet a different size
+//  bool operator==(const BitSet & in_set) const  -- Test if all bits are the same size.
 //
 // Sizing:
 //  int GetSize() const
 //
-// Accessors:
+// Accessors for bits:
 //  void Set(int index, bool value)
 //  bool Get(int index) const
 //  bool operator[](int index) const
 //  cBitProxy operator[](int index)
-//  void Clear()
-//  void SetAll()
+//
+// Accessors for larger chunks:
+//  void Clear()                                   -- Set all bits to zero
+//  void SetAll()                                  -- Set all bits to one
+//  unsigned char GetByte(int byte_id) const       -- Read a full byte of bits
+//  void SetByte(int byte_id, unsigned char value) -- Set a full byte of bits
+//  unsigned int GetUInt(int uint_id) const        -- Read 32 bits at once
+//  void SetUInt(int uint_id, unsigned int value)  -- Set 32 bits at once
 //
 // Printing:
-//  void Print(ostream & out=cout) const          -- Print bitset (least significant on right)
+//  void Print(ostream & out=cout) const          -- Print BitSet (least significant on right)
 //  void PrintArray(ostream & out=cout) const     -- Print as array (index zero on left)
 //  void PrintOneIDs(ostream & out=cout) const    -- Just print the IDs of the set bits.
 //
-// Bit play:
+// Bit analysis:
 //  int CountOnes()
 //  int FindBit1(int start_bit)   -- Return pos of first 1 after start_bit 
 //
@@ -83,6 +91,7 @@ namespace emp {
   private:
     static const int NUM_FIELDS = 1 + ((NUM_BITS - 1) >> 5);
     static const int LAST_BIT = NUM_BITS & 31;
+    static const int NUM_BYTES = 1 + ((NUM_BITS - 1) >> 3);
 
     unsigned int bit_set[NUM_FIELDS];
     
@@ -109,6 +118,9 @@ namespace emp {
       return index >> 5;
     }
     inline static int FieldPos(const int index) { return index & 31; }
+
+    inline static int Byte2Field(const int index) { return index/4; }
+    inline static int Byte2FieldPos(const int index) { return (index & 3) << 3; }
 
     inline void Copy(const unsigned int in_set[NUM_FIELDS]) {
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
@@ -176,9 +188,30 @@ namespace emp {
     BitSet(const BitSet & in_set) { Copy(in_set.bit_set); }
     ~BitSet() { ; }
 
-    BitSet & operator=(const BitSet & in_set) {
+    BitSet & operator=(const BitSet<NUM_BITS> & in_set) {
       Copy(in_set.bit_set);
       return *this;
+    }
+
+    // Assign from a BitSet of a different size.
+    template <int NUM_BITS2>
+    BitSet & Import(const BitSet<NUM_BITS2> & in_set) {
+      static const int NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> 5);
+      static const int MIN_FIELDS = (NUM_FIELDS < NUM_FIELDS2) ? NUM_FIELDS : NUM_FIELDS2;
+      for (int i = 0; i < MIN_FIELDS; i++) bit_set[i] = in_set.GetUInt(i);  // Copy avail fields
+      for (int i = MIN_FIELDS; i < NUM_FIELDS; i++) bit_set[i] = 0;         // Zero extra fields
+      return *this;
+    }
+
+    // Convert to a Bitset of a different size.
+    template <int NUM_BITS2>
+    BitSet<NUM_BITS2> Export() const {
+      static const int NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> 5);
+      static const int MIN_FIELDS = (NUM_FIELDS < NUM_FIELDS2) ? NUM_FIELDS : NUM_FIELDS2;
+      BitSet<NUM_BITS2> out_bits;
+      for (int i = 0; i < MIN_FIELDS; i++) out_bits.SetUInt(i, bit_set[i]);  // Copy avail fields
+      for (int i = MIN_FIELDS; i < NUM_FIELDS; i++) out_bits.SetUInt(i, 0);  // Zero extra fields
+      return out_bits;
     }
 
     bool operator==(const BitSet & in_set) const {
@@ -188,7 +221,15 @@ namespace emp {
       return true;
     }
 
-    int GetSize() const { return NUM_BITS; }
+    constexpr int GetSize() { return NUM_BITS; }
+    constexpr size_t size() { return NUM_BITS; }  // For STL compatability.
+
+    bool Get(int index) const {
+      assert(index >= 0 && index < NUM_BITS);
+      const int field_id = FieldID(index);
+      const int pos_id = FieldPos(index);
+      return (bit_set[field_id] & (1 << pos_id)) != 0;
+    }
 
     void Set(int index, bool value) {
       assert(index >= 0 && index < NUM_BITS);
@@ -200,12 +241,31 @@ namespace emp {
       else       bit_set[field_id] &= ~pos_mask;
     }
 
-    bool Get(int index) const {
-      assert(index >= 0 && index < NUM_BITS);
-      const int field_id = FieldID(index);
-      const int pos_id = FieldPos(index);
-      return (bit_set[field_id] & (1 << pos_id)) != 0;
+    unsigned char GetByte(int index) const {
+      assert(index >= 0 && index < NUM_BYTES);
+      const int field_id = Byte2Field(index);
+      const int pos_id = Byte2FieldPos(index);
+      return (bit_set[field_id] >> pos_id) & 255;
     }
+
+    void SetByte(int index, unsigned char value) {
+      assert(index >= 0 && index < NUM_BYTES);
+      const int field_id = Byte2Field(index);
+      const int pos_id = Byte2FieldPos(index);
+      const unsigned int val_uint = value;
+      bit_set[field_id] = (bit_set[field_id] & ~(255UL << pos_id)) | (val_uint << pos_id);
+    }
+
+    unsigned int GetUInt(int index) const {
+      assert(index >= 0 && index < NUM_FIELDS);
+      return bit_set[index];
+    }
+
+    void SetUInt(int index, unsigned int value) {
+      assert(index >= 0 && index < NUM_FIELDS);
+      bit_set[index] = value;
+    }
+
 
     bool operator[](int index) const { return Get(index); }
     cBitProxy operator[](int index) { return cBitProxy(*this, index); }
@@ -399,6 +459,13 @@ namespace emp {
     return out;
   }
 
+  template <int NUM_BITS1, int NUM_BITS2>
+  BitSet<NUM_BITS1+NUM_BITS2> join(const BitSet<NUM_BITS1> & in1, const BitSet<NUM_BITS2> & in2) {
+    BitSet<NUM_BITS1+NUM_BITS2> out_bits;
+    out_bits.Import(in2);
+    out_bits <<= NUM_BITS1;
+    out_bits |= in2.template Export<NUM_BITS1+NUM_BITS2>();
+  }
 
 };
 
