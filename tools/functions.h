@@ -120,7 +120,8 @@ namespace emp {
   };
 
   int count_bits(unsigned long long val) {
-    return ByteCount[ val >> 56 ] +
+    return
+      ByteCount[  val >> 56         ] +
       ByteCount[ (val >> 48) & 0xFF ] +
       ByteCount[ (val >> 40) & 0xFF ] +
       ByteCount[ (val >> 32) & 0xFF ] +
@@ -130,7 +131,17 @@ namespace emp {
       ByteCount[  val        & 0xFF ];
   }
 
-  int find_bit(unsigned long long val) { return count_bits( ~val & (val-1) ); }
+  int count_bits(unsigned int val) {
+    return 
+      ByteCount[  val >> 24         ] +
+      ByteCount[ (val >> 16) & 0xFF ] +
+      ByteCount[ (val >>  8) & 0xFF ] +
+      ByteCount[  val        & 0xFF ];
+  }
+
+  int find_bit(unsigned long long val) { return count_bits( (~val) & (val-1) ); }
+  int find_bit(const unsigned int val) { return count_bits( (~val) & (val-1) ); }
+
 
 
   // --- Distance functions for any array-type objects ---
