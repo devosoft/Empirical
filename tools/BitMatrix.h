@@ -14,27 +14,26 @@
 //    6 7 8
 //
 
-#include <bitset>
 #include <iostream>
 
-#include "bitset_utils.h"
+#include "BitSet.h"
 #include "functions.h"
 
 namespace emp {
   template <int COLS, int ROWS>
   class BitMatrix {
   private:
-    std::bitset<COLS*ROWS> bits;
+    BitSet<COLS*ROWS> bits;
 
   public:
     template <int START_POS, int STEP_POS, int END_POS>
-    constexpr std::bitset<COLS*ROWS> Mask() {
-      return std::bitset<COLS*ROWS>();
+    constexpr BitSet<COLS*ROWS> Mask() {
+      return BitSet<COLS*ROWS>();
     }
 
-    template <int COL_ID> static const std::bitset<COLS*ROWS> & MaskCol() {
+    template <int COL_ID> static const BitSet<COLS*ROWS> & MaskCol() {
       static bool init = false;
-      static std::bitset<COLS*ROWS> mask;
+      static BitSet<COLS*ROWS> mask;
       if (!init) {
         for (int i = 0; i < ROWS; i++) mask[i*COLS + COL_ID] = 1;
         init = true;
@@ -43,9 +42,9 @@ namespace emp {
       // return mask_pattern<COLS*ROWS, COL_ID, COLS, COLS*ROWS-1>();
     }
       
-    template <int ROW_ID> static const std::bitset<COLS*ROWS> & MaskRow() {
+    template <int ROW_ID> static const BitSet<COLS*ROWS> & MaskRow() {
       static bool init = false;
-      static std::bitset<COLS*ROWS> mask;
+      static BitSet<COLS*ROWS> mask;
       if (!init) {
         for (int i = 0; i < COLS; i++) mask[ROW_ID * COLS + i] = 1;
         init = true;
@@ -55,7 +54,7 @@ namespace emp {
       
   public:
     BitMatrix() { ; }
-    BitMatrix(const std::bitset<COLS*ROWS> & in_bits) : bits(in_bits) { ; }
+    BitMatrix(const BitSet<COLS*ROWS> & in_bits) : bits(in_bits) { ; }
     BitMatrix(const BitMatrix & in_matrix) : bits(in_matrix.bits) { ; }
     ~BitMatrix() { ; }
 
@@ -94,7 +93,7 @@ namespace emp {
     // Find the position of the first non-zero bit.
     // int FindBit() const { return (~bits & (bits - 1)).count(); }
 
-    int FindBit() const { return find_bit(bits); }
+    int FindBit() const { return bits.FindBit(); }
 
     // Shift the whole matrix in the specified direction.
     BitMatrix LeftShift() const { return ((bits & ~MaskCol<0>()) >> 1); }
@@ -158,7 +157,7 @@ namespace emp {
     BitMatrix operator^(const BitMatrix & in) const { return bits ^ in.bits; }
 
     // Conversions
-    const std::bitset<COLS*ROWS> & to_bitset() { return bits; }
+    const BitSet<COLS*ROWS> & to_bitset() { return bits; }
   };
 };
 
