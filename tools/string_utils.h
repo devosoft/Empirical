@@ -73,6 +73,31 @@ namespace emp {
   }
 
 
+  // Convert to roman numerals
+  std::string to_roman_numeral(int val, const std::string & prefix="") {
+    std::string ret_string(prefix);
+    if (val < 0) ret_string += to_roman_numeral(-val, "-");
+    else if (val > 3999) { ; } // Out of bounds; return a blank;
+    else if (val >= 1000) ret_string += to_roman_numeral(val - 1000, "M");
+    else if (val >= 900) ret_string += to_roman_numeral(val - 900, "CM");
+    else if (val >= 500) ret_string += to_roman_numeral(val - 500, "D");
+    else if (val >= 400) ret_string += to_roman_numeral(val - 400, "CD");
+    else if (val >= 100) ret_string += to_roman_numeral(val - 100, "C");
+    else if (val >= 90) ret_string += to_roman_numeral(val - 90, "XC");
+    else if (val >= 50) ret_string += to_roman_numeral(val - 50, "L");
+    else if (val >= 40) ret_string += to_roman_numeral(val - 40, "XL");
+    else if (val >= 10) ret_string += to_roman_numeral(val - 10, "X");
+    else if (val == 9) ret_string += "IX";
+    else if (val >= 5) ret_string += to_roman_numeral(val - 5, "V");
+    else if (val == 4) ret_string += "IV";
+    else if (val > 0) ret_string += to_roman_numeral(val - 1, "I");
+
+    // else we already have it exactly and don't need to return anything.                             
+    return ret_string;
+  }
+
+
+
   bool is_whitespace(char test_char) {
     return (test_char == ' ' || test_char == '\n' || test_char == '\r' || test_char == '\t');
   }
