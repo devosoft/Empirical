@@ -1,10 +1,6 @@
 #ifndef EMP_BIT_SET_H
 #define EMP_BIT_SET_H
 
-#include <assert.h>
-#include <iostream>
-#include <vector>
-
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // Class: template <int NUM_BITS> emp::BitSet
@@ -85,7 +81,21 @@
 //
 
 
+#include <assert.h>
+#include <iostream>
+#include <vector>
+
+#include "functions.h"
+
 namespace emp {
+
+  constexpr unsigned int UIntMaskLow(int num_bits) {
+    return (num_bits == 32) ? -1 : ((1 << num_bits) - 1);
+  }
+
+  constexpr unsigned int UIntMaskHigh(int num_bits) {
+    return UIntMaskLow(num_bits) << (32-num_bits);
+  }
 
   template <int NUM_BITS> class BitSet {
   private:
@@ -267,22 +277,30 @@ namespace emp {
     }
 
 
+    bool Any() const { for (auto i : bit_set) if (i) return true; return false; }
+    bool None() const { return !Any(); }
+    bool All() const { return (~(*this)).None(); }
+
+    // For compatability with std::bitset.
+    bool all() const { return All(); }
+    bool any() const { return Any(); }
+    bool none() const { return !Any(); }
+    
+
     bool operator[](int index) const { return Get(index); }
     cBitProxy operator[](int index) { return cBitProxy(*this, index); }
 
-    void Clear() { for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = 0; }
+    void Clear() { for (auto & i : bit_set) i = 0UL; }
     void SetAll() { 
-      for (int i = 0; i < NUM_FIELDS; i++) { bit_set[i] = ~0; }    
-      if (LAST_BIT > 0) { bit_set[NUM_FIELDS - 1] &= (1 << LAST_BIT) - 1; }
+      for (auto & i : bit_set) i = ~0UL;
+      if (LAST_BIT > 0) { bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT); }
     }
+
   
-    // void Print(std::ostream & out=std::cout) const {
-    //   for (int i = NUM_BITS - 1; i >= 0; i--) out << Get(i);
-    // }
     void Print(std::ostream & out=std::cout) const {
       for (int i = NUM_BITS - 1; i >= 0; i--) {
         out << Get(i);
-        if (i % 32 == 0) out << ' ';
+        // if (i % 32 == 0) out << ' ';
       }
     }
     void PrintArray(std::ostream & out=std::cout) const {
@@ -292,14 +310,14 @@ namespace emp {
       for (int i = 0; i < NUM_BITS; i++) { if (Get(i)) out << i << spacer; }
     }
 
+
     // Count 1's by looping through once for each bit equal to 1
     int CountOnes_Sparse() const { 
       int bit_count = 0;
-      for (int i = 0; i < NUM_FIELDS; i++) {
-        int temp = bit_set[i];
-        while (temp) {
-          temp = temp & (temp - 1);
-          bit_count++;
+      for (auto i : bit_set) {
+        while (i) {
+          i &= (i-1);       // Peel off a single 1.
+          bit_count++;      // And increment the counter
         }
       }
       return bit_count;
@@ -308,18 +326,28 @@ namespace emp {
     // Count 1's in semi-parallel; fastest for even 0's & 1's
     int CountOnes_Mixed() const {
       int bit_count = 0;
-      for (int i = 0; i < NUM_FIELDS; i++) {
-        const int  v = bit_set[i];
-        unsigned int const t1 = v - ((v >> 1) & 0x55555555);
-        unsigned int const t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
+      for (const auto v : bit_set) {
+        const unsigned int t1 = v - ((v >> 1) & 0x55555555);
+        const unsigned int t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
         bit_count += ((t2 + (t2 >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
       }
       return bit_count;
     }
 
     int CountOnes() const { return CountOnes_Mixed(); }
+    int count() const { return CountOnes_Mixed(); } // For compatability with std::bitset
 
-    int FindBit1(const int start_pos=0) const {
+    int FindBit() const {
+      int field_id;
+      int offset = 0;
+      for (field_id = 0; field_id < NUM_FIELDS; field_id++) {
+        if (bit_set[field_id]) break;
+        offset += 32;
+      }
+      return (field_id < NUM_FIELDS) ? find_bit(bit_set[field_id]) + offset : -1;
+    }
+
+    int FindBit(const int start_pos) const {
       // @CAO -- There are better ways to do this with bit tricks 
       //         (but start_pos is tricky...)
       for (int i = start_pos; i < NUM_BITS; i++) {
@@ -341,7 +369,7 @@ namespace emp {
     BitSet NOT() const {
       BitSet out_set(*this);
       for (int i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~bit_set[i];
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= (1 << LAST_BIT) - 1;
+      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT);
       return out_set;
     }
 
@@ -360,14 +388,14 @@ namespace emp {
     BitSet NAND(const BitSet & set2) const {
       BitSet out_set(*this);
       for (int i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= (1 << LAST_BIT) - 1;
+      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT);
       return out_set;
     }
 
     BitSet NOR(const BitSet & set2) const {
       BitSet out_set(*this);
       for (int i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= (1 << LAST_BIT) - 1;
+      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT);
       return out_set;
     }
 
@@ -380,7 +408,7 @@ namespace emp {
     BitSet EQU(const BitSet & set2) const {
       BitSet out_set(*this);
       for (int i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= (1 << LAST_BIT) - 1;
+      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT);
       return out_set;
     }
   
@@ -388,7 +416,7 @@ namespace emp {
     // Boolean math functions...
     BitSet & NOT_SELF() {
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= (1 << LAST_BIT) - 1;
+      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT);
       return *this;
     }
 
@@ -404,13 +432,13 @@ namespace emp {
 
     BitSet & NAND_SELF(const BitSet & set2) {
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= (1 << LAST_BIT) - 1;
+      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT);
       return *this;
     }
 
     BitSet & NOR_SELF(const BitSet & set2) {
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= (1 << LAST_BIT) - 1;
+      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT);
       return *this;
     }
 
@@ -421,7 +449,7 @@ namespace emp {
 
     BitSet & EQU_SELF(const BitSet & set2) {
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= (1 << LAST_BIT) - 1;
+      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT);
       return *this;
     }
   
