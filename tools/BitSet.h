@@ -231,8 +231,7 @@ namespace emp {
       return true;
     }
 
-    constexpr int GetSize() { return NUM_BITS; }
-    constexpr size_t size() { return NUM_BITS; }  // For STL compatability.
+    constexpr static int GetSize() { return NUM_BITS; }
 
     bool Get(int index) const {
       assert(index >= 0 && index < NUM_BITS);
@@ -281,11 +280,6 @@ namespace emp {
     bool None() const { return !Any(); }
     bool All() const { return (~(*this)).None(); }
 
-    // For compatability with std::bitset.
-    bool all() const { return All(); }
-    bool any() const { return Any(); }
-    bool none() const { return !Any(); }
-    
 
     bool operator[](int index) const { return Get(index); }
     cBitProxy operator[](int index) { return cBitProxy(*this, index); }
@@ -335,7 +329,6 @@ namespace emp {
     }
 
     int CountOnes() const { return CountOnes_Mixed(); }
-    int count() const { return CountOnes_Mixed(); } // For compatability with std::bitset
 
     int FindBit() const {
       int field_id;
@@ -480,6 +473,13 @@ namespace emp {
     const BitSet & operator^=(const BitSet & ar2) { return XOR_SELF(ar2); }
     const BitSet & operator<<=(const int shift_size) { return SHIFT_SELF(-shift_size); }
     const BitSet & operator>>=(const int shift_size) { return SHIFT_SELF(shift_size); }
+
+    // For compatability with std::bitset.
+    constexpr static size_t size() { return NUM_BITS; }
+    inline bool all() const { return All(); }
+    inline bool any() const { return Any(); }
+    inline bool none() const { return !Any(); }
+    inline size_t count() const { return CountOnes_Mixed(); }
   };
 
   template <int NUM_BITS> std::ostream & operator<<(std::ostream & out, const BitSet<NUM_BITS> & _bit_set) {
