@@ -1,0 +1,16 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Empirical Test</title>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script type="text/javascript" src="../libs/kinetic-v5.1.0.min.js"></script>
+    <script type="text/javascript" src="LayerManagement.js"></script>
+    <script>
+      empJSDoCallback = Module.cwrap('empJSDoCallback', null, ['number', 'number']);
+      empMain = Module.cwrap('empMain', 'number');
+      var result = empMain();
+    </script>
+  </body>
+</html>
