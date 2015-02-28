@@ -217,7 +217,6 @@ namespace emp {
   int align(TYPE & in1, TYPE & in2, GAP_TYPE gap) {
     const auto size1 = in1.size();
     const auto size2 = in2.size();
-    bool multi = false; // Are there multiple ways of solving this problem?
 
     // If either size is zero, other size indicates number of insertions needed to produce it.
     if (size1 == 0) return size2;

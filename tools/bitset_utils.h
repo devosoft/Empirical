@@ -12,9 +12,16 @@
 
 namespace emp {
 
+  template <int NUM_BITS>
+  constexpr unsigned int UIntMaskFirst() { return (UIintMaskFirst<NUM_BITS-1> << 1) | 1; }
+
+  template <>
+  constexpr unsigned int UIntMaskFirst<0>() { return 0; }
+
+  /*
   // Returns the position of the first set (one) bit or a -1 if none exist.
   template <size_t BITS>
-  int find_bit(const std::bitset<BITS> & in) noexcept {
+  int find_bit(const std::bitset<BITS> & in) {
     int offset = 0;
     unsigned long long tmp_bits = 0ULL;
     while (offset < BITS && ((tmp_bits = (in >> offset).to_ullong()) == 0ULL)) {
