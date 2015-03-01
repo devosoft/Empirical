@@ -45,7 +45,7 @@ namespace Kinetic {
   class Node {
   protected:
     int obj_id;
-    Node * layer;
+    Layer * layer;
     std::string name;
 
     // Helpers...
@@ -222,8 +222,8 @@ namespace Kinetic {
 
     inline Node & SetCenter(const Point<int> & point) { return SetXY(point.GetX()-GetWidth()/2, point.GetY()-GetHeight()/2); }
 
-    Layer * GetLayer() { return (Layer *) layer; }
-    void SetLayer(Layer * _layer) { layer = (Node *) _layer; }
+    Layer * GetLayer() { return layer; }
+    void SetLayer(Layer * _layer) { layer = _layer; }
 
     // Draw either this object or objects in contains.
     void Draw() {
@@ -232,7 +232,7 @@ namespace Kinetic {
     }
 
     // Draw all objects in this layer.
-    void DrawLayer() { if (layer) layer->Draw(); }
+    void DrawLayer() { emp_assert(layer != NULL); ((Node *) layer)->Draw(); }
 
     // Move this object to the top of the current layer.
     void MoveToTop() {
@@ -593,6 +593,9 @@ namespace Kinetic {
   {
     // @CAO Technically we should track these callbacks to make sure we delete them properly.
     MethodCallback_Event<T> * new_callback = new MethodCallback_Event<T>(target, method_ptr);
+
+    emp::Alert("Setting up an On for obj ", obj_id, " with target id ", target->GetID());
+
     EM_ASM_ARGS({
         var trigger = Pointer_stringify($1);
         emp_info.objs[$0].on(trigger, function(event) {
