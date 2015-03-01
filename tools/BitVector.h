@@ -26,7 +26,7 @@ namespace emp {
     int NumFields() const { return 1 + ((num_bits - 1) >> 5); }
     int NumBytes() const { return  1 + ((num_bits - 1) >> 3); }
 
-    unsigned long * bit_set;
+    unsigned int * bit_set;
     
     // Setup a bit proxy so that we can use operator[] on bit sets as a lvalue.
     class BitProxy {
@@ -55,7 +55,7 @@ namespace emp {
     // The following function assumes that the size of the bit_set has already been adjusted
     // to be the same as the size of the one being copied and only the fields need to be
     // copied over.
-    inline void RawCopy(const unsigned long * in_set) {
+    inline void RawCopy(const unsigned int * in_set) {
       const int NUM_FIELDS = NumFields();
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
     }
@@ -88,7 +88,7 @@ namespace emp {
 
       // Mask out any bits that have left-shifted away
       const int last_bit_id = LastBitID();
-      if (last_bit_id) { bit_set[NUM_FIELDS - 1] &= (1UL << last_bit_id) - 1UL; }
+      if (last_bit_id) { bit_set[NUM_FIELDS - 1] &= (1U << last_bit_id) - 1U; }
     }
 
   
@@ -109,7 +109,7 @@ namespace emp {
         for (int i = 0; i < (NUM_FIELDS - field_shift); ++i) {
           bit_set[i] = bit_set[i + field_shift];
         }
-        for (int i = NUM_FIELDS - field_shift; i < NUM_FIELDS; i++) bit_set[i] = 0UL;
+        for (int i = NUM_FIELDS - field_shift; i < NUM_FIELDS; i++) bit_set[i] = 0U;
       }
   
       // account for bit_shift
@@ -125,13 +125,13 @@ namespace emp {
   public:
     BitVector(int in_num_bits=0) : num_bits(in_num_bits) {
       assert(in_num_bits >= 0);
-      bit_set = (num_bits == 0) ? NULL : new unsigned long[NumFields()];
+      bit_set = (num_bits == 0) ? NULL : new unsigned int[NumFields()];
       Clear();
     }
     BitVector(const BitVector & in_set) : num_bits(in_set.num_bits) {
       if (num_bits == 0) bit_set = NULL;
       else {
-        bit_set = new unsigned long[NumFields()];
+        bit_set = new unsigned int[NumFields()];
         RawCopy(in_set.bit_set);
       }
     }
@@ -146,7 +146,7 @@ namespace emp {
         if (bit_set) delete [] bit_set;
         if (num_bits == 0) bit_set = NULL;
         else {
-          bit_set = new unsigned long[NumFields()];
+          bit_set = new unsigned int[NumFields()];
         }
       }
 
@@ -164,7 +164,7 @@ namespace emp {
 
       if (in_num_fields != prev_num_fields) {
         if (bit_set) delete [] bit_set;
-        bit_set = (num_bits == 0) ? NULL : new unsigned long[NumFields()];
+        bit_set = (num_bits == 0) ? NULL : new unsigned int[NumFields()];
       }
 
       for (int i = 0; i < in_num_fields; i++) bit_set[i] = in_set.GetUInt(i);
@@ -189,14 +189,14 @@ namespace emp {
       assert(index >= 0 && index < num_bits);
       const int field_id = FieldID(index);
       const int pos_id = FieldPos(index);
-      return (bit_set[field_id] & (1UL << pos_id)) != 0;
+      return (bit_set[field_id] & (1U << pos_id)) != 0;
     }
 
     void Set(int index, bool value) {
       assert(index >= 0 && index < num_bits);
       const int field_id = FieldID(index);
       const int pos_id = FieldPos(index);
-      const int pos_mask = 1UL << pos_id;
+      const int pos_mask = 1U << pos_id;
 
       if (value) bit_set[field_id] |= pos_mask;
       else       bit_set[field_id] &= ~pos_mask;
@@ -206,23 +206,23 @@ namespace emp {
       assert(index >= 0 && index < NumBytes());
       const int field_id = Byte2Field(index);
       const int pos_id = Byte2FieldPos(index);
-      return (bit_set[field_id] >> pos_id) & 255UL;
+      return (bit_set[field_id] >> pos_id) & 255U;
     }
 
     void SetByte(int index, unsigned char value) {
       assert(index >= 0 && index < NumBytes());
       const int field_id = Byte2Field(index);
       const int pos_id = Byte2FieldPos(index);
-      const unsigned long val_uint = value;
-      bit_set[field_id] = (bit_set[field_id] & ~(255UL << pos_id)) | (val_uint << pos_id);
+      const unsigned int val_uint = value;
+      bit_set[field_id] = (bit_set[field_id] & ~(255U << pos_id)) | (val_uint << pos_id);
     }
 
-    unsigned long GetUInt(int index) const {
+    unsigned int GetUInt(int index) const {
       assert(index >= 0 && index < NumFields());
       return bit_set[index];
     }
 
-    void SetUInt(int index, unsigned long value) {
+    void SetUInt(int index, unsigned int value) {
       assert(index >= 0 && index < NumFields());
       bit_set[index] = value;
     }
@@ -241,11 +241,11 @@ namespace emp {
 
     void Clear() {
       const int NUM_FIELDS = NumFields();
-      for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = 0UL;
+      for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = 0U;
     }
     void SetAll() { 
       const int NUM_FIELDS = NumFields();
-      for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(0UL);
+      for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(0U);
       if (LastBitID() > 0) { bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LastBitID()); }
     }
 
@@ -302,7 +302,7 @@ namespace emp {
         if (bit_set[field_id]) break;
         offset += 32;
       }
-      return (field_id < NUM_FIELDS) ? find_bit(bit_set[field_id]) + offset : ((unsigned long) -1);
+      return (field_id < NUM_FIELDS) ? find_bit(bit_set[field_id]) + offset : ((unsigned int) -1);
     }
 
     int FindBit(const int start_pos) const {

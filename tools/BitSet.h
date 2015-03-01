@@ -27,7 +27,7 @@
 //  void Set(int index, bool value)
 //  bool Get(int index) const
 //  bool operator[](int index) const
-//  cBitProxy operator[](int index)
+//  BitProxy operator[](int index)
 //
 // Accessors for larger chunks:
 //  void Clear()                                   -- Set all bits to zero
@@ -106,14 +106,14 @@ namespace emp {
     unsigned int bit_set[NUM_FIELDS];
     
     // Setup a bit proxy so that we can use operator[] on bit sets as a lvalue.
-    class cBitProxy {
+    class BitProxy {
     private:
       BitSet<NUM_BITS> & bit_set;
       int index;
     public:
-      cBitProxy(BitSet<NUM_BITS> & _set, int _idx) : bit_set(_set), index(_idx) {;}
+      BitProxy(BitSet<NUM_BITS> & _set, int _idx) : bit_set(_set), index(_idx) {;}
       
-      cBitProxy & operator=(bool b) {    // lvalue handling...
+      BitProxy & operator=(bool b) {    // lvalue handling...
         bit_set.Set(index, b);
         return *this;
       }
@@ -121,7 +121,7 @@ namespace emp {
         return bit_set.Get(index);
       }
     };
-    friend class cBitProxy;
+    friend class BitProxy;
 
     inline static int FieldID(const int index) {
       assert((index >> 5) >= 0 && (index >> 5) < NUM_FIELDS);
@@ -161,10 +161,8 @@ namespace emp {
         bit_set[field_shift] <<= bit_shift;
       }
 
-      // mask out any bits that have left-shifted away, allowing CountBits and CountBits2 to work
-      // blw: if CountBits/CountBits2 are fixed, this code should be removed as it will be redundant
-      unsigned int shift_mask = 0xFFFFFFFF >> ((32 - (NUM_BITS % 32)) & 0x1F);
-      bit_set[NUM_FIELDS - 1] &= shift_mask;    
+      // Mask out any bits that have left-shifted away
+      if (LAST_BIT) { bit_set[NUM_FIELDS - 1] &= (1U << LAST_BIT) - 1U; }
     }
 
   
@@ -180,7 +178,7 @@ namespace emp {
         for (int i = 0; i < (NUM_FIELDS - field_shift); ++i) {
           bit_set[i] = bit_set[i + field_shift];
         }
-        for(int i = NUM_FIELDS - field_shift; i < NUM_FIELDS; i++) bit_set[i] = 0;
+        for (int i = NUM_FIELDS - field_shift; i < NUM_FIELDS; i++) bit_set[i] = 0;
       }
   
       // account for bit_shift
@@ -262,7 +260,7 @@ namespace emp {
       const int field_id = Byte2Field(index);
       const int pos_id = Byte2FieldPos(index);
       const unsigned int val_uint = value;
-      bit_set[field_id] = (bit_set[field_id] & ~(255UL << pos_id)) | (val_uint << pos_id);
+      bit_set[field_id] = (bit_set[field_id] & ~(255U << pos_id)) | (val_uint << pos_id);
     }
 
     unsigned int GetUInt(int index) const {
@@ -282,11 +280,11 @@ namespace emp {
 
 
     bool operator[](int index) const { return Get(index); }
-    cBitProxy operator[](int index) { return cBitProxy(*this, index); }
+    BitProxy operator[](int index) { return BitProxy(*this, index); }
 
-    void Clear() { for (auto & i : bit_set) i = 0UL; }
+    void Clear() { for (auto & i : bit_set) i = 0U; }
     void SetAll() { 
-      for (auto & i : bit_set) i = ~0UL;
+      for (auto & i : bit_set) i = ~0U;
       if (LAST_BIT > 0) { bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT); }
     }
 
