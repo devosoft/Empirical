@@ -131,7 +131,7 @@ namespace emp {
       ByteCount[  val        & 0xFF ];
   }
 
-  int count_bits(unsigned int val) {
+  int count_bits(unsigned long val) {
     return 
       ByteCount[  val >> 24         ] +
       ByteCount[ (val >> 16) & 0xFF ] +
@@ -140,7 +140,7 @@ namespace emp {
   }
 
   int find_bit(unsigned long long val) { return count_bits( (~val) & (val-1) ); }
-  int find_bit(const unsigned int val) { return count_bits( (~val) & (val-1) ); }
+  int find_bit(const unsigned long val) { return count_bits( (~val) & (val-1) ); }
 
 
 
