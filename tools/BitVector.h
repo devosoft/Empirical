@@ -281,13 +281,12 @@ namespace emp {
     // Count 1's in semi-parallel; fastest for even 0's & 1's
     int CountOnes_Mixed() const {
       const int NUM_FIELDS = NumFields(); 
-      std::cout << "xxFCxx=" << NUM_FIELDS << " ";
       int bit_count = 0;
       for (int i = 0; i < NUM_FIELDS; i++) {
         const unsigned int v = bit_set[i];
         const unsigned int t1 = v - ((v >> 1) & 0x55555555);
         const unsigned int t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
-        bit_count += ((t2 + (t2 >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
+        bit_count += (((t2 + (t2 >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
       }
       return bit_count;
     }
