@@ -40,9 +40,6 @@ namespace emp {
     }
   }
 
-  // Swap the value of two variables. // @CAO -- better to use STL version that does a MOVE.
-  // template <typename TYPE> void swap(TYPE & in1, TYPE & in2) { TYPE tmp = in1; in1 = in2; in2 = tmp; }
-
   // Run both min and max on a value to put it into a desired range.
   template <typename TYPE> TYPE to_range(const TYPE & value, const TYPE & in_min, const TYPE & in_max) {
     return (value < in_min) ? in_min : ((value > in_max) ? in_max : value);
@@ -69,6 +66,17 @@ namespace emp {
       if (*it > *max_found) max_found = it;
     }
     return *max_found;
+  }
+
+
+  std::vector<int> build_range(int min, int max, int step=1) {
+    int size = (max-min) / step;
+    std::vector<int> out_v(size);
+    int pos = 0;
+    for (int i = min; i < max; i += step) {
+      out_v[pos++] = i;
+    }
+    return out_v;
   }
 
   //  ----- Variadic Template Helpers! -----
