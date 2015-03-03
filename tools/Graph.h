@@ -30,15 +30,17 @@ namespace emp {
       void AddEdge(int to) { edge_set.Set(to, true); }
       void RemoveEdge(int to) { edge_set.Set(to, false); }
       void SetEdge(int to, bool val) { edge_set.Set(to, val); }
+      const BitVector & GetEdgeSet() const { return edge_set; }
 
       int GetDegree() const { return edge_set.CountOnes(); }
+      int GetMaskedDegree(const BitVector & mask) const { return (mask & edge_set).CountOnes(); }
     };
 
   private:
     std::vector<Node> nodes;
 
   public:
-    Graph(int num_nodes) : nodes(num_nodes, num_nodes) { ; }
+    Graph(int num_nodes=0) : nodes(num_nodes, num_nodes) { ; }
     Graph(const Graph & in_graph) : nodes(in_graph.nodes) { ; }
     ~Graph() { ; }
 
@@ -51,9 +53,17 @@ namespace emp {
       return edge_count;
     }
 
+    const BitVector & GetEdgeSet(int id) const {
+      assert(id >= 0 && id < (int) nodes.size());
+      return nodes[id].GetEdgeSet();
+    }
     int GetDegree(int id) const {
       assert(id >= 0 && id < (int) nodes.size());
       return nodes[id].GetDegree();
+    }
+    int GetMaskedDegree(int id, const BitVector & mask) const {
+      assert(id >= 0 && id < (int) nodes.size());
+      return nodes[id].GetMaskedDegree(mask);
     }
 
 
@@ -97,7 +107,6 @@ namespace emp {
 
 
     void PrintSym(std::ostream & os=std::cout) {
-      os << GetSize() << std::endl;
       os << GetSize() << " " << (GetEdgeCount()/2) << std::endl;
       for (int from = 0; from < (int) nodes.size(); from++) {
         for (int to=from+1; to < (int) nodes.size(); to++) {
