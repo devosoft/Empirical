@@ -44,7 +44,7 @@
 //
 // Bit analysis:
 //  int CountOnes()
-//  int FindBit1(int start_bit)   -- Return pos of first 1 after start_bit 
+//  int FindBit(int start_bit)   -- Return pos of first 1 after start_bit 
 //
 // Boolean math functions:
 //  BitSet NOT() const
@@ -329,14 +329,21 @@ namespace emp {
     int CountOnes() const { return CountOnes_Mixed(); }
 
     int FindBit() const {
-      int field_id;
-      int offset = 0;
-      for (field_id = 0; field_id < NUM_FIELDS; field_id++) {
-        if (bit_set[field_id]) break;
-        offset += 32;
-      }
-      return (field_id < NUM_FIELDS) ? find_bit(bit_set[field_id]) + offset : -1;
+      int field_id = 0;
+      while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
+      return (field_id < NUM_FIELDS) ? find_bit(bit_set[field_id]) + (field_id << 5) : -1;
     }
+
+    int PopBit() {
+      int field_id = 0;
+      while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
+      if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
+
+      const int pos_found = find_bit(bit_set[field_id]);
+      bit_set[field_id] &= ~(1U << pos_found);
+      return pos_found + (field_id << 5);
+    }
+
 
     int FindBit(const int start_pos) const {
       // @CAO -- There are better ways to do this with bit tricks 
