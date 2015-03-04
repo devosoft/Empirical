@@ -40,6 +40,16 @@ namespace emp {
     }
   }
 
+  // Quick bit-mask generators...
+  constexpr unsigned int UIntMaskLow(int num_bits) {
+    return (num_bits == 32) ? -1 : ((1 << num_bits) - 1);
+  }
+
+  constexpr unsigned int UIntMaskHigh(int num_bits) {
+    return UIntMaskLow(num_bits) << (32-num_bits);
+  }
+
+
   // Run both min and max on a value to put it into a desired range.
   template <typename TYPE> TYPE to_range(const TYPE & value, const TYPE & in_min, const TYPE & in_max) {
     return (value < in_min) ? in_min : ((value > in_max) ? in_max : value);

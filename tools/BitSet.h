@@ -89,14 +89,6 @@
 
 namespace emp {
 
-  constexpr unsigned int UIntMaskLow(int num_bits) {
-    return (num_bits == 32) ? -1 : ((1 << num_bits) - 1);
-  }
-
-  constexpr unsigned int UIntMaskHigh(int num_bits) {
-    return UIntMaskLow(num_bits) << (32-num_bits);
-  }
-
   template <int NUM_BITS> class BitSet {
   private:
     static const int NUM_FIELDS = 1 + ((NUM_BITS - 1) >> 5);
