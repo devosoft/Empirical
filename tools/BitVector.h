@@ -1,7 +1,7 @@
 #ifndef EMP_BIT_VECTOR_H
 #define EMP_BIT_VECTOR_H
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
 //
 // Class: emp::BitVector
 // Desc: A customized version of std::vector<bool> with additional bit magic operations
@@ -14,7 +14,6 @@
 #include <vector>
 
 #include "functions.h"
-#include "BitSet.h"
 
 namespace emp {
 
@@ -100,10 +99,6 @@ namespace emp {
       const int bit_overflow = 32 - bit_shift;
       const int NUM_FIELDS = NumFields();
       
-      std::cout << " ==RS=="
-                << " ";
-
-
       // account for field_shift
       if (field_shift) {
         for (int i = 0; i < (NUM_FIELDS - field_shift); ++i) {
@@ -154,24 +149,6 @@ namespace emp {
 
       return *this;
     }
-
-    /*
-    template <int NUM_BITS>
-    BitVector & operator=(const BitSet<NUM_BITS> & in_set) {
-      const int in_num_fields = (NUM_BITS - 1)/32 + 1;
-      const int prev_num_fields = NumFields();
-      num_bits = NUM_BITS;
-
-      if (in_num_fields != prev_num_fields) {
-        if (bit_set) delete [] bit_set;
-        bit_set = (num_bits == 0) ? NULL : new unsigned int[NumFields()];
-      }
-
-      for (int i = 0; i < in_num_fields; i++) bit_set[i] = in_set.GetUInt(i);
-
-      return *this;
-    }
-    */
 
     bool operator==(const BitVector & in_set) const {
       if (num_bits != in_set.num_bits) return false;
@@ -459,7 +436,7 @@ namespace emp {
     const BitVector & operator<<=(const int shift_size) { return SHIFT_SELF(-shift_size); }
     const BitVector & operator>>=(const int shift_size) { return SHIFT_SELF(shift_size); }
 
-    // For compatability with std::bitset.
+    // For compatability with std::vector<bool>.
     inline size_t size() { return num_bits; }
     inline bool all() const { return All(); }
     inline bool any() const { return Any(); }
