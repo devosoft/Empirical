@@ -150,6 +150,39 @@ namespace emp {
       return *this;
     }
 
+    BitVector & Resize(int new_bits) {
+      const int old_num_fields = NumFields();
+      num_bits = new_bits;
+      const int NUM_FIELDS = NumFields();
+      
+      if (new_bits == 0) {  // We are emptying this BitVector
+        if (bit_set) delete [] bit_set;
+        bit_set = NULL;
+        num_bits = 0;
+      }
+
+      else if (old_num_fields == 0) {   // We are increasing from an empty BitVector
+        bit_set = new unsigned int[NUM_FIELDS];
+        for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = 0U;
+      }
+
+      else if (NUM_FIELDS == old_num_fields) {   // We can use our existing bit field
+        num_bits = new_bits;
+        if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LastBitID()); // Zero extra bits
+      }
+
+      else {  // We have to change the number of bitfields.  Resize & copy old info.
+        unsigned int * old_bit_set = bit_set;
+        bit_set = new unsigned int[NUM_FIELDS];
+        const int min_fields = std::min(old_num_fields, NUM_FIELDS);
+        for (int i = 0; i < min_fields; i++) bit_set[i] = old_bit_set[i];
+        for (int i = min_fields; i < NUM_FIELDS; i++) bit_set[i] = 0U;
+        if (old_bit_set) delete [] old_bit_set;
+      }
+
+      return *this;
+    }
+
     bool operator==(const BitVector & in_set) const {
       if (num_bits != in_set.num_bits) return false;
 
@@ -289,12 +322,19 @@ namespace emp {
     }
 
     int FindBit(const int start_pos) const {
-      // @CAO -- There are better ways to do this with bit tricks 
-      //         (but start_pos is tricky...)
-      for (int i = start_pos; i < num_bits; i++) {
-        if (Get(i)) return i;
+      assert(start_pos >= 0);
+      if (start_pos >= num_bits) return -1;
+      int field_id  = FieldID(start_pos);     // What field do we start in?
+      const int field_pos = FieldPos(start_pos);    // What position in that field?
+      if (field_pos && (bit_set[field_id] & ~(UIntMaskLow(field_pos)))) {  // First field hit!
+        return find_bit(bit_set[field_id] & ~(UIntMaskLow(field_pos))) + (field_id << 5);
       }
-      return -1;
+
+      // Search other fields...
+      const int NUM_FIELDS = NumFields();
+      if (field_pos) field_id++;
+      while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
+      return (field_id < NUM_FIELDS) ? find_bit(bit_set[field_id]) + (field_id << 5) : -1;
     }
     std::vector<int> GetOnes() const {
       // @CAO -- There are probably better ways to do this with bit tricks.
