@@ -118,10 +118,10 @@ namespace emp {
     }
 
   public:
-    BitVector(int in_num_bits=0) : num_bits(in_num_bits) {
+    BitVector(int in_num_bits=0, bool init_val=false) : num_bits(in_num_bits) {
       assert(in_num_bits >= 0);
       bit_set = (num_bits == 0) ? NULL : new unsigned int[NumFields()];
-      Clear();
+      if (init_val) SetAll(); else Clear();
     }
     BitVector(const BitVector & in_set) : num_bits(in_set.num_bits) {
       if (num_bits == 0) bit_set = NULL;
@@ -193,7 +193,7 @@ namespace emp {
       return true;
     }
 
-    int GetSize() { return num_bits; }
+    int GetSize() const { return num_bits; }
 
     bool Get(int index) const {
       assert(index >= 0 && index < num_bits);
