@@ -1,7 +1,9 @@
 #ifndef EMP_FUNCTIONS_H
 #define EMP_FUNCTIONS_H
 
+#include <algorithm>
 #include <ctime>
+#include <map>
 #include <string>
 #include <sstream>
 #include <type_traits>
@@ -60,19 +62,19 @@ namespace emp {
   }
 
   // Build a min and max that allows a variable number of inputs to be compared.
-  template <typename T> const T & min(std::initializer_list<const T&> list) {
-    emp_assert(list.size > 0); // Nothing to return if nothing in the list!
-    auto min_found = list.begin();
-    for (auto it = list.begin()+1; it < list.end(); it++) {
+  template <typename T> const T & min(std::initializer_list<const T&> lst) {
+    emp_assert(lst.size > 0); // Nothing to return if nothing in the list!
+    auto min_found = lst.begin();
+    for (auto it = lst.begin()+1; it < lst.end(); it++) {
       if (*it < *min_found) min_found = it;
     }
     return *min_found;
   }
 
-  template <typename T> const T & max(std::initializer_list<const T&> list) {
-    emp_assert(list.size > 0); // Nothing to return if nothing in the list!
-    auto max_found = list.begin();
-    for (auto it = list.begin()+1; it < list.end(); it++) {
+  template <typename T> const T & max(std::initializer_list<const T&> lst) {
+    emp_assert(lst.size > 0); // Nothing to return if nothing in the list!
+    auto max_found = lst.begin();
+    for (auto it = lst.begin()+1; it < lst.end(); it++) {
       if (*it > *max_found) max_found = it;
     }
     return *max_found;
@@ -87,6 +89,20 @@ namespace emp {
       out_v[pos++] = i;
     }
     return out_v;
+  }
+
+  // The following two functions are from:
+  // http://stackoverflow.com/questions/5056645/sorting-stdmap-using-value
+  template<typename A, typename B> std::pair<B,A> flip_pair(const std::pair<A,B> &p)
+  {
+    return std::pair<B,A>(p.second, p.first);
+  }
+  
+  template<typename A, typename B> std::multimap<B,A> flip_map(const std::map<A,B> &src)
+  {
+    std::multimap<B,A> dst;
+    std::transform(src.begin(), src.end(), std::inserter(dst, dst.begin()), flip_pair<A,B>);
+    return dst;
   }
 
   //  ----- Variadic Template Helpers! -----
