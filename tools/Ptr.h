@@ -11,11 +11,7 @@
 
 #include <map>
 
-#undef EMP_IF_TRACK
 #ifdef EMP_TRACK_MEM
-#define EMP_IF_TRACK(STATEMENT) STATEMENT;
-#else
-#define EMP_IF_TRACK(STATEMENT)
 #endif
 
 namespace emp {
@@ -34,15 +30,17 @@ namespace emp {
     void Dec() { count--; }
     void MarkDeleted() { active = false; }
   };
-    
-
+  
   
   template <typename TYPE>
   class PtrTracker {
   private:
     std::map<TYPE *, PtrInfo> ptr_count;
 
-    PtrTracker() { ; } // Make sure trackers can't be built outside of this class.
+    // Make sure trackers can't be built outside of this class.
+    PtrTracker() { ; } 
+    PtrTracker(const PtrTracker<int> &) { ; } 
+    PtrTracker<int> & operator=(const PtrTracker<TYPE> &) { return this; }
   public:
     ~PtrTracker() { ; }
 
@@ -54,7 +52,7 @@ namespace emp {
       // @CAO Make sure this pointer is deleted before it drops to zero.
       ptr_count[ptr].Dec();
     }
-    void MarkDeleted() {
+    void MarkDeleted(TYPE * ptr) {
       // @CAO Make sure this pointer exists before deleting it!
       ptr_count[ptr].MarkDeleted();
     }
@@ -71,7 +69,10 @@ namespace emp {
     Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) { ; }
     ~Ptr() { ; }
 
-    void New() { ptr = new type; }
+    bool IsNull() { return ptr == NULL; }
+
+    void New() { ptr = new TYPE; }
+    void New(const TYPE & init_val) { ptr = new TYPE(init_val); }
     void Delete() { delete ptr; }
 
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) { ptr=_in.ptr; return *this; }
