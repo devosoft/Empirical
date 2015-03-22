@@ -9,7 +9,7 @@
 //  pointers are released.
 //
 
-// #define EMP_TRACK_MEM
+#define EMP_TRACK_MEM
 
 #include <map>
 
@@ -74,26 +74,37 @@ namespace emp {
     // Treat this class as a singleton with a single Get() method to retrieve it.
     static PtrTracker<TYPE> & Get() { static PtrTracker<TYPE> tracker; return tracker; }
 
+    // Some simple accessors
+    bool HasPtr(TYPE * ptr) const { return ptr_count.find(ptr) != ptr_count.end(); }
+    bool IsActive(TYPE * ptr) const {
+      if (!HasPtr(ptr)) return false;
+      return ptr_count.find(ptr)->IsActive();
+    }
+    int GetCount(TYPE * ptr) const {
+      if (!HasPtr(ptr)) return 0;
+      return ptr_count.find(ptr)->GetCount();
+    }
+
     // This pointer was just created as a Ptr!
     void New(TYPE * ptr) {
-      emp_assert(ptr_count.find(ptr) == ptr_count.end()); // Make sure pointer does not exist!
+      emp_assert(!HasPtr(ptr)); // Make sure pointer is not already stored!
       ptr_count[ptr] = PtrInfo(true);
     }
  
     // This pointer was already created, but given to Ptr.
     void Old(TYPE * ptr) {
-      emp_assert(ptr_count.find(ptr) == ptr_count.end()); // Make sure pointer does not exist!
+      emp_assert(!HasPtr(ptr)); // Make sure pointer is not already stored!
       ptr_count[ptr] = PtrInfo(false);
     }
     void Inc(TYPE * ptr) {
-      emp_assert(ptr_count.find(ptr) != ptr_count.end()); // Make sure pointer already exists!
+      emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
       ptr_count[ptr].Inc();
     }
     void Dec(TYPE * ptr) {
       ptr_count[ptr].Dec();
     }
     void MarkDeleted(TYPE * ptr) {
-      emp_assert(ptr_count.find(ptr) != ptr_count.end()); // Make sure pointer actually exists!
+      emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
       ptr_count[ptr].MarkDeleted();
     }
   };
