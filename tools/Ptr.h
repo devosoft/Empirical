@@ -9,18 +9,11 @@
 //  pointers are released.
 //
 
-#define EMP_TRACK_MEM
+// #define EMP_TRACK_MEM
 
 #include <map>
 
 #include "assert.h"
-
-#undef EMP_IF_MEMTRACK
-#ifdef EMP_TRACK_MEM
-#define EMP_IF_MEMTRACK(STATEMENTS) { STATEMENTS }
-#else
-#define EMP_IF_MEMTRACK(STATEMENTS)
-#endif
 
 namespace emp {
 
@@ -105,6 +98,14 @@ namespace emp {
     }
   };
 
+
+#undef EMP_IF_MEMTRACK
+#ifdef EMP_TRACK_MEM
+#define EMP_IF_MEMTRACK(STATEMENTS) { STATEMENTS }
+#else
+#define EMP_IF_MEMTRACK(STATEMENTS)
+#endif
+
   template <typename TYPE>
   class Ptr {
   private:
@@ -115,7 +116,7 @@ namespace emp {
 #endif
   public:
     Ptr() : ptr(NULL) { ; }
-    Ptr(TYPE * in_ptr) : ptr(in_ptr) { EMP_IF_MEMTRACK( Tracker().Old(ptr); ); }
+    Ptr(TYPE * in_ptr) : ptr(in_ptr) { EMP_IF_MEMTRACK( Tracker().New(ptr); ); }
     Ptr(TYPE & obj) : ptr(&obj) { EMP_IF_MEMTRACK( Tracker().Old(ptr); ); }
     Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) { EMP_IF_MEMTRACK( Tracker().Inc(ptr); ); }
     ~Ptr() { EMP_IF_MEMTRACK( Tracker().Dec(ptr); ); }
@@ -126,10 +127,21 @@ namespace emp {
       ptr = new TYPE;
       EMP_IF_MEMTRACK(Tracker().New(ptr););
     }
-    void New(const TYPE & init_val) { ptr = new TYPE(init_val); }
-    void Delete() { delete ptr; }
+    void New(const TYPE & init_val) {
+      ptr = new TYPE(init_val);
+      EMP_IF_MEMTRACK(Tracker().New(ptr););
+    }
+    void Delete() {
+      delete ptr;
+      EMP_IF_MEMTRACK( Tracker().MarkDeleted(ptr); );
+    }
 
-    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) { ptr=_in.ptr; return *this; }
+    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
+      ptr=_in.ptr;
+      EMP_IF_MEMTRACK(Tracker().Inc(ptr););
+      return *this;
+    }
+
     TYPE & operator*() { return *ptr; }
   };
 
