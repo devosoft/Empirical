@@ -154,6 +154,7 @@ namespace emp {
     }
 
     TYPE & operator*() { return *ptr; }
+    TYPE * operator->() { return ptr; }
   };
 
 };
