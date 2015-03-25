@@ -232,7 +232,10 @@ namespace Kinetic {
     }
 
     // Draw all objects in this layer.
-    void DrawLayer() { emp_assert(layer != NULL); ((Node *) layer)->Draw(); }
+    void DrawLayer() {
+      emp_assert(layer != NULL);
+      ((Node *) layer)->Draw();
+    }
 
     // Move this object to the top of the current layer.
     void MoveToTop() {
@@ -785,9 +788,9 @@ namespace Kinetic {
   public:
     Layer() {
       obj_id = EM_ASM_INT_V({
-          var obj_id = emp_info.objs.length;                   // Determine the next free id for a Kinetic object.
-          emp_info.objs[obj_id] = new Kinetic.Layer();         // Build the new layer and save it as a Kinetic object.
-          return obj_id;                                       // Return the Kinetic object id.
+          var obj_id = emp_info.objs.length;            // Determine next free id for a Kinetic object.
+          emp_info.objs[obj_id] = new Kinetic.Layer();  // Build new layer and save as a Kinetic object.
+          return obj_id;                                // Return the Kinetic object id.
       });
     }
     virtual ~Layer() { ; }
@@ -821,7 +824,11 @@ namespace Kinetic {
       return *this;
     }
 
-    void Draw() { EM_ASM_ARGS({emp_info.objs[$0].draw();}, obj_id); }
+    void Draw() {
+      emp::Alert("Testing...");
+      emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
+      EM_ASM_ARGS({emp_info.objs[$0].draw();}, obj_id);
+    }
     void BatchDraw() { EM_ASM_ARGS({emp_info.objs[$0].batchDraw();}, obj_id); }
   };
 
