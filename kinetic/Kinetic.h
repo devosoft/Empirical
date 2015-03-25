@@ -232,10 +232,7 @@ namespace Kinetic {
     }
 
     // Draw all objects in this layer.
-    void DrawLayer() {
-      emp_assert(layer != NULL);
-      ((Node *) layer)->Draw();
-    }
+    void DrawLayer(); // Defined *after* Layer.
 
     // Move this object to the top of the current layer.
     void MoveToTop() {
@@ -831,6 +828,9 @@ namespace Kinetic {
     }
     void BatchDraw() { EM_ASM_ARGS({emp_info.objs[$0].batchDraw();}, obj_id); }
   };
+
+  // Functions that rely on Layers, declared above.
+  void Node::DrawLayer() { emp_assert(layer != NULL); layer->Draw(); }
 
 
   // The main Stage object from Kinetic
