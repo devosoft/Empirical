@@ -22,15 +22,15 @@
 namespace emp {
 
   // Toggle an input bool.
-  bool toggle(bool & in_bool) { return (in_bool = !in_bool); }
+  inline bool toggle(bool & in_bool) { return (in_bool = !in_bool); }
 
   // % is actually remainder; this is a proper modulus command that handles negative #'s correctly.
-  int mod(int in_val, int mod_val) {
+  inline int mod(int in_val, int mod_val) {
     return (in_val < 0) ? (in_val % mod_val + mod_val) : (in_val % mod_val);
   }
 
   // A fast (O(log p)) integer-power command.
-  int pow(int base, int p) {
+  static int pow(int base, int p) {
     if (p == 0) return 1;
     if (p < 0) return 0;
     
@@ -81,7 +81,7 @@ namespace emp {
   }
 
 
-  std::vector<int> build_range(int min, int max, int step=1) {
+  static std::vector<int> build_range(int min, int max, int step=1) {
     int size = (max-min) / step;
     std::vector<int> out_v(size);
     int pos = 0;
@@ -153,7 +153,7 @@ namespace emp {
     3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
   };
 
-  int count_bits(unsigned long long val) {
+  inline int count_bits(unsigned long long val) {
     return
       ByteCount[  val >> 56         ] +
       ByteCount[ (val >> 48) & 0xFF ] +
@@ -165,7 +165,7 @@ namespace emp {
       ByteCount[  val        & 0xFF ];
   }
 
-  int count_bits(unsigned int val) {
+  inline int count_bits(unsigned int val) {
     return 
       ByteCount[  val >> 24         ] +
       ByteCount[ (val >> 16) & 0xFF ] +
@@ -173,8 +173,8 @@ namespace emp {
       ByteCount[  val        & 0xFF ];
   }
 
-  int find_bit(unsigned long long val) { return count_bits( (~val) & (val-1) ); }
-  int find_bit(const unsigned int val) { return count_bits( (~val) & (val-1) ); }
+  inline int find_bit(unsigned long long val) { return count_bits( (~val) & (val-1) ); }
+  inline int find_bit(const unsigned int val) { return count_bits( (~val) & (val-1) ); }
 
 
 
