@@ -43,11 +43,11 @@ namespace emp {
   }
 
   // Quick bit-mask generators...
-  constexpr unsigned int UIntMaskLow(int num_bits) {
+  static constexpr unsigned int UIntMaskLow(int num_bits) {
     return (num_bits == 32) ? -1 : ((1 << num_bits) - 1);
   }
 
-  constexpr unsigned int UIntMaskHigh(int num_bits) {
+  static constexpr unsigned int UIntMaskHigh(int num_bits) {
     return UIntMaskLow(num_bits) << (32-num_bits);
   }
 
