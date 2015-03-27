@@ -237,6 +237,24 @@ namespace emp {
       bit_set[index] = value;
     }
 
+    unsigned int GetUIntAtBit(int index) {
+      assert(index >= 0 && index < num_bits);
+      const int field_id = FieldID(index);
+      const int pos_id = FieldPos(index);
+      if (pos_id == 0) return bit_set[field_id];
+      const int NUM_FIELDS = NumFields();
+      return (bit_set[field_id] >> pos_id) |
+        ((field_id+1 < NUM_FIELDS) ? bit_set[field_id+1] << (32-pos_id) : 0);
+    }
+
+    template <int OUT_BITS>
+    unsigned int GetValueAtBit(int index) {
+      static_assert(OUT_BITS <= 32, "Requesting too many bits to fit in a UInt");
+      return GetUIntAtBit(index) & UIntMaskLow(OUT_BITS);
+    }
+
+
+
 
     bool Any() const {
       const int NUM_FIELDS = NumFields();
