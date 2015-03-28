@@ -41,9 +41,9 @@
 #include <unordered_set>
 #include <vector>
 
-#include "errors.h"
-#include "functions.h"
-#include "string_utils.h"
+#include "../tools/errors.h"
+#include "../tools/functions.h"
+#include "../tools/string_utils.h"
 #include "ConfigManager.h"
 
 using namespace std::placeholders;
