@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "../../../tools/assert.h"
-#include "../../../tools/command_line.h"
-#include "../../../tools/config.h"
+#include "../../tools/assert.h"
+#include "../../tools/command_line.h"
+#include "../../config/config.h"
 
 int main(int argc, char* argv[])
 {
