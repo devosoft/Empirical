@@ -62,4 +62,9 @@ int main(int argc, char* argv[])
   bv10 = (bv80 >> 70);
   std::cout << (bv80 >> 70) << std::endl;
   std::cout << bv10 << std::endl;
+
+  // Test arbitrary bit retrieval of UInts
+  bv80[65] = 1;
+  emp_assert(bv80.GetUIntAtBit(64) == 130);
+  emp_assert(bv80.GetValueAtBit<5>(64) == 2);  
 }

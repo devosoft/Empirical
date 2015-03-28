@@ -53,7 +53,19 @@ int main(int argc, char* argv[])
       std::cout << std::endl;
   }
 
+  // Test importing....
   bs10.Import(bs80 >> 70);
-  std::cout << (bs80 >> 70) << std::endl;
-  std::cout << bs10 << std::endl;
+
+  if (verbose) {
+    std::cout << (bs80 >> 70) << std::endl;
+    std::cout << bs10 << std::endl;
+  }
+
+  emp_assert(bs10.GetUInt(0) == 2);
+
+
+  // Test arbitrary bit retrieval of UInts
+  bs80[65] = 1;
+  emp_assert(bs80.GetUIntAtBit(64) == 130);
+  emp_assert(bs80.GetValueAtBit<5>(64) == 2);
 }
