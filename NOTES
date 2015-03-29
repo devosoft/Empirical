@@ -5,7 +5,7 @@ Write some documentation outside of the code!
 -= Questions =-
 Best way to convert to a c++ literal independent of type?
 How to dynamically change an include file?
-How does boost::static_assert work?
+How does static_assert work?
 
 -= General tools to build =-
 A more automated test system
@@ -15,7 +15,6 @@ Serialization helpers
 - Option 2: #define overrides for types?  (tricky to get right, especially for STL types)
 - Option 3: Require manual save a load functions?  (Requires all programmers to always keep updated,
             but might be possible with good automated test system.)
-Interface around Box2D to handle physics instead of my current scheme?
 A data management system that can track data by:
   - Temporal series (values over time)
   - Batch (where a batch reset occurs periodicall)
@@ -35,6 +34,8 @@ Explore if quick-looking up for sin, cos, tan should be at higher resolution (no
 Fix how sectors are handled in surfaces to be more dynamic based on sizes of organisms.
 - Consider sorting organisms by size and processing smallest first?
   Then any particular comparison is only up against as small or smaller.
+- Test only objects that have moved (against all objects)
+- Sort all objects within bands?
 
 -= Improvements (that rquire some thought...) =-
 InstLib: Can we lock in a set of instruction at compile time?  Or at least put them in a fixed array?
@@ -49,8 +50,14 @@ Come up with a cleaner method to time functions?  Current macro is pretty ugly.
 * Auto-generation of config file entries beyond just "set"
 
 -= Documentation =-
-* Getting started -- an overview of the code layout and what you'll find.
-* Simple, useful tools.
 * How to setup and use the config tools.
 * Basic idea of Kinetic Wrappers and how to use them.
 
+-= Librarys to consider wrapping =-
+FabricJS
+PaperJS -- VERY impressive demos!!
+oCanvas
+
+Box2D
+Processing.JS
+ChartJS
