@@ -9,6 +9,7 @@
 //  Grid::Board objects are templated based on which of the components they work with.
 //  They include three template arguments for the state types associated with cells,
 //  edges, and instersection points.  The most commonly use types are:
+//
 //    int    -- full state; this or an enumerated type should be used for discrete states.
 //    bool   -- binary state (on/off)
 //    void   -- no state (or extra memory) associated with this component
@@ -42,7 +43,7 @@ namespace Grid {
     Layout(int w, int h) : width(w), height(h) { ; }
     Layout(const Layout &) = default;
     ~Layout() { ; }
-    opterator=(const Layout &) = default;
+    Layout & operator=(const Layout &) = default;
 
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
@@ -100,7 +101,7 @@ namespace Grid {
     StateSet<POINT_TYPE> point_states;
 
   public:
-    Board(const BoardLayout & in_layout)
+    Board(const Layout & in_layout)
       : layout(in_layout)
       , cell_states(layout.GetWidth(), layout.GetHeight())
       , edge_states(layout.GetWidth(), layout.GetHeight())
