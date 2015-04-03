@@ -1,45 +1,37 @@
-#ifndef EMP_PUZZLE_GRID_H
-#define EMP_PUZZLE_GRID_H
+#ifndef EMP_GRID_H
+#define EMP_GRID_H
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Tools for building puzzle solvers on grid-based puzzles.
+//  Tools for building grids that can be easily navigated and have state associated with
+//  grid cells, edges, and/or intersection points.
 //
-//  Puzzles may have several components to consider.
-//    PuzzleGrid::Board  -- An entire, manipulable state for a puzzle instance
-//    PuzzleGrid::Cell   -- A single element in a puzzle grid
-//    PuzzleGrid::Edge   -- An edge between to cells
-//    PuzzleGrid::Point  -- A corner of up to four grid cells
-//    PuzzleGrid::Region -- A collection of an arbitrary number of related cells.
+//  Grid::Board objects are templated based on which of the components they work with.
+//  They include three template arguments for the state types associated with cells,
+//  edges, and instersection points.  The most commonly use types are:
+//    int    -- full state; this or an enumerated type should be used for discrete states.
+//    bool   -- binary state (on/off)
+//    void   -- no state (or extra memory) associated with this component
 //
-//  Grid components (Cells, Edges, and Points) have three versions.  The default versions have
-//  int states, but there are also binary versions (eg, PuzzleGrid::CellBinary), non-state
-//  versions (eg: PuzzleGrid::CellNoState), and null version (eg: PuzzleGrid::CellBase).
-//  The difference between CellNoState and CellBase is that the former allows you to navigate
-//  relative to the cell, but the latter does not.
+//    A Sudoku puzzle (which only uses cells and regions) might be defined as:
+//    Grid::Board<int, void, void>
 //
-//  PuzzleGrid::Board object are templated based on which of the components they work with.
+//    A Sliterlink puzzle has binary states at edges and possibly cells (inside/outside):
+//    Grid::Board<bool, bool, void>
 //
-//  A Sudoku puzzle (which only uses cells and regions) might be defined as:
-//    PuzzleGrid::Board<PuzzleGrid::Cell, PuzzleGrid::EdgeBase, PuzzleGrid::PointNULL>
+//  Grid::Layout describes the layout of a grid, including its size and which cells
+//  should be grouped together into a region.
+//
+//  Grid::StateSet is a helper templated class the holds a collection of states, or is
+//  empty if given a template type of void.
 //  
-//  A Sliterlink puzzle has binary states at edges and possibly cells (inside/outside), and will
-//  use relative positions at points, so:
-//    PuzzleGrid::Board<PuzzleGrid::CellBinary, PuzzleGrid::EdgeBinary, PuzzleGrid::PointNoState>
-//
 
 #include <vector>
 
 #include "assert.h"
 
 namespace emp {
-namespace PuzzleGrid {
-
-  // States for a Cell, Edge, or Point can be void, bool, or int.
-
-  class Layout;    // No state, but tracks connections.
-  class StateSet;  // A matrix of board states
-  class Board;     // All states (for cells, edges, and points) on a board.
+namespace Grid {
 
   class Layout {
   private:
@@ -54,6 +46,10 @@ namespace PuzzleGrid {
 
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
+    int GetNumRegions() const { return (int) regions.size(); }
+    const std::vector<int> & GetRegion(int id) { return regions[id]; }
+
+    void AddRegion(const std::vector<int> & in_region) { regions.push_back(in_region); }
   };
 
   template <typename STATE_TYPE>
