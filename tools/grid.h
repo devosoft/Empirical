@@ -30,6 +30,7 @@
 #include <vector>
 
 #include "assert.h"
+#include "BitVector.h"
 
 namespace emp {
 namespace Grid {
@@ -72,6 +73,27 @@ namespace Grid {
     STATE_TYPE operator()(int x, int y) { return states[y*width+x]; }
     STATE_TYPE operator()(int id) { return states[id]; }
     STATE_TYPE operator[](int id) { return states[id]; }
+  };
+
+  template <>
+  class StateSet<bool> {
+  private:
+    int width;
+    BitVector states;
+
+  public:
+    StateSet(int _w, int _h) : width(_w), states(_w*_h) { ; }
+    StateSet(const StateSet &) = default;
+    ~StateSet() { ; }
+    StateSet & operator=(const StateSet &) = default;
+
+    int GetWidth() const { return width; }
+    int GetHeight() const { return states.size() / width; }
+    int GetSize() const { return states.size(); }
+
+    bool operator()(int x, int y) { return states[y*width+x]; }
+    bool operator()(int id) { return states[id]; }
+    bool operator[](int id) { return states[id]; }
   };
 
   // StateSet is specialized on void: no data is stored.
