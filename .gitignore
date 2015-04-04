@@ -2,3 +2,4 @@
 a.out
 *.map
 a.out.dSYM
+*.o
