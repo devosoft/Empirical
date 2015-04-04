@@ -495,7 +495,7 @@ namespace emp {
     const BitVector & operator>>=(const int shift_size) { return SHIFT_SELF(shift_size); }
 
     // For compatability with std::vector<bool>.
-    inline size_t size() { return num_bits; }
+    inline size_t size() const { return num_bits; }
     inline bool all() const { return All(); }
     inline bool any() const { return Any(); }
     inline bool none() const { return !Any(); }
