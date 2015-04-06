@@ -61,3 +61,9 @@ oCanvas
 Box2D
 Processing.JS
 ChartJS
+jqPlot
+JQuery Sparklines -- Inline graphs
+
+-= Frameworks to consider wrapping =-
+Ionic
+Ember -- read strong arguments from developer; built to be practical in getting good aps fast.
