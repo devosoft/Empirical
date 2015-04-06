@@ -118,18 +118,27 @@ namespace Grid {
   class Board {
   private:
     const Layout & layout;
-    StateSet<CELL_TYPE> cell_states;
-    StateSet<EDGE_TYPE> edge_states;
-    StateSet<POINT_TYPE> point_states;
+    StateSet<CELL_TYPE> cell_states;    // States of cells in grid.
+    StateSet<EDGE_TYPE> edge_states_h;  // States of horizontal edges.
+    StateSet<EDGE_TYPE> edge_states_v;  // States of vertical edges.
+    StateSet<POINT_TYPE> point_states;  // States of points (where edges cross)
 
   public:
     Board(const Layout & in_layout)
       : layout(in_layout)
       , cell_states(layout.GetWidth(), layout.GetHeight())
-      , edge_states(layout.GetWidth(), layout.GetHeight())
-      , point_states(layout.GetWidth(), layout.GetHeight())
+      , edge_states_h(layout.GetWidth(), layout.GetHeight()+1)
+      , edge_states_v(layout.GetWidth()+1, layout.GetHeight())
+      , point_states(layout.GetWidth()+1, layout.GetHeight()+1)
     {
+      // std::cout << "Built Board with " << cell_states.GetSize() << " cells!" << std::endl;
+      // std::cout << "Built Board with " << edge_states_h.GetSize() << " h edges!" << std::endl;
+      // std::cout << "Built Board with " << edge_states_v.GetSize() << " v edges!" << std::endl;
+      // std::cout << "Built Board with " << point_states.GetSize() << " points!" << std::endl
+      //           << std::endl;
     }
+
+    CELL_TYPE GetCellState(int id) { return cell_states[id]; }
   };
 
 };
