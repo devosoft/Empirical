@@ -52,6 +52,16 @@ namespace Grid {
     const std::vector<int> & GetRegion(int id) { return regions[id]; }
 
     void AddRegion(const std::vector<int> & in_region) { regions.push_back(in_region); }
+
+    // Helper functions
+    int GetX(int id) const { return id % width; }
+    int GetY(int id) const { return id / width; }
+    int GetID(int x, int y) const { return y*width + x; }
+
+    int GetTopID(int id) const { return id; }                              // ID of edge at top
+    int GetBottomID(int id) const { return id + width; }                   // ID of edge at bottom
+    int GetLeftID(int id) const { return GetY(id)*(width+1) + GetX(id); }  // ID of edge at left
+    int GetRightID(int id) const { return GetLeftID(id)+1; }               // ID of edge at right
   };
 
   template <typename STATE_TYPE>
@@ -138,7 +148,12 @@ namespace Grid {
       //           << std::endl;
     }
 
-    CELL_TYPE GetCellState(int id) { return cell_states[id]; }
+    const Layout & GetLayout() const { return layout; }
+
+    CELL_TYPE GetCell(int id) const { return cell_states[id]; }
+    EDGE_TYPE GetEdgeH(int id) const { return edge_states_h[id]; }
+    EDGE_TYPE GetEdgeV(int id) const { return edge_states_v[id]; }
+    POINT_TYPE GetPoint(int id) const { return point_states[id]; }
   };
 
 };
