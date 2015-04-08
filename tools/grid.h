@@ -156,6 +156,46 @@ namespace Grid {
     POINT_TYPE GetPoint(int id) const { return point_states[id]; }
   };
 
+  class Cell {
+  private:
+    Board & board;
+    int id;
+  public:
+    Cell(Board & b, int in_id) : board(b), id(in_id) { ; }
+    Cell(const Cell &) = default;
+    Cell & operator=(const Cell &) = default;
+  };
+
+  class VEdge {
+  private:
+    Board & board;
+    int id;
+  public:
+    VEdge(Board & b, int in_id) : board(b), id(in_id) { ; }
+    VEdge(const VEdge &) = default;
+    VEdge & operator=(const VEdge &) = default;
+  };
+
+  class HEdge {
+  private:
+    Board & board;
+    int id;
+  public:
+    HEdge(Board & b, int in_id) : board(b), id(in_id) { ; }
+    HEdge(const HEdge &) = default;
+    HEdge & operator=(const HEdge &) = default;
+  };
+
+  class Point {
+  private:
+    Board & board;
+    int id;
+  public:
+    Point(Board & b, int in_id) : board(b), id(in_id) { ; }
+    Point(const Point &) = default;
+    Point & operator=(const Pointe &) = default;
+  };
+  
 };
 };
 
