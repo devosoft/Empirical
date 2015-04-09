@@ -156,6 +156,7 @@ namespace Grid {
     POINT_TYPE GetPoint(int id) const { return point_states[id]; }
   };
 
+  template <typename CELL_TYPE>
   class Cell {
   private:
     Board & board;
@@ -164,8 +165,11 @@ namespace Grid {
     Cell(Board & b, int in_id) : board(b), id(in_id) { ; }
     Cell(const Cell &) = default;
     Cell & operator=(const Cell &) = default;
+
+    CELL_TYPE GetValue() const { return board.GetCell(id); }
   };
 
+  template <typename EDGE_TYPE>
   class VEdge {
   private:
     Board & board;
@@ -174,8 +178,11 @@ namespace Grid {
     VEdge(Board & b, int in_id) : board(b), id(in_id) { ; }
     VEdge(const VEdge &) = default;
     VEdge & operator=(const VEdge &) = default;
+
+    EDGE_TYPE GetValue() const { return board.GetEdgeV(id); }
   };
 
+  template <typename EDGE_TYPE>
   class HEdge {
   private:
     Board & board;
@@ -184,8 +191,11 @@ namespace Grid {
     HEdge(Board & b, int in_id) : board(b), id(in_id) { ; }
     HEdge(const HEdge &) = default;
     HEdge & operator=(const HEdge &) = default;
+
+    EDGE_TYPE GetValue() const { return board.GetEdgeH(id); }
   };
 
+  template <typename POINT_TYPE>
   class Point {
   private:
     Board & board;
@@ -194,6 +204,8 @@ namespace Grid {
     Point(Board & b, int in_id) : board(b), id(in_id) { ; }
     Point(const Point &) = default;
     Point & operator=(const Pointe &) = default;
+
+    POINT_TYPE GetValue() const { return board.GetPoint(id); }
   };
   
 };
