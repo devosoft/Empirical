@@ -154,6 +154,11 @@ namespace Grid {
     EDGE_TYPE GetEdgeH(int id) const { return edge_states_h[id]; }
     EDGE_TYPE GetEdgeV(int id) const { return edge_states_v[id]; }
     POINT_TYPE GetPoint(int id) const { return point_states[id]; }
+
+    void SetCell(int id, CELL_TYPE value) { cell_states[id] = value; }
+    void SetEdgeH(int id, EDGE_TYPE value) { edge_states_h[id] = value; }
+    void SetEdgeV(int id, EDGE_TYPE value) { edge_states_v[id] = value; }
+    void SetPoint(int id, POINT_TYPE value) { point_states[id] = value; }
   };
 
   template <typename CELL_TYPE>
@@ -167,6 +172,7 @@ namespace Grid {
     Cell & operator=(const Cell &) = default;
 
     CELL_TYPE GetValue() const { return board.GetCell(id); }
+    void SetValue(CELL_TYPE value) { board.SetCell(id, value); }
   };
 
   template <typename EDGE_TYPE>
@@ -180,6 +186,7 @@ namespace Grid {
     VEdge & operator=(const VEdge &) = default;
 
     EDGE_TYPE GetValue() const { return board.GetEdgeV(id); }
+    void SetValue(EDGE_TYPE value) { board.SetEdgeV(id, value); }
   };
 
   template <typename EDGE_TYPE>
@@ -193,6 +200,7 @@ namespace Grid {
     HEdge & operator=(const HEdge &) = default;
 
     EDGE_TYPE GetValue() const { return board.GetEdgeH(id); }
+    void SetValue(EDGE_TYPE value) { board.SetEdgeH(id, value); }
   };
 
   template <typename POINT_TYPE>
