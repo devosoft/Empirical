@@ -5,6 +5,28 @@
 //
 //  This file contains tools for dealing with command-line arguments (argv and argc).
 //
+//  Functions here include:
+//
+//    std::vector<std::string> args_to_strings(int argc, char* argv[]);
+//        - Convert the standard command-line args to a more managable vector of strings.
+//
+//    bool has_arg(const std::vector<std::string> & args, const std::string & pattern);
+//        - Return true if a particular argument was set on the command line
+//
+//    bool use_arg(std::vector<std::string> & args, const std::string & pattern);
+//        - Same as has_arg(), but remove the argument for the set of available args.
+//
+//
+//    Development notes:
+//    * Add has_flag() and use_flag() functions to more gracefully handle flags.
+//      For example, if -a and -b are legal flags, -ab should trigger both of them.
+//
+//    * Add find_arg() to return the position of an argument (and -1 if not found?)
+//
+//    * Add get_arg_value() to find an argument, and return the next arg as its value.
+//      Should default to string, but can have variants (or templated?) to allow other values
+//
+
 
 #include <string>
 #include <vector>
