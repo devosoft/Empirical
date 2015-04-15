@@ -24,11 +24,20 @@ namespace emp {
     ~Author() { ; }
     Author & operator=(const Author &) = delete;
 
-    bool operator==(const Author & other) {
+    bool operator==(const Author & other) const {
       return (first_name == other.first_name) &&
         (midd_name == other.middle_name) &&
         (last_name == other.last_name);
     }
+    bool operator!=(const Author & other) const { return !(*this == other); }
+    bool operator<(const Author & other) const {
+      if (last_name != other.last_name) return (last_name < other.last_name);
+      if (first_name != other.first_name) return (first_name < other.first_name);
+      return (middle_name < other.middle_name);
+    }
+    bool operator>(const Author & other) const { return other < *this; }
+    bool operator>=(const Author & other) const { return !(*this < other); }
+    bool operator<=(const Author & other) const { return !(*this > other); }
 
     const std::string GetFirstName() const { return first_name; }
     const std::string GetMiddleName() const { return middle_name; }
