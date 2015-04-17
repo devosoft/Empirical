@@ -39,13 +39,31 @@ namespace emp {
     bool operator>=(const Author & other) const { return !(*this < other); }
     bool operator<=(const Author & other) const { return !(*this > other); }
 
-    const std::string GetFirstName() const { return first_name; }
-    const std::string GetMiddleName() const { return middle_name; }
-    const std::string GetLastName() const { return last_name; }
+    bool HasFirstName() const { return first_name.size(); }
+    bool HasMiddleName() const { return middle_name.size(); }
+    bool HasLastName() const { return last_name.size(); }
 
-    char GetFirstInitial() const { return first_name.size() ? first_name[0] : 0; }
-    char GetMiddleInitial() const { return middle_name.size() ? middle_name[0] : 0; }
-    char GetLastInitial() const { return last_name.size() ? last_name[0] : 0; }
+    const std::string & GetFirstName() const { return first_name; }
+    const std::string & GetMiddleName() const { return middle_name; }
+    const std::string & GetLastName() const { return last_name; }
+    std::string GetFullName() const {
+      std::string full_name(first_name);
+      if (full_name.size() && HasMiddleName()) full_name += " ";
+      full_name += middle_name; 
+      if (full_name.size() && HasLastName()) full_name += " ";
+      full_name += last_name;
+      return full_name;
+    }
+
+    char GetFirstInitial() const { return HasFirstName() ? first_name[0] : 0; }
+    char GetMiddleInitial() const { return HasMiddleName() ? middle_name[0] : 0; }
+    char GetLastInitial() const { return HasLastName() ? last_name[0] : 0; }
+    std::string GetInitials() const {
+      std::string inits;
+      if (HasFirstName()) inits.push_back(first_name[0]);
+      if (HasMiddleName()) inits.push_back(middle_name[0]);
+      if (HasLastName()) inits.push_back(last_name[0]);
+    }
   };
 
 };
