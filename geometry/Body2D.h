@@ -14,6 +14,8 @@
 //    CircleBody2D - One individual circular object in the 2D world.
 //
 
+#include "../tools/assert.h"
+#include "../tools/alert.h"
 #include "Angle2D.h"
 #include "Circle2D.h"
 
@@ -21,27 +23,33 @@ namespace emp {
 
   template <typename BODY_INFO, typename BASE_TYPE> class CircleBody2D {
   private:
-    Circle<BASE_TYPE> perimeter;     // Includes position and size.
-    Angle orientation;               // Which way is body facing?
-    BASE_TYPE target_radius;         // For growing/shrinking
-    BODY_INFO * info;                // External information about individual
-    Point<BASE_TYPE> velocity;       // Speed and direction of movement
-    BASE_TYPE mass;                  // "Weight" of this object
-    int color_id;                    // Which color should this body appear?
+    Circle<BASE_TYPE> perimeter;  // Includes position and size.
+    Angle orientation;            // Which way is body facing?
+    BASE_TYPE target_radius;      // For growing/shrinking
+    BODY_INFO * info;             // External information about individual
+    Point<BASE_TYPE> velocity;    // Speed and direction of movement
+    BASE_TYPE mass;               // "Weight" of this object (@CAO not used yet..)
+    unsigned int color_id;        // Which color should this body appear?
 
     // @CAO Technically, we should allow any number of links.
-    CircleBody2D * pair_link;        // Is this body linked to another (typically part of reproduction)
-    BASE_TYPE pair_dist;             // How far away should the linked body be kept?
-    BASE_TYPE target_pair_dist;      // How far out should the pair get before splitting?
+    CircleBody2D * pair_link;     // Is this body linked to another? (typically during reproduction)
+    BASE_TYPE pair_dist;          // How far away should the linked body be kept?
+    BASE_TYPE target_pair_dist;   // How far out should the pair get before splitting?
 
-    Point<BASE_TYPE> shift;          // How should this body be updated to minimize overlap.
-    BASE_TYPE total_overlap;         // How much overlap occurred across all collisions?
+    Point<BASE_TYPE> shift;       // How should this body be updated to minimize overlap.
+    BASE_TYPE total_overlap;      // How much overlap occurred across all collisions?
 
   public:
     CircleBody2D(const Circle<BASE_TYPE> & _p, BODY_INFO * _i)
       : perimeter(_p), target_radius(_p.GetRadius()), info(_i), mass(1), color_id(0)
       , pair_link(NULL), pair_dist(0), target_pair_dist(0), total_overlap(0) { ; }
-    ~CircleBody2D() { ; }
+    ~CircleBody2D() {
+      // If this body is paired with another one, removing the pairing.
+      if (pair_link) {
+        emp_assert(pair_link->pair_link == this);
+        pair_link->pair_link = NULL;
+      }
+    }
 
     const Circle<BASE_TYPE> & GetPerimeter() const { return perimeter; }
     const Point<BASE_TYPE> & GetAnchor() const { return perimeter.GetCenter(); }
@@ -52,7 +60,7 @@ namespace emp {
     BODY_INFO * GetInfo() { return info; }
     const Point<BASE_TYPE> & GetVelocity() const { return velocity; }
     BASE_TYPE GetMass() const { return mass; }
-    int GetColorID() const { return color_id; }
+    unsigned int GetColorID() const { return color_id; }
 
     CircleBody2D<BODY_INFO, BASE_TYPE> & SetPosition(const Point<BASE_TYPE> & new_pos) {
       perimeter.SetCenter(new_pos); 
@@ -69,7 +77,7 @@ namespace emp {
     CircleBody2D<BODY_INFO, BASE_TYPE> &
     SetVelocity(const Point<BASE_TYPE> & in_vel) { velocity = in_vel; return *this; }
     CircleBody2D<BODY_INFO, BASE_TYPE> &
-    SetColorID(int in_id) { color_id = in_id; return *this; }
+    SetColorID(unsigned int in_id) { color_id = in_id; return *this; }
 
     // Shift at end of next update.
     CircleBody2D<BODY_INFO, BASE_TYPE> &
@@ -90,22 +98,33 @@ namespace emp {
     Translate(const Point<BASE_TYPE> & inc_val) { perimeter.Translate(inc_val); return *this; }
 
     // Creating, testing, and unlinking other organisms (used for gestation & reproduction)
-    bool IsLinked(const CircleBody2D & link_test) const {
-      return pair_link == &link_test || link_test.pair_link == this;
-    }
+    bool IsLinked(const CircleBody2D & link_test) const { return pair_link == &link_test; }
     BASE_TYPE GetLinkDist() const { return pair_dist; }
     BASE_TYPE GetTargetLinkDist() const { return target_pair_dist; }
     void ShiftLinkDist(BASE_TYPE change) { pair_dist += change; }
-    CircleBody2D * BuildOffspring(emp::Point<BASE_TYPE> offset=emp::Point<BASE_TYPE>(0,0)) {
+
+    // CircleBody2D * BuildOffspring(emp::Point<BASE_TYPE> offset=emp::Point<BASE_TYPE>(0,0)) {
+    CircleBody2D * BuildOffspring(emp::Point<BASE_TYPE> offset) {
+      emp::Alert("Building Offspring!");
+      emp_assert(offset.GetX() != 0 || offset.GetY() != 0);
+      if (pair_link) {   // If this body is already paired with another, break that link!
+        emp_assert(pair_link->pair_link == this);
+        pair_link->pair_link = NULL;
+      }
+      // Create the offspring as a paired link.
       pair_link = new CircleBody2D(perimeter, new BODY_INFO(*info));
+      pair_link->pair_link = this;
       pair_link->Translate(offset);
-      pair_dist = 0;
+      pair_dist = 1;
       target_pair_dist = perimeter.GetRadius() * 2.0;
       return pair_link;
     }
+
     void BreakLink(CircleBody2D * old_link) {
       emp_assert(pair_link == old_link);
+      emp_assert(old_link->pair_link == this);
       pair_link = NULL;
+      old_link->pair_link = NULL;
       pair_dist = 0;
     }
 
@@ -128,7 +147,7 @@ namespace emp {
       else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - change_factor);
 
       // Test if the link distance for this body needs to be updated
-      if (pair_dist != target_pair_dist) {
+      if (pair_link && pair_dist != target_pair_dist) {
         if ((int) pair_dist < (int) target_pair_dist) pair_dist += change_factor;
         else pair_dist -= change_factor;
       }
@@ -163,7 +182,7 @@ namespace emp {
       // If this body is linked to another, enforce the distance between them.
       if (pair_link != NULL) {
         if (GetAnchor() == pair_link->GetAnchor()) {
-          // If two organisms may be on top of each other... shift one.
+          // If two organisms are on top of each other... shift one.
           Translate(emp::Point<BASE_TYPE>(0.01, 0.01));
         }
         
