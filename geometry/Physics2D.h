@@ -41,14 +41,20 @@ namespace emp {
       // If there was no collision, return false.
       if (sq_pair_dist >= sq_min_dist) { return false; }
 
+      if (sq_pair_dist == 0.0) {
+        // @CAO if the shapes are on top of each other, we're going to have a problem!
+        emp_assert(false);
+      }
+
       // @CAO If objects can phase or explode, identify that here.
       
       // Re-adjust position to remove overlap.
       const double true_dist = sqrt(sq_pair_dist);
-      const double overlap_frac = ((double) radius_sum) / true_dist - 1.0;
+      const double overlap_dist = ((double) radius_sum) - true_dist;
+      const double overlap_frac = overlap_dist / true_dist;
       const Point<BASE_TYPE> cur_shift = dist * (overlap_frac / 2.0);
-      body1.AddShift(cur_shift);
-      body2.AddShift(-cur_shift);
+      body1.AddShift(cur_shift, overlap_dist);
+      body2.AddShift(-cur_shift, overlap_dist);
 
       // @CAO if we have inelastic collisions, we just take the weighted average of velocites
       // and let the move together.
@@ -100,11 +106,20 @@ namespace emp {
       surface.TestCollisions(collide_fun);
     }
 
-    const std::vector<BODY_TYPE *> & GetBodySet() const {
+    // Access to bodies
+    std::vector<BODY_TYPE *> & GetBodySet() {
       return surface.GetBodySet();
     }
-    const std::vector<BODY_TYPE *> & GetBackgroundSet() const {
+    std::vector<BODY_TYPE *> & GetBackgroundSet() {
       return background.GetBodySet();
+    }
+
+    // Access to bodies in a const physics...
+    const std::vector<BODY_TYPE *> & GetConstBodySet() const {
+      return surface.GetConstBodySet();
+    }
+    const std::vector<BODY_TYPE *> & GetConstBackgroundSet() const {
+      return background.GetConstBodySet();
     }
   };
 
