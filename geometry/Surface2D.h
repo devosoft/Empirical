@@ -38,6 +38,7 @@ namespace emp {
       return *this;
     }
 
+    // @CAO Need a good function to remove a body!
 
     // The following function will test pairs of collisions and run the passed-in function
     // on pairs of objects that *may* collide.

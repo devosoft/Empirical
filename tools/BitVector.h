@@ -27,7 +27,7 @@ namespace emp {
 
     unsigned int * bit_set;
     
-    // Setup a bit proxy so that we can use operator[] on bit sets as a lvalue.
+    // Setup a bit proxy so that we can use operator[] on bit sets as an lvalue.
     class BitProxy {
     private:
       BitVector & bit_vector;

@@ -35,6 +35,11 @@
 namespace emp {
 namespace Grid {
 
+  template <typename CELL_TYPE> class Cell;
+  template <typename EDGE_TYPE> class VEdge;
+  template <typename EDGE_TYPE> class HEdge;
+  template <typename POINT_TYPE> class Point;
+
   class Layout {
   private:
     int width;
@@ -150,15 +155,15 @@ namespace Grid {
 
     const Layout & GetLayout() const { return layout; }
 
-    CELL_TYPE GetCell(int id) const { return cell_states[id]; }
-    EDGE_TYPE GetEdgeH(int id) const { return edge_states_h[id]; }
-    EDGE_TYPE GetEdgeV(int id) const { return edge_states_v[id]; }
-    POINT_TYPE GetPoint(int id) const { return point_states[id]; }
+    CELL_TYPE GetCellValue(int id) const { return cell_states[id]; }
+    EDGE_TYPE GetEdgeHValue(int id) const { return edge_states_h[id]; }
+    EDGE_TYPE GetEdgeVValue(int id) const { return edge_states_v[id]; }
+    POINT_TYPE GetPointValue(int id) const { return point_states[id]; }
 
-    void SetCell(int id, CELL_TYPE value) { cell_states[id] = value; }
-    void SetEdgeH(int id, EDGE_TYPE value) { edge_states_h[id] = value; }
-    void SetEdgeV(int id, EDGE_TYPE value) { edge_states_v[id] = value; }
-    void SetPoint(int id, POINT_TYPE value) { point_states[id] = value; }
+    void SetCellValue(int id, CELL_TYPE value) { cell_states[id] = value; }
+    void SetEdgeHValue(int id, EDGE_TYPE value) { edge_states_h[id] = value; }
+    void SetEdgeVValue(int id, EDGE_TYPE value) { edge_states_v[id] = value; }
+    void SetPointValue(int id, POINT_TYPE value) { point_states[id] = value; }
   };
 
   template <typename CELL_TYPE>
@@ -171,8 +176,8 @@ namespace Grid {
     Cell(const Cell &) = default;
     Cell & operator=(const Cell &) = default;
 
-    CELL_TYPE GetValue() const { return board.GetCell(id); }
-    void SetValue(CELL_TYPE value) { board.SetCell(id, value); }
+    CELL_TYPE GetValue() const { return board.GetCellValue(id); }
+    void SetValue(CELL_TYPE value) { board.SetCellValue(id, value); }
   };
 
   template <typename EDGE_TYPE>
@@ -185,8 +190,8 @@ namespace Grid {
     VEdge(const VEdge &) = default;
     VEdge & operator=(const VEdge &) = default;
 
-    EDGE_TYPE GetValue() const { return board.GetEdgeV(id); }
-    void SetValue(EDGE_TYPE value) { board.SetEdgeV(id, value); }
+    EDGE_TYPE GetValue() const { return board.GetEdgeVValue(id); }
+    void SetValue(EDGE_TYPE value) { board.SetEdgeVValue(id, value); }
   };
 
   template <typename EDGE_TYPE>
@@ -199,8 +204,8 @@ namespace Grid {
     HEdge(const HEdge &) = default;
     HEdge & operator=(const HEdge &) = default;
 
-    EDGE_TYPE GetValue() const { return board.GetEdgeH(id); }
-    void SetValue(EDGE_TYPE value) { board.SetEdgeH(id, value); }
+    EDGE_TYPE GetValue() const { return board.GetEdgeHValue(id); }
+    void SetValue(EDGE_TYPE value) { board.SetEdgeHValue(id, value); }
   };
 
   template <typename POINT_TYPE>
@@ -213,7 +218,8 @@ namespace Grid {
     Point(const Point &) = default;
     Point & operator=(const Pointe &) = default;
 
-    POINT_TYPE GetValue() const { return board.GetPoint(id); }
+    POINT_TYPE GetValue() const { return board.GetPointValue(id); }
+    void SetValue(POINT_TYPE value) { board.SetPointValue(id, value); }
   };
   
 };

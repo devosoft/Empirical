@@ -1,8 +1,6 @@
 #ifndef EMP_CALLBACKS_H
 #define EMP_CALLBACKS_H
 
-#include <tuple>
-
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  A set of callback objects (functors) to manage interactions across subsystems 
@@ -56,7 +54,7 @@ namespace emp {
     }
   
     RETURN operator()(Args... args) { return function_ptr(args...); }
-};
+  };
   
   template <class T> class MethodCallback : public Callback {
   private:

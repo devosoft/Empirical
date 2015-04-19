@@ -6,6 +6,7 @@ Write some documentation outside of the code!
 Best way to convert to a c++ literal independent of type?
 How to dynamically change an include file?
 How does static_assert work?
+Have multi-purpose headers with static functions; how can I prevent those specific unused function errors while still getting others that I don't specifically block?
 
 -= General tools to build =-
 A more automated test system
@@ -58,6 +59,7 @@ FabricJS
 PaperJS -- VERY impressive demos!!
 oCanvas
 
+http://www.graphdracula.net/  - build vertices & edges easily!
 Box2D
 Processing.JS
 ChartJS

@@ -594,7 +594,7 @@ namespace Kinetic {
     // @CAO Technically we should track these callbacks to make sure we delete them properly.
     MethodCallback_Event<T> * new_callback = new MethodCallback_Event<T>(target, method_ptr);
 
-    emp::Alert("Setting up an On for obj ", obj_id, " with target id ", target->GetID());
+    // emp::Alert("Setting up an On for obj ", obj_id, " with target id ", target->GetID());
 
     EM_ASM_ARGS({
         var trigger = Pointer_stringify($1);

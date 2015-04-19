@@ -1,7 +1,6 @@
 #ifndef EMP_ASSERT_H
 #define EMP_ASSERT_H
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  This file is a replacement for the system-level assert.h, called "emp_assert"
@@ -12,9 +11,11 @@
 #include <iostream>
 #include <string>
 
+// If we are in emscripten, make sure to include the header.
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
 #endif
+
 
 #ifdef NDEBUG
 namespace emp {
