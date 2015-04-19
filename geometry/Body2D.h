@@ -35,11 +35,12 @@ namespace emp {
     BASE_TYPE target_pair_dist;      // How far out should the pair get before splitting?
 
     Point<BASE_TYPE> shift;          // How should this body be updated to minimize overlap.
+    BASE_TYPE total_overlap;         // How much overlap occurred across all collisions?
 
   public:
     CircleBody2D(const Circle<BASE_TYPE> & _p, BODY_INFO * _i)
       : perimeter(_p), target_radius(_p.GetRadius()), info(_i), mass(1), color_id(0)
-      , pair_link(NULL), pair_dist(0), target_pair_dist(0) { ; }
+      , pair_link(NULL), pair_dist(0), target_pair_dist(0), total_overlap(0) { ; }
     ~CircleBody2D() { ; }
 
     const Circle<BASE_TYPE> & GetPerimeter() const { return perimeter; }
@@ -72,7 +73,17 @@ namespace emp {
 
     // Shift at end of next update.
     CircleBody2D<BODY_INFO, BASE_TYPE> &
-    AddShift(const Point<BASE_TYPE> & inc_val) { shift += inc_val; return *this; }
+    AddShift(const Point<BASE_TYPE> & inc_val, BASE_TYPE overlap_dist) {
+      shift += inc_val;
+      total_overlap += overlap_dist;
+      return *this;
+    }
+
+    double CalcPressure() {
+      double pressure = total_overlap / GetRadius();
+      total_overlap = 0;
+      return pressure;
+    }
 
     // Translate immediately.
     CircleBody2D<BODY_INFO, BASE_TYPE> &
