@@ -29,7 +29,9 @@ namespace emp {
     ~Surface2D() { ; }
 
     const Point<BASE_TYPE> & GetMaxPosition() const { return max_pos; }
-    const std::vector<BODY_TYPE *> & GetBodySet() const { return body_set; }
+
+    std::vector<BODY_TYPE *> & GetBodySet() { return body_set; }
+    const std::vector<BODY_TYPE *> & GetConstBodySet() const { return body_set; }
 
     Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> & AddBody(BODY_TYPE * new_body) {
       body_set.push_back(new_body);                         // Add body to master list
@@ -37,8 +39,8 @@ namespace emp {
     }
 
 
-    // The following function will test pairs of collisions and run the passed-in function on pairs of
-    // objects that *may* collide.
+    // The following function will test pairs of collisions and run the passed-in function
+    // on pairs of objects that *may* collide.
 
     void TestCollisions(std::function<bool(BODY_TYPE &, BODY_TYPE &)> collide_fun) {
       int hit_count = 0;
@@ -52,7 +54,8 @@ namespace emp {
 
       std::vector< std::vector<BODY_TYPE *> > sector_set(num_sectors);
 
-      // Loop through all of the bodies on this surface.
+      // Loop through all of the bodies on this surface placing them in sectors and testing for
+      // collisions with other bodies already in nearby sectors.
       for (auto body : body_set) {
         // Determine which sector the current body is in.
         const int cur_col = body->GetCenter().GetX() / sector_width;
