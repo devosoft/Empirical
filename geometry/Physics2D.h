@@ -42,8 +42,8 @@ namespace emp {
       if (sq_pair_dist >= sq_min_dist) { return false; }
 
       if (sq_pair_dist == 0.0) {
-        // @CAO if the shapes are on top of each other, we're going to have a problem!
-        emp_assert(false);
+        // If the shapes are on top of each other, we have a problem.  Shift one!
+        body2.Translate(emp::Point<BASE_TYPE>(0.01, 0.01));
       }
 
       // @CAO If objects can phase or explode, identify that here.
@@ -95,7 +95,7 @@ namespace emp {
 
     void Update() {
       // Handle movement of bodies
-      auto body_set = surface.GetBodySet();
+      auto & body_set = surface.GetBodySet();
       for (BODY_TYPE * cur_body : body_set) {
         cur_body->BodyUpdate(0.5);   // Let a body change size or shape, as needed.
         cur_body->ProcessStep(0.0125);  // Update position and velocity.
@@ -104,6 +104,28 @@ namespace emp {
       // Handle collisions
       auto collide_fun = std::bind(&Physics2D::TestPairCollision, this, _1, _2);
       surface.TestCollisions(collide_fun);
+
+      // Determine which bodies we should remove.
+      int cur_size = (int) body_set.size();
+      for (int i = 0; i < cur_size; i++) {
+        const double cur_pressure = body_set[i]->CalcPressure();
+
+        // @CAO Arbitrary pressure threshold!
+        if (cur_pressure > 2.0) {
+          static bool popped = false;
+          if (popped == false) {
+            popped = true;
+            emp::Alert("First Pop! Num orgs=", body_set.size());
+          }
+
+          // Too much pressure!  We need to burst this cell.
+          delete body_set[i];
+          cur_size--;
+          body_set[i] = body_set[cur_size];
+          --i;
+        }
+      }
+      body_set.resize(cur_size);
     }
 
     // Access to bodies
