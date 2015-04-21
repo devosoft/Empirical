@@ -5,6 +5,8 @@
 #include "../../tools/command_line.h"
 #include "../../tools/Ptr.h"
 
+#define EMP_TRACK_MEM
+
 int main(int argc, char* argv[])
 {
   std::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
@@ -38,7 +40,30 @@ int main(int argc, char* argv[])
   emp_assert(*ptr3 == 25);       // ...make sure the other pointer reflects the change.
   emp_assert(base_val == 25);    // ...make sure the original variable changed.
 
+  if (verbose) {
+    std::cout << "Basic pointer operations are functional." << std::endl;
+  }
 
   // Make sure pointer trackers are working.
+  int * real_ptr1 = new int(1);  // Count of 2 in tracker
+  int * real_ptr2 = new int(2);  // Deleted in tracker
+  int * real_ptr3 = new int(3);  // Unknown to tracker
   emp::PtrTracker<int> & tracker = emp::PtrTracker<int>::Get();
+  
+  tracker.New(real_ptr1);
+  tracker.Inc(real_ptr1);
+
+  tracker.New(real_ptr2);
+  tracker.MarkDeleted(real_ptr2);
+
+  emp_assert(tracker.HasPtr(real_ptr1) == true);
+  emp_assert(tracker.HasPtr(real_ptr2) == true);
+  emp_assert(tracker.HasPtr(real_ptr3) == false);
+
+  emp_assert(tracker.IsActive(real_ptr1) == true);
+
+  emp_assert(tracker.GetCount(real_ptr1) == 2);
+  emp_assert(tracker.GetCount(real_ptr2) == 1);
+  emp_assert(tracker.GetCount(real_ptr3) == 0);
+  
 }
