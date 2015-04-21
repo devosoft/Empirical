@@ -76,12 +76,11 @@ namespace emp {
     bool HasPtr(TYPE * ptr) const { return ptr_count.find(ptr) != ptr_count.end(); }
     bool IsActive(TYPE * ptr) const {
       if (!HasPtr(ptr)) return false;
-      return ptr_count.find(ptr)->IsActive();
+      return ptr_count.find(ptr)->second.IsActive();
     }
     int GetCount(TYPE * ptr) const {
       if (!HasPtr(ptr)) return 0;
       return ptr_count.find(ptr)->second.GetCount();
-      // return ptr_count[ptr].GetCount();
     }
 
     // This pointer was just created as a Ptr!
