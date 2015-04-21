@@ -9,8 +9,6 @@
 //  pointers are released.
 //
 
-#define EMP_TRACK_MEM
-
 #include <map>
 
 #include "assert.h"
@@ -23,7 +21,7 @@ namespace emp {
     bool active;   // Has this pointer been deleted? (i.e., we should no longer access it!)
     bool owner;    // Are we responsible for deleting this pointer?
   public:
-    PtrInfo(bool is_owner=false) : count(0), active(true), owner(is_owner) { ; }
+    PtrInfo(bool is_owner=false) : count(1), active(true), owner(is_owner) { ; }
     ~PtrInfo() { ; }
 
     int GetCount() const { return count; }
@@ -66,8 +64,8 @@ namespace emp {
 
     // Make sure trackers can't be built outside of this class.
     PtrTracker() { ; } 
-    PtrTracker(const PtrTracker<int> &) { ; } 
-    PtrTracker<int> & operator=(const PtrTracker<TYPE> &) { return this; }
+    PtrTracker(const PtrTracker<int> &) = delete;
+    PtrTracker<int> & operator=(const PtrTracker<TYPE> &) = delete;
   public:
     ~PtrTracker() { ; }
 
@@ -82,7 +80,8 @@ namespace emp {
     }
     int GetCount(TYPE * ptr) const {
       if (!HasPtr(ptr)) return 0;
-      return ptr_count.find(ptr)->GetCount();
+      return ptr_count.find(ptr)->second.GetCount();
+      // return ptr_count[ptr].GetCount();
     }
 
     // This pointer was just created as a Ptr!
