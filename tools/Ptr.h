@@ -78,6 +78,10 @@ namespace emp {
       if (!HasPtr(ptr)) return false;
       return ptr_count.find(ptr)->second.IsActive();
     }
+    bool IsOwner(TYPE * ptr) const {
+      if (!HasPtr(ptr)) return false;
+      return ptr_count.find(ptr)->second.IsOwner();
+    }
     int GetCount(TYPE * ptr) const {
       if (!HasPtr(ptr)) return 0;
       return ptr_count.find(ptr)->second.GetCount();
