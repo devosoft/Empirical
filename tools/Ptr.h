@@ -103,6 +103,7 @@ namespace emp {
       ptr_count[ptr].Inc();
     }
     void Dec(TYPE * ptr) {
+      emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
       ptr_count[ptr].Dec();
     }
     void MarkDeleted(TYPE * ptr) {
@@ -137,10 +138,12 @@ namespace emp {
     bool IsNull() { return ptr == NULL; }
 
     void New() {
+      EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
       ptr = new TYPE;
       EMP_IF_MEMTRACK(Tracker().New(ptr););
     }
     void New(const TYPE & init_val) {
+      EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
       ptr = new TYPE(init_val);
       EMP_IF_MEMTRACK(Tracker().New(ptr););
     }
@@ -150,6 +153,7 @@ namespace emp {
     }
 
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
+      EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
       ptr=_in.ptr;
       EMP_IF_MEMTRACK(Tracker().Inc(ptr););
       return *this;
@@ -157,6 +161,13 @@ namespace emp {
 
     TYPE & operator*() { return *ptr; }
     TYPE * operator->() { return ptr; }
+
+    bool operator==(const Ptr<TYPE> & in_ptr) { return ptr == in_ptr.ptr; }
+    bool operator!=(const Ptr<TYPE> & in_ptr) { return ptr != in_ptr.ptr; }
+    bool operator<(const Ptr<TYPE> & in_ptr)  { return ptr < in_ptr.ptr; }
+    bool operator<=(const Ptr<TYPE> & in_ptr) { return ptr <= in_ptr.ptr; }
+    bool operator>(const Ptr<TYPE> & in_ptr)  { return ptr > in_ptr.ptr; }
+    bool operator>=(const Ptr<TYPE> & in_ptr) { return ptr >= in_ptr.ptr; }
   };
 
 };
