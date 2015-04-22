@@ -48,6 +48,7 @@ int main(int argc, char* argv[])
   int * real_ptr1 = new int(1);  // Count of 2 in tracker
   int * real_ptr2 = new int(2);  // Deleted in tracker
   int * real_ptr3 = new int(3);  // Unknown to tracker
+  int * real_ptr4 = new int(4);  // Passively known to tracker (marked non-owner)
   emp::PtrTracker<int> & tracker = emp::PtrTracker<int>::Get();
   
   tracker.New(real_ptr1);
@@ -56,14 +57,27 @@ int main(int argc, char* argv[])
   tracker.New(real_ptr2);
   tracker.MarkDeleted(real_ptr2);
 
+  tracker.Old(real_ptr4);
+
   emp_assert(tracker.HasPtr(real_ptr1) == true);
   emp_assert(tracker.HasPtr(real_ptr2) == true);
   emp_assert(tracker.HasPtr(real_ptr3) == false);
+  emp_assert(tracker.HasPtr(real_ptr4) == true);
 
   emp_assert(tracker.IsActive(real_ptr1) == true);
+  emp_assert(tracker.IsActive(real_ptr2) == false);
+  emp_assert(tracker.IsActive(real_ptr3) == false);
+  emp_assert(tracker.IsActive(real_ptr4) == true);
+
+  emp_assert(tracker.IsOwner(real_ptr1) == true);
+  emp_assert(tracker.IsOwner(real_ptr2) == true);
+  emp_assert(tracker.IsOwner(real_ptr3) == false);
+  emp_assert(tracker.IsOwner(real_ptr4) == false);
 
   emp_assert(tracker.GetCount(real_ptr1) == 2);
   emp_assert(tracker.GetCount(real_ptr2) == 1);
   emp_assert(tracker.GetCount(real_ptr3) == 0);
+  emp_assert(tracker.GetCount(real_ptr4) == 1);
+  
   
 }
