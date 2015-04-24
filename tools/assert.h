@@ -30,7 +30,7 @@ namespace emp {
 // generate any assembly code.
 #define emp_assert(EXPR) ((void) sizeof(EXPR) )
 
-#elif TDEBUG           // NDEBUG not set, but TDEBUG is!
+#elif defined(TDEBUG)           // NDEBUG not set, but TDEBUG is!
 
 namespace emp {
   const bool assert_on = true;
