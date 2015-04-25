@@ -1,11 +1,13 @@
 #include <iostream>
 #include <vector>
 
+#define TDEBUG
+
+#define EMP_TRACK_MEM
+
 #include "../../tools/assert.h"
 #include "../../tools/command_line.h"
 #include "../../tools/Ptr.h"
-
-#define EMP_TRACK_MEM
 
 int main(int argc, char* argv[])
 {
@@ -41,10 +43,25 @@ int main(int argc, char* argv[])
   emp_assert(base_val == 25);    // ...make sure the original variable changed.
 
   if (verbose) {
-    std::cout << "Basic pointer operations are functional." << std::endl;
+    std::cout << "Basic pointer operations passed tests." << std::endl;
   }
 
-  // Make sure pointer trackers are working.
+  // -- Test count tracking on emp::Ptr --
+  // A bit of an odd set of test... we need to create and destory pointers to make sure
+  // that all of the counts are correct, so we're going to use arrays of pointers to them.
+
+  std::vector<emp::Ptr<char> *> ptr_set(10);
+  ptr_set[0] = new emp::Ptr<char>;
+  ptr_set[0]->New(42);
+  for (int i = 1; i < 10; i++) ptr_set[i] = new emp::Ptr<char>(*(ptr_set[0]));
+
+  // Do we have a proper count of 10?
+  emp_assert(ptr_set[0]->DebugGetCount() == 10);
+
+  std::cout << ptr_set[0]->DebugGetCount() << std::endl;
+
+  // -- Do some direct tests on pointer trackers --
+
   int * real_ptr1 = new int(1);  // Count of 2 in tracker
   int * real_ptr2 = new int(2);  // Deleted in tracker
   int * real_ptr3 = new int(3);  // Unknown to tracker
@@ -53,6 +70,8 @@ int main(int argc, char* argv[])
   
   tracker.New(real_ptr1);
   tracker.Inc(real_ptr1);
+  tracker.Inc(real_ptr1);
+  tracker.Dec(real_ptr1);
 
   tracker.New(real_ptr2);
   tracker.MarkDeleted(real_ptr2);
@@ -78,6 +97,8 @@ int main(int argc, char* argv[])
   emp_assert(tracker.GetCount(real_ptr2) == 1);
   emp_assert(tracker.GetCount(real_ptr3) == 0);
   emp_assert(tracker.GetCount(real_ptr4) == 1);
-  
-  
+
+  if (verbose) {
+    std::cout << "Pointer trackers passed tests." << std::endl;
+  }
 }
