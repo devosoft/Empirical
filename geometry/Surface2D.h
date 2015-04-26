@@ -10,6 +10,15 @@
 //  BODY_TYPE is the class that represents the body geometry.
 //  BODY_INFO represents the internal infomation about the body, including the controller.
 //  BASE_TYPE indicates if the physics should be calculated as integer or floating point.
+//
+//  Member functions include:
+//   Surface2D(BASE_TYPE _width, BASE_TYPE _height);
+//   const Point<BASE_TYPE> & GetMaxPosition() const;
+//   std::vector<BODY_TYPE *> & GetBodySet();
+//   const std::vector<BODY_TYPE *> & GetConstBodySet() const;
+//   Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> & AddBody(BODY_TYPE * new_body);
+//   void TestCollisions(std::function<bool(BODY_TYPE &, BODY_TYPE &)> collide_fun);
+//
 
 #include "Body2D.h"
 #include <functional>
