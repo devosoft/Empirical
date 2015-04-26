@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-#define TDEBUG
+// #define TDEBUG
 
 #define EMP_TRACK_MEM
 
@@ -14,6 +14,9 @@ int main(int argc, char* argv[])
   std::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
   const bool verbose = emp::cl::use_arg(args, "-v");
   
+  emp::PtrTracker<char>::Get().SetVerbose(verbose);
+  emp::PtrTracker<int>::Get().SetVerbose(verbose);
+
   // Test default constructor.
   emp::Ptr<int> ptr1;
   ptr1.New();
@@ -22,7 +25,8 @@ int main(int argc, char* argv[])
   ptr1.Delete();
   
   // Test pointer constructor
-  emp::Ptr<int> ptr2(new int);
+  int * temp_int = new int;
+  emp::Ptr<int> ptr2(temp_int);
   *ptr2 = 10;
   emp_assert(*ptr2 == 10);
   ptr2.Delete();
@@ -57,8 +61,21 @@ int main(int argc, char* argv[])
 
   // Do we have a proper count of 10?
   emp_assert(ptr_set[0]->DebugGetCount() == 10);
+  ptr_set[1]->New(91);
+  emp_assert(ptr_set[0]->DebugGetCount() == 9);
+  *(ptr_set[2]) = *(ptr_set[1]);
+  emp_assert(ptr_set[0]->DebugGetCount() == 8);
+  emp_assert(ptr_set[1]->DebugGetCount() == 2);
+
+  ptr_set[3]->Delete();
 
   std::cout << ptr_set[0]->DebugGetCount() << std::endl;
+
+  // @CAO Make sure we don't delete below 0
+  // @CAO Make sure we don't delete below 1 if we own it
+  // @CAO Make sure we only delete if you own it
+  // @CAO Make sure not to delete twice!
+  // @CAO Make sure we don't add (as owner) a pointer we already own
 
   // -- Do some direct tests on pointer trackers --
 
