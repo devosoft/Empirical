@@ -28,15 +28,18 @@ namespace emp {
     bool IsActive() const { return active; }
     bool IsOwner() const { return owner; }
 
-    void Inc() { count++; }
+    void Inc() { emp_assert(active); count++; }
     void Dec() {
+      // If this pointer is not active, it doesn't matter how many copies we have.
+      if (active == false) return; 
+
       emp_assert(count > 0);        // Do not decrement more copies than we have!
 
       // Make sure one of these conditions is true:
       // * We are not getting rid of the last copy, -or-
       // * We've already deleted this pointer, -or-
       // * We're not responsible for deleting this pointer.
-      emp_assert(count > 1 || active == false || owner == false);
+      emp_assert(count > 1 || owner == false);
       count--;
     }
 
@@ -61,52 +64,67 @@ namespace emp {
   class PtrTracker {
   private:
     std::map<TYPE *, PtrInfo> ptr_count;
+    bool verbose;
 
     // Make sure trackers can't be built outside of this class.
-    PtrTracker() { ; } 
+    PtrTracker() : verbose (false) { ; } 
     PtrTracker(const PtrTracker<int> &) = delete;
     PtrTracker<int> & operator=(const PtrTracker<TYPE> &) = delete;
   public:
     ~PtrTracker() { ; }
 
+    bool GetVerbose() const { return verbose; }
+    void SetVerbose(bool v=true) { verbose = v; }
+
     // Treat this class as a singleton with a single Get() method to retrieve it.
     static PtrTracker<TYPE> & Get() { static PtrTracker<TYPE> tracker; return tracker; }
 
     // Some simple accessors
-    bool HasPtr(TYPE * ptr) const { return ptr_count.find(ptr) != ptr_count.end(); }
+    bool HasPtr(TYPE * ptr) const {
+      if (verbose) std::cout << "HasPtr: " << ((long long) ptr) << std::endl;
+      return ptr_count.find(ptr) != ptr_count.end();
+    }
     bool IsActive(TYPE * ptr) const {
+      if (verbose) std::cout << "Active: " << ((long long) ptr) << std::endl;
       if (!HasPtr(ptr)) return false;
       return ptr_count.find(ptr)->second.IsActive();
     }
     bool IsOwner(TYPE * ptr) const {
+      if (verbose) std::cout << "Owner:  " << ((long long) ptr) << std::endl;
       if (!HasPtr(ptr)) return false;
       return ptr_count.find(ptr)->second.IsOwner();
     }
     int GetCount(TYPE * ptr) const {
+      if (verbose) std::cout << "Count:  " << ((long long) ptr) << std::endl;
       if (!HasPtr(ptr)) return 0;
       return ptr_count.find(ptr)->second.GetCount();
     }
 
     // This pointer was just created as a Ptr!
     void New(TYPE * ptr) {
-      emp_assert(!HasPtr(ptr)); // Make sure pointer is not already stored!
+      if (verbose) std::cout << "New:    " << ((long long) ptr) << std::endl;
+      emp_assert(!HasPtr(ptr) || !IsActive(ptr)); // Make sure pointer is not already stored!
       ptr_count[ptr] = PtrInfo(true);
     }
  
     // This pointer was already created, but given to Ptr.
     void Old(TYPE * ptr) {
-      emp_assert(!HasPtr(ptr)); // Make sure pointer is not already stored!
+      if (verbose) std::cout << "Old:    " << ((long long) ptr) << std::endl;
+      emp_assert(!HasPtr(ptr) || !IsActive(ptr)); // Make sure pointer is not already stored!
       ptr_count[ptr] = PtrInfo(false);
     }
     void Inc(TYPE * ptr) {
+      if (verbose) std::cout << "Inc:    " << ((long long) ptr) << std::endl;
       emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
       ptr_count[ptr].Inc();
     }
     void Dec(TYPE * ptr) {
+      if (verbose) std::cout << "Dec:    " << ((long long) ptr) << std::endl;
       emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
       ptr_count[ptr].Dec();
     }
     void MarkDeleted(TYPE * ptr) {
+      if (verbose) std::cout << "Delete: " << ((long long) ptr) << std::endl;
       emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
       ptr_count[ptr].MarkDeleted();
     }
@@ -148,8 +166,9 @@ namespace emp {
       EMP_IF_MEMTRACK(Tracker().New(ptr););
     }
     void Delete() {
-      delete ptr;
       EMP_IF_MEMTRACK( Tracker().MarkDeleted(ptr); );
+      EMP_IF_MEMTRACK( Tracker().Dec(ptr); );
+      delete ptr;
     }
 
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
@@ -168,6 +187,12 @@ namespace emp {
     bool operator<=(const Ptr<TYPE> & in_ptr) { return ptr <= in_ptr.ptr; }
     bool operator>(const Ptr<TYPE> & in_ptr)  { return ptr > in_ptr.ptr; }
     bool operator>=(const Ptr<TYPE> & in_ptr) { return ptr >= in_ptr.ptr; }
+
+    // Some debug testing functions
+#ifdef EMP_TRACK_MEM
+    int DebugGetCount() const { return Tracker().GetCount(ptr); }
+#endif
+
   };
 
 };
