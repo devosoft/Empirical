@@ -32,17 +32,17 @@ namespace emp {
     unsigned int color_id;        // Which color should this body appear?
 
     // @CAO Technically, we should allow any number of links.
-    CircleBody2D * pair_link;     // Is this body linked to another? (typically during reproduction)
+    CircleBody2D * pair_link;     // Is this body physically linked to another?
     BASE_TYPE pair_dist;          // How far away should the linked body be kept?
     BASE_TYPE target_pair_dist;   // How far out should the pair get before splitting?
 
-    Point<BASE_TYPE> shift;       // How should this body be updated to minimize overlap.
-    BASE_TYPE total_overlap;      // How much overlap occurred across all collisions?
+    Point<BASE_TYPE> shift;           // How should this body be updated to minimize overlap.
+    Point<BASE_TYPE> total_abs_shift; // Total absolute-value of shifts (to calculate pressure)
 
   public:
     CircleBody2D(const Circle<BASE_TYPE> & _p, BODY_INFO * _i)
       : perimeter(_p), target_radius(_p.GetRadius()), info(_i), mass(1), color_id(0)
-      , pair_link(NULL), pair_dist(0), target_pair_dist(0), total_overlap(0) { ; }
+      , pair_link(NULL), pair_dist(0), target_pair_dist(0) { ; }
     ~CircleBody2D() {
       // If this body is paired with another one, removing the pairing.
       if (pair_link) {
@@ -83,14 +83,15 @@ namespace emp {
     CircleBody2D<BODY_INFO, BASE_TYPE> &
     AddShift(const Point<BASE_TYPE> & inc_val, BASE_TYPE overlap_dist) {
       shift += inc_val;
-      total_overlap += overlap_dist;
+      total_abs_shift += inc_val.Abs();
       return *this;
     }
 
     double CalcPressure() {
-      double pressure = total_overlap / GetRadius();
-      total_overlap = 0;
-      return pressure;
+      // double pressure = total_overlap / GetRadius();
+      // total_overlap = 0;
+      // return pressure;
+      return (total_abs_shift - shift.Abs()).SquareMagnitude();
     }
 
     // Translate immediately.
@@ -103,9 +104,12 @@ namespace emp {
     BASE_TYPE GetTargetLinkDist() const { return target_pair_dist; }
     void ShiftLinkDist(BASE_TYPE change) { pair_dist += change; }
 
-    // CircleBody2D * BuildOffspring(emp::Point<BASE_TYPE> offset=emp::Point<BASE_TYPE>(0,0)) {
     CircleBody2D * BuildOffspring(emp::Point<BASE_TYPE> offset) {
-      emp::Alert("Building Offspring!");
+      static int alert_count = 0;
+      if (alert_count++ < 5) {
+        emp::Alert("Building Offspring at offset ", offset.GetX(), ',', offset.GetY());
+      }
+
       emp_assert(offset.GetX() != 0 || offset.GetY() != 0);
       if (pair_link) {   // If this body is already paired with another, break that link!
         emp_assert(pair_link->pair_link == this);
@@ -178,6 +182,7 @@ namespace emp {
 
       perimeter.Translate(shift); // Act on the accumulated shifts.
       shift.ToOrigin();           // Clear out the shift for the next round.
+      total_abs_shift.ToOrigin();
 
       // If this body is linked to another, enforce the distance between them.
       if (pair_link != NULL) {
