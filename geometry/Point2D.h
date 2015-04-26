@@ -57,6 +57,8 @@ namespace emp {
     Point operator/(int div) const { return Point(x / div, y / div); }
     Point operator-() const { return Point(-x, -y); } // Unary minus
 
+    Point Abs() const { return Point(std::abs(x), std::abs(y)); } // Absolute value
+
     // Modify this point.
     Point & Translate(TYPE shift_x, TYPE shift_y) { x += shift_x; y += shift_y; return *this; }
     Point & TranslateX(TYPE shift) { x += shift; return *this; }
