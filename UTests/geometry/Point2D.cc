@@ -49,7 +49,27 @@ int main(int argc, char* argv[])
     std::cout << "Point Setting tests passed." << std::endl;
   }
 
+  // Test if at origin...
 
-  // Explicitly test magnitude-related member functions
+  emp_assert(points[0].AtOrigin() == false);
+  emp_assert(points[1].AtOrigin() == false);
+  emp_assert(points[2].AtOrigin() == false);
+  emp_assert(points[3].AtOrigin() == true);
   
+  emp_assert(points[0].NonZero() == true);
+  emp_assert(points[1].NonZero() == true);
+  emp_assert(points[2].NonZero() == true);
+  emp_assert(points[3].NonZero() == false);
+
+  if (verbose) {
+    std::cout << "At origin tests passed." << std::endl;
+  }
+
+  // Test Midpoint and rotations
+
+  points[4].Set(4,4);
+  points[5].Set(5,5);
+
+  emp_assert(points[4].GetMidpoint(points[5]) == emp::Point<double>(4.5,4.5));
+  emp_assert(points[5].GetMidpoint(points[4]) == emp::Point<double>(4.5,4.5));
 }
