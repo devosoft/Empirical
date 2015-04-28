@@ -72,4 +72,7 @@ int main(int argc, char* argv[])
 
   emp_assert(points[4].GetMidpoint(points[5]) == emp::Point<double>(4.5,4.5));
   emp_assert(points[5].GetMidpoint(points[4]) == emp::Point<double>(4.5,4.5));
+  emp_assert(points[2].GetRot90().Magnitude() == 13);
+  emp_assert(points[2].GetRot180().Magnitude() == 13);
+  emp_assert(points[2].GetRot270().Magnitude() == 13);
 }
