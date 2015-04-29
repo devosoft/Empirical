@@ -6,7 +6,10 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  A simple class to track points in 2-Dimensional space.
+//  A simple class to track value pairs of any kind, optimized for points in 2D Space
+//
+//  Note: For maximal efficiency, you should prefer SquareMagnitude() and SquareDistance()
+//        over Magnitude() and Distance() as the latter require a square-root.
 //
 
 namespace emp {
@@ -15,7 +18,6 @@ namespace emp {
   private:
     TYPE x;
     TYPE y;
-    // @CAO store magnitude?  Lazy eval?
 
   public:
     Point() : x(0.0), y(0.0) { ; }                      // Default = 0,0
