@@ -53,8 +53,8 @@ namespace emp {
       const double overlap_dist = ((double) radius_sum) - true_dist;
       const double overlap_frac = overlap_dist / true_dist;
       const Point<BASE_TYPE> cur_shift = dist * (overlap_frac / 2.0);
-      body1.AddShift(cur_shift, overlap_dist);
-      body2.AddShift(-cur_shift, overlap_dist);
+      body1.AddShift(cur_shift);
+      body2.AddShift(-cur_shift);
 
       // @CAO if we have inelastic collisions, we just take the weighted average of velocites
       // and let the move together.
@@ -112,6 +112,7 @@ namespace emp {
 
         // @CAO Arbitrary pressure threshold!
         if (cur_pressure > 2.0) {
+          // @CAO Debug to alert the first popped.
           static bool popped = false;
           if (popped == false) {
             popped = true;
