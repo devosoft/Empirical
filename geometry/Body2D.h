@@ -40,7 +40,7 @@ namespace emp {
     Point<BASE_TYPE> total_abs_shift; // Total absolute-value of shifts (to calculate pressure)
 
   public:
-    CircleBody2D(const Circle<BASE_TYPE> & _p, BODY_INFO * _i)
+    CircleBody2D(const Circle<BASE_TYPE> & _p, BODY_INFO * _i = NULL)
       : perimeter(_p), target_radius(_p.GetRadius()), info(_i), mass(1), color_id(0)
       , pair_link(NULL), pair_dist(0), target_pair_dist(0) { ; }
     ~CircleBody2D() {
@@ -62,6 +62,8 @@ namespace emp {
     BASE_TYPE GetMass() const { return mass; }
     unsigned int GetColorID() const { return color_id; }
 
+    Point<BASE_TYPE> GetShift() const { return shift; }
+
     CircleBody2D<BODY_INFO, BASE_TYPE> & SetPosition(const Point<BASE_TYPE> & new_pos) {
       perimeter.SetCenter(new_pos); 
       return *this;
@@ -81,16 +83,13 @@ namespace emp {
 
     // Shift at end of next update.
     CircleBody2D<BODY_INFO, BASE_TYPE> &
-    AddShift(const Point<BASE_TYPE> & inc_val, BASE_TYPE overlap_dist) {
+    AddShift(const Point<BASE_TYPE> & inc_val) {
       shift += inc_val;
       total_abs_shift += inc_val.Abs();
       return *this;
     }
 
     double CalcPressure() {
-      // double pressure = total_overlap / GetRadius();
-      // total_overlap = 0;
-      // return pressure;
       return (total_abs_shift - shift.Abs()).SquareMagnitude();
     }
 
@@ -105,10 +104,7 @@ namespace emp {
     void ShiftLinkDist(BASE_TYPE change) { pair_dist += change; }
 
     CircleBody2D * BuildOffspring(emp::Point<BASE_TYPE> offset) {
-      static int alert_count = 0;
-      if (alert_count++ < 5) {
-        emp::Alert("Building Offspring at offset ", offset.GetX(), ',', offset.GetY());
-      }
+      emp::Alert("Building Offspring at offset ", offset.GetX(), ',', offset.GetY());
 
       emp_assert(offset.GetX() != 0 || offset.GetY() != 0);
       if (pair_link) {   // If this body is already paired with another, break that link!
@@ -116,7 +112,7 @@ namespace emp {
         pair_link->pair_link = NULL;
       }
       // Create the offspring as a paired link.
-      pair_link = new CircleBody2D(perimeter, new BODY_INFO(*info));
+      pair_link = new CircleBody2D(perimeter, info ? new BODY_INFO(*info) : NULL);
       pair_link->pair_link = this;
       pair_link->Translate(offset);
       pair_dist = 1;
