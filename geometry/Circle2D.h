@@ -21,6 +21,7 @@ namespace emp {
 
     const Point<TYPE> & GetCenter() const { return center; }
     TYPE GetRadius() const { return radius; }
+    TYPE GetSquareRadius() const { return radius * radius; }
 
     Circle<TYPE> & SetCenter(const Point<TYPE> & new_center) { center = new_center; return *this; }
     Circle<TYPE> & SetCenterX(TYPE new_x) { center.SetX(new_x); return *this; }
@@ -30,7 +31,11 @@ namespace emp {
     Circle<TYPE> & Translate(Point<TYPE> shift) { center += shift; return *this; }
 
     bool Contains(const Point<TYPE> & point) const {
-      return center.SquareDistance(point) < radius * radius;
+      return center.SquareDistance(point) < GetSquareRadius();
+    }
+    bool Contains(const Circle<TYPE> & other) const {
+      const TYPE max_dist = other.center.Distance(center) + other.GetRadius();
+      return max_dist < GetRadius();
     }
     bool HasOverlap(const Circle<TYPE> & other) const {
       const TYPE min_dist = radius + other.radius;
