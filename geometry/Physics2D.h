@@ -97,7 +97,7 @@ namespace emp {
       // Handle movement of bodies
       auto & body_set = surface.GetBodySet();
       for (BODY_TYPE * cur_body : body_set) {
-        cur_body->BodyUpdate(0.5);   // Let a body change size or shape, as needed.
+        cur_body->BodyUpdate(0.25);   // Let a body change size or shape, as needed.
         cur_body->ProcessStep(0.0125);  // Update position and velocity.
       }
 
@@ -108,17 +108,10 @@ namespace emp {
       // Determine which bodies we should remove.
       int cur_size = (int) body_set.size();
       for (int i = 0; i < cur_size; i++) {
-        const double cur_pressure = body_set[i]->CalcPressure();
+        const double cur_pressure = body_set[i]->GetPressure();
 
         // @CAO Arbitrary pressure threshold!
         if (cur_pressure > 2.0) {
-          // @CAO Debug to alert the first popped.
-          static bool popped = false;
-          if (popped == false) {
-            popped = true;
-            emp::Alert("First Pop! Num orgs=", body_set.size());
-          }
-
           // Too much pressure!  We need to burst this cell.
           delete body_set[i];
           cur_size--;
