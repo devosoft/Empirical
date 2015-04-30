@@ -38,11 +38,12 @@ namespace emp {
 
     Point<BASE_TYPE> shift;           // How should this body be updated to minimize overlap.
     Point<BASE_TYPE> total_abs_shift; // Total absolute-value of shifts (to calculate pressure)
+    double pressure;                  // Current pressure on this body.
 
   public:
     CircleBody2D(const Circle<BASE_TYPE> & _p, BODY_INFO * _i = NULL)
       : perimeter(_p), target_radius(_p.GetRadius()), info(_i), mass(1), color_id(0)
-      , pair_link(NULL), pair_dist(0), target_pair_dist(0) { ; }
+      , pair_link(NULL), pair_dist(0), target_pair_dist(0), pressure(0) { ; }
     ~CircleBody2D() {
       // If this body is paired with another one, removing the pairing.
       if (pair_link) {
@@ -63,6 +64,7 @@ namespace emp {
     unsigned int GetColorID() const { return color_id; }
 
     Point<BASE_TYPE> GetShift() const { return shift; }
+    double GetPressure() const { return pressure; }
 
     CircleBody2D<BODY_INFO, BASE_TYPE> & SetPosition(const Point<BASE_TYPE> & new_pos) {
       perimeter.SetCenter(new_pos); 
@@ -89,16 +91,14 @@ namespace emp {
       return *this;
     }
 
-    double CalcPressure() {
-      return (total_abs_shift - shift.Abs()).SquareMagnitude();
-    }
-
     // Translate immediately.
     CircleBody2D<BODY_INFO, BASE_TYPE> &
     Translate(const Point<BASE_TYPE> & inc_val) { perimeter.Translate(inc_val); return *this; }
 
     // Creating, testing, and unlinking other organisms (used for gestation & reproduction)
-    bool IsLinked(const CircleBody2D & link_org) const { return pair_link == &link_org; }
+    bool IsLinked(const CircleBody2D & link_org) const {
+      return pair_link == &link_org;
+    }
     BASE_TYPE GetLinkDist(const CircleBody2D & link_org) const {
       if (!IsLinked(link_org)) return -1;
       return pair_dist;
@@ -113,7 +113,7 @@ namespace emp {
     }
 
     CircleBody2D * BuildOffspring(emp::Point<BASE_TYPE> offset) {
-      emp::Alert("Building Offspring at offset ", offset.GetX(), ',', offset.GetY());
+      // emp::Alert("Building Offspring at offset ", offset.GetX(), ',', offset.GetY());
 
       emp_assert(offset.GetX() != 0 || offset.GetY() != 0);
       if (pair_link) {   // If this body is already paired with another, break that link!
@@ -162,8 +162,15 @@ namespace emp {
 
       // Test if the link distance for this body needs to be updated
       if (pair_link && pair_dist != target_pair_dist) {
-        if ((int) pair_dist < (int) target_pair_dist) pair_dist += change_factor;
-        else pair_dist -= change_factor;
+        // If we're within the change_factor, just set pair_dist to target.
+        if (std::abs(pair_dist - target_pair_dist) < change_factor) {
+          pair_dist = target_pair_dist;
+        }
+        else {
+          if ((int) pair_dist < (int) target_pair_dist) pair_dist += change_factor;
+          else pair_dist -= change_factor;
+        }
+        pair_link->pair_dist = pair_dist;
       }
 
       return *this;
@@ -190,17 +197,24 @@ namespace emp {
       const BASE_TYPE max_x = max_coords.GetX() - GetRadius();
       const BASE_TYPE max_y = max_coords.GetY() - GetRadius();
 
-      perimeter.Translate(shift); // Act on the accumulated shifts.
+      // Act on the accumulated shifts.
+      perimeter.Translate(shift);
+
+      // Update the caclulcation for pressure.
+      pressure = (total_abs_shift - shift.Abs()).SquareMagnitude();
       shift.ToOrigin();           // Clear out the shift for the next round.
       total_abs_shift.ToOrigin();
 
       // If this body is linked to another, enforce the distance between them.
       if (pair_link != NULL) {
+        emp_assert(pair_link->pair_link == this);
+
         if (GetAnchor() == pair_link->GetAnchor()) {
           // If two organisms are on top of each other... shift one.
           Translate(emp::Point<BASE_TYPE>(0.01, 0.01));
         }
         
+        // Figure out how much each oragnism should move so that they will be properly spaced.
         const BASE_TYPE start_dist = GetAnchor().Distance(pair_link->GetAnchor());
         const BASE_TYPE link_dist = GetLinkDist(*pair_link);
         const double frac_change = (1.0 - ((double) link_dist) / ((double) start_dist)) / 2.0;
@@ -210,7 +224,8 @@ namespace emp {
         perimeter.Translate(-dist_move);
         pair_link->perimeter.Translate(dist_move);
       }
-
+      
+      // Adjust the organism so it stays within the bounding box of the world.
       if (GetCenter().GetX() < GetRadius()) { 
         perimeter.SetCenterX(GetRadius());     // Put back in range...
         velocity.NegateX();                    // Bounce off left side.
@@ -230,6 +245,16 @@ namespace emp {
       return *this;
     }
     
+    // Check to make sure there are no obvious issues with this object.
+    bool OK() {
+      if (pair_link) {
+        emp_assert(pair_link->pair_link == this); // Make sure pairing is reciprical.
+        emp_assert(pair_dist >= 0);               // Distances cannot be negative
+        emp_assert(target_pair_dist >= 0);        // Distances cannot be negative
+      }
+      return true;
+    }
+
   };
 };
 
