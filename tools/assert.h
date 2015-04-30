@@ -62,18 +62,20 @@ namespace emp {
 #elif EMSCRIPTEN       // NDEBUG and TDEBUG not set, but compiling with Emscripten
 
 namespace emp {
-  int assert_trip_count = 0;
   const bool assert_on = true;
 }
 
 // Generate a pop-up alert in a web browser if an assert it tripped.
-#define emp_assert(EXPR)                                                       \
-  do { if ( !(EXPR) && emp::assert_trip_count++ < 3 ) {                        \
-    std::string msg = std::string("Assert Error (In ") + std::string(__FILE__) \
-      + std::string(" line ") + std::to_string(__LINE__)                       \
-      + std::string("): ") + std::string(#EXPR);                               \
-    EM_ASM_ARGS({ msg = Pointer_stringify($0); alert(msg); }, msg.c_str()); \
-    abort(); }                                                                 \
+#define emp_assert(EXPR)                                                \
+  do { if ( !(EXPR) ) {                                                 \
+      std::string msg = std::string("Assert Error (In ")                \
+        + std::string(__FILE__)                                         \
+        + std::string(" line ") + std::to_string(__LINE__)              \
+        + std::string("): ") + std::string(#EXPR);                      \
+      static int trip_count = 0;                                        \
+      if (trip_count++ < 3)                                             \
+      EM_ASM_ARGS({ msg = Pointer_stringify($0); alert(msg); }, msg.c_str()); \
+      abort(); }                                                        \
   } while (0)
 
 
