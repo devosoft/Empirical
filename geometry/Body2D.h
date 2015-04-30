@@ -98,10 +98,19 @@ namespace emp {
     Translate(const Point<BASE_TYPE> & inc_val) { perimeter.Translate(inc_val); return *this; }
 
     // Creating, testing, and unlinking other organisms (used for gestation & reproduction)
-    bool IsLinked(const CircleBody2D & link_test) const { return pair_link == &link_test; }
-    BASE_TYPE GetLinkDist() const { return pair_dist; }
-    BASE_TYPE GetTargetLinkDist() const { return target_pair_dist; }
-    void ShiftLinkDist(BASE_TYPE change) { pair_dist += change; }
+    bool IsLinked(const CircleBody2D & link_org) const { return pair_link == &link_org; }
+    BASE_TYPE GetLinkDist(const CircleBody2D & link_org) const {
+      if (!IsLinked(link_org)) return -1;
+      return pair_dist;
+    }
+    BASE_TYPE GetTargetLinkDist(const CircleBody2D & link_org) const {
+      if (!IsLinked(link_org)) return -1;
+      return target_pair_dist;
+    }
+    void ShiftLinkDist(CircleBody2D & link_org, BASE_TYPE change) {
+      pair_dist += change;
+      if (pair_link) pair_link->pair_dist = pair_dist;
+    }
 
     CircleBody2D * BuildOffspring(emp::Point<BASE_TYPE> offset) {
       emp::Alert("Building Offspring at offset ", offset.GetX(), ',', offset.GetY());
@@ -115,8 +124,13 @@ namespace emp {
       pair_link = new CircleBody2D(perimeter, info ? new BODY_INFO(*info) : NULL);
       pair_link->pair_link = this;
       pair_link->Translate(offset);
-      pair_dist = 1;
+
+      // Setup distances with offspring...
+      pair_dist = offset.Magnitude();
+      pair_link->pair_dist = pair_dist;
       target_pair_dist = perimeter.GetRadius() * 2.0;
+      pair_link->target_pair_dist = target_pair_dist;
+
       return pair_link;
     }
 
@@ -188,7 +202,7 @@ namespace emp {
         }
         
         const BASE_TYPE start_dist = GetAnchor().Distance(pair_link->GetAnchor());
-        const BASE_TYPE link_dist = GetLinkDist();
+        const BASE_TYPE link_dist = GetLinkDist(*pair_link);
         const double frac_change = (1.0 - ((double) link_dist) / ((double) start_dist)) / 2.0;
         
         emp::Point<BASE_TYPE> dist_move = (GetAnchor() - pair_link->GetAnchor()) * frac_change;
