@@ -66,6 +66,8 @@ namespace emp {
     Point<BASE_TYPE> GetShift() const { return shift; }
     double GetPressure() const { return pressure; }
 
+    bool IsReproducing() const { return (pair_link != NULL) && (GetRadius() != target_radius); }
+
     CircleBody2D<BODY_INFO, BASE_TYPE> & SetPosition(const Point<BASE_TYPE> & new_pos) {
       perimeter.SetCenter(new_pos); 
       return *this;
@@ -163,8 +165,11 @@ namespace emp {
       // Test if the link distance for this body needs to be updated
       if (pair_link && pair_dist != target_pair_dist) {
         // If we're within the change_factor, just set pair_dist to target.
-        if (std::abs(pair_dist - target_pair_dist) < change_factor) {
+        if (std::abs(pair_dist - target_pair_dist) <= change_factor) {
           pair_dist = target_pair_dist;
+          // @CAO, for now, break the link!
+          pair_link->pair_link = NULL;
+          pair_link = NULL;
         }
         else {
           if ((int) pair_dist < (int) target_pair_dist) pair_dist += change_factor;
