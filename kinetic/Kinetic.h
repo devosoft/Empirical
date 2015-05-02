@@ -822,7 +822,6 @@ namespace Kinetic {
     }
 
     void Draw() {
-      emp::Alert("Testing...");
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
       EM_ASM_ARGS({emp_info.objs[$0].draw();}, obj_id);
     }
