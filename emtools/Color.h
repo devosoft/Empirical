@@ -13,10 +13,11 @@ namespace emp {
 
   public:
     Color() { ; }
+    Color(const Color & _in) = default;
     Color(const std::string & _name) : colorname(_name) { ; }
-    Color(const Color & _in) : colorname(_in.colorname) { ; }
     Color(const char * _name) : colorname(_name) { ; }
-    Color(int r, int g, int b) { // @CAO This is technically shorter than "rgb(##,##,##)", but more processing up front.
+    Color(int r, int g, int b) {
+      // @CAO Technically shorter than "rgb(##,##,##)", but more processing up front.
       std::stringstream stream;
       stream << '#' << std::setw(2) << std::setfill('0') << std::hex << r
              << std::setw(2) << std::setfill('0') << std::hex << g
@@ -29,7 +30,7 @@ namespace emp {
       colorname = stream.str();
     }
 
-    const Color & operator=(const Color & _in) { colorname = _in.colorname; return *this; }
+    Color & operator=(const Color & _in) = default;
     bool operator==(const Color & _in) const { return colorname == colorname; }
     bool operator!=(const Color & _in) const { return colorname != colorname; }
 
