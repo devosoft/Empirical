@@ -13,12 +13,10 @@ namespace emp {
   private:
     std::vector<Color> color_map;
   public:
-    ColorMap(int size, bool autocolor=false) : color_map(size) {
+    ColorMap(int size, double autocolor=0) : color_map(size) {
+      //  The value in autocolor determines the max degree of the hue.
       if (autocolor) {
-        //const double cap = 240.0;
-        const double cap = 300.0;
-        
-        const double step = cap / (double) size;
+        const double step = autocolor / (double) size;
         for (int i = 0; i < size; i++) {
           const double hue = 330 + step * (double) i;
           std::stringstream stream;
