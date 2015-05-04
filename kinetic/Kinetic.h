@@ -19,6 +19,7 @@
 #include "../emtools/RawImage.h"
 
 extern "C" {
+  extern void EMP_SETUP(); // @CAO -- This function should be more generic!
   extern int EMP_Tween_Build(int target_id, double seconds);
   extern int EMP_Tween_Clone(int orig_settings_id);
 
