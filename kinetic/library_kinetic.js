@@ -3,6 +3,11 @@ mergeInto(LibraryManager.library, {
 
     // Below are a functions that weren't as easy to inline in the C++
 
+    EMP_SETUP__deps: ['$empJSDoCallback'],
+    EMP_SETUP: function() {
+        empJSDoCallback = Module.cwrap('empJSDoCallback', null, ['number', 'number']);
+    },
+
     EMP_Tween_Build__deps: ['$emp_info'],
     EMP_Tween_Build: function(target_id, seconds) {
         var settings_id = emp_info.objs.length;
