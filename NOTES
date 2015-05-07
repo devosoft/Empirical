@@ -1,4 +1,6 @@
 -= Next Steps =-
+Make sure BitVector / BitSet have a move constructor (& incorporate Ben's changes)
+Simplify constructon of standard HTML elements (text, buttons, canvas, etc...)
 (work on applications of library and see what needs to be fixed/added)
 Write some documentation outside of the code!
 
@@ -21,7 +23,7 @@ A data management system that can track data by:
   - Batch (where a batch reset occurs periodicall)
   - Log (tracking particular events when they occur)
   All output files should have headers that allow them to be read back in more easily.
-A citation tool? Useful for pointing people to appropriate references to learn more about a component.
+A citation tool: Useful for pointing people to appropriate references & building online bibs.
 
 -= Evolution-specific Tools =-
 Organism Object (Contains Genome and templated on virtual hardware type)
@@ -31,7 +33,7 @@ Phylogeny/lineage manager with multiple modes of purging (and link to phenotypes
 Clade manager that will mark into phenotypes which clades they are associated with
 
 -= Optimizations to Explore =-
-Explore if quick-looking up for sin, cos, tan should be at higher resolution (now it's 256 entires).
+Should quick-lookup for sin, cos, tan be at higher resolution (now it's 256 entires)?
 Fix how sectors are handled in surfaces to be more dynamic based on sizes of organisms.
 - Consider sorting organisms by size and processing smallest first?
   Then any particular comparison is only up against as small or smaller.
@@ -39,7 +41,7 @@ Fix how sectors are handled in surfaces to be more dynamic based on sizes of org
 - Sort all objects within bands?
 
 -= Improvements (that rquire some thought...) =-
-InstLib: Can we lock in a set of instruction at compile time?  Or at least put them in a fixed array?
+InstLib: Can we lock a set of instruction at compile time?  Or at least put them in a fixed array?
 Change HardwareCPU to something linke Hardware_SimpleCPU and Instruction to Instruction_SimpleCPU
 Come up with a cleaner method to time functions?  Current macro is pretty ugly.
 
@@ -56,7 +58,7 @@ Come up with a cleaner method to time functions?  Current macro is pretty ugly.
 
 -= Librarys to consider wrapping =-
 FabricJS
-PaperJS -- VERY impressive demos!!
+PaperJS -- VERY impressive demos!!  (PLUS best benchmarks next to native canvas)
 oCanvas
 
 http://www.graphdracula.net/  - build vertices & edges easily!
