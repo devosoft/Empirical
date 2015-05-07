@@ -91,6 +91,8 @@ namespace emp {
 
   template <int NUM_BITS> class BitSet {
   private:
+    static_assert(NUM_BITS > 0, "BitSet templates must have a positive number of bits");
+
     static const int NUM_FIELDS = 1 + ((NUM_BITS - 1) >> 5);
     static const int LAST_BIT = NUM_BITS & 31;
     static const int NUM_BYTES = 1 + ((NUM_BITS - 1) >> 3);
