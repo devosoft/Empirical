@@ -8,6 +8,9 @@
 //
 // To implement: append(), resize()...
 //
+// Note, this class is about 15-20% slower than BitSet, but is not fixed size and does
+// not require knowledge of the size at compile time.
+//
 
 #include <assert.h>
 #include <iostream>
@@ -130,6 +133,10 @@ namespace emp {
         RawCopy(in_set.bit_set);
       }
     }
+    BitVector(BitVector && in_set) : num_bits(in_set.num_bits) {
+      bit_set = in_set.bit_set;
+      in_set.bit_set = NULL;
+    }
     ~BitVector() { if (bit_set != NULL) delete [] bit_set; }
 
     BitVector & operator=(const BitVector & in_set) {
@@ -146,6 +153,16 @@ namespace emp {
       }
 
       if (num_bits > 0) RawCopy(in_set.bit_set);
+
+      return *this;
+    }
+
+    BitVector & operator=(BitVector && in_set) {
+      if (&in_set == this) return *this;
+      if (bit_set != NULL) delete [] bit_set;
+      num_bits = in_set.num_bits;
+      bit_set = in_set.bit_set;
+      in_set.bit_set = NULL;
 
       return *this;
     }
