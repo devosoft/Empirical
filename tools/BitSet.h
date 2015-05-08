@@ -32,8 +32,8 @@
 // Accessors for larger chunks:
 //  void Clear()                                   -- Set all bits to zero
 //  void SetAll()                                  -- Set all bits to one
-//  unsigned char GetByte(int byte_id) const       -- Read a full byte of bits
-//  void SetByte(int byte_id, unsigned char value) -- Set a full byte of bits
+//  uint8_t GetByte(int byte_id) const       -- Read a full byte of bits
+//  void SetByte(int byte_id, uint8_t value) -- Set a full byte of bits
 //  unsigned int GetUInt(int uint_id) const        -- Read 32 bits at once
 //  void SetUInt(int uint_id, unsigned int value)  -- Set 32 bits at once
 //
@@ -97,7 +97,7 @@ namespace emp {
     static const int LAST_BIT = NUM_BITS & 31;
     static const int NUM_BYTES = 1 + ((NUM_BITS - 1) >> 3);
 
-    unsigned int bit_set[NUM_FIELDS];
+    uint32_t bit_set[NUM_FIELDS];
     
     // Setup a bit proxy so that we can use operator[] on bit sets as a lvalue.
     class BitProxy {
@@ -126,7 +126,7 @@ namespace emp {
     inline static int Byte2Field(const int index) { return index/4; }
     inline static int Byte2FieldPos(const int index) { return (index & 3) << 3; }
 
-    inline void Copy(const unsigned int in_set[NUM_FIELDS]) {
+    inline void Copy(const uint32_t in_set[NUM_FIELDS]) {
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
     }
 
@@ -242,32 +242,32 @@ namespace emp {
       else       bit_set[field_id] &= ~pos_mask;
     }
 
-    unsigned char GetByte(int index) const {
+    uint8_t GetByte(int index) const {
       assert(index >= 0 && index < NUM_BYTES);
       const int field_id = Byte2Field(index);
       const int pos_id = Byte2FieldPos(index);
       return (bit_set[field_id] >> pos_id) & 255;
     }
 
-    void SetByte(int index, unsigned char value) {
+    void SetByte(int index, uint8_t value) {
       assert(index >= 0 && index < NUM_BYTES);
       const int field_id = Byte2Field(index);
       const int pos_id = Byte2FieldPos(index);
-      const unsigned int val_uint = value;
+      const uint32_t val_uint = value;
       bit_set[field_id] = (bit_set[field_id] & ~(255U << pos_id)) | (val_uint << pos_id);
     }
 
-    unsigned int GetUInt(int index) const {
+    uint32_t GetUInt(int index) const {
       assert(index >= 0 && index < NUM_FIELDS);
       return bit_set[index];
     }
 
-    void SetUInt(int index, unsigned int value) {
+    void SetUInt(int index, uint32_t value) {
       assert(index >= 0 && index < NUM_FIELDS);
       bit_set[index] = value;
     }
 
-    unsigned int GetUIntAtBit(int index) {
+    uint32_t GetUIntAtBit(int index) {
       assert(index >= 0 && index < NUM_BITS);
       const int field_id = FieldID(index);
       const int pos_id = FieldPos(index);
@@ -277,7 +277,7 @@ namespace emp {
     }
 
     template <int OUT_BITS>
-    unsigned int GetValueAtBit(int index) {
+    uint32_t GetValueAtBit(int index) {
       static_assert(OUT_BITS <= 32, "Requesting too many bits to fit in a UInt");
       return GetUIntAtBit(index) & UIntMaskLow(OUT_BITS);
     }
@@ -329,8 +329,8 @@ namespace emp {
     int CountOnes_Mixed() const {
       int bit_count = 0;
       for (const auto v : bit_set) {
-        const unsigned int t1 = v - ((v >> 1) & 0x55555555);
-        const unsigned int t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
+        const uint32_t t1 = v - ((v >> 1) & 0x55555555);
+        const uint32_t t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
         bit_count += ((t2 + (t2 >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
       }
       return bit_count;
