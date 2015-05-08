@@ -10,9 +10,10 @@ int main(int argc, char* argv[])
   const bool verbose = emp::cl::use_arg(args, "-v");
 
   const int set_size = 100000;
+  typedef emp::BitSet<set_size> TEST_TYPE;
 
-  emp::BitSet<set_size> set1;
-  emp::BitSet<set_size> set2;
+  TEST_TYPE set1;
+  TEST_TYPE set2;
 
   for (int i = 0; i < set_size; i++) {
     if (!(i%2) && (i%5)) set1[i] = 1;
@@ -22,10 +23,10 @@ int main(int argc, char* argv[])
   // TIMING!!!!!
   std::clock_t emp_start_time = std::clock();
 
-  emp::BitSet<set_size> set3(set1 & set2);
-  emp::BitSet<set_size> set4 = (set1 | set2);
+  TEST_TYPE set3(set1 & set2);
+  TEST_TYPE set4 = (set1 | set2);
   int total = 0;
-  for (int i = 0; i < 10000; i++) {
+  for (int i = 0; i < 100000; i++) {
     set3 |= (set4 << 3);
     set4 &= (set3 >> 3);
     auto set5 = set3 & set4;
@@ -39,7 +40,7 @@ int main(int argc, char* argv[])
   // END TIMING!!!
 
   if (verbose) {
-    std::cout << "Starting emp::BitSet objects: " << std::endl
+    std::cout << "emp::BitSet objects: " << std::endl
               << "   " << set1 << std::endl
               << "   " << set2 << std::endl
               << "   " << set3 << std::endl
