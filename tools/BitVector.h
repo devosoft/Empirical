@@ -28,7 +28,7 @@ namespace emp {
     int NumFields() const { return 1 + ((num_bits - 1) >> 5); }
     int NumBytes() const { return  1 + ((num_bits - 1) >> 3); }
 
-    unsigned int * bit_set;
+    uint32_t * bit_set;
     
     // Setup a bit proxy so that we can use operator[] on bit sets as an lvalue.
     class BitProxy {
@@ -57,7 +57,7 @@ namespace emp {
     // The following function assumes that the size of the bit_set has already been adjusted
     // to be the same as the size of the one being copied and only the fields need to be
     // copied over.
-    inline void RawCopy(const unsigned int * in_set) {
+    inline void RawCopy(const uint32_t * in_set) {
       const int NUM_FIELDS = NumFields();
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
     }
@@ -123,13 +123,13 @@ namespace emp {
   public:
     BitVector(int in_num_bits=0, bool init_val=false) : num_bits(in_num_bits) {
       assert(in_num_bits >= 0);
-      bit_set = (num_bits == 0) ? NULL : new unsigned int[NumFields()];
+      bit_set = (num_bits == 0) ? NULL : new uint32_t[NumFields()];
       if (init_val) SetAll(); else Clear();
     }
     BitVector(const BitVector & in_set) : num_bits(in_set.num_bits) {
       if (num_bits == 0) bit_set = NULL;
       else {
-        bit_set = new unsigned int[NumFields()];
+        bit_set = new uint32_t[NumFields()];
         RawCopy(in_set.bit_set);
       }
     }
@@ -148,7 +148,7 @@ namespace emp {
         if (bit_set) delete [] bit_set;
         if (num_bits == 0) bit_set = NULL;
         else {
-          bit_set = new unsigned int[NumFields()];
+          bit_set = new uint32_t[NumFields()];
         }
       }
 
@@ -179,7 +179,7 @@ namespace emp {
       }
 
       else if (old_num_fields == 0) {   // We are increasing from an empty BitVector
-        bit_set = new unsigned int[NUM_FIELDS];
+        bit_set = new uint32_t[NUM_FIELDS];
         for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = 0U;
       }
 
@@ -189,8 +189,8 @@ namespace emp {
       }
 
       else {  // We have to change the number of bitfields.  Resize & copy old info.
-        unsigned int * old_bit_set = bit_set;
-        bit_set = new unsigned int[NUM_FIELDS];
+        uint32_t * old_bit_set = bit_set;
+        bit_set = new uint32_t[NUM_FIELDS];
         const int min_fields = std::min(old_num_fields, NUM_FIELDS);
         for (int i = 0; i < min_fields; i++) bit_set[i] = old_bit_set[i];
         for (int i = min_fields; i < NUM_FIELDS; i++) bit_set[i] = 0U;
@@ -229,32 +229,32 @@ namespace emp {
       else       bit_set[field_id] &= ~pos_mask;
     }
 
-    unsigned char GetByte(int index) const {
+    uint8_t GetByte(int index) const {
       assert(index >= 0 && index < NumBytes());
       const int field_id = Byte2Field(index);
       const int pos_id = Byte2FieldPos(index);
       return (bit_set[field_id] >> pos_id) & 255U;
     }
 
-    void SetByte(int index, unsigned char value) {
+    void SetByte(int index, uint8_t value) {
       assert(index >= 0 && index < NumBytes());
       const int field_id = Byte2Field(index);
       const int pos_id = Byte2FieldPos(index);
-      const unsigned int val_uint = value;
+      const uint32_t val_uint = value;
       bit_set[field_id] = (bit_set[field_id] & ~(255U << pos_id)) | (val_uint << pos_id);
     }
 
-    unsigned int GetUInt(int index) const {
+    uint32_t GetUInt(int index) const {
       assert(index >= 0 && index < NumFields());
       return bit_set[index];
     }
 
-    void SetUInt(int index, unsigned int value) {
+    void SetUInt(int index, uint32_t value) {
       assert(index >= 0 && index < NumFields());
       bit_set[index] = value;
     }
 
-    unsigned int GetUIntAtBit(int index) {
+    uint32_t GetUIntAtBit(int index) {
       assert(index >= 0 && index < num_bits);
       const int field_id = FieldID(index);
       const int pos_id = FieldPos(index);
@@ -265,7 +265,7 @@ namespace emp {
     }
 
     template <int OUT_BITS>
-    unsigned int GetValueAtBit(int index) {
+    uint32_t GetValueAtBit(int index) {
       static_assert(OUT_BITS <= 32, "Requesting too many bits to fit in a UInt");
       return GetUIntAtBit(index) & UIntMaskLow(OUT_BITS);
     }
@@ -328,9 +328,9 @@ namespace emp {
       const int NUM_FIELDS = NumFields(); 
       int bit_count = 0;
       for (int i = 0; i < NUM_FIELDS; i++) {
-        const unsigned int v = bit_set[i];
-        const unsigned int t1 = v - ((v >> 1) & 0x55555555);
-        const unsigned int t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
+        const uint32_t v = bit_set[i];
+        const uint32_t t1 = v - ((v >> 1) & 0x55555555);
+        const uint32_t t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
         bit_count += (((t2 + (t2 >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
       }
       return bit_count;
