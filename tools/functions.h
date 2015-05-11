@@ -42,10 +42,16 @@ namespace emp {
     }
   }
 
-  // A fast int-log calculator
+  // A compile-time int-log calculator
   template <typename TYPE>
   static constexpr int IntLog2(TYPE x) {
     return x == 0 ? 0 : IntLog2(x/2) + 1;
+  }
+
+  // A compile-time bit counter.
+  template <typename TYPE>
+  static constexpr int CountOnes(TYPE x) {
+    return x == 0 ? 0 : (CountOnes(x/2) + (x&1));
   }
 
   // Quick bit-mask generators...
