@@ -42,7 +42,7 @@ namespace emp {
     }
   }
 
-  // A compile-time int-log calculator
+  // A compile-time int-log calculator (aka, significant bits)
   template <typename TYPE>
   static constexpr int IntLog2(TYPE x) {
     return x == 0 ? 0 : IntLog2(x/2) + 1;
@@ -55,12 +55,14 @@ namespace emp {
   }
 
   // Quick bit-mask generators...
-  static constexpr unsigned int UIntMaskLow(int num_bits) {
-    return (num_bits == 32) ? -1 : ((1 << num_bits) - 1);
+  template <typename TYPE>
+  static constexpr TYPE MaskLow(int num_bits) {
+    return (num_bits == 8*sizeof(TYPE)) ? -1 : ((((TYPE)1) << num_bits) - 1);
   }
 
-  static constexpr unsigned int UIntMaskHigh(int num_bits) {
-    return UIntMaskLow(num_bits) << (32-num_bits);
+  template <typename TYPE>
+  static constexpr TYPE MaskHigh(int num_bits) {
+    return MaskLow<TYPE>(num_bits) << (8*sizeof(TYPE)-num_bits);
   }
 
 
