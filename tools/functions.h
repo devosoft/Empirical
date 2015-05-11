@@ -42,29 +42,6 @@ namespace emp {
     }
   }
 
-  // A compile-time int-log calculator (aka, significant bits)
-  template <typename TYPE>
-  static constexpr int IntLog2(TYPE x) {
-    return x == 0 ? 0 : IntLog2(x/2) + 1;
-  }
-
-  // A compile-time bit counter.
-  template <typename TYPE>
-  static constexpr int CountOnes(TYPE x) {
-    return x == 0 ? 0 : (CountOnes(x/2) + (x&1));
-  }
-
-  // Quick bit-mask generators...
-  template <typename TYPE>
-  static constexpr TYPE MaskLow(int num_bits) {
-    return (num_bits == 8*sizeof(TYPE)) ? -1 : ((((TYPE)1) << num_bits) - 1);
-  }
-
-  template <typename TYPE>
-  static constexpr TYPE MaskHigh(int num_bits) {
-    return MaskLow<TYPE>(num_bits) << (8*sizeof(TYPE)-num_bits);
-  }
-
 
   // Run both min and max on a value to put it into a desired range.
   template <typename TYPE> TYPE to_range(const TYPE & value, const TYPE & in_min, const TYPE & in_max) {
