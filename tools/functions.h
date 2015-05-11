@@ -43,8 +43,9 @@ namespace emp {
   }
 
   // A fast int-log calculator
-  static constexpr int UIntLog2(unsigned int x) {
-    return x == 0 ? 0 : UIntLog(x/2) + 1;
+  template <typename TYPE>
+  static constexpr int IntLog2(TYPE x) {
+    return x == 0 ? 0 : IntLog2(x/2) + 1;
   }
 
   // Quick bit-mask generators...
