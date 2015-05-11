@@ -42,6 +42,11 @@ namespace emp {
     }
   }
 
+  // A fast int-log calculator
+  static constexpr int UIntLog2(unsigned int x) {
+    return x == 0 ? 0 : UIntLog(x/2) + 1;
+  }
+
   // Quick bit-mask generators...
   static constexpr unsigned int UIntMaskLow(int num_bits) {
     return (num_bits == 32) ? -1 : ((1 << num_bits) - 1);
