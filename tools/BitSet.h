@@ -86,6 +86,7 @@
 #include <vector>
 
 #include "functions.h"
+#include "const_utils.h"
 
 namespace emp {
 
@@ -279,7 +280,7 @@ namespace emp {
     template <int OUT_BITS>
     uint32_t GetValueAtBit(int index) {
       static_assert(OUT_BITS <= 32, "Requesting too many bits to fit in a UInt");
-      return GetUIntAtBit(index) & UIntMaskLow(OUT_BITS);
+      return GetUIntAtBit(index) & constant::MaskLow<uint32_t>(OUT_BITS);
     }
 
 
@@ -295,7 +296,7 @@ namespace emp {
     void Clear() { for (auto & i : bit_set) i = 0U; }
     void SetAll() { 
       for (auto & i : bit_set) i = ~0U;
-      if (LAST_BIT > 0) { bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT); }
+      if (LAST_BIT > 0) { bit_set[NUM_FIELDS - 1] &= constant::MaskLow<uint32_t>(LAST_BIT); }
     }
 
   
@@ -377,7 +378,7 @@ namespace emp {
     BitSet NOT() const {
       BitSet out_set(*this);
       for (int i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~bit_set[i];
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT);
+      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= constant::MaskLow<uint32_t>(LAST_BIT);
       return out_set;
     }
 
@@ -396,14 +397,14 @@ namespace emp {
     BitSet NAND(const BitSet & set2) const {
       BitSet out_set(*this);
       for (int i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT);
+      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= constant::MaskLow<uint32_t>(LAST_BIT);
       return out_set;
     }
 
     BitSet NOR(const BitSet & set2) const {
       BitSet out_set(*this);
       for (int i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT);
+      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= constant::MaskLow<uint32_t>(LAST_BIT);
       return out_set;
     }
 
@@ -416,7 +417,7 @@ namespace emp {
     BitSet EQU(const BitSet & set2) const {
       BitSet out_set(*this);
       for (int i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT);
+      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= constant::MaskLow<uint32_t>(LAST_BIT);
       return out_set;
     }
   
@@ -424,7 +425,7 @@ namespace emp {
     // Boolean math functions...
     BitSet & NOT_SELF() {
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT);
+      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= constant::MaskLow<uint32_t>(LAST_BIT);
       return *this;
     }
 
@@ -440,13 +441,13 @@ namespace emp {
 
     BitSet & NAND_SELF(const BitSet & set2) {
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT);
+      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= constant::MaskLow<uint32_t>(LAST_BIT);
       return *this;
     }
 
     BitSet & NOR_SELF(const BitSet & set2) {
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT);
+      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= constant::MaskLow<uint32_t>(LAST_BIT);
       return *this;
     }
 
@@ -457,7 +458,7 @@ namespace emp {
 
     BitSet & EQU_SELF(const BitSet & set2) {
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= UIntMaskLow(LAST_BIT);
+      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= constant::MaskLow<uint32_t>(LAST_BIT);
       return *this;
     }
   
