@@ -26,8 +26,8 @@ namespace emp {
 #ifdef EMSCRIPTEN
     typedef uint32_t field_type;
 #else
-    typedef uint32_t field_type;
-    // typedef uint64_t field_type;
+    // typedef uint32_t field_type;
+    typedef uint64_t field_type;
 #endif
 
     static const int FIELD_BITS = sizeof(field_type)*8;
