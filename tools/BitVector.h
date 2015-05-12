@@ -27,7 +27,7 @@ namespace emp {
     typedef uint32_t field_type;
 #else
     typedef uint32_t field_type;
-    //    typedef uint64_t field_type;
+    // typedef uint64_t field_type;
 #endif
 
     static const int FIELD_BITS = sizeof(field_type)*8;
@@ -345,12 +345,14 @@ namespace emp {
 
     // Count 1's in semi-parallel; fastest for even 0's & 1's
     int CountOnes_Mixed() const {
-      const int NUM_FIELDS = NumFields(); 
+      // const int NUM_FIELDS = NumFields(); 
+      const int NUM_FIELDS = NumFields() * sizeof(field_type)/4; 
+      uint32_t * uint_bit_set = (uint32_t *) bit_set;
       int bit_count = 0;
       for (int i = 0; i < NUM_FIELDS; i++) {
-        const field_type v = bit_set[i];
-        const field_type t1 = v - ((v >> 1) & 0x55555555);
-        const field_type t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
+        const uint32_t v = uint_bit_set[i];
+        const uint32_t t1 = v - ((v >> 1) & 0x55555555);
+        const uint32_t t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
         bit_count += (((t2 + (t2 >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
       }
       return bit_count;
