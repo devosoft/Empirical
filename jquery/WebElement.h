@@ -9,6 +9,8 @@
 #include <emscripten>
 #include <string>
 
+#include "../tools/assert.h"
+
 namespace emp {
 
   class WebElement {
@@ -16,11 +18,17 @@ namespace emp {
     std::string name;
 
   public:
-    WebElement(const std::string & in_name) : name(in_name) { ; }
+    WebElement(const std::string & in_name) : name(in_name) {
+      emp_assert(name.size() > 0);  // Make sure the name exists!
+      // @CAO ensure the name consists of just alphanumeric chars (plus '_' & '-'?)
+    }
     WebElement(const WebElement &) = delete;
+    virtual ~WebElement() { ; }
     WebElement & operator=(const WebElement &) = delete;
 
-    void SetText(const std::string & text) {
+    const std::string GetName() { return name; }
+
+    virtual void SetText(const std::string & text) {
       EM_ASM_ARGS({
           var element_name = Pointer_stringify($0);
           var new_text = Pointer_stringify($1);
