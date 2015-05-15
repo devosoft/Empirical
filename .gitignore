@@ -1,5 +1,6 @@
 *~
 a.out
-*.map
 a.out.dSYM
+a.out.js
+*.map
 *.o
