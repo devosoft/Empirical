@@ -15,13 +15,16 @@ OFLAGS_web := -g4 -Werror -pedantic -Wno-dollar-in-identifier-extension -s TOTAL
 
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../jquery/library_jquery.js -s DISABLE_EXCEPTION_CATCHING=1 -s COMPILER_ASSERTIONS=1 -s NO_EXIT_RUNTIME=1
 
-default: test3.js
+default: test4.js
 
 test3.js: test3.cc
 	$(CXX_web) $(CFLAGS_web) test3.cc -o test3.js
 
+test4.js: test4.cc
+	$(CXX_web) $(CFLAGS_web) test4.cc -o test4.js
+
 clean:
-	rm -f test3.js *.js.map *~ source/*.o source/*/*.o
+	rm -f test?.js *.js.map *~ source/*.o source/*/*.o
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
