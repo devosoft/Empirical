@@ -7,4 +7,11 @@ extern "C" {
 
 int main() {
   EMP_TestJQ("a", 100);
+  EM_ASM({
+      $( document ).ready(function() {
+          $( "a" ).after("<p>More text here.</p>");
+          $( "p" ).before("<p>And still more...</p>");
+        });
+    });
+  
 }
