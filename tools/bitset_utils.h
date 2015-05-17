@@ -13,10 +13,45 @@
 namespace emp {
 
   template <int NUM_BITS>
-  constexpr unsigned int UIntMaskFirst() { return (UIintMaskFirst<NUM_BITS-1> << 1) | 1; }
+  constexpr unsigned int UIntMaskFirst() { return (UIntMaskFirst<NUM_BITS-1> << 1) | 1; }
 
   template <>
   constexpr unsigned int UIntMaskFirst<0>() { return 0; }
+
+  // Dealing with bits in unsigned long long variables
+  const int ByteCount[256] = {
+    0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+    3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
+  };
+
+  inline int count_bits(unsigned long long val) {
+    return
+      ByteCount[  val >> 56         ] +
+      ByteCount[ (val >> 48) & 0xFF ] +
+      ByteCount[ (val >> 40) & 0xFF ] +
+      ByteCount[ (val >> 32) & 0xFF ] +
+      ByteCount[ (val >> 24) & 0xFF ] +
+      ByteCount[ (val >> 16) & 0xFF ] +
+      ByteCount[ (val >>  8) & 0xFF ] +
+      ByteCount[  val        & 0xFF ];
+  }
+
+  inline int count_bits(unsigned int val) {
+    return 
+      ByteCount[  val >> 24         ] +
+      ByteCount[ (val >> 16) & 0xFF ] +
+      ByteCount[ (val >>  8) & 0xFF ] +
+      ByteCount[  val        & 0xFF ];
+  }
+
+  inline int find_bit(unsigned long long val) { return count_bits( (~val) & (val-1) ); }
+  inline int find_bit(const unsigned int val) { return count_bits( (~val) & (val-1) ); }
 
   /*
   // Returns the position of the first set (one) bit or a -1 if none exist.
