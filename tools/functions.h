@@ -132,6 +132,42 @@ namespace emp {
 
 
 
+  // implementation details, users never invoke these directly
+  // Based on Kerrek SB in http://stackoverflow.com/questions/10766112/c11-i-can-go-from-multiple-args-to-tuple-but-can-i-go-from-tuple-to-multiple
+ 
+  namespace internal {
+    template <typename FUN_TYPE, typename TUPLE_TYPE, bool is_done, int TOTAL, int... N>
+    struct apply_impl {
+      static void apply(FUN_TYPE fun, TUPLE_TYPE && t) {
+        apply_impl<FUN_TYPE, TUPLE_TYPE, TOTAL == 1 + sizeof...(N), TOTAL, N..., sizeof...(N)>::apply(fun, std::forward<TUPLE_TYPE>(t));
+      }
+    };
+
+    template <typename FUN_TYPE, typename TUPLE_TYPE, int TOTAL, int... N>
+    struct apply_impl<FUN_TYPE, TUPLE_TYPE, true, TOTAL, N...> {
+      static void apply(FUN_TYPE fun, TUPLE_TYPE && t) {
+        fun(std::get<N>(std::forward<TUPLE_TYPE>(t))...);
+      }
+    };
+  }
+  
+  // user invokes this
+  template <typename FUN_TYPE, typename TUPLE_TYPE>
+  void ApplyTuple(FUN_TYPE fun, TUPLE_TYPE && tuple) {
+    typedef typename std::decay<TUPLE_TYPE>::type TUPLE_DECAY_TYPE;
+    internal::apply_impl<FUN_TYPE, TUPLE_TYPE, 0 == std::tuple_size<TUPLE_DECAY_TYPE>::value, std::tuple_size<TUPLE_DECAY_TYPE>::value>::apply(fun, std::forward<TUPLE_TYPE>(tuple));
+  }
+
+
+
+
+
+
+
+
+
+
+
   // Dealing with bits in unsigned long long variables
   const int ByteCount[256] = {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
