@@ -5,6 +5,11 @@
 #include "../../tools/command_line.h"
 #include "../../tools/functions.h"
 
+char result_char;
+void TestFun(int x, int y, char z) {
+  result_char = z + x*y;
+}
+
 int main(int argc, char* argv[])
 {
   std::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
@@ -111,6 +116,15 @@ int main(int argc, char* argv[])
   }
 
   emp_assert((v2 == std::vector<int>({1,0,0,4,5,6,0,8,0})));
+
+  std::tuple<int, int, char> test_tuple(3,2,'a');
+  emp::ApplyTuple(TestFun, test_tuple);
+
+  if (verbose) {
+    std::cout << "Result of tuple application: " << result_char << std::endl;
+  }
   
+  emp_assert(result_char == 'g');
+
   return 0;
 }
