@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
     std::cout << std::endl;
   }
 
-  emp::BitMatrix<4,5>(bm45.Mask<10,5,40>()).Print();
+  // emp::BitMatrix<4,5>(bm45.Mask<10,5,40>()).Print();
 
   emp::BitMatrix<10,10> bm100;
   bm100.Set(9,9);
@@ -132,5 +132,5 @@ int main(int argc, char* argv[])
     bm100.Print();
   }
 
-  std::cout << bm100.FindBit() << std::endl;
+  // std::cout << bm100.FindBit() << std::endl;
 }
