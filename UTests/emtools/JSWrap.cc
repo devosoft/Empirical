@@ -4,15 +4,17 @@
 #include "../../emtools/JSWrap.h"
 
 
-void TestFun(int x, int y, int z) {
-  emp::Alert(x*y*z);
+void TestFun(int w, int x, int y, double z) {
+  emp::Alert(w + x*y*z);
 }
 
 
 int main() {
-  std::function<void(int,int,int)> test_ptr(TestFun);
-  // emp::JSWrap<int,int,int>(&TestFun);
-  emp::JSWrap<int,int,int>(test_ptr);
+  unsigned int fun_id = emp::JSWrap(TestFun);
 
-  emp::Alert("Testing!");
+  EM_ASM({
+      emp.cb_args = [100, 2.5, -4, 8.5];
+    });
+
+  empCppCallback(fun_id);
 }
