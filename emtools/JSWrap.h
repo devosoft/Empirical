@@ -19,24 +19,19 @@ extern "C" {
 
 namespace emp {
   
+  // The following code is in the "internal" namespace since it's used only to implement the
+  // details of the JSWrap function.
+
   namespace internal {
 
-    template<typename TUPLE_TYPE, int ARG_ID,  int FIRST_ARG, typename... OTHER_ARGS>
-    void JSWrap_CollectArgs(TUPLE_TYPE & tuple) {
-        std::get<ARG_ID>(tuple) = EM_ASM_INT({ return emp_data.callback_args[$0]; }, ARG_ID);
-        JSWrap_CollectArgs<TUPLE_TYPE, ARG_ID+1, OTHER_ARGS...>(tuple);
-    }
-
-    template<typename TUPLE_TYPE, int ARG_ID>
-    void JSWrap_CollectArgs(TUPLE_TYPE & tuple) {
-      // @CAO Add a static assert to make sure the ARG_ID is the tuple size?
-      (void) tuple;
-    }
-    
+    // JSWrap_Callback_Base provides a base class for the wrappers around functions.
+    // Specifically, it allows a virtual DoCallback() member function that can be called
+    // to trigger the wrapped function.
 
     class JSWrap_Callback_Base {
     protected:
       bool is_disposable;
+
     public:
       JSWrap_Callback_Base(bool in_disposable=false) : is_disposable(in_disposable) { ; }
       virtual ~JSWrap_Callback_Base() { ; }
@@ -46,14 +41,42 @@ namespace emp {
       
       // Base class to be called from Javascript (after storing args) to do a callback.
       virtual void DoCallback() = 0;
+
+      static void LoadArg(int arg_id, int & arg_var) {
+        arg_var = EM_ASM_INT({ return emp_data.callback_args[$0]; }, arg_id);
+      }
+      static void LoadArg(int arg_id, double & arg_var) {
+        arg_var = EM_ASM_DOUBLE({ return emp_data.callback_args[$0]; }, arg_id);
+      }
+
     };
-    
+
+
+    // The CollectArgs methods below takes a tuple and trasfer all of the arguments saved
+    // in JaveScript into the tuple.
+
+    template <typename TUPLE_TYPE, int ARGS_LEFT>
+    struct JSWrap_Collect_impl {
+      static void CollectArgs(TUPLE_TYPE & tuple) {
+        JSWrap_Callback_Base::LoadArg( ARGS_LEFT-1, std::get<ARGS_LEFT-1>(tuple) );
+        JSWrap_Collect_impl<TUPLE_TYPE, ARGS_LEFT-1>::CollectArgs(tuple);
+      }
+    };
+
+    template <typename TUPLE_TYPE>
+    struct JSWrap_Collect_impl<TUPLE_TYPE, 0> {
+      static void CollectArgs(TUPLE_TYPE & tuple) {
+        (void) tuple;
+      }
+    };
+
+
     template <typename... ARG_TYPES>
     class JSWrap_Callback : public JSWrap_Callback_Base {
     private:
       std::function<void(ARG_TYPES...)> fun;
       std::tuple<ARG_TYPES...> args;
-      
+
     public:
       JSWrap_Callback(std::function<void(ARG_TYPES...)> in_fun, bool in_disposable=false)
         : JSWrap_Callback_Base(in_disposable) { ; }
@@ -61,18 +84,19 @@ namespace emp {
       
       // This function is called from Javascript.  Arguments should be collected and then used
       // to call the target function.
-      virtual void DoCallback() {
+      void DoCallback() {
         const int num_args = sizeof...(ARG_TYPES);  
         
         // Make sure that we are returning the correct number of arguments.
         emp_assert(EMP_GetCBArgCount() == num_args);
         
         // Collect the values of the arguments
-        JSWrap_CollectArgs<std::tuple<ARG_TYPES...>, 0, ARG_TYPES...>(args);
+        JSWrap_Collect_impl<std::tuple<ARG_TYPES...>, num_args>::CollectArgs(args);
         
         // And finally, do the actual callback.
-        ApplyTuple(fun, args);
+        emp::ApplyTuple(fun, args);
       }
+
     };
 
   };
