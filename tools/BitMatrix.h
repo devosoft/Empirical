@@ -1,9 +1,9 @@
-#ifndef EMP_RANDOM_MATRIC_H
-#define EMP_RANDOM_MATRIC_H
+#ifndef EMP_BIT_MATRIX_H
+#define EMP_BIT_MATRIX_H
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  This class maintains a COL x ROW matrix of bits and provides easy indexing and manipulation.
+//  BIT_MATRIX maintains a COL x ROW matrix of bits and provides easy indexing and manipulation.
 //
 //  Bits are translated to a bitset with 0 in the upper left and moving through bits from
 //  left to right and top to bottom.  For example, the indecies in a 3x3 bit matrix would be
@@ -18,6 +18,7 @@
 
 #include "BitSet.h"
 #include "functions.h"
+#include "bitset_utils.h"
 
 namespace emp {
   template <int COLS, int ROWS>
