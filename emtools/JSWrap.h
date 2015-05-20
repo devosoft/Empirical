@@ -78,15 +78,15 @@ namespace emp {
       std::tuple<ARG_TYPES...> args;
 
     public:
-      JSWrap_Callback(std::function<void(ARG_TYPES...)> in_fun, bool in_disposable=false)
-        : JSWrap_Callback_Base(in_disposable) { ; }
+      JSWrap_Callback(std::function<void(ARG_TYPES...)> & in_fun, bool in_disposable=false)
+        : JSWrap_Callback_Base(in_disposable), fun(in_fun) { ; }
       ~JSWrap_Callback() { ; }
       
       // This function is called from Javascript.  Arguments should be collected and then used
       // to call the target function.
       void DoCallback() {
         const int num_args = sizeof...(ARG_TYPES);  
-        
+
         // Make sure that we are returning the correct number of arguments.
         emp_assert(EMP_GetCBArgCount() == num_args);
         
@@ -105,20 +105,33 @@ namespace emp {
   // To call the target function from Javascript, supply CPPCallback with the id and all args.
   
   template <typename... ARG_TYPES>
-  unsigned int JSWrap(std::function<void(ARG_TYPES...)> in_fun, bool dispose_on_use=false)
+  unsigned int JSWrap2(std::function<void(ARG_TYPES...)> & in_fun, bool dispose_on_use=false)
   {
     auto * new_cb = new emp::internal::JSWrap_Callback<ARG_TYPES...>(in_fun, dispose_on_use);
     return (unsigned int) new_cb;
   }
 
+
+  template <typename FUN_TYPE>
+  unsigned int JSWrap(FUN_TYPE & in_fun, bool dispose_on_use=false)
+  {
+    std::function<FUN_TYPE> fun_ptr(in_fun);
+    return JSWrap2(fun_ptr, dispose_on_use);
+  }
+
 };
 
 
-extern "C" void empCppCallback(unsigned int cb_ptr)
+extern "C" void empCppCallback(uint32_t cb_ptr)
 {
+  // Convert the uint passed in from 32 bits to 64 and THEN convert it to a pointer.
   auto * cb_obj = (emp::internal::JSWrap_Callback_Base *) (long long) cb_ptr;
+
+  // Run DoCallback() on the generic base class type, which is virtual and will call 
+  // the correct template automatically.
   cb_obj->DoCallback();
   
+  // If we have indicated that this callback is single use, delete it now.
   if (cb_obj->IsDisposable()) {
     delete cb_obj;
   }
