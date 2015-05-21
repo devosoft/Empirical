@@ -107,6 +107,7 @@ namespace emp {
       }
     };
 
+
   };
   
   // The following JSWrap functions take a target function and return an integer id.
@@ -114,19 +115,41 @@ namespace emp {
   // the second version assumes we have a raw function pointer and wraps it for us.
   
   template <typename... ARG_TYPES>
-  uint32_t JSWrap(std::function<void(ARG_TYPES...)> & in_fun, bool dispose_on_use=false)
+  uint32_t JSWrap(std::function<void(ARG_TYPES...)> & in_fun,
+                  const std::string & fun_name="",
+                  bool dispose_on_use=false)
   {
     auto * new_cb = new emp::internal::JSWrap_Callback<ARG_TYPES...>(in_fun, dispose_on_use);
+    
+    if (fun_name != "") {
+      EM_ASM_ARGS({
+          var fun_name = Pointer_stringify($1);
+          emp[fun_name] = function() {
+            emp.cb_args = [];
+            for (var i = 0; i < arguments.length; i++) {
+              emp.cb_args[i] = arguments[i];
+            }
+            
+            // Callback to the original function.
+            empCppCallback($0);
+          };
+        }, (uint32_t) new_cb, fun_name.c_str());
+    }
+    
     return (uint32_t) new_cb;
   }
 
   template <typename FUN_TYPE>
-  uint32_t JSWrap(FUN_TYPE & in_fun, bool dispose_on_use=false)
+  uint32_t JSWrap(FUN_TYPE & in_fun, const std::string & fun_name="", bool dispose_on_use=false)
   {
     std::function<FUN_TYPE> fun_ptr(in_fun);
-    return JSWrap(fun_ptr, dispose_on_use);
+    return JSWrap(fun_ptr, fun_name, dispose_on_use);
   }
 
+
+  // If we want a quick, unnammed, disposable function, use JSWrapOnce
+  template <typename T>
+  uint32_t JSWrapOnce(T && in_fun) { return JSWrap(in_fun, "", true); }
 };
 
 
