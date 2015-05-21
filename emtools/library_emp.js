@@ -1,6 +1,6 @@
 mergeInto(LibraryManager.library, {
     $emp: { cb_args:[],
-            CppCallback: function() {
+            Callback: function() {
                 // Copy over the additional arguments
                 emp.cb_args = [];
                 for (var i = 1; i < arguments.length; i++) {
