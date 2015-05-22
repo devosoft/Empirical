@@ -68,6 +68,13 @@ namespace emp {
       static void LoadArg(int arg_id, double & arg_var) {
         arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, arg_id);
       }
+      static void LoadArg(int arg_id, std::string & arg_var) {
+        char * tmp_var = (char *) EM_ASM_INT({
+            return allocate(intArrayFromString(emp_i.cb_args[$0]), 'i8', ALLOC_STACK);
+          }, arg_id);
+        arg_var = tmp_var;
+        // @CAO Do we need to free the memory in tmp_var?
+      }
 
       // A pair of helper functions that systematically load ALL arguments from JS.
       template <typename TUPLE_TYPE, int ARGS_LEFT>
