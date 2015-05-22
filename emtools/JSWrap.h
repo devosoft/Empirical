@@ -62,16 +62,19 @@ namespace emp {
       virtual void DoCallback() = 0;
 
       // Helper functions to load individual arguments from JS based on expected type.
-      static void LoadArg(int arg_id, int & arg_var) {
-        arg_var = EM_ASM_INT({ return emp_i.cb_args[$0]; }, arg_id);
+      template <int ARG_ID>
+      static void LoadArg(int & arg_var) {
+        arg_var = EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
       }
-      static void LoadArg(int arg_id, double & arg_var) {
-        arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, arg_id);
+      template <int ARG_ID>
+      static void LoadArg(double & arg_var) {
+        arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
       }
-      static void LoadArg(int arg_id, std::string & arg_var) {
+      template <int ARG_ID>
+      static void LoadArg(std::string & arg_var) {
         char * tmp_var = (char *) EM_ASM_INT({
             return allocate(intArrayFromString(emp_i.cb_args[$0]), 'i8', ALLOC_STACK);
-          }, arg_id);
+          }, ARG_ID);
         arg_var = tmp_var;
         // @CAO Do we need to free the memory in tmp_var?
       }
@@ -80,7 +83,7 @@ namespace emp {
       template <typename TUPLE_TYPE, int ARGS_LEFT>
       struct Collect_impl {
         static void CollectArgs(TUPLE_TYPE & tuple) {
-          LoadArg( ARGS_LEFT-1, std::get<ARGS_LEFT-1>(tuple) );      // Load an arg
+          LoadArg<ARGS_LEFT-1>(std::get<ARGS_LEFT-1>(tuple) );      // Load an arg
           Collect_impl<TUPLE_TYPE, ARGS_LEFT-1>::CollectArgs(tuple); // Recurse to load next arg
         }
       };
