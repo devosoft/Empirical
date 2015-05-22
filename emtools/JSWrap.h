@@ -6,11 +6,23 @@
 //  Wrap a C++ function and convert it to an integer that can be called from Javascript
 //
 //  To wrap a function, call:
-//     uint32_t fun_id = emp::JSWrap(FunctionToBeWrapped);
+//     uint32_t fun_id = emp::JSWrap(FunctionToBeWrapped, "JS_Function_Name");
 //
-//  To callback from Javascript, first set emp.cb_args to an array of function arguments.
+//  To manually callback a function from Javascript, first set emp_i.cb_args to an array of
+//  function arguments, then call empCppCallback( fun_id );   This all happens automatically
+//  if you use the emp.Callback(fun_id, args...) function from Javascript.
 //
-//  Then call empCppCallback( fun_id );
+//  The JS_Function_Name string is optional, but if you use it, the appropriate function will
+//  be automatically generated in Javascript by JSWrap, in the emp class.
+//
+//  For example, if you have:
+//     int AddPair(int x, int y) { return x + y; }
+//
+//  You can wrap it with:
+//     uint32_t fun_id = emp::JSWrap(AddPair, "AddPair");
+//
+//  And then in Javascript, you can simply call it as:
+//     emp.AddPair(4, 5); // will return 9.
 //
 
 #include <functional>
@@ -51,10 +63,10 @@ namespace emp {
 
       // Helper functions to load individual arguments from JS based on expected type.
       static void LoadArg(int arg_id, int & arg_var) {
-        arg_var = EM_ASM_INT({ return emp.cb_args[$0]; }, arg_id);
+        arg_var = EM_ASM_INT({ return emp_i.cb_args[$0]; }, arg_id);
       }
       static void LoadArg(int arg_id, double & arg_var) {
-        arg_var = EM_ASM_DOUBLE({ return emp.cb_args[$0]; }, arg_id);
+        arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, arg_id);
       }
 
       // A pair of helper functions that systematically load ALL arguments from JS.
@@ -125,9 +137,9 @@ namespace emp {
       EM_ASM_ARGS({
           var fun_name = Pointer_stringify($1);
           emp[fun_name] = function() {
-            emp.cb_args = [];
+            emp_i.cb_args = [];
             for (var i = 0; i < arguments.length; i++) {
-              emp.cb_args[i] = arguments[i];
+              emp_i.cb_args[i] = arguments[i];
             }
             
             // Callback to the original function.

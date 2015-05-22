@@ -1,10 +1,10 @@
 mergeInto(LibraryManager.library, {
-    $emp: { cb_args:[],
-            Callback: function() {
+    // Data accessible to library users.
+    $emp: { Callback: function() {
                 // Copy over the additional arguments
-                emp.cb_args = [];
+                emp_i.cb_args = [];
                 for (var i = 1; i < arguments.length; i++) {
-                    emp.cb_args[i-1] = arguments[i];
+                    emp_i.cb_args[i-1] = arguments[i];
                 }
 
                 // Callback to the original function.
@@ -12,6 +12,10 @@ mergeInto(LibraryManager.library, {
             }
           },
 
-    EMP_GetCBArgCount__deps: ['$emp'],
-    EMP_GetCBArgCount: function() { return emp.cb_args.length; },
+    // Data internal to EMP
+    $emp_i: { cb_args:[]
+            },
+
+    EMP_GetCBArgCount__deps: ['$emp', '$emp_i'],
+    EMP_GetCBArgCount: function() { return emp_i.cb_args.length; },
 });
