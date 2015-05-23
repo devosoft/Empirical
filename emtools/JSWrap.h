@@ -79,6 +79,18 @@ namespace emp {
         // @CAO Do we need to free the memory in tmp_var?
       }
 
+      static void StoreReturn(const int & ret_var) {
+        EM_ASM_ARGS({ emp_i.cb_return = $0; }, ret_var);
+      }
+
+      static void StoreReturn(const double & ret_var) {
+        EM_ASM_ARGS({ emp_i.cb_return = $0; }, ret_var);
+      }
+
+      static void StoreReturn(const std::string & ret_var) {
+        EM_ASM_ARGS({ emp_i.cb_return = Pointer_stringify($0); }, ret_var.c_str());
+      }
+
       // A pair of helper functions that systematically load ALL arguments from JS.
       template <typename TUPLE_TYPE, int ARGS_LEFT>
       struct Collect_impl {
@@ -100,8 +112,45 @@ namespace emp {
     // needed, keeps track of the function poninter, and has a tuple in which the arguments
     // can be loaded before a call is made.
 
-    template <typename... ARG_TYPES>
+    template <typename RET_TYPE, typename... ARG_TYPES>
     class JSWrap_Callback : public JSWrap_Callback_Base {
+    private:
+      std::function<RET_TYPE(ARG_TYPES...)> fun;   // Function to be wrapped
+      std::tuple<ARG_TYPES...> args;           // Argument values to call function with.
+      RET_TYPE return_val;
+
+    public:
+      JSWrap_Callback(std::function<RET_TYPE(ARG_TYPES...)> & in_fun, bool in_disposable=false)
+        : JSWrap_Callback_Base(in_disposable), fun(in_fun) { ; }
+      ~JSWrap_Callback() { ; }
+      
+      // This function is called from Javascript.  Arguments should be collected and then used
+      // to call the target function.
+      void DoCallback() {
+        const int num_args = sizeof...(ARG_TYPES);  
+
+        // Make sure that we are returning the correct number of arguments.  If this
+        // assert fails, it means that we've failed to set the correct number of arguments
+        // in emp.cb_args, and need to realign.
+        emp_assert(EMP_GetCBArgCount() == num_args);
+        
+        // Collect the values of the arguments
+        Collect_impl<std::tuple<ARG_TYPES...>, num_args>::CollectArgs(args);
+        
+        // And finally, do the actual callback.
+        // emp::ApplyTuple(fun, args);
+
+        emp::ApplyTuple([&](ARG_TYPES... in_args){ return_val = fun(in_args...); }, args);
+
+        // And save the return value for JS.
+        StoreReturn(return_val);
+      }
+    };
+
+    // A specialized version of the class that handles functions with void returns.
+
+    template <typename... ARG_TYPES>
+    class JSWrap_Callback<void, ARG_TYPES...> : public JSWrap_Callback_Base {
     private:
       std::function<void(ARG_TYPES...)> fun;   // Function to be wrapped
       std::tuple<ARG_TYPES...> args;           // Argument values to call function with.
@@ -125,7 +174,12 @@ namespace emp {
         Collect_impl<std::tuple<ARG_TYPES...>, num_args>::CollectArgs(args);
         
         // And finally, do the actual callback.
+        // emp::ApplyTuple(fun, args);
+
         emp::ApplyTuple(fun, args);
+
+        // And save a return value for JS.
+        StoreReturn(0);
       }
     };
 
@@ -136,12 +190,12 @@ namespace emp {
   // The first version assumes that we already have it enclosed in an std::function, while
   // the second version assumes we have a raw function pointer and wraps it for us.
   
-  template <typename... ARG_TYPES>
-  uint32_t JSWrap(std::function<void(ARG_TYPES...)> & in_fun,
+  template <typename RET_TYPE, typename... ARG_TYPES>
+  uint32_t JSWrap(std::function<RET_TYPE(ARG_TYPES...)> & in_fun,
                   const std::string & fun_name="",
                   bool dispose_on_use=false)
   {
-    auto * new_cb = new emp::internal::JSWrap_Callback<ARG_TYPES...>(in_fun, dispose_on_use);
+    auto * new_cb = new emp::internal::JSWrap_Callback<RET_TYPE, ARG_TYPES...>(in_fun, dispose_on_use);
     
     if (fun_name != "") {
       EM_ASM_ARGS({
@@ -154,6 +208,9 @@ namespace emp {
             
             // Callback to the original function.
             empCppCallback($0);
+
+            // Return the resulting value
+            return emp_i.cb_return;
           };
         }, (uint32_t) new_cb, fun_name.c_str());
     }
