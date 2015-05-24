@@ -1,0 +1,73 @@
+#ifndef EMP_EVENTS_H
+#define EMP_EVENTS_H
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+//  This file provides event handling for browser interfaces.
+//
+
+namespace emp {
+
+  struct GUI_Event {
+    bool bubbles;           // Is this a bubbling event?
+    bool cancelable;        // Can the default action be prevented?
+    bool defaultPrevented;  // Has the default action already been prevented?
+    // int currentTarget;   // Element whose event listeners triggered this event
+    // int eventPhase;      // 0=none, 1=capturing, 2=at target, 3=bubbling
+    // bool isTrusted;
+    // int target;          // Which element triggered this event?
+    // int timeStamp;       // When was event created?
+    // std::string type;    // E.g., "mousedown"
+    // int view;            // Which window did event occur in?
+
+    void preventDefault() { ; }
+    void stopImmediatePropagation() { ; }   // Prevents other listeners from being called.
+    void stopPropagation() { ; }
+  };
+
+
+  struct GUI_MouseEvent : public GUI_Event {
+    // All values reflect the state of devices when the event was triggered.
+    bool altKey;     // Was "ALT" key was pressed?
+    bool ctrlKey;    // Was "CTRL" key pressed?
+    bool metaKey;    // Was "META" key pressed?
+    bool shiftKey;   // Was "SHIFT" key pressed?
+
+    int button;      // Which mouse button was pressed?  -1=none  (0/1/2)
+    int detail;      // How many clicks happened in short succession?
+
+    int clientX;     // X-mouse postion, relative to current window
+    int clientY;     // Y-mouse postion, relative to current window
+    int screenX;     // X-mouse position, relative to the screen
+    int screenY;     // Y-mouse position, relative to the screen
+    // int buttons;     // Which mouse buttons were pressed? Sum: (1/4/2) (Special: 8,16)
+    // int relatedTarget    // Element related to the element that triggered the mouse event
+    // int which     // Which mouse button was pressed?  0=none  (1/2/3)
+  };
+
+
+  struct GUI_KeyboardEvent : public GUI_Event {
+    // All values reflect the state of devices when the event was triggered.
+    bool altKey;     // Was "ALT" key was pressed?
+    bool ctrlKey;    // Was "CTRL" key pressed?
+    bool metaKey;    // Was "META" key pressed?
+    bool shiftKey;   // Was "SHIFT" key pressed?
+
+    int charCode;    // Unicode character pressed
+    int keyCode;     // Which key was pressed on the keyboard (e.g., 'a' and 'A' are the same)
+  };
+  
+  
+  struct GUI_WheelEvent : public GUI_Event {
+    // All values reflect the state of devices when the event was triggered.
+    int deltaX;      // Horizontal scroll amount.
+    int deltaY;      // Vertical scroll amount.
+    int deltaZ;      // Scroll amount of a mouse wheel for the z-axis
+    int deltaMode;   // The unit of measurements for delta values (pixels, lines or pages)
+  };    
+ 
+   
+};
+
+
+#endif
