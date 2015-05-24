@@ -1,5 +1,5 @@
-#ifndef EMP_EVENTS_H
-#define EMP_EVENTS_H
+#ifndef EMP_GUI_EVENTS_H
+#define EMP_GUI_EVENTS_H
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -11,7 +11,7 @@ namespace emp {
   struct GUI_Event {
     bool bubbles;           // Is this a bubbling event?
     bool cancelable;        // Can the default action be prevented?
-    bool defaultPrevented;  // Has the default action already been prevented?
+    // bool defaultPrevented;  // Has the default action already been prevented?
     // int currentTarget;   // Element whose event listeners triggered this event
     // int eventPhase;      // 0=none, 1=capturing, 2=at target, 3=bubbling
     // bool isTrusted;
@@ -20,9 +20,15 @@ namespace emp {
     // std::string type;    // E.g., "mousedown"
     // int view;            // Which window did event occur in?
 
-    void preventDefault() { ; }
-    void stopImmediatePropagation() { ; }   // Prevents other listeners from being called.
-    void stopPropagation() { ; }
+    // void preventDefault() { ; }
+    // void stopImmediatePropagation() { ; }   // Prevents other listeners from being called.
+    // void stopPropagation() { ; }
+
+    template <int ARG_ID>
+    void LoadFromArg() {
+      bubbles = EM_ASM_INT({ return emp_i.cb_args[$0].bubbles; }, ARG_ID);
+      cancelable = EM_ASM_INT({ return emp_i.cb_args[$0].cancelable; }, ARG_ID);
+    }
   };
 
 
