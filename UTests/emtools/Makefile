@@ -11,13 +11,16 @@ OFLAGS_web := -g4 -Werror -pedantic -Wno-dollar-in-identifier-extension -s TOTAL
 
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s COMPILER_ASSERTIONS=1 -s NO_EXIT_RUNTIME=1
 default: all
-all: JSWrap.js
+all: html5_events.js JSWrap.js
 
 JSWrap.js: JSWrap.cc
 	$(CXX_web) $(CFLAGS_web) JSWrap.cc -o JSWrap.js
 
+html5_events.js: html5_events.cc
+	$(CXX_web) $(CFLAGS_web) html5_events.cc -o html5_events.js
+
 clean:
-	rm -f JSWrap.js *.js.map *~
+	rm -f html5_events.js JSWrap.js *.js.map *~
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
