@@ -61,23 +61,34 @@ namespace emp {
       // Base class to be called from Javascript (after storing args) to do a callback.
       virtual void DoCallback() = 0;
 
-      // Helper functions to load individual arguments from JS based on expected type.
+
+      // Helper functions to individually LOAD ARGUMENTS from JS based on expected type.
+
       template <int ARG_ID>
       static void LoadArg(int & arg_var) {
         arg_var = EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
       }
+
       template <int ARG_ID>
       static void LoadArg(double & arg_var) {
         arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
       }
+
       template <int ARG_ID>
       static void LoadArg(std::string & arg_var) {
         char * tmp_var = (char *) EM_ASM_INT({
             return allocate(intArrayFromString(emp_i.cb_args[$0]), 'i8', ALLOC_STACK);
           }, ARG_ID);
-        arg_var = tmp_var;
-        // @CAO Do we need to free the memory in tmp_var?
+        arg_var = tmp_var;   // @CAO Do we need to free the memory in tmp_var?
       }
+
+      template <typename ARG_TYPE, int ARG_ID>
+      static void LoadArg(ARG_TYPE & arg_var) {
+        arg_var.template LoadFromArg<ARG_ID>();
+      }
+
+
+      // Helper functions to individually STORE RETURN VALUES to JS
 
       static void StoreReturn(const int & ret_var) {
         EM_ASM_ARGS({ emp_i.cb_return = $0; }, ret_var);
