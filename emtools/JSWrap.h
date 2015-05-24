@@ -116,8 +116,6 @@ namespace emp {
     class JSWrap_Callback : public JSWrap_Callback_Base {
     private:
       std::function<RET_TYPE(ARG_TYPES...)> fun;   // Function to be wrapped
-      std::tuple<ARG_TYPES...> args;           // Argument values to call function with.
-      RET_TYPE return_val;
 
     public:
       JSWrap_Callback(std::function<RET_TYPE(ARG_TYPES...)> & in_fun, bool in_disposable=false)
@@ -135,12 +133,14 @@ namespace emp {
         emp_assert(EMP_GetCBArgCount() == num_args);
         
         // Collect the values of the arguments
+        std::tuple<ARG_TYPES...> args;           // Argument values to call function with.
         Collect_impl<std::tuple<ARG_TYPES...>, num_args>::CollectArgs(args);
         
         // And finally, do the actual callback.
         // emp::ApplyTuple(fun, args);
 
-        emp::ApplyTuple([&](ARG_TYPES... in_args){ return_val = fun(in_args...); }, args);
+        RET_TYPE return_val;
+        emp::ApplyTuple([&return_val, this](ARG_TYPES... in_args){ return_val = fun(in_args...); }, args);
 
         // And save the return value for JS.
         StoreReturn(return_val);
@@ -153,7 +153,6 @@ namespace emp {
     class JSWrap_Callback<void, ARG_TYPES...> : public JSWrap_Callback_Base {
     private:
       std::function<void(ARG_TYPES...)> fun;   // Function to be wrapped
-      std::tuple<ARG_TYPES...> args;           // Argument values to call function with.
 
     public:
       JSWrap_Callback(std::function<void(ARG_TYPES...)> & in_fun, bool in_disposable=false)
@@ -171,6 +170,7 @@ namespace emp {
         emp_assert(EMP_GetCBArgCount() == num_args);
         
         // Collect the values of the arguments
+        std::tuple<ARG_TYPES...> args;           // Argument values to call function with.
         Collect_impl<std::tuple<ARG_TYPES...>, num_args>::CollectArgs(args);
         
         // And finally, do the actual callback.
