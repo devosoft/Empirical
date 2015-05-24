@@ -64,13 +64,23 @@ namespace emp {
 
       // Helper functions to individually LOAD ARGUMENTS from JS based on expected type.
 
-      template <int ARG_ID>
-      static void LoadArg(int & arg_var) {
+      template <int ARG_ID> static void LoadArg(int & arg_var) {
         arg_var = EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
       }
 
-      template <int ARG_ID>
-      static void LoadArg(double & arg_var) {
+      template <int ARG_ID> static void LoadArg(bool & arg_var) {
+        arg_var = EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
+      }
+
+      template <int ARG_ID> static void LoadArg(char & arg_var) {
+        arg_var = EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
+      }
+
+      template <int ARG_ID> static void LoadArg(double & arg_var) {
+        arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
+      }
+
+      template <int ARG_ID> static void LoadArg(float & arg_var) {
         arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
       }
 
@@ -82,7 +92,7 @@ namespace emp {
         arg_var = tmp_var;   // @CAO Do we need to free the memory in tmp_var?
       }
 
-      template <typename ARG_TYPE, int ARG_ID>
+      template <class ARG_TYPE, int ARG_ID>
       static void LoadArg(ARG_TYPE & arg_var) {
         arg_var.template LoadFromArg<ARG_ID>();
       }
