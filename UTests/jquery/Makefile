@@ -13,10 +13,10 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 
 
 default: all
-all: JQ_events.js
+all: events.js
 
-JQ_events.js: JQ_events.cc
-	$(CXX_web) $(CFLAGS_web) JQ_events.cc -o JQ_events.js
+events.js: events.cc
+	$(CXX_web) $(CFLAGS_web) events.cc -o events.js
 
 test3.js: test3.cc
 	$(CXX_web) $(CFLAGS_web) test3.cc -o test3.js
@@ -25,7 +25,7 @@ test4.js: test4.cc
 	$(CXX_web) $(CFLAGS_web) test4.cc -o test4.js
 
 clean:
-	rm -f test?.js *.js.map *~ source/*.o source/*/*.o
+	rm -f events.js test?.js *.js.map *~ source/*.o source/*/*.o
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
