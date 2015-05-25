@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Graph Generator</title>
+  </head>
+
+  <body>
+    <style>
+      form * {
+        display: block;
+        margin: 10px;
+      }
+    </style>
+
+    <script type="text/javascript" src="MSS.js"></script>
+    <script>
+      // Setup files for C++ function calls
+      empLoadString = Module.cwrap('empLoadString', 'number', ['string']);
+
+      function download(filename, text) {
+        var pom = document.createElement('a');
+        pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        pom.setAttribute('download', filename);
+        pom.click();
+      }
+</script>
+
+    <h1>Welcome to the Graph Generator!</h1>
+
+    <p>
+        Choose type of graph that you would like to create...
+    </p>
+        
+    <form onsubmit="download(this['name'].value, this['text'].value)">
+      <input type="text" name="name" value="test.txt">
+      <textarea name="text"></textarea>
+      <input type="submit" value="Download">
+    </form>
+        
+    <br><br>
+
+    <div id="container"></div>
+
+    <script>
+      download('test.txt', 'Hello world!');
+    </script>
+  </body>
+</html>

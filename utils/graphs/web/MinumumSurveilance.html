@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Minimum Surveilance Solver</title>
+  </head>
+
+  <body>
+    <script type="text/javascript" src="MSS.js"></script>
+    <script>
+      // Setup files for C++ function calls
+      empLoadString = Module.cwrap('empLoadString', 'number', ['string']);
+    </script>
+
+    <h1>Welcome to the Minimum Surveilance Solver!</h1>
+
+    <p>
+        Choose a graph file that you would like to load and solve.
+    </p>
+
+    <input type="file" id="infile" name="infile[]" />
+    <output id="list"></output>
+
+    <br><br>
+
+    <div id="container"></div>
+
+    <script>
+      function handleFileSelect(evt) {
+        var infile = evt.target.files; // FileList object (List of File objects)
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          empLoadString(e.target.result + '\n');
+        };
+        reader.readAsText(evt.target.files.item(0));
+      }
+
+      document.getElementById('infile').addEventListener('change', handleFileSelect, false);
+    </script>
+  </body>
+</html>
