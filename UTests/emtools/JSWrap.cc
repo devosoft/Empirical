@@ -24,6 +24,10 @@ double TestFun4(double a, double b) {
 
 double TestFun5() { return 10000.1; }
 
+bool TestFun6(char in_char) {
+  return in_char >= 'a' && in_char <= 'z';
+}
+
 int main() {
 
   emp::Initialize();
@@ -33,8 +37,9 @@ int main() {
   uint32_t fun_id3 = emp::JSWrap(TestFun3, "TestName3", false);
   uint32_t fun_id4 = emp::JSWrap(TestFun4, "TestName4", false);
   uint32_t fun_id5 = emp::JSWrap(TestFun5, "TestName5", false);
+  uint32_t fun_id6 = emp::JSWrap(TestFun6, "TestName6", false);
   (void) fun_id4;
-  (void) fun_id5;
+  (void) fun_id6;
 
 
   double in1 = 4.5;
