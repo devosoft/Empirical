@@ -6,9 +6,10 @@ int main() {
 
   int test_num = 42;
 
-  emp::JQ::document.AddTextBox() 
+  emp::JQ::document
     << "<h1>This is a test site!</h1>"
-    << "<p>This value is " << test_num << ".</p>";
+    << "<p>The value of test_num is " << test_num << ".</p>";
 
+  emp::JQ::document.Update();
 }
 

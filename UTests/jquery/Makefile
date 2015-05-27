@@ -13,13 +13,13 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 
 
 default: all
-all: events.js TextBox.js
+all: events.js Element.js
 
 events.js: events.cc
 	$(CXX_web) $(CFLAGS_web) events.cc -o events.js
 
-TextBox.js: TextBox.cc
-	$(CXX_web) $(CFLAGS_web) TextBox.cc -o TextBox.js
+Element.js: Element.cc
+	$(CXX_web) $(CFLAGS_web) Element.cc -o Element.js
 
 # test3.js: test3.cc
 # 	$(CXX_web) $(CFLAGS_web) test3.cc -o test3.js
@@ -28,7 +28,7 @@ TextBox.js: TextBox.cc
 # 	$(CXX_web) $(CFLAGS_web) test4.cc -o test4.js
 
 clean:
-	rm -f events.js TextBox.js test?.js *.js.map *~ source/*.o source/*/*.o
+	rm -f events.js Element.js test?.js *.js.map *~ source/*.o source/*/*.o
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
