@@ -13,6 +13,11 @@ namespace emp {
 
   bool Initialize() {
 
+    // Make sure we only initialize once!
+    static bool init = false;
+    if (init) return false;
+    init = true;
+
     // Setup the empCppCallback function to be called from Javascript.
     EM_ASM({  empCppCallback = Module.cwrap('empCppCallback', null, ['number']);  });
 
