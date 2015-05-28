@@ -139,7 +139,8 @@ namespace emp {
       std::function<RET_TYPE(ARG_TYPES...)> fun;   // Function to be wrapped
 
     public:
-      JSWrap_Callback(std::function<RET_TYPE(ARG_TYPES...)> & in_fun, bool in_disposable=false)
+      JSWrap_Callback(const std::function<RET_TYPE(ARG_TYPES...)> & in_fun,
+                      bool in_disposable=false)
         : JSWrap_Callback_Base(in_disposable), fun(in_fun) { ; }
       ~JSWrap_Callback() { ; }
       
@@ -176,7 +177,7 @@ namespace emp {
       std::function<void(ARG_TYPES...)> fun;   // Function to be wrapped
 
     public:
-      JSWrap_Callback(std::function<void(ARG_TYPES...)> & in_fun, bool in_disposable=false)
+      JSWrap_Callback(const std::function<void(ARG_TYPES...)> & in_fun, bool in_disposable=false)
         : JSWrap_Callback_Base(in_disposable), fun(in_fun) { ; }
       ~JSWrap_Callback() { ; }
       
@@ -212,7 +213,7 @@ namespace emp {
   // the second version assumes we have a raw function pointer and wraps it for us.
   
   template <typename RET_TYPE, typename... ARG_TYPES>
-  uint32_t JSWrap(std::function<RET_TYPE(ARG_TYPES...)> & in_fun,
+  uint32_t JSWrap(const std::function<RET_TYPE(ARG_TYPES...)> & in_fun,
                   const std::string & fun_name="",
                   bool dispose_on_use=false)
   {
@@ -239,17 +240,26 @@ namespace emp {
     return (uint32_t) new_cb;
   }
 
-  template <typename FUN_TYPE>
-  uint32_t JSWrap(FUN_TYPE & in_fun, const std::string & fun_name="", bool dispose_on_use=false)
+  template <typename RETURN_TYPE, typename... ARG_TYPES>
+  uint32_t JSWrap( RETURN_TYPE (*in_fun) (ARG_TYPES...),
+                   const std::string & fun_name="", bool dispose_on_use=false)
   {
-    std::function<FUN_TYPE> fun_ptr(in_fun);
+    std::function<RETURN_TYPE(ARG_TYPES...)> fun_ptr(in_fun);
     return JSWrap(fun_ptr, fun_name, dispose_on_use);
   }
 
+  // template <typename FUN_TYPE>
+  // uint32_t JSWrap(const FUN_TYPE & in_fun, const std::string & fun_name="", bool dispose_on_use=false)
+  // {
+  //   std::function<FUN_TYPE> fun_ptr(in_fun);
+  //   return JSWrap(fun_ptr, fun_name, dispose_on_use);
+  // }
+
+
 
   // If we want a quick, unnammed, disposable function, use JSWrapOnce
-  template <typename T>
-  uint32_t JSWrapOnce(T && in_fun) { return JSWrap(in_fun, "", true); }
+  template <typename FUN_TYPE>
+  uint32_t JSWrapOnce(FUN_TYPE && in_fun) { return JSWrap(std::forward<FUN_TYPE>(in_fun), "", true); }
 };
 
 
