@@ -8,7 +8,7 @@
 namespace emp {
 namespace JQ {
 
-  static ElementSlate document("document");
+  static ElementSlate document("emp_base");
 
   bool Initialize() {
 

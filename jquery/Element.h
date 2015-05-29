@@ -19,8 +19,8 @@ namespace JQ {
 
   class Element {
   protected:
-    bool initialized;
-    bool up_to_date;
+    bool initialized;   // Has this element been initialized into the HTML DOM hierarchy.
+    bool modified;      // Has this element been modified since the last update? 
     std::string name;
 
     // Track hiearchy
@@ -29,7 +29,7 @@ namespace JQ {
 
   public:
     Element(const std::string & in_name, Element * in_parent)
-      : initialized(false), up_to_date(false), name(in_name), parent(in_parent)
+      : initialized(false), modified(true), name(in_name), parent(in_parent)
     {
       emp_assert(name.size() > 0);  // Make sure a name was included.
       // @CAO ensure the name consists of just alphanumeric chars (plus '_' & '-'?)
@@ -44,7 +44,10 @@ namespace JQ {
 
     // Functions to access current state
     bool IsInitialized() const { return initialized; }
-    bool IsUpToDate() const { return up_to_date; }
+    bool IsModified() const { return modified; }
+
+    virtual bool IsText() const { return false; }
+
     const std::string GetName() { return name; }
     Element * GetParent() { return parent; }
 
@@ -61,14 +64,15 @@ namespace JQ {
 
     // Function to make current element as modified and pass information up to parents.
     void SetModified() {
-      up_to_date = false;
+      if (modified) return;   // Stop recursion if already not up-to-date.
+      modified = true;
       if (parent) parent->SetModified();
     }
 
     // Register is used to lookup classes by name.  Should exist in classes that manage
     // multiple element; below is the default version.
     virtual bool Register(Element * new_element) {
-      if (!parent) return false;  // Top level should always be able to register.
+      if (!parent) return false;  // Top level should always have an override for Register()
 
       parent->Register(new_element);
       return true;
@@ -90,7 +94,7 @@ namespace JQ {
     // Element & operator<<(IN_TYPE && in_val) { return Append(std::forward<IN_TYPE>(in_val)); }
 
     // UpdateNow() refreshes the document immediately (and should only be called if that's okay!)
-    virtual void UpdateNow() { up_to_date = true; }
+    virtual void UpdateNow() = 0;  // Overrides must check initialized and set modified to false!
 
     // Update() refreshes the document as soon as it's ready.
     void Update() {
