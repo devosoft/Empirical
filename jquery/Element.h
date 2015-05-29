@@ -19,7 +19,6 @@ namespace JQ {
 
   class Element {
   protected:
-    bool initialized;   // Has this element been initialized into the HTML DOM hierarchy.
     bool modified;      // Has this element been modified since the last update? 
     std::string name;
 
@@ -29,7 +28,7 @@ namespace JQ {
 
   public:
     Element(const std::string & in_name, Element * in_parent)
-      : initialized(false), modified(true), name(in_name), parent(in_parent)
+      : modified(true), name(in_name), parent(in_parent)
     {
       emp_assert(name.size() > 0);  // Make sure a name was included.
       // @CAO ensure the name consists of just alphanumeric chars (plus '_' & '-'?)
@@ -43,7 +42,6 @@ namespace JQ {
     Element & operator=(const Element &) = delete;
 
     // Functions to access current state
-    bool IsInitialized() const { return initialized; }
     bool IsModified() const { return modified; }
 
     virtual bool IsText() const { return false; }
@@ -79,22 +77,8 @@ namespace JQ {
     }
 
 
-    // // Add additional children on to this element.
-    // Element & Append(const std::string & in_text) {
-    //   SetModified();
-    //   return *this;
-    // }
-
-    // template <typename IN_TYPE>
-    // Element & Append(const IN_TYPE & in_text) {
-    //   return Append(emp::to_string(in_text));
-    // }
-
-    // template <typename IN_TYPE>
-    // Element & operator<<(IN_TYPE && in_val) { return Append(std::forward<IN_TYPE>(in_val)); }
-
     // UpdateNow() refreshes the document immediately (and should only be called if that's okay!)
-    virtual void UpdateNow() = 0;  // Overrides must check initialized and set modified to false!
+    virtual void UpdateNow() = 0;
 
     // Update() refreshes the document as soon as it's ready.
     void Update() {
@@ -104,6 +88,28 @@ namespace JQ {
       // OnDocumentReady( [this](){ this->UpdateNow(); } );
       // OnDocumentReady( std::function<void()> ( std::bind(&Element::UpdateNow, this) ) );
     }
+
+
+
+    // Add text...
+    virtual Element & Append(const std::string & in_text) {
+      // Base elements cannot add text; have parent handle this or error!
+      emp_assert(parent != nullptr);
+      return parent->Append(in_text);
+    }
+
+    template <typename IN_TYPE>
+    Element & Append(const IN_TYPE & in_obj) {
+      // Convert arbitrary inputs to a string and try again!
+      return Append(emp::to_string(in_obj));
+    }
+
+    template <typename IN_TYPE>
+    Element & operator<<(IN_TYPE && in_val) { return Append(std::forward<IN_TYPE>(in_val)); }
+
+
+
+
 
     virtual void PrintHTML(std::ostream & os) = 0;
   };

@@ -33,8 +33,11 @@ namespace JQ {
     void ClearText() { text.str(std::string()); }
     void AppendText(const std::string & in_text) { text << in_text; }
 
-    template <typename IN_TYPE>
-    void Append(const IN_TYPE & in_var) { text << in_var; }
+    Element & Append(const std::string & in_text) {
+      text << in_text;
+      SetModified();
+      return *this;
+    }
 
     void UpdateNow() {
       EM_ASM_ARGS({

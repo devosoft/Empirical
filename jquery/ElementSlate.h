@@ -22,8 +22,8 @@ namespace JQ {
 
   class ElementSlate : public Element {
   protected:
-    std::map<std::string, Element *> element_dict;
-    std::string end_tag;
+    std::map<std::string, Element *> element_dict;  // By-name lookup for elements.
+    bool initialized;                               // Is element hooked into HTML DOM hierarchy.
 
     void InitializeChild(Element * child) {
       EM_ASM_ARGS({
@@ -59,8 +59,7 @@ namespace JQ {
   
 public:
     ElementSlate(const std::string & name, Element * in_parent=nullptr)
-      : Element(name, in_parent)
-      , end_tag(name + std::string("__end")) 
+      : Element(name, in_parent), initialized(false)
     { ; }
     ~ElementSlate() { ; }
     
@@ -71,25 +70,18 @@ public:
     bool Contains(const std::string & name) {
       return element_dict.find(name) != element_dict.end();
     }
-    Element & GetElement(const std::string & name) {
+    Element & FindElement(const std::string & name) {
       emp_assert(Contains(name));
       return *(element_dict[name]);
     }
 
+
+
     // Add additional children on to this element.
-    ElementSlate & Append(const std::string & in_text) {
-      GetTextElement().Append(in_text);
-      SetModified();
-      return *this;
+    Element & Append(const std::string & in_text) {
+      return GetTextElement().Append(in_text);
     }
 
-    template <typename IN_TYPE>
-    ElementSlate & Append(const IN_TYPE & in_text) {
-      return Append(emp::to_string(in_text));
-    }
-
-    template <typename IN_TYPE>
-    ElementSlate & operator<<(IN_TYPE && in_val) { return Append(std::forward<IN_TYPE>(in_val)); }
 
 
     virtual void UpdateNow() {
@@ -103,11 +95,11 @@ public:
             }, GetName().c_str(), child->GetName().c_str() );
         }
 
-        // Otherwise sub-elements should be in place -- just update them!
-        for (auto * child : children) child->UpdateNow();
-
         initialized = true;
       }
+
+      // Otherwise sub-elements should be in place -- just update them!
+      for (auto * child : children) child->UpdateNow();
 
       modified = false;
     }
