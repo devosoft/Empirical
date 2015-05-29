@@ -3,12 +3,12 @@
 
 #include "../emtools/init.h"
 
-#include "ElementGroup.h"
+#include "ElementSlate.h"
 
 namespace emp {
 namespace JQ {
 
-  static ElementGroup document("document");
+  static ElementSlate document("document");
 
   bool Initialize() {
 
