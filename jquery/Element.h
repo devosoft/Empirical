@@ -10,6 +10,7 @@
 #include <string>
 
 #include "../tools/assert.h"
+#include "../tools/string_utils.h"
 
 #include "events.h"
 
@@ -60,17 +61,29 @@ namespace JQ {
     // Add additional children on to this element.
     Element & Append(const std::string & in_text) {
       SetModified();
+      return *this;
     }
 
     template <typename IN_TYPE>
-    Element & operator<<(IN_TYPE && in_val) { return Append(in_val); }
+    Element & Append(const IN_TYPE & in_text) {
+      return Append(emp::to_string(in_text));
+    }
 
-
-    // Update() refreshes the document as soon as it's ready.
-    void Update() { OnDocumentReady( [this](){ this->UpdateNow(); } ); }
+    template <typename IN_TYPE>
+    Element & operator<<(IN_TYPE && in_val) { return Append(std::forward<IN_TYPE>(in_val)); }
 
     // UpdateNow() refreshes the document immediately (and should only be called if that's okay!)
     virtual void UpdateNow() { up_to_date = true; }
+
+    // Update() refreshes the document as soon as it's ready.
+    void Update() {
+      std::function<void(void)> update_fun = [this](){ this->UpdateNow(); };
+      OnDocumentReady( update_fun );
+
+      // OnDocumentReady( [this](){ this->UpdateNow(); } );
+      // OnDocumentReady( std::function<void()> ( std::bind(&Element::UpdateNow, this) ) );
+    }
+
   };
 
 };
