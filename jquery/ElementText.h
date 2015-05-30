@@ -21,7 +21,8 @@ namespace JQ {
     std::stringstream text;
 
   public:
-    ElementText(const std::string & name, Element * in_parent) : Element(name, in_parent) { ; }
+    ElementText(const std::string & in_name, Element * in_parent)
+      : Element(in_name, in_parent) { ; }
     ~ElementText() { ; }
 
     // Do not allow Managers to be copied

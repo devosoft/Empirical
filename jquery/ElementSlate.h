@@ -16,6 +16,7 @@
 
 #include "Element.h"
 #include "ElementText.h"
+#include "ElementFunction.h"
 
 namespace emp {
 namespace JQ {
@@ -29,7 +30,7 @@ namespace JQ {
       EM_ASM_ARGS({
           var slate_name = Pointer_stringify($0);
           var elem_name = Pointer_stringify($1);
-          $( '#' + slate_name ).append('<div id=\'' + elem_name + '\'></div>');
+          $( '#' + slate_name ).append('<span id=\'' + elem_name + '\'></span>');
         }, GetName().c_str(), child->GetName().c_str() );
     }
 
@@ -82,6 +83,20 @@ public:
       return GetTextElement().Append(in_text);
     }
 
+    Element & Append(const std::function<std::string()> & in_fun) {
+      // We need to build a new element around this variable; but first we need type info!
+
+      std::string new_name = name + std::string("__") + std::to_string(children.size());
+      Element * new_child = new ElementFunction(new_name, this, in_fun);
+      children.push_back(new_child);
+
+      // If this slate is already initialized, we should immediately initialize the child.
+      if (initialized) InitializeChild(new_child);
+
+      return *this;
+    }
+
+
 
 
     virtual void UpdateNow() {
@@ -91,11 +106,12 @@ public:
           EM_ASM_ARGS({
               var slate_name = Pointer_stringify($0);
               var elem_name = Pointer_stringify($1);
-              $( '#' + slate_name ).append('<div id=\'' + elem_name + '\'></div>');
+              $( '#' + slate_name ).append('<span id=\'' + elem_name + '\'></span>');
             }, GetName().c_str(), child->GetName().c_str() );
         }
 
         initialized = true;
+
       }
 
       // Otherwise sub-elements should be in place -- just update them!
@@ -106,11 +122,11 @@ public:
     
 
     virtual void PrintHTML(std::ostream & os) {
-      os << "<div id=\"" << name <<"\">\n";
+      os << "<span id=\"" << name <<"\">\n";
       for (auto * element : children) {
         element->PrintHTML(os);
       }
-      os << "</div>\n";
+      os << "</span>\n";
     }
 
   };
