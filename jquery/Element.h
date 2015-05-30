@@ -93,19 +93,34 @@ namespace JQ {
 
     // Add text...
     virtual Element & Append(const std::string & in_text) {
-      // Base elements cannot add text; have parent handle this or error!
+      // Base elements cannot add text; have parent handle this (or error)!
       emp_assert(parent != nullptr);
       return parent->Append(in_text);
     }
 
-    template <typename IN_TYPE>
-    Element & Append(const IN_TYPE & in_obj) {
-      // Convert arbitrary inputs to a string and try again!
-      return Append(emp::to_string(in_obj));
+    virtual Element & Append(const std::function<std::string()> & in_fun) {
+      // Base elements cannot add function; have parent handle this (or error)!
+      emp_assert(parent != nullptr);
+      return parent->Append(in_fun);
     }
+
+
+    // Convert arbitrary inputs to a string and try again!
+    Element & Append(int in_num) { return Append(emp::to_string(in_num)); }
+    Element & Append(char in_char) { return Append(emp::to_string(in_char)); }
+
+    // template <typename IN_TYPE>
+    // Element & Append(const IN_TYPE & in_obj) {
+    //   // Convert arbitrary inputs to a string and try again!
+    //   return Append(emp::to_string(in_obj));
+    // }
+
 
     template <typename IN_TYPE>
     Element & operator<<(IN_TYPE && in_val) { return Append(std::forward<IN_TYPE>(in_val)); }
+
+    // template <typename IN_TYPE>
+    // Element & operator<<(IN_TYPE && in_val) { return Append(std::forward<IN_TYPE>(in_val)); }
 
 
 
