@@ -6,8 +6,9 @@
 //  Manage a section of the current web page
 //
 
+#include <functional>
 #include <string>
-#include <sstream>
+#include <vector>
 
 #include "emscripten.h"
 
@@ -18,7 +19,8 @@ namespace JQ {
 
   class ElementText : public Element {
   private:
-    std::stringstream text;
+    std::vector<std::string> string_set;
+    std::vector<std::function<void()>> fun_set;
 
   public:
     ElementText(const std::string & in_name, Element * in_parent)
@@ -31,25 +33,36 @@ namespace JQ {
 
     virtual bool IsText() const { return true; }
 
-    void ClearText() { text.str(std::string()); }
-    void AppendText(const std::string & in_text) { text << in_text; }
+    void ClearText() { string_set.resize(0); }
 
     Element & Append(const std::string & in_text) {
-      text << in_text;
+      string_set.push_back(in_text);
       SetModified();
       return *this;
     }
 
+    Element & Append(const std::function<std::string()> & in_fun) {
+      int string_id = string_set.size();
+      string_set.push_back(in_fun());
+      std::string & cur_string = string_set[string_id];
+      fun_set.push_back( [&cur_string, in_fun](){ cur_string = in_fun(); }  );
+      return *this;
+    }
+
     void UpdateNow() {
+      std::string text;
+      for (auto & cur_str : string_set) { text += cur_str; }
       EM_ASM_ARGS({
           var elem_name = Pointer_stringify($0);
           var text = Pointer_stringify($1);
           $( '#' + elem_name ).html(text);
-        }, GetName().c_str(), text.str().c_str() );
+        }, GetName().c_str(), text.c_str() );
     }
 
     virtual void PrintHTML(std::ostream & os) {
-      os << text.str() << std::endl;
+      std::string text;
+      for (auto & cur_str : string_set) { text += cur_str; }
+      os << text << std::endl;
     }
   };
 
