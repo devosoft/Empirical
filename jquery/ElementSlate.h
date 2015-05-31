@@ -16,7 +16,6 @@
 
 #include "Element.h"
 #include "ElementText.h"
-#include "ElementFunction.h"
 
 namespace emp {
 namespace JQ {
@@ -84,18 +83,8 @@ public:
     }
 
     Element & Append(const std::function<std::string()> & in_fun) {
-      // We need to build a new element around this variable; but first we need type info!
-
-      std::string new_name = name + std::string("__") + std::to_string(children.size());
-      Element * new_child = new ElementFunction(new_name, this, in_fun);
-      children.push_back(new_child);
-
-      // If this slate is already initialized, we should immediately initialize the child.
-      if (initialized) InitializeChild(new_child);
-
-      return *this;
+      return GetTextElement().Append(in_fun);
     }
-
 
 
 
