@@ -4,6 +4,7 @@
 #include "../emtools/init.h"
 
 #include "ElementSlate.h"
+#include "UI_base.h"
 
 namespace emp {
 namespace JQ {
@@ -21,11 +22,6 @@ namespace JQ {
     emp::Initialize();
 
     return true;
-  }
-
-  template <typename VAR_TYPE>
-  std::function<std::string()> Var(VAR_TYPE & var) {
-    return [&var](){ return emp::to_string(var); };
   }
 
 };

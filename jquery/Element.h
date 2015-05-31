@@ -13,6 +13,7 @@
 #include "../tools/string_utils.h"
 
 #include "events.h"
+#include "UI_base.h"
 
 namespace emp {
 namespace JQ {
@@ -109,20 +110,18 @@ namespace JQ {
     Element & Append(int in_num) { return Append(emp::to_string(in_num)); }
     Element & Append(char in_char) { return Append(emp::to_string(in_char)); }
 
-    // template <typename IN_TYPE>
-    // Element & Append(const IN_TYPE & in_obj) {
-    //   // Convert arbitrary inputs to a string and try again!
-    //   return Append(emp::to_string(in_obj));
-    // }
+
+    // Setup all speciality operators to also have an append varient.
+    template <typename VAR_TYPE>
+    Element & AppendVar(VAR_TYPE & var) {
+      // return Append( [&var](){ return emp::to_string(var); } );
+      return Append( emp::JQ::Var(var) );
+    }
 
 
+    // Setup << operator to redirect to Append.
     template <typename IN_TYPE>
     Element & operator<<(IN_TYPE && in_val) { return Append(std::forward<IN_TYPE>(in_val)); }
-
-    // template <typename IN_TYPE>
-    // Element & operator<<(IN_TYPE && in_val) { return Append(std::forward<IN_TYPE>(in_val)); }
-
-
 
 
 
