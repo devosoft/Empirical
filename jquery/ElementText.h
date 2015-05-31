@@ -50,6 +50,10 @@ namespace JQ {
     }
 
     void UpdateNow() {
+      // Collect all function outputs
+      for (auto & cur_fun : fun_set) cur_fun();
+
+      // Concatenate the text.
       std::string text;
       for (auto & cur_str : string_set) { text += cur_str; }
       EM_ASM_ARGS({
