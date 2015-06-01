@@ -63,7 +63,7 @@ namespace JQ {
         }, GetName().c_str(), text.c_str() );
     }
 
-    virtual void PrintHTML(std::ostream & os) {
+    void PrintHTML(std::ostream & os) {
       std::string text;
       for (auto & cur_str : string_set) { text += cur_str; }
       os << text << std::endl;

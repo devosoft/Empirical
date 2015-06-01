@@ -27,6 +27,13 @@ namespace JQ {
     Element * parent;
     std::vector<Element *> children;
 
+    // If an Append doesn't work with the currnet class, forward it to the parent!
+    template <typename FORWARD_TYPE>
+    Element & ForwardAppend(FORWARD_TYPE && arg) {
+      emp_assert(parent != nullptr);
+      return parent->Append(std::forward<FORWARD_TYPE>(arg));
+    }
+
   public:
     Element(const std::string & in_name, Element * in_parent)
       : modified(true), name(in_name), parent(in_parent)
@@ -92,23 +99,21 @@ namespace JQ {
 
 
 
-    // Add text...
-    virtual Element & Append(const std::string & in_text) {
-      // Base elements cannot add text; have parent handle this (or error)!
-      emp_assert(parent != nullptr);
-      return parent->Append(in_text);
-    }
+    // By default, elements should forward unknown inputs to their parents.
 
+    virtual Element & Append(const std::string & in_text) { return ForwardAppend(in_text); }
     virtual Element & Append(const std::function<std::string()> & in_fun) {
-      // Base elements cannot add function; have parent handle this (or error)!
-      emp_assert(parent != nullptr);
-      return parent->Append(in_fun);
+      return ForwardAppend(in_fun);
     }
+    virtual Element & Append(emp::JQ::Button info) { return ForwardAppend(info); }
+    virtual Element & Append(emp::JQ::Image info) { return ForwardAppend(info); }
+    virtual Element & Append(emp::JQ::Table info) { return ForwardAppend(info); }
 
 
     // Convert arbitrary inputs to a string and try again!
-    Element & Append(int in_num) { return Append(emp::to_string(in_num)); }
-    Element & Append(char in_char) { return Append(emp::to_string(in_char)); }
+    virtual Element & Append(char in_char) { return Append(emp::to_string(in_char)); }
+    virtual Element & Append(double in_num) { return Append(emp::to_string(in_num)); }
+    virtual Element & Append(int in_num) { return Append(emp::to_string(in_num)); }
 
 
     // Setup all speciality operators to also have an append varient.
@@ -116,6 +121,20 @@ namespace JQ {
     Element & AppendVar(VAR_TYPE & var) {
       // return Append( [&var](){ return emp::to_string(var); } );
       return Append( emp::JQ::Var(var) );
+    }
+
+    Element & AppendButton(const std::function<void()> & in_cb,
+                           const std::string & in_label="",
+                           const std::string & in_name="") {
+      return Append(emp::JQ::Button(in_cb, in_label, in_name));
+    }
+
+    Element & AppendImage(const std::string & in_url, const std::string & in_name="") {
+      return Append(emp::JQ::Image(in_url, in_name));
+    }
+
+    Element & AppendTable(int in_cols, int in_rows, const std::string & in_name="") {
+      return Append(emp::JQ::Table(in_cols, in_rows, in_name));
     }
 
 

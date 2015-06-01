@@ -15,6 +15,9 @@
 #include "../tools/alert.h"
 
 #include "Element.h"
+#include "ElementButton.h"
+#include "ElementImage.h"
+#include "ElementTable.h"
 #include "ElementText.h"
 
 namespace emp {
@@ -56,6 +59,10 @@ namespace JQ {
       
       return true; // Registration successful.
     }
+
+    std::string CalcNextName() const {
+      return name + std::string("__") + std::to_string(children.size());
+    }
   
 public:
     ElementSlate(const std::string & name, Element * in_parent=nullptr)
@@ -87,6 +94,45 @@ public:
     Element & Append(const std::function<std::string()> & in_fun) {
       return GetTextElement().Append(in_fun);
     }
+
+    // Default to passing specialty operators to parent.
+    Element & Append(emp::JQ::Button info) {
+      // If a name was passed in, use it.  Otherwise generate a default name.
+      if (info.name == "") info.name = CalcNextName();
+
+      ElementButton * new_child = new ElementButton(info, this);
+      children.push_back(new_child);
+      
+      // If this slate is already initialized, we should immediately initialize the child.
+      if (initialized) InitializeChild(new_child);
+      
+      return *new_child;
+    }
+    Element & Append(emp::JQ::Image info) {
+      // If a name was passed in, use it.  Otherwise generate a default name.
+      if (info.name == "") info.name = CalcNextName();
+
+      ElementImage * new_child = new ElementImage(info, this);
+      children.push_back(new_child);
+      
+      // If this slate is already initialized, we should immediately initialize the child.
+      if (initialized) InitializeChild(new_child);
+      
+      return *new_child;
+    }
+    Element & Append(emp::JQ::Table info) {
+      // If a name was passed in, use it.  Otherwise generate a default name.
+      if (info.name == "") info.name = CalcNextName();
+
+      ElementTable * new_child = new ElementTable(info, this);
+      children.push_back(new_child);
+      
+      // If this slate is already initialized, we should immediately initialize the child.
+      if (initialized) InitializeChild(new_child);
+      
+      return *new_child;
+    }
+
 
 
 
