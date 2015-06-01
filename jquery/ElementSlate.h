@@ -67,14 +67,16 @@ public:
     ElementSlate(const ElementSlate &) = delete;
     ElementSlate & operator=(const ElementSlate &) = delete;
 
-    bool Contains(const std::string & name) {
-      return element_dict.find(name) != element_dict.end();
+    bool Contains(const std::string & test_name) {
+      return element_dict.find(test_name) != element_dict.end();
     }
-    Element & FindElement(const std::string & name) {
-      emp_assert(Contains(name));
-      return *(element_dict[name]);
+    Element & FindElement(const std::string & test_name) {
+      emp_assert(Contains(test_name));
+      return *(element_dict[test_name]);
     }
-
+    Element & operator[](const std::string & test_name) {
+      return FindElement(test_name);
+    }
 
 
     // Add additional children on to this element.
