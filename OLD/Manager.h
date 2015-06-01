@@ -15,20 +15,21 @@
 #include "../tools/assert.h"
 #include "../tools/alert.h"
 
-#include "JQElement.h"
+#include "Element.h"
 
 namespace emp {
+namespace JQ {
 
-  class JQManager : public JQElement {
+  class Manager : public Element {
   private:
-    std::map<std::string, JQElement *> element_map;    
-    std::vector<JQElement *> element_vector;
+    std::map<std::string, Element *> element_map;    
+    std::vector<Element *> element_vector;
     std::string end_tag;
     bool ready;
 
   public:
-    JQManager(const std::string & name)
-      : JQElement(name)
+    Manager(const std::string & name)
+      : Element(name)
       , end_tag(name + std::string("__end"))
       , ready(false)
     {
@@ -41,27 +42,27 @@ namespace emp {
             });
         }, name.c_str(), end_tag.c_str());;
     }
-    ~JQManager() {
+    ~Manager() {
       // Delete all of the elements created as part of this managed space.
       for (auto i : element_vector) {
         delete i;
       }
     }
 
-    // Do not allow JQManagers to be copied
-    JQManager(const JQManager &) = delete;
-    JQManager & operator=(const JQManager &) = delete;
+    // Do not allow Managers to be copied
+    Manager(const Manager &) = delete;
+    Manager & operator=(const Manager &) = delete;
 
     bool Contains(const std::string & name) { return element_map.find(name) != element_map.end(); }
-    JQElement & Get(const std::string & name) {
+    Element & Get(const std::string & name) {
       emp_assert(Contains(name));
       return *(element_map[name]);
     }
 
-    JQElement & AddFront(const std::string & html_string) {
+    Element & AddFront(const std::string & html_string) {
       // Create the new element (and its unique tag name).
       const std::string new_tag = emp::to_string(GetName(), "__", element_vector.size());
-      JQElement * new_element = new JQElement(new_tag, html_string);
+      Element * new_element = new Element(new_tag, html_string);
 
       // Store the new element.
       element_vector.push_back(new_element);
@@ -83,7 +84,7 @@ namespace emp {
     //     }, GetName().c_str(), in_element.GetName().c_str());;
     // }
 
-    // void AddFront(JQElement & in_element) {
+    // void AddFront(Element & in_element) {
     //   element_map[in_element.GetName()] = &in_element;
     //   EM_ASM_ARGS({
     //       var manager_name = Pointer_stringify($0);
@@ -101,6 +102,7 @@ namespace emp {
 
   };
 
+};
 };
 
 #endif
