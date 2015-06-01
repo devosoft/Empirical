@@ -22,8 +22,18 @@ namespace JQ {
     std::string url;
     std::string name;
 
+    std::string alt_text;
+    int width;
+    int height;
+
     Image(const std::string & in_url, const std::string & in_name="")
-      : url(in_url), name(in_name) { ; }
+      : url(in_url), name(in_name), alt_text(""), width(-1), height(-1) { ; }
+
+    Image & Name(const std::string & in_name) { name = in_name; return *this; }
+    Image & Alt(const std::string & in_alt) { alt_text = in_alt; return *this; }
+    Image & Width(int w) { width = w; return *this; }
+    Image & Height(int h) { height = h; return *this; }
+    Image & Size(int w, int h) { width = w, height = h; return *this; }
   };
 
   struct Table {
