@@ -14,7 +14,6 @@ JSWrap needs for disposable flag to actually work
 In general, classes made with JSWrap need an easy cleanup
 
 -= Improvements =-
-Element HTML writing should be centralized
 Base document should register where keypresses should be directed.
 Buttons should be able to have a hotkey (or more than one?)
 Slates should have a current location and always "append" at that location.

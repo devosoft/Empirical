@@ -27,8 +27,8 @@ namespace JQ {
       for (auto & cur_fun : fun_set) cur_fun();
 
       // Concatenate the text.
-      HTML_string = "";
-      for (auto & cur_str : string_set) { HTML_string += cur_str; }
+      HTML.str("");
+      for (auto & cur_str : string_set) { HTML << cur_str; }
     }
 
   public:

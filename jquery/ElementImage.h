@@ -18,26 +18,15 @@ namespace JQ {
   class ElementImage : public Element, public emp::JQ::Image {
   private:
     void UpdateHTML() {
-      HTML_string = "<img src='";
-      HTML_string += url;
-      HTML_string += "' alt='";
-      HTML_string += alt_text;
-      HTML_string += "'";
+      HTML.str("");
+      HTML << "<img src=\"" << url << "\" alt=\"" << alt_text << "\"";
       if (width > 0 || height > 0) {
-        HTML_string += " style='";
-        if (width > 0) {
-          HTML_string += "width:";
-          HTML_string += std::to_string(width);
-          HTML_string += "px;";
-        }
-        if (height > 0) {
-          HTML_string += "height:";
-          HTML_string += std::to_string(height);
-          HTML_string += "px;";
-        }
-        HTML_string += "'";
+        HTML << " style=\"";
+        if (width > 0) HTML << "width:" << width << "px;";
+        if (height > 0) HTML << "height:" << height << "px;";
+        HTML << "\"";
       }
-      HTML_string += ">";
+      HTML << ">";
     }
 
   public:

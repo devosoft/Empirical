@@ -18,33 +18,22 @@ namespace JQ {
   class ElementButton : public Element, public Button {
   private:
     void UpdateHTML() {
-      HTML_string = "<button";
-      if (title != "") {
-        HTML_string += " title=\"";
-        HTML_string += title;
-        HTML_string += "\"";
+      HTML.str("");                               // Clear the current stream.
+      HTML << "<button";                          // Start the button tag.
+      if (title != "") {                          // If the button has a title, add it!
+        HTML << " title=\"" << title << "\"";
       }
-      if (width > 0 || height > 0) {
-        HTML_string += " style='";
-        if (width > 0) {
-          HTML_string += "width:";
-          HTML_string += std::to_string(width);
-          HTML_string += "px;";
-        }
-        if (height > 0) {
-          HTML_string += "height:";
-          HTML_string += std::to_string(height);
-          HTML_string += "px;";
-        }
-        HTML_string += "'";
+      if (width > 0 || height > 0) {              // If the button has a style, add it!
+        HTML << " style=\"";
+        if (width > 0) HTML << "width:" << width << "px;";
+        if (height > 0) HTML << "height:" << height << "px;";
+        HTML << "\"";
       }
-      HTML_string += " onclick=\"empCppCallback(";
-      HTML_string += std::to_string(callback_id);
-      HTML_string += ")\"";
-        
-      HTML_string += ">";
-      HTML_string += label;
-      HTML_string += "</button>";
+
+      // Indicate action on click.
+      HTML << " onclick=\"empCppCallback(" << std::to_string(callback_id) << ")\"";
+
+      HTML << ">" << label << "</button>";       // Close and label the button.
     }
 
   public:

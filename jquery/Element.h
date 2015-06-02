@@ -7,6 +7,7 @@
 //
 
 #include <emscripten.h>
+#include <sstream>
 #include <string>
 
 #include "../tools/assert.h"
@@ -21,7 +22,7 @@ namespace JQ {
   class Element {
   protected:
     std::string name;        // Unique DOM id for this element.
-    std::string HTML_string; // Full HTML contents for this element.
+    std::stringstream HTML; // Full HTML contents for this element.
     bool modified;           // Has this element been modified since the last update? 
 
 
@@ -101,7 +102,7 @@ namespace JQ {
           var elem_name = Pointer_stringify($0);
           var html_str = Pointer_stringify($1);
           $( '#' + elem_name ).html(html_str);
-        }, GetName().c_str(), HTML_string.c_str() );
+        }, GetName().c_str(), HTML.str().c_str() );
     }
 
 
@@ -163,7 +164,7 @@ namespace JQ {
     // Print out the contents of this element as HTML.
     virtual void PrintHTML(std::ostream & os) {
       UpdateHTML();
-      os << HTML_string;
+      os << HTML.str();
     }
 
     void AlertHTML() {
