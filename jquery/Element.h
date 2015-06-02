@@ -54,7 +54,7 @@ namespace JQ {
 
     virtual bool IsText() const { return false; }
 
-    const std::string GetName() { return name; }
+    const std::string & GetName() const { return name; }
     Element * GetParent() { return parent; }
 
     // Functions to access children
@@ -145,6 +145,11 @@ namespace JQ {
 
 
     virtual void PrintHTML(std::ostream & os) = 0;
+    void AlertHTML() {
+      std::stringstream ss;
+      PrintHTML(ss);
+      emp::Alert(ss.str());
+    }
   };
 
 };
