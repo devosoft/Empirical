@@ -17,10 +17,34 @@ namespace JQ {
 
   class ElementButton : public Element, public Button {
   private:
-    std::string HTML_string;
-
     void UpdateHTML() {
-      HTML_string = "<img src='";
+      HTML_string = "<button";
+      if (title != "") {
+        HTML_string += " title=\"";
+        HTML_string += title;
+        HTML_string += "\"";
+      }
+      if (width > 0 || height > 0) {
+        HTML_string += " style='";
+        if (width > 0) {
+          HTML_string += "width:";
+          HTML_string += std::to_string(width);
+          HTML_string += "px;";
+        }
+        if (height > 0) {
+          HTML_string += "height:";
+          HTML_string += std::to_string(height);
+          HTML_string += "px;";
+        }
+        HTML_string += "'";
+      }
+      HTML_string += " onclick=\"empCppCallback(";
+      HTML_string += std::to_string(callback_id);
+      HTML_string += ")\"";
+        
+      HTML_string += ">";
+      HTML_string += label;
+      HTML_string += "</button>";
     }
 
   public:
@@ -31,10 +55,6 @@ namespace JQ {
     // Do not allow Managers to be copied
     ElementButton(const ElementButton &) = delete;
     ElementButton & operator=(const ElementButton &) = delete;
-
-
-    void UpdateNow() { ; }
-    void PrintHTML(std::ostream & os) { ; }
 
   };
 

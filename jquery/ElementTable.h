@@ -27,9 +27,6 @@ namespace JQ {
     ElementTable(const ElementTable &) = delete;
     ElementTable & operator=(const ElementTable &) = delete;
 
-    void UpdateNow() { ; }
-    void PrintHTML(std::ostream & os) { ; }
-
   };
 
 };

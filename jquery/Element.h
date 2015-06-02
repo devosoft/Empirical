@@ -3,7 +3,7 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Base class for a single element on a web page (a paragraph, a table, etc.)
+//  Base class for a single element on a web page (a paragraph, a button, a table, etc.)
 //
 
 #include <emscripten.h>
@@ -20,12 +20,18 @@ namespace JQ {
 
   class Element {
   protected:
-    bool modified;      // Has this element been modified since the last update? 
-    std::string name;
+    std::string name;        // Unique DOM id for this element.
+    std::string HTML_string; // Full HTML contents for this element.
+    bool modified;           // Has this element been modified since the last update? 
+
 
     // Track hiearchy
     Element * parent;
     std::vector<Element *> children;
+
+    // This is the main function that needs to be filled in for a derived class to
+    // behave properly.
+    virtual void UpdateHTML() { ; }
 
     // If an Append doesn't work with the currnet class, forward it to the parent!
     template <typename FORWARD_TYPE>
@@ -36,17 +42,19 @@ namespace JQ {
 
   public:
     Element(const std::string & in_name, Element * in_parent)
-      : modified(true), name(in_name), parent(in_parent)
+      : name(in_name), modified(true), parent(in_parent)
     {
       emp_assert(name.size() > 0);  // Make sure a name was included.
       // @CAO ensure the name consists of just alphanumeric chars (plus '_' & '-'?)
       Register(this);
     }
-    Element(const Element &) = delete;
     virtual ~Element() {
       // Recursively delete children.
       for (Element * cur_element : children) { delete cur_element; }
     }
+
+    // Do not allow elements to be copied.
+    Element(const Element &) = delete;
     Element & operator=(const Element &) = delete;
 
     // Functions to access current state
@@ -86,7 +94,16 @@ namespace JQ {
 
 
     // UpdateNow() refreshes the document immediately (and should only be called if that's okay!)
-    virtual void UpdateNow() = 0;
+    // By default: call UpdateHTML (which should be overridden) and print HTML_string.
+    virtual void UpdateNow() {
+      UpdateHTML();
+      EM_ASM_ARGS({
+          var elem_name = Pointer_stringify($0);
+          var html_str = Pointer_stringify($1);
+          $( '#' + elem_name ).html(html_str);
+        }, GetName().c_str(), HTML_string.c_str() );
+    }
+
 
     // Update() refreshes the document as soon as it's ready.
     void Update() {
@@ -143,8 +160,12 @@ namespace JQ {
     Element & operator<<(IN_TYPE && in_val) { return Append(std::forward<IN_TYPE>(in_val)); }
 
 
+    // Print out the contents of this element as HTML.
+    virtual void PrintHTML(std::ostream & os) {
+      UpdateHTML();
+      os << HTML_string;
+    }
 
-    virtual void PrintHTML(std::ostream & os) = 0;
     void AlertHTML() {
       std::stringstream ss;
       PrintHTML(ss);

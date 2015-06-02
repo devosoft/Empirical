@@ -177,7 +177,7 @@ public:
 
       }
 
-      // Otherwise sub-elements should be in place -- just update them!
+      // Step through all sub-elements and update their HTML contents.
       for (auto * child : children) child->UpdateNow();
 
       modified = false;

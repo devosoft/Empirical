@@ -22,6 +22,15 @@ namespace JQ {
     std::vector<std::string> string_set;
     std::vector<std::function<void()>> fun_set;
 
+    void UpdateHTML() {
+      // Collect all function outputs
+      for (auto & cur_fun : fun_set) cur_fun();
+
+      // Concatenate the text.
+      HTML_string = "";
+      for (auto & cur_str : string_set) { HTML_string += cur_str; }
+    }
+
   public:
     ElementText(const std::string & in_name, Element * in_parent)
       : Element(in_name, in_parent) { ; }
@@ -49,27 +58,6 @@ namespace JQ {
       return *this;
     }
 
-    void UpdateNow() {
-      // Collect all function outputs
-      for (auto & cur_fun : fun_set) cur_fun();
-
-      // Concatenate the text.
-      std::string text;
-      for (auto & cur_str : string_set) { text += cur_str; }
-
-      // Print the text into the HTML block.
-      EM_ASM_ARGS({
-          var elem_name = Pointer_stringify($0);
-          var text = Pointer_stringify($1);
-          $( '#' + elem_name ).html(text);
-        }, GetName().c_str(), text.c_str() );
-    }
-
-    void PrintHTML(std::ostream & os) {
-      std::string text;
-      for (auto & cur_str : string_set) { text += cur_str; }
-      os << text << std::endl;
-    }
   };
 
 };

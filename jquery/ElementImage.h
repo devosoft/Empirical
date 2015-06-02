@@ -17,8 +17,6 @@ namespace JQ {
 
   class ElementImage : public Element, public emp::JQ::Image {
   private:
-    std::string HTML_string;
-
     void UpdateHTML() {
       HTML_string = "<img src='";
       HTML_string += url;
@@ -50,20 +48,6 @@ namespace JQ {
     // Do not allow Managers to be copied
     ElementImage(const ElementImage &) = delete;
     ElementImage & operator=(const ElementImage &) = delete;
-
-    void UpdateNow() {
-      UpdateHTML();
-      EM_ASM_ARGS({
-          var elem_name = Pointer_stringify($0);
-          var html_str = Pointer_stringify($1);
-          $( '#' + elem_name ).html(html_str);
-        }, GetName().c_str(), HTML_string.c_str() );
-    }
-
-    void PrintHTML(std::ostream & os) {
-      UpdateHTML();
-      os << HTML_string;
-    }
 
   };
 
