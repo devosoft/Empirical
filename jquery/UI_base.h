@@ -19,15 +19,25 @@ namespace JQ {
     int height;
     std::string title;
 
+    uint32_t callback_id;
   public:
     Button(const std::function<void()> & in_cb,
            const std::string & in_label="",
            const std::string & in_name="")
       : temp_name(in_name), callback(in_cb), label(in_label)
-      , autofocus(false), disabled(false), width(-1), height(-1), title("") { ; }
+      , autofocus(false), disabled(false), width(-1), height(-1), title("")
+      , callback_id(JSWrap(callback)) { ; }
+    ~Button() {
+      // @CAO Need to cleanup callabck! 
+    }
 
     Button & TempName(const std::string & in_name) { temp_name = in_name; return *this; }
-    Button & Callback(const std::function<void()> & in_cb) { callback = in_cb; return *this; }
+    Button & Callback(const std::function<void()> & in_cb) {
+      // @CAO Need to cleanup old callback!
+      callback = in_cb;
+      callback_id = JSWrap(callback);
+      return *this;
+    }
     Button & Label(const std::string & in_label) { label = in_label; return *this; }
 
     Button & Autofocus(bool in_af) { autofocus = in_af; return *this; }
