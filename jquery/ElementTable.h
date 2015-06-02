@@ -17,13 +17,10 @@
 namespace emp {
 namespace JQ {
 
-  class ElementTable : public Element {
-  private:
-    emp::JQ::Table base_info;
-
+  class ElementTable : public Element, public emp::JQ::Table {
   public:
     ElementTable(const emp::JQ::Table & in_info, Element * in_parent)
-      : Element(in_info.name, in_parent), base_info(in_info) { ; }
+      : Element(in_info.GetTempName(), in_parent), emp::JQ::Table(in_info) { ; }
     ~ElementTable() { ; }
 
     // Do not allow Managers to be copied

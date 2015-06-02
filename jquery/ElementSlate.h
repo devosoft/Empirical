@@ -84,6 +84,31 @@ public:
     Element & operator[](const std::string & test_name) {
       return FindElement(test_name);
     }
+    ElementButton & Button(const std::string & test_name) {
+      // Assert that we have the correct type, then return it.
+      emp_assert(dynamic_cast<ElementButton *>( &(FindElement(test_name)) ) != NULL);
+      return dynamic_cast<ElementButton&>( FindElement(test_name) );
+    }
+    ElementImage & Image(const std::string & test_name) {
+      // Assert that we have the correct type, then return it.
+      emp_assert(dynamic_cast<ElementImage *>( &(FindElement(test_name)) ) != NULL);
+      return dynamic_cast<ElementImage&>( FindElement(test_name) );
+    }
+    ElementSlate & Slate(const std::string & test_name) {
+      // Assert that we have the correct type, then return it.
+      emp_assert(dynamic_cast<ElementSlate *>( &(FindElement(test_name)) ) != NULL);
+      return dynamic_cast<ElementSlate&>( FindElement(test_name) );
+    }
+    ElementTable & Table(const std::string & test_name) {
+      // Assert that we have the correct type, then return it.
+      emp_assert(dynamic_cast<ElementTable *>( &(FindElement(test_name)) ) != NULL);
+      return dynamic_cast<ElementTable&>( FindElement(test_name) );
+    }
+    ElementText & Text(const std::string & test_name) {
+      // Assert that we have the correct type, then return it.
+      emp_assert(dynamic_cast<ElementText *>( &(FindElement(test_name)) ) != NULL);
+      return dynamic_cast<ElementText&>( FindElement(test_name) );
+    }
 
 
     // Add additional children on to this element.
@@ -98,7 +123,7 @@ public:
     // Default to passing specialty operators to parent.
     Element & Append(emp::JQ::Button info) {
       // If a name was passed in, use it.  Otherwise generate a default name.
-      if (info.name == "") info.name = CalcNextName();
+      if (info.GetTempName() == "") info.TempName( CalcNextName() );
 
       ElementButton * new_child = new ElementButton(info, this);
       children.push_back(new_child);
@@ -110,7 +135,8 @@ public:
     }
     Element & Append(emp::JQ::Image info) {
       // If a name was passed in, use it.  Otherwise generate a default name.
-      if (info.name == "") info.name = CalcNextName();
+      // @CAO should we default name to URL??
+      if (info.GetTempName() == "") info.TempName( CalcNextName() );
 
       ElementImage * new_child = new ElementImage(info, this);
       children.push_back(new_child);
@@ -122,7 +148,7 @@ public:
     }
     Element & Append(emp::JQ::Table info) {
       // If a name was passed in, use it.  Otherwise generate a default name.
-      if (info.name == "") info.name = CalcNextName();
+      if (info.GetTempName() == "") info.TempName( CalcNextName() );
 
       ElementTable * new_child = new ElementTable(info, this);
       children.push_back(new_child);

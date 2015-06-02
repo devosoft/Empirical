@@ -6,9 +6,7 @@
 //  Managae a single button.
 //
 
-#include <functional>
 #include <string>
-#include <vector>
 
 #include "emscripten.h"
 
@@ -17,13 +15,17 @@
 namespace emp {
 namespace JQ {
 
-  class ElementButton : public Element {
+  class ElementButton : public Element, public Button {
   private:
-    emp::JQ::Button base_info;
+    std::string HTML_string;
+
+    void UpdateHTML() {
+      HTML_string = "<img src='";
+    }
 
   public:
     ElementButton(const emp::JQ::Button & in_info, Element * in_parent)
-      : Element(in_info.name, in_parent), base_info(in_info) { ; }
+      : Element(in_info.GetTempName(), in_parent), Button(in_info) { ; }
     ~ElementButton() { ; }
 
     // Do not allow Managers to be copied

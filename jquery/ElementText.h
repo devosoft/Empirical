@@ -56,6 +56,8 @@ namespace JQ {
       // Concatenate the text.
       std::string text;
       for (auto & cur_str : string_set) { text += cur_str; }
+
+      // Print the text into the HTML block.
       EM_ASM_ARGS({
           var elem_name = Pointer_stringify($0);
           var text = Pointer_stringify($1);
