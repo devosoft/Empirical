@@ -1,14 +1,30 @@
 -= Next Steps =-
-Make sure BitVector / BitSet have a move constructor (& incorporate Ben's changes)
+Incorporate Ben's changes into BitVector/BitSet
 Simplify constructon of standard HTML elements (text, buttons, canvas, etc...)
 (work on applications of library and see what needs to be fixed/added)
-Write some documentation outside of the code!
+Setup documentation outside of the code!
 
 -= Questions =-
 Best way to convert to a c++ literal independent of type?
 How to dynamically change an include file?
-How does static_assert work?
 Have multi-purpose headers with static functions; how can I prevent those specific unused function errors while still getting others that I don't specifically block?
+
+-= Fixes =-
+JSWrap needs for disposable flag to actually work
+In general, classes made with JSWrap need an easy cleanup
+
+-= Improvements =-
+Element HTML writing should be centralized
+Base document should register where keypresses should be directed.
+Buttons should be able to have a hotkey (or more than one?)
+Slates should have a current location and always "append" at that location.
+- Forwarding to a parent should track where the forward came from to update position information.
+
+-= New Elements =-
+Tabs
+Settings (that can be initialized with a config object)
+Placeholder (?) for future references
+
 
 -= General tools to build =-
 A more automated test system
