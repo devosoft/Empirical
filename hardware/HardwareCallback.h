@@ -3,7 +3,7 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  This file defines the callback functions that the hardware should use to interact with the
+//  This class collects the callback functions that the hardware will use to interact with the
 //  external world.
 //
 

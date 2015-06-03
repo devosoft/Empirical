@@ -6,6 +6,8 @@
 //  This file provides event handling for browser interfaces.
 //
 
+#include "JSWrap.h"
+
 namespace emp {
 namespace html5 {
 
@@ -110,7 +112,8 @@ namespace html5 {
       deltaMode = EM_ASM_INT({ return emp_i.cb_args[$0].deltaMode; }, ARG_ID);
     }
   };    
- 
+
+
 };
 };
 

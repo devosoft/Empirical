@@ -3,11 +3,12 @@
 
 #include <algorithm>
 #include <ctime>
+#include <initializer_list>
 #include <map>
 #include <string>
 #include <sstream>
 #include <type_traits>
-#include <initializer_list>
+#include <vector>
 
 #define EMP_FUNCTION_TIMER(TEST_FUN) {                                       \
     std::clock_t emp_start_time = std::clock();                              \

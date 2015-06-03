@@ -85,8 +85,9 @@
 #include <iostream>
 #include <vector>
 
-#include "functions.h"
+#include "bitset_utils.h"
 #include "const_utils.h"
+#include "functions.h"
 
 namespace emp {
 
