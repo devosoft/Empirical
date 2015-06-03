@@ -25,6 +25,12 @@ namespace emp {
     const std::function<std::string()> & GetFunction(int id) const { return fun_set[id]; }
     DynamicStringSet & Clear() { fun_set.resize(0); return *this; }
 
+    std::string str() {
+      std::stringstream ss;
+      for (auto & cur_fun : fun_set) ss << cur_fun();
+      return ss.str();
+    }
+
     DynamicStringSet & Set(int id, const std::function<std::string()> & in_fun) {
       fun_set[id] = in_fun;
       return *this;
@@ -44,8 +50,21 @@ namespace emp {
       return Append( [in_text](){ return in_text; } );
     }
 
+    template <typename IN_TYPE>
+    DynamicStringSet & operator<<(IN_TYPE && _in) { return Append(_in); }
+
   };
 
 };
+
+
+std::ostream & operator<<( std::ostream & os, const emp::DynamicStringSet & strings )
+{ 
+  for (int i = 0; i < (int) strings.GetSize(); ++i) {
+    os << strings[i];
+  }
+  return os;
+}
+
 
 #endif
