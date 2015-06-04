@@ -1,5 +1,5 @@
-#ifndef EMP_JQ_ELEMENT_TEXT_H
-#define EMP_JQ_ELEMENT_TEXT_H
+#ifndef EMP_UI_ELEMENT_TEXT_H
+#define EMP_UI_ELEMENT_TEXT_H
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -17,7 +17,7 @@
 #include "Element.h"
 
 namespace emp {
-namespace JQ {
+namespace UI {
 
   class ElementText : public Element {
   private:

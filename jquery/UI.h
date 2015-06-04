@@ -1,5 +1,5 @@
-#ifndef EMP_JQUERY_H
-#define EMP_JQUERY_H
+#ifndef EMP_UI_H
+#define EMP_UI_H
 
 #include "../emtools/init.h"
 
@@ -7,7 +7,7 @@
 #include "UI_base.h"
 
 namespace emp {
-namespace JQ {
+namespace UI {
 
   static ElementSlate document("emp_base");
 

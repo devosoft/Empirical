@@ -1,5 +1,5 @@
-#ifndef EMP_JQ_ELEMENT_WRAPPER_H
-#define EMP_JQ_ELEMENT_WRAPPER_H
+#ifndef EMP_UI_ELEMENT_WRAPPER_H
+#define EMP_UI_ELEMENT_WRAPPER_H
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -9,7 +9,7 @@
 #include "Element.h"
 
 namespace emp {
-namespace JQ {
+namespace UI {
 
   template <typename BASE_TYPE>
   class ElementWrapper : public Element, public BASE_TYPE {

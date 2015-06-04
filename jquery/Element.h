@@ -1,5 +1,5 @@
-#ifndef EMP_JQ_ELEMENT_H
-#define EMP_JQ_ELEMENT_H
+#ifndef EMP_UI_ELEMENT_H
+#define EMP_UI_ELEMENT_H
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -17,7 +17,7 @@
 #include "UI_base.h"
 
 namespace emp {
-namespace JQ {
+namespace UI {
 
   class Element {
   protected:
@@ -123,9 +123,9 @@ namespace JQ {
     virtual Element & Append(const std::function<std::string()> & in_fun) {
       return ForwardAppend(in_fun);
     }
-    virtual Element & Append(emp::JQ::Button info) { return ForwardAppend(info); }
-    virtual Element & Append(emp::JQ::Image info) { return ForwardAppend(info); }
-    virtual Element & Append(emp::JQ::Table info) { return ForwardAppend(info); }
+    virtual Element & Append(emp::UI::Button info) { return ForwardAppend(info); }
+    virtual Element & Append(emp::UI::Image info) { return ForwardAppend(info); }
+    virtual Element & Append(emp::UI::Table info) { return ForwardAppend(info); }
 
 
     // Convert arbitrary inputs to a string and try again!
@@ -138,21 +138,21 @@ namespace JQ {
     template <typename VAR_TYPE>
     Element & AppendVar(VAR_TYPE & var) {
       // return Append( [&var](){ return emp::to_string(var); } );
-      return Append( emp::JQ::Var(var) );
+      return Append( emp::UI::Var(var) );
     }
 
     Element & AppendButton(const std::function<void()> & in_cb,
                            const std::string & in_label="",
                            const std::string & in_name="") {
-      return Append(emp::JQ::Button(in_cb, in_label, in_name));
+      return Append(emp::UI::Button(in_cb, in_label, in_name));
     }
 
     Element & AppendImage(const std::string & in_url, const std::string & in_name="") {
-      return Append(emp::JQ::Image(in_url, in_name));
+      return Append(emp::UI::Image(in_url, in_name));
     }
 
     Element & AppendTable(int in_cols, int in_rows, const std::string & in_name="") {
-      return Append(emp::JQ::Table(in_cols, in_rows, in_name));
+      return Append(emp::UI::Table(in_cols, in_rows, in_name));
     }
 
 

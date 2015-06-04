@@ -1,5 +1,5 @@
-#ifndef EMP_JQ_EVENTS_H
-#define EMP_JQ_EVENTS_H
+#ifndef EMP_UI_EVENTS_H
+#define EMP_UI_EVENTS_H
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -11,7 +11,7 @@
 #include "../emtools/html5_events.h"
 
 namespace emp {
-namespace JQ {
+namespace UI {
 
   template <typename FUN_TYPE> void OnDocumentReady(FUN_TYPE && fun) {
     // const int fun_id = JSWrapOnce(fun);

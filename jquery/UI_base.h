@@ -6,7 +6,7 @@
 #include <string>
 
 namespace emp {
-namespace JQ {
+namespace UI {
 
   class Button {
   protected:

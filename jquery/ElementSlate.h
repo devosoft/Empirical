@@ -1,5 +1,5 @@
-#ifndef EMP_JQ_ELEMENT_SLATE_H
-#define EMP_JQ_ELEMENT_SLATE_H
+#ifndef EMP_UI_ELEMENT_SLATE_H
+#define EMP_UI_ELEMENT_SLATE_H
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -19,11 +19,11 @@
 #include "ElementWrapper.h"
 
 namespace emp {
-namespace JQ {
+namespace UI {
 
-  using ElementButton = emp::JQ::ElementWrapper<emp::JQ::Button>;
-  using ElementImage = emp::JQ::ElementWrapper<emp::JQ::Image>;
-  using ElementTable = emp::JQ::ElementWrapper<emp::JQ::Table>;
+  using ElementButton = emp::UI::ElementWrapper<emp::UI::Button>;
+  using ElementImage = emp::UI::ElementWrapper<emp::UI::Image>;
+  using ElementTable = emp::UI::ElementWrapper<emp::UI::Table>;
 
   class ElementSlate : public Element {
   protected:
@@ -123,7 +123,7 @@ public:
     }
 
     // Default to passing specialty operators to parent.
-    Element & Append(emp::JQ::Button info) {
+    Element & Append(emp::UI::Button info) {
       // If a name was passed in, use it.  Otherwise generate a default name.
       if (info.GetTempName() == "") info.TempName( CalcNextName() );
 
@@ -135,7 +135,7 @@ public:
       
       return *new_child;
     }
-    Element & Append(emp::JQ::Image info) {
+    Element & Append(emp::UI::Image info) {
       // If a name was passed in, use it.  Otherwise generate a default name.
       // @CAO should we default name to URL??
       if (info.GetTempName() == "") info.TempName( CalcNextName() );
@@ -148,7 +148,7 @@ public:
       
       return *new_child;
     }
-    Element & Append(emp::JQ::Table info) {
+    Element & Append(emp::UI::Table info) {
       // If a name was passed in, use it.  Otherwise generate a default name.
       if (info.GetTempName() == "") info.TempName( CalcNextName() );
 
