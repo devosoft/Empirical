@@ -24,13 +24,11 @@ namespace UI {
     std::string name;        // Unique DOM id for this element.
     std::stringstream HTML; // Full HTML contents for this element.
 
-
     // Track hiearchy
     Element * parent;
     std::vector<Element *> children;
 
-    // This is the main function that needs to be filled in for a derived class to
-    // behave properly.
+    // UpdateHTML() makes sure that the HTML stream above id up-to-date.
     virtual void UpdateHTML() { ; }
 
     // If an Append doesn't work with the currnet class, forward it to the parent!
@@ -45,7 +43,10 @@ namespace UI {
       : name(in_name), parent(in_parent)
     {
       emp_assert(name.size() > 0);  // Make sure a name was included.
-      // @CAO ensure the name consists of just alphanumeric chars (plus '_' & '-'?)
+      // Ensure the name consists of just alphanumeric chars (plus '_' & '-'?)
+      emp_assert( emp::is_valid(name,
+                                { emp::is_alphanumeric,
+                                  [](char x){return x=='_' || x=='-';}}) );
       Register(this);
     }
     virtual ~Element() {
@@ -94,6 +95,9 @@ namespace UI {
           var html_str = Pointer_stringify($1);
           $( '#' + elem_name ).html(html_str);
         }, GetName().c_str(), HTML.str().c_str() );
+
+      // Now that the parent is up-to-day, update all children.
+      for (auto * child : children) child->UpdateNow();
     }
 
 

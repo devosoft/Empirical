@@ -65,6 +65,14 @@ namespace UI {
     std::string CalcNextName() const {
       return name + std::string("__") + std::to_string(children.size());
     }
+
+    void UpdateHTML() {
+      HTML.str("");                               // Clear the current stream.
+      for (auto * element : children) {
+        HTML << "<span id=\"" << element->GetName() << "\"></span>\n";
+      }
+    }
+
   
 public:
     ElementSlate(const std::string & name, Element * in_parent=nullptr)
@@ -161,33 +169,6 @@ public:
       return *new_child;
     }
 
-
-    virtual void UpdateNow() {
-      if (!initialized) {
-        // We can assume that the base div tags have been added already. Expand with contents!
-        for (auto * child : children) {
-          EM_ASM_ARGS({
-              var slate_name = Pointer_stringify($0);
-              var elem_name = Pointer_stringify($1);
-              $( '#' + slate_name ).append('<span id=\'' + elem_name + '\'></span>');
-            }, GetName().c_str(), child->GetName().c_str() );
-        }
-
-        initialized = true;
-      }
-
-      // Step through all sub-elements and update their HTML contents.
-      for (auto * child : children) child->UpdateNow();
-    }
-    
-
-    virtual void PrintHTML(std::ostream & os) {
-      os << "<span id=\"" << name <<"\">\n";
-      for (auto * element : children) {
-        element->PrintHTML(os);
-      }
-      os << "</span>\n";
-    }
 
   };
 
