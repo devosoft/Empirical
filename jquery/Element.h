@@ -23,7 +23,6 @@ namespace UI {
   protected:
     std::string name;        // Unique DOM id for this element.
     std::stringstream HTML; // Full HTML contents for this element.
-    bool modified;           // Has this element been modified since the last update? 
 
 
     // Track hiearchy
@@ -43,7 +42,7 @@ namespace UI {
 
   public:
     Element(const std::string & in_name, Element * in_parent)
-      : name(in_name), modified(true), parent(in_parent)
+      : name(in_name), parent(in_parent)
     {
       emp_assert(name.size() > 0);  // Make sure a name was included.
       // @CAO ensure the name consists of just alphanumeric chars (plus '_' & '-'?)
@@ -59,8 +58,6 @@ namespace UI {
     Element & operator=(const Element &) = delete;
 
     // Functions to access current state
-    bool IsModified() const { return modified; }
-
     virtual bool IsText() const { return false; }
 
     const std::string & GetName() const { return name; }
@@ -77,12 +74,6 @@ namespace UI {
       return *(children[id]);
     }
 
-    // Function to make current element as modified and pass information up to parents.
-    void SetModified() {
-      if (modified) return;   // Stop recursion if already not up-to-date.
-      modified = true;
-      if (parent) parent->SetModified();
-    }
 
     // Register is used to lookup classes by name.  Should exist in classes that manage
     // multiple element; below is the default version.

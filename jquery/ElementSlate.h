@@ -174,13 +174,10 @@ public:
         }
 
         initialized = true;
-
       }
 
       // Step through all sub-elements and update their HTML contents.
       for (auto * child : children) child->UpdateNow();
-
-      modified = false;
     }
     
 

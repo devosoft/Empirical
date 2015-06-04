@@ -43,7 +43,6 @@ namespace UI {
 
     Element & Append(const std::string & in_text) {
       strings.Append(in_text);
-      SetModified();
       return *this;
     }
 
