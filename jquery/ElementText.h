@@ -10,7 +10,9 @@
 #include <string>
 #include <vector>
 
-#include "emscripten.h"
+#include <emscripten.h>
+
+#include "../tools/DynamicStringSet.h"
 
 #include "Element.h"
 
@@ -19,16 +21,11 @@ namespace JQ {
 
   class ElementText : public Element {
   private:
-    std::vector<std::string> string_set;
-    std::vector<std::function<void()>> fun_set;
+    DynamicStringSet strings;
 
     void UpdateHTML() {
-      // Collect all function outputs
-      for (auto & cur_fun : fun_set) cur_fun();
-
-      // Concatenate the text.
-      HTML.str("");
-      for (auto & cur_str : string_set) { HTML << cur_str; }
+      HTML.str("");        // Clear the current text.
+      HTML << strings;  // Save the current value of the strings.
     }
 
   public:
@@ -42,19 +39,16 @@ namespace JQ {
 
     virtual bool IsText() const { return true; }
 
-    void ClearText() { string_set.resize(0); }
+    void ClearText() { strings.Clear(); }
 
     Element & Append(const std::string & in_text) {
-      string_set.push_back(in_text);
+      strings.Append(in_text);
       SetModified();
       return *this;
     }
 
     Element & Append(const std::function<std::string()> & in_fun) {
-      int string_id = string_set.size();
-      string_set.push_back(in_fun());
-      std::string & cur_string = string_set[string_id];
-      fun_set.push_back( [&cur_string, in_fun](){ cur_string = in_fun(); }  );
+      strings.Append(in_fun);
       return *this;
     }
 
