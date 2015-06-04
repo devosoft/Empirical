@@ -15,13 +15,15 @@
 #include "../tools/alert.h"
 
 #include "Element.h"
-#include "ElementButton.h"
-#include "ElementImage.h"
-#include "ElementTable.h"
 #include "ElementText.h"
+#include "ElementWrapper.h"
 
 namespace emp {
 namespace JQ {
+
+  using ElementButton = emp::JQ::ElementWrapper<emp::JQ::Button>;
+  using ElementImage = emp::JQ::ElementWrapper<emp::JQ::Image>;
+  using ElementTable = emp::JQ::ElementWrapper<emp::JQ::Table>;
 
   class ElementSlate : public Element {
   protected:
@@ -158,8 +160,6 @@ public:
       
       return *new_child;
     }
-
-
 
 
     virtual void UpdateNow() {
