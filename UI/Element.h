@@ -76,13 +76,10 @@ namespace UI {
     }
 
 
-    // Register is used to lookup classes by name.  Should exist in classes that manage
-    // multiple element; below is the default version.
-    virtual bool Register(Element * new_element) {
-      if (!parent) return false;  // Top level should always have an override for Register()
-
-      parent->Register(new_element);
-      return true;
+    // Register is used so we can lookup classes by name.
+    // Overridden in classes that manage multiple element; below is the default version.
+    virtual void Register(Element * new_element) {
+      if (parent) parent->Register(new_element);
     }
 
 
@@ -101,15 +98,11 @@ namespace UI {
     }
 
 
-    // Update() refreshes the document as soon as it's ready.
+    // Update() refreshes the document once it's ready.
     void Update() {
-      std::function<void(void)> update_fun = [this](){ this->UpdateNow(); };
-      OnDocumentReady( update_fun );
-
       // OnDocumentReady( [this](){ this->UpdateNow(); } );
-      // OnDocumentReady( std::function<void()> ( std::bind(&Element::UpdateNow, this) ) );
+      OnDocumentReady( std::function<void(void)>([this](){ this->UpdateNow(); }) );
     }
-
 
 
     // By default, elements should forward unknown inputs to their parents.
@@ -127,28 +120,6 @@ namespace UI {
     virtual Element & Append(char in_char) { return Append(emp::to_string(in_char)); }
     virtual Element & Append(double in_num) { return Append(emp::to_string(in_num)); }
     virtual Element & Append(int in_num) { return Append(emp::to_string(in_num)); }
-
-
-    // Setup all speciality operators to also have an append varient.
-    template <typename VAR_TYPE>
-    Element & AppendVar(VAR_TYPE & var) {
-      // return Append( [&var](){ return emp::to_string(var); } );
-      return Append( emp::UI::Var(var) );
-    }
-
-    Element & AppendButton(const std::function<void()> & in_cb,
-                           const std::string & in_label="",
-                           const std::string & in_name="") {
-      return Append(emp::UI::Button(in_cb, in_label, in_name));
-    }
-
-    Element & AppendImage(const std::string & in_url, const std::string & in_name="") {
-      return Append(emp::UI::Image(in_url, in_name));
-    }
-
-    Element & AppendTable(int in_cols, int in_rows, const std::string & in_name="") {
-      return Append(emp::UI::Table(in_cols, in_rows, in_name));
-    }
 
 
     // Setup << operator to redirect to Append.

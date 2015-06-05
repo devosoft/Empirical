@@ -28,15 +28,6 @@ namespace UI {
   class ElementSlate : public Element {
   protected:
     std::map<std::string, Element *> element_dict;  // By-name lookup for elements.
-    bool initialized;                               // Is element hooked into HTML DOM hierarchy.
-
-    void InitializeChild(Element * child) {
-      EM_ASM_ARGS({
-          var slate_name = Pointer_stringify($0);
-          var elem_name = Pointer_stringify($1);
-          $( '#' + slate_name ).append('<span id=\'' + elem_name + '\'></span>');
-        }, GetName().c_str(), child->GetName().c_str() );
-    }
 
     // Return a text element for appending, either the current last element or build new one.
     ElementText & GetTextElement() {
@@ -45,23 +36,19 @@ namespace UI {
         std::string new_name = name + std::string("__") + std::to_string(children.size());
         Element * new_child = new ElementText(new_name, this);
         children.push_back(new_child);
-
-        // If this slate is already initialized, we should immediately initialize the child.
-        if (initialized) InitializeChild(new_child);
       }
       return *((ElementText *) children.back());
     }
     
-    virtual bool Register(Element * new_element) {
-      // @CAO Make sure that name is not already used?
-      element_dict[new_element->GetName()] = new_element;
-      
-      // Also register in parent, if available.
-      if (parent) parent->Register(new_element);
-      
-      return true; // Registration successful.
+    void Register(Element * in_element) {
+      // Make sure name is not already used
+      emp_assert(element_dict.find(in_element->GetName()) == element_dict.end()); 
+
+      element_dict[in_element->GetName()] = in_element;  // Save element name
+      if (parent) parent->Register(in_element);          // Also register in parent, if available
     }
 
+    // Provide a quick method for generating names when not otherwise specified.
     std::string CalcNextName() const {
       return name + std::string("__") + std::to_string(children.size());
     }
@@ -76,48 +63,40 @@ namespace UI {
   
 public:
     ElementSlate(const std::string & name, Element * in_parent=nullptr)
-      : Element(name, in_parent), initialized(false)
-    { ; }
+      : Element(name, in_parent) { ; }
     ~ElementSlate() { ; }
     
-    // Do not allow Managers to be copied
-    ElementSlate(const ElementSlate &) = delete;
-    ElementSlate & operator=(const ElementSlate &) = delete;
-
     bool Contains(const std::string & test_name) {
       return element_dict.find(test_name) != element_dict.end();
     }
-    Element & FindElement(const std::string & test_name) {
+    Element & operator[](const std::string & test_name) {
       emp_assert(Contains(test_name));
       return *(element_dict[test_name]);
     }
-    Element & operator[](const std::string & test_name) {
-      return FindElement(test_name);
-    }
     ElementButton & Button(const std::string & test_name) {
       // Assert that we have the correct type, then return it.
-      emp_assert(dynamic_cast<ElementButton *>( &(FindElement(test_name)) ) != NULL);
-      return dynamic_cast<ElementButton&>( FindElement(test_name) );
+      emp_assert(dynamic_cast<ElementButton *>( element_dict[test_name] ) != NULL);
+      return dynamic_cast<ElementButton&>( operator[](test_name) );
     }
     ElementImage & Image(const std::string & test_name) {
       // Assert that we have the correct type, then return it.
-      emp_assert(dynamic_cast<ElementImage *>( &(FindElement(test_name)) ) != NULL);
-      return dynamic_cast<ElementImage&>( FindElement(test_name) );
+      emp_assert(dynamic_cast<ElementImage *>( element_dict[test_name] ) != NULL);
+      return dynamic_cast<ElementImage&>( operator[](test_name) );
     }
     ElementSlate & Slate(const std::string & test_name) {
       // Assert that we have the correct type, then return it.
-      emp_assert(dynamic_cast<ElementSlate *>( &(FindElement(test_name)) ) != NULL);
-      return dynamic_cast<ElementSlate&>( FindElement(test_name) );
+      emp_assert(dynamic_cast<ElementSlate *>( element_dict[test_name] ) != NULL);
+      return dynamic_cast<ElementSlate&>( operator[](test_name) );
     }
     ElementTable & Table(const std::string & test_name) {
       // Assert that we have the correct type, then return it.
-      emp_assert(dynamic_cast<ElementTable *>( &(FindElement(test_name)) ) != NULL);
-      return dynamic_cast<ElementTable&>( FindElement(test_name) );
+      emp_assert(dynamic_cast<ElementTable *>( element_dict[test_name] ) != NULL);
+      return dynamic_cast<ElementTable&>( operator[](test_name) );
     }
     ElementText & Text(const std::string & test_name) {
       // Assert that we have the correct type, then return it.
-      emp_assert(dynamic_cast<ElementText *>( &(FindElement(test_name)) ) != NULL);
-      return dynamic_cast<ElementText&>( FindElement(test_name) );
+      emp_assert(dynamic_cast<ElementText *>( element_dict[test_name] ) != NULL);
+      return dynamic_cast<ElementText&>( operator[](test_name) );
     }
 
 
@@ -138,9 +117,6 @@ public:
       ElementButton * new_child = new ElementButton(info, this);
       children.push_back(new_child);
       
-      // If this slate is already initialized, we should immediately initialize the child.
-      if (initialized) InitializeChild(new_child);
-      
       return *new_child;
     }
     Element & Append(emp::UI::Image info) {
@@ -151,9 +127,6 @@ public:
       ElementImage * new_child = new ElementImage(info, this);
       children.push_back(new_child);
       
-      // If this slate is already initialized, we should immediately initialize the child.
-      if (initialized) InitializeChild(new_child);
-      
       return *new_child;
     }
     Element & Append(emp::UI::Table info) {
@@ -162,9 +135,6 @@ public:
 
       ElementTable * new_child = new ElementTable(info, this);
       children.push_back(new_child);
-      
-      // If this slate is already initialized, we should immediately initialize the child.
-      if (initialized) InitializeChild(new_child);
       
       return *new_child;
     }
