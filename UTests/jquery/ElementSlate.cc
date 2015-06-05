@@ -1,19 +1,28 @@
-#include "../../jquery/jquery.h"
+#include "../../UI/UI.h"
+
+namespace UI = emp::UI;
+
+int myvar = 20;
+
+void IncVar() { myvar++; UI::document.Update(); }
 
 int main() {
 
-  emp::JQ::Initialize();
+  UI::Initialize();
 
-  int test_num = 42;
+  UI::document << "<h2>This is a header!</h2>"
+               << "<p>And here is some regular text."
+               << "<p>Here is a variable: " << myvar;
 
-  emp::JQ::document
-    << "<h1>This is a test site!</h1>"
-    << "<p>The value of test_num is " << test_num << ".</p>";
+  UI::document << "<p>Here is an updating variable: " << UI::Var(myvar)
+               << "<br>" << UI::Button(IncVar, "MyButton", "but");
 
-  emp::JQ::document.Update();
+  UI::document << "<br>" << UI::Image("motivator.jpg").Width(600);
 
-  std::stringstream ss;
-  emp::JQ::document.PrintHTML(ss);
-  emp::Alert(ss.str());
+  myvar = 100;
+
+  UI::document.Button("but").Height(50);
+
+  UI::document.Update();
 }
 
