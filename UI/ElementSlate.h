@@ -48,9 +48,11 @@ namespace UI {
       if (parent) parent->Register(in_element);          // Also register in parent, if available
     }
 
-    // Provide a quick method for generating names when not otherwise specified.
-    std::string CalcNextName() const {
-      return name + std::string("__") + std::to_string(children.size());
+    // Provide a quick method for generating unique names when not otherwise specified.
+    static std::string CalcNextName() {
+      static int next_id = 0;
+      return std::string("emp__") + std::to_string(next_id++);
+      // return name + std::string("__") + std::to_string(children.size());
     }
 
     void UpdateHTML() {
