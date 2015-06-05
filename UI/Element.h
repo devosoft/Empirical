@@ -9,6 +9,7 @@
 #include <emscripten.h>
 #include <sstream>
 #include <string>
+#include <typeinfo>
 
 #include "../tools/assert.h"
 #include "../tools/string_utils.h"
@@ -33,7 +34,7 @@ namespace UI {
 
     // If an Append doesn't work with the currnet class, forward it to the parent!
     template <typename FORWARD_TYPE>
-    Element & ForwardAppend(FORWARD_TYPE && arg) {
+    Element & AppendParent(FORWARD_TYPE && arg) {
       emp_assert(parent != nullptr);
       return parent->Append(std::forward<FORWARD_TYPE>(arg));
     }
@@ -107,14 +108,20 @@ namespace UI {
 
     // By default, elements should forward unknown inputs to their parents.
 
-    virtual Element & Append(const std::string & in_text) { return ForwardAppend(in_text); }
-    virtual Element & Append(const std::function<std::string()> & in_fun) {
-      return ForwardAppend(in_fun);
-    }
-    virtual Element & Append(emp::UI::Button info) { return ForwardAppend(info); }
-    virtual Element & Append(emp::UI::Image info) { return ForwardAppend(info); }
-    virtual Element & Append(emp::UI::Table info) { return ForwardAppend(info); }
+    virtual Element & Append(const std::string & text) { return AppendParent(text); }
+    virtual Element & Append(const std::function<std::string()> & fun) { return AppendParent(fun); }
+    virtual Element & Append(emp::UI::Button info) { return AppendParent(info); }
+    virtual Element & Append(emp::UI::Image info) { return AppendParent(info); }
+    virtual Element & Append(emp::UI::Table info) { return AppendParent(info); }
 
+    Element & Append(const emp::UI::UI_base & info) {
+      // Dynamically determine type of UI element and re-call append with typed version.
+      if (typeid(info) == typeid(Button)) return Append( dynamic_cast<const Button&>(info) );
+      if (typeid(info) == typeid(Image))  return Append( dynamic_cast<const Image&>(info) );
+      if (typeid(info) == typeid(Table))  return Append( dynamic_cast<const Table&>(info) );
+      emp_assert( !"Unknown derived type of UI_base being passed into Append!" );
+      return *this;
+    }
 
     // Convert arbitrary inputs to a string and try again!
     virtual Element & Append(char in_char) { return Append(emp::to_string(in_char)); }
