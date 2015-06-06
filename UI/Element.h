@@ -114,15 +114,6 @@ namespace UI {
     virtual Element & Append(emp::UI::Image info) { return AppendParent(info); }
     virtual Element & Append(emp::UI::Table info) { return AppendParent(info); }
 
-    Element & Append(const emp::UI::UI_base & info) {
-      // Dynamically determine type of UI element and re-call append with typed version.
-      if (typeid(info) == typeid(Button)) return Append( dynamic_cast<const Button&>(info) );
-      if (typeid(info) == typeid(Image))  return Append( dynamic_cast<const Image&>(info) );
-      if (typeid(info) == typeid(Table))  return Append( dynamic_cast<const Table&>(info) );
-      emp_assert( !"Unknown derived type of UI_base being passed into Append!" );
-      return *this;
-    }
-
     // Convert arbitrary inputs to a string and try again!
     virtual Element & Append(char in_char) { return Append(emp::to_string(in_char)); }
     virtual Element & Append(double in_num) { return Append(emp::to_string(in_num)); }

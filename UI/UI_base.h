@@ -11,12 +11,21 @@ namespace UI {
   // Widget_core is a base class containing information needed by all GUI widget classes
   // (Buttons, Images, etc...).
 
+  struct CSS_Info {
+    std::string setting;
+    std::string value;
+
+    CSS_Info(const std::string & s, const std::string & v) : setting(s), value(v) { ; }
+  };
+
   class Widget_base {
   protected: 
     std::string temp_name;
     int width;
     int height;
     
+    std::vector<CSS_Info> css_mods;
+
     Widget_base() : temp_name(""), width(-1), height(-1) { ; }
   };
 
@@ -27,14 +36,21 @@ namespace UI {
   class Widget_wrap : public DETAIL_TYPE {
   public:
     Widget_wrap(ARG_TYPES... args, const std::string & in_name="") : DETAIL_TYPE(args...)
-    {
-      Widget_base::temp_name = in_name;
-    }
+    { Widget_base::temp_name = in_name; }
 
     Widget_wrap & TempName(const std::string & in_name) { Widget_base::temp_name = in_name; return *this; }
     Widget_wrap & Width(int w) { Widget_base::width = w; return *this; }
     Widget_wrap & Height(int h) { Widget_base::height = h; return *this; }
-    Widget_wrap & Size(int w, int h) { Widget_base::width = w; Widget_base::height = h; return *this; }
+    Widget_wrap & Size(int w, int h) {
+      Widget_base::width = w;
+      Widget_base::height = h;
+      return *this;
+    }
+
+    Widget_wrap & Background(const std::string & color) {
+      Widget_base::css_mods.emplace_back("background-color", color);
+      return *this;
+    }
 
     const std::string & GetTempName() const { return Widget_base::temp_name; }
   };
@@ -77,7 +93,8 @@ namespace UI {
     Button_detail(const std::function<void()> & in_cb, const std::string & in_label)
       : callback(in_cb), label(in_label)
       , autofocus(false), disabled(false), title("")
-      , callback_id(JSWrap(callback)) { ; }
+      , callback_id(JSWrap(callback))
+    { ; }
     ~Button_detail() {
       // @CAO Need to cleanup callback! 
     }
