@@ -17,6 +17,10 @@
 #include "events.h"
 #include "UI_base.h"
 
+#include "Button.h"
+#include "Image.h"
+#include "Table.h"
+
 namespace emp {
 namespace UI {
 

@@ -4,7 +4,6 @@
 #include "../emtools/init.h"
 
 #include "ElementSlate.h"
-#include "UI_base.h"
 
 namespace emp {
 namespace UI {
