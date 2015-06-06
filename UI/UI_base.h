@@ -55,6 +55,8 @@ namespace UI {
         Widget_base::css_mods.emplace_back("background-color", color);
         return *this;
       }
+
+      void TriggerCSS() { ; }
       
       const std::string & GetTempName() const { return Widget_base::temp_name; }
     };
