@@ -31,6 +31,7 @@ namespace UI {
 
     // UpdateHTML() makes sure that the HTML stream above id up-to-date.
     virtual void UpdateHTML() { ; }
+    virtual void UpdateCSS() { ; }
 
     // If an Append doesn't work with the currnet class, forward it to the parent!
     template <typename FORWARD_TYPE>
@@ -85,7 +86,7 @@ namespace UI {
 
 
     // UpdateNow() refreshes the document immediately (and should only be called if that's okay!)
-    // By default: call UpdateHTML (which should be overridden) and print HTML_string.
+    // By default: call UpdateHTML (which should be overridden) print HTML_string, and UpdateCSS
     virtual void UpdateNow() {
       UpdateHTML();
       EM_ASM_ARGS({
@@ -93,6 +94,7 @@ namespace UI {
           var html_str = Pointer_stringify($1);
           $( '#' + elem_name ).html(html_str);
         }, GetName().c_str(), HTML.str().c_str() );
+      UpdateCSS();
 
       // Now that the parent is up-to-day, update all children.
       for (auto * child : children) child->UpdateNow();

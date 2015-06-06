@@ -24,13 +24,17 @@ namespace UI {
     
     class Widget_base {
     protected: 
-      std::string temp_name;
+      std::string div_id;  // ID used for the div surrounding this element.
+      std::string obj_ext; // Extension for internal object if eeds own id: div_id + '__but'
       int width;
       int height;
       
       std::vector<CSS_Info> css_mods;
       
-      Widget_base() : temp_name(""), width(-1), height(-1) { ; }
+      Widget_base() : width(-1), height(-1) { ; }
+
+    public:
+      const std::string & GetDivID() const { return div_id; }      
     };
     
     // Widget_wrap is a template wrapper to make sure all derived widgets return the
@@ -40,9 +44,14 @@ namespace UI {
     class Widget_wrap : public DETAIL_TYPE {
     public:
       Widget_wrap(ARG_TYPES... args, const std::string & in_name="") : DETAIL_TYPE(args...)
-      { Widget_base::temp_name = in_name; }
+      {
+        Widget_base::div_id = in_name;
+      }
 
-      Widget_wrap & TempName(const std::string & in_name) { Widget_base::temp_name = in_name; return *this; }
+      Widget_wrap & DivID(const std::string & in_name) {
+        Widget_base::div_id = in_name;
+        return *this;
+      }
       Widget_wrap & Width(int w) { Widget_base::width = w; return *this; }
       Widget_wrap & Height(int h) { Widget_base::height = h; return *this; }
       Widget_wrap & Size(int w, int h) {
@@ -56,9 +65,17 @@ namespace UI {
         return *this;
       }
 
-      void TriggerCSS() { ; }
-      
-      const std::string & GetTempName() const { return Widget_base::temp_name; }
+      void TriggerCSS() {
+        for (auto css_mod : Widget_base::css_mods) {
+          std::string obj_id = Widget_base::div_id + Widget_base::obj_ext;
+          EM_ASM_ARGS({
+              var id = Pointer_stringify($0);
+              var name = Pointer_stringify($1);
+              var value = Pointer_stringify($2);
+              $( '#' + id ).css( name, value);
+            }, obj_id.c_str(), css_mod.setting.c_str(), css_mod.value.c_str());
+        };
+      }
     };
     
     
@@ -96,6 +113,9 @@ namespace UI {
           os << "\"";
         }
         
+        // Indicate ID.
+        os << " id=\"" << div_id << obj_ext << "\"";
+
         // Indicate action on click.
         os << " onclick=\"empCppCallback(" << std::to_string(callback_id) << ")\"";
         
@@ -106,7 +126,7 @@ namespace UI {
         : callback(in_cb), label(in_label)
         , autofocus(false), disabled(false), title("")
         , callback_id(JSWrap(callback))
-      { ; }
+      { obj_ext = "__b"; }
       ~Button_detail() {
         // @CAO Need to cleanup callback! 
       }

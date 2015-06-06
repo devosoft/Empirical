@@ -114,7 +114,7 @@ public:
     // Default to passing specialty operators to parent.
     Element & Append(emp::UI::Button info) {
       // If a name was passed in, use it.  Otherwise generate a default name.
-      if (info.GetTempName() == "") info.TempName( CalcNextName() );
+      if (info.GetDivID() == "") info.DivID( CalcNextName() );
 
       ElementButton * new_child = new ElementButton(info, this);
       children.push_back(new_child);
@@ -124,7 +124,7 @@ public:
     Element & Append(emp::UI::Image info) {
       // If a name was passed in, use it.  Otherwise generate a default name.
       // @CAO should we default name to URL??
-      if (info.GetTempName() == "") info.TempName( CalcNextName() );
+      if (info.GetDivID() == "") info.DivID( CalcNextName() );
 
       ElementImage * new_child = new ElementImage(info, this);
       children.push_back(new_child);
@@ -133,7 +133,7 @@ public:
     }
     Element & Append(emp::UI::Table info) {
       // If a name was passed in, use it.  Otherwise generate a default name.
-      if (info.GetTempName() == "") info.TempName( CalcNextName() );
+      if (info.GetDivID() == "") info.DivID( CalcNextName() );
 
       ElementTable * new_child = new ElementTable(info, this);
       children.push_back(new_child);
