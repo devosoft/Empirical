@@ -19,7 +19,7 @@
 namespace emp {
 namespace UI {
 
-  class ElementText : public Element {
+  class ElementText : public Element, public Text {
   private:
     DynamicStringSet strings;
 
@@ -27,10 +27,15 @@ namespace UI {
       HTML.str("");        // Clear the current text.
       HTML << strings;  // Save the current value of the strings.
     }
+    void UpdateCSS() {
+      TriggerCSS();
+    }
 
   public:
-    ElementText(const std::string & in_name, Element * in_parent)
-      : Element(in_name, in_parent) { ; }
+    // ElementText(const std::string & in_name, Element * in_parent)
+    //   : Element(in_name, in_parent) { ; }
+    ElementText(const Text & in_text, Element * in_parent)
+      : Element(in_text.GetDivID(), in_parent), Text(in_text) { ; }
     ~ElementText() { ; }
 
     // Do not allow Managers to be copied

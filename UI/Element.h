@@ -20,6 +20,7 @@
 #include "Button.h"
 #include "Image.h"
 #include "Table.h"
+#include "Text.h"
 
 namespace emp {
 namespace UI {
@@ -119,6 +120,7 @@ namespace UI {
     virtual Element & Append(emp::UI::Button info) { return AppendParent(info); }
     virtual Element & Append(emp::UI::Image info) { return AppendParent(info); }
     virtual Element & Append(emp::UI::Table info) { return AppendParent(info); }
+    virtual Element & Append(emp::UI::Text info) { return AppendParent(info); }
 
     // Convert arbitrary inputs to a string and try again!
     virtual Element & Append(char in_char) { return Append(emp::to_string(in_char)); }

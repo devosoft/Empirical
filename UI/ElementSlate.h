@@ -33,7 +33,8 @@ namespace UI {
     ElementText & GetTextElement() {
       // If the final element is not text, add one.
       if (children.size() == 0 || children.back()->IsText() == false)  {
-        std::string new_name = name + std::string("__") + std::to_string(children.size());
+        // std::string new_name = name + std::string("__") + std::to_string(children.size());
+        std::string new_name = internal::CalcNextID();
         Element * new_child = new ElementText(new_name, this);
         children.push_back(new_child);
       }
@@ -46,13 +47,6 @@ namespace UI {
 
       element_dict[in_element->GetName()] = in_element;  // Save element name
       if (parent) parent->Register(in_element);          // Also register in parent, if available
-    }
-
-    // Provide a quick method for generating unique names when not otherwise specified.
-    static std::string CalcNextName() {
-      static int next_id = 0;
-      return std::string("emp__") + std::to_string(next_id++);
-      // return name + std::string("__") + std::to_string(children.size());
     }
 
     void UpdateHTML() {
@@ -113,31 +107,23 @@ public:
 
     // Default to passing specialty operators to parent.
     Element & Append(emp::UI::Button info) {
-      // If a name was passed in, use it.  Otherwise generate a default name.
-      if (info.GetDivID() == "") info.DivID( CalcNextName() );
-
       ElementButton * new_child = new ElementButton(info, this);
       children.push_back(new_child);
-      
       return *new_child;
     }
     Element & Append(emp::UI::Image info) {
-      // If a name was passed in, use it.  Otherwise generate a default name.
-      // @CAO should we default name to URL??
-      if (info.GetDivID() == "") info.DivID( CalcNextName() );
-
       ElementImage * new_child = new ElementImage(info, this);
       children.push_back(new_child);
-      
       return *new_child;
     }
     Element & Append(emp::UI::Table info) {
-      // If a name was passed in, use it.  Otherwise generate a default name.
-      if (info.GetDivID() == "") info.DivID( CalcNextName() );
-
       ElementTable * new_child = new ElementTable(info, this);
       children.push_back(new_child);
-      
+      return *new_child;
+    }
+    Element & Append(emp::UI::Text info) {
+      ElementText * new_child = new ElementText(info, this);
+      children.push_back(new_child);
       return *new_child;
     }
 

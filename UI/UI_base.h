@@ -10,6 +10,12 @@ namespace UI {
 
   namespace internal {
   
+    // Provide a quick method for generating unique IDs when not otherwise specified.
+    static std::string CalcNextID() {
+      static int next_id = 0;
+      return std::string("emp__") + std::to_string(next_id++);
+    }
+    
     // CSS_Info contains information about a single CSS Setting.
     
     struct CSS_Info {
@@ -45,7 +51,8 @@ namespace UI {
     public:
       Widget_wrap(ARG_TYPES... args, const std::string & in_name="") : DETAIL_TYPE(args...)
       {
-        Widget_base::div_id = in_name;
+        // Setup the div_id to a non-empty and unique default if not specified.
+        Widget_base::div_id = (in_name == "") ? CalcNextID() : in_name;
       }
 
       Widget_wrap & DivID(const std::string & in_name) {
@@ -60,10 +67,14 @@ namespace UI {
         return *this;
       }
       
-      Widget_wrap & Background(const std::string & color) {
-        Widget_base::css_mods.emplace_back("background-color", color);
+      Widget_wrap & CSS(const std::string & setting, const std::string & value) {
+        Widget_base::css_mods.emplace_back(setting, value);
         return *this;
       }
+
+      Widget_wrap & Background(const std::string & v) { return CSS("background-color", v); }
+      Widget_wrap & Color(const std::string & v) { return CSS("color", v); }
+
 
       void TriggerCSS() {
         for (auto css_mod : Widget_base::css_mods) {
@@ -79,13 +90,6 @@ namespace UI {
     };
     
   };
-
-
-  // class Text : public UI_base {
-  // protected:
-  // public:
-  //   Text(const std::string & in_name="") : UI_base(in_name) { ; }
-  // };
 
 
   // Specialty functions...
