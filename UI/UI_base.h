@@ -2,6 +2,7 @@
 #define EMP_UI_BASE_H
 
 #include <functional>
+#include <map>
 #include <ostream>
 #include <string>
 
@@ -18,11 +19,41 @@ namespace UI {
     
     // CSS_Info contains information about a single CSS Setting.
     
-    struct CSS_Info {
-      std::string setting;
-      std::string value;
+    // struct CSS_Info {
+    //   std::string setting;
+    //   std::string value;
       
-      CSS_Info(const std::string & s, const std::string & v) : setting(s), value(v) { ; }
+    //   CSS_Info(const std::string & s, const std::string & v) : setting(s), value(v) { ; }
+    // };
+
+    class CSS_Class {
+    private:
+      std::map<std::string, std::string> settings;
+
+    public:
+      CSS_Class() { ; }
+
+      int GetSize() const { return (int) settings.size(); }
+
+      CSS_Class & DoSet(const std::string & in_set, const std::string & in_val) {
+        settings[in_set] = in_val;
+        return *this;
+      }
+
+      template <typename SET_TYPE>
+      CSS_Class & Set(const std::string & s, SET_TYPE v) { return DoSet(s, emp::to_string(v)); }
+
+      void Apply(const std::string & widget_id) {
+        for (auto css_pair : settings) {
+          EM_ASM_ARGS({
+              var id = Pointer_stringify($0);
+              var name = Pointer_stringify($1);
+              var value = Pointer_stringify($2);
+              $( '#' + id ).css( name, value);
+            }, widget_id.c_str(), css_pair.first.c_str(), css_pair.second.c_str());
+        };
+      }
+
     };
 
     // Widget_base is a base class containing information needed by all GUI widget classes
@@ -35,7 +66,7 @@ namespace UI {
       int width;
       int height;
       
-      std::vector<CSS_Info> css_mods;
+      CSS_Class css_info;
       
       Widget_base() : width(-1), height(-1) { ; }
 
@@ -67,25 +98,19 @@ namespace UI {
         return *this;
       }
       
-      Widget_wrap & CSS(const std::string & setting, const std::string & value) {
-        Widget_base::css_mods.emplace_back(setting, value);
+      template <typename SETTING_TYPE>
+      Widget_wrap & CSS(const std::string & setting, SETTING_TYPE && value) {
+        Widget_base::css_info.Set(setting, value);
         return *this;
       }
 
       Widget_wrap & Background(const std::string & v) { return CSS("background-color", v); }
       Widget_wrap & Color(const std::string & v) { return CSS("color", v); }
-
+      Widget_wrap & Opacity(double v) { return CSS("opacity", v); }
 
       void TriggerCSS() {
-        for (auto css_mod : Widget_base::css_mods) {
-          std::string obj_id = Widget_base::div_id + Widget_base::obj_ext;
-          EM_ASM_ARGS({
-              var id = Pointer_stringify($0);
-              var name = Pointer_stringify($1);
-              var value = Pointer_stringify($2);
-              $( '#' + id ).css( name, value);
-            }, obj_id.c_str(), css_mod.setting.c_str(), css_mod.value.c_str());
-        };
+        std::string obj_id = Widget_base::div_id + Widget_base::obj_ext;
+        Widget_base::css_info.Apply(obj_id);
       }
     };
     
