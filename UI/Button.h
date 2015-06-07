@@ -60,13 +60,14 @@ namespace UI {
         , callback_id(JSWrap(callback))
       { obj_ext = "__b"; }
       ~Button_detail() {
-        // @CAO Need to cleanup callback! 
+        // @CAO Can't delete unless we're sure no other copies of Button_detail are using id...
+        //emp::JSDelete(callback_id);  // Delete callback wrapper.
       }
 
       Button & Callback(const std::function<void()> & in_cb) {
-        // @CAO Need to cleanup old callback before setting up new one.
-        callback = in_cb;
-        callback_id = JSWrap(callback);
+        emp::JSDelete(callback_id);       // Delete previous callback wrapper.
+        callback = in_cb;                 // Save target function
+        callback_id = JSWrap(callback);   // Save id for callback trigger.
         return (Button &) *this;
       }
       Button & Label(const std::string & in_label) { label = in_label; return (Button &) *this; }

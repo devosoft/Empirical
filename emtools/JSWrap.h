@@ -217,6 +217,9 @@ namespace emp {
                   const std::string & fun_name="",
                   bool dispose_on_use=false)
   {
+    // We should never create disposible functions with names!
+    emp_assert(fun_name == "" || dispose_on_use == false);
+    
     auto * new_cb = new emp::internal::JSWrap_Callback<RET_TYPE, ARG_TYPES...>(in_fun, dispose_on_use);
     
     if (fun_name != "") {
@@ -240,6 +243,13 @@ namespace emp {
     return (uint32_t) new_cb;
   }
 
+  // uint32_t JSWrap(const std::function<void()> & in_fun,
+  //                 const std::string & fun_name="",
+  //                 bool dispose_on_use=false)
+  // {
+  //   return 0;
+  // }
+
   template <typename RETURN_TYPE, typename... ARG_TYPES>
   uint32_t JSWrap( RETURN_TYPE (*in_fun) (ARG_TYPES...),
                    const std::string & fun_name="", bool dispose_on_use=false)
@@ -260,7 +270,16 @@ namespace emp {
   // If we want a quick, unnammed, disposable function, use JSWrapOnce
   template <typename FUN_TYPE>
   uint32_t JSWrapOnce(FUN_TYPE && in_fun) { return JSWrap(std::forward<FUN_TYPE>(in_fun), "", true); }
+
+
+  // Cleanup a function pointer when finished with it.
+  void JSDelete( uint32_t fun_id ) {
+    // @CAO -- make sure we're not trying to delete a named function; JS side will still exist.
+    delete (emp::internal::JSWrap_Callback_Base *) (long long) fun_id;
+  }
 };
+
+
 
 
 // Once you use JSWrap to create an ID, you can call the wrapped function from Javascript
