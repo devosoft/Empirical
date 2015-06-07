@@ -6,6 +6,8 @@
 #include <ostream>
 #include <string>
 
+#include "CSS_Class.h"
+
 namespace emp {
 namespace UI {
 
@@ -17,45 +19,6 @@ namespace UI {
       return std::string("emp__") + std::to_string(next_id++);
     }
     
-    // CSS_Info contains information about a single CSS Setting.
-    
-    // struct CSS_Info {
-    //   std::string setting;
-    //   std::string value;
-      
-    //   CSS_Info(const std::string & s, const std::string & v) : setting(s), value(v) { ; }
-    // };
-
-    class CSS_Class {
-    private:
-      std::map<std::string, std::string> settings;
-
-    public:
-      CSS_Class() { ; }
-
-      int GetSize() const { return (int) settings.size(); }
-
-      CSS_Class & DoSet(const std::string & in_set, const std::string & in_val) {
-        settings[in_set] = in_val;
-        return *this;
-      }
-
-      template <typename SET_TYPE>
-      CSS_Class & Set(const std::string & s, SET_TYPE v) { return DoSet(s, emp::to_string(v)); }
-
-      void Apply(const std::string & widget_id) {
-        for (auto css_pair : settings) {
-          EM_ASM_ARGS({
-              var id = Pointer_stringify($0);
-              var name = Pointer_stringify($1);
-              var value = Pointer_stringify($2);
-              $( '#' + id ).css( name, value);
-            }, widget_id.c_str(), css_pair.first.c_str(), css_pair.second.c_str());
-        };
-      }
-
-    };
-
     // Widget_base is a base class containing information needed by all GUI widget classes
     // (Buttons, Images, etc...).
     

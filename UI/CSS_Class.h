@@ -1,0 +1,51 @@
+#ifndef EMP_UI_CSS_CLASS_H
+#define EMP_UI_CSS_CLASS_H
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//
+//  A CSS class tracking font style, etc.
+//
+
+#include <string>
+
+namespace emp {
+namespace UI {
+
+  class CSS_Class {
+  private:
+    std::map<std::string, std::string> settings;
+    
+  public:
+    CSS_Class() { ; }
+    CSS_Class(const Class &) = default;
+    CSS_Class & operator=(const Class &) = default;
+    
+    int GetSize() const { return (int) settings.size(); }
+    
+    CSS_Class & DoSet(const std::string & in_set, const std::string & in_val) {
+      settings[in_set] = in_val;
+      return *this;
+    }
+    
+    template <typename SET_TYPE>
+    CSS_Class & Set(const std::string & s, SET_TYPE v) { return DoSet(s, emp::to_string(v)); }
+    
+    void Apply(const std::string & widget_id) {
+      for (auto css_pair : settings) {
+        EM_ASM_ARGS({
+            var id = Pointer_stringify($0);
+            var name = Pointer_stringify($1);
+            var value = Pointer_stringify($2);
+            $( '#' + id ).css( name, value);
+          }, widget_id.c_str(), css_pair.first.c_str(), css_pair.second.c_str());
+      };
+    }
+    
+  };
+
+
+};
+};
+
+
+#endif
