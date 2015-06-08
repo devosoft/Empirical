@@ -52,10 +52,13 @@ namespace UI {
     void UpdateHTML() {
       HTML.str("");                               // Clear the current stream.
       for (auto * element : children) {
-        HTML << "<span id=\"" << element->GetName() << "\"></span>\n";
+        const std::string & tag = element->GetWrapperTag();
+        HTML << "<" << tag << " id=\"" << element->GetName() << "\"></" << tag << ">\n";
       }
     }
-
+    void UpdateCSS() {
+      TriggerCSS();
+    }
   
 public:
     // ElementSlate(const std::string & name, Element * in_parent=nullptr)
@@ -65,6 +68,7 @@ public:
     ~ElementSlate() { ; }
     
     virtual bool IsSlate() const { return true; }
+    virtual std::string GetWrapperTag() const { return "div"; }
 
     bool Contains(const std::string & test_name) {
       return element_dict.find(test_name) != element_dict.end();
