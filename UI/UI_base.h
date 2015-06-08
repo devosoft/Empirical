@@ -26,12 +26,10 @@ namespace UI {
     protected: 
       std::string div_id;  // ID used for the div surrounding this element.
       std::string obj_ext; // Extension for internal object if eeds own id: div_id + '__but'
-      int width;
-      int height;
       
       CSS_Class css_info;
       
-      Widget_base() : width(-1), height(-1) { ; }
+      Widget_base() { ; }
 
     public:
       const std::string & GetDivID() const { return div_id; }      
@@ -49,24 +47,24 @@ namespace UI {
         Widget_base::div_id = (in_name == "") ? CalcNextID() : in_name;
       }
 
-      Widget_wrap & DivID(const std::string & in_name) {
-        Widget_base::div_id = in_name;
-        return *this;
+      std::string CSS(const std::string & setting) {
+        return Widget_base::css_info.Get(setting);
       }
-      Widget_wrap & Width(int w) { Widget_base::width = w; return *this; }
-      Widget_wrap & Height(int h) { Widget_base::height = h; return *this; }
-      Widget_wrap & Size(int w, int h) {
-        Widget_base::width = w;
-        Widget_base::height = h;
-        return *this;
-      }
-      
+
       template <typename SETTING_TYPE>
       Widget_wrap & CSS(const std::string & setting, SETTING_TYPE && value) {
         Widget_base::css_info.Set(setting, value);
         return *this;
       }
 
+      Widget_wrap & ID(const std::string & in_id) {
+        Widget_base::div_id = in_id;
+        return *this;
+      }
+      Widget_wrap & Width(int w) { return CSS("width", emp::to_string(w, "px") ); }
+      Widget_wrap & Height(int h) { return CSS("height", emp::to_string(h, "px") ); }
+      Widget_wrap & Size(int w, int h) { Width(w); Height(h); return *this; }
+      
       Widget_wrap & Background(const std::string & v) { return CSS("background-color", v); }
       Widget_wrap & Color(const std::string & v) { return CSS("color", v); }
       Widget_wrap & Opacity(double v) { return CSS("opacity", v); }

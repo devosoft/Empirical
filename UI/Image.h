@@ -28,12 +28,6 @@ namespace UI {
         os << "<img src=\"" << url << "\""
            << " alt=\"" << alt_text << "\""
            << " id=\"" << div_id << obj_ext << "\"";
-        if (width > 0 || height > 0) {
-          os << " style=\"";
-          if (width > 0) os << "width:" << width << "px;";
-          if (height > 0) os << "height:" << height << "px;";
-          os << "\"";
-        }
         os << ">";
       }
 

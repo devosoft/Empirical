@@ -38,13 +38,9 @@ namespace UI {
         if (title != "") {                          // If the button has a title, add it!
           os << " title=\"" << title << "\"";
         }
-        if (width > 0 || height > 0) {              // If the button has a style, add it!
-          os << " style=\"";
-          if (width > 0) os << "width:" << width << "px;";
-          if (height > 0) os << "height:" << height << "px;";
-          os << "\"";
-        }
-        
+
+        if (disabled) { os << " disabled=true"; }
+
         // Indicate ID.
         os << " id=\"" << div_id << obj_ext << "\"";
 
@@ -75,6 +71,8 @@ namespace UI {
       Button & Autofocus(bool in_af) { autofocus = in_af; return (Button &) *this; }
       Button & Disabled(bool in_dis) { disabled = in_dis; return (Button &) *this; }
       Button & Title(const std::string & t) { title = t; return (Button &) *this; }
+
+      bool IsDisabled() const { return disabled; }
     };
 
   };
