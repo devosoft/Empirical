@@ -17,8 +17,8 @@ namespace UI {
     
   public:
     CSS_Class() { ; }
-    CSS_Class(const Class &) = default;
-    CSS_Class & operator=(const Class &) = default;
+    CSS_Class(const CSS_Class &) = default;
+    CSS_Class & operator=(const CSS_Class &) = default;
     
     int GetSize() const { return (int) settings.size(); }
     
@@ -29,9 +29,20 @@ namespace UI {
     
     template <typename SET_TYPE>
     CSS_Class & Set(const std::string & s, SET_TYPE v) { return DoSet(s, emp::to_string(v)); }
+
+    CSS_Class & Insert(CSS_Class & in_css) {
+      settings.insert(in_css.settings.begin(), in_css.settings.end());
+      return *this;
+    }
+
+    const std::string & Get(const std::string setting) {
+      // Note: if setting did not exist, this does create an empty entry.
+      return settings[setting];
+    };
     
     void Apply(const std::string & widget_id) {
       for (auto css_pair : settings) {
+        if (css_pair.second == "") continue; // Ignore empy entries.
         EM_ASM_ARGS({
             var id = Pointer_stringify($0);
             var name = Pointer_stringify($1);
