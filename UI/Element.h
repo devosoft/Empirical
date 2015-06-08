@@ -42,7 +42,7 @@ namespace UI {
     // If an Append doesn't work with the currnet class, forward it to the parent!
     template <typename FORWARD_TYPE>
     Element & AppendParent(FORWARD_TYPE && arg) {
-      emp_assert(parent != nullptr);
+      emp_assert(parent != nullptr && "Trying to forward to parent, but no parent!");
       return parent->Append(std::forward<FORWARD_TYPE>(arg));
     }
 
@@ -132,17 +132,14 @@ namespace UI {
     virtual Element & Append(int in_num) { return Append(emp::to_string(in_num)); }
 
     // Handle special commands
-    virtual Element & Append(emp::UI::Close close) {
-      if (close.levels == 0) return *this;  // Nothing to close!
-
-      // See if we should close this element.
-      if (close.IsGeneral() ||
-          (close.SlateOK() && IsSlate()) ||
-          (close.TextOK() && IsText())) {
-        --close.levels;
+    virtual Element & Append(const emp::UI::Close & close) {
+      // See if this is the element we need to close.
+      if (GetName() == close.GetID()) {
+        emp_assert(parent != nullptr && "Trying to close the outer-most level!");
+        return *parent;
       }
 
-      // Pass the close to the parent!
+      // Otherwise pass the close to the parent!
       return AppendParent(close);
     }
 

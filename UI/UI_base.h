@@ -108,27 +108,14 @@ namespace UI {
     return [fun](){ return emp::to_string(fun()); };
   }
 
-  struct Close {
-    int levels;
-    Close(int l=1) : levels(l) { ; }
+  class Close {
+  private:
+    std::string close_id;
+  public:
+    Close(const std::string & id) : close_id(id) { ; }
+    Close(const internal::Widget_base & w) : close_id(w.GetDivID()) { ; }
 
-    virtual bool IsGeneral() const { return true; }
-    virtual bool SlateOK() const { return true; }
-    virtual bool TextOK() const { return true; }
-  };
-
-  struct CloseSlate : public Close {
-    CloseSlate(int l=1) : Close(l) { ; }
-    virtual bool IsGeneral() const { return false; }
-    virtual bool SlateOK() const { return true; }
-    virtual bool TextOK() const { return false; }
-  };
-
-  struct CloseText : public Close {
-    CloseText(int l=1) : Close(l) { ; }
-    virtual bool IsGeneral() const { return false; }
-    virtual bool SlateOK() const { return false; }
-    virtual bool TextOK() const { return true; }
+    const std::string & GetID() const { return close_id; }
   };
 
 };
