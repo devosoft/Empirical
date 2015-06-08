@@ -131,6 +131,21 @@ namespace UI {
     virtual Element & Append(double in_num) { return Append(emp::to_string(in_num)); }
     virtual Element & Append(int in_num) { return Append(emp::to_string(in_num)); }
 
+    // Handle special commands
+    virtual Element & Append(emp::UI::Close close) {
+      if (close.levels == 0) return *this;  // Nothing to close!
+
+      // See if we should close this element.
+      if (close.IsGeneral() ||
+          (close.SlateOK() && IsSlate()) ||
+          (close.TextOK() && IsText())) {
+        --close.levels;
+      }
+
+      // Pass the close to the parent!
+      return AppendParent(close);
+    }
+
 
     // Setup << operator to redirect to Append.
     template <typename IN_TYPE>

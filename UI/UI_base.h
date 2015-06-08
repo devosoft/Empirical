@@ -108,6 +108,29 @@ namespace UI {
     return [fun](){ return emp::to_string(fun()); };
   }
 
+  struct Close {
+    int levels;
+    Close(int l=1) : levels(l) { ; }
+
+    virtual bool IsGeneral() const { return true; }
+    virtual bool SlateOK() const { return true; }
+    virtual bool TextOK() const { return true; }
+  };
+
+  struct CloseSlate : public Close {
+    CloseSlate(int l=1) : Close(l) { ; }
+    virtual bool IsGeneral() const { return false; }
+    virtual bool SlateOK() const { return true; }
+    virtual bool TextOK() const { return false; }
+  };
+
+  struct CloseText : public Close {
+    CloseText(int l=1) : Close(l) { ; }
+    virtual bool IsGeneral() const { return false; }
+    virtual bool SlateOK() const { return false; }
+    virtual bool TextOK() const { return true; }
+  };
+
 };
 };
 
