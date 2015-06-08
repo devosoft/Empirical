@@ -28,7 +28,9 @@ namespace UI {
     }
     
     template <typename SET_TYPE>
-    CSS_Class & Set(const std::string & s, SET_TYPE v) { return DoSet(s, emp::to_string(v)); }
+    CSS_Class & Set(const std::string & s, SET_TYPE v) {
+      return DoSet(s, emp::to_string(v));
+    }
 
     CSS_Class & Insert(CSS_Class & in_css) {
       settings.insert(in_css.settings.begin(), in_css.settings.end());

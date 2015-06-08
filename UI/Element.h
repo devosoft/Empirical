@@ -21,6 +21,7 @@
 #include "Image.h"
 #include "Table.h"
 #include "Text.h"
+#include "Slate.h"
 
 namespace emp {
 namespace UI {
@@ -67,6 +68,7 @@ namespace UI {
 
     // Functions to access current state
     virtual bool IsText() const { return false; }
+    virtual bool IsSlate() const { return false; }
 
     const std::string & GetName() const { return name; }
     Element * GetParent() { return parent; }
@@ -121,6 +123,7 @@ namespace UI {
     virtual Element & Append(emp::UI::Image info) { return AppendParent(info); }
     virtual Element & Append(emp::UI::Table info) { return AppendParent(info); }
     virtual Element & Append(emp::UI::Text info) { return AppendParent(info); }
+    virtual Element & Append(emp::UI::Slate info) { return AppendParent(info); }
 
     // Convert arbitrary inputs to a string and try again!
     virtual Element & Append(char in_char) { return Append(emp::to_string(in_char)); }

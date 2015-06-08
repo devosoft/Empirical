@@ -25,7 +25,7 @@ namespace UI {
   using ElementImage = emp::UI::ElementWrapper<emp::UI::Image>;
   using ElementTable = emp::UI::ElementWrapper<emp::UI::Table>;
 
-  class ElementSlate : public Element {
+  class ElementSlate : public Element, public Slate {
   protected:
     std::map<std::string, Element *> element_dict;  // By-name lookup for elements.
 
@@ -58,10 +58,14 @@ namespace UI {
 
   
 public:
-    ElementSlate(const std::string & name, Element * in_parent=nullptr)
-      : Element(name, in_parent) { ; }
+    // ElementSlate(const std::string & name, Element * in_parent=nullptr)
+    //   : Element(name, in_parent) { ; }
+    ElementSlate(const Slate & in_slate, Element * in_parent=nullptr)
+      : Element(in_slate.GetDivID(), in_parent), emp::UI::Slate(in_slate) { ; }
     ~ElementSlate() { ; }
     
+    virtual bool IsSlate() const { return true; }
+
     bool Contains(const std::string & test_name) {
       return element_dict.find(test_name) != element_dict.end();
     }
@@ -113,6 +117,11 @@ public:
     }
     Element & Append(emp::UI::Image info) {
       ElementImage * new_child = new ElementImage(info, this);
+      children.push_back(new_child);
+      return *new_child;
+    }
+    Element & Append(emp::UI::Slate info) {
+      ElementSlate * new_child = new ElementSlate(info, this);
       children.push_back(new_child);
       return *new_child;
     }
