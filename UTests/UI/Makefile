@@ -13,13 +13,16 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 
 
 default: all
-all: events.js ElementSlate.js
+all: events.js ElementSlate.js Example.js
 
 events.js: events.cc
 	$(CXX_web) $(CFLAGS_web) events.cc -o events.js
 
 ElementSlate.js: ElementSlate.cc
 	$(CXX_web) $(CFLAGS_web) ElementSlate.cc -o ElementSlate.js
+
+Example.js: Example.cc
+	$(CXX_web) $(CFLAGS_web) Example.cc -o Example.js
 
 # test3.js: test3.cc
 # 	$(CXX_web) $(CFLAGS_web) test3.cc -o test3.js
@@ -28,7 +31,7 @@ ElementSlate.js: ElementSlate.cc
 # 	$(CXX_web) $(CFLAGS_web) test4.cc -o test4.js
 
 clean:
-	rm -f events.js ElementSlate.js test?.js *.js.map *~ source/*.o source/*/*.o
+	rm -f events.js ElementSlate.js Example.js test?.js *.js.map *~ source/*.o source/*/*.o
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
