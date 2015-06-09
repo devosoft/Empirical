@@ -6,6 +6,7 @@
 //  This file contains a set of simple functions to manipulate strings.
 //
 
+#include <initializer_list>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -120,6 +121,27 @@ namespace emp {
 
   bool is_alphanumeric(char test_char) {
     return is_letter(test_char) || is_digit(test_char);
+  }
+
+  // A string is valid if each character passes the supplied function.
+  bool is_valid(const std::string & test_str, std::function<bool(char)> in_fun) {
+    for (char x : test_str) { if (in_fun(x) == false) return false; }
+    return true;
+  }
+
+  // A character is valid if it passes any of the test functions provided.
+  bool is_valid(char test_char, std::initializer_list<std::function<bool(char)> > funs) {
+    for (auto cur_fun : funs) { if (cur_fun(test_char)) return true; }
+    return false;
+  }
+
+  // A string is valid as long as each character passes at least one provided function.
+  bool is_valid(const std::string & test_str,
+                std::initializer_list<std::function<bool(char)> > funs) {
+    for (char x : test_str) {
+      if (is_valid(x, funs) == false) return false;
+    }
+    return true;
   }
 
   // Pop a segment from the beginning of a string as another string, shortening original.
