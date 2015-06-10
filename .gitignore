@@ -4,3 +4,14 @@ a.out.dSYM
 a.out.js
 *.map
 *.o
+UTests/UI/Example.js
+UTests/emtools/JSWrap.js
+incoming/
+tmp/
+utils/edit_dist/IO/
+utils/edit_dist/edit_dist
+utils/edit_dist/tmp.py
+utils/graphs/downloads/
+utils/graphs/for_web/
+utils/graphs/history/
+utils/graphs/upload/
