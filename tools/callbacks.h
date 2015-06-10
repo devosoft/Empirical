@@ -14,8 +14,6 @@
 //
 //  emp::MethodCallback - Allows for an object and a method on that object to be passed in.
 //
-//  emp::EventInfo - Describes standard mouse and keyboard input to pass through a callback.
-//
 //  emp::MethodCallback_Event - Triggers a method that takes EventInfo as its argument.
 //
 
@@ -89,10 +87,8 @@ namespace emp {
   };
   
   
-  // Generic interface callback information...
-  class EventInfo {
-  public:
-    // Mouse:
+  struct EventInfo {
+    // Mouse / Touch:
     int layer_x;      // Coordinates of mouse in this layer.
     int layer_y;
     int button;       // Which button was pressed?
@@ -108,7 +104,7 @@ namespace emp {
       : layer_x(lx), layer_y(ly), button(but), key_code(key)
       , alt_key(alt), ctrl_key(ctrl), meta_key(meta), shift_key(shift) { ; }
   };
-  
+
   
   template <class T> class MethodCallback_Event : public Callback {
   private:

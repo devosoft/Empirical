@@ -24,8 +24,8 @@ namespace UI {
     DynamicStringSet strings;
 
     void UpdateHTML() {
-      HTML.str("");        // Clear the current text.
-      HTML << strings;  // Save the current value of the strings.
+      HTML.str("");       // Clear the current text.
+      HTML << strings;    // Save the current value of the strings.
     }
     void UpdateCSS() {
       TriggerCSS();

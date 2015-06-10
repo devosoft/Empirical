@@ -81,7 +81,6 @@ namespace emp {
     }
   }
 
-  /*
   template <size_t BITS>
   constexpr std::bitset<BITS> mask_bit(unsigned int id) {
     return (std::bitset<BITS>(1)) << id;

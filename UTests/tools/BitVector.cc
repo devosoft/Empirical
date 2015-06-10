@@ -44,6 +44,7 @@ int main(int argc, char* argv[])
       if (i < 10) std::cout << ' ';
       std::cout << i << " : " << shift_vector
                 << " : " << shift_vector.CountOnes()
+                << " (" << (i <= 71) << ")"
                 << std::endl;
     }
 
