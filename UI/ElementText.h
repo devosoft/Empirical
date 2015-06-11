@@ -42,16 +42,16 @@ namespace UI {
     ElementText(const ElementText &) = delete;
     ElementText & operator=(const ElementText &) = delete;
 
-    virtual bool IsText() const { return true; }
+    virtual bool IsText() const override { return true; }
 
     void ClearText() { strings.Clear(); }
 
-    Element & Append(const std::string & in_text) {
+    Element & Append(const std::string & in_text) override {
       strings.Append(in_text);
       return *this;
     }
 
-    Element & Append(const std::function<std::string()> & in_fun) {
+    Element & Append(const std::function<std::string()> & in_fun) override {
       strings.Append(in_fun);
       return *this;
     }
