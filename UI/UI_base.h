@@ -28,6 +28,13 @@ namespace UI {
       std::string obj_ext; // Extension for internal object if eeds own id: div_id + '__but'
       
       CSS_Class css_info;
+
+      // Function to override if a widget wants to be able to redirect CSS calls.
+      template <typename SETTING_TYPE>      
+      bool RedirectCSS(const std::string & setting, SETTING_TYPE && value) {
+        (void) setting; (void) value;
+        return false;
+      }
       
       Widget_base() { ; }
 
@@ -53,7 +60,9 @@ namespace UI {
 
       template <typename SETTING_TYPE>
       Widget_wrap & CSS(const std::string & setting, SETTING_TYPE && value) {
-        Widget_base::css_info.Set(setting, value);
+        if (this->RedirectCSS(setting, std::forward<SETTING_TYPE>(value)) == false) {
+          Widget_base::css_info.Set(setting, value);
+        }
         return *this;
       }
 

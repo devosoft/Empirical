@@ -33,8 +33,8 @@ namespace UI {
       friend TableRow_detail;
     protected:
       int pos_id;   // Where is the Control Cell for this data field?
-      int cols;     // How many columns wide is this TableData?
-      int rows;     // How many rows deep is this TableData?
+      int colspan;  // How many columns wide is this TableData?
+      int rowspan;  // How many rows deep is this TableData?
       bool header;  // Is this TableData a header (<th> vs <td>)?
 
       void WriteHTML(std::ostream & os) {
@@ -134,22 +134,65 @@ namespace UI {
       Table & Cols(int c) { col_count = c; return (Table &) *this; }
       Table & Rows(int r) { row_count = r; return (Table &) *this; }
       
-      // Apply to target row.
-      template <typename SETTING_TYPE>
-      Table & CSS(int row_id, const std::string & setting, SETTING_TYPE && value) {
-        emp_assert(row_id >= 0 && row_id < row_count);
-        rows[row_id].CSS(setting, value);
+      Table & GetCell(int r, int c) {
+        cur_row = r; cur_col = c;
+        state = CELL;
         return (Table &) *this;
       }
+      Table & GetRow(int r) {
+        cur_row = r; cur_col = 0;
+        state = ROW;
+        return (Table &) *this;
+      }
+      Table & GetTable() {
+        // Leave row and col where they are.
+        state = TABLE;
+        return (Table &) *this;
+      }
+
+      // Apply to appropriate component based on current state.
+      template <typename SETTING_TYPE>
+      Table & CSS(const std::string & setting, SETTING_TYPE && value) {
+        CSS(setting, value);
+        return (Table &) *this;
+      }
+
+      // Function to override if a widget wants to be able to redirect CSS calls.
+      template <typename SETTING_TYPE>      
+      bool RedirectCSS(const std::string & setting, SETTING_TYPE && value) {
+        emp::Alert("Testing!");
+        switch (state) {
+        case TABLE:
+          css_info.Set(setting, value);
+          break;
+        case ROW:
+          rows[cur_row].CSS(setting, value);
+          break;
+        case CELL:
+          rows[cur_row].data[cur_col].CSS(setting, value);
+          break;
+        };
+
+        return true;
+      }
+      
+
+      // // Apply to target row.
+      // template <typename SETTING_TYPE>
+      // Table & CSS(int row_id, const std::string & setting, SETTING_TYPE && value) {
+      //   emp_assert(row_id >= 0 && row_id < row_count);
+      //   rows[row_id].CSS(setting, value);
+      //   return (Table &) *this;
+      // }
         
-      // Apply to target cell.
-      template <typename SETTING_TYPE>
-      Table & CSS(int row_id, int col_id, const std::string & setting, SETTING_TYPE && value) {
-        emp_assert(row_id >= 0 && row_id < row_count);
-        emp_assert(col_id >= 0 && col_id < row_count);
-        rows[row_id].CSS(setting, value);
-        return (Table &) *this;
-      }
+      // // Apply to target cell.
+      // template <typename SETTING_TYPE>
+      // Table & CSS(int row_id, int col_id, const std::string & setting, SETTING_TYPE && value) {
+      //   emp_assert(row_id >= 0 && row_id < row_count);
+      //   emp_assert(col_id >= 0 && col_id < row_count);
+      //   rows[row_id].CSS(setting, value);
+      //   return (Table &) *this;
+      // }
         
 
 
