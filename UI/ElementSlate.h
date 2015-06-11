@@ -15,15 +15,16 @@
 #include "../tools/alert.h"
 
 #include "Element.h"
+#include "ElementTable.h"
 #include "ElementText.h"
 #include "ElementWrapper.h"
 
 namespace emp {
 namespace UI {
 
+  // Elements that do not override Append() can be generated on the fly from their widgets.
   using ElementButton = emp::UI::ElementWrapper<emp::UI::Button>;
   using ElementImage = emp::UI::ElementWrapper<emp::UI::Image>;
-  using ElementTable = emp::UI::ElementWrapper<emp::UI::Table>;
 
   class ElementSlate : public Element, public Slate {
   protected:

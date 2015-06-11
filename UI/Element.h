@@ -67,8 +67,9 @@ namespace UI {
     Element & operator=(const Element &) = delete;
 
     // Functions to access current state
-    virtual bool IsText() const { return false; }
     virtual bool IsSlate() const { return false; }
+    virtual bool IsTable() const { return false; }
+    virtual bool IsText() const { return false; }
     virtual std::string GetWrapperTag() const { return "span"; }
 
     const std::string & GetName() const { return name; }
