@@ -136,13 +136,22 @@ namespace UI {
       int GetCurRow() const { return cur_row; }
       int GetCurCol() const { return cur_col; }
 
-      bool InTableState() const { return state == TABLE; }
-      bool InRowState() const { return state == ROW; }
-      bool InCellState() const { return state == CELL; }
+      bool InStateTable() const { return state == TABLE; }
+      bool InStateRow() const { return state == ROW; }
+      bool InStateCell() const { return state == CELL; }
 
 
-      Table & Cols(int c) { col_count = c; return (Table &) *this; }
-      Table & Rows(int r) { row_count = r; return (Table &) *this; }
+      Table & Rows(int r) {
+        rows.resize(r);                                                 // Resize rows.
+        for (int i = row_count; i < r; i++) rows[i].SetCols(col_count); // Initialize new rows.
+        row_count = r;                                                  // Store new size.
+        return (Table &) *this;
+      }
+      Table & Cols(int c) {
+        col_count = c;                                    // Store new size.
+        for (auto & row : rows) row.SetCols(col_count);   // Make sure all rows have new col_count
+        return (Table &) *this;
+      }
       
       Table & GetCell(int r, int c) {
         cur_row = r; cur_col = c;
