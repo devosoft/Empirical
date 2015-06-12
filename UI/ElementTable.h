@@ -76,6 +76,12 @@ namespace UI {
 
     virtual bool IsTable() const override { return true; }
 
+    // Mask some "Get" methods to facilitate appending (have them return ElementTable type)
+    ElementTable & GetCell(int r, int c) {  Table::GetCell(r,c);  return (ElementTable &) *this; }
+    ElementTable & GetRow(int r) { Table::GetRow(r);  return (ElementTable &) *this; }
+    ElementTable & GetTable() { Table::GetTable(); return (ElementTable &) *this; }
+    
+
     // When appending children to a table, forward to an internal slate.
     Element & Append(const std::string & in_text) { return GetCurSlate().Append(in_text); }
     Element & Append(const std::function<std::string()> & fun) { return GetCurSlate().Append(fun); }
