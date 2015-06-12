@@ -39,6 +39,11 @@ namespace UI {
     virtual void UpdateHTML() { ; }
     virtual void UpdateCSS() { ; }
 
+    bool HasChild(Element * test_child) {
+      for (Element * c : children) if (c == test_child) return true;
+      return false;
+    }
+
     // If an Append doesn't work with the currnet class, forward it to the parent!
     template <typename FORWARD_TYPE>
     Element & AppendParent(FORWARD_TYPE && arg) {
@@ -193,6 +198,38 @@ namespace UI {
       std::stringstream ss;
       PrintHTML(ss);
       emp::Alert(ss.str());
+    }
+
+
+    // Make sure everything about this element is consistent and logical.
+    // ss will include any warnings (conserns, but potentially ok) or errors (serious problems)
+    // found.  If verbose is set to true, will also include many additional comments.
+
+    virtual bool OK(std::stringstream & ss, bool verbose=false, int depth=0) {
+      bool ok = true;
+      std::string tab;
+      for (int i = 0; i < depth; i++) tab += " ";  // @CAO Constructor fails!:  ('-', depth);
+
+      if (verbose) {
+        ss << tab << "Scanning: emp::Element with name = '" << name << "'" << std::endl;
+      }
+
+      if (parent != nullptr && parent->HasChild(this) == false) {
+        ss << tab << "ERROR: this element not listed as child of it's parent!" << std::endl;
+        ok = false;
+      }
+
+      // Make sure all children are ok (they will report their own errors!
+      for (int i = 0; i < (int) children.size(); i++) {
+        auto & child = children[i];
+        if (child == nullptr) {
+          ss << tab << "ERROR: Child element " << i << " has value 'nullptr'" << std::endl;
+          ok = false;
+        }
+        else if (!child->OK(ss,verbose,depth+2)) ok = false;
+      }
+
+      return ok;
     }
   };
 
