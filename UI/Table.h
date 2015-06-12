@@ -194,6 +194,57 @@ namespace UI {
         return true;
       }
       
+      // Allow the row and column span of the current cell to be adjusted.
+      Table & SetColSpan(int new_span) {
+        emp_assert((cur_col + new_span <= GetNumCols()) && "Col span too wide for table!");
+        
+        auto & datum = rows[cur_row].data[cur_col];
+        const int old_span = datum.GetColSpan();
+        const int row_span = datum.GetRowSpan();
+        datum.SetColSpan(new_span);
+        
+        // For each row, make sure new columns are masked!
+        for (int row = cur_row; row < cur_row + row_span; row++) {
+          for (int col = cur_col + old_span; col < cur_col + new_span; col++) {
+            rows[row].data[col].SetMasked(true);
+          }
+        }
+        
+        // For each row, make sure former columns are unmasked!
+        for (int row = cur_row; row < cur_row + row_span; row++) {
+          for (int col = cur_col + new_span; col < cur_col + old_span; col++) {
+            rows[row].data[col].SetMasked(false);
+          }
+        }
+        
+        return (Table &) *this;
+      }
+      
+      Table & SetRowSpan(int new_span) {
+        emp_assert((cur_row + new_span <= GetNumRows()) && "Row span too wide for table!");
+        
+        auto & datum = rows[cur_row].data[cur_col];
+        const int old_span = datum.GetRowSpan();
+        const int col_span = datum.GetColSpan();
+        datum.SetRowSpan(new_span);
+        
+        // For each col, make sure NEW rows are masked!
+        for (int row = cur_row + old_span; row < cur_row + new_span; row++) {
+          for (int col = cur_col; col < cur_col + col_span; col++) {
+            rows[row].data[col].SetMasked(true);
+          }
+        }
+        
+        // For each row, make sure former columns are unmasked!
+        for (int row = cur_row + new_span; row < cur_row + old_span; row++) {
+          for (int col = cur_col; col < cur_col + col_span; col++) {
+            rows[row].data[col].SetMasked(false);
+          }
+        }
+        
+        return (Table &) *this;
+      }
+    
 
       // Apply to target row.
       template <typename SETTING_TYPE>

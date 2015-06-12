@@ -31,13 +31,28 @@ namespace UI {
 
         // Loop through each cell in this row.
         for (auto & datum : row.GetCells()) {
+          // If this cell is masked by another, skip it!
+          if (datum.IsMasked()) continue;
+
+          // Print opening tag.
           HTML << (datum.IsHeader() ? "<th id=" : "<td id=\"")
-               << datum.GetDivID() << datum.GetObjExt() << "\">";
+               << datum.GetDivID() << datum.GetObjExt()
+               << "\"";
+
+          // If this cell spans multiple rows or columns, indicate!
+          if (datum.GetColSpan() > 1) HTML << " colspan=\"" << datum.GetColSpan() << "\"";
+          if (datum.GetRowSpan() > 1) HTML << " rowspan=\"" << datum.GetRowSpan() << "\"";
+          
+          HTML << ">";
+          
+          // If this cell has contents, print them!
           if (datum.GetChildID() >= 0) {
             Element * element = children[datum.GetChildID()];
             const std::string & tag = element->GetWrapperTag();
             HTML << "<" << tag << " id=\"" << element->GetName() << "\"></" << tag << ">\n";
           }
+
+          // Print closing tag.
           HTML << (datum.IsHeader() ? "</th>" : "</td>");
         }
 
@@ -93,6 +108,8 @@ namespace UI {
 
     Element & Append(const emp::UI::GetCell & cell) {
       this->GetCell(cell.row, cell.col);
+      if (cell.row_span > 0) SetRowSpan(cell.row_span);
+      if (cell.col_span > 0) SetColSpan(cell.col_span);
       return *this;
     }
 
@@ -100,6 +117,18 @@ namespace UI {
       this->GetRow(row.row);
       return *this;
     }
+
+    // Allow the row and column span of the current cell to be adjusted.
+    ElementTable & ColSpan(int new_span) {
+      SetColSpan(new_span);
+      return (ElementTable &) *this;
+    }
+
+    ElementTable & RowSpan(int new_span) {
+      SetRowSpan(new_span);
+      return (ElementTable &) *this;
+    }
+    
   };
 
 };

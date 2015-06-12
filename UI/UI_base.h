@@ -129,7 +129,12 @@ namespace UI {
   struct GetCell {
     int row;
     int col;
-    GetCell(int r, int c) : row(r), col(c) { ; }
+    int row_span;  // Stored row & column info to pass on.
+    int col_span;
+
+    GetCell(int r, int c) : row(r), col(c), row_span(0), col_span(0) { ; }
+    GetCell & RowSpan(int rs) { row_span = rs; return *this; }
+    GetCell & ColSpan(int cs) { col_span = cs; return *this; }
   };
 
   struct GetRow {
