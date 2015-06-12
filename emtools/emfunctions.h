@@ -32,6 +32,22 @@ namespace emp {
         window.open = url;
     }, url.c_str());
   }
+
+  // Convert a sequence with possible html codes to appear identically in html.
+  std::string text2html(const std::string & text) {
+    std::stringstream html;
+    for (char x : text) {
+      switch (x) {
+      case '<': html << "&lt;"; break;
+      case '>': html << "&gt;"; break;
+      case '&': html << "&amp;"; break;
+      case ' ': html << "&nbsp;"; break;
+      case '\n': html << "<br>"; break;
+      default: html << x;
+      };
+    }
+    return html.str();
+  }
 };
 
 #endif
