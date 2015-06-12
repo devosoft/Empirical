@@ -40,6 +40,7 @@ namespace UI {
 
     public:
       const std::string & GetDivID() const { return div_id; }      
+      const std::string & GetObjExt() const { return obj_ext; }
     };
     
     // Widget_wrap is a template wrapper to make sure all derived widgets return the
@@ -123,6 +124,17 @@ namespace UI {
     Close(const internal::Widget_base & w) : close_id(w.GetDivID()) { ; }
 
     const std::string & GetID() const { return close_id; }
+  };
+
+  struct GetCell {
+    int row;
+    int col;
+    GetCell(int r, int c) : row(r), col(c) { ; }
+  };
+
+  struct GetRow {
+    int row;
+    GetRow(int r) : row(r) { ; }
   };
 
 };

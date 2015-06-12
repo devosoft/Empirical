@@ -42,8 +42,15 @@ namespace UI {
     // If an Append doesn't work with the currnet class, forward it to the parent!
     template <typename FORWARD_TYPE>
     Element & AppendParent(FORWARD_TYPE && arg) {
-      emp_assert(parent != nullptr && "Trying to forward to parent, but no parent!");
+      emp_assert(parent != nullptr && "Trying to forward append to parent, but no parent!");
       return parent->Append(std::forward<FORWARD_TYPE>(arg));
+    }
+
+    // If the current class can't build the requested element, see if its parent can.
+    template <typename FORWARD_TYPE>
+    Element * ForwardBuild(FORWARD_TYPE && arg, Element * fwd_parent) {
+      emp_assert(parent != nullptr && "Trying to forward build to parent, but no parent!");
+      return parent->BuildElement(std::forward<FORWARD_TYPE>(arg), fwd_parent);
     }
 
   public:
@@ -118,7 +125,6 @@ namespace UI {
 
 
     // By default, elements should forward unknown inputs to their parents.
-
     virtual Element & Append(const std::string & text) { return AppendParent(text); }
     virtual Element & Append(const std::function<std::string()> & fun) { return AppendParent(fun); }
     virtual Element & Append(emp::UI::Button info) { return AppendParent(info); }
@@ -144,10 +150,37 @@ namespace UI {
       return AppendParent(close);
     }
 
+    virtual Element & Append(const emp::UI::GetCell & cell) {
+      // GetCell can only be appended to a table class... see if parent is a table.
+      return AppendParent(cell);
+    }
+
+    virtual Element & Append(const emp::UI::GetRow & row) {
+      // GetCell can only be appended to a table class... see if parent is a table.
+      return AppendParent(row);
+    }
 
     // Setup << operator to redirect to Append.
     template <typename IN_TYPE>
     Element & operator<<(IN_TYPE && in_val) { return Append(std::forward<IN_TYPE>(in_val)); }
+
+
+    // BuildElement allows any element to build another as long as one of its ancestors knows how.
+    virtual Element * BuildElement(emp::UI::Button info, Element * fwd_parent) {
+      return ForwardBuild(info, fwd_parent);
+    }
+    virtual Element * BuildElement(emp::UI::Image info, Element * fwd_parent) {
+      return ForwardBuild(info, fwd_parent);
+    }
+    virtual Element * BuildElement(emp::UI::Table info, Element * fwd_parent) {
+      return ForwardBuild(info, fwd_parent);
+    }
+    virtual Element * BuildElement(emp::UI::Text info, Element * fwd_parent) {
+      return ForwardBuild(info, fwd_parent);
+    }
+    virtual Element * BuildElement(emp::UI::Slate info, Element * fwd_parent) {
+      return ForwardBuild(info, fwd_parent);
+    }
 
 
     // Print out the contents of this element as HTML.

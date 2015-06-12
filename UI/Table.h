@@ -30,27 +30,36 @@ namespace UI {
 
   namespace internal {
     class TableData_detail : public Widget_base {
-      friend TableRow_detail;
+      friend TableRow_detail; friend Table_detail;
     protected:
-      int pos_id;   // Where is the Control Cell for this data field?
       int colspan;  // How many columns wide is this TableData?
       int rowspan;  // How many rows deep is this TableData?
+      int child_id; // Which child element is this cell associated with?
       bool header;  // Is this TableData a header (<th> vs <td>)?
+      bool masked;  // Is this cell masked by another cell?
 
-      void WriteHTML(std::ostream & os) {
-        os << (header ? "<th id=" : "<td id=\"")
-           << div_id << obj_ext << "\">&nbsp;"
-           << (header ? "</th>" : "</td>");
-      }
       void UpdateCSS() {
         std::string obj_id = div_id + obj_ext;
         css_info.Apply(obj_id);
       }
     public:
-      TableData_detail() {
+      TableData_detail() : colspan(1), rowspan(1), child_id(-1), header(false), masked(false) {
         obj_ext = "td";    // Make sure table row has own CSS.
       }
       ~TableData_detail() { ; }
+
+      int GetColSpan() const { return colspan; }
+      int GetRowSpan() const { return rowspan; }
+      int GetChildID() const { return child_id; }
+
+      bool IsHeader() const { return header; }
+      bool IsMasked() const { return masked; }
+
+      void SetColSpan(int cs) { colspan = cs; }
+      void SetRowSpan(int rs) { rowspan = rs; }
+      void SetChildID(int cid) { child_id = cid; }
+      void SetHeader(bool h=true) { header = h; }
+      void SetMasked(bool m=true) { masked = m; }
     };
     
     class TableRow_detail : public Widget_base{
@@ -58,11 +67,6 @@ namespace UI {
     protected:
       std::vector<TableData> data;  // detail object for each cell in this row.
 
-      void WriteHTML(std::ostream & os) {
-        os << "<tr id=\"" << div_id << obj_ext << "\">";
-        for (auto & datum : data) datum.WriteHTML(os);
-        os << "</tr>";
-      }
       void UpdateCSS() {
         std::string obj_id = div_id + obj_ext;
         css_info.Apply(obj_id);
@@ -74,7 +78,7 @@ namespace UI {
       }
       ~TableRow_detail() { ; }
 
-      TableRow & Cols(int c) { data.resize(c); return (TableRow &) *this; }
+      TableRow & SetCols(int c) { data.resize(c); return (TableRow &) *this; }
 
       // Apply to all cells in row.  (@CAO: Can we use fancier jquery here?)
       template <typename SETTING_TYPE>
@@ -89,6 +93,8 @@ namespace UI {
         data[col_id].CSS(setting, value);
         return (TableRow &) *this;
       }
+
+      std::vector<TableData> & GetCells() { return data; }
 
       // NOTE: Regular CSS applied to a TableRow will modify row's own CSS.
     };
@@ -107,30 +113,34 @@ namespace UI {
       enum state_t { TABLE, ROW, CELL };
       state_t state;
 
-      void WriteHTML(std::ostream & os) {
-        os << "<table id=\"" << div_id << obj_ext << "\">";
-        for (auto & row : rows) row.WriteHTML(os);
-        os << "</table>";
-      }
       void UpdateCSS() {
         std::string obj_id = div_id + obj_ext;
         css_info.Apply(obj_id);
         for (auto & row : rows) row.UpdateCSS();
       }
 
-      static bool OverrideCSS() { return true; } // Let tables control their own CSS function.
+      TableData_detail & GetCurCell() { return rows[cur_row].data[cur_col]; }
+
     public:
       Table_detail(int r, int c) : row_count(r), col_count(c), rows(r), state(TABLE) {
-        emp_assert(c > 0 && r > 0);           // Ensure that we have rows and columns!
-        obj_ext = "__t";                      // Make sure table has own CSS.
-        for (auto & row : rows) row.Cols(c);  // Set all rows to correct number of columns.
+        emp_assert(c > 0 && r > 0);              // Ensure that we have rows and columns!
+        obj_ext = "__t";                         // Make sure table has own CSS.
+        for (auto & row : rows) row.SetCols(c);  // Set all rows to correct number of columns.
       }
       ~Table_detail() { ; }
 
       int GetNumCols() const { return col_count; }
       int GetNumRows() const { return row_count; }
       int GetNumCells() const { return col_count*row_count; }
-      
+
+      int GetCurRow() const { return cur_row; }
+      int GetCurCol() const { return cur_col; }
+
+      bool InTableState() const { return state == TABLE; }
+      bool InRowState() const { return state == ROW; }
+      bool InCellState() const { return state == CELL; }
+
+
       Table & Cols(int c) { col_count = c; return (Table &) *this; }
       Table & Rows(int r) { row_count = r; return (Table &) *this; }
       
@@ -160,7 +170,6 @@ namespace UI {
       // Function to override if a widget wants to be able to redirect CSS calls.
       template <typename SETTING_TYPE>      
       bool RedirectCSS(const std::string & setting, SETTING_TYPE && value) {
-        emp::Alert("Testing!");
         switch (state) {
         case TABLE:
           css_info.Set(setting, value);
@@ -177,34 +186,31 @@ namespace UI {
       }
       
 
-      // // Apply to target row.
-      // template <typename SETTING_TYPE>
-      // Table & CSS(int row_id, const std::string & setting, SETTING_TYPE && value) {
-      //   emp_assert(row_id >= 0 && row_id < row_count);
-      //   rows[row_id].CSS(setting, value);
-      //   return (Table &) *this;
-      // }
+      // Apply to target row.
+      template <typename SETTING_TYPE>
+      Table & RowCSS(int row_id, const std::string & setting, SETTING_TYPE && value) {
+        emp_assert(row_id >= 0 && row_id < row_count);
+        rows[row_id].CSS(setting, value);
+        return (Table &) *this;
+      }
+       
+      // Apply to target cell.
+      template <typename SETTING_TYPE>
+      Table & CellCSS(int row_id, int col_id, const std::string & setting, SETTING_TYPE && value) {
+        emp_assert(row_id >= 0 && row_id < row_count);
+        emp_assert(col_id >= 0 && col_id < row_count);
+        rows[row_id].CSS(setting, value);
+        return (Table &) *this;
+      }
         
-      // // Apply to target cell.
-      // template <typename SETTING_TYPE>
-      // Table & CSS(int row_id, int col_id, const std::string & setting, SETTING_TYPE && value) {
-      //   emp_assert(row_id >= 0 && row_id < row_count);
-      //   emp_assert(col_id >= 0 && col_id < row_count);
-      //   rows[row_id].CSS(setting, value);
-      //   return (Table &) *this;
-      // }
-        
-
-
-      // Apply to all rows.  
+      // Apply to all rows.  (@CAO: Should we use fancier jquery here?)
       template <typename SETTING_TYPE>
       Table & RowsCSS(const std::string & setting, SETTING_TYPE && value) {
-        // (@CAO: Can we use fancier jquery here?)
         for (auto & row : rows) row.CSS(setting, value);
         return (Table &) *this;
       }
         
-      // Apply to all rows.  (@CAO: Can we use fancier jquery here?)
+      // Apply to all rows.  (@CAO: Should we use fancier jquery here?)
       template <typename SETTING_TYPE>
       Table & CellsCSS(const std::string & setting, SETTING_TYPE && value) {
         for (auto & row : rows) row.CellsCSS(setting, value);

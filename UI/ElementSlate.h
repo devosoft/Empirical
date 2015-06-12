@@ -141,6 +141,22 @@ public:
       return *new_child;
     }
 
+    Element * BuildElement(emp::UI::Button info, Element * fwd_parent) {
+      return new ElementButton(info, fwd_parent);
+    }
+    Element * BuildElement(emp::UI::Image info, Element * fwd_parent) {
+      return new ElementImage(info, fwd_parent);
+    }
+    Element * BuildElement(emp::UI::Table info, Element * fwd_parent) {
+      return new ElementTable(info, fwd_parent);
+    }
+    Element * BuildElement(emp::UI::Text info, Element * fwd_parent) {
+      return new ElementText(info, fwd_parent);
+    }
+    Element * BuildElement(emp::UI::Slate info, Element * fwd_parent) {
+      return new ElementSlate(info, fwd_parent);
+    }
+      
 
   };
 
