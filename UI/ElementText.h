@@ -56,6 +56,22 @@ namespace UI {
       return *this;
     }
 
+    virtual bool OK(std::stringstream & ss, bool verbose=false, int depth=0) {
+      bool ok = true;
+      std::string tab;
+      for (int i = 0; i < depth; i++) tab += " ";  // @CAO Constructor fails!:  ('-', depth);
+
+      if (verbose) {
+        ss << tab << "Scanning: emp::ElementText with name = '" << name << "'" << std::endl;
+      }
+
+      Element::OK(ss, verbose, depth);  // Check base class; same obj, don't increment depth
+      // @CAO Make sure the Text base class is okay?
+      // @CAO Make sure the DynamicStringSet is okay?
+
+      return ok;
+    }
+
   };
 
 };
