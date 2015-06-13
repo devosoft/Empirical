@@ -73,6 +73,8 @@ namespace UI {
       Button & Title(const std::string & t) { title = t; return (Button &) *this; }
 
       bool IsDisabled() const { return disabled; }
+
+      static std::string TypeName() { return "Button"; }
     };
 
   };

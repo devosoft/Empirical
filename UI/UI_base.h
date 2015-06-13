@@ -41,6 +41,7 @@ namespace UI {
     public:
       const std::string & GetDivID() const { return div_id; }      
       const std::string & GetObjExt() const { return obj_ext; }
+      static std::string TypeName() { return "Widget_base"; }
     };
     
     // Widget_wrap is a template wrapper to make sure all derived widgets return the

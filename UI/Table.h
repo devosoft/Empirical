@@ -60,6 +60,8 @@ namespace UI {
       void SetChildID(int cid) { child_id = cid; }
       void SetHeader(bool h=true) { header = h; }
       void SetMasked(bool m=true) { masked = m; }
+
+      static std::string TypeName() { return "TableData"; }
     };
     
     class TableRow_detail : public Widget_base{
@@ -97,6 +99,8 @@ namespace UI {
       std::vector<TableData> & GetCells() { return data; }
 
       // NOTE: Regular CSS applied to a TableRow will modify row's own CSS.
+
+      static std::string TypeName() { return "TableRow"; }
     };
 
     class Table_detail : public Widget_base {
@@ -277,6 +281,7 @@ namespace UI {
         return (Table &) *this;
       }
 
+      static std::string TypeName() { return "Table"; }
     };
 
   };

@@ -37,6 +37,8 @@ namespace UI {
       
       Image & URL(const std::string & in_url) { url = in_url; return (Image &) *this; }
       Image & Alt(const std::string & in_alt) { alt_text = in_alt; return (Image &) *this; }
+
+      static std::string TypeName() { return "Image"; }
     };
 
   };
