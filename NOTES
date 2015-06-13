@@ -1,4 +1,6 @@
 -= Next Steps =-
+Elements: Finish details on OK() method and extend to widgets.
+Table: Add appropriate resizing and bounding checks throughout
 Incorporate Ben's changes into BitVector/BitSet
 (work on applications of library and see what needs to be fixed/added)
 Setup documentation outside of the code!
@@ -9,14 +11,18 @@ How to dynamically change an include file?
 Have multi-purpose headers with static functions; how can I prevent those specific unused function errors while still getting others that I don't specifically block?
 
 -= Fixes =-
+Make getting of CSS in tables redirect in a similar fashion to setting CSS.
 JSDelete should make sure that we are not deleting a named function (or cleanup JS side too!)
+fix how is_valid() functions are handled in string_utils.h
 
 -= Improvements =-
+Add default CSS for each object type.
 Base document should register where keypresses should be directed.
 Buttons should be able to have a hotkey (or more than one?)
 Slates should have a current location and always "append" at that location, not just at end.
 - Forwarding to a parent should track where the forward came from to update location information.
 BitSet should have a non-emscripten version that uses 64-bits (same as BitVector)
+Setup a disabled_CSS for buttons that they apply when disabled?
 
 -= New Elements =-
 Canvas
