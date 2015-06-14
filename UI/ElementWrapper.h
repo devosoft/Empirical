@@ -32,17 +32,15 @@ namespace UI {
       return *this;
     }
 
-    virtual bool OK(std::stringstream & ss, bool verbose=false, int depth=0) {
+    virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
       bool ok = true;
-      std::string tab;
-      for (int i = 0; i < depth; i++) tab += " ";  // @CAO Constructor fails!:  ('-', depth);
 
       if (verbose) {
-        ss << tab << "Scanning: emp::ElementWrapper<" << BASE_TYPE::TypeName()
+        ss << prefix << "Scanning: emp::ElementWrapper<" << BASE_TYPE::TypeName()
            << "> with name = '" << name << "'" << std::endl;
       }
 
-      Element::OK(ss, verbose, depth);  // Check base class; same obj, don't increment depth
+      Element::OK(ss, verbose, prefix);  // Check base class; same obj, don't change depth
       // @CAO Make sure the base widget class is okay?
 
       return ok;
