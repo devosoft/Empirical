@@ -13,7 +13,7 @@ namespace constant {
   // A compile-time int-log calculator (aka, significant bits)
   template <typename TYPE>
   static constexpr int IntLog2(TYPE x) {
-    return x == 0 ? 0 : IntLog2(x/2) + 1;
+    return x <= 1 ? 0 : IntLog2(x/2) + 1;
   }
 
   // A compile-time bit counter.
