@@ -62,6 +62,21 @@ namespace UI {
       void SetMasked(bool m=true) { masked = m; }
 
       static std::string TypeName() { return "TableData"; }
+
+      virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
+        bool ok = true;
+        if (verbose) {
+          ss << prefix << "Scanning: emp::TableData with child_id = " << child_id << std::endl;
+        }
+
+        if (child_id >= 0 && masked == true) {
+          ss << "Warning: Masked row has contents!" << std::endl;
+          ok = false;
+        }
+
+        return ok;
+      }
+
     };
     
     class TableRow_detail : public Widget_base{
@@ -79,6 +94,8 @@ namespace UI {
         obj_ext = "tr";    // Make sure table row has own CSS.
       }
       ~TableRow_detail() { ; }
+
+      int GetSize() { return (int) data.size(); }
 
       TableRow & SetCols(int c) { data.resize(c); return (TableRow &) *this; }
 
@@ -101,6 +118,17 @@ namespace UI {
       // NOTE: Regular CSS applied to a TableRow will modify row's own CSS.
 
       static std::string TypeName() { return "TableRow"; }
+
+      virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
+        bool ok = true;
+        if (verbose) {
+          ss << prefix << "Scanning: emp::TableRow" << std::endl;
+        }
+
+        for (auto & cell : data) ok = ok && cell.OK(ss, verbose, prefix+"  ");
+
+        return ok;
+      }
     };
 
     class Table_detail : public Widget_base {
@@ -282,6 +310,52 @@ namespace UI {
       }
 
       static std::string TypeName() { return "Table"; }
+
+      virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
+        bool ok = true;
+        if (verbose) {
+          ss << prefix << "Scanning: emp::Table (rows=" << row_count
+             << ", cols=" << col_count << ")." << std::endl;
+        }
+
+        if (row_count != (int) rows.size()) {
+          ss << prefix << "Error: row_count = " << row_count
+             << ", but rows has " << rows.size() << " elements." << std::endl;
+          ok = false;
+        }
+
+        if (row_count < 1) {
+          ss << prefix << "Error: Cannot have " << row_count << " rows in table." << std::endl;
+          ok = false;
+        }
+
+        if (col_count < 1) {
+          ss << prefix << "Error: Cannot have " << col_count << " cols in table." << std::endl;
+          ok = false;
+        }
+
+        if (cur_row < 0 || cur_row >= row_count) {
+          ss << prefix << "Error: cur_row = " << cur_row << "." << std::endl;
+          ok = false;
+        }
+        
+        if (cur_col < 0 || cur_col >= col_count) {
+          ss << prefix << "Error: cur_col = " << cur_col << "." << std::endl;
+          ok = false;
+        }
+
+        for (auto & row : rows) {
+          ok = ok && row.OK(ss, verbose, prefix+"  ");
+          if (col_count != row.GetSize()) {
+            ss << prefix << "  Error: col_count = " << col_count
+               << ", but row has " << row.GetSize() << " elements." << std::endl;
+            ok = false;
+          }
+        }
+
+
+        return ok;
+      }
     };
 
   };

@@ -136,8 +136,8 @@ namespace UI {
         ss << prefix << "Scanning: emp::ElementTable with name = '" << name << "'" << std::endl;
       }
 
-      Element::OK(ss, verbose, prefix);  // Check base class; same obj, don't change prefix
-      // @CAO Make sure the Table base class is okay?
+      Element::OK(ss, verbose, prefix);  // Check base Element class; same obj, don't change prefix
+      Table::OK(ss, verbose, prefix);    // Check base Table class.
 
       return ok;
     }
