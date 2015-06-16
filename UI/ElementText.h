@@ -58,7 +58,6 @@ namespace UI {
 
     virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
       bool ok = true;
-
       if (verbose) {
         ss << prefix << "Scanning: emp::ElementText with name = '" << name << "'" << std::endl;
       }
