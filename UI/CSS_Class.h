@@ -6,6 +6,8 @@
 //  A CSS class tracking font style, etc.
 //
 
+#include "../tools/string_utils.h"
+
 #include <string>
 
 namespace emp {
@@ -45,13 +47,18 @@ namespace UI {
     void Apply(const std::string & widget_id) {
       for (auto css_pair : settings) {
         if (css_pair.second == "") continue; // Ignore empy entries.
+#ifdef EMSCRIPTEN
         EM_ASM_ARGS({
             var id = Pointer_stringify($0);
             var name = Pointer_stringify($1);
             var value = Pointer_stringify($2);
             $( '#' + id ).css( name, value);
           }, widget_id.c_str(), css_pair.first.c_str(), css_pair.second.c_str());
-      };
+#else
+        std::cout << "Setting '" << widget_id << "' attribute '" << css_pair.first
+                  << "' to '" << css_pair.second << "'.";
+#endif
+      }
     }
     
   };
