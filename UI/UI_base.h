@@ -19,70 +19,45 @@ namespace UI {
       return std::string("emp__") + std::to_string(next_id++);
     }
     
-    // Widget_base is a base class containing information needed by all GUI widget classes
-    // (Buttons, Images, etc...).
+    // Widget is a base class containing information needed by all GUI widget classes
+    // (Buttons, Images, etc...).  It take in a return type to be cast to for accessors.
     
-    class Widget_base {
+    template <typename RETURN_TYPE>
+    class Widget {
     protected: 
       std::string div_id;  // ID used for the div surrounding this element.
       std::string obj_ext; // Extension for internal object if eeds own id: div_id + '__but'
       
       CSS_Class css_info;
 
-      // Function to override if a widget wants to be able to redirect CSS calls.
-      template <typename SETTING_TYPE>      
-      bool RedirectCSS(const std::string & setting, SETTING_TYPE && value) {
-        (void) setting; (void) value;
-        return false;
+      Widget(const std::string & in_name="") {
+        div_id = (in_name == "") ? CalcNextID() : in_name;
       }
-      
-      Widget_base() { ; }
 
     public:
       const std::string & GetDivID() const { return div_id; }      
       const std::string & GetObjExt() const { return obj_ext; }
-      static std::string TypeName() { return "Widget_base"; }
-    };
-    
-    // Widget_wrap is a template wrapper to make sure all derived widgets return the
-    // correct types when setting values.
-    
-    template <typename DETAIL_TYPE, typename... ARG_TYPES>
-    class Widget_wrap : public DETAIL_TYPE {
-    public:
-      Widget_wrap(ARG_TYPES... args, const std::string & in_name="") : DETAIL_TYPE(args...)
-      {
-        // Setup the div_id to a non-empty and unique default if not specified.
-        Widget_base::div_id = (in_name == "") ? CalcNextID() : in_name;
-      }
+      static std::string TypeName() { return "Widget"; }
 
-      std::string CSS(const std::string & setting) {
-        return Widget_base::css_info.Get(setting);
-      }
-
+      std::string CSS(const std::string & setting) { return css_info.Get(setting); }
       template <typename SETTING_TYPE>
-      Widget_wrap & CSS(const std::string & setting, SETTING_TYPE && value) {
-        if (this->RedirectCSS(setting, std::forward<SETTING_TYPE>(value)) == false) {
-          Widget_base::css_info.Set(setting, value);
-        }
-        return *this;
+      RETURN_TYPE & CSS(const std::string & setting, SETTING_TYPE && value) {
+        css_info.Set(setting, value);
+        return (RETURN_TYPE &) *this;
       }
+      RETURN_TYPE & ID(const std::string & in_id) { div_id = in_id; return (RETURN_TYPE &) *this; }
 
-      Widget_wrap & ID(const std::string & in_id) {
-        Widget_base::div_id = in_id;
-        return *this;
-      }
-      Widget_wrap & Width(int w) { return CSS("width", emp::to_string(w, "px") ); }
-      Widget_wrap & Height(int h) { return CSS("height", emp::to_string(h, "px") ); }
-      Widget_wrap & Size(int w, int h) { Width(w); Height(h); return *this; }
+      RETURN_TYPE & Width(int w) { return CSS("width", emp::to_string(w, "px") ); }
+      RETURN_TYPE & Height(int h) { return CSS("height", emp::to_string(h, "px") ); }
+      RETURN_TYPE & Size(int w, int h) { Width(w); Height(h); return *this; }
       
-      Widget_wrap & Background(const std::string & v) { return CSS("background-color", v); }
-      Widget_wrap & Color(const std::string & v) { return CSS("color", v); }
-      Widget_wrap & Opacity(double v) { return CSS("opacity", v); }
-
+      RETURN_TYPE & Background(const std::string & v) { return CSS("background-color", v); }
+      RETURN_TYPE & Color(const std::string & v) { return CSS("color", v); }
+      RETURN_TYPE & Opacity(double v) { return CSS("opacity", v); }
+      
       void TriggerCSS() {
-        std::string obj_id = Widget_base::div_id + Widget_base::obj_ext;
-        Widget_base::css_info.Apply(obj_id);
+        std::string obj_id = div_id + obj_ext;
+        css_info.Apply(obj_id);
       }
     };
     
@@ -122,7 +97,6 @@ namespace UI {
     std::string close_id;
   public:
     Close(const std::string & id) : close_id(id) { ; }
-    Close(const internal::Widget_base & w) : close_id(w.GetDivID()) { ; }
 
     const std::string & GetID() const { return close_id; }
   };

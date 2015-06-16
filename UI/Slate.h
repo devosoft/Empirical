@@ -13,19 +13,10 @@
 namespace emp {
 namespace UI {
 
-  // Forward-declare the internal Slate_detail class
-  namespace internal { class Slate_detail; };
-
-  // Specify the Slate class for use in return values in the Slate_detail definitions below.
-  using Slate = internal::Widget_wrap<internal::Slate_detail>;
-  
-  // Define Slate_detail in internal namespace (i.e., details should not be accessed directly.)
-  namespace internal {
-    class Slate_detail : public Widget_base {
-    public:
-      Slate_detail() { ; }
-      ~Slate_detail() { ; }
-    };
+  class Slate : public internal::Widget<Slate> {
+  public:
+    Slate(const std::string & in_name) : Widget(in_name) { ; }
+    ~Slate() { ; }
   };
 
 };

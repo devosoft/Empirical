@@ -6,6 +6,10 @@
 //  A CSS class tracking font style, etc.
 //
 
+#ifdef EMSCRIPTEN
+#include <emscripten.h>
+#endif
+
 #include "../tools/string_utils.h"
 
 #include <string>
