@@ -34,9 +34,7 @@ namespace UI {
     ElementText & GetTextElement() {
       // If the final element is not text, add one.
       if (children.size() == 0 || children.back()->IsText() == false)  {
-        // std::string new_name = name + std::string("__") + std::to_string(children.size());
-        std::string new_name = internal::CalcNextID();
-        Element * new_child = new ElementText(new_name, this);
+        Element * new_child = new ElementText(UI::Text(), this);
         children.push_back(new_child);
       }
       return *((ElementText *) children.back());
@@ -62,8 +60,6 @@ namespace UI {
     }
   
 public:
-    // ElementSlate(const std::string & name, Element * in_parent=nullptr)
-    //   : Element(name, in_parent) { ; }
     ElementSlate(const Slate & in_slate, Element * in_parent=nullptr)
       : Element(in_slate.GetDivID(), in_parent), emp::UI::Slate(in_slate) { ; }
     ~ElementSlate() { ; }
@@ -166,7 +162,6 @@ public:
 
       Element::OK(ss, verbose, prefix);  // Check base class; same obj, don't change prefix
 
-      // @CAO Make sure the Slate base class is okay?
       // @CAO Make sure the element_dict is okay?
 
       return ok;

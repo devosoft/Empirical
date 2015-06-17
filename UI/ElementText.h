@@ -32,8 +32,6 @@ namespace UI {
     }
 
   public:
-    // ElementText(const std::string & in_name, Element * in_parent)
-    //   : Element(in_name, in_parent) { ; }
     ElementText(const Text & in_text, Element * in_parent)
       : Element(in_text.GetDivID(), in_parent), Text(in_text) { ; }
     ~ElementText() { ; }
@@ -63,7 +61,6 @@ namespace UI {
       }
 
       Element::OK(ss, verbose, prefix);  // Check base class; same obj, don't change prefix
-      // @CAO Make sure the Text base class is okay?
       // @CAO Make sure the DynamicStringSet is okay?
 
       return ok;

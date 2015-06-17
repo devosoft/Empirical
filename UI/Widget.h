@@ -27,8 +27,11 @@ namespace UI {
       
       CSS_Class css_info;
 
-      Widget(const std::string & in_name="") {
-        div_id = (in_name == "") ? CalcNextID() : in_name;
+      Widget(const std::string & in_name="") : div_id(in_name) {
+        if (div_id == "") {
+          static int next_id = 0;
+          div_id = emp::to_string("emp__", next_id++);
+        }
       }
 
     public:
