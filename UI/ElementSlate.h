@@ -42,6 +42,9 @@ namespace UI {
     
     void Register(Element * in_element) {
       // Make sure name is not already used
+      if (element_dict.find(in_element->GetName()) != element_dict.end()) {
+        emp::Alert(in_element->GetType(), " called ", in_element->GetName());
+      }
       emp_assert(element_dict.find(in_element->GetName()) == element_dict.end()); 
 
       element_dict[in_element->GetName()] = in_element;  // Save element name
@@ -153,6 +156,10 @@ public:
       return new ElementSlate(info, fwd_parent);
     }
       
+    virtual std::string GetType() {
+      return "ElementSlate";
+    }
+
     virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
       bool ok = true;
 

@@ -32,6 +32,10 @@ namespace UI {
       return *this;
     }
 
+    virtual std::string GetType() {
+      return std::string("Element") + BASE_TYPE::TypeName();
+    }
+
     virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
       bool ok = true;
 

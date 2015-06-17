@@ -129,6 +129,10 @@ namespace UI {
       return (ElementTable &) *this;
     }
     
+    virtual std::string GetType() {
+      return "ElementTable";
+    }
+
     virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
       bool ok = true;
 

@@ -200,6 +200,8 @@ namespace UI {
       emp::Alert(ss.str());
     }
 
+    
+    virtual std::string GetType() = 0;
 
     // Make sure everything about this element is consistent and logical.
     // ss will include any warnings (conserns, but potentially ok) or errors (serious problems)
