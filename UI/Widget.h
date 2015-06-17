@@ -25,7 +25,7 @@ namespace UI {
       std::string div_id;  // ID used for the div surrounding this element.
       std::string obj_ext; // Extension for internal object if eeds own id: div_id + '__but'
       
-      Style css_info;
+      UI::Style style;
 
       Widget(const std::string & in_name="") : div_id(in_name) {
         if (div_id == "") {
@@ -39,10 +39,10 @@ namespace UI {
       const std::string & GetObjExt() const { return obj_ext; }
       static std::string TypeName() { return "Widget"; }
 
-      std::string CSS(const std::string & setting) { return css_info.Get(setting); }
+      std::string CSS(const std::string & setting) { return style.Get(setting); }
       template <typename SETTING_TYPE>
       RETURN_TYPE & CSS(const std::string & setting, SETTING_TYPE && value) {
-        css_info.Set(setting, value);
+        style.Set(setting, value);
         return (RETURN_TYPE &) *this;
       }
       RETURN_TYPE & ID(const std::string & in_id) { div_id = in_id; return (RETURN_TYPE &) *this; }
@@ -57,7 +57,7 @@ namespace UI {
       
       void TriggerCSS() {
         std::string obj_id = div_id + obj_ext;
-        css_info.Apply(obj_id);
+        style.Apply(obj_id);
       }
     };
     

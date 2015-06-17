@@ -34,7 +34,7 @@ namespace UI {
 
     void UpdateCSS() {
       std::string obj_id = div_id + obj_ext;
-      css_info.Apply(obj_id);
+      style.Apply(obj_id);
     }
   public:
     TableData() : colspan(1), rowspan(1), child_id(-1), header(false), masked(false) {
@@ -80,7 +80,7 @@ namespace UI {
 
     void UpdateCSS() {
       std::string obj_id = div_id + obj_ext;
-      css_info.Apply(obj_id);
+      style.Apply(obj_id);
       for (auto & datum : data) datum.UpdateCSS();
     }
   public:
@@ -139,7 +139,7 @@ namespace UI {
 
     void UpdateCSS() {
       std::string obj_id = div_id + obj_ext;
-      css_info.Apply(obj_id);
+      style.Apply(obj_id);
       for (auto & row : rows) row.UpdateCSS();
     }
 
@@ -200,7 +200,7 @@ namespace UI {
     Table & CSS(const std::string & setting, SETTING_TYPE && value) {
       switch (state) {
       case TABLE:
-        css_info.Set(setting, value);
+        style.Set(setting, value);
         break;
       case ROW:
         rows[cur_row].CSS(setting, value);
