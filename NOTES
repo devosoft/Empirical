@@ -1,5 +1,5 @@
 -= Next Steps =-
-Elements: Finish details on OK() method and extend to widgets.
+Make sure Tables override CSS reading.
 Table: Add appropriate resizing and bounding checks throughout
 Incorporate Ben's changes into BitVector/BitSet
 (work on applications of library and see what needs to be fixed/added)
@@ -11,21 +11,30 @@ How to dynamically change an include file?
 Have multi-purpose headers with static functions; how can I prevent those specific unused function errors while still getting others that I don't specifically block?
 
 -= Fixes =-
-Make getting of CSS in tables redirect in a similar fashion to setting CSS.
 JSDelete should make sure that we are not deleting a named function (or cleanup JS side too!)
 fix how is_valid() functions are handled in string_utils.h
 
 -= Improvements =-
-Add default CSS for each object type.
+Create a UI::Style object instead of CSS_Class.
+-Allow addition of defaults UI::Style for each object type.
+-Allow UI::Style objects to be added as a whole to widgets.
+-Create a UI::StyleGroup that elements can be added to and altered as one (use proper CSS class?)
 Base document should register where keypresses should be directed.
-Buttons should be able to have a hotkey (or more than one?)
-Slates should have a current location and always "append" at that location, not just at end.
-- Forwarding to a parent should track where the forward came from to update location information.
+-Buttons should be able to have a hotkey (or more than one?)
 BitSet should have a non-emscripten version that uses 64-bits (same as BitVector)
 Setup a disabled_CSS for buttons that they apply when disabled?
+Allow Slates to have alternate children sets for rapid swapping to a new mode.
+Alias UI::ElementSlate to UI::Document (or build as a new object with possible extra functions?)
+
+-= Improvements to Consider =-
+Slates should have a current location and always "append" at that location, not just at end.
+- Forwarding to a parent should track where the forward came from to update location information.
+Adjust Elements so that Widget name comes first.  E.g., ButtonElement instead of ElementButton
+
 
 -= New Elements =-
 Canvas
+Forms
 Tabs
 Settings (that can be initialized with a config object)
 Placeholder (?) for future references (empty span?)
