@@ -11,9 +11,9 @@ namespace UI {
   namespace internal {
   
     // Provide a quick method for generating unique IDs when not otherwise specified.
-    static std::string CalcNextID() {
+    static int NextWidgetID() {
       static int next_id = 0;
-      return std::string("emp__") + std::to_string(next_id++);
+      return next_id++;
     }
     
     // Widget is a base class containing information needed by all GUI widget classes
@@ -29,8 +29,7 @@ namespace UI {
 
       Widget(const std::string & in_name="") : div_id(in_name) {
         if (div_id == "") {
-          static int next_id = 0;
-          div_id = emp::to_string("emp__", next_id++);
+          div_id = emp::to_string("emp__", NextWidgetID());
         }
       }
 
