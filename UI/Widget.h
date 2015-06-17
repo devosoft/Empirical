@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "CSS_Class.h"
+#include "Style.h"
 
 namespace emp {
 namespace UI {
@@ -25,7 +25,7 @@ namespace UI {
       std::string div_id;  // ID used for the div surrounding this element.
       std::string obj_ext; // Extension for internal object if eeds own id: div_id + '__but'
       
-      CSS_Class css_info;
+      Style css_info;
 
       Widget(const std::string & in_name="") : div_id(in_name) {
         if (div_id == "") {
