@@ -1,14 +1,13 @@
 #ifndef EMP_UI_TEXT_H
 #define EMP_UI_TEXT_H
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Specs for the Text widget.
 //
 
 
-#include "UI_base.h"
+#include "Widget.h"
 
 namespace emp {
 namespace UI {

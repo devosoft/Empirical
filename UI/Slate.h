@@ -1,14 +1,13 @@
 #ifndef EMP_UI_SLATE_H
 #define EMP_UI_SLATE_H
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Specs for the Slate widget.
 //
 
 
-#include "UI_base.h"
+#include "Widget.h"
 
 namespace emp {
 namespace UI {

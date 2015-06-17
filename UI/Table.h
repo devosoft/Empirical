@@ -15,7 +15,7 @@
 
 #include <vector>
 
-#include "UI_base.h"
+#include "Widget.h"
 
 namespace emp {
 namespace UI {

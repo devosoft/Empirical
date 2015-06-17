@@ -7,7 +7,7 @@
 //
 
 
-#include "UI_base.h"
+#include "Widget.h"
 
 namespace emp {
 namespace UI {
@@ -24,15 +24,10 @@ namespace UI {
     uint32_t callback_id;
       
     void WriteHTML(std::ostream & os) {
-      os << "<button";                          // Start the button tag.
-      if (title != "") {                          // If the button has a title, add it!
-        os << " title=\"" << title << "\"";
-      }
-      
-      if (disabled) { os << " disabled=true"; }
-      
-      // Indicate ID.
-      os << " id=\"" << div_id << obj_ext << "\"";
+      os << "<button";                                      // Start the button tag.
+      if (title != "") os << " title=\"" << title << "\"";  // Add a title if there is one.
+      if (disabled) { os << " disabled=true"; }             // Check if should be disabled
+      os << " id=\"" << div_id << obj_ext << "\"";          // Indicate ID.
 
       // Indicate action on click.
       os << " onclick=\"empCppCallback(" << std::to_string(callback_id) << ")\"";
@@ -48,7 +43,7 @@ namespace UI {
       , callback_id(JSWrap(callback))
     { obj_ext = "__b"; }
     ~Button() {
-      // @CAO Can't delete unless we're sure no other copies of Button_detail are using id...
+      // @CAO Can't delete unless we're sure no other copies of Button are using id...
       //emp::JSDelete(callback_id);  // Delete callback wrapper.
     }
 
