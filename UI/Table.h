@@ -196,6 +196,14 @@ namespace UI {
     }
 
     // Apply to appropriate component based on current state.
+    std::string CSS(const std::string & setting) {
+      if (state == TABLE) return style.Get(setting);
+      if (state == ROW) return rows[cur_row].CSS(setting);
+      if (state == CELL) return rows[cur_row].data[cur_col].CSS(setting);
+      return "";
+    }
+    
+    // Apply to appropriate component based on current state.
     template <typename SETTING_TYPE>      
     Table & CSS(const std::string & setting, SETTING_TYPE && value) {
       switch (state) {
