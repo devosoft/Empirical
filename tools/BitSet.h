@@ -499,11 +499,6 @@ namespace emp {
     inline size_t count() const { return CountOnes_Mixed(); }
   };
 
-  template <int NUM_BITS> std::ostream & operator<<(std::ostream & out, const BitSet<NUM_BITS> & _bit_set) {
-    _bit_set.Print(out);
-    return out;
-  }
-
   template <int NUM_BITS1, int NUM_BITS2>
   BitSet<NUM_BITS1+NUM_BITS2> join(const BitSet<NUM_BITS1> & in1, const BitSet<NUM_BITS2> & in2) {
     BitSet<NUM_BITS1+NUM_BITS2> out_bits;
@@ -513,5 +508,11 @@ namespace emp {
   }
 
 };
+
+template <int NUM_BITS> std::ostream & operator<<(std::ostream & out, const emp::BitSet<NUM_BITS> & _bit_set) {
+  _bit_set.Print(out);
+  return out;
+}
+
 
 #endif

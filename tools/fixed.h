@@ -94,18 +94,20 @@ namespace emp {
   };
 
   
-  // Overload istream and ostream to work with fixed.
-  template <int FRAC_BITS> std::ostream & operator<<(std::ostream & os, const fixed<FRAC_BITS> & input) { 
-    return os << input.AsDouble();
-  }
-
-  template <int FRAC_BITS> std::istream & operator>>(std::istream & is, fixed<FRAC_BITS> & input) { 
-    double tmp_val;
-    is >> tmp_val;
-    input = tmp_val;
-    return is;
-  }
-  
 };
   
+// Overload istream and ostream to work with fixed.
+template <int FRAC_BITS> std::ostream & operator<<(std::ostream & os,
+                                                   const emp::fixed<FRAC_BITS> & input) { 
+  return os << input.AsDouble();
+}
+
+template <int FRAC_BITS> std::istream & operator>>(std::istream & is,
+                                                   emp::fixed<FRAC_BITS> & input) { 
+  double tmp_val;
+  is >> tmp_val;
+  input = tmp_val;
+  return is;
+}
+
 #endif
