@@ -48,6 +48,7 @@ namespace UI {
     
     bool IsHeader() const { return header; }
     bool IsMasked() const { return masked; }
+    explicit operator bool() { return !masked; }   // Unmasked cell = true, masked = false.
     
     void SetColSpan(int cs) { colspan = cs; }
     void SetRowSpan(int rs) { rowspan = rs; }
@@ -87,7 +88,16 @@ namespace UI {
     TableRow() { obj_ext = "tr"; }
     ~TableRow() { ; }
 
-    int GetSize() { return (int) data.size(); }
+    int GetSize() { return (int) data.size(); }           // How many cells in this row?
+    TableData & operator[](int id) {                      // Get a single cell
+      emp_assert(id >= 0 && id < (int) data.size());
+      return data[id];
+    }
+    const TableData & operator[](int id) const {          // Get a single const cell
+      emp_assert(id >= 0 && id < (int) data.size());
+      return data[id];
+    }
+    std::vector<TableData> & GetCells() { return data; }  // Get ALL cells
 
     TableRow & SetCols(int c) { data.resize(c); return *this; }
 
@@ -104,8 +114,6 @@ namespace UI {
       data[col_id].CSS(setting, value);
       return *this;
     }
-
-    std::vector<TableData> & GetCells() { return data; }
 
     // NOTE: Regular CSS applied to a TableRow will modify row's own CSS.
 
@@ -171,20 +179,24 @@ namespace UI {
       rows.resize(r);                                                 // Resize rows.
       for (int i = row_count; i < r; i++) rows[i].SetCols(col_count); // Initialize new rows.
       row_count = r;                                                  // Store new size.
+      if (cur_row >= row_count) cur_row = 0;
       return *this;
     }
     Table & Cols(int c) {
       col_count = c;                                    // Store new size.
       for (auto & row : rows) row.SetCols(col_count);   // Make sure all rows have new col_count
+      if (cur_col >= col_count) cur_col = 0;
       return *this;
     }
       
     Table & GetCell(int r, int c) {
+      emp_assert(r < row_count && c < col_count);
       cur_row = r; cur_col = c;
       state = CELL;
       return *this;
     }
     Table & GetRow(int r) {
+      emp_assert(r < row_count);
       cur_row = r; cur_col = 0;
       state = ROW;
       return *this;
@@ -206,17 +218,10 @@ namespace UI {
     // Apply to appropriate component based on current state.
     template <typename SETTING_TYPE>      
     Table & CSS(const std::string & setting, SETTING_TYPE && value) {
-      switch (state) {
-      case TABLE:
-        style.Set(setting, value);
-        break;
-      case ROW:
-        rows[cur_row].CSS(setting, value);
-        break;
-      case CELL:
-        rows[cur_row].data[cur_col].CSS(setting, value);
-        break;
-      };
+      if (state == TABLE) style.Set(setting, value);
+      else if (state == ROW) rows[cur_row].CSS(setting, value);
+      else if (state == CELL) rows[cur_row].data[cur_col].CSS(setting, value);
+      else emp_assert(false && "Table in unknown state!");
       
       return *this;
     }
@@ -339,12 +344,25 @@ namespace UI {
         ok = false;
       }
       
-      for (auto & row : rows) {
-        ok = ok && row.OK(ss, verbose, prefix+"  ");
-        if (col_count != row.GetSize()) {
+      for (int r = 0; r < row_count; r++) {
+        ok = ok && rows[r].OK(ss, verbose, prefix+"  ");
+        if (col_count != rows[r].GetSize()) {
           ss << prefix << "  Error: col_count = " << col_count
-             << ", but row has " << row.GetSize() << " elements." << std::endl;
+             << ", but row has " << rows[r].GetSize() << " elements." << std::endl;
           ok = false;
+        }
+        for (int c = 0; c < col_count; c++) {
+          auto & cell = rows[r][c];
+          if (c + cell.GetColSpan() > col_count) {
+            ss << prefix << "  Error: Cell at row " << r << ", col " << c
+               << " extends past right side of table." << std::endl;
+            ok = false;
+          }
+          if (r + cell.GetRowSpan() > row_count) {
+            ss << prefix << "  Error: Cell at row " << r << ", col " << c
+               << " extends past bottom of table." << std::endl;
+            ok = false;
+          }
         }
       }
 
