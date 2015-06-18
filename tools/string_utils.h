@@ -123,6 +123,16 @@ namespace emp {
     return is_letter(test_char) || is_digit(test_char);
   }
 
+  bool is_one_of(char test_char, const std::string & char_set) {
+    for (char x : char_set) if (test_char == x) return true;
+    return false;
+  }
+
+  bool is_composed_of(const std::string & test_str, const std::string & char_set) {
+    for (char x : test_str) if (!is_one_of(x, char_set)) return false;
+    return true;
+  }
+
   // A string is valid if each character passes the supplied function.
   bool is_valid(const std::string & test_str, std::function<bool(char)> in_fun) {
     for (char x : test_str) { if (in_fun(x) == false) return false; }
