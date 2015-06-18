@@ -28,6 +28,7 @@ namespace UI {
       // Loop through all of the rows in the table.
       for (auto & row : rows) {
         HTML << "<tr id=\"" << row.GetDivID() << row.GetObjExt() << "\">";
+        //HTML << "<tr>";
 
         // Loop through each cell in this row.
         for (auto & datum : row.GetCells()) {
@@ -38,6 +39,7 @@ namespace UI {
           HTML << (datum.IsHeader() ? "<th id=" : "<td id=\"")
                << datum.GetDivID() << datum.GetObjExt()
                << "\"";
+          // HTML << (datum.IsHeader() ? "<th" : "<td");
 
           // If this cell spans multiple rows or columns, indicate!
           if (datum.GetColSpan() > 1) HTML << " colspan=\"" << datum.GetColSpan() << "\"";

@@ -29,7 +29,7 @@ namespace UI {
   class Element {
   protected:
     std::string name;        // Unique DOM id for this element.
-    std::stringstream HTML; // Full HTML contents for this element.
+    std::stringstream HTML;  // Full HTML contents for this element.
 
     // Track hiearchy
     Element * parent;
