@@ -28,7 +28,11 @@ namespace emp {
 
 // This assert uses the expression (to prevent compiler error), but should not
 // generate any assembly code.
-#define emp_assert(EXPR) ((void) sizeof(EXPR) )
+// #define emp_assert(EXPR) ((void) sizeof(EXPR) )
+#define emp_assert(EXPR) {                               \
+    constexpr bool __emp_assert_tmp = false && (EXPR);   \
+    (void) __emp_assert_tmp;                             \
+  }
 
 #elif defined(TDEBUG)           // NDEBUG not set, but TDEBUG is!
 
