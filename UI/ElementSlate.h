@@ -65,6 +65,8 @@ namespace UI {
 public:
     ElementSlate(const Slate & in_slate, Element * in_parent=nullptr)
       : Element(in_slate.GetDivID(), in_parent), emp::UI::Slate(in_slate) { ; }
+    ElementSlate(const std::string & in_name, Element * in_parent=nullptr)
+      : Element(in_name, in_parent), emp::UI::Slate(in_name) { ; }
     ~ElementSlate() { ; }
     
     virtual bool IsSlate() const { return true; }
@@ -176,6 +178,7 @@ public:
 
   };
 
+  using Document = emp::UI::ElementSlate;
 };
 };
 

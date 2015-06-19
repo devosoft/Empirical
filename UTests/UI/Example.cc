@@ -6,6 +6,7 @@ int main() {
 
   UI::Initialize();
 
+
   UI::document.Update();
 }
 

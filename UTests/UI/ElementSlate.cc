@@ -1,4 +1,5 @@
 #include "../../UI/UI.h"
+#include "../../emtools/emfunctions.h"
 
 namespace UI = emp::UI;
 
@@ -6,13 +7,20 @@ int myvar = 20;
 
 void IncVar() { myvar++; UI::document.Update(); }
 
+UI::ElementSlate doc2(UI::Slate("emp_base"));
+
 int main() {
 
   UI::Initialize();
 
-  UI::document << "<h2>This is a header!</h2>"
+  doc2 << "This is the alternate page!"
+       << UI::Button( [](){ UI::document.Update(); }, "Swap Back!" );
+
+  UI::document << "<h2>This is a second-level header!</h2>"
                << "<p>And here is some regular text."
                << "<p>Here is a variable: " << myvar;
+
+  UI::document << UI::Button( [](){ doc2.Update(); }, "Swap State");
 
   UI::document << UI::Text("my_text").Background("#DDDDFF")
     .CSS("color", "#550055")
@@ -45,9 +53,12 @@ int main() {
 
   UI::document.Slate("new_slate")
     << "  And appending some more text onto the new slate.  Let's see how this all works out."
-    // << UI::Close("new_slate")
-    << UI::Close( UI::document.Slate("new_slate") )
+    << UI::Close("new_slate")
     << "And let's make sure this isn't in the red border.";
+
+  std::stringstream os;
+  UI::document.OK(os, true);
+  UI::document << "<p>" << emp::text2html(os.str());
 
   UI::document.Update();
 }
