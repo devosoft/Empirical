@@ -15,7 +15,7 @@
     emp::serialize::StoreText(os, __VA_ARGS__);  \
   }                                              \
   void EMP_LoadText(std::istream & is) {         \
-    emp::serialize::LoadText(os, __VA_ARGS__);   \
+    emp::serialize::LoadText(is, __VA_ARGS__);   \
   }
 
 
@@ -45,7 +45,7 @@ namespace serialize {
   }
   
   template <typename... ARG_TYPES>
-  void LoadText(std::ostream & is, ARG_TYPES&... args) {
+  void LoadText(std::istream & is, ARG_TYPES&... args) {
     // internal::serial_impl<ARG_TYPES...>::LoadText(is, args...);
   }
   
@@ -53,10 +53,3 @@ namespace serialize {
 };
 
 #endif
-
-
-
-
-
-
-
