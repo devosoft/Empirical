@@ -31,12 +31,12 @@ namespace serialize {
     struct serial_impl<FIRST_TYPE, OTHER_TYPES...> {
       static void StoreText(std::ostream & os, FIRST_TYPE & arg1, OTHER_TYPES&... others) {
         os << ':' << arg1;
-        save_impl<OTHER_TYPES...>::StoreText(os, others...);
+        serial_impl<OTHER_TYPES...>::StoreText(os, others...);
       }
     };
     
     // End condition for recursion when no vars remaining.
-    template <> struct serial_impl<> { static void StoreText(Archive& arch) { ; } };
+    template <> struct serial_impl<> { static void StoreText(std::ostream &) { ; } };
   };
   
   template <typename... ARG_TYPES>
@@ -59,21 +59,4 @@ namespace serialize {
 
 
 
-
-class apple {
-public:
-  int a;
-  bool isTasty;
-  float unimportantData;
-  
-  SET_SAVED_MEMBERS(a, isTasty);
-};
-
-
-int main() {
-  apple a = {7, false, 2.34};
-  a.isTasty=true;
-  a.serialize("Test: ");
-
-}
 
