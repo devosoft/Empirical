@@ -1,6 +1,4 @@
 -= Next Steps =-
-Make sure Tables override CSS reading.
-Table: Add appropriate resizing and bounding checks throughout
 Incorporate Ben's changes into BitVector/BitSet
 (work on applications of library and see what needs to be fixed/added)
 Setup documentation outside of the code!
@@ -11,12 +9,13 @@ How to dynamically change an include file?
 Have multi-purpose headers with static functions; how can I prevent those specific unused function errors while still getting others that I don't specifically block?
 
 -= Fixes =-
-emp_assert does not allow labdas in current form?
-Make CSS method virtual so others (width/height/etc) to call the proper version when its overloaded.
+Make CSS method virtual so others (width/height/etc) call the proper version when its overloaded.
 JSDelete should make sure that we are not deleting a named function (or cleanup JS side too!)
 fix how is_valid() functions are handled in string_utils.h
 
 -= Improvements =-
+Tables should have single CSS for all rows and all cells.
+- Remove ID's from table cells and rows; manually fill out style instead.
 Allow addition of defaults UI::Style for each object type.
 -Allow UI::Style objects to be added as a whole to widgets.
 -Create a UI::StyleGroup that elements can be added to and altered as one (use proper CSS class?)
@@ -25,15 +24,12 @@ Base document should register where keypresses should be directed.
 BitSet should have a non-emscripten version that uses 64-bits (same as BitVector)
 Setup a disabled_CSS for buttons that they apply when disabled?
 Allow Slates to have alternate children sets for rapid swapping to a new mode.
-Alias UI::ElementSlate to UI::Document (or build as a new object with possible extra functions?)
-Tables should have single CSS for all rows and all cells.
-- Remove ID's from table cells and rows; fill out style instead.
+Setup Elements to be able to run in unit tests.
 
 -= Improvements to Consider =-
 Slates should have a current location and always "append" at that location, not just at end.
 - Forwarding to a parent should track where the forward came from to update location information.
 Adjust Elements so that Widget name comes first.  E.g., ButtonElement instead of ElementButton
-
 
 -= New Elements =-
 Canvas
