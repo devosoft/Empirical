@@ -15,14 +15,29 @@
 #include <iostream>
 
 // Use this macro to automatically build methods in a class to save and load data.
-#define EMP_SETUP_SERIALIZE(CLASS_NAME, ...)     \
+#define EMP_SETUP_SERIALIZE_INTERNAL(CLASS_NAME, BASE_INFO, ...) \
   void EMP_StoreText(std::ostream & os) {        \
     emp::serialize::StoreText(os, __VA_ARGS__);  \
   }                                              \
-  CLASS_NAME(std::istream & is) {         \
+  CLASS_NAME(std::istream & is) BASE_INFO {         \
     emp::serialize::LoadText(is, __VA_ARGS__);   \
   }
 
+// Version to use in stand-along classes.
+#define EMP_SETUP_SERIALIZE(CLASS_NAME, ...) \
+  EMP_SETUP_SERIALIZE_INTERNAL(CLASS_NAME, , __VA_ARGS__)
+
+// Version to use in derived classes (with a base that also needs to be serialized).
+#define EMP_SETUP_SERIALIZE_D(CLASS_NAME, BASE_CLASS, ...)         \
+  EMP_SETUP_SERIALIZE_INTERNAL(CLASS_NAME, :BASE_CLASS(is), __VA_ARGS__)
+
+// Version to use in derived classes (with TWO bases that need to be serialized).
+#define EMP_COMMA ,
+#define EMP_SETUP_SERIALIZE_D2(CLASS_NAME, BASE_CLASS1, BASE_CLASS2, ...) \
+  EMP_SETUP_SERIALIZE_INTERNAL(CLASS_NAME, :BASE_CLASS1(is) EMP_COMMA BASE_CLASS2(is), __VA_ARGS__)
+#undef EMP_COMMA
+
+// If there's a base class, 
 
 namespace emp {
 namespace serialize {
