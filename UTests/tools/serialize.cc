@@ -15,12 +15,27 @@ struct SerializeTest {
   EMP_SETUP_SERIALIZE(SerializeTest, a,c);
 };
 
-struct SerializeTest_D :public SerializeTest {
+struct SerializeTest_D : public SerializeTest {
   char d = '$';
 
   SerializeTest_D(int _a, float _b, std::string _c, char _d)
     : SerializeTest(_a, _b, _c), d(_d) { ; }
   EMP_SETUP_SERIALIZE_D(SerializeTest_D, SerializeTest, d);
+};
+
+struct ExtraBase {
+  double e;
+
+  ExtraBase(double _e) : e(_e) { ; }
+  EMP_SETUP_SERIALIZE(ExtraBase, e);
+};
+
+struct MultiTest : public SerializeTest, public ExtraBase {
+  bool f;
+
+  MultiTest(int _a, float _b, std::string _c, double _e, bool _f)
+    : SerializeTest(_a, _b, _c), ExtraBase(_e), f(_f) { ; }
+  EMP_SETUP_SERIALIZE_D2(MultiTest, SerializeTest, ExtraBase, f);
 };
 
 int main(int argc, char* argv[])
@@ -55,4 +70,27 @@ int main(int argc, char* argv[])
   if (verbose) {
     std::cout << "Finished save on derived class.\nSaved stream: " << ss.str() << std::endl;
   }
+
+  SerializeTest_D stD2(io);
+
+  emp_assert(stD2.a == 10);
+  emp_assert(stD2.c == "three");
+  emp_assert(stD2.d == 'D');
+
+  MultiTest stM(111,2.22,"ttt",4.5,true);
+  stM.EMP_Store(io);
+
+  if (verbose) {
+    std::cout << "Finished save on mulit-derived class.\nSaved stream: " << ss.str() << std::endl;
+  }
+
+  MultiTest stM2(io);
+
+  emp_assert(stM2.a == 111);
+  emp_assert(stM2.c == "ttt");
+  emp_assert(stM2.e == 4.5);
+  emp_assert(stM2.f == true);
+
+
+  if (verbose) std::cout << "All reloads successful!!!" << std::endl;
 }
