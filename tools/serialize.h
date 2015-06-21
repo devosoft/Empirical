@@ -15,27 +15,34 @@
 #include <iostream>
 
 // Use this macro to automatically build methods in a class to save and load data.
-#define EMP_SETUP_SERIALIZE_BASEINFO(CLASS_NAME, BASE_INFO, ...) \
-  void EMP_Store(emp::serialize::TextIO & io) {                  \
-    emp::serialize::Store(io, __VA_ARGS__);                      \
-  }                                                              \
-  CLASS_NAME(emp::serialize::TextIO & io) BASE_INFO {            \
-    emp::serialize::Load(io, __VA_ARGS__);                       \
+#define EMP_SETUP_SERIALIZE_BASEINFO(CLASS_NAME, BASE_LOAD, BASE_STORE, ...) \
+  void EMP_Store(emp::serialize::TextIO & io) {                         \
+    BASE_STORE;                                                         \
+    emp::serialize::Store(io, __VA_ARGS__);                             \
+  }                                                                     \
+  explicit CLASS_NAME(emp::serialize::TextIO & io) BASE_LOAD {          \
+    emp::serialize::Load(io, __VA_ARGS__);                              \
   }
 
 // Version to use in stand-along classes.
 #define EMP_SETUP_SERIALIZE(CLASS_NAME, ...) \
-  EMP_SETUP_SERIALIZE_BASEINFO(CLASS_NAME, , __VA_ARGS__)
+  EMP_SETUP_SERIALIZE_BASEINFO(CLASS_NAME, , , __VA_ARGS__)
 
 // Version to use in derived classes (with a base that also needs to be serialized).
-#define EMP_SETUP_SERIALIZE_D(CLASS_NAME, BASE_CLASS, ...)         \
-  EMP_SETUP_SERIALIZE_BASEINFO(CLASS_NAME, :BASE_CLASS(io), __VA_ARGS__)
+#define EMP_SETUP_SERIALIZE_D(CLASS_NAME, BASE_CLASS, ...)              \
+  EMP_SETUP_SERIALIZE_BASEINFO(CLASS_NAME,                              \
+                               :BASE_CLASS(io),                         \
+                               BASE_CLASS::EMP_Store(io),               \
+                               __VA_ARGS__)
 
 // Version to use in derived classes (with TWO bases that need to be serialized).
-// @CAO NOTE: Right not BASE_CLASS2 is ignored!!!
-#define EMP_COMMA ,
-#define EMP_SETUP_SERIALIZE_D2(CLASS_NAME, BASE_CLASS1, BASE_CLASS2, ...) \
-  EMP_SETUP_SERIALIZE_BASEINFO(CLASS_NAME, :BASE_CLASS1(is) EMP_COMMA BASE_CLASS2(is), __VA_ARGS__)
+#define EMP_COMMA_MERGE(A,B) A,B
+
+#define EMP_SETUP_SERIALIZE_D2(CLASS_NAME, BASE_CLASS1, BASE_CLASS2, ...)   \
+  EMP_SETUP_SERIALIZE_BASEINFO(CLASS_NAME,                                  \
+                               EMP_COMMA_MERGE(:BASE_CLASS1(io), BASE_CLASS2(io)),     \
+                               BASE_CLASS1::EMP_Store(io); BASE_CLASS2::EMP_Store(io), \
+                               __VA_ARGS__)
 #undef EMP_COMMA
 
 // If there's a base class, 
@@ -67,14 +74,11 @@ namespace serialize {
     IO.is >> var;
     IO.is.ignore(1);  // Ignore ':'
     emp_assert(IO.is);
-    std::cout << "Loaded '" << var << "'" << std::endl;
-    emp_assert(IO.is);
   }
   
   template <>
   void LoadVar<std::string>(TextIO & IO, std::string & var) {
     std::getline(IO.is, var,':');
-    std::cout << "Loaded '" << var << "'" << std::endl;
     emp_assert(IO.is);
   }
 
