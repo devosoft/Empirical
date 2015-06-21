@@ -12,7 +12,7 @@ struct SerializeTest {
   std::string c;
   
   SerializeTest(int _a, float _b, std::string _c) : a(_a), b(_b), c(_c) { ; }
-  EMP_SETUP_SERIALIZE(SerializeTest, a,c);
+  EMP_SETUP_CPOD(SerializeTest, a,c);
 };
 
 struct SerializeTest_D : public SerializeTest {
@@ -20,14 +20,14 @@ struct SerializeTest_D : public SerializeTest {
 
   SerializeTest_D(int _a, float _b, std::string _c, char _d)
     : SerializeTest(_a, _b, _c), d(_d) { ; }
-  EMP_SETUP_SERIALIZE_D(SerializeTest_D, SerializeTest, d);
+  EMP_SETUP_CPOD_D(SerializeTest_D, SerializeTest, d);
 };
 
 struct ExtraBase {
   double e;
 
   ExtraBase(double _e) : e(_e) { ; }
-  EMP_SETUP_SERIALIZE(ExtraBase, e);
+  EMP_SETUP_CPOD(ExtraBase, e);
 };
 
 struct MultiTest : public SerializeTest, public ExtraBase {
@@ -35,7 +35,7 @@ struct MultiTest : public SerializeTest, public ExtraBase {
 
   MultiTest(int _a, float _b, std::string _c, double _e, bool _f)
     : SerializeTest(_a, _b, _c), ExtraBase(_e), f(_f) { ; }
-  EMP_SETUP_SERIALIZE_D2(MultiTest, SerializeTest, ExtraBase, f);
+  EMP_SETUP_CPOD_D2(MultiTest, SerializeTest, ExtraBase, f);
 };
 
 int main(int argc, char* argv[])
@@ -44,15 +44,15 @@ int main(int argc, char* argv[])
   const bool verbose = emp::cl::use_arg(args, "-v");
 
   std::stringstream ss;
-  emp::serialize::TextIO io(ss);
+  emp::serialize::CPod pod(ss);
   SerializeTest st(7, 2.34, "my_test_string");
-  st.EMP_Store(io);
+  st.EMP_Store(pod);
 
   if (verbose) {
     std::cout << "Finished save on base class.\nSaved stream: " << ss.str() << std::endl;
   }
 
-  SerializeTest st2(io);
+  SerializeTest st2(pod);
 
   emp_assert(st2.a == 7);      // Make sure a was reloaded correctly.
   emp_assert(st2.c == "my_test_string");  // Make sure ss was fully emptied!
@@ -65,26 +65,26 @@ int main(int argc, char* argv[])
   }
 
   SerializeTest_D stD(10,0.2,"three",'D');
-  stD.EMP_Store(io);
+  stD.EMP_Store(pod);
 
   if (verbose) {
     std::cout << "Finished save on derived class.\nSaved stream: " << ss.str() << std::endl;
   }
 
-  SerializeTest_D stD2(io);
+  SerializeTest_D stD2(pod);
 
   emp_assert(stD2.a == 10);
   emp_assert(stD2.c == "three");
   emp_assert(stD2.d == 'D');
 
   MultiTest stM(111,2.22,"ttt",4.5,true);
-  stM.EMP_Store(io);
+  stM.EMP_Store(pod);
 
   if (verbose) {
     std::cout << "Finished save on mulit-derived class.\nSaved stream: " << ss.str() << std::endl;
   }
 
-  MultiTest stM2(io);
+  MultiTest stM2(pod);
 
   emp_assert(stM2.a == 111);
   emp_assert(stM2.c == "ttt");
