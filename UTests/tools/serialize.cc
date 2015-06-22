@@ -12,7 +12,7 @@ struct SerializeTest {
   std::string c;
   
   SerializeTest(int _a, float _b, std::string _c) : a(_a), b(_b), c(_c) { ; }
-  EMP_SETUP_CPOD(SerializeTest, a,c);
+  EMP_SETUP_DATAPOD(SerializeTest, a,c);
 };
 
 struct SerializeTest_D : public SerializeTest {
@@ -20,14 +20,14 @@ struct SerializeTest_D : public SerializeTest {
 
   SerializeTest_D(int _a, float _b, std::string _c, char _d)
     : SerializeTest(_a, _b, _c), d(_d) { ; }
-  EMP_SETUP_CPOD_D(SerializeTest_D, SerializeTest, d);
+  EMP_SETUP_DATAPOD_D(SerializeTest_D, SerializeTest, d);
 };
 
 struct ExtraBase {
   double e;
 
   ExtraBase(double _e) : e(_e) { ; }
-  EMP_SETUP_CPOD(ExtraBase, e);
+  EMP_SETUP_DATAPOD(ExtraBase, e);
 };
 
 struct MultiTest : public SerializeTest, public ExtraBase {
@@ -35,7 +35,7 @@ struct MultiTest : public SerializeTest, public ExtraBase {
 
   MultiTest(int _a, float _b, std::string _c, double _e, bool _f)
     : SerializeTest(_a, _b, _c), ExtraBase(_e), f(_f) { ; }
-  EMP_SETUP_CPOD_D2(MultiTest, SerializeTest, ExtraBase, f);
+  EMP_SETUP_DATAPOD_D2(MultiTest, SerializeTest, ExtraBase, f);
 };
 
 int main(int argc, char* argv[])
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
   const bool verbose = emp::cl::use_arg(args, "-v");
 
   std::stringstream ss;
-  emp::serialize::CPod pod(ss);
+  emp::serialize::DataPod pod(ss);
   SerializeTest st(7, 2.34, "my_test_string");
   st.EMP_Store(pod);
 
