@@ -7,13 +7,9 @@
 //  after careful exclusion of alternative approaches!
 //
 
-#define EMP_COMMA ,
-
 // EMP_STRINGIFY takes any input, processes macros, and puts the result in quotes.
 #define EMP_STRINGIFY(A) EMP_STRINGIFY_IMPL(A)
 #define EMP_STRINGIFY_IMPL(...) #__VA_ARGS__
-
-#define EMP_COMMA_MERGE(A,B) A,B
 
 #define EMP_GET_ARG_1(A1, ...) A1
 #define EMP_GET_ARG_2(A1, A2, ...) A2
@@ -47,72 +43,77 @@
 #define EMP_ADD_SPACER(SPACER, ...) EMP_ASSEMBLE_MACRO(EMP_ADD_SPACER_, EMP_COUNT_ARGS(__VA_ARGS__), SPACER, __VA_ARGS__)
 
 
-#define EMP_WRAP_EACH(W, ...) EMP_ASSEMBLE_MACRO(EMP_PAD_, EMP_COUNT_ARGS(__VA_ARGS__), W, , __VA_ARGS__)
-#define EMP_PAD(W, P, ...) EMP_ASSEMBLE_MACRO(EMP_PAD_, EMP_COUNT_ARGS(__VA_ARGS__), W, P, __VA_ARGS__)
-#define EMP_PAD_0(W, P)
-#define EMP_PAD_1(W, P, A) W(A)
-#define EMP_PAD_2(W, P, A, ...) W(A) EMP_PAD_1(W, P, __VA_ARGS__)
-#define EMP_PAD_3(W, P, A, ...) W(A) EMP_PAD_2(W, P, __VA_ARGS__)
-#define EMP_PAD_4(W, P, A, ...) W(A) EMP_PAD_3(W, P, __VA_ARGS__)
-#define EMP_PAD_5(W, P, A, ...) W(A) EMP_PAD_4(W, P, __VA_ARGS__)
-#define EMP_PAD_6(W, P, A, ...) W(A) EMP_PAD_5(W, P, __VA_ARGS__)
-#define EMP_PAD_7(W, P, A, ...) W(A) EMP_PAD_6(W, P, __VA_ARGS__)
-#define EMP_PAD_8(W, P, A, ...) W(A) EMP_PAD_7(W, P, __VA_ARGS__)
-#define EMP_PAD_9(W, P, A, ...) W(A) EMP_PAD_8(W, P, __VA_ARGS__)
-#define EMP_PAD_10(W, P, A, ...) W(A) EMP_PAD_9(W, P, __VA_ARGS__)
-#define EMP_PAD_11(W, P, A, ...) W(A) EMP_PAD_10(W, P, __VA_ARGS__)
-#define EMP_PAD_12(W, P, A, ...) W(A) EMP_PAD_11(W, P, __VA_ARGS__)
-#define EMP_PAD_13(W, P, A, ...) W(A) EMP_PAD_12(W, P, __VA_ARGS__)
-#define EMP_PAD_14(W, P, A, ...) W(A) EMP_PAD_13(W, P, __VA_ARGS__)
-#define EMP_PAD_15(W, P, A, ...) W(A) EMP_PAD_14(W, P, __VA_ARGS__)
-#define EMP_PAD_16(W, P, A, ...) W(A) EMP_PAD_15(W, P, __VA_ARGS__)
-#define EMP_PAD_17(W, P, A, ...) W(A) EMP_PAD_16(W, P, __VA_ARGS__)
-#define EMP_PAD_18(W, P, A, ...) W(A) EMP_PAD_17(W, P, __VA_ARGS__)
-#define EMP_PAD_19(W, P, A, ...) W(A) EMP_PAD_18(W, P, __VA_ARGS__)
-#define EMP_PAD_20(W, P, A, ...) W(A) EMP_PAD_19(W, P, __VA_ARGS__)
-#define EMP_PAD_21(W, P, A, ...) W(A) EMP_PAD_20(W, P, __VA_ARGS__)
-#define EMP_PAD_22(W, P, A, ...) W(A) EMP_PAD_21(W, P, __VA_ARGS__)
-#define EMP_PAD_23(W, P, A, ...) W(A) EMP_PAD_22(W, P, __VA_ARGS__)
-#define EMP_PAD_24(W, P, A, ...) W(A) EMP_PAD_23(W, P, __VA_ARGS__)
-#define EMP_PAD_25(W, P, A, ...) W(A) EMP_PAD_24(W, P, __VA_ARGS__)
-#define EMP_PAD_26(W, P, A, ...) W(A) EMP_PAD_25(W, P, __VA_ARGS__)
-#define EMP_PAD_27(W, P, A, ...) W(A) EMP_PAD_26(W, P, __VA_ARGS__)
-#define EMP_PAD_28(W, P, A, ...) W(A) EMP_PAD_27(W, P, __VA_ARGS__)
-#define EMP_PAD_29(W, P, A, ...) W(A) EMP_PAD_28(W, P, __VA_ARGS__)
-#define EMP_PAD_30(W, P, A, ...) W(A) EMP_PAD_29(W, P, __VA_ARGS__)
-#define EMP_PAD_31(W, P, A, ...) W(A) EMP_PAD_30(W, P, __VA_ARGS__)
-#define EMP_PAD_32(W, P, A, ...) W(A) EMP_PAD_31(W, P, __VA_ARGS__)
-#define EMP_PAD_33(W, P, A, ...) W(A) EMP_PAD_32(W, P, __VA_ARGS__)
-#define EMP_PAD_34(W, P, A, ...) W(A) EMP_PAD_33(W, P, __VA_ARGS__)
-#define EMP_PAD_35(W, P, A, ...) W(A) EMP_PAD_34(W, P, __VA_ARGS__)
-#define EMP_PAD_36(W, P, A, ...) W(A) EMP_PAD_35(W, P, __VA_ARGS__)
-#define EMP_PAD_37(W, P, A, ...) W(A) EMP_PAD_36(W, P, __VA_ARGS__)
-#define EMP_PAD_38(W, P, A, ...) W(A) EMP_PAD_37(W, P, __VA_ARGS__)
-#define EMP_PAD_39(W, P, A, ...) W(A) EMP_PAD_38(W, P, __VA_ARGS__)
-#define EMP_PAD_40(W, P, A, ...) W(A) EMP_PAD_39(W, P, __VA_ARGS__)
-#define EMP_PAD_41(W, P, A, ...) W(A) EMP_PAD_40(W, P, __VA_ARGS__)
-#define EMP_PAD_42(W, P, A, ...) W(A) EMP_PAD_41(W, P, __VA_ARGS__)
-#define EMP_PAD_43(W, P, A, ...) W(A) EMP_PAD_42(W, P, __VA_ARGS__)
-#define EMP_PAD_44(W, P, A, ...) W(A) EMP_PAD_43(W, P, __VA_ARGS__)
-#define EMP_PAD_45(W, P, A, ...) W(A) EMP_PAD_44(W, P, __VA_ARGS__)
-#define EMP_PAD_46(W, P, A, ...) W(A) EMP_PAD_45(W, P, __VA_ARGS__)
-#define EMP_PAD_47(W, P, A, ...) W(A) EMP_PAD_46(W, P, __VA_ARGS__)
-#define EMP_PAD_48(W, P, A, ...) W(A) EMP_PAD_47(W, P, __VA_ARGS__)
-#define EMP_PAD_49(W, P, A, ...) W(A) EMP_PAD_48(W, P, __VA_ARGS__)
-#define EMP_PAD_50(W, P, A, ...) W(A) EMP_PAD_49(W, P, __VA_ARGS__)
-#define EMP_PAD_51(W, P, A, ...) W(A) EMP_PAD_50(W, P, __VA_ARGS__)
-#define EMP_PAD_52(W, P, A, ...) W(A) EMP_PAD_51(W, P, __VA_ARGS__)
-#define EMP_PAD_53(W, P, A, ...) W(A) EMP_PAD_52(W, P, __VA_ARGS__)
-#define EMP_PAD_54(W, P, A, ...) W(A) EMP_PAD_53(W, P, __VA_ARGS__)
-#define EMP_PAD_55(W, P, A, ...) W(A) EMP_PAD_54(W, P, __VA_ARGS__)
-#define EMP_PAD_56(W, P, A, ...) W(A) EMP_PAD_55(W, P, __VA_ARGS__)
-#define EMP_PAD_57(W, P, A, ...) W(A) EMP_PAD_56(W, P, __VA_ARGS__)
-#define EMP_PAD_58(W, P, A, ...) W(A) EMP_PAD_57(W, P, __VA_ARGS__)
-#define EMP_PAD_59(W, P, A, ...) W(A) EMP_PAD_58(W, P, __VA_ARGS__)
-#define EMP_PAD_60(W, P, A, ...) W(A) EMP_PAD_59(W, P, __VA_ARGS__)
-#define EMP_PAD_61(W, P, A, ...) W(A) EMP_PAD_60(W, P, __VA_ARGS__)
-#define EMP_PAD_62(W, P, A, ...) W(A) EMP_PAD_61(W, P, __VA_ARGS__)
-#define EMP_PAD_63(W, P, A, ...) W(A) EMP_PAD_62(W, P, __VA_ARGS__)
+// EMP_WRAP_EACH takes a wrapper macro and a variable set of arguments,
+// then applied to wrapper macro to each argument in order.
+#define EMP_WRAP_EACH(W, ...) EMP_ASSEMBLE_MACRO(EMP_LAYOUT_, EMP_COUNT_ARGS(__VA_ARGS__), W, , __VA_ARGS__)
+
+// EMP_LAYOUT takes a wrapper macro and padding information, wraps each argument in the macro
+// and then spaces them out with the padding.
+#define EMP_LAYOUT(W, P, ...) EMP_ASSEMBLE_MACRO(EMP_LAYOUT_, EMP_COUNT_ARGS(__VA_ARGS__), W, P, __VA_ARGS__)
+#define EMP_LAYOUT_0(W, P)
+#define EMP_LAYOUT_1(W, P, A) W(A)
+#define EMP_LAYOUT_2(W, P, A, ...) W(A) P EMP_LAYOUT_1(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_3(W, P, A, ...) W(A) P EMP_LAYOUT_2(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_4(W, P, A, ...) W(A) P EMP_LAYOUT_3(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_5(W, P, A, ...) W(A) P EMP_LAYOUT_4(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_6(W, P, A, ...) W(A) P EMP_LAYOUT_5(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_7(W, P, A, ...) W(A) P EMP_LAYOUT_6(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_8(W, P, A, ...) W(A) P EMP_LAYOUT_7(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_9(W, P, A, ...) W(A) P EMP_LAYOUT_8(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_10(W, P, A, ...) W(A) P EMP_LAYOUT_9(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_11(W, P, A, ...) W(A) P EMP_LAYOUT_10(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_12(W, P, A, ...) W(A) P EMP_LAYOUT_11(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_13(W, P, A, ...) W(A) P EMP_LAYOUT_12(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_14(W, P, A, ...) W(A) P EMP_LAYOUT_13(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_15(W, P, A, ...) W(A) P EMP_LAYOUT_14(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_16(W, P, A, ...) W(A) P EMP_LAYOUT_15(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_17(W, P, A, ...) W(A) P EMP_LAYOUT_16(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_18(W, P, A, ...) W(A) P EMP_LAYOUT_17(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_19(W, P, A, ...) W(A) P EMP_LAYOUT_18(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_20(W, P, A, ...) W(A) P EMP_LAYOUT_19(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_21(W, P, A, ...) W(A) P EMP_LAYOUT_20(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_22(W, P, A, ...) W(A) P EMP_LAYOUT_21(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_23(W, P, A, ...) W(A) P EMP_LAYOUT_22(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_24(W, P, A, ...) W(A) P EMP_LAYOUT_23(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_25(W, P, A, ...) W(A) P EMP_LAYOUT_24(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_26(W, P, A, ...) W(A) P EMP_LAYOUT_25(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_27(W, P, A, ...) W(A) P EMP_LAYOUT_26(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_28(W, P, A, ...) W(A) P EMP_LAYOUT_27(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_29(W, P, A, ...) W(A) P EMP_LAYOUT_28(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_30(W, P, A, ...) W(A) P EMP_LAYOUT_29(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_31(W, P, A, ...) W(A) P EMP_LAYOUT_30(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_32(W, P, A, ...) W(A) P EMP_LAYOUT_31(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_33(W, P, A, ...) W(A) P EMP_LAYOUT_32(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_34(W, P, A, ...) W(A) P EMP_LAYOUT_33(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_35(W, P, A, ...) W(A) P EMP_LAYOUT_34(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_36(W, P, A, ...) W(A) P EMP_LAYOUT_35(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_37(W, P, A, ...) W(A) P EMP_LAYOUT_36(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_38(W, P, A, ...) W(A) P EMP_LAYOUT_37(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_39(W, P, A, ...) W(A) P EMP_LAYOUT_38(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_40(W, P, A, ...) W(A) P EMP_LAYOUT_39(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_41(W, P, A, ...) W(A) P EMP_LAYOUT_40(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_42(W, P, A, ...) W(A) P EMP_LAYOUT_41(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_43(W, P, A, ...) W(A) P EMP_LAYOUT_42(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_44(W, P, A, ...) W(A) P EMP_LAYOUT_43(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_45(W, P, A, ...) W(A) P EMP_LAYOUT_44(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_46(W, P, A, ...) W(A) P EMP_LAYOUT_45(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_47(W, P, A, ...) W(A) P EMP_LAYOUT_46(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_48(W, P, A, ...) W(A) P EMP_LAYOUT_47(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_49(W, P, A, ...) W(A) P EMP_LAYOUT_48(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_50(W, P, A, ...) W(A) P EMP_LAYOUT_49(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_51(W, P, A, ...) W(A) P EMP_LAYOUT_50(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_52(W, P, A, ...) W(A) P EMP_LAYOUT_51(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_53(W, P, A, ...) W(A) P EMP_LAYOUT_52(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_54(W, P, A, ...) W(A) P EMP_LAYOUT_53(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_55(W, P, A, ...) W(A) P EMP_LAYOUT_54(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_56(W, P, A, ...) W(A) P EMP_LAYOUT_55(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_57(W, P, A, ...) W(A) P EMP_LAYOUT_56(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_58(W, P, A, ...) W(A) P EMP_LAYOUT_57(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_59(W, P, A, ...) W(A) P EMP_LAYOUT_58(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_60(W, P, A, ...) W(A) P EMP_LAYOUT_59(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_61(W, P, A, ...) W(A) P EMP_LAYOUT_60(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_62(W, P, A, ...) W(A) P EMP_LAYOUT_61(W, P, __VA_ARGS__)
+#define EMP_LAYOUT_63(W, P, A, ...) W(A) P EMP_LAYOUT_62(W, P, __VA_ARGS__)
 
 
 
@@ -120,5 +121,9 @@
 // Setup a generic method of calling a specific version of a macro based on argument count.
 #define EMP_ASSEMBLE_IMPL(BASE, ARG_COUNT) BASE ## ARG_COUNT
 #define EMP_ASSEMBLE_MACRO(BASE, ARG_COUNT, ...) EMP_ASSEMBLE_IMPL(BASE, ARG_COUNT) (__VA_ARGS__)
+
+
+#define EMP_COMMA ,
+
 
 #endif
