@@ -34,12 +34,19 @@
 
 #define EMP_COUNT_ARGS(...) EMP_GET_ARG_64(__VA_ARGS__, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 
-#define EMP_MERGE(A,B) A ## B
+// Enable an arbitrary number of arguments to be merged AFTER being processed!
+#define EMP_MERGE(...) EMP_ASSEMBLE_MACRO(EMP_MERGE_, EMP_COUNT_ARGS(__VA_ARGS__), __VA_ARGS__)
+#define EMP_MERGE_1(A1) A1
+#define EMP_MERGE_2(A1,A2) A1 ## A2
+#define EMP_MERGE_3(A1,A2,A3) A1 ## A2 ## A3
+#define EMP_MERGE_4(A1,A2,A3,A4) A1 ## A2 ## A3 ## A4
+#define EMP_MERGE_5(A1,A2,A3,A4,A5) A1 ## A2 ## A3 ## A4 ## A5
+#define EMP_MERGE_6(A1,A2,A3,A4,A5,A6) A1 ## A2 ## A3 ## A4 ## A5 ## A6
+#define EMP_MERGE_7(A1,A2,A3,A4,A5,A6,A7) A1 ## A2 ## A3 ## A4 ## A5 ## A6 ## A7
 
-// #define EMP_MERGE(...) EMP_ASSEMBLE_MACRO(EMP_MERGE_, EMP_COUNT_ARGS(__VA_ARGS__), __VA_ARGS__)
-// #define EMP_MERGE_2(A,B) A ## B
-// #define EMP_MERGE_3(A,B,C) A ## B ## C
+#define EMP_ADD_SPACER(SPACER, ...) EMP_ASSEMBLE_MACRO(EMP_ADD_SPACER_, EMP_COUNT_ARGS(__VA_ARGS__), SPACER, __VA_ARGS__)
 
+// Setup a generic method of calling a specific version of a macro based on argument count.
 #define EMP_ASSEMBLE_IMPL(BASE, ARG_COUNT) BASE ## ARG_COUNT
 #define EMP_ASSEMBLE_MACRO(BASE, ARG_COUNT, ...) EMP_ASSEMBLE_IMPL(BASE, ARG_COUNT) (__VA_ARGS__)
 
