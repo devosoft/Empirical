@@ -41,6 +41,8 @@
 
 #include <iostream>
 
+#include "macros.h"
+
 // Use this macro to automatically build methods in a class to save and load data.
 #define EMP_SETUP_DATAPOD_BASEINFO(CLASS_NAME, BASE_LOAD, BASE_STORE, ...) \
   void EMP_Store(emp::serialize::DataPod & pod) {                       \
@@ -63,7 +65,6 @@
                           __VA_ARGS__)
 
 // Version to use in derived classes (with TWO bases that need to be serialized).
-#define EMP_COMMA_MERGE(A,B) A,B
 
 #define EMP_SETUP_DATAPOD_D2(CLASS_NAME, BASE_CLASS1, BASE_CLASS2, ...)    \
   EMP_SETUP_DATAPOD_BASEINFO(CLASS_NAME,                                   \
