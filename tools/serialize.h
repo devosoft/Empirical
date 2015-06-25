@@ -41,39 +41,7 @@
 
 #include <iostream>
 
-#include "macros.h"
-
-// Use this macro to automatically build methods in a class to save and load data.
-#define EMP_SETUP_DATAPOD_BASEINFO(CLASS_NAME, BASE_LOAD, BASE_STORE, ...) \
-  void EMP_Store(emp::serialize::DataPod & pod) {                       \
-    BASE_STORE;                                                         \
-    emp::serialize::Store(pod, __VA_ARGS__);                            \
-  }                                                                     \
-  explicit CLASS_NAME(emp::serialize::DataPod & pod) BASE_LOAD {        \
-    emp::serialize::Load(pod, __VA_ARGS__);                             \
-  }
-
-// Version to use in stand-along classes.
-#define EMP_SETUP_DATAPOD(CLASS_NAME, ...) \
-  EMP_SETUP_DATAPOD_BASEINFO(CLASS_NAME, , , __VA_ARGS__)
-
-// Version to use in derived classes (with a base that also needs to be serialized).
-#define EMP_SETUP_DATAPOD_D(CLASS_NAME, BASE_CLASS, ...)    \
-  EMP_SETUP_DATAPOD_BASEINFO(CLASS_NAME,                    \
-                          :BASE_CLASS(pod),              \
-                          BASE_CLASS::EMP_Store(pod),    \
-                          __VA_ARGS__)
-
-// Version to use in derived classes (with TWO bases that need to be serialized).
-
-#define EMP_SETUP_DATAPOD_D2(CLASS_NAME, BASE_CLASS1, BASE_CLASS2, ...)    \
-  EMP_SETUP_DATAPOD_BASEINFO(CLASS_NAME,                                   \
-                 EMP_COMMA_MERGE(:BASE_CLASS1(pod), BASE_CLASS2(pod)),     \
-                 BASE_CLASS1::EMP_Store(pod); BASE_CLASS2::EMP_Store(pod), \
-                __VA_ARGS__)
-
-
-// If there's a base class, 
+#include "serialize_macros.h"
 
 namespace emp {
 namespace serialize {
@@ -135,6 +103,25 @@ namespace serialize {
     emp_assert(pod.IStream());
   }
 
+
+  // The SetupLoad() function determines what type of information a constructor needs from
+  // a DataPod (based on the objects types) and returns that information.  By default, the
+  // function will produce an instance of the needed type to trigger the copy constructor,
+  // but if a constructor exists that takes a DataPod it will use that instead.
+
+  // Use SFINAE technique to identify custom types.
+  template <typename T> DataPod & SetupLoad(T, typename T::EMP_DataPod_t & pod) { return pod; }
+
+  // Otherwise use default streams.
+  template <typename T> T SetupLoad(T, DataPod & pod) {
+    T var;
+    pod.IStream() >> var;
+    return var;
+  }
+
+
+
+  // Specialized initializers...
 
   namespace internal {
 
