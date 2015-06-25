@@ -110,10 +110,14 @@ namespace serialize {
   // but if a constructor exists that takes a DataPod it will use that instead.
 
   // Use SFINAE technique to identify custom types.
-  template <typename T> DataPod & SetupLoad(T, typename T::EMP_DataPod_t & pod) { return pod; }
+  //template <typename T> DataPod & SetupLoad(T, typename T::EMP_DataPod_t & pod) { return pod; }
+  template <typename T>
+  typename T::EMP_DataPod_t & SetupLoad(DataPod & pod, T) {
+    return pod;
+  }
 
   // Otherwise use default streams.
-  template <typename T> T SetupLoad(T, DataPod & pod) {
+  template <typename T> T SetupLoad(DataPod & pod, ...) {
     T var;
     pod.IStream() >> var;
     return var;
