@@ -25,7 +25,7 @@
 //
 //   EMP_SETUP_DATAPOD_D2(ClassName, BassClass1Name, BaseClass2Name, var1, var2, ...)
 //
-//  Depending on how many base classes it was derived from (currently max 2).
+//  ...depending on how many base classes it was derived from (currently max 2).
 //
 //  Note also that this macro must either go in the public section of the target class
 //  definition, or the target class must be made a friend to the emp::serialize::DataPod
@@ -33,8 +33,6 @@
 //
 //
 //  Development Notes:
-//  * Constructors should call correct internal member constructors, not rely on assignment
-//  * Use SFINAE technique to know when classes have an internal save already setup.
 //  * To deal with pointers we should recurse, but keep map to new pointer locations.
 //  * Add a mechanism to set value to constant rather than previous value.
 //
@@ -42,7 +40,6 @@
 #include <iostream>
 
 #include "serialize_macros.h"
-#include "reflection.h"
 
 namespace emp {
 namespace serialize {
@@ -84,26 +81,21 @@ namespace serialize {
     std::istream & IStream() { return *is; }
   };
   
+  // Custom classes should run their build-in EMP_Store member function.
   template <typename T>
-  void StoreVar(DataPod & pod, T & var) {
+  auto StoreVar(DataPod & pod, T & var, bool) -> typename T::emp_load_return_type & {
+    var.EMP_Store(pod);
+    return pod;
+  }
+
+  // By default, just try sending the saved object to the DataPod's output stream.
+  template <typename T>
+  void StoreVar(DataPod & pod, T & var, int) {
     // @CAO for now use ':', but more generally we need to ensure uniquness.
     pod.OStream() << var << ':';
     emp_assert(pod.OStream());
   }
   
-  template <typename T>
-  void LoadVar(DataPod & pod, T & var) {
-    pod.IStream() >> var;
-    pod.IStream().ignore(1);  // Ignore ':'
-    emp_assert(pod.IStream());
-  }
-  
-  template <>
-  void LoadVar<std::string>(DataPod & pod, std::string & var) {
-    std::getline(pod.IStream(), var,':');
-    emp_assert(pod.IStream());
-  }
-
 
   // The SetupLoad() function determines what type of information a constructor needs from
   // a DataPod (based on the objects types) and returns that information.  By default, the
@@ -147,12 +139,8 @@ namespace serialize {
     template <typename FIRST_TYPE, typename... OTHER_TYPES>
     struct serial_impl<FIRST_TYPE, OTHER_TYPES...> {
       static void Store(DataPod & pod, FIRST_TYPE & arg1, OTHER_TYPES&... others) {
-        StoreVar(pod, arg1);
+        StoreVar(pod, arg1, true);
         serial_impl<OTHER_TYPES...>::Store(pod, others...);
-      }
-      static void Load(DataPod & pod, FIRST_TYPE & arg1, OTHER_TYPES&... others) {
-        LoadVar(pod, arg1);
-        serial_impl<OTHER_TYPES...>::Load(pod, others...);
       }
     };
     
