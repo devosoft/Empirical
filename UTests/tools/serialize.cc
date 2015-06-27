@@ -38,6 +38,20 @@ struct MultiTest : public SerializeTest, public ExtraBase {
   EMP_SETUP_DATAPOD_D2(MultiTest, SerializeTest, ExtraBase, f);
 };
 
+struct NestedTest {
+  SerializeTest st;
+  std::string name;
+  SerializeTest_D std;
+  MultiTest mt;
+
+  NestedTest(int a1, float b1, std::string c1,
+             int a2, float b2, std::string c2, char d2,
+             int a3, float b3, std::string c3, double e3, bool f3)
+    : st(a1, b1, c1), name("my_class"), std(a2, b2, c2, d2), mt(a3, b3, c3, e3, f3) { ; }
+
+  EMP_SETUP_DATAPOD(NestedTest, st, name, std, mt);
+};
+
 int main(int argc, char* argv[])
 {
   std::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
@@ -45,6 +59,10 @@ int main(int argc, char* argv[])
 
   std::stringstream ss;
   emp::serialize::DataPod pod(ss);
+
+
+  // Basic test...
+
   SerializeTest st(7, 2.34, "my_test_string");
   st.EMP_Store(pod);
 
@@ -67,6 +85,9 @@ int main(int argc, char* argv[])
   if (verbose) {
     std::cout << "After reload, stream: " << ss.str() << std::endl;
   }
+
+
+  // Derived class Test
 
   SerializeTest_D stD(10,0.2,"three",'D');
   stD.EMP_Store(pod);
@@ -94,11 +115,15 @@ int main(int argc, char* argv[])
     std::cout << "Reload successful!" << std::endl;
   }
 
+
+
+  // Multiply-derived class Test
+
   MultiTest stM(111,2.22,"ttt",4.5,true);
   stM.EMP_Store(pod);
 
   if (verbose) {
-    std::cout << "Finished save on mulit-derived class.\nSaved stream: " << ss.str() << std::endl;
+    std::cout << "Finished save on multi-derived class.\nSaved stream: " << ss.str() << std::endl;
   }
 
   MultiTest stM2(pod);
@@ -119,7 +144,50 @@ int main(int argc, char* argv[])
   emp_assert(stM2.f == true);
 
 
+  // Nested objects test...
+
+  NestedTest nt(91, 3.14, "magic numbers",
+                100, 0.01, "powers of 10", '1',
+                1001, 1.001, "ones and zeros", 0.125, true);
+  nt.EMP_Store(pod);
+
+  if (verbose) {
+    std::cout << "Finished save on nested class.\nSaved stream: " << ss.str() << std::endl;
+  }
+
+  NestedTest nt2(pod);
+
+  if (verbose) {
+    std::cout << "Reloaded DataPod for multi-derived class.  Results:\n"
+              << "  nt2.st.a = " << nt2.st.a << "\n"
+              << "  nt2.st.c = " << nt2.st.c << "\n"
+              << "  nt2.name = " << nt2.name << "\n"
+              << "  nt2.std.a = " << nt2.std.a << "\n"
+              << "  nt2.std.c = " << nt2.std.c << "\n"
+              << "  nt2.std.d = " << nt2.std.d << "\n"
+              << "  nt2.mt.a = " << nt2.mt.a << "\n"
+              << "  nt2.mt.c = " << nt2.mt.c << "\n"
+              << "  nt2.mt.e = " << nt2.mt.e << "\n"
+              << "  nt2.mt.f = " << nt2.mt.f << "\n"
+              << std::endl;
+  }
+
+  emp_assert(nt2.st.a == 91);
+  emp_assert(nt2.st.c == "magic numbers");
+  emp_assert(nt2.name == "my_class");
+  emp_assert(nt2.std.a == 100);
+  emp_assert(nt2.std.c == "powers of 10");
+  emp_assert(nt2.std.d == '1');
+  emp_assert(nt2.mt.a == 1001);
+  emp_assert(nt2.mt.c == "ones and zeros");
+  emp_assert(nt2.mt.e == 0.125);
+  emp_assert(nt2.mt.f == true);
+
+
+  // If we made it this far, everything must have worked!
+
   if (verbose) std::cout << "All reloads successful!!!" << std::endl;
+
 
   // int test_int;
   // emp::serialize::SetupLoad<int>(pod, &test_int, true);
