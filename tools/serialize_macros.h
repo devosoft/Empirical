@@ -3,7 +3,7 @@
 
 #include "macros.h"
 
-#define EMP_SERIALIZE_INIT_VAR(VAR) VAR(emp::serialize::SetupLoad<decltype(VAR)>(pod, &VAR, true))
+#define EMP_SERIALIZE_INIT_VAR(VAR) VAR(emp::serialize::SetupLoad(pod, &VAR, true))
 
 // Use this macro to automatically build methods in a class to save and load data.
 #define EMP_SETUP_DATAPOD_BASEINFO(CLASS_NAME, BASE_LOAD, BASE_STORE, ...) \
