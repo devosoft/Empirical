@@ -42,6 +42,7 @@
 #include <iostream>
 
 #include "serialize_macros.h"
+#include "reflection.h"
 
 namespace emp {
 namespace serialize {
@@ -110,18 +111,32 @@ namespace serialize {
   // but if a constructor exists that takes a DataPod it will use that instead.
 
   // Use SFINAE technique to identify custom types.
-  //template <typename T> DataPod & SetupLoad(T, typename T::EMP_DataPod_t & pod) { return pod; }
   template <typename T>
-  typename T::EMP_DataPod_t & SetupLoad(DataPod & pod, T) {
+  auto SetupLoad(DataPod & pod, T*, bool) -> typename T::emp_load_return_type & {
+    std::cout << "Load 1" << std::endl;
     return pod;
   }
 
   // Otherwise use default streams.
-  template <typename T> T SetupLoad(DataPod & pod, ...) {
+  template <typename T>
+  auto SetupLoad(DataPod & pod, T*, int) -> T {
+    std::cout << "Load 3" << std::endl;
     T var;
     pod.IStream() >> var;
+    pod.IStream().ignore(1);  // Ignore ':'
+    emp_assert(pod.IStream() && "Make sure the DataPod is still okay.");
     return var;
   }
+
+  // Use special load for strings.
+  // template <>
+  // std::string SetupLoad<std::string>(DataPod & pod, std::string *, bool) {
+  //   std::cout << "Load 2" << std::endl;
+  //   std::string var;
+  //   std::getline(pod.IStream(), var, ':');
+  //   emp_assert(pod.IStream() && "Make sure the DataPod is still okay.");
+  //   return var;
+  // }
 
 
 
