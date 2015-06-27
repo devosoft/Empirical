@@ -12,7 +12,7 @@ struct SerializeTest {
   std::string c;
   
   SerializeTest(int _a, float _b, std::string _c) : a(_a), b(_b), c(_c) { ; }
-  EMP_SETUP_DATAPOD(SerializeTest, a,c);
+  EMP_SETUP_DATAPOD(SerializeTest, a, c);
 };
 
 struct SerializeTest_D : public SerializeTest {
@@ -49,13 +49,20 @@ int main(int argc, char* argv[])
   st.EMP_Store(pod);
 
   if (verbose) {
-    std::cout << "Finished save on base class.\nSaved stream: " << ss.str() << std::endl;
+    std::cout << "Finished storing to DataPod for base class.\nSaved stream: "
+              << ss.str() << std::endl;
   }
 
   SerializeTest st2(pod);
 
-  emp_assert(st2.a == 7);      // Make sure a was reloaded correctly.
-  emp_assert(st2.c == "my_test_string");  // Make sure ss was fully emptied!
+  if (verbose) {
+    std::cout << "Reloaded DataPod for base class.\n  st2.a = " << st2.a
+              << "\n  st2.b = " << st2.b << " (uninitialized)\n  st2.c = " << st2.c
+              << std::endl;
+  }
+
+  emp_assert(st2.a == 7);                 // Make sure a was reloaded correctly.
+  emp_assert(st2.c == "my_test_string");  // Make sure c was reloaded correctly.
 
   if (verbose) {
     std::cout << "a reloaded as: " << st2.a << std::endl;
@@ -93,4 +100,8 @@ int main(int argc, char* argv[])
 
 
   if (verbose) std::cout << "All reloads successful!!!" << std::endl;
+
+  int test_int;
+  emp::serialize::SetupLoad<int>(pod, &test_int, true);
+  emp::serialize::SetupLoad(pod, &stM2, true);
 }
