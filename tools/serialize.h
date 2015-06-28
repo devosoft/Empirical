@@ -33,7 +33,11 @@
 //
 //
 //  Development Notes:
+//  * Build custom load/store function for STL objects (especially containers)
 //  * To deal with pointers we should recurse, but keep map to new pointer locations.
+//  * Setup a more robust method for dealing with arbitrary strings so we don't have
+//    to worry about collisions in streams.
+//  * Setup a (compressed) binary saved form in DataPods.
 //  * Add a mechanism to set value to constant rather than previous value.
 //
 
@@ -81,7 +85,13 @@ namespace serialize {
     std::istream & IStream() { return *is; }
   };
   
-  // Custom classes should run their build-in EMP_Store member function.
+
+  // The StoreVar function takes a DataPod and a variable and stores that vatiable to
+  // the pod.  The third argument (bool vs. int) will receive a bool, and thus bool versions
+  // are preferred in the case of a tie.  Specialized versions of this function can be
+  //included elsewhere, as needed, and should take a bool as the third argument.
+
+  // Custom classes should run their built-in EMP_Store member function.
   template <typename T>
   auto StoreVar(DataPod & pod, T & var, bool) -> typename T::emp_load_return_type & {
     var.EMP_Store(pod);
@@ -128,7 +138,7 @@ namespace serialize {
   
 
 
-  // Specialized initializers...
+  // Setup for a variadic Store() function that systematically save all variables in a DataPod.
 
   namespace internal {
 
@@ -147,18 +157,12 @@ namespace serialize {
     // End condition for recursion when no vars remaining.
     template <> struct serial_impl<> {
       static void Store(DataPod &) { ; }
-      static void Load(DataPod &) { ; }
     };
   };
   
   template <typename... ARG_TYPES>
   void Store(DataPod & pod, ARG_TYPES&... args) {
     internal::serial_impl<ARG_TYPES...>::Store(pod, args...);
-  }
-  
-  template <typename... ARG_TYPES>
-  void Load(DataPod & pod, ARG_TYPES&... args) {
-    internal::serial_impl<ARG_TYPES...>::Load(pod, args...);
   }
   
 };
