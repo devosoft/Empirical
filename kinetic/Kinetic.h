@@ -1,5 +1,5 @@
-#ifndef EM_KINETIC_H
-#define EM_KINETIC_H
+#ifndef EMP_KINETIC_H
+#define EMP_KINETIC_H
 
 #include <emscripten.h>
 
@@ -50,7 +50,7 @@ namespace Kinetic {
     std::string name;
 
     // Helpers...
-    static int GetNumObjs() { return EM_ASM_INT_V({ return emp_info.objs.length; }); }
+    static int GetNumObjs() { return EM_ASM_INT_V({ return emp_kinetic.objs.length; }); }
 
     Node(const std::string & _name="") : obj_id(-1), layer(NULL), name(_name) {;}  // Protected so that you can't make a direct Node.
   private:
@@ -60,7 +60,7 @@ namespace Kinetic {
   public:
     ~Node() {
       EM_ASM_ARGS({
-          if ($0 >= 0 && emp_info.objs[$0] != 0) emp_info.objs[$0].destroy();
+          if ($0 >= 0 && emp_kinetic.objs[$0] != 0) emp_kinetic.objs[$0].destroy();
         }, obj_id);
     }
     int GetID() const { emp_assert(obj_id >= 0 && obj_id < GetNumObjs()); return obj_id; }
@@ -69,20 +69,20 @@ namespace Kinetic {
     // Retrieve info from JS Kinetic::Node objects
     int GetX() const {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      return EM_ASM_INT({return emp_info.objs[$0].x();}, obj_id);
+      return EM_ASM_INT({return emp_kinetic.objs[$0].x();}, obj_id);
     }
     int GetY() const {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      return EM_ASM_INT({return emp_info.objs[$0].y();}, obj_id);
+      return EM_ASM_INT({return emp_kinetic.objs[$0].y();}, obj_id);
     }
     Point<int> GetPos() const { return Point<int>(GetX(), GetY()); }
     int GetWidth() const {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      return EM_ASM_INT({return emp_info.objs[$0].width();}, obj_id);
+      return EM_ASM_INT({return emp_kinetic.objs[$0].width();}, obj_id);
     }
     int GetHeight() const {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      return EM_ASM_INT({return emp_info.objs[$0].height();}, obj_id);
+      return EM_ASM_INT({return emp_kinetic.objs[$0].height();}, obj_id);
     }
     Point<int> GetUL(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+x_offset,              GetY()+y_offset); }
     Point<int> GetUM(int x_offset=0, int y_offset=0) const { return Point<int>(GetX()+GetWidth()/2+x_offset, GetY()+y_offset); }
@@ -96,109 +96,109 @@ namespace Kinetic {
     Point<int> GetCenter(int x_offset=0, int y_offset=0) const { return GetMM(x_offset, y_offset); }
     bool GetVisible() const {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      return EM_ASM_INT({return emp_info.objs[$0].visible();}, obj_id);
+      return EM_ASM_INT({return emp_kinetic.objs[$0].visible();}, obj_id);
     }
     double GetOpacity() const {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      return EM_ASM_DOUBLE({return emp_info.objs[$0].opacity();}, obj_id);
+      return EM_ASM_DOUBLE({return emp_kinetic.objs[$0].opacity();}, obj_id);
     }
     bool GetListening() const {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      return EM_ASM_INT({return emp_info.objs[$0].listening();}, obj_id);
+      return EM_ASM_INT({return emp_kinetic.objs[$0].listening();}, obj_id);
     }
     double GetScaleX() const {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      return EM_ASM_DOUBLE({return emp_info.objs[$0].scaleX();}, obj_id);
+      return EM_ASM_DOUBLE({return emp_kinetic.objs[$0].scaleX();}, obj_id);
     }
     double GetScaleY() const {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      return EM_ASM_DOUBLE({return emp_info.objs[$0].scaleY();}, obj_id);
+      return EM_ASM_DOUBLE({return emp_kinetic.objs[$0].scaleY();}, obj_id);
     }
     int GetOffsetX() const {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      return EM_ASM_INT({return emp_info.objs[$0].offsetX();}, obj_id);
+      return EM_ASM_INT({return emp_kinetic.objs[$0].offsetX();}, obj_id);
     }
     int GetOffsetY() const {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      return EM_ASM_INT({return emp_info.objs[$0].offsetY();}, obj_id);
+      return EM_ASM_INT({return emp_kinetic.objs[$0].offsetY();}, obj_id);
     }
     int GetRotation() const {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      return EM_ASM_INT({return emp_info.objs[$0].rotation();}, obj_id);
+      return EM_ASM_INT({return emp_kinetic.objs[$0].rotation();}, obj_id);
     }
     int GetDraggable() const {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      return EM_ASM_INT({return emp_info.objs[$0].draggable();}, obj_id);
+      return EM_ASM_INT({return emp_kinetic.objs[$0].draggable();}, obj_id);
     }
     int GetZIndex() const {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      return EM_ASM_INT({return emp_info.objs[$0].getZIndex();}, obj_id);
+      return EM_ASM_INT({return emp_kinetic.objs[$0].getZIndex();}, obj_id);
     }
 
     Node & SetName(const std::string & _name) { name = _name; return *this; }
     Node & SetX(int _in) {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].x($1);}, obj_id, _in); return *this;
+      EM_ASM_ARGS({emp_kinetic.objs[$0].x($1);}, obj_id, _in); return *this;
     }
     Node & SetY(int _in) {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].y($1);}, obj_id, _in); return *this;
+      EM_ASM_ARGS({emp_kinetic.objs[$0].y($1);}, obj_id, _in); return *this;
     }
     Node & SetWidth(int _in) {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].width($1);}, obj_id, _in); return *this;
+      EM_ASM_ARGS({emp_kinetic.objs[$0].width($1);}, obj_id, _in); return *this;
     }
     Node & SetHeight(int _in) {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].height($1);}, obj_id, _in); return *this;
+      EM_ASM_ARGS({emp_kinetic.objs[$0].height($1);}, obj_id, _in); return *this;
     }
     Node & SetVisible(int _in) {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].visible($1);}, obj_id, _in); return *this;
+      EM_ASM_ARGS({emp_kinetic.objs[$0].visible($1);}, obj_id, _in); return *this;
     }
     Node & SetOpacity(double _in) {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].opacity($1);}, obj_id, _in); return *this;
+      EM_ASM_ARGS({emp_kinetic.objs[$0].opacity($1);}, obj_id, _in); return *this;
     }
     Node & SetListening(int _in) {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].listening($1);}, obj_id, _in); return *this;
+      EM_ASM_ARGS({emp_kinetic.objs[$0].listening($1);}, obj_id, _in); return *this;
     }
     Node & SetScaleX(double _in) {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].scaleX($1);}, obj_id, _in); return *this;
+      EM_ASM_ARGS({emp_kinetic.objs[$0].scaleX($1);}, obj_id, _in); return *this;
     }
     Node & SetScaleY(double _in) {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].scaleY($1);}, obj_id, _in); return *this;
+      EM_ASM_ARGS({emp_kinetic.objs[$0].scaleY($1);}, obj_id, _in); return *this;
     }
     Node & SetOffsetX(int _in) {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].offsetX($1);}, obj_id, _in); return *this;
+      EM_ASM_ARGS({emp_kinetic.objs[$0].offsetX($1);}, obj_id, _in); return *this;
     }
     Node & SetOffsetY(int _in) {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].offsetY($1);}, obj_id, _in); return *this;
+      EM_ASM_ARGS({emp_kinetic.objs[$0].offsetY($1);}, obj_id, _in); return *this;
     }
     Node & SetRotation(int _in) {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].rotation($1);}, obj_id, _in); return *this;
+      EM_ASM_ARGS({emp_kinetic.objs[$0].rotation($1);}, obj_id, _in); return *this;
     }
     Node & SetDraggable(int _in) {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].draggable($1);}, obj_id, _in); return *this;
+      EM_ASM_ARGS({emp_kinetic.objs[$0].draggable($1);}, obj_id, _in); return *this;
     }
     Node & SetZIndex(int _in) {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].setZIndex($1);}, obj_id, _in); return *this;
+      EM_ASM_ARGS({emp_kinetic.objs[$0].setZIndex($1);}, obj_id, _in); return *this;
     }
     Node & SetZBottom() {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].moveToBottom();}, obj_id); return *this;
+      EM_ASM_ARGS({emp_kinetic.objs[$0].moveToBottom();}, obj_id); return *this;
     }
     Node & SetZTop() {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].moveToTop();}, obj_id); return *this;
+      EM_ASM_ARGS({emp_kinetic.objs[$0].moveToTop();}, obj_id); return *this;
     }
 
     inline Node & SetXY(int x, int y) { SetX(x); SetY(y); return *this; }
@@ -229,7 +229,7 @@ namespace Kinetic {
     // Draw either this object or objects in contains.
     void Draw() {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].draw();}, obj_id);
+      EM_ASM_ARGS({emp_kinetic.objs[$0].draw();}, obj_id);
     }
 
     // Draw all objects in this layer.
@@ -238,7 +238,7 @@ namespace Kinetic {
     // Move this object to the top of the current layer.
     void MoveToTop() {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].moveToTop();}, obj_id);
+      EM_ASM_ARGS({emp_kinetic.objs[$0].moveToTop();}, obj_id);
     }
 
     template<class T> void On(const std::string & _trigger, T * _target, void (T::*_method_ptr)());
@@ -286,8 +286,8 @@ namespace Kinetic {
 
     void ConfigureTween() {
       EM_ASM_ARGS({
-          emp_info.objs[$0].node = emp_info.objs[$1];
-          emp_info.objs[$2] = new Kinetic.Tween( emp_info.objs[$0] );
+          emp_kinetic.objs[$0].node = emp_kinetic.objs[$1];
+          emp_kinetic.objs[$2] = new Kinetic.Tween( emp_kinetic.objs[$0] );
       }, settings_id, target->GetID(), obj_id);
       needs_config = false;
     }
@@ -302,7 +302,7 @@ namespace Kinetic {
     }
     virtual ~Tween() {
       EM_ASM_ARGS({
-          if ($0 >= 0) delete emp_info.objs[$0];  // Remove the tween settings from memory.
+          if ($0 >= 0) delete emp_kinetic.objs[$0];  // Remove the tween settings from memory.
       }, settings_id);
     }
 
@@ -316,32 +316,32 @@ namespace Kinetic {
     };
 
     Tween & SetTarget(Node & _target) { target = &_target; needs_config=true; return *this; }
-    Tween & SetTime(double _in) { EM_ASM_ARGS({ emp_info.objs[$0].duration = $1; }, settings_id, _in); needs_config=true; return *this; }
-    Tween & SetX(int _in) { EM_ASM_ARGS({ emp_info.objs[$0].x = $1; }, settings_id, _in); needs_config=true; return *this; }
-    Tween & SetY(int _in) { EM_ASM_ARGS({ emp_info.objs[$0].y = $1; }, settings_id, _in); needs_config=true; return *this; }
-    Tween & SetScaleX(double _in) { EM_ASM_ARGS({ emp_info.objs[$0].scaleX = $1; }, settings_id, _in); needs_config=true; return *this; }
-    Tween & SetScaleY(double _in) { EM_ASM_ARGS({ emp_info.objs[$0].scaleY = $1; }, settings_id, _in); needs_config=true; return *this; }
-    Tween & SetRotation(double _in) { EM_ASM_ARGS({emp_info.objs[$0].rotation = $1; }, settings_id, _in); needs_config=true; return *this; }
-    Tween & SetOpacity(double _in) { EM_ASM_ARGS({emp_info.objs[$0].opacity = $1; }, settings_id, _in); needs_config=true; return *this; }
-    Tween & SetStrokeWidth(double _in) { EM_ASM_ARGS({emp_info.objs[$0].strokeWidth = $1; }, settings_id, _in); needs_config=true; return *this; }
+    Tween & SetTime(double _in) { EM_ASM_ARGS({ emp_kinetic.objs[$0].duration = $1; }, settings_id, _in); needs_config=true; return *this; }
+    Tween & SetX(int _in) { EM_ASM_ARGS({ emp_kinetic.objs[$0].x = $1; }, settings_id, _in); needs_config=true; return *this; }
+    Tween & SetY(int _in) { EM_ASM_ARGS({ emp_kinetic.objs[$0].y = $1; }, settings_id, _in); needs_config=true; return *this; }
+    Tween & SetScaleX(double _in) { EM_ASM_ARGS({ emp_kinetic.objs[$0].scaleX = $1; }, settings_id, _in); needs_config=true; return *this; }
+    Tween & SetScaleY(double _in) { EM_ASM_ARGS({ emp_kinetic.objs[$0].scaleY = $1; }, settings_id, _in); needs_config=true; return *this; }
+    Tween & SetRotation(double _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].rotation = $1; }, settings_id, _in); needs_config=true; return *this; }
+    Tween & SetOpacity(double _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].opacity = $1; }, settings_id, _in); needs_config=true; return *this; }
+    Tween & SetStrokeWidth(double _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].strokeWidth = $1; }, settings_id, _in); needs_config=true; return *this; }
     Tween & SetEasing(easing in_ease) {
       switch (in_ease) {
-      case Linear: EM_ASM_ARGS({emp_info.objs[$0].easing = Kinetic.Easings.Linear; }, settings_id); break;
-      case EaseIn: EM_ASM_ARGS({emp_info.objs[$0].easing = Kinetic.Easings.EaseIn; }, settings_id); break;
-      case EaseOut: EM_ASM_ARGS({emp_info.objs[$0].easing = Kinetic.Easings.EaseOut; }, settings_id); break;
-      case EaseInOut: EM_ASM_ARGS({emp_info.objs[$0].easing = Kinetic.Easings.EaseInOut; }, settings_id); break;
-      case BackEaseIn: EM_ASM_ARGS({emp_info.objs[$0].easing = Kinetic.Easings.BackEaseIn; }, settings_id); break;
-      case BackEaseOut: EM_ASM_ARGS({emp_info.objs[$0].easing = Kinetic.Easings.BackEaseOut; }, settings_id); break;
-      case BackEaseInOut: EM_ASM_ARGS({emp_info.objs[$0].easing = Kinetic.Easings.BackEaseInOut; }, settings_id); break;
-      case ElasticEaseIn: EM_ASM_ARGS({emp_info.objs[$0].easing = Kinetic.Easings.ElasticEaseIn; }, settings_id); break;
-      case ElasticEaseOut: EM_ASM_ARGS({emp_info.objs[$0].easing = Kinetic.Easings.ElasticEaseOut; }, settings_id); break;
-      case ElasticEaseInOut: EM_ASM_ARGS({emp_info.objs[$0].easing = Kinetic.Easings.ElasticEaseInOut; }, settings_id); break;
-      case BounceEaseIn: EM_ASM_ARGS({emp_info.objs[$0].easing = Kinetic.Easings.BounceEaseIn; }, settings_id); break;
-      case BounceEaseOut: EM_ASM_ARGS({emp_info.objs[$0].easing = Kinetic.Easings.BounceEaseOut; }, settings_id); break;
-      case BounceEaseInOut: EM_ASM_ARGS({emp_info.objs[$0].easing = Kinetic.Easings.BounceEaseInOut; }, settings_id); break;
-      case StrongEaseIn: EM_ASM_ARGS({emp_info.objs[$0].easing = Kinetic.Easings.StrongEaseIn; }, settings_id); break;
-      case StrongEaseOut: EM_ASM_ARGS({emp_info.objs[$0].easing = Kinetic.Easings.StrongEaseOut; }, settings_id); break;
-      case StrongEaseInOut: EM_ASM_ARGS({emp_info.objs[$0].easing = Kinetic.Easings.StrongEaseInOut; }, settings_id); break;
+      case Linear: EM_ASM_ARGS({emp_kinetic.objs[$0].easing = Kinetic.Easings.Linear; }, settings_id); break;
+      case EaseIn: EM_ASM_ARGS({emp_kinetic.objs[$0].easing = Kinetic.Easings.EaseIn; }, settings_id); break;
+      case EaseOut: EM_ASM_ARGS({emp_kinetic.objs[$0].easing = Kinetic.Easings.EaseOut; }, settings_id); break;
+      case EaseInOut: EM_ASM_ARGS({emp_kinetic.objs[$0].easing = Kinetic.Easings.EaseInOut; }, settings_id); break;
+      case BackEaseIn: EM_ASM_ARGS({emp_kinetic.objs[$0].easing = Kinetic.Easings.BackEaseIn; }, settings_id); break;
+      case BackEaseOut: EM_ASM_ARGS({emp_kinetic.objs[$0].easing = Kinetic.Easings.BackEaseOut; }, settings_id); break;
+      case BackEaseInOut: EM_ASM_ARGS({emp_kinetic.objs[$0].easing = Kinetic.Easings.BackEaseInOut; }, settings_id); break;
+      case ElasticEaseIn: EM_ASM_ARGS({emp_kinetic.objs[$0].easing = Kinetic.Easings.ElasticEaseIn; }, settings_id); break;
+      case ElasticEaseOut: EM_ASM_ARGS({emp_kinetic.objs[$0].easing = Kinetic.Easings.ElasticEaseOut; }, settings_id); break;
+      case ElasticEaseInOut: EM_ASM_ARGS({emp_kinetic.objs[$0].easing = Kinetic.Easings.ElasticEaseInOut; }, settings_id); break;
+      case BounceEaseIn: EM_ASM_ARGS({emp_kinetic.objs[$0].easing = Kinetic.Easings.BounceEaseIn; }, settings_id); break;
+      case BounceEaseOut: EM_ASM_ARGS({emp_kinetic.objs[$0].easing = Kinetic.Easings.BounceEaseOut; }, settings_id); break;
+      case BounceEaseInOut: EM_ASM_ARGS({emp_kinetic.objs[$0].easing = Kinetic.Easings.BounceEaseInOut; }, settings_id); break;
+      case StrongEaseIn: EM_ASM_ARGS({emp_kinetic.objs[$0].easing = Kinetic.Easings.StrongEaseIn; }, settings_id); break;
+      case StrongEaseOut: EM_ASM_ARGS({emp_kinetic.objs[$0].easing = Kinetic.Easings.StrongEaseOut; }, settings_id); break;
+      case StrongEaseInOut: EM_ASM_ARGS({emp_kinetic.objs[$0].easing = Kinetic.Easings.StrongEaseInOut; }, settings_id); break;
       default: Alert("Unknown Easing..."); break;
       };
       
@@ -356,18 +356,18 @@ namespace Kinetic {
 
     Tween & SetFinishedCallback(Callback * callback, int * info_ptr) {
       EM_ASM_ARGS({
-          emp_info.objs[$0].onFinish = function() { empJSDoCallback($1, $2); };
+          emp_kinetic.objs[$0].onFinish = function() { empJSDoCallback($1, $2); };
         }, settings_id, (int) (callback), (int) info_ptr);
       return *this;
     }
 
     void Play() {
       if (needs_config) ConfigureTween();
-      EM_ASM_ARGS({ emp_info.objs[$0].play(); }, obj_id);
+      EM_ASM_ARGS({ emp_kinetic.objs[$0].play(); }, obj_id);
     }
     void Reverse() {
       if (needs_config) ConfigureTween();
-      EM_ASM_ARGS({ emp_info.objs[$0].reverse(); }, obj_id);
+      EM_ASM_ARGS({ emp_kinetic.objs[$0].reverse(); }, obj_id);
     }
   };
 
@@ -432,63 +432,63 @@ namespace Kinetic {
     void ImageLoaded(); // Called back when image is loaded
 
     // @CAO Move these to RawImage?
-    static int NumImages() { return EM_ASM_INT_V({return emp_info.images.length;}); }
-    static int NumLoaded() { return EM_ASM_INT_V({return emp_info.image_load_count;}); }
-    static bool AllLoaded() { return EM_ASM_INT_V({return (emp_info.images.length == emp_info.image_load_count);}); }
+    static int NumImages() { return EM_ASM_INT_V({return emp_kinetic.images.length;}); }
+    static int NumLoaded() { return EM_ASM_INT_V({return emp_kinetic.image_load_count;}); }
+    static bool AllLoaded() { return EM_ASM_INT_V({return (emp_kinetic.images.length == emp_kinetic.image_load_count);}); }
   };
 
 
-  // Manual control over the canvas...  For the moment, we assume that a context has been placed in emp_info.ctx
+  // Manual control over the canvas...  For the moment, we assume that a context has been placed in emp_kinetic.ctx
   class Canvas {
   public:
     // Setting values
     inline static void SetFill(const Color & color) { 
-      EM_ASM_ARGS({var fs = Pointer_stringify($0); emp_info.ctx.fillStyle = fs;}, color.AsString().c_str());
+      EM_ASM_ARGS({var fs = Pointer_stringify($0); emp_kinetic.ctx.fillStyle = fs;}, color.AsString().c_str());
     }
 
     inline static void SetStroke(const Color & color) {
-      EM_ASM_ARGS({var stroke = Pointer_stringify($0); emp_info.ctx.strokeStyle = stroke;}, color.AsString().c_str());
+      EM_ASM_ARGS({var stroke = Pointer_stringify($0); emp_kinetic.ctx.strokeStyle = stroke;}, color.AsString().c_str());
     }
 
-    inline static void SetLineWidth(double width) { EM_ASM_ARGS({emp_info.ctx.lineWidth = $0;}, width); }
+    inline static void SetLineWidth(double width) { EM_ASM_ARGS({emp_kinetic.ctx.lineWidth = $0;}, width); }
 
     inline static void SetLineJoin(const std::string & lj) {
-      EM_ASM_ARGS({var lj = Pointer_stringify($0); emp_info.ctx.lineJoin = lj;}, lj.c_str());
+      EM_ASM_ARGS({var lj = Pointer_stringify($0); emp_kinetic.ctx.lineJoin = lj;}, lj.c_str());
     }
 
     inline static void SetFont(const std::string & font) {
-      EM_ASM_ARGS({var font = Pointer_stringify($0); emp_info.ctx.font = font;}, font.c_str());
+      EM_ASM_ARGS({var font = Pointer_stringify($0); emp_kinetic.ctx.font = font;}, font.c_str());
     }
 
     inline static void SetFont(const Font & font) {
       std::string font_str = std::to_string(font.GetSize()) + std::string("pt ") + font.GetFamily();
       // @CAO Also set font color?
-      EM_ASM_ARGS({var font = Pointer_stringify($0); emp_info.ctx.font = font;}, font_str.c_str());
+      EM_ASM_ARGS({var font = Pointer_stringify($0); emp_kinetic.ctx.font = font;}, font_str.c_str());
     }
 
     inline static void SetTextAlign(const std::string & align) {
-      EM_ASM_ARGS({var align = Pointer_stringify($0); emp_info.ctx.textAlign = align;}, align.c_str());
+      EM_ASM_ARGS({var align = Pointer_stringify($0); emp_kinetic.ctx.textAlign = align;}, align.c_str());
     }
 
     inline static void SetShadowColor(const Color & color) {
-      EM_ASM_ARGS({var color = Pointer_stringify($0); emp_info.ctx.shadowColor = color;}, color.AsString().c_str());
+      EM_ASM_ARGS({var color = Pointer_stringify($0); emp_kinetic.ctx.shadowColor = color;}, color.AsString().c_str());
     }
-    inline static void SetShadowBlur(int _in) { EM_ASM_ARGS({emp_info.ctx.shadowBlur = $0;}, _in); }
-    inline static void SetShadowOffsetX(int _in) { EM_ASM_ARGS({emp_info.ctx.shadowOffsetX = $0;}, _in); }
-    inline static void SetShadowOffsetY(int _in) { EM_ASM_ARGS({emp_info.ctx.shadowOffsetY = $0;}, _in); }
+    inline static void SetShadowBlur(int _in) { EM_ASM_ARGS({emp_kinetic.ctx.shadowBlur = $0;}, _in); }
+    inline static void SetShadowOffsetX(int _in) { EM_ASM_ARGS({emp_kinetic.ctx.shadowOffsetX = $0;}, _in); }
+    inline static void SetShadowOffsetY(int _in) { EM_ASM_ARGS({emp_kinetic.ctx.shadowOffsetY = $0;}, _in); }
 
     // Shapes and Text
     inline static void Text(const std::string & msg, int x, int y, bool fill=true) {
-      if (fill) EM_ASM_ARGS({var msg = Pointer_stringify($0); emp_info.ctx.fillText(msg, $1, $2);}, msg.c_str(), x, y);
-      else EM_ASM_ARGS({var msg = Pointer_stringify($0); emp_info.ctx.strokeText(msg, $1, $2);}, msg.c_str(), x, y);
+      if (fill) EM_ASM_ARGS({var msg = Pointer_stringify($0); emp_kinetic.ctx.fillText(msg, $1, $2);}, msg.c_str(), x, y);
+      else EM_ASM_ARGS({var msg = Pointer_stringify($0); emp_kinetic.ctx.strokeText(msg, $1, $2);}, msg.c_str(), x, y);
     }
     inline static void Text(const std::string & msg, const Point<int> & point, bool fill=true) {
       Text(msg, point.GetX(), point.GetY(), fill);
     }
 
     inline static void Rect(int x, int y, int width, int height, bool fill=false) {
-      if (fill) EM_ASM_ARGS({emp_info.ctx.fillRect($0, $1, $2, $3);}, x, y, width, height);
-      else EM_ASM_ARGS({emp_info.ctx.strokeRect($0, $1, $2, $3);}, x, y, width, height);
+      if (fill) EM_ASM_ARGS({emp_kinetic.ctx.fillRect($0, $1, $2, $3);}, x, y, width, height);
+      else EM_ASM_ARGS({emp_kinetic.ctx.strokeRect($0, $1, $2, $3);}, x, y, width, height);
     }
     inline static void Rect(const Point<int> & point, int width, int height, bool fill=false) {
       Rect(point.GetX(), point.GetY(), width, height, fill);
@@ -496,7 +496,7 @@ namespace Kinetic {
 
     template <typename BASE_TYPE>
     inline static void Arc(BASE_TYPE x, BASE_TYPE y, BASE_TYPE radius, double start, double end, bool cclockwise=false) {
-      EM_ASM_ARGS({emp_info.ctx.arc($0, $1, $2, $3, $4, $5);},
+      EM_ASM_ARGS({emp_kinetic.ctx.arc($0, $1, $2, $3, $4, $5);},
                   x, y, radius, start, end, cclockwise);
     }
     template <typename BASE_TYPE>
@@ -518,42 +518,42 @@ namespace Kinetic {
 
     inline static void DrawImage(const Image & image, int x, int y) {
       // @CAO Do something different if the image hasn't loaded yet?  Maybe draw a placeholder rectangle?
-      EM_ASM_ARGS({emp_info.ctx.drawImage(emp_info.images[$0], $1, $2);}, image.GetRawImage().GetImgID(), x, y);
+      EM_ASM_ARGS({emp_kinetic.ctx.drawImage(emp_kinetic.images[$0], $1, $2);}, image.GetRawImage().GetImgID(), x, y);
     }
     inline static void DrawImage(const Image & image, const Point<int> & point) {
       DrawImage(image, point.GetX(), point.GetY());
     }
 
     inline static void DrawImage(const Image & image, int x, int y, int w, int h) {
-      EM_ASM_ARGS({emp_info.ctx.drawImage(emp_info.images[$0], $1, $2, $3, $4);}, image.GetRawImage().GetImgID(), x, y, w, h);
+      EM_ASM_ARGS({emp_kinetic.ctx.drawImage(emp_kinetic.images[$0], $1, $2, $3, $4);}, image.GetRawImage().GetImgID(), x, y, w, h);
     }
     inline static void DrawImage(const Image & image, const Point<int> & point, int w, int h) {
       DrawImage(image, point.GetX(), point.GetY(), w, h);
     }
 
     // Paths
-    inline static void BeginPath() { EM_ASM( emp_info.ctx.beginPath() ); }
-    inline static void ClosePath() { EM_ASM( emp_info.ctx.closePath() ); }
-    inline static void Fill() { EM_ASM( emp_info.ctx.fill() ); }
-    inline static void LineTo(int x, int y) { EM_ASM_ARGS({ emp_info.ctx.lineTo($0, $1); }, x, y); }
+    inline static void BeginPath() { EM_ASM( emp_kinetic.ctx.beginPath() ); }
+    inline static void ClosePath() { EM_ASM( emp_kinetic.ctx.closePath() ); }
+    inline static void Fill() { EM_ASM( emp_kinetic.ctx.fill() ); }
+    inline static void LineTo(int x, int y) { EM_ASM_ARGS({ emp_kinetic.ctx.lineTo($0, $1); }, x, y); }
     template <typename T> static void LineTo(const Point<T> & point) { LineTo(point.GetX(), point.GetY()); }
-    inline static void MoveTo(int x, int y) { EM_ASM_ARGS({ emp_info.ctx.moveTo($0, $1); }, x, y); }
+    inline static void MoveTo(int x, int y) { EM_ASM_ARGS({ emp_kinetic.ctx.moveTo($0, $1); }, x, y); }
     template <typename T> static void MoveTo(const Point<T> & point) { MoveTo(point.GetX(), point.GetY()); }
 
     // Transformations
-    inline static void Restore() { EM_ASM( emp_info.ctx.restore() ); }
-    inline static void Save() { EM_ASM( emp_info.ctx.save() ); }
-    inline static void Scale(double x, double y) { EM_ASM_ARGS({ emp_info.ctx.scale($0, $1); }, x, y); }
-    inline static void Scale(double new_scale) { EM_ASM_ARGS({ emp_info.ctx.scale($0, $0); }, new_scale); }
-    inline static void Translate(int x, int y) { EM_ASM_ARGS({ emp_info.ctx.translate($0, $1); }, x, y); }
+    inline static void Restore() { EM_ASM( emp_kinetic.ctx.restore() ); }
+    inline static void Save() { EM_ASM( emp_kinetic.ctx.save() ); }
+    inline static void Scale(double x, double y) { EM_ASM_ARGS({ emp_kinetic.ctx.scale($0, $1); }, x, y); }
+    inline static void Scale(double new_scale) { EM_ASM_ARGS({ emp_kinetic.ctx.scale($0, $0); }, new_scale); }
+    inline static void Translate(int x, int y) { EM_ASM_ARGS({ emp_kinetic.ctx.translate($0, $1); }, x, y); }
     inline static void Translate(const Point<int> & point) { Translate(point.GetX(), point.GetY()); }
-    inline static void Rotate(double angle) { EM_ASM_ARGS({ emp_info.ctx.rotate($0); }, angle); }
+    inline static void Rotate(double angle) { EM_ASM_ARGS({ emp_kinetic.ctx.rotate($0); }, angle); }
  
 
     // Finsihing
-    inline static void Stroke() { EM_ASM( emp_info.ctx.stroke() ); }
+    inline static void Stroke() { EM_ASM( emp_kinetic.ctx.stroke() ); }
     inline static void SetupTarget(const Node & obj) {
-      EM_ASM_ARGS({emp_info.canvas.fillStrokeShape(emp_info.objs[$0])}, obj.GetID());
+      EM_ASM_ARGS({emp_kinetic.canvas.fillStrokeShape(emp_kinetic.objs[$0])}, obj.GetID());
     }
   };
 
@@ -583,7 +583,7 @@ namespace Kinetic {
     MethodCallback<T> * new_callback = new MethodCallback<T>(target, method_ptr);
     EM_ASM_ARGS({
         var trigger = Pointer_stringify($1);
-        emp_info.objs[$0].on(trigger, function() {
+        emp_kinetic.objs[$0].on(trigger, function() {
             empJSDoCallback($2);
         });
     }, obj_id, trigger.c_str(), (int) new_callback);
@@ -599,7 +599,7 @@ namespace Kinetic {
 
     EM_ASM_ARGS({
         var trigger = Pointer_stringify($1);
-        emp_info.objs[$0].on(trigger, function(event) {
+        emp_kinetic.objs[$0].on(trigger, function(event) {
             var evt = event.evt;
             var ptr = Module._malloc(32); // 8 ints @ 4 bytes each...
             setValue(ptr,    evt.layerX,   'i32');
@@ -631,114 +631,114 @@ namespace Kinetic {
     virtual Shape & SetFillPatternImage(const Image & _image) {
       image = &_image;
       EM_ASM_ARGS({
-        emp_info.objs[$0].setFillPriority('pattern');
-        emp_info.objs[$0].setFillPatternImage(emp_info.images[$1]);
+        emp_kinetic.objs[$0].setFillPriority('pattern');
+        emp_kinetic.objs[$0].setFillPatternImage(emp_kinetic.images[$1]);
       }, obj_id, image->GetRawImage().GetImgID());
       return *this;
     }
 
 
     Shape & SetFill(const Color & color) {
-      EM_ASM_ARGS({var fill = Pointer_stringify($1); emp_info.objs[$0].fill(fill);}, obj_id, color.AsString().c_str());
+      EM_ASM_ARGS({var fill = Pointer_stringify($1); emp_kinetic.objs[$0].fill(fill);}, obj_id, color.AsString().c_str());
       return *this;
     }
 
-    int GetFillPatternX() const { return EM_ASM_INT({return emp_info.objs[$0].fillPatternX();}, obj_id); }
-    Shape & SetFillPatternX(int _in) { EM_ASM_ARGS({emp_info.objs[$0].fillPatternX($1);}, obj_id, _in); return *this; }
+    int GetFillPatternX() const { return EM_ASM_INT({return emp_kinetic.objs[$0].fillPatternX();}, obj_id); }
+    Shape & SetFillPatternX(int _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].fillPatternX($1);}, obj_id, _in); return *this; }
 
-    int GetFillPatternY() const { return EM_ASM_INT({return emp_info.objs[$0].fillPatternY();}, obj_id); }
-    Shape & SetFillPatternY(int _in) { EM_ASM_ARGS({emp_info.objs[$0].fillPatternY($1);}, obj_id, _in); return *this; }
+    int GetFillPatternY() const { return EM_ASM_INT({return emp_kinetic.objs[$0].fillPatternY();}, obj_id); }
+    Shape & SetFillPatternY(int _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].fillPatternY($1);}, obj_id, _in); return *this; }
 
     Shape & SetFillPatternXY(int _x, int _y) { SetFillPatternX(_x); SetFillPatternY(_y); return *this; }
 
 
-    int GetFillPatternOffsetX() const { return EM_ASM_INT({return emp_info.objs[$0].fillPatternOffsetX();}, obj_id); }
-    Shape & SetFillPatternOffsetX(int _in) { EM_ASM_ARGS({emp_info.objs[$0].fillPatternOffsetX($1);}, obj_id, _in); return *this; }
+    int GetFillPatternOffsetX() const { return EM_ASM_INT({return emp_kinetic.objs[$0].fillPatternOffsetX();}, obj_id); }
+    Shape & SetFillPatternOffsetX(int _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].fillPatternOffsetX($1);}, obj_id, _in); return *this; }
 
-    int GetFillPatternOffsetY() const { return EM_ASM_INT({return emp_info.objs[$0].fillPatternOffsetY();}, obj_id); }
-    Shape & SetFillPatternOffsetY(int _in) { EM_ASM_ARGS({emp_info.objs[$0].fillPatternOffsetY($1);}, obj_id, _in); return *this; }
+    int GetFillPatternOffsetY() const { return EM_ASM_INT({return emp_kinetic.objs[$0].fillPatternOffsetY();}, obj_id); }
+    Shape & SetFillPatternOffsetY(int _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].fillPatternOffsetY($1);}, obj_id, _in); return *this; }
 
     Shape & SetFillPatternOffsetXY(int _x, int _y) { SetFillPatternOffsetX(_x); SetFillPatternOffsetY(_y); return *this; }
 
 
-    double GetFillPatternScaleX() const { return EM_ASM_DOUBLE({return emp_info.objs[$0].fillPatternScaleX();}, obj_id); }
-    Shape & SetFillPatternScaleX(double _in) { EM_ASM_ARGS({emp_info.objs[$0].fillPatternScaleX($1);}, obj_id, _in); return *this; }
+    double GetFillPatternScaleX() const { return EM_ASM_DOUBLE({return emp_kinetic.objs[$0].fillPatternScaleX();}, obj_id); }
+    Shape & SetFillPatternScaleX(double _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].fillPatternScaleX($1);}, obj_id, _in); return *this; }
 
-    double GetFillPatternScaleY() const { return EM_ASM_DOUBLE({return emp_info.objs[$0].fillPatternScaleY();}, obj_id); }
-    Shape & SetFillPatternScaleY(double _in) { EM_ASM_ARGS({emp_info.objs[$0].fillPatternScaleY($1);}, obj_id, _in); return *this; }
+    double GetFillPatternScaleY() const { return EM_ASM_DOUBLE({return emp_kinetic.objs[$0].fillPatternScaleY();}, obj_id); }
+    Shape & SetFillPatternScaleY(double _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].fillPatternScaleY($1);}, obj_id, _in); return *this; }
 
     Shape & SetFillPatternScale(double _x, double _y) { SetFillPatternScaleX(_x); SetFillPatternScaleY(_y); return *this; }
     Shape & SetFillPatternScale(double scale) { SetFillPatternScaleX(scale); SetFillPatternScaleY(scale); return *this; }
 
 
-    double GetFillPatternRotation() const { return EM_ASM_DOUBLE({return emp_info.objs[$0].fillPatternRotation();}, obj_id); }
-    Shape & SetFillPatternRotation(double _in) { EM_ASM_ARGS({emp_info.objs[$0].fillPatternRotation($1);}, obj_id, _in); return *this; }
+    double GetFillPatternRotation() const { return EM_ASM_DOUBLE({return emp_kinetic.objs[$0].fillPatternRotation();}, obj_id); }
+    Shape & SetFillPatternRotation(double _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].fillPatternRotation($1);}, obj_id, _in); return *this; }
 
 
-    Shape & SetFillPatternRepeat(int _in) { EM_ASM_ARGS({emp_info.objs[$0].fillPatternRepeat($1);}, obj_id, _in); return *this; }
+    Shape & SetFillPatternRepeat(int _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].fillPatternRepeat($1);}, obj_id, _in); return *this; }
 
 
-    bool GetFillEnabled() const { return EM_ASM_INT({return emp_info.objs[$0].fillEnabled();}, obj_id); }
-    Shape & SetFillEnabled(bool _in) { EM_ASM_ARGS({emp_info.objs[$0].fillEnabled($1);}, obj_id, (int) _in); return *this; }
+    bool GetFillEnabled() const { return EM_ASM_INT({return emp_kinetic.objs[$0].fillEnabled();}, obj_id); }
+    Shape & SetFillEnabled(bool _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].fillEnabled($1);}, obj_id, (int) _in); return *this; }
 
 
     Shape & SetFillPriority(const std::string & _in) {
-      EM_ASM_ARGS({var priority = Pointer_stringify($1); emp_info.objs[$0].fillPriority(priority);}, obj_id, (int) _in.c_str());
+      EM_ASM_ARGS({var priority = Pointer_stringify($1); emp_kinetic.objs[$0].fillPriority(priority);}, obj_id, (int) _in.c_str());
       return *this;
     }
 
 
     Shape & SetStroke(const std::string & _in) {
-      EM_ASM_ARGS({var stroke = Pointer_stringify($1); emp_info.objs[$0].stroke(stroke);}, obj_id, _in.c_str());
+      EM_ASM_ARGS({var stroke = Pointer_stringify($1); emp_kinetic.objs[$0].stroke(stroke);}, obj_id, _in.c_str());
       return *this;
     }
 
-    int GetStrokeWidth() const { return EM_ASM_INT({return emp_info.objs[$0].strokeWidth();}, obj_id); }
-    Shape & SetStrokeWidth(int _in) { EM_ASM_ARGS({emp_info.objs[$0].strokeWidth($1);}, obj_id, _in); return *this; }
+    int GetStrokeWidth() const { return EM_ASM_INT({return emp_kinetic.objs[$0].strokeWidth();}, obj_id); }
+    Shape & SetStrokeWidth(int _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].strokeWidth($1);}, obj_id, _in); return *this; }
 
-    bool GetStrokeScaleEnabled() const { return EM_ASM_INT({return emp_info.objs[$0].strokeScaleEnabled();}, obj_id); }
-    Shape & SetStrokeScaleEnabled(bool _in) { EM_ASM_ARGS({emp_info.objs[$0].strokeScaleEnabled($1);}, obj_id, (int) _in); return *this; }
+    bool GetStrokeScaleEnabled() const { return EM_ASM_INT({return emp_kinetic.objs[$0].strokeScaleEnabled();}, obj_id); }
+    Shape & SetStrokeScaleEnabled(bool _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].strokeScaleEnabled($1);}, obj_id, (int) _in); return *this; }
 
-    bool GetStrokeEnabled() const { return EM_ASM_INT({return emp_info.objs[$0].strokeEnabled();}, obj_id); }
-    Shape & SetStrokeEnabled(bool _in) { EM_ASM_ARGS({emp_info.objs[$0].strokeEnabled($1);}, obj_id, (int) _in); return *this; }
+    bool GetStrokeEnabled() const { return EM_ASM_INT({return emp_kinetic.objs[$0].strokeEnabled();}, obj_id); }
+    Shape & SetStrokeEnabled(bool _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].strokeEnabled($1);}, obj_id, (int) _in); return *this; }
 
 
     Shape & SetLineJoin(const std::string & _in) {
-      EM_ASM_ARGS({var lj = Pointer_stringify($1); emp_info.objs[$0].lineJoin(lj);}, obj_id, _in.c_str());
+      EM_ASM_ARGS({var lj = Pointer_stringify($1); emp_kinetic.objs[$0].lineJoin(lj);}, obj_id, _in.c_str());
       return *this;
     }
     Shape & SetLineCap(const std::string & _in) {
-      EM_ASM_ARGS({var lc = Pointer_stringify($1); emp_info.objs[$0].lineCap(lc);}, obj_id, _in.c_str());
+      EM_ASM_ARGS({var lc = Pointer_stringify($1); emp_kinetic.objs[$0].lineCap(lc);}, obj_id, _in.c_str());
       return *this;
     }
 
     Shape & SetShadowColor(const Color & _in) {
-      EM_ASM_ARGS({var sc = Pointer_stringify($1); emp_info.objs[$0].shadowColor($1);}, obj_id, _in.AsString().c_str());
+      EM_ASM_ARGS({var sc = Pointer_stringify($1); emp_kinetic.objs[$0].shadowColor($1);}, obj_id, _in.AsString().c_str());
       return *this;
     }
 
-    double GetShadowBlur() const { return EM_ASM_DOUBLE({return emp_info.objs[$0].shadowBlur();}, obj_id); }
-    Shape & SetShadowBlur(double _in) { EM_ASM_ARGS({emp_info.objs[$0].shadowBlur($1);}, obj_id, _in); return *this; }
+    double GetShadowBlur() const { return EM_ASM_DOUBLE({return emp_kinetic.objs[$0].shadowBlur();}, obj_id); }
+    Shape & SetShadowBlur(double _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].shadowBlur($1);}, obj_id, _in); return *this; }
 
 
-    int GetShadowOffsetX() const { return EM_ASM_INT({return emp_info.objs[$0].shadowOffsetX();}, obj_id); }
-    Shape & SetShadowOffsetX(int _in) { EM_ASM_ARGS({emp_info.objs[$0].shadowOffsetX($1);}, obj_id, _in); return *this; }
+    int GetShadowOffsetX() const { return EM_ASM_INT({return emp_kinetic.objs[$0].shadowOffsetX();}, obj_id); }
+    Shape & SetShadowOffsetX(int _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].shadowOffsetX($1);}, obj_id, _in); return *this; }
 
-    int GetShadowOffsetY() const { return EM_ASM_INT({return emp_info.objs[$0].shadowOffsetY();}, obj_id); }
-    Shape & SetShadowOffsetY(int _in) { EM_ASM_ARGS({emp_info.objs[$0].shadowOffsetY($1);}, obj_id, _in); return *this; }
+    int GetShadowOffsetY() const { return EM_ASM_INT({return emp_kinetic.objs[$0].shadowOffsetY();}, obj_id); }
+    Shape & SetShadowOffsetY(int _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].shadowOffsetY($1);}, obj_id, _in); return *this; }
 
     Shape & SetShadowOffset(int _x, int _y) { SetShadowOffsetX(_x); SetShadowOffsetY(_y); return *this; }
 
 
-    double GetShadowOpacity() const { return EM_ASM_DOUBLE({return emp_info.objs[$0].shadowOpacity();}, obj_id); }
-    Shape & SetShadowOpacity(double _in) { EM_ASM_ARGS({emp_info.objs[$0].shadowOpacity($1);}, obj_id, _in); return *this; }
+    double GetShadowOpacity() const { return EM_ASM_DOUBLE({return emp_kinetic.objs[$0].shadowOpacity();}, obj_id); }
+    Shape & SetShadowOpacity(double _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].shadowOpacity($1);}, obj_id, _in); return *this; }
 
-    bool GetShadowEnabled() const { return EM_ASM_INT({return emp_info.objs[$0].shadowEnabled();}, obj_id); }
-    Shape & SetShadowEnabled(bool _in) { EM_ASM_ARGS({emp_info.objs[$0].shadowEnabled($1);}, obj_id, (int) _in); return *this; }
+    bool GetShadowEnabled() const { return EM_ASM_INT({return emp_kinetic.objs[$0].shadowEnabled();}, obj_id); }
+    Shape & SetShadowEnabled(bool _in) { EM_ASM_ARGS({emp_kinetic.objs[$0].shadowEnabled($1);}, obj_id, (int) _in); return *this; }
 
 
     // @CAO -- not the proper place for this??
-    inline Shape & SetCornerRadius(int radius) { EM_ASM_ARGS({emp_info.objs[$0].cornerRadius($1);}, obj_id, radius); return *this; }
+    inline Shape & SetCornerRadius(int radius) { EM_ASM_ARGS({emp_kinetic.objs[$0].cornerRadius($1);}, obj_id, radius); return *this; }
 
 
     // Override the drawing of this shape.
@@ -747,17 +747,17 @@ namespace Kinetic {
       draw_callback = new Callback_Canvas<T>(target, draw_ptr);
 
       EM_ASM_ARGS({
-        emp_info.objs[$0].setDrawFunc( function(_ctx) {
-            emp_info.ctx = _ctx._context;
+        emp_kinetic.objs[$0].setDrawFunc( function(_ctx) {
+            emp_kinetic.ctx = _ctx._context;
             empJSDoCallback($1, 0);
-            emp_info.ctx = null;
+            emp_kinetic.ctx = null;
         } );
       }, obj_id, (int) draw_callback);
 
       return *this;
     }
 
-    Shape & DoRotate(double rot) { EM_ASM_ARGS({emp_info.objs[$0].rotate($1);}, obj_id, rot); return *this; }
+    Shape & DoRotate(double rot) { EM_ASM_ARGS({emp_kinetic.objs[$0].rotate($1);}, obj_id, rot); return *this; }
 
     const Image * GetImage() { return image; }
   };
@@ -786,8 +786,8 @@ namespace Kinetic {
   public:
     Layer() {
       obj_id = EM_ASM_INT_V({
-          var obj_id = emp_info.objs.length;            // Determine next free id for a Kinetic object.
-          emp_info.objs[obj_id] = new Kinetic.Layer();  // Build new layer and save as a Kinetic object.
+          var obj_id = emp_kinetic.objs.length;            // Determine next free id for a Kinetic object.
+          emp_kinetic.objs[obj_id] = new Kinetic.Layer();  // Build new layer and save as a Kinetic object.
           return obj_id;                                // Return the Kinetic object id.
       });
     }
@@ -801,13 +801,13 @@ namespace Kinetic {
       if (image && image->HasLoaded() == false) {
         image->DrawOnLoad(this);
       }
-      EM_ASM_ARGS({emp_info.objs[$0].add(emp_info.objs[$1]);}, obj_id, _obj.GetID());
+      EM_ASM_ARGS({emp_kinetic.objs[$0].add(emp_kinetic.objs[$1]);}, obj_id, _obj.GetID());
       return *this;
     }
 
     Layer & Add(Image & _obj) {
       _obj.SetLayer(this);   // Track what layer this image is in.
-      EM_ASM_ARGS({emp_info.objs[$0].add(emp_info.objs[$1]);}, obj_id, _obj.GetID());
+      EM_ASM_ARGS({emp_kinetic.objs[$0].add(emp_kinetic.objs[$1]);}, obj_id, _obj.GetID());
       return *this;
     }
 
@@ -817,16 +817,16 @@ namespace Kinetic {
     }
 
     Layer & Remove(Node & _obj) {
-      EM_ASM_ARGS({emp_info.objs[$0].remove();}, _obj.GetID());
+      EM_ASM_ARGS({emp_kinetic.objs[$0].remove();}, _obj.GetID());
       _obj.SetLayer(NULL);
       return *this;
     }
 
     void Draw() {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].draw();}, obj_id);
+      EM_ASM_ARGS({emp_kinetic.objs[$0].draw();}, obj_id);
     }
-    void BatchDraw() { EM_ASM_ARGS({emp_info.objs[$0].batchDraw();}, obj_id); }
+    void BatchDraw() { EM_ASM_ARGS({emp_kinetic.objs[$0].batchDraw();}, obj_id); }
   };
 
   // Functions that rely on Layers, declared above.
@@ -847,8 +847,8 @@ namespace Kinetic {
     {
       obj_id = EM_ASM_INT({
         name = Pointer_stringify($2);
-        var obj_id = emp_info.objs.length;
-        emp_info.objs[obj_id] = new Kinetic.Stage({
+        var obj_id = emp_kinetic.objs.length;
+        emp_kinetic.objs[obj_id] = new Kinetic.Stage({
                 container: name,
                 width: $0,
                 height: $1
@@ -914,7 +914,7 @@ namespace Kinetic {
 
     // Add a layer and return this stage itself (so adding can be chained...)
     Stage & Add(Layer & _layer) {
-      EM_ASM_ARGS({emp_info.objs[$0].add(emp_info.objs[$1]);}, obj_id, _layer.GetID());
+      EM_ASM_ARGS({emp_kinetic.objs[$0].add(emp_kinetic.objs[$1]);}, obj_id, _layer.GetID());
       return *this;
     }
   };
@@ -926,13 +926,13 @@ namespace Kinetic {
     TextBox(int x=0, int y=0, const std::string & text="", int font_size=30, const std::string & font_family="Helvetica", const emp::Color & fill="black")
     {
       obj_id = EM_ASM_INT( {
-          var obj_id = emp_info.objs.length;         // Determine the next free id for a Kinetic object.
+          var obj_id = emp_kinetic.objs.length;         // Determine the next free id for a Kinetic object.
           _text = Pointer_stringify($2);             // Make sure string values are properly converted (text)
           _font_size = Pointer_stringify($3);        // Make sure string values are properly converted (size)
           _font_family = Pointer_stringify($4);      // Make sure string values are properly converted (font)
           _fill = Pointer_stringify($5);             // Make sure string values are properly converted (color)
         
-          emp_info.objs[obj_id] = new Kinetic.Text({           // Build the new text object!
+          emp_kinetic.objs[obj_id] = new Kinetic.Text({           // Build the new text object!
               x: $0,
               y: $1,
               text: _text,
@@ -949,7 +949,7 @@ namespace Kinetic {
     ~TextBox() { ; }
 
     TextBox & SetText(const std::string & _text) {
-      EM_ASM_ARGS({var _text = Pointer_stringify($1); emp_info.objs[$0].text(_text);}, obj_id, _text.c_str());
+      EM_ASM_ARGS({var _text = Pointer_stringify($1); emp_kinetic.objs[$0].text(_text);}, obj_id, _text.c_str());
       return *this;
     }
   };
@@ -1039,12 +1039,12 @@ namespace Kinetic {
     
     void Start() {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].start();}, obj_id);
+      EM_ASM_ARGS({emp_kinetic.objs[$0].start();}, obj_id);
       is_running = true;
     }
     void Stop() {
       emp_assert(obj_id >= 0 && obj_id < GetNumObjs());
-      EM_ASM_ARGS({emp_info.objs[$0].stop();}, obj_id);
+      EM_ASM_ARGS({emp_kinetic.objs[$0].stop();}, obj_id);
       is_running = false;
     }
   };
@@ -1055,16 +1055,16 @@ namespace Kinetic {
 
   void Image::ImageLoaded() // Called back when image is loaded
   {
-    if (width == -1) width = EM_ASM_INT({return emp_info.images[$0].width;}, raw_image.GetImgID());
-    if (height == -1) height = EM_ASM_INT({return emp_info.images[$0].height;}, raw_image.GetImgID());
+    if (width == -1) width = EM_ASM_INT({return emp_kinetic.images[$0].width;}, raw_image.GetImgID());
+    if (height == -1) height = EM_ASM_INT({return emp_kinetic.images[$0].height;}, raw_image.GetImgID());
 
     // Build the kinetic image object now that the raw image has loaded.
     obj_id = EM_ASM_INT({
-        var obj_id = emp_info.objs.length;       // Determine the next free id for a Kinetic object.
-        emp_info.objs[obj_id] = new Kinetic.Image({
+        var obj_id = emp_kinetic.objs.length;       // Determine the next free id for a Kinetic object.
+        emp_kinetic.objs[obj_id] = new Kinetic.Image({
           x: $1,
           y: $2,
-          image: emp_info.images[$0],
+          image: emp_kinetic.images[$0],
           width: $3,
           height: $4,
           scaleX: $5,
