@@ -18,6 +18,7 @@
 //
 
 namespace emp {
+
   class Callback {
   private:
     bool is_disposible;  // Can this callback be deleted immediately after use?
