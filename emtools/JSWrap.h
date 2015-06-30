@@ -35,8 +35,6 @@ extern "C" {
   extern int EMP_GetCBArgCount();  // Get the number of arguments associated with a callback.
 };
 
-// Create a helper macro the will facilitate using custom classes in wrapped args.
-#define EMP_SETUP_JSWRAP(...)
 
 namespace emp {
   
@@ -69,7 +67,7 @@ namespace emp {
     arg_var = tmp_var;   // @CAO Do we need to free the memory in tmp_var?
   }
 
-  // If no specialized LoadArg() exists, call LoadFromArg() in the target object.
+  // If no specialized LoadArg() exists, call LoadFromArg() member function in target object.
   template <class ARG_TYPE, int ARG_ID>
   static void LoadArg(ARG_TYPE & arg_var) {
     arg_var.template LoadFromArg<ARG_ID>();

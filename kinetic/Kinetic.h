@@ -1,6 +1,16 @@
 #ifndef EMP_KINETIC_H
 #define EMP_KINETIC_H
 
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+//  This file contains information for using KineticJS from C++
+//
+//
+//  Development Notes:
+//  * Need to move from callbacks.h to JSWrap.h
+//    - Setup JSWrap to be able to convert AnimationFrame object (or original versions?)
+//
+
 #include <emscripten.h>
 
 #include <list>
@@ -8,7 +18,7 @@
 #include <vector>
 
 #include "../tools/assert.h"
-#include "../tools/callbacks.h"
+#include "callbacks.h"
 #include "../tools/const.h"
 #include "../geometry/Circle2D.h"
 #include "../geometry/Point2D.h"

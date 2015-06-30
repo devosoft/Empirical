@@ -54,6 +54,7 @@ namespace emp {
   
     RETURN operator()(Args... args) { return function_ptr(args...); }
   };
+
   
   template <class T> class MethodCallback : public Callback {
   private:
@@ -86,8 +87,7 @@ namespace emp {
     void DoCallback(int * arg_ptr) { (target->*(method_ptr))((A) arg_ptr); }
     void DoArgCallback(A arg) { (target->*(method_ptr))(arg); }
   };
-  
-  
+
   struct EventInfo {
     // Mouse / Touch:
     int layer_x;      // Coordinates of mouse in this layer.
@@ -105,7 +105,7 @@ namespace emp {
       : layer_x(lx), layer_y(ly), button(but), key_code(key)
       , alt_key(alt), ctrl_key(ctrl), meta_key(meta), shift_key(shift) { ; }
   };
-
+  
   
   template <class T> class MethodCallback_Event : public Callback {
   private:
