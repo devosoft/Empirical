@@ -1,12 +1,13 @@
 #ifndef EMP_RAW_IMAGE_H
 #define EMP_RAW_IMAGE_H
 
-#include <list>
+#include <functional>
 #include <map>
 #include <string>
+#include <vector>
 
-#include "../tools/callbacks.h"
 #include "emfunctions.h"
+#include "JSWrap.h"
 
 namespace emp {
 
@@ -16,17 +17,18 @@ namespace emp {
     int img_id;
     mutable bool has_loaded;
     mutable bool has_error;
-    mutable std::list<Callback *> callbacks_on_load;
-    mutable std::list<Callback *> callbacks_on_error;
+    mutable std::vector<uint32_t> callbacks_on_load;
+    mutable std::vector<uint32_t> callbacks_on_error;
 
-    MethodCallback<RawImage> loaded_callback;
-    MethodCallback<RawImage> error_callback;
+    uint32_t loaded_callback;
+    uint32_t error_callback;
   public:
     RawImage(const std::string & _filename)
       : filename(_filename), has_loaded(false), has_error(false)
-      , loaded_callback(this, &RawImage::MarkLoaded)
-      , error_callback(this, &RawImage::MarkError)
     {
+      loaded_callback = JSWrapOnce( std::function<void()>(std::bind(&RawImage::MarkLoaded, this)) );
+      error_callback = JSWrapOnce( std::function<void()>(std::bind(&RawImage::MarkError, this)) );
+
       img_id = EM_ASM_INT({
         var file = Pointer_stringify($0);
         var img_id = emp_info.images.length;
@@ -35,16 +37,16 @@ namespace emp {
 
         emp_info.images[img_id].onload = function() {
             emp_info.image_load_count += 1;
-            empJSDoCallback($1, 0);
+            emp.Callback($1);
         };
 
         emp_info.images[img_id].onerror = function() {
             emp_info.image_error_count += 1;
-            empJSDoCallback($2, 0);
+            emp.Callback($2);
         };
 
         return img_id;
-      }, filename.c_str(), (int) &loaded_callback, (int) &error_callback);
+      }, filename.c_str(), loaded_callback, error_callback);
 
     }
     ~RawImage() { ; }
@@ -56,46 +58,32 @@ namespace emp {
 
     void MarkLoaded() {
       has_loaded = true;
-
-      while (callbacks_on_load.size()) {
-        Callback * cur_callback = callbacks_on_load.front();
-        callbacks_on_load.pop_front();
-        cur_callback->DoCallback();
-      }
+      for (uint32_t id : callbacks_on_load) empCppCallback(id);
+      callbacks_on_load.resize(0);
     }
 
     void MarkError() {
       has_error = true;
       emp::Alert(std::string("Error loading image: ") + filename);
 
-      while (callbacks_on_error.size()) {
-        Callback * cur_callback = callbacks_on_error.front();
-        callbacks_on_error.pop_front();
-        cur_callback->DoCallback();
-      }
+      for (uint32_t id : callbacks_on_error) empCppCallback(id);
+      callbacks_on_error.resize(0);
     }
 
-    void AddLoadCallback(Callback * load_callback) {
-      callbacks_on_load.push_back(load_callback);
+    void AddLoadCallback(const std::function<void()> & callback_fun) {
+      callbacks_on_load.push_back( JSWrapOnce(callback_fun) );
     }
-    void AddErrorCallback(Callback * error_callback) {
-      callbacks_on_error.push_back(error_callback);
-    }
-    template <class T> void AddLoadCallback(T * cb_target, void (T::*method_ptr)()) {
-      MethodCallback<T> * cb = new MethodCallback<T>(cb_target, method_ptr);
-      cb->SetDisposible(true); // Make sure callback gets deleted when triggered.
-      callbacks_on_load.push_back(cb);
-    }
-    template <class T> void AddErrorCallback(T * cb_target, void (T::*method_ptr)()) {
-      MethodCallback<T> * cb = new MethodCallback<T>(cb_target, method_ptr);
-      cb->SetDisposible(true); // Make sure callback gets deleted when triggered.
-      callbacks_on_error.push_back(cb);
+    void AddErrorCallback(const std::function<void()> & callback_fun) {
+      callbacks_on_error.push_back( JSWrapOnce(callback_fun) );
     }
   };
 
   static std::map<std::string, RawImage *> raw_image_map;
   
-  RawImage & LoadRawImage(const std::string & filename, Callback * load_callback=NULL, Callback * error_callback=NULL) {
+  RawImage & LoadRawImage(const std::string & filename,
+                          const std::function<void()> & load_callback=NULL,
+                          const std::function<void()> & error_callback=NULL)
+  {
     auto it = raw_image_map.find(filename);
     RawImage * raw_image;
     if (it == raw_image_map.end()) {        // New filename
@@ -107,12 +95,12 @@ namespace emp {
     }
 
     if (load_callback) {
-      if (raw_image->HasLoaded()) load_callback->DoCallback();
+      if (raw_image->HasLoaded()) load_callback();
       else raw_image->AddLoadCallback(load_callback);
     }
 
     if (error_callback) {
-      if (raw_image->HasError()) error_callback->DoCallback();
+      if (raw_image->HasError()) error_callback();
       else raw_image->AddErrorCallback(error_callback);
     }
 
