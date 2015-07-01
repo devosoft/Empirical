@@ -400,7 +400,7 @@ namespace Kinetic {
       , x(_x), y(_y), width(_w), height(_h)
       , scale_x(1.0), scale_y(1.0)
     {
-      raw_image.AddLoadCallback(this, &Image::ImageLoaded);
+      raw_image.AddLoadCallback(std::bind(&Image::ImageLoaded, this));
     }
 
     Image(const std::string & _filename, const Point<int> & point, int _w=-1, int _h=-1) 
@@ -409,7 +409,7 @@ namespace Kinetic {
     Image(const Image & _image)
       : Image(_image.raw_image.GetFilename(), _image.x, _image.y, _image.width, _image.height)
     {
-      raw_image.AddLoadCallback(this, &Image::ImageLoaded);
+      raw_image.AddLoadCallback(std::bind(&Image::ImageLoaded, this));
     }
 
     virtual ~Image() { ; }
