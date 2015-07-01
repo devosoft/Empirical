@@ -98,35 +98,16 @@ namespace emp {
 
   namespace internal {
 
-    // If a specialized LoadFromArg() method was created for a class, use it...
-    //If no specialized LoadArg() exists, call LoadFromArg() member function in target object.
-    template <class ARG_TYPE, int ARG_ID>
-    struct LoadArg_impl {
-      using ret_type = decltype(&ARG_TYPE::LoadFromArg<ARG_ID>);
-      static void Load(ARG_TYPE & arg_var, bool) {
-        arg_var.template LoadFromArg<ARG_ID>();
-      }
-    };
+    template <typename T, int ARG_ID>
+    void LoadArg_impl(typename emp::sfinae_decoy<bool, decltype(&T::template LoadFromArg<ARG_ID>)>::type,
+                      T & target) {
+      target.template LoadFromArg<ARG_ID>();
+    }
+    template <typename T, int ARG_ID>
+    void LoadArg_impl(int, T & target) {
+      LoadArg<ARG_ID>(target);
+    }
 
-    // ...otherwise see if an external LoadArg was created for the type we are loading.
-    //If no specialized LoadArg() exists, call LoadFromArg() member function in target object.
-    template <class ARG_TYPE, int ARG_ID>
-    struct LoadArg_impl {
-      using ret_type = void;
-      static void Load(ARG_TYPE & arg_var, int) {
-        LoadArg<ARG_ID>();
-      }
-    };
-
-
-    template <int ARG_ID>
-    struct LoadArg_redirect {
-      template <typename ARG_TYPE>
-      static void Load(ARG_TYPE & arg_var) {
-        LoadArg_impl<ARG_TYPE, ARG_ID>::Load(arg_var, true);
-      }
-    };
-      
     // JSWrap_Callback_Base provides a base class for the wrappers around functions.
     // Specifically, it creates a virtual DoCallback() member function that can be called
     // to trigger a specific wrapped function.
@@ -150,8 +131,8 @@ namespace emp {
       template <typename TUPLE_TYPE, int ARGS_LEFT>
       struct Collect_impl {
         static void CollectArgs(TUPLE_TYPE & tuple) {
-          LoadArg_redirect<ARGS_LEFT-1>( std::get<ARGS_LEFT-1>(tuple) );      // Load an arg
-          Collect_impl<TUPLE_TYPE, ARGS_LEFT-1>::CollectArgs(tuple); // Recurse to load next arg
+          LoadArg_impl<typename std::tuple_element<ARGS_LEFT-1,TUPLE_TYPE>::type, ARGS_LEFT-1>( true, std::get<ARGS_LEFT-1>(tuple) );  // Load an arg
+          Collect_impl<TUPLE_TYPE, ARGS_LEFT-1>::CollectArgs(tuple);        // Recurse to next arg
         }
       };
       
