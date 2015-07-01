@@ -7,6 +7,8 @@
 //  after careful exclusion of alternative approaches!
 //
 
+#define EMP_COMMA ,
+
 // EMP_STRINGIFY takes any input, processes macros, and puts the result in quotes.
 #define EMP_STRINGIFY(A) EMP_STRINGIFY_IMPL(A)
 #define EMP_STRINGIFY_IMPL(...) #__VA_ARGS__
@@ -230,12 +232,58 @@
 #define EMP_WRAP_ARGS_62(W, A, ...) W(A), EMP_WRAP_ARGS_61(W, __VA_ARGS__)
 #define EMP_WRAP_ARGS_63(W, A, ...) W(A), EMP_WRAP_ARGS_62(W, __VA_ARGS__)
 
+#define EMP_REVERSE_ARGS(...) EMP_ASSEMBLE_MACRO(EMP_REVERSE_ARGS_, EMP_COUNT_ARGS(__VA_ARGS__), __VA_ARGS__)
+#define EMP_REVERSE_ARGS_1(A) A
+#define EMP_REVERSE_ARGS_2(A, ...) EMP_REVERSE_ARGS_1(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_3(A, ...) EMP_REVERSE_ARGS_2(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_4(A, ...) EMP_REVERSE_ARGS_3(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_5(A, ...) EMP_REVERSE_ARGS_4(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_6(A, ...) EMP_REVERSE_ARGS_5(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_7(A, ...) EMP_REVERSE_ARGS_6(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_8(A, ...) EMP_REVERSE_ARGS_7(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_9(A, ...) EMP_REVERSE_ARGS_8(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_10(A, ...) EMP_REVERSE_ARGS_9(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_11(A, ...) EMP_REVERSE_ARGS_10(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_12(A, ...) EMP_REVERSE_ARGS_11(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_13(A, ...) EMP_REVERSE_ARGS_12(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_14(A, ...) EMP_REVERSE_ARGS_13(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_15(A, ...) EMP_REVERSE_ARGS_14(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_16(A, ...) EMP_REVERSE_ARGS_15(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_17(A, ...) EMP_REVERSE_ARGS_16(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_18(A, ...) EMP_REVERSE_ARGS_17(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_19(A, ...) EMP_REVERSE_ARGS_18(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_20(A, ...) EMP_REVERSE_ARGS_19(__VA_ARGS__), A
+#define EMP_REVERSE_ARGS_21(A, ...) EMP_REVERSE_ARGS_20(__VA_ARGS__), A
+
+
+#define EMP_TYPES_TO_ARGS(...) EMP_ASSEMBLE_MACRO(EMP_TYPES_TO_ARGS_, EMP_COUNT_ARGS(__VA_ARGS__), EMP_REVERSE_ARGS(__VA_ARGS__))
+#define EMP_TYPES_TO_ARGS_1(A) A arg1
+#define EMP_TYPES_TO_ARGS_2(A, ...) EMP_TYPES_TO_ARGS_1(__VA_ARGS__), A arg2
+#define EMP_TYPES_TO_ARGS_3(A, ...) EMP_TYPES_TO_ARGS_2(__VA_ARGS__), A arg3
+#define EMP_TYPES_TO_ARGS_4(A, ...) EMP_TYPES_TO_ARGS_3(__VA_ARGS__), A arg4
+#define EMP_TYPES_TO_ARGS_5(A, ...) EMP_TYPES_TO_ARGS_4(__VA_ARGS__), A arg5
+#define EMP_TYPES_TO_ARGS_6(A, ...) EMP_TYPES_TO_ARGS_5(__VA_ARGS__), A arg6
+#define EMP_TYPES_TO_ARGS_7(A, ...) EMP_TYPES_TO_ARGS_6(__VA_ARGS__), A arg7
+#define EMP_TYPES_TO_ARGS_8(A, ...) EMP_TYPES_TO_ARGS_7(__VA_ARGS__), A arg8
+#define EMP_TYPES_TO_ARGS_9(A, ...) EMP_TYPES_TO_ARGS_8(__VA_ARGS__), A arg9
+#define EMP_TYPES_TO_ARGS_10(A, ...) EMP_TYPES_TO_ARGS_9(__VA_ARGS__), A arg10
+#define EMP_TYPES_TO_ARGS_11(A, ...) EMP_TYPES_TO_ARGS_10(__VA_ARGS__), A arg11
+#define EMP_TYPES_TO_ARGS_12(A, ...) EMP_TYPES_TO_ARGS_11(__VA_ARGS__), A arg12
+#define EMP_TYPES_TO_ARGS_13(A, ...) EMP_TYPES_TO_ARGS_12(__VA_ARGS__), A arg13
+#define EMP_TYPES_TO_ARGS_14(A, ...) EMP_TYPES_TO_ARGS_13(__VA_ARGS__), A arg14
+#define EMP_TYPES_TO_ARGS_15(A, ...) EMP_TYPES_TO_ARGS_14(__VA_ARGS__), A arg15
+#define EMP_TYPES_TO_ARGS_16(A, ...) EMP_TYPES_TO_ARGS_15(__VA_ARGS__), A arg16
+#define EMP_TYPES_TO_ARGS_17(A, ...) EMP_TYPES_TO_ARGS_16(__VA_ARGS__), A arg17
+#define EMP_TYPES_TO_ARGS_18(A, ...) EMP_TYPES_TO_ARGS_17(__VA_ARGS__), A arg18
+#define EMP_TYPES_TO_ARGS_19(A, ...) EMP_TYPES_TO_ARGS_18(__VA_ARGS__), A arg19
+#define EMP_TYPES_TO_ARGS_20(A, ...) EMP_TYPES_TO_ARGS_19(__VA_ARGS__), A arg20
+#define EMP_TYPES_TO_ARGS_21(A, ...) EMP_TYPES_TO_ARGS_20(__VA_ARGS__), A arg21
+
+
 // Setup a generic method of calling a specific version of a macro based on argument count.
 #define EMP_ASSEMBLE_IMPL(BASE, ARG_COUNT) BASE ## ARG_COUNT
 #define EMP_ASSEMBLE_MACRO(BASE, ARG_COUNT, ...) EMP_ASSEMBLE_IMPL(BASE, ARG_COUNT) (__VA_ARGS__)
 
-
-#define EMP_COMMA ,
 
 
 #endif
