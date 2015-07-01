@@ -24,6 +24,11 @@
 //  And then in Javascript, you can simply call it as:
 //     emp.AddPair(4, 5); // will return 9.
 //
+//
+//  Development notes:
+//  * Make sure JSWrap can take function objects, lambdas, or just function names.
+//  * Add a JSWrap that takes an object and method and does the bind automatically.
+//
 
 #include <functional>
 #include <tuple>
@@ -67,12 +72,6 @@ namespace emp {
     arg_var = tmp_var;   // @CAO Do we need to free the memory in tmp_var?
   }
 
-  // If no specialized LoadArg() exists, call LoadFromArg() member function in target object.
-  template <class ARG_TYPE, int ARG_ID>
-  static void LoadArg(ARG_TYPE & arg_var) {
-    arg_var.template LoadFromArg<ARG_ID>();
-  }
-  
 
   // ----- StoreReturn -----
   // Helper functions to individually store return values to JS
@@ -99,6 +98,35 @@ namespace emp {
 
   namespace internal {
 
+    // If a specialized LoadFromArg() method was created for a class, use it...
+    //If no specialized LoadArg() exists, call LoadFromArg() member function in target object.
+    template <class ARG_TYPE, int ARG_ID>
+    struct LoadArg_impl {
+      using ret_type = decltype(&ARG_TYPE::LoadFromArg<ARG_ID>);
+      static void Load(ARG_TYPE & arg_var, bool) {
+        arg_var.template LoadFromArg<ARG_ID>();
+      }
+    };
+
+    // ...otherwise see if an external LoadArg was created for the type we are loading.
+    //If no specialized LoadArg() exists, call LoadFromArg() member function in target object.
+    template <class ARG_TYPE, int ARG_ID>
+    struct LoadArg_impl {
+      using ret_type = void;
+      static void Load(ARG_TYPE & arg_var, int) {
+        LoadArg<ARG_ID>();
+      }
+    };
+
+
+    template <int ARG_ID>
+    struct LoadArg_redirect {
+      template <typename ARG_TYPE>
+      static void Load(ARG_TYPE & arg_var) {
+        LoadArg_impl<ARG_TYPE, ARG_ID>::Load(arg_var, true);
+      }
+    };
+      
     // JSWrap_Callback_Base provides a base class for the wrappers around functions.
     // Specifically, it creates a virtual DoCallback() member function that can be called
     // to trigger a specific wrapped function.
@@ -122,7 +150,7 @@ namespace emp {
       template <typename TUPLE_TYPE, int ARGS_LEFT>
       struct Collect_impl {
         static void CollectArgs(TUPLE_TYPE & tuple) {
-          LoadArg<ARGS_LEFT-1>(std::get<ARGS_LEFT-1>(tuple) );      // Load an arg
+          LoadArg_redirect<ARGS_LEFT-1>( std::get<ARGS_LEFT-1>(tuple) );      // Load an arg
           Collect_impl<TUPLE_TYPE, ARGS_LEFT-1>::CollectArgs(tuple); // Recurse to load next arg
         }
       };
@@ -197,13 +225,12 @@ namespace emp {
         // in emp.cb_args, and need to realign.
         emp_assert(EMP_GetCBArgCount() == num_args);
         
-        // Collect the values of the arguments
-        std::tuple<ARG_TYPES...> args;           // Argument values to call function with.
-        Collect_impl<std::tuple<ARG_TYPES...>, num_args>::CollectArgs(args);
+        // Collect the values of the arguments in a tuple 
+        using args_t = std::tuple< typename std::decay<ARG_TYPES>::type... >;
+        args_t args;
+        Collect_impl<args_t, num_args>::CollectArgs(args);
         
         // And finally, do the actual callback.
-        // emp::ApplyTuple(fun, args);
-
         emp::ApplyTuple(fun, args);
 
         // And save a return value for JS.
