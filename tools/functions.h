@@ -160,7 +160,12 @@ namespace emp {
   }
 
 
-
+  // The following template takes two parameters; the real type you want it to be and a decoy
+  // type that should just be evaluated for use in SFINAE.
+  // To use: typename sfinae_decoy<X,Y>::type
+  // This will always evaluate to X no matter what Y is.
+  template <typename REAL_TYPE, typename EVAL_TYPE>
+  struct sfinae_decoy { using type = REAL_TYPE; };
 
 
 };
