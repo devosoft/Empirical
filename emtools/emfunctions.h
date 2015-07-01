@@ -1,18 +1,19 @@
 #ifndef EMP_EM_FUNCTIONS_H
 #define EMP_EM_FUNCTIONS_H
 
+#include <functional>
+
 #include "../tools/alert.h"
-#include "../tools/callbacks.h"
 #include "../tools/string_utils.h"
+#include "JSWrap.h"
 
 namespace emp {
 
 #define AlertVar(VAR) emp::Alert(std::string(#VAR) + std::string("=") + std::to_string(VAR))
 
-  template<class T> void ScheduleMethod(T * target, void (T::*method_ptr)(), int delay) {
-    MethodCallback<T> * new_callback = new MethodCallback<T>(target, method_ptr);
-    new_callback->SetDisposible(); // Get rid of this object after one use.
-    EM_ASM_ARGS({ window.setTimeout(function() { empJSDoCallback($0); }, $1); }, (int) new_callback, delay);
+  template<class T> void DelayCall(const std::function<void()> & in_fun, int delay) {
+    uint32_t callback_id = JSWrapOnce(in_fun); // Wrap and dispose when called.
+    EM_ASM_ARGS({ window.setTimeout(function() { emp.Callback($0); }, $1); }, callback_id, delay);
   }
 
   int GetWindowInnerWidth() { return EM_ASM_INT_V({ return window.innerWidth; }); }
