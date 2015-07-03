@@ -45,13 +45,14 @@
 #define EMP_CREATE_METHOD_FALLBACK(NEW_NAME, METHOD, FALLBACK, RETURN_TYPE) \
   namespace internal {                                                  \
     template <typename T, typename... ARG_TYPES>                        \
-    RETURN_TYPE RelayCall_ ## NEW_NAME(typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type, \
+    RETURN_TYPE RelayCall_ ## NEW_NAME(                                 \
+      typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type,     \
       T & target, ARG_TYPES... ARGS) {                                  \
-    target.METHOD(ARGS...);                                             \
+        return target.METHOD(ARGS...);                                  \
     }                                                                   \
     template <typename T, typename... ARG_TYPES>                        \
     RETURN_TYPE RelayCall_ ## NEW_NAME(int, T & target, ARG_TYPES... ARGS) { \
-      FALLBACK(target, ARGS...);                                        \
+      return FALLBACK(target, ARGS...);                                 \
     }                                                                   \
   }                                                                     \
   template <typename T, typename... ARG_TYPES>                          \
