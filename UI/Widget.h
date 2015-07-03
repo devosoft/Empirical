@@ -36,6 +36,7 @@ namespace UI {
     public:
       const std::string & GetDivID() const { return div_id; }      
       const std::string & GetObjExt() const { return obj_ext; }
+      std::string GetFullID() const { return div_id + obj_ext; }
       static std::string TypeName() { return "Widget"; }
 
       std::string CSS(const std::string & setting) { return style.Get(setting); }
@@ -57,6 +58,8 @@ namespace UI {
       void TriggerCSS() {
         std::string obj_id = div_id + obj_ext;
         style.Apply(obj_id);
+      }
+      void TriggerJS() {
       }
     };
     

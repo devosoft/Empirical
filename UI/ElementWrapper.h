@@ -19,9 +19,8 @@ namespace UI {
       BASE_TYPE::WriteHTML(HTML);
     }
 
-    void UpdateCSS() {
-      BASE_TYPE::TriggerCSS();
-    }
+    void UpdateCSS() { BASE_TYPE::TriggerCSS(); }
+    void UpdateJS() { BASE_TYPE::TriggerJS(); }
 
   public:
     ElementWrapper(const BASE_TYPE & in_info, Element * in_parent)

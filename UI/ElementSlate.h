@@ -24,6 +24,7 @@ namespace UI {
 
   // Elements that do not override Append() can be generated on the fly from their widgets.
   using ElementButton = emp::UI::ElementWrapper<emp::UI::Button>;
+  using ElementCanvas = emp::UI::ElementWrapper<emp::UI::Canvas>;
   using ElementImage = emp::UI::ElementWrapper<emp::UI::Image>;
 
   class ElementSlate : public Element, public Slate {
@@ -84,6 +85,11 @@ public:
       emp_assert(dynamic_cast<ElementButton *>( element_dict[test_name] ) != NULL);
       return dynamic_cast<ElementButton&>( operator[](test_name) );
     }
+    ElementCanvas & Canvas(const std::string & test_name) {
+      // Assert that we have the correct type, then return it.
+      emp_assert(dynamic_cast<ElementCanvas *>( element_dict[test_name] ) != NULL);
+      return dynamic_cast<ElementCanvas&>( operator[](test_name) );
+    }
     ElementImage & Image(const std::string & test_name) {
       // Assert that we have the correct type, then return it.
       emp_assert(dynamic_cast<ElementImage *>( element_dict[test_name] ) != NULL);
@@ -121,6 +127,11 @@ public:
       children.push_back(new_child);
       return *new_child;
     }
+    Element & Append(emp::UI::Canvas info) {
+      ElementCanvas * new_child = new ElementCanvas(info, this);
+      children.push_back(new_child);
+      return *new_child;
+    }
     Element & Append(emp::UI::Image info) {
       ElementImage * new_child = new ElementImage(info, this);
       children.push_back(new_child);
@@ -144,6 +155,9 @@ public:
 
     Element * BuildElement(emp::UI::Button info, Element * fwd_parent) {
       return new ElementButton(info, fwd_parent);
+    }
+    Element * BuildElement(emp::UI::Canvas info, Element * fwd_parent) {
+      return new ElementCanvas(info, fwd_parent);
     }
     Element * BuildElement(emp::UI::Image info, Element * fwd_parent) {
       return new ElementImage(info, fwd_parent);

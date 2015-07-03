@@ -18,6 +18,7 @@
 #include "UI_base.h"
 
 #include "Button.h"
+#include "Canvas.h"
 #include "Image.h"
 #include "Table.h"
 #include "Text.h"
@@ -35,9 +36,11 @@ namespace UI {
     Element * parent;
     std::vector<Element *> children;
 
-    // UpdateHTML() makes sure that the HTML stream above id up-to-date.
+    // UpdateHTML() makes sure that the HTML stream is up-to-date, CSS is triggered, and
+    // any Javascript actions are takens, as per the needs of an element.
     virtual void UpdateHTML() { ; }
     virtual void UpdateCSS() { ; }
+    virtual void UpdateJS() { ; }
 
     bool HasChild(Element * test_child) {
       for (Element * c : children) if (c == test_child) return true;
@@ -116,6 +119,7 @@ namespace UI {
           $( '#' + elem_name ).html(html_str);
         }, GetName().c_str(), HTML.str().c_str() );
       UpdateCSS();
+      UpdateJS();
 
       // Now that the parent is up-to-day, update all children.
       for (auto * child : children) child->UpdateNow();
@@ -133,6 +137,7 @@ namespace UI {
     virtual Element & Append(const std::string & text) { return AppendParent(text); }
     virtual Element & Append(const std::function<std::string()> & fun) { return AppendParent(fun); }
     virtual Element & Append(emp::UI::Button info) { return AppendParent(info); }
+    virtual Element & Append(emp::UI::Canvas info) { return AppendParent(info); }
     virtual Element & Append(emp::UI::Image info) { return AppendParent(info); }
     virtual Element & Append(emp::UI::Table info) { return AppendParent(info); }
     virtual Element & Append(emp::UI::Text info) { return AppendParent(info); }
@@ -172,6 +177,9 @@ namespace UI {
 
     // BuildElement allows any element to build another as long as one of its ancestors knows how.
     virtual Element * BuildElement(emp::UI::Button info, Element * fwd_parent) {
+      return ForwardBuild(info, fwd_parent);
+    }
+    virtual Element * BuildElement(emp::UI::Canvas info, Element * fwd_parent) {
       return ForwardBuild(info, fwd_parent);
     }
     virtual Element * BuildElement(emp::UI::Image info, Element * fwd_parent) {
