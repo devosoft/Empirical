@@ -98,7 +98,7 @@ namespace serialize {
     return pod;
   }
 
-  // By default, just try sending the saved object to the DataPod's output stream.
+  // As a fallback, just send the saved object to the DataPod's output stream.
   template <typename T>
   void StoreVar(DataPod & pod, T & var, int) {
     // @CAO for now use ':', but more generally we need to ensure uniquness.

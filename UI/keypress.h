@@ -42,7 +42,7 @@ namespace UI {
       //   new MethodCallback_Event<KeypressManager>(this, &KeypressManager::DoCallback);
 
       std::function<void(const html5::KeyboardEvent &)> callback_fun =
-        std::bind(&KeypressManager::DoCallback, this, _1);
+        std::bind( &KeypressManager::DoCallback, this, _1 );
       uint32_t callback_id = JSWrap( callback_fun );
 
       EM_ASM_ARGS({
