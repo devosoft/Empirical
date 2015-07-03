@@ -10,103 +10,11 @@
 #include <string>
 #include <vector>
 
-#include "Widget.h"
+#include "CanvasAction.h"
+#include "CanvasShape.h"
 
 namespace emp {
 namespace UI {
-
-  // Base class to maintain canvas actions.
-  class CanvasAction {
-  protected:
-    // Helper functions that may be useful to specific actions.
-    void Fill(const std::string & style="") {
-      if (style != "") {
-        EM_ASM_ARGS({
-            emp.ctx.fillStyle = Pointer_stringify($0);
-          }, style.c_str());
-      }
-      EM_ASM({ emp.ctx.fill(); });
-    }
-    void Stroke(const std::string & style="") {
-      if (style != "") {
-        EM_ASM_ARGS({
-            emp.ctx.strokeStyle = Pointer_stringify($0);
-          }, style.c_str());
-      }
-      EM_ASM({ emp.ctx.stroke(); });
-      
-    }
-
-  public:
-    CanvasAction() { ; }
-    virtual ~CanvasAction() { ; }
-
-    
-    virtual void Apply() = 0;            // Apply current action to emp.ctx.
-    virtual CanvasAction * Clone() = 0;  // Make a copy of the current action.
-  };
-
-
-  class CanvasShape : public CanvasAction {
-  protected:
-    int x; int y;
-    std::string fill_color;
-    std::string line_color;
-  public:
-    CanvasShape(int _x, int _y, const std::string & fc="", const std::string & lc="")
-      : x(_x), y(_y), fill_color(fc), line_color(lc) { ; }
-    virtual ~CanvasShape() { ; }
-  };
-
-  class CanvasCircle : public CanvasShape {
-    int radius;
-  public:
-    CanvasCircle(int _x, int _y, int _r, const std::string & fc="", const std::string & lc="")
-      : CanvasShape(_x, _y, fc, lc), radius(_r) { ; }
-
-    void Apply() {
-      EM_ASM_ARGS({
-          emp.ctx.beginPath();
-          emp.ctx.arc($0, $1, $2, 0, Math.PI*2);
-        }, x, y, radius);  // Draw the circle
-      Fill(fill_color);
-      Stroke(line_color);
-    }
-    CanvasAction * Clone() { return new CanvasCircle(*this); }
-  };
-
-  class CanvasRect : public CanvasShape {
-    int w; int h;
-  public:
-    CanvasRect(int _x, int _y, int _w, int _h, const std::string & fc="", const std::string & lc="")
-      : CanvasShape(_x, _y, fc, lc), w(_w), h(_h) { ; }
-
-    void Apply() {
-      EM_ASM_ARGS({
-          emp.ctx.beginPath();
-          emp.ctx.rect($0, $1, $2, $3);
-        }, x, y, w, h);  // Draw the rectangle
-      Fill(fill_color);
-      Stroke(line_color);
-    }
-    CanvasAction * Clone() { return new CanvasRect(*this); }
-  };
-
-
-  class CanvasStrokeColor : public CanvasAction {
-    std::string color;
-  public:
-    CanvasStrokeColor(const std::string & c) : color(c) { ; }
-
-    void Apply() {
-      EM_ASM_ARGS({
-          var color = Pointer_stringify($0);
-          emp.ctx.strokeStyle = color;
-        }, color.c_str());
-    }
-    CanvasAction * Clone() { return new CanvasStrokeColor(*this); }
-  };
-
 
   ///////////////  Main Canvas Class ////////////////
 
