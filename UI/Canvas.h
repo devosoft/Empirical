@@ -46,22 +46,52 @@ namespace UI {
     virtual CanvasAction * Clone() = 0;  // Make a copy of the current action.
   };
 
-  class CanvasRect : public CanvasAction {
-    int x; int y; int w; int h;
+
+  class CanvasShape : public CanvasAction {
+  protected:
+    int x; int y;
     std::string fill_color;
     std::string line_color;
   public:
-    CanvasRect(int _x, int _y, int _w, int _h,
-               const std::string & fc="", const std::string & lc="")
-      : x(_x), y(_y), w(_w), h(_h), fill_color(fc), line_color(lc) { ; }
+    CanvasShape(int _x, int _y, const std::string & fc="", const std::string & lc="")
+      : x(_x), y(_y), fill_color(fc), line_color(lc) { ; }
+    virtual ~CanvasShape() { ; }
+  };
+
+  class CanvasCircle : public CanvasShape {
+    int radius;
+  public:
+    CanvasCircle(int _x, int _y, int _r, const std::string & fc="", const std::string & lc="")
+      : CanvasShape(_x, _y, fc, lc), radius(_r) { ; }
 
     void Apply() {
-      EM_ASM_ARGS({ emp.ctx.rect($0, $1, $2, $3); }, x, y, w, h);  // Draw the rectangle
+      EM_ASM_ARGS({
+          emp.ctx.beginPath();
+          emp.ctx.arc($0, $1, $2, 0, Math.PI*2);
+        }, x, y, radius);  // Draw the circle
+      Fill(fill_color);
+      Stroke(line_color);
+    }
+    CanvasAction * Clone() { return new CanvasCircle(*this); }
+  };
+
+  class CanvasRect : public CanvasShape {
+    int w; int h;
+  public:
+    CanvasRect(int _x, int _y, int _w, int _h, const std::string & fc="", const std::string & lc="")
+      : CanvasShape(_x, _y, fc, lc), w(_w), h(_h) { ; }
+
+    void Apply() {
+      EM_ASM_ARGS({
+          emp.ctx.beginPath();
+          emp.ctx.rect($0, $1, $2, $3);
+        }, x, y, w, h);  // Draw the rectangle
       Fill(fill_color);
       Stroke(line_color);
     }
     CanvasAction * Clone() { return new CanvasRect(*this); }
   };
+
 
   class CanvasStrokeColor : public CanvasAction {
     std::string color;
@@ -123,14 +153,14 @@ namespace UI {
 
   public:
     Canvas(int w, int h, const std::string & in_name="")
-      : Widget(in_name), width(w), height(h), next_action(0) { ; }
-    Canvas(const Canvas & in) : width(in.width), height(in.height), next_action(0) {
+      : Widget(in_name), width(w), height(h), next_action(0) { obj_ext = "__c"; }
+    Canvas(const Canvas & in) : internal::Widget<Canvas>(in), width(in.width), height(in.height), next_action(0) {
       actions.resize(in.actions.size());
       for (int i = 0; i < (int) actions.size(); i++) {
         actions[i] = in.actions[i]->Clone();
       }
     }
-    Canvas(Canvas && in) : width(in.width), height(in.height), actions(in.actions), next_action(0) {
+    Canvas(Canvas && in) : internal::Widget<Canvas>(in), width(in.width), height(in.height), actions(in.actions), next_action(0) {
       in.actions.resize(0);
       in.next_action = 0;
     }
@@ -142,6 +172,8 @@ namespace UI {
     int GetHeight() const { return height; }
 
     // Setup Canvas Actions
+    Canvas & Circle(int x, int y, int r, const std::string & fc="", const std::string & lc="")
+    { return AddAction( new CanvasCircle(x, y, r, fc, lc) ); }
     Canvas & Rect(int x, int y, int w, int h, const std::string & fc="", const std::string & lc="")
     { return AddAction( new CanvasRect(x, y, w, h, fc, lc) ); }
     Canvas & StrokeColor(std::string c) { return AddAction( new CanvasStrokeColor(c) ); }
