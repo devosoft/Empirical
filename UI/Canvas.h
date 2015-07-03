@@ -17,26 +17,48 @@ namespace UI {
 
   // Base class to maintain canvas actions.
   class CanvasAction {
+  protected:
+    // Helper functions that may be useful to specific actions.
+    void Fill(const std::string & style="") {
+      if (style != "") {
+        EM_ASM_ARGS({
+            emp.ctx.fillStyle = Pointer_stringify($0);
+          }, style.c_str());
+      }
+      EM_ASM({ emp.ctx.fill(); });
+    }
+    void Stroke(const std::string & style="") {
+      if (style != "") {
+        EM_ASM_ARGS({
+            emp.ctx.strokeStyle = Pointer_stringify($0);
+          }, style.c_str());
+      }
+      EM_ASM({ emp.ctx.stroke(); });
+      
+    }
+
   public:
     CanvasAction() { ; }
     virtual ~CanvasAction() { ; }
 
-    // The Apply method assumed correct context is in emp.ctx and applies current action to it.
-    virtual void Apply() = 0;
-    virtual CanvasAction * Clone() = 0;
+    
+    virtual void Apply() = 0;            // Apply current action to emp.ctx.
+    virtual CanvasAction * Clone() = 0;  // Make a copy of the current action.
   };
 
   class CanvasRect : public CanvasAction {
     int x; int y; int w; int h;
+    std::string fill_color;
+    std::string line_color;
   public:
-    CanvasRect(int _x, int _y, int _w, int _h) : x(_x), y(_y), w(_w), h(_h) { ; }
+    CanvasRect(int _x, int _y, int _w, int _h,
+               const std::string & fc="", const std::string & lc="")
+      : x(_x), y(_y), w(_w), h(_h), fill_color(fc), line_color(lc) { ; }
 
     void Apply() {
-      EM_ASM_ARGS({
-          emp.ctx.rect($0, $1, $2, $3);
-          emp.ctx.fill();
-          emp.ctx.stroke();
-        }, x, y, w, h);
+      EM_ASM_ARGS({ emp.ctx.rect($0, $1, $2, $3); }, x, y, w, h);  // Draw the rectangle
+      Fill(fill_color);
+      Stroke(line_color);
     }
     CanvasAction * Clone() { return new CanvasRect(*this); }
   };
@@ -44,7 +66,7 @@ namespace UI {
   class CanvasStrokeColor : public CanvasAction {
     std::string color;
   public:
-    CanvasStrokeColor(std::string c) : color(c) { ; }
+    CanvasStrokeColor(const std::string & c) : color(c) { ; }
 
     void Apply() {
       EM_ASM_ARGS({
@@ -120,7 +142,8 @@ namespace UI {
     int GetHeight() const { return height; }
 
     // Setup Canvas Actions
-    Canvas & Rect(int x, int y, int w, int h) { return AddAction( new CanvasRect(x, y, w, h) ); }
+    Canvas & Rect(int x, int y, int w, int h, const std::string & fc="", const std::string & lc="")
+    { return AddAction( new CanvasRect(x, y, w, h, fc, lc) ); }
     Canvas & StrokeColor(std::string c) { return AddAction( new CanvasStrokeColor(c) ); }
 
     Canvas & Clear() { ClearActions(); return *this; }
