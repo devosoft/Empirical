@@ -47,11 +47,13 @@ namespace emp {
       return *this;
     }
 
-    Slideshow & NewSlide() {
+    Slideshow & NewSlide(const std::string & slide_title = "") {
       cur_pos = (int) slides.size();
       auto * new_slide = new UI::Document(div_name);
-      // new_slide->CSS("font-family", default_font);
       new_slide->Font(default_font);
+      if (slide_title != "") {
+        (*new_slide) << UI::Text("title").FontSize(50).Center() << slide_title;
+      }
       slides.push_back(new_slide);
       return *this;
     }
