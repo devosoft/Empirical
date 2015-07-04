@@ -50,7 +50,8 @@ namespace emp {
     Slideshow & NewSlide() {
       cur_pos = (int) slides.size();
       auto * new_slide = new UI::Document(div_name);
-      new_slide->CSS("font-family", default_font);
+      // new_slide->CSS("font-family", default_font);
+      new_slide->Font(default_font);
       slides.push_back(new_slide);
       return *this;
     }
