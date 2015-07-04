@@ -17,39 +17,55 @@ namespace emp {
   private:
     std::string div_name;
     std::vector<UI::Document *> slides;
-    int cur_slide;
+    int cur_pos;
+
+    // Formatting details.
+    std::string default_font;
     
+    // Helper functions
+
   public:
-    Slideshow(const std::string name = "emp_base") : div_name(name), cur_slide(0) {
-      slides.push_back(new UI::Document(div_name));
+    Slideshow(const std::string name = "emp_base") : div_name(name), cur_pos(0) {
+      default_font = "\"Lucida Sans Unicode\", \"Lucida Grande\", sans-serif";
+      NewSlide();
     }
     ~Slideshow() {
       for (auto * slide : slides) delete slide;
     }
 
-    int GetSlideNum() const { return cur_slide; }
+    int GetSlideNum() const { return cur_pos; }
 
-    UI::Document & operator[](int id) {
-      emp_assert(id >= 0 && id < (int) slides.size());
-      cur_slide = id;
-      return *(slides[id]);
+    UI::Document & operator[](int new_pos) {
+      emp_assert(new_pos >= 0 && new_pos < (int) slides.size());
+      cur_pos = new_pos;
+      return *(slides[new_pos]);
     }
 
     template <typename T>
     Slideshow & operator<<(T && input) {
-      (*slides[cur_slide]) << input;
+      (*slides[cur_pos]) << input;
       return *this;
     }
 
-    void NewSlide() {
-      cur_slide = (int) slides.size();
-      slides.push_back(new UI::Document(div_name));
+    Slideshow & NewSlide() {
+      cur_pos = (int) slides.size();
+      auto * new_slide = new UI::Document(div_name);
+      new_slide->CSS("font-family", default_font);
+      slides.push_back(new_slide);
+      return *this;
     }
+    
+    UI::Document & GetSlide() { return *(slides[cur_pos]); }
 
-    void NextSlide() { ++cur_slide; if (cur_slide == slides.size()) --cur_slide; }
-    void PrevSlide() { --cur_slide; if (cur_slide < 0) cur_slide = 0; }
-    void Update() { slides[cur_slide]->Update(); }
+    Slideshow & NextSlide() { if (++cur_pos == slides.size()) --cur_pos; return *this; }
+    Slideshow & PrevSlide() { if (--cur_pos < 0) cur_pos = 0; return *this; }
 
+    void Update() { slides[cur_pos]->Update(); }
+    void Start(int first_slide=0) { 
+      cur_pos = first_slide;
+      Update();
+    }
+    
     virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
       bool ok = true;
 
@@ -63,9 +79,9 @@ namespace emp {
       }
       
       // Make sure the current slide position is valid.
-      if (cur_slide < 0 || cur_slide >= (int) slides.size()) {
+      if (cur_pos < 0 || cur_pos >= (int) slides.size()) {
         ss << "Error: Show has " << slides.size() << " slides.  Current slide = "
-           << cur_slide << std::endl;
+           << cur_pos << std::endl;
         ok = false;
       }
 
