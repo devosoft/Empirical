@@ -139,7 +139,7 @@ namespace UI {
       bool ok = true;
 
       if (verbose) {
-        ss << prefix << "Scanning: emp::ElementTable with name = '" << name << "'" << std::endl;
+        ss << prefix << "Scanning: emp::UI::ElementTable with name = '" << name << "'" << std::endl;
       }
 
       Element::OK(ss, verbose, prefix);  // Check base Element class; same obj, don't change prefix

@@ -180,7 +180,7 @@ public:
       bool ok = true;
 
       if (verbose) {
-        ss << prefix << "Scanning: emp::ElementSlate with name = '" << name << "'" << std::endl;
+        ss << prefix << "Scanning: emp::UI::ElementSlate with name = '" << name << "'" << std::endl;
       }
 
       Element::OK(ss, verbose, prefix);  // Check base class; same obj, don't change prefix

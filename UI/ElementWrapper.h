@@ -14,11 +14,7 @@ namespace UI {
   template <typename BASE_TYPE>
   class ElementWrapper : public Element, public BASE_TYPE {
   private:
-    void UpdateHTML() {
-      HTML.str("");                               // Clear the current stream.
-      BASE_TYPE::WriteHTML(HTML);
-    }
-
+    void UpdateHTML() { HTML.str("");  BASE_TYPE::WriteHTML(HTML); }
     void UpdateCSS() { BASE_TYPE::TriggerCSS(); }
     void UpdateJS() { BASE_TYPE::TriggerJS(); }
 
@@ -39,7 +35,7 @@ namespace UI {
       bool ok = true;
 
       if (verbose) {
-        ss << prefix << "Scanning: emp::ElementWrapper<" << BASE_TYPE::TypeName()
+        ss << prefix << "Scanning: emp::UI::ElementWrapper<" << BASE_TYPE::TypeName()
            << "> with name = '" << name << "'" << std::endl;
       }
 

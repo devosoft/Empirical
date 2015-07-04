@@ -37,7 +37,7 @@ namespace UI {
     std::vector<Element *> children;
 
     // UpdateHTML() makes sure that the HTML stream is up-to-date, CSS is triggered, and
-    // any Javascript actions are takens, as per the needs of an element.
+    // any Javascript actions are taken, as per the needs of an element.
     virtual void UpdateHTML() { ; }
     virtual void UpdateCSS() { ; }
     virtual void UpdateJS() { ; }
@@ -218,7 +218,7 @@ namespace UI {
     virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
       bool ok = true;
       if (verbose) {
-        ss << prefix << "Scanning: emp::Element with name = '" << name << "'" << std::endl;
+        ss << prefix << "Scanning: emp::UI::Element with name = '" << name << "'" << std::endl;
       }
 
       if (parent != nullptr && parent->HasChild(this) == false) {

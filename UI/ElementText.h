@@ -61,7 +61,7 @@ namespace UI {
     virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
       bool ok = true;
       if (verbose) {
-        ss << prefix << "Scanning: emp::ElementText with name = '" << name << "'" << std::endl;
+        ss << prefix << "Scanning: emp::UI::ElementText with name = '" << name << "'" << std::endl;
       }
 
       Element::OK(ss, verbose, prefix);  // Check base class; same obj, don't change prefix
