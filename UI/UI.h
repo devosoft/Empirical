@@ -8,7 +8,7 @@
 namespace emp {
 namespace UI {
 
-  static ElementSlate document(Slate("emp_base"));
+  static Document document("emp_base");
 
   bool Initialize() {
 
