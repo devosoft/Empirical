@@ -19,6 +19,20 @@ namespace emp {
   int GetWindowInnerWidth() { return EM_ASM_INT_V({ return window.innerWidth; }); }
   int GetWindowInnerHeight() { return EM_ASM_INT_V({ return window.innerHeight; }); }
 
+  void SetBackgroundColor(const std::string color) {
+    EM_ASM_ARGS({
+        var color = Pointer_stringify($0);
+        $("body").first().css("background-color", color);
+      }, color.c_str());
+  }
+  
+  void SetColor(const std::string color) {
+    EM_ASM_ARGS({
+        var color = Pointer_stringify($0);
+        $("body").first().css("color", color);
+      }, color.c_str());
+  }
+  
   // These may already be in HTML5 for Emscripten
   void SetCursor(const char * type) {
     EM_ASM_ARGS({

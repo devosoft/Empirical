@@ -50,6 +50,7 @@ namespace UI {
       RETURN_TYPE & Width(int w) { return CSS("width", emp::to_string(w, "px") ); }
       RETURN_TYPE & Height(int h) { return CSS("height", emp::to_string(h, "px") ); }
       RETURN_TYPE & Size(int w, int h) { Width(w); Height(h); return (RETURN_TYPE &) *this; }
+      RETURN_TYPE & Font(const std::string & font) { return CSS("font-family", font); }
       
       RETURN_TYPE & Background(const std::string & v) { return CSS("background-color", v); }
       RETURN_TYPE & Color(const std::string & v) { return CSS("color", v); }
