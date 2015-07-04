@@ -30,6 +30,9 @@ ElementTable.js: ElementTable.cc
 Example.js: Example.cc
 	$(CXX_web) $(CFLAGS_web) Example.cc -o Example.js
 
+Slideshow.js: Slideshow.cc
+	$(CXX_web) $(CFLAGS_web) Slideshow.cc -o Slideshow.js
+
 # test3.js: test3.cc
 # 	$(CXX_web) $(CFLAGS_web) test3.cc -o test3.js
 
@@ -37,7 +40,7 @@ Example.js: Example.cc
 # 	$(CXX_web) $(CFLAGS_web) test4.cc -o test4.js
 
 clean:
-	rm -f Canvas.js events.js ElementSlate.js ElementTable.js Example.js test?.js *.js.map *~ source/*.o source/*/*.o
+	rm -f Canvas.js events.js ElementSlate.js ElementTable.js Example.js Slideshow.js test?.js *.js.map *~ source/*.o source/*/*.o
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
