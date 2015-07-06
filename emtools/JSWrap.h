@@ -76,9 +76,9 @@ namespace emp {
   // ----- StoreReturn -----
   // Helper functions to individually store return values to JS
 
-  static void StoreReturn(const bool & ret_var) {
-    EM_ASM_ARGS({ emp_i.cb_return = $0; }, ret_var);
-  }
+  // static void StoreReturn(const bool & ret_var) {
+  //   EM_ASM_ARGS({ emp_i.cb_return = $0; }, ret_var);
+  // }
 
   static void StoreReturn(const int & ret_var) {
     EM_ASM_ARGS({ emp_i.cb_return = $0; }, ret_var);
@@ -92,10 +92,14 @@ namespace emp {
     EM_ASM_ARGS({ emp_i.cb_return = Pointer_stringify($0); }, ret_var.c_str());
   }
 
+  // If the return type has a personalized function to handle the return, use it!
   template <class RETURN_TYPE>
-  static void StoreReturn(const RETURN_TYPE & ret_var) {
+  static typename emp::sfinae_decoy<void, decltype(&RETURN_TYPE::StoreAsReturn)>::type
+  StoreReturn(const RETURN_TYPE & ret_var) {
     ret_var.template StoreAsReturn();
   }
+
+
   
   // The following code is in the "internal" namespace since it's used only to implement the
   // details of the JSWrap function.
