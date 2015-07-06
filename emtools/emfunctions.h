@@ -11,9 +11,27 @@ namespace emp {
 
 #define AlertVar(VAR) emp::Alert(std::string(#VAR) + std::string("=") + std::to_string(VAR))
 
-  template<class T> void DelayCall(const std::function<void()> & in_fun, int delay) {
+  void DelayCall(const std::function<void()> & in_fun, int delay) {
     uint32_t callback_id = JSWrapOnce(in_fun); // Wrap and dispose when called.
     EM_ASM_ARGS({ window.setTimeout(function() { emp.Callback($0); }, $1); }, callback_id, delay);
+  }
+
+  // Two versions of OnResize depending on whether the new size is desired as inputs.
+
+  void OnResize(const std::function<void()> & in_fun) {
+    uint32_t callback_id = JSWrap(in_fun);
+    EM_ASM_ARGS({
+        window.addEventListener("resize", function() { emp.Callback($0); });
+      }, callback_id);
+  }
+
+  void OnResize(const std::function<void(int,int)> & in_fun) {
+    uint32_t callback_id = JSWrap(in_fun);
+    EM_ASM_ARGS({
+        window.addEventListener("resize", function() {
+            emp.Callback($0, window.innerWidth, window.innerHeight);
+          });
+      }, callback_id);
   }
 
   int GetWindowInnerWidth() { return EM_ASM_INT_V({ return window.innerWidth; }); }
