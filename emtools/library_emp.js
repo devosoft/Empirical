@@ -13,7 +13,22 @@ mergeInto(LibraryManager.library, {
             empCppCallback(arguments[0]);
 
             return emp_i.cb_return;
+        },
+
+        InspectObj: function(o,i) {
+            // From: http://stackoverflow.com/questions/5357442/how-to-inspect-javascript-objects
+            if (typeof i == 'undefined') i='';
+            if (i.length > 50) return '[MAX ITERATIONS]';
+            var r = [];
+            for(var p in o){
+                var t = typeof o[p];
+                r.push(i + '"' + p + '" (' + t + ') => '
+                       + (t == 'object' ? 'object:' + InspectObj(o[p], i+'  ') : o[p] + ''));
+            }
+            return r.join(i+'\n');
         }
+
+
     },
     
     // Data internal to EMP
