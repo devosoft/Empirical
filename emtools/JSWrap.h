@@ -76,6 +76,10 @@ namespace emp {
   // ----- StoreReturn -----
   // Helper functions to individually store return values to JS
 
+  static void StoreReturn(const bool & ret_var) {
+    EM_ASM_ARGS({ emp_i.cb_return = $0; }, ret_var);
+  }
+
   static void StoreReturn(const int & ret_var) {
     EM_ASM_ARGS({ emp_i.cb_return = $0; }, ret_var);
   }
@@ -154,9 +158,8 @@ namespace emp {
       std::function<RET_TYPE(ARG_TYPES...)> fun;   // Function to be wrapped
 
     public:
-      JSWrap_Callback(const std::function<RET_TYPE(ARG_TYPES...)> & in_fun,
-                      bool in_disposable=false)
-        : JSWrap_Callback_Base(in_disposable), fun(in_fun) { ; }
+      JSWrap_Callback(const std::function<RET_TYPE(ARG_TYPES...)> & in_fun, bool disposable=false)
+        : JSWrap_Callback_Base(disposable), fun(in_fun) { ; }
       ~JSWrap_Callback() { ; }
       
       // This function is called from Javascript.  Arguments should be collected and then used
@@ -169,10 +172,11 @@ namespace emp {
         // in emp.cb_args, and need to realign.
         emp_assert(EMP_GetCBArgCount() == num_args);
         
-        // Collect the values of the arguments
-        std::tuple<ARG_TYPES...> args;           // Argument values to call function with.
-        Collect_impl<std::tuple<ARG_TYPES...>, num_args>::CollectArgs(args);
-        
+        // Collect the values of the arguments in a tuple
+        using args_t = std::tuple< typename std::decay<ARG_TYPES>::type... >;
+        args_t args;
+        Collect_impl<args_t, num_args>::CollectArgs(args);
+
         // And finally, do the actual callback.
         // emp::ApplyTuple(fun, args);
 
@@ -192,8 +196,8 @@ namespace emp {
       std::function<void(ARG_TYPES...)> fun;   // Function to be wrapped
 
     public:
-      JSWrap_Callback(const std::function<void(ARG_TYPES...)> & in_fun, bool in_disposable=false)
-        : JSWrap_Callback_Base(in_disposable), fun(in_fun) { ; }
+      JSWrap_Callback(const std::function<void(ARG_TYPES...)> & in_fun, bool disposable=false)
+        : JSWrap_Callback_Base(disposable), fun(in_fun) { ; }
       ~JSWrap_Callback() { ; }
       
       // This function is called from Javascript.  Arguments should be collected and then used
