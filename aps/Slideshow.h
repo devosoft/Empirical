@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "../UI/UI.h"
+#include "../UI/keypress.h"
 
 namespace emp {
 
@@ -18,6 +19,8 @@ namespace emp {
     std::string div_name;
     std::vector<UI::Document *> slides;
     int cur_pos;
+
+    UI::KeypressManager key_manager;
 
     // Formatting details.
     std::string default_font;
@@ -60,13 +63,23 @@ namespace emp {
     
     UI::Document & GetSlide() { return *(slides[cur_pos]); }
 
-    Slideshow & NextSlide() { if (++cur_pos == slides.size()) --cur_pos; return *this; }
-    Slideshow & PrevSlide() { if (--cur_pos < 0) cur_pos = 0; return *this; }
-
     void Update() { slides[cur_pos]->Update(); }
+
+    // Presentation Navigation
+
     void Start(int first_slide=0) { 
       cur_pos = first_slide;
       Update();
+    }
+    void NextSlide() { if (++cur_pos >= slides.size()) --cur_pos; Update(); }
+    void PrevSlide() { if (--cur_pos < 0) cur_pos = 0; Update(); }
+
+
+    Slideshow & ActivateKeypress() {
+      // key_manager.AddKeydownCallback('p', [this](){this->NextSlide();});
+      key_manager.AddKeydownCallback("N ", std::bind(&Slideshow::NextSlide, this));
+      key_manager.AddKeydownCallback("P\b", std::bind(&Slideshow::PrevSlide, this));
+      return *this;
     }
     
     virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
