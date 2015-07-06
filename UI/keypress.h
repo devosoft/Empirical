@@ -23,7 +23,7 @@ namespace UI {
     int next_order;  // Ordering to use if not specified (always last)
     uint32_t callback_id;
 
-    void DoCallback(const html5::KeyboardEvent & evt_info) {
+    bool DoCallback(const html5::KeyboardEvent & evt_info) {
       bool handled = false;
       for (auto fun_entry : fun_map) {
         if (fun_entry.second(evt_info) == true) {
@@ -32,21 +32,20 @@ namespace UI {
         }
       }
 
-      // @CAO If an event has been handled, don't pass it on!
-      if (handled) { ; }
+      return handled;
     };
 
 
   public:
     KeypressManager() : next_order(0) {
-      std::function<void(const html5::KeyboardEvent &)> callback_fun =
+      std::function<bool(const html5::KeyboardEvent &)> callback_fun =
         std::bind( &KeypressManager::DoCallback, this, _1 );
       callback_id = JSWrap( callback_fun );
 
       EM_ASM_ARGS({
           document.addEventListener('keydown', function(evt) {
-              emp.Callback($0, evt);
-              // if (!evt.metaKey) evt.preventDefault();
+              var is_used = emp.Callback($0, evt);
+              if (is_used == 1) evt.preventDefault();
             }, false);
 
         }, callback_id);
