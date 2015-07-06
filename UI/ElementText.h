@@ -36,6 +36,8 @@ namespace UI {
       : Element(in_text.GetDivID(), in_parent), Text(in_text) { ; }
     ~ElementText() { ; }
 
+    virtual std::string GetWrapperTag() const { return "div"; }
+
     // Do not allow Managers to be copied
     ElementText(const ElementText &) = delete;
     ElementText & operator=(const ElementText &) = delete;

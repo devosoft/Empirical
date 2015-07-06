@@ -84,6 +84,27 @@ namespace UI {
       return *(children[child_id]);
     }
 
+    // When appending children to a table, forward to an internal slate.
+    Element & Append(const std::string & in_text) { return GetCurSlate() << in_text; }
+    Element & Append(const std::function<std::string()> & fun) { return GetCurSlate() << fun; }
+    Element & Append(emp::UI::Button info) { return GetCurSlate() << info; }
+    Element & Append(emp::UI::Image info) { return GetCurSlate() << info; }
+    Element & Append(emp::UI::Table info) { return GetCurSlate() << info; }
+    Element & Append(emp::UI::Text info) { return GetCurSlate() << info; }
+    Element & Append(emp::UI::Slate info) { return GetCurSlate() << info; }
+
+    Element & Append(const emp::UI::GetCell & cell) {
+      this->GetCell(cell.row, cell.col);
+      if (cell.row_span > 0) SetRowSpan(cell.row_span);
+      if (cell.col_span > 0) SetColSpan(cell.col_span);
+      return *this;
+    }
+
+    Element & Append(const emp::UI::GetRow & row) {
+      this->GetRow(row.row);
+      return *this;
+    }
+
   public:
     ElementTable(const Table & in_table, Element * in_parent)
       : Element(in_table.GetDivID(), in_parent), Table(in_table) {
@@ -98,27 +119,6 @@ namespace UI {
     ElementTable & GetRow(int r) { Table::GetRow(r);  return (ElementTable &) *this; }
     ElementTable & GetTable() { Table::GetTable(); return (ElementTable &) *this; }
     
-
-    // When appending children to a table, forward to an internal slate.
-    Element & Append(const std::string & in_text) { return GetCurSlate().Append(in_text); }
-    Element & Append(const std::function<std::string()> & fun) { return GetCurSlate().Append(fun); }
-    Element & Append(emp::UI::Button info) { return GetCurSlate().Append(info); }
-    Element & Append(emp::UI::Image info) { return GetCurSlate().Append(info); }
-    Element & Append(emp::UI::Table info) { return GetCurSlate().Append(info); }
-    Element & Append(emp::UI::Text info) { return GetCurSlate().Append(info); }
-    Element & Append(emp::UI::Slate info) { return GetCurSlate().Append(info); }
-
-    Element & Append(const emp::UI::GetCell & cell) {
-      this->GetCell(cell.row, cell.col);
-      if (cell.row_span > 0) SetRowSpan(cell.row_span);
-      if (cell.col_span > 0) SetColSpan(cell.col_span);
-      return *this;
-    }
-
-    Element & Append(const emp::UI::GetRow & row) {
-      this->GetRow(row.row);
-      return *this;
-    }
 
     // Allow the row and column span of the current cell to be adjusted.
     ElementTable & ColSpan(int new_span) {

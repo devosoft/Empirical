@@ -31,10 +31,13 @@ namespace UI {
   protected:
     std::map<std::string, Element *> element_dict;  // By-name lookup for elements.
 
-    // Return a text element for appending, either the current last element or build new one.
+    // Return a text element for appending.  Use the last element unless there are no elements,
+    // the last element is not text, or it is not appendable (instead, build a new one).
     ElementText & GetTextElement() {
       // If the final element is not text, add one.
-      if (children.size() == 0 || children.back()->IsText() == false)  {
+      if (children.size() == 0
+          || children.back()->IsText() == false
+          || children.back()->AppendOK() == false)  {
         Element * new_child = new ElementText(UI::Text(), this);
         children.push_back(new_child);
       }
@@ -62,7 +65,48 @@ namespace UI {
     void UpdateCSS() {
       TriggerCSS();
     }
-  
+    
+    // Add additional children on to this element.
+    Element & Append(const std::string & in_text) {
+      return GetTextElement().Append(in_text);
+    }
+
+    Element & Append(const std::function<std::string()> & in_fun) {
+      return GetTextElement().Append(in_fun);
+    }
+
+    // Default to passing specialty operators to parent.
+    Element & Append(emp::UI::Button info) {
+      ElementButton * new_child = new ElementButton(info, this);
+      children.push_back(new_child);
+      return *new_child;
+    }
+    Element & Append(emp::UI::Canvas info) {
+      ElementCanvas * new_child = new ElementCanvas(info, this);
+      children.push_back(new_child);
+      return *new_child;
+    }
+    Element & Append(emp::UI::Image info) {
+      ElementImage * new_child = new ElementImage(info, this);
+      children.push_back(new_child);
+      return *new_child;
+    }
+    Element & Append(emp::UI::Slate info) {
+      ElementSlate * new_child = new ElementSlate(info, this);
+      children.push_back(new_child);
+      return *new_child;
+    }
+    Element & Append(emp::UI::Table info) {
+      ElementTable * new_child = new ElementTable(info, this);
+      children.push_back(new_child);
+      return *new_child;
+    }
+    Element & Append(emp::UI::Text info) {
+      ElementText * new_child = new ElementText(info, this);
+      children.push_back(new_child);
+      return *new_child;
+    }
+
 public:
     ElementSlate(const Slate & in_slate, Element * in_parent=nullptr)
       : Element(in_slate.GetDivID(), in_parent), emp::UI::Slate(in_slate) { ; }
@@ -111,47 +155,6 @@ public:
       return dynamic_cast<ElementText&>( operator[](test_name) );
     }
 
-
-    // Add additional children on to this element.
-    Element & Append(const std::string & in_text) {
-      return GetTextElement().Append(in_text);
-    }
-
-    Element & Append(const std::function<std::string()> & in_fun) {
-      return GetTextElement().Append(in_fun);
-    }
-
-    // Default to passing specialty operators to parent.
-    Element & Append(emp::UI::Button info) {
-      ElementButton * new_child = new ElementButton(info, this);
-      children.push_back(new_child);
-      return *new_child;
-    }
-    Element & Append(emp::UI::Canvas info) {
-      ElementCanvas * new_child = new ElementCanvas(info, this);
-      children.push_back(new_child);
-      return *new_child;
-    }
-    Element & Append(emp::UI::Image info) {
-      ElementImage * new_child = new ElementImage(info, this);
-      children.push_back(new_child);
-      return *new_child;
-    }
-    Element & Append(emp::UI::Slate info) {
-      ElementSlate * new_child = new ElementSlate(info, this);
-      children.push_back(new_child);
-      return *new_child;
-    }
-    Element & Append(emp::UI::Table info) {
-      ElementTable * new_child = new ElementTable(info, this);
-      children.push_back(new_child);
-      return *new_child;
-    }
-    Element & Append(emp::UI::Text info) {
-      ElementText * new_child = new ElementText(info, this);
-      children.push_back(new_child);
-      return *new_child;
-    }
 
     Element * BuildElement(emp::UI::Button info, Element * fwd_parent) {
       return new ElementButton(info, fwd_parent);
