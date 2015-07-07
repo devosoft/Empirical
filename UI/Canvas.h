@@ -48,10 +48,14 @@ namespace UI {
           emp.ctx = canvas.getContext('2d');
         }, GetFullID().c_str());
 
+      next_action = 0; // @CAO This should be moved when we go to a Redraw() and Refresh system...
       while (next_action < actions.size()) {
         actions[next_action]->Apply();
         ++next_action;
       };
+
+      // Trigger any JS actions from the base class.
+      Widget::TriggerJS();
     }
 
     Canvas & AddAction(CanvasAction * new_action) {
