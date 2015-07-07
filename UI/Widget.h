@@ -45,6 +45,16 @@ namespace UI {
         style.Set(setting, value);
         return (RETURN_TYPE &) *this;
       }
+
+      // Allow multiple CSS settings to be grouped.
+      template <typename T1, typename T2, typename... OTHER_SETTINGS>
+      RETURN_TYPE & CSS(const std::string & setting1, T1 && val1,
+                        const std::string & setting2, T2 && val2,
+                        OTHER_SETTINGS... others) {
+        CSS(setting1, val1);              // Set the first CSS value.
+        return CSS(setting2, val2, others...);   // Recurse to the others.
+      }
+
       RETURN_TYPE & ID(const std::string & in_id) { div_id = in_id; return (RETURN_TYPE &) *this; }
 
       // Size Manipulation
@@ -52,10 +62,38 @@ namespace UI {
       RETURN_TYPE & Height(int h) { return CSS("height", emp::to_string(h, "px") ); }
       RETURN_TYPE & Size(int w, int h) { Width(w); Height(h); return (RETURN_TYPE &) *this; }
 
+
+      // Position Manipulation
+      RETURN_TYPE & Center() { return CSS("margin", "auto"); }
+      RETURN_TYPE & SetPosition(int x, int y) {
+        CSS("position", "fixed",
+            "left", emp::to_string(x, "px"),
+            "top", emp::to_string(y, "px"));
+        return (RETURN_TYPE &) *this;
+      }
+      RETURN_TYPE & SetPositionRT(int x, int y) {
+        CSS("position", "fixed",
+            "right", emp::to_string(x, "px"),
+            "top", emp::to_string(y, "px"));
+        return (RETURN_TYPE &) *this;
+      }
+      RETURN_TYPE & SetPositionRB(int x, int y) {
+        CSS("position", "fixed",
+            "right", emp::to_string(x, "px"),
+            "bottom", emp::to_string(y, "px"));
+        return (RETURN_TYPE &) *this;
+      }
+      RETURN_TYPE & SetPositionLB(int x, int y) {
+        CSS("position", "fixed",
+            "left", emp::to_string(x, "px"),
+            "bottom", emp::to_string(y, "px"));
+        return (RETURN_TYPE &) *this;
+      }
+
       // Text Manipulation
       RETURN_TYPE & Font(const std::string & font) { return CSS("font-family", font); }
       RETURN_TYPE & FontSize(int s) { return CSS("font-size", emp::to_string(s, "px")); }
-      RETURN_TYPE & Center() { return CSS("text-align", "center"); }
+      RETURN_TYPE & CenterText() { return CSS("text-align", "center"); }
 
       // Color Manipulation
       RETURN_TYPE & Background(const std::string & v) { return CSS("background-color", v); }
