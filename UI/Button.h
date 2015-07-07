@@ -30,7 +30,7 @@ namespace UI {
       os << " id=\"" << div_id << obj_ext << "\"";          // Indicate ID.
 
       // Indicate action on click.
-      os << " onclick=\"empCppCallback(" << std::to_string(callback_id) << ")\"";
+      os << " onclick=\"emp.Callback(" << std::to_string(callback_id) << ")\"";
       
       os << ">" << label << "</button>";       // Close and label the button.
     }
