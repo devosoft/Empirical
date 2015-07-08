@@ -520,10 +520,142 @@
 #define EMP_TYPES_TO_ARGS_63(A, ...) EMP_TYPES_TO_ARGS_62(__VA_ARGS__), A arg13
 
 
+// Some basic math macros.  Since brute force is the only way to do math with macros...
+#define EMP_INC(X) EMP_INC_ ## X
+#define EMP_INC_0  1
+#define EMP_INC_1  2
+#define EMP_INC_2  3
+#define EMP_INC_3  4
+#define EMP_INC_4  5
+#define EMP_INC_5  6
+#define EMP_INC_6  7
+#define EMP_INC_7  8
+#define EMP_INC_8  9
+#define EMP_INC_9  10
+#define EMP_INC_10  11
+#define EMP_INC_11  12
+#define EMP_INC_12  13
+#define EMP_INC_13  14
+#define EMP_INC_14  15
+#define EMP_INC_15  16
+#define EMP_INC_16  17
+#define EMP_INC_17  18
+#define EMP_INC_18  19
+#define EMP_INC_19  20
+#define EMP_INC_20  21
+#define EMP_INC_21  22
+#define EMP_INC_22  23
+#define EMP_INC_23  24
+#define EMP_INC_24  25
+#define EMP_INC_25  26
+#define EMP_INC_26  27
+#define EMP_INC_27  28
+#define EMP_INC_28  29
+#define EMP_INC_29  30
+#define EMP_INC_30  31
+#define EMP_INC_31  32
+#define EMP_INC_32  33
+#define EMP_INC_33  34
+#define EMP_INC_34  35
+#define EMP_INC_35  36
+#define EMP_INC_36  37
+#define EMP_INC_37  38
+#define EMP_INC_38  39
+#define EMP_INC_39  40
+#define EMP_INC_40  41
+#define EMP_INC_41  42
+#define EMP_INC_42  43
+#define EMP_INC_43  44
+#define EMP_INC_44  45
+#define EMP_INC_45  46
+#define EMP_INC_46  47
+#define EMP_INC_47  48
+#define EMP_INC_48  49
+#define EMP_INC_49  50
+#define EMP_INC_50  51
+#define EMP_INC_51  52
+#define EMP_INC_52  53
+#define EMP_INC_53  54
+#define EMP_INC_54  55
+#define EMP_INC_55  56
+#define EMP_INC_56  57
+#define EMP_INC_57  58
+#define EMP_INC_58  59
+#define EMP_INC_59  60
+#define EMP_INC_60  61
+#define EMP_INC_61  62
+#define EMP_INC_62  63
+#define EMP_INC_63  64
+
+#define EMP_HALF(X) EMP_HALF_ ## X
+#define EMP_HALF_0  0
+#define EMP_HALF_1  0
+#define EMP_HALF_2  1
+#define EMP_HALF_3  1
+#define EMP_HALF_4  2
+#define EMP_HALF_5  2
+#define EMP_HALF_6  3
+#define EMP_HALF_7  3
+#define EMP_HALF_8  4
+#define EMP_HALF_9  4
+#define EMP_HALF_10  5
+#define EMP_HALF_11  5
+#define EMP_HALF_12  6
+#define EMP_HALF_13  6
+#define EMP_HALF_14  7
+#define EMP_HALF_15  7
+#define EMP_HALF_16  8
+#define EMP_HALF_17  8
+#define EMP_HALF_18  9
+#define EMP_HALF_19  9
+#define EMP_HALF_20  10
+#define EMP_HALF_21  10
+#define EMP_HALF_22  11
+#define EMP_HALF_23  11
+#define EMP_HALF_24  12
+#define EMP_HALF_25  12
+#define EMP_HALF_26  13
+#define EMP_HALF_27  13
+#define EMP_HALF_28  14
+#define EMP_HALF_29  14
+#define EMP_HALF_30  15
+#define EMP_HALF_31  15
+#define EMP_HALF_32  16
+#define EMP_HALF_33  16
+#define EMP_HALF_34  17
+#define EMP_HALF_35  17
+#define EMP_HALF_36  18
+#define EMP_HALF_37  18
+#define EMP_HALF_38  19
+#define EMP_HALF_39  19
+#define EMP_HALF_40  20
+#define EMP_HALF_41  20
+#define EMP_HALF_42  21
+#define EMP_HALF_43  21
+#define EMP_HALF_44  22
+#define EMP_HALF_45  22
+#define EMP_HALF_46  23
+#define EMP_HALF_47  23
+#define EMP_HALF_48  24
+#define EMP_HALF_49  24
+#define EMP_HALF_50  25
+#define EMP_HALF_51  25
+#define EMP_HALF_52  26
+#define EMP_HALF_53  26
+#define EMP_HALF_54  27
+#define EMP_HALF_55  27
+#define EMP_HALF_56  28
+#define EMP_HALF_57  28
+#define EMP_HALF_58  29
+#define EMP_HALF_59  29
+#define EMP_HALF_60  30
+#define EMP_HALF_61  30
+#define EMP_HALF_62  31
+#define EMP_HALF_63  31
+
+
 // Setup a generic method of calling a specific version of a macro based on argument count.
 #define EMP_ASSEMBLE_IMPL(BASE, ARG_COUNT) BASE ## ARG_COUNT
 #define EMP_ASSEMBLE_MACRO(BASE, ARG_COUNT, ...) EMP_ASSEMBLE_IMPL(BASE, ARG_COUNT) (__VA_ARGS__)
-
-// Some basic math macros.  Since brute force is the only way to do math with macros...
 
 #endif
