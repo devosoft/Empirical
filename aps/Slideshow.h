@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+#include "../emtools/emfunctions.h"
 #include "../UI/UI.h"
 #include "../UI/keypress.h"
 
@@ -20,17 +21,33 @@ namespace emp {
     std::vector<UI::Document *> slides;
     int cur_pos;
 
+    // UI Tracking
     UI::KeypressManager key_manager;
+    int window_width;
+    int window_height;
 
     // Formatting details.
     std::string default_font;
     
     // Helper functions
-
+    void OnResize(int new_w, int new_h) {
+      // emp::Alert("New size = ", new_w, ", ", new_h);
+      window_width = new_w;
+      window_height = new_h;
+    }
   public:
     Slideshow(const std::string name = "emp_base") : div_name(name), cur_pos(0) {
+      // Setup default captures.
+      emp::OnResize( std::bind(&Slideshow::OnResize, this, UI::_1, UI::_2) );
+
+      // Track page information
+      window_width = GetWindowInnerWidth();
+      window_height = GetWindowInnerHeight();
+
+      // Setup default look.
       default_font = "\"Lucida Sans Unicode\", \"Lucida Grande\", sans-serif";
-      NewSlide();
+
+      NewSlide(); // Create the title slide.
     }
     ~Slideshow() {
       for (auto * slide : slides) delete slide;
@@ -56,8 +73,19 @@ namespace emp {
       new_slide->Font(default_font);
       if (slide_title != "") {
         (*new_slide) << UI::Text("title").FontSize(50).Center() << slide_title;
+        new_slide->Text("title").PreventAppend();  // Additional text in a new box!
       }
       slides.push_back(new_slide);
+
+      (*new_slide) << UI::Button([this](){this->PrevSlide();}, "<b>Prev</b>", "prev")
+                   << UI::Button([this](){this->NextSlide();}, "<b>Next</b>", "next");
+
+      const int bw = 50;
+      const int bh = 50;
+      const int boffset = 10;
+      new_slide->Button("next").SetPositionRB(boffset, boffset).Size(bw, bh).Opacity(1.0);
+      new_slide->Button("prev").SetPositionRB(boffset+bw, boffset).Size(bw, bh).Opacity(1.0);
+        
       return *this;
     }
     
