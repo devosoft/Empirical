@@ -6,11 +6,11 @@
 //  These macros will build a tuple and accessors to that tuple's members inside of a
 //  class definintion.
 //
-//  "But WHY???" I hear you ask. Let me explain: Keeping a tuple allows us to easily
-//  track the members in the stuct or class, and makes possible powerful types of
-//  reflection including identifying all members and performing an action on each
-//  (such as serialization).  Since tuples instantiate members directly, these benefits
-//  should come at no cost to performance.
+//  "But WHY???" you ask. Let me explain: Keeping a tuple allows us to easily track the
+//  members in the stuct or class, and makes possible powerful types of reflection
+//  including identifying all members and performing an action on each (such as
+//  serialization).  Since tuples instantiate members directly, these benefits should
+//  come at no cost to performance.
 //
 //  The instantial these tuple member, inside the class definition use:
 //
@@ -30,6 +30,11 @@
 //  name for it (for example if you want more than one tuple in the class), you need to
 //  call EMP_BUILD_NAMED_TUPLE, which is identical to EMP_BUILD_TUPLE, but takes the
 //  name to be used for the tuple as its first argument.
+//
+//
+//  Development notes:
+//  * Add static member function to help with reflection?
+//  * Make play nicely with serialization techniques.
 //
 
 #include <tuple>
