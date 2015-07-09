@@ -10,7 +10,34 @@ struct TestStruct {
 
   EMP_BUILD_TUPLE( int, MyInt,
                    int, MyInt2,
-                   std::string, MyString )
+                   int, MyInt3,
+                   int, MyInt4,
+                   int, MyInt5,
+                   int, MyInt6,
+                   int, MyInt7,
+                   int, MyInt8,
+                   int, MyInt9,
+                   int, MyInt10,
+                   std::string, MyString, 
+                   std::string, MyString2, 
+                   std::string, MyString3, 
+                   std::string, MyString4, 
+                   std::string, MyString5, 
+                   std::string, MyString6, 
+                   std::string, MyString7, 
+                   std::string, MyString8, 
+                   std::string, MyString9, 
+                   std::string, MyString10, 
+                   char, MyChar,
+                   char, MyChar2,
+                   char, MyChar3,
+                   char, MyChar4,
+                   char, MyChar5,
+                   char, MyChar6,
+                   char, MyChar7,
+                   char, MyChar8,
+                   char, MyChar9,
+                   char, MyChar10)
 };
 
 int main(int argc, char* argv[])
