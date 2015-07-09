@@ -1,0 +1,9 @@
+#include <emscripten.h>
+#include <iostream>
+
+int main()
+{
+  EM_ASM({
+      d3.select("body").append("p")
+    })
+}
