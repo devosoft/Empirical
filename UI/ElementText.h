@@ -23,11 +23,11 @@ namespace UI {
   private:
     DynamicStringSet strings;
 
-    void UpdateHTML() {
+    void UpdateHTML() override {
       HTML.str("");       // Clear the current text.
       HTML << strings;    // Save the current value of the strings.
     }
-    void UpdateCSS() {
+    void UpdateCSS() override {
       TriggerCSS();
     }
 
@@ -36,7 +36,7 @@ namespace UI {
       : Element(in_text.GetDivID(), in_parent), Text(in_text) { ; }
     ~ElementText() { ; }
 
-    virtual std::string GetWrapperTag() const { return "div"; }
+    virtual std::string GetWrapperTag() const override { return "div"; }
 
     // Do not allow Managers to be copied
     ElementText(const ElementText &) = delete;
@@ -56,11 +56,11 @@ namespace UI {
       return *this;
     }
 
-    virtual std::string GetType() {
+    virtual std::string GetType() override {
       return "ElementText";
     }
 
-    virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
+    virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") override {
       bool ok = true;
       if (verbose) {
         ss << prefix << "Scanning: emp::UI::ElementText with name = '" << name << "'" << std::endl;

@@ -21,7 +21,7 @@ namespace UI {
 
   class ElementTable : public Element, public Table {
   private:
-    void UpdateHTML() {
+    void UpdateHTML() override {
       HTML.str("");       // Clear the current HTML
       HTML << "<table id=\"" << div_id << obj_ext << "\">";
 
@@ -63,7 +63,7 @@ namespace UI {
 
       HTML << "</table>";
     }
-    void UpdateCSS() {
+    void UpdateCSS() override {
       Table::UpdateCSS();
     }
 
@@ -85,22 +85,22 @@ namespace UI {
     }
 
     // When appending children to a table, forward to an internal slate.
-    Element & Append(const std::string & in_text) { return GetCurSlate() << in_text; }
-    Element & Append(const std::function<std::string()> & fun) { return GetCurSlate() << fun; }
-    Element & Append(emp::UI::Button info) { return GetCurSlate() << info; }
-    Element & Append(emp::UI::Image info) { return GetCurSlate() << info; }
-    Element & Append(emp::UI::Table info) { return GetCurSlate() << info; }
-    Element & Append(emp::UI::Text info) { return GetCurSlate() << info; }
-    Element & Append(emp::UI::Slate info) { return GetCurSlate() << info; }
+    Element & Append(const std::string & in_text) override { return GetCurSlate() << in_text; }
+    Element & Append(const std::function<std::string()> & fun) override { return GetCurSlate() << fun; }
+    Element & Append(emp::UI::Button info) override { return GetCurSlate() << info; }
+    Element & Append(emp::UI::Image info) override { return GetCurSlate() << info; }
+    Element & Append(emp::UI::Table info) override { return GetCurSlate() << info; }
+    Element & Append(emp::UI::Text info) override { return GetCurSlate() << info; }
+    Element & Append(emp::UI::Slate info) override { return GetCurSlate() << info; }
 
-    Element & Append(const emp::UI::GetCell & cell) {
+    Element & Append(const emp::UI::GetCell & cell) override {
       this->GetCell(cell.row, cell.col);
       if (cell.row_span > 0) SetRowSpan(cell.row_span);
       if (cell.col_span > 0) SetColSpan(cell.col_span);
       return *this;
     }
 
-    Element & Append(const emp::UI::GetRow & row) {
+    Element & Append(const emp::UI::GetRow & row) override {
       this->GetRow(row.row);
       return *this;
     }
@@ -131,11 +131,11 @@ namespace UI {
       return (ElementTable &) *this;
     }
     
-    virtual std::string GetType() {
+    virtual std::string GetType() override {
       return "ElementTable";
     }
 
-    virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
+    virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") override {
       bool ok = true;
 
       if (verbose) {
