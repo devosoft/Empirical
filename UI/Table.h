@@ -153,6 +153,16 @@ namespace UI {
 
     TableData & GetCurCell() { return rows[cur_row].data[cur_col]; }
 
+    // Apply to appropriate component based on current state.
+    Table & CSS_impl(const std::string & setting, const std::string & value) override {
+      if (state == TABLE) style.Set(setting, value);
+      else if (state == ROW) rows[cur_row].CSS(setting, value);
+      else if (state == CELL) rows[cur_row].data[cur_col].CSS(setting, value);
+      else emp_assert(false && "Table in unknown state!");
+      
+      return *this;
+    }
+    
   public:
     Table(int r, int c, const std::string & in_name="")
       : Widget(in_name)
@@ -213,17 +223,6 @@ namespace UI {
       if (state == ROW) return rows[cur_row].CSS(setting);
       if (state == CELL) return rows[cur_row].data[cur_col].CSS(setting);
       return "";
-    }
-    
-    // Apply to appropriate component based on current state.
-    template <typename SETTING_TYPE>      
-    Table & CSS(const std::string & setting, SETTING_TYPE && value) {
-      if (state == TABLE) style.Set(setting, value);
-      else if (state == ROW) rows[cur_row].CSS(setting, value);
-      else if (state == CELL) rows[cur_row].data[cur_col].CSS(setting, value);
-      else emp_assert(false && "Table in unknown state!");
-      
-      return *this;
     }
     
     // Allow the row and column span of the current cell to be adjusted.

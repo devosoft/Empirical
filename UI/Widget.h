@@ -33,17 +33,22 @@ namespace UI {
         }
       }
 
+      virtual RETURN_TYPE & CSS_impl(const std::string & setting, const std::string & value) {
+        style.Set(setting, value);
+        return (RETURN_TYPE &) *this;
+      }
+
     public:
       const std::string & GetDivID() const { return div_id; }      
       const std::string & GetObjExt() const { return obj_ext; }
       std::string GetFullID() const { return div_id + obj_ext; }
       static std::string TypeName() { return "Widget"; }
 
-      std::string CSS(const std::string & setting) { return style.Get(setting); }
+      virtual std::string CSS(const std::string & setting) { return style.Get(setting); }
+      
       template <typename SETTING_TYPE>
       RETURN_TYPE & CSS(const std::string & setting, SETTING_TYPE && value) {
-        style.Set(setting, value);
-        return (RETURN_TYPE &) *this;
+        return CSS_impl(setting, emp::to_string(value));
       }
 
       // Allow multiple CSS settings to be grouped.
