@@ -55,10 +55,10 @@ namespace emp {
 
     int GetSlideNum() const { return cur_pos; }
 
-    UI::Document & operator[](int new_pos) {
-      emp_assert(new_pos >= 0 && new_pos < (int) slides.size());
-      cur_pos = new_pos;
-      return *(slides[new_pos]);
+    UI::Document & operator[](int slide_id) {
+      emp_assert(slide_id >= 0 && slide_id < (int) slides.size());
+      cur_pos = slide_id;
+      return *(slides[slide_id]);
     }
 
     template <typename T>
@@ -107,6 +107,9 @@ namespace emp {
       // key_manager.AddKeydownCallback('p', [this](){this->NextSlide();});
       key_manager.AddKeydownCallback("N ", std::bind(&Slideshow::NextSlide, this));
       key_manager.AddKeydownCallback("P\b", std::bind(&Slideshow::PrevSlide, this));
+
+      key_manager.AddKeydownCallback(39, std::bind(&Slideshow::NextSlide, this));
+      key_manager.AddKeydownCallback(37, std::bind(&Slideshow::PrevSlide, this));
       return *this;
     }
     
