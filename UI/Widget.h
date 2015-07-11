@@ -67,37 +67,61 @@ namespace UI {
       RETURN_TYPE & Height(int h) { return CSS("height", emp::to_string(h, "px") ); }
       RETURN_TYPE & Size(int w, int h) { Width(w); Height(h); return (RETURN_TYPE &) *this; }
 
+      // Set size in terms of percent of the viewport width (vw's)
+      RETURN_TYPE & WidthVW(double w) { return CSS("width", emp::to_string(w, "vw") ); }
+      RETURN_TYPE & HeightVW(double h) { return CSS("height", emp::to_string(h, "vw") ); }
+      RETURN_TYPE & SizeVW(double w, double h) { WidthVW(w); return HeightVW(h); }
+
 
       // Position Manipulation
       RETURN_TYPE & Center() { return CSS("margin", "auto"); }
       RETURN_TYPE & SetPosition(int x, int y) {
-        CSS("position", "fixed",
-            "left", emp::to_string(x, "px"),
-            "top", emp::to_string(y, "px"));
-        return (RETURN_TYPE &) *this;
+        return CSS("position", "fixed",
+                   "left", emp::to_string(x, "px"),
+                   "top", emp::to_string(y, "px"));
       }
       RETURN_TYPE & SetPositionRT(int x, int y) {
-        CSS("position", "fixed",
-            "right", emp::to_string(x, "px"),
-            "top", emp::to_string(y, "px"));
-        return (RETURN_TYPE &) *this;
+        return CSS("position", "fixed",
+                   "right", emp::to_string(x, "px"),
+                   "top", emp::to_string(y, "px"));
       }
       RETURN_TYPE & SetPositionRB(int x, int y) {
-        CSS("position", "fixed",
-            "right", emp::to_string(x, "px"),
-            "bottom", emp::to_string(y, "px"));
-        return (RETURN_TYPE &) *this;
+        return CSS("position", "fixed",
+                   "right", emp::to_string(x, "px"),
+                   "bottom", emp::to_string(y, "px"));
       }
       RETURN_TYPE & SetPositionLB(int x, int y) {
-        CSS("position", "fixed",
-            "left", emp::to_string(x, "px"),
-            "bottom", emp::to_string(y, "px"));
-        return (RETURN_TYPE &) *this;
+        return CSS("position", "fixed",
+                   "left", emp::to_string(x, "px"),
+                   "bottom", emp::to_string(y, "px"));
+      }
+
+      // Set position in terms of percent of the viewport width (vw's)
+      RETURN_TYPE & SetPositionVW(double x, double y) {
+        return CSS("position", "fixed",
+                   "left", emp::to_string(x, "vw"),
+                   "top", emp::to_string(y, "vw"));
+      }
+      RETURN_TYPE & SetPositionRTVW(double x, double y) {
+        return CSS("position", "fixed",
+                   "right", emp::to_string(x, "vw"),
+                   "top", emp::to_string(y, "vw"));
+      }
+      RETURN_TYPE & SetPositionRBVW(double x, double y) {
+        return CSS("position", "fixed",
+                   "right", emp::to_string(x, "vw"),
+                   "bottom", emp::to_string(y, "vw"));
+      }
+      RETURN_TYPE & SetPositionLBVW(double x, double y) {
+        return CSS("position", "fixed",
+                   "left", emp::to_string(x, "vw"),
+                   "bottom", emp::to_string(y, "vw"));
       }
 
       // Text Manipulation
       RETURN_TYPE & Font(const std::string & font) { return CSS("font-family", font); }
       RETURN_TYPE & FontSize(int s) { return CSS("font-size", emp::to_string(s, "px")); }
+      RETURN_TYPE & FontSizeVW(double s) { return CSS("font-size", emp::to_string(s, "vw")); }
       RETURN_TYPE & CenterText() { return CSS("text-align", "center"); }
 
       // Color Manipulation
