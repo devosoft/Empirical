@@ -107,6 +107,27 @@ namespace UI {
       return *new_child;
     }
 
+    // BuildElement allows any element to build another as long as an ancestor knows how.
+    Element * BuildElement(emp::UI::Button info, Element * fwd_parent) {
+      return new ElementButton(info, fwd_parent);
+    }
+    Element * BuildElement(emp::UI::Canvas info, Element * fwd_parent) {
+      return new ElementCanvas(info, fwd_parent);
+    }
+    Element * BuildElement(emp::UI::Image info, Element * fwd_parent) {
+      return new ElementImage(info, fwd_parent);
+    }
+    Element * BuildElement(emp::UI::Table info, Element * fwd_parent) {
+      return new ElementTable(info, fwd_parent);
+    }
+    Element * BuildElement(emp::UI::Text info, Element * fwd_parent) {
+      return new ElementText(info, fwd_parent);
+    }
+    Element * BuildElement(emp::UI::Slate info, Element * fwd_parent) {
+      return new ElementSlate(info, fwd_parent);
+    }
+      
+
 public:
     ElementSlate(const Slate & in_slate, Element * in_parent=nullptr)
       : Element(in_slate.GetDivID(), in_parent), emp::UI::Slate(in_slate) { ; }
@@ -124,6 +145,9 @@ public:
       emp_assert(Contains(test_name));
       return *(element_dict[test_name]);
     }
+
+    // Methods to look up previously created elements, by type.
+
     ElementButton & Button(const std::string & test_name) {
       // Assert that we have the correct type, then return it.
       emp_assert(dynamic_cast<ElementButton *>( element_dict[test_name] ) != NULL);
@@ -156,26 +180,7 @@ public:
     }
 
 
-    Element * BuildElement(emp::UI::Button info, Element * fwd_parent) {
-      return new ElementButton(info, fwd_parent);
-    }
-    Element * BuildElement(emp::UI::Canvas info, Element * fwd_parent) {
-      return new ElementCanvas(info, fwd_parent);
-    }
-    Element * BuildElement(emp::UI::Image info, Element * fwd_parent) {
-      return new ElementImage(info, fwd_parent);
-    }
-    Element * BuildElement(emp::UI::Table info, Element * fwd_parent) {
-      return new ElementTable(info, fwd_parent);
-    }
-    Element * BuildElement(emp::UI::Text info, Element * fwd_parent) {
-      return new ElementText(info, fwd_parent);
-    }
-    Element * BuildElement(emp::UI::Slate info, Element * fwd_parent) {
-      return new ElementSlate(info, fwd_parent);
-    }
-      
-
+    // Add a an element to this slate that was created elsewhere.
     Element & AddChild(Element * child) {
       emp_assert(child != nullptr);
       child->SetParent(this);
@@ -184,6 +189,47 @@ public:
     }
 
 
+    // Build a new element of the specified type in this slate.
+    // Add additional children on to this element.
+
+    ElementButton & Add(UI::Button info) {
+      ElementButton * new_child = new ElementButton(info, this);
+      children.push_back(new_child);
+      return *new_child;
+    }
+    ElementCanvas & Add(UI::Canvas info) {
+      ElementCanvas * new_child = new ElementCanvas(info, this);
+      children.push_back(new_child);
+      return *new_child;
+    }
+    ElementImage & Add(UI::Image info) {
+      ElementImage * new_child = new ElementImage(info, this);
+      children.push_back(new_child);
+      return *new_child;
+    }
+    ElementSlate & Add(UI::Slate info) {
+      ElementSlate * new_child = new ElementSlate(info, this);
+      children.push_back(new_child);
+      return *new_child;
+    }
+    ElementTable & Add(UI::Table info) {
+      ElementTable * new_child = new ElementTable(info, this);
+      children.push_back(new_child);
+      return *new_child;
+    }
+    ElementText & Add(UI::Text info) {
+      ElementText * new_child = new ElementText(info, this);
+      children.push_back(new_child);
+      return *new_child;
+    }
+
+    // Shortcut adders where parameters don't have to be widgets
+    template <class... T> ElementButton& AddButton(T... args){return Add(UI::Button(args...));}
+    template <class... T> ElementCanvas& AddCanvas(T... args){return Add(UI::Canvas(args...));}
+    template <class... T> ElementImage&  AddImage(T... args) {return Add(UI::Image(args...));}
+    template <class... T> ElementSlate&  AddSlate(T... args) {return Add(UI::Slate(args...));}
+    template <class... T> ElementTable&  AddTable(T... args) {return Add(UI::Table(args...));}
+    template <class... T> ElementText&   AddText(T... args)  {return Add(UI::Text(args...));}
 
     virtual std::string GetType() {
       return "ElementSlate";
