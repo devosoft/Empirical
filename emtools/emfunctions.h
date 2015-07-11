@@ -13,7 +13,9 @@ namespace emp {
 
   void DelayCall(const std::function<void()> & in_fun, int delay) {
     uint32_t callback_id = JSWrapOnce(in_fun); // Wrap and dispose when called.
-    EM_ASM_ARGS({ window.setTimeout(function() { emp.Callback($0); }, $1); }, callback_id, delay);
+    EM_ASM_ARGS({
+        window.setTimeout(function() { emp.Callback($0); }, $1);
+      }, callback_id, delay);
   }
 
   // Two versions of OnResize depending on whether the new size is desired as inputs.
