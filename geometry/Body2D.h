@@ -21,7 +21,7 @@
 
 namespace emp {
 
-  template <typename BODY_INFO, typename BASE_TYPE> class CircleBody2D {
+  template <typename BODY_INFO, typename BASE_TYPE=double> class CircleBody2D {
   private:
     Circle<BASE_TYPE> perimeter;  // Includes position and size.
     Angle orientation;            // Which way is body facing?

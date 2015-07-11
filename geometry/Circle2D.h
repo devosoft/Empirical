@@ -10,7 +10,7 @@
 
 namespace emp {
 
-  template <typename TYPE> class Circle {
+  template <typename TYPE=double> class Circle {
   private:
     Point<TYPE> center;
     TYPE radius;

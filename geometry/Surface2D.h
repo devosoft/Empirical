@@ -25,7 +25,7 @@
 
 namespace emp {
 
-  template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE> class Surface2D {
+  template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE=double> class Surface2D {
   private:
     const Point<BASE_TYPE> max_pos;     // Lower-left corner of the surface.
     std::vector<BODY_TYPE *> body_set;  // Set of all bodies on surface

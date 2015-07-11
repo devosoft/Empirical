@@ -14,7 +14,7 @@
 
 namespace emp {
 
-  template <typename TYPE> class Point {
+  template <typename TYPE=double> class Point {
   private:
     TYPE x;
     TYPE y;

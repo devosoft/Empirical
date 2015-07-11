@@ -15,7 +15,7 @@ using namespace std::placeholders;
 
 namespace emp {
 
-  template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE> class Physics2D {
+  template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE=double> class Physics2D {
   private:
     Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> surface;    // Contains bodies that can collide.
     Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> background; // Contains bodies that can't collide.
