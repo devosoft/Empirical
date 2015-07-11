@@ -98,17 +98,20 @@ namespace emp {
       slides.push_back(new_slide);
 
       (*new_slide) << UI::Button([this](){this->PrevSlide();}, "<b>Prev</b>", "prev")
-                   << UI::Button([this](){this->NextSlide();}, "<b>Next</b>", "next");
+                   << UI::Button([this](){this->NextSlide();}, "<b>Next</b>", "next")
+                   << UI::Button(std::string("document.querySelector('body').webkitRequestFullScreen();"),
+                                 "<b>Full</b>", "full");
 
       const double bw = 5.0;  // Button width (in vw's)
       const double bh = 5.0;  // Button height
       const double bo = 1.0;  // Button offset from edge.
       new_slide->Button("next").SetPositionRBVW(bo, bo).SizeVW(bw, bh).Opacity(1.0);
       new_slide->Button("prev").SetPositionRBVW(bo+bw, bo).SizeVW(bw, bh).Opacity(1.0);
-        
+      new_slide->Button("full").SetPositionRBVW(bo+bw+bw, bo).SizeVW(bw, bh).Opacity(1.0);
+
       return *this;
     }
-    
+
     UI::Document & GetSlide() { return *(slides[cur_pos]); }
 
     void Update() { slides[cur_pos]->Update(); }
