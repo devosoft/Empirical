@@ -52,7 +52,6 @@ namespace emp {
     {
       (void) base_width;
       (void) base_height;
-      (void) text_height;
 
       // Setup default captures.
       emp::OnResize( std::bind(&Slideshow::OnResize, this, UI::_1, UI::_2) );
@@ -79,6 +78,27 @@ namespace emp {
       return *(slides[slide_id]);
     }
 
+    Slideshow & operator<<(UI::Text & input) {
+      if (!input.HasCSS("font-size")) {
+        input.FontSizeVW(text_height);
+      }
+      (*slides[cur_pos]) << input;
+      return *this;
+    }
+
+    Slideshow & operator<<(UI::Text && input) {
+      if (!input.HasCSS("font-size")) {
+        input.FontSizeVW(text_height);
+      }
+      (*slides[cur_pos]) << std::forward<UI::Text>(input);
+      return *this;
+    }
+
+    Slideshow & operator<<(const std::string & input) {
+      (*slides[cur_pos]) << input;
+      return *this;
+    }
+
     template <typename T>
     Slideshow & operator<<(T && input) {
       (*slides[cur_pos]) << input;
@@ -88,6 +108,7 @@ namespace emp {
     Slideshow & NewSlide(const std::string & slide_title = "", double in_height=-1.0) {
       cur_pos = (int) slides.size();
       auto * new_slide = new UI::Document(div_name);
+      new_slide->SizeVW(100, 62.5).Background("black");
       new_slide->Font(default_font);
       if (slide_title != "") {
         if (in_height < 0.0) in_height = title_height;
