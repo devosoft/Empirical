@@ -1,4 +1,7 @@
 -= Next Steps =-
+In UI Elements change Update() to Redraw() throughout (to indicate that it starts drawing from
+scratch) and add in a Refresh() to just make new changes.  Particular important w/canvas.
+
 Incorporate Ben's changes into BitVector/BitSet
 (work on applications of library and see what needs to be fixed/added)
 Setup documentation outside of the code!
@@ -12,6 +15,10 @@ Have multi-purpose headers with static functions; how can I prevent those specif
 Make CSS method virtual so others (width/height/etc) call the proper version when its overloaded.
 JSDelete should make sure that we are not deleting a named function (or cleanup JS side too!)
 fix how is_valid() functions are handled in string_utils.h
+Make sure to check append_ok in slates; use SFINAE to test if input is a command in << before
+  forwarding to Append.  Commands should occur, true appends should now.  (Maybe change the
+  name to Comamnd when not appending as long as we're detecting anyway?)
+Closing a Text() element should automatically run PreventAppend();
 
 -= Improvements =-
 Tables should have single CSS for all rows and all cells.
