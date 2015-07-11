@@ -15,10 +15,10 @@ using namespace std::placeholders;
 
 namespace emp {
 
-  template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE=double> class Physics2D {
+  template <typename BODY_TYPE, typename BRAIN_TYPE, typename BASE_TYPE=double> class Physics2D {
   private:
-    Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> surface;    // Contains bodies that can collide.
-    Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> background; // Contains bodies that can't collide.
+    Surface2D<BODY_TYPE, BRAIN_TYPE, BASE_TYPE> surface;    // Bodies that can collide.
+    Surface2D<BODY_TYPE, BRAIN_TYPE, BASE_TYPE> background; // Bodies that can't collide.
 
   public:
     Physics2D(BASE_TYPE width, BASE_TYPE height, BASE_TYPE max_org_diameter=20) 

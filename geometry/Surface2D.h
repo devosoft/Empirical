@@ -19,13 +19,18 @@
 //   Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> & AddBody(BODY_TYPE * new_body);
 //   void TestCollisions(std::function<bool(BODY_TYPE &, BODY_TYPE &)> collide_fun);
 //
+//
+//  Development notes:
+//  * Need a good function to remove a body; now we have to use GetBodySet() and modify it.
+//
 
 #include "Body2D.h"
 #include <functional>
 
 namespace emp {
 
-  template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE=double> class Surface2D {
+  template <typename BODY_TYPE, typename BRAIN_TYPE, typename BASE_TYPE=double>
+  class Surface2D {
   private:
     const Point<BASE_TYPE> max_pos;     // Lower-left corner of the surface.
     std::vector<BODY_TYPE *> body_set;  // Set of all bodies on surface
@@ -37,17 +42,17 @@ namespace emp {
     }
     ~Surface2D() { ; }
 
+    BASE_TYPE GetWidth() const { return max_pos.GetX(); }
+    BASE_TYPE GetHeight() const { return max_pos.GetY(); }
     const Point<BASE_TYPE> & GetMaxPosition() const { return max_pos; }
 
     std::vector<BODY_TYPE *> & GetBodySet() { return body_set; }
     const std::vector<BODY_TYPE *> & GetConstBodySet() const { return body_set; }
 
-    Surface2D<BODY_TYPE, BODY_INFO, BASE_TYPE> & AddBody(BODY_TYPE * new_body) {
-      body_set.push_back(new_body);                         // Add body to master list
+    Surface2D & AddBody(BODY_TYPE * new_body) {
+      body_set.push_back(new_body);     // Add body to master list
       return *this;
     }
-
-    // @CAO Need a good function to remove a body!
 
     // The following function will test pairs of collisions and run the passed-in function
     // on pairs of objects that *may* collide.

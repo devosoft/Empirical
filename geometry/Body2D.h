@@ -21,12 +21,13 @@
 
 namespace emp {
 
-  template <typename BODY_INFO, typename BASE_TYPE=double> class CircleBody2D {
+  template <typename BRAIN_TYPE, typename BASE_TYPE=double>
+  class CircleBody2D {
   private:
     Circle<BASE_TYPE> perimeter;  // Includes position and size.
     Angle orientation;            // Which way is body facing?
     BASE_TYPE target_radius;      // For growing/shrinking
-    BODY_INFO * info;             // External information about individual
+    BRAIN_TYPE * brain;           // Controller for individual
     Point<BASE_TYPE> velocity;    // Speed and direction of movement
     BASE_TYPE mass;               // "Weight" of this object (@CAO not used yet..)
     unsigned int color_id;        // Which color should this body appear?
@@ -41,8 +42,8 @@ namespace emp {
     double pressure;                  // Current pressure on this body.
 
   public:
-    CircleBody2D(const Circle<BASE_TYPE> & _p, BODY_INFO * _i = NULL)
-      : perimeter(_p), target_radius(_p.GetRadius()), info(_i), mass(1), color_id(0)
+    CircleBody2D(const Circle<BASE_TYPE> & _p, BRAIN_TYPE * _b = NULL)
+      : perimeter(_p), target_radius(_p.GetRadius()), brain(_b), mass(1), color_id(0)
       , pair_link(NULL), pair_dist(0), target_pair_dist(0), pressure(0) { ; }
     ~CircleBody2D() {
       // If this body is paired with another one, removing the pairing.
@@ -58,7 +59,7 @@ namespace emp {
     BASE_TYPE GetRadius() const { return perimeter.GetRadius(); }
     const Angle & GetOrientation() const { return orientation; }
     BASE_TYPE GetTargetRadius() const { return target_radius; }
-    BODY_INFO * GetInfo() { return info; }
+    BRAIN_TYPE * GetBrain() { return brain; }
     const Point<BASE_TYPE> & GetVelocity() const { return velocity; }
     BASE_TYPE GetMass() const { return mass; }
     unsigned int GetColorID() const { return color_id; }
@@ -68,34 +69,31 @@ namespace emp {
 
     bool IsReproducing() const { return (pair_link != NULL) && (GetRadius() != target_radius); }
 
-    CircleBody2D<BODY_INFO, BASE_TYPE> & SetPosition(const Point<BASE_TYPE> & new_pos) {
+    CircleBody2D & SetPosition(const Point<BASE_TYPE> & new_pos) {
       perimeter.SetCenter(new_pos); 
       return *this;
     }
-    CircleBody2D<BODY_INFO, BASE_TYPE> & SetRadius(BASE_TYPE new_radius) {
+    CircleBody2D & SetRadius(BASE_TYPE new_radius) {
       perimeter.SetRadius(new_radius); 
       return *this;
     }
-    CircleBody2D<BODY_INFO, BASE_TYPE> &
-    SetTargetRadius(BASE_TYPE _target) { target_radius = _target; return *this; }
-    CircleBody2D<BODY_INFO, BASE_TYPE> &
-    SetVelocity(BASE_TYPE _x, BASE_TYPE _y) { velocity.Set(_x, _y); return *this; }
-    CircleBody2D<BODY_INFO, BASE_TYPE> &
-    SetVelocity(const Point<BASE_TYPE> & in_vel) { velocity = in_vel; return *this; }
-    CircleBody2D<BODY_INFO, BASE_TYPE> &
-    SetColorID(unsigned int in_id) { color_id = in_id; return *this; }
+    CircleBody2D & SetTargetRadius(BASE_TYPE t) { target_radius = t; return *this; }
+    CircleBody2D & SetVelocity(BASE_TYPE x, BASE_TYPE y) { velocity.Set(x, y); return *this; }
+    CircleBody2D & SetVelocity(const Point<BASE_TYPE> & v) { velocity = v; return *this; }
+    CircleBody2D & SetColorID(unsigned int in_id) { color_id = in_id; return *this; }
 
     // Shift at end of next update.
-    CircleBody2D<BODY_INFO, BASE_TYPE> &
-    AddShift(const Point<BASE_TYPE> & inc_val) {
+    CircleBody2D & AddShift(const Point<BASE_TYPE> & inc_val) {
       shift += inc_val;
       total_abs_shift += inc_val.Abs();
       return *this;
     }
 
     // Translate immediately.
-    CircleBody2D<BODY_INFO, BASE_TYPE> &
-    Translate(const Point<BASE_TYPE> & inc_val) { perimeter.Translate(inc_val); return *this; }
+    CircleBody2D & Translate(const Point<BASE_TYPE> & inc_val) {
+      perimeter.Translate(inc_val);
+      return *this;
+    }
 
     // Creating, testing, and unlinking other organisms (used for gestation & reproduction)
     bool IsLinked(const CircleBody2D & link_org) const {
@@ -123,7 +121,7 @@ namespace emp {
         pair_link->pair_link = NULL;
       }
       // Create the offspring as a paired link.
-      pair_link = new CircleBody2D(perimeter, info ? new BODY_INFO(*info) : NULL);
+      pair_link = new CircleBody2D(perimeter, brain ? new BRAIN_TYPE(*brain) : NULL);
       pair_link->pair_link = this;
       pair_link->Translate(offset);
 
@@ -144,20 +142,20 @@ namespace emp {
       pair_dist = 0;
     }
 
-    CircleBody2D<BODY_INFO, BASE_TYPE> &
+    CircleBody2D<BRAIN_TYPE, BASE_TYPE> &
     TurnLeft(int steps=1) { orientation.RotateDegrees(45); return *this; }
-    CircleBody2D<BODY_INFO, BASE_TYPE> &
+    CircleBody2D<BRAIN_TYPE, BASE_TYPE> &
     TurnRight(int steps=1) { orientation.RotateDegrees(-45); return *this; }
-    CircleBody2D<BODY_INFO, BASE_TYPE> &
+    CircleBody2D<BRAIN_TYPE, BASE_TYPE> &
     IncSpeed(double steps=1.0) {
       velocity += Point<BASE_TYPE>(orientation.Sin(), orientation.Cos());
       return *this;
     }
-    CircleBody2D<BODY_INFO, BASE_TYPE> &
+    CircleBody2D<BRAIN_TYPE, BASE_TYPE> &
     DecSpeed(double steps=1.0) { return *this; }
 
     // If a body is not at its target radius, grow it or shrink it, as needed.
-    CircleBody2D<BODY_INFO, BASE_TYPE> & BodyUpdate(BASE_TYPE change_factor=1) {
+    CircleBody2D<BRAIN_TYPE, BASE_TYPE> & BodyUpdate(BASE_TYPE change_factor=1) {
       // Test if this body needs to grow or shrink.
       if ((int) target_radius > (int) GetRadius()) SetRadius(GetRadius() + change_factor);
       else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - change_factor);
@@ -182,7 +180,7 @@ namespace emp {
     }
 
     // Move this body by its velocity and reduce velocity based on friction.
-    CircleBody2D<BODY_INFO, BASE_TYPE> & ProcessStep(BASE_TYPE friction=0) {
+    CircleBody2D<BRAIN_TYPE, BASE_TYPE> & ProcessStep(BASE_TYPE friction=0) {
       if (velocity.NonZero()) {
         perimeter.Translate(velocity);
         const double velocity_mag = velocity.Magnitude();
@@ -198,7 +196,7 @@ namespace emp {
 
 
     // Determine where the circle will end up and force it to be within a bounding box.
-    CircleBody2D<BODY_INFO, BASE_TYPE> & FinalizePosition(const Point<BASE_TYPE> & max_coords) {
+    CircleBody2D<BRAIN_TYPE, BASE_TYPE> & FinalizePosition(const Point<BASE_TYPE> & max_coords) {
       const BASE_TYPE max_x = max_coords.GetX() - GetRadius();
       const BASE_TYPE max_y = max_coords.GetY() - GetRadius();
 

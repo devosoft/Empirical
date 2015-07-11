@@ -9,12 +9,15 @@ UI::Document doc("emp_base");
 int main() {
   UI::Initialize();
 
+  // How big should each canvas be?
+  const int w = 300;
+  const int h = 300;
+
   emp::Random random;
 
   // Draw a random bitmap onto a canvas.
 
-  auto & canvas = doc.AddCanvas(300, 300, "can");
-  //UI::Draw(canvas, emp::Circle<>(emp::Point<>(20, 20), 10));
+  auto & canvas = doc.AddCanvas(w, h, "can");
   
   emp::BitMatrix<10,10> matrix;
   for (int x = 0; x < 10; x++) {
@@ -23,11 +26,31 @@ int main() {
     }
   }
 
-  UI::Draw(canvas, matrix, 300, 300);
+  UI::Draw(canvas, matrix, w, h);
 
 
-  auto & canvas2 = doc.AddCanvas(300, 300, "can2");
-  (void) canvas2;
+  // Draw a surface with circles on it!
+  using dBRAIN = int;
+  using dBODY = emp::CircleBody2D<dBRAIN>;
+    
+  // Build the surface with bodies on it.
+  emp::Surface2D<dBODY, dBRAIN> surface(w, h);
+  for (int i = 0; i < 1000; i++) {
+    auto new_circle = emp::Circle<>(random.GetDouble(w), random.GetDouble(h), 7);
+    dBODY * new_body = new dBODY( new_circle );
+    new_body->SetColorID(random.GetInt(360));  // Set color to random hue.
+    surface.AddBody( new_body );
+  }
+
+  // Determine the possible colors.
+  std::vector<std::string> color_map(360);
+  for (int i = 0; i < 360; i++) {
+    color_map[i] = emp::to_string("hsl(", i, ",100%,50%");
+  }
+
+  // Draw the surface on a new canvas!
+  auto & canvas2 = doc.AddCanvas(w, h, "can2");
+  emp::UI::Draw(canvas2, surface, color_map);
 
   doc.Update();
 }

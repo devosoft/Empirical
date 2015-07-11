@@ -12,14 +12,14 @@ emp::Slideshow show("Understanding Complexity Barriers in Evolving Systems");
 int main() {
 
   UI::Initialize();
-  emp::SetBackgroundColor("black");
+  emp::SetBackgroundColor("gray");
   emp::SetColor("cyan");
   
   show.ActivateKeypress();
 
   show << UI::Text("authors") << "By Emily Dolson, Anya Vostinar, Michael Wiser, and Charles Ofria<br><br>BEACON Center for the Study of Evolution in Action<br>";
   show.GetSlide().CSS("text-align", "center");
-  show.GetSlide().Text("authors").CSS("font-size", "25px").Color("white").CSS("width", "70%").Center();
+  show.GetSlide().Text("authors").Color("white").CSS("width", "70%").Center();
 
 
   show.NewSlide("Introduction");

@@ -17,6 +17,7 @@ namespace emp {
 
   public:
     Circle(const Point<TYPE> & _c, TYPE _r=0) : center(_c), radius(_r) { ; }
+    Circle(TYPE _x, TYPE _y, TYPE _r=0) : center(_x,_y), radius(_r) { ; }
     Circle(TYPE _r=0) : center(0.0, 0.0), radius(_r) { ; }
 
     const Point<TYPE> & GetCenter() const { return center; }

@@ -5,22 +5,31 @@
 //
 //  Method for converting objects to visualizations in canvas.
 //
+//  Current list of values that can be drawn with Draw():
+//  * BitMatrix
+//  * Circle
+//  * Surface2D
+//
 
 #include "Canvas.h"
 
 #include "../geometry/Circle2D.h"
+#include "../geometry/Surface2D.h"
 #include "../tools/BitMatrix.h"
 
 namespace emp {
 namespace UI {
 
-  void Draw(Canvas & canvas, const Circle<> & circle,
+  // Draw a Circle!
+  void Draw(Canvas & canvas, const emp::Circle<> & circle,
             const std::string & fill="",
             const std::string & line="")
   {
     canvas.Circle(circle, fill, line);
   }
 
+
+  // Draw a BitMatrix!
   template <int COLS, int ROWS>
   void Draw(Canvas & canvas, const BitMatrix<COLS,ROWS> & matrix, double w, double h)
   {
@@ -33,6 +42,27 @@ namespace UI {
           canvas.Rect(x*cell_w, y*cell_h, cell_w, cell_h, "black");
         }
       }
+    }
+  }
+
+  
+  // Draw a Surface2D!
+  template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE=double>
+  void Draw(Canvas & canvas,
+            const Surface2D<BODY_TYPE,BODY_INFO,BASE_TYPE> & surface,
+            const std::vector<std::string> & color_map)
+  {
+    const double w = surface.GetWidth();
+    const double h = surface.GetHeight();
+
+    // Setup a black background for the surface.
+    canvas.Rect(0, 0, w, h, "black");
+
+    // Draw the circles.
+    const auto & body_set = surface.GetConstBodySet();
+    for (auto * body : body_set) {
+      //emp::CappedAlert(3, "color_map[", body->GetColorID(), "] = ", color_map[body->GetColorID()]);
+      canvas.Circle(body->GetPerimeter(), color_map[body->GetColorID()], "white");
     }
   }
 
