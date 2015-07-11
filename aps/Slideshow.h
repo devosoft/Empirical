@@ -32,6 +32,9 @@ namespace emp {
     std::string default_font;
     double title_height;       // Font height of title in vw's (percent of viewport width)
     double text_height;        // Font height of main text (such as bullets) in vw's.
+
+    // Show details
+    std::string show_title;
     
     // Helper functions
     void OnResize(int new_w, int new_h) {
@@ -41,10 +44,11 @@ namespace emp {
     }
 
   public:
-    Slideshow(const std::string name = "emp_base")
+    Slideshow(const std::string & in_title="", const std::string name = "emp_base")
       : div_name(name), cur_pos(0)
       , base_width(1000), base_height(625)
       , title_height(5.0), text_height(3.0)
+      , show_title(in_title)
     {
       (void) base_width;
       (void) base_height;
@@ -61,6 +65,7 @@ namespace emp {
       default_font = "\"Lucida Sans Unicode\", \"Lucida Grande\", sans-serif";
 
       NewSlide(); // Create the title slide.
+      *this << UI::Text("title").FontSizeVW(title_height*1.3) << show_title;
     }
     ~Slideshow() {
       for (auto * slide : slides) delete slide;
@@ -95,11 +100,11 @@ namespace emp {
       (*new_slide) << UI::Button([this](){this->PrevSlide();}, "<b>Prev</b>", "prev")
                    << UI::Button([this](){this->NextSlide();}, "<b>Next</b>", "next");
 
-      const double bw = 5.0;
-      const double bh = 5.0;
-      const double boffset = 1.0;
-      new_slide->Button("next").SetPositionRBVW(boffset, boffset).SizeVW(bw, bh).Opacity(1.0);
-      new_slide->Button("prev").SetPositionRBVW(boffset+bw, boffset).SizeVW(bw, bh).Opacity(1.0);
+      const double bw = 5.0;  // Button width (in vw's)
+      const double bh = 5.0;  // Button height
+      const double bo = 1.0;  // Button offset from edge.
+      new_slide->Button("next").SetPositionRBVW(bo, bo).SizeVW(bw, bh).Opacity(1.0);
+      new_slide->Button("prev").SetPositionRBVW(bo+bw, bo).SizeVW(bw, bh).Opacity(1.0);
         
       return *this;
     }
