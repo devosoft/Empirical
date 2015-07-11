@@ -175,6 +175,16 @@ public:
       return new ElementSlate(info, fwd_parent);
     }
       
+
+    Element & AddChild(Element * child) {
+      emp_assert(child != nullptr);
+      child->SetParent(this);
+      children.push_back(child);
+      return *child;
+    }
+
+
+
     virtual std::string GetType() {
       return "ElementSlate";
     }

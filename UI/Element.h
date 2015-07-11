@@ -140,6 +140,8 @@ namespace UI {
       return *(children[id]);
     }
 
+    Element & SetParent(Element * p) { parent = p; return *this; }
+
     
     Element & PreventAppend() { append_ok = false; return *this; }
 
