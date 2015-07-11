@@ -45,6 +45,7 @@ namespace UI {
       static std::string TypeName() { return "Widget"; }
 
       virtual std::string CSS(const std::string & setting) { return style.Get(setting); }
+      bool HasCSS(const std::string & setting) { return style.Has(setting); }
       
       template <typename SETTING_TYPE>
       RETURN_TYPE & CSS(const std::string & setting, SETTING_TYPE && value) {

@@ -43,6 +43,10 @@ namespace UI {
       return *this;
     }
 
+    bool Has(const std::string setting) {
+      return settings.find(setting) != settings.end();
+    };
+
     const std::string & Get(const std::string setting) {
       // Note: if setting did not exist, this does create an empty entry.
       return settings[setting];
