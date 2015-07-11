@@ -27,7 +27,11 @@ namespace emp {
     int window_height;
 
     // Formatting details.
+    int base_width;
+    int base_height;
     std::string default_font;
+    double title_height;       // Font height of title in vw's (percent of viewport width)
+    double text_height;        // Font height of main text (such as bullets) in vw's.
     
     // Helper functions
     void OnResize(int new_w, int new_h) {
@@ -35,8 +39,17 @@ namespace emp {
       window_width = new_w;
       window_height = new_h;
     }
+
   public:
-    Slideshow(const std::string name = "emp_base") : div_name(name), cur_pos(0) {
+    Slideshow(const std::string name = "emp_base")
+      : div_name(name), cur_pos(0)
+      , base_width(1000), base_height(625)
+      , title_height(5.0), text_height(3.0)
+    {
+      (void) base_width;
+      (void) base_height;
+      (void) text_height;
+
       // Setup default captures.
       emp::OnResize( std::bind(&Slideshow::OnResize, this, UI::_1, UI::_2) );
 
@@ -67,12 +80,14 @@ namespace emp {
       return *this;
     }
 
-    Slideshow & NewSlide(const std::string & slide_title = "") {
+    Slideshow & NewSlide(const std::string & slide_title = "", double in_height=-1.0) {
       cur_pos = (int) slides.size();
       auto * new_slide = new UI::Document(div_name);
       new_slide->Font(default_font);
       if (slide_title != "") {
-        (*new_slide) << UI::Text("title").FontSize(50).Center() << slide_title;
+        if (in_height < 0.0) in_height = title_height;
+        (*new_slide) << UI::Text("title").FontSizeVW(in_height).Center()
+                     << slide_title;
         new_slide->Text("title").PreventAppend();  // Additional text in a new box!
       }
       slides.push_back(new_slide);
@@ -80,11 +95,11 @@ namespace emp {
       (*new_slide) << UI::Button([this](){this->PrevSlide();}, "<b>Prev</b>", "prev")
                    << UI::Button([this](){this->NextSlide();}, "<b>Next</b>", "next");
 
-      const int bw = 50;
-      const int bh = 50;
-      const int boffset = 10;
-      new_slide->Button("next").SetPositionRB(boffset, boffset).Size(bw, bh).Opacity(1.0);
-      new_slide->Button("prev").SetPositionRB(boffset+bw, boffset).Size(bw, bh).Opacity(1.0);
+      const double bw = 5.0;
+      const double bh = 5.0;
+      const double boffset = 1.0;
+      new_slide->Button("next").SetPositionRBVW(boffset, boffset).SizeVW(bw, bh).Opacity(1.0);
+      new_slide->Button("prev").SetPositionRBVW(boffset+bw, boffset).SizeVW(bw, bh).Opacity(1.0);
         
       return *this;
     }
