@@ -7,10 +7,7 @@ namespace UI = emp::UI;
 
 UI::Document doc("emp_base");
 
-emp::Slideshow show;
-
-void NextSlide() { show.NextSlide(); }
-void PrevSlide() { show.PrevSlide(); }
+emp::Slideshow show("Understanding Complexity Barriers in Evolving Systems");
 
 int main() {
 
@@ -20,10 +17,8 @@ int main() {
   
   show.ActivateKeypress();
 
-  show << UI::Text("title") << "Understanding Complexity Barriers in Evolving Systems<br><br>"
-       << UI::Text("authors") << "By Emily Dolson, Anya Vostinar, Michael Wiser, and Charles Ofria<br><br>BEACON Center for the Study of Evolution in Action<br>";
+  show << UI::Text("authors") << "By Emily Dolson, Anya Vostinar, Michael Wiser, and Charles Ofria<br><br>BEACON Center for the Study of Evolution in Action<br>";
   show.GetSlide().CSS("text-align", "center");
-  show.GetSlide().Text("title").CSS("font-size", "50px");
   show.GetSlide().Text("authors").CSS("font-size", "25px").Color("white").CSS("width", "70%").Center();
 
 
