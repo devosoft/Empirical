@@ -92,25 +92,64 @@ namespace D3 {
     }
     
     template <typename C>
-    Selection Data(C values){
-      int new_id = EM_ASM_INT_V({return js.selections.length});
+    Selection[] Data(C values){
+      int update_id = EM_ASM_INT_V({return js.selections.length});
+      int enter_id = update_id + 1;
+      int exit_id = enter_id + 1;
       EM_ASM_ARGS({
-	  js.selections.push(js.selections[$0].data([1,2,3]))}, 
+	  selection_array = js.selections[$0].data([1,2,3]);
+	  update_selection = selection_array.update();
+	  enter_selection = selection_array.enter();
+	  exit_selection = selection_array.exit();
+	  js.selections.push(update_selection);
+	  js.selections.push(enter_selection);
+	  js.selections.push(exit_selection);
+	}, 
 	  this->id, values);
-      return Selection(new_id);
+      return [Selection(update_id), Selection(enter_id), Selection(exit_id)];
+    }
+
+
+    int GetAttrInt(const char* name){
+      return EM_ASM_INT({
+	  return js.selections[$0].attr(Pointer_stringify($1));
+	}, this->id, name);
+    }
+
+    double GetAttrDouble(const char* name){
+      return EM_ASM_DOUBLE({
+	  return js.selections[$0].attr(Pointer_stringify($1));
+	}, this->id, name);
+    }
+
+    int GetStyleInt(const char* name){
+      return EM_ASM_INT({
+	  return js.selections[$0].style(Pointer_stringify($1));
+	}, this->id, name);
+    }
+
+    double GetStyleDouble(const char* name){
+      return EM_ASM_INT({
+	  return js.selections[$0].style(Pointer_stringify($1));
+	}, this->id, name);
+    }
+
+    void SetText(const char* text){
+      EM_ASM_ARGS({js.selections[$0].text(Pointer_stringify($1))}, 
+		  this->id, text);
     }
 
     //TODO:
-    //T GetAttrNumeric()
+    //
     //GetAttrString
+    //GetStyleString()
 
     //GetClassed()
     //SetClassed()
-    //GetStyle()
+    
     //GetProperty()
     //SetProperty()
     //GetText()
-    //SetText()
     //SetHtml()
     //GetHtml()
     //Insert()
