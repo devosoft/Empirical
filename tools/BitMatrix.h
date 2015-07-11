@@ -28,7 +28,7 @@ namespace emp {
 
   public:
     template <int START_POS, int STEP_POS, int END_POS>
-    constexpr BitSet<COLS*ROWS> Mask() {
+    constexpr BitSet<COLS*ROWS> Mask() const {
       return BitSet<COLS*ROWS>();
     }
 
@@ -59,9 +59,9 @@ namespace emp {
     BitMatrix(const BitMatrix & in_matrix) : bits(in_matrix.bits) { ; }
     ~BitMatrix() { ; }
 
-    constexpr int NumRows() { return ROWS; }
-    constexpr int NumCols() { return COLS; }
-    constexpr int GetSize() { return ROWS * COLS; }
+    constexpr int NumRows() const { return ROWS; }
+    constexpr int NumCols() const { return COLS; }
+    constexpr int GetSize() const { return ROWS * COLS; }
 
     inline static int GetCol(int id) { return id % COLS; }
     inline static int GetRow(int id) { return id / COLS; }
@@ -71,8 +71,8 @@ namespace emp {
     bool None() const { return bits.none(); }
     bool All() const { return bits.all(); }
 
-    bool Get(int col, int row) { return bits[GetID(col,row)]; }
-    bool Get(int id) { return bits[id]; }
+    bool Get(int col, int row) const { return bits[GetID(col,row)]; }
+    bool Get(int id) const { return bits[id]; }
     
     void Set(int col, int row, bool val=true) { bits[GetID(col, row)] = val; }
     void Set(int id) { bits[id] = true; }

@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 
+#include "../geometry/Circle2D.h"
+
 #include "CanvasAction.h"
 #include "CanvasShape.h"
 
@@ -84,10 +86,18 @@ namespace UI {
     int GetHeight() const { return height; }
 
     // Setup Canvas Actions
-    Canvas & Circle(int x, int y, int r, const std::string & fc="", const std::string & lc="")
-    { return AddAction( new CanvasCircle(x, y, r, fc, lc) ); }
-    Canvas & Rect(int x, int y, int w, int h, const std::string & fc="", const std::string & lc="")
-    { return AddAction( new CanvasRect(x, y, w, h, fc, lc) ); }
+    Canvas & Circle(double x, double y, double r,
+                    const std::string & fc="", const std::string & lc="") {
+      return AddAction( new CanvasCircle(x, y, r, fc, lc) );
+    }
+    Canvas & Circle(const emp::Circle<> & circle,
+                    const std::string & fc="", const std::string & lc="") {
+      return AddAction( new CanvasCircle(circle, fc, lc) );
+    }
+    Canvas & Rect(double x, double y, double w, double h,
+                  const std::string & fc="", const std::string & lc="") {
+      return AddAction( new CanvasRect(x, y, w, h, fc, lc) );
+    }
     Canvas & StrokeColor(std::string c) { return AddAction( new CanvasStrokeColor(c) ); }
 
     Canvas & Clear() { ClearActions(); return *this; }

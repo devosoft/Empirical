@@ -7,19 +7,33 @@
 //
 
 #include "Canvas.h"
+
 #include "../geometry/Circle2D.h"
+#include "../tools/BitMatrix.h"
 
 namespace emp {
 namespace UI {
 
-  template <typename UNIT_TYPE>
-  void Draw(Canvas & canvas, const Circle<UNIT_TYPE> & circle,
+  void Draw(Canvas & canvas, const Circle<> & circle,
             const std::string & fill="",
             const std::string & line="")
   {
-    const Point<UNIT_TYPE> & center = circle.GetCenter();
-    UNIT_TYPE radius = circle.GetRadius();
-    canvas.Circle(center.GetX(), center.GetY(), radius, fill, line);
+    canvas.Circle(circle, fill, line);
+  }
+
+  template <int COLS, int ROWS>
+  void Draw(Canvas & canvas, const BitMatrix<COLS,ROWS> & matrix, double w, double h)
+  {
+    double cell_w = w / (double) COLS;
+    double cell_h = h / (double) ROWS;
+
+    for (int x = 0; x < COLS; x++) {
+      for (int y = 0; y < ROWS; y++) {
+        if (matrix.Get(x,y)) {
+          canvas.Rect(x*cell_w, y*cell_h, cell_w, cell_h, "black");
+        }
+      }
+    }
   }
 
 }

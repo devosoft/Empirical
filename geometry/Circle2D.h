@@ -20,6 +20,8 @@ namespace emp {
     Circle(TYPE _r=0) : center(0.0, 0.0), radius(_r) { ; }
 
     const Point<TYPE> & GetCenter() const { return center; }
+    TYPE GetCenterX() const { return center.GetX(); }
+    TYPE GetCenterY() const { return center.GetY(); }
     TYPE GetRadius() const { return radius; }
     TYPE GetSquareRadius() const { return radius * radius; }
 

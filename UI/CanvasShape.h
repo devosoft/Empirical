@@ -19,20 +19,26 @@ namespace UI {
 
   class CanvasShape : public CanvasAction {
   protected:
-    int x; int y;
+    double x; double y;
     std::string fill_color;
     std::string line_color;
   public:
-    CanvasShape(int _x, int _y, const std::string & fc="", const std::string & lc="")
+    CanvasShape(double _x, double _y, const std::string & fc="", const std::string & lc="")
       : x(_x), y(_y), fill_color(fc), line_color(lc) { ; }
     virtual ~CanvasShape() { ; }
   };
 
   class CanvasCircle : public CanvasShape {
-    int radius;
+    double radius;
   public:
-    CanvasCircle(int _x, int _y, int _r, const std::string & fc="", const std::string & lc="")
+    CanvasCircle(double _x, double _y, double _r,
+                 const std::string & fc="", const std::string & lc="")
       : CanvasShape(_x, _y, fc, lc), radius(_r) { ; }
+
+    CanvasCircle(emp::Circle<> circle,
+                 const std::string & fc="", const std::string & lc="")
+      : CanvasShape(circle.GetCenterX(), circle.GetCenterY(), fc, lc)
+      , radius(circle.GetRadius()) { ; }
 
     void Apply() {
       EM_ASM_ARGS({
@@ -46,9 +52,10 @@ namespace UI {
   };
 
   class CanvasRect : public CanvasShape {
-    int w; int h;
+    double w; double h;
   public:
-    CanvasRect(int _x, int _y, int _w, int _h, const std::string & fc="", const std::string & lc="")
+    CanvasRect(double _x, double _y, double _w, double _h,
+               const std::string & fc="", const std::string & lc="")
       : CanvasShape(_x, _y, fc, lc), w(_w), h(_h) { ; }
 
     void Apply() {
