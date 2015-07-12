@@ -37,6 +37,10 @@ namespace UI {
     return [fun](){ return emp::to_string(fun()); };
   }
 
+  std::function<std::string()> Live(const std::function<double()> & fun) {
+    return [fun](){ return emp::to_string(fun()); };
+  }
+
   class Close {
   private:
     std::string close_id;

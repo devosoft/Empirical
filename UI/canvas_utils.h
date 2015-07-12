@@ -61,11 +61,17 @@ namespace UI {
     // Draw the circles.
     const auto & body_set = surface.GetConstBodySet();
     for (auto * body : body_set) {
-      //emp::CappedAlert(3, "color_map[", body->GetColorID(), "] = ", color_map[body->GetColorID()]);
       canvas.Circle(body->GetPerimeter(), color_map[body->GetColorID()], "white");
     }
   }
 
+  template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE=double>
+  void Draw(Canvas & canvas,
+            const Surface2D<BODY_TYPE,BODY_INFO,BASE_TYPE> & surface,
+            int num_colors)
+  {
+    Draw(canvas, surface, GetColorMap(num_colors));
+  }
 }
 }
 

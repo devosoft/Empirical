@@ -36,6 +36,8 @@ namespace emp {
       }, callback_id);
   }
 
+  double GetTime() { return EM_ASM_DOUBLE_V({ return (new Date()).getTime(); }); }
+
   int GetWindowInnerWidth() { return EM_ASM_INT_V({ return window.innerWidth; }); }
   int GetWindowInnerHeight() { return EM_ASM_INT_V({ return window.innerHeight; }); }
 

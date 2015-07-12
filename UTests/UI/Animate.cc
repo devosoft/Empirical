@@ -11,12 +11,12 @@ UI::Document doc("emp_base");
 int cx = 150;
 int cy = 150;
 int cr = 50;
-int can_size = 300;
+int can_size = 400;
 
 void CanvasAnim(double time) {
-  (void) time;
-
   auto & mycanvas = doc.Canvas("can");
+
+  std::cerr << time << std::endl;
 
   cx+=3;
   if (cx >= can_size + cr) cx -= can_size;
@@ -25,6 +25,8 @@ void CanvasAnim(double time) {
   mycanvas.Circle(cx, cy, cr, "green", "purple");
   if (cx + cr > can_size) mycanvas.Circle(cx-can_size, cy, cr, "green", "purple");
   mycanvas.Refresh();
+
+  doc.Text("fps").Update();
 };
 
 int main()
@@ -46,5 +48,17 @@ int main()
   UI::Animate * anim = new UI::Animate(CanvasAnim, mycanvas);
   (void) anim;
 
-  emp::DelayCall( [anim](){anim->Start();}, 1000 );
+  doc << "<br>";
+  // doc.AddButton([anim](){anim->Start();}, "Start");
+  // doc.AddButton([anim](){anim->Stop();}, "Pause");
+  doc.AddButton([anim](){
+      anim->ToggleActive();
+      auto & but = doc.Button("toggle");
+      if (anim->GetActive()) but.Label("Pause");
+      else but.Label("Start");
+      but.Update();
+    }, "Start", "toggle");
+
+  doc << UI::Text("fps") << "FPS = " << UI::Live( [anim](){return anim->GetStepTime();} ) ;
+
 }

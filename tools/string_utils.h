@@ -6,6 +6,7 @@
 //  This file contains a set of simple functions to manipulate strings.
 //
 
+#include <functional>
 #include <initializer_list>
 #include <iostream>
 #include <sstream>
