@@ -35,6 +35,8 @@ namespace emp {
     bool operator!=(const Color & _in) const { return colorname != colorname; }
 
     const std::string & AsString() const { return colorname; }
+    const std::string & operator(std::string)() const { return colorname; }
+    std::string & operator(std::string)() { return colorname; }
 
     void Set(const Color & _in) { colorname = _in.colorname; }
   };
