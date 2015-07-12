@@ -64,9 +64,15 @@ namespace UI {
       RETURN_TYPE & ID(const std::string & in_id) { div_id = in_id; return (RETURN_TYPE &) *this; }
 
       // Size Manipulation
-      RETURN_TYPE & Width(int w) { return CSS("width", emp::to_string(w, "px") ); }
-      RETURN_TYPE & Height(int h) { return CSS("height", emp::to_string(h, "px") ); }
-      RETURN_TYPE & Size(int w, int h) { Width(w); Height(h); return (RETURN_TYPE &) *this; }
+      RETURN_TYPE & Width(int w, const std::string unit="px") {
+        return CSS("width", emp::to_string(w, unit) );
+      }
+      RETURN_TYPE & Height(int h, const std::string unit="px") {
+        return CSS("height", emp::to_string(h, unit) );
+      }
+      RETURN_TYPE & Size(int w, int h, const std::string unit="px") {
+        Width(w, unit); Height(h, unit); return (RETURN_TYPE &) *this;
+      }
 
       // Set size in terms of percent of the viewport width (vw's)
       RETURN_TYPE & WidthVW(double w) { return CSS("width", emp::to_string(w, "vw") ); }
