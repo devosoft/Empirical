@@ -13,7 +13,10 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 
 
 default: all
-all: Canvas.js canvas_utils.js events.js ElementSlate.js ElementTable.js Example.js Slideshow.js
+all: Animate.js Canvas.js canvas_utils.js events.js ElementSlate.js ElementTable.js Example.js Slideshow.js
+
+Animate.js: Animate.cc
+	$(CXX_web) $(CFLAGS_web) Animate.cc -o Animate.js
 
 Canvas.js: Canvas.cc
 	$(CXX_web) $(CFLAGS_web) Canvas.cc -o Canvas.js
@@ -43,7 +46,7 @@ Slideshow.js: Slideshow.cc
 # 	$(CXX_web) $(CFLAGS_web) test4.cc -o test4.js
 
 clean:
-	rm -f Canvas.js canvas_utils.js events.js ElementSlate.js ElementTable.js Example.js Slideshow.js test?.js *.js.map *~ source/*.o source/*/*.o
+	rm -f Animate.js Canvas.js canvas_utils.js events.js ElementSlate.js ElementTable.js Example.js Slideshow.js test?.js *.js.map *~ source/*.o source/*/*.o
 
 # Debugging information
 #print-%: ; @echo $*=$($*)

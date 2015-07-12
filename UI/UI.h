@@ -20,6 +20,18 @@ namespace UI {
     // Run the base-level initialize in case it hasn't be run yet.
     emp::Initialize();
 
+    // Setup the animation callback in Javascript
+    EM_ASM({
+        window.requestAnimFrame = (function(callback) {
+            return window.requestAnimationFrame
+              || window.webkitRequestAnimationFrame
+              || window.mozRequestAnimationFrame
+              || window.oRequestAnimationFrame
+              || window.msRequestAnimationFrame
+              || function(callback) { window.setTimeout(callback, 1000 / 60); };
+          })();
+      });
+
     return true;
   }
 
