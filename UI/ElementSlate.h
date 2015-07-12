@@ -31,6 +31,12 @@ namespace UI {
   protected:
     std::map<std::string, Element *> element_dict;  // By-name lookup for elements.
 
+    ElementSlate(const ElementSlate & src, Element * parent, const std::string & ext)
+      : Element(src, parent, ext), UI::Slate(src)
+    {
+      for (auto * e : children) element_dict[e->GetName()] = e;
+    }
+
     // Return a text element for appending.  Use the last element unless there are no elements,
     // the last element is not text, or it is not appendable (instead, build a new one).
     ElementText & GetTextElement() {
@@ -44,7 +50,7 @@ namespace UI {
       return *((ElementText *) children.back());
     }
     
-    void Register(Element * in_element) {
+    void Register(Element * in_element) override {
       // Make sure name is not already used
       if (element_dict.find(in_element->GetName()) != element_dict.end()) {
         emp::Alert(in_element->GetType(), " called ", in_element->GetName());
@@ -55,75 +61,75 @@ namespace UI {
       if (parent) parent->Register(in_element);          // Also register in parent, if available
     }
 
-    void UpdateHTML() {
+    void UpdateHTML() override {
       HTML.str("");                               // Clear the current stream.
       for (auto * element : children) {
         const std::string & tag = element->GetWrapperTag();
         HTML << "<" << tag << " id=\"" << element->GetName() << "\"></" << tag << ">\n";
       }
     }
-    void UpdateCSS() {
+    void UpdateCSS() override {
       TriggerCSS();
     }
     
     // Add additional children on to this element.
-    Element & Append(const std::string & in_text) {
+    Element & Append(const std::string & in_text) override {
       return GetTextElement().Append(in_text);
     }
 
-    Element & Append(const std::function<std::string()> & in_fun) {
+    Element & Append(const std::function<std::string()> & in_fun) override {
       return GetTextElement().Append(in_fun);
     }
 
     // Default to passing specialty operators to parent.
-    Element & Append(emp::UI::Button info) {
+    Element & Append(emp::UI::Button info) override {
       ElementButton * new_child = new ElementButton(info, this);
       children.push_back(new_child);
       return *new_child;
     }
-    Element & Append(emp::UI::Canvas info) {
+    Element & Append(emp::UI::Canvas info) override {
       ElementCanvas * new_child = new ElementCanvas(info, this);
       children.push_back(new_child);
       return *new_child;
     }
-    Element & Append(emp::UI::Image info) {
+    Element & Append(emp::UI::Image info) override {
       ElementImage * new_child = new ElementImage(info, this);
       children.push_back(new_child);
       return *new_child;
     }
-    Element & Append(emp::UI::Slate info) {
+    Element & Append(emp::UI::Slate info) override {
       ElementSlate * new_child = new ElementSlate(info, this);
       children.push_back(new_child);
       return *new_child;
     }
-    Element & Append(emp::UI::Table info) {
+    Element & Append(emp::UI::Table info) override {
       ElementTable * new_child = new ElementTable(info, this);
       children.push_back(new_child);
       return *new_child;
     }
-    Element & Append(emp::UI::Text info) {
+    Element & Append(emp::UI::Text info) override {
       ElementText * new_child = new ElementText(info, this);
       children.push_back(new_child);
       return *new_child;
     }
 
     // BuildElement allows any element to build another as long as an ancestor knows how.
-    Element * BuildElement(emp::UI::Button info, Element * fwd_parent) {
+    Element * BuildElement(emp::UI::Button info, Element * fwd_parent) override {
       return new ElementButton(info, fwd_parent);
     }
-    Element * BuildElement(emp::UI::Canvas info, Element * fwd_parent) {
+    Element * BuildElement(emp::UI::Canvas info, Element * fwd_parent) override {
       return new ElementCanvas(info, fwd_parent);
     }
-    Element * BuildElement(emp::UI::Image info, Element * fwd_parent) {
+    Element * BuildElement(emp::UI::Image info, Element * fwd_parent) override {
       return new ElementImage(info, fwd_parent);
     }
-    Element * BuildElement(emp::UI::Table info, Element * fwd_parent) {
+    Element * BuildElement(emp::UI::Table info, Element * fwd_parent) override {
       return new ElementTable(info, fwd_parent);
     }
-    Element * BuildElement(emp::UI::Text info, Element * fwd_parent) {
+    Element * BuildElement(emp::UI::Text info, Element * fwd_parent) override {
       return new ElementText(info, fwd_parent);
     }
-    Element * BuildElement(emp::UI::Slate info, Element * fwd_parent) {
+    Element * BuildElement(emp::UI::Slate info, Element * fwd_parent) override {
       return new ElementSlate(info, fwd_parent);
     }
       
@@ -135,8 +141,12 @@ public:
       : Element(in_name, in_parent), emp::UI::Slate(in_name) { ; }
     ~ElementSlate() { ; }
     
-    virtual bool IsSlate() const { return true; }
-    virtual std::string GetWrapperTag() const { return "div"; }
+    virtual Element * Clone(Element * parent, const std::string & ext) const override {
+      return new ElementSlate(*this, parent, ext);
+    };
+
+    virtual bool IsSlate() const override { return true; }
+    virtual std::string GetWrapperTag() const override { return "div"; }
 
     bool Contains(const std::string & test_name) {
       return element_dict.find(test_name) != element_dict.end();
@@ -231,11 +241,11 @@ public:
     template <class... T> ElementTable&  AddTable(T... args) {return Add(UI::Table(args...));}
     template <class... T> ElementText&   AddText(T... args)  {return Add(UI::Text(args...));}
 
-    virtual std::string GetType() {
+    virtual std::string GetType() override {
       return "ElementSlate";
     }
 
-    virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
+    virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") override {
       bool ok = true;
 
       if (verbose) {

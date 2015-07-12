@@ -105,12 +105,18 @@ namespace UI {
       return *this;
     }
 
+  protected:
+    ElementTable(const ElementTable & src, Element * parent, const std::string & ext)
+      : Element(src, parent, ext), Table(src) { ; }
+
   public:
     ElementTable(const Table & in_table, Element * in_parent)
-      : Element(in_table.GetDivID(), in_parent), Table(in_table) {
-      ;
-    }
+      : Element(in_table.GetDivID(), in_parent), Table(in_table) { ; }
     ~ElementTable() { ; }
+
+    virtual Element * Clone(Element * parent, const std::string & ext) const override {
+      return new ElementTable(*this, parent, ext);
+    };
 
     virtual bool IsTable() const override { return true; }
 

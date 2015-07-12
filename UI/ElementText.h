@@ -31,10 +31,18 @@ namespace UI {
       TriggerCSS();
     }
 
+  protected:
+    ElementText(const ElementText & src, Element * parent, const std::string & ext)
+      : Element(src, parent, ext), Text(src) { ; }
+
   public:
     ElementText(const Text & in_text, Element * in_parent)
       : Element(in_text.GetDivID(), in_parent), Text(in_text) { ; }
     ~ElementText() { ; }
+
+    virtual Element * Clone(Element * parent, const std::string & ext) const override {
+      return new ElementText(*this, parent, ext);
+    };
 
     virtual std::string GetWrapperTag() const override { return "div"; }
 
