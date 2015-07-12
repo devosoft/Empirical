@@ -13,6 +13,7 @@
 
 #include "Canvas.h"
 
+#include "../emtools/color_map.h"
 #include "../geometry/Circle2D.h"
 #include "../geometry/Surface2D.h"
 #include "../tools/BitMatrix.h"
@@ -70,7 +71,7 @@ namespace UI {
             const Surface2D<BODY_TYPE,BODY_INFO,BASE_TYPE> & surface,
             int num_colors)
   {
-    Draw(canvas, surface, GetColorMap(num_colors));
+    Draw(canvas, surface, GetHueMap(num_colors));
   }
 }
 }
