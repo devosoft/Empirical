@@ -8,8 +8,6 @@
 namespace emp {
 namespace UI {
 
-  static Document document("emp_base");
-
   bool Initialize() {
 
     // Make sure we only run Initialize once!
