@@ -50,7 +50,7 @@ namespace UI {
           emp.ctx = canvas.getContext('2d');
         }, GetFullID().c_str());
 
-      next_action = 0; // @CAO This should be moved when we go to a Redraw() and Refresh system...
+      next_action = 0; // @CAO Move when we go to a Redraw() and Refresh system...
       while (next_action < actions.size()) {
         actions[next_action]->Apply();
         ++next_action;
@@ -100,7 +100,33 @@ namespace UI {
     }
     Canvas & StrokeColor(std::string c) { return AddAction( new CanvasStrokeColor(c) ); }
 
-    Canvas & Clear() { ClearActions(); return *this; }
+    Canvas & Clear() {
+      ClearActions();
+      return AddAction( new CanvasClearRect(0, 0, GetWidth(), GetHeight()) );
+    }
+
+    // Refresh() will apply new actions on the screen.
+    // return value is whether any change was made.
+
+    bool Refresh() {
+      if (next_action == actions.size()) return false;
+
+      // Setup the canvas info to act upon.
+      EM_ASM_ARGS({
+          var cname = Pointer_stringify($0);
+          var canvas = document.getElementById(cname);
+          emp.ctx = canvas.getContext('2d');
+        }, GetFullID().c_str());
+
+      while (next_action < actions.size()) {
+        actions[next_action]->Apply();
+        ++next_action;
+      };
+
+      return true;
+    }
+
+
 
     static std::string TypeName() { return "Canvas"; }
 

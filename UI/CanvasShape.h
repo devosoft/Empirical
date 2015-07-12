@@ -69,6 +69,20 @@ namespace UI {
     CanvasAction * Clone() { return new CanvasRect(*this); }
   };
 
+  class CanvasClearRect : public CanvasShape {
+    double w; double h;
+  public:
+    CanvasClearRect(double _x, double _y, double _w, double _h)
+      : CanvasShape(_x, _y), w(_w), h(_h) { ; }
+
+    void Apply() {
+      EM_ASM_ARGS({
+          emp.ctx.clearRect($0, $1, $2, $3);
+        }, x, y, w, h);  // Draw the rectangle
+    }
+    CanvasAction * Clone() { return new CanvasClearRect(*this); }
+  };
+
 }
 }
 
