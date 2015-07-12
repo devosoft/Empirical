@@ -11,6 +11,7 @@
 #include <string>
 #include <typeinfo>
 
+#include "../tools/alert.h"
 #include "../tools/assert.h"
 #include "../tools/string_utils.h"
 

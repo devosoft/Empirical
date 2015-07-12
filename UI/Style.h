@@ -12,6 +12,7 @@
 
 #include "../tools/string_utils.h"
 
+#include <map>
 #include <string>
 
 namespace emp {
