@@ -14,24 +14,32 @@ namespace UI {
   template <typename BASE_TYPE>
   class ElementWrapper : public Element, public BASE_TYPE {
   private:
-    void UpdateHTML() { HTML.str("");  BASE_TYPE::WriteHTML(HTML); }
-    void UpdateCSS() { BASE_TYPE::TriggerCSS(); }
-    void UpdateJS() { BASE_TYPE::TriggerJS(); }
+    void UpdateHTML() override { HTML.str("");  BASE_TYPE::WriteHTML(HTML); }
+    void UpdateCSS() override { BASE_TYPE::TriggerCSS(); }
+    void UpdateJS() override { BASE_TYPE::TriggerJS(); }
+
+  protected:
+    ElementWrapper(const ElementWrapper & src, Element * parent, const std::string & ext)
+      : Element(src, parent, ext), BASE_TYPE(src) { ; }
 
   public:
     ElementWrapper(const BASE_TYPE & in_info, Element * in_parent)
-      : Element(in_info.GetDivID(), in_parent), BASE_TYPE(in_info) { ; }
+    : Element(in_info.GetDivID(), in_parent), BASE_TYPE(in_info) { ; }
+
+    virtual Element * Clone(Element * parent, const std::string & ext) const override {
+      return new ElementWrapper(*this, parent, ext);
+    };
 
     BASE_TYPE & DivID(const std::string & in_name) { 
       emp_assert(false && "Cannot change div ID after div is created.");
       return *this;
     }
 
-    virtual std::string GetType() {
+    virtual std::string GetType() override {
       return std::string("Element") + BASE_TYPE::TypeName();
     }
 
-    virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
+    virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") override {
       bool ok = true;
 
       if (verbose) {

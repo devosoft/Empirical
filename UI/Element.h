@@ -38,6 +38,13 @@ namespace UI {
     std::vector<Element *> children;  // What elements are contained in this one?
     bool append_ok;                   // Can we add more children?
 
+    Element(const Element & src, Element * parent, const std::string & ext)
+      : name(src.name + ext), parent(parent), append_ok(src.append_ok)
+    {
+      HTML.str(src.HTML.str());
+      for (auto * e : src.children) children.push_back(e->Clone(this, ext));
+    }
+
     // UpdateHTML() makes sure that the HTML stream is up-to-date, CSS is triggered, and
     // any Javascript actions are taken, as per the needs of an element.
     virtual void UpdateHTML() { ; }
@@ -139,8 +146,11 @@ namespace UI {
     }
 
     // Do not allow elements to be copied.
-    Element(const Element &) = delete;
     Element & operator=(const Element &) = delete;
+    Element(const Element &) = delete;
+
+    // Clone
+    virtual Element * Clone(Element *, const std::string &) const = 0;
 
     // Functions to access current state
     virtual bool IsSlate() const { return false; }
