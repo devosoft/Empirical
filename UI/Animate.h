@@ -15,8 +15,12 @@
 #include <functional>
 #include <vector>
 
-#include "Element.h"
+#include "../emtools/emfunctions.h"
 #include "../emtools/JSWrap.h"
+#include "../tools/assert.h"
+
+#include "Element.h"
+
 
 namespace emp {
 namespace UI {
@@ -40,11 +44,13 @@ namespace UI {
     }
 
     void Step() {
-      if (!active) return;  // If Stop has been called, don't propagate further.
+      emp_assert(anim_fun);
 
-      prev_time = cur_time;              // Update timing.
+      if (!active) return;              // If Stop has been called, halt animating.
+
+      prev_time = cur_time;             // Update timing.
       cur_time = emp::GetTime();
-      anim_fun(cur_time - prev_time);    // Call anim function, sending time since last frame.
+      anim_fun(cur_time - prev_time);   // Call anim function, sending time since last frame.
 
       // Setup the callback for the next frame of the animation.
       EM_ASM_ARGS({
@@ -66,7 +72,8 @@ namespace UI {
     Animate(const std::function<void()> & fun, E_TYPES&... targets) 
       : Animate([fun](double){fun();}, targets...) { ; }
 
-    Animate() = delete;
+    Animate() { callback_id = JSWrap( std::function<void()>([this](){ this->Step(); }) ); }
+
     Animate(const Animate &) = delete;
     ~Animate() { ; }
 
@@ -87,6 +94,9 @@ namespace UI {
 
     double GetStepTime() const { return cur_time - prev_time; }
     double GetRunTime() const { return cur_time - start_time; }
+
+    void SetCallback(const std::function<void(double)> & fun) { anim_fun = fun; }
+    void SetCallback(const std::function<void()> & fun) { anim_fun = [fun](double){fun();}; }
   };
 
 }
