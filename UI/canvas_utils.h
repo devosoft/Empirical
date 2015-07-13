@@ -26,6 +26,8 @@ namespace UI {
             const std::string & fill="",
             const std::string & line="")
   {
+    canvas.Clear();
+
     canvas.Circle(circle, fill, line);
   }
 
@@ -34,6 +36,8 @@ namespace UI {
   template <int COLS, int ROWS>
   void Draw(Canvas & canvas, const BitMatrix<COLS,ROWS> & matrix, double w, double h)
   {
+    canvas.Clear();
+
     double cell_w = w / (double) COLS;
     double cell_h = h / (double) ROWS;
 
@@ -53,6 +57,8 @@ namespace UI {
             const Surface2D<BODY_TYPE,BODY_INFO,BASE_TYPE> & surface,
             const std::vector<std::string> & color_map)
   {
+    canvas.Clear();
+
     const double w = surface.GetWidth();
     const double h = surface.GetHeight();
 
@@ -73,6 +79,8 @@ namespace UI {
   {
     Draw(canvas, surface, GetHueMap(num_colors));
   }
+
+  
 }
 }
 
