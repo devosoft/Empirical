@@ -28,9 +28,16 @@ namespace UI {
       UI::Style style;
 
       Widget(const std::string & in_name="") : div_id(in_name) {
+        EMP_TRACK_CONSTRUCT(Widget);
         if (div_id == "") {
           div_id = emp::to_string("emp__", NextWidgetID());
         }
+      }
+      Widget(const Widget & in) : div_id(in.div_id), obj_ext(in.obj_ext), style(in.style) {
+        EMP_TRACK_CONSTRUCT(Widget);
+      }
+      virtual ~Widget() {
+        EMP_TRACK_DESTRUCT(Widget);
       }
 
       virtual RETURN_TYPE & CSS_impl(const std::string & setting, const std::string & value) {

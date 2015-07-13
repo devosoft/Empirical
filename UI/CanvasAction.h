@@ -40,8 +40,9 @@ namespace UI {
     }
 
   public:
-    CanvasAction() { ; }
-    virtual ~CanvasAction() { ; }
+    CanvasAction() { EMP_TRACK_CONSTRUCT(CanvasAction); }
+    CanvasAction(const CanvasAction &) { EMP_TRACK_CONSTRUCT(CanvasAction); }
+    virtual ~CanvasAction() { EMP_TRACK_DESTRUCT(CanvasAction); }
 
     
     virtual void Apply() = 0;            // Apply current action to emp.ctx.

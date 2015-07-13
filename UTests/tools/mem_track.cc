@@ -15,12 +15,22 @@ struct TestClass1 {
   }
 };
 
+struct TestClass2 {
+  TestClass2() {
+    EMP_TRACK_CONSTRUCT(TestClass2);
+  }
+  ~TestClass2() {
+    EMP_TRACK_DESTRUCT(TestClass2);
+  }
+};
+
 int main(int argc, char* argv[])
 {
   std::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
   const bool verbose = emp::cl::use_arg(args, "-v");
 
   std::vector<TestClass1 *> test_v;
+  TestClass2 class2_mem;
 
   if (verbose) {
     std::cout << "(before construct) TestClass1 count = "
@@ -45,5 +55,6 @@ int main(int argc, char* argv[])
   if (verbose) {
     std::cout << "(after delete) TestClass1 count = "
               << EMP_TRACK_COUNT(TestClass1) << std::endl;
+    std::cout << EMP_TRACK_STATUS << std::endl;
   }
 }

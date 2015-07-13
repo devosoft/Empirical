@@ -41,6 +41,7 @@ namespace UI {
     Element(const Element & src, Element * parent, const std::string & ext)
       : name(src.name + ext), parent(parent), append_ok(src.append_ok)
     {
+      EMP_TRACK_CONSTRUCT(Element);
       HTML.str(src.HTML.str());
       for (auto * e : src.children) children.push_back(e->Clone(this, ext));
     }
@@ -139,10 +140,12 @@ namespace UI {
                                 { emp::is_alphanumeric,
                                   [](char x){return x=='_' || x=='-';}}) );
       Register(this);
+      EMP_TRACK_CONSTRUCT(Element);
     }
     virtual ~Element() {
       // Recursively delete children.
       for (Element * cur_element : children) { delete cur_element; }
+      EMP_TRACK_DESTRUCT(Element);
     }
 
     // Do not allow elements to be copied.

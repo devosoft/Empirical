@@ -16,6 +16,8 @@
 
 #include "../tools/assert.h"
 #include "../tools/alert.h"
+#include "../tools/mem_track.h"
+
 #include "Angle2D.h"
 #include "Circle2D.h"
 
@@ -44,7 +46,10 @@ namespace emp {
   public:
     CircleBody2D(const Circle<BASE_TYPE> & _p, BRAIN_TYPE * _b = nullptr)
       : perimeter(_p), target_radius(_p.GetRadius()), brain(_b), mass(1), color_id(0)
-      , pair_link(nullptr), pair_dist(0), target_pair_dist(0), pressure(0) { ; }
+      , pair_link(nullptr), pair_dist(0), target_pair_dist(0), pressure(0)
+    {
+      EMP_TRACK_CONSTRUCT(CircleBody2D);
+    }
     ~CircleBody2D() {
       // If this body is paired with another one, remove the pairing.
       if (pair_link) {
@@ -52,6 +57,7 @@ namespace emp {
         pair_link->pair_link = nullptr;
       }
       if (brain) delete brain;
+      EMP_TRACK_DESTRUCT(CircleBody2D);
     }
 
     const Circle<BASE_TYPE> & GetPerimeter() const { return perimeter; }

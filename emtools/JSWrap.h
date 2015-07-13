@@ -35,6 +35,7 @@
 
 #include "../tools/assert.h"
 #include "../tools/functions.h"
+#include "../tools/mem_track.h"
 
 extern "C" {
   extern int EMP_GetCBArgCount();  // Get the number of arguments associated with a callback.
@@ -163,8 +164,11 @@ namespace emp {
 
     public:
       JSWrap_Callback(const std::function<RET_TYPE(ARG_TYPES...)> & in_fun, bool disposable=false)
-        : JSWrap_Callback_Base(disposable), fun(in_fun) { ; }
-      ~JSWrap_Callback() { ; }
+        : JSWrap_Callback_Base(disposable), fun(in_fun)
+      {
+        EMP_TRACK_CONSTRUCT(JSWrap_Callback);
+      }
+      ~JSWrap_Callback() { EMP_TRACK_DESTRUCT(JSWrap_Callback); }
       
       // This function is called from Javascript.  Arguments should be collected and then used
       // to call the target function.
@@ -201,8 +205,10 @@ namespace emp {
 
     public:
       JSWrap_Callback(const std::function<void(ARG_TYPES...)> & in_fun, bool disposable=false)
-        : JSWrap_Callback_Base(disposable), fun(in_fun) { ; }
-      ~JSWrap_Callback() { ; }
+        : JSWrap_Callback_Base(disposable), fun(in_fun)
+      { EMP_TRACK_CONSTRUCT(JSWrap_Callback_VOID); }
+      ~JSWrap_Callback() { EMP_TRACK_DESTRUCT(JSWrap_Callback_VOID); }
+
       
       // This function is called from Javascript.  Arguments should be collected and then used
       // to call the target function.
