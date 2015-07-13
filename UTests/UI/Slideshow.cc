@@ -5,25 +5,31 @@
 
 namespace UI = emp::UI;
 
-UI::Document doc("emp_base");
-
-emp::Slideshow show("Understanding Complexity Barriers in Evolving Systems");
+std::unique_ptr<emp::Slideshow> slideshow;
 
 int main() {
 
   UI::Initialize();
   emp::SetBackgroundColor("gray");
   emp::SetColor("cyan");
-  
+
+	// Create slideshow
+	slideshow.reset(new emp::Slideshow("slideshow_base", emp::defaults::TITLE_HEIGHT));
+	emp::Slideshow &show = *slideshow;
   show.ActivateKeypress();
 
-  show << UI::Text("authors") << "By Emily Dolson, Anya Vostinar, Michael Wiser, and Charles Ofria<br><br>BEACON Center for the Study of Evolution in Action<br>";
-  show.GetSlide().CSS("text-align", "center");
-  show.GetSlide().Text("authors").Color("white").CSS("width", "70%").Center();
+	// Title Slide
+  int title_height = 50;
+	show.NewSlide();
+	show << UI::Text("title").Color("black").FontSize(title_height*1.3).Center()
+			 << "Understanding Complexity Barriers in Evolving Systems";
+  show << UI::Text("authors").FontSize(title_height).Color("black").CSS("width", "70%").Center()
+       << "By Emily Dolson, Anya Vostinar, Michael Wiser, and Charles Ofria<br><br>BEACON Center for the Study of Evolution in Action<br>";
 
-
-  show.NewSlide("Introduction");
-
+	// Introduction Slide
+  show.NewSlide();
+	show << UI::Text("title").FontSizeVW(title_height).Center() << "Introduction";
+	//show.Text("title").PreventAppend()
   show << "<h1>Testing Canvas Object!</h1>"
        << UI::Image("motivator.jpg", "im").Size(200,200)
        << UI::Canvas(300,300,"cvs").StrokeColor("blue");
@@ -33,24 +39,38 @@ int main() {
   canvas.Rect(100,175,100,100, "yellow");
 
 
-  show.NewSlide("How do we define \"keep going\"?");
+  show.NewSlide();
+	show << UI::Text("title").Color("black").FontSize(title_height*1.3).Center()
+			 << "How do we define \"keep going\"?";
 
-  show.NewSlide("Change Potential");
+  show.NewSlide();
+	show << UI::Text("title").Color("black").FontSize(title_height*1.3).Center()
+			 << "Change Potential";
 
-  show.NewSlide("Novelity Potential");
+  show.NewSlide();
+	show << UI::Text("title").Color("black").FontSize(title_height*1.3).Center()
+			 << "Novelity Potential";
 
-  show.NewSlide("Complexity Potential");
+  show.NewSlide();
+	show << UI::Text("title").Color("black").FontSize(title_height*1.3).Center()
+			 << "Complexity Potential";
 
-  show.NewSlide("Ecological Potential");
+  show.NewSlide();
+	show << UI::Text("title").Color("black").FontSize(title_height*1.3).Center()
+			 << "Ecological Potential";
 
-  show.NewSlide("Measurement Techniques");
+  show.NewSlide();
+	show << UI::Text("title").Color("black").FontSize(title_height*1.3).Center()
+			 << "Measurement Techniques";
 
-  show.NewSlide("Results");
+  show.NewSlide();
+	show << UI::Text("title").Color("black").FontSize(title_height*1.3).Center()
+			 << "Results";
 
-  show.NewSlide("Acknowledgements");
+  show.NewSlide();
+	show << UI::Text("title").Color("black").FontSize(title_height*1.3).Center()
+			 << "Acknowledgements";
 
-
-  // UI::document.Update();
   show.Start();
 }
 
