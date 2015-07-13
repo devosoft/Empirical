@@ -17,8 +17,10 @@ namespace emp {
 
   template <typename BODY_TYPE, typename BRAIN_TYPE, typename BASE_TYPE=double> class Physics2D {
   private:
-    Surface2D<BODY_TYPE, BRAIN_TYPE, BASE_TYPE> surface;    // Bodies that can collide.
-    Surface2D<BODY_TYPE, BRAIN_TYPE, BASE_TYPE> background; // Bodies that can't collide.
+    using Surface_t = Surface2D<BODY_TYPE, BRAIN_TYPE, BASE_TYPE>;
+
+    Surface_t surface;    // Bodies that can collide.
+    Surface_t background; // Bodies that can't collide.
 
   public:
     Physics2D(BASE_TYPE width, BASE_TYPE height, BASE_TYPE max_org_diameter=20) 
@@ -26,6 +28,9 @@ namespace emp {
       , background(width, height)
     { ; }
     ~Physics2D() { ; }
+
+    const Surface_t & GetSurface() const { return surface; }
+    const Surface_t & GetBackground() const { return background; }
 
     Physics2D & AddBody(BODY_TYPE * in_body) { surface.AddBody(in_body); return *this; }
     Physics2D & AddBackground(BODY_TYPE * in_body) { background.AddBody(in_body); return *this; }
@@ -95,30 +100,36 @@ namespace emp {
 
     void Update() {
       // Handle movement of bodies
+
       auto & body_set = surface.GetBodySet();
-      for (BODY_TYPE * cur_body : body_set) {
+
+      for (auto * cur_body : body_set) {
         cur_body->BodyUpdate(0.25);   // Let a body change size or shape, as needed.
         cur_body->ProcessStep(0.0125);  // Update position and velocity.
       }
 
       // Handle collisions
-      auto collide_fun = std::bind(&Physics2D::TestPairCollision, this, _1, _2);
+      auto collide_fun =
+        [this](BODY_TYPE & b1, BODY_TYPE & b2){ return this->TestPairCollision(b1,b2); };
       surface.TestCollisions(collide_fun);
 
       // Determine which bodies we should remove.
       int cur_size = (int) body_set.size();
-      for (int i = 0; i < cur_size; i++) {
-        const double cur_pressure = body_set[i]->GetPressure();
+      int cur_id = 0;
+      while (cur_id < cur_size) {
+        emp_assert(body_set[cur_id] != nullptr);
+        const double cur_pressure = body_set[cur_id]->GetPressure();
 
         // @CAO Arbitrary pressure threshold!
-        if (cur_pressure > 1.0) {
-          // Too much pressure!  We need to burst this cell.
-          delete body_set[i];
-          cur_size--;
-          body_set[i] = body_set[cur_size];
-          --i;
+        if (cur_pressure > 1.0) {                // If pressure too high, burst this cell!
+          delete body_set[cur_id];               // Delete the burst cell.
+          cur_size--;                            // Indicate one fewer cells in population.
+          body_set[cur_id] = body_set[cur_size]; // Move last cell to popped position.
         }
+        else cur_id++;
       }
+
+      // Now that some cells are removed, resize number of bodies
       body_set.resize(cur_size);
     }
 

@@ -58,20 +58,35 @@ namespace emp {
     // on pairs of objects that *may* collide.
 
     void TestCollisions(std::function<bool(BODY_TYPE &, BODY_TYPE &)> collide_fun) {
-      int hit_count = 0;
-      int test_count = 0;
-      
-      const int cols = 32;
-      const int rows = 32;
+      emp_assert(collide_fun);
+
+      // Find the size of the largest body to determine minimum sector size.
+      double max_radius = 0.0;
+      for (auto * body : body_set) {
+        if (body->GetRadius() > max_radius) max_radius = body->GetRadius();
+      }
+
+      const int max_cols = max_pos.GetX() / (max_radius * 2.0);
+      const int max_rows = max_pos.GetY() / (max_radius * 2.0);
+
+      // Figure out the actual number of sectors to use (currently no more than 1024).
+      const int cols = std::min(max_cols, 32);
+      const int rows = std::min(max_rows, 32);
+
       const int num_sectors = rows * cols;
-      const int sector_width = max_pos.GetX() / cols;
-      const int sector_height = max_pos.GetY() / rows;
+      const double sector_width = max_pos.GetX() / (double) cols;
+      const double sector_height = max_pos.GetY() / (double) rows;
 
       std::vector< std::vector<BODY_TYPE *> > sector_set(num_sectors);
 
+
+      int hit_count = 0;
+      int test_count = 0;
+      
       // Loop through all of the bodies on this surface placing them in sectors and testing for
       // collisions with other bodies already in nearby sectors.
-      for (auto body : body_set) {
+      for (auto * body : body_set) {
+        emp_assert(body);
         // Determine which sector the current body is in.
         const int cur_col = body->GetCenter().GetX() / sector_width;
         const int cur_row = body->GetCenter().GetY() / sector_height;
@@ -92,9 +107,10 @@ namespace emp {
 
         // Add this body to the current sector for future tests to compare with.
         const int cur_sector = cur_col + cur_row * cols;
+        emp_assert(cur_sector < (int) sector_set.size());
+
         sector_set[cur_sector].push_back(body);
       }
-
 
       // Make sure all bodies are in a legal position on the surface.
       for (BODY_TYPE * cur_body : body_set) {

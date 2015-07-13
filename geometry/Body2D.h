@@ -42,15 +42,16 @@ namespace emp {
     double pressure;                  // Current pressure on this body.
 
   public:
-    CircleBody2D(const Circle<BASE_TYPE> & _p, BRAIN_TYPE * _b = NULL)
+    CircleBody2D(const Circle<BASE_TYPE> & _p, BRAIN_TYPE * _b = nullptr)
       : perimeter(_p), target_radius(_p.GetRadius()), brain(_b), mass(1), color_id(0)
-      , pair_link(NULL), pair_dist(0), target_pair_dist(0), pressure(0) { ; }
+      , pair_link(nullptr), pair_dist(0), target_pair_dist(0), pressure(0) { ; }
     ~CircleBody2D() {
-      // If this body is paired with another one, removing the pairing.
+      // If this body is paired with another one, remove the pairing.
       if (pair_link) {
         emp_assert(pair_link->pair_link == this);
-        pair_link->pair_link = NULL;
+        pair_link->pair_link = nullptr;
       }
+      if (brain) delete brain;
     }
 
     const Circle<BASE_TYPE> & GetPerimeter() const { return perimeter; }
@@ -67,7 +68,7 @@ namespace emp {
     Point<BASE_TYPE> GetShift() const { return shift; }
     double GetPressure() const { return pressure; }
 
-    bool IsReproducing() const { return (pair_link != NULL) && (GetRadius() != target_radius); }
+    bool IsReproducing() const { return (pair_link != nullptr) && (GetRadius() != target_radius); }
 
     CircleBody2D & SetPosition(const Point<BASE_TYPE> & new_pos) {
       perimeter.SetCenter(new_pos); 
@@ -118,10 +119,10 @@ namespace emp {
       emp_assert(offset.GetX() != 0 || offset.GetY() != 0);
       if (pair_link) {   // If this body is already paired with another, break that link!
         emp_assert(pair_link->pair_link == this);
-        pair_link->pair_link = NULL;
+        pair_link->pair_link = nullptr;
       }
       // Create the offspring as a paired link.
-      pair_link = new CircleBody2D(perimeter, brain ? new BRAIN_TYPE(*brain) : NULL);
+      pair_link = new CircleBody2D(perimeter, brain ? new BRAIN_TYPE(*brain) : nullptr);
       pair_link->pair_link = this;
       pair_link->Translate(offset);
 
@@ -137,8 +138,8 @@ namespace emp {
     void BreakLink(CircleBody2D * old_link) {
       emp_assert(pair_link == old_link);
       emp_assert(old_link->pair_link == this);
-      pair_link = NULL;
-      old_link->pair_link = NULL;
+      pair_link = nullptr;
+      old_link->pair_link = nullptr;
       pair_dist = 0;
     }
 
@@ -166,8 +167,8 @@ namespace emp {
         if (std::abs(pair_dist - target_pair_dist) <= change_factor) {
           pair_dist = target_pair_dist;
           // @CAO, for now, break the link!
-          pair_link->pair_link = NULL;
-          pair_link = NULL;
+          pair_link->pair_link = nullptr;
+          pair_link = nullptr;
         }
         else {
           if ((int) pair_dist < (int) target_pair_dist) pair_dist += change_factor;
@@ -209,7 +210,7 @@ namespace emp {
       total_abs_shift.ToOrigin();
 
       // If this body is linked to another, enforce the distance between them.
-      if (pair_link != NULL) {
+      if (pair_link != nullptr) {
         emp_assert(pair_link->pair_link == this);
 
         if (GetAnchor() == pair_link->GetAnchor()) {
