@@ -8,9 +8,9 @@
 
 
 #include <string>
-#include <vector>
 
 #include "../geometry/Circle2D.h"
+#include "../tools/vector.h"
 
 #include "CanvasAction.h"
 #include "CanvasShape.h"
@@ -25,7 +25,7 @@ namespace UI {
     int width;
     int height;
 
-    std::vector<CanvasAction *> actions;
+    emp::vector<CanvasAction *> actions;
     std::size_t next_action;
 
     void WriteHTML(std::ostream & os) {
@@ -102,7 +102,8 @@ namespace UI {
 
     Canvas & Clear() {
       ClearActions();
-      return AddAction( new CanvasClearRect(0, 0, GetWidth(), GetHeight()) );
+      AddAction( new CanvasClearRect(0, 0, GetWidth(), GetHeight()) );
+      return *this;
     }
 
     // Refresh() will apply new actions on the screen.

@@ -35,7 +35,7 @@ namespace emp {
     ~vector() = default;
 
     uint32_t size() const { return v.size(); }
-    void resize(int new_size) { emp_assert(size >= 0); v.resize(new_size); }
+    void resize(int new_size) { emp_assert(new_size >= 0); v.resize(new_size); }
 
     T & operator[](int pos) {
       emp_assert(pos >= 0 && pos < (int) v.size());
@@ -52,6 +52,11 @@ namespace emp {
 
     auto begin() -> decltype(v.begin()) { return v.begin(); }
     auto end() -> decltype(v.end()) { return v.end(); }
+    auto begin() const -> const decltype(v.begin()) { return v.begin(); }
+    auto end() const -> const decltype(v.end()) { return v.end(); }
+
+    T & back() { return v.back(); }
+    const T & back() const { return v.back(); }
   };
 
 }

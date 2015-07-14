@@ -14,6 +14,7 @@
 #include "../tools/alert.h"
 #include "../tools/assert.h"
 #include "../tools/string_utils.h"
+#include "../tools/vector.h"
 
 #include "events.h"
 #include "UI_base.h"
@@ -35,7 +36,7 @@ namespace UI {
 
     // Track hiearchy
     Element * parent;                 // Which element is this one contained within?
-    std::vector<Element *> children;  // What elements are contained in this one?
+    emp::vector<Element *> children;  // What elements are contained in this one?
     bool append_ok;                   // Can we add more children?
 
     Element(const Element & src, Element * parent, const std::string & ext)

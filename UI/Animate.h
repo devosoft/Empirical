@@ -13,11 +13,11 @@
 //
 
 #include <functional>
-#include <vector>
 
 #include "../emtools/emfunctions.h"
 #include "../emtools/JSWrap.h"
 #include "../tools/assert.h"
+#include "../tools/vector.h"
 
 #include "Element.h"
 
@@ -28,7 +28,7 @@ namespace UI {
   class Animate {
   private:
     std::function<void(double)> anim_fun;
-    std::vector<UI::Element *> targets;
+    emp::vector<UI::Element *> targets;
     bool active;                          // Is this animation running?
     int callback_id;
 

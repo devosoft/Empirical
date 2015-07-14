@@ -9,25 +9,25 @@
 #include <map>
 #include <string>
 #include <tuple>
-#include <vector>
 
 #include "../tools/string_utils.h"
+#include "../tools/vector.h"
 
 namespace emp {
 
   namespace internal {
     using dHueMapKey = std::tuple<int, double, double, int, int>;
-    using dHueMap = std::map<dHueMapKey, std::vector<std::string> >;
+    using dHueMap = std::map<dHueMapKey, emp::vector<std::string> >;
 
     dHueMap hue_maps;
   }
   
-  const std::vector<std::string> &
+  const emp::vector<std::string> &
   GetHueMap(int map_size, double min_h=0.0, double max_h=360.0, int s=100, int l=50) {
     internal::dHueMapKey map_key = std::make_tuple(map_size, min_h, max_h, s, l);
 
     // Grab the current map out of the cache.
-    std::vector<std::string> & cur_map = internal::hue_maps[map_key];
+    emp::vector<std::string> & cur_map = internal::hue_maps[map_key];
 
     // If we've already asked for an identical map before, skip map generation!
     if (cur_map.size() != map_size) {

@@ -17,6 +17,7 @@
 #include "../geometry/Circle2D.h"
 #include "../geometry/Surface2D.h"
 #include "../tools/BitMatrix.h"
+#include "../tools/vector.h"
 
 namespace emp {
 namespace UI {
@@ -55,7 +56,7 @@ namespace UI {
   template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE=double>
   void Draw(Canvas & canvas,
             const Surface2D<BODY_TYPE,BODY_INFO,BASE_TYPE> & surface,
-            const std::vector<std::string> & color_map)
+            const emp::vector<std::string> & color_map)
   {
     canvas.Clear();
 

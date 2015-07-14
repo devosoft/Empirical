@@ -13,7 +13,7 @@
 //
 
 
-#include <vector>
+#include "../tools/vector.h"
 
 #include "Widget.h"
 
@@ -77,7 +77,7 @@ namespace UI {
   class TableRow : public internal::Widget<TableRow>{
     friend Table;
   protected:
-    std::vector<TableData> data;  // detail object for each cell in this row.
+    emp::vector<TableData> data;  // detail object for each cell in this row.
 
     void UpdateCSS() {
       std::string obj_id = div_id + obj_ext;
@@ -97,7 +97,7 @@ namespace UI {
       emp_assert(id >= 0 && id < (int) data.size());
       return data[id];
     }
-    std::vector<TableData> & GetCells() { return data; }  // Get ALL cells
+    emp::vector<TableData> & GetCells() { return data; }  // Get ALL cells
 
     TableRow & SetCols(int c) { data.resize(c); return *this; }
 
@@ -139,7 +139,7 @@ namespace UI {
     int cur_row;      // Which row/col is currently active?
     int cur_col;
       
-    std::vector<TableRow> rows;   // detail object for each row.
+    emp::vector<TableRow> rows;   // detail object for each row.
      
     // A table's state determines how some operations work.
     enum state_t { TABLE, ROW, CELL };
