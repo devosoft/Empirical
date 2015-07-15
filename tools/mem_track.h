@@ -20,13 +20,10 @@
 //
 
 
-#define EMP_NO_MEM_CHECK
-
-
 // If NDEBUG is turned on, turn off mem checks.
-// #ifdef NDEBUG
-// #define EMP_NO_MEM_CHECK
-// #endif
+#ifdef NDEBUG
+#define EMP_NO_MEM_CHECK
+#endif
 
 
 #include <map>
@@ -52,44 +49,38 @@
 namespace emp {
 
   namespace internal {
-    std::map<std::string,int> & TrackMem_GetMap() {
+
+    static std::map<std::string,int> & TrackMem_GetMap() {
       static std::map<std::string,int> * track_mem_class_map = nullptr;
       if (!track_mem_class_map) track_mem_class_map = new std::map<std::string,int>;
       return *track_mem_class_map;
     }
 
-    std::string TrackMem_Status() {
+    static std::string TrackMem_Status() {
       auto & mem_map = TrackMem_GetMap();
-      return "Test!";
-      /*
+
       std::stringstream ss;
       for (auto stat : mem_map) {
         ss << "[" << stat.first << "] : " << stat.second << std::endl;
       }
       return ss.str();
-      */
     }
 
-    void TrackMem_Inc(const std::string & class_name) {
+    static void TrackMem_Inc(const std::string & class_name) {
       (void) class_name;
       auto & mem_map = TrackMem_GetMap();
-      // std::cerr << "Creating: [" << class_name << "]" << std::endl;
       if (mem_map.find(class_name) == mem_map.end()) {
-        emp::CappedAlert(10, "New class: ", class_name, "; Total classes: ", mem_map.size());
+        emp::CappedAlert(10, (long long) &mem_map, " New class: ", class_name, "; Total classes: ", mem_map.size());
         mem_map[class_name] = 0;
       }
       mem_map[class_name]++;
-      /*
-      */
     }
-
-    void TrackMem_Dec(const std::string & class_name) {
+    
+    static void TrackMem_Dec(const std::string & class_name) {
       (void) class_name;
       auto & mem_map = TrackMem_GetMap();
-      /*
+
       // Make sure we are not trying to delete a class that was never registered!
-      // std::cerr << "Deleting: [" << class_name << "]" << std::endl;
-      // std::cerr << "Deleting." << std::endl;
       if (mem_map.find(class_name) == mem_map.end()) {
         emp::CappedAlert(3, "Trying to delete unknown: [", class_name,
                          "]; map size = ", mem_map.size());
@@ -105,19 +96,16 @@ namespace emp {
         emp::CappedAlert(3, "Trying to delete too many: ", class_name);
         abort();
       }
-      */
     }
 
-    int TrackMem_Count(const std::string & class_name) {
+    static int TrackMem_Count(const std::string & class_name) {
       (void) class_name;
       auto & mem_map = TrackMem_GetMap();
-      return 0;
-      /*
+
       if (mem_map.find(class_name) == mem_map.end()) {
         return 0;
       }
       return mem_map[class_name];
-      */
     }
       
   }
