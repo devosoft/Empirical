@@ -9,17 +9,21 @@
 
 #include <emscripten.h>
 
+extern "C" {
+  extern void EMP_Initialize();
+}
+
 namespace emp {
 
-  bool Initialize() {
+  static bool Initialize() {
 
     // Make sure we only initialize once!
     static bool init = false;
     if (init) return false;
     init = true;
 
-    // Setup the empCppCallback function to be called from Javascript.
-    EM_ASM({  empCppCallback = Module.cwrap('empCppCallback', null, ['number']);  });
+    // Setup everything that needs to be initialized on the JS side...
+    EMP_Initialize();
 
     return true;
   };

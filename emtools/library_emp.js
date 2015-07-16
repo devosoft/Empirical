@@ -28,12 +28,16 @@ mergeInto(LibraryManager.library, {
             return r.join(i+'\n');
         }
 
-
     },
     
     // Data internal to EMP
     $emp_i: { cb_args:[], cb_return:0
             },
+
+    EMP_Initialize__deps: ['$emp', '$emp_i'],
+    EMP_Initialize: function () {
+        empCppCallback = Module.cwrap('empCppCallback', null, ['number']);
+    },
 
     EMP_GetCBArgCount__deps: ['$emp', '$emp_i'],
     EMP_GetCBArgCount: function() { return emp_i.cb_args.length; },
