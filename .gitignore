@@ -4,8 +4,10 @@ a.out.dSYM
 a.out.js
 *.map
 *.o
-UTests/UI/Example.js
+*.js.mem
 UTests/emtools/JSWrap.js
+UTests/UI/Example.js
+UTests/UI/mini_evoke.js
 incoming/
 tmp/
 utils/edit_dist/IO/
