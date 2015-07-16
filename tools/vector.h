@@ -15,7 +15,8 @@
 #ifdef EMP_NDEBUG
 
 namespace emp {
-  using vector = std::vector;
+  template <typename T>
+  using vector = std::vector<T>;
 }
 
 
