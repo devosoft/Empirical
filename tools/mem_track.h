@@ -20,8 +20,8 @@
 //
 
 
-// If NDEBUG is turned on, turn off mem checks.
-#ifdef NDEBUG
+// If EMP_NDEBUG is turned on, turn off mem checks.
+#ifdef EMP_NDEBUG
 #define EMP_NO_MEM_CHECK
 #endif
 
