@@ -7,9 +7,9 @@
 //  It behaves nearly identically, but provide pop-up alerts when working in a web browser.
 //
 //  By default, emp_assert(X) throws an error if X evaluates to false.
-//  - if NDEBUG is defined, the expression in emp_assert() is ignored (not evaluated)
-//  - if TDEBUG is defined, emp_assert() is put into test mode and will record failures, but
-//    not otherwise act on them.  (useful for unit tests of asserts)
+//  - if EMP_NDEBUG is defined, the expression in emp_assert() is ignored (not evaluated)
+//  - if EMP_TDEBUG is defined, emp_assert() goes into test mode and records failures, but
+//    does not act on them.  (useful for unit tests of asserts)
 //
 
 #include <iostream>
@@ -20,10 +20,20 @@
 #include <emscripten.h>
 #endif
 
-
+// NDEBUG and TDEBUG should trigger their EMP equivilents.
 #ifdef NDEBUG
+#define EMP_NDEBUG
+#endif
+
+#ifdef TDEBUG
+#define EMP_TDEBUG
+#endif
+
+
+#ifdef EMP_NDEBUG
 namespace emp {
   const bool assert_on = false;
+  int assert_count = 0;
 }
 
 // This assert uses the expression (to prevent compiler error), but should not
@@ -34,7 +44,7 @@ namespace emp {
     (void) __emp_assert_tmp;                             \
   }
 
-#elif defined(TDEBUG)           // NDEBUG not set, but TDEBUG is!
+#elif defined(EMP_TDEBUG)           // EMP_NDEBUG not set, but EMP_TDEBUG is!
 
 namespace emp {
   const bool assert_on = true;
@@ -63,7 +73,7 @@ namespace emp {
 
 
 
-#elif EMSCRIPTEN       // NDEBUG and TDEBUG not set, but compiling with Emscripten
+#elif EMSCRIPTEN  // Neither EMP_NDEBUG nor EMP_TDEBUG set, but compiling with Emscripten
 
 namespace emp {
   const bool assert_on = true;
