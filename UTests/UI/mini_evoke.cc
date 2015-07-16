@@ -65,8 +65,6 @@ void EvokeAnim()
 int main() {
   UI::Initialize();
 
-  emp::Alert("Test2!");
-
   // Add bodies to the physics...
   for (int i = 0; i < 300; i++) {
     auto new_circle = emp::Circle<>(evoke.random.GetDouble(cw), evoke.random.GetDouble(ch), 7);
