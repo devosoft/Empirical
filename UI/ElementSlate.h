@@ -14,6 +14,7 @@
 #include "../tools/assert.h"
 #include "../tools/alert.h"
 
+#include "Animate.h"
 #include "Element.h"
 #include "ElementTable.h"
 #include "ElementText.h"
@@ -240,6 +241,24 @@ public:
     template <class... T> ElementSlate&  AddSlate(T... args) {return Add(UI::Slate(args...));}
     template <class... T> ElementTable&  AddTable(T... args) {return Add(UI::Table(args...));}
     template <class... T> ElementText&   AddText(T... args)  {return Add(UI::Text(args...));}
+
+    // Other helpful adders...
+    ElementButton & AddAnimToggle(UI::Animate & anim,
+                                  const std::string & play_label="Play",
+                                  const std::string & pause_label="Pause",
+                                  const std::string & button_id
+                                  =emp::to_string("emp__", internal::NextWidgetID())) {
+      UI::Button toggle_but = UI::Button([&anim, play_label, pause_label, button_id, this](){
+          anim.ToggleActive();                           // Toggle state of animation.
+          auto & but = Button(button_id);                // Lookup this button...
+          if (anim.GetActive()) but.Label(pause_label);  // Setup proper label on button.
+          else but.Label(play_label);
+          but.Update();                                  // Redraw the button.
+        }, play_label, button_id).Size(50,30);  
+      return Add(toggle_but);
+    }
+
+
 
     virtual std::string GetType() override {
       return "ElementSlate";
