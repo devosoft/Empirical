@@ -121,7 +121,7 @@ namespace emp {
         const double cur_pressure = body_set[cur_id]->GetPressure();
 
         // @CAO Arbitrary pressure threshold!
-        if (cur_pressure > 1.0) {                // If pressure too high, burst this cell!
+        if (cur_pressure > 3.0) {                // If pressure too high, burst this cell!
           delete body_set[cur_id];               // Delete the burst cell.
           cur_size--;                            // Indicate one fewer cells in population.
           body_set[cur_id] = body_set[cur_size]; // Move last cell to popped position.
