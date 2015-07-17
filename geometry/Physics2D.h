@@ -35,6 +35,26 @@ namespace emp {
     Physics2D & AddBody(BODY_TYPE * in_body) { surface.AddBody(in_body); return *this; }
     Physics2D & AddBackground(BODY_TYPE * in_body) { background.AddBody(in_body); return *this; }
 
+    Physics2D & KillOldest() {
+      auto & body_set = surface.GetBodySet();
+      if (body_set.size() == 0) return *this;
+
+      int oldest_id = 0;
+
+      for (int i = 1; i < (int) body_set.size(); i++) {
+        if (body_set[i]->GetBirthTime() < body_set[oldest_id]->GetBirthTime()) {
+          oldest_id = i;
+        }
+      }
+
+      // Now kill it!
+      delete body_set[oldest_id];
+      body_set[oldest_id] = body_set.back();
+      body_set.resize(body_set.size() - 1);
+
+      return *this;
+    }
+
     bool TestPairCollision(BODY_TYPE & body1, BODY_TYPE & body2) {
       if (body1.IsLinked(body2)) return false;  // Linked bodies can overlap.
 
