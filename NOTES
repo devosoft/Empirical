@@ -1,4 +1,7 @@
 -= Next Steps =-
+Wrap std::vector to facilitate debugging
+Try out Ptr class to see if it can catch mis-handled pointers
+
 In UI Elements change Update() to Redraw() throughout (to indicate that it starts drawing from
 scratch) and add in a Refresh() to just make new changes.  Particular important w/canvas.
 
@@ -37,6 +40,7 @@ Setup Elements to be able to run in unit tests.
 Slates should have a current location and always "append" at that location, not just at end.
 - Forwarding to a parent should track where the forward came from to update location information.
 Adjust Elements so that Widget name comes first.  E.g., ButtonElement instead of ElementButton
+Build version of UI tools with stubs that compile under GCC.
 
 -= New Elements =-
 Canvas
