@@ -8,8 +8,8 @@
 //  Inputs to the constructor include the function to run each animation step, and
 //  zero or more elements that should be updated post-animation.
 //
-//  The function may take an optional double (representing time since the last frame),
-//  an optional reference to the animation object, or both.
+//  The function may take an optional double (representing time since the last frame)
+//  -or- an optional reference to the animation object
 //
 
 #include <functional>
@@ -27,7 +27,7 @@ namespace UI {
 
   class Animate {
   private:
-    std::function<void(double)> anim_fun;
+    std::function<void(const Animate &)> anim_fun;
     emp::vector<UI::Element *> targets;
     bool active;                          // Is this animation running?
     int callback_id;
@@ -50,7 +50,8 @@ namespace UI {
 
       prev_time = cur_time;             // Update timing.
       cur_time = emp::GetTime();
-      anim_fun(cur_time - prev_time);   // Call anim function, sending time since last frame.
+      // anim_fun(cur_time - prev_time); // Call anim function, sending time since last frame.
+      anim_fun(*this);                   // Call anim function, sending this object.
 
       // Setup the callback for the next frame of the animation.
       EM_ASM_ARGS({
@@ -61,7 +62,7 @@ namespace UI {
 
   public:
     template <typename... E_TYPES>
-    Animate(const std::function<void(double)> & fun, E_TYPES&... targets) 
+    Animate(const std::function<void(const Animate &)> & fun, E_TYPES&... targets) 
       : anim_fun(fun), active(false)
     {
       LoadTargets(targets...);
@@ -69,8 +70,12 @@ namespace UI {
     }
 
     template <typename... E_TYPES>
+    Animate(const std::function<void(double)> & fun, E_TYPES&... targets) 
+      : Animate([fun,this](const Animate &){fun(GetStepTime());}, targets...) { ; }
+
+    template <typename... E_TYPES>
     Animate(const std::function<void()> & fun, E_TYPES&... targets) 
-      : Animate([fun](double){fun();}, targets...) { ; }
+      : Animate([fun](const Animate &){fun();}, targets...) { ; }
 
     Animate() { callback_id = JSWrap( std::function<void()>([this](){ this->Step(); }) ); }
 
@@ -95,8 +100,15 @@ namespace UI {
     double GetStepTime() const { return cur_time - prev_time; }
     double GetRunTime() const { return cur_time - start_time; }
 
-    void SetCallback(const std::function<void(double)> & fun) { anim_fun = fun; }
-    void SetCallback(const std::function<void()> & fun) { anim_fun = [fun](double){fun();}; }
+    void SetCallback(const std::function<void(const Animate &)> & fun) { anim_fun = fun; }
+
+    void SetCallback(const std::function<void(double)> & fun) {
+      anim_fun = [fun, this](const Animate &){fun(GetStepTime());};
+    }
+
+    void SetCallback(const std::function<void()> & fun) {
+      anim_fun = [fun](const Animate &){fun();};
+    }
   };
 
 }
