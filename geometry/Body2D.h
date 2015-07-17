@@ -33,6 +33,7 @@ namespace emp {
     Point<BASE_TYPE> velocity;    // Speed and direction of movement
     BASE_TYPE mass;               // "Weight" of this object (@CAO not used yet..)
     unsigned int color_id;        // Which color should this body appear?
+    double birth_time;            // At what time point was this organism born?
 
     // @CAO Technically, we should allow any number of links.
     CircleBody2D * pair_link;     // Is this body physically linked to another?
@@ -46,6 +47,7 @@ namespace emp {
   public:
     CircleBody2D(const Circle<BASE_TYPE> & _p, BRAIN_TYPE * _b = nullptr)
       : perimeter(_p), target_radius(_p.GetRadius()), brain(_b), mass(1), color_id(0)
+      , birth_time(0)
       , pair_link(nullptr), pair_dist(0), target_pair_dist(0), pressure(0)
     {
       EMP_TRACK_CONSTRUCT(CircleBody2D);
@@ -70,6 +72,7 @@ namespace emp {
     const Point<BASE_TYPE> & GetVelocity() const { return velocity; }
     BASE_TYPE GetMass() const { return mass; }
     unsigned int GetColorID() const { return color_id; }
+    double GetBirthTime() const { return birth_time; }
 
     Point<BASE_TYPE> GetShift() const { return shift; }
     double GetPressure() const { return pressure; }
@@ -88,6 +91,7 @@ namespace emp {
     CircleBody2D & SetVelocity(BASE_TYPE x, BASE_TYPE y) { velocity.Set(x, y); return *this; }
     CircleBody2D & SetVelocity(const Point<BASE_TYPE> & v) { velocity = v; return *this; }
     CircleBody2D & SetColorID(unsigned int in_id) { color_id = in_id; return *this; }
+    CircleBody2D & SetBirthTime(double in_time) { birth_time = in_time; return *this; }
 
     // Shift at end of next update.
     CircleBody2D & AddShift(const Point<BASE_TYPE> & inc_val) {
