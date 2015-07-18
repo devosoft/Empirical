@@ -33,10 +33,20 @@ namespace emp {
     vector() = default;
     vector(const emp::vector<T> &) = default;
     vector(int size) : v(size) { emp_assert(size >= 0); }
+    vector(const std::vector<T> & in) : v(in) { ; }         // Emergency fallback conversion.
     ~vector() = default;
 
     uint32_t size() const { return v.size(); }
     void resize(int new_size) { emp_assert(new_size >= 0); v.resize(new_size); }
+
+    emp::vector<T> & operator=(const emp::vector<T> &) = default;
+
+    bool operator==(const emp::vector<T> & in) const { return v == in.v; }
+    bool operator!=(const emp::vector<T> & in) const { return v != in.v; }
+    bool operator<(const emp::vector<T> & in)  const { return v < in.v; }
+    bool operator<=(const emp::vector<T> & in) const { return v <= in.v; }
+    bool operator>(const emp::vector<T> & in)  const { return v > in.v; }
+    bool operator>=(const emp::vector<T> & in) const { return v >= in.v; }
 
     T & operator[](int pos) {
       emp_assert(pos >= 0 && pos < (int) v.size());
