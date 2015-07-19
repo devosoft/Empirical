@@ -88,6 +88,7 @@ namespace UI {
     Element & Append(const std::string & in_text) override { return GetCurSlate() << in_text; }
     Element & Append(const std::function<std::string()> & fun) override { return GetCurSlate() << fun; }
     Element & Append(emp::UI::Button info) override { return GetCurSlate() << info; }
+    Element & Append(emp::UI::Canvas info) override { return GetCurSlate() << info; }
     Element & Append(emp::UI::Image info) override { return GetCurSlate() << info; }
     Element & Append(emp::UI::Table info) override { return GetCurSlate() << info; }
     Element & Append(emp::UI::Text info) override { return GetCurSlate() << info; }

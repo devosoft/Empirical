@@ -217,6 +217,12 @@ namespace UI {
       return *this;
     }
 
+    Table & SetHeader(bool _h=true) {
+      emp_assert(state == CELL);
+      rows[cur_row].data[cur_col].SetHeader(_h);
+      return *this;
+    }
+
     // Apply to appropriate component based on current state.
     std::string CSS(const std::string & setting) override {
       if (state == TABLE) return style.Get(setting);
