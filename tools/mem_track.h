@@ -70,7 +70,6 @@ namespace emp {
       (void) class_name;
       auto & mem_map = TrackMem_GetMap();
       if (mem_map.find(class_name) == mem_map.end()) {
-        emp::CappedAlert(10, (long long) &mem_map, " New class: ", class_name, "; Total classes: ", mem_map.size());
         mem_map[class_name] = 0;
       }
       mem_map[class_name]++;
@@ -84,11 +83,6 @@ namespace emp {
       if (mem_map.find(class_name) == mem_map.end()) {
         emp::CappedAlert(3, "Trying to delete unknown: [", class_name,
                          "]; map size = ", mem_map.size());
-
-        for (auto stat : mem_map) {
-          emp::Alert("[", stat.first, "] : ", stat.second, "  (deleting [", class_name, "]");
-        }
-
         abort();
       }
       mem_map[class_name]--;
