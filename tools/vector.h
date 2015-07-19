@@ -33,6 +33,7 @@ namespace emp {
     vector() = default;
     vector(const emp::vector<T> &) = default;
     vector(int size) : v(size) { emp_assert(size >= 0); }
+    vector(int size, const T & val) : v(size, val) { emp_assert(size >= 0); }
     vector(const std::vector<T> & in) : v(in) { ; }         // Emergency fallback conversion.
     ~vector() = default;
 
