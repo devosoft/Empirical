@@ -20,20 +20,30 @@ int main() {
   show << UI::Text("authors") << "By Emily Dolson, Anya Vostinar, Michael Wiser, and Charles Ofria<br><br>BEACON Center for the Study of Evolution in Action<br>";
   show.GetSlide().CSS("text-align", "center");
   show.GetSlide().Text("authors").Color("white").CSS("width", "70%").Center();
-
+  show << UI::Image("Devolab.png").WidthVW(30)
+       << UI::Image("BEACON.png").WidthVW(18);
 
   show.NewSlide("Introduction");
+  show << UI::Text("intro").SetPositionVW(25, 20).Color("white")
+       << "<big>Informally open-endedness =<br>"
+       << "\"Keep Doing Interesting Things\"</big>";
 
-  show << "<h1>Testing Canvas Object!</h1>"
-       << UI::Image("motivator.jpg", "im").Size(200,200)
-       << UI::Canvas(300,300,"cvs").StrokeColor("blue");
-  auto & canvas = show.GetSlide().Canvas("cvs");
-  canvas.Rect(100,25,100,100, "red");
-  canvas.Circle(50, 50, 45, "green", "purple");
-  canvas.Rect(100,175,100,100, "yellow");
+  show.NewSlide("Introduction");
+  show << UI::Text("intro").SetPositionVW(25, 20).Color("white")
+       << "<big>Informally open-endedness =<br>"
+       << "\"<b><font color=\"red\">Keep Doing</font></b> Interesting Things\"</big>";
 
 
-  show.NewSlide("How do we define \"keep going\"?");
+  // show << "<h1>Testing Canvas Object!</h1>"
+  //      << UI::Image("motivator.jpg", "im").Size(200,200)
+  //      << UI::Canvas(300,300,"cvs").StrokeColor("blue");
+  // auto & canvas = show.GetSlide().Canvas("cvs");
+  // canvas.Rect(100,25,100,100, "red");
+  // canvas.Circle(50, 50, 45, "green", "purple");
+  // canvas.Rect(100,175,100,100, "yellow");
+
+
+  show.NewSlide("How do we define \"Keep Doing\"?");
 
   show.NewSlide("Change Potential");
 
