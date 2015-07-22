@@ -45,8 +45,8 @@ namespace UI {
           emp.ctx.beginPath();
           emp.ctx.arc($0, $1, $2, 0, Math.PI*2);
         }, x, y, radius);  // Draw the circle
-      Fill(fill_color);
-      Stroke(line_color);
+      if (fill_color.size()) Fill(fill_color);
+      if (line_color.size()) Stroke(line_color);
     }
     CanvasAction * Clone() { return new CanvasCircle(*this); }
   };
@@ -63,8 +63,8 @@ namespace UI {
           emp.ctx.beginPath();
           emp.ctx.rect($0, $1, $2, $3);
         }, x, y, w, h);  // Draw the rectangle
-      Fill(fill_color);
-      Stroke(line_color);
+      if (fill_color.size()) Fill(fill_color);
+      if (line_color.size()) Stroke(line_color);
     }
     CanvasAction * Clone() { return new CanvasRect(*this); }
   };
