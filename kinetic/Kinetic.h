@@ -23,8 +23,8 @@
 #include "../geometry/Circle2D.h"
 #include "../geometry/Point2D.h"
 
+#include "../emtools/color_map.h"
 #include "../emtools/emfunctions.h"
-#include "../emtools/Color.h"
 #include "../emtools/Font.h"
 #include "../emtools/RawImage.h"
 
@@ -452,12 +452,12 @@ namespace Kinetic {
   class Canvas {
   public:
     // Setting values
-    inline static void SetFill(const Color & color) { 
-      EM_ASM_ARGS({var fs = Pointer_stringify($0); emp_kinetic.ctx.fillStyle = fs;}, color.AsString().c_str());
+    inline static void SetFill(const std::string & color) { 
+      EM_ASM_ARGS({var fs = Pointer_stringify($0); emp_kinetic.ctx.fillStyle = fs;}, color.c_str());
     }
 
-    inline static void SetStroke(const Color & color) {
-      EM_ASM_ARGS({var stroke = Pointer_stringify($0); emp_kinetic.ctx.strokeStyle = stroke;}, color.AsString().c_str());
+    inline static void SetStroke(const std::string & color) {
+      EM_ASM_ARGS({var stroke = Pointer_stringify($0); emp_kinetic.ctx.strokeStyle = stroke;}, color.c_str());
     }
 
     inline static void SetLineWidth(double width) { EM_ASM_ARGS({emp_kinetic.ctx.lineWidth = $0;}, width); }
@@ -480,8 +480,8 @@ namespace Kinetic {
       EM_ASM_ARGS({var align = Pointer_stringify($0); emp_kinetic.ctx.textAlign = align;}, align.c_str());
     }
 
-    inline static void SetShadowColor(const Color & color) {
-      EM_ASM_ARGS({var color = Pointer_stringify($0); emp_kinetic.ctx.shadowColor = color;}, color.AsString().c_str());
+    inline static void SetShadowColor(const std::string & color) {
+      EM_ASM_ARGS({var color = Pointer_stringify($0); emp_kinetic.ctx.shadowColor = color;}, color.c_str());
     }
     inline static void SetShadowBlur(int _in) { EM_ASM_ARGS({emp_kinetic.ctx.shadowBlur = $0;}, _in); }
     inline static void SetShadowOffsetX(int _in) { EM_ASM_ARGS({emp_kinetic.ctx.shadowOffsetX = $0;}, _in); }
@@ -648,8 +648,8 @@ namespace Kinetic {
     }
 
 
-    Shape & SetFill(const Color & color) {
-      EM_ASM_ARGS({var fill = Pointer_stringify($1); emp_kinetic.objs[$0].fill(fill);}, obj_id, color.AsString().c_str());
+    Shape & SetFill(const std::string & color) {
+      EM_ASM_ARGS({var fill = Pointer_stringify($1); emp_kinetic.objs[$0].fill(fill);}, obj_id, color.c_str());
       return *this;
     }
 
@@ -722,8 +722,8 @@ namespace Kinetic {
       return *this;
     }
 
-    Shape & SetShadowColor(const Color & _in) {
-      EM_ASM_ARGS({var sc = Pointer_stringify($1); emp_kinetic.objs[$0].shadowColor($1);}, obj_id, _in.AsString().c_str());
+    Shape & SetShadowColor(const std::string & _in) {
+      EM_ASM_ARGS({var sc = Pointer_stringify($1); emp_kinetic.objs[$0].shadowColor($1);}, obj_id, _in.c_str());
       return *this;
     }
 
@@ -933,7 +933,8 @@ namespace Kinetic {
   // The text object from Kinetic...
   class TextBox : public Shape {
   public:
-    TextBox(int x=0, int y=0, const std::string & text="", int font_size=30, const std::string & font_family="Helvetica", const emp::Color & fill="black")
+    TextBox(int x=0, int y=0, const std::string & text="", int font_size=30,
+            const std::string & font_family="Helvetica", const std::string & fill="black")
     {
       obj_id = EM_ASM_INT( {
           var obj_id = emp_kinetic.objs.length;         // Determine the next free id for a Kinetic object.
@@ -951,7 +952,7 @@ namespace Kinetic {
               fill: _fill
           });
           return obj_id;                                       // Return the Kinetic object id.
-      }, x, y, text.c_str(), std::to_string(font_size).c_str(), font_family.c_str(), fill.AsString().c_str());
+      }, x, y, text.c_str(), std::to_string(font_size).c_str(), font_family.c_str(), fill.c_str());
     }
     TextBox(int x, int y, std::string text, const Font & font) : TextBox(x, y, text, font.GetSize(), font.GetFamily(), font.GetColor()) { ; }
     TextBox(const Point<int> & point, std::string text, const Font & font)
