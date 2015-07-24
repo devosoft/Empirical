@@ -65,6 +65,7 @@ namespace UI {
       return *this;
     }
 
+
   public:
     Canvas(int w, int h, const std::string & in_name="")
       : Widget(in_name), width(w), height(h), next_action(0) { obj_ext = "__c"; }
@@ -106,11 +107,14 @@ namespace UI {
       return *this;
     }
 
-    // Refresh() will apply new actions on the screen.
-    // return value is whether any change was made.
+
+    static std::string TypeName() { return "Canvas"; }
+
+    // Refresh() will apply new actions to the screen.  Return value is whether a change was made.
 
     bool Refresh() {
-      if (next_action == actions.size()) return false;
+      if (next_action == actions.size()) return false;  // Stop if nothing to refresh.
+      if (IsElement() == false) return false;           // Can only refresh if we are an element.
 
       // Setup the canvas info to act upon.
       EM_ASM_ARGS({
@@ -127,9 +131,6 @@ namespace UI {
       return true;
     }
 
-
-
-    static std::string TypeName() { return "Canvas"; }
 
     bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
       bool ok = true;

@@ -30,6 +30,8 @@ namespace UI {
     canvas.Clear();
 
     canvas.Circle(circle, fill, line);
+
+    if (canvas.IsElement()) canvas.Refresh();
   }
 
 
@@ -49,6 +51,8 @@ namespace UI {
         }
       }
     }
+
+    if (canvas.IsElement()) canvas.Refresh();
   }
 
   
@@ -71,6 +75,8 @@ namespace UI {
     for (auto * body : body_set) {
       canvas.Circle(body->GetPerimeter(), color_map[body->GetColorID()], "white");
     }
+
+    if (canvas.IsElement()) canvas.Refresh();
   }
 
   template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE=double>

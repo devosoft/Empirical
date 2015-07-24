@@ -39,7 +39,11 @@ namespace UI {
       return std::string("Element") + BASE_TYPE::TypeName();
     }
 
-    virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") override {
+    bool IsElement() const override { return true; }
+
+    virtual bool OK(std::stringstream & ss,
+                    bool verbose=false,
+                    const std::string & prefix="") override {
       bool ok = true;
 
       if (verbose) {

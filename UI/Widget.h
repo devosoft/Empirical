@@ -50,6 +50,7 @@ namespace UI {
       const std::string & GetObjExt() const { return obj_ext; }
       std::string GetFullID() const { return div_id + obj_ext; }
       static std::string TypeName() { return "Widget"; }
+      virtual bool IsElement() const { return false; }           // Base widgets are not elements.
 
       virtual std::string CSS(const std::string & setting) { return style.Get(setting); }
       bool HasCSS(const std::string & setting) { return style.Has(setting); }
