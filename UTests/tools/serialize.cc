@@ -8,7 +8,7 @@
 
 struct SerializeTest {
   int a;
-  float b;
+  float b;        // unimportant data!
   std::string c;
   
   SerializeTest(int _a, float _b, std::string _c) : a(_a), b(_b), c(_c) { ; }
@@ -50,6 +50,17 @@ struct NestedTest {
     : st(a1, b1, c1), name("my_class"), std(a2, b2, c2, d2), mt(a3, b3, c3, e3, f3) { ; }
 
   EMP_SETUP_DATAPOD(NestedTest, st, name, std, mt);
+};
+
+struct BuiltInTypesTest {
+  const int a;
+  std::vector<int> int_v;
+
+  BuiltInTypesTest(int _a, int v_size) : a(_a), int_v(v_size) {
+    for (int i = 0; i < v_size; i++) int_v[i] = i*i;
+  }
+
+  EMP_SETUP_DATAPOD(BuiltInTypesTest, a, int_v);
 };
 
 int main(int argc, char* argv[])
@@ -189,7 +200,20 @@ int main(int argc, char* argv[])
   if (verbose) std::cout << "All reloads successful!!!" << std::endl;
 
 
-  // int test_int;
-  // emp::serialize::SetupLoad<int>(pod, &test_int, true);
-  // emp::serialize::SetupLoad(pod, &stM2, true);
+  const int v_size = 43;
+  BuiltInTypesTest bitt(91, v_size);
+  bitt.EMP_Store(pod);
+
+  if (verbose) {
+    std::cout << "Finishd save on built-in library types.\nSaved stream: " << ss.str() << std::endl;
+  }
+
+  BuiltInTypesTest bitt2(pod);
+  if (verbose) {
+    std::cout << "Reloaded DataPod for built-in library types class.\nResults:\n"
+              << "  vector size = " << bitt2.int_v.size() << "\n";
+    for (int i = 0; i < v_size; i++) {
+      std::cout << "  int_v[" << i << "] = " << bitt2.int_v[i] << "\n";
+    }
+  }
 }
