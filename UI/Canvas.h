@@ -24,6 +24,7 @@ namespace UI {
   protected:
     int width;
     int height;
+    bool needs_first_update;
 
     emp::vector<CanvasAction *> actions;
     std::size_t next_action;
@@ -34,6 +35,7 @@ namespace UI {
          << "\" height=\"" << height << "\">";
       // @CAO We can include fallback content here for browsers that don't support canvas.
       os << "</canvas>";
+      needs_first_update = false;
     }    
 
     void ClearActions() {
@@ -68,14 +70,21 @@ namespace UI {
 
   public:
     Canvas(int w, int h, const std::string & in_name="")
-      : Widget(in_name), width(w), height(h), next_action(0) { obj_ext = "__c"; }
-    Canvas(const Canvas & in) : internal::Widget<Canvas>(in), width(in.width), height(in.height), next_action(0) {
+      : Widget(in_name), width(w), height(h), needs_first_update(true), next_action(0) 
+    { obj_ext = "__c"; }
+    Canvas(const Canvas & in)
+      : internal::Widget<Canvas>(in), width(in.width), height(in.height)
+      , needs_first_update(true), next_action(0)
+    {
       actions.resize(in.actions.size());
       for (int i = 0; i < (int) actions.size(); i++) {
         actions[i] = in.actions[i]->Clone();
       }
     }
-    Canvas(Canvas && in) : internal::Widget<Canvas>(in), width(in.width), height(in.height), actions(in.actions), next_action(0) {
+    Canvas(Canvas && in)
+      : internal::Widget<Canvas>(in), width(in.width), height(in.height), needs_first_update(true)
+      , actions(in.actions), next_action(0)
+    {
       in.actions.resize(0);
       in.next_action = 0;
     }
@@ -110,11 +119,14 @@ namespace UI {
 
     static std::string TypeName() { return "Canvas"; }
 
+
     // Refresh() will apply new actions to the screen.  Return value is whether a change was made.
 
     bool Refresh() {
-      if (next_action == actions.size()) return false;  // Stop if nothing to refresh.
-      if (IsElement() == false) return false;           // Can only refresh if we are an element.
+      emp_assert(IsElement());                          // Can only refresh if we are an element.
+      
+      // Stop if nothing to refresh or the document isn't ready.
+      if (next_action == actions.size() || needs_first_update) return false;
 
       // Setup the canvas info to act upon.
       EM_ASM_ARGS({
