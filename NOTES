@@ -1,5 +1,4 @@
 -= Next Steps =-
-Wrap std::vector to facilitate debugging
 Try out Ptr class to see if it can catch mis-handled pointers
 
 In UI Elements change Update() to Redraw() throughout (to indicate that it starts drawing from
@@ -43,28 +42,25 @@ Adjust Elements so that Widget name comes first.  E.g., ButtonElement instead of
 Build version of UI tools with stubs that compile under GCC.
 
 -= New Elements =-
-Canvas
 Forms
-Tabs
+JQuerryUI Tabs
 Settings (that can be initialized with a config object)
-Placeholder (?) for future references (empty span?)
-Dynamic link? (Easy to change, rather than existing like which is embeded in text.)
+Span (?) for future manual references
+Dynamic link? (Easy to change, rather than embeded in text.)
 
 
 -= General tools to build =-
 A more automated test system
-Serialization helpers
-- Option 1: Use only emp-specific types in classes that can be easily saved?
-            (Makes coding harder)
-- Option 2: #define overrides for types?  (tricky to get right, especially for STL types)
-- Option 3: Require manual save a load functions?  (Requires all programmers to always keep updated,
-            but might be possible with good automated test system.)
 A data management system that can track data by:
   - Temporal series (values over time)
-  - Batch (where a batch reset occurs periodicall)
+  - Batch (where a batch reset occurs periodically)
   - Log (tracking particular events when they occur)
   All output files should have headers that allow them to be read back in more easily.
 A citation tool: Useful for pointing people to appropriate references & building online bibs.
+
+-= Serialization =-
+Make work with vectors
+Special mechanisms to handle both pointers we are in charge of AND pointers to be connected to.
 
 -= Evolution-specific Tools =-
 Organism Object (Contains Genome and templated on virtual hardware type)
@@ -83,7 +79,7 @@ Fix how sectors are handled in surfaces to be more dynamic based on sizes of org
 
 -= Improvements that rquire more thought... =-
 InstLib: Can we lock a set of instruction at compile time?  Or at least put them in a fixed array?
-Change HardwareCPU to something linke Hardware_SimpleCPU and Instruction to Instruction_SimpleCPU
+Change HardwareCPU to something like Hardware_SimpleCPU and Instruction to Instruction_SimpleCPU
 Come up with a cleaner method to time functions?  Current macro is pretty ugly.
 
 -= Specific ideas for Configurtion tools =-
