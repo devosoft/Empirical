@@ -41,6 +41,7 @@ namespace emp {
     BASE_TYPE target_pair_dist;   // How far out should the pair get before splitting?
 
     Point<BASE_TYPE> shift;           // How should this body be updated to minimize overlap.
+    Point<BASE_TYPE> cum_shift;       // Build up of shift not yet acted upon.
     Point<BASE_TYPE> total_abs_shift; // Total absolute-value of shifts (to calculate pressure)
     double pressure;                  // Current pressure on this body.
 
@@ -80,7 +81,8 @@ namespace emp {
     bool IsReproducing() const { return (pair_link != nullptr) && (GetRadius() != target_radius); }
 
     CircleBody2D & SetPosition(const Point<BASE_TYPE> & new_pos) {
-      perimeter.SetCenter(new_pos); 
+      //if (perimeter.GetCenter().SquareDistance(new_pos) > 2.0)
+        perimeter.SetCenter(new_pos);
       return *this;
     }
     CircleBody2D & SetRadius(BASE_TYPE new_radius) {
@@ -211,14 +213,18 @@ namespace emp {
       const BASE_TYPE max_x = max_coords.GetX() - GetRadius();
       const BASE_TYPE max_y = max_coords.GetY() - GetRadius();
 
-      // Act on the accumulated shifts.
-      perimeter.Translate(shift);
-
       // Update the caclulcation for pressure.
-      pressure = (total_abs_shift - shift.Abs()).SquareMagnitude();
-      shift.ToOrigin();           // Clear out the shift for the next round.
-      total_abs_shift.ToOrigin();
 
+      // Act on the accumulated shifts only when they add up enough.
+      cum_shift += shift;
+      if (cum_shift.SquareMagnitude() > 0.25) {
+        perimeter.Translate(cum_shift);
+        cum_shift.ToOrigin();
+      }
+      pressure = (total_abs_shift - shift.Abs()).SquareMagnitude();
+      shift.ToOrigin();              // Clear out the shift for the next round.
+      total_abs_shift.ToOrigin();
+        
       // If this body is linked to another, enforce the distance between them.
       if (pair_link != nullptr) {
         emp_assert(pair_link->pair_link == this);
