@@ -35,6 +35,8 @@ namespace emp {
     Physics2D & AddBody(BODY_TYPE * in_body) { surface.AddBody(in_body); return *this; }
     Physics2D & AddBackground(BODY_TYPE * in_body) { background.AddBody(in_body); return *this; }
 
+    Physics2D & Clear() { surface.Clear(); background.Clear(); return *this; }
+
     Physics2D & KillOldest() {
       auto & body_set = surface.GetBodySet();
       if (body_set.size() == 0) return *this;

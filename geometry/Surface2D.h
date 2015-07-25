@@ -40,7 +40,7 @@ namespace emp {
       : max_pos(_width, _height)
     {
     }
-    ~Surface2D() { ; }
+    ~Surface2D() { Clear(); }
 
     BASE_TYPE GetWidth() const { return max_pos.GetX(); }
     BASE_TYPE GetHeight() const { return max_pos.GetY(); }
@@ -49,8 +49,16 @@ namespace emp {
     std::vector<BODY_TYPE *> & GetBodySet() { return body_set; }
     const std::vector<BODY_TYPE *> & GetConstBodySet() const { return body_set; }
 
+    // Add a single body.  Surface now controls this body and must delete it.
     Surface2D & AddBody(BODY_TYPE * new_body) {
       body_set.push_back(new_body);     // Add body to master list
+      return *this;
+    }
+
+    // Clear all bodies on the surface.
+    Surface2D & Clear() {
+      for (auto * body : body_set) delete body;
+      body_set.resize(0);
       return *this;
     }
 
