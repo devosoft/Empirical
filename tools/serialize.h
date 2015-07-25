@@ -93,14 +93,27 @@ namespace serialize {
 
   // Custom classes should run their built-in EMP_Store member function.
   template <typename T>
-  auto StoreVar(DataPod & pod, T & var, bool) -> typename T::emp_load_return_type & {
+  auto StoreVar(DataPod & pod, const T & var, bool) -> typename T::emp_load_return_type & {
     var.EMP_Store(pod);
     return pod;
   }
 
+  // Special standard library types need to have a custom StoreVar method built.
+  template <typename T>
+  void StoreVar(DataPod & pod, const std::vector<T> & var, bool) {
+    StoreVar(pod, var.size(), true);
+    for (int i = 0; i < (int) var.size(); ++i) {
+      StoreVar(pod, var[i], true);
+    }
+
+    // @CAO for now use ':' separator, but more generally we need to ensure uniquness.
+    pod.OStream() << ':';
+    emp_assert(pod.OStream());
+  }
+  
   // As a fallback, just send the saved object to the DataPod's output stream.
   template <typename T>
-  void StoreVar(DataPod & pod, T & var, int) {
+  void StoreVar(DataPod & pod, const T & var, int) {
     // @CAO for now use ':', but more generally we need to ensure uniquness.
     pod.OStream() << var << ':';
     emp_assert(pod.OStream());
@@ -120,7 +133,8 @@ namespace serialize {
 
   // Otherwise use default streams.
   template <typename T>
-  auto SetupLoad(DataPod & pod, T*, int) -> T {
+  auto SetupLoad(DataPod & pod, const T*, int) -> T {
+    // std::decay<T> var;
     T var;
     pod.IStream() >> var;
     pod.IStream().ignore(1);  // Ignore ':'
@@ -132,6 +146,20 @@ namespace serialize {
   std::string SetupLoad(DataPod & pod, std::string *, bool) {
     std::string var;
     std::getline(pod.IStream(), var, ':');
+    emp_assert(pod.IStream() && "Make sure the DataPod is still okay.");
+    return var;
+  }
+  
+  // Use special load for vectors of arbitrary type.
+  template <typename T>
+  std::vector<T> SetupLoad(DataPod & pod, std::vector<T> *, bool) {
+    const uint32_t v_size(SetupLoad(pod, &v_size, true));
+    std::vector<T> var; 
+
+    // Create vector of correct size and create elements with pod.
+    for (int i = 0; i < v_size; i++) {
+      var.emplace_back(SetupLoad(pod, &(var[0]), true));
+    }
     emp_assert(pod.IStream() && "Make sure the DataPod is still okay.");
     return var;
   }

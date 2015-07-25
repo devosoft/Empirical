@@ -8,7 +8,7 @@
 // Use this macro to automatically build methods in a class to save and load data.
 #define EMP_SETUP_DATAPOD_BASEINFO(CLASS_NAME, BASE_LOAD, BASE_STORE, ...) \
   using emp_load_return_type = emp::serialize::DataPod;                 \
-  void EMP_Store(emp::serialize::DataPod & pod) {                       \
+  void EMP_Store(emp::serialize::DataPod & pod) const {                 \
     BASE_STORE;                                                         \
     emp::serialize::Store(pod, __VA_ARGS__);                            \
   }                                                                     \
@@ -25,7 +25,7 @@
 // Version to use in derived classes (with a base that also needs to be serialized).
 #define EMP_SETUP_DATAPOD_D(CLASS_NAME, BASE_CLASS, ...)    \
   EMP_SETUP_DATAPOD_BASEINFO(CLASS_NAME,                    \
-                             EMP_CALL_BASE_1(BASE_CLASS),  \
+                             EMP_CALL_BASE_1(BASE_CLASS),   \
                              BASE_CLASS::EMP_Store(pod),    \
                              __VA_ARGS__)
 
