@@ -69,8 +69,8 @@ namespace emp {
       cur_map.resize(map_size);
       double step_size = (max_h - min_h) / (double) map_size;
       for (int i = 0; i < map_size; ++i) {
-        double cur_hue = min_h + step_size * i;
-        cur_map[i] = emp::to_string("hsl(", cur_hue, ",", s, "%,", l, "%)");
+        double h = min_h + step_size * i;
+        cur_map[i] = ColorHSL(h, s, l);
       }
     }
 
