@@ -22,6 +22,13 @@
 
 namespace emp {
 
+  double time_fun(std::function<void()> test_fun) {
+    std::clock_t start_time = std::clock();
+    test_fun();
+    std::clock_t tot_time = std::clock() - start_time;
+    return 1000.0 * ((double) tot_time) / (double) CLOCKS_PER_SEC;
+  }
+
   // Toggle an input bool.
   inline bool toggle(bool & in_bool) { return (in_bool = !in_bool); }
 
