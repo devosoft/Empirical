@@ -8,6 +8,12 @@
 //  All of the important information about a class is stored in a DataPod, which can be
 //  used to restore the class at a later time.
 //
+//  Why is this better than other serialization techniques?
+//  * Only one line of code is added to a custom class to make it serializable.
+//  * Serialized objects do not need a default constructor (a DataPod constructor is added)
+//  * Serialized objects can be const since they get rebuilt during construction.
+//  * Synergistic interactions with other EMP classes, such as config and tuple_struct
+//
 //  In order to setup a target class to be able to be serialized into a pod, you must
 //  add a macro to include the needed functionality.  For a basic class, use:
 //
@@ -33,12 +39,13 @@
 //
 //
 //  Development Notes:
-//  * Build custom load/store function for STL objects (especially containers)
+//  * Build custom load/store function for more STL objects (especially containers)
 //  * To deal with pointers we should recurse, but keep map to new pointer locations.
 //  * Setup a more robust method for dealing with arbitrary strings so we don't have
-//    to worry about collisions in streams.
+//    to worry about collisions in streams (JSon format??)
 //  * Setup a (compressed) binary saved form in DataPods.
-//  * Add a mechanism to set value to constant rather than previous value.
+//  * Setup promised synergistic interactions with config and tuple_struct to auto
+//    store and load without any additional effort on the part of the library user.
 //
 
 #include <iostream>
