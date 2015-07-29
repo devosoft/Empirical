@@ -20,26 +20,39 @@ namespace UI {
     return out_string;
   }
 
-  template <typename VAR_TYPE>
-  std::function<std::string()> Var(VAR_TYPE & var) {
-    return [&var](){ return emp::to_string(var); };
-  }
+  // template <typename VAR_TYPE>
+  // std::function<std::string()> Var(VAR_TYPE & var) {
+  //   return [&var](){ return emp::to_string(var); };
+  // }
 
+  
   // Live keyword means that whatever is passed in needs to be re-evaluated every update.
+  namespace internal {
 
-  template <typename VAR_TYPE>
-  std::function<std::string()> Live(VAR_TYPE & var) {
-    return [&var](){ return emp::to_string(var); };
+    // If a variable is passed in to live, construct a function to look up its current value.
+    template <typename VAR_TYPE>
+    std::function<std::string()> Live_impl(VAR_TYPE & var, bool) {
+      return [&var](){ return emp::to_string(var); };
+    }
+    
+    // // If a function is passed in, call it and use the return value.
+    // template <typename RET_TYPE>
+    // std::function<std::string()> Live_impl(const std::function<RET_TYPE()> & fun, bool) {
+    //   return [fun](){ return emp::to_string(fun()); };
+    // }
+
+    // If anything else is passed in, assume it is a function!
+    template <typename IN_TYPE>
+    std::function<std::string()> Live_impl(IN_TYPE && fun, int) {
+      return [fun](){ return emp::to_string(fun()); };
+    }
   }
 
-  template <typename RET_TYPE>
-  std::function<std::string()> Live(const std::function<RET_TYPE()> & fun) {
-    return [fun](){ return emp::to_string(fun()); };
+  template <typename T>
+  std::function<std::string()> Live(T && val) {
+    return internal::Live_impl(std::forward<T>(val), true);
   }
 
-  std::function<std::string()> Live(const std::function<double()> & fun) {
-    return [fun](){ return emp::to_string(fun()); };
-  }
 
   class Close {
   private:
