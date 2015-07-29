@@ -108,6 +108,7 @@ namespace UI {
     virtual Element & Append(char in_char) { return Append(emp::to_string(in_char)); }
     virtual Element & Append(double in_num) { return Append(emp::to_string(in_num)); }
     virtual Element & Append(int in_num) { return Append(emp::to_string(in_num)); }
+    virtual Element & Append(uint32_t in_num) { return Append(emp::to_string(in_num)); }
 
     // Handle special commands
     virtual Element & Append(const emp::UI::Close & close) {
