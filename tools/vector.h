@@ -7,6 +7,7 @@
 //  If EMP_NDEBUG is set then it reverts back to std::vector.
 //
 
+#include <initializer_list>
 #include <vector>
 
 #include "assert.h"
@@ -34,6 +35,7 @@ namespace emp {
     vector(const emp::vector<T> &) = default;
     vector(int size) : v(size) { emp_assert(size >= 0); }
     vector(int size, const T & val) : v(size, val) { emp_assert(size >= 0); }
+    vector(std::initializer_list<T> in_list) : v(in_list) { ; }
     vector(const std::vector<T> & in) : v(in) { ; }         // Emergency fallback conversion.
     ~vector() = default;
 
@@ -50,7 +52,12 @@ namespace emp {
     bool operator>=(const emp::vector<T> & in) const { return v >= in.v; }
 
     T & operator[](int pos) {
-      emp_assert(pos >= 0 && pos < (int) v.size());
+#ifndef NDEBUG
+      if (pos < 0 || pos >= (int) v.size()) {
+        emp::Alert("Vector overflow.  Indexing to ", pos, " in array of size ", v.size(), ".");
+      }
+#endif      
+      //emp_assert(pos >= 0 && pos < (int) v.size());
       return v[pos];
     }
 
