@@ -24,6 +24,7 @@
 #include "Image.h"
 #include "Table.h"
 #include "Text.h"
+#include "Selector.h"
 #include "Slate.h"
 
 namespace emp {
@@ -88,6 +89,9 @@ namespace UI {
     virtual Element * BuildElement(emp::UI::Text info, Element * fwd_parent) {
       return ForwardBuild(info, fwd_parent);
     }
+    virtual Element * BuildElement(emp::UI::Selector info, Element * fwd_parent) {
+      return ForwardBuild(info, fwd_parent);
+    }
     virtual Element * BuildElement(emp::UI::Slate info, Element * fwd_parent) {
       return ForwardBuild(info, fwd_parent);
     }
@@ -102,6 +106,7 @@ namespace UI {
     virtual Element & Append(emp::UI::Image info) { return AppendParent(info); }
     virtual Element & Append(emp::UI::Table info) { return AppendParent(info); }
     virtual Element & Append(emp::UI::Text info) { return AppendParent(info); }
+    virtual Element & Append(emp::UI::Selector info) { return AppendParent(info); }
     virtual Element & Append(emp::UI::Slate info) { return AppendParent(info); }
 
     // Convert arbitrary inputs to a string and try again!

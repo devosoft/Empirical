@@ -27,6 +27,7 @@ namespace UI {
   using ElementButton = emp::UI::ElementWrapper<emp::UI::Button>;
   using ElementCanvas = emp::UI::ElementWrapper<emp::UI::Canvas>;
   using ElementImage = emp::UI::ElementWrapper<emp::UI::Image>;
+  using ElementSelector = emp::UI::ElementWrapper<emp::UI::Selector>;
 
   class ElementSlate : public Element, public Slate {
   protected:
@@ -98,6 +99,11 @@ namespace UI {
       children.push_back(new_child);
       return *new_child;
     }
+    Element & Append(emp::UI::Selector info) override {
+      ElementSelector * new_child = new ElementSelector(info, this);
+      children.push_back(new_child);
+      return *new_child;
+    }
     Element & Append(emp::UI::Slate info) override {
       ElementSlate * new_child = new ElementSlate(info, this);
       children.push_back(new_child);
@@ -123,6 +129,9 @@ namespace UI {
     }
     Element * BuildElement(emp::UI::Image info, Element * fwd_parent) override {
       return new ElementImage(info, fwd_parent);
+    }
+    Element * BuildElement(emp::UI::Selector info, Element * fwd_parent) override {
+      return new ElementSelector(info, fwd_parent);
     }
     Element * BuildElement(emp::UI::Table info, Element * fwd_parent) override {
       return new ElementTable(info, fwd_parent);
@@ -174,6 +183,11 @@ public:
       emp_assert(dynamic_cast<ElementImage *>( element_dict[test_name] ) != NULL);
       return dynamic_cast<ElementImage&>( operator[](test_name) );
     }
+    ElementSelector & Selector(const std::string & test_name) {
+      // Assert that we have the correct type, then return it.
+      emp_assert(dynamic_cast<ElementSelector *>( element_dict[test_name] ) != NULL);
+      return dynamic_cast<ElementSelector&>( operator[](test_name) );
+    }
     ElementSlate & Slate(const std::string & test_name) {
       // Assert that we have the correct type, then return it.
       emp_assert(dynamic_cast<ElementSlate *>( element_dict[test_name] ) != NULL);
@@ -218,6 +232,11 @@ public:
       children.push_back(new_child);
       return *new_child;
     }
+    ElementSelector & Add(UI::Selector info) {
+      ElementSelector * new_child = new ElementSelector(info, this);
+      children.push_back(new_child);
+      return *new_child;
+    }
     ElementSlate & Add(UI::Slate info) {
       ElementSlate * new_child = new ElementSlate(info, this);
       children.push_back(new_child);
@@ -238,6 +257,7 @@ public:
     template <class... T> ElementButton& AddButton(T... args){return Add(UI::Button(args...));}
     template <class... T> ElementCanvas& AddCanvas(T... args){return Add(UI::Canvas(args...));}
     template <class... T> ElementImage&  AddImage(T... args) {return Add(UI::Image(args...));}
+    template <class... T> ElementSelector&AddSelector(T... args){return Add(UI::Selector(args...));}
     template <class... T> ElementSlate&  AddSlate(T... args) {return Add(UI::Slate(args...));}
     template <class... T> ElementTable&  AddTable(T... args) {return Add(UI::Table(args...));}
     template <class... T> ElementText&   AddText(T... args)  {return Add(UI::Text(args...));}
