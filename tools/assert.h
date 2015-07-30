@@ -14,6 +14,9 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
+
+#include "macros.h"
 
 // If we are in emscripten, make sure to include the header.
 #ifdef EMSCRIPTEN
@@ -36,13 +39,14 @@ namespace emp {
   int assert_count = 0;
 }
 
-// This assert uses the expression (to prevent compiler error), but should not
-// generate any assembly code.
+// Ideally, this assert should use the expression (to prevent compiler error), but should not
+// generate any assembly code.  For now, just make it blank (other options commented out)
+#define emp_assert(...)
 // #define emp_assert(EXPR) ((void) sizeof(EXPR) )
-#define emp_assert(EXPR) {                               \
-    constexpr bool __emp_assert_tmp = false && (EXPR);   \
-    (void) __emp_assert_tmp;                             \
-  }
+// #define emp_assert(EXPR, ...) {                          \
+//     constexpr bool __emp_assert_tmp = false && (EXPR);   \
+//     (void) __emp_assert_tmp;                             \
+//   }
 
 #elif defined(EMP_TDEBUG)           // EMP_NDEBUG not set, but EMP_TDEBUG is!
 
@@ -57,8 +61,8 @@ namespace emp {
   bool assert_last_fail = false;
 }
 
-// Generate a pop-up alert in a web browser if an assert it tripped.
-#define emp_assert(EXPR)                                                \
+// Generate a pop-up alert in a web browser if an assert is tripped.
+#define emp_assert_tdebug_impl(EXPR)                                    \
   do {                                                                  \
     if ( !(EXPR) ) {                                                    \
       emp::assert_last_fail = true;                                     \
@@ -71,6 +75,7 @@ namespace emp {
     }                                                                   \
   } while (0)
 
+#define emp_assert(...) emp_assert_tdebug_impl( EMP_GET_ARG_1(__VA_ARGS__, ~) )
 
 
 #elif EMSCRIPTEN  // Neither EMP_NDEBUG nor EMP_TDEBUG set, but compiling with Emscripten
@@ -80,17 +85,38 @@ namespace emp {
 }
 
 // Generate a pop-up alert in a web browser if an assert it tripped.
-#define emp_assert(EXPR)                                                \
-  do { if ( !(EXPR) ) {                                                 \
-      std::string msg = std::string("Assert Error (In ")                \
-        + std::string(__FILE__)                                         \
-        + std::string(" line ") + std::to_string(__LINE__)              \
-        + std::string("): ") + std::string(#EXPR);                      \
-      static int trip_count = 0;                                        \
-      if (trip_count++ < 3)                                             \
+#define emp_assert_impl_1(EXPR)                                      \
+  if ( !(EXPR) ) {                                                      \
+    std::string msg = std::string("Assert Error (In ")                  \
+      + std::string(__FILE__)                                           \
+      + std::string(" line ") + std::to_string(__LINE__)                \
+      + std::string("): ") + std::string(#EXPR) + "\n"                  \
+      + emp_assert_var_info.str();                                      \
+    static int trip_count = 0;                                          \
+    if (trip_count++ < 3)                                               \
       EM_ASM_ARGS({ msg = Pointer_stringify($0); alert(msg); }, msg.c_str()); \
-      abort(); }                                                        \
-  } while (0)
+    abort();                                                            \
+  }                                                                     \
+  
+#define emp_assert_var(VAR) emp_assert_var_info << #VAR << ": [" << VAR << "]\n";
+
+#define emp_assert_impl_2(EXPR, VAR) emp_assert_var(VAR); emp_assert_impl_1(EXPR)
+#define emp_assert_impl_3(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_2(EXPR,__VA_ARGS__)
+#define emp_assert_impl_4(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_3(EXPR,__VA_ARGS__)
+#define emp_assert_impl_5(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_4(EXPR,__VA_ARGS__)
+#define emp_assert_impl_6(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_5(EXPR,__VA_ARGS__)
+#define emp_assert_impl_7(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_6(EXPR,__VA_ARGS__)
+#define emp_assert_impl_8(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_7(EXPR,__VA_ARGS__)
+#define emp_assert_impl_9(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_8(EXPR,__VA_ARGS__)
+#define emp_assert_impl_10(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_9(EXPR,__VA_ARGS__)
+#define emp_assert_impl_11(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_10(EXPR,__VA_ARGS__)
+#define emp_assert_impl_12(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_11(EXPR,__VA_ARGS__)
+
+#define emp_assert(...)                                                 \
+  do {                                                                  \
+    std::stringstream emp_assert_var_info;                              \
+    EMP_ASSEMBLE_MACRO(emp_assert_impl_, EMP_COUNT_ARGS(__VA_ARGS__), __VA_ARGS__) \
+  } while(0)
 
 
 #else // We ARE in DEBUG, but NOT in EMSCRIPTEN
@@ -100,13 +126,16 @@ namespace emp {
 }
 
 // Generating an output to standard error is an assert is tripped.
-#define emp_assert(EXPR)                           \
+#define emp_assert_base_impl(EXPR)                 \
   do { if ( !(EXPR) ) {                            \
     std::cerr << "Assert Error (In " << __FILE__   \
               << " line " << __LINE__              \
               << "): " << #EXPR << std::endl;      \
     abort(); }                                     \
   } while (0)
+
+#define emp_assert(...) emp_assert_base_impl( EMP_GET_ARG_1(__VA_ARGS__, ~) )
+
 
 #endif // NDEBUG
 
