@@ -6,6 +6,7 @@
 //  Specs for the Selector widget.
 //
 
+#include "../emtools/JSWrap.h"
 #include "../tools/vector.h"
 
 #include "Widget.h"
@@ -15,13 +16,14 @@ namespace UI {
 
   class Selector : public internal::Widget<Selector> {
   protected:
-    emp::vector<std::string> options;
+    emp::vector<std::string> options;               // What are the options to choose from?
+    emp::vector<std::function<void()> > callbacks;  // Which funtion to run for each option?
+    int select_id;                                  // Which index is currently selected?
 
     bool autofocus;
     bool disabled;
     
     uint32_t callback_id;
-    std::string onchange_info;
       
     void WriteHTML(std::ostream & os) {
       os << "<select";                                      // Start the select tag.
@@ -29,36 +31,32 @@ namespace UI {
       os << " id=\"" << div_id << obj_ext << "\"";          // Indicate ID.
 
       // Indicate action on change.
-      os << " onchange=\"" << onchange_info << "\">";
+      os << " onchange=\"emp.Callback(" << callback_id << ", this.selectedIndex)\">";
 
       // List out options
       for (int i = 0; i < (int) options.size(); i++) {
-        os << "<option value=\"" << i << "\">" << options[i] << "</option>";
+        os << "<option value=\"" << i;
+        if (i == select_id) os << " selected";
+        os << "\">" << options[i] << "</option>";
       }
       os << "</select>";
     }
+
+    void DoChange(int new_id) {
+      select_id = new_id;
+      if (callbacks[new_id]) callbacks[new_id]();
+    }
       
   public:
-    Selector(const std::string & in_cb_info, const emp::vector<std::string> & in_options,
-             const std::string & in_name="")
+    Selector(const std::string & in_name="")
       : Widget(in_name)
-      , options(in_options)
+      , select_id(0)
       , autofocus(false), disabled(false)
-      , callback_id(0)
-      , onchange_info(in_cb_info)
     {
+      callback_id = JSWrap( std::function<void(int)>([this](int new_id){DoChange(new_id);}) );
       obj_ext = "__s";
     }
-    Selector(const std::function<void(int)> & in_cb, const emp::vector<std::string> & in_options,
-           const std::string & in_name="")
-      : Selector(std::string(""), in_options, in_name)
-    {
-      obj_ext = "__s";
-      callback_id = JSWrap(in_cb);
-      onchange_info = std::string("emp.Callback(")
-        + std::to_string(callback_id)
-        + ", this.selectedIndex)";
-    }
+
     ~Selector() {
       // @CAO Can't delete unless we're sure no other copies of Selector are using id...
       //emp::JSDelete(callback_id);  // Delete callback wrapper.
@@ -67,28 +65,33 @@ namespace UI {
     Selector & Callback(const std::function<void(int)> & in_cb) {
       if (callback_id) emp::JSDelete(callback_id);    // Delete previous callback wrapper.
       callback_id = JSWrap(in_cb);   // Save id for callback trigger.
-      onchange_info = std::string("emp.Callback(")
-        + std::to_string(callback_id)
-        + ", this.selectedIndex)";
-      return *this;
-    }
-    Selector & Callback(const std::string in_cb_info) {
-      if (callback_id) emp::JSDelete(callback_id);  // Delete previous callback wrapper.
-      callback_id = 0;   // No ID currently in callback.
-      onchange_info = in_cb_info;
       return *this;
     }
     
-    Selector & SetOption(const std::string & in_option, int opt_id=-1) {
+    int GetSelectID() const { return select_id; }
+    int GetNumOptions() const { return (int) options.size(); }
+    const std::string & GetOption(int id) const { return options[id]; }
+
+    Selector & SetOption(const std::string & in_option,
+                         const std::function<void()> & in_cb,
+                         int opt_id=-1) {
       // If no option id was specified, choose the next one.
       if (opt_id < 0) opt_id = (int) options.size();
 
       // If we need more room for options, increase the array size.
-      if (opt_id >= (int) options.size()) options.resize(opt_id+1);
+      if (opt_id >= (int) options.size()) {
+        options.resize(opt_id+1);
+        callbacks.resize(opt_id+1);
+      }
       options[opt_id] = in_option;
+      callbacks[opt_id] = in_cb;
       return *this;
     }
     
+    Selector & SetOption(const std::string & in_option, int opt_id=-1) {
+      return SetOption(in_option, std::function<void()>([](){}), opt_id);
+    }
+
     Selector & Autofocus(bool in_af) { autofocus = in_af; return *this; }
     Selector & Disabled(bool in_dis) { disabled = in_dis; return *this; }
     
