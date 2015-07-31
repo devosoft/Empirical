@@ -36,26 +36,18 @@ namespace web {
     
     class Widget {
     protected:
-    public:
-    };
-
-    // WidgetCore is a template that provides accessors into Widget with a derived return type.
-    
-    template <typename RETURN_TYPE>
-    class WidgetCore {
-    protected: 
       std::string id;     // ID used for this element.
       UI::Style style;
 
-      // WidgetCore cannot be built unless within derived class, so constructors are protected
-      WidgetCore(const std::string & in_id="") : id(in_id) {
-        EMP_TRACK_CONSTRUCT(WebWidgetCore);
+      // Widget cannot be built unless within derived class, so constructors are protected
+      Widget(const std::string & in_id="") : id(in_id) {
+        EMP_TRACK_CONSTRUCT(WebWidget);
         if (id == "") id = emp::to_string("emp__", NextWidgetID());
       }
-      WidgetCore(const WidgetCore & in) : id(in.id), style(in.style) {
-        EMP_TRACK_CONSTRUCT(WebWidgetCore);
+      Widget(const Widget & in) : id(in.id), style(in.style) {
+        EMP_TRACK_CONSTRUCT(WebWidget);
       }
-      virtual ~WidgetCore() { EMP_TRACK_DESTRUCT(WebWidgetCore); }
+      virtual ~Widget() { EMP_TRACK_DESTRUCT(WebWidget); }
 
     public:
       const std::string & GetID() const { return id; }
@@ -64,6 +56,19 @@ namespace web {
       virtual std::string CSS(const std::string & setting) { return style.Get(setting); }
       bool HasCSS(const std::string & setting) { return style.Has(setting); }
       
+    };
+
+    // WidgetCore is a template that provides accessors into Widget with a derived return type.
+    
+    template <typename RETURN_TYPE>
+    class WidgetCore : public Widget {
+    protected: 
+      // WidgetCore cannot be built unless within derived class, so constructors are protected
+      WidgetCore(const std::string & in_id="") : Widget(in_id) { ; }
+      WidgetCore(const WidgetCore & in) : Widget(in) { ; }
+      virtual ~WidgetCore() { ; }
+
+    public:
       template <typename SETTING_TYPE>
       RETURN_TYPE & CSS(const std::string & setting, SETTING_TYPE && value) {
         style.Set(setting, value);
@@ -127,13 +132,6 @@ namespace web {
       RETURN_TYPE & Background(const std::string & v) { return CSS("background-color", v); }
       RETURN_TYPE & Color(const std::string & v) { return CSS("color", v); }
       RETURN_TYPE & Opacity(double v) { return CSS("opacity", v); }
-      
-      void TriggerCSS() {
-        std::string obj_id = div_id + obj_ext;
-        style.Apply(obj_id);
-      }
-      void TriggerJS() {
-      }
     };
     
   };
