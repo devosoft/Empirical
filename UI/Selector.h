@@ -43,6 +43,7 @@ namespace UI {
     }
 
     void DoChange(int new_id) {
+      emp::Alert("Changing to ", new_id);
       select_id = new_id;
       if (callbacks[new_id]) callbacks[new_id]();
     }
@@ -57,17 +58,21 @@ namespace UI {
       obj_ext = "__s";
     }
 
+    Selector(const Selector & _in)
+      : Widget(_in)
+      , options(_in.options), callbacks(_in.callbacks)
+      , select_id(_in.select_id)
+      , autofocus(_in.autofocus), disabled(_in.disabled)
+    {
+      callback_id = JSWrap( std::function<void(int)>([this](int new_id){DoChange(new_id);}) );
+      obj_ext = "__s";      
+    }
+
     ~Selector() {
       // @CAO Can't delete unless we're sure no other copies of Selector are using id...
       //emp::JSDelete(callback_id);  // Delete callback wrapper.
     }
 
-    Selector & Callback(const std::function<void(int)> & in_cb) {
-      if (callback_id) emp::JSDelete(callback_id);    // Delete previous callback wrapper.
-      callback_id = JSWrap(in_cb);   // Save id for callback trigger.
-      return *this;
-    }
-    
     int GetSelectID() const { return select_id; }
     int GetNumOptions() const { return (int) options.size(); }
     const std::string & GetOption(int id) const { return options[id]; }
