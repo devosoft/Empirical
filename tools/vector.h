@@ -69,6 +69,9 @@ namespace emp {
     template <typename T2>
     vector & push_back(T2 && in) { v.push_back(std::forward<T2>(in)); return *this; }
 
+    template <typename... T2>
+    vector & emplace_back(T2 &&... in) { v.push_back(std::forward<T2>(in)...); return *this; }
+
     auto begin() -> decltype(v.begin()) { return v.begin(); }
     auto end() -> decltype(v.end()) { return v.end(); }
     auto begin() const -> const decltype(v.begin()) { return v.begin(); }
