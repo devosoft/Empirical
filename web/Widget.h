@@ -10,8 +10,8 @@
 //  WidgetFacet is a template that allows Set* methods to return derived return-type.
 //
 //  In other files, Widgets will be used to define specific elements.
-//  ELEMENTCore maintains all information about the specific widget.
-//  ELEMENT creates an interface to ELEMENTCore so multiple elements can use the same core.
+//  ELEMENTInfo maintains information about the specific widget (derived from WidgetInfo)
+//  ELEMENT interfaces to ELEMENTInfo so multiple elements use same core; derived from WidgetFacet
 //
 
 
@@ -57,13 +57,13 @@ namespace web {
       // By default, elements should forward unknown appends to their parents.
       virtual Widget & Append(const std::string & text) { return ForwardAppend(text); }
       virtual Widget & Append(const std::function<std::string()> & fn) { return ForwardAppend(fn); }
-      virtual Widget & Append(emp::web::Button & info) { return ForwardAppend(info); }
-      virtual Widget & Append(emp::web::Canvas & info) { return ForwardAppend(info); }
-      virtual Widget & Append(emp::web::Image & info) { return ForwardAppend(info); }
-      virtual Widget & Append(emp::web::Table & info) { return ForwardAppend(info); }
-      virtual Widget & Append(emp::web::Text & info) { return ForwardAppend(info); }
-      virtual Widget & Append(emp::web::Selector & info) { return ForwardAppend(info); }
-      virtual Widget & Append(emp::web::Slate & info) { return ForwardAppend(info); }
+      // virtual Widget & Append(emp::web::Button & info) { return ForwardAppend(info); }
+      // virtual Widget & Append(emp::web::Canvas & info) { return ForwardAppend(info); }
+      // virtual Widget & Append(emp::web::Image & info) { return ForwardAppend(info); }
+      // virtual Widget & Append(emp::web::Selector & info) { return ForwardAppend(info); }
+      // virtual Widget & Append(emp::web::Slate & info) { return ForwardAppend(info); }
+      // virtual Widget & Append(emp::web::Table & info) { return ForwardAppend(info); }
+      // virtual Widget & Append(emp::web::Text & info) { return ForwardAppend(info); }
 
       // Convert arbitrary inputs to a string and try again!
       virtual Widget & Append(char in_char) { return Append(emp::to_string(in_char)); }
@@ -113,7 +113,7 @@ namespace web {
 
       // Basic info about a widget
       std::string id;                 // ID used for associated element.
-      UI::Style style;                // CSS Style
+      Style style;                    // CSS Style
       std::stringstream HTML;         // Full HTML contents
 
       // Track hiearchy
@@ -213,6 +213,9 @@ namespace web {
       WidgetFacet(const std::string & in_id="") : Widget(in_id) { ; }
       WidgetFacet(const WidgetFacet & in) : Widget(in) { ; }
       virtual ~WidgetFacet() { ; }
+
+      emp::vector<Widget> & Children() { return info->children; }
+      Widget & AddChild(Widget & in) { info->children.emplace_back(in); return in; }
 
     public:
       template <typename SETTING_TYPE>
