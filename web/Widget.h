@@ -48,28 +48,12 @@ namespace web {
 
     // Widget is a smart pointer to a WidgetInfo object, plus some basic accessors.
     class Widget {
+      friend WidgetInfo;
     protected:
       WidgetInfo * info;
 
       // If an Append doesn't work with current class, forward it to the parent.
       template <typename FWD_TYPE> Widget & ForwardAppend(FWD_TYPE && arg);
-
-      // By default, elements should forward unknown appends to their parents.
-      virtual Widget & Append(const std::string & text) { return ForwardAppend(text); }
-      virtual Widget & Append(const std::function<std::string()> & fn) { return ForwardAppend(fn); }
-      // virtual Widget & Append(emp::web::Button & info) { return ForwardAppend(info); }
-      // virtual Widget & Append(emp::web::Canvas & info) { return ForwardAppend(info); }
-      // virtual Widget & Append(emp::web::Image & info) { return ForwardAppend(info); }
-      // virtual Widget & Append(emp::web::Selector & info) { return ForwardAppend(info); }
-      // virtual Widget & Append(emp::web::Slate & info) { return ForwardAppend(info); }
-      // virtual Widget & Append(emp::web::Table & info) { return ForwardAppend(info); }
-      // virtual Widget & Append(emp::web::Text & info) { return ForwardAppend(info); }
-
-      // Convert arbitrary inputs to a string and try again!
-      virtual Widget & Append(char in_char) { return Append(emp::to_string(in_char)); }
-      virtual Widget & Append(double in_num) { return Append(emp::to_string(in_num)); }
-      virtual Widget & Append(int in_num) { return Append(emp::to_string(in_num)); }
-      virtual Widget & Append(uint32_t in_num) { return Append(emp::to_string(in_num)); }
 
       // Register is used so we can lookup classes by name.
       // Overridden in classes that manage multiple element; below is the default version.
@@ -99,6 +83,9 @@ namespace web {
       bool operator==(const Widget & in) const { return info == in.info; }
       bool operator!=(const Widget & in) const { return info != in.info; }
       operator bool() const { return info != nullptr; }
+
+      // Setup << operator to redirect to Append.
+      template <typename IN_TYPE> Widget & operator<<(IN_TYPE && in_val);
     };
     
 
@@ -136,20 +123,37 @@ namespace web {
 
       virtual ~WidgetInfo() { EMP_TRACK_DESTRUCT(WebWidgetInfo); }
 
+      // By default, elements should forward unknown appends to their parents.
+      virtual Widget & Append(const std::string & text) { return ForwardAppend(text); }
+      virtual Widget & Append(const std::function<std::string()> & fn) { return ForwardAppend(fn); }
+      // virtual Widget & Append(emp::web::Button & info) { return ForwardAppend(info); }
+      // virtual Widget & Append(emp::web::Canvas & info) { return ForwardAppend(info); }
+      // virtual Widget & Append(emp::web::Image & info) { return ForwardAppend(info); }
+      // virtual Widget & Append(emp::web::Selector & info) { return ForwardAppend(info); }
+      // virtual Widget & Append(emp::web::Slate & info) { return ForwardAppend(info); }
+      // virtual Widget & Append(emp::web::Table & info) { return ForwardAppend(info); }
+      // virtual Widget & Append(emp::web::Text & info) { return ForwardAppend(info); }
+
+      // Convert arbitrary inputs to a string and try again!
+      virtual Widget & Append(char in_char) { return Append(emp::to_string(in_char)); }
+      virtual Widget & Append(double in_num) { return Append(emp::to_string(in_num)); }
+      virtual Widget & Append(int in_num) { return Append(emp::to_string(in_num)); }
+      virtual Widget & Append(uint32_t in_num) { return Append(emp::to_string(in_num)); }
+
+      // If an Append doesn't work with current class, forward it to the parent.
+      template <typename FWD_TYPE>
+      Widget & ForwardAppend(FWD_TYPE && arg) {
+        emp_assert(parent && "Trying to forward append to parent, but no parent!");
+        return parent.info->Append(std::forward<FWD_TYPE>(arg));
+      }
+      
     public:
-      static std::string TypeName() { return "Web::WidgetInfo"; }
+      virtual std::string GetType() { return "web::WidgetInfo"; }
     };
 
 
     // Implementation of Widget methods...
 
-    // If an Append doesn't work with current class, forward it to the parent.
-    template <typename FWD_TYPE>
-    Widget & Widget::ForwardAppend(FWD_TYPE && arg) {
-      emp_assert(info->parent && "Trying to forward append to parent, but no parent!");
-      return info->parent.Append(std::forward<FWD_TYPE>(arg));
-    }
-    
     void Widget::Register(Widget & new_widget) {
       if (info->parent) info->parent.Register(new_widget);
     }
@@ -202,6 +206,10 @@ namespace web {
       return false;
     }
 
+    template <typename IN_TYPE>
+    Widget & Widget::operator<<(IN_TYPE && in_val) {
+      return info->Append(std::forward<IN_TYPE>(in_val));
+    }
 
 
     // WidgetFacet is a template that provides accessors into Widget with a derived return type.
