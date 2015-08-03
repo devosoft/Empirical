@@ -61,9 +61,10 @@ namespace web {
       virtual void Unregister(Widget & old_widget);
 
     public:
-      Widget() : info(nullptr) { ; }
       Widget(const std::string & id);
-      Widget(const Widget & in);
+      Widget(WidgetInfo * in_info=nullptr);
+      Widget(const Widget & in) : Widget(in.info) { ; }
+      Widget & operator=(const Widget & in);
       virtual ~Widget();
 
       void SetInfo(WidgetInfo * in_info);
@@ -85,7 +86,7 @@ namespace web {
       operator bool() const { return info != nullptr; }
 
       // Setup << operator to redirect to Append.
-      template <typename IN_TYPE> Widget & operator<<(IN_TYPE && in_val);
+      template <typename IN_TYPE> Widget operator<<(IN_TYPE && in_val);
     };
     
 
@@ -118,31 +119,32 @@ namespace web {
         if (id == "") id = NextWidgetID();
       }
 
-      // No copies allowed
-      WidgetInfo(const Widget &) = delete;
+      // No copies of INFO allowed
+      WidgetInfo(const WidgetInfo &) = delete;
+      WidgetInfo & operator=(const WidgetInfo &) = delete;
 
       virtual ~WidgetInfo() { EMP_TRACK_DESTRUCT(WebWidgetInfo); }
 
       // By default, elements should forward unknown appends to their parents.
-      virtual Widget & Append(const std::string & text) { return ForwardAppend(text); }
-      virtual Widget & Append(const std::function<std::string()> & fn) { return ForwardAppend(fn); }
-      // virtual Widget & Append(emp::web::Button & info) { return ForwardAppend(info); }
-      // virtual Widget & Append(emp::web::Canvas & info) { return ForwardAppend(info); }
-      // virtual Widget & Append(emp::web::Image & info) { return ForwardAppend(info); }
-      // virtual Widget & Append(emp::web::Selector & info) { return ForwardAppend(info); }
-      // virtual Widget & Append(emp::web::Slate & info) { return ForwardAppend(info); }
-      // virtual Widget & Append(emp::web::Table & info) { return ForwardAppend(info); }
-      // virtual Widget & Append(emp::web::Text & info) { return ForwardAppend(info); }
+      virtual Widget Append(const std::string & text) { return ForwardAppend(text); }
+      virtual Widget Append(const std::function<std::string()> & fn) { return ForwardAppend(fn); }
+      // virtual Widget Append(emp::web::Button & info) { return ForwardAppend(info); }
+      // virtual Widget Append(emp::web::Canvas & info) { return ForwardAppend(info); }
+      // virtual Widget Append(emp::web::Image & info) { return ForwardAppend(info); }
+      // virtual Widget Append(emp::web::Selector & info) { return ForwardAppend(info); }
+      // virtual Widget Append(emp::web::Slate & info) { return ForwardAppend(info); }
+      // virtual Widget Append(emp::web::Table & info) { return ForwardAppend(info); }
+      // virtual Widget Append(emp::web::Text & info) { return ForwardAppend(info); }
 
       // Convert arbitrary inputs to a string and try again!
-      virtual Widget & Append(char in_char) { return Append(emp::to_string(in_char)); }
-      virtual Widget & Append(double in_num) { return Append(emp::to_string(in_num)); }
-      virtual Widget & Append(int in_num) { return Append(emp::to_string(in_num)); }
-      virtual Widget & Append(uint32_t in_num) { return Append(emp::to_string(in_num)); }
+      virtual Widget Append(char in_char) { return Append(emp::to_string(in_char)); }
+      virtual Widget Append(double in_num) { return Append(emp::to_string(in_num)); }
+      virtual Widget Append(int in_num) { return Append(emp::to_string(in_num)); }
+      virtual Widget Append(uint32_t in_num) { return Append(emp::to_string(in_num)); }
 
       // If an Append doesn't work with current class, forward it to the parent.
       template <typename FWD_TYPE>
-      Widget & ForwardAppend(FWD_TYPE && arg) {
+      Widget ForwardAppend(FWD_TYPE && arg) {
         emp_assert(parent && "Trying to forward append to parent, but no parent!");
         return parent.info->Append(std::forward<FWD_TYPE>(arg));
       }
@@ -166,10 +168,23 @@ namespace web {
       // We are creating a new widget; make sure to assign info pointer in derived class.
     }
 
-    Widget::Widget(const Widget & in) {
-      // We are copying a Widget; should point to same core information.
+    Widget::Widget(WidgetInfo * in_info) {
+      info = in_info;
+      if (info) info->ptr_count++;
+    }
+
+    Widget & Widget::operator=(const Widget & in) {
+      // Clean up the old info that was previously pointed to.
+      if (info) {
+        info->ptr_count--;
+        if (info->ptr_count == 0) delete info;
+      }
+
+      // Setup new info.
       info = in.info;
       if (info) info->ptr_count++;
+
+      return *this;
     }
 
     Widget::~Widget() {
@@ -207,7 +222,7 @@ namespace web {
     }
 
     template <typename IN_TYPE>
-    Widget & Widget::operator<<(IN_TYPE && in_val) {
+    Widget Widget::operator<<(IN_TYPE && in_val) {
       return info->Append(std::forward<IN_TYPE>(in_val));
     }
 
@@ -220,6 +235,8 @@ namespace web {
       // WidgetFacet cannot be built unless within derived class, so constructors are protected
       WidgetFacet(const std::string & in_id="") : Widget(in_id) { ; }
       WidgetFacet(const WidgetFacet & in) : Widget(in) { ; }
+      WidgetFacet(WidgetInfo * in_info) : Widget(in_info) { ; }
+      WidgetFacet & operator=(const WidgetFacet & in) { Widget::operator=(in); return *this; }
       virtual ~WidgetFacet() { ; }
 
       emp::vector<Widget> & Children() { return info->children; }
