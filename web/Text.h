@@ -20,27 +20,26 @@ namespace web {
   protected:
     DynamicStringSet strings;
 
-    Element & Append(const std::string & in_text) override {
-      strings.Append(in_text);
-      return *this;
-    }
-
-    Element & Append(const std::function<std::string()> & in_fun) override {
-      strings.Append(in_fun);
-      return *this;
-    }
+    internal::Widget Append(const std::string & in_text) override;
+    internal::Widget Append(const std::function<std::string()> & in_fun) override;
 
   public:
-    virtual std::string GetType() override { return "web::TextInfo"; }
+    TextInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
+    TextInfo(const TextInfo &) = delete;               // No copies of INFO allowed
+    TextInfo & operator=(const TextInfo &) = delete;   // No copies of INFO allowed
+    virtual ~TextInfo() { ; }
 
+    virtual std::string GetType() override { return "web::TextInfo"; }
   };
 
 
   class Text : public internal::WidgetFacet<Text> {
+    friend TextInfo;
   protected:
     // Get a properly cast version of indo.
     TextInfo * Info() { return (TextInfo *) info; }
 
+    Text(TextInfo * in_info) : WidgetFacet(in_info) { ; }
   public:
     Text(const std::string & in_name) : WidgetFacet(in_name) {
       // When a name is provided, create an associated Widget info.
@@ -54,6 +53,16 @@ namespace web {
     void Clear() { Info()->strings.Clear(); }
 
   };  
+
+  internal::Widget TextInfo::Append(const std::string & in_text) {
+    strings.Append(in_text);
+    return web::Text(this);
+  }
+
+  internal::Widget TextInfo::Append(const std::function<std::string()> & in_fun) {
+    strings.Append(in_fun);
+    return web::Text(this);
+  }
 
 };
 };
