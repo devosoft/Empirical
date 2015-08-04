@@ -52,12 +52,7 @@ namespace emp {
     bool operator>=(const emp::vector<T> & in) const { return v >= in.v; }
 
     T & operator[](int pos) {
-#ifndef NDEBUG
-      if (pos < 0 || pos >= (int) v.size()) {
-        emp::Alert("Vector overflow.  Indexing to ", pos, " in array of size ", v.size(), ".");
-      }
-#endif      
-      //emp_assert(pos >= 0 && pos < (int) v.size());
+      emp_assert(pos >= 0 && pos < (int) v.size(), pos, v.size());
       return v[pos];
     }
 
