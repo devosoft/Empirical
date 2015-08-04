@@ -60,11 +60,6 @@ namespace web {
       // If an Append doesn't work with current class, forward it to the parent.
       template <typename FWD_TYPE> Widget & ForwardAppend(FWD_TYPE && arg);
 
-      // Register is used so we can lookup classes by name.
-      // Overridden in classes that manage multiple element; below is the default version.
-      virtual void Register(Widget & new_widget);
-      virtual void Unregister(Widget & old_widget);
-
       // Activates need to be delayed until the document is ready, when DoActivate will be called.
       void DoActivate();
 
@@ -92,6 +87,7 @@ namespace web {
       bool HasCSS(const std::string & setting);
       bool HasChild(const Widget & test_child);
 
+      WidgetInfo * operator->() { return info; }
       bool operator==(const Widget & in) const { return info == in.info; }
       bool operator!=(const Widget & in) const { return info != in.info; }
       operator bool() const { return info != nullptr; }
@@ -143,6 +139,10 @@ namespace web {
 
       virtual ~WidgetInfo() { EMP_TRACK_DESTRUCT(WebWidgetInfo); }
 
+      void AddChild(Widget in) {
+        children.emplace_back(in);
+      }
+
       // By default, elements should forward unknown appends to their parents.
       virtual Widget Append(const std::string & text) { return ForwardAppend(text); }
       virtual Widget Append(const std::function<std::string()> & fn) { return ForwardAppend(fn); }
@@ -184,18 +184,16 @@ namespace web {
       
     public:
       virtual std::string GetType() { return "web::WidgetInfo"; }
+
+      // Register is used so we can lookup classes by name.
+      // Overridden in classes that manage multiple element; below is the default version.
+      virtual void Register(Widget & new_widget) { if (parent) parent->Register(new_widget); }
+      virtual void Unregister(Widget & old_widget) { if (parent) parent->Unregister(old_widget); }
+    
     };
 
 
     // Implementation of Widget methods...
-
-    void Widget::Register(Widget & new_widget) {
-      if (info->parent) info->parent.Register(new_widget);
-    }
-    void Widget::Unregister(Widget & old_widget) {
-      if (info->parent) info->parent.Unregister(old_widget);
-    }
-    
 
     Widget::Widget(const std::string & id) {
       // We are creating a new widget; in derived class, make sure:
@@ -288,7 +286,6 @@ namespace web {
       virtual ~WidgetFacet() { ; }
 
       emp::vector<Widget> & Children() { return info->children; }
-      Widget & AddChild(Widget & in) { info->children.emplace_back(in); return in; }
 
     public:
       template <typename SETTING_TYPE>
