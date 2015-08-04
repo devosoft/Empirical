@@ -20,15 +20,23 @@ namespace web {
   protected:
     DynamicStringSet strings;
 
-    internal::Widget Append(const std::string & in_text) override;
-    internal::Widget Append(const std::function<std::string()> & in_fun) override;
-
-  public:
     TextInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
     TextInfo(const TextInfo &) = delete;               // No copies of INFO allowed
     TextInfo & operator=(const TextInfo &) = delete;   // No copies of INFO allowed
     virtual ~TextInfo() { ; }
 
+    internal::Widget Append(const std::string & in_text) override;
+    internal::Widget Append(const std::function<std::string()> & in_fun) override;
+
+    // All derived widgets must suply a mechanism for providing associated HTML code.
+    virtual void GetHTML(std::stringstream & HTML) override {
+      HTML.str("");       // Clear the current text.
+      HTML << "<span id=\'" << id << "'>"   // Initial span tag to keep id.
+           << strings                       // Save the current value of all of the strings.      
+           << "</span>";                    // Close span tag.
+    }
+
+  public:
     virtual std::string GetType() override { return "web::TextInfo"; }
   };
 
@@ -41,16 +49,16 @@ namespace web {
 
     Text(TextInfo * in_info) : WidgetFacet(in_info) { ; }
   public:
-    Text(const std::string & in_name) : WidgetFacet(in_name) {
+    Text(const std::string & in_id) : WidgetFacet(in_id) {
       // When a name is provided, create an associated Widget info.
-      info = new TextInfo(in_name);
+      info = new TextInfo(in_id);
     }
     Text(const Text & in) : WidgetFacet(in) { ; }
     ~Text() { ; }
 
     virtual bool IsText() const { return true; }
 
-    void Clear() { Info()->strings.Clear(); }
+    Text & Clear() { Info()->strings.Clear(); return *this; }
 
   };  
 
