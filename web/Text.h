@@ -49,7 +49,7 @@ namespace web {
 
     Text(TextInfo * in_info) : WidgetFacet(in_info) { ; }
   public:
-    Text(const std::string & in_id) : WidgetFacet(in_id) {
+    Text(const std::string & in_id="") : WidgetFacet(in_id) {
       // When a name is provided, create an associated Widget info.
       info = new TextInfo(in_id);
     }
