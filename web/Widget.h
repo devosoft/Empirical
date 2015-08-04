@@ -13,13 +13,18 @@
 //  ELEMENTInfo maintains information about the specific widget (derived from WidgetInfo)
 //  ELEMENT interfaces to ELEMENTInfo so multiple elements use same core; derived from WidgetFacet
 //
-
+//
+//  Development notes:
+//  * Change 'active' flag to an activity state enum, which can include INACTIVE,
+//    WAITING (for document ready), LIVE, and ERROR (due to not having an element?).
+//
 
 #include <string>
 
 #include "../tools/mem_track.h"
 #include "../tools/vector.h"
 
+#include "events.h"
 #include "Style.h"
 
 
@@ -60,15 +65,21 @@ namespace web {
       virtual void Register(Widget & new_widget);
       virtual void Unregister(Widget & old_widget);
 
+      // Activates need to be delayed until the document is ready, when DoActivate will be called.
+      void DoActivate();
+
+      Widget & SetInfo(WidgetInfo * in_info);
+
     public:
       Widget(const std::string & id);
       Widget(WidgetInfo * in_info=nullptr);
       Widget(const Widget & in) : Widget(in.info) { ; }
-      Widget & operator=(const Widget & in);
+      Widget & operator=(const Widget & in) { return SetInfo(in.info); }
+      
       virtual ~Widget();
 
-      void SetInfo(WidgetInfo * in_info);
-      bool IsNull() { return info == nullptr; }
+      bool IsNull() const { return info == nullptr; }
+      bool IsActive() const;
 
       virtual bool IsSlate() const { return false; }
       virtual bool IsTable() const { return false; }
@@ -84,6 +95,14 @@ namespace web {
       bool operator==(const Widget & in) const { return info == in.info; }
       bool operator!=(const Widget & in) const { return info != in.info; }
       operator bool() const { return info != nullptr; }
+
+      // An active widget makes live changes to the webpage (once document is ready)
+      // An inactive widget just records changes internally.
+      void Activate() {
+        OnDocumentReady( std::function<void(void)>([this](){ this->DoActivate(); }) );
+      }
+      void Deactivate();
+      bool ToggleActive();
 
       // Setup << operator to redirect to Append.
       template <typename IN_TYPE> Widget operator<<(IN_TYPE && in_val);
@@ -102,7 +121,6 @@ namespace web {
       // Basic info about a widget
       std::string id;                 // ID used for associated element.
       Style style;                    // CSS Style
-      std::stringstream HTML;         // Full HTML contents
 
       // Track hiearchy
       Widget parent;                  // Which widget is this one contained within?
@@ -113,7 +131,7 @@ namespace web {
 
       // WidgetInfo cannot be built unless within derived class, so constructor is protected
       WidgetInfo(const std::string & in_id="")
-        : ptr_count(0), id(in_id), parent(nullptr), append_ok(true), active(false)
+        : ptr_count(1), id(in_id), parent(nullptr), append_ok(true), active(false)
       {
         EMP_TRACK_CONSTRUCT(WebWidgetInfo);
         if (id == "") id = NextWidgetID();
@@ -148,6 +166,21 @@ namespace web {
         emp_assert(parent && "Trying to forward append to parent, but no parent!");
         return parent.info->Append(std::forward<FWD_TYPE>(arg));
       }
+
+      // All derived widgets must suply a mechanism for providing associated HTML code.
+      virtual void GetHTML(std::stringstream & ss) = 0;
+
+      // Assume that the associated ID exists and replace it with the currnet HTML code.
+      void ReplaceHTML() {
+        emp_assert(active == true);
+        std::stringstream ss;
+        GetHTML(ss);
+        EM_ASM_ARGS({
+            var widget_id = Pointer_stringify($0);
+            var out_html = Pointer_stringify($1);
+            $('#' + widget_id).replaceWith(out_html);
+          }, id.c_str(), ss.str().c_str());
+      }
       
     public:
       virtual std::string GetType() { return "web::WidgetInfo"; }
@@ -165,26 +198,14 @@ namespace web {
     
 
     Widget::Widget(const std::string & id) {
-      // We are creating a new widget; make sure to assign info pointer in derived class.
+      // We are creating a new widget; in derived class, make sure:
+      // ... to assign info pointer to new object of proper *Info type
+      // ... NOT to increment info->ptr_count since it's initialized to 1.
     }
 
     Widget::Widget(WidgetInfo * in_info) {
       info = in_info;
       if (info) info->ptr_count++;
-    }
-
-    Widget & Widget::operator=(const Widget & in) {
-      // Clean up the old info that was previously pointed to.
-      if (info) {
-        info->ptr_count--;
-        if (info->ptr_count == 0) delete info;
-      }
-
-      // Setup new info.
-      info = in.info;
-      if (info) info->ptr_count++;
-
-      return *this;
     }
 
     Widget::~Widget() {
@@ -195,15 +216,25 @@ namespace web {
       }
     }
 
-    void Widget::SetInfo(WidgetInfo * in_info) {
-      if (info == in_info) return;
+    Widget & Widget::SetInfo(WidgetInfo * in_info) {
+      if (info == in_info) return *this;
       
+      // Clean up the old info that was previously pointed to.
       if (info) {
         info->ptr_count--;
         if (info->ptr_count == 0) delete info;
       }
+
+      // Setup new info.
       info = in_info;
       if (info) info->ptr_count++;
+
+      return *this;
+    }
+
+    bool Widget::IsActive() const {
+      if (!info) return false;
+      return info->active;
     }
 
     bool Widget::AppendOK() const { return info->append_ok; }
@@ -219,6 +250,23 @@ namespace web {
       if (!info) return false;
       for (const Widget & c : info->children) if (c == test_child) return true;
       return false;
+    }
+    
+    void Widget::DoActivate() {
+      emp_assert(info);
+      info->active = true;
+      info->ReplaceHTML();   // Print full contents now!
+    }
+    void Widget::Deactivate() {
+      emp_assert(info && info->active, info);
+      info->active = false;
+      // @CAO Clear contents now????
+    }
+    bool Widget::ToggleActive() {
+      emp_assert(info);
+      if (info->active == true) Deactivate();
+      else Activate();
+      return info->active;
     }
 
     template <typename IN_TYPE>
