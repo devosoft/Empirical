@@ -30,7 +30,7 @@ namespace web {
 
     // All derived widgets must suply a mechanism for providing associated HTML code.
     virtual void GetHTML(std::stringstream & HTML) override {
-      HTML.str("");       // Clear the current text.
+      HTML.str("");                         // Clear the current text.
       HTML << "<span id=\'" << id << "'>"   // Initial span tag to keep id.
            << strings                       // Save the current value of all of the strings.      
            << "</span>";                    // Close span tag.
@@ -63,12 +63,14 @@ namespace web {
   };  
 
   internal::Widget TextInfo::Append(const std::string & in_text) {
-    strings.Append(in_text);
+    strings.Append(in_text);     // Record the new string being added.
+    if (active) ReplaceHTML();   // If node is active, immediately redraw!
     return web::Text(this);
   }
 
   internal::Widget TextInfo::Append(const std::function<std::string()> & in_fun) {
-    strings.Append(in_fun);
+    strings.Append(in_fun);      // Record the new function being added.
+    if (active) ReplaceHTML();   // If node is active, immediately redraw!
     return web::Text(this);
   }
 
