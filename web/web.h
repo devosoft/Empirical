@@ -2,6 +2,7 @@
 #define EMP_WEB_H
 
 #include "../emtools/init.h"
+#include "Slate.h"
 
 namespace emp {
 namespace web {
@@ -30,6 +31,19 @@ namespace web {
 
     return true;
   }
+
+
+  //  A Document is a root-level slate that automatically initializes Empirical and starts
+  //  out in an active state.
+
+  class Document : public Slate {
+  public:
+    Document(const std::string & doc_id) : Slate(doc_id) {
+      emp::web::Initialize();
+      Activate();
+    }
+    ~Document() { ; }
+  };
 
 };
 };
