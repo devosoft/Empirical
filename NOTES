@@ -23,6 +23,9 @@ Make sure to check append_ok in slates; use SFINAE to test if input is a command
 Closing a Text() element should automatically run PreventAppend();
 
 -= Improvements =-
+emp_assert should take extra arguments for variables to print when triggered.
+Tables need more natural interface that should behave like a slate.  Perhaps derive from Slate?
+std::endl should work on TextBox
 Tables should have single CSS for all rows and all cells.
 - Remove ID's from table cells and rows; manually fill out style instead.
 Allow addition of defaults UI::Style for each object type.
@@ -59,7 +62,6 @@ A data management system that can track data by:
 A citation tool: Useful for pointing people to appropriate references & building online bibs.
 
 -= Serialization =-
-Make work with vectors
 Special mechanisms to handle both pointers we are in charge of AND pointers to be connected to.
 
 -= Evolution-specific Tools =-
