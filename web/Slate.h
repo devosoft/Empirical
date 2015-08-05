@@ -61,14 +61,14 @@ namespace web {
       return GetTextWidget() << in_fun;
     }
 
-    // Default to passing specialty operators to parent.
-    // Widget & Append(emp::web::Button & info) override { return AddChild(info); }
-    // Widget & Append(emp::web::Canvas & info) override { return AddChild(info); }
-    // Widget & Append(emp::web::Image & info) override { return AddChild(info); }
-    // Widget & Append(emp::web::Selector & info) override { return AddChild(info); }
-    // Widget & Append(emp::web::Slate & info) override { return AddChild(info); }
-    // Widget & Append(emp::web::Table & info) override { return AddChild(info); }
-    // Widget & Append(emp::web::Text & info) override { return AddChild(info); }
+    // Widget Append(emp::web::Button & info) override { return AddChild(info); }
+    // Widget Append(emp::web::Canvas & info) override { return AddChild(info); }
+    // Widget Append(emp::web::Image & info) override { return AddChild(info); }
+    // Widget Append(emp::web::Selector & info) override { return AddChild(info); }
+    // Widget Append(emp::web::Slate & info) override { return AddChild(info); }
+    // Widget Append(emp::web::Table & info) override { return AddChild(info); }
+    // Widget Append(emp::web::Text & info) override { return AddChild(info); }
+    internal::Widget Append(internal::Widget info) override { AddChild(info); return info; }
     
     // All derived widgets must suply a mechanism for providing associated HTML code.
     virtual void GetHTML(std::stringstream & HTML) override {
