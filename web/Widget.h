@@ -150,8 +150,17 @@ namespace web {
 
         children.emplace_back(in);
 
-        // If the new parent is active, set widget (and children) active and refesh all!
+        // If this element (as new parent) is active, anchor widget and activate it!
         if (active) {
+          // Create a span tag to anchor the new widget.
+          EM_ASM_ARGS({
+              parent_id = Pointer_stringify($0);
+              child_id = Pointer_stringify($1);
+              $('#' + parent_id).append('<span id=\'' + child_id + '\'></span>');
+            }, id.c_str(), in.GetID().c_str());
+
+          // Now that the new widget has some place to hook in, activate it!
+          in.DoActivate();
         }
       }
 
