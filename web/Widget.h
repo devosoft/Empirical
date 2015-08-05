@@ -97,7 +97,7 @@ namespace web {
       void Activate() {
         OnDocumentReady( std::function<void(void)>([this](){ this->DoActivate(); }) );
       }
-      void Deactivate();
+      void Deactivate(bool top_level=true);
       bool ToggleActive();
 
       // Setup << operator to redirect to Append.
@@ -140,19 +140,32 @@ namespace web {
       virtual ~WidgetInfo() { EMP_TRACK_DESTRUCT(WebWidgetInfo); }
 
       void AddChild(Widget in) {
+        // If the inserted widget is already active, remove it from its old position.
+        if (in->parent) {
+          // @CAO Remove inserted widget from old parent
+          // @CAO If active, make sure parent is redrawn.
+          // @CAO Set inactive.
+        }
+        emp_assert (!in->active && "Cannot insert a stand-alone active widget!");
+
         children.emplace_back(in);
+
+        // If the new parent is active, set widget (and children) active and refesh all!
+        if (active) {
+        }
       }
 
       // By default, elements should forward unknown appends to their parents.
       virtual Widget Append(const std::string & text) { return ForwardAppend(text); }
       virtual Widget Append(const std::function<std::string()> & fn) { return ForwardAppend(fn); }
-      // virtual Widget Append(emp::web::Button & info) { return ForwardAppend(info); }
-      // virtual Widget Append(emp::web::Canvas & info) { return ForwardAppend(info); }
-      // virtual Widget Append(emp::web::Image & info) { return ForwardAppend(info); }
-      // virtual Widget Append(emp::web::Selector & info) { return ForwardAppend(info); }
-      // virtual Widget Append(emp::web::Slate & info) { return ForwardAppend(info); }
-      // virtual Widget Append(emp::web::Table & info) { return ForwardAppend(info); }
-      // virtual Widget Append(emp::web::Text & info) { return ForwardAppend(info); }
+      // virtual Widget Append(emp::web::Button info) { return ForwardAppend(info); }
+      // virtual Widget Append(emp::web::Canvas info) { return ForwardAppend(info); }
+      // virtual Widget Append(emp::web::Image info) { return ForwardAppend(info); }
+      // virtual Widget Append(emp::web::Selector info) { return ForwardAppend(info); }
+      // virtual Widget Append(emp::web::Slate info) { return ForwardAppend(info); }
+      // virtual Widget Append(emp::web::Table info) { return ForwardAppend(info); }
+      // virtual Widget Append(emp::web::Text info) { return ForwardAppend(info); }
+      virtual Widget Append(Widget info) { return ForwardAppend(info); }
 
       // Convert arbitrary inputs to a string and try again!
       virtual Widget Append(char in_char) { return Append(emp::to_string(in_char)); }
@@ -172,9 +185,13 @@ namespace web {
 
       // Assume that the associated ID exists and replace it with the currnet HTML code.
       void ReplaceHTML() {
-        emp_assert(active == true);
         std::stringstream ss;
-        GetHTML(ss);
+
+        // If this node is active, fill in its contents; otherwise make it an empty span.
+        if (active) GetHTML(ss);
+        else ss << "<span id=" << id << "></span>";
+
+        // Now do the replacement.
         EM_ASM_ARGS({
             var widget_id = Pointer_stringify($0);
             var out_html = Pointer_stringify($1);
@@ -215,6 +232,7 @@ namespace web {
     }
 
     Widget & Widget::SetInfo(WidgetInfo * in_info) {
+      // If the widget is already set correctly, stop here.
       if (info == in_info) return *this;
       
       // Clean up the old info that was previously pointed to.
@@ -251,14 +269,26 @@ namespace web {
     }
     
     void Widget::DoActivate() {
-      emp_assert(info);
-      info->active = true;
-      info->ReplaceHTML();   // Print full contents now!
+      if (!info) return;           // Cannot activate a null widget.
+
+      // Activate this widget
+      info->active = true;   // Mark as active.
+      info->ReplaceHTML();   // Print full contents to document.
+
+      // Now activate all of this widget's children!
+      for (auto & child : info->children) child.DoActivate();
     }
-    void Widget::Deactivate() {
-      emp_assert(info && info->active, info);
+    void Widget::Deactivate(bool top_level) {
+      // Skip if we are not active.
+      if (!info || !info->active) return;
+
       info->active = false;
-      // @CAO Clear contents now????
+
+      // Deactivate all of the children (marking them as not at the top level.)
+      for (auto & child : info->children) child.Deactivate(false);
+
+      // If we are at the top level, clear the contents by replaceing the HTML.
+      info->ReplaceHTML();
     }
     bool Widget::ToggleActive() {
       emp_assert(info);
