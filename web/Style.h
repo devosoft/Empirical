@@ -54,15 +54,23 @@ namespace web {
     };
     
     void Apply(const std::string & widget_id) {
+      // Stop immediately if nothing to set.
+      if (settings.size() == 0) return;
+      
+      // Find the current object only once.
+      EM_ASM_ARGS({
+          var id = Pointer_stringify($0);
+          emp_i.cur_obj = $( '#' + id );
+        }, widget_id.c_str());
+
       for (auto css_pair : settings) {
-        if (css_pair.second == "") continue; // Ignore empy entries.
+        if (css_pair.second == "") continue; // Ignore empty entries.
 #ifdef EMSCRIPTEN
         EM_ASM_ARGS({
-            var id = Pointer_stringify($0);
-            var name = Pointer_stringify($1);
-            var value = Pointer_stringify($2);
-            $( '#' + id ).css( name, value);
-          }, widget_id.c_str(), css_pair.first.c_str(), css_pair.second.c_str());
+            var name = Pointer_stringify($0);
+            var value = Pointer_stringify($1);
+            emp_i.cur_obj.css( name, value);
+          }, css_pair.first.c_str(), css_pair.second.c_str());
 #else
         std::cout << "Setting '" << widget_id << "' attribute '" << css_pair.first
                   << "' to '" << css_pair.second << "'.";
