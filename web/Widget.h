@@ -32,13 +32,6 @@ namespace emp {
 namespace web {
 
   // Setup some types we will need later
-  class Button;
-  class Canvas;
-  class Image;
-  class Table;
-  class Text;
-  class Selector;
-  class Slate;
   class SlateInfo;
 
   namespace internal {
@@ -60,9 +53,6 @@ namespace web {
 
       // If an Append doesn't work with current class, forward it to the parent.
       template <typename FWD_TYPE> Widget & ForwardAppend(FWD_TYPE && arg);
-
-      // Activates need to be delayed until the document is ready, when DoActivate will be called.
-      void DoActivate(bool top_level=true);
 
       Widget & SetInfo(WidgetInfo * in_info);
 
@@ -97,9 +87,7 @@ namespace web {
 
       // An active widget makes live changes to the webpage (once document is ready)
       // An inactive widget just records changes internally.
-      void Activate() {
-        OnDocumentReady( std::function<void(void)>([this](){ this->DoActivate(); }) );
-      }
+      void Activate();
       void Deactivate(bool top_level=true);
       bool ToggleActive();
 
@@ -175,7 +163,7 @@ namespace web {
             }, id.c_str(), in.GetID().c_str());
 
           // Now that the new widget has some place to hook in, activate it!
-          in.DoActivate();
+          in->DoActivate();
         }
       }
 
@@ -195,6 +183,16 @@ namespace web {
 
       void UpdateDependents() {
         for (auto & d : dependents) d->ReplaceHTML();
+      }
+
+      // Activate is delayed until the document is ready, when DoActivate will be called.
+      void DoActivate(bool top_level=true) {
+        // Activate this widget and its children.
+        active = true;
+        for (auto & child : children) child->DoActivate(false);
+        
+        // Finally, put everything on the screen.
+        ReplaceHTML();   // Print full contents to document.
       }
 
       // By default, elements should forward unknown appends to their parents.
@@ -308,18 +306,11 @@ namespace web {
       return false;
     }
     
-    void Widget::DoActivate(bool top_level) {
-      if (!info) return;           // Cannot activate a null widget.
-
-      // Activate this widget and its children.
-      info->active = true;
-      for (auto & child : info->children) child.DoActivate(false);
-      
-      // Finally, put everything on the screen.
-      info->ReplaceHTML();   // Print full contents to document.
+    void Widget::Activate() {
+      auto * cur_info = info;
+      OnDocumentReady( std::function<void(void)>([cur_info](){ cur_info->DoActivate(); }) );
     }
 
-      
     void Widget::Deactivate(bool top_level) {
       // Skip if we are not active.
       if (!info || !info->active) return;
