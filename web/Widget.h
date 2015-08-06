@@ -62,7 +62,7 @@ namespace web {
       template <typename FWD_TYPE> Widget & ForwardAppend(FWD_TYPE && arg);
 
       // Activates need to be delayed until the document is ready, when DoActivate will be called.
-      void DoActivate();
+      void DoActivate(bool top_level=true);
 
       Widget & SetInfo(WidgetInfo * in_info);
 
@@ -93,7 +93,7 @@ namespace web {
 
       bool operator==(const Widget & in) const { return info == in.info; }
       bool operator!=(const Widget & in) const { return info != in.info; }
-      operator bool() const { return info != nullptr; }
+      operator bool() const { return info != nullptr; }      
 
       // An active widget makes live changes to the webpage (once document is ready)
       // An inactive widget just records changes internally.
@@ -102,6 +102,8 @@ namespace web {
       }
       void Deactivate(bool top_level=true);
       bool ToggleActive();
+
+      Widget & AddDependent(const Widget & w);
 
       // Setup << operator to redirect to Append.
       template <typename IN_TYPE> Widget operator<<(IN_TYPE && in_val);
@@ -159,7 +161,9 @@ namespace web {
         }
         emp_assert (!in->active && "Cannot insert a stand-alone active widget!");
 
+        // Setup parent-child relationship
         children.emplace_back(in);
+        in->parent = Widget(this);
 
         // If this element (as new parent) is active, anchor widget and activate it!
         if (active) {
@@ -207,7 +211,7 @@ namespace web {
       // If an Append doesn't work with current class, forward it to the parent.
       template <typename FWD_TYPE>
       Widget ForwardAppend(FWD_TYPE && arg) {
-        emp_assert(parent && "Trying to forward append to parent, but no parent!");
+        emp_assert(parent && "Trying to forward append to parent, but no parent!", id);
         return parent.info->Append(std::forward<FWD_TYPE>(arg));
       }
 
@@ -217,17 +221,22 @@ namespace web {
       // Assume that the associated ID exists and replace it with the currnet HTML code.
       void ReplaceHTML() {
         std::stringstream ss;
-
+        
         // If this node is active, fill in its contents; otherwise make it an empty span.
         if (active) GetHTML(ss);
         else ss << "<span id=" << id << "></span>";
-
+        
         // Now do the replacement.
         EM_ASM_ARGS({
             var widget_id = Pointer_stringify($0);
             var out_html = Pointer_stringify($1);
             $('#' + widget_id).replaceWith(out_html);
           }, id.c_str(), ss.str().c_str());
+        
+        // If active, recurse to children!
+        if (active) {
+          for (auto & child : children) child->ReplaceHTML();
+        }
       }
       
     public:
@@ -299,16 +308,18 @@ namespace web {
       return false;
     }
     
-    void Widget::DoActivate() {
+    void Widget::DoActivate(bool top_level) {
       if (!info) return;           // Cannot activate a null widget.
 
-      // Activate this widget
-      info->active = true;   // Mark as active.
+      // Activate this widget and its children.
+      info->active = true;
+      for (auto & child : info->children) child.DoActivate(false);
+      
+      // Finally, put everything on the screen.
       info->ReplaceHTML();   // Print full contents to document.
-
-      // Now activate all of this widget's children!
-      for (auto & child : info->children) child.DoActivate();
     }
+
+      
     void Widget::Deactivate(bool top_level) {
       // Skip if we are not active.
       if (!info || !info->active) return;
@@ -319,13 +330,19 @@ namespace web {
       for (auto & child : info->children) child.Deactivate(false);
 
       // If we are at the top level, clear the contents by replaceing the HTML.
-      info->ReplaceHTML();
+      if (top_level) info->ReplaceHTML();
     }
+
     bool Widget::ToggleActive() {
       emp_assert(info);
       if (info->active == true) Deactivate();
       else Activate();
       return info->active;
+    }
+
+    Widget & Widget::AddDependent(const Widget & w) {
+      info->AddDependent(w);
+      return *this;
     }
 
     template <typename IN_TYPE>
