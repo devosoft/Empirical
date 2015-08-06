@@ -22,6 +22,7 @@ namespace web {
     bool autofocus;
     bool disabled;
     
+    std::function<void()> callback;
     uint32_t callback_id;
     std::string onclick_info;
     
@@ -30,6 +31,11 @@ namespace web {
     ButtonInfo & operator=(const ButtonInfo &) = delete;   // No copies of INFO allowed
     virtual ~ButtonInfo() {
       if (callback_id) emp::JSDelete(callback_id);  // Delete callback wrapper.
+    }
+
+    void DoCallback() {
+      callback();
+      UpdateDependents();
     }
 
     virtual void GetHTML(std::stringstream & HTML) override {
@@ -90,22 +96,21 @@ namespace web {
  
     Button(ButtonInfo * in_info) : WidgetFacet(in_info) { ; }
 
-    void DoCallback() {
-    }
-
   public:
     Button(const std::function<void()> & in_cb, const std::string & in_label,
            const std::string & in_id="")
       : WidgetFacet(in_id)
     {
       info = new ButtonInfo(in_id);
-
+    
       Info()->label = in_label;
       Info()->title = "";
       Info()->autofocus = false;
       Info()->disabled = false;
-
-      Info()->callback_id = JSWrap(in_cb);
+      
+      Info()->callback = in_cb;
+      ButtonInfo * b_info = Info();
+      Info()->callback_id = JSWrap( std::function<void()>( [b_info](){b_info->DoCallback();} )  );
       Info()->onclick_info = emp::to_string("emp.Callback(", Info()->callback_id, ")");
     }
     Button(const Button & in) : WidgetFacet(in) { ; }
