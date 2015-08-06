@@ -7,6 +7,7 @@
 //
 
 #include "Button.h"
+#include "Canvas.h"
 #include "Image.h"
 #include "Text.h"
 #include "Widget.h"
@@ -63,13 +64,6 @@ namespace web {
       return GetTextWidget() << in_fun;
     }
 
-    // Widget Append(emp::web::Button & info) override { return AddChild(info); }
-    // Widget Append(emp::web::Canvas & info) override { return AddChild(info); }
-    // Widget Append(emp::web::Image & info) override { return AddChild(info); }
-    // Widget Append(emp::web::Selector & info) override { return AddChild(info); }
-    // Widget Append(emp::web::Slate & info) override { return AddChild(info); }
-    // Widget Append(emp::web::Table & info) override { return AddChild(info); }
-    // Widget Append(emp::web::Text & info) override { return AddChild(info); }
     internal::Widget Append(internal::Widget info) override { AddChild(info); return info; }
     
     // All derived widgets must suply a mechanism for providing associated HTML code.
@@ -110,7 +104,7 @@ namespace web {
        return Info()->GetRegistered(test_name);
     }
     Button   FindButton  (const std::string & in_id) { return Button  ( Find(in_id) ); }
-    // Canvas   FindCanvas  (const std::string & in_id) { return Canvas  ( Find(in_id) ); }
+    Canvas   FindCanvas  (const std::string & in_id) { return Canvas  ( Find(in_id) ); }
     Image    FindImage   (const std::string & in_id) { return Image   ( Find(in_id) ); }
     // Selector FindSelector(const std::string & in_id) { return Selector( Find(in_id) ); }
     Slate    FindSlate   (const std::string & in_id) { return Slate   ( Find(in_id) ); }

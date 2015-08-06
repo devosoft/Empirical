@@ -15,9 +15,12 @@ namespace web {
 
   class ImageInfo : public internal::WidgetInfo {
     friend Image;
+
   protected:
+
     std::string url;
     std::string alt_text;
+
       
     ImageInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
     ImageInfo(const ImageInfo &) = delete;               // No copies of INFO allowed

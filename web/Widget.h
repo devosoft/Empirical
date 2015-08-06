@@ -194,7 +194,7 @@ namespace web {
         for (auto & child : children) child->DoActivate(false);
         
         // Finally, put everything on the screen.
-        ReplaceHTML();   // Print full contents to document.
+        if (top_level) ReplaceHTML();   // Print full contents to document.
       }
 
       // By default, elements should forward unknown appends to their parents.
@@ -218,6 +218,9 @@ namespace web {
       // All derived widgets must suply a mechanism for providing associated HTML code.
       virtual void GetHTML(std::stringstream & ss) = 0;
 
+      // Derived widgets may also provide JavaScript code to be run on redraw.
+      virtual void TriggerJS() { ; }
+
       // Assume that the associated ID exists and replace it with the currnet HTML code.
       void ReplaceHTML() {
         std::stringstream ss;
@@ -235,6 +238,9 @@ namespace web {
         
         // Update the style
         style.Apply(id);
+
+        // Run associated Javascript code, if any.
+        TriggerJS();
 
         // If active, recurse to children!
         if (active) {
