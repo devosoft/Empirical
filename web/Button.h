@@ -114,7 +114,10 @@ namespace web {
       Info()->onclick_info = emp::to_string("emp.Callback(", Info()->callback_id, ")");
     }
     Button(const Button & in) : WidgetFacet(in) { ; }
+    Button(const internal::Widget & in) : WidgetFacet(in) { ; }
     virtual ~Button() { ; }
+
+    using INFO_TYPE = ButtonInfo;
 
     Button & Callback(const std::function<void()> & in_cb) {
       Info()->UpdateCallback(in_cb);

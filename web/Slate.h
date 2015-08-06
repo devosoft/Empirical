@@ -42,13 +42,13 @@ namespace web {
     }
 
     internal::Widget & GetRegistered(const std::string & find_name) {
-      emp_assert(IsRegistered(find_name));
+      emp_assert(IsRegistered(find_name), find_name, widget_dict.size());
       return widget_dict[find_name];
     }
 
     void Register(internal::Widget & new_widget) override {
       // Make sure name is not already used
-      emp_assert(IsRegistered(new_widget.GetID()) == false);
+      emp_assert(IsRegistered(new_widget.GetID()) == false, new_widget.GetID());
 
       widget_dict[new_widget.GetID()] = new_widget;   // Track widget by name
       if (parent) parent->Register(new_widget);       // Also register in parent, if available
@@ -98,39 +98,23 @@ namespace web {
       info = new SlateInfo(in_name);
     }
     Slate(const Slate & in) : WidgetFacet(in) { ; }
+    Slate(const internal::Widget & in) : WidgetFacet(in) { ; }
     ~Slate() { ; }
 
     virtual bool IsSlate() const { return true; }
-
+    using INFO_TYPE = SlateInfo;
+   
     // Methods to look up previously created elements, by type.
-    // web::Button & Button(const std::string & test_name) {
-    //   emp_assert(dynamic_cast<Button *>( &(Info()->GetRegistered(test_name)) ) != NULL);
-    //   return dynamic_cast<Button&>( Info()->GetRegistered(test_name) );
-    // }
-    // web::Canvas & Canvas(const std::string & test_name) {
-    //   emp_assert(dynamic_cast<Canvas *>( &(Info()->GetRegistered(test_name)) ) != NULL);
-    //   return dynamic_cast<Canvas&>( Info()->GetRegistered(test_name) );
-    // }
-    // web::Image & Image(const std::string & test_name) {
-    //   emp_assert(dynamic_cast<Image *>( &(Info()->GetRegistered(test_name)) ) != NULL);
-    //   return dynamic_cast<Image&>( Info()->GetRegistered(test_name) );
-    // }
-    // web::Selector & Selector(const std::string & test_name) {
-    //   emp_assert(dynamic_cast<Selector *>( &(Info()->GetRegistered(test_name)) ) != NULL);
-    //   return dynamic_cast<Selector&>( Info()->GetRegistered(test_name) );
-    // }
-    // web::Slate & Slate(const std::string & test_name) {
-    //   emp_assert(dynamic_cast<Slate *>( &(Info()->GetRegistered(test_name)) ) != NULL);
-    //   return dynamic_cast<Slate&>( Info()->GetRegistered(test_name) );
-    // }
-    // web::Table & Table(const std::string & test_name) {
-    //   emp_assert(dynamic_cast<Table *>( &(Info()->GetRegistered(test_name)) ) != NULL);
-    //   return dynamic_cast<Table&>( Info()->GetRegistered(test_name) );
-    // }
-    // web::Text & Text(const std::string & test_name) {
-    //   emp_assert(dynamic_cast<Text *>( &(Info()->GetRegistered(test_name)) ) != NULL);
-    //   return dynamic_cast<Text&>( Info()->GetRegistered(test_name) );
-    // }
+    internal::Widget & Find(const std::string & test_name) {
+       return Info()->GetRegistered(test_name);
+    }
+    Button   FindButton  (const std::string & in_id) { return Button  ( Find(in_id) ); }
+    // Canvas   FindCanvas  (const std::string & in_id) { return Canvas  ( Find(in_id) ); }
+    // Image    FindImage   (const std::string & in_id) { return Image   ( Find(in_id) ); }
+    // Selector FindSelector(const std::string & in_id) { return Selector( Find(in_id) ); }
+    Slate    FindSlate   (const std::string & in_id) { return Slate   ( Find(in_id) ); }
+    // Table    FindTable   (const std::string & in_id) { return Table   ( Find(in_id) ); }
+    Text     FindText    (const std::string & in_id) { return Text    ( Find(in_id) ); }
 
 
   };

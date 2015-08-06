@@ -54,9 +54,11 @@ namespace web {
       info = new TextInfo(in_id);
     }
     Text(const Text & in) : WidgetFacet(in) { ; }
+    Text(const internal::Widget & in) : WidgetFacet(in) { ; }
     ~Text() { ; }
 
     virtual bool IsText() const { return true; }
+    using INFO_TYPE = TextInfo;
 
     Text & Clear() { Info()->strings.Clear(); return *this; }
 

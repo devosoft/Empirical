@@ -59,6 +59,9 @@ namespace web {
       // Internally, we can treat a Widget as a pointer to its WidgetInfo.
       WidgetInfo * operator->() { return info; }
 
+      // Give derived classes the ability to access widget info.
+      static WidgetInfo * Info(const Widget & w) { return w.info; }
+
     public:
       Widget(const std::string & id);
       Widget(WidgetInfo * in_info=nullptr);
@@ -150,6 +153,7 @@ namespace web {
         // Setup parent-child relationship
         children.emplace_back(in);
         in->parent = Widget(this);
+        Register(in);
 
         // If this element (as new parent) is active, anchor widget and activate it!
         if (active) {
@@ -356,6 +360,10 @@ namespace web {
       // WidgetFacet cannot be built unless within derived class, so constructors are protected
       WidgetFacet(const std::string & in_id="") : Widget(in_id) { ; }
       WidgetFacet(const WidgetFacet & in) : Widget(in) { ; }
+      WidgetFacet(const internal::Widget & in) : Widget(in) {
+        // Converting from a generic widget; make sure type is correct!
+        emp_assert(dynamic_cast<typename RETURN_TYPE::INFO_TYPE *>( Info(in) ) != NULL);
+      }
       WidgetFacet(WidgetInfo * in_info) : Widget(in_info) { ; }
       WidgetFacet & operator=(const WidgetFacet & in) { Widget::operator=(in); return *this; }
       virtual ~WidgetFacet() { ; }
