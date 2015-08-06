@@ -39,6 +39,7 @@ namespace web {
   class Text;
   class Selector;
   class Slate;
+  class SlateInfo;
 
   namespace internal {
 
@@ -53,7 +54,7 @@ namespace web {
 
     // Widget is a smart pointer to a WidgetInfo object, plus some basic accessors.
     class Widget {
-      friend WidgetInfo;
+      friend WidgetInfo; friend SlateInfo;
     protected:
       WidgetInfo * info;
 
@@ -64,6 +65,9 @@ namespace web {
       void DoActivate();
 
       Widget & SetInfo(WidgetInfo * in_info);
+
+      // Internally, we can treat a Widget as a pointer to its WidgetInfo.
+      WidgetInfo * operator->() { return info; }
 
     public:
       Widget(const std::string & id);
@@ -87,7 +91,6 @@ namespace web {
       bool HasCSS(const std::string & setting);
       bool HasChild(const Widget & test_child);
 
-      WidgetInfo * operator->() { return info; }
       bool operator==(const Widget & in) const { return info == in.info; }
       bool operator!=(const Widget & in) const { return info != in.info; }
       operator bool() const { return info != nullptr; }
@@ -102,6 +105,9 @@ namespace web {
 
       // Setup << operator to redirect to Append.
       template <typename IN_TYPE> Widget operator<<(IN_TYPE && in_val);
+
+      // Debug...
+      std::string GetInfoType() const;
     };
     
 
@@ -120,7 +126,8 @@ namespace web {
 
       // Track hiearchy
       Widget parent;                  // Which widget is this one contained within?
-      emp::vector<Widget> children;   // What widgets are contained in this one?
+      emp::vector<Widget> children;   // Widgets contained in this one.
+      emp::vector<Widget> dependents; // Widgets to be refreshed if this one is activated.
       bool append_ok;                 // Can we add more children?
       bool active;                    // Is this element active in DOM?
 
@@ -140,8 +147,12 @@ namespace web {
       virtual ~WidgetInfo() { EMP_TRACK_DESTRUCT(WebWidgetInfo); }
 
       void AddChild(Widget in) {
+        // emp::Alert("Adding child [", in.GetID(), "] of type ", in.GetInfoType(),
+        //            " to parent [", id, "].");
+
         // If the inserted widget is already active, remove it from its old position.
         if (in->parent) {
+          emp_assert(!"Currently cannot insert widget if already active!");
           // @CAO Remove inserted widget from old parent
           // @CAO If active, make sure parent is redrawn.
           // @CAO Set inactive.
@@ -164,16 +175,27 @@ namespace web {
         }
       }
 
+      // Record dependents.  Dependents are only acted upon when this widget's action is
+      // triggered (e.g. a button is pressed)
+      void AddDependent(Widget in) {
+        dependents.emplace_back(in);
+      }
+
+      template <typename... T>
+      void AddDependents(Widget first, T... widgets) {
+        AddDependent(first);
+        AddDependents(widgets...);
+      }
+
+      void AddDependents() { ; }
+
+      void UpdateDependents() {
+        for (auto & d : dependents) d->ReplaceHTML();
+      }
+
       // By default, elements should forward unknown appends to their parents.
       virtual Widget Append(const std::string & text) { return ForwardAppend(text); }
       virtual Widget Append(const std::function<std::string()> & fn) { return ForwardAppend(fn); }
-      // virtual Widget Append(emp::web::Button info) { return ForwardAppend(info); }
-      // virtual Widget Append(emp::web::Canvas info) { return ForwardAppend(info); }
-      // virtual Widget Append(emp::web::Image info) { return ForwardAppend(info); }
-      // virtual Widget Append(emp::web::Selector info) { return ForwardAppend(info); }
-      // virtual Widget Append(emp::web::Slate info) { return ForwardAppend(info); }
-      // virtual Widget Append(emp::web::Table info) { return ForwardAppend(info); }
-      // virtual Widget Append(emp::web::Text info) { return ForwardAppend(info); }
       virtual Widget Append(Widget info) { return ForwardAppend(info); }
 
       // Convert arbitrary inputs to a string and try again!
@@ -309,6 +331,11 @@ namespace web {
     template <typename IN_TYPE>
     Widget Widget::operator<<(IN_TYPE && in_val) {
       return info->Append(std::forward<IN_TYPE>(in_val));
+    }
+
+    std::string Widget::GetInfoType() const {
+      if (!info) return "UNINITIALIZED";
+      return info->GetType();
     }
 
 
