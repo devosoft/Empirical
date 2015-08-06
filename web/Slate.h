@@ -6,6 +6,7 @@
 //  Specs for the Slate widget.
 //
 
+#include "Button.h"
 #include "Text.h"
 #include "Widget.h"
 

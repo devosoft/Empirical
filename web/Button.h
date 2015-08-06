@@ -90,23 +90,21 @@ namespace web {
  
     Button(ButtonInfo * in_info) : WidgetFacet(in_info) { ; }
 
+    void DoCallback() {
+    }
+
   public:
-    // If we provide all info about the button, create the ButtonInfo object now.
-    Button(const std::string & in_cb_info, const std::string & in_label,
+    Button(const std::function<void()> & in_cb, const std::string & in_label,
            const std::string & in_id="")
       : WidgetFacet(in_id)
     {
+      info = new ButtonInfo(in_id);
+
       Info()->label = in_label;
       Info()->title = "";
       Info()->autofocus = false;
       Info()->disabled = false;
-      Info()->callback_id = 0;
-      Info()->onclick_info = in_cb_info;
-    }
-    Button(const std::function<void()> & in_cb, const std::string & in_label,
-           const std::string & in_id="")
-      : Button(std::string(""), in_label, in_id)
-    {
+
       Info()->callback_id = JSWrap(in_cb);
       Info()->onclick_info = emp::to_string("emp.Callback(", Info()->callback_id, ")");
     }
