@@ -74,7 +74,6 @@ namespace web {
       virtual bool IsTable() const { return false; }
       virtual bool IsText() const { return false; }
       virtual bool AppendOK() const;
-      virtual std::string GetWrapperTag() const { return "span"; }
 
       std::string GetID() const;
       virtual std::string CSS(const std::string & setting);
@@ -105,8 +104,7 @@ namespace web {
     // (Buttons, Images, etc...).  It take in a return type to be cast to for accessors.
     
     class WidgetInfo {
-      friend Widget;
-    protected:
+    public:
       // Smart-pointer info
       int ptr_count;                  // How many widgets are pointing to this info?
 
@@ -231,6 +229,9 @@ namespace web {
             $('#' + widget_id).replaceWith(out_html);
           }, id.c_str(), ss.str().c_str());
         
+        // Update the style
+        style.Apply(id);
+
         // If active, recurse to children!
         if (active) {
           for (auto & child : children) child->ReplaceHTML();
@@ -364,7 +365,9 @@ namespace web {
     public:
       template <typename SETTING_TYPE>
       RETURN_TYPE & CSS(const std::string & setting, SETTING_TYPE && value) {
+        emp_assert(info != nullptr);
         info->style.Set(setting, value);
+        if (info->active) info->style.Apply(info->id);
         return (RETURN_TYPE &) *this;
       }
 
@@ -377,10 +380,11 @@ namespace web {
         return CSS(setting2, val2, others...);    // Recurse to the others.
       }
 
-      RETURN_TYPE & ID(const std::string & in_id) {
-        info->id = in_id;
-        return (RETURN_TYPE &) *this;
-      }
+      // @CAO This seems like a bigger deal than just changing the id...
+      // RETURN_TYPE & ID(const std::string & in_id) {
+      //   info->id = in_id;
+      //   return (RETURN_TYPE &) *this;
+      // }
 
 
       // Size Manipulation
