@@ -61,26 +61,10 @@ namespace web {
       if (active) ReplaceHTML();                      // If node is active, immediately redraw!
     }
 
-    void UpdateLabel(const std::string & in_label) {
-      label = in_label;
-      if (active) ReplaceHTML();                      // If node is active, immediately redraw!
-    }
-
-    void UpdateTitle(const std::string & in_title) {
-      title = in_title;
-      if (active) ReplaceHTML();                      // If node is active, immediately redraw!
-    }
-
-    void UpdateAutofocus(bool in_af) {
-      autofocus = in_af;
-      if (active) ReplaceHTML();                      // If node is active, immediately redraw!
-    }
-
-    void UpdateDisabled(bool in_dis) {
-      disabled = in_dis;
-      if (active) ReplaceHTML();                      // If node is active, immediately redraw!
-    }
-
+    void UpdateLabel(const std::string & in_label) { label = in_label; if (active) ReplaceHTML(); }
+    void UpdateTitle(const std::string & in_title) { title = in_title; if (active) ReplaceHTML(); }
+    void UpdateAutofocus(bool in_af) { autofocus = in_af; if (active) ReplaceHTML(); }
+    void UpdateDisabled(bool in_dis) { disabled = in_dis; if (active) ReplaceHTML(); }
 
   public:
     virtual std::string GetType() override { return "web::ButtonInfo"; }
