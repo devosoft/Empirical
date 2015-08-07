@@ -9,6 +9,7 @@
 #include "Button.h"
 #include "Canvas.h"
 #include "Image.h"
+#include "Selector.h"
 #include "Text.h"
 #include "Widget.h"
 
@@ -106,7 +107,7 @@ namespace web {
     Button   FindButton  (const std::string & in_id) { return Button  ( Find(in_id) ); }
     Canvas   FindCanvas  (const std::string & in_id) { return Canvas  ( Find(in_id) ); }
     Image    FindImage   (const std::string & in_id) { return Image   ( Find(in_id) ); }
-    // Selector FindSelector(const std::string & in_id) { return Selector( Find(in_id) ); }
+    Selector FindSelector(const std::string & in_id) { return Selector( Find(in_id) ); }
     Slate    FindSlate   (const std::string & in_id) { return Slate   ( Find(in_id) ); }
     // Table    FindTable   (const std::string & in_id) { return Table   ( Find(in_id) ); }
     Text     FindText    (const std::string & in_id) { return Text    ( Find(in_id) ); }

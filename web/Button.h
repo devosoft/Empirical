@@ -30,7 +30,7 @@ namespace web {
     ButtonInfo(const ButtonInfo &) = delete;               // No copies of INFO allowed
     ButtonInfo & operator=(const ButtonInfo &) = delete;   // No copies of INFO allowed
     virtual ~ButtonInfo() {
-      if (callback_id) emp::JSDelete(callback_id);  // Delete callback wrapper.
+      if (callback_id) emp::JSDelete(callback_id);         // Delete callback wrapper.
     }
 
     void DoCallback() {
