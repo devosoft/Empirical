@@ -302,7 +302,8 @@ namespace emp {
 
   // Cleanup a function pointer when finished with it.
   void JSDelete( uint32_t fun_id ) {
-    // @CAO -- make sure we're not trying to delete a named function; JS side will still exist.
+    emp_assert(fun_id > 0);  // Make sure this isn't a null pointer!
+    // @CAO -- Should make sure to clean up named functions on JS side if they exist.
     delete (emp::internal::JSWrap_Callback_Base *) (long long) fun_id;
   }
 };
