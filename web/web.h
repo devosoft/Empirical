@@ -2,7 +2,15 @@
 #define EMP_WEB_H
 
 #include "../emtools/init.h"
+
+#include "Button.h"
+#include "Canvas.h"
+#include "Image.h"
+#include "Selector.h"
 #include "Slate.h"
+#include "Table.h"
+#include "Text.h"
+
 
 namespace emp {
 namespace web {

@@ -6,10 +6,12 @@
 //  Specs for the Slate widget.
 //
 
-#include "Button.h"
-#include "Canvas.h"
-#include "Image.h"
-#include "Selector.h"
+class Button;
+class Canvas;
+class Image;
+class Selector;
+class Table;
+
 #include "Text.h"
 #include "Widget.h"
 
@@ -104,14 +106,14 @@ namespace web {
     internal::Widget & Find(const std::string & test_name) {
        return Info()->GetRegistered(test_name);
     }
-    Button   FindButton  (const std::string & in_id) { return Button  ( Find(in_id) ); }
-    Canvas   FindCanvas  (const std::string & in_id) { return Canvas  ( Find(in_id) ); }
-    Image    FindImage   (const std::string & in_id) { return Image   ( Find(in_id) ); }
-    Selector FindSelector(const std::string & in_id) { return Selector( Find(in_id) ); }
-    Slate    FindSlate   (const std::string & in_id) { return Slate   ( Find(in_id) ); }
-    // Table    FindTable   (const std::string & in_id) { return Table   ( Find(in_id) ); }
-    Text     FindText    (const std::string & in_id) { return Text    ( Find(in_id) ); }
 
+    Button &   FindButton  (const std::string & in_id) { return (Button &)   Find(in_id); }
+    Canvas &   FindCanvas  (const std::string & in_id) { return (Canvas &)   Find(in_id); }
+    Image &    FindImage   (const std::string & in_id) { return (Image &)    Find(in_id); }
+    Selector & FindSelector(const std::string & in_id) { return (Selector &) Find(in_id); }
+    Slate &    FindSlate   (const std::string & in_id) { return (Slate &)    Find(in_id); }
+    Table &    FindTable   (const std::string & in_id) { return (Table &)    Find(in_id); }
+    Text &     FindText    (const std::string & in_id) { return (Text &)     Find(in_id); }
 
   };
 
