@@ -46,22 +46,25 @@ namespace web {
 
     bool Has(const std::string setting) {
       return settings.find(setting) != settings.end();
-    };
+    }
 
     const std::string & Get(const std::string setting) {
       // Note: if setting did not exist, this does create an empty entry.
       return settings[setting];
-    };
+    }
     
+    // Apply ALL of the style settings.
     void Apply(const std::string & widget_id) {
       // Stop immediately if nothing to set.
       if (settings.size() == 0) return;
       
       // Find the current object only once.
+#ifdef EMSCRIPTEN
       EM_ASM_ARGS({
           var id = Pointer_stringify($0);
           emp_i.cur_obj = $( '#' + id );
         }, widget_id.c_str());
+#endif
 
       for (auto css_pair : settings) {
         if (css_pair.second == "") continue; // Ignore empty entries.
@@ -76,6 +79,39 @@ namespace web {
                   << "' to '" << css_pair.second << "'.";
 #endif
       }
+    }
+
+    // Apply onlay a SPECIFIC style setting from the setting library.
+    void Apply(const std::string & widget_id, const std::string & setting) {
+      emp_assert(Has(setting));
+      
+#ifdef EMSCRIPTEN
+      EM_ASM_ARGS({
+          var id = Pointer_stringify($0);
+          var setting = Pointer_stringify($1);
+          var value = Pointer_stringify($2);
+          $( '#' + id ).css( setting, value);
+        }, widget_id.c_str(), setting.c_str(), settings[setting].c_str());
+#else
+      std::cout << "Setting '" << widget_id << "' attribute '" << name
+                << "' to '" << settings[name] << "'.";
+#endif
+    }
+    
+    // Apply onlay a SPECIFIC style setting with a specifid value!
+    static void Apply(const std::string & widget_id, const std::string & setting,
+                      const std::string & value) {
+#ifdef EMSCRIPTEN
+      EM_ASM_ARGS({
+          var id = Pointer_stringify($0);
+          var setting = Pointer_stringify($1);
+          var value = Pointer_stringify($2);
+          $( '#' + id ).css( setting, value);
+        }, widget_id.c_str(), setting.c_str(), value.c_str());
+#else
+      std::cout << "Setting '" << widget_id << "' attribute '" << name
+                << "' to '" << value << "'.";
+#endif
     }
     
   };
