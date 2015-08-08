@@ -17,6 +17,7 @@
 //  Development notes:
 //  * Change 'active' flag to an activity state enum, which can include INACTIVE,
 //    WAITING (for document ready), LIVE, and ERROR (due to not having an element?).
+//  * Move Widget outside of internal; possibly put various other *Info classes INTO internal.
 //
 
 #include <string>
@@ -97,7 +98,8 @@ namespace web {
 
       Widget & AddDependent(const Widget & w);
 
-      // Setup << operator to redirect to Append.
+      // Setup << operator to redirect to Append; option preparation can be overridden.
+      virtual void PrepareAppend() { ; }
       template <typename IN_TYPE> Widget operator<<(IN_TYPE && in_val);
 
       // Debug...
@@ -123,7 +125,6 @@ namespace web {
       emp::vector<Widget> dependents; // Widgets to be refreshed if this one is activated.
       bool append_ok;                 // Can we add more children?
       bool active;                    // Is this element active in DOM?
-
 
       // WidgetInfo cannot be built unless within derived class, so constructor is protected
       WidgetInfo(const std::string & in_id="")
@@ -353,6 +354,7 @@ namespace web {
 
     template <typename IN_TYPE>
     Widget Widget::operator<<(IN_TYPE && in_val) {
+      PrepareAppend();
       return info->Append(std::forward<IN_TYPE>(in_val));
     }
 
