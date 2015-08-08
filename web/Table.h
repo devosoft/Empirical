@@ -15,6 +15,7 @@
 
 #include "../tools/vector.h"
 
+#include "Slate.h"
 #include "Widget.h"
 
 namespace emp {
@@ -195,11 +196,11 @@ namespace web {
       // If the current cell does not have a slate, generate one now.
       if (!cur_cell.HasSlate()) {
         cur_cell.SetChildID(Info()->children.size());
-        AddChild( Info()->BuildSlate() );
+        Info()->AddChild( Slate("") );
       }
 
       // Return the element, now that we know we have it.
-      return children.back();
+      return Info()->children.back();
     }
 
 
