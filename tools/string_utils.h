@@ -289,19 +289,38 @@ namespace emp {
   // The next functions are not efficient, but they will take any number of inputs and
   // dynamically convert them all into a single, concatanated strings or stringstreams.
 
-  void append_sstream(std::stringstream & ss) { (void) ss; }
+  namespace internal {
+    void append_sstream(std::stringstream & ss) { (void) ss; }
 
-  template <typename TYPE, typename... OTHER_TYPES>
-  void append_sstream(std::stringstream & ss, TYPE value, OTHER_TYPES... other_values) {
-    ss << value;
-    append_sstream(ss, other_values...);
+    template <typename TYPE, typename... OTHER_TYPES>
+    void append_sstream(std::stringstream & ss, TYPE value, OTHER_TYPES... other_values) {
+      ss << value;
+      append_sstream(ss, other_values...);
+    }
+
+    // Give mutliple implmentations of to_string_impl... if we can append quickly, do so!!
+    template <typename... ALL_TYPES>
+    inline std::string to_string_impl(int, ALL_TYPES... all_values) {
+      std::stringstream ss;
+      append_sstream(ss, all_values...);
+      return ss.str();
+    }
+
+    // If there's a single POD entry, we can convert it manually and pass the result back.
+    inline std::string to_string_impl(bool, const std::string & s) { return s; }
+    inline std::string to_string_impl(bool, int32_t v) { return std::to_string(v); }
+    inline std::string to_string_impl(bool, uint32_t v) { return std::to_string(v); }
+    inline std::string to_string_impl(bool, int64_t v) { return std::to_string(v); }
+    inline std::string to_string_impl(bool, uint64_t v) { return std::to_string(v); }
+    inline std::string to_string_impl(bool, float v) { return std::to_string(v); }
+    inline std::string to_string_impl(bool, double v) { return std::to_string(v); }
+    inline std::string to_string_impl(bool, char c) { return std::string(1,c); }
+    inline std::string to_string_impl(bool, unsigned char c) { return std::string(1,c); }
   }
 
   template <typename... ALL_TYPES>
-  std::string to_string(ALL_TYPES... all_values) {
-    std::stringstream ss;
-    append_sstream(ss, all_values...);
-    return ss.str();
+  inline std::string to_string(ALL_TYPES... all_values) {
+    return internal::to_string_impl(true, std::forward<ALL_TYPES>(all_values)...);
   }
 };
 
