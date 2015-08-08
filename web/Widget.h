@@ -79,9 +79,11 @@ namespace web {
       virtual bool AppendOK() const;
 
       std::string GetID() const;
-      virtual std::string CSS(const std::string & setting);
-      bool HasCSS(const std::string & setting);
       bool HasChild(const Widget & test_child);
+
+      // CSS-related options may be overridden in derived classes that have multiple styles.
+      virtual std::string CSS(const std::string & setting);
+      virtual bool HasCSS(const std::string & setting);
 
       bool operator==(const Widget & in) const { return info == in.info; }
       bool operator!=(const Widget & in) const { return info != in.info; }
@@ -304,6 +306,13 @@ namespace web {
 
     bool Widget::AppendOK() const { return info->append_ok; }
     std::string Widget::GetID() const { return info ? info->id : ""; }
+
+    bool Widget::HasChild(const Widget & test_child) {
+      if (!info) return false;
+      for (const Widget & c : info->children) if (c == test_child) return true;
+      return false;
+    }
+
     std::string Widget::CSS(const std::string & setting) {
       return info ? info->style.Get(setting) : "";
     }
@@ -311,11 +320,6 @@ namespace web {
       return info ? info->style.Has(setting) : false;
     }
 
-    bool Widget::HasChild(const Widget & test_child) {
-      if (!info) return false;
-      for (const Widget & c : info->children) if (c == test_child) return true;
-      return false;
-    }
     
     void Widget::Activate() {
       auto * cur_info = info;
@@ -376,12 +380,17 @@ namespace web {
 
       emp::vector<Widget> & Children() { return info->children; }
 
+      // CSS-related options may be overridden in derived classes that have multiple styles.
+      virtual void DoCSS(const std::string & setting, const std::string & value) {
+        info->style.DoSet(setting, value);
+        if (info->active) Style::Apply(info->id, setting, value);
+      }
+
     public:
       template <typename SETTING_TYPE>
       RETURN_TYPE & CSS(const std::string & setting, SETTING_TYPE && value) {
         emp_assert(info != nullptr);
-        info->style.Set(setting, value);
-        if (info->active) info->style.Apply(info->id);
+        DoCSS(setting, emp::to_string(value));
         return (RETURN_TYPE &) *this;
       }
 
