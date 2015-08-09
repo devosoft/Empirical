@@ -176,13 +176,21 @@ namespace web {
     }
 
     void UpdateRows(int r) {
-      rows.resize(r);                                                  // Resize rows.
-      for (int i = row_count; i < r; i++) rows[i].SetCols(col_count);  // Initialize new rows.
-      row_count = r;                                                   // Store new size.
+      if (row_count != r) {                             // Update only if we're making a change.
+        rows.resize(r);                                 // Resize rows.
+        for (int i = row_count; i < r; i++) {
+          rows[i].SetCols(col_count);                   // Initialize new rows.
+        }
+        row_count = r;                                  // Store new size.
+        if (active) ReplaceHTML();                      // If active, update screen!
+      }
     }
     void UpdateCols(int c) {
-      col_count = c;                                    // Store new size.
-      for (auto & row : rows) row.SetCols(col_count);   // Make sure all rows have new col_count
+      if (col_count != c) {                               // Update only if we're making a change.
+        col_count = c;                                    // Store new size.
+        for (auto & row : rows) row.SetCols(col_count);   // Make sure all rows have new col_count
+        if (active) ReplaceHTML();                        // If active, update screen!
+      }
     }
 
       
@@ -290,6 +298,7 @@ namespace web {
     Table & SetHeader(bool _h=true) {
       emp_assert(state == CELL);
       Info()->rows[cur_row].data[cur_col].SetHeader(_h);
+      if (Info()->active) Info()->ReplaceHTML();
       return *this;
     }
 
@@ -325,6 +334,8 @@ namespace web {
         }
       }
       
+      if (Info()->active) Info()->ReplaceHTML();
+
       return *this;
     }
       
@@ -351,6 +362,8 @@ namespace web {
         }
       }
       
+      if (Info()->active) Info()->ReplaceHTML();
+
       return *this;
     }
     
