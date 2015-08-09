@@ -22,6 +22,7 @@ namespace emp {
 namespace web {
 
   class TableRow;
+  class TableInfo;
   class Table;
 
   class TableData {
@@ -35,7 +36,8 @@ namespace web {
     Style style;    // CSS Style
 
   public:
-    TableData() : colspan(1), rowspan(1), child_id(-1), header(false), masked(false) { ; }
+    TableData() : colspan(1), rowspan(1), child_id(-1)
+                , header(false), masked(false) { ; }
     ~TableData() { ; }
 
     int GetColSpan() const { return colspan; }
@@ -69,7 +71,7 @@ namespace web {
   };
     
   class TableRow {
-    friend Table;
+    friend Table; friend TableInfo;
   protected:
     emp::vector<TableData> data;  // detail object for each cell in this row.
     Style style;
@@ -110,15 +112,32 @@ namespace web {
   class TableInfo : public internal::WidgetInfo {
     friend Table;
   protected:
-    int row_count;    // How big is this table?
+    int row_count;                // How big is this table?
     int col_count;
     emp::vector<TableRow> rows;   // detail object for each row.
+    Table * append_widget;        // Which widget is triggering an append?
 
-    TableInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
+    TableInfo(const std::string & in_id="")
+      : internal::WidgetInfo(in_id), row_count(0), col_count(0), append_widget(nullptr) { ; }
     TableInfo(const TableInfo &) = delete;               // No copies of INFO allowed
     TableInfo & operator=(const TableInfo &) = delete;   // No copies of INFO allowed
     virtual ~TableInfo() { ; }
 
+    // Get a slate associated with the current cell (and build one if we need to...)
+    internal::Widget & GetCurSlate();
+
+    // Add additional children on to this element.
+    internal::Widget Append(const std::string & text) override {
+      return GetCurSlate() << text;
+    }
+    internal::Widget Append(const std::function<std::string()> & in_fun) override {
+      return GetCurSlate() << in_fun;
+    }
+
+    internal::Widget Append(internal::Widget info) override {
+      return GetCurSlate() << info;
+    }
+    
     virtual void GetHTML(std::stringstream & HTML) override {
       HTML.str("");                                           // Clear the current text.
       HTML << "<table id=\"" << id << "\">";
@@ -189,21 +208,6 @@ namespace web {
  
     Table(TableInfo * in_info) : WidgetFacet(in_info) { ; }
 
-    // Get a slate associated with the current cell (and build one if we need to...)
-    Widget & GetCurSlate() {
-      auto & cur_cell = GetCurCell();
-
-      // If the current cell does not have a slate, generate one now.
-      if (!cur_cell.HasSlate()) {
-        cur_cell.SetChildID(Info()->children.size());
-        Info()->AddChild( Slate("") );
-      }
-
-      // Return the element, now that we know we have it.
-      return Info()->children.back();
-    }
-
-
     // Apply to appropriate component based on current state.
     void DoCSS(const std::string & setting, const std::string & value) override {
       if (state == TABLE) WidgetFacet<Table>::DoCSS(setting, value);
@@ -237,9 +241,14 @@ namespace web {
 
     using INFO_TYPE = TableInfo;
 
+    bool IsTable() const override { return true; } 
+
     int GetNumCols() const { return Info()->col_count; }
     int GetNumRows() const { return Info()->row_count; }
     int GetNumCells() const { return Info()->col_count*Info()->row_count; }
+
+    // Called before an append.
+    virtual void PrepareAppend() override { Info()->append_widget = this; }
     
     int GetCurRow() const { return cur_row; }
     int GetCurCol() const { return cur_col; }
@@ -248,8 +257,6 @@ namespace web {
     bool InStateRow() const { return state == ROW; }
     bool InStateCell() const { return state == CELL; }
     
-
-    TableData & GetCurCell() { return Info()->rows[cur_row].data[cur_col]; }
 
     Table & Rows(int r) {
       Info()->UpdateRows(r);
@@ -443,6 +450,27 @@ namespace web {
     }
   };
 
+  // Setup mechanism to retrieve current slate for table append.
+  internal::Widget & TableInfo::GetCurSlate() {
+    int cur_col = append_widget->cur_row;
+    int cur_row = append_widget->cur_row;
+
+    // Make sure the number of rows hasn't changed, making the current position illegal.
+    if (cur_col >= col_count) cur_col = 0;
+    if (cur_row >= row_count) cur_row = 0;
+
+    auto & cur_cell = rows[cur_row].data[cur_col];
+    
+    // If the current cell does not have a slate, generate one now.
+    if (!cur_cell.HasSlate()) {
+      cur_cell.SetChildID(children.size());
+      AddChild( Slate("") );
+    }
+    
+    // Return the element, now that we know we have it.
+    return children.back();
+  }
+  
 };
 };
 
