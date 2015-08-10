@@ -61,7 +61,7 @@ namespace web {
       if (verbose) ss << prefix << "Scanning: emp::TableData; child_id=" << child_id << std::endl;
 
       if (child_id >= 0 && masked == true) {
-        ss << "Warning: Masked row has contents!" << std::endl;
+        ss << "Warning: Masked cell has contents!" << std::endl;
         ok = false;
       }
       
@@ -298,7 +298,7 @@ namespace web {
     Table & SetHeader(bool _h=true) {
       emp_assert(state == CELL);
       Info()->rows[cur_row].data[cur_col].SetHeader(_h);
-      if (Info()->active) Info()->ReplaceHTML();   // @CAO only really need to replace this cell.
+      if (Info()->active) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
       return *this;
     }
 
@@ -376,6 +376,7 @@ namespace web {
     Table & RowCSS(int row_id, const std::string & setting, SETTING_TYPE && value) {
       emp_assert(row_id >= 0 && row_id < Info()->row_count);
       Info()->rows[row_id].style.Set(setting, value);
+      if (Info()->active) Info()->ReplaceHTML();   // @CAO only should replace row's CSS
       return *this;
     }
        
@@ -385,6 +386,7 @@ namespace web {
       emp_assert(row_id >= 0 && row_id < Info()->row_count);
       emp_assert(col_id >= 0 && col_id < Info()->row_count);
       Info()->rows[row_id].style.Set(setting, value);
+      if (Info()->active) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
       return *this;
     }
         
@@ -392,6 +394,7 @@ namespace web {
     template <typename SETTING_TYPE>
     Table & RowsCSS(const std::string & setting, SETTING_TYPE && value) {
       for (auto & row : Info()->rows) row.style.Set(setting, emp::to_string(value));
+      if (Info()->active) Info()->ReplaceHTML();
       return *this;
     }
         
@@ -399,6 +402,7 @@ namespace web {
     template <typename SETTING_TYPE>
     Table & CellsCSS(const std::string & setting, SETTING_TYPE && value) {
       for (auto & row : Info()->rows) row.CellsCSS(setting, emp::to_string(value));
+      if (Info()->active) Info()->ReplaceHTML();
       return *this;
     }
 
