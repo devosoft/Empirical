@@ -87,7 +87,7 @@ namespace web {
 
     TableRow & SetCols(int c) { data.resize(c); return *this; }
 
-    // Apply to all cells in row.  (@CAO: Can we use fancier jquery here?)
+    // Apply to all cells in row.
     template <typename SETTING_TYPE>
     TableRow & CellsCSS(const std::string & setting, SETTING_TYPE && value) {
       for (auto & datum : data) datum.style.Set(setting, value);
@@ -298,11 +298,12 @@ namespace web {
     Table & SetHeader(bool _h=true) {
       emp_assert(state == CELL);
       Info()->rows[cur_row].data[cur_col].SetHeader(_h);
-      if (Info()->active) Info()->ReplaceHTML();
+      if (Info()->active) Info()->ReplaceHTML();   // @CAO only really need to replace this cell.
       return *this;
     }
 
     // Apply to appropriate component based on current state.
+    using WidgetFacet<Table>::CSS;
     std::string CSS(const std::string & setting) override {
       if (state == TABLE) return Info()->style.Get(setting);
       if (state == ROW) return Info()->rows[cur_row].style.Get(setting);
@@ -334,6 +335,7 @@ namespace web {
         }
       }
       
+      // Redraw the entire table to fix col span information.
       if (Info()->active) Info()->ReplaceHTML();
 
       return *this;
@@ -362,6 +364,7 @@ namespace web {
         }
       }
       
+      // Redraw the entire table to fix row span information.
       if (Info()->active) Info()->ReplaceHTML();
 
       return *this;
