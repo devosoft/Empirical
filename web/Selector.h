@@ -104,7 +104,7 @@ namespace web {
         JSWrap( std::function<void(int)>([s_info](int new_id){s_info->DoChange(new_id);}) );
     }
     Selector(const Selector & in) : WidgetFacet(in) { ; }
-    Selector(const internal::Widget & in) : WidgetFacet(in) { ; }
+    Selector(const Widget & in) : WidgetFacet(in) { ; }
     virtual ~Selector() { ; }
 
     using INFO_TYPE = SelectorInfo;

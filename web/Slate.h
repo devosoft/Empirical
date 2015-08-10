@@ -23,7 +23,7 @@ namespace web {
   class SlateInfo : public internal::WidgetInfo {
     friend Slate;
   protected:
-    std::map<std::string, internal::Widget> widget_dict;   // By-name lookup for widgets
+    std::map<std::string, Widget> widget_dict;   // By-name lookup for widgets
     
     SlateInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
     SlateInfo(const SlateInfo &) = delete;               // No copies of INFO allowed
@@ -46,12 +46,12 @@ namespace web {
       return (widget_dict.find(test_name) != widget_dict.end());
     }
 
-    internal::Widget & GetRegistered(const std::string & find_name) {
+    Widget & GetRegistered(const std::string & find_name) {
       emp_assert(IsRegistered(find_name), find_name, widget_dict.size());
       return widget_dict[find_name];
     }
 
-    void Register(internal::Widget & new_widget) override {
+    void Register(Widget & new_widget) override {
       // Make sure name is not already used
       emp_assert(IsRegistered(new_widget.GetID()) == false, new_widget.GetID());
 
@@ -60,21 +60,21 @@ namespace web {
     }
 
     // Add additional children on to this element.
-    internal::Widget Append(const std::string & text) override {
+    Widget Append(const std::string & text) override {
       return GetTextWidget() << text;
     }
-    internal::Widget Append(const std::function<std::string()> & in_fun) override {
+    Widget Append(const std::function<std::string()> & in_fun) override {
       return GetTextWidget() << in_fun;
     }
 
-    internal::Widget Append(internal::Widget info) override { AddChild(info); return info; }
+    Widget Append(Widget info) override { AddChild(info); return info; }
     
     // All derived widgets must suply a mechanism for providing associated HTML code.
     virtual void GetHTML(std::stringstream & HTML) override {
       HTML.str("");       // Clear the current text.
 
       // Loop through all children and build a span element for each to replace.
-      for (internal::Widget & w : children) {
+      for (Widget & w : children) {
         HTML << "<span id=\'" << w.GetID() << "'></span>";  // Span element for current widget.
       }
     }
@@ -96,14 +96,14 @@ namespace web {
       info = new SlateInfo(in_name);
     }
     Slate(const Slate & in) : WidgetFacet(in) { ; }
-    Slate(const internal::Widget & in) : WidgetFacet(in) { ; }
+    Slate(const Widget & in) : WidgetFacet(in) { ; }
     ~Slate() { ; }
 
     virtual bool IsSlate() const { return true; }
     using INFO_TYPE = SlateInfo;
    
     // Methods to look up previously created elements, by type.
-    internal::Widget & Find(const std::string & test_name) {
+    Widget & Find(const std::string & test_name) {
        return Info()->GetRegistered(test_name);
     }
 

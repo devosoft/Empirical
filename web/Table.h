@@ -124,17 +124,17 @@ namespace web {
     virtual ~TableInfo() { ; }
 
     // Get a slate associated with the current cell (and build one if we need to...)
-    internal::Widget & GetCurSlate();
+    Widget & GetCurSlate();
 
     // Add additional children on to this element.
-    internal::Widget Append(const std::string & text) override {
+    Widget Append(const std::string & text) override {
       return GetCurSlate() << text;
     }
-    internal::Widget Append(const std::function<std::string()> & in_fun) override {
+    Widget Append(const std::function<std::string()> & in_fun) override {
       return GetCurSlate() << in_fun;
     }
 
-    internal::Widget Append(internal::Widget info) override {
+    Widget Append(Widget info) override {
       return GetCurSlate() << info;
     }
     
@@ -161,7 +161,7 @@ namespace web {
           
           // If this cell has contents, initialize them!
           if (datum.HasSlate()) {
-            internal::Widget & widget = children[datum.GetChildID()];
+            Widget & widget = children[datum.GetChildID()];
             HTML << "<span id=\"" << widget.GetID() << "\"></span>\n";
           }
 
@@ -244,7 +244,7 @@ namespace web {
     }
     Table(const Table & in)
       : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col), state(in.state) { ; }
-    Table(const internal::Widget & in) : WidgetFacet(in) { ; }
+    Table(const Widget & in) : WidgetFacet(in) { ; }
     virtual ~Table() { ; }
 
     using INFO_TYPE = TableInfo;
@@ -471,7 +471,7 @@ namespace web {
   };
 
   // Setup mechanism to retrieve current slate for table append.
-  internal::Widget & TableInfo::GetCurSlate() {
+  Widget & TableInfo::GetCurSlate() {
     int cur_col = append_widget->cur_row;
     int cur_row = append_widget->cur_row;
 

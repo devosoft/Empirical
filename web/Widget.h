@@ -15,8 +15,12 @@
 //
 //
 //  Development notes:
-//  * Change 'active' flag to an activity state enum, which can include INACTIVE,
-//    WAITING (for document ready), LIVE, and ERROR (due to not having an element?).
+//  * Change 'active' flag to an activity state enum, which can include:
+//      INACTIVE - Widget is not currently part of the DOM.
+//      WAITING - As soon as document is ready, widgit will be live.
+//      LIVE - Widget is part of DOM
+//      STATIC - Part of DOM, but not immediately updating when changes occur.
+//      ERROR -  Hopefully not needed?  Possible in case of DOM corruption?
 //  * Move Widget outside of internal; possibly put various other *Info classes INTO internal.
 //
 
@@ -36,7 +40,6 @@ namespace web {
   class SlateInfo;
 
   namespace internal {
-
       // Provide a quick method for generating unique IDs when not otherwise specified.
     static std::string NextWidgetID() {
       static int next_id = 0;
@@ -45,67 +48,71 @@ namespace web {
     
     // Pre-declate WidgetInfo so classes can inter-operate.
     class WidgetInfo;
+  }
+  
 
-    // Widget is a smart pointer to a WidgetInfo object, plus some basic accessors.
-    class Widget {
-      friend WidgetInfo; friend SlateInfo;
-    protected:
-      WidgetInfo * info;
-
-      // If an Append doesn't work with current class, forward it to the parent.
-      template <typename FWD_TYPE> Widget & ForwardAppend(FWD_TYPE && arg);
-
-      Widget & SetInfo(WidgetInfo * in_info);
-
-      // Internally, we can treat a Widget as a pointer to its WidgetInfo.
-      WidgetInfo * operator->() { return info; }
-
-      // Give derived classes the ability to access widget info.
-      static WidgetInfo * Info(const Widget & w) { return w.info; }
-
-    public:
-      Widget(const std::string & id);
-      Widget(WidgetInfo * in_info=nullptr);
-      Widget(const Widget & in) : Widget(in.info) { ; }
-      Widget & operator=(const Widget & in) { return SetInfo(in.info); }
-      
-      virtual ~Widget();
-
-      bool IsNull() const { return info == nullptr; }
-      bool IsActive() const;
-
-      virtual bool IsSlate() const { return false; }
-      virtual bool IsTable() const { return false; }
-      virtual bool IsText() const { return false; }
-      virtual bool AppendOK() const;
-
-      std::string GetID() const;
-      bool HasChild(const Widget & test_child);
-
-      // CSS-related options may be overridden in derived classes that have multiple styles.
-      virtual std::string CSS(const std::string & setting);
-      virtual bool HasCSS(const std::string & setting);
-
-      bool operator==(const Widget & in) const { return info == in.info; }
-      bool operator!=(const Widget & in) const { return info != in.info; }
-      operator bool() const { return info != nullptr; }      
-
-      // An active widget makes live changes to the webpage (once document is ready)
-      // An inactive widget just records changes internally.
-      void Activate();
-      void Deactivate(bool top_level=true);
-      bool ToggleActive();
-
-      Widget & AddDependent(const Widget & w);
-
-      // Setup << operator to redirect to Append; option preparation can be overridden.
-      virtual void PrepareAppend() { ; }
-      template <typename IN_TYPE> Widget operator<<(IN_TYPE && in_val);
-
-      // Debug...
-      std::string GetInfoType() const;
-    };
+  // Widget is a smart pointer to a WidgetInfo object, plus some basic accessors.
+  class Widget {
+    friend internal::WidgetInfo; friend SlateInfo;
+  protected:
+    using WidgetInfo = internal::WidgetInfo;
+    WidgetInfo * info;
     
+    // If an Append doesn't work with current class, forward it to the parent.
+    template <typename FWD_TYPE> Widget & ForwardAppend(FWD_TYPE && arg);
+    
+    Widget & SetInfo(WidgetInfo * in_info);
+    
+    // Internally, we can treat a Widget as a pointer to its WidgetInfo.
+    WidgetInfo * operator->() { return info; }
+    
+    // Give derived classes the ability to access widget info.
+    static WidgetInfo * Info(const Widget & w) { return w.info; }
+    
+  public:
+    Widget(const std::string & id);
+    Widget(WidgetInfo * in_info=nullptr);
+    Widget(const Widget & in) : Widget(in.info) { ; }
+    Widget & operator=(const Widget & in) { return SetInfo(in.info); }
+    
+    virtual ~Widget();
+    
+    bool IsNull() const { return info == nullptr; }
+    bool IsActive() const;
+    
+    virtual bool IsSlate() const { return false; }
+    virtual bool IsTable() const { return false; }
+    virtual bool IsText() const { return false; }
+    virtual bool AppendOK() const;
+    
+    std::string GetID() const;
+    bool HasChild(const Widget & test_child);
+    
+    // CSS-related options may be overridden in derived classes that have multiple styles.
+    virtual std::string CSS(const std::string & setting);
+    virtual bool HasCSS(const std::string & setting);
+    
+    bool operator==(const Widget & in) const { return info == in.info; }
+    bool operator!=(const Widget & in) const { return info != in.info; }
+    operator bool() const { return info != nullptr; }      
+    
+    // An active widget makes live changes to the webpage (once document is ready)
+    // An inactive widget just records changes internally.
+    void Activate();
+    void Deactivate(bool top_level=true);
+    bool ToggleActive();
+    
+    Widget & AddDependent(const Widget & w);
+    
+    // Setup << operator to redirect to Append; option preparation can be overridden.
+    virtual void PrepareAppend() { ; }
+    template <typename IN_TYPE> Widget operator<<(IN_TYPE && in_val);
+    
+    // Debug...
+    std::string GetInfoType() const;
+  };
+  
+  namespace internal {
 
     // WidgetInfo is a base class containing information needed by all GUI widget classes
     // (Buttons, Images, etc...).  It take in a return type to be cast to for accessors.
@@ -242,7 +249,7 @@ namespace web {
         // Update the style
         style.Apply(id);
 
-        // Run associated Javascript code, if any.
+        // Run associated Javascript code, if any (e.g., to fill out a canvas)
         TriggerJS();
 
         // If active, recurse to children!
@@ -261,118 +268,120 @@ namespace web {
     
     };
 
+  }  // end namespaceinternal
 
-    // Implementation of Widget methods...
+  // Implementation of Widget methods...
 
-    Widget::Widget(const std::string & id) {
-      // We are creating a new widget; in derived class, make sure:
-      // ... to assign info pointer to new object of proper *Info type
-      // ... NOT to increment info->ptr_count since it's initialized to 1.
+  Widget::Widget(const std::string & id) {
+    // We are creating a new widget; in derived class, make sure:
+    // ... to assign info pointer to new object of proper *Info type
+    // ... NOT to increment info->ptr_count since it's initialized to 1.
+  }
+  
+  Widget::Widget(WidgetInfo * in_info) {
+    info = in_info;
+    if (info) info->ptr_count++;
+  }
+  
+  Widget::~Widget() {
+    // We are deleting a widget.
+    if (info) {
+      info->ptr_count--;
+      if (info->ptr_count == 0) delete info;
     }
+  }
 
-    Widget::Widget(WidgetInfo * in_info) {
-      info = in_info;
-      if (info) info->ptr_count++;
-    }
-
-    Widget::~Widget() {
-      // We are deleting a widget.
-      if (info) {
-        info->ptr_count--;
-        if (info->ptr_count == 0) delete info;
-      }
-    }
-
-    Widget & Widget::SetInfo(WidgetInfo * in_info) {
-      // If the widget is already set correctly, stop here.
-      if (info == in_info) return *this;
-      
-      // Clean up the old info that was previously pointed to.
-      if (info) {
-        info->ptr_count--;
-        if (info->ptr_count == 0) delete info;
-      }
-
-      // Setup new info.
-      info = in_info;
-      if (info) info->ptr_count++;
-
-      return *this;
-    }
-
-    bool Widget::IsActive() const {
-      if (!info) return false;
-      return info->active;
-    }
-
-    bool Widget::AppendOK() const { return info->append_ok; }
-    std::string Widget::GetID() const { return info ? info->id : ""; }
-
-    bool Widget::HasChild(const Widget & test_child) {
-      if (!info) return false;
-      for (const Widget & c : info->children) if (c == test_child) return true;
-      return false;
-    }
-
-    std::string Widget::CSS(const std::string & setting) {
-      return info ? info->style.Get(setting) : "";
-    }
-    bool Widget::HasCSS(const std::string & setting) {
-      return info ? info->style.Has(setting) : false;
-    }
-
+  Widget & Widget::SetInfo(WidgetInfo * in_info) {
+    // If the widget is already set correctly, stop here.
+    if (info == in_info) return *this;
     
-    void Widget::Activate() {
-      auto * cur_info = info;
-      OnDocumentReady( std::function<void(void)>([cur_info](){ cur_info->DoActivate(); }) );
+    // Clean up the old info that was previously pointed to.
+    if (info) {
+      info->ptr_count--;
+      if (info->ptr_count == 0) delete info;
     }
 
-    void Widget::Deactivate(bool top_level) {
-      // Skip if we are not active.
-      if (!info || !info->active) return;
+    // Setup new info.
+    info = in_info;
+    if (info) info->ptr_count++;
+    
+    return *this;
+  }
 
-      info->active = false;
+  bool Widget::IsActive() const {
+    if (!info) return false;
+    return info->active;
+  }
+  
+  bool Widget::AppendOK() const { return info->append_ok; }
+  std::string Widget::GetID() const { return info ? info->id : ""; }
+  
+  bool Widget::HasChild(const Widget & test_child) {
+    if (!info) return false;
+    for (const Widget & c : info->children) if (c == test_child) return true;
+    return false;
+  }
+  
+  std::string Widget::CSS(const std::string & setting) {
+    return info ? info->style.Get(setting) : "";
+  }
+  bool Widget::HasCSS(const std::string & setting) {
+    return info ? info->style.Has(setting) : false;
+  }
+  
+  
+  void Widget::Activate() {
+    auto * cur_info = info;
+    OnDocumentReady( std::function<void(void)>([cur_info](){ cur_info->DoActivate(); }) );
+  }
+  
+  void Widget::Deactivate(bool top_level) {
+    // Skip if we are not active.
+    if (!info || !info->active) return;
+    
+    info->active = false;
+    
+    // Deactivate all of the children (marking them as not at the top level.)
+    for (auto & child : info->children) child.Deactivate(false);
+    
+    // If we are at the top level, clear the contents by replaceing the HTML.
+    if (top_level) info->ReplaceHTML();
+  }
 
-      // Deactivate all of the children (marking them as not at the top level.)
-      for (auto & child : info->children) child.Deactivate(false);
+  bool Widget::ToggleActive() {
+    emp_assert(info);
+    if (info->active == true) Deactivate();
+    else Activate();
+    return info->active;
+  }
+  
+  Widget & Widget::AddDependent(const Widget & w) {
+    info->AddDependent(w);
+    return *this;
+  }
+  
+  template <typename IN_TYPE>
+  Widget Widget::operator<<(IN_TYPE && in_val) {
+    PrepareAppend();
+    return info->Append(std::forward<IN_TYPE>(in_val));
+  }
 
-      // If we are at the top level, clear the contents by replaceing the HTML.
-      if (top_level) info->ReplaceHTML();
-    }
-
-    bool Widget::ToggleActive() {
-      emp_assert(info);
-      if (info->active == true) Deactivate();
-      else Activate();
-      return info->active;
-    }
-
-    Widget & Widget::AddDependent(const Widget & w) {
-      info->AddDependent(w);
-      return *this;
-    }
-
-    template <typename IN_TYPE>
-    Widget Widget::operator<<(IN_TYPE && in_val) {
-      PrepareAppend();
-      return info->Append(std::forward<IN_TYPE>(in_val));
-    }
-
-    std::string Widget::GetInfoType() const {
-      if (!info) return "UNINITIALIZED";
-      return info->GetType();
-    }
-
-
+  std::string Widget::GetInfoType() const {
+    if (!info) return "UNINITIALIZED";
+    return info->GetType();
+  }
+  
+  
+  namespace internal {
     // WidgetFacet is a template that provides accessors into Widget with a derived return type.
-    
+  
     template <typename RETURN_TYPE>
     class WidgetFacet : public Widget {
     protected: 
       // WidgetFacet cannot be built unless within derived class, so constructors are protected
       WidgetFacet(const std::string & in_id="") : Widget(in_id) { ; }
       WidgetFacet(const WidgetFacet & in) : Widget(in) { ; }
-      WidgetFacet(const internal::Widget & in) : Widget(in) {
+      WidgetFacet(const Widget & in) : Widget(in) {
         // Converting from a generic widget; make sure type is correct!
         emp_assert(dynamic_cast<typename RETURN_TYPE::INFO_TYPE *>( Info(in) ) != NULL);
       }

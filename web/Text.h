@@ -25,8 +25,8 @@ namespace web {
     TextInfo & operator=(const TextInfo &) = delete;   // No copies of INFO allowed
     virtual ~TextInfo() { ; }
 
-    internal::Widget Append(const std::string & in_text) override;
-    internal::Widget Append(const std::function<std::string()> & in_fun) override;
+    Widget Append(const std::string & in_text) override;
+    Widget Append(const std::function<std::string()> & in_fun) override;
 
     // All derived widgets must suply a mechanism for providing associated HTML code.
     virtual void GetHTML(std::stringstream & HTML) override {
@@ -54,7 +54,7 @@ namespace web {
       info = new TextInfo(in_id);
     }
     Text(const Text & in) : WidgetFacet(in) { ; }
-    Text(const internal::Widget & in) : WidgetFacet(in) { ; }
+    Text(const Widget & in) : WidgetFacet(in) { ; }
     ~Text() { ; }
 
     virtual bool IsText() const { return true; }
@@ -64,13 +64,13 @@ namespace web {
 
   };  
 
-  internal::Widget TextInfo::Append(const std::string & in_text) {
+  Widget TextInfo::Append(const std::string & in_text) {
     strings.Append(in_text);     // Record the new string being added.
     if (active) ReplaceHTML();   // If node is active, immediately redraw!
     return web::Text(this);
   }
 
-  internal::Widget TextInfo::Append(const std::function<std::string()> & in_fun) {
+  Widget TextInfo::Append(const std::function<std::string()> & in_fun) {
     strings.Append(in_fun);      // Record the new function being added.
     if (active) ReplaceHTML();   // If node is active, immediately redraw!
     return web::Text(this);

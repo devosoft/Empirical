@@ -28,7 +28,7 @@ namespace web {
     virtual ~ImageInfo() { ; }
 
     virtual void GetHTML(std::stringstream & HTML) override {
-      HTML.str("");                                           // Clear the current text.
+      HTML.str("");                                      // Clear the current text.
       HTML << "<img src=\"" << url << "\""
            << " alt=\"" << alt_text << "\""
            << " id=\"" << id << "\">";
@@ -59,7 +59,7 @@ namespace web {
       Info()->url = in_url;
     }
     Image(const Image & in) : WidgetFacet(in) { ; }
-    Image(const internal::Widget & in) : WidgetFacet(in) { ; }
+    Image(const Widget & in) : WidgetFacet(in) { ; }
     virtual ~Image() { ; }
 
     using INFO_TYPE = ImageInfo;

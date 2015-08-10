@@ -98,7 +98,7 @@ namespace web {
       Info()->height = h;
     }
     Canvas(const Canvas & in) : WidgetFacet(in) { ; }
-    Canvas(const internal::Widget & in) : WidgetFacet(in) { ; }
+    Canvas(const Widget & in) : WidgetFacet(in) { ; }
     virtual ~Canvas() { ; }
 
     using INFO_TYPE = CanvasInfo;
