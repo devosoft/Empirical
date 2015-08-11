@@ -55,25 +55,31 @@ namespace web {
         if (callback_id) emp::JSDelete(callback_id);    // Delete previous callback wrapper.
         callback_id = JSWrap(in_cb);                    // Save id for callback trigger.
         onclick_info = std::string("emp.Callback(") + std::to_string(callback_id) + ")";
-        if (active) ReplaceHTML();                      // If node is active, immediately redraw!
+        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
       }
       void UpdateCallback(const std::string in_cb_info) {
         if (callback_id) emp::JSDelete(callback_id);    // Delete previous callback wrapper.
         callback_id = 0;                                // No ID currently in callback.
         onclick_info = in_cb_info;
-        if (active) ReplaceHTML();                      // If node is active, immediately redraw!
+        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
       }
 
       void UpdateLabel(const std::string & in_label) {
         label = in_label;
-        if (active) ReplaceHTML();
+        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
       }
       void UpdateTitle(const std::string & in_title) {
         title = in_title;
-        if (active) ReplaceHTML();
+        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
       }
-      void UpdateAutofocus(bool in_af) { autofocus = in_af; if (active) ReplaceHTML(); }
-      void UpdateDisabled(bool in_dis) { disabled = in_dis; if (active) ReplaceHTML(); }
+      void UpdateAutofocus(bool in_af) {
+        autofocus = in_af;
+        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
+      }
+      void UpdateDisabled(bool in_dis) {
+        disabled = in_dis;
+        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
+      }
       
     public:
       virtual std::string GetType() override { return "web::ButtonInfo"; }

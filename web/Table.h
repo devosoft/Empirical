@@ -185,14 +185,14 @@ namespace web {
           rows[i].SetCols(col_count);                   // Initialize new rows.
         }
         row_count = r;                                  // Store new size.
-        if (active) ReplaceHTML();                      // If active, update screen!
+        if (state == Widget::ACTIVE) ReplaceHTML();     // If active, update screen!
       }
     }
     void UpdateCols(int c) {
       if (col_count != c) {                               // Update only if we're making a change.
         col_count = c;                                    // Store new size.
         for (auto & row : rows) row.SetCols(col_count);   // Make sure all rows have new col_count
-        if (active) ReplaceHTML();                        // If active, update screen!
+        if (state == Widget::ACTIVE) ReplaceHTML();       // If active, update screen!
       }
     }
 
@@ -298,7 +298,7 @@ namespace web {
     Table & SetHeader(bool _h=true) {
       emp_assert(state == CELL);
       Info()->rows[cur_row].data[cur_col].SetHeader(_h);
-      if (Info()->active) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
+      if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
       return *this;
     }
 
@@ -336,7 +336,7 @@ namespace web {
       }
       
       // Redraw the entire table to fix col span information.
-      if (Info()->active) Info()->ReplaceHTML();
+      if (IsActive()) Info()->ReplaceHTML();
 
       return *this;
     }
@@ -365,7 +365,7 @@ namespace web {
       }
       
       // Redraw the entire table to fix row span information.
-      if (Info()->active) Info()->ReplaceHTML();
+      if (IsActive()) Info()->ReplaceHTML();
 
       return *this;
     }
@@ -376,7 +376,7 @@ namespace web {
     Table & RowCSS(int row_id, const std::string & setting, SETTING_TYPE && value) {
       emp_assert(row_id >= 0 && row_id < Info()->row_count);
       Info()->rows[row_id].style.Set(setting, value);
-      if (Info()->active) Info()->ReplaceHTML();   // @CAO only should replace row's CSS
+      if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace row's CSS
       return *this;
     }
        
@@ -386,7 +386,7 @@ namespace web {
       emp_assert(row_id >= 0 && row_id < Info()->row_count);
       emp_assert(col_id >= 0 && col_id < Info()->row_count);
       Info()->rows[row_id].style.Set(setting, value);
-      if (Info()->active) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
+      if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
       return *this;
     }
         
@@ -394,7 +394,7 @@ namespace web {
     template <typename SETTING_TYPE>
     Table & RowsCSS(const std::string & setting, SETTING_TYPE && value) {
       for (auto & row : Info()->rows) row.style.Set(setting, emp::to_string(value));
-      if (Info()->active) Info()->ReplaceHTML();
+      if (IsActive()) Info()->ReplaceHTML();
       return *this;
     }
         
@@ -402,7 +402,7 @@ namespace web {
     template <typename SETTING_TYPE>
     Table & CellsCSS(const std::string & setting, SETTING_TYPE && value) {
       for (auto & row : Info()->rows) row.CellsCSS(setting, emp::to_string(value));
-      if (Info()->active) Info()->ReplaceHTML();
+      if (IsActive()) Info()->ReplaceHTML();
       return *this;
     }
 

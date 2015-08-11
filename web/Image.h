@@ -34,8 +34,14 @@ namespace web {
              << " id=\"" << id << "\">";
       }
       
-      void UpdateURL(const std::string & in_url) { url = in_url; if (active) ReplaceHTML(); }
-      void UpdateAlt(const std::string & in_alt) { alt_text = in_alt; if (active) ReplaceHTML(); }
+      void UpdateURL(const std::string & in_url) {
+        url = in_url;
+        if (state == Widget::ACTIVE) ReplaceHTML();
+      }
+      void UpdateAlt(const std::string & in_alt) {
+        alt_text = in_alt;
+        if (state == Widget::ACTIVE) ReplaceHTML();
+      }
       
     public:
       virtual std::string GetType() override { return "web::ButtonInfo"; }

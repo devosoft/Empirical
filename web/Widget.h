@@ -20,7 +20,6 @@
 //      WAITING - As soon as document is ready, widgit will be live.
 //      STATIC - Part of DOM, but not immediately updating when changes occur.
 //      LIVE - Widget is part of DOM and should be updated immediately on change.
-//  * Put other *Info classes INTO internal namespace.
 //
 
 #include <string>
@@ -76,9 +75,14 @@ namespace web {
     Widget(const Widget & in) : Widget(in.info) { ; }
     Widget & operator=(const Widget & in) { return SetInfo(in.info); }
     
+    enum ActivityState { INACTIVE, WAITING, STATIC, ACTIVE };
+
     virtual ~Widget();
     
     bool IsNull() const { return info == nullptr; }
+    bool IsInactive() const;
+    bool IsWaiting() const;
+    bool IsStatic() const;
     bool IsActive() const;
     
     virtual bool IsSlate() const { return false; }
@@ -130,13 +134,13 @@ namespace web {
       // Track hiearchy
       Widget parent;                  // Which widget is this one contained within?
       emp::vector<Widget> children;   // Widgets contained in this one.
-      emp::vector<Widget> dependents; // Widgets to be refreshed if this one is activated.
+      emp::vector<Widget> dependents; // Widgets to be refreshed if this one is triggered
       bool append_ok;                 // Can we add more children?
-      bool active;                    // Is this element active in DOM?
+      Widget::ActivityState state;    // Is this element active in DOM?
 
       // WidgetInfo cannot be built unless within derived class, so constructor is protected
       WidgetInfo(const std::string & in_id="")
-        : ptr_count(1), id(in_id), parent(nullptr), append_ok(true), active(false)
+        : ptr_count(1), id(in_id), parent(nullptr), append_ok(true), state(Widget::INACTIVE)
       {
         EMP_TRACK_CONSTRUCT(WebWidgetInfo);
         if (id == "") id = NextWidgetID();
@@ -159,7 +163,7 @@ namespace web {
           // @CAO If active, make sure parent is redrawn.
           // @CAO Set inactive.
         }
-        emp_assert (!in->active && "Cannot insert a stand-alone active widget!");
+        emp_assert (in->state != Widget::ACTIVE && "Cannot insert a stand-alone active widget!");
 
         // Setup parent-child relationship
         children.emplace_back(in);
@@ -167,7 +171,7 @@ namespace web {
         Register(in);
 
         // If this element (as new parent) is active, anchor widget and activate it!
-        if (active) {
+        if (state == Widget::ACTIVE) {
           // Create a span tag to anchor the new widget.
           EM_ASM_ARGS({
               parent_id = Pointer_stringify($0);
@@ -201,7 +205,7 @@ namespace web {
       // Activate is delayed until the document is ready, when DoActivate will be called.
       void DoActivate(bool top_level=true) {
         // Activate this widget and its children.
-        active = true;
+        state = Widget::ACTIVE;
         for (auto & child : children) child->DoActivate(false);
         
         // Finally, put everything on the screen.
@@ -236,8 +240,11 @@ namespace web {
       void ReplaceHTML() {
         std::stringstream ss;
         
+        // If this node is static, don't change it!
+        if (state == Widget::STATIC) return;
+
         // If this node is active, fill in its contents; otherwise make it an empty span.
-        if (active) GetHTML(ss);
+        if (state == Widget::ACTIVE) GetHTML(ss);
         else ss << "<span id=" << id << "></span>";
         
         // Now do the replacement.
@@ -254,7 +261,7 @@ namespace web {
         TriggerJS();
 
         // If active, recurse to children!
-        if (active) {
+        if (state == Widget::ACTIVE) {
           for (auto & child : children) child->ReplaceHTML();
         }
       }
@@ -309,9 +316,26 @@ namespace web {
     return *this;
   }
 
+  enum ActivityState { INACTIVE, WAITING, STATIC, ACTIVE };
+
+  bool Widget::IsInactive() const {
+    if (!info) return false;
+    return info->state == INACTIVE;
+  }
+  
+  bool Widget::IsWaiting() const {
+    if (!info) return false;
+    return info->state == WAITING;
+  }
+  
+  bool Widget::IsStatic() const {
+    if (!info) return false;
+    return info->state == STATIC;
+  }
+  
   bool Widget::IsActive() const {
     if (!info) return false;
-    return info->active;
+    return info->state == ACTIVE;
   }
   
   bool Widget::AppendOK() const { return info->append_ok; }
@@ -333,14 +357,15 @@ namespace web {
   
   void Widget::Activate() {
     auto * cur_info = info;
+    info->state = WAITING;
     OnDocumentReady( std::function<void(void)>([cur_info](){ cur_info->DoActivate(); }) );
   }
   
   void Widget::Deactivate(bool top_level) {
     // Skip if we are not active.
-    if (!info || !info->active) return;
+    if (!info || info->state == INACTIVE) return;
     
-    info->active = false;
+    info->state = INACTIVE;
     
     // Deactivate all of the children (marking them as not at the top level.)
     for (auto & child : info->children) child.Deactivate(false);
@@ -351,9 +376,9 @@ namespace web {
 
   bool Widget::ToggleActive() {
     emp_assert(info);
-    if (info->active == true) Deactivate();
+    if (info->state != INACTIVE) Deactivate();
     else Activate();
-    return info->active;
+    return info->state;
   }
   
   Widget & Widget::AddDependent(const Widget & w) {
@@ -395,7 +420,7 @@ namespace web {
       // CSS-related options may be overridden in derived classes that have multiple styles.
       virtual void DoCSS(const std::string & setting, const std::string & value) {
         info->style.DoSet(setting, value);
-        if (info->active) Style::Apply(info->id, setting, value);
+        if (IsActive()) Style::Apply(info->id, setting, value);
       }
 
     public:

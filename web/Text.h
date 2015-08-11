@@ -64,14 +64,14 @@ namespace web {
   };  
 
   Widget Text::TextInfo::Append(const std::string & in_text) {
-    strings.Append(in_text);     // Record the new string being added.
-    if (active) ReplaceHTML();   // If node is active, immediately redraw!
+    strings.Append(in_text);                     // Record the new string being added.
+    if (state == Widget::ACTIVE) ReplaceHTML();  // If node is active, immediately redraw!
     return web::Text(this);
   }
 
   Widget Text::TextInfo::Append(const std::function<std::string()> & in_fun) {
-    strings.Append(in_fun);      // Record the new function being added.
-    if (active) ReplaceHTML();   // If node is active, immediately redraw!
+    strings.Append(in_fun);                      // Record the new function being added.
+    if (state == Widget::ACTIVE) ReplaceHTML();  // If node is active, immediately redraw!
     return web::Text(this);
   }
 

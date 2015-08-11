@@ -55,14 +55,14 @@ namespace web {
 
       // Trigger any JS code needed on re-draw.
       void TriggerJS() override {
-        if (active) {                             // Only draw on active canvases
+        if (state == Widget::ACTIVE) {            // Only draw on active canvases
           SetupCanvas();                          // Prepare the canvas for drawing
           for (auto & a : actions) a->Apply();    // Run all of the actions
         }
       }
 
       void AddAction(CanvasAction * new_action) {
-        if (active) {                     // Only draw on active canvases
+        if (state == Widget::ACTIVE) {    // Only draw on active canvases
           SetupCanvas();                  // Prepare the canvas for drawing
           new_action->Apply();            // Draw the current action
         }

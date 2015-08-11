@@ -75,8 +75,14 @@ namespace web {
         HTML << "</select>";
       }
 
-      void UpdateAutofocus(bool in_af) { autofocus = in_af; if (active) ReplaceHTML(); }
-      void UpdateDisabled(bool in_dis) { disabled = in_dis; if (active) ReplaceHTML(); }
+      void UpdateAutofocus(bool in_af) {
+        autofocus = in_af;
+        if (state == Widget::ACTIVE) ReplaceHTML();
+      }
+      void UpdateDisabled(bool in_dis) {
+        disabled = in_dis;
+        if (state == Widget::ACTIVE) ReplaceHTML();
+      }
       
     public:
       virtual std::string GetType() override { return "web::SelectorInfo"; }
