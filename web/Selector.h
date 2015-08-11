@@ -14,76 +14,75 @@
 namespace emp {
 namespace web {
 
-  class Selector;
-    
-  class SelectorInfo : public internal::WidgetInfo {
-    friend Selector;
-  protected:
-    emp::vector<std::string> options;               // What are the options to choose from?
-    emp::vector<std::function<void()> > callbacks;  // Which funtion to run for each option?
-    int select_id;                                  // Which index is currently selected?
-
-    bool autofocus;
-    bool disabled;
-    
-    uint32_t callback_id;
-      
-    SelectorInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
-    SelectorInfo(const SelectorInfo &) = delete;               // No copies of INFO allowed
-    SelectorInfo & operator=(const SelectorInfo &) = delete;   // No copies of INFO allowed
-    virtual ~SelectorInfo() {
-      if (callback_id) emp::JSDelete(callback_id);             // Delete callback wrapper.
-    }
-
-    void SetOption(const std::string & in_option,
-                         const std::function<void()> & in_cb,
-                         int opt_id=-1) {
-      // If no option id was specified, choose the next one.
-      if (opt_id < 0) opt_id = (int) options.size();
-
-      // If we need more room for options, increase the array size.
-      if (opt_id >= (int) options.size()) {
-        options.resize(opt_id+1);
-        callbacks.resize(opt_id+1);
-      }
-      options[opt_id] = in_option;
-      callbacks[opt_id] = in_cb;
-    }
-    
-    void DoChange(int new_id) {
-      // emp::Alert("Changing to ", new_id);
-      select_id = new_id;
-      if (callbacks[new_id]) callbacks[new_id]();
-    }
-      
-    virtual void GetHTML(std::stringstream & HTML) override {
-      HTML << "<select";                              // Start the select tag.
-      if (disabled) { HTML << " disabled=true"; }     // Check if should be disabled
-      HTML << " id=\"" << id << "\"";                 // Indicate ID.
-
-      // Indicate action on change.
-      HTML << " onchange=\"emp.Callback(" << callback_id << ", this.selectedIndex)\">";
-
-      // List out options
-      for (int i = 0; i < (int) options.size(); i++) {
-        HTML << "<option value=\"" << i;
-        if (i == select_id) HTML << " selected";
-        HTML << "\">" << options[i] << "</option>";
-      }
-      HTML << "</select>";
-    }
-
-    void UpdateAutofocus(bool in_af) { autofocus = in_af; if (active) ReplaceHTML(); }
-    void UpdateDisabled(bool in_dis) { disabled = in_dis; if (active) ReplaceHTML(); }
-
-  public:
-    virtual std::string GetType() override { return "web::SelectorInfo"; }
-  };
-
-
   class Selector : public internal::WidgetFacet<Selector> {
-    friend SelectorInfo;
+    friend class SelectorInfo;
   protected:
+
+    class SelectorInfo : public internal::WidgetInfo {
+      friend Selector;
+    protected:
+      emp::vector<std::string> options;               // What are the options to choose from?
+      emp::vector<std::function<void()> > callbacks;  // Which funtion to run for each option?
+      int select_id;                                  // Which index is currently selected?
+      
+      bool autofocus;
+      bool disabled;
+    
+      uint32_t callback_id;
+      
+      SelectorInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
+      SelectorInfo(const SelectorInfo &) = delete;               // No copies of INFO allowed
+      SelectorInfo & operator=(const SelectorInfo &) = delete;   // No copies of INFO allowed
+      virtual ~SelectorInfo() {
+        if (callback_id) emp::JSDelete(callback_id);             // Delete callback wrapper.
+      }
+
+      void SetOption(const std::string & in_option,
+                     const std::function<void()> & in_cb,
+                     int opt_id=-1) {
+        // If no option id was specified, choose the next one.
+        if (opt_id < 0) opt_id = (int) options.size();
+        
+        // If we need more room for options, increase the array size.
+        if (opt_id >= (int) options.size()) {
+          options.resize(opt_id+1);
+          callbacks.resize(opt_id+1);
+        }
+        options[opt_id] = in_option;
+        callbacks[opt_id] = in_cb;
+      }
+    
+      void DoChange(int new_id) {
+        // emp::Alert("Changing to ", new_id);
+        select_id = new_id;
+        if (callbacks[new_id]) callbacks[new_id]();
+      }
+      
+      virtual void GetHTML(std::stringstream & HTML) override {
+        HTML << "<select";                              // Start the select tag.
+        if (disabled) { HTML << " disabled=true"; }     // Check if should be disabled
+        HTML << " id=\"" << id << "\"";                 // Indicate ID.
+        
+        // Indicate action on change.
+        HTML << " onchange=\"emp.Callback(" << callback_id << ", this.selectedIndex)\">";
+        
+        // List out options
+        for (int i = 0; i < (int) options.size(); i++) {
+          HTML << "<option value=\"" << i;
+          if (i == select_id) HTML << " selected";
+          HTML << "\">" << options[i] << "</option>";
+        }
+        HTML << "</select>";
+      }
+
+      void UpdateAutofocus(bool in_af) { autofocus = in_af; if (active) ReplaceHTML(); }
+      void UpdateDisabled(bool in_dis) { disabled = in_dis; if (active) ReplaceHTML(); }
+      
+    public:
+      virtual std::string GetType() override { return "web::SelectorInfo"; }
+    };  // End of SelectorInfo class.
+
+
     // Get a properly cast version of indo.  
     SelectorInfo * Info() { return (SelectorInfo *) info; }
     const SelectorInfo * Info() const { return (SelectorInfo *) info; }

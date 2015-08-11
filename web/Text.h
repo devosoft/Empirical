@@ -13,7 +13,9 @@
 namespace emp {
 namespace web {
 
-  class Text;
+  class Text : public internal::WidgetFacet<Text> {
+    friend class TextInfo;
+  protected:
 
   class TextInfo : public internal::WidgetInfo {
     friend Text;
@@ -38,12 +40,9 @@ namespace web {
 
   public:
     virtual std::string GetType() override { return "web::TextInfo"; }
-  };
+  };  // End of TextInfo
 
 
-  class Text : public internal::WidgetFacet<Text> {
-    friend TextInfo;
-  protected:
     // Get a properly cast version of indo.
     TextInfo * Info() { return (TextInfo *) info; }
 
@@ -64,13 +63,13 @@ namespace web {
 
   };  
 
-  Widget TextInfo::Append(const std::string & in_text) {
+  Widget Text::TextInfo::Append(const std::string & in_text) {
     strings.Append(in_text);     // Record the new string being added.
     if (active) ReplaceHTML();   // If node is active, immediately redraw!
     return web::Text(this);
   }
 
-  Widget TextInfo::Append(const std::function<std::string()> & in_fun) {
+  Widget Text::TextInfo::Append(const std::function<std::string()> & in_fun) {
     strings.Append(in_fun);      // Record the new function being added.
     if (active) ReplaceHTML();   // If node is active, immediately redraw!
     return web::Text(this);

@@ -17,72 +17,70 @@
 namespace emp {
 namespace web {
 
-  class Canvas;
-
-  class CanvasInfo : public internal::WidgetInfo {
-    friend Canvas;
-
-  protected:
-
-    int width;
-    int height;
-
-    emp::vector<CanvasAction *> actions;
-
-
-    CanvasInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
-    CanvasInfo(const CanvasInfo &) = delete;               // No copies of INFO allowed
-    CanvasInfo & operator=(const CanvasInfo &) = delete;   // No copies of INFO allowed
-    virtual ~CanvasInfo() { ClearActions(); }
-
-    virtual void GetHTML(std::stringstream & HTML) override {
-      HTML.str("");                                           // Clear the current text.
-      HTML << "<canvas id=\"" << id
-           << "\" width=\"" << width
-           << "\" height=\"" << height << "\">";
-      // @CAO We can include fallback content here for browsers that don't support canvas.
-      HTML << "</canvas>";
-    }
-
-    // Setup a canvas to be drawn on.
-    void SetupCanvas() {
-      EM_ASM_ARGS({
-          var cname = Pointer_stringify($0);
-          var canvas = document.getElementById(cname);
-          emp_i.ctx = canvas.getContext('2d');
-        }, id.c_str());
-    }
-
-    // Trigger any JS code needed on re-draw.
-    void TriggerJS() override {
-      if (active) {                             // Only draw on active canvases
-        SetupCanvas();                          // Prepare the canvas for drawing
-        for (auto & a : actions) a->Apply();    // Run all of the actions
-      }
-    }
-
-    void AddAction(CanvasAction * new_action) {
-      if (active) {                     // Only draw on active canvases
-        SetupCanvas();                  // Prepare the canvas for drawing
-        new_action->Apply();            // Draw the current action
-      }
-      actions.push_back(new_action);    // Store the current action.
-    }
-
-    void ClearActions() {
-      for (auto * a : actions) delete a;
-      actions.resize(0);
-    }
-
-
-  public:
-    virtual std::string GetType() override { return "web::CanvasInfo"; }
-  };
-
-
   class Canvas : public internal::WidgetFacet<Canvas> {
-    friend CanvasInfo;
+    friend class CanvasInfo;
   protected:
+
+    class CanvasInfo : public internal::WidgetInfo {
+      friend Canvas;
+
+    protected:
+      int width;
+      int height;
+      
+      emp::vector<CanvasAction *> actions;
+
+      CanvasInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
+      CanvasInfo(const CanvasInfo &) = delete;               // No copies of INFO allowed
+      CanvasInfo & operator=(const CanvasInfo &) = delete;   // No copies of INFO allowed
+      virtual ~CanvasInfo() { ClearActions(); }
+      
+      virtual void GetHTML(std::stringstream & HTML) override {
+        HTML.str("");                                           // Clear the current text.
+        HTML << "<canvas id=\"" << id
+             << "\" width=\"" << width
+             << "\" height=\"" << height << "\">";
+        // @CAO We can include fallback content here for browsers that don't support canvas.
+        HTML << "</canvas>";
+      }
+
+      // Setup a canvas to be drawn on.
+      void SetupCanvas() {
+        EM_ASM_ARGS({
+            var cname = Pointer_stringify($0);
+            var canvas = document.getElementById(cname);
+            emp_i.ctx = canvas.getContext('2d');
+        }, id.c_str());
+      }
+
+      // Trigger any JS code needed on re-draw.
+      void TriggerJS() override {
+        if (active) {                             // Only draw on active canvases
+          SetupCanvas();                          // Prepare the canvas for drawing
+          for (auto & a : actions) a->Apply();    // Run all of the actions
+        }
+      }
+
+      void AddAction(CanvasAction * new_action) {
+        if (active) {                     // Only draw on active canvases
+          SetupCanvas();                  // Prepare the canvas for drawing
+          new_action->Apply();            // Draw the current action
+        }
+        actions.push_back(new_action);    // Store the current action.
+      }
+
+      void ClearActions() {
+        for (auto * a : actions) delete a;
+        actions.resize(0);
+      }
+
+
+    public:
+      virtual std::string GetType() override { return "web::CanvasInfo"; }
+
+    };  // End of ButtonInfo definition.
+    
+
     // Get a properly cast version of indo.  
     CanvasInfo * Info() { return (CanvasInfo *) info; }
     const CanvasInfo * Info() const { return (CanvasInfo *) info; }

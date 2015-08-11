@@ -18,10 +18,9 @@
 //  * Change 'active' flag to an activity state enum, which can include:
 //      INACTIVE - Widget is not currently part of the DOM.
 //      WAITING - As soon as document is ready, widgit will be live.
-//      LIVE - Widget is part of DOM
 //      STATIC - Part of DOM, but not immediately updating when changes occur.
-//      ERROR -  Hopefully not needed?  Possible in case of DOM corruption?
-//  * Move Widget outside of internal; possibly put various other *Info classes INTO internal.
+//      LIVE - Widget is part of DOM and should be updated immediately on change.
+//  * Put other *Info classes INTO internal namespace.
 //
 
 #include <string>
@@ -37,7 +36,9 @@ namespace emp {
 namespace web {
 
   // Setup some types we will need later
-  class SlateInfo;
+  namespace internal {
+    class SlateInfo;
+  }
 
   namespace internal {
       // Provide a quick method for generating unique IDs when not otherwise specified.
@@ -53,7 +54,7 @@ namespace web {
 
   // Widget is a smart pointer to a WidgetInfo object, plus some basic accessors.
   class Widget {
-    friend internal::WidgetInfo; friend SlateInfo;
+    friend internal::WidgetInfo; friend internal::SlateInfo;
   protected:
     using WidgetInfo = internal::WidgetInfo;
     WidgetInfo * info;

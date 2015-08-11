@@ -21,9 +21,12 @@
 namespace emp {
 namespace web {
 
+  class Table : public internal::WidgetFacet<Table> {
+    friend class TableInfo;
+  protected:
+
   class TableRow;
   class TableInfo;
-  class Table;
 
   class TableData {
     friend TableRow; friend Table;
@@ -199,9 +202,6 @@ namespace web {
   };
 
 
-  class Table : public internal::WidgetFacet<Table> {
-    friend TableInfo;
-  protected:
     int cur_row;      // Which row/col is currently active?
     int cur_col;
            
@@ -471,7 +471,7 @@ namespace web {
   };
 
   // Setup mechanism to retrieve current slate for table append.
-  Widget & TableInfo::GetCurSlate() {
+  Widget & Table::TableInfo::GetCurSlate() {
     int cur_col = append_widget->cur_row;
     int cur_row = append_widget->cur_row;
 
