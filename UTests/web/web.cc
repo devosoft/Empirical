@@ -16,7 +16,12 @@ int main()
 
   UI::Image motiv("../UI/motivator.jpg");
 
+  UI::Table tab(5,5);
 
+  tab.CSS("border", "1px solid black");
+
+  tab << "Test!";
+  tab.GetCell(1,1) << "Test 2";
 
   text << "Testing testing!!!"
        << "<br>" << std::function<std::string()>(TestFun)
@@ -33,7 +38,7 @@ int main()
   sel.SetOption("Option the Forth");
   sel.SetOption("Option IV");
 
-  doc << canvas << sel;
+  doc << canvas << sel << "<br>" << tab;
   canvas.Rect(0,0,200,200, "#AAAAAA", "black");
   canvas.Circle(100,75,50, "red", "black");
 
