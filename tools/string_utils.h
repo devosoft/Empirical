@@ -308,6 +308,7 @@ namespace emp {
 
     // If there's a single POD entry, we can convert it manually and pass the result back.
     inline std::string to_string_impl(bool, const std::string & s) { return s; }
+    inline std::string to_string_impl(bool, const char * s) { return std::string(s); }
     inline std::string to_string_impl(bool, int32_t v) { return std::to_string(v); }
     inline std::string to_string_impl(bool, uint32_t v) { return std::to_string(v); }
     inline std::string to_string_impl(bool, int64_t v) { return std::to_string(v); }
