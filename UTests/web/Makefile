@@ -17,13 +17,16 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 
 
 default: all
-all: web.js
+all: Slate.js web.js
+
+Slate.js: Slate.cc
+	$(CXX_web) $(CFLAGS_web) Slate.cc -o Slate.js
 
 web.js: web.cc
 	$(CXX_web) $(CFLAGS_web) web.cc -o web.js
 
 clean:
-	rm -f web.js *.js.map *~ source/*.o source/*/*.o
+	rm -f Slate.js web.js *.js.map *~ source/*.o source/*/*.o
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
