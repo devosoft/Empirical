@@ -175,6 +175,6 @@ namespace emp {
   struct sfinae_decoy { using type = REAL_TYPE; };
 
 
-};
+}
 
 #endif

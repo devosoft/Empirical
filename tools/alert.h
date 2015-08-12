@@ -31,9 +31,7 @@ namespace emp {
     static int cur_count = 0;
     if (cur_count++ < cap) Alert(emp::to_string(inputs...));
   }
-};
-
-
+}
 
 
 #endif

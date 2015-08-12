@@ -323,6 +323,6 @@ namespace emp {
   inline std::string to_string(ALL_TYPES... all_values) {
     return internal::to_string_impl(true, std::forward<ALL_TYPES>(all_values)...);
   }
-};
+}
 
 #endif

@@ -39,7 +39,7 @@
 
 extern "C" {
   extern int EMP_GetCBArgCount();  // Get the number of arguments associated with a callback.
-};
+}
 
 
 namespace emp {
@@ -234,7 +234,7 @@ namespace emp {
     };
 
 
-  };
+  }
   
   // The following JSWrap functions take a target function and return an integer id.
   // The first version assumes that we already have it enclosed in an std::function, while
@@ -306,7 +306,7 @@ namespace emp {
     // @CAO -- Should make sure to clean up named functions on JS side if they exist.
     delete (emp::internal::JSWrap_Callback_Base *) (long long) fun_id;
   }
-};
+}
 
 
 

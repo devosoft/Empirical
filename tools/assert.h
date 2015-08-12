@@ -43,10 +43,7 @@ namespace emp {
 // generate any assembly code.  For now, just make it blank (other options commented out)
 #define emp_assert(...)
 // #define emp_assert(EXPR) ((void) sizeof(EXPR) )
-// #define emp_assert(EXPR, ...) {                          \
-//     constexpr bool __emp_assert_tmp = false && (EXPR);   \
-//     (void) __emp_assert_tmp;                             \
-//   }
+// #define emp_assert(EXPR, ...) { constexpr bool __emp_assert_tmp = false && (EXPR); (void) __emp_assert_tmp; }
 
 #elif defined(EMP_TDEBUG)           // EMP_NDEBUG not set, but EMP_TDEBUG is!
 
