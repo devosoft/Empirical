@@ -21,9 +21,9 @@ Make sure to check append_ok in slates; use SFINAE to test if input is a command
   forwarding to Append.  Commands should occur, true appends should now.  (Maybe change the
   name to Comamnd when not appending as long as we're detecting anyway?)
 Closing a Text() element should automatically run PreventAppend();
+Fix reference counting in C++ DOM trees to delete element if ONLY children are pointing to it.
 
 -= Improvements =-
-emp_assert should take extra arguments for variables to print when triggered.
 Tables need more natural interface that should behave like a slate.  Perhaps derive from Slate?
 std::endl should work on TextBox
 Tables should have single CSS for all rows and all cells.
