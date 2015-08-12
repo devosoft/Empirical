@@ -45,6 +45,7 @@ namespace emp {
       return center.SquareDistance(other.center) < (min_dist * min_dist);
     }
   };
-};
+
+}
 
 #endif

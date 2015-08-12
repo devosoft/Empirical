@@ -55,7 +55,7 @@ namespace emp {
 
   };
 
-};
+}
 
 
 std::ostream & operator<<( std::ostream & os, const emp::DynamicStringSet & strings )

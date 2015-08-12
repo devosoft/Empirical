@@ -85,6 +85,7 @@ namespace emp {
     }
     return html.str();
   }
-};
+
+}
 
 #endif

@@ -234,7 +234,7 @@ namespace emp {
     };
 
 
-  }
+  } // End internal namespace
   
   // The following JSWrap functions take a target function and return an integer id.
   // The first version assumes that we already have it enclosed in an std::function, while
