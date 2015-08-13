@@ -92,13 +92,34 @@ namespace web {
     }
 
     // Setup a quick way to retrieve old widgets by name.
-    Button &   Button  (const std::string & in_id) { return (web::Button &)   Find(in_id); }
-    Canvas &   Canvas  (const std::string & in_id) { return (web::Canvas &)   Find(in_id); }
-    Image &    Image   (const std::string & in_id) { return (web::Image &)    Find(in_id); }
-    Selector & Selector(const std::string & in_id) { return (web::Selector &) Find(in_id); }
-    Slate &    Slate   (const std::string & in_id) { return (web::Slate &)    Find(in_id); }
-    Table &    Table   (const std::string & in_id) { return (web::Table &)    Find(in_id); }
-    Text &     Text    (const std::string & in_id) { return (web::Text &)     Find(in_id); }
+    web::Button & Button (const std::string & in_id) {
+      emp_assert( static_cast<web::Button *>(&(Find(in_id))) );
+      return (web::Button &) Find(in_id);
+    }
+    web::Canvas & Canvas (const std::string & in_id) {
+      emp_assert( static_cast<web::Canvas *>(&(Find(in_id))) );
+      return (web::Canvas &) Find(in_id);
+    }
+    web::Image & Image (const std::string & in_id) {
+      emp_assert( static_cast<web::Image *>(&(Find(in_id))) );
+      return (web::Image &) Find(in_id);
+    }
+    web::Selector & Selector (const std::string & in_id) {
+      emp_assert( static_cast<web::Selector *>(&(Find(in_id))) );
+      return (web::Selector &) Find(in_id);
+    }
+    web::Slate & Slate (const std::string & in_id) {
+      emp_assert( static_cast<web::Slate *>(&(Find(in_id))) );
+      return (web::Slate &) Find(in_id);
+    }
+    web::Table & Table (const std::string & in_id) {
+      emp_assert( static_cast<web::Table *>(&(Find(in_id))) );
+      return (web::Table &) Find(in_id);
+    }
+    web::Text & Text (const std::string & in_id) {
+      emp_assert( static_cast<web::Text *>(&(Find(in_id))) );
+      return (web::Text &) Find(in_id);
+    }
 
   };
 
@@ -125,7 +146,7 @@ namespace web {
     return internal::Live_impl(std::forward<T>(val), true);
   }
 
-};
-};
+}
+}
 
 #endif
