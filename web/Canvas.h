@@ -35,6 +35,8 @@ namespace web {
       CanvasInfo & operator=(const CanvasInfo &) = delete;   // No copies of INFO allowed
       virtual ~CanvasInfo() { ClearActions(); }
       
+      virtual bool IsCanvasInfo() const override { return true; }
+
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");                                           // Clear the current text.
         HTML << "<canvas id=\"" << id
@@ -45,7 +47,7 @@ namespace web {
       }
 
       // Setup a canvas to be drawn on.
-      void SetupCanvas() {
+      void TargetCanvas() {
         EM_ASM_ARGS({
             var cname = Pointer_stringify($0);
             var canvas = document.getElementById(cname);
@@ -56,14 +58,14 @@ namespace web {
       // Trigger any JS code needed on re-draw.
       void TriggerJS() override {
         if (state == Widget::ACTIVE) {            // Only draw on active canvases
-          SetupCanvas();                          // Prepare the canvas for drawing
+          TargetCanvas();                         // Prepare the canvas for drawing
           for (auto & a : actions) a->Apply();    // Run all of the actions
         }
       }
 
       void AddAction(CanvasAction * new_action) {
         if (state == Widget::ACTIVE) {    // Only draw on active canvases
-          SetupCanvas();                  // Prepare the canvas for drawing
+          TargetCanvas();                 // Prepare the canvas for drawing
           new_action->Apply();            // Draw the current action
         }
         actions.push_back(new_action);    // Store the current action.
@@ -96,7 +98,7 @@ namespace web {
       Info()->height = h;
     }
     Canvas(const Canvas & in) : WidgetFacet(in) { ; }
-    Canvas(const Widget & in) : WidgetFacet(in) { ; }
+    Canvas(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsCanvasInfo()); }
     virtual ~Canvas() { ; }
 
     using INFO_TYPE = CanvasInfo;
@@ -134,7 +136,7 @@ namespace web {
   };
 
 
-};
-};
+}
+}
 
 #endif

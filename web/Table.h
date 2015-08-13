@@ -126,6 +126,8 @@ namespace web {
     TableInfo & operator=(const TableInfo &) = delete;   // No copies of INFO allowed
     virtual ~TableInfo() { ; }
 
+    virtual bool IsTableInfo() const override { return true; }
+
     // Get a slate associated with the current cell (and build one if we need to...)
     Widget & GetCurSlate();
 
@@ -244,7 +246,7 @@ namespace web {
     }
     Table(const Table & in)
       : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col), state(in.state) { ; }
-    Table(const Widget & in) : WidgetFacet(in) { ; }
+    Table(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsTableInfo()); }
     virtual ~Table() { ; }
 
     using INFO_TYPE = TableInfo;
@@ -491,7 +493,7 @@ namespace web {
     return children.back();
   }
   
-};
-};
+}
+}
 
 #endif

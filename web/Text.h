@@ -27,6 +27,8 @@ namespace web {
     TextInfo & operator=(const TextInfo &) = delete;   // No copies of INFO allowed
     virtual ~TextInfo() { ; }
 
+    virtual bool IsTextInfo() const override { return true; }
+
     Widget Append(const std::string & in_text) override;
     Widget Append(const std::function<std::string()> & in_fun) override;
 
@@ -53,7 +55,7 @@ namespace web {
       info = new TextInfo(in_id);
     }
     Text(const Text & in) : WidgetFacet(in) { ; }
-    Text(const Widget & in) : WidgetFacet(in) { ; }
+    Text(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsTextInfo()); }
     ~Text() { ; }
 
     virtual bool IsText() const { return true; }
@@ -75,7 +77,7 @@ namespace web {
     return web::Text(this);
   }
 
-};
-};
+}
+}
 
 #endif

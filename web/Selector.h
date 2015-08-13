@@ -37,6 +37,8 @@ namespace web {
         if (callback_id) emp::JSDelete(callback_id);             // Delete callback wrapper.
       }
 
+      virtual bool IsSelectorInfo() const override { return true; }
+
       void SetOption(const std::string & in_option,
                      const std::function<void()> & in_cb,
                      int opt_id=-1) {
@@ -109,7 +111,7 @@ namespace web {
         JSWrap( std::function<void(int)>([s_info](int new_id){s_info->DoChange(new_id);}) );
     }
     Selector(const Selector & in) : WidgetFacet(in) { ; }
-    Selector(const Widget & in) : WidgetFacet(in) { ; }
+    Selector(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsSelectorInfo()); }
     virtual ~Selector() { ; }
 
     using INFO_TYPE = SelectorInfo;
@@ -137,7 +139,7 @@ namespace web {
   };
 
 
-};
-};
+}
+}
 
 #endif

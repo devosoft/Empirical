@@ -25,11 +25,13 @@ namespace web {
       friend Slate;
     protected:
       std::map<std::string, Widget> widget_dict;   // By-name lookup for widgets
-      
+    
       SlateInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
       SlateInfo(const SlateInfo &) = delete;               // No copies of INFO allowed
       SlateInfo & operator=(const SlateInfo &) = delete;   // No copies of INFO allowed
       virtual ~SlateInfo() { ; }
+
+      virtual bool IsSlateInfo() const override { return true; }
 
       // Return a text element for appending.  Use the last element unless there are no elements,
       // the last element is not text, or it is not appendable (instead, build a new one).
@@ -46,7 +48,7 @@ namespace web {
       bool IsRegistered(const std::string & test_name) {
         return (widget_dict.find(test_name) != widget_dict.end());
       }
-      
+    
       Widget & GetRegistered(const std::string & find_name) {
         emp_assert(IsRegistered(find_name), find_name, widget_dict.size());
         return widget_dict[find_name];
@@ -59,6 +61,7 @@ namespace web {
         widget_dict[new_widget.GetID()] = new_widget;   // Track widget by name
         if (parent) parent->Register(new_widget);       // Also register in parent, if available
       }
+
 
       // Add additional children on to this element.
       Widget Append(const std::string & text) override {
@@ -96,7 +99,7 @@ namespace web {
       info = new internal::SlateInfo(in_name);
     }
     Slate(const Slate & in) : WidgetFacet(in) { ; }
-    Slate(const Widget & in) : WidgetFacet(in) { ; }
+    Slate(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsSlateInfo()); }
     ~Slate() { ; }
 
     virtual bool IsSlate() const { return true; }
@@ -110,7 +113,7 @@ namespace web {
 
   };
 
-};
-};
+}
+}
 
 #endif

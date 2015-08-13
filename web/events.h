@@ -19,7 +19,7 @@ namespace web {
     EM_ASM_ARGS({  $( document ).ready(function() { emp.Callback($0); });  }, fun_id);
   }
  
-};
-};
+}
+}
 
 #endif

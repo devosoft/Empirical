@@ -36,6 +36,8 @@ namespace web {
         if (callback_id) emp::JSDelete(callback_id);         // Delete callback wrapper.
       }
       
+      virtual bool IsButtonInfo() const override { return true; }
+
       void DoCallback() {
         callback();
         UpdateDependents();
@@ -110,7 +112,7 @@ namespace web {
       Info()->onclick_info = emp::to_string("emp.Callback(", Info()->callback_id, ")");
     }
     Button(const Button & in) : WidgetFacet(in) { ; }
-    Button(const Widget & in) : WidgetFacet(in) { ; }
+    Button(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsButtonInfo()); }
     virtual ~Button() { ; }
 
     using INFO_TYPE = ButtonInfo;
@@ -135,7 +137,7 @@ namespace web {
   };
 
 
-};
-};
+}
+}
 
 #endif

@@ -27,6 +27,8 @@ namespace web {
       ImageInfo & operator=(const ImageInfo &) = delete;   // No copies of INFO allowed
       virtual ~ImageInfo() { ; }
       
+      virtual bool IsImageInfo() const override { return true; }
+
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");                                      // Clear the current text.
         HTML << "<img src=\"" << url << "\""
@@ -62,7 +64,7 @@ namespace web {
       Info()->url = in_url;
     }
     Image(const Image & in) : WidgetFacet(in) { ; }
-    Image(const Widget & in) : WidgetFacet(in) { ; }
+    Image(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsImageInfo()); }
     virtual ~Image() { ; }
 
     using INFO_TYPE = ImageInfo;
@@ -73,7 +75,7 @@ namespace web {
     Image & Alt(const std::string & in_alt) { Info()->UpdateAlt(in_alt); return *this; }
   };
 
-};
-};
+}
+}
 
 #endif
