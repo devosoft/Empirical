@@ -261,24 +261,24 @@ namespace emp {
       bit_set[field_id] = (bit_set[field_id] & ~(255U << pos_id)) | (val_uint << pos_id);
     }
 
-    unsigned int GetUInt(int index) const {
+    uint32_t GetUInt(int index) const {
       // @CAO Need proper assert for variable bit fields!
       // assert(index >= 0 && index < NumFields());
-      return ((unsigned int *) bit_set)[index];
+      return ((uint32_t *) bit_set)[index];
     }
 
     void SetUInt(int index, field_type value) {
       // @CAO Need proper assert for variable bit fields!
       // assert(index >= 0 && index < NumFields());
-      ((unsigned int *) bit_set)[index] = value;
+      ((uint32_t *) bit_set)[index] = value;
     }
 
-    unsigned int GetUIntAtBit(int index) {
+    uint32_t GetUIntAtBit(int index) {
       // @CAO Need proper assert for non-32-size bit fields!
       // assert(index >= 0 && index < num_bits);
       const int field_id = FieldID(index);
       const int pos_id = FieldPos(index);
-      if (pos_id == 0) return (unsigned int) bit_set[field_id];
+      if (pos_id == 0) return (uint32_t) bit_set[field_id];
       const int NUM_FIELDS = NumFields();
       return (bit_set[field_id] >> pos_id) |
         ((field_id+1 < NUM_FIELDS) ? bit_set[field_id+1] << (FIELD_BITS-pos_id) : 0);
@@ -288,7 +288,7 @@ namespace emp {
     field_type GetValueAtBit(int index) {
       // @CAO This function needs to be generalized to return more then 32 bits.
       static_assert(OUT_BITS <= 32, "Requesting too many bits to fit in a UInt");
-      return GetUIntAtBit(index) & constant::MaskLow<unsigned int>(OUT_BITS);
+      return GetUIntAtBit(index) & constant::MaskLow<uint32_t>(OUT_BITS);
     }
 
 

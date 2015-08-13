@@ -32,7 +32,7 @@ namespace emp {
     BRAIN_TYPE * brain;           // Controller for individual
     Point<BASE_TYPE> velocity;    // Speed and direction of movement
     BASE_TYPE mass;               // "Weight" of this object (@CAO not used yet..)
-    unsigned int color_id;        // Which color should this body appear?
+    uint32_t color_id;            // Which color should this body appear?
     double birth_time;            // At what time point was this organism born?
 
     // @CAO Technically, we should allow any number of links.
@@ -72,7 +72,7 @@ namespace emp {
     BRAIN_TYPE * GetBrain() { return brain; }
     const Point<BASE_TYPE> & GetVelocity() const { return velocity; }
     BASE_TYPE GetMass() const { return mass; }
-    unsigned int GetColorID() const { return color_id; }
+    uint32_t GetColorID() const { return color_id; }
     double GetBirthTime() const { return birth_time; }
 
     Point<BASE_TYPE> GetShift() const { return shift; }
@@ -92,7 +92,7 @@ namespace emp {
     CircleBody2D & SetTargetRadius(BASE_TYPE t) { target_radius = t; return *this; }
     CircleBody2D & SetVelocity(BASE_TYPE x, BASE_TYPE y) { velocity.Set(x, y); return *this; }
     CircleBody2D & SetVelocity(const Point<BASE_TYPE> & v) { velocity = v; return *this; }
-    CircleBody2D & SetColorID(unsigned int in_id) { color_id = in_id; return *this; }
+    CircleBody2D & SetColorID(uint32_t in_id) { color_id = in_id; return *this; }
     CircleBody2D & SetBirthTime(double in_time) { birth_time = in_time; return *this; }
 
     // Shift at end of next update.

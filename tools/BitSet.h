@@ -30,12 +30,12 @@
 //  BitProxy operator[](int index)
 //
 // Accessors for larger chunks:
-//  void Clear()                                   -- Set all bits to zero
-//  void SetAll()                                  -- Set all bits to one
-//  uint8_t GetByte(int byte_id) const       -- Read a full byte of bits
-//  void SetByte(int byte_id, uint8_t value) -- Set a full byte of bits
-//  unsigned int GetUInt(int uint_id) const        -- Read 32 bits at once
-//  void SetUInt(int uint_id, unsigned int value)  -- Set 32 bits at once
+//  void Clear()                                  -- Set all bits to zero
+//  void SetAll()                                 -- Set all bits to one
+//  uint8_t GetByte(int byte_id) const            -- Read a full byte of bits
+//  void SetByte(int byte_id, uint8_t value)      -- Set a full byte of bits
+//  uint32_t GetUInt(int uint_id) const           -- Read 32 bits at once
+//  void SetUInt(int uint_id, uint32_t value)     -- Set 32 bits at once
 //
 // Printing:
 //  void Print(ostream & out=cout) const          -- Print BitSet (least significant on right)

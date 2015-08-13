@@ -18,7 +18,7 @@ namespace emp {
 
   class Instruction {
   private:
-    typedef const unsigned int ctype;                     // Type for all constants in definition.
+    typedef const uint32_t ctype;                         // Type for all constants in definition.
     static ctype ID_BITS = 10;                            // # of bits to track instruction ID.
     static ctype ID_MASK = (1 << ID_BITS) - 1;            // Mask to extract the ID (also, ID max)
     static ctype ARG_BITS = 6;                            // Allows for 64 distinct arguments.
@@ -36,10 +36,10 @@ namespace emp {
     void SetFlag(int id) { info |= (1 << id); }
     void ClearFlag(int id) { info &= ~(1 << id); }
 
-    unsigned int info;  // Full information about this instruction; both ID and flags.
+    uint32_t info;  // Full information about this instruction; both ID and flags.
 
   public:
-    Instruction(unsigned int id=0, unsigned int arg=0,
+    Instruction(uint32_t id=0, uint32_t arg=0,
                 bool extra_cycle_cost=false, bool extra_stability=false)
       : info(id + (arg<<ID_BITS))
     {
@@ -70,7 +70,7 @@ namespace emp {
     bool HasCycleCost() const { return GetFlag(CYCLE_COST_BIT); }
     bool HasStability() const { return GetFlag(EXTRA_STABILITY_BIT); }
 
-    Instruction & SetID(unsigned int new_id) {
+    Instruction & SetID(uint32_t new_id) {
       emp_assert((new_id & ID_MASK) == new_id);
       info = new_id;
       return *this;

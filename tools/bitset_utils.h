@@ -13,12 +13,12 @@
 namespace emp {
 
   template <int NUM_BITS>
-  constexpr unsigned int UIntMaskFirst() { return (UIntMaskFirst<NUM_BITS-1> << 1) | 1; }
+  constexpr uint32_t UIntMaskFirst() { return (UIntMaskFirst<NUM_BITS-1> << 1) | 1; }
 
   template <>
-  constexpr unsigned int UIntMaskFirst<0>() { return 0; }
+  constexpr uint32_t UIntMaskFirst<0>() { return 0; }
 
-  // Dealing with bits in unsigned long long variables
+  // Dealing with bits in uint64_t variables
   const int ByteCount[256] = {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
@@ -30,7 +30,7 @@ namespace emp {
     3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
   };
 
-  inline int count_bits(unsigned long long val) {
+  inline int count_bits(uint64_t val) {
     return
       ByteCount[  val >> 56         ] +
       ByteCount[ (val >> 48) & 0xFF ] +
@@ -42,7 +42,7 @@ namespace emp {
       ByteCount[  val        & 0xFF ];
   }
 
-  inline int count_bits(unsigned int val) {
+  inline int count_bits(uint32_t val) {
     return 
       ByteCount[  val >> 24         ] +
       ByteCount[ (val >> 16) & 0xFF ] +
@@ -50,15 +50,15 @@ namespace emp {
       ByteCount[  val        & 0xFF ];
   }
 
-  inline int find_bit(unsigned long long val) { return count_bits( (~val) & (val-1) ); }
-  inline int find_bit(const unsigned int val) { return count_bits( (~val) & (val-1) ); }
+  inline int find_bit(uint64_t val) { return count_bits( (~val) & (val-1) ); }
+  inline int find_bit(const uint32_t val) { return count_bits( (~val) & (val-1) ); }
 
   /*
   // Returns the position of the first set (one) bit or a -1 if none exist.
   template <size_t BITS>
   int find_bit(const std::bitset<BITS> & in) {
     int offset = 0;
-    unsigned long long tmp_bits = 0ULL;
+    uint64_t tmp_bits = 0ULL;
     while (offset < BITS && ((tmp_bits = (in >> offset).to_ullong()) == 0ULL)) {
       offset += 64;
     }
@@ -82,7 +82,7 @@ namespace emp {
   }
 
   template <size_t BITS>
-  constexpr std::bitset<BITS> mask_bit(unsigned int id) {
+  constexpr std::bitset<BITS> mask_bit(uint32_t id) {
     return (std::bitset<BITS>(1)) << id;
   }
 

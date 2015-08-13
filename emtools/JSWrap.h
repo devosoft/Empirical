@@ -324,7 +324,6 @@ namespace emp {
   void JSDelete( uint32_t fun_id ) {
     emp_assert(fun_id > 0);  // Make sure this isn't a null pointer!
     // @CAO -- Should make sure to clean up named functions on JS side if they exist.
-    // delete (emp::internal::JSWrap_Callback_Base *) (long long) fun_id;
     auto & callback_array = internal::CallbackArray();
     delete callback_array[fun_id];
     callback_array[fun_id] = nullptr;

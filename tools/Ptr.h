@@ -81,50 +81,50 @@ namespace emp {
 
     // Some simple accessors
     bool HasPtr(TYPE * ptr) const {
-      if (verbose) std::cout << "HasPtr: " << ((long long) ptr) << std::endl;
+      if (verbose) std::cout << "HasPtr: " << ((uint64_t) ptr) << std::endl;
       return ptr_count.find(ptr) != ptr_count.end();
     }
     bool IsActive(TYPE * ptr) const {
-      if (verbose) std::cout << "Active: " << ((long long) ptr) << std::endl;
+      if (verbose) std::cout << "Active: " << ((uint64_t) ptr) << std::endl;
       if (!HasPtr(ptr)) return false;
       return ptr_count.find(ptr)->second.IsActive();
     }
     bool IsOwner(TYPE * ptr) const {
-      if (verbose) std::cout << "Owner:  " << ((long long) ptr) << std::endl;
+      if (verbose) std::cout << "Owner:  " << ((uint64_t) ptr) << std::endl;
       if (!HasPtr(ptr)) return false;
       return ptr_count.find(ptr)->second.IsOwner();
     }
     int GetCount(TYPE * ptr) const {
-      if (verbose) std::cout << "Count:  " << ((long long) ptr) << std::endl;
+      if (verbose) std::cout << "Count:  " << ((uint64_t) ptr) << std::endl;
       if (!HasPtr(ptr)) return 0;
       return ptr_count.find(ptr)->second.GetCount();
     }
 
     // This pointer was just created as a Ptr!
     void New(TYPE * ptr) {
-      if (verbose) std::cout << "New:    " << ((long long) ptr) << std::endl;
+      if (verbose) std::cout << "New:    " << ((uint64_t) ptr) << std::endl;
       emp_assert(!HasPtr(ptr) || !IsActive(ptr)); // Make sure pointer is not already stored!
       ptr_count[ptr] = PtrInfo(true);
     }
  
     // This pointer was already created, but given to Ptr.
     void Old(TYPE * ptr) {
-      if (verbose) std::cout << "Old:    " << ((long long) ptr) << std::endl;
+      if (verbose) std::cout << "Old:    " << ((uint64_t) ptr) << std::endl;
       emp_assert(!HasPtr(ptr) || !IsActive(ptr)); // Make sure pointer is not already stored!
       ptr_count[ptr] = PtrInfo(false);
     }
     void Inc(TYPE * ptr) {
-      if (verbose) std::cout << "Inc:    " << ((long long) ptr) << std::endl;
+      if (verbose) std::cout << "Inc:    " << ((uint64_t) ptr) << std::endl;
       emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
       ptr_count[ptr].Inc();
     }
     void Dec(TYPE * ptr) {
-      if (verbose) std::cout << "Dec:    " << ((long long) ptr) << std::endl;
+      if (verbose) std::cout << "Dec:    " << ((uint64_t) ptr) << std::endl;
       emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
       ptr_count[ptr].Dec();
     }
     void MarkDeleted(TYPE * ptr) {
-      if (verbose) std::cout << "Delete: " << ((long long) ptr) << std::endl;
+      if (verbose) std::cout << "Delete: " << ((uint64_t) ptr) << std::endl;
       emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
       ptr_count[ptr].MarkDeleted();
     }

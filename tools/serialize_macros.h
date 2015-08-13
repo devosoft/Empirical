@@ -18,7 +18,7 @@
 
 
 
-// Version to use in stand-along classes.
+// Version to use in stand-alone classes.
 #define EMP_SETUP_DATAPOD(CLASS_NAME, ...) \
   EMP_SETUP_DATAPOD_BASEINFO(CLASS_NAME, , , __VA_ARGS__)
 

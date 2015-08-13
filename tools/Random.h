@@ -20,8 +20,8 @@
 //
 //    int GetInt(int max)
 //    int GetInt(int min, int max)
-//    unsigned int GetUInt(unsigned int max)
-//    unsigned int GetUInt(unsigned int min, unsigned int max)
+//    uint32_t GetUInt(uint32_t max)
+//    uint32_t GetUInt(uint32_t min, uint32_t max)
 //      Retrive a random int or uint in the range [min, max).  By default, min=0.
 //
 //    bool P(double p)
@@ -32,9 +32,9 @@
 //      vector.
 //
 //    double GetRandNormal(const double mean, const double std)
-//    unsigned int GetRandPoisson(const double n, double p)
-//    unsigned int GetRandPoisson(const double mean)
-//    unsigned int GetRandBinomial(const double n, const double p)
+//    uint32_t GetRandPoisson(const double n, double p)
+//    uint32_t GetRandPoisson(const double mean)
+//    uint32_t GetRandBinomial(const double n, const double p)
 //      Draw a value from the given distributions
 //
 
@@ -61,12 +61,12 @@ namespace emp {
 
     // Constants ////////////////////////////////////////////////////////////////
     // Statistical Approximation
-    static const unsigned int _BINOMIAL_TO_NORMAL = 50;     // if < n*p*(1-p)
-    static const unsigned int _BINOMIAL_TO_POISSON = 1000;  // if < n && !Normal approx Engine
+    static const uint32_t _BINOMIAL_TO_NORMAL = 50;     // if < n*p*(1-p)
+    static const uint32_t _BINOMIAL_TO_POISSON = 1000;  // if < n && !Normal approx Engine
 
     // Engine
-    static const unsigned int _RAND_MBIG = 1000000000;
-    static const unsigned int _RAND_MSEED = 161803398;
+    static const uint32_t _RAND_MBIG = 1000000000;
+    static const uint32_t _RAND_MSEED = 161803398;
 
     // Internal functions
 
@@ -104,7 +104,7 @@ namespace emp {
   
     // Basic Random number
     // Returns a random number [0,_RAND_MBIG)
-    unsigned int Get() {
+    uint32_t Get() {
       if (++inext == 56) inext = 0;
       if (++inextp == 56) inextp = 0;
       int mj = ma[inext] - ma[inextp];
@@ -151,7 +151,7 @@ namespace emp {
     
       if (_seed <= 0) {
         int seed_time = (int) time(NULL);
-        int seed_mem = (int) ((long long) this);
+        int seed_mem = (int) ((uint64_t) this);
         seed = seed_time ^ seed_mem;
       } else {
         seed = _seed;
@@ -191,21 +191,21 @@ namespace emp {
     double GetDouble(const double min, const double max) { return GetDouble() * (max - min) + min; }
   
     /**
-     * Generate an unsigned int.
+     * Generate an uint32_t.
      *
      * @return The pseudo random number.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    unsigned int GetUInt(const unsigned int max) { return static_cast<int>(GetDouble() * static_cast<double>(max)); }
+    uint32_t GetUInt(const uint32_t max) { return static_cast<int>(GetDouble() * static_cast<double>(max)); }
   
     /**
-     * Generate an unsigned int out of an interval.
+     * Generate an uint32_t out of an interval.
      *
      * @return The pseudo random number.
      * @param min The lower bound for the random numbers.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    unsigned int GetUInt(const unsigned int min, const unsigned int max) { return GetUInt(max - min) + min; }
+    uint32_t GetUInt(const uint32_t min, const uint32_t max) { return GetUInt(max - min) + min; }
   
     /**
      * Generate an int out of an interval.
@@ -266,9 +266,9 @@ namespace emp {
     /**
      * Generate a random variable drawn from a Poisson distribution.
      **/
-    unsigned int GetRandPoisson(const double n, double p) {
+    uint32_t GetRandPoisson(const double n, double p) {
       // Optimizes for speed and calculability using symetry of the distribution
-      if (p > .5) return (unsigned int)n - GetRandPoisson(n * (1 - p));
+      if (p > .5) return (uint32_t)n - GetRandPoisson(n * (1 - p));
       else return GetRandPoisson(n * p);
     }
   
@@ -277,12 +277,12 @@ namespace emp {
      *
      * @param mean The mean of the distribution.
      **/
-    unsigned int GetRandPoisson(const double mean) {
+    uint32_t GetRandPoisson(const double mean) {
       // Draw from a Poisson Dist with mean; if cannot calculate, return UINT_MAX.
       // Uses Rejection Method
       const double a = exp(-mean);
       if (a <= 0) return UINT_MAX; // cannot calculate, so return UINT_MAX
-      unsigned int k = 0;
+      uint32_t k = 0;
       double u = GetDouble();
       while (u >= a) {
         u *= GetDouble();
@@ -297,10 +297,10 @@ namespace emp {
      * This function is exact, but slow. 
      * @see Random::GetRandBinomial
      **/
-    unsigned int GetFullRandBinomial(const double n, const double p) { // Exact
+    uint32_t GetFullRandBinomial(const double n, const double p) { // Exact
       // Actually try n Bernoulli events with probability p
-      unsigned int k = 0;
-      for (unsigned int i = 0; i < n; ++i) if (P(p)) k++;
+      uint32_t k = 0;
+      for (uint32_t i = 0; i < n; ++i) if (P(p)) k++;
       return k;
     }
 
@@ -312,15 +312,15 @@ namespace emp {
      *
      * @see Random::GetFullRandBinomial
      **/  
-    unsigned int GetRandBinomial(const double n, const double p) { // Approx
+    uint32_t GetRandBinomial(const double n, const double p) { // Approx
       // Approximate Binomial if appropriate
       // if np(1-p) is large, use a Normal approx
       if (n * p * (1 - p) >= _BINOMIAL_TO_NORMAL) {
-        return static_cast<unsigned int>(GetRandNormal(n * p, n * p * (1 - p)) + 0.5);
+        return static_cast<uint32_t>(GetRandNormal(n * p, n * p * (1 - p)) + 0.5);
       }
       // elseif n is large, use a Poisson approx
       if (n >= _BINOMIAL_TO_POISSON) {
-        unsigned int k = GetRandPoisson(n, p);
+        uint32_t k = GetRandPoisson(n, p);
         if (k < UINT_MAX) return k; // if approx worked
       }
       // otherwise, actually generate the randBinomial
