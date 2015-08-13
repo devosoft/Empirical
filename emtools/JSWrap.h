@@ -38,9 +38,14 @@
 #include "../tools/mem_track.h"
 #include "../tools/vector.h"
 
+#ifdef EMSCRIPTEN
 extern "C" {
   extern int EMP_GetCBArgCount();  // Get the number of arguments associated with a callback.
 }
+#else
+// When NOT in Emscripten, need a stub for this function.
+int EMP_GetCBArgCount() { return -1; }
+#endif
 
 
 namespace emp {
@@ -179,7 +184,7 @@ namespace emp {
         // Make sure that we are returning the correct number of arguments.  If this
         // assert fails, it means that we've failed to set the correct number of arguments
         // in emp.cb_args, and need to realign.
-        emp_assert(EMP_GetCBArgCount() == num_args);
+        emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() == num_args);
         
         // Collect the values of the arguments in a tuple
         using args_t = std::tuple< typename std::decay<ARG_TYPES>::type... >;
@@ -187,10 +192,11 @@ namespace emp {
         Collect_impl<args_t, num_args>::CollectArgs(args);
 
         // And finally, do the actual callback.
-        // emp::ApplyTuple(fun, args);
 
         RET_TYPE return_val;
-        emp::ApplyTuple([&return_val, this](ARG_TYPES... in_args){ return_val = fun(in_args...); }, args);
+        emp::ApplyTuple([&return_val, this](ARG_TYPES... in_args){
+            return_val = fun(in_args...);
+          }, args);
 
         // And save the return value for JS.
         StoreReturn(return_val);
@@ -219,7 +225,7 @@ namespace emp {
         // Make sure that we are returning the correct number of arguments.  If this
         // assert fails, it means that we've failed to set the correct number of arguments
         // in emp.cb_args, and need to realign.
-        emp_assert(EMP_GetCBArgCount() == num_args);
+        emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() == num_args);
         
         // Collect the values of the arguments in a tuple 
         using args_t = std::tuple< typename std::decay<ARG_TYPES>::type... >;
@@ -323,6 +329,7 @@ namespace emp {
     delete callback_array[fun_id];
     callback_array[fun_id] = nullptr;
   }
+
 }
 
 
