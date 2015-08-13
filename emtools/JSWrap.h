@@ -36,6 +36,7 @@
 #include "../tools/assert.h"
 #include "../tools/functions.h"
 #include "../tools/mem_track.h"
+#include "../tools/vector.h"
 
 extern "C" {
   extern int EMP_GetCBArgCount();  // Get the number of arguments associated with a callback.
@@ -94,7 +95,7 @@ namespace emp {
   }
 
   // If the return type has a personalized function to handle the return, use it!
-  template <class RETURN_TYPE>
+  template <typename RETURN_TYPE>
   static typename emp::sfinae_decoy<void, decltype(&RETURN_TYPE::StoreAsReturn)>::type
   StoreReturn(const RETURN_TYPE & ret_var) {
     ret_var.template StoreAsReturn();
@@ -233,10 +234,19 @@ namespace emp {
       }
     };
 
+    
+    // The following function returns a static callback array; callback ID's all index into
+    // this array.
+    static emp::vector<JSWrap_Callback_Base *> & CallbackArray() {
+      static emp::vector<JSWrap_Callback_Base *> callback_array;
+      return callback_array;
+    }
 
   } // End internal namespace
   
-  // The following JSWrap functions take a target function and return an integer id.
+  // The following JSWrap functions take a target function and return an integer id that
+  // indexes into a callback array.
+
   // The first version assumes that we already have it enclosed in an std::function, while
   // the second version assumes we have a raw function pointer and wraps it for us.
   
@@ -248,7 +258,11 @@ namespace emp {
     // We should never create disposible functions with names!
     emp_assert(fun_name == "" || dispose_on_use == false);
     
-    auto * new_cb = new emp::internal::JSWrap_Callback<RET_TYPE, ARG_TYPES...>(in_fun, dispose_on_use);
+    auto * new_cb =
+      new emp::internal::JSWrap_Callback<RET_TYPE, ARG_TYPES...>(in_fun, dispose_on_use);
+    auto & callback_array = internal::CallbackArray();
+    uint32_t out_id = (int) callback_array.size();
+    callback_array.push_back(new_cb);
     
     if (fun_name != "") {
       EM_ASM_ARGS({
@@ -265,10 +279,10 @@ namespace emp {
             // Return the resulting value
             return emp_i.cb_return;
           };
-        }, (uint32_t) new_cb, fun_name.c_str());
+        }, out_id, fun_name.c_str());
     }
     
-    return (uint32_t) new_cb;
+    return out_id;
   }
 
   // uint32_t JSWrap(const std::function<void()> & in_fun,
@@ -304,7 +318,10 @@ namespace emp {
   void JSDelete( uint32_t fun_id ) {
     emp_assert(fun_id > 0);  // Make sure this isn't a null pointer!
     // @CAO -- Should make sure to clean up named functions on JS side if they exist.
-    delete (emp::internal::JSWrap_Callback_Base *) (long long) fun_id;
+    // delete (emp::internal::JSWrap_Callback_Base *) (long long) fun_id;
+    auto & callback_array = internal::CallbackArray();
+    delete callback_array[fun_id];
+    callback_array[fun_id] = nullptr;
   }
 }
 
@@ -314,10 +331,10 @@ namespace emp {
 // Once you use JSWrap to create an ID, you can call the wrapped function from Javascript
 // by supplying CPPCallback with the id and all args.
 
-extern "C" void empCppCallback(uint32_t cb_ptr)
+extern "C" void empCppCallback(uint32_t cb_id)
 {
   // Convert the uint passed in from 32 bits to 64 and THEN convert it to a pointer.
-  auto * cb_obj = (emp::internal::JSWrap_Callback_Base *) (long long) cb_ptr;
+  auto * cb_obj = emp::internal::CallbackArray()[cb_id];
 
   // Run DoCallback() on the generic base class type, which is virtual and will call 
   // the correct template automatically.
@@ -326,6 +343,7 @@ extern "C" void empCppCallback(uint32_t cb_ptr)
   // If we have indicated that this callback is single use, delete it now.
   if (cb_obj->IsDisposable()) {
     delete cb_obj;
+    emp::internal::CallbackArray()[cb_id] = nullptr;
   }
 }
 
