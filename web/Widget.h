@@ -85,10 +85,20 @@ namespace web {
     bool IsStatic() const;
     bool IsActive() const;
     
+    virtual bool AppendOK() const;
+
     virtual bool IsSlate() const { return false; }
     virtual bool IsTable() const { return false; }
     virtual bool IsText() const { return false; }
-    virtual bool AppendOK() const;
+
+    // Checks to see if this widget can be converted to other types...
+    bool ButtonOK() const;
+    bool CanvasOK() const;
+    bool ImageOK() const;
+    bool SelectorOK() const;
+    bool SlateOK() const;
+    bool TableOK() const;
+    bool TextOK() const;
     
     std::string GetID() const;
     bool HasChild(const Widget & test_child);
@@ -150,12 +160,19 @@ namespace web {
       WidgetInfo(const WidgetInfo &) = delete;
       WidgetInfo & operator=(const WidgetInfo &) = delete;
 
-      virtual ~WidgetInfo() { EMP_TRACK_DESTRUCT(WebWidgetInfo); }
+      virtual ~WidgetInfo() {
+        EMP_TRACK_DESTRUCT(WebWidgetInfo); 
+      }
+
+      virtual bool IsButtonInfo() const { return false; }
+      virtual bool IsCanvasInfo() const { return false; }
+      virtual bool IsImageInfo() const { return false; }
+      virtual bool IsSelectorInfo() const { return false; }
+      virtual bool IsSlateInfo() const { return false; }
+      virtual bool IsTableInfo() const { return false; }
+      virtual bool IsTextInfo() const { return false; }
 
       void AddChild(Widget in) {
-        // emp::Alert("Adding child [", in.GetID(), "] of type ", in.GetInfoType(),
-        //            " to parent [", id, "].");
-
         // If the inserted widget is already active, remove it from its old position.
         if (in->parent) {
           emp_assert(!"Currently cannot insert widget if already active!");
@@ -318,25 +335,10 @@ namespace web {
 
   enum ActivityState { INACTIVE, WAITING, STATIC, ACTIVE };
 
-  bool Widget::IsInactive() const {
-    if (!info) return false;
-    return info->state == INACTIVE;
-  }
-  
-  bool Widget::IsWaiting() const {
-    if (!info) return false;
-    return info->state == WAITING;
-  }
-  
-  bool Widget::IsStatic() const {
-    if (!info) return false;
-    return info->state == STATIC;
-  }
-  
-  bool Widget::IsActive() const {
-    if (!info) return false;
-    return info->state == ACTIVE;
-  }
+  bool Widget::IsInactive() const { if (!info) return false; return info->state == INACTIVE; }  
+  bool Widget::IsWaiting() const { if (!info) return false; return info->state == WAITING; }
+  bool Widget::IsStatic() const { if (!info) return false; return info->state == STATIC; }
+  bool Widget::IsActive() const { if (!info) return false; return info->state == ACTIVE; }
   
   bool Widget::AppendOK() const { return info->append_ok; }
   std::string Widget::GetID() const { return info ? info->id : ""; }
@@ -347,6 +349,14 @@ namespace web {
     return false;
   }
   
+  bool Widget::ButtonOK() const { if (!info) return false; return info->IsButtonInfo(); }
+  bool Widget::CanvasOK() const { if (!info) return false; return info->IsCanvasInfo(); }
+  bool Widget::ImageOK() const { if (!info) return false; return info->IsImageInfo(); }
+  bool Widget::SelectorOK() const { if (!info) return false; return info->IsSelectorInfo(); }
+  bool Widget::SlateOK() const { if (!info) return false; return info->IsSlateInfo(); }
+  bool Widget::TableOK() const { if (!info) return false; return info->IsTableInfo(); }
+  bool Widget::TextOK() const { if (!info) return false; return info->IsTextInfo(); }
+
   std::string Widget::CSS(const std::string & setting) {
     return info ? info->style.Get(setting) : "";
   }
@@ -494,10 +504,10 @@ namespace web {
       RETURN_TYPE & Opacity(double v) { return CSS("opacity", v); }
     };
     
-  };
+  }
 
-};
-};  
+}
+}
 
 
 #endif
