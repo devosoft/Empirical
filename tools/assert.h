@@ -79,6 +79,10 @@ namespace emp {
 
 namespace emp {
   const bool assert_on = true;
+  static int TripAssert() {
+    static int trip_count = 0;
+    return ++trip_count;
+  }
 }
 
 // Generate a pop-up alert in a web browser if an assert it tripped.
@@ -89,8 +93,7 @@ namespace emp {
       + std::string(" line ") + std::to_string(__LINE__)                \
       + std::string("): ") + std::string(#EXPR) + "\n"                  \
       + emp_assert_var_info.str();                                      \
-    static int trip_count = 0;                                          \
-    if (trip_count++ < 3)                                               \
+    if (TripAssert() <= 3)                                              \
       EM_ASM_ARGS({ msg = Pointer_stringify($0); alert(msg); }, msg.c_str()); \
     abort();                                                            \
   }                                                                     \
