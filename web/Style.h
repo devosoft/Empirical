@@ -93,8 +93,8 @@ namespace web {
           $( '#' + id ).css( setting, value);
         }, widget_id.c_str(), setting.c_str(), settings[setting].c_str());
 #else
-      std::cout << "Setting '" << widget_id << "' attribute '" << name
-                << "' to '" << settings[name] << "'.";
+      std::cout << "Setting '" << widget_id << "' attribute '" << setting
+                << "' to '" << settings[setting] << "'.";
 #endif
     }
     
@@ -109,7 +109,7 @@ namespace web {
           $( '#' + id ).css( setting, value);
         }, widget_id.c_str(), setting.c_str(), value.c_str());
 #else
-      std::cout << "Setting '" << widget_id << "' attribute '" << name
+      std::cout << "Setting '" << widget_id << "' attribute '" << setting
                 << "' to '" << value << "'.";
 #endif
     }
@@ -117,8 +117,8 @@ namespace web {
   };
 
 
-};
-};
+}
+}
 
 
 #endif
