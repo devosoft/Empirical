@@ -30,7 +30,7 @@
 
 #include "events.h"
 #include "Style.h"
-
+#include "web_base.h"
 
 namespace emp {
 namespace web {
@@ -240,6 +240,16 @@ namespace web {
       virtual Widget Append(double in_num) { return Append(emp::to_string(in_num)); }
       virtual Widget Append(int in_num) { return Append(emp::to_string(in_num)); }
       virtual Widget Append(uint32_t in_num) { return Append(emp::to_string(in_num)); }
+
+      // Handle special commands
+      virtual Widget Append(const emp::web::Close & close) {
+        if (id == close.GetID()) {  // Test if this is the element we need to close.
+          append_ok = false;
+          return parent;
+        }
+        return ForwardAppend(close);  // Otherwise pass the Close to parent!
+      }
+
 
       // If an Append doesn't work with current class, forward it to the parent.
       template <typename FWD_TYPE>
