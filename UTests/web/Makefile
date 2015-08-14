@@ -4,6 +4,10 @@ CFLAGS_all := -Wall -Wno-unused-variable -Wno-unused-function -std=c++11 -I../..
 
 # Emscripten compiler information
 CXX_web := emcc
+CXX_native := g++
+
+OFLAGS_native := -g -pedantic
+
 OFLAGS_web := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864 -s ASSERTIONS=2 -s DEMANGLE_SUPPORT=1 # -s SAFE_HEAP=1
 #OFLAGS_web := -g4 -DEMP_NDEBUG -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864 -s ASSERTIONS=2 -s DEMANGLE_SUPPORT=1 # -s SAFE_HEAP=1
 #OFLAGS_web := -g4 -DNDEBUG -s TOTAL_MEMORY=67108864 -s DEMANGLE_SUPPORT=1 # -s SAFE_HEAP=1
@@ -12,21 +16,36 @@ OFLAGS_web := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=
 #OFLAGS_web := -Os -DNDEBUG -s TOTAL_MEMORY=67108864
 
 
+CFLAGS_native := $(CFLAGS_all) $(OFLAGS_native)
+
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 
-default: all
-all: Slate.js web.js
+default: web
+web: keypress.js Slate.js web.js
+native: debug-keypress debug-Slate debug-web
+
+keypress.js: keypress.cc
+	$(CXX_web) $(CFLAGS_web) keypress.cc -o keypress.js
+
+debug-keypress: keypress.cc
+	$(CXX_native) $(CFLAGS_native) keypress.cc -o debug-keypress
 
 Slate.js: Slate.cc
 	$(CXX_web) $(CFLAGS_web) Slate.cc -o Slate.js
 
+debug-Slate: Slate.cc
+	$(CXX_native) $(CFLAGS_native) Slate.cc -o debug-Slate
+
 web.js: web.cc
 	$(CXX_web) $(CFLAGS_web) web.cc -o web.js
 
+debug-web: web.cc
+	$(CXX_native) $(CFLAGS_native) web.cc -o debug-web
+
 clean:
-	rm -f Slate.js web.js *.js.map *~ source/*.o source/*/*.o
+	rm -f debug-* keypress.js Slate.js web.js *.js.map *~ source/*.o source/*/*.o
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
