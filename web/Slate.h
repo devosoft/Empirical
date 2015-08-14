@@ -78,9 +78,11 @@ namespace web {
         HTML.str("");       // Clear the current text.
 
         // Loop through all children and build a span element for each to replace.
+        HTML << "<div id=\'" << id << "\'>"; // Tag to envelope Slate
         for (Widget & w : children) {
           HTML << "<span id=\'" << w.GetID() << "'></span>";  // Span element for current widget.
         }
+        HTML << "</div>";
       }
       
     public:
