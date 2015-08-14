@@ -24,6 +24,7 @@
 
 #include <string>
 
+#include "../emtools/init.h"
 #include "../tools/mem_track.h"
 #include "../tools/vector.h"
 
@@ -260,7 +261,7 @@ namespace web {
         // If this node is static, don't change it!
         if (state == Widget::STATIC) return;
 
-        // If this node is active, fill in its contents; otherwise make it an empty span.
+        // If this node is active, fill put its contents in ss; otherwise make ss an empty span.
         if (state == Widget::ACTIVE) GetHTML(ss);
         else ss << "<span id=" << id << "></span>";
         
@@ -271,14 +272,14 @@ namespace web {
             $('#' + widget_id).replaceWith(out_html);
           }, id.c_str(), ss.str().c_str());
         
-        // Update the style
-        style.Apply(id);
-
-        // Run associated Javascript code, if any (e.g., to fill out a canvas)
-        TriggerJS();
-
-        // If active, recurse to children!
+        // If active update style, trigger JS, and recurse to children!
         if (state == Widget::ACTIVE) {
+          // Update the style
+          style.Apply(id);
+
+          // Run associated Javascript code, if any (e.g., to fill out a canvas)
+          TriggerJS();
+
           for (auto & child : children) child->ReplaceHTML();
         }
       }
