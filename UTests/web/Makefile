@@ -23,8 +23,14 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 
 
 default: web
-web: keypress.js Slate.js web.js
-native: debug-keypress debug-Slate debug-web
+web: Animate.js keypress.js Slate.js web.js
+native: debug-Animate debug-keypress debug-Slate debug-web
+
+Animate.js: Animate.cc
+	$(CXX_web) $(CFLAGS_web) Animate.cc -o Animate.js
+
+debug-Animate: Animate.cc
+	$(CXX_native) $(CFLAGS_native) Animate.cc -o debug-Animate
 
 keypress.js: keypress.cc
 	$(CXX_web) $(CFLAGS_web) keypress.cc -o keypress.js
@@ -45,7 +51,7 @@ debug-web: web.cc
 	$(CXX_native) $(CFLAGS_native) web.cc -o debug-web
 
 clean:
-	rm -f debug-* keypress.js Slate.js web.js *.js.map *~ source/*.o source/*/*.o
+	rm -f debug-* Animate.js keypress.js Slate.js web.js *.js.map *~ source/*.o source/*/*.o
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
