@@ -117,6 +117,10 @@ namespace web {
     void Activate();
     void Deactivate(bool top_level=true);
     bool ToggleActive();
+
+    // Clear and redraw the current widget on the screen.
+    void Redraw();
+      
     
     Widget & AddDependent(const Widget & w);
     
@@ -293,7 +297,7 @@ namespace web {
           for (auto & child : children) child->ReplaceHTML();
         }
       }
-      
+
     public:
       virtual std::string GetType() { return "web::WidgetInfo"; }
 
@@ -400,6 +404,11 @@ namespace web {
     if (info->state != INACTIVE) Deactivate();
     else Activate();
     return info->state;
+  }
+
+  void Widget::Redraw() {
+    emp_assert(info);
+    info->ReplaceHTML();
   }
   
   Widget & Widget::AddDependent(const Widget & w) {
