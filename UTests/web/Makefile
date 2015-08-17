@@ -29,29 +29,23 @@ native: debug-Animate debug-keypress debug-Slate debug-web
 Animate.js: Animate.cc
 	$(CXX_web) $(CFLAGS_web) Animate.cc -o Animate.js
 
-debug-Animate: Animate.cc
-	$(CXX_native) $(CFLAGS_native) Animate.cc -o debug-Animate
+debug-%: $*.cc
+	$(CXX_native) $(CFLAGS_native) $< -o $@
 
 keypress.js: keypress.cc
 	$(CXX_web) $(CFLAGS_web) keypress.cc -o keypress.js
 
-debug-keypress: keypress.cc
-	$(CXX_native) $(CFLAGS_native) keypress.cc -o debug-keypress
-
 Slate.js: Slate.cc
 	$(CXX_web) $(CFLAGS_web) Slate.cc -o Slate.js
 
-debug-Slate: Slate.cc
-	$(CXX_native) $(CFLAGS_native) Slate.cc -o debug-Slate
+Tween.js: Tween.cc
+	$(CXX_web) $(CFLAGS_web) Tween.cc -o Tween.js
 
 web.js: web.cc
 	$(CXX_web) $(CFLAGS_web) web.cc -o web.js
 
-debug-web: web.cc
-	$(CXX_native) $(CFLAGS_native) web.cc -o debug-web
-
 clean:
-	rm -f debug-* Animate.js keypress.js Slate.js web.js *.js.map *~ source/*.o source/*/*.o
+	rm -f debug-* Animate.js keypress.js Slate.js Tween.js web.js *.js.map *~ source/*.o source/*/*.o
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
