@@ -12,8 +12,11 @@ void SetVar(double v) { myvar = v; }
 int main()
 {
   UI::Text text("text");
-  text.CSS("border", "3px solid blue").CSS("padding", "3px") << "Testing.  " << myvar;
+  text.CSS("border", "3px solid blue").CSS("padding", "3px") << "Testing.  " << UI::Live(myvar);
   doc << text;
 
   tween.AddPath(SetVar, 0, 1000);
+  tween.AddDependant(text);
+
+  doc << UI::Button([](){tween.Start();}, "Start!");
 }
