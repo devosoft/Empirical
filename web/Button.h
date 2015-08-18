@@ -40,7 +40,7 @@ namespace web {
 
       void DoCallback() {
         callback();
-        UpdateDependents();
+        UpdateDependants();
       }
 
       virtual void GetHTML(std::stringstream & HTML) override {

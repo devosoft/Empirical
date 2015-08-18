@@ -122,7 +122,7 @@ namespace web {
     void Redraw();
       
     
-    Widget & AddDependent(const Widget & w);
+    Widget & AddDependant(const Widget & w);
     
     // Setup << operator to redirect to Append; option preparation can be overridden.
     virtual void PrepareAppend() { ; }
@@ -149,7 +149,7 @@ namespace web {
       // Track hiearchy
       Widget parent;                  // Which widget is this one contained within?
       emp::vector<Widget> children;   // Widgets contained in this one.
-      emp::vector<Widget> dependents; // Widgets to be refreshed if this one is triggered
+      emp::vector<Widget> dependants; // Widgets to be refreshed if this one is triggered
       bool append_ok;                 // Can we add more children?
       Widget::ActivityState state;    // Is this element active in DOM?
 
@@ -206,22 +206,22 @@ namespace web {
         }
       }
 
-      // Record dependents.  Dependents are only acted upon when this widget's action is
+      // Record dependants.  Dependants are only acted upon when this widget's action is
       // triggered (e.g. a button is pressed)
-      void AddDependent(Widget in) {
-        dependents.emplace_back(in);
+      void AddDependant(Widget in) {
+        dependants.emplace_back(in);
       }
 
       template <typename... T>
-      void AddDependents(Widget first, T... widgets) {
-        AddDependent(first);
-        AddDependents(widgets...);
+      void AddDependants(Widget first, T... widgets) {
+        AddDependant(first);
+        AddDependants(widgets...);
       }
 
-      void AddDependents() { ; }
+      void AddDependants() { ; }
 
-      void UpdateDependents() {
-        for (auto & d : dependents) d->ReplaceHTML();
+      void UpdateDependants() {
+        for (auto & d : dependants) d->ReplaceHTML();
       }
 
       // Activate is delayed until the document is ready, when DoActivate will be called.
@@ -411,8 +411,8 @@ namespace web {
     info->ReplaceHTML();
   }
   
-  Widget & Widget::AddDependent(const Widget & w) {
-    info->AddDependent(w);
+  Widget & Widget::AddDependant(const Widget & w) {
+    info->AddDependant(w);
     return *this;
   }
   
