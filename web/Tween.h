@@ -33,11 +33,12 @@ namespace web {
       std::function<void()> trigger;
     };
 
-    double duration;                 // How long should this Tween take?
-    Widget default_target;           // Allow paths to be added w/o specifying widget each time.
-    emp::vector<Path*> paths;        // Paths to be updated as part of this tween.
-    emp::vector<Event*> events;      // Events to be triggered as specific steps.
-    emp::vector<Widget> dependants;  // Widgets to be refreshed at each frame.
+    double duration;                                // How long should this Tween take?
+    Widget default_target;                          // Default widget to use for specifying paths
+    emp::vector<Path*> paths;                       // Paths to be updated as part of this tween.
+    emp::vector<Event*> events;                     // Events to be triggered as specific steps.
+    emp::vector<std::function<void()>> update_funs; // Call after paths are triggered to UD screen.
+    emp::vector<Widget> dependants;                 // Widgets to be refreshed at each frame.
 
     bool running;
     int callback_id;
@@ -62,6 +63,11 @@ namespace web {
       // Loop through each path and adjust accordingly...
       for (auto * p : paths) {
         p->Set(frac);
+      }
+
+      // Loop through each update function to make sure it gets triggered.
+      for (auto f : update_funs) {
+        f();
       }
 
       // Loop through all dependants be redrawn and do so.
@@ -93,14 +99,25 @@ namespace web {
     Tween & SetDefaultTarget(const Widget & w) { default_target = w; return *this; }
 
     Tween & AddPath(std::function<void(double)> set_fun,
-                 double start_val, double end_val, std::function<double(double)> timing=LINEAR) {
+                    double start_val, double end_val, std::function<double(double)> timing=LINEAR) {
       Path * new_path = new Path({set_fun, start_val, end_val, timing});
       paths.push_back(new_path);
       return *this;
     }
 
+    Tween & AddPath(double & set_var,
+                    double start_val, double end_val, std::function<double(double)> timing=LINEAR) {
+      AddPath( [&set_var](double v) { set_var = v; }, start_val, end_val, timing);
+      return *this;
+    }
+
     Tween & AddPath(Widget w, std::string setting, double start_val, double end_val) {
       emp_assert(false && "need to fill in!");
+      return *this;
+    }
+
+    Tween & AddUpdate(std::function<void(void)> ud_fun) {
+      update_funs.push_back(ud_fun);
       return *this;
     }
 
