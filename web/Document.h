@@ -14,6 +14,7 @@
 #include "Slate.h"
 #include "Table.h"
 #include "Text.h"
+#include "TextArea.h"
 
 #include "web_init.h"
 

@@ -176,6 +176,7 @@ namespace web {
       virtual bool IsSlateInfo() const { return false; }
       virtual bool IsTableInfo() const { return false; }
       virtual bool IsTextInfo() const { return false; }
+      virtual bool IsTextAreaInfo() const { return false; }
 
       void AddChild(Widget in) {
         // If the inserted widget is already active, remove it from its old position.
