@@ -54,17 +54,14 @@ namespace web {
       }
       
       void UpdateCallback(const std::function<void()> & in_cb) {
-        if (callback_id) emp::JSDelete(callback_id);    // Delete previous callback wrapper.
-        callback_id = JSWrap(in_cb);                    // Save id for callback trigger.
-        onclick_info = std::string("emp.Callback(") + std::to_string(callback_id) + ")";
-        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
+        callback = in_cb;
       }
-      void UpdateCallback(const std::string in_cb_info) {
-        if (callback_id) emp::JSDelete(callback_id);    // Delete previous callback wrapper.
-        callback_id = 0;                                // No ID currently in callback.
-        onclick_info = in_cb_info;
-        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
-      }
+      // void UpdateCallback(const std::string in_cb_info) {
+      //   if (callback_id) emp::JSDelete(callback_id);    // Delete previous callback wrapper.
+      //   callback_id = 0;                                // No ID currently in callback.
+      //   onclick_info = in_cb_info;
+      //   if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
+      // }
 
       void UpdateLabel(const std::string & in_label) {
         label = in_label;
@@ -121,10 +118,10 @@ namespace web {
       Info()->UpdateCallback(in_cb);
       return *this;
     }
-    Button & Callback(const std::string in_cb_info) {
-      Info()->UpdateCallback(in_cb_info);
-      return *this;
-    }
+    // Button & Callback(const std::string in_cb_info) {
+    //   Info()->UpdateCallback(in_cb_info);
+    //   return *this;
+    // }
     Button & Label(const std::string & in_label) { Info()->UpdateLabel(in_label); return *this; }
     Button & Title(const std::string & in_t) { Info()->UpdateTitle(in_t); return *this; }
     Button & Autofocus(bool in_af) { Info()->UpdateAutofocus(in_af); return *this; }
