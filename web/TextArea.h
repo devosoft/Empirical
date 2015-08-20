@@ -23,12 +23,12 @@ namespace web {
       int rows;                 // How many rows of text in the area?
       int max_length;           // Maximum number of total characters allowed.
 
-      std::string placeholder;  // Info text prior to initial typing.
+      std::string cur_text;     // Text that should currently be in the box.
 
       bool autofocus;
       bool disabled;
       
-      std::function<void()> callback;
+      std::function<void(const std::string &)> callback;
       uint32_t callback_id;
       std::string onclick_info;
       
@@ -36,37 +36,27 @@ namespace web {
       TextAreaInfo(const TextAreaInfo &) = delete;               // No copies of INFO allowed
       TextAreaInfo & operator=(const TextAreaInfo &) = delete;   // No copies of INFO allowed
       virtual ~TextAreaInfo() {
-        if (callback_id) emp::JSDelete(callback_id);         // Delete callback wrapper.
+        if (callback_id) emp::JSDelete(callback_id);             // Delete callback wrapper.
       }
       
       virtual bool IsTextAreaInfo() const override { return true; }
 
       void DoCallback() {
-        callback();
+        if (callback) callback(cur_text);
         UpdateDependants();
       }
 
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");                                           // Clear the current text.
         HTML << "<textarea ";                                   // Start the textarea tag.
-        if (title != "") HTML << " title=\"" << title << "\"";  // Add a title if there is one.
         if (disabled) { HTML << " disabled=true"; }             // Check if should be disabled
         HTML << " id=\"" << id << "\"";                         // Indicate ID.
         HTML << " onclick=\"" << onclick_info << "\"";          // Indicate action on click.
-        HTML << ">" << label << "</textarea>";                  // Close and label the textarea
+        HTML << ">" << "testing" << "</textarea>";                  // Close and label the textarea
       }
       
-      void UpdateCallback(const std::function<void()> & in_cb) {
-        if (callback_id) emp::JSDelete(callback_id);    // Delete previous callback wrapper.
-        callback_id = JSWrap(in_cb);                    // Save id for callback trigger.
-        onclick_info = std::string("emp.Callback(") + std::to_string(callback_id) + ")";
-        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
-      }
-      void UpdateCallback(const std::string in_cb_info) {
-        if (callback_id) emp::JSDelete(callback_id);    // Delete previous callback wrapper.
-        callback_id = 0;                                // No ID currently in callback.
-        onclick_info = in_cb_info;
-        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
+      void UpdateCallback(const std::function<void(const std::string &)> & in_cb) {
+        callback = in_cb;
       }
 
       void UpdateAutofocus(bool in_af) {
@@ -90,7 +80,7 @@ namespace web {
     TextArea(TextAreaInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:
-    TextArea(const std::string & in_id="")
+    TextArea(std::function<void(const std::string &)> in_cb, const std::string & in_id="")
       : WidgetFacet(in_id)
     {
       info = new TextAreaInfo(in_id);
@@ -98,7 +88,7 @@ namespace web {
       Info()->cols = 20;
       Info()->rows = 1;
       Info()->max_length = -1;
-      Info()->placeholder = "";
+      Info()->cur_text = "";
       Info()->autofocus = false;
       Info()->disabled = false;
       
@@ -113,19 +103,13 @@ namespace web {
 
     using INFO_TYPE = TextAreaInfo;
 
-    TextArea & Callback(const std::function<void()> & in_cb) {
+    TextArea & Callback(const std::function<void(const std::string &)> & in_cb) {
       Info()->UpdateCallback(in_cb);
-      return *this;
-    }
-    TextArea & Callback(const std::string in_cb_info) {
-      Info()->UpdateCallback(in_cb_info);
       return *this;
     }
     TextArea & Autofocus(bool in_af) { Info()->UpdateAutofocus(in_af); return *this; }
     TextArea & Disabled(bool in_dis) { Info()->UpdateDisabled(in_dis); return *this; }
     
-    const std::string & GetLabel() const { return Info()->label; }
-    const std::string & GetTitle() const { return Info()->title; }
     bool HasAutofocus() const { return Info()->autofocus; }
     bool IsDisabled() const { return Info()->disabled; }
   };
