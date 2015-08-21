@@ -68,6 +68,11 @@ namespace web {
       info->Append(new_widget);
       return new_widget;
     }
+    template <class... T> web::TextArea AddTextArea(T... args)  {
+      web::TextArea new_widget(std::forward<T>(args)...);
+      info->Append(new_widget);
+      return new_widget;
+    }
 
     // Setup a quick way to retrieve old widgets by name.
     web::Button Button (const std::string & in_id) { return web::Button(Find(in_id)); }
@@ -77,6 +82,7 @@ namespace web {
     web::Slate Slate (const std::string & in_id) { return web::Slate(Find(in_id)); }
     web::Table Table (const std::string & in_id) { return web::Table(Find(in_id)); }
     web::Text Text (const std::string & in_id) { return web::Text(Find(in_id)); }
+    web::TextArea TextArea (const std::string & in_id) { return web::TextArea(Find(in_id)); }
 
   };
 
