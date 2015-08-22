@@ -30,8 +30,7 @@ namespace web {
       
       std::function<void(const std::string &)> callback;
       uint32_t callback_id;
-      std::string onclick_info;
-      
+            
       TextAreaInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
       TextAreaInfo(const TextAreaInfo &) = delete;               // No copies of INFO allowed
       TextAreaInfo & operator=(const TextAreaInfo &) = delete;   // No copies of INFO allowed
@@ -50,9 +49,12 @@ namespace web {
         HTML.str("");                                           // Clear the current text.
         HTML << "<textarea ";                                   // Start the textarea tag.
         if (disabled) { HTML << " disabled=true"; }             // Check if should be disabled
-        HTML << " id=\"" << id << "\"";                         // Indicate ID.
-        HTML << " onclick=\"" << onclick_info << "\"";          // Indicate action on click.
-        HTML << ">" << "testing" << "</textarea>";                  // Close and label the textarea
+        HTML << " id=\"" << id << "\""                          // Indicate ID.
+             << " onchange=\"emp.Callback(" << callback_id << ", this.innerHTML)\""
+             << " rows=\"" << rows << "\""
+             << " cols=\"" << cols << "\"";
+        if (max_length >= 0) { HTML << " maxlength=\"" << max_length << "\""; }
+        HTML << ">" << "testing" << "</textarea>";              // Close and label the textarea
       }
       
       void UpdateCallback(const std::function<void(const std::string &)> & in_cb) {
@@ -95,7 +97,6 @@ namespace web {
       Info()->callback = in_cb;
       TextAreaInfo * ta_info = Info();
       Info()->callback_id = JSWrap( std::function<void()>( [ta_info](){ta_info->DoCallback();} )  );
-      Info()->onclick_info = emp::to_string("emp.Callback(", Info()->callback_id, ")");
     }
     TextArea(const TextArea & in) : WidgetFacet(in) { ; }
     TextArea(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsTextAreaInfo()); }
