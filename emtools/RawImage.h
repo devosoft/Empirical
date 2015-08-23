@@ -78,12 +78,17 @@ namespace emp {
     }
   };
 
-  static std::map<std::string, RawImage *> raw_image_map;
+  namespace internal {
+    static std::map<std::string, RawImage *> & RawImageMap() {
+      static std::map<std::string, RawImage *> raw_image_map;
+    }
+  }
   
   RawImage & LoadRawImage(const std::string & filename,
                           const std::function<void()> & load_callback=NULL,
                           const std::function<void()> & error_callback=NULL)
   {
+    auto & raw_image_map = internal::RawImageMap();
     auto it = raw_image_map.find(filename);
     RawImage * raw_image;
     if (it == raw_image_map.end()) {        // New filename
