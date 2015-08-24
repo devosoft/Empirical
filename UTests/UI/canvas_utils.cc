@@ -43,7 +43,7 @@ int main() {
   }
 
   // Determine the possible colors.
-  std::vector<std::string> color_map(360);
+  emp::vector<std::string> color_map(360);
   for (int i = 0; i < 360; i++) {
     color_map[i] = emp::to_string("hsl(", i, ",100%,50%");
   }
@@ -51,6 +51,21 @@ int main() {
   // Draw the surface on a new canvas!
   auto & canvas2 = doc.AddCanvas(w, h, "can2");
   emp::UI::Draw(canvas2, surface, color_map);
+
+  // Draw a grid on the canvas!
+  const int num_rows = 50;
+  const int num_cols = 20;
+  emp::vector< emp::vector<int> > grid(num_rows); //  = {{0,100,200},{100,200,0},{200,0,100}};  
+  for (int row = 0; row < num_rows; row++) {
+    grid[row].resize(num_cols);
+    for (int col = 0; col < num_cols; col++) {
+      grid[row][col] = random.GetInt(360);
+    }
+  }
+
+  auto & canvas3 = doc.AddCanvas(w, h, "can3");
+  emp::UI::Draw(canvas3, grid, color_map);
+
 
   doc.Update();
 }

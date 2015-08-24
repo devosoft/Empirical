@@ -131,7 +131,7 @@ void EvokeAnim_Basic(int colors_used, const std::string & canvas_name, Evoke & e
   auto & canvas = doc.Canvas(canvas_name);
   emp::UI::Draw(canvas, evoke.physics.GetSurface(), color_map);
   
-  canvas.Refresh();
+  // canvas.Refresh();
 }
 
 void EvokeAnim_Change() {

@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title></title>
+</head>
+
+<body>
+
+<canvas id="cvs" width="300", height="300"></canvas>
+
+<script>
+
+var canvas = document.getElementById("cvs");
+var ctx = canvas.getContext('2d');
+
+ctx.strokeStyle = "blue";
+
+ctx.beginPath();
+ctx.fillStyle = "red";
+ctx.rect(100, 25, 100, 100);
+ctx.fill();
+ctx.stroke()
+
+ctx.beginPath();
+ctx.rect(100, 175, 100, 100);
+ctx.fillStyle = "yellow";
+ctx.fill();
+ctx.stroke()
+
+</script>
+
+
+<hr>
+<address></address>
+<!-- hhmts start -->
+Last modified: Jul  3, 2015 (14:18:06 EDT)  by <a href=mailto:charles@13-181-250.client.wireless.msu.edu>Charles Ofria</a>
+<!-- hhmts end -->
+</body> </html>
