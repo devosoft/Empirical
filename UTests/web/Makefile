@@ -38,6 +38,9 @@ keypress.js: keypress.cc
 Slate.js: Slate.cc
 	$(CXX_web) $(CFLAGS_web) Slate.cc -o Slate.js
 
+TextArea.js: TextArea.cc
+	$(CXX_web) $(CFLAGS_web) TextArea.cc -o TextArea.js
+
 Tween.js: Tween.cc
 	$(CXX_web) $(CFLAGS_web) Tween.cc -o Tween.js
 
@@ -45,7 +48,7 @@ web.js: web.cc
 	$(CXX_web) $(CFLAGS_web) web.cc -o web.js
 
 clean:
-	rm -f debug-* Animate.js keypress.js Slate.js Tween.js web.js *.js.map *~ source/*.o source/*/*.o
+	rm -f debug-* Animate.js keypress.js Slate.js TextArea.js Tween.js web.js *.js.map *~ source/*.o source/*/*.o
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
