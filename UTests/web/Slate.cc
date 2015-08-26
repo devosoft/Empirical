@@ -35,11 +35,11 @@ int main() {
     //    .CSS("position", "fixed")
                << "Is this text formatted?";
 
-  doc << UI::Text() << "<p>Here is an updating variable: " << UI::Live(myvar)
+  doc << UI::Text("ud_text") << "<p>Here is an updating variable: " << UI::Live(myvar)
                << "<br>"
                << UI::Button(IncVar, "MyButton", "but")
                << UI::Button([](){
-                   auto & but = doc.Button("but");
+                   auto but = doc.Button("but");
                    but.Disabled(!but.IsDisabled());
                  }, "Disable Button");
 
@@ -48,7 +48,7 @@ int main() {
   doc << "<p>" << UI::Slate("new_slate")
     .CSS("border", "5px solid red")
     .CSS("padding", "5px")
-    .CSS("max-width", "580px")
+    .CSS("max-width", "200px")
     .CSS("border-radius", "15px")
                << "Testing out the new slate object with some wide text!";
 
@@ -56,13 +56,14 @@ int main() {
 
   myvar = 100;
 
-  // doc.Button("but").Height(50).Background("green").CSS("border-radius", "5px");
-  doc.Button("but").Height(50); // .Background("green").CSS("border-radius", "5px");
+  doc.Button("but").Height(50).Background("green").CSS("border-radius", "5px")
+    .AddDependent(doc.Text("ud_text"));
+  
 
-  // doc.Slate("new_slate")
-  //   << "  And appending some more text onto the new slate.  Let's see how this all works out."
-  //   << UI::Close("new_slate")
-  //   << "And let's make sure this isn't in the red border.";
+  doc.Slate("new_slate")
+    << "  And appending some more text onto the new slate.  Let's see how this all works out."
+    << UI::Close("new_slate")
+    << "And let's make sure this isn't in the red border.";
 
   std::stringstream os;
   doc << "<p>" << emp::text2html(os.str());

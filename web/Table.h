@@ -132,17 +132,12 @@ namespace web {
     Widget & GetCurSlate();
 
     // Add additional children on to this element.
-    Widget Append(const std::string & text) override {
-      return GetCurSlate() << text;
-    }
+    Widget Append(Widget info) override { return GetCurSlate() << info; }
+    Widget Append(const std::string & text) override { return GetCurSlate() << text; }
     Widget Append(const std::function<std::string()> & in_fun) override {
       return GetCurSlate() << in_fun;
     }
 
-    Widget Append(Widget info) override {
-      return GetCurSlate() << info;
-    }
-    
     virtual void GetHTML(std::stringstream & HTML) override {
       HTML.str("");                                           // Clear the current text.
       HTML << "<table id=\"" << id << "\">";

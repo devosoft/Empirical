@@ -5,9 +5,14 @@ a.out.js
 *.map
 *.o
 *.js.mem
+UTests/tools/tmp*.cc
 UTests/emtools/JSWrap.js
+UTests/UI/Animate.js
+UTests/UI/ElementSlate.js
 UTests/UI/Example.js
 UTests/UI/mini_evoke.js
+UTests/web/TextArea.js
+Slideshow.js
 incoming/
 tmp/
 utils/edit_dist/IO/
