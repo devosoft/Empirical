@@ -23,7 +23,7 @@ namespace emp {
 namespace web {
 
   // Draw a Circle!
-  void Draw(Canvas & canvas, const emp::Circle<> & circle,
+  void Draw(Canvas canvas, const emp::Circle<> & circle,
             const std::string & fill="",
             const std::string & line="")
   {
@@ -34,7 +34,7 @@ namespace web {
 
   // Draw a BitMatrix!
   template <int COLS, int ROWS>
-  void Draw(Canvas & canvas, const BitMatrix<COLS,ROWS> & matrix, double w, double h)
+  void Draw(Canvas canvas, const BitMatrix<COLS,ROWS> & matrix, double w, double h)
   {
     canvas.Clear();
 
@@ -53,7 +53,7 @@ namespace web {
   
   // Draw a Surface2D, specifying the full colormap to be used.
   template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE=double>
-  void Draw(Canvas & canvas,
+  void Draw(Canvas canvas,
             const Surface2D<BODY_TYPE,BODY_INFO,BASE_TYPE> & surface,
             const emp::vector<std::string> & color_map)
   {
@@ -76,7 +76,7 @@ namespace web {
 
   // Draw a Surface2D, just specifying the number of colors.
   template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE=double>
-  void Draw(Canvas & canvas,
+  void Draw(Canvas canvas,
             const Surface2D<BODY_TYPE,BODY_INFO,BASE_TYPE> & surface,
             int num_colors)
   {
@@ -85,7 +85,7 @@ namespace web {
 
 
   // Draw a grid.
-  void Draw(Canvas & canvas,
+  void Draw(Canvas canvas,
             const emp::vector<emp::vector<int>> & grid,
             const emp::vector<std::string> & color_map,
             std::string line_color="black",
