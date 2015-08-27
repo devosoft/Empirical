@@ -105,7 +105,7 @@ namespace web {
     bool HasChild(const Widget & test_child);
     
     // CSS-related options may be overridden in derived classes that have multiple styles.
-    virtual std::string CSS(const std::string & setting);
+    virtual std::string GetCSS(const std::string & setting);
     virtual bool HasCSS(const std::string & setting);
     
     bool operator==(const Widget & in) const { return info == in.info; }
@@ -373,7 +373,7 @@ namespace web {
   bool Widget::TableOK() const { if (!info) return false; return info->IsTableInfo(); }
   bool Widget::TextOK() const { if (!info) return false; return info->IsTextInfo(); }
 
-  std::string Widget::CSS(const std::string & setting) {
+  std::string Widget::GetCSS(const std::string & setting) {
     return info ? info->style.Get(setting) : "";
   }
   bool Widget::HasCSS(const std::string & setting) {
@@ -456,7 +456,7 @@ namespace web {
 
     public:
       template <typename SETTING_TYPE>
-      RETURN_TYPE & CSS(const std::string & setting, SETTING_TYPE && value) {
+      RETURN_TYPE & SetCSS(const std::string & setting, SETTING_TYPE && value) {
         emp_assert(info != nullptr);
         DoCSS(setting, emp::to_string(value));
         return (RETURN_TYPE &) *this;
@@ -464,11 +464,21 @@ namespace web {
 
       // Allow multiple CSS settings to be grouped.
       template <typename T1, typename T2, typename... OTHER_SETTINGS>
-      RETURN_TYPE & CSS(const std::string & setting1, T1 && val1,
+      RETURN_TYPE & SetCSS(const std::string & setting1, T1 && val1,
                         const std::string & setting2, T2 && val2,
                         OTHER_SETTINGS... others) {
-        CSS(setting1, val1);                      // Set the first CSS value.
-        return CSS(setting2, val2, others...);    // Recurse to the others.
+        SetCSS(setting1, val1);                      // Set the first CSS value.
+        return SetCSS(setting2, val2, others...);    // Recurse to the others.
+      }
+
+      // Allow multiple CSS settigns as a single style object.
+      // (still go through DoCSS given need for virtual re-routing.)
+      RETURN_TYPE & SetCSS(const Style & in_style) {
+        emp_assert(info != nullptr);
+        for (const auto & s : in_style.GetMap()) {
+          DoCSS(s.first, s.second);
+        }
+        return (RETURN_TYPE &) *this;
       }
 
       // @CAO This seems like a bigger deal than just changing the id...
@@ -480,49 +490,49 @@ namespace web {
 
       // Size Manipulation
       RETURN_TYPE & Width(double w, const std::string & unit="px") {
-        return CSS("width", emp::to_string(w, unit) );
+        return SetCSS("width", emp::to_string(w, unit) );
       }
       RETURN_TYPE & Height(double h, const std::string & unit="px") {
-        return CSS("height", emp::to_string(h, unit) );
+        return SetCSS("height", emp::to_string(h, unit) );
       }
       RETURN_TYPE & Size(double w, double h, const std::string & unit="px") {
         Width(w, unit); return Height(h, unit);
       }
 
       // Position Manipulation
-      RETURN_TYPE & Center() { return CSS("margin", "auto"); }
+      RETURN_TYPE & Center() { return SetCSS("margin", "auto"); }
       RETURN_TYPE & SetPosition(int x, int y, const std::string & unit="px") {
-        return CSS("position", "fixed",
-                   "left", emp::to_string(x, unit),
-                   "top", emp::to_string(y, unit));
+        return SetCSS("position", "fixed",
+                      "left", emp::to_string(x, unit),
+                      "top", emp::to_string(y, unit));
       }
       RETURN_TYPE & SetPositionRT(int x, int y, const std::string & unit="px") {
-        return CSS("position", "fixed",
-                   "right", emp::to_string(x, unit),
-                   "top", emp::to_string(y, unit));
+        return SetCSS("position", "fixed",
+                      "right", emp::to_string(x, unit),
+                      "top", emp::to_string(y, unit));
       }
       RETURN_TYPE & SetPositionRB(int x, int y, const std::string & unit="px") {
-        return CSS("position", "fixed",
-                   "right", emp::to_string(x, unit),
-                   "bottom", emp::to_string(y, unit));
+        return SetCSS("position", "fixed",
+                      "right", emp::to_string(x, unit),
+                      "bottom", emp::to_string(y, unit));
       }
       RETURN_TYPE & SetPositionLB(int x, int y, const std::string & unit="px") {
-        return CSS("position", "fixed",
-                   "left", emp::to_string(x, unit),
-                   "bottom", emp::to_string(y, unit));
+        return SetCSS("position", "fixed",
+                      "left", emp::to_string(x, unit),
+                      "bottom", emp::to_string(y, unit));
       }
 
 
       // Text Manipulation
-      RETURN_TYPE & Font(const std::string & font) { return CSS("font-family", font); }
-      RETURN_TYPE & FontSize(int s) { return CSS("font-size", emp::to_string(s, "px")); }
-      RETURN_TYPE & FontSizeVW(double s) { return CSS("font-size", emp::to_string(s, "vw")); }
-      RETURN_TYPE & CenterText() { return CSS("text-align", "center"); }
+      RETURN_TYPE & Font(const std::string & font) { return SetCSS("font-family", font); }
+      RETURN_TYPE & FontSize(int s) { return SetCSS("font-size", emp::to_string(s, "px")); }
+      RETURN_TYPE & FontSizeVW(double s) { return SetCSS("font-size", emp::to_string(s, "vw")); }
+      RETURN_TYPE & CenterText() { return SetCSS("text-align", "center"); }
 
       // Color Manipulation
-      RETURN_TYPE & Background(const std::string & v) { return CSS("background-color", v); }
-      RETURN_TYPE & Color(const std::string & v) { return CSS("color", v); }
-      RETURN_TYPE & Opacity(double v) { return CSS("opacity", v); }
+      RETURN_TYPE & Background(const std::string & v) { return SetCSS("background-color", v); }
+      RETURN_TYPE & Color(const std::string & v) { return SetCSS("color", v); }
+      RETURN_TYPE & Opacity(double v) { return SetCSS("opacity", v); }
     };
     
   }
