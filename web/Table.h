@@ -300,8 +300,8 @@ namespace web {
     }
 
     // Apply to appropriate component based on current state.
-    using WidgetFacet<Table>::CSS;
-    std::string CSS(const std::string & setting) override {
+    using WidgetFacet<Table>::SetCSS;
+    std::string GetCSS(const std::string & setting) override {
       if (state == TABLE) return Info()->style.Get(setting);
       if (state == ROW) return Info()->rows[cur_row].style.Get(setting);
       if (state == CELL) return Info()->rows[cur_row].data[cur_col].style.Get(setting);
