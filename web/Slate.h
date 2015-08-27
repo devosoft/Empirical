@@ -65,13 +65,19 @@ namespace web {
 
       // Add additional children on to this element.
       Widget Append(const std::string & text) override {
+        if (!append_ok) return ForwardAppend(text);
         return GetTextWidget() << text;
       }
       Widget Append(const std::function<std::string()> & in_fun) override {
+        if (!append_ok) return ForwardAppend(in_fun);
         return GetTextWidget() << in_fun;
       }
       
-      Widget Append(Widget info) override { AddChild(info); return info; }
+      Widget Append(Widget info) override {
+        if (!append_ok) return ForwardAppend(info);
+        AddChild(info);
+        return info;
+      }
       
       // All derived widgets must suply a mechanism for providing associated HTML code.
       virtual void GetHTML(std::stringstream & HTML) override {
