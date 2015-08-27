@@ -2,234 +2,31 @@
 #include <iostream>
 #include <vector>
 #include <string>
-
-
-/*class Node(){
- private:
-  int id;
-  
- public:
-  Node();
-  ~Node();
-  string GetData(){EM_ASM(allocate(intArrayFromString($dom_nodes.nodes[this->id].data), 'i8', ALLOC_STACK))};
-  
-};
-
-
-
-Node::Node(){
-  
-}*/
-
-extern "C" {
-  extern int n_selections();
-}
-
-namespace D3 {
-
-  class Selection{
-  private:
-    int id;
-    Selection(int id); //append constructor
-
-  public:
-    Selection(const char* selector, bool all = false);
-    //Selection(Selection* selector, bool all = false); //Do we need this?
-    //~Selection(); //tilde is creating demangling issues
-    
-    
-    template <typename T>
-    void SetAttrNumeric(const char* name, T value){
-      /* Assigns [value] to the selections='s [name] attribute.
-	 This method handles numeric values - use SetAttrString
-	 for non-numeric values. */
-
-      //TODO: Make sure the user actually uses a number
-      EM_ASM_ARGS({js.selections[$0].attr(Pointer_stringify($1), $2)},
-		  this->id, name, value);
-    }
-
-    void SetAttrString(const char* name, const char* value){
-      /* Assigns [value] to the selections='s [name] attribute.
-	 This method handles numeric values - use SetAttrString
-	 for non-numeric values. */
-
-      //TODO: Make sure the user actually uses a number
-      EM_ASM_ARGS({js.selections[$0].attr(Pointer_stringify($1), 
-		 Pointer_stringify($2))}, this->id, name, value);
-    }
-
-    Selection Append(const char* name){
-      int new_id = EM_ASM_INT_V({return js.selections.length});
-      EM_ASM_ARGS({
-	  var new_selection = js.selections[$0].append(Pointer_stringify($1));
-	  js.selections.push(new_selection);
-	}, this->id, name);
-      return Selection(new_id);
-    }
-
-    void SetStyleString(const char* name, const char* value, bool priority=false){
-      if (priority){
-	EM_ASM_ARGS({js.selections[$0].style(Pointer_stringify($1), 
-	Pointer_stringify($2), "important")}, this->id, name, value);
-      }
-      else {
-	EM_ASM_ARGS({js.selections[$0].style(Pointer_stringify($1), 
-	Pointer_stringify($2))}, this->id, name, value);
-      }
-    }
-
-    template <typename T>
-    void SetStyleNumeric(const char* name, T value, bool priority=false){
-      if (priority){
-	EM_ASM_ARGS({js.selections[$0].style(Pointer_stringify($1), 
-	$2, "important")}, this->id, name, value);
-      }
-      else {
-	EM_ASM_ARGS({js.selections[$0].style(Pointer_stringify($1), 
-	$2)}, this->id, name, value);
-      }
-    }
-    
-    template <typename C>
-    Selection[] Data(C values){
-      int update_id = EM_ASM_INT_V({return js.selections.length});
-      int enter_id = update_id + 1;
-      int exit_id = enter_id + 1;
-      EM_ASM_ARGS({
-	  selection_array = js.selections[$0].data([1,2,3]);
-	  update_selection = selection_array.update();
-	  enter_selection = selection_array.enter();
-	  exit_selection = selection_array.exit();
-	  js.selections.push(update_selection);
-	  js.selections.push(enter_selection);
-	  js.selections.push(exit_selection);
-	}, 
-	  this->id, values);
-      return [Selection(update_id), Selection(enter_id), Selection(exit_id)];
-    }
-
-
-    int GetAttrInt(const char* name){
-      return EM_ASM_INT({
-	  return js.selections[$0].attr(Pointer_stringify($1));
-	}, this->id, name);
-    }
-
-    double GetAttrDouble(const char* name){
-      return EM_ASM_DOUBLE({
-	  return js.selections[$0].attr(Pointer_stringify($1));
-	}, this->id, name);
-    }
-
-    int GetStyleInt(const char* name){
-      return EM_ASM_INT({
-	  return js.selections[$0].style(Pointer_stringify($1));
-	}, this->id, name);
-    }
-
-    double GetStyleDouble(const char* name){
-      return EM_ASM_INT({
-	  return js.selections[$0].style(Pointer_stringify($1));
-	}, this->id, name);
-    }
-
-    void SetText(const char* text){
-      EM_ASM_ARGS({js.selections[$0].text(Pointer_stringify($1))}, 
-		  this->id, text);
-    }
-
-    //TODO:
-    //
-    //GetAttrString
-    //GetStyleString()
-
-    //GetClassed()
-    //SetClassed()
-    
-    //GetProperty()
-    //SetProperty()
-    //GetText()
-    //SetHtml()
-    //GetHtml()
-    //Insert()
-    //Remove()
-    //Data() //this one's a biggie
-    //Enter() //also pretty important
-    //Exit() //this one too
-    //Filter()
-    //Datum()
-    //Sort()
-    //Order()
-    //On() //also notable
-    //Transition()
-    //Interrupt()
-    //Subselection
-    //Each()
-    //Call()
-    //Empty()
-    //Node()
-    //Size()
-    
-
-
-  };
-
-  Selection::Selection(const char* selector, bool all){
-    this->id = EM_ASM_INT_V({return js.selections.length});
-    if (all){
-      EM_ASM_ARGS({
-	  js.selections[$0] = 
-	  d3.selectAll(Pointer_stringify($1))}, this->id, selector);
-    }
-    else {
-      EM_ASM_ARGS({
-	  js.selections[$0] = 
-	  d3.select(Pointer_stringify($1))}, this->id, selector);
-    }
-  }
-
-  Selection::Selection(int id){
-    this->id = id;
-  }
-
-  /* I don't know why you'd actually want to do this
-  Selection::Selection(Selection* selector, bool all){
-    this->id = EM_ASM_INT_V({return js.selections.length});
-    if (all){
-      EM_ASM_ARGS({
-	  js.selections[$0] = 
-	  d3.selectAll($1.id)}, this->id, selector);
-    }
-    else {
-      EM_ASM_ARGS({
-	  js.selections[$0] = 
-	  d3.select(Pointer_stringify($1))}, this->id, selector);
-    }
-  }
-  */
-
-//void bind_data(std::vector data){
-// 
-//}
-};
+#include "selection.h"
 
 int main()
 {
+  D3::Selection svg = D3::Selection("body").Append("svg");
+  
+  D3::Selection s = svg.SelectAll("circle");
+ 
   std::cout << n_selections() << std::endl;
-  D3::Selection s = D3::Selection("body");
-  s.SetAttrNumeric("test", 4);
-  D3::Selection s2 = s.Append("svg");
-  D3::Selection update = s2.Data(2);
-  update.SetAttrNumeric("cx", 25);
-  update.SetAttrNumeric("cy", 25);
-  update.SetAttrNumeric("r", 25);
-  update.SetStyleString("fill", "purple");
-  EM_ASM({js.selections[js.selections.length-1] = js.selections[js.selections.length-1].enter().append("circle")});
-  update.SetAttrNumeric("cx", 25);
-  update.SetAttrNumeric("cy", 25);
-  update.SetAttrNumeric("r", 25);
-  update.SetStyleString("fill", "purple");
-
+  int32_t test_data[] = {1,2,3};
+  D3::Selection update = s.Data(test_data, 3);
+  //D3::Selection update = data_bind[0];
+  //D3::Selection enter = data_bind[1];
+  update.EnterAppend("circle");
+  D3::Selection circles = D3::Selection("circle", true);
+  circles.SetAttrNumeric("cx", 25);
+  circles.SetAttrNumeric("cy", 25);
+  circles.SetAttrNumeric("r", 25);
+  circles.SetStyleString("fill", "purple");
+  //EM_ASM({js.selections[4].enter().append("circle")});
+  //D3::Selection enter_circles = enter.Append("circle");
+  //enter_circles.SetStyleString("fill", "green");
   
 }
+
+
+//The only way to bind data appropriately?
+//d3.selectAll("svg").selectAll("line").data([1,2,3]).enter().append("line")
