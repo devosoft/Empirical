@@ -30,26 +30,29 @@
 
 #include "events.h"
 #include "Style.h"
-#include "web_base.h"
 
 namespace emp {
 namespace web {
 
   // Setup some types we will need later
   namespace internal {
+    // Pre-declate WidgetInfo so classes can inter-operate.
+    class WidgetInfo;
     class SlateInfo;
-  }
 
-  namespace internal {
-      // Provide a quick method for generating unique IDs when not otherwise specified.
+    // Quick method for generating unique IDs when not otherwise specified.
     static std::string NextWidgetID() {
       static int next_id = 0;
       return emp::to_string("emp__", next_id++);
     }
     
-    // Pre-declate WidgetInfo so classes can inter-operate.
-    class WidgetInfo;
+    // Base class for command-objects that can be fed into widgets.
+    class WidgetCommand {
+    public:
+      virtual bool Trigger(WidgetInfo &) const = 0;
+    };
   }
+  
   
 
   // Widget is a smart pointer to a WidgetInfo object, plus some basic accessors.
@@ -247,12 +250,9 @@ namespace web {
       virtual Widget Append(uint32_t in_num) { return Append(emp::to_string(in_num)); }
 
       // Handle special commands
-      virtual Widget Append(const emp::web::Close & close) {
-        if (id == close.GetID()) {  // Test if this is the element we need to close.
-          append_ok = false;
-          return parent;
-        }
-        return ForwardAppend(close);  // Otherwise pass the Close to parent!
+      virtual Widget Append(const emp::web::internal::WidgetCommand & cmd) {
+        if (cmd.Trigger(*this)) return Widget(this);
+        return ForwardAppend(cmd);  // Otherwise pass the Close to parent!
       }
 
 
