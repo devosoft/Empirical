@@ -3,6 +3,7 @@
 #include <string>
 
 
+
 /*class Node(){
  private:
   int id;
@@ -74,7 +75,7 @@ namespace D3 {
 
       //TODO: Make sure the user actually uses a number
       EM_ASM_ARGS({js.selections[$0].attr(Pointer_stringify($1), 
-		 Pointer_stringify($2))}, this->id, name, value);
+					  eval(Pointer_stringify($2)))}, this->id, name, value);
     }
 
     Selection Append(const char* name){
@@ -111,6 +112,8 @@ namespace D3 {
       }
     }
     
+    //TODO: Try to make this generalize better - there shouldn't
+    //need to be a different function for each specific type.
     Selection Data(int32_t* values, int length){
       int update_id = EM_ASM_INT_V({return js.selections.length});
       std::cout << update_id << std::endl;

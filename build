@@ -1,1 +1,1 @@
-/usr/bin/emsdk_portable/emscripten/master/emcc -std=c++11 test.cc -o test.js --js-library library_d3.js
+/usr/bin/emsdk_portable/emscripten/master/emcc -std=c++11 test.cc -o test.js --js-library library_d3.js --js-library ../Empirical/emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_empCppCallback', '_main']"
