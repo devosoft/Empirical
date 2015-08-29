@@ -26,10 +26,10 @@ int main()
   //D3::Selection enter = data_bind[1];
   update.EnterAppend("circle");
   D3::Selection circles = D3::Selection("circle", true);
-  circles.SetAttrNumeric("cx", 25);
-  circles.SetAttrNumeric("cy", 25);
-  circles.SetAttrNumeric("r", 25);
-  circles.SetStyleString("fill", "purple");
+  circles.SetAttr("cx", 25);
+  circles.SetAttr("cy", 25);
+  circles.SetAttr("r", 25);
+  circles.SetStyle("fill", "purple");
 
   //Now let's try making a callback function with JSWrap
   uint32_t fun_id = emp::JSWrap(return_d, "return_d");

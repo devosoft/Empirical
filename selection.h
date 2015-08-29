@@ -58,24 +58,22 @@ namespace D3 {
     }
 
     template <typename T>
-    void SetAttrNumeric(const char* name, T value){
+    void SetAttr(const char* name, T value){
       /* Assigns [value] to the selections='s [name] attribute.
 	 This method handles numeric values - use SetAttrString
 	 for non-numeric values. */
 
-      //TODO: Make sure the user actually uses a number
       EM_ASM_ARGS({js.selections[$0].attr(Pointer_stringify($1), $2)},
 		  this->id, name, value);
     }
 
-    void SetAttrString(const char* name, const char* value){
+    void SetAttr(const char* name, const char* value){
       /* Assigns [value] to the selections='s [name] attribute.
 	 This method handles numeric values - use SetAttrString
 	 for non-numeric values. */
 
-      //TODO: Make sure the user actually uses a number
       EM_ASM_ARGS({js.selections[$0].attr(Pointer_stringify($1), 
-					  eval(Pointer_stringify($2)))}, this->id, name, value);
+		       eval(Pointer_stringify($2)))}, this->id, name, value);
     }
 
     Selection Append(const char* name){
@@ -89,7 +87,7 @@ namespace D3 {
       return Selection(new_id);
     }
     
-    void SetStyleString(const char* name, const char* value, bool priority=false){
+    void SetStyle(const char* name, const char* value, bool priority=false){
       if (priority){
 	EM_ASM_ARGS({js.selections[$0].style(Pointer_stringify($1), 
 	Pointer_stringify($2), "important")}, this->id, name, value);
@@ -101,7 +99,7 @@ namespace D3 {
     }
 
     template <typename T>
-    void SetStyleNumeric(const char* name, T value, bool priority=false){
+    void SetStyle(const char* name, T value, bool priority=false){
       if (priority){
 	EM_ASM_ARGS({js.selections[$0].style(Pointer_stringify($1), 
 	$2, "important")}, this->id, name, value);
@@ -177,6 +175,29 @@ namespace D3 {
 		  this->id, text);
     }
 
+    void SetHtml(const char* value){
+      EM_ASM_ARGS({js.selections[$0].html(Pointer_stringify($1))}, 
+		  this->id, value);
+    }    
+
+    void insert(const char* name, const char* before=NULL){
+      if (before){
+	EM_ASM_ARGS({js.selections[$0].insert(Pointer_stringify($1), 
+					      Pointer_stringify($2))}, 
+		    this->id, name, before);
+      } else {
+	EM_ASM_ARGS({js.selections[$0].insert(Pointer_stringify($1))}, 
+		    this->id, name);
+      }
+    }    
+
+    void Remove(){
+      EM_ASM_ARGS({js.selections[$0].remove()}, 
+		  this->id);
+    }    
+
+
+
     //TODO:
     //
     //GetAttrString
@@ -188,11 +209,7 @@ namespace D3 {
     //GetProperty()
     //SetProperty()
     //GetText()
-    //SetHtml()
     //GetHtml()
-    //Insert()
-    //Remove()
-    //Data() //this one's a biggie
     //Enter() //also pretty important
     //Exit() //this one too
     //Filter()
@@ -202,7 +219,7 @@ namespace D3 {
     //On() //also notable
     //Transition()
     //Interrupt()
-    //Subselection
+
     //Each()
     //Call()
     //Empty()
