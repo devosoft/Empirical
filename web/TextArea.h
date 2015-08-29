@@ -40,7 +40,8 @@ namespace web {
       
       virtual bool IsTextAreaInfo() const override { return true; }
 
-      void DoCallback() {
+      void DoCallback(std::string in_text) {
+        cur_text = in_text;
         if (callback) callback(cur_text);
         UpdateDependants();
       }
@@ -50,7 +51,7 @@ namespace web {
         HTML << "<textarea ";                                   // Start the textarea tag.
         if (disabled) { HTML << " disabled=true"; }             // Check if should be disabled
         HTML << " id=\"" << id << "\""                          // Indicate ID.
-             << " onchange=\"emp.Callback(" << callback_id << ", this.innerHTML)\""
+             << " onchange=\"emp.Callback(" << callback_id << ", this.val())\""
              << " rows=\"" << rows << "\""
              << " cols=\"" << cols << "\"";
         if (max_length >= 0) { HTML << " maxlength=\"" << max_length << "\""; }
@@ -96,7 +97,7 @@ namespace web {
       
       Info()->callback = in_cb;
       TextAreaInfo * ta_info = Info();
-      Info()->callback_id = JSWrap( std::function<void()>( [ta_info](){ta_info->DoCallback();} )  );
+      Info()->callback_id = JSWrap( std::function<void(std::string)>( [ta_info](std::string in_str){ta_info->DoCallback(in_str);} )  );
     }
     TextArea(const TextArea & in) : WidgetFacet(in) { ; }
     TextArea(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsTextAreaInfo()); }
