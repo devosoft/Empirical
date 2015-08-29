@@ -30,7 +30,12 @@ int main()
   circles.SetAttrNumeric("cy", 25);
   circles.SetAttrNumeric("r", 25);
   circles.SetStyleString("fill", "purple");
+
+  //Now let's try making a callback function with JSWrap
   uint32_t fun_id = emp::JSWrap(return_d, "return_d");
+  std::cout << "function id: " << fun_id << std::endl;
+
+  //It works if you call empCppCallback from C++...
   EM_ASM({
       emp_i.cb_args.push(2);
     });
@@ -38,10 +43,15 @@ int main()
   EM_ASM({
       console.log(emp_i.cb_return);
     });
-  std::cout << "fucntion id: " << fun_id << std::endl;
+
+  //Calling the function directly from C++ works fine...
   std::cout << "calling from C++: " << return_d(4) << std::endl;
+
+  //Calling the function directly from Javascript doesn't work
+  //This breaks with: "Uncaught ReferenceError: empCppCallback is not defined"
   int jsresult = EM_ASM_INT({return emp.return_d($0);},5);
   std::cout << "calling from JS: " << jsresult << std::endl;
+
   //circles.SetAttrString("r", "emp.return_d");
   //EM_ASM({js.selections[4].enter().append("circle")});
   //D3::Selection enter_circles = enter.Append("circle");
