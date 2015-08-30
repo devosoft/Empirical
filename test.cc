@@ -48,6 +48,7 @@ int main()
   t.SetAttr("cx", "return_d");
   t.SetStyle("fill", "green");
   D3::Selection("circle", true).On("mouseover", "mouseover");
+  D3::Selection("circle", true).On("mouseover");
   
 }
 
