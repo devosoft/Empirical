@@ -51,7 +51,7 @@ namespace web {
         HTML << "<textarea ";                                   // Start the textarea tag.
         if (disabled) { HTML << " disabled=true"; }             // Check if should be disabled
         HTML << " id=\"" << id << "\""                          // Indicate ID.
-             << " onchange=\"emp.Callback(" << callback_id << ", this.val())\""
+             << " onkeyup=\"emp.Callback(" << callback_id << ", $(this).val())\""
              << " rows=\"" << rows << "\""
              << " cols=\"" << cols << "\"";
         if (max_length >= 0) { HTML << " maxlength=\"" << max_length << "\""; }
