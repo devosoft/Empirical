@@ -333,7 +333,7 @@ namespace emp {
       for (const auto v : bit_set) {
         const uint32_t t1 = v - ((v >> 1) & 0x55555555);
         const uint32_t t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
-        bit_count += ((t2 + (t2 >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
+        bit_count += (((t2 + (t2 >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
       }
       return bit_count;
     }
