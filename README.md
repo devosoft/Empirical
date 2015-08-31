@@ -4,6 +4,7 @@ This repository contains the begginnings of a an emscripten wrapper for d3.js. O
 Dependencies:
 * Emscripten (https://github.com/kripken/emscripten) - must be used as compiler for any of this to work
 * Empirical (https://github.com/mercere99/Empirical) - provides JSWrap, for making callback functions not painful
+* d3.js (https://github.com/mbostock/d3) - current version included here in d3.js file for convenience
 
 Status:
 Selection class is mostly functional - you can bind data, do transitions, and create interactions.
