@@ -6,8 +6,6 @@
 //  This file contains a set of simple functions to manipulate bitsets.
 //
 
-#include <bitset>
-
 #include "functions.h"
 
 namespace emp {
