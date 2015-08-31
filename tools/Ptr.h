@@ -195,6 +195,6 @@ namespace emp {
 
   };
 
-};
+}
 
 #endif

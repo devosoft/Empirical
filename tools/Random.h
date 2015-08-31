@@ -400,6 +400,6 @@ namespace emp {
     return first+rng(range);
   }
 
-};
+}
 
 #endif

@@ -160,6 +160,6 @@ namespace emp {
     // Conversions
     const BitSet<COLS*ROWS> & to_bitset() { return bits; }
   };
-};
+}
 
 #endif

@@ -63,7 +63,7 @@ namespace emp {
       return false;
     }
 
-  };
-};
+  }
+}
 
 #endif

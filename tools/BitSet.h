@@ -507,7 +507,7 @@ namespace emp {
     out_bits |= in2.template Export<NUM_BITS1+NUM_BITS2>();
   }
 
-};
+}
 
 template <int NUM_BITS> std::ostream & operator<<(std::ostream & out, const emp::BitSet<NUM_BITS> & _bit_set) {
   _bit_set.Print(out);

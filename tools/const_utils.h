@@ -34,7 +34,7 @@ namespace constant {
   }
 
 
-};
-};
+}
+}
 
 #endif

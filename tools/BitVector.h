@@ -542,7 +542,7 @@ namespace emp {
     inline size_t count() const { return CountOnes_Mixed(); }
   };
 
-};
+}
 
 std::ostream & operator<<(std::ostream & out, const emp::BitVector & _bit_set) {
   _bit_set.Print(out);

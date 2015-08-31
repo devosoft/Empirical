@@ -96,6 +96,6 @@ namespace emp {
     return 0;
   }
   */
-};
+}
 
 #endif
