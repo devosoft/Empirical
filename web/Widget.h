@@ -489,14 +489,14 @@ namespace web {
 
 
       // Size Manipulation
-      RETURN_TYPE & Width(double w, const std::string & unit="px") {
+      RETURN_TYPE & SetWidth(double w, const std::string & unit="px") {
         return SetCSS("width", emp::to_string(w, unit) );
       }
-      RETURN_TYPE & Height(double h, const std::string & unit="px") {
+      RETURN_TYPE & SetHeight(double h, const std::string & unit="px") {
         return SetCSS("height", emp::to_string(h, unit) );
       }
-      RETURN_TYPE & Size(double w, double h, const std::string & unit="px") {
-        Width(w, unit); return Height(h, unit);
+      RETURN_TYPE & SetSize(double w, double h, const std::string & unit="px") {
+        SetWidth(w, unit); return SetHeight(h, unit);
       }
 
       // Position Manipulation
@@ -524,15 +524,15 @@ namespace web {
 
 
       // Text Manipulation
-      RETURN_TYPE & Font(const std::string & font) { return SetCSS("font-family", font); }
-      RETURN_TYPE & FontSize(int s) { return SetCSS("font-size", emp::to_string(s, "px")); }
-      RETURN_TYPE & FontSizeVW(double s) { return SetCSS("font-size", emp::to_string(s, "vw")); }
-      RETURN_TYPE & CenterText() { return SetCSS("text-align", "center"); }
+      RETURN_TYPE & SetFont(const std::string & font) { return SetCSS("font-family", font); }
+      RETURN_TYPE & SetFontSize(int s) { return SetCSS("font-size", emp::to_string(s, "px")); }
+      RETURN_TYPE & SetFontSizeVW(double s) { return SetCSS("font-size", emp::to_string(s, "vw")); }
+      RETURN_TYPE & SetCenterText() { return SetCSS("text-align", "center"); }
 
       // Color Manipulation
-      RETURN_TYPE & Background(const std::string & v) { return SetCSS("background-color", v); }
-      RETURN_TYPE & Color(const std::string & v) { return SetCSS("color", v); }
-      RETURN_TYPE & Opacity(double v) { return SetCSS("opacity", v); }
+      RETURN_TYPE & SetBackground(const std::string & v) { return SetCSS("background-color", v); }
+      RETURN_TYPE & SetColor(const std::string & v) { return SetCSS("color", v); }
+      RETURN_TYPE & SetOpacity(double v) { return SetCSS("opacity", v); }
     };
     
   }
