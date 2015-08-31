@@ -21,14 +21,20 @@ int main()
 
   D3::Selection svg = D3::Selection("body").Append("svg");
   
-  D3::Selection s = svg.SelectAll("circle");
+  D3::Selection text = D3::Selection("body").Append("text");
+  text.SetText("Testing");
+  std::cout << text.GetText() << std::endl;
+
+  //D3::Selection s = svg.SelectAll("circle");
  
   std::cout << n_selections() << std::endl;
   int32_t test_data[] = {10,30,60};
-  D3::Selection update = s.Data(test_data, 3);
+  D3::ShapesFromData(test_data, 3, "circle");
+
+  //D3::Selection update = s.Data(test_data, 3);
   //D3::Selection update = data_bind[0];
   //D3::Selection enter = data_bind[1];
-  update.EnterAppend("circle");
+  //update.EnterAppend("circle");
   D3::Selection circles = D3::Selection("circle", true);
   circles.SetAttr("cx", 25);
   circles.SetAttr("cy", 25);
