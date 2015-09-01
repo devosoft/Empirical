@@ -1,8 +1,8 @@
 #ifndef EMP_FUNCTIONS_H
 #define EMP_FUNCTIONS_H
 
-#include <algorithm>
 #include <ctime>
+#include <functional>
 #include <initializer_list>
 #include <map>
 #include <string>
@@ -100,7 +100,7 @@ namespace emp {
   template<typename A, typename B> std::multimap<B,A> flip_map(const std::map<A,B> &src)
   {
     std::multimap<B,A> dst;
-    std::transform(src.begin(), src.end(), std::inserter(dst, dst.begin()), flip_pair<A,B>);
+    for (const auto & x : src) dst.insert( flip_pair(x) );
     return dst;
   }
 
