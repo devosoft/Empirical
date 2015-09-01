@@ -193,14 +193,14 @@ namespace serialize {
     template <> struct serial_impl<> {
       static void Store(DataPod &) { ; }
     };
-  };
+  }
   
   template <typename... ARG_TYPES>
   void Store(DataPod & pod, ARG_TYPES&... args) {
     internal::serial_impl<ARG_TYPES...>::Store(pod, args...);
   }
   
-};
-};
+}
+}
 
 #endif

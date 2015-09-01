@@ -196,6 +196,6 @@ namespace emp {
     std::ifstream ifile(filename);
     return load_graph_table(ifile);
   }
-};
+}
 
 #endif

@@ -29,7 +29,7 @@
   public:                                                               \
     typedef EMP_Detect_##MEMBER_NAME type;                              \
     enum { value = sizeof(func<Derived>(0)) == 2 };                     \
-  };
+  }
 
 
 // This macro will Call a member function on a given object if that member exists, but
@@ -58,6 +58,6 @@
   template <typename T, typename... ARG_TYPES>                          \
   RETURN_TYPE NEW_NAME(T & target, ARG_TYPES... ARGS) {                 \
     return internal::RelayCall_ ## NEW_NAME(true, target, ARGS...);     \
-  }
+  } int ignore_semicolon_to_follow = 0
 
 #endif
