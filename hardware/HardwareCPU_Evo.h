@@ -3,7 +3,7 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  HardwareCPU is a basic, CPU-style virtual hardware object.
+//  HardwareCPU_Evo is a basic, CPU-style virtual hardware object.
 //
 //  This is a templated type that allows compile-time configuration of properties.
 //   CPU_SCALE = How many components of each type (stacks, heads, memory, nops) are available?
@@ -20,17 +20,17 @@ using namespace std::placeholders;
 
 namespace emp {
 
-  template <int CPU_SCALE=8, int STACK_SIZE=16> class HardwareCPU
+  template <int CPU_SCALE=8, int STACK_SIZE=16> class HardwareCPU_Evo
     : public HardwareCPU_Base<Instruction> {
   protected:
     // Hardware components...
     typedef std::vector<emp::Instruction> MEMORY_TYPE;
-    typedef HardwareCPU<CPU_SCALE, STACK_SIZE> HARDWARE_TYPE;
+    typedef HardwareCPU_Evo<CPU_SCALE, STACK_SIZE> HARDWARE_TYPE;
     MEMORY_TYPE memory[CPU_SCALE];
     CPUStack<STACK_SIZE> stacks[CPU_SCALE];
     CPUHead heads[CPU_SCALE];
 
-    const InstLib<HardwareCPU, Instruction> & inst_lib;
+    const InstLib<HardwareCPU_Evo, Instruction> & inst_lib;
 
   public:
     // Track the default positions of various heads.
@@ -46,13 +46,13 @@ namespace emp {
     static const int STACK_OUT          = 1;  // Same as IN1 for now.
     static const int STACK_TEST_RESULTS = 3;
 
-    HardwareCPU(const InstLib<HardwareCPU, Instruction> & _inst_lib) : inst_lib(_inst_lib) {
+    HardwareCPU_Evo(const InstLib<HardwareCPU_Evo, Instruction> & _inst_lib) : inst_lib(_inst_lib) {
       emp_assert(CPU_SCALE >= 4 && "Minimum 4 heads needed");
       // Initialize all of the heads to the beginning of the code.
       for (int i=0; i < CPU_SCALE; i++) heads[i].Set(memory[0], 0);
     }
-    HardwareCPU(const HardwareCPU & prototype) : HardwareCPU(prototype.inst_lib) { ; }
-    ~HardwareCPU() { ; }
+    HardwareCPU_Evo(const HardwareCPU_Evo & prototype) : HardwareCPU_Evo(prototype.inst_lib) { ; }
+    ~HardwareCPU_Evo() { ; }
 
     // Do a full factory-reset on the virtual hardware.
     void Clear() {
