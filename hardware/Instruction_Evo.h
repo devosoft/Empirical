@@ -1,22 +1,28 @@
-#ifndef EMP_INSTRUCTION_H
-#define EMP_INSTRUCTION_H
+#ifndef EMP_INSTRUCTION_EVO_H
+#define EMP_INSTRUCTION_EVO_H
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
 //
-// This class represents a single instruction in a genome.  It holds the information about which
-// instruction we are working with as well as any relevant flags about that instruction.
+// This class represents a single instruction in a program, with no arguments.
+// It holds the information about which operation it is associated with as well as any
+// relevant flags about that operation.
 //
-// The entire instruction is stores in a 32-bit unsgined int.  The first 10 bits are set aside
-// for the instruction ID.  The next 6 are for quick-check information about the instruction
-// (such as can it be used as an argument for other instructions?), and the final 16 bits are for
-// tracking run-time information (has this site been mutated?  If recombined, which parent is it
-// from, etc.)
+// The entire instruction is stored in a 32-bit unsgined int.  The first 10 bits are set
+// aside for the instruction ID (max 1024 distinct instructions).  The next 6 are for
+// quick-check information about the instruction (such as can it be used as an argument
+// for other instructions?), and the final 16 bits are for tracking run-time information
+// (has this site been mutated?  If recombined, which parent is it from, etc.)
+//
+// Since this instruction type was designed for use in genomes in large populations of
+// evolving computer programs, the main goals were to keep it small and allow for rapid
+// execution.
+//
 
 #include "../tools/assert.h"
 
 namespace emp {
 
-  class Instruction {
+  class Instruction_Evo {
   private:
     typedef const uint32_t ctype;                         // Type for all constants in definition.
     static ctype ID_BITS = 10;                            // # of bits to track instruction ID.
@@ -39,7 +45,7 @@ namespace emp {
     uint32_t info;  // Full information about this instruction; both ID and flags.
 
   public:
-    Instruction(uint32_t id=0, uint32_t arg=0,
+    Instruction_Evo(uint32_t id=0, uint32_t arg=0,
                 bool extra_cycle_cost=false, bool extra_stability=false)
       : info(id + (arg<<ID_BITS))
     {
@@ -48,21 +54,21 @@ namespace emp {
       if (extra_cycle_cost) SetCycleCost();
       if (extra_stability) SetStability();
     }
-    Instruction(const Instruction & in_inst) : info(in_inst.info & FIXED_BIT_MASK) { ; }
-    ~Instruction() { ; }
+    Instruction_Evo(const Instruction_Evo & in_inst) : info(in_inst.info & FIXED_BIT_MASK) { ; }
+    ~Instruction_Evo() { ; }
 
-    Instruction & operator=(const Instruction & _in) {
+    Instruction_Evo & operator=(const Instruction_Evo & _in) {
       info = _in.info & FIXED_BIT_MASK;
       return *this;
     }
 
     // Comparison operators ignore flags.
-    bool operator==(const Instruction & _in) const { return GetID() == _in.GetID(); }
-    bool operator!=(const Instruction & _in) const { return GetID() != _in.GetID(); }
-    bool operator< (const Instruction & _in) const { return GetID() <  _in.GetID(); }
-    bool operator<=(const Instruction & _in) const { return GetID() <= _in.GetID(); }
-    bool operator> (const Instruction & _in) const { return GetID() >  _in.GetID(); }
-    bool operator>=(const Instruction & _in) const { return GetID() >= _in.GetID(); }
+    bool operator==(const Instruction_Evo & _in) const { return GetID() == _in.GetID(); }
+    bool operator!=(const Instruction_Evo & _in) const { return GetID() != _in.GetID(); }
+    bool operator< (const Instruction_Evo & _in) const { return GetID() <  _in.GetID(); }
+    bool operator<=(const Instruction_Evo & _in) const { return GetID() <= _in.GetID(); }
+    bool operator> (const Instruction_Evo & _in) const { return GetID() >  _in.GetID(); }
+    bool operator>=(const Instruction_Evo & _in) const { return GetID() >= _in.GetID(); }
 
     int GetID() const { return (int) info & ID_MASK; }
     int GetArgValue() const { return (int) ((info & ARG_MASK) >> ID_BITS); }
@@ -70,23 +76,23 @@ namespace emp {
     bool HasCycleCost() const { return GetFlag(CYCLE_COST_BIT); }
     bool HasStability() const { return GetFlag(EXTRA_STABILITY_BIT); }
 
-    Instruction & SetID(uint32_t new_id) {
+    Instruction_Evo & SetID(uint32_t new_id) {
       emp_assert((new_id & ID_MASK) == new_id);
       info = new_id;
       return *this;
     }
-    Instruction & SetArgValue(int arg_value) {
-      emp_assert((arg_value >> ARG_BITS) == 0 && "Argument too large to store in Instruction");
+    Instruction_Evo & SetArgValue(int arg_value) {
+      emp_assert((arg_value >> ARG_BITS) == 0 && "Argument too large to store in Instruction_Evo");
       info &= ~ARG_MASK;               // Clear out current arg contenst of instruction.
       info |= (arg_value << ID_BITS);  // Set new arg contents of instruction.
       return *this;
     }
 
-    Instruction & SetCycleCost() { SetFlag(CYCLE_COST_BIT); return *this; }
-    Instruction & SetStability() { SetFlag(EXTRA_STABILITY_BIT); return *this; }
+    Instruction_Evo & SetCycleCost() { SetFlag(CYCLE_COST_BIT); return *this; }
+    Instruction_Evo & SetStability() { SetFlag(EXTRA_STABILITY_BIT); return *this; }
 
-    Instruction & ClearCycleCost() { ClearFlag(CYCLE_COST_BIT); return *this; }
-    Instruction & ClearStability() { ClearFlag(EXTRA_STABILITY_BIT); return *this; }
+    Instruction_Evo & ClearCycleCost() { ClearFlag(CYCLE_COST_BIT); return *this; }
+    Instruction_Evo & ClearStability() { ClearFlag(EXTRA_STABILITY_BIT); return *this; }
   };
 
 };

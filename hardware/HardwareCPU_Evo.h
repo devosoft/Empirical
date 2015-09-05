@@ -1,5 +1,5 @@
-#ifndef EMP_HARDWARE_CPU_H
-#define EMP_HARDWARE_CPU_H
+#ifndef EMP_HARDWARE_CPU_EVO_H
+#define EMP_HARDWARE_CPU_EVO_H
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -14,23 +14,23 @@
 using namespace std::placeholders;
 
 #include "HardwareCPU_Base.h"
-#include "Instruction.h"
+#include "Instruction_Evo.h"
 #include "InstLib.h"
 #include "../tools/assert.h"
 
 namespace emp {
 
   template <int CPU_SCALE=8, int STACK_SIZE=16> class HardwareCPU_Evo
-    : public HardwareCPU_Base<Instruction> {
+    : public HardwareCPU_Base<Instruction_Evo> {
   protected:
     // Hardware components...
-    typedef std::vector<emp::Instruction> MEMORY_TYPE;
+    typedef std::vector<emp::Instruction_Evo> MEMORY_TYPE;
     typedef HardwareCPU_Evo<CPU_SCALE, STACK_SIZE> HARDWARE_TYPE;
     MEMORY_TYPE memory[CPU_SCALE];
     CPUStack<STACK_SIZE> stacks[CPU_SCALE];
     CPUHead heads[CPU_SCALE];
 
-    const InstLib<HardwareCPU_Evo, Instruction> & inst_lib;
+    const InstLib<HardwareCPU_Evo, Instruction_Evo> & inst_lib;
 
   public:
     // Track the default positions of various heads.
@@ -46,7 +46,7 @@ namespace emp {
     static const int STACK_OUT          = 1;  // Same as IN1 for now.
     static const int STACK_TEST_RESULTS = 3;
 
-    HardwareCPU_Evo(const InstLib<HardwareCPU_Evo, Instruction> & _inst_lib) : inst_lib(_inst_lib) {
+    HardwareCPU_Evo(const InstLib<HardwareCPU_Evo, Instruction_Evo> & _inst_lib) : inst_lib(_inst_lib) {
       emp_assert(CPU_SCALE >= 4 && "Minimum 4 heads needed");
       // Initialize all of the heads to the beginning of the code.
       for (int i=0; i < CPU_SCALE; i++) heads[i].Set(memory[0], 0);
@@ -74,7 +74,7 @@ namespace emp {
 
     MEMORY_TYPE & GetMemory(int mem_id=0) { return memory[mem_id]; }
     
-    void LoadMemory(const std::vector<emp::Instruction> & in_memory) { memory[0] = in_memory; }
+    void LoadMemory(const std::vector<emp::Instruction_Evo> & in_memory) { memory[0] = in_memory; }
 
     // Examines the nops following the IP to test if they override the default arguments.
     int ChooseTarget(int default_target) {
@@ -93,7 +93,7 @@ namespace emp {
     void SingleProcess() {
       emp_assert(heads[HEAD_IP].IsValid());
 
-      const Instruction & inst = heads[HEAD_IP].GetInst();
+      const Instruction_Evo & inst = heads[HEAD_IP].GetInst();
       ++heads[HEAD_IP];
       inst_lib.RunInst(*this, inst.GetID());
     }
