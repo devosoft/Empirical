@@ -33,11 +33,11 @@ int main(int argc, char* argv[])
 
   // Make sure we can wrap each argument in a macro.
   emp_assert( std::string(EMP_STRINGIFY( EMP_WRAP_EACH(EMP_DECORATE, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p) )) == "[a] [b] [c] [d] [e] [f] [g] [h] [i] [j] [k] [l] [m] [n] [o] [p]" );
-  emp_assert( EMP_STRINGIFY( EMP_LAYOUT(EMP_DECORATE, +, a, b, c, d, e, f, g, h) ) == "[a] + [b] + [c] + [d] + [e] + [f] + [g] + [h]" );
-  emp_assert( EMP_STRINGIFY( EMP_WRAP_ARGS(EMP_DECORATE, a, b, c, d, e, f, g, h) ) == "[a], [b], [c], [d], [e], [f], [g], [h]" );
-  emp_assert( EMP_STRINGIFY( EMP_WRAP_ARG_PAIRS(EMP_DECORATE_PAIR, A, a, B, b, C, c, D, d, E, e, F, f) ) == "[A-a], [B-b], [C-c], [D-d], [E-e], [F-f]" );
-  emp_assert( EMP_STRINGIFY( EMP_GET_ODD_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13) ) == "1, 3, 5, 7, 9, 11, 13");
-  emp_assert( EMP_STRINGIFY( EMP_GET_EVEN_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13) ) == "2, 4, 6, 8, 10, 12");
+  emp_assert( std::string( EMP_STRINGIFY( EMP_LAYOUT(EMP_DECORATE, +, a, b, c, d, e, f, g, h) ) ) == "[a] + [b] + [c] + [d] + [e] + [f] + [g] + [h]" );
+  emp_assert( std::string( EMP_STRINGIFY( EMP_WRAP_ARGS(EMP_DECORATE, a, b, c, d, e, f, g, h) ) ) == "[a], [b], [c], [d], [e], [f], [g], [h]" );
+  emp_assert( std::string( EMP_STRINGIFY( EMP_WRAP_ARG_PAIRS(EMP_DECORATE_PAIR, A, a, B, b, C, c, D, d, E, e, F, f) ) ) == "[A-a], [B-b], [C-c], [D-d], [E-e], [F-f]" );
+  emp_assert( std::string( EMP_STRINGIFY( EMP_GET_ODD_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13) ) ) == "1, 3, 5, 7, 9, 11, 13");
+  emp_assert( std::string( EMP_STRINGIFY( EMP_GET_EVEN_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13) ) ) == "2, 4, 6, 8, 10, 12");
 
   if (verbose) {
     std::cout << EMP_STRINGIFY( EMP_WRAP_EACH(EMP_DECORATE, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p) ) << std::endl;

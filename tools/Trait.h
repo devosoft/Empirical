@@ -194,6 +194,6 @@ namespace emp {
     tm.SetDefaults(*this);
   }
 
-};
+}
 
 #endif

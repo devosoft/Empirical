@@ -134,26 +134,23 @@ namespace emp {
     return true;
   }
 
-  // A string is valid if each character passes the supplied function.
-  bool is_valid(const std::string & test_str, std::function<bool(char)> in_fun) {
-    for (char x : test_str) { if (in_fun(x) == false) return false; }
-    return true;
-  }
+
+  // If no functions are provided to is_value(), always return false as base case.
+  bool is_valid(char test_char) { return false; }
 
   // A character is valid if it passes any of the test functions provided.
-  bool is_valid(char test_char, std::initializer_list<std::function<bool(char)> > funs) {
-    for (auto cur_fun : funs) { if (cur_fun(test_char)) return true; }
-    return false;
+  template <typename... FUNS>
+  bool is_valid(char test_char, std::function<bool(char)> fun1, FUNS... funs) {
+    return fun1(test_char) || is_valid(test_char, funs...);
   }
 
-  // A string is valid as long as each character passes at least one provided function.
-  bool is_valid(const std::string & test_str,
-                std::initializer_list<std::function<bool(char)> > funs) {
-    for (char x : test_str) {
-      if (is_valid(x, funs) == false) return false;
-    }
+  // For a string to be valid, each character must pass at least one provided function.
+  template <typename... FUNS>
+  bool is_valid(const std::string & test_str, FUNS... funs) {
+    for (char x : test_str) if ( !is_valid(x, funs...) ) return false;
     return true;
   }
+
 
   // Pop a segment from the beginning of a string as another string, shortening original.
   std::string string_pop_fixed(std::string & in_string, std::size_t end_pos, int delim_size=0) {

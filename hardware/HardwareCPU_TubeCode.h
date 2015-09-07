@@ -1,80 +1,61 @@
-#ifndef EMP_HARDWARE_CPU_H
-#define EMP_HARDWARE_CPU_H
+#ifndef EMP_HARDWARE_CPU_TUBECODE_H
+#define EMP_HARDWARE_CPU_TUBECODE_H
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//  HardwareCPU is a basic, CPU-style virtual hardware object.
-//
-//  This is a templated type that allows compile-time configuration of properties.
-//   CPU_SCALE = How many components of each type (stacks, heads, memory, nops) are available?
-//   STACK_SIZE = Maximum number of entries that are allowed in a stack (default=16)
+//  HardwareCPU_TubeCode is a basic virtual CPU intended to represent and idealized Hardware
+//  for use in classroom projects.  It was originally developed for "CSE 450: Translation of
+//  Programming Languages" at Michigan State University.
 //
 
 #include <functional>
 using namespace std::placeholders;
 
 #include "HardwareCPU_Base.h"
-#include "Instruction.h"
+#include "Instruction_TubeCode.h"
 #include "InstLib.h"
 #include "../tools/assert.h"
 
 namespace emp {
 
-  template <int CPU_SCALE=8, int STACK_SIZE=16> class HardwareCPU
-    : public HardwareCPU_Base<Instruction> {
+  template <int REG_SIZE=8, int MEM_SIZE=65536, typename VAL_TYPE=double> class HardwareCPU_TubeCode
+    : public HardwareCPU_Base<Instruction_TubeCode> {
   protected:
     // Hardware components...
-    typedef std::vector<emp::Instruction> MEMORY_TYPE;
-    typedef HardwareCPU<CPU_SCALE, STACK_SIZE> HARDWARE_TYPE;
-    MEMORY_TYPE memory[CPU_SCALE];
-    CPUStack<STACK_SIZE> stacks[CPU_SCALE];
-    CPUHead heads[CPU_SCALE];
+    typedef std::vector<emp::Instruction_TubeCode> CODE_TYPE;
+    typedef HardwareCPU_TubeCode<REG_SIZE, MEM_SIZE> HARDWARE_TYPE;
 
-    const InstLib<HardwareCPU, Instruction> & inst_lib;
+    CODE_TYPE code;
+    VAL_TYPE regs[REG_SIZE];
+    VAL_TYPE memory[MEM_SIZE];
+
+    const InstLib<HardwareCPU_TubeCode, Instruction_TubeCode> & inst_lib;
 
   public:
-    // Track the default positions of various heads.
-    static const int HEAD_IP    = 0;
-    static const int HEAD_READ  = 1;
-    static const int HEAD_WRITE = 2;  // Not used yet?
-    static const int HEAD_FLOW  = 3;
-    
-    // Track the contents of stacks.
-    static const int STACK_BIO          = 0;  // Not used yet?
-    static const int STACK_IN1          = 1;
-    static const int STACK_IN2          = 2;
-    static const int STACK_OUT          = 1;  // Same as IN1 for now.
-    static const int STACK_TEST_RESULTS = 3;
-
-    HardwareCPU(const InstLib<HardwareCPU, Instruction> & _inst_lib) : inst_lib(_inst_lib) {
-      emp_assert(CPU_SCALE >= 4 && "Minimum 4 heads needed");
-      // Initialize all of the heads to the beginning of the code.
-      for (int i=0; i < CPU_SCALE; i++) heads[i].Set(memory[0], 0);
+    HardwareCPU_TubeCode(const InstLib<HardwareCPU_TubeCode, Instruction_TubeCode> & _inst_lib)
+      : inst_lib(_inst_lib)
+    {
+      // Initialize all registers and memory.
+      for (VAL_TYPE & x : regs) x = 0;
+      for (VAL_TYPE & x : memory) x = 0;
     }
-    HardwareCPU(const HardwareCPU & prototype) : HardwareCPU(prototype.inst_lib) { ; }
-    ~HardwareCPU() { ; }
+    HardwareCPU_TubeCode(const HardwareCPU_TubeCode & prototype)
+      : HardwareCPU_TubeCode(prototype.inst_lib) { ; }
+    ~HardwareCPU_TubeCode() { ; }
 
     // Do a full factory-reset on the virtual hardware.
     void Clear() {
-      for (int i = 0; i < CPU_SCALE; i++) {
-        stacks[i].Clear();
-        heads[i].Set(memory[i], 0);
-        memory[i].resize(0);
-      }
+      // Initialize all registers and memory.
+      for (VAL_TYPE & x : regs) x = 0;
+      for (VAL_TYPE & x : memory) x = 0;
+      code.resize(0);
     }
 
-    CPUStack<STACK_SIZE> & GetStack(int stack_id) {
-      emp_assert(stack_id >= 0 && stack_id < CPU_SCALE);
-      return stacks[stack_id];
-    }
+    int GetCodeSize() const { return (int) code.size(); }
+    constexpr int GetNumRegs() const { return REG_SIZE; }
+    constexpr int GetMemSize() const { return MEM_SIZE; }
 
-    static int GetNumStacks()  { return CPU_SCALE; }
-    static int GetStackSize()  { return STACK_SIZE; }
-    static int GetNumArgNops() { return CPU_SCALE; }
-
-    MEMORY_TYPE & GetMemory(int mem_id=0) { return memory[mem_id]; }
-    
-    void LoadMemory(const std::vector<emp::Instruction> & in_memory) { memory[0] = in_memory; }
+    void LoadCode(const std::vector<emp::Instruction_TubeCode> & in_code) { code = in_code; }
 
     // Examines the nops following the IP to test if they override the default arguments.
     int ChooseTarget(int default_target) {
@@ -93,7 +74,7 @@ namespace emp {
     void SingleProcess() {
       emp_assert(heads[HEAD_IP].IsValid());
 
-      const Instruction & inst = heads[HEAD_IP].GetInst();
+      const Instruction_TubeCode & inst = heads[HEAD_IP].GetInst();
       ++heads[HEAD_IP];
       inst_lib.RunInst(*this, inst.GetID());
     }

@@ -18,7 +18,7 @@ int main()
 
   UI::Table tab(5,5);
 
-  tab.CSS("border", "1px solid black");
+  tab.SetCSS("border", "1px solid black");
 
   tab << "Test!";
   tab.GetCell(1,1) << "Test 2";
@@ -29,7 +29,7 @@ int main()
 
   doc << text << "<br>" << UI::Button(IncVar, "Test", "my_but") << "<br>" << motiv;
 
-  UI::Button my_but = doc.FindButton("my_but");
+  UI::Button my_but = doc.Button("my_but");
   UI::Canvas canvas(200, 200);
   UI::Selector sel("sel");
 
@@ -42,9 +42,9 @@ int main()
   canvas.Rect(0,0,200,200, "#AAAAAA", "black");
   canvas.Circle(100,75,50, "red", "black");
 
-  my_but.AddDependent(text);
-  my_but.Size(100,100);
-  my_but.Background("blue");
+  my_but.AddDependant(text);
+  my_but.SetSize(100,100);
+  my_but.SetBackground("blue");
 
-  motiv.Size(100,100);
+  motiv.SetSize(100,100);
 }

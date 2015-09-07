@@ -30,26 +30,29 @@
 
 #include "events.h"
 #include "Style.h"
-#include "web_base.h"
 
 namespace emp {
 namespace web {
 
   // Setup some types we will need later
   namespace internal {
+    // Pre-declate WidgetInfo so classes can inter-operate.
+    class WidgetInfo;
     class SlateInfo;
-  }
 
-  namespace internal {
-      // Provide a quick method for generating unique IDs when not otherwise specified.
+    // Quick method for generating unique IDs when not otherwise specified.
     static std::string NextWidgetID() {
       static int next_id = 0;
       return emp::to_string("emp__", next_id++);
     }
     
-    // Pre-declate WidgetInfo so classes can inter-operate.
-    class WidgetInfo;
+    // Base class for command-objects that can be fed into widgets.
+    class WidgetCommand {
+    public:
+      virtual bool Trigger(WidgetInfo &) const = 0;
+    };
   }
+  
   
 
   // Widget is a smart pointer to a WidgetInfo object, plus some basic accessors.
@@ -247,12 +250,9 @@ namespace web {
       virtual Widget Append(uint32_t in_num) { return Append(emp::to_string(in_num)); }
 
       // Handle special commands
-      virtual Widget Append(const emp::web::Close & close) {
-        if (id == close.GetID()) {  // Test if this is the element we need to close.
-          append_ok = false;
-          return parent;
-        }
-        return ForwardAppend(close);  // Otherwise pass the Close to parent!
+      virtual Widget Append(const emp::web::internal::WidgetCommand & cmd) {
+        if (cmd.Trigger(*this)) return Widget(this);
+        return ForwardAppend(cmd);  // Otherwise pass the Close to parent!
       }
 
 
@@ -489,14 +489,14 @@ namespace web {
 
 
       // Size Manipulation
-      RETURN_TYPE & Width(double w, const std::string & unit="px") {
+      RETURN_TYPE & SetWidth(double w, const std::string & unit="px") {
         return SetCSS("width", emp::to_string(w, unit) );
       }
-      RETURN_TYPE & Height(double h, const std::string & unit="px") {
+      RETURN_TYPE & SetHeight(double h, const std::string & unit="px") {
         return SetCSS("height", emp::to_string(h, unit) );
       }
-      RETURN_TYPE & Size(double w, double h, const std::string & unit="px") {
-        Width(w, unit); return Height(h, unit);
+      RETURN_TYPE & SetSize(double w, double h, const std::string & unit="px") {
+        SetWidth(w, unit); return SetHeight(h, unit);
       }
 
       // Position Manipulation
@@ -524,15 +524,15 @@ namespace web {
 
 
       // Text Manipulation
-      RETURN_TYPE & Font(const std::string & font) { return SetCSS("font-family", font); }
-      RETURN_TYPE & FontSize(int s) { return SetCSS("font-size", emp::to_string(s, "px")); }
-      RETURN_TYPE & FontSizeVW(double s) { return SetCSS("font-size", emp::to_string(s, "vw")); }
-      RETURN_TYPE & CenterText() { return SetCSS("text-align", "center"); }
+      RETURN_TYPE & SetFont(const std::string & font) { return SetCSS("font-family", font); }
+      RETURN_TYPE & SetFontSize(int s) { return SetCSS("font-size", emp::to_string(s, "px")); }
+      RETURN_TYPE & SetFontSizeVW(double s) { return SetCSS("font-size", emp::to_string(s, "vw")); }
+      RETURN_TYPE & SetCenterText() { return SetCSS("text-align", "center"); }
 
       // Color Manipulation
-      RETURN_TYPE & Background(const std::string & v) { return SetCSS("background-color", v); }
-      RETURN_TYPE & Color(const std::string & v) { return SetCSS("color", v); }
-      RETURN_TYPE & Opacity(double v) { return SetCSS("opacity", v); }
+      RETURN_TYPE & SetBackground(const std::string & v) { return SetCSS("background-color", v); }
+      RETURN_TYPE & SetColor(const std::string & v) { return SetCSS("color", v); }
+      RETURN_TYPE & SetOpacity(double v) { return SetCSS("opacity", v); }
     };
     
   }

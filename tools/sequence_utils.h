@@ -167,6 +167,6 @@ namespace emp {
     return prev_row[size1 - 1];
   }
 
-};
+}
 
 #endif

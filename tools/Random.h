@@ -38,7 +38,7 @@
 //      Draw a value from the given distributions
 //
 
-#include <algorithm>
+// #include <algorithm>
 #include <ctime>
 #include <climits>
 #include <cmath>
@@ -355,51 +355,51 @@ namespace emp {
   }
 
 
-  /*! Draw a sample (without replacement) from an input range, copying to the output range.
-   */
-  template <typename ForwardIterator, typename OutputIterator, typename RNG>
-  void sample_without_replacement(ForwardIterator first, ForwardIterator last, OutputIterator ofirst, OutputIterator olast, RNG rng) {
-    std::size_t range = std::distance(first, last);
-    std::size_t output_range = std::distance(ofirst, olast);
+  // /*! Draw a sample (without replacement) from an input range, copying to the output range.
+  //  */
+  // template <typename ForwardIterator, typename OutputIterator, typename RNG>
+  // void sample_without_replacement(ForwardIterator first, ForwardIterator last, OutputIterator ofirst, OutputIterator olast, RNG rng) {
+  //   std::size_t range = std::distance(first, last);
+  //   std::size_t output_range = std::distance(ofirst, olast);
   
-    // if our output range is greater in size than our input range, copy the whole thing.
-    if(output_range >= range) {
-      std::copy(first, last, ofirst);
-      return;
-    }
+  //   // if our output range is greater in size than our input range, copy the whole thing.
+  //   if(output_range >= range) {
+  //     std::copy(first, last, ofirst);
+  //     return;
+  //   }
 	
-    std::vector<std::size_t> rmap(range);
-    int next_val = 0;
-    for (std::size_t & entry : rmap) entry = next_val++;
-    std::random_shuffle(rmap.begin(), rmap.end());
+  //   std::vector<std::size_t> rmap(range);
+  //   int next_val = 0;
+  //   for (std::size_t & entry : rmap) entry = next_val++;
+  //   std::random_shuffle(rmap.begin(), rmap.end());
   
-    while(ofirst != olast) {
-      *ofirst = *(first + rmap.back());
-      ++ofirst;
-      rmap.pop_back();
-    }
-  }
+  //   while(ofirst != olast) {
+  //     *ofirst = *(first + rmap.back());
+  //     ++ofirst;
+  //     rmap.pop_back();
+  //   }
+  // }
 
-  /*! Convenience function to draw samples (without replacement) from a range of values.
-   */
-  template <typename T, typename OutputIterator, typename RNG>
-  void sample_range_without_replacement(T min, T max, OutputIterator ofirst, OutputIterator olast, RNG rng) {
-    std::size_t range = static_cast<std::size_t>(max - min);
-    std::vector<T> input(range);
-    int next_val = min;
-    for (T & entry : input) entry = next_val++;
-    sample_without_replacement(input.begin(), input.end(), ofirst, olast, rng);
-  }
+  // /*! Convenience function to draw samples (without replacement) from a range of values.
+  //  */
+  // template <typename T, typename OutputIterator, typename RNG>
+  // void sample_range_without_replacement(T min, T max, OutputIterator ofirst, OutputIterator olast, RNG rng) {
+  //   std::size_t range = static_cast<std::size_t>(max - min);
+  //   std::vector<T> input(range);
+  //   int next_val = min;
+  //   for (T & entry : input) entry = next_val++;
+  //   sample_without_replacement(input.begin(), input.end(), ofirst, olast, rng);
+  // }
 
 	
-  /*! Choose one element at random from the given range.
-   */
-  template <typename ForwardIterator, typename RNG>
-  ForwardIterator choose(ForwardIterator first, ForwardIterator last, RNG rng) {
-    std::size_t range = std::distance(first, last);
-    return first+rng(range);
-  }
+  // /*! Choose one element at random from the given range.
+  //  */
+  // template <typename ForwardIterator, typename RNG>
+  // ForwardIterator choose(ForwardIterator first, ForwardIterator last, RNG rng) {
+  //   std::size_t range = std::distance(first, last);
+  //   return first+rng(range);
+  // }
 
-};
+}
 
 #endif

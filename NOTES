@@ -1,59 +1,44 @@
 -= Next Steps =-
-Try out Ptr class to see if it can catch mis-handled pointers
-
-In UI Elements change Update() to Redraw() throughout (to indicate that it starts drawing from
-scratch) and add in a Refresh() to just make new changes.  Particular important w/canvas.
-
-Incorporate Ben's changes into BitVector/BitSet
-(work on applications of library and see what needs to be fixed/added)
-Setup documentation outside of the code!
+Setup Config class to << into Slate to produce settings management
+Implement TubeCode in Hardware class
+Setup documentation outside of the code
 
 -= Questions =-
 Best way to convert to a c++ literal independent of type?
 How to dynamically change an include file?
-Have multi-purpose headers with static functions; how can I prevent those specific unused function errors while still getting others that I don't specifically block?
 
 -= Fixes =-
-Make CSS method virtual so others (width/height/etc) call the proper version when its overloaded.
-JSDelete should make sure that we are not deleting a named function (or cleanup JS side too!)
-fix how is_valid() functions are handled in string_utils.h
-Make sure to check append_ok in slates; use SFINAE to test if input is a command in << before
-  forwarding to Append.  Commands should occur, true appends should now.  (Maybe change the
-  name to Comamnd when not appending as long as we're detecting anyway?)
-Closing a Text() element should automatically run PreventAppend();
 Fix reference counting in C++ DOM trees to delete element if ONLY children are pointing to it.
+JSDelete should make sure that we are not deleting a named function (or cleanup JS side too!)
+Fix how is_valid() functions are handled in string_utils.h
 
 -= Improvements =-
-Tables need more natural interface that should behave like a slate.  Perhaps derive from Slate?
+Tables need more natural interface that should behave like a slate.
 std::endl should work on TextBox
 Tables should have single CSS for all rows and all cells.
-- Remove ID's from table cells and rows; manually fill out style instead.
-Allow addition of defaults UI::Style for each object type.
--Allow UI::Style objects to be added as a whole to widgets.
+Allow default UI::Style overall and for each object type.
 -Create a UI::StyleGroup that elements can be added to and altered as one (use proper CSS class?)
 Base document should register where keypresses should be directed.
--Buttons should be able to have a hotkey (or more than one?)
+-Buttons should be able to easily specify hotkeys
 BitSet should have a non-emscripten version that uses 64-bits (same as BitVector)
+- Incorporate Ben's changes into BitVector/BitSet
 Setup a disabled_CSS for buttons that they apply when disabled?
-Allow Slates to have alternate children sets for rapid swapping to a new mode.
-Setup Elements to be able to run in unit tests.
 
 -= Improvements to Consider =-
+Try out Ptr class to see if it can catch mis-handled pointers
 Slates should have a current location and always "append" at that location, not just at end.
 - Forwarding to a parent should track where the forward came from to update location information.
-Adjust Elements so that Widget name comes first.  E.g., ButtonElement instead of ElementButton
-Build version of UI tools with stubs that compile under GCC.
+InstLib: Can we lock a set of instruction at compile time?  Or at least put them in a fixed array?
+Change HardwareCPU to something like Hardware_SimpleCPU and Instruction to Instruction_SimpleCPU
 
 -= New Elements =-
 Forms
-JQuerryUI Tabs
-Settings (that can be initialized with a config object)
+JQuerryUI Tabs?
 Span (?) for future manual references
-Dynamic link? (Easy to change, rather than embeded in text.)
-
+Dynamic link? (Easy to change and verify, rather than embeded in text.)
 
 -= General tools to build =-
-A more automated test system
+A more automated test system (Try out "Catch"?)
 A data management system that can track data by:
   - Temporal series (values over time)
   - Batch (where a batch reset occurs periodically)
@@ -62,7 +47,10 @@ A data management system that can track data by:
 A citation tool: Useful for pointing people to appropriate references & building online bibs.
 
 -= Serialization =-
-Special mechanisms to handle both pointers we are in charge of AND pointers to be connected to.
+Special mechanisms to handle pointers of various types:
+- Pointers we are in charge of and need to build.
+- Pointers we are NOT in charge of and someone else needs to expliclty build
+- Pointers we are not in charge of because they are objects built elsewhere.
 
 -= Evolution-specific Tools =-
 Organism Object (Contains Genome and templated on virtual hardware type)
@@ -79,10 +67,6 @@ Fix how sectors are handled in surfaces to be more dynamic based on sizes of org
 - Test only objects that have moved (against all objects)
 - Sort all objects within bands?
 
--= Improvements that rquire more thought... =-
-InstLib: Can we lock a set of instruction at compile time?  Or at least put them in a fixed array?
-Change HardwareCPU to something like Hardware_SimpleCPU and Instruction to Instruction_SimpleCPU
-Come up with a cleaner method to time functions?  Current macro is pretty ugly.
 
 -= Specific ideas for Configurtion tools =-
 * Build links into setting variables that will trigger function calls
@@ -90,8 +74,10 @@ Come up with a cleaner method to time functions?  Current macro is pretty ugly.
 * Build an HTML object to automatically allow adjustment of settings in a running ap.
 * Allow other commands to redirect the rest of the line to a specific object for processing.
 * Auto-generation of config file entries beyond just "set"
+* Each setting could have a "level" value to indicate when it should be shouwn.
 
 -= Documentation =-
+* Examples using the web framework
 * How to setup and use the config tools.
 * Basic idea of Kinetic Wrappers and how to use them.
 
@@ -106,6 +92,8 @@ Processing.JS
 ChartJS
 jqPlot
 JQuery Sparklines -- Inline graphs
+
+D3
 
 -= Frameworks to consider wrapping =-
 Ionic

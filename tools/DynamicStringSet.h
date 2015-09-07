@@ -20,7 +20,7 @@ namespace emp {
     DynamicStringSet() { ; }
     DynamicStringSet(const DynamicStringSet &) = default;
 
-    uint32_t GetSize() const { return fun_set.size(); }
+    int GetSize() const { return (int) fun_set.size(); }
     std::string operator[](int id) const { return fun_set[id](); }
     const std::function<std::string()> & GetFunction(int id) const { return fun_set[id]; }
     DynamicStringSet & Clear() { fun_set.resize(0); return *this; }
