@@ -93,7 +93,7 @@ namespace emp {
       + std::string(" line ") + std::to_string(__LINE__)                \
       + std::string("): ") + std::string(#EXPR) + "\n"                  \
       + emp_assert_var_info.str();                                      \
-    if (TripAssert() <= 3)                                              \
+    if (emp::TripAssert() <= 3)						\
       EM_ASM_ARGS({ msg = Pointer_stringify($0); alert(msg); }, msg.c_str()); \
     abort();                                                            \
   }                                                                     \
