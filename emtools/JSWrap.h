@@ -29,14 +29,22 @@
 //  * Make sure JSWrap can take function objects, lambdas, or just function names.
 //  * Add a JSWrap that takes an object and method and does the bind automatically.
 //
+//  Recent changes:
+//  * Made JSWrap compatible with Javascript objects with multiple properties. 
+//    In order do so, you must define the properties of the object as a tuple 
+//    struct in js_object_struct.h. - @ELD
+//
 
 #include <functional>
 #include <tuple>
+#include <array>
 
 #include "../tools/assert.h"
 #include "../tools/functions.h"
 #include "../tools/mem_track.h"
 #include "../tools/vector.h"
+#include "../tools/tuple_struct.h"
+#include "js_object_struct.h"
 
 #ifdef EMSCRIPTEN
 extern "C" {
@@ -77,6 +85,85 @@ namespace emp {
         return allocate(intArrayFromString(emp_i.cb_args[$0]), 'i8', ALLOC_STACK);
       }, ARG_ID);
     arg_var = tmp_var;   // @CAO Do we need to free the memory in tmp_var?
+  }
+
+  //Helper functions to load arguments from inside Javascript objects by name.
+  template <int ARG_ID> static void LoadArg(int & arg_var, const char* var) {
+    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0][Pointer_stringify($1)]; 
+      }, ARG_ID, var);
+  }
+
+  template <int ARG_ID> static void LoadArg(bool & arg_var, const char* var) {
+    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0][Pointer_stringify($1)]; 
+      }, ARG_ID, var);
+  }
+  
+  template <int ARG_ID> static void LoadArg(char & arg_var, const char* var) {
+    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0][Pointer_stringify($1)]; 
+      }, ARG_ID, var);
+  }
+  
+  template <int ARG_ID> static void LoadArg(double & arg_var, const char* var) {
+    arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0][Pointer_stringify($1)]; 
+      }, ARG_ID, var);
+  }
+  
+  template <int ARG_ID> static void LoadArg(float & arg_var, const char* var) {
+    arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0][Pointer_stringify($1)]; 
+      }, ARG_ID, var);
+  }
+  
+  template <int ARG_ID> static void LoadArg(std::string & arg_var, const char* var) {
+    char * tmp_var = (char *) EM_ASM_INT({
+        return allocate(intArrayFromString(
+		emp_i.cb_args[$0][Pointer_stringify($1)]), 'i8', ALLOC_STACK);
+      }, ARG_ID, var);
+    arg_var = tmp_var;   // Free memory here?
+  }
+
+  //Helper macros to make sure that every piece of a tuple_struct gets loaded
+  #define LOAD_TUPLE_ARG_1 LoadArg<ARG_ID>(std::get<0>(arg_var.emp__tuple_body),\
+    arg_var.var_names[0].c_str());
+  #define LOAD_TUPLE_ARG_2 LOAD_TUPLE_ARG_1 LoadArg<ARG_ID>(std::get<1>(\
+			arg_var.emp__tuple_body),arg_var.var_names[1].c_str());
+  #define LOAD_TUPLE_ARG_3 LOAD_TUPLE_ARG_2 LoadArg<ARG_ID>(std::get<2>(\
+			arg_var.emp__tuple_body),arg_var.var_names[2].c_str());
+  #define LOAD_TUPLE_ARG_4 LOAD_TUPLE_ARG_3 LoadArg<ARG_ID>(std::get<3>(\
+			arg_var.emp__tuple_body),arg_var.var_names[3].c_str());
+  #define LOAD_TUPLE_ARG_5 LOAD_TUPLE_ARG_4 LoadArg<ARG_ID>(std::get<4>(\
+			arg_var.emp__tuple_body),arg_var.var_names[4].c_str());
+  #define LOAD_TUPLE_ARG_6 LOAD_TUPLE_ARG_5 LoadArg<ARG_ID>(std::get<5>(\
+			arg_var.emp__tuple_body),arg_var.var_names[5].c_str());
+  #define LOAD_TUPLE_ARG_7 LOAD_TUPLE_ARG_6 LoadArg<ARG_ID>(std::get<6>(\
+			arg_var.emp__tuple_body),arg_var.var_names[6].c_str());
+  #define LOAD_TUPLE_ARG_8 LOAD_TUPLE_ARG_7 LoadArg<ARG_ID>(std::get<7>(\
+			arg_var.emp__tuple_body),arg_var.var_names[7].c_str());
+  #define LOAD_TUPLE_ARG_9 LOAD_TUPLE_ARG_8 LoadArg<ARG_ID>(std::get<8>(\
+			arg_var.emp__tuple_body),arg_var.var_names[8].c_str());
+  #define LOAD_TUPLE_ARG_10 LOAD_TUPLE_ARG_9 LoadArg<ARG_ID>(std::get<9>(\
+			arg_var.emp__tuple_body),arg_var.var_names[9].c_str());
+  #define LOAD_TUPLE_ARG_11 LOAD_TUPLE_ARG_10 LoadArg<ARG_ID>(std::get<10>(\
+			arg_var.emp__tuple_body),arg_var.var_names[10].c_str());
+  #define LOAD_TUPLE_ARG_12 LOAD_TUPLE_ARG_11 LoadArg<ARG_ID>(std::get<11>(\
+			arg_var.emp__tuple_body),arg_var.var_names[11].c_str());
+  #define LOAD_TUPLE_ARG_13 LOAD_TUPLE_ARG_12 LoadArg<ARG_ID>(std::get<12>(\
+			arg_var.emp__tuple_body),arg_var.var_names[12].c_str());
+  #define LOAD_TUPLE_ARG_14 LOAD_TUPLE_ARG_13 LoadArg<ARG_ID>(std::get<13>(\
+			arg_var.emp__tuple_body),arg_var.var_names[13].c_str());
+  #define LOAD_TUPLE_ARG_15 LOAD_TUPLE_ARG_14 LoadArg<ARG_ID>(std::get<14>(\
+			arg_var.emp__tuple_body),arg_var.var_names[14].c_str());
+  #define LOAD_TUPLE_ARG_16 LOAD_TUPLE_ARG_15 LoadArg<ARG_ID>(std::get<15>(\
+			arg_var.emp__tuple_body),arg_var.var_names[15].c_str());
+
+  //Macro to load the right set of args into the tuple
+  //This requires that the user define DATA_OBJECT_SIZE with the struct,
+  //which is kind of ugly. Is there a way around it with templating?
+  #define LOAD_ARGS_FROM_TUPLE(s) EMP_MERGE(LOAD_TUPLE_ARG_,  s)
+  
+  //Load a Javascript-style object of the form described in js_object_struct.h
+  //into a JSDataObject struct. 
+  template <int ARG_ID> static void LoadArg(JSDataObject & arg_var) {
+    LOAD_ARGS_FROM_TUPLE(DATA_OBJECT_SIZE)
   }
 
 

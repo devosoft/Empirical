@@ -36,9 +36,14 @@
 //  * Add static member function to help with reflection?
 //  * Make play nicely with serialization techniques.
 //
+//  Changes in last revision:
+//  * Added alternative build macro that store array of variable names
+//     (which starts to address that development note about reflection) - @ELD
+//
 
 #include <tuple>
 #include "macros.h"
+
 
 // For each entry, we want to build accessors to easily get and set each value.
 #define EMP_BUILD_TUPLE_ACCESSORS(TUPLE_NAME, POS, TYPE, NAME)     \
@@ -47,7 +52,7 @@
   TYPE & NAME(const std::decay<TYPE>::type & _in) {                \
     std::get<POS>(TUPLE_NAME) = _in;                               \
     return std::get<POS>(TUPLE_NAME);                              \
-  }
+  }								   \
 
 
 // We have to figure out how many arguments we have.
@@ -131,5 +136,25 @@
   EMP_BUILD_TUPLE_IMPL(TUPLE_NAME, __VA_ARGS__)
 
 #define EMP_BUILD_TUPLE(...) EMP_BUILD_NAMED_TUPLE(emp__tuple_body, __VA_ARGS__)
+
+//Helper for EMP_BUILD_TUPLE_STORE_VAR_NAMES below
+//Also can be called directly if you want a tuple with a name other than
+//emp__tuple_body with stored variables.
+#define EMP_BUILD_NAMED_TUPLE_STORE_VAR_NAMES(TUPLE_NAME, ...)	\
+  std::tuple< EMP_GET_ODD_ARGS(__VA_ARGS__) > TUPLE_NAME; \
+  EMP_BUILD_TUPLE_IMPL(TUPLE_NAME, __VA_ARGS__) \
+  std::array<std::string, EMP_COUNT_ARGS(EMP_GET_EVEN_ARGS(__VA_ARGS__))> var_names = {EMP_GET_EVEN_ARGS(EMP_STRINGIFY_EACH(__VA_ARGS__))}; \
+
+//This varient of the tuple building macro can be used in situations where 
+//access to stringified versions of variable names is necessary.
+//It stores an array of stringified variable names called var_names in the 
+//struct this macro was called from.
+//
+// For instance:
+// MyStruct.var_names[0] <- returns the name of the first variable
+// 
+#define EMP_BUILD_TUPLE_STORE_VAR_NAMES(...) EMP_BUILD_NAMED_TUPLE_STORE_VAR_NAMES(emp__tuple_body, __VA_ARGS__)
+
+
 
 #endif

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <array>
 
 #include "../../tools/assert.h"
 #include "../../tools/command_line.h"
@@ -64,11 +65,14 @@ int main(int argc, char* argv[])
   emp_assert ( EMP_HALF(18) == 9);
   emp_assert ( EMP_HALF(60) == 30);
 
+ 
   if (verbose) {
+    std::array<std::string, 2> test = {EMP_STRINGIFY_EACH(some, words)};
     std::cout << "EMP_INC(11) = " << EMP_INC(11) << std::endl;
     std::cout << "EMP_INC(42) = " << EMP_INC(42) << std::endl;
     std::cout << "EMP_HALF(11) = " << EMP_HALF(11) << std::endl;
     std::cout << "EMP_HALF(42) = " << EMP_HALF(42) << std::endl;
+    std::cout << "EMP_STRINGIFY_EACH(some, words) = " << test[0] << " " << test[1] << std::endl;
   }
 
   std::cout << "All tests passed." << std::endl;

@@ -28,6 +28,14 @@ bool TestFun6(char in_char) {
   return in_char >= 'a' && in_char <= 'z';
 }
 
+//Test JSDataObject integration
+float TestFun7(JSDataObject d) {
+  emp::Alert( d.val2() );
+  emp::Alert( d.word() );
+  emp::Alert( d.val() );
+  return d.val2();
+}
+
 int main() {
 
   emp::Initialize();
@@ -38,6 +46,7 @@ int main() {
   uint32_t fun_id4 = emp::JSWrap(TestFun4, "TestName4", false);
   uint32_t fun_id5 = emp::JSWrap(TestFun5, "TestName5", false);
   uint32_t fun_id6 = emp::JSWrap(TestFun6, "TestName6", false);
+  uint32_t fun_id7 = emp::JSWrap(TestFun7, "TestName7", false);
   (void) fun_id4;
   (void) fun_id6;
 
@@ -72,6 +81,8 @@ int main() {
       emp.TestName2(1.5, 1.5);
     });
 
-
-
+  EM_ASM({
+      emp.TestName7({val:5, word:"hi", val2:6.3});
+    });
+  
 }
