@@ -6,12 +6,29 @@
 //  Generally useful macros that can perform cools tricks.  As with all macros, use only
 //  after careful exclusion of alternative approaches!
 //
+//  The Macros to highlight here are:
+//
+//  ===== String Handling and Printing =====
+//  EMP_PRINT_RESULT(A) will print to std::cout both the string that was passed into the
+//       macro and what that string evaluates to.
+//
+//  EMP_STRINGIFY(...) will convert all arguments into a single string (including commas).
+//
+//  ===== Managing variadic arguments =====
+//  EMP_GET_ARG_x(...) will return arg 'x' from the __VA_ARGS__ set (replace x with number!)
+//
+
+
 
 #define EMP_COMMA ,
 
 // EMP_STRINGIFY takes any input, processes macros, and puts the result in quotes.
-#define EMP_STRINGIFY(A) EMP_STRINGIFY_IMPL(A)
+#define EMP_STRINGIFY(...) EMP_STRINGIFY_IMPL(__VA_ARGS__)
 #define EMP_STRINGIFY_IMPL(...) #__VA_ARGS__
+
+#define EMP_PRINT_RESULT_IMPL(STREAM, LHS, RHS) STREAM << "[[" << LHS << "]] = [[" << RHS << "]]" << std::endl
+#define EMP_PRINT_RESULT_TO(STREAM, A) EMP_PRINT_RESULT_IMPL(STREAM, #A, A)
+#define EMP_PRINT_RESULT(A) EMP_PRINT_RESULT_IMPL(std::cout, #A, A)
 
 #define EMP_GET_ARG_1(A1, ...) A1
 #define EMP_GET_ARG_2(A1, A2, ...) A2
