@@ -15,10 +15,21 @@
 //  EMP_STRINGIFY(...) will convert all arguments into a single string (including commas).
 //
 //  ===== Managing variadic arguments =====
-//  EMP_GET_ARG_x(...) will return arg 'x' from the __VA_ARGS__ set (replace x with number!)
+//  EMP_COUNT_ARGS(...) will return the number of arguments in the __VA_ARGS__
 //
-
-
+//  EMP_GET_ARG_*(...) replace * with number and will return the arg at that position.
+//
+//  EMP_GET_ODD_ARGS(...) will return all arguments at odd positions (1,3,5,7, etc.)
+//  EMP_GET_EVEN_ARGS(...) will return all arguments at odd positions (2,4,6,8, etc.)
+//  EMP_REVERSE_ARGS(...) Reverse the order of arguments passed in.
+//
+//  ===== Argument Manipulation and Formatting =====
+//  EMP_MERGE(...) merge all arguments (after conversion) into a single unit.
+//  EMP_WRAP_EACH(W, ...) will run macro W on each of the other args and concatinate them.
+//  EMP_LAYOUT(W, P, ...) Similar to EMP_WRAP_EACH, but puts a P between each arg pair.
+//  EMP_WRAP_ARGS(W, ...) Similar to EMP_WRAP_EACH, but puts a COMMA between each arg pair.
+//  EMP_WRAP_ARG_PAIRS(W, ...) Similar to EMP_WRAP_ARGS, but passes pairs of args into W.
+//
 
 #define EMP_COMMA ,
 
@@ -229,7 +240,7 @@
 #define EMP_GET_EVEN_ARGS_63(A, B, ...) B, EMP_GET_EVEN_ARGS_61(__VA_ARGS__)
 
 
-// Enable an arbitrary number of arguments to be merged AFTER being processed!
+// Enable an arbitrary number of arguments (well, up to 10) to be merged AFTER being processed!
 #define EMP_MERGE(...) EMP_ASSEMBLE_MACRO(EMP_MERGE_, EMP_COUNT_ARGS(__VA_ARGS__), __VA_ARGS__)
 #define EMP_MERGE_1(A1) A1
 #define EMP_MERGE_2(A1,A2) A1 ## A2
@@ -238,6 +249,9 @@
 #define EMP_MERGE_5(A1,A2,A3,A4,A5) A1 ## A2 ## A3 ## A4 ## A5
 #define EMP_MERGE_6(A1,A2,A3,A4,A5,A6) A1 ## A2 ## A3 ## A4 ## A5 ## A6
 #define EMP_MERGE_7(A1,A2,A3,A4,A5,A6,A7) A1 ## A2 ## A3 ## A4 ## A5 ## A6 ## A7
+#define EMP_MERGE_8(A1,A2,A3,A4,A5,A6,A7,A8) A1 ## A2 ## A3 ## A4 ## A5 ## A6 ## A7 ## A8
+#define EMP_MERGE_9(A1,A2,A3,A4,A5,A6,A7,A8,A9) A1 ## A2 ## A3 ## A4 ## A5 ## A6 ## A7 ## A8 ## A9
+#define EMP_MERGE_10(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10) A1 ## A2 ## A3 ## A4 ## A5 ## A6 ## A7 ## A8 ## A9 ## A10
 
 
 // EMP_WRAP_EACH takes a wrapper macro and a variable set of arguments,
