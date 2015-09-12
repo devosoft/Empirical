@@ -33,6 +33,7 @@
 //
 //  ===== Simple Math =====
 //  EMP_INC_x resolves to x+1 (for a number in the place of x)
+//  EMP_DEC_x resolves to x-1 (for a number in the place of x)
 //  EMP_HALF_x resolves to x/2
 //
 //  Development Notes:
@@ -406,6 +407,11 @@
 #define EMP_WRAP_ARGS_62(W, A, ...) W(A), EMP_WRAP_ARGS_61(W, __VA_ARGS__)
 #define EMP_WRAP_ARGS_63(W, A, ...) W(A), EMP_WRAP_ARGS_62(W, __VA_ARGS__)
 
+//Individually stringifies each variable passed to it and returns them
+//with commas in between.
+#define EMP_STRINGIFY_EACH(...) EMP_WRAP_ARGS(EMP_STRINGIFY, __VA_ARGS__)
+
+
 #define EMP_WRAP_ARG_PAIRS(W, ...) EMP_ASSEMBLE_MACRO(EMP_WRAP_ARG_PAIRS_, EMP_COUNT_ARGS(__VA_ARGS__), W, __VA_ARGS__)
 #define EMP_WRAP_ARG_PAIRS_2(W, A1, A2) W(A1, A2)
 #define EMP_WRAP_ARG_PAIRS_4(W, A1, A2, ...) W(A1, A2), EMP_WRAP_ARG_PAIRS_2(W, __VA_ARGS__)
@@ -671,6 +677,72 @@
 #define EMP_INC_62  63
 #define EMP_INC_63  64
 
+#define EMP_DEC(X) EMP_DEC_ ## X
+#define EMP_DEC_0  -1
+#define EMP_DEC_1  0
+#define EMP_DEC_2  1
+#define EMP_DEC_3  2
+#define EMP_DEC_4  3
+#define EMP_DEC_5  4
+#define EMP_DEC_6  5
+#define EMP_DEC_7  6
+#define EMP_DEC_8  7
+#define EMP_DEC_9  8
+#define EMP_DEC_10  9
+#define EMP_DEC_11  10
+#define EMP_DEC_12  11
+#define EMP_DEC_13  12
+#define EMP_DEC_14  13
+#define EMP_DEC_15  14
+#define EMP_DEC_16  15
+#define EMP_DEC_17  16
+#define EMP_DEC_18  17
+#define EMP_DEC_19  18
+#define EMP_DEC_20  19
+#define EMP_DEC_21  20
+#define EMP_DEC_22  21
+#define EMP_DEC_23  22
+#define EMP_DEC_24  23
+#define EMP_DEC_25  24
+#define EMP_DEC_26  25
+#define EMP_DEC_27  26
+#define EMP_DEC_28  27
+#define EMP_DEC_29  28
+#define EMP_DEC_30  29
+#define EMP_DEC_31  30
+#define EMP_DEC_32  31
+#define EMP_DEC_33  32
+#define EMP_DEC_34  33
+#define EMP_DEC_35  34
+#define EMP_DEC_36  35
+#define EMP_DEC_37  36
+#define EMP_DEC_38  37
+#define EMP_DEC_39  38
+#define EMP_DEC_40  39
+#define EMP_DEC_41  40
+#define EMP_DEC_42  41
+#define EMP_DEC_43  42
+#define EMP_DEC_44  43
+#define EMP_DEC_45  44
+#define EMP_DEC_46  45
+#define EMP_DEC_47  46
+#define EMP_DEC_48  47
+#define EMP_DEC_49  48
+#define EMP_DEC_50  49
+#define EMP_DEC_51  50
+#define EMP_DEC_52  51
+#define EMP_DEC_53  52
+#define EMP_DEC_54  53
+#define EMP_DEC_55  54
+#define EMP_DEC_56  55
+#define EMP_DEC_57  56
+#define EMP_DEC_58  57
+#define EMP_DEC_59  58
+#define EMP_DEC_60  59
+#define EMP_DEC_61  60
+#define EMP_DEC_62  61
+#define EMP_DEC_63  62
+
 #define EMP_HALF(X) EMP_HALF_ ## X
 #define EMP_HALF_0  0
 #define EMP_HALF_1  0
@@ -736,10 +808,6 @@
 #define EMP_HALF_61  30
 #define EMP_HALF_62  31
 #define EMP_HALF_63  31
-
-//Individually stringifies each variable passed to it and returns them
-//with commas in between.
-#define EMP_STRINGIFY_EACH(...) EMP_WRAP_ARGS(EMP_STRINGIFY, __VA_ARGS__)
 
 
 // Setup a generic method of calling a specific version of a macro based on argument count.
