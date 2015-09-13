@@ -4,12 +4,13 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  This file is a replacement for the system-level assert.h, called "emp_assert"
-//  It behaves nearly identically, but provide pop-up alerts when working in a web browser.
-//
-//  By default, emp_assert(X) throws an error if X evaluates to false.
-//  - if EMP_NDEBUG is defined, the expression in emp_assert() is ignored (not evaluated)
+//  It behaves nearly identically, but with some additional functionality:
+//  - If compiled with Emscripten, will provide pop-up alerts in a web browser.
+//  - emp_assert can take additional arguments.  If the assert is triggered, those arguments
+//    will be evaluated and printed.
+//  - if NDEBUG -or- EMP_NDEBUG is defined, the expression in emp_assert() is not evaluated.
 //  - if EMP_TDEBUG is defined, emp_assert() goes into test mode and records failures, but
-//    does not act on them.  (useful for unit tests of asserts)
+//    does not abort.  (useful for unit tests of asserts)
 //
 
 #include <iostream>
@@ -86,7 +87,7 @@ namespace emp {
 }
 
 // Generate a pop-up alert in a web browser if an assert it tripped.
-#define emp_assert_impl_1(EXPR)                                      \
+#define emp_assert_impl_1(EXPR)                                         \
   if ( !(EXPR) ) {                                                      \
     std::string msg = std::string("Assert Error (In ")                  \
       + std::string(__FILE__)                                           \

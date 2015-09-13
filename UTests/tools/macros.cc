@@ -67,11 +67,24 @@ int main(int argc, char* argv[])
 
  
   if (verbose) {
-    std::array<std::string, 2> test = {EMP_STRINGIFY_EACH(some, words)};
     std::cout << "EMP_INC(11) = " << EMP_INC(11) << std::endl;
     std::cout << "EMP_INC(42) = " << EMP_INC(42) << std::endl;
     std::cout << "EMP_HALF(11) = " << EMP_HALF(11) << std::endl;
     std::cout << "EMP_HALF(42) = " << EMP_HALF(42) << std::endl;
+  }
+
+
+  // Test EMP_STRINGIFY_EACH
+  std::array<std::string, 2> test = {EMP_STRINGIFY_EACH(some, words)};
+  std::array<std::string, 9> test9 = {EMP_STRINGIFY_EACH(one, two, three, four, five, six, seven, eight, nine)};
+  emp_assert(test.size() == 2);
+  emp_assert(test[0] == "some");
+  emp_assert(test[1] == "words");
+  emp_assert(test9.size() == 9);
+  emp_assert(test9[4] == "five");
+  emp_assert(test9[7] == "eight");
+
+  if (verbose) {
     std::cout << "EMP_STRINGIFY_EACH(some, words) = " << test[0] << " " << test[1] << std::endl;
   }
 

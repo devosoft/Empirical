@@ -6,12 +6,54 @@
 //  Generally useful macros that can perform cools tricks.  As with all macros, use only
 //  after careful exclusion of alternative approaches!
 //
+//  The Macros to highlight here are:
+//
+//  ===== String Handling and Printing =====
+//  EMP_PRINT_RESULT(A) will print to std::cout both the string that was passed into the
+//       macro and what that string evaluates to.
+//
+//  EMP_STRINGIFY(...) converts all arguments into a single string (including commas).
+//  EMP_STRINGIFY_EACH(...) converts each argument into a string (leaving commas).
+//
+//  ===== Managing variadic arguments =====
+//  EMP_COUNT_ARGS(...) will return the number of arguments in the __VA_ARGS__
+//
+//  EMP_GET_ARG_*(...) replace * with number and will return the arg at that position.
+//
+//  EMP_GET_ODD_ARGS(...) will return all arguments at odd positions (1,3,5,7, etc.)
+//  EMP_GET_EVEN_ARGS(...) will return all arguments at odd positions (2,4,6,8, etc.)
+//  EMP_REVERSE_ARGS(...) Reverse the order of arguments passed in.
+//
+//  ===== Argument Manipulation and Formatting =====
+//  EMP_MERGE(...) merge all arguments (after conversion) into a single unit.
+//  EMP_WRAP_EACH(W, ...) will run macro W on each of the other args and concatinate them.
+//  EMP_LAYOUT(W, P, ...) Similar to EMP_WRAP_EACH, but puts a P between each arg pair.
+//  EMP_WRAP_ARGS(W, ...) Similar to EMP_WRAP_EACH, but puts a COMMA between each arg pair.
+//  EMP_WRAP_ARG_PAIRS(W, ...) Similar to EMP_WRAP_ARGS, but passes pairs of args into W.
+//
+//  ===== Simple Math =====
+//  EMP_INC_x resolves to x+1 (for a number in the place of x)
+//  EMP_DEC_x resolves to x-1 (for a number in the place of x)
+//  EMP_HALF_x resolves to x/2
+//
+//  Development Notes:
+//  * We need to fix who we handle macros that covert inputs to comma-separated results,
+//    from those that merge them all together.  One option is to have comma-separated the
+//    default and then have an EMP_REMOVE_COMMAS (or somesuch)
+//  * EMP_TYPES_TO_ARGS (not yet list above) is poorly name.  Maybe EMP_DECLARE_ARGS?
+//  * It would be useful to have EMP_WRAP_WITH_ID which passes in the position ID as
+//    the second argument.  This would allow us to, for example, redo EMP_TYPES_TO_ARGS.
+//
 
 #define EMP_COMMA ,
 
 // EMP_STRINGIFY takes any input, processes macros, and puts the result in quotes.
-#define EMP_STRINGIFY(A) EMP_STRINGIFY_IMPL(A)
+#define EMP_STRINGIFY(...) EMP_STRINGIFY_IMPL(__VA_ARGS__)
 #define EMP_STRINGIFY_IMPL(...) #__VA_ARGS__
+
+#define EMP_PRINT_RESULT_IMPL(STREAM, LHS, RHS) STREAM << "[[" << LHS << "]] = [[" << RHS << "]]" << std::endl
+#define EMP_PRINT_RESULT_TO(STREAM, A) EMP_PRINT_RESULT_IMPL(STREAM, #A, A)
+#define EMP_PRINT_RESULT(A) EMP_PRINT_RESULT_IMPL(std::cout, #A, A)
 
 #define EMP_GET_ARG_1(A1, ...) A1
 #define EMP_GET_ARG_2(A1, A2, ...) A2
@@ -19,64 +61,64 @@
 #define EMP_GET_ARG_4(A1, A2, A3, A4, ...) A4
 #define EMP_GET_ARG_5(A1, A2, A3, A4, A5, ...) A5
 #define EMP_GET_ARG_6(A1, A2, A3, A4, A5, A6, ...) A6
-#define EMP_GET_ARG_7(A1, A2, A3, A4, A5, A6, A7, ...) A7
-#define EMP_GET_ARG_8(A1, A2, A3, A4, A5, A6, A7, A8, ...) A8
-#define EMP_GET_ARG_9(A1, A2, A3, A4, A5, A6, A7, A8, A9, ...) A9
-#define EMP_GET_ARG_10(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, ...) A10
-#define EMP_GET_ARG_11(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, ...) A11
-#define EMP_GET_ARG_12(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, ...) A12
-#define EMP_GET_ARG_13(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, ...) A13
-#define EMP_GET_ARG_14(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, ...) A14
-#define EMP_GET_ARG_15(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, ...) A15
-#define EMP_GET_ARG_16(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, ...) A16
-#define EMP_GET_ARG_17(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, ...) A17
-#define EMP_GET_ARG_18(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, ...) A18
-#define EMP_GET_ARG_19(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, ...) A19
-#define EMP_GET_ARG_20(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, ...) A20
-#define EMP_GET_ARG_21(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, ...) A21
-#define EMP_GET_ARG_22(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, ...) A22
-#define EMP_GET_ARG_23(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, ...) A23
-#define EMP_GET_ARG_24(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, ...) A24
-#define EMP_GET_ARG_25(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, ...) A25
-#define EMP_GET_ARG_26(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, ...) A26
-#define EMP_GET_ARG_27(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, ...) A27
-#define EMP_GET_ARG_28(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, ...) A28
-#define EMP_GET_ARG_29(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, ...) A29
-#define EMP_GET_ARG_30(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, ...) A30
-#define EMP_GET_ARG_31(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, ...) A31
-#define EMP_GET_ARG_32(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, ...) A32
-#define EMP_GET_ARG_33(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, ...) A33
-#define EMP_GET_ARG_34(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, ...) A34
-#define EMP_GET_ARG_35(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, ...) A35
-#define EMP_GET_ARG_36(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, ...) A36
-#define EMP_GET_ARG_37(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, ...) A37
-#define EMP_GET_ARG_38(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, ...) A38
-#define EMP_GET_ARG_39(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, ...) A39
-#define EMP_GET_ARG_40(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, ...) A40
-#define EMP_GET_ARG_41(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, ...) A41
-#define EMP_GET_ARG_42(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, ...) A42
-#define EMP_GET_ARG_43(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, ...) A43
-#define EMP_GET_ARG_44(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, ...) A44
-#define EMP_GET_ARG_45(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, ...) A45
-#define EMP_GET_ARG_46(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, ...) A46
-#define EMP_GET_ARG_47(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, ...) A47
-#define EMP_GET_ARG_48(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, ...) A48
-#define EMP_GET_ARG_49(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, ...) A49
-#define EMP_GET_ARG_50(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, ...) A50
-#define EMP_GET_ARG_51(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, ...) A51
-#define EMP_GET_ARG_52(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, ...) A52
-#define EMP_GET_ARG_53(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, ...) A53
-#define EMP_GET_ARG_54(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, ...) A54
-#define EMP_GET_ARG_55(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, ...) A55
-#define EMP_GET_ARG_56(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56, ...) A56
-#define EMP_GET_ARG_57(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56, A57, ...) A57
-#define EMP_GET_ARG_58(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56, A57, A58, ...) A58
-#define EMP_GET_ARG_59(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56, A57, A58, A59, ...) A59
-#define EMP_GET_ARG_60(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56, A57, A58, A59, A60, ...) A60
-#define EMP_GET_ARG_A61(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56, A57, A58, A59, A60, A61, ...) A61
-#define EMP_GET_ARG_A62(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56, A57, A58, A59, A60, A61, A62, ...) A62
-#define EMP_GET_ARG_A63(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56, A57, A58, A59, A60, A61, A62, A63, ...) A63
-#define EMP_GET_ARG_64(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56, A57, A58, A59, A60, A61, A62, A63, A64, ...) A64
+#define EMP_GET_ARG_7(A, ...) EMP_GET_ARG_6(__VA_ARGS__)
+#define EMP_GET_ARG_8(A, ...) EMP_GET_ARG_7(__VA_ARGS__)
+#define EMP_GET_ARG_9(A, ...) EMP_GET_ARG_8(__VA_ARGS__)
+#define EMP_GET_ARG_10(A, ...) EMP_GET_ARG_9(__VA_ARGS__)
+#define EMP_GET_ARG_11(A, ...) EMP_GET_ARG_10(__VA_ARGS__)
+#define EMP_GET_ARG_12(A, ...) EMP_GET_ARG_11(__VA_ARGS__)
+#define EMP_GET_ARG_13(A, ...) EMP_GET_ARG_12(__VA_ARGS__)
+#define EMP_GET_ARG_14(A, ...) EMP_GET_ARG_13(__VA_ARGS__)
+#define EMP_GET_ARG_15(A, ...) EMP_GET_ARG_14(__VA_ARGS__)
+#define EMP_GET_ARG_16(A, ...) EMP_GET_ARG_15(__VA_ARGS__)
+#define EMP_GET_ARG_17(A, ...) EMP_GET_ARG_16(__VA_ARGS__)
+#define EMP_GET_ARG_18(A, ...) EMP_GET_ARG_17(__VA_ARGS__)
+#define EMP_GET_ARG_19(A, ...) EMP_GET_ARG_18(__VA_ARGS__)
+#define EMP_GET_ARG_20(A, ...) EMP_GET_ARG_19(__VA_ARGS__)
+#define EMP_GET_ARG_21(A, ...) EMP_GET_ARG_20(__VA_ARGS__)
+#define EMP_GET_ARG_22(A, ...) EMP_GET_ARG_21(__VA_ARGS__)
+#define EMP_GET_ARG_23(A, ...) EMP_GET_ARG_22(__VA_ARGS__)
+#define EMP_GET_ARG_24(A, ...) EMP_GET_ARG_23(__VA_ARGS__)
+#define EMP_GET_ARG_25(A, ...) EMP_GET_ARG_24(__VA_ARGS__)
+#define EMP_GET_ARG_26(A, ...) EMP_GET_ARG_25(__VA_ARGS__)
+#define EMP_GET_ARG_27(A, ...) EMP_GET_ARG_26(__VA_ARGS__)
+#define EMP_GET_ARG_28(A, ...) EMP_GET_ARG_27(__VA_ARGS__)
+#define EMP_GET_ARG_29(A, ...) EMP_GET_ARG_28(__VA_ARGS__)
+#define EMP_GET_ARG_30(A, ...) EMP_GET_ARG_29(__VA_ARGS__)
+#define EMP_GET_ARG_31(A, ...) EMP_GET_ARG_30(__VA_ARGS__)
+#define EMP_GET_ARG_32(A, ...) EMP_GET_ARG_31(__VA_ARGS__)
+#define EMP_GET_ARG_33(A, ...) EMP_GET_ARG_32(__VA_ARGS__)
+#define EMP_GET_ARG_34(A, ...) EMP_GET_ARG_33(__VA_ARGS__)
+#define EMP_GET_ARG_35(A, ...) EMP_GET_ARG_34(__VA_ARGS__)
+#define EMP_GET_ARG_36(A, ...) EMP_GET_ARG_35(__VA_ARGS__)
+#define EMP_GET_ARG_37(A, ...) EMP_GET_ARG_36(__VA_ARGS__)
+#define EMP_GET_ARG_38(A, ...) EMP_GET_ARG_37(__VA_ARGS__)
+#define EMP_GET_ARG_39(A, ...) EMP_GET_ARG_38(__VA_ARGS__)
+#define EMP_GET_ARG_40(A, ...) EMP_GET_ARG_39(__VA_ARGS__)
+#define EMP_GET_ARG_41(A, ...) EMP_GET_ARG_40(__VA_ARGS__)
+#define EMP_GET_ARG_42(A, ...) EMP_GET_ARG_41(__VA_ARGS__)
+#define EMP_GET_ARG_43(A, ...) EMP_GET_ARG_42(__VA_ARGS__)
+#define EMP_GET_ARG_44(A, ...) EMP_GET_ARG_43(__VA_ARGS__)
+#define EMP_GET_ARG_45(A, ...) EMP_GET_ARG_44(__VA_ARGS__)
+#define EMP_GET_ARG_46(A, ...) EMP_GET_ARG_45(__VA_ARGS__)
+#define EMP_GET_ARG_47(A, ...) EMP_GET_ARG_46(__VA_ARGS__)
+#define EMP_GET_ARG_48(A, ...) EMP_GET_ARG_47(__VA_ARGS__)
+#define EMP_GET_ARG_49(A, ...) EMP_GET_ARG_48(__VA_ARGS__)
+#define EMP_GET_ARG_50(A, ...) EMP_GET_ARG_49(__VA_ARGS__)
+#define EMP_GET_ARG_51(A, ...) EMP_GET_ARG_50(__VA_ARGS__)
+#define EMP_GET_ARG_52(A, ...) EMP_GET_ARG_51(__VA_ARGS__)
+#define EMP_GET_ARG_53(A, ...) EMP_GET_ARG_52(__VA_ARGS__)
+#define EMP_GET_ARG_54(A, ...) EMP_GET_ARG_53(__VA_ARGS__)
+#define EMP_GET_ARG_55(A, ...) EMP_GET_ARG_54(__VA_ARGS__)
+#define EMP_GET_ARG_56(A, ...) EMP_GET_ARG_55(__VA_ARGS__)
+#define EMP_GET_ARG_57(A, ...) EMP_GET_ARG_56(__VA_ARGS__)
+#define EMP_GET_ARG_58(A, ...) EMP_GET_ARG_57(__VA_ARGS__)
+#define EMP_GET_ARG_59(A, ...) EMP_GET_ARG_58(__VA_ARGS__)
+#define EMP_GET_ARG_60(A, ...) EMP_GET_ARG_59(__VA_ARGS__)
+#define EMP_GET_ARG_61(A, ...) EMP_GET_ARG_60(__VA_ARGS__)
+#define EMP_GET_ARG_62(A, ...) EMP_GET_ARG_61(__VA_ARGS__)
+#define EMP_GET_ARG_63(A, ...) EMP_GET_ARG_62(__VA_ARGS__)
+#define EMP_GET_ARG_64(A, ...) EMP_GET_ARG_63(__VA_ARGS__)
 
 #define EMP_COUNT_ARGS(...) EMP_GET_ARG_64(__VA_ARGS__, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 
@@ -212,7 +254,7 @@
 #define EMP_GET_EVEN_ARGS_63(A, B, ...) B, EMP_GET_EVEN_ARGS_61(__VA_ARGS__)
 
 
-// Enable an arbitrary number of arguments to be merged AFTER being processed!
+// Enable an arbitrary number of arguments (well, up to 10) to be merged AFTER being processed!
 #define EMP_MERGE(...) EMP_ASSEMBLE_MACRO(EMP_MERGE_, EMP_COUNT_ARGS(__VA_ARGS__), __VA_ARGS__)
 #define EMP_MERGE_1(A1) A1
 #define EMP_MERGE_2(A1,A2) A1 ## A2
@@ -221,6 +263,9 @@
 #define EMP_MERGE_5(A1,A2,A3,A4,A5) A1 ## A2 ## A3 ## A4 ## A5
 #define EMP_MERGE_6(A1,A2,A3,A4,A5,A6) A1 ## A2 ## A3 ## A4 ## A5 ## A6
 #define EMP_MERGE_7(A1,A2,A3,A4,A5,A6,A7) A1 ## A2 ## A3 ## A4 ## A5 ## A6 ## A7
+#define EMP_MERGE_8(A1,A2,A3,A4,A5,A6,A7,A8) A1 ## A2 ## A3 ## A4 ## A5 ## A6 ## A7 ## A8
+#define EMP_MERGE_9(A1,A2,A3,A4,A5,A6,A7,A8,A9) A1 ## A2 ## A3 ## A4 ## A5 ## A6 ## A7 ## A8 ## A9
+#define EMP_MERGE_10(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10) A1 ## A2 ## A3 ## A4 ## A5 ## A6 ## A7 ## A8 ## A9 ## A10
 
 
 // EMP_WRAP_EACH takes a wrapper macro and a variable set of arguments,
@@ -361,6 +406,11 @@
 #define EMP_WRAP_ARGS_61(W, A, ...) W(A), EMP_WRAP_ARGS_60(W, __VA_ARGS__)
 #define EMP_WRAP_ARGS_62(W, A, ...) W(A), EMP_WRAP_ARGS_61(W, __VA_ARGS__)
 #define EMP_WRAP_ARGS_63(W, A, ...) W(A), EMP_WRAP_ARGS_62(W, __VA_ARGS__)
+
+//Individually stringifies each variable passed to it and returns them
+//with commas in between.
+#define EMP_STRINGIFY_EACH(...) EMP_WRAP_ARGS(EMP_STRINGIFY, __VA_ARGS__)
+
 
 #define EMP_WRAP_ARG_PAIRS(W, ...) EMP_ASSEMBLE_MACRO(EMP_WRAP_ARG_PAIRS_, EMP_COUNT_ARGS(__VA_ARGS__), W, __VA_ARGS__)
 #define EMP_WRAP_ARG_PAIRS_2(W, A1, A2) W(A1, A2)
@@ -516,48 +566,48 @@
 #define EMP_TYPES_TO_ARGS_19(A, ...) EMP_TYPES_TO_ARGS_18(__VA_ARGS__), A arg19
 #define EMP_TYPES_TO_ARGS_20(A, ...) EMP_TYPES_TO_ARGS_19(__VA_ARGS__), A arg20
 #define EMP_TYPES_TO_ARGS_21(A, ...) EMP_TYPES_TO_ARGS_20(__VA_ARGS__), A arg21
-#define EMP_TYPES_TO_ARGS_22(A, ...) EMP_TYPES_TO_ARGS_21(__VA_ARGS__), A arg12
-#define EMP_TYPES_TO_ARGS_23(A, ...) EMP_TYPES_TO_ARGS_22(__VA_ARGS__), A arg13
-#define EMP_TYPES_TO_ARGS_24(A, ...) EMP_TYPES_TO_ARGS_23(__VA_ARGS__), A arg14
-#define EMP_TYPES_TO_ARGS_25(A, ...) EMP_TYPES_TO_ARGS_24(__VA_ARGS__), A arg15
-#define EMP_TYPES_TO_ARGS_26(A, ...) EMP_TYPES_TO_ARGS_25(__VA_ARGS__), A arg16
-#define EMP_TYPES_TO_ARGS_27(A, ...) EMP_TYPES_TO_ARGS_26(__VA_ARGS__), A arg17
-#define EMP_TYPES_TO_ARGS_28(A, ...) EMP_TYPES_TO_ARGS_27(__VA_ARGS__), A arg18
-#define EMP_TYPES_TO_ARGS_29(A, ...) EMP_TYPES_TO_ARGS_28(__VA_ARGS__), A arg19
-#define EMP_TYPES_TO_ARGS_30(A, ...) EMP_TYPES_TO_ARGS_29(__VA_ARGS__), A arg20
-#define EMP_TYPES_TO_ARGS_31(A, ...) EMP_TYPES_TO_ARGS_30(__VA_ARGS__), A arg21
-#define EMP_TYPES_TO_ARGS_32(A, ...) EMP_TYPES_TO_ARGS_31(__VA_ARGS__), A arg12
-#define EMP_TYPES_TO_ARGS_33(A, ...) EMP_TYPES_TO_ARGS_32(__VA_ARGS__), A arg13
-#define EMP_TYPES_TO_ARGS_34(A, ...) EMP_TYPES_TO_ARGS_33(__VA_ARGS__), A arg14
-#define EMP_TYPES_TO_ARGS_35(A, ...) EMP_TYPES_TO_ARGS_34(__VA_ARGS__), A arg15
-#define EMP_TYPES_TO_ARGS_36(A, ...) EMP_TYPES_TO_ARGS_35(__VA_ARGS__), A arg16
-#define EMP_TYPES_TO_ARGS_37(A, ...) EMP_TYPES_TO_ARGS_36(__VA_ARGS__), A arg17
-#define EMP_TYPES_TO_ARGS_38(A, ...) EMP_TYPES_TO_ARGS_37(__VA_ARGS__), A arg18
-#define EMP_TYPES_TO_ARGS_39(A, ...) EMP_TYPES_TO_ARGS_38(__VA_ARGS__), A arg19
-#define EMP_TYPES_TO_ARGS_40(A, ...) EMP_TYPES_TO_ARGS_39(__VA_ARGS__), A arg20
-#define EMP_TYPES_TO_ARGS_41(A, ...) EMP_TYPES_TO_ARGS_40(__VA_ARGS__), A arg21
-#define EMP_TYPES_TO_ARGS_42(A, ...) EMP_TYPES_TO_ARGS_41(__VA_ARGS__), A arg12
-#define EMP_TYPES_TO_ARGS_43(A, ...) EMP_TYPES_TO_ARGS_42(__VA_ARGS__), A arg13
-#define EMP_TYPES_TO_ARGS_44(A, ...) EMP_TYPES_TO_ARGS_43(__VA_ARGS__), A arg14
-#define EMP_TYPES_TO_ARGS_45(A, ...) EMP_TYPES_TO_ARGS_44(__VA_ARGS__), A arg15
-#define EMP_TYPES_TO_ARGS_46(A, ...) EMP_TYPES_TO_ARGS_45(__VA_ARGS__), A arg16
-#define EMP_TYPES_TO_ARGS_47(A, ...) EMP_TYPES_TO_ARGS_46(__VA_ARGS__), A arg17
-#define EMP_TYPES_TO_ARGS_48(A, ...) EMP_TYPES_TO_ARGS_47(__VA_ARGS__), A arg18
-#define EMP_TYPES_TO_ARGS_49(A, ...) EMP_TYPES_TO_ARGS_48(__VA_ARGS__), A arg19
-#define EMP_TYPES_TO_ARGS_50(A, ...) EMP_TYPES_TO_ARGS_49(__VA_ARGS__), A arg20
-#define EMP_TYPES_TO_ARGS_51(A, ...) EMP_TYPES_TO_ARGS_50(__VA_ARGS__), A arg21
-#define EMP_TYPES_TO_ARGS_52(A, ...) EMP_TYPES_TO_ARGS_51(__VA_ARGS__), A arg12
-#define EMP_TYPES_TO_ARGS_53(A, ...) EMP_TYPES_TO_ARGS_52(__VA_ARGS__), A arg13
-#define EMP_TYPES_TO_ARGS_54(A, ...) EMP_TYPES_TO_ARGS_53(__VA_ARGS__), A arg14
-#define EMP_TYPES_TO_ARGS_55(A, ...) EMP_TYPES_TO_ARGS_54(__VA_ARGS__), A arg15
-#define EMP_TYPES_TO_ARGS_56(A, ...) EMP_TYPES_TO_ARGS_55(__VA_ARGS__), A arg16
-#define EMP_TYPES_TO_ARGS_57(A, ...) EMP_TYPES_TO_ARGS_56(__VA_ARGS__), A arg17
-#define EMP_TYPES_TO_ARGS_58(A, ...) EMP_TYPES_TO_ARGS_57(__VA_ARGS__), A arg18
-#define EMP_TYPES_TO_ARGS_59(A, ...) EMP_TYPES_TO_ARGS_58(__VA_ARGS__), A arg19
-#define EMP_TYPES_TO_ARGS_60(A, ...) EMP_TYPES_TO_ARGS_59(__VA_ARGS__), A arg20
-#define EMP_TYPES_TO_ARGS_61(A, ...) EMP_TYPES_TO_ARGS_60(__VA_ARGS__), A arg21
-#define EMP_TYPES_TO_ARGS_62(A, ...) EMP_TYPES_TO_ARGS_61(__VA_ARGS__), A arg12
-#define EMP_TYPES_TO_ARGS_63(A, ...) EMP_TYPES_TO_ARGS_62(__VA_ARGS__), A arg13
+#define EMP_TYPES_TO_ARGS_22(A, ...) EMP_TYPES_TO_ARGS_21(__VA_ARGS__), A arg22
+#define EMP_TYPES_TO_ARGS_23(A, ...) EMP_TYPES_TO_ARGS_22(__VA_ARGS__), A arg23
+#define EMP_TYPES_TO_ARGS_24(A, ...) EMP_TYPES_TO_ARGS_23(__VA_ARGS__), A arg24
+#define EMP_TYPES_TO_ARGS_25(A, ...) EMP_TYPES_TO_ARGS_24(__VA_ARGS__), A arg25
+#define EMP_TYPES_TO_ARGS_26(A, ...) EMP_TYPES_TO_ARGS_25(__VA_ARGS__), A arg26
+#define EMP_TYPES_TO_ARGS_27(A, ...) EMP_TYPES_TO_ARGS_26(__VA_ARGS__), A arg27
+#define EMP_TYPES_TO_ARGS_28(A, ...) EMP_TYPES_TO_ARGS_27(__VA_ARGS__), A arg28
+#define EMP_TYPES_TO_ARGS_29(A, ...) EMP_TYPES_TO_ARGS_28(__VA_ARGS__), A arg29
+#define EMP_TYPES_TO_ARGS_30(A, ...) EMP_TYPES_TO_ARGS_29(__VA_ARGS__), A arg30
+#define EMP_TYPES_TO_ARGS_31(A, ...) EMP_TYPES_TO_ARGS_30(__VA_ARGS__), A arg31
+#define EMP_TYPES_TO_ARGS_32(A, ...) EMP_TYPES_TO_ARGS_31(__VA_ARGS__), A arg32
+#define EMP_TYPES_TO_ARGS_33(A, ...) EMP_TYPES_TO_ARGS_32(__VA_ARGS__), A arg33
+#define EMP_TYPES_TO_ARGS_34(A, ...) EMP_TYPES_TO_ARGS_33(__VA_ARGS__), A arg34
+#define EMP_TYPES_TO_ARGS_35(A, ...) EMP_TYPES_TO_ARGS_34(__VA_ARGS__), A arg35
+#define EMP_TYPES_TO_ARGS_36(A, ...) EMP_TYPES_TO_ARGS_35(__VA_ARGS__), A arg36
+#define EMP_TYPES_TO_ARGS_37(A, ...) EMP_TYPES_TO_ARGS_36(__VA_ARGS__), A arg37
+#define EMP_TYPES_TO_ARGS_38(A, ...) EMP_TYPES_TO_ARGS_37(__VA_ARGS__), A arg38
+#define EMP_TYPES_TO_ARGS_39(A, ...) EMP_TYPES_TO_ARGS_38(__VA_ARGS__), A arg39
+#define EMP_TYPES_TO_ARGS_40(A, ...) EMP_TYPES_TO_ARGS_39(__VA_ARGS__), A arg40
+#define EMP_TYPES_TO_ARGS_41(A, ...) EMP_TYPES_TO_ARGS_40(__VA_ARGS__), A arg41
+#define EMP_TYPES_TO_ARGS_42(A, ...) EMP_TYPES_TO_ARGS_41(__VA_ARGS__), A arg42
+#define EMP_TYPES_TO_ARGS_43(A, ...) EMP_TYPES_TO_ARGS_42(__VA_ARGS__), A arg43
+#define EMP_TYPES_TO_ARGS_44(A, ...) EMP_TYPES_TO_ARGS_43(__VA_ARGS__), A arg44
+#define EMP_TYPES_TO_ARGS_45(A, ...) EMP_TYPES_TO_ARGS_44(__VA_ARGS__), A arg45
+#define EMP_TYPES_TO_ARGS_46(A, ...) EMP_TYPES_TO_ARGS_45(__VA_ARGS__), A arg46
+#define EMP_TYPES_TO_ARGS_47(A, ...) EMP_TYPES_TO_ARGS_46(__VA_ARGS__), A arg47
+#define EMP_TYPES_TO_ARGS_48(A, ...) EMP_TYPES_TO_ARGS_47(__VA_ARGS__), A arg48
+#define EMP_TYPES_TO_ARGS_49(A, ...) EMP_TYPES_TO_ARGS_48(__VA_ARGS__), A arg49
+#define EMP_TYPES_TO_ARGS_50(A, ...) EMP_TYPES_TO_ARGS_49(__VA_ARGS__), A arg50
+#define EMP_TYPES_TO_ARGS_51(A, ...) EMP_TYPES_TO_ARGS_50(__VA_ARGS__), A arg51
+#define EMP_TYPES_TO_ARGS_52(A, ...) EMP_TYPES_TO_ARGS_51(__VA_ARGS__), A arg52
+#define EMP_TYPES_TO_ARGS_53(A, ...) EMP_TYPES_TO_ARGS_52(__VA_ARGS__), A arg53
+#define EMP_TYPES_TO_ARGS_54(A, ...) EMP_TYPES_TO_ARGS_53(__VA_ARGS__), A arg54
+#define EMP_TYPES_TO_ARGS_55(A, ...) EMP_TYPES_TO_ARGS_54(__VA_ARGS__), A arg55
+#define EMP_TYPES_TO_ARGS_56(A, ...) EMP_TYPES_TO_ARGS_55(__VA_ARGS__), A arg56
+#define EMP_TYPES_TO_ARGS_57(A, ...) EMP_TYPES_TO_ARGS_56(__VA_ARGS__), A arg57
+#define EMP_TYPES_TO_ARGS_58(A, ...) EMP_TYPES_TO_ARGS_57(__VA_ARGS__), A arg58
+#define EMP_TYPES_TO_ARGS_59(A, ...) EMP_TYPES_TO_ARGS_58(__VA_ARGS__), A arg59
+#define EMP_TYPES_TO_ARGS_60(A, ...) EMP_TYPES_TO_ARGS_59(__VA_ARGS__), A arg60
+#define EMP_TYPES_TO_ARGS_61(A, ...) EMP_TYPES_TO_ARGS_60(__VA_ARGS__), A arg61
+#define EMP_TYPES_TO_ARGS_62(A, ...) EMP_TYPES_TO_ARGS_61(__VA_ARGS__), A arg62
+#define EMP_TYPES_TO_ARGS_63(A, ...) EMP_TYPES_TO_ARGS_62(__VA_ARGS__), A arg63
 
 
 // Some basic math macros.  Since brute force is the only way to do math with macros...
@@ -627,6 +677,72 @@
 #define EMP_INC_62  63
 #define EMP_INC_63  64
 
+#define EMP_DEC(X) EMP_DEC_ ## X
+#define EMP_DEC_0  -1
+#define EMP_DEC_1  0
+#define EMP_DEC_2  1
+#define EMP_DEC_3  2
+#define EMP_DEC_4  3
+#define EMP_DEC_5  4
+#define EMP_DEC_6  5
+#define EMP_DEC_7  6
+#define EMP_DEC_8  7
+#define EMP_DEC_9  8
+#define EMP_DEC_10  9
+#define EMP_DEC_11  10
+#define EMP_DEC_12  11
+#define EMP_DEC_13  12
+#define EMP_DEC_14  13
+#define EMP_DEC_15  14
+#define EMP_DEC_16  15
+#define EMP_DEC_17  16
+#define EMP_DEC_18  17
+#define EMP_DEC_19  18
+#define EMP_DEC_20  19
+#define EMP_DEC_21  20
+#define EMP_DEC_22  21
+#define EMP_DEC_23  22
+#define EMP_DEC_24  23
+#define EMP_DEC_25  24
+#define EMP_DEC_26  25
+#define EMP_DEC_27  26
+#define EMP_DEC_28  27
+#define EMP_DEC_29  28
+#define EMP_DEC_30  29
+#define EMP_DEC_31  30
+#define EMP_DEC_32  31
+#define EMP_DEC_33  32
+#define EMP_DEC_34  33
+#define EMP_DEC_35  34
+#define EMP_DEC_36  35
+#define EMP_DEC_37  36
+#define EMP_DEC_38  37
+#define EMP_DEC_39  38
+#define EMP_DEC_40  39
+#define EMP_DEC_41  40
+#define EMP_DEC_42  41
+#define EMP_DEC_43  42
+#define EMP_DEC_44  43
+#define EMP_DEC_45  44
+#define EMP_DEC_46  45
+#define EMP_DEC_47  46
+#define EMP_DEC_48  47
+#define EMP_DEC_49  48
+#define EMP_DEC_50  49
+#define EMP_DEC_51  50
+#define EMP_DEC_52  51
+#define EMP_DEC_53  52
+#define EMP_DEC_54  53
+#define EMP_DEC_55  54
+#define EMP_DEC_56  55
+#define EMP_DEC_57  56
+#define EMP_DEC_58  57
+#define EMP_DEC_59  58
+#define EMP_DEC_60  59
+#define EMP_DEC_61  60
+#define EMP_DEC_62  61
+#define EMP_DEC_63  62
+
 #define EMP_HALF(X) EMP_HALF_ ## X
 #define EMP_HALF_0  0
 #define EMP_HALF_1  0
@@ -692,81 +808,6 @@
 #define EMP_HALF_61  30
 #define EMP_HALF_62  31
 #define EMP_HALF_63  31
-
-//Individually stringifies each variable passed to it and returns them
-//with commas in between.
-#define EMP_STRINGIFY_EACH(...) EMP_ASSEMBLE_MACRO(EMP_STRINGIFY_ARG_, EMP_COUNT_ARGS(__VA_ARGS__), __VA_ARGS__)
-
-//Python code to generate EMP_STRINGIFY_ARG macros:
-//for i in range(1, 65):
-//    print "#define EMP_STRINGIFY_ARG_" + str(i) + \
-//          "(" + ", ".join(["A"+str(j) for j in range(1, i+1)]) + ") " \
-//          + ", ".join(["#A"+str(j) for j in range(1, i+1)])
-
-#define EMP_STRINGIFY_ARG_1(A1) #A1
-#define EMP_STRINGIFY_ARG_2(A1, A2) #A1, #A2
-#define EMP_STRINGIFY_ARG_3(A1, A2, A3) #A1, #A2, #A3
-#define EMP_STRINGIFY_ARG_4(A1, A2, A3, A4) #A1, #A2, #A3, #A4
-#define EMP_STRINGIFY_ARG_5(A1, A2, A3, A4, A5) #A1, #A2, #A3, #A4, #A5
-#define EMP_STRINGIFY_ARG_6(A1, A2, A3, A4, A5, A6) #A1, #A2, #A3, #A4, #A5, #A6
-#define EMP_STRINGIFY_ARG_7(A1, A2, A3, A4, A5, A6, A7) #A1, #A2, #A3, #A4, #A5, #A6, #A7
-#define EMP_STRINGIFY_ARG_8(A1, A2, A3, A4, A5, A6, A7, A8) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8
-#define EMP_STRINGIFY_ARG_9(A1, A2, A3, A4, A5, A6, A7, A8, A9) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9
-#define EMP_STRINGIFY_ARG_10(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10
-#define EMP_STRINGIFY_ARG_11(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11
-#define EMP_STRINGIFY_ARG_12(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12
-#define EMP_STRINGIFY_ARG_13(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13
-#define EMP_STRINGIFY_ARG_14(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14
-#define EMP_STRINGIFY_ARG_15(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15
-#define EMP_STRINGIFY_ARG_16(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16
-#define EMP_STRINGIFY_ARG_17(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17
-#define EMP_STRINGIFY_ARG_18(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18
-#define EMP_STRINGIFY_ARG_19(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19
-#define EMP_STRINGIFY_ARG_20(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20
-#define EMP_STRINGIFY_ARG_21(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21
-#define EMP_STRINGIFY_ARG_22(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22
-#define EMP_STRINGIFY_ARG_23(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23
-#define EMP_STRINGIFY_ARG_24(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24
-#define EMP_STRINGIFY_ARG_25(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25
-#define EMP_STRINGIFY_ARG_26(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26
-#define EMP_STRINGIFY_ARG_27(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27
-#define EMP_STRINGIFY_ARG_28(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28
-#define EMP_STRINGIFY_ARG_29(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29
-#define EMP_STRINGIFY_ARG_30(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30
-#define EMP_STRINGIFY_ARG_31(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31
-#define EMP_STRINGIFY_ARG_32(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32
-#define EMP_STRINGIFY_ARG_33(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33
-#define EMP_STRINGIFY_ARG_34(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34
-#define EMP_STRINGIFY_ARG_35(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35
-#define EMP_STRINGIFY_ARG_36(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36
-#define EMP_STRINGIFY_ARG_37(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37
-#define EMP_STRINGIFY_ARG_38(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38
-#define EMP_STRINGIFY_ARG_39(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39
-#define EMP_STRINGIFY_ARG_40(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40
-#define EMP_STRINGIFY_ARG_41(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41
-#define EMP_STRINGIFY_ARG_42(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42
-#define EMP_STRINGIFY_ARG_43(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43
-#define EMP_STRINGIFY_ARG_44(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44
-#define EMP_STRINGIFY_ARG_45(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45
-#define EMP_STRINGIFY_ARG_46(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46
-#define EMP_STRINGIFY_ARG_47(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47
-#define EMP_STRINGIFY_ARG_48(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47, #A48
-#define EMP_STRINGIFY_ARG_49(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47, #A48, #A49
-#define EMP_STRINGIFY_ARG_50(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47, #A48, #A49, #A50
-#define EMP_STRINGIFY_ARG_51(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47, #A48, #A49, #A50, #A51
-#define EMP_STRINGIFY_ARG_52(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47, #A48, #A49, #A50, #A51, #A52
-#define EMP_STRINGIFY_ARG_53(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47, #A48, #A49, #A50, #A51, #A52, #A53
-#define EMP_STRINGIFY_ARG_54(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47, #A48, #A49, #A50, #A51, #A52, #A53, #A54
-#define EMP_STRINGIFY_ARG_55(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47, #A48, #A49, #A50, #A51, #A52, #A53, #A54, #A55
-#define EMP_STRINGIFY_ARG_56(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47, #A48, #A49, #A50, #A51, #A52, #A53, #A54, #A55, #A56
-#define EMP_STRINGIFY_ARG_57(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56, A57) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47, #A48, #A49, #A50, #A51, #A52, #A53, #A54, #A55, #A56, #A57
-#define EMP_STRINGIFY_ARG_58(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56, A57, A58) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47, #A48, #A49, #A50, #A51, #A52, #A53, #A54, #A55, #A56, #A57, #A58
-#define EMP_STRINGIFY_ARG_59(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56, A57, A58, A59) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47, #A48, #A49, #A50, #A51, #A52, #A53, #A54, #A55, #A56, #A57, #A58, #A59
-#define EMP_STRINGIFY_ARG_60(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56, A57, A58, A59, A60) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47, #A48, #A49, #A50, #A51, #A52, #A53, #A54, #A55, #A56, #A57, #A58, #A59, #A60
-#define EMP_STRINGIFY_ARG_61(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56, A57, A58, A59, A60, A61) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47, #A48, #A49, #A50, #A51, #A52, #A53, #A54, #A55, #A56, #A57, #A58, #A59, #A60, #A61
-#define EMP_STRINGIFY_ARG_62(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56, A57, A58, A59, A60, A61, A62) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47, #A48, #A49, #A50, #A51, #A52, #A53, #A54, #A55, #A56, #A57, #A58, #A59, #A60, #A61, #A62
-#define EMP_STRINGIFY_ARG_63(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56, A57, A58, A59, A60, A61, A62, A63) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47, #A48, #A49, #A50, #A51, #A52, #A53, #A54, #A55, #A56, #A57, #A58, #A59, #A60, #A61, #A62, #A63
-#define EMP_STRINGIFY_ARG_64(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23, A24, A25, A26, A27, A28, A29, A30, A31, A32, A33, A34, A35, A36, A37, A38, A39, A40, A41, A42, A43, A44, A45, A46, A47, A48, A49, A50, A51, A52, A53, A54, A55, A56, A57, A58, A59, A60, A61, A62, A63, A64) #A1, #A2, #A3, #A4, #A5, #A6, #A7, #A8, #A9, #A10, #A11, #A12, #A13, #A14, #A15, #A16, #A17, #A18, #A19, #A20, #A21, #A22, #A23, #A24, #A25, #A26, #A27, #A28, #A29, #A30, #A31, #A32, #A33, #A34, #A35, #A36, #A37, #A38, #A39, #A40, #A41, #A42, #A43, #A44, #A45, #A46, #A47, #A48, #A49, #A50, #A51, #A52, #A53, #A54, #A55, #A56, #A57, #A58, #A59, #A60, #A61, #A62, #A63, #A64
 
 
 // Setup a generic method of calling a specific version of a macro based on argument count.
