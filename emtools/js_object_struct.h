@@ -20,14 +20,23 @@
 //  Development notes:
 //  * It would be great if we could do away with this whole header
 
+#include "../tools/tuple_struct.h"
+
 
 #define DATA_OBJECT_SIZE 3
 
 struct JSDataObject{
-  EMP_BUILD_TUPLE_STORE_VAR_NAMES( int, val,
+  EMP_BUILD_INTROSPECTIVE_TUPLE( int, val,
 				   std::string, word,
 				   float, val2
-				   );
+				   )
+  
+  //Overloading the [] operator feels tantalizingly close
+  //to being within reach, however the compiler can't infer
+  //the return type (and understandably so)
+  //template <typename T>
+  //T& operator[](std::size_t idx){return pointers[idx];};
+  
   
 };
 #endif

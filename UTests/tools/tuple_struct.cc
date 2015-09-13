@@ -42,7 +42,7 @@ struct TestStruct {
 };
 
 struct TestStoredVarStruct {
-  EMP_BUILD_TUPLE_STORE_VAR_NAMES( int, MyInt,
+  EMP_BUILD_INTROSPECTIVE_TUPLE( int, MyInt,
                    int, MyInt2,
                    int, MyInt3,
                    int, MyInt4,
