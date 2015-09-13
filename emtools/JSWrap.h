@@ -109,7 +109,7 @@ namespace emp {
   }
   
   template <int ARG_ID> static void LoadArg(float & arg_var, std::string var) {
-    arg_var = EM_ASM_DOUBLE({ console.log(emp_i.cb_args[$0][Pointer_stringify($1)]); return emp_i.cb_args[$0][Pointer_stringify($1)]; 
+    arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0][Pointer_stringify($1)]; 
       }, ARG_ID, var.c_str());
   }
   
