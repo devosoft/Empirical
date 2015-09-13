@@ -1,25 +1,12 @@
 #include <emscripten.h>
 #include <iostream>
 #include <string>
+#include <typeinfo>
+#include <map>
+#include "../Empirical/tools/assert.h"
+#include <array>
+#include "../Empirical/emtools/js_object_struct.h"
 
-
-
-/*class Node(){
- private:
-  int id;
-  
- public:
-  Node();
-  ~Node();
-  string GetData(){EM_ASM(allocate(intArrayFromString($dom_nodes.nodes[this->id].data), 'i8', ALLOC_STACK))};
-  
-};
-
-
-
-Node::Node(){
-  
-}*/
 
 extern "C" {
   extern int n_selections();
@@ -155,16 +142,120 @@ namespace D3 {
 					   $2)}, this->id, name);
       return *this;
     }
-    
-    //TODO: Try to make this generalize better - there shouldn't
-    //need to be a different function for each specific type.
-    Selection Data(int32_t* values, int length, const char* key=""){
+
+    //Bind an array of JSDataObjects
+    template<std::size_t SIZE>
+    Selection Data(std::array<JSDataObject, SIZE> values, const char* key=""){
+
+      //Using typeid().name() could potentially create problems
+      //because it varies by implementation.
+      //So far it seems to work with emscripten though...
+      //And that's really the only compiler anyone would be using here...
+      std::map<const char *, std::string> map_type_names;
+      map_type_names[typeid(int8_t).name()] = "i8";
+      map_type_names[typeid(int16_t).name()] = "i16";
+      map_type_names[typeid(int32_t).name()] = "i32";
+      map_type_names[typeid(int64_t).name()] = "i64";
+      map_type_names[typeid(float).name()] = "float";
+      map_type_names[typeid(double).name()] = "double";
+      map_type_names[typeid(int8_t*).name()] = "i8*";
+      map_type_names[typeid(int16_t*).name()] = "i16*";
+      map_type_names[typeid(int32_t*).name()] = "i32*";
+      map_type_names[typeid(int64_t*).name()] = "i64*";
+      map_type_names[typeid(float*).name()] = "float*";
+      map_type_names[typeid(double*).name()] = "double*";
+      map_type_names[typeid(void*).name()] = "*";
+      map_type_names[typeid(std::string).name()] = "string";
+
       int update_id = EM_ASM_INT_V({return js.selections.length});
       
+      //Initialize array objects in javascript
+      EM_ASM_ARGS({	    
+	  emp.__data_to_bind = [];
+	  for (i=0; i<$0; i++){
+	    var new_obj = {};
+	    emp.__data_to_bind.push(new_obj);
+	  }
+	}, values.size());
+
+      for (int j = 0; j<SIZE; j++){ //iterate over array
+	for (int i = 0; i<DATA_OBJECT_SIZE; i++){ //iterate over object members
+
+	  //Get variable name and type for this member variable 
+	  std::string var_name = values[j].var_names[i];
+	  std::string type_string = \
+	                map_type_names[values[j].var_types[i].name()];
+
+	  //Make sure member variable is an allowed type
+	  emp_assert(map_type_names.find(values[j].var_types[i].name())	\
+		     != map_type_names.end());
+
+	  //Load data into array of objects
+	  EM_ASM_ARGS({
+	      if (Pointer_stringify($1) == "string"){
+		emp.__data_to_bind[$3][Pointer_stringify($2)] = \
+		  Pointer_stringify($0);  
+	      } else{
+		emp.__data_to_bind[$3][Pointer_stringify($2)] = \
+		  getValue($0, Pointer_stringify($1));  
+	      }
+	    }, values[j].pointers[i], type_string.c_str(), var_name.c_str(), j);
+	}
+      }
+
+      //Do the actual binding
+      EM_ASM_ARGS({
+	  var in_string = Pointer_stringify($1);
+	  var fn = window["emp"][in_string];
+	  if (typeof fn === "function"){
+	    var update_selection = \
+	      js.selections[$0].data(emp.__data_to_bind, fn);
+	  } else {
+	    var update_selection = js.selections[$0].data(emp.__data_to_bind);
+	  }
+	  
+	  js.selections.push(update_selection);
+	}, this->id, key);
+
+      Selection update = Selection(update_id);
+      update.enter = true;
+      update.exit = true;
+      return update;
+    }
+
+    //
+    template<std::size_t SIZE, typename T>
+    Selection Data(std::array<T, SIZE> values, const char* key=""){
+
+      //Using typeid().name() could potentially create problems
+      //because it varies by implementation.
+      //So far it seems to work with emscripten though...
+      //And that's really the only compiler anyone would be using here...
+      std::map<const char *, std::string> map_type_names;
+      map_type_names[typeid(int8_t).name()] = "i8";
+      map_type_names[typeid(int16_t).name()] = "i16";
+      map_type_names[typeid(int32_t).name()] = "i32";
+      map_type_names[typeid(int64_t).name()] = "i64";
+      map_type_names[typeid(double).name()] = "double";
+      map_type_names[typeid(int8_t*).name()] = "i8*";
+      map_type_names[typeid(int16_t*).name()] = "i16*";
+      map_type_names[typeid(int32_t*).name()] = "i32*";
+      map_type_names[typeid(int64_t*).name()] = "i64*";
+      map_type_names[typeid(float*).name()] = "float*";
+      map_type_names[typeid(double*).name()] = "double*";
+      map_type_names[typeid(void*).name()] = "*";
+
+      emp_assert(map_type_names.find(typeid(T).name()) != map_type_names.end());
+
+      int update_id = EM_ASM_INT_V({return js.selections.length});
+      
+      int type_size = sizeof(T);
+      std::string type_string = map_type_names[typeid(T).name()];
+
       EM_ASM_ARGS({
 	  var d = [];
 	  for (i=0; i<$2; i++){
-	    d.push(getValue($1+(i*4), 'i32'));
+	    d.push(getValue($1+(i*$4), Pointer_stringify($5)));
 	  }
 	  var in_string = Pointer_stringify($3);
 	  var fn = window["emp"][in_string];
@@ -175,36 +266,42 @@ namespace D3 {
 	  }
 	  
 	  js.selections.push(update_selection);
-	}, this->id, values, length, key);
+	},this->id, values, values.size(), key, type_size, type_string.c_str());
       Selection update = Selection(update_id);
       update.enter = true;
       update.exit = true;
       return update;
     }
 
+    template<std::size_t SIZE, typename T>
+      void BindDataGuts(){
+
+    }
+
     Selection EnterAppend(const char* type){
 
       int new_id = EM_ASM_INT_V({return js.selections.length});
       
-      if (!this->enter){
-	std::cout << "No valid enter selection" << std::endl;
-	//TODO: this is an error. throw exception
-      }
+      emp_assert(this->enter);
+
       EM_ASM_ARGS({
 	  var append_selection = js.selections[$0]
 	    .enter().append(Pointer_stringify($1));
 	  js.selections.push(append_selection);
 	    }, this->id, type);
+
+      this->enter = false;
+
       return Selection(new_id);
     }
 
     Selection ExitRemove(){
       int new_id = EM_ASM_INT_V({return js.selections.length});
       
-      if (!this->exit){
-	std::cout << "No valid enter selection" << std::endl;
-	//TODO: this is an error. throw exception
-      }
+      emp_assert(this->exit);
+
+      this->exit = false;
+
       EM_ASM_ARGS({
 	  var exit_selection = js.selections[$0].exit().remove();
 	  js.selections.push(exit_selection);
@@ -215,16 +312,14 @@ namespace D3 {
 
     Selection Exit(){
       /* Usually the only thing you want to do with the exit selection
-	 is remove it's contents, in which case you should use the
+	 is remove its contents, in which case you should use the
 	 ExitRemove method. However, advanced users may want to operate
 	 on the exit selection, which is why this method is provided.*/
 	 
       int new_id = EM_ASM_INT_V({return js.selections.length});
       
-      if (!this->exit){
-	std::cout << "No valid enter selection" << std::endl;
-	//TODO: this is an error. throw exception
-      }
+      emp_assert(this->exit);
+
       EM_ASM_ARGS({
 	  var exit_selection = js.selections[$0].exit();
 	  js.selections.push(exit_selection);
@@ -316,10 +411,7 @@ namespace D3 {
     Selection EnterInsert(const char* name, const char* before=NULL){
       int new_id = EM_ASM_INT_V({return js.selections.length});
 
-      if (!this->enter){
-	std::cout << "No valid enter selection" << std::endl;
-	//TODO: this is an error. throw exception
-      }
+      emp_assert(this->enter);
 
       if (before){
 	EM_ASM_ARGS({
@@ -371,10 +463,10 @@ namespace D3 {
 		     js.selections.push(d3.select(this));
 		     fn(new_id);}, $3);
 	  } else {
-	    if (in_string != "null"){
-	      //Should probably throw a proper error
-	      console.log("Warning - on called with invalid listener")
-	    }
+	    //if this isn't the name of a function, then it should be null
+	    //otherwise, the user passed an invalid listener
+	    //emp_assert(in_string == "null"); 
+	    
 	    js.selections[$0].on(Pointer_stringify($1), null);
 	  }
 	  
@@ -513,8 +605,9 @@ namespace D3 {
     return Selection(selector, true);
   }
 
-  Selection ShapesFromData(int32_t* values, int length, const char* shape){
-    Selection s = Select("svg").SelectAll(shape).Data(values, length);
+  template<std::size_t SIZE>
+  Selection ShapesFromData(std::array<int32_t, SIZE> values, const char* shape){
+    Selection s = Select("svg").SelectAll(shape).Data(values);
     s.EnterAppend(shape);
     return s;
   }
