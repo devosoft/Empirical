@@ -41,7 +41,7 @@ struct TestStruct {
                    char, MyChar10)
 };
 
-struct TestStoredVarStruct {
+struct TestIntrospectiveStruct {
   EMP_BUILD_INTROSPECTIVE_TUPLE( int, MyInt,
                    int, MyInt2,
                    int, MyInt3,
@@ -89,9 +89,9 @@ int main(int argc, char* argv[])
   std::cout << "myvar = " << test.myvar << std::endl;
   std::cout << "MyInt = " << test.MyInt() << std::endl;
 
-  TestStoredVarStruct test2;
+  TestIntrospectiveStruct test2;
   test2.MyInt(8);
   std::cout << "MyInt = " << test2.MyInt() << std::endl;
   std::cout << "First variable name: " << test2.var_names[0] << std::endl;
-  
+  std::cout << "MyInt from pointer: " << *(int*)test2.pointers[0] << std::endl;
 }
