@@ -17,11 +17,10 @@
 //
 //  ===== Managing variadic arguments =====
 //  EMP_COUNT_ARGS(...) returns the number of arguments in the __VA_ARGS__
-//
 //  EMP_GET_ARG_*(...) replace * with number and will return the arg at that position.
-//
 //  EMP_DUPLICATE_ARGS(N, ...) makes N collated copies of all args to follow.
-//
+//  EMP_CROP_ARGS(N, ...) reduces N args (must have at least that many)
+//  EMP_FORCE_ARGS_TO(N, P, ...) Crops or pads (with p) args to be exactly N long.
 //  EMP_GET_ODD_ARGS(...) will return all arguments at odd positions (1,3,5,7, etc.)
 //  EMP_GET_EVEN_ARGS(...) will return all arguments at odd positions (2,4,6,8, etc.)
 //  EMP_REVERSE_ARGS(...) Reverse the order of arguments passed in.
@@ -192,6 +191,77 @@
 #define EMP_DUPLICATE_ARGS_63(...) EMP_DUPLICATE_ARGS_62(__VA_ARGS__), __VA_ARGS__
 #define EMP_DUPLICATE_ARGS_64(...) EMP_DUPLICATE_ARGS_63(__VA_ARGS__), __VA_ARGS__
 
+// Save the first N args (assumes at least N args exist!
+#define EMP_CROP_ARGS(N, ...) EMP_CROP_ARGS_TO_ ## N (__VA_ARGS__, ~)
+#define EMP_CROP_ARGS_TO_1(A, ...) A
+#define EMP_CROP_ARGS_TO_2(A, B, ...) A, B
+#define EMP_CROP_ARGS_TO_3(A, B, C, ...) A, B, C
+#define EMP_CROP_ARGS_TO_4(A, B, C, D, ...) A, B, C, D
+#define EMP_CROP_ARGS_TO_5(A, B, C, D, E, ...) A, B, C, D, E
+#define EMP_CROP_ARGS_TO_6(A, B, C, D, E, F, ...) A, B, C, D, E, F
+#define EMP_CROP_ARGS_TO_7(A, ...) A, EMP_CROP_ARGS_TO_6(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_8(A, ...) A, EMP_CROP_ARGS_TO_7(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_9(A, ...) A, EMP_CROP_ARGS_TO_8(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_10(A, ...) A, EMP_CROP_ARGS_TO_9(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_11(A, ...) A, EMP_CROP_ARGS_TO_10(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_12(A, ...) A, EMP_CROP_ARGS_TO_11(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_13(A, ...) A, EMP_CROP_ARGS_TO_12(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_14(A, ...) A, EMP_CROP_ARGS_TO_13(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_15(A, ...) A, EMP_CROP_ARGS_TO_14(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_16(A, ...) A, EMP_CROP_ARGS_TO_15(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_17(A, ...) A, EMP_CROP_ARGS_TO_16(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_18(A, ...) A, EMP_CROP_ARGS_TO_17(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_19(A, ...) A, EMP_CROP_ARGS_TO_18(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_20(A, ...) A, EMP_CROP_ARGS_TO_19(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_21(A, ...) A, EMP_CROP_ARGS_TO_20(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_22(A, ...) A, EMP_CROP_ARGS_TO_21(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_23(A, ...) A, EMP_CROP_ARGS_TO_22(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_24(A, ...) A, EMP_CROP_ARGS_TO_23(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_25(A, ...) A, EMP_CROP_ARGS_TO_24(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_26(A, ...) A, EMP_CROP_ARGS_TO_25(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_27(A, ...) A, EMP_CROP_ARGS_TO_26(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_28(A, ...) A, EMP_CROP_ARGS_TO_27(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_29(A, ...) A, EMP_CROP_ARGS_TO_28(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_30(A, ...) A, EMP_CROP_ARGS_TO_29(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_31(A, ...) A, EMP_CROP_ARGS_TO_30(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_32(A, ...) A, EMP_CROP_ARGS_TO_31(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_33(A, ...) A, EMP_CROP_ARGS_TO_32(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_34(A, ...) A, EMP_CROP_ARGS_TO_33(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_35(A, ...) A, EMP_CROP_ARGS_TO_34(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_36(A, ...) A, EMP_CROP_ARGS_TO_35(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_37(A, ...) A, EMP_CROP_ARGS_TO_36(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_38(A, ...) A, EMP_CROP_ARGS_TO_37(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_39(A, ...) A, EMP_CROP_ARGS_TO_38(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_40(A, ...) A, EMP_CROP_ARGS_TO_39(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_41(A, ...) A, EMP_CROP_ARGS_TO_40(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_42(A, ...) A, EMP_CROP_ARGS_TO_41(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_43(A, ...) A, EMP_CROP_ARGS_TO_42(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_44(A, ...) A, EMP_CROP_ARGS_TO_43(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_45(A, ...) A, EMP_CROP_ARGS_TO_44(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_46(A, ...) A, EMP_CROP_ARGS_TO_45(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_47(A, ...) A, EMP_CROP_ARGS_TO_46(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_48(A, ...) A, EMP_CROP_ARGS_TO_47(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_49(A, ...) A, EMP_CROP_ARGS_TO_48(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_50(A, ...) A, EMP_CROP_ARGS_TO_49(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_51(A, ...) A, EMP_CROP_ARGS_TO_50(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_52(A, ...) A, EMP_CROP_ARGS_TO_51(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_53(A, ...) A, EMP_CROP_ARGS_TO_52(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_54(A, ...) A, EMP_CROP_ARGS_TO_53(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_55(A, ...) A, EMP_CROP_ARGS_TO_54(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_56(A, ...) A, EMP_CROP_ARGS_TO_55(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_57(A, ...) A, EMP_CROP_ARGS_TO_56(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_58(A, ...) A, EMP_CROP_ARGS_TO_57(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_59(A, ...) A, EMP_CROP_ARGS_TO_58(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_60(A, ...) A, EMP_CROP_ARGS_TO_59(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_61(A, ...) A, EMP_CROP_ARGS_TO_60(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_62(A, ...) A, EMP_CROP_ARGS_TO_61(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_63(A, ...) A, EMP_CROP_ARGS_TO_62(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_64(A, ...) A, EMP_CROP_ARGS_TO_63(__VA_ARGS__)
+
+// Force arguments to a specific number.  If less, pad them; if more crop them.
+#define EMP_FORCE_ARGS_TO(N, PAD, ...) EMP_CROP_ARGS(N, __VA_ARGS__, EMP_DUPLICATE_ARGS(N, PAD))
+
+// Trim arguments by taking only odd or even positions.
 #define EMP_GET_ODD_ARGS(...) EMP_ASSEMBLE_MACRO(EMP_GET_ODD_ARGS_, EMP_COUNT_ARGS(__VA_ARGS__), __VA_ARGS__)
 #define EMP_GET_ODD_ARGS_1(A) A
 #define EMP_GET_ODD_ARGS_2(A, B) A
