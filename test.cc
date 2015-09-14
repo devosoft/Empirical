@@ -6,68 +6,9 @@
 #include "selection.h"
 #include "../Empirical/emtools/JSWrap.h"
 #include "../Empirical/tools/tuple_struct.h"
+#include "scales.h"
 
-struct JSDataObject;/*{
-  int myvar;
-  EMP_BUILD_TUPLE( int, val,
-		   std::string, word)
-		   };*/
-
-
-/*class JSObject{
-
-public:
-  JSObject();
-};
-
-JSObject::JSObject(){
-
-  
-
-  //This is probably not possible
-
-  int buffer = EM_ASM_INT_V({
-      var d = ({val: 4, word: "hi"});
-      var buffer = Module._malloc(JSON.stringify(d).length+1);
-      Module.writeStringToMemory(JSON.stringify(d), buffer);
-      return buffer;
-    });
-   char* string_object = (char*)(buffer);
-   std::map<std::string, std::string> variables;
-   //std::cout << "string object " << string_object << std::endl;
-   char* token = std::strtok(string_object, ",");
-   std::cout << "first token " << token << std::endl;
-   while (token != NULL){
-     std::string string_token = std::string(token);
-     size_t location = string_token.find(":");
-     std::cout << "location " << location << std::endl;
-     if (location != std::string::npos){
-
-       std::string first = string_token.substr(0, location);
-       if (strncmp(&first.front(), "{", 1) == 0){
-	 first = first.substr(1);
-       }
-       std::string second = string_token.substr(location+1);
-       if (strncmp(&second.back(), "}", 1) == 0){
-	 second = second.substr(0, second.length()-1);
-       }
-       std::cout << "first " << first << std::endl;
-       std::cout << "second " << second << std::endl;
-       variables[first] = second;
-     }
-     token = std::strtok(NULL, ",");
-   }
-   
-   auto it = variables.begin();
-
-   struct ObjectStruct {
-     EMP_BUILD_TUPLE(std::string, it->first 
-     );
-   };
-   ObjectStruct test;
-   test.
-  
-}*/
+struct JSDataObject;
 
 int return_val(JSDataObject d, int i=0, int k=0){
   //std::cout << d.word() << std::endl;
@@ -97,7 +38,11 @@ int main()
 
   //D3::Selection s = svg.SelectAll("circle");
  
-  std::cout << n_selections() << std::endl;
+  std::cout << n_objects() << std::endl;
+
+  D3::LinearScale s = D3::LinearScale();
+  s.SetRange(std::array<int,2>({2,3}));
+
   std::array<int32_t, 3> test_data = {10,30,60};
   JSDataObject test_obj_1;
   test_obj_1.val() = 10;
@@ -123,6 +68,7 @@ int main()
   //D3::Selection enter = data_bind[1];
   //update.EnterAppend("circle");
   D3::Selection circles = D3::Selection("circle", true);
+  circles.Sort();
   circles.SetAttr("cx", 25);
   circles.SetAttr("cy", 25);
   circles.SetAttr("r", 25);

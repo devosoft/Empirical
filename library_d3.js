@@ -1,7 +1,7 @@
 var D3Library = {
-    $js: {selections:[]},
-    n_selections: function(){
-	return js.selections.length;
+    $js: {objects:[], charts:[]},
+    n_objects: function(){
+	return js.objects.length;
     },
 };
 

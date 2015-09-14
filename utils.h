@@ -1,3 +1,6 @@
+#ifndef __UTILS_H__
+#define __UTILS_H__
+
 #include <map>
 #include <emscripten.h>
 #include <string>
@@ -14,21 +17,22 @@
       var in_string = Pointer_stringify($2);				\
       var fn = window["d3"][in_string];					\
       if (typeof fn === "function"){					\
-	var new_sel = js.selections[$0].FUNC(arg1, fn);			\
+	var new_sel = js.objects[$0].FUNC(arg1, fn);			\
       } else {								\
 	var fn = window["emp"][in_string];				\
 	if (typeof fn === "function"){					\
-	  var new_sel = js.selections[$0].FUNC(arg1, fn);		\
+	  var new_sel = js.objects[$0].FUNC(arg1, fn);			\
 	} else {							\
 	  var fn = window[in_string];					\
 	  if (typeof fn === "function"){				\
-	    var new_sel = js.selections[$0].FUNC(arg1, fn);		\
+	    var new_sel = js.objects[$0].FUNC(arg1, fn);		\
 	  } else {							\
-	    var new_sel = js.selections[$0].FUNC(arg1, in_string);	\
+	    var new_sel = js.objects[$0].FUNC(arg1, in_string);		\
 	  }								\
 	}								\
       }									\
-    }, this->id, ARG1, ARG2);
+      emp.__new_object = new_sel;					\
+      }, this->id, ARG1, ARG2);
 
 //The same as CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS except for FUNCs
 //that only accept a single argument (the string that might or might not
@@ -38,20 +42,21 @@
       var in_string = Pointer_stringify($1);				\
       var fn = window["d3"][in_string];					\
       if (typeof fn === "function"){					\
-	var new_sel = js.selections[$0].FUNC(fn);			\
+	var new_sel = js.objects[$0].FUNC(fn);				\
       } else {								\
 	var fn = window["emp"][in_string];				\
 	if (typeof fn === "function"){					\
-	  var new_sel = js.selections[$0].FUNC(fn);			\
+	  var new_sel = js.objects[$0].FUNC(fn);			\
 	} else {							\
 	  var fn = window[in_string];					\
 	  if (typeof fn === "function"){				\
-	    var new_sel = js.selections[$0].FUNC(fn);			\
+	    var new_sel = js.objects[$0].FUNC(fn);			\
 	  } else {							\
-	    var new_sel = js.selections[$0].FUNC(in_string);		\
+	    var new_sel = js.objects[$0].FUNC(in_string);		\
 	  }								\
 	}								\
       }									\
+      emp.__new_object = new_sel;					\
     }, this->id, ARG1);	
 
 
@@ -133,3 +138,7 @@ void PassArrayToJavascript(std::array<JSDataObject,SIZE> values){
     }
   }
 }
+
+void StoreNewObject(){EM_ASM({js.objects.push(emp.__new_object);});}
+
+#endif
