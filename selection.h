@@ -6,7 +6,7 @@
 #include "../Empirical/tools/assert.h"
 #include <array>
 #include "../Empirical/emtools/js_object_struct.h"
-
+#include "utils.h"
 
 extern "C" {
   extern int n_selections();
@@ -56,22 +56,13 @@ namespace D3 {
     }
 
     Selection SetAttr(const char* name, const char* value){
-      /* Assigns [value] to the selections='s [name] attribute.
-	 This method handles numeric values - use SetAttrString
-	 for non-numeric values. 
+      /* Assigns [value] to the selections's [name] attribute.
 	 
 	 This will break if someone happens to use a string that
 	 is identical to a function name... but that's unlikely, right?
       */
 
-      EM_ASM_ARGS({
-	  var in_string = Pointer_stringify($2);
-	  var fn = window["emp"][in_string];
-	  if (typeof fn === "function"){
-	    js.selections[$0].attr(Pointer_stringify($1), fn);
-	  } else {
-	    js.selections[$0].attr(Pointer_stringify($1), in_string);
-	  }}, this->id, name, value);
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS(attr, name, value)
       return *this;
     }
 
@@ -99,14 +90,7 @@ namespace D3 {
 	    }}, this->id, name, value);
       }
       else {
-	EM_ASM_ARGS({
-	    var in_string = Pointer_stringify($2);
-	    var fn = window["emp"][in_string];
-	    if (typeof fn === "function"){
-	      js.selections[$0].style(Pointer_stringify($1), fn);
-	    } else {
-	      js.selections[$0].style(Pointer_stringify($1), in_string);
-	    }}, this->id, name, value);
+	CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS(style, name, value)
       }
       return *this;
     }
@@ -125,14 +109,7 @@ namespace D3 {
     }
 
     Selection SetProperty(const char* name, const char* value){
-      EM_ASM_ARGS({
-	  var in_string = Pointer_stringify($2);
-	  var fn = window["emp"][in_string];
-	  if (typeof fn === "function"){
-	    js.selections[$0].property(Pointer_stringify($1), fn);
-	  } else {
-	    js.selections[$0].property(Pointer_stringify($1), in_string);
-	  }}, this->id, name);
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS(property, name, value)
       return *this;
     }
 
@@ -143,142 +120,37 @@ namespace D3 {
       return *this;
     }
 
-    //Bind an array of JSDataObjects
-    template<std::size_t SIZE>
-    Selection Data(std::array<JSDataObject, SIZE> values, const char* key=""){
-
-      //Using typeid().name() could potentially create problems
-      //because it varies by implementation.
-      //So far it seems to work with emscripten though...
-      //And that's really the only compiler anyone would be using here...
-      std::map<const char *, std::string> map_type_names;
-      map_type_names[typeid(int8_t).name()] = "i8";
-      map_type_names[typeid(int16_t).name()] = "i16";
-      map_type_names[typeid(int32_t).name()] = "i32";
-      map_type_names[typeid(int64_t).name()] = "i64";
-      map_type_names[typeid(float).name()] = "float";
-      map_type_names[typeid(double).name()] = "double";
-      map_type_names[typeid(int8_t*).name()] = "i8*";
-      map_type_names[typeid(int16_t*).name()] = "i16*";
-      map_type_names[typeid(int32_t*).name()] = "i32*";
-      map_type_names[typeid(int64_t*).name()] = "i64*";
-      map_type_names[typeid(float*).name()] = "float*";
-      map_type_names[typeid(double*).name()] = "double*";
-      map_type_names[typeid(void*).name()] = "*";
-      map_type_names[typeid(std::string).name()] = "string";
-
+    template<std::size_t SIZE, typename T>
+    Selection Data(std::array<T, SIZE> values, const char* key=""){
       int update_id = EM_ASM_INT_V({return js.selections.length});
-      
-      //Initialize array objects in javascript
-      EM_ASM_ARGS({	    
-	  emp.__data_to_bind = [];
-	  for (i=0; i<$0; i++){
-	    var new_obj = {};
-	    emp.__data_to_bind.push(new_obj);
-	  }
-	}, values.size());
+      PassArrayToJavascript(values);
 
-      for (int j = 0; j<SIZE; j++){ //iterate over array
-	for (int i = 0; i<DATA_OBJECT_SIZE; i++){ //iterate over object members
-
-	  //Get variable name and type for this member variable 
-	  std::string var_name = values[j].var_names[i];
-	  std::string type_string = \
-	                map_type_names[values[j].var_types[i].name()];
-
-	  //Make sure member variable is an allowed type
-	  emp_assert(map_type_names.find(values[j].var_types[i].name())	\
-		     != map_type_names.end());
-
-	  //Load data into array of objects
-	  EM_ASM_ARGS({
-	      if (Pointer_stringify($1) == "string"){
-		emp.__data_to_bind[$3][Pointer_stringify($2)] = \
-		  Pointer_stringify($0);  
-	      } else{
-		emp.__data_to_bind[$3][Pointer_stringify($2)] = \
-		  getValue($0, Pointer_stringify($1));  
-	      }
-	    }, values[j].pointers[i], type_string.c_str(), var_name.c_str(), j);
-	}
-      }
-
-      //Do the actual binding
       EM_ASM_ARGS({
 	  var in_string = Pointer_stringify($1);
 	  var fn = window["emp"][in_string];
 	  if (typeof fn === "function"){
-	    var update_selection = \
-	      js.selections[$0].data(emp.__data_to_bind, fn);
+	    var update_sel = js.selections[$0].data(emp.__incoming_array, fn);
 	  } else {
-	    var update_selection = js.selections[$0].data(emp.__data_to_bind);
+	    var update_sel = js.selections[$0].data(emp.__incoming_array);
 	  }
 	  
-	  js.selections.push(update_selection);
-	}, this->id, key);
-
+	  js.selections.push(update_sel);
+	},this->id, key);
+     
       Selection update = Selection(update_id);
       update.enter = true;
       update.exit = true;
       return update;
-    }
-
-    //
-    template<std::size_t SIZE, typename T>
-    Selection Data(std::array<T, SIZE> values, const char* key=""){
-
-      //Using typeid().name() could potentially create problems
-      //because it varies by implementation.
-      //So far it seems to work with emscripten though...
-      //And that's really the only compiler anyone would be using here...
-      std::map<const char *, std::string> map_type_names;
-      map_type_names[typeid(int8_t).name()] = "i8";
-      map_type_names[typeid(int16_t).name()] = "i16";
-      map_type_names[typeid(int32_t).name()] = "i32";
-      map_type_names[typeid(int64_t).name()] = "i64";
-      map_type_names[typeid(double).name()] = "double";
-      map_type_names[typeid(int8_t*).name()] = "i8*";
-      map_type_names[typeid(int16_t*).name()] = "i16*";
-      map_type_names[typeid(int32_t*).name()] = "i32*";
-      map_type_names[typeid(int64_t*).name()] = "i64*";
-      map_type_names[typeid(float*).name()] = "float*";
-      map_type_names[typeid(double*).name()] = "double*";
-      map_type_names[typeid(void*).name()] = "*";
-
-      emp_assert(map_type_names.find(typeid(T).name()) != map_type_names.end());
-
-      int update_id = EM_ASM_INT_V({return js.selections.length});
-      
-      int type_size = sizeof(T);
-      std::string type_string = map_type_names[typeid(T).name()];
-
-      EM_ASM_ARGS({
-	  var d = [];
-	  for (i=0; i<$2; i++){
-	    d.push(getValue($1+(i*$4), Pointer_stringify($5)));
-	  }
-	  var in_string = Pointer_stringify($3);
-	  var fn = window["emp"][in_string];
-	  if (typeof fn === "function"){
-	    var update_selection = js.selections[$0].data(d, fn);
-	  } else {
-	    var update_selection = js.selections[$0].data(d);
-	  }
-	  
-	  js.selections.push(update_selection);
-	},this->id, values, values.size(), key, type_size, type_string.c_str());
-      Selection update = Selection(update_id);
-      update.enter = true;
-      update.exit = true;
-      return update;
-    }
-
-    template<std::size_t SIZE, typename T>
-      void BindDataGuts(){
-
     }
 
     Selection EnterAppend(const char* type){
+      /*This function appends the specified type of nodes to this
+	selection's enter selection, which merges the enter selection
+	with the update selection.
+
+	Triggers an assertion error if this selection has no valid enter
+	selection.
+       */
 
       int new_id = EM_ASM_INT_V({return js.selections.length});
       
@@ -296,6 +168,13 @@ namespace D3 {
     }
 
     Selection ExitRemove(){
+      /*Pretty much the only thing you ever want to do with the exit() selection
+	is remove all of the nodes in it. This function does just that.
+
+	Triggers an assertion error if this selection has no valid exit
+	selection.
+       */
+
       int new_id = EM_ASM_INT_V({return js.selections.length});
       
       emp_assert(this->exit);
@@ -314,7 +193,10 @@ namespace D3 {
       /* Usually the only thing you want to do with the exit selection
 	 is remove its contents, in which case you should use the
 	 ExitRemove method. However, advanced users may want to operate
-	 on the exit selection, which is why this method is provided.*/
+	 on the exit selection, which is why this method is provided.
+
+	 Returns a selection object pointing at this selection's exit selection.
+      */
 	 
       int new_id = EM_ASM_INT_V({return js.selections.length});
       
@@ -353,25 +235,11 @@ namespace D3 {
     }
 
     void SetText(const char* text){
-      EM_ASM_ARGS({
-	  var in_string = Pointer_stringify($1);
-	  var fn = window["emp"][in_string];
-	  if (typeof fn === "function"){
-	    js.selections[$0].text(fn);
-	  } else {
-	    js.selections[$0].text(in_string);
-	  }}, this->id, text);
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(text, text)
     }
 
     void SetHtml(const char* value){
-      EM_ASM_ARGS({
-	  var in_string = Pointer_stringify($1);
-	  var fn = window["emp"][in_string];
-	  if (typeof fn === "function"){
-	    js.selections[$0].html(fn);
-	  } else {
-	    js.selections[$0].html(in_string);
-	  }}, this->id, value);
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(html, value)
     }    
 
     Selection Transition(const char* name=""){
@@ -532,18 +400,65 @@ namespace D3 {
       return (char *)buffer;
     }
 
+    void Sort(const char * comparator = "ascending"){
+      /* Sort the selection by the given comparator function. The function
+	 is indicated as a string and can either be in the d3 namespace,
+	 the emp namespace (as results from JSWrapping C++ functions), or the
+	 window namespace. These three options are checked sequentially in that
+	 order, so a C++ function with the same name as d3 built-in will not
+	 override the built-in. Similarly, a function declared directly in the
+	 window will be overriden by a JSWrapped function with the same name.
+       */
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(sort, comparator)
+    }
+
+    void Each(const char * function){
+      /* Call the given function on each element of the selection. The function
+	 is indicated as a string and can either be in the d3 namespace,
+	 the emp namespace (as results from JSWrapping C++ functions), or the
+	 window namespace. These three options are checked sequentially in that
+	 order, so a C++ function with the same name as d3 built-in will not
+	 override the built-in. Similarly, a function declared directly in the
+	 window will be overriden by a JSWrapped function with the same name.
+       */
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(each, function)
+    }
+
+    void Call(const char * function){
+      /* Call the given function once on the entire selection. The function
+	 is indicated as a string and can either be in the d3 namespace,
+	 the emp namespace (as results from JSWrapping C++ functions), or the
+	 window namespace. These three options are checked sequentially in that
+	 order, so a C++ function with the same name as d3 built-in will not
+	 override the built-in. Similarly, a function declared directly in the
+	 window will be overriden by a JSWrapped function with the same name.
+
+	 TODO: Allow arguments
+       */
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(call, function)
+    }
+
+    Selection Filter(const char * selector){
+      /* Returns a new selection, representing the current selection
+	 filtered by the given string. The string can represent a function
+	 in either the d3, emp, or window namespaces (as described in Sort),
+	 or it can be a filter selector. Using a filter selector that somehow
+	 has the same name as a function in one of the allowed namespaces
+	 will create a problem, but shouldn't actually be possible.
+       */
+
+      int new_id = EM_ASM_INT_V({return js.selections.length});
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(filter, selector)
+      return Selection(new_id);
+    }
 
     //TODO:
     //
     //GetClassed()
     //SetClassed()
         
-    //Filter() //requires callbacks
     //Datum() //requires callbacks
-    //Sort() //requires callbacks
 
-    //Each() //requires callbacks
-    //Call() //requires callbacks
     //Node() //Is the node a selection? Do we even need this?
 
     //EnterCall //requires callbacks
