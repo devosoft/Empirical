@@ -4,26 +4,10 @@
 #include "../../tools/assert.h"
 #include "../../tools/command_line.h"
 #include "../../tools/macros.h"
+#include "../../tools/unit_tests.h"
 
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]
-
-// EMP_TEST_MACRO takes in a macro call and a string representing the expected result
-// It will assert that the stringifyied macro result is the expected string AND
-// it will print this information if the -v flag is set. 
-#define EMP_TEST_MACRO( MACRO, EXP_RESULT )                             \
-  if (true) {                                                           \
-    std::string result = std::string(EMP_STRINGIFY( MACRO ));           \
-    bool match = (result == EXP_RESULT);                                \
-    if (verbose || !match) {                                            \
-      std::cout << #MACRO << " == " << result << std::endl;             \
-    }                                                                   \
-    if (!match) {                                                       \
-      std::cout << "MATCH FAILED!  Expected: "                          \
-                << EXP_RESULT << std::endl;                             \
-      abort();                                                          \
-    }                                                                   \
-  }
 
 int main(int argc, char* argv[])
 {
