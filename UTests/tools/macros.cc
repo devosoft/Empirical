@@ -41,8 +41,8 @@ int main(int argc, char* argv[])
   EMP_TEST_MACRO( EMP_STRINGIFY("abcdef"), "\"\\\"abcdef\\\"\"" );
 
   // Make sure we can assemble arbitrary macros
-  EMP_TEST_MACRO( EMP_ASSEMBLE_MACRO( EMP_GET_ARG_, 2, x, y, z ), "y" );
-  
+  EMP_TEST_MACRO( EMP_ASSEMBLE_MACRO_1ARG( EMP_GET_ARG_, 2, x, y, z ), "y" );
+
 
   // Make sure we can wrap each argument in a macro.
   EMP_TEST_MACRO( EMP_WRAP_EACH(EMP_DECORATE, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p), "[a] [b] [c] [d] [e] [f] [g] [h] [i] [j] [k] [l] [m] [n] [o] [p]" );
@@ -64,6 +64,8 @@ int main(int argc, char* argv[])
   EMP_TEST_MACRO( EMP_FORCE_ARGS_TO(7, x, a, b, c, d), "a, b, c, d, x, x, x" );
 
   // Test collect only-odd or only-even arguments.
+  EMP_TEST_MACRO( EMP_GET_ODD_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), "1, 3, 5, 7, 9, 11");
+  EMP_TEST_MACRO( EMP_GET_EVEN_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), "2, 4, 6, 8, 10, 12");
   EMP_TEST_MACRO( EMP_GET_ODD_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), "1, 3, 5, 7, 9, 11, 13");
   EMP_TEST_MACRO( EMP_GET_EVEN_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), "2, 4, 6, 8, 10, 12");
 
