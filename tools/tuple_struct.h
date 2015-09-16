@@ -65,8 +65,7 @@
 // We have to figure out how many arguments we have.
 // To get the last arg first (and know its position), reverse all arguments before sending them on.
 #define EMP_BUILD_TUPLE_IMPL(TUPLE_NAME, ...) \
-  EMP_ASSEMBLE_MACRO(EMP_BUILD_TUPLE_IMPL_, EMP_COUNT_ARGS(__VA_ARGS__), \
-                     TUPLE_NAME, EMP_REVERSE_ARGS(__VA_ARGS__) )
+  EMP_ASSEMBLE_MACRO_1ARG(EMP_BUILD_TUPLE_IMPL_, TUPLE_NAME, EMP_REVERSE_ARGS(__VA_ARGS__) )
 
 #define EMP_BUILD_TUPLE_IMPL_2(TNAME, NAME, TYPE)  \
                                              EMP_BUILD_TUPLE_ACCESSORS(TNAME, 0, TYPE, NAME)
@@ -151,15 +150,15 @@
 //Helper for EMP_BUILD_INTROSPECTIVE_TUPLE below
 //Also can be called directly if you want a tuple with a name other than
 //emp__tuple_body with stored variables.
-#define EMP_BUILD_INTROSPECTIVE_NAMED_TUPLE(TUPLE_NAME, ...)	\
-  std::tuple< EMP_GET_ODD_ARGS(__VA_ARGS__) > TUPLE_NAME;	\
-  EMP_BUILD_TUPLE_IMPL(TUPLE_NAME, __VA_ARGS__) \
+#define EMP_BUILD_INTROSPECTIVE_NAMED_TUPLE(TUPLE_NAME, ...)            \
+  std::tuple< EMP_GET_ODD_ARGS(__VA_ARGS__) > TUPLE_NAME;               \
+  EMP_BUILD_TUPLE_IMPL(TUPLE_NAME, __VA_ARGS__);                        \
   std::array<std::string, EMP_COUNT_ARGS(EMP_GET_EVEN_ARGS(__VA_ARGS__))> \
-    var_names = {EMP_GET_EVEN_ARGS(EMP_STRINGIFY_EACH(__VA_ARGS__))};	\
+  var_names{{EMP_GET_EVEN_ARGS(EMP_STRINGIFY_EACH(__VA_ARGS__))}};      \
   std::array<std::type_index, EMP_COUNT_ARGS(EMP_GET_ODD_ARGS(__VA_ARGS__))> \
-    var_types = {EMP_WRAP_ARGS(GET_TYPEID, EMP_GET_ODD_ARGS(__VA_ARGS__))}; \
-  std::array<void *, EMP_COUNT_ARGS(EMP_GET_EVEN_ARGS(__VA_ARGS__))> pointers \
-    = {EMP_WRAP_ARGS(GET_POINTER, EMP_GET_EVEN_ARGS(__VA_ARGS__))};
+  var_types{{EMP_WRAP_ARGS(GET_TYPEID, EMP_GET_ODD_ARGS(__VA_ARGS__))}}; \
+  std::array<void *, EMP_COUNT_ARGS(EMP_GET_EVEN_ARGS(__VA_ARGS__))>    \
+  pointers{{EMP_WRAP_ARGS(GET_POINTER, EMP_GET_EVEN_ARGS(__VA_ARGS__))}};
 
 //This varient of the tuple building macro can be used in situations where 
 //access to stringified versions of variable names is necessary.
