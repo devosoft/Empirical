@@ -37,18 +37,40 @@
 //  EMP_DEC_x resolves to x-1 (for a number in the place of x)
 //  EMP_HALF_x resolves to x/2
 //
+//  ===== Macro Building =====
+//  EMP_ASSEMBLE_MACRO takes in a prefix and set of arguments and appends the size of the
+//  number of arguments to the prefix, and passes in all of the arguments.
+//
+//  EMP_ASSEMBLE_MACRO_1ARG assumes the first argument after the prefix should not count
+//  toward the size, but passed in anyway. (*_2ARG also works for two arguments).
+//
+//  EMP_FAKE_ARG or EMP_FAKE_2ARG behave as a single argument.  If, in manipulating them
+//  You make them become EMP_CONVERT_ARG_EMP_FAKE_ARG(A) or EMP_CONVERT_ARG_EMP_FAKE_2ARG(A)
+//  (i.e., prepend with EMP_CONVERT and provide an argument) it will trigger a conversion.
+//  If you prepend anything else similarly, it wil NOT trigger a conversion.
+//  
+//  This is especially useful with _2ARG since anything unconverted will be a single
+//  argument, while anything converted will be two, allowing us to shift arguments
+//  to perform conditional behaviors.
+//
+//
 //  Development Notes:
-//  * We need to fix who we handle macros that covert inputs to comma-separated results,
-//    from those that merge them all together.  One option is to have comma-separated the
+//  * We need to standardize how we handle macros that covert inputs to comma-separated
+//    results vs those that merge them together.  One option is to have comma-separated the
 //    default and then have an EMP_REMOVE_COMMAS (or somesuch)
-//  * EMP_TYPES_TO_ARGS (not yet list above) is poorly name.  Maybe EMP_DECLARE_ARGS?
-//  * It would be useful to have EMP_WRAP_WITH_ID which passes in the position ID as
-//    the second argument.  This would allow us to, for example, redo EMP_TYPES_TO_ARGS.
-//  * Simplify EMP_ASSEMBLE_MACRO so that it just takes the args and automatically counts
-//    them so you don't need to pass them in twice.
+//  * EMP_TYPES_TO_ARGS (not yet list above) is poorly named.  Maybe EMP_DECLARE_ARGS?
+//  * It would be useful to have EMP_WRAP_WITH_ID which passes in the position ID as the
+//    second argument.  This would allow us to, for example, streamline EMP_TYPES_TO_ARGS.
 //
 
 #define EMP_COMMA ,
+
+// The below values allow you to have EMP_FAKE_ARG or EMP_FAKE_2ARG as a single argument.
+// If you prepend it with EMP_CONVERT it will trigger a conversion.  If you prepend anything
+// else similarly, it wil NOT triggera a conversion (and stay a single argument)
+#define EMP_CONVERT_ARG_EMP_FAKE_ARG(A) A
+#define EMP_CONVERT_ARG_EMP_FAKE_2ARG(A) ~, A
+
 
 // EMP_STRINGIFY takes any input, processes macros, and puts the result in quotes.
 #define EMP_STRINGIFY(...) EMP_STRINGIFY_IMPL(__VA_ARGS__)
@@ -751,7 +773,8 @@
 
 
 // Some basic math macros.  Since brute force is the only way to do math with macros...
-#define EMP_INC(X) EMP_INC_ ## X
+#define EMP_INC(X) EMP_INC_IMPL(X)
+#define EMP_INC_IMPL(X) EMP_INC_ ## X
 #define EMP_INC_0  1
 #define EMP_INC_1  2
 #define EMP_INC_2  3
@@ -817,7 +840,8 @@
 #define EMP_INC_62  63
 #define EMP_INC_63  64
 
-#define EMP_DEC(X) EMP_DEC_ ## X
+#define EMP_DEC(X) EMP_DEC_IMPL(X)
+#define EMP_DEC_IMPL(X) EMP_DEC_ ## X
 #define EMP_DEC_0  -1
 #define EMP_DEC_1  0
 #define EMP_DEC_2  1
@@ -883,7 +907,8 @@
 #define EMP_DEC_62  61
 #define EMP_DEC_63  62
 
-#define EMP_HALF(X) EMP_HALF_ ## X
+#define EMP_HALF(X) EMP_HALF_IMPL(X)
+#define EMP_HALF_IMPL(X) EMP_HALF_ ## X
 #define EMP_HALF_0  0
 #define EMP_HALF_1  0
 #define EMP_HALF_2  1
