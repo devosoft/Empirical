@@ -82,6 +82,6 @@ int main(int argc, char* argv[])
 
   EMP_TEST_MACRO( EMP_STRINGIFY_EACH(some, words), "\"some\", \"words\"" );
 
-  std::cout << "All tests passed." << std::endl;
+  if (verbose) std::cout << "All tests passed." << std::endl;
 }
 

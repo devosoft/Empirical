@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
 
   ptr_set[3]->Delete();
 
-  std::cout << ptr_set[0]->DebugGetCount() << std::endl;
+  // std::cout << ptr_set[0]->DebugGetCount() << std::endl;
 
   // @CAO Make sure we don't delete below 0
   // @CAO Make sure we don't delete below 1 if we own it

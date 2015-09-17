@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
   // emp::Graph graph( emp::build_graph_random(20, 40, random) );
   emp::Graph graph( emp::build_graph_grid(5, 4, random) );
 
-  graph.PrintSym();
+  // graph.PrintSym();
   
   if (verbose) std::cout << "Done!" << std::endl;
 }
