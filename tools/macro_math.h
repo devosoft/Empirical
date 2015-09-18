@@ -527,60 +527,75 @@
 #define EMP_BIN_TO_VAL_11111111  255
 
 
-#define EMP_COUNT_BITS(A,B) EMP_COUNT_BITS_IMPL(A,B)
-#define EMP_COUNT_BITS_IMPL(A,B) EMP_COUNT_BITS_ ## A ## B
-#define EMP_COUNT_BITS_00 0
-#define EMP_COUNT_BITS_01 1
-#define EMP_COUNT_BITS_10 1
-#define EMP_COUNT_BITS_11 2
+// Possible bit values during computation are:
+// 0 or 1 (normal bits)
+// 2 (after an ADD)
+// N (for -1; after a SUB)
+
+
+#define EMP_MATH_COUNT_BITS(A,B) EMP_MATH_COUNT_BITS_IMPL(A,B)
+#define EMP_MATH_COUNT_BITS_IMPL(A,B) EMP_MATH_COUNT_BITS_ ## A ## B
+#define EMP_MATH_COUNT_BITS_00 0
+#define EMP_MATH_COUNT_BITS_01 1
+#define EMP_MATH_COUNT_BITS_10 1
+#define EMP_MATH_COUNT_BITS_11 2
+#define EMP_MATH_COUNT_BITS_0N N
+#define EMP_MATH_COUNT_BITS_1N 0
+
+#define EMP_MATH_DIFF_BITS(A,B) EMP_MATH_DIFF_BITS_IMPL(A,B)
+#define EMP_MATH_DIFF_BITS_IMPL(A,B) EMP_MATH_DIFF_BITS_ ## A ## B
+#define EMP_MATH_DIFF_BITS_00 0
+#define EMP_MATH_DIFF_BITS_01 N
+#define EMP_MATH_DIFF_BITS_10 1
+#define EMP_MATH_DIFF_BITS_11 0
 
 #define EMP_MATH_GET_CARRY(A) EMP_MATH_GET_CARRY_IMPL(A)
 #define EMP_MATH_GET_CARRY_IMPL(A) EMP_MATH_GET_CARRY_ ## A
 #define EMP_MATH_GET_CARRY_0 0
 #define EMP_MATH_GET_CARRY_1 0
 #define EMP_MATH_GET_CARRY_2 1
-#define EMP_MATH_GET_CARRY_3 1
+#define EMP_MATH_GET_CARRY_N N
 
 #define EMP_MATH_CLEAR_CARRY(A) EMP_MATH_CLEAR_CARRY_IMPL(A)
 #define EMP_MATH_CLEAR_CARRY_IMPL(A) EMP_MATH_CLEAR_CARRY_ ## A
 #define EMP_MATH_CLEAR_CARRY_0 0
 #define EMP_MATH_CLEAR_CARRY_1 1
 #define EMP_MATH_CLEAR_CARRY_2 0
-#define EMP_MATH_CLEAR_CARRY_3 1
+#define EMP_MATH_CLEAR_CARRY_N 1
 
 // In order to handle carrys, we need to run RESTORE_BIN once per bit (-1)
 
 #define EMP_MATH_RESTORE_BIN(A1, A2, A3, A4, A5, A6, A7, A8)          \
   EMP_MATH_RESTORE_BIN_2(                                             \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A1), EMP_MATH_GET_CARRY(A2)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A2), EMP_MATH_GET_CARRY(A3)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A3), EMP_MATH_GET_CARRY(A4)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A4), EMP_MATH_GET_CARRY(A5)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A5), EMP_MATH_GET_CARRY(A6)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A6), EMP_MATH_GET_CARRY(A7)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A7), EMP_MATH_GET_CARRY(A8)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A1), EMP_MATH_GET_CARRY(A2)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A2), EMP_MATH_GET_CARRY(A3)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A3), EMP_MATH_GET_CARRY(A4)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A4), EMP_MATH_GET_CARRY(A5)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A5), EMP_MATH_GET_CARRY(A6)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A6), EMP_MATH_GET_CARRY(A7)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A7), EMP_MATH_GET_CARRY(A8)), \
     EMP_MATH_CLEAR_CARRY(A8)                                          \
   )
 
 #define EMP_MATH_RESTORE_BIN_2(A1, A2, A3, A4, A5, A6, A7, A8)        \
   EMP_MATH_RESTORE_BIN_3(                                             \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A1), EMP_MATH_GET_CARRY(A2)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A2), EMP_MATH_GET_CARRY(A3)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A3), EMP_MATH_GET_CARRY(A4)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A4), EMP_MATH_GET_CARRY(A5)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A5), EMP_MATH_GET_CARRY(A6)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A6), EMP_MATH_GET_CARRY(A7)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A1), EMP_MATH_GET_CARRY(A2)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A2), EMP_MATH_GET_CARRY(A3)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A3), EMP_MATH_GET_CARRY(A4)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A4), EMP_MATH_GET_CARRY(A5)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A5), EMP_MATH_GET_CARRY(A6)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A6), EMP_MATH_GET_CARRY(A7)), \
     EMP_MATH_CLEAR_CARRY(A7),                                         \
     A8                                                                \
   )
 
 #define EMP_MATH_RESTORE_BIN_3(A1, A2, A3, A4, A5, A6, A7, A8)        \
   EMP_MATH_RESTORE_BIN_4(                                             \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A1), EMP_MATH_GET_CARRY(A2)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A2), EMP_MATH_GET_CARRY(A3)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A3), EMP_MATH_GET_CARRY(A4)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A4), EMP_MATH_GET_CARRY(A5)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A5), EMP_MATH_GET_CARRY(A6)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A1), EMP_MATH_GET_CARRY(A2)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A2), EMP_MATH_GET_CARRY(A3)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A3), EMP_MATH_GET_CARRY(A4)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A4), EMP_MATH_GET_CARRY(A5)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A5), EMP_MATH_GET_CARRY(A6)), \
     EMP_MATH_CLEAR_CARRY(A6),                                         \
     A7,                                                               \
     A8                                                                \
@@ -588,10 +603,10 @@
 
 #define EMP_MATH_RESTORE_BIN_4(A1, A2, A3, A4, A5, A6, A7, A8)        \
   EMP_MATH_RESTORE_BIN_5(                                             \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A1), EMP_MATH_GET_CARRY(A2)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A2), EMP_MATH_GET_CARRY(A3)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A3), EMP_MATH_GET_CARRY(A4)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A4), EMP_MATH_GET_CARRY(A5)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A1), EMP_MATH_GET_CARRY(A2)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A2), EMP_MATH_GET_CARRY(A3)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A3), EMP_MATH_GET_CARRY(A4)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A4), EMP_MATH_GET_CARRY(A5)), \
     EMP_MATH_CLEAR_CARRY(A5),                                         \
     A6,                                                               \
     A7,                                                               \
@@ -600,9 +615,9 @@
 
 #define EMP_MATH_RESTORE_BIN_5(A1, A2, A3, A4, A5, A6, A7, A8)        \
   EMP_MATH_RESTORE_BIN_6(                                             \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A1), EMP_MATH_GET_CARRY(A2)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A2), EMP_MATH_GET_CARRY(A3)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A3), EMP_MATH_GET_CARRY(A4)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A1), EMP_MATH_GET_CARRY(A2)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A2), EMP_MATH_GET_CARRY(A3)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A3), EMP_MATH_GET_CARRY(A4)), \
     EMP_MATH_CLEAR_CARRY(A4),                                         \
     A5,                                                               \
     A6,                                                               \
@@ -612,8 +627,8 @@
 
 #define EMP_MATH_RESTORE_BIN_6(A1, A2, A3, A4, A5, A6, A7, A8)        \
   EMP_MATH_RESTORE_BIN_7(                                             \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A1), EMP_MATH_GET_CARRY(A2)), \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A2), EMP_MATH_GET_CARRY(A3)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A1), EMP_MATH_GET_CARRY(A2)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A2), EMP_MATH_GET_CARRY(A3)), \
     EMP_MATH_CLEAR_CARRY(A3),                                         \
     A4,                                                               \
     A5,                                                               \
@@ -624,7 +639,7 @@
 
 #define EMP_MATH_RESTORE_BIN_7(A1, A2, A3, A4, A5, A6, A7, A8)        \
   EMP_MATH_RESTORE_BIN_8(                                             \
-    EMP_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A1), EMP_MATH_GET_CARRY(A2)), \
+    EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(A1), EMP_MATH_GET_CARRY(A2)), \
     EMP_MATH_CLEAR_CARRY(A2),                                         \
     A3,                                                               \
     A4,                                                               \
@@ -644,15 +659,28 @@
     A7,                                                               \
     A8                                                                \
 
+// --- Addition ---
 #define EMP_ADD_BIN(A1, A2, A3, A4, A5, A6, A7, A8, \
                     B1, B2, B3, B4, B5, B6, B7, B8) \
-  EMP_MATH_RESTORE_BIN( EMP_COUNT_BITS(A1, B1), EMP_COUNT_BITS(A2, B2), \
-                        EMP_COUNT_BITS(A3, B3), EMP_COUNT_BITS(A4, B4), \
-                        EMP_COUNT_BITS(A5, B5), EMP_COUNT_BITS(A6, B6), \
-                        EMP_COUNT_BITS(A7, B7), EMP_COUNT_BITS(A8, B8)  \
+  EMP_MATH_RESTORE_BIN( EMP_MATH_COUNT_BITS(A1, B1), EMP_MATH_COUNT_BITS(A2, B2), \
+                        EMP_MATH_COUNT_BITS(A3, B3), EMP_MATH_COUNT_BITS(A4, B4), \
+                        EMP_MATH_COUNT_BITS(A5, B5), EMP_MATH_COUNT_BITS(A6, B6), \
+                        EMP_MATH_COUNT_BITS(A7, B7), EMP_MATH_COUNT_BITS(A8, B8)  \
                         )
 
 #define EMP_ADD(A, B) EMP_ADD_IMPL( EMP_VAL_TO_BIN(A), EMP_VAL_TO_BIN(B) )
 #define EMP_ADD_IMPL(...) EMP_BIN_TO_VAL( EMP_ADD_BIN( __VA_ARGS__ ) )
+
+// --- Subtraction ---
+#define EMP_SUB_BIN(A1, A2, A3, A4, A5, A6, A7, A8, \
+                    B1, B2, B3, B4, B5, B6, B7, B8) \
+  EMP_MATH_RESTORE_BIN( EMP_MATH_DIFF_BITS(A1, B1), EMP_MATH_DIFF_BITS(A2, B2), \
+                        EMP_MATH_DIFF_BITS(A3, B3), EMP_MATH_DIFF_BITS(A4, B4), \
+                        EMP_MATH_DIFF_BITS(A5, B5), EMP_MATH_DIFF_BITS(A6, B6), \
+                        EMP_MATH_DIFF_BITS(A7, B7), EMP_MATH_DIFF_BITS(A8, B8)  \
+                        )
+
+#define EMP_SUB(A, B) EMP_SUB_IMPL( EMP_VAL_TO_BIN(A), EMP_VAL_TO_BIN(B) )
+#define EMP_SUB_IMPL(...) EMP_BIN_TO_VAL( EMP_SUB_BIN( __VA_ARGS__ ) )
 
 #endif
