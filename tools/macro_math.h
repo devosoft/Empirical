@@ -5,6 +5,15 @@
 //
 //  These macros build a pre-processor calculator system.
 //
+//  Working macros include:
+//   EMP_INC(A)    : converts to result of A+1
+//   EMP_DEC(A)    : converts to result of A-1
+//   EMP_SHIFTL(A) : converts to result of A*2
+//   EMP_SHIFTR(A) : converts to result of A/2
+//
+//   EMP_ADD(A,B)  : converts to result of A+B
+//   EMP_SUB(A,B)  : converts to result of A-B
+//
 
 #define EMP_VAL_TO_BIN(VAL) EMP_VAL_TO_BIN_ ## VAL
 
@@ -659,6 +668,28 @@
     A7,                                                               \
     A8                                                                \
 
+// Pre-define some simple multiplication
+#define EMP_MATH_BIN_TIMES_0(A1, A2, A3, A4, A5, A6, A7, A8) 0, 0, 0, 0, 0, 0, 0, 0
+#define EMP_MATH_BIN_TIMES_1(A1, A2, A3, A4, A5, A6, A7, A8) A1, A2, A3, A4, A5, A6, A7, A8
+
+
+///////////////////////////
+//
+//  Math Operations!!!
+//
+
+// --- Shifting ---
+
+#define EMP_SHIFTL_BIN(A1, A2, A3, A4, A5, A6, A7, A8) A2, A3, A4, A5, A6, A7, A8, 0
+#define EMP_SHIFTR_BIN(A1, A2, A3, A4, A5, A6, A7, A8) 0, A1, A2, A3, A4, A5, A6, A7
+
+#define EMP_SHIFTL(A) EMP_SHIFTL_IMPL( EMP_VAL_TO_BIN(A) )
+#define EMP_SHIFTL_IMPL(...) EMP_BIN_TO_VAL( EMP_SHIFTL_BIN( __VA_ARGS__ ) )
+
+#define EMP_SHIFTR(A) EMP_SHIFTR_IMPL( EMP_VAL_TO_BIN(A) )
+#define EMP_SHIFTR_IMPL(...) EMP_BIN_TO_VAL( EMP_SHIFTR_BIN( __VA_ARGS__ ) )
+
+
 // --- Addition ---
 #define EMP_ADD_BIN(A1, A2, A3, A4, A5, A6, A7, A8, \
                     B1, B2, B3, B4, B5, B6, B7, B8) \
@@ -682,5 +713,35 @@
 
 #define EMP_SUB(A, B) EMP_SUB_IMPL( EMP_VAL_TO_BIN(A), EMP_VAL_TO_BIN(B) )
 #define EMP_SUB_IMPL(...) EMP_BIN_TO_VAL( EMP_SUB_BIN( __VA_ARGS__ ) )
+
+// --- Increment and Decrement ---
+#define EMP_INC(A) EMP_ADD(A, 1)
+#define EMP_DEC(A) EMP_SUB(A, 1)
+#define EMP_HALF(A) EMP_SHIFTR(A)
+
+
+// --- Multiply ---
+#define EMP_MULT_BIN(A1, A2, A3, A4, A5, A6, A7, A8, \
+                     B1, B2, B3, B4, B5, B6, B7, B8)
+//   B8 * (A1, A2, A3, A4, A5, A6, A7, A8)
+// + B7 * (A2, A3, A4, A5, A6, A7, A8,  0)
+// + B6 * (A3, A4, A5, A6, A7, A8,  0,  0)
+// + B5 * (A4, A5, A6, A7, A8,  0,  0,  0)
+// + B4 * (A5, A6, A7, A8,  0,  0,  0,  0)
+// + B3 * (A6, A7, A8,  0,  0,  0,  0,  0)
+// + B2 * (A7, A8,  0,  0,  0,  0,  0,  0)
+// + B1 * (A8,  0,  0,  0,  0,  0,  0,  0)
+
+
+// #define EMP_MULT_BIN(A1, A2, A3, A4, A5, A6, A7, A8,  \
+//                     B1, B2, B3, B4, B5, B6, B7, B8)
+//   B8 * (A1, A2, A3, A4, A5, A6, A7, A8)
+// + B7 * (A2, A3, A4, A5, A6, A7, A8,  0)
+// + B6 * (A3, A4, A5, A6, A7, A8,  0,  0)
+// + B5 * (A4, A5, A6, A7, A8,  0,  0,  0)
+// + B4 * (A5, A6, A7, A8,  0,  0,  0,  0)
+// + B3 * (A6, A7, A8,  0,  0,  0,  0,  0)
+// + B2 * (A7, A8,  0,  0,  0,  0,  0,  0)
+// + B1 * (A8,  0,  0,  0,  0,  0,  0,  0)
 
 #endif
