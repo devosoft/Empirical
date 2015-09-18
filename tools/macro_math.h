@@ -669,8 +669,8 @@
     A8                                                                \
 
 // Pre-define some simple multiplication
-#define EMP_MATH_BIN_TIMES_0(A1, A2, A3, A4, A5, A6, A7, A8) 0, 0, 0, 0, 0, 0, 0, 0
-#define EMP_MATH_BIN_TIMES_1(A1, A2, A3, A4, A5, A6, A7, A8) A1, A2, A3, A4, A5, A6, A7, A8
+#define EMP_MATH_BIN_TIMES_0(A1, A2, A3, A4, A5, A6, A7, A8)  0, 0, 0, 0, 0, 0, 0, 0
+#define EMP_MATH_BIN_TIMES_1(A1, A2, A3, A4, A5, A6, A7, A8)  A1, A2, A3, A4, A5, A6, A7, A8
 
 
 ///////////////////////////
@@ -691,8 +691,10 @@
 
 
 // --- Addition ---
-#define EMP_ADD_BIN(A1, A2, A3, A4, A5, A6, A7, A8, \
-                    B1, B2, B3, B4, B5, B6, B7, B8) \
+#define EMP_ADD_BIN(...) EMP_ADD_BIN_IMPL(__VA_ARGS__)
+
+#define EMP_ADD_BIN_IMPL(A1, A2, A3, A4, A5, A6, A7, A8,                \
+                         B1, B2, B3, B4, B5, B6, B7, B8)                \
   EMP_MATH_RESTORE_BIN( EMP_MATH_COUNT_BITS(A1, B1), EMP_MATH_COUNT_BITS(A2, B2), \
                         EMP_MATH_COUNT_BITS(A3, B3), EMP_MATH_COUNT_BITS(A4, B4), \
                         EMP_MATH_COUNT_BITS(A5, B5), EMP_MATH_COUNT_BITS(A6, B6), \
@@ -700,7 +702,7 @@
                         )
 
 #define EMP_ADD(A, B) EMP_ADD_IMPL( EMP_VAL_TO_BIN(A), EMP_VAL_TO_BIN(B) )
-#define EMP_ADD_IMPL(...) EMP_BIN_TO_VAL( EMP_ADD_BIN( __VA_ARGS__ ) )
+#define EMP_ADD_IMPL(...) EMP_BIN_TO_VAL( EMP_ADD_BIN_IMPL( __VA_ARGS__ ) )
 
 // --- Subtraction ---
 #define EMP_SUB_BIN(A1, A2, A3, A4, A5, A6, A7, A8, \
@@ -722,16 +724,25 @@
 
 // --- Multiply ---
 #define EMP_MULT_BIN(A1, A2, A3, A4, A5, A6, A7, A8, \
-                     B1, B2, B3, B4, B5, B6, B7, B8)
-//   B8 * (A1, A2, A3, A4, A5, A6, A7, A8)
-// + B7 * (A2, A3, A4, A5, A6, A7, A8,  0)
-// + B6 * (A3, A4, A5, A6, A7, A8,  0,  0)
-// + B5 * (A4, A5, A6, A7, A8,  0,  0,  0)
-// + B4 * (A5, A6, A7, A8,  0,  0,  0,  0)
-// + B3 * (A6, A7, A8,  0,  0,  0,  0,  0)
-// + B2 * (A7, A8,  0,  0,  0,  0,  0,  0)
-// + B1 * (A8,  0,  0,  0,  0,  0,  0,  0)
+                     B1, B2, B3, B4, B5, B6, B7, B8) \
+EMP_ADD_BIN(                                         \
+    EMP_ADD_BIN( EMP_ADD_BIN( EMP_MATH_BIN_TIMES_ ## B8 (A1, A2, A3, A4, A5, A6, A7, A8),     \
+                              EMP_MATH_BIN_TIMES_ ## B7 (A2, A3, A4, A5, A6, A7, A8,  0) ),   \
+                 EMP_ADD_BIN( EMP_MATH_BIN_TIMES_ ## B6 (A3, A4, A5, A6, A7, A8,  0,  0),     \
+                              EMP_MATH_BIN_TIMES_ ## B5 (A4, A5, A6, A7, A8,  0,  0,  0) ) ), \
+    EMP_ADD_BIN( EMP_ADD_BIN( EMP_MATH_BIN_TIMES_ ## B4 (A5, A6, A7, A8,  0,  0,  0,  0),     \
+                              EMP_MATH_BIN_TIMES_ ## B3 (A6, A7, A8,  0,  0,  0,  0,  0) ),   \
+                 EMP_ADD_BIN( EMP_MATH_BIN_TIMES_ ## B2 (A7, A8,  0,  0,  0,  0,  0,  0),     \
+                              EMP_MATH_BIN_TIMES_ ## B1 (A8,  0,  0,  0,  0,  0,  0,  0) ) )  \
+ )
 
+/*
+  EMP_ADD_BIN( EMP_MATH_BIN_TIMES_ ## B8 (A1, A2, A3, A4, A5, A6, A7, A8), EMP_MATH_BIN_TIMES_ ## B7 (A2, A3, A4, A5, A6, A7, A8,  0) )
+
+*/
+
+#define EMP_MULT(A, B) EMP_MULT_IMPL( EMP_VAL_TO_BIN(A), EMP_VAL_TO_BIN(B) )
+#define EMP_MULT_IMPL(...) EMP_BIN_TO_VAL( EMP_MULT_BIN( __VA_ARGS__ ) )
 
 // #define EMP_MULT_BIN(A1, A2, A3, A4, A5, A6, A7, A8,  \
 //                     B1, B2, B3, B4, B5, B6, B7, B8)
