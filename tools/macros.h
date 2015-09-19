@@ -17,10 +17,11 @@
 //
 //  ===== Managing variadic arguments =====
 //  EMP_COUNT_ARGS(...) returns the number of arguments in the __VA_ARGS__
-//  EMP_GET_ARG_*(...) replace * with number and will return the arg at that position.
+//  EMP_GET_ARG(N, ...) return the Nth arg that follows
 //  EMP_DUPLICATE_ARGS(N, ...) makes N collated copies of all args to follow.
 //  EMP_CROP_ARGS(N, ...) reduces N args (must have at least that many)
 //  EMP_FORCE_ARGS_TO(N, P, ...) Crops or pads (with p) args to be exactly N long.
+//  EMP_ROTATE_ARGS(...) Moves the first argument to the end of the arg list.
 //  EMP_GET_ODD_ARGS(...) will return all arguments at odd positions (1,3,5,7, etc.)
 //  EMP_GET_EVEN_ARGS(...) will return all arguments at odd positions (2,4,6,8, etc.)
 //  EMP_REVERSE_ARGS(...) Reverse the order of arguments passed in.
@@ -80,6 +81,7 @@
 #define EMP_PRINT_RESULT_TO(STREAM, A) EMP_PRINT_RESULT_IMPL(STREAM, #A, A)
 #define EMP_PRINT_RESULT(A) EMP_PRINT_RESULT_IMPL(std::cout, #A, A)
 
+#define EMP_GET_ARG(N, ...) EMP_GET_ARG_ ## N (__VA_ARGS__)
 #define EMP_GET_ARG_1(A1, ...) A1
 #define EMP_GET_ARG_2(A1, A2, ...) A2
 #define EMP_GET_ARG_3(A1, A2, A3, ...) A3
@@ -415,6 +417,45 @@
 #define EMP_GET_EVEN_ARGS_62(A, B, ...) B, EMP_GET_EVEN_ARGS_60(__VA_ARGS__)
 #define EMP_GET_EVEN_ARGS_63(A, B, ...) B, EMP_GET_EVEN_ARGS_61(__VA_ARGS__)
 
+#define EMP_ROTATE_ARGS(A, ...) __VA_ARGS__, A
+#define EMP_RUN_JOIN(A, B) A B
+
+// A generic technique to trim the arguments we have.  In parens, list i or x for each
+// position and whether it should be included or excluded.  For example
+//
+// EMP_TRIM_ARGS( (i,x,x,i,i), 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 )
+//
+// ... would return:
+//
+// 1,4,5,6,9,10,11,14,15
+
+#define EMP_TRIM_i(A, ...) A
+#define EMP_TRIM_x(A, ...)
+
+#define EMP_TRIM_do_arg(P, A) EMP_IMERGE_2(EMP_TRIM_, EMP_RUN_JOIN(EMP_GET_ARG_1, P))(A,~)
+#define EMP_TRIM_next(N, P, ...) EMP_TRIM_ARGS_ ## N( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+
+#define EMP_TRIM_ARGS(PATTERN, ...) EMP_ASSEMBLE_MACRO_1ARG(EMP_TRIM_ARGS_, PATTERN, __VA_ARGS__)
+
+#define EMP_TRIM_ARGS_1(P, A) EMP_TRIM_do_arg(P, A)
+#define EMP_TRIM_ARGS_2(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_ARGS_1( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+#define EMP_TRIM_ARGS_3(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_ARGS_2( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+#define EMP_TRIM_ARGS_4(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_ARGS_3( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+#define EMP_TRIM_ARGS_5(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_ARGS_4( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+#define EMP_TRIM_ARGS_6(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_ARGS_5( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+#define EMP_TRIM_ARGS_7(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_ARGS_6( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+#define EMP_TRIM_ARGS_8(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_ARGS_7( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+#define EMP_TRIM_ARGS_9(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_ARGS_8( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+
+// #define EMP_TRIM_ARGS_1(P, A) EMP_TRIM_do_arg(P, A)
+// #define EMP_TRIM_ARGS_2(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_next(1, P, __VA_ARGS__)
+// #define EMP_TRIM_ARGS_3(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_next(2, P, __VA_ARGS__)
+// #define EMP_TRIM_ARGS_4(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_next(3, P, __VA_ARGS__)
+// #define EMP_TRIM_ARGS_5(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_next(4, P, __VA_ARGS__)
+// #define EMP_TRIM_ARGS_6(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_next(5, P, __VA_ARGS__)
+// #define EMP_TRIM_ARGS_7(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_next(6, P, __VA_ARGS__)
+// #define EMP_TRIM_ARGS_8(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_next(7, P, __VA_ARGS__)
+// #define EMP_TRIM_ARGS_9(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_next(8, P, __VA_ARGS__)
 
 // Enable an arbitrary number of arguments (well, up to 10) to be merged AFTER being processed!
 #define EMP_MERGE(...) EMP_ASSEMBLE_MACRO(EMP_MERGE_, __VA_ARGS__)
@@ -429,6 +470,8 @@
 #define EMP_MERGE_9(A1,A2,A3,A4,A5,A6,A7,A8,A9) A1 ## A2 ## A3 ## A4 ## A5 ## A6 ## A7 ## A8 ## A9
 #define EMP_MERGE_10(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10) A1 ## A2 ## A3 ## A4 ## A5 ## A6 ## A7 ## A8 ## A9 ## A10
 
+// Indirect merges to give a chance for arg evaluation...
+#define EMP_IMERGE_2(A1, A2) EMP_MERGE_2(A1, A2)
 
 // EMP_WRAP_EACH takes a wrapper macro and a variable set of arguments,
 // then applied to wrapper macro to each argument in order.
@@ -569,6 +612,15 @@
 #define EMP_WRAP_ARGS_62(W, A, ...) W(A), EMP_WRAP_ARGS_61(W, __VA_ARGS__)
 #define EMP_WRAP_ARGS_63(W, A, ...) W(A), EMP_WRAP_ARGS_62(W, __VA_ARGS__)
 
+// Wrap C different arguments.
+#define EMP_WRAP_ARGSET(W, C, ...) EMP_ASSEMBLE_MACRO_2ARG(EMP_WRAP_ARGS_, W, C, __VA_ARGS__)
+#define EMP_WRAP_ARGSET_0(W, C, ...)
+#define EMP_WRAP_ARGSET_1(W, C, ...) W( EMP_CROP_ARGS(C, __VA_ARGS__) ), \
+                                                                                                     EMP_MERGE_2( EMP_WRAP_ARGSET_, EMP_SUB_1_ ## C ) (W, C, EMP_CROP_OFF(C, __VA_ARGS__) )
+#define EMP_WRAP_ARGSET_2(W, C, ...) W(A), EMP_WRAP_ARGSET_1(W, C, __VA_ARGS__)
+#define EMP_WRAP_ARGSET_3(W, C, ...) W(A), EMP_WRAP_ARGSET_2(W, C, __VA_ARGS__)
+
+
 //Individually stringifies each variable passed to it and returns them
 //with commas in between.
 #define EMP_STRINGIFY_EACH(...) EMP_WRAP_ARGS(EMP_STRINGIFY, __VA_ARGS__)
@@ -639,6 +691,12 @@
 #define EMP_WRAP_ARG_PAIRS_124(W, A1, A2, ...) W(A1, A2), EMP_WRAP_ARG_PAIRS_122(W, __VA_ARGS__)
 #define EMP_WRAP_ARG_PAIRS_126(W, A1, A2, ...) W(A1, A2), EMP_WRAP_ARG_PAIRS_124(W, __VA_ARGS__)
 #define EMP_WRAP_ARG_PAIRS_128(W, A1, A2, ...) W(A1, A2), EMP_WRAP_ARG_PAIRS_126(W, __VA_ARGS__)
+
+#define EMP_WRAP_ARG_TRIPLES(W, ...) EMP_ASSEMBLE_MACRO_1ARG(EMP_WRAP_ARG_TRIPLES_, W, __VA_ARGS__)
+#define EMP_WRAP_ARG_TRIPLES_3(W, A1, A2, A3) W(A1, A2, A3)
+#define EMP_WRAP_ARG_TRIPLES_6(W, A1, A2, A3, ...) W(A1, A2), EMP_WRAP_ARG_TRIPLES_3(W, __VA_ARGS__)
+#define EMP_WRAP_ARG_TRIPLES_9(W, A1, A2, A3, ...) W(A1, A2), EMP_WRAP_ARG_TRIPLES_6(W, __VA_ARGS__)
+#define EMP_WRAP_ARG_TRIPLES_12(W, A1, A2, A3, ...) W(A1, A2), EMP_WRAP_ARG_TRIPLES_9(W, __VA_ARGS__)
 
 #define EMP_REVERSE_ARGS(...) EMP_ASSEMBLE_MACRO(EMP_REVERSE_ARGS_, __VA_ARGS__)
 #define EMP_REVERSE_ARGS_1(A) A
@@ -772,208 +830,6 @@
 #define EMP_TYPES_TO_ARGS_63(A, ...) EMP_TYPES_TO_ARGS_62(__VA_ARGS__), A arg63
 
 
-// Some basic math macros.  Since brute force is the only way to do math with macros...
-#define EMP_INC(X) EMP_INC_IMPL(X)
-#define EMP_INC_IMPL(X) EMP_INC_ ## X
-#define EMP_INC_0  1
-#define EMP_INC_1  2
-#define EMP_INC_2  3
-#define EMP_INC_3  4
-#define EMP_INC_4  5
-#define EMP_INC_5  6
-#define EMP_INC_6  7
-#define EMP_INC_7  8
-#define EMP_INC_8  9
-#define EMP_INC_9  10
-#define EMP_INC_10  11
-#define EMP_INC_11  12
-#define EMP_INC_12  13
-#define EMP_INC_13  14
-#define EMP_INC_14  15
-#define EMP_INC_15  16
-#define EMP_INC_16  17
-#define EMP_INC_17  18
-#define EMP_INC_18  19
-#define EMP_INC_19  20
-#define EMP_INC_20  21
-#define EMP_INC_21  22
-#define EMP_INC_22  23
-#define EMP_INC_23  24
-#define EMP_INC_24  25
-#define EMP_INC_25  26
-#define EMP_INC_26  27
-#define EMP_INC_27  28
-#define EMP_INC_28  29
-#define EMP_INC_29  30
-#define EMP_INC_30  31
-#define EMP_INC_31  32
-#define EMP_INC_32  33
-#define EMP_INC_33  34
-#define EMP_INC_34  35
-#define EMP_INC_35  36
-#define EMP_INC_36  37
-#define EMP_INC_37  38
-#define EMP_INC_38  39
-#define EMP_INC_39  40
-#define EMP_INC_40  41
-#define EMP_INC_41  42
-#define EMP_INC_42  43
-#define EMP_INC_43  44
-#define EMP_INC_44  45
-#define EMP_INC_45  46
-#define EMP_INC_46  47
-#define EMP_INC_47  48
-#define EMP_INC_48  49
-#define EMP_INC_49  50
-#define EMP_INC_50  51
-#define EMP_INC_51  52
-#define EMP_INC_52  53
-#define EMP_INC_53  54
-#define EMP_INC_54  55
-#define EMP_INC_55  56
-#define EMP_INC_56  57
-#define EMP_INC_57  58
-#define EMP_INC_58  59
-#define EMP_INC_59  60
-#define EMP_INC_60  61
-#define EMP_INC_61  62
-#define EMP_INC_62  63
-#define EMP_INC_63  64
-
-#define EMP_DEC(X) EMP_DEC_IMPL(X)
-#define EMP_DEC_IMPL(X) EMP_DEC_ ## X
-#define EMP_DEC_0  -1
-#define EMP_DEC_1  0
-#define EMP_DEC_2  1
-#define EMP_DEC_3  2
-#define EMP_DEC_4  3
-#define EMP_DEC_5  4
-#define EMP_DEC_6  5
-#define EMP_DEC_7  6
-#define EMP_DEC_8  7
-#define EMP_DEC_9  8
-#define EMP_DEC_10  9
-#define EMP_DEC_11  10
-#define EMP_DEC_12  11
-#define EMP_DEC_13  12
-#define EMP_DEC_14  13
-#define EMP_DEC_15  14
-#define EMP_DEC_16  15
-#define EMP_DEC_17  16
-#define EMP_DEC_18  17
-#define EMP_DEC_19  18
-#define EMP_DEC_20  19
-#define EMP_DEC_21  20
-#define EMP_DEC_22  21
-#define EMP_DEC_23  22
-#define EMP_DEC_24  23
-#define EMP_DEC_25  24
-#define EMP_DEC_26  25
-#define EMP_DEC_27  26
-#define EMP_DEC_28  27
-#define EMP_DEC_29  28
-#define EMP_DEC_30  29
-#define EMP_DEC_31  30
-#define EMP_DEC_32  31
-#define EMP_DEC_33  32
-#define EMP_DEC_34  33
-#define EMP_DEC_35  34
-#define EMP_DEC_36  35
-#define EMP_DEC_37  36
-#define EMP_DEC_38  37
-#define EMP_DEC_39  38
-#define EMP_DEC_40  39
-#define EMP_DEC_41  40
-#define EMP_DEC_42  41
-#define EMP_DEC_43  42
-#define EMP_DEC_44  43
-#define EMP_DEC_45  44
-#define EMP_DEC_46  45
-#define EMP_DEC_47  46
-#define EMP_DEC_48  47
-#define EMP_DEC_49  48
-#define EMP_DEC_50  49
-#define EMP_DEC_51  50
-#define EMP_DEC_52  51
-#define EMP_DEC_53  52
-#define EMP_DEC_54  53
-#define EMP_DEC_55  54
-#define EMP_DEC_56  55
-#define EMP_DEC_57  56
-#define EMP_DEC_58  57
-#define EMP_DEC_59  58
-#define EMP_DEC_60  59
-#define EMP_DEC_61  60
-#define EMP_DEC_62  61
-#define EMP_DEC_63  62
-
-#define EMP_HALF(X) EMP_HALF_IMPL(X)
-#define EMP_HALF_IMPL(X) EMP_HALF_ ## X
-#define EMP_HALF_0  0
-#define EMP_HALF_1  0
-#define EMP_HALF_2  1
-#define EMP_HALF_3  1
-#define EMP_HALF_4  2
-#define EMP_HALF_5  2
-#define EMP_HALF_6  3
-#define EMP_HALF_7  3
-#define EMP_HALF_8  4
-#define EMP_HALF_9  4
-#define EMP_HALF_10  5
-#define EMP_HALF_11  5
-#define EMP_HALF_12  6
-#define EMP_HALF_13  6
-#define EMP_HALF_14  7
-#define EMP_HALF_15  7
-#define EMP_HALF_16  8
-#define EMP_HALF_17  8
-#define EMP_HALF_18  9
-#define EMP_HALF_19  9
-#define EMP_HALF_20  10
-#define EMP_HALF_21  10
-#define EMP_HALF_22  11
-#define EMP_HALF_23  11
-#define EMP_HALF_24  12
-#define EMP_HALF_25  12
-#define EMP_HALF_26  13
-#define EMP_HALF_27  13
-#define EMP_HALF_28  14
-#define EMP_HALF_29  14
-#define EMP_HALF_30  15
-#define EMP_HALF_31  15
-#define EMP_HALF_32  16
-#define EMP_HALF_33  16
-#define EMP_HALF_34  17
-#define EMP_HALF_35  17
-#define EMP_HALF_36  18
-#define EMP_HALF_37  18
-#define EMP_HALF_38  19
-#define EMP_HALF_39  19
-#define EMP_HALF_40  20
-#define EMP_HALF_41  20
-#define EMP_HALF_42  21
-#define EMP_HALF_43  21
-#define EMP_HALF_44  22
-#define EMP_HALF_45  22
-#define EMP_HALF_46  23
-#define EMP_HALF_47  23
-#define EMP_HALF_48  24
-#define EMP_HALF_49  24
-#define EMP_HALF_50  25
-#define EMP_HALF_51  25
-#define EMP_HALF_52  26
-#define EMP_HALF_53  26
-#define EMP_HALF_54  27
-#define EMP_HALF_55  27
-#define EMP_HALF_56  28
-#define EMP_HALF_57  28
-#define EMP_HALF_58  29
-#define EMP_HALF_59  29
-#define EMP_HALF_60  30
-#define EMP_HALF_61  30
-#define EMP_HALF_62  31
-#define EMP_HALF_63  31
-
 
 // Setup a generic method of calling a specific version of a macro based on argument count.
 // If some of the args need to be passed to each version, specify number in macro call.
@@ -985,6 +841,24 @@
 
 #define EMP_ASSEMBLE_MACRO_2ARG(BASE, A, B, ...)                         \
   EMP_ASSEMBLE_IMPL(BASE, EMP_COUNT_ARGS(__VA_ARGS__), A, B, __VA_ARGS__)
+
+#define EMP_ASSEMBLE_MACRO_3ARG(BASE, A, B, C, ...)                      \
+  EMP_ASSEMBLE_IMPL(BASE, EMP_COUNT_ARGS(__VA_ARGS__), A, B, C, __VA_ARGS__)
+
+#define EMP_ASSEMBLE_MACRO_4ARG(BASE, A, B, C, D, ...)                   \
+  EMP_ASSEMBLE_IMPL(BASE, EMP_COUNT_ARGS(__VA_ARGS__), A, B, C, D, __VA_ARGS__)
+
+#define EMP_ASSEMBLE_MACRO_5ARG(BASE, A, B, C, D, E, ...)                \
+  EMP_ASSEMBLE_IMPL(BASE, EMP_COUNT_ARGS(__VA_ARGS__), A, B, C, D, E, __VA_ARGS__)
+
+#define EMP_ASSEMBLE_MACRO_6ARG(BASE, A, B, C, D, E, F, ...)             \
+  EMP_ASSEMBLE_IMPL(BASE, EMP_COUNT_ARGS(__VA_ARGS__), A, B, C, D, E, F, __VA_ARGS__)
+
+#define EMP_ASSEMBLE_MACRO_7ARG(BASE, A, B, C, D, E, F, G, ...)          \
+  EMP_ASSEMBLE_IMPL(BASE, EMP_COUNT_ARGS(__VA_ARGS__), A, B, C, D, E, F, G, __VA_ARGS__)
+
+#define EMP_ASSEMBLE_MACRO_8ARG(BASE, A, B, C, D, E, F, G, H, ...)       \
+  EMP_ASSEMBLE_IMPL(BASE, EMP_COUNT_ARGS(__VA_ARGS__), A, B, C, D, E, F, G, H, __VA_ARGS__)
 
 #define EMP_ASSEMBLE_IMPL(BASE, ARG_COUNT, ...) EMP_ASSEMBLE_MERGE(BASE, ARG_COUNT) (__VA_ARGS__)
 #define EMP_ASSEMBLE_MERGE(A, B) A ## B
