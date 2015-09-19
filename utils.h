@@ -85,7 +85,7 @@ std::map<const char *, std::string> GetTypeToStringMap(){
 }
 
 template<std::size_t SIZE, typename T>
-void PassArrayToJavascript(std::array<T,SIZE> values, int recursive_el = -1){
+  void PassArrayToJavascript(std::array<T,SIZE> values, std::vector<int> recursive_el = {}){
 
   std::map<const char *, std::string> map_type_names = GetTypeToStringMap();
   emp_assert(map_type_names.find(typeid(T).name()) != map_type_names.end());
@@ -94,23 +94,25 @@ void PassArrayToJavascript(std::array<T,SIZE> values, int recursive_el = -1){
   std::string type_string = map_type_names[typeid(T).name()];
 
   static_assert(!std::is_array<T>::value, "No nested arrays allowed.");
-  
-  std::cout << "recursing " << recursive_el << std::endl;
 
   //clear array
-  if (recursive_el < 0){
+  if (recursive_el.size() == 0){
     EM_ASM({emp.__incoming_array = [];});
   }
 
   EM_ASM_ARGS({
       var curr_array = emp.__incoming_array;
-      if (curr_array.length > 0){
-	curr_array = curr_array[$4];
+      var depth = 0;
+      while (curr_array.length > 0){
+	var next_index = getValue($4+(depth*4), "i32");
+	console.log(next_index);
+	depth += 1;
+	curr_array = curr_array[next_index];
       }
       for (i=0; i<$1; i++){
 	curr_array.push(getValue($0+(i*$2), Pointer_stringify($3)));
       }
-    }, values, values.size(), type_size, type_string.c_str(), recursive_el);
+    }, values, values.size(), type_size, type_string.c_str(), recursive_el.data());
 }
 
 template<std::size_t SIZE>
@@ -153,15 +155,33 @@ void PassArrayToJavascript(std::array<JSDataObject,SIZE> values){
 }
 
 template<std::size_t SIZE1, std::size_t SIZE2, typename T>
-void PassArrayToJavascript(std::array<std::array<T, SIZE1>, SIZE2> values){
-  
-  EM_ASM({emp.__incoming_array = [];});
+void PassArrayToJavascript(std::array<std::array<T, SIZE1>, SIZE2> values, std::vector<int> recursive_el = std::vector<int>()){
+
+  if (recursive_el.size() == 0){
+    std::cout << "initializing array" << std::endl;
+    EM_ASM({emp.__incoming_array = [];});
+  }
+
+  std::cout << "recursive els: " << recursive_el[0] << " " << recursive_el[1] << std::endl;
+
+  EM_ASM_ARGS({
+      var curr_array = emp.__incoming_array;
+      var depth = 0;
+      while (curr_array.length > 0){
+	var next_index = getValue($0+(depth*4), "i32");
+	console.log(curr_array, next_index);
+	depth += 1;
+	curr_array = curr_array[next_index];
+      }
+      for (i=0; i<$1; i++){
+	curr_array.push([]);
+      }
+    }, recursive_el.data(), SIZE2);
 
   for (int i = 0; i<SIZE2; i++){
-    EM_ASM({
-	emp.__incoming_array.push([]);
-      });
-    PassArrayToJavascript(values[i], i);
+    std::vector<int> new_recursive_el (recursive_el);
+    new_recursive_el.push_back(i);
+    PassArrayToJavascript(values[i], new_recursive_el);
   }
 }
 

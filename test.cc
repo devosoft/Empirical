@@ -59,6 +59,11 @@ int main()
 
   std::array<std::array<int,2>, 5> test_path = {{{0,0}, {0,10}, {10,10}, {20,20}, {30, 30}}};
 
+  std::array<std::array<std::array<int, 2>, 1>, 5> horrible_array = {{{{0,0}}, {{0,10}}, {{10,10}}, {{20,20}}, {{30, 30}}}};
+
+  PassArrayToJavascript(horrible_array);
+  EM_ASM({console.log(emp.__incoming_array)});
+
   //D3::ShapesFromData(test_data, "circle");
   //EM_ASM({d3.select("svg").selectAll("circle").data([{val:5, word:"hi", val2:6.3}]).enter().append("circle")});
 
