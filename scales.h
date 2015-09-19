@@ -1,28 +1,35 @@
+#ifndef __SCALES_H__
+#define __SCALES_H__
+
 #include "utils.h"
 
-namespace D3{
+namespace D3 {
 
-  class Scale{
+  class Scale {
   protected:
     int id;
     Scale(int id);
 
   public:
     Scale();
+
+    int GetID() {
+      return this->id;
+    }
     
     template <typename T, size_t SIZE>
-    void SetRange(std::array<T,SIZE> values){
+    void SetRange(std::array<T,SIZE> values) {
       PassArrayToJavascript(values);
       EM_ASM_ARGS({js.objects[$0].range(emp.__incoming_array);}, this->id);
     }
 
     template <typename T, size_t SIZE>
-    void SetDomain(std::array<T,SIZE> values){
+    void SetDomain(std::array<T,SIZE> values) {
       PassArrayToJavascript(values);
       EM_ASM_ARGS({js.objects[$0].domain(emp.__incoming_array);}, this->id);
     }
 
-    Scale Copy(){
+    Scale Copy() {
       int new_id = EM_ASM_INT_V({return js.objects.length});
       EM_ASM_ARGS({
 	  js.objects.push(js.objects[$0].copy());
@@ -30,14 +37,18 @@ namespace D3{
       return Scale(new_id);
     }
 
+    double ApplyScale(double input) {
+      //TODO: make this work for other types
+      return EM_ASM_DOUBLE({return js.objects[$0]($1);},this->id, input);
+    }
     //TODO:Getters
   };
 
-  Scale::Scale(int id){
+  Scale::Scale(int id) {
     this->id = id;
   }
 
-  Scale::Scale(){
+  Scale::Scale() {
     this->id = EM_ASM_INT_V({return js.objects.length});
     EM_ASM({js.objects.push(d3.scale)});
   }
@@ -47,13 +58,13 @@ namespace D3{
     QuantizeScale();
 
     template <typename T>
-    double InvertExtent(T y){
+    double InvertExtent(T y) {
       return EM_ASM_DOUBLE({return js.objects[$0].invertExtent($1);}, 
 			   this->id, y);
     }
   };
 
-  QuantizeScale::QuantizeScale(){
+  QuantizeScale::QuantizeScale() {
     this->id = EM_ASM_INT_V({return js.objects.length});
     EM_ASM({js.objects.push(d3.scale.quantize())});
   }
@@ -65,7 +76,7 @@ namespace D3{
     //TODO: Quantiles()
   };
 
-  QuantileScale::QuantileScale(){
+  QuantileScale::QuantileScale() {
     this->id = EM_ASM_INT_V({return js.objects.length});
     EM_ASM({js.objects.push(d3.scale.quantile())});
   }
@@ -75,7 +86,7 @@ namespace D3{
     ThresholdScale();
   };
 
-  ThresholdScale::ThresholdScale(){
+  ThresholdScale::ThresholdScale() {
     this->id = EM_ASM_INT_V({return js.objects.length});
     EM_ASM({js.objects.push(d3.scale.threshold())});
   }
@@ -85,15 +96,15 @@ namespace D3{
     IdentityScale();
 
     template <typename T>
-    double Invert(T y){
+    double Invert(T y) {
       return EM_ASM_DOUBLE({return js.objects[$0].invert($1);}, this->id, y);
     }
 
-    void SetTicks(int count){
+    void SetTicks(int count) {
       EM_ASM_ARGS({js.objects[$0].ticks($1);}, this->id, count);
     }
 
-    void SetTickFormat(int count, const char * format){
+    void SetTickFormat(int count, const char * format) {
       //TODO: format is technically optional, but what is the point of this
       //function without it?
       EM_ASM_ARGS({js.objects[$0].tick($1, Pointer_stringify($2));}, 
@@ -101,7 +112,7 @@ namespace D3{
     }
   };
 
-  IdentityScale::IdentityScale(){
+  IdentityScale::IdentityScale() {
     this->id = EM_ASM_INT_V({return js.objects.length});
     EM_ASM({js.objects.push(d3.scale.identity())});
   }
@@ -111,20 +122,20 @@ namespace D3{
     LinearScale();
 
     template <typename T, size_t SIZE>
-    void SetRangeRound(std::array<T,SIZE> values){
+    void SetRangeRound(std::array<T,SIZE> values) {
       PassArrayToJavascript(values);
       EM_ASM_ARGS({js.objects[$0].rangeRound(emp.__incoming_array);}, this->id);
     }
 
-    void SetInterpolate(const char * factory){
+    void SetInterpolate(const char * factory) {
       CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(interpolate, factory)
     }
 
-    void Clamp(bool clamp){
+    void Clamp(bool clamp) {
       EM_ASM_ARGS({js.objects[$0].clamp($1);}, this->id, clamp);
     }
 
-    void Nice(int count = -1){
+    void Nice(int count = -1) {
       if (count != -1){
 	EM_ASM_ARGS({js.objects[$0].nice($1);}, this->id, count);
       } else {
@@ -134,7 +145,7 @@ namespace D3{
 
   };
 
-  LinearScale::LinearScale(){
+  LinearScale::LinearScale() {
     this->id = EM_ASM_INT_V({return js.objects.length});
     EM_ASM({js.objects.push(d3.scale.linear())});
   }
@@ -144,7 +155,7 @@ namespace D3{
     LogScale();
   };
 
-  LogScale::LogScale(){
+  LogScale::LogScale() {
     this->id = EM_ASM_INT_V({return js.objects.length});
     EM_ASM({js.objects.push(d3.scale.log())});
   }
@@ -157,7 +168,7 @@ namespace D3{
     //TODO Sqrt constructor
   };
 
-  PowScale::PowScale(){
+  PowScale::PowScale() {
     this->id = EM_ASM_INT_V({return js.objects.length});
     EM_ASM({js.objects.push(d3.scale.pow())});
   }
@@ -167,7 +178,7 @@ namespace D3{
     TimeScale();
   };
 
-  TimeScale::TimeScale(){
+  TimeScale::TimeScale() {
     this->id = EM_ASM_INT_V({return js.objects.length});
     EM_ASM({js.objects.push(d3.scale.time())});
   }
@@ -177,59 +188,63 @@ namespace D3{
     OrdinalScale();
   };
 
-  OrdinalScale::OrdinalScale(){
+  OrdinalScale::OrdinalScale() {
     this->id = EM_ASM_INT_V({return js.objects.length});
     EM_ASM({js.objects.push(d3.scale.ordinal())});
   }
 
-  class Category10Scale{
+  class Category10Scale {
   protected:
     int id;
   public:
     Category10Scale();
   };
 
-  Category10Scale::Category10Scale(){
+  Category10Scale::Category10Scale() {
     this->id = EM_ASM_INT_V({return js.objects.length});
     EM_ASM({js.objects.push(d3.scale.category10())});
   }
 
-  class Category20Scale{
+  class Category20Scale {
   protected:
     int id;
   public:
     Category20Scale();
   };
 
-  Category20Scale::Category20Scale(){
-    this->id = EM_ASM_INT_V({return js.objects.length});
+  Category20Scale::Category20Scale() {
+    this->id = EM_ASM_INT_V({
+	return js.objects.length
+    });
     EM_ASM({js.objects.push(d3.scale.category20())});
   }
 
 
-  class Category20bScale{
+  class Category20bScale {
   protected:
     int id;
   public:
     Category20bScale();
   };
 
-  Category20bScale::Category20bScale(){
+  Category20bScale::Category20bScale() {
     this->id = EM_ASM_INT_V({return js.objects.length});
     EM_ASM({js.objects.push(d3.scale.category20b())});
   }
 
-  class Category20cScale{
+  class Category20cScale {
   protected:
     int id;
   public:
     Category20cScale();
   };
 
-  Category20cScale::Category20cScale(){
+  Category20cScale::Category20cScale() {
     this->id = EM_ASM_INT_V({return js.objects.length});
     EM_ASM({js.objects.push(d3.scale.category20c())});
   }
 
 
 }
+
+#endif

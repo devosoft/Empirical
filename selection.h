@@ -1,3 +1,6 @@
+#ifndef __SELECTION_H__
+#define __SELECTION_H__
+
 #include <emscripten.h>
 #include <iostream>
 #include <string>
@@ -66,6 +69,21 @@ namespace D3 {
       return *this;
     }
 
+    template <typename T, size_t SIZE>
+    Selection SetAttr(const char* name, std::array<T, SIZE> value){
+      /* Assigns [value] to the selections's [name] attribute.
+	 
+	 This will break if someone happens to use a string that
+	 is identical to a function name... but that's unlikely, right?
+      */
+      PassArrayToJavascript(value);
+
+      EM_ASM_ARGS({
+	  js.objects[$0].attr(Pointer_stringify($1), emp.__incoming_array);
+	}, this->id, name);
+
+      return *this;
+    }
 
     Selection Append(const char* name){
       int new_id = EM_ASM_INT_V({return js.objects.length});
@@ -530,3 +548,4 @@ namespace D3 {
 
 }
 
+#endif

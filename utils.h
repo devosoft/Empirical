@@ -85,19 +85,32 @@ std::map<const char *, std::string> GetTypeToStringMap(){
 }
 
 template<std::size_t SIZE, typename T>
-void PassArrayToJavascript(std::array<T,SIZE> values){
+void PassArrayToJavascript(std::array<T,SIZE> values, int recursive_el = -1){
+
   std::map<const char *, std::string> map_type_names = GetTypeToStringMap();
   emp_assert(map_type_names.find(typeid(T).name()) != map_type_names.end());
   
   int type_size = sizeof(T);
   std::string type_string = map_type_names[typeid(T).name()];
+
+  static_assert(!std::is_array<T>::value, "No nested arrays allowed.");
   
+  std::cout << "recursing " << recursive_el << std::endl;
+
+  //clear array
+  if (recursive_el < 0){
+    EM_ASM({emp.__incoming_array = [];});
+  }
+
   EM_ASM_ARGS({
-      emp.__incoming_array = [];
-      for (i=0; i<$1; i++){
-	emp.__incoming_array.push(getValue($0+(i*$2), Pointer_stringify($3)));
+      var curr_array = emp.__incoming_array;
+      if (curr_array.length > 0){
+	curr_array = curr_array[$4];
       }
-    }, values, values.size(), type_size, type_string.c_str());
+      for (i=0; i<$1; i++){
+	curr_array.push(getValue($0+(i*$2), Pointer_stringify($3)));
+      }
+    }, values, values.size(), type_size, type_string.c_str(), recursive_el);
 }
 
 template<std::size_t SIZE>
@@ -136,6 +149,19 @@ void PassArrayToJavascript(std::array<JSDataObject,SIZE> values){
 	  }
 	}, values[j].pointers[i], type_string.c_str(), var_name.c_str(), j);
     }
+  }
+}
+
+template<std::size_t SIZE1, std::size_t SIZE2, typename T>
+void PassArrayToJavascript(std::array<std::array<T, SIZE1>, SIZE2> values){
+  
+  EM_ASM({emp.__incoming_array = [];});
+
+  for (int i = 0; i<SIZE2; i++){
+    EM_ASM({
+	emp.__incoming_array.push([]);
+      });
+    PassArrayToJavascript(values[i], i);
   }
 }
 

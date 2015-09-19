@@ -7,6 +7,7 @@
 #include "../Empirical/emtools/JSWrap.h"
 #include "../Empirical/tools/tuple_struct.h"
 #include "scales.h"
+#include "svg_shapes.h"
 
 struct JSDataObject;
 
@@ -56,10 +57,19 @@ int main()
 
   std::array<JSDataObject, 2> test_data_2 = {test_obj_1, test_obj_2};
 
+  std::array<std::array<int,2>, 5> test_path = {{{0,0}, {0,10}, {10,10}, {20,20}, {30, 30}}};
+
   //D3::ShapesFromData(test_data, "circle");
   //EM_ASM({d3.select("svg").selectAll("circle").data([{val:5, word:"hi", val2:6.3}]).enter().append("circle")});
 
   svg.SelectAll("circle").Data(test_data_2).EnterAppend("circle");
+
+  D3::Selection path = svg.Append("path");
+  path.SetAttr("fill", "none");
+  path.SetAttr("stroke", "blue");
+  path.SetAttr("stroke-width", 2);
+  D3::LineGenerator make_line = D3::LineGenerator();
+  path.SetAttr("d", make_line.MakeLine(test_path).c_str());
 
   std::cout << "data bound" << std::endl;
 
