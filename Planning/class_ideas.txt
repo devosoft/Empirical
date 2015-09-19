@@ -1,0 +1,62 @@
+Some possibilities about how to build classes capable of self-reflection.  I can
+implement macros to make any one of these work.  Method A requires all member
+variables to have a default provided or a "NONE".  Method B assumes no default
+values for variables, so if you include one you need to surround it with a DEFAULT().
+
+In both cases, however, I should be able to identify functions to allow them as well
+(I have to figure out if I can disambiguate declares vs. defines, but if not I'll
+just use declares).
+
+Methods C & D require the user to manually declare the class and it fills in the
+member functions.  This technique allows member functions to be defined separately,
+while member variables are still tracked and can be reflected.
+
+The big advantages of using a macro system to build member variables are:
+(1) ease of data transfer between C++ and JavaScript
+(2) ease of serialization for saving and loading
+(3) general reflection abilities (a class-level map of all member variables)
+(4) ease of updating the class without having to make changes in many places
+    (the macro handles all of the updating by itself.)
+
+
+EMP_CLASS( MyClassA,
+           int, arg1, 0,
+           std::string, arg2, "def",
+           Blob, arg3, NONE,
+           bool, iffy, NONE,
+           int, mem_fun, (int a, int b, int c), { return a+b+c; },
+           char, c, 'c'
+         );
+
+EMP_CLASS( MyClassB,
+           int, arg1, DEFAULT(0),
+           std::string, arg2, DEFAULT("def"),
+           Blob, arg3,
+           bool, iffy,
+           int, mem_fun, (int a, int b, int c), { return a+b+c; },
+           char, c, DEFAULT('c')
+         );
+
+
+class MyClassC {
+  EMP_MEMBERS( int, arg1, 0,
+             std::string, arg2, "def",
+             Blob, arg3, NONE,
+             bool, iffy, NONE,
+             char, c, 'c'
+           );
+
+  int mem_fun(int a, int b, int c) { return a+b+c; }
+};
+
+class MyClassD {
+  EMP_MEMBERS( int, arg1, DEFAULT(0),
+             std::string, arg2, DEFAULT("def"),
+             Blob, arg3,
+             bool, iffy,
+             char, c, DEFAULT('c')
+           );
+
+  int mem_fun(int a, int b, int c) { return a+b+c; }
+};
+
