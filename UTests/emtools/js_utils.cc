@@ -34,12 +34,12 @@ int main(int argc, char* argv[]) {
   std::array<std::array<JSDataObject, 2>, 2> test_data_4 = {{{test_obj_1, test_obj_2}, {test_obj_2, test_obj_2}}};
   
 
-  emp::PassArrayToJavascript(test_data);
+  emp::pass_array_to_javascript(test_data);
   EMP_TEST_VALUE(
 		 EM_ASM_INT_V({return emp.__incoming_array[0];})
 		 , "10");
 
-  emp::PassArrayToJavascript(test_data_2);
+  emp::pass_array_to_javascript(test_data_2);
   EMP_TEST_VALUE(
 		 EM_ASM_INT_V({return emp.__incoming_array[1].val;})
 		 , "40");
@@ -47,12 +47,12 @@ int main(int argc, char* argv[]) {
 		 EM_ASM_DOUBLE_V({return emp.__incoming_array[1].val2;})
 		 , "11.2");
 
-  emp::PassArrayToJavascript(horrible_array);
+  emp::pass_array_to_javascript(horrible_array);
   EMP_TEST_VALUE(
 		 EM_ASM_INT_V({return emp.__incoming_array[4][0][0];})
 		 , "30");
 
-  emp::PassArrayToJavascript(test_data_4);
+  emp::pass_array_to_javascript(test_data_4);
   EMP_TEST_VALUE(
 		 EM_ASM_INT_V({return emp.__incoming_array[1][0].val;})
 		 , "40");
