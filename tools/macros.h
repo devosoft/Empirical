@@ -420,42 +420,44 @@
 #define EMP_ROTATE_ARGS(A, ...) __VA_ARGS__, A
 #define EMP_RUN_JOIN(A, B) A B
 
+#define EMP_POP_ARG(...) EMP_POP_ARG_IMPL(__VA_ARGS__)
+#define EMP_POP_ARG_IMPL(A, ...) __VA_ARGS__
+
 // A generic technique to trim the arguments we have.  In parens, list i or x for each
 // position and whether it should be included or excluded.  For example
 //
-// EMP_TRIM_ARGS( (i,x,x,i,i), 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 )
+// EMP_SECECT_ARGS( (i,x,x,i,i), 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 )
 //
 // ... would return:
 //
 // 1,4,5,6,9,10,11,14,15
 
-#define EMP_TRIM_i(A, ...) A
-#define EMP_TRIM_x(A, ...)
+#define EMP_SELECT_i(A, ...) , A
+#define EMP_SELECT_x(A, ...)
 
-#define EMP_TRIM_do_arg(P, A) EMP_IMERGE_2(EMP_TRIM_, EMP_RUN_JOIN(EMP_GET_ARG_1, P))(A,~)
-#define EMP_TRIM_next(N, P, ...) EMP_TRIM_ARGS_ ## N( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+#define EMP_SELECT_do_arg(P, A) EMP_IMERGE_2(EMP_SELECT_, EMP_RUN_JOIN(EMP_GET_ARG_1, P))(A,~)
 
-#define EMP_TRIM_ARGS(PATTERN, ...) EMP_ASSEMBLE_MACRO_1ARG(EMP_TRIM_ARGS_, PATTERN, __VA_ARGS__)
+#define EMP_SELECT_ARGS(PATTERN, ...) EMP_POP_ARG( ~ EMP_ASSEMBLE_MACRO_1ARG(EMP_SELECT_ARGS_, PATTERN, __VA_ARGS__) )
 
-#define EMP_TRIM_ARGS_1(P, A) EMP_TRIM_do_arg(P, A)
-#define EMP_TRIM_ARGS_2(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_ARGS_1( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
-#define EMP_TRIM_ARGS_3(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_ARGS_2( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
-#define EMP_TRIM_ARGS_4(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_ARGS_3( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
-#define EMP_TRIM_ARGS_5(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_ARGS_4( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
-#define EMP_TRIM_ARGS_6(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_ARGS_5( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
-#define EMP_TRIM_ARGS_7(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_ARGS_6( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
-#define EMP_TRIM_ARGS_8(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_ARGS_7( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
-#define EMP_TRIM_ARGS_9(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_ARGS_8( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+#define EMP_SELECT_ARGS_1(P, A) EMP_SELECT_do_arg(P, A)
+#define EMP_SELECT_ARGS_2(P, A, ...) EMP_SELECT_do_arg(P, A)EMP_SELECT_ARGS_1( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+#define EMP_SELECT_ARGS_3(P, A, ...) EMP_SELECT_do_arg(P, A)EMP_SELECT_ARGS_2( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+#define EMP_SELECT_ARGS_4(P, A, ...) EMP_SELECT_do_arg(P, A)EMP_SELECT_ARGS_3( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+#define EMP_SELECT_ARGS_5(P, A, ...) EMP_SELECT_do_arg(P, A)EMP_SELECT_ARGS_4( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+#define EMP_SELECT_ARGS_6(P, A, ...) EMP_SELECT_do_arg(P, A)EMP_SELECT_ARGS_5( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+#define EMP_SELECT_ARGS_7(P, A, ...) EMP_SELECT_do_arg(P, A)EMP_SELECT_ARGS_6( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+#define EMP_SELECT_ARGS_8(P, A, ...) EMP_SELECT_do_arg(P, A)EMP_SELECT_ARGS_7( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
+#define EMP_SELECT_ARGS_9(P, A, ...) EMP_SELECT_do_arg(P, A)EMP_SELECT_ARGS_8( (EMP_ROTATE_ARGS P), __VA_ARGS__ )
 
-// #define EMP_TRIM_ARGS_1(P, A) EMP_TRIM_do_arg(P, A)
-// #define EMP_TRIM_ARGS_2(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_next(1, P, __VA_ARGS__)
-// #define EMP_TRIM_ARGS_3(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_next(2, P, __VA_ARGS__)
-// #define EMP_TRIM_ARGS_4(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_next(3, P, __VA_ARGS__)
-// #define EMP_TRIM_ARGS_5(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_next(4, P, __VA_ARGS__)
-// #define EMP_TRIM_ARGS_6(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_next(5, P, __VA_ARGS__)
-// #define EMP_TRIM_ARGS_7(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_next(6, P, __VA_ARGS__)
-// #define EMP_TRIM_ARGS_8(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_next(7, P, __VA_ARGS__)
-// #define EMP_TRIM_ARGS_9(P, A, ...) EMP_TRIM_do_arg(P, A) , EMP_TRIM_next(8, P, __VA_ARGS__)
+// #define EMP_SELECT_ARGS_1(P, A) EMP_SELECT_do_arg(P, A)
+// #define EMP_SELECT_ARGS_2(P, A, ...) EMP_SELECT_do_arg(P, A) , EMP_SELECT_next(1, P, __VA_ARGS__)
+// #define EMP_SELECT_ARGS_3(P, A, ...) EMP_SELECT_do_arg(P, A) , EMP_SELECT_next(2, P, __VA_ARGS__)
+// #define EMP_SELECT_ARGS_4(P, A, ...) EMP_SELECT_do_arg(P, A) , EMP_SELECT_next(3, P, __VA_ARGS__)
+// #define EMP_SELECT_ARGS_5(P, A, ...) EMP_SELECT_do_arg(P, A) , EMP_SELECT_next(4, P, __VA_ARGS__)
+// #define EMP_SELECT_ARGS_6(P, A, ...) EMP_SELECT_do_arg(P, A) , EMP_SELECT_next(5, P, __VA_ARGS__)
+// #define EMP_SELECT_ARGS_7(P, A, ...) EMP_SELECT_do_arg(P, A) , EMP_SELECT_next(6, P, __VA_ARGS__)
+// #define EMP_SELECT_ARGS_8(P, A, ...) EMP_SELECT_do_arg(P, A) , EMP_SELECT_next(7, P, __VA_ARGS__)
+// #define EMP_SELECT_ARGS_9(P, A, ...) EMP_SELECT_do_arg(P, A) , EMP_SELECT_next(8, P, __VA_ARGS__)
 
 // Enable an arbitrary number of arguments (well, up to 10) to be merged AFTER being processed!
 #define EMP_MERGE(...) EMP_ASSEMBLE_MACRO(EMP_MERGE_, __VA_ARGS__)
