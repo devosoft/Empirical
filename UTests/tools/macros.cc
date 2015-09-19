@@ -4,26 +4,10 @@
 #include "../../tools/assert.h"
 #include "../../tools/command_line.h"
 #include "../../tools/macros.h"
+#include "../../tools/unit_tests.h"
 
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]
-
-// EMP_TEST_MACRO takes in a macro call and a string representing the expected result
-// It will assert that the stringifyied macro result is the expected string AND
-// it will print this information if the -v flag is set. 
-#define EMP_TEST_MACRO( MACRO, EXP_RESULT )                             \
-  if (true) {                                                           \
-    std::string result = std::string(EMP_STRINGIFY( MACRO ));           \
-    bool match = (result == EXP_RESULT);                                \
-    if (verbose || !match) {                                            \
-      std::cout << #MACRO << " == " << result << std::endl;             \
-    }                                                                   \
-    if (!match) {                                                       \
-      std::cout << "MATCH FAILED!  Expected: "                          \
-                << EXP_RESULT << std::endl;                             \
-      abort();                                                          \
-    }                                                                   \
-  }
 
 int main(int argc, char* argv[])
 {
@@ -41,21 +25,34 @@ int main(int argc, char* argv[])
   EMP_TEST_MACRO( EMP_STRINGIFY("abcdef"), "\"\\\"abcdef\\\"\"" );
 
   // Make sure we can assemble arbitrary macros
-  EMP_TEST_MACRO( EMP_ASSEMBLE_MACRO( EMP_GET_ARG_, 2, x, y, z ), "y" );
-  
+  EMP_TEST_MACRO( EMP_ASSEMBLE_MACRO_1ARG( EMP_GET_ARG_, 2, x, y, z ), "y" );
+
 
   // Make sure we can wrap each argument in a macro.
   EMP_TEST_MACRO( EMP_WRAP_EACH(EMP_DECORATE, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p), "[a] [b] [c] [d] [e] [f] [g] [h] [i] [j] [k] [l] [m] [n] [o] [p]" );
   EMP_TEST_MACRO( EMP_LAYOUT(EMP_DECORATE, +, a, b, c, d, e, f, g, h), "[a] + [b] + [c] + [d] + [e] + [f] + [g] + [h]" );
   EMP_TEST_MACRO( EMP_WRAP_ARGS(EMP_DECORATE, a, b, c, d, e, f, g, h), "[a], [b], [c], [d], [e], [f], [g], [h]" );
   EMP_TEST_MACRO( EMP_WRAP_ARG_PAIRS(EMP_DECORATE_PAIR, A, a, B, b, C, c, D, d, E, e, F, f), "[A-a], [B-b], [C-c], [D-d], [E-e], [F-f]" );
-  EMP_TEST_MACRO( EMP_GET_ODD_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), "1, 3, 5, 7, 9, 11, 13");
-  EMP_TEST_MACRO( EMP_GET_EVEN_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), "2, 4, 6, 8, 10, 12");
 
 
+  // Rest controlling argument number.
   EMP_TEST_MACRO( EMP_DUPLICATE_ARGS(15, x), "x, x, x, x, x, x, x, x, x, x, x, x, x, x, x" );
   EMP_TEST_MACRO( EMP_DUPLICATE_ARGS(5, x,y,z), "x,y,z, x,y,z, x,y,z, x,y,z, x,y,z" );
   EMP_TEST_MACRO( EMP_DUPLICATE_ARGS(63, 123), "123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123" );
+
+  EMP_TEST_MACRO( EMP_CROP_ARGS(4, a, b, c, d, e, f, g, h, i, j), "a, b, c, d" );
+  EMP_TEST_MACRO( EMP_CROP_ARGS(4, a, b, c, d), "a, b, c, d" );
+  
+  EMP_TEST_MACRO( EMP_FORCE_ARGS_TO(3, x, a, b, c, d), "a, b, c" );
+  EMP_TEST_MACRO( EMP_FORCE_ARGS_TO(4, x, a, b, c, d), "a, b, c, d" );
+  EMP_TEST_MACRO( EMP_FORCE_ARGS_TO(7, x, a, b, c, d), "a, b, c, d, x, x, x" );
+
+  // Test collect only-odd or only-even arguments.
+  EMP_TEST_MACRO( EMP_GET_ODD_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), "1, 3, 5, 7, 9, 11");
+  EMP_TEST_MACRO( EMP_GET_EVEN_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), "2, 4, 6, 8, 10, 12");
+  EMP_TEST_MACRO( EMP_GET_ODD_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), "1, 3, 5, 7, 9, 11, 13");
+  EMP_TEST_MACRO( EMP_GET_EVEN_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), "2, 4, 6, 8, 10, 12");
+
 
   EMP_TEST_MACRO( EMP_REVERSE_ARGS(a,b,c, d), "d, c, b, a" );
   EMP_TEST_MACRO( EMP_TYPES_TO_ARGS(int, char, bool, std::string),
@@ -85,6 +82,6 @@ int main(int argc, char* argv[])
 
   EMP_TEST_MACRO( EMP_STRINGIFY_EACH(some, words), "\"some\", \"words\"" );
 
-  std::cout << "All tests passed." << std::endl;
+  if (verbose) std::cout << "All tests passed." << std::endl;
 }
 

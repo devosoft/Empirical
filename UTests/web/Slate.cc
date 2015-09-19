@@ -1,4 +1,5 @@
 #include "../../web/web.h"
+#include "../../web/commands.h"
 #include "../../emtools/emfunctions.h"
 
 namespace UI = emp::web;
@@ -27,13 +28,13 @@ int main() {
   // emp::Alert("Select size = ", test_select.GetNumOptions());
 
 
-  doc << UI::Text("my_text").Background("#DDDDFF")
-    .CSS("color", "#550055")
-    .CSS("border", "3px solid blue")
-    .CSS("padding", "3px")
-    .CSS("border-radius", "5px")
-    //    .CSS("position", "fixed")
-               << "Is this text formatted?";
+  doc << UI::Text("my_text").SetBackground("#DDDDFF")
+    .SetCSS("color", "#550055")
+    .SetCSS("border", "3px solid blue")
+    .SetCSS("padding", "3px")
+    .SetCSS("border-radius", "5px")
+    //    .SetCSS("position", "fixed")
+      << "Is this text formatted?";
 
   doc << UI::Text("ud_text") << "<p>Here is an updating variable: " << UI::Live(myvar)
                << "<br>"
@@ -46,18 +47,18 @@ int main() {
 
 
   doc << "<p>" << UI::Slate("new_slate")
-    .CSS("border", "5px solid red")
-    .CSS("padding", "5px")
-    .CSS("max-width", "200px")
-    .CSS("border-radius", "15px")
-               << "Testing out the new slate object with some wide text!";
+    .SetCSS("border", "5px solid red")
+    .SetCSS("padding", "5px")
+    .SetCSS("max-width", "200px")
+    .SetCSS("border-radius", "15px")
+      << "Testing out the new slate object with some wide text!";
 
-  doc << "<br>" << UI::Image("motivator.jpg").Width(300).Opacity(0.8);
+  doc << "<br>" << UI::Image("motivator.jpg").SetWidth(300).SetOpacity(0.8);
 
   myvar = 100;
 
-  doc.Button("but").Height(50).Background("green").CSS("border-radius", "5px")
-    .AddDependent(doc.Text("ud_text"));
+  doc.Button("but").SetHeight(50).SetBackground("green").SetCSS("border-radius", "5px")
+    .AddDependant(doc.Text("ud_text"));
   
 
   doc.Slate("new_slate")

@@ -17,11 +17,10 @@
 //
 //  ===== Managing variadic arguments =====
 //  EMP_COUNT_ARGS(...) returns the number of arguments in the __VA_ARGS__
-//
 //  EMP_GET_ARG_*(...) replace * with number and will return the arg at that position.
-//
 //  EMP_DUPLICATE_ARGS(N, ...) makes N collated copies of all args to follow.
-//
+//  EMP_CROP_ARGS(N, ...) reduces N args (must have at least that many)
+//  EMP_FORCE_ARGS_TO(N, P, ...) Crops or pads (with p) args to be exactly N long.
 //  EMP_GET_ODD_ARGS(...) will return all arguments at odd positions (1,3,5,7, etc.)
 //  EMP_GET_EVEN_ARGS(...) will return all arguments at odd positions (2,4,6,8, etc.)
 //  EMP_REVERSE_ARGS(...) Reverse the order of arguments passed in.
@@ -38,18 +37,40 @@
 //  EMP_DEC_x resolves to x-1 (for a number in the place of x)
 //  EMP_HALF_x resolves to x/2
 //
+//  ===== Macro Building =====
+//  EMP_ASSEMBLE_MACRO takes in a prefix and set of arguments and appends the size of the
+//  number of arguments to the prefix, and passes in all of the arguments.
+//
+//  EMP_ASSEMBLE_MACRO_1ARG assumes the first argument after the prefix should not count
+//  toward the size, but passed in anyway. (*_2ARG also works for two arguments).
+//
+//  EMP_FAKE_ARG or EMP_FAKE_2ARG behave as a single argument.  If, in manipulating them
+//  You make them become EMP_CONVERT_ARG_EMP_FAKE_ARG(A) or EMP_CONVERT_ARG_EMP_FAKE_2ARG(A)
+//  (i.e., prepend with EMP_CONVERT and provide an argument) it will trigger a conversion.
+//  If you prepend anything else similarly, it wil NOT trigger a conversion.
+//  
+//  This is especially useful with _2ARG since anything unconverted will be a single
+//  argument, while anything converted will be two, allowing us to shift arguments
+//  to perform conditional behaviors.
+//
+//
 //  Development Notes:
-//  * We need to fix who we handle macros that covert inputs to comma-separated results,
-//    from those that merge them all together.  One option is to have comma-separated the
+//  * We need to standardize how we handle macros that covert inputs to comma-separated
+//    results vs those that merge them together.  One option is to have comma-separated the
 //    default and then have an EMP_REMOVE_COMMAS (or somesuch)
-//  * EMP_TYPES_TO_ARGS (not yet list above) is poorly name.  Maybe EMP_DECLARE_ARGS?
-//  * It would be useful to have EMP_WRAP_WITH_ID which passes in the position ID as
-//    the second argument.  This would allow us to, for example, redo EMP_TYPES_TO_ARGS.
-//  * Simplify EMP_ASSEMBLE_MACRO so that it just takes the args and automatically counts
-//    them so you don't need to pass them in twice.
+//  * EMP_TYPES_TO_ARGS (not yet list above) is poorly named.  Maybe EMP_DECLARE_ARGS?
+//  * It would be useful to have EMP_WRAP_WITH_ID which passes in the position ID as the
+//    second argument.  This would allow us to, for example, streamline EMP_TYPES_TO_ARGS.
 //
 
 #define EMP_COMMA ,
+
+// The below values allow you to have EMP_FAKE_ARG or EMP_FAKE_2ARG as a single argument.
+// If you prepend it with EMP_CONVERT it will trigger a conversion.  If you prepend anything
+// else similarly, it wil NOT triggera a conversion (and stay a single argument)
+#define EMP_CONVERT_ARG_EMP_FAKE_ARG(A) A
+#define EMP_CONVERT_ARG_EMP_FAKE_2ARG(A) ~, A
+
 
 // EMP_STRINGIFY takes any input, processes macros, and puts the result in quotes.
 #define EMP_STRINGIFY(...) EMP_STRINGIFY_IMPL(__VA_ARGS__)
@@ -192,7 +213,78 @@
 #define EMP_DUPLICATE_ARGS_63(...) EMP_DUPLICATE_ARGS_62(__VA_ARGS__), __VA_ARGS__
 #define EMP_DUPLICATE_ARGS_64(...) EMP_DUPLICATE_ARGS_63(__VA_ARGS__), __VA_ARGS__
 
-#define EMP_GET_ODD_ARGS(...) EMP_ASSEMBLE_MACRO(EMP_GET_ODD_ARGS_, EMP_COUNT_ARGS(__VA_ARGS__), __VA_ARGS__)
+// Save the first N args (assumes at least N args exist!
+#define EMP_CROP_ARGS(N, ...) EMP_CROP_ARGS_TO_ ## N (__VA_ARGS__, ~)
+#define EMP_CROP_ARGS_TO_1(A, ...) A
+#define EMP_CROP_ARGS_TO_2(A, B, ...) A, B
+#define EMP_CROP_ARGS_TO_3(A, B, C, ...) A, B, C
+#define EMP_CROP_ARGS_TO_4(A, B, C, D, ...) A, B, C, D
+#define EMP_CROP_ARGS_TO_5(A, B, C, D, E, ...) A, B, C, D, E
+#define EMP_CROP_ARGS_TO_6(A, B, C, D, E, F, ...) A, B, C, D, E, F
+#define EMP_CROP_ARGS_TO_7(A, ...) A, EMP_CROP_ARGS_TO_6(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_8(A, ...) A, EMP_CROP_ARGS_TO_7(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_9(A, ...) A, EMP_CROP_ARGS_TO_8(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_10(A, ...) A, EMP_CROP_ARGS_TO_9(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_11(A, ...) A, EMP_CROP_ARGS_TO_10(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_12(A, ...) A, EMP_CROP_ARGS_TO_11(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_13(A, ...) A, EMP_CROP_ARGS_TO_12(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_14(A, ...) A, EMP_CROP_ARGS_TO_13(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_15(A, ...) A, EMP_CROP_ARGS_TO_14(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_16(A, ...) A, EMP_CROP_ARGS_TO_15(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_17(A, ...) A, EMP_CROP_ARGS_TO_16(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_18(A, ...) A, EMP_CROP_ARGS_TO_17(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_19(A, ...) A, EMP_CROP_ARGS_TO_18(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_20(A, ...) A, EMP_CROP_ARGS_TO_19(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_21(A, ...) A, EMP_CROP_ARGS_TO_20(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_22(A, ...) A, EMP_CROP_ARGS_TO_21(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_23(A, ...) A, EMP_CROP_ARGS_TO_22(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_24(A, ...) A, EMP_CROP_ARGS_TO_23(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_25(A, ...) A, EMP_CROP_ARGS_TO_24(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_26(A, ...) A, EMP_CROP_ARGS_TO_25(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_27(A, ...) A, EMP_CROP_ARGS_TO_26(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_28(A, ...) A, EMP_CROP_ARGS_TO_27(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_29(A, ...) A, EMP_CROP_ARGS_TO_28(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_30(A, ...) A, EMP_CROP_ARGS_TO_29(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_31(A, ...) A, EMP_CROP_ARGS_TO_30(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_32(A, ...) A, EMP_CROP_ARGS_TO_31(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_33(A, ...) A, EMP_CROP_ARGS_TO_32(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_34(A, ...) A, EMP_CROP_ARGS_TO_33(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_35(A, ...) A, EMP_CROP_ARGS_TO_34(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_36(A, ...) A, EMP_CROP_ARGS_TO_35(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_37(A, ...) A, EMP_CROP_ARGS_TO_36(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_38(A, ...) A, EMP_CROP_ARGS_TO_37(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_39(A, ...) A, EMP_CROP_ARGS_TO_38(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_40(A, ...) A, EMP_CROP_ARGS_TO_39(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_41(A, ...) A, EMP_CROP_ARGS_TO_40(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_42(A, ...) A, EMP_CROP_ARGS_TO_41(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_43(A, ...) A, EMP_CROP_ARGS_TO_42(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_44(A, ...) A, EMP_CROP_ARGS_TO_43(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_45(A, ...) A, EMP_CROP_ARGS_TO_44(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_46(A, ...) A, EMP_CROP_ARGS_TO_45(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_47(A, ...) A, EMP_CROP_ARGS_TO_46(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_48(A, ...) A, EMP_CROP_ARGS_TO_47(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_49(A, ...) A, EMP_CROP_ARGS_TO_48(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_50(A, ...) A, EMP_CROP_ARGS_TO_49(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_51(A, ...) A, EMP_CROP_ARGS_TO_50(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_52(A, ...) A, EMP_CROP_ARGS_TO_51(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_53(A, ...) A, EMP_CROP_ARGS_TO_52(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_54(A, ...) A, EMP_CROP_ARGS_TO_53(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_55(A, ...) A, EMP_CROP_ARGS_TO_54(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_56(A, ...) A, EMP_CROP_ARGS_TO_55(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_57(A, ...) A, EMP_CROP_ARGS_TO_56(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_58(A, ...) A, EMP_CROP_ARGS_TO_57(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_59(A, ...) A, EMP_CROP_ARGS_TO_58(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_60(A, ...) A, EMP_CROP_ARGS_TO_59(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_61(A, ...) A, EMP_CROP_ARGS_TO_60(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_62(A, ...) A, EMP_CROP_ARGS_TO_61(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_63(A, ...) A, EMP_CROP_ARGS_TO_62(__VA_ARGS__)
+#define EMP_CROP_ARGS_TO_64(A, ...) A, EMP_CROP_ARGS_TO_63(__VA_ARGS__)
+
+// Force arguments to a specific number.  If less, pad them; if more crop them.
+#define EMP_FORCE_ARGS_TO(N, PAD, ...) EMP_CROP_ARGS(N, __VA_ARGS__, EMP_DUPLICATE_ARGS(N, PAD))
+
+// Trim arguments by taking only odd or even positions.
+#define EMP_GET_ODD_ARGS(...) EMP_ASSEMBLE_MACRO(EMP_GET_ODD_ARGS_, __VA_ARGS__)
 #define EMP_GET_ODD_ARGS_1(A) A
 #define EMP_GET_ODD_ARGS_2(A, B) A
 #define EMP_GET_ODD_ARGS_3(A, B, ...) A, EMP_GET_ODD_ARGS_1(__VA_ARGS__)
@@ -258,7 +350,7 @@
 #define EMP_GET_ODD_ARGS_63(A, B, ...) A, EMP_GET_ODD_ARGS_61(__VA_ARGS__)
 
 
-#define EMP_GET_EVEN_ARGS(...) EMP_ASSEMBLE_MACRO(EMP_GET_EVEN_ARGS_, EMP_COUNT_ARGS(__VA_ARGS__), __VA_ARGS__)
+#define EMP_GET_EVEN_ARGS(...) EMP_ASSEMBLE_MACRO(EMP_GET_EVEN_ARGS_, __VA_ARGS__)
 #define EMP_GET_EVEN_ARGS_1(A)
 #define EMP_GET_EVEN_ARGS_2(A, B) B
 #define EMP_GET_EVEN_ARGS_3(A, B, C) B
@@ -325,7 +417,7 @@
 
 
 // Enable an arbitrary number of arguments (well, up to 10) to be merged AFTER being processed!
-#define EMP_MERGE(...) EMP_ASSEMBLE_MACRO(EMP_MERGE_, EMP_COUNT_ARGS(__VA_ARGS__), __VA_ARGS__)
+#define EMP_MERGE(...) EMP_ASSEMBLE_MACRO(EMP_MERGE_, __VA_ARGS__)
 #define EMP_MERGE_1(A1) A1
 #define EMP_MERGE_2(A1,A2) A1 ## A2
 #define EMP_MERGE_3(A1,A2,A3) A1 ## A2 ## A3
@@ -340,12 +432,12 @@
 
 // EMP_WRAP_EACH takes a wrapper macro and a variable set of arguments,
 // then applied to wrapper macro to each argument in order.
-#define EMP_WRAP_EACH(W, ...) EMP_ASSEMBLE_MACRO(EMP_LAYOUT_, EMP_COUNT_ARGS(__VA_ARGS__), W, , __VA_ARGS__)
+#define EMP_WRAP_EACH(W, ...) EMP_ASSEMBLE_MACRO_2ARG(EMP_LAYOUT_, W, , __VA_ARGS__)
 
 // EMP_LAYOUT takes a wrapper macro and padding information, wraps each argument in the macro
 // and then spaces them out with the padding.
 // W = Wrapper macro name, P = Padding between results
-#define EMP_LAYOUT(W, P, ...) EMP_ASSEMBLE_MACRO(EMP_LAYOUT_, EMP_COUNT_ARGS(__VA_ARGS__), W, P, __VA_ARGS__)
+#define EMP_LAYOUT(W, P, ...) EMP_ASSEMBLE_MACRO_2ARG(EMP_LAYOUT_, W, P, __VA_ARGS__)
 #define EMP_LAYOUT_0(W, P)
 #define EMP_LAYOUT_1(W, P, A) W(A)
 #define EMP_LAYOUT_2(W, P, A, ...) W(A) P EMP_LAYOUT_1(W, P, __VA_ARGS__)
@@ -412,7 +504,7 @@
 #define EMP_LAYOUT_63(W, P, A, ...) W(A) P EMP_LAYOUT_62(W, P, __VA_ARGS__)
 
 
-#define EMP_WRAP_ARGS(W, ...) EMP_ASSEMBLE_MACRO(EMP_WRAP_ARGS_, EMP_COUNT_ARGS(__VA_ARGS__), W, __VA_ARGS__)
+#define EMP_WRAP_ARGS(W, ...) EMP_ASSEMBLE_MACRO_1ARG(EMP_WRAP_ARGS_, W, __VA_ARGS__)
 #define EMP_WRAP_ARGS_1(W, A) W(A)
 #define EMP_WRAP_ARGS_2(W, A, ...) W(A), EMP_WRAP_ARGS_1(W, __VA_ARGS__)
 #define EMP_WRAP_ARGS_3(W, A, ...) W(A), EMP_WRAP_ARGS_2(W, __VA_ARGS__)
@@ -482,7 +574,7 @@
 #define EMP_STRINGIFY_EACH(...) EMP_WRAP_ARGS(EMP_STRINGIFY, __VA_ARGS__)
 
 
-#define EMP_WRAP_ARG_PAIRS(W, ...) EMP_ASSEMBLE_MACRO(EMP_WRAP_ARG_PAIRS_, EMP_COUNT_ARGS(__VA_ARGS__), W, __VA_ARGS__)
+#define EMP_WRAP_ARG_PAIRS(W, ...) EMP_ASSEMBLE_MACRO_1ARG(EMP_WRAP_ARG_PAIRS_, W, __VA_ARGS__)
 #define EMP_WRAP_ARG_PAIRS_2(W, A1, A2) W(A1, A2)
 #define EMP_WRAP_ARG_PAIRS_4(W, A1, A2, ...) W(A1, A2), EMP_WRAP_ARG_PAIRS_2(W, __VA_ARGS__)
 #define EMP_WRAP_ARG_PAIRS_6(W, A1, A2, ...) W(A1, A2), EMP_WRAP_ARG_PAIRS_4(W, __VA_ARGS__)
@@ -548,7 +640,7 @@
 #define EMP_WRAP_ARG_PAIRS_126(W, A1, A2, ...) W(A1, A2), EMP_WRAP_ARG_PAIRS_124(W, __VA_ARGS__)
 #define EMP_WRAP_ARG_PAIRS_128(W, A1, A2, ...) W(A1, A2), EMP_WRAP_ARG_PAIRS_126(W, __VA_ARGS__)
 
-#define EMP_REVERSE_ARGS(...) EMP_ASSEMBLE_MACRO(EMP_REVERSE_ARGS_, EMP_COUNT_ARGS(__VA_ARGS__), __VA_ARGS__)
+#define EMP_REVERSE_ARGS(...) EMP_ASSEMBLE_MACRO(EMP_REVERSE_ARGS_, __VA_ARGS__)
 #define EMP_REVERSE_ARGS_1(A) A
 #define EMP_REVERSE_ARGS_2(A, ...) EMP_REVERSE_ARGS_1(__VA_ARGS__), A
 #define EMP_REVERSE_ARGS_3(A, ...) EMP_REVERSE_ARGS_2(__VA_ARGS__), A
@@ -614,7 +706,7 @@
 #define EMP_REVERSE_ARGS_63(A, ...) EMP_REVERSE_ARGS_62(__VA_ARGS__), A
 #define EMP_REVERSE_ARGS_64(A, ...) EMP_REVERSE_ARGS_63(__VA_ARGS__), A
 
-#define EMP_TYPES_TO_ARGS(...) EMP_ASSEMBLE_MACRO(EMP_TYPES_TO_ARGS_, EMP_COUNT_ARGS(__VA_ARGS__), EMP_REVERSE_ARGS(__VA_ARGS__))
+#define EMP_TYPES_TO_ARGS(...) EMP_ASSEMBLE_MACRO(EMP_TYPES_TO_ARGS_, EMP_REVERSE_ARGS(__VA_ARGS__))
 #define EMP_TYPES_TO_ARGS_1(A) A arg1
 #define EMP_TYPES_TO_ARGS_2(A, ...) EMP_TYPES_TO_ARGS_1(__VA_ARGS__), A arg2
 #define EMP_TYPES_TO_ARGS_3(A, ...) EMP_TYPES_TO_ARGS_2(__VA_ARGS__), A arg3
@@ -681,7 +773,8 @@
 
 
 // Some basic math macros.  Since brute force is the only way to do math with macros...
-#define EMP_INC(X) EMP_INC_ ## X
+#define EMP_INC(X) EMP_INC_IMPL(X)
+#define EMP_INC_IMPL(X) EMP_INC_ ## X
 #define EMP_INC_0  1
 #define EMP_INC_1  2
 #define EMP_INC_2  3
@@ -747,7 +840,8 @@
 #define EMP_INC_62  63
 #define EMP_INC_63  64
 
-#define EMP_DEC(X) EMP_DEC_ ## X
+#define EMP_DEC(X) EMP_DEC_IMPL(X)
+#define EMP_DEC_IMPL(X) EMP_DEC_ ## X
 #define EMP_DEC_0  -1
 #define EMP_DEC_1  0
 #define EMP_DEC_2  1
@@ -813,7 +907,8 @@
 #define EMP_DEC_62  61
 #define EMP_DEC_63  62
 
-#define EMP_HALF(X) EMP_HALF_ ## X
+#define EMP_HALF(X) EMP_HALF_IMPL(X)
+#define EMP_HALF_IMPL(X) EMP_HALF_ ## X
 #define EMP_HALF_0  0
 #define EMP_HALF_1  0
 #define EMP_HALF_2  1
@@ -881,7 +976,17 @@
 
 
 // Setup a generic method of calling a specific version of a macro based on argument count.
-#define EMP_ASSEMBLE_IMPL(BASE, ARG_COUNT) BASE ## ARG_COUNT
-#define EMP_ASSEMBLE_MACRO(BASE, ARG_COUNT, ...) EMP_ASSEMBLE_IMPL(BASE, ARG_COUNT) (__VA_ARGS__)
+// If some of the args need to be passed to each version, specify number in macro call.
+#define EMP_ASSEMBLE_MACRO(BASE, ...)                                   \
+  EMP_ASSEMBLE_IMPL(BASE, EMP_COUNT_ARGS(__VA_ARGS__), __VA_ARGS__)
+
+#define EMP_ASSEMBLE_MACRO_1ARG(BASE, A, ...)                           \
+  EMP_ASSEMBLE_IMPL(BASE, EMP_COUNT_ARGS(__VA_ARGS__), A, __VA_ARGS__)
+
+#define EMP_ASSEMBLE_MACRO_2ARG(BASE, A, B, ...)                         \
+  EMP_ASSEMBLE_IMPL(BASE, EMP_COUNT_ARGS(__VA_ARGS__), A, B, __VA_ARGS__)
+
+#define EMP_ASSEMBLE_IMPL(BASE, ARG_COUNT, ...) EMP_ASSEMBLE_MERGE(BASE, ARG_COUNT) (__VA_ARGS__)
+#define EMP_ASSEMBLE_MERGE(A, B) A ## B
 
 #endif

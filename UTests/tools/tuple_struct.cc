@@ -5,6 +5,7 @@
 #include "../../tools/assert.h"
 #include "../../tools/command_line.h"
 #include "../../tools/tuple_struct.h"
+#include "../../tools/unit_tests.h"
 
 struct TestStruct {
   int myvar;
@@ -79,19 +80,21 @@ int main(int argc, char* argv[])
   std::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
   const bool verbose = emp::cl::use_arg(args, "-v");
 
-  std::cout << "Hello!" << std::endl;
-
   TestStruct test;
   test.myvar = 12;
   test.MyInt(15);
   test.MyInt() = 20;
 
-  std::cout << "myvar = " << test.myvar << std::endl;
-  std::cout << "MyInt = " << test.MyInt() << std::endl;
+  EMP_TEST_VALUE(test.myvar, "12");
+  EMP_TEST_VALUE(test.MyInt(), "20");
+  // std::cout << "myvar = " << test.myvar << std::endl;
+  // std::cout << "MyInt = " << test.MyInt() << std::endl;
 
   TestIntrospectiveStruct test2;
   test2.MyInt(8);
-  std::cout << "MyInt = " << test2.MyInt() << std::endl;
-  std::cout << "First variable name: " << test2.var_names[0] << std::endl;
-  std::cout << "MyInt from pointer: " << *(int*)test2.pointers[0] << std::endl;
+  EMP_TEST_VALUE(test2.MyInt(), "8");
+  EMP_TEST_VALUE(test2.var_names[0], "MyInt");
+  // std::cout << "MyInt = " << test2.MyInt() << std::endl;
+  // std::cout << "First variable name: " << test2.var_names[0] << std::endl;
+  
 }

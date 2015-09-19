@@ -29,14 +29,12 @@ int main(int argc, char* argv[])
   bv80[70] = 1;
   emp::BitVector bv80c(bv80);
 
-  std::cout << "Pre-shift:  " << bv80 << std::endl;
+  if (verbose) std::cout << "Pre-shift:  " << bv80 << std::endl;
   bv80 <<= 1;
   // bv80 >>= 1;
-  std::cout << "Post-shift: " << bv80 << std::endl;
+  if (verbose) std::cout << "Post-shift: " << bv80 << std::endl;
 
-  if (verbose) {
-    std::cout << "Shifting!" << std::endl;
-  }
+  if (verbose) std::cout << "Shifting!" << std::endl;
 
   for (int i = 0; i < 75; i += 2) {
     emp::BitVector shift_vector = bv80 >> i;
@@ -61,8 +59,8 @@ int main(int argc, char* argv[])
   }
 
   bv10 = (bv80 >> 70);
-  std::cout << (bv80 >> 70) << std::endl;
-  std::cout << bv10 << std::endl;
+  if (verbose) std::cout << (bv80 >> 70) << std::endl;
+  if (verbose) std::cout << bv10 << std::endl;
 
   // Test arbitrary bit retrieval of UInts
   bv80[65] = 1;
