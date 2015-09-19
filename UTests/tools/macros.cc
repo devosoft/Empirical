@@ -27,6 +27,14 @@ int main(int argc, char* argv[])
   // Make sure we can assemble arbitrary macros
   EMP_TEST_MACRO( EMP_ASSEMBLE_MACRO_1ARG( EMP_GET_ARG_, 2, x, y, z ), "y" );
 
+  // Simple argument manipulation
+  EMP_TEST_MACRO( EMP_ROTATE_ARGS(a, b, c), "b, c, a" );
+
+  // Test trimming argument lists.
+  EMP_TEST_MACRO( EMP_SELECT_ARGS( (i,x,i), a ), "a" );
+  EMP_TEST_MACRO( EMP_SELECT_ARGS( (i,x,i), a,b ), "a" );
+  EMP_TEST_MACRO( EMP_SELECT_ARGS( (i,x,i), a,b,c,d,e,f,g,h,i ), "a, c, d, f, g, i" );
+
 
   // Make sure we can wrap each argument in a macro.
   EMP_TEST_MACRO( EMP_WRAP_EACH(EMP_DECORATE, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p), "[a] [b] [c] [d] [e] [f] [g] [h] [i] [j] [k] [l] [m] [n] [o] [p]" );
@@ -57,16 +65,6 @@ int main(int argc, char* argv[])
   EMP_TEST_MACRO( EMP_REVERSE_ARGS(a,b,c, d), "d, c, b, a" );
   EMP_TEST_MACRO( EMP_TYPES_TO_ARGS(int, char, bool, std::string),
                   "int arg1, char arg2, bool arg3, std::string arg4" );
-
-  EMP_TEST_MACRO( EMP_INC(20), "21");
-  EMP_TEST_MACRO( EMP_INC(55), "56");
-  EMP_TEST_MACRO( EMP_INC(63), "64");
-  EMP_TEST_MACRO( EMP_DEC(20), "19");
-  EMP_TEST_MACRO( EMP_DEC(55), "54");
-  EMP_TEST_MACRO( EMP_DEC(63), "62");
-  EMP_TEST_MACRO( EMP_HALF(17), "8");
-  EMP_TEST_MACRO( EMP_HALF(18), "9");
-  EMP_TEST_MACRO( EMP_HALF(60), "30");
 
 
   // Test EMP_STRINGIFY_EACH
