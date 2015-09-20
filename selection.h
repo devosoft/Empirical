@@ -9,6 +9,7 @@
 #include "../Empirical/tools/assert.h"
 #include <array>
 #include "../Empirical/emtools/js_object_struct.h"
+#include "../Empirical/emtools/js_utils.h"
 #include "utils.h"
 
 extern "C" {
@@ -28,6 +29,10 @@ namespace D3 {
     Selection(const char* selector, bool all = false);
     //Selection(Selection* selector, bool all = false); //Do we need this?
     //~Selection(); //tilde is creating demangling issues
+
+    int GetID() {
+      return this->id;
+    }
 
     Selection Select(const char* selector){
       int new_id = EM_ASM_INT_V({return js.objects.length});
@@ -76,7 +81,7 @@ namespace D3 {
 	 This will break if someone happens to use a string that
 	 is identical to a function name... but that's unlikely, right?
       */
-      PassArrayToJavascript(value);
+      emp::pass_array_to_javascript(value);
 
       EM_ASM_ARGS({
 	  js.objects[$0].attr(Pointer_stringify($1), emp.__incoming_array);
@@ -141,7 +146,7 @@ namespace D3 {
     template<std::size_t SIZE, typename T>
     Selection Data(std::array<T, SIZE> values, const char* key=""){
       int update_id = EM_ASM_INT_V({return js.objects.length});
-      PassArrayToJavascript(values);
+      emp::pass_array_to_javascript(values);
 
 	EM_ASM_ARGS({
 	  var in_string = Pointer_stringify($1);

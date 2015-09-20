@@ -8,6 +8,7 @@
 #include "../Empirical/tools/tuple_struct.h"
 #include "scales.h"
 #include "svg_shapes.h"
+#include "axis.h"
 
 struct JSDataObject;
 
@@ -59,22 +60,27 @@ int main()
 
   std::array<std::array<int,2>, 5> test_path = {{{0,0}, {0,10}, {10,10}, {20,20}, {30, 30}}};
 
-  std::array<std::array<std::array<int, 2>, 1>, 5> horrible_array = {{{{0,0}}, {{0,10}}, {{10,10}}, {{20,20}}, {{30, 30}}}};
-
-  PassArrayToJavascript(horrible_array);
-  EM_ASM({console.log(emp.__incoming_array)});
+  std::array<std::array<std::array<int,2>, 2>, 3> test_paths = {{ {{{0,0}, {100,0}}}, {{{0,10}, {100,100}}}, {{{20,20}, {300, 300}}} }};
 
   //D3::ShapesFromData(test_data, "circle");
   //EM_ASM({d3.select("svg").selectAll("circle").data([{val:5, word:"hi", val2:6.3}]).enter().append("circle")});
 
   svg.SelectAll("circle").Data(test_data_2).EnterAppend("circle");
 
-  D3::Selection path = svg.Append("path");
+  //D3::Selection path = svg.Append("path");
+  D3::LineGenerator make_line = D3::LineGenerator();
+  D3::Selection path = make_line.DrawLine(test_path);
   path.SetAttr("fill", "none");
   path.SetAttr("stroke", "blue");
   path.SetAttr("stroke-width", 2);
-  D3::LineGenerator make_line = D3::LineGenerator();
-  path.SetAttr("d", make_line.MakeLine(test_path).c_str());
+  D3::Selection group = make_line.DrawLines(test_paths);
+  //group = D3::SelectAll("path");
+  group.SetAttr("fill", "none");
+  group.SetAttr("stroke", "blue");
+  group.SetAttr("stroke-width", 2);
+
+  //
+  //path.SetAttr("d", make_line.MakeLine(test_path).c_str());
 
   std::cout << "data bound" << std::endl;
 

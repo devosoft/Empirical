@@ -1,6 +1,7 @@
 #ifndef __SCALES_H__
 #define __SCALES_H__
 
+#include "../Empirical/emtools/js_utils.h"
 #include "utils.h"
 
 namespace D3 {
@@ -19,13 +20,13 @@ namespace D3 {
     
     template <typename T, size_t SIZE>
     void SetRange(std::array<T,SIZE> values) {
-      PassArrayToJavascript(values);
+      emp::pass_array_to_javascript(values);
       EM_ASM_ARGS({js.objects[$0].range(emp.__incoming_array);}, this->id);
     }
 
     template <typename T, size_t SIZE>
     void SetDomain(std::array<T,SIZE> values) {
-      PassArrayToJavascript(values);
+      emp::pass_array_to_javascript(values);
       EM_ASM_ARGS({js.objects[$0].domain(emp.__incoming_array);}, this->id);
     }
 
@@ -123,7 +124,7 @@ namespace D3 {
 
     template <typename T, size_t SIZE>
     void SetRangeRound(std::array<T,SIZE> values) {
-      PassArrayToJavascript(values);
+      emp::pass_array_to_javascript(values);
       EM_ASM_ARGS({js.objects[$0].rangeRound(emp.__incoming_array);}, this->id);
     }
 
