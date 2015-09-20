@@ -22,6 +22,8 @@
 //  EMP_CROP_ARGS(N, ...) reduces N args (must have at least that many)
 //  EMP_FORCE_ARGS_TO(N, P, ...) Crops or pads (with p) args to be exactly N long.
 //  EMP_ROTATE_ARGS(...) Moves the first argument to the end of the arg list.
+//  EMP_SELECT_ARGS(PATTERN, ...) Uses the (repeating) patter to select arguments to keep.
+//    Pattern is an argument pack consisting of i (include) or x (exclude). 
 //  EMP_GET_ODD_ARGS(...) will return all arguments at odd positions (1,3,5,7, etc.)
 //  EMP_GET_EVEN_ARGS(...) will return all arguments at odd positions (2,4,6,8, etc.)
 //  EMP_REVERSE_ARGS(...) Reverse the order of arguments passed in.
@@ -33,17 +35,12 @@
 //  EMP_WRAP_ARGS(W, ...) Similar to EMP_WRAP_EACH, but puts a COMMA between each arg pair.
 //  EMP_WRAP_ARG_PAIRS(W, ...) Similar to EMP_WRAP_ARGS, but passes pairs of args into W.
 //
-//  ===== Simple Math =====
-//  EMP_INC_x resolves to x+1 (for a number in the place of x)
-//  EMP_DEC_x resolves to x-1 (for a number in the place of x)
-//  EMP_HALF_x resolves to x/2
-//
 //  ===== Macro Building =====
 //  EMP_ASSEMBLE_MACRO takes in a prefix and set of arguments and appends the size of the
 //  number of arguments to the prefix, and passes in all of the arguments.
 //
 //  EMP_ASSEMBLE_MACRO_1ARG assumes the first argument after the prefix should not count
-//  toward the size, but passed in anyway. (*_2ARG also works for two arguments).
+//  toward the size, but passed in anyway. (*_?ARG  works for more arguments up to 10).
 //
 //  EMP_FAKE_ARG or EMP_FAKE_2ARG behave as a single argument.  If, in manipulating them
 //  You make them become EMP_CONVERT_ARG_EMP_FAKE_ARG(A) or EMP_CONVERT_ARG_EMP_FAKE_2ARG(A)
@@ -63,8 +60,6 @@
 //  * It would be useful to have EMP_WRAP_WITH_ID which passes in the position ID as the
 //    second argument.  This would allow us to, for example, streamline EMP_TYPES_TO_ARGS.
 //
-
-#define EMP_COMMA ,
 
 // The below values allow you to have EMP_FAKE_ARG or EMP_FAKE_2ARG as a single argument.
 // If you prepend it with EMP_CONVERT it will trigger a conversion.  If you prepend anything
@@ -753,7 +748,6 @@
 #define EMP_TYPES_TO_ARGS_61(A, ...) EMP_TYPES_TO_ARGS_60(__VA_ARGS__), A arg61
 #define EMP_TYPES_TO_ARGS_62(A, ...) EMP_TYPES_TO_ARGS_61(__VA_ARGS__), A arg62
 #define EMP_TYPES_TO_ARGS_63(A, ...) EMP_TYPES_TO_ARGS_62(__VA_ARGS__), A arg63
-
 
 
 // Setup a generic method of calling a specific version of a macro based on argument count.
