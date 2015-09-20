@@ -42,7 +42,7 @@ struct TestStruct {
                    char, MyChar10)
 };
 
-struct TestStoredVarStruct {
+struct TestIntrospectiveStruct {
   EMP_BUILD_INTROSPECTIVE_TUPLE( int, MyInt,
                    int, MyInt2,
                    int, MyInt3,
@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
   // std::cout << "myvar = " << test.myvar << std::endl;
   // std::cout << "MyInt = " << test.MyInt() << std::endl;
 
-  TestStoredVarStruct test2;
+  TestIntrospectiveStruct test2;
   test2.MyInt(8);
   EMP_TEST_VALUE(test2.MyInt(), "8");
   EMP_TEST_VALUE(test2.var_names[0], "MyInt");

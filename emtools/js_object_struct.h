@@ -30,13 +30,8 @@ struct JSDataObject{
 				   std::string, word,
 				   float, val2
 				   )
-  
-  //Overloading the [] operator feels tantalizingly close
-  //to being within reach, however the compiler can't infer
-  //the return type (and understandably so)
-  //template <typename T>
-  //T& operator[](std::size_t idx){return pointers[idx];};
-  
+ 
+ 
   
 };
 #endif
