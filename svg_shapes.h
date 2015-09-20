@@ -6,16 +6,79 @@
 namespace D3 {
   class Scale;
 
-  
   class SvgShapeGenerator {
   protected:
     int id;
     SvgShapeGenerator();
   public:
+    //This function creates a string specifying a path
+    template <typename T, size_t SIZE>
+    std::string Generate(std::array<std::array<T, 2>, SIZE> data){
+      emp::pass_array_to_javascript(data);
+    
+      int buffer = EM_ASM_INT({
+	  var result = js.objects[$0](emp.__incoming_array);
+	  var buffer = Module._malloc(result.length+1);
+	  Module.writeStringToMemory(result, buffer);
+	  return buffer;
+	}, this->id);
+
+      return (char *)buffer;
+    }
+
+    //This function actually handles the binding of the path string to the dom
+    template <typename T, std::size_t SIZE>
+    Selection DrawShape(std::array<std::array<T, 2>, SIZE> data) {
+      Selection path = Select("svg").Append("path");
+      path.SetAttr("d", Generate(data).c_str());
+      return path;
+    }
+
+   //This function draws an array of lines
+    template <typename T, std::size_t SIZE, std::size_t SIZE2>
+    Selection DrawShapes(std::array<std::array<std::array<T, 2>, SIZE>,\
+			 SIZE2>  data) {
+      Selection group = Select("svg").Append("g");
+      for (auto arr: data) {
+	Selection path = group.Append("path");
+	path.SetAttr("d", Generate(arr).c_str());
+      }
+      return group;
+    }
   };
 
   SvgShapeGenerator::SvgShapeGenerator() {}
   
+  class SymbolGenerator : public SvgShapeGenerator {
+  public:
+    SymbolGenerator();
+    
+    void SetType(std::string type){
+      //TODO: Should we check that type is in d3.svg.symbolTypes?
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(type, type.c_str())
+    }
+
+    //If size is a constant, it's in pixels, so an int is reasonable
+    void SetSize(int size) {
+      EM_ASM_ARGS({
+	  js.objects[$0].size($1);
+	}, this->id, size);
+    }
+    
+    //Otherwise it's a function
+    void SetSize(std::string size){
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(size, size.c_str())
+    }
+  };
+
+  SymbolGenerator::SymbolGenerator() {
+    this->id = EM_ASM_INT_V({return js.objects.length});
+    EM_ASM({
+	var new_line = d3.svg.symbol();
+	js.objects.push(new_line);
+      });
+  }
+
 
   class LineGenerator : public SvgShapeGenerator {
   public:
@@ -34,41 +97,6 @@ namespace D3 {
     void SetDefined(std::string defined){
       CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(defined, defined.c_str())
     }
-
-    //This function creates a string specifying a path
-    template <typename T, size_t SIZE>
-    std::string Path(std::array<std::array<T, 2>, SIZE> data){
-      emp::pass_array_to_javascript(data);
-    
-      int buffer = EM_ASM_INT({
-	  var result = js.objects[$0](emp.__incoming_array);
-	  var buffer = Module._malloc(result.length+1);
-	  Module.writeStringToMemory(result, buffer);
-	  return buffer;
-	}, this->id);
-
-      return (char *)buffer;
-    }
-
-    //This function actually handles the binding of the path string to the dom
-    template <typename T, std::size_t SIZE>
-    Selection DrawLine(std::array<std::array<T, 2>, SIZE> data) {
-      Selection path = Select("svg").Append("path");
-      path.SetAttr("d", Path(data).c_str());
-      return path;
-    }
-
-   //This function draws an array of lines
-    template <typename T, std::size_t SIZE, std::size_t SIZE2>
-    Selection DrawLines(std::array<std::array<std::array<T, 2>, SIZE>, SIZE2>  data) {
-      Selection group = Select("svg").Append("g");
-      for (auto arr: data) {
-	Selection path = group.Append("path");
-	path.SetAttr("d", Path(arr).c_str());
-      }
-      return group;
-    }
-
   };
 
   LineGenerator::LineGenerator() {
@@ -280,6 +308,69 @@ namespace D3 {
       });
   }
  
+  class ChordGenerator : public RadialAreaGenerator {
+  public:
+    ChordGenerator();
+
+    template <typename T>
+    void SetSource(T source) {
+      EM_ASM_ARGS({js.objects[$0].source($1);}, this->id, source);
+    }
+
+    void SetSource(std::string source) {
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(source, source.c_str())
+    }
+
+    template <typename T>
+    void SetTarget(T target) {
+      EM_ASM_ARGS({js.objects[$0].target($1);}, this->id, target);
+    }
+
+    void SetTarget(std::string target) {
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(target, target.c_str())
+    }
+  };
+
+  ChordGenerator::ChordGenerator() {
+    this->id = EM_ASM_INT_V({return js.objects.length});
+    EM_ASM({
+	var new_line = d3.svg.area.chord();
+	js.objects.push(new_line);
+      });
+  }
+
+  class DiagonalGenerator : public ChordGenerator {
+  public:
+    DiagonalGenerator();
+
+   void SetProjection(std::string projection) {
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(projection, projection.c_str())
+    }
+  };
+
+  DiagonalGenerator::DiagonalGenerator() {
+    this->id = EM_ASM_INT_V({return js.objects.length});
+    EM_ASM({
+	var new_line = d3.svg.area.diagonal();
+	js.objects.push(new_line);
+      });
+  }
+
+  //There is no documentation on this class in D3 other than that it exists
+  //so I'm just making it exist here too.
+  class DiagonalRadialGenerator : public ChordGenerator {
+  public:
+    DiagonalRadialGenerator();
+  };
+
+  DiagonalRadialGenerator::DiagonalRadialGenerator() {
+    this->id = EM_ASM_INT_V({return js.objects.length});
+    EM_ASM({
+	var new_line = d3.svg.area.diagonal.radil();
+	js.objects.push(new_line);
+      });
+  }
+
   class ArcGenerator : public RadialAreaGenerator {
   public:
     ArcGenerator();
@@ -319,8 +410,6 @@ namespace D3 {
 	js.objects.push(new_line);
       });
   }
-
-  //TODO: symbol, chord, diagonal
 
 }
 

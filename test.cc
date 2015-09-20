@@ -69,11 +69,11 @@ int main()
 
   //D3::Selection path = svg.Append("path");
   D3::LineGenerator make_line = D3::LineGenerator();
-  D3::Selection path = make_line.DrawLine(test_path);
+  D3::Selection path = make_line.DrawShape(test_path);
   path.SetAttr("fill", "none");
   path.SetAttr("stroke", "blue");
   path.SetAttr("stroke-width", 2);
-  D3::Selection group = make_line.DrawLines(test_paths);
+  D3::Selection group = make_line.DrawShapes(test_paths);
   //group = D3::SelectAll("path");
   group.SetAttr("fill", "none");
   group.SetAttr("stroke", "blue");
