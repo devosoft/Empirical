@@ -22,7 +22,7 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 
 
 default: native
-native: BitMatrix BitSet BitVector DynamicStringSet FunctionSet Graph Ptr Random Trait assert functions graph_utils macros mem_track reflection sequence_utils serialize string_utils tuple_struct vector
+native: BitMatrix BitSet BitVector DynamicStringSet FunctionSet Graph Ptr Random Trait assert functions graph_utils macros macro_math mem_track reflection sequence_utils serialize string_utils tuple_struct vector
 
 BitMatrix:	BitMatrix.cc ../../tools/BitMatrix.h
 	$(CXX_native) $(CFLAGS_native) BitMatrix.cc -o BitMatrix
@@ -63,6 +63,9 @@ graph_utils:	graph_utils.cc ../../tools/graph_utils.h
 macros:	macros.cc ../../tools/macros.h
 	$(CXX_native) $(CFLAGS_native) macros.cc -o macros
 
+macro_math:	macro_math.cc ../../tools/macro_math.h
+	$(CXX_native) $(CFLAGS_native) macro_math.cc -o macro_math
+
 mem_track:	mem_track.cc ../../tools/mem_track.h
 	$(CXX_native) $(CFLAGS_native) mem_track.cc -o mem_track
 
@@ -85,7 +88,7 @@ vector:	vector.cc ../../tools/vector.h
 	$(CXX_native) $(CFLAGS_native) vector.cc -o vector
 
 clean:
-	rm -rf *.dSYM BitMatrix BitSet BitVector DynamicStringSet FunctionSet Graph Ptr Random Trait assert functions graph_utils macros mem_track reflection sequence_utils serialize string_utils tuple_struct vector *.js.map *~
+	rm -rf *.dSYM BitMatrix BitSet BitVector DynamicStringSet FunctionSet Graph Ptr Random Trait assert functions graph_utils macros macro_math mem_track reflection sequence_utils serialize string_utils tuple_struct vector *.js.map *~
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
