@@ -11,16 +11,30 @@ int main(int argc, char* argv[])
   std::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
   const bool verbose = emp::cl::use_arg(args, "-v");
 
-  // Test converting between binary and decimal.
-  EMP_TEST_MACRO( EMP_VAL_TO_BIN(9), "0, 0, 0, 0, 1, 0, 0, 1");
-  EMP_TEST_MACRO( EMP_BIN_TO_VAL(0,0,0,0,1,0,1,1), "11");
+  // Test converting between binary, decimal, and sum formats.
+  EMP_TEST_MACRO( EMP_DEC_TO_BIN(9), "0, 0, 0, 0, 1, 0, 0, 1");
+  EMP_TEST_MACRO( EMP_DEC_TO_BIN(91), "0, 1, 0, 1, 1, 0, 1, 1");
+  EMP_TEST_MACRO( EMP_BIN_TO_DEC(0,0,0,0,1,0,1,1), "11");
+  EMP_TEST_MACRO( EMP_BIN_TO_DEC(0,1,0,1,1,0,1,1), "91");
+  EMP_TEST_MACRO( EMP_BIN_TO_SUM(0,1,0,1,1,0,1,1), "0, 64, 0, 16, 8, 0, 2, 1");
+  EMP_TEST_MACRO( EMP_DEC_TO_SUM(91), "0, 64, 0, 16, 8, 0, 2, 1");
+
+//   DEC - Standard decimal values (e.g., 91)
+//   BIN - Binary numbers, with bits separated by commas (e.g.  0,  1, 0,  1, 1, 0, 1, 1 )
+//   SUM - Like BIN, but stored as zero or magnitude.    (e.g., 0, 64, 0, 16, 8, 0, 2, 1
+
 
   // Test other helper functions.
+  EMP_TEST_MACRO( EMP_MATH_VAL_TIMES_0(222), "0" );
+  EMP_TEST_MACRO( EMP_MATH_VAL_TIMES_1(222), "222" );
+
   EMP_TEST_MACRO( EMP_MATH_BIN_TIMES_0(1,0,1,0,1,0,1,0), "0, 0, 0, 0, 0, 0, 0, 0" );
   EMP_TEST_MACRO( EMP_MATH_BIN_TIMES_1(1,0,1,0,1,0,1,0), "1, 0, 1, 0, 1, 0, 1, 0" );
 
   // Test simple math.
   EMP_TEST_MACRO( EMP_MATH_COUNT_BITS(1, 1), "2");
+  EMP_TEST_MACRO( EMP_MATH_COUNT_BITS(1, N), "0");
+  EMP_TEST_MACRO( EMP_MATH_COUNT_BITS(0, N), "N");
   EMP_TEST_MACRO( EMP_MATH_GET_CARRY(2), "1");
   EMP_TEST_MACRO( EMP_MATH_CLEAR_CARRY(2), "0");
   
