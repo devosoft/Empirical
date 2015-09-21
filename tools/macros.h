@@ -106,71 +106,9 @@
 #define EMP_POP_ARGS(N, ...) EMP_POP_ARGS_SUM EMP_EMPTY (EMP_EVAL(EMP_DEC_TO_SUM(N)),__VA_ARGS__)
 #define EMP_POP_ARGS_SUM(S0,S1,S2,S3,S4,S5,S6,S7,S8,S9,...) EMP_POP_ARGS_##S0( EMP_POP_ARGS_##S1( EMP_POP_ARGS_##S2( EMP_POP_ARGS_##S3( EMP_POP_ARGS_##S4( EMP_POP_ARGS_##S5( EMP_POP_ARGS_##S6( EMP_POP_ARGS_##S7( EMP_POP_ARGS_##S8( EMP_POP_ARGS_##S9( __VA_ARGS__ ))))))))))
 
-#define EMP_GET_ARG(N, ...) EMP_GET_ARG_ ## N (__VA_ARGS__)
-#define EMP_GET_ARG_1(A1, ...) A1
-#define EMP_GET_ARG_2(A1, A2, ...) A2
-#define EMP_GET_ARG_3(A1, A2, A3, ...) A3
-#define EMP_GET_ARG_4(A1, A2, A3, A4, ...) A4
-#define EMP_GET_ARG_5(A1, A2, A3, A4, A5, ...) A5
-#define EMP_GET_ARG_6(A1, A2, A3, A4, A5, A6, ...) A6
-#define EMP_GET_ARG_7(A, ...) EMP_GET_ARG_6(__VA_ARGS__)
-#define EMP_GET_ARG_8(A, ...) EMP_GET_ARG_7(__VA_ARGS__)
-#define EMP_GET_ARG_9(A, ...) EMP_GET_ARG_8(__VA_ARGS__)
-#define EMP_GET_ARG_10(A, ...) EMP_GET_ARG_9(__VA_ARGS__)
-#define EMP_GET_ARG_11(A, ...) EMP_GET_ARG_10(__VA_ARGS__)
-#define EMP_GET_ARG_12(A, ...) EMP_GET_ARG_11(__VA_ARGS__)
-#define EMP_GET_ARG_13(A, ...) EMP_GET_ARG_12(__VA_ARGS__)
-#define EMP_GET_ARG_14(A, ...) EMP_GET_ARG_13(__VA_ARGS__)
-#define EMP_GET_ARG_15(A, ...) EMP_GET_ARG_14(__VA_ARGS__)
-#define EMP_GET_ARG_16(A, ...) EMP_GET_ARG_15(__VA_ARGS__)
-#define EMP_GET_ARG_17(A, ...) EMP_GET_ARG_16(__VA_ARGS__)
-#define EMP_GET_ARG_18(A, ...) EMP_GET_ARG_17(__VA_ARGS__)
-#define EMP_GET_ARG_19(A, ...) EMP_GET_ARG_18(__VA_ARGS__)
-#define EMP_GET_ARG_20(A, ...) EMP_GET_ARG_19(__VA_ARGS__)
-#define EMP_GET_ARG_21(A, ...) EMP_GET_ARG_20(__VA_ARGS__)
-#define EMP_GET_ARG_22(A, ...) EMP_GET_ARG_21(__VA_ARGS__)
-#define EMP_GET_ARG_23(A, ...) EMP_GET_ARG_22(__VA_ARGS__)
-#define EMP_GET_ARG_24(A, ...) EMP_GET_ARG_23(__VA_ARGS__)
-#define EMP_GET_ARG_25(A, ...) EMP_GET_ARG_24(__VA_ARGS__)
-#define EMP_GET_ARG_26(A, ...) EMP_GET_ARG_25(__VA_ARGS__)
-#define EMP_GET_ARG_27(A, ...) EMP_GET_ARG_26(__VA_ARGS__)
-#define EMP_GET_ARG_28(A, ...) EMP_GET_ARG_27(__VA_ARGS__)
-#define EMP_GET_ARG_29(A, ...) EMP_GET_ARG_28(__VA_ARGS__)
-#define EMP_GET_ARG_30(A, ...) EMP_GET_ARG_29(__VA_ARGS__)
-#define EMP_GET_ARG_31(A, ...) EMP_GET_ARG_30(__VA_ARGS__)
-#define EMP_GET_ARG_32(A, ...) EMP_GET_ARG_31(__VA_ARGS__)
-#define EMP_GET_ARG_33(A, ...) EMP_GET_ARG_32(__VA_ARGS__)
-#define EMP_GET_ARG_34(A, ...) EMP_GET_ARG_33(__VA_ARGS__)
-#define EMP_GET_ARG_35(A, ...) EMP_GET_ARG_34(__VA_ARGS__)
-#define EMP_GET_ARG_36(A, ...) EMP_GET_ARG_35(__VA_ARGS__)
-#define EMP_GET_ARG_37(A, ...) EMP_GET_ARG_36(__VA_ARGS__)
-#define EMP_GET_ARG_38(A, ...) EMP_GET_ARG_37(__VA_ARGS__)
-#define EMP_GET_ARG_39(A, ...) EMP_GET_ARG_38(__VA_ARGS__)
-#define EMP_GET_ARG_40(A, ...) EMP_GET_ARG_39(__VA_ARGS__)
-#define EMP_GET_ARG_41(A, ...) EMP_GET_ARG_40(__VA_ARGS__)
-#define EMP_GET_ARG_42(A, ...) EMP_GET_ARG_41(__VA_ARGS__)
-#define EMP_GET_ARG_43(A, ...) EMP_GET_ARG_42(__VA_ARGS__)
-#define EMP_GET_ARG_44(A, ...) EMP_GET_ARG_43(__VA_ARGS__)
-#define EMP_GET_ARG_45(A, ...) EMP_GET_ARG_44(__VA_ARGS__)
-#define EMP_GET_ARG_46(A, ...) EMP_GET_ARG_45(__VA_ARGS__)
-#define EMP_GET_ARG_47(A, ...) EMP_GET_ARG_46(__VA_ARGS__)
-#define EMP_GET_ARG_48(A, ...) EMP_GET_ARG_47(__VA_ARGS__)
-#define EMP_GET_ARG_49(A, ...) EMP_GET_ARG_48(__VA_ARGS__)
-#define EMP_GET_ARG_50(A, ...) EMP_GET_ARG_49(__VA_ARGS__)
-#define EMP_GET_ARG_51(A, ...) EMP_GET_ARG_50(__VA_ARGS__)
-#define EMP_GET_ARG_52(A, ...) EMP_GET_ARG_51(__VA_ARGS__)
-#define EMP_GET_ARG_53(A, ...) EMP_GET_ARG_52(__VA_ARGS__)
-#define EMP_GET_ARG_54(A, ...) EMP_GET_ARG_53(__VA_ARGS__)
-#define EMP_GET_ARG_55(A, ...) EMP_GET_ARG_54(__VA_ARGS__)
-#define EMP_GET_ARG_56(A, ...) EMP_GET_ARG_55(__VA_ARGS__)
-#define EMP_GET_ARG_57(A, ...) EMP_GET_ARG_56(__VA_ARGS__)
-#define EMP_GET_ARG_58(A, ...) EMP_GET_ARG_57(__VA_ARGS__)
-#define EMP_GET_ARG_59(A, ...) EMP_GET_ARG_58(__VA_ARGS__)
-#define EMP_GET_ARG_60(A, ...) EMP_GET_ARG_59(__VA_ARGS__)
-#define EMP_GET_ARG_61(A, ...) EMP_GET_ARG_60(__VA_ARGS__)
-#define EMP_GET_ARG_62(A, ...) EMP_GET_ARG_61(__VA_ARGS__)
-#define EMP_GET_ARG_63(A, ...) EMP_GET_ARG_62(__VA_ARGS__)
-#define EMP_GET_ARG_64(A, ...) EMP_GET_ARG_63(__VA_ARGS__)
+#define EMP_GET_ARG(N, ...) EMP_GET_ARG_1( EMP_POP_ARGS( EMP_DEC(N), __VA_ARGS__ ) )
+#define EMP_GET_ARG_1(A, ...) A
+
 
 #define EMP_COUNT_ARGS(...) EMP_GET_ARG_64(__VA_ARGS__, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 
@@ -185,80 +123,19 @@
 #define EMP_dup_impl(B128, B64, B32, B16, B8, B4, B2, B1, ...) EMP_dup_bin CONTINUE HERE
 
 #define EMP_dup_bin_0(...)
-#define EMP_dup_bin_1(...) __VA_ARGS__
-#define EMP_dup_bin_2(...) __VA_ARGS__, __VA_ARGS__
-#define EMP_dup_bin_4(...) __VA_ARGS__, __VA_ARGS__, __VA_ARGS__, __VA_ARGS__
-#define EMP_dup_bin_8(...)   EMP_dup_bin_4(__VA_ARGS__),  EMP_dup_bin_4(__VA_ARGS__)
-#define EMP_dup_bin_16(...)  EMP_dup_bin_8(__VA_ARGS__),  EMP_dup_bin_8(__VA_ARGS__)
-#define EMP_dup_bin_32(...)  EMP_dup_bin_16(__VA_ARGS__), EMP_dup_bin_16(__VA_ARGS__)
-#define EMP_dup_bin_64(...)  EMP_dup_bin_32(__VA_ARGS__), EMP_dup_bin_32(__VA_ARGS__)
-#define EMP_dup_bin_128(...) EMP_dup_bin_64(__VA_ARGS__), EMP_dup_bin_64(__VA_ARGS__)
+#define EMP_dup_bin_1(...) , __VA_ARGS__
+#define EMP_dup_bin_2(...) , __VA_ARGS__, __VA_ARGS__
+#define EMP_dup_bin_4(...) , __VA_ARGS__, __VA_ARGS__, __VA_ARGS__, __VA_ARGS__
+#define EMP_dup_bin_8(...)   EMP_dup_bin_4(__VA_ARGS__)EMP_dup_bin_4(__VA_ARGS__)
+#define EMP_dup_bin_16(...)  EMP_dup_bin_8(__VA_ARGS__)EMP_dup_bin_8(__VA_ARGS__)
+#define EMP_dup_bin_32(...)  EMP_dup_bin_16(__VA_ARGS__)EMP_dup_bin_16(__VA_ARGS__)
+#define EMP_dup_bin_64(...)  EMP_dup_bin_32(__VA_ARGS__)EMP_dup_bin_32(__VA_ARGS__)
+#define EMP_dup_bin_128(...) EMP_dup_bin_64(__VA_ARGS__)EMP_dup_bin_64(__VA_ARGS__)
+#define EMP_dup_bin_256(...) EMP_dup_bin_128(__VA_ARGS__)EMP_dup_bin_128(__VA_ARGS__)
+#define EMP_dup_bin_512(...) EMP_dup_bin_256(__VA_ARGS__)EMP_dup_bin_256(__VA_ARGS__)
 
-#define EMP_DUPLICATE_ARGS(N, ...) EMP_DUPLICATE_ARGS_ ## N (__VA_ARGS__)
-#define EMP_DUPLICATE_ARGS_1(...) __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_2(...) __VA_ARGS__, __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_3(...) __VA_ARGS__, __VA_ARGS__, __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_4(...) EMP_DUPLICATE_ARGS_3(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_5(...) EMP_DUPLICATE_ARGS_4(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_6(...) EMP_DUPLICATE_ARGS_5(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_7(...) EMP_DUPLICATE_ARGS_6(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_8(...) EMP_DUPLICATE_ARGS_7(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_9(...) EMP_DUPLICATE_ARGS_8(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_10(...) EMP_DUPLICATE_ARGS_9(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_11(...) EMP_DUPLICATE_ARGS_10(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_12(...) EMP_DUPLICATE_ARGS_11(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_13(...) EMP_DUPLICATE_ARGS_12(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_14(...) EMP_DUPLICATE_ARGS_13(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_15(...) EMP_DUPLICATE_ARGS_14(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_16(...) EMP_DUPLICATE_ARGS_15(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_17(...) EMP_DUPLICATE_ARGS_16(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_18(...) EMP_DUPLICATE_ARGS_17(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_19(...) EMP_DUPLICATE_ARGS_18(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_20(...) EMP_DUPLICATE_ARGS_19(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_21(...) EMP_DUPLICATE_ARGS_20(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_22(...) EMP_DUPLICATE_ARGS_21(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_23(...) EMP_DUPLICATE_ARGS_22(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_24(...) EMP_DUPLICATE_ARGS_23(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_25(...) EMP_DUPLICATE_ARGS_24(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_26(...) EMP_DUPLICATE_ARGS_25(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_27(...) EMP_DUPLICATE_ARGS_26(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_28(...) EMP_DUPLICATE_ARGS_27(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_29(...) EMP_DUPLICATE_ARGS_28(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_30(...) EMP_DUPLICATE_ARGS_29(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_31(...) EMP_DUPLICATE_ARGS_30(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_32(...) EMP_DUPLICATE_ARGS_31(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_33(...) EMP_DUPLICATE_ARGS_32(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_34(...) EMP_DUPLICATE_ARGS_33(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_35(...) EMP_DUPLICATE_ARGS_34(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_36(...) EMP_DUPLICATE_ARGS_35(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_37(...) EMP_DUPLICATE_ARGS_36(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_38(...) EMP_DUPLICATE_ARGS_37(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_39(...) EMP_DUPLICATE_ARGS_38(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_40(...) EMP_DUPLICATE_ARGS_39(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_41(...) EMP_DUPLICATE_ARGS_40(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_42(...) EMP_DUPLICATE_ARGS_41(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_43(...) EMP_DUPLICATE_ARGS_42(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_44(...) EMP_DUPLICATE_ARGS_43(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_45(...) EMP_DUPLICATE_ARGS_44(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_46(...) EMP_DUPLICATE_ARGS_45(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_47(...) EMP_DUPLICATE_ARGS_46(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_48(...) EMP_DUPLICATE_ARGS_47(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_49(...) EMP_DUPLICATE_ARGS_48(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_50(...) EMP_DUPLICATE_ARGS_49(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_51(...) EMP_DUPLICATE_ARGS_50(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_52(...) EMP_DUPLICATE_ARGS_51(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_53(...) EMP_DUPLICATE_ARGS_52(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_54(...) EMP_DUPLICATE_ARGS_53(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_55(...) EMP_DUPLICATE_ARGS_54(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_56(...) EMP_DUPLICATE_ARGS_55(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_57(...) EMP_DUPLICATE_ARGS_56(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_58(...) EMP_DUPLICATE_ARGS_57(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_59(...) EMP_DUPLICATE_ARGS_58(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_60(...) EMP_DUPLICATE_ARGS_59(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_61(...) EMP_DUPLICATE_ARGS_60(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_62(...) EMP_DUPLICATE_ARGS_61(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_63(...) EMP_DUPLICATE_ARGS_62(__VA_ARGS__), __VA_ARGS__
-#define EMP_DUPLICATE_ARGS_64(...) EMP_DUPLICATE_ARGS_63(__VA_ARGS__), __VA_ARGS__
+#define EMP_DUPLICATE_ARGS(N, ...) EMP_DUPLICATE_ARGS_SUM EMP_EMPTY (EMP_EVAL(EMP_DEC_TO_SUM(N)),__VA_ARGS__)
+#define EMP_DUPLICATE_ARGS_SUM(S0,S1,S2,S3,S4,S5,S6,S7,S8,S9,...) EMP_POP_ARG(~ EMP_dup_bin_##S0(__VA_ARGS__)EMP_dup_bin_##S1(__VA_ARGS__)EMP_dup_bin_##S2(__VA_ARGS__)EMP_dup_bin_##S3(__VA_ARGS__)EMP_dup_bin_##S4(__VA_ARGS__)EMP_dup_bin_##S5(__VA_ARGS__)EMP_dup_bin_##S6(__VA_ARGS__)EMP_dup_bin_##S7(__VA_ARGS__)EMP_dup_bin_##S8(__VA_ARGS__)EMP_dup_bin_##S9(__VA_ARGS__))
 
 // Save the first N args (assumes at least N args exist!
 #define EMP_CROP_ARGS(N, ...) EMP_CROP_ARGS_TO_ ## N (__VA_ARGS__, ~)
