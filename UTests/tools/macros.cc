@@ -14,6 +14,10 @@ int main(int argc, char* argv[])
   std::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
   const bool verbose = emp::cl::use_arg(args, "-v");
 
+  EMP_TEST_MACRO( EMP_POP_ARGS_32(1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0), "3,4,5,6,7,8,9,0");
+  EMP_TEST_MACRO( EMP_POP_ARGS(32, 1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0), "3,4,5,6,7,8,9,0");
+  EMP_TEST_MACRO( EMP_POP_ARGS(39, 1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0), "0");
+
   // Test getting a specific argument.
   EMP_TEST_MACRO( EMP_GET_ARG_5(11,12,13,14,15,16,17), "15");
 
