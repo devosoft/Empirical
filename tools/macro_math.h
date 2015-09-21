@@ -26,7 +26,7 @@
 //   HEX - Hexidecimal representation (e.g., 0x5B)  [todo]
 //
 
-#define EMP_EMPTY
+#define EMP_EMPTY()
 
 #define EMP_EVAL(...) __VA_ARGS__
 #define EMP_EVAL2(...) EMP_EVAL(__VA_ARGS__)
@@ -1060,7 +1060,7 @@
 #define EMP_DEC_TO_BIN_1022  1, 1, 1, 1, 1, 1, 1, 1, 1, 0
 #define EMP_DEC_TO_BIN_1023  1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 
-#define EMP_BIN_TO_DEC(...) EMP_BIN_TO_DEC_IMPL EMP_EMPTY (__VA_ARGS__)
+#define EMP_BIN_TO_DEC(...) EMP_BIN_TO_DEC_IMPL EMP_EMPTY() (__VA_ARGS__)
 #define EMP_BIN_TO_DEC_IMPL(B0,B1,B2,B3,B4,B5,B6,B7,B8,B9)              \
   EMP_BIN_TO_DEC_ ## B0 ## B1 ## B2 ## B3 ## B4 ## B5 ## B6 ## B7 ## B8 ## B9
 
@@ -2103,7 +2103,7 @@
     EMP_MATH_VAL_TIMES_##A4(32),  EMP_MATH_VAL_TIMES_##A5(16),  EMP_MATH_VAL_TIMES_##A6(8),    \
     EMP_MATH_VAL_TIMES_##A7(4),   EMP_MATH_VAL_TIMES_##A8(2),   EMP_MATH_VAL_TIMES_##A9(1)
 
-#define EMP_DEC_TO_SUM(A) EMP_BIN_TO_SUM EMP_EMPTY ( EMP_DEC_TO_BIN(A) )
+#define EMP_DEC_TO_SUM(A) EMP_BIN_TO_SUM EMP_EMPTY() ( EMP_DEC_TO_BIN(A) )
 
 // Possible bit values during computation are:
 // 0 or 1 (normal bits)
@@ -2300,7 +2300,7 @@
 
 
 // --- Addition ---
-#define EMP_ADD_BIN(...) EMP_ADD_BIN_IMPL EMP_EMPTY (__VA_ARGS__)
+#define EMP_ADD_BIN(...) EMP_ADD_BIN_IMPL EMP_EMPTY() (__VA_ARGS__)
 
 #define EMP_ADD_BIN_IMPL(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9,        \
                          B0, B1, B2, B3, B4, B5, B6, B7, B8, B9)        \
@@ -2354,7 +2354,7 @@
 // --- Multiply ---
 #define EMP_MULT_BIN(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9,   \
                      B0, B1, B2, B3, B4, B5, B6, B7, B8, B9)   \
-  EMP_ADD_BIN_10 EMP_EMPTY (              \
+  EMP_ADD_BIN_10 EMP_EMPTY() (                                          \
                  EMP_MATH_BIN_TIMES_ ## B9 (A0, A1, A2, A3, A4, A5, A6, A7, A8, A9), \
                  EMP_MATH_BIN_TIMES_ ## B8 (A1, A2, A3, A4, A5, A6, A7, A8, A9,  0), \
                  EMP_MATH_BIN_TIMES_ ## B7 (A2, A3, A4, A5, A6, A7, A8, A9,  0,  0), \
@@ -2368,6 +2368,6 @@
   )
 
 #define EMP_MULT(A, B) EMP_EVAL( EMP_MULT_IMPL( EMP_DEC_TO_BIN(A), EMP_DEC_TO_BIN(B) ) )
-#define EMP_MULT_IMPL(...) EMP_BIN_TO_DEC EMP_EMPTY ( EMP_MULT_BIN( __VA_ARGS__ ) )
+#define EMP_MULT_IMPL(...) EMP_BIN_TO_DEC EMP_EMPTY() ( EMP_MULT_BIN( __VA_ARGS__ ) )
 
 #endif
