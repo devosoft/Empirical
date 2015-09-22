@@ -22,7 +22,8 @@
 //  Representations include:
 //   DEC - Standard decimal values (e.g., 91)
 //   BIN - Binary numbers, with bits separated by commas (e.g.  0, 0, 0,  1, 0,  1, 1, 0, 1, 1 )
-//   SUM - Like BIN, but stored as zero or magnitude.    (e.g., 0, 0, 0, 64, 0, 16, 8, 0, 2, 1
+//   SUM - Like BIN, but stored as zero or magnitude.    (e.g., 0, 0, 0, 64, 0, 16, 8, 0, 2, 1 )
+//   PACK - Like SUM, but without zeros and in parens    (e.g., (64,16,8,2,1) )
 //   HEX - Hexidecimal representation (e.g., 0x5B)  [todo]
 //
 
@@ -2093,6 +2094,9 @@
 #define EMP_MATH_VAL_TIMES_0(A) 0
 #define EMP_MATH_VAL_TIMES_1(A) A
 
+#define EMP_ADD_ARG_IF_VAL_0(A)
+#define EMP_ADD_ARG_IF_VAL_1(A) , A
+
 #define EMP_MATH_BIN_TIMES_0(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 #define EMP_MATH_BIN_TIMES_1(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A0, A1, A2, A3, A4, A5, A6, A7, A8, A9
 
@@ -2103,7 +2107,17 @@
     EMP_MATH_VAL_TIMES_##A4(32),  EMP_MATH_VAL_TIMES_##A5(16),  EMP_MATH_VAL_TIMES_##A6(8),    \
     EMP_MATH_VAL_TIMES_##A7(4),   EMP_MATH_VAL_TIMES_##A8(2),   EMP_MATH_VAL_TIMES_##A9(1)
 
+// Now, convert to PACK format.
+#define EMP_BIN_TO_PACK(...) \
+  (EMP_EVAL( EMP_BIN_TO_PACK_POP EMP_EMPTY() ( EMP_BIN_TO_PACK_IMPL(__VA_ARGS__) ) ))
+#define EMP_BIN_TO_PACK_POP(A, ...) __VA_ARGS__
+#define EMP_BIN_TO_PACK_IMPL(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9)    \
+  ~ EMP_ADD_ARG_IF_VAL_##A0(512)EMP_ADD_ARG_IF_VAL_##A1(256)EMP_ADD_ARG_IF_VAL_##A2(128)EMP_ADD_ARG_IF_VAL_##A3(64)EMP_ADD_ARG_IF_VAL_##A4(32)EMP_ADD_ARG_IF_VAL_##A5(16)EMP_ADD_ARG_IF_VAL_##A6(8)EMP_ADD_ARG_IF_VAL_##A7(4)EMP_ADD_ARG_IF_VAL_##A8(2)EMP_ADD_ARG_IF_VAL_##A9(1)
+
+
+
 #define EMP_DEC_TO_SUM(A) EMP_BIN_TO_SUM EMP_EMPTY() ( EMP_DEC_TO_BIN(A) )
+#define EMP_DEC_TO_PACK(A) EMP_BIN_TO_PACK EMP_EMPTY() ( EMP_DEC_TO_BIN(A) )
 
 // Possible bit values during computation are:
 // 0 or 1 (normal bits)
