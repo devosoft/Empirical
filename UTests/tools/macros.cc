@@ -19,18 +19,27 @@ int main(int argc, char* argv[])
   EMP_TEST_MACRO( EMP_POP_ARGS(39, 1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0), "0");
 
   // Test getting a specific argument.
-  EMP_TEST_MACRO( EMP_GET_ARG_5(11,12,13,14,15,16,17), "15");
+  EMP_TEST_MACRO( EMP_POP_ARGS( EMP_DEC(5), 11,12,13,14,15,16,17 ), "15,16,17");
+  EMP_TEST_MACRO( EMP_GET_ARG(5, 11,12,13,14,15,16,17), "15");
 
   // Test counting number of arguments.
   EMP_TEST_MACRO( EMP_COUNT_ARGS(a, b, c), "3" );
+  EMP_TEST_MACRO( EMP_COUNT_ARGS(x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x), "600" );
 
   // Make sure EMP_STRINGIFY can process macros before running
   EMP_TEST_MACRO( EMP_STRINGIFY(EMP_MERGE(ab, c, de, f)), "\"abcdef\"");
   EMP_TEST_MACRO( EMP_STRINGIFY("abcdef"), "\"\\\"abcdef\\\"\"" );
 
-  // Make sure we can assemble arbitrary macros
-  EMP_TEST_MACRO( EMP_ASSEMBLE_MACRO_1ARG( EMP_GET_ARG_, 2, x, y, z ), "y" );
 
+  // Test PACK manipulation
+  EMP_TEST_MACRO( EMP_PACK_ARGS(a,b,c), "(a,b,c)");
+  EMP_TEST_MACRO( EMP_UNPACK_ARGS((a,b,c)), "a,b,c");
+  EMP_TEST_MACRO( EMP_PACK_POP((a,b,c)), "(b,c)");
+  EMP_TEST_MACRO( EMP_PACK_TOP((a,b,c)), "a");
+  EMP_TEST_MACRO( EMP_PACK_PUSH(x, (a,b,c)), "(x,a,b,c)");
+  EMP_TEST_MACRO( EMP_PACK_SIZE((a,b,c)), "3");
+  
+  
   // Simple argument manipulation
   EMP_TEST_MACRO( EMP_ROTATE_ARGS(a, b, c), "b, c, a" );
 
@@ -53,8 +62,8 @@ int main(int argc, char* argv[])
   EMP_TEST_MACRO( EMP_DUPLICATE_ARGS(5, x,y,z), "x,y,z, x,y,z, x,y,z, x,y,z, x,y,z" );
   EMP_TEST_MACRO( EMP_DUPLICATE_ARGS(63, 123), "123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123" );
 
-  EMP_TEST_MACRO( EMP_CROP_ARGS(4, a, b, c, d, e, f, g, h, i, j), "a, b, c, d" );
-  EMP_TEST_MACRO( EMP_CROP_ARGS(4, a, b, c, d), "a, b, c, d" );
+  EMP_TEST_MACRO( EMP_CROP_ARGS_TO(4, a, b, c, d, e, f, g, h, i, j), "a, b, c, d" );
+  EMP_TEST_MACRO( EMP_CROP_ARGS_TO(4, a, b, c, d), "a, b, c, d" );
   
   EMP_TEST_MACRO( EMP_FORCE_ARGS_TO(3, x, a, b, c, d), "a, b, c" );
   EMP_TEST_MACRO( EMP_FORCE_ARGS_TO(4, x, a, b, c, d), "a, b, c, d" );
