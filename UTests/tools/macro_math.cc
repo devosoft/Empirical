@@ -23,6 +23,9 @@ int main(int argc, char* argv[])
   EMP_TEST_MACRO( EMP_BIN_TO_SUM(0,0,0,1,0,1,1,0,1,1), "0, 0, 0, 64, 0, 16, 8, 0, 2, 1");
   EMP_TEST_MACRO( EMP_DEC_TO_SUM(91), "0, 0, 0, 64, 0, 16, 8, 0, 2, 1");
 
+  EMP_TEST_MACRO( EMP_BIN_TO_PACK(0,0,0,1,0,1,1,0,1,1), "(64, 16, 8, 2, 1)");
+  EMP_TEST_MACRO( EMP_DEC_TO_PACK(91), "(64, 16, 8, 2, 1)");
+  
   // Test other helper math functions.
   EMP_TEST_MACRO( EMP_MATH_VAL_TIMES_0(222), "0" );
   EMP_TEST_MACRO( EMP_MATH_VAL_TIMES_1(222), "222" );
