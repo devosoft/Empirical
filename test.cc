@@ -3,12 +3,14 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <typeinfo>
 #include "selection.h"
 #include "../Empirical/emtools/JSWrap.h"
 #include "../Empirical/tools/tuple_struct.h"
 #include "scales.h"
 #include "svg_shapes.h"
 #include "axis.h"
+#include "load_data.h"
 
 struct JSDataObject;
 
@@ -30,6 +32,13 @@ void mouseover(int id){
 int main()
 {
   emp::Initialize();
+
+
+  EM_ASM({emp.__outgoing_array = [1,2,3,4,5]});
+  std::array<int, 2> new_array = pass_array_to_cpp(2);
+  std::cout << new_array[0] << " " << new_array[1] << std::endl;
+
+  //D3::CSVDataset csv = D3::CSVDataset("test.csv");
 
   //JSObject();
   
