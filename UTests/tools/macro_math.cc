@@ -26,6 +26,27 @@ int main(int argc, char* argv[])
   EMP_TEST_MACRO( EMP_BIN_TO_PACK(0,0,0,1,0,1,1,0,1,1), "(64, 16, 8, 2, 1)");
   EMP_TEST_MACRO( EMP_DEC_TO_PACK(91), "(64, 16, 8, 2, 1)");
   
+  // Test Boolean logic
+  EMP_TEST_MACRO( EMP_NOT(0), "1" );
+  EMP_TEST_MACRO( EMP_NOT(EMP_NOT(0)), "0" );
+  
+  EMP_TEST_MACRO( EMP_EQU(0,0), "1" );
+  EMP_TEST_MACRO( EMP_EQU(0,1), "0" );
+  EMP_TEST_MACRO( EMP_EQU(1,0), "0" );
+  EMP_TEST_MACRO( EMP_EQU(1,1), "1" );
+
+  EMP_TEST_MACRO( EMP_BIT_LESS(0,0), "0" );
+  EMP_TEST_MACRO( EMP_BIT_LESS(0,1), "1" );
+  EMP_TEST_MACRO( EMP_BIT_LESS(1,0), "0" );
+  EMP_TEST_MACRO( EMP_BIT_LESS(1,1), "0" );
+
+  EMP_TEST_MACRO( EMP_BIT_GTR(0,0), "0" );
+  EMP_TEST_MACRO( EMP_BIT_GTR(0,1), "0" );
+  EMP_TEST_MACRO( EMP_BIT_GTR(1,0), "1" );
+  EMP_TEST_MACRO( EMP_BIT_GTR(1,1), "0" );
+
+
+  
   // Test other helper math functions.
   EMP_TEST_MACRO( EMP_MATH_VAL_TIMES_0(222), "0" );
   EMP_TEST_MACRO( EMP_MATH_VAL_TIMES_1(222), "222" );

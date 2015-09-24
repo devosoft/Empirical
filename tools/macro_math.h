@@ -2090,6 +2090,55 @@
 #define EMP_BIN_TO_DEC_1111111110  1022
 #define EMP_BIN_TO_DEC_1111111111  1023
 
+// Pre-define simple comparisons & boolean logic
+#define EMP_MATH_BIT_EQU_00 1
+#define EMP_MATH_BIT_EQU_01 0
+#define EMP_MATH_BIT_EQU_10 0
+#define EMP_MATH_BIT_EQU_11 1
+
+#define EMP_MATH_BIT_LESS_00 0
+#define EMP_MATH_BIT_LESS_01 1
+#define EMP_MATH_BIT_LESS_10 0
+#define EMP_MATH_BIT_LESS_11 0
+
+#define EMP_MATH_BIT_AND_00 0
+#define EMP_MATH_BIT_AND_01 0
+#define EMP_MATH_BIT_AND_10 0
+#define EMP_MATH_BIT_AND_11 1
+
+#define EMP_MATH_BIT_OR_00 0
+#define EMP_MATH_BIT_OR_01 1
+#define EMP_MATH_BIT_OR_10 1
+#define EMP_MATH_BIT_OR_11 1
+
+#define EMP_MATH_BIT_NAND_00 1
+#define EMP_MATH_BIT_NAND_01 1
+#define EMP_MATH_BIT_NAND_10 1
+#define EMP_MATH_BIT_NAND_11 0
+
+#define EMP_MATH_BIT_NOR_00 1
+#define EMP_MATH_BIT_NOR_01 0
+#define EMP_MATH_BIT_NOR_10 0
+#define EMP_MATH_BIT_NOR_11 0
+
+#define EMP_MATH_BIT_XOR_00 0
+#define EMP_MATH_BIT_XOR_01 1
+#define EMP_MATH_BIT_XOR_10 1
+#define EMP_MATH_BIT_XOR_11 0
+
+#define EMP_BOOL_IMPL(OP, X, Y) EMP_MATH_BIT_ ## OP ## _ ## X ## Y
+
+#define EMP_NOT(X) EMP_BOOL_IMPL(NOR, X, 0)
+#define EMP_EQU(X, Y) EMP_BOOL_IMPL(EQU, X, Y)
+#define EMP_AND(X, Y) EMP_BOOL_IMPL(AND, X, Y)
+#define EMP_OR(X, Y) EMP_BOOL_IMPL(OR, X, Y)
+#define EMP_NAND(X, Y) EMP_BOOL_IMPL(NAND, X, Y)
+#define EMP_NOR(X, Y) EMP_BOOL_IMPL(NOR, X, Y)
+#define EMP_XOR(X, Y) EMP_BOOL_IMPL(XOR, X, Y)
+#define EMP_BIT_LESS(X, Y) EMP_BOOL_IMPL(LESS, X, Y)
+#define EMP_BIT_GTR(X, Y) EMP_BOOL_IMPL(LESS, Y, X)
+
+
 // Pre-define some simple multiplication
 #define EMP_MATH_VAL_TIMES_0(A) 0
 #define EMP_MATH_VAL_TIMES_1(A) A
