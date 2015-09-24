@@ -22,8 +22,22 @@
 //               TYPE2, ID2,
 //               etc... )
 //
-//  Note that if you are building only members, the macro does not have control over
-//  the constructors, and as such cannot set defaults.
+//  Further, if you make the members private and need to add accessors, you can use:
+//
+//  EMP_ACCESSORS( NAME,
+//                 TYPE1, ID1,
+//                 TYPE2, ID2,
+//                 etc... )
+//
+//  Finally, if you want it to build a specialized constructor for only these elements
+//  (which should be rare, since if you're not adding more to the class, you should just
+//   trigger EMP_CLASS), you can use:
+//
+//  EMP_CONSTRUCTOR( NAME,
+//                   TYPE1, ID1, DEFAULT1,
+//                   TYPE2, ID2, DEFAULT2,
+//                   etc... )
+//
 //
 
 // EMP_MEMBERS expects a series of type/id pairs to setup.
