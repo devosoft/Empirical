@@ -2090,6 +2090,37 @@
 #define EMP_BIN_TO_DEC_1111111110  1022
 #define EMP_BIN_TO_DEC_1111111111  1023
 
+
+// Pre-define some simple multiplication
+#define EMP_MATH_VAL_TIMES_0(A) 0
+#define EMP_MATH_VAL_TIMES_1(A) A
+
+#define EMP_ADD_ARG_IF_VAL_0(A)
+#define EMP_ADD_ARG_IF_VAL_1(A) , A
+
+#define EMP_MATH_BIN_TIMES_0(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+#define EMP_MATH_BIN_TIMES_1(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A0, A1, A2, A3, A4, A5, A6, A7, A8, A9
+
+
+// Now, convert to SUM format.
+#define EMP_BIN_TO_SUM(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) EMP_MATH_VAL_TIMES_ ## A0(512), \
+    EMP_MATH_VAL_TIMES_##A1(256), EMP_MATH_VAL_TIMES_##A2(128), EMP_MATH_VAL_TIMES_##A3(64),   \
+    EMP_MATH_VAL_TIMES_##A4(32),  EMP_MATH_VAL_TIMES_##A5(16),  EMP_MATH_VAL_TIMES_##A6(8),    \
+    EMP_MATH_VAL_TIMES_##A7(4),   EMP_MATH_VAL_TIMES_##A8(2),   EMP_MATH_VAL_TIMES_##A9(1)
+
+// Now, convert to PACK format.
+#define EMP_BIN_TO_PACK(...) \
+  (EMP_EVAL( EMP_BIN_TO_PACK_POP EMP_EMPTY() ( EMP_BIN_TO_PACK_IMPL(__VA_ARGS__) ) ))
+#define EMP_BIN_TO_PACK_POP(A, ...) __VA_ARGS__
+#define EMP_BIN_TO_PACK_IMPL(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9)    \
+  ~ EMP_ADD_ARG_IF_VAL_##A0(512)EMP_ADD_ARG_IF_VAL_##A1(256)EMP_ADD_ARG_IF_VAL_##A2(128)EMP_ADD_ARG_IF_VAL_##A3(64)EMP_ADD_ARG_IF_VAL_##A4(32)EMP_ADD_ARG_IF_VAL_##A5(16)EMP_ADD_ARG_IF_VAL_##A6(8)EMP_ADD_ARG_IF_VAL_##A7(4)EMP_ADD_ARG_IF_VAL_##A8(2)EMP_ADD_ARG_IF_VAL_##A9(1)
+
+
+
+#define EMP_DEC_TO_SUM(A) EMP_BIN_TO_SUM EMP_EMPTY() ( EMP_DEC_TO_BIN(A) )
+#define EMP_DEC_TO_PACK(A) EMP_BIN_TO_PACK EMP_EMPTY() ( EMP_DEC_TO_BIN(A) )
+
+
 // Pre-define simple comparisons & boolean logic
 #define EMP_MATH_BIT_EQU_00 1
 #define EMP_MATH_BIT_EQU_01 0
@@ -2138,35 +2169,33 @@
 #define EMP_BIT_LESS(X, Y) EMP_BOOL_IMPL(LESS, X, Y)
 #define EMP_BIT_GTR(X, Y) EMP_BOOL_IMPL(LESS, Y, X)
 
+// EMP_IF examines the first argument; if it's 0, it resolves to the third argument, otherwise
+// it resolves to the second argument.  We do this by converting a 0 into two arguments, with
+// F being the second one.  Anything else stays as one argument, and the default second is T
+#define EMP_IF(TEST, T, F) EMP_EVAL( EMP_IF_impl_get_2 EMP_EMPTY() ( EMP_IF_impl_##TEST(F), T, ~) )
+#define EMP_IF_impl_get_2(A, B, ...) B
+#define EMP_IF_impl_0(A) ~, A
 
-// Pre-define some simple multiplication
-#define EMP_MATH_VAL_TIMES_0(A) 0
-#define EMP_MATH_VAL_TIMES_1(A) A
+// Tools to handle comparisons
+// This macro will create a list of comparisons only when difference occur, and then always
+// grab the first one.  If the values are equal, the result will be an X.
+#define EMP_COMPARE(VAL_A, VAL_B)                                       \
+  EMP_EVAL( EMP_COMPARE_IMPL( EMP_DEC_TO_BIN(VAL_A), EMP_DEC_TO_BIN(VAL_B) ) )
+#define EMP_COMPARE_IMPL(...) EMP_COMPARE_BIN_IMPL( __VA_ARGS__ )
 
-#define EMP_ADD_ARG_IF_VAL_0(A)
-#define EMP_ADD_ARG_IF_VAL_1(A) , A
+#define EMP_COMPARE_BIN(...) EMP_COMPARE_BIN_IMPL EMP_EMPTY() (__VA_ARGS__)
+#define EMP_COMPARE_BIN_IMPL(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9,    \
+                             B0, B1, B2, B3, B4, B5, B6, B7, B8, B9)    \
+  EMP_COMPARE_GET_FIRST( EMP_COMPARE_BITS(A0,B0) EMP_COMPARE_BITS(A1,B1) EMP_COMPARE_BITS(A2,B2) EMP_COMPARE_BITS(A3,B3) EMP_COMPARE_BITS(A4,B4) EMP_COMPARE_BITS(A5,B5) EMP_COMPARE_BITS(A6,B6) EMP_COMPARE_BITS(A7,B7) EMP_COMPARE_BITS(A8,B8) EMP_COMPARE_BITS(A9,B9) X, ~ )
 
-#define EMP_MATH_BIN_TIMES_0(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-#define EMP_MATH_BIN_TIMES_1(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A0, A1, A2, A3, A4, A5, A6, A7, A8, A9
-
-
-// Now, convert to SUM format.
-#define EMP_BIN_TO_SUM(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) EMP_MATH_VAL_TIMES_ ## A0(512), \
-    EMP_MATH_VAL_TIMES_##A1(256), EMP_MATH_VAL_TIMES_##A2(128), EMP_MATH_VAL_TIMES_##A3(64),   \
-    EMP_MATH_VAL_TIMES_##A4(32),  EMP_MATH_VAL_TIMES_##A5(16),  EMP_MATH_VAL_TIMES_##A6(8),    \
-    EMP_MATH_VAL_TIMES_##A7(4),   EMP_MATH_VAL_TIMES_##A8(2),   EMP_MATH_VAL_TIMES_##A9(1)
-
-// Now, convert to PACK format.
-#define EMP_BIN_TO_PACK(...) \
-  (EMP_EVAL( EMP_BIN_TO_PACK_POP EMP_EMPTY() ( EMP_BIN_TO_PACK_IMPL(__VA_ARGS__) ) ))
-#define EMP_BIN_TO_PACK_POP(A, ...) __VA_ARGS__
-#define EMP_BIN_TO_PACK_IMPL(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9)    \
-  ~ EMP_ADD_ARG_IF_VAL_##A0(512)EMP_ADD_ARG_IF_VAL_##A1(256)EMP_ADD_ARG_IF_VAL_##A2(128)EMP_ADD_ARG_IF_VAL_##A3(64)EMP_ADD_ARG_IF_VAL_##A4(32)EMP_ADD_ARG_IF_VAL_##A5(16)EMP_ADD_ARG_IF_VAL_##A6(8)EMP_ADD_ARG_IF_VAL_##A7(4)EMP_ADD_ARG_IF_VAL_##A8(2)EMP_ADD_ARG_IF_VAL_##A9(1)
-
-
-
-#define EMP_DEC_TO_SUM(A) EMP_BIN_TO_SUM EMP_EMPTY() ( EMP_DEC_TO_BIN(A) )
-#define EMP_DEC_TO_PACK(A) EMP_BIN_TO_PACK EMP_EMPTY() ( EMP_DEC_TO_BIN(A) )
+#define EMP_COMPARE_GET_FIRST(...) EMP_COMPARE_GET_FIRST_IMPL(__VA_ARGS__)
+#define EMP_COMPARE_GET_FIRST_IMPL(A, ...) A
+#define EMP_COMPARE_RESULT_00
+#define EMP_COMPARE_RESULT_01 B,
+#define EMP_COMPARE_RESULT_10 A,
+#define EMP_COMPARE_RESULT_11
+#define EMP_COMPARE_BITS(BIT_A, BIT_B) EMP_COMPARE_BITS_IMPL(BIT_A, BIT_B)
+#define EMP_COMPARE_BITS_IMPL(BIT_A, BIT_B) EMP_COMPARE_RESULT_ ## BIT_A ## BIT_B
 
 // Possible bit values during computation are:
 // 0 or 1 (normal bits)
