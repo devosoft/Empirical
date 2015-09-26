@@ -35,7 +35,8 @@ int main()
 
 
   EM_ASM({emp.__outgoing_array = [1,2,3,4,5]});
-  std::array<int, 2> new_array = pass_array_to_cpp(2);
+  std::array<int, 5> new_array;
+  pass_array_to_cpp(new_array);
   std::cout << new_array[0] << " " << new_array[1] << std::endl;
 
   //D3::CSVDataset csv = D3::CSVDataset("test.csv");

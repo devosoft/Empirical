@@ -137,28 +137,26 @@
 
 void StoreNewObject(){EM_ASM({js.objects.push(emp.__new_object);});}
 
-std::array<int, 2> pass_array_to_cpp(int size) {
+template <std::size_t SIZE>
+void pass_array_to_cpp(std::array<int32_t, SIZE> & arr) {
   
+  emp_assert(SIZE == EM_ASM_INT_V({return emp.__outgoing_array.length}));
+
   int buffer = EM_ASM_INT_V({
-      emp.__outgoing_array = ([5, 3]);
       var buffer = Module._malloc(emp.__outgoing_array.length*4);
 
       for (i=0; i<emp.__outgoing_array.length; i++){
 	setValue(buffer+(i*4), emp.__outgoing_array[i], "i32");
       }
-
+ 
       return buffer;
-      });
+    });
 
-  std::array<int, 2> new_array;
-  std::cout << "Let's give this array a try" << std::endl;
-  for (int i=0; i<2; i++){
-    std::cout << *(int32_t*) (buffer + i*4) << std::endl;
-    new_array[i] = *(int*) (buffer + i*4);
+  for (int i=0; i<SIZE; i++){
+    arr[i] = *(int*) (buffer + i*4);
   }
   
   free((void*)buffer);
-  return new_array;
 }
 
 #endif
