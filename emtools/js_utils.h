@@ -204,6 +204,114 @@ namespace emp {
       pass_array_to_javascript(values[i], new_recursive_el);
     }
   }
+
+  //This function lets you pass an array from javascript to C++!
+  //It takes a reference to the array as an argument and populates it
+  //with the contents of emp.__outgoing_array.
+  //
+  //Currently accepts arrays of ints, floats, doubles, chars, and std::strings
+  //The size of the passed array must be equal to the size of the array stored
+  //in emp.__outgoing_array
+  template <std::size_t SIZE, typename T>
+  void pass_array_to_cpp(std::array<T, SIZE> & arr) {
+  
+    //Figure out type stuff
+    std::map<const char *, std::string> map_type_names =\
+      get_type_to_string_map();
+    emp_assert((map_type_names.find(typeid(T).name()) != map_type_names.end()));
+    int type_size = sizeof(T);
+    std::string type_string = map_type_names[typeid(T).name()];
+    
+    //Make sure arrays have the same length
+    emp_assert(SIZE == EM_ASM_INT_V({return emp.__outgoing_array.length}));
+    
+    //Write emp.__outgoing_array contents to a buffer
+    int buffer = EM_ASM_INT({
+	var buffer = Module._malloc(emp.__outgoing_array.length*$0);
+	
+	for (i=0; i<emp.__outgoing_array.length; i++) {
+	  setValue(buffer+(i*$0), emp.__outgoing_array[i],\
+		   Pointer_stringify($1));
+	}
+
+	return buffer;
+      }, type_size, type_string.c_str());
+
+    //Populate array from buffer
+    for (int i=0; i<SIZE; i++) {
+      arr[i] = *(T*) (buffer + i*type_size);
+    }
+  
+    //Free the memory we allocated in Javascript
+    free((void*)buffer);
+  }
+
+  //Chars aren't one of the types supported by setValue, but by treating them
+  //as strings in Javascript we can pass them out to a C++ array
+  template <std::size_t SIZE>
+  void pass_array_to_cpp(std::array<char, SIZE> & arr) {
+    
+    emp_assert(SIZE == EM_ASM_INT_V({return emp.__outgoing_array.length}));
+
+    int buffer = EM_ASM_INT_V({
+
+	//Since we're treating each char as it's own string, each one
+	//will be null-termianted. So we malloc length*2 addresses.
+	var buffer = Module._malloc(emp.__outgoing_array.length*2);
+	
+	for (i=0; i<emp.__outgoing_array.length; i++){
+	  writeStringToMemory(emp.__outgoing_array[i], buffer+(i*2));
+	}
+ 
+	return buffer;
+      });
+    
+    for (int i=0; i<SIZE; i++){
+      arr[i] = *(char*) (buffer + i*2);
+    }
+    
+    free((void*)buffer);
+  }
+
+  //We can handle strings in a similar way
+  template <std::size_t SIZE>
+  void pass_array_to_cpp(std::array<std::string, SIZE> & arr) {
+    
+    emp_assert(SIZE == EM_ASM_INT_V({return emp.__outgoing_array.length}));
+
+    int buffer = EM_ASM_INT_V({
+
+	//Figure how much memory to allocate
+	var arr_size = 0;
+	for (i=0; i<emp.__outgoing_array.length; i++){
+	  arr_size += emp.__outgoing_array[i] + 1;
+	}
+	
+	var buffer = Module._malloc(arr_size);
+	
+	//Track place in memory to write too
+	var cumulative_size = 0;
+	for (i=0; i<emp.__outgoing_array.length; i++){
+	  writeStringToMemory(emp.__outgoing_array[i], buffer + \
+			      (cumulative_size));
+	  cumulative_size += emp.__outgoing_array[i].length + 1;
+	}
+ 
+	return buffer;
+      });
+
+    //Track place in memory to read from
+    int cumulative_size = 0;
+    for (int i=0; i<SIZE; i++){
+      //Since std::string constructor reads to null terminator, this just works.
+      arr[i] = std::string((char*) (buffer + cumulative_size));
+      cumulative_size += arr[i].size() + 1;
+    }
+
+    //This is throwing an error... not sure why
+    //TODO: Figure out how to free this memory
+    //free((void*)buffer);
+  }
 }
 
 #endif

@@ -15,6 +15,7 @@ int main(int argc, char* argv[]) {
 
   emp::Initialize();
 
+  //Test passing arrays to Javascript
   std::array<int32_t, 3> test_data = {10,30,60};
 
   JSDataObject test_obj_1;
@@ -59,4 +60,46 @@ int main(int argc, char* argv[]) {
   EMP_TEST_VALUE(
 		 EM_ASM_DOUBLE_V({return emp.__incoming_array[1][0].val2;})
 		 , "11.2");
+
+  //Test passing arrays to C++
+  //Test ints
+  EM_ASM({emp.__outgoing_array = [5, 1, 3]});
+  std::array<int, 3> test_arr_1;
+  emp::pass_array_to_cpp(test_arr_1);
+  EMP_TEST_VALUE(test_arr_1[0], "5");
+  EMP_TEST_VALUE(test_arr_1[1], "1");
+  EMP_TEST_VALUE(test_arr_1[2], "3");
+
+  //Test floats
+  EM_ASM({emp.__outgoing_array = [5.2, 1.5, 3.1]});
+  std::array<float, 3> test_arr_2;
+  emp::pass_array_to_cpp(test_arr_2);
+  EMP_TEST_VALUE(test_arr_2[0], "5.2");
+  EMP_TEST_VALUE(test_arr_2[1], "1.5");
+  EMP_TEST_VALUE(test_arr_2[2], "3.1");
+
+  //Test doubles
+  EM_ASM({emp.__outgoing_array = [5.2, 1.5, 3.1]});
+  std::array<double, 3> test_arr_3;
+  emp::pass_array_to_cpp(test_arr_3);
+  EMP_TEST_VALUE(test_arr_3[0], "5.2");
+  EMP_TEST_VALUE(test_arr_3[1], "1.5");
+  EMP_TEST_VALUE(test_arr_3[2], "3.1");
+
+  //Test chars
+  EM_ASM({emp.__outgoing_array = ["h", "i", "!"]});
+  std::array<char, 3> test_arr_4;
+  emp::pass_array_to_cpp(test_arr_4);
+  EMP_TEST_VALUE(test_arr_4[0], "h");
+  EMP_TEST_VALUE(test_arr_4[1], "i");
+  EMP_TEST_VALUE(test_arr_4[2], "!");
+
+  //Test std::strings
+  EM_ASM({emp.__outgoing_array = ["jello", "world", "!!"]});
+  std::array<std::string, 3> test_arr_5;
+  emp::pass_array_to_cpp(test_arr_5);
+  EMP_TEST_VALUE(test_arr_5[0], "jello");
+  EMP_TEST_VALUE(test_arr_5[1], "world");
+  EMP_TEST_VALUE(test_arr_5[2], "!!");
+
 }
