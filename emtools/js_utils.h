@@ -284,7 +284,7 @@ namespace emp {
 	//Figure how much memory to allocate
 	var arr_size = 0;
 	for (i=0; i<emp.__outgoing_array.length; i++){
-	  arr_size += emp.__outgoing_array[i] + 1;
+	  arr_size += emp.__outgoing_array[i].length + 1;
 	}
 	
 	var buffer = Module._malloc(arr_size);
@@ -308,9 +308,7 @@ namespace emp {
       cumulative_size += arr[i].size() + 1;
     }
 
-    //This is throwing an error... not sure why
-    //TODO: Figure out how to free this memory
-    //free((void*)buffer);
+    free((void*)buffer);
   }
 }
 
