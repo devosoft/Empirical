@@ -29,10 +29,17 @@
 
 #define EMP_EMPTY()
 
-#define EMP_EVAL(...) __VA_ARGS__
-#define EMP_EVAL2(...) EMP_EVAL(__VA_ARGS__)
-#define EMP_EVAL3(...) EMP_EVAL2(__VA_ARGS__)
-#define EMP_EVAL4(...) EMP_EVAL3(__VA_ARGS__)
+// Several versions of eval...
+#define EMP_EVAL(...)  __VA_ARGS__
+#define EMP_EVAL2(...) __VA_ARGS__
+#define EMP_EVAL3(...) __VA_ARGS__
+#define EMP_EVAL4(...) __VA_ARGS__
+#define EMP_EVAL5(...) __VA_ARGS__
+#define EMP_EVAL6(...) __VA_ARGS__
+#define EMP_EVAL7(...) __VA_ARGS__
+#define EMP_EVAL8(...) __VA_ARGS__
+#define EMP_EVAL9(...) __VA_ARGS__
+#define EMP_EVAL10(...) __VA_ARGS__
 
 #define EMP_DEC_TO_BIN(VAL) EMP_DEC_TO_BIN_ ## VAL
 
