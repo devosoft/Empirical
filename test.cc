@@ -27,19 +27,44 @@ void mouseover(int id){
   D3::Selection(id).SetAttr("cx", 500);
 }
 
+void make_graph() {
+  D3::Selection svg = D3::Selection("body").Append("svg");
+  std::array<std::array<int, 2>, 5> data;
+  EM_ASM({emp.__outgoing_array = emp.__incoming_data;
+      console.log(emp.__outgoing_array);
+    });
+  emp::pass_array_to_cpp(data);
+  D3::Axis<D3::LinearScale> x_axis = D3::Axis<D3::LinearScale>();
+  x_axis.SetScale(D3::LinearScale());
+  std::array<int, 2> domain = {0, 200};
+  std::array<int, 2> range = {0, 400};
+  x_axis.GetScale().SetDomain(domain);
+  x_axis.GetScale().SetRange(range);
+  x_axis.SetTicks(3);
 
+  D3::CartesianLineGenerator<D3::LinearScale, D3::LinearScale> make_line = D3::CartesianLineGenerator<D3::LinearScale, D3::LinearScale>();
+  make_line.SetXScale(x_axis.GetScale());
+  //make_line.SetYScale(x_axis.GetScale());
+  D3::Selection group = make_line.DrawShape(data);
+  group.SetAttr("fill", "none");
+  group.SetAttr("stroke", "blue");
+  group.SetAttr("stroke-width", 2);
+  
+  x_axis.Draw(svg);
+}
 
 int main()
 {
   emp::Initialize();
 
+  emp::JSWrap(make_graph, "make_graph");
 
-  EM_ASM({emp.__outgoing_array = [1,2,3,4,5]});
-  std::array<int, 5> new_array;
-  pass_array_to_cpp(new_array);
-  std::cout << new_array[0] << " " << new_array[1] << std::endl;
+  EM_ASM({emp.__outgoing_array = ["hi", "eeee", "l", "l", "o"]; });
+  std::array<std::string, 5> new_array;
+  emp::pass_array_to_cpp(new_array);
+  std::cout << new_array[0] << " " << new_array[1] << " " << new_array[2] << std::endl;
 
-  //D3::CSVDataset csv = D3::CSVDataset("test.csv");
+  D3::CSVDataset csv = D3::CSVDataset("test_no_headers.csv", "make_graph", false);
 
   //JSObject();
   

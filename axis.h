@@ -9,13 +9,23 @@ class Scale;
 
 namespace D3 {
 
+  template <typename SCALE_TYPE>
   class Axis {
   private:
     int id;
-    Scale scale;
+    SCALE_TYPE scale;
 
   public:
-    Axis();
+    Axis() {
+      this->id = EM_ASM_INT_V({return js.objects.length});
+      EM_ASM({js.objects.push(d3.svg.axis())});
+    }
+
+    void Draw(Selection selection){
+      EM_ASM_ARGS({
+	  js.objects[$1].call(js.objects[$0]);
+	}, this->id, selection.GetID());
+    }
 
     void ApplyAxis(Selection selection) {
       EM_ASM_ARGS({
@@ -23,7 +33,7 @@ namespace D3 {
 	}, this->id, selection.GetID());
     }
 
-    void SetScale(Scale scale) {
+    void SetScale(SCALE_TYPE scale) {
       this->scale = scale;
 
       EM_ASM_ARGS({
@@ -31,7 +41,7 @@ namespace D3 {
 	}, this->id, scale.GetID());
     }
 
-    Scale GetScale(){
+    SCALE_TYPE GetScale(){
       return this->scale;
     }
 
@@ -74,15 +84,18 @@ namespace D3 {
 	}, this->id, padding);
     }
 
+    void SetTicks(int count){
+      EM_ASM_ARGS({
+	  js.objects[$0].ticks($1);
+	}, this->id, count);
+    }
+
     //TODO: Format, ticks
 
   };
 
-  Axis::Axis() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-
-    EM_ASM({js.objects.push(d3.svg.axis())});
-  }
+  //  template <typename SCALE_TYPE>
+  //Axis::Axis() 
 
 }
 

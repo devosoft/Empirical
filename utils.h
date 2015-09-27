@@ -5,6 +5,7 @@
 #include <emscripten.h>
 #include <string>
 #include "../Empirical/tools/macros.h"
+#include "../Empirical/emtools/js_utils.h"
 
 //Let's try some awful macro stuff
 
@@ -137,6 +138,7 @@
 
 void StoreNewObject(){EM_ASM({js.objects.push(emp.__new_object);});}
 
+/*
 template <std::size_t SIZE>
 void pass_array_to_cpp(std::array<int32_t, SIZE> & arr) {
   
@@ -158,5 +160,32 @@ void pass_array_to_cpp(std::array<int32_t, SIZE> & arr) {
   
   free((void*)buffer);
 }
+
+template <std::size_t SIZE>
+void pass_array_to_cpp(std::array<double, SIZE> & arr) {
+  
+  emp_assert(SIZE == EM_ASM_INT_V({return emp.__outgoing_array.length}));
+
+  int buffer = EM_ASM_INT_V({
+      var buffer = Module._malloc(emp.__outgoing_array.length*8);
+
+      for (i=0; i<emp.__outgoing_array.length; i++){
+	setValue(buffer+(i*8), emp.__outgoing_array[i], "double");
+      }
+ 
+      return buffer;
+    });
+
+  for (int i=0; i<SIZE; i++){
+    arr[i] = *(double*) (buffer + i*sizeof(double));
+  }
+  
+  free((void*)buffer);
+}
+*/
+
+
+
+
 
 #endif

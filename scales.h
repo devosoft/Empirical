@@ -43,6 +43,7 @@ namespace D3 {
       return EM_ASM_DOUBLE({return js.objects[$0]($1);},this->id, input);
     }
     //TODO:Getters
+
   };
 
   Scale::Scale(int id) {

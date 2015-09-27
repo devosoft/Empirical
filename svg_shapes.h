@@ -11,6 +11,7 @@ namespace D3 {
     int id;
     SvgShapeGenerator();
   public:
+
     //This function creates a string specifying a path
     template <typename T, size_t SIZE>
     std::string Generate(std::array<std::array<T, 2>, SIZE> data){
@@ -107,41 +108,48 @@ namespace D3 {
       });
   }
 
+  template <typename X_SCALE_TYPE, typename Y_SCALE_TYPE>
   class CartesianLineGenerator : public LineGenerator {
 
   private:
-    Scale xscale;
-    Scale yscale;
+    X_SCALE_TYPE xscale;
+    Y_SCALE_TYPE yscale;
   public:
-    CartesianLineGenerator();
-
-    void SetXScale(Scale scale){
+    CartesianLineGenerator() {
+    this->id = EM_ASM_INT_V({return js.objects.length});
+    EM_ASM({
+	var new_line = d3.svg.line();
+	js.objects.push(new_line);
+      });
+    }
+    
+    void SetXScale(X_SCALE_TYPE scale){
       this->xscale = scale;
       EM_ASM_ARGS({
 	  var scale = js.objects[$1];
-	  var curr_x = js.objects[$0].x;
+	  var curr_x = js.objects[$0].x();
 
 	  //Apply scale to whatever the current x axis function is
-	  js.objects[$0].x(function(d, i){return scale(curr_x)});
+	  js.objects[$0].x(function(d, i){return scale(curr_x(d, i))});
 	}, this->id, scale.GetID());
     }
 
-    void SetYScale(Scale scale){
+    void SetYScale(Y_SCALE_TYPE scale){
       this->yscale = scale;
       EM_ASM_ARGS({
 	  var scale = js.objects[$1];
-	  var curr_y = js.objects[$0].y;
+	  var curr_y = js.objects[$0].y();
 
 	  //Apply scale on top of whatever the current y axis function is
-	  js.objects[$0].y(function(d, i){return scale(curr_y)});
+	  js.objects[$0].y(function(d, i){return scale(curr_y(d, i))});
 	}, this->id, scale.GetID());
     }
 
-    Scale GetXScale(){
+    X_SCALE_TYPE GetXScale(){
       return this->xscale;
     }
 
-    Scale GetYScale(){
+    Y_SCALE_TYPE GetYScale(){
       return this->yscale;
     }
 
@@ -169,17 +177,16 @@ namespace D3 {
 
   };
   
-  CartesianLineGenerator::CartesianLineGenerator() {
+  template <typename X_SCALE_TYPE, typename Y_SCALE_TYPE>
+  class AreaGenerator : public CartesianLineGenerator<X_SCALE_TYPE, Y_SCALE_TYPE> {
+  public:
+    AreaGenerator() {
     this->id = EM_ASM_INT_V({return js.objects.length});
     EM_ASM({
-	var new_line = d3.svg.line();
+	var new_line = d3.svg.area();
 	js.objects.push(new_line);
       });
-  }
- 
-  class AreaGenerator : public CartesianLineGenerator {
-  public:
-    AreaGenerator();
+    }
 
     //Handles setting x0 accessor to a constant
     template <typename T>
@@ -225,14 +232,6 @@ namespace D3 {
       CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(y1, y.c_str())
     }    
   };
-
-  AreaGenerator::AreaGenerator() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({
-	var new_line = d3.svg.area();
-	js.objects.push(new_line);
-      });
-  }
 
   class RadialLineGenerator : public LineGenerator {
   public:
