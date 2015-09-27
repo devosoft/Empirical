@@ -155,7 +155,7 @@
 // P is the pack of call counts the still need to be done
 // A is the number of arguments in P.
 #define EMP_CALL_BY_PACKS(C, F, ...)                                     \
-  EMP_CALL_BY_PACKS_impl(C, F, EMP_DEC_TO_PACK(EMP_COUNT_ARGS(__VA_ARGS__)), __VA_ARGS__ )
+  EMP_CALL_BY_PACKS_impl(C, F, EMP_DEC_TO_PACK(EMP_COUNT_ARGS(__VA_ARGS__)), __VA_ARGS__, ~ )
 // EMP_CALL_BY_PACKS_impl(C, F, EMP_DEC_TO_PACK(EMP_DEC(EMP_COUNT_ARGS(__VA_ARGS__))), __VA_ARGS__ )
 #define EMP_CALL_BY_PACKS_impl(C, F, P, ...) \
   EMP_CALL_BY_PACKS_implB(C, F, EMP_PACK_SIZE(P), EMP_PACK_PUSH_REAR(~, P), __VA_ARGS__)
@@ -216,15 +216,44 @@
 #define EMP_CALL_BY_PACKS_do_call(C, V, F, ...) C ## V(F, __VA_ARGS__)
 
 
-// Replace all of the commas in an argument set with something else (including nothing)
-#define EMP_REPLACE_COMMAS(X, ...) \
-  EMP_REPLACE_COMMAS_pack(EMP_DEC_TO_PACK( EMP_DEC(EMP_COUNT_ARGS(__VA_ARGS__)) ), X, __VA_ARGS__)
-#define EMP_REPLACE_COMMAS_pack(P, X, ...) EMP_PACK_SIZE(P)   @CAO
 
-#define EMP_REPLACE_COMMAS_1(X, A, ...) A
-#define EMP_REPLACE_COMMAS_2(X, A,B, ...) A X B
-#define EMP_REPLACE_COMMAS_4(X, A,B,C,D, ...) A X B X C X D
-#define EMP_REPLACE_COMMAS_8(X, A,B,C,D,E,F,G,H, ...) A X B X C X D X E X F X G X H
+// EMP_WRAP_EACH, wraps each argument in the specified macro wrapper.
+#define EMP_WRAP_EACH(W, ...) EMP_CALL_BY_PACKS(EMP_WRAP_EACH_, W, __VA_ARGS__)
+#define EMP_WRAP_EACH_1(W, A, ...) W(A)
+#define EMP_WRAP_EACH_2(W, A,B,...) EMP_WRAP_EACH_1(W, A, ~) EMP_WRAP_EACH_1(W, B, ~)
+#define EMP_WRAP_EACH_4(W, A,B,...) EMP_WRAP_EACH_2(W, A, B, ~) EMP_WRAP_EACH_2(W, __VA_ARGS__)
+#define EMP_WRAP_EACH_8(W, ...)                                         \
+  EMP_WRAP_EACH_4(W, __VA_ARGS__)                                       \
+  EMP_EVAL( EMP_WRAP_EACH_4 EMP_EMPTY() (W, EMP_POP_ARGS_4(__VA_ARGS__)) )
+#define EMP_WRAP_EACH_16(W, ...) \
+  EMP_WRAP_EACH_8(W, __VA_ARGS__) \
+  EMP_EVAL2( EMP_WRAP_EACH_8 EMP_EMPTY() (W, EMP_POP_ARGS_8(__VA_ARGS__)) )
+#define EMP_WRAP_EACH_32(W, ...) \
+  EMP_WRAP_EACH_16(W, __VA_ARGS__) \
+  EMP_EVAL3( EMP_WRAP_EACH_16 EMP_EMPTY() (W, EMP_POP_ARGS_16(__VA_ARGS__)) )
+#define EMP_WRAP_EACH_64(W, ...) \
+  EMP_WRAP_EACH_32(W, __VA_ARGS__) \
+  EMP_EVAL4( EMP_WRAP_EACH_32 EMP_EMPTY() (W, EMP_POP_ARGS_32(__VA_ARGS__)) )
+#define EMP_WRAP_EACH_128(W, ...) \
+  EMP_WRAP_EACH_64(W, __VA_ARGS__) \
+  EMP_EVAL5( EMP_WRAP_EACH_64 EMP_EMPTY() (W, EMP_POP_ARGS_64(__VA_ARGS__)) )
+#define EMP_WRAP_EACH_256(W, ...) \
+  EMP_WRAP_EACH_128(W, __VA_ARGS__) \
+  EMP_EVAL6( EMP_WRAP_EACH_128 EMP_EMPTY() (W, EMP_POP_ARGS_128(__VA_ARGS__)) )
+#define EMP_WRAP_EACH_512(W, ...) \
+  EMP_WRAP_EACH_256(W, __VA_ARGS__) \
+  EMP_EVAL7( EMP_WRAP_EACH_256 EMP_EMPTY() (W, EMP_POP_ARGS_256(__VA_ARGS__)) )
+  
+
+// Replace all of the commas in an argument set with something else (including nothing)
+#define EMP_REPLACE_COMMAS(X, ...) EMP_GET_ARG_1(__VA_ARGS__) EMP_CALL_BY_PACKS(EMP_REPLACE_COMMAS_, X, EMP_POP_ARGS_1(__VA_ARGS__) )
+//  EMP_REPLACE_COMMAS_pack(EMP_DEC_TO_PACK( EMP_DEC(EMP_COUNT_ARGS(__VA_ARGS__)) ), X, __VA_ARGS__)
+// #define EMP_REPLACE_COMMAS_pack(P, X, ...) EMP_PACK_SIZE(P)   @CAO
+
+#define EMP_REPLACE_COMMAS_1(X, A, ...) X A
+#define EMP_REPLACE_COMMAS_2(X, A,B, ...) X A X B
+#define EMP_REPLACE_COMMAS_4(X, A,B,C,D, ...) X A X B X C X D
+#define EMP_REPLACE_COMMAS_8(X, A,B,C,D,E,F,G,H, ...) X A X B X C X D X E X F X G X H
 #define EMP_REPLACE_COMMAS_16(X, ...) \
   EMP_REPLACE_COMMAS_8(__VA_ARGS__) X EMP_REPLACE_COMMAS( EMP_POP_ARGS_8(__VA_ARGS__) )
 #define EMP_REPLACE_COMMAS_32(X, ...) \
@@ -421,7 +450,7 @@
 
 // EMP_WRAP_EACH takes a wrapper macro and a variable set of arguments,
 // then applied to wrapper macro to each argument in order.
-#define EMP_WRAP_EACH(W, ...) EMP_ASSEMBLE_MACRO_2ARG(EMP_LAYOUT_, W, , __VA_ARGS__)
+//#define EMP_WRAP_EACH(W, ...) EMP_ASSEMBLE_MACRO_2ARG(EMP_LAYOUT_, W, , __VA_ARGS__)
 
 // EMP_LAYOUT takes a wrapper macro and padding information, wraps each argument in the macro
 // and then spaces them out with the padding.
