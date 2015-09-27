@@ -62,6 +62,11 @@
 //  * It would be useful to have EMP_WRAP_WITH_ID which passes in the position ID as the
 //    second argument.  This would allow us to, for example, streamline EMP_TYPES_TO_ARGS.
 //
+//  * A more generic EMP_WRAP macro that is specified on the fly.  For example:
+//      EMP_WRAP(W,2,4,A,B,a,b,c,d,e,f,g,h,i,j,k,l)
+//    would assume six args in each wrap, A, B, and the rest broken into groups of four. I.e.:
+//      W(A,B,a,b,c,d), W(A,B,e,f,g,h), W(A,B,i,j,k,l)
+//
 
 #include "macro_math.h"
 
@@ -141,11 +146,63 @@
 #define EMP_PACK_POP(PACK) (EMP_POP_ARG PACK)
 #define EMP_PACK_TOP(PACK) EMP_GET_ARG_1 PACK
 #define EMP_PACK_PUSH(NEW, PACK) (NEW,EMP_UNPACK_ARGS(PACK))
+#define EMP_PACK_PUSH_REAR(NEW, PACK) (EMP_UNPACK_ARGS(PACK),NEW)
 #define EMP_PACK_SIZE(PACK) EMP_COUNT_ARGS PACK
+
+// C is the CALL needed to be made on each parameter
+// F is a pack of FIXED parameters sent to all calls.
+// N is the NEXT call count needed to be done.
+// P is the pack of call counts the still need to be done
+// A is the number of arguments in P.
+#define EMP_CALL_BY_PACKS(C, F, ...)                                     \
+  EMP_CALL_BY_PACKS_impl(C, F, EMP_DEC_TO_PACK(EMP_COUNT_ARGS(__VA_ARGS__)), __VA_ARGS__ )
+// EMP_CALL_BY_PACKS_impl(C, F, EMP_DEC_TO_PACK(EMP_DEC(EMP_COUNT_ARGS(__VA_ARGS__))), __VA_ARGS__ )
+#define EMP_CALL_BY_PACKS_impl(C, F, P, ...) \
+  EMP_CALL_BY_PACKS_implB(C, F, EMP_PACK_SIZE(P), EMP_PACK_PUSH_REAR(~, P), __VA_ARGS__)
+#define EMP_CALL_BY_PACKS_implB(C, F, A, P, ...) EMP_CALL_BY_PACKS_implC(C, F, A, P, __VA_ARGS__)
+#define EMP_CALL_BY_PACKS_implC(C, F, A, P, ...) \
+  EMP_CALL_BY_PACKS_implD(C, EMP_PACK_TOP(P), F, A, EMP_PACK_POP(P), __VA_ARGS__)
+#define EMP_CALL_BY_PACKS_implD(C, N, F, A, P, ...)                      \
+  EMP_CALL_BY_PACKS_impl ## A(C, N, F, P, __VA_ARGS__)
+
+#define EMP_CALL_BY_PACKS_impl1(C, N, F, P, ...)                        \
+  EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)
+#define EMP_CALL_BY_PACKS_impl2(C, N, F, P, ...)                        \
+  EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_CALL_BY_PACKS_impl1(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+#define EMP_CALL_BY_PACKS_impl3(C, N, F, P, ...)                        \
+  EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_CALL_BY_PACKS_impl2(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+#define EMP_CALL_BY_PACKS_impl4(C, N, F, P, ...)                        \
+  EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_CALL_BY_PACKS_impl3(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+#define EMP_CALL_BY_PACKS_impl5(C, N, F, P, ...)                        \
+  EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_CALL_BY_PACKS_impl4(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+#define EMP_CALL_BY_PACKS_impl6(C, N, F, P, ...)                        \
+  EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_CALL_BY_PACKS_impl5(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+#define EMP_CALL_BY_PACKS_impl7(C, N, F, P, ...)                        \
+  EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_CALL_BY_PACKS_impl6(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+#define EMP_CALL_BY_PACKS_impl8(C, N, F, P, ...)                        \
+  EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_CALL_BY_PACKS_impl7(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+#define EMP_CALL_BY_PACKS_impl9(C, N, F, P, ...)                        \
+  EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_CALL_BY_PACKS_impl8(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+#define EMP_CALL_BY_PACKS_impl10(C, N, F, P, ...)                       \
+  EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_CALL_BY_PACKS_impl9(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_CALL_BY_PACKS_do_call(C, V, F, ...) C ## V(F, __VA_ARGS__)
 
 
 // Replace all of the commas in an argument set with something else (including nothing)
-#define EMP_REPLACE_COMMAS(X, ...)  @CAO TODO!!!
+#define EMP_REPLACE_COMMAS(X, ...) \
+  EMP_REPLACE_COMMAS_pack(EMP_DEC_TO_PACK( EMP_DEC(EMP_COUNT_ARGS(__VA_ARGS__)) ), X, __VA_ARGS__)
+#define EMP_REPLACE_COMMAS_pack(P, X, ...) EMP_PACK_SIZE(P)   @CAO
+
 #define EMP_REPLACE_COMMAS_1(X, A, ...) A
 #define EMP_REPLACE_COMMAS_2(X, A,B, ...) A X B
 #define EMP_REPLACE_COMMAS_4(X, A,B,C,D, ...) A X B X C X D
