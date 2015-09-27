@@ -162,36 +162,54 @@
 #define EMP_CALL_BY_PACKS_implB(C, F, A, P, ...) EMP_CALL_BY_PACKS_implC(C, F, A, P, __VA_ARGS__)
 #define EMP_CALL_BY_PACKS_implC(C, F, A, P, ...) \
   EMP_CALL_BY_PACKS_implD(C, EMP_PACK_TOP(P), F, A, EMP_PACK_POP(P), __VA_ARGS__)
-#define EMP_CALL_BY_PACKS_implD(C, N, F, A, P, ...)                      \
+#define EMP_CALL_BY_PACKS_implD(C, N, F, A, P, ...)     \
   EMP_CALL_BY_PACKS_impl ## A(C, N, F, P, __VA_ARGS__)
 
-#define EMP_CALL_BY_PACKS_impl1(C, N, F, P, ...)                        \
+#define EMP_CALL_BY_PACKS_impl1(C, N, F, P, ...)        \
   EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)
-#define EMP_CALL_BY_PACKS_impl2(C, N, F, P, ...)                        \
+
+#define EMP_CALL_BY_PACKS_impl2(C, N, F, P, ...) EMP_CALL_BY_PACKS_impl2B(C, N, F, P, __VA_ARGS__)
+#define EMP_CALL_BY_PACKS_impl2B(C, N, F, P, ...)                       \
   EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
   EMP_CALL_BY_PACKS_impl1(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
-#define EMP_CALL_BY_PACKS_impl3(C, N, F, P, ...)                        \
+
+#define EMP_CALL_BY_PACKS_impl3(C, N, F, P, ...) EMP_CALL_BY_PACKS_impl3B(C, N, F, P, __VA_ARGS__)
+#define EMP_CALL_BY_PACKS_impl3B(C, N, F, P, ...)                       \
   EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
   EMP_CALL_BY_PACKS_impl2(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
-#define EMP_CALL_BY_PACKS_impl4(C, N, F, P, ...)                        \
+
+#define EMP_CALL_BY_PACKS_impl4(C, N, F, P, ...) EMP_CALL_BY_PACKS_impl4B(C, N, F, P, __VA_ARGS__)
+#define EMP_CALL_BY_PACKS_impl4B(C, N, F, P, ...)                       \
   EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
   EMP_CALL_BY_PACKS_impl3(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
-#define EMP_CALL_BY_PACKS_impl5(C, N, F, P, ...)                        \
+
+#define EMP_CALL_BY_PACKS_impl5(C, N, F, P, ...) EMP_CALL_BY_PACKS_impl5B(C, N, F, P, __VA_ARGS__)
+#define EMP_CALL_BY_PACKS_impl5B(C, N, F, P, ...)                       \
   EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
   EMP_CALL_BY_PACKS_impl4(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
-#define EMP_CALL_BY_PACKS_impl6(C, N, F, P, ...)                        \
+
+#define EMP_CALL_BY_PACKS_impl6(C, N, F, P, ...) EMP_CALL_BY_PACKS_impl6B(C, N, F, P, __VA_ARGS__)
+#define EMP_CALL_BY_PACKS_impl6B(C, N, F, P, ...)                       \
   EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
   EMP_CALL_BY_PACKS_impl5(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
-#define EMP_CALL_BY_PACKS_impl7(C, N, F, P, ...)                        \
+
+#define EMP_CALL_BY_PACKS_impl7(C, N, F, P, ...) EMP_CALL_BY_PACKS_impl7B(C, N, F, P, __VA_ARGS__)
+#define EMP_CALL_BY_PACKS_impl7B(C, N, F, P, ...)                       \
   EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
   EMP_CALL_BY_PACKS_impl6(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
-#define EMP_CALL_BY_PACKS_impl8(C, N, F, P, ...)                        \
+
+#define EMP_CALL_BY_PACKS_impl8(C, N, F, P, ...) EMP_CALL_BY_PACKS_impl8B(C, N, F, P, __VA_ARGS__)
+#define EMP_CALL_BY_PACKS_impl8B(C, N, F, P, ...)                       \
   EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
   EMP_CALL_BY_PACKS_impl7(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
-#define EMP_CALL_BY_PACKS_impl9(C, N, F, P, ...)                        \
+
+#define EMP_CALL_BY_PACKS_impl9(C, N, F, P, ...) EMP_CALL_BY_PACKS_impl9B(C, N, F, P, __VA_ARGS__)
+#define EMP_CALL_BY_PACKS_impl9B(C, N, F, P, ...)                       \
   EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
   EMP_CALL_BY_PACKS_impl8(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
-#define EMP_CALL_BY_PACKS_impl10(C, N, F, P, ...)                       \
+
+#define EMP_CALL_BY_PACKS_impl10(C, N, F, P, ...) EMP_CALL_BY_PACKS_impl10B(C, N, F, P, __VA_ARGS__)
+#define EMP_CALL_BY_PACKS_impl10B(C, N, F, P, ...)                      \
   EMP_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
   EMP_CALL_BY_PACKS_impl9(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
 
