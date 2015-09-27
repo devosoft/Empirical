@@ -212,8 +212,11 @@ namespace emp {
   //Currently accepts arrays of ints, floats, doubles, chars, and std::strings
   //The size of the passed array must be equal to the size of the array stored
   //in emp.__outgoing_array
+  //
+  //Don't worry about the recurse argument - it's for handling nested arrays
+  //internally
   template <std::size_t SIZE, typename T>
-  void pass_array_to_cpp(std::array<T, SIZE> & arr) {
+    void pass_array_to_cpp(std::array<T, SIZE> & arr, bool recurse = false) {
   
     //Figure out type stuff
     std::map<const char *, std::string> map_type_names =\
@@ -249,7 +252,7 @@ namespace emp {
   //Chars aren't one of the types supported by setValue, but by treating them
   //as strings in Javascript we can pass them out to a C++ array
   template <std::size_t SIZE>
-  void pass_array_to_cpp(std::array<char, SIZE> & arr) {
+    void pass_array_to_cpp(std::array<char, SIZE> & arr, bool recurse = false) {
     
     emp_assert(SIZE == EM_ASM_INT_V({return emp.__outgoing_array.length}));
 
@@ -275,8 +278,9 @@ namespace emp {
 
   //We can handle strings in a similar way
   template <std::size_t SIZE>
-  void pass_array_to_cpp(std::array<std::string, SIZE> & arr) {
-    
+    void pass_array_to_cpp(std::array<std::string, SIZE> & arr, \
+			   bool recurse = false) {
+  
     emp_assert(SIZE == EM_ASM_INT_V({return emp.__outgoing_array.length}));
 
     int buffer = EM_ASM_INT_V({
@@ -310,6 +314,41 @@ namespace emp {
 
     free((void*)buffer);
   }
+
+
+  //We can handle nested arrays through recursive calls on chunks of them
+  template <std::size_t SIZE, std::size_t SIZE2, typename T>
+    void pass_array_to_cpp(std::array<std::array<T, SIZE2>, SIZE> & arr,\
+			   bool recurse = false) {
+    
+    emp_assert(SIZE == EM_ASM_INT_V({return emp.__outgoing_array.length}));
+
+    //Create temp array to hold whole array while pieces are passed in
+    if (recurse == 0) {
+      EM_ASM({emp.__temp_array = [emp.__outgoing_array];});
+    } else{
+      //This is a little wasteful of space, but the alternatives are
+      //surprisingly ugly
+      EM_ASM({emp.__temp_array.push(emp.__outgoing_array);});
+    }
+      
+    for (int i = 0; i < SIZE; i++) {
+      EM_ASM_ARGS({
+	  emp.__outgoing_array\
+	    = emp.__temp_array[emp.__temp_array.length - 1][$0];
+	}, i);
+      pass_array_to_cpp(arr[i], true);
+    }
+    
+    //Clear temp array
+    if (recurse == 0){
+      EM_ASM({emp.__temp_array = [];});
+    } else {
+      EM_ASM({emp.__temp_array.pop();});
+    }
+  }
+
 }
+
 
 #endif
