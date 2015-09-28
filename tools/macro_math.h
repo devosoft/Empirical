@@ -2451,6 +2451,9 @@
 #define EMP_ADD(A, B) EMP_EVAL( EMP_ADD_IMPL( EMP_DEC_TO_BIN(A), EMP_DEC_TO_BIN(B) ) )
 #define EMP_ADD_IMPL(...) EMP_BIN_TO_DEC( EMP_ADD_BIN_IMPL( __VA_ARGS__ ) )
 
+#define EMP_ADD_10(A,B,C,D,E,F,G,H,I,J) EMP_EVAL( EMP_ADD_10_IMPL( EMP_DEC_TO_BIN(A), EMP_DEC_TO_BIN(B), EMP_DEC_TO_BIN(C), EMP_DEC_TO_BIN(D), EMP_DEC_TO_BIN(E), EMP_DEC_TO_BIN(F), EMP_DEC_TO_BIN(G), EMP_DEC_TO_BIN(H), EMP_DEC_TO_BIN(I), EMP_DEC_TO_BIN(J) ) )
+#define EMP_ADD_10_IMPL(...) EMP_BIN_TO_DEC( EMP_ADD_BIN_10( __VA_ARGS__ ) )
+
 // --- Subtraction ---
 #define EMP_SUB_BIN(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9,             \
                     B0, B1, B2, B3, B4, B5, B6, B7, B8, B9)             \
@@ -2488,5 +2491,15 @@
 
 #define EMP_MULT(A, B) EMP_EVAL( EMP_MULT_IMPL( EMP_DEC_TO_BIN(A), EMP_DEC_TO_BIN(B) ) )
 #define EMP_MULT_IMPL(...) EMP_BIN_TO_DEC EMP_EMPTY() ( EMP_MULT_BIN( __VA_ARGS__ ) )
+
+
+// --- Bit Manipulation ---
+#define EMP_COUNT_ONES(A) EMP_ADD_10 EMP_EMPTY() ( EMP_DEC_TO_BIN_ ## A )
+
+// --- Log2 ---
+#define EMP_LOG2_BIN(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) EMP_IF(A0, 10, EMP_IF(A1, 9, EMP_IF(A2, 8, EMP_IF(A3, 7, EMP_IF(A4, 6, EMP_IF(A5, 5, EMP_IF(A6, 4, EMP_IF(A7, 3, EMP_IF(A8, 2, EMP_IF(A9, 1, 0) ) ) ) ) ) ) ) ) )
+
+#define EMP_LOG2(A) EMP_EVAL( EMP_LOG2_IMPL( EMP_DEC_TO_BIN(A) ) )
+#define EMP_LOG2_IMPL(...) EMP_LOG2_BIN( __VA_ARGS__)
 
 #endif
