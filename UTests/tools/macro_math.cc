@@ -121,6 +121,8 @@ int main(int argc, char* argv[])
   EMP_TEST_MACRO( EMP_ADD(123, 789), "912");
   EMP_TEST_MACRO( EMP_ADD(1023, 1), "0");      // Overflow
 
+  EMP_TEST_MACRO( EMP_ADD_10(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), "55" );
+  
   // Basic Subtraction...
   EMP_TEST_MACRO( EMP_SUB(10, 7), "3");
   EMP_TEST_MACRO( EMP_SUB(128, 1), "127");
@@ -166,6 +168,21 @@ int main(int argc, char* argv[])
   EMP_TEST_MACRO( EMP_MULT(65, 3), "195");
   EMP_TEST_MACRO( EMP_MULT(65, 15), "975");
 
+  // Bit Manipulation!
+  EMP_TEST_MACRO( EMP_COUNT_ONES(0), "0");
+  EMP_TEST_MACRO( EMP_COUNT_ONES(509), "8");
+  EMP_TEST_MACRO( EMP_COUNT_ONES(1023), "10");
 
+  EMP_TEST_MACRO( EMP_LOG2(0), "0" );
+  EMP_TEST_MACRO( EMP_LOG2(1), "1" );
+  EMP_TEST_MACRO( EMP_LOG2(3), "2" );
+  EMP_TEST_MACRO( EMP_LOG2(10), "4" );
+  EMP_TEST_MACRO( EMP_LOG2(20), "5" );
+  EMP_TEST_MACRO( EMP_LOG2(40), "6" );
+  EMP_TEST_MACRO( EMP_LOG2(75), "7" );
+  EMP_TEST_MACRO( EMP_LOG2(150), "8" );
+  EMP_TEST_MACRO( EMP_LOG2(300), "9" );
+  EMP_TEST_MACRO( EMP_LOG2(600), "10" );
+  
   if (verbose) std::cout << "All tests passed." << std::endl;
 }
