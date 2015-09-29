@@ -31,6 +31,7 @@
 
 // Several versions of eval...
 #define EMP_EVAL(...)  __VA_ARGS__
+#define EMP_EVAL1(...)  __VA_ARGS__
 #define EMP_EVAL2(...) __VA_ARGS__
 #define EMP_EVAL3(...) __VA_ARGS__
 #define EMP_EVAL4(...) __VA_ARGS__
@@ -40,6 +41,16 @@
 #define EMP_EVAL8(...) __VA_ARGS__
 #define EMP_EVAL9(...) __VA_ARGS__
 #define EMP_EVAL10(...) __VA_ARGS__
+#define EMP_EVAL11(...)  __VA_ARGS__
+#define EMP_EVAL12(...) __VA_ARGS__
+#define EMP_EVAL13(...) __VA_ARGS__
+#define EMP_EVAL14(...) __VA_ARGS__
+#define EMP_EVAL15(...) __VA_ARGS__
+#define EMP_EVAL16(...) __VA_ARGS__
+#define EMP_EVAL17(...) __VA_ARGS__
+#define EMP_EVAL18(...) __VA_ARGS__
+#define EMP_EVAL19(...) __VA_ARGS__
+#define EMP_EVAL20(...) __VA_ARGS__
 
 #define EMP_DEC_TO_BIN(VAL) EMP_DEC_TO_BIN_ ## VAL
 
@@ -2411,11 +2422,51 @@
 #define EMP_SHIFTL_BIN(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A1, A2, A3, A4, A5, A6, A7, A8, A9, 0
 #define EMP_SHIFTR_BIN(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, A0, A1, A2, A3, A4, A5, A6, A7, A8
 
+#define EMP_SHIFTL_BIN_0(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A0, A1, A2, A3, A4, A5, A6, A7, A8, A9
+#define EMP_SHIFTR_BIN_0(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A0, A1, A2, A3, A4, A5, A6, A7, A8, A9
+
+#define EMP_SHIFTL_BIN_1(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A1, A2, A3, A4, A5, A6, A7, A8, A9, 0
+#define EMP_SHIFTR_BIN_1(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, A0, A1, A2, A3, A4, A5, A6, A7, A8
+
+#define EMP_SHIFTL_BIN_2(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A2, A3, A4, A5, A6, A7, A8, A9, 0, 0
+#define EMP_SHIFTR_BIN_2(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, A0, A1, A2, A3, A4, A5, A6, A7
+
+#define EMP_SHIFTL_BIN_3(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A3, A4, A5, A6, A7, A8, A9, 0, 0, 0
+#define EMP_SHIFTR_BIN_3(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, A0, A1, A2, A3, A4, A5, A6
+
+#define EMP_SHIFTL_BIN_4(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A4, A5, A6, A7, A8, A9, 0, 0, 0, 0
+#define EMP_SHIFTR_BIN_4(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, A0, A1, A2, A3, A4, A5
+
+#define EMP_SHIFTL_BIN_5(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A5, A6, A7, A8, A9, 0, 0, 0, 0, 0
+#define EMP_SHIFTR_BIN_5(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, A0, A1, A2, A3, A4
+
+#define EMP_SHIFTL_BIN_6(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A6, A7, A8, A9, 0, 0, 0, 0, 0, 0
+#define EMP_SHIFTR_BIN_6(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, A0, A1, A2, A3
+
+#define EMP_SHIFTL_BIN_7(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A7, A8, A9, 0, 0, 0, 0, 0, 0, 0
+#define EMP_SHIFTR_BIN_7(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, 0, A0, A1, A2
+
+#define EMP_SHIFTL_BIN_8(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A8, A9, 0, 0, 0, 0, 0, 0, 0, 0
+#define EMP_SHIFTR_BIN_8(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, 0, 0, A0, A1
+
+#define EMP_SHIFTL_BIN_9(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A9, 0, 0, 0, 0, 0, 0, 0, 0, 0
+#define EMP_SHIFTR_BIN_9(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, 0, 0, 0, A0
+
+#define EMP_SHIFTL_BIN_10(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+#define EMP_SHIFTR_BIN_10(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+
+
 #define EMP_SHIFTL(A) EMP_SHIFTL_IMPL( EMP_DEC_TO_BIN(A) )
 #define EMP_SHIFTL_IMPL(...) EMP_BIN_TO_DEC( EMP_SHIFTL_BIN( __VA_ARGS__ ) )
 
+#define EMP_SHIFTL_X(X, A) EMP_SHIFTL_X_IMPL( X, EMP_DEC_TO_BIN(A) )
+#define EMP_SHIFTL_X_IMPL(X, ...) EMP_BIN_TO_DEC( EMP_SHIFTL_BIN_##X( __VA_ARGS__ ) )
+
 #define EMP_SHIFTR(A) EMP_SHIFTR_IMPL( EMP_DEC_TO_BIN(A) )
 #define EMP_SHIFTR_IMPL(...) EMP_BIN_TO_DEC( EMP_SHIFTR_BIN( __VA_ARGS__ ) )
+
+#define EMP_SHIFTR_X(X, A) EMP_SHIFTR_X_IMPL( X, EMP_DEC_TO_BIN(A) )
+#define EMP_SHIFTR_X_IMPL(X, ...) EMP_BIN_TO_DEC( EMP_EVAL(EMP_SHIFTR_BIN_##X( __VA_ARGS__ )) )
 
 
 // --- Addition ---
