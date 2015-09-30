@@ -2595,6 +2595,9 @@
                                      EMP_ADD(512, EMP_DIV_impl_8( EMP_SUB(A,B), EMP_SHIFTR(B) )) )
                                     
 
-
+/// --- Modulus ---
+#define EMP_MOD(A, B) EMP_MOD_impl(A, B, EMP_DIV(A, B))
+#define EMP_MOD_impl(A, B, D) EMP_MOD_impl2( A, EMP_MULT(D, B))
+#define EMP_MOD_impl2(A, M) EMP_SUB(A, M)
 
 #endif

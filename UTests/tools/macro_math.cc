@@ -197,5 +197,11 @@ int main(int argc, char* argv[])
   EMP_TEST_MACRO( EMP_DIV(100, 5), "20" );
   EMP_TEST_MACRO( EMP_DIV(1000, 17), "58" );
 
+  // Modulus!
+  EMP_TEST_MACRO( EMP_MOD(10, 3), "1" );
+  EMP_TEST_MACRO( EMP_MOD(127, 10), "7" );
+  EMP_TEST_MACRO( EMP_MOD(127, 1000), "127" );
+  EMP_TEST_MACRO( EMP_MOD(102, 3), "0" );
+  
   if (verbose) std::cout << "All tests passed." << std::endl;
 }
