@@ -143,6 +143,12 @@ int main(int argc, char* argv[])
   EMP_TEST_MACRO( EMP_SHIFTR(100), "50");
   EMP_TEST_MACRO( EMP_SHIFTR(151), "75");
 
+  EMP_TEST_MACRO( EMP_SHIFTL_X(0, 700), "700");
+  EMP_TEST_MACRO( EMP_SHIFTL_X(5, 17),  "544");
+  EMP_TEST_MACRO( EMP_SHIFTL_X(1, 111), "222");  
+  EMP_TEST_MACRO( EMP_SHIFTR_X(1, 100), "50");
+  EMP_TEST_MACRO( EMP_SHIFTR_X(3, 151), "18");
+
   // Inc, dec, half...
   EMP_TEST_MACRO( EMP_INC(20), "21");
   EMP_TEST_MACRO( EMP_INC(55), "56");
@@ -176,6 +182,7 @@ int main(int argc, char* argv[])
   EMP_TEST_MACRO( EMP_LOG2(0), "0" );
   EMP_TEST_MACRO( EMP_LOG2(1), "1" );
   EMP_TEST_MACRO( EMP_LOG2(3), "2" );
+  EMP_TEST_MACRO( EMP_LOG2(5), "3" );
   EMP_TEST_MACRO( EMP_LOG2(10), "4" );
   EMP_TEST_MACRO( EMP_LOG2(20), "5" );
   EMP_TEST_MACRO( EMP_LOG2(40), "6" );
@@ -183,6 +190,12 @@ int main(int argc, char* argv[])
   EMP_TEST_MACRO( EMP_LOG2(150), "8" );
   EMP_TEST_MACRO( EMP_LOG2(300), "9" );
   EMP_TEST_MACRO( EMP_LOG2(600), "10" );
-  
+
+  // Division!
+  EMP_TEST_MACRO( EMP_DIV_start(2), "8" );
+  EMP_TEST_MACRO( EMP_DIV(8, 2), "4" );
+  EMP_TEST_MACRO( EMP_DIV(100, 5), "20" );
+  EMP_TEST_MACRO( EMP_DIV(1000, 17), "58" );
+
   if (verbose) std::cout << "All tests passed." << std::endl;
 }
