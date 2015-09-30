@@ -2190,7 +2190,8 @@
 // EMP_IF examines the first argument; if it's 0, it resolves to the third argument, otherwise
 // it resolves to the second argument.  We do this by converting a 0 into two arguments, with
 // F being the second one.  Anything else stays as one argument, and the default second is T
-#define EMP_IF(TEST, T, F) EMP_EVAL( EMP_IF_impl_get_2 EMP_EMPTY() ( EMP_IF_impl_##TEST(F), T, ~) )
+#define EMP_IF(TEST, T, F) EMP_IF_impl(TEST, T, F)
+#define EMP_IF_impl(TEST, T, F) EMP_EVAL( EMP_IF_impl_get_2 EMP_EMPTY() ( EMP_IF_impl_##TEST(F), T, ~) )
 #define EMP_IF_impl_get_2(A, B, ...) B
 #define EMP_IF_impl_0(A) ~, A
 
@@ -2552,5 +2553,48 @@
 
 #define EMP_LOG2(A) EMP_EVAL( EMP_LOG2_IMPL( EMP_DEC_TO_BIN(A) ) )
 #define EMP_LOG2_IMPL(...) EMP_LOG2_BIN( __VA_ARGS__)
+
+
+// --- Division ---
+#define EMP_DIV_start(B) EMP_SUB(10, EMP_LOG2(B))
+
+#define EMP_DIV(A, B) EMP_IF( EMP_EQU(B,0), DIV_BY_ZERO_ERROR,          \
+                              EMP_DIV_impl(EMP_DIV_start(B), A,B) )
+
+#define EMP_DIV_impl(START, A, B) EMP_DIV_implB(START, A, B)
+#define EMP_DIV_implB(START, A, B) EMP_DIV_impl_ ## START(A, EMP_SHIFTL_X(START, B) )
+  
+
+#define EMP_DIV_impl_0(A, B) EMP_IF( EMP_LESS(A, B), 0, 1)
+#define EMP_DIV_impl_1(A, B) EMP_IF( EMP_LESS(A, B),                    \
+                                     EMP_DIV_impl_0(A, EMP_SHIFTR(B)),  \
+                                     EMP_ADD(2, EMP_DIV_impl_0( EMP_SUB(A,B), EMP_SHIFTR(B) )) )
+#define EMP_DIV_impl_2(A, B) EMP_IF( EMP_LESS(A, B),                    \
+                                     EMP_DIV_impl_1(A, EMP_SHIFTR(B)),  \
+                                     EMP_ADD(4, EMP_DIV_impl_1( EMP_SUB(A,B), EMP_SHIFTR(B) )) )
+#define EMP_DIV_impl_3(A, B) EMP_IF( EMP_LESS(A, B),                    \
+                                     EMP_DIV_impl_2(A, EMP_SHIFTR(B)),  \
+                                     EMP_ADD(8, EMP_DIV_impl_2( EMP_SUB(A,B), EMP_SHIFTR(B) )) )
+#define EMP_DIV_impl_4(A, B) EMP_IF( EMP_LESS(A, B),                    \
+                                     EMP_DIV_impl_3(A, EMP_SHIFTR(B)),  \
+                                     EMP_ADD(16, EMP_DIV_impl_3( EMP_SUB(A,B), EMP_SHIFTR(B) )) )
+#define EMP_DIV_impl_5(A, B) EMP_IF( EMP_LESS(A, B),                    \
+                                     EMP_DIV_impl_4(A, EMP_SHIFTR(B)),  \
+                                     EMP_ADD(32, EMP_DIV_impl_4( EMP_SUB(A,B), EMP_SHIFTR(B) )) )
+#define EMP_DIV_impl_6(A, B) EMP_IF( EMP_LESS(A, B),                    \
+                                     EMP_DIV_impl_5(A, EMP_SHIFTR(B)),  \
+                                     EMP_ADD(64, EMP_DIV_impl_5( EMP_SUB(A,B), EMP_SHIFTR(B) )) )
+#define EMP_DIV_impl_7(A, B) EMP_IF( EMP_LESS(A, B),                    \
+                                     EMP_DIV_impl_6(A, EMP_SHIFTR(B)),  \
+                                     EMP_ADD(128, EMP_DIV_impl_6( EMP_SUB(A,B), EMP_SHIFTR(B) )) )
+#define EMP_DIV_impl_8(A, B) EMP_IF( EMP_LESS(A, B),                    \
+                                     EMP_DIV_impl_7(A, EMP_SHIFTR(B)),  \
+                                     EMP_ADD(256, EMP_DIV_impl_7( EMP_SUB(A,B), EMP_SHIFTR(B) )) )
+#define EMP_DIV_impl_9(A, B) EMP_IF( EMP_LESS(A, B),                    \
+                                     EMP_DIV_impl_8(A, EMP_SHIFTR(B)),  \
+                                     EMP_ADD(512, EMP_DIV_impl_8( EMP_SUB(A,B), EMP_SHIFTR(B) )) )
+                                    
+
+
 
 #endif
