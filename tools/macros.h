@@ -149,6 +149,37 @@
 #define EMP_PACK_PUSH_REAR(NEW, PACK) (EMP_UNPACK_ARGS(PACK),NEW)
 #define EMP_PACK_SIZE(PACK) EMP_COUNT_ARGS PACK
 
+// Group the arguments that follow into packs of size S.
+#define EMP_ARGS_TO_PACKS(S, ...) \
+  EMP_ARGS_TO_PACKS_impl(S, EMP_DIV(EMP_COUNT_ARGS(__VA_ARGS__), S), __VA_ARGS__)
+
+// S = Size of each pack
+// N = Number of packs
+// P = Pack representatio of number of packs
+#define EMP_ARGS_TO_PACKS_impl(S, N, ...) EMP_ARGS_TO_PACKS_implB(S, EMP_DEC_TO_PACK(N), __VA_ARGS)
+#define EMP_ARGS_TO_PACKS_implB(S, P, ...) @CAO
+
+#define EMP_ARGS_TO_PACKS_1(S, ...) , (EMP_CROP_ARGS_TO(S, __VA_ARGS__))
+#define EMP_ARGS_TO_PACKS_2(S, ...)                                     \
+  EMP_ARGS_TO_PACKS_1(S,__VA_ARGS__)EMP_ARGS_TO_PACKS_1(S,EMP_POP(N, __VA_ARGS__))
+#define EMP_ARGS_TO_PACKS_4(S, ...)                                     \
+  EMP_ARGS_TO_PACKS_2(S,__VA_ARGS__)EMP_ARGS_TO_PACKS_2(S,EMP_POP(EMP_MULT(N,2),__VA_ARGS__))
+#define EMP_ARGS_TO_PACKS_8(S, ...)                                     \
+  EMP_ARGS_TO_PACKS_4(S,__VA_ARGS__)EMP_ARGS_TO_PACKS_4(S,EMP_POP(EMP_MULT(N,4),__VA_ARGS__))
+#define EMP_ARGS_TO_PACKS_16(S, ...)                                    \
+  EMP_ARGS_TO_PACKS_8(S,__VA_ARGS__)EMP_ARGS_TO_PACKS_8(S,EMP_POP(EMP_MULT(N,8),__VA_ARGS__))
+#define EMP_ARGS_TO_PACKS_32(S, ...)                                    \
+  EMP_ARGS_TO_PACKS_16(S,__VA_ARGS__)EMP_ARGS_TO_PACKS_16(S,EMP_POP(EMP_MULT(N,16),__VA_ARGS__))
+#define EMP_ARGS_TO_PACKS_64(S, ...)                                    \
+  EMP_ARGS_TO_PACKS_32(S,__VA_ARGS__)EMP_ARGS_TO_PACKS_32(S,EMP_POP(EMP_MULT(N,32),__VA_ARGS__))
+#define EMP_ARGS_TO_PACKS_128(S, ...)                                   \
+  EMP_ARGS_TO_PACKS_64(S,__VA_ARGS__)EMP_ARGS_TO_PACKS_64(S,EMP_POP(EMP_MULT(N,64),__VA_ARGS__))
+#define EMP_ARGS_TO_PACKS_256(S, ...)                                   \
+  EMP_ARGS_TO_PACKS_128(S,__VA_ARGS__)EMP_ARGS_TO_PACKS_128(S,EMP_POP(EMP_MULT(N,128),__VA_ARGS__))
+#define EMP_ARGS_TO_PACKS_512(S, ...)                                   \
+  EMP_ARGS_TO_PACKS_256(S,__VA_ARGS__)EMP_ARGS_TO_PACKS_256(S,EMP_POP(EMP_MULT(N,256),__VA_ARGS__))
+
+
 // EMP_CALL_BY_PACKS is used to build other macros.  It will call a series of versions of C
 // based on binary representations so that all args are called, passing F in as the first
 // parameter.  For example, if C = ABC_ and 13 arguments are passed in, it will call ABC_8,
