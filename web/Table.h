@@ -292,6 +292,7 @@ namespace web {
       return *this;
     }
 
+
     Table & SetHeader(bool _h=true) {
       emp_assert(state == CELL);
       Info()->rows[cur_row].data[cur_col].SetHeader(_h);
@@ -299,6 +300,18 @@ namespace web {
       return *this;
     }
 
+    Widget AddText(int r, int c, const std::string & text) {
+      GetCell(r,c) << text;
+      return *this;
+    }
+
+    Widget AddHeader(int r, int c, const std::string & text) {
+      GetCell(r,c) << text;
+      SetHeader();
+      return *this;
+    }
+
+    
     // Apply to appropriate component based on current state.
     using WidgetFacet<Table>::SetCSS;
     std::string GetCSS(const std::string & setting) override {
