@@ -523,6 +523,10 @@ namespace web {
       }
 
 
+      // Positioning
+      RETURN_TYPE & SetFloat(const std::string & f) { return SetCSS("float", f); }
+      RETURN_TYPE & SetOverflow(const std::string & o) { return SetCSS("overflow", o); }
+      
       // Text Manipulation
       RETURN_TYPE & SetFont(const std::string & font) { return SetCSS("font-family", font); }
       RETURN_TYPE & SetFontSize(int s) { return SetCSS("font-size", emp::to_string(s, "px")); }
@@ -533,6 +537,11 @@ namespace web {
       RETURN_TYPE & SetBackground(const std::string & v) { return SetCSS("background-color", v); }
       RETURN_TYPE & SetColor(const std::string & v) { return SetCSS("color", v); }
       RETURN_TYPE & SetOpacity(double v) { return SetCSS("opacity", v); }
+
+      // Tables...
+      RETURN_TYPE & SetPadding(double p, const std::string & unit="px") {
+        return SetCSS("padding", emp::to_string(p, unit));
+      }
     };
     
   }
