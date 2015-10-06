@@ -196,9 +196,9 @@ namespace web {
       
   public:
     virtual std::string GetType() override { return "web::TableInfo"; }
-  };
+  }; // end TableInfo
 
-
+  
     int cur_row;      // Which row/col is currently active?
     int cur_col;
            
@@ -482,7 +482,7 @@ namespace web {
 
   // Setup mechanism to retrieve current slate for table append.
   Widget & Table::TableInfo::GetCurSlate() {
-    int cur_col = append_widget->cur_row;
+    int cur_col = append_widget->cur_col;
     int cur_row = append_widget->cur_row;
 
     // Make sure the number of rows hasn't changed, making the current position illegal.
