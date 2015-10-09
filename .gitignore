@@ -5,6 +5,8 @@ a.out.js
 *.map
 *.o
 *.js.mem
+*.pyc
+*.swp
 UTests/tools/tmp*.cc
 UTests/emtools/JSWrap.js
 UTests/UI/Animate.js
