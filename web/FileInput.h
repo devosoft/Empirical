@@ -37,35 +37,25 @@ namespace web {
         if (callback_id) emp::JSDelete(callback_id);               // Delete callback wrapper.
       }
       
-      void DoCallback() {
-        function handleFileSelect(evt) {
-          var infile = evt.target.files; // FileList object (List of File objects)
-
-          var reader = new FileReader();
-          reader.onload = function(e) {
-            emkLoadString(e.target.result + '\n');
-          };
-          reader.readAsText(evt.target.files.item(0));
-        }
-
-        
-        callback();
+      void DoCallback(const std::string & file_body) {
+        callback(file_body);
         UpdateDependants();
       }
 
       virtual void GetHTML(std::stringstream & HTML) override {
-        HTML.str("");                                           // Clear the current text.
+        HTML.str("");                                             // Clear the current text.
         HTML <<"<input type=\"file\"";
-        if (title != "") HTML << " title=\"" << title << "\"";  // Add a title if there is one.
-        if (disabled) { HTML << " disabled=true"; }             // Check if should be disabled
-        HTML << " id=\"" << id << "\"";                         // Indicate ID.
-        HTML << " name=\"" << id << "\"";                       // Use same name as ID.
+        if (title != "") HTML << " title=\"" << title << "\"";    // Add a title if there is one
+        if (disabled) { HTML << " disabled=true"; }               // Check if should be disabled
+        HTML << " id=\"" << id << "\"";                           // Indicate ID.
+        HTML << " name=\"" << id << "\"";                         // Use same name as ID
         HTML << " onchange=\""
              << " function(evt) {"
-             << "   var infile = evt.target.files;"             // List of File objects
-             << "   var reader = new FileReader();"             // Reader object
-             << "   reader.onload = function(e) {"              // Fun to run when file loaded.
-             << "     emkLoadString(e.target.result + '\n');"   // Do callback!
+             << "   var infile = evt.target.files;"               // List of File objects
+             << "   var reader = new FileReader();"               // Reader object
+             << "   reader.onload = function(e) {"                // Fun to run when file loaded
+             << "     emp.Callback(" << callback_id
+             << "                  , e.target.result + '\n');"    // Do callback!
              << "   };"
              << "   reader.readAsText(evt.target.files.item(0));" // Load file!
              << " }\"";
@@ -113,11 +103,11 @@ namespace web {
       Info()->disabled = false;
       
       Info()->callback = in_cb;
-      FileInputInfo * b_info = Info();
-      Info()->callback_id = JSWrap( std::function<void()>( [b_info](){b_info->DoCallback();} )  );
+      FileInputInfo * w_info = Info();
+      Info()->callback_id = JSWrap( std::function<void(std::string & file_body)>( [w_info](std::string & file_body){w_info->DoCallback(file_body);} )  );
     }
     FileInput(const FileInput & in) : WidgetFacet(in) { ; }
-    FileInput(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsFileInputInfo()); }
+    FileInput(const Widget & in) : WidgetFacet(in) { ; }
     virtual ~FileInput() { ; }
 
     using INFO_TYPE = FileInputInfo;
