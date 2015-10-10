@@ -9,6 +9,7 @@
 
 #include "Button.h"
 #include "Canvas.h"
+#include "FileInput.h"
 #include "Image.h"
 #include "Selector.h"
 #include "Slate.h"
@@ -40,6 +41,11 @@ namespace web {
     }
     template <class... T> web::Canvas AddCanvas(T... args){
       web::Canvas new_widget(std::forward<T>(args)...);
+      info->Append(new_widget);
+      return new_widget;
+    }
+    template <class... T> web::FileInput AddFileInput(T... args){
+      web::FileInput new_widget(std::forward<T>(args)...);
       info->Append(new_widget);
       return new_widget;
     }
@@ -77,6 +83,7 @@ namespace web {
     // Setup a quick way to retrieve old widgets by name.
     web::Button Button (const std::string & in_id) { return web::Button(Find(in_id)); }
     web::Canvas Canvas (const std::string & in_id) { return web::Canvas(Find(in_id)); }
+    web::FileInput FileInput (const std::string & in_id) { return web::FileInput(Find(in_id)); }
     web::Image Image (const std::string & in_id) { return web::Image(Find(in_id)); }
     web::Selector Selector (const std::string & in_id) { return web::Selector(Find(in_id)); }
     web::Slate Slate (const std::string & in_id) { return web::Slate(Find(in_id)); }
