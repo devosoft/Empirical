@@ -51,14 +51,16 @@ namespace web {
         HTML << " name=\"" << id << "\"";                         // Use same name as ID
         HTML << " onchange=\""
              << " function(evt) {"
-             << "   var infile = evt.target.files;"               // List of File objects
-             << "   var reader = new FileReader();"               // Reader object
-             << "   reader.onload = function(e) {"                // Fun to run when file loaded
-             << "     emp.Callback(" << callback_id
-             << "                  , e.target.result + '\n');"    // Do callback!
-             << "   };"
-             << "   reader.readAsText(evt.target.files.item(0));" // Load file!
-             << " }\"";
+             <<    "var infile = evt.target.files;"               // List of File objects
+             <<    "var reader = new FileReader();"               // Reader object
+             <<    "reader.onload = function(e) {"                // Fun to run when file loaded
+             <<      "alert('Ping!');"
+             <<      "emp.Callback(" << callback_id
+             <<                   ", e.target.result + '\\n');"   // Do callback!
+             <<      "alert('Ping!2');"
+             <<    "};"
+             <<    "reader.readAsText(evt.target.files.item(0));" // Load file!
+             << "}\"";
 
         HTML << ">";
       }
