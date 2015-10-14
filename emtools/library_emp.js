@@ -31,7 +31,7 @@ mergeInto(LibraryManager.library, {
         LoadFileEvent: function(files, callback_id) {
             var reader = new FileReader();            // Reader object
             reader.onload = function(e) {             // Fun to run when file loaded
-                emp.Callback(callback_id, e.target.result + '\\n');   // Do callback!
+                emp.Callback(callback_id, e.target.result + '\n');   // Do callback!
             };
             reader.readAsText(files[0]);   // Load file!
         }
