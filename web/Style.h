@@ -56,6 +56,8 @@ namespace web {
     const std::map<std::string, std::string> & GetMap() const {
       return settings;
     }
+
+    void Clear() { settings.clear(); }
     
     // Apply ALL of the style settings.
     void Apply(const std::string & widget_id) {
