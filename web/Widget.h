@@ -105,7 +105,7 @@ namespace web {
     bool TextOK() const;
     
     std::string GetID() const;
-    void Clear();
+    virtual void ClearChildren();
     bool HasChild(const Widget & test_child);
     
     // CSS-related options may be overridden in derived classes that have multiple styles.
@@ -182,7 +182,7 @@ namespace web {
       virtual bool IsTextInfo() const { return false; }
       virtual bool IsTextAreaInfo() const { return false; }
 
-      void Clear() { children.resize(0); }
+      void ClearChildren() { children.resize(0); }
       
       void AddChild(Widget in) {
         // If the inserted widget is already active, remove it from its old position.
@@ -362,8 +362,8 @@ namespace web {
   bool Widget::AppendOK() const { return info->append_ok; }
   std::string Widget::GetID() const { return info ? info->id : ""; }
   
-  virtual void Widget::Clear() {
-    if (info) info->Clear();
+  void Widget::ClearChildren() {
+    if (info) info->ClearChildren();
   }
   
   bool Widget::HasChild(const Widget & test_child) {
