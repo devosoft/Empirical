@@ -58,7 +58,7 @@ namespace web {
     void SetChildID(int cid) { child_id = cid; }
     void SetHeader(bool h=true) { header = h; }
     void SetMasked(bool m=true) { masked = m; }
-    
+
     bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
       bool ok = true;
       if (verbose) ss << prefix << "Scanning: emp::TableData; child_id=" << child_id << std::endl;
@@ -193,7 +193,23 @@ namespace web {
       }
     }
 
-      
+    void ClearCell(int row_id, int col_id) {
+      rows[row_id].data[col_id].colspan = 1;
+      rows[row_id].data[col_id].rowspan = 1;
+      const int child_id = rows[row_id].data[col_id].child_id;
+      if (child_id >= 0) children[child_id].Clear();
+      rows[row_id].data[col_id].header = false;
+      rows[row_id].data[col_id].masked = false;  // @CAO Technically, cell might still be masked!
+      rows[row_id].data[col_id].style.Clear();
+    }
+    void ClearRowCells(int row_id) {
+      for (int col_id = 0; col_id < col_count; col_id++) ClearCell(row_id, col_id);
+    }
+    void ClearTableCells() {
+      for (int row_id = 0; row_id < row_count; row_id++) ClearRowCells(row_id);
+    }
+    
+
   public:
     virtual std::string GetType() override { return "web::TableInfo"; }
   }; // end TableInfo
@@ -262,6 +278,14 @@ namespace web {
     bool InStateRow() const { return state == ROW; }
     bool InStateCell() const { return state == CELL; }
     
+    void Clear() {
+      // Clear based on tables current state.
+      if (state == TABLE) Info()->ClearTableCells();
+      else if (state == ROW) Info()->ClearRowCells(cur_row);
+      else if (state == CELL) Info()->ClearCell(cur_row, cur_col);
+      else emp_assert(false && "Table in unknown state!");
+    }
+
 
     Table & Rows(int r) {
       Info()->UpdateRows(r);
@@ -310,7 +334,7 @@ namespace web {
       SetHeader();
       return *this;
     }
-
+    
     
     // Apply to appropriate component based on current state.
     using WidgetFacet<Table>::SetCSS;
