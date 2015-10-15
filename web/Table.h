@@ -197,7 +197,7 @@ namespace web {
       rows[row_id].data[col_id].colspan = 1;
       rows[row_id].data[col_id].rowspan = 1;
       const int child_id = rows[row_id].data[col_id].child_id;
-      if (child_id >= 0) children[child_id].Clear();
+      if (child_id >= 0) children[child_id].ClearChildren();
       rows[row_id].data[col_id].header = false;
       rows[row_id].data[col_id].masked = false;  // @CAO Technically, cell might still be masked!
       rows[row_id].data[col_id].style.Clear();
