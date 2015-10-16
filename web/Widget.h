@@ -546,6 +546,9 @@ namespace web {
       RETURN_TYPE & SetOpacity(double v) { return SetCSS("opacity", v); }
 
       // Tables...
+      RETURN_TYPE & SetBorder(const std::string & border_info) {
+        return SetCSS("border", border_info);
+      }
       RETURN_TYPE & SetPadding(double p, const std::string & unit="px") {
         return SetCSS("padding", emp::to_string(p, unit));
       }
