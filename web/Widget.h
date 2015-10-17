@@ -125,7 +125,9 @@ namespace web {
     // Clear and redraw the current widget on the screen.
     void Redraw();
       
-    
+    // Methods to look up previously created elements, by type.
+    Widget & Find(const std::string & test_name);
+
     Widget & AddDependant(const Widget & w);
     
     // Setup << operator to redirect to Append; option preparation can be overridden.
@@ -156,6 +158,8 @@ namespace web {
       emp::vector<Widget> dependants; // Widgets to be refreshed if this one is triggered
       bool append_ok;                 // Can we add more children?
       Widget::ActivityState state;    // Is this element active in DOM?
+      std::map<std::string, Widget> widget_dict;   // By-name lookup for child widgets
+    
 
       // WidgetInfo cannot be built unless within derived class, so constructor is protected
       WidgetInfo(const std::string & in_id="")
@@ -182,7 +186,41 @@ namespace web {
       virtual bool IsTextInfo() const { return false; }
       virtual bool IsTextAreaInfo() const { return false; }
 
-      void ClearChildren() { children.resize(0); }
+      bool IsRegistered(const std::string & test_name) {
+        return (widget_dict.find(test_name) != widget_dict.end());
+      }
+    
+      Widget & GetRegistered(const std::string & find_name) {
+        emp_assert(IsRegistered(find_name), find_name, widget_dict.size());
+        return widget_dict[find_name];
+      }
+      
+      // Register is used so we can lookup classes by name.
+      void Register(Widget & new_widget) {
+        // Make sure name is not already used
+        emp_assert(IsRegistered(new_widget.GetID()) == false, new_widget.GetID());
+        
+        // Register THIS widget.
+        widget_dict[new_widget.GetID()] = new_widget;   // Track widget by name
+        if (parent) parent->Register(new_widget);       // Also register in parent, if available
+
+        // Register CHILD widgets, if any already in this one.
+        for (Widget & child : new_widget.info->children) {
+          Register(child);
+        }
+      }
+
+      void Unregister(Widget & old_widget) {
+        widget_dict.erase(old_widget.GetID());
+        // @CAO Also unregister all children!
+        if (parent) parent->Unregister(old_widget);
+      }
+    
+      void ClearChildren() {
+        // Unregister all children and then delete links to them.
+        for (Widget & child : children) Unregister(child);
+        children.resize(0);
+      }
       
       void AddChild(Widget in) {
         // If the inserted widget is already active, remove it from its old position.
@@ -305,11 +343,6 @@ namespace web {
     public:
       virtual std::string GetType() { return "web::WidgetInfo"; }
 
-      // Register is used so we can lookup classes by name.
-      // Overridden in classes that manage multiple element; below is the default version.
-      virtual void Register(Widget & new_widget) { if (parent) parent->Register(new_widget); }
-      virtual void Unregister(Widget & old_widget) { if (parent) parent->Unregister(old_widget); }
-    
     };
 
   }  // end namespaceinternal
@@ -419,6 +452,11 @@ namespace web {
     info->ReplaceHTML();
   }
   
+  Widget & Widget::Find(const std::string & test_name) {
+    emp_assert(info);
+    return info->GetRegistered(test_name);
+  }
+
   Widget & Widget::AddDependant(const Widget & w) {
     info->AddDependant(w);
     return *this;
