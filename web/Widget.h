@@ -195,25 +195,30 @@ namespace web {
         return widget_dict[find_name];
       }
       
+      void Register_recurse(Widget & new_widget) { 
+        emp_assert(IsRegistered(new_widget.GetID()) == false, new_widget.GetID());
+        widget_dict[new_widget.GetID()] = new_widget;     // Track widget by name
+        if (parent) parent->Register_recurse(new_widget); // Also register in parent, if available
+      }
+
       // Register is used so we can lookup classes by name.
       void Register(Widget & new_widget) {
         // Make sure name is not already used
-        emp_assert(IsRegistered(new_widget.GetID()) == false, new_widget.GetID());
+        Register_recurse(new_widget);  // Register THIS widget here an in ancestors.
         
-        // Register THIS widget.
-        widget_dict[new_widget.GetID()] = new_widget;   // Track widget by name
-        if (parent) parent->Register(new_widget);       // Also register in parent, if available
-
         // Register CHILD widgets, if any already in this one.
-        for (Widget & child : new_widget.info->children) {
-          Register(child);
-        }
+        for (Widget & child : new_widget.info->children) Register(child);
+      }
+
+      void Unregister_recurse(Widget & old_widget) { 
+        emp_assert(IsRegistered(old_widget.GetID()) == true, old_widget.GetID());
+        widget_dict.erase(old_widget.GetID());
+        if (parent) parent->Unregister_recurse(old_widget); // Unregister in parent, if available
       }
 
       void Unregister(Widget & old_widget) {
-        widget_dict.erase(old_widget.GetID());
-        // @CAO Also unregister all children!
-        if (parent) parent->Unregister(old_widget);
+        if (parent) parent->Unregister_recurse(old_widget);
+        for (Widget & child : old_widget.info->children) Unregister(child);
       }
     
       void ClearChildren() {
@@ -393,7 +398,7 @@ namespace web {
   bool Widget::IsActive() const { if (!info) return false; return info->state == ACTIVE; }
   
   bool Widget::AppendOK() const { return info->append_ok; }
-  std::string Widget::GetID() const { return info ? info->id : ""; }
+  std::string Widget::GetID() const { return info ? info->id : "(none)"; }
   
   void Widget::ClearChildren() {
     if (info) info->ClearChildren();
@@ -485,7 +490,8 @@ namespace web {
       WidgetFacet(const WidgetFacet & in) : Widget(in) { ; }
       WidgetFacet(const Widget & in) : Widget(in) {
         // Converting from a generic widget; make sure type is correct!
-        emp_assert(dynamic_cast<typename RETURN_TYPE::INFO_TYPE *>( Info(in) ) != NULL);
+        emp_assert(dynamic_cast<typename RETURN_TYPE::INFO_TYPE *>( Info(in) ) != NULL,
+                   in.GetID());
       }
       WidgetFacet(WidgetInfo * in_info) : Widget(in_info) { ; }
       WidgetFacet & operator=(const WidgetFacet & in) { Widget::operator=(in); return *this; }
