@@ -299,13 +299,16 @@ namespace web {
     }
       
     Table & GetCell(int r, int c) {
-      emp_assert(r < Info()->row_count && c < Info()->col_count);
+      emp_assert(Info() != nullptr);
+      emp_assert(r < Info()->row_count && c < Info()->col_count,
+                 r, c, Info()->row_count, Info()->col_count, GetID());
       cur_row = r; cur_col = c;
       state = CELL;
       return *this;
     }
     Table & GetRow(int r) {
-      emp_assert(r < Info()->row_count);
+      emp_assert(r < Info()->row_count,
+                 r, Info()->row_count, GetID());
       cur_row = r; cur_col = 0;
       state = ROW;
       return *this;
@@ -348,7 +351,8 @@ namespace web {
     // Allow the row and column span of the current cell to be adjusted.
     Table & SetColSpan(int new_span) {
       emp_assert(state == CELL);
-      emp_assert((cur_col + new_span <= GetNumCols()) && "Col span too wide for table!");
+      emp_assert((cur_col + new_span <= GetNumCols()) && "Col span too wide for table!",
+                 cur_col, new_span, GetNumCols(), GetID());
         
       auto & datum = Info()->rows[cur_row].data[cur_col];
       const int old_span = datum.GetColSpan();
