@@ -133,7 +133,9 @@ namespace web {
 
     // Add additional children on to this element.
     Widget Append(Widget info) override { return GetCurSlate() << info; }
-    Widget Append(const std::string & text) override { return GetCurSlate() << text; }
+    Widget Append(const std::string & text) override {
+      return GetCurSlate() << text;
+    }
     Widget Append(const std::function<std::string()> & in_fun) override {
       return GetCurSlate() << in_fun;
     }
@@ -209,6 +211,46 @@ namespace web {
       for (int row_id = 0; row_id < row_count; row_id++) ClearRowCells(row_id);
     }
     
+    bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
+      bool ok = true;
+
+      // Basic info
+      if (verbose) {
+        ss << prefix << "Scanning: emp::TableInfo (rows=" << row_count
+           << ", cols=" << col_count << ")." << std::endl;
+      }
+
+      // Recursively call OK on rows and data.
+      for (int r = 0; r < row_count; r++) {
+        ok = ok && rows[r].OK(ss, verbose, prefix+"  ");
+        if (col_count != rows[r].GetSize()) {
+          ss << prefix << "  Error: col_count = " << col_count
+             << ", but row has " << rows[r].GetSize() << " elements." << std::endl;
+          ok = false;
+        }
+        for (int c = 0; c < col_count; c++) {
+          auto & cell = rows[r][c];
+          if (c + cell.GetColSpan() > col_count) {
+            ss << prefix << "  Error: Cell at row " << r << ", col " << c
+               << " extends past right side of table." << std::endl;
+            ok = false;
+          }
+          if (r + cell.GetRowSpan() > row_count) {
+            ss << prefix << "  Error: Cell at row " << r << ", col " << c
+               << " extends past bottom of table." << std::endl;
+            ok = false;
+          }
+        }
+      }
+
+      // Make sure all children are associated with one and only one cell.
+      if (children.size() > 0) {
+        
+      }
+
+
+      return ok;
+    }
 
   public:
     virtual std::string GetType() override { return "web::TableInfo"; }
@@ -278,12 +320,13 @@ namespace web {
     bool InStateRow() const { return state == ROW; }
     bool InStateCell() const { return state == CELL; }
     
-    void Clear() {
+    Table & Clear() {
       // Clear based on tables current state.
       if (state == TABLE) Info()->ClearTableCells();
       else if (state == ROW) Info()->ClearRowCells(cur_row);
       else if (state == CELL) Info()->ClearCell(cur_row, cur_col);
       else emp_assert(false && "Table in unknown state!");
+      return *this;
     }
 
 
@@ -446,11 +489,14 @@ namespace web {
 
     virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
       bool ok = true;
+
+      // Basic info
       if (verbose) {
         ss << prefix << "Scanning: emp::Table (rows=" << Info()->row_count
            << ", cols=" << Info()->col_count << ")." << std::endl;
       }
-      
+
+      // Make sure rows and columns are being counted correctly.
       if (Info()->row_count != (int) Info()->rows.size()) {
         ss << prefix << "Error: row_count = " << Info()->row_count
            << ", but rows has " << Info()->rows.size() << " elements." << std::endl;
@@ -478,32 +524,11 @@ namespace web {
         ss << prefix << "Error: cur_col = " << cur_col << "." << std::endl;
         ok = false;
       }
+
+      // Make sure internal info is okay.
+      ok = ok && Info()->OK(ss, verbose, prefix+"  ");
       
-      // Recursively call OK on rows and data.
-      // @CAO Move to OK in TableInfo?
-      for (int r = 0; r < Info()->row_count; r++) {
-        ok = ok && Info()->rows[r].OK(ss, verbose, prefix+"  ");
-        if (Info()->col_count != Info()->rows[r].GetSize()) {
-          ss << prefix << "  Error: col_count = " << Info()->col_count
-             << ", but row has " << Info()->rows[r].GetSize() << " elements." << std::endl;
-          ok = false;
-        }
-        for (int c = 0; c < Info()->col_count; c++) {
-          auto & cell = Info()->rows[r][c];
-          if (c + cell.GetColSpan() > Info()->col_count) {
-            ss << prefix << "  Error: Cell at row " << r << ", col " << c
-               << " extends past right side of table." << std::endl;
-            ok = false;
-          }
-          if (r + cell.GetRowSpan() > Info()->row_count) {
-            ss << prefix << "  Error: Cell at row " << r << ", col " << c
-               << " extends past bottom of table." << std::endl;
-            ok = false;
-          }
-        }
-      }
-
-
+ 
       return ok;
     }
   };
@@ -524,6 +549,8 @@ namespace web {
       cur_cell.SetChildID(children.size());
       AddChild( Slate("") );
     }
+
+    // emp::Alert("row=", cur_row, "  col=", cur_col, "  SlateID=", cur_cell.GetChildID());
     
     // Return the element, now that we know we have it.
     return children.back();
