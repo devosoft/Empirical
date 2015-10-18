@@ -220,6 +220,25 @@ namespace web {
            << ", cols=" << col_count << ")." << std::endl;
       }
 
+      // Make sure rows and columns are being sized correctly.
+      if (row_count != (int) rows.size()) {
+        ss << prefix << "Error: row_count = " << row_count
+           << ", but rows has " << rows.size() << " elements." << std::endl;
+        ok = false;
+      }
+      
+      if (row_count < 1) {
+        ss << prefix << "Error: Cannot have " << row_count
+           << " rows in table." << std::endl;
+        ok = false;
+      }
+
+      if (col_count < 1) {
+        ss << prefix << "Error: Cannot have " << col_count
+           << " cols in table." << std::endl;
+        ok = false;
+      }
+
       // Recursively call OK on rows and data.
       for (int r = 0; r < row_count; r++) {
         ok = ok && rows[r].OK(ss, verbose, prefix+"  ");
@@ -496,25 +515,7 @@ namespace web {
            << ", cols=" << Info()->col_count << ")." << std::endl;
       }
 
-      // Make sure rows and columns are being counted correctly.
-      if (Info()->row_count != (int) Info()->rows.size()) {
-        ss << prefix << "Error: row_count = " << Info()->row_count
-           << ", but rows has " << Info()->rows.size() << " elements." << std::endl;
-        ok = false;
-      }
-      
-      if (Info()->row_count < 1) {
-        ss << prefix << "Error: Cannot have " << Info()->row_count
-           << " rows in table." << std::endl;
-        ok = false;
-      }
-
-      if (Info()->col_count < 1) {
-        ss << prefix << "Error: Cannot have " << Info()->col_count
-           << " cols in table." << std::endl;
-        ok = false;
-      }
-
+      // Make sure current row and col are valid.
       if (cur_row < 0 || cur_row >= Info()->row_count) {
         ss << prefix << "Error: cur_row = " << cur_row << "." << std::endl;
         ok = false;
@@ -527,7 +528,6 @@ namespace web {
 
       // Make sure internal info is okay.
       ok = ok && Info()->OK(ss, verbose, prefix+"  ");
-      
  
       return ok;
     }
