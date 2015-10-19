@@ -29,7 +29,7 @@ namespace web {
   class TableInfo;
 
   class TableData {
-    friend TableRow; friend Table;
+    friend TableRow; friend Table; friend TableInfo;
   protected:
     int colspan;    // How many columns wide is this TableData?
     int rowspan;    // How many rows deep is this TableData?
@@ -264,7 +264,31 @@ namespace web {
 
       // Make sure all children are associated with one and only one cell.
       if (children.size() > 0) {
-        
+        std::vector<bool> linked_slate(children.size(), false);
+        for (int r = 0; r < row_count; r++) {
+          for (int c = 0; c < col_count; c++) {
+            const int child_id = rows[r][c].child_id;
+            if (child_id < 0) continue;
+
+            // If we made it this far, the current cell DOES have a slate.
+
+            // If the current cell is linked to an already-found slate; error!
+            if (linked_slate[child_id] == true) {
+              ss << prefix << "  Error: Cell at row " << r << ", col " << c
+                 << " reuses already-used slate!." << std::endl;
+              ok = false;
+            }
+            linked_slate[child_id] = true;
+          }
+        }
+
+        // Determine if any slates are unattached.
+        for (int i = 0; i < linked_slate.size(); i++) {
+          if (linked_slate[i] == false) {
+            ss << prefix << "  Slate #" << i << " created but unlinked!" << std::endl;
+            ok = false;
+          }
+        }
       }
 
 
