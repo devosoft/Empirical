@@ -147,13 +147,13 @@ namespace web {
     public:
       // Smart-pointer info
       int ptr_count;                  // How many widgets are pointing to this info?
-
+      
       // Basic info about a widget
       std::string id;                 // ID used for associated element.
       Style style;                    // CSS Style
 
       // Track hiearchy
-      Widget parent;                  // Which widget is this one contained within?
+      WidgetInfo * parent;            // Which WidgetInfo is this one contained within?
       emp::vector<Widget> children;   // Widgets contained in this one.
       emp::vector<Widget> dependants; // Widgets to be refreshed if this one is triggered
       bool append_ok;                 // Can we add more children?
@@ -239,7 +239,7 @@ namespace web {
 
         // Setup parent-child relationship
         children.emplace_back(in);
-        in->parent = Widget(this);
+        in->parent = this;
         Register(in);
 
         // If this element (as new parent) is active, anchor widget and activate it!
@@ -306,7 +306,7 @@ namespace web {
       template <typename FWD_TYPE>
       Widget ForwardAppend(FWD_TYPE && arg) {
         emp_assert(parent && "Trying to forward append to parent, but no parent!", id);
-        return parent.info->Append(std::forward<FWD_TYPE>(arg));
+        return parent->Append(std::forward<FWD_TYPE>(arg));
       }
 
       // All derived widgets must suply a mechanism for providing associated HTML code.
