@@ -33,38 +33,41 @@ namespace web {
   protected:
     int colspan;    // How many columns wide is this TableData?
     int rowspan;    // How many rows deep is this TableData?
-    int child_id;   // Which child element is this cell associated with?
     bool header;    // Is this TableData a header (<th> vs <td>)?
     bool masked;    // Is this cell masked by another cell?
     Style style;    // CSS Style
 
+    Slate slate;   // Which slate is associated with this data cell?
+    
   public:
-    TableData() : colspan(1), rowspan(1), child_id(-1)
-                , header(false), masked(false) { ; }
+    TableData() : colspan(1), rowspan(1), header(false), masked(false), slate("") { ; }
     ~TableData() { ; }
 
     int GetColSpan() const { return colspan; }
     int GetRowSpan() const { return rowspan; }
-    int GetChildID() const { return child_id; }
-    bool HasSlate() const { return child_id >= 0; }
     bool IsHeader() const { return header; }
     bool IsMasked() const { return masked; }
     Style & GetStyle() { return style; }
     const Style & GetStyle() const { return style; }
     explicit operator bool() { return !masked; }      // Unmasked cell = true, masked = false.
+
+    bool HasSlate() const { return slate; }
+    Slate & GetSlate() {
+      if (!slate) slate = Slate("");  // If we don't have a slate, build one!
+      return slate;
+    }
     
     void SetColSpan(int cs) { colspan = cs; }
     void SetRowSpan(int rs) { rowspan = rs; }
-    void SetChildID(int cid) { child_id = cid; }
     void SetHeader(bool h=true) { header = h; }
     void SetMasked(bool m=true) { masked = m; }
 
     bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
       bool ok = true;
-      if (verbose) ss << prefix << "Scanning: emp::TableData; child_id=" << child_id << std::endl;
+      if (verbose) ss << prefix << "Scanning: emp::TableData" << std::endl;
 
-      if (child_id >= 0 && masked == true) {
-        ss << "Warning: Masked cell has contents!" << std::endl;
+      if (slate && masked == true) {
+        ss << "Warning: Masked cell may have contents!" << std::endl;
         ok = false;
       }
       
@@ -163,8 +166,7 @@ namespace web {
           
           // If this cell has contents, initialize them!
           if (datum.HasSlate()) {
-            Widget & widget = children[datum.GetChildID()];
-            HTML << "<span id=\"" << widget.GetID() << "\"></span>\n";
+            HTML << "<span id=\"" << datum.GetSlate().GetID() << "\"></span>\n";
           }
 
           // Print closing tag.
@@ -198,8 +200,8 @@ namespace web {
     void ClearCell(int row_id, int col_id) {
       rows[row_id].data[col_id].colspan = 1;
       rows[row_id].data[col_id].rowspan = 1;
-      const int child_id = rows[row_id].data[col_id].child_id;
-      if (child_id >= 0) children[child_id].ClearChildren();
+      Slate slate = rows[row_id].data[col_id].GetSlate();
+      if (slate) slate.ClearChildren();
       rows[row_id].data[col_id].header = false;
       rows[row_id].data[col_id].masked = false;  // @CAO Technically, cell might still be masked!
       rows[row_id].data[col_id].style.Clear();
@@ -264,33 +266,10 @@ namespace web {
 
       // Make sure all children are associated with one and only one cell.
       if (children.size() > 0) {
-        std::vector<bool> linked_slate(children.size(), false);
-        for (int r = 0; r < row_count; r++) {
-          for (int c = 0; c < col_count; c++) {
-            const int child_id = rows[r][c].child_id;
-            if (child_id < 0) continue;
-
-            // If we made it this far, the current cell DOES have a slate.
-
-            // If the current cell is linked to an already-found slate; error!
-            if (linked_slate[child_id] == true) {
-              ss << prefix << "  Error: Cell at row " << r << ", col " << c
-                 << " reuses already-used slate!." << std::endl;
-              ok = false;
-            }
-            linked_slate[child_id] = true;
-          }
-        }
-
-        // Determine if any slates are unattached.
-        for (int i = 0; i < linked_slate.size(); i++) {
-          if (linked_slate[i] == false) {
-            ss << prefix << "  Slate #" << i << " created but unlinked!" << std::endl;
-            ok = false;
-          }
-        }
+        ss << prefix << "  Error: Table has " << children.size()
+           << "direct children (should have 0)!" << std::endl;
+        ok = false;
       }
-
 
       return ok;
     }
@@ -566,18 +545,7 @@ namespace web {
     if (cur_col >= col_count) cur_col = 0;
     if (cur_row >= row_count) cur_row = 0;
 
-    auto & cur_cell = rows[cur_row].data[cur_col];
-    
-    // If the current cell does not have a slate, generate one now.
-    if (!cur_cell.HasSlate()) {
-      cur_cell.SetChildID(children.size());
-      AddChild( Slate("") );
-    }
-
-    // emp::Alert("row=", cur_row, "  col=", cur_col, "  SlateID=", cur_cell.GetChildID());
-    
-    // Return the element, now that we know we have it.
-    return children.back();
+    return rows[cur_row].data[cur_col].GetSlate();
   }
   
 }
