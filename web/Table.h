@@ -129,7 +129,21 @@ namespace web {
     TableInfo & operator=(const TableInfo &) = delete;   // No copies of INFO allowed
     virtual ~TableInfo() { ; }
 
-    virtual bool IsTableInfo() const override { return true; }
+    virtual emp::vector<Widget> & GetChildren() override {
+      emp::vector<Widget> & children = internal::WidgetInfo::GetChildren();
+
+      // @CAO fill out children with active slates.
+      children.resize(0);
+      for (int r = 0; r < row_count; r++) {
+        for (int c = 0; c < col_count; c++) {
+          children.push_back(rows[r][c].slate);
+        }
+      }
+
+      return children;
+    }
+    
+    virtual bool IsTableInfo() const override { return true; }    
 
     // Get a slate associated with the current cell (and build one if we need to...)
     Widget & GetCurSlate();
