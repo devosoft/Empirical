@@ -144,6 +144,9 @@ namespace web {
     // (Buttons, Images, etc...).  It take in a return type to be cast to for accessors.
     
     class WidgetInfo {
+    private:
+      emp::vector<Widget> m_children; // Widgets contained in this one.
+
     public:
       // Smart-pointer info
       int ptr_count;                  // How many widgets are pointing to this info?
@@ -154,7 +157,6 @@ namespace web {
 
       // Track hiearchy
       WidgetInfo * parent;            // Which WidgetInfo is this one contained within?
-      emp::vector<Widget> children;   // Widgets contained in this one.
       emp::vector<Widget> dependants; // Widgets to be refreshed if this one is triggered
       bool append_ok;                 // Can we add more children?
       Widget::ActivityState state;    // Is this element active in DOM?
@@ -207,7 +209,7 @@ namespace web {
         Register_recurse(new_widget);  // Register THIS widget here an in ancestors.
         
         // Register CHILD widgets, if any already in this one.
-        for (Widget & child : new_widget.info->children) Register(child);
+        for (Widget & child : new_widget.info->GetChildren()) Register(child);
       }
 
       void Unregister_recurse(Widget & old_widget) { 
@@ -218,11 +220,16 @@ namespace web {
 
       void Unregister(Widget & old_widget) {
         if (parent) parent->Unregister_recurse(old_widget);
-        for (Widget & child : old_widget.info->children) Unregister(child);
+        for (Widget & child : old_widget.info->GetChildren()) Unregister(child);
       }
-    
+
+      // Collect child widgets.  Virtual so children can be updated first, if needed.
+      virtual emp::vector<Widget> & GetChildren() { return m_children; }
+      int GetNumChildren() { return (int) GetChildren().size(); }
+      
       void ClearChildren() {
         // Unregister all children and then delete links to them.
+        auto & children = GetChildren();
         for (Widget & child : children) Unregister(child);
         children.resize(0);
       }
@@ -238,7 +245,7 @@ namespace web {
         emp_assert (in->state != Widget::ACTIVE && "Cannot insert a stand-alone active widget!");
 
         // Setup parent-child relationship
-        children.emplace_back(in);
+        GetChildren().emplace_back(in);
         in->parent = this;
         Register(in);
 
@@ -278,7 +285,7 @@ namespace web {
       void DoActivate(bool top_level=true) {
         // Activate this widget and its children.
         state = Widget::ACTIVE;
-        for (auto & child : children) child->DoActivate(false);
+        for (auto & child : GetChildren()) child->DoActivate(false);
         
         // Finally, put everything on the screen.
         if (top_level) ReplaceHTML();   // Print full contents to document.
@@ -341,7 +348,7 @@ namespace web {
           // Run associated Javascript code, if any (e.g., to fill out a canvas)
           TriggerJS();
 
-          for (auto & child : children) child->ReplaceHTML();
+          for (auto & child : GetChildren()) child->ReplaceHTML();
         }
       }
 
@@ -406,7 +413,7 @@ namespace web {
   
   bool Widget::HasChild(const Widget & test_child) {
     if (!info) return false;
-    for (const Widget & c : info->children) if (c == test_child) return true;
+    for (const Widget & c : info->GetChildren()) if (c == test_child) return true;
     return false;
   }
   
@@ -439,7 +446,7 @@ namespace web {
     info->state = INACTIVE;
     
     // Deactivate all of the children (marking them as not at the top level.)
-    for (auto & child : info->children) child.Deactivate(false);
+    for (auto & child : info->GetChildren()) child.Deactivate(false);
     
     // If we are at the top level, clear the contents by replaceing the HTML.
     if (top_level) info->ReplaceHTML();
@@ -497,7 +504,7 @@ namespace web {
       WidgetFacet & operator=(const WidgetFacet & in) { Widget::operator=(in); return *this; }
       virtual ~WidgetFacet() { ; }
 
-      emp::vector<Widget> & Children() { return info->children; }
+      emp::vector<Widget> & Children() { return info->GetChildren(); }
 
       // CSS-related options may be overridden in derived classes that have multiple styles.
       virtual void DoCSS(const std::string & setting, const std::string & value) {

@@ -265,8 +265,8 @@ namespace web {
       }
 
       // Make sure all children are associated with one and only one cell.
-      if (children.size() > 0) {
-        ss << prefix << "  Error: Table has " << children.size()
+      if (GetNumChildren() > 0) {
+        ss << prefix << "  Error: Table has " << GetNumChildren()
            << "direct children (should have 0)!" << std::endl;
         ok = false;
       }

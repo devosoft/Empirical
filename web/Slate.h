@@ -35,6 +35,7 @@ namespace web {
       // the last element is not text, or it is not appendable (instead, build a new one).
       web::Text & GetTextWidget() {
         // If the final element is not text, add one.
+        auto & children = GetChildren();
         if (children.size() == 0
             || children.back().IsText() == false
             || children.back().AppendOK() == false)  {
@@ -66,7 +67,7 @@ namespace web {
 
         // Loop through all children and build a span element for each to replace.
         HTML << "<div id=\'" << id << "\'>"; // Tag to envelope Slate
-        for (Widget & w : children) {
+        for (Widget & w : GetChildren()) {
           HTML << "<span id=\'" << w.GetID() << "'></span>";  // Span element for current widget.
         }
         HTML << "</div>";
