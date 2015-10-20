@@ -178,7 +178,11 @@ namespace web {
       virtual ~WidgetInfo() {
         EMP_TRACK_DESTRUCT(WebWidgetInfo); 
       }
-
+ 
+      // Collect child widgets.  Virtual so children can be updated first, if needed.
+      virtual emp::vector<Widget> & GetChildren() { return m_children; }
+      int GetNumChildren() { return (int) GetChildren().size(); }
+      
       virtual bool IsButtonInfo() const { return false; }
       virtual bool IsCanvasInfo() const { return false; }
       virtual bool IsImageInfo() const { return false; }
@@ -223,10 +227,6 @@ namespace web {
         for (Widget & child : old_widget.info->GetChildren()) Unregister(child);
       }
 
-      // Collect child widgets.  Virtual so children can be updated first, if needed.
-      virtual emp::vector<Widget> & GetChildren() { return m_children; }
-      int GetNumChildren() { return (int) GetChildren().size(); }
-      
       void ClearChildren() {
         // Unregister all children and then delete links to them.
         auto & children = GetChildren();
