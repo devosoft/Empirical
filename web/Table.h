@@ -128,6 +128,31 @@ namespace web {
       virtual ~TableInfo() { ; }
       
       virtual bool IsTableInfo() const override { return true; }    
+
+      void Resize(int new_rows, int new_cols) {
+        // Resize existing rows        
+        if (new_cols != col_count) {
+          for (auto & row : rows) {
+            row.SetCols(new_cols);
+            for (int c = col_count; c < new_cols; c++) {
+              row[c].slate->parent = this;
+            }
+          }
+          col_count = new_cols;
+        }
+
+        // Resize number of rows.
+        if (new_rows != row_count) {
+          rows.resize(new_rows);
+          for (int r = row_count; r < new_rows; r++) {
+            for (int c = 0; c < col_count; c++) {
+              rows[r][c].slate->parent = this;
+            }
+          }
+          row_count = new_rows;          
+        }
+        
+      }
       
       void DoActivate(bool top_level=true) override {
         // Activate all of the cell slates.
@@ -342,11 +367,7 @@ namespace web {
       emp_assert(c > 0 && r > 0);              // Ensure that we have rows and columns!
 
       info = new internal::TableInfo(in_id);
-    
-      Info()->row_count = r;
-      Info()->col_count = c;
-      Info()->rows.resize(r);
-      for (auto & row : Info()->rows) row.SetCols(c);  // Set all rows to correct # of columns
+      Info()->Resize(r, c);
     }
     Table(const Table & in)
       : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col), state(in.state) { ; }
@@ -382,12 +403,12 @@ namespace web {
 
 
     Table & Rows(int r) {
-      Info()->UpdateRows(r);
+      Info()->Resize(r, Info()->col_count);
       if (cur_row >= r) cur_row = 0;
       return *this;
     }
     Table & Cols(int c) {
-      Info()->UpdateCols(c);
+      Info()->Resize(Info()->row_count, c);
       if (cur_col >= c) cur_col = 0;
       return *this;
     }
