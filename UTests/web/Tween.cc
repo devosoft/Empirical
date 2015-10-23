@@ -25,7 +25,8 @@ void TweenAnim() {
 int main()
 {
   UI::Text text("text");
-  text.CSS("border", "3px solid blue").CSS("padding", "3px") << "Testing.  " << UI::Live(myvar);
+  text.SetCSS("border", "3px solid blue").SetCSS("padding", "3px") << "Testing.  "
+                                                                   << UI::Live(myvar);
   doc << text;
 
   tween.AddPath(SetVar, 0, 1000);
