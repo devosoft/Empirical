@@ -39,7 +39,8 @@ namespace web {
     // Pre-declate WidgetInfo so classes can inter-operate.
     class WidgetInfo;
     class SlateInfo;
-
+    class TableInfo;
+    
     // Quick method for generating unique IDs when not otherwise specified.
     static std::string NextWidgetID() {
       static int next_id = 0;
@@ -57,7 +58,7 @@ namespace web {
 
   // Widget is a smart pointer to a WidgetInfo object, plus some basic accessors.
   class Widget {
-    friend internal::WidgetInfo; friend internal::SlateInfo;
+    friend internal::WidgetInfo; friend internal::SlateInfo; friend internal::TableInfo;
   protected:
     using WidgetInfo = internal::WidgetInfo;
     WidgetInfo * info;
@@ -89,7 +90,7 @@ namespace web {
     bool IsStatic() const;
     bool IsActive() const;
     
-    virtual bool AppendOK() const;
+    virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
 
     virtual bool IsSlate() const { return false; }
     virtual bool IsTable() const { return false; }
@@ -105,8 +106,6 @@ namespace web {
     bool TextOK() const;
     
     std::string GetID() const;
-    virtual void ClearChildren();
-    bool HasChild(const Widget & test_child);
     
     // CSS-related options may be overridden in derived classes that have multiple styles.
     virtual std::string GetCSS(const std::string & setting);
@@ -119,7 +118,7 @@ namespace web {
     // An active widget makes live changes to the webpage (once document is ready)
     // An inactive widget just records changes internally.
     void Activate();
-    void Deactivate(bool top_level=true);
+    virtual void Deactivate(bool top_level=true);
     bool ToggleActive();
 
     // Clear and redraw the current widget on the screen.
@@ -144,28 +143,23 @@ namespace web {
     // (Buttons, Images, etc...).  It take in a return type to be cast to for accessors.
     
     class WidgetInfo {
-    private:
-      emp::vector<Widget> m_children; // Widgets contained in this one.
-
     public:
       // Smart-pointer info
       int ptr_count;                  // How many widgets are pointing to this info?
       
       // Basic info about a widget
-      std::string id;                 // ID used for associated element.
+      std::string id;                 // ID used for associated DOM element.
       Style style;                    // CSS Style
 
       // Track hiearchy
       WidgetInfo * parent;            // Which WidgetInfo is this one contained within?
       emp::vector<Widget> dependants; // Widgets to be refreshed if this one is triggered
-      bool append_ok;                 // Can we add more children?
       Widget::ActivityState state;    // Is this element active in DOM?
-      std::map<std::string, Widget> widget_dict;   // By-name lookup for child widgets
     
 
       // WidgetInfo cannot be built unless within derived class, so constructor is protected
       WidgetInfo(const std::string & in_id="")
-        : ptr_count(1), id(in_id), parent(nullptr), append_ok(true), state(Widget::INACTIVE)
+        : ptr_count(1), id(in_id), parent(nullptr), state(Widget::INACTIVE)
       {
         EMP_TRACK_CONSTRUCT(WebWidgetInfo);
         if (id == "") id = NextWidgetID();
@@ -179,10 +173,6 @@ namespace web {
         EMP_TRACK_DESTRUCT(WebWidgetInfo); 
       }
  
-      // Collect child widgets.  Virtual so children can be updated first, if needed.
-      virtual emp::vector<Widget> & GetChildren() { return m_children; }
-      int GetNumChildren() { return (int) GetChildren().size(); }
-      
       virtual bool IsButtonInfo() const { return false; }
       virtual bool IsCanvasInfo() const { return false; }
       virtual bool IsImageInfo() const { return false; }
@@ -192,76 +182,15 @@ namespace web {
       virtual bool IsTextInfo() const { return false; }
       virtual bool IsTextAreaInfo() const { return false; }
 
-      bool IsRegistered(const std::string & test_name) {
-        return (widget_dict.find(test_name) != widget_dict.end());
-      }
-    
-      Widget & GetRegistered(const std::string & find_name) {
-        emp_assert(IsRegistered(find_name), find_name, widget_dict.size());
-        return widget_dict[find_name];
-      }
-      
-      void Register_recurse(Widget & new_widget) { 
-        emp_assert(IsRegistered(new_widget.GetID()) == false, new_widget.GetID());
-        widget_dict[new_widget.GetID()] = new_widget;     // Track widget by name
-        if (parent) parent->Register_recurse(new_widget); // Also register in parent, if available
-      }
+      // If not overloaded, pass along widget registration to parent.
+      virtual void Register_recurse(Widget & w) { if (parent) parent->Register_recurse(w); }
+      virtual void Register(Widget & w) { if (parent) parent->Register(w); }
+      virtual void Unregister_recurse(Widget & w) { if (parent) parent->Unregister_recurse(w); }
+      virtual void Unregister(Widget & w) { if (parent) parent->Unregister(w); }
 
-      // Register is used so we can lookup classes by name.
-      void Register(Widget & new_widget) {
-        // Make sure name is not already used
-        Register_recurse(new_widget);  // Register THIS widget here an in ancestors.
-        
-        // Register CHILD widgets, if any already in this one.
-        for (Widget & child : new_widget.info->GetChildren()) Register(child);
-      }
-
-      void Unregister_recurse(Widget & old_widget) { 
-        emp_assert(IsRegistered(old_widget.GetID()) == true, old_widget.GetID());
-        widget_dict.erase(old_widget.GetID());
-        if (parent) parent->Unregister_recurse(old_widget); // Unregister in parent, if available
-      }
-
-      void Unregister(Widget & old_widget) {
-        if (parent) parent->Unregister_recurse(old_widget);
-        for (Widget & child : old_widget.info->GetChildren()) Unregister(child);
-      }
-
-      void ClearChildren() {
-        // Unregister all children and then delete links to them.
-        auto & children = GetChildren();
-        for (Widget & child : children) Unregister(child);
-        children.resize(0);
-      }
-      
-      void AddChild(Widget in) {
-        // If the inserted widget is already active, remove it from its old position.
-        if (in->parent) {
-          emp_assert(!"Currently cannot insert widget if already active!");
-          // @CAO Remove inserted widget from old parent
-          // @CAO If active, make sure parent is redrawn.
-          // @CAO Set inactive.
-        }
-        emp_assert (in->state != Widget::ACTIVE && "Cannot insert a stand-alone active widget!");
-
-        // Setup parent-child relationship
-        GetChildren().emplace_back(in);
-        in->parent = this;
-        Register(in);
-
-        // If this element (as new parent) is active, anchor widget and activate it!
-        if (state == Widget::ACTIVE) {
-          // Create a span tag to anchor the new widget.
-          EM_ASM_ARGS({
-              parent_id = Pointer_stringify($0);
-              child_id = Pointer_stringify($1);
-              $('#' + parent_id).append('<span id=\'' + child_id + '\'></span>');
-            }, id.c_str(), in.GetID().c_str());
-
-          // Now that the new widget has some place to hook in, activate it!
-          in->DoActivate();
-        }
-      }
+      // Some nodes can have children and need to be able to recursively register them.
+      virtual void RegisterChildren(SlateInfo * registrar) { ; }   // No children by default.
+      virtual void UnregisterChildren(SlateInfo * regestrar) { ; } // No children by default.
 
       // Record dependants.  Dependants are only acted upon when this widget's action is
       // triggered (e.g. a button is pressed)
@@ -277,19 +206,15 @@ namespace web {
 
       void AddDependants() { ; }
 
-      void UpdateDependants() {
-        for (auto & d : dependants) d->ReplaceHTML();
-      }
+      void UpdateDependants() { for (auto & d : dependants) d->ReplaceHTML(); }
 
+      
       // Activate is delayed until the document is ready, when DoActivate will be called.
-      void DoActivate(bool top_level=true) {
-        // Activate this widget and its children.
-        state = Widget::ACTIVE;
-        for (auto & child : GetChildren()) child->DoActivate(false);
-        
-        // Finally, put everything on the screen.
+      virtual void DoActivate(bool top_level=true) {
+        state = Widget::ACTIVE;         // Activate this widget and its children.
         if (top_level) ReplaceHTML();   // Print full contents to document.
       }
+      
 
       // By default, elements should forward unknown appends to their parents.
       virtual Widget Append(const std::string & text) { return ForwardAppend(text); }
@@ -323,7 +248,7 @@ namespace web {
       virtual void TriggerJS() { ; }
 
       // Assume that the associated ID exists and replace it with the currnet HTML code.
-      void ReplaceHTML() {
+      virtual void ReplaceHTML() {
         std::stringstream ss;
         
         // If this node is static, don't change it!
@@ -347,8 +272,6 @@ namespace web {
 
           // Run associated Javascript code, if any (e.g., to fill out a canvas)
           TriggerJS();
-
-          for (auto & child : GetChildren()) child->ReplaceHTML();
         }
       }
 
@@ -404,18 +327,7 @@ namespace web {
   bool Widget::IsStatic() const { if (!info) return false; return info->state == STATIC; }
   bool Widget::IsActive() const { if (!info) return false; return info->state == ACTIVE; }
   
-  bool Widget::AppendOK() const { return info->append_ok; }
   std::string Widget::GetID() const { return info ? info->id : "(none)"; }
-  
-  void Widget::ClearChildren() {
-    if (info) info->ClearChildren();
-  }
-  
-  bool Widget::HasChild(const Widget & test_child) {
-    if (!info) return false;
-    for (const Widget & c : info->GetChildren()) if (c == test_child) return true;
-    return false;
-  }
   
   bool Widget::ButtonOK() const { if (!info) return false; return info->IsButtonInfo(); }
   bool Widget::CanvasOK() const { if (!info) return false; return info->IsCanvasInfo(); }
@@ -440,16 +352,9 @@ namespace web {
   }
   
   void Widget::Deactivate(bool top_level) {
-    // Skip if we are not active.
-    if (!info || info->state == INACTIVE) return;
-    
+    if (!info || info->state == INACTIVE) return;  // Skip if we are not active.
     info->state = INACTIVE;
-    
-    // Deactivate all of the children (marking them as not at the top level.)
-    for (auto & child : info->GetChildren()) child.Deactivate(false);
-    
-    // If we are at the top level, clear the contents by replaceing the HTML.
-    if (top_level) info->ReplaceHTML();
+    if (top_level) info->ReplaceHTML();            // If at top level, clear the contents
   }
 
   bool Widget::ToggleActive() {
@@ -464,11 +369,6 @@ namespace web {
     info->ReplaceHTML();
   }
   
-  Widget & Widget::Find(const std::string & test_name) {
-    emp_assert(info);
-    return info->GetRegistered(test_name);
-  }
-
   Widget & Widget::AddDependant(const Widget & w) {
     info->AddDependant(w);
     return *this;
@@ -503,8 +403,6 @@ namespace web {
       WidgetFacet(WidgetInfo * in_info) : Widget(in_info) { ; }
       WidgetFacet & operator=(const WidgetFacet & in) { Widget::operator=(in); return *this; }
       virtual ~WidgetFacet() { ; }
-
-      emp::vector<Widget> & Children() { return info->GetChildren(); }
 
       // CSS-related options may be overridden in derived classes that have multiple styles.
       virtual void DoCSS(const std::string & setting, const std::string & value) {

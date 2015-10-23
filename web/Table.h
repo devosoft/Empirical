@@ -21,278 +21,293 @@
 namespace emp {
 namespace web {
 
-  class Table : public internal::WidgetFacet<Table> {
-    friend class TableInfo;
-  protected:
+  namespace internal {
 
-  class TableRow;
-  class TableInfo;
+    class TableRow;
+    class TableInfo;
 
-  class TableData {
-    friend TableRow; friend Table; friend TableInfo;
-  protected:
-    int colspan;    // How many columns wide is this TableData?
-    int rowspan;    // How many rows deep is this TableData?
-    bool header;    // Is this TableData a header (<th> vs <td>)?
-    bool masked;    // Is this cell masked by another cell?
-    Style style;    // CSS Style
-
-    Slate slate;   // Which slate is associated with this data cell?
-    
-  public:
-    TableData() : colspan(1), rowspan(1), header(false), masked(false), slate("") { ; }
-    ~TableData() { ; }
-
-    int GetColSpan() const { return colspan; }
-    int GetRowSpan() const { return rowspan; }
-    bool IsHeader() const { return header; }
-    bool IsMasked() const { return masked; }
-    Style & GetStyle() { return style; }
-    const Style & GetStyle() const { return style; }
-    explicit operator bool() { return !masked; }      // Unmasked cell = true, masked = false.
-
-    bool HasSlate() const { return slate; }
-    Slate & GetSlate() {
-      if (!slate) slate = Slate("");  // If we don't have a slate, build one!
-      return slate;
-    }
-    
-    void SetColSpan(int cs) { colspan = cs; }
-    void SetRowSpan(int rs) { rowspan = rs; }
-    void SetHeader(bool h=true) { header = h; }
-    void SetMasked(bool m=true) { masked = m; }
-
-    bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
-      bool ok = true;
-      if (verbose) ss << prefix << "Scanning: emp::TableData" << std::endl;
-
-      if (slate && masked == true) {
-        ss << "Warning: Masked cell may have contents!" << std::endl;
-        ok = false;
+    class TableData {
+      friend TableRow; friend Table; friend TableInfo;
+    protected:
+      int colspan;    // How many columns wide is this TableData?
+      int rowspan;    // How many rows deep is this TableData?
+      bool header;    // Is this TableData a header (<th> vs <td>)?
+      bool masked;    // Is this cell masked by another cell?
+      Style style;    // CSS Style
+      
+      Slate slate;   // Which slate is associated with this data cell?
+      
+    public:
+      TableData() : colspan(1), rowspan(1), header(false), masked(false), slate("") { ; }
+      ~TableData() { ; }
+      
+      int GetColSpan() const { return colspan; }
+      int GetRowSpan() const { return rowspan; }
+      bool IsHeader() const { return header; }
+      bool IsMasked() const { return masked; }
+      Style & GetStyle() { return style; }
+      const Style & GetStyle() const { return style; }
+      explicit operator bool() { return !masked; }      // Unmasked cell = true, masked = false.
+      
+      bool HasSlate() const { return slate; }
+      Slate & GetSlate() {
+        if (!slate) slate = Slate("");  // If we don't have a slate, build one!
+        return slate;
       }
       
-      return ok;
-    }
-    
-  };
-    
-  class TableRow {
-    friend Table; friend TableInfo;
-  protected:
-    emp::vector<TableData> data;  // detail object for each cell in this row.
-    Style style;
-
-  public:
-    TableRow() { ; }
-    ~TableRow() { ; }
-
-    int GetSize() const { return (int) data.size(); }                 // How many cells in this row?
-    TableData & operator[](int id) { return data[id]; }               // Get a single cell
-    const TableData & operator[](int id) const { return data[id]; }   // Get a single const cell
-    emp::vector<TableData> & GetCells() { return data; }              // Get ALL cells
-
-    TableRow & SetCols(int c) { data.resize(c); return *this; }
-
-    // Apply to all cells in row.
-    template <typename SETTING_TYPE>
-    TableRow & CellsCSS(const std::string & setting, SETTING_TYPE && value) {
-      for (auto & datum : data) datum.style.Set(setting, value);
-      return *this;
-    }
+      void SetColSpan(int cs) { colspan = cs; }
+      void SetRowSpan(int rs) { rowspan = rs; }
+      void SetHeader(bool h=true) { header = h; }
+      void SetMasked(bool m=true) { masked = m; }
+      
+      bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
+        bool ok = true;
+        if (verbose) ss << prefix << "Scanning: emp::TableData" << std::endl;
         
-    // Apply to specific cell in row.
-    template <typename SETTING_TYPE>
-    TableRow & CellCSS(int col_id, const std::string & setting, SETTING_TYPE && value) {
-      data[col_id].style.Set(setting, value);
-      return *this;
-    }
-
-    virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
-      bool ok = true;
-      if (verbose) { ss << prefix << "Scanning: emp::TableRow" << std::endl; }
-      for (auto & cell : data) ok = ok && cell.OK(ss, verbose, prefix+"  ");      
-      return ok;
-    }
-  };
-
-  class TableInfo : public internal::WidgetInfo {
-    friend Table;
-  protected:
-    int row_count;                // How big is this table?
-    int col_count;
-    emp::vector<TableRow> rows;   // detail object for each row.
-    Table * append_widget;        // Which widget is triggering an append?
-
-    TableInfo(const std::string & in_id="")
-      : internal::WidgetInfo(in_id), row_count(0), col_count(0), append_widget(nullptr) { ; }
-    TableInfo(const TableInfo &) = delete;               // No copies of INFO allowed
-    TableInfo & operator=(const TableInfo &) = delete;   // No copies of INFO allowed
-    virtual ~TableInfo() { ; }
-
-    virtual emp::vector<Widget> & GetChildren() override {
-      emp::vector<Widget> & children = internal::WidgetInfo::GetChildren();
-
-      // @CAO fill out children with active slates.
-      children.resize(0);
-      for (int r = 0; r < row_count; r++) {
-        for (int c = 0; c < col_count; c++) {
-          children.push_back(rows[r][c].slate);
-        }
-      }
-
-      return children;
-    }
-    
-    virtual bool IsTableInfo() const override { return true; }    
-
-    // Get a slate associated with the current cell (and build one if we need to...)
-    Widget & GetCurSlate();
-
-    // Add additional children on to this element.
-    Widget Append(Widget info) override { return GetCurSlate() << info; }
-    Widget Append(const std::string & text) override {
-      return GetCurSlate() << text;
-    }
-    Widget Append(const std::function<std::string()> & in_fun) override {
-      return GetCurSlate() << in_fun;
-    }
-
-    virtual void GetHTML(std::stringstream & HTML) override {
-      HTML.str("");                                           // Clear the current text.
-      HTML << "<table id=\"" << id << "\">";
-
-      // Loop through all of the rows in the table.
-      for (auto & row : rows) {
-        HTML << "<tr>";
-
-        // Loop through each cell in this row.
-        for (auto & datum : row.GetCells()) {
-          if (datum.IsMasked()) continue;  // If this cell is masked by another, skip it!
-
-          // Print opening tag.
-          HTML << (datum.IsHeader() ? "<th" : "<td");
-
-          // If this cell spans multiple rows or columns, indicate!
-          if (datum.GetColSpan() > 1) HTML << " colspan=\"" << datum.GetColSpan() << "\"";
-          if (datum.GetRowSpan() > 1) HTML << " rowspan=\"" << datum.GetRowSpan() << "\"";
-          
-          HTML << ">";
-          
-          // If this cell has contents, initialize them!
-          if (datum.HasSlate()) {
-            HTML << "<span id=\"" << datum.GetSlate().GetID() << "\"></span>\n";
-          }
-
-          // Print closing tag.
-          HTML << (datum.IsHeader() ? "</th>" : "</td>");
-        }
-
-        HTML << "</tr>";
-      }
-      
-      HTML << "</table>";
-    }
-
-    void UpdateRows(int r) {
-      if (row_count != r) {                             // Update only if we're making a change.
-        rows.resize(r);                                 // Resize rows.
-        for (int i = row_count; i < r; i++) {
-          rows[i].SetCols(col_count);                   // Initialize new rows.
-        }
-        row_count = r;                                  // Store new size.
-        if (state == Widget::ACTIVE) ReplaceHTML();     // If active, update screen!
-      }
-    }
-    void UpdateCols(int c) {
-      if (col_count != c) {                               // Update only if we're making a change.
-        col_count = c;                                    // Store new size.
-        for (auto & row : rows) row.SetCols(col_count);   // Make sure all rows have new col_count
-        if (state == Widget::ACTIVE) ReplaceHTML();       // If active, update screen!
-      }
-    }
-
-    void ClearCell(int row_id, int col_id) {
-      rows[row_id].data[col_id].colspan = 1;
-      rows[row_id].data[col_id].rowspan = 1;
-      Slate slate = rows[row_id].data[col_id].GetSlate();
-      if (slate) slate.ClearChildren();
-      rows[row_id].data[col_id].header = false;
-      rows[row_id].data[col_id].masked = false;  // @CAO Technically, cell might still be masked!
-      rows[row_id].data[col_id].style.Clear();
-    }
-    void ClearRowCells(int row_id) {
-      for (int col_id = 0; col_id < col_count; col_id++) ClearCell(row_id, col_id);
-    }
-    void ClearTableCells() {
-      for (int row_id = 0; row_id < row_count; row_id++) ClearRowCells(row_id);
-    }
-    
-    bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
-      bool ok = true;
-
-      // Basic info
-      if (verbose) {
-        ss << prefix << "Scanning: emp::TableInfo (rows=" << row_count
-           << ", cols=" << col_count << ")." << std::endl;
-      }
-
-      // Make sure rows and columns are being sized correctly.
-      if (row_count != (int) rows.size()) {
-        ss << prefix << "Error: row_count = " << row_count
-           << ", but rows has " << rows.size() << " elements." << std::endl;
-        ok = false;
-      }
-      
-      if (row_count < 1) {
-        ss << prefix << "Error: Cannot have " << row_count
-           << " rows in table." << std::endl;
-        ok = false;
-      }
-
-      if (col_count < 1) {
-        ss << prefix << "Error: Cannot have " << col_count
-           << " cols in table." << std::endl;
-        ok = false;
-      }
-
-      // Recursively call OK on rows and data.
-      for (int r = 0; r < row_count; r++) {
-        ok = ok && rows[r].OK(ss, verbose, prefix+"  ");
-        if (col_count != rows[r].GetSize()) {
-          ss << prefix << "  Error: col_count = " << col_count
-             << ", but row has " << rows[r].GetSize() << " elements." << std::endl;
+        if (slate && masked == true) {
+          ss << "Warning: Masked cell may have contents!" << std::endl;
           ok = false;
         }
-        for (int c = 0; c < col_count; c++) {
-          auto & cell = rows[r][c];
-          if (c + cell.GetColSpan() > col_count) {
-            ss << prefix << "  Error: Cell at row " << r << ", col " << c
-               << " extends past right side of table." << std::endl;
-            ok = false;
+        
+        return ok;
+      }
+      
+    };
+    
+    class TableRow {
+      friend Table; friend TableInfo;
+    protected:
+      emp::vector<TableData> data;  // detail object for each cell in this row.
+      Style style;
+      
+    public:
+      TableRow() { ; }
+      ~TableRow() { ; }
+      
+      int GetSize() const { return (int) data.size(); }               // How many cells in this row?
+      TableData & operator[](int id) { return data[id]; }             // Get a single cell
+      const TableData & operator[](int id) const { return data[id]; } // Get a single const cell
+      emp::vector<TableData> & GetCells() { return data; }            // Get ALL cells
+      
+      TableRow & SetCols(int c) { data.resize(c); return *this; }
+
+      // Apply to all cells in row.
+      template <typename SETTING_TYPE>
+      TableRow & CellsCSS(const std::string & setting, SETTING_TYPE && value) {
+        for (auto & datum : data) datum.style.Set(setting, value);
+        return *this;
+      }
+      
+      // Apply to specific cell in row.
+      template <typename SETTING_TYPE>
+      TableRow & CellCSS(int col_id, const std::string & setting, SETTING_TYPE && value) {
+        data[col_id].style.Set(setting, value);
+        return *this;
+      }
+
+      virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
+        bool ok = true;
+        if (verbose) { ss << prefix << "Scanning: emp::TableRow" << std::endl; }
+        for (auto & cell : data) ok = ok && cell.OK(ss, verbose, prefix+"  ");      
+        return ok;
+      }
+    };
+    
+    class TableInfo : public internal::WidgetInfo {
+      friend Table;
+    protected:
+      int row_count;                // How big is this table?
+      int col_count;
+      emp::vector<TableRow> rows;   // detail object for each row.
+      Table * append_widget;        // Which widget is triggering an append?
+      
+      TableInfo(const std::string & in_id="")
+        : internal::WidgetInfo(in_id), row_count(0), col_count(0), append_widget(nullptr) { ; }
+      TableInfo(const TableInfo &) = delete;               // No copies of INFO allowed
+      TableInfo & operator=(const TableInfo &) = delete;   // No copies of INFO allowed
+      virtual ~TableInfo() { ; }
+      
+      virtual bool IsTableInfo() const override { return true; }    
+      
+      void DoActivate(bool top_level=true) override {
+        // Activate all of the cell slates.
+        for (int r = 0; r < row_count; r++) {
+          for (int c = 0; c < col_count; c++) {
+            rows[r][c].slate->DoActivate(false);
           }
-          if (r + cell.GetRowSpan() > row_count) {
-            ss << prefix << "  Error: Cell at row " << r << ", col " << c
-               << " extends past bottom of table." << std::endl;
-            ok = false;
+        }
+        internal::WidgetInfo::DoActivate(top_level);
+      }
+      
+      
+      // Get a slate associated with the current cell (and build one if we need to...)
+      Widget & GetCurSlate();
+      
+      // Add additional children on to this element.
+      Widget Append(Widget info) override { return GetCurSlate() << info; }
+      Widget Append(const std::string & text) override {
+        return GetCurSlate() << text;
+      }
+      Widget Append(const std::function<std::string()> & in_fun) override {
+        return GetCurSlate() << in_fun;
+      }
+      
+      // Normally only slates deal with registering other widgets, but Tables
+      // need to facilitate recursive registrations.
+      
+      void RegisterChildren(internal::SlateInfo * regestrar) override {
+        for (int r = 0; r < row_count; r++) {
+          for (int c = 0; c < col_count; c++) {
+            regestrar->Register( rows[r][c].slate );
           }
         }
       }
-
-      // Make sure all children are associated with one and only one cell.
-      if (GetNumChildren() > 0) {
-        ss << prefix << "  Error: Table has " << GetNumChildren()
-           << "direct children (should have 0)!" << std::endl;
-        ok = false;
+      
+      void UnregisterChildren(internal::SlateInfo * regestrar) override {
+        for (int r = 0; r < row_count; r++) {
+          for (int c = 0; c < col_count; c++) {
+            regestrar->Unregister( rows[r][c].slate );
+          }
+        }
       }
-
-      return ok;
-    }
-
-  public:
-    virtual std::string GetType() override { return "web::TableInfo"; }
-  }; // end TableInfo
-
+      
+      
+      virtual void GetHTML(std::stringstream & HTML) override {
+        HTML.str("");                                           // Clear the current text.
+        HTML << "<table id=\"" << id << "\">";
+        
+        // Loop through all of the rows in the table.
+        for (auto & row : rows) {
+          HTML << "<tr>";
+          
+          // Loop through each cell in this row.
+          for (auto & datum : row.GetCells()) {
+            if (datum.IsMasked()) continue;  // If this cell is masked by another, skip it!
+            
+            // Print opening tag.
+            HTML << (datum.IsHeader() ? "<th" : "<td");
+            
+            // If this cell spans multiple rows or columns, indicate!
+            if (datum.GetColSpan() > 1) HTML << " colspan=\"" << datum.GetColSpan() << "\"";
+            if (datum.GetRowSpan() > 1) HTML << " rowspan=\"" << datum.GetRowSpan() << "\"";
+            
+            HTML << ">";
+            
+            // If this cell has contents, initialize them!
+            if (datum.HasSlate()) {
+              HTML << "<span id=\"" << datum.GetSlate().GetID() << "\"></span>\n";
+            }
+            
+            // Print closing tag.
+            HTML << (datum.IsHeader() ? "</th>" : "</td>");
+          }
+          
+          HTML << "</tr>";
+        }
+        
+        HTML << "</table>";
+      }
+      
+      void UpdateRows(int r) {
+        if (row_count != r) {                             // Update only if we're making a change.
+          rows.resize(r);                                 // Resize rows.
+          for (int i = row_count; i < r; i++) {
+            rows[i].SetCols(col_count);                   // Initialize new rows.
+          }
+          row_count = r;                                  // Store new size.
+          if (state == Widget::ACTIVE) ReplaceHTML();     // If active, update screen!
+        }
+      }
+      void UpdateCols(int c) {
+        if (col_count != c) {                               // Update only if we're making a change.
+          col_count = c;                                    // Store new size.
+          for (auto & row : rows) row.SetCols(col_count);   // Make sure all rows have new col_count
+          if (state == Widget::ACTIVE) ReplaceHTML();       // If active, update screen!
+        }
+      }
+      
+      void ClearCell(int row_id, int col_id) {
+        rows[row_id].data[col_id].colspan = 1;
+        rows[row_id].data[col_id].rowspan = 1;
+        Slate slate = rows[row_id].data[col_id].GetSlate();
+        if (slate) slate.ClearChildren();
+        rows[row_id].data[col_id].header = false;
+        rows[row_id].data[col_id].masked = false;  // @CAO Technically, cell might still be masked!
+        rows[row_id].data[col_id].style.Clear();
+      }
+      void ClearRowCells(int row_id) {
+        for (int col_id = 0; col_id < col_count; col_id++) ClearCell(row_id, col_id);
+      }
+      void ClearTableCells() {
+        for (int row_id = 0; row_id < row_count; row_id++) ClearRowCells(row_id);
+      }
+      
+      bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
+        bool ok = true;
+        
+        // Basic info
+        if (verbose) {
+          ss << prefix << "Scanning: emp::TableInfo (rows=" << row_count
+             << ", cols=" << col_count << ")." << std::endl;
+        }
+        
+        // Make sure rows and columns are being sized correctly.
+        if (row_count != (int) rows.size()) {
+          ss << prefix << "Error: row_count = " << row_count
+             << ", but rows has " << rows.size() << " elements." << std::endl;
+          ok = false;
+        }
+        
+        if (row_count < 1) {
+          ss << prefix << "Error: Cannot have " << row_count
+             << " rows in table." << std::endl;
+          ok = false;
+        }
+        
+        if (col_count < 1) {
+          ss << prefix << "Error: Cannot have " << col_count
+             << " cols in table." << std::endl;
+          ok = false;
+        }
+        
+        // Recursively call OK on rows and data.
+        for (int r = 0; r < row_count; r++) {
+          ok = ok && rows[r].OK(ss, verbose, prefix+"  ");
+          if (col_count != rows[r].GetSize()) {
+            ss << prefix << "  Error: col_count = " << col_count
+               << ", but row has " << rows[r].GetSize() << " elements." << std::endl;
+            ok = false;
+          }
+          for (int c = 0; c < col_count; c++) {
+            auto & cell = rows[r][c];
+            if (c + cell.GetColSpan() > col_count) {
+              ss << prefix << "  Error: Cell at row " << r << ", col " << c
+                 << " extends past right side of table." << std::endl;
+              ok = false;
+            }
+            if (r + cell.GetRowSpan() > row_count) {
+              ss << prefix << "  Error: Cell at row " << r << ", col " << c
+                 << " extends past bottom of table." << std::endl;
+              ok = false;
+            }
+          }
+        }
+        
+        return ok;
+      }
+      
+    public:
+      virtual std::string GetType() override { return "web::TableInfo"; }
+    }; // end TableInfo
+    
+    
+  } // end namespace internal
   
+
+  class Table : public internal::WidgetFacet<Table> {
+    friend class internal::TableInfo;
+  protected:
+
     int cur_row;      // Which row/col is currently active?
     int cur_col;
            
@@ -302,10 +317,10 @@ namespace web {
 
 
     // Get a properly cast version of indo.  
-    TableInfo * Info() { return (TableInfo *) info; }
-    const TableInfo * Info() const { return (TableInfo *) info; }
+    internal::TableInfo * Info() { return (internal::TableInfo *) info; }
+    const internal::TableInfo * Info() const { return (internal::TableInfo *) info; }
  
-    Table(TableInfo * in_info) : WidgetFacet(in_info) { ; }
+    Table(internal::TableInfo * in_info) : WidgetFacet(in_info) { ; }
 
     // Apply to appropriate component based on current state.
     void DoCSS(const std::string & setting, const std::string & value) override {
@@ -326,7 +341,7 @@ namespace web {
     {
       emp_assert(c > 0 && r > 0);              // Ensure that we have rows and columns!
 
-      info = new TableInfo(in_id);
+      info = new internal::TableInfo(in_id);
     
       Info()->row_count = r;
       Info()->col_count = c;
@@ -338,7 +353,7 @@ namespace web {
     Table(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsTableInfo()); }
     virtual ~Table() { ; }
 
-    using INFO_TYPE = TableInfo;
+    using INFO_TYPE = internal::TableInfo;
 
     bool IsTable() const override { return true; } 
 
@@ -551,13 +566,13 @@ namespace web {
   };
 
   // Setup mechanism to retrieve current slate for table append.
-  Widget & Table::TableInfo::GetCurSlate() {
-    int cur_col = append_widget->cur_col;
+  Widget & internal::TableInfo::GetCurSlate() {
     int cur_row = append_widget->cur_row;
+    int cur_col = append_widget->cur_col;
 
     // Make sure the number of rows hasn't changed, making the current position illegal.
-    if (cur_col >= col_count) cur_col = 0;
     if (cur_row >= row_count) cur_row = 0;
+    if (cur_col >= col_count) cur_col = 0;
 
     return rows[cur_row].data[cur_col].GetSlate();
   }
