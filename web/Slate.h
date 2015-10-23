@@ -86,13 +86,9 @@ namespace web {
       
       void AddChild(Widget in) {
         // If the inserted widget is already active, remove it from its old position.
-        if (in->parent) {
-          emp_assert(!"Currently cannot insert widget if already active!");
-          // @CAO Remove inserted widget from old parent
-          // @CAO If active, make sure parent is redrawn.
-          // @CAO Set inactive.
-        }
-        emp_assert (in->state != Widget::ACTIVE && "Cannot insert a stand-alone active widget!");
+        emp_assert(in->parent == nullptr && "Cannot insert widget if already has parent!",
+                   in->id, in->parent->id);
+        emp_assert(in->state != Widget::ACTIVE && "Cannot insert a stand-alone active widget!");
 
         // Setup parent-child relationship
         m_children.emplace_back(in);
@@ -144,6 +140,7 @@ namespace web {
       
       Widget Append(Widget info) override {
         if (!append_ok) return ForwardAppend(info);
+        emp_assert(info->parent == nullptr);
         AddChild(info);
         return info;
       }
