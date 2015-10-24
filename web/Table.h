@@ -323,6 +323,20 @@ namespace web {
         
         return ok;
       }
+
+      
+      void ReplaceHTML() override {
+        // Replace Slate's HTML...
+        internal::WidgetInfo::ReplaceHTML();
+
+        // Then replace children.
+        for (int r = 0; r < row_count; r++) {
+          for (int c = 0; c < col_count; c++) {
+            rows[r][c].slate->ReplaceHTML();
+          }
+        }
+      }
+
       
     public:
       virtual std::string GetType() override { return "web::TableInfo"; }
