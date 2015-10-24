@@ -136,6 +136,7 @@ namespace web {
             row.SetCols(new_cols);
             for (int c = col_count; c < new_cols; c++) {
               row[c].slate->parent = this;
+              if (state == Widget::ACTIVE) row[c].slate->DoActivate();
             }
           }
           col_count = new_cols;
@@ -145,8 +146,10 @@ namespace web {
         if (new_rows != row_count) {
           rows.resize(new_rows);
           for (int r = row_count; r < new_rows; r++) {
+            rows[r].SetCols(col_count);
             for (int c = 0; c < col_count; c++) {
               rows[r][c].slate->parent = this;
+              if (state == Widget::ACTIVE) rows[r][c].slate->DoActivate();
             }
           }
           row_count = new_rows;          
