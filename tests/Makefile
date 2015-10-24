@@ -1,9 +1,9 @@
 GCOV_FLAGS = -g -fprofile-arcs -ftest-coverage
 
-test: test_tools.cc
-	g++ ${GCOV_FLAGS} -std=c++11 test_tools.cc -o test_tools.o
+test: test_driver.cc test_tools.h
+	g++ ${GCOV_FLAGS} -std=c++11 test_driver.cc -o test.o
 	# Execute tests
-	./test_tools.o
+	./test.o
 	
 coverage: test
 	lcov -c -d . -b . -o cov.info

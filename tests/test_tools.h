@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #define EMP_TRACK_MEM
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]
@@ -9,7 +8,6 @@
 #include <string>
 #include <vector>
 
-#include "../third-party/catch/single_include/catch.hpp"
 #include "../tools/BitMatrix.h"
 #include "../tools/BitSet.h"
 #include "../tools/BitVector.h"
