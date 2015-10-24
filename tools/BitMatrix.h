@@ -17,7 +17,11 @@
 #include <iostream>
 
 #include "BitSet.h"
+
+#ifndef functions
 #include "functions.h"
+#endif
+
 #include "bitset_utils.h"
 
 namespace emp {

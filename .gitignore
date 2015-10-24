@@ -5,6 +5,7 @@ a.out.js
 *.map
 *.o
 *.js.mem
+*.swp
 UTests/tools/tmp*.cc
 UTests/emtools/JSWrap.js
 UTests/UI/Animate.js
@@ -12,9 +13,17 @@ UTests/UI/ElementSlate.js
 UTests/UI/Example.js
 UTests/UI/mini_evoke.js
 UTests/web/TextArea.js
+tests/html
+tests/*.gcda
+tests/*.gcno
+tests/*cov.info
+
 Slideshow.js
 incoming/
+*/env/*
 tmp/
+build/*
+doc/_build/*
 utils/edit_dist/IO/
 utils/edit_dist/edit_dist
 utils/edit_dist/tmp.py
