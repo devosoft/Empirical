@@ -1,0 +1,27 @@
+// objective: test the \*only and \*endonly commands
+// check: indexpage.xml
+/** \mainpage
+ * Text.
+ * \htmlonly
+ * HTML
+ * \endhtmlonly
+ * \htmlonly[block]
+ * HTML with block
+ * \endhtmlonly
+ * \rtfonly
+ * RTF
+ * \endrtfonly
+ * \manonly
+ * Man
+ * \endmanonly
+ * \latexonly
+ * LaTeX
+ * \endlatexonly
+ * \xmlonly
+ * XML
+ * \endxmlonly
+ * \docbookonly
+ * DocBook
+ * \enddocbookonly
+ * More text.
+ */
