@@ -1,6 +1,6 @@
 GCOV_FLAGS = -g -fprofile-arcs -ftest-coverage
 
-test: test_driver.cc test_tools.h
+test: test_driver.cc test_tools.cc
 	g++ ${GCOV_FLAGS} -std=c++11 test_driver.cc -o test.o
 	# Execute tests
 	./test.o
@@ -19,4 +19,6 @@ clean:
 	rm -f *.out
 	rm -f *.o
 	rm -f *.gcda
-	rm -f *.gcno 
+	rm -f *.gcno
+	rm -f *~
+	rm -rf ./html
