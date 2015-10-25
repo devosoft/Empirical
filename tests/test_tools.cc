@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+
 #include "../tools/BitMatrix.h"
 #include "../tools/BitSet.h"
 #include "../tools/BitVector.h"
@@ -30,6 +31,18 @@
 #include "../tools/macro_math.h"
 #include "../tools/macros.h"
 #include "../tools/assert.h"
+
+// currently these have no coveage; we include them so we get metrics on them
+// this doesn't actually work--TODO: figure out why this doesn't work
+#include "../tools/alert.h"
+#include "../tools/const.h"
+#include "../tools/errors.h"
+#include "../tools/class.h"
+#include "../tools/fixed.h"
+#include "../tools/SolveState.h"
+#include "../tools/ProbSchedule.h"
+#include "../tools/serialize_macros.h"
+
 
 // "Macros testing macros...Oh dear..."
 #define EMP_TEST_MACRO( MACRO, EXP_RESULT )                             \
