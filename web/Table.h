@@ -329,9 +329,11 @@ namespace web {
         // Replace Slate's HTML...
         internal::WidgetInfo::ReplaceHTML();
 
-        // Then replace children.
+        // Then replace cells
         for (int r = 0; r < row_count; r++) {
+          rows[r].style.Apply(id);
           for (int c = 0; c < col_count; c++) {
+            rows[r][c].style.Apply(id);
             rows[r][c].slate->ReplaceHTML();
           }
         }
