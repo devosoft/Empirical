@@ -205,16 +205,23 @@ namespace web {
         HTML << "<table id=\"" << id << "\">";
         
         // Loop through all of the rows in the table.
-        for (auto & row : rows) {
-          HTML << "<tr>";
+        for (int r = 0; r < (int) rows.size(); r++) {
+          auto & row = rows[r];
+          HTML << "<tr";
+          if (row.style.GetSize()) HTML << " id=" << id << '_' << r;
+          HTML << ">";
           
           // Loop through each cell in this row.
-          for (auto & datum : row.GetCells()) {
+          for (int c = 0; c < row.GetSize(); c++) {
+            auto & datum = row[c];
             if (datum.IsMasked()) continue;  // If this cell is masked by another, skip it!
             
             // Print opening tag.
             HTML << (datum.IsHeader() ? "<th" : "<td");
             
+            // Include an id for this cell if we have one.
+            if (datum.style.GetSize()) HTML << " id=" << id << '_' << r << '_' << c;
+
             // If this cell spans multiple rows or columns, indicate!
             if (datum.GetColSpan() > 1) HTML << " colspan=\"" << datum.GetColSpan() << "\"";
             if (datum.GetRowSpan() > 1) HTML << " rowspan=\"" << datum.GetRowSpan() << "\"";
@@ -331,9 +338,9 @@ namespace web {
 
         // Then replace cells
         for (int r = 0; r < row_count; r++) {
-          rows[r].style.Apply(id);
+          rows[r].style.Apply(emp::to_string(id, '_', r));
           for (int c = 0; c < col_count; c++) {
-            rows[r][c].style.Apply(id);
+            rows[r][c].style.Apply(emp::to_string(id, '_', r, '_', c));
             rows[r][c].slate->ReplaceHTML();
           }
         }
