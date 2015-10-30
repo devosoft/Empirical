@@ -119,6 +119,7 @@ namespace web {
       int row_count;                // How big is this table?
       int col_count;
       emp::vector<TableRow> rows;   // detail object for each row.
+
       Table * append_widget;        // Which widget is triggering an append?
       
       TableInfo(const std::string & in_id="")
@@ -204,7 +205,7 @@ namespace web {
         HTML.str("");                                           // Clear the current text.
         HTML << "<table id=\"" << id << "\">";
         
-        // Loop through all of the rows in the table.
+        // Loop through all of the rows in the table. 
         for (int r = 0; r < (int) rows.size(); r++) {
           auto & row = rows[r];
           HTML << "<tr";
@@ -273,8 +274,19 @@ namespace web {
       void ClearRowCells(int row_id) {
         for (int col_id = 0; col_id < col_count; col_id++) ClearCell(row_id, col_id);
       }
+      void ClearRow(int row_id) {
+        rows[row_id].style.Clear();
+        ClearRowCells(row_id);
+      }
       void ClearTableCells() {
         for (int row_id = 0; row_id < row_count; row_id++) ClearRowCells(row_id);
+      }
+      void ClearTableRows() {
+        for (int row_id = 0; row_id < row_count; row_id++) ClearRow(row_id);
+      }
+      void ClearTable() {
+        style.Clear();
+        Resize(0,0);
       }
       
       bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
@@ -396,8 +408,13 @@ namespace web {
       Info()->Resize(r, c);
     }
     Table(const Table & in)
-      : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col), state(in.state) { ; }
-    Table(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsTableInfo()); }
+      : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col), state(in.state)
+    {
+      emp_assert(state == TABLE || state == ROW || state == CELL, state);
+    }
+    Table(const Widget & in) : WidgetFacet(in), cur_row(0), cur_col(0), state(TABLE) {
+      emp_assert(info->IsTableInfo());
+    }
     virtual ~Table() { ; }
 
     using INFO_TYPE = internal::TableInfo;
@@ -420,13 +437,23 @@ namespace web {
     
     Table & Clear() {
       // Clear based on tables current state.
-      if (state == TABLE) Info()->ClearTableCells();
-      else if (state == ROW) Info()->ClearRowCells(cur_row);
+      if (state == TABLE) Info()->ClearTable();
+      else if (state == ROW) Info()->ClearRow(cur_row);
       else if (state == CELL) Info()->ClearCell(cur_row, cur_col);
-      else emp_assert(false && "Table in unknown state!");
+      else emp_assert(false && "Table in unknown state!", state);
       return *this;
     }
-
+    Table & ClearTable() { Info()->ClearTable(); return *this; }
+    Table & ClearRows() { Info()->ClearTableRows(); return *this; }
+    Table & ClearRow(int r) { Info()->ClearRow(r); return *this; }
+    Table & ClearCells() {
+      if (state == TABLE) Info()->ClearTableCells();
+      else if (state == ROW) Info()->ClearRowCells(cur_row);
+      else emp_assert(false && "Cannot run ClearCells on single cell!", state);
+      return *this;
+    }
+    Table & ClearCell(int r, int c) { Info()->ClearCell(r, c); return *this; }
+    
 
     Table & Rows(int r) {
       Info()->Resize(r, Info()->col_count);
@@ -435,6 +462,12 @@ namespace web {
     }
     Table & Cols(int c) {
       Info()->Resize(Info()->row_count, c);
+      if (cur_col >= c) cur_col = 0;
+      return *this;
+    }
+    Table & Resize(int r, int c) {
+      Info()->Resize(r, c);
+      if (cur_row >= r) cur_row = 0;
       if (cur_col >= c) cur_col = 0;
       return *this;
     }
