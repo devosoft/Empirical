@@ -67,7 +67,7 @@ for a full list.
 General Standards
 -----------------
 
-All plain-text files should have line widths of 80 characters or less unless
+All plain-text files should have line widths of 100 characters or less unless
 that is unsupported for the particular file format.
 
 All contributions should have their spelling checked before being committed to
