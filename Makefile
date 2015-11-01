@@ -1,4 +1,4 @@
-build-docs:
+bild-docs:
 	mkdir -p build/doxydoc/source
 	./third-party/doxygen/build/bin/doxygen Doxyfile
 
