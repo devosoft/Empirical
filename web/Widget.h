@@ -288,11 +288,13 @@ namespace web {
     // We are creating a new widget; in derived class, make sure:
     // ... to assign info pointer to new object of proper *Info type
     // ... NOT to increment info->ptr_count since it's initialized to 1.
+    EMP_TRACK_CONSTRUCT(WebWidget);
   }
   
   Widget::Widget(WidgetInfo * in_info) {
     info = in_info;
     if (info) info->ptr_count++;
+    EMP_TRACK_CONSTRUCT(WebWidget);
   }
   
   Widget::~Widget() {
@@ -301,6 +303,7 @@ namespace web {
       info->ptr_count--;
       if (info->ptr_count == 0) delete info;
     }
+    EMP_TRACK_DESTRUCT(WebWidget);
   }
 
   Widget & Widget::SetInfo(WidgetInfo * in_info) {

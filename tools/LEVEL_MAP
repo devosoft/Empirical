@@ -1,17 +1,59 @@
-== Level 0 (No dependencies) ==
-assert.h
-callbacks.h
-ConfigManager.h
-config_include.h
-config_opts.h
-const.h
-errors.h
-fixed.h
-functions.h
-ProbSchedule.h
-Random.h
-string_utils.h
+== Level 0 (no dependencies) ==
+./string_utils.h
+./BitSet.h
+./DynamicStringSet.h
+./macros.h
+./Random.h
+./errors.h
+./serialize.h
+./fixed.h
+./mem_track.h
+./command_line.h
+./unit_tests.h
+./const_utils.h
+./tuple_struct.h
+./const.h
+./random_utils.h
+./grid.h
+./FunctionSet.h
+./functions.h
+
 
 == Level 1 ==
-confg.h   - includes: ConfigManager.h, config_utils.h, config_opts.h, errors.h,
-                      functions.h, and string_utils.h
+
+ ./vector.h depends:
+	./assert.h, 
+ ./reflection.h depends:
+	./functions.h, 
+ ./bitset_utils.h depends:
+	./functions.h, 
+ ./ProbSchedule.h depends:
+	./Random.h, 
+ ./alert.h depends:
+	./string_utils.h, 
+ ./serialize_macros.h depends:
+	./macros.h, 
+ ./Graph.h depends:
+	./BitVector.h, 
+ ./Ptr.h depends:
+	./assert.h, 
+ ./assert.h depends:
+	./macros.h, 
+ ./sequence_utils.h depends:
+	./functions.h, 
+ ./SolveState.h depends:
+	./BitVector.h, 
+
+== Level 2 ==
+
+ ./Trait.h depends:
+	./assert.h, ./functions.h, 
+
+== Level 3 ==
+
+ ./BitVector.h depends:
+	./bitset_utils.h, ./const_utils.h, ./functions.h, 
+ ./BitMatrix.h depends:
+	./BitSet.h, ./bitset_utils.h, ./functions.h, 
+ ./graph_utils.h depends:
+	./Graph.h, ./Random.h, ./random_utils.h, 
