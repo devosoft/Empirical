@@ -87,7 +87,7 @@ namespace web {
       void AddChild(Widget in) {
         // If the inserted widget is already active, remove it from its old position.
         emp_assert(in->parent == nullptr && "Cannot insert widget if already has parent!",
-                   in->id, in->parent->id);
+                   in->id);
         emp_assert(in->state != Widget::ACTIVE && "Cannot insert a stand-alone active widget!");
 
         // Setup parent-child relationship

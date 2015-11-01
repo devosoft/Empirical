@@ -5,7 +5,9 @@ a.out.js
 *.map
 *.o
 *.js.mem
+*.pyc
 *.swp
+*.swo
 UTests/tools/tmp*.cc
 UTests/emtools/JSWrap.js
 UTests/UI/Animate.js
@@ -18,7 +20,6 @@ tests/*.gcda
 tests/*.gcno
 tests/*cov.info
 third-party/doxygen/build/*
-third-party/*.swo
 Slideshow.js
 incoming/
 */env/*
