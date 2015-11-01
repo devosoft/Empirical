@@ -17,7 +17,8 @@ tests/html
 tests/*.gcda
 tests/*.gcno
 tests/*cov.info
-
+third-party/doxygen/build/*
+third-party/*.swo
 Slideshow.js
 incoming/
 */env/*
