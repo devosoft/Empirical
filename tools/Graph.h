@@ -1,3 +1,7 @@
+// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
+// Copyright (C) Michigan State University, 2015. It is licensed 
+// under the MIT Software license; see doc/LICENSE
+
 #ifndef EMP_GRAPH_H
 #define EMP_GRAPH_H
 
