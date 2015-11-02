@@ -37,6 +37,7 @@
 //    void SetCallback(const std::function<void(const Animate &)> & fun)
 //    void SetCallback(const std::function<void(double)> & fun)
 //    void SetCallback(const std::function<void()> & fun)
+//
 
 #include <functional>
 
