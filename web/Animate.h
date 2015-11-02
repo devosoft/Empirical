@@ -5,12 +5,38 @@
 //
 //  This class manages animations in a web page.
 //
+//  To build an animation, you must provide a function to be run repeatedly.  When Start()
+//  is triggered, the function will be called 60 time per second (or as close as possible),
+//  until Stop() is caled.
+//
 //  Inputs to the constructor include the function to run each animation step, and
-//  zero or more elements that should be updated post-animation.
+//  zero or more UI elements that should be updated after each frame.
 //
-//  The function may take an optional double (representing time since the last frame)
-//  -or- an optional reference to the animation object
+//  Parameters to the animation function can be:
+//    * double (representing time since the last frame)
+//    * a const reference to the animation object itself
+//    * nothing
 //
+//  Control methods:
+//    void Start()
+//    void Stop() 
+//    void Step() 
+//    void ToggleActive()
+//
+//  Access methods:
+//    bool GetActive() const 
+//    bool GetDoStep() const 
+//    double GetStartTime() const
+//    double GetPrevTime() const 
+//    double GetCurTime() const 
+//    double GetStepTime() const
+//    double GetRunTime() const 
+//    int GetFrameCount() const 
+//
+//  Config methods:
+//    void SetCallback(const std::function<void(const Animate &)> & fun)
+//    void SetCallback(const std::function<void(double)> & fun)
+//    void SetCallback(const std::function<void()> & fun)
 
 #include <functional>
 
