@@ -1,0 +1,401 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - cov.info - tools/string_utils.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">tools</a> - string_utils.h<span style="font-size: 80%;"> (source / <a href="string_utils.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">cov.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">111</td>
+            <td class="headerCovTableEntry">152</td>
+            <td class="headerCovTableEntryLo">73.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2015-11-01 13:32:36</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">31</td>
+            <td class="headerCovTableEntry">48</td>
+            <td class="headerCovTableEntryLo">64.6 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #ifndef EMP_STRING_UTILS_H</a>
+<span class="lineNum">       2 </span>            : #define EMP_STRING_UTILS_H
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            : //////////////////////////////////////////////////////////////////////////////
+<span class="lineNum">       5 </span>            : //
+<span class="lineNum">       6 </span>            : //  This file contains a set of simple functions to manipulate strings.
+<span class="lineNum">       7 </span>            : //
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #include &lt;functional&gt;
+<span class="lineNum">      10 </span>            : #include &lt;initializer_list&gt;
+<span class="lineNum">      11 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">      12 </span>            : #include &lt;sstream&gt;
+<span class="lineNum">      13 </span>            : #include &lt;string&gt;
+<span class="lineNum">      14 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      15 </span>            : 
+<a name="16"><span class="lineNum">      16 </span>            : namespace emp {</a>
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span><span class="lineCov">         38 :   std::string to_escaped_string(char value) {</span>
+<span class="lineNum">      19 </span>            :     // Start by quickly returning a string if it's easy.
+<span class="lineNum">      20 </span><span class="lineCov">         76 :     std::stringstream ss;</span>
+<span class="lineNum">      21 </span><span class="lineCov">         38 :     if ( (value &gt;= 40 &amp;&amp; value &lt; 91) || value &gt; 96) {</span>
+<span class="lineNum">      22 </span><span class="lineCov">         29 :       ss &lt;&lt; value;</span>
+<span class="lineNum">      23 </span><span class="lineCov">         29 :       return ss.str();</span>
+<span class="lineNum">      24 </span>            :     }
+<span class="lineNum">      25 </span><span class="lineCov">          9 :     switch (value) {</span>
+<span class="lineNum">      26 </span>            :     case '\\':
+<span class="lineNum">      27 </span><span class="lineNoCov">          0 :       return &quot;\\\\&quot;;</span>
+<span class="lineNum">      28 </span>            :       break;
+<span class="lineNum">      29 </span>            :     case '\'':
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :       return &quot;\\\'&quot;;</span>
+<span class="lineNum">      31 </span>            :       break;
+<span class="lineNum">      32 </span>            :     case '\&quot;':
+<span class="lineNum">      33 </span><span class="lineCov">          2 :       return &quot;\\\&quot;&quot;;</span>
+<span class="lineNum">      34 </span>            :       break;
+<span class="lineNum">      35 </span>            :     case '\n':
+<span class="lineNum">      36 </span><span class="lineCov">          2 :       return &quot;\\n&quot;;</span>
+<span class="lineNum">      37 </span>            :       break;
+<span class="lineNum">      38 </span>            :     case '\r':
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :       return &quot;\\r&quot;;</span>
+<span class="lineNum">      40 </span>            :       break;
+<span class="lineNum">      41 </span>            :     case '\t':
+<span class="lineNum">      42 </span><span class="lineCov">          2 :       return &quot;\\t&quot;;</span>
+<span class="lineNum">      43 </span>            :       break;
+<span class="lineNum">      44 </span>            :     default:
+<span class="lineNum">      45 </span><span class="lineCov">          3 :       ss &lt;&lt; value;</span>
+<span class="lineNum">      46 </span><span class="lineCov">          3 :       return ss.str();</span>
+<a name="47"><span class="lineNum">      47 </span>            :     };</a>
+<span class="lineNum">      48 </span>            :   }
+<span class="lineNum">      49 </span><span class="lineCov">          1 :   std::string to_escaped_string(const std::string &amp; value) {</span>
+<span class="lineNum">      50 </span><span class="lineCov">          2 :     std::stringstream ss;</span>
+<span class="lineNum">      51 </span><span class="lineCov">          1 :     for (char c : value) { ss &lt;&lt; to_escaped_string(c); }</span>
+<span class="lineNum">      52 </span><span class="lineCov">          2 :     return ss.str();</span>
+<span class="lineNum">      53 </span>            :   }
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            : 
+<a name="56"><span class="lineNum">      56 </span>            : </a>
+<span class="lineNum">      57 </span>            :   // The to_literal function set will take a value and convert it to a C++ literal.
+<span class="lineNum">      58 </span><span class="lineCov">          2 :   template &lt;typename LIT_TYPE&gt; std::string to_literal(const LIT_TYPE &amp; value) {</span>
+<a name="59"><span class="lineNum">      59 </span><span class="lineCov">          2 :     return std::to_string(value);</span></a>
+<span class="lineNum">      60 </span>            :   }
+<span class="lineNum">      61 </span><span class="lineCov">          2 :   std::string to_literal(char value) {</span>
+<span class="lineNum">      62 </span><span class="lineCov">          4 :     std::stringstream ss;</span>
+<span class="lineNum">      63 </span><span class="lineCov">          2 :     ss &lt;&lt; &quot;'&quot; &lt;&lt; to_escaped_string(value) &lt;&lt; &quot;'&quot;;</span>
+<a name="64"><span class="lineNum">      64 </span><span class="lineCov">          4 :     return ss.str();</span></a>
+<span class="lineNum">      65 </span>            :   }
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :   std::string to_literal(const std::string &amp; value) {</span>
+<span class="lineNum">      67 </span>            :     // Add quotes to the ends and convert each character.
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :     std::stringstream ss;</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;\&quot;&quot;;</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :     for (char c : value) {</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :       ss &lt;&lt; to_escaped_string(c);</span>
+<span class="lineNum">      72 </span>            :     }
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;\&quot;&quot;;</span>
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :     return ss.str();</span>
+<span class="lineNum">      75 </span>            :   }
+<span class="lineNum">      76 </span>            : 
+<a name="77"><span class="lineNum">      77 </span>            : </a>
+<span class="lineNum">      78 </span>            :   // Convert to roman numerals
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :   std::string to_roman_numeral(int val, const std::string &amp; prefix=&quot;&quot;) {</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :     std::string ret_string(prefix);</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :     if (val &lt; 0) ret_string += to_roman_numeral(-val, &quot;-&quot;);</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :     else if (val &gt; 3999) { ; } // Out of bounds; return a blank;</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :     else if (val &gt;= 1000) ret_string += to_roman_numeral(val - 1000, &quot;M&quot;);</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :     else if (val &gt;= 900) ret_string += to_roman_numeral(val - 900, &quot;CM&quot;);</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :     else if (val &gt;= 500) ret_string += to_roman_numeral(val - 500, &quot;D&quot;);</span>
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :     else if (val &gt;= 400) ret_string += to_roman_numeral(val - 400, &quot;CD&quot;);</span>
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :     else if (val &gt;= 100) ret_string += to_roman_numeral(val - 100, &quot;C&quot;);</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :     else if (val &gt;= 90) ret_string += to_roman_numeral(val - 90, &quot;XC&quot;);</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :     else if (val &gt;= 50) ret_string += to_roman_numeral(val - 50, &quot;L&quot;);</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :     else if (val &gt;= 40) ret_string += to_roman_numeral(val - 40, &quot;XL&quot;);</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :     else if (val &gt;= 10) ret_string += to_roman_numeral(val - 10, &quot;X&quot;);</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :     else if (val == 9) ret_string += &quot;IX&quot;;</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :     else if (val &gt;= 5) ret_string += to_roman_numeral(val - 5, &quot;V&quot;);</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :     else if (val == 4) ret_string += &quot;IV&quot;;</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :     else if (val &gt; 0) ret_string += to_roman_numeral(val - 1, &quot;I&quot;);</span>
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span>            :     // else we already have it exactly and don't need to return anything.                             
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :     return ret_string;</span>
+<span class="lineNum">      99 </span>            :   }
+<span class="lineNum">     100 </span>            : 
+<a name="101"><span class="lineNum">     101 </span>            : </a>
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span><span class="lineCov">         96 :   bool is_whitespace(char test_char) {</span>
+<span class="lineNum">     104 </span><span class="lineCov">         96 :     return (test_char == ' ' || test_char == '\n' || test_char == '\r' || test_char == '\t');</span>
+<a name="105"><span class="lineNum">     105 </span>            :   }</a>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineCov">        108 :   bool is_upper_letter(char test_char) {</span>
+<span class="lineNum">     108 </span><span class="lineCov">        108 :     return (test_char &gt;= 'A' &amp;&amp; test_char &lt;= 'Z');</span>
+<a name="109"><span class="lineNum">     109 </span>            :   }</a>
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span><span class="lineCov">         96 :   bool is_lower_letter(char test_char) {</span>
+<span class="lineNum">     112 </span><span class="lineCov">         96 :     return (test_char &gt;= 'a' &amp;&amp; test_char &lt;= 'z');</span>
+<a name="113"><span class="lineNum">     113 </span>            :   }</a>
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span><span class="lineCov">         72 :   bool is_letter(char test_char) {</span>
+<span class="lineNum">     116 </span><span class="lineCov">         72 :     return is_upper_letter(test_char) || is_lower_letter(test_char);</span>
+<a name="117"><span class="lineNum">     117 </span>            :   }</a>
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span><span class="lineCov">         50 :   bool is_digit(char test_char) {</span>
+<span class="lineNum">     120 </span><span class="lineCov">         50 :     return (test_char &gt;= '0' &amp;&amp; test_char &lt;= '9');</span>
+<a name="121"><span class="lineNum">     121 </span>            :   }</a>
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span><span class="lineCov">         36 :   bool is_alphanumeric(char test_char) {</span>
+<span class="lineNum">     124 </span><span class="lineCov">         36 :     return is_letter(test_char) || is_digit(test_char);</span>
+<a name="125"><span class="lineNum">     125 </span>            :   }</a>
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :   bool is_one_of(char test_char, const std::string &amp; char_set) {</span>
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :     for (char x : char_set) if (test_char == x) return true;</span>
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :     return false;</span>
+<a name="130"><span class="lineNum">     130 </span>            :   }</a>
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :   bool is_composed_of(const std::string &amp; test_str, const std::string &amp; char_set) {</span>
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :     for (char x : test_str) if (!is_one_of(x, char_set)) return false;</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     135 </span>            :   }
+<span class="lineNum">     136 </span>            : 
+<a name="137"><span class="lineNum">     137 </span>            : </a>
+<span class="lineNum">     138 </span>            :   // If no functions are provided to is_value(), always return false as base case.
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :   bool is_valid(char test_char) { return false; }</span>
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            :   // A character is valid if it passes any of the test functions provided.
+<span class="lineNum">     142 </span>            :   template &lt;typename... FUNS&gt;
+<span class="lineNum">     143 </span>            :   bool is_valid(char test_char, std::function&lt;bool(char)&gt; fun1, FUNS... funs) {
+<span class="lineNum">     144 </span>            :     return fun1(test_char) || is_valid(test_char, funs...);
+<span class="lineNum">     145 </span>            :   }
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span>            :   // For a string to be valid, each character must pass at least one provided function.
+<span class="lineNum">     148 </span>            :   template &lt;typename... FUNS&gt;
+<span class="lineNum">     149 </span>            :   bool is_valid(const std::string &amp; test_str, FUNS... funs) {
+<span class="lineNum">     150 </span>            :     for (char x : test_str) if ( !is_valid(x, funs...) ) return false;
+<span class="lineNum">     151 </span>            :     return true;
+<span class="lineNum">     152 </span>            :   }
+<span class="lineNum">     153 </span>            : 
+<a name="154"><span class="lineNum">     154 </span>            : </a>
+<span class="lineNum">     155 </span>            :   // Pop a segment from the beginning of a string as another string, shortening original.
+<span class="lineNum">     156 </span><span class="lineCov">          6 :   std::string string_pop_fixed(std::string &amp; in_string, std::size_t end_pos, int delim_size=0) {</span>
+<span class="lineNum">     157 </span><span class="lineCov">          6 :     std::string out_string = &quot;&quot;;</span>
+<span class="lineNum">     158 </span><span class="lineCov">          6 :     if (end_pos == 0);                        // Not popping anything!</span>
+<span class="lineNum">     159 </span><span class="lineCov">          6 :     else if (end_pos == std::string::npos) {  // Popping whole string.</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :       out_string = in_string;</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :       in_string = &quot;&quot;;</span>
+<span class="lineNum">     162 </span>            :     }
+<span class="lineNum">     163 </span>            :     else {
+<span class="lineNum">     164 </span><span class="lineCov">          6 :       out_string = in_string.substr(0, end_pos);  // Copy up to the deliminator for ouput</span>
+<span class="lineNum">     165 </span><span class="lineCov">          6 :       in_string.erase(0, end_pos + delim_size);   // Delete output string AND deliminator</span>
+<span class="lineNum">     166 </span>            :     }
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span><span class="lineCov">          6 :     return out_string;</span>
+<span class="lineNum">     169 </span>            :   }
+<a name="170"><span class="lineNum">     170 </span>            : </a>
+<span class="lineNum">     171 </span>            :   // Get a segment from the beginning of a string as another string, leaving original untouched.
+<span class="lineNum">     172 </span><span class="lineCov">          1 :   std::string string_get_range(const std::string &amp; in_string, std::size_t start_pos,</span>
+<span class="lineNum">     173 </span>            :                                std::size_t end_pos) {
+<span class="lineNum">     174 </span><span class="lineCov">          1 :     if (end_pos == std::string::npos) end_pos = in_string.size() - start_pos;</span>
+<span class="lineNum">     175 </span><span class="lineCov">          1 :     return in_string.substr(start_pos, end_pos);</span>
+<span class="lineNum">     176 </span>            :   }
+<a name="177"><span class="lineNum">     177 </span>            : </a>
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span><span class="lineCov">          2 :   std::string string_pop(std::string &amp; in_string, const char delim) {</span>
+<span class="lineNum">     180 </span><span class="lineCov">          2 :     return string_pop_fixed(in_string, in_string.find(delim), 1);</span>
+<a name="181"><span class="lineNum">     181 </span>            :   }</a>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :   std::string string_get(const std::string &amp; in_string, const char delim, int start_pos=0) {</span>
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :     return string_get_range(in_string, start_pos, in_string.find(delim, start_pos));</span>
+<a name="185"><span class="lineNum">     185 </span>            :   }</a>
+<span class="lineNum">     186 </span>            : 
+<span class="lineNum">     187 </span><span class="lineCov">          3 :   std::string string_pop(std::string &amp; in_string, const std::string &amp; delim_set) {</span>
+<span class="lineNum">     188 </span><span class="lineCov">          3 :     return string_pop_fixed(in_string, in_string.find_first_of(delim_set), 1);</span>
+<a name="189"><span class="lineNum">     189 </span>            :   }</a>
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span><span class="lineCov">          1 :   std::string string_get(const std::string &amp; in_string, const std::string &amp; delim_set, int start_pos=0) {</span>
+<span class="lineNum">     192 </span><span class="lineCov">          1 :     return string_get_range(in_string, start_pos, in_string.find_first_of(delim_set, start_pos));</span>
+<a name="193"><span class="lineNum">     193 </span>            :   }</a>
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span><span class="lineCov">          1 :   std::string string_pop_word(std::string &amp; in_string) {</span>
+<span class="lineNum">     196 </span>            :     // Whitespace = ' ' '\n' '\r' or '\t'
+<span class="lineNum">     197 </span><span class="lineCov">          1 :     return string_pop(in_string, &quot; \n\r\t&quot;);</span>
+<a name="198"><span class="lineNum">     198 </span>            :   }</a>
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span><span class="lineCov">          1 :   std::string string_get_word(const std::string &amp; in_string, int start_pos=0) {</span>
+<span class="lineNum">     201 </span>            :     // Whitespace = ' ' '\n' '\r' or '\t'
+<span class="lineNum">     202 </span><span class="lineCov">          1 :     return string_get(in_string, &quot; \n\r\t&quot;, start_pos);</span>
+<a name="203"><span class="lineNum">     203 </span>            :   }</a>
+<span class="lineNum">     204 </span>            : 
+<span class="lineNum">     205 </span><span class="lineCov">          1 :   std::string string_pop_line(std::string &amp; in_string) {</span>
+<span class="lineNum">     206 </span><span class="lineCov">          1 :     return string_pop(in_string, '\n');</span>
+<a name="207"><span class="lineNum">     207 </span>            :   }</a>
+<span class="lineNum">     208 </span>            : 
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :   std::string string_get_line(const std::string &amp; in_string, int start_pos=0) {</span>
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :     return string_get(in_string, '\n', start_pos);</span>
+<span class="lineNum">     211 </span>            :   }
+<a name="212"><span class="lineNum">     212 </span>            : </a>
+<span class="lineNum">     213 </span>            :   // Tricks for dealing with whitespace.
+<span class="lineNum">     214 </span><span class="lineCov">          1 :   std::string left_justify(std::string &amp; in_string) {</span>
+<span class="lineNum">     215 </span><span class="lineCov">          1 :     return string_pop_fixed(in_string, in_string.find_first_not_of(&quot; \n\r\t&quot;));</span>
+<a name="216"><span class="lineNum">     216 </span>            :   }</a>
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span><span class="lineCov">          4 :   void right_justify(std::string &amp; in_string) {</span>
+<span class="lineNum">     219 </span>            :     // @CAO *very* inefficient at the moment.
+<span class="lineNum">     220 </span><span class="lineCov">          4 :     while (is_whitespace(in_string.back())) in_string.pop_back();</span>
+<a name="221"><span class="lineNum">     221 </span><span class="lineCov">          1 :   }</span></a>
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span><span class="lineCov">          1 :   void compress_whitespace(std::string &amp; in_string) {</span>
+<span class="lineNum">     224 </span><span class="lineCov">          1 :     const int strlen = (int) in_string.size();</span>
+<span class="lineNum">     225 </span><span class="lineCov">          1 :     bool last_whitespace = true;</span>
+<span class="lineNum">     226 </span><span class="lineCov">          1 :     int next_char = 0;</span>
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span><span class="lineCov">         39 :     for (int i = 0; i &lt; strlen; i++) {</span>
+<span class="lineNum">     229 </span><span class="lineCov">         38 :       if (is_whitespace(in_string[i])) {  // This char is whitespace</span>
+<span class="lineNum">     230 </span><span class="lineCov">         10 :         if (last_whitespace) continue;</span>
+<span class="lineNum">     231 </span><span class="lineCov">          5 :         in_string[next_char++] = ' ';</span>
+<span class="lineNum">     232 </span><span class="lineCov">          5 :         last_whitespace = true;</span>
+<span class="lineNum">     233 </span>            :       }
+<span class="lineNum">     234 </span>            :       else {  // Not whitespace
+<span class="lineNum">     235 </span><span class="lineCov">         28 :         in_string[next_char++] = in_string[i];</span>
+<span class="lineNum">     236 </span><span class="lineCov">         28 :         last_whitespace = false;</span>
+<span class="lineNum">     237 </span>            :       }
+<span class="lineNum">     238 </span>            :     }
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span><span class="lineCov">          1 :     in_string.resize(next_char);</span>
+<a name="241"><span class="lineNum">     241 </span><span class="lineCov">          1 :   }</span></a>
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span><span class="lineCov">          1 :   void remove_whitespace(std::string &amp; in_string) {</span>
+<span class="lineNum">     244 </span><span class="lineCov">          1 :     const int strlen = (int) in_string.size();</span>
+<span class="lineNum">     245 </span><span class="lineCov">          1 :     int next_char = 0;</span>
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span><span class="lineCov">         19 :     for (int i = 0; i &lt; strlen; i++) {</span>
+<span class="lineNum">     248 </span><span class="lineCov">         18 :       if (is_whitespace(in_string[i])) continue;</span>
+<span class="lineNum">     249 </span><span class="lineCov">         15 :       in_string[next_char++] = in_string[i];</span>
+<span class="lineNum">     250 </span>            :     }
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span><span class="lineCov">          1 :     in_string.resize(next_char);</span>
+<span class="lineNum">     253 </span><span class="lineCov">          1 :   }</span>
+<a name="254"><span class="lineNum">     254 </span>            : </a>
+<span class="lineNum">     255 </span>            :   // Cut up a string based on a deliminator.
+<span class="lineNum">     256 </span><span class="lineCov">          1 :   void slice_string(const std::string &amp; in_string, std::vector&lt;std::string&gt; &amp; out_set,</span>
+<span class="lineNum">     257 </span>            :                     char delim='\n') {
+<span class="lineNum">     258 </span><span class="lineCov">          1 :     int test_size = (int) in_string.size();</span>
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span>            :     // Count produced strings
+<span class="lineNum">     261 </span><span class="lineCov">          1 :     int out_count = 0;</span>
+<span class="lineNum">     262 </span><span class="lineCov">          1 :     int pos = 0;</span>
+<span class="lineNum">     263 </span><span class="lineCov">         11 :     while (pos &lt; test_size) {</span>
+<span class="lineNum">     264 </span><span class="lineCov">         34 :       while (pos &lt; test_size &amp;&amp; in_string[pos] != delim) pos++;</span>
+<span class="lineNum">     265 </span><span class="lineCov">          5 :       pos++; // Skip over deliminator</span>
+<span class="lineNum">     266 </span><span class="lineCov">          5 :       out_count++;</span>
+<span class="lineNum">     267 </span>            :     }
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span>            :     // And copy over the strings
+<span class="lineNum">     270 </span><span class="lineCov">          1 :     out_set.resize(out_count);</span>
+<span class="lineNum">     271 </span><span class="lineCov">          1 :     pos = 0;</span>
+<span class="lineNum">     272 </span><span class="lineCov">          1 :     int string_id = 0;</span>
+<span class="lineNum">     273 </span><span class="lineCov">         11 :     while (pos &lt; test_size) {</span>
+<span class="lineNum">     274 </span><span class="lineCov">          5 :       out_set[string_id] = &quot;&quot;;</span>
+<span class="lineNum">     275 </span><span class="lineCov">         63 :       while (pos &lt; test_size &amp;&amp; in_string[pos] != delim) {</span>
+<span class="lineNum">     276 </span><span class="lineCov">         29 :         out_set[string_id] += in_string[pos];</span>
+<span class="lineNum">     277 </span><span class="lineCov">         29 :         pos++;</span>
+<span class="lineNum">     278 </span>            :       }
+<span class="lineNum">     279 </span><span class="lineCov">          5 :       pos++;        // Skip over any final deliminator</span>
+<span class="lineNum">     280 </span><span class="lineCov">          5 :       string_id++;  // Move to the next sub-string.</span>
+<span class="lineNum">     281 </span>            :     }
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span><span class="lineCov">          1 :   }</span>
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span>            :   // The next functions are not efficient, but they will take any number of inputs and
+<span class="lineNum">     287 </span>            :   // dynamically convert them all into a single, concatanated strings or stringstreams.
+<a name="288"><span class="lineNum">     288 </span>            : </a>
+<span class="lineNum">     289 </span>            :   namespace internal {
+<span class="lineNum">     290 </span><span class="lineCov">          1 :     void append_sstream(std::stringstream &amp; ss) { (void) ss; }</span>
+<a name="291"><span class="lineNum">     291 </span>            : </a>
+<span class="lineNum">     292 </span>            :     template &lt;typename TYPE, typename... OTHER_TYPES&gt;
+<span class="lineNum">     293 </span><span class="lineCov">          4 :     void append_sstream(std::stringstream &amp; ss, TYPE value, OTHER_TYPES... other_values) {</span>
+<span class="lineNum">     294 </span><span class="lineCov">          4 :       ss &lt;&lt; value;</span>
+<span class="lineNum">     295 </span><span class="lineCov">          4 :       append_sstream(ss, other_values...);</span>
+<span class="lineNum">     296 </span><span class="lineCov">          4 :     }</span>
+<span class="lineNum">     297 </span>            : 
+<a name="298"><span class="lineNum">     298 </span>            :     // Give mutliple implmentations of to_string_impl... if we can append quickly, do so!!</a>
+<span class="lineNum">     299 </span>            :     template &lt;typename... ALL_TYPES&gt;
+<span class="lineNum">     300 </span><span class="lineCov">          1 :     inline std::string to_string_impl(int, ALL_TYPES... all_values) {</span>
+<span class="lineNum">     301 </span><span class="lineCov">          2 :       std::stringstream ss;</span>
+<span class="lineNum">     302 </span><span class="lineCov">          1 :       append_sstream(ss, all_values...);</span>
+<span class="lineNum">     303 </span><span class="lineCov">          2 :       return ss.str();</span>
+<span class="lineNum">     304 </span>            :     }
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span>            :     // If there's a single POD entry, we can convert it manually and pass the result back.
+<span class="lineNum">     307 </span>            :     inline std::string to_string_impl(bool, const std::string &amp; s) { return s; }
+<span class="lineNum">     308 </span>            :     inline std::string to_string_impl(bool, const char * s) { return std::string(s); }
+<span class="lineNum">     309 </span>            :     inline std::string to_string_impl(bool, int32_t v) { return std::to_string(v); }
+<span class="lineNum">     310 </span>            :     inline std::string to_string_impl(bool, uint32_t v) { return std::to_string(v); }
+<span class="lineNum">     311 </span>            :     inline std::string to_string_impl(bool, int64_t v) { return std::to_string(v); }
+<span class="lineNum">     312 </span>            :     inline std::string to_string_impl(bool, uint64_t v) { return std::to_string(v); }
+<span class="lineNum">     313 </span>            :     inline std::string to_string_impl(bool, float v) { return std::to_string(v); }
+<span class="lineNum">     314 </span>            :     inline std::string to_string_impl(bool, double v) { return std::to_string(v); }
+<span class="lineNum">     315 </span>            :     inline std::string to_string_impl(bool, char c) { return std::string(1,c); }
+<span class="lineNum">     316 </span>            :     inline std::string to_string_impl(bool, unsigned char c) { return std::string(1,c); }
+<span class="lineNum">     317 </span>            :   }
+<a name="318"><span class="lineNum">     318 </span>            : </a>
+<span class="lineNum">     319 </span>            :   template &lt;typename... ALL_TYPES&gt;
+<span class="lineNum">     320 </span><span class="lineCov">          1 :   inline std::string to_string(ALL_TYPES... all_values) {</span>
+<span class="lineNum">     321 </span><span class="lineCov">          1 :     return internal::to_string_impl(true, std::forward&lt;ALL_TYPES&gt;(all_values)...);</span>
+<span class="lineNum">     322 </span>            :   }
+<span class="lineNum">     323 </span>            : }
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.11</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

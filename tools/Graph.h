@@ -2,9 +2,10 @@
 #define EMP_GRAPH_H
 
 //////////////////////////////////////////////////////////////////////////////////////////
+///  A simple, fast graph class
 //
-//  A simple, fast graph class
-//
+
+/*! This is a test */
 
 #include <assert.h>
 #include <iostream>
@@ -14,6 +15,8 @@
 
 namespace emp {
 
+/*! A simple, fast graph class.
+*/
   class Graph {
   public:
     class Node {

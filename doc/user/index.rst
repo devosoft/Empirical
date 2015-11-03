@@ -3,10 +3,10 @@ The Empirical User Documentation
 
 Contents:
 
-.. doxygennamespace:: emp
-   :project: Empirical
-   :members:
+.. toctree::
+   :maxdepth: 1
 
+   tools
 
 Indices and tables
 ==================
