@@ -1,0 +1,481 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - cov.info - tools/Random.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">tools</a> - Random.h<span style="font-size: 80%;"> (source / <a href="Random.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">cov.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">47</td>
+            <td class="headerCovTableEntry">48</td>
+            <td class="headerCovTableEntryHi">97.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2015-11-01 13:32:36</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #ifndef EMP_RANDOM_H</a>
+<span class="lineNum">       2 </span>            : #define EMP_RANDOM_H
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            : //////////////////////////////////////////////////////////////////////////////////////////////////
+<span class="lineNum">       5 </span>            : //
+<span class="lineNum">       6 </span>            : //  A versatile and non-patterned pseudo-random-number generator.
+<span class="lineNum">       7 </span>            : //
+<span class="lineNum">       8 </span>            : //  Constructor:
+<span class="lineNum">       9 </span>            : //    Random(int _seed=-1)
+<span class="lineNum">      10 </span>            : //      _seed is the random number seed that will produce a unique pseudo-random sequence.
+<span class="lineNum">      11 </span>            : //      (a value of -1 indicates that the seed should be bassed off of a combination of time
+<span class="lineNum">      12 </span>            : //      and the memory position of the random number generator, in case multiple generators
+<span class="lineNum">      13 </span>            : //      start at the same time.)
+<span class="lineNum">      14 </span>            : //
+<span class="lineNum">      15 </span>            : //  Other useful functions:
+<span class="lineNum">      16 </span>            : //    double GetDouble()
+<span class="lineNum">      17 </span>            : //    double GetDouble(double max)
+<span class="lineNum">      18 </span>            : //    double GetDouble(double min, double max)
+<span class="lineNum">      19 </span>            : //      Retrive a random double in the range [min, max).  By default, min=0.0 and max=1.0.
+<span class="lineNum">      20 </span>            : //
+<span class="lineNum">      21 </span>            : //    int GetInt(int max)
+<span class="lineNum">      22 </span>            : //    int GetInt(int min, int max)
+<span class="lineNum">      23 </span>            : //    uint32_t GetUInt(uint32_t max)
+<span class="lineNum">      24 </span>            : //    uint32_t GetUInt(uint32_t min, uint32_t max)
+<span class="lineNum">      25 </span>            : //      Retrive a random int or uint in the range [min, max).  By default, min=0.
+<span class="lineNum">      26 </span>            : //
+<span class="lineNum">      27 </span>            : //    bool P(double p)
+<span class="lineNum">      28 </span>            : //      Tests a random value [0,1) against a given probability p, and returns true of false.
+<span class="lineNum">      29 </span>            : //
+<span class="lineNum">      30 </span>            : //    bool Choose(int N, int K, std::vector&lt;int&gt; &amp; choices)
+<span class="lineNum">      31 </span>            : //      Chooses K random entries from N possibilities and returns the selections in the choices
+<span class="lineNum">      32 </span>            : //      vector.
+<span class="lineNum">      33 </span>            : //
+<span class="lineNum">      34 </span>            : //    double GetRandNormal(const double mean, const double std)
+<span class="lineNum">      35 </span>            : //    uint32_t GetRandPoisson(const double n, double p)
+<span class="lineNum">      36 </span>            : //    uint32_t GetRandPoisson(const double mean)
+<span class="lineNum">      37 </span>            : //    uint32_t GetRandBinomial(const double n, const double p)
+<span class="lineNum">      38 </span>            : //      Draw a value from the given distributions
+<span class="lineNum">      39 </span>            : //
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : // #include &lt;algorithm&gt;
+<span class="lineNum">      42 </span>            : #include &lt;ctime&gt;
+<span class="lineNum">      43 </span>            : #include &lt;climits&gt;
+<span class="lineNum">      44 </span>            : #include &lt;cmath&gt;
+<span class="lineNum">      45 </span>            : #include &lt;iterator&gt;
+<span class="lineNum">      46 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      47 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            : namespace emp {
+<span class="lineNum">      50 </span>            :   class Random {
+<span class="lineNum">      51 </span>            :   protected:
+<span class="lineNum">      52 </span>            :     // Internal members
+<span class="lineNum">      53 </span>            :     int seed;
+<span class="lineNum">      54 </span>            :     int original_seed;
+<span class="lineNum">      55 </span>            :     int inext;
+<span class="lineNum">      56 </span>            :     int inextp;
+<span class="lineNum">      57 </span>            :     int ma[56];
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            :     // Members &amp; functions for stat functions
+<span class="lineNum">      60 </span>            :     double expRV; // Exponential Random Variable for the randNormal function
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :     // Constants ////////////////////////////////////////////////////////////////
+<span class="lineNum">      63 </span>            :     // Statistical Approximation
+<span class="lineNum">      64 </span>            :     static const uint32_t _BINOMIAL_TO_NORMAL = 50;     // if &lt; n*p*(1-p)
+<span class="lineNum">      65 </span>            :     static const uint32_t _BINOMIAL_TO_POISSON = 1000;  // if &lt; n &amp;&amp; !Normal approx Engine
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            :     // Engine
+<span class="lineNum">      68 </span>            :     static const uint32_t _RAND_MBIG = 1000000000;
+<span class="lineNum">      69 </span>            :     static const uint32_t _RAND_MSEED = 161803398;
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :     // Internal functions
+<a name="72"><span class="lineNum">      72 </span>            : </a>
+<span class="lineNum">      73 </span>            :     // Setup, called on initialization and seed reset.
+<span class="lineNum">      74 </span><span class="lineCov">          2 :     void init()</span>
+<span class="lineNum">      75 </span>            :     {
+<span class="lineNum">      76 </span>            :       // Clear variables
+<span class="lineNum">      77 </span><span class="lineCov">          2 :       for (int i = 0; i &lt; 56; ++i) ma[i] = 0;</span>
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span><span class="lineCov">          2 :       int mj = (_RAND_MSEED - seed) % _RAND_MBIG;</span>
+<span class="lineNum">      80 </span><span class="lineCov">          2 :       ma[55] = mj;</span>
+<span class="lineNum">      81 </span><span class="lineCov">          2 :       int mk = 1;</span>
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span><span class="lineCov">        110 :       for (int i = 1; i &lt; 55; ++i) {</span>
+<span class="lineNum">      84 </span><span class="lineCov">        108 :         int ii = (21 * i) % 55;</span>
+<span class="lineNum">      85 </span><span class="lineCov">        108 :         ma[ii] = mk;</span>
+<span class="lineNum">      86 </span><span class="lineCov">        108 :         mk = mj - mk;</span>
+<span class="lineNum">      87 </span><span class="lineCov">        108 :         if (mk &lt; 0) mk += _RAND_MBIG;</span>
+<span class="lineNum">      88 </span><span class="lineCov">        108 :         mj = ma[ii];</span>
+<span class="lineNum">      89 </span>            :       }
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span><span class="lineCov">         10 :       for (int k = 0; k &lt; 4; ++k) {</span>
+<span class="lineNum">      92 </span><span class="lineCov">        440 :         for (int j = 1; j &lt; 55; ++j) {</span>
+<span class="lineNum">      93 </span><span class="lineCov">        432 :           ma[j] -= ma[1 + (j + 30) % 55];</span>
+<span class="lineNum">      94 </span><span class="lineCov">        432 :           if (ma[j] &lt; 0) ma[j] += _RAND_MBIG;</span>
+<span class="lineNum">      95 </span>            :         }
+<span class="lineNum">      96 </span>            :       }
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span><span class="lineCov">          2 :       inext = 0;</span>
+<span class="lineNum">      99 </span><span class="lineCov">          2 :       inextp = 31;</span>
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            :       // Setup variables used by Statistical Distribution functions
+<span class="lineNum">     102 </span><span class="lineCov">          2 :       expRV = -log(Random::Get() / (double) _RAND_MBIG);</span>
+<span class="lineNum">     103 </span><span class="lineCov">          2 :     }</span>
+<span class="lineNum">     104 </span>            :   
+<a name="105"><span class="lineNum">     105 </span>            :     // Basic Random number</a>
+<span class="lineNum">     106 </span>            :     // Returns a random number [0,_RAND_MBIG)
+<span class="lineNum">     107 </span><span class="lineCov">     300052 :     uint32_t Get() {</span>
+<span class="lineNum">     108 </span><span class="lineCov">     300052 :       if (++inext == 56) inext = 0;</span>
+<span class="lineNum">     109 </span><span class="lineCov">     300052 :       if (++inextp == 56) inextp = 0;</span>
+<span class="lineNum">     110 </span><span class="lineCov">     300052 :       int mj = ma[inext] - ma[inextp];</span>
+<span class="lineNum">     111 </span><span class="lineCov">     300052 :       if (mj &lt; 0) mj += _RAND_MBIG;</span>
+<span class="lineNum">     112 </span><span class="lineCov">     300052 :       ma[inext] = mj;</span>
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span><span class="lineCov">     300052 :       return mj;</span>
+<span class="lineNum">     115 </span>            :     }
+<span class="lineNum">     116 </span>            :   
+<span class="lineNum">     117 </span>            :   public:
+<span class="lineNum">     118 </span>            :     /**
+<span class="lineNum">     119 </span>            :      * Set up the random generator object.
+<span class="lineNum">     120 </span>            :      * @param _seed The seed of the random number generator. 
+<span class="lineNum">     121 </span>            :      * A negative seed means that the random number generator gets its
+<a name="122"><span class="lineNum">     122 </span>            :      * seed from the actual system time.</a>
+<span class="lineNum">     123 </span>            :      **/
+<span class="lineNum">     124 </span><span class="lineCov">          2 :     Random(const int _seed = -1) : seed(0), original_seed(0), inext(0), inextp(0), expRV(0) {</span>
+<span class="lineNum">     125 </span><span class="lineCov">          2 :       for (int i = 0; i &lt; 56; ++i) ma[i] = 0;</span>
+<span class="lineNum">     126 </span><span class="lineCov">          2 :       ResetSeed(_seed);  // Calls init()</span>
+<a name="127"><span class="lineNum">     127 </span><span class="lineCov">          2 :     }</span></a>
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span><span class="lineCov">          2 :     ~Random() { ; }</span>
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span>            :   
+<span class="lineNum">     132 </span>            :     /**
+<span class="lineNum">     133 </span>            :      * @return The seed that was actually used to start the random sequence.
+<span class="lineNum">     134 </span>            :      **/
+<span class="lineNum">     135 </span>            :     inline int GetSeed() const { return seed; }
+<span class="lineNum">     136 </span>            :   
+<span class="lineNum">     137 </span>            :     /**
+<span class="lineNum">     138 </span>            :      * @return The seed that was originally provided by the user.
+<span class="lineNum">     139 </span>            :      **/
+<span class="lineNum">     140 </span>            :     inline int GetOriginalSeed() const { return original_seed; }
+<span class="lineNum">     141 </span>            :   
+<span class="lineNum">     142 </span>            :     /**
+<span class="lineNum">     143 </span>            :      * Starts a new sequence of pseudo random numbers.
+<span class="lineNum">     144 </span>            :      *
+<span class="lineNum">     145 </span>            :      * @param new_seed The seed for the new sequence.
+<span class="lineNum">     146 </span>            :      * A negative seed means that the random number generator gets its
+<a name="147"><span class="lineNum">     147 </span>            :      * seed from the actual system time and the process ID.</a>
+<span class="lineNum">     148 </span>            :      **/
+<span class="lineNum">     149 </span><span class="lineCov">          2 :     void ResetSeed(const int _seed) {</span>
+<span class="lineNum">     150 </span><span class="lineCov">          2 :       original_seed = _seed;</span>
+<span class="lineNum">     151 </span>            :     
+<span class="lineNum">     152 </span><span class="lineCov">          2 :       if (_seed &lt;= 0) {</span>
+<span class="lineNum">     153 </span><span class="lineCov">          2 :         int seed_time = (int) time(NULL);</span>
+<span class="lineNum">     154 </span><span class="lineCov">          2 :         int seed_mem = (int) ((uint64_t) this);</span>
+<span class="lineNum">     155 </span><span class="lineCov">          2 :         seed = seed_time ^ seed_mem;</span>
+<span class="lineNum">     156 </span>            :       } else {
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :         seed = _seed;</span>
+<span class="lineNum">     158 </span>            :       }
+<span class="lineNum">     159 </span>            :     
+<span class="lineNum">     160 </span><span class="lineCov">          2 :       if (seed &lt; 0) seed *= -1;</span>
+<span class="lineNum">     161 </span><span class="lineCov">          2 :       seed %= _RAND_MSEED;</span>
+<span class="lineNum">     162 </span>            :     
+<span class="lineNum">     163 </span><span class="lineCov">          2 :       init();</span>
+<span class="lineNum">     164 </span><span class="lineCov">          2 :     }</span>
+<span class="lineNum">     165 </span>            :   
+<span class="lineNum">     166 </span>            :   
+<span class="lineNum">     167 </span>            :     // Random Number Generation /////////////////////////////////////////////////
+<span class="lineNum">     168 </span>            :   
+<span class="lineNum">     169 </span>            :     /**
+<span class="lineNum">     170 </span>            :      * Generate a double between 0.0 and 1.0
+<span class="lineNum">     171 </span>            :      *
+<a name="172"><span class="lineNum">     172 </span>            :      * @return The pseudo random number.</a>
+<span class="lineNum">     173 </span>            :      **/
+<span class="lineNum">     174 </span><span class="lineCov">     200019 :     double GetDouble() { return Get() / (double) _RAND_MBIG; }</span>
+<span class="lineNum">     175 </span>            :   
+<span class="lineNum">     176 </span>            :     /**
+<span class="lineNum">     177 </span>            :      * Generate a double between 0 and a given number.
+<span class="lineNum">     178 </span>            :      *
+<span class="lineNum">     179 </span>            :      * @return The pseudo random number.
+<span class="lineNum">     180 </span>            :      * @param max The upper bound for the random numbers (will never be returned).
+<span class="lineNum">     181 </span>            :      **/
+<span class="lineNum">     182 </span>            :     double GetDouble(const double max) { return GetDouble() * max; }
+<span class="lineNum">     183 </span>            :   
+<span class="lineNum">     184 </span>            :     /**
+<span class="lineNum">     185 </span>            :      * Generate a double out of a given interval.
+<span class="lineNum">     186 </span>            :      *
+<span class="lineNum">     187 </span>            :      * @return The pseudo random number.
+<span class="lineNum">     188 </span>            :      * @param min The lower bound for the random numbers.
+<a name="189"><span class="lineNum">     189 </span>            :      * @param max The upper bound for the random numbers (will never be returned).</a>
+<span class="lineNum">     190 </span>            :      **/
+<span class="lineNum">     191 </span><span class="lineCov">     100000 :     double GetDouble(const double min, const double max) { return GetDouble() * (max - min) + min; }</span>
+<span class="lineNum">     192 </span>            :   
+<span class="lineNum">     193 </span>            :     /**
+<span class="lineNum">     194 </span>            :      * Generate an uint32_t.
+<span class="lineNum">     195 </span>            :      *
+<span class="lineNum">     196 </span>            :      * @return The pseudo random number.
+<a name="197"><span class="lineNum">     197 </span>            :      * @param max The upper bound for the random numbers (will never be returned).</a>
+<span class="lineNum">     198 </span>            :      **/
+<span class="lineNum">     199 </span><span class="lineCov">     100019 :     uint32_t GetUInt(const uint32_t max) { return static_cast&lt;int&gt;(GetDouble() * static_cast&lt;double&gt;(max)); }</span>
+<span class="lineNum">     200 </span>            :   
+<span class="lineNum">     201 </span>            :     /**
+<span class="lineNum">     202 </span>            :      * Generate an uint32_t out of an interval.
+<span class="lineNum">     203 </span>            :      *
+<span class="lineNum">     204 </span>            :      * @return The pseudo random number.
+<span class="lineNum">     205 </span>            :      * @param min The lower bound for the random numbers.
+<span class="lineNum">     206 </span>            :      * @param max The upper bound for the random numbers (will never be returned).
+<span class="lineNum">     207 </span>            :      **/
+<span class="lineNum">     208 </span>            :     uint32_t GetUInt(const uint32_t min, const uint32_t max) { return GetUInt(max - min) + min; }
+<span class="lineNum">     209 </span>            :   
+<span class="lineNum">     210 </span>            :     /**
+<span class="lineNum">     211 </span>            :      * Generate an int out of an interval.
+<span class="lineNum">     212 </span>            :      *
+<span class="lineNum">     213 </span>            :      * @return The pseudo random number.
+<span class="lineNum">     214 </span>            :      * @param min The lower bound for the random numbers.
+<a name="215"><span class="lineNum">     215 </span>            :      * @param max The upper bound for the random numbers (will never be returned).</a>
+<a name="216"><span class="lineNum">     216 </span>            :      **/</a>
+<span class="lineNum">     217 </span><span class="lineCov">         19 :     int GetInt(const int max) { return static_cast&lt;int&gt;(GetUInt(max)); }</span>
+<span class="lineNum">     218 </span><span class="lineCov">     100000 :     int GetInt(const int min, const int max) { return static_cast&lt;int&gt;(GetUInt(max - min)) + min; }</span>
+<span class="lineNum">     219 </span>            :   
+<span class="lineNum">     220 </span>            :   
+<span class="lineNum">     221 </span>            :     // Random Event Generation //////////////////////////////////////////////////
+<a name="222"><span class="lineNum">     222 </span>            :   </a>
+<span class="lineNum">     223 </span>            :     // P(p) =&gt; if p &lt; [0,1) random variable
+<span class="lineNum">     224 </span><span class="lineCov">     100031 :     bool P(const double _p) { return (Get() &lt; (_p * _RAND_MBIG));}</span>
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span>            :     bool Choose(int N, int K, std::vector&lt;int&gt; &amp; choices) {
+<span class="lineNum">     227 </span>            :       if (N &lt; K || K &lt; 0) return false;
+<span class="lineNum">     228 </span>            :     
+<span class="lineNum">     229 </span>            :       choices.resize(K);
+<span class="lineNum">     230 </span>            :       while (K) {
+<span class="lineNum">     231 </span>            :         if (N==K || P(((double) K)/((double) N))) { choices[--K] = --N; }
+<span class="lineNum">     232 </span>            :         else --N;
+<span class="lineNum">     233 </span>            :       }
+<span class="lineNum">     234 </span>            :     
+<span class="lineNum">     235 </span>            :       return true;
+<span class="lineNum">     236 </span>            :     }
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            :     // Statistical functions ////////////////////////////////////////////////////
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            :     // Distributions //
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span>            :     /**
+<span class="lineNum">     244 </span>            :      * Generate a random variable drawn from a unit normal distribution.
+<span class="lineNum">     245 </span>            :      **/
+<span class="lineNum">     246 </span>            :     double GetRandNormal() {
+<span class="lineNum">     247 </span>            :       // Draw from a Unit Normal Dist
+<span class="lineNum">     248 </span>            :       // Using Rejection Method and saving of initial exponential random variable
+<span class="lineNum">     249 </span>            :       double expRV2;
+<span class="lineNum">     250 </span>            :       while (1) {
+<span class="lineNum">     251 </span>            :         expRV2 = -log(GetDouble());
+<span class="lineNum">     252 </span>            :         expRV -= (expRV2-1)*(expRV2-1)/2;
+<span class="lineNum">     253 </span>            :         if (expRV &gt; 0) break;  
+<span class="lineNum">     254 </span>            :         expRV = -log(GetDouble());
+<span class="lineNum">     255 </span>            :       }
+<span class="lineNum">     256 </span>            :       if (P(.5)) return expRV2;
+<span class="lineNum">     257 </span>            :       return -expRV2;
+<span class="lineNum">     258 </span>            :     }
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span>            :     /**
+<span class="lineNum">     261 </span>            :      * Generate a random variable drawn from a distribution with given
+<span class="lineNum">     262 </span>            :      * mean and standard deviation.
+<span class="lineNum">     263 </span>            :      **/
+<span class="lineNum">     264 </span>            :     double GetRandNormal(const double mean, const double std) { return mean + GetRandNormal() * std; }
+<span class="lineNum">     265 </span>            :   
+<span class="lineNum">     266 </span>            :     /**
+<span class="lineNum">     267 </span>            :      * Generate a random variable drawn from a Poisson distribution.
+<span class="lineNum">     268 </span>            :      **/
+<span class="lineNum">     269 </span>            :     uint32_t GetRandPoisson(const double n, double p) {
+<span class="lineNum">     270 </span>            :       // Optimizes for speed and calculability using symetry of the distribution
+<span class="lineNum">     271 </span>            :       if (p &gt; .5) return (uint32_t)n - GetRandPoisson(n * (1 - p));
+<span class="lineNum">     272 </span>            :       else return GetRandPoisson(n * p);
+<span class="lineNum">     273 </span>            :     }
+<span class="lineNum">     274 </span>            :   
+<span class="lineNum">     275 </span>            :     /**
+<span class="lineNum">     276 </span>            :      * Generate a random variable drawn from a Poisson distribution.
+<span class="lineNum">     277 </span>            :      *
+<span class="lineNum">     278 </span>            :      * @param mean The mean of the distribution.
+<span class="lineNum">     279 </span>            :      **/
+<span class="lineNum">     280 </span>            :     uint32_t GetRandPoisson(const double mean) {
+<span class="lineNum">     281 </span>            :       // Draw from a Poisson Dist with mean; if cannot calculate, return UINT_MAX.
+<span class="lineNum">     282 </span>            :       // Uses Rejection Method
+<span class="lineNum">     283 </span>            :       const double a = exp(-mean);
+<span class="lineNum">     284 </span>            :       if (a &lt;= 0) return UINT_MAX; // cannot calculate, so return UINT_MAX
+<span class="lineNum">     285 </span>            :       uint32_t k = 0;
+<span class="lineNum">     286 </span>            :       double u = GetDouble();
+<span class="lineNum">     287 </span>            :       while (u &gt;= a) {
+<span class="lineNum">     288 </span>            :         u *= GetDouble();
+<span class="lineNum">     289 </span>            :         ++k;
+<span class="lineNum">     290 </span>            :       }
+<span class="lineNum">     291 </span>            :       return k;
+<span class="lineNum">     292 </span>            :     }
+<span class="lineNum">     293 </span>            :   
+<span class="lineNum">     294 </span>            :     /**
+<span class="lineNum">     295 </span>            :      * Generate a random variable drawn from a Binomial distribution.
+<span class="lineNum">     296 </span>            :      * 
+<span class="lineNum">     297 </span>            :      * This function is exact, but slow. 
+<span class="lineNum">     298 </span>            :      * @see Random::GetRandBinomial
+<span class="lineNum">     299 </span>            :      **/
+<span class="lineNum">     300 </span>            :     uint32_t GetFullRandBinomial(const double n, const double p) { // Exact
+<span class="lineNum">     301 </span>            :       // Actually try n Bernoulli events with probability p
+<span class="lineNum">     302 </span>            :       uint32_t k = 0;
+<span class="lineNum">     303 </span>            :       for (uint32_t i = 0; i &lt; n; ++i) if (P(p)) k++;
+<span class="lineNum">     304 </span>            :       return k;
+<span class="lineNum">     305 </span>            :     }
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span>            :     /**
+<span class="lineNum">     308 </span>            :      * Generate a random variable drawn from a Binomial distribution.
+<span class="lineNum">     309 </span>            :      * 
+<span class="lineNum">     310 </span>            :      * This function is faster than @ref Random::GetFullRandBinomial(), but 
+<span class="lineNum">     311 </span>            :      * uses some approximations.
+<span class="lineNum">     312 </span>            :      *
+<span class="lineNum">     313 </span>            :      * @see Random::GetFullRandBinomial
+<span class="lineNum">     314 </span>            :      **/  
+<span class="lineNum">     315 </span>            :     uint32_t GetRandBinomial(const double n, const double p) { // Approx
+<span class="lineNum">     316 </span>            :       // Approximate Binomial if appropriate
+<span class="lineNum">     317 </span>            :       // if np(1-p) is large, use a Normal approx
+<span class="lineNum">     318 </span>            :       if (n * p * (1 - p) &gt;= _BINOMIAL_TO_NORMAL) {
+<span class="lineNum">     319 </span>            :         return static_cast&lt;uint32_t&gt;(GetRandNormal(n * p, n * p * (1 - p)) + 0.5);
+<span class="lineNum">     320 </span>            :       }
+<span class="lineNum">     321 </span>            :       // elseif n is large, use a Poisson approx
+<span class="lineNum">     322 </span>            :       if (n &gt;= _BINOMIAL_TO_POISSON) {
+<span class="lineNum">     323 </span>            :         uint32_t k = GetRandPoisson(n, p);
+<span class="lineNum">     324 </span>            :         if (k &lt; UINT_MAX) return k; // if approx worked
+<span class="lineNum">     325 </span>            :       }
+<span class="lineNum">     326 </span>            :       // otherwise, actually generate the randBinomial
+<span class="lineNum">     327 </span>            :       return GetFullRandBinomial(n, p);
+<span class="lineNum">     328 </span>            :     }
+<span class="lineNum">     329 </span>            :   };
+<span class="lineNum">     330 </span>            : 
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span>            :   /*! This is an adaptor to make Random behave like a proper STL random number
+<span class="lineNum">     333 </span>            :     generator.
+<span class="lineNum">     334 </span>            :   */
+<span class="lineNum">     335 </span>            :   struct RandomStdAdaptor {
+<span class="lineNum">     336 </span>            :     typedef int argument_type;
+<span class="lineNum">     337 </span>            :     typedef int result_type;
+<span class="lineNum">     338 </span>            :   
+<span class="lineNum">     339 </span>            :     RandomStdAdaptor(Random&amp; rng) : _rng(rng) { }
+<span class="lineNum">     340 </span>            :     int operator()(int n) { return _rng.GetInt(n); }
+<span class="lineNum">     341 </span>            :   
+<span class="lineNum">     342 </span>            :     Random&amp; _rng;
+<span class="lineNum">     343 </span>            :   };
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span>            : 
+<span class="lineNum">     346 </span>            :   /*! Draw a sample (with replacement) from an input range, copying to the output range.
+<span class="lineNum">     347 </span>            :    */
+<span class="lineNum">     348 </span>            :   template &lt;typename ForwardIterator, typename OutputIterator, typename RNG&gt;
+<span class="lineNum">     349 </span>            :   void sample_with_replacement(ForwardIterator first, ForwardIterator last, OutputIterator ofirst, OutputIterator olast, RNG rng) {
+<span class="lineNum">     350 </span>            :     std::size_t range = std::distance(first, last);
+<span class="lineNum">     351 </span>            :     while(ofirst != olast) {
+<span class="lineNum">     352 </span>            :       *ofirst = *(first+rng(range));
+<span class="lineNum">     353 </span>            :       ++ofirst;
+<span class="lineNum">     354 </span>            :     }
+<span class="lineNum">     355 </span>            :   }
+<span class="lineNum">     356 </span>            : 
+<span class="lineNum">     357 </span>            : 
+<span class="lineNum">     358 </span>            :   // /*! Draw a sample (without replacement) from an input range, copying to the output range.
+<span class="lineNum">     359 </span>            :   //  */
+<span class="lineNum">     360 </span>            :   // template &lt;typename ForwardIterator, typename OutputIterator, typename RNG&gt;
+<span class="lineNum">     361 </span>            :   // void sample_without_replacement(ForwardIterator first, ForwardIterator last, OutputIterator ofirst, OutputIterator olast, RNG rng) {
+<span class="lineNum">     362 </span>            :   //   std::size_t range = std::distance(first, last);
+<span class="lineNum">     363 </span>            :   //   std::size_t output_range = std::distance(ofirst, olast);
+<span class="lineNum">     364 </span>            :   
+<span class="lineNum">     365 </span>            :   //   // if our output range is greater in size than our input range, copy the whole thing.
+<span class="lineNum">     366 </span>            :   //   if(output_range &gt;= range) {
+<span class="lineNum">     367 </span>            :   //     std::copy(first, last, ofirst);
+<span class="lineNum">     368 </span>            :   //     return;
+<span class="lineNum">     369 </span>            :   //   }
+<span class="lineNum">     370 </span>            :         
+<span class="lineNum">     371 </span>            :   //   std::vector&lt;std::size_t&gt; rmap(range);
+<span class="lineNum">     372 </span>            :   //   int next_val = 0;
+<span class="lineNum">     373 </span>            :   //   for (std::size_t &amp; entry : rmap) entry = next_val++;
+<span class="lineNum">     374 </span>            :   //   std::random_shuffle(rmap.begin(), rmap.end());
+<span class="lineNum">     375 </span>            :   
+<span class="lineNum">     376 </span>            :   //   while(ofirst != olast) {
+<span class="lineNum">     377 </span>            :   //     *ofirst = *(first + rmap.back());
+<span class="lineNum">     378 </span>            :   //     ++ofirst;
+<span class="lineNum">     379 </span>            :   //     rmap.pop_back();
+<span class="lineNum">     380 </span>            :   //   }
+<span class="lineNum">     381 </span>            :   // }
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span>            :   // /*! Convenience function to draw samples (without replacement) from a range of values.
+<span class="lineNum">     384 </span>            :   //  */
+<span class="lineNum">     385 </span>            :   // template &lt;typename T, typename OutputIterator, typename RNG&gt;
+<span class="lineNum">     386 </span>            :   // void sample_range_without_replacement(T min, T max, OutputIterator ofirst, OutputIterator olast, RNG rng) {
+<span class="lineNum">     387 </span>            :   //   std::size_t range = static_cast&lt;std::size_t&gt;(max - min);
+<span class="lineNum">     388 </span>            :   //   std::vector&lt;T&gt; input(range);
+<span class="lineNum">     389 </span>            :   //   int next_val = min;
+<span class="lineNum">     390 </span>            :   //   for (T &amp; entry : input) entry = next_val++;
+<span class="lineNum">     391 </span>            :   //   sample_without_replacement(input.begin(), input.end(), ofirst, olast, rng);
+<span class="lineNum">     392 </span>            :   // }
+<span class="lineNum">     393 </span>            : 
+<span class="lineNum">     394 </span>            :         
+<span class="lineNum">     395 </span>            :   // /*! Choose one element at random from the given range.
+<span class="lineNum">     396 </span>            :   //  */
+<span class="lineNum">     397 </span>            :   // template &lt;typename ForwardIterator, typename RNG&gt;
+<span class="lineNum">     398 </span>            :   // ForwardIterator choose(ForwardIterator first, ForwardIterator last, RNG rng) {
+<span class="lineNum">     399 </span>            :   //   std::size_t range = std::distance(first, last);
+<span class="lineNum">     400 </span>            :   //   return first+rng(range);
+<span class="lineNum">     401 </span>            :   // }
+<span class="lineNum">     402 </span>            : 
+<span class="lineNum">     403 </span>            : }
+<span class="lineNum">     404 </span>            : 
+<span class="lineNum">     405 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.11</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

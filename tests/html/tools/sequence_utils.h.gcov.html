@@ -1,0 +1,248 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - cov.info - tools/sequence_utils.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">tools</a> - sequence_utils.h<span style="font-size: 80%;"> (source / <a href="sequence_utils.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">cov.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">73</td>
+            <td class="headerCovTableEntry">73</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2015-11-01 13:32:36</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #ifndef EMP_SEQUENCE_UTILS_H</a>
+<span class="lineNum">       2 </span>            : #define EMP_SEQUENCE_UTILS_H
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            : //////////////////////////////////////////////////////////////////////////////////////////
+<span class="lineNum">       5 </span>            : //
+<span class="lineNum">       6 </span>            : //  These functions focus on dealing with generic sequence types.
+<span class="lineNum">       7 </span>            : //
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #include &quot;functions.h&quot;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : namespace emp {
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            :   // --- Distance functions for any array-type objects ---
+<span class="lineNum">      14 </span>            : 
+<a name="15"><span class="lineNum">      15 </span>            :   // Hamming distance is a simple count of substitutions needed to convert on array to another.</a>
+<span class="lineNum">      16 </span>            :   template &lt;typename TYPE&gt;
+<span class="lineNum">      17 </span><span class="lineCov">          1 :   int calc_hamming_distance(const TYPE &amp; in1, const TYPE &amp; in2, int offset=0) {</span>
+<span class="lineNum">      18 </span><span class="lineCov">          1 :     if (offset &lt; 0) return calc_hamming_distance(in2, in1, -offset);</span>
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span><span class="lineCov">          1 :     const auto size1 = in1.size();</span>
+<span class="lineNum">      21 </span><span class="lineCov">          1 :     const auto size2 = in2.size();</span>
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            :     // Calculate by how much the strings overlap.
+<span class="lineNum">      24 </span><span class="lineCov">          1 :     int overlap = std::min( size1 - offset,  size2 );</span>
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            :     // Initialize the distance to that part of the strings which do not overlap.
+<span class="lineNum">      27 </span><span class="lineCov">          1 :     int num_diffs = size1 + size2 - 2 * overlap;</span>
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            :     // Step through the overlapped section and add on additional differences.
+<span class="lineNum">      30 </span><span class="lineCov">         31 :     for (size_t i = 0; i &lt; overlap; i++) {</span>
+<span class="lineNum">      31 </span><span class="lineCov">         30 :       if (in1[i + offset] != in2[i]) num_diffs++;</span>
+<span class="lineNum">      32 </span>            :     }
+<span class="lineNum">      33 </span>            :     
+<span class="lineNum">      34 </span><span class="lineCov">          1 :     return num_diffs;</span>
+<span class="lineNum">      35 </span>            :   }
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            :   // Edit distance is the minimum number of insertions, deletions and substitutions to convert
+<a name="38"><span class="lineNum">      38 </span>            :   // one array to another.</a>
+<span class="lineNum">      39 </span>            :   template &lt;typename TYPE&gt;
+<span class="lineNum">      40 </span><span class="lineCov">          1 :   int calc_edit_distance(const TYPE &amp; in1, const TYPE &amp; in2) {</span>
+<span class="lineNum">      41 </span><span class="lineCov">          1 :     const auto size1 = in1.size();</span>
+<span class="lineNum">      42 </span><span class="lineCov">          1 :     const auto size2 = in2.size();</span>
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            :     // If either size is zero, other size indicates number of insertions needed to produce it.
+<span class="lineNum">      45 </span><span class="lineCov">          1 :     if (size1 == 0) return size2;</span>
+<span class="lineNum">      46 </span><span class="lineCov">          1 :     if (size2 == 0) return size1;</span>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span><span class="lineCov">          2 :     std::vector&lt;int&gt; cur_row(size1);   // The row we are calculating</span>
+<span class="lineNum">      49 </span><span class="lineCov">          2 :     std::vector&lt;int&gt; prev_row(size1);  // The previous row we calculated</span>
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            :     // Initialize the previous row to record the differece from nothing.
+<span class="lineNum">      52 </span><span class="lineCov">          1 :     for (int i = 0; i &lt; size1; i++) prev_row[i] = i + 1;</span>
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :     // Loop through all other rows
+<span class="lineNum">      55 </span><span class="lineCov">         32 :     for (int row = 0; row &lt; (int) size2; row++) {</span>
+<span class="lineNum">      56 </span>            :       // Initialize the first entry in the current row.
+<span class="lineNum">      57 </span><span class="lineCov">         31 :       if (in1[0] == in2[row]) cur_row[0] = row;</span>
+<span class="lineNum">      58 </span><span class="lineCov">         30 :       else cur_row[0] = std::min(row, prev_row[0]) + 1;</span>
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            :       // Move through the cur_row and fill it in.
+<span class="lineNum">      61 </span><span class="lineCov">        930 :       for (int col = 1; col &lt; (int) size1; col++) {</span>
+<span class="lineNum">      62 </span>            :         // If the values are equal, keep the value in the upper left.
+<span class="lineNum">      63 </span><span class="lineCov">        899 :         if (in1[col] == in2[row]) cur_row[col] = prev_row[col-1];</span>
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            :         // Otherwise, set the current position the the minimal of the three
+<span class="lineNum">      66 </span>            :         // numbers to the upper right in the chart plus one.
+<span class="lineNum">      67 </span>            :         else {
+<span class="lineNum">      68 </span><span class="lineCov">        801 :           cur_row[col] = emp::min(prev_row[col], prev_row[col-1], cur_row[col-1]) + 1;</span>
+<span class="lineNum">      69 </span>            :         }
+<span class="lineNum">      70 </span>            :       }
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            :       // Swap cur_row and prev_row (keep cur vals in prev row, recycle vector cur_row)
+<span class="lineNum">      73 </span><span class="lineCov">         31 :       std::swap(cur_row, prev_row);</span>
+<span class="lineNum">      74 </span>            :     }
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            :     // Now that we are done, return the bottom-right corner of the chart.
+<span class="lineNum">      77 </span><span class="lineCov">          1 :     return prev_row[size1 - 1];</span>
+<span class="lineNum">      78 </span>            :   }
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            :   // Use edit distance to find the minimum number of insertions, deletions and substitutions
+<a name="81"><span class="lineNum">      81 </span>            :   // to convert one array to another, and then insert gaps into the arrays appropriately.</a>
+<span class="lineNum">      82 </span>            :   template &lt;typename TYPE, typename GAP_TYPE&gt;
+<span class="lineNum">      83 </span><span class="lineCov">          2 :   int align(TYPE &amp; in1, TYPE &amp; in2, GAP_TYPE gap) {</span>
+<span class="lineNum">      84 </span><span class="lineCov">          2 :     const auto size1 = in1.size();</span>
+<span class="lineNum">      85 </span><span class="lineCov">          2 :     const auto size2 = in2.size();</span>
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            :     // If either size is zero, other size indicates number of insertions needed to produce it.
+<span class="lineNum">      88 </span><span class="lineCov">          2 :     if (size1 == 0) return size2;</span>
+<span class="lineNum">      89 </span><span class="lineCov">          2 :     if (size2 == 0) return size1;</span>
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span><span class="lineCov">          4 :     std::vector&lt;int&gt; cur_row(size1);   // The row we are calculating</span>
+<span class="lineNum">      92 </span><span class="lineCov">          4 :     std::vector&lt;int&gt; prev_row(size1);  // The previous row we calculated</span>
+<span class="lineNum">      93 </span><span class="lineCov">          4 :     std::vector&lt;std::vector&lt;char&gt; &gt; edit_info(size2, std::vector&lt;char&gt;(size1));</span>
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :     // Initialize the previous row to record the differece from nothing.
+<span class="lineNum">      96 </span><span class="lineCov">         27 :     for (int i = 0; i &lt; size1; i++) {</span>
+<span class="lineNum">      97 </span><span class="lineCov">         25 :       prev_row[i] = i + 1;</span>
+<span class="lineNum">      98 </span><span class="lineCov">         25 :       edit_info[0][i] = 'i';</span>
+<span class="lineNum">      99 </span>            :     }
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            :     // Loop through all other rows
+<span class="lineNum">     102 </span><span class="lineCov">         33 :     for (int row = 0; row &lt; (int) size2; row++) {</span>
+<span class="lineNum">     103 </span>            :       // Initialize the first entry in the current row.
+<span class="lineNum">     104 </span><span class="lineCov">         31 :       if (in1[0] == in2[row]) { cur_row[0] = row; edit_info[row][0] = 's'; }</span>
+<span class="lineNum">     105 </span><span class="lineCov">         29 :       else { cur_row[0] = prev_row[0] + 1; edit_info[row][0] = 'd'; }</span>
+<span class="lineNum">     106 </span>            :       
+<span class="lineNum">     107 </span>            :       // Move through the cur_row and fill it in.
+<span class="lineNum">     108 </span><span class="lineCov">        461 :       for (int col = 1; col &lt; (int) size1; col++) {</span>
+<span class="lineNum">     109 </span>            :         // If the values are equal, keep the value in the upper left.
+<span class="lineNum">     110 </span><span class="lineCov">        430 :         if (in1[col] == in2[row]) { cur_row[col] = prev_row[col-1]; edit_info[row][col] = 's'; }</span>
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span>            :         // Otherwise, set the current position to the minimum of the three
+<span class="lineNum">     113 </span>            :         // numbers to the left, upper, or upper left in the chart plus one.
+<span class="lineNum">     114 </span>            :         else {
+<span class="lineNum">     115 </span><span class="lineCov">        411 :           cur_row[col] = emp::min(prev_row[col], prev_row[col-1], cur_row[col-1]) + 1;</span>
+<span class="lineNum">     116 </span><span class="lineCov">        411 :           if (cur_row[col] == prev_row[col]+1)   { edit_info[row][col] = 'd'; }</span>
+<span class="lineNum">     117 </span><span class="lineCov">        411 :           if (cur_row[col] == prev_row[col-1]+1) { edit_info[row][col] = 's'; }</span>
+<span class="lineNum">     118 </span><span class="lineCov">        411 :           if (cur_row[col] == cur_row[col-1]+1)  { edit_info[row][col] = 'i'; }</span>
+<span class="lineNum">     119 </span>            :         }
+<span class="lineNum">     120 </span>            :       }
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span>            :       // Swap cur_row and prev_row (keep cur vals in prev row, recycle vector cur_row)
+<span class="lineNum">     123 </span><span class="lineCov">         31 :       std::swap(cur_row, prev_row);</span>
+<span class="lineNum">     124 </span>            :     }
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            :     // Fill in gaps in the sequences to make them align!
+<span class="lineNum">     127 </span>            :     
+<span class="lineNum">     128 </span><span class="lineCov">          2 :     int c = size1-1;</span>
+<span class="lineNum">     129 </span><span class="lineCov">          2 :     int r = size2-1;</span>
+<span class="lineNum">     130 </span><span class="lineCov">          2 :     int length = 0;</span>
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span><span class="lineCov">         72 :     while (c &gt;= 0 || r &gt;= 0) {</span>
+<span class="lineNum">     133 </span><span class="lineCov">         35 :       if (c &lt; 0) { ++length; --r; continue; }</span>
+<span class="lineNum">     134 </span><span class="lineCov">         35 :       else if (r &lt; 0) { ++length; --c; continue; }</span>
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span><span class="lineCov">         35 :       char cur_move = edit_info[r][c];</span>
+<span class="lineNum">     137 </span><span class="lineCov">         35 :       switch(cur_move) {</span>
+<span class="lineNum">     138 </span><span class="lineCov">         21 :       case 's': --c; --r; ++length; break;</span>
+<span class="lineNum">     139 </span><span class="lineCov">         10 :       case 'd': --r; ++length; break;</span>
+<span class="lineNum">     140 </span><span class="lineCov">          4 :       case 'i': --c; ++length; break;</span>
+<span class="lineNum">     141 </span>            :       };
+<span class="lineNum">     142 </span>            :     }
+<span class="lineNum">     143 </span>            :       
+<span class="lineNum">     144 </span><span class="lineCov">          2 :     c = size1-1;</span>
+<span class="lineNum">     145 </span><span class="lineCov">          2 :     r = size2-1;</span>
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span><span class="lineCov">          4 :     TYPE out1(length, gap);</span>
+<span class="lineNum">     148 </span><span class="lineCov">          4 :     TYPE out2(length, gap);</span>
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span><span class="lineCov">          2 :     int pos = length - 1;</span>
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span><span class="lineCov">         72 :     while (c &gt;= 0 &amp;&amp; r &gt;= 0) {</span>
+<span class="lineNum">     153 </span><span class="lineCov">         35 :       switch(edit_info[r][c]) {</span>
+<span class="lineNum">     154 </span><span class="lineCov">         21 :       case 's': out1[pos] = in1[c]; out2[pos] = in2[r]; --c; --r; break;</span>
+<span class="lineNum">     155 </span><span class="lineCov">         10 :       case 'd': out1[pos] = gap;    out2[pos] = in2[r];      --r; break;</span>
+<span class="lineNum">     156 </span><span class="lineCov">          4 :       case 'i': out1[pos] = in1[c]; out2[pos] = gap;    --c;      break;</span>
+<span class="lineNum">     157 </span>            :       };
+<span class="lineNum">     158 </span><span class="lineCov">         35 :       --pos;</span>
+<span class="lineNum">     159 </span>            :     }
+<span class="lineNum">     160 </span><span class="lineCov">          2 :     while (c &gt;= 0) { out1[pos] = in1[c]; --c; --pos; }</span>
+<span class="lineNum">     161 </span><span class="lineCov">          2 :     while (r &gt;= 0) { out2[pos] = in2[r]; --r; --pos; }</span>
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span><span class="lineCov">          2 :     in1 = out1;</span>
+<span class="lineNum">     164 </span><span class="lineCov">          2 :     in2 = out2;</span>
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            :     // Now that we are done, return the bottom-right corner of the chart.
+<span class="lineNum">     167 </span><span class="lineCov">          2 :     return prev_row[size1 - 1];</span>
+<span class="lineNum">     168 </span>            :   }
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            : }
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.11</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - cov.info - tools/BitMatrix.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">tools</a> - BitMatrix.h<span style="font-size: 80%;"> (source / <a href="BitMatrix.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">cov.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2015-11-01 13:32:36</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #ifndef EMP_BIT_MATRIX_H</a>
+<span class="lineNum">       2 </span>            : #define EMP_BIT_MATRIX_H
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            : //////////////////////////////////////////////////////////////////////////////////////////////////
+<span class="lineNum">       5 </span>            : //
+<span class="lineNum">       6 </span>            : //  BIT_MATRIX maintains a COL x ROW matrix of bits and provides easy indexing and manipulation.
+<span class="lineNum">       7 </span>            : //
+<span class="lineNum">       8 </span>            : //  Bits are translated to a bitset with 0 in the upper left and moving through bits from
+<span class="lineNum">       9 </span>            : //  left to right and top to bottom.  For example, the indecies in a 3x3 bit matrix would be
+<span class="lineNum">      10 </span>            : //  organized as such:
+<span class="lineNum">      11 </span>            : //
+<span class="lineNum">      12 </span>            : //    0 1 2
+<span class="lineNum">      13 </span>            : //    3 4 5
+<span class="lineNum">      14 </span>            : //    6 7 8
+<span class="lineNum">      15 </span>            : //
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #include &quot;BitSet.h&quot;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #ifndef functions
+<span class="lineNum">      22 </span>            : #include &quot;functions.h&quot;
+<span class="lineNum">      23 </span>            : #endif
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : #include &quot;bitset_utils.h&quot;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : namespace emp {
+<span class="lineNum">      28 </span>            :   template &lt;int COLS, int ROWS&gt;
+<span class="lineNum">      29 </span>            :   class BitMatrix {
+<span class="lineNum">      30 </span>            :   private:
+<span class="lineNum">      31 </span>            :     BitSet&lt;COLS*ROWS&gt; bits;
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            :   public:
+<span class="lineNum">      34 </span>            :     template &lt;int START_POS, int STEP_POS, int END_POS&gt;
+<span class="lineNum">      35 </span>            :     constexpr BitSet&lt;COLS*ROWS&gt; Mask() const {
+<span class="lineNum">      36 </span>            :       return BitSet&lt;COLS*ROWS&gt;();
+<span class="lineNum">      37 </span>            :     }
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            :     template &lt;int COL_ID&gt; static const BitSet&lt;COLS*ROWS&gt; &amp; MaskCol() {
+<span class="lineNum">      40 </span>            :       static bool init = false;
+<span class="lineNum">      41 </span>            :       static BitSet&lt;COLS*ROWS&gt; mask;
+<span class="lineNum">      42 </span>            :       if (!init) {
+<span class="lineNum">      43 </span>            :         for (int i = 0; i &lt; ROWS; i++) mask[i*COLS + COL_ID] = 1;
+<span class="lineNum">      44 </span>            :         init = true;
+<span class="lineNum">      45 </span>            :       }
+<span class="lineNum">      46 </span>            :       return mask;
+<span class="lineNum">      47 </span>            :       // return mask_pattern&lt;COLS*ROWS, COL_ID, COLS, COLS*ROWS-1&gt;();
+<span class="lineNum">      48 </span>            :     }
+<span class="lineNum">      49 </span>            :       
+<span class="lineNum">      50 </span>            :     template &lt;int ROW_ID&gt; static const BitSet&lt;COLS*ROWS&gt; &amp; MaskRow() {
+<span class="lineNum">      51 </span>            :       static bool init = false;
+<span class="lineNum">      52 </span>            :       static BitSet&lt;COLS*ROWS&gt; mask;
+<span class="lineNum">      53 </span>            :       if (!init) {
+<span class="lineNum">      54 </span>            :         for (int i = 0; i &lt; COLS; i++) mask[ROW_ID * COLS + i] = 1;
+<span class="lineNum">      55 </span>            :         init = true;
+<span class="lineNum">      56 </span>            :       }
+<span class="lineNum">      57 </span>            :       return mask;
+<span class="lineNum">      58 </span>            :     }
+<a name="59"><span class="lineNum">      59 </span>            :       </a>
+<span class="lineNum">      60 </span>            :   public:
+<span class="lineNum">      61 </span><span class="lineCov">          1 :     BitMatrix() { ; }</span>
+<a name="62"><span class="lineNum">      62 </span>            :     BitMatrix(const BitSet&lt;COLS*ROWS&gt; &amp; in_bits) : bits(in_bits) { ; }</a>
+<span class="lineNum">      63 </span>            :     BitMatrix(const BitMatrix &amp; in_matrix) : bits(in_matrix.bits) { ; }
+<a name="64"><span class="lineNum">      64 </span><span class="lineCov">          1 :     ~BitMatrix() { ; }</span></a>
+<a name="65"><span class="lineNum">      65 </span>            : </a>
+<a name="66"><span class="lineNum">      66 </span><span class="lineCov">          1 :     constexpr int NumRows() const { return ROWS; }</span></a>
+<span class="lineNum">      67 </span><span class="lineCov">          1 :     constexpr int NumCols() const { return COLS; }</span>
+<span class="lineNum">      68 </span><span class="lineCov">          1 :     constexpr int GetSize() const { return ROWS * COLS; }</span>
+<span class="lineNum">      69 </span>            : 
+<a name="70"><span class="lineNum">      70 </span>            :     inline static int GetCol(int id) { return id % COLS; }</a>
+<span class="lineNum">      71 </span>            :     inline static int GetRow(int id) { return id / COLS; }
+<a name="72"><span class="lineNum">      72 </span><span class="lineCov">          6 :     inline static int GetID(int col, int row) { return row * COLS + col; }</span></a>
+<a name="73"><span class="lineNum">      73 </span>            : </a>
+<a name="74"><span class="lineNum">      74 </span><span class="lineCov">          2 :     bool Any() const { return bits.any(); }</span></a>
+<span class="lineNum">      75 </span><span class="lineCov">          2 :     bool None() const { return bits.none(); }</span>
+<a name="76"><span class="lineNum">      76 </span><span class="lineCov">          2 :     bool All() const { return bits.all(); }</span></a>
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span><span class="lineCov">          4 :     bool Get(int col, int row) const { return bits[GetID(col,row)]; }</span>
+<a name="79"><span class="lineNum">      79 </span>            :     bool Get(int id) const { return bits[id]; }</a>
+<span class="lineNum">      80 </span>            :     
+<span class="lineNum">      81 </span><span class="lineCov">          1 :     void Set(int col, int row, bool val=true) { bits[GetID(col, row)] = val; }</span>
+<span class="lineNum">      82 </span>            :     void Set(int id) { bits[id] = true; }
+<span class="lineNum">      83 </span>            :     void Unset(int col, int row) { bits[GetID(col, row)] = false; }
+<span class="lineNum">      84 </span>            :     void Unset(int id) { bits[id] = false; }
+<span class="lineNum">      85 </span>            :     void Flip(int col, int row) { bits.flip(GetID(col, row)); }
+<span class="lineNum">      86 </span>            :     void Flip(int id) { bits.flip(id); }
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            :     void SetAll() { bits.set(); }
+<span class="lineNum">      89 </span>            :     void SetCol(int col) { bits |= (MaskCol&lt;0&gt; &lt;&lt; col); }
+<span class="lineNum">      90 </span>            :     void SetRow(int row) { bits |= (MaskRow&lt;0&gt; &lt;&lt; (row * COLS)); }
+<span class="lineNum">      91 </span>            :     void Clear() { bits.clear(); }
+<span class="lineNum">      92 </span>            :     void ClearCol(int col) { bits &amp;= ~(MaskCol&lt;0&gt; &lt;&lt; col); }
+<span class="lineNum">      93 </span>            :     void ClearRow(int row) { bits &amp;= ~(MaskRow&lt;0&gt; &lt;&lt; (row * COLS)); }
+<a name="94"><span class="lineNum">      94 </span>            : </a>
+<span class="lineNum">      95 </span>            :     // Count the number of set bits in the matrix.
+<span class="lineNum">      96 </span><span class="lineCov">          2 :     int CountOnes() const { return bits.count(); }</span>
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            :     // Find the position of the first non-zero bit.
+<a name="99"><span class="lineNum">      99 </span>            :     // int FindBit() const { return (~bits &amp; (bits - 1)).count(); }</a>
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span><span class="lineCov">          1 :     int FindBit() const { return bits.FindBit(); }</span>
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            :     // Shift the whole matrix in the specified direction.
+<span class="lineNum">     104 </span>            :     BitMatrix LeftShift() const { return ((bits &amp; ~MaskCol&lt;0&gt;()) &gt;&gt; 1); }
+<span class="lineNum">     105 </span>            :     BitMatrix RightShift() const { return ((bits &lt;&lt; 1) &amp; ~MaskCol&lt;0&gt;()); }
+<span class="lineNum">     106 </span>            :     BitMatrix UpShift() const { return bits &gt;&gt; COLS; } 
+<span class="lineNum">     107 </span>            :     BitMatrix DownShift() const { return bits &lt;&lt; COLS; }
+<span class="lineNum">     108 </span>            :     BitMatrix ULShift() const { return ((bits &amp; ~MaskCol&lt;0&gt;()) &gt;&gt; (COLS+1)); }    
+<span class="lineNum">     109 </span>            :     BitMatrix DLShift() const { return ((bits &amp; ~MaskCol&lt;0&gt;()) &lt;&lt; (COLS-1)); }
+<span class="lineNum">     110 </span>            :     BitMatrix URShift() const { return ((bits &gt;&gt; (COLS-1)) &amp; ~MaskCol&lt;0&gt;()); }
+<span class="lineNum">     111 </span>            :     BitMatrix DRShift() const { return ((bits &lt;&lt; (COLS+1)) &amp; ~MaskCol&lt;0&gt;()); }
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            :     // Find all points within one step of the ones on this bit matrix.
+<span class="lineNum">     114 </span>            :     BitMatrix GetReach() const { return *this | LeftShift() | RightShift() | UpShift() | DownShift(); }
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            :     // Find all points reachable from the start position.
+<span class="lineNum">     117 </span>            :     BitMatrix GetRegion(int start_pos) const {
+<span class="lineNum">     118 </span>            :       // Make sure we have a legal region, or else return an empty matrix.
+<span class="lineNum">     119 </span>            :       if (start_pos &lt; 0 || start_pos &gt;= GetSize() || bits[start_pos] == 0) return BitMatrix();
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            :       BitMatrix cur_region, last_region;
+<span class="lineNum">     122 </span>            :       cur_region.Set(start_pos);
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            :       while (cur_region != last_region) {
+<span class="lineNum">     125 </span>            :         last_region = cur_region;
+<span class="lineNum">     126 </span>            :         cur_region = *this &amp; cur_region.GetReach();
+<span class="lineNum">     127 </span>            :       }
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span>            :       return cur_region;
+<span class="lineNum">     130 </span>            :     }
+<span class="lineNum">     131 </span>            :     BitMatrix GetRegion(int col, int row) const { return GetRegion(GetID(col,row)); }
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            :     // Does this bit matrix represent a connected set of ones?
+<span class="lineNum">     134 </span>            :     bool IsConnected() const { return GetRegion(FindBit()) == *this; }
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span>            :     // Does this bit matrix have any 2x2 square of ones in it?
+<span class="lineNum">     137 </span>            :     bool Has2x2() const { return (*this &amp; UpShift() &amp; LeftShift() &amp; ULShift()).Any(); }
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span>            :     void Print(std::ostream &amp; os = std::cout) const {
+<span class="lineNum">     140 </span>            :       for (int y = 0; y &lt; ROWS; y++) {
+<span class="lineNum">     141 </span>            :         for (int x = 0; x &lt; COLS; x++) {
+<span class="lineNum">     142 </span>            :           os &lt;&lt; bits[GetID(x,y)];
+<span class="lineNum">     143 </span>            :         }
+<span class="lineNum">     144 </span>            :         os &lt;&lt; std::endl;
+<span class="lineNum">     145 </span>            :       }
+<span class="lineNum">     146 </span>            :     }
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            :     // Assignments and compound assignments
+<span class="lineNum">     149 </span>            :     BitMatrix &amp; operator=(const BitMatrix &amp; in) { bits = in.bits; return *this; }
+<span class="lineNum">     150 </span>            :     BitMatrix &amp; operator&amp;=(const BitMatrix &amp; in) { bits &amp;= in.bits; return *this; }
+<span class="lineNum">     151 </span>            :     BitMatrix &amp; operator|=(const BitMatrix &amp; in) { bits |= in.bits; return *this; }
+<span class="lineNum">     152 </span>            :     BitMatrix &amp; operator^=(const BitMatrix &amp; in) { bits ^= in.bits; return *this; }
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span>            :     // Comparisons
+<span class="lineNum">     155 </span>            :     bool operator==(const BitMatrix &amp; in) const { return bits == in.bits; }
+<span class="lineNum">     156 </span>            :     bool operator!=(const BitMatrix &amp; in) const { return bits != in.bits; }
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            :     // Logic operators
+<span class="lineNum">     159 </span>            :     BitMatrix operator~() const { return ~bits; }
+<span class="lineNum">     160 </span>            :     BitMatrix operator&amp;(const BitMatrix &amp; in) const { return bits &amp; in.bits; }
+<span class="lineNum">     161 </span>            :     BitMatrix operator|(const BitMatrix &amp; in) const { return bits | in.bits; }
+<span class="lineNum">     162 </span>            :     BitMatrix operator^(const BitMatrix &amp; in) const { return bits ^ in.bits; }
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span>            :     // Conversions
+<span class="lineNum">     165 </span>            :     const BitSet&lt;COLS*ROWS&gt; &amp; to_bitset() { return bits; }
+<span class="lineNum">     166 </span>            :   };
+<span class="lineNum">     167 </span>            : }
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.11</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
