@@ -3,8 +3,17 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
-//  The Document class is built off of Slate, but immediately initializes the EMP web
-//  framework and activates itself.
+//  The Document class is built off of Slate, but initializes the EMP web framework, if
+//  neeeded, and activates itself.  It also provides quick ways to add and lookup
+//  widgets.
+//
+//  For example, you can use doc.AddButon(...) to add a new button to the document,
+//  where the ... can be any of the mechanisms to build a new button.  This technique
+//  works for any widget type.
+//
+//  You can also look up any widget by name.  For example, if you previously created a
+//  Canvas widget with the HTML id "my_canvas", you can look it up later by using
+//  doc.Canvas("my_canvas")
 //
 
 #include "Button.h"
