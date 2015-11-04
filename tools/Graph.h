@@ -1,12 +1,6 @@
 #ifndef EMP_GRAPH_H
 #define EMP_GRAPH_H
 
-//////////////////////////////////////////////////////////////////////////////////////////
-///  A simple, fast graph class
-//
-
-/*! This is a test */
-
 #include <assert.h>
 #include <iostream>
 #include <vector>
