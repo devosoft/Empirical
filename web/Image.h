@@ -3,7 +3,11 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Specs for the Image widget.
+//  The Image widget will load an image from a specified URL.  For example, you can use
+//  emp::web::Image("http://kripken.github.io/emscripten-site/_static/Emscripten_logo_full.png")
+//  to load the emscripten logo from its website.
+//
+//  You can also set the Alt-text with the Alt() function.
 //
 
 #include "Widget.h"
