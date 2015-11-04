@@ -1,11 +1,17 @@
 The Empirical Tools Documentation
 =================================
 
-Graph:
+**alert.h**
 
-.. doxygenclass:: emp::Graph
+.. doxygenfile:: alert.h
    :project: Empirical
-   :members:
-   :private-members:
-   :protected-members:
-   :undoc-members: 
+
+**functions.h**
+
+.. doxygenfile:: functions.h
+   :project: Empirical
+
+**Empirical 'emp' namespace**
+
+.. doxygennamespace:: emp
+   :project: Empirical
