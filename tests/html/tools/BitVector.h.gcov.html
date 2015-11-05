@@ -1,0 +1,628 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - cov.info - tools/BitVector.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">tools</a> - BitVector.h<span style="font-size: 80%;"> (source / <a href="BitVector.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">cov.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">128</td>
+            <td class="headerCovTableEntry">164</td>
+            <td class="headerCovTableEntryMed">78.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2015-11-01 13:32:36</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">33</td>
+            <td class="headerCovTableEntry">39</td>
+            <td class="headerCovTableEntryMed">84.6 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #ifndef EMP_BIT_VECTOR_H</a>
+<span class="lineNum">       2 </span>            : #define EMP_BIT_VECTOR_H
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            : //////////////////////////////////////////////////////////////////////////////////////////
+<span class="lineNum">       5 </span>            : //
+<span class="lineNum">       6 </span>            : // Class: emp::BitVector
+<span class="lineNum">       7 </span>            : // Desc: A customized version of std::vector&lt;bool&gt; with additional bit magic operations
+<span class="lineNum">       8 </span>            : //
+<span class="lineNum">       9 </span>            : // To implement: append(), resize()...
+<span class="lineNum">      10 </span>            : //
+<span class="lineNum">      11 </span>            : // Note, this class is about 15-20% slower than BitSet, but is not fixed size and does
+<span class="lineNum">      12 </span>            : // not require knowledge of the size at compile time.
+<span class="lineNum">      13 </span>            : //
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : #include &lt;assert.h&gt;
+<span class="lineNum">      16 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">      17 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #include &quot;bitset_utils.h&quot;
+<span class="lineNum">      20 </span>            : #include &quot;const_utils.h&quot;
+<span class="lineNum">      21 </span>            : #include &quot;functions.h&quot;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : namespace emp {
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            :   class BitVector {
+<span class="lineNum">      26 </span>            :   private:
+<span class="lineNum">      27 </span>            : #ifdef EMSCRIPTEN
+<span class="lineNum">      28 </span>            :     typedef uint32_t field_type;
+<span class="lineNum">      29 </span>            : #else
+<span class="lineNum">      30 </span>            :     // typedef uint32_t field_type;
+<span class="lineNum">      31 </span>            :     typedef uint64_t field_type;
+<span class="lineNum">      32 </span>            : #endif
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            :     static const int FIELD_BITS = sizeof(field_type)*8;
+<a name="35"><span class="lineNum">      35 </span>            :     int num_bits;</a>
+<a name="36"><span class="lineNum">      36 </span>            : </a>
+<span class="lineNum">      37 </span><span class="lineCov">     100001 :     int LastBitID() const { return num_bits &amp; (FIELD_BITS - 1); }</span>
+<span class="lineNum">      38 </span><span class="lineCov">    1200261 :     int NumFields() const { return 1 + ((num_bits - 1) / FIELD_BITS); }</span>
+<span class="lineNum">      39 </span>            :     int NumBytes() const { return  1 + ((num_bits - 1) &gt;&gt; 3); }
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            :     field_type * bit_set;
+<span class="lineNum">      42 </span>            :     
+<span class="lineNum">      43 </span>            :     // Setup a bit proxy so that we can use operator[] on bit sets as an lvalue.
+<span class="lineNum">      44 </span>            :     class BitProxy {
+<span class="lineNum">      45 </span>            :     private:
+<span class="lineNum">      46 </span>            :       BitVector &amp; bit_vector;
+<a name="47"><span class="lineNum">      47 </span>            :       int index;</a>
+<span class="lineNum">      48 </span>            :     public:
+<a name="49"><span class="lineNum">      49 </span><span class="lineCov">      40002 :       BitProxy(BitVector &amp; _v, int _idx) : bit_vector(_v), index(_idx) {;}</span></a>
+<span class="lineNum">      50 </span>            :       
+<span class="lineNum">      51 </span><span class="lineCov">      40002 :       BitProxy &amp; operator=(bool b) {    // lvalue handling...</span>
+<span class="lineNum">      52 </span><span class="lineCov">      40002 :         bit_vector.Set(index, b);</span>
+<span class="lineNum">      53 </span><span class="lineCov">      40002 :         return *this;</span>
+<span class="lineNum">      54 </span>            :       }
+<span class="lineNum">      55 </span>            :       operator bool() const {            // rvalue handling...
+<span class="lineNum">      56 </span>            :         return bit_vector.Get(index);
+<span class="lineNum">      57 </span>            :       }
+<span class="lineNum">      58 </span>            :     };
+<a name="59"><span class="lineNum">      59 </span>            :     friend class BitProxy;</a>
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span><span class="lineCov">      68644 :     inline static int FieldID(const int index)  {</span>
+<span class="lineNum">      62 </span><span class="lineCov">      68644 :       assert(index &gt;= 0);</span>
+<a name="63"><span class="lineNum">      63 </span><span class="lineCov">      68644 :       return index / FIELD_BITS;</span></a>
+<span class="lineNum">      64 </span>            :     }
+<span class="lineNum">      65 </span><span class="lineCov">      68644 :     inline static int FieldPos(const int index) {</span>
+<span class="lineNum">      66 </span><span class="lineCov">      68644 :       assert(index &gt;= 0);</span>
+<span class="lineNum">      67 </span><span class="lineCov">      68644 :       return index &amp; (FIELD_BITS-1);</span>
+<span class="lineNum">      68 </span>            :     }
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :     inline static int Byte2Field(const int index) { return index/4; }
+<span class="lineNum">      71 </span>            :     inline static int Byte2FieldPos(const int index) { return (index &amp; 3) &lt;&lt; 3; }
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            :     // The following function assumes that the size of the bit_set has already been adjusted
+<a name="74"><span class="lineNum">      74 </span>            :     // to be the same as the size of the one being copied and only the fields need to be</a>
+<span class="lineNum">      75 </span>            :     // copied over.
+<span class="lineNum">      76 </span><span class="lineCov">     300082 :     inline void RawCopy(const field_type * in_set) {</span>
+<span class="lineNum">      77 </span><span class="lineCov">     300082 :       const int NUM_FIELDS = NumFields();</span>
+<span class="lineNum">      78 </span><span class="lineCov">     300082 :       for (int i = 0; i &lt; NUM_FIELDS; i++) bit_set[i] = in_set[i];</span>
+<span class="lineNum">      79 </span><span class="lineCov">     300082 :     }</span>
+<a name="80"><span class="lineNum">      80 </span>            : </a>
+<span class="lineNum">      81 </span>            :     // Helper: call SHIFT with positive number
+<span class="lineNum">      82 </span><span class="lineCov">     100001 :     void ShiftLeft(const int shift_size) {</span>
+<span class="lineNum">      83 </span><span class="lineCov">     100001 :       assert(shift_size &gt; 0);</span>
+<span class="lineNum">      84 </span><span class="lineCov">     100001 :       const int field_shift = shift_size / FIELD_BITS;</span>
+<span class="lineNum">      85 </span><span class="lineCov">     100001 :       const int bit_shift = shift_size % FIELD_BITS;</span>
+<span class="lineNum">      86 </span><span class="lineCov">     100001 :       const int bit_overflow = FIELD_BITS - bit_shift;</span>
+<span class="lineNum">      87 </span><span class="lineCov">     100001 :       const int NUM_FIELDS = NumFields();</span>
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            :       // Loop through each field, from L to R, and update it.
+<span class="lineNum">      90 </span><span class="lineCov">     100001 :       if (field_shift) {</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :         for (int i = NUM_FIELDS - 1; i &gt;= field_shift; --i) {</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :           bit_set[i] = bit_set[i - field_shift];</span>
+<span class="lineNum">      93 </span>            :         }
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :         for (int i = field_shift - 1; i &gt;= 0; i--) bit_set[i] = 0;</span>
+<span class="lineNum">      95 </span>            :       }
+<span class="lineNum">      96 </span>            :     
+<span class="lineNum">      97 </span>            :       // account for bit_shift
+<span class="lineNum">      98 </span><span class="lineCov">     100001 :       if (bit_shift) {</span>
+<span class="lineNum">      99 </span><span class="lineCov">  156300002 :         for (int i = NUM_FIELDS - 1; i &gt; field_shift; --i) {</span>
+<span class="lineNum">     100 </span><span class="lineCov">  156200001 :           bit_set[i] &lt;&lt;= bit_shift;</span>
+<span class="lineNum">     101 </span><span class="lineCov">  156200001 :           bit_set[i] |= (bit_set[i-1] &gt;&gt; bit_overflow);</span>
+<span class="lineNum">     102 </span>            :         }
+<span class="lineNum">     103 </span>            :         // Handle final field (field_shift position)
+<span class="lineNum">     104 </span><span class="lineCov">     100001 :         bit_set[field_shift] &lt;&lt;= bit_shift;</span>
+<span class="lineNum">     105 </span>            :       }
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :       // Mask out any bits that have left-shifted away
+<span class="lineNum">     108 </span><span class="lineCov">     100001 :       const int last_bit_id = LastBitID();</span>
+<span class="lineNum">     109 </span><span class="lineCov">     100001 :       if (last_bit_id) { bit_set[NUM_FIELDS - 1] &amp;= (1U &lt;&lt; last_bit_id) - 1U; }</span>
+<span class="lineNum">     110 </span><span class="lineCov">     100001 :     }</span>
+<span class="lineNum">     111 </span>            : 
+<a name="112"><span class="lineNum">     112 </span>            :   </a>
+<span class="lineNum">     113 </span>            :     // Helper for calling SHIFT with negative number
+<span class="lineNum">     114 </span><span class="lineCov">     100038 :     void ShiftRight(const int shift_size) {</span>
+<span class="lineNum">     115 </span><span class="lineCov">     100038 :       assert(shift_size &gt; 0);</span>
+<span class="lineNum">     116 </span><span class="lineCov">     100038 :       const int field_shift = shift_size / FIELD_BITS;</span>
+<span class="lineNum">     117 </span><span class="lineCov">     100038 :       const int bit_shift = shift_size % FIELD_BITS;</span>
+<span class="lineNum">     118 </span><span class="lineCov">     100038 :       const int bit_overflow = FIELD_BITS - bit_shift;</span>
+<span class="lineNum">     119 </span><span class="lineCov">     100038 :       const int NUM_FIELDS = NumFields();</span>
+<span class="lineNum">     120 </span>            :       
+<span class="lineNum">     121 </span>            :       // account for field_shift
+<span class="lineNum">     122 </span><span class="lineCov">     100038 :       if (field_shift) {</span>
+<span class="lineNum">     123 </span><span class="lineCov">         14 :         for (int i = 0; i &lt; (NUM_FIELDS - field_shift); ++i) {</span>
+<span class="lineNum">     124 </span><span class="lineCov">          7 :           bit_set[i] = bit_set[i + field_shift];</span>
+<span class="lineNum">     125 </span>            :         }
+<span class="lineNum">     126 </span><span class="lineCov">          7 :         for (int i = NUM_FIELDS - field_shift; i &lt; NUM_FIELDS; i++) bit_set[i] = 0U;</span>
+<span class="lineNum">     127 </span>            :       }
+<span class="lineNum">     128 </span>            :   
+<span class="lineNum">     129 </span>            :       // account for bit_shift
+<span class="lineNum">     130 </span><span class="lineCov">     100038 :       if (bit_shift) {</span>
+<span class="lineNum">     131 </span><span class="lineCov">  156300068 :         for (int i = 0; i &lt; (NUM_FIELDS - 1 - field_shift); ++i) {</span>
+<span class="lineNum">     132 </span><span class="lineCov">  156200031 :           bit_set[i] &gt;&gt;= bit_shift;</span>
+<span class="lineNum">     133 </span><span class="lineCov">  156200031 :           bit_set[i] |= (bit_set[i+1] &lt;&lt; bit_overflow);</span>
+<span class="lineNum">     134 </span>            :         }
+<span class="lineNum">     135 </span><span class="lineCov">     100037 :         bit_set[NUM_FIELDS - 1 - field_shift] &gt;&gt;= bit_shift;</span>
+<span class="lineNum">     136 </span>            :       }
+<span class="lineNum">     137 </span><span class="lineCov">     100038 :     }</span>
+<a name="138"><span class="lineNum">     138 </span>            : </a>
+<span class="lineNum">     139 </span>            :   public:
+<span class="lineNum">     140 </span><span class="lineCov">          9 :     BitVector(int in_num_bits=0, bool init_val=false) : num_bits(in_num_bits) {</span>
+<span class="lineNum">     141 </span><span class="lineCov">          9 :       assert(in_num_bits &gt;= 0);</span>
+<span class="lineNum">     142 </span><span class="lineCov">          9 :       bit_set = (num_bits == 0) ? NULL : new field_type[NumFields()];</span>
+<a name="143"><span class="lineNum">     143 </span><span class="lineCov">          9 :       if (init_val) SetAll(); else Clear();</span></a>
+<span class="lineNum">     144 </span><span class="lineCov">          9 :     }</span>
+<span class="lineNum">     145 </span><span class="lineCov">     300082 :     BitVector(const BitVector &amp; in_set) : num_bits(in_set.num_bits) {</span>
+<span class="lineNum">     146 </span><span class="lineCov">     300082 :       if (num_bits == 0) bit_set = NULL;</span>
+<span class="lineNum">     147 </span>            :       else {
+<span class="lineNum">     148 </span><span class="lineCov">     300082 :         bit_set = new field_type[NumFields()];</span>
+<span class="lineNum">     149 </span><span class="lineCov">     300082 :         RawCopy(in_set.bit_set);</span>
+<span class="lineNum">     150 </span>            :       }
+<span class="lineNum">     151 </span><span class="lineCov">     300082 :     }</span>
+<span class="lineNum">     152 </span>            :     BitVector(BitVector &amp;&amp; in_set) : num_bits(in_set.num_bits) {
+<span class="lineNum">     153 </span>            :       bit_set = in_set.bit_set;
+<a name="154"><span class="lineNum">     154 </span>            :       in_set.bit_set = NULL;</a>
+<span class="lineNum">     155 </span>            :     }
+<a name="156"><span class="lineNum">     156 </span><span class="lineCov">     300091 :     ~BitVector() { if (bit_set != NULL) delete [] bit_set; }</span></a>
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :     BitVector &amp; operator=(const BitVector &amp; in_set) {</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :       const int in_num_fields = in_set.NumFields();</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :       const int prev_num_fields = NumFields();</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :       num_bits = in_set.num_bits;</span>
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :       if (in_num_fields != prev_num_fields) {</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :         if (bit_set) delete [] bit_set;</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :         if (num_bits == 0) bit_set = NULL;</span>
+<span class="lineNum">     166 </span>            :         else {
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :           bit_set = new field_type[NumFields()];</span>
+<span class="lineNum">     168 </span>            :         }
+<span class="lineNum">     169 </span>            :       }
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :       if (num_bits &gt; 0) RawCopy(in_set.bit_set);</span>
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :       return *this;</span>
+<a name="174"><span class="lineNum">     174 </span>            :     }</a>
+<span class="lineNum">     175 </span>            : 
+<span class="lineNum">     176 </span><span class="lineCov">          1 :     BitVector &amp; operator=(BitVector &amp;&amp; in_set) {</span>
+<span class="lineNum">     177 </span><span class="lineCov">          1 :       if (&amp;in_set == this) return *this;</span>
+<span class="lineNum">     178 </span><span class="lineCov">          1 :       if (bit_set != NULL) delete [] bit_set;</span>
+<span class="lineNum">     179 </span><span class="lineCov">          1 :       num_bits = in_set.num_bits;</span>
+<span class="lineNum">     180 </span><span class="lineCov">          1 :       bit_set = in_set.bit_set;</span>
+<span class="lineNum">     181 </span><span class="lineCov">          1 :       in_set.bit_set = NULL;</span>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span><span class="lineCov">          1 :       return *this;</span>
+<span class="lineNum">     184 </span>            :     }
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span>            :     BitVector &amp; Resize(int new_bits) {
+<span class="lineNum">     187 </span>            :       const int old_num_fields = NumFields();
+<span class="lineNum">     188 </span>            :       num_bits = new_bits;
+<span class="lineNum">     189 </span>            :       const int NUM_FIELDS = NumFields();
+<span class="lineNum">     190 </span>            :       
+<span class="lineNum">     191 </span>            :       if (new_bits == 0) {  // We are emptying this BitVector
+<span class="lineNum">     192 </span>            :         if (bit_set) delete [] bit_set;
+<span class="lineNum">     193 </span>            :         bit_set = NULL;
+<span class="lineNum">     194 </span>            :         num_bits = 0;
+<span class="lineNum">     195 </span>            :       }
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span>            :       else if (old_num_fields == 0) {   // We are increasing from an empty BitVector
+<span class="lineNum">     198 </span>            :         bit_set = new field_type[NUM_FIELDS];
+<span class="lineNum">     199 </span>            :         for (int i = 0; i &lt; NUM_FIELDS; i++) bit_set[i] = 0U;
+<span class="lineNum">     200 </span>            :       }
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span>            :       else if (NUM_FIELDS == old_num_fields) {   // We can use our existing bit field
+<span class="lineNum">     203 </span>            :         num_bits = new_bits;
+<span class="lineNum">     204 </span>            :         // If there are extra bits, zero them out.
+<span class="lineNum">     205 </span>            :         if (LastBitID() &gt; 0) bit_set[NUM_FIELDS - 1] &amp;= constant::MaskLow&lt;field_type&gt;(LastBitID()); 
+<span class="lineNum">     206 </span>            :       }
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span>            :       else {  // We have to change the number of bitfields.  Resize &amp; copy old info.
+<span class="lineNum">     209 </span>            :         field_type * old_bit_set = bit_set;
+<span class="lineNum">     210 </span>            :         bit_set = new field_type[NUM_FIELDS];
+<span class="lineNum">     211 </span>            :         const int min_fields = std::min(old_num_fields, NUM_FIELDS);
+<span class="lineNum">     212 </span>            :         for (int i = 0; i &lt; min_fields; i++) bit_set[i] = old_bit_set[i];
+<span class="lineNum">     213 </span>            :         for (int i = min_fields; i &lt; NUM_FIELDS; i++) bit_set[i] = 0U;
+<span class="lineNum">     214 </span>            :         if (old_bit_set) delete [] old_bit_set;
+<span class="lineNum">     215 </span>            :       }
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span>            :       return *this;
+<span class="lineNum">     218 </span>            :     }
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span>            :     bool operator==(const BitVector &amp; in_set) const {
+<span class="lineNum">     221 </span>            :       if (num_bits != in_set.num_bits) return false;
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span>            :       const int NUM_FIELDS = NumFields();
+<span class="lineNum">     224 </span>            :       for (int i = 0; i &lt; NUM_FIELDS; i++) {
+<span class="lineNum">     225 </span>            :         if (bit_set[i] != in_set.bit_set[i]) return false;
+<span class="lineNum">     226 </span>            :       }
+<span class="lineNum">     227 </span>            :       return true;
+<span class="lineNum">     228 </span>            :     }
+<span class="lineNum">     229 </span>            : 
+<a name="230"><span class="lineNum">     230 </span>            :     int GetSize() const { return num_bits; }</a>
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :     bool Get(int index) const {</span>
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :       assert(index &gt;= 0 &amp;&amp; index &lt; num_bits);</span>
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :       const int field_id = FieldID(index);</span>
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :       const int pos_id = FieldPos(index);</span>
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :       return (bit_set[field_id] &amp; (1U &lt;&lt; pos_id)) != 0;</span>
+<a name="237"><span class="lineNum">     237 </span>            :     }</a>
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span><span class="lineCov">      68642 :     void Set(int index, bool value) {</span>
+<span class="lineNum">     240 </span><span class="lineCov">      68642 :       assert(index &gt;= 0 &amp;&amp; index &lt; num_bits);</span>
+<span class="lineNum">     241 </span><span class="lineCov">      68642 :       const int field_id = FieldID(index);</span>
+<span class="lineNum">     242 </span><span class="lineCov">      68642 :       const int pos_id = FieldPos(index);</span>
+<span class="lineNum">     243 </span><span class="lineCov">      68642 :       const int pos_mask = 1U &lt;&lt; pos_id;</span>
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span><span class="lineCov">      68642 :       if (value) bit_set[field_id] |= pos_mask;</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :       else       bit_set[field_id] &amp;= ~pos_mask;</span>
+<span class="lineNum">     247 </span><span class="lineCov">      68642 :     }</span>
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            :     uint8_t GetByte(int index) const {
+<span class="lineNum">     250 </span>            :       assert(index &gt;= 0 &amp;&amp; index &lt; NumBytes());
+<span class="lineNum">     251 </span>            :       const int field_id = Byte2Field(index);
+<span class="lineNum">     252 </span>            :       const int pos_id = Byte2FieldPos(index);
+<span class="lineNum">     253 </span>            :       return (bit_set[field_id] &gt;&gt; pos_id) &amp; 255U;
+<span class="lineNum">     254 </span>            :     }
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span>            :     void SetByte(int index, uint8_t value) {
+<span class="lineNum">     257 </span>            :       assert(index &gt;= 0 &amp;&amp; index &lt; NumBytes());
+<span class="lineNum">     258 </span>            :       const int field_id = Byte2Field(index);
+<span class="lineNum">     259 </span>            :       const int pos_id = Byte2FieldPos(index);
+<span class="lineNum">     260 </span>            :       const field_type val_uint = value;
+<span class="lineNum">     261 </span>            :       bit_set[field_id] = (bit_set[field_id] &amp; ~(255U &lt;&lt; pos_id)) | (val_uint &lt;&lt; pos_id);
+<span class="lineNum">     262 </span>            :     }
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span>            :     uint32_t GetUInt(int index) const {
+<span class="lineNum">     265 </span>            :       // @CAO Need proper assert for variable bit fields!
+<span class="lineNum">     266 </span>            :       // assert(index &gt;= 0 &amp;&amp; index &lt; NumFields());
+<span class="lineNum">     267 </span>            :       return ((uint32_t *) bit_set)[index];
+<span class="lineNum">     268 </span>            :     }
+<span class="lineNum">     269 </span>            : 
+<span class="lineNum">     270 </span>            :     void SetUInt(int index, field_type value) {
+<span class="lineNum">     271 </span>            :       // @CAO Need proper assert for variable bit fields!
+<span class="lineNum">     272 </span>            :       // assert(index &gt;= 0 &amp;&amp; index &lt; NumFields());
+<span class="lineNum">     273 </span>            :       ((uint32_t *) bit_set)[index] = value;
+<a name="274"><span class="lineNum">     274 </span>            :     }</a>
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span><span class="lineCov">          2 :     uint32_t GetUIntAtBit(int index) {</span>
+<span class="lineNum">     277 </span>            :       // @CAO Need proper assert for non-32-size bit fields!
+<span class="lineNum">     278 </span>            :       // assert(index &gt;= 0 &amp;&amp; index &lt; num_bits);
+<span class="lineNum">     279 </span><span class="lineCov">          2 :       const int field_id = FieldID(index);</span>
+<span class="lineNum">     280 </span><span class="lineCov">          2 :       const int pos_id = FieldPos(index);</span>
+<span class="lineNum">     281 </span><span class="lineCov">          2 :       if (pos_id == 0) return (uint32_t) bit_set[field_id];</span>
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :       const int NUM_FIELDS = NumFields();</span>
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :       return (bit_set[field_id] &gt;&gt; pos_id) |</span>
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :         ((field_id+1 &lt; NUM_FIELDS) ? bit_set[field_id+1] &lt;&lt; (FIELD_BITS-pos_id) : 0);</span>
+<span class="lineNum">     285 </span>            :     }
+<a name="286"><span class="lineNum">     286 </span>            : </a>
+<span class="lineNum">     287 </span>            :     template &lt;int OUT_BITS&gt;
+<span class="lineNum">     288 </span><span class="lineCov">          1 :     field_type GetValueAtBit(int index) {</span>
+<span class="lineNum">     289 </span>            :       // @CAO This function needs to be generalized to return more then 32 bits.
+<span class="lineNum">     290 </span>            :       static_assert(OUT_BITS &lt;= 32, &quot;Requesting too many bits to fit in a UInt&quot;);
+<span class="lineNum">     291 </span><span class="lineCov">          1 :       return GetUIntAtBit(index) &amp; constant::MaskLow&lt;uint32_t&gt;(OUT_BITS);</span>
+<span class="lineNum">     292 </span>            :     }
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span>            : 
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span>            :     bool Any() const {
+<span class="lineNum">     298 </span>            :       const int NUM_FIELDS = NumFields();
+<span class="lineNum">     299 </span>            :       for (int i = 0; i &lt; NUM_FIELDS; i++) if (bit_set[i]) return true; return false;
+<span class="lineNum">     300 </span>            :     }
+<span class="lineNum">     301 </span>            :     bool None() const { return !Any(); }
+<span class="lineNum">     302 </span>            :     bool All() const { return (~(*this)).None(); }
+<a name="303"><span class="lineNum">     303 </span>            : </a>
+<a name="304"><span class="lineNum">     304 </span>            : </a>
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :     bool operator[](int index) const { return Get(index); }</span>
+<a name="306"><span class="lineNum">     306 </span><span class="lineCov">      40002 :     BitProxy operator[](int index) { return BitProxy(*this, index); }</span></a>
+<span class="lineNum">     307 </span>            : 
+<span class="lineNum">     308 </span><span class="lineCov">          9 :     void Clear() {</span>
+<span class="lineNum">     309 </span><span class="lineCov">          9 :       const int NUM_FIELDS = NumFields();</span>
+<a name="310"><span class="lineNum">     310 </span><span class="lineCov">          9 :       for (int i = 0; i &lt; NUM_FIELDS; i++) bit_set[i] = 0U;</span></a>
+<span class="lineNum">     311 </span><span class="lineCov">          9 :     }</span>
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 :     void SetAll() { </span>
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :       const int NUM_FIELDS = NumFields();</span>
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :       for (int i = 0; i &lt; NUM_FIELDS; i++) bit_set[i] = ~(0U);</span>
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :       if (LastBitID() &gt; 0) { bit_set[NUM_FIELDS - 1] &amp;= constant::MaskLow&lt;field_type&gt;(LastBitID()); }</span>
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :     }</span>
+<a name="317"><span class="lineNum">     317 </span>            : </a>
+<span class="lineNum">     318 </span>            :   
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :     void Print(std::ostream &amp; out=std::cout) const {</span>
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :       for (int i = num_bits - 1; i &gt;= 0; i--) {</span>
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :         out &lt;&lt; Get(i);</span>
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :         if (i % FIELD_BITS == 0) out &lt;&lt; ' ';</span>
+<span class="lineNum">     323 </span>            :       }
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     325 </span>            :     void PrintArray(std::ostream &amp; out=std::cout) const {
+<span class="lineNum">     326 </span>            :       for (int i = 0; i &lt; num_bits; i++) out &lt;&lt; Get(i);
+<span class="lineNum">     327 </span>            :     }
+<span class="lineNum">     328 </span>            :     void PrintOneIDs(std::ostream &amp; out=std::cout, char spacer=' ') const {
+<span class="lineNum">     329 </span>            :       for (int i = 0; i &lt; num_bits; i++) { if (Get(i)) out &lt;&lt; i &lt;&lt; spacer; }
+<span class="lineNum">     330 </span>            :     }
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span>            :     // Count 1's by looping through once for each bit equal to 1
+<span class="lineNum">     334 </span>            :     int CountOnes_Sparse() const { 
+<span class="lineNum">     335 </span>            :       const int NUM_FIELDS = NumFields();
+<span class="lineNum">     336 </span>            :       int bit_count = 0;
+<span class="lineNum">     337 </span>            :       for (int i = 0; i &lt; NUM_FIELDS; i++) {
+<span class="lineNum">     338 </span>            :         field_type cur_field = bit_set[i];
+<span class="lineNum">     339 </span>            :         while (cur_field) {
+<span class="lineNum">     340 </span>            :           cur_field &amp;= (cur_field-1);       // Peel off a single 1.
+<span class="lineNum">     341 </span>            :           bit_count++;      // And increment the counter
+<span class="lineNum">     342 </span>            :         }
+<span class="lineNum">     343 </span>            :       }
+<span class="lineNum">     344 </span>            :       return bit_count;
+<span class="lineNum">     345 </span>            :     }
+<a name="346"><span class="lineNum">     346 </span>            : </a>
+<span class="lineNum">     347 </span>            :     // Count 1's in semi-parallel; fastest for even 0's &amp; 1's
+<span class="lineNum">     348 </span><span class="lineCov">     100038 :     int CountOnes_Mixed() const {</span>
+<span class="lineNum">     349 </span>            :       // const int NUM_FIELDS = NumFields(); 
+<span class="lineNum">     350 </span><span class="lineCov">     100038 :       const int NUM_FIELDS = NumFields() * sizeof(field_type)/4; </span>
+<span class="lineNum">     351 </span><span class="lineCov">     100038 :       uint32_t * uint_bit_set = (uint32_t *) bit_set;</span>
+<span class="lineNum">     352 </span><span class="lineCov">     100038 :       int bit_count = 0;</span>
+<span class="lineNum">     353 </span><span class="lineCov">  312700190 :       for (int i = 0; i &lt; NUM_FIELDS; i++) {</span>
+<span class="lineNum">     354 </span><span class="lineCov">  312600152 :         const uint32_t v = uint_bit_set[i];</span>
+<span class="lineNum">     355 </span><span class="lineCov">  312600152 :         const uint32_t t1 = v - ((v &gt;&gt; 1) &amp; 0x55555555);</span>
+<span class="lineNum">     356 </span><span class="lineCov">  312600152 :         const uint32_t t2 = (t1 &amp; 0x33333333) + ((t1 &gt;&gt; 2) &amp; 0x33333333);</span>
+<span class="lineNum">     357 </span><span class="lineCov">  312600152 :         bit_count += (((t2 + (t2 &gt;&gt; 4)) &amp; 0xF0F0F0F) * 0x1010101) &gt;&gt; 24;</span>
+<span class="lineNum">     358 </span>            :       }
+<span class="lineNum">     359 </span><span class="lineCov">     100038 :       return bit_count;</span>
+<a name="360"><span class="lineNum">     360 </span>            :     }</a>
+<span class="lineNum">     361 </span>            : 
+<span class="lineNum">     362 </span><span class="lineCov">     100038 :     int CountOnes() const { return CountOnes_Mixed(); }</span>
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span>            :     int FindBit() const {
+<span class="lineNum">     365 </span>            :       const int NUM_FIELDS = NumFields();
+<span class="lineNum">     366 </span>            :       int field_id = 0;
+<span class="lineNum">     367 </span>            :       while (field_id &lt; NUM_FIELDS &amp;&amp; bit_set[field_id]==0) field_id++;
+<span class="lineNum">     368 </span>            :       return (field_id &lt; NUM_FIELDS) ? find_bit(bit_set[field_id]) + (field_id * FIELD_BITS) : -1;
+<span class="lineNum">     369 </span>            :     }
+<span class="lineNum">     370 </span>            : 
+<span class="lineNum">     371 </span>            :     int PopBit() {
+<span class="lineNum">     372 </span>            :       const int NUM_FIELDS = NumFields();
+<span class="lineNum">     373 </span>            :       int field_id = 0;
+<span class="lineNum">     374 </span>            :       while (field_id &lt; NUM_FIELDS &amp;&amp; bit_set[field_id]==0) field_id++;
+<span class="lineNum">     375 </span>            :       if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
+<span class="lineNum">     376 </span>            : 
+<span class="lineNum">     377 </span>            :       const int pos_found = find_bit(bit_set[field_id]);
+<span class="lineNum">     378 </span>            :       bit_set[field_id] &amp;= ~(1U &lt;&lt; pos_found);
+<span class="lineNum">     379 </span>            :       return pos_found + (field_id * FIELD_BITS);
+<span class="lineNum">     380 </span>            :     }
+<span class="lineNum">     381 </span>            : 
+<span class="lineNum">     382 </span>            :     int FindBit(const int start_pos) const {
+<span class="lineNum">     383 </span>            :       assert(start_pos &gt;= 0);
+<span class="lineNum">     384 </span>            :       if (start_pos &gt;= num_bits) return -1;
+<span class="lineNum">     385 </span>            :       int field_id  = FieldID(start_pos);     // What field do we start in?
+<span class="lineNum">     386 </span>            :       const int field_pos = FieldPos(start_pos);    // What position in that field?
+<span class="lineNum">     387 </span>            :       if (field_pos &amp;&amp; (bit_set[field_id] &amp; ~(constant::MaskLow&lt;field_type&gt;(field_pos)))) {  // First field hit!
+<span class="lineNum">     388 </span>            :         return find_bit(bit_set[field_id] &amp; ~(constant::MaskLow&lt;field_type&gt;(field_pos))) + (field_id * FIELD_BITS);
+<span class="lineNum">     389 </span>            :       }
+<span class="lineNum">     390 </span>            : 
+<span class="lineNum">     391 </span>            :       // Search other fields...
+<span class="lineNum">     392 </span>            :       const int NUM_FIELDS = NumFields();
+<span class="lineNum">     393 </span>            :       if (field_pos) field_id++;
+<span class="lineNum">     394 </span>            :       while (field_id &lt; NUM_FIELDS &amp;&amp; bit_set[field_id]==0) field_id++;
+<span class="lineNum">     395 </span>            :       return (field_id &lt; NUM_FIELDS) ? find_bit(bit_set[field_id]) + (field_id * FIELD_BITS) : -1;
+<span class="lineNum">     396 </span>            :     }
+<span class="lineNum">     397 </span>            :     std::vector&lt;int&gt; GetOnes() const {
+<span class="lineNum">     398 </span>            :       // @CAO -- There are probably better ways to do this with bit tricks.
+<span class="lineNum">     399 </span>            :       std::vector&lt;int&gt; out_set(CountOnes());
+<span class="lineNum">     400 </span>            :       int cur_pos = 0;
+<span class="lineNum">     401 </span>            :       for (int i = 0; i &lt; num_bits; i++) {
+<span class="lineNum">     402 </span>            :         if (Get(i)) out_set[cur_pos++] = i;
+<span class="lineNum">     403 </span>            :       }
+<span class="lineNum">     404 </span>            :       return out_set;
+<span class="lineNum">     405 </span>            :     }
+<span class="lineNum">     406 </span>            :     
+<span class="lineNum">     407 </span>            :     // Boolean math functions...
+<span class="lineNum">     408 </span>            :     BitVector NOT() const {
+<span class="lineNum">     409 </span>            :       const int NUM_FIELDS = NumFields();
+<span class="lineNum">     410 </span>            :       BitVector out_set(*this);
+<span class="lineNum">     411 </span>            :       for (int i = 0; i &lt; NUM_FIELDS; i++) out_set.bit_set[i] = ~bit_set[i];
+<span class="lineNum">     412 </span>            :       if (LastBitID() &gt; 0) out_set.bit_set[NUM_FIELDS - 1] &amp;= constant::MaskLow&lt;field_type&gt;(LastBitID());
+<span class="lineNum">     413 </span>            :       return out_set;
+<a name="414"><span class="lineNum">     414 </span>            :     }</a>
+<span class="lineNum">     415 </span>            : 
+<span class="lineNum">     416 </span><span class="lineCov">     100001 :     BitVector AND(const BitVector &amp; set2) const {</span>
+<span class="lineNum">     417 </span><span class="lineCov">     100001 :       const int NUM_FIELDS = NumFields();</span>
+<span class="lineNum">     418 </span><span class="lineCov">     100001 :       BitVector out_set(*this);</span>
+<span class="lineNum">     419 </span><span class="lineCov">     100001 :       for (int i = 0; i &lt; NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] &amp; set2.bit_set[i];</span>
+<span class="lineNum">     420 </span><span class="lineCov">     100001 :       return out_set;</span>
+<a name="421"><span class="lineNum">     421 </span>            :     }</a>
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span><span class="lineCov">          1 :     BitVector OR(const BitVector &amp; set2) const {</span>
+<span class="lineNum">     424 </span><span class="lineCov">          1 :       const int NUM_FIELDS = NumFields();</span>
+<span class="lineNum">     425 </span><span class="lineCov">          1 :       BitVector out_set(*this);</span>
+<span class="lineNum">     426 </span><span class="lineCov">          1 :       for (int i = 0; i &lt; NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] | set2.bit_set[i];</span>
+<span class="lineNum">     427 </span><span class="lineCov">          1 :       return out_set;</span>
+<span class="lineNum">     428 </span>            :     }
+<span class="lineNum">     429 </span>            : 
+<span class="lineNum">     430 </span>            :     BitVector NAND(const BitVector &amp; set2) const {
+<span class="lineNum">     431 </span>            :       const int NUM_FIELDS = NumFields();
+<span class="lineNum">     432 </span>            :       BitVector out_set(*this);
+<span class="lineNum">     433 </span>            :       for (int i = 0; i &lt; NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] &amp; set2.bit_set[i]);
+<span class="lineNum">     434 </span>            :       if (LastBitID() &gt; 0) out_set.bit_set[NUM_FIELDS - 1] &amp;= constant::MaskLow&lt;field_type&gt;(LastBitID());
+<span class="lineNum">     435 </span>            :       return out_set;
+<span class="lineNum">     436 </span>            :     }
+<span class="lineNum">     437 </span>            : 
+<span class="lineNum">     438 </span>            :     BitVector NOR(const BitVector &amp; set2) const {
+<span class="lineNum">     439 </span>            :       const int NUM_FIELDS = NumFields();
+<span class="lineNum">     440 </span>            :       BitVector out_set(*this);
+<span class="lineNum">     441 </span>            :       for (int i = 0; i &lt; NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
+<span class="lineNum">     442 </span>            :       if (LastBitID() &gt; 0) out_set.bit_set[NUM_FIELDS - 1] &amp;= constant::MaskLow&lt;field_type&gt;(LastBitID());
+<span class="lineNum">     443 </span>            :       return out_set;
+<span class="lineNum">     444 </span>            :     }
+<span class="lineNum">     445 </span>            : 
+<span class="lineNum">     446 </span>            :     BitVector XOR(const BitVector &amp; set2) const {
+<span class="lineNum">     447 </span>            :       const int NUM_FIELDS = NumFields();
+<span class="lineNum">     448 </span>            :       BitVector out_set(*this);
+<span class="lineNum">     449 </span>            :       for (int i = 0; i &lt; NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] ^ set2.bit_set[i];
+<span class="lineNum">     450 </span>            :       return out_set;
+<span class="lineNum">     451 </span>            :     }
+<span class="lineNum">     452 </span>            : 
+<span class="lineNum">     453 </span>            :     BitVector EQU(const BitVector &amp; set2) const {
+<span class="lineNum">     454 </span>            :       const int NUM_FIELDS = NumFields();
+<span class="lineNum">     455 </span>            :       BitVector out_set(*this);
+<span class="lineNum">     456 </span>            :       for (int i = 0; i &lt; NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
+<span class="lineNum">     457 </span>            :       if (LastBitID() &gt; 0) out_set.bit_set[NUM_FIELDS - 1] &amp;= constant::MaskLow&lt;field_type&gt;(LastBitID());
+<span class="lineNum">     458 </span>            :       return out_set;
+<span class="lineNum">     459 </span>            :     }
+<span class="lineNum">     460 </span>            :   
+<span class="lineNum">     461 </span>            : 
+<span class="lineNum">     462 </span>            :     // Boolean math functions...
+<span class="lineNum">     463 </span>            :     BitVector &amp; NOT_SELF() {
+<span class="lineNum">     464 </span>            :       const int NUM_FIELDS = NumFields();
+<span class="lineNum">     465 </span>            :       for (int i = 0; i &lt; NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
+<span class="lineNum">     466 </span>            :       if (LastBitID() &gt; 0) bit_set[NUM_FIELDS - 1] &amp;= constant::MaskLow&lt;field_type&gt;(LastBitID());
+<span class="lineNum">     467 </span>            :       return *this;
+<a name="468"><span class="lineNum">     468 </span>            :     }</a>
+<span class="lineNum">     469 </span>            : 
+<span class="lineNum">     470 </span><span class="lineCov">     100000 :     BitVector &amp; AND_SELF(const BitVector &amp; set2) {</span>
+<span class="lineNum">     471 </span><span class="lineCov">     100000 :       const int NUM_FIELDS = NumFields();</span>
+<span class="lineNum">     472 </span><span class="lineCov">     100000 :       for (int i = 0; i &lt; NUM_FIELDS; i++) bit_set[i] = bit_set[i] &amp; set2.bit_set[i];</span>
+<span class="lineNum">     473 </span><span class="lineCov">     100000 :       return *this;</span>
+<a name="474"><span class="lineNum">     474 </span>            :     }</a>
+<span class="lineNum">     475 </span>            : 
+<span class="lineNum">     476 </span><span class="lineCov">     100000 :     BitVector &amp; OR_SELF(const BitVector &amp; set2) {</span>
+<span class="lineNum">     477 </span><span class="lineCov">     100000 :       const int NUM_FIELDS = NumFields();</span>
+<span class="lineNum">     478 </span><span class="lineCov">     100000 :       for (int i = 0; i &lt; NUM_FIELDS; i++) bit_set[i] = bit_set[i] | set2.bit_set[i];</span>
+<span class="lineNum">     479 </span><span class="lineCov">     100000 :       return *this;</span>
+<span class="lineNum">     480 </span>            :     }
+<span class="lineNum">     481 </span>            : 
+<span class="lineNum">     482 </span>            :     BitVector &amp; NAND_SELF(const BitVector &amp; set2) {
+<span class="lineNum">     483 </span>            :       const int NUM_FIELDS = NumFields();
+<span class="lineNum">     484 </span>            :       for (int i = 0; i &lt; NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] &amp; set2.bit_set[i]);
+<span class="lineNum">     485 </span>            :       if (LastBitID() &gt; 0) bit_set[NUM_FIELDS - 1] &amp;= constant::MaskLow&lt;field_type&gt;(LastBitID());
+<span class="lineNum">     486 </span>            :       return *this;
+<span class="lineNum">     487 </span>            :     }
+<span class="lineNum">     488 </span>            : 
+<span class="lineNum">     489 </span>            :     BitVector &amp; NOR_SELF(const BitVector &amp; set2) {
+<span class="lineNum">     490 </span>            :       const int NUM_FIELDS = NumFields();
+<span class="lineNum">     491 </span>            :       for (int i = 0; i &lt; NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
+<span class="lineNum">     492 </span>            :       if (LastBitID() &gt; 0) bit_set[NUM_FIELDS - 1] &amp;= constant::MaskLow&lt;field_type&gt;(LastBitID());
+<span class="lineNum">     493 </span>            :       return *this;
+<span class="lineNum">     494 </span>            :     }
+<span class="lineNum">     495 </span>            : 
+<span class="lineNum">     496 </span>            :     BitVector &amp; XOR_SELF(const BitVector &amp; set2) {
+<span class="lineNum">     497 </span>            :       const int NUM_FIELDS = NumFields();
+<span class="lineNum">     498 </span>            :       for (int i = 0; i &lt; NUM_FIELDS; i++) bit_set[i] = bit_set[i] ^ set2.bit_set[i];
+<span class="lineNum">     499 </span>            :       return *this;
+<span class="lineNum">     500 </span>            :     }
+<span class="lineNum">     501 </span>            : 
+<span class="lineNum">     502 </span>            :     BitVector &amp; EQU_SELF(const BitVector &amp; set2) {
+<span class="lineNum">     503 </span>            :       const int NUM_FIELDS = NumFields();
+<span class="lineNum">     504 </span>            :       for (int i = 0; i &lt; NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
+<span class="lineNum">     505 </span>            :       if (LastBitID() &gt; 0) bit_set[NUM_FIELDS - 1] &amp;= constant::MaskLow&lt;field_type&gt;(LastBitID());
+<span class="lineNum">     506 </span>            :       return *this;
+<span class="lineNum">     507 </span>            :     }
+<a name="508"><span class="lineNum">     508 </span>            :   </a>
+<span class="lineNum">     509 </span>            :     // Positive shifts go left and negative go right (0 does nothing)
+<span class="lineNum">     510 </span><span class="lineCov">     200039 :     BitVector SHIFT(const int shift_size) const {</span>
+<span class="lineNum">     511 </span><span class="lineCov">     200039 :       BitVector out_set(*this);</span>
+<span class="lineNum">     512 </span><span class="lineCov">     200039 :       if (shift_size &gt; 0) out_set.ShiftRight(shift_size);</span>
+<span class="lineNum">     513 </span><span class="lineCov">     100001 :       else if (shift_size &lt; 0) out_set.ShiftLeft(-shift_size);</span>
+<span class="lineNum">     514 </span><span class="lineCov">     200039 :       return out_set;</span>
+<a name="515"><span class="lineNum">     515 </span>            :     }</a>
+<span class="lineNum">     516 </span>            : 
+<span class="lineNum">     517 </span><span class="lineCov">          1 :     BitVector &amp; SHIFT_SELF(const int shift_size) {</span>
+<span class="lineNum">     518 </span><span class="lineCov">          1 :       if (shift_size &gt; 0) ShiftRight(shift_size);</span>
+<span class="lineNum">     519 </span><span class="lineCov">          1 :       else if (shift_size &lt; 0) ShiftLeft(-shift_size);</span>
+<span class="lineNum">     520 </span><span class="lineCov">          1 :       return *this;</span>
+<span class="lineNum">     521 </span>            :     }
+<span class="lineNum">     522 </span>            : 
+<span class="lineNum">     523 </span>            : 
+<a name="524"><span class="lineNum">     524 </span>            :     // Operator overloads...</a>
+<a name="525"><span class="lineNum">     525 </span>            :     BitVector operator~() const { return NOT(); }</a>
+<span class="lineNum">     526 </span><span class="lineCov">     100001 :     BitVector operator&amp;(const BitVector &amp; ar2) const { return AND(ar2); }</span>
+<a name="527"><span class="lineNum">     527 </span><span class="lineCov">          1 :     BitVector operator|(const BitVector &amp; ar2) const { return OR(ar2); }</span></a>
+<a name="528"><span class="lineNum">     528 </span>            :     BitVector operator^(const BitVector &amp; ar2) const { return XOR(ar2); }</a>
+<a name="529"><span class="lineNum">     529 </span><span class="lineCov">     100000 :     BitVector operator&lt;&lt;(const int shift_size) const { return SHIFT(-shift_size); }</span></a>
+<a name="530"><span class="lineNum">     530 </span><span class="lineCov">     100039 :     BitVector operator&gt;&gt;(const int shift_size) const { return SHIFT(shift_size); }</span></a>
+<span class="lineNum">     531 </span><span class="lineCov">     100000 :     const BitVector &amp; operator&amp;=(const BitVector &amp; ar2) { return AND_SELF(ar2); }</span>
+<a name="532"><span class="lineNum">     532 </span><span class="lineCov">     100000 :     const BitVector &amp; operator|=(const BitVector &amp; ar2) { return OR_SELF(ar2); }</span></a>
+<span class="lineNum">     533 </span>            :     const BitVector &amp; operator^=(const BitVector &amp; ar2) { return XOR_SELF(ar2); }
+<span class="lineNum">     534 </span><span class="lineCov">          1 :     const BitVector &amp; operator&lt;&lt;=(const int shift_size) { return SHIFT_SELF(-shift_size); }</span>
+<span class="lineNum">     535 </span>            :     const BitVector &amp; operator&gt;&gt;=(const int shift_size) { return SHIFT_SELF(shift_size); }
+<span class="lineNum">     536 </span>            : 
+<span class="lineNum">     537 </span>            :     // For compatability with std::vector&lt;bool&gt;.
+<span class="lineNum">     538 </span>            :     inline size_t size() const { return num_bits; }
+<span class="lineNum">     539 </span>            :     inline bool all() const { return All(); }
+<span class="lineNum">     540 </span>            :     inline bool any() const { return Any(); }
+<span class="lineNum">     541 </span>            :     inline bool none() const { return !Any(); }
+<span class="lineNum">     542 </span>            :     inline size_t count() const { return CountOnes_Mixed(); }
+<span class="lineNum">     543 </span>            :   };
+<span class="lineNum">     544 </span>            : 
+<a name="545"><span class="lineNum">     545 </span>            : }</a>
+<span class="lineNum">     546 </span>            : 
+<span class="lineNum">     547 </span><span class="lineNoCov">          0 : std::ostream &amp; operator&lt;&lt;(std::ostream &amp; out, const emp::BitVector &amp; _bit_set) {</span>
+<span class="lineNum">     548 </span><span class="lineNoCov">          0 :   _bit_set.Print(out);</span>
+<span class="lineNum">     549 </span><span class="lineNoCov">          0 :   return out;</span>
+<span class="lineNum">     550 </span>            : }
+<span class="lineNum">     551 </span>            : 
+<span class="lineNum">     552 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.11</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

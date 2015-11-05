@@ -7,6 +7,7 @@ a.out.js
 *.js.mem
 *.pyc
 *.swp
+*.swo
 UTests/tools/tmp*.cc
 UTests/emtools/JSWrap.js
 UTests/UI/Animate.js
@@ -16,7 +17,11 @@ UTests/UI/mini_evoke.js
 UTests/web/TextArea.js
 Slideshow.js
 incoming/
+*/env/*
 tmp/
+build/*
+third-party/doxygen/build/*
+doc/_build/*
 utils/edit_dist/IO/
 utils/edit_dist/edit_dist
 utils/edit_dist/tmp.py
