@@ -25,8 +25,8 @@ namespace emp {
   template <typename... TYPE_SET>
   void Alert(TYPE_SET... inputs) { Alert(emp::to_string(inputs...)); }
 
-  // A version of Alert that will cap how many times it can go off
   template <typename... TYPE_SET>
+  /** A version of Alert that will cap how many times it can go off */
   static void CappedAlert(int cap, TYPE_SET... inputs) {
     static int cur_count = 0;
     if (cur_count++ < cap) Alert(emp::to_string(inputs...));

@@ -1,0 +1,6 @@
+
+TinyXML Test Suite
+==================
+
+.. doxygenindex::
+
