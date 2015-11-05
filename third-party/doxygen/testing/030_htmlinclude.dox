@@ -1,0 +1,7 @@
+// objective: test the \htmlinclude command
+// check: indexpage.xml
+/** \mainpage
+ * Some text.
+ * \htmlinclude sample.html
+ * More text.
+ */

@@ -32,7 +32,7 @@ namespace emp {
   // Toggle an input bool.
   inline bool toggle(bool & in_bool) { return (in_bool = !in_bool); }
 
-  // % is actually remainder; this is a proper modulus command that handles negative #'s correctly.
+  /// % is actually remainder; this is a proper modulus command that handles negative #'s correctly
   inline int mod(int in_val, int mod_val) {
     return (in_val < 0) ? (in_val % mod_val + mod_val) : (in_val % mod_val);
   }
