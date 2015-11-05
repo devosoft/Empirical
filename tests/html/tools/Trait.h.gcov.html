@@ -1,0 +1,275 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - cov.info - tools/Trait.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">tools</a> - Trait.h<span style="font-size: 80%;"> (source / <a href="Trait.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">cov.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">37</td>
+            <td class="headerCovTableEntry">39</td>
+            <td class="headerCovTableEntryHi">94.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2015-11-01 13:32:36</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">34</td>
+            <td class="headerCovTableEntry">42</td>
+            <td class="headerCovTableEntryMed">81.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #ifndef EMP_TRAIT_H</a>
+<span class="lineNum">       2 </span>            : #define EMP_TRAIT_H
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            : //////////////////////////////////////////////////////////////////////////////////////////
+<span class="lineNum">       5 </span>            : //
+<span class="lineNum">       6 </span>            : //  The TraitDef class maintains a category of measuments about another class.
+<span class="lineNum">       7 </span>            : //
+<span class="lineNum">       8 </span>            : //  Each trait is associated with a name, a description, and a type.  Instance of that
+<span class="lineNum">       9 </span>            : //  trait are of type TraitValue.  A TraitManager contains information about a group of
+<span class="lineNum">      10 </span>            : //  related traits, and a TraitSet is a set of TraitValues.
+<span class="lineNum">      11 </span>            : //
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;string&gt;
+<span class="lineNum">      14 </span>            : #include &lt;tuple&gt;
+<span class="lineNum">      15 </span>            : #include &lt;type_traits&gt;
+<span class="lineNum">      16 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : #include &quot;assert.h&quot;
+<span class="lineNum">      19 </span>            : #include &quot;functions.h&quot;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : namespace emp {
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            :   template &lt;typename TRAIT_TYPE&gt; struct TraitKey {
+<span class="lineNum">      24 </span>            :     int index;
+<span class="lineNum">      25 </span>            :     TraitKey(int _index) : index(_index) { ; }
+<span class="lineNum">      26 </span>            :   };
+<a name="27"><span class="lineNum">      27 </span>            : </a>
+<span class="lineNum">      28 </span>            :   template &lt;typename TRAIT_TYPE&gt;
+<span class="lineNum">      29 </span><span class="lineCov">          4 :   class TraitDef {</span>
+<span class="lineNum">      30 </span>            :   private:
+<span class="lineNum">      31 </span>            :     const std::string name;
+<span class="lineNum">      32 </span>            :     const std::string desc;
+<span class="lineNum">      33 </span>            :     const TRAIT_TYPE default_val;
+<span class="lineNum">      34 </span>            :     const int index;
+<a name="35"><span class="lineNum">      35 </span>            : </a>
+<span class="lineNum">      36 </span>            :   public:
+<span class="lineNum">      37 </span><span class="lineCov">          3 :     TraitDef(const std::string &amp; _name, const std::string &amp; _desc, const TRAIT_TYPE &amp; _default_val,</span>
+<span class="lineNum">      38 </span>            :              int _index)
+<a name="39"><span class="lineNum">      39 </span><span class="lineCov">          3 :       : name(_name), desc(_desc), default_val(_default_val), index(_index)</span></a>
+<span class="lineNum">      40 </span><span class="lineCov">          3 :     { ; }</span>
+<span class="lineNum">      41 </span><span class="lineCov">          7 :     ~TraitDef() { ; }</span>
+<span class="lineNum">      42 </span>            : 
+<a name="43"><span class="lineNum">      43 </span>            :     const std::string &amp; GetName() const { return name; }</a>
+<span class="lineNum">      44 </span>            :     const std::string &amp; GetDesc() const { return desc; }
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :     const TRAIT_TYPE &amp; GetDefault() const { return default_val; }</span>
+<span class="lineNum">      46 </span>            :     int GetIndex() const { return index; }
+<span class="lineNum">      47 </span>            :     TraitKey&lt;TRAIT_TYPE&gt; GetKey() const { return index; }
+<span class="lineNum">      48 </span>            :   };
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :   template &lt;typename... TRAIT_TYPES&gt; class TraitManager;
+<a name="51"><span class="lineNum">      51 </span>            : </a>
+<span class="lineNum">      52 </span>            :   template &lt;typename... TRAIT_TYPES&gt;
+<span class="lineNum">      53 </span><span class="lineCov">          1 :   class TraitSet {</span>
+<span class="lineNum">      54 </span>            :     friend class TraitManager&lt;TRAIT_TYPES...&gt;;
+<span class="lineNum">      55 </span>            :   private:
+<span class="lineNum">      56 </span>            :     std::tuple&lt; std::vector&lt;TRAIT_TYPES&gt;... &gt; type_sets;
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :     // Add in a new trait (with value) to the appropriate type set.
+<span class="lineNum">      59 </span>            :     template &lt;typename IN_TYPE&gt;
+<span class="lineNum">      60 </span>            :     void PushTrait(const IN_TYPE &amp; in_trait) {
+<span class="lineNum">      61 </span>            :       constexpr int type_id = emp::get_type_index&lt;IN_TYPE, TRAIT_TYPES...&gt;();
+<span class="lineNum">      62 </span>            :       static_assert(type_id &gt;= 0, &quot;Unhandled type provided to TraitSet::PushTrait()&quot;);
+<span class="lineNum">      63 </span>            :       std::get&lt;type_id&gt;(type_sets).push_back(in_trait);
+<span class="lineNum">      64 </span>            :     }
+<span class="lineNum">      65 </span>            : 
+<a name="66"><span class="lineNum">      66 </span>            :     // Get set (vector of entries) associated with the given type.</a>
+<span class="lineNum">      67 </span>            :     template &lt;typename IN_TYPE&gt;
+<span class="lineNum">      68 </span><span class="lineCov">          5 :     std::vector&lt;IN_TYPE&gt; &amp; GetTypeSet() {</span>
+<span class="lineNum">      69 </span><span class="lineCov">          5 :       constexpr int type_id = emp::get_type_index&lt;IN_TYPE, TRAIT_TYPES...&gt;();</span>
+<span class="lineNum">      70 </span>            :       static_assert(type_id &gt;= 0, &quot;Unknown type provided to TraitSet::GetTypeSet()&quot;);
+<span class="lineNum">      71 </span><span class="lineCov">          5 :       return std::get&lt; type_id &gt;(type_sets);</span>
+<span class="lineNum">      72 </span>            :     }
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :   public:
+<span class="lineNum">      75 </span>            :     TraitSet(const TraitManager&lt;TRAIT_TYPES...&gt; &amp; tm); // Defined after TraitManager.
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :     // Access a specific trait value by passing in its definition.
+<span class="lineNum">      78 </span>            :     template &lt;typename IN_TYPE&gt;
+<span class="lineNum">      79 </span>            :     const IN_TYPE &amp; Get(const TraitKey&lt;IN_TYPE&gt; &amp; in_key) const {
+<span class="lineNum">      80 </span>            :       constexpr int type_id = emp::get_type_index&lt;IN_TYPE, TRAIT_TYPES...&gt;();
+<span class="lineNum">      81 </span>            :       static_assert(type_id &gt;= 0, &quot;Unknown type provided to TraitSet::Get() const&quot;);
+<span class="lineNum">      82 </span>            :       return std::get&lt;type_id&gt;(type_sets)[in_key.GetIndex()];
+<span class="lineNum">      83 </span>            :     }
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            :     template &lt;typename IN_TYPE&gt;
+<span class="lineNum">      86 </span>            :     IN_TYPE &amp; Get(const TraitKey&lt;IN_TYPE&gt; &amp; in_key) {
+<span class="lineNum">      87 </span>            :       constexpr int type_id = emp::get_type_index&lt;IN_TYPE, TRAIT_TYPES...&gt;();
+<span class="lineNum">      88 </span>            :       static_assert(type_id &gt;= 0, &quot;Unknown type provided to TraitSet::Get()&quot;);
+<span class="lineNum">      89 </span>            :       return std::get&lt;type_id&gt;(type_sets)[in_key.GetIndex()];
+<span class="lineNum">      90 </span>            :     }
+<span class="lineNum">      91 </span>            :   };
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            :   template &lt;typename... TRAIT_TYPES&gt;
+<span class="lineNum">      94 </span>            :   class TraitManager {
+<span class="lineNum">      95 </span>            :     friend class TraitSet&lt;TRAIT_TYPES...&gt;;
+<span class="lineNum">      96 </span>            :   private:
+<span class="lineNum">      97 </span>            :     // A group of trait definitions must be created for each type handled.
+<span class="lineNum">      98 </span>            :     std::tuple&lt; std::vector&lt; TraitDef&lt;TRAIT_TYPES&gt; &gt;... &gt; trait_groups;
+<span class="lineNum">      99 </span>            :     int num_traits;
+<span class="lineNum">     100 </span>            :     TraitSet&lt;TRAIT_TYPES...&gt; default_trait_set;
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            :     static const int num_types = sizeof...(TRAIT_TYPES);
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span>            :     // Helper Functions:
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            :     // Return a constant indicating the position of a given type in the tuple.
+<span class="lineNum">     107 </span>            :     template &lt;typename BASE_TYPE&gt;
+<span class="lineNum">     108 </span>            :     constexpr static int GetTraitID() {
+<span class="lineNum">     109 </span>            :       return emp::get_type_index&lt;BASE_TYPE, TRAIT_TYPES...&gt;();
+<span class="lineNum">     110 </span>            :     }
+<span class="lineNum">     111 </span>            : 
+<a name="112"><span class="lineNum">     112 </span>            :     // Return the vector of traits for the given type (const version).</a>
+<span class="lineNum">     113 </span>            :     template &lt;typename IN_TYPE&gt;
+<span class="lineNum">     114 </span><span class="lineCov">          5 :     const std::vector&lt; TraitDef&lt;IN_TYPE&gt; &gt; &amp; GetTraitGroup() const {</span>
+<span class="lineNum">     115 </span>            :       static_assert(GetTraitID&lt;IN_TYPE&gt;() &gt;= 0,
+<span class="lineNum">     116 </span>            :                     &quot;Unknown type provided to TraitManager::GetTraitGroup() const&quot;);
+<span class="lineNum">     117 </span><span class="lineCov">          5 :       return std::get&lt; GetTraitID&lt;IN_TYPE&gt;() &gt;(trait_groups);</span>
+<span class="lineNum">     118 </span>            :     }
+<span class="lineNum">     119 </span>            : 
+<a name="120"><span class="lineNum">     120 </span>            :     // Return the vector of traits for the given type.</a>
+<span class="lineNum">     121 </span>            :     template &lt;typename IN_TYPE&gt;
+<span class="lineNum">     122 </span><span class="lineCov">          3 :     std::vector&lt; TraitDef&lt;IN_TYPE&gt; &gt; &amp; GetTraitGroup() {</span>
+<span class="lineNum">     123 </span>            :       static_assert(GetTraitID&lt;IN_TYPE&gt;() &gt;= 0,
+<span class="lineNum">     124 </span>            :                     &quot;Unknown type provided to TraitManager::GetTraitGroup()&quot;);
+<span class="lineNum">     125 </span><span class="lineCov">          3 :       return std::get&lt; GetTraitID&lt;IN_TYPE&gt;() &gt;(trait_groups);</span>
+<span class="lineNum">     126 </span>            :     }
+<span class="lineNum">     127 </span>            : 
+<a name="128"><span class="lineNum">     128 </span>            :     // Base Case...</a>
+<span class="lineNum">     129 </span>            :     template &lt;typename CUR_TYPE&gt;
+<span class="lineNum">     130 </span><span class="lineCov">          5 :     void SetDefaultsByType(TraitSet&lt;TRAIT_TYPES...&gt; &amp; trait_set) const {</span>
+<span class="lineNum">     131 </span>            :       // Get the relevant vectors for the current type.
+<span class="lineNum">     132 </span><span class="lineCov">          5 :       const std::vector&lt; TraitDef&lt;CUR_TYPE&gt; &gt; &amp; cur_group = GetTraitGroup&lt;CUR_TYPE&gt;();</span>
+<span class="lineNum">     133 </span><span class="lineCov">          5 :       std::vector&lt;CUR_TYPE&gt; &amp; type_set = trait_set.template GetTypeSet&lt;CUR_TYPE&gt;();</span>
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span>            :       // Set all of the values in type_set
+<span class="lineNum">     136 </span><span class="lineCov">          5 :       type_set.resize(0);</span>
+<span class="lineNum">     137 </span><span class="lineCov">          5 :       for (const TraitDef&lt;CUR_TYPE&gt; &amp; cur_def : cur_group) {</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :         type_set.push_back(cur_def.GetDefault());</span>
+<span class="lineNum">     139 </span>            :       }
+<span class="lineNum">     140 </span><span class="lineCov">          5 :     }</span>
+<a name="141"><span class="lineNum">     141 </span>            : </a>
+<span class="lineNum">     142 </span>            :     template &lt;typename FIRST_TYPE, typename SECOND_TYPE, typename... OTHER_TYPES&gt;
+<span class="lineNum">     143 </span><span class="lineCov">          4 :     void SetDefaultsByType(TraitSet&lt;TRAIT_TYPES...&gt; &amp; trait_set) const {</span>
+<span class="lineNum">     144 </span><span class="lineCov">          4 :       SetDefaultsByType&lt;FIRST_TYPE&gt;(trait_set);</span>
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            :       // And recurse through the other types.
+<span class="lineNum">     147 </span><span class="lineCov">          4 :       SetDefaultsByType&lt;SECOND_TYPE, OTHER_TYPES...&gt;(trait_set);</span>
+<span class="lineNum">     148 </span><span class="lineCov">          4 :     }</span>
+<a name="149"><span class="lineNum">     149 </span>            : </a>
+<a name="150"><span class="lineNum">     150 </span>            :   public:</a>
+<span class="lineNum">     151 </span><span class="lineCov">          1 :     TraitManager() : num_traits(0), default_trait_set(*this) { ; }</span>
+<span class="lineNum">     152 </span><span class="lineCov">          1 :     ~TraitManager() { ; }</span>
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span>            :     static int GetNumTypes() { return num_types; }
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            :     int GetNumTraits() const { return num_traits; }
+<span class="lineNum">     157 </span>            :     template &lt;typename IN_TYPE&gt; int GetNumTraitsOfType() const {
+<span class="lineNum">     158 </span>            :       return (int) GetTraitGroup&lt;IN_TYPE&gt;().size();
+<span class="lineNum">     159 </span>            :     }
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span>            :     // Lookup a trait by its type and index.
+<span class="lineNum">     162 </span>            :     template &lt;typename IN_TYPE&gt;
+<span class="lineNum">     163 </span>            :     const TraitDef&lt;IN_TYPE&gt; &amp; GetTraitDef(int index) {
+<span class="lineNum">     164 </span>            :       std::vector&lt; TraitDef&lt;IN_TYPE&gt; &gt; &amp; cur_group = GetTraitGroup&lt;IN_TYPE&gt;();      
+<span class="lineNum">     165 </span>            :       emp_assert(index &gt;= 0 &amp;&amp; index &lt; (int) cur_group.size());
+<span class="lineNum">     166 </span>            :       return cur_group[index];
+<span class="lineNum">     167 </span>            :     }
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :     // Lookup a trait by its type and index.
+<span class="lineNum">     170 </span>            :     template &lt;typename IN_TYPE&gt;
+<span class="lineNum">     171 </span>            :     const TraitDef&lt;IN_TYPE&gt; &amp; GetTraitDef(TraitKey&lt;IN_TYPE&gt; key) {
+<span class="lineNum">     172 </span>            :       std::vector&lt; TraitDef&lt;IN_TYPE&gt; &gt; &amp; cur_group = GetTraitGroup&lt;IN_TYPE&gt;();      
+<span class="lineNum">     173 </span>            :       return cur_group[key.GetIndex()];
+<span class="lineNum">     174 </span>            :     }
+<a name="175"><span class="lineNum">     175 </span>            : </a>
+<span class="lineNum">     176 </span>            :     template &lt;typename IN_TYPE&gt;
+<span class="lineNum">     177 </span><span class="lineCov">          3 :     const TraitDef&lt;IN_TYPE&gt; &amp; AddTrait(const std::string &amp; _name, const std::string &amp; _desc,</span>
+<span class="lineNum">     178 </span>            :                               const IN_TYPE &amp; _default_val) {
+<span class="lineNum">     179 </span><span class="lineCov">          3 :       std::vector&lt; TraitDef&lt;IN_TYPE&gt; &gt; &amp; cur_group = GetTraitGroup&lt;IN_TYPE&gt;();</span>
+<span class="lineNum">     180 </span><span class="lineCov">          3 :       const int trait_index = (int) cur_group.size();</span>
+<span class="lineNum">     181 </span><span class="lineCov">          3 :       cur_group.push_back( TraitDef&lt;IN_TYPE&gt;(_name, _desc, _default_val, trait_index) );</span>
+<span class="lineNum">     182 </span><span class="lineCov">          3 :       num_traits++;</span>
+<span class="lineNum">     183 </span><span class="lineCov">          3 :       return cur_group[trait_index];</span>
+<a name="184"><span class="lineNum">     184 </span>            :     }</a>
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span><span class="lineCov">          1 :     void SetDefaults(TraitSet&lt;TRAIT_TYPES...&gt; &amp; trait_set) const {</span>
+<span class="lineNum">     187 </span><span class="lineCov">          1 :       SetDefaultsByType&lt;TRAIT_TYPES...&gt;(trait_set);</span>
+<span class="lineNum">     188 </span><span class="lineCov">          1 :     }</span>
+<span class="lineNum">     189 </span>            :   };
+<span class="lineNum">     190 </span>            : 
+<a name="191"><span class="lineNum">     191 </span>            : </a>
+<span class="lineNum">     192 </span>            :   template &lt;typename... TRAIT_TYPES&gt;
+<span class="lineNum">     193 </span><span class="lineCov">          1 :   TraitSet&lt;TRAIT_TYPES...&gt;::TraitSet(const TraitManager&lt;TRAIT_TYPES...&gt; &amp; tm) {</span>
+<span class="lineNum">     194 </span><span class="lineCov">          1 :     tm.SetDefaults(*this);</span>
+<span class="lineNum">     195 </span><span class="lineCov">          1 :   }</span>
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span>            : }
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.11</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
