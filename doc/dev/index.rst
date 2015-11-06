@@ -1,5 +1,5 @@
-The Empirical developer documentation
-=====================================
+The Empirical Contributor Documentation
+=======================================
 
 This section of the documentation is for people who are contributing (or who
 would like to contribute to) the Emscripten codebase, either through
@@ -9,11 +9,6 @@ Contents:
 
 .. toctree::
    contribution-guidelines-and-review
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   getting-started
+   adding-documentation
 
