@@ -62,7 +62,7 @@ namespace emp {
 // Generate a pop-up alert in a web browser if an assert is tripped.
 #define emp_assert_tdebug_impl(EXPR) emp_assert_tdebug_impl2(EXPR)
 
-#define emp_assert_tdebug_impl2(EXPR)                                    \
+#define emp_assert_tdebug_impl2(EXPR)                                   \
   do {                                                                  \
     if ( !(EXPR) ) {                                                    \
       emp::assert_last_fail = true;                                     \
