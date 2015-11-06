@@ -22,4 +22,5 @@ clean:
 	rm -f *.o
 	rm -f *.gcda
 	rm -f *.gcno
+	rm -f *.info
 	rm -rf ./html
