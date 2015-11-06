@@ -3,8 +3,32 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
-//  This class manages the gradual movement of a widget from one state to another.
+//  A Tween manages the gradual shift in properties of one or more widgets over time.
 //
+//  To create a Tween, a duration must be specified, along with an optional default
+//  target.  Once a Tween is setup, paths can be added to it, which represent the
+//  changes that should occure over the specified duration.
+//
+//  A path can be a function to call (with the 0.0 to 1.0 fraction of the time that's
+//  gone by) or a variable to set to the current fraction.  Dependants can also be set
+//  to refresh with each Tween update.
+//
+//  Available methods include:
+//   Tween & AddPath(std::function<void(double)> set_fun,
+//                   double start_val, double end_val, std::function<double(double)> timing=LINEAR);
+//   Tween & AddPath(double & set_var,
+//                   double start_val, double end_val, std::function<double(double)> timing=LINEAR);
+//   Tween & AddDependant(Widget w);
+//   void Start();
+//   void Stop();
+//
+//
+//  Development notes:
+//   * Need to setup an AddPath that actually uses widgets and properties (stub in place).
+//   * Need a Reverse(), which swaps start and end positions.
+//   * Need a Reset()
+//
+
 
 #include "../emtools/emfunctions.h"
 

@@ -3,8 +3,24 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Specs for the Slate widget.
+//  Slate Widgets maintain an ordered collection of other widgets.  When printed to the
+//  web page, these internal widgets are presented in order.
 //
+//  To create a Slate:
+//
+//    emp::web::Slate my_slate("name");
+//
+//  To use a Slate:
+//
+//    my_slate << "Add this text!"
+//             << emp::web::Image("my_image.png")
+//             << "<br>";
+//
+//  To register a Slate in a Document:
+//
+//    my_doc << my_slate;
+//
+
 
 #include "Text.h"
 #include "Widget.h"
