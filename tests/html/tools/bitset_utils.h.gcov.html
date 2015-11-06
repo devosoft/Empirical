@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - cov.info - tools/bitset_utils.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">tools</a> - bitset_utils.h<span style="font-size: 80%;"> (source / <a href="bitset_utils.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">cov.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2015-11-01 13:32:36</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #ifndef EMP_BITSET_UTILS_H</a>
+<span class="lineNum">       2 </span>            : #define EMP_BITSET_UTILS_H
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            : //////////////////////////////////////////////////////////////////////////////
+<span class="lineNum">       5 </span>            : //
+<span class="lineNum">       6 </span>            : //  This file contains a set of simple functions to manipulate bitsets.
+<span class="lineNum">       7 </span>            : //
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #include &quot;functions.h&quot;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : namespace emp {
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            :   template &lt;int NUM_BITS&gt;
+<span class="lineNum">      14 </span>            :   constexpr uint32_t UIntMaskFirst() { return (UIntMaskFirst&lt;NUM_BITS-1&gt; &lt;&lt; 1) | 1; }
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :   template &lt;&gt;
+<span class="lineNum">      17 </span>            :   constexpr uint32_t UIntMaskFirst&lt;0&gt;() { return 0; }
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            :   // Dealing with bits in uint64_t variables
+<span class="lineNum">      20 </span>            :   const int ByteCount[256] = {
+<span class="lineNum">      21 </span>            :     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+<span class="lineNum">      22 </span>            :     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+<span class="lineNum">      23 </span>            :     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+<span class="lineNum">      24 </span>            :     2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+<span class="lineNum">      25 </span>            :     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+<span class="lineNum">      26 </span>            :     2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+<span class="lineNum">      27 </span>            :     2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+<span class="lineNum">      28 </span>            :     3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
+<span class="lineNum">      29 </span>            :   };
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            :   inline int count_bits(uint64_t val) {
+<span class="lineNum">      32 </span>            :     return
+<span class="lineNum">      33 </span>            :       ByteCount[  val &gt;&gt; 56         ] +
+<span class="lineNum">      34 </span>            :       ByteCount[ (val &gt;&gt; 48) &amp; 0xFF ] +
+<span class="lineNum">      35 </span>            :       ByteCount[ (val &gt;&gt; 40) &amp; 0xFF ] +
+<span class="lineNum">      36 </span>            :       ByteCount[ (val &gt;&gt; 32) &amp; 0xFF ] +
+<span class="lineNum">      37 </span>            :       ByteCount[ (val &gt;&gt; 24) &amp; 0xFF ] +
+<span class="lineNum">      38 </span>            :       ByteCount[ (val &gt;&gt; 16) &amp; 0xFF ] +
+<span class="lineNum">      39 </span>            :       ByteCount[ (val &gt;&gt;  8) &amp; 0xFF ] +
+<span class="lineNum">      40 </span>            :       ByteCount[  val        &amp; 0xFF ];
+<a name="41"><span class="lineNum">      41 </span>            :   }</a>
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span><span class="lineCov">          1 :   inline int count_bits(uint32_t val) {</span>
+<span class="lineNum">      44 </span>            :     return 
+<span class="lineNum">      45 </span><span class="lineCov">          2 :       ByteCount[  val &gt;&gt; 24         ] +</span>
+<span class="lineNum">      46 </span><span class="lineCov">          2 :       ByteCount[ (val &gt;&gt; 16) &amp; 0xFF ] +</span>
+<span class="lineNum">      47 </span><span class="lineCov">          1 :       ByteCount[ (val &gt;&gt;  8) &amp; 0xFF ] +</span>
+<span class="lineNum">      48 </span><span class="lineCov">          1 :       ByteCount[  val        &amp; 0xFF ];</span>
+<span class="lineNum">      49 </span>            :   }
+<a name="50"><span class="lineNum">      50 </span>            : </a>
+<span class="lineNum">      51 </span>            :   inline int find_bit(uint64_t val) { return count_bits( (~val) &amp; (val-1) ); }
+<span class="lineNum">      52 </span><span class="lineCov">          1 :   inline int find_bit(const uint32_t val) { return count_bits( (~val) &amp; (val-1) ); }</span>
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :   /*
+<span class="lineNum">      55 </span>            :   // Returns the position of the first set (one) bit or a -1 if none exist.
+<span class="lineNum">      56 </span>            :   template &lt;size_t BITS&gt;
+<span class="lineNum">      57 </span>            :   int find_bit(const std::bitset&lt;BITS&gt; &amp; in) {
+<span class="lineNum">      58 </span>            :     int offset = 0;
+<span class="lineNum">      59 </span>            :     uint64_t tmp_bits = 0ULL;
+<span class="lineNum">      60 </span>            :     while (offset &lt; BITS &amp;&amp; ((tmp_bits = (in &gt;&gt; offset).to_ullong()) == 0ULL)) {
+<span class="lineNum">      61 </span>            :       offset += 64;
+<span class="lineNum">      62 </span>            :     }
+<span class="lineNum">      63 </span>            :     return tmp_bits ? find_bit(tmp_bits) + offset : -1;
+<span class="lineNum">      64 </span>            :   }
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :   template &lt;size_t BITS1, size_t BITS2&gt;
+<span class="lineNum">      67 </span>            :   std::bitset&lt;BITS1+BITS2&gt; concat_bits(std::bitset&lt;BITS1&gt; in1, std::bitset&lt;BITS2&gt; in2) {
+<span class="lineNum">      68 </span>            :     constexpr int BITS_OUT = BITS1 + BITS2;  // How many bits are in the output?
+<span class="lineNum">      69 </span>            :     constexpr int FULL_ULLS1 = BITS1 &gt;&gt; 6;   // How many 64-bit groups of bits fit into in1?
+<span class="lineNum">      70 </span>            :     constexpr int FULL_ULLS2 = BITS2 &gt;&gt; 6;   // How many 64-bit groups of bits fit into in2?
+<span class="lineNum">      71 </span>            :     // constexpr int EXTRA_BITS1 = BITS1 &amp; 63;  // How many bits are leftover in BITS1?
+<span class="lineNum">      72 </span>            :     constexpr int EXTRA_BITS2 = BITS2 &amp; 63;  // How many bits are leftover in BITS2?
+<span class="lineNum">      73 </span>            :     std::bitset&lt;BITS_OUT&gt; out_bits;
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :     // Copy over in1...
+<span class="lineNum">      76 </span>            :     for (int i = FULL_ULLS1; i &gt;= 0; --i) {
+<span class="lineNum">      77 </span>            :       out_bits &lt;&lt;= 64;                          // Make room for the next group of bits.
+<span class="lineNum">      78 </span>            :       out_bits |= (in1 &gt;&gt; (i*64)).to_ullong();  // Put them in place.
+<span class="lineNum">      79 </span>            :     }
+<span class="lineNum">      80 </span>            :   }
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            :   template &lt;size_t BITS&gt;
+<span class="lineNum">      83 </span>            :   constexpr std::bitset&lt;BITS&gt; mask_bit(uint32_t id) {
+<span class="lineNum">      84 </span>            :     return (std::bitset&lt;BITS&gt;(1)) &lt;&lt; id;
+<span class="lineNum">      85 </span>            :   }
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            :   template &lt;size_t BITS&gt;
+<span class="lineNum">      88 </span>            :   constexpr std::bitset&lt;BITS&gt; mask_pattern(size_t start, size_t step, size_t end) {
+<span class="lineNum">      89 </span>            :     return mask_bit&lt;BITS&gt;(start) | std::bitset&lt;BITS&gt;(mask_pattern&lt;BITS*(start&lt;end)&gt;(start+step,step,end));
+<span class="lineNum">      90 </span>            :   }
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span>            :   template &lt;&gt;
+<span class="lineNum">      93 </span>            :   constexpr size_t mask_pattern&lt;0&gt;(size_t start, size_t step, size_t end) {
+<span class="lineNum">      94 </span>            :     return 0;
+<span class="lineNum">      95 </span>            :   }
+<span class="lineNum">      96 </span>            :   */
+<span class="lineNum">      97 </span>            : }
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.11</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

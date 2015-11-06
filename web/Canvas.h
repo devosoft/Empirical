@@ -3,7 +3,27 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Specs for the Canvas widget.
+//  This class manages canvases on the web
+//
+//  To build a Canvas object, a width and height (in pixels, by default) need to be
+//  supplied, along with an optional HTML id.
+//
+//  As of now, only circles and rectangles are supported, but more soon:
+//
+//    int GetWidth() const
+//    int GetHeight() const
+//
+//    Canvas & Circle(double x, double y, double r,
+//                    const std::string & fc="", const std::string & lc="")
+//    Canvas & Circle(const emp::Circle<> & circle,
+//                    const std::string & fc="", const std::string & lc="")
+//    Canvas & Rect(double x, double y, double w, double h,
+//                    const std::string & fc="", const std::string & lc="")
+//    Canvas & StrokeColor(std::string c)
+//    Canvas & Clear()
+//
+//  For each, x and y are the anchor coordinates; r is the radius of a circle;
+//  fc is the foreground color, and lc is the line color.
 //
 
 #include <string>

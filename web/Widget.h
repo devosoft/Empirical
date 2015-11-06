@@ -13,13 +13,7 @@
 //  ELEMENTInfo maintains information about the specific widget (derived from WidgetInfo)
 //  ELEMENT interfaces to ELEMENTInfo so multiple elements use same core; derived from WidgetFacet
 //
-//
-//  Development notes:
-//  * Change 'active' flag to an activity state enum, which can include:
-//      INACTIVE - Widget is not currently part of the DOM.
-//      WAITING - As soon as document is ready, widgit will be live.
-//      STATIC - Part of DOM, but not immediately updating when changes occur.
-//      LIVE - Widget is part of DOM and should be updated immediately on change.
+//  Library uses should not need to access Widgets directly, only specific derived types.
 //
 
 #include <string>
@@ -247,7 +241,7 @@ namespace web {
       // Derived widgets may also provide JavaScript code to be run on redraw.
       virtual void TriggerJS() { ; }
 
-      // Assume that the associated ID exists and replace it with the currnet HTML code.
+      // Assume that the associated ID exists and replace it with the current HTML code.
       virtual void ReplaceHTML() {
         std::stringstream ss;
         

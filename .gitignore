@@ -25,6 +25,7 @@ incoming/
 */env/*
 tmp/
 build/*
+third-party/doxygen/build/*
 doc/_build/*
 utils/edit_dist/IO/
 utils/edit_dist/edit_dist

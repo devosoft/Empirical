@@ -3,8 +3,32 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
-//  Specs for the Button widget.
+//  The Button widget will create a button and call a specified function when that
+//  button is clicked.
 //
+//  Use example:
+//
+//    emp::web::Button my_button(MyFun, "Button Name", "html_id");
+//
+//  Where my_button is the C++ object linking to the button, MyFun is the function you
+//  want to call on clicks, "Button Name" is the label on the button itself, and
+//  "html_id" is the optional id you want it to use in the HTML code (otherwise it will
+//  generate a unique name on it's own.)
+//
+//  Member functions to set state:
+//    Button & Callback(const std::function<void()> & in_callback)
+//    Button & Label(const std::string & in_label)
+//    Button & Title(const std::string & in_t)
+//    Button & Autofocus(bool in_af)
+//    Button & Disabled(bool in_dis)
+//
+//  Retriving current state:
+//    const std::string & GetLabel() const
+//    const std::string & GetTitle() const
+//    bool HasAutofocus() const
+//    bool IsDisabled() const
+//
+
 
 #include "Widget.h"
 
