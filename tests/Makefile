@@ -1,11 +1,13 @@
 GCOV_FLAGS = -g -fprofile-arcs -ftest-coverage
 
 test: test_driver.cc test_tools.cc
-	g++ ${GCOV_FLAGS} -std=c++11 test_driver.cc -o test.o
+	g++ -std=c++11 test_driver.cc -o test.o
 	# Execute tests
 	./test.o
 	
-coverage: test
+coverage:
+	g++ ${GCOV_FLAGS} -std=c++11 test_driver.cc -o test.o
+	./test.o
 	lcov -c -d . -b . -o cov.info
 
 	# sanitize the tracefile for things we don't care about
@@ -20,5 +22,4 @@ clean:
 	rm -f *.o
 	rm -f *.gcda
 	rm -f *.gcno
-	rm -f *~
 	rm -rf ./html
