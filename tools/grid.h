@@ -173,10 +173,10 @@ namespace Grid {
   template <typename CELL_TYPE>
   class Cell {
   private:
-    Board & board;
+    Board<CELL_TYPE> & board;
     int id;
   public:
-    Cell(Board & b, int in_id) : board(b), id(in_id) { ; }
+    Cell(Board &b, int in_id) : board(b), id(in_id) { ; }
     Cell(const Cell &) = default;
     Cell & operator=(const Cell &) = default;
 
