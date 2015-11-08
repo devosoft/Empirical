@@ -15,6 +15,11 @@ UTests/UI/ElementSlate.js
 UTests/UI/Example.js
 UTests/UI/mini_evoke.js
 UTests/web/TextArea.js
+tests/html
+tests/*.gcda
+tests/*.gcno
+tests/*cov.info
+third-party/doxygen/build/*
 Slideshow.js
 incoming/
 */env/*

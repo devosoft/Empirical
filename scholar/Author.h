@@ -16,12 +16,12 @@ namespace emp {
     std::string middle_name;
     std::string last_name;
   public:
+    Author(const std::string & first, const std::string & middle, const std::string & last)
+      : first_name(first), middle_name(middle), last_name(last) { ; }
     Author(const std::string & first, const std::string & last)
       : first_name(first), last_name(last) { ; }
     Author(const std::string & last)
       : last_name(last) { ; }
-    Author(const std::string & first, const std::string & middle, const std::string & last)
-      : first_name(first), middle_name(middle), last_name(last) { ; }
     Author(const Author &) = delete;
     ~Author() { ; }
     Author & operator=(const Author &) = delete;
