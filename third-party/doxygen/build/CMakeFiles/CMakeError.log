@@ -1,0 +1,86 @@
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec1866300824/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1866300824.dir/build.make CMakeFiles/cmTryCompileExec1866300824.dir/build
+make[1]: Entering directory '/home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1866300824.dir/CheckSymbolExists.c.o
+/usr/lib/ccache/cc    -o CMakeFiles/cmTryCompileExec1866300824.dir/CheckSymbolExists.c.o   -c /home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTryCompileExec1866300824
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1866300824.dir/link.txt --verbose=1
+/usr/lib/ccache/cc       CMakeFiles/cmTryCompileExec1866300824.dir/CheckSymbolExists.c.o  -o cmTryCompileExec1866300824 -rdynamic 
+CMakeFiles/cmTryCompileExec1866300824.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x16): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTryCompileExec1866300824.dir/build.make:88: recipe for target 'cmTryCompileExec1866300824' failed
+make[1]: *** [cmTryCompileExec1866300824] Error 1
+make[1]: Leaving directory '/home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp'
+Makefile:118: recipe for target 'cmTryCompileExec1866300824/fast' failed
+make: *** [cmTryCompileExec1866300824/fast] Error 2
+
+File /home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec867661484/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec867661484.dir/build.make CMakeFiles/cmTryCompileExec867661484.dir/build
+make[1]: Entering directory '/home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec867661484.dir/CheckFunctionExists.c.o
+/usr/lib/ccache/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTryCompileExec867661484.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.0/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec867661484
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec867661484.dir/link.txt --verbose=1
+/usr/lib/ccache/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTryCompileExec867661484.dir/CheckFunctionExists.c.o  -o cmTryCompileExec867661484 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTryCompileExec867661484.dir/build.make:88: recipe for target 'cmTryCompileExec867661484' failed
+make[1]: *** [cmTryCompileExec867661484] Error 1
+make[1]: Leaving directory '/home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp'
+Makefile:118: recipe for target 'cmTryCompileExec867661484/fast' failed
+make: *** [cmTryCompileExec867661484/fast] Error 2
+
+
+Performing C++ SOURCE FILE Test ICONV_ACCEPTS_CONST_INPUT failed with the following output:
+Change Dir: /home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec3832582549/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec3832582549.dir/build.make CMakeFiles/cmTryCompileExec3832582549.dir/build
+make[1]: Entering directory '/home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec3832582549.dir/src.cxx.o
+/usr/lib/ccache/c++    -DICONV_ACCEPTS_CONST_INPUT   -o CMakeFiles/cmTryCompileExec3832582549.dir/src.cxx.o -c /home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp/src.cxx
+/home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp/src.cxx: In function ‘int main()’:
+/home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp/src.cxx:4:43: error: invalid conversion from ‘const char**’ to ‘char**’ [-fpermissive]
+             iconv(iconv_t(-1), &p, 0, 0, 0);
+                                           ^
+In file included from /home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp/src.cxx:1:0:
+/usr/include/iconv.h:42:15: note: initializing argument 2 of ‘size_t iconv(iconv_t, char**, size_t*, char**, size_t*)’
+ extern size_t iconv (iconv_t __cd, char **__restrict __inbuf,
+               ^
+CMakeFiles/cmTryCompileExec3832582549.dir/build.make:57: recipe for target 'CMakeFiles/cmTryCompileExec3832582549.dir/src.cxx.o' failed
+make[1]: *** [CMakeFiles/cmTryCompileExec3832582549.dir/src.cxx.o] Error 1
+make[1]: Leaving directory '/home/bocajnotnef/git/Empirical/third-party/doxygen/build/CMakeFiles/CMakeTmp'
+Makefile:118: recipe for target 'cmTryCompileExec3832582549/fast' failed
+make: *** [cmTryCompileExec3832582549/fast] Error 2
+
+Source file was:
+#include <iconv.h>
+         int main() {
+            char const *p = 0;
+            iconv(iconv_t(-1), &p, 0, 0, 0);
+         }

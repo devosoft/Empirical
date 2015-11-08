@@ -8,7 +8,9 @@ contributing code or by improving the documentation.
 Contents:
 
 .. toctree::
+   getting-started
    contribution-guidelines-and-review
+   guide-to-testing
 
 Indices and tables
 ==================
