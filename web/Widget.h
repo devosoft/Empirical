@@ -124,6 +124,7 @@ namespace web {
     // An active widget makes live changes to the webpage (once document is ready)
     // An inactive widget just records changes internally.
     void Activate();
+    void Freeze();
     virtual void Deactivate(bool top_level=true);
     bool ToggleActive();
 
@@ -356,6 +357,10 @@ namespace web {
     auto * cur_info = info;
     info->state = WAITING;
     OnDocumentReady( std::function<void(void)>([cur_info](){ cur_info->DoActivate(); }) );
+  }
+
+  void Widget::Freeze() {
+    info->state = FROZEN;
   }
   
   void Widget::Deactivate(bool top_level) {
