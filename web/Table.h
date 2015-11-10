@@ -352,8 +352,10 @@ namespace web {
         for (int r = 0; r < row_count; r++) {
           rows[r].style.Apply(emp::to_string(id, '_', r));
           for (int c = 0; c < col_count; c++) {
-            rows[r][c].style.Apply(emp::to_string(id, '_', r, '_', c));
-            rows[r][c].slate->ReplaceHTML();
+            auto & datum = rows[r][c];
+            if (datum.IsMasked()) continue;  // If this cell is masked by another, skip it!
+            datum.style.Apply(emp::to_string(id, '_', r, '_', c));
+            datum.slate->ReplaceHTML();
           }
         }
       }
