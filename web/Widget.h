@@ -17,7 +17,12 @@
 //  ELEMENTInfo maintains information about the specific widget (derived from WidgetInfo)
 //  ELEMENT interfaces to ELEMENTInfo so multiple elements use same core; derived from WidgetFacet
 //
-//  Library uses should not need to access Widgets directly, only specific derived types.
+//  Library users should not need to access Widgets directly, only specific derived types.
+//
+//  Tips for using widgets:
+//
+//  * If you are about to make a lot of changes at once, run Freeze(), make the changes, and
+//    then run Activate() again.  Freeze prevents widgets from being updated immediately.
 //
 
 #include <string>
@@ -72,20 +77,27 @@ namespace web {
     // Give derived classes the ability to access widget info.
     static WidgetInfo * Info(const Widget & w) { return w.info; }
     
+    // Four activity states for any widget.
+    //   INACTIVE - Not be in DOM at all.
+    //   WAITING  - Will become active once the page finishes loading.
+    //   FROZEN   - Part of DOM, but not updating on the screen.
+    //   ACTIVE   - Fully active; changes are reflected as they happen.
+    
+    enum ActivityState { INACTIVE, WAITING, FROZEN, ACTIVE };
+
   public:
     Widget(const std::string & id);
     Widget(WidgetInfo * in_info=nullptr);
     Widget(const Widget & in) : Widget(in.info) { ; }
     Widget & operator=(const Widget & in) { return SetInfo(in.info); }
     
-    enum ActivityState { INACTIVE, WAITING, STATIC, ACTIVE };
-
     virtual ~Widget();
     
     bool IsNull() const { return info == nullptr; }
+
     bool IsInactive() const;
     bool IsWaiting() const;
-    bool IsStatic() const;
+    bool IsFrozen() const;
     bool IsActive() const;
     
     virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
@@ -116,6 +128,7 @@ namespace web {
     // An active widget makes live changes to the webpage (once document is ready)
     // An inactive widget just records changes internally.
     void Activate();
+    void Freeze();
     virtual void Deactivate(bool top_level=true);
     bool ToggleActive();
 
@@ -249,8 +262,8 @@ namespace web {
       virtual void ReplaceHTML() {
         std::stringstream ss;
         
-        // If this node is static, don't change it!
-        if (state == Widget::STATIC) return;
+        // If this node is frozen, don't change it!
+        if (state == Widget::FROZEN) return;
 
         // If this node is active, fill put its contents in ss; otherwise make ss an empty span.
         if (state == Widget::ACTIVE) GetHTML(ss);
@@ -321,11 +334,9 @@ namespace web {
     return *this;
   }
 
-  enum ActivityState { INACTIVE, WAITING, STATIC, ACTIVE };
-
   bool Widget::IsInactive() const { if (!info) return false; return info->state == INACTIVE; }  
   bool Widget::IsWaiting() const { if (!info) return false; return info->state == WAITING; }
-  bool Widget::IsStatic() const { if (!info) return false; return info->state == STATIC; }
+  bool Widget::IsFrozen() const { if (!info) return false; return info->state == FROZEN; }
   bool Widget::IsActive() const { if (!info) return false; return info->state == ACTIVE; }
   
   std::string Widget::GetID() const { return info ? info->id : "(none)"; }
@@ -350,6 +361,10 @@ namespace web {
     auto * cur_info = info;
     info->state = WAITING;
     OnDocumentReady( std::function<void(void)>([cur_info](){ cur_info->DoActivate(); }) );
+  }
+
+  void Widget::Freeze() {
+    info->state = FROZEN;
   }
   
   void Widget::Deactivate(bool top_level) {

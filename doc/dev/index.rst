@@ -8,7 +8,14 @@ contributing code or by improving the documentation.
 Contents:
 
 .. toctree::
-   contribution-guidelines-and-review
    getting-started
+   contribution-guidelines-and-review
    adding-documentation
+   guide-to-testing
 
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

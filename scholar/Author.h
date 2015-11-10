@@ -24,13 +24,15 @@ namespace emp {
       : first_name(first), middle_name(middle), last_name(last) { ; }
     Author(const std::string & first, const std::string & last)
       : first_name(first), last_name(last) { ; }
+    Author(const std::string & last)
+      : last_name(last) { ; }
     Author(const Author &) = delete;
     ~Author() { ; }
     Author & operator=(const Author &) = delete;
 
     bool operator==(const Author & other) const {
       return (first_name == other.first_name) &&
-        (midd_name == other.middle_name) &&
+        (middle_name == other.middle_name) &&
         (last_name == other.last_name);
     }
     bool operator!=(const Author & other) const { return !(*this == other); }
