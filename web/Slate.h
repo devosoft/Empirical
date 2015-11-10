@@ -41,12 +41,14 @@ namespace web {
     class SlateInfo : public internal::WidgetInfo {
       friend Slate; friend TableInfo;
     protected:
-      emp::vector<Widget> m_children;             // Widgets contained in this one.
-      bool append_ok;                             // Can we add more children?
-      std::map<std::string, Widget> widget_dict;  // By-name lookup for child widgets
+      double scroll_top;                         // Where should slate scroll to? (0.0 to 1.0)
+      emp::vector<Widget> m_children;            // Widgets contained in this one.
+      bool append_ok;                            // Can we add more children?
+      std::map<std::string, Widget> widget_dict; // By-name lookup for child widgets
 
       
-      SlateInfo(const std::string & in_id="") : internal::WidgetInfo(in_id), append_ok(true) { ; }
+      SlateInfo(const std::string & in_id="")
+        : internal::WidgetInfo(in_id), scroll_top(0.0), append_ok(true) { ; }
       SlateInfo(const SlateInfo &) = delete;               // No copies of INFO allowed
       SlateInfo & operator=(const SlateInfo &) = delete;   // No copies of INFO allowed
       virtual ~SlateInfo() { ; }
@@ -182,6 +184,32 @@ namespace web {
         if (state == Widget::ACTIVE) {
           for (auto & child : m_children) child->ReplaceHTML();
         }
+
+        if (scroll_top >= 0.0) {
+          EM_ASM_ARGS({
+              var slate_id = Pointer_stringify($0);
+              var slate_obj = document.getElementById(slate_id);
+              if (slate_obj == null) alert(slate_id);
+              // alert('id=' + slate_id + '  top=' + $1 +
+              //       '  height=' + slate_obj.scrollHeight);
+              var scroll_top = $1 * slate_obj.scrollHeight;
+              slate_obj.scrollTop = scroll_top;
+            }, id.c_str(), scroll_top);
+        }
+
+        // @CAO If scrolltop is set, handle scrolling!
+    // float scroll_frac = ((float) (hardware->GetIP() - 3)) / (float) hardware->GetNumInsts();
+    // if (scroll_frac < 0.0) scroll_frac = 0.0;
+
+    // EM_ASM_ARGS({
+    //     var code = Pointer_stringify($0);
+    //     var code_obj = document.getElementById("code");
+    //     code_obj.innerHTML = code;
+    //     code_obj.scrollTop = $1 * code_obj.scrollHeight;
+    //     var cycle_obj = document.getElementById("cycle_count");
+    //     cycle_obj.innerHTML = "&nbsp;&nbsp;&nbsp;Cycles Used = " + $2;
+    // }, ss.str().c_str(), scroll_frac, hardware->GetExeCount());
+
       }
 
     public:
@@ -209,6 +237,9 @@ namespace web {
    
     bool AppendOK() const override { return Info()->append_ok; }
 
+    double ScrollTop() const { return Info()->scroll_top; }
+    Slate & ScrollTop(double in_top) { Info()->scroll_top = in_top; return *this; }
+    
     void ClearChildren() {
       if (info) Info()->ClearChildren();
     }
