@@ -23,7 +23,7 @@ Contents:
 .. toctree::
    :maxdepth: 1
 
-   user/index
+   library/index
    dev/index
 
 Indices and tables
