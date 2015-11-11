@@ -8,3 +8,6 @@ build-doxygen: download-doxygen
 
 install-sphinx:
 	bash ./install_sphinx.sh
+
+clean:
+	rm -rf doxygen/build/*
