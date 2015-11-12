@@ -26,6 +26,7 @@ namespace emp {
     // Hardware components...
     typedef std::vector<emp::Instruction_Evo> MEMORY_TYPE;
     typedef HardwareCPU_Evo<CPU_SCALE, STACK_SIZE> HARDWARE_TYPE;
+
     MEMORY_TYPE memory[CPU_SCALE];
     CPUStack<STACK_SIZE> stacks[CPU_SCALE];
     CPUHead heads[CPU_SCALE];
@@ -68,9 +69,9 @@ namespace emp {
       return stacks[stack_id];
     }
 
-    static int GetNumStacks()  { return CPU_SCALE; }
-    static int GetStackSize()  { return STACK_SIZE; }
-    static int GetNumArgNops() { return CPU_SCALE; }
+    constexpr int GetNumStacks() const { return CPU_SCALE; }
+    constexpr int GetStackSize() const { return STACK_SIZE; }
+    constexpr int GetNumArgNops() const { return CPU_SCALE; }
 
     MEMORY_TYPE & GetMemory(int mem_id=0) { return memory[mem_id]; }
     
