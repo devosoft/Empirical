@@ -33,7 +33,7 @@
 
 #define EMP_EMPTY()
 
-// Several versions of eval...
+// Several versions of eval...  these simply make sure arguments are evaluated before use.
 #define EMP_EVAL(...)  __VA_ARGS__
 #define EMP_EVAL1(...)  __VA_ARGS__
 #define EMP_EVAL2(...) __VA_ARGS__
@@ -45,7 +45,7 @@
 #define EMP_EVAL8(...) __VA_ARGS__
 #define EMP_EVAL9(...) __VA_ARGS__
 #define EMP_EVAL10(...) __VA_ARGS__
-#define EMP_EVAL11(...)  __VA_ARGS__
+#define EMP_EVAL11(...) __VA_ARGS__
 #define EMP_EVAL12(...) __VA_ARGS__
 #define EMP_EVAL13(...) __VA_ARGS__
 #define EMP_EVAL14(...) __VA_ARGS__
@@ -56,6 +56,10 @@
 #define EMP_EVAL19(...) __VA_ARGS__
 #define EMP_EVAL20(...) __VA_ARGS__
 
+
+// Full set of conversions from Decimal representations of numbers to their
+// binary versions (up to 1024).
+  
 #define EMP_DEC_TO_BIN(VAL) EMP_DEC_TO_BIN_ ## VAL
 
 #define EMP_DEC_TO_BIN_0    0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -1082,6 +1086,9 @@
 #define EMP_DEC_TO_BIN_1021  1, 1, 1, 1, 1, 1, 1, 1, 0, 1
 #define EMP_DEC_TO_BIN_1022  1, 1, 1, 1, 1, 1, 1, 1, 1, 0
 #define EMP_DEC_TO_BIN_1023  1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+
+
+// Convert binary values back to decimal (10 bits).
 
 #define EMP_BIN_TO_DEC(...) EMP_BIN_TO_DEC_IMPL EMP_EMPTY() (__VA_ARGS__)
 #define EMP_BIN_TO_DEC_IMPL(B0,B1,B2,B3,B4,B5,B6,B7,B8,B9)              \
