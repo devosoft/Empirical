@@ -11,7 +11,15 @@
 //  TableData is represented in its upper-left most cell, but may be muliple cells wide/tall.
 //  Cells representing TableData are "Control Cells"; other cells are "Helper Cells".
 //
-
+//
+//  Developer notes:
+//  * Tables should more directly manage internal slates rather than just adding divs and
+//    then having them filled in.
+//  * TextTables should be created that simply use text in cells, radically speeding up
+//    printing of such tables (and covering 80% of use cases).
+//  * IDEALLY: Make a single table that will look at what each cell is pointing to (table
+//    or text) and write out what it needs to, in place.
+//
 
 #include "../tools/vector.h"
 
