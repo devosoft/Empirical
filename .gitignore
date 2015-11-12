@@ -19,6 +19,7 @@ tests/html
 tests/*.gcda
 tests/*.gcno
 tests/*cov.info
+tests/coverage*
 third-party/doxygen/build/*
 Slideshow.js
 incoming/

@@ -8,14 +8,12 @@ test: test_driver.cc test_tools.cc
 coverage:
 	g++ ${GCOV_FLAGS} -std=c++11 test_driver.cc -o test.o
 	./test.o
-	lcov -c -d . -b . -o cov.info
 
-	# sanitize the tracefile for things we don't care about
-	lcov --remove cov.info "*/third-party/*" -o cov.info
-	lcov --remove cov.info "*/Empirical/tests/*" -o cov.info
-	lcov --extract cov.info "*/Empirical/*" -o cov.info
-	# build html coverage info
-	genhtml cov.info --output-directory ./html/
+coverage-html: coverage
+	../third-party/env/bin/gcovr -e "third-party/catch/single_include/catch.hpp" -r ../ --html -o coverage.html
+
+coverage-xml: coverage
+	../third-party/env/bin/gcovr -e "third-party/catch/single_include/catch.hpp" -r ../ --xml-pretty > coverage.xml
 
 clean:
 	rm -f *.out
@@ -23,4 +21,4 @@ clean:
 	rm -f *.gcda
 	rm -f *.gcno
 	rm -f *.info
-	rm -rf ./html
+	rm -f coverage*
