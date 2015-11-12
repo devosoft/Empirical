@@ -1,7 +1,0 @@
-/home/bocajnotnef/git/Empirical/third-party/doxygen/build/src/CMakeFiles/_doxygen.dir
-/home/bocajnotnef/git/Empirical/third-party/doxygen/build/src/CMakeFiles/doxycfg.dir
-/home/bocajnotnef/git/Empirical/third-party/doxygen/build/src/CMakeFiles/doxygen.dir
-/home/bocajnotnef/git/Empirical/third-party/doxygen/build/libmd5/CMakeFiles/md5.dir
-/home/bocajnotnef/git/Empirical/third-party/doxygen/build/qtools/CMakeFiles/qtools.dir
-/home/bocajnotnef/git/Empirical/third-party/doxygen/build/testing/CMakeFiles/tests.dir
-/home/bocajnotnef/git/Empirical/third-party/doxygen/build/vhdlparser/CMakeFiles/vhdlparser.dir
