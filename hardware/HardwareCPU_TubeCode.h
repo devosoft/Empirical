@@ -9,6 +9,8 @@
 //
 
 #include <functional>
+#include <map>
+#include <vector>
 using namespace std::placeholders;
 
 #include "HardwareCPU_Base.h"
@@ -18,16 +20,19 @@ using namespace std::placeholders;
 
 namespace emp {
 
-  template <int REG_SIZE=8, int MEM_SIZE=65536, typename VAL_TYPE=double> class HardwareCPU_TubeCode
+  template <int NUM_REGS=8, int MEM_SIZE=65536, typename VAL_TYPE=double> class HardwareCPU_TubeCode
     : public HardwareCPU_Base<Instruction_TubeCode> {
   protected:
     // Hardware components...
     typedef std::vector<emp::Instruction_TubeCode> CODE_TYPE;
-    typedef HardwareCPU_TubeCode<REG_SIZE, MEM_SIZE> HARDWARE_TYPE;
+    typedef HardwareCPU_TubeCode<NUM_REGS, MEM_SIZE> HARDWARE_TYPE;
 
     CODE_TYPE code;
-    VAL_TYPE regs[REG_SIZE];
-    VAL_TYPE memory[MEM_SIZE];
+    VAL_TYPE memory[MEM_SIZE];                         // Memory!
+    VAL_TYPE regs[NUM_REGS];                           // Registers!
+    std::map<int, VAL_TYPE> var_map;                   // Variables!
+    std::map<int, std::vector<VAL_TYPE> > array_map;   // Arrays!
+    CPUHead IP;                                        // Instruction Pointer!
 
     const InstLib<HardwareCPU_TubeCode, Instruction_TubeCode> & inst_lib;
 
@@ -36,8 +41,9 @@ namespace emp {
       : inst_lib(_inst_lib)
     {
       // Initialize all registers and memory.
-      for (VAL_TYPE & x : regs) x = 0;
       for (VAL_TYPE & x : memory) x = 0;
+      for (VAL_TYPE & x : regs) x = 0;
+      IP.Set(memory, 0);
     }
     HardwareCPU_TubeCode(const HardwareCPU_TubeCode & prototype)
       : HardwareCPU_TubeCode(prototype.inst_lib) { ; }
@@ -46,38 +52,34 @@ namespace emp {
     // Do a full factory-reset on the virtual hardware.
     void Clear() {
       // Initialize all registers and memory.
-      for (VAL_TYPE & x : regs) x = 0;
-      for (VAL_TYPE & x : memory) x = 0;
       code.resize(0);
+      for (VAL_TYPE & x : memory) x = 0;
+      for (VAL_TYPE & x : regs) x = 0;
+      var_map.clear();
+      array_map.clear();
+      IP.Set(memory, 0);
     }
 
     int GetCodeSize() const { return (int) code.size(); }
-    constexpr int GetNumRegs() const { return REG_SIZE; }
     constexpr int GetMemSize() const { return MEM_SIZE; }
+    constexpr int GetNumRegs() const { return NUM_REGS; }
+    int GetNumVars() const { return (int) var_map.size(); }
+    int GetNumArrays() const { return (int) array_map.size(); }
 
     void LoadCode(const std::vector<emp::Instruction_TubeCode> & in_code) { code = in_code; }
-
-    // Examines the nops following the IP to test if they override the default arguments.
-    int ChooseTarget(int default_target) {
-      const int arg_value = heads[HEAD_IP].GetInst().GetArgValue();
-      if (arg_value) {
-        ++heads[HEAD_IP];
-        return arg_value - 1;
-      }
-
-      return default_target;
-    }
 
 
     // The following function drives the execution of the virtual hardware -- it executes the
     // next instruction pointed to by the IP.
     void SingleProcess() {
-      emp_assert(heads[HEAD_IP].IsValid());
+      emp_assert(IP.IsValid());
 
-      const Instruction_TubeCode & inst = heads[HEAD_IP].GetInst();
-      ++heads[HEAD_IP];
+      const Instruction_TubeCode & inst = IP.GetInst();
+      ++IP;
       inst_lib.RunInst(*this, inst.GetID());
     }
+
+
 
 
 
