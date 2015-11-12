@@ -1,4 +1,4 @@
-The Empirical User Documentation
+The Empirical Library Documentation
 ================================
 
 Contents:
