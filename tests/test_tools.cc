@@ -31,7 +31,7 @@
 #include "../tools/macro_math.h"
 #include "../tools/macros.h"
 #include "../tools/assert.h"
-
+#include "../tools/unit_tests.h"
 // currently these have no coveage; we include them so we get metrics on them
 // this doesn't actually work--TODO: figure out why this doesn't work
 #include "../tools/alert.h"

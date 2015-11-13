@@ -5,14 +5,21 @@ build-doxygen-xml:
 	mkdir -p build/doxydoc/source
 	./third-party/doxygen/build/bin/doxygen Doxyfile
 
+diff-cover:
+	cd tests && make diff-cover
+
 test:
 	cd tests && make test
 
 coverage:
 	cd tests && make coverage
 
+coverage-html:
+	cd tests && make coverage-html
+
 install-dependencies:
 	cd third-party && make
 
 clean:
 	rm -rf build/*
+	cd tests && make clean
