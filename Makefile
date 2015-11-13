@@ -23,3 +23,5 @@ install-dependencies:
 clean:
 	rm -rf build/*
 	cd tests && make clean
+clean-dep:
+	cd third-party && make clean
