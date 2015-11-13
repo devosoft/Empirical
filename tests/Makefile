@@ -15,9 +15,11 @@ coverage-html: coverage
 
 coverage-xml: coverage
 	../third-party/env/bin/gcovr -e "third-party/catch/single_include/catch.hpp" -r ../ --xml-pretty > coverage.xml
-
+	
 diff-cover: coverage-xml
-	diff-cover coverage.xml
+	cp coverage.xml ../coverage.xml
+	cd .. && diff-cover coverage.xml
+
 
 clean:
 	rm -f *.out
