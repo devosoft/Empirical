@@ -56,3 +56,9 @@
 
 
 #endif
+
+void somefunc(int someint)
+{
+    // goes nowhere, does nothing
+    return;
+}
