@@ -45,9 +45,13 @@ namespace web {
     class TableInfo;
     
     // Quick method for generating unique IDs when not otherwise specified.
-    static std::string NextWidgetID() {
+    static int NextWidgetNum(bool inc_num=true) {
       static int next_id = 0;
-      return emp::to_string("emp__", next_id++);
+      if (!inc_num) return next_id;
+      return next_id++;
+    }
+    static std::string NextWidgetID() {
+      return emp::to_string("emp__", NextWidgetNum());
     }
     
     // Base class for command-objects that can be fed into widgets.
