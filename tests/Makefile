@@ -10,7 +10,7 @@ coverage:
 	./test.o
 
 coverage-html: coverage
-	mkdir html
+	mkdir -p html
 	../third-party/env/bin/gcovr -e "third-party/catch/single_include/catch.hpp" -r ../ --html --html-details -o html/coverage.html
 
 coverage-xml: coverage
