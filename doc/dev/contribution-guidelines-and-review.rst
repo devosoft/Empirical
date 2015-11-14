@@ -85,8 +85,9 @@ Checklist
 Copy and paste the following into a pull request comment when it is ready for
 review::
 
-   - [ ] Is it mergeable?                                                          
-   - [ ] Did it pass the tests?                                                    
-   - [ ] If you added code, is it tested? Look at the code coverage metrics
+   - [ ] Is it mergeable?
+   - [ ] Did it pass the tests?
+   - [ ] Does 'make doc' succeed?
+   - [ ] If you added code, is it tested? Look at the output for 'make diff-cover'
    - [ ] Was a spellchecker run on the source code and documentation after
      changes were made?
