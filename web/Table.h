@@ -256,28 +256,11 @@ namespace web {
         HTML << "</table>";
       }
       
-      void UpdateRows(int r) {
-        if (row_count != r) {                             // Update only if we're making a change.
-          rows.resize(r);                                 // Resize rows.
-          for (int i = row_count; i < r; i++) {
-            rows[i].SetCols(col_count);                   // Initialize new rows.
-          }
-          row_count = r;                                  // Store new size.
-          if (state == Widget::ACTIVE) ReplaceHTML();     // If active, update screen!
-        }
-      }
-      void UpdateCols(int c) {
-        if (col_count != c) {                               // Update only if we're making a change.
-          col_count = c;                                    // Store new size.
-          for (auto & row : rows) row.SetCols(col_count);   // Make sure all rows have new col_count
-          if (state == Widget::ACTIVE) ReplaceHTML();       // If active, update screen!
-        }
-      }
-      
+
       void ClearCell(int row_id, int col_id) {
         rows[row_id].data[col_id].colspan = 1;
         rows[row_id].data[col_id].rowspan = 1;
-        Slate slate = rows[row_id].data[col_id].GetSlate();
+        Slate & slate = rows[row_id].data[col_id].GetSlate();
         if (slate) slate.ClearChildren();
         rows[row_id].data[col_id].header = false;
         rows[row_id].data[col_id].masked = false;  // @CAO Technically, cell might still be masked!
