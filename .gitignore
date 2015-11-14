@@ -8,6 +8,7 @@ a.out.js
 *.pyc
 *.swp
 *.swo
+coverage.xml
 UTests/tools/tmp*.cc
 UTests/emtools/JSWrap.js
 UTests/UI/Animate.js
@@ -19,6 +20,7 @@ tests/html
 tests/*.gcda
 tests/*.gcno
 tests/*cov.info
+tests/coverage*
 third-party/doxygen/build/*
 Slideshow.js
 incoming/
