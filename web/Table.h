@@ -53,33 +53,12 @@ namespace web {
       TableData() : colspan(1), rowspan(1), header(false), masked(false), slate("") { ; }
       ~TableData() { ; }
       
-      int GetColSpan() const { return colspan; }
-      int GetRowSpan() const { return rowspan; }
-      bool IsHeader() const { return header; }
-      bool IsMasked() const { return masked; }
-      Style & GetStyle() { return style; }
-      const Style & GetStyle() const { return style; }
-      explicit operator bool() { return !masked; }      // Unmasked cell = true, masked = false.
-      
-      Slate & GetSlate() { return slate; }
-      
-      void SetColSpan(int cs) { colspan = cs; }
-      void SetRowSpan(int rs) { rowspan = rs; }
-      void SetHeader(bool h=true) { header = h; }
-      void SetMasked(bool m=true) { masked = m; }
-      
       bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
         bool ok = true;
         if (verbose) ss << prefix << "Scanning: emp::TableData" << std::endl;
-        
-        if (masked == true) {
-          ss << "Warning: Masked cell may have contents!" << std::endl;
-          ok = false;
-        }
-        
+        if (masked) { ss << "Warning: Masked cell may have contents!" << std::endl; ok = false; }
         return ok;
       }
-      
     };  // END: TableData
 
     
@@ -222,25 +201,25 @@ namespace web {
           // Loop through each cell in this row.
           for (int c = 0; c < row.GetSize(); c++) {
             auto & datum = row[c];
-            if (datum.IsMasked()) continue;  // If this cell is masked by another, skip it!
+            if (datum.masked) continue;  // If this cell is masked by another, skip it!
             
             // Print opening tag.
-            HTML << (datum.IsHeader() ? "<th" : "<td");
+            HTML << (datum.header ? "<th" : "<td");
             
             // Include an id for this cell if we have one.
             if (datum.style.GetSize()) HTML << " id=" << id << '_' << r << '_' << c;
 
             // If this cell spans multiple rows or columns, indicate!
-            if (datum.GetColSpan() > 1) HTML << " colspan=\"" << datum.GetColSpan() << "\"";
-            if (datum.GetRowSpan() > 1) HTML << " rowspan=\"" << datum.GetRowSpan() << "\"";
+            if (datum.colspan > 1) HTML << " colspan=\"" << datum.colspan << "\"";
+            if (datum.rowspan > 1) HTML << " rowspan=\"" << datum.rowspan << "\"";
             
             HTML << ">";
             
             // If this cell has contents, initialize them!
-            HTML << "<span id=\"" << datum.GetSlate().GetID() << "\"></span>\n";
+            HTML << "<span id=\"" << datum.slate.GetID() << "\"></span>\n";
             
             // Print closing tag.
-            HTML << (datum.IsHeader() ? "</th>" : "</td>");
+            HTML << (datum.header ? "</th>" : "</td>");
           }
           
           HTML << "</tr>";
@@ -314,12 +293,12 @@ namespace web {
           }
           for (int c = 0; c < col_count; c++) {
             auto & cell = rows[r][c];
-            if (c + cell.GetColSpan() > col_count) {
+            if (c + cell.colspan > col_count) {
               ss << prefix << "  Error: Cell at row " << r << ", col " << c
                  << " extends past right side of table." << std::endl;
               ok = false;
             }
-            if (r + cell.GetRowSpan() > row_count) {
+            if (r + cell.rowspan > row_count) {
               ss << prefix << "  Error: Cell at row " << r << ", col " << c
                  << " extends past bottom of table." << std::endl;
               ok = false;
@@ -340,7 +319,7 @@ namespace web {
           rows[r].style.Apply(emp::to_string(id, '_', r));
           for (int c = 0; c < col_count; c++) {
             auto & datum = rows[r][c];
-            if (datum.IsMasked()) continue;  // If this cell is masked by another, skip it!
+            if (datum.masked) continue;  // If this cell is masked by another, skip it!
             datum.style.Apply(emp::to_string(id, '_', r, '_', c));
             datum.slate->ReplaceHTML();
           }
@@ -485,7 +464,7 @@ namespace web {
 
     Table & SetHeader(bool _h=true) {
       emp_assert(state == CELL);
-      Info()->rows[cur_row].data[cur_col].SetHeader(_h);
+      Info()->rows[cur_row].data[cur_col].header = _h;
       if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
       return *this;
     }
@@ -518,21 +497,21 @@ namespace web {
                  cur_col, new_span, GetNumCols(), GetID());
         
       auto & datum = Info()->rows[cur_row].data[cur_col];
-      const int old_span = datum.GetColSpan();
-      const int row_span = datum.GetRowSpan();
-      datum.SetColSpan(new_span);
+      const int old_span = datum.colspan;
+      const int row_span = datum.rowspan;
+      datum.colspan = new_span;
         
       // For each row, make sure new columns are masked!
       for (int row = cur_row; row < cur_row + row_span; row++) {
         for (int col = cur_col + old_span; col < cur_col + new_span; col++) {
-          Info()->rows[row].data[col].SetMasked(true);
+          Info()->rows[row].data[col].masked = true;
         }
       }
         
       // For each row, make sure former columns are unmasked!
       for (int row = cur_row; row < cur_row + row_span; row++) {
         for (int col = cur_col + new_span; col < cur_col + old_span; col++) {
-          Info()->rows[row].data[col].SetMasked(false);
+          Info()->rows[row].data[col].masked = false;
         }
       }
       
@@ -547,21 +526,21 @@ namespace web {
       emp_assert(state == CELL);
       
       auto & datum = Info()->rows[cur_row].data[cur_col];
-      const int old_span = datum.GetRowSpan();
-      const int col_span = datum.GetColSpan();
-      datum.SetRowSpan(new_span);
+      const int old_span = datum.rowspan;
+      const int col_span = datum.colspan;
+      datum.rowspan = new_span;
       
       // For each col, make sure NEW rows are masked!
       for (int row = cur_row + old_span; row < cur_row + new_span; row++) {
         for (int col = cur_col; col < cur_col + col_span; col++) {
-          Info()->rows[row].data[col].SetMasked(true);
+          Info()->rows[row].data[col].masked = true;
         }
       }
         
       // For each row, make sure former columns are unmasked!
       for (int row = cur_row + new_span; row < cur_row + old_span; row++) {
         for (int col = cur_col; col < cur_col + col_span; col++) {
-          Info()->rows[row].data[col].SetMasked(false);
+          Info()->rows[row].data[col].masked = false;
         }
       }
       
@@ -643,7 +622,7 @@ namespace web {
     if (cur_row >= row_count) cur_row = 0;
     if (cur_col >= col_count) cur_col = 0;
 
-    return rows[cur_row].data[cur_col].GetSlate();
+    return rows[cur_row].data[cur_col].slate;
   }
   
 }
