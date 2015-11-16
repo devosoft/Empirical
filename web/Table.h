@@ -61,11 +61,7 @@ namespace web {
       const Style & GetStyle() const { return style; }
       explicit operator bool() { return !masked; }      // Unmasked cell = true, masked = false.
       
-      bool HasSlate() const { return slate; }
-      Slate & GetSlate() {
-        if (!slate) slate = Slate("");  // If we don't have a slate, build one!
-        return slate;
-      }
+      Slate & GetSlate() { return slate; }
       
       void SetColSpan(int cs) { colspan = cs; }
       void SetRowSpan(int rs) { rowspan = rs; }
@@ -76,7 +72,7 @@ namespace web {
         bool ok = true;
         if (verbose) ss << prefix << "Scanning: emp::TableData" << std::endl;
         
-        if (slate && masked == true) {
+        if (masked == true) {
           ss << "Warning: Masked cell may have contents!" << std::endl;
           ok = false;
         }
@@ -187,9 +183,7 @@ namespace web {
       
       // Add additional children on to this element.
       Widget Append(Widget info) override { return GetCurSlate() << info; }
-      Widget Append(const std::string & text) override {
-        return GetCurSlate() << text;
-      }
+      Widget Append(const std::string & text) override { return GetCurSlate() << text; }
       Widget Append(const std::function<std::string()> & in_fun) override {
         return GetCurSlate() << in_fun;
       }
@@ -243,9 +237,7 @@ namespace web {
             HTML << ">";
             
             // If this cell has contents, initialize them!
-            if (datum.HasSlate()) {
-              HTML << "<span id=\"" << datum.GetSlate().GetID() << "\"></span>\n";
-            }
+            HTML << "<span id=\"" << datum.GetSlate().GetID() << "\"></span>\n";
             
             // Print closing tag.
             HTML << (datum.IsHeader() ? "</th>" : "</td>");
@@ -261,8 +253,7 @@ namespace web {
       void ClearCell(int row_id, int col_id) {
         rows[row_id].data[col_id].colspan = 1;
         rows[row_id].data[col_id].rowspan = 1;
-        Slate & slate = rows[row_id].data[col_id].GetSlate();
-        if (slate) slate.ClearChildren();
+        rows[row_id].data[col_id].slate.ClearChildren();
         rows[row_id].data[col_id].header = false;
         rows[row_id].data[col_id].masked = false;  // @CAO Technically, cell might still be masked!
         rows[row_id].data[col_id].style.Clear();
@@ -341,7 +332,7 @@ namespace web {
 
       
       void ReplaceHTML() override {
-        // Replace Slate's HTML...
+        // Replace Table's HTML...
         internal::WidgetInfo::ReplaceHTML();
 
         // Then replace cells
