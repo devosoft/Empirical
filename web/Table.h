@@ -1,19 +1,16 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_WEB_TABLE_H
-#define EMP_WEB_TABLE_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  Specs for the Table widget
 //
 //  TableInfo has two helper classes: TableRow and TableData.
 //
 //  A Table is composed of row x col cells
-//  TableData is represented in its upper-left most cell, but may be muliple cells wide/tall.
-//  Cells representing TableData are "Control Cells"; other cells are "Helper Cells".
+//  TableData may be muliple cells wide/tall, masking other cells.
 //
 //
 //  Developer notes:
@@ -24,6 +21,9 @@
 //  * IDEALLY: Make a single table that will look at what each cell is pointing to (table
 //    or text) and write out what it needs to, in place.
 //
+
+#ifndef EMP_WEB_TABLE_H
+#define EMP_WEB_TABLE_H
 
 #include "../tools/vector.h"
 
@@ -84,7 +84,8 @@ namespace web {
         return ok;
       }
       
-    };
+    };  // END: TableData
+
     
     class TableRow {
       friend Table; friend TableInfo;
