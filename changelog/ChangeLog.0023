@@ -1,0 +1,8 @@
+2015-11-10  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * {Utests,config,scholar,emtools,geometry,hardware,kinetic,web}/*.h:
+	added copyright header
+    * LICESNE: added symlink to doc/LICENSE
+    * doc/dev/adding-documentation.rst: added doc on writing docs
+    * doc/user*, doc/library*: renamed 'user' to 'library'
+

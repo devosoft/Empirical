@@ -8,6 +8,11 @@ build-doxygen-xml:
 test:
 	cd tests && make test
 
+ChangeLog: changelog/*
+	cd changelog && for f in ChangeLog.*; do cat $f log >> temp; mv temp log; done;
+	cp -f changelog/log ChangeLog
+	@echo "Ignore that 'not found' warning"
+
 coverage:
 	cd tests && make coverage
 

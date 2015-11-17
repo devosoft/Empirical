@@ -1,0 +1,5 @@
+2015-11-05  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * third-party/{doxygen,breathe}/*: added doxygen/breathe autodoc system
+    * Makefile: added doc and install-dep maketargets
+    * doc/{Makefile,conf.py,: added sphinx

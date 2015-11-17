@@ -1,0 +1,5 @@
+2014-10-09  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * tools/{LEVEL_MAP,level_detection.py}: added dependency level mapping
+	script
+
