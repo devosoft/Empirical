@@ -1,3 +1,7 @@
+2015-11-17  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * ChangeLog, Makefile, changelog/*: added changelog system
+
 2015-11-13  Jacob Fenton  <bocajnotnef@gmail.com>
 
 	* Makefile, tests/Makefile: Implemented diff-cover maketargets
