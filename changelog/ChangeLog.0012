@@ -6,3 +6,4 @@
     * tests/*: added unit tests using Catch
     * utests/{tools,geometry,scholar}: migrated all viable tests to Catch
     * third-party/catch/*: implemented catch
+

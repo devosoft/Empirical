@@ -3,3 +3,4 @@
     * third-party/{doxygen,breathe}/*: added doxygen/breathe autodoc system
     * Makefile: added doc and install-dep maketargets
     * doc/{Makefile,conf.py,: added sphinx
+
