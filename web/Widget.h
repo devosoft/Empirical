@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_WEB_WIDGET_H
-#define EMP_WEB_WIDGET_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  Widgets maintain individual components on a web page and link to Elements
 //
@@ -23,7 +19,10 @@
 //
 //  * If you are about to make a lot of changes at once, run Freeze(), make the changes, and
 //    then run Activate() again.  Freeze prevents widgets from being updated immediately.
-//
+
+
+#ifndef EMP_WEB_WIDGET_H
+#define EMP_WEB_WIDGET_H
 
 #include <string>
 
@@ -264,12 +263,11 @@ namespace web {
 
       // Assume that the associated ID exists and replace it with the current HTML code.
       virtual void ReplaceHTML() {
-        std::stringstream ss;
-        
         // If this node is frozen, don't change it!
         if (state == Widget::FROZEN) return;
 
         // If this node is active, fill put its contents in ss; otherwise make ss an empty span.
+        std::stringstream ss;
         if (state == Widget::ACTIVE) GetHTML(ss);
         else ss << "<span id=" << id << "></span>";
         
@@ -416,8 +414,8 @@ namespace web {
       WidgetFacet(const std::string & in_id="") : Widget(in_id) { ; }
       WidgetFacet(const WidgetFacet & in) : Widget(in) { ; }
       WidgetFacet(const Widget & in) : Widget(in) {
-        // Converting from a generic widget; make sure type is correct!
-        emp_assert(dynamic_cast<typename RETURN_TYPE::INFO_TYPE *>( Info(in) ) != NULL,
+        // Converting from a generic widget; make sure type is correct or non-existant!
+        emp_assert(!in || dynamic_cast<typename RETURN_TYPE::INFO_TYPE *>( Info(in) ) != NULL,
                    in.GetID());
       }
       WidgetFacet(WidgetInfo * in_info) : Widget(in_info) { ; }
