@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_WEB_SLATE_H
-#define EMP_WEB_SLATE_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  Slate Widgets maintain an ordered collection of other widgets.  When printed to the
 //  web page, these internal widgets are presented in order.
@@ -24,6 +20,12 @@
 //
 //    my_doc << my_slate;
 //
+//
+//  Development Notes:
+//  * Should we move all widget_dict info into Document?
+
+#ifndef EMP_WEB_SLATE_H
+#define EMP_WEB_SLATE_H
 
 
 #include "Text.h"
@@ -108,8 +110,7 @@ namespace web {
       
       void AddChild(Widget in) {
         // If the inserted widget is already active, remove it from its old position.
-        emp_assert(in->parent == nullptr && "Cannot insert widget if already has parent!",
-                   in->id);
+        emp_assert(in->parent == nullptr && "Cannot insert widget if already has parent!", in->id);
         emp_assert(in->state != Widget::ACTIVE && "Cannot insert a stand-alone active widget!");
 
         // Setup parent-child relationship
