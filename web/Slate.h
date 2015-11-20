@@ -163,7 +163,6 @@ namespace web {
       
       Widget Append(Widget info) override {
         if (!append_ok) return ForwardAppend(info);
-        emp_assert(info->parent == nullptr);
         AddChild(info);
         return info;
       }
