@@ -1,5 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////
-//
 //  This file is part of Empirical, https://github.com/mercere99/Empirical/
 //  Copyright (C) Michigan State University, 2015.
 //  Released under the MIT Software license; see doc/LICENSE
@@ -20,7 +18,6 @@
 //    printing of such tables (and covering 80% of use cases).
 //  * IDEALLY: Make a single table that will look at what each cell is pointing to (table
 //    or text) and write out what it needs to, in place.
-//
 
 #ifndef EMP_WEB_TABLE_H
 #define EMP_WEB_TABLE_H
@@ -47,10 +44,10 @@ namespace web {
       bool masked;    // Is this cell masked by another cell?
       Style style;    // CSS Style
       
-      Slate slate;   // Which slate is associated with this data cell?
+      emp::vector<Widget> children;  // Widgets contained in this cell.
       
     public:
-      TableData() : colspan(1), rowspan(1), header(false), masked(false), slate("") { ; }
+      TableData() : colspan(1), rowspan(1), header(false), masked(false) { ; }
       ~TableData() { ; }
       
       bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
@@ -75,7 +72,6 @@ namespace web {
       int GetSize() const { return (int) data.size(); }               // How many cells in this row?
       TableData & operator[](int id) { return data[id]; }             // Get a single cell
       const TableData & operator[](int id) const { return data[id]; } // Get a single const cell
-      emp::vector<TableData> & GetCells() { return data; }            // Get ALL cells
       
       TableRow & SetCols(int c) { data.resize(c); return *this; }
 
@@ -108,10 +104,11 @@ namespace web {
       int col_count;
       emp::vector<TableRow> rows;   // detail object for each row.
 
-      Table * append_widget;        // Which widget is triggering an append?
+      int append_row;               // Which row is triggering an append?
+      int append_col;               // Which col is triggering an append?
       
       TableInfo(const std::string & in_id="")
-        : internal::WidgetInfo(in_id), row_count(0), col_count(0), append_widget(nullptr) { ; }
+        : internal::WidgetInfo(in_id), row_count(0), col_count(0), append_row(0), append_col(0) { ; }
       TableInfo(const TableInfo &) = delete;               // No copies of INFO allowed
       TableInfo & operator=(const TableInfo &) = delete;   // No copies of INFO allowed
       virtual ~TableInfo() { ; }
@@ -121,12 +118,9 @@ namespace web {
       void Resize(int new_rows, int new_cols) {
         // Resize existing rows        
         if (new_cols != col_count) {
-          for (auto & row : rows) {
-            row.SetCols(new_cols);
-            for (int c = col_count; c < new_cols; c++) {
-              row[c].slate->parent = this;
-              if (state == Widget::ACTIVE) row[c].slate->DoActivate();
-            }
+          for (int r = 0; r < (int) rows.size() && r < new_rows; r++) {
+            rows[r].SetCols(new_cols);
+            for (int c = col_count; c < new_cols; c++) { AddChild(r, c, Text("")); }
           }
           col_count = new_cols;
         }
@@ -136,10 +130,7 @@ namespace web {
           rows.resize(new_rows);
           for (int r = row_count; r < new_rows; r++) {
             rows[r].SetCols(col_count);
-            for (int c = 0; c < col_count; c++) {
-              rows[r][c].slate->parent = this;
-              if (state == Widget::ACTIVE) rows[r][c].slate->DoActivate();
-            }
+            for (int c = 0; c < col_count; c++) { AddChild(r, c, Text("")); }
           }
           row_count = new_rows;          
         }
@@ -147,33 +138,89 @@ namespace web {
       }
       
       void DoActivate(bool top_level=true) override {
-        // Activate all of the cell slates.
+        // Activate all of the cell children.        
         for (int r = 0; r < row_count; r++) {
           for (int c = 0; c < col_count; c++) {
-            rows[r][c].slate->DoActivate(false);
+            for (auto & child : rows[r][c].children) child->DoActivate(false);
           }
         }
+
+        // Activate this Table.
         internal::WidgetInfo::DoActivate(top_level);
       }
       
       
-      // Get a slate associated with the current cell (and build one if we need to...)
-      Widget & GetCurSlate();
-      
-      // Add additional children on to this element.
-      Widget Append(Widget info) override { return GetCurSlate() << info; }
-      Widget Append(const std::string & text) override { return GetCurSlate() << text; }
-      Widget Append(const std::function<std::string()> & in_fun) override {
-        return GetCurSlate() << in_fun;
+      // Return a text element for appending into a specific cell.
+      // If the last element is text, use it; otherwise build a new one.
+      web::Text & GetTextWidget(int r, int c) {
+        // If the final element is not text, add one.
+        if (rows[r][c].children.size() == 0
+            || rows[r][c].children.back().IsText() == false
+            || rows[r][c].children.back().AppendOK() == false)  {
+          AddChild(Text());
+        }
+        return (Text &) rows[r][c].children.back();
       }
       
-      // Normally only slates deal with registering other widgets, but Tables
-      // need to facilitate recursive registrations.
+      web::Text & GetTextWidget() {
+        // Make sure the number of rows hasn't changed, making the current position illegal.
+        if (append_row >= row_count) append_row = 0;
+        if (append_col >= col_count) append_col = 0;
+
+        return GetTextWidget(append_row, append_col);
+      }
+      
+      // Append into the current cell
+      Widget Append(Widget in) override { AddChild(in); return in; }
+      Widget Append(const std::string & text) override { return GetTextWidget() << text; }
+      Widget Append(const std::function<std::string()> & in_fun) override {
+        return GetTextWidget() << in_fun;
+      }
+
+      
+
+      // Add a widget to the specified cell in the current table.
+      void AddChild(int r, int c, Widget in) {
+        emp_assert(in->parent == nullptr && "Cannot insert widget if already has parent!", in->id);
+        emp_assert(in->state != Widget::ACTIVE && "Cannot insert a stand-alone active widget!");
+
+        // Setup parent-child relationship in the specified cell.
+        rows[r][c].children.emplace_back(in);
+        in->parent = this;
+        Register(in);
+
+        
+        // If this element (as new parent) is active, anchor widget and activate it!
+        if (state == Widget::ACTIVE) {
+          // Create a span tag to anchor the new widget.
+          std::string cell_id = emp::to_string(id, '_', r, '_', c);
+          EM_ASM_ARGS({
+              parent_id = Pointer_stringify($0);
+              child_id = Pointer_stringify($1);
+              $('#' + parent_id).append('<span id=\'' + child_id + '\'></span>');
+            }, cell_id.c_str(), in.GetID().c_str());
+
+          // Now that the new widget has some place to hook in, activate it!
+          in->DoActivate();
+        }
+      }
+
+      // If no cell is specified for AddChild, use the current cell.
+      void AddChild(Widget in) {
+        // Make sure the number of rows hasn't changed, making the current position illegal.
+        if (append_row >= row_count) append_row = 0;
+        if (append_col >= col_count) append_col = 0;
+
+        AddChild(append_row, append_col, in);
+      }
+        
+
+      // Tables need to facilitate recursive registrations
       
       void RegisterChildren(internal::SlateInfo * regestrar) override {
         for (int r = 0; r < row_count; r++) {
           for (int c = 0; c < col_count; c++) {
-            regestrar->Register( rows[r][c].slate );
+            for (Widget & child : rows[r][c].children) regestrar->Register(child);
           }
         }
       }
@@ -181,7 +228,7 @@ namespace web {
       void UnregisterChildren(internal::SlateInfo * regestrar) override {
         for (int r = 0; r < row_count; r++) {
           for (int c = 0; c < col_count; c++) {
-            regestrar->Unregister( rows[r][c].slate );
+            for (Widget & child : rows[r][c].children) regestrar->Unregister(child);
           }
         }
       }
@@ -215,8 +262,10 @@ namespace web {
             
             HTML << ">";
             
-            // If this cell has contents, initialize them!
-            HTML << "<span id=\"" << datum.slate.GetID() << "\"></span>\n";
+            // Loop through all children of this cell and build a span element for each.
+            for (Widget & w : datum.children) {
+              HTML << "<span id=\'" << w.GetID() << "'></span>";
+            }
             
             // Print closing tag.
             HTML << (datum.header ? "</th>" : "</td>");
@@ -230,12 +279,19 @@ namespace web {
       
 
       void ClearCell(int row_id, int col_id) {
-        rows[row_id].data[col_id].colspan = 1;
-        rows[row_id].data[col_id].rowspan = 1;
-        rows[row_id].data[col_id].slate.ClearChildren();
-        rows[row_id].data[col_id].header = false;
-        rows[row_id].data[col_id].masked = false;  // @CAO Technically, cell might still be masked!
-        rows[row_id].data[col_id].style.Clear();
+        auto & datum = rows[row_id].data[col_id];
+        datum.colspan = 1;
+        datum.rowspan = 1;
+        datum.header = false;
+        datum.masked = false;  // @CAO Technically, cell might still be masked!
+        datum.style.Clear();
+        
+        // Clear out this cell's children.
+        // @CAO: Keep a starting text widget if we can!
+        if (parent) {
+          for (Widget & child : datum.children) parent->Unregister(child);
+        }
+        datum.children.resize(0);
       }
       void ClearRowCells(int row_id) {
         for (int col_id = 0; col_id < col_count; col_id++) ClearCell(row_id, col_id);
@@ -321,7 +377,12 @@ namespace web {
             auto & datum = rows[r][c];
             if (datum.masked) continue;  // If this cell is masked by another, skip it!
             datum.style.Apply(emp::to_string(id, '_', r, '_', c));
-            datum.slate->ReplaceHTML();
+
+            // If this widget is active, immediately replace children.
+            if (state == Widget::ACTIVE) {
+              for (auto & child : datum.children) child->ReplaceHTML();
+            }
+
           }
         }
       }
@@ -394,7 +455,10 @@ namespace web {
     int GetNumCells() const { return Info()->col_count*Info()->row_count; }
 
     // Called before an append.
-    virtual void PrepareAppend() override { Info()->append_widget = this; }
+    virtual void PrepareAppend() override {
+      Info()->append_row = cur_row;
+      Info()->append_col = cur_col;
+    }
     
     int GetCurRow() const { return cur_row; }
     int GetCurCol() const { return cur_col; }
@@ -613,17 +677,6 @@ namespace web {
     }
   };
 
-  // Setup mechanism to retrieve current slate for table append.
-  Widget & internal::TableInfo::GetCurSlate() {
-    int cur_row = append_widget->cur_row;
-    int cur_col = append_widget->cur_col;
-
-    // Make sure the number of rows hasn't changed, making the current position illegal.
-    if (cur_row >= row_count) cur_row = 0;
-    if (cur_col >= col_count) cur_col = 0;
-
-    return rows[cur_row].data[cur_col].slate;
-  }
   
 }
 }
