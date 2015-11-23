@@ -1,6 +1,9 @@
 sudo: false
 language: cpp
 
+notifications:
+    email: false
+
 compiler:
     - g++
 install:
