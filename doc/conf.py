@@ -13,7 +13,7 @@
 # serve to show the default.
 
 import sys
-import os
+import os, subprocess
 import shlex
 
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
