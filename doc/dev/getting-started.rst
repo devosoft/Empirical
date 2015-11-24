@@ -212,8 +212,6 @@ Claiming an issue and starting to develop
    you the remote branch doesn't exist -- This is fine, as it will also provide
    the command to create the branch. Copy/paste/run and you should be set.
 
-   You should also visit and read :doc:`contribution-guidelines-and-review.`.
-
 #. Periodically update your branch from the main Empirical master branch::
 
       git pull upstream master
@@ -261,7 +259,7 @@ Claiming an issue and starting to develop
    info.)
 
 #. Paste in the committer checklist from
-   :doc:`contribution-guidelines-and-review.rst`
+   :doc:`contribution-guidelines-and-review`
    and, after its pasted in, check off as many of the boxes as you can.
 
 #. As you add new commits to address bugs or formatting issues, you can keep
