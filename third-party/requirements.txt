@@ -1,3 +1,4 @@
 sphinx
 gcovr
 diff-cover
+breathe
