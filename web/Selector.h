@@ -1,14 +1,27 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  Specs for the Selector widget.
+//
+//  A Selector widget provides the user with a pull-down menu.  It can be
+//  examined at any time (via GetSelectID()) or else alerts call a designated
+//  function when a particular option is chosen.
+//
+//     UI::Selector sel("sel");
+//
+//     sel.SetOption("Option 1");
+//     sel.SetOption("Option B", TriggerB) ;
+//     sel.SetOption("Option the Third", [](){ emp::Alert("3 chosen!"} );
+//     sel.SetOption("Option IV");
+//
+//  In this example, the second option will call TriggerB when it is chosen,
+//  while the third option will call the provided lambda function.
 
 #ifndef EMP_WEB_SELECTOR_H
 #define EMP_WEB_SELECTOR_H
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-//  Specs for the Selector widget.
-//
 
 #include "../emtools/JSWrap.h"
 #include "../tools/vector.h"
