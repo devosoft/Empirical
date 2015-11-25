@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_WEB_DOCUMENT_H
-#define EMP_WEB_DOCUMENT_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  The Document class is built off of Slate, but initializes the EMP web framework, if
 //  neeeded, and activates itself.  It also provides quick ways to add and lookup
@@ -18,7 +14,10 @@
 //  You can also look up any widget by name.  For example, if you previously created a
 //  Canvas widget with the HTML id "my_canvas", you can look it up later by using
 //  doc.Canvas("my_canvas")
-//
+
+
+#ifndef EMP_WEB_DOCUMENT_H
+#define EMP_WEB_DOCUMENT_H
 
 #include "Button.h"
 #include "Canvas.h"

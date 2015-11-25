@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_WEB_ANIMATE_H
-#define EMP_WEB_ANIMATE_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  This class manages animations in a web page.
 //
@@ -41,7 +37,10 @@
 //    void SetCallback(const std::function<void(const Animate &)> & fun)
 //    void SetCallback(const std::function<void(double)> & fun)
 //    void SetCallback(const std::function<void()> & fun)
-//
+
+
+#ifndef EMP_WEB_ANIMATE_H
+#define EMP_WEB_ANIMATE_H
 
 #include <functional>
 

@@ -1,23 +1,19 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_WEB_BUTTON_H
-#define EMP_WEB_BUTTON_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
 //
-//  The Button widget will create a button and call a specified function when that
-//  button is clicked.
+//
+//  The Button widget will create a button and call a specified function when
+//  that button is clicked.
 //
 //  Use example:
 //
 //    emp::web::Button my_button(MyFun, "Button Name", "html_id");
 //
-//  Where my_button is the C++ object linking to the button, MyFun is the function you
-//  want to call on clicks, "Button Name" is the label on the button itself, and
-//  "html_id" is the optional id you want it to use in the HTML code (otherwise it will
-//  generate a unique name on it's own.)
+//  Where my_button is the C++ object linking to the button, MyFun is the
+//  function you want to call on clicks, "Button Name" is the label on the
+//  button itself, and "html_id" is the optional id you want it to use in the
+//  HTML code (otherwise it will generate a unique name on it's own.)
 //
 //  Member functions to set state:
 //    Button & Callback(const std::function<void()> & in_callback)
@@ -32,6 +28,9 @@
 //    bool HasAutofocus() const
 //    bool IsDisabled() const
 //
+
+#ifndef EMP_WEB_BUTTON_H
+#define EMP_WEB_BUTTON_H
 
 
 #include "Widget.h"
