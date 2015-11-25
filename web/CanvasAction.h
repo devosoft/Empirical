@@ -1,18 +1,18 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_WEB_CANVAS_ACTION_H
-#define EMP_WEB_CANVAS_ACTION_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  Specs for the CanvasAction widget, which is a base class for all available
 //  actions on Canvases.
 //
-//  Other specific actions defined here include:
+//  Other, more specific actions defined here are:
 //    CanvasStrokeColor
 //
+//  See also CanvasShape.h for more actions
+
+#ifndef EMP_WEB_CANVAS_ACTION_H
+#define EMP_WEB_CANVAS_ACTION_H
 
 #include <string>
 
