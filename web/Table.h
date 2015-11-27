@@ -10,6 +10,119 @@
 //  A Table is composed of row x col cells
 //  TableData may be muliple cells wide/tall, masking other cells.
 //
+//  Constructors:
+//
+//    Table(int r, int c, const std::string & in_id="")
+//      Create a new r-by-c table with an optional DOM id specified.
+//      State is initialized to TABLE; the first row and first cell are default locations.
+//
+//    Table(const Widget & in)
+//      Point to an existing table (assert that widget IS a table!)
+//
+//
+//  Accessors:
+//
+//    int GetNumCols() const
+//    int GetNumRows() const
+//    int GetNumCells() const
+//      Return associated information about the table size.
+//
+//    int GetCurRow() const { return cur_row; }
+//    int GetCurCol() const { return cur_col; }
+//      Return information about the focal position on the table.
+//
+//
+//  Adjusting Table size:
+//
+//    Table & Rows(int r)
+//    Table & Cols(int c)
+//    Table & Resize(int r, int c)
+//      Set the number of rows, columns, or both in the table.
+//
+//
+//  Setting or identifying the current table state:
+//
+//    bool InStateTable() const
+//    bool InStateRow() const
+//    bool InStateCell() const
+//      Return true/false to identify what state the table is currently in.
+//
+//    Table & GetCell(int r, int c)
+//      Make the specified row and column active and the table state CELL.
+//      All further manipulations of the table object will focus on that cell until
+//      the state is changed again.
+//
+//    Table & GetRow(int r)
+//      Make the specified row active, column zero, and the table state ROW
+//      All further manipulations of the table object will focus on that row until
+//      the state is changed again.
+//
+//    Table & GetTable()
+//      Leave the active row and column, but set the table state to TABLE
+//      All further manipulations of the table object will focus on the whole table
+//      until the state is changed again.
+//
+//
+//  Modifying data in table
+//
+//    Table & SetHeader(bool _h=true)
+//      Set the current cell to be a header (or not if false is passed in)
+//
+//    Widget AddText(int r, int c, const std::string & text)
+//      Add text to the specified table cell.
+//
+//    Widget AddHeader(int r, int c, const std::string & text)
+//      Add text to the specified table cell AND set the cell to be a header.
+//
+//    Table & SetRowSpan(int row_span)
+//    Table & SetColSpan(int col_span)
+//    Table & SetSpan(int row_span, int col_span)
+//      Allow the row and/or column span of the current cell to be adjusted.
+//
+//
+//  Clearing table contents:
+//
+//    Table & ClearTable()
+//      Clear all style information from table, remove contents from all cells, and
+//      shrink table to no rows and no cells.
+//
+//    Table & ClearRows()
+//      Clear style information from rows and cells and remove contents from cells
+//      (but leave table style information and size.)
+//
+//    Table & ClearRow(int r)
+//      Clear style information from the specified row and contents from all cells
+//      in that row (but leave other rows untouched).
+//
+//    Table & ClearCells()
+//      If state is TABLE, clear contents from all cells in entire table.
+//      If state is ROW, clear contents from all cells in that row.
+//      If state is CELL, clear just that single cell.
+//
+//    Table & ClearCell(int r, int c)
+//      Clear contents of just the specified cell.
+//
+//    Table & Clear()
+//      Dynamically clear the entire active state (TABLE, ROW, or CELL).
+//
+//
+//  Style manipulation
+//
+//    std::string GetCSS(const std::string & setting)
+//    std::string GetCSS(const std::string & setting, SETTING_TYPE && value)
+//      Get or Set the current value of the specified Style setting, based on the state of
+//      the table (i.e., TABLE affects full table style, ROW affects active row style, and
+//      CELL affects active cell style.)
+//
+//    Table & RowCSS(int row_id, const std::string & setting, SETTING_TYPE && value)
+//    Table & CellCSS(int row_id, int col_id, const std::string & setting, SETTING_TYPE && value)
+//      Set the specified row or cell Style to the value indicated.
+//
+//    Table & RowsCSS(const std::string & setting, SETTING_TYPE && value)
+//    Table & CellsCSS(const std::string & setting, SETTING_TYPE && value)
+//      Set the specified Style setting of all rows or all cells to the value indicated.
+//
+//
 //
 //  Developer notes:
 //  * Tables should more directly manage internal slates rather than just adding divs and
@@ -18,6 +131,7 @@
 //    printing of such tables (and covering 80% of use cases).
 //  * IDEALLY: Make a single table that will look at what each cell is pointing to (table
 //    or text) and write out what it needs to, in place.
+
 
 #ifndef EMP_WEB_TABLE_H
 #define EMP_WEB_TABLE_H
@@ -481,7 +595,8 @@ namespace web {
     Table & ClearCells() {
       if (state == TABLE) Info()->ClearTableCells();
       else if (state == ROW) Info()->ClearRowCells(cur_row);
-      else emp_assert(false && "Cannot run ClearCells on single cell!", state);
+      else if (state == CELL) Info()->ClearCell(cur_row, cur_col);
+      else emp_assert(false && "Unknown State!", state);
       return *this;
     }
     Table & ClearCell(int r, int c) { Info()->ClearCell(r, c); return *this; }
@@ -555,6 +670,35 @@ namespace web {
     }
     
     // Allow the row and column span of the current cell to be adjusted.
+    Table & SetRowSpan(int new_span) {
+      emp_assert((cur_row + new_span <= GetNumRows()) && "Row span too wide for table!");
+      emp_assert(state == CELL);
+      
+      auto & datum = Info()->rows[cur_row].data[cur_col];
+      const int old_span = datum.rowspan;
+      const int col_span = datum.colspan;
+      datum.rowspan = new_span;
+      
+      // For each col, make sure NEW rows are masked!
+      for (int row = cur_row + old_span; row < cur_row + new_span; row++) {
+        for (int col = cur_col; col < cur_col + col_span; col++) {
+          Info()->rows[row].data[col].masked = true;
+        }
+      }
+        
+      // For each row, make sure former columns are unmasked!
+      for (int row = cur_row + new_span; row < cur_row + old_span; row++) {
+        for (int col = cur_col; col < cur_col + col_span; col++) {
+          Info()->rows[row].data[col].masked = false;
+        }
+      }
+      
+      // Redraw the entire table to fix row span information.
+      if (IsActive()) Info()->ReplaceHTML();
+
+      return *this;
+    }
+    
     Table & SetColSpan(int new_span) {
       emp_assert(state == CELL);
       emp_assert((cur_col + new_span <= GetNumCols()) && "Col span too wide for table!",
@@ -585,35 +729,13 @@ namespace web {
       return *this;
     }
       
-    Table & SetRowSpan(int new_span) {
-      emp_assert((cur_row + new_span <= GetNumRows()) && "Row span too wide for table!");
-      emp_assert(state == CELL);
-      
-      auto & datum = Info()->rows[cur_row].data[cur_col];
-      const int old_span = datum.rowspan;
-      const int col_span = datum.colspan;
-      datum.rowspan = new_span;
-      
-      // For each col, make sure NEW rows are masked!
-      for (int row = cur_row + old_span; row < cur_row + new_span; row++) {
-        for (int col = cur_col; col < cur_col + col_span; col++) {
-          Info()->rows[row].data[col].masked = true;
-        }
-      }
-        
-      // For each row, make sure former columns are unmasked!
-      for (int row = cur_row + new_span; row < cur_row + old_span; row++) {
-        for (int col = cur_col; col < cur_col + col_span; col++) {
-          Info()->rows[row].data[col].masked = false;
-        }
-      }
-      
-      // Redraw the entire table to fix row span information.
-      if (IsActive()) Info()->ReplaceHTML();
-
+    Table & SetSpan(int row_span, int col_span) {
+      // @CAO Can do this more efficiently, but probably not worth it.
+      SetRowSpan(row_span);
+      SetColSpan(col_span);
       return *this;
     }
-    
+      
 
     // Apply to target row.
     template <typename SETTING_TYPE>
