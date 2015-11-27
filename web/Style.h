@@ -1,14 +1,46 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  A CSS class for tracking font style, etc.
+//
+//  This class maintains a map of setting names to values that can be easily
+//  ported over to JavaScript.
+//
+//  int GetSize() const
+//    Return a count of the number of settings that have been set.
+//
+//  Style & Set(const std::string & s, SET_TYPE v)
+//    Record that setting "s" is set to value "v" (converted to string) and return this object.
+//
+//  Style & Insert(const Style & in_css)
+//    Set all values from in_css here as well.  Return this object.
+//
+//  bool Has(const std::string setting) const
+//    Return true/false based on whether "setting" has been given a value in this Style.
+//
+//  const std::string & Get(const std::string setting)
+//    Return the (string) value of "setting" that has been recorded in this Style.
+//    If setting did not exist, this does create an empty entry and return it.
+//
+//  void Clear()
+//    Remove all setting values.
+//
+//  void Apply(const std::string & widget_id) -
+//    Apply all settings to dom element "widget_id".
+//
+//  void Apply(const std::string & widget_id, const std::string & setting)
+//    Apply current value of "setting" to dom element "widget_id".
+//
+//  static void Apply(const std::string & widget_id, const std::string & setting,
+//                    const std::string & value)
+//    Apply "setting: value" to widget_id.
 
+      
 #ifndef EMP_WEB_STYLE_H
 #define EMP_WEB_STYLE_H
 
-///////////////////////////////////////////////////////////////////////////////////////////
-//
-//  A CSS class tracking font style, etc.
-//
 
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
@@ -43,7 +75,7 @@ namespace web {
       return DoSet(s, emp::to_string(v));
     }
 
-    Style & Insert(Style & in_css) {
+    Style & Insert(const Style & in_css) {
       settings.insert(in_css.settings.begin(), in_css.settings.end());
       return *this;
     }
