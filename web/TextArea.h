@@ -1,18 +1,21 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_WEB_TEXT_AREA_H
-#define EMP_WEB_TEXT_AREA_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
 //
-//  Specs for the TextArea widget.
+//
+//  The TextArea Widget
+//
+//  An input field for text data.  A function provided at creation time will be called
+//  each time the contents of the TextWidget are changed.  The current text contents
+//  can also always be accessed with the GetText() member function.
 //
 //
 //  Developer notes:
 //  * Callback does a lot of string-copies at the moment; should be streamlined.
 //
+
+#ifndef EMP_WEB_TEXT_AREA_H
+#define EMP_WEB_TEXT_AREA_H
 
 #include "Widget.h"
 

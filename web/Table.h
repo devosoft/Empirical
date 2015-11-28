@@ -3,11 +3,13 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  Specs for the Table widget
+//  The Table widget
 //
-//  TableInfo has two helper classes: TableRow and TableData.
+//  TableInfo is the core information for a table and has two helper classes:
+//  TableRow and TableData.  The Table class is a smart pointer to a TableInfo
+//  object.
 //
-//  A Table is composed of row x col cells
+//  A Table is composed of a series of rows, each with the same number of columns.
 //  TableData may be muliple cells wide/tall, masking other cells.
 //
 //  Constructors:
