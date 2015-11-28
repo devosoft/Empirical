@@ -1,17 +1,20 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_WEB_FILE_INPUT_H
-#define EMP_WEB_FILE_INPUT_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  Specs for the FileInput widget (click on to upload a file)
 //
-//  FileInput will convert the file to a std::string and pass the result to a designated
-//  function.
+//  FileInput will convert the file to a std::string and pass the result to a
+//  designated function.
 //
+//  To create a new file input, you must pass it a void function that takes a
+//  const std::string & as its only argument.  When a file is loaded, the
+//  specified function is called and the body of the file is passed in as the
+//  string.
+
+#ifndef EMP_WEB_FILE_INPUT_H
+#define EMP_WEB_FILE_INPUT_H
 
 #include "Widget.h"
 
