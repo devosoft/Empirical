@@ -1,14 +1,42 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  KeypressManager is a tracker for keypresses in HTML5 pages.
+//
+//  When a KeypressManager is created, it can be given functions to run in response
+//  to different types of key presses via overloaded version of the AddKeydownCallback
+//  method.  Each of these accepts an order parameter that is optional and, if provided,
+//  will indicate the order in which tests should be performed to resolve a keypress.
+//  If order is not provided, tests will occur in the order that they were given to the
+//  manager.
+//
+//  The specific versions of AddKeydownCallback are:
+//
+//    void AddKeydownCallback(std::function<bool(const html5::KeyboardEvent &)> cb_fun,
+//                            int order=-1)
+//
+//      Link a function to the KeypressManager that is called for any unresolved keypress.
+//      The function must take in an html5::KeyboardEvent (which includes information about
+//      the specific key pressed as well as any modifiers such as SHIFT or CTRL) and it
+//      must return a boolean value indicating whether it has resolved the keypress.
+//
+//    void AddKeydownCallback(char key, std::function<void()> cb_fun, int order=-1)
+//
+//      Link a specific key to a target function to be called when that key is pressed.
+//      The function my return a void and take no arguments.
+//
+//    void AddKeydownCallback(const std::string & key_set, std::function<void()> cb_fun,
+//                            int order=-1)
+//
+//      Same as the previous method, but will respond to any of the keys in the provided
+//      string.
+//
+
 
 #ifndef EMP_WEB_KEYPRESS_H
 #define EMP_WEB_KEYPRESS_H
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-//
-//  An tracker for keypresses in HTML5 pages.
-//
 
 #include <functional>
 #include <map>
