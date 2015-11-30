@@ -1,19 +1,18 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_WEB_CANVAS_UTILS_H
-#define EMP_WEB_CANVAS_UTILS_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
 //
-//  Method for converting objects to visualizations in canvas.
+//
+//  A collection of Draw() functions that convert objects to visualizations in canvas.
 //
 //  Current list of values that can be drawn with Draw():
 //  * BitMatrix
 //  * Circle
 //  * Surface2D
 //
+
+#ifndef EMP_WEB_CANVAS_UTILS_H
+#define EMP_WEB_CANVAS_UTILS_H
 
 #include "Canvas.h"
 

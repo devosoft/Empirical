@@ -1,15 +1,17 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_WEB_COMMANDS_H
-#define EMP_WEB_COMMANDS_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  This file defines a set of command-defining classes that can be fed into widgets
 //  using the << operator.
 //
+//  Currently Close is the only command available; it will prevent the specified
+//  DOM id from being added to further.
+//
+
+#ifndef EMP_WEB_COMMANDS_H
+#define EMP_WEB_COMMANDS_H
 
 namespace emp {
 namespace web {

@@ -1,14 +1,16 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_WEB_EVENTS_H
-#define EMP_WEB_EVENTS_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  Event handlers that use JQuerry.
 //
+//  OnDocumentReady(fun)
+//    Runs the specified function when the document is finished loading and being set up.
+//
+
+#ifndef EMP_WEB_EVENTS_H
+#define EMP_WEB_EVENTS_H
 
 #include <utility>
 
