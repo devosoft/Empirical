@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_WEB_TWEEN_H
-#define EMP_WEB_TWEEN_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  A Tween manages the gradual shift in properties of one or more widgets over time.
 //
@@ -33,6 +29,9 @@
 //   * Need a Reset()
 //
 
+
+#ifndef EMP_WEB_TWEEN_H
+#define EMP_WEB_TWEEN_H
 
 #include "../emtools/emfunctions.h"
 

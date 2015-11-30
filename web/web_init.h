@@ -1,15 +1,14 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_WEB_INIT_H
-#define EMP_WEB_INIT_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  Function to handle any special initialization for a web page (also calls base
 //  emp::Initialize() function.
 //
+
+#ifndef EMP_WEB_INIT_H
+#define EMP_WEB_INIT_H
 
 #include "../emtools/init.h"
 

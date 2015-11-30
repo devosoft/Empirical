@@ -1,6 +1,18 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  This file is intended to be the main file to include to load the entire
+//  Empirical web framework.
+//
+//  The main to includes are Document.h, which loads all of the needed widgets, and
+//  web_init.h, which sets up the web page as needed.
+//
+//  The main function defined here is Live(), which is used to indicate that a variable
+//  or function on a web page should be updated every time the page is redrawn, and not
+//  just called once.
+//
 
 #ifndef EMP_WEB_H
 #define EMP_WEB_H
