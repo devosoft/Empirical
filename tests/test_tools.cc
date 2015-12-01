@@ -45,10 +45,11 @@
 
 
 // "Macros testing macros...Oh dear..."
+#undef EMP_TEST_MACRO
 #define EMP_TEST_MACRO( MACRO, EXP_RESULT )                             \
   do {                                                                  \
     std::string result = std::string(EMP_STRINGIFY( MACRO ));           \
-    REQUIRE(result == EXP_RESULT);                                \
+    REQUIRE(result == EXP_RESULT);                                      \
   } while (false)
 
 
@@ -894,6 +895,8 @@ TEST_CASE("Test string utils", "[tools]")
   int num_let = 0;
   int num_num = 0;
   int num_alphanum = 0;
+  int num_i = 0;
+  int num_vowel = 0;
   for (char cur_char : special_string) {
     if (emp::is_whitespace(cur_char)) num_ws++;
     if (emp::is_upper_letter(cur_char)) num_cap++;
@@ -901,6 +904,14 @@ TEST_CASE("Test string utils", "[tools]")
     if (emp::is_letter(cur_char)) num_let++;
     if (emp::is_digit(cur_char)) num_num++;
     if (emp::is_alphanumeric(cur_char)) num_alphanum++;
+    if (emp::is_valid(cur_char, [](char c){ return c=='i'; })) num_i++;
+    if (emp::is_valid(cur_char, [](char c){return c=='a' || c=='A';},
+                      [](char c){return c=='e' || c=='E';},
+                      [](char c){return c=='i' || c=='I';},
+                      [](char c){return c=='o' || c=='O';},
+                      [](char c){return c=='u' || c=='U';},
+                      [](char c){return c=='y';}
+                      )) num_vowel++;
   }
   int num_other = ((int) special_string.size()) - num_alphanum - num_ws;
 
@@ -912,6 +923,8 @@ TEST_CASE("Test string utils", "[tools]")
   REQUIRE(num_num == 3);
   REQUIRE(num_alphanum == 25);
   REQUIRE(num_other == 5);
+  REQUIRE(num_i == 3);
+  REQUIRE(num_vowel == 7);
 
   std::string base_string = "This is an okay string.\n  \tThis\nis   -MY-    very best string!!!!   ";
 
