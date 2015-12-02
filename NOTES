@@ -1,20 +1,16 @@
--= Next Steps =-
-Setup Config class to << into Slate to produce settings management
-Implement TubeCode in Hardware class
-Setup documentation outside of the code
+-= Active Projects =-
+TubeCode
+EvoPuzzler
+Evoke
 
 -= Questions =-
 Best way to convert to a c++ literal independent of type?
 How to dynamically change an include file?
 
 -= Fixes =-
-Fix reference counting in C++ DOM trees to delete element if ONLY children are pointing to it.
 JSDelete should make sure that we are not deleting a named function (or cleanup JS side too!)
-Fix how is_valid() functions are handled in string_utils.h
 
 -= Improvements =-
-Tables need more natural interface that should behave like a slate.
-std::endl should work on TextBox
 Tables should have single CSS for all rows and all cells.
 Allow default UI::Style overall and for each object type.
 -Create a UI::StyleGroup that elements can be added to and altered as one (use proper CSS class?)
@@ -22,8 +18,6 @@ Base document should register where keypresses should be directed.
 -Buttons should be able to easily specify hotkeys
 BitSet should have a non-emscripten version that uses 64-bits (same as BitVector)
 - Incorporate Ben's changes into BitVector/BitSet
-Setup a disabled_CSS for buttons that they apply when disabled?
-Allow Widgets to be removed from slates (and deactivated, slate redrawn, etc.)
 
 -= Improvements to Consider =-
 Try out Ptr class to see if it can catch mis-handled pointers
@@ -39,13 +33,11 @@ Span (?) for future manual references
 Dynamic web link? (Easy to change and verify, rather than embeded in text.)
 
 -= General tools to build =-
-A more automated test system (Try out "Catch"?)
 A data management system that can track data by:
   - Temporal series (values over time)
   - Batch (where a batch reset occurs periodically)
   - Log (tracking particular events when they occur)
   All output files should have headers that allow them to be read back in more easily.
-A citation tool: Useful for pointing people to appropriate references & building online bibs.
 
 -= Serialization =-
 Special mechanisms to handle pointers of various types:
