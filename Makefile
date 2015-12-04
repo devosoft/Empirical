@@ -20,6 +20,9 @@ coverage-html:
 install-dependencies:
 	cd third-party && make
 
+install-testing-dependencies:
+	cd third-party && make install-testing-dependencies
+
 clean:
 	rm -rf build/*
 	cd tests && make clean

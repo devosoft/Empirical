@@ -1,12 +1,12 @@
 GCOV_FLAGS = -o0 -g -fprofile-arcs -ftest-coverage
 
 test: test_driver.cc test_tools.cc
-	g++ -std=c++11 test_driver.cc -o test.o
+	$(CXX) -std=c++11 test_driver.cc -o test.o
 	# Execute tests
 	./test.o
 	
 coverage:
-	g++ ${GCOV_FLAGS} -std=c++11 test_driver.cc -o test.o
+	$(CXX) ${GCOV_FLAGS} -std=c++11 test_driver.cc -o test.o
 	./test.o
 
 coverage-html: coverage
@@ -18,7 +18,11 @@ coverage-xml: coverage
 	
 diff-cover: coverage-xml
 	cp coverage.xml ../coverage.xml
-	cd .. && diff-cover coverage.xml
+	cd .. && diff-cover coverage.xml > diff_cover.txt
+	cat ../diff_cover.txt
+	@printf "\n\n\nIf this fails, your coverage is bad!\n\n\n"
+	grep "Missing: 0 lines" ../diff_cover.txt || grep "No lines with coverage" ../diff_cover.txt
+	rm ../diff_cover.txt
 
 
 clean:
