@@ -1,0 +1,30 @@
+sudo: false
+language: cpp
+
+notifications:
+    email: false
+
+compiler:
+    - g++
+install:
+    - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+addons:
+    apt:
+        sources:
+        - kalakris-cmake
+        - ubuntu-toolchain-r-test
+        packages:
+        - g++-4.8
+        - cmake
+        - bison
+        - python-virtualenv
+        - python-pip
+
+before_script:
+    - make install-testing-dependencies
+
+script:
+    - source third-party/env/bin/activate
+    - cd tests
+    - git fetch origin master:refs/remotes/origin/master
+    - make diff-cover
