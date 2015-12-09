@@ -10,6 +10,8 @@ a.out.js
 *.swo
 coverage.xml
 diff_cover.txt
+examples/getting_started/*.html
+examples/getting_started/*.js
 UTests/tools/tmp*.cc
 UTests/emtools/JSWrap.js
 UTests/UI/Animate.js
