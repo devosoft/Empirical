@@ -104,7 +104,8 @@ namespace web {
     bool IsActive() const;
     
     virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
-
+    virtual void PreventAppend() { emp_assert(false); } // This isn't meaningful to most widgets.
+    
     virtual bool IsSlate() const { return false; }
     virtual bool IsTable() const { return false; }
     virtual bool IsText() const { return false; }
