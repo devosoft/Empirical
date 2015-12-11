@@ -240,6 +240,7 @@ namespace web {
     using INFO_TYPE = internal::SlateInfo;
    
     bool AppendOK() const override { return Info()->append_ok; }
+    void PreventAppend() override { Info()->append_ok = false; }
 
     double ScrollTop() const { return Info()->scroll_top; }
     Slate & ScrollTop(double in_top) { Info()->scroll_top = in_top; return *this; }

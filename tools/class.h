@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_CLASS_H
-#define EMP_CLASS_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  A re-engineering of tuple_struct.h, intended to be usable throughout Empirical.
 //
@@ -44,23 +40,31 @@
 //
 //
 
+#ifndef EMP_CLASS_H
+#define EMP_CLASS_H
+
 // EMP_MEMBERS expects a series of type/id pairs to setup.
 #define EMP_CLASS_MEMBER_DECLARE(TYPE, ID) TYPE ID;
 #define EMP_CLASS_MEMBERS(...) EMP_WRAP_ARG_PAIRS(EMP_MEMBER_DECLARE, __VA_ARGS__)
 
+// EMP_CLASS_ACCESSORS_DECLARE expect the name of this class, the type of the id,
+// and the name of the id.
 #define EMP_CLASS_ACCESSORS_DECLARE(NAME, TYPE, ID)                     \
   public: TYPE Get ## ID() { return m_ ## ID; }                         \
   NAME & Set ## ID(const TYPE & _in) { m_ ## ID = _in;  return *this; }
 
+// EMP_CLASS_ACCESSORS expect the name of the class followd by type/id pairs to setup.
 #define EMP_CLASS_ACCASSORS(NAME, ...) @CAO
 
+// EMP_CLASS_CONSTRUCTOR takes the class name followd by a set of types, ids, and default
+// values which it uses to setup initialization.
 #define EMP_CLASS_CONSTRUCTOR(NAME, ...) @CAO
 
-#define EMP_CLASS( NAME, ...)                                  \
-  class NAME {                                                 \
-  private:                                                     \
+#define EMP_CLASS( NAME, ...)                                        \
+  class NAME {                                                       \
+  private:                                                           \
     EMP_CLASS_MEMBERS(EMP_FILTER_ARGS((i,i,x), __VA_ARGS__))         \
-  public:                                                      \
+  public:                                                            \
     EMP_CLASS_ACCESSORS(NAME, EMP_FILTER_ARGS((i,i,x), __VA_ARGS__)) \
   };
 
