@@ -24,7 +24,7 @@ namespace web {
 
     bool Trigger(internal::WidgetInfo & w) const override {
       if (w.id == close_id) {  // Test if this is the element we need to close.
-        w.append_ok = false;
+        Widget(&w).PreventAppend();
         return true;
       }
       return false;
