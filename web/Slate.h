@@ -166,7 +166,7 @@ namespace web {
         AddChild(info);
         return info;
       }
-      
+
       // All derived widgets must suply a mechanism for providing associated HTML code.
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");       // Clear the current text.

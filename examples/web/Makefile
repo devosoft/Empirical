@@ -29,7 +29,7 @@ native: debug-Animate debug-keypress debug-Slate debug-web
 Animate.js: Animate.cc
 	$(CXX_web) $(CFLAGS_web) Animate.cc -o Animate.js
 
-debug-%: $*.cc
+debug-%: %.cc
 	$(CXX_native) $(CFLAGS_native) $< -o $@
 
 Example.js: Example.cc
