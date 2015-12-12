@@ -24,14 +24,11 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 
 default: web
 
-web: Animate.js keypress.js Example.js Slate.js Table.js Web.js
+web: Animate.js Example.js keypress.js Slate.js Table.js Web.js
 native: debug-Animate debug-keypress debug-Slate debug-web
 
 Animate.js: Animate.cc
 	$(CXX_web) $(CFLAGS_web) Animate.cc -o Animate.js
-
-# debug-%: $*.cc
-# 	$(CXX_native) $(CFLAGS_native) $< -o $@
 
 Example.js: Example.cc
 	$(CXX_web) $(CFLAGS_web) Example.cc -o Example.js
@@ -53,6 +50,9 @@ Tween.js: Tween.cc
 
 Web.js: Web.cc
 	$(CXX_web) $(CFLAGS_web) Web.cc -o Web.js
+
+debug-%: $*.cc
+	$(CXX_native) $(CFLAGS_native) $< -o $@
 
 clean:
 	rm -f debug-* Animate.js Example.js keypress.js Slate.js Table.js TextArea.js Tween.js Web.js *.js.map *~ source/*.o source/*/*.o
