@@ -24,7 +24,7 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 
 default: web
 
-web: Animate.js Example.js keypress.js Slate.js Table.js TextArea.js Web.js
+web: Animate.js Example.js keypress.js Slate.js Table.js TextArea.js Tween.js Web.js
 native: debug-Animate debug-keypress debug-Slate debug-web
 
 Animate.js: Animate.cc
