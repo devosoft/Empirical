@@ -17,6 +17,6 @@ int main()
       text_area.SetText("Changed!");
     });
 
-  doc << text_area.Size(300,300);
+  doc << text_area.SetSize(300,300);
 }
 
