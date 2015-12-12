@@ -23,14 +23,15 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 
 
 default: web
-web: Animate.js keypress.js Example.js Slate.js Table.js web.js
+
+web: Animate.js keypress.js Example.js Slate.js Table.js Web.js
 native: debug-Animate debug-keypress debug-Slate debug-web
 
 Animate.js: Animate.cc
 	$(CXX_web) $(CFLAGS_web) Animate.cc -o Animate.js
 
-debug-%: $*.cc
-	$(CXX_native) $(CFLAGS_native) $< -o $@
+# debug-%: $*.cc
+# 	$(CXX_native) $(CFLAGS_native) $< -o $@
 
 Example.js: Example.cc
 	$(CXX_web) $(CFLAGS_web) Example.cc -o Example.js
@@ -50,11 +51,11 @@ TextArea.js: TextArea.cc
 Tween.js: Tween.cc
 	$(CXX_web) $(CFLAGS_web) Tween.cc -o Tween.js
 
-web.js: web.cc
-	$(CXX_web) $(CFLAGS_web) web.cc -o web.js
+Web.js: Web.cc
+	$(CXX_web) $(CFLAGS_web) Web.cc -o Web.js
 
 clean:
-	rm -f debug-* Animate.js Example.js keypress.js Slate.js Table.js TextArea.js Tween.js web.js *.js.map *~ source/*.o source/*/*.o
+	rm -f debug-* Animate.js Example.js keypress.js Slate.js Table.js TextArea.js Tween.js Web.js *.js.map *~ source/*.o source/*/*.o
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
