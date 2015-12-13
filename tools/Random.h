@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_RANDOM_H
-#define EMP_RANDOM_H
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  A versatile and non-patterned pseudo-random-number generator.
 //
@@ -28,6 +24,9 @@
 //    uint32_t GetUInt(uint32_t min, uint32_t max)
 //      Retrive a random int or uint in the range [min, max).  By default, min=0.
 //
+//    std::vector<int> GetPermutation(int size)
+//      Retrive a vector from one to size in a random order.
+//
 //    bool P(double p)
 //      Tests a random value [0,1) against a given probability p, and returns true of false.
 //
@@ -41,6 +40,9 @@
 //    uint32_t GetRandBinomial(const double n, const double p)
 //      Draw a value from the given distributions
 //
+
+#ifndef EMP_RANDOM_H
+#define EMP_RANDOM_H
 
 // #include <algorithm>
 #include <ctime>
@@ -221,7 +223,24 @@ namespace emp {
     int GetInt(const int max) { return static_cast<int>(GetUInt(max)); }
     int GetInt(const int min, const int max) { return static_cast<int>(GetUInt(max - min)) + min; }
   
-  
+
+    /**
+     * Generate a random ordering.
+     *
+     * @return An std::vector<int> numbered 0 through size-1 in a random order.
+     * @param size The number of values to randomly order.
+     **/
+    std::vector<int> GetPermutation(int size) {
+      std::vector<int> seq(size);
+      seq[0] = 0;
+      for (int i = 1; i < size; i++) {
+        uint32_t val_pos = GetUInt(i+1);
+        seq[i] = seq[val_pos];
+        seq[val_pos] = i;
+      }
+      return seq;
+    }
+
     // Random Event Generation //////////////////////////////////////////////////
   
     // P(p) => if p < [0,1) random variable
