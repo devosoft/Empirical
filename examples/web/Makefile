@@ -4,7 +4,7 @@ CFLAGS_all := -Wall -Wno-unused-variable -Wno-unused-function -std=c++11 -I../..
 
 # Emscripten compiler information
 CXX_web := emcc
-CXX_native := g++
+#CXX_native := g++
 
 OFLAGS_native := -g -pedantic
 
@@ -28,9 +28,6 @@ native: debug-Animate debug-keypress debug-Slate debug-web
 
 Animate.js: Animate.cc
 	$(CXX_web) $(CFLAGS_web) Animate.cc -o Animate.js
-
-debug-%: %.cc
-	$(CXX_native) $(CFLAGS_native) $< -o $@
 
 Example.js: Example.cc
 	$(CXX_web) $(CFLAGS_web) Example.cc -o Example.js
