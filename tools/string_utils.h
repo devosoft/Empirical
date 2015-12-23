@@ -19,7 +19,7 @@
 
 namespace emp {
 
-  std::string to_escaped_string(char value) {
+  static std::string to_escaped_string(char value) {
     // Start by quickly returning a string if it's easy.
     std::stringstream ss;
     if ( (value >= 40 && value < 91) || value > 96) {
@@ -50,7 +50,7 @@ namespace emp {
       return ss.str();
     };
   }
-  std::string to_escaped_string(const std::string & value) {
+  static std::string to_escaped_string(const std::string & value) {
     std::stringstream ss;
     for (char c : value) { ss << to_escaped_string(c); }
     return ss.str();
@@ -59,15 +59,16 @@ namespace emp {
 
 
   // The to_literal function set will take a value and convert it to a C++ literal.
-  template <typename LIT_TYPE> std::string to_literal(const LIT_TYPE & value) {
+  template <typename LIT_TYPE>
+  inline std::string to_literal(const LIT_TYPE & value) {
     return std::to_string(value);
   }
-  std::string to_literal(char value) {
+  static std::string to_literal(char value) {
     std::stringstream ss;
     ss << "'" << to_escaped_string(value) << "'";
     return ss.str();
   }
-  std::string to_literal(const std::string & value) {
+  static std::string to_literal(const std::string & value) {
     // Add quotes to the ends and convert each character.
     std::stringstream ss;
     ss << "\"";
@@ -80,7 +81,7 @@ namespace emp {
 
 
   // Convert to roman numerals
-  std::string to_roman_numeral(int val, const std::string & prefix="") {
+  static std::string to_roman_numeral(int val, const std::string & prefix="") {
     std::string ret_string(prefix);
     if (val < 0) ret_string += to_roman_numeral(-val, "-");
     else if (val > 3999) { ; } // Out of bounds; return a blank;
@@ -104,60 +105,61 @@ namespace emp {
 
 
 
-  bool is_whitespace(char test_char) {
+  inline bool is_whitespace(char test_char) {
     return (test_char == ' ' || test_char == '\n' || test_char == '\r' || test_char == '\t');
   }
 
-  bool is_upper_letter(char test_char) {
+  inline bool is_upper_letter(char test_char) {
     return (test_char >= 'A' && test_char <= 'Z');
   }
 
-  bool is_lower_letter(char test_char) {
+  inline bool is_lower_letter(char test_char) {
     return (test_char >= 'a' && test_char <= 'z');
   }
 
-  bool is_letter(char test_char) {
+  inline bool is_letter(char test_char) {
     return is_upper_letter(test_char) || is_lower_letter(test_char);
   }
 
-  bool is_digit(char test_char) {
+  inline bool is_digit(char test_char) {
     return (test_char >= '0' && test_char <= '9');
   }
 
-  bool is_alphanumeric(char test_char) {
+  inline bool is_alphanumeric(char test_char) {
     return is_letter(test_char) || is_digit(test_char);
   }
 
-  bool is_one_of(char test_char, const std::string & char_set) {
+  static bool is_one_of(char test_char, const std::string & char_set) {
     for (char x : char_set) if (test_char == x) return true;
     return false;
   }
 
-  bool is_composed_of(const std::string & test_str, const std::string & char_set) {
+  static bool is_composed_of(const std::string & test_str, const std::string & char_set) {
     for (char x : test_str) if (!is_one_of(x, char_set)) return false;
     return true;
   }
 
 
   // If no functions are provided to is_value(), always return false as base case.
-  bool is_valid(char test_char) { return false; }
+  inline bool is_valid(char test_char) { return false; }
 
   // A character is valid if it passes any of the test functions provided.
   template <typename... FUNS>
-  bool is_valid(char test_char, std::function<bool(char)> fun1, FUNS... funs) {
+  inline bool is_valid(char test_char, std::function<bool(char)> fun1, FUNS... funs) {
     return fun1(test_char) || is_valid(test_char, funs...);
   }
 
   // For a string to be valid, each character must pass at least one provided function.
   template <typename... FUNS>
-  bool is_valid(const std::string & test_str, FUNS... funs) {
+  static bool is_valid(const std::string & test_str, FUNS... funs) {
     for (char x : test_str) if ( !is_valid(x, funs...) ) return false;
     return true;
   }
 
 
   // Pop a segment from the beginning of a string as another string, shortening original.
-  std::string string_pop_fixed(std::string & in_string, std::size_t end_pos, int delim_size=0) {
+  static std::string string_pop_fixed(std::string & in_string, std::size_t end_pos, int delim_size=0)
+  {
     std::string out_string = "";
     if (end_pos == 0);                        // Not popping anything!
     else if (end_pos == std::string::npos) {  // Popping whole string.
@@ -173,58 +175,58 @@ namespace emp {
   }
 
   // Get a segment from the beginning of a string as another string, leaving original untouched.
-  std::string string_get_range(const std::string & in_string, std::size_t start_pos,
+  static std::string string_get_range(const std::string & in_string, std::size_t start_pos,
                                std::size_t end_pos) {
     if (end_pos == std::string::npos) end_pos = in_string.size() - start_pos;
     return in_string.substr(start_pos, end_pos);
   }
 
 
-  std::string string_pop(std::string & in_string, const char delim) {
+  inline std::string string_pop(std::string & in_string, const char delim) {
     return string_pop_fixed(in_string, in_string.find(delim), 1);
   }
 
-  std::string string_get(const std::string & in_string, const char delim, int start_pos=0) {
+  inline std::string string_get(const std::string & in_string, const char delim, int start_pos=0) {
     return string_get_range(in_string, start_pos, in_string.find(delim, start_pos));
   }
 
-  std::string string_pop(std::string & in_string, const std::string & delim_set) {
+  inline std::string string_pop(std::string & in_string, const std::string & delim_set) {
     return string_pop_fixed(in_string, in_string.find_first_of(delim_set), 1);
   }
 
-  std::string string_get(const std::string & in_string, const std::string & delim_set, int start_pos=0) {
+  inline std::string string_get(const std::string & in_string, const std::string & delim_set, int start_pos=0) {
     return string_get_range(in_string, start_pos, in_string.find_first_of(delim_set, start_pos));
   }
 
-  std::string string_pop_word(std::string & in_string) {
+  inline std::string string_pop_word(std::string & in_string) {
     // Whitespace = ' ' '\n' '\r' or '\t'
     return string_pop(in_string, " \n\r\t");
   }
 
-  std::string string_get_word(const std::string & in_string, int start_pos=0) {
+  inline std::string string_get_word(const std::string & in_string, int start_pos=0) {
     // Whitespace = ' ' '\n' '\r' or '\t'
     return string_get(in_string, " \n\r\t", start_pos);
   }
 
-  std::string string_pop_line(std::string & in_string) {
+  inline std::string string_pop_line(std::string & in_string) {
     return string_pop(in_string, '\n');
   }
 
-  std::string string_get_line(const std::string & in_string, int start_pos=0) {
+  inline std::string string_get_line(const std::string & in_string, int start_pos=0) {
     return string_get(in_string, '\n', start_pos);
   }
 
   // Tricks for dealing with whitespace.
-  std::string left_justify(std::string & in_string) {
+  inline std::string left_justify(std::string & in_string) {
     return string_pop_fixed(in_string, in_string.find_first_not_of(" \n\r\t"));
   }
 
-  void right_justify(std::string & in_string) {
+  inline void right_justify(std::string & in_string) {
     // @CAO *very* inefficient at the moment.
     while (is_whitespace(in_string.back())) in_string.pop_back();
   }
 
-  void compress_whitespace(std::string & in_string) {
+  static void compress_whitespace(std::string & in_string) {
     const int strlen = (int) in_string.size();
     bool last_whitespace = true;
     int next_char = 0;
@@ -244,7 +246,7 @@ namespace emp {
     in_string.resize(next_char);
   }
 
-  void remove_whitespace(std::string & in_string) {
+  static void remove_whitespace(std::string & in_string) {
     const int strlen = (int) in_string.size();
     int next_char = 0;
 
@@ -257,7 +259,7 @@ namespace emp {
   }
 
   // Cut up a string based on a deliminator.
-  void slice_string(const std::string & in_string, std::vector<std::string> & out_set,
+  static void slice_string(const std::string & in_string, std::vector<std::string> & out_set,
                     char delim='\n') {
     int test_size = (int) in_string.size();
 
@@ -291,10 +293,10 @@ namespace emp {
   // dynamically convert them all into a single, concatanated strings or stringstreams.
 
   namespace internal {
-    void append_sstream(std::stringstream & ss) { (void) ss; }
+    inline void append_sstream(std::stringstream & ss) { (void) ss; }
 
     template <typename TYPE, typename... OTHER_TYPES>
-    void append_sstream(std::stringstream & ss, TYPE value, OTHER_TYPES... other_values) {
+    static void append_sstream(std::stringstream & ss, TYPE value, OTHER_TYPES... other_values) {
       ss << value;
       append_sstream(ss, other_values...);
     }
