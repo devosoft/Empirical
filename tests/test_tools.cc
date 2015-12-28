@@ -658,8 +658,7 @@ TEST_CASE("Test random", "[tools]")
     REQUIRE(mean_value > min_threshold);
     REQUIRE(mean_value < max_threshold);
   }
-
-
+  
   // Test P
   double flip_prob = 0.56789;
   int hit_count = 0;
@@ -669,10 +668,14 @@ TEST_CASE("Test random", "[tools]")
 
   double actual_prob = ((double) hit_count) / (double) num_tests;
 
-   
   REQUIRE(actual_prob < flip_prob + 0.005);
   REQUIRE(actual_prob > flip_prob - 0.005);
 
+  
+  // Mimimal test of Choose()
+  std::vector<int> choices = rng.Choose(100,10);
+
+  REQUIRE(choices.size() == 10);
 }
 
 struct TestTrue {
