@@ -30,9 +30,8 @@
 //    bool P(double p)
 //      Tests a random value [0,1) against a given probability p, and returns true of false.
 //
-//    bool Choose(int N, int K, std::vector<int> & choices)
-//      Chooses K random entries from N possibilities and returns the selections in the choices
-//      vector.
+//    std::vector<int> Choose(int N, int K)
+//      Chooses K random entries from N possibilities and returns in a vector of int.
 //
 //    double GetRandNormal(const double mean, const double std)
 //    uint32_t GetRandPoisson(const double n, double p)
@@ -246,16 +245,17 @@ namespace emp {
     // P(p) => if p < [0,1) random variable
     bool P(const double _p) { return (Get() < (_p * _RAND_MBIG));}
 
-    bool Choose(int N, int K, std::vector<int> & choices) {
-      if (N < K || K < 0) return false;
-    
-      choices.resize(K);
+    // N choose K:
+    std::vector<int> Choose(int N, int K) {
+      std::vector<int> choices(K);
+      if (N < K || K < 0) return choices;  // @CAO Should be an assert!
+
       while (K) {
         if (N==K || P(((double) K)/((double) N))) { choices[--K] = --N; }
         else --N;
       }
     
-      return true;
+      return choices;
     }
 
 
