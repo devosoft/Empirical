@@ -41,7 +41,7 @@
 #ifdef EMP_NDEBUG
 namespace emp {
   const bool assert_on = false;
-  int assert_count = 0;
+  const int assert_count = 0;
 }
 
 // Ideally, this assert should use the expression (to prevent compiler error), but should not
