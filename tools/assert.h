@@ -72,7 +72,7 @@ namespace emp {
       emp::assert_last_fail = true;                                     \
       emp::assert_fail_info.filename = __FILE__;                        \
       emp::assert_fail_info.line_num = __LINE__;                        \
-      emp::assert_fail_info.error = #EXPR;                              \
+      emp::assert_fail_info.error = EMP_STRINGIFY(EXPR);                \
     }                                                                   \
     else {                                                              \
       emp::assert_last_fail = false;                                    \
@@ -133,12 +133,12 @@ namespace emp {
 }
 
 // Generating an output to standard error is an assert is tripped.
-#define emp_assert_base_impl(EXPR)                 \
-  do { if ( !(EXPR) ) {                            \
-    std::cerr << "Assert Error (In " << __FILE__   \
-              << " line " << __LINE__              \
-              << "): " << #EXPR << std::endl;      \
-    abort(); }                                     \
+#define emp_assert_base_impl(EXPR)                              \
+  do { if ( !(EXPR) ) {                                         \
+      std::cerr << "Assert Error (In " << __FILE__              \
+                << " line " << __LINE__                         \
+                << "): " << EMP_STRINGIFY(EXPR) << std::endl;   \
+      abort(); }                                                \
   } while (0)
 
 #define emp_assert(...) emp_assert_base_impl( EMP_GET_ARG_1(__VA_ARGS__, ~) )
