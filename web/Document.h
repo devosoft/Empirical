@@ -19,6 +19,7 @@
 #ifndef EMP_WEB_DOCUMENT_H
 #define EMP_WEB_DOCUMENT_H
 
+#include "Animate.h"
 #include "Button.h"
 #include "Canvas.h"
 #include "FileInput.h"
@@ -36,12 +37,17 @@ namespace emp {
 namespace web {
 
   class Document : public web::Slate {
+  private:
+    std::map<std::string, web::Animate *> anim_map;
+
   public:
     Document(const std::string & doc_id) : web::Slate(doc_id) {
       emp::web::Initialize();
       Activate();
     }
-    ~Document() { ; }
+    ~Document() {
+      for (auto & p : anim_map) delete p.second;  // Delete this document's animations.
+    }
 
     // Retrieve specific types of widgets.
 
@@ -92,6 +98,16 @@ namespace web {
       return new_widget;
     }
 
+    
+    // Shortcut adders for helpers
+    template <class... T> web::Animate & AddAnimation(const std::string & name, T... args){
+      web::Animate * new_anim = new web::Animate(std::forward<T>(args)...);
+      emp_assert(anim_map.find(name) == anim_map.end());  // Make sure not in map already!
+      anim_map[name] = new_anim;
+      return *new_anim;
+    }
+
+    
     // Setup a quick way to retrieve old widgets by name.
     web::Button Button (const std::string & in_id) { return web::Button(Find(in_id)); }
     web::Canvas Canvas (const std::string & in_id) { return web::Canvas(Find(in_id)); }
@@ -103,6 +119,8 @@ namespace web {
     web::Text Text (const std::string & in_id) { return web::Text(Find(in_id)); }
     web::TextArea TextArea (const std::string & in_id) { return web::TextArea(Find(in_id)); }
 
+    // Setup a quick way to retrieve old helpers by name.
+    web::Animate & Animate (const std::string & in_id) { return *(anim_map[in_id]); }
   };
 
 }
