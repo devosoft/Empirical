@@ -3,8 +3,7 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  This file is intended to be the main file to include to load the entire
-//  Empirical web framework.
+//  This file is the main file to include the entire Empirical web framework.
 //
 //  The main to includes are Document.h, which loads all of the needed widgets, and
 //  web_init.h, which sets up the web page as needed.
@@ -46,7 +45,7 @@ namespace web {
     return internal::Live_impl(std::forward<T>(val), true);
   }
 
-}
-}
+} // END web namespace
+} // END emp namespace
 
 #endif

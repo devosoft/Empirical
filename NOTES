@@ -1,6 +1,6 @@
 -= Active Projects =-
 TubeCode
-EvoPuzzler
+PuzzleEngine (was EvoPuzzler)
 Evoke
 
 -= Questions =-
@@ -8,21 +8,15 @@ Best way to convert to a c++ literal independent of type?
 How to dynamically change an include file?
 
 -= Fixes =-
-JSDelete should make sure that we are not deleting a named function (or cleanup JS side too!)
+Make emp_assert handle extra arguments outside of just Emscripten mode.
+Make JSWrap more flexible for different types of functions that can get passed into it.
 
 -= Improvements =-
-Tables should have single CSS for all rows and all cells.
 Allow default UI::Style overall and for each object type.
 -Create a UI::StyleGroup that elements can be added to and altered as one (use proper CSS class?)
-Base document should register where keypresses should be directed.
--Buttons should be able to easily specify hotkeys
-BitSet should have a non-emscripten version that uses 64-bits (same as BitVector)
-- Incorporate Ben's changes into BitVector/BitSet
 
 -= Improvements to Consider =-
 Try out Ptr class to see if it can catch mis-handled pointers
-Slates should have a current location and always "append" at that location, not just at end.
-- Forwarding to a parent should track where the forward came from to update location information.
 InstLib: Can we lock a set of instruction at compile time?  Or at least put them in a fixed array?
 Change HardwareCPU to something like Hardware_SimpleCPU and Instruction to Instruction_SimpleCPU
 
@@ -38,12 +32,6 @@ A data management system that can track data by:
   - Batch (where a batch reset occurs periodically)
   - Log (tracking particular events when they occur)
   All output files should have headers that allow them to be read back in more easily.
-
--= Serialization =-
-Special mechanisms to handle pointers of various types:
-- Pointers we are in charge of and need to build.
-- Pointers we are NOT in charge of and someone else needs to expliclty build
-- Pointers we are not in charge of because they are objects built elsewhere.
 
 -= Evolution-specific Tools =-
 Organism Object (Contains Genome and templated on virtual hardware type)
@@ -62,19 +50,14 @@ Fix how sectors are handled in surfaces to be more dynamic based on sizes of org
 
 
 -= Specific ideas for Configurtion tools =-
-* Build links into setting variables that will trigger function calls
-* Warn more gracefully if a variable/const name is used more than once?
 * Build an HTML object to automatically allow adjustment of settings in a running ap.
 * Allow other commands to redirect the rest of the line to a specific object for processing.
 * Auto-generation of config file entries beyond just "set"
-* Each setting could have a "level" value to indicate when it should be shouwn.
 * See about uniting library user config file and end user config file into consistent format.
-* Can we make the whole thing into just one macro?  Should we??
 
 -= Documentation =-
-* Examples using the web framework
+* Overview of web framework with examples.
 * How to setup and use the config tools.
-* Basic idea of Kinetic Wrappers and how to use them.
 
 -= Librarys to consider wrapping =-
 FabricJS

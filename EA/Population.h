@@ -12,8 +12,8 @@
 //  may have additional requirements.
 
 
-#ifndef EMP_WEB_H
-#define EMP_WEB_H
+#ifndef EMP_POPULATION_H
+#define EMP_POPULATION_H
 
 #include <functional>
 #include <map>
@@ -108,7 +108,7 @@ namespace EA {
     
   };
 
-}
-}
+}  // END EA namespace
+}  // END emp namespace
 
 #endif
