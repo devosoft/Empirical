@@ -34,15 +34,20 @@ namespace EA {
   public:
     Population() { ; }
     Population(const Population &) = default;
-    ~Population() {
-      // Clear out all organisms.
-      for (MEMBER * m : pop) delete m;
-      for (MEMBER * m : next_pop) delete m;
-    }
+    ~Population() { Clear(); }
     Population & operator=(const Population &) = default;
 
     int GetSize() const { return (int) pop.size(); }
     MEMBER & operator[](int i) { return *(pop[i]); }
+
+    void Clear() {
+      // Clear out all organisms.
+      for (MEMBER * m : pop) delete m;
+      for (MEMBER * m : next_pop) delete m;
+
+      pop.resize(0);
+      next_pop.resize(0);
+    }
     
     void Insert(const MEMBER & mem, int copy_count=1) {
       for (int i = 0; i < copy_count; i++) pop.push_back(new MEMBER(mem));
