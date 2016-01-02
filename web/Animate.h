@@ -120,9 +120,11 @@ namespace web {
     {
       callback_id = JSWrap( std::function<void()>([this](){ this->AdvanceFrame(); }) );
     }
-
-    Animate(const Animate &) = delete;
     ~Animate() { ; }
+
+    // Do not copy animations directly.
+    Animate(const Animate &) = delete;
+    Animate & operator=(const Animate &) = delete;
 
     void Start() {
       if (active) return;          // If animation is already active, ignore start.
