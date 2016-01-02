@@ -423,6 +423,6 @@ namespace emp {
   //   return first+rng(range);
   // }
 
-}
+} // END emp namespace
 
 #endif

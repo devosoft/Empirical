@@ -133,6 +133,7 @@
 //    printing of such tables (and covering 80% of use cases).
 //  * IDEALLY: Make a single table that will look at what each cell is pointing to (table
 //    or text) and write out what it needs to, in place.
+//  * Add a ClearColumn method, as well as other column functionality.
 
 
 #ifndef EMP_WEB_TABLE_H
