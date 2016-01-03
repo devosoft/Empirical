@@ -59,6 +59,11 @@
 //      All further manipulations of the table object will focus on that row until
 //      the state is changed again.
 //
+//    Table & GetCol(int c)
+//      Make the specified column active, row zero, and the table state COL
+//      All further manipulations of the table object will focus on that column until
+//      the state is changed again.
+//
 //    Table & GetTable()
 //      Leave the active row and column, but set the table state to TABLE
 //      All further manipulations of the table object will focus on the whole table
@@ -99,13 +104,14 @@
 //    Table & ClearCells()
 //      If state is TABLE, clear contents from all cells in entire table.
 //      If state is ROW, clear contents from all cells in that row.
+//      If state is COL, clear contents from all cells in that column.
 //      If state is CELL, clear just that single cell.
 //
 //    Table & ClearCell(int r, int c)
 //      Clear contents of just the specified cell.
 //
 //    Table & Clear()
-//      Dynamically clear the entire active state (TABLE, ROW, or CELL).
+//      Dynamically clear the entire active state (TABLE, ROW, COL, or CELL).
 //
 //
 //  Style manipulation
@@ -213,6 +219,20 @@ namespace web {
         return ok;
       }
     };
+
+    class TableCol {
+      friend Table; friend TableInfo;
+    protected:
+      Style style;
+      int span;
+      bool masked;
+
+    public:
+      TableCol() : span(1), masked(false) { ; }
+      ~TableCol() { ; }
+
+      int GetSpan() const { return span; }
+    };
     
     class TableInfo : public internal::WidgetInfo {
       friend Table;
@@ -220,7 +240,8 @@ namespace web {
       int row_count;                // How big is this table?
       int col_count;
       emp::vector<TableRow> rows;   // detail object for each row.
-
+      emp::vector<TableCol> cols;   // detail object for each column (if needed).
+      
       int append_row;               // Which row is triggering an append?
       int append_col;               // Which col is triggering an append?
       
@@ -521,7 +542,7 @@ namespace web {
     int cur_col;
            
     // A table's state determines how some operations work.
-    enum state_t { TABLE, ROW, CELL };
+    enum state_t { TABLE, ROW, CELL, COL };
     state_t state;
 
 
@@ -533,14 +554,25 @@ namespace web {
 
     // Apply to appropriate component based on current state.
     void DoCSS(const std::string & setting, const std::string & value) override {
-      if (state == TABLE) WidgetFacet<Table>::DoCSS(setting, value);
-      else if (state == ROW) {
+      switch (state) {
+      case TABLE:
+        WidgetFacet<Table>::DoCSS(setting, value);
+        break;
+      case ROW:
         Info()->rows[cur_row].style.Set(setting, value);
         // @CAO need to make change active immediately...
-      } else if (state == CELL) {
+        break;
+      case CELL:
         Info()->rows[cur_row].data[cur_col].style.Set(setting, value);
         // @CAO need to make change active immediately...
-      } else emp_assert(false && "Table in unknown state!");
+        break;
+      case COL:
+        // If we haven't setup columns at all yet, do so.
+        if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
+        Info()->cols[cur_col].style.Set(setting, value);
+      default:
+        emp_assert(false && "Table in unknown state!");
+      };
     }
     
   public:
@@ -556,7 +588,7 @@ namespace web {
     Table(const Table & in)
       : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col), state(in.state)
     {
-      emp_assert(state == TABLE || state == ROW || state == CELL, state);
+      emp_assert(state == TABLE || state == ROW || state == CELL || state == COL, state);
     }
     Table(const Widget & in) : WidgetFacet(in), cur_row(0), cur_col(0), state(TABLE) {
       emp_assert(info->IsTableInfo());
@@ -582,12 +614,14 @@ namespace web {
     
     bool InStateTable() const { return state == TABLE; }
     bool InStateRow() const { return state == ROW; }
+    bool InStateCol() const { return state == COL; }
     bool InStateCell() const { return state == CELL; }
     
     Table & Clear() {
       // Clear based on tables current state.
       if (state == TABLE) Info()->ClearTable();
       else if (state == ROW) Info()->ClearRow(cur_row);
+      // @CAO Make work for state == COL
       else if (state == CELL) Info()->ClearCell(cur_row, cur_col);
       else emp_assert(false && "Table in unknown state!", state);
       return *this;
@@ -598,6 +632,7 @@ namespace web {
     Table & ClearCells() {
       if (state == TABLE) Info()->ClearTableCells();
       else if (state == ROW) Info()->ClearRowCells(cur_row);
+      // @CAO Make work for state == COL
       else if (state == CELL) Info()->ClearCell(cur_row, cur_col);
       else emp_assert(false && "Unknown State!", state);
       return *this;
@@ -637,6 +672,13 @@ namespace web {
       state = ROW;
       return *this;
     }
+    Table & GetCol(int c) {
+      emp_assert(c < Info()->col_count,
+                 c, Info()->col_count, GetID());
+      cur_col = c; cur_row = 0;
+      state = COL;
+      return *this;
+    }
     Table & GetTable() {
       // Leave row and col where they are.
       state = TABLE;
@@ -668,6 +710,7 @@ namespace web {
     std::string GetCSS(const std::string & setting) override {
       if (state == TABLE) return Info()->style.Get(setting);
       if (state == ROW) return Info()->rows[cur_row].style.Get(setting);
+      if (state == COL) return Info()->cols[cur_col].style.Get(setting);
       if (state == CELL) return Info()->rows[cur_row].data[cur_col].style.Get(setting);
       return "";
     }
@@ -703,9 +746,9 @@ namespace web {
     }
     
     Table & SetColSpan(int new_span) {
-      emp_assert(state == CELL);
       emp_assert((cur_col + new_span <= GetNumCols()) && "Col span too wide for table!",
                  cur_col, new_span, GetNumCols(), GetID());
+      emp_assert(state == CELL);
         
       auto & datum = Info()->rows[cur_row].data[cur_col];
       const int old_span = datum.colspan;
@@ -731,7 +774,24 @@ namespace web {
 
       return *this;
     }
+
+    // We can control properties of whole columns.
+    Table & SetColSpan(int col_id, int new_span) {
+      emp_assert(col_id >= 0 && new_span >= 0);
+      emp_assert(col_id + new_span <= GetNumCols());
+
+      // If we haven't setup columns at all yet, do so.
+      if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
       
+      const int old_span = Info()->cols[col_id].GetSpan();
+      if (old_span != new_span) {
+        for (int i = old_span; i < new_span; i++) { Info()->cols[col_id + i].masked = true; }
+        for (int i = new_span; i < old_span; i++) { Info()->cols[col_id + i].masked = false; }
+      }
+      
+      return *this;
+    }
+    
     Table & SetSpan(int row_span, int col_span) {
       // @CAO Can do this more efficiently, but probably not worth it.
       SetRowSpan(row_span);
