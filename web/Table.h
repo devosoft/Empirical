@@ -375,6 +375,20 @@ namespace web {
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");                                           // Clear the current text.
         HTML << "<table id=\"" << id << "\">";
+
+        // Include any column details, if needed.
+        if (cols.size()) {
+          for (int c = 0; c < (int) cols.size(); ++c) {
+            if (cols[c].masked) continue;     // Skip masked columns.
+            HTML << "<colgroup";
+            if (cols[c].style.GetSize()) HTML << " id=" << id << "_c" << c;
+            HTML << ">";
+
+            HTML << "<col";
+            if (cols[c].span > 1) HTML << " span=" << cols[c].span;
+            HTML << ">";
+          }
+        }
         
         // Loop through all of the rows in the table. 
         for (int r = 0; r < (int) rows.size(); r++) {
@@ -521,6 +535,14 @@ namespace web {
               for (auto & child : datum.children) child->ReplaceHTML();
             }
 
+          }
+        }
+
+        // And setup columns.
+        if (cols.size()) {
+          for (int c = 0; c < col_count; c++) {
+            if (cols[c].masked || cols[c].style.GetSize()==0) continue;
+            cols[c].style.Apply(emp::to_string(id, "_c", c));
           }
         }
       }
