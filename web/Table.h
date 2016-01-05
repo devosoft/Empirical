@@ -376,6 +376,8 @@ namespace web {
         HTML.str("");                                           // Clear the current text.
         HTML << "<table id=\"" << id << "\">";
 
+        emp::CappedAlert(6, cols.size());
+
         // Include any column details, if needed.
         if (cols.size()) {
           for (int c = 0; c < (int) cols.size(); ++c) {
@@ -384,9 +386,7 @@ namespace web {
             if (cols[c].style.GetSize()) HTML << " id=" << id << "_c" << c;
             HTML << ">";
 
-            HTML << "<col";
-            if (cols[c].span > 1) HTML << " span=" << cols[c].span;
-            HTML << ">";
+            for (int i = 0; i < cols[c].span; i++) HTML << "<col>";
           }
         }
         
@@ -806,6 +806,8 @@ namespace web {
       if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
       
       const int old_span = Info()->cols[col_id].GetSpan();
+      Info()->cols[col_id].span = new_span;
+
       if (old_span != new_span) {
         for (int i = old_span; i < new_span; i++) { Info()->cols[col_id + i].masked = true; }
         for (int i = new_span; i < old_span; i++) { Info()->cols[col_id + i].masked = false; }
