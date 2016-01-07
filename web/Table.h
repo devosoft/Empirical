@@ -64,6 +64,16 @@
 //      All further manipulations of the table object will focus on that column until
 //      the state is changed again.
 //
+//    Table & GetRowGroup(int r)
+//      Select a group of rows starting at the specified row, make it active, and
+//      set the table state to ROW_GROUP.  All further manipulations of the table object
+//      will focus on that row group until the state is changed again.
+//
+//    Table & GetColGroup(int c)
+//      Select a group of columns starting at the specified column, make it active, and
+//      set the table state to COL_GROUP.  All further manipulations of the table object
+//      will focus on that column group until the state is changed again.
+//
 //    Table & GetTable()
 //      Leave the active row and column, but set the table state to TABLE
 //      All further manipulations of the table object will focus on the whole table
@@ -85,6 +95,8 @@
 //    Table & SetColSpan(int col_span)
 //    Table & SetSpan(int row_span, int col_span)
 //      Allow the row and/or column span of the current cell to be adjusted.
+//    Table & SetSpan(int new_span)
+//      Set the span of a row group or column group to the value provided.
 //
 //
 //  Clearing table contents:
@@ -103,15 +115,16 @@
 //
 //    Table & ClearCells()
 //      If state is TABLE, clear contents from all cells in entire table.
-//      If state is ROW, clear contents from all cells in that row.
-//      If state is COL, clear contents from all cells in that column.
+//      If state is ROW or COL, clear contents from all cells in that row/column.
+//      If state is ROW_GROUP or COL_GROUP, clear contents of cells in all rows/cols in group
 //      If state is CELL, clear just that single cell.
 //
 //    Table & ClearCell(int r, int c)
 //      Clear contents of just the specified cell.
 //
 //    Table & Clear()
-//      Dynamically clear the entire active state (TABLE, ROW, COL, or CELL).
+//      Dynamically clear the entire active state
+//      (TABLE, ROW, COL, ROW_GROUP, COL_GROUP, or CELL).
 //
 //
 //  Style manipulation
@@ -224,12 +237,36 @@ namespace web {
       friend Table; friend TableInfo;
     protected:
       Style style;
+
+    public:
+      TableCol() { ; }
+      ~TableCol() { ; }
+    };
+    
+    class TableColGroup {
+      friend Table; friend TableInfo;
+    protected:
+      Style style;
       int span;
       bool masked;
 
     public:
-      TableCol() : span(1), masked(false) { ; }
-      ~TableCol() { ; }
+      TableColGroup() : span(1), masked(false) { ; }
+      ~TableColGroup() { ; }
+
+      int GetSpan() const { return span; }
+    };
+    
+    class TableRowGroup {
+      friend Table; friend TableInfo;
+    protected:
+      Style style;
+      int span;
+      bool masked;
+
+    public:
+      TableRowGroup() : span(1), masked(false) { ; }
+      ~TableRowGroup() { ; }
 
       int GetSpan() const { return span; }
     };
@@ -237,10 +274,12 @@ namespace web {
     class TableInfo : public internal::WidgetInfo {
       friend Table;
     protected:
-      int row_count;                // How big is this table?
+      int row_count;                         // How big is this table?
       int col_count;
-      emp::vector<TableRow> rows;   // detail object for each row.
-      emp::vector<TableCol> cols;   // detail object for each column (if needed).
+      emp::vector<TableRow> rows;            // Detail object for each row
+      emp::vector<TableCol> cols;            // Detail object for each column (if needed)
+      emp::vector<TableColGroup> col_groups; // Detail object for each column group (if needed)
+      emp::vector<TableRowGroup> row_groups; // Detail object for each row group (if needed)
       
       int append_row;               // Which row is triggering an append?
       int append_col;               // Which col is triggering an append?
@@ -260,7 +299,11 @@ namespace web {
             rows[r].SetCols(new_cols);
             for (int c = col_count; c < new_cols; c++) { AddChild(r, c, Text("")); }
           }
-          col_count = new_cols;
+          col_count = new_cols;                    // Store the new column count
+
+          // Resize extra column info, only if needed.
+          if (cols.size()) cols.resize(new_cols);
+          if (col_groups.size()) col_groups.resize(new_cols);
         }
 
         // Resize number of rows.
@@ -271,6 +314,9 @@ namespace web {
             for (int c = 0; c < col_count; c++) { AddChild(r, c, Text("")); }
           }
           row_count = new_rows;          
+
+          // Resize extra row group info, only if needed.
+          if (row_groups.size()) row_groups.resize(new_rows);
         }
         
       }
@@ -373,25 +419,38 @@ namespace web {
       
       
       virtual void GetHTML(std::stringstream & HTML) override {
+        emp_assert(cols.size() == 0 || cols.size() == col_count);
+        emp_assert(col_groups.size() == 0 || col_groups.size() == col_count);
+
         HTML.str("");                                           // Clear the current text.
         HTML << "<table id=\"" << id << "\">";
 
-        emp::CappedAlert(6, cols.size());
-
-        // Include any column details, if needed.
-        if (cols.size()) {
-          for (int c = 0; c < (int) cols.size(); ++c) {
-            if (cols[c].masked) continue;     // Skip masked columns.
-            HTML << "<colgroup";
-            if (cols[c].style.GetSize()) HTML << " id=" << id << "_c" << c;
+        // Include column/row details only as needed.
+        const bool use_colg = col_groups.size();
+        const bool use_cols = cols.size();
+        const bool use_rowg = row_groups.size();
+        
+        if (use_colg || use_cols) {
+          for (int c = 0; c < col_count; ++c) {
+            if (use_colg && col_groups[c].masked == false) {
+              HTML << "<colgroup";
+              if (col_groups[c].style.GetSize()) HTML << " id=" << id << "_cg" << c;
+              HTML << ">";
+            }
+            HTML << "<col";
+            if (use_cols && cols[c].style.GetSize()) HTML << " id=" << id << "_c" << c;
             HTML << ">";
-
-            for (int i = 0; i < cols[c].span; i++) HTML << "<col>";
           }
         }
         
         // Loop through all of the rows in the table. 
         for (int r = 0; r < (int) rows.size(); r++) {
+          if (use_rowg && row_groups[r].masked == false) {
+            HTML << "<tbody";
+            if (row_groups[r].style.GetSize()) HTML << " id=" << id << "_rg" << r;
+            HTML << ">";
+          }
+
           auto & row = rows[r];
           HTML << "<tr";
           if (row.style.GetSize()) HTML << " id=" << id << '_' << r;
@@ -478,6 +537,12 @@ namespace web {
              << ", but rows has " << rows.size() << " elements." << std::endl;
           ok = false;
         }
+
+        if (cols.size() && col_count != (int) cols.size()) {
+          ss << prefix << "Error: col_count = " << col_count
+             << ", but cols has " << cols.size() << " elements." << std::endl;
+          ok = false;
+        }
         
         if (row_count < 1) {
           ss << prefix << "Error: Cannot have " << row_count
@@ -488,6 +553,19 @@ namespace web {
         if (col_count < 1) {
           ss << prefix << "Error: Cannot have " << col_count
              << " cols in table." << std::endl;
+          ok = false;
+        }
+
+        // And perform the same test for row/column groups.
+        if (col_groups.size() && col_count != (int) col_groups.size()) {
+          ss << prefix << "Error: col_count = " << col_count
+             << ", but col_groups has " << col_groups.size() << " elements." << std::endl;
+          ok = false;
+        }
+        
+        if (row_groups.size() && row_count != (int) row_groups.size()) {
+          ss << prefix << "Error: row_count = " << row_count
+             << ", but row_groups has " << row_groups.size() << " elements." << std::endl;
           ok = false;
         }
         
@@ -519,6 +597,10 @@ namespace web {
 
       
       void ReplaceHTML() override {
+        emp_assert(cols.size() == 0 || cols.size() == col_count);
+        emp_assert(col_groups.size() == 0 || col_groups.size() == col_count);
+        emp_assert(row_groups.size() == 0 || row_groups.size() == row_count);
+
         // Replace Table's HTML...
         internal::WidgetInfo::ReplaceHTML();
 
@@ -538,11 +620,23 @@ namespace web {
           }
         }
 
-        // And setup columns.
+        // And setup columns, column groups, and row groups, as needed.
         if (cols.size()) {
           for (int c = 0; c < col_count; c++) {
-            if (cols[c].masked || cols[c].style.GetSize()==0) continue;
+            if (cols[c].style.GetSize()==0) continue;
             cols[c].style.Apply(emp::to_string(id, "_c", c));
+          }
+        }
+        if (col_groups.size()) {
+          for (int c = 0; c < col_count; c++) {
+            if (col_groups[c].masked || col_groups[c].style.GetSize()==0) continue;
+            col_groups[c].style.Apply(emp::to_string(id, "_cg", c));
+          }
+        }
+        if (row_groups.size()) {
+          for (int c = 0; c < col_count; c++) {
+            if (row_groups[c].masked || row_groups[c].style.GetSize()==0) continue;
+            row_groups[c].style.Apply(emp::to_string(id, "_rg", c));
           }
         }
       }
@@ -564,7 +658,7 @@ namespace web {
     int cur_col;
            
     // A table's state determines how some operations work.
-    enum state_t { TABLE, ROW, CELL, COL };
+    enum state_t { TABLE, ROW, CELL, COL, COL_GROUP, ROW_GROUP };
     state_t state;
 
 
@@ -592,6 +686,17 @@ namespace web {
         // If we haven't setup columns at all yet, do so.
         if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
         Info()->cols[cur_col].style.Set(setting, value);
+        break;
+      case COL_GROUP:
+        // If we haven't setup column groups at all yet, do so.
+        if (Info()->col_groups.size() == 0) Info()->col_groups.resize(GetNumCols());
+        Info()->col_groups[cur_col].style.Set(setting, value);
+        break;
+      case ROW_GROUP:
+        // If we haven't setup row groups at all yet, do so.
+        if (Info()->row_groups.size() == 0) Info()->row_groups.resize(GetNumRows());
+        Info()->row_groups[cur_row].style.Set(setting, value);
+        break;
       default:
         emp_assert(false && "Table in unknown state!");
       };
@@ -610,7 +715,8 @@ namespace web {
     Table(const Table & in)
       : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col), state(in.state)
     {
-      emp_assert(state == TABLE || state == ROW || state == CELL || state == COL, state);
+      emp_assert(state == TABLE || state == ROW || state == CELL
+                 || state == COL || state == COL_GROUP || state == ROW_GROUP, state);
     }
     Table(const Widget & in) : WidgetFacet(in), cur_row(0), cur_col(0), state(TABLE) {
       emp_assert(info->IsTableInfo());
@@ -635,6 +741,8 @@ namespace web {
     int GetCurCol() const { return cur_col; }
     
     bool InStateTable() const { return state == TABLE; }
+    bool InStateRowGroup() const { return state == ROW_GROUP; }
+    bool InStateColGroup() const { return state == COL_GROUP; }
     bool InStateRow() const { return state == ROW; }
     bool InStateCol() const { return state == COL; }
     bool InStateCell() const { return state == CELL; }
@@ -643,7 +751,7 @@ namespace web {
       // Clear based on tables current state.
       if (state == TABLE) Info()->ClearTable();
       else if (state == ROW) Info()->ClearRow(cur_row);
-      // @CAO Make work for state == COL
+      // @CAO Make work for state == COL, COL_GROUP, or ROW_GROUP
       else if (state == CELL) Info()->ClearCell(cur_row, cur_col);
       else emp_assert(false && "Table in unknown state!", state);
       return *this;
@@ -654,7 +762,7 @@ namespace web {
     Table & ClearCells() {
       if (state == TABLE) Info()->ClearTableCells();
       else if (state == ROW) Info()->ClearRowCells(cur_row);
-      // @CAO Make work for state == COL
+      // @CAO Make work for state == COL, COL_GROUP, or ROW_GROUP
       else if (state == CELL) Info()->ClearCell(cur_row, cur_col);
       else emp_assert(false && "Unknown State!", state);
       return *this;
@@ -701,6 +809,20 @@ namespace web {
       state = COL;
       return *this;
     }
+    Table & GetRowGroup(int r) {
+      emp_assert(r < Info()->row_count,
+                 r, Info()->row_count, GetID());
+      cur_row = r; cur_col = 0;
+      state = ROW_GROUP;
+      return *this;
+    }
+    Table & GetColGroup(int c) {
+      emp_assert(c < Info()->col_count,
+                 c, Info()->col_count, GetID());
+      cur_col = c; cur_row = 0;
+      state = COL_GROUP;
+      return *this;
+    }
     Table & GetTable() {
       // Leave row and col where they are.
       state = TABLE;
@@ -730,34 +852,51 @@ namespace web {
     // Apply to appropriate component based on current state.
     using WidgetFacet<Table>::SetCSS;
     std::string GetCSS(const std::string & setting) override {
-      if (state == TABLE) return Info()->style.Get(setting);
+      if (state == CELL) return Info()->rows[cur_row].data[cur_col].style.Get(setting);
       if (state == ROW) return Info()->rows[cur_row].style.Get(setting);
       if (state == COL) return Info()->cols[cur_col].style.Get(setting);
-      if (state == CELL) return Info()->rows[cur_row].data[cur_col].style.Get(setting);
+      if (state == ROW_GROUP) return Info()->row_groups[cur_row].style.Get(setting);
+      if (state == COL_GROUP) return Info()->col_groups[cur_col].style.Get(setting);
+      if (state == TABLE) return Info()->style.Get(setting);
       return "";
     }
     
     // Allow the row and column span of the current cell to be adjusted.
     Table & SetRowSpan(int new_span) {
       emp_assert((cur_row + new_span <= GetNumRows()) && "Row span too wide for table!");
-      emp_assert(state == CELL);
+      emp_assert(state == CELL || state == ROW_GROUP);
       
-      auto & datum = Info()->rows[cur_row].data[cur_col];
-      const int old_span = datum.rowspan;
-      const int col_span = datum.colspan;
-      datum.rowspan = new_span;
-      
-      // For each col, make sure NEW rows are masked!
-      for (int row = cur_row + old_span; row < cur_row + new_span; row++) {
-        for (int col = cur_col; col < cur_col + col_span; col++) {
-          Info()->rows[row].data[col].masked = true;
+      if (state == CELL) {
+        auto & datum = Info()->rows[cur_row].data[cur_col];
+        const int old_span = datum.rowspan;
+        const int col_span = datum.colspan;
+        datum.rowspan = new_span;
+        
+        // For each col, make sure NEW rows are masked!
+        for (int row = cur_row + old_span; row < cur_row + new_span; row++) {
+          for (int col = cur_col; col < cur_col + col_span; col++) {
+            Info()->rows[row].data[col].masked = true;
+          }
+        }
+        
+        // For each row, make sure former columns are unmasked!
+        for (int row = cur_row + new_span; row < cur_row + old_span; row++) {
+          for (int col = cur_col; col < cur_col + col_span; col++) {
+            Info()->rows[row].data[col].masked = false;
+          }
         }
       }
+
+      else if (state == ROW_GROUP) {
+        // If we haven't setup columns at all yet, do so.
+        if (Info()->row_groups.size() == 0) Info()->row_groups.resize(GetNumRows());
         
-      // For each row, make sure former columns are unmasked!
-      for (int row = cur_row + new_span; row < cur_row + old_span; row++) {
-        for (int col = cur_col; col < cur_col + col_span; col++) {
-          Info()->rows[row].data[col].masked = false;
+        const int old_span = Info()->row_groups[cur_row].GetSpan();
+        Info()->row_groups[cur_row].span = new_span;
+        
+        if (old_span != new_span) {
+          for (int i=old_span; i<new_span; i++) { Info()->row_groups[cur_row+i].masked = true; }
+          for (int i=new_span; i<old_span; i++) { Info()->row_groups[cur_row+i].masked = false; }
         }
       }
       
@@ -770,27 +909,42 @@ namespace web {
     Table & SetColSpan(int new_span) {
       emp_assert((cur_col + new_span <= GetNumCols()) && "Col span too wide for table!",
                  cur_col, new_span, GetNumCols(), GetID());
-      emp_assert(state == CELL);
+      emp_assert(state == CELL || state == COL_GROUP);
         
-      auto & datum = Info()->rows[cur_row].data[cur_col];
-      const int old_span = datum.colspan;
-      const int row_span = datum.rowspan;
-      datum.colspan = new_span;
+      if (state == CELL) {
+        auto & datum = Info()->rows[cur_row].data[cur_col];
+        const int old_span = datum.colspan;
+        const int row_span = datum.rowspan;
+        datum.colspan = new_span;
         
-      // For each row, make sure new columns are masked!
-      for (int row = cur_row; row < cur_row + row_span; row++) {
-        for (int col = cur_col + old_span; col < cur_col + new_span; col++) {
-          Info()->rows[row].data[col].masked = true;
+        // For each row, make sure new columns are masked!
+        for (int row = cur_row; row < cur_row + row_span; row++) {
+          for (int col = cur_col + old_span; col < cur_col + new_span; col++) {
+            Info()->rows[row].data[col].masked = true;
+          }
         }
-      }
         
-      // For each row, make sure former columns are unmasked!
-      for (int row = cur_row; row < cur_row + row_span; row++) {
-        for (int col = cur_col + new_span; col < cur_col + old_span; col++) {
-          Info()->rows[row].data[col].masked = false;
+        // For each row, make sure former columns are unmasked!
+        for (int row = cur_row; row < cur_row + row_span; row++) {
+          for (int col = cur_col + new_span; col < cur_col + old_span; col++) {
+            Info()->rows[row].data[col].masked = false;
+          }
         }
       }
       
+      else if (state == COL_GROUP) {
+        // If we haven't setup columns at all yet, do so.
+        if (Info()->col_groups.size() == 0) Info()->col_groups.resize(GetNumCols());
+        
+        const int old_span = Info()->col_groups[cur_col].GetSpan();
+        Info()->col_groups[cur_col].span = new_span;
+        
+        if (old_span != new_span) {
+          for (int i=old_span; i<new_span; i++) { Info()->col_groups[cur_col+i].masked = true; }
+          for (int i=new_span; i<old_span; i++) { Info()->col_groups[cur_col+i].masked = false; }
+        }
+      }
+        
       // Redraw the entire table to fix col span information.
       if (IsActive()) Info()->ReplaceHTML();
 
@@ -798,25 +952,33 @@ namespace web {
     }
 
     // We can control properties of whole columns.
-    Table & SetColSpan(int col_id, int new_span) {
-      emp_assert(col_id >= 0 && new_span >= 0);
-      emp_assert(col_id + new_span <= GetNumCols());
+    // Table & SetColSpan(int col_id, int new_span) {
+    //   emp_assert(col_id >= 0 && new_span >= 0);
+    //   emp_assert(col_id + new_span <= GetNumCols());
 
-      // If we haven't setup columns at all yet, do so.
-      if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
+    //   // If we haven't setup columns at all yet, do so.
+    //   if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
       
-      const int old_span = Info()->cols[col_id].GetSpan();
-      Info()->cols[col_id].span = new_span;
+    //   const int old_span = Info()->cols[col_id].GetSpan();
+    //   Info()->cols[col_id].span = new_span;
 
-      if (old_span != new_span) {
-        for (int i = old_span; i < new_span; i++) { Info()->cols[col_id + i].masked = true; }
-        for (int i = new_span; i < old_span; i++) { Info()->cols[col_id + i].masked = false; }
-      }
+    //   if (old_span != new_span) {
+    //     for (int i = old_span; i < new_span; i++) { Info()->cols[col_id + i].masked = true; }
+    //     for (int i = new_span; i < old_span; i++) { Info()->cols[col_id + i].masked = false; }
+    //   }
       
+    //   return *this;
+    // }
+
+    Table & SetSpan(int new_span) {
+      if (state == ROW_GROUP) return SetRowSpan(new_span);
+      if (state == COL_GROUP) return SetColSpan(new_span);
+      emp_assert(false);  // No other state should be allowd.
       return *this;
     }
     
     Table & SetSpan(int row_span, int col_span) {
+      emp_assert(state == CELL);
       // @CAO Can do this more efficiently, but probably not worth it.
       SetRowSpan(row_span);
       SetColSpan(col_span);
