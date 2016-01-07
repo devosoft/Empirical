@@ -59,6 +59,7 @@ int main()
   test_table.GetCell(3,3) << "Three";
   test_table.GetRow(1).SetCSS("border", "3px solid black");
   test_table.GetCol(2).SetCSS("border", "3px solid red");
+  test_table.GetRowGroup(1).SetSpan(2).SetCSS("background-color", "yellow");
   doc << test_table;
 
   test_table.GetCell(0,3) << "Test1";
