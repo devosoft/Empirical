@@ -57,6 +57,8 @@ int main()
   test_table.GetCell(1,1) << "One";
   test_table.GetCell(2,2) << "Two";
   test_table.GetCell(3,3) << "Three";
+  test_table.GetRow(1).SetCSS("border", "3px solid black");
+  test_table.GetCol(2).SetCSS("border", "3px solid red");
   doc << test_table;
 
   test_table.GetCell(0,3) << "Test1";
