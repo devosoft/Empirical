@@ -22,9 +22,11 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 
+JS_TARGETS := Animate.js Example.js keypress.js Slate.js Sudoku.js Table.js TextArea.js Tween.js Web.js
+
 default: web
 
-web: Animate.js Example.js keypress.js Slate.js Table.js TextArea.js Tween.js Web.js
+web: $(JS_TARGETS)
 native: debug-Animate debug-keypress debug-Slate debug-web
 
 Animate.js: Animate.cc
@@ -38,6 +40,9 @@ keypress.js: keypress.cc
 
 Slate.js: Slate.cc
 	$(CXX_web) $(CFLAGS_web) Slate.cc -o Slate.js
+
+Sudoku.js: Sudoku.cc
+	$(CXX_web) $(CFLAGS_web) Sudoku.cc -o Sudoku.js
 
 Table.js: Table.cc
 	$(CXX_web) $(CFLAGS_web) Table.cc -o Table.js
@@ -55,7 +60,7 @@ debug-%: $*.cc
 	$(CXX_native) $(CFLAGS_native) $< -o $@
 
 clean:
-	rm -f debug-* Animate.js Example.js keypress.js Slate.js Table.js TextArea.js Tween.js Web.js *.js.map *~ source/*.o source/*/*.o
+	rm -f debug-* $(JS_TARGETS) *.js.map *~ source/*.o source/*/*.o
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
