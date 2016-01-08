@@ -13,19 +13,31 @@ int main()
 {
   auto table = doc.AddTable(9,9);
 
-  table.CellsCSS("border", "1px solid black");  // Each cell should have a light background.
-  table.CellsCSS("width", "15px");
-  table.CellsCSS("height", "15px");
+  table.SetCSS("border-collapse", "collapse")
+    .SetCSS("font-family", "Calibri, sans-serif")
+    .CellsCSS("border", "1px solid black")  // Each cell should have a light background.
+    .CellsCSS("width", "25px")
+    .CellsCSS("height", "25px");
   
-  std::vector<int> puzzle = {{ 0,1,2, 3,4,5, 6,7,8, 
-                               5,7,4, 6,0,8, 1,2,3, 
-                               3,8,6, 1,7,2, 0,5,4, 
-                               8,2,0, 7,3,6, 4,1,5, 
-                               1,5,3, 8,2,4, 7,6,0, 
-                               6,4,7, 0,5,1, 3,8,2, 
-                               7,0,1, 5,8,3, 2,4,6, 
-                               4,6,5, 2,1,0, 8,3,7, 
-                               2,3,8, 4,6,7, 5,0,1
+  // std::vector<int> puzzle = {{ '0','1','2', '3','4','5', '6','7','8', 
+  //                              '5','7','4', '6','0','8', '1','2','3', 
+  //                              '3','8','6', '1','7','2', '0','5','4', 
+  //                              '8','2','0', '7','3','6', '4','1','5', 
+  //                              '1','5','3', '8','2','4', '7','6','0', 
+  //                              '6','4','7', '0','5','1', '3','8','2', 
+  //                              '7','0','1', '5','8','3', '2','4','6', 
+  //                              '4','6','5', '2','1','0', '8','3','7', 
+  //                              '2','3','8', '4','6','7', '5','0','1'
+  //   }};
+  std::vector<int> puzzle = {{ '-','1','2', '3','4','5', '6','7','8', 
+                               '5','-','4', '6','0','8', '1','2','3', 
+                               '3','8','-', '1','7','2', '0','5','4', 
+                               '8','2','0', '7','3','6', '4','1','5', 
+                               '1','5','3', '8','2','4', '7','6','0', 
+                               '6','4','7', '0','5','1', '3','8','2', 
+                               '7','0','1', '5','8','3', '2','4','6', 
+                               '4','6','5', '2','1','0', '8','3','7', 
+                               '2','3','8', '4','6','7', '5','0','1'
     }};
 
           // Make regions have a dark background.
@@ -38,8 +50,8 @@ int main()
   
   for (int r = 0; r < 9; r++) {
     for (int c = 0; c < 9; c++) {
-      const char cur_symbol = '0' + puzzle[r*9+c];
-      if (cur_symbol != '-') table.GetCell(r,c) <<  "&nbsp;" << cur_symbol << "&nbsp;";
+      const char cur_symbol = puzzle[r*9+c];
+      if (cur_symbol != '-') table.GetCell(r,c) <<  "<center>" << cur_symbol << "</center>";
     }
   }
 
