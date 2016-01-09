@@ -11,9 +11,20 @@ UI::Document doc("emp_base");
 
 int main()
 {
-  auto table = doc.AddTable(9,9);
+  doc << "<h1>Sudoku!</h1>";
 
-  table.SetCSS("border-collapse", "collapse")
+  UI::Slate table_bg("table_bg");
+  table_bg.SetCSS("padding", "4px")
+    .SetCSS("border-radius", "10px")
+    .SetBackground("black")
+    .SetWidth(413);
+  
+  UI::Table table(9,9);
+  table_bg << table;
+  doc << table_bg;
+    
+  table.SetBackground("#F0F0FF")
+    .SetCSS("border-collapse", "collapse")
     .SetCSS("font", "35px Calibri, sans-serif")
     .CellsCSS("border", "1px solid black")  // Each cell should have a light background.
     .CellsCSS("width", "45px")
@@ -62,6 +73,4 @@ int main()
       };
     }
   }
-
-  table.Redraw();
 }
