@@ -14,17 +14,16 @@ int main()
   doc << "<h1>Sudoku!</h1>";
 
   UI::Slate table_bg("table_bg");
-  table_bg.SetCSS("padding", "4px")
+  table_bg.SetCSS("border", "3px solid black")
     .SetCSS("border-radius", "10px")
-    .SetBackground("black")
+    .SetBackground("#F0F0FF")
     .SetWidth(413);
   
   UI::Table table(9,9);
   table_bg << table;
   doc << table_bg;
     
-  table.SetBackground("#F0F0FF")
-    .SetCSS("border-collapse", "collapse")
+  table.SetCSS("border-collapse", "collapse")
     .SetCSS("font", "35px Calibri, sans-serif")
     .CellsCSS("border", "1px solid black")  // Each cell should have a light background.
     .CellsCSS("width", "45px")
