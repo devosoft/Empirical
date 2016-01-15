@@ -32,15 +32,19 @@
 
 namespace emp {
 
+  enum class LINK_TYPE { NOT_SET, REPRODUCTION, BOND, ATTACK, TARGET };
+
   template <typename BODY_TYPE, typename BASE_TYPE=double>
   struct BodyLink {
+    LINK_TYPE type;
     BODY_TYPE * other;
     BASE_TYPE cur_dist;     // How far are bodies currently being kept apart?
     BASE_TYPE target_dist;  // How far should the be moved to before splitting?
-
-    BodyLink() : other(nullptr), cur_dist(0), target_dist(0) { ; }
-    BodyLink(BODY_TYPE * o, BASE_TYPE cur=0, BASE_TYPE target=0)
-      : other(o), cur_dist(cur), target_dist(target) { ; }
+    
+    BodyLink() : type(LINK_TYPE::NOT_SET), other(nullptr), cur_dist(0), target_dist(0) { ; }
+    BodyLink(LINK_TYPE t, BODY_TYPE * o, BASE_TYPE cur=0, BASE_TYPE target=0)
+      : type(t), other(o), cur_dist(cur), target_dist(target) { ; }
+    BodyLink(const BodyLink &) = default;
     ~BodyLink() { ; }
   };
   
@@ -58,10 +62,8 @@ namespace emp {
     int repro_count;              // Number of offspring currently being produced.
     
     // Information about other bodies that this one is linked to.
-    emp::vector< BodyLink<CircleBody2D,BASE_TYPE> > links;
-    // emp::vector<CircleBody2D *> links;
-    // BASE_TYPE pair_dist;               // How far away should the linked bodies be kept?
-    // BASE_TYPE target_pair_dist;        // How far out should a pair get before splitting?
+    emp::vector< BodyLink<CircleBody2D,BASE_TYPE> > links; // Active links
+    emp::vector< CircleBody2D * > dead_links;              // List of links to remove!
 
     Point<BASE_TYPE> shift;           // How should this body be updated to minimize overlap.
     Point<BASE_TYPE> cum_shift;       // Build up of shift not yet acted upon.
@@ -102,7 +104,6 @@ namespace emp {
 
     // @CAO Links are possible without reproducing; should come up with a better way to track.
     bool IsReproducing() const {
-      // return (links.size()) && (GetRadius() != target_radius);
       return repro_count;
     }
 
@@ -134,17 +135,18 @@ namespace emp {
       return *this;
     }
 
-    // Creating, testing, and unlinking other organisms (used for gestation & reproduction)
+    // Creating, testing, and unlinking other organisms
     bool IsLinked(const CircleBody2D & link_org) const {
       for (auto & cur_link : links) if (cur_link.other == &link_org) return true;
       return false;
     }
 
-    CircleBody2D & AddLink(CircleBody2D & link_org, BASE_TYPE cur_dist, BASE_TYPE target_dist) {
+    CircleBody2D & AddLink(LINK_TYPE type, CircleBody2D & link_org,
+                           BASE_TYPE cur_dist, BASE_TYPE target_dist) {
       emp_assert(!IsLinked(link_org));  // Don't link twice!
 
-      links.emplace_back(&link_org, cur_dist, target_dist);       // Connect to the linked org.
-      link_org.links.emplace_back(this, cur_dist, target_dist);   // Build the connection back.
+      links.emplace_back(type, &link_org, cur_dist, target_dist); // Connect to the linked org.
+      link_org.links.emplace_back(LINK_TYPE::TARGET, this, cur_dist, target_dist);   // Build the connection back.
       
       return *this;
     }
@@ -180,11 +182,11 @@ namespace emp {
     }
     
     BASE_TYPE GetLinkDist(const CircleBody2D & link_org) const {
-      emp_assert(!IsLinked(link_org));
+      emp_assert(IsLinked(link_org));
       return FindLink(link_org).cur_dist;
     }
     BASE_TYPE GetTargetLinkDist(const CircleBody2D & link_org) const {
-      emp_assert(!IsLinked(link_org));
+      emp_assert(IsLinked(link_org));
       return FindLink(link_org).target_dist;
     }
     void ShiftLinkDist(CircleBody2D & link_org, BASE_TYPE change) {
@@ -201,9 +203,10 @@ namespace emp {
 
       // Create the offspring as a paired link.
       auto * offspring = new CircleBody2D(perimeter, brain ? new BRAIN_TYPE(*brain) : nullptr);
-      AddLink(*offspring, offset.Magnitude(), perimeter.GetRadius()*2.0);
+      AddLink(LINK_TYPE::REPRODUCTION, *offspring, offset.Magnitude(), perimeter.GetRadius()*2.0);
       offspring->Translate(offset);
-
+      repro_count++;
+      
       return offspring;
     }
 
@@ -225,14 +228,23 @@ namespace emp {
       if ((int) target_radius > (int) GetRadius()) SetRadius(GetRadius() + change_factor);
       else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - change_factor);
 
+      // If there are any links flagged for removal, do so!
+      if (dead_links.size()) {
+        for (auto * other : dead_links) RemoveLink(*other);
+        dead_links.resize(0);
+      }
+
       // Test if the link distance for this body needs to be updated
       for (auto & link : links) {
         if (link.cur_dist != link.target_dist) {
           // If we're within the change_factor, just set pair_dist to target.
           if (std::abs(link.cur_dist - link.target_dist) <= change_factor) {
             link.cur_dist = link.target_dist;
-
-            // @CAO Should remove the link!!
+            if (link.type == LINK_TYPE::REPRODUCTION) {
+              emp_assert(repro_count > 0);
+              repro_count--;
+              dead_links.push_back(link.other);  // Flag this link for removal!
+            }
           }
           else {
             // @CAO because of the previous check, do we really need to case to int here??
