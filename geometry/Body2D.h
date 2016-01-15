@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_BODY_2D_H
-#define EMP_BODY_2D_H
-
-///////////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  This file defines templated classes to represent bodies that exist on a 2D surface.
 //  Each class should be able to:
@@ -17,16 +13,37 @@
 //
 //    CircleBody2D - One individual circular object in the 2D world.
 //
+//
+//  Development notes:
+//  * Links should probably be shared by both bodies.
+//  * If we are going to have a lot of links, we may want a better data structure than vector.
+
+
+#ifndef EMP_BODY_2D_H
+#define EMP_BODY_2D_H
 
 #include "../tools/assert.h"
 #include "../tools/alert.h"
 #include "../tools/mem_track.h"
+#include "../tools/vector.h"
 
 #include "Angle2D.h"
 #include "Circle2D.h"
 
 namespace emp {
 
+  template <typename BODY_TYPE, typename BASE_TYPE=double>
+  struct BodyLink {
+    BODY_TYPE * other;
+    BASE_TYPE cur_dist;     // How far are bodies currently being kept apart?
+    BASE_TYPE target_dist;  // How far should the be moved to before splitting?
+
+    BodyLink() : other(nullptr), cur_dist(0), target_dist(0) { ; }
+    BodyLink(BODY_TYPE * o, BASE_TYPE cur=0, BASE_TYPE target=0)
+      : other(o), cur_dist(cur), target_dist(target) { ; }
+    ~BodyLink() { ; }
+  };
+  
   template <typename BRAIN_TYPE, typename BASE_TYPE=double>
   class CircleBody2D {
   private:
@@ -38,11 +55,13 @@ namespace emp {
     BASE_TYPE mass;               // "Weight" of this object (@CAO not used yet..)
     uint32_t color_id;            // Which color should this body appear?
     double birth_time;            // At what time point was this organism born?
-
-    // @CAO Technically, we should allow any number of links.
-    CircleBody2D * pair_link;     // Is this body physically linked to another?
-    BASE_TYPE pair_dist;          // How far away should the linked body be kept?
-    BASE_TYPE target_pair_dist;   // How far out should the pair get before splitting?
+    int repro_count;              // Number of offspring currently being produced.
+    
+    // Information about other bodies that this one is linked to.
+    emp::vector< BodyLink<CircleBody2D,BASE_TYPE> > links;
+    // emp::vector<CircleBody2D *> links;
+    // BASE_TYPE pair_dist;               // How far away should the linked bodies be kept?
+    // BASE_TYPE target_pair_dist;        // How far out should a pair get before splitting?
 
     Point<BASE_TYPE> shift;           // How should this body be updated to minimize overlap.
     Point<BASE_TYPE> cum_shift;       // Build up of shift not yet acted upon.
@@ -52,16 +71,15 @@ namespace emp {
   public:
     CircleBody2D(const Circle<BASE_TYPE> & _p, BRAIN_TYPE * _b = nullptr)
       : perimeter(_p), target_radius(_p.GetRadius()), brain(_b), mass(1), color_id(0)
-      , birth_time(0)
-      , pair_link(nullptr), pair_dist(0), target_pair_dist(0), pressure(0)
+      , birth_time(0), repro_count(0), pressure(0)
     {
       EMP_TRACK_CONSTRUCT(CircleBody2D);
     }
     ~CircleBody2D() {
       // If this body is paired with another one, remove the pairing.
-      if (pair_link) {
-        emp_assert(pair_link->pair_link == this);
-        pair_link->pair_link = nullptr;
+      if (links.size()) {
+        for (auto & link : links) link.other->RemoveLink(*this, false);
+        links.resize(0);
       }
       if (brain) delete brain;
       EMP_TRACK_DESTRUCT(CircleBody2D);
@@ -82,7 +100,11 @@ namespace emp {
     Point<BASE_TYPE> GetShift() const { return shift; }
     double GetPressure() const { return pressure; }
 
-    bool IsReproducing() const { return (pair_link != nullptr) && (GetRadius() != target_radius); }
+    // @CAO Links are possible without reproducing; should come up with a better way to track.
+    bool IsReproducing() const {
+      // return (links.size()) && (GetRadius() != target_radius);
+      return repro_count;
+    }
 
     CircleBody2D & SetPosition(const Point<BASE_TYPE> & new_pos) {
       //if (perimeter.GetCenter().SquareDistance(new_pos) > 2.0)
@@ -114,49 +136,75 @@ namespace emp {
 
     // Creating, testing, and unlinking other organisms (used for gestation & reproduction)
     bool IsLinked(const CircleBody2D & link_org) const {
-      return pair_link == &link_org;
+      for (auto & cur_link : links) if (cur_link.other == &link_org) return true;
+      return false;
     }
+
+    CircleBody2D & AddLink(CircleBody2D & link_org, BASE_TYPE cur_dist, BASE_TYPE target_dist) {
+      emp_assert(!IsLinked(link_org));  // Don't link twice!
+
+      links.emplace_back(&link_org, cur_dist, target_dist);       // Connect to the linked org.
+      link_org.links.emplace_back(this, cur_dist, target_dist);   // Build the connection back.
+      
+      return *this;
+    }
+
+    CircleBody2D & RemoveLink(CircleBody2D & link_org, bool remove_link_back=true) {
+      emp_assert(IsLinked(link_org));   // Make sure link exists!
+
+      // Find the link and remove it.
+      for (int i = 0; i < (int) links.size(); i++) {
+        if (links[i].other == &link_org) {
+          links[i] = links.back();
+          links.pop_back();
+          break;
+        }
+      }
+
+      // Remove link in other direction (unless we don't need to).
+      if (remove_link_back) link_org.RemoveLink(*this, false);
+
+      return *this;
+    }
+
+    const BodyLink<CircleBody2D,BASE_TYPE> & FindLink(const CircleBody2D & link_org) const {
+      emp_assert(IsLinked(link_org));
+      for (auto & link : links) if ( link.other == &link_org) return link;
+      return links[0]; // Should never get here!
+    }
+    
+    BodyLink<CircleBody2D,BASE_TYPE> & FindLink(CircleBody2D & link_org)  {
+      emp_assert(IsLinked(link_org));
+      for (auto & link : links) if ( link.other == &link_org) return link;
+      return links[0]; // Should never get here!
+    }
+    
     BASE_TYPE GetLinkDist(const CircleBody2D & link_org) const {
-      if (!IsLinked(link_org)) return -1;
-      return pair_dist;
+      emp_assert(!IsLinked(link_org));
+      return FindLink(link_org).cur_dist;
     }
     BASE_TYPE GetTargetLinkDist(const CircleBody2D & link_org) const {
-      if (!IsLinked(link_org)) return -1;
-      return target_pair_dist;
+      emp_assert(!IsLinked(link_org));
+      return FindLink(link_org).target_dist;
     }
     void ShiftLinkDist(CircleBody2D & link_org, BASE_TYPE change) {
-      pair_dist += change;
-      if (pair_link) pair_link->pair_dist = pair_dist;
+      auto & link = FindLink(link_org);
+      auto & olink = link.FindLink(*this);
+      
+      link.cur_dist += change;
+      olink.cur_dist = link.cur_dist;
     }
 
     CircleBody2D * BuildOffspring(emp::Point<BASE_TYPE> offset) {
-      // emp::Alert("Building Offspring at offset ", offset.GetX(), ',', offset.GetY());
-
+      // Offspring cannot be right on top of parent.
       emp_assert(offset.GetX() != 0 || offset.GetY() != 0);
-      if (pair_link) {   // If this body is already paired with another, break that link!
-        emp_assert(pair_link->pair_link == this);
-        pair_link->pair_link = nullptr;
-      }
+
       // Create the offspring as a paired link.
-      pair_link = new CircleBody2D(perimeter, brain ? new BRAIN_TYPE(*brain) : nullptr);
-      pair_link->pair_link = this;
-      pair_link->Translate(offset);
+      auto * offspring = new CircleBody2D(perimeter, brain ? new BRAIN_TYPE(*brain) : nullptr);
+      AddLink(*offspring, offset.Magnitude(), perimeter.GetRadius()*2.0);
+      offspring->Translate(offset);
 
-      // Setup distances with offspring...
-      pair_dist = offset.Magnitude();
-      pair_link->pair_dist = pair_dist;
-      target_pair_dist = perimeter.GetRadius() * 2.0;
-      pair_link->target_pair_dist = target_pair_dist;
-
-      return pair_link;
-    }
-
-    void BreakLink(CircleBody2D * old_link) {
-      emp_assert(pair_link == old_link);
-      emp_assert(old_link->pair_link == this);
-      pair_link = nullptr;
-      old_link->pair_link = nullptr;
-      pair_dist = 0;
+      return offspring;
     }
 
     CircleBody2D<BRAIN_TYPE, BASE_TYPE> &
@@ -178,21 +226,22 @@ namespace emp {
       else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - change_factor);
 
       // Test if the link distance for this body needs to be updated
-      if (pair_link && pair_dist != target_pair_dist) {
-        // If we're within the change_factor, just set pair_dist to target.
-        if (std::abs(pair_dist - target_pair_dist) <= change_factor) {
-          pair_dist = target_pair_dist;
-          // @CAO, for now, break the link!
-          pair_link->pair_link = nullptr;
-          pair_link = nullptr;
-        }
-        else {
-          if ((int) pair_dist < (int) target_pair_dist) pair_dist += change_factor;
-          else pair_dist -= change_factor;
-        }
-        pair_link->pair_dist = pair_dist;
-      }
+      for (auto & link : links) {
+        if (link.cur_dist != link.target_dist) {
+          // If we're within the change_factor, just set pair_dist to target.
+          if (std::abs(link.cur_dist - link.target_dist) <= change_factor) {
+            link.cur_dist = link.target_dist;
 
+            // @CAO Should remove the link!!
+          }
+          else {
+            // @CAO because of the previous check, do we really need to case to int here??
+            if ((int) link.cur_dist < (int) link.target_dist) link.cur_dist += change_factor;
+            else link.cur_dist -= change_factor;
+          }
+        }
+      }
+      
       return *this;
     }
 
@@ -230,23 +279,23 @@ namespace emp {
       total_abs_shift.ToOrigin();
         
       // If this body is linked to another, enforce the distance between them.
-      if (pair_link != nullptr) {
-        emp_assert(pair_link->pair_link == this);
+      for (auto & link : links) {
+        emp_assert(link.other->IsLinked(*this));
 
-        if (GetAnchor() == pair_link->GetAnchor()) {
+        if (GetAnchor() == link.other->GetAnchor()) {
           // If two organisms are on top of each other... shift one.
           Translate(emp::Point<BASE_TYPE>(0.01, 0.01));
         }
         
         // Figure out how much each oragnism should move so that they will be properly spaced.
-        const BASE_TYPE start_dist = GetAnchor().Distance(pair_link->GetAnchor());
-        const BASE_TYPE link_dist = GetLinkDist(*pair_link);
+        const BASE_TYPE start_dist = GetAnchor().Distance(link.other->GetAnchor());
+        const BASE_TYPE link_dist = GetLinkDist(*(link.other));
         const double frac_change = (1.0 - ((double) link_dist) / ((double) start_dist)) / 2.0;
         
-        emp::Point<BASE_TYPE> dist_move = (GetAnchor() - pair_link->GetAnchor()) * frac_change;
+        emp::Point<BASE_TYPE> dist_move = (GetAnchor() - link.other->GetAnchor()) * frac_change;
         
         perimeter.Translate(-dist_move);
-        pair_link->perimeter.Translate(dist_move);
+        link.other->perimeter.Translate(dist_move);
       }
       
       // Adjust the organism so it stays within the bounding box of the world.
@@ -271,11 +320,12 @@ namespace emp {
     
     // Check to make sure there are no obvious issues with this object.
     bool OK() {
-      if (pair_link) {
-        emp_assert(pair_link->pair_link == this); // Make sure pairing is reciprical.
-        emp_assert(pair_dist >= 0);               // Distances cannot be negative
-        emp_assert(target_pair_dist >= 0);        // Distances cannot be negative
+      for (auto & link : links) {
+        emp_assert(link.other->IsLinked(*this)); // Make sure pairing is reciprical.
+        emp_assert(link.cur_dist >= 0);          // Distances cannot be negative.
+        emp_assert(link.target_dist >= 0);       // Distances cannot be negative.
       }
+
       return true;
     }
 
