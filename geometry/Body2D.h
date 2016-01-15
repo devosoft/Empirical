@@ -32,46 +32,68 @@
 
 namespace emp {
 
-  enum class LINK_TYPE { NOT_SET, REPRODUCTION, BOND, ATTACK, TARGET };
-
-  template <typename BODY_TYPE, typename BASE_TYPE=double>
-  struct BodyLink {
-    LINK_TYPE type;
-    BODY_TYPE * other;
-    BASE_TYPE cur_dist;     // How far are bodies currently being kept apart?
-    BASE_TYPE target_dist;  // How far should the be moved to before splitting?
+  class Body2D_Base {
+  protected:
+    enum class LINK_TYPE { NOT_SET, REPRODUCTION, BOND, ATTACK, TARGET };
     
-    BodyLink() : type(LINK_TYPE::NOT_SET), other(nullptr), cur_dist(0), target_dist(0) { ; }
-    BodyLink(LINK_TYPE t, BODY_TYPE * o, BASE_TYPE cur=0, BASE_TYPE target=0)
-      : type(t), other(o), cur_dist(cur), target_dist(target) { ; }
-    BodyLink(const BodyLink &) = default;
-    ~BodyLink() { ; }
+    template <typename BODY_TYPE>
+    struct BodyLink {
+      LINK_TYPE type;
+      BODY_TYPE * other;
+      double cur_dist;     // How far are bodies currently being kept apart?
+      double target_dist;  // How far should the be moved to before splitting?
+      
+      BodyLink() : type(LINK_TYPE::NOT_SET), other(nullptr), cur_dist(0), target_dist(0) { ; }
+      BodyLink(LINK_TYPE t, BODY_TYPE * o, double cur=0, double target=0)
+        : type(t), other(o), cur_dist(cur), target_dist(target) { ; }
+      BodyLink(const BodyLink &) = default;
+      ~BodyLink() { ; }
+    };
+
+    Angle orientation;            // Which way is body facing?
+    Point<double> velocity;    // Speed and direction of movement
+
+  public:
+    const Angle & GetOrientation() const { return orientation; }
+    const Point<double> & GetVelocity() const { return velocity; }
+
+    void TurnLeft(int steps=1) { orientation.RotateDegrees(45); }
+    void TurnRight(int steps=1) { orientation.RotateDegrees(-45); }
+
+    void IncSpeed(double steps=1.0) {
+      velocity += Point<double>(orientation.Sin(), orientation.Cos());
+    }
+    void DecSpeed(double steps=1.0) {
+      velocity -= Point<double>(orientation.Sin(), orientation.Cos());
+    }
+
+    void SetVelocity(double x, double y) { velocity.Set(x, y); }
+    void SetVelocity(const Point<double> & v) { velocity = v; }
+
   };
   
-  template <typename BRAIN_TYPE, typename BASE_TYPE=double>
-  class CircleBody2D {
+  template <typename BRAIN_TYPE>
+  class CircleBody2D : public Body2D_Base {
   private:
-    Circle<BASE_TYPE> perimeter;  // Includes position and size.
-    Angle orientation;            // Which way is body facing?
-    BASE_TYPE target_radius;      // For growing/shrinking
+    Circle<double> perimeter;  // Includes position and size.
+    double target_radius;      // For growing/shrinking
     BRAIN_TYPE * brain;           // Controller for individual
-    Point<BASE_TYPE> velocity;    // Speed and direction of movement
-    BASE_TYPE mass;               // "Weight" of this object (@CAO not used yet..)
+    double mass;               // "Weight" of this object (@CAO not used yet..)
     uint32_t color_id;            // Which color should this body appear?
     double birth_time;            // At what time point was this organism born?
     int repro_count;              // Number of offspring currently being produced.
     
     // Information about other bodies that this one is linked to.
-    emp::vector< BodyLink<CircleBody2D,BASE_TYPE> > links; // Active links
+    emp::vector< BodyLink<CircleBody2D> > links; // Active links
     emp::vector< CircleBody2D * > dead_links;              // List of links to remove!
 
-    Point<BASE_TYPE> shift;           // How should this body be updated to minimize overlap.
-    Point<BASE_TYPE> cum_shift;       // Build up of shift not yet acted upon.
-    Point<BASE_TYPE> total_abs_shift; // Total absolute-value of shifts (to calculate pressure)
+    Point<double> shift;           // How should this body be updated to minimize overlap.
+    Point<double> cum_shift;       // Build up of shift not yet acted upon.
+    Point<double> total_abs_shift; // Total absolute-value of shifts (to calculate pressure)
     double pressure;                  // Current pressure on this body.
 
   public:
-    CircleBody2D(const Circle<BASE_TYPE> & _p, BRAIN_TYPE * _b = nullptr)
+    CircleBody2D(const Circle<double> & _p, BRAIN_TYPE * _b = nullptr)
       : perimeter(_p), target_radius(_p.GetRadius()), brain(_b), mass(1), color_id(0)
       , birth_time(0), repro_count(0), pressure(0)
     {
@@ -87,19 +109,17 @@ namespace emp {
       EMP_TRACK_DESTRUCT(CircleBody2D);
     }
 
-    const Circle<BASE_TYPE> & GetPerimeter() const { return perimeter; }
-    const Point<BASE_TYPE> & GetAnchor() const { return perimeter.GetCenter(); }
-    const Point<BASE_TYPE> & GetCenter() const { return perimeter.GetCenter(); }
-    BASE_TYPE GetRadius() const { return perimeter.GetRadius(); }
-    const Angle & GetOrientation() const { return orientation; }
-    BASE_TYPE GetTargetRadius() const { return target_radius; }
+    const Circle<double> & GetPerimeter() const { return perimeter; }
+    const Point<double> & GetAnchor() const { return perimeter.GetCenter(); }
+    const Point<double> & GetCenter() const { return perimeter.GetCenter(); }
+    double GetRadius() const { return perimeter.GetRadius(); }
+    double GetTargetRadius() const { return target_radius; }
     BRAIN_TYPE * GetBrain() { return brain; }
-    const Point<BASE_TYPE> & GetVelocity() const { return velocity; }
-    BASE_TYPE GetMass() const { return mass; }
+    double GetMass() const { return mass; }
     uint32_t GetColorID() const { return color_id; }
     double GetBirthTime() const { return birth_time; }
 
-    Point<BASE_TYPE> GetShift() const { return shift; }
+    Point<double> GetShift() const { return shift; }
     double GetPressure() const { return pressure; }
 
     // @CAO Links are possible without reproducing; should come up with a better way to track.
@@ -107,30 +127,28 @@ namespace emp {
       return repro_count;
     }
 
-    CircleBody2D & SetPosition(const Point<BASE_TYPE> & new_pos) {
+    CircleBody2D & SetPosition(const Point<double> & new_pos) {
       //if (perimeter.GetCenter().SquareDistance(new_pos) > 2.0)
         perimeter.SetCenter(new_pos);
       return *this;
     }
-    CircleBody2D & SetRadius(BASE_TYPE new_radius) {
+    CircleBody2D & SetRadius(double new_radius) {
       perimeter.SetRadius(new_radius); 
       return *this;
     }
-    CircleBody2D & SetTargetRadius(BASE_TYPE t) { target_radius = t; return *this; }
-    CircleBody2D & SetVelocity(BASE_TYPE x, BASE_TYPE y) { velocity.Set(x, y); return *this; }
-    CircleBody2D & SetVelocity(const Point<BASE_TYPE> & v) { velocity = v; return *this; }
+    CircleBody2D & SetTargetRadius(double t) { target_radius = t; return *this; }
     CircleBody2D & SetColorID(uint32_t in_id) { color_id = in_id; return *this; }
     CircleBody2D & SetBirthTime(double in_time) { birth_time = in_time; return *this; }
 
     // Shift at end of next update.
-    CircleBody2D & AddShift(const Point<BASE_TYPE> & inc_val) {
+    CircleBody2D & AddShift(const Point<double> & inc_val) {
       shift += inc_val;
       total_abs_shift += inc_val.Abs();
       return *this;
     }
 
     // Translate immediately.
-    CircleBody2D & Translate(const Point<BASE_TYPE> & inc_val) {
+    CircleBody2D & Translate(const Point<double> & inc_val) {
       perimeter.Translate(inc_val);
       return *this;
     }
@@ -142,7 +160,7 @@ namespace emp {
     }
 
     CircleBody2D & AddLink(LINK_TYPE type, CircleBody2D & link_org,
-                           BASE_TYPE cur_dist, BASE_TYPE target_dist) {
+                           double cur_dist, double target_dist) {
       emp_assert(!IsLinked(link_org));  // Don't link twice!
 
       links.emplace_back(type, &link_org, cur_dist, target_dist); // Connect to the linked org.
@@ -169,27 +187,27 @@ namespace emp {
       return *this;
     }
 
-    const BodyLink<CircleBody2D,BASE_TYPE> & FindLink(const CircleBody2D & link_org) const {
+    const BodyLink<CircleBody2D> & FindLink(const CircleBody2D & link_org) const {
       emp_assert(IsLinked(link_org));
       for (auto & link : links) if ( link.other == &link_org) return link;
       return links[0]; // Should never get here!
     }
     
-    BodyLink<CircleBody2D,BASE_TYPE> & FindLink(CircleBody2D & link_org)  {
+    BodyLink<CircleBody2D> & FindLink(CircleBody2D & link_org)  {
       emp_assert(IsLinked(link_org));
       for (auto & link : links) if ( link.other == &link_org) return link;
       return links[0]; // Should never get here!
     }
     
-    BASE_TYPE GetLinkDist(const CircleBody2D & link_org) const {
+    double GetLinkDist(const CircleBody2D & link_org) const {
       emp_assert(IsLinked(link_org));
       return FindLink(link_org).cur_dist;
     }
-    BASE_TYPE GetTargetLinkDist(const CircleBody2D & link_org) const {
+    double GetTargetLinkDist(const CircleBody2D & link_org) const {
       emp_assert(IsLinked(link_org));
       return FindLink(link_org).target_dist;
     }
-    void ShiftLinkDist(CircleBody2D & link_org, BASE_TYPE change) {
+    void ShiftLinkDist(CircleBody2D & link_org, double change) {
       auto & link = FindLink(link_org);
       auto & olink = link.FindLink(*this);
       
@@ -197,7 +215,7 @@ namespace emp {
       olink.cur_dist = link.cur_dist;
     }
 
-    CircleBody2D * BuildOffspring(emp::Point<BASE_TYPE> offset) {
+    CircleBody2D * BuildOffspring(emp::Point<double> offset) {
       // Offspring cannot be right on top of parent.
       emp_assert(offset.GetX() != 0 || offset.GetY() != 0);
 
@@ -210,20 +228,8 @@ namespace emp {
       return offspring;
     }
 
-    CircleBody2D<BRAIN_TYPE, BASE_TYPE> &
-    TurnLeft(int steps=1) { orientation.RotateDegrees(45); return *this; }
-    CircleBody2D<BRAIN_TYPE, BASE_TYPE> &
-    TurnRight(int steps=1) { orientation.RotateDegrees(-45); return *this; }
-    CircleBody2D<BRAIN_TYPE, BASE_TYPE> &
-    IncSpeed(double steps=1.0) {
-      velocity += Point<BASE_TYPE>(orientation.Sin(), orientation.Cos());
-      return *this;
-    }
-    CircleBody2D<BRAIN_TYPE, BASE_TYPE> &
-    DecSpeed(double steps=1.0) { return *this; }
-
     // If a body is not at its target radius, grow it or shrink it, as needed.
-    CircleBody2D<BRAIN_TYPE, BASE_TYPE> & BodyUpdate(BASE_TYPE change_factor=1) {
+    CircleBody2D<BRAIN_TYPE> & BodyUpdate(double change_factor=1) {
       // Test if this body needs to grow or shrink.
       if ((int) target_radius > (int) GetRadius()) SetRadius(GetRadius() + change_factor);
       else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - change_factor);
@@ -257,8 +263,9 @@ namespace emp {
       return *this;
     }
 
+
     // Move this body by its velocity and reduce velocity based on friction.
-    CircleBody2D<BRAIN_TYPE, BASE_TYPE> & ProcessStep(BASE_TYPE friction=0) {
+    void ProcessStep(double friction=0) {
       if (velocity.NonZero()) {
         perimeter.Translate(velocity);
         const double velocity_mag = velocity.Magnitude();
@@ -269,14 +276,13 @@ namespace emp {
         // Otherwise slow it down proportionately in the x and y directions.
         else { velocity *= 1.0 - ((double) friction) / ((double) velocity_mag); }
       }   
-      return *this;
     }
 
 
     // Determine where the circle will end up and force it to be within a bounding box.
-    CircleBody2D<BRAIN_TYPE, BASE_TYPE> & FinalizePosition(const Point<BASE_TYPE> & max_coords) {
-      const BASE_TYPE max_x = max_coords.GetX() - GetRadius();
-      const BASE_TYPE max_y = max_coords.GetY() - GetRadius();
+    CircleBody2D<BRAIN_TYPE> & FinalizePosition(const Point<double> & max_coords) {
+      const double max_x = max_coords.GetX() - GetRadius();
+      const double max_y = max_coords.GetY() - GetRadius();
 
       // Update the caclulcation for pressure.
 
@@ -296,15 +302,15 @@ namespace emp {
 
         if (GetAnchor() == link.other->GetAnchor()) {
           // If two organisms are on top of each other... shift one.
-          Translate(emp::Point<BASE_TYPE>(0.01, 0.01));
+          Translate(emp::Point<double>(0.01, 0.01));
         }
         
         // Figure out how much each oragnism should move so that they will be properly spaced.
-        const BASE_TYPE start_dist = GetAnchor().Distance(link.other->GetAnchor());
-        const BASE_TYPE link_dist = GetLinkDist(*(link.other));
+        const double start_dist = GetAnchor().Distance(link.other->GetAnchor());
+        const double link_dist = GetLinkDist(*(link.other));
         const double frac_change = (1.0 - ((double) link_dist) / ((double) start_dist)) / 2.0;
         
-        emp::Point<BASE_TYPE> dist_move = (GetAnchor() - link.other->GetAnchor()) * frac_change;
+        emp::Point<double> dist_move = (GetAnchor() - link.other->GetAnchor()) * frac_change;
         
         perimeter.Translate(-dist_move);
         link.other->perimeter.Translate(dist_move);
