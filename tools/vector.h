@@ -1,15 +1,13 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//  This class is a drop-in wrapper for std::vector, adding on bounds checking.
+//  If EMP_NDEBUG is set then it reverts back to std::vector.
+
 
 #ifndef EMP_VECTOR_H
 #define EMP_VECTOR_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-//  This class is a drop-in replacement for std::vector, but with bounds checking.
-//  If EMP_NDEBUG is set then it reverts back to std::vector.
-//
 
 #include <initializer_list>
 #include <vector>
@@ -78,6 +76,11 @@ namespace emp {
 
     T & back() { return v.back(); }
     const T & back() const { return v.back(); }
+
+    void pop_back() {
+      emp_assert(v.size() > 0);
+      v.pop_back();
+    }
   };
 
 }
