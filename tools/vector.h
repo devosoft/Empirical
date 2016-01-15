@@ -67,7 +67,7 @@ namespace emp {
     vector & push_back(T2 && in) { v.push_back(std::forward<T2>(in)); return *this; }
 
     template <typename... T2>
-    vector & emplace_back(T2 &&... in) { v.push_back(std::forward<T2>(in)...); return *this; }
+    vector & emplace_back(T2 &&... in) { v.emplace_back(std::forward<T2>(in)...); return *this; }
 
     auto begin() -> decltype(v.begin()) { return v.begin(); }
     auto end() -> decltype(v.end()) { return v.end(); }
