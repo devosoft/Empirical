@@ -60,10 +60,13 @@ namespace emp {
     void TurnLeft(int steps=1) { orientation.RotateDegrees(45); }
     void TurnRight(int steps=1) { orientation.RotateDegrees(-45); }
 
-    void IncSpeed(double steps=1.0) {
+    void IncSpeed() {
       velocity += Point<double>(orientation.Sin(), orientation.Cos());
     }
-    void DecSpeed(double steps=1.0) {
+    void IncSpeed(const Point<double> & offset) {
+      velocity += offset;
+    }
+    void DecSpeed() {
       velocity -= Point<double>(orientation.Sin(), orientation.Cos());
     }
 
@@ -159,6 +162,8 @@ namespace emp {
       return false;
     }
 
+    int GetLinkCount() const { return (int) links.size(); }
+
     CircleBody2D & AddLink(LINK_TYPE type, CircleBody2D & link_org,
                            double cur_dist, double target_dist) {
       emp_assert(!IsLinked(link_org));  // Don't link twice!
@@ -249,7 +254,7 @@ namespace emp {
             if (link.type == LINK_TYPE::REPRODUCTION) {
               emp_assert(repro_count > 0);
               repro_count--;
-              dead_links.push_back(link.other);  // Flag this link for removal!
+              // dead_links.push_back(link.other);  // Flag this link for removal!
             }
           }
           else {
