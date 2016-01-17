@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_SURFACE_2D_H
-#define EMP_SURFACE_2D_H
-
-///////////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  This file defines a templated class to represent a 2D suface capable of maintaining data
 //  about which 2D bodies are currently on that surface and rapidly identifying if they are 
@@ -26,9 +22,14 @@
 //
 //  Development notes:
 //  * Need a good function to remove a body; now we have to use GetBodySet() and modify it.
-//
 
+
+#ifndef EMP_SURFACE_2D_H
+#define EMP_SURFACE_2D_H
+
+#include "../tools/functions.h"
 #include "Body2D.h"
+
 #include <functional>
 
 namespace emp {
@@ -78,16 +79,15 @@ namespace emp {
         if (body->GetRadius() > max_radius) max_radius = body->GetRadius();
       }
 
-      const int max_cols = max_pos.GetX() / (max_radius * 2.0);
-      const int max_rows = max_pos.GetY() / (max_radius * 2.0);
-
       // Figure out the actual number of sectors to use (currently no more than 1024).
-      const int cols = std::min(max_cols, 32);
-      const int rows = std::min(max_rows, 32);
-
-      const int num_sectors = rows * cols;
-      const double sector_width = max_pos.GetX() / (double) cols;
-      const double sector_height = max_pos.GetY() / (double) rows;
+      const int num_cols = std::min<int>(max_pos.GetX() / (max_radius * 2.0), 32);
+      const int num_rows = std::min<int>(max_pos.GetY() / (max_radius * 2.0), 32);
+      const int max_col = num_cols-1;
+      const int max_row = num_rows-1;
+      
+      const int num_sectors = num_cols * num_rows;
+      const double sector_width = max_pos.GetX() / (double) num_cols;
+      const double sector_height = max_pos.GetY() / (double) num_rows;
 
       std::vector< std::vector<BODY_TYPE *> > sector_set(num_sectors);
 
@@ -100,13 +100,13 @@ namespace emp {
       for (auto * body : body_set) {
         emp_assert(body);
         // Determine which sector the current body is in.
-        const int cur_col = body->GetCenter().GetX() / sector_width;
-        const int cur_row = body->GetCenter().GetY() / sector_height;
+        const int cur_col = emp::to_range<int>(body->GetCenter().GetX()/sector_width, 0, max_col);
+        const int cur_row = emp::to_range<int>(body->GetCenter().GetY()/sector_height, 0, max_row);
 
         // See if this body may collide with any of the bodies previously put into sectors.
-        for (int i = std::max(0, cur_col-1); i <= std::min(cur_col+1, cols-1); i++) {
-          for (int j = std::max(0, cur_row-1); j <= std::min(cur_row+1, rows-1); j++) {
-            const int sector_id = i + cols * j;
+        for (int i = std::max(0, cur_col-1); i <= std::min(cur_col+1, num_cols-1); i++) {
+          for (int j = std::max(0, cur_row-1); j <= std::min(cur_row+1, num_rows-1); j++) {
+            const int sector_id = i + num_cols * j;
             if (sector_set[sector_id].size() == 0) continue;
 
             for (auto body2 : sector_set[sector_id]) {
@@ -118,7 +118,7 @@ namespace emp {
         }
 
         // Add this body to the current sector for future tests to compare with.
-        const int cur_sector = cur_col + cur_row * cols;
+        const int cur_sector = cur_col + cur_row * num_cols;
         emp_assert(cur_sector < (int) sector_set.size());
 
         sector_set[cur_sector].push_back(body);
