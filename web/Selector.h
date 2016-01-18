@@ -87,9 +87,9 @@ namespace web {
         
         // List out options
         for (int i = 0; i < (int) options.size(); i++) {
-          HTML << "<option value=\"" << i;
+          HTML << "<option value=\"" << i << "\"";
           if (i == select_id) HTML << " selected";
-          HTML << "\">" << options[i] << "</option>";
+          HTML << ">" << options[i] << "</option>";
         }
         HTML << "</select>";
       }
@@ -139,6 +139,8 @@ namespace web {
     const std::string & GetOption(int id) const { return Info()->options[id]; }
     bool HasAutofocus() const { return Info()->autofocus; }
     bool IsDisabled() const { return Info()->disabled; }
+
+    Selector & SelectID(int id) { Info()->select_id = id; return *this; }
     
     Selector & SetOption(const std::string & in_option,
                          const std::function<void()> & in_cb,
