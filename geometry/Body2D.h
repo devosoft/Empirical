@@ -234,7 +234,7 @@ namespace emp {
     }
 
     // If a body is not at its target radius, grow it or shrink it, as needed.
-    CircleBody2D<BRAIN_TYPE> & BodyUpdate(double change_factor=1) {
+    CircleBody2D<BRAIN_TYPE> & BodyUpdate(double change_factor=1, bool detach_on_birth=true) {
       // Test if this body needs to grow or shrink.
       if ((int) target_radius > (int) GetRadius()) SetRadius(GetRadius() + change_factor);
       else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - change_factor);
@@ -254,7 +254,7 @@ namespace emp {
             if (link.type == LINK_TYPE::REPRODUCTION) {
               emp_assert(repro_count > 0);
               repro_count--;
-              // dead_links.push_back(link.other);  // Flag this link for removal!
+              if (detach_on_birth) dead_links.push_back(link.other);  // Flag link for removal!
             }
           }
           else {
