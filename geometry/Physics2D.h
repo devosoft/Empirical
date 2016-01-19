@@ -26,16 +26,22 @@ namespace emp {
     Surface_t surface;    // Bodies that can collide.
     Surface_t background; // Bodies that can't collide.
 
+    bool detach_on_birth; // Should bodies detach from their parents when born?
+
   public:
-    Physics2D(BASE_TYPE width, BASE_TYPE height, BASE_TYPE max_org_diameter=20) 
+    Physics2D(BASE_TYPE width, BASE_TYPE height, BASE_TYPE max_org_diameter=20, bool detach=true)
       : surface(width, height)
       , background(width, height)
+      , detach_on_birth(detach)
     { ; }
     ~Physics2D() { ; }
 
     const Surface_t & GetSurface() const { return surface; }
     const Surface_t & GetBackground() const { return background; }
+    bool GetDetach() const { return detach_on_birth; }
 
+    Physics2D & SetDetach(bool _in) { detach_on_birth = _in; return *this; }
+    
     Physics2D & AddBody(BODY_TYPE * in_body) { surface.AddBody(in_body); return *this; }
     Physics2D & AddBackground(BODY_TYPE * in_body) { background.AddBody(in_body); return *this; }
 
@@ -130,8 +136,8 @@ namespace emp {
       auto & body_set = surface.GetBodySet();
 
       for (auto * cur_body : body_set) {
-        cur_body->BodyUpdate(0.25);   // Let a body change size or shape, as needed.
-        cur_body->ProcessStep(0.0125);  // Update position and velocity.
+        cur_body->BodyUpdate(0.25, detach_on_birth); // Let a body change size or shape, as needed.
+        cur_body->ProcessStep(0.0125);               // Update position and velocity.
       }
 
       // Handle collisions
