@@ -1,4 +1,4 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
@@ -19,9 +19,9 @@ using namespace std::placeholders;
 
 namespace emp {
 
-  template <typename BODY_TYPE, typename BRAIN_TYPE, typename BASE_TYPE=double> class Physics2D {
+  template <typename BODY_TYPE> class Physics2D {
   private:
-    using Surface_t = Surface2D<BODY_TYPE, BRAIN_TYPE, BASE_TYPE>;
+    using Surface_t = Surface2D<BODY_TYPE>;
 
     Surface_t surface;    // Bodies that can collide.
     Surface_t background; // Bodies that can't collide.
@@ -29,7 +29,7 @@ namespace emp {
     bool detach_on_birth; // Should bodies detach from their parents when born?
 
   public:
-    Physics2D(BASE_TYPE width, BASE_TYPE height, BASE_TYPE max_org_diameter=20, bool detach=true)
+    Physics2D(double width, double height, double max_org_diameter=20, bool detach=true)
       : surface(width, height)
       , background(width, height)
       , detach_on_birth(detach)
@@ -70,17 +70,17 @@ namespace emp {
     bool TestPairCollision(BODY_TYPE & body1, BODY_TYPE & body2) {
       if (body1.IsLinked(body2)) return false;  // Linked bodies can overlap.
 
-      const Point<BASE_TYPE> dist = body1.GetCenter() - body2.GetCenter();
-      const BASE_TYPE sq_pair_dist = dist.SquareMagnitude();
-      const BASE_TYPE radius_sum = body1.GetRadius() + body2.GetRadius();
-      const BASE_TYPE sq_min_dist = radius_sum * radius_sum;
+      const Point<double> dist = body1.GetCenter() - body2.GetCenter();
+      const double sq_pair_dist = dist.SquareMagnitude();
+      const double radius_sum = body1.GetRadius() + body2.GetRadius();
+      const double sq_min_dist = radius_sum * radius_sum;
 
       // If there was no collision, return false.
       if (sq_pair_dist >= sq_min_dist) { return false; }
 
       if (sq_pair_dist == 0.0) {
         // If the shapes are on top of each other, we have a problem.  Shift one!
-        body2.Translate(emp::Point<BASE_TYPE>(0.01, 0.01));
+        body2.Translate(emp::Point<double>(0.01, 0.01));
       }
 
       // @CAO If objects can phase or explode, identify that here.
@@ -89,7 +89,7 @@ namespace emp {
       const double true_dist = sqrt(sq_pair_dist);
       const double overlap_dist = ((double) radius_sum) - true_dist;
       const double overlap_frac = overlap_dist / true_dist;
-      const Point<BASE_TYPE> cur_shift = dist * (overlap_frac / 2.0);
+      const Point<double> cur_shift = dist * (overlap_frac / 2.0);
       body1.AddShift(cur_shift);
       body2.AddShift(-cur_shift);
 
@@ -103,18 +103,18 @@ namespace emp {
         x1 = body1.GetVelocity().GetX();  y1 = body2.GetVelocity().GetY();
         x2 = body2.GetVelocity().GetX();  y2 = body1.GetVelocity().GetY();
 
-        body1.SetVelocity(Point<BASE_TYPE>(x1, y1));
-        body2.SetVelocity(Point<BASE_TYPE>(x2, y2));
+        body1.SetVelocity(Point<double>(x1, y1));
+        body2.SetVelocity(Point<double>(x2, y2));
       }
       else if (dist.GetY() == 0) {
         x1 = body2.GetVelocity().GetX();  y1 = body1.GetVelocity().GetY();
         x2 = body1.GetVelocity().GetX();  y2 = body2.GetVelocity().GetY();
 
-        body1.SetVelocity(Point<BASE_TYPE>(x1, y1));
-        body2.SetVelocity(Point<BASE_TYPE>(x2, y2));
+        body1.SetVelocity(Point<double>(x1, y1));
+        body2.SetVelocity(Point<double>(x2, y2));
       }
       else {
-        const Point<BASE_TYPE> rel_velocity(body2.GetVelocity() - body1.GetVelocity());
+        const Point<double> rel_velocity(body2.GetVelocity() - body1.GetVelocity());
         double normal_a = dist.GetY() / dist.GetX();
         x1 = ( rel_velocity.GetX() + normal_a * rel_velocity.GetY() )
           / ( normal_a * normal_a + 1 );
@@ -122,8 +122,8 @@ namespace emp {
         x2 = rel_velocity.GetX() - x1;
         y2 = - (1 / normal_a) * x2;
 
-        body2.SetVelocity(body1.GetVelocity() + Point<BASE_TYPE>(x2, y2));
-        body1.SetVelocity(body1.GetVelocity() + Point<BASE_TYPE>(x1, y1));
+        body2.SetVelocity(body1.GetVelocity() + Point<double>(x2, y2));
+        body1.SetVelocity(body1.GetVelocity() + Point<double>(x1, y1));
       }
   
 
