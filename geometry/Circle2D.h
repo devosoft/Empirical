@@ -1,14 +1,13 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//  A class to manage circles in a 2D plane.
+
 
 #ifndef EMP_CIRCLE_2D_H
 #define EMP_CIRCLE_2D_H
 
-////////////////////////////////////////////////////////////////
-//
-//  A class to manage circles in a 2D plane.
-//
 
 #include "Point2D.h"
 

@@ -50,7 +50,7 @@ namespace emp {
       ~BodyLink() { ; }
     };
 
-    Angle orientation;            // Which way is body facing?
+    Angle orientation;         // Which way is body facing?
     Point<double> velocity;    // Speed and direction of movement
 
   public:
@@ -60,15 +60,9 @@ namespace emp {
     void TurnLeft(int steps=1) { orientation.RotateDegrees(45); }
     void TurnRight(int steps=1) { orientation.RotateDegrees(-45); }
 
-    void IncSpeed() {
-      velocity += Point<double>(orientation.Sin(), orientation.Cos());
-    }
-    void IncSpeed(const Point<double> & offset) {
-      velocity += offset;
-    }
-    void DecSpeed() {
-      velocity -= Point<double>(orientation.Sin(), orientation.Cos());
-    }
+    void IncSpeed(const Point<double> & offset) { velocity += offset; }
+    void IncSpeed() { velocity += orientation.GetPoint<double>(); }
+    void DecSpeed() { velocity -= orientation.GetPoint<double>(); }
 
     void SetVelocity(double x, double y) { velocity.Set(x, y); }
     void SetVelocity(const Point<double> & v) { velocity = v; }
@@ -80,18 +74,18 @@ namespace emp {
     Circle<double> perimeter;  // Includes position and size.
     double target_radius;      // For growing/shrinking
     double mass;               // "Weight" of this object (@CAO not used yet..)
-    uint32_t color_id;            // Which color should this body appear?
-    double birth_time;            // At what time point was this organism born?
-    int repro_count;              // Number of offspring currently being produced.
+    uint32_t color_id;         // Which color should this body appear?
+    double birth_time;         // At what time point was this organism born?
+    int repro_count;           // Number of offspring currently being produced.
     
     // Information about other bodies that this one is linked to.
-    emp::vector< BodyLink<CircleBody2D> > links; // Active links
-    emp::vector< CircleBody2D * > dead_links;              // List of links to remove!
+    emp::vector< BodyLink<CircleBody2D> > links;  // Active links
+    emp::vector< CircleBody2D * > dead_links;     // List of links to remove!
 
-    Point<double> shift;           // How should this body be updated to minimize overlap.
-    Point<double> cum_shift;       // Build up of shift not yet acted upon.
-    Point<double> total_abs_shift; // Total absolute-value of shifts (to calculate pressure)
-    double pressure;                  // Current pressure on this body.
+    Point<double> shift;            // How should this body be updated to minimize overlap.
+    Point<double> cum_shift;        // Build up of shift not yet acted upon.
+    Point<double> total_abs_shift;  // Total absolute-value of shifts (to calculate pressure)
+    double pressure;                // Current pressure on this body.
 
   public:
     CircleBody2D(const Circle<double> & _p)
@@ -120,21 +114,10 @@ namespace emp {
 
     Point<double> GetShift() const { return shift; }
     double GetPressure() const { return pressure; }
+    bool IsReproducing() const { return repro_count; }
 
-    // @CAO Links are possible without reproducing; should come up with a better way to track.
-    bool IsReproducing() const {
-      return repro_count;
-    }
-
-    CircleBody2D & SetPosition(const Point<double> & new_pos) {
-      //if (perimeter.GetCenter().SquareDistance(new_pos) > 2.0)
-        perimeter.SetCenter(new_pos);
-      return *this;
-    }
-    CircleBody2D & SetRadius(double new_radius) {
-      perimeter.SetRadius(new_radius); 
-      return *this;
-    }
+    CircleBody2D & SetPosition(const Point<double> & p) { perimeter.SetCenter(p); return *this; }
+    CircleBody2D & SetRadius(double r) { perimeter.SetRadius(r); return *this; }
     CircleBody2D & SetTargetRadius(double t) { target_radius = t; return *this; }
     CircleBody2D & SetColorID(uint32_t in_id) { color_id = in_id; return *this; }
     CircleBody2D & SetBirthTime(double in_time) { birth_time = in_time; return *this; }
