@@ -1,20 +1,19 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  A simple class to track value pairs of any kind, optimized for points in 2D Space
+//
+//  Note: For maximal efficiency, prefer SquareMagnitude() and SquareDistance()
+//        over Magnitude() and Distance() as the latter require a square-root.
+
 
 #ifndef EMP_POINT_2D_H
 #define EMP_POINT_2D_H
 
 #include <cmath>
 #include <iostream>
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//  A simple class to track value pairs of any kind, optimized for points in 2D Space
-//
-//  Note: For maximal efficiency, you should prefer SquareMagnitude() and SquareDistance()
-//        over Magnitude() and Distance() as the latter require a square-root.
-//
 
 namespace emp {
 

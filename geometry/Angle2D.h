@@ -1,11 +1,6 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_ANGLE_2D_H
-#define EMP_ANGLE_2D_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
 //
 //  This class maintains an angle on a 2D surface.
 //
@@ -13,6 +8,10 @@
 //  First two bytes are number of full circles.
 //  Last two bytes represent angle angles.
 // 
+
+#ifndef EMP_ANGLE_2D_H
+#define EMP_ANGLE_2D_H
+
 
 #include <cmath>
 
