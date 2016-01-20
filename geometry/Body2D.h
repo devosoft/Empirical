@@ -1,9 +1,9 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  This file defines templated classes to represent bodies that exist on a 2D surface.
+//  This file defines classes to represent bodies that exist on a 2D surface.
 //  Each class should be able to:
 //   * Maintain a pointer to information about the full organism associated with this body.
 //   * provide a circular perimeter of the body (for phase1 of collision detection)
@@ -75,12 +75,10 @@ namespace emp {
 
   };
   
-  template <typename BRAIN_TYPE>
   class CircleBody2D : public Body2D_Base {
   private:
     Circle<double> perimeter;  // Includes position and size.
     double target_radius;      // For growing/shrinking
-    BRAIN_TYPE * brain;           // Controller for individual
     double mass;               // "Weight" of this object (@CAO not used yet..)
     uint32_t color_id;            // Which color should this body appear?
     double birth_time;            // At what time point was this organism born?
@@ -96,8 +94,8 @@ namespace emp {
     double pressure;                  // Current pressure on this body.
 
   public:
-    CircleBody2D(const Circle<double> & _p, BRAIN_TYPE * _b = nullptr)
-      : perimeter(_p), target_radius(_p.GetRadius()), brain(_b), mass(1), color_id(0)
+    CircleBody2D(const Circle<double> & _p)
+      : perimeter(_p), target_radius(_p.GetRadius()), mass(1), color_id(0)
       , birth_time(0), repro_count(0), pressure(0)
     {
       EMP_TRACK_CONSTRUCT(CircleBody2D);
@@ -108,7 +106,6 @@ namespace emp {
         for (auto & link : links) link.other->RemoveLink(*this, false);
         links.resize(0);
       }
-      if (brain) delete brain;
       EMP_TRACK_DESTRUCT(CircleBody2D);
     }
 
@@ -117,7 +114,6 @@ namespace emp {
     const Point<double> & GetCenter() const { return perimeter.GetCenter(); }
     double GetRadius() const { return perimeter.GetRadius(); }
     double GetTargetRadius() const { return target_radius; }
-    BRAIN_TYPE * GetBrain() { return brain; }
     double GetMass() const { return mass; }
     uint32_t GetColorID() const { return color_id; }
     double GetBirthTime() const { return birth_time; }
@@ -175,8 +171,9 @@ namespace emp {
     }
 
     CircleBody2D & RemoveLink(CircleBody2D & link_org, bool remove_link_back=true) {
-      emp_assert(IsLinked(link_org));   // Make sure link exists!
-
+      // emp_assert(IsLinked(link_org));   // Make sure link exists!
+      // OK to try to remove a non-existant link!
+      
       // Find the link and remove it.
       for (int i = 0; i < (int) links.size(); i++) {
         if (links[i].other == &link_org) {
@@ -214,7 +211,7 @@ namespace emp {
     }
     void ShiftLinkDist(CircleBody2D & link_org, double change) {
       auto & link = FindLink(link_org);
-      auto & olink = link.FindLink(*this);
+      auto & olink = link.other->FindLink(*this);
       
       link.cur_dist += change;
       olink.cur_dist = link.cur_dist;
@@ -225,7 +222,7 @@ namespace emp {
       emp_assert(offset.GetX() != 0 || offset.GetY() != 0);
 
       // Create the offspring as a paired link.
-      auto * offspring = new CircleBody2D(perimeter, brain ? new BRAIN_TYPE(*brain) : nullptr);
+      auto * offspring = new CircleBody2D(perimeter);
       AddLink(LINK_TYPE::REPRODUCTION, *offspring, offset.Magnitude(), perimeter.GetRadius()*2.0);
       offspring->Translate(offset);
       repro_count++;
@@ -234,7 +231,7 @@ namespace emp {
     }
 
     // If a body is not at its target radius, grow it or shrink it, as needed.
-    CircleBody2D<BRAIN_TYPE> & BodyUpdate(double change_factor=1, bool detach_on_birth=true) {
+    CircleBody2D & BodyUpdate(double change_factor=1, bool detach_on_birth=true) {
       // Test if this body needs to grow or shrink.
       if ((int) target_radius > (int) GetRadius()) SetRadius(GetRadius() + change_factor);
       else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - change_factor);
@@ -285,7 +282,7 @@ namespace emp {
 
 
     // Determine where the circle will end up and force it to be within a bounding box.
-    CircleBody2D<BRAIN_TYPE> & FinalizePosition(const Point<double> & max_coords) {
+    CircleBody2D & FinalizePosition(const Point<double> & max_coords) {
       const double max_x = max_coords.GetX() - GetRadius();
       const double max_y = max_coords.GetY() - GetRadius();
 
@@ -344,6 +341,7 @@ namespace emp {
     // Check to make sure there are no obvious issues with this object.
     bool OK() {
       for (auto & link : links) {
+        (void) link;
         emp_assert(link.other->IsLinked(*this)); // Make sure pairing is reciprical.
         emp_assert(link.cur_dist >= 0);          // Distances cannot be negative.
         emp_assert(link.target_dist >= 0);       // Distances cannot be negative.
