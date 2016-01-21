@@ -124,16 +124,13 @@ namespace emp {
     const Point<double> & GetCenter() const { return perimeter.GetCenter(); }
     double GetRadius() const { return perimeter.GetRadius(); }
     double GetTargetRadius() const { return target_radius; }
-
-    CircleBody2D & SetPosition(const Point<double> & p) { perimeter.SetCenter(p); return *this; }
-    CircleBody2D & SetRadius(double r) { perimeter.SetRadius(r); return *this; }
-    CircleBody2D & SetTargetRadius(double t) { target_radius = t; return *this; }
-
-    // Translate immediately.
-    CircleBody2D & Translate(const Point<double> & inc_val) {
-      perimeter.Translate(inc_val);
-      return *this;
-    }
+    
+    void SetPosition(const Point<double> & p) { perimeter.SetCenter(p); }
+    void SetRadius(double r) { perimeter.SetRadius(r); }
+    void SetTargetRadius(double t) { target_radius = t; }
+    
+    // Translate immediately (ignoring physics)
+    void Translate(const Point<double> & t) { perimeter.Translate(t); }
 
     // Creating, testing, and unlinking other organisms
     bool IsLinked(const CircleBody2D & link_org) const {
@@ -143,20 +140,15 @@ namespace emp {
 
     int GetLinkCount() const { return (int) links.size(); }
 
-    CircleBody2D & AddLink(LINK_TYPE type, CircleBody2D & link_org,
-                           double cur_dist, double target_dist) {
+    void AddLink(LINK_TYPE type, CircleBody2D & link_org, double cur_dist, double target_dist) {
       emp_assert(!IsLinked(link_org));  // Don't link twice!
 
-      links.emplace_back(type, &link_org, cur_dist, target_dist); // Connect to the linked org.
-      link_org.links.emplace_back(LINK_TYPE::TARGET, this, cur_dist, target_dist);   // Build the connection back.
-      
-      return *this;
+      // Build connections in both directions.
+      links.emplace_back(type, &link_org, cur_dist, target_dist);
+      link_org.links.emplace_back(LINK_TYPE::TARGET, this, cur_dist, target_dist);
     }
 
-    CircleBody2D & RemoveLink(CircleBody2D & link_org, bool remove_link_back=true) {
-      // emp_assert(IsLinked(link_org));   // Make sure link exists!
-      // OK to try to remove a non-existant link!
-      
+    void RemoveLink(CircleBody2D & link_org, bool remove_link_back=true) {
       // Find the link and remove it.
       for (int i = 0; i < (int) links.size(); i++) {
         if (links[i].other == &link_org) {
@@ -168,8 +160,6 @@ namespace emp {
 
       // Remove link in other direction (unless we don't need to).
       if (remove_link_back) link_org.RemoveLink(*this, false);
-
-      return *this;
     }
 
     const BodyLink<CircleBody2D> & FindLink(const CircleBody2D & link_org) const {
@@ -214,7 +204,7 @@ namespace emp {
     }
 
     // If a body is not at its target radius, grow it or shrink it, as needed.
-    CircleBody2D & BodyUpdate(double change_factor=1, bool detach_on_birth=true) {
+    void BodyUpdate(double change_factor=1, bool detach_on_birth=true) {
       // Test if this body needs to grow or shrink.
       if ((int) target_radius > (int) GetRadius()) SetRadius(GetRadius() + change_factor);
       else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - change_factor);
@@ -244,8 +234,7 @@ namespace emp {
           }
         }
       }
-      
-      return *this;
+
     }
 
 
@@ -265,7 +254,7 @@ namespace emp {
 
 
     // Determine where the circle will end up and force it to be within a bounding box.
-    CircleBody2D & FinalizePosition(const Point<double> & max_coords) {
+    void FinalizePosition(const Point<double> & max_coords) {
       const double max_x = max_coords.GetX() - GetRadius();
       const double max_y = max_coords.GetY() - GetRadius();
 
@@ -317,8 +306,6 @@ namespace emp {
         perimeter.SetCenterY(max_y);           // Put back in range...
         velocity.NegateY();                    // Bounce off bottom.
       }
-
-      return *this;
     }
     
     // Check to make sure there are no obvious issues with this object.
