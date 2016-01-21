@@ -42,7 +42,7 @@ namespace emp {
       BODY_TYPE * other;
       double cur_dist;     // How far are bodies currently being kept apart?
       double target_dist;  // How far should the be moved to before splitting?
-      
+
       BodyLink() : type(LINK_TYPE::NOT_SET), other(nullptr), cur_dist(0), target_dist(0) { ; }
       BodyLink(LINK_TYPE t, BODY_TYPE * o, double cur=0, double target=0)
         : type(t), other(o), cur_dist(cur), target_dist(target) { ; }
@@ -50,37 +50,12 @@ namespace emp {
       ~BodyLink() { ; }
     };
 
-    Angle orientation;         // Which way is body facing?
-    Point<double> velocity;    // Speed and direction of movement
-
-  public:
-    const Angle & GetOrientation() const { return orientation; }
-    const Point<double> & GetVelocity() const { return velocity; }
-
-    void TurnLeft(int steps=1) { orientation.RotateDegrees(45); }
-    void TurnRight(int steps=1) { orientation.RotateDegrees(-45); }
-
-    void IncSpeed(const Point<double> & offset) { velocity += offset; }
-    void IncSpeed() { velocity += orientation.GetPoint<double>(); }
-    void DecSpeed() { velocity -= orientation.GetPoint<double>(); }
-
-    void SetVelocity(double x, double y) { velocity.Set(x, y); }
-    void SetVelocity(const Point<double> & v) { velocity = v; }
-
-  };
-  
-  class CircleBody2D : public Body2D_Base {
-  private:
-    Circle<double> perimeter;  // Includes position and size.
-    double target_radius;      // For growing/shrinking
-    double mass;               // "Weight" of this object (@CAO not used yet..)
-    uint32_t color_id;         // Which color should this body appear?
-    double birth_time;         // At what time point was this organism born?
-    int repro_count;           // Number of offspring currently being produced.
-    
-    // Information about other bodies that this one is linked to.
-    emp::vector< BodyLink<CircleBody2D> > links;  // Active links
-    emp::vector< CircleBody2D * > dead_links;     // List of links to remove!
+    double birth_time;        // At what time point was this organism born?
+    Angle orientation;        // Which way is body facing?
+    Point<double> velocity;   // Speed and direction of movement
+    double mass;              // "Weight" of this object (@CAO not used yet..)
+    uint32_t color_id;        // Which color should this body appear?
+    int repro_count;          // Number of offspring currently being produced.
 
     Point<double> shift;            // How should this body be updated to minimize overlap.
     Point<double> cum_shift;        // Build up of shift not yet acted upon.
@@ -88,9 +63,50 @@ namespace emp {
     double pressure;                // Current pressure on this body.
 
   public:
+    Body2D_Base() : birth_time(0.0), mass(1.0), color_id(0), repro_count(0), pressure(0) { ; }
+    ~Body2D_Base() { ; }
+
+    double GetBirthTime() const { return birth_time; }
+    const Angle & GetOrientation() const { return orientation; }
+    const Point<double> & GetVelocity() const { return velocity; }
+    double GetMass() const { return mass; }
+    uint32_t GetColorID() const { return color_id; }
+    bool IsReproducing() const { return repro_count; }
+    int GetReproCount() const { return repro_count; }
+    Point<double> GetShift() const { return shift; }
+    double GetPressure() const { return pressure; }
+    
+    
+    void SetBirthTime(double in_time) { birth_time = in_time; }
+    void SetColorID(uint32_t in_id) { color_id = in_id; }
+
+    // Orientation control...
+    void TurnLeft(int steps=1) { orientation.RotateDegrees(45); }
+    void TurnRight(int steps=1) { orientation.RotateDegrees(-45); }
+
+    // Velocity control...
+    void IncSpeed(const Point<double> & offset) { velocity += offset; }
+    void IncSpeed() { velocity += orientation.GetPoint<double>(); }
+    void DecSpeed() { velocity -= orientation.GetPoint<double>(); }
+    void SetVelocity(double x, double y) { velocity.Set(x, y); }
+    void SetVelocity(const Point<double> & v) { velocity = v; }
+
+    // Shift to apply next update.
+    void AddShift(const Point<double> & s) { shift += s; total_abs_shift += s.Abs(); }
+};
+  
+  class CircleBody2D : public Body2D_Base {
+  private:
+    Circle<double> perimeter;  // Includes position and size.
+    double target_radius;      // For growing/shrinking
+    
+    // Information about other bodies that this one is linked to.
+    emp::vector< BodyLink<CircleBody2D> > links;  // Active links
+    emp::vector< CircleBody2D * > dead_links;     // List of links to remove!
+
+  public:
     CircleBody2D(const Circle<double> & _p)
-      : perimeter(_p), target_radius(_p.GetRadius()), mass(1), color_id(0)
-      , birth_time(0), repro_count(0), pressure(0)
+      : perimeter(_p), target_radius(_p.GetRadius())
     {
       EMP_TRACK_CONSTRUCT(CircleBody2D);
     }
@@ -108,26 +124,10 @@ namespace emp {
     const Point<double> & GetCenter() const { return perimeter.GetCenter(); }
     double GetRadius() const { return perimeter.GetRadius(); }
     double GetTargetRadius() const { return target_radius; }
-    double GetMass() const { return mass; }
-    uint32_t GetColorID() const { return color_id; }
-    double GetBirthTime() const { return birth_time; }
-
-    Point<double> GetShift() const { return shift; }
-    double GetPressure() const { return pressure; }
-    bool IsReproducing() const { return repro_count; }
 
     CircleBody2D & SetPosition(const Point<double> & p) { perimeter.SetCenter(p); return *this; }
     CircleBody2D & SetRadius(double r) { perimeter.SetRadius(r); return *this; }
     CircleBody2D & SetTargetRadius(double t) { target_radius = t; return *this; }
-    CircleBody2D & SetColorID(uint32_t in_id) { color_id = in_id; return *this; }
-    CircleBody2D & SetBirthTime(double in_time) { birth_time = in_time; return *this; }
-
-    // Shift at end of next update.
-    CircleBody2D & AddShift(const Point<double> & inc_val) {
-      shift += inc_val;
-      total_abs_shift += inc_val.Abs();
-      return *this;
-    }
 
     // Translate immediately.
     CircleBody2D & Translate(const Point<double> & inc_val) {
