@@ -1,17 +1,16 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_PTR_H
-#define EMP_PTR_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  This version of pointers act as normal pointers under most conditions.  However,
 //  if a program is compiled with EMP_TRACK_MEM set, then these pointers perform extra
 //  tests to ensure that they point to valid memory and that memory is freed before
 //  pointers are released.
-//
+
+
+#ifndef EMP_PTR_H
+#define EMP_PTR_H
 
 #include <map>
 
@@ -169,6 +168,12 @@ namespace emp {
       ptr = new TYPE(init_val);
       EMP_IF_MEMTRACK(Tracker().New(ptr););
     }
+    template <typename... T>
+    void New(T... args) {
+      EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
+      ptr = new TYPE(args...);
+      EMP_IF_MEMTRACK(Tracker().New(ptr););
+    }
     void Delete() {
       EMP_IF_MEMTRACK( Tracker().MarkDeleted(ptr); );
       EMP_IF_MEMTRACK( Tracker().Dec(ptr); );
@@ -201,4 +206,4 @@ namespace emp {
 
 }
 
-#endif
+#endif // EMP_PTR_H
