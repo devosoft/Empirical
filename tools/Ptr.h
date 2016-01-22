@@ -168,10 +168,12 @@ namespace emp {
       ptr = new TYPE(init_val);
       EMP_IF_MEMTRACK(Tracker().New(ptr););
     }
+
     template <typename... T>
     void New(T... args) {
       EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
-      ptr = new TYPE(args...);
+      ptr = new TYPE(std::forward<T>(args)...);
+      // ptr = new TYPE(args...);
       EMP_IF_MEMTRACK(Tracker().New(ptr););
     }
     void Delete() {
