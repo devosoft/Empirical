@@ -55,9 +55,9 @@ namespace web {
 
   
   // Draw a Surface2D, specifying the full colormap to be used.
-  template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE=double>
+  template <typename BODY_TYPE>
   void Draw(Canvas canvas,
-            const Surface2D<BODY_TYPE,BODY_INFO,BASE_TYPE> & surface,
+            const Surface2D<BODY_TYPE> & surface,
             const emp::vector<std::string> & color_map)
   {
     canvas.Clear();
@@ -78,10 +78,8 @@ namespace web {
   }
 
   // Draw a Surface2D, just specifying the number of colors.
-  template <typename BODY_TYPE, typename BODY_INFO, typename BASE_TYPE=double>
-  void Draw(Canvas canvas,
-            const Surface2D<BODY_TYPE,BODY_INFO,BASE_TYPE> & surface,
-            int num_colors)
+  template <typename BODY_TYPE>
+  void Draw(Canvas canvas, const Surface2D<BODY_TYPE> & surface, int num_colors)
   {
     Draw(canvas, surface, GetHueMap(num_colors));
   }
