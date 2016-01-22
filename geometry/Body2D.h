@@ -40,12 +40,11 @@ namespace emp {
     // REPRODUCTION -> "from" is gestating "to"
     // ATTACK -> "from" is trying to eat "to"
     // PARASITE -> "from" is stealing resources from "to"
-    // DEAD -> This link is schedule for removal.
-    enum class LINK_TYPE { DEFAULT, REPRODUCTION, ATTACK, PARASITE, DEAD };
+    enum class LINK_TYPE { DEFAULT, REPRODUCTION, ATTACK, PARASITE };
 
     template <typename BODY_TYPE>
     struct BodyLink {
-      LINK_TYPE type;      // DEFAULT, REPRODUCTION, ATTACK, DEAD
+      LINK_TYPE type;      // DEFAULT, REPRODUCTION, ATTACK, PARASITE
       BODY_TYPE * from;    // Initiator of the connection (e.g., parent, attacker)
       BODY_TYPE * to;      // Target of the connection (e.g., offspring, prey/host)
       double cur_dist;     // How far are bodies currently being kept apart?
@@ -112,7 +111,6 @@ namespace emp {
     // Information about other bodies that this one is linked to.
     emp::vector< BodyLink<CircleBody2D> * > from_links;   // Active links initiated by body
     emp::vector< BodyLink<CircleBody2D> * > to_links;   // Active links targeting body
-    // emp::vector< BodyLink<CircleBody2D> * > dead_links; // List of links to remove!
 
     void RemoveFromLink(int link_id) {
       emp_assert(link_id >= 0 && link_id < (int) from_links.size());
@@ -125,16 +123,6 @@ namespace emp {
       to_links.pop_back();
     }
 
-    // void SetDeadLink(BodyLink<CircleBody2D> * link) {
-    //   link->type = LINK_TYPE::DEAD;
-    //   dead_links.push_back(link);
-    // }
-
-    // void PurgeDeadLinks() {
-    //   for (auto * link : dead_links) RemoveLink(link, true);
-    //   dead_links.resize(0);
-    // }
-    
   public:
     CircleBody2D(const Circle<double> & _p)
       : perimeter(_p), target_radius(_p.GetRadius())
@@ -142,14 +130,10 @@ namespace emp {
       EMP_TRACK_CONSTRUCT(CircleBody2D);
     }
     ~CircleBody2D() {
-      // PurgeDeadLinks(); // Clear any links already marked dead.
-      
       // Remove any remaining links from this body.
       while (from_links.size()) RemoveLink(from_links[0]);
       while (to_links.size()) RemoveLink(to_links[0]);
 
-      // Mark links to this body for deletion.
-      // for (auto * link : to_links) link->from->SetDeadLink(link);
       EMP_TRACK_DESTRUCT(CircleBody2D);
     }
 
@@ -188,7 +172,7 @@ namespace emp {
     }
 
 
-    void RemoveLink(BodyLink<CircleBody2D> * link, bool ignore_dead=false) {
+    void RemoveLink(BodyLink<CircleBody2D> * link) {
       if (link->to == this) {
         link->from->RemoveLink(link);
         return;
@@ -205,14 +189,6 @@ namespace emp {
         if (link->to->to_links[i]->from == this) { link->to->RemoveToLink(i); break; }
       }
 
-      // // Remove the DEAD link if needed.
-      // if (!ignore_dead && link->type == LINK_TYPE::DEAD) {
-      //   for (int i = 0; i < (int) dead_links.size(); i++) {
-      //     dead_links[i] = dead_links.back();
-      //     dead_links.pop_back();
-      //   }
-      // }
-      
       delete link;
     }
 
@@ -260,8 +236,6 @@ namespace emp {
       if ((int) target_radius > (int) GetRadius()) SetRadius(GetRadius() + change_factor);
       else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - change_factor);
 
-      // PurgeDeadLinks();  // If there are any links flagged for removal, do so!
-      
       // Test if the link distance for this body needs to be updated
       for (int i = 0; i < (int) from_links.size(); i++) {
         auto * link = from_links[i];
