@@ -25,6 +25,7 @@
 #include "../tools/assert.h"
 #include "../tools/alert.h"
 #include "../tools/mem_track.h"
+#include "../tools/Ptr.h"
 #include "../tools/vector.h"
 
 #include "Angle2D.h"
@@ -34,18 +35,26 @@ namespace emp {
 
   class Body2D_Base {
   protected:
-    enum class LINK_TYPE { NOT_SET, REPRODUCTION, BOND, ATTACK, TARGET };
-    
+    // Bodies can be linked in seveal ways.
+    // DEFAULT -> Joined together with no extra meaning
+    // REPRODUCTION -> "from" is gestating "to"
+    // ATTACK -> "from" is trying to eat "to"
+    // PARASITE -> "from" is stealing resources from "to"
+    // DEAD -> This link is schedule for removal.
+    enum class LINK_TYPE { DEFAULT, REPRODUCTION, ATTACK, PARASITE, DEAD };
+
     template <typename BODY_TYPE>
     struct BodyLink {
-      LINK_TYPE type;
-      BODY_TYPE * other;
+      LINK_TYPE type;      // DEFAULT, REPRODUCTION, ATTACK, DEAD
+      BODY_TYPE * from;    // Initiator of the connection (e.g., parent, attacker)
+      BODY_TYPE * to;      // Target of the connection (e.g., offspring, prey/host)
       double cur_dist;     // How far are bodies currently being kept apart?
-      double target_dist;  // How far should the be moved to before splitting?
+      double target_dist;  // How far should the be moved to? (e.g., if growing)
 
-      BodyLink() : type(LINK_TYPE::NOT_SET), other(nullptr), cur_dist(0), target_dist(0) { ; }
-      BodyLink(LINK_TYPE t, BODY_TYPE * o, double cur=0, double target=0)
-        : type(t), other(o), cur_dist(cur), target_dist(target) { ; }
+      BodyLink() : type(LINK_TYPE::DEFAULT), from(nullptr), to(nullptr), cur_dist(0)
+                 , target_dist(0) { ; }
+      BodyLink(LINK_TYPE t, BODY_TYPE * _frm, BODY_TYPE * _to, double cur=0, double target=0)
+        : type(t), from(_frm), to(_to), cur_dist(cur), target_dist(target) { ; }
       BodyLink(const BodyLink &) = default;
       ~BodyLink() { ; }
     };
@@ -101,9 +110,31 @@ namespace emp {
     double target_radius;      // For growing/shrinking
     
     // Information about other bodies that this one is linked to.
-    emp::vector< BodyLink<CircleBody2D> > links;  // Active links
-    emp::vector< CircleBody2D * > dead_links;     // List of links to remove!
+    emp::vector< BodyLink<CircleBody2D> * > from_links;   // Active links initiated by body
+    emp::vector< BodyLink<CircleBody2D> * > to_links;   // Active links targeting body
+    // emp::vector< BodyLink<CircleBody2D> * > dead_links; // List of links to remove!
 
+    void RemoveFromLink(int link_id) {
+      emp_assert(link_id >= 0 && link_id < (int) from_links.size());
+      from_links[link_id] = from_links.back();
+      from_links.pop_back();
+    }
+    void RemoveToLink(int link_id) {
+      emp_assert(link_id >= 0 && link_id < (int) to_links.size());
+      to_links[link_id] = to_links.back();
+      to_links.pop_back();
+    }
+
+    // void SetDeadLink(BodyLink<CircleBody2D> * link) {
+    //   link->type = LINK_TYPE::DEAD;
+    //   dead_links.push_back(link);
+    // }
+
+    // void PurgeDeadLinks() {
+    //   for (auto * link : dead_links) RemoveLink(link, true);
+    //   dead_links.resize(0);
+    // }
+    
   public:
     CircleBody2D(const Circle<double> & _p)
       : perimeter(_p), target_radius(_p.GetRadius())
@@ -111,11 +142,14 @@ namespace emp {
       EMP_TRACK_CONSTRUCT(CircleBody2D);
     }
     ~CircleBody2D() {
-      // If this body is paired with another one, remove the pairing.
-      if (links.size()) {
-        for (auto & link : links) link.other->RemoveLink(*this, false);
-        links.resize(0);
-      }
+      // PurgeDeadLinks(); // Clear any links already marked dead.
+      
+      // Remove any remaining links from this body.
+      while (from_links.size()) RemoveLink(from_links[0]);
+      while (to_links.size()) RemoveLink(to_links[0]);
+
+      // Mark links to this body for deletion.
+      // for (auto * link : to_links) link->from->SetDeadLink(link);
       EMP_TRACK_DESTRUCT(CircleBody2D);
     }
 
@@ -133,45 +167,65 @@ namespace emp {
     void Translate(const Point<double> & t) { perimeter.Translate(t); }
 
     // Creating, testing, and unlinking other organisms
-    bool IsLinked(const CircleBody2D & link_org) const {
-      for (auto & cur_link : links) if (cur_link.other == &link_org) return true;
+    bool IsLinkedFrom(const CircleBody2D & link_org) const {
+      for (auto * cur_link : from_links) if (cur_link->to == &link_org) return true;
       return false;
     }
+    bool IsLinkedTo(const CircleBody2D & link_org) const { return link_org.IsLinkedFrom(*this); }
+    bool IsLinked(const CircleBody2D & link_org) const {
+      return IsLinkedFrom(link_org) || IsLinkedTo(link_org);
+    }
 
-    int GetLinkCount() const { return (int) links.size(); }
+    int GetLinkCount() const { return (int) (from_links.size() + to_links.size()); }
 
     void AddLink(LINK_TYPE type, CircleBody2D & link_org, double cur_dist, double target_dist) {
       emp_assert(!IsLinked(link_org));  // Don't link twice!
 
       // Build connections in both directions.
-      links.emplace_back(type, &link_org, cur_dist, target_dist);
-      link_org.links.emplace_back(LINK_TYPE::TARGET, this, cur_dist, target_dist);
+      auto * new_link = new BodyLink<CircleBody2D>(type, this, &link_org, cur_dist, target_dist);
+      from_links.push_back(new_link);
+      link_org.to_links.push_back(new_link);
     }
 
-    void RemoveLink(CircleBody2D & link_org, bool remove_link_back=true) {
-      // Find the link and remove it.
-      for (int i = 0; i < (int) links.size(); i++) {
-        if (links[i].other == &link_org) {
-          links[i] = links.back();
-          links.pop_back();
-          break;
-        }
+
+    void RemoveLink(BodyLink<CircleBody2D> * link, bool ignore_dead=false) {
+      if (link->to == this) {
+        link->from->RemoveLink(link);
+        return;
       }
 
-      // Remove link in other direction (unless we don't need to).
-      if (remove_link_back) link_org.RemoveLink(*this, false);
+      // Remove the FROM link.
+      for (int i = 0; i < (int) from_links.size(); i++) {
+        if (from_links[i]->to == link->to) { RemoveFromLink(i); break; }
+      }
+
+      // Remove the TO link.
+      const int to_size = (int) link->to->to_links.size();
+      for (int i = 0; i < to_size; i++) {
+        if (link->to->to_links[i]->from == this) { link->to->RemoveToLink(i); break; }
+      }
+
+      // // Remove the DEAD link if needed.
+      // if (!ignore_dead && link->type == LINK_TYPE::DEAD) {
+      //   for (int i = 0; i < (int) dead_links.size(); i++) {
+      //     dead_links[i] = dead_links.back();
+      //     dead_links.pop_back();
+      //   }
+      // }
+      
+      delete link;
     }
 
     const BodyLink<CircleBody2D> & FindLink(const CircleBody2D & link_org) const {
       emp_assert(IsLinked(link_org));
-      for (auto & link : links) if ( link.other == &link_org) return link;
-      return links[0]; // Should never get here!
+      for (auto * link : from_links) if ( link->to == &link_org) return *link;
+      return link_org.FindLink(*this);
     }
     
     BodyLink<CircleBody2D> & FindLink(CircleBody2D & link_org)  {
       emp_assert(IsLinked(link_org));
-      for (auto & link : links) if ( link.other == &link_org) return link;
-      return links[0]; // Should never get here!
+      for (auto * link : from_links) if ( link->to == &link_org) return *link;
+      return link_org.FindLink(*this);
     }
     
     double GetLinkDist(const CircleBody2D & link_org) const {
@@ -184,10 +238,7 @@ namespace emp {
     }
     void ShiftLinkDist(CircleBody2D & link_org, double change) {
       auto & link = FindLink(link_org);
-      auto & olink = link.other->FindLink(*this);
-      
       link.cur_dist += change;
-      olink.cur_dist = link.cur_dist;
     }
 
     CircleBody2D * BuildOffspring(emp::Point<double> offset) {
@@ -209,32 +260,32 @@ namespace emp {
       if ((int) target_radius > (int) GetRadius()) SetRadius(GetRadius() + change_factor);
       else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - change_factor);
 
-      // If there are any links flagged for removal, do so!
-      if (dead_links.size()) {
-        for (auto * other : dead_links) RemoveLink(*other);
-        dead_links.resize(0);
-      }
-
+      // PurgeDeadLinks();  // If there are any links flagged for removal, do so!
+      
       // Test if the link distance for this body needs to be updated
-      for (auto & link : links) {
-        if (link.cur_dist != link.target_dist) {
-          // If we're within the change_factor, just set pair_dist to target.
-          if (std::abs(link.cur_dist - link.target_dist) <= change_factor) {
-            link.cur_dist = link.target_dist;
-            if (link.type == LINK_TYPE::REPRODUCTION) {
-              emp_assert(repro_count > 0);
-              repro_count--;
-              if (detach_on_birth) dead_links.push_back(link.other);  // Flag link for removal!
+      for (int i = 0; i < (int) from_links.size(); i++) {
+        auto * link = from_links[i];
+        if (link->cur_dist == link->target_dist) continue; // No adjustment needed.
+        
+        // If we're within the change_factor, just set pair_dist to target.
+        if (std::abs(link->cur_dist - link->target_dist) <= change_factor) {
+          link->cur_dist = link->target_dist;
+          if (link->type == LINK_TYPE::REPRODUCTION) {
+            emp_assert(repro_count > 0);
+            repro_count--;
+            if (detach_on_birth) {   // Flag link for removal!
+              RemoveLink(link);      // Remove the link.
+              i--;                   // Check this position again.
             }
           }
-          else {
-            // @CAO because of the previous check, do we really need to case to int here??
-            if ((int) link.cur_dist < (int) link.target_dist) link.cur_dist += change_factor;
-            else link.cur_dist -= change_factor;
-          }
+        }
+        else {
+          if (link->cur_dist < link->target_dist) link->cur_dist += change_factor;
+          else link->cur_dist -= change_factor;
         }
       }
 
+      
     }
 
 
@@ -271,23 +322,21 @@ namespace emp {
       total_abs_shift.ToOrigin();
         
       // If this body is linked to another, enforce the distance between them.
-      for (auto & link : links) {
-        emp_assert(link.other->IsLinked(*this));
-
-        if (GetAnchor() == link.other->GetAnchor()) {
+      for (auto * link : from_links) {
+        if (GetAnchor() == link->to->GetAnchor()) {
           // If two organisms are on top of each other... shift one.
           Translate(emp::Point<double>(0.01, 0.01));
         }
         
         // Figure out how much each oragnism should move so that they will be properly spaced.
-        const double start_dist = GetAnchor().Distance(link.other->GetAnchor());
-        const double link_dist = GetLinkDist(*(link.other));
+        const double start_dist = GetAnchor().Distance(link->to->GetAnchor());
+        const double link_dist = link->cur_dist;
         const double frac_change = (1.0 - ((double) link_dist) / ((double) start_dist)) / 2.0;
         
-        emp::Point<double> dist_move = (GetAnchor() - link.other->GetAnchor()) * frac_change;
+        emp::Point<double> dist_move = (GetAnchor() - link->to->GetAnchor()) * frac_change;
         
         perimeter.Translate(-dist_move);
-        link.other->perimeter.Translate(dist_move);
+        link->to->perimeter.Translate(dist_move);
       }
       
       // Adjust the organism so it stays within the bounding box of the world.
@@ -310,11 +359,10 @@ namespace emp {
     
     // Check to make sure there are no obvious issues with this object.
     bool OK() {
-      for (auto & link : links) {
+      for (auto * link : from_links) {
         (void) link;
-        emp_assert(link.other->IsLinked(*this)); // Make sure pairing is reciprical.
-        emp_assert(link.cur_dist >= 0);          // Distances cannot be negative.
-        emp_assert(link.target_dist >= 0);       // Distances cannot be negative.
+        emp_assert(link->cur_dist >= 0);          // Distances cannot be negative.
+        emp_assert(link->target_dist >= 0);       // Distances cannot be negative.
       }
 
       return true;
