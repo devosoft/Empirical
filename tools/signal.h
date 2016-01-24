@@ -35,41 +35,33 @@
 #ifndef EMP_SIGNAL_H
 #define EMP_SIGNAL_H
 
+#include <functional>
 #include <map>
 #include <string>
 
+#include "assert.h"
 #include "FunctionSet.h"
 
 namespace emp {
 
+  class SignalManager;
+
   class Signal_Base {
-  };
-
-  template <typename... ARGS>
-  class Signal : public Signal_Base {
-  private:
-    FunctionSet<void, ARGS...> actions;
+  protected:
+    std::string name;
   public:
-    Signal() { ; }
-    ~Signal() { ; }
-    
-    Trigger(ARGS... args) { actions.Run(args...); }
-
-    // Add an action that takes the proper arguments.
-    AddAction(const std::function<void(ARGS...)> & in_fun) { actions.Add(in_fun) }
-
-    // Add an action that takes no arguments.
-    AddAction(const std::function<void()> & in_fun) { actions.Add( [in_fun](ARGS...){in_fun();} ) }
-
-    // @CAO... if we want chain base clasess (or do other clever meta-programming), we
-    // could allow addition of actions that leave off sub-sets of actions....
+    Signal_Base(const std::string & n) : name(n) { ; }
+    Signal_Base(const Signal_Base &) = delete;
+    Signal_Base & operator=(const Signal_Base &) = delete;
   };
 
   class Action_Base {
-  };
-  
-  template <typename... ARGS>
-  class Action : public Action_Base {
+  protected:
+    std::string name;
+  public:
+    Action_Base(const std::string & n) : name(n) { ; }
+    Action_Base(const Action_Base &) = delete;
+    Action_Base & operator=(const Action_Base &) = delete;
   };
   
   // The SignalManager creates signals and handles all proper associations, but
@@ -77,8 +69,63 @@ namespace emp {
   // overly optimized.
   
   class SignalManager {
-    std::map<std::string, Signal_Base *> triggers;
+  private:
+    std::map<std::string, Signal_Base *> signals;
     std::map<std::string, Action_Base *> actions;
+
+    SignalManager() = default;
+    SignalManager(const SignalManager &) = delete;
+  public:
+    void Register(const std::string & name, Signal_Base * s) {
+      emp_assert(signals.find(name) == signals.end() &&
+                 "Cannot register two signals by the same name.");
+      signals[name] = s;
+    }
+    void Register(const std::string & name, Action_Base * a) {
+      emp_assert(actions.find(name) == actions.end() &&
+                 "Cannot register two actions by the same name.");
+      actions[name] = a;
+    }
+
+    static SignalManager & Get() {
+      static SignalManager s;
+      return s;
+    }
+  };
+  
+
+  template <typename... ARGS>
+  class Signal : public Signal_Base {
+  private:
+    FunctionSet<void, ARGS...> actions;
+  public:
+    Signal(const std::string & name="") : Signal_Base(name) {
+      SignalManager::Get().Register(name, this);
+    }
+    ~Signal() { ; }
+    
+    void Trigger(ARGS... args) { actions.Run(args...); }
+
+    // Add an action that takes the proper arguments.
+    void AddAction(const std::function<void(ARGS...)> & in_fun) { actions.Add(in_fun); }
+
+    // Add an action that takes no arguments.
+    void AddAction(const std::function<void()> & in_fun) {
+      actions.Add( [in_fun](ARGS...){in_fun();} );
+    }
+
+    // @CAO... if we want chain base clasess (or do other clever meta-programming), we
+    // could allow addition of actions that leave off sub-sets of actions....
+  };
+
+  template <typename... ARGS>
+  class Action : public Action_Base {
+  public:
+    std::function<void(ARGS...)> fun;
+
+    Action(std::function<void(ARGS...)> & f, const std::string & name="") : fun(f) {
+      if (name != "") SignalManager::Get().Register(name, this);
+    }
   };
   
 }
