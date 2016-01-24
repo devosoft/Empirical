@@ -1,6 +1,6 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
 
 #ifndef EMP_FUNCTIONS_H
 #define EMP_FUNCTIONS_H
@@ -110,12 +110,13 @@ namespace emp {
 
   //  ----- Variadic Template Helpers! -----
 
-  // The following functions take in a test type and a list of types and return the index that
+  // The following functions take a test type and a list of types and return the index that
   // matches the test type in question.
   template <typename TEST_TYPE>
   constexpr int get_type_index() {
     // @CAO We don't have a type that matches, so ideally trigger a compile time error.
-    // Given we need this to be constexpr, we can't easily put even a static assert here until C++14
+    // Given we need this to be constexpr, we can't easily put even a static assert here
+    // until we require C++14.
     // static_assert(false && "trying to find index of non-existant type");
     return -1000000;
   }

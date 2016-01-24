@@ -16,6 +16,7 @@ Allow default UI::Style overall and for each object type.
 -Create a UI::StyleGroup that elements can be added to and altered as one (use proper CSS class?)
 
 -= Improvements to Consider =-
+Why are styles applied AFTER GetHTML is run; can't they be done at the same time?
 Try out Ptr class to see if it can catch mis-handled pointers
 InstLib: Can we lock a set of instruction at compile time?  Or at least put them in a fixed array?
 Change HardwareCPU to something like Hardware_SimpleCPU and Instruction to Instruction_SimpleCPU
