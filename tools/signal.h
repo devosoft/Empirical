@@ -118,6 +118,23 @@ namespace emp {
     // could allow addition of actions that leave off sub-sets of actions....
   };
 
+  // A specialized function for no arguments.
+  template <>
+  class Signal<> : public Signal_Base {
+  private:
+    FunctionSet<void> actions;
+  public:
+    Signal(const std::string & name="") : Signal_Base(name) {
+      SignalManager::Get().Register(name, this);
+    }
+    ~Signal() { ; }
+    
+    void Trigger() { actions.Run(); }
+
+    // Add an action that takes the proper arguments.
+    void AddAction(const std::function<void()> & in_fun) { actions.Add(in_fun); }
+  };
+
   template <typename... ARGS>
   class Action : public Action_Base {
   public:
