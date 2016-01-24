@@ -10,14 +10,14 @@
 //    emp::Signal<Genome,int> mutation_signal("mutation");
 //    emp::Signal<int> update_signal("update");
 //
-//  Actions are just std::function or lambdas.  An action can be named with emp::NameAction:
+//  Actions can be just std::function or lambdas, or can be built as an emp::Action object.
 //
-//    emp::NameAction("kill_most", [pop](int ud){ if (id % 10000 == 0) pop.Kill(0.99); });
+//    emp::Action([pop](int ud){ if (id%1000==0) pop.Kill(0.99); }, "kill_most");
 //
 //  Actions can be linked to symbols by name or by object:
 //
-//    mutation_signal.Link( RecordMutation );        // Link signal object to a function.
-//    update_signal.Link( "kill_most" );             // Link signal object to an action name.
+//    mutation_signal.AddAction( RecordMutation );   // Link signal object to a function.
+//    update_signal.AddAction( "kill_most" );        // Link signal object to an action name.
 //    emp::LinkSignal("update", OutputUpdateInfo );  // Link signal name to a function.
 //    emp::LinkSignal("update", "kill_most");        // Link signal name to an action name.
 //
@@ -46,23 +46,25 @@ namespace emp {
 
   class SignalManager;
 
-  class Signal_Base {
-  protected:
-    std::string name;
-  public:
-    Signal_Base(const std::string & n) : name(n) { ; }
-    Signal_Base(const Signal_Base &) = delete;
-    Signal_Base & operator=(const Signal_Base &) = delete;
-  };
-
-  class Action_Base {
-  protected:
-    std::string name;
-  public:
-    Action_Base(const std::string & n) : name(n) { ; }
-    Action_Base(const Action_Base &) = delete;
-    Action_Base & operator=(const Action_Base &) = delete;
-  };
+  namespace internal {
+    class Signal_Base {
+    protected:
+      std::string name;
+    public:
+      Signal_Base(const std::string & n) : name(n) { ; }
+      Signal_Base(const Signal_Base &) = delete;
+      Signal_Base & operator=(const Signal_Base &) = delete;
+    };
+    
+    class Action_Base {
+    protected:
+      std::string name;
+    public:
+      Action_Base(const std::string & n) : name(n) { ; }
+      Action_Base(const Action_Base &) = delete;
+      Action_Base & operator=(const Action_Base &) = delete;
+    };
+  }
   
   // The SignalManager creates signals and handles all proper associations, but
   // is not involved once a run gets started.  As such, it does not need to be
@@ -70,18 +72,18 @@ namespace emp {
   
   class SignalManager {
   private:
-    std::map<std::string, Signal_Base *> signals;
-    std::map<std::string, Action_Base *> actions;
+    std::map<std::string, internal::Signal_Base *> signals;
+    std::map<std::string, internal::Action_Base *> actions;
 
     SignalManager() = default;
     SignalManager(const SignalManager &) = delete;
   public:
-    void Register(const std::string & name, Signal_Base * s) {
+    void Register(const std::string & name, internal::Signal_Base * s) {
       emp_assert(signals.find(name) == signals.end() &&
                  "Cannot register two signals by the same name.");
       signals[name] = s;
     }
-    void Register(const std::string & name, Action_Base * a) {
+    void Register(const std::string & name, internal::Action_Base * a) {
       emp_assert(actions.find(name) == actions.end() &&
                  "Cannot register two actions by the same name.");
       actions[name] = a;
@@ -95,11 +97,11 @@ namespace emp {
   
 
   template <typename... ARGS>
-  class Signal : public Signal_Base {
+  class Signal : public internal::Signal_Base {
   private:
     FunctionSet<void, ARGS...> actions;
   public:
-    Signal(const std::string & name="") : Signal_Base(name) {
+    Signal(const std::string & name="") : internal::Signal_Base(name) {
       SignalManager::Get().Register(name, this);
     }
     ~Signal() { ; }
@@ -120,11 +122,11 @@ namespace emp {
 
   // A specialized function for no arguments.
   template <>
-  class Signal<> : public Signal_Base {
+  class Signal<> : public internal::Signal_Base {
   private:
     FunctionSet<void> actions;
   public:
-    Signal(const std::string & name="") : Signal_Base(name) {
+    Signal(const std::string & name="") : internal::Signal_Base(name) {
       SignalManager::Get().Register(name, this);
     }
     ~Signal() { ; }
@@ -136,7 +138,7 @@ namespace emp {
   };
 
   template <typename... ARGS>
-  class Action : public Action_Base {
+  class Action : public internal::Action_Base {
   public:
     std::function<void(ARGS...)> fun;
 
