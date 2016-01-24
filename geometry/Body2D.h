@@ -15,9 +15,8 @@
 //
 //
 //  Development notes:
-//  * Links should probably be shared by both bodies.
 //  * If we are going to have a lot of links, we may want a better data structure than vector.
-
+//    (if we don't have a lot, vector may be the best choice...)
 
 #ifndef EMP_BODY_2D_H
 #define EMP_BODY_2D_H

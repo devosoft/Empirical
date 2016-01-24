@@ -84,7 +84,7 @@ namespace html5 {
 
     int charCode;    // Unicode character pressed
     int keyCode;     // Which key was pressed on the keyboard (e.g., 'a' and 'A' are the same)
-
+    
     template <int ARG_ID>
     void LoadFromArg() {
       Event::LoadFromArg<ARG_ID>();
