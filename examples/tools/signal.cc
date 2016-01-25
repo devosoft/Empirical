@@ -19,13 +19,29 @@ void PrintVoid() {
 int main()
 {
   // A simple signal that sends an int.
-  emp::Signal<int> test_signal("test");
-  test_signal.AddAction(PrintInt);
-  test_signal.Trigger(12);
-  test_signal.Trigger(-1);
+  emp::Signal<int> test_sig("test");
+  test_sig.AddAction(PrintInt);
+  test_sig.AddAction(PrintVoid);
+  test_sig.AddAction([](int x){std::cout<<"---:"<<x<<std::endl<<std::endl;});
+  test_sig.Trigger(12);
+  test_sig.Trigger(-1);
 
   // Signals dont need to take arguments or have names.
-  emp::Signal<> test_signal2;
-  test_signal2.AddAction(PrintVoid);
-  test_signal2.Trigger();
+  emp::Signal<> test_sig2;
+  test_sig2.AddAction(PrintVoid);
+  test_sig2.Trigger();
+
+
+  // Actions can be turned into named objects as well.
+  int total=0;
+  emp::Action<int> act1([&total](int inc){total+=inc;}, "sum");
+  emp::Action<int> act2(PrintInt, "iprint");
+
+  emp::Signal<int> test_sig3("test3");
+  test_sig3.AddAction(act1);
+  test_sig3.AddAction(act2);
+  test_sig3.Trigger(10);
+  test_sig3.Trigger(20);
+
+  test_sig.Trigger(total);
 }
