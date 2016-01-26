@@ -70,7 +70,7 @@ namespace emp {
       virtual void AddAction(const std::function<void()> & in_fun) = 0;
 
       // Add an action by Action object.
-      virtual void AddAction_Base(internal::Action_Base *) = 0;
+      virtual void AddAction(internal::Action_Base *) = 0;
     };
     
     // BASE CLASS for Actions
@@ -119,40 +119,26 @@ namespace emp {
     template <typename A>
     void LinkSignal(const std::string & s_name, A && a) {
       emp_assert(signals.find(s_name) != signals.end());
-      LinkSignal(signals[s_name], std::forward(a));
+      LinkSignal(signals[s_name], std::forward<A>(a));
     }
 
     // If action is a name, convert it.  (signal names were handled in the previous.
     void LinkSignal(internal::Signal_Base * s, const std::string & a_name) {
       emp_assert(actions.find(a_name) != actions.end());
-      s->AddAction_Base(actions[a_name]);
+      s->AddAction(actions[a_name]);
     }
 
     // We now know we have base classes for both signals and actions.  Convert them to
     // the derrived versions!
     void LinkSignal(internal::Signal_Base * s, internal::Action_Base * a) {
-      s->AddAction_Base(a);
+      s->AddAction(a);
     }
-
-    // void LinkSignal(internal::Signal_Base * s, internal::Action_Base * a) {
-    //   // @CAO CONTINUE HERE!
-    // }
-
-    // void LinkSignal(internal::Signal_Base * s, const std::string & a_name) {
-    //   emp_assert(actions.find(a_name) != actions.end());
-    //   LinkSignal(s, actions[a_name]);
-    // }
-
-    // void LinkSignal(const std::string & s_name, internal::Action_Base * a) {
-    // }
-    
-    // void LinkSignal(const std::string & s_name, const std::string & a_name) {
-    //   emp_assert(signals.find(s_name) != signals.end());
-    //   emp_assert(actions.find(a_name) != actions.end());
-    //   LinkSignal(signals[s_name], actions[a_name]);
-    // }
   };
 
+  template <typename S, typename A>
+  void LinkSignal(S && s, A && a) {
+    SignalManager::Get().LinkSignal(std::forward<S>(s), std::forward<A>(a));
+  }
   
   void internal::Signal_Base::AddAction(const std::string & name)
   {
@@ -187,12 +173,12 @@ namespace emp {
     void AddAction(const std::function<void(ARGS...)> & in_fun) { actions.Add(in_fun); }
 
     // Add an action that takes no arguments.
-    void AddAction(const std::function<void()> & in_fun) {
+    void AddAction(const std::function<void()> & in_fun) override {
       actions.Add( [in_fun](ARGS...){in_fun();} );
     }
 
     // Add an action object using Action_Base.
-    void AddAction_Base(internal::Action_Base * a_base) {
+    void AddAction(internal::Action_Base * a_base) override {
       Action<ARGS...> * a = dynamic_cast< Action<ARGS...>* >(a_base);
       emp_assert( a != nullptr && "action type must match signal type." );
       AddAction(a->fun);
@@ -220,9 +206,9 @@ namespace emp {
     inline void Trigger() { actions.Run(); }
 
     // Add an action that takes the proper arguments.
-    void AddAction(const std::function<void()> & in_fun) { actions.Add(in_fun); }
+    void AddAction(const std::function<void()> & in_fun) override { actions.Add(in_fun); }
 
-    void AddAction_Base(internal::Action_Base * a_base) {
+    void AddAction(internal::Action_Base * a_base) override {
       Action<> * a = dynamic_cast< Action<>* >(a_base);
       emp_assert( a != nullptr && "action type must match signal type." );
       AddAction(a->fun);
