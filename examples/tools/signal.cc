@@ -16,6 +16,11 @@ void PrintVoid() {
   std::cout << "***" << std::endl;
 }
 
+void MultInt(int i, int j) {
+  std::cout << "[" << i*j << "]" << std::endl;
+}
+
+
 int main()
 {
   // A simple signal that sends an int.
@@ -36,10 +41,15 @@ int main()
   int total=0;
   emp::Action<int> act1([&total](int inc){total+=inc;}, "sum");
   emp::Action<int> act2(PrintInt, "iprint");
+  emp::Action<int,int>(MultInt, "mint");
 
   emp::Signal<int> test_sig3("test3");
   test_sig3.AddAction(act1);
+
+  emp::LinkSignal("test3", "iprint");
+  emp::LinkSignal("test3", "iprint");
   test_sig3.AddAction(act2);
+
   test_sig3.Trigger(10);
   test_sig3.Trigger(20);
 
