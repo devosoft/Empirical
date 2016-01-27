@@ -53,5 +53,6 @@ int main()
   test_sig3.Trigger(10);
   test_sig3.Trigger(20);
 
-  test_sig.Trigger(total);
+  // Trigger by signal name!
+  emp::TriggerSignal("test", total);
 }
