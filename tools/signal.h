@@ -147,19 +147,7 @@ namespace emp {
   };
 
 
-  // Global functions that interact with the SignalManager
-  
-  template <typename S, typename A>
-  void LinkSignal(S && s, A && a) {
-    SignalManager::Get().LinkSignal(std::forward<S>(s), std::forward<A>(a));
-  }
-
-  template <typename... ARGS>
-  void TriggerSignal(const std::string & name, ARGS... args) {
-    SignalManager::Get().FindSignal(name);
-  }
-
-  
+  // Method to add an action by name to a Signal object
   void internal::Signal_Base::AddAction(const std::string & name)
   {
     SignalManager::Get().LinkSignal(this, name);
@@ -234,6 +222,22 @@ namespace emp {
       AddAction(a->fun);
     }
   };
+
+
+  // Global functions that interact with the SignalManager
+  
+  template <typename S, typename A>
+  void LinkSignal(S && s, A && a) {
+    SignalManager::Get().LinkSignal(std::forward<S>(s), std::forward<A>(a));
+  }
+  
+  template <typename... ARGS>
+  void TriggerSignal(const std::string & name, ARGS... args) {
+    auto * base_signal = SignalManager::Get().FindSignal(name);
+    auto * signal = dynamic_cast< Signal<ARGS...>* >(base_signal);
+    signal->Trigger(args...);
+  }
+
 
 }
 
