@@ -133,12 +133,32 @@ namespace emp {
     void LinkSignal(internal::Signal_Base * s, internal::Action_Base * a) {
       s->AddAction(a);
     }
+
+
+    // Provide accessors to signals and actions by name.
+    internal::Signal_Base * FindSignal(const std::string & name) {
+      if (signals.find(name) == signals.end()) return nullptr;
+      return signals[name];
+    }
+    internal::Action_Base * FindAction(const std::string & name) {
+      if (actions.find(name) == actions.end()) return nullptr;
+      return actions[name];
+    }
   };
 
+
+  // Global functions that interact with the SignalManager
+  
   template <typename S, typename A>
   void LinkSignal(S && s, A && a) {
     SignalManager::Get().LinkSignal(std::forward<S>(s), std::forward<A>(a));
   }
+
+  template <typename... ARGS>
+  void TriggerSignal(const std::string & name, ARGS... args) {
+    SignalManager::Get().FindSignal(name);
+  }
+
   
   void internal::Signal_Base::AddAction(const std::string & name)
   {
