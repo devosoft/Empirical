@@ -44,11 +44,34 @@
 
 namespace emp {
 
+  // Pre-declare classes
   class SignalManager;
-  
   namespace internal {
     class Action_Base;
-    
+    class Signal_Base;
+  }
+
+  class LinkKey {
+  private:
+    int id;
+  public:
+    LinkKey(int _id) : id(_id) { ; }
+    LinkKey(const LinkKey &) = default;
+    LinkKey & operator=(const LinkKey &) = default;
+    LinkKey() = delete;
+    ~LinkKey() { ; }
+
+    int GetID() const { return id; }
+    bool IsActive() const { return id > 0; }
+
+    // Define later...
+    internal::Signal_Base * GetSignal();
+    void Delete();
+    void Replace(internal::Action_Base & new_action);
+    template <typename... ARGS> void Replace(const std::function<void(ARGS...)> & fun);
+  };
+
+  namespace internal {  
     // BASE CLASS for Signals
     class Signal_Base {
     protected:
