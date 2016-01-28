@@ -22,7 +22,8 @@ namespace emp {
     ~FunctionSet() { ; }
 
     int GetSize() const { return (int) fun_set.size(); }
-
+    uint32_t size() const { return fun_set.size(); }     // For compatability with STL
+    
     void Add(const std::function<RETURN_TYPE(ARG_TYPES...)> & in_fun) {
       fun_set.push_back(in_fun);
     }
@@ -75,6 +76,7 @@ namespace emp {
     ~FunctionSet() { ; }
 
     int GetSize() const { return (int) fun_set.size(); }
+    uint32_t size() const { return fun_set.size(); }     // For compatability with STL
 
     void Add(const std::function<void(ARG_TYPES...)> & in_fun) {
       fun_set.push_back(in_fun);
