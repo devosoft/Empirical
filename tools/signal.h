@@ -52,7 +52,8 @@ namespace emp {
     // BASE CLASS for Signals
     class Signal_Base {
     protected:
-      std::string name;
+      std::string name;                 // What is the unique name of this signal?
+      std::map<int, int> link_key_map;  // Map unique keys for links to the link index for actions.
     public:
       Signal_Base(const std::string & n) : name(n) { ; }
       virtual ~Signal_Base() { ; }
@@ -63,14 +64,14 @@ namespace emp {
 
       // NOTE: Trigger must have specialized arguments!  Cannot be in base class.
       
-      // Add an action by name.
-      void AddAction(const std::string & name);
+      // Add an action by name and return a unique key for the pairing.
+      int AddAction(const std::string & name);
 
       // Actions without arguments can be associated with any signal.
-      virtual void AddAction(const std::function<void()> & in_fun) = 0;
+      virtual int AddAction(const std::function<void()> & in_fun) = 0;
 
       // Add an action by Action object.
-      virtual void AddAction(internal::Action_Base *) = 0;
+      virtual int AddAction(internal::Action_Base *) = 0;
     };
     
     // BASE CLASS for Actions
@@ -95,8 +96,10 @@ namespace emp {
   private:
     std::map<std::string, internal::Signal_Base *> signals;
     std::map<std::string, internal::Action_Base *> actions;
-
-    SignalManager() = default;
+    std::map<int, internal::Signal_Base*> link_key_to_signal;
+    int next_link_key;
+    
+    SignalManager() : next_link_key(0) { ; }
     SignalManager(const SignalManager &) = delete;
   public:
     void Register(const std::string & name, internal::Signal_Base * s) {
@@ -115,25 +118,32 @@ namespace emp {
       return s;
     }
 
-    // If a name is passed in for the signal, convert it.  Pass through anything for actions.
+    // If a name is passed in for the signal, convert it.  Pass through anything for actions
+    // and return a unique key for the pairing.
     template <typename A>
-    void LinkSignal(const std::string & s_name, A && a) {
+    int LinkSignal(const std::string & s_name, A && a) {
       emp_assert(signals.find(s_name) != signals.end());
-      LinkSignal(signals[s_name], std::forward<A>(a));
+      return LinkSignal(signals[s_name], std::forward<A>(a));
     }
 
     // If action is a name, convert it.  (signal names were handled in the previous.
-    void LinkSignal(internal::Signal_Base * s, const std::string & a_name) {
+    int LinkSignal(internal::Signal_Base * s, const std::string & a_name) {
       emp_assert(actions.find(a_name) != actions.end());
-      s->AddAction(actions[a_name]);
+      return s->AddAction(actions[a_name]);
     }
 
     // We now know we have base classes for both signals and actions.  Convert them to
     // the derrived versions!
-    void LinkSignal(internal::Signal_Base * s, internal::Action_Base * a) {
-      s->AddAction(a);
+    int LinkSignal(internal::Signal_Base * s, internal::Action_Base * a) {
+      return s->AddAction(a);
     }
 
+    // Every link needs a unique key to be able to look it up again.
+    int RegisterLink(internal::Signal_Base * s) {
+      next_link_key++;
+      link_key_to_signal[next_link_key] = s;
+      return next_link_key;
+    }
 
     // Provide accessors to signals and actions by name.
     internal::Signal_Base * FindSignal(const std::string & name) {
@@ -148,9 +158,9 @@ namespace emp {
 
 
   // Method to add an action by name to a Signal object
-  void internal::Signal_Base::AddAction(const std::string & name)
+  int internal::Signal_Base::AddAction(const std::string & name)
   {
-    SignalManager::Get().LinkSignal(this, name);
+    return SignalManager::Get().LinkSignal(this, name);
   }
     
 
@@ -178,22 +188,30 @@ namespace emp {
     inline void Trigger(ARGS... args) { actions.Run(args...); }
 
     // Add an action that takes the proper arguments.
-    void AddAction(const std::function<void(ARGS...)> & in_fun) { actions.Add(in_fun); }
+    int AddAction(const std::function<void(ARGS...)> & in_fun) {
+      const int link_id = SignalManager::Get().RegisterLink(this);
+      link_key_map[link_id] = (int) actions.size();
+      actions.Add(in_fun);
+      return link_id;
+    }
 
     // Add an action that takes no arguments.
-    void AddAction(const std::function<void()> & in_fun) override {
+    int AddAction(const std::function<void()> & in_fun) override {
+      const int link_id = SignalManager::Get().RegisterLink(this);
+      link_key_map[link_id] = (int) actions.size();
       actions.Add( [in_fun](ARGS...){in_fun();} );
+      return link_id;
     }
 
     // Add an action object using Action_Base.
-    void AddAction(internal::Action_Base * a_base) override {
+    int AddAction(internal::Action_Base * a_base) override {
       Action<ARGS...> * a = dynamic_cast< Action<ARGS...>* >(a_base);
       emp_assert( a != nullptr && "action type must match signal type." );
-      AddAction(a->fun);
+      return AddAction(a->fun);
     }
     
     // Add an action object.
-    void AddAction(Action<ARGS...> & a) { AddAction(a.fun); }
+    int AddAction(Action<ARGS...> & a) { return AddAction(a.fun); }
 
 
     // @CAO... if we want chain base clasess (or do other clever meta-programming), we
@@ -214,12 +232,17 @@ namespace emp {
     inline void Trigger() { actions.Run(); }
 
     // Add an action that takes the proper arguments.
-    void AddAction(const std::function<void()> & in_fun) override { actions.Add(in_fun); }
+    int AddAction(const std::function<void()> & in_fun) override {
+      const int link_id = SignalManager::Get().RegisterLink(this);
+      link_key_map[link_id] = (int) actions.size();
+      actions.Add(in_fun);
+      return link_id;
+    }
 
-    void AddAction(internal::Action_Base * a_base) override {
+    int AddAction(internal::Action_Base * a_base) override {
       Action<> * a = dynamic_cast< Action<>* >(a_base);
       emp_assert( a != nullptr && "action type must match signal type." );
-      AddAction(a->fun);
+      return AddAction(a->fun);
     }
   };
 
@@ -227,8 +250,8 @@ namespace emp {
   // Global functions that interact with the SignalManager
   
   template <typename S, typename A>
-  void LinkSignal(S && s, A && a) {
-    SignalManager::Get().LinkSignal(std::forward<S>(s), std::forward<A>(a));
+  int LinkSignal(S && s, A && a) {
+    return SignalManager::Get().LinkSignal(std::forward<S>(s), std::forward<A>(a));
   }
   
   template <typename... ARGS>
