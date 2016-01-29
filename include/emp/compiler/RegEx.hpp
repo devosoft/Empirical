@@ -458,7 +458,7 @@ namespace emp {
       return result;
     }
 
-    /// Process the input regex into a tree representaion.
+    /// Process the input regex into a tree representation.
     Ptr<re_block> Process(Ptr<re_block> cur_block=nullptr) {
       emp_assert(pos < regex.size(), pos, regex.size());
 

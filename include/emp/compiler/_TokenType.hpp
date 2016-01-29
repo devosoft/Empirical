@@ -19,12 +19,12 @@ namespace emp {
 
   /// Information about an individual TYPE of token to be processed within a Lexer.
   struct TokenType {
-    String name;    ///< Name of this token type.
-    String desc;    ///< More detailed description of this token type.
-    RegEx regex;         ///< Pattern to describe token type.
-    int id;              ///< Unique id for token.
-    bool save_lexeme;    ///< Preserve the lexeme for this token?
-    bool save_token;     ///< Keep token at all? (Whitespace and comments are often discarded).
+    String name;      ///< Name of this token type.
+    String desc;      ///< More detailed description of this token type.
+    RegEx regex;      ///< Pattern to describe token type.
+    int id;           ///< Unique id for token.
+    bool save_lexeme; ///< Preserve the lexeme for this token?
+    bool save_token;  ///< Keep token at all? (Whitespace and comments are often discarded).
 
     // Default constructor produces an error token.
     TokenType() : name(""), desc("Unable to parse input!"), regex(""),
