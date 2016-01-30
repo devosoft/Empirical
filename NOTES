@@ -14,6 +14,9 @@ Make JSWrap more flexible for different types of functions that can get passed i
 -= Improvements =-
 Allow default UI::Style overall and for each object type.
 -Create a UI::StyleGroup that elements can be added to and altered as one (use proper CSS class?)
+Allow Signal links to be REMOVED or REPLACED
+Allow Signal triggers to be chained (with a single trigger being able to chain to a series of others)
+Allow Signal links to be named?
 
 -= Improvements to Consider =-
 Why are styles applied AFTER GetHTML is run; can't they be done at the same time?
