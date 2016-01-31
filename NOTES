@@ -1,3 +1,11 @@
+-= NEXT STEPS =-
+Working on Singals/Actions
+* In the case of physics, each body shouldn't need its own signal.
+  - Do we have the physics manage this?
+  - Or should signals be static to a class?
+  - Or should they all go through the global manager?
+  At the moment, option 2 makes the most sense since each instance would pass in its own info.
+
 -= Active Projects =-
 TubeCode
 PuzzleEngine (was EvoPuzzler)
