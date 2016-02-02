@@ -1,0 +1,9 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<body>
+  <h1>Test File</h1>
+  <script type="text/javascript" src="js_take_charge.js"></script>
+  <script>
+    SquareVal = Module.cwrap('SquareVal', 'number', ['number']);
+    document.write("result == " + SquareVal(10));
+</script>
+</body>

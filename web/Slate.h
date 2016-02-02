@@ -124,7 +124,7 @@ namespace web {
           EM_ASM_ARGS({
               parent_id = Pointer_stringify($0);
               child_id = Pointer_stringify($1);
-              $('#' + parent_id).append('<span id=\'' + child_id + '\'></span>');
+              $('#' + parent_id).append("<span id='" + child_id + "'></span>");
             }, id.c_str(), in.GetID().c_str());
 
           // Now that the new widget has some place to hook in, activate it!
@@ -166,7 +166,7 @@ namespace web {
         AddChild(info);
         return info;
       }
-      
+
       // All derived widgets must suply a mechanism for providing associated HTML code.
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");       // Clear the current text.
