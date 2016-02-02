@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2015.
+//  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -39,6 +39,14 @@
 //                   etc... )
 //
 //
+//  Developer notes:
+//  Goal: Make it trival to build a class that has self-reflection.
+//        As such, it should interact will with serializaion and Javascript conversion.
+//
+//  An alternative option is to do something similar to the config object.  In order to build
+//  a dynamic class, one would just create a file with a full set of macro calls.  They would
+//  need to be included several times -- it might not be possible, but if it is it wouild allow
+//  an arbitrarily large class definition.
 
 #ifndef EMP_CLASS_H
 #define EMP_CLASS_H
