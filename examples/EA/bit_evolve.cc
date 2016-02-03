@@ -26,14 +26,25 @@ int main()
   }
 
   std::cout << "Start Size = " << pop.GetSize() << std::endl;
-//   for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << " ";
-//   std::cout << std::endl;
+  for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
+  std::cout << std::endl;
 
-//   pop.TournamentSelect([](int * i){ return (double) *i; }, 5, random, 100);
-//   pop.Update();
-//   std::cout << "Post-Tourney Size = " << pop.GetSize() << std::endl;
-//   for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << " ";
-//   std::cout << std::endl;
+  // Loop through 100 updates
+  for (int ud = 0; ud < 100; ud++) {
+    // Run a tournament...
+    pop.TournamentSelect([](BitOrg * org){ return (double) org->CountOnes(); }, 5, random, 100);
+    pop.Update();
+
+    // Do mutations...
+    for (int i = 0; i < pop.GetSize(); i++) {
+      pop[i][random.GetInt(100)] = random.P(0.3);
+    }
+
+    // Print results
+    // for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
+    // std::cout << std::endl;
+    std::cout << pop[0] << std::endl;
+  }
 
 //   pop.EliteSelect([](int * i){ return (double) *i; }, 10, 10);
 //   pop.Update();
