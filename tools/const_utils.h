@@ -1,23 +1,28 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  This file contains functions that all run at compile time to produce a constant
+//  value.
+
 
 #ifndef EMP_CONST_UTILS_H
 #define EMP_CONST_UTILS_H
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-// This file contains functions that all run at compile time to produce a constant
-// value.
-//
-
 namespace emp {
 namespace constant {
 
+  // A compile-time exponentiation calculator.
+  template <typename TYPE>
+  static constexpr TYPE IntPow(TYPE base, TYPE exp) {
+    return exp <= 1 ? 1 : (base * IntPow(base, exp-1));
+  }
+  
   // A compile-time int-log calculator (aka, significant bits)
   template <typename TYPE>
   static constexpr int IntLog2(TYPE x) {
-    return x <= 1 ? 0 : IntLog2(x/2) + 1;
+    return x <= 1 ? 0 : (IntLog2(x/2) + 1);
   }
 
   // A compile-time bit counter.
