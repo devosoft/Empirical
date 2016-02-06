@@ -26,9 +26,13 @@ namespace EA {
     std::array< std::array<double, state_count>, N > landscape;
 
   public:
-    NKLandscape() { ; }
+    NKLandscape() = delete; // { ; }
     NKLandscape(emp::Random & random) {
-      for (double & pos : landscape) pos = random.GetDouble();
+      for ( std::array<double, state_count> & ltable : landscape) {
+	for (double & pos : ltable) {
+	  pos = random.GetDouble();
+	}
+      }
     }
     NKLandscape(const NKLandscape &) = default;
     ~NKLandscape() { ; }
@@ -40,12 +44,8 @@ namespace EA {
     constexpr int GetTotalCount() const { return total_count; }
     
     double GetFitness(int n, uint32_t state) const {
-      if (state >= state_count) {
-	std::cout << "state=" << state
-		  << "   state_count=" << state_count
-		  << std::endl;
-      }
       emp_assert(state < state_count, state, state_count);
+      // std::cout << n << " : " << state << " : " << landscape[n][state] << std::endl;
       return landscape[n][state];
     }
     double GetFitness( std::array<uint32_t, N> states ) const {
@@ -61,7 +61,9 @@ namespace EA {
       double total = 0.0;
       constexpr uint32_t mask = emp::constant::MaskLow<uint32_t>(K+1);
       for (int i = 0; i < N; i++) {
-	total += GetFitness(i, (genome2 >> i).GetUInt(0) & mask);
+	const uint32_t cur_val = (genome2 >> i).GetUInt(0) & mask;
+	const double cur_fit = GetFitness(i, cur_val);
+	total += cur_fit;
       }
       return total;
     }
