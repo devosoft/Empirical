@@ -39,24 +39,29 @@ namespace EA {
     constexpr int GetStateCount() const { return state_count; }
     constexpr int GetTotalCount() const { return total_count; }
     
-    double GetFitness(int n, uint32_t state) {
-      emp_assert(state < state_count);
+    double GetFitness(int n, uint32_t state) const {
+      if (state >= state_count) {
+	std::cout << "state=" << state
+		  << "   state_count=" << state_count
+		  << std::endl;
+      }
+      emp_assert(state < state_count, state, state_count);
       return landscape[n][state];
     }
-    double GetFitness( std::array<uint32_t, N> states ) {
+    double GetFitness( std::array<uint32_t, N> states ) const {
       double total = landscape[0][states[0]];
       for (int i = 1; i < N; i++) total += GetFitness(i,states[i]);
       return total;
     }
-    double GetFitness(const BitSet<N> & genome) {
+    double GetFitness(const BitSet<N> & genome) const {
       // Create a double-length genome to easily handle wrap-around.
       BitSet<N*2> genome2( genome.template Export<N*2>() );
       genome2 |= (genome2 << N);
 
-      double total = 0;
+      double total = 0.0;
       constexpr uint32_t mask = emp::constant::MaskLow<uint32_t>(K+1);
       for (int i = 0; i < N; i++) {
-	total += GetFitness(i, (genome2 >> i) & mask);
+	total += GetFitness(i, (genome2 >> i).GetUInt(0) & mask);
       }
       return total;
     }
