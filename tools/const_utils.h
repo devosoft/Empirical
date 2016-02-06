@@ -16,7 +16,7 @@ namespace constant {
   // A compile-time exponentiation calculator.
   template <typename TYPE>
   static constexpr TYPE IntPow(TYPE base, TYPE exp) {
-    return exp <= 1 ? 1 : (base * IntPow(base, exp-1));
+    return exp < 1 ? 1 : (base * IntPow(base, exp-1));
   }
   
   // A compile-time int-log calculator (aka, significant bits)
