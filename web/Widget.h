@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2015.
+//  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -270,7 +270,7 @@ namespace web {
         // If this node is active, fill put its contents in ss; otherwise make ss an empty span.
         std::stringstream ss;
         if (state == Widget::ACTIVE) GetHTML(ss);
-        else ss << "<span id=" << id << "></span>";
+        else ss << "<span id='" << id << "'></span>";
         
         // Now do the replacement.
         EM_ASM_ARGS({
