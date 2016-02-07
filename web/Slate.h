@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2015.
+//  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -124,7 +124,7 @@ namespace web {
           EM_ASM_ARGS({
               parent_id = Pointer_stringify($0);
               child_id = Pointer_stringify($1);
-              $('#' + parent_id).append('<span id=\'' + child_id + '\'></span>');
+              $('#' + parent_id).append('<span id="' + child_id + '"></span>');
             }, id.c_str(), in.GetID().c_str());
 
           // Now that the new widget has some place to hook in, activate it!
@@ -236,7 +236,7 @@ namespace web {
     Slate(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsSlateInfo()); }
     ~Slate() { ; }
 
-    virtual bool IsSlate() const { return true; }
+    virtual bool IsSlate() const override { return true; }
     using INFO_TYPE = internal::SlateInfo;
    
     bool AppendOK() const override { return Info()->append_ok; }
