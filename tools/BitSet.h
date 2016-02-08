@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_BIT_SET_H
-#define EMP_BIT_SET_H
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 // Class: template <int NUM_BITS> emp::BitSet
 // Desc: This class handles a fixed-sized (but arbitrarily large) array of bits,
@@ -22,7 +18,12 @@
 //  BitSet & operator=(const BitSet & in_set)     -- Copy over a BitSet of the same size
 //  BitSet & Import(const BitSet & in_set)        -- Copy over a BitSet of a different size
 //  BitSet Export<NEW_SIZE>()                     -- Convert this BitSet a different size
-//  bool operator==(const BitSet & in_set) const  -- Test if all bits are the same size.
+//  bool operator==(const BitSet & in_set) const  -- Test if all bits are identical
+//  bool operator<(const BitSet & in_set) const   -- Ordering to facilitate sorting, etc.
+//  bool operator<=(const BitSet & in_set) const  -- ...filling out remaining Boolean comparisons
+//  bool operator>(const BitSet & in_set) const   -- 
+//  bool operator>=(const BitSet & in_set) const  -- 
+//  bool operator!=(const BitSet & in_set) const  -- 
 //
 // Sizing:
 //  int GetSize() const
@@ -82,8 +83,10 @@
 //  const BitSet & operator^=(const BitSet & ar2)
 //  const BitSet & operator>>=(const int)
 //  const BitSet & operator<<=(const int)
-//
 
+
+#ifndef EMP_BIT_SET_H
+#define EMP_BIT_SET_H
 
 #include <assert.h>
 #include <iostream>
@@ -223,11 +226,28 @@ namespace emp {
     }
 
     bool operator==(const BitSet & in_set) const {
-      for (int i = 0; i < NUM_FIELDS; i++) {
+      for (int i = 0; i < NUM_FIELDS; ++i) {
         if (bit_set[i] != in_set.bit_set[i]) return false;
       }
       return true;
     }
+    bool operator<(const BitSet & in_set) const {
+      for (int i = NUM_FIELDS-1; i >= 0; --i) {         // Start loop at the largest field.
+        if (bit_set[i] == in_set.bit_set[i]) continue;  // If same, keep looking!
+        return (bit_set[i] < in_set.bit_set[i]);        // Otherwise, do comparison
+      }
+      return false;
+    }
+    bool operator<=(const BitSet & in_set) const {
+      for (int i = NUM_FIELDS-1; i >= 0; --i) {         // Start loop at the largest field.
+        if (bit_set[i] == in_set.bit_set[i]) continue;  // If same, keep looking!
+        return (bit_set[i] < in_set.bit_set[i]);        // Otherwise, do comparison
+      }
+      return true;
+    }
+    bool operator!=(const BitSet & in_set) const { return !operator==(in_set); }
+    bool operator>(const BitSet & in_set) const { return !operator<=(in_set); }
+    bool operator>=(const BitSet & in_set) const { return !operator<(in_set); }
 
     constexpr static int GetSize() { return NUM_BITS; }
 
