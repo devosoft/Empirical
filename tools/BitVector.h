@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_BIT_VECTOR_H
-#define EMP_BIT_VECTOR_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 // Class: emp::BitVector
 // Desc: A customized version of std::vector<bool> with additional bit magic operations
@@ -15,6 +11,9 @@
 // Note, this class is about 15-20% slower than BitSet, but is not fixed size and does
 // not require knowledge of the size at compile time.
 //
+
+#ifndef EMP_BIT_VECTOR_H
+#define EMP_BIT_VECTOR_H
 
 #include <assert.h>
 #include <iostream>
@@ -225,11 +224,35 @@ namespace emp {
       if (num_bits != in_set.num_bits) return false;
 
       const int NUM_FIELDS = NumFields();
-      for (int i = 0; i < NUM_FIELDS; i++) {
+      for (int i = 0; i < NUM_FIELDS; ++i) {
         if (bit_set[i] != in_set.bit_set[i]) return false;
       }
       return true;
     }
+    bool operator<(const BitVector & in_set) const {
+      if (num_bits != in_set.num_bits) return num_bits < in_set.num_bits;
+
+      const int NUM_FIELDS = NumFields();
+      for (int i = NUM_FIELDS-1; i >= 0; --i) {         // Start loop at the largest field.
+        if (bit_set[i] == in_set.bit_set[i]) continue;  // If same, keep looking!
+        return (bit_set[i] < in_set.bit_set[i]);        // Otherwise, do comparison
+      }
+      return false;
+    }
+    bool operator<=(const BitVector & in_set) const {
+      if (num_bits != in_set.num_bits) return num_bits <= in_set.num_bits;
+
+      const int NUM_FIELDS = NumFields();
+      for (int i = NUM_FIELDS-1; i >= 0; --i) {         // Start loop at the largest field.
+        if (bit_set[i] == in_set.bit_set[i]) continue;  // If same, keep looking!
+        return (bit_set[i] < in_set.bit_set[i]);        // Otherwise, do comparison
+      }
+      return true;
+    }
+    bool operator!=(const BitVector & in_set) const { return !operator==(in_set); }
+    bool operator>(const BitVector & in_set) const { return !operator<=(in_set); }
+    bool operator>=(const BitVector & in_set) const { return !operator<(in_set); }
+
 
     int GetSize() const { return num_bits; }
 
