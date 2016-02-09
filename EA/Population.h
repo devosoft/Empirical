@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2015.
+//  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -85,14 +85,18 @@ namespace EA {
                           Random & random, int tourny_count=1) {
       emp_assert(t_size > 0 && t_size <= (int) pop.size());
 
+      // Pre-calculate fitnesses.
+      std::vector<double> fitness(pop.size());
+      for (int i = 0; i < (int) pop.size(); ++i) fitness[i] = fit_fun(pop[i]);
+      
       for (int T = 0; T < tourny_count; T++) {
         std::vector<int> entries = random.Choose(pop.size(), t_size);
-        double best_fit = fit_fun(pop[entries[0]]);
+        double best_fit = fitness[entries[0]];
         int best_id = entries[0];
       
         // Search for a higher fit org in the tournament.
         for (int i = 1; i < t_size; i++) {
-          const double cur_fit = fit_fun(pop[entries[i]]);
+          const double cur_fit = fitness[entries[i]];
           if (cur_fit > best_fit) {
             best_fit = cur_fit;
             best_id = entries[i];
