@@ -16,7 +16,7 @@
 #include "../tools/Random.h"
 
 namespace emp {
-namespace EA {
+namespace evo {
 
   template <int N, int K>
   class NKLandscape {
