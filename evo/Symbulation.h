@@ -20,47 +20,52 @@ namespace evo {
   
   class SymbulationOrg {
   private:
-    BitVector org;
+    BitVector host;
     BitVector symbiont;
     
-    int org_pos;     // What bit position to execute next in the host?
+    int host_pos;    // What bit position to execute next in the host?
     int symb_pos;    // What bit position to execute next in the symbiont?
     
-    int org_score;   // Score accumulated by host, toward replication
+    int host_score;  // Score accumulated by host, toward replication
     int symb_score;  // Score accumulated by symbiont, toward horizontal transmission
 
     int streak_0;    // Number of consecutive zeros executed by symbiont.
     int streak_1;    // Number of consecutive ones executed by symbiont.
     
   public:
-    SymbulationOrg() : org_pos(0), symb_pos(0), org_score(0), symb_score(0),
+    SymbulationOrg() : host_pos(0), symb_pos(0), host_score(0), symb_score(0),
 		       streak_0(0), streak_1(0) { ; }
     ~SymbulationOrg() { ; }
 
-    int GetOrgScore() const { return org_score; }
+    int GetHostScore() const { return host_score; }
     int GetSymbiontScore() const { return symb_score; }
 
-    Execute() {
-      if (org[org_pos]) {  // Host generating score for itself.
-	org_score++;
+    Execute(bool use_streaks=true,
+	    int host_self_bonus=1, int symb_self_bonus=1, int symb_host_bonus=1) {
+      if (host[host_pos]) {                            // Host generating score for itself.
+	host_score += host_self_bonus;
       }
-      else {               // Host allowing symbiont to execute.
-	if (!symbiont.GetSize()) break;  // No symbiont in this host.
+      else {                                           // Host allowing symbiont to execute.
+	if (!symbiont.GetSize()) break;                // No symbiont in this host.
 	
-	if (symbiont[symb_pos]) {   // Symbiont helping host.
-	  streak_1++;
-	  streak_0 = 0;
-	  org_score += streak_1;
+	if (symbiont[symb_pos]) {                      // Symbiont helping host.
+	  if (use_streaks) {
+	    streak_1++; streak_0 = 0;
+	    host_score += streak_1 * symb_host_bonus;
+	  }
+	  else host_score += symb_host_bonus;
 	}
-	else {                      // Symbiont helping itself.
-	  streak_0++;
-	  streak_1 = 0;
-	  symb_score += streak_0;
+	else {                                         // Symbiont helping itself.
+	  if (use_streaks) {
+	    streak_0++; streak_1 = 0;
+	    symb_score += streak_0 * symb_self_bonus;
+	  }
+	  else symb_score += symb_self_bonus;
 	}
 	if (++symb_pos >= symbiont.GetSize()) symb_pos = 0;  // Advance symbiont position.
 	
       }
-      if (++org_pos >= org.GetSize()) org_pos = 0;  // Advance org position.
+      if (++host_pos >= host.GetSize()) host_pos = 0;  // Advance host position.
     }
   };
   
