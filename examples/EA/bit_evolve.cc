@@ -3,13 +3,13 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  This file explores the template defined in EA::Population.h
+//  This file explores the template defined in evo::Population.h
 
 #include <iostream>
 
-#include "../../EA/Population.h"
-#include "../../tools/Random.h"
+#include "../../evo/Population.h"
 #include "../../tools/BitSet.h"
+#include "../../tools/Random.h"
 
 using BitOrg = emp::BitSet<100>;
 
@@ -17,8 +17,9 @@ int main()
 {
   emp::Random random;
 
-  emp::EA::Population<BitOrg> pop;
+  emp::evo::Population<BitOrg> pop;
 
+  // Build a random initial population
   for (int i = 0; i < 100; i++) {
     BitOrg next_org;
     for (int j = 0; j < 100; j++) next_org[j] = random.P(0.3);

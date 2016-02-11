@@ -3,28 +3,28 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  This file explores the template defined in EA::Population.h
+//  This file explores the template defined in evo::Population.h
 
 #include <iostream>
 
-#include "../../EA/NK.h"
-#include "../../EA/Population.h"
+#include "../../evo/NK.h"
+#include "../../evo/Population.h"
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
 
 constexpr int K = 3;
 constexpr int N = 50;
 
-constexpr int POP_SIZE = 100;
-constexpr int UD_COUNT = 100;
+constexpr int POP_SIZE = 1000;
+constexpr int UD_COUNT = 1000;
 
 using BitOrg = emp::BitSet<N>;
 
 int main()
 {
   emp::Random random;
-  emp::EA::NKLandscape<N,K> landscape(random);
-  emp::EA::Population<BitOrg> pop;
+  emp::evo::NKLandscape<N,K> landscape(random);
+  emp::evo::Population<BitOrg> pop;
 
   // Build a random initial population
   for (int i = 0; i < POP_SIZE; i++) {
@@ -38,14 +38,14 @@ int main()
     // Print current state.
     // for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
     // std::cout << std::endl;
-    std::cout << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
+    //std::cout << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 
     // Keep the best individual.
     pop.EliteSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1);
 
     // Run a tournament for the rest...
     pop.TournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }
-			 , 2, random, POP_SIZE-1);
+			 , 5, random, POP_SIZE-1);
     pop.Update();
 
     // Do mutations...
@@ -58,4 +58,5 @@ int main()
   }
   
 
+  std::cout << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 }
