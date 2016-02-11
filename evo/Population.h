@@ -23,7 +23,7 @@
 #include "../tools/vector.h"
 
 namespace emp {
-namespace EA {
+namespace evo {
 
   template <typename MEMBER>
   class Population {
@@ -117,7 +117,7 @@ namespace EA {
     
   };
 
-}  // END EA namespace
+}  // END evo namespace
 }  // END emp namespace
 
 #endif
