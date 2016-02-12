@@ -33,21 +33,42 @@ namespace evo {
     int streak_1;    // Number of consecutive ones executed by symbiont.
     
   public:
-    SymbulationOrg() : host_pos(0), symb_pos(0), host_score(0), symb_score(0),
-		       streak_0(0), streak_1(0) { ; }
+    SymbulationOrg(BitVector genome) : host(genome), host_pos(0), symb_pos(0)
+				     , host_score(0), symb_score(0)
+				     , streak_0(0), streak_1(0) {
+      emp_assert(host.GetSize() > 0);
+    }
     ~SymbulationOrg() { ; }
 
     int GetHostScore() const { return host_score; }
     int GetSymbiontScore() const { return symb_score; }
 
-    Execute(bool use_streaks=true,
-	    int host_self_bonus=1, int symb_self_bonus=1, int symb_host_bonus=1) {
+    void InjectSymbiont(const BitVector & in_symb, Random & random, double displace_prob=0.5) {
+      // For a symbiont to be injectected successfully, there either has to be no symbiont
+      // in the current cell -or- the existing symbiont must be displaced.
+      if (symbiont.GetSize() == 0 || random.P(dislpace_prob)) {
+	symbiont = in_symb;
+	symb_pos = 0;
+	symb_score = 0;
+	streak_0 = streak_1 = 0;
+      }
+    }
+    
+    void Execute(bool use_streaks=true, bool align symbiont=false,
+		 int host_self_bonus=1, int symb_self_bonus=1, int symb_host_bonus=1)
+    {
       if (host[host_pos]) {                            // Host generating score for itself.
 	host_score += host_self_bonus;
       }
       else {                                           // Host allowing symbiont to execute.
 	if (!symbiont.GetSize()) break;                // No symbiont in this host.
-	
+
+	// If a symbiont should exectue at the same position as a host, readjust.
+	if (align_symbiont) {
+	  symb_pos = host_pos % symbiont.GetSize();
+	}
+
+	// Determine next step based on symbiont bit
 	if (symbiont[symb_pos]) {                      // Symbiont helping host.
 	  if (use_streaks) {
 	    streak_1++; streak_0 = 0;
