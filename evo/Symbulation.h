@@ -15,6 +15,10 @@
 #ifndef SYMBULATION_H
 #define SYMBULATION_H
 
+#include "../tools/assert.h"
+#include "../tools/BitVector.h"
+#include "../tools/Random.h"
+
 namespace emp {
 namespace evo {
   
@@ -64,22 +68,20 @@ namespace evo {
     bool InjectSymbiont(const BitVector & in_symb, Random & random, double displace_prob=0.5) {
       // For a symbiont to be injectected successfully, there either has to be no symbiont
       // in the current cell -or- the existing symbiont must be displaced.
-      if (symbiont.GetSize() == 0 || random.P(dislpace_prob)) {
+      if (symbiont.GetSize() == 0 || random.P(displace_prob)) {
 	SetSymbiont(in_symb);
 	return true;
       }
       return false;
     }
     
-    void Execute(bool use_streaks=true, bool align symbiont=false,
+    void Execute(bool use_streaks=true, bool align_symbiont=false,
 		 int host_self_bonus=1, int symb_self_bonus=1, int symb_host_bonus=1)
     {
       if (host[host_pos]) {                            // Host generating score for itself.
 	host_score += host_self_bonus;
       }
-      else {                                           // Host allowing symbiont to execute.
-	if (!symbiont.GetSize()) break;                // No symbiont in this host.
-
+      else if (symbiont.GetSize()) {                   // Host allowing extant symbiont to execute.
 	// If a symbiont should exectue at the same position as a host, readjust.
 	if (align_symbiont) {
 	  symb_pos = host_pos % symbiont.GetSize();
