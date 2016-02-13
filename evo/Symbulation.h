@@ -43,15 +43,32 @@ namespace evo {
     int GetHostScore() const { return host_score; }
     int GetSymbiontScore() const { return symb_score; }
 
-    void InjectSymbiont(const BitVector & in_symb, Random & random, double displace_prob=0.5) {
+    void SetHost(const BitVector & genome, bool clear_symbiont=true) {
+      host = genome;
+      emp_assert(host.GetSize() > 0);
+      host_pos = host_score = 0;
+      if (clear_symbiont) {
+	symbiont.Resize(0);
+	symb_pos = symb_score = streak_0 = streak_1 = 0;
+      }
+    }
+
+    void SetSymbiont(const BitVector & in_symb) {
+      symbiont = in_symb;
+      symb_pos = 0;
+      symb_score = 0;
+      streak_0 = streak_1 = 0;
+    }
+    
+    // Try to inject a symbiont, but it might fail if another symbiont is already there.
+    bool InjectSymbiont(const BitVector & in_symb, Random & random, double displace_prob=0.5) {
       // For a symbiont to be injectected successfully, there either has to be no symbiont
       // in the current cell -or- the existing symbiont must be displaced.
       if (symbiont.GetSize() == 0 || random.P(dislpace_prob)) {
-	symbiont = in_symb;
-	symb_pos = 0;
-	symb_score = 0;
-	streak_0 = streak_1 = 0;
+	SetSymbiont(in_symb);
+	return true;
       }
+      return false;
     }
     
     void Execute(bool use_streaks=true, bool align symbiont=false,
