@@ -30,7 +30,8 @@ namespace evo {
   protected:
     emp::vector<MEMBER *> pop;
     emp::vector<MEMBER *> next_pop;
-
+    std::function<double(MEMBER*)> default_fit_fun;
+ 
   public:
     Population() { ; }
     Population(const Population &) = default;
@@ -38,8 +39,14 @@ namespace evo {
     Population & operator=(const Population &) = default;
 
     int GetSize() const { return (int) pop.size(); }
+    const std::function<double(MEMBER*)> & GetDefaultFitnessFun() const { return default_fit_fun; }
     MEMBER & operator[](int i) { return *(pop[i]); }
 
+    void SetDefaultFitnessFun(const std::function<double(MEMBER*)> & f) {
+      default_fit_fun = f;
+    }
+    
+    
     void Clear() {
       // Clear out all organisms.
       for (MEMBER * m : pop) delete m;
@@ -60,7 +67,7 @@ namespace evo {
 
     // Elite Selection picks a set of the most fit individuals from the population to move to
     // the next generation.  Find top e_count individuals and make copy_count copies of each.
-    void EliteSelect(std::function<double(MEMBER*)> fit_fun, int e_count, int copy_count=1) {
+    void EliteSelect(std::function<double(MEMBER*)> fit_fun, int e_count=1, int copy_count=1) {
       emp_assert(e_count > 0 && e_count <= (int) pop.size());
 
       // Load the population into a multimap, sorted by fitness.
@@ -76,7 +83,12 @@ namespace evo {
         ++m;
       }
     }
-    
+
+    // Elite Selection can use the default fitness function.
+    void EliteSelect(int e_count=1, int copy_count=1) {
+      EliteSelect(default_fit_fun, e_count, copy_count);
+    }
+
     // Tournament Selection create a tournament with a random sub-set of organisms,
     // finds the one with the highest fitness, and moves it to the next generation.
     // User provides the fitness function, the tournament size, the random-number generator
@@ -106,6 +118,11 @@ namespace evo {
         // Place the highest fitness into the next generation!
         InsertNext( *(pop[best_id]) );
       }
+    }
+
+    // Trournament Selection can use the default fitness function.
+    void TournamentSelect(int t_size, Random & random, int tourny_count=1) {
+      TournamentSelect(default_fit_fun, t_size, random, tourny_count);
     }
 
     // Update() moves the next population to the current position, managing memory as needed.
