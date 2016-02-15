@@ -154,7 +154,7 @@ namespace evo {
 	double niche_count = 0;
 	for (int j = 0; j < (int) pop.size(); ++j) {
 	  double dij = dist_fun(pop[i], pop[j]);
-	  niche_count += (1 - pow(dij/sharing_threshhold, alpha));
+	  niche_count += std::max(1 - std::pow(dij/sharing_threshhold, alpha), 0.0);
 	}
 	fitness[i] = fit_fun(pop[i])/niche_count;
       }

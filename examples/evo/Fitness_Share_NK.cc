@@ -15,7 +15,7 @@
 constexpr int K = 3;
 constexpr int N = 50;
 
-constexpr int POP_SIZE = 3600;
+constexpr int POP_SIZE = 100;
 constexpr int UD_COUNT = 1000;
 
 using BitOrg = emp::BitSet<N>;
@@ -41,10 +41,10 @@ int main()
     //std::cout << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 
     // Keep the best individual.
-  pop.EliteSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1);
+    pop.EliteSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1);
 
     // Run a tournament for the rest...
-pop.FitnessSharingTournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }, [double] (BitOrg* org1, BitOrg* org2){ return (double)(org1->XOR(*org2).CountOnes());}, 10, 1, 5, random, POP_SIZE-1);
+    pop.FitnessSharingTournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }, [](BitOrg* org1, BitOrg* org2){ return (double)(org1->XOR(*org2)).CountOnes();}, 10, 1, 5, random, POP_SIZE-1);
     pop.Update();
 
     // Do mutations...
@@ -53,7 +53,7 @@ pop.FitnessSharingTournamentSelect([landscape](BitOrg * org){ return landscape.G
       pop[i][random.GetInt(N)] = random.P(0.5);
       pop[i][random.GetInt(N)] = random.P(0.5);
     }
-
+  
   }
   
 
