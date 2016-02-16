@@ -27,7 +27,12 @@ int main()
   for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << " ";
   std::cout << std::endl;
 
-  pop.EliteSelect([](int * i){ return (double) *i; }, 10, 10);
+  // Populations can be supplied a default fitness function so that it doesn't
+  // need to keep being specified.
+  pop.SetDefaultFitnessFun([](int * i){ return (double) *i; });
+  
+  // pop.EliteSelect([](int * i){ return (double) *i; }, 10, 10);
+  pop.EliteSelect(10, 10);
   pop.Update();
   std::cout << "Post-Elite Size = " << pop.GetSize() << std::endl;
   for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << " ";
