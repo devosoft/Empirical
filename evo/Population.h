@@ -100,7 +100,19 @@ namespace evo {
       // Pre-calculate fitnesses.
       std::vector<double> fitness(pop.size());
       for (int i = 0; i < (int) pop.size(); ++i) fitness[i] = fit_fun(pop[i]);
-      
+
+      RunTournament(fitness, t_size, random, tourny_count);
+
+    }
+
+    // Tournament Selection can use the default fitness function.
+    void TournamentSelect(int t_size, Random & random, int tourny_count=1) {
+      TournamentSelect(default_fit_fun, t_size, random, tourny_count);
+    }
+
+    // Helper function to actually run tournament
+    void RunTournament(std::vector<double> fitness, int t_size, 
+		       Random & random, int tourny_count=1){
       for (int T = 0; T < tourny_count; T++) {
         std::vector<int> entries = random.Choose(pop.size(), t_size);
         double best_fit = fitness[entries[0]];
@@ -120,9 +132,44 @@ namespace evo {
       }
     }
 
-    // Trournament Selection can use the default fitness function.
-    void TournamentSelect(int t_size, Random & random, int tourny_count=1) {
-      TournamentSelect(default_fit_fun, t_size, random, tourny_count);
+    // Run tournament selection with fitnesses adjusted by Goldberg and
+    // Richardson's fitness sharing function (1987)
+    // Requires a distance function that is valid for members of the population,
+    // a sharing threshold (sigma share) that defines which members are
+    // in the same niche, and a value of alpha (which controls the shape of
+    // the fitness sharing curve
+    void FitnessSharingTournamentSelect(std::function<double(MEMBER*)> 
+					fit_fun, 
+					std::function<double(MEMBER*, MEMBER*)>
+					dist_fun,
+					double sharing_threshhold, double alpha,
+					int t_size, Random & random, 
+					int tourny_count=1){
+
+      emp_assert(t_size > 0 && t_size <= (int) pop.size());
+
+      // Pre-calculate fitnesses.
+      std::vector<double> fitness(pop.size());
+      for (int i = 0; i < (int) pop.size(); ++i) {
+	double niche_count = 0;
+	for (int j = 0; j < (int) pop.size(); ++j) {
+	  double dij = dist_fun(pop[i], pop[j]);
+	  niche_count += std::max(1 - std::pow(dij/sharing_threshhold, alpha), 0.0);
+	}
+	fitness[i] = fit_fun(pop[i])/niche_count;
+      }
+
+      RunTournament(fitness, t_size, random, tourny_count);      
+    }
+
+    // Fitness sharing Tournament Selection can use the default fitness function
+    void FitnessSharingTournamentSelect(std::function<double(MEMBER*, MEMBER*)>
+					dist_fun, double sharing_threshold, 
+					double alpha, int t_size, 
+					Random & random, 
+					int tourny_count=1) {
+      TournamentSelect(default_fit_fun, dist_fun, sharing_threshold, alpha, 
+		       t_size, random, tourny_count);
     }
 
     // Update() moves the next population to the current position, managing memory as needed.
