@@ -36,13 +36,12 @@ namespace emp {
 
     static const int FIELD_BITS = sizeof(field_type)*8;
     int num_bits;
-
-    int LastBitID() const { return num_bits & (FIELD_BITS - 1); }
-    int NumFields() const { return 1 + ((num_bits - 1) / FIELD_BITS); }
-    int NumBytes() const { return  1 + ((num_bits - 1) >> 3); }
-
     field_type * bit_set;
     
+    int LastBitID() const { return num_bits & (FIELD_BITS - 1); }
+    int NumFields() const { return bit_set ? 1 + ((num_bits - 1) / FIELD_BITS) : 0; }
+    int NumBytes()  const { return bit_set ? 1 + ((num_bits - 1) >> 3) : 0; }
+
     // Setup a bit proxy so that we can use operator[] on bit sets as an lvalue.
     class BitProxy {
     private:
