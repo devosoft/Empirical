@@ -37,10 +37,11 @@ namespace emp {
     static const int FIELD_BITS = sizeof(field_type)*8;
     int num_bits;
     field_type * bit_set;
-    
+
+    // NOTE: due to math edge cases, when num_bits=0 a minimum of 1 field/byte is returned.
     int LastBitID() const { return num_bits & (FIELD_BITS - 1); }
-    int NumFields() const { return bit_set ? 1 + ((num_bits - 1) / FIELD_BITS) : 0; }
-    int NumBytes()  const { return bit_set ? 1 + ((num_bits - 1) >> 3) : 0; }
+    int NumFields() const { return 1 + ((num_bits - 1) / FIELD_BITS); }
+    int NumBytes()  const { return 1 + ((num_bits - 1) >> 3); }
 
     // Setup a bit proxy so that we can use operator[] on bit sets as an lvalue.
     class BitProxy {
@@ -140,22 +141,22 @@ namespace emp {
 
   public:
     BitVector(int in_num_bits=0, bool init_val=false) : num_bits(in_num_bits) {
-      assert(in_num_bits >= 0);
-      bit_set = (num_bits == 0) ? NULL : new field_type[NumFields()];
+      assert(num_bits >= 0);
+      bit_set = new field_type[NumFields()];
       if (init_val) SetAll(); else Clear();
     }
     BitVector(const BitVector & in_set) : num_bits(in_set.num_bits) {
-      if (num_bits == 0) bit_set = NULL;
-      else {
-        bit_set = new field_type[NumFields()];
-        RawCopy(in_set.bit_set);
-      }
+      bit_set = new field_type[NumFields()];
+      RawCopy(in_set.bit_set);
     }
     BitVector(BitVector && in_set) : num_bits(in_set.num_bits) {
       bit_set = in_set.bit_set;
-      in_set.bit_set = NULL;
+      in_set.bit_set = nullptr;
     }
-    ~BitVector() { if (bit_set != NULL) delete [] bit_set; }
+    ~BitVector() {
+      // NOTE: A move constructor may have left bit_set == nullptr
+      if (bit_set) delete [] bit_set;
+    }
 
     BitVector & operator=(const BitVector & in_set) {
       const int in_num_fields = in_set.NumFields();
@@ -163,11 +164,8 @@ namespace emp {
       num_bits = in_set.num_bits;
 
       if (in_num_fields != prev_num_fields) {
-        if (bit_set) delete [] bit_set;
-        if (num_bits == 0) bit_set = NULL;
-        else {
-          bit_set = new field_type[NumFields()];
-        }
+        delete [] bit_set;
+	bit_set = new field_type[NumFields()];
       }
 
       if (num_bits > 0) RawCopy(in_set.bit_set);
@@ -177,10 +175,10 @@ namespace emp {
 
     BitVector & operator=(BitVector && in_set) {
       if (&in_set == this) return *this;
-      if (bit_set != NULL) delete [] bit_set;
+      delete [] bit_set;
       num_bits = in_set.num_bits;
       bit_set = in_set.bit_set;
-      in_set.bit_set = NULL;
+      in_set.bit_set = nullptr;
 
       return *this;
     }
@@ -190,18 +188,7 @@ namespace emp {
       num_bits = new_bits;
       const int NUM_FIELDS = NumFields();
       
-      if (new_bits == 0) {  // We are emptying this BitVector
-        if (bit_set) delete [] bit_set;
-        bit_set = NULL;
-        num_bits = 0;
-      }
-
-      else if (old_num_fields == 0) {   // We are increasing from an empty BitVector
-        bit_set = new field_type[NUM_FIELDS];
-        for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = 0U;
-      }
-
-      else if (NUM_FIELDS == old_num_fields) {   // We can use our existing bit field
+      if (NUM_FIELDS == old_num_fields) {   // We can use our existing bit field
         num_bits = new_bits;
         // If there are extra bits, zero them out.
         if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= constant::MaskLow<field_type>(LastBitID()); 
@@ -213,7 +200,7 @@ namespace emp {
         const int min_fields = std::min(old_num_fields, NUM_FIELDS);
         for (int i = 0; i < min_fields; i++) bit_set[i] = old_bit_set[i];
         for (int i = min_fields; i < NUM_FIELDS; i++) bit_set[i] = 0U;
-        if (old_bit_set) delete [] old_bit_set;
+        delete [] old_bit_set;
       }
 
       return *this;
