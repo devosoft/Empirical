@@ -133,11 +133,13 @@ namespace emp {
     SignalManager(const SignalManager &) = delete;
   public:
     void Register(const std::string & name, internal::Signal_Base * s) {
+      emp_assert(name != "" && "Cannot register a signal without a name!");
       emp_assert(signals.find(name) == signals.end() &&
                  "Cannot register two signals by the same name.");
       signals[name] = s;
     }
     void Register(const std::string & name, internal::Action_Base * a) {
+      emp_assert(name != "" && "Cannot register an action without a name!");
       emp_assert(actions.find(name) == actions.end() &&
                  "Cannot register two actions by the same name.");
       actions[name] = a;
@@ -211,7 +213,7 @@ namespace emp {
     FunctionSet<void, ARGS...> actions;
   public:
     Signal(const std::string & name="") : internal::Signal_Base(name) {
-      SignalManager::Get().Register(name, this);
+      if (name != "") SignalManager::Get().Register(name, this);
     }
     ~Signal() { ; }
     
@@ -255,7 +257,7 @@ namespace emp {
     FunctionSet<void> actions;
   public:
     Signal(const std::string & name="") : internal::Signal_Base(name) {
-      SignalManager::Get().Register(name, this);
+      if (name != "") SignalManager::Get().Register(name, this);
     }
     ~Signal() { ; }
     
