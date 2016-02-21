@@ -45,6 +45,7 @@
 namespace emp {
 
   // Pre-declare classes
+  template <typename... ARGS> class Signal;
   class SignalManager;
   namespace internal {
     class Action_Base;
@@ -92,8 +93,9 @@ namespace emp {
       Signal_Base(const Signal_Base &) = delete;
       Signal_Base & operator=(const Signal_Base &) = delete;
 
-      // NOTE: Trigger must have specialized arguments!  Cannot be in base class.
-      
+      // NOTE: Trigger must have specialized arguments!  We require extra testing in here.
+      template <typename... ARGS> void BaseTrigger(ARGS... args);
+     
       // Add an action by name and return a unique key for the pairing.
       LinkKey AddAction(const std::string & name);
 
@@ -188,6 +190,14 @@ namespace emp {
     }
   };
 
+
+  // Method to trigger a signal object from the BASE CLASS.
+  template <typename... ARGS>
+  void internal::Signal_Base::BaseTrigger(ARGS... args) {
+    // Make sure this base class is really of the correct derrived time.
+    emp_assert(dynamic_cast< Signal<ARGS...> * >(this));
+    ((Signal<ARGS...> *) this)->Trigger(args...);
+  }
 
   // Method to add an action by name to a Signal object
   LinkKey internal::Signal_Base::AddAction(const std::string & name)
