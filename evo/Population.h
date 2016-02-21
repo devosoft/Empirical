@@ -59,6 +59,10 @@ namespace evo {
     void Insert(const MEMBER & mem, int copy_count=1) {
       for (int i = 0; i < copy_count; i++) pop.push_back(new MEMBER(mem));
     }
+    template <typename... ARGS>
+    void Insert(Random & random, ARGS... args) {
+      pop.push_back(new MEMBER(random, std::forward<ARGS>(args)...));      
+    }
     void InsertNext(const MEMBER & mem, int copy_count=1) {
       for (int i = 0; i < copy_count; i++) next_pop.push_back(new MEMBER(mem));
     }
@@ -172,11 +176,22 @@ namespace evo {
 		       t_size, random, tourny_count);
     }
 
+
     // Update() moves the next population to the current position, managing memory as needed.
     void Update() {
       for (MEMBER * m : pop) delete m;   // Delete the current population.
       pop = next_pop;                    // Move over the next generation.
       next_pop.resize(0);                // Clear out the next pop to refill again.
+    }
+
+
+    // Execute() runs the Execute() method on all organisms in the population, forwarding
+    // any arguments.
+    template <typename... ARGS>
+    void Execute(ARGS... args) {
+      for (MEMBER * m : pop) {
+	m->Execute(std::forward<ARGS>(args)...);
+      }
     }
     
   };
