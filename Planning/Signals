@@ -1,0 +1,56 @@
+The goal of Signals and Actions are to simplify connections across a piece of
+software; is should be especially useful when the components that interact vary
+due to either lots of configuration options or plug-ins.
+
+NOTE: This is an implementation of the Observer design pattern.
+
+Components trigger signals at appropriate times.  For example, Organisms might
+trigger a signal when they reproduce, or a Population might trigger one when a
+new generation begins.
+
+Actions can be linked to signals, so the an appropriate event occurs.  When an
+organism reproduces, we might want to track it's lineage, or trigger some
+mutations.  At a new generation, we might want to collect extra statistics.
+
+Signals and actions can be associated with names, and a signal manager
+simplifies linking them together.  In the end, a signal consists of a vector
+of actions, which themselves are just function points.  Both signals and
+actions are templated so that specific arguments can be passed if desired.
+
+If a signal is triggered and no actions are associated with it, only a single
+test is done, so this should be faster than the long list of if-statments that
+were previously used to allow dynamic configurations.
+
+Since each action goes through a function pointer, there is an extra level of
+redirection when they are called, but that should be a negligible slowdown.
+
+
+The challenge lies in the questions:
+1. Where do we put the signals?
+2. How do we name the signals appropriately to be able to hook up actions.
+
+For Q1, I see three options:
+1a: Put signals statically affected classes. (e.g., in emp::Organism)
+    Pros: Low memory footpring, easy to access.
+    Cons: Any signal MUST affect all objects within the class.
+1b: Put signals into each object (e.g., in each individual organism)
+    Pros: Very flexible.
+    Cons: Annoying to initialize; takes up more space.
+1c: Put signals into continer objects (e.g., in Population)
+    Pros: Selectively flexible
+    Const: internal object need a way to link back to container; possibly pointer.
+
+
+The answer to Q1 heavily impacts Q2.  If we go with 1a, then we can simply name
+singals like "org_repro" or "org_mutate" and there's only one option.  If we go
+with 1b, we need a unique name for every signal (or some dynamic way of setting
+them up, which limits the power of signals.  In the end, both 1a and 1b have
+sufficiently large negatives that 1c is probably the way to go.
+
+For 1c, it seems the the best naming scheme is to make sure that each container
+object has its own name.  Since the signal names can be any legal string, this
+freedom would allow us to use names like "my_pop" for a population, and
+then "my_pop:org_repro" for that population's specific instance of repro.  We
+can even have faux namespaces.  For example, we could auto-generate names for
+signals in emp::web::Button using the button name.  Like "emp:web:Button:Quit"
+(or we could do other types of separators like "::" or ".")
