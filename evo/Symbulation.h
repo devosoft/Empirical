@@ -18,6 +18,7 @@
 #include "../tools/assert.h"
 #include "../tools/BitVector.h"
 #include "../tools/Random.h"
+#include "../tools/random_utils.h"
 
 namespace emp {
 namespace evo {
@@ -37,11 +38,20 @@ namespace evo {
     int streak_1;    // Number of consecutive ones executed by symbiont.
     
   public:
-    SymbulationOrg(BitVector genome) : host(genome), host_pos(0), symb_pos(0)
-				     , host_score(0), symb_score(0)
-				     , streak_0(0), streak_1(0) {
+    SymbulationOrg(const BitVector & genome)
+      : host(genome), host_pos(0), symb_pos(0)
+      , host_score(0), symb_score(0), streak_0(0), streak_1(0)
+    {
       emp_assert(host.GetSize() > 0);
     }
+    SymbulationOrg(Random & random, int size, double p=0.5)
+      : host(RandomBitVector(random, size, p)), host_pos(0), symb_pos(0)
+      , host_score(0), symb_score(0), streak_0(0), streak_1(0)
+    {
+      emp_assert(host.GetSize() > 0);
+    }
+    SymbulationOrg() = delete;
+    SymbulationOrg(const SymbulationOrg &) = default;
     ~SymbulationOrg() { ; }
 
     int GetHostScore() const { return host_score; }
@@ -106,7 +116,9 @@ namespace evo {
 	
       }
       if (++host_pos >= host.GetSize()) host_pos = 0;  // Advance host position.
+
     }
+
   };
   
 }
