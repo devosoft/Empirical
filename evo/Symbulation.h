@@ -20,11 +20,15 @@
 #include "../tools/Random.h"
 #include "../tools/random_utils.h"
 
+#include "OrgSignals.h"
+
 namespace emp {
 namespace evo {
   
   class SymbulationOrg {
   private:
+    using callback_t = OrgSignals;
+
     BitVector host;
     BitVector symbiont;
     
