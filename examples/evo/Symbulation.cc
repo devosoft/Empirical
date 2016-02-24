@@ -20,4 +20,14 @@ int main()
   emp::Random random;
   emp::evo::Population<emp::evo::SymbulationOrg> pop;
 
+  for (int i = 0; i < POP_SIZE; i++) {
+    pop.Insert(random, 100);  // Generate a random org.
+  }
+  
+  std::cout << "Start!" << std::endl;
+  pop.Execute();
+  pop.Execute();
+  pop.Execute();
+  std::cout << "Done!" << std::endl;
+  
 }
