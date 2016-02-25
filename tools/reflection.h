@@ -64,4 +64,15 @@
     return internal::RelayCall_ ## NEW_NAME(true, target, ARGS...);     \
   } int ignore_semicolon_to_follow = 0
 
+
+// This macro will create NEW_TYPE; it will use TEST_TYPE is TEST_TYPE exists,
+// otherwise it will use FALLBACK_TYPE.
+
+#define EMP_CREATE_TYPE_FALLBACK(NEW_TYPE, OBJ_TYPE, TEST_TYPE, FALLBACK_TYPE) \
+  template <typename ABC>						\
+  static auto ResolveType__ ## NEW_TYPE(typename emp::sfinae_decoy<bool, typename ABC::TEST_TYPE>::type) -> typename ABC::TEST_TYPE; \
+  template <typename ABC>						\
+  static auto ResolveType__ ## NEW_TYPE(int) -> FALLBACK_TYPE;		\
+  using NEW_TYPE = decltype(ResolveType__ ## NEW_TYPE<OBJ_TYPE>(true));
+
 #endif
