@@ -26,7 +26,6 @@ namespace evo{
     
     
   public:
-    std::set<int> current;
     LineageTracker() { ; }
     ~LineageTracker() {
       //for (GENOME g : genomes) delete &g;
@@ -44,8 +43,6 @@ namespace evo{
       GENOME* genome = (GENOME*)&(*it);
       this->org_to_genome[id] = genome;
       this->parents[id] = parent;
-      this->current.erase(parent);
-      this->current.insert(id);
 
       return id;
     }
