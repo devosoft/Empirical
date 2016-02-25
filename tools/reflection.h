@@ -1,14 +1,11 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//  This class provides macro utilities to help determine details about unknown classes.
 
 #ifndef EMP_REFLECTION_H
 #define EMP_REFLECTION_H
-
-////////////////////////////////////////////////////////////////////////////////////////
-//
-//  This class provides utilities to help determine details about classes.
-//
 
 #include "functions.h"
 
@@ -44,7 +41,7 @@
 // FALLBACK - function to call if no such member function exists.
 // RETURN_TYPE - type that should be returned by whichever function is called.
 //
-// @CAO - RETURN_TYPE should be deducible.
+// @CAO - RETURN_TYPE should be deducible from FALLBACK
 
 #define EMP_CREATE_METHOD_FALLBACK(NEW_NAME, METHOD, FALLBACK, RETURN_TYPE) \
   namespace internal {                                                  \
@@ -67,6 +64,14 @@
 
 // This macro will create NEW_TYPE; it will use TEST_TYPE if TEST_TYPE exists inside of
 // CLASS_TYPE, otherwise it will use FALLBACK_TYPE.
+//
+// For example:  EMP_CREATE_TYPE_FALLBACK(new_type, T, test_type, int);
+//
+// If class T has a member type called test_type, this is the same as:
+//    using new_type = T::test_type;
+//
+// If T does NOT have a member type called test_type, this is the same as:
+//    using new_type = int;
 
 #define EMP_CREATE_TYPE_FALLBACK(NEW_TYPE_NAME, CLASS_TYPE, TEST_TYPE, FALLBACK_TYPE) \
   template <typename ABC>						\
