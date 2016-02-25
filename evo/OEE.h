@@ -13,12 +13,13 @@
 namespace emp{
 namespace evo{
   template <typename GENOME>
-  int ChangeMetric(LineageTracker<GENOME>* lineages, 
-		   LineageTracker<GENOME>* prev_lineages, int generations){
+    int ChangeMetric(LineageTracker<GENOME>* lineages, 
+		     std::set<int> curr_generation, 
+		     std::set<int> prev_generation, int generations){
     
     //Find persistant lineages
-    std::set<GENOME> persist = GetPersistLineage(lineages, generations);
-    std::set<GENOME> prev_persist = GetPersistLineage(prev_lineages, generations);
+    std::set<GENOME> persist = GetPersistLineage(lineages, curr_generation,  generations);
+    std::set<GENOME> prev_persist = GetPersistLineage(lineages, prev_generation, generations);
     
     std::set<GENOME> result;
     std::set_difference(persist.begin(), persist.end(), prev_persist.begin(),
@@ -28,10 +29,11 @@ namespace evo{
 
   template <typename GENOME>
     std::set<GENOME> GetPersistLineage(LineageTracker<GENOME>* lineages, 
+				       std::set<int> curr_generation,
 				       int generations){
 
     std::set<GENOME> persist;
-    for (int id : lineages->current){
+    for (int id : curr_generation){
       emp::vector<GENOME*> lin = lineages->TraceLineage(id);
       persist.insert(**(lin.begin() + generations));
     }
