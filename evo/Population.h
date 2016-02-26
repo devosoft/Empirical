@@ -23,6 +23,8 @@
 #include "../tools/reflection.h"
 #include "../tools/vector.h"
 
+#include "OrgSignals.h"
+
 namespace emp {
 namespace evo {
 
