@@ -74,11 +74,11 @@
 //    using new_type = int;
 
 #define EMP_CREATE_TYPE_FALLBACK(NEW_TYPE_NAME, CLASS_TYPE, TEST_TYPE, FALLBACK_TYPE) \
-  template <typename ABC>						\
+  template <typename EMP__T>						\
   static auto ResolveType__ ## NEW_TYPE_NAME(typename emp::sfinae_decoy<bool, \
-					     typename ABC::TEST_TYPE>::type) \
-  -> typename ABC::TEST_TYPE;						\
-  template <typename ABC>						\
+					     typename EMP__T::TEST_TYPE>::type) \
+  -> typename EMP__T::TEST_TYPE;					\
+  template <typename EMP__T>						\
   static auto ResolveType__ ## NEW_TYPE_NAME(int) -> FALLBACK_TYPE;	\
   using NEW_TYPE_NAME = decltype(ResolveType__ ## NEW_TYPE_NAME<CLASS_TYPE>(true));
 
