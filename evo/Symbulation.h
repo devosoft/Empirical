@@ -27,7 +27,7 @@ namespace evo {
   
   class SymbulationOrg {
   private:
-    using callback_t = OrgSignals;
+    using callback_t = OrgSignals_Basic;
 
     BitVector host;
     BitVector symbiont;
