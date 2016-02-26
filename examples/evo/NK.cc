@@ -1,4 +1,4 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
@@ -38,7 +38,7 @@ int main()
     // Print current state.
     // for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
     // std::cout << std::endl;
-    //std::cout << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
+    std::cout << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 
     // Keep the best individual.
     pop.EliteSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1);
