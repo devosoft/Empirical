@@ -1,4 +1,4 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
@@ -20,6 +20,7 @@
 
 #include "../tools/assert.h"
 #include "../tools/Random.h"
+#include "../tools/reflection.h"
 #include "../tools/vector.h"
 
 namespace emp {
@@ -31,9 +32,14 @@ namespace evo {
     emp::vector<MEMBER *> pop;
     emp::vector<MEMBER *> next_pop;
     std::function<double(MEMBER*)> default_fit_fun;
- 
+
+    // Determine the callback type; by default this will be OrgSignals_NONE, but it can be
+    // overridden by setting the type callback_t in the organism class.
+    EMP_CREATE_TYPE_FALLBACK(callback_t, MEMBER, callback_t, OrgSignals_NONE);
+    callback_t callbacks;
+    
   public:
-    Population() { ; }
+    Population(const std::string & pop_name="emp::evo::Population") : callbacks(pop_name) { ; }
     Population(const Population &) = default;
     ~Population() { Clear(); }
     Population & operator=(const Population &) = default;
