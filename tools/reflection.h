@@ -59,7 +59,29 @@
   template <typename T, typename... ARG_TYPES>                          \
   RETURN_TYPE NEW_NAME(T & target, ARG_TYPES... ARGS) {                 \
     return internal::RelayCall_ ## NEW_NAME(true, target, ARGS...);     \
-  } int ignore_semicolon_to_follow = 0
+  } int ignore_semicolon_to_follow_ ## NEW_NAME = 0
+
+
+// Similar to EMP_CREATE_METHOD_FALLBACK, but only calls method if it exists, otherwise
+// does nothing.
+
+#define EMP_CREATE_OPTIONAL_METHOD(NEW_NAME, METHOD)			\
+  template <typename T, typename... ARG_TYPES>				\
+  void internal__RelayCall_ ## NEW_NAME(				\
+	  typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type, \
+	  T & target, ARG_TYPES... ARGS) {				\
+    std::cout << "A!" << std::endl;					\
+    return target.METHOD(ARGS...);					\
+  }									\
+  template <typename T, typename... ARG_TYPES>				\
+  void internal__RelayCall_ ## NEW_NAME(int, T &, ARG_TYPES...) {	\
+    std::cout << "B!" << std::endl;					\
+  }									\
+  									\
+  template <typename T, typename... ARG_TYPES>                          \
+  void NEW_NAME(T & target, ARG_TYPES... ARGS) {			\
+    return internal__RelayCall_ ## NEW_NAME(true, target, ARGS...);     \
+  } int ignore_semicolon_to_follow_ ## NEW_NAME = 0
 
 
 // This macro will create NEW_TYPE; it will use TEST_TYPE if TEST_TYPE exists inside of
@@ -81,5 +103,6 @@
   template <typename EMP__T>						\
   static auto ResolveType__ ## NEW_TYPE_NAME(int) -> FALLBACK_TYPE;	\
   using NEW_TYPE_NAME = decltype(ResolveType__ ## NEW_TYPE_NAME<CLASS_TYPE>(true));
+
 
 #endif
