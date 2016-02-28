@@ -39,12 +39,15 @@ namespace evo {
     // overridden by setting the type callback_t in the organism class.
     EMP_CREATE_TYPE_FALLBACK(callback_t, MEMBER, callback_t, OrgSignals_NONE);
     callback_t callbacks;
+
+    // Build a Setup method in population that calls MEMBER::Setup only if it exists.
+    EMP_CREATE_METHOD_RELAY(Setup, Setup);
     
   public:
     Population(const std::string & pop_name="emp::evo::Population") : callbacks(pop_name) { ; }
-    Population(const Population &) = default;
+    Population(const Population &) = delete;
     ~Population() { Clear(); }
-    Population & operator=(const Population &) = default;
+    Population & operator=(const Population &) = delete;
 
     int GetSize() const { return (int) pop.size(); }
     const std::function<double(MEMBER*)> & GetDefaultFitnessFun() const { return default_fit_fun; }
@@ -63,16 +66,24 @@ namespace evo {
       pop.resize(0);
       next_pop.resize(0);
     }
-    
+
+    // All additions to the population must go through one of the following Insert methods.
+    void AddOrg(MEMBER * new_org) {
+      pop.push_back(new_org);
+    }
+    void AddOrgNext(MEMBER * new_org) {
+      next_pop.push_back(new_org);
+    }
+
     void Insert(const MEMBER & mem, int copy_count=1) {
-      for (int i = 0; i < copy_count; i++) pop.push_back(new MEMBER(mem));
+      for (int i = 0; i < copy_count; i++) AddOrg(new MEMBER(mem));
     }
     template <typename... ARGS>
     void Insert(Random & random, ARGS... args) {
-      pop.push_back(new MEMBER(random, std::forward<ARGS>(args)...));      
+      AddOrg(new MEMBER(random, std::forward<ARGS>(args)...));      
     }
     void InsertNext(const MEMBER & mem, int copy_count=1) {
-      for (int i = 0; i < copy_count; i++) next_pop.push_back(new MEMBER(mem));
+      for (int i = 0; i < copy_count; i++) AddOrgNext(new MEMBER(mem));
     }
 
     // Selection mechanisms choose organisms for the next generation.
