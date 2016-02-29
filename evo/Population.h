@@ -41,8 +41,8 @@ namespace evo {
     callback_t callbacks;
 
     // Build a Setup method in population that calls MEMBER::Setup only if it exists.
-    EMP_CREATE_METHOD_RELAY(Setup, Setup);
-    
+    EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
+
   public:
     Population(const std::string & pop_name="emp::evo::Population") : callbacks(pop_name) { ; }
     Population(const Population &) = delete;
@@ -68,22 +68,20 @@ namespace evo {
     }
 
     // All additions to the population must go through one of the following Insert methods.
-    void AddOrg(MEMBER * new_org) {
-      pop.push_back(new_org);
-    }
-    void AddOrgNext(MEMBER * new_org) {
-      next_pop.push_back(new_org);
+    void AddOrg(emp::vector<MEMBER *> & target_pop, MEMBER * new_org) {
+      // SetupOrg(*new_org, &callbacks);
+      target_pop.push_back(new_org);
     }
 
     void Insert(const MEMBER & mem, int copy_count=1) {
-      for (int i = 0; i < copy_count; i++) AddOrg(new MEMBER(mem));
+      for (int i = 0; i < copy_count; i++) AddOrg(pop, new MEMBER(mem));
     }
     template <typename... ARGS>
     void Insert(Random & random, ARGS... args) {
-      AddOrg(new MEMBER(random, std::forward<ARGS>(args)...));      
+      AddOrg(pop, new MEMBER(random, std::forward<ARGS>(args)...));      
     }
     void InsertNext(const MEMBER & mem, int copy_count=1) {
-      for (int i = 0; i < copy_count; i++) AddOrgNext(new MEMBER(mem));
+      for (int i = 0; i < copy_count; i++) AddOrg(next_pop, new MEMBER(mem));
     }
 
     // Selection mechanisms choose organisms for the next generation.
