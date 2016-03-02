@@ -26,9 +26,11 @@ namespace emp {
 namespace evo {
   
   class SymbulationOrg {
-  private:
+  public:
     using callback_t = OrgSignals_Basic;
-
+  private:
+    callback_t * callbacks;
+    
     BitVector host;
     BitVector symbiont;
     
@@ -58,6 +60,11 @@ namespace evo {
     SymbulationOrg(const SymbulationOrg &) = default;
     ~SymbulationOrg() { ; }
 
+    void Setup(callback_t * in_callbacks) {
+      std::cout << "Ping!" << std::endl;
+      callbacks = in_callbacks;
+    }
+    
     int GetHostScore() const { return host_score; }
     int GetSymbiontScore() const { return symb_score; }
 
