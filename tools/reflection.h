@@ -70,12 +70,10 @@
   void internal__RelayCall_ ## NEW_NAME(				\
 	  typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type, \
 	  T & target, ARG_TYPES... ARGS) {				\
-    std::cout << "A!" << std::endl;					\
     return target.METHOD(ARGS...);					\
   }									\
   template <typename T, typename... ARG_TYPES>				\
   void internal__RelayCall_ ## NEW_NAME(int, T &, ARG_TYPES...) {	\
-    std::cout << "B!" << std::endl;					\
   }									\
   									\
   template <typename T, typename... ARG_TYPES>                          \
