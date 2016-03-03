@@ -29,33 +29,35 @@ namespace evo {
   public:
     using callback_t = OrgSignals_Basic;
   private:
+    // Fixed members
     callback_t * callbacks;
     
-    BitVector host;
-    BitVector symbiont;
-    
-    int host_pos;    // What bit position to execute next in the host?
-    int symb_pos;    // What bit position to execute next in the symbiont?
-    
-    int host_score;  // Score accumulated by host, toward replication
-    int symb_score;  // Score accumulated by symbiont, toward horizontal transmission
+    BitVector host;      // Current host genome
+    BitVector symbiont;  // Current symbiont genome
 
-    int streak_0;    // Number of consecutive zeros executed by symbiont.
-    int streak_1;    // Number of consecutive ones executed by symbiont.
+    int host_cost;       // Score needed for host to replicate.
+    int symb_cost;       // Score needed for symbiont to replicate.
+    
+    // Active members
+    int host_pos;        // What bit position to execute next in the host?
+    int symb_pos;        // What bit position to execute next in the symbiont?
+    
+    int host_score;      // Current host score, toward replication
+    int symb_score;      // Current symbiont score, toward horizontal transmission
+
+    int streak_0;        // Number of consecutive zeros executed by symbiont.
+    int streak_1;        // Number of consecutive ones executed by symbiont.
     
   public:
-    SymbulationOrg(const BitVector & genome)
-      : host(genome), host_pos(0), symb_pos(0)
+    SymbulationOrg(const BitVector & genome, int h_cost=-1, int s_cost=-1)
+      : host(genome), host_cost((s_cost<0) ? host.size() : h_cost), symb_cost(s_cost)
+      , host_pos(0), symb_pos(0)
       , host_score(0), symb_score(0), streak_0(0), streak_1(0)
     {
       emp_assert(host.GetSize() > 0);
     }
-    SymbulationOrg(Random & random, int size, double p=0.5)
-      : host(RandomBitVector(random, size, p)), host_pos(0), symb_pos(0)
-      , host_score(0), symb_score(0), streak_0(0), streak_1(0)
-    {
-      emp_assert(host.GetSize() > 0);
-    }
+    SymbulationOrg(Random & random, int size, double p=0.5, int h_cost=-1, int s_cost=-1)
+      : SymbulationOrg(RandomBitVector(random, size, p), h_cost, s_cost) { ; }
     SymbulationOrg() = delete;
     SymbulationOrg(const SymbulationOrg &) = default;
     ~SymbulationOrg() { ; }
@@ -65,6 +67,8 @@ namespace evo {
       callbacks = in_callbacks;
     }
     
+    int GetHostCost() const { return host_cost; }
+    int GetSymbiontCost() const { return symb_cost; }
     int GetHostScore() const { return host_score; }
     int GetSymbiontScore() const { return symb_score; }
 
