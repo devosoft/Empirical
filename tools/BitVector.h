@@ -70,8 +70,8 @@ namespace emp {
       return index & (FIELD_BITS-1);
     }
 
-    inline static int Byte2Field(const int index) { return index/4; }
-    inline static int Byte2FieldPos(const int index) { return (index & 3) << 3; }
+    inline static int Byte2Field(const int index) { return index/sizeof(field_type); }
+    inline static int Byte2FieldPos(const int index) { return (index & (sizeof(field_type)-1)) << 3; }
 
     // The following function assumes that the size of the bit_set has already been adjusted
     // to be the same as the size of the one being copied and only the fields need to be
@@ -271,7 +271,7 @@ namespace emp {
       const int field_id = Byte2Field(index);
       const int pos_id = Byte2FieldPos(index);
       const field_type val_uint = value;
-      bit_set[field_id] = (bit_set[field_id] & ~(255U << pos_id)) | (val_uint << pos_id);
+      bit_set[field_id] = (bit_set[field_id] & ~(static_cast<field_type>(255) << pos_id)) | (val_uint << pos_id);
     }
 
     uint32_t GetUInt(int index) const {
@@ -300,8 +300,8 @@ namespace emp {
     template <int OUT_BITS>
     field_type GetValueAtBit(int index) {
       // @CAO This function needs to be generalized to return more then 32 bits.
-      static_assert(OUT_BITS <= 32, "Requesting too many bits to fit in a UInt");
-      return GetUIntAtBit(index) & constant::MaskLow<uint32_t>(OUT_BITS);
+      static_assert(OUT_BITS <= sizeof(field_type)*8, "Requesting too many bits to fit in a UInt");
+      return GetUIntAtBit(index) & constant::MaskLow<field_type>(OUT_BITS);
     }
 
 
