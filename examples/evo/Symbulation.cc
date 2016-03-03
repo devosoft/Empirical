@@ -12,6 +12,7 @@
 #include "../../tools/Random.h"
 
 constexpr int POP_SIZE = 1000;
+constexpr int ORG_SIZE = 100;
 constexpr int UD_COUNT = 1000;
 
 
@@ -21,13 +22,13 @@ int main()
   emp::evo::Population<emp::evo::SymbulationOrg> pop;
 
   for (int i = 0; i < POP_SIZE; i++) {
-    pop.Insert(random, 100);  // Generate a random org.
+    pop.Insert(random, ORG_SIZE);  // Generate a random org.
   }
   
   std::cout << "Start!" << std::endl;
-  pop.Execute();
-  pop.Execute();
-  pop.Execute();
+  for (int ud = 0; ud < UD_COUNT; ud++) {
+    pop.Execute();
+  }
   std::cout << "Done!" << std::endl;
   
 }
