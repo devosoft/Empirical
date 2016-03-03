@@ -63,7 +63,6 @@ namespace evo {
     ~SymbulationOrg() { ; }
 
     void Setup(callback_t * in_callbacks) {
-      std::cout << "Ping!" << std::endl;
       callbacks = in_callbacks;
     }
     
