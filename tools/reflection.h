@@ -63,7 +63,7 @@
 
 
 // Similar to EMP_CREATE_METHOD_FALLBACK, but only calls method if it exists, otherwise
-// does nothing.
+// does nothing.  Note, must have a void return type to facilitate doing nothing.
 
 #define EMP_CREATE_OPTIONAL_METHOD(NEW_NAME, METHOD)			\
   template <typename T, typename... ARG_TYPES>				\
