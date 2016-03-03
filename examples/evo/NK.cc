@@ -38,7 +38,7 @@ int main()
     // Print current state.
     // for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
     // std::cout << std::endl;
-    std::cout << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
+    std::cout << ud << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 
     // Keep the best individual.
     pop.EliteSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1);
@@ -58,5 +58,5 @@ int main()
   }
   
 
-  std::cout << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
+  std::cout << UD_COUNT << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 }
