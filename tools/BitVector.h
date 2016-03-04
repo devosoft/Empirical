@@ -246,14 +246,14 @@ namespace emp {
       assert(index >= 0 && index < num_bits);
       const int field_id = FieldID(index);
       const int pos_id = FieldPos(index);
-      return (bit_set[field_id] & (1U << pos_id)) != 0;
+      return (bit_set[field_id] & (static_cast<field_type>(1) << pos_id)) != 0;
     }
 
     void Set(int index, bool value) {
       assert(index >= 0 && index < num_bits);
       const int field_id = FieldID(index);
       const int pos_id = FieldPos(index);
-      const int pos_mask = 1U << pos_id;
+      const field_type pos_mask = static_cast<field_type>(1) << pos_id;
 
       if (value) bit_set[field_id] |= pos_mask;
       else       bit_set[field_id] &= ~pos_mask;
@@ -299,7 +299,7 @@ namespace emp {
 
     template <int OUT_BITS>
     field_type GetValueAtBit(int index) {
-      // @CAO This function needs to be generalized to return more then 32 bits.
+      // @CAO This function needs to be generalized to return more then sizeof(field_type)*8 bits.
       static_assert(OUT_BITS <= sizeof(field_type)*8, "Requesting too many bits to fit in a UInt");
       return GetUIntAtBit(index) & constant::MaskLow<field_type>(OUT_BITS);
     }
