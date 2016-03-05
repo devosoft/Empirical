@@ -8,7 +8,7 @@
 TEST_CASE("Test Body2d", "[geometry]")
 {
   emp::Circle<double> body_outline(10.0);
-  emp::CircleBody2D<int, double> body1(body_outline);
+  emp::CircleBody2D body1(body_outline);
 
 
   // Test to make sure shifts and pressure are being calculated correctly.
@@ -27,7 +27,7 @@ TEST_CASE("Test Body2d", "[geometry]")
 
   // Start a round of replication for tests
 
-  emp::CircleBody2D<int, double> & body2 = *(body1.BuildOffspring({3.0, -4.0}));
+  emp::CircleBody2D & body2 = *(body1.BuildOffspring({3.0, -4.0}));
 
   // Make sure original organism is linked to offspring.
   REQUIRE(body1.IsLinked(body2));
