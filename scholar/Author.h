@@ -69,6 +69,7 @@ namespace emp {
       if (HasFirstName()) inits.push_back(first_name[0]);
       if (HasMiddleName()) inits.push_back(middle_name[0]);
       if (HasLastName()) inits.push_back(last_name[0]);
+      return inits;
     }
   };
 
