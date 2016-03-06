@@ -1,4 +1,4 @@
-CXX = g++-4.8
+CXX = g++
 GCOV_FLAGS = -o0 -g -fprofile-arcs -ftest-coverage
 
 test: test_driver.cc test_tools.cc
