@@ -43,8 +43,19 @@ namespace evo {
     // Build a Setup method in population that calls MEMBER::Setup only if it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
+    void DoRepro(int id) {
+      std::cout << "Repro " << id << std::endl;
+    }
+    
+    void SetupCallbacks(OrgSignals_NONE &) { ; }
+    void SetupCallbacks(OrgSignals_Basic & sigs) {
+      sigs.repro_sig.AddAction([this](int id){DoRepro(id);});
+    }
+    
   public:
-    Population(const std::string & pop_name="emp::evo::Population") : callbacks(pop_name) { ; }
+    Population(const std::string & pop_name="emp::evo::Population") : callbacks(pop_name) {
+      SetupCallbacks(callbacks);
+    }
     Population(const Population &) = delete;
     ~Population() { Clear(); }
     Population & operator=(const Population &) = delete;
@@ -69,7 +80,7 @@ namespace evo {
 
     // All additions to the population must go through one of the following Insert methods.
     void AddOrg(emp::vector<MEMBER *> & target_pop, MEMBER * new_org) {
-      // SetupOrg(*new_org, &callbacks);
+      SetupOrg(*new_org, &callbacks, (int) target_pop.size());
       target_pop.push_back(new_org);
     }
 

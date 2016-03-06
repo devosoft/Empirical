@@ -25,7 +25,7 @@ namespace evo {
   struct OrgSignals_Basic {
     static std::string GetName() { return "OrgSignals_Basic"; }
 
-    Signal<> repro_sig;
+    Signal<int> repro_sig;
     std::string prefix;
 
     OrgSignals_Basic(const std::string & sig_prefix)
