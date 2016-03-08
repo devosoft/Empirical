@@ -67,6 +67,12 @@ namespace evo {
       callbacks = in_callbacks;
       id = in_id;
     }
+
+    void Reset(){
+      host_pos = symb_pos = 0;
+      host_score = symb_score = 0;
+      streak_0 = streak_1 = 0;
+    }
     
     int GetHostCost() const { return host_cost; }
     int GetSymbiontCost() const { return symb_cost; }
@@ -101,8 +107,12 @@ namespace evo {
       return false;
     }
 
-    void TestHostRepro() {
-      if (host_score > host_cost) callbacks->repro_sig.Trigger(id);
+    void TestHostRepro() {      
+      // Trigger reproduction.
+      if (host_score > host_cost) {
+	Reset();                          // Reset before replication.
+	callbacks->repro_sig.Trigger(id); // Trigger replication call.
+      }
     }
     
     void Execute(bool use_streaks=true, bool align_symbiont=false,
