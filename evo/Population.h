@@ -46,11 +46,28 @@ namespace evo {
     // only if it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
+
+    // AddOrg and ReplaceOrg should be the only ways new organisms come into a population.
+    // AddOrg inserts them into the end of the designated population.
+    // ReplaceOrg places them at a specific position, replacing anyone who may already be there.
+    void AddOrg(emp::vector<MEMBER *> & target_pop, MEMBER * new_org) {
+      SetupOrg(*new_org, &callbacks, (int) target_pop.size());
+      target_pop.push_back(new_org);
+    }
+
+    void ReplaceOrg(emp::vector<MEMBER *> & target_pop, int pos, MEMBER * new_org) {
+      if (pop[pos]) delete pop[pos];
+      pop[pos] = new_org;
+      SetupOrg(*new_org, &callbacks, pos);
+    }
+    
     void DoRepro(int id) {
       emp_assert(random_ptr != nullptr && "DoRepro() requires a random number generator.");
       std::cout << "Repro " << id << std::endl;
       MEMBER * new_org = new MEMBER(*(pop[id]));
       // @CAO For the moment, assume random replacement (in the future, setup a topology)
+      const int target_id = random_ptr->GetInt((int) pop.size());
+      ReplaceOrg(pop, target_id, new_org);
     }
     
     void SetupCallbacks(OrgSignals_NONE &) { ; }
@@ -95,11 +112,8 @@ namespace evo {
       next_pop.resize(0);
     }
 
-    // All additions to the population must go through one of the following Insert methods.
-    void AddOrg(emp::vector<MEMBER *> & target_pop, MEMBER * new_org) {
-      SetupOrg(*new_org, &callbacks, (int) target_pop.size());
-      target_pop.push_back(new_org);
-    }
+    // All additions to the population must go through one of the following Insert methods
+    // (all of which call AddOrg())
 
     void Insert(const MEMBER & mem, int copy_count=1) {
       for (int i = 0; i < copy_count; i++) AddOrg(pop, new MEMBER(mem));
