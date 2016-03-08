@@ -33,6 +33,7 @@ namespace evo {
   protected:
     emp::vector<MEMBER *> pop;
     emp::vector<MEMBER *> next_pop;
+    emp::Random * random_ptr;
     std::function<double(MEMBER*)> default_fit_fun;  // Returns fitness.
     std::function<bool(MEMBER*)> default_mut_fun;    // Returns if there was a mutation.
 
@@ -46,6 +47,7 @@ namespace evo {
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
     void DoRepro(int id) {
+      emp_assert(random_ptr != nullptr && "DoRepro() requires a random number generator.");
       std::cout << "Repro " << id << std::endl;
       MEMBER * new_org = new MEMBER(*(pop[id]));
       // @CAO For the moment, assume random replacement (in the future, setup a topology)
@@ -57,7 +59,14 @@ namespace evo {
     }
     
   public:
-    Population(const std::string & pop_name="emp::evo::Population") : callbacks(pop_name) {
+    Population(const std::string & pop_name="emp::evo::Population")
+      : random_ptr(nullptr), callbacks(pop_name)
+    {
+      SetupCallbacks(callbacks);
+    }
+    Population(emp::Random & random, const std::string & pop_name="emp::evo::Population")
+      : random_ptr(&random), callbacks(pop_name)
+    {
       SetupCallbacks(callbacks);
     }
     Population(const Population &) = delete;
@@ -98,6 +107,11 @@ namespace evo {
     template <typename... ARGS>
     void Insert(Random & random, ARGS... args) {
       AddOrg(pop, new MEMBER(random, std::forward<ARGS>(args)...));      
+    }
+    template <typename... ARGS>
+    void InsertRandomOrg(ARGS... args) {
+      emp_assert(random_ptr != nullptr && "InsertRandomOrg() requires active random_ptr");
+      AddOrg(pop, new MEMBER(*random_ptr, std::forward<ARGS>(args)...));      
     }
     void InsertNext(const MEMBER & mem, int copy_count=1) {
       for (int i = 0; i < copy_count; i++) AddOrg(next_pop, new MEMBER(mem));
@@ -144,30 +158,29 @@ namespace evo {
 
     // Tournament Selection create a tournament with a random sub-set of organisms,
     // finds the one with the highest fitness, and moves it to the next generation.
-    // User provides the fitness function, the tournament size, the random-number generator
-    // and (optionally) the number of tournaments to run.
+    // User provides the fitness function, the tournament size, and (optionally) the
+    // number of tournaments to run.
     void TournamentSelect(std::function<double(MEMBER*)> fit_fun, int t_size,
-                          Random & random, int tourny_count=1) {
+			  int tourny_count=1) {
       emp_assert(t_size > 0 && t_size <= (int) pop.size());
 
       // Pre-calculate fitnesses.
       std::vector<double> fitness(pop.size());
       for (int i = 0; i < (int) pop.size(); ++i) fitness[i] = fit_fun(pop[i]);
 
-      RunTournament(fitness, t_size, random, tourny_count);
-
+      RunTournament(fitness, t_size, tourny_count);
     }
 
     // Tournament Selection can use the default fitness function.
-    void TournamentSelect(int t_size, Random & random, int tourny_count=1) {
-      TournamentSelect(default_fit_fun, t_size, random, tourny_count);
+    void TournamentSelect(int t_size, int tourny_count=1) {
+      TournamentSelect(default_fit_fun, t_size, tourny_count);
     }
 
-    // Helper function to actually run tournament
-    void RunTournament(std::vector<double> fitness, int t_size, 
-		       Random & random, int tourny_count=1){
+    // Helper function to actually run a tournament
+    void RunTournament(std::vector<double> fitness, int t_size, int tourny_count=1){
+      emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
       for (int T = 0; T < tourny_count; T++) {
-        std::vector<int> entries = random.Choose(pop.size(), t_size);
+        std::vector<int> entries = random_ptr->Choose(pop.size(), t_size);
         double best_fit = fitness[entries[0]];
         int best_id = entries[0];
       
@@ -191,13 +204,10 @@ namespace evo {
     // a sharing threshold (sigma share) that defines which members are
     // in the same niche, and a value of alpha (which controls the shape of
     // the fitness sharing curve
-    void FitnessSharingTournamentSelect(std::function<double(MEMBER*)> 
-					fit_fun, 
-					std::function<double(MEMBER*, MEMBER*)>
-					dist_fun,
+    void FitnessSharingTournamentSelect(std::function<double(MEMBER*)> fit_fun, 
+					std::function<double(MEMBER*, MEMBER*)> dist_fun,
 					double sharing_threshhold, double alpha,
-					int t_size, Random & random, 
-					int tourny_count=1){
+					int t_size, int tourny_count=1){
 
       emp_assert(t_size > 0 && t_size <= (int) pop.size());
 
@@ -212,17 +222,15 @@ namespace evo {
 	fitness[i] = fit_fun(pop[i])/niche_count;
       }
 
-      RunTournament(fitness, t_size, random, tourny_count);      
+      RunTournament(fitness, t_size, tourny_count);      
     }
 
     // Fitness sharing Tournament Selection can use the default fitness function
     void FitnessSharingTournamentSelect(std::function<double(MEMBER*, MEMBER*)>
 					dist_fun, double sharing_threshold, 
 					double alpha, int t_size, 
-					Random & random, 
 					int tourny_count=1) {
-      TournamentSelect(default_fit_fun, dist_fun, sharing_threshold, alpha, 
-		       t_size, random, tourny_count);
+      TournamentSelect(default_fit_fun, dist_fun, sharing_threshold, alpha, t_size, tourny_count);
     }
 
 
