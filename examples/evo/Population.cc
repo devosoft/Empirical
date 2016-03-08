@@ -1,4 +1,5 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
@@ -12,7 +13,8 @@
 
 int main()
 {
-  emp::evo::Population<int> pop;
+  emp::Random random;
+  emp::evo::Population<int> pop(random);
 
   for (int i = 0; i < 100; i++) pop.Insert(i+100);
 
@@ -20,8 +22,7 @@ int main()
   for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << " ";
   std::cout << std::endl;
 
-  emp::Random random;
-  pop.TournamentSelect([](int * i){ return (double) *i; }, 5, random, 100);
+  pop.TournamentSelect([](int * i){ return (double) *i; }, 5, 100);
   pop.Update();
   std::cout << "Post-Tourney Size = " << pop.GetSize() << std::endl;
   for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << " ";

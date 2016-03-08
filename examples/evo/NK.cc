@@ -24,7 +24,7 @@ int main()
 {
   emp::Random random;
   emp::evo::NKLandscape<N,K> landscape(random);
-  emp::evo::Population<BitOrg> pop;
+  emp::evo::Population<BitOrg> pop(random);
 
   // Build a random initial population
   for (int i = 0; i < POP_SIZE; i++) {
@@ -33,6 +33,14 @@ int main()
     pop.Insert(next_org);
   }
 
+  pop.SetDefaultMutationFun( [&random](BitOrg* org){
+      (*org)[random.GetInt(N)] = random.P(0.5);
+      (*org)[random.GetInt(N)] = random.P(0.5);
+      (*org)[random.GetInt(N)] = random.P(0.5);
+      return true;
+    } );
+
+  
   // Loop through updates
   for (int ud = 0; ud < UD_COUNT; ud++) {
     // Print current state.
@@ -45,16 +53,9 @@ int main()
 
     // Run a tournament for the rest...
     pop.TournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }
-			 , 5, random, POP_SIZE-1);
+			 , 5, POP_SIZE-1);
     pop.Update();
-
-    // Do mutations...
-    for (int i = 1; i < pop.GetSize(); i++) {
-      pop[i][random.GetInt(N)] = random.P(0.5);
-      pop[i][random.GetInt(N)] = random.P(0.5);
-      pop[i][random.GetInt(N)] = random.P(0.5);
-    }
-
+    pop.Mutate();
   }
   
 

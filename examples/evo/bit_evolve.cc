@@ -1,4 +1,4 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
@@ -16,8 +16,7 @@ using BitOrg = emp::BitSet<100>;
 int main()
 {
   emp::Random random;
-
-  emp::evo::Population<BitOrg> pop;
+  emp::evo::Population<BitOrg> pop(random);
 
   // Build a random initial population
   for (int i = 0; i < 100; i++) {
@@ -33,7 +32,7 @@ int main()
   // Loop through 100 updates
   for (int ud = 0; ud < 100; ud++) {
     // Run a tournament...
-    pop.TournamentSelect([](BitOrg * org){ return (double) org->CountOnes(); }, 5, random, 100);
+    pop.TournamentSelect([](BitOrg * org){ return (double) org->CountOnes(); }, 5, 100);
     pop.Update();
 
     // Do mutations...
