@@ -1,4 +1,4 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
@@ -11,7 +11,7 @@
 #include "../../evo/Population.h"
 #include "../../tools/Random.h"
 
-constexpr int POP_SIZE = 1000;
+constexpr int POP_SIZE = 10;
 constexpr int ORG_SIZE = 100;
 constexpr int UD_COUNT = 1000;
 
@@ -19,7 +19,7 @@ constexpr int UD_COUNT = 1000;
 int main()
 {
   emp::Random random;
-  emp::evo::Population<emp::evo::SymbulationOrg> pop;
+  emp::evo::Population<emp::evo::SymbulationOrg> pop(random);
 
   for (int i = 0; i < POP_SIZE; i++) {
     pop.Insert(random, ORG_SIZE);  // Generate a random org.

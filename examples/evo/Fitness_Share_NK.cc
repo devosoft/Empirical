@@ -1,4 +1,4 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
@@ -24,7 +24,7 @@ int main()
 {
   emp::Random random;
   emp::evo::NKLandscape<N,K> landscape(random);
-  emp::evo::Population<BitOrg> pop;
+  emp::evo::Population<BitOrg> pop(random);
 
   // Build a random initial population
   for (int i = 0; i < POP_SIZE; i++) {
@@ -44,7 +44,7 @@ int main()
     pop.EliteSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1);
 
     // Run a tournament for the rest...
-    pop.FitnessSharingTournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }, [](BitOrg* org1, BitOrg* org2){ return (double)(org1->XOR(*org2)).CountOnes();}, 10, 1, 5, random, POP_SIZE-1);
+    pop.FitnessSharingTournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }, [](BitOrg* org1, BitOrg* org2){ return (double)(org1->XOR(*org2)).CountOnes();}, 10, 1, 5, POP_SIZE-1);
     pop.Update();
 
     // Do mutations...
