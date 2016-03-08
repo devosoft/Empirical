@@ -33,18 +33,22 @@ namespace evo {
   protected:
     emp::vector<MEMBER *> pop;
     emp::vector<MEMBER *> next_pop;
-    std::function<double(MEMBER*)> default_fit_fun;
+    std::function<double(MEMBER*)> default_fit_fun;  // Returns fitness.
+    std::function<bool(MEMBER*)> default_mut_fun;    // Returns if there was a mutation.
 
     // Determine the callback type; by default this will be OrgSignals_NONE, but it can be
     // overridden by setting the type callback_t in the organism class.
     EMP_CREATE_TYPE_FALLBACK(callback_t, MEMBER, callback_t, OrgSignals_NONE);
     callback_t callbacks;
 
-    // Build a Setup method in population that calls MEMBER::Setup only if it exists.
+    // Build a Setup method in population that calls .Setup() on whatever is passed in, but
+    // only if it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
     void DoRepro(int id) {
       std::cout << "Repro " << id << std::endl;
+      MEMBER * new_org = new MEMBER(*(pop[id]));
+      // @CAO For the moment, assume random replacement (in the future, setup a topology)
     }
     
     void SetupCallbacks(OrgSignals_NONE &) { ; }
@@ -62,10 +66,14 @@ namespace evo {
 
     int GetSize() const { return (int) pop.size(); }
     const std::function<double(MEMBER*)> & GetDefaultFitnessFun() const { return default_fit_fun; }
+    const std::function<bool(MEMBER*)> & GetDefaultMutationFun() const { return default_mut_fun; }
     MEMBER & operator[](int i) { return *(pop[i]); }
 
     void SetDefaultFitnessFun(const std::function<double(MEMBER*)> & f) {
       default_fit_fun = f;
+    }
+    void SetDefaultMutationFun(const std::function<bool(MEMBER*)> & f) {
+      default_mut_fun = f;
     }
     
     
@@ -95,6 +103,19 @@ namespace evo {
       for (int i = 0; i < copy_count; i++) AddOrg(next_pop, new MEMBER(mem));
     }
 
+    // Mutations for the next generation (count number of mutated organisms)
+    int Mutate(std::function<bool(MEMBER*)> mut_fun, const int first_mut=1) {
+      int mut_count = 0;
+      for (int i = 1; i < (int) pop.size(); i++) {
+	if (mut_fun(pop[i])) mut_count++;
+      }
+      return mut_count;
+    }
+
+    int Mutate(const int first_mut=1) {
+      return Mutate(default_mut_fun, first_mut);
+    }
+    
     // Selection mechanisms choose organisms for the next generation.
 
     // Elite Selection picks a set of the most fit individuals from the population to move to
