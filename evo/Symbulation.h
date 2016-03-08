@@ -30,29 +30,30 @@ namespace evo {
     using callback_t = OrgSignals_Basic;
   private:
     // Fixed members
-    callback_t * callbacks;
+    callback_t * callbacks; // Callbacks to population
+    int id;                 // Organism ID
     
-    BitVector host;      // Current host genome
-    BitVector symbiont;  // Current symbiont genome
+    BitVector host;         // Current host genome
+    BitVector symbiont;     // Current symbiont genome
 
-    int host_cost;       // Score needed for host to replicate.
-    int symb_cost;       // Score needed for symbiont to replicate.
+    int host_cost;          // Score needed for host to replicate.
+    int symb_cost;          // Score needed for symbiont to replicate.
     
     // Active members
-    int host_pos;        // What bit position to execute next in the host?
-    int symb_pos;        // What bit position to execute next in the symbiont?
+    int host_pos;           // What bit position to execute next in the host?
+    int symb_pos;           // What bit position to execute next in the symbiont?
     
-    int host_score;      // Current host score, toward replication
-    int symb_score;      // Current symbiont score, toward horizontal transmission
+    int host_score;         // Current host score, toward replication
+    int symb_score;         // Current symbiont score, toward horizontal transmission
 
-    int streak_0;        // Number of consecutive zeros executed by symbiont.
-    int streak_1;        // Number of consecutive ones executed by symbiont.
+    int streak_0;           // Number of consecutive zeros executed by symbiont.
+    int streak_1;           // Number of consecutive ones executed by symbiont.
     
   public:
     SymbulationOrg(const BitVector & genome, int h_cost=-1, int s_cost=-1)
-      : host(genome), host_cost((s_cost<0) ? host.size() : h_cost), symb_cost(s_cost)
-      , host_pos(0), symb_pos(0)
-      , host_score(0), symb_score(0), streak_0(0), streak_1(0)
+      : callbacks(nullptr), id(-1), host(genome)
+      , host_cost((s_cost<0) ? host.size() : h_cost), symb_cost(s_cost)
+      , host_pos(0), symb_pos(0), host_score(0), symb_score(0), streak_0(0), streak_1(0)
     {
       emp_assert(host.GetSize() > 0);
     }
@@ -62,8 +63,9 @@ namespace evo {
     SymbulationOrg(const SymbulationOrg &) = default;
     ~SymbulationOrg() { ; }
 
-    void Setup(callback_t * in_callbacks) {
+    void Setup(callback_t * in_callbacks, int in_id) {
       callbacks = in_callbacks;
+      id = in_id;
     }
     
     int GetHostCost() const { return host_cost; }
@@ -98,12 +100,19 @@ namespace evo {
       }
       return false;
     }
+
+    void TestHostRepro() {
+      if (host_score > host_cost) callbacks->repro_sig.Trigger(id);
+    }
     
     void Execute(bool use_streaks=true, bool align_symbiont=false,
 		 int host_self_bonus=1, int symb_self_bonus=1, int symb_host_bonus=1)
     {
+      emp_assert(callbacks != nullptr);
+      
       if (host[host_pos]) {                            // Host generating score for itself.
 	host_score += host_self_bonus;
+	TestHostRepro();
       }
       else if (symbiont.GetSize()) {                   // Host allowing extant symbiont to execute.
 	// If a symbiont should exectue at the same position as a host, readjust.
