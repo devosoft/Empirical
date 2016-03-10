@@ -33,6 +33,22 @@ namespace evo {
     { ; }
   };
 
+
+  // A more detailed set of signals with ecological interactions of all sorts.
+  struct OrgSignals_Eco {
+    static std::string GetName() { return "OrgSignals_Eco"; }
+
+    Signal<int> repro_sig;           // Identify organism reproducing.
+    Signal<int> symbiont_repro_sig;  // Identify organism with symbiont reproducing.
+    std::string prefix;
+
+    OrgSignals_Eco(const std::string & sig_prefix)
+      : repro_sig(to_string(sig_prefix, ":repro"))
+      , symbiont_repro_sig(to_string(sig_prefix, ":symbiont_repro"))
+      , prefix(sig_prefix)
+    { ; }
+  };
+
 }
 }
 
