@@ -70,9 +70,23 @@ namespace evo {
       ReplaceOrg(pop, target_id, new_org);
     }
     
+    void DoSymbiontRepro(int id) {
+      emp_assert(random_ptr != nullptr && "DoSymbiontRepro() requires a random number generator.");
+      std::cout << "SymbRepro " << id << std::endl;
+      // @CAO For the moment, assume random replacement (in the future, setup a topology)
+      const int target_id = random_ptr->GetInt((int) pop.size());
+
+      // @CAO Call member class function to determine which symboiont is being comied from
+      // the host in id, and how (and if) they should going into the target id.
+    }
+    
     void SetupCallbacks(OrgSignals_NONE &) { ; }
     void SetupCallbacks(OrgSignals_Basic & sigs) {
       sigs.repro_sig.AddAction([this](int id){DoRepro(id);});
+    }
+    void SetupCallbacks(OrgSignals_Eco & sigs) {
+      sigs.repro_sig.AddAction([this](int id){DoRepro(id);});
+      sigs.symbiont_repro_sig.AddAction([this](int id){DoSymbiontRepro(id);});
     }
     
   public:
