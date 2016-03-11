@@ -27,7 +27,7 @@ namespace evo {
   
   class SymbulationOrg {
   public:
-    using callback_t = OrgSignals_Basic;
+    using callback_t = OrgSignals_Eco;
   private:
     // Fixed members
     callback_t * callbacks; // Callbacks to population
@@ -109,9 +109,17 @@ namespace evo {
 
     void TestHostRepro() {      
       // Trigger reproduction.
-      if (host_score > host_cost) {
+      if (host_score >= host_cost) {
 	Reset();                          // Reset before replication.
 	callbacks->repro_sig.Trigger(id); // Trigger replication call.
+      }
+    }
+    
+    void TestSymbiontRepro() {      
+      // Trigger reproduction.
+      if (symb_score >= symb_cost) {
+	Reset();                               // Reset before replication.
+	callbacks->symbiont_repro_sig.Trigger(id); // Trigger symbiont replication call.
       }
     }
     
@@ -137,6 +145,7 @@ namespace evo {
 	    host_score += streak_1 * symb_host_bonus;
 	  }
 	  else host_score += symb_host_bonus;
+	  TestHostRepro();
 	}
 	else {                                         // Symbiont helping itself.
 	  if (use_streaks) {
@@ -144,6 +153,7 @@ namespace evo {
 	    symb_score += streak_0 * symb_self_bonus;
 	  }
 	  else symb_score += symb_self_bonus;
+	  TestSymbiontRepro();
 	}
 	if (++symb_pos >= symbiont.GetSize()) symb_pos = 0;  // Advance symbiont position.
 	
