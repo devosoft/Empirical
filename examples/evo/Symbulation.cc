@@ -11,9 +11,10 @@
 #include "../../evo/Population.h"
 #include "../../tools/Random.h"
 
-constexpr int POP_SIZE = 10;
-constexpr int ORG_SIZE = 100;
-constexpr int UD_COUNT = 1000;
+constexpr int POP_SIZE  = 14000;
+constexpr int ORG_SIZE  = 100;
+constexpr int SYMB_SIZE = 50;
+constexpr int UD_COUNT  = 20000;
 
 
 int main()
@@ -23,6 +24,7 @@ int main()
 
   for (int i = 0; i < POP_SIZE; i++) {
     pop.Insert(random, ORG_SIZE);  // Generate a random org.
+    pop[i].SetSymbiont(RandomBitVector(random, SYMB_SIZE, 0.5));
   }
   
   std::cout << "Start!" << std::endl;
