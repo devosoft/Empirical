@@ -10,7 +10,12 @@
 //
 //  A 1 executed in the symbiont increases org_score by the number of consecutive ones thus far.
 //  A 0 exectued in the symbiont increases symb_score by the number of consecutive zeroes thus far.
-
+//
+//
+//  Developer notes:
+//  * Implement chance of vertical transmission.
+//  * Implement chance of existing symbiont repelling horizontal transmission.
+//  * Implement stats collection.
 
 #ifndef SYMBULATION_H
 #define SYMBULATION_H
@@ -118,7 +123,8 @@ namespace evo {
     void TestSymbiontRepro() {      
       // Trigger reproduction.
       if (symb_score >= symb_cost) {
-	Reset();                               // Reset before replication.
+	symb_pos = symb_score = 0;                 // Reset Symbiont stats.
+	streak_0 = streak_1 = 0;
 	callbacks->symbiont_repro_sig.Trigger(id); // Trigger symbiont replication call.
       }
     }
