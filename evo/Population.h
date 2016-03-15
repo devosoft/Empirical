@@ -14,22 +14,23 @@
 // Constructors:
 //  Population(const std::string & pop_name="emp::evo::Population")
 //  Population(emp::Random & random, const std::string & pop_name="emp::evo::Population")
+//     pop_name is prepended before all signal names.
+//     random is used as a random number seed, if needed.
 //
 // Accessors
 //  int GetSize() const
+//  MEMBER & operator[](int i)
 //  const std::function<double(MEMBER*)> & GetDefaultFitnessFun() const
 //  const std::function<bool(MEMBER*)> & GetDefaultMutationFun() const
-//  MEMBER & operator[](int i)
-//
-//  void SetDefaultFitnessFun(const std::function<double(MEMBER*)> & f) {
-//  void SetDefaultMutationFun(const std::function<bool(MEMBER*)> & f) {
+//  void SetDefaultFitnessFun(const std::function<double(MEMBER*)> & f)
+//  void SetDefaultMutationFun(const std::function<bool(MEMBER*)> & f)
 //
 // Population Building
-//  void Clear() {
-//  void Insert(const MEMBER & mem, int copy_count=1)
-//  void Insert(Random & random, ARGS... args)
+//  void Clear()                                           - Clear all organisms in population
+//  void Insert(const MEMBER & mem, int copy_count=1)      - Insert a copy of an individual
+//  void Insert(Random & random, ARGS... args)             - Insert a random organism
 //  void InsertRandomOrg(ARGS... args)
-//  void InsertNext(const MEMBER & mem, int copy_count=1) {
+//  void InsertNext(const MEMBER & mem, int copy_count=1)  - Insert into NEXT GENERATION of pop
 //
 // Population Variation
 //  int Mutate(std::function<bool(MEMBER*)> mut_fun, const int first_mut=1)
@@ -53,8 +54,8 @@
 //					int tourny_count=1)
 //
 // Advancing Population
-//  void Update();
-//  void Execute(ARGS... args)
+//  void Update()                  -- Shift to the next generation.
+//  void Execute(ARGS... args)     -- Execute each organism in the population.
 
 	
 
