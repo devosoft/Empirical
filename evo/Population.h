@@ -8,9 +8,55 @@
 //  MEMBER can be any object type with the following properties:
 //  * The copy constructor must work.
 //
-//  Dervied version of this class (with more complex population structuress)
+//  Dervied versions of this class (with more complex population structuress)
 //  may have additional requirements.
+//
+// Constructors:
+//  Population(const std::string & pop_name="emp::evo::Population")
+//  Population(emp::Random & random, const std::string & pop_name="emp::evo::Population")
+//
+// Accessors
+//  int GetSize() const
+//  const std::function<double(MEMBER*)> & GetDefaultFitnessFun() const
+//  const std::function<bool(MEMBER*)> & GetDefaultMutationFun() const
+//  MEMBER & operator[](int i)
+//
+//  void SetDefaultFitnessFun(const std::function<double(MEMBER*)> & f) {
+//  void SetDefaultMutationFun(const std::function<bool(MEMBER*)> & f) {
+//
+// Population Building
+//  void Clear() {
+//  void Insert(const MEMBER & mem, int copy_count=1)
+//  void Insert(Random & random, ARGS... args)
+//  void InsertRandomOrg(ARGS... args)
+//  void InsertNext(const MEMBER & mem, int copy_count=1) {
+//
+// Population Variation
+//  int Mutate(std::function<bool(MEMBER*)> mut_fun, const int first_mut=1)
+//  int Mutate(const int first_mut=1)
+//
+// Selection Mechanisms
+//  void EliteSelect(std::function<double(MEMBER*)> fit_fun, int e_count=1, int copy_count=1)
+//  void EliteSelect(int e_count=1, int copy_count=1)
+//
+//  void TournamentSelect(std::function<double(MEMBER*)> fit_fun, int t_size, int tourny_count=1)
+//  void TournamentSelect(int t_size, int tourny_count=1)
+//  void RunTournament(std::vector<double> fitness, int t_size, int tourny_count=1)
+//
+//  void FitnessSharingTournamentSelect(std::function<double(MEMBER*)> fit_fun, 
+//					std::function<double(MEMBER*, MEMBER*)> dist_fun,
+//					double sharing_threshhold, double alpha,
+//					int t_size, int tourny_count=1)
+//  void FitnessSharingTournamentSelect(std::function<double(MEMBER*, MEMBER*)>
+//					dist_fun, double sharing_threshold, 
+//					double alpha, int t_size, 
+//					int tourny_count=1)
+//
+// Advancing Population
+//  void Update();
+//  void Execute(ARGS... args)
 
+	
 
 #ifndef EMP_POPULATION_H
 #define EMP_POPULATION_H
