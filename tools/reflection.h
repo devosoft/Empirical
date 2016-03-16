@@ -13,7 +13,7 @@
 // specific member.  From: https://en.wikibooks.org/wiki/More_C++_Idioms/Member_Detector
 
 #define EMP_CREATE_MEMBER_DETECTOR(MEMBER_NAME)                         \
-  template<typename T>                                                  \
+  template <typename T>							\
   class EMP_Detect_ ## MEMBER_NAME {                                    \
   private:                                                              \
     struct Fallback { int MEMBER_NAME; };                               \
@@ -70,7 +70,7 @@
   void internal__RelayCall_ ## NEW_NAME(				\
 	  typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type, \
 	  T & target, ARG_TYPES... ARGS) {				\
-    return target.METHOD(ARGS...);					\
+    target.METHOD(ARGS...);						\
   }									\
   template <typename T, typename... ARG_TYPES>				\
   void internal__RelayCall_ ## NEW_NAME(int, T &, ARG_TYPES...) {	\
@@ -78,6 +78,26 @@
   									\
   template <typename T, typename... ARG_TYPES>                          \
   void NEW_NAME(T & target, ARG_TYPES... ARGS) {			\
+    internal__RelayCall_ ## NEW_NAME(true, target, ARGS...);		\
+  } int ignore_semicolon_to_follow_ ## NEW_NAME = 0
+
+
+// Same as above, but a return type and default value are specified.
+
+#define EMP_CREATE_OPTIONAL_METHOD_RT(NEW_NAME, METHOD, RTYPE, DEFAULT)	\
+  template <typename T, typename... ARG_TYPES>				\
+  RTYPE internal__RelayCall_ ## NEW_NAME(				\
+	  typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type, \
+	  T & target, ARG_TYPES... ARGS) {				\
+    return target.METHOD(ARGS...);					\
+  }									\
+  template <typename T, typename... ARG_TYPES>				\
+  RTYPE internal__RelayCall_ ## NEW_NAME(int, T &, ARG_TYPES...) {	\
+    return DEFAULT;							\
+  }									\
+  									\
+  template <typename T, typename... ARG_TYPES>                          \
+  RTYPE NEW_NAME(T & target, ARG_TYPES... ARGS) {			\
     return internal__RelayCall_ ## NEW_NAME(true, target, ARGS...);     \
   } int ignore_semicolon_to_follow_ ## NEW_NAME = 0
 
