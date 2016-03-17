@@ -75,6 +75,15 @@
 namespace emp {
 namespace evo {
 
+#define EMP_SETUP_EVO_POP_DEFAULT(FUN_VAR, METHOD)			\
+  template <class T> void Setup_ ## METHOD(emp_bool_decoy(T::METHOD)) { \
+    FUN_VAR = [](T* org){ return org->GetMETHOD(); };			\
+  }									\
+  template <class T> void Setup_ ## METHOD(int) { ; }
+
+
+  // Main population class...
+  
   template <typename MEMBER>
   class Population {
   protected:
@@ -93,7 +102,8 @@ namespace evo {
     // only if it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
-
+    EMP_SETUP_EVO_POP_DEFAULT(default_fit_fun, GetFitness);  // Setup_GetFitness()
+    
     // AddOrg and ReplaceOrg should be the only ways new organisms come into a population.
     // AddOrg inserts them into the end of the designated population.
     // ReplaceOrg places them at a specific position, replacing anyone who may already be there.
@@ -141,12 +151,10 @@ namespace evo {
       : random_ptr(nullptr), callbacks(pop_name)
     {
       SetupCallbacks(callbacks);
+      Setup_GetFitness<MEMBER>(true);
     }
     Population(emp::Random & random, const std::string & pop_name="emp::evo::Population")
-      : random_ptr(&random), callbacks(pop_name)
-    {
-      SetupCallbacks(callbacks);
-    }
+      : Population(pop_name) { random_ptr = &random; }
     Population(const Population &) = delete;
     ~Population() { Clear(); }
     Population & operator=(const Population &) = delete;
