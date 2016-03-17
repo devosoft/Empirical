@@ -76,10 +76,11 @@ namespace emp {
 namespace evo {
 
 #define EMP_SETUP_EVO_POP_DEFAULT(FUN_VAR, METHOD)			\
-  template <class T> void Setup_ ## METHOD(emp_bool_decoy(T::METHOD)) { \
+  template <class T> void Setup_ ## METHOD ## _impl(emp_bool_decoy(T::METHOD)) { \
     FUN_VAR = [](T* org){ return org->GetMETHOD(); };			\
   }									\
-  template <class T> void Setup_ ## METHOD(int) { ; }
+  template <class T> void Setup_ ## METHOD ## _impl(int) { ; }		\
+  void Setup_ ## METHOD() { Setup_ ## METHOD ## _impl<MEMBER>(true); }
 
 
   // Main population class...
@@ -151,7 +152,7 @@ namespace evo {
       : random_ptr(nullptr), callbacks(pop_name)
     {
       SetupCallbacks(callbacks);
-      Setup_GetFitness<MEMBER>(true);
+      Setup_GetFitness();
     }
     Population(emp::Random & random, const std::string & pop_name="emp::evo::Population")
       : Population(pop_name) { random_ptr = &random; }
