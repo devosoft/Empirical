@@ -179,7 +179,11 @@ namespace emp {
   template <typename REAL_TYPE, typename EVAL_TYPE>
   struct sfinae_decoy { using type = REAL_TYPE; };
 
+  // Most commonly we will use a decoy to determine if a member exists, but be treated as a
+  // bool value.
 
+#define emp_bool_decoy(TEST) emp::sfinae_decoy<bool, decltype(&T::TEST)>
+  
 }
 
 #endif
