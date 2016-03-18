@@ -75,7 +75,8 @@
 namespace emp {
 namespace evo {
 
-#define EMP_SETUP_EVO_POP_DEFAULT(FUN_VAR, METHOD)			\
+#define EMP_SETUP_EVO_POP_DEFAULT(TYPE, FUN_VAR, METHOD)			\
+  TYPE FUN_VAR;								\
   template <class T> void Setup_ ## METHOD ## _impl(emp_bool_decoy(T::METHOD)) { \
     FUN_VAR = [](T* org){ return org->GetMETHOD(); };			\
   }									\
@@ -91,8 +92,8 @@ namespace evo {
     emp::vector<MEMBER *> pop;
     emp::vector<MEMBER *> next_pop;
     emp::Random * random_ptr;
-    std::function<double(MEMBER*)> default_fit_fun;  // Returns fitness.
-    std::function<bool(MEMBER*)> default_mut_fun;    // Returns if there was a mutation.
+    EMP_SETUP_EVO_POP_DEFAULT(std::function<double(MEMBER*)>, default_fit_fun, Fitness);
+    EMP_SETUP_EVO_POP_DEFAULT(std::function<bool(MEMBER*)>, default_mut_fun, Mutate);
 
     // Determine the callback type; by default this will be OrgSignals_NONE, but it can be
     // overridden by setting the type callback_t in the organism class.
@@ -103,7 +104,6 @@ namespace evo {
     // only if it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
-    EMP_SETUP_EVO_POP_DEFAULT(default_fit_fun, GetFitness);  // Setup_GetFitness()
     
     // AddOrg and ReplaceOrg should be the only ways new organisms come into a population.
     // AddOrg inserts them into the end of the designated population.
@@ -152,7 +152,7 @@ namespace evo {
       : random_ptr(nullptr), callbacks(pop_name)
     {
       SetupCallbacks(callbacks);
-      Setup_GetFitness();
+      Setup_Fitness();
     }
     Population(emp::Random & random, const std::string & pop_name="emp::evo::Population")
       : Population(pop_name) { random_ptr = &random; }
