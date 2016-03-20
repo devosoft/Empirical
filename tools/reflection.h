@@ -29,7 +29,7 @@
     template <typename U> static ArrayOfTwo & func(...);                \
   public:                                                               \
     typedef EMP_Detect_##MEMBER_NAME type;                              \
-    enum { value = sizeof(func<Derived>(0)) == 2 };                     \
+    enum { value = (sizeof(func<Derived>(0)) == 2) };			\
   }
 
 
