@@ -72,17 +72,38 @@
 
 #include "OrgSignals.h"
 
-namespace emp {
-namespace evo {
+// Macro to add class elements associated with a dynamic function call.
+// For example, if you wanted to be able to have a dynamic fitness function, you would call:
+//
+//   EMP_SETUP_EVO_POP_DEFAULT(std::function<double(MEMBER*)>, default_fit_fun, Fitness)
+//
+// This macro will create a function object called "default_fit_fun), which takes a pointer
+// to a member and converts it into a double value representing fitness.
+//
+// It will also create member fuctions in the population:
+//   Setup_Fitness()  -- call in Setup to make sure we use MEMBER.Fitness() if it exists.
+//   GetDefaultFitnessFun()  -- Return the current default fitness function being used.
+//   SetDefaultFitnessFun(new_fun)  -- Set the default fitness function to be new_fun.
 
-#define EMP_SETUP_EVO_POP_DEFAULT(TYPE, FUN_VAR, METHOD)			\
+#define EMP_SETUP_EVO_POP_DEFAULT(TYPE, FUN_VAR, METHOD)		\
   TYPE FUN_VAR;								\
   template <class T> void Setup_ ## METHOD ## _impl(emp_bool_decoy(T::METHOD)) { \
     FUN_VAR = [](T* org){ return org->GetMETHOD(); };			\
   }									\
   template <class T> void Setup_ ## METHOD ## _impl(int) { ; }		\
-  void Setup_ ## METHOD() { Setup_ ## METHOD ## _impl<MEMBER>(true); }
+  void Setup_ ## METHOD() { Setup_ ## METHOD ## _impl<MEMBER>(true); }	\
+  public:								\
+  const TYPE & GetDefault ## METHOD ## Fun() const {			\
+    return FUN_VAR;							\
+  }									\
+  void SetDefault ## METHOD ## Fun(const TYPE & f) {			\
+    FUN_VAR = f;							\
+  }									\
+  protected:
 
+
+namespace emp {
+namespace evo {
 
   // Main population class...
   
@@ -102,7 +123,7 @@ namespace evo {
 
     // Build a Setup method in population that calls .Setup() on whatever is passed in, but
     // only if it exists.
-    EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
+   EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
     
     // AddOrg and ReplaceOrg should be the only ways new organisms come into a population.
@@ -161,20 +182,10 @@ namespace evo {
     Population & operator=(const Population &) = delete;
 
     int GetSize() const { return (int) pop.size(); }
-    const std::function<double(MEMBER*)> & GetDefaultFitnessFun() const { return default_fit_fun; }
-    const std::function<bool(MEMBER*)> & GetDefaultMutationFun() const { return default_mut_fun; }
     MEMBER & operator[](int i) { return *(pop[i]); }
 
-    void SetDefaultFitnessFun(const std::function<double(MEMBER*)> & f) {
-      default_fit_fun = f;
-    }
-    void SetDefaultMutationFun(const std::function<bool(MEMBER*)> & f) {
-      default_mut_fun = f;
-    }
-    
-    
     void Clear() {
-      // Clear out all organisms.
+      // Delete all organisms.
       for (MEMBER * m : pop) delete m;
       for (MEMBER * m : next_pop) delete m;
 
