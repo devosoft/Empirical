@@ -21,7 +21,7 @@ namespace evo {
 
     OrgSignals_NONE(const std::string & sig_prefix) { ; }
   };
-  
+
   struct OrgSignals_Basic {
     static std::string GetName() { return "OrgSignals_Basic"; }
 
@@ -35,17 +35,14 @@ namespace evo {
 
 
   // A more detailed set of signals with ecological interactions of all sorts.
-  struct OrgSignals_Eco {
+  struct OrgSignals_Eco : public OrgSignals_Basic {
     static std::string GetName() { return "OrgSignals_Eco"; }
 
-    Signal<int> repro_sig;           // Identify organism reproducing.
     Signal<int> symbiont_repro_sig;  // Identify organism with symbiont reproducing.
-    std::string prefix;
 
     OrgSignals_Eco(const std::string & sig_prefix)
-      : repro_sig(to_string(sig_prefix, ":repro"))
+      : OrgSignals_Basic(sig_prefix)
       , symbiont_repro_sig(to_string(sig_prefix, ":symbiont_repro"))
-      , prefix(sig_prefix)
     { ; }
   };
 
