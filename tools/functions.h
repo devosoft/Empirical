@@ -45,7 +45,7 @@ namespace emp {
   static int pow(int base, int p) {
     if (p == 0) return 1;
     if (p < 0) return 0;
-    
+
     int r = 1;
     while (true) {
       if (p & 1) r *= base;
@@ -100,7 +100,7 @@ namespace emp {
   {
     return std::pair<B,A>(p.second, p.first);
   }
-  
+
   template<typename A, typename B> std::multimap<B,A> flip_map(const std::map<A,B> &src)
   {
     std::multimap<B,A> dst;
@@ -147,7 +147,7 @@ namespace emp {
 
   // implementation details, users never invoke these directly
   // Based on Kerrek SB in http://stackoverflow.com/questions/10766112/c11-i-can-go-from-multiple-args-to-tuple-but-can-i-go-from-tuple-to-multiple
- 
+
   namespace internal {
     template <typename FUN_TYPE, typename TUPLE_TYPE, bool is_done, int TOTAL, int... N>
     struct apply_impl {
@@ -163,7 +163,7 @@ namespace emp {
       }
     };
   }
-  
+
   // user invokes this
   template <typename FUN_TYPE, typename TUPLE_TYPE>
   void ApplyTuple(FUN_TYPE fun, TUPLE_TYPE && tuple) {
@@ -182,8 +182,8 @@ namespace emp {
   // Most commonly we will use a decoy to determine if a member exists, but be treated as a
   // bool value.
 
-#define emp_bool_decoy(TEST) emp::sfinae_decoy<bool, decltype(&T::TEST)>
-  
+#define emp_bool_decoy(TEST) typename emp::sfinae_decoy<bool, decltype(&TEST)>::type
+
 }
 
 #endif
