@@ -102,8 +102,8 @@
   } int ignore_semicolon_to_follow_ ## NEW_NAME = 0
 
 
-// This macro will create NEW_TYPE; it will use TEST_TYPE if TEST_TYPE exists inside of
-// CLASS_TYPE, otherwise it will use FALLBACK_TYPE.
+// This macro will create a type called NAME; it will use TEST_TYPE if TEST_TYPE exists
+// in CLASS_TYPE, otherwise it will use FALLBACK_TYPE.
 //
 // For example:  EMP_CREATE_TYPE_FALLBACK(new_type, T, test_type, int);
 //
@@ -113,14 +113,13 @@
 // If T does NOT have a member type called test_type, this is the same as:
 //    using new_type = int;
 
-#define EMP_CREATE_TYPE_FALLBACK(NEW_TYPE_NAME, CLASS_TYPE, TEST_TYPE, FALLBACK_TYPE) \
+#define EMP_CREATE_TYPE_FALLBACK(NAME, CLASS_TYPE, TEST_TYPE, FALLBACK_TYPE) \
   template <typename EMP__T>						\
-  static auto ResolveType__ ## NEW_TYPE_NAME(typename emp::sfinae_decoy<bool, \
-					     typename EMP__T::TEST_TYPE>::type) \
+  static auto ResolveType__ ## NAME(typename emp::sfinae_decoy<bool, typename EMP__T::TEST_TYPE>::type) \
   -> typename EMP__T::TEST_TYPE;					\
   template <typename EMP__T>						\
-  static auto ResolveType__ ## NEW_TYPE_NAME(int) -> FALLBACK_TYPE;	\
-  using NEW_TYPE_NAME = decltype(ResolveType__ ## NEW_TYPE_NAME<CLASS_TYPE>(true));
+  static auto ResolveType__ ## NAME(int) -> FALLBACK_TYPE;	\
+  using NAME = decltype(ResolveType__ ## NAME<CLASS_TYPE>(true));
 
 
 #endif
