@@ -85,19 +85,18 @@
 // Same as above, but a return type and default value are specified.
 
 #define EMP_CREATE_OPTIONAL_METHOD_RT(NEW_NAME, METHOD, RTYPE, DEFAULT)	\
-  template <typename T, typename... ARG_TYPES>				\
-  RTYPE internal__RelayCall_ ## NEW_NAME(				\
-	  typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type, \
-	  T & target, ARG_TYPES... ARGS) {				\
-    return target.METHOD(ARGS...);					\
-  }									\
-  template <typename T, typename... ARG_TYPES>				\
-  RTYPE internal__RelayCall_ ## NEW_NAME(int, T &, ARG_TYPES...) {	\
-    return DEFAULT;							\
-  }									\
-  									\
+  template <typename T, typename... ARG_TYPES>	                        \
+  RTYPE internal__RelayCall_ ## NEW_NAME(                               \
+	  typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type,       \
+	  T & target, ARG_TYPES... ARGS) {                                    \
+    return target.METHOD(ARGS...);				                            	\
+  }                                                                     \
   template <typename T, typename... ARG_TYPES>                          \
-  RTYPE NEW_NAME(T & target, ARG_TYPES... ARGS) {			\
+  RTYPE internal__RelayCall_ ## NEW_NAME(int, T &, ARG_TYPES...) {      \
+    return DEFAULT;                                                     \
+  }                                                                     \
+  template <typename T, typename... ARG_TYPES>                          \
+  RTYPE NEW_NAME(T & target, ARG_TYPES... ARGS) {                       \
     return internal__RelayCall_ ## NEW_NAME(true, target, ARGS...);     \
   } int ignore_semicolon_to_follow_ ## NEW_NAME = 0
 
@@ -113,13 +112,30 @@
 // If T does NOT have a member type called test_type, this is the same as:
 //    using new_type = int;
 
-#define EMP_CREATE_TYPE_FALLBACK(NAME, CLASS_TYPE, TEST_TYPE, FALLBACK_TYPE) \
-  template <typename EMP__T>						\
-  static auto ResolveType__ ## NAME(typename emp::sfinae_decoy<bool, typename EMP__T::TEST_TYPE>::type) \
-  -> typename EMP__T::TEST_TYPE;					\
-  template <typename EMP__T>						\
-  static auto ResolveType__ ## NAME(int) -> FALLBACK_TYPE;	\
+#define EMP_CREATE_TYPE_FALLBACK(NAME, CLASS_TYPE, TEST_TYPE, FALLBACK_TYPE)                           \
+  template <typename EMP__T>                                                                           \
+  static auto ResolveType__ ## NAME(typename emp::sfinae_decoy<bool,typename EMP__T::TEST_TYPE>::type) \
+    -> typename EMP__T::TEST_TYPE;                                                                     \
+  template <typename EMP__T>                                                                           \
+  static auto ResolveType__ ## NAME(int) -> FALLBACK_TYPE;                                             \
   using NAME = decltype(ResolveType__ ## NAME<CLASS_TYPE>(true));
 
+// Given a list of classes, pick the first one that has the type MEMBER_NAME defined and
+// call in NAME.  If none have MEMBER_NAME, use FALLBACK_TYPE.
+
+#define EMP_CHOOSE_MEMBER_TYPE(NAME, MEMBER_NAME, FALLBACK_TYPE, ...)                           \
+  template <typename EMP__T>                                                                    \
+  static auto ResolveType__ ## NAME(typename emp::sfinae_decoy<bool, typename EMP__T::MEMBER_NAME>::type) \
+    -> typename EMP__T::MEMBER_NAME;                                                            \
+  template <typename EMP__T>                                                                    \
+  static auto ResolveType__ ## NAME(int) -> FALLBACK_TYPE;                                      \
+  \
+  template <typename EMP__T, typename EMP__T2, typename... EXTRAS>                              \
+  static auto ResolveType__ ## NAME(typename emp::sfinae_decoy<bool, typename EMP__T::MEMBER_NAME>::type) \
+    -> typename EMP__T::MEMBER_NAME;                                                            \
+  template <typename EMP__T, typename EMP__T2, typename... EXTRAS>                              \
+  static auto ResolveType__ ## NAME(int) -> decltype(ResolveType__ ## NAME<EMP__T2, EXTRAS...>(true)); \
+  \
+  using NAME = decltype(ResolveType__ ## NAME<__VA_ARGS__>(true));
 
 #endif
