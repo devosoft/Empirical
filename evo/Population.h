@@ -8,9 +8,6 @@
 //  MEMBER can be any object type with the following properties:
 //  * The copy constructor must work.
 //
-//  Dervied versions of this class (with more complex population structuress)
-//  may have additional requirements.
-//
 // Constructors:
 //  Population(const std::string & pop_name="emp::evo::Population")
 //  Population(emp::Random & random, const std::string & pop_name="emp::evo::Population")
@@ -90,12 +87,14 @@
     FUN_VAR = [](T* org){ return org->METHOD(); };                                \
   }                                                                               \
   template <class T> void Setup_ ## METHOD ## _impl(int) { ; }                    \
-  void Setup_ ## METHOD() { Setup_ ## METHOD ## _impl<MEMBER>(true); }            \
+  void Setup_ ## METHOD() {                                                       \
+		Setup_ ## METHOD ## _impl<MEMBER>(true);                                      \
+	}                                                                               \
   public:                                                                         \
-  const std::function<RTYPE(MEMBER*)> & GetDefault ## METHOD ## Fun() const {    \
+  const std::function<RTYPE(MEMBER*)> & GetDefault ## METHOD ## Fun() const {     \
     return FUN_VAR;                                                               \
   }                                                                               \
-  void SetDefault ## METHOD ## Fun(const std::function<RTYPE(MEMBER*)> & f) {    \
+  void SetDefault ## METHOD ## Fun(const std::function<RTYPE(MEMBER*)> & f) {     \
     FUN_VAR = f;                                                                  \
   }                                                                               \
   protected:
@@ -173,6 +172,7 @@ namespace evo {
     {
       SetupCallbacks(callbacks);
       Setup_Fitness();
+	    Setup_Mutate();
     }
     Population(emp::Random & random, const std::string & pop_name="emp::evo::Population")
       : Population(pop_name) { random_ptr = &random; }
