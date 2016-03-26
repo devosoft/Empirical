@@ -101,27 +101,16 @@
   } int ignore_semicolon_to_follow_ ## NEW_NAME = 0
 
 
-// This macro will create a type called NAME; it will use TEST_TYPE if TEST_TYPE exists
-// in CLASS_TYPE, otherwise it will use FALLBACK_TYPE.
+//  Given a list of classes, pick the first one that has the type MEMBER_NAME defined and
+//  call in NAME.  If none have MEMBER_NAME, use FALLBACK_TYPE.
 //
-// For example:  EMP_CREATE_TYPE_FALLBACK(new_type, T, test_type, int);
+//  For example:  EMP_CHOOSE_MEMBER_TYPE(new_type, test_type, int, T);
 //
-// If class T has a member type called test_type, this is the same as:
-//    using new_type = T::test_type;
+//  If class T has a member type called test_type, this is the same as:
+//     using new_type = T::test_type;
 //
-// If T does NOT have a member type called test_type, this is the same as:
-//    using new_type = int;
-
-#define EMP_CREATE_TYPE_FALLBACK(NAME, CLASS_TYPE, TEST_TYPE, FALLBACK_TYPE)                           \
-  template <typename EMP__T>                                                                           \
-  static auto ResolveType__ ## NAME(typename emp::sfinae_decoy<bool,typename EMP__T::TEST_TYPE>::type) \
-    -> typename EMP__T::TEST_TYPE;                                                                     \
-  template <typename EMP__T>                                                                           \
-  static auto ResolveType__ ## NAME(int) -> FALLBACK_TYPE;                                             \
-  using NAME = decltype(ResolveType__ ## NAME<CLASS_TYPE>(true));
-
-// Given a list of classes, pick the first one that has the type MEMBER_NAME defined and
-// call in NAME.  If none have MEMBER_NAME, use FALLBACK_TYPE.
+//  If T does NOT have a member type called test_type, this is the same as:
+//     using new_type = int;
 
 #define EMP_CHOOSE_MEMBER_TYPE(NAME, MEMBER_NAME, FALLBACK_TYPE, ...)                           \
   template <typename EMP__T>                                                                    \
