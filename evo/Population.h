@@ -116,7 +116,8 @@ namespace evo {
 
     // Determine the callback type; by default this will be OrgSignals_NONE, but it can be
     // overridden by setting the type callback_t in the organism class.
-    EMP_CREATE_TYPE_FALLBACK(callback_t, MEMBER, callback_t, OrgSignals_NONE);
+    // EMP_CREATE_TYPE_FALLBACK(callback_t, MEMBER, callback_t, OrgSignals_NONE);
+    EMP_CHOOSE_MEMBER_TYPE(callback_t, callback_t, OrgSignals_NONE, MEMBER);
     callback_t callbacks;
 
     // Build a Setup method in population that calls .Setup() on whatever is passed in, but
