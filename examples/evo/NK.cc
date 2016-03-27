@@ -33,14 +33,14 @@ int main()
     pop.Insert(next_org);
   }
 
-  pop.SetDefaultMutationFun( [&random](BitOrg* org){
+  pop.SetDefaultMutateFun( [&random](BitOrg* org){
       (*org)[random.GetInt(N)] = random.P(0.5);
       (*org)[random.GetInt(N)] = random.P(0.5);
       (*org)[random.GetInt(N)] = random.P(0.5);
       return true;
     } );
 
-  
+
   // Loop through updates
   for (int ud = 0; ud < UD_COUNT; ud++) {
     // Print current state.
@@ -57,7 +57,7 @@ int main()
     pop.Update();
     pop.Mutate();
   }
-  
+
 
   std::cout << UD_COUNT << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 }
