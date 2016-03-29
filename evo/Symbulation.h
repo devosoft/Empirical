@@ -29,7 +29,7 @@
 
 namespace emp {
 namespace evo {
-  
+
   class SymbulationOrg {
   public:
     using callback_t = OrgSignals_Eco;
@@ -37,23 +37,23 @@ namespace evo {
     // Fixed members
     callback_t * callbacks; // Callbacks to population
     int id;                 // Organism ID
-    
+
     BitVector host;         // Current host genome
     BitVector symbiont;     // Current symbiont genome
 
     int host_cost;          // Score needed for host to replicate.
     int symb_cost;          // Score needed for symbiont to replicate.
-    
+
     // Active members
     int host_pos;           // What bit position to execute next in the host?
     int symb_pos;           // What bit position to execute next in the symbiont?
-    
+
     int host_score;         // Current host score, toward replication
     int symb_score;         // Current symbiont score, toward horizontal transmission
 
     int streak_0;           // Number of consecutive zeros executed by symbiont.
     int streak_1;           // Number of consecutive ones executed by symbiont.
-    
+
   public:
     SymbulationOrg(const BitVector & genome, int h_cost=-1, int s_cost=-1)
       : callbacks(nullptr), id(-1), host(genome)
@@ -78,7 +78,7 @@ namespace evo {
       host_score = symb_score = 0;
       streak_0 = streak_1 = 0;
     }
-    
+
     int GetHostCost() const { return host_cost; }
     int GetSymbiontCost() const { return symb_cost; }
     int GetHostScore() const { return host_score; }
@@ -100,7 +100,7 @@ namespace evo {
       symb_score = 0;
       streak_0 = streak_1 = 0;
     }
-    
+
     // Try to inject a symbiont, but it might fail if another symbiont is already there.
     bool InjectSymbiont(const BitVector & in_symb, Random & random, double displace_prob=0.5) {
       // For a symbiont to be injectected successfully, there either has to be no symbiont
@@ -112,15 +112,15 @@ namespace evo {
       return false;
     }
 
-    void TestHostRepro() {      
+    void TestHostRepro() {
       // Trigger reproduction.
       if (host_score >= host_cost) {
 	Reset();                          // Reset before replication.
 	callbacks->repro_sig.Trigger(id); // Trigger replication call.
       }
     }
-    
-    void TestSymbiontRepro() {      
+
+    void TestSymbiontRepro() {
       // Trigger reproduction.
       if (symb_score >= symb_cost) {
 	symb_pos = symb_score = 0;                 // Reset Symbiont stats.
@@ -128,12 +128,12 @@ namespace evo {
 	callbacks->symbiont_repro_sig.Trigger(id); // Trigger symbiont replication call.
       }
     }
-    
+
     void Execute(bool use_streaks=true, bool align_symbiont=false,
 		 int host_self_bonus=1, int symb_self_bonus=1, int symb_host_bonus=1)
     {
       emp_assert(callbacks != nullptr);
-      
+
       if (host[host_pos]) {                            // Host generating score for itself.
 	host_score += host_self_bonus;
 	TestHostRepro();
@@ -162,14 +162,14 @@ namespace evo {
 	  TestSymbiontRepro();
 	}
 	if (++symb_pos >= symbiont.GetSize()) symb_pos = 0;  // Advance symbiont position.
-	
+
       }
       if (++host_pos >= host.GetSize()) host_pos = 0;  // Advance host position.
 
     }
 
   };
-  
+
 }
 }
 
