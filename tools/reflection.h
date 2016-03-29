@@ -65,20 +65,20 @@
 // Similar to EMP_CREATE_METHOD_FALLBACK, but only calls method if it exists, otherwise
 // does nothing.  Note, must have a void return type to facilitate doing nothing.
 
-#define EMP_CREATE_OPTIONAL_METHOD(NEW_NAME, METHOD)			\
-  template <typename T, typename... ARG_TYPES>				\
-  void internal__RelayCall_ ## NEW_NAME(				\
-	  typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type, \
-	  T & target, ARG_TYPES... ARGS) {				\
-    target.METHOD(ARGS...);						\
-  }									\
-  template <typename T, typename... ARG_TYPES>				\
-  void internal__RelayCall_ ## NEW_NAME(int, T &, ARG_TYPES...) {	\
-  }									\
-  									\
-  template <typename T, typename... ARG_TYPES>                          \
-  void NEW_NAME(T & target, ARG_TYPES... ARGS) {			\
-    internal__RelayCall_ ## NEW_NAME(true, target, ARGS...);		\
+#define EMP_CREATE_OPTIONAL_METHOD(NEW_NAME, METHOD)              \
+  template <typename T, typename... ARG_TYPES>                    \
+  void internal__RelayCall_ ## NEW_NAME(                          \
+  typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type, \
+    T & target, ARG_TYPES... ARGS) {                              \
+    target.METHOD(ARGS...);                                       \
+  }                                                               \
+  template <typename T, typename... ARG_TYPES>                    \
+  void internal__RelayCall_ ## NEW_NAME(int, T &, ARG_TYPES...) { \
+  }                                                               \
+                                                                  \
+  template <typename T, typename... ARG_TYPES>                    \
+  void NEW_NAME(T & target, ARG_TYPES... ARGS) {                  \
+    internal__RelayCall_ ## NEW_NAME(true, target, ARGS...);      \
   } int ignore_semicolon_to_follow_ ## NEW_NAME = 0
 
 
@@ -87,9 +87,9 @@
 #define EMP_CREATE_OPTIONAL_METHOD_RT(NEW_NAME, METHOD, RTYPE, DEFAULT)	\
   template <typename T, typename... ARG_TYPES>	                        \
   RTYPE internal__RelayCall_ ## NEW_NAME(                               \
-	  typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type,       \
-	  T & target, ARG_TYPES... ARGS) {                                    \
-    return target.METHOD(ARGS...);				                            	\
+    typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type,       \
+    T & target, ARG_TYPES... ARGS) {                                    \
+    return target.METHOD(ARGS...);                                      \
   }                                                                     \
   template <typename T, typename... ARG_TYPES>                          \
   RTYPE internal__RelayCall_ ## NEW_NAME(int, T &, ARG_TYPES...) {      \
@@ -126,5 +126,6 @@
   static auto ResolveType__ ## NAME(int) -> decltype(ResolveType__ ## NAME<EMP__T2, EXTRAS...>(true)); \
   \
   using NAME = decltype(ResolveType__ ## NAME<__VA_ARGS__>(true));
+
 
 #endif
