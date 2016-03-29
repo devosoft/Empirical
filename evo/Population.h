@@ -42,13 +42,13 @@
 //  void RunTournament(std::vector<double> fitness, int t_size, int tourny_count=1)
 //
 //  void FitnessSharingTournamentSelect(std::function<double(MEMBER*)> fit_fun,
-//					std::function<double(MEMBER*, MEMBER*)> dist_fun,
-//					double sharing_threshhold, double alpha,
-//					int t_size, int tourny_count=1)
+//          std::function<double(MEMBER*, MEMBER*)> dist_fun,
+//          double sharing_threshhold, double alpha,
+//          int t_size, int tourny_count=1)
 //  void FitnessSharingTournamentSelect(std::function<double(MEMBER*, MEMBER*)>
-//					dist_fun, double sharing_threshold,
-//					double alpha, int t_size,
-//					int tourny_count=1)
+//          dist_fun, double sharing_threshold,
+//          double alpha, int t_size,
+//          int tourny_count=1)
 //
 // Advancing Population
 //  void Update()                  -- Shift to the next generation.
@@ -71,7 +71,7 @@
 // Macro to add class elements associated with a dynamic function call.
 // For example, if you wanted to be able to have a dynamic fitness function, you would call:
 //
-//   EMP_SETUP_EVO_POP_DEFAULT(std::function<double(MEMBER*)>, default_fit_fun, Fitness)
+//   EMP_SETUP_EVO_POP_DEFAULT(default_fit_fun, Fitness, double)
 //
 // This macro will create a function object called "default_fit_fun), which takes a pointer
 // to a member and converts it into a double value representing fitness.
@@ -81,20 +81,38 @@
 //   GetDefaultFitnessFun()  -- Return the current default fitness function being used.
 //   SetDefaultFitnessFun(new_fun)  -- Set the default fitness function to be new_fun.
 
-#define EMP_SETUP_EVO_POP_DEFAULT(RTYPE, FUN_VAR, METHOD)                         \
+#define EMP_SETUP_EVO_POP_DEFAULT(FUN_VAR, METHOD, RTYPE)                         \
   std::function<RTYPE(MEMBER*)> FUN_VAR;                                          \
   template <class T> void Setup_ ## METHOD ## _impl(emp_bool_decoy(T::METHOD)) {  \
     FUN_VAR = [](T* org){ return org->METHOD(); };                                \
   }                                                                               \
   template <class T> void Setup_ ## METHOD ## _impl(int) { ; }                    \
   void Setup_ ## METHOD() {                                                       \
-		Setup_ ## METHOD ## _impl<MEMBER>(true);                                      \
-	}                                                                               \
+    Setup_ ## METHOD ## _impl<MEMBER>(true);                                      \
+  }                                                                               \
   public:                                                                         \
   const std::function<RTYPE(MEMBER*)> & GetDefault ## METHOD ## Fun() const {     \
     return FUN_VAR;                                                               \
   }                                                                               \
   void SetDefault ## METHOD ## Fun(const std::function<RTYPE(MEMBER*)> & f) {     \
+    FUN_VAR = f;                                                                  \
+  }                                                                               \
+  protected:
+
+#define EMP_SETUP_EVO_POP_DEFAULT_1ARG(FUN_VAR, METHOD, RTYPE, ARG1)              \
+  std::function<RTYPE(MEMBER*, ARG1 a1)> FUN_VAR;                                 \
+  template <class T> void Setup_ ## METHOD ## _impl(emp_bool_decoy(T::METHOD)) {  \
+    FUN_VAR = [](T* org, ARG1 a1){ return org->METHOD(a1); };                     \
+  }                                                                               \
+  template <class T> void Setup_ ## METHOD ## _impl(int,ARG1) { ; }               \
+  void Setup_ ## METHOD() {                                                       \
+    Setup_ ## METHOD ## _impl<MEMBER>(true);                                      \
+  }                                                                               \
+  public:                                                                         \
+  const std::function<RTYPE(MEMBER*,ARG1)>& GetDefault ## METHOD ## Fun() const { \
+    return FUN_VAR;                                                               \
+  }                                                                               \
+  void SetDefault ## METHOD ## Fun(const std::function<RTYPE(MEMBER*,ARG1)>& f) { \
     FUN_VAR = f;                                                                  \
   }                                                                               \
   protected:
@@ -111,8 +129,9 @@ namespace evo {
     emp::vector<MEMBER *> pop;
     emp::vector<MEMBER *> next_pop;
     emp::Random * random_ptr;
-    EMP_SETUP_EVO_POP_DEFAULT(double, default_fit_fun, Fitness);
-    EMP_SETUP_EVO_POP_DEFAULT(bool, default_mut_fun, Mutate);
+    EMP_SETUP_EVO_POP_DEFAULT(default_fit_fun, Fitness, double)
+    EMP_SETUP_EVO_POP_DEFAULT(default_mut_fun, Mutate, bool)
+    EMP_SETUP_EVO_POP_DEFAULT_1ARG(default_placement_fun, PlaceOffspring, int, int)
 
     // Determine the callback type; by default this will be OrgSignals_NONE, but it can be
     // overridden by setting the type callback_t in the organism class.
@@ -173,7 +192,7 @@ namespace evo {
     {
       SetupCallbacks(callbacks);
       Setup_Fitness();
-	    Setup_Mutate();
+      Setup_Mutate();
     }
     Population(emp::Random & random, const std::string & pop_name="emp::evo::Population")
       : Population(pop_name) { random_ptr = &random; }
