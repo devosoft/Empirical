@@ -29,9 +29,9 @@ namespace evo {
     NKLandscape() = delete; // { ; }
     NKLandscape(emp::Random & random) {
       for ( std::array<double, state_count> & ltable : landscape) {
-	for (double & pos : ltable) {
-	  pos = random.GetDouble();
-	}
+        for (double & pos : ltable) {
+          pos = random.GetDouble();
+        }
       }
     }
     NKLandscape(const NKLandscape &) = default;
