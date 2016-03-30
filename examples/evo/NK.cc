@@ -33,7 +33,7 @@ int main()
     pop.Insert(next_org);
   }
 
-  pop.SetDefaultMutateFun( [&random](BitOrg* org){
+  pop.SetDefaultMutateFun( [](BitOrg* org, emp::Random& random){
       (*org)[random.GetInt(N)] = random.P(0.5);
       (*org)[random.GetInt(N)] = random.P(0.5);
       (*org)[random.GetInt(N)] = random.P(0.5);
