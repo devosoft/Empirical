@@ -16,7 +16,7 @@ struct TestOrg1 {
   TestOrg1() { fitness = 0; }
   TestOrg1(int f) { fitness = f; }
   double Fitness() { return (double) fitness; }
-  bool Mutate() { return false; }
+  bool Mutate(emp::Random&) { return false; }
 };
 
 int main()
