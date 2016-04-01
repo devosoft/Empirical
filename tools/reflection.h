@@ -13,7 +13,7 @@
 // specific member.  From: https://en.wikibooks.org/wiki/More_C++_Idioms/Member_Detector
 
 #define EMP_CREATE_MEMBER_DETECTOR(MEMBER_NAME)                         \
-  template <typename T>							\
+  template <typename T>                                                 \
   class EMP_Detect_ ## MEMBER_NAME {                                    \
   private:                                                              \
     struct Fallback { int MEMBER_NAME; };                               \
@@ -29,7 +29,7 @@
     template <typename U> static ArrayOfTwo & func(...);                \
   public:                                                               \
     typedef EMP_Detect_##MEMBER_NAME type;                              \
-    enum { value = (sizeof(func<Derived>(0)) == 2) };			\
+    enum { value = (sizeof(func<Derived>(0)) == 2) };                   \
   }
 
 
@@ -128,8 +128,8 @@
   using NAME = decltype(ResolveType__ ## NAME<__VA_ARGS__>(true));
 
 
-//  Given a list of classes, pick the first one that has the any member MEMBER_NAME defined and
-//  call that class NAME.  If none have MEMBER_NAME, use FALLBACK_TYPE.
+//  Given a list of classes, pick the first one that has the any member MEMBER defined
+//  and call that class NAME.
 //
 //  For example:  EMP_CHOOSE_TYPE_WITH_MEMBER(new_type, test_type, int, T);
 //
@@ -139,19 +139,16 @@
 //  If T does NOT have a member type called test_type, this is the same as:
 //     using new_type = int;
 
-#define EMP_CHOOSE_TYPE_WITH_MEMBER(NAME, MEMBER_NAME, FALLBACK_TYPE, ...)                      \
-  template <typename EMP__T>                                                                    \
-  static auto ResolveType__ ## NAME(typename emp::sfinae_decoy<bool, decltype(EMP__T::MEMBER_NAME)>::type) \
-    -> EMP__T;                                                                         \
-  template <typename EMP__T>                                                                    \
-  static auto ResolveType__ ## NAME(int) -> FALLBACK_TYPE;                                      \
-  \
-  template <typename EMP__T, typename EMP__T2, typename... EXTRAS>                              \
-  static auto ResolveType__ ## NAME(typename emp::sfinae_decoy<bool, decltype(EMP__T::MEMBER_NAME)>::type) \
-    -> EMP__T;                                                                         \
-  template <typename EMP__T, typename EMP__T2, typename... EXTRAS>                              \
-  static auto ResolveType__ ## NAME(int) -> decltype(ResolveType__ ## NAME<EMP__T2, EXTRAS...>(true)); \
-  \
-  using NAME = decltype(ResolveType__ ## NAME<__VA_ARGS__>(true));
+#define EMP_CHOOSE_TYPE_WITH_MEMBER(NAME, MEMBER, ...)                                 \
+template <typename EMP__T, typename... EXTRAS>                                         \
+struct EMP_ResolveType__ ## NAME {                                                         \
+  template <typename T>                                                                \
+  static EMP__T GetType(typename emp::sfinae_decoy<bool, decltype(T::MEMBER)>::type);  \
+  template <typename T>                                                                \
+  static typename EMP_ResolveType__ ## NAME<EXTRAS...>::type GetType(...);                 \
+  using type = decltype(GetType<EMP__T>(true));                                        \
+};                                                                                     \
+template <> struct EMP_ResolveType__ ## NAME<void> { using type = void; };                 \
+using NAME = typename EMP_ResolveType__ ## NAME<__VA_ARGS__, void>::type;
 
 #endif
