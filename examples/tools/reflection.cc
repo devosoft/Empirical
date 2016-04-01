@@ -39,12 +39,27 @@ struct E {
   static constexpr int class_id = 5;
   bool use_this;
 };
-struct Fallback {
-  static constexpr int class_id = -1;
-  bool use_this;
+struct F {
+  static constexpr int class_id = 6;
+};
+struct G {
+  static constexpr int class_id = 7;
 };
 
-EMP_CHOOSE_TYPE_WITH_MEMBER(auto_type, use_this, Fallback, C, D, E);
+EMP_CHOOSE_TYPE_WITH_MEMBER(auto_type, use_this, int, C, D, E);
+
+
+/*
+ * template <typename EMP__T, typename... EXTRAS>
+struct ABC {
+  template <typename T> static EMP__T GetType(typename emp::sfinae_decoy<bool, decltype(T::use_this)>::type);
+  template <typename T> static typename ABC<EXTRAS...>::type GetType(...);
+
+  using type = decltype(GetType<EMP__T>(true));
+};
+template <> struct ABC<void> { using type = void; };
+using auto_type = typename ABC<int, bool, F, G, D, E, C, D, E, void>::type;
+*/
 
 int main()
 {
