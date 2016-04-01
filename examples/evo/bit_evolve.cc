@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../evo/Population.h"
+#include "../../evo/World.h"
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
 
@@ -16,7 +16,7 @@ using BitOrg = emp::BitSet<100>;
 int main()
 {
   emp::Random random;
-  emp::evo::Population<BitOrg> pop(random);
+  emp::evo::World<BitOrg> pop(random);
 
   // Build a random initial population
   for (int i = 0; i < 100; i++) {

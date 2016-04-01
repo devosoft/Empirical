@@ -8,7 +8,7 @@
 #include <iostream>
 
 #include "../../evo/NK.h"
-#include "../../evo/Population.h"
+#include "../../evo/World.h"
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
 
@@ -24,7 +24,7 @@ int main()
 {
   emp::Random random;
   emp::evo::NKLandscape<N,K> landscape(random);
-  emp::evo::Population<BitOrg> pop(random);
+  emp::evo::World<BitOrg> pop(random);
 
   // Build a random initial population
   for (int i = 0; i < POP_SIZE; i++) {

@@ -19,7 +19,7 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 
-TARGETS := Fitness_Share_NK NK Population Symbulation bit_evolve
+TARGETS := Fitness_Share_NK NK Symbulation World bit_evolve
 
 
 default: native
@@ -33,8 +33,8 @@ Fitness_Share_NK: Fitness_Share_NK.cc
 NK: NK.cc
 	$(CXX_native) $(CFLAGS_native) NK.cc -o NK
 
-Population: Population.cc
-	$(CXX_native) $(CFLAGS_native) Population.cc -o Population
+World: World.cc
+	$(CXX_native) $(CFLAGS_native) World.cc -o World
 
 Symbulation: Symbulation.cc
 	$(CXX_native) $(CFLAGS_native) Symbulation.cc -o Symbulation

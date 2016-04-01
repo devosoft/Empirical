@@ -8,7 +8,7 @@
 #include <iostream>
 
 #include "../../evo/Symbulation.h"
-#include "../../evo/Population.h"
+#include "../../evo/World.h"
 #include "../../tools/Random.h"
 
 constexpr int POP_SIZE  = 14000;
@@ -20,7 +20,7 @@ constexpr int UD_COUNT  = 20000;
 int main()
 {
   emp::Random random;
-  emp::evo::Population<emp::evo::SymbulationOrg> pop(random);
+  emp::evo::World<emp::evo::SymbulationOrg> pop(random);
 
   for (int i = 0; i < POP_SIZE; i++) {
     pop.Insert(random, ORG_SIZE);  // Generate a random org.
