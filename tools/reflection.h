@@ -33,8 +33,8 @@
   }
 
 
-// This macro will Call a member function on a given object if that member exists, but
-// otherwise pass the object as an arguent to a function fallback.
+// This macro will generate a function that calls a member function on a given object IF that
+// member exists, but otherwise pass the object as an arguent to a function fallback.
 //
 // NEW_NAME - name of the function to be generated.
 // METHOD - name of the member function that should be attempted.
@@ -43,22 +43,22 @@
 //
 // @CAO - RETURN_TYPE should be deducible from FALLBACK
 
-#define EMP_CREATE_METHOD_FALLBACK(NEW_NAME, METHOD, FALLBACK, RETURN_TYPE) \
-  namespace internal {                                                  \
-    template <typename T, typename... ARG_TYPES>                        \
-    RETURN_TYPE RelayCall_ ## NEW_NAME(                                 \
-      typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type,     \
-      T & target, ARG_TYPES... ARGS) {                                  \
-        return target.METHOD(ARGS...);                                  \
-    }                                                                   \
-    template <typename T, typename... ARG_TYPES>                        \
+#define EMP_CREATE_METHOD_FALLBACK(NEW_NAME, METHOD, FALLBACK, RETURN_TYPE)  \
+  namespace internal {                                                       \
+    template <typename T, typename... ARG_TYPES>                             \
+    RETURN_TYPE RelayCall_ ## NEW_NAME(                                      \
+      typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type,          \
+      T & target, ARG_TYPES... ARGS) {                                       \
+        return target.METHOD(ARGS...);                                       \
+    }                                                                        \
+    template <typename T, typename... ARG_TYPES>                             \
     RETURN_TYPE RelayCall_ ## NEW_NAME(int, T & target, ARG_TYPES... ARGS) { \
-      return FALLBACK(target, ARGS...);                                 \
-    }                                                                   \
-  }                                                                     \
-  template <typename T, typename... ARG_TYPES>                          \
-  RETURN_TYPE NEW_NAME(T & target, ARG_TYPES... ARGS) {                 \
-    return internal::RelayCall_ ## NEW_NAME(true, target, ARGS...);     \
+      return FALLBACK(target, ARGS...);                                      \
+    }                                                                        \
+  }                                                                          \
+  template <typename T, typename... ARG_TYPES>                               \
+  RETURN_TYPE NEW_NAME(T & target, ARG_TYPES... ARGS) {                      \
+    return internal::RelayCall_ ## NEW_NAME(true, target, ARGS...);          \
   } int ignore_semicolon_to_follow_ ## NEW_NAME = 0
 
 
@@ -68,7 +68,7 @@
 #define EMP_CREATE_OPTIONAL_METHOD(NEW_NAME, METHOD)              \
   template <typename T, typename... ARG_TYPES>                    \
   void internal__RelayCall_ ## NEW_NAME(                          \
-  typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type, \
+  typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type,   \
     T & target, ARG_TYPES... ARGS) {                              \
     target.METHOD(ARGS...);                                       \
   }                                                               \
@@ -101,6 +101,35 @@
   } int ignore_semicolon_to_follow_ ## NEW_NAME = 0
 
 
+//  Build a struct which will, given a list of classes, pick the first one that has the any
+//  member MEMBER defined and call that class NAME.
+//
+//  For example:
+//    EMP_SETUP_TYPE_SELECTOR(SelectTests, is_test_type);
+//    using new_type = SelectTests<S, T>
+//
+//  If class S has a member called test_type, this is the same as:
+//    using new_type = S;
+//
+//  Otherwise, if S does not and T does, new_type will be T.  If neither has it, the new test_type
+//  will be void.
+
+#define EMP_SETUP_TYPE_SELECTOR(NAME, MEMBER)                                          \
+template <typename EMP__T, typename... EXTRAS>                                         \
+struct EMP_ResolveType__ ## NAME {                                                     \
+  template <typename T>                                                                \
+  static EMP__T GetType(typename emp::sfinae_decoy<bool, decltype(T::MEMBER)>::type);  \
+  template <typename T>                                                                \
+  static typename EMP_ResolveType__ ## NAME<EXTRAS...>::type GetType(...);             \
+  using type = decltype(GetType<EMP__T>(true));                                        \
+};                                                                                     \
+template <> struct EMP_ResolveType__ ## NAME<void> { using type = void; };             \
+template <typename... TYPES> struct NAME {                                             \
+  using type = typename EMP_ResolveType__ ## NAME<TYPES..., void>::type;               \
+};
+
+
+
 //  Given a list of classes, pick the first one that has the type MEMBER_NAME defined and
 //  call that MEMBER type NAME.  If none have MEMBER_NAME, use FALLBACK_TYPE.
 //
@@ -127,28 +156,5 @@
   \
   using NAME = decltype(ResolveType__ ## NAME<__VA_ARGS__>(true));
 
-
-//  Given a list of classes, pick the first one that has the any member MEMBER defined
-//  and call that class NAME.
-//
-//  For example:  EMP_CHOOSE_TYPE_WITH_MEMBER(new_type, test_type, int, T);
-//
-//  If class T has a member called test_type, this is the same as:
-//     using new_type = T;
-//
-//  If T does NOT have a member type called test_type, this is the same as:
-//     using new_type = int;
-
-#define EMP_CHOOSE_TYPE_WITH_MEMBER(NAME, MEMBER, ...)                                 \
-template <typename EMP__T, typename... EXTRAS>                                         \
-struct EMP_ResolveType__ ## NAME {                                                         \
-  template <typename T>                                                                \
-  static EMP__T GetType(typename emp::sfinae_decoy<bool, decltype(T::MEMBER)>::type);  \
-  template <typename T>                                                                \
-  static typename EMP_ResolveType__ ## NAME<EXTRAS...>::type GetType(...);                 \
-  using type = decltype(GetType<EMP__T>(true));                                        \
-};                                                                                     \
-template <> struct EMP_ResolveType__ ## NAME<void> { using type = void; };                 \
-using NAME = typename EMP_ResolveType__ ## NAME<__VA_ARGS__, void>::type;
 
 #endif
