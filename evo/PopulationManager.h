@@ -15,7 +15,14 @@ namespace evo {
     // Allow this and derived classes to be identified as a population manager.
     static constexpr bool emp_is_population_manager = true;
 
+    using ptr_t = MEMBER *;
     emp::vector<MEMBER *> pop;
+
+    ptr_t & operator[](int i) { return pop[i]; }
+    const ptr_t operator[](int i) const { return pop[i]; }
+
+    uint32_t size() const { return pop.size(); }
+    void resize(int new_size) { pop.resize(new_size); }
   };
 
   // A standard population manager for using sychronous generations in a traditional

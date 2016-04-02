@@ -137,9 +137,11 @@ namespace evo {
   template <typename MEMBER, typename... MANAGERS>
   class World {
   protected:
-    using pop_manager_t = typename SelectPopManager<MANAGERS...>::type;
+    using pop_manager_t = typename SelectPopManager<MANAGERS...,PopulationManager_Base<MEMBER>>::type;
 
-    emp::vector<MEMBER *> pop;
+    pop_manager_t pop;
+
+    // emp::vector<MEMBER *> pop;
     emp::vector<MEMBER *> next_pop;
     emp::Random * random_ptr;
     EMP_SETUP_EVO_WORLD_DEFAULT(default_fit_fun, Fitness, double)
@@ -176,7 +178,7 @@ namespace evo {
       MEMBER * new_org = new MEMBER(*(pop[id]));
       // @CAO For the moment, assume random replacement (in the future, setup a topology)
       const int target_id = random_ptr->GetInt((int) pop.size());
-      ReplaceOrg(pop, target_id, new_org);
+      ReplaceOrg(pop.pop, target_id, new_org);
     }
 
     void DoSymbiontRepro(int id) {
@@ -217,7 +219,7 @@ namespace evo {
 
     void Clear() {
       // Delete all organisms.
-      for (MEMBER * m : pop) delete m;
+      for (MEMBER * m : pop.pop) delete m;
       for (MEMBER * m : next_pop) delete m;
 
       pop.resize(0);
@@ -228,11 +230,11 @@ namespace evo {
     // (all of which call AddOrg())
 
     void Insert(const MEMBER & mem, int copy_count=1) {
-      for (int i = 0; i < copy_count; i++) AddOrg(pop, new MEMBER(mem));
+      for (int i = 0; i < copy_count; i++) AddOrg(pop.pop, new MEMBER(mem));
     }
     template <typename... ARGS>
     void Insert(Random & random, ARGS... args) {
-      AddOrg(pop, new MEMBER(random, std::forward<ARGS>(args)...));
+      AddOrg(pop.pop, new MEMBER(random, std::forward<ARGS>(args)...));
     }
     template <typename... ARGS>
     void InsertRandomOrg(ARGS... args) {
@@ -363,8 +365,8 @@ namespace evo {
 
     // Update() moves the next population to the current position, managing memory as needed.
     void Update() {
-      for (MEMBER * m : pop) delete m;   // Delete the current population.
-      pop = next_pop;                    // Move over the next generation.
+      for (MEMBER * m : pop.pop) delete m;   // Delete the current population.
+      pop.pop = next_pop;                    // Move over the next generation.
       next_pop.resize(0);                // Clear out the next pop to refill again.
     }
 
@@ -373,7 +375,7 @@ namespace evo {
     // any arguments.
     template <typename... ARGS>
     void Execute(ARGS... args) {
-      for (MEMBER * m : pop) {
+      for (MEMBER * m : pop.pop) {
         m->Execute(std::forward<ARGS>(args)...);
       }
     }
