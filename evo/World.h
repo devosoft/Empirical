@@ -73,6 +73,7 @@
 #include "../tools/vector.h"
 
 #include "OrgSignals.h"
+#include "PopulationManager.h"
 
 // Macro to add class elements associated with a dynamic function call.
 // For example, if you wanted to be able to have a dynamic fitness function, you would call:
@@ -129,11 +130,15 @@
 namespace emp {
 namespace evo {
 
+  EMP_SETUP_TYPE_SELECTOR(SelectPopManager, emp_is_population_manager);
+
   // Main world class...
 
-  template <typename MEMBER>
+  template <typename MEMBER, typename... MANAGERS>
   class World {
   protected:
+    using pop_manager_t = typename SelectPopManager<MANAGERS...>::type;
+
     emp::vector<MEMBER *> pop;
     emp::vector<MEMBER *> next_pop;
     emp::Random * random_ptr;
