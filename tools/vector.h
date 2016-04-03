@@ -35,14 +35,14 @@ namespace emp {
   public:
     vector() = default;
     vector(const emp::vector<T> &) = default;
-    vector(int size) : v(size) { emp_assert(size >= 0); }
-    vector(int size, const T & val) : v(size, val) { emp_assert(size >= 0); }
+    vector(int size) : v(size) { emp_assert(size >= 0, size); }
+    vector(int size, const T & val) : v(size, val) { emp_assert(size >= 0, size); }
     vector(std::initializer_list<T> in_list) : v(in_list) { ; }
     vector(const std::vector<T> & in) : v(in) { ; }         // Emergency fallback conversion.
     ~vector() = default;
 
     uint32_t size() const { return v.size(); }
-    void resize(int new_size) { emp_assert(new_size >= 0); v.resize(new_size); }
+    void resize(int new_size) { emp_assert(new_size >= 0, new_size); v.resize(new_size); }
 
     emp::vector<T> & operator=(const emp::vector<T> &) = default;
 
@@ -59,7 +59,7 @@ namespace emp {
     }
 
     const T & operator[](int pos) const {
-      emp_assert(pos >= 0 && pos < (int) v.size());
+      emp_assert(pos >= 0 && pos < (int) v.size(), pos, v.size());
       return v[pos];
     }
 
@@ -78,7 +78,7 @@ namespace emp {
     const T & back() const { return v.back(); }
 
     void pop_back() {
-      emp_assert(v.size() > 0);
+      emp_assert(v.size() > 0, v.size());
       v.pop_back();
     }
   };
