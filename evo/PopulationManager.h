@@ -42,12 +42,6 @@ namespace evo {
       return pos;
     }
     int AddOrgBirth(MEMBER * new_org) {
-      const int pos = pop.size();
-      pop.push_back(new_org);
-      return pos;
-    }
-
-    int ReplaceOrg(MEMBER * new_org) {
       const int pos = random_ptr->GetInt((int) pop.size());
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
