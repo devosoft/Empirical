@@ -1,5 +1,5 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
+// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
+// Copyright (C) Michigan State University, 2015. It is licensed
 // under the MIT Software license; see doc/LICENSE
 
 #ifndef EMP_ASSERT_H
@@ -104,7 +104,7 @@ namespace emp {
       EM_ASM_ARGS({ msg = Pointer_stringify($0); alert(msg); }, msg.c_str()); \
     abort();                                                            \
   }                                                                     \
-  
+
 #define emp_assert_var(VAR) emp_assert_var_info << #VAR << ": [" << VAR << "]\n";
 
 #define emp_assert_impl_2(EXPR, VAR) emp_assert_var(VAR); emp_assert_impl_1(EXPR)
@@ -133,19 +133,33 @@ namespace emp {
 }
 
 // Generating an output to standard error is an assert is tripped.
-#define emp_assert_base_impl(EXPR)                              \
-  do { if ( !(EXPR) ) {                                         \
-      std::cerr << "Assert Error (In " << __FILE__              \
-                << " line " << __LINE__                         \
-                << "): " << EMP_STRINGIFY(EXPR) << std::endl;   \
-      abort(); }                                                \
-  } while (0)
+#define emp_assert_var(VAR) std::cerr << #VAR << ": [" << VAR << "]\n";
 
-#define emp_assert(...) emp_assert_base_impl( EMP_GET_ARG_1(__VA_ARGS__, ~) )
+#define emp_assert_impl_1(X)
+#define emp_assert_impl_2(X, VAR)       emp_assert_var(VAR); emp_assert_impl_1(X);
+#define emp_assert_impl_3(X, VAR, ...)  emp_assert_var(VAR); emp_assert_impl_2(X,__VA_ARGS__);
+#define emp_assert_impl_4(X, VAR, ...)  emp_assert_var(VAR); emp_assert_impl_3(X,__VA_ARGS__);
+#define emp_assert_impl_5(X, VAR, ...)  emp_assert_var(VAR); emp_assert_impl_4(X,__VA_ARGS__);
+#define emp_assert_impl_6(X, VAR, ...)  emp_assert_var(VAR); emp_assert_impl_5(X,__VA_ARGS__);
+#define emp_assert_impl_7(X, VAR, ...)  emp_assert_var(VAR); emp_assert_impl_6(X,__VA_ARGS__);
+#define emp_assert_impl_8(X, VAR, ...)  emp_assert_var(VAR); emp_assert_impl_7(X,__VA_ARGS__);
+#define emp_assert_impl_9(X, VAR, ...)  emp_assert_var(VAR); emp_assert_impl_8(X,__VA_ARGS__);
+#define emp_assert_impl_10(X, VAR, ...) emp_assert_var(VAR); emp_assert_impl_9(X,__VA_ARGS__);
+#define emp_assert_impl_11(X, VAR, ...) emp_assert_var(VAR); emp_assert_impl_10(X,__VA_ARGS__);
+#define emp_assert_impl_12(X, VAR, ...) emp_assert_var(VAR); emp_assert_impl_11(X,__VA_ARGS__);
+
+#define emp_assert(...)                                                                 \
+  do { if ( !(EMP_GET_ARG_1(__VA_ARGS__, ~)) ) {                                        \
+      std::cerr << "Assert Error (In " << __FILE__                                      \
+                << " line " << __LINE__                                                 \
+                <<  "): " << EMP_STRINGIFY(EMP_GET_ARG_1(__VA_ARGS__, ~)) << std::endl; \
+      EMP_ASSEMBLE_MACRO(emp_assert_impl_, __VA_ARGS__)                                 \
+      abort();                                                                          \
+    }                                                                                   \
+  } while(0)
 
 
 #endif // NDEBUG
-
 
 
 #endif // Include guard
