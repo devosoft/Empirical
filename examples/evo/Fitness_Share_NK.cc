@@ -24,7 +24,7 @@ int main()
 {
   emp::Random random;
   emp::evo::NKLandscape<N,K> landscape(random);
-  emp::evo::World<BitOrg> pop(random);
+  emp::evo::EAWorld<BitOrg> pop(random);
 
   // Build a random initial population
   for (int i = 0; i < POP_SIZE; i++) {
@@ -53,9 +53,9 @@ int main()
       pop[i][random.GetInt(N)] = random.P(0.5);
       pop[i][random.GetInt(N)] = random.P(0.5);
     }
-  
+
   }
-  
+
 
   std::cout << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 }
