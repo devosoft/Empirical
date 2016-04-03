@@ -55,7 +55,7 @@ int main()
     pop.TournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }
 			 , 5, POP_SIZE-1);
     pop.Update();
-    pop.Mutate();
+    pop.MutatePop();
   }
 
 

@@ -16,7 +16,7 @@ using BitOrg = emp::BitSet<100>;
 int main()
 {
   emp::Random random;
-  emp::evo::World<BitOrg> pop(random);
+  emp::evo::EAWorld<BitOrg> pop(random);
 
   // Build a random initial population
   for (int i = 0; i < 100; i++) {

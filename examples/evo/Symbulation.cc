@@ -23,14 +23,14 @@ int main()
   emp::evo::World<emp::evo::SymbulationOrg> pop(random);
 
   for (int i = 0; i < POP_SIZE; i++) {
-    pop.Insert(random, ORG_SIZE);  // Generate a random org.
+    pop.InsertRandomOrg(ORG_SIZE);  // Generate a random org.
     pop[i].SetSymbiont(RandomBitVector(random, SYMB_SIZE, 0.5));
   }
-  
+
   std::cout << "Start!" << std::endl;
   for (int ud = 0; ud < UD_COUNT; ud++) {
     pop.Execute();
   }
   std::cout << "Done!" << std::endl;
-  
+
 }
