@@ -46,7 +46,7 @@
 //
 //  void TournamentSelect(std::function<double(ORG*)> fit_fun, int t_size, int tourny_count=1)
 //  void TournamentSelect(int t_size, int tourny_count=1)
-//  void RunTournament(std::vector<double> fitness, int t_size, int tourny_count=1)
+//  void RunTournament(emp::vector<double> fitness, int t_size, int tourny_count=1)
 //
 //  void FitnessSharingTournamentSelect(std::function<double(ORG*)> fit_fun,
 //          std::function<double(ORG*, ORG*)> dist_fun,
@@ -287,7 +287,7 @@ namespace evo {
       emp_assert(t_size > 0 && t_size <= (int) pop.size(), t_size, pop.size());
 
       // Pre-calculate fitnesses.
-      std::vector<double> fitness(pop.size());
+      emp::vector<double> fitness(pop.size());
       for (int i = 0; i < (int) pop.size(); ++i) fitness[i] = fit_fun(pop[i]);
 
       RunTournament(fitness, t_size, tourny_count);
@@ -299,10 +299,10 @@ namespace evo {
     }
 
     // Helper function to actually run a tournament
-    void RunTournament(std::vector<double> fitness, int t_size, int tourny_count=1){
+    void RunTournament(const emp::vector<double> & fitness, int t_size, int tourny_count=1){
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
       for (int T = 0; T < tourny_count; T++) {
-        std::vector<int> entries = random_ptr->Choose(pop.size(), t_size);
+        emp::vector<int> entries = random_ptr->Choose(pop.size(), t_size);
         double best_fit = fitness[entries[0]];
         int best_id = entries[0];
 
@@ -334,7 +334,7 @@ namespace evo {
       emp_assert(t_size > 0 && t_size <= (int) pop.size());
 
       // Pre-calculate fitnesses.
-      std::vector<double> fitness(pop.size());
+      emp::vector<double> fitness(pop.size());
       for (int i = 0; i < (int) pop.size(); ++i) {
         double niche_count = 0;
         for (int j = 0; j < (int) pop.size(); ++j) {
