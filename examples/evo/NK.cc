@@ -24,7 +24,7 @@ int main()
 {
   emp::Random random;
   emp::evo::NKLandscape<N,K> landscape(random);
-  emp::evo::World<BitOrg> pop(random);
+  emp::evo::EAWorld<BitOrg> pop(random);
 
   // Build a random initial population
   for (int i = 0; i < POP_SIZE; i++) {
@@ -33,7 +33,7 @@ int main()
     pop.Insert(next_org);
   }
 
-  pop.SetDefaultMutateFun( [](BitOrg* org, emp::Random& random){
+  pop.SetDefaultMutateFun( [](BitOrg* org, emp::Random& random) {
       (*org)[random.GetInt(N)] = random.P(0.5);
       (*org)[random.GetInt(N)] = random.P(0.5);
       (*org)[random.GetInt(N)] = random.P(0.5);

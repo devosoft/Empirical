@@ -49,7 +49,7 @@ int main()
 
 
 
-  emp::evo::World<TestOrg1> pop1(random);
+  emp::evo::EAWorld<TestOrg1> pop1(random);
   for (int i = 0; i < 100; i++) pop1.Insert(i+200);
 
   std::cout << "Start Size = " << pop1.GetSize() << std::endl;
