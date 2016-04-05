@@ -13,12 +13,24 @@
 namespace emp {
 
   template <typename TYPE>
-  void shuffle(std::vector<TYPE> & v, Random & random)
+  void Shuffle(Random & random, std::vector<TYPE> & v)
   {
     for (int i = 1; i < (int) v.size(); i++) {
-      int new_pos = random.GetInt(i+1);
-      if (new_pos == i) continue;
-      std::swap(v[i], v[new_pos]);
+      int pos = random.GetInt(i+1);
+      if (pos == i) continue;
+      std::swap(v[i], v[pos]);
+    }
+  }
+
+  // Shrink N-element vector to a random K elements:
+  template <typename T>
+  void Shrink(Random & random, std::vector<T> & v, int K) {
+    const int N = v.size();
+    if (N <= K) return;                     // Nothing to shrink!
+    for (int i = 0; i < K; i++) {           // Choose the elements to shrink to.
+      const int pos = random.GetInt(i, N);
+      if (pos == i) continue;
+      std::swap(v[i], v[pos]);
     }
   }
 
