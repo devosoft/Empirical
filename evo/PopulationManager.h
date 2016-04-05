@@ -69,14 +69,16 @@ namespace evo {
 
     // --- POPULATION MANIPULATIONS ---
 
-    // Run population through a bottlenect to (potentiall) shrink it.
+    // Run population through a bottleneck to (potentiall) shrink it.
     void DoBottleneck(const int new_size, bool choose_random=true) {
-      if (choose_random) {
-        std::cout << "Ping 1! " << new_size << std::endl;
-        emp::Shrink<ptr_t>(*random_ptr, pop, new_size);
-      } else {
-        if (new_size < (int) pop.size()) pop.resize(new_size);
-      }
+      if (new_size >= (int) pop.size()) return;  // No bottleneck needed!
+      std::cout << "Ping 1! " << new_size << std::endl;
+      // If we are supposed to keep only random organisms, shuffle the beginning into place!
+      if (choose_random) emp::Shuffle<ptr_t>(*random_ptr, pop, new_size);
+
+      // Delete all of the organisms we are removing and resize the population.
+      for (int i = new_size; i < (int) pop.size(); ++i) delete pop[i];
+      pop.resize(new_size);
     }
   };
 
