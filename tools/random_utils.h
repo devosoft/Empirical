@@ -13,30 +13,19 @@
 
 namespace emp {
 
+  // Shuffle all of the elements in a vector.
+  // If max_count is provided, just make sure that the first max_count entries are randomly
+  // drawn from entire vector.
   template <typename TYPE>
-  void Shuffle(Random & random, std::vector<TYPE> & v)
+  void Shuffle(Random & random, std::vector<TYPE> & v, int max_count=-1)
   {
-    for (int i = 1; i < (int) v.size(); i++) {
-      int pos = random.GetInt(i+1);
+    if (max_count < 0) max_count = (int) v.size();
+    for (uint32_t i = 0; i < max_count; i++) {
+      const uint32_t pos = random.GetUInt(i, v.size());
       if (pos == i) continue;
       std::swap(v[i], v[pos]);
     }
   }
-
-
-  // Shrink N-element vector to a random K elements:
-  template <typename T>
-  void Shrink(Random & random, emp::vector<T> & v, const int K) {
-    const int N = v.size();
-    if (N <= K) return;                     // Nothing to shrink!
-    for (int i = 0; i < K; i++) {           // Choose the elements to shrink to.
-      const int pos = random.GetInt(i, N);
-      if (pos == i) continue;
-      std::swap(v[i], v[pos]);
-    }
-    v.resize(K);
-  }
-
 
   BitVector RandomBitVector(Random & random, int size, double p=0.5)
   {
