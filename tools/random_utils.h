@@ -9,6 +9,7 @@
 
 #include "BitVector.h"
 #include "Random.h"
+#include "vector.h"
 
 namespace emp {
 
@@ -22,9 +23,10 @@ namespace emp {
     }
   }
 
+
   // Shrink N-element vector to a random K elements:
   template <typename T>
-  void Shrink(Random & random, std::vector<T> & v, int K) {
+  void Shrink(Random & random, emp::vector<T> & v, const int K) {
     const int N = v.size();
     if (N <= K) return;                     // Nothing to shrink!
     for (int i = 0; i < K; i++) {           // Choose the elements to shrink to.
@@ -32,6 +34,7 @@ namespace emp {
       if (pos == i) continue;
       std::swap(v[i], v[pos]);
     }
+    v.resize(K);
   }
 
 
