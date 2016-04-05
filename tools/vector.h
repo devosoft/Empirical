@@ -34,6 +34,7 @@ namespace emp {
 
   public:
     vector() = default;
+    typedef T value_type;
     vector(const emp::vector<T> &) = default;
     vector(int size) : v(size) { emp_assert(size >= 0, size); }
     vector(int size, const T & val) : v(size, val) { emp_assert(size >= 0, size); }
@@ -73,6 +74,11 @@ namespace emp {
     auto end() -> decltype(v.end()) { return v.end(); }
     auto begin() const -> const decltype(v.begin()) { return v.begin(); }
     auto end() const -> const decltype(v.end()) { return v.end(); }
+
+    auto rbegin() -> decltype(v.rbegin()) { return v.rbegin(); }
+    auto rend() -> decltype(v.rend()) { return v.rend(); }
+    auto rbegin() const -> const decltype(v.rbegin()) { return v.rbegin(); }
+    auto rend() const -> const decltype(v.rend()) { return v.rend(); }
 
     T & back() { return v.back(); }
     const T & back() const { return v.back(); }
