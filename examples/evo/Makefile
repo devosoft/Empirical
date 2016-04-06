@@ -6,8 +6,8 @@ CFLAGS_all := -Wall -Wno-unused-variable -Wno-unused-function -Wno-extra-semi -s
 CXX_web := emcc
 CXX_native := g++
 
-OFLAGS_native := -g -pedantic
-#OFLAGS_native := -O3 -DNDEBUG
+#OFLAGS_native := -g -pedantic
+OFLAGS_native := -O3 -DNDEBUG
 
 OFLAGS_web := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864 -s ASSERTIONS=2 -s DEMANGLE_SUPPORT=1 # -s SAFE_HEAP=1
 #OFLAGS_web := -Os -DNDEBUG -s TOTAL_MEMORY=67108864
@@ -19,7 +19,7 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 
-TARGETS := Fitness_Share_NK NK Symbulation World bit_evolve
+TARGETS := Fitness_Share_NK NK NK-Serial Symbulation World bit_evolve
 
 
 default: native
@@ -32,6 +32,9 @@ Fitness_Share_NK: Fitness_Share_NK.cc
 
 NK: NK.cc
 	$(CXX_native) $(CFLAGS_native) NK.cc -o NK
+
+NK-Serial: NK-Serial.cc
+	$(CXX_native) $(CFLAGS_native) NK-Serial.cc -o NK-Serial
 
 World: World.cc
 	$(CXX_native) $(CFLAGS_native) World.cc -o World
