@@ -14,6 +14,24 @@
 //  MANAGERS handle specific aspects of how the world should function, such as organism
 //  placement in the population, systematics tracking, environmental resources, etc.
 //
+//    PopulationManager.h defines:
+//      PopulationManager_Base<ORG>            -- Continuous generations
+//      PopulationManager_EA<ORG>              -- Synchronous generations
+//      PopulationManager_SerialTransfer<ORG>  -- Sequential bottlenecks
+//
+//  SIGNALS that will be triggered associated with world can customize behaviors.  Note that
+//  all signal names must be prefixed with the world name so that the correct world is used.
+//
+//      ::before-repro(int parent_position)   Trigger: Immediately prior to producing offspring
+//      ::on-birth(ORG * offspring)           Trigger: Offspring about to enter population
+//      ::on-inject(ORG * new_organism)       Trigger: New org about to be added to population
+//      ::on-new-org(int org_position)        Trigger: Organism has been added to population
+//
+//  Organisms can also trigger signals to affect the world.
+//
+//      ::do-repro(int org_id)                Trigger to initiate reproduction
+//      ::do-symbiont_repro(int host_id)      Trigger to initiate symbiont reproduction
+//
 // Constructors:
 //  World(const std::string & world_name="emp::evo::World")
 //  World(int random_seed, const std::string & world_name="emp::evo::World")
@@ -37,8 +55,8 @@
 //  void InsertNext(const ORG & mem, int copy_count=1)  - Insert into NEXT GENERATION of pop
 //
 // Organism Variation
-//  int Mutate(std::function<bool(ORG*)> mut_fun, const int first_mut=1)
-//  int Mutate(const int first_mut=1)
+//  int MutatePop(std::function<bool(ORG*)> mut_fun, int first_mut=0, int last_mut=-1)
+//  int MutatePop(int first_mut=0, int last_mut=-1)
 //
 // Selection Mechanisms
 //  void EliteSelect(std::function<double(ORG*)> fit_fun, int e_count=1, int copy_count=1)
@@ -142,8 +160,14 @@ namespace evo {
     pop_manager_t pop;
 
   protected:
-    emp::Random * random_ptr;
+    Random * random_ptr;
     bool random_owner;
+
+    // Signals triggered by the world.
+    Signal<int> before_repro_sig;     // Trigger: Immediately prior to producing offspring
+    Signal<ORG *> on_birth_sig;       // Trigger: Offspring about to enter population
+    Signal<ORG *> on_inject_sig;      // Trigger: New org about to be added to population
+    Signal<int> on_new_org_sig;       // Trigger: Organism has been added to population
 
     EMP_SETUP_EVO_WORLD_DEFAULT(default_fit_fun, Fitness, double)
     EMP_SETUP_EVO_WORLD_DEFAULT_ARGS(default_mut_fun, Mutate, bool, emp::Random &)
@@ -176,12 +200,20 @@ namespace evo {
     }
 
   public:
+    World(emp::Random * r_ptr, const std::string & pop_name="emp::evo::World")
+      : random_ptr(r_ptr), random_owner(false)
+      , before_repro_sig(to_string(pop_name,"before-repro"))
+      , on_birth_sig(to_string(pop_name,"on-birth"))
+      , on_inject_sig(to_string(pop_name,"on-inject"))
+      , on_new_org_sig(to_string(pop_name,"on-new-org"))
+      , callbacks(pop_name) { SetupWorld(); }
+
     World(const std::string & pop_name="emp::evo::World")
-      : random_ptr(new Random()), random_owner(true), callbacks(pop_name) { SetupWorld(); }
+      : World(new Random(), pop_name) { random_owner = true; }
     World(emp::Random & random, const std::string & pop_name="emp::evo::World")
-      : random_ptr(&random), random_owner(false), callbacks(pop_name) { SetupWorld(); }
+      : World(&random, pop_name) { ; }
     World(int seed, const std::string & pop_name="emp::evo::World")
-      : random_ptr(new Random(seed)), random_owner(true), callbacks(pop_name) { SetupWorld(); }
+      : World(new Random(seed), pop_name) { random_owner = true; }
     World(const World &) = delete;
     ~World() { Clear(); if (random_owner) delete random_ptr; }
     World & operator=(const World &) = delete;
@@ -196,27 +228,39 @@ namespace evo {
     void SetRandom(Random & random) { if (random_owner) delete random_ptr; random_ptr = &random; }
     void ResetRandom(int seed=-1) { SetRandom(*(new Random(seed))); }
 
+    LinkKey BeforeRepro(std::function<void(int)> fun) { return before_repro_sig.AddAction(fun); }
+    LinkKey OnBirth(std::function<void(ORG *)> fun) { return on_birth_sig.AddAction(fun); }
+    LinkKey OnInject(std::function<void(ORG *)> fun) { return on_inject_sig.AddAction(fun); }
+    LinkKey OnNewOrg(std::function<void(int)> fun) { return on_new_org_sig.AddAction(fun); }
+
+
     // All additions to the population must go through one of the following Insert methods
 
     void Insert(const ORG & mem, int copy_count=1) {
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);
+        on_inject_sig.Trigger(new_org);
         const int pos = pop.AddOrg(new_org);
         SetupOrg(*new_org, &callbacks, pos);
+        on_new_org_sig.Trigger(pos);
       }
     }
     template <typename... ARGS>
     void InsertRandomOrg(ARGS... args) {
       emp_assert(random_ptr != nullptr && "InsertRandomOrg() requires active random_ptr");
       ORG * new_org = new ORG(*random_ptr, std::forward<ARGS>(args)...);
+      on_inject_sig.Trigger(new_org);
       const int pos = pop.AddOrg(new_org);
       SetupOrg(*new_org, &callbacks, pos);
+      on_new_org_sig.Trigger(pos);
     }
     void InsertBirth(const ORG & mem, int copy_count=1) {
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);
+        on_birth_sig.Trigger(new_org);
         const int pos = pop.AddOrgBirth(new_org);
         SetupOrg(*new_org, &callbacks, pos);
+        on_new_org_sig.Trigger(pos);
       }
     }
 
@@ -224,6 +268,7 @@ namespace evo {
     void DoRepro(int id) {
       emp_assert(random_ptr != nullptr && "DoRepro() requires a random number generator.");
       std::cout << "Repro " << id << std::endl;
+      before_repro_sig.Trigger(id);
       ORG * new_org = new ORG(*(pop[id]));
       InsertBirth(*new_org);
     }
@@ -240,17 +285,19 @@ namespace evo {
     }
 
     // Mutations for the next generation (count number of mutated organisms)
-    int MutatePop(std::function<bool(ORG*,emp::Random&)> mut_fun, const int first_mut=1) {
+    int MutatePop(std::function<bool(ORG*,emp::Random&)> mut_fun,
+                  int first_mut=0, int last_mut=-1) {
       emp_assert(random_ptr != nullptr && "Mutate() requires active random_ptr");
+      if (last_mut == -1) last_mut = (int) pop.size();
       int mut_count = 0;
-      for (int i = 1; i < (int) pop.size(); i++) {
+      for (int i = first_mut; i < last_mut; i++) {
         if (mut_fun(pop[i], *random_ptr)) mut_count++;
       }
       return mut_count;
     }
 
-    int MutatePop(const int first_mut=1) {
-      return MutatePop(default_mut_fun, first_mut);
+    int MutatePop(const int first_mut=0, const int last_mut=-1) {
+      return MutatePop(default_mut_fun, first_mut, last_mut);
     }
 
     // Selection mechanisms choose organisms for the next generation.
