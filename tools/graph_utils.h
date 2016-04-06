@@ -1,5 +1,5 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
+// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
+// Copyright (C) Michigan State University, 2015. It is licensed
 // under the MIT Software license; see doc/LICENSE
 
 #ifndef EMP_GRAPH_UTILS_H
@@ -22,13 +22,13 @@
 #include "random_utils.h"
 
 namespace emp {
-  
+
   Graph build_graph_ring(int v_count, Random & random) {
     assert(v_count >= 0);
     Graph graph(v_count);
 
     std::vector<int> v_map = build_range(0, v_count);
-    shuffle(v_map, random);
+    Shuffle(random, v_map);
 
     for (int i = 1; i < v_count; i++) {
       const int from = v_map[i];
@@ -46,7 +46,7 @@ namespace emp {
     Graph graph(v_count);
 
     std::vector<int> v_map = build_range(0, v_count);
-    shuffle(v_map, random);
+    Shuffle(random, v_map);
 
     for (int i = 1; i < v_count; i++) {
       const int from = v_map[i];
@@ -64,7 +64,7 @@ namespace emp {
 
     assert(v_count >= 2 && e_count > 0); // We need at least two vertices to support an edge.
     assert(e_count <= max_edges); // Shouldn't have more edges than can fit!
-           
+
     Graph graph(v_count);
     int e_cur = 0;           // How many edges have we added?
 
@@ -74,7 +74,7 @@ namespace emp {
       graph = build_graph_tree(v_count, random);
       e_cur = v_count - 1;
     }
-    
+
     // @CAO -- we should do something better if we are filling in most of the edges.
 
     while (e_cur < e_count) {
@@ -99,7 +99,7 @@ namespace emp {
     Graph graph(v_count);
 
     std::vector<int> v_map = build_range(0, v_count);
-    shuffle(v_map, random);
+    Shuffle(random, v_map);
 
     for (int x=0; x < width; ++x) {
       for (int y=0; y < height; ++y) {
@@ -121,12 +121,12 @@ namespace emp {
   Graph build_graph_clique_set(int clique_size, int clique_count, Random & random,
                                double extra_prob=0.5) {
     assert(clique_size > 0 && clique_count > 0);
-    
+
     const int v_count = clique_size * clique_count;
     Graph graph(v_count);
 
     std::vector<int> v_map = build_range(0, v_count);
-    shuffle(v_map, random);
+    Shuffle(random, v_map);
 
     // Fill out all of the edges within a clique
     for (int start_id = 0; start_id < v_count; start_id += clique_size) {
@@ -154,7 +154,7 @@ namespace emp {
 
     return graph;
   }
-  
+
 
   // Helper function for loading symetric graphs from an input stream.
   // sub1 indicates that verticies are numbered 1 to N instead of 0 to N-1.

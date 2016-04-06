@@ -106,7 +106,7 @@ namespace emp {
       // Setup variables used by Statistical Distribution functions
       expRV = -log(Random::Get() / (double) _RAND_MBIG);
     }
-  
+
     // Basic Random number
     // Returns a random number [0,_RAND_MBIG)
     uint32_t Get() {
@@ -118,11 +118,11 @@ namespace emp {
 
       return mj;
     }
-  
+
   public:
     /**
      * Set up the random generator object.
-     * @param _seed The seed of the random number generator. 
+     * @param _seed The seed of the random number generator.
      * A negative seed means that the random number generator gets its
      * seed from the actual system time.
      **/
@@ -133,17 +133,17 @@ namespace emp {
 
     ~Random() { ; }
 
-  
+
     /**
      * @return The seed that was actually used to start the random sequence.
      **/
     inline int GetSeed() const { return seed; }
-  
+
     /**
      * @return The seed that was originally provided by the user.
      **/
     inline int GetOriginalSeed() const { return original_seed; }
-  
+
     /**
      * Starts a new sequence of pseudo random numbers.
      *
@@ -153,7 +153,7 @@ namespace emp {
      **/
     void ResetSeed(const int _seed) {
       original_seed = _seed;
-    
+
       if (_seed <= 0) {
         int seed_time = (int) time(NULL);
         int seed_mem = (int) ((uint64_t) this);
@@ -161,23 +161,23 @@ namespace emp {
       } else {
         seed = _seed;
       }
-    
+
       if (seed < 0) seed *= -1;
       seed %= _RAND_MSEED;
-    
+
       init();
     }
-  
-  
+
+
     // Random Number Generation /////////////////////////////////////////////////
-  
+
     /**
      * Generate a double between 0.0 and 1.0
      *
      * @return The pseudo random number.
      **/
     double GetDouble() { return Get() / (double) _RAND_MBIG; }
-  
+
     /**
      * Generate a double between 0 and a given number.
      *
@@ -185,7 +185,7 @@ namespace emp {
      * @param max The upper bound for the random numbers (will never be returned).
      **/
     double GetDouble(const double max) { return GetDouble() * max; }
-  
+
     /**
      * Generate a double out of a given interval.
      *
@@ -194,7 +194,7 @@ namespace emp {
      * @param max The upper bound for the random numbers (will never be returned).
      **/
     double GetDouble(const double min, const double max) { return GetDouble() * (max - min) + min; }
-  
+
     /**
      * Generate an uint32_t.
      *
@@ -202,7 +202,7 @@ namespace emp {
      * @param max The upper bound for the random numbers (will never be returned).
      **/
     uint32_t GetUInt(const uint32_t max) { return static_cast<int>(GetDouble() * static_cast<double>(max)); }
-  
+
     /**
      * Generate an uint32_t out of an interval.
      *
@@ -211,7 +211,7 @@ namespace emp {
      * @param max The upper bound for the random numbers (will never be returned).
      **/
     uint32_t GetUInt(const uint32_t min, const uint32_t max) { return GetUInt(max - min) + min; }
-  
+
     /**
      * Generate an int out of an interval.
      *
@@ -221,7 +221,7 @@ namespace emp {
      **/
     int GetInt(const int max) { return static_cast<int>(GetUInt(max)); }
     int GetInt(const int min, const int max) { return static_cast<int>(GetUInt(max - min)) + min; }
-  
+
 
     /**
      * Generate a random ordering.
@@ -241,20 +241,26 @@ namespace emp {
     }
 
     // Random Event Generation //////////////////////////////////////////////////
-  
+
     // P(p) => if p < [0,1) random variable
     bool P(const double _p) { return (Get() < (_p * _RAND_MBIG));}
 
-    // N choose K:
-    std::vector<int> Choose(int N, int K) {
-      std::vector<int> choices(K);
-      if (N < K || K < 0) return choices;  // @CAO Should be an assert!
 
+    // N choose K:
+    void Choose(int N, int K, std::vector<int> & choices) {
+      if (N < K || K < 0) return;  // @CAO Should be an assert!
+
+      choices.resize(K);
       while (K) {
         if (N==K || P(((double) K)/((double) N))) { choices[--K] = --N; }
         else --N;
       }
-    
+    }
+
+    // N choose K:
+    std::vector<int> Choose(int N, int K) {
+      std::vector<int> choices;
+      Choose(N,K,choices);
       return choices;
     }
 
@@ -273,7 +279,7 @@ namespace emp {
       while (1) {
         expRV2 = -log(GetDouble());
         expRV -= (expRV2-1)*(expRV2-1)/2;
-        if (expRV > 0) break;  
+        if (expRV > 0) break;
         expRV = -log(GetDouble());
       }
       if (P(.5)) return expRV2;
@@ -285,7 +291,7 @@ namespace emp {
      * mean and standard deviation.
      **/
     double GetRandNormal(const double mean, const double std) { return mean + GetRandNormal() * std; }
-  
+
     /**
      * Generate a random variable drawn from a Poisson distribution.
      **/
@@ -294,7 +300,7 @@ namespace emp {
       if (p > .5) return (uint32_t)n - GetRandPoisson(n * (1 - p));
       else return GetRandPoisson(n * p);
     }
-  
+
     /**
      * Generate a random variable drawn from a Poisson distribution.
      *
@@ -313,11 +319,11 @@ namespace emp {
       }
       return k;
     }
-  
+
     /**
      * Generate a random variable drawn from a Binomial distribution.
-     * 
-     * This function is exact, but slow. 
+     *
+     * This function is exact, but slow.
      * @see Random::GetRandBinomial
      **/
     uint32_t GetFullRandBinomial(const double n, const double p) { // Exact
@@ -329,12 +335,12 @@ namespace emp {
 
     /**
      * Generate a random variable drawn from a Binomial distribution.
-     * 
-     * This function is faster than @ref Random::GetFullRandBinomial(), but 
+     *
+     * This function is faster than @ref Random::GetFullRandBinomial(), but
      * uses some approximations.
      *
      * @see Random::GetFullRandBinomial
-     **/  
+     **/
     uint32_t GetRandBinomial(const double n, const double p) { // Approx
       // Approximate Binomial if appropriate
       // if np(1-p) is large, use a Normal approx
@@ -358,10 +364,10 @@ namespace emp {
   struct RandomStdAdaptor {
     typedef int argument_type;
     typedef int result_type;
-  
+
     RandomStdAdaptor(Random& rng) : _rng(rng) { }
     int operator()(int n) { return _rng.GetInt(n); }
-  
+
     Random& _rng;
   };
 
@@ -384,18 +390,18 @@ namespace emp {
   // void sample_without_replacement(ForwardIterator first, ForwardIterator last, OutputIterator ofirst, OutputIterator olast, RNG rng) {
   //   std::size_t range = std::distance(first, last);
   //   std::size_t output_range = std::distance(ofirst, olast);
-  
+
   //   // if our output range is greater in size than our input range, copy the whole thing.
   //   if(output_range >= range) {
   //     std::copy(first, last, ofirst);
   //     return;
   //   }
-	
+
   //   std::vector<std::size_t> rmap(range);
   //   int next_val = 0;
   //   for (std::size_t & entry : rmap) entry = next_val++;
   //   std::random_shuffle(rmap.begin(), rmap.end());
-  
+
   //   while(ofirst != olast) {
   //     *ofirst = *(first + rmap.back());
   //     ++ofirst;
@@ -414,7 +420,7 @@ namespace emp {
   //   sample_without_replacement(input.begin(), input.end(), ofirst, olast, rng);
   // }
 
-	
+
   // /*! Choose one element at random from the given range.
   //  */
   // template <typename ForwardIterator, typename RNG>
