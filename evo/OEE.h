@@ -12,8 +12,36 @@
 
 namespace emp{
 namespace evo{
+
   template <typename GENOME>
-    int ChangeMetric(LineageTracker<GENOME>* lineages, 
+  float EcologyMetric(LineageTracker<GENOME>* lineages,
+		      std::set<int> curr_generation, int generations){
+
+    std::set<GENOME> persist = GetPersistLineage(lineages, curr_generation,  generations);
+    
+    
+
+  }
+
+  template <typename GENOME>
+  int NoveltyMetric(LineageTracker<GENOME>* lineages,
+		      std::set<int> curr_generation, int generations,
+		      std::set<GENOME> novel){
+    
+    std::set<GENOME> persist = GetPersistLineage(lineages, curr_generation,  generations);
+    int result = 0;
+
+    for (GENOME gen : persist){
+      if (novel.find(gen) == novel.end()){
+	result++;
+      }
+    }
+
+    return result;
+  }
+
+  template <typename GENOME>
+  int ChangeMetric(LineageTracker<GENOME>* lineages, 
 		     std::set<int> curr_generation, 
 		     std::set<int> prev_generation, int generations){
     
@@ -27,14 +55,22 @@ namespace evo{
     return result.size();
   }
 
+
+  //Returns a set of org ids (from lineage tracker) representing ancestors
+  //of the organisms with ids in curr_generation that lived the specified number
+  //of generations earlier
+  //
+  //TODO: This depends on generations right now, which means it won't work
+  //with steady-state populations.
   template <typename GENOME>
-    std::set<GENOME> GetPersistLineage(LineageTracker<GENOME>* lineages, 
+  std::set<GENOME> GetPersistLineage(LineageTracker<GENOME>* lineages, 
 				       std::set<int> curr_generation,
 				       int generations){
 
     std::set<GENOME> persist;
     for (int id : curr_generation){
       emp::vector<GENOME*> lin = lineages->TraceLineage(id);
+      emp_assert(lin.size() - generations > 0);
       persist.insert(**(lin.begin() + generations));
     }
     
