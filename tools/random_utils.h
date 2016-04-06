@@ -9,19 +9,23 @@
 
 #include "BitVector.h"
 #include "Random.h"
+#include "vector.h"
 
 namespace emp {
 
+  // Shuffle all of the elements in a vector.
+  // If max_count is provided, just make sure that the first max_count entries are randomly
+  // drawn from entire vector.
   template <typename TYPE>
-  void shuffle(std::vector<TYPE> & v, Random & random)
+  void Shuffle(Random & random, std::vector<TYPE> & v, int max_count=-1)
   {
-    for (int i = 1; i < (int) v.size(); i++) {
-      int new_pos = random.GetInt(i+1);
-      if (new_pos == i) continue;
-      std::swap(v[i], v[new_pos]);
+    if (max_count < 0) max_count = (int) v.size();
+    for (uint32_t i = 0; i < max_count; i++) {
+      const uint32_t pos = random.GetUInt(i, v.size());
+      if (pos == i) continue;
+      std::swap(v[i], v[pos]);
     }
   }
-
 
   BitVector RandomBitVector(Random & random, int size, double p=0.5)
   {

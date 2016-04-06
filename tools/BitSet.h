@@ -11,19 +11,23 @@
 //
 //
 // Constructors:
-//  BitSet()                        -- Assume all zeroes in set
-//  BitSet(const BitSet & in_set)   -- Copy Constructor
+//  BitSet()                                     -- Assume all zeroes in set
+//  BitSet(const BitSet & in_set)                -- Copy Constructor
+//  BitSet(emp::Random & random, double p1=0.5)  -- Build a random bitset.
 //
-// Assignment and equality test:
-//  BitSet & operator=(const BitSet & in_set)     -- Copy over a BitSet of the same size
-//  BitSet & Import(const BitSet & in_set)        -- Copy over a BitSet of a different size
-//  BitSet Export<NEW_SIZE>()                     -- Convert this BitSet a different size
+// Assignment helpers:
+//  BitSet & operator=(const BitSet & in_set)           -- Copy over a BitSet of the same size
+//  void Randomize(emp::Random & random, double p1=0.5) -- Randomize all bits.
+//  BitSet & Import(const BitSet & in_set)              -- Copy over a BitSet of a different size
+//  BitSet Export<NEW_SIZE>()                           -- Convert this BitSet a different size
+//
+// Comparisons:
 //  bool operator==(const BitSet & in_set) const  -- Test if all bits are identical
 //  bool operator<(const BitSet & in_set) const   -- Ordering to facilitate sorting, etc.
 //  bool operator<=(const BitSet & in_set) const  -- ...filling out remaining Boolean comparisons
-//  bool operator>(const BitSet & in_set) const   -- 
-//  bool operator>=(const BitSet & in_set) const  -- 
-//  bool operator!=(const BitSet & in_set) const  -- 
+//  bool operator>(const BitSet & in_set) const   --
+//  bool operator>=(const BitSet & in_set) const  --
+//  bool operator!=(const BitSet & in_set) const  --
 //
 // Sizing:
 //  int GetSize() const
@@ -49,7 +53,7 @@
 //
 // Bit analysis:
 //  int CountOnes()
-//  int FindBit(int start_bit)   -- Return pos of first 1 after start_bit 
+//  int FindBit(int start_bit)   -- Return pos of first 1 after start_bit
 //
 // Boolean math functions:
 //  BitSet NOT() const
@@ -95,6 +99,7 @@
 #include "bitset_utils.h"
 #include "const_utils.h"
 #include "functions.h"
+#include "Random.h"
 
 namespace emp {
 
@@ -107,7 +112,7 @@ namespace emp {
     static const int NUM_BYTES = 1 + ((NUM_BITS - 1) >> 3);
 
     uint32_t bit_set[NUM_FIELDS];
-    
+
     // Setup a bit proxy so that we can use operator[] on bit sets as a lvalue.
     class BitProxy {
     private:
@@ -115,7 +120,7 @@ namespace emp {
       int index;
     public:
       BitProxy(BitSet<NUM_BITS> & _set, int _idx) : bit_set(_set), index(_idx) {;}
-      
+
       BitProxy & operator=(bool b) {    // lvalue handling...
         bit_set.Set(index, b);
         return *this;
@@ -153,7 +158,7 @@ namespace emp {
         }
         for (int i = field_shift - 1; i >= 0; i--) bit_set[i] = 0;
       }
-    
+
       // account for bit_shift
       if (bit_shift) {
         for (int i = NUM_FIELDS - 1; i > field_shift; --i) {
@@ -168,14 +173,14 @@ namespace emp {
       if (LAST_BIT) { bit_set[NUM_FIELDS - 1] &= (1U << LAST_BIT) - 1U; }
     }
 
-  
+
     // Helper for calling SHIFT with negative number
     void ShiftRight(const int shift_size) {
       assert(shift_size > 0);
       const int field_shift = shift_size / 32;
       const int bit_shift = shift_size % 32;
       const int bit_overflow = 32 - bit_shift;
-  
+
       // account for field_shift
       if (field_shift) {
         for (int i = 0; i < (NUM_FIELDS - field_shift); ++i) {
@@ -183,7 +188,7 @@ namespace emp {
         }
         for (int i = NUM_FIELDS - field_shift; i < NUM_FIELDS; i++) bit_set[i] = 0;
       }
-  
+
       // account for bit_shift
       if (bit_shift) {
         for (int i = 0; i < (NUM_FIELDS - 1 - field_shift); ++i) {
@@ -197,11 +202,16 @@ namespace emp {
   public:
     BitSet() { Clear(); }
     BitSet(const BitSet & in_set) { Copy(in_set.bit_set); }
+    BitSet(Random & random, const double p1=0.5) { Randomize(random, p1); }
     ~BitSet() { ; }
 
     BitSet & operator=(const BitSet<NUM_BITS> & in_set) {
       Copy(in_set.bit_set);
       return *this;
+    }
+
+    void Randomize(Random & random, const double p1=0.5) {
+      for (int i = 0; i < NUM_BITS; i++) Set(i, random.P(p1));
     }
 
     // Assign from a BitSet of a different size.
@@ -319,12 +329,12 @@ namespace emp {
     BitProxy operator[](int index) { return BitProxy(*this, index); }
 
     void Clear() { for (auto & i : bit_set) i = 0U; }
-    void SetAll() { 
+    void SetAll() {
       for (auto & i : bit_set) i = ~0U;
       if (LAST_BIT > 0) { bit_set[NUM_FIELDS - 1] &= constant::MaskLow<uint32_t>(LAST_BIT); }
     }
 
-  
+
     void Print(std::ostream & out=std::cout) const {
       for (int i = NUM_BITS - 1; i >= 0; i--) {
         out << Get(i);
@@ -340,7 +350,7 @@ namespace emp {
 
 
     // Count 1's by looping through once for each bit equal to 1
-    int CountOnes_Sparse() const { 
+    int CountOnes_Sparse() const {
       int bit_count = 0;
       for (auto i : bit_set) {
         while (i) {
@@ -382,7 +392,7 @@ namespace emp {
 
 
     int FindBit(const int start_pos) const {
-      // @CAO -- There are better ways to do this with bit tricks 
+      // @CAO -- There are better ways to do this with bit tricks
       //         (but start_pos is tricky...)
       for (int i = start_pos; i < NUM_BITS; i++) {
         if (Get(i)) return i;
@@ -398,7 +408,7 @@ namespace emp {
       }
       return out_set;
     }
-    
+
     // Boolean math functions...
     BitSet NOT() const {
       BitSet out_set(*this);
@@ -445,7 +455,7 @@ namespace emp {
       if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= constant::MaskLow<uint32_t>(LAST_BIT);
       return out_set;
     }
-  
+
 
     // Boolean math functions...
     BitSet & NOT_SELF() {
@@ -486,7 +496,7 @@ namespace emp {
       if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= constant::MaskLow<uint32_t>(LAST_BIT);
       return *this;
     }
-  
+
     // Positive shifts go left and negative go right (0 does nothing)
     BitSet SHIFT(const int shift_size) const {
       BitSet out_set(*this);

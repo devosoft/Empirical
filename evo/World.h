@@ -137,12 +137,13 @@ namespace evo {
 
   template <typename ORG, typename... MANAGERS>
   class World {
+  public:
+    using pop_manager_t = typename SelectPopManager<MANAGERS...,PopulationManager_Base<ORG>>::type;
+    pop_manager_t pop;
+
   protected:
     emp::Random * random_ptr;
     bool random_owner;
-
-    using pop_manager_t = typename SelectPopManager<MANAGERS...,PopulationManager_Base<ORG>>::type;
-    pop_manager_t pop;
 
     EMP_SETUP_EVO_WORLD_DEFAULT(default_fit_fun, Fitness, double)
     EMP_SETUP_EVO_WORLD_DEFAULT_ARGS(default_mut_fun, Mutate, bool, emp::Random &)
@@ -283,14 +284,17 @@ namespace evo {
     // User provides the fitness function, the tournament size, and (optionally) the
     // number of tournaments to run.
     void TournamentSelect(std::function<double(ORG*)> fit_fun, int t_size,
-        int tourny_count=1) {
+        int tourny_count=1, bool precalc_fitness=true) {
       emp_assert(t_size > 0 && t_size <= (int) pop.size(), t_size, pop.size());
 
-      // Pre-calculate fitnesses.
-      emp::vector<double> fitness(pop.size());
-      for (int i = 0; i < (int) pop.size(); ++i) fitness[i] = fit_fun(pop[i]);
+      if (precalc_fitness && t_size * tourny_count * 2 >= (int) pop.size()) {
+        // Pre-calculate fitnesses.
+        emp::vector<double> fitness(pop.size());
+        for (int i = 0; i < (int) pop.size(); ++i) fitness[i] = fit_fun(pop[i]);
 
-      RunTournament(fitness, t_size, tourny_count);
+        RunTournament(fitness, t_size, tourny_count);
+      }
+      else RunTournament(fit_fun, t_size, tourny_count);
     }
 
     // Tournament Selection can use the default fitness function.
@@ -298,7 +302,7 @@ namespace evo {
       TournamentSelect(default_fit_fun, t_size, tourny_count);
     }
 
-    // Helper function to actually run a tournament
+    // Helper function to run a tournament when fitness is pre-calculated
     void RunTournament(const emp::vector<double> & fitness, int t_size, int tourny_count=1){
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
       for (int T = 0; T < tourny_count; T++) {
@@ -319,6 +323,29 @@ namespace evo {
         InsertBirth( *(pop[best_id]) );
       }
     }
+
+    // Helper function to run a tournament when fitness is NOT pre-calculated
+    void RunTournament(std::function<double(ORG*)> fit_fun, int t_size, int tourny_count=1){
+      emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
+      for (int T = 0; T < tourny_count; T++) {
+        emp::vector<int> entries = random_ptr->Choose(pop.size(), t_size);
+        double best_fit = fit_fun(pop[entries[0]]);
+        int best_id = entries[0];
+
+        // Search for a higher fit org in the tournament.
+        for (int i = 1; i < t_size; i++) {
+          const double cur_fit = fit_fun(pop[entries[i]]);
+          if (cur_fit > best_fit) {
+            best_fit = cur_fit;
+            best_id = entries[i];
+          }
+        }
+
+        // Place the highest fitness into the next generation!
+        InsertBirth( *(pop[best_id]) );
+      }
+    }
+
 
     // Run tournament selection with fitnesses adjusted by Goldberg and
     // Richardson's fitness sharing function (1987)
