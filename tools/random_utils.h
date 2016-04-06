@@ -16,8 +16,8 @@ namespace emp {
   // Shuffle all of the elements in a vector.
   // If max_count is provided, just make sure that the first max_count entries are randomly
   // drawn from entire vector.
-  template <typename TYPE>
-  void Shuffle(Random & random, std::vector<TYPE> & v, int max_count=-1)
+  template <typename T>
+  void Shuffle(Random & random, emp::vector<T> & v, int max_count=-1)
   {
     if (max_count < 0) max_count = (int) v.size();
     for (uint32_t i = 0; i < max_count; i++) {
