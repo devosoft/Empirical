@@ -32,12 +32,11 @@ int main()
   BitOrg ancestor(random);                       // Build a random ancestor
   world.Insert(ancestor, MIN_POP_SIZE);          // Insert several copies of ancestor
 
-  // Setup default method for mutations...
-  world.SetDefaultMutateFun( [](BitOrg* org, emp::Random& random) {
+  // Trigger mutations on organisms when they are born.
+  world.OnBirth( [&random](BitOrg* org) {
       (*org)[random.GetInt(N)] = random.P(0.5);
       (*org)[random.GetInt(N)] = random.P(0.5);
       (*org)[random.GetInt(N)] = random.P(0.5);
-      return true;
     } );
 
 
@@ -52,8 +51,6 @@ int main()
     // Run a tournament for the rest...
     world.TournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }
 			 , 5, 1000, false);
-    world.Update();
-    world.MutatePop();
   }
 
 
