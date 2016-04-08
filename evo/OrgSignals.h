@@ -29,7 +29,7 @@ namespace evo {
     std::string prefix;
 
     OrgSignals_Basic(const std::string & sig_prefix)
-      : repro_sig(to_string(sig_prefix, ":repro")), prefix(sig_prefix)
+      : repro_sig(to_string(sig_prefix, "::do-repro")), prefix(sig_prefix)
     { ; }
   };
 
@@ -42,7 +42,7 @@ namespace evo {
 
     OrgSignals_Eco(const std::string & sig_prefix)
       : OrgSignals_Basic(sig_prefix)
-      , symbiont_repro_sig(to_string(sig_prefix, ":symbiont_repro"))
+      , symbiont_repro_sig(to_string(sig_prefix, "::do-symbiont_repro"))
     { ; }
   };
 

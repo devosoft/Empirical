@@ -72,7 +72,7 @@ namespace evo {
     // Run population through a bottleneck to (potentiall) shrink it.
     void DoBottleneck(const int new_size, bool choose_random=true) {
       if (new_size >= (int) pop.size()) return;  // No bottleneck needed!
-      std::cout << "Ping 1! " << new_size << std::endl;
+
       // If we are supposed to keep only random organisms, shuffle the beginning into place!
       if (choose_random) emp::Shuffle<ptr_t>(*random_ptr, pop, new_size);
 
