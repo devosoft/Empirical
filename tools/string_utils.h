@@ -1,5 +1,5 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
+// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
+// Copyright (C) Michigan State University, 2015. It is licensed
 // under the MIT Software license; see doc/LICENSE
 
 #ifndef EMP_STRING_UTILS_H
@@ -15,7 +15,8 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <vector>
+
+#include "vector.h"
 
 namespace emp {
 
@@ -99,7 +100,7 @@ namespace emp {
     else if (val == 4) ret_string += "IV";
     else if (val > 0) ret_string += to_roman_numeral(val - 1, "I");
 
-    // else we already have it exactly and don't need to return anything.                             
+    // else we already have it exactly and don't need to return anything.
     return ret_string;
   }
 
@@ -259,7 +260,7 @@ namespace emp {
   }
 
   // Cut up a string based on a deliminator.
-  static void slice_string(const std::string & in_string, std::vector<std::string> & out_set,
+  static void slice_string(const std::string & in_string, emp::vector<std::string> & out_set,
                     char delim='\n') {
     int test_size = (int) in_string.size();
 
