@@ -1,4 +1,4 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
@@ -50,7 +50,7 @@ namespace emp {
       int index;
     public:
       BitProxy(BitVector & _v, int _idx) : bit_vector(_v), index(_idx) {;}
-      
+
       BitProxy & operator=(bool b) {    // lvalue handling...
         bit_vector.Set(index, b);
         return *this;
@@ -96,7 +96,7 @@ namespace emp {
         }
         for (int i = field_shift - 1; i >= 0; i--) bit_set[i] = 0;
       }
-    
+
       // account for bit_shift
       if (bit_shift) {
         for (int i = NUM_FIELDS - 1; i > field_shift; --i) {
@@ -112,7 +112,7 @@ namespace emp {
       if (last_bit_id) { bit_set[NUM_FIELDS - 1] &= (1U << last_bit_id) - 1U; }
     }
 
-  
+
     // Helper for calling SHIFT with negative number
     void ShiftRight(const int shift_size) {
       assert(shift_size > 0);
@@ -120,7 +120,7 @@ namespace emp {
       const int bit_shift = shift_size % FIELD_BITS;
       const int bit_overflow = FIELD_BITS - bit_shift;
       const int NUM_FIELDS = NumFields();
-      
+
       // account for field_shift
       if (field_shift) {
         for (int i = 0; i < (NUM_FIELDS - field_shift); ++i) {
@@ -128,7 +128,7 @@ namespace emp {
         }
         for (int i = NUM_FIELDS - field_shift; i < NUM_FIELDS; i++) bit_set[i] = 0U;
       }
-  
+
       // account for bit_shift
       if (bit_shift) {
         for (int i = 0; i < (NUM_FIELDS - 1 - field_shift); ++i) {
@@ -187,11 +187,11 @@ namespace emp {
       const int old_num_fields = NumFields();
       num_bits = new_bits;
       const int NUM_FIELDS = NumFields();
-      
+
       if (NUM_FIELDS == old_num_fields) {   // We can use our existing bit field
         num_bits = new_bits;
         // If there are extra bits, zero them out.
-        if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= constant::MaskLow<field_type>(LastBitID()); 
+        if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= constant::MaskLow<field_type>(LastBitID());
       }
 
       else {  // We have to change the number of bitfields.  Resize & copy old info.
@@ -322,13 +322,13 @@ namespace emp {
       const int NUM_FIELDS = NumFields();
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = 0U;
     }
-    void SetAll() { 
+    void SetAll() {
       const int NUM_FIELDS = NumFields();
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(0U);
       if (LastBitID() > 0) { bit_set[NUM_FIELDS - 1] &= constant::MaskLow<field_type>(LastBitID()); }
     }
 
-  
+
     void Print(std::ostream & out=std::cout) const {
       for (int i = num_bits - 1; i >= 0; i--) {
         out << Get(i);
@@ -344,7 +344,7 @@ namespace emp {
 
 
     // Count 1's by looping through once for each bit equal to 1
-    int CountOnes_Sparse() const { 
+    int CountOnes_Sparse() const {
       const int NUM_FIELDS = NumFields();
       int bit_count = 0;
       for (int i = 0; i < NUM_FIELDS; i++) {
@@ -359,8 +359,8 @@ namespace emp {
 
     // Count 1's in semi-parallel; fastest for even 0's & 1's
     int CountOnes_Mixed() const {
-      // const int NUM_FIELDS = NumFields(); 
-      const int NUM_FIELDS = NumFields() * sizeof(field_type)/4; 
+      // const int NUM_FIELDS = NumFields();
+      const int NUM_FIELDS = NumFields() * sizeof(field_type)/4;
       uint32_t * uint_bit_set = (uint32_t *) bit_set;
       int bit_count = 0;
       for (int i = 0; i < NUM_FIELDS; i++) {
@@ -416,7 +416,7 @@ namespace emp {
       }
       return out_set;
     }
-    
+
     // Boolean math functions...
     BitVector NOT() const {
       const int NUM_FIELDS = NumFields();
@@ -470,7 +470,7 @@ namespace emp {
       if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= constant::MaskLow<field_type>(LastBitID());
       return out_set;
     }
-  
+
 
     // Boolean math functions...
     BitVector & NOT_SELF() {
@@ -518,7 +518,7 @@ namespace emp {
       if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= constant::MaskLow<field_type>(LastBitID());
       return *this;
     }
-  
+
     // Positive shifts go left and negative go right (0 does nothing)
     BitVector SHIFT(const int shift_size) const {
       BitVector out_set(*this);

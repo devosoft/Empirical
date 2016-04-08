@@ -1,14 +1,12 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  This file provides a number of tools for manipulating graphs.
 
 #ifndef EMP_GRAPH_UTILS_H
 #define EMP_GRAPH_UTILS_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-//  This file provides a number of tools for manipulating graphs.
-//
 
 #include <assert.h>
 #include <fstream>
