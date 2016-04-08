@@ -353,7 +353,7 @@ namespace evo {
     void RunTournament(const emp::vector<double> & fitness, int t_size, int tourny_count=1){
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
       for (int T = 0; T < tourny_count; T++) {
-        emp::vector<int> entries = random_ptr->Choose(pop.size(), t_size);
+        emp::vector<int> entries = Choose(*random_ptr, pop.size(), t_size);
         double best_fit = fitness[entries[0]];
         int best_id = entries[0];
 
@@ -375,7 +375,7 @@ namespace evo {
     void RunTournament(std::function<double(ORG*)> fit_fun, int t_size, int tourny_count=1){
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
       for (int T = 0; T < tourny_count; T++) {
-        emp::vector<int> entries = random_ptr->Choose(pop.size(), t_size);
+        emp::vector<int> entries = Choose(*random_ptr, pop.size(), t_size);
         double best_fit = fit_fun(pop[entries[0]]);
         int best_id = entries[0];
 
