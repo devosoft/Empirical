@@ -1,4 +1,4 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
@@ -11,7 +11,7 @@
 #include <vector>
 
 namespace emp {
-  
+
   template <typename RETURN_TYPE, typename... ARG_TYPES> class FunctionSet {
   private:
     std::vector<std::function<RETURN_TYPE(ARG_TYPES...)> > fun_set;
@@ -23,7 +23,7 @@ namespace emp {
 
     int GetSize() const { return (int) fun_set.size(); }
     uint32_t size() const { return fun_set.size(); }     // For compatability with STL
-    
+
     void Add(const std::function<RETURN_TYPE(ARG_TYPES...)> & in_fun) {
       fun_set.push_back(in_fun);
     }

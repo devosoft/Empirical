@@ -1,16 +1,13 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//
+// This file sets up an Alert function that will go to std::cerr in c++ or
+// to Alert() in Javascript.
 
 #ifndef EMP_ALERT_H
 #define EMP_ALERT_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
-// 
-// This file sets up an Alert function that will go to std::cerr in c++ or
-// to Alert() in Javascript.
-//
-
 
 #include "string_utils.h"
 
