@@ -24,14 +24,8 @@
 //    uint32_t GetUInt(uint32_t min, uint32_t max)
 //      Retrive a random int or uint in the range [min, max).  By default, min=0.
 //
-//    std::vector<int> GetPermutation(int size)
-//      Retrive a vector from one to size in a random order.
-//
 //    bool P(double p)
 //      Tests a random value [0,1) against a given probability p, and returns true of false.
-//
-//    std::vector<int> Choose(int N, int K)
-//      Chooses K random entries from N possibilities and returns in a vector of int.
 //
 //    double GetRandNormal(const double mean, const double std)
 //    uint32_t GetRandPoisson(const double n, double p)
@@ -49,7 +43,6 @@
 #include <cmath>
 #include <iterator>
 #include <unistd.h>
-#include <vector>
 
 namespace emp {
   class Random {
@@ -223,46 +216,10 @@ namespace emp {
     int GetInt(const int min, const int max) { return static_cast<int>(GetUInt(max - min)) + min; }
 
 
-    /**
-     * Generate a random ordering.
-     *
-     * @return An std::vector<int> numbered 0 through size-1 in a random order.
-     * @param size The number of values to randomly order.
-     **/
-    std::vector<int> GetPermutation(int size) {
-      std::vector<int> seq(size);
-      seq[0] = 0;
-      for (int i = 1; i < size; i++) {
-        uint32_t val_pos = GetUInt(i+1);
-        seq[i] = seq[val_pos];
-        seq[val_pos] = i;
-      }
-      return seq;
-    }
-
     // Random Event Generation //////////////////////////////////////////////////
 
     // P(p) => if p < [0,1) random variable
     bool P(const double _p) { return (Get() < (_p * _RAND_MBIG));}
-
-
-    // N choose K:
-    void Choose(int N, int K, std::vector<int> & choices) {
-      if (N < K || K < 0) return;  // @CAO Should be an assert!
-
-      choices.resize(K);
-      while (K) {
-        if (N==K || P(((double) K)/((double) N))) { choices[--K] = --N; }
-        else --N;
-      }
-    }
-
-    // N choose K:
-    std::vector<int> Choose(int N, int K) {
-      std::vector<int> choices;
-      Choose(N,K,choices);
-      return choices;
-    }
 
 
     // Statistical functions ////////////////////////////////////////////////////
@@ -383,51 +340,6 @@ namespace emp {
     }
   }
 
-
-  // /*! Draw a sample (without replacement) from an input range, copying to the output range.
-  //  */
-  // template <typename ForwardIterator, typename OutputIterator, typename RNG>
-  // void sample_without_replacement(ForwardIterator first, ForwardIterator last, OutputIterator ofirst, OutputIterator olast, RNG rng) {
-  //   std::size_t range = std::distance(first, last);
-  //   std::size_t output_range = std::distance(ofirst, olast);
-
-  //   // if our output range is greater in size than our input range, copy the whole thing.
-  //   if(output_range >= range) {
-  //     std::copy(first, last, ofirst);
-  //     return;
-  //   }
-
-  //   std::vector<std::size_t> rmap(range);
-  //   int next_val = 0;
-  //   for (std::size_t & entry : rmap) entry = next_val++;
-  //   std::random_shuffle(rmap.begin(), rmap.end());
-
-  //   while(ofirst != olast) {
-  //     *ofirst = *(first + rmap.back());
-  //     ++ofirst;
-  //     rmap.pop_back();
-  //   }
-  // }
-
-  // /*! Convenience function to draw samples (without replacement) from a range of values.
-  //  */
-  // template <typename T, typename OutputIterator, typename RNG>
-  // void sample_range_without_replacement(T min, T max, OutputIterator ofirst, OutputIterator olast, RNG rng) {
-  //   std::size_t range = static_cast<std::size_t>(max - min);
-  //   std::vector<T> input(range);
-  //   int next_val = min;
-  //   for (T & entry : input) entry = next_val++;
-  //   sample_without_replacement(input.begin(), input.end(), ofirst, olast, rng);
-  // }
-
-
-  // /*! Choose one element at random from the given range.
-  //  */
-  // template <typename ForwardIterator, typename RNG>
-  // ForwardIterator choose(ForwardIterator first, ForwardIterator last, RNG rng) {
-  //   std::size_t range = std::distance(first, last);
-  //   return first+rng(range);
-  // }
 
 } // END emp namespace
 
