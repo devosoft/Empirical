@@ -7,8 +7,6 @@
 #include <array>
 #include <sstream>
 #include <string>
-#include <vector>
-
 
 #include "../tools/BitMatrix.h"
 #include "../tools/BitSet.h"
@@ -68,7 +66,7 @@ TEST_CASE("Test bitvectors", "[tools]")
   REQUIRE(bm45.Get(1,1) == 0);
   REQUIRE(bm45.Get(1,2) == 0);
   REQUIRE(bm45.CountOnes() == 0);
-  
+
   bm45.Set(1,2);  // Try setting a single bit!
 
   REQUIRE(bm45.Any() == true);
@@ -81,7 +79,7 @@ TEST_CASE("Test bitvectors", "[tools]")
 
 /* This block needs asserts
   bm45 = bm45.GetReach().GetReach();
-  
+
   bm45 = bm45.DownShift();
 
   bm45 = bm45.RightShift();
@@ -120,7 +118,7 @@ TEST_CASE("test BitSet", "[tools]")
     REQUIRE((shift_set.CountOnes() == 1) == (i <= 71));
   }
 
-  
+
   // Test importing....
   bs10.Import(bs80 >> 70);
 
@@ -152,7 +150,7 @@ TEST_CASE("test BitSet timing", "[tools]")
   TEST_TYPE set3(set1 & set2);
   TEST_TYPE set4 = (set1 | set2);
   int total = 0;
-  
+
   // should probably assert that this does what we want it to do...
   for (int i = 0; i < 100000; i++) {
     set3 |= (set4 << 3);
@@ -164,7 +162,7 @@ TEST_CASE("test BitSet timing", "[tools]")
   std::clock_t emp_tot_time = std::clock() - emp_start_time;
   double time = 1000.0 * ((double) emp_tot_time) / (double) CLOCKS_PER_SEC;
   //REQUIRE(time < 13000); // WARNING: WILL VARY ON DIFFERENT SYSTEMS
-  
+
   // END TIMING!!!
 }
 
@@ -192,7 +190,7 @@ TEST_CASE( "Testing BitVectors", "[tools]")
   // Test arbitrary bit retrieval of UInts
   bv80[65] = 1;
   REQUIRE(bv80.GetUIntAtBit(64) == 130);
-  REQUIRE(bv80.GetValueAtBit<5>(64) == 2);  
+  REQUIRE(bv80.GetValueAtBit<5>(64) == 2);
 }
 
 TEST_CASE("Test BitVector timing", "[tools]")
@@ -223,7 +221,7 @@ TEST_CASE("Test BitVector timing", "[tools]")
   }
 
   std::clock_t emp_tot_time = std::clock() - emp_start_time;
-  
+
   double time = 1000.0 * ((double) emp_tot_time) / (double) CLOCKS_PER_SEC;
   //REQUIRE(time < 9000); // NOTE: WILL VARY INTENSELY ON VARIOUS SYSTEMS
   // SHOULD PROBABLY CHANGE
@@ -302,7 +300,7 @@ TEST_CASE("Test functions", "[tools]")
   REQUIRE(emp::to_range<double>(12345678, 10, 20.1) == 20.1);
   REQUIRE(emp::to_range(12345678.0, 10.7, 20.1) == 20.1);
 
-  
+
   // TEST FOR VARIADIC HELPER FUNCTIONS:
 
   REQUIRE((emp::get_type_index<char, char, bool, int, double>()) == 0);
@@ -312,13 +310,13 @@ TEST_CASE("Test functions", "[tools]")
 
   REQUIRE((emp::has_unique_first_type<int, bool, std::string, bool, char>()) == true);
   REQUIRE((emp::has_unique_first_type<bool, int, std::string, bool, char>()) == false);
-  REQUIRE((emp::has_unique_types<bool, int, std::string, std::vector<bool>, char>()) == true);
+  REQUIRE((emp::has_unique_types<bool, int, std::string, emp::vector<bool>, char>()) == true);
   REQUIRE((emp::has_unique_types<int, bool, std::string, bool, char>()) == false);
 
 
   std::tuple<int, int, char> test_tuple(3,2,'a');
   emp::ApplyTuple(TestFun, test_tuple);
-  
+
   REQUIRE(result_char == 'g');
 
 }
@@ -362,7 +360,7 @@ TEST_CASE("Test FunctionSet", "[tools]")
   fun_set2.Add(&fun6);
   fun_set2.Add(&fun7);
 
-  std::vector<double> out_vals;
+  emp::vector<double> out_vals;
 
   out_vals = fun_set2.Run(10.0);
 
@@ -405,7 +403,7 @@ TEST_CASE("Test FunctionSet", "[tools]")
   REQUIRE(fun_set2.FindMin(0.1) < 0.0010000001);
   REQUIRE(fun_set2.FindMin(0.1) > 0.0009999999);
   REQUIRE(fun_set2.FindMin(-0.1) == -0.1);
-  
+
   REQUIRE(fun_set2.FindSum(10.0) == 1110.0);
   REQUIRE(fun_set2.FindSum(-10.0) == -910.0);
   REQUIRE(fun_set2.FindSum(0.1) < 0.1110000001);
@@ -435,7 +433,7 @@ TEST_CASE("Test graph", "[tools]")
   graph.AddEdgePair(0, 1);
   graph.AddEdgePair(0, 2);
   graph.AddEdgePair(0, 3);
-  
+
 }
 
 // TODO: add asserts
@@ -489,7 +487,7 @@ struct TestClass2 {
 
 TEST_CASE("Test mem_track", "[tools]")
 {
-  std::vector<TestClass1 *> test_v;
+  emp::vector<TestClass1 *> test_v;
   TestClass2 class2_mem;
 
   REQUIRE(EMP_TRACK_COUNT(TestClass1) == 0);
@@ -507,11 +505,11 @@ TEST_CASE("Test mem_track", "[tools]")
 
   REQUIRE(EMP_TRACK_COUNT(TestClass1) == 500);
   //REQUIRE(EMP_TRACK_STATUS == 0);
- 
+
 }
 
 TEST_CASE("Test Ptr", "[tools]")
-{ 
+{
   emp::PtrTracker<char>::Get();
   emp::PtrTracker<int>::Get();
 
@@ -521,7 +519,7 @@ TEST_CASE("Test Ptr", "[tools]")
   *ptr1 = 5;
   REQUIRE(*ptr1 == 5);
   ptr1.Delete();
-  
+
   // Test pointer constructor
   int * temp_int = new int;
   emp::Ptr<int> ptr2(temp_int);
@@ -548,7 +546,7 @@ TEST_CASE("Test Ptr", "[tools]")
   // A bit of an odd set of test... we need to create and destory pointers to make sure
   // that all of the counts are correct, so we're going to use arrays of pointers to them.
 
-  std::vector<emp::Ptr<char> *> ptr_set(10);
+  emp::vector<emp::Ptr<char> *> ptr_set(10);
   ptr_set[0] = new emp::Ptr<char>;
   ptr_set[0]->New(42);
   for (int i = 1; i < 10; i++) ptr_set[i] = new emp::Ptr<char>(*(ptr_set[0]));
@@ -578,7 +576,7 @@ TEST_CASE("Test Ptr", "[tools]")
   int * real_ptr3 = new int(3);  // Unknown to tracker
   int * real_ptr4 = new int(4);  // Passively known to tracker (marked non-owner)
   emp::PtrTracker<int> & tracker = emp::PtrTracker<int>::Get();
-  
+
   tracker.New(real_ptr1);
   tracker.Inc(real_ptr1);
   tracker.Inc(real_ptr1);
@@ -617,7 +615,7 @@ TEST_CASE("Test random", "[tools]")
   emp::Random rng;
 
   // Test GetDouble with the law of large numbers.
-  std::vector<int> val_counts(10);
+  emp::vector<int> val_counts(10);
   for (int i = 0; i < (int) val_counts.size(); i++) val_counts[i] = 0;
 
   const int num_tests = 100000;
@@ -655,11 +653,11 @@ TEST_CASE("Test random", "[tools]")
     const double min_threshold = (expected_mean*0.997);
     const double max_threshold = (expected_mean*1.004);
     double mean_value = total/(double) num_tests;
-    
+
     REQUIRE(mean_value > min_threshold);
     REQUIRE(mean_value < max_threshold);
   }
-  
+
   // Test P
   double flip_prob = 0.56789;
   int hit_count = 0;
@@ -672,9 +670,9 @@ TEST_CASE("Test random", "[tools]")
   REQUIRE(actual_prob < flip_prob + 0.005);
   REQUIRE(actual_prob > flip_prob - 0.005);
 
-  
+
   // Mimimal test of Choose()
-  std::vector<int> choices = rng.Choose(100,10);
+  emp::vector<int> choices = Choose(rng,100,10);
 
   REQUIRE(choices.size() == 10);
 }
@@ -720,7 +718,7 @@ TEST_CASE("Test sequence utils", "[tools]")
 
   REQUIRE(emp::calc_hamming_distance(s1,s2) == 19);
   REQUIRE(emp::calc_edit_distance(s1,s2) == 6);
-  
+
   // std::string s3 = "abcdefghijklmnopqrstuvwWxyz";
   // std::string s4 = "abBcdefghijXXmnopqrstuvwxyz";
 
@@ -734,12 +732,12 @@ TEST_CASE("Test sequence utils", "[tools]")
 
   REQUIRE(s3 == "a__d___h___lmnopqrstuv_xy_");
 
-  std::vector<int> v1 = { 1,2,3,4,5,6,7,8,9 };
-  std::vector<int> v2 = { 1,4,5,6,8 };
+  emp::vector<int> v1 = { 1,2,3,4,5,6,7,8,9 };
+  emp::vector<int> v2 = { 1,4,5,6,8 };
 
   emp::align(v1,v2,0);
 
-  REQUIRE((v2 == std::vector<int>({1,0,0,4,5,6,0,8,0})));
+  REQUIRE((v2 == emp::vector<int>({1,0,0,4,5,6,0,8,0})));
 }
 
 
@@ -748,7 +746,7 @@ struct SerializeTest {
   int a;
   float b;        // unimportant data!
   std::string c;
-  
+
   SerializeTest(int _a, float _b, std::string _c) : a(_a), b(_b), c(_c) { ; }
   EMP_SETUP_DATAPOD(SerializeTest, a, c);
 };
@@ -792,7 +790,7 @@ struct NestedTest {
 
 struct BuiltInTypesTest {
   const int a;
-  std::vector<int> int_v;
+  emp::vector<int> int_v;
 
   BuiltInTypesTest(int _a, int v_size) : a(_a), int_v(v_size) {
     for (int i = 0; i < v_size; i++) int_v[i] = i*i;
@@ -958,13 +956,13 @@ TEST_CASE("Test string utils", "[tools]")
   REQUIRE(popped_str == "a");
   REQUIRE(first_line == "okaystring.");
 
-  
+
 
   popped_str = emp::string_pop(first_line, 'y');
 
   REQUIRE(popped_str == "oka");
   REQUIRE(first_line == "string.");
-  
+
   emp::left_justify(base_string);
   REQUIRE(base_string == "This\nis   -MY-    very best string!!!!   ");
 
@@ -972,9 +970,9 @@ TEST_CASE("Test string utils", "[tools]")
   REQUIRE(base_string == "This\nis   -MY-    very best string!!!!");
 
   emp::compress_whitespace(base_string);
-  REQUIRE(base_string == "This is -MY- very best string!!!!");  
+  REQUIRE(base_string == "This is -MY- very best string!!!!");
 
-  std::vector<std::string> slices;
+  emp::vector<std::string> slices;
   emp::slice_string(base_string, slices, 's');
 
   REQUIRE(slices.size() == 5);
@@ -996,7 +994,7 @@ TEST_CASE("Test string utils", "[tools]")
 
 TEST_CASE("Test trait", "[tools]")
 {
-  emp::TraitManager<int, double, std::vector<bool>, char, std::string> tm;
+  emp::TraitManager<int, double, emp::vector<bool>, char, std::string> tm;
 
   tm.AddTrait<int>("test_trait", "This is a test trait", 42);
   tm.AddTrait<std::string>("test2", "This is technically our second test trait.", "VALUE");
@@ -1041,11 +1039,11 @@ TEST_CASE("Test macro math", "[tools]")
 
   EMP_TEST_MACRO( EMP_BIN_TO_PACK(0,0,0,1,0,1,1,0,1,1), "(64, 16, 8, 2, 1)");
   EMP_TEST_MACRO( EMP_DEC_TO_PACK(91), "(64, 16, 8, 2, 1)");
-  
+
   // Test Boolean logic
   EMP_TEST_MACRO( EMP_NOT(0), "1" );
   EMP_TEST_MACRO( EMP_NOT(EMP_NOT(0)), "0" );
-  
+
   EMP_TEST_MACRO( EMP_BIT_EQU(0,0), "1" );
   EMP_TEST_MACRO( EMP_BIT_EQU(0,1), "0" );
   EMP_TEST_MACRO( EMP_BIT_EQU(1,0), "0" );
@@ -1066,7 +1064,7 @@ TEST_CASE("Test macro math", "[tools]")
   EMP_TEST_MACRO( EMP_IF_impl_1(abc), "EMP_IF_impl_1(abc)" );
   EMP_TEST_MACRO( EMP_IF(0, A, B), "B" );
   EMP_TEST_MACRO( EMP_IF(1, A, B), "A" );
-  
+
   // Test comparisons
   EMP_TEST_MACRO( EMP_COMPARE(10,20), "B" );
   EMP_TEST_MACRO( EMP_COMPARE(1023,1022), "A" );
@@ -1110,7 +1108,7 @@ TEST_CASE("Test macro math", "[tools]")
   EMP_TEST_MACRO( EMP_NEQU(5,2), "1" );
 
 
-  
+
   // Test other helper math functions.
   EMP_TEST_MACRO( EMP_MATH_VAL_TIMES_0(222), "0" );
   EMP_TEST_MACRO( EMP_MATH_VAL_TIMES_1(222), "222" );
@@ -1124,7 +1122,7 @@ TEST_CASE("Test macro math", "[tools]")
 
   EMP_TEST_MACRO( EMP_MATH_GET_CARRY(2), "1");
   EMP_TEST_MACRO( EMP_MATH_CLEAR_CARRY(2), "0");
-  
+
   // Now in combination...
   EMP_TEST_MACRO( EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(1), EMP_MATH_GET_CARRY(2)), "2" );
 
@@ -1138,7 +1136,7 @@ TEST_CASE("Test macro math", "[tools]")
   EMP_TEST_MACRO( EMP_ADD(1023, 1), "0");      // Overflow
 
   EMP_TEST_MACRO( EMP_ADD_10(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), "55" );
-  
+
   // Basic Subtraction...
   EMP_TEST_MACRO( EMP_SUB(10, 7), "3");
   EMP_TEST_MACRO( EMP_SUB(128, 1), "127");
@@ -1152,8 +1150,8 @@ TEST_CASE("Test macro math", "[tools]")
 
   // Shifting
   EMP_TEST_MACRO( EMP_SHIFTL(17), "34");
-  EMP_TEST_MACRO( EMP_SHIFTL(111), "222");  
-  EMP_TEST_MACRO( EMP_SHIFTL(444), "888");  
+  EMP_TEST_MACRO( EMP_SHIFTL(111), "222");
+  EMP_TEST_MACRO( EMP_SHIFTL(444), "888");
   EMP_TEST_MACRO( EMP_SHIFTL(1023), "1022");   // Overflow...
 
   EMP_TEST_MACRO( EMP_SHIFTR(100), "50");
@@ -1161,7 +1159,7 @@ TEST_CASE("Test macro math", "[tools]")
 
   EMP_TEST_MACRO( EMP_SHIFTL_X(0, 700), "700");
   EMP_TEST_MACRO( EMP_SHIFTL_X(5, 17),  "544");
-  EMP_TEST_MACRO( EMP_SHIFTL_X(1, 111), "222");  
+  EMP_TEST_MACRO( EMP_SHIFTL_X(1, 111), "222");
   EMP_TEST_MACRO( EMP_SHIFTR_X(1, 100), "50");
   EMP_TEST_MACRO( EMP_SHIFTR_X(3, 151), "18");
 
@@ -1251,7 +1249,7 @@ TEST_CASE("Test macros", "[tools]")
 
   // BAD TEST: EMP_TEST_MACRO( EMP_ARGS_TO_PACKS_1(4, a,b,c,d,e,f,g), "(a , b , c , d)" );
 
-  
+
   EMP_TEST_MACRO( EMP_CALL_BY_PACKS(TST_, (Fixed), a,b,c,d,e,f,g,h,i,j,k,l,m), "TST_8((Fixed), a,b,c,d,e,f,g,h,i,j,k,l,m, ~) TST_4((Fixed), i,j,k,l,m, ~) TST_1((Fixed), m, ~)" );
 
   // Make sure we can wrap each argument in a macro.
@@ -1264,10 +1262,10 @@ TEST_CASE("Test macros", "[tools]")
   EMP_TEST_MACRO( EMP_REPLACE_COMMAS(~, x,x,x,x,x,x,x), "x ~ x ~ x ~ x ~ x ~ x ~ x" );
   EMP_TEST_MACRO( EMP_REPLACE_COMMAS(%, x,x,x,x,x,x,x,x), "x % x % x % x % x % x % x % x" );
 
-  
+
   // Simple argument manipulation
   EMP_TEST_MACRO( EMP_ROTATE_ARGS(a, b, c), "b, c, a" );
-  
+
   // Test trimming argument lists.
   EMP_TEST_MACRO( EMP_SELECT_ARGS( (i,x,i), a ), "a" );
   EMP_TEST_MACRO( EMP_SELECT_ARGS( (i,x,i), a,b ), "a" );
@@ -1292,7 +1290,7 @@ TEST_CASE("Test macros", "[tools]")
   EMP_TEST_MACRO( EMP_CROP_ARGS_TO(5, a, b, c, d, e, f, g, h, i, j), "a , b , c , d , e" );
   EMP_TEST_MACRO( EMP_CROP_ARGS_TO(4, a, b, c, d, e, f, g, h, i, j), "a , b , c , d" );
   EMP_TEST_MACRO( EMP_CROP_ARGS_TO(4, a, b, c, d), "a , b , c , d" );
-  
+
   EMP_TEST_MACRO( EMP_FORCE_ARGS_TO(3, x, a, b, c, d), "a , b , c" );
   EMP_TEST_MACRO( EMP_FORCE_ARGS_TO(4, x, a, b, c, d), "a , b , c , d" );
   EMP_TEST_MACRO( EMP_FORCE_ARGS_TO(7, x, a, b, c, d), "a , b , c , d , x , x , x" );
