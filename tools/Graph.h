@@ -1,20 +1,20 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//  A simple, fast class for managing verticies (nodes) and edges.
 
 #ifndef EMP_GRAPH_H
 #define EMP_GRAPH_H
 
 #include <assert.h>
 #include <iostream>
-#include <vector>
 
 #include "BitVector.h"
+#include "vector.h"
 
 namespace emp {
 
-/*! A simple, fast graph class.
-*/
   class Graph {
   public:
     class Node {
@@ -38,7 +38,7 @@ namespace emp {
     };
 
   private:
-    std::vector<Node> nodes;
+    emp::vector<Node> nodes;
 
   public:
     Graph(int num_nodes=0) : nodes(num_nodes, num_nodes) { ; }
