@@ -146,6 +146,7 @@
   protected:
 
 
+
 namespace emp {
 namespace evo {
 
@@ -156,8 +157,7 @@ namespace evo {
   template <typename ORG, typename... MANAGERS>
   class World {
   public:
-    using pop_manager_t = typename SelectPopManager<MANAGERS...,PopulationManager_Base<ORG>>::type;
-    pop_manager_t pop;
+    AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> pop;
 
   protected:
     Random * random_ptr;
