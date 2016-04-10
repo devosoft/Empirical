@@ -12,7 +12,7 @@
 namespace emp {
 namespace evo {
 
-  template <typename ORG>
+  template <typename ORG=int>
   class PopulationManager_Base {
   protected:
     using ptr_t = ORG *;
@@ -85,7 +85,7 @@ namespace evo {
   // A standard population manager for using synchronous generations in a traditional
   // evolutionary algorithm setup.
 
-  template <typename ORG>
+  template <typename ORG=int>
   class PopulationManager_EA : public PopulationManager_Base<ORG> {
   protected:
     emp::vector<ORG *> next_pop;
@@ -122,7 +122,7 @@ namespace evo {
   // organisms get inserted into the main population; once it is full the population
   // is shrunk down.
 
-  template <typename ORG>
+  template <typename ORG=int>
   class PopulationManager_SerialTransfer : public PopulationManager_Base<ORG> {
   protected:
     using PopulationManager_Base<ORG>::pop;
@@ -157,6 +157,9 @@ namespace evo {
     }
   };
 
+  using PopBasic = PopulationManager_Base<int>;
+  using PopEA    = PopulationManager_EA<int>;
+  using PopST    = PopulationManager_SerialTransfer<int>;
 }
 }
 
