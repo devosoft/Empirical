@@ -157,4 +157,25 @@ template <typename... TYPES> struct NAME {                                      
   using NAME = decltype(ResolveType__ ## NAME<__VA_ARGS__>(true));
 
 
+// Call a function with more args than it can take; ignore extras.
+
+namespace emp {
+
+  namespace internal {
+    template <typename RETURN, typename... FUN_ARGS>
+    struct SubsetCall_impl {
+      template <typename... EXTRA_ARGS>
+      static RETURN Call(std::function<RETURN(FUN_ARGS...)> fun, FUN_ARGS... args, EXTRA_ARGS...) {
+        return fun(args...);
+      }
+    };
+
+  }
+
+  template <typename RETURN, typename... FUN_ARGS, typename... CALL_ARGS>
+  auto SubsetCall(std::function<RETURN(FUN_ARGS...)> fun, CALL_ARGS... args) -> RETURN {
+    return internal::SubsetCall_impl<RETURN, FUN_ARGS...>::Call(fun, args...);
+  }
+
+}
 #endif
