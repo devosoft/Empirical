@@ -3,6 +3,11 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  This file defines built-in population manages for use with emp::evo::World
+//
+//
+//  Developer notes:
+//  * Rather than deleting organisms ourright, run all deletions through a ClearCell function
+//    so that a common signal system can also be run.
 
 #ifndef EMP_EVO_POPULATION_MANAGER_H
 #define EMP_EVO_POPULATION_MANAGER_H
@@ -177,15 +182,21 @@ namespace evo {
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
 
-    void Config(int w, int h) { width = w; height = h; pop.resize(width*height); }
+    void Config(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }
 
     int AddOrgBirth(ORG * new_org, int parent_pos) {
-      if (pop.size() >= max_size) {
-        DoBottleneck(bottleneck_size);
-        ++num_bottlenecks;
-      }
-      const int pos = pop.size();
-      pop.push_back(new_org);
+      const int parent_x = ToX(parent_pos);
+      const int parent_y = ToY(parent_pos);
+
+      const int offset = random_ptr->GetInt(9);
+      const int offspring_x = emp::mod(parent_x + offset%3 - 1, width);
+      const int offspring_y = emp::mod(parent_y + offset%3 - 1, height);
+      const int pos = ToID(offspring_x, offspring_y);
+
+      if (pop[pos]) delete pop[pos];
+
+      pop[pos] = new_org;
+
       return pos;
     }
 
