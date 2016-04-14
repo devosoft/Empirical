@@ -254,11 +254,11 @@ namespace evo {
       SetupOrg(*new_org, &callbacks, pos);
       on_new_org_sig.Trigger(pos);
     }
-    void InsertBirth(const ORG & mem, int copy_count=1) {
+    void InsertBirth(const ORG & mem, int parent_pos, int copy_count) {
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);
         on_birth_sig.Trigger(new_org);
-        const int pos = pop.AddOrgBirth(new_org);
+        const int pos = pop.AddOrgBirth(new_org, parent_pos);
         SetupOrg(*new_org, &callbacks, pos);
         on_new_org_sig.Trigger(pos);
       }
@@ -270,7 +270,7 @@ namespace evo {
       std::cout << "Repro " << id << std::endl;
       before_repro_sig.Trigger(id);
       ORG * new_org = new ORG(*(pop[id]));
-      InsertBirth(*new_org);
+      InsertBirth(*new_org, id, 1);
     }
 
     void DoSymbiontRepro(int id) {
@@ -316,7 +316,7 @@ namespace evo {
       // Grab the top fitnesses and move them into the next generation.
       auto m = fit_map.rbegin();
       for (int i = 0; i < e_count; i++) {
-        InsertBirth( *(pop[m->second]), copy_count);
+        InsertBirth( *(pop[m->second]), m->second, copy_count);
         ++m;
       }
     }
@@ -367,7 +367,7 @@ namespace evo {
         }
 
         // Place the highest fitness into the next generation!
-        InsertBirth( *(pop[best_id]) );
+        InsertBirth( *(pop[best_id]), best_id, 1 );
       }
     }
 
@@ -389,7 +389,7 @@ namespace evo {
         }
 
         // Place the highest fitness into the next generation!
-        InsertBirth( *(pop[best_id]) );
+        InsertBirth( *(pop[best_id]), best_id, 1 );
       }
     }
 

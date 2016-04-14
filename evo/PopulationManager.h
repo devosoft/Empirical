@@ -43,7 +43,7 @@ namespace evo {
       pop.push_back(new_org);
       return pos;
     }
-    int AddOrgBirth(ORG * new_org) {
+    int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = random_ptr->GetInt((int) pop.size());
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
@@ -62,7 +62,7 @@ namespace evo {
     template <typename... ARGS>
     void Execute(ARGS... args) {
       for (ORG * m : pop) {
-        m->Execute(std::forward<ARGS>(args)...);
+        if (m) m->Execute(std::forward<ARGS>(args)...);
       }
     }
 
@@ -95,7 +95,7 @@ namespace evo {
     PopulationManager_EA() { ; }
     ~ PopulationManager_EA() { Clear(); }
 
-    int AddOrgBirth(ORG * new_org) {
+    int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = next_pop.size();
       next_pop.push_back(new_org);
       return pos;
@@ -146,7 +146,7 @@ namespace evo {
 
     void Config(int m, int b) { max_size = m; bottleneck_size = b; }
 
-    int AddOrgBirth(ORG * new_org) {
+    int AddOrgBirth(ORG * new_org, int parent_pos) {
       if (pop.size() >= max_size) {
         DoBottleneck(bottleneck_size);
         ++num_bottlenecks;
@@ -157,9 +157,45 @@ namespace evo {
     }
   };
 
+  template <typename ORG=int>
+  class PopulationManager_Grid : public PopulationManager_Base<ORG> {
+  protected:
+    using PopulationManager_Base<ORG>::pop;
+    using PopulationManager_Base<ORG>::random_ptr;
+
+    int width;
+    int height;
+
+    int ToX(int id) const { return id % width; }
+    int ToY(int id) const { return id / width; }
+    int ToID(int x, int y) const { return y*width + x; }
+
+  public:
+    PopulationManager_Grid() { Config(10,10); }
+    ~PopulationManager_Grid() { ; }
+
+    int GetWidth() const { return width; }
+    int GetHeight() const { return height; }
+
+    void Config(int w, int h) { width = w; height = h; pop.resize(width*height); }
+
+    int AddOrgBirth(ORG * new_org, int parent_pos) {
+      if (pop.size() >= max_size) {
+        DoBottleneck(bottleneck_size);
+        ++num_bottlenecks;
+      }
+      const int pos = pop.size();
+      pop.push_back(new_org);
+      return pos;
+    }
+
+  };
+
   using PopBasic = PopulationManager_Base<int>;
   using PopEA    = PopulationManager_EA<int>;
   using PopST    = PopulationManager_SerialTransfer<int>;
+  using PopGrid  = PopulationManager_Grid<int>;
+
 }
 }
 
