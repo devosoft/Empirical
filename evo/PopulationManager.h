@@ -37,6 +37,7 @@ namespace evo {
 
     uint32_t size() const { return pop.size(); }
     void resize(int new_size) { pop.resize(new_size); }
+    int GetSize() const { return (int) pop.size(); }
 
     void SetRandom(Random * r) { random_ptr = r; }
 
@@ -184,13 +185,22 @@ namespace evo {
 
     void Config(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }
 
+    // Injected orgs go into a random position.
+    int AddOrg(ORG * new_org) {
+      const int pos = random_ptr->GetInt((int) pop.size());
+      if (pop[pos]) delete pop[pos];
+      pop[pos] = new_org;
+      return pos;
+    }
+
+    // Newly born orgs go next to their parents.
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int parent_x = ToX(parent_pos);
       const int parent_y = ToY(parent_pos);
 
       const int offset = random_ptr->GetInt(9);
       const int offspring_x = emp::mod(parent_x + offset%3 - 1, width);
-      const int offspring_y = emp::mod(parent_y + offset%3 - 1, height);
+      const int offspring_y = emp::mod(parent_y + offset/3 - 1, height);
       const int pos = ToID(offspring_x, offspring_y);
 
       if (pop[pos]) delete pop[pos];
@@ -200,6 +210,16 @@ namespace evo {
       return pos;
     }
 
+    void DebugPrint(const std::string & empty="-", const std::string & spacing=" ") {
+      for (int y=0; y<height; y++) {
+        for (int x = 0; x<width; x++) {
+          const ORG * print_org = pop[ToID(x,y)];
+          if (print_org) std::cout << *print_org << spacing;
+          else std::cout << empty << spacing;
+        }
+        std::cout << std::endl;
+      }
+    }
   };
 
   using PopBasic = PopulationManager_Base<int>;
