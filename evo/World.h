@@ -23,7 +23,7 @@
 //  all signal names must be prefixed with the world name so that the correct world is used.
 //
 //      ::before-repro(int parent_position)   Trigger: Immediately prior to producing offspring
-//      ::on-birth(ORG * offspring)           Trigger: Offspring about to enter population
+//      ::offspring-ready(ORG * offspring)    Trigger: Offspring about to enter population
 //      ::on-inject(ORG * new_organism)       Trigger: New org about to be added to population
 //      ::on-new-org(int org_position)        Trigger: Organism has been added to population
 //
@@ -164,10 +164,10 @@ namespace evo {
     bool random_owner;
 
     // Signals triggered by the world.
-    Signal<int> before_repro_sig;     // Trigger: Immediately prior to producing offspring
-    Signal<ORG *> on_birth_sig;       // Trigger: Offspring about to enter population
-    Signal<ORG *> on_inject_sig;      // Trigger: New org about to be added to population
-    Signal<int> on_new_org_sig;       // Trigger: Organism has been added to population
+    Signal<int> before_repro_sig;       // Trigger: Immediately prior to producing offspring
+    Signal<ORG *> offspring_ready_sig;  // Trigger: Offspring about to enter population
+    Signal<ORG *> on_inject_sig;        // Trigger: New org about to be added to population
+    Signal<int> on_new_org_sig;         // Trigger: Organism has been added to population
 
     EMP_SETUP_EVO_WORLD_DEFAULT(default_fit_fun, Fitness, double)
     EMP_SETUP_EVO_WORLD_DEFAULT_ARGS(default_mut_fun, Mutate, bool, emp::Random &)
@@ -203,7 +203,7 @@ namespace evo {
     World(emp::Random * r_ptr, const std::string & pop_name="emp::evo::World")
       : random_ptr(r_ptr), random_owner(false)
       , before_repro_sig(to_string(pop_name,"before-repro"))
-      , on_birth_sig(to_string(pop_name,"on-birth"))
+      , offspring_ready_sig(to_string(pop_name,"offspring-ready"))
       , on_inject_sig(to_string(pop_name,"on-inject"))
       , on_new_org_sig(to_string(pop_name,"on-new-org"))
       , callbacks(pop_name) { SetupWorld(); }
@@ -229,7 +229,7 @@ namespace evo {
     void ResetRandom(int seed=-1) { SetRandom(*(new Random(seed))); }
 
     LinkKey BeforeRepro(std::function<void(int)> fun) { return before_repro_sig.AddAction(fun); }
-    LinkKey OnBirth(std::function<void(ORG *)> fun) { return on_birth_sig.AddAction(fun); }
+    LinkKey OffspringReady(std::function<void(ORG *)> fun) { return offspring_ready_sig.AddAction(fun); }
     LinkKey OnInject(std::function<void(ORG *)> fun) { return on_inject_sig.AddAction(fun); }
     LinkKey OnNewOrg(std::function<void(int)> fun) { return on_new_org_sig.AddAction(fun); }
 
@@ -254,10 +254,10 @@ namespace evo {
       SetupOrg(*new_org, &callbacks, pos);
       on_new_org_sig.Trigger(pos);
     }
-    void InsertBirth(const ORG & mem, int parent_pos, int copy_count) {
+    void InsertBirth(const ORG & mem, int parent_pos, int copy_count=1) {
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);
-        on_birth_sig.Trigger(new_org);
+        offspring_ready_sig.Trigger(new_org);
         const int pos = pop.AddOrgBirth(new_org, parent_pos);
         SetupOrg(*new_org, &callbacks, pos);
         on_new_org_sig.Trigger(pos);
@@ -270,7 +270,7 @@ namespace evo {
       std::cout << "Repro " << id << std::endl;
       before_repro_sig.Trigger(id);
       ORG * new_org = new ORG(*(pop[id]));
-      InsertBirth(*new_org, id, 1);
+      InsertBirth(*new_org, id, 1);  // @CAO new_org will be thrown away here!
     }
 
     void DoSymbiontRepro(int id) {
