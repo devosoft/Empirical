@@ -24,8 +24,8 @@
 //
 //      ::before-repro(int parent_position)   Trigger: Immediately prior to producing offspring
 //      ::offspring-ready(ORG * offspring)    Trigger: Offspring about to enter population
-//      ::on-inject(ORG * new_organism)       Trigger: New org about to be added to population
-//      ::on-new-org(int org_position)        Trigger: Organism has been added to population
+//      ::inject-ready(ORG * new_organism)    Trigger: New org about to be added to population
+//      ::on-placement(int org_position)      Trigger: Organism has been added to population
 //
 //  Organisms can also trigger signals to affect the world.
 //
@@ -166,7 +166,7 @@ namespace evo {
     // Signals triggered by the world.
     Signal<int> before_repro_sig;       // Trigger: Immediately prior to producing offspring
     Signal<ORG *> offspring_ready_sig;  // Trigger: Offspring about to enter population
-    Signal<ORG *> on_inject_sig;        // Trigger: New org about to be added to population
+    Signal<ORG *> inject_ready_sig;        // Trigger: New org about to be added to population
     Signal<int> on_new_org_sig;         // Trigger: Organism has been added to population
 
     EMP_SETUP_EVO_WORLD_DEFAULT(default_fit_fun, Fitness, double)
@@ -204,7 +204,7 @@ namespace evo {
       : random_ptr(r_ptr), random_owner(false)
       , before_repro_sig(to_string(pop_name,"before-repro"))
       , offspring_ready_sig(to_string(pop_name,"offspring-ready"))
-      , on_inject_sig(to_string(pop_name,"on-inject"))
+      , inject_ready_sig(to_string(pop_name,"inject-ready"))
       , on_new_org_sig(to_string(pop_name,"on-new-org"))
       , callbacks(pop_name) { SetupWorld(); }
 
@@ -230,7 +230,7 @@ namespace evo {
 
     LinkKey BeforeRepro(std::function<void(int)> fun) { return before_repro_sig.AddAction(fun); }
     LinkKey OffspringReady(std::function<void(ORG *)> fun) { return offspring_ready_sig.AddAction(fun); }
-    LinkKey OnInject(std::function<void(ORG *)> fun) { return on_inject_sig.AddAction(fun); }
+    LinkKey InjectReady(std::function<void(ORG *)> fun) { return inject_ready_sig.AddAction(fun); }
     LinkKey OnNewOrg(std::function<void(int)> fun) { return on_new_org_sig.AddAction(fun); }
 
 
@@ -239,7 +239,7 @@ namespace evo {
     void Insert(const ORG & mem, int copy_count=1) {
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);
-        on_inject_sig.Trigger(new_org);
+        inject_ready_sig.Trigger(new_org);
         const int pos = pop.AddOrg(new_org);
         SetupOrg(*new_org, &callbacks, pos);
         on_new_org_sig.Trigger(pos);
@@ -249,7 +249,7 @@ namespace evo {
     void InsertRandomOrg(ARGS... args) {
       emp_assert(random_ptr != nullptr && "InsertRandomOrg() requires active random_ptr");
       ORG * new_org = new ORG(*random_ptr, std::forward<ARGS>(args)...);
-      on_inject_sig.Trigger(new_org);
+      inject_ready_sig.Trigger(new_org);
       const int pos = pop.AddOrg(new_org);
       SetupOrg(*new_org, &callbacks, pos);
       on_new_org_sig.Trigger(pos);
