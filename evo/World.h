@@ -205,7 +205,7 @@ namespace evo {
       , before_repro_sig(to_string(pop_name,"before-repro"))
       , offspring_ready_sig(to_string(pop_name,"offspring-ready"))
       , inject_ready_sig(to_string(pop_name,"inject-ready"))
-      , on_new_org_sig(to_string(pop_name,"on-new-org"))
+      , on_placement_sig(to_string(pop_name,"on-placement"))
       , callbacks(pop_name) { SetupWorld(); }
 
     World(const std::string & pop_name="emp::evo::World")
@@ -231,7 +231,7 @@ namespace evo {
     LinkKey BeforeRepro(std::function<void(int)> fun) { return before_repro_sig.AddAction(fun); }
     LinkKey OffspringReady(std::function<void(ORG *)> fun) { return offspring_ready_sig.AddAction(fun); }
     LinkKey InjectReady(std::function<void(ORG *)> fun) { return inject_ready_sig.AddAction(fun); }
-    LinkKey OnNewOrg(std::function<void(int)> fun) { return on_new_org_sig.AddAction(fun); }
+    LinkKey OnPlacement(std::function<void(int)> fun) { return on_placement_sig.AddAction(fun); }
 
 
     // All additions to the population must go through one of the following Insert methods
@@ -242,7 +242,7 @@ namespace evo {
         inject_ready_sig.Trigger(new_org);
         const int pos = pop.AddOrg(new_org);
         SetupOrg(*new_org, &callbacks, pos);
-        on_new_org_sig.Trigger(pos);
+        on_placement_sig.Trigger(pos);
       }
     }
     template <typename... ARGS>
@@ -252,7 +252,7 @@ namespace evo {
       inject_ready_sig.Trigger(new_org);
       const int pos = pop.AddOrg(new_org);
       SetupOrg(*new_org, &callbacks, pos);
-      on_new_org_sig.Trigger(pos);
+      on_placement_sig.Trigger(pos);
     }
     void InsertBirth(const ORG & mem, int parent_pos, int copy_count=1) {
       for (int i = 0; i < copy_count; i++) {
@@ -260,7 +260,7 @@ namespace evo {
         offspring_ready_sig.Trigger(new_org);
         const int pos = pop.AddOrgBirth(new_org, parent_pos);
         SetupOrg(*new_org, &callbacks, pos);
-        on_new_org_sig.Trigger(pos);
+        on_placement_sig.Trigger(pos);
       }
     }
 
