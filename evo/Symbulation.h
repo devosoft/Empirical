@@ -1,4 +1,4 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
@@ -79,6 +79,9 @@ namespace evo {
       streak_0 = streak_1 = 0;
     }
 
+    const BitVector & GetHost() const { return host; }
+    const BitVector & GetSymbiont() const { return symbiont; }
+
     int GetHostCost() const { return host_cost; }
     int GetSymbiontCost() const { return symb_cost; }
     int GetHostScore() const { return host_score; }
@@ -89,16 +92,14 @@ namespace evo {
       emp_assert(host.GetSize() > 0);
       host_pos = host_score = 0;
       if (clear_symbiont) {
-	symbiont.Resize(0);
-	symb_pos = symb_score = streak_0 = streak_1 = 0;
+        symbiont.Resize(0);
+        symb_pos = symb_score = streak_0 = streak_1 = 0;
       }
     }
 
     void SetSymbiont(const BitVector & in_symb) {
       symbiont = in_symb;
-      symb_pos = 0;
-      symb_score = 0;
-      streak_0 = streak_1 = 0;
+      symb_pos = symb_score = streak_0 = streak_1 = 0;
     }
 
     // Try to inject a symbiont, but it might fail if another symbiont is already there.
@@ -106,26 +107,26 @@ namespace evo {
       // For a symbiont to be injectected successfully, there either has to be no symbiont
       // in the current cell -or- the existing symbiont must be displaced.
       if (symbiont.GetSize() == 0 || random.P(displace_prob)) {
-	SetSymbiont(in_symb);
-	return true;
+        SetSymbiont(in_symb);
+        return true;
       }
       return false;
     }
 
     void TestHostRepro() {
-      // Trigger reproduction.
+      // Trigger reproduction if score is high enough.
       if (host_score >= host_cost) {
-	Reset();                          // Reset before replication.
-	callbacks->repro_sig.Trigger(id); // Trigger replication call.
+        Reset();                          // Reset before replication.
+        callbacks->repro_sig.Trigger(id); // Trigger replication call.
       }
     }
 
     void TestSymbiontRepro() {
-      // Trigger reproduction.
+      // Trigger reproduction if score is high enough.
       if (symb_score >= symb_cost) {
-	symb_pos = symb_score = 0;                 // Reset Symbiont stats.
-	streak_0 = streak_1 = 0;
-	callbacks->symbiont_repro_sig.Trigger(id); // Trigger symbiont replication call.
+        symb_pos = symb_score = 0;                 // Reset Symbiont stats only.
+        streak_0 = streak_1 = 0;
+        callbacks->symbiont_repro_sig.Trigger(id); // Trigger symbiont replication call.
       }
     }
 
@@ -135,33 +136,33 @@ namespace evo {
       emp_assert(callbacks != nullptr);
 
       if (host[host_pos]) {                            // Host generating score for itself.
-	host_score += host_self_bonus;
-	TestHostRepro();
+        host_score += host_self_bonus;
+        TestHostRepro();
       }
       else if (symbiont.GetSize()) {                   // Host allowing extant symbiont to execute.
-	// If a symbiont should exectue at the same position as a host, readjust.
-	if (align_symbiont) {
-	  symb_pos = host_pos % symbiont.GetSize();
-	}
+        // If a symbiont should exectue at the same position as a host, readjust.
+	      if (align_symbiont) {
+	        symb_pos = host_pos % symbiont.GetSize();
+	      }
 
-	// Determine next step based on symbiont bit
-	if (symbiont[symb_pos]) {                      // Symbiont helping host.
-	  if (use_streaks) {
-	    streak_1++; streak_0 = 0;
-	    host_score += streak_1 * symb_host_bonus;
-	  }
-	  else host_score += symb_host_bonus;
-	  TestHostRepro();
-	}
-	else {                                         // Symbiont helping itself.
-	  if (use_streaks) {
-	    streak_0++; streak_1 = 0;
-	    symb_score += streak_0 * symb_self_bonus;
-	  }
-	  else symb_score += symb_self_bonus;
-	  TestSymbiontRepro();
-	}
-	if (++symb_pos >= symbiont.GetSize()) symb_pos = 0;  // Advance symbiont position.
+	      // Determine next step based on symbiont bit
+	      if (symbiont[symb_pos]) {                      // Symbiont helping host.
+	        if (use_streaks) {
+	          streak_1++; streak_0 = 0;
+	          host_score += streak_1 * symb_host_bonus;
+	        }
+	        else host_score += symb_host_bonus;
+	        TestHostRepro();
+	      }
+	      else {                                         // Symbiont helping itself.
+          if (use_streaks) {
+	          streak_0++; streak_1 = 0;
+	          symb_score += streak_0 * symb_self_bonus;
+	        }
+	        else symb_score += symb_self_bonus;
+	        TestSymbiontRepro();
+	      }
+	      if (++symb_pos >= symbiont.GetSize()) symb_pos = 0;  // Advance symbiont position.
 
       }
       if (++host_pos >= host.GetSize()) host_pos = 0;  // Advance host position.
