@@ -167,7 +167,7 @@ namespace evo {
     Signal<int> before_repro_sig;       // Trigger: Immediately prior to producing offspring
     Signal<ORG *> offspring_ready_sig;  // Trigger: Offspring about to enter population
     Signal<ORG *> inject_ready_sig;        // Trigger: New org about to be added to population
-    Signal<int> on_new_org_sig;         // Trigger: Organism has been added to population
+    Signal<int> on_placement_sig;         // Trigger: Organism has been added to population
 
     EMP_SETUP_EVO_WORLD_DEFAULT(default_fit_fun, Fitness, double)
     EMP_SETUP_EVO_WORLD_DEFAULT_ARGS(default_mut_fun, Mutate, bool, emp::Random &)
@@ -269,8 +269,7 @@ namespace evo {
       emp_assert(random_ptr != nullptr && "DoRepro() requires a random number generator.");
       std::cout << "Repro " << id << std::endl;
       before_repro_sig.Trigger(id);
-      ORG * new_org = new ORG(*(pop[id]));
-      InsertBirth(*new_org, id, 1);  // @CAO new_org will be thrown away here!
+      InsertBirth(*(pop[id]), id, 1);
     }
 
     void DoSymbiontRepro(int id) {
