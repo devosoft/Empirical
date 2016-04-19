@@ -34,7 +34,7 @@ namespace emp {
     void Inc() { emp_assert(active); count++; }
     void Dec() {
       // If this pointer is not active, it doesn't matter how many copies we have.
-      if (active == false) return; 
+      if (active == false) return;
 
       emp_assert(count > 0);        // Do not decrement more copies than we have!
 
@@ -61,8 +61,8 @@ namespace emp {
       owner = false;
     }
   };
-  
-  
+
+
   template <typename TYPE>
   class PtrTracker {
   private:
@@ -70,7 +70,7 @@ namespace emp {
     bool verbose;
 
     // Make sure trackers can't be built outside of this class.
-    PtrTracker() : verbose (false) { ; } 
+    PtrTracker() : verbose (false) { ; }
     PtrTracker(const PtrTracker<int> &) = delete;
     PtrTracker<int> & operator=(const PtrTracker<TYPE> &) = delete;
   public:
@@ -109,7 +109,7 @@ namespace emp {
       emp_assert(!HasPtr(ptr) || !IsActive(ptr)); // Make sure pointer is not already stored!
       ptr_count[ptr] = PtrInfo(true);
     }
- 
+
     // This pointer was already created, but given to Ptr.
     void Old(TYPE * ptr) {
       if (verbose) std::cout << "Old:    " << ((uint64_t) ptr) << std::endl;
@@ -150,13 +150,13 @@ namespace emp {
     static PtrTracker<TYPE> & Tracker() { return PtrTracker<TYPE>::Get(); }
 #endif
   public:
-    Ptr() : ptr(NULL) { ; }
+    Ptr() : ptr(nullptr) { ; }
     Ptr(TYPE * in_ptr) : ptr(in_ptr) { EMP_IF_MEMTRACK( Tracker().New(ptr); ); }
     Ptr(TYPE & obj) : ptr(&obj) { EMP_IF_MEMTRACK( Tracker().Old(ptr); ); }
     Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) { EMP_IF_MEMTRACK( Tracker().Inc(ptr); ); }
     ~Ptr() { EMP_IF_MEMTRACK( Tracker().Dec(ptr); ); }
 
-    bool IsNull() { return ptr == NULL; }
+    bool IsNull() { return ptr == nullptr; }
 
     void New() {
       EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );

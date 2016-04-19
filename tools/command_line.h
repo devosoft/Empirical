@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_COMMAND_LINE_H
-#define EMP_COMMAND_LINE_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  This file contains tools for dealing with command-line arguments (argv and argc).
 //
@@ -29,8 +25,10 @@
 //
 //    * Add get_arg_value() to find an argument, and return the next arg as its value.
 //      Should default to string, but can have variants (or templated?) to allow other values
-//
 
+
+#ifndef EMP_COMMAND_LINE_H
+#define EMP_COMMAND_LINE_H
 
 #include <string>
 #include <vector>
@@ -46,8 +44,8 @@ namespace emp {
       }
       return args;
     }
-    
-    
+
+
     // Return true/false if a specific argument is present.
     bool has_arg(const std::vector<std::string> & args, const std::string & pattern) {
       for (int i = 0; i < (int) args.size(); i++) {
@@ -55,7 +53,7 @@ namespace emp {
       }
       return false;
     }
-    
+
     // Return true/false if a specific argument is present and REMOVE IT.
     bool use_arg(std::vector<std::string> & args, const std::string & pattern) {
       for (int i = 0; i < (int) args.size(); i++) {

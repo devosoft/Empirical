@@ -3,6 +3,11 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  This file defines built-in population manages for use with emp::evo::World
+//
+//
+//  Developer notes:
+//  * Rather than deleting organisms ourright, run all deletions through a ClearCell function
+//    so that a common signal system can also be run.
 
 #ifndef EMP_EVO_POPULATION_MANAGER_H
 #define EMP_EVO_POPULATION_MANAGER_H
@@ -12,7 +17,7 @@
 namespace emp {
 namespace evo {
 
-  template <typename ORG>
+  template <typename ORG=int>
   class PopulationManager_Base {
   protected:
     using ptr_t = ORG *;
@@ -32,6 +37,7 @@ namespace evo {
 
     uint32_t size() const { return pop.size(); }
     void resize(int new_size) { pop.resize(new_size); }
+    int GetSize() const { return (int) pop.size(); }
 
     void SetRandom(Random * r) { random_ptr = r; }
 
@@ -43,7 +49,7 @@ namespace evo {
       pop.push_back(new_org);
       return pos;
     }
-    int AddOrgBirth(ORG * new_org) {
+    int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = random_ptr->GetInt((int) pop.size());
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
@@ -62,7 +68,7 @@ namespace evo {
     template <typename... ARGS>
     void Execute(ARGS... args) {
       for (ORG * m : pop) {
-        m->Execute(std::forward<ARGS>(args)...);
+        if (m) m->Execute(std::forward<ARGS>(args)...);
       }
     }
 
@@ -72,7 +78,7 @@ namespace evo {
     // Run population through a bottleneck to (potentiall) shrink it.
     void DoBottleneck(const int new_size, bool choose_random=true) {
       if (new_size >= (int) pop.size()) return;  // No bottleneck needed!
-      std::cout << "Ping 1! " << new_size << std::endl;
+
       // If we are supposed to keep only random organisms, shuffle the beginning into place!
       if (choose_random) emp::Shuffle<ptr_t>(*random_ptr, pop, new_size);
 
@@ -85,7 +91,7 @@ namespace evo {
   // A standard population manager for using synchronous generations in a traditional
   // evolutionary algorithm setup.
 
-  template <typename ORG>
+  template <typename ORG=int>
   class PopulationManager_EA : public PopulationManager_Base<ORG> {
   protected:
     emp::vector<ORG *> next_pop;
@@ -95,7 +101,7 @@ namespace evo {
     PopulationManager_EA() { ; }
     ~ PopulationManager_EA() { Clear(); }
 
-    int AddOrgBirth(ORG * new_org) {
+    int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = next_pop.size();
       next_pop.push_back(new_org);
       return pos;
@@ -122,7 +128,7 @@ namespace evo {
   // organisms get inserted into the main population; once it is full the population
   // is shrunk down.
 
-  template <typename ORG>
+  template <typename ORG=int>
   class PopulationManager_SerialTransfer : public PopulationManager_Base<ORG> {
   protected:
     using PopulationManager_Base<ORG>::pop;
@@ -146,7 +152,7 @@ namespace evo {
 
     void Config(int m, int b) { max_size = m; bottleneck_size = b; }
 
-    int AddOrgBirth(ORG * new_org) {
+    int AddOrgBirth(ORG * new_org, int parent_pos) {
       if (pop.size() >= max_size) {
         DoBottleneck(bottleneck_size);
         ++num_bottlenecks;
@@ -156,6 +162,70 @@ namespace evo {
       return pos;
     }
   };
+
+  template <typename ORG=int>
+  class PopulationManager_Grid : public PopulationManager_Base<ORG> {
+  protected:
+    using PopulationManager_Base<ORG>::pop;
+    using PopulationManager_Base<ORG>::random_ptr;
+
+    int width;
+    int height;
+
+    int ToX(int id) const { return id % width; }
+    int ToY(int id) const { return id / width; }
+    int ToID(int x, int y) const { return y*width + x; }
+
+  public:
+    PopulationManager_Grid() { Config(10,10); }
+    ~PopulationManager_Grid() { ; }
+
+    int GetWidth() const { return width; }
+    int GetHeight() const { return height; }
+
+    void Config(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }
+
+    // Injected orgs go into a random position.
+    int AddOrg(ORG * new_org) {
+      const int pos = random_ptr->GetInt((int) pop.size());
+      if (pop[pos]) delete pop[pos];
+      pop[pos] = new_org;
+      return pos;
+    }
+
+    // Newly born orgs go next to their parents.
+    int AddOrgBirth(ORG * new_org, int parent_pos) {
+      const int parent_x = ToX(parent_pos);
+      const int parent_y = ToY(parent_pos);
+
+      const int offset = random_ptr->GetInt(9);
+      const int offspring_x = emp::mod(parent_x + offset%3 - 1, width);
+      const int offspring_y = emp::mod(parent_y + offset/3 - 1, height);
+      const int pos = ToID(offspring_x, offspring_y);
+
+      if (pop[pos]) delete pop[pos];
+
+      pop[pos] = new_org;
+
+      return pos;
+    }
+
+    void DebugPrint(const std::string & empty="-", const std::string & spacing=" ") {
+      for (int y=0; y<height; y++) {
+        for (int x = 0; x<width; x++) {
+          const ORG * print_org = pop[ToID(x,y)];
+          if (print_org) std::cout << *print_org << spacing;
+          else std::cout << empty << spacing;
+        }
+        std::cout << std::endl;
+      }
+    }
+  };
+
+  using PopBasic = PopulationManager_Base<int>;
+  using PopEA    = PopulationManager_EA<int>;
+  using PopST    = PopulationManager_SerialTransfer<int>;
+  using PopGrid  = PopulationManager_Grid<int>;
 
 }
 }

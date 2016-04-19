@@ -23,9 +23,9 @@
 //  all signal names must be prefixed with the world name so that the correct world is used.
 //
 //      ::before-repro(int parent_position)   Trigger: Immediately prior to producing offspring
-//      ::on-birth(ORG * offspring)           Trigger: Offspring about to enter population
-//      ::on-inject(ORG * new_organism)       Trigger: New org about to be added to population
-//      ::on-new-org(int org_position)        Trigger: Organism has been added to population
+//      ::offspring-ready(ORG * offspring)    Trigger: Offspring about to enter population
+//      ::inject-ready(ORG * new_organism)    Trigger: New org about to be added to population
+//      ::on-placement(int org_position)      Trigger: Organism has been added to population
 //
 //  Organisms can also trigger signals to affect the world.
 //
@@ -146,6 +146,7 @@
   protected:
 
 
+
 namespace emp {
 namespace evo {
 
@@ -156,18 +157,17 @@ namespace evo {
   template <typename ORG, typename... MANAGERS>
   class World {
   public:
-    using pop_manager_t = typename SelectPopManager<MANAGERS...,PopulationManager_Base<ORG>>::type;
-    pop_manager_t pop;
+    AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> pop;
 
   protected:
     Random * random_ptr;
     bool random_owner;
 
     // Signals triggered by the world.
-    Signal<int> before_repro_sig;     // Trigger: Immediately prior to producing offspring
-    Signal<ORG *> on_birth_sig;       // Trigger: Offspring about to enter population
-    Signal<ORG *> on_inject_sig;      // Trigger: New org about to be added to population
-    Signal<int> on_new_org_sig;       // Trigger: Organism has been added to population
+    Signal<int> before_repro_sig;       // Trigger: Immediately prior to producing offspring
+    Signal<ORG *> offspring_ready_sig;  // Trigger: Offspring about to enter population
+    Signal<ORG *> inject_ready_sig;        // Trigger: New org about to be added to population
+    Signal<int> on_placement_sig;         // Trigger: Organism has been added to population
 
     EMP_SETUP_EVO_WORLD_DEFAULT(default_fit_fun, Fitness, double)
     EMP_SETUP_EVO_WORLD_DEFAULT_ARGS(default_mut_fun, Mutate, bool, emp::Random &)
@@ -203,9 +203,9 @@ namespace evo {
     World(emp::Random * r_ptr, const std::string & pop_name="emp::evo::World")
       : random_ptr(r_ptr), random_owner(false)
       , before_repro_sig(to_string(pop_name,"before-repro"))
-      , on_birth_sig(to_string(pop_name,"on-birth"))
-      , on_inject_sig(to_string(pop_name,"on-inject"))
-      , on_new_org_sig(to_string(pop_name,"on-new-org"))
+      , offspring_ready_sig(to_string(pop_name,"offspring-ready"))
+      , inject_ready_sig(to_string(pop_name,"inject-ready"))
+      , on_placement_sig(to_string(pop_name,"on-placement"))
       , callbacks(pop_name) { SetupWorld(); }
 
     World(const std::string & pop_name="emp::evo::World")
@@ -229,9 +229,9 @@ namespace evo {
     void ResetRandom(int seed=-1) { SetRandom(*(new Random(seed))); }
 
     LinkKey BeforeRepro(std::function<void(int)> fun) { return before_repro_sig.AddAction(fun); }
-    LinkKey OnBirth(std::function<void(ORG *)> fun) { return on_birth_sig.AddAction(fun); }
-    LinkKey OnInject(std::function<void(ORG *)> fun) { return on_inject_sig.AddAction(fun); }
-    LinkKey OnNewOrg(std::function<void(int)> fun) { return on_new_org_sig.AddAction(fun); }
+    LinkKey OffspringReady(std::function<void(ORG *)> fun) { return offspring_ready_sig.AddAction(fun); }
+    LinkKey InjectReady(std::function<void(ORG *)> fun) { return inject_ready_sig.AddAction(fun); }
+    LinkKey OnPlacement(std::function<void(int)> fun) { return on_placement_sig.AddAction(fun); }
 
 
     // All additions to the population must go through one of the following Insert methods
@@ -239,28 +239,28 @@ namespace evo {
     void Insert(const ORG & mem, int copy_count=1) {
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);
-        on_inject_sig.Trigger(new_org);
+        inject_ready_sig.Trigger(new_org);
         const int pos = pop.AddOrg(new_org);
         SetupOrg(*new_org, &callbacks, pos);
-        on_new_org_sig.Trigger(pos);
+        on_placement_sig.Trigger(pos);
       }
     }
     template <typename... ARGS>
     void InsertRandomOrg(ARGS... args) {
       emp_assert(random_ptr != nullptr && "InsertRandomOrg() requires active random_ptr");
       ORG * new_org = new ORG(*random_ptr, std::forward<ARGS>(args)...);
-      on_inject_sig.Trigger(new_org);
+      inject_ready_sig.Trigger(new_org);
       const int pos = pop.AddOrg(new_org);
       SetupOrg(*new_org, &callbacks, pos);
-      on_new_org_sig.Trigger(pos);
+      on_placement_sig.Trigger(pos);
     }
-    void InsertBirth(const ORG & mem, int copy_count=1) {
+    void InsertBirth(const ORG & mem, int parent_pos, int copy_count=1) {
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);
-        on_birth_sig.Trigger(new_org);
-        const int pos = pop.AddOrgBirth(new_org);
+        offspring_ready_sig.Trigger(new_org);
+        const int pos = pop.AddOrgBirth(new_org, parent_pos);
         SetupOrg(*new_org, &callbacks, pos);
-        on_new_org_sig.Trigger(pos);
+        on_placement_sig.Trigger(pos);
       }
     }
 
@@ -269,8 +269,7 @@ namespace evo {
       emp_assert(random_ptr != nullptr && "DoRepro() requires a random number generator.");
       std::cout << "Repro " << id << std::endl;
       before_repro_sig.Trigger(id);
-      ORG * new_org = new ORG(*(pop[id]));
-      InsertBirth(*new_org);
+      InsertBirth(*(pop[id]), id, 1);
     }
 
     void DoSymbiontRepro(int id) {
@@ -280,8 +279,9 @@ namespace evo {
       // @CAO For the moment, assume random replacement (in the future, make pop_manager handle it)
       const int target_id = random_ptr->GetInt((int) pop.size());
 
-      // @CAO Call member class function to determine which symboiont is being comied from
-      // the host in id, and how (and if) they should going into the target id.
+      // Copy the symbiont into the target.
+      const auto & symbiont = pop[id]->GetSymbiont();
+      pop[target_id]->InjectSymbiont(symbiont, *random_ptr);
     }
 
     // Mutations for the next generation (count number of mutated organisms)
@@ -316,7 +316,7 @@ namespace evo {
       // Grab the top fitnesses and move them into the next generation.
       auto m = fit_map.rbegin();
       for (int i = 0; i < e_count; i++) {
-        InsertBirth( *(pop[m->second]), copy_count);
+        InsertBirth( *(pop[m->second]), m->second, copy_count);
         ++m;
       }
     }
@@ -353,7 +353,7 @@ namespace evo {
     void RunTournament(const emp::vector<double> & fitness, int t_size, int tourny_count=1){
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
       for (int T = 0; T < tourny_count; T++) {
-        emp::vector<int> entries = random_ptr->Choose(pop.size(), t_size);
+        emp::vector<int> entries = Choose(*random_ptr, pop.size(), t_size);
         double best_fit = fitness[entries[0]];
         int best_id = entries[0];
 
@@ -367,7 +367,7 @@ namespace evo {
         }
 
         // Place the highest fitness into the next generation!
-        InsertBirth( *(pop[best_id]) );
+        InsertBirth( *(pop[best_id]), best_id, 1 );
       }
     }
 
@@ -375,7 +375,7 @@ namespace evo {
     void RunTournament(std::function<double(ORG*)> fit_fun, int t_size, int tourny_count=1){
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
       for (int T = 0; T < tourny_count; T++) {
-        emp::vector<int> entries = random_ptr->Choose(pop.size(), t_size);
+        emp::vector<int> entries = Choose(*random_ptr, pop.size(), t_size);
         double best_fit = fit_fun(pop[entries[0]]);
         int best_id = entries[0];
 
@@ -389,7 +389,7 @@ namespace evo {
         }
 
         // Place the highest fitness into the next generation!
-        InsertBirth( *(pop[best_id]) );
+        InsertBirth( *(pop[best_id]), best_id, 1 );
       }
     }
 

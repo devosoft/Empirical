@@ -22,50 +22,63 @@ struct TestOrg1 {
 int main()
 {
   emp::Random random;
-  emp::evo::World<int> pop(random);
+  emp::evo::World<int> world(random);
 
-  for (int i = 0; i < 100; i++) pop.Insert(i+100);
+  for (int i = 0; i < 100; i++) world.Insert(i+100);
 
-  std::cout << "Start Size = " << pop.GetSize() << std::endl;
-  for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << " ";
+  std::cout << "Start Size = " << world.GetSize() << std::endl;
+  for (int i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
   std::cout << std::endl;
 
-  pop.TournamentSelect([](int * i){ return (double) *i; }, 5, 100);
-  pop.Update();
-  std::cout << "Post-Tourney Size = " << pop.GetSize() << std::endl;
-  for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << " ";
+  world.TournamentSelect([](int * i){ return (double) *i; }, 5, 100);
+  world.Update();
+  std::cout << "Post-Tourney Size = " << world.GetSize() << std::endl;
+  for (int i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
   std::cout << std::endl;
 
   // Populations can be supplied a default fitness function so that it doesn't
   // need to keep being specified.
-  pop.SetDefaultFitnessFun([](int * i){ return (double) *i; });
+  world.SetDefaultFitnessFun([](int * i){ return (double) *i; });
 
-  // pop.EliteSelect([](int * i){ return (double) *i; }, 10, 10);
-  pop.EliteSelect(10, 10);
-  pop.Update();
-  std::cout << "Post-Elite Size = " << pop.GetSize() << std::endl;
-  for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << " ";
+  // world.EliteSelect([](int * i){ return (double) *i; }, 10, 10);
+  world.EliteSelect(10, 10);
+  world.Update();
+  std::cout << "Post-Elite Size = " << world.GetSize() << std::endl;
+  for (int i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
   std::cout << std::endl << std::endl;
 
 
 
-  emp::evo::EAWorld<TestOrg1> pop1(random);
-  for (int i = 0; i < 100; i++) pop1.Insert(i+200);
+  emp::evo::EAWorld<TestOrg1> ea_world(random);
+  for (int i = 0; i < 100; i++) ea_world.Insert(i+200);
 
-  std::cout << "Start Size = " << pop1.GetSize() << std::endl;
-  for (int i = 0; i < pop1.GetSize(); i++) std::cout << pop1[i].Fitness() << " ";
+  std::cout << "Start Size = " << ea_world.GetSize() << std::endl;
+  for (int i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].Fitness() << " ";
   std::cout << std::endl;
 
-  pop1.TournamentSelect(5, 100);
-  pop1.Update();
-  std::cout << "Post-Tourney Size = " << pop1.GetSize() << std::endl;
-  for (int i = 0; i < pop1.GetSize(); i++) std::cout << pop1[i].Fitness() << " ";
+  ea_world.TournamentSelect(5, 100);
+  ea_world.Update();
+  std::cout << "Post-Tourney Size = " << ea_world.GetSize() << std::endl;
+  for (int i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].Fitness() << " ";
   std::cout << std::endl;
 
-  // pop.EliteSelect([](int * i){ return (double) *i; }, 10, 10);
-  pop1.EliteSelect(10, 10);
-  pop1.Update();
-  std::cout << "Post-Elite Size = " << pop1.GetSize() << std::endl;
-  for (int i = 0; i < pop1.GetSize(); i++) std::cout << pop1[i].Fitness() << " ";
+  // world.EliteSelect([](int * i){ return (double) *i; }, 10, 10);
+  ea_world.EliteSelect(10, 10);
+  ea_world.Update();
+  std::cout << "Post-Elite Size = " << ea_world.GetSize() << std::endl;
+  for (int i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].Fitness() << " ";
   std::cout << std::endl << std::endl;
+
+
+  // Test grid Populations
+  emp::evo::World<int, emp::evo::PopGrid> grid_world(random);
+  for (int i = 0; i < 10; i++) grid_world.Insert(i);
+  grid_world.pop.DebugPrint();
+
+  for (int i = 0; i < grid_world.pop.GetSize(); ++i) {
+    int id = random.GetInt(grid_world.pop.GetSize());
+    if (grid_world.pop[id]) grid_world.InsertBirth(*(grid_world.pop[id]), id);
+  }
+  std::cout << std::endl;
+  grid_world.pop.DebugPrint();
 }

@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
-// Copyright (C) Michigan State University, 2015. It is licensed
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_ASSERT_H
-#define EMP_ASSERT_H
-
-///////////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  This file is a replacement for the system-level assert.h, called "emp_assert"
 //  It behaves nearly identically, but with some additional functionality:
@@ -15,7 +11,9 @@
 //  - if NDEBUG -or- EMP_NDEBUG is defined, the expression in emp_assert() is not evaluated.
 //  - if EMP_TDEBUG is defined, emp_assert() goes into test mode and records failures, but
 //    does not abort.  (useful for unit tests of asserts)
-//
+
+#ifndef EMP_ASSERT_H
+#define EMP_ASSERT_H
 
 #include <iostream>
 #include <string>

@@ -1,6 +1,6 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
 
 #ifndef EMP_SEQUENCE_UTILS_H
 #define EMP_SEQUENCE_UTILS_H
@@ -34,7 +34,7 @@ namespace emp {
     for (size_t i = 0; i < overlap; i++) {
       if (in1[i + offset] != in2[i]) num_diffs++;
     }
-    
+
     return num_diffs;
   }
 
@@ -107,7 +107,7 @@ namespace emp {
       // Initialize the first entry in the current row.
       if (in1[0] == in2[row]) { cur_row[0] = row; edit_info[row][0] = 's'; }
       else { cur_row[0] = prev_row[0] + 1; edit_info[row][0] = 'd'; }
-      
+
       // Move through the cur_row and fill it in.
       for (int col = 1; col < (int) size1; col++) {
         // If the values are equal, keep the value in the upper left.
@@ -128,7 +128,7 @@ namespace emp {
     }
 
     // Fill in gaps in the sequences to make them align!
-    
+
     int c = size1-1;
     int r = size2-1;
     int length = 0;
@@ -144,7 +144,7 @@ namespace emp {
       case 'i': --c; ++length; break;
       };
     }
-      
+
     c = size1-1;
     r = size2-1;
 

@@ -1,4 +1,4 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 
@@ -183,6 +183,24 @@ namespace emp {
   // bool value.
 
 #define emp_bool_decoy(TEST) typename emp::sfinae_decoy<bool, decltype(&TEST)>::type
+
+
+  // Change the internal type arguments on a template...
+  // From: Sam Varshavchik
+  // http://stackoverflow.com/questions/36511990/is-it-possible-to-disentangle-a-template-from-its-arguments-in-c
+  namespace internal {
+    template<typename T, typename ...U> class AdaptTemplateHelper;
+
+    template<template <typename...> class T, typename ...V, typename ...U>
+    class AdaptTemplateHelper<T<V...>, U...> {
+    public:
+      typedef T<U...> type;
+    };
+  }
+
+  template<typename T, typename ...U>
+  using AdaptTemplate=typename internal::AdaptTemplateHelper<T, U...>::type;
+
 
 }
 
