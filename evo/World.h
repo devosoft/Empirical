@@ -279,8 +279,9 @@ namespace evo {
       // @CAO For the moment, assume random replacement (in the future, make pop_manager handle it)
       const int target_id = random_ptr->GetInt((int) pop.size());
 
-      // @CAO Call member class function to determine which symboiont is being comied from
-      // the host in id, and how (and if) they should going into the target id.
+      // Copy the symbiont into the target.
+      const auto & symbiont = pop[id]->GetSymbiont();
+      pop[target_id]->InjectSymbiont(symbiont, *random_ptr);
     }
 
     // Mutations for the next generation (count number of mutated organisms)
