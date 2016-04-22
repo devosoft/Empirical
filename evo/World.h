@@ -172,6 +172,7 @@ namespace evo {
 
     EMP_SETUP_EVO_WORLD_DEFAULT(default_fit_fun, Fitness, double)
     EMP_SETUP_EVO_WORLD_DEFAULT_ARGS(default_mut_fun, Mutate, bool, emp::Random &)
+    EMP_SETUP_EVO_WORLD_DEFAULT_ARGS(default_print_fun, Print, bool, std::ostream)
 
     // Determine the callback type; by default this will be OrgSignals_NONE, but it can be
     // overridden by setting the type callback_t in the organism class.
@@ -302,6 +303,8 @@ namespace evo {
     int MutatePop(const int first_mut=0, const int last_mut=-1) {
       return MutatePop(default_mut_fun, first_mut, last_mut);
     }
+
+    void Print(std::ostream & os = std::cout) { pop.Print(os); }
 
     // Selection mechanisms choose organisms for the next generation.
 

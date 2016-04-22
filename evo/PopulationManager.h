@@ -41,6 +41,19 @@ namespace evo {
 
     void SetRandom(Random * r) { random_ptr = r; }
 
+
+    void Print(std::function<bool(ORG*,std::ostream &)> print_fun, std::ostream & os = std::cout,
+              std::string empty="X", std::string spacer=" ") {
+      for (ORG * org : pop) {
+        if (org) org->default_print_fun(os);
+        else os << empty;
+        os << spacer;
+      }
+    }
+    void Print(std::ostream & os = std::cout, std::string empty="X", std::string spacer=" ") {
+      Print( [](ORG* org,std::ostream & os){os << *org;}, os, empty, spacer );
+    }
+
     // AddOrg and ReplaceOrg should be the only ways new organisms come into a population.
     // AddOrg inserts them into the end of the designated population.
     // ReplaceOrg places them at a specific position, replacing anyone who may already be there.
@@ -210,14 +223,14 @@ namespace evo {
       return pos;
     }
 
-    void DebugPrint(const std::string & empty="-", const std::string & spacing=" ") {
+    void Print(std::ostream & os = std::cout, const std::string & empty="-", const std::string & spacer=" ") {
       for (int y=0; y<height; y++) {
         for (int x = 0; x<width; x++) {
           const ORG * print_org = pop[ToID(x,y)];
-          if (print_org) std::cout << *print_org << spacing;
-          else std::cout << empty << spacing;
+          if (print_org) os << *print_org << spacer;
+          else os << empty << spacer;
         }
-        std::cout << std::endl;
+        os << std::endl;
       }
     }
   };

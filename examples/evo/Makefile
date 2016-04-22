@@ -21,28 +21,29 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 
 TARGETS := Fitness_Share_NK NK NK-Serial Symbulation World bit_evolve
 
+EVO_DEPEND := ../../evo/PopulationManager.h ../../evo/World.h
 
 default: native
 
 native: $(TARGETS)
 
 
-Fitness_Share_NK: Fitness_Share_NK.cc
+Fitness_Share_NK: Fitness_Share_NK.cc $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) Fitness_Share_NK.cc -o Fitness_Share_NK
 
-NK: NK.cc
+NK: NK.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) NK.cc -o NK
 
-NK-Serial: NK-Serial.cc
+NK-Serial: NK-Serial.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) NK-Serial.cc -o NK-Serial
 
-World: World.cc
+World: World.cc $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) World.cc -o World
 
-Symbulation: Symbulation.cc
+Symbulation: Symbulation.cc ../../evo/Symbulation.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) Symbulation.cc -o Symbulation
 
-bit_evolve: bit_evolve.cc
+bit_evolve: bit_evolve.cc $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) bit_evolve.cc -o bit_evolve
 
 
