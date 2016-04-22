@@ -168,6 +168,7 @@ namespace evo {
     Signal<ORG *> offspring_ready_sig;  // Trigger: Offspring about to enter population
     Signal<ORG *> inject_ready_sig;        // Trigger: New org about to be added to population
     Signal<int> on_placement_sig;         // Trigger: Organism has been added to population
+    Signal<emp::vector<ORG *>* > on_update_sig;         // Trigger: Organism has been added to population
 
     EMP_SETUP_EVO_WORLD_DEFAULT(default_fit_fun, Fitness, double)
     EMP_SETUP_EVO_WORLD_DEFAULT_ARGS(default_mut_fun, Mutate, bool, emp::Random &)
@@ -206,6 +207,7 @@ namespace evo {
       , offspring_ready_sig(to_string(pop_name,"offspring-ready"))
       , inject_ready_sig(to_string(pop_name,"inject-ready"))
       , on_placement_sig(to_string(pop_name,"on-placement"))
+      , on_update_sig(to_string(pop_name,"on-update"))
       , callbacks(pop_name) { SetupWorld(); }
 
     World(const std::string & pop_name="emp::evo::World")
@@ -232,6 +234,7 @@ namespace evo {
     LinkKey OffspringReady(std::function<void(ORG *)> fun) { return offspring_ready_sig.AddAction(fun); }
     LinkKey InjectReady(std::function<void(ORG *)> fun) { return inject_ready_sig.AddAction(fun); }
     LinkKey OnPlacement(std::function<void(int)> fun) { return on_placement_sig.AddAction(fun); }
+    LinkKey OnUpdate(std::function<void(int)> fun) { return on_update_sig.AddAction(fun); }
 
 
     // All additions to the population must go through one of the following Insert methods
@@ -433,6 +436,7 @@ namespace evo {
     // Update() moves the next population to the current position, managing memory as needed.
     void Update() {
       // @CAO Setup a trigger here?
+      on_update_sig.Trigger(&pop.pop);
       pop.Update();
     }
 
