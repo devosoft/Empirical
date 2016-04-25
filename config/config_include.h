@@ -1,12 +1,12 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 // This file gets called by config.h.  It is a wrapper around the custom config_opts file
 // that will be built into each project to ensure that all needed macros are handled before
 // calling that file and cleaned up afterward.
 
-// Setup default values for all unset macros.
+// Setup default values for all unset macros so they get ignored.
 #ifndef EMP_CONFIG_GROUP
 #define EMP_CONFIG_GROUP(NAME, DESC)
 #endif
