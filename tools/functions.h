@@ -94,6 +94,16 @@ namespace emp {
     return out_v;
   }
 
+  namespace internal {
+    template <typename FT>
+    FT to_function_impl(std::function<FT> & in_fun) { return in_fun; }
+  }
+
+  template <typename T>
+  auto to_function(T && in) -> decltype(internal::to_function_impl(std::forward<T>(in))) {
+    return internal::to_function_impl(std::forward<T>(in));
+  }
+
   // The following two functions are from:
   // http://stackoverflow.com/questions/5056645/sorting-stdmap-using-value
   template<typename A, typename B> std::pair<B,A> flip_pair(const std::pair<A,B> &p)
@@ -144,6 +154,7 @@ namespace emp {
   }
 
 
+  // Apply a tuple as arguments to a function!
 
   // implementation details, users never invoke these directly
   // Based on Kerrek SB in http://stackoverflow.com/questions/10766112/c11-i-can-go-from-multiple-args-to-tuple-but-can-i-go-from-tuple-to-multiple
