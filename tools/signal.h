@@ -201,6 +201,15 @@ namespace emp {
       return s->AddAction(a);
     }
 
+    // One final cases: if we were provided with a function object; pass it through!
+    template <typename... ARGS>
+    LinkKey LinkSignal(internal::Signal_Base * s, const std::function<void(ARGS...)> & fun);
+
+    // Add an action that takes no arguments.
+    LinkKey LinkSignal(internal::Signal_Base * s, const std::function<void()> & in_fun) {
+      return s->AddAction(in_fun);
+    }
+
     // Every link needs a unique key to be able to look it up again.
     LinkKey RegisterLink(internal::Signal_Base * s) {
       next_link_key++;
@@ -317,6 +326,12 @@ namespace emp {
     }
   };
 
+  template <typename... ARGS>
+  LinkKey SignalManager::LinkSignal(internal::Signal_Base * s,
+                                    const std::function<void(ARGS...)> & fun) {
+    emp::Action<ARGS...> action(fun);
+    return s->AddAction(&action);
+  }
 
   // Global functions that interact with the SignalManager
 
