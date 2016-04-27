@@ -159,7 +159,21 @@ namespace emp {
         std::cout << s.first << std::endl;
       }
       for (int i = 0; i < indent; i++) std::cout << " ";
-      std::cout << "PLUS " << unnamed_count << " unnamed signals." << std::endl;
+      std::cout << unnamed_count << " unnamed signals." << std::endl;
+    }
+
+    void PrintActionNames(int indent=0) {
+      int unnamed_count = 0;
+      for (const auto & s : actions) {
+        if (s.first == "") {
+          unnamed_count++;
+          continue;
+        }
+        for (int i = 0; i < indent; i++) std::cout << " ";
+        std::cout << s.first << std::endl;
+      }
+      for (int i = 0; i < indent; i++) std::cout << " ";
+      std::cout << unnamed_count << " unnamed actions." << std::endl;
     }
 
     static SignalManager & Get() {
@@ -318,8 +332,15 @@ namespace emp {
     signal->Trigger(args...);
   }
 
-  void PrintSignalNames(int indent=0) {
-    SignalManager::Get().PrintSignalNames(indent);
+  void PrintSignalNames(int indent=0) { SignalManager::Get().PrintSignalNames(indent); }
+  void PrintActionNames(int indent=0) { SignalManager::Get().PrintActionNames(indent); }
+  void PrintSignalInfo(int indent=0) {
+    if (indent) std::cout << std::string(indent, ' ');
+    std::cout << "SIGNAL NAMES:" << std::endl;
+    SignalManager::Get().PrintSignalNames(indent+2);
+    if (indent) std::cout << std::string(indent, ' ');
+    std::cout << "ACTION NAMES:" << std::endl;
+    SignalManager::Get().PrintActionNames(indent+2);
   }
 }
 
