@@ -95,29 +95,6 @@ namespace emp {
   }
 
 
-  // to_function() will take any kind of function (function pointer, lambda, function object,
-  // etc.) and convert it to a function object.
-  namespace internal {
-    template <typename FT>
-    std::function<FT> & to_function_impl(std::function<FT> & in_fun, bool) { return in_fun; }
-
-    template <typename RETURN_TYPE, typename... ARG_TYPES>
-    std::function<RETURN_TYPE(ARG_TYPES...)>
-    to_function_impl( RETURN_TYPE (*in_fun) (ARG_TYPES...), int ) {
-      return std::function<RETURN_TYPE(ARG_TYPES...)>(in_fun);
-    }
-
-    // template <typename T>
-    // std::function<T> to_function_impl( T in_fun, ... ) {
-    //   return std::function<T>(in_fun);
-    // }
-  }
-
-  template <typename T>
-  auto to_function(T && in) -> decltype(internal::to_function_impl(std::forward<T>(in), true)) {
-    return internal::to_function_impl(std::forward<T>(in), true);
-  }
-
   // The following two functions are from:
   // http://stackoverflow.com/questions/5056645/sorting-stdmap-using-value
   template<typename A, typename B> std::pair<B,A> flip_pair(const std::pair<A,B> &p)
