@@ -203,10 +203,10 @@ namespace evo {
   public:
     World(emp::Random * r_ptr, const std::string & pop_name="emp::evo::World")
       : random_ptr(r_ptr), random_owner(false)
-      , before_repro_sig(to_string(pop_name,"before-repro"))
-      , offspring_ready_sig(to_string(pop_name,"offspring-ready"))
-      , inject_ready_sig(to_string(pop_name,"inject-ready"))
-      , on_placement_sig(to_string(pop_name,"on-placement"))
+      , before_repro_sig(to_string(pop_name,"::before-repro"))
+      , offspring_ready_sig(to_string(pop_name,"::offspring-ready"))
+      , inject_ready_sig(to_string(pop_name,"::inject-ready"))
+      , on_placement_sig(to_string(pop_name,"::on-placement"))
       , callbacks(pop_name) { SetupWorld(); }
 
     World(const std::string & pop_name="emp::evo::World")
