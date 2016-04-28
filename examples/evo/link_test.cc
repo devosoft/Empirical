@@ -28,10 +28,7 @@ int main()
 
   // world.OffspringReady( [&random](Org * org) { org->Print(); std::cout << " born!" << std::endl;});
   std::function<void(Org*)> fun = [&random](Org * org) { org->Print(); std::cout << " born!" << std::endl;};
-  auto * act = new emp::Action<Org*>(fun);
-
-  emp::PrintSignalNames();
-  emp::LinkSignal( "loud::offspring-ready", act );
+  emp::LinkSignal( "loud::offspring-ready", fun );
 
   for (int i = 0; i < 36; i++) world.Insert( random.GetInt(100, 1000) );
 
@@ -56,6 +53,7 @@ int main()
       std::cout << " ";
     }
     std::cout << std::endl;
-
   }
+
+  emp::PrintSignalInfo(2);
 }
