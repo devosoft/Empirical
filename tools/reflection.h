@@ -101,6 +101,27 @@
   } int ignore_semicolon_to_follow_ ## NEW_NAME = 0
 
 
+// Try to perform operation EVAL1 if TEST exists, otherwise do EVAL2.
+// This is good for operations like == or << that may be defined inside
+// a class OR outside of it.
+
+#define EMP_CREATE_EVAL_SELECT(NEW_NAME, TEST, RTYPE, EVAL1, EVAL2)  \
+  template <typename... ARG_TYPES>                                   \
+  RTYPE internal__RelayCall_ ## NEW_NAME(                            \
+    typename emp::sfinae_decoy<bool, decltype(TEST)>::type,          \
+    ARG_TYPES... args) {                                             \
+    return EVAL1(args...);                                           \
+  }                                                                  \
+  template <typename... ARG_TYPES>                                   \
+  RTYPE internal__RelayCall_ ## NEW_NAME(int, ARG_TYPES... args) {   \
+    return EVAL2(args...);                                           \
+  }                                                                  \
+  template <typename... ARG_TYPES>                                   \
+  RTYPE NEW_NAME(ARG_TYPES... args) {                                \
+    return internal__RelayCall_ ## NEW_NAME(true, args...);          \
+  } int ignore_semicolon_to_follow_ ## NEW_NAME = 0
+
+
 //  Build a struct which will, given a list of classes, pick the first one that has the any
 //  member MEMBER defined and call that class NAME.
 //
