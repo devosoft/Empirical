@@ -33,8 +33,9 @@ namespace emp {
     std::vector<T> v;
 
   public:
+    using value_type = T;
+
     vector() = default;
-    typedef T value_type;
     vector(const emp::vector<T> &) = default;
     vector(int size) : v(size) { emp_assert(size >= 0, size); }
     vector(int size, const T & val) : v(size, val) { emp_assert(size >= 0, size); }
@@ -44,6 +45,10 @@ namespace emp {
 
     uint32_t size() const { return v.size(); }
     void resize(int new_size) { emp_assert(new_size >= 0, new_size); v.resize(new_size); }
+    void resize(int new_size, const T & val) {
+      emp_assert(new_size >= 0, new_size);
+      v.resize(new_size, val);
+    }
 
     emp::vector<T> & operator=(const emp::vector<T> &) = default;
 
