@@ -107,42 +107,44 @@
 //   GetDefaultFitnessFun()  -- Return the current default fitness function being used.
 //   SetDefaultFitnessFun(new_fun)  -- Set the default fitness function to be new_fun.
 
-#define EMP_SETUP_EVO_WORLD_DEFAULT(FUN_VAR, METHOD, RTYPE)                       \
-  std::function<RTYPE(ORG*)> FUN_VAR;                                             \
-  template <class T> void Setup_ ## METHOD ## _impl(emp_bool_decoy(T::METHOD)) {  \
-    FUN_VAR = [](T* org){ return org->METHOD(); };                                \
-  }                                                                               \
-  template <class T> void Setup_ ## METHOD ## _impl(int) { ; }                    \
-  void Setup_ ## METHOD() {                                                       \
-    Setup_ ## METHOD ## _impl<ORG>(true);                                         \
-  }                                                                               \
-  public:                                                                         \
-  const std::function<RTYPE(ORG*)> & GetDefault ## METHOD ## Fun() const {        \
-    return FUN_VAR;                                                               \
-  }                                                                               \
-  void SetDefault ## METHOD ## Fun(const std::function<RTYPE(ORG*)> & f) {        \
-    FUN_VAR = f;                                                                  \
-  }                                                                               \
+
+#define EMP_SETUP_EVO_DEFAULT(FUN_VAR, NAME, TEST, ACTION, RTYPE)              \
+  std::function<RTYPE(ORG*)> FUN_VAR;                                          \
+  template <class T> void Setup_ ## FUN_VAR ## _impl(emp_bool_decoy(TEST)) {   \
+    FUN_VAR = [](T* org){ return ACTION; };                                    \
+  }                                                                            \
+  template <class T> void Setup_ ## FUN_VAR ## _impl(int) { ; }                \
+  void Setup_ ## NAME() {                                                      \
+    Setup_ ## FUN_VAR ## _impl<ORG>(true);                                     \
+  }                                                                            \
+  public:                                                                      \
+  const std::function<RTYPE(ORG*)> & GetDefault ## NAME ## Fun() const {       \
+    return FUN_VAR;                                                            \
+  }                                                                            \
+  void SetDefault ## NAME ## Fun(const std::function<RTYPE(ORG*)> & f) {       \
+    FUN_VAR = f;                                                               \
+  }                                                                            \
   protected:
 
-#define EMP_SETUP_EVO_WORLD_DEFAULT_ARGS(FUN_VAR, METHOD, RTYPE, ...)             \
-  std::function<RTYPE(ORG*, __VA_ARGS__)> FUN_VAR;                                \
-  template <class T, typename... ARG_TYPES>                                       \
-  void Setup_ ## METHOD ## _impl(emp_bool_decoy(T::METHOD)) {                     \
-    FUN_VAR = [](T* org, ARG_TYPES... args){ return org->METHOD(args...); };      \
-  }                                                                               \
-  template <class T, typename... ARG_TYPES>                                       \
-  void Setup_ ## METHOD ## _impl(int) { ; }                                       \
-  void Setup_ ## METHOD() {                                                       \
-    Setup_ ## METHOD ## _impl<ORG, __VA_ARGS__>(true);                            \
-  }                                                                               \
-  public:                                                                         \
-  const std::function<RTYPE(ORG*,__VA_ARGS__)>& GetDefault ## METHOD ## Fun() const { \
-    return FUN_VAR;                                                               \
-  }                                                                               \
-  void SetDefault ## METHOD ## Fun(const std::function<RTYPE(ORG*,__VA_ARGS__)>& f) { \
-    FUN_VAR = f;                                                                  \
-  }                                                                               \
+// ACTION was org->METHOD(args...)
+#define EMP_SETUP_EVO_DEFAULT_ARGS(FUN_VAR, NAME, TEST, ACTION, RTYPE, ...)         \
+  std::function<RTYPE(ORG*, __VA_ARGS__)> FUN_VAR;                                  \
+  template <class T, typename... ARG_TYPES>                                         \
+  void Setup_ ## FUN_VAR ## _impl(emp_bool_decoy(TEST)) {                           \
+    FUN_VAR = [](T* org, ARG_TYPES... args){ return ACTION; };                      \
+  }                                                                                 \
+  template <class T, typename... ARG_TYPES>                                         \
+  void Setup_ ## FUN_VAR ## _impl(int) { ; }                                        \
+  void Setup_ ## NAME() {                                                           \
+    Setup_ ## FUN_VAR ## _impl<ORG, __VA_ARGS__>(true);                             \
+  }                                                                                 \
+  public:                                                                           \
+  const std::function<RTYPE(ORG*,__VA_ARGS__)>& GetDefault ## NAME ## Fun() const { \
+    return FUN_VAR;                                                                 \
+  }                                                                                 \
+  void SetDefault ## NAME ## Fun(const std::function<RTYPE(ORG*,__VA_ARGS__)>& f) { \
+    FUN_VAR = f;                                                                    \
+  }                                                                                 \
   protected:
 
 
@@ -169,9 +171,9 @@ namespace evo {
     Signal<ORG *> inject_ready_sig;     // Trigger: New org about to be added to population
     Signal<int> org_placement_sig;      // Trigger: Organism has been added to population
 
-    EMP_SETUP_EVO_WORLD_DEFAULT(default_fit_fun, Fitness, double)
-    EMP_SETUP_EVO_WORLD_DEFAULT_ARGS(default_mut_fun, Mutate, bool, emp::Random &)
-    EMP_SETUP_EVO_WORLD_DEFAULT_ARGS(default_print_fun, Print, bool, std::ostream)
+    EMP_SETUP_EVO_DEFAULT(default_fit_fun, Fitness, T::Fitness, org->Fitness(), double)
+    EMP_SETUP_EVO_DEFAULT_ARGS(default_mut_fun, Mutate, T::Mutate, org->Mutate(args...), bool, emp::Random &)
+    EMP_SETUP_EVO_DEFAULT(default_string_fun, ToString, T::ToString, org->ToString(), std::string)
 
     // Determine the callback type; by default this will be OrgSignals_NONE, but it can be
     // overridden by setting the type callback_t in the organism class.
@@ -196,12 +198,14 @@ namespace evo {
       SetupCallbacks(callbacks);
       Setup_Fitness();
       Setup_Mutate();
+      Setup_ToString();
+      if (!default_string_fun) default_string_fun = [](ORG*){ return "UNDEFINED"; };
 
       pop.SetRandom(random_ptr);
     }
 
   public:
-    World(emp::Random * r_ptr, const std::string & pop_name="emp::evo::World")
+    World(emp::Random * r_ptr, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
       : random_ptr(r_ptr), random_owner(false)
       , before_repro_sig(to_string(pop_name,"::before-repro"))
       , offspring_ready_sig(to_string(pop_name,"::offspring-ready"))
@@ -209,11 +213,11 @@ namespace evo {
       , org_placement_sig(to_string(pop_name,"::org-placement"))
       , callbacks(pop_name) { SetupWorld(); }
 
-    World(const std::string & pop_name="emp::evo::World")
+    World(const std::string & pop_name=GenerateSignalName("emp::evo::World"))
       : World(new Random(), pop_name) { random_owner = true; }
-    World(emp::Random & random, const std::string & pop_name="emp::evo::World")
+    World(emp::Random & random, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
       : World(&random, pop_name) { ; }
-    World(int seed, const std::string & pop_name="emp::evo::World")
+    World(int seed, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
       : World(new Random(seed), pop_name) { random_owner = true; }
     World(const World &) = delete;
     ~World() { Clear(); if (random_owner) delete random_ptr; }
@@ -301,7 +305,7 @@ namespace evo {
       return MutatePop(default_mut_fun, first_mut, last_mut);
     }
 
-    void Print(std::ostream & os = std::cout) { pop.Print(os); }
+    void Print(std::ostream & os = std::cout) { pop.Print(default_string_fun, os); }
 
     // Selection mechanisms choose organisms for the next generation.
 
