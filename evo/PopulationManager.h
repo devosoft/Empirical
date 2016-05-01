@@ -42,16 +42,20 @@ namespace evo {
     void SetRandom(Random * r) { random_ptr = r; }
 
 
-    void Print(std::function<bool(ORG*,std::ostream &)> print_fun, std::ostream & os = std::cout,
+    void Print(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout,
               std::string empty="X", std::string spacer=" ") {
       for (ORG * org : pop) {
-        if (org) org->default_print_fun(os);
+        if (org) os << string_fun(org);
         else os << empty;
         os << spacer;
       }
     }
     void Print(std::ostream & os = std::cout, std::string empty="X", std::string spacer=" ") {
-      Print( [](ORG* org,std::ostream & os){os << *org;}, os, empty, spacer );
+      for (ORG * org : pop) {
+        if (org) os << *org;
+        else os << empty;
+        os << spacer;
+      }
     }
 
     // AddOrg and ReplaceOrg should be the only ways new organisms come into a population.
@@ -223,11 +227,27 @@ namespace evo {
       return pos;
     }
 
-    void Print(std::ostream & os = std::cout, const std::string & empty="-", const std::string & spacer=" ") {
+    void Print(std::function<std::string(ORG*)> string_fun,
+               std::ostream & os = std::cout,
+               const std::string & empty="-",
+               const std::string & spacer=" ")
+    {
+      emp_assert(string_fun);
       for (int y=0; y<height; y++) {
         for (int x = 0; x<width; x++) {
-          const ORG * print_org = pop[ToID(x,y)];
-          if (print_org) os << *print_org << spacer;
+          ORG * org = pop[ToID(x,y)];
+          if (org) os << string_fun(org) << spacer;
+          else os << empty << spacer;
+        }
+        os << std::endl;
+      }
+    }
+
+    void Print(std::ostream & os = std::cout, std::string empty="X", std::string spacer=" ") {
+      for (int y=0; y<height; y++) {
+        for (int x = 0; x<width; x++) {
+          ORG * org = pop[ToID(x,y)];
+          if (org) os << *org << spacer;
           else os << empty << spacer;
         }
         os << std::endl;
