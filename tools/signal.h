@@ -41,6 +41,7 @@
 
 #include "assert.h"
 #include "FunctionSet.h"
+#include "string_utils.h"
 
 namespace emp {
 
@@ -127,12 +128,14 @@ namespace emp {
 
   class SignalManager {
   private:
-    std::map<std::string, internal::Signal_Base *> signals;
-    std::map<std::string, internal::Action_Base *> actions;
-    std::map<int, internal::Signal_Base*> link_key_to_signal;
-    int next_link_key;
+    std::map<std::string, internal::Signal_Base *> signals;    // Map names to signals
+    std::map<std::string, internal::Action_Base *> actions;    // Map names to actions
+    std::map<int, internal::Signal_Base*> link_key_to_signal;  // Map keys to signals
 
-    SignalManager() : next_link_key(0) { ; }
+    int next_link_key;     // Each signal-action link should have a unique key id
+    int next_name_id;      // Used in order to build unique signal names
+
+    SignalManager() : next_link_key(0), next_name_id(0) { ; }
     SignalManager(const SignalManager &) = delete;
   public:
     void Register(const std::string & name, internal::Signal_Base * s) {
@@ -174,6 +177,11 @@ namespace emp {
       }
       for (int i = 0; i < indent; i++) std::cout << " ";
       std::cout << unnamed_count << " unnamed actions." << std::endl;
+    }
+
+    // Generate a unique signal name to prevent duplicates.
+    std::string GenerateSignalName(const std::string & prefix) {
+      return emp::to_string(prefix, '.', next_name_id++);
     }
 
     static SignalManager & Get() {
@@ -356,6 +364,9 @@ namespace emp {
     if (indent) std::cout << std::string(indent, ' ');
     std::cout << "ACTION NAMES:" << std::endl;
     SignalManager::Get().PrintActionNames(indent+2);
+  }
+  std::string GenerateSignalName(const std::string & prefix) {
+    return SignalManager::Get().GenerateSignalName(prefix);
   }
 }
 
