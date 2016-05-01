@@ -169,6 +169,10 @@ namespace evo {
 
     }
 
+    void Print(std::ostream & os) {
+      os << "Host: " << host << std::endl
+         << "Symbiont: " << symbiont << std::endl;
+    }
   };
 
 }
