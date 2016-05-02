@@ -16,7 +16,8 @@ public:
   double Fitness() const { return (double) value; }
   bool Mutate(emp::Random & r) { value += r.GetInt(-50,51); return true; }
 
-  void Print() { std::cout << value; }
+  void Print(std::ostream & os=std::cout) { os << value; }
+  std::string ToString() { return emp::to_string(value); }
 };
 
 int main()
