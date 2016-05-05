@@ -184,8 +184,8 @@ namespace emp {
   // Most commonly we will use a decoy to determine if a member exists, but be treated as a
   // bool value.
 
-#define emp_bool_decoy(TEST) typename emp::sfinae_decoy<bool, decltype(&TEST)>::type
-#define emp_int_decoy(TEST) typename emp::sfinae_decoy<int, decltype(&TEST)>::type
+#define emp_bool_decoy(TEST) typename emp::sfinae_decoy<bool, decltype(TEST)>::type
+#define emp_int_decoy(TEST) typename emp::sfinae_decoy<int, decltype(TEST)>::type
 
   // Change the internal type arguments on a template...
   // From: Sam Varshavchik
