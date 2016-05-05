@@ -169,11 +169,16 @@ namespace evo {
 
     }
 
-    void Print(std::ostream & os) {
+    void Print(std::ostream & os) const {
       os << "Host: " << host << std::endl
          << "Symbiont: " << symbiont << std::endl;
     }
   };
+
+  std::ostream & operator<<(std::ostream & os, const SymbulationOrg & org) {
+    org.Print(os);
+    return os;
+  }
 
 }
 }
