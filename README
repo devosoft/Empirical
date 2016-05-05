@@ -1,9 +1,20 @@
-A library of tools for scientific software development, with emphasis on also being able to build web interfaces using Emscripten.
+A library of tools for scientific software development, with emphasis on compiling to the web and
+building web interfaces using the Emscripten compiler (from C++ to high efficiency JavaScript).
 
-(planned) Directory structure:
+Top-level directory structure:
 
 tools/    - Basic tools that are generally useful for scientific software.
-physics/  - Basic physics-based tools for implementing simple virtual worlds
-emtools/  - Basic tools that make use of being compiled with emscripten.
-kinetic/  - A C++ wrapper for KineticJS, (requires Emscripten.)
-kintools/ - Tools that build off of KineticJS.
+emtools/  - Tools that make use of being compiled with emscripten.
+
+config/   - Tools to setup a simple configuration system.
+geometry/ - Geometry and physics-based tools for implementing simple virtual worlds.
+hardware/ - Implementation of basic virtual hardware that is easy to configure.
+scholar/  - Tools for tracking authors, citations, and bibliographies
+web/      - Tools for builing web interfaces
+
+evo/      - Tools for building evolution-based software, such as genetic algorithms, digital
+            evolution systems, or agent-based simulations.
+
+examples/ - Example code for many of the above tools
+tests/    - Unit tests
+utils/    - mini projects using Empirical with broad utility.
