@@ -174,6 +174,7 @@ namespace evo {
     EMP_SETUP_EVO_DEFAULT(default_fit_fun, Fitness, T::Fitness, org->Fitness(), double)
     EMP_SETUP_EVO_DEFAULT_ARGS(default_mut_fun, Mutate, T::Mutate, org->Mutate(args...), bool, emp::Random &)
     EMP_SETUP_EVO_DEFAULT(default_string_fun, ToString, T::ToString, org->ToString(), std::string)
+    EMP_SETUP_EVO_DEFAULT(default_ext_string_fun, ToString_ext, std::declval<std::stringstream>() << std::declval<ORG>(), emp::to_string(*org), std::string)
 
     // Determine the callback type; by default this will be OrgSignals_NONE, but it can be
     // overridden by setting the type callback_t in the organism class.
@@ -199,6 +200,7 @@ namespace evo {
       Setup_Fitness();
       Setup_Mutate();
       Setup_ToString();
+      Setup_ToString_ext();
       if (!default_string_fun) default_string_fun = [](ORG*){ return "UNDEFINED"; };
 
       pop.SetRandom(random_ptr);
