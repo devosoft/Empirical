@@ -154,6 +154,7 @@ namespace emp {
 namespace evo {
 
   EMP_SETUP_TYPE_SELECTOR(SelectPopManager, emp_is_population_manager);
+  EMP_SETUP_TYPE_SELECTOR(SelectOrgManager, emp_is_organism_manager);
 
   // Main world class...
 
@@ -161,6 +162,7 @@ namespace evo {
   class World {
   public:
     AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> pop;
+    AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgManBasic>::type, ORG> orgM;
 
   protected:
     Random * random_ptr;
