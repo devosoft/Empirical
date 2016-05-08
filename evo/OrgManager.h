@@ -27,6 +27,10 @@ namespace evo {
     bool Mutate(ORG *, emp::Random&) { return false; }
   };
 
+  using OrgManBasic  = OrgManager_Base<int>;
+//  using OrgManDirect = OrgManager_Direct<int>;
+
+
 }
 }
 
