@@ -92,6 +92,7 @@
 #include "../tools/vector.h"
 
 #include "OrgSignals.h"
+#include "OrgManager.h"
 #include "PopulationManager.h"
 
 // Macro to add class elements associated with a dynamic function call.

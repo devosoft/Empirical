@@ -2,7 +2,7 @@
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
-//  This file defines built-in population manages for use with emp::evo::World
+//  This file defines built-in population managers for use with emp::evo::World
 //
 //
 //  Developer notes:

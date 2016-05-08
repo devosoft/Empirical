@@ -5,8 +5,8 @@
 //  This file defines built-in mechanisms for the organisms to interact with the world.
 //  (I.e., how is fitness determined?  How are mutations performed?)
 
-#ifndef EMP_EVO_POPULATION_MANAGER_H
-#define EMP_EVO_POPULATION_MANAGER_H
+#ifndef EMP_EVO_ORGANISM_MANAGER_H
+#define EMP_EVO_ORGANISM_MANAGER_H
 
 namespace emp {
 namespace evo {
