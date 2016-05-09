@@ -23,12 +23,21 @@ namespace evo {
     // Allow this and derived classes to be identified as an organism manager.
     static constexpr bool emp_is_organism_manager = true;
 
-    double Fitness(ORG *) { return 0.0; }
+    double Fitness(ORG * org) { return (double) *org; }
     bool Mutate(ORG *, emp::Random&) { return false; }
   };
 
-  using OrgManBasic  = OrgManager_Base<int>;
-//  using OrgManDirect = OrgManager_Direct<int>;
+  template <typename ORG=int>
+  class OrgManager_Dynamic : public OrgManager_Base<ORG> {
+  protected:
+  public:
+    OrgManager_Dynamic() { ; }
+    ~OrgManager_Dynamic() { ; }
+  };
+
+  using OrgMBasic  = OrgManager_Base<int>;
+  using OrgMDynamic  = OrgManager_Dynamic<int>;
+//  using OrgMDirect = OrgManager_Direct<int>;
 
 
 }
