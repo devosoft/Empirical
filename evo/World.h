@@ -6,7 +6,7 @@
 //  This file defines a World template for use in evolutionary algorithms.
 //
 //  The template *must* define ORG to identify the type of organism in the population.
-//  The template *may* also be passed in any number of MANAGERS.
+//  The template *config* also be passed in any number of MANAGERS.
 //
 //  ORG can be any object type with the following properties:
 //  * The copy constructor must work.
@@ -161,8 +161,9 @@ namespace evo {
   template <typename ORG, typename... MANAGERS>
   class World {
   public:
-    AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> pop;
-    AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgManBasic>::type, ORG> orgM;
+    // Build managers...
+    AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> popM;
+    AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgMDynamic>::type, ORG> orgM;
 
   protected:
     Random * random_ptr;
@@ -201,7 +202,7 @@ namespace evo {
       Setup_Fitness();
       Setup_Mutate();
 
-      pop.SetRandom(random_ptr);
+      popM.SetRandom(random_ptr);
     }
 
   public:
@@ -223,15 +224,18 @@ namespace evo {
     ~World() { Clear(); if (random_owner) delete random_ptr; }
     World & operator=(const World &) = delete;
 
-    int GetSize() const { return (int) pop.size(); }
-    ORG & operator[](int i) { return *(pop[i]); }
-    const ORG & operator[](int i) const { return *(pop[i]); }
+    int GetSize() const { return (int) popM.size(); }
+    ORG & operator[](int i) { return *(popM[i]); }
+    const ORG & operator[](int i) const { return *(popM[i]); }
 
-    void Clear() { pop.Clear(); }
+    void Clear() { popM.Clear(); }
 
     Random & GetRandom() { return *random_ptr; }
     void SetRandom(Random & random) { if (random_owner) delete random_ptr; random_ptr = &random; }
     void ResetRandom(int seed=-1) { SetRandom(*(new Random(seed))); }
+
+    template <typename... T>
+    void ConfigPop(T &&... args) { popM.Config(std::forward<T>(args)...); }
 
     LinkKey OnBeforeRepro(std::function<void(int)> fun) { return before_repro_sig.AddAction(fun); }
     LinkKey OnOffspringReady(std::function<void(ORG *)> fun) { return offspring_ready_sig.AddAction(fun); }
@@ -245,7 +249,7 @@ namespace evo {
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);
         inject_ready_sig.Trigger(new_org);
-        const int pos = pop.AddOrg(new_org);
+        const int pos = popM.AddOrg(new_org);
         SetupOrg(*new_org, &callbacks, pos);
         org_placement_sig.Trigger(pos);
       }
@@ -255,7 +259,7 @@ namespace evo {
       emp_assert(random_ptr != nullptr && "InsertRandomOrg() requires active random_ptr");
       ORG * new_org = new ORG(*random_ptr, std::forward<ARGS>(args)...);
       inject_ready_sig.Trigger(new_org);
-      const int pos = pop.AddOrg(new_org);
+      const int pos = popM.AddOrg(new_org);
       SetupOrg(*new_org, &callbacks, pos);
       org_placement_sig.Trigger(pos);
     }
@@ -263,7 +267,7 @@ namespace evo {
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);
         offspring_ready_sig.Trigger(new_org);
-        const int pos = pop.AddOrgBirth(new_org, parent_pos);
+        const int pos = popM.AddOrgBirth(new_org, parent_pos);
         SetupOrg(*new_org, &callbacks, pos);
         org_placement_sig.Trigger(pos);
       }
@@ -274,7 +278,7 @@ namespace evo {
       emp_assert(random_ptr != nullptr && "DoRepro() requires a random number generator.");
       std::cout << "Repro " << id << std::endl;
       before_repro_sig.Trigger(id);
-      InsertBirth(*(pop[id]), id, 1);
+      InsertBirth(*(popM[id]), id, 1);
     }
 
     void DoSymbiontRepro(int id) {
@@ -282,21 +286,21 @@ namespace evo {
       std::cout << "SymbRepro " << id << std::endl;
 
       // @CAO For the moment, assume random replacement (in the future, make pop_manager handle it)
-      const int target_id = random_ptr->GetInt((int) pop.size());
+      const int target_id = random_ptr->GetInt((int) popM.size());
 
       // Copy the symbiont into the target.
-      const auto & symbiont = pop[id]->GetSymbiont();
-      pop[target_id]->InjectSymbiont(symbiont, *random_ptr);
+      const auto & symbiont = popM[id]->GetSymbiont();
+      popM[target_id]->InjectSymbiont(symbiont, *random_ptr);
     }
 
     // Mutations for the next generation (count number of mutated organisms)
     int MutatePop(std::function<bool(ORG*,emp::Random&)> mut_fun,
                   int first_mut=0, int last_mut=-1) {
       emp_assert(random_ptr != nullptr && "Mutate() requires active random_ptr");
-      if (last_mut == -1) last_mut = (int) pop.size();
+      if (last_mut == -1) last_mut = (int) popM.size();
       int mut_count = 0;
       for (int i = first_mut; i < last_mut; i++) {
-        if (mut_fun(pop[i], *random_ptr)) mut_count++;
+        if (mut_fun(popM[i], *random_ptr)) mut_count++;
       }
       return mut_count;
     }
@@ -305,25 +309,25 @@ namespace evo {
       return MutatePop(default_mut_fun, first_mut, last_mut);
     }
 
-    void Print(std::ostream & os = std::cout) { pop.Print(os); }
+    void Print(std::ostream & os = std::cout) { popM.Print(os); }
 
     // Selection mechanisms choose organisms for the next generation.
 
     // Elite Selection picks a set of the most fit individuals from the population to move to
     // the next generation.  Find top e_count individuals and make copy_count copies of each.
     void EliteSelect(std::function<double(ORG*)> fit_fun, int e_count=1, int copy_count=1) {
-      emp_assert(e_count > 0 && e_count <= (int) pop.size());
+      emp_assert(e_count > 0 && e_count <= (int) popM.size());
 
       // Load the population into a multimap, sorted by fitness.
       std::multimap<double, int> fit_map;
-      for (int i = 0; i < (int) pop.size(); i++) {
-        fit_map.insert( std::make_pair(fit_fun(pop[i]), i) );
+      for (int i = 0; i < (int) popM.size(); i++) {
+        fit_map.insert( std::make_pair(fit_fun(popM[i]), i) );
       }
 
       // Grab the top fitnesses and move them into the next generation.
       auto m = fit_map.rbegin();
       for (int i = 0; i < e_count; i++) {
-        InsertBirth( *(pop[m->second]), m->second, copy_count);
+        InsertBirth( *(popM[m->second]), m->second, copy_count);
         ++m;
       }
     }
@@ -339,12 +343,12 @@ namespace evo {
     // number of tournaments to run.
     void TournamentSelect(std::function<double(ORG*)> fit_fun, int t_size,
         int tourny_count=1, bool precalc_fitness=true) {
-      emp_assert(t_size > 0 && t_size <= (int) pop.size(), t_size, pop.size());
+      emp_assert(t_size > 0 && t_size <= (int) popM.size(), t_size, popM.size());
 
-      if (precalc_fitness && t_size * tourny_count * 2 >= (int) pop.size()) {
+      if (precalc_fitness && t_size * tourny_count * 2 >= (int) popM.size()) {
         // Pre-calculate fitnesses.
-        emp::vector<double> fitness(pop.size());
-        for (int i = 0; i < (int) pop.size(); ++i) fitness[i] = fit_fun(pop[i]);
+        emp::vector<double> fitness(popM.size());
+        for (int i = 0; i < (int) popM.size(); ++i) fitness[i] = fit_fun(popM[i]);
 
         RunTournament(fitness, t_size, tourny_count);
       }
@@ -360,7 +364,7 @@ namespace evo {
     void RunTournament(const emp::vector<double> & fitness, int t_size, int tourny_count=1){
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
       for (int T = 0; T < tourny_count; T++) {
-        emp::vector<int> entries = Choose(*random_ptr, pop.size(), t_size);
+        emp::vector<int> entries = Choose(*random_ptr, popM.size(), t_size);
         double best_fit = fitness[entries[0]];
         int best_id = entries[0];
 
@@ -374,7 +378,7 @@ namespace evo {
         }
 
         // Place the highest fitness into the next generation!
-        InsertBirth( *(pop[best_id]), best_id, 1 );
+        InsertBirth( *(popM[best_id]), best_id, 1 );
       }
     }
 
@@ -382,13 +386,13 @@ namespace evo {
     void RunTournament(std::function<double(ORG*)> fit_fun, int t_size, int tourny_count=1){
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
       for (int T = 0; T < tourny_count; T++) {
-        emp::vector<int> entries = Choose(*random_ptr, pop.size(), t_size);
-        double best_fit = fit_fun(pop[entries[0]]);
+        emp::vector<int> entries = Choose(*random_ptr, popM.size(), t_size);
+        double best_fit = fit_fun(popM[entries[0]]);
         int best_id = entries[0];
 
         // Search for a higher fit org in the tournament.
         for (int i = 1; i < t_size; i++) {
-          const double cur_fit = fit_fun(pop[entries[i]]);
+          const double cur_fit = fit_fun(popM[entries[i]]);
           if (cur_fit > best_fit) {
             best_fit = cur_fit;
             best_id = entries[i];
@@ -396,7 +400,7 @@ namespace evo {
         }
 
         // Place the highest fitness into the next generation!
-        InsertBirth( *(pop[best_id]), best_id, 1 );
+        InsertBirth( *(popM[best_id]), best_id, 1 );
       }
     }
 
@@ -412,17 +416,17 @@ namespace evo {
           double sharing_threshhold, double alpha,
           int t_size, int tourny_count=1)
     {
-      emp_assert(t_size > 0 && t_size <= (int) pop.size());
+      emp_assert(t_size > 0 && t_size <= (int) popM.size());
 
       // Pre-calculate fitnesses.
-      emp::vector<double> fitness(pop.size());
-      for (int i = 0; i < (int) pop.size(); ++i) {
+      emp::vector<double> fitness(popM.size());
+      for (int i = 0; i < (int) popM.size(); ++i) {
         double niche_count = 0;
-        for (int j = 0; j < (int) pop.size(); ++j) {
-          double dij = dist_fun(pop[i], pop[j]);
+        for (int j = 0; j < (int) popM.size(); ++j) {
+          double dij = dist_fun(popM[i], popM[j]);
           niche_count += std::max(1 - std::pow(dij/sharing_threshhold, alpha), 0.0);
         }
-        fitness[i] = fit_fun(pop[i])/niche_count;
+        fitness[i] = fit_fun(popM[i])/niche_count;
       }
 
       RunTournament(fitness, t_size, tourny_count);
@@ -440,7 +444,7 @@ namespace evo {
     // Update() moves the next population to the current position, managing memory as needed.
     void Update() {
       // @CAO Setup a trigger here?
-      pop.Update();
+      popM.Update();
     }
 
 
@@ -448,7 +452,7 @@ namespace evo {
     // any arguments.
     template <typename... ARGS>
     void Execute(ARGS... args) {
-      pop.Execute(std::forward<ARGS>(args)...);
+      popM.Execute(std::forward<ARGS>(args)...);
     }
 
   };
