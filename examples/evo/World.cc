@@ -75,9 +75,9 @@ int main()
   for (int i = 0; i < 10; i++) grid_world.Insert(i);
   grid_world.Print();
 
-  for (int i = 0; i < grid_world.pop.GetSize(); ++i) {
-    int id = random.GetInt(grid_world.pop.GetSize());
-    if (grid_world.pop[id]) grid_world.InsertBirth(*(grid_world.pop[id]), id);
+  for (int i = 0; i < grid_world.GetSize(); ++i) {
+    int id = random.GetInt(grid_world.GetSize());
+    if (grid_world.IsOccupied(id)) grid_world.InsertBirth(grid_world[id], id);
   }
   std::cout << std::endl;
   grid_world.Print();

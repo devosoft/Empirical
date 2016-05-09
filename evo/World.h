@@ -227,6 +227,7 @@ namespace evo {
     int GetSize() const { return (int) popM.size(); }
     ORG & operator[](int i) { return *(popM[i]); }
     const ORG & operator[](int i) const { return *(popM[i]); }
+    bool IsOccupied(int i) const { return popM[i] != nullptr; }
 
     void Clear() { popM.Clear(); }
 
