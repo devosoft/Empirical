@@ -169,12 +169,10 @@ namespace evo {
       , org_placement_sig(to_string(pop_name,"::org-placement"))
       , callbacks(pop_name) { SetupWorld(); }
 
-    World(const std::string & pop_name=GenerateSignalName("emp::evo::World"))
-      : World(new Random(), pop_name) { random_owner = true; }
+    World(int seed=-1, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
+      : World(new Random(seed), pop_name) { random_owner = true; }
     World(emp::Random & random, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
       : World(&random, pop_name) { ; }
-    World(int seed, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
-      : World(new Random(seed), pop_name) { random_owner = true; }
     World(const World &) = delete;
     ~World() { Clear(); if (random_owner) delete random_ptr; }
     World & operator=(const World &) = delete;
