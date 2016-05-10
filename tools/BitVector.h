@@ -329,15 +329,25 @@ namespace emp {
     }
 
 
+    // Regular print function (from most significant bit to least)
     void Print(std::ostream & out=std::cout) const {
+      for (int i = num_bits - 1; i >= 0; i--) out << Get(i);
+    }
+
+    // Print a space between each field
+    void PrintFields(std::ostream & out=std::cout) const {
       for (int i = num_bits - 1; i >= 0; i--) {
         out << Get(i);
         if (i % FIELD_BITS == 0) out << ' ';
       }
     }
+
+    // Print from smallest bit position to largest.
     void PrintArray(std::ostream & out=std::cout) const {
       for (int i = 0; i < num_bits; i++) out << Get(i);
     }
+
+    // Print the positions of all one bits.
     void PrintOneIDs(std::ostream & out=std::cout, char spacer=' ') const {
       for (int i = 0; i < num_bits; i++) { if (Get(i)) out << i << spacer; }
     }
