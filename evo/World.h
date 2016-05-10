@@ -264,7 +264,9 @@ namespace evo {
       return MutatePop(orgM.GetMutFun(), first_mut, last_mut);
     }
 
-    void Print(std::ostream & os = std::cout) { popM.Print(os); }
+    void Print(std::ostream & os=std::cout, const std::string & empty="X", const std::string & spacer=" ") {
+      popM.Print(os, empty, spacer);
+    }
 
     // Selection mechanisms choose organisms for the next generation.
 
