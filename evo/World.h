@@ -108,46 +108,8 @@
 //   GetDefaultFitnessFun()  -- Return the current default fitness function being used.
 //   SetDefaultFitnessFun(new_fun)  -- Set the default fitness function to be new_fun.
 
-
-#define EMP_SETUP_EVO_DEFAULT(FUN_VAR, NAME, TEST, ACTION, RTYPE)              \
-  std::function<RTYPE(ORG*)> FUN_VAR;                                          \
-  template <class T> void Setup_ ## FUN_VAR ## _impl(emp_bool_decoy(TEST)) {   \
-    FUN_VAR = [](T* org){ return ACTION; };                                    \
-  }                                                                            \
-  template <class T> void Setup_ ## FUN_VAR ## _impl(int) { ; }                \
-  void Setup_ ## NAME() {                                                      \
-    Setup_ ## FUN_VAR ## _impl<ORG>(true);                                     \
-  }                                                                            \
-  public:                                                                      \
-  const std::function<RTYPE(ORG*)> & GetDefault ## NAME ## Fun() const {       \
-    return FUN_VAR;                                                            \
-  }                                                                            \
-  void SetDefault ## NAME ## Fun(const std::function<RTYPE(ORG*)> & f) {       \
-    FUN_VAR = f;                                                               \
-  }                                                                            \
-  protected:
-
-// ACTION was org->METHOD(args...)
-#define EMP_SETUP_EVO_DEFAULT_ARGS(FUN_VAR, NAME, TEST, ACTION, RTYPE, ...)         \
-  std::function<RTYPE(ORG*, __VA_ARGS__)> FUN_VAR;                                  \
-  template <class T, typename... ARG_TYPES>                                         \
-  void Setup_ ## FUN_VAR ## _impl(emp_bool_decoy(TEST)) {                           \
-    FUN_VAR = [](T* org, ARG_TYPES... args){ return ACTION; };                      \
-  }                                                                                 \
-  template <class T, typename... ARG_TYPES>                                         \
-  void Setup_ ## FUN_VAR ## _impl(int) { ; }                                        \
-  void Setup_ ## NAME() {                                                           \
-    Setup_ ## FUN_VAR ## _impl<ORG, __VA_ARGS__>(true);                             \
-  }                                                                                 \
-  public:                                                                           \
-  const std::function<RTYPE(ORG*,__VA_ARGS__)>& GetDefault ## NAME ## Fun() const { \
-    return FUN_VAR;                                                                 \
-  }                                                                                 \
-  void SetDefault ## NAME ## Fun(const std::function<RTYPE(ORG*,__VA_ARGS__)>& f) { \
-    FUN_VAR = f;                                                                    \
-  }                                                                                 \
-  protected:
-
+#define EMP_EVO_FORWARD(FUN, TARGET) \
+template <typename... T> void FUN(T &&... args) { TARGET.FUN(std::forward<T>(args)...); }
 
 
 namespace emp {
@@ -160,12 +122,11 @@ namespace evo {
 
   template <typename ORG, typename... MANAGERS>
   class World {
-  public:
+  protected:
     // Build managers...
     AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> popM;
     AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgMDynamic>::type, ORG> orgM;
 
-  protected:
     Random * random_ptr;
     bool random_owner;
 
@@ -174,9 +135,6 @@ namespace evo {
     Signal<ORG *> offspring_ready_sig;  // Trigger: Offspring about to enter population
     Signal<ORG *> inject_ready_sig;     // Trigger: New org about to be added to population
     Signal<int> org_placement_sig;      // Trigger: Organism has been added to population
-
-    EMP_SETUP_EVO_DEFAULT(default_fit_fun, Fitness, T::Fitness, org->Fitness(), double)
-    EMP_SETUP_EVO_DEFAULT_ARGS(default_mut_fun, Mutate, T::Mutate, org->Mutate(args...), bool, emp::Random &)
 
     // Determine the callback type; by default this will be OrgSignals_NONE, but it can be
     // overridden by setting the type callback_t in the organism class.
@@ -199,9 +157,6 @@ namespace evo {
 
     void SetupWorld() {
       SetupCallbacks(callbacks);
-      Setup_Fitness();
-      Setup_Mutate();
-
       popM.SetRandom(random_ptr);
     }
 
@@ -235,14 +190,15 @@ namespace evo {
     void SetRandom(Random & random) { if (random_owner) delete random_ptr; random_ptr = &random; }
     void ResetRandom(int seed=-1) { SetRandom(*(new Random(seed))); }
 
-    template <typename... T>
-    void ConfigPop(T &&... args) { popM.Config(std::forward<T>(args)...); }
+    // Forward function calls to appropriate internal objects
+    EMP_EVO_FORWARD(ConfigPop, popM);
+    EMP_EVO_FORWARD(SetDefaultFitnessFun, orgM);
+    EMP_EVO_FORWARD(SetDefaultMutateFun, orgM);
 
     LinkKey OnBeforeRepro(std::function<void(int)> fun) { return before_repro_sig.AddAction(fun); }
     LinkKey OnOffspringReady(std::function<void(ORG *)> fun) { return offspring_ready_sig.AddAction(fun); }
     LinkKey OnInjectReady(std::function<void(ORG *)> fun) { return inject_ready_sig.AddAction(fun); }
     LinkKey OnOrgPlacement(std::function<void(int)> fun) { return org_placement_sig.AddAction(fun); }
-
 
     // All additions to the population must go through one of the following Insert methods
 
@@ -307,7 +263,7 @@ namespace evo {
     }
 
     int MutatePop(const int first_mut=0, const int last_mut=-1) {
-      return MutatePop(default_mut_fun, first_mut, last_mut);
+      return MutatePop(orgM.GetMutFun(), first_mut, last_mut);
     }
 
     void Print(std::ostream & os = std::cout) { popM.Print(os); }
@@ -335,7 +291,7 @@ namespace evo {
 
     // Elite Selection can use the default fitness function.
     void EliteSelect(int e_count=1, int copy_count=1) {
-      EliteSelect(default_fit_fun, e_count, copy_count);
+      EliteSelect(orgM.GetFitFun(), e_count, copy_count);
     }
 
     // Tournament Selection create a tournament with a random sub-set of organisms,
@@ -358,7 +314,7 @@ namespace evo {
 
     // Tournament Selection can use the default fitness function.
     void TournamentSelect(int t_size, int tourny_count=1) {
-      TournamentSelect(default_fit_fun, t_size, tourny_count);
+      TournamentSelect(orgM.GetFitFun(), t_size, tourny_count);
     }
 
     // Helper function to run a tournament when fitness is pre-calculated
@@ -438,7 +394,7 @@ namespace evo {
           dist_fun, double sharing_threshold,
           double alpha, int t_size,
           int tourny_count=1) {
-      TournamentSelect(default_fit_fun, dist_fun, sharing_threshold, alpha, t_size, tourny_count);
+      TournamentSelect(orgM.GetFitFun(), dist_fun, sharing_threshold, alpha, t_size, tourny_count);
     }
 
 
@@ -462,6 +418,8 @@ namespace evo {
   template <typename ORG, typename... MANAGERS>
   using EAWorld = World<ORG, MANAGERS..., PopulationManager_EA<ORG>>;
 
+  template <typename ORG, typename... MANAGERS>
+  using GridWorld = World<ORG, MANAGERS..., PopulationManager_Grid<ORG>>;
 
 }  // END evo namespace
 }  // END emp namespace
