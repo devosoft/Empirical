@@ -116,7 +116,7 @@ namespace evo {
 
   public:
     PopulationManager_EA() { ; }
-    ~ PopulationManager_EA() { Clear(); }
+    ~PopulationManager_EA() { Clear(); }
 
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = next_pop.size();
@@ -167,7 +167,7 @@ namespace evo {
     void SetMaxSize(const int m) { max_size = m; }
     void SetBottleneckSize(const int b) { bottleneck_size = b; }
 
-    void Config(int m, int b) { max_size = m; bottleneck_size = b; }
+    void ConfigPop(int m, int b) { max_size = m; bottleneck_size = b; }
 
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       if (pop.size() >= max_size) {
@@ -194,13 +194,13 @@ namespace evo {
     int ToID(int x, int y) const { return y*width + x; }
 
   public:
-    PopulationManager_Grid() { Config(10,10); }
+    PopulationManager_Grid() { ConfigPop(10,10); }
     ~PopulationManager_Grid() { ; }
 
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
 
-    void Config(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }
+    void ConfigPop(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }
 
     // Injected orgs go into a random position.
     int AddOrg(ORG * new_org) {
