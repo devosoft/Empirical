@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_CONFIG_MANAGER_H
-#define EMP_CONFIG_MANAGER_H
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  The ConfigManager templated class handles the building and configuration of new objects
 //  of the target type.
@@ -21,7 +17,10 @@
 //     inst inc
 //     inst divide cycle_cost=10
 //     ...
-//
+
+
+#ifndef EMP_CONFIG_MANAGER_H
+#define EMP_CONFIG_MANAGER_H
 
 #include <functional>
 #include <iostream>
@@ -59,7 +58,7 @@ namespace emp {
     ConfigManager(const std::string & _type, const std::string & _command,
                   std::function<bool(MANAGED_TYPE &, std::string)> _fun)
       : ConfigManager_Base(_type, _command)
-      , cur_obj(NULL)
+      , cur_obj(nullptr)
       , callback_fun(_fun)
     {
     }
@@ -93,7 +92,7 @@ namespace emp {
     }
 
     bool CommandCallback(const std::string & command) {
-      if (cur_obj == NULL) {
+      if (cur_obj == nullptr) {
         std::stringstream ss;
         ss << "Must build new '" << type_keyword << "' object before using command '"
            << command_keyword << "'.  Ignoring." << std::endl;

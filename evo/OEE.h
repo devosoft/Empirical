@@ -144,11 +144,11 @@ namespace evo{
       };
 
       std::cout << "Doing Setup" << std::endl;
-      world->BeforeRepro(RecordParentFun);
-      world->OffspringReady(TrackOffspringFun);
-      world->InjectReady(TrackInjectedOffspringFun);
+      world->OnBeforeRepro(RecordParentFun);
+      world->OnOffspringReady(TrackOffspringFun);
+      world->OnInjectReady(TrackInjectedOffspringFun);
       world->OnUpdate(UpdateFun);
-      world->OnPlacement(TrackPlacementFun);
+      world->OnOrgPlacement(TrackPlacementFun);
     }
 
 

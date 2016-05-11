@@ -33,7 +33,7 @@ int main()
   world.Insert(ancestor, MIN_POP_SIZE);          // Insert several copies of ancestor
 
   // Trigger mutations on organisms when they are born.
-  world.OnBirth( [&random](BitOrg* org) {
+  world.OnOffspringReady( [&random](BitOrg* org) {
       (*org)[random.GetInt(N)] = random.P(0.5);
       (*org)[random.GetInt(N)] = random.P(0.5);
       (*org)[random.GetInt(N)] = random.P(0.5);

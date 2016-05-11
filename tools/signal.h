@@ -41,6 +41,7 @@
 
 #include "assert.h"
 #include "FunctionSet.h"
+#include "string_utils.h"
 
 namespace emp {
 
@@ -52,6 +53,7 @@ namespace emp {
     class Signal_Base;
   }
 
+  // A LinkKey is a quick way to re-find a specific link to modify or remove it.
   class LinkKey {
   private:
     int id;
@@ -68,7 +70,7 @@ namespace emp {
     bool operator>(const LinkKey& in)  const { return id > in.id; }
     bool operator<=(const LinkKey& in) const { return id <= in.id; }
     bool operator>=(const LinkKey& in) const { return id >= in.id; }
-    
+
     int GetID() const { return id; }
     bool IsActive() const { return id > 0; }
 
@@ -79,7 +81,7 @@ namespace emp {
     template <typename... ARGS> void Replace(const std::function<void(ARGS...)> & fun);
   };
 
-  namespace internal {  
+  namespace internal {
     // BASE CLASS for Signals
     class Signal_Base {
     protected:
@@ -88,14 +90,14 @@ namespace emp {
     public:
       Signal_Base(const std::string & n) : name(n) { ; }
       virtual ~Signal_Base() { ; }
-      
+
       // Don't allow Signals to be copied.
       Signal_Base(const Signal_Base &) = delete;
       Signal_Base & operator=(const Signal_Base &) = delete;
 
       // NOTE: Trigger must have specialized arguments!  We require extra testing in here.
       template <typename... ARGS> void BaseTrigger(ARGS... args);
-     
+
       // Add an action by name and return a unique key for the pairing.
       LinkKey AddAction(const std::string & name);
 
@@ -105,7 +107,7 @@ namespace emp {
       // Add an action by Action object.
       virtual LinkKey AddAction(internal::Action_Base *) = 0;
     };
-    
+
     // BASE CLASS for Actions
     class Action_Base {
     protected:
@@ -113,25 +115,27 @@ namespace emp {
     public:
       Action_Base(const std::string & n) : name(n) { ; }
       virtual ~Action_Base() { ; }
-      
+
       // Don't allow Actions to be copied.
       Action_Base(const Action_Base &) = delete;
       Action_Base & operator=(const Action_Base &) = delete;
     };
    }
-  
+
   // The SignalManager creates signals and handles all proper associations, but
   // is not involved once a run gets started.  As such, it does not need to be
   // overly optimized.
-  
+
   class SignalManager {
   private:
-    std::map<std::string, internal::Signal_Base *> signals;
-    std::map<std::string, internal::Action_Base *> actions;
-    std::map<int, internal::Signal_Base*> link_key_to_signal;
-    int next_link_key;
-    
-    SignalManager() : next_link_key(0) { ; }
+    std::map<std::string, internal::Signal_Base *> signals;    // Map names to signals
+    std::map<std::string, internal::Action_Base *> actions;    // Map names to actions
+    std::map<int, internal::Signal_Base*> link_key_to_signal;  // Map keys to signals
+
+    int next_link_key;     // Each signal-action link should have a unique key id
+    int next_name_id;      // Used in order to build unique signal names
+
+    SignalManager() : next_link_key(0), next_name_id(0) { ; }
     SignalManager(const SignalManager &) = delete;
   public:
     void Register(const std::string & name, internal::Signal_Base * s) {
@@ -145,6 +149,39 @@ namespace emp {
       emp_assert(actions.find(name) == actions.end() &&
                  "Cannot register two actions by the same name.");
       actions[name] = a;
+    }
+
+    void PrintSignalNames(int indent=0) {
+      int unnamed_count = 0;
+      for (const auto & s : signals) {
+        if (s.first == "") {
+          unnamed_count++;
+          continue;
+        }
+        for (int i = 0; i < indent; i++) std::cout << " ";
+        std::cout << s.first << std::endl;
+      }
+      for (int i = 0; i < indent; i++) std::cout << " ";
+      std::cout << unnamed_count << " unnamed signals." << std::endl;
+    }
+
+    void PrintActionNames(int indent=0) {
+      int unnamed_count = 0;
+      for (const auto & s : actions) {
+        if (s.first == "") {
+          unnamed_count++;
+          continue;
+        }
+        for (int i = 0; i < indent; i++) std::cout << " ";
+        std::cout << s.first << std::endl;
+      }
+      for (int i = 0; i < indent; i++) std::cout << " ";
+      std::cout << unnamed_count << " unnamed actions." << std::endl;
+    }
+
+    // Generate a unique signal name to prevent duplicates.
+    std::string GenerateSignalName(const std::string & prefix) {
+      return emp::to_string(prefix, '.', next_name_id++);
     }
 
     static SignalManager & Get() {
@@ -170,6 +207,15 @@ namespace emp {
     // the derrived versions!
     LinkKey LinkSignal(internal::Signal_Base * s, internal::Action_Base * a) {
       return s->AddAction(a);
+    }
+
+    // One final cases: if we were provided with a function object; pass it through!
+    template <typename... ARGS>
+    LinkKey LinkSignal(internal::Signal_Base * s, const std::function<void(ARGS...)> & fun);
+
+    // Add an action that takes no arguments.
+    LinkKey LinkSignal(internal::Signal_Base * s, const std::function<void()> & in_fun) {
+      return s->AddAction(in_fun);
     }
 
     // Every link needs a unique key to be able to look it up again.
@@ -204,7 +250,7 @@ namespace emp {
   {
     return SignalManager::Get().LinkSignal(this, name);
   }
-    
+
 
   template <typename... ARGS>
   class Action : public internal::Action_Base {
@@ -216,7 +262,7 @@ namespace emp {
       if (name != "") SignalManager::Get().Register(name, this);
     }
   };
-  
+
   template <typename... ARGS>
   class Signal : public internal::Signal_Base {
   private:
@@ -226,7 +272,7 @@ namespace emp {
       if (name != "") SignalManager::Get().Register(name, this);
     }
     ~Signal() { ; }
-    
+
     inline void Trigger(ARGS... args) { actions.Run(args...); }
 
     // Add an action that takes the proper arguments.
@@ -251,7 +297,7 @@ namespace emp {
       emp_assert( a != nullptr && "action type must match signal type." );
       return AddAction(a->fun);
     }
-    
+
     // Add an action object.
     LinkKey AddAction(Action<ARGS...> & a) { return AddAction(a.fun); }
 
@@ -270,7 +316,7 @@ namespace emp {
       if (name != "") SignalManager::Get().Register(name, this);
     }
     ~Signal() { ; }
-    
+
     inline void Trigger() { actions.Run(); }
 
     // Add an action that takes the proper arguments.
@@ -288,14 +334,20 @@ namespace emp {
     }
   };
 
+  template <typename... ARGS>
+  LinkKey SignalManager::LinkSignal(internal::Signal_Base * s,
+                                    const std::function<void(ARGS...)> & fun) {
+    emp::Action<ARGS...> action(fun);
+    return s->AddAction(&action);
+  }
 
   // Global functions that interact with the SignalManager
-  
+
   template <typename S, typename A>
   LinkKey LinkSignal(S && s, A && a) {
     return SignalManager::Get().LinkSignal(std::forward<S>(s), std::forward<A>(a));
   }
-  
+
   template <typename... ARGS>
   void TriggerSignal(const std::string & name, ARGS... args) {
     auto * base_signal = SignalManager::Get().FindSignal(name);
@@ -303,8 +355,19 @@ namespace emp {
     signal->Trigger(args...);
   }
 
-
+  void PrintSignalNames(int indent=0) { SignalManager::Get().PrintSignalNames(indent); }
+  void PrintActionNames(int indent=0) { SignalManager::Get().PrintActionNames(indent); }
+  void PrintSignalInfo(int indent=0) {
+    if (indent) std::cout << std::string(indent, ' ');
+    std::cout << "SIGNAL NAMES:" << std::endl;
+    SignalManager::Get().PrintSignalNames(indent+2);
+    if (indent) std::cout << std::string(indent, ' ');
+    std::cout << "ACTION NAMES:" << std::endl;
+    SignalManager::Get().PrintActionNames(indent+2);
+  }
+  std::string GenerateSignalName(const std::string & prefix) {
+    return SignalManager::Get().GenerateSignalName(prefix);
+  }
 }
 
 #endif
-

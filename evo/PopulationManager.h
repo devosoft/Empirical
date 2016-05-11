@@ -2,7 +2,7 @@
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
-//  This file defines built-in population manages for use with emp::evo::World
+//  This file defines built-in population managers for use with emp::evo::World
 //
 //
 //  Developer notes:
@@ -43,16 +43,20 @@ namespace evo {
     void SetRandom(Random * r) { random_ptr = r; }
 
 
-    void Print(std::function<bool(ORG*,std::ostream &)> print_fun, std::ostream & os = std::cout,
+    void Print(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout,
               std::string empty="X", std::string spacer=" ") {
       for (ORG * org : pop) {
-        if (org) org->default_print_fun(os);
+        if (org) os << string_fun(org);
         else os << empty;
         os << spacer;
       }
     }
     void Print(std::ostream & os = std::cout, std::string empty="X", std::string spacer=" ") {
-      Print( [](ORG* org,std::ostream & os){os << *org;}, os, empty, spacer );
+      for (ORG * org : pop) {
+        if (org) os << *org;
+        else os << empty;
+        os << spacer;
+      }
     }
 
     // AddOrg and ReplaceOrg should be the only ways new organisms come into a population.
@@ -113,7 +117,7 @@ namespace evo {
 
   public:
     PopulationManager_EA() { ; }
-    ~ PopulationManager_EA() { Clear(); }
+    ~PopulationManager_EA() { Clear(); }
 
     static constexpr bool emp_has_separate_generations = true;
 
@@ -166,7 +170,7 @@ namespace evo {
     void SetMaxSize(const int m) { max_size = m; }
     void SetBottleneckSize(const int b) { bottleneck_size = b; }
 
-    void Config(int m, int b) { max_size = m; bottleneck_size = b; }
+    void ConfigPop(int m, int b) { max_size = m; bottleneck_size = b; }
 
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       if (pop.size() >= max_size) {
@@ -193,13 +197,13 @@ namespace evo {
     int ToID(int x, int y) const { return y*width + x; }
 
   public:
-    PopulationManager_Grid() { Config(10,10); }
+    PopulationManager_Grid() { ConfigPop(10,10); }
     ~PopulationManager_Grid() { ; }
 
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
 
-    void Config(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }
+    void ConfigPop(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }
 
     // Injected orgs go into a random position.
     int AddOrg(ORG * new_org) {
@@ -226,11 +230,27 @@ namespace evo {
       return pos;
     }
 
-    void Print(std::ostream & os = std::cout, const std::string & empty="-", const std::string & spacer=" ") {
+    void Print(std::function<std::string(ORG*)> string_fun,
+               std::ostream & os = std::cout,
+               const std::string & empty="-",
+               const std::string & spacer=" ")
+    {
+      emp_assert(string_fun);
       for (int y=0; y<height; y++) {
         for (int x = 0; x<width; x++) {
-          const ORG * print_org = pop[ToID(x,y)];
-          if (print_org) os << *print_org << spacer;
+          ORG * org = pop[ToID(x,y)];
+          if (org) os << string_fun(org) << spacer;
+          else os << empty << spacer;
+        }
+        os << std::endl;
+      }
+    }
+
+    void Print(std::ostream & os = std::cout, std::string empty="X", std::string spacer=" ") {
+      for (int y=0; y<height; y++) {
+        for (int x = 0; x<width; x++) {
+          ORG * org = pop[ToID(x,y)];
+          if (org) os << *org << spacer;
           else os << empty << spacer;
         }
         os << std::endl;

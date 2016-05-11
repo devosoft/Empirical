@@ -94,6 +94,7 @@ namespace emp {
     return out_v;
   }
 
+
   // The following two functions are from:
   // http://stackoverflow.com/questions/5056645/sorting-stdmap-using-value
   template<typename A, typename B> std::pair<B,A> flip_pair(const std::pair<A,B> &p)
@@ -144,6 +145,7 @@ namespace emp {
   }
 
 
+  // Apply a tuple as arguments to a function!
 
   // implementation details, users never invoke these directly
   // Based on Kerrek SB in http://stackoverflow.com/questions/10766112/c11-i-can-go-from-multiple-args-to-tuple-but-can-i-go-from-tuple-to-multiple
@@ -182,8 +184,8 @@ namespace emp {
   // Most commonly we will use a decoy to determine if a member exists, but be treated as a
   // bool value.
 
-#define emp_bool_decoy(TEST) typename emp::sfinae_decoy<bool, decltype(&TEST)>::type
-
+#define emp_bool_decoy(TEST) typename emp::sfinae_decoy<bool, decltype(TEST)>::type
+#define emp_int_decoy(TEST) typename emp::sfinae_decoy<int, decltype(TEST)>::type
 
   // Change the internal type arguments on a template...
   // From: Sam Varshavchik
