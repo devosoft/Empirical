@@ -114,6 +114,7 @@ namespace evo {
     }
 
     void TestHostRepro() {
+      emp_assert(host_cost > 0);
       // Trigger reproduction if score is high enough.
       if (host_score >= host_cost) {
         Reset();                          // Reset before replication.
@@ -122,6 +123,7 @@ namespace evo {
     }
 
     void TestSymbiontRepro() {
+      emp_assert(symb_cost > 0);
       // Trigger reproduction if score is high enough.
       if (symb_score >= symb_cost) {
         symb_pos = symb_score = 0;                 // Reset Symbiont stats only.
@@ -130,49 +132,55 @@ namespace evo {
       }
     }
 
-    void Execute(bool use_streaks=true, bool align_symbiont=false,
-		 int host_self_bonus=1, int symb_self_bonus=1, int symb_host_bonus=1)
+    // void Execute(bool use_streaks=true, bool align_symbiont=false,
+		//  int host_self_bonus=1, int symb_self_bonus=1, int symb_host_bonus=1)
+    void Execute(bool align_symbiont=false,
+                 const std::function<int(int)> & symb_bonus00=[](int streak){ return streak; },
+                 const std::function<int(int)> & host_bonus01=[](int streak){ return streak; },
+                 const std::function<int(int)> & host_bonus1=[](int streak){ return 1; },
+                 const std::function<int(int)> & symb_bonus01=[](int streak){ return 0; },
+                 const std::function<int(int)> & host_bonus00=[](int streak){ return 0; }
+               )
     {
       emp_assert(callbacks != nullptr);
 
       if (host[host_pos]) {                            // Host generating score for itself.
-        host_score += host_self_bonus;
+        host_score += host_bonus1(1);
         TestHostRepro();
       }
       else if (symbiont.GetSize()) {                   // Host allowing extant symbiont to execute.
         // If a symbiont should exectue at the same position as a host, readjust.
-	      if (align_symbiont) {
-	        symb_pos = host_pos % symbiont.GetSize();
-	      }
+	      if (align_symbiont) symb_pos = host_pos % symbiont.GetSize();
 
 	      // Determine next step based on symbiont bit
 	      if (symbiont[symb_pos]) {                      // Symbiont helping host.
-	        if (use_streaks) {
-	          streak_1++; streak_0 = 0;
-	          host_score += streak_1 * symb_host_bonus;
-	        }
-	        else host_score += symb_host_bonus;
-	        TestHostRepro();
+          streak_1++; streak_0 = 0;
+          host_score += host_bonus01(streak_1);
+          symb_score += symb_bonus01(streak_1);
 	      }
 	      else {                                         // Symbiont helping itself.
-          if (use_streaks) {
-	          streak_0++; streak_1 = 0;
-	          symb_score += streak_0 * symb_self_bonus;
-	        }
-	        else symb_score += symb_self_bonus;
-	        TestSymbiontRepro();
+          streak_0++; streak_1 = 0;
+          host_score += host_bonus00(streak_0);
+          symb_score += symb_bonus00(streak_0);
 	      }
+        TestHostRepro();
+        TestSymbiontRepro();
 	      if (++symb_pos >= symbiont.GetSize()) symb_pos = 0;  // Advance symbiont position.
 
       }
+      // else std::cout << "No Symbiont";
       if (++host_pos >= host.GetSize()) host_pos = 0;  // Advance host position.
 
+      // std::cout << "host_score=" << host_score
+      //           << "  symb_score=" << symb_score
+      //           << std::endl;
     }
 
     void Print(std::ostream & os) const {
       os << "Host: " << host << std::endl
          << "Symbiont: " << symbiont << std::endl;
     }
+
   };
 
   std::ostream & operator<<(std::ostream & os, const SymbulationOrg & org) {
