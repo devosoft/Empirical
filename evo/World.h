@@ -146,14 +146,12 @@
   protected:
 
 
-
 namespace emp {
 namespace evo {
 
   EMP_SETUP_TYPE_SELECTOR(SelectPopManager, emp_is_population_manager);
 
   // Main world class...
-
   template <typename ORG, typename... MANAGERS>
   class World {
   public:
@@ -162,13 +160,14 @@ namespace evo {
   protected:
     Random * random_ptr;
     bool random_owner;
+    int update = 0;
 
     // Signals triggered by the world.
     Signal<int> before_repro_sig;       // Trigger: Immediately prior to producing offspring
     Signal<ORG *> offspring_ready_sig;  // Trigger: Offspring about to enter population
     Signal<ORG *> inject_ready_sig;        // Trigger: New org about to be added to population
     Signal<int> on_placement_sig;         // Trigger: Organism has been added to population
-    Signal<emp::vector<ORG *>* > on_update_sig;         // Trigger: Organism has been added to population
+    Signal<int> on_update_sig;         // Trigger: Organism has been added to population
 
     EMP_SETUP_EVO_WORLD_DEFAULT(default_fit_fun, Fitness, double)
     EMP_SETUP_EVO_WORLD_DEFAULT_ARGS(default_mut_fun, Mutate, bool, emp::Random &)
@@ -259,6 +258,7 @@ namespace evo {
       on_placement_sig.Trigger(pos);
     }
     void InsertBirth(const ORG & mem, int parent_pos, int copy_count=1) {
+      before_repro_sig.Trigger(parent_pos);
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);
         offspring_ready_sig.Trigger(new_org);
@@ -272,7 +272,6 @@ namespace evo {
     void DoRepro(int id) {
       emp_assert(random_ptr != nullptr && "DoRepro() requires a random number generator.");
       std::cout << "Repro " << id << std::endl;
-      before_repro_sig.Trigger(id);
       InsertBirth(*(pop[id]), id, 1);
     }
 
@@ -438,8 +437,11 @@ namespace evo {
 
     // Update() moves the next population to the current position, managing memory as needed.
     void Update() {
-      // @CAO Setup a trigger here?
-      on_update_sig.Trigger(&pop.pop);
+      // @ELD Should this go before or after the update?
+      // Before means that update signal listeners can see
+      // the 0th generation, whereas after means they can't
+      on_update_sig.Trigger(update);
+      update++;
       pop.Update();
     }
 

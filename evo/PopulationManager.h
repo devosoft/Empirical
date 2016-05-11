@@ -31,6 +31,7 @@ namespace evo {
 
     // Allow this and derived classes to be identified as a population manager.
     static constexpr bool emp_is_population_manager = true;
+    static constexpr bool emp_has_separate_generations = false;
 
     ptr_t & operator[](int i) { return pop[i]; }
     const ptr_t operator[](int i) const { return pop[i]; }
@@ -113,6 +114,8 @@ namespace evo {
   public:
     PopulationManager_EA() { ; }
     ~ PopulationManager_EA() { Clear(); }
+
+    static constexpr bool emp_has_separate_generations = true;
 
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = next_pop.size();
