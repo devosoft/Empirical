@@ -78,14 +78,15 @@ namespace evo{
       std::cout << "Update: " << update << std::endl;
       if (update % resolution == 0) {
         std::cout << "Printing stats" << std::endl;
-        //int change = ChangeMetric(&lineage, past_snapshots[0], past_snapshots[generations/resolution], generations);
-        //std::cout << "Change done" << std::endl;
-        //int novelty = NoveltyMetric(&lineage, past_snapshots[0], generations, this->novel);
+        int change = ChangeMetric(&lineage, past_snapshots[0], past_snapshots[generations/resolution], generations);
+        std::cout << "Change done" << std::endl;
+        int novelty = NoveltyMetric(&lineage, past_snapshots[0], past_snapshots[generations/resolution], &(this->novel));
+        std::cout << "Novelty done" << std::endl;
         double ecology = EcologyMetric(&lineage, past_snapshots[0], past_snapshots[generations/resolution]);
         std::cout << "Ecology done" << std::endl;
         double complexity = ComplexityMetric(&lineage, past_snapshots[0], past_snapshots[generations/resolution]);
         std::cout << "Complexity done" << std::endl;
-        std::cout << "Update: " << update /*<< " Change: " << change*/ /*<< " Novelty: " << novelty*/ << " Ecology: " << ecology << " Complexity: " << complexity<< std::endl;
+        std::cout << "Update: " << update << " Change: " << change << " Novelty: " << novelty << " Ecology: " << ecology << " Complexity: " << complexity<< std::endl;
         past_snapshots.pop_back();
         past_snapshots.push_front(generation_since_update);
       }
@@ -207,21 +208,24 @@ namespace evo{
 
   template <typename GENOME>
   int NoveltyMetric(LineageTracker<GENOME>* lineages,
-		      emp::vector<int> curr_generation, int generations,
+		      emp::vector<int> curr_generation,
+          emp::vector<int> prev_generation,
 		      std::set<GENOME>* novel){
 
-    //if (prev_generation.size() == 0) {
-    //  return -1;
-    //}
+    if (prev_generation.size() == 0) {
+      return -1;
+    }
 
     std::set<int> curr_set(curr_generation.begin(), curr_generation.end());
+    std::set<int> prev_set(prev_generation.begin(), prev_generation.end());
 
-    std::set<GENOME> persist = GetPersistLineage(lineages, curr_set,  generations);
+    std::set<GENOME> persist = GetPersistLineage(lineages, curr_set,  prev_set);
     int result = 0;
 
-    for (GENOME gen : persist){
-      if (novel->find(gen) == novel->end()){
+    for (GENOME lin : persist){
+      if (novel->find(lin) == novel->end()){
 	       result++;
+         novel->insert(lin);
       }
     }
 
@@ -231,18 +235,20 @@ namespace evo{
   template <typename GENOME>
   int ChangeMetric(LineageTracker<GENOME>* lineages,
 		     emp::vector<int> curr_generation,
-		     emp::vector<int> prev_generation, int generations){
+		     emp::vector<int> prev_generation,
+         emp::vector<int> first_generation){
 
-    if (prev_generation.size() == 0) {
-      return -1;
-    }
+           if (prev_generation.size() == 0 || first_generation.size() == 0) {
+             return -1;
+           }
 
     std::set<int> curr_set(curr_generation.begin(), curr_generation.end());
     std::set<int> prev_set(prev_generation.begin(), prev_generation.end());
+    std::set<int> first_set(first_generation.begin(), first_generation.end());
 
     //Find persistant lineages
-    std::set<GENOME> persist = GetPersistLineage(lineages, curr_set,  generations);
-    std::set<GENOME> prev_persist = GetPersistLineage(lineages, prev_set, generations);
+    std::set<GENOME> persist = GetPersistLineage(lineages, curr_set,  prev_set);
+    std::set<GENOME> prev_persist = GetPersistLineage(lineages, prev_set, first_set);
 
     std::set<GENOME> result;
     std::set_difference(persist.begin(), persist.end(), prev_persist.begin(),
@@ -272,6 +278,21 @@ namespace evo{
     return persist;
   }
 
+  template <typename GENOME, typename C, typename = std::enable_if<std::is_integral<typename C::value_type>::value > >
+  std::set<GENOME> GetPersistLineage(LineageTracker<GENOME>* lineages,
+                C curr_generation,
+                C prev_generation){
+
+    std::set<int> persist_ids = GetPersistLineageIDs(lineages, curr_generation, prev_generation);
+
+    std::set<GENOME> persist;
+    for (int id : persist_ids){
+      persist.insert(*(lineages->org_to_genome[id]));
+    }
+
+    return persist;
+  }
+
   template <typename GENOME>
   std::set<int> GetPersistLineageIDs(LineageTracker<GENOME>* lineages,
                std::set<int> curr_generation,
@@ -287,10 +308,11 @@ namespace evo{
     return persist;
   }
 
-  template <typename GENOME>
+  //Can take any container of ints
+  template <typename GENOME, typename C, typename = std::enable_if<std::is_integral<typename C::value_type>::value > >
   std::set<int> GetPersistLineageIDs(LineageTracker<GENOME>* lineages,
-               emp::vector<int> curr_generation,
-               emp::vector<int> prev_generation){
+                C curr_generation,
+                C prev_generation){
 
     std::set<int> persist;
 
