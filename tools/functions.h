@@ -34,33 +34,25 @@ namespace emp {
   }
 
   // Toggle an input bool.
-  inline bool toggle(bool & in_bool) { return (in_bool = !in_bool); }
+  inline constexpr bool toggle(bool & in_bool) { return (in_bool = !in_bool); }
 
   /// % is actually remainder; this is a proper modulus command that handles negative #'s correctly
-  inline int mod(int in_val, int mod_val) {
+  inline constexpr int mod(int in_val, int mod_val) {
     return (in_val < 0) ? (in_val % mod_val + mod_val) : (in_val % mod_val);
   }
 
   // A fast (O(log p)) integer-power command.
-  static int pow(int base, int p) {
-    if (p == 0) return 1;
-    if (p < 0) return 0;
-
-    int r = 1;
-    while (true) {
-      if (p & 1) r *= base;
-      if (!(p >>= 1)) return r;
-      base *= base;
-    }
+  static constexpr int pow(int base, int p) {
+    return (p <= 0) ? 1 : base * pow(base, p-1);
   }
 
 
   // Run both min and max on a value to put it into a desired range.
-  template <typename TYPE> TYPE to_range(const TYPE & value, const TYPE & in_min, const TYPE & in_max) {
+  template <typename TYPE> constexpr TYPE to_range(const TYPE & value, const TYPE & in_min, const TYPE & in_max) {
     return (value < in_min) ? in_min : ((value > in_max) ? in_max : value);
   }
 
-  template <typename T> const T & min(const T& in1, const T& in2, const T& in3) {
+  template <typename T> constexpr const T & min(const T& in1, const T& in2, const T& in3) {
     return std::min(std::min(in1,in2), in3);
   }
 
@@ -97,7 +89,7 @@ namespace emp {
 
   // The following two functions are from:
   // http://stackoverflow.com/questions/5056645/sorting-stdmap-using-value
-  template<typename A, typename B> std::pair<B,A> flip_pair(const std::pair<A,B> &p)
+  template<typename A, typename B> constexpr std::pair<B,A> flip_pair(const std::pair<A,B> &p)
   {
     return std::pair<B,A>(p.second, p.first);
   }
