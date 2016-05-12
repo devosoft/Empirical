@@ -68,8 +68,9 @@
 #define EMP_CREATE_OPTIONAL_METHOD(NEW_NAME, METHOD)              \
   template <typename T, typename... ARG_TYPES>                    \
   void internal__RelayCall_ ## NEW_NAME(                          \
-  typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type,   \
-    T & target, ARG_TYPES... ARGS) {                              \
+    typename emp::sfinae_decoy<bool, decltype(&T::METHOD)>::type, \
+    T & target, ARG_TYPES... ARGS)                                \
+  {                                                               \
     target.METHOD(ARGS...);                                       \
   }                                                               \
   template <typename T, typename... ARG_TYPES>                    \
@@ -103,7 +104,7 @@
 
 // Try to perform operation EVAL1 if TEST exists, otherwise do EVAL2.
 // This is good for operations like == or << that may be defined inside
-// a class OR outside of it.
+// a class OR outside of it. (@CAO Needs more testing)
 
 #define EMP_CREATE_EVAL_SELECT(NEW_NAME, TEST, RTYPE, EVAL1, EVAL2)  \
   template <typename... ARG_TYPES>                                   \
@@ -175,8 +176,31 @@ template <typename... TYPES> struct NAME {                                      
   template <typename EMP__T, typename EMP__T2, typename... EXTRAS>                              \
   static auto ResolveType__ ## NAME(int) -> decltype(ResolveType__ ## NAME<EMP__T2, EXTRAS...>(true)); \
   \
-  using NAME = decltype(ResolveType__ ## NAME<__VA_ARGS__>(true));
+  using NAME = decltype(ResolveType__ ## NAME<__VA_ARGS__>(true))
 
+
+
+// Return a type based on features in a class.
+// FUN = org_to_genome_t
+// LEVEL = int
+// OBJ = genome
+#define EMP_IMPL_TYPE_HAS_MEMBER(FUN, LEVEL, MBR)                                                 \
+ template <typename EMP__T> static                                                                \
+ auto FUN ## _impl(typename emp::sfinae_decoy<LEVEL, decltype(std::declval<EMP__T>().MBR)>::type) \
+     -> decltype(std::declval<EMP__T>().MBR)
+
+#define EMP_IMPL_TYPE_HAS_TYPE(FUN, LEVEL, TYPE)                              \
+ template <typename EMP__T> static                                            \
+ auto FUN ## _impl(typename emp::sfinae_decoy<LEVEL, typename EMP__T::TYPE)   \
+     -> EMP__T::TYPE
+
+#define EMP_IMPL_TYPE_DEFAULT(FUN, LEVEL, DEFAULT)    \
+ template <typename EMP__T> static DEFAULT FUN ## _impl(LEVEL)
+
+#define EMP_ADD_TYPE_FROM_MEMBER(NEW_TYPE, BASE_TYPE, MEMBER, DEFAULT)         \
+ EMP_IMPL_TYPE_HAS_MEMBER(EMP_DETECT_ ## NEW_TYPE, bool, MEMBER);              \
+ EMP_IMPL_TYPE_DEFAULT(EMP_DETECT_ ## NEW_TYPE, int, DEFAULT);                 \
+ using NEW_TYPE = decltype(EMP_DETECT_ ## NEW_TYPE ## _impl<BASE_TYPE>(true))
 
 // Call a function with more args than it can take; ignore extras.
 
