@@ -12,6 +12,7 @@
 #include <functional>
 
 #include "../tools/vector.h"
+#include "../tools/array.h"
 #include "LineageTracker.h"
 #include "World.h"
 #include "PopulationManager.h"
@@ -22,22 +23,27 @@ namespace evo{
 
   //EMP_SETUP_TYPE_SELECTOR(DetermineSeparateGens, emp_has_separate_generations);
   EMP_SETUP_TYPE_SELECTOR(SelectPopManagerOEE, emp_is_population_manager);
+  EMP_SETUP_TYPE_SELECTOR(SelectOrgManagerOEE, emp_is_organism_manager);
   //This is all going to get superceded by Cliff's stuff
   //The pop_manager totally knows what the org type is and I'm sure there's
   //a way to get it to tell us rather than making it a separate template
   //argument
 
-  template <typename ORG, typename... MANAGERS>
-  class World;
+  //template <typename ORG, typename... MANAGERS>
+  //class World;
 
-  template <typename ORG, typename W>
+  template <typename ORG, typename... MANAGERS>
   class OEEStatsManager {
   private:
     static constexpr bool separate_generations = PopulationManager_Base<int>::emp_has_separate_generations;//SelectPopManagerOEE<MANAGERS..., PopulationManager_Base<int> >::emp_has_separate_generations;
     static constexpr bool emp_is_stats_manager = true;
     //TODO: Make this use existing lineage tracker if there is one
     LineageTracker<ORG> lineage;
-    std::set<ORG> novel;
+    static constexpr int ORGSIZE = 5;
+    std::set<emp::array<int, ORGSIZE> > novel;
+
+    //This may or may not get untennably huge
+    std::map<ORG, emp::array<int, ORGSIZE> > skeleton_cache;
 
     // The generation we're currently working with - we need this to
     // track lineage
@@ -54,6 +60,7 @@ namespace evo{
     int next_org_id;
 
   public:
+    std::function<double(ORG * org)> fit_fun;
     void TrackOffspring(ORG * org) {
       //std::cout << "Track Offspring" << std::endl;
       next_org_id = lineage.AddOrganism(*org, next_parent_id);
@@ -77,8 +84,11 @@ namespace evo{
     void Update(int update) {
       std::cout << "Update: " << update << std::endl;
       if (update % resolution == 0) {
+        //emp::vector<ORG> curr_gen = Skeletonize(fit_fun, past_snapshots[0]);
+        //emp::vector<ORG> prev_gen = Skeletonize(fit_fun, past_snapshots[generations/resolution]);
+
         std::cout << "Printing stats" << std::endl;
-        int change = ChangeMetric(&lineage, past_snapshots[0], past_snapshots[generations/resolution], generations);
+        int change = ChangeMetric(&lineage, past_snapshots[0], past_snapshots[generations/resolution], past_snapshots[2*generations/resolution]);
         std::cout << "Change done" << std::endl;
         int novelty = NoveltyMetric(&lineage, past_snapshots[0], past_snapshots[generations/resolution], &(this->novel));
         std::cout << "Novelty done" << std::endl;
@@ -110,13 +120,144 @@ namespace evo{
       }
     }
 
+    //TODO: Currently assumes bit org
+    template <typename C>
+    emp::vector<emp::array<int, ORGSIZE> > Skeletonize (std::function<double(ORG*)> fit_fun, C orgs){
+      emp::vector<emp::array<int, ORGSIZE> > skeletons;
+      for (auto org : orgs) {
+        double fitness = fit_fun(&org);
+        //TODO: Make this work for non-ints
+        emp::array<int, ORGSIZE> skeleton;
+        ORG test = org;
+
+        for (int i = 0; i < org.size(); i++) {
+          test[i] = !test[i];
+          if (fit_fun(&test) >= fitness){
+            //std::cout << "Not informative" << std::endl;
+            skeleton[i] = -1;
+          } else {
+            //std::cout << "Informative"<< org[i] << std::endl;
+            skeleton[i] = org[i];
+          }
+          test[i] = !test[i];
+        }
+
+        std::cout << "Skeleton: ";
+        for (int i : skeleton){
+          std::cout << i;
+        }
+        std::cout << std::endl;
+        skeletons.push_back(skeleton);
+
+      }
+
+
+      return skeletons;
+    }
+
+    double ComplexityMetric(LineageTracker<ORG>* lineages,
+                            emp::vector<int> curr_generation,
+                            emp::vector<int> prev_generation){
+
+      if (prev_generation.size() == 0) {
+        return -1;
+      }
+
+      std::set<int> curr_set(curr_generation.begin(), curr_generation.end());
+      std::set<int> prev_set(prev_generation.begin(), prev_generation.end());
+
+      //Find persistant lineages
+      std::set<int> persist = GetPersistLineageIDs(lineages, curr_generation, prev_generation);
+
+      double most_complex = lineages->org_to_genome[prev_generation[0]]->GetSize();
+
+      for (int org : prev_generation) {
+        if (std::find(persist.begin(), persist.end(), org) != persist.end()) {
+          if (lineages->org_to_genome[org]->GetSize() > most_complex) {
+            most_complex = lineages->org_to_genome[org]->GetSize();
+          }
+        }
+      }
+      return most_complex;
+    }
+
+    double EcologyMetric(LineageTracker<ORG>* lineages,
+                          emp::vector<int> curr_generation,
+                          emp::vector<int> prev_generation){
+
+      if (prev_generation.size() == 0) {
+        return -1;
+      }
+
+      //std::set<int> curr_set(curr_generation.begin(), curr_generation.end());
+      std::set<int> persist = GetPersistLineageIDs(lineages, curr_generation, prev_generation);
+      emp::vector<ORG> culled_generation;
+
+      for (int org : prev_generation) {
+        if (std::find(persist.begin(), persist.end(), org) != persist.end()) {
+          culled_generation.push_back(*(lineages->org_to_genome[org]));
+        }
+      }
+
+      return emp::evo::ShannonDiversity(culled_generation);
+
+    }
+
+    int NoveltyMetric(LineageTracker<ORG>* lineages,
+                      emp::vector<int> curr_generation,
+                      emp::vector<int> prev_generation,
+                      std::set<emp::array<int, ORGSIZE> >* novel){
+
+      if (prev_generation.size() == 0) {
+        return -1;
+      }
+
+      std::set<int> curr_set(curr_generation.begin(), curr_generation.end());
+      std::set<int> prev_set(prev_generation.begin(), prev_generation.end());
+
+      std::set<ORG> persist = GetPersistLineage(lineages, curr_set,  prev_set);
+      emp::vector<emp::array<int, ORGSIZE> > persist_skeletons = Skeletonize(fit_fun, persist);
+      int result = 0;
+
+      for (emp::array<int, ORGSIZE> lin : persist_skeletons){
+        if (novel->find(lin) == novel->end()){
+          result++;
+          novel->insert(lin);
+        }
+      }
+
+      return result;
+    }
+
+    int ChangeMetric(LineageTracker<ORG>* lineages,
+                      emp::vector<int> curr_generation,
+                      emp::vector<int> prev_generation,
+                      emp::vector<int> first_generation){
+
+      if (prev_generation.size() == 0 || first_generation.size() == 0) {
+        return -1;
+      }
+
+      std::set<int> curr_set(curr_generation.begin(), curr_generation.end());
+      std::set<int> prev_set(prev_generation.begin(), prev_generation.end());
+      std::set<int> first_set(first_generation.begin(), first_generation.end());
+
+      //Find persistant lineages
+      std::set<ORG> persist = GetPersistLineage(lineages, curr_set,  prev_set);
+      std::set<ORG> prev_persist = GetPersistLineage(lineages, prev_set, first_set);
+
+      std::set<ORG> result;
+      std::set_difference(persist.begin(), persist.end(), prev_persist.begin(),
+      prev_persist.end(), std::inserter(result, result.end()));
+      return result.size();
+    }
 
 
     //std::function<void(ORG *)> TrackOffspringFun = TrackOffspring;
     //std::function<void(ORG *)> TrackInjectedOffspringFun = TrackInjectedOffspring;
     //std::function<void(int)> UpdateFun = Update;
 
-    OEEStatsManager(W world){
+    OEEStatsManager(World<ORG, MANAGERS...>* world){
       // This isn't going to work if generations aren't a multiple of resolution
       emp_assert(generations % resolution == 0 && "TEST MESSAGE");
 
@@ -150,111 +291,13 @@ namespace evo{
       world->OnInjectReady(TrackInjectedOffspringFun);
       world->OnUpdate(UpdateFun);
       world->OnOrgPlacement(TrackPlacementFun);
+
+      //fit_fun = world->GetFitFun();
     }
 
 
   };
 
-
-  template <typename GENOME>
-  double ComplexityMetric(LineageTracker<GENOME>* lineages,
-		     emp::vector<int> curr_generation,
-		     emp::vector<int> prev_generation){
-
-    if (prev_generation.size() == 0) {
-      return -1;
-    }
-
-    std::set<int> curr_set(curr_generation.begin(), curr_generation.end());
-    std::set<int> prev_set(prev_generation.begin(), prev_generation.end());
-
-    //Find persistant lineages
-    std::set<int> persist = GetPersistLineageIDs(lineages, curr_generation, prev_generation);
-
-    double most_complex = lineages->org_to_genome[prev_generation[0]]->GetSize();
-
-    for (int org : prev_generation) {
-      if (std::find(persist.begin(), persist.end(), org) != persist.end()) {
-        if (lineages->org_to_genome[org]->GetSize() > most_complex) {
-          most_complex = lineages->org_to_genome[org]->GetSize();
-        }
-      }
-    }
-    return most_complex;
-  }
-
-  template <typename GENOME>
-  double EcologyMetric(LineageTracker<GENOME>* lineages,
-		      emp::vector<int> curr_generation,
-          emp::vector<int> prev_generation){
-
-    if (prev_generation.size() == 0) {
-      return -1;
-    }
-
-    //std::set<int> curr_set(curr_generation.begin(), curr_generation.end());
-    std::set<int> persist = GetPersistLineageIDs(lineages, curr_generation, prev_generation);
-    emp::vector<GENOME> culled_generation;
-
-    for (int org : prev_generation) {
-      if (std::find(persist.begin(), persist.end(), org) != persist.end()) {
-        culled_generation.push_back(*(lineages->org_to_genome[org]));
-      }
-    }
-
-    return emp::evo::ShannonDiversity(culled_generation);
-
-  }
-
-  template <typename GENOME>
-  int NoveltyMetric(LineageTracker<GENOME>* lineages,
-		      emp::vector<int> curr_generation,
-          emp::vector<int> prev_generation,
-		      std::set<GENOME>* novel){
-
-    if (prev_generation.size() == 0) {
-      return -1;
-    }
-
-    std::set<int> curr_set(curr_generation.begin(), curr_generation.end());
-    std::set<int> prev_set(prev_generation.begin(), prev_generation.end());
-
-    std::set<GENOME> persist = GetPersistLineage(lineages, curr_set,  prev_set);
-    int result = 0;
-
-    for (GENOME lin : persist){
-      if (novel->find(lin) == novel->end()){
-	       result++;
-         novel->insert(lin);
-      }
-    }
-
-    return result;
-  }
-
-  template <typename GENOME>
-  int ChangeMetric(LineageTracker<GENOME>* lineages,
-		     emp::vector<int> curr_generation,
-		     emp::vector<int> prev_generation,
-         emp::vector<int> first_generation){
-
-           if (prev_generation.size() == 0 || first_generation.size() == 0) {
-             return -1;
-           }
-
-    std::set<int> curr_set(curr_generation.begin(), curr_generation.end());
-    std::set<int> prev_set(prev_generation.begin(), prev_generation.end());
-    std::set<int> first_set(first_generation.begin(), first_generation.end());
-
-    //Find persistant lineages
-    std::set<GENOME> persist = GetPersistLineage(lineages, curr_set,  prev_set);
-    std::set<GENOME> prev_persist = GetPersistLineage(lineages, prev_set, first_set);
-
-    std::set<GENOME> result;
-    std::set_difference(persist.begin(), persist.end(), prev_persist.begin(),
-			prev_persist.end(), std::inserter(result, result.end()));
-    return result.size();
-  }
 
 
   //Returns a set of org ids (from lineage tracker) representing ancestors
@@ -284,7 +327,11 @@ namespace evo{
                 C prev_generation){
 
     std::set<int> persist_ids = GetPersistLineageIDs(lineages, curr_generation, prev_generation);
+    return IDsToGenomes(lineages, persist_ids);
+  }
 
+  template <typename GENOME, typename C, typename = std::enable_if<std::is_integral<typename C::value_type>::value > >
+  std::set<GENOME> IDsToGenomes(LineageTracker<GENOME>*, C persist_ids) {
     std::set<GENOME> persist;
     for (int id : persist_ids){
       persist.insert(*(lineages->org_to_genome[id]));
