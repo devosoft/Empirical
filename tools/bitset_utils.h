@@ -1,14 +1,11 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//  This file contains a set of simple functions to manipulate bitsets.
 
 #ifndef EMP_BITSET_UTILS_H
 #define EMP_BITSET_UTILS_H
-
-//////////////////////////////////////////////////////////////////////////////
-//
-//  This file contains a set of simple functions to manipulate bitsets.
-//
 
 #include "functions.h"
 
@@ -21,7 +18,7 @@ namespace emp {
   constexpr uint32_t UIntMaskFirst<0>() { return 0; }
 
   // Dealing with bits in uint64_t variables
-  const int ByteCount[256] = {
+  constexpr int ByteCount[256] = {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
@@ -32,7 +29,7 @@ namespace emp {
     3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
   };
 
-  inline int count_bits(uint64_t val) {
+  inline constexpr int count_bits(uint64_t val) {
     return
       ByteCount[  val >> 56         ] +
       ByteCount[ (val >> 48) & 0xFF ] +
@@ -44,16 +41,16 @@ namespace emp {
       ByteCount[  val        & 0xFF ];
   }
 
-  inline int count_bits(uint32_t val) {
-    return 
+  inline constexpr int count_bits(uint32_t val) {
+    return
       ByteCount[  val >> 24         ] +
       ByteCount[ (val >> 16) & 0xFF ] +
       ByteCount[ (val >>  8) & 0xFF ] +
       ByteCount[  val        & 0xFF ];
   }
 
-  inline int find_bit(uint64_t val) { return count_bits( (~val) & (val-1) ); }
-  inline int find_bit(const uint32_t val) { return count_bits( (~val) & (val-1) ); }
+  inline constexpr int find_bit(const uint64_t & val) { return count_bits( (~val) & (val-1) ); }
+  inline constexpr int find_bit(const uint32_t & val) { return count_bits( (~val) & (val-1) ); }
 
   /*
   // Returns the position of the first set (one) bit or a -1 if none exist.
