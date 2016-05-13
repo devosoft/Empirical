@@ -10,6 +10,8 @@
 #include "../../evo/World.h"
 #include "../../tools/Random.h"
 
+namespace evo = emp::evo;
+
 struct TestOrg1 {
   int fitness;
 
@@ -22,7 +24,7 @@ struct TestOrg1 {
 int main()
 {
   emp::Random random;
-  emp::evo::World<int> world(random);
+  evo::World<int> world(random);
 
   for (int i = 0; i < 100; i++) world.Insert(i+100);
 
@@ -49,7 +51,7 @@ int main()
 
 
 
-  emp::evo::EAWorld<TestOrg1> ea_world(random);
+  evo::EAWorld<TestOrg1> ea_world(random);
   for (int i = 0; i < 100; i++) ea_world.Insert(i+200);
 
   std::cout << "Start Size = " << ea_world.GetSize() << std::endl;
@@ -71,7 +73,8 @@ int main()
 
 
   // Test grid Populations
-  emp::evo::World<int, emp::evo::PopGrid> grid_world(random);
+//  evo::World<int, evo::PopGrid> grid_world(random);
+  evo::GridWorld<int> grid_world(random);
   for (int i = 0; i < 10; i++) grid_world.Insert(i);
   grid_world.Print();
 
