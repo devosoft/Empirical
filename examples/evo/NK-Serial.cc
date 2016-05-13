@@ -27,7 +27,7 @@ int main()
   emp::Random random;                            // Build a random number generator.
   emp::evo::NKLandscape<N,K> landscape(random);  // Build the landscape...
   STWorld world(random);                         // Build the world...
-  world.pop.Config(MAX_POP_SIZE,MIN_POP_SIZE);   // Setup default population extremes.
+  world.ConfigPop(MAX_POP_SIZE, MIN_POP_SIZE);   // Setup default population extremes.
 
   BitOrg ancestor(random);                       // Build a random ancestor
   world.Insert(ancestor, MIN_POP_SIZE);          // Insert several copies of ancestor
