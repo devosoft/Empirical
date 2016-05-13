@@ -21,29 +21,22 @@
 namespace emp{
 namespace evo{
 
-  //EMP_SETUP_TYPE_SELECTOR(DetermineSeparateGens, emp_has_separate_generations);
-  EMP_SETUP_TYPE_SELECTOR(SelectPopManagerOEE, emp_is_population_manager);
-  EMP_SETUP_TYPE_SELECTOR(SelectOrgManagerOEE, emp_is_organism_manager);
+
   //This is all going to get superceded by Cliff's stuff
   //The pop_manager totally knows what the org type is and I'm sure there's
   //a way to get it to tell us rather than making it a separate template
   //argument
 
-  //template <typename ORG, typename... MANAGERS>
-  //class World;
-
-  template <typename ORG, typename... MANAGERS>
+  template <typename ORG, int MAX_ORG_SIZE, typename... MANAGERS>
   class OEEStatsManager {
   private:
-    static constexpr bool separate_generations = PopulationManager_Base<int>::emp_has_separate_generations;//SelectPopManagerOEE<MANAGERS..., PopulationManager_Base<int> >::emp_has_separate_generations;
+    using skeleton_type = emp::array<int, MAX_ORG_SIZE>;
+    using pop_manager_type = AdaptTemplate< typename SelectPopManager<MANAGERS..., PopBasic>::type, ORG>;
+    static constexpr bool separate_generations = pop_manager_type::emp_has_separate_generations;
     static constexpr bool emp_is_stats_manager = true;
     //TODO: Make this use existing lineage tracker if there is one
     LineageTracker<ORG> lineage;
-    static constexpr int ORGSIZE = 50;
-    std::set<emp::array<int, ORGSIZE> > novel;
-
-    //This may or may not get untennably huge
-    std::map<ORG, emp::array<int, ORGSIZE> > skeleton_cache;
+    std::set<skeleton_type > novel;
 
     // The generation we're currently working with - we need this to
     // track lineage
@@ -60,7 +53,6 @@ namespace evo{
     int next_org_id;
 
   public:
-    using skeleton_type = emp::array<int, ORGSIZE>;
     std::function<double(ORG * org)> fit_fun;
     void TrackOffspring(ORG * org) {
       //std::cout << "Track Offspring" << std::endl;
@@ -92,11 +84,11 @@ namespace evo{
         //emp::vector<ORG> curr_gen = Skeletonize(fit_fun, past_snapshots[0]);
         //emp::vector<ORG> prev_gen = Skeletonize(fit_fun, past_snapshots[generations/resolution]);
 
-        emp::vector<emp::array<int, ORGSIZE> > persist_skeletons = Skeletonize(
+        emp::vector<skeleton_type > persist_skeletons = Skeletonize(
                                               GetPersistLineage(&lineage,
                                               past_snapshots[0],
                                               past_snapshots[generations/resolution]));
-        emp::vector<emp::array<int, ORGSIZE> > prev_persist_skeletons = Skeletonize(
+        emp::vector<skeleton_type > prev_persist_skeletons = Skeletonize(
                                               GetPersistLineage(&lineage,
                                               past_snapshots[generations/resolution],
                                               past_snapshots[2*generations/resolution]));
@@ -149,8 +141,7 @@ namespace evo{
       C<skeleton_type> skeletons;
       for (auto org : orgs) {
         double fitness = fit_fun(&org);
-        //TODO: Make this work for non-ints
-        emp::array<int, ORGSIZE> skeleton;
+        skeleton_type skeleton;
         ORG test = org;
 
         for (int i = 0; i < org.size(); i++) {
@@ -186,11 +177,11 @@ namespace evo{
 
     }
 
-    int NoveltyMetric(emp::vector<emp::array<int, ORGSIZE> > persist){
+    int NoveltyMetric(emp::vector<skeleton_type > persist){
 
       int result = 0;
 
-      for (emp::array<int, ORGSIZE> lin : persist){
+      for (skeleton_type lin : persist){
         if (novel.find(lin) == novel.end()){
           result++;
           novel.insert(lin);
@@ -200,22 +191,17 @@ namespace evo{
       return result;
     }
 
-    int ChangeMetric( emp::vector<emp::array<int, ORGSIZE> > persist,
-                      emp::vector<emp::array<int, ORGSIZE> > prev_persist){
+    int ChangeMetric( emp::vector<skeleton_type > persist,
+                      emp::vector<skeleton_type > prev_persist){
 
-      std::set<emp::array<int, ORGSIZE> > curr_set(persist.begin(), persist.end());
-      std::set<emp::array<int, ORGSIZE> > prev_set(prev_persist.begin(), prev_persist.end());
+      std::set<skeleton_type > curr_set(persist.begin(), persist.end());
+      std::set<skeleton_type > prev_set(prev_persist.begin(), prev_persist.end());
 
-      std::set<emp::array<int, ORGSIZE> > result;
+      std::set<skeleton_type > result;
       std::set_difference(persist.begin(), persist.end(), prev_persist.begin(),
       prev_persist.end(), std::inserter(result, result.end()));
       return result.size();
     }
-
-
-    //std::function<void(ORG *)> TrackOffspringFun = TrackOffspring;
-    //std::function<void(ORG *)> TrackInjectedOffspringFun = TrackInjectedOffspring;
-    //std::function<void(int)> UpdateFun = Update;
 
     OEEStatsManager(World<ORG, MANAGERS...>* world){
       // This isn't going to work if generations aren't a multiple of resolution
@@ -252,6 +238,7 @@ namespace evo{
       world->OnUpdate(UpdateFun);
       world->OnOrgPlacement(TrackPlacementFun);
 
+      //TODO: Figure out how to make this work automatically
       //fit_fun = world->GetFitFun();
     }
 
