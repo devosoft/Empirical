@@ -46,8 +46,11 @@ struct G {
   static constexpr int class_id = 7;
 };
 
-EMP_CHOOSE_TYPE_WITH_MEMBER(auto_type, use_this, int, C, D, E);
+EMP_SETUP_TYPE_SELECTOR(auto_type, use_this);
 
+int TestFun(int x, int y, int z) {
+  return x+y+z;
+}
 
 /*
  * template <typename EMP__T, typename... EXTRAS>
@@ -61,6 +64,11 @@ template <> struct ABC<void> { using type = void; };
 using auto_type = typename ABC<int, bool, F, G, D, E, C, D, E, void>::type;
 */
 
+template <typename T> struct has_XY {
+  EMP_ADD_TYPE_FROM_MEMBER(type_X, T, X, double);  // has_XY<A>::type_X = int
+  EMP_ADD_TYPE_FROM_MEMBER(type_Y, T, Y, double);  // has_XY<A>::type_Y = double since A::Y does not exist.
+};
+
 int main()
 {
   // Continuing test of EMP_CHOOSE_MEMBER_TYPE...
@@ -70,6 +78,18 @@ int main()
   std::cout << Wrapper<A>::VALUE/2 << std::endl;  // 2.5
   std::cout << Wrapper<B>::VALUE/2 << std::endl;  // 2
 
-  // Continuing test of EMP_CHOOSE_TYPE_WITH_MEMBER...
-  std::cout << auto_type::class_id << std::endl;
+  // Continuing test of EMP_SETUP_TYPE_SELECTOR...
+
+  std::cout << auto_type<int, C, D, E>::type::class_id << std::endl;
+
+  std::cout << TestFun(1,2,3) << std::endl;
+  std::cout << emp::internal::SubsetCall_impl<int,int,int,int>::Call<>(TestFun, 4,5,6,7.5,8.5) << std::endl;
+
+  std::function<int(int,int,int)> tfun(TestFun);
+  std::cout << emp::SubsetCall(tfun, 4,5,6,7.5,8.5) << std::endl;
+
+  has_XY<A>::type_X test_val = (has_XY<A>::type_X) 2.5;
+  std::cout << "has_XY<A>::type_X = " << test_val << std::endl;
+  has_XY<A>::type_Y test_val2 = (has_XY<A>::type_Y) 2.5;
+  std::cout << "has_XY<A>::type_Y = " << test_val2 << std::endl;
 }
