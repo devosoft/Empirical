@@ -13,7 +13,7 @@
 #include <map>
 #include <cmath>
 #include <vector>
-#include <set> 
+#include <set>
 #include "../tools/vector.h"
 
 
@@ -28,29 +28,29 @@ namespace evo{
     std::map<typename C::value_type, int> counts;
     for (auto element : elements) {
       if (counts.find(element) != counts.end()) {
-	counts[element]++;
+	       counts[element]++;
       } else {
-	counts[element] = 1;
+	       counts[element] = 1;
       }
     }
-    
+
     //Shannon entropy calculation
     double result = 0;
     for (auto element : counts) {
       double p = double(element.second)/elements.size();
       result +=  p * log2(p);
     }
-    
+
     return -1 * result;
   }
 
   //Calculates number of unique elements in the container passed
   template <typename C>
-  int Richness(C elements) { 
+  int Richness(C elements) {
     //Converting to a set will remove duplicates leaving only unique values
     std::set<typename C::value_type> unique_elements(elements.begin(),
 						     elements.end());
-    return unique_elements.size(); 
+    return unique_elements.size();
   }
 
 }

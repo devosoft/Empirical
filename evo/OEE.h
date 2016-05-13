@@ -39,7 +39,7 @@ namespace evo{
     static constexpr bool emp_is_stats_manager = true;
     //TODO: Make this use existing lineage tracker if there is one
     LineageTracker<ORG> lineage;
-    static constexpr int ORGSIZE = 5;
+    static constexpr int ORGSIZE = 50;
     std::set<emp::array<int, ORGSIZE> > novel;
 
     //This may or may not get untennably huge
@@ -60,6 +60,7 @@ namespace evo{
     int next_org_id;
 
   public:
+    using skeleton_type = emp::array<int, ORGSIZE>;
     std::function<double(ORG * org)> fit_fun;
     void TrackOffspring(ORG * org) {
       //std::cout << "Track Offspring" << std::endl;
@@ -82,20 +83,42 @@ namespace evo{
     }
 
     void Update(int update) {
+      int change = -1;
+      int novelty = -1;
+      double ecology = -1;
+      int complexity = -1;
       std::cout << "Update: " << update << std::endl;
       if (update % resolution == 0) {
         //emp::vector<ORG> curr_gen = Skeletonize(fit_fun, past_snapshots[0]);
         //emp::vector<ORG> prev_gen = Skeletonize(fit_fun, past_snapshots[generations/resolution]);
 
+        emp::vector<emp::array<int, ORGSIZE> > persist_skeletons = Skeletonize(
+                                              GetPersistLineage(&lineage,
+                                              past_snapshots[0],
+                                              past_snapshots[generations/resolution]));
+        emp::vector<emp::array<int, ORGSIZE> > prev_persist_skeletons = Skeletonize(
+                                              GetPersistLineage(&lineage,
+                                              past_snapshots[generations/resolution],
+                                              past_snapshots[2*generations/resolution]));
+
+
         std::cout << "Printing stats" << std::endl;
-        int change = ChangeMetric(&lineage, past_snapshots[0], past_snapshots[generations/resolution], past_snapshots[2*generations/resolution]);
-        std::cout << "Change done" << std::endl;
-        int novelty = NoveltyMetric(&lineage, past_snapshots[0], past_snapshots[generations/resolution], &(this->novel));
-        std::cout << "Novelty done" << std::endl;
-        double ecology = EcologyMetric(&lineage, past_snapshots[0], past_snapshots[generations/resolution]);
-        std::cout << "Ecology done" << std::endl;
-        double complexity = ComplexityMetric(&lineage, past_snapshots[0], past_snapshots[generations/resolution]);
-        std::cout << "Complexity done" << std::endl;
+        if (past_snapshots[2*generations/resolution].size() > 0){
+          change = ChangeMetric(persist_skeletons, prev_persist_skeletons);
+          std::cout << "Change done" << std::endl;
+        }
+        if (past_snapshots[generations/resolution].size() > 0){
+          novelty = NoveltyMetric(persist_skeletons);
+          std::cout << "Novelty done" << std::endl;
+          ecology = EcologyMetric(persist_skeletons);
+          std::cout << "Ecology done" << std::endl;
+          complexity = ComplexityMetric(persist_skeletons,
+                              [](skeleton_type skel){
+                                int nulls = std::count(skel.begin(), skel.end(), -1);
+                                return (double)(skel.size() - nulls);
+                              });
+          std::cout << "Complexity done" << std::endl;
+        }
         std::cout << "Update: " << update << " Change: " << change << " Novelty: " << novelty << " Ecology: " << ecology << " Complexity: " << complexity<< std::endl;
         past_snapshots.pop_back();
         past_snapshots.push_front(generation_since_update);
@@ -121,9 +144,9 @@ namespace evo{
     }
 
     //TODO: Currently assumes bit org
-    template <typename C>
-    emp::vector<emp::array<int, ORGSIZE> > Skeletonize (std::function<double(ORG*)> fit_fun, C orgs){
-      emp::vector<emp::array<int, ORGSIZE> > skeletons;
+    template <typename T, template <typename> class C >
+    C<skeleton_type> Skeletonize (C<T> orgs){
+      C<skeleton_type> skeletons;
       for (auto org : orgs) {
         double fitness = fit_fun(&org);
         //TODO: Make this work for non-ints
@@ -133,120 +156,57 @@ namespace evo{
         for (int i = 0; i < org.size(); i++) {
           test[i] = !test[i];
           if (fit_fun(&test) >= fitness){
-            //std::cout << "Not informative" << std::endl;
             skeleton[i] = -1;
           } else {
-            //std::cout << "Informative"<< org[i] << std::endl;
             skeleton[i] = org[i];
           }
           test[i] = !test[i];
         }
-
-        std::cout << "Skeleton: ";
-        for (int i : skeleton){
-          std::cout << i;
-        }
-        std::cout << std::endl;
         skeletons.push_back(skeleton);
-
       }
-
-
       return skeletons;
     }
 
-    double ComplexityMetric(LineageTracker<ORG>* lineages,
-                            emp::vector<int> curr_generation,
-                            emp::vector<int> prev_generation){
+    double ComplexityMetric(emp::vector<skeleton_type> persist,
+                            std::function<double(skeleton_type)> complexity_fun) {
 
-      if (prev_generation.size() == 0) {
-        return -1;
-      }
+      double most_complex = complexity_fun(*(persist.begin()));
 
-      std::set<int> curr_set(curr_generation.begin(), curr_generation.end());
-      std::set<int> prev_set(prev_generation.begin(), prev_generation.end());
-
-      //Find persistant lineages
-      std::set<int> persist = GetPersistLineageIDs(lineages, curr_generation, prev_generation);
-
-      double most_complex = lineages->org_to_genome[prev_generation[0]]->GetSize();
-
-      for (int org : prev_generation) {
-        if (std::find(persist.begin(), persist.end(), org) != persist.end()) {
-          if (lineages->org_to_genome[org]->GetSize() > most_complex) {
-            most_complex = lineages->org_to_genome[org]->GetSize();
-          }
+      for (auto org : persist) {
+        if (complexity_fun(org) > most_complex) {
+          most_complex = complexity_fun(org);
         }
       }
       return most_complex;
     }
 
-    double EcologyMetric(LineageTracker<ORG>* lineages,
-                          emp::vector<int> curr_generation,
-                          emp::vector<int> prev_generation){
+    double EcologyMetric(emp::vector<skeleton_type> persist){
 
-      if (prev_generation.size() == 0) {
-        return -1;
-      }
-
-      //std::set<int> curr_set(curr_generation.begin(), curr_generation.end());
-      std::set<int> persist = GetPersistLineageIDs(lineages, curr_generation, prev_generation);
-      emp::vector<ORG> culled_generation;
-
-      for (int org : prev_generation) {
-        if (std::find(persist.begin(), persist.end(), org) != persist.end()) {
-          culled_generation.push_back(*(lineages->org_to_genome[org]));
-        }
-      }
-
-      return emp::evo::ShannonDiversity(culled_generation);
+      return emp::evo::ShannonDiversity(persist);
 
     }
 
-    int NoveltyMetric(LineageTracker<ORG>* lineages,
-                      emp::vector<int> curr_generation,
-                      emp::vector<int> prev_generation,
-                      std::set<emp::array<int, ORGSIZE> >* novel){
+    int NoveltyMetric(emp::vector<emp::array<int, ORGSIZE> > persist){
 
-      if (prev_generation.size() == 0) {
-        return -1;
-      }
-
-      std::set<int> curr_set(curr_generation.begin(), curr_generation.end());
-      std::set<int> prev_set(prev_generation.begin(), prev_generation.end());
-
-      std::set<ORG> persist = GetPersistLineage(lineages, curr_set,  prev_set);
-      emp::vector<emp::array<int, ORGSIZE> > persist_skeletons = Skeletonize(fit_fun, persist);
       int result = 0;
 
-      for (emp::array<int, ORGSIZE> lin : persist_skeletons){
-        if (novel->find(lin) == novel->end()){
+      for (emp::array<int, ORGSIZE> lin : persist){
+        if (novel.find(lin) == novel.end()){
           result++;
-          novel->insert(lin);
+          novel.insert(lin);
         }
       }
 
       return result;
     }
 
-    int ChangeMetric(LineageTracker<ORG>* lineages,
-                      emp::vector<int> curr_generation,
-                      emp::vector<int> prev_generation,
-                      emp::vector<int> first_generation){
+    int ChangeMetric( emp::vector<emp::array<int, ORGSIZE> > persist,
+                      emp::vector<emp::array<int, ORGSIZE> > prev_persist){
 
-      if (prev_generation.size() == 0 || first_generation.size() == 0) {
-        return -1;
-      }
+      std::set<emp::array<int, ORGSIZE> > curr_set(persist.begin(), persist.end());
+      std::set<emp::array<int, ORGSIZE> > prev_set(prev_persist.begin(), prev_persist.end());
 
-      std::set<int> curr_set(curr_generation.begin(), curr_generation.end());
-      std::set<int> prev_set(prev_generation.begin(), prev_generation.end());
-      std::set<int> first_set(first_generation.begin(), first_generation.end());
-
-      //Find persistant lineages
-      std::set<ORG> persist = GetPersistLineage(lineages, curr_set,  prev_set);
-      std::set<ORG> prev_persist = GetPersistLineage(lineages, prev_set, first_set);
-
-      std::set<ORG> result;
+      std::set<emp::array<int, ORGSIZE> > result;
       std::set_difference(persist.begin(), persist.end(), prev_persist.begin(),
       prev_persist.end(), std::inserter(result, result.end()));
       return result.size();
@@ -298,20 +258,37 @@ namespace evo{
 
   };
 
-
+  //Here lies the beastiary of functions for dealing with persistant lineages
 
   //Returns a set of org ids (from lineage tracker) representing ancestors
   //of the organisms with ids in curr_generation that lived the specified number
   //of generations earlier
-  //
-  //TODO: This depends on generations right now, which means it won't work
-  //with steady-state populations.
+  template <typename GENOME, template <typename> class C >
+  C<GENOME> IDsToGenomes(LineageTracker<GENOME>* lineages, C<int> persist_ids) {
+    C<GENOME> persist;
+    for (int id : persist_ids){
+      persist.insert(*(lineages->org_to_genome[id]));
+    }
+
+    return persist;
+  }
+
   template <typename GENOME>
-  std::set<GENOME> GetPersistLineage(LineageTracker<GENOME>* lineages,
-				       std::set<int> curr_generation,
+  emp::vector<GENOME> IDsToGenomes(LineageTracker<GENOME>* lineages, emp::vector<int> persist_ids) {
+    emp::vector<GENOME> persist;
+    for (int id : persist_ids){
+      persist.push_back(*(lineages->org_to_genome[id]));
+    }
+
+    return persist;
+  }
+
+  template <typename GENOME, template <typename> class C >
+  C<GENOME> GetPersistLineage(LineageTracker<GENOME>* lineages,
+				       C<int> curr_generation,
 				       int generations){
 
-    std::set<GENOME> persist;
+    C<GENOME> persist;
     for (int id : curr_generation){
       emp::vector<GENOME*> lin = lineages->TraceLineage(id);
       emp_assert(lin.size() - generations > 0);
@@ -321,31 +298,21 @@ namespace evo{
     return persist;
   }
 
-  template <typename GENOME, typename C, typename = std::enable_if<std::is_integral<typename C::value_type>::value > >
-  std::set<GENOME> GetPersistLineage(LineageTracker<GENOME>* lineages,
-                C curr_generation,
-                C prev_generation){
+  template <typename GENOME, template <typename> class C >
+  C<GENOME> GetPersistLineage(LineageTracker<GENOME>* lineages,
+                C<int> curr_generation,
+                C<int> prev_generation){
 
-    std::set<int> persist_ids = GetPersistLineageIDs(lineages, curr_generation, prev_generation);
+    C<int> persist_ids = GetPersistLineageIDs(lineages, curr_generation, prev_generation);
     return IDsToGenomes(lineages, persist_ids);
   }
 
-  template <typename GENOME, typename C, typename = std::enable_if<std::is_integral<typename C::value_type>::value > >
-  std::set<GENOME> IDsToGenomes(LineageTracker<GENOME>*, C persist_ids) {
-    std::set<GENOME> persist;
-    for (int id : persist_ids){
-      persist.insert(*(lineages->org_to_genome[id]));
-    }
-
-    return persist;
-  }
-
-  template <typename GENOME>
-  std::set<int> GetPersistLineageIDs(LineageTracker<GENOME>* lineages,
-               std::set<int> curr_generation,
+  template <typename GENOME, template <typename> class C >
+  C<int> GetPersistLineageIDs(LineageTracker<GENOME>* lineages,
+               C<int> curr_generation,
                int generations){
 
-    std::set<int> persist;
+    C<int> persist;
     for (int id : curr_generation){
       emp::vector<int> lin = lineages->TraceLineageIDs(id);
       emp_assert(lin.size() - generations > 0);
@@ -355,19 +322,57 @@ namespace evo{
     return persist;
   }
 
-  //Can take any container of ints
-  template <typename GENOME, typename C, typename = std::enable_if<std::is_integral<typename C::value_type>::value > >
-  std::set<int> GetPersistLineageIDs(LineageTracker<GENOME>* lineages,
-                C curr_generation,
-                C prev_generation){
+  template <typename GENOME>
+  emp::vector<int> GetPersistLineageIDs(LineageTracker<GENOME>* lineages,
+               emp::vector<int> curr_generation,
+               int generations){
 
-    std::set<int> persist;
-
+    emp::vector<int> persist;
     for (int id : curr_generation){
+      emp::vector<int> lin = lineages->TraceLineageIDs(id);
+      emp_assert(lin.size() - generations > 0);
+      persist.push_back(*(lin.begin() + generations));
+    }
+
+    return persist;
+  }
+
+  //Can take any container of ints
+
+  template <typename GENOME, template <typename> class C >
+  C<int> GetPersistLineageIDs(LineageTracker<GENOME>* lineages,
+                C<int> curr_generation,
+                C<int> prev_generation){
+
+    C<int> persist;
+
+    for (auto id : curr_generation){
       while(id) {
 
         if (std::find(prev_generation.begin(), prev_generation.end(), id) != prev_generation.end()) {
           persist.insert(id);
+          break;
+        }
+        id = lineages->parents[id];
+      }
+    }
+
+    return persist;
+  }
+
+  //Specialization for emp::vector so we can use push_back
+  template <typename GENOME>
+  emp::vector<int> GetPersistLineageIDs(LineageTracker<GENOME>* lineages,
+                emp::vector<int> curr_generation,
+                emp::vector<int> prev_generation){
+
+    emp::vector<int> persist;
+
+    for (auto id : curr_generation){
+      while(id) {
+
+        if (std::find(prev_generation.begin(), prev_generation.end(), id) != prev_generation.end()) {
+          persist.push_back(id);
           break;
         }
         id = lineages->parents[id];
