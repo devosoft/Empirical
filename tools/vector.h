@@ -37,6 +37,9 @@ namespace emp {
     using iterator = typename std::vector<T>::iterator;
     using const_iterator = typename std::vector<T>::const_iterator;
     using value_type = T;
+    using size_type = typename std::vector<T>::size_type;
+    using reference = typename std::vector<T>::reference;
+    using const_reference = typename std::vector<T>::const_reference;
 
     vector() = default;
     vector(const emp::vector<T> &) = default;
@@ -52,6 +55,8 @@ namespace emp {
       emp_assert(new_size >= 0, new_size);
       v.resize(new_size, val);
     }
+    bool empty() const noexcept { return v.empty(); }
+    size_type capacity() const noexcept { return v.capacity(); }
 
     emp::vector<T> & operator=(const emp::vector<T> &) = default;
 
@@ -72,11 +77,16 @@ namespace emp {
       return v[pos];
     }
 
+    T* data() noexcept { return v.data(); }
+    const T* data() const noexcept { return v.data(); }
+
     template <typename T2>
     vector & push_back(T2 && in) { v.push_back(std::forward<T2>(in)); return *this; }
 
     template <typename... T2>
-    vector & emplace_back(T2 &&... in) { v.emplace_back(std::forward<T2>(in)...); return *this; }
+    iterator emplace (T2 &&... in) { return v.emplace_back(std::forward<T2>(in)...); }
+    template <typename... T2>
+    void emplace_back(T2 &&... in) { v.emplace_back(std::forward<T2>(in)...); }
 
     auto begin() -> decltype(v.begin()) { return v.begin(); }
     auto end() -> decltype(v.end()) { return v.end(); }
@@ -88,9 +98,19 @@ namespace emp {
     auto rbegin() const -> const decltype(v.rbegin()) { return v.rbegin(); }
     auto rend() const -> const decltype(v.rend()) { return v.rend(); }
 
+    auto cbegin() const noexcept -> decltype(v.cbegin()) { return v.cbegin(); }
+    auto cend() const noexcept -> decltype(v.cend()) { return v.cend(); }
+    auto crbegin() const noexcept -> const decltype(v.crbegin()) { return v.crbegin(); }
+    auto crend() const noexcept -> const decltype(v.crend()) { return v.crend(); }
+
+    template <typename... ARGS>
+    void assign(ARGS &&... args) { v.assign(std::forward<ARGS>(args)...); }
+
+    reference at(size_type n) { return v.at(n); }
+    const_reference at(size_type n) const { return v.at(n); }
+
     template <typename... ARGS>
     iterator insert(ARGS &&... args) { return v.insert(std::forward<ARGS>(args)...); }
-
 
     T & back() { return v.back(); }
     const T & back() const { return v.back(); }
