@@ -10,6 +10,7 @@
 #define EMP_VECTOR_H
 
 #include <initializer_list>
+#include <utility>
 #include <vector>
 
 #include "assert.h"
@@ -33,6 +34,8 @@ namespace emp {
     std::vector<T> v;
 
   public:
+    using iterator = typename std::vector<T>::iterator;
+    using const_iterator = typename std::vector<T>::const_iterator;
     using value_type = T;
 
     vector() = default;
@@ -84,6 +87,10 @@ namespace emp {
     auto rend() -> decltype(v.rend()) { return v.rend(); }
     auto rbegin() const -> const decltype(v.rbegin()) { return v.rbegin(); }
     auto rend() const -> const decltype(v.rend()) { return v.rend(); }
+
+    template <typename... ARGS>
+    iterator insert(ARGS &&... args) { return v.insert(std::forward<ARGS>(args)...); }
+
 
     T & back() { return v.back(); }
     const T & back() const { return v.back(); }
