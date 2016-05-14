@@ -13,8 +13,8 @@
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
 
-constexpr int K = 10;
-constexpr int N = 50;
+constexpr int K = 0;
+constexpr int N = 20;
 
 constexpr int POP_SIZE = 200;
 constexpr int UD_COUNT = 1000;
@@ -47,7 +47,7 @@ pop.SetDefaultFitnessFun([landscape](BitOrg * org){ return landscape.GetFitness(
 oee_stats.fit_fun = [landscape](BitOrg * org){ return landscape.GetFitness(*org); };
 
   // Loop through updates
-  for (int ud = 0; ud < UD_COUNT; ud++) {
+  for (int ud = 0; ud < UD_COUNT+1; ud++) {
     // Print current state.
     // for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
     // std::cout << std::endl;
@@ -55,7 +55,7 @@ oee_stats.fit_fun = [landscape](BitOrg * org){ return landscape.GetFitness(*org)
 
     // Run a tournament for the rest...
     pop.TournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }
-			 , 5, POP_SIZE);
+			 , 15, POP_SIZE);
     //pop.FitnessSharingTournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }, [](BitOrg* org1, BitOrg* org2){ return (double)(org1->XOR(*org2)).CountOnes();}, 10, 1, 5, POP_SIZE);
     pop.Update();
     pop.MutatePop();

@@ -42,7 +42,7 @@ namespace evo{
 
     // Historical generations needed to count stats. We only need these in
     // proportion to resolution.
-    int generations = 10; //How far back do we look for persistance?
+    int generations = 50; //How far back do we look for persistance?
     int resolution = 10; //With what frequency do we record data?
     std::deque<emp::vector<int> > past_snapshots;
 
@@ -57,7 +57,7 @@ namespace evo{
       emp_assert(generations % resolution == 0 &&
           "ERROR: Generations required for persistance must be a multiple of resolution.");
 
-      past_snapshots = std::deque<emp::vector<int> >(2*generations/resolution);
+      past_snapshots = std::deque<emp::vector<int> >(2*generations/resolution + 1);
 
       //Create std::function objects for all the callbacks. It seems like
       //this maybe shouldn't be necessary (or at least shouldn't need to happen
@@ -134,6 +134,7 @@ namespace evo{
       int novelty = -1;
       double ecology = -1;
       int complexity = -1;
+      double fittest = -1;
       if (update % resolution == 0) {
 
         emp::vector<skeleton_type > persist_skeletons = Skeletonize(
@@ -157,8 +158,9 @@ namespace evo{
                                 int nulls = std::count(skel.begin(), skel.end(), -1);
                                 return (double)(skel.size() - nulls);
                               });
+          fittest = MaxFitness(fit_fun, IDsToGenomes(&lineage, past_snapshots[0]));
         }
-        std::cout << "Update: " << update << " Change: " << change << " Novelty: " << novelty << " Ecology: " << ecology << " Complexity: " << complexity<< std::endl;
+        std::cout << "Update: " << update << ", Change: " << change << ", Novelty: " << novelty << ", Ecology: " << ecology << ", Complexity: " << complexity << ", MaxFitness: " << fittest << std::endl;
         past_snapshots.pop_back();
         past_snapshots.push_front(generation_since_update);
       }
@@ -169,6 +171,7 @@ namespace evo{
         generation_since_update.resize(0);
       }
     }
+
 
     //Convert a container of orgs to skeletons containing only informative sites
     //TODO: Currently assumes bit org
