@@ -12,7 +12,7 @@
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
 
-constexpr int K = 3;
+constexpr int K = 13;
 constexpr int N = 50;
 
 constexpr int POP_SIZE = 1000;
@@ -49,10 +49,10 @@ int main()
     std::cout << ud << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 
     // Keep the best individual.
-    pop.EliteSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1);
+    pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 100);
 
     // Run a tournament for the rest...
-    pop.TournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }
+    pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
 			 , 5, POP_SIZE-1);
     pop.Update();
     pop.MutatePop();
@@ -60,4 +60,6 @@ int main()
 
 
   std::cout << UD_COUNT << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
+
+  std::cout << sizeof(emp::evo::NKLandscape<N,K>) << std::endl;
 }
