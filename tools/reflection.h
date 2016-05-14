@@ -202,6 +202,23 @@ template <typename... TYPES> struct NAME {                                      
  EMP_IMPL_TYPE_DEFAULT(EMP_DETECT_ ## NEW_TYPE, int, DEFAULT);                 \
  using NEW_TYPE = decltype(EMP_DETECT_ ## NEW_TYPE ## _impl<BASE_TYPE>(true))
 
+#define EMP_ADD_TYPE_FROM_TYPE(NEW_TYPE, BASE_TYPE, TYPE, DEFAULT)             \
+ EMP_IMPL_TYPE_HAS_TYPE(EMP_DETECT_ ## NEW_TYPE, bool, TYPE);                  \
+ EMP_IMPL_TYPE_DEFAULT(EMP_DETECT_ ## NEW_TYPE, int, DEFAULT);                 \
+ using NEW_TYPE = decltype(EMP_DETECT_ ## NEW_TYPE ## _impl<BASE_TYPE>(true))
+
+#define EMP_ADD_TYPE_FROM_MEMBER_OR_TYPE(NEW_TYPE, BASE_TYPE, MEMBER, TYPE, DEFAULT) \
+ EMP_IMPL_TYPE_HAS_MEMBER(EMP_DETECT_ ## NEW_TYPE, bool, MEMBER);                    \
+ EMP_IMPL_TYPE_HAS_TYPE(EMP_DETECT_ ## NEW_TYPE, int, TYPE);                         \
+ EMP_IMPL_TYPE_DEFAULT(EMP_DETECT_ ## NEW_TYPE, ..., DEFAULT);                       \
+ using NEW_TYPE = decltype(EMP_DETECT_ ## NEW_TYPE ## _impl<BASE_TYPE>(true))
+
+#define EMP_ADD_TYPE_FROM_TYPE_OR_MEMBER(NEW_TYPE, BASE_TYPE, TYPE, MEMBER, DEFAULT) \
+ EMP_IMPL_TYPE_HAS_TYPE(EMP_DETECT_ ## NEW_TYPE, bool, TYPE);                        \
+ EMP_IMPL_TYPE_HAS_MEMBER(EMP_DETECT_ ## NEW_TYPE, int, MEMBER);                     \
+ EMP_IMPL_TYPE_DEFAULT(EMP_DETECT_ ## NEW_TYPE, ..., DEFAULT);                       \
+ using NEW_TYPE = decltype(EMP_DETECT_ ## NEW_TYPE ## _impl<BASE_TYPE>(true))
+
 // Call a function with more args than it can take; ignore extras.
 
 namespace emp {

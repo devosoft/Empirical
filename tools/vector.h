@@ -49,7 +49,7 @@ namespace emp {
     vector(const std::vector<T> & in) : v(in) { ; }         // Emergency fallback conversion.
     ~vector() = default;
 
-    uint32_t size() const { return v.size(); }
+    size_type size() const noexcept { return v.size(); }
     void resize(int new_size) { emp_assert(new_size >= 0, new_size); v.resize(new_size); }
     void resize(int new_size, const T & val) {
       emp_assert(new_size >= 0, new_size);
@@ -57,8 +57,19 @@ namespace emp {
     }
     bool empty() const noexcept { return v.empty(); }
     size_type capacity() const noexcept { return v.capacity(); }
+    size_type max_size() const noexcept { return v.max_size(); }
+    void reserve(size_type n) { v.reserve(n); }
+    void shrink_to_fit() { v.shrink_to_fit(); }
 
     emp::vector<T> & operator=(const emp::vector<T> &) = default;
+    emp::vector<T> & operator=(const std::vector<T> & x) { v = x; return *this; }
+    emp::vector<T> & operator=(const std::initializer_list<value_type> & il) {
+      v.operator=(il);
+      return *this;
+    }
+
+    void swap(emp::vector<T> & x) { v.swap(x.v); }
+    void swap(std::vector<T> & x) { v.swap(x); }
 
     bool operator==(const emp::vector<T> & in) const { return v == in.v; }
     bool operator!=(const emp::vector<T> & in) const { return v != in.v; }
@@ -88,6 +99,9 @@ namespace emp {
     template <typename... T2>
     void emplace_back(T2 &&... in) { v.emplace_back(std::forward<T2>(in)...); }
 
+    template <typename... T2>
+    iterator erase(T2 &&... in) { return v.erase(std::forward<T2>(in)...); }
+
     auto begin() -> decltype(v.begin()) { return v.begin(); }
     auto end() -> decltype(v.end()) { return v.end(); }
     auto begin() const -> const decltype(v.begin()) { return v.begin(); }
@@ -114,6 +128,8 @@ namespace emp {
 
     T & back() { return v.back(); }
     const T & back() const { return v.back(); }
+    T & front() { return v.front(); }
+    const T & front() const { return v.front(); }
 
     void pop_back() {
       emp_assert(v.size() > 0, v.size());
