@@ -34,7 +34,7 @@ namespace emp {
   }
 
   // Toggle an input bool.
-  inline constexpr bool toggle(bool & in_bool) { return (in_bool = !in_bool); }
+  inline bool toggle(bool & in_bool) { return (in_bool = !in_bool); }
 
   /// % is actually remainder; this is a proper modulus command that handles negative #'s correctly
   inline constexpr int mod(int in_val, int mod_val) {
