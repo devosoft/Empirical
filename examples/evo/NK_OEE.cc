@@ -13,16 +13,18 @@
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
 
-constexpr int K = 0;
+constexpr int K = 10;
 constexpr int N = 20;
 
 constexpr int POP_SIZE = 200;
-constexpr int UD_COUNT = 1000;
+constexpr int UD_COUNT = 5000;
+constexpr int TOURNAMENT_SIZE = 15;
 
 using BitOrg = emp::BitSet<N>;
 
 int main()
 {
+  std::cout << "N: " << N << ", K: " << K << ", POP_SIZE: " << POP_SIZE << ", Selection: " << "Standard_tournament" << ", TournamentSize: " << TOURNAMENT_SIZE << std::endl;
   emp::Random random;
   emp::evo::NKLandscape<N,K> landscape(random);
   emp::evo::World<BitOrg> pop(random);
@@ -55,8 +57,8 @@ oee_stats.fit_fun = [landscape](BitOrg * org){ return landscape.GetFitness(*org)
 
     // Run a tournament for the rest...
     pop.TournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }
-			 , 15, POP_SIZE);
-    //pop.FitnessSharingTournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }, [](BitOrg* org1, BitOrg* org2){ return (double)(org1->XOR(*org2)).CountOnes();}, 10, 1, 5, POP_SIZE);
+    , TOURNAMENT_SIZE, POP_SIZE);
+    //pop.FitnessSharingTournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }, [](BitOrg* org1, BitOrg* org2){ return (double)(org1->XOR(*org2)).CountOnes();}, 10, 1, TOURNAMENT_SIZE, POP_SIZE);
     pop.Update();
     pop.MutatePop();
   }
