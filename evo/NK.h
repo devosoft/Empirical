@@ -34,15 +34,15 @@ namespace evo {
         }
       }
     }
-    NKLandscape(const NKLandscape &) = default;
+    NKLandscape(const NKLandscape &) = delete;
     ~NKLandscape() { ; }
-    NKLandscape & operator=(const NKLandscape &) = default;
+    NKLandscape & operator=(const NKLandscape &) = delete;
 
     constexpr int GetN() const { return N; }
     constexpr int GetK() const { return K; }
     constexpr int GetStateCount() const { return state_count; }
     constexpr int GetTotalCount() const { return total_count; }
-    
+
     double GetFitness(int n, uint32_t state) const {
       emp_assert(state < state_count, state, state_count);
       // std::cout << n << " : " << state << " : " << landscape[n][state] << std::endl;
@@ -68,9 +68,8 @@ namespace evo {
       return total;
     }
   };
-  
-}
-}
-  
-#endif
 
+}
+}
+
+#endif
