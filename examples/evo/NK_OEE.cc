@@ -13,7 +13,7 @@
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
 
-constexpr int K = 10;
+constexpr int K = 3;
 constexpr int N = 20;
 
 constexpr int POP_SIZE = 200;

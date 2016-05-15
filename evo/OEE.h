@@ -192,10 +192,32 @@ namespace evo{
           }
           test[i] = !test[i];
         }
+        skeletons.insert(skeleton);
+      }
+      return skeletons;
+    }
+
+    emp::vector<skeleton_type> Skeletonize (emp::vector<ORG> orgs){
+      emp::vector<skeleton_type> skeletons;
+      for (auto org : orgs) {
+        double fitness = fit_fun(&org);
+        skeleton_type skeleton;
+        ORG test = org;
+
+        for (int i = 0; i < org.size(); i++) {
+          test[i] = !test[i];
+          if (fit_fun(&test) >= fitness){
+            skeleton[i] = -1;
+          } else {
+            skeleton[i] = org[i];
+          }
+          test[i] = !test[i];
+        }
         skeletons.push_back(skeleton);
       }
       return skeletons;
     }
+
 
     //Find most complex skeleton in the given vector.
     double ComplexityMetric(emp::vector<skeleton_type> persist,
@@ -257,7 +279,7 @@ namespace evo{
   C<GENOME> IDsToGenomes(LineageTracker<GENOME>* lineages, C<int> persist_ids) {
     C<GENOME> persist;
     for (int id : persist_ids){
-      persist.insert(*(lineages->org_to_genome[id]));
+      persist.insert(persist.back(), *(lineages->org_to_genome[id]));
     }
 
     return persist;
@@ -294,7 +316,7 @@ namespace evo{
     for (int id : curr_generation){
       emp::vector<int> lin = lineages->TraceLineageIDs(id);
       emp_assert(lin.size() - generations > 0);
-      persist.insert(*(lin.begin() + generations));
+      persist.insert(persist.back(), *(lin.begin() + generations));
     }
 
     return persist;
@@ -332,7 +354,7 @@ namespace evo{
       while(id) {
 
         if (std::find(prev_generation.begin(), prev_generation.end(), id) != prev_generation.end()) {
-          persist.insert(id);
+          persist.insert(persist.back(), id);
           break;
         }
         id = lineages->parents[id];
@@ -367,7 +389,7 @@ namespace evo{
   //Whereas GetPersistLineageIDs returns the ids of the orgs that are the
   //ancestors of persistent lineages, GetPersistLineage converts the ids to
   //GENOMEs first.
-  template <typename GENOME, template <typename> class C >
+  template <typename GENOME, template <typename> class C>
   C<GENOME> GetPersistLineage(LineageTracker<GENOME>* lineages,
 				       C<int> curr_generation,
 				       int generations){
@@ -376,7 +398,7 @@ namespace evo{
     for (int id : curr_generation){
       emp::vector<GENOME*> lin = lineages->TraceLineage(id);
       emp_assert(lin.size() - generations > 0);
-      persist.insert(**(lin.begin() + generations));
+      persist.insert(persist.back(), **(lin.begin() + generations));
     }
 
     return persist;
@@ -389,6 +411,16 @@ namespace evo{
                 C<int> prev_generation){
 
     C<int> persist_ids = GetPersistLineageIDs(lineages, curr_generation, prev_generation);
+    return IDsToGenomes(lineages, persist_ids);
+  }
+
+  //Version that takes two populations
+  template <typename GENOME>
+  emp::vector<GENOME> GetPersistLineage(LineageTracker<GENOME>* lineages,
+                emp::vector<int> curr_generation,
+                emp::vector<int> prev_generation){
+
+    emp::vector<int> persist_ids = GetPersistLineageIDs(lineages, curr_generation, prev_generation);
     return IDsToGenomes(lineages, persist_ids);
   }
 
