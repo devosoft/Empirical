@@ -16,19 +16,19 @@ constexpr int K = 13;
 constexpr int N = 50;
 
 constexpr int POP_SIZE = 1000;
-constexpr int UD_COUNT = 1000;
+constexpr int UD_COUNT = 2000;
 
-using BitOrg = emp::BitSet<N>;
+using BitOrg = emp::BitVector;
 
 int main()
 {
   emp::Random random;
-  emp::evo::NKLandscape<N,K> landscape(random);
+  emp::evo::NKLandscape landscape(N, K, random);
   emp::evo::EAWorld<BitOrg> pop(random);
 
   // Build a random initial population
   for (int i = 0; i < POP_SIZE; i++) {
-    BitOrg next_org;
+    BitOrg next_org(N);
     for (int j = 0; j < N; j++) next_org[j] = random.P(0.5);
     pop.Insert(next_org);
   }
@@ -49,7 +49,7 @@ int main()
     std::cout << ud << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 
     // Keep the best individual.
-    pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 100);
+    pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1);
 
     // Run a tournament for the rest...
     pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
@@ -60,6 +60,4 @@ int main()
 
 
   std::cout << UD_COUNT << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
-
-  std::cout << sizeof(emp::evo::NKLandscape<N,K>) << std::endl;
 }
