@@ -1,12 +1,12 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
 //  This file provides code to build NK-based algorithms.
 
-#ifndef NK_H
-#define NK_H
+#ifndef EMP_EVO_NK_CONST_H
+#define EMP_EVO_NK_CONST_H
 
 #include <array>
 
@@ -19,24 +19,24 @@ namespace emp {
 namespace evo {
 
   template <int N, int K>
-  class NKLandscape {
+  class NKLandscapeConst {
   private:
     static constexpr int state_count = emp::constant::IntPow(2,K+1);
     static constexpr int total_count = N * state_count;
     std::array< std::array<double, state_count>, N > landscape;
 
   public:
-    NKLandscape() = delete; // { ; }
-    NKLandscape(emp::Random & random) {
+    NKLandscapeConst() = delete; // { ; }
+    NKLandscapeConst(emp::Random & random) {
       for ( std::array<double, state_count> & ltable : landscape) {
         for (double & pos : ltable) {
           pos = random.GetDouble();
         }
       }
     }
-    NKLandscape(const NKLandscape &) = delete;
-    ~NKLandscape() { ; }
-    NKLandscape & operator=(const NKLandscape &) = delete;
+    NKLandscapeConst(const NKLandscapeConst &) = delete;
+    ~NKLandscapeConst() { ; }
+    NKLandscapeConst & operator=(const NKLandscapeConst &) = delete;
 
     constexpr int GetN() const { return N; }
     constexpr int GetK() const { return K; }
@@ -61,9 +61,9 @@ namespace evo {
       double total = 0.0;
       constexpr uint32_t mask = emp::constant::MaskLow<uint32_t>(K+1);
       for (int i = 0; i < N; i++) {
-	const uint32_t cur_val = (genome2 >> i).GetUInt(0) & mask;
-	const double cur_fit = GetFitness(i, cur_val);
-	total += cur_fit;
+	      const uint32_t cur_val = (genome2 >> i).GetUInt(0) & mask;
+	      const double cur_fit = GetFitness(i, cur_val);
+	      total += cur_fit;
       }
       return total;
     }
