@@ -7,26 +7,25 @@
 
 #include <map>
 #include <set>
-
 #include "../tools/vector.h"
 
 namespace emp{
 namespace evo{
 
   // Class to keep track of lineages
-  // Maintains record of all genomes that ever existed, which organisms 
+  // Maintains record of all genomes that ever existed, which organisms
   // they belonged to, and which organisms were the parents of which
   template <typename GENOME>
   class LineageTracker {
-  protected:
+  public:
     std::set<GENOME> genomes;
     std::map<int, GENOME*> org_to_genome;
     std::map<int, int> parents;
-    int next = 1; //0 indicates no parent
-    
-    
-  public:
-    LineageTracker() { ; }
+    int next = 0; //-1 indicates no parent
+
+    LineageTracker() {
+      this->parents[-1] = 0;
+    }
     ~LineageTracker() {
       //for (GENOME g : genomes) delete &g;
     }
@@ -49,11 +48,24 @@ namespace evo{
 
     // Return a vector containing the genomes of an organism's ancestors
     emp::vector<GENOME*> TraceLineage(int org_id) {
-      emp::vector<GENOME*> lineage;      
+      emp::vector<GENOME*> lineage;
 
       while(org_id) {
-	lineage.push_back(this->org_to_genome[org_id]);
-	org_id = this->parents[org_id];
+        lineage.push_back(this->org_to_genome[org_id]);
+        org_id = this->parents[org_id];
+      }
+
+      return lineage;
+
+    }
+
+    //Return a vector containing the IDs of an oraganism's ancestors
+    emp::vector<int> TraceLineageIDs(int org_id) {
+      emp::vector<GENOME*> lineage;
+
+      while(org_id) {
+        lineage.push_back(org_id);
+        org_id = this->parents[org_id];
       }
 
       return lineage;
