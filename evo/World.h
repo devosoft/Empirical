@@ -120,7 +120,7 @@ namespace evo {
   // Main world class...
   template <typename ORG, typename... MANAGERS>
   class World {
-  protected:
+  public:
     // Build managers...
     AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> popM;
     AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgMDynamic>::type, ORG> orgM;

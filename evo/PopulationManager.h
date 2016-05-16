@@ -19,7 +19,7 @@ namespace evo {
 
   template <typename ORG=int>
   class PopulationManager_Base {
-  protected:
+  public:
     using ptr_t = ORG *;
     emp::vector<ORG *> pop;
 
@@ -185,7 +185,7 @@ namespace evo {
 
   template <typename ORG=int>
   class PopulationManager_Grid : public PopulationManager_Base<ORG> {
-  protected:
+  public:
     using PopulationManager_Base<ORG>::pop;
     using PopulationManager_Base<ORG>::random_ptr;
 
