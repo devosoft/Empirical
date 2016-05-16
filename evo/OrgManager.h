@@ -8,6 +8,8 @@
 #ifndef EMP_EVO_ORGANISM_MANAGER_H
 #define EMP_EVO_ORGANISM_MANAGER_H
 
+#include <unordered_map>
+
 #define EMP_SETUP_EVO_DEFAULT(FUN_VAR, NAME, TEST, ACTION, RTYPE)              \
   std::function<RTYPE(ORG*)> FUN_VAR;                                          \
   template <class T> void Setup_ ## FUN_VAR ## _impl(emp_bool_decoy(TEST)) {   \
@@ -26,7 +28,7 @@
   }                                                                            \
   protected:
 
-// ACTION was org->METHOD(args...)
+
 #define EMP_SETUP_EVO_DEFAULT_ARGS(FUN_VAR, NAME, TEST, ACTION, RTYPE, ...)         \
   std::function<RTYPE(ORG*, __VA_ARGS__)> FUN_VAR;                                  \
   template <class T, typename... ARG_TYPES>                                         \
@@ -55,6 +57,13 @@ namespace evo {
       double Fitness() { emp_assert(false); return 0.0; }
       bool Mutate() { emp_assert(false); return false; }
     };
+
+    template <typename GENOME>
+    struct FitnessCache {
+      std::unordered_map<GENOME, double> fit_map;
+    };
+
+//    template <typename ORG> auto org_to_genome_t(emp_int_decoy(ORG::genome)) -> decltype(ORG::genome);
   }
 
   template <typename ORG=int>
@@ -95,8 +104,8 @@ namespace evo {
   template <typename ORG=int>
   class OrgManager_Dynamic : public OrgManager_Base<ORG> {
   protected:
-    EMP_SETUP_EVO_DEFAULT(default_fit_fun, Fitness, T::Fitness, org->Fitness(), double)
-    EMP_SETUP_EVO_DEFAULT_ARGS(default_mut_fun, Mutate, T::Mutate, org->Mutate(args...), bool, emp::Random &)
+    EMP_SETUP_EVO_DEFAULT(default_fit_fun, Fitness, &T::Fitness, org->Fitness(), double)
+    EMP_SETUP_EVO_DEFAULT_ARGS(default_mut_fun, Mutate, &T::Mutate, org->Mutate(args...), bool, emp::Random &)
 
   public:
     OrgManager_Dynamic() {
