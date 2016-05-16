@@ -10,18 +10,25 @@
 #include "../../evo/NK.h"
 #include "../../evo/World.h"
 #include "../../tools/BitSet.h"
+#include "../../tools/command_line.h"
 #include "../../tools/Random.h"
 
-constexpr int K = 13;
-constexpr int N = 50;
+int K = 13;
+int N = 50;
 
-constexpr int POP_SIZE = 1000;
-constexpr int UD_COUNT = 2000;
+int POP_SIZE = 1000;
+int UD_COUNT = 2000;
 
 using BitOrg = emp::BitVector;
 
-int main()
+int main(int argc, char* argv[])
 {
+  auto args = emp::cl::args_to_strings(argc, argv);
+  emp::cl::use_arg_value(args, "-N", N);
+  emp::cl::use_arg_value(args, "-K", K);
+  emp::cl::use_arg_value(args, "-pop", POP_SIZE);
+  emp::cl::use_arg_value(args, "-ud", UD_COUNT);
+
   emp::Random random;
   emp::evo::NKLandscape landscape(N, K, random);
   emp::evo::EAWorld<BitOrg> pop(random);
