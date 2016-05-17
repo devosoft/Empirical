@@ -55,7 +55,7 @@ namespace evo {
       return landscape[n][state];
     }
     double GetFitness( std::vector<uint32_t> states ) const {
-      emp_assert(stats.GetSize() == N);
+      emp_assert(states.size() == N);
       double total = landscape[0][states[0]];
       for (int i = 1; i < N; i++) total += GetFitness(i,states[i]);
       return total;
