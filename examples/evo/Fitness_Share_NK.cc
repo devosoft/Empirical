@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../evo/NK.h"
+#include "../../evo/NK-const.h"
 #include "../../evo/World.h"
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
@@ -23,7 +23,7 @@ using BitOrg = emp::BitSet<N>;
 int main()
 {
   emp::Random random;
-  emp::evo::NKLandscape<N,K> landscape(random);
+  emp::evo::NKLandscapeConst<N,K> landscape(random);
   emp::evo::EAWorld<BitOrg> pop(random);
 
   // Build a random initial population
@@ -41,10 +41,10 @@ int main()
     //std::cout << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 
     // Keep the best individual.
-    pop.EliteSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1);
+    pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1);
 
     // Run a tournament for the rest...
-    pop.FitnessSharingTournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }, [](BitOrg* org1, BitOrg* org2){ return (double)(org1->XOR(*org2)).CountOnes();}, 10, 1, 5, POP_SIZE-1);
+    pop.FitnessSharingTournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, [](BitOrg* org1, BitOrg* org2){ return (double)(org1->XOR(*org2)).CountOnes();}, 10, 1, 5, POP_SIZE-1);
     pop.Update();
 
     // Do mutations...
