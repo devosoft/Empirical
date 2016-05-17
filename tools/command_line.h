@@ -64,7 +64,7 @@ namespace emp {
     }
 
     // Return true/false if a specific argument is present and REMOVE IT.
-    bool use_arg(std::vector<std::string> & args, const std::string & pattern) {
+    bool use_flag(std::vector<std::string> & args, const std::string & pattern) {
       const int pos = find_arg(args, pattern);
       if (pos >= 0) args.erase(args.begin()+pos);
       return (pos != -1);
@@ -111,13 +111,58 @@ namespace emp {
 
 
     // Same as get arg_value, but ALSO remove the args.
-    template <typename... T>
-    int use_arg_value(std::vector<std::string> & args, const std::string & pattern, T &... vars) {
+    template <typename... Ts>
+    int use_arg_value(std::vector<std::string> & args, const std::string & pattern, Ts &... vars) {
       const int result = get_arg_value(args, pattern, vars...);
       const int pos = find_arg(args, pattern);
-      if (result == 1) args.erase(args.begin()+pos, args.begin()+pos+sizeof...(T)+1);
+      if (result == 1) args.erase(args.begin()+pos, args.begin()+pos+sizeof...(Ts)+1);
       return result;
     }
+
+    class ArgManager {
+    private:
+      std::vector<std::string> args;
+      std::vector<std::string> arg_names;
+      std::vector<std::string> arg_descs;
+
+    public:
+      ArgManager() { ; }
+      ArgManager(int argc, char* argv[]) : args(args_to_strings(argc, argv)) { ; }
+      ~ArgManager() { ; }
+
+      int GetArgCount() { return (int) args.size(); }
+
+      // UseArg takes a name, a variable and an optional description.  If the name exists,
+      // it uses the next argument to change the value of the variable.
+      // Return 1 if found, 0 if not found, and -1 if error (no value provided)
+      template <typename T>
+      int UseArg(const std::string & name, T & var, const std::string & desc="") {
+        arg_names.push_back(name);
+        arg_descs.push_back(desc);
+        return use_arg_value(args, name, var);
+      }
+
+      // UseFlag take a name and an optional description.  If the name exists, return true,
+      // otherwise return false.
+      bool UseFlag(const std::string & name, const std::string & desc="") {
+        arg_names.push_back(name);
+        arg_descs.push_back(desc);
+        return use_flag(args, name);
+      }
+
+      void PrintHelp(std::ostream & os) {
+        int max_name_size = 0;
+        for (const auto & name : arg_names) {
+          if (max_name_size < (int) name.size()) max_name_size = (int) name.size();
+        }
+        for (int i = 0; i < arg_names.size(); i++) {
+          os << arg_names[i]
+             << std::string(max_name_size + 1 - (int) arg_names[i].size(), ' ')
+             << arg_descs[i]
+             << std::endl;
+        }
+      }
+    };
 
   }
 }
