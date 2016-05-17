@@ -70,6 +70,54 @@ namespace emp {
       return (pos != -1);
     }
 
+    // Return 1 for arg set to value, 0 for arg not found, and -1 for invalid use.
+    // ...assume arg is a single string.
+    int get_arg_value(std::vector<std::string> & args, const std::string & pattern, std::string & var) {
+      const int pos = find_arg(args, pattern);
+      if (pos == -1) return 0;                      // Arg not found.
+      if (pos >= (int) args.size() - 1) return -1;  // No room for a value!
+      var = args[pos+1];
+      return 1;
+    }
+
+    // ...assume arg is a PAIR of strings.
+    int get_arg_value(std::vector<std::string> & args, const std::string & pattern,
+                      std::string & var1, std::string & var2) {
+      const int pos = find_arg(args, pattern);
+      if (pos == -1) return 0;                      // Arg not found.
+      if (pos >= (int) args.size() - 2) return -1;  // No room for both values!
+      var1 = args[pos+1];
+      var2 = args[pos+2];
+      return 1;
+    }
+
+    // ...assume arg is a single int.
+    int get_arg_value(std::vector<std::string> & args, const std::string & pattern, int & var) {
+      const int pos = find_arg(args, pattern);
+      if (pos == -1) return 0;                      // Arg not found.
+      if (pos >= (int) args.size() - 1) return -1;  // No room for a value!
+      var = stoi(args[pos+1]);
+      return 1;
+    }
+
+    // ...assume arg is a single double.
+    int get_arg_value(std::vector<std::string> & args, const std::string & pattern, double & var) {
+      const int pos = find_arg(args, pattern);
+      if (pos == -1) return 0;                      // Arg not found.
+      if (pos >= (int) args.size() - 1) return -1;  // No room for a value!
+      var = stod(args[pos+1]);
+      return 1;
+    }
+
+
+    // Same as get arg_value, but ALSO remove the args.
+    template <typename... T>
+    int use_arg_value(std::vector<std::string> & args, const std::string & pattern, T &... vars) {
+      const int result = get_arg_value(args, pattern, vars...);
+      const int pos = find_arg(args, pattern);
+      if (result == 1) args.erase(args.begin()+pos, args.begin()+pos+sizeof...(T)+1);
+      return result;
+    }
 
   }
 }
