@@ -38,7 +38,7 @@ NK: NK.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) NK.cc -o NK
 
 replica: replica.cc ../../evo/NK.h $(EVO_DEPEND)
-	$(CXX_native) $(CFLAGS_native) replica.cc -o replica -g
+	$(CXX_native) $(CFLAGS_native) replica.cc -o replica
 
 NK-const: NK-const.cc ../../evo/NK-const.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) NK-const.cc -o NK-const
