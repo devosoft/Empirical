@@ -111,13 +111,47 @@ namespace emp {
 
 
     // Same as get arg_value, but ALSO remove the args.
-    template <typename... T>
-    int use_arg_value(std::vector<std::string> & args, const std::string & pattern, T &... vars) {
+    template <typename... Ts>
+    int use_arg_value(std::vector<std::string> & args, const std::string & pattern, Ts &... vars) {
       const int result = get_arg_value(args, pattern, vars...);
       const int pos = find_arg(args, pattern);
-      if (result == 1) args.erase(args.begin()+pos, args.begin()+pos+sizeof...(T)+1);
+      if (result == 1) args.erase(args.begin()+pos, args.begin()+pos+sizeof...(Ts)+1);
       return result;
     }
+
+    class ArgManager {
+    private:
+      std::vector<std::string> args;
+      std::vector<std::string> arg_names;
+      std::vector<std::string> arg_descs;
+
+    public:
+      ArgManager() { ; }
+      ArgManager(int argc, char* argv[]) : args(args_to_strings(argc, argv)) { ; }
+      ~ArgManager() { ; }
+
+      int GetArgCount() { return (int) args.size(); }
+
+      template <typename... Ts>
+      int TestArgs(const std::string & name, const std::string & desc, Ts &... vars) {
+        arg_names.push_back(name);
+        arg_descs.push_back(desc);
+        return use_arg_value(args, name, vars...);
+      }
+
+      void PrintHelp(std::ostream & os) {
+        int max_name_size = 0;
+        for (const auto & name : arg_names) {
+          if (max_name_size < (int) name.size()) max_name_size = (int) name.size();
+        }
+        for (int i = 0; i < arg_names.size(); i++) {
+          os << arg_names[i]
+             << std::string(' ', max_name_size + 1 - (int) arg_names[i].size())
+             << arg_descs[i]
+             << std::endl;
+        }
+      }
+    };
 
   }
 }
