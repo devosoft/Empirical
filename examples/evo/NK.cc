@@ -23,11 +23,17 @@ using BitOrg = emp::BitVector;
 
 int main(int argc, char* argv[])
 {
-  auto args = emp::cl::args_to_strings(argc, argv);
-  emp::cl::use_arg_value(args, "-N", N);
-  emp::cl::use_arg_value(args, "-K", K);
-  emp::cl::use_arg_value(args, "-pop", POP_SIZE);
-  emp::cl::use_arg_value(args, "-ud", UD_COUNT);
+  auto args = emp::cl::ArgManager(argc, argv);
+  args.UseArg("-N", N, "Set the number of bits in each sequence.");
+  args.UseArg("-K", K, "Set the number of extra bits affecting each fitness contribution.");
+  args.UseArg("-pop", POP_SIZE, "Set the population size.");
+  args.UseArg("-ud", UD_COUNT, "Set the number of updates to run.");
+  bool print_help = args.UseFlag("-h", "Print help information.");
+
+  if (print_help) {
+    args.PrintHelp(std::cout);
+    exit(0);
+  }
 
   emp::Random random;
   emp::evo::NKLandscape landscape(N, K, random);
