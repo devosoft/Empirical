@@ -64,7 +64,7 @@ namespace emp {
     }
 
     // Return true/false if a specific argument is present and REMOVE IT.
-    bool use_arg(std::vector<std::string> & args, const std::string & pattern) {
+    bool use_flag(std::vector<std::string> & args, const std::string & pattern) {
       const int pos = find_arg(args, pattern);
       if (pos >= 0) args.erase(args.begin()+pos);
       return (pos != -1);
@@ -132,11 +132,22 @@ namespace emp {
 
       int GetArgCount() { return (int) args.size(); }
 
-      template <typename... Ts>
-      int TestArgs(const std::string & name, const std::string & desc, Ts &... vars) {
+      // UseArg takes a name, a variable and an optional description.  If the name exists,
+      // it uses the next argument to change the value of the variable.
+      // Return 1 if found, 0 if not found, and -1 if error (no value provided)
+      template <typename T>
+      int UseArg(const std::string & name, T & var, const std::string & desc="") {
         arg_names.push_back(name);
         arg_descs.push_back(desc);
-        return use_arg_value(args, name, vars...);
+        return use_arg_value(args, name, var);
+      }
+
+      // UseFlag take a name and an optional description.  If the name exists, return true,
+      // otherwise return false.
+      bool UseFlag(const std::string & name, const std::string & desc="") {
+        arg_names.push_back(name);
+        arg_descs.push_back(desc);
+        return use_flag(args, name);
       }
 
       void PrintHelp(std::ostream & os) {
@@ -146,7 +157,7 @@ namespace emp {
         }
         for (int i = 0; i < arg_names.size(); i++) {
           os << arg_names[i]
-             << std::string(' ', max_name_size + 1 - (int) arg_names[i].size())
+             << std::string(max_name_size + 1 - (int) arg_names[i].size(), ' ')
              << arg_descs[i]
              << std::endl;
         }
