@@ -80,6 +80,18 @@ namespace evo{
     return unique_elements.size();
   }
 
+  template <typename ORG>
+	  double MaxFitness(std::function<double(ORG * org)> fit_fun, emp::vector<ORG *> orgs){
+	    double fittest = fit_fun(orgs[0]);
+	    for (auto org : orgs){
+	      double fitness = fit_fun(org);
+	      if (fitness > fittest){
+	        fittest = fitness;
+	      }
+	    }
+	    return fittest;
+	  }
+
   template <typename ORG, typename C >
   double MaxFitness(std::function<double(ORG * org)> fit_fun, C orgs){
     double fittest = fit_fun(&orgs[0]);

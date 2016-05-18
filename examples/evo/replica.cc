@@ -58,15 +58,15 @@ int main()
   for (int ud = 0; ud < UD_COUNT; ud++) {
 
     // output allll of the population
-    std::cerr << "Update " << ud << std::endl;
-    for (int i = 0; i < POP_SIZE; i++) {std::cerr << "\t" << mixed_pop[i] << std::endl;}
+    //std::cerr << "Update " << ud << std::endl;
+    //for (int i = 0; i < POP_SIZE; i++) {std::cerr << "\t" << mixed_pop[i] << std::endl;}
 
     // handle tick for mixed_world
       
     // Print current state.
     // for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
     // std::cout << std::endl;
-    std::cout << ud  << "," << emp::evo::ShannonDiversity(mixed_pop.popM.pop);
+    std::cout << ud  << "," << emp::evo::ShannonDiversity(mixed_pop);
     std::cout << "," << emp::evo::MaxFitness(fit_func, mixed_pop.popM.pop) << std::endl;
 
     // Keep the best individual.
