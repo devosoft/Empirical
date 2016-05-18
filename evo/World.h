@@ -94,6 +94,7 @@
 #include "OrgSignals.h"
 #include "OrgManager.h"
 #include "PopulationManager.h"
+#include "WorldIterator.h"
 
 // Macro to add class elements associated with a dynamic function call.
 // For example, if you wanted to be able to have a dynamic fitness function, you would call:
@@ -118,6 +119,8 @@ namespace evo {
   EMP_SETUP_TYPE_SELECTOR(SelectPopManager, emp_is_population_manager);
   EMP_SETUP_TYPE_SELECTOR(SelectOrgManager, emp_is_organism_manager);
 
+  template <typename ORG, typename... MANAGERS> class WorldIterator;
+
   // Main world class...
 
   template <typename ORG, typename... MANAGERS>
@@ -129,6 +132,9 @@ namespace evo {
 
     Random * random_ptr;
     bool random_owner;
+
+    friend class WorldIterator<ORG, MANAGERS...>;
+    typedef WorldIterator<ORG, MANAGERS...> iterator;
 
     // Signals triggered by the world.
     Signal<int> before_repro_sig;       // Trigger: Immediately prior to producing offspring
@@ -181,6 +187,8 @@ namespace evo {
     ORG & operator[](int i) { return *(popM[i]); }
     const ORG & operator[](int i) const { return *(popM[i]); }
     bool IsOccupied(int i) const { return popM[i] != nullptr; }
+    iterator begin(){return WorldIterator<ORG, MANAGERS...>(this, 0);}
+    iterator end(){return WorldIterator<ORG, MANAGERS...>(this, this->GetSize());}
 
     void Clear() { popM.Clear(); }
 
