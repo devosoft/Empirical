@@ -68,7 +68,19 @@ namespace evo{
     return -1 * result;
   }
 
-  //Calculates number of unique elements in the container passed
+  template <typename ORG>
+  double MaxFitness(std::function<double(ORG * org)> fit_fun, emp::vector<ORG *> orgs){
+    double fittest = fit_fun(orgs[0]);
+    for (auto org : orgs){
+      double fitness = fit_fun(org);
+      if (fitness > fittest){
+        fittest = fitness;
+      }
+    }
+    return fittest;
+  }
+
+//Calculates number of unique elements in the container passed
   template <typename C>
   int Richness(C elements) {
     //Converting to a set will remove duplicates leaving only unique values

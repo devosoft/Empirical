@@ -39,3 +39,4 @@ utils/graphs/for_web/
 utils/graphs/history/
 utils/graphs/upload/
 examples/evo/replica
+examples/evo/runs/*
