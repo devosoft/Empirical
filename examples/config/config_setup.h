@@ -3,34 +3,36 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-// This file defines all of the configuration options available.  It is read in several
-// times from config.h, each with different macros associated with the command below.
+// This file provides an example of how to build a configuration class.
 //
-// The available commands are:
+// To create a new config from scratch, the format is:
+//   EMP_BUILD_CONFIG( CLASS_NAME, OPTIONS... )
 //
-// EMP_CONFIG_GROUP(group name, group description string) -- This command is only needed
-//  if you want to break configuration options into groups.  Any group structure will be
-//  preserved when user-accessible configuration options are presented.
+// To extend an existing config, simply use:
+//   EMP_EXTEND_CONFIG( NEW_NAME, BASE_CLASS, OPTIONS... )
+// 
+// where options can be:
 //
-// EMP_CONFIG_VAR(variable name, type, default value, description string) -- This command
-//  allows you to create a new command in the cConfig object that can be easily accessed,
-//  changed, etc.
+// GROUP(group name, group description string) -- Start a new group for configuration
+//  options.  Any group structure will be visable to users.
 //
-// EMP_CONFIG_ALIAS(alias name) -- Include an alias for the previous variable.  This is
-//  particularly useful to maintain backward compatibility if you need to change a
-//  variable name in a new release of software
+// VALUE(value name, type, default value, description string, aliases...) -- Create a new
+//  variable in the config object that can be easily accessed, changed, etc.  Zero or more
+//  aliases may be included, which are particularly useful to maintain backward compatibility.
 //
-// EMP_CONFIG_CONST(variable name, type, fixed value, description string) -- This command
-//  creates a configuration constant that cannot be changed.  In practice, it is used to
-//  allow broader optimizations in the code.
+// CONST(variable name, type, fixed value, description string, aliases...) -- Creates a
+//  configuration constant that cannot be changed (in practice, it is used to allow broader
+//  optimizations in the code.)  As with VALUEs, aliases may be included.
 
-EMP_CONFIG_GROUP(DEFAULT_GROUP, "General Settings")
-EMP_CONFIG_VAR(DEBUG_MODE, bool, false, "Should we output debug information?")
-EMP_CONFIG_VAR(RANDOM_SEED, int, 0, "Random number seed (0 for based on time)")
+EMP_BUILD_CONFIG( MyConfig,
+  GROUP(DEFAULT_GROUP, "General Settings"),
+  VALUE(DEBUG_MODE, bool, false, "Should we output debug information?"),
+  VALUE(RANDOM_SEED, int, 0, "Random number seed (0 for based on time)"),
 
-EMP_CONFIG_GROUP(TEST_GROUP, "These are settings with the sole purpose of testing cConfig.\nFor example, are multi-line descriptions okay?")
-EMP_CONFIG_VAR(TEST_BOOL, bool, false, "This is a bool value.\nAnd what happens\n  ...if we have multiple\n    lines?")
-EMP_CONFIG_VAR(TEST_STRING, std::string, "default", "This is a string!")
-EMP_CONFIG_CONST(TEST_CONST, int, 91, "This is an unchanging const!")
-EMP_CONFIG_VAR(TEST_STRING_SPACE, std::string, "abc def   ghi", "This is a string with spaces.")
-EMP_CONFIG_VAR(MUTATION_RATE, float, 0.025, "This is my mutation rate.")
+  GROUP(TEST_GROUP, "These are settings with the sole purpose of testing cConfig.\nFor example, are multi-line descriptions okay?"),
+  VALUE(TEST_BOOL, bool, false, "This is a bool value.\nWhat happens\n  ...if we have multiple\n    lines?"),
+  VALUE(TEST_STRING, std::string, "default", "This is a string!"),
+  CONST(TEST_CONST, int, 91, "This is an unchanging const!"),
+  VALUE(TEST_STRING_SPACE, std::string, "abc def   ghi", "This is a string with spaces."),
+  VALUE(MUTATION_RATE, float, 0.025, "This is my mutation rate.", MUT_RATE),
+)
