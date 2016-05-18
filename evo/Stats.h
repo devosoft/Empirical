@@ -15,24 +15,22 @@
 #include <vector>
 #include <set>
 #include "../tools/vector.h"
-#include "../tools/BitVector.h"
-
-using BitOrg = emp::BitVector;
+#include "World.h"
 
 namespace emp{
 namespace evo{
 
   //Calculates Shannon Entropy of the members of the container passed
-  template <typename C>
-  double ShannonDiversity(C & elements) {
+  template <typename C, class = typename C::value_type >
+  double ShannonDiversity(C elements) {
 
     //Count number of each value present
     std::map<typename C::value_type, int> counts;
     for (auto element : elements) {
-      if (counts.find(*element) != counts.end()) {
-	       counts[*element]++;
+      if (counts.find(element) != counts.end()) {
+	       counts[element]++;
       } else {
-	       counts[*element] = 1;
+	       counts[element] = 1;
       }
     }
 
@@ -46,41 +44,34 @@ namespace evo{
     return -1 * result;
   }
 
-  double ShannonDiversity(emp::vector<BitOrg *> & elements) {
+  //Calculates Shannon Entropy of the members of a world
+  template <typename ORG, typename... MANAGERS>
+  double ShannonDiversity(emp::evo::World<ORG, MANAGERS...> & elements) {
 
     //Count number of each value present
-    std::map<BitOrg, int> counts;
-    for (auto element : elements) {
-      if (counts.find(*element) != counts.end()) {
-	       counts[*element]++;
-      } else {
-	       counts[*element] = 1;
+    std::map<ORG, int> counts;
+    for (int i=0; i < elements.GetSize(); i++) {
+      if (elements.IsOccupied(i)) {
+        const ORG & element = elements[i];
+        if (counts.find(element) != counts.end()) {
+          counts[element]++;
+        } else {
+          counts[element] = 1;
+        }
       }
     }
 
     //Shannon entropy calculation
     double result = 0;
     for (auto element : counts) {
-      double p = double(element.second)/elements.size();
+      double p = double(element.second)/elements.GetSize();
       result +=  p * log2(p);
     }
 
     return -1 * result;
   }
 
-  template <typename ORG>
-  double MaxFitness(std::function<double(ORG * org)> fit_fun, emp::vector<ORG *> orgs){
-    double fittest = fit_fun(orgs[0]);
-    for (auto org : orgs){
-      double fitness = fit_fun(org);
-      if (fitness > fittest){
-        fittest = fitness;
-      }
-    }
-    return fittest;
-  }
-
-//Calculates number of unique elements in the container passed
+  //Calculates number of unique elements in the container passed
   template <typename C>
   int Richness(C elements) {
     //Converting to a set will remove duplicates leaving only unique values
