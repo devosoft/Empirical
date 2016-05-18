@@ -7,41 +7,28 @@
 
 #include <iostream>
 
-#include "../../evo/NK.h"
+#include "../../evo/NK-const.h"
 #include "../../evo/World.h"
 #include "../../tools/BitSet.h"
-#include "../../tools/command_line.h"
 #include "../../tools/Random.h"
 
-int K = 13;
-int N = 50;
+constexpr int K = 13;
+constexpr int N = 50;
 
-int POP_SIZE = 1000;
-int UD_COUNT = 2000;
+constexpr int POP_SIZE = 1000;
+constexpr int UD_COUNT = 2000;
 
-using BitOrg = emp::BitVector;
+using BitOrg = emp::BitSet<N>;
 
-int main(int argc, char* argv[])
+int main()
 {
-  auto args = emp::cl::ArgManager(argc, argv);
-  args.UseArg("-N", N, "Set the number of bits in each sequence.");
-  args.UseArg("-K", K, "Set the number of extra bits affecting each fitness contribution.");
-  args.UseArg("-pop", POP_SIZE, "Set the population size.");
-  args.UseArg("-ud", UD_COUNT, "Set the number of updates to run.");
-  bool print_help = args.UseFlag("-h", "Print help information.");
-
-  if (print_help) {
-    args.PrintHelp(std::cout);
-    exit(0);
-  }
-
   emp::Random random;
-  emp::evo::NKLandscape landscape(N, K, random);
+  emp::evo::NKLandscapeConst<N,K> landscape(random);
   emp::evo::EAWorld<BitOrg> pop(random);
 
   // Build a random initial population
   for (int i = 0; i < POP_SIZE; i++) {
-    BitOrg next_org(N);
+    BitOrg next_org;
     for (int j = 0; j < N; j++) next_org[j] = random.P(0.5);
     pop.Insert(next_org);
   }
@@ -73,4 +60,6 @@ int main(int argc, char* argv[])
 
 
   std::cout << UD_COUNT << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
+
+  std::cout << sizeof(emp::evo::NKLandscapeConst<N,K>) << std::endl;
 }

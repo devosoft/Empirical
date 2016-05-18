@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../evo/NK.h"
+#include "../../evo/NK-const.h"
 #include "../../evo/World.h"
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
@@ -25,7 +25,7 @@ using STWorld = emp::evo::World<BitOrg, emp::evo::PopulationManager_SerialTransf
 int main()
 {
   emp::Random random;                            // Build a random number generator.
-  emp::evo::NKLandscape<N,K> landscape(random);  // Build the landscape...
+  emp::evo::NKLandscapeConst<N,K> landscape(random);  // Build the landscape...
   STWorld world(random);                         // Build the world...
   world.ConfigPop(MAX_POP_SIZE, MIN_POP_SIZE);   // Setup default population extremes.
 
@@ -49,7 +49,7 @@ int main()
               << std::endl;
 
     // Run a tournament for the rest...
-    world.TournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }
+    world.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
 			 , 5, 1000, false);
   }
 

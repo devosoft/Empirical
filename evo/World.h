@@ -234,15 +234,15 @@ namespace evo {
 
     void DoRepro(int id) {
       emp_assert(random_ptr != nullptr && "DoRepro() requires a random number generator.");
-      std::cout << "Repro " << id << std::endl;
-
+      // std::cout << "Repro " << id << std::endl;
+      before_repro_sig.Trigger(id);
       InsertBirth(*(popM[id]), id, 1);
 
     }
 
     void DoSymbiontRepro(int id) {
       emp_assert(random_ptr != nullptr && "DoSymbiontRepro() requires a random number generator.");
-      std::cout << "SymbRepro " << id << std::endl;
+      // std::cout << "SymbRepro " << id << std::endl;
 
       // @CAO For the moment, assume random replacement (in the future, make pop_manager handle it)
       const int target_id = random_ptr->GetInt((int) popM.size());
@@ -255,6 +255,7 @@ namespace evo {
     // Mutations for the next generation (count number of mutated organisms)
     int MutatePop(std::function<bool(ORG*,emp::Random&)> mut_fun,
                   int first_mut=0, int last_mut=-1) {
+      emp_assert(mut_fun);
       emp_assert(random_ptr != nullptr && "Mutate() requires active random_ptr");
       if (last_mut == -1) last_mut = (int) popM.size();
       int mut_count = 0;
@@ -277,6 +278,7 @@ namespace evo {
     // Elite Selection picks a set of the most fit individuals from the population to move to
     // the next generation.  Find top e_count individuals and make copy_count copies of each.
     void EliteSelect(std::function<double(ORG*)> fit_fun, int e_count=1, int copy_count=1) {
+      emp_assert(fit_fun);
       emp_assert(e_count > 0 && e_count <= (int) popM.size());
 
       // Load the population into a multimap, sorted by fitness.
@@ -304,6 +306,7 @@ namespace evo {
     // number of tournaments to run.
     void TournamentSelect(std::function<double(ORG*)> fit_fun, int t_size,
         int tourny_count=1, bool precalc_fitness=true) {
+      emp_assert(fit_fun);
       emp_assert(t_size > 0 && t_size <= (int) popM.size(), t_size, popM.size());
 
       if (precalc_fitness && t_size * tourny_count * 2 >= (int) popM.size()) {
