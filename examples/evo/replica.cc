@@ -31,8 +31,6 @@ int main()
   emp::evo::NKLandscape landscape(N, K, random);
 
   MixedWorld<BitOrg> mixed_pop(random);
-  emp::evo::GridWorld<BitOrg> grid_pop(random);
-  grid_pop.ConfigPop(WIDTH, POP_SIZE / WIDTH);
 
   // Build a random initial population
   for (int i = 0; i < POP_SIZE; i++) {
@@ -42,15 +40,7 @@ int main()
     // looking at the Insert() func it looks like it does a deep copy, so we should be safe in
     // doing this. Theoretically...
     mixed_pop.Insert(next_org);
-    grid_pop.Insert(next_org);
   }
-
-  grid_pop.SetDefaultMutateFun( [](BitOrg* org, emp::Random& random) {
-      (*org)[random.GetInt(N)] = random.P(0.5);
-      (*org)[random.GetInt(N)] = random.P(0.5);
-      (*org)[random.GetInt(N)] = random.P(0.5);
-      return true;
-    } );
 
   mixed_pop.SetDefaultMutateFun( [](BitOrg* org, emp::Random& random) {
       (*org)[random.GetInt(N)] = random.P(0.5);
@@ -67,7 +57,7 @@ int main()
     // Print current state.
     // for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
     // std::cout << std::endl;
-    std::cout << ud  << " Mixed: " << emp::evo::ShannonDiversity(mixed_pop.popM.pop);
+    std::cout << ud  << "," << emp::evo::ShannonDiversity(mixed_pop.popM.pop) << std::endl;
 
     // Keep the best individual.
     mixed_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1);
@@ -83,7 +73,7 @@ int main()
     // Print current state.
     // for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
     // std::cout << std::endl;
-    std::cout << " \t\tGrid: " << emp::evo::ShannonDiversity(grid_pop.popM.pop) << std::endl;
+    /*std::cout << " \t\tGrid: " << emp::evo::ShannonDiversity(grid_pop.popM.pop) << std::endl;
 
     // Keep the best individual.
     grid_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1);
@@ -94,7 +84,7 @@ int main()
     grid_pop.Update();
     grid_pop.MutatePop();
     
-    /*
+    
     std::cout << "\t\t";
     for (size_t i = 0; i < POP_SIZE; i++) {
         std::cout << mixed_pop[i] << " ";
@@ -108,10 +98,4 @@ int main()
 
   }
 
-  // output 
-  std::cout << UD_COUNT << " : " << mixed_pop[0] << " : ";
-  std::cout << landscape.GetFitness(mixed_pop[0]) << std::endl;
-
-  std::cout << UD_COUNT << " : " << grid_pop[0] << " : ";
-  std::cout << landscape.GetFitness(grid_pop[0]) << std::endl;
 }
