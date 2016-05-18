@@ -15,13 +15,13 @@
 #include <vector>
 #include <set>
 #include "../tools/vector.h"
-
+#include "World.h"
 
 namespace emp{
 namespace evo{
 
   //Calculates Shannon Entropy of the members of the container passed
-  template <typename C>
+  template <typename C, class = typename C::value_type >
   double ShannonDiversity(C elements) {
 
     //Count number of each value present
@@ -38,6 +38,33 @@ namespace evo{
     double result = 0;
     for (auto element : counts) {
       double p = double(element.second)/elements.size();
+      result +=  p * log2(p);
+    }
+
+    return -1 * result;
+  }
+
+  //Calculates Shannon Entropy of the members of a world
+  template <typename ORG, typename... MANAGERS>
+  double ShannonDiversity(emp::evo::World<ORG, MANAGERS...> & elements) {
+
+    //Count number of each value present
+    std::map<ORG, int> counts;
+    for (int i=0; i < elements.GetSize(); i++) {
+      if (elements.IsOccupied(i)) {
+        const ORG & element = elements[i];
+        if (counts.find(element) != counts.end()) {
+          counts[element]++;
+        } else {
+          counts[element] = 1;
+        }
+      }
+    }
+
+    //Shannon entropy calculation
+    double result = 0;
+    for (auto element : counts) {
+      double p = double(element.second)/elements.GetSize();
       result +=  p * log2(p);
     }
 
