@@ -217,12 +217,12 @@ namespace emp {
 
       void WriteMacros(std::ostream & out) {
         // Print header information to register group.
-        out << "EMP_CONFIG_GROUP(" << m_name << ", \"" << m_desc << "\")" << std::endl;
+        out << "  GROUP(" << m_name << ", \"" << m_desc << "\")" << std::endl;
 
         // Loop through once to figure out non-comment output
         for (ConfigEntry * cur_entry : entry_set) {
-          if (cur_entry->IsConst()) { out << "EMP_CONFIG_CONST("; }
-          else { out << "EMP_CONFIG_VAR("; }
+          if (cur_entry->IsConst()) { out << "    CONST("; }
+          else { out << "    VALUE("; }
 
           out << cur_entry->GetName() << ", "
               << cur_entry->GetType() << ", "
@@ -233,7 +233,7 @@ namespace emp {
           // Output aliases.
           const std::unordered_set<std::string> & alias_set = cur_entry->GetAliases();
           for (const std::string & cur_alias : alias_set) {
-            out << "EMP_CONFIG_ALIAS(" << cur_alias << ")" << std::endl;
+            out << "      ALIAS(" << cur_alias << ")" << std::endl;
           }
         }
 
@@ -241,7 +241,8 @@ namespace emp {
       }
     };
 
-    // Private member variables
+    // === Protected member variables ===
+    emp::vector<std::string> class_names;           // Names in class heiarchy.
     std::map<std::string, ConfigEntry *> m_var_map; // All variables across groups.
     std::string m_version_id;                       // Unique version ID to ensure synced config.
     emp::vector<ConfigGroup *> m_group_set;         // All of the config groups.
@@ -261,6 +262,7 @@ namespace emp {
       : m_version_id(in_version)
       , m_delay_warnings(0)
     {
+      class_names.push_back("emp::Config");
     }
 
     ~Config() {
@@ -325,31 +327,33 @@ namespace emp {
     void WriteMacros(std::ostream & out) {
       out << "/////////////////////////////////////////////////////////////////////////////////\n"
           << "//  This is an auto-generated file that defines a set of configuration options.\n"
-          << "//  This file is read in mulitple times from config.h, each with different macro\n"
-          << "//  definitions to generate correct, effecient code for the command below.\n"
           << "//\n"
           << "//  The available commands are:\n"
           << "//\n"
-          << "//  EMP_CONFIG_GROUP(group name, group description string)\n"
+          << "//  GROUP(group name, group description string)\n"
           << "//   Start a new group of configuration options.  Group structure is preserved\n"
           << "//   when user-accessible configuration options are generated.\n"
           << "//\n"
-          << "//  EMP_CONFIG_VAR(variable name, type, default value, description string)\n"
+          << "//  VALUE(variable name, type, default value, description string)\n"
           << "//   Create a new setting in the emp::Config object that can be easily accessed.\n"
           << "//\n"
-          << "//  EMP_CONFIG_ALIAS(alias name)\n"
-          << "//   Include an alias for the previous setting.  This command is useful to\n"
-          << "//   maintain backward compatibility if names change in newer software versions.\n"
-          << "//\n"
-          << "//  EMP_CONFIG_CONST(variable name, type, fixed value, description string)\n"
+          << "//  CONST(variable name, type, fixed value, description string)\n"
           << "//   Create a new configuration constant that cannot be changed.  In practice,\n"
           << "//   allows broader optimizations in the code.\n"
+          << "//\n"
+          << "//  ALIAS(alias name)\n"
+          << "//   Include an alias for the previous setting.  This command is useful to\n"
+          << "//   maintain backward compatibility if names change in newer software versions.\n"
+          << "\n"
+          << "EMP_BUILD_CONFIG(" << class_names.back()
           << std::endl;
 
       // Next print each group and it's information.
       for (auto it = m_group_set.begin(); it != m_group_set.end(); it++) {
         (*it)->WriteMacros(out);
       }
+
+      out << ")" << std::endl;
     }
 
     // If a string is passed into Write, treat it as a filename.
@@ -542,9 +546,10 @@ namespace emp {
     EMP_WRAP_EACH(EMP_CONFIG__DECLARE, __VA_ARGS__)              \
     bool is_ ## CLASS_NAME;                                      \
   public:                                                        \
-    CLASS_NAME() : is_ ## CLASS_NAME(true)                        \
+    CLASS_NAME() : is_ ## CLASS_NAME(true)                       \
     EMP_WRAP_EACH(EMP_CONFIG__CONSTRUCT, __VA_ARGS__)            \
     {                                                            \
+      class_names.push_back(#CLASS_NAME);                        \
       EMP_WRAP_EACH(EMP_CONFIG__INIT, __VA_ARGS__)               \
     }                                                            \
     EMP_WRAP_EACH(EMP_CONFIG__ACCESS, __VA_ARGS__)               \
