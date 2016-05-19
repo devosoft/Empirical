@@ -305,7 +305,9 @@ namespace evo {
       // Load the population into a multimap, sorted by fitness.
       std::multimap<double, int> fit_map;
       for (int i = 0; i < (int) popM.size(); i++) {
-        fit_map.insert( std::make_pair(fit_fun(popM[i]), i) );
+        if (IsOccupied(i)){
+          fit_map.insert( std::make_pair(fit_fun(popM[i]), i) );
+        }
       }
 
       // Grab the top fitnesses and move them into the next generation.
