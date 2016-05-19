@@ -241,6 +241,14 @@ namespace emp {
       }
     };
 
+    // === Helper Functions ===
+    ConfigGroup * GetActiveGroup() {
+      if (m_group_set.size() == 0) {
+        m_group_set.push_back(new ConfigGroup("DEFAULT", "Default settings group"));
+      }
+      return m_group_set.back();
+    }
+
     // === Protected member variables ===
     emp::vector<std::string> class_names;           // Names in class heiarchy.
     std::map<std::string, ConfigEntry *> m_var_map; // All variables across groups.
@@ -290,7 +298,7 @@ namespace emp {
         // This setting is not currently in the map!  We should put it in, but let user know.
         m_warnings << "Unknown setting '" << setting_name << "'.  Creating." << std::endl;
         m_var_map[setting_name] = new ConfigLiveEntry(setting_name, "std::string", new_value, in_desc);
-        m_group_set.back()->Add(m_var_map[setting_name]);
+        GetActiveGroup()->Add(m_var_map[setting_name]);
       }
       m_var_map[setting_name]->SetValue(new_value, m_warnings);
       if (!m_delay_warnings && m_warnings.rdbuf()->in_avail()) {
@@ -328,7 +336,13 @@ namespace emp {
       out << "/////////////////////////////////////////////////////////////////////////////////\n"
           << "//  This is an auto-generated file that defines a set of configuration options.\n"
           << "//\n"
-          << "//  The available commands are:\n"
+          << "//  To create a new config from scratch, the format is:\n"
+          << "//    EMP_BUILD_CONFIG( CLASS_NAME, OPTIONS... )\n"
+          << "//\n"
+          << "//  To extend an existing config, simply use:\n"
+          << "//    EMP_EXTEND_CONFIG( NEW_NAME, BASE_CLASS, OPTIONS... )\n"
+          << "//\n"
+          << "//  The available OPTIONS are:\n"
           << "//\n"
           << "//  GROUP(group name, group description string)\n"
           << "//   Start a new group of configuration options.  Group structure is preserved\n"
@@ -512,10 +526,10 @@ namespace emp {
 #define EMP_CONFIG__INIT(CMD) EMP_CONFIG__INIT_ ## CMD
 #define EMP_CONFIG__INIT_VALUE(NAME, TYPE, DEFAULT, DESC)                               \
   m_var_map[#NAME] = new tConfigEntry<TYPE>(#NAME, #TYPE, #DEFAULT, DESC, m_ ## NAME);  \
-  m_group_set.back()->Add(m_var_map[#NAME]);
+  GetActiveGroup()->Add(m_var_map[#NAME]);
 #define EMP_CONFIG__INIT_CONST(NAME, TYPE, VALUE, DESC)                                 \
   m_var_map[#NAME] = new tConfigConstEntry<TYPE>(#NAME, #TYPE, #VALUE, DESC, VALUE);    \
-  m_group_set.back()->Add(m_var_map[#NAME]);
+  GetActiveGroup()->Add(m_var_map[#NAME]);
 #define EMP_CONFIG__INIT_GROUP(NAME, DESC)                                              \
   m_group_set.push_back(new ConfigGroup(#NAME, DESC));
 #define EMP_CONFIG__INIT_
@@ -543,8 +557,8 @@ namespace emp {
 #define EMP_EXTEND_CONFIG(CLASS_NAME, BASE_NAME, ...)            \
   class CLASS_NAME : public BASE_NAME {                          \
   protected:                                                     \
-    EMP_WRAP_EACH(EMP_CONFIG__DECLARE, __VA_ARGS__)              \
     bool is_ ## CLASS_NAME;                                      \
+    EMP_WRAP_EACH(EMP_CONFIG__DECLARE, __VA_ARGS__)              \
   public:                                                        \
     CLASS_NAME() : is_ ## CLASS_NAME(true)                       \
     EMP_WRAP_EACH(EMP_CONFIG__CONSTRUCT, __VA_ARGS__)            \
