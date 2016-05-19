@@ -40,6 +40,9 @@ NK: NK.cc ../../evo/NK.h $(EVO_DEPEND)
 replica: replica.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) replica.cc -o replica
 
+fast-replica: replica.cc ../../evo/NK.h $(EVO_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 replica.cc -o replica
+
 NK-const: NK-const.cc ../../evo/NK-const.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) NK-const.cc -o NK-const
 

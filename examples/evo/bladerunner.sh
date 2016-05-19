@@ -13,9 +13,18 @@ fi
 prefix=""
 prefix+="$1"
 
-for ((i=0; i<"$2"; i++))
-do
+confname=${prefix}
+confname+=".config"
+
+head -n 24 ./replica.cc | tail -n 8 > runs/${confname}
+
+for ((i=0; i<"$2"; i++)); do
     fname=${prefix}
     fname+="$i"
-    ./replica > runs/${fname}
+    
+    while [[($(jobs -rp | wc -l) > 2)]]; do
+        sleep 1
+    done
+    echo "Launching ${fname}"
+    ./replica > runs/${fname} && echo -e "\tDone with ${fname}" &
 done

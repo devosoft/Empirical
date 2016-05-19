@@ -15,24 +15,25 @@
 
 // k controls # of hills in the fitness landscape
 constexpr int K = 0;
-constexpr int N = 100;
-constexpr int WIDTH = 2;
+constexpr int N = 300;
+constexpr double MUTATION_RATE = 0.005;
 
-constexpr int TOURNAMENT_SIZE = 10;
-constexpr int POP_SIZE = 10;
-constexpr int UD_COUNT = 2000;
+constexpr int TOURNAMENT_SIZE = 20;
+constexpr int POP_SIZE = 200;
+constexpr int UD_COUNT = 1000;
 
 using BitOrg = emp::BitVector;
 
-template <typename ORG, typename... MANAGERS>
-using MixedWorld = emp::evo::World<ORG, MANAGERS..., emp::evo::PopulationManager_Base<ORG>>;
+//template <typename ORG, typename... MANAGERS>
+//using MixedWorld = emp::evo::World<ORG, MANAGERS..., emp::evo::PopulationManager_Base<ORG>>;
 
 int main()
 {
   emp::Random random;
   emp::evo::NKLandscape landscape(N, K, random);
 
-  MixedWorld<BitOrg> mixed_pop(random);
+  //MixedWorld<BitOrg> mixed_pop(random);
+  emp::evo::EAWorld<BitOrg> mixed_pop(random);
 
   std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return landscape.GetFitness(*org);};
 
@@ -46,28 +47,24 @@ int main()
     mixed_pop.Insert(next_org);
   }
 
+  // mutation function:
+  // for every site in the gnome there is a MUTATION_RATE chance that the 
+  // site will flip it's value.
   mixed_pop.SetDefaultMutateFun( [](BitOrg* org, emp::Random& random) {
-      (*org)[random.GetInt(N)] = random.P(0.5);
-      //(*org)[random.GetInt(N)] = random.P(0.5);
-      //(*org)[random.GetInt(N)] = random.P(0.5);
+      
+      for (size_t site = 0; site < N; site++) {
+        if (random.P(MUTATION_RATE)) {(*org)[site] = !(*org)[site];}
+      }
       return true;
     } );
 
   // Loop through updates
-  std::cout << "Update,ShannonDiversity,MaxFitness" << std::endl;
+  std::cout << "Update,ShannonDiversity,MaxFitness,AvgFitness" << std::endl;
   for (int ud = 0; ud < UD_COUNT; ud++) {
 
-    // output allll of the population
-    //std::cerr << "Update " << ud << std::endl;
-    //for (int i = 0; i < POP_SIZE; i++) {std::cerr << "\t" << mixed_pop[i] << std::endl;}
-
-    // handle tick for mixed_world
-      
-    // Print current state.
-    // for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
-    // std::cout << std::endl;
     std::cout << ud  << "," << emp::evo::ShannonDiversity(mixed_pop);
-    std::cout << "," << emp::evo::MaxFitness(fit_func, mixed_pop.popM.pop) << std::endl;
+    std::cout << "," << emp::evo::MaxFitness(fit_func, mixed_pop);
+    std::cout << "," << emp::evo::AverageFitness(fit_func, mixed_pop) << std::endl;
 
     // Keep the best individual.
     mixed_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1);

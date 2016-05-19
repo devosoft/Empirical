@@ -102,6 +102,17 @@ namespace evo{
     return fittest;
   }
 
+template <typename ORG, typename... MANAGERS>
+  double AverageFitness(std::function<double(ORG * org)> fit_fun, World<ORG, MANAGERS...> & orgs){
+    double cumulative_fitness = 0;
+    double num_orgs = 0;
+    for (auto org : orgs){
+        ++num_orgs;
+        cumulative_fitness += fit_fun(&org);
+    }
+    return (cumulative_fitness / num_orgs);
+  }
+
 }
 }
 
