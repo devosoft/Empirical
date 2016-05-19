@@ -1,7 +1,11 @@
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+
 #include <iostream>
 
+#include "../../config/command_line.h"
 #include "../../tools/assert.h"
-#include "../../tools/command_line.h"
 #include "../../tools/Graph.h"
 #include "../../tools/graph_utils.h"
 #include "../../tools/string_utils.h"
@@ -47,7 +51,7 @@ int main(int argc, char* argv[])
   emp::Graph graph;
   emp::Random random;
   std::string filename;
-  
+
   if (graph_type == 0) {
     std::cout << "Generating a Random Graph." << std::endl;
     int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
@@ -105,10 +109,10 @@ int main(int argc, char* argv[])
     std::cout << "Unknown Graph type '" << graph_type << "'. Aborting." << std::endl;
     return 0;
   }
-  
-  
+
+
   std::ofstream of(filename);
   graph.PrintSym(of);
-  
+
   std::cout << "Printed to file '" << filename << "'." << std::endl;
 }

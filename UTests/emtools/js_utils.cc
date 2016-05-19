@@ -1,16 +1,16 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
 
 #include <emscripten.h>
 #include <string>
 #include <array>
 
+#include "../../config/command_line.h"
 #include "../../emtools/init.h"
 #include "../../emtools/JSWrap.h"
 #include "../../emtools/js_utils.h"
 #include "../../tools/unit_tests.h"
-#include "../../tools/command_line.h"
 #include "../../tools/assert.h"
 
 struct JSDataObject;
@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
   std::array<std::array<std::array<int, 2>, 1>, 5> horrible_array = {{{{0,0}}, {{0,10}}, {{10,10}}, {{20,20}}, {{30, 30}}}};
 
   std::array<std::array<JSDataObject, 2>, 2> test_data_4 = {{{test_obj_1, test_obj_2}, {test_obj_2, test_obj_2}}};
-  
+
 
   emp::pass_array_to_javascript(test_data);
   EMP_TEST_VALUE(
@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
   EMP_TEST_VALUE(test_arr_2[0], "5.2");
   EMP_TEST_VALUE(test_arr_2[1], "1.5");
   EMP_TEST_VALUE(test_arr_2[2], "3.1");
- 
+
   //Test doubles
   EM_ASM({emp.__outgoing_array = [5.2, 1.5, 3.1]});
   std::array<double, 3> test_arr_3;
@@ -91,7 +91,7 @@ int main(int argc, char* argv[]) {
   EMP_TEST_VALUE(test_arr_3[0], "5.2");
   EMP_TEST_VALUE(test_arr_3[1], "1.5");
   EMP_TEST_VALUE(test_arr_3[2], "3.1");
-  
+
   //Test chars
   EM_ASM({emp.__outgoing_array = ["h", "i", "!"]});
   std::array<char, 3> test_arr_4;
@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
   EMP_TEST_VALUE(test_arr_4[0], "h");
   EMP_TEST_VALUE(test_arr_4[1], "i");
   EMP_TEST_VALUE(test_arr_4[2], "!");
- 
+
   //Test std::strings
   EM_ASM({emp.__outgoing_array = ["jello", "world", "!!"]});
   std::array<std::string, 3> test_arr_5;

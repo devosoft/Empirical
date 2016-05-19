@@ -24,13 +24,11 @@
 //    * Add has_flag() and use_flag() functions to more gracefully handle flags.
 //      For example, if -a and -b are legal flags, -ab should trigger both of them.
 //
-//    * Add find_arg() to return the position of an argument (and -1 if not found?)
+//    * Process arguments from left-to right, rather than out of order?
 //
-//    * std::string get_arg_value(std::vector<std::string> & args,
-//                                const std::string & pattern,
-//                                std::string default_val="")
-//       - Same as has_arg(), but returns the NEXT string as the value of the argument.
-
+//    * Identify errors if arguments to a flag begin with a '-' and should be a
+//      flag themselves?  Or, more generally, recognize if an argument is clearly
+//      the wrong type (e.g., a string where and int was expected)
 
 #ifndef EMP_COMMAND_LINE_H
 #define EMP_COMMAND_LINE_H
