@@ -284,17 +284,12 @@ namespace evo {
     //Helper function to return PopulationManager indices of
     //all organisms that are not null
     emp::vector<int> GetValidOrgIndices(){
-      int count = 0;
-      emp::vector<int> valid_orgs;
-      valid_orgs.resize(popM.size());
-      for (int i = 0; i < popM.size(); ++i){
+      emp::vector<int> valid_orgs(0);
+      for (int i = 0; i < popM.size(); i++){
         if (this->IsOccupied(i)){
           valid_orgs.push_back(i);
-          count++;
         }
       }
-
-      valid_orgs.resize(count);
       return valid_orgs;
     }
 
