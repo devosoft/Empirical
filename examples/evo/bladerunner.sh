@@ -16,11 +16,18 @@ prefix+="$1"
 confname=${prefix}
 confname+=".config"
 
-echo "Making fast-replica..."
-make fast-replica > /dev/null
 
+# do setup
+echo "Making fast-replica..."
+make fast-replica &> /dev/null
+
+echo "Updating list of runs..."
+echo "${prefix}" >> runs/names
+
+# grab config
 head -n 24 ./replica.cc | tail -n 8 > runs/${confname}
 
+# launch the specified number of threads
 for ((i=0; i<"$2"; i++)); do
     fname=${prefix}
     fname+="$i"
@@ -32,6 +39,7 @@ for ((i=0; i<"$2"; i++)); do
     ./replica > runs/${fname} && echo -e "\tDone with ${fname}" &
 done
 
+# wait for threads to join
 for job in `jobs -p`
 do
     wait $job

@@ -18,9 +18,9 @@ constexpr int K = 0;
 constexpr int N = 400;
 constexpr double MUTATION_RATE = 0.005;
 
-constexpr int TOURNAMENT_SIZE = 20;
-constexpr int POP_SIZE = 800;
-constexpr int UD_COUNT = 2000;
+constexpr int TOURNAMENT_SIZE = 200;
+constexpr int POP_SIZE = 200;
+constexpr int UD_COUNT = 1000;
 
 using BitOrg = emp::BitVector;
 
@@ -32,7 +32,7 @@ int main()
   emp::Random random;
   emp::evo::NKLandscape landscape(N, K, random);
 
-  //MixedWorld<BitOrg> mixed_pop(random);
+//  MixedWorld<BitOrg> mixed_pop(random);
   emp::evo::EAWorld<BitOrg> mixed_pop(random);
 
   std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return landscape.GetFitness(*org);};
@@ -51,11 +51,15 @@ int main()
   // for every site in the gnome there is a MUTATION_RATE chance that the 
   // site will flip it's value.
   mixed_pop.SetDefaultMutateFun( [](BitOrg* org, emp::Random& random) {
-      
+    bool mutated = false;    
       for (size_t site = 0; site < N; site++) {
-        if (random.P(MUTATION_RATE)) {(*org)[site] = !(*org)[site];}
+        if (random.P(MUTATION_RATE)) {
+          (*org)[site] = !(*org)[site];
+          mutated = true;
+//          std::cerr << "ZergRush" << std::endl;
+        }
       }
-      return true;
+      return mutated;
     } );
 
   // Loop through updates
@@ -67,11 +71,11 @@ int main()
     std::cout << "," << emp::evo::AverageFitness(fit_func, mixed_pop) << std::endl;
 
     // Keep the best individual.
-    mixed_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1);
+    //    mixed_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 5, 10);
 
     // Run a tournament for the rest...
     mixed_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
-			 , TOURNAMENT_SIZE, POP_SIZE-1);
+			 , TOURNAMENT_SIZE, POP_SIZE);
     
     mixed_pop.Update();
     mixed_pop.MutatePop();
