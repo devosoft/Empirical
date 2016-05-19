@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../evo/NK.h"
+#include "../../evo/NK-const.h"
 #include "../../evo/World.h"
 #include "../../evo/OEE.h"
 #include "../../tools/BitSet.h"
@@ -26,7 +26,7 @@ int main()
 {
   std::cout << "N: " << N << ", K: " << K << ", POP_SIZE: " << POP_SIZE << ", Selection: " << "Standard_tournament" << ", TournamentSize: " << TOURNAMENT_SIZE << std::endl;
   emp::Random random;
-  emp::evo::NKLandscape<N,K> landscape(random);
+  emp::evo::NKLandscapeConst<N,K> landscape(random);
   emp::evo::World<BitOrg> pop(random);
   emp::evo::OEEStatsManager<BitOrg, N> oee_stats(&pop);
 
@@ -45,8 +45,8 @@ int main()
     } );
 
 
-pop.SetDefaultFitnessFun([landscape](BitOrg * org){ return landscape.GetFitness(*org); });
-oee_stats.fit_fun = [landscape](BitOrg * org){ return landscape.GetFitness(*org); };
+pop.SetDefaultFitnessFun([&landscape](BitOrg * org){ return landscape.GetFitness(*org); });
+oee_stats.fit_fun = [&landscape](BitOrg * org){ return landscape.GetFitness(*org); };
 
   // Loop through updates
   for (int ud = 0; ud < UD_COUNT+1; ud++) {
@@ -56,7 +56,7 @@ oee_stats.fit_fun = [landscape](BitOrg * org){ return landscape.GetFitness(*org)
     //std::cout << ud << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 
     // Run a tournament for the rest...
-    pop.TournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }
+    pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
     , TOURNAMENT_SIZE, POP_SIZE);
     //pop.FitnessSharingTournamentSelect([landscape](BitOrg * org){ return landscape.GetFitness(*org); }, [](BitOrg* org1, BitOrg* org2){ return (double)(org1->XOR(*org2)).CountOnes();}, 10, 1, TOURNAMENT_SIZE, POP_SIZE);
     pop.Update();
