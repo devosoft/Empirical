@@ -277,6 +277,23 @@ namespace evo {
       popM.Print(os, empty, spacer);
     }
 
+    //Helper function to return PopulationManager indices of
+    //all organisms that are not null
+    emp::vector<int> GetValidOrgIndices(){
+      int count = 0;
+      emp::vector<int> valid_orgs;
+      valid_orgs.resize(popM.size());
+      for (int i = 0; i < popM.size(); ++i){
+        if (this->IsOccupied(i)){
+          valid_orgs.push_back(i);
+          count++;
+        }
+      }
+
+      valid_orgs.resize(count);
+      return valid_orgs;
+    }
+
     // Selection mechanisms choose organisms for the next generation.
 
     // Elite Selection picks a set of the most fit individuals from the population to move to
@@ -331,14 +348,17 @@ namespace evo {
     // Helper function to run a tournament when fitness is pre-calculated
     void RunTournament(const emp::vector<double> & fitness, int t_size, int tourny_count=1){
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
+
+      emp::vector<int> valid_orgs = GetValidOrgIndices();
+
       for (int T = 0; T < tourny_count; T++) {
-        emp::vector<int> entries = Choose(*random_ptr, popM.size(), t_size);
-        double best_fit = fitness[entries[0]];
+        emp::vector<int> entries = Choose(*random_ptr, valid_orgs.size(), t_size);
+        double best_fit = fitness[valid_orgs[entries[0]]];
         int best_id = entries[0];
 
         // Search for a higher fit org in the tournament.
         for (int i = 1; i < t_size; i++) {
-          const double cur_fit = fitness[entries[i]];
+          const double cur_fit = fitness[valid_orgs[entries[i]]];
           if (cur_fit > best_fit) {
             best_fit = cur_fit;
             best_id = entries[i];
@@ -353,14 +373,19 @@ namespace evo {
     // Helper function to run a tournament when fitness is NOT pre-calculated
     void RunTournament(std::function<double(ORG*)> fit_fun, int t_size, int tourny_count=1){
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
+
+      //This technique for avoiding null orgs can probably be improved
+      //once org managers are handling that
+      emp::vector<int> valid_orgs = GetValidOrgIndices();
+
       for (int T = 0; T < tourny_count; T++) {
-        emp::vector<int> entries = Choose(*random_ptr, popM.size(), t_size);
-        double best_fit = fit_fun(popM[entries[0]]);
+        emp::vector<int> entries = Choose(*random_ptr, valid_orgs.size(), t_size);
+        double best_fit = fit_fun(popM[valid_orgs[entries[0]]]);
         int best_id = entries[0];
 
         // Search for a higher fit org in the tournament.
         for (int i = 1; i < t_size; i++) {
-          const double cur_fit = fit_fun(popM[entries[i]]);
+          const double cur_fit = fit_fun(popM[valid_orgs[entries[i]]]);
           if (cur_fit > best_fit) {
             best_fit = cur_fit;
             best_id = entries[i];
