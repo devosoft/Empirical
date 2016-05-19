@@ -14,10 +14,10 @@
 #include "../../tools/Random.h"
 
 constexpr int K = 3;
-constexpr int N = 20;
+constexpr int N = 10;
 
-constexpr int POP_SIZE = 200;
-constexpr int UD_COUNT = 5000;
+constexpr int POP_SIZE = 20;
+constexpr int UD_COUNT = 500;
 constexpr int TOURNAMENT_SIZE = 15;
 
 using BitOrg = emp::BitSet<N>;
@@ -29,6 +29,8 @@ int main()
   emp::evo::NKLandscapeConst<N,K> landscape(random);
   emp::evo::World<BitOrg> pop(random);
   emp::evo::OEEStatsManager<BitOrg, N> oee_stats(&pop);
+  emp::evo::LineageTracker<BitOrg> lineage(&pop);
+  oee_stats.lineage = &lineage;
 
   // Build a random initial population
   for (int i = 0; i < POP_SIZE; i++) {
