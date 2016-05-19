@@ -15,12 +15,12 @@
 
 // k controls # of hills in the fitness landscape
 constexpr int K = 0;
-constexpr int N = 300;
+constexpr int N = 400;
 constexpr double MUTATION_RATE = 0.005;
 
 constexpr int TOURNAMENT_SIZE = 20;
-constexpr int POP_SIZE = 200;
-constexpr int UD_COUNT = 1000;
+constexpr int POP_SIZE = 800;
+constexpr int UD_COUNT = 2000;
 
 using BitOrg = emp::BitVector;
 

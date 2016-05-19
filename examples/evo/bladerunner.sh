@@ -16,6 +16,9 @@ prefix+="$1"
 confname=${prefix}
 confname+=".config"
 
+echo "Making fast-replica..."
+make fast-replica > /dev/null
+
 head -n 24 ./replica.cc | tail -n 8 > runs/${confname}
 
 for ((i=0; i<"$2"; i++)); do
@@ -27,4 +30,9 @@ for ((i=0; i<"$2"; i++)); do
     done
     echo "Launching ${fname}"
     ./replica > runs/${fname} && echo -e "\tDone with ${fname}" &
+done
+
+for job in `jobs -p`
+do
+    wait $job
 done
