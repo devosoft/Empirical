@@ -41,11 +41,11 @@
 #include <string>
 #include <sstream>
 #include <unordered_set>
-#include <vector>
 
 #include "../tools/errors.h"
 #include "../tools/functions.h"
 #include "../tools/string_utils.h"
+#include "../tools/vector.h"
 #include "ConfigManager.h"
 
 using namespace std::placeholders;
@@ -54,7 +54,7 @@ namespace emp {
 
   // Master configuration class.
   class Config {
-  private:
+  protected:
     class ConfigEntry {
     protected:
       std::string name;
@@ -93,7 +93,7 @@ namespace emp {
 
     // We need type-specific versions on this class to manage variables
     template <class VAR_TYPE> class tConfigEntry : public ConfigEntry {
-    private:
+    protected:
       VAR_TYPE & entry_ref;
     public:
       tConfigEntry(const std::string _name, const std::string _type,
@@ -113,7 +113,7 @@ namespace emp {
 
     // We need a special entry type to represent constant values.
     template <class VAR_TYPE> class tConfigConstEntry : public ConfigEntry {
-    private:
+    protected:
       const VAR_TYPE literal_val;
     public:
       tConfigConstEntry(const std::string _name, const std::string _type,
@@ -156,10 +156,10 @@ namespace emp {
 
     // Entrys should be divided into groups
     class ConfigGroup {
-    private:
+    protected:
       std::string m_name;
       std::string m_desc;
-      std::vector<ConfigEntry *> entry_set;
+      emp::vector<ConfigEntry *> entry_set;
     public:
       ConfigGroup(const std::string & _name, const std::string & _desc)
         : m_name(_name), m_desc(_desc)
@@ -176,7 +176,7 @@ namespace emp {
         // Print header information with the group name.
         out << "### " << m_name << " ###" << std::endl;
         // Print group description.
-        std::vector<std::string> desc_lines;
+        emp::vector<std::string> desc_lines;
         slice_string(m_desc, desc_lines);
         for (int comment_line = 0; comment_line < (int) desc_lines.size(); comment_line++) {
           out << "# " << desc_lines[comment_line] << std::endl;
@@ -184,7 +184,7 @@ namespace emp {
         out << std::endl;
 
         const int entry_count = entry_set.size();
-        std::vector<std::string> setting_info(entry_count);
+        emp::vector<std::string> setting_info(entry_count);
         int max_length = 0;
 
         // Loop through once to figure out non-comment output
@@ -201,7 +201,7 @@ namespace emp {
           out << setting_info[i];
 
           // Break the description up over multiple lines.
-          std::vector<std::string> desc_lines;
+          emp::vector<std::string> desc_lines;
           emp::slice_string(entry_set[i]->GetDescription(), desc_lines);
 
           int start_col = (int) setting_info[i].size();
@@ -244,7 +244,7 @@ namespace emp {
     // Private member variables
     std::map<std::string, ConfigEntry *> m_var_map; // All variables across groups.
     std::string m_version_id;                       // Unique version ID to ensure synced config.
-    std::vector<ConfigGroup *> m_group_set;         // All of the config groups.
+    emp::vector<ConfigGroup *> m_group_set;         // All of the config groups.
     std::stringstream m_warnings;                   // Aggrigate warnings for combined display.
     int m_delay_warnings;                           // Count of delays to collect warnings for printing.
 
@@ -256,28 +256,11 @@ namespace emp {
     std::map<std::string, std::function<bool(std::string)> > m_new_map;
     std::map<std::string, std::function<bool(std::string)> > m_use_map;
 
-    // Place all of the config private member variables here.
-#define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC) TYPE m_ ## NAME;
-#include "config_include.h"
-
   public:
     Config(const std::string & in_version = "")
       : m_version_id(in_version)
       , m_delay_warnings(0)
-        // Setup inital values for all variables.
-#define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC) , m_ ## NAME(DEFAULT)
-#include "config_include.h"
     {
-      // Build a map to information about each variable.
-#define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC)                                          \
-      m_var_map[#NAME] = new tConfigEntry<TYPE>(#NAME, #TYPE, #DEFAULT, DESC, m_ ## NAME); \
-      m_group_set.back()->Add(m_var_map[#NAME]);
-#define EMP_CONFIG_CONST(NAME, TYPE, VALUE, DESC)                                          \
-      m_var_map[#NAME] = new tConfigConstEntry<TYPE>(#NAME, #TYPE, #VALUE, DESC, VALUE); \
-      m_group_set.back()->Add(m_var_map[#NAME]);
-#define EMP_CONFIG_GROUP(NAME, DESC) \
-      m_group_set.push_back(new ConfigGroup(#NAME, DESC));
-#include "config_include.h"
     }
 
     ~Config() {
@@ -502,23 +485,69 @@ namespace emp {
 
     }
 
-    // Build Get and Set Accessors, as well as const check
-#define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC)                       \
-    inline const TYPE & NAME() const { return m_ ## NAME; }             \
-    const TYPE & NAME(const TYPE & _in) { m_ ## NAME = _in; return m_ ## NAME; } \
-    bool NAME ## _is_const() const { return false; }
-#define EMP_CONFIG_CONST(NAME, TYPE, VALUE, DESC)                       \
-    constexpr static TYPE NAME() { return VALUE; }                      \
-    TYPE NAME(const TYPE & _in) {                                       \
-      std::stringstream ss;                                             \
-      ss << "Trying to set const '" << #NAME << "'. Ignoring." << std::endl; \
-      emp::NotifyWarning(ss.str());                                     \
-      return VALUE;                                                     \
-    }                                                                   \
-    bool NAME ## _is_const() const { return true; }
-#include "config_include.h"
-
   };
-};
+
+}
+
+// Macros to handle declaration of protected member variables.
+// Note, unneeded macros defined to nothing, as is extra ending in '_' to allow trailing comma.
+#define EMP_CONFIG__DECLARE(CMD) EMP_CONFIG__DECLARE_ ## CMD
+#define EMP_CONFIG__DECLARE_VALUE(NAME, TYPE, DEFAULT, DESC) TYPE m_ ## NAME;
+#define EMP_CONFIG__DECLARE_CONST(NAME, TYPE, DEFAULT, DESC)
+#define EMP_CONFIG__DECLARE_GROUP(NAME, DESC)
+#define EMP_CONFIG__DECLARE_
+
+// Macros to handle construction of vars.
+#define EMP_CONFIG__CONSTRUCT(CMD) EMP_CONFIG__CONSTRUCT_ ## CMD
+#define EMP_CONFIG__CONSTRUCT_VALUE(NAME, TYPE, DEFAULT, DESC) , m_ ## NAME(DEFAULT)
+#define EMP_CONFIG__CONSTRUCT_CONST(NAME, TYPE, DEFAULT, DESC)
+#define EMP_CONFIG__CONSTRUCT_GROUP(NAME, DESC)
+#define EMP_CONFIG__CONSTRUCT_
+
+// Macros to initialize internal representation of variables.
+#define EMP_CONFIG__INIT(CMD) EMP_CONFIG__INIT_ ## CMD
+#define EMP_CONFIG__INIT_VALUE(NAME, TYPE, DEFAULT, DESC)                               \
+  m_var_map[#NAME] = new tConfigEntry<TYPE>(#NAME, #TYPE, #DEFAULT, DESC, m_ ## NAME);  \
+  m_group_set.back()->Add(m_var_map[#NAME]);
+#define EMP_CONFIG__INIT_CONST(NAME, TYPE, VALUE, DESC)                                 \
+  m_var_map[#NAME] = new tConfigConstEntry<TYPE>(#NAME, #TYPE, #VALUE, DESC, VALUE);    \
+  m_group_set.back()->Add(m_var_map[#NAME]);
+#define EMP_CONFIG__INIT_GROUP(NAME, DESC)                                              \
+  m_group_set.push_back(new ConfigGroup(#NAME, DESC));
+#define EMP_CONFIG__INIT_
+
+// Build Get and Set Accessors, as well as const check
+#define EMP_CONFIG__ACCESS(CMD) EMP_CONFIG__ACCESS_ ## CMD
+#define EMP_CONFIG__ACCESS_VALUE(NAME, TYPE, DEFAULT, DESC)                     \
+  inline const TYPE & NAME() const { return m_ ## NAME; }                       \
+  const TYPE & NAME(const TYPE & _in) { m_ ## NAME = _in; return m_ ## NAME; }  \
+  bool NAME ## _is_const() const { return false; }
+#define EMP_CONFIG__ACCESS_CONST(NAME, TYPE, VALUE, DESC)                       \
+  constexpr static TYPE NAME() { return VALUE; }                                \
+  TYPE NAME(const TYPE & _in) {                                                 \
+    std::stringstream ss;                                                       \
+    ss << "Trying to set const '" << #NAME << "'. Ignoring." << std::endl;      \
+    emp::NotifyWarning(ss.str());                                               \
+    return VALUE;                                                               \
+  }                                                                             \
+  bool NAME ## _is_const() const { return true; }
+#define EMP_CONFIG__ACCESS_GROUP(NAME, DESC)
+#define EMP_CONFIG__ACCESS_
+
+#define EMP_BUILD_CONFIG(CLASS_NAME, ...) EMP_EXTEND_CONFIG(CLASS_NAME, emp::Config, __VA_ARGS__)
+
+#define EMP_EXTEND_CONFIG(CLASS_NAME, BASE_NAME, ...)            \
+  class CLASS_NAME : public BASE_NAME {                          \
+  protected:                                                     \
+    EMP_WRAP_EACH(EMP_CONFIG__DECLARE, __VA_ARGS__)              \
+    bool is_ ## CLASS_NAME;                                      \
+  public:                                                        \
+    CLASS_NAME() : is_ ## CLASS_NAME(true)                        \
+    EMP_WRAP_EACH(EMP_CONFIG__CONSTRUCT, __VA_ARGS__)            \
+    {                                                            \
+      EMP_WRAP_EACH(EMP_CONFIG__INIT, __VA_ARGS__)               \
+    }                                                            \
+    EMP_WRAP_EACH(EMP_CONFIG__ACCESS, __VA_ARGS__)               \
+  };
 
 #endif
