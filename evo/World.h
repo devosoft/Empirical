@@ -358,14 +358,14 @@ namespace evo {
       for (int T = 0; T < tourny_count; T++) {
         emp::vector<int> entries = Choose(*random_ptr, valid_orgs.size(), t_size);
         double best_fit = fitness[valid_orgs[entries[0]]];
-        int best_id = entries[0];
+        int best_id = valid_orgs[entries[0]];
 
         // Search for a higher fit org in the tournament.
         for (int i = 1; i < t_size; i++) {
           const double cur_fit = fitness[valid_orgs[entries[i]]];
           if (cur_fit > best_fit) {
             best_fit = cur_fit;
-            best_id = entries[i];
+            best_id = valid_orgs[entries[i]];
           }
         }
 
@@ -385,14 +385,14 @@ namespace evo {
       for (int T = 0; T < tourny_count; T++) {
         emp::vector<int> entries = Choose(*random_ptr, valid_orgs.size(), t_size);
         double best_fit = fit_fun(popM[valid_orgs[entries[0]]]);
-        int best_id = entries[0];
+        int best_id = valid_orgs[entries[0]];
 
         // Search for a higher fit org in the tournament.
         for (int i = 1; i < t_size; i++) {
           const double cur_fit = fit_fun(popM[valid_orgs[entries[i]]]);
           if (cur_fit > best_fit) {
             best_fit = cur_fit;
-            best_id = entries[i];
+            best_id = valid_orgs[entries[i]];
           }
         }
 
