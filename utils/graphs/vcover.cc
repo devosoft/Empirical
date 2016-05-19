@@ -1,8 +1,12 @@
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+
 #include <iostream>
 #include <map>
 
+#include "../../config/command_line.h"
 #include "../../tools/assert.h"
-#include "../../tools/command_line.h"
 #include "../../tools/Graph.h"
 #include "../../tools/graph_utils.h"
 #include "../../tools/string_utils.h"
@@ -37,7 +41,7 @@ bool TestSolution(const emp::SolveState & solution) {
 
 void FindInitBound() {
   emp::BitVector node_mask(graph.GetSize(), true);  // IDs of which nodes need to be decided upon.
-  
+
   while (true) {
     // Find node of max untagged degree.
     int max_degree = 0;
@@ -63,7 +67,7 @@ void FindInitBound() {
 void Solve(const emp::SolveState & in_state, int depth=0)
 {
   if (debug) std::cout << "Solve(" << depth << ")" << std::endl;
-  
+
   // Simple Bounds tests
   const int cur_count = in_state.CountIn();
   if (cur_count >= best_count) return;
@@ -78,7 +82,7 @@ void Solve(const emp::SolveState & in_state, int depth=0)
   }
 
   emp::SolveState state(in_state);                     // @CAO Still need to cache these!
-  
+
   // Scan the remaining nodes.
   int test_id = -1;
   const emp::BitVector & degree_mask = state.GetUnkVector(); // Count edges only to other unknowns
@@ -97,7 +101,7 @@ void Solve(const emp::SolveState & in_state, int depth=0)
 
   // If there are no nodes left to test, let the early solver deal with it.
   if (state.IsFinal()) { Solve(state, depth+1); return; }
-  
+
   // Now that we've simplified and know we have more to do, find the max degree
   int max_degree = -1;
   int max_id = -1;
@@ -108,7 +112,7 @@ void Solve(const emp::SolveState & in_state, int depth=0)
     total_degree += cur_degree;
     if (cur_degree > max_degree) { max_degree = cur_degree; max_id = test_id; }
   }
-  
+
   // Better bounds checking: How few nodes can we get away with adding to cover all of the edges
   const int min_added = (total_degree - 2) / (max_degree * 2) + 1;
   if (state.CountIn() + min_added >= best_count) return;
@@ -128,11 +132,11 @@ int main(int argc, char* argv[])
 {
   // Use some emp tools to check which args were set on the command line.
   std::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
-  verbose = emp::cl::use_arg(args, "-v");
-  debug = emp::cl::use_arg(args, "-d");
-  bool off_by_1 = emp::cl::use_arg(args, "-1");   // Are nodes numbered 1 to N instead of 0 to N-1?
-  bool load_table = emp::cl::use_arg(args, "-t"); // Do we want to load the full adj matrix?
-  
+  verbose = emp::cl::use_flag(args, "-v");
+  debug = emp::cl::use_flag(args, "-d");
+  bool off_by_1 = emp::cl::use_flag(args, "-1");   // Are nodes numbered 1 to N instead of 0 to N-1?
+  bool load_table = emp::cl::use_flag(args, "-t"); // Do we want to load the full adj matrix?
+
   graph = (load_table) ? emp::load_graph_table(std::cin) : emp::load_graph_sym(std::cin, off_by_1);
 
   // Initialize best count and best nodes to be the whole graph.
