@@ -45,7 +45,7 @@ extensions = [
 breathe_projects = {
         "Empirical" : os.path.abspath("../build/doxydoc/xml")
 }
-
+breathe_default_project = "Empirical"
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
