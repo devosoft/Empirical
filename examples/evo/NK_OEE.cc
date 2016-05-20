@@ -6,18 +6,20 @@
 //  This file explores the template defined in evo::Population.h
 
 #include <iostream>
+#include <functional>
 
 #include "../../evo/NK-const.h"
 #include "../../evo/World.h"
 #include "../../evo/OEE.h"
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
+#include "../../evo/Stats.h"
 
 constexpr int K = 3;
-constexpr int N = 10;
+constexpr int N = 20;
 
-constexpr int POP_SIZE = 20;
-constexpr int UD_COUNT = 500;
+constexpr int POP_SIZE = 200;
+constexpr int UD_COUNT = 5000;
 constexpr int TOURNAMENT_SIZE = 15;
 
 using BitOrg = emp::BitSet<N>;
@@ -29,8 +31,16 @@ int main()
   emp::evo::NKLandscapeConst<N,K> landscape(random);
   emp::evo::World<BitOrg> pop(random);
   emp::evo::OEEStatsManager<BitOrg, N> oee_stats(&pop);
-  emp::evo::LineageTracker<BitOrg> lineage(&pop);
-  oee_stats.lineage = &lineage;
+  emp::evo::LineageTracker<BitOrg> lin(&pop);
+  oee_stats.lineage = &lin;
+
+  emp::evo::StatsManager_FunctionsOnUpdate<BitOrg> common_stats(&pop);
+  std::function<double(emp::evo::World<BitOrg>*)> diversity = [](emp::evo::World<BitOrg> * world){return emp::evo::ShannonDiversity(*world);};
+  std::function<double(std::function<double(BitOrg * org)>, emp::evo::World<BitOrg>*)> max_fitness = [](std::function<double(BitOrg * org)> fit_func, emp::evo::World<BitOrg> * world){return emp::evo::MaxFitness(fit_func, *world);};
+  std::function<double(std::function<double(BitOrg * org)>, emp::evo::World<BitOrg>*)> avg_fitness = [](std::function<double(BitOrg * org)> fit_func, emp::evo::World<BitOrg> * world){return emp::evo::AverageFitness(fit_func, *world);};
+  common_stats.AddFunction(diversity);
+  common_stats.AddFunction(max_fitness);
+  common_stats.AddFunction(avg_fitness);
 
   // Build a random initial population
   for (int i = 0; i < POP_SIZE; i++) {
@@ -49,6 +59,7 @@ int main()
 
 pop.SetDefaultFitnessFun([&landscape](BitOrg * org){ return landscape.GetFitness(*org); });
 oee_stats.fit_fun = [&landscape](BitOrg * org){ return landscape.GetFitness(*org); };
+common_stats.fit_fun = [&landscape](BitOrg * org){ return landscape.GetFitness(*org); };
 
   // Loop through updates
   for (int ud = 0; ud < UD_COUNT+1; ud++) {
