@@ -42,6 +42,14 @@ int main(int argc, char* argv[])
   bool print_help = args.UseFlag("-h", "Print help information.");
   bool create_config = args.UseFlag("-gen", "Generate configuration file.");
 
+  // If there are leftover args, throw an error.
+  if (args.size() > 1) {
+    std::cerr << "Unknown args:";
+    for (int i = 1; i < args.size(); i++) std::cout << " " << args[i];
+    std::cerr << std::endl;
+    print_help = true;
+  }
+
   if (print_help) { args.PrintHelp(std::cout); exit(0); }
   if (create_config) { config.Write("NK.cfg"); exit(0); }
 
