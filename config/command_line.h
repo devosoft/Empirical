@@ -36,6 +36,8 @@
 #include <string>
 #include <vector>
 
+#include "config.h"
+
 namespace emp {
   namespace cl {
 
@@ -128,7 +130,11 @@ namespace emp {
       ArgManager(int argc, char* argv[]) : args(args_to_strings(argc, argv)) { ; }
       ~ArgManager() { ; }
 
-      int GetArgCount() { return (int) args.size(); }
+      int size() { return (int) args.size(); }
+      auto begin() -> decltype(args.begin()) { return args.begin(); }
+      auto end() -> decltype(args.end()) { return args.end(); }
+      std::string & operator[](int i) { return args[i]; }
+      const std::string & operator[](int i) const { return args[i]; }
 
       // UseArg takes a name, a variable and an optional description.  If the name exists,
       // it uses the next argument to change the value of the variable.
@@ -138,6 +144,18 @@ namespace emp {
         arg_names.push_back(name);
         arg_descs.push_back(desc);
         return use_arg_value(args, name, var);
+      }
+
+      // UseArg can also take a config object and a name, and use the argument to set the
+      // config object.
+      int UseArg(const std::string & name, Config & config, const std::string & cfg_name,
+                 const std::string & desc="") {
+        arg_names.push_back(name);
+        arg_descs.push_back(desc);
+        std::string var;
+        bool rv = use_arg_value(args, name, var);
+        if (rv==1) config.Set(cfg_name, var);
+        return rv;
       }
 
       // UseFlag take a name and an optional description.  If the name exists, return true,
