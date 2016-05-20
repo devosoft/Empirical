@@ -50,15 +50,13 @@ namespace evo{
 
     //Count number of each value present
     std::map<ORG, int> counts;
-    for (int i=0; i < elements.GetSize(); i++) {
-      if (elements.IsOccupied(i)) {
-        const ORG & element = elements[i];
-        if (counts.find(element) != counts.end()) {
-          counts[element]++;
-        } else {
-          counts[element] = 1;
-        }
+    for (auto element : elements) {
+      if (counts.find(element) != counts.end()) {
+        counts[element]++;
+      } else {
+        counts[element] = 1;
       }
+
     }
 
     //Shannon entropy calculation
@@ -80,7 +78,7 @@ namespace evo{
     return unique_elements.size();
   }
 
-  template <typename ORG, typename C >
+  template <typename ORG, typename C, class = typename C::value_type >
   double MaxFitness(std::function<double(ORG * org)> fit_fun, C orgs){
     double fittest = fit_fun(&orgs[0]);
     for (auto org : orgs){
@@ -92,6 +90,28 @@ namespace evo{
     return fittest;
   }
 
+  template <typename ORG, typename... MANAGERS>
+  double MaxFitness(std::function<double(ORG * org)> fit_fun, World<ORG, MANAGERS...> & orgs){
+    double fittest = fit_fun(&(*(orgs.begin())));
+    for (auto org : orgs){
+      double fitness = fit_fun(&org);
+      if (fitness > fittest){
+        fittest = fitness;
+      }
+    }
+    return fittest;
+  }
+
+template <typename ORG, typename... MANAGERS>
+  double AverageFitness(std::function<double(ORG * org)> fit_fun, World<ORG, MANAGERS...> & orgs){
+    double cumulative_fitness = 0;
+    double num_orgs = 0;
+    for (auto org : orgs){
+        ++num_orgs;
+        cumulative_fitness += fit_fun(&org);
+    }
+    return (cumulative_fitness / num_orgs);
+  }
 
 }
 }
