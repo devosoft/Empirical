@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_MACROS_H
-#define EMP_MACROS_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  Generally useful macros that can perform cools tricks.  As with all macros, use only
 //  after careful exclusion of alternative approaches!
@@ -29,7 +25,7 @@
 //  EMP_FORCE_ARGS_TO(N, P, ...) Crops or pads (with p) args to be exactly N long.
 //  EMP_ROTATE_ARGS(...) Moves the first argument to the end of the arg list.
 //  EMP_SELECT_ARGS(PATTERN, ...) Uses the (repeating) patter to select arguments to keep.
-//    Pattern is an argument pack consisting of i (include) or x (exclude). 
+//    Pattern is an argument pack consisting of i (include) or x (exclude).
 //  EMP_GET_ODD_ARGS(...) will return all arguments at odd positions (1,3,5,7, etc.)
 //  EMP_GET_EVEN_ARGS(...) will return all arguments at odd positions (2,4,6,8, etc.)
 //  EMP_REVERSE_ARGS(...) Reverse the order of arguments passed in.
@@ -52,7 +48,7 @@
 //  You make them become EMP_CONVERT_ARG_EMP_FAKE_ARG(A) or EMP_CONVERT_ARG_EMP_FAKE_2ARG(A)
 //  (i.e., prepend with EMP_CONVERT and provide an argument) it will trigger a conversion.
 //  If you prepend anything else similarly, it wil NOT trigger a conversion.
-//  
+//
 //  This is especially useful with _2ARG since anything unconverted will be a single
 //  argument, while anything converted will be two, allowing us to shift arguments
 //  to perform conditional behaviors.
@@ -70,7 +66,10 @@
 //      EMP_WRAP(W,2,4,A,B,a,b,c,d,e,f,g,h,i,j,k,l)
 //    would assume six args in each wrap, A, B, and the rest broken into groups of four. I.e.:
 //      W(A,B,a,b,c,d), W(A,B,e,f,g,h), W(A,B,i,j,k,l)
-//
+
+
+#ifndef EMP_MACROS_H
+#define EMP_MACROS_H
 
 #include "macro_math.h"
 
@@ -283,7 +282,7 @@
 #define EMP_WRAP_EACH_512(W, ...) \
   EMP_WRAP_EACH_256(W, __VA_ARGS__) \
   EMP_EVAL7( EMP_WRAP_EACH_256 EMP_EMPTY() (W, EMP_POP_ARGS_256(__VA_ARGS__)) )
-  
+
 
 // Replace all of the commas in an argument set with something else (including nothing)
 #define EMP_REPLACE_COMMAS(X, ...) EMP_GET_ARG_1(__VA_ARGS__) EMP_CALL_BY_PACKS(EMP_REPLACE_COMMAS_, X, EMP_POP_ARGS_1(__VA_ARGS__) )
@@ -592,7 +591,7 @@
 #define EMP_WRAP_ARG_PAIRS_4(W, A1, A2, ...) W(A1, A2), EMP_WRAP_ARG_PAIRS_2(W, __VA_ARGS__)
 #define EMP_WRAP_ARG_PAIRS_6(W, A1, A2, ...) W(A1, A2), EMP_WRAP_ARG_PAIRS_4(W, __VA_ARGS__)
 #define EMP_WRAP_ARG_PAIRS_8(W, A1, A2, ...) W(A1, A2), EMP_WRAP_ARG_PAIRS_6(W, __VA_ARGS__)
-#define EMP_WRAP_ARG_PAIRS_10(W, A1, A2, ...) W(A1, A2), EMP_WRAP_ARG_PAIRS_8(W, __VA_ARGS__) 
+#define EMP_WRAP_ARG_PAIRS_10(W, A1, A2, ...) W(A1, A2), EMP_WRAP_ARG_PAIRS_8(W, __VA_ARGS__)
 #define EMP_WRAP_ARG_PAIRS_12(W, A1, A2, ...) W(A1, A2), EMP_WRAP_ARG_PAIRS_10(W, __VA_ARGS__)
 #define EMP_WRAP_ARG_PAIRS_14(W, A1, A2, ...) W(A1, A2), EMP_WRAP_ARG_PAIRS_12(W, __VA_ARGS__)
 #define EMP_WRAP_ARG_PAIRS_16(W, A1, A2, ...) W(A1, A2), EMP_WRAP_ARG_PAIRS_14(W, __VA_ARGS__)
