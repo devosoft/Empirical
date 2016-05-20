@@ -507,6 +507,18 @@ namespace emp {
 
 }
 
+// Below are macros that help build the config classes.
+
+// Check that all of the commands are legal so that sensible errors can be produced.
+// (legal commands convert to two arguments; illeagal ones stay as one, so second arg is error!)
+#define EMP_CONFIG__ERROR_CHECK(CMD) EMP_GET_ARG(2, EMP_CONFIG__ARG_OKAY_ ## CMD, \
+                                     static_assert(false, "Unknown Config option: " #CMD), ~);
+#define EMP_CONFIG__ARG_OKAY_VALUE(...) ~,
+#define EMP_CONFIG__ARG_OKAY_CONST(...) ~,
+#define EMP_CONFIG__ARG_OKAY_GROUP(...) ~,
+#define EMP_CONFIG__ARG_OKAY_ ~,
+
+
 // Macros to handle declaration of protected member variables.
 // Note, unneeded macros defined to nothing, as is extra ending in '_' to allow trailing comma.
 #define EMP_CONFIG__DECLARE(CMD) EMP_CONFIG__DECLARE_ ## CMD
@@ -555,6 +567,7 @@ namespace emp {
 #define EMP_BUILD_CONFIG(CLASS_NAME, ...) EMP_EXTEND_CONFIG(CLASS_NAME, emp::Config, __VA_ARGS__)
 
 #define EMP_EXTEND_CONFIG(CLASS_NAME, BASE_NAME, ...)            \
+  EMP_WRAP_EACH(EMP_CONFIG__ERROR_CHECK, __VA_ARGS__)            \
   class CLASS_NAME : public BASE_NAME {                          \
   protected:                                                     \
     bool is_ ## CLASS_NAME;                                      \
