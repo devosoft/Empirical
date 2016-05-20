@@ -7,55 +7,72 @@
 
 #include <iostream>
 
+#include "../../config/command_line.h"
+#include "../../config/config.h"
 #include "../../evo/NK.h"
 #include "../../evo/World.h"
 #include "../../tools/BitSet.h"
-#include "../../tools/command_line.h"
 #include "../../tools/Random.h"
 
-int K = 13;
-int N = 50;
+EMP_BUILD_CONFIG( NKConfig,
+  GROUP(DEFAULT, "Default settings for NK model"),
+  VALUE(K, int, 10, "Level of epistasis in the NK model"),
+  VALUE(N, int, 50, "Number of bits in each organisms (must be > K)"),
+  VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
+  VALUE(POP_SIZE, int, 1000, "Number of organisms in the popoulation."),
+  VALUE(MAX_GENS, int, 2000, "How many generations should we process?"),
+  VALUE(MUT_COUNT, int, 3, "How many bit positions should be randomized?"),
+)
 
-int POP_SIZE = 1000;
-int UD_COUNT = 2000;
 
 using BitOrg = emp::BitVector;
 
 int main(int argc, char* argv[])
 {
+  NKConfig config;
+  config.Read("NK.cfg");
+
   auto args = emp::cl::ArgManager(argc, argv);
-  args.UseArg("-N", N, "Set the number of bits in each sequence.");
-  args.UseArg("-K", K, "Set the number of extra bits affecting each fitness contribution.");
-  args.UseArg("-pop", POP_SIZE, "Set the population size.");
-  args.UseArg("-ud", UD_COUNT, "Set the number of updates to run.");
+  args.UseArg("-N", config, "N", "Set the number of bits in each sequence.");
+  args.UseArg("-K", config, "K", "Set the number of extra bits affecting each fitness contribution.");
+  args.UseArg("-seed", config, "SEED", "Set the number of sites randomized with each birth");
+  args.UseArg("-pop", config, "POP_SIZE", "Set the population size.");
+  args.UseArg("-gens", config, "MAX_GENS", "Set the number of generations to run.");
+  args.UseArg("-mut", config, "MUT_COUNT", "Set the number of sites randomized with each birth");
   bool print_help = args.UseFlag("-h", "Print help information.");
+  bool create_config = args.UseFlag("-gen", "Generate configuration file.");
 
-  if (print_help) {
-    args.PrintHelp(std::cout);
-    exit(0);
-  }
+  if (print_help) { args.PrintHelp(std::cout); exit(0); }
+  if (create_config) { config.Write("NK.cfg"); exit(0); }
 
-  emp::Random random;
+  const int N = config.N();
+  const int K = config.K();
+  const int POP_SIZE = config.POP_SIZE();
+  const int MAX_GENS = config.MAX_GENS();
+  const int MUT_COUNT = config.MUT_COUNT();
+
+  emp::Random random(config.SEED());
   emp::evo::NKLandscape landscape(N, K, random);
   emp::evo::EAWorld<BitOrg> pop(random);
 
   // Build a random initial population
-  for (int i = 0; i < POP_SIZE; i++) {
+  for (int i = 0; i < config.POP_SIZE(); i++) {
     BitOrg next_org(N);
     for (int j = 0; j < N; j++) next_org[j] = random.P(0.5);
     pop.Insert(next_org);
   }
 
-  pop.SetDefaultMutateFun( [](BitOrg* org, emp::Random& random) {
-      (*org)[random.GetInt(N)] = random.P(0.5);
-      (*org)[random.GetInt(N)] = random.P(0.5);
-      (*org)[random.GetInt(N)] = random.P(0.5);
+  pop.SetDefaultMutateFun( [MUT_COUNT, N](BitOrg* org, emp::Random& random) {
+      for (int m = 0; m < MUT_COUNT; m++) {
+        const int pos = random.GetInt(N);
+        (*org)[pos] = random.P(0.5);
+      }
       return true;
     } );
 
 
   // Loop through updates
-  for (int ud = 0; ud < UD_COUNT; ud++) {
+  for (int ud = 0; ud < MAX_GENS; ud++) {
     // Print current state.
     // for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
     // std::cout << std::endl;
@@ -72,5 +89,5 @@ int main(int argc, char* argv[])
   }
 
 
-  std::cout << UD_COUNT << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
+  std::cout << MAX_GENS << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 }
