@@ -21,29 +21,29 @@
 #include "World.h"
 #include "PopulationManager.h"
 #include "Stats.h"
+#include "StatsManager.h"
 
 namespace emp{
 namespace evo{
 
   template <typename ORG, int MAX_ORG_SIZE, typename... MANAGERS>
-  class OEEStatsManager {
+  class OEEStatsManager : StatsManager_Base {
   private:
     using skeleton_type = emp::array<int, MAX_ORG_SIZE>;
     using pop_manager_type = AdaptTemplate< typename SelectPopManager<MANAGERS..., PopBasic>::type, ORG>;
     static constexpr bool separate_generations = pop_manager_type::emp_has_separate_generations;
-    static constexpr bool emp_is_stats_manager = true;
     //TODO: Make this use existing lineage tracker if there is one
 
     std::set<skeleton_type > novel;
 
+    int generations = 50; //How far back do we look for persistance?
+
     // Historical generations needed to count stats. We only need these in
     // proportion to resolution.
-    int generations = 50; //How far back do we look for persistance?
-    int resolution = 10; //With what frequency do we record data?
     std::deque<emp::vector<int> > past_snapshots;
+    using StatsManager_Base::resolution;
 
   public:
-
     LineageTracker<ORG, MANAGERS...> * lineage;
 
     OEEStatsManager(World<ORG, MANAGERS...>* world){
