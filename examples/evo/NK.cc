@@ -17,11 +17,11 @@
 EMP_BUILD_CONFIG( NKConfig,
   GROUP(DEFAULT, "Default settings for NK model"),
   VALUE(K, int, 10, "Level of epistasis in the NK model"),
-  VALUE(N, int, 50, "Number of bits in each organisms (must be > K)"),
+  VALUE(N, int, 50, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
   VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
-  VALUE(POP_SIZE, int, 1000, "Number of organisms in the popoulation."),
+  CONST(POP_SIZE, int, 1000, "Number of organisms in the popoulation."),
   VALUE(MAX_GENS, int, 2000, "How many generations should we process?"),
-  VALUE(MUT_COUNT, int, 3, "How many bit positions should be randomized?"),
+  VALUE(MUT_COUNT, int, 3, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
 )
 
 
