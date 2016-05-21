@@ -215,13 +215,13 @@ namespace emp {
         out << std::endl; // Skip a line after each group.
       }
 
-      void WriteMacros(std::ostream & out) {
+      void WriteMacros(std::ostream & out, bool as_const) {
         // Print header information to register group.
         out << "  GROUP(" << name << ", \"" << desc << "\"),\n";
 
         // Loop through once to figure out non-comment output
         for (ConfigEntry * cur_entry : entry_set) {
-          if (cur_entry->IsConst()) { out << "    CONST("; }
+          if (as_const || cur_entry->IsConst()) { out << "    CONST("; }
           else { out << "    VALUE("; }
 
           out << cur_entry->GetName() << ", "
@@ -356,7 +356,7 @@ namespace emp {
     }
 
     // Generate a text representation (typically a file) for the state of Config
-    void WriteMacros(std::ostream & out) {
+    void WriteMacros(std::ostream & out, bool as_const=false) {
       out << "/////////////////////////////////////////////////////////////////////////////////\n"
           << "//  This is an auto-generated file that defines a set of configuration options.\n"
           << "//\n"
@@ -388,16 +388,16 @@ namespace emp {
 
       // Next print each group and it's information.
       for (auto it = group_set.begin(); it != group_set.end(); it++) {
-        (*it)->WriteMacros(out);
+        (*it)->WriteMacros(out, as_const);
       }
 
       out << ")" << std::endl;
     }
 
     // If a string is passed into Write, treat it as a filename.
-    void WriteMacros(std::string filename) {
+    void WriteMacros(std::string filename, bool as_const=false) {
       std::ofstream out(filename);
-      WriteMacros(out);
+      WriteMacros(out, as_const);
       out.close();
     }
 
