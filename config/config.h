@@ -290,27 +290,32 @@ namespace emp {
       }
     }
 
-    std::string Get(const std::string & setting_name) {
-      if (m_var_map.find(setting_name) == m_var_map.end()) {
-        // This setting is not currently in the map!
-        // @CAO Print warning?
-        return "";
+    bool Has(const std::string & setting_name) const {
+      return (m_var_map.find(setting_name) != m_var_map.end()) ||
+        (alias_map.find(setting_name) != alias_map.end());
+    }
+
+    bool ResolveAlias(std::string & setting_name) const {
+      if (m_var_map.find(setting_name) != m_var_map.end()) return true;
+      if (alias_map.find(setting_name) != alias_map.end()) {
+        setting_name = alias_map.find(setting_name)->second;
+        return true;
       }
+      return false;
+    }
+
+    std::string Get(std::string setting_name) {
+      if (!ResolveAlias(setting_name)) return "";  // @CAO Print warning?
       return m_var_map[setting_name]->GetValue();
     }
 
     Config & Set(std::string setting_name, const std::string & new_value,
                   const std::string & in_desc="") {
-      if (m_var_map.find(setting_name) == m_var_map.end()) {
-        if (alias_map.find(setting_name) != alias_map.end()) {
-          setting_name = alias_map[setting_name];
-        }
-        else {
-          // This setting is not currently in the map!  We should put it in, but let user know.
-          m_warnings << "Unknown setting '" << setting_name << "'.  Creating." << std::endl;
-          m_var_map[setting_name] = new ConfigLiveEntry(setting_name, "std::string", new_value, in_desc);
-          GetActiveGroup()->Add(m_var_map[setting_name]);
-        }
+      if (!ResolveAlias(setting_name)) {
+        // This setting is not currently in the map!  We should put it in, but let user know.
+        m_warnings << "Unknown setting '" << setting_name << "'.  Creating." << std::endl;
+        m_var_map[setting_name] = new ConfigLiveEntry(setting_name, "std::string", new_value, in_desc);
+        GetActiveGroup()->Add(m_var_map[setting_name]);
       }
       m_var_map[setting_name]->SetValue(new_value, m_warnings);
       if (!m_delay_warnings && m_warnings.rdbuf()->in_avail()) {
@@ -328,7 +333,7 @@ namespace emp {
 
     void AddAlias(const std::string & base_name, const std::string & alias_name) {
       emp_assert( m_var_map.find(base_name) != m_var_map.end() );  // Make sure base exists.
-      emp_assert( m_var_map.find(alias_name) == m_var_map.end() ); // Make sure alias does not!
+      emp_assert( !Has(alias_name) ); // Make sure alias does not!
       alias_map[alias_name] = base_name;
       m_var_map[base_name]->AddAlias(alias_name);
     }
