@@ -168,7 +168,7 @@ namespace emp {
 
       int GetSize() const { return (int) entry_set.size(); }
       ConfigEntry * GetEntry(int id) { return entry_set[id]; }
-      ConfigEntry * GetLastEntry() { return entry_set.back(); }
+      ConfigEntry * GetLastEntry() { emp_assert(GetSize() > 0); return entry_set.back(); }
 
       void Add(ConfigEntry * new_entry) { entry_set.push_back(new_entry); }
 
@@ -249,6 +249,12 @@ namespace emp {
       return m_group_set.back();
     }
 
+    ConfigEntry * GetActiveEntry() {
+      ConfigGroup * group = GetActiveGroup();
+      emp_assert(group->GetSize() > 0);
+      return group->GetLastEntry();
+    }
+
     // === Protected member variables ===
     emp::vector<std::string> class_names;           // Names in class heiarchy.
     std::map<std::string, ConfigEntry *> m_var_map; // All variables across groups.
@@ -256,6 +262,7 @@ namespace emp {
     emp::vector<ConfigGroup *> m_group_set;         // All of the config groups.
     std::stringstream m_warnings;                   // Aggrigate warnings for combined display.
     int m_delay_warnings;                           // Count of delays to collect warnings for printing.
+    std::map<std::string, std::string> alias_map;   // Map all aliases to original name.
 
     // Map new type names to the manager that handles them.
     std::map<std::string, ConfigManager_Base *> m_type_manager_map;
@@ -292,13 +299,18 @@ namespace emp {
       return m_var_map[setting_name]->GetValue();
     }
 
-    Config & Set(const std::string & setting_name, const std::string & new_value,
+    Config & Set(std::string setting_name, const std::string & new_value,
                   const std::string & in_desc="") {
       if (m_var_map.find(setting_name) == m_var_map.end()) {
-        // This setting is not currently in the map!  We should put it in, but let user know.
-        m_warnings << "Unknown setting '" << setting_name << "'.  Creating." << std::endl;
-        m_var_map[setting_name] = new ConfigLiveEntry(setting_name, "std::string", new_value, in_desc);
-        GetActiveGroup()->Add(m_var_map[setting_name]);
+        if (alias_map.find(setting_name) != alias_map.end()) {
+          setting_name = alias_map[setting_name];
+        }
+        else {
+          // This setting is not currently in the map!  We should put it in, but let user know.
+          m_warnings << "Unknown setting '" << setting_name << "'.  Creating." << std::endl;
+          m_var_map[setting_name] = new ConfigLiveEntry(setting_name, "std::string", new_value, in_desc);
+          GetActiveGroup()->Add(m_var_map[setting_name]);
+        }
       }
       m_var_map[setting_name]->SetValue(new_value, m_warnings);
       if (!m_delay_warnings && m_warnings.rdbuf()->in_avail()) {
@@ -312,6 +324,13 @@ namespace emp {
 
     Config & operator()(const std::string & setting_name, const std::string & new_value) {
       return Set(setting_name, new_value);
+    }
+
+    void AddAlias(const std::string & base_name, const std::string & alias_name) {
+      emp_assert( m_var_map.find(base_name) != m_var_map.end() );  // Make sure base exists.
+      emp_assert( m_var_map.find(alias_name) == m_var_map.end() ); // Make sure alias does not!
+      alias_map[alias_name] = base_name;
+      m_var_map[base_name]->AddAlias(alias_name);
     }
 
     // Generate a text representation (typically a file) for the state of Config
@@ -516,6 +535,7 @@ namespace emp {
 #define EMP_CONFIG__ARG_OKAY_VALUE(...) ~,
 #define EMP_CONFIG__ARG_OKAY_CONST(...) ~,
 #define EMP_CONFIG__ARG_OKAY_GROUP(...) ~,
+#define EMP_CONFIG__ARG_OKAY_ALIAS(...) ~,
 #define EMP_CONFIG__ARG_OKAY_ ~,
 
 
@@ -525,6 +545,7 @@ namespace emp {
 #define EMP_CONFIG__DECLARE_VALUE(NAME, TYPE, DEFAULT, DESC) TYPE m_ ## NAME;
 #define EMP_CONFIG__DECLARE_CONST(NAME, TYPE, DEFAULT, DESC)
 #define EMP_CONFIG__DECLARE_GROUP(NAME, DESC)
+#define EMP_CONFIG__DECLARE_ALIAS(NAME)
 #define EMP_CONFIG__DECLARE_
 
 // Macros to handle construction of vars.
@@ -532,6 +553,7 @@ namespace emp {
 #define EMP_CONFIG__CONSTRUCT_VALUE(NAME, TYPE, DEFAULT, DESC) , m_ ## NAME(DEFAULT)
 #define EMP_CONFIG__CONSTRUCT_CONST(NAME, TYPE, DEFAULT, DESC)
 #define EMP_CONFIG__CONSTRUCT_GROUP(NAME, DESC)
+#define EMP_CONFIG__CONSTRUCT_ALIAS(NAME)
 #define EMP_CONFIG__CONSTRUCT_
 
 // Macros to initialize internal representation of variables.
@@ -544,6 +566,8 @@ namespace emp {
   GetActiveGroup()->Add(m_var_map[#NAME]);
 #define EMP_CONFIG__INIT_GROUP(NAME, DESC)                                              \
   m_group_set.push_back(new ConfigGroup(#NAME, DESC));
+#define EMP_CONFIG__INIT_ALIAS(NAME)                                                    \
+  AddAlias(GetActiveEntry()->GetName(), #NAME);
 #define EMP_CONFIG__INIT_
 
 // Build Get and Set Accessors, as well as const check
@@ -562,6 +586,7 @@ namespace emp {
   }                                                                             \
   bool NAME ## _is_const() const { return true; }
 #define EMP_CONFIG__ACCESS_GROUP(NAME, DESC)
+#define EMP_CONFIG__ACCESS_ALIAS(NAME)
 #define EMP_CONFIG__ACCESS_
 
 #define EMP_BUILD_CONFIG(CLASS_NAME, ...) EMP_EXTEND_CONFIG(CLASS_NAME, emp::Config, __VA_ARGS__)
