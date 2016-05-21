@@ -41,6 +41,7 @@ int main(int argc, char* argv[])
   args.UseArg("-mut", config, "MUT_COUNT", "Set the number of sites randomized with each birth");
   bool print_help = args.UseFlag("-h", "Print help information.");
   bool create_config = args.UseFlag("-gen", "Generate configuration file.");
+  bool const_macros = args.UseFlag("-const", "Generate const version of macros file.");
 
   // If there are leftover args, throw an error.
   if (args.size() > 1) {
@@ -52,6 +53,7 @@ int main(int argc, char* argv[])
 
   if (print_help) { args.PrintHelp(std::cout); exit(0); }
   if (create_config) { config.Write("NK.cfg"); exit(0); }
+  if (const_macros) { config.WriteMacros("NK-macros.h"); exit(0); }
 
   const int N = config.N();
   const int K = config.K();
