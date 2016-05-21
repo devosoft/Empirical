@@ -217,7 +217,7 @@ namespace emp {
 
       void WriteMacros(std::ostream & out) {
         // Print header information to register group.
-        out << "  GROUP(" << name << ", \"" << desc << "\")" << std::endl;
+        out << "  GROUP(" << name << ", \"" << desc << "\"),\n";
 
         // Loop through once to figure out non-comment output
         for (ConfigEntry * cur_entry : entry_set) {
@@ -228,12 +228,12 @@ namespace emp {
               << cur_entry->GetType() << ", "
               << cur_entry->GetLiteralValue() << ", "
               << to_literal( cur_entry->GetDescription() )
-              << std::endl;
+              << "),\n";
 
           // Output aliases.
           const std::unordered_set<std::string> & alias_set = cur_entry->GetAliases();
           for (const std::string & cur_alias : alias_set) {
-            out << "      ALIAS(" << cur_alias << ")" << std::endl;
+            out << "      ALIAS(" << cur_alias << "),\n";
           }
         }
 
@@ -383,7 +383,7 @@ namespace emp {
           << "//   Include an alias for the previous setting.  This command is useful to\n"
           << "//   maintain backward compatibility if names change in newer software versions.\n"
           << "\n"
-          << "EMP_BUILD_CONFIG(" << class_names.back()
+          << "EMP_BUILD_CONFIG(" << class_names.back() << ","
           << std::endl;
 
       // Next print each group and it's information.
