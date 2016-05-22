@@ -3,7 +3,7 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  This file explores the template defined in evo::Population.h
+//  This file explores the template defined in evo::Population.h with an NK landscape.
 
 #include <iostream>
 
@@ -32,16 +32,8 @@ int main(int argc, char* argv[])
   config.Read("NK.cfg");
 
   auto args = emp::cl::ArgManager(argc, argv);
-  if (args.UseConfigOptions(config, "NK.cfg", "NK-macros.h") == false) exit(0);
-
-  // If there are leftover args, throw an error.
-  if (args.size() > 1) {
-    std::cerr << "Unknown args:";
-    for (int i = 1; i < args.size(); i++) std::cout << " " << args[i];
-    std::cerr << std::endl;
-    args.PrintHelp(std::cout);
-    exit(0);
-  }
+  if (args.ProcessConfigOptions(config, std::cout, "NK.cfg", "NK-macros.h") == false) exit(0);
+  if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
 
   const int N = config.N();
   const int K = config.K();
