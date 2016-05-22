@@ -7,8 +7,7 @@
 
 #include <iostream>
 
-#include "../../config/command_line.h"
-#include "../../config/config.h"
+#include "../../config/ArgManager.h"
 #include "../../evo/NK.h"
 #include "../../evo/World.h"
 #include "../../tools/BitSet.h"
@@ -53,7 +52,7 @@ int main(int argc, char* argv[])
 
   if (print_help) { args.PrintHelp(std::cout); exit(0); }
   if (create_config) { config.Write("NK.cfg"); exit(0); }
-  if (const_macros) { config.WriteMacros("NK-macros.h"); exit(0); }
+  if (const_macros) { config.WriteMacros("NK-macros.h", true); exit(0); }
 
   const int N = config.N();
   const int K = config.K();
