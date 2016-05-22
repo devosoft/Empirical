@@ -19,7 +19,7 @@ constexpr int K = 3;
 constexpr int N = 20;
 
 constexpr int POP_SIZE = 200;
-constexpr int UD_COUNT = 5000;
+constexpr int UD_COUNT = 500;
 constexpr int TOURNAMENT_SIZE = 15;
 
 using BitOrg = emp::BitSet<N>;

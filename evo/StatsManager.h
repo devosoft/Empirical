@@ -2,6 +2,9 @@
 #define EMP_EVO_STATS_MANAGER_H
 
 #include <functional>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include "../tools/FunctionSet.h"
 #include "../tools/vector.h"
@@ -15,8 +18,22 @@ namespace evo{
   public:
     int resolution = 10; //With what frequency do we record data?
     static constexpr bool emp_is_stats_manager = true;
-    StatsManager_Base(){;}
+    std::ofstream output_location;
+    StatsManager_Base(std::string location = "cout"){
+        SetOutput(location);
+    }
     ~StatsManager_Base(){;}
+
+    void SetOutput(std::string location){
+        if (location == "cout" || location == "stdout"){
+            output_location.copyfmt(std::cout);
+            output_location.clear(std::cout.rdstate());
+            output_location.basic_ios<char>::rdbuf(std::cout.rdbuf());
+        } else {
+            output_location.open(location);
+        }
+    }
+
   };
 
   template <typename ORG, typename... MANAGERS>
@@ -24,11 +41,14 @@ namespace evo{
   private:
     FunctionSet<double, World<ORG, MANAGERS...>* > world_stats;
     FunctionSet<double, std::function<double(ORG * org)>, World<ORG, MANAGERS...>* > fitness_stats;
-
     World<ORG, MANAGERS...> * world;
     using StatsManager_Base::resolution;
+    using StatsManager_Base::output_location;
+
   public:
-    StatsManager_FunctionsOnUpdate(World<ORG, MANAGERS...> * w){
+
+    StatsManager_FunctionsOnUpdate(World<ORG, MANAGERS...> * w,
+        std::string location = "averages.csv") : StatsManager_Base(location){
       std::function<void(int)> UpdateFun = [this] (int ud){
         Update(ud);
       };
@@ -51,14 +71,14 @@ namespace evo{
       if (update % resolution == 0){
         emp::vector<double> world_results = world_stats.Run(world);
         for (double d : world_results){
-          std::cout << d << " ";
+          output_location << d << " ";
         }
 
         emp::vector<double> fitness_results = fitness_stats.Run(fit_fun, world);
         for (double d : fitness_results){
-          std::cout << d << " ";
+            output_location << d << " ";
         }
-        std::cout << std::endl;
+        output_location << std::endl;
       }
     }
 
