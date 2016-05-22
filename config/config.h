@@ -52,45 +52,46 @@ using namespace std::placeholders;
 
 namespace emp {
 
+  class ConfigEntry {
+  protected:
+    std::string name;
+    std::string type;
+    std::string default_val;
+    std::string desc;
+
+    std::unordered_set<std::string> alias_set;
+  public:
+    ConfigEntry(const std::string _name, const std::string _type,
+                 const std::string _d_val, const std::string _desc)
+      : name(_name), type(_type), default_val(_d_val), desc(_desc)
+    { ; }
+    virtual ~ConfigEntry() { ; }
+
+    const std::string & GetName() const { return name; }
+    const std::string & GetType() const { return type; }
+    const std::string & GetDefault() const { return default_val; }
+    const std::string & GetDescription() const { return desc; }
+
+    ConfigEntry & SetName(const std::string & _in) { name = _in; return *this; }
+    ConfigEntry & SetType(const std::string & _in) { type = _in; return *this; }
+    ConfigEntry & SetDefault(const std::string & _in) { default_val = _in; return *this; }
+    ConfigEntry & SetDescription(const std::string & _in) { desc = _in; return *this; }
+
+    ConfigEntry & AddAlias(const std::string & _in) { alias_set.insert(_in); return *this; }
+    bool HasAlias(const std::string & _in) { return alias_set.find(_in) != alias_set.end(); }
+    bool IsMatch(const std::string & _in) { return name == _in || HasAlias(_in); }
+    const std::unordered_set<std::string> & GetAliases() { return alias_set; }
+
+    virtual std::string GetValue() const = 0;
+    virtual std::string GetLiteralValue() const = 0;
+    virtual ConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) = 0;
+    virtual bool IsConst() const = 0;
+  };
+
+
   // Master configuration class.
   class Config {
   protected:
-    class ConfigEntry {
-    protected:
-      std::string name;
-      std::string type;
-      std::string default_val;
-      std::string desc;
-
-      std::unordered_set<std::string> alias_set;
-    public:
-      ConfigEntry(const std::string _name, const std::string _type,
-                   const std::string _d_val, const std::string _desc)
-        : name(_name), type(_type), default_val(_d_val), desc(_desc)
-      { ; }
-      virtual ~ConfigEntry() { ; }
-
-      const std::string & GetName() const { return name; }
-      const std::string & GetType() const { return type; }
-      const std::string & GetDefault() const { return default_val; }
-      const std::string & GetDescription() const { return desc; }
-
-      ConfigEntry & SetName(const std::string & _in) { name = _in; return *this; }
-      ConfigEntry & SetType(const std::string & _in) { type = _in; return *this; }
-      ConfigEntry & SetDefault(const std::string & _in) { default_val = _in; return *this; }
-      ConfigEntry & SetDescription(const std::string & _in) { desc = _in; return *this; }
-
-      ConfigEntry & AddAlias(const std::string & _in) { alias_set.insert(_in); return *this; }
-      bool HasAlias(const std::string & _in) { return alias_set.find(_in) != alias_set.end(); }
-      bool IsMatch(const std::string & _in) { return name == _in || HasAlias(_in); }
-      const std::unordered_set<std::string> & GetAliases() { return alias_set; }
-
-      virtual std::string GetValue() const = 0;
-      virtual std::string GetLiteralValue() const = 0;
-      virtual ConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) = 0;
-      virtual bool IsConst() const = 0;
-    };
-
     // We need type-specific versions on this class to manage variables
     template <class VAR_TYPE> class tConfigEntry : public ConfigEntry {
     protected:
@@ -257,11 +258,11 @@ namespace emp {
 
     // === Protected member variables ===
     emp::vector<std::string> class_names;           // Names in class heiarchy.
-    std::map<std::string, ConfigEntry *> var_map; // All variables across groups.
-    std::string version_id;                       // Unique version ID to ensure synced config.
-    emp::vector<ConfigGroup *> group_set;         // All of the config groups.
-    std::stringstream warnings;                   // Aggrigate warnings for combined display.
-    int delay_warnings;                           // Count of delays to collect warnings for printing.
+    std::map<std::string, ConfigEntry *> var_map;   // All variables across groups.
+    std::string version_id;                         // Unique version ID to ensure synced config.
+    emp::vector<ConfigGroup *> group_set;           // All of the config groups.
+    std::stringstream warnings;                     // Aggrigate warnings for combined display.
+    int delay_warnings;                             // Count of delays to collect warnings for printing.
     std::map<std::string, std::string> alias_map;   // Map all aliases to original name.
 
     // Map new type names to the manager that handles them.
@@ -289,6 +290,10 @@ namespace emp {
         delete it->second;
       }
     }
+
+    ConfigEntry * operator[](const std::string & name) { return var_map[name]; }
+    auto begin() -> decltype(var_map.begin()) { return var_map.begin(); }
+    auto end() -> decltype(var_map.end()) { return var_map.end(); }
 
     bool Has(const std::string & setting_name) const {
       return (var_map.find(setting_name) != var_map.end()) ||
