@@ -76,6 +76,29 @@ namespace emp {
              << std::endl;
         }
       }
+
+      // UseConfigOptions loads all settings from a configure file and sets up arguments for
+      // them.  Return bool for should program proceed (false=exit).
+      bool UseConfigOptions(Config & config, const std::string & cfg_file="",
+                            const std::string & macro_file="") {
+        for (auto e : config) {
+          auto entry = e.second;
+          std::string desc = emp::to_string( entry->GetDescription(),
+                " (type=", entry->GetType(), "; default=", entry->GetDefault(), ')' );
+          UseArg(to_string('-', entry->GetName()), config, entry->GetName(), desc);
+        }
+
+        bool print_help    = UseFlag("--help", "Print help information.");
+        bool create_config = cfg_file.size() && UseFlag("--gen", "Generate configuration file.");
+        bool const_macros  = macro_file.size() && UseFlag("--const", "Generate const version of macros file.");
+
+        if (print_help)    { PrintHelp(std::cout); return false; }
+        if (create_config) { config.Write(cfg_file); return false; }
+        if (const_macros)  { config.WriteMacros(macro_file, true); return false; }
+
+        return true;
+      }
+
     };
 
 
