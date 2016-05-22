@@ -32,27 +32,16 @@ int main(int argc, char* argv[])
   config.Read("NK.cfg");
 
   auto args = emp::cl::ArgManager(argc, argv);
-  args.UseArg("-N", config, "N", "Set the number of bits in each sequence.");
-  args.UseArg("-K", config, "K", "Set the number of extra bits affecting each fitness contribution.");
-  args.UseArg("-seed", config, "SEED", "Set the number of sites randomized with each birth");
-  args.UseArg("-pop", config, "POP_SIZE", "Set the population size.");
-  args.UseArg("-gens", config, "MAX_GENS", "Set the number of generations to run.");
-  args.UseArg("-mut", config, "MUT_COUNT", "Set the number of sites randomized with each birth");
-  bool print_help = args.UseFlag("-h", "Print help information.");
-  bool create_config = args.UseFlag("-gen", "Generate configuration file.");
-  bool const_macros = args.UseFlag("-const", "Generate const version of macros file.");
+  if (args.UseConfigOptions(config, "NK.cfg", "NK-macros.h") == false) exit(0);
 
   // If there are leftover args, throw an error.
   if (args.size() > 1) {
     std::cerr << "Unknown args:";
     for (int i = 1; i < args.size(); i++) std::cout << " " << args[i];
     std::cerr << std::endl;
-    print_help = true;
+    args.PrintHelp(std::cout);
+    exit(0);
   }
-
-  if (print_help) { args.PrintHelp(std::cout); exit(0); }
-  if (create_config) { config.Write("NK.cfg"); exit(0); }
-  if (const_macros) { config.WriteMacros("NK-macros.h", true); exit(0); }
 
   const int N = config.N();
   const int K = config.K();
