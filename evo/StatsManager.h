@@ -31,6 +31,10 @@ namespace evo{
             output_location.basic_ios<char>::rdbuf(std::cout.rdbuf());
         } else {
             output_location.open(location);
+            if (!output_location.good()){
+                std::cout << "Invalid output file. Exiting." << std::endl;
+                exit(0);
+            }
         }
     }
 
