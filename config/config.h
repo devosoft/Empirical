@@ -256,6 +256,69 @@ namespace emp {
       return group->GetLastEntry();
     }
 
+    // Which characters can legally be part of a variable identifier?
+    bool IsVarChar(const char c) {
+      if (c >= 'a' && c <= 'z') return true;
+      if (c >= 'A' && c <= 'Z') return true;
+      if (c >= '0' && c <= '9') return true;
+      if (c == '_') return true;
+      return false;
+    }
+
+    // Process a line by:
+    // * Remove excess whitespace
+    // * Expand all variables beginning with a $ in config line.
+    // * If wrap-around, move line to extras
+    void ProcessLine(std::string & cur_line, std::string & extras) {
+      int start_pos = (int) extras.size();       // If there were extras last time, skip them.
+      if (extras.size()) cur_line.insert(0, extras);
+      extras.resize(0);
+      emp::left_justify(cur_line);               // Clear out leading whitespace.
+
+      for (int pos = start_pos; pos < (int) cur_line.size(); pos++) {
+        const char cur_char = cur_line[pos];
+        // Check for escape characters and convert them appropriately.
+        if (cur_char == '\\') {
+          if (pos+1 == (int) cur_line.size()) {              // If backslash is at end of line...
+            extras = cur_line.substr(0, cur_line.size()-1);  // ...move string to extras
+            cur_line.resize(0);                              // ...don't process current line
+            return;                                          // ...since this is the line end, stop
+          }
+          // If we make it this far, we have a regular character being escaped.  Make the swap!
+          const char esc_char = cur_line[pos+1];
+          switch (esc_char) {
+            case '$': cur_line.replace(pos, 2, "$"); break;
+            case '#': cur_line.replace(pos, 2, "#"); break;
+            case '\\': cur_line.replace(pos, 2, "\\"); break;
+            case 'n': cur_line.replace(pos, 2, "\n"); break;
+            case 'r': cur_line.replace(pos, 2, "\r"); break;
+            case 't': cur_line.replace(pos, 2, "\t"); break;
+          }
+        }
+        // A '#' indicates that a comment is starting that the rest of the line should be removed.
+        else if (cur_char == '#') {
+          cur_line.resize(pos);
+        }
+        // A '$' indicates that we should expand a variable in place.
+        else if (cur_char == '$' && expand_ok) {
+          int end_pos = pos+1;
+          while (end_pos < (int) cur_line.size() && IsVarChar(cur_line[end_pos])) end_pos++;
+          const int var_size = end_pos - pos - 1;
+          std::string var_name(cur_line, pos+1, var_size);
+
+          if (ResolveAlias(var_name)) {
+            std::string new_val = var_map[var_name]->GetValue();  // Lookup variable value.
+            cur_line.replace(pos, var_size+1, new_val);           // Replace var name with value.
+            pos += (int) new_val.size();                          // Skip new text.
+          } else {
+            // @CAO ERROR!
+          }
+          // @CAO CONTINUE
+        }
+      }
+
+    }
+
     // === Protected member variables ===
     emp::vector<std::string> class_names;           // Names in class heiarchy.
     std::map<std::string, ConfigEntry *> var_map;   // All variables across groups.
@@ -412,44 +475,6 @@ namespace emp {
       out.close();
     }
 
-    // Process a line by:
-    // * Remove excess whitespace
-    // * Expand all variables beginning with a $ in config line.
-    // * If wrap-around, move line to extras
-    void ProcessLine(std::string & cur_line, std::string & extras) {
-      int start_pos = (int) extras.size();       // If there were extras last time, skip them.
-      if (extras.size()) cur_line.insert(0, extras);
-      extras.resize(0);
-      emp::left_justify(cur_line);               // Clear out leading whitespace.
-
-      for (int pos = start_pos; pos < (int) cur_line.size(); pos++) {
-        const char cur_char = cur_line[pos];
-        if (cur_char == '\\') {
-          if (pos+1 == (int) cur_line.size()) {              // If backslash is at end of line...
-            extras = cur_line.substr(0, cur_line.size()-1);  // ...move string to extras
-            cur_line.resize(0);                              // ...don't process current line
-            return;                                          // ...since this is the line end, stop
-          }
-          // If we make it this far, we have a character being escaped.  Grab it and make the swap.
-          const char esc_char = cur_line[pos+1];
-          switch (esc_char) {
-            case '$': cur_line.replace(pos, 2, "$"); break;
-            case '#': cur_line.replace(pos, 2, "#"); break;
-            case '\\': cur_line.replace(pos, 2, "\\"); break;
-            case 'n': cur_line.replace(pos, 2, "\n"); break;
-            case 'r': cur_line.replace(pos, 2, "\r"); break;
-            case 't': cur_line.replace(pos, 2, "\t"); break;
-          }
-        }
-        else if (cur_char == '#') {
-          cur_line.resize(pos);
-        }
-        else if (cur_char == '$' && expand_ok) {
-          // @CAO CONTINUE
-        }
-      }
-
-    }
 
     // Read in from a text representation (typically a file) to set the state of Config.
     // Return success state.
