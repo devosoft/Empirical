@@ -46,10 +46,13 @@ namespace evo{
   public:
     LineageTracker<ORG, MANAGERS...> * lineage;
 
-    OEEStatsManager(World<ORG, MANAGERS...>* world){
+    OEEStatsManager(World<ORG, MANAGERS...>* world,
+                    std::string location = "oee_stats.csv")
+                    : StatsManager_Base(location){
       // This isn't going to work if generations aren't a multiple of resolution
       emp_assert(generations % resolution == 0 &&
-          "ERROR: Generations required for persistance must be a multiple of resolution.");
+                "ERROR: Generations required for persistance must be a multiple of resolution.",
+                resolution, generations);
 
       past_snapshots = std::deque<emp::vector<int> >(2*generations/resolution + 1);
 
@@ -61,13 +64,15 @@ namespace evo{
         Update(ud);
       };
 
-
       //Setup signal callbacks
       world->OnUpdate(UpdateFun);
       //lineage = LineageTracker<ORG, MANAGERS...>(world);
 
       //TODO: Figure out how to make this work automatically
       //fit_fun = world->GetFitFun();
+      output_location << "update" << delimiter << "change" << delimiter
+            << "novelty" << delimiter << "ecology" << delimiter
+            << "complexity" << std::endl;
     }
 
     std::function<double(ORG * org)> fit_fun;
@@ -78,7 +83,7 @@ namespace evo{
       int novelty = -1;
       double ecology = -1;
       int complexity = -1;
-      double fittest = -1;
+
       if (update % resolution == 0) {
 
         emp::vector<skeleton_type > persist_skeletons = Skeletonize(
@@ -102,9 +107,8 @@ namespace evo{
                                 int nulls = std::count(skel.begin(), skel.end(), -1);
                                 return (double)(skel.size() - nulls);
                               });
-          fittest = MaxFitness(fit_fun, IDsToGenomes(lineage, past_snapshots[0]));
         }
-        std::cout << "Update: " << update << ", Change: " << change << ", Novelty: " << novelty << ", Ecology: " << ecology << ", Complexity: " << complexity << ", MaxFitness: " << fittest << std::endl;
+        output_location << update << delimiter << change << delimiter << novelty << delimiter << ecology << delimiter << complexity << std::endl;
         past_snapshots.pop_back();
         past_snapshots.push_front(lineage->generation_since_update);
       }

@@ -8,6 +8,7 @@
 #include <map>
 #include <set>
 #include "../tools/vector.h"
+#include "World.h"
 
 namespace emp{
 namespace evo{
