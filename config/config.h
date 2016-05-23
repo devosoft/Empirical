@@ -430,6 +430,16 @@ namespace emp {
             cur_line.resize(0);                              // ...don't process current line
             return;                                          // ...since this is the line end, stop
           }
+          // If we make it this far, we have a character being escaped.  Grab it and make the swap.
+          const char esc_char = cur_line[pos+1];
+          switch (esc_char) {
+            case '$': cur_line.replace(pos, 2, "$"); break;
+            case '#': cur_line.replace(pos, 2, "#"); break;
+            case '\\': cur_line.replace(pos, 2, "\\"); break;
+            case 'n': cur_line.replace(pos, 2, "\n"); break;
+            case 'r': cur_line.replace(pos, 2, "\r"); break;
+            case 't': cur_line.replace(pos, 2, "\t"); break;
+          }
         }
         else if (cur_char == '#') {
           cur_line.resize(pos);
