@@ -331,9 +331,11 @@ namespace evo {
 
       if (precalc_fitness && t_size * tourny_count * 2 >= (int) popM.size()) {
         // Pre-calculate fitnesses.
-        emp::vector<double> fitness(popM.size());
-        for (int i = 0; i < (int) popM.size(); ++i) fitness[i] = fit_fun(popM[i]);
-
+        emp::vector<int> valid_orgs = GetValidOrgIndices();
+        emp::vector<double> fitness(valid_orgs.size());
+        for (int i = 0; i < (int) valid_orgs.size(); ++i){
+             fitness[i] = fit_fun(popM[valid_orgs[i]]);
+         }
         RunTournament(fitness, t_size, tourny_count);
       }
       else RunTournament(fit_fun, t_size, tourny_count);
@@ -352,12 +354,12 @@ namespace evo {
 
       for (int T = 0; T < tourny_count; T++) {
         emp::vector<int> entries = Choose(*random_ptr, valid_orgs.size(), t_size);
-        double best_fit = fitness[valid_orgs[entries[0]]];
+        double best_fit = fitness[entries[0]];
         int best_id = valid_orgs[entries[0]];
 
         // Search for a higher fit org in the tournament.
         for (int i = 1; i < t_size; i++) {
-          const double cur_fit = fitness[valid_orgs[entries[i]]];
+          const double cur_fit = fitness[entries[i]];
           if (cur_fit > best_fit) {
             best_fit = cur_fit;
             best_id = valid_orgs[entries[i]];
