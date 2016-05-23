@@ -11,12 +11,15 @@
 #include "../Empirical/emtools/js_object_struct.h"
 #include "../Empirical/emtools/js_utils.h"
 #include "utils.h"
+#include "load_data.h"
 
 extern "C" {
   extern int n_objects();
 }
 
 namespace D3 {
+
+  class Dataset;
 
   class Selection{
   private:
@@ -143,6 +146,35 @@ namespace D3 {
       return *this;
     }
 
+    //Option to pass loaded dataset without translating to C++
+    Selection Data(Dataset values, const char* key=""){
+      int update_id = EM_ASM_INT_V({return js.objects.length});      
+
+      EM_ASM_ARGS({
+	  var in_string = Pointer_stringify($1);
+	  var fn = window["emp"][in_string];
+	  if (typeof fn === "function"){
+	    var update_sel = js.objects[$0].data(js.objects[$2], fn);
+	  } else if (typeof window["d3"][in_string] === "function") {
+	    var update_sel = js.objects[$0].data(js.objects[$2],
+						 window["d3"][in_string]);
+	  } else if (typeof window[in_string] === "function") {
+	    var update_sel = js.objects[$0].data(js.objects[$2], 
+						 window[in_string]);
+	  } else {
+	    var update_sel = js.objects[$0].data(js.objects[$2]);
+	  }
+	  
+	  js.objects.push(update_sel);
+	},this->id, key, values.GetID());
+      
+
+      Selection update = Selection(update_id);
+      update.enter = true;
+      update.exit = true;
+      return update;
+    }
+
     template<std::size_t SIZE, typename T>
     Selection Data(std::array<T, SIZE> values, const char* key=""){
       int update_id = EM_ASM_INT_V({return js.objects.length});
@@ -153,6 +185,12 @@ namespace D3 {
 	  var fn = window["emp"][in_string];
 	  if (typeof fn === "function"){
 	    var update_sel = js.objects[$0].data(emp.__incoming_array, fn);
+	  } else if (typeof window["d3"][in_string] === "function") {
+	    var update_sel = js.objects[$0].data(emp.__incoming_array,
+						 window["d3"][in_string]);
+	  } else if (typeof window[in_string] === "function") {
+	    var update_sel = js.objects[$0].data(emp.__incoming_array, 
+						 window[in_string]);
 	  } else {
 	    var update_sel = js.objects[$0].data(emp.__incoming_array);
 	  }
@@ -546,6 +584,13 @@ namespace D3 {
 
   template<std::size_t SIZE>
   Selection ShapesFromData(std::array<int32_t, SIZE> values, const char* shape){
+    Selection s = Select("svg").SelectAll(shape).Data(values);
+    s.EnterAppend(shape);
+    return s;
+  }
+
+
+  Selection ShapesFromData(Dataset values, const char* shape){
     Selection s = Select("svg").SelectAll(shape).Data(values);
     s.EnterAppend(shape);
     return s;

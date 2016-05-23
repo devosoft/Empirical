@@ -29,15 +29,14 @@ void mouseover(int id){
 
 void make_graph() {
   D3::Selection svg = D3::Selection("body").Append("svg");
-  std::array<std::array<int, 2>, 5> data;
-  EM_ASM({emp.__outgoing_array = emp.__incoming_data;
-      console.log(emp.__outgoing_array);
-    });
-  emp::pass_array_to_cpp(data);
+  //std::array<std::array<int, 2>, 5> data;
+  //EM_ASM({emp.__outgoing_array = emp.__incoming_data;});
+  //emp::pass_array_to_cpp(data);
+  D3::Dataset data = D3::Dataset();
   D3::Axis<D3::LinearScale> x_axis = D3::Axis<D3::LinearScale>();
   x_axis.SetScale(D3::LinearScale());
-  std::array<int, 2> domain = {0, 200};
-  std::array<int, 2> range = {0, 400};
+  std::array<int, 2> domain = {0, 60};
+  std::array<int, 2> range = {0, 250};
   x_axis.GetScale().SetDomain(domain);
   x_axis.GetScale().SetRange(range);
   x_axis.SetTicks(3);
@@ -103,7 +102,7 @@ int main()
   svg.SelectAll("circle").Data(test_data_2).EnterAppend("circle");
 
   //D3::Selection path = svg.Append("path");
-  D3::LineGenerator make_line = D3::LineGenerator();
+  /*D3::LineGenerator make_line = D3::LineGenerator();
   D3::Selection path = make_line.DrawShape(test_path);
   path.SetAttr("fill", "none");
   path.SetAttr("stroke", "blue");
@@ -112,12 +111,10 @@ int main()
   //group = D3::SelectAll("path");
   group.SetAttr("fill", "none");
   group.SetAttr("stroke", "blue");
-  group.SetAttr("stroke-width", 2);
+  group.SetAttr("stroke-width", 2);*/
 
   //
   //path.SetAttr("d", make_line.MakeLine(test_path).c_str());
-
-  std::cout << "data bound" << std::endl;
 
   //D3::Selection update = s.Data(test_data, 3);
   //D3::Selection update = data_bind[0];

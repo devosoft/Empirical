@@ -3,8 +3,10 @@
 
 #include "../Empirical/emtools/js_utils.h"
 
+
 namespace D3 {
   class Scale;
+  class Dataset;
 
   class SvgShapeGenerator {
   protected:
@@ -32,6 +34,30 @@ namespace D3 {
     Selection DrawShape(std::array<std::array<T, 2>, SIZE> data) {
       Selection path = Select("svg").Append("path");
       path.SetAttr("d", Generate(data).c_str());
+      return path;
+    }
+
+    //This function actually handles the binding of the path string to the dom
+    //without passing the data through C++
+    Selection DrawShape(Dataset data){//, Selection appendto=Select("svg"), 
+      //std::string type = "path") {
+      Selection path = Select("svg").Append("path");
+      //Selection path = appendto.SelectAll("path");//type.c_str());
+      //Selection path = Select("svg").SelectAll("path");//type.c_str());
+
+      EM_ASM_ARGS({
+	  var accessor = function(data){
+	    for (i=0; i<data.length; i++) {
+	      for (j=0; j<data[i].length; j++) {
+		data[i][j] = +data[i][j];
+	      }
+	    }
+	    return(data);
+	  };
+	  emp.__incoming_data = accessor(emp.__incoming_data);
+	  js.objects[$0].data(emp.__incoming_data).enter().append("path").attr("d", js.objects[$1]);
+	  console.log(d3.selectAll("path"));
+	}, path.GetID(), this->id, data.GetID());
       return path;
     }
 
