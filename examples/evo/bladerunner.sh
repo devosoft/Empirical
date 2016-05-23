@@ -25,7 +25,7 @@ echo "Updating list of runs..."
 echo "${prefix}" >> runs/names
 
 # grab config
-head -n 24 ./replica.cc | tail -n 8 > runs/${confname}
+head -n 25 ./replica.cc | tail -n 8 > runs/${confname}
 
 # launch the specified number of threads
 for ((i=0; i<"$2"; i++)); do
@@ -36,7 +36,7 @@ for ((i=0; i<"$2"; i++)); do
         sleep 1
     done
     echo "Launching ${fname}"
-    ./replica > runs/${fname} && echo -e "\tDone with ${fname}" &
+    ./replica runs/${fname} && echo -e "\tDone with ${fname}" &
 done
 
 # wait for threads to join

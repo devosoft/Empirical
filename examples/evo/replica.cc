@@ -6,6 +6,7 @@
 //  This file explores the template defined in evo::Population.h
 
 #include <iostream>
+#include <string>
 
 #include "../../evo/NK.h"
 #include "../../evo/World.h"
@@ -28,10 +29,22 @@ using BitOrg = emp::BitVector;
 template <typename ORG>
 using MixedWorld = emp::evo::World<ORG, emp::evo::PopulationManager_Base<ORG>>;
 
-int main()
+int main(int argc, char* argv[])
 {
   emp::Random random;
   emp::evo::NKLandscape landscape(N, K, random);
+
+  std::string prefix;
+
+  if (argc == 1) { // program name, no prefix
+    prefix = "";
+  }
+  else if (argc == 2) { // has prefix
+    prefix = std::string(argv[1]) + "-";
+  }
+  else {
+    std::cerr << "** Usage: ./replica output-prefix";
+  }
 
 //  MixedWorld<BitOrg> mixed_pop(random);
 //  emp::evo::EAWorld<BitOrg> mixed_pop(random);
@@ -41,11 +54,15 @@ int main()
 
   std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return landscape.GetFitness(*org);};
 
+
   // make a couple stats managers
   emp::evo::StatsManager_DefaultStats<BitOrg, emp::evo::PopulationManager_Base<BitOrg>> 
-      mixed_stats (&mixed_pop, "mixed.csv");
+      mixed_stats (&mixed_pop, prefix + "mixed.csv");
   emp::evo::StatsManager_DefaultStats<BitOrg, emp::evo::PopulationManager_Grid<BitOrg>> 
-      grid_stats (&grid_pop, "grid.csv");
+      grid_stats (&grid_pop, prefix + "grid.csv");
+
+  mixed_stats.fit_fun = fit_func;
+  grid_stats.fit_fun = fit_func;
 
   // Build a random initial population
   for (int i = 0; i < POP_SIZE; i++) {
