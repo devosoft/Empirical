@@ -24,13 +24,11 @@
 //    * Add has_flag() and use_flag() functions to more gracefully handle flags.
 //      For example, if -a and -b are legal flags, -ab should trigger both of them.
 //
-//    * Add find_arg() to return the position of an argument (and -1 if not found?)
+//    * Process arguments from left-to right, rather than out of order?
 //
-//    * std::string get_arg_value(std::vector<std::string> & args,
-//                                const std::string & pattern,
-//                                std::string default_val="")
-//       - Same as has_arg(), but returns the NEXT string as the value of the argument.
-
+//    * Identify errors if arguments to a flag begin with a '-' and should be a
+//      flag themselves?  Or, more generally, recognize if an argument is clearly
+//      the wrong type (e.g., a string where and int was expected)
 
 #ifndef EMP_COMMAND_LINE_H
 #define EMP_COMMAND_LINE_H
@@ -119,50 +117,6 @@ namespace emp {
       return result;
     }
 
-    class ArgManager {
-    private:
-      std::vector<std::string> args;
-      std::vector<std::string> arg_names;
-      std::vector<std::string> arg_descs;
-
-    public:
-      ArgManager() { ; }
-      ArgManager(int argc, char* argv[]) : args(args_to_strings(argc, argv)) { ; }
-      ~ArgManager() { ; }
-
-      int GetArgCount() { return (int) args.size(); }
-
-      // UseArg takes a name, a variable and an optional description.  If the name exists,
-      // it uses the next argument to change the value of the variable.
-      // Return 1 if found, 0 if not found, and -1 if error (no value provided)
-      template <typename T>
-      int UseArg(const std::string & name, T & var, const std::string & desc="") {
-        arg_names.push_back(name);
-        arg_descs.push_back(desc);
-        return use_arg_value(args, name, var);
-      }
-
-      // UseFlag take a name and an optional description.  If the name exists, return true,
-      // otherwise return false.
-      bool UseFlag(const std::string & name, const std::string & desc="") {
-        arg_names.push_back(name);
-        arg_descs.push_back(desc);
-        return use_flag(args, name);
-      }
-
-      void PrintHelp(std::ostream & os) {
-        int max_name_size = 0;
-        for (const auto & name : arg_names) {
-          if (max_name_size < (int) name.size()) max_name_size = (int) name.size();
-        }
-        for (int i = 0; i < arg_names.size(); i++) {
-          os << arg_names[i]
-             << std::string(max_name_size + 1 - (int) arg_names[i].size(), ' ')
-             << arg_descs[i]
-             << std::endl;
-        }
-      }
-    };
 
   }
 }

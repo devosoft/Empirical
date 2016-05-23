@@ -41,59 +41,60 @@
 #include <string>
 #include <sstream>
 #include <unordered_set>
-#include <vector>
 
 #include "../tools/errors.h"
 #include "../tools/functions.h"
 #include "../tools/string_utils.h"
+#include "../tools/vector.h"
 #include "ConfigManager.h"
 
 using namespace std::placeholders;
 
 namespace emp {
 
+  class ConfigEntry {
+  protected:
+    std::string name;
+    std::string type;
+    std::string default_val;
+    std::string desc;
+
+    std::unordered_set<std::string> alias_set;
+  public:
+    ConfigEntry(const std::string _name, const std::string _type,
+                 const std::string _d_val, const std::string _desc)
+      : name(_name), type(_type), default_val(_d_val), desc(_desc)
+    { ; }
+    virtual ~ConfigEntry() { ; }
+
+    const std::string & GetName() const { return name; }
+    const std::string & GetType() const { return type; }
+    const std::string & GetDefault() const { return default_val; }
+    const std::string & GetDescription() const { return desc; }
+
+    ConfigEntry & SetName(const std::string & _in) { name = _in; return *this; }
+    ConfigEntry & SetType(const std::string & _in) { type = _in; return *this; }
+    ConfigEntry & SetDefault(const std::string & _in) { default_val = _in; return *this; }
+    ConfigEntry & SetDescription(const std::string & _in) { desc = _in; return *this; }
+
+    ConfigEntry & AddAlias(const std::string & _in) { alias_set.insert(_in); return *this; }
+    bool HasAlias(const std::string & _in) { return alias_set.find(_in) != alias_set.end(); }
+    bool IsMatch(const std::string & _in) { return name == _in || HasAlias(_in); }
+    const std::unordered_set<std::string> & GetAliases() { return alias_set; }
+
+    virtual std::string GetValue() const = 0;
+    virtual std::string GetLiteralValue() const = 0;
+    virtual ConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) = 0;
+    virtual bool IsConst() const = 0;
+  };
+
+
   // Master configuration class.
   class Config {
-  private:
-    class ConfigEntry {
-    protected:
-      std::string name;
-      std::string type;
-      std::string default_val;
-      std::string desc;
-
-      std::unordered_set<std::string> alias_set;
-    public:
-      ConfigEntry(const std::string _name, const std::string _type,
-                   const std::string _d_val, const std::string _desc)
-        : name(_name), type(_type), default_val(_d_val), desc(_desc)
-      { ; }
-      virtual ~ConfigEntry() { ; }
-
-      const std::string & GetName() const { return name; }
-      const std::string & GetType() const { return type; }
-      const std::string & GetDefault() const { return default_val; }
-      const std::string & GetDescription() const { return desc; }
-
-      ConfigEntry & SetName(const std::string & _in) { name = _in; return *this; }
-      ConfigEntry & SetType(const std::string & _in) { type = _in; return *this; }
-      ConfigEntry & SetDefault(const std::string & _in) { default_val = _in; return *this; }
-      ConfigEntry & SetDescription(const std::string & _in) { desc = _in; return *this; }
-
-      ConfigEntry & AddAlias(const std::string & _in) { alias_set.insert(_in); return *this; }
-      bool HasAlias(const std::string & _in) { return alias_set.find(_in) != alias_set.end(); }
-      bool IsMatch(const std::string & _in) { return name == _in || HasAlias(_in); }
-      const std::unordered_set<std::string> & GetAliases() { return alias_set; }
-
-      virtual std::string GetValue() const = 0;
-      virtual std::string GetLiteralValue() const = 0;
-      virtual ConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) = 0;
-      virtual bool IsConst() const = 0;
-    };
-
+  protected:
     // We need type-specific versions on this class to manage variables
     template <class VAR_TYPE> class tConfigEntry : public ConfigEntry {
-    private:
+    protected:
       VAR_TYPE & entry_ref;
     public:
       tConfigEntry(const std::string _name, const std::string _type,
@@ -113,7 +114,7 @@ namespace emp {
 
     // We need a special entry type to represent constant values.
     template <class VAR_TYPE> class tConfigConstEntry : public ConfigEntry {
-    private:
+    protected:
       const VAR_TYPE literal_val;
     public:
       tConfigConstEntry(const std::string _name, const std::string _type,
@@ -156,35 +157,35 @@ namespace emp {
 
     // Entrys should be divided into groups
     class ConfigGroup {
-    private:
-      std::string m_name;
-      std::string m_desc;
-      std::vector<ConfigEntry *> entry_set;
+    protected:
+      std::string name;
+      std::string desc;
+      emp::vector<ConfigEntry *> entry_set;
     public:
       ConfigGroup(const std::string & _name, const std::string & _desc)
-        : m_name(_name), m_desc(_desc)
+        : name(_name), desc(_desc)
       { ; }
       ~ConfigGroup() { ; }
 
       int GetSize() const { return (int) entry_set.size(); }
       ConfigEntry * GetEntry(int id) { return entry_set[id]; }
-      ConfigEntry * GetLastEntry() { return entry_set.back(); }
+      ConfigEntry * GetLastEntry() { emp_assert(GetSize() > 0); return entry_set.back(); }
 
       void Add(ConfigEntry * new_entry) { entry_set.push_back(new_entry); }
 
       void Write(std::ostream & out) {
         // Print header information with the group name.
-        out << "### " << m_name << " ###" << std::endl;
+        out << "### " << name << " ###" << std::endl;
         // Print group description.
-        std::vector<std::string> desc_lines;
-        slice_string(m_desc, desc_lines);
+        emp::vector<std::string> desc_lines;
+        slice_string(desc, desc_lines);
         for (int comment_line = 0; comment_line < (int) desc_lines.size(); comment_line++) {
           out << "# " << desc_lines[comment_line] << std::endl;
         }
         out << std::endl;
 
         const int entry_count = entry_set.size();
-        std::vector<std::string> setting_info(entry_count);
+        emp::vector<std::string> setting_info(entry_count);
         int max_length = 0;
 
         // Loop through once to figure out non-comment output
@@ -201,7 +202,7 @@ namespace emp {
           out << setting_info[i];
 
           // Break the description up over multiple lines.
-          std::vector<std::string> desc_lines;
+          emp::vector<std::string> desc_lines;
           emp::slice_string(entry_set[i]->GetDescription(), desc_lines);
 
           int start_col = (int) setting_info[i].size();
@@ -215,25 +216,25 @@ namespace emp {
         out << std::endl; // Skip a line after each group.
       }
 
-      void WriteMacros(std::ostream & out) {
+      void WriteMacros(std::ostream & out, bool as_const) {
         // Print header information to register group.
-        out << "EMP_CONFIG_GROUP(" << m_name << ", \"" << m_desc << "\")" << std::endl;
+        out << "  GROUP(" << name << ", \"" << desc << "\"),\n";
 
         // Loop through once to figure out non-comment output
         for (ConfigEntry * cur_entry : entry_set) {
-          if (cur_entry->IsConst()) { out << "EMP_CONFIG_CONST("; }
-          else { out << "EMP_CONFIG_VAR("; }
+          if (as_const || cur_entry->IsConst()) { out << "    CONST("; }
+          else { out << "    VALUE("; }
 
           out << cur_entry->GetName() << ", "
               << cur_entry->GetType() << ", "
               << cur_entry->GetLiteralValue() << ", "
               << to_literal( cur_entry->GetDescription() )
-              << std::endl;
+              << "),\n";
 
           // Output aliases.
           const std::unordered_set<std::string> & alias_set = cur_entry->GetAliases();
           for (const std::string & cur_alias : alias_set) {
-            out << "EMP_CONFIG_ALIAS(" << cur_alias << ")" << std::endl;
+            out << "      ALIAS(" << cur_alias << "),\n";
           }
         }
 
@@ -241,76 +242,90 @@ namespace emp {
       }
     };
 
-    // Private member variables
-    std::map<std::string, ConfigEntry *> m_var_map; // All variables across groups.
-    std::string m_version_id;                       // Unique version ID to ensure synced config.
-    std::vector<ConfigGroup *> m_group_set;         // All of the config groups.
-    std::stringstream m_warnings;                   // Aggrigate warnings for combined display.
-    int m_delay_warnings;                           // Count of delays to collect warnings for printing.
+    // === Helper Functions ===
+    ConfigGroup * GetActiveGroup() {
+      if (group_set.size() == 0) {
+        group_set.push_back(new ConfigGroup("DEFAULT", "Default settings group"));
+      }
+      return group_set.back();
+    }
+
+    ConfigEntry * GetActiveEntry() {
+      ConfigGroup * group = GetActiveGroup();
+      emp_assert(group->GetSize() > 0);
+      return group->GetLastEntry();
+    }
+
+    // === Protected member variables ===
+    emp::vector<std::string> class_names;           // Names in class heiarchy.
+    std::map<std::string, ConfigEntry *> var_map;   // All variables across groups.
+    std::string version_id;                         // Unique version ID to ensure synced config.
+    emp::vector<ConfigGroup *> group_set;           // All of the config groups.
+    std::stringstream warnings;                     // Aggrigate warnings for combined display.
+    int delay_warnings;                             // Count of delays to collect warnings for printing.
+    std::map<std::string, std::string> alias_map;   // Map all aliases to original name.
 
     // Map new type names to the manager that handles them.
-    std::map<std::string, ConfigManager_Base *> m_type_manager_map;
+    std::map<std::string, ConfigManager_Base *> type_manager_map;
 
     // Build a map of extra input commands to the function that they should call if triggered.
-    std::map<std::string, std::function<bool(std::string)> > m_command_map;
-    std::map<std::string, std::function<bool(std::string)> > m_new_map;
-    std::map<std::string, std::function<bool(std::string)> > m_use_map;
-
-    // Place all of the config private member variables here.
-#define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC) TYPE m_ ## NAME;
-#include "config_include.h"
+    std::map<std::string, std::function<bool(std::string)> > command_map;
+    std::map<std::string, std::function<bool(std::string)> > new_map;
+    std::map<std::string, std::function<bool(std::string)> > use_map;
 
   public:
     Config(const std::string & in_version = "")
-      : m_version_id(in_version)
-      , m_delay_warnings(0)
-        // Setup inital values for all variables.
-#define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC) , m_ ## NAME(DEFAULT)
-#include "config_include.h"
+      : version_id(in_version)
+      , delay_warnings(0)
     {
-      // Build a map to information about each variable.
-#define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC)                                          \
-      m_var_map[#NAME] = new tConfigEntry<TYPE>(#NAME, #TYPE, #DEFAULT, DESC, m_ ## NAME); \
-      m_group_set.back()->Add(m_var_map[#NAME]);
-#define EMP_CONFIG_CONST(NAME, TYPE, VALUE, DESC)                                          \
-      m_var_map[#NAME] = new tConfigConstEntry<TYPE>(#NAME, #TYPE, #VALUE, DESC, VALUE); \
-      m_group_set.back()->Add(m_var_map[#NAME]);
-#define EMP_CONFIG_GROUP(NAME, DESC) \
-      m_group_set.push_back(new ConfigGroup(#NAME, DESC));
-#include "config_include.h"
+      class_names.push_back("emp::Config");
     }
 
     ~Config() {
       // Delete all entries in the var_map
-      for (auto it = m_var_map.begin(); it != m_var_map.end(); it++) {
+      for (auto it = var_map.begin(); it != var_map.end(); it++) {
         delete it->second;
       }
-      for (auto it = m_type_manager_map.begin(); it != m_type_manager_map.end(); it++) {
+      for (auto it = type_manager_map.begin(); it != type_manager_map.end(); it++) {
         delete it->second;
       }
     }
 
-    std::string Get(const std::string & setting_name) {
-      if (m_var_map.find(setting_name) == m_var_map.end()) {
-        // This setting is not currently in the map!
-        // @CAO Print warning?
-        return "";
-      }
-      return m_var_map[setting_name]->GetValue();
+    ConfigEntry * operator[](const std::string & name) { return var_map[name]; }
+    auto begin() -> decltype(var_map.begin()) { return var_map.begin(); }
+    auto end() -> decltype(var_map.end()) { return var_map.end(); }
+
+    bool Has(const std::string & setting_name) const {
+      return (var_map.find(setting_name) != var_map.end()) ||
+        (alias_map.find(setting_name) != alias_map.end());
     }
 
-    Config & Set(const std::string & setting_name, const std::string & new_value,
+    bool ResolveAlias(std::string & setting_name) const {
+      if (var_map.find(setting_name) != var_map.end()) return true;
+      if (alias_map.find(setting_name) != alias_map.end()) {
+        setting_name = alias_map.find(setting_name)->second;
+        return true;
+      }
+      return false;
+    }
+
+    std::string Get(std::string setting_name) {
+      if (!ResolveAlias(setting_name)) return "";  // @CAO Print warning?
+      return var_map[setting_name]->GetValue();
+    }
+
+    Config & Set(std::string setting_name, const std::string & new_value,
                   const std::string & in_desc="") {
-      if (m_var_map.find(setting_name) == m_var_map.end()) {
+      if (!ResolveAlias(setting_name)) {
         // This setting is not currently in the map!  We should put it in, but let user know.
-        m_warnings << "Unknown setting '" << setting_name << "'.  Creating." << std::endl;
-        m_var_map[setting_name] = new ConfigLiveEntry(setting_name, "std::string", new_value, in_desc);
-        m_group_set.back()->Add(m_var_map[setting_name]);
+        warnings << "Unknown setting '" << setting_name << "'.  Creating." << std::endl;
+        var_map[setting_name] = new ConfigLiveEntry(setting_name, "std::string", new_value, in_desc);
+        GetActiveGroup()->Add(var_map[setting_name]);
       }
-      m_var_map[setting_name]->SetValue(new_value, m_warnings);
-      if (!m_delay_warnings && m_warnings.rdbuf()->in_avail()) {
-        emp::NotifyWarning(m_warnings.str());
-        m_warnings.str(std::string()); // Clear the warnings.
+      var_map[setting_name]->SetValue(new_value, warnings);
+      if (!delay_warnings && warnings.rdbuf()->in_avail()) {
+        emp::NotifyWarning(warnings.str());
+        warnings.str(std::string()); // Clear the warnings.
       }
       return *this;
     }
@@ -321,12 +336,19 @@ namespace emp {
       return Set(setting_name, new_value);
     }
 
+    void AddAlias(const std::string & base_name, const std::string & alias_name) {
+      emp_assert( var_map.find(base_name) != var_map.end() );  // Make sure base exists.
+      emp_assert( !Has(alias_name) ); // Make sure alias does not!
+      alias_map[alias_name] = base_name;
+      var_map[base_name]->AddAlias(alias_name);
+    }
+
     // Generate a text representation (typically a file) for the state of Config
     void Write(std::ostream & out) {
       // @CAO Start by printing some file header information?
 
       // Next print each group and it's information.
-      for (auto it = m_group_set.begin(); it != m_group_set.end(); it++) {
+      for (auto it = group_set.begin(); it != group_set.end(); it++) {
         (*it)->Write(out);
       }
     }
@@ -339,40 +361,48 @@ namespace emp {
     }
 
     // Generate a text representation (typically a file) for the state of Config
-    void WriteMacros(std::ostream & out) {
+    void WriteMacros(std::ostream & out, bool as_const=false) {
       out << "/////////////////////////////////////////////////////////////////////////////////\n"
           << "//  This is an auto-generated file that defines a set of configuration options.\n"
-          << "//  This file is read in mulitple times from config.h, each with different macro\n"
-          << "//  definitions to generate correct, effecient code for the command below.\n"
           << "//\n"
-          << "//  The available commands are:\n"
+          << "//  To create a new config from scratch, the format is:\n"
+          << "//    EMP_BUILD_CONFIG( CLASS_NAME, OPTIONS... )\n"
           << "//\n"
-          << "//  EMP_CONFIG_GROUP(group name, group description string)\n"
+          << "//  To extend an existing config, simply use:\n"
+          << "//    EMP_EXTEND_CONFIG( NEW_NAME, BASE_CLASS, OPTIONS... )\n"
+          << "//\n"
+          << "//  The available OPTIONS are:\n"
+          << "//\n"
+          << "//  GROUP(group name, group description string)\n"
           << "//   Start a new group of configuration options.  Group structure is preserved\n"
           << "//   when user-accessible configuration options are generated.\n"
           << "//\n"
-          << "//  EMP_CONFIG_VAR(variable name, type, default value, description string)\n"
+          << "//  VALUE(variable name, type, default value, description string)\n"
           << "//   Create a new setting in the emp::Config object that can be easily accessed.\n"
           << "//\n"
-          << "//  EMP_CONFIG_ALIAS(alias name)\n"
-          << "//   Include an alias for the previous setting.  This command is useful to\n"
-          << "//   maintain backward compatibility if names change in newer software versions.\n"
-          << "//\n"
-          << "//  EMP_CONFIG_CONST(variable name, type, fixed value, description string)\n"
+          << "//  CONST(variable name, type, fixed value, description string)\n"
           << "//   Create a new configuration constant that cannot be changed.  In practice,\n"
           << "//   allows broader optimizations in the code.\n"
+          << "//\n"
+          << "//  ALIAS(alias name)\n"
+          << "//   Include an alias for the previous setting.  This command is useful to\n"
+          << "//   maintain backward compatibility if names change in newer software versions.\n"
+          << "\n"
+          << "EMP_BUILD_CONFIG(" << class_names.back() << ","
           << std::endl;
 
       // Next print each group and it's information.
-      for (auto it = m_group_set.begin(); it != m_group_set.end(); it++) {
-        (*it)->WriteMacros(out);
+      for (auto it = group_set.begin(); it != group_set.end(); it++) {
+        (*it)->WriteMacros(out, as_const);
       }
+
+      out << ")" << std::endl;
     }
 
     // If a string is passed into Write, treat it as a filename.
-    void WriteMacros(std::string filename) {
+    void WriteMacros(std::string filename, bool as_const=false) {
       std::ofstream out(filename);
-      WriteMacros(out);
+      WriteMacros(out, as_const);
       out.close();
     }
 
@@ -381,7 +411,7 @@ namespace emp {
     bool Read(std::istream & input) {
       // Load in the file one line at a time and process each line.
       std::string cur_line;
-      m_delay_warnings++;
+      delay_warnings++;
 
       // Loop through the file until eof is hit (does this work for other streams?)
       while (!input.eof()) {
@@ -401,7 +431,7 @@ namespace emp {
         else if (command == "new") {
           std::string type_name = emp::string_pop_word(cur_line);
           // @CAO Make sure type exists!
-          m_new_map[type_name](cur_line);
+          new_map[type_name](cur_line);
         }
         else if (command == "set") {
           // Set a specific value.
@@ -411,11 +441,11 @@ namespace emp {
         else if (command == "use") {
           std::string type_name = emp::string_pop_word(cur_line);
           // @CAO Make sure type exists!
-          m_use_map[type_name](cur_line);
+          use_map[type_name](cur_line);
         }
-        else if (m_command_map.find(command) != m_command_map.end()) {
+        else if (command_map.find(command) != command_map.end()) {
           // Run this custom command.
-          m_command_map[command](cur_line);
+          command_map[command](cur_line);
         }
         else {
           // We don't know this command... give an error and move on.
@@ -426,11 +456,11 @@ namespace emp {
       }
 
       // Print out all accumulated warnings (if any).
-      if (m_warnings.rdbuf()->in_avail()) {
-        emp::NotifyWarning(m_warnings.str());
-        m_warnings.str(std::string()); // Clear the warnings.
+      if (warnings.rdbuf()->in_avail()) {
+        emp::NotifyWarning(warnings.str());
+        warnings.str(std::string()); // Clear the warnings.
       }
-      m_delay_warnings--;
+      delay_warnings--;
 
       return true;
     }
@@ -451,38 +481,38 @@ namespace emp {
 
     void AddCommand(const std::string & command_name, std::function<bool(std::string)> command_fun) {
       // Give a warning if we are re-defining an existing command.
-      if (m_command_map.find(command_name) != m_command_map.end()) {
-        m_warnings << "Re-defining command '" << command_name << "'. Allowing." << std::endl;
-        if (!m_delay_warnings) {
-          emp::NotifyWarning(m_warnings.str());
-          m_warnings.str(std::string()); // Clear the warnings.
+      if (command_map.find(command_name) != command_map.end()) {
+        warnings << "Re-defining command '" << command_name << "'. Allowing." << std::endl;
+        if (!delay_warnings) {
+          emp::NotifyWarning(warnings.str());
+          warnings.str(std::string()); // Clear the warnings.
         }
       }
-      m_command_map[command_name] = command_fun;
+      command_map[command_name] = command_fun;
     }
 
     void AddNewCallback(const std::string & type_name, std::function<bool(std::string)> new_fun) {
       // Give a warning if we are re-defining an existing command.
-      if (m_new_map.find(type_name) != m_new_map.end()) {
-        m_warnings << "Re-defining config type '" << type_name << "'. Allowing." << std::endl;
-        if (!m_delay_warnings) {
-          emp::NotifyWarning(m_warnings.str());
-          m_warnings.str(std::string()); // Clear the warnings.
+      if (new_map.find(type_name) != new_map.end()) {
+        warnings << "Re-defining config type '" << type_name << "'. Allowing." << std::endl;
+        if (!delay_warnings) {
+          emp::NotifyWarning(warnings.str());
+          warnings.str(std::string()); // Clear the warnings.
         }
       }
-      m_new_map[type_name] = new_fun;
+      new_map[type_name] = new_fun;
     }
 
     void AddUseCallback(const std::string & type_name, std::function<bool(std::string)> use_fun) {
       // Give a warning if we are re-defining an existing command.
-      if (m_use_map.find(type_name) != m_use_map.end()) {
-        m_warnings << "Re-defining config type '" << type_name << "'. Allowing." << std::endl;
-        if (!m_delay_warnings) {
-          emp::NotifyWarning(m_warnings.str());
-          m_warnings.str(std::string()); // Clear the warnings.
+      if (use_map.find(type_name) != use_map.end()) {
+        warnings << "Re-defining config type '" << type_name << "'. Allowing." << std::endl;
+        if (!delay_warnings) {
+          emp::NotifyWarning(warnings.str());
+          warnings.str(std::string()); // Clear the warnings.
         }
       }
-      m_use_map[type_name] = use_fun;
+      use_map[type_name] = use_fun;
     }
 
 
@@ -491,7 +521,7 @@ namespace emp {
                         std::function<bool(MANAGED_TYPE &, std::string)> fun_callback)
     {
       ConfigManager<MANAGED_TYPE> * new_manager = new ConfigManager<MANAGED_TYPE>(type_keyword, command_keyword, fun_callback);
-      m_type_manager_map[type_keyword] = new_manager;
+      type_manager_map[type_keyword] = new_manager;
 
       AddCommand(command_keyword,
                  std::bind(&ConfigManager<MANAGED_TYPE>::CommandCallback, new_manager, _1) );
@@ -499,26 +529,91 @@ namespace emp {
                      std::bind(&ConfigManager<MANAGED_TYPE>::NewObject, new_manager, _1) );
       AddUseCallback(type_keyword,
                      std::bind(&ConfigManager<MANAGED_TYPE>::UseObject, new_manager, _1) );
-
     }
 
-    // Build Get and Set Accessors, as well as const check
-#define EMP_CONFIG_VAR(NAME, TYPE, DEFAULT, DESC)                       \
-    inline const TYPE & NAME() const { return m_ ## NAME; }             \
-    const TYPE & NAME(const TYPE & _in) { m_ ## NAME = _in; return m_ ## NAME; } \
-    bool NAME ## _is_const() const { return false; }
-#define EMP_CONFIG_CONST(NAME, TYPE, VALUE, DESC)                       \
-    constexpr static TYPE NAME() { return VALUE; }                      \
-    TYPE NAME(const TYPE & _in) {                                       \
-      std::stringstream ss;                                             \
-      ss << "Trying to set const '" << #NAME << "'. Ignoring." << std::endl; \
-      emp::NotifyWarning(ss.str());                                     \
-      return VALUE;                                                     \
-    }                                                                   \
-    bool NAME ## _is_const() const { return true; }
-#include "config_include.h"
-
   };
-};
+
+}
+
+// Below are macros that help build the config classes.
+
+// Check that all of the commands are legal so that sensible errors can be produced.
+// (legal commands convert to two arguments; illeagal ones stay as one, so second arg is error!)
+#define EMP_CONFIG__ERROR_CHECK(CMD) EMP_GET_ARG(2, EMP_CONFIG__ARG_OKAY_ ## CMD, \
+                                     static_assert(false, "Unknown Config option: " #CMD), ~);
+#define EMP_CONFIG__ARG_OKAY_VALUE(...) ~,
+#define EMP_CONFIG__ARG_OKAY_CONST(...) ~,
+#define EMP_CONFIG__ARG_OKAY_GROUP(...) ~,
+#define EMP_CONFIG__ARG_OKAY_ALIAS(...) ~,
+#define EMP_CONFIG__ARG_OKAY_ ~,
+
+
+// Macros to handle declaration of protected member variables.
+// Note, unneeded macros defined to nothing, as is extra ending in '_' to allow trailing comma.
+#define EMP_CONFIG__DECLARE(CMD) EMP_CONFIG__DECLARE_ ## CMD
+#define EMP_CONFIG__DECLARE_VALUE(NAME, TYPE, DEFAULT, DESC) TYPE m_ ## NAME;
+#define EMP_CONFIG__DECLARE_CONST(NAME, TYPE, DEFAULT, DESC)
+#define EMP_CONFIG__DECLARE_GROUP(NAME, DESC)
+#define EMP_CONFIG__DECLARE_ALIAS(NAME)
+#define EMP_CONFIG__DECLARE_
+
+// Macros to handle construction of vars.
+#define EMP_CONFIG__CONSTRUCT(CMD) EMP_CONFIG__CONSTRUCT_ ## CMD
+#define EMP_CONFIG__CONSTRUCT_VALUE(NAME, TYPE, DEFAULT, DESC) , m_ ## NAME(DEFAULT)
+#define EMP_CONFIG__CONSTRUCT_CONST(NAME, TYPE, DEFAULT, DESC)
+#define EMP_CONFIG__CONSTRUCT_GROUP(NAME, DESC)
+#define EMP_CONFIG__CONSTRUCT_ALIAS(NAME)
+#define EMP_CONFIG__CONSTRUCT_
+
+// Macros to initialize internal representation of variables.
+#define EMP_CONFIG__INIT(CMD) EMP_CONFIG__INIT_ ## CMD
+#define EMP_CONFIG__INIT_VALUE(NAME, TYPE, DEFAULT, DESC)                               \
+  var_map[#NAME] = new tConfigEntry<TYPE>(#NAME, #TYPE, #DEFAULT, DESC, m_ ## NAME);  \
+  GetActiveGroup()->Add(var_map[#NAME]);
+#define EMP_CONFIG__INIT_CONST(NAME, TYPE, VALUE, DESC)                                 \
+  var_map[#NAME] = new tConfigConstEntry<TYPE>(#NAME, #TYPE, #VALUE, DESC, VALUE);    \
+  GetActiveGroup()->Add(var_map[#NAME]);
+#define EMP_CONFIG__INIT_GROUP(NAME, DESC)                                              \
+  group_set.push_back(new ConfigGroup(#NAME, DESC));
+#define EMP_CONFIG__INIT_ALIAS(NAME)                                                    \
+  AddAlias(GetActiveEntry()->GetName(), #NAME);
+#define EMP_CONFIG__INIT_
+
+// Build Get and Set Accessors, as well as const check
+#define EMP_CONFIG__ACCESS(CMD) EMP_CONFIG__ACCESS_ ## CMD
+#define EMP_CONFIG__ACCESS_VALUE(NAME, TYPE, DEFAULT, DESC)                     \
+  inline const TYPE & NAME() const { return m_ ## NAME; }                       \
+  const TYPE & NAME(const TYPE & _in) { m_ ## NAME = _in; return m_ ## NAME; }  \
+  bool NAME ## _is_const() const { return false; }
+#define EMP_CONFIG__ACCESS_CONST(NAME, TYPE, VALUE, DESC)                       \
+  constexpr static TYPE NAME() { return VALUE; }                                \
+  TYPE NAME(const TYPE & _in) {                                                 \
+    std::stringstream ss;                                                       \
+    ss << "Trying to set const '" << #NAME << "'. Ignoring." << std::endl;      \
+    emp::NotifyWarning(ss.str());                                               \
+    return VALUE;                                                               \
+  }                                                                             \
+  bool NAME ## _is_const() const { return true; }
+#define EMP_CONFIG__ACCESS_GROUP(NAME, DESC)
+#define EMP_CONFIG__ACCESS_ALIAS(NAME)
+#define EMP_CONFIG__ACCESS_
+
+#define EMP_BUILD_CONFIG(CLASS_NAME, ...) EMP_EXTEND_CONFIG(CLASS_NAME, emp::Config, __VA_ARGS__)
+
+#define EMP_EXTEND_CONFIG(CLASS_NAME, BASE_NAME, ...)            \
+  EMP_WRAP_EACH(EMP_CONFIG__ERROR_CHECK, __VA_ARGS__)            \
+  class CLASS_NAME : public BASE_NAME {                          \
+  protected:                                                     \
+    bool is_ ## CLASS_NAME;                                      \
+    EMP_WRAP_EACH(EMP_CONFIG__DECLARE, __VA_ARGS__)              \
+  public:                                                        \
+    CLASS_NAME() : is_ ## CLASS_NAME(true)                       \
+    EMP_WRAP_EACH(EMP_CONFIG__CONSTRUCT, __VA_ARGS__)            \
+    {                                                            \
+      class_names.push_back(#CLASS_NAME);                        \
+      EMP_WRAP_EACH(EMP_CONFIG__INIT, __VA_ARGS__)               \
+    }                                                            \
+    EMP_WRAP_EACH(EMP_CONFIG__ACCESS, __VA_ARGS__)               \
+  };
 
 #endif

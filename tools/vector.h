@@ -126,10 +126,10 @@ namespace emp {
     template <typename... ARGS>
     iterator insert(ARGS &&... args) { return v.insert(std::forward<ARGS>(args)...); }
 
-    T & back() { return v.back(); }
-    const T & back() const { return v.back(); }
-    T & front() { return v.front(); }
-    const T & front() const { return v.front(); }
+    T & back() { emp_assert(size() > 0); return v.back(); }
+    const T & back() const { emp_assert(size() > 0); return v.back(); }
+    T & front() { emp_assert(size() > 0); return v.front(); }
+    const T & front() const { emp_assert(size() > 0); return v.front(); }
 
     void pop_back() {
       emp_assert(v.size() > 0, v.size());

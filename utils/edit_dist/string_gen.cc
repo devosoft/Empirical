@@ -2,8 +2,8 @@
 #include <string>
 #include <vector>
 
+#include "../../config/command_line.h"
 #include "../../tools/assert.h"
-#include "../../tools/command_line.h"
 #include "../../tools/functions.h"
 #include "../../tools/Random.h"
 
@@ -11,18 +11,18 @@
 int main(int argc, char* argv[])
 {
   std::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
-  const bool verbose = emp::cl::use_arg(args, "-v");
+  const bool verbose = emp::cl::use_flag(args, "-v");
 
   int N = 15;
   int S = 1000;
   std::cout << N << std::endl;
-  
+
   emp::Random random;
 
   for (int t = 0; t < N; t++) {
     std::string str;
     for (int i = 0; i < S; i++) str += (char) (random.GetInt(26) + 'A');
-    
+
     std::cout << str << std::endl;
 
     for (int s=0; s<S; s++) {
@@ -44,6 +44,6 @@ int main(int argc, char* argv[])
     }
     std::cout << std::endl;
   }
-  
+
   return 0;
 }
