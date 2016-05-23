@@ -34,13 +34,7 @@ int main()
   emp::evo::LineageTracker<BitOrg> lin(&pop);
   oee_stats.lineage = &lin;
 
-  emp::evo::StatsManager_FunctionsOnUpdate<BitOrg> common_stats(&pop);
-  std::function<double(emp::evo::World<BitOrg>*)> diversity = [](emp::evo::World<BitOrg> * world){return emp::evo::ShannonDiversity(*world);};
-  std::function<double(std::function<double(BitOrg * org)>, emp::evo::World<BitOrg>*)> max_fitness = [](std::function<double(BitOrg * org)> fit_func, emp::evo::World<BitOrg> * world){return emp::evo::MaxFitness(fit_func, *world);};
-  std::function<double(std::function<double(BitOrg * org)>, emp::evo::World<BitOrg>*)> avg_fitness = [](std::function<double(BitOrg * org)> fit_func, emp::evo::World<BitOrg> * world){return emp::evo::AverageFitness(fit_func, *world);};
-  common_stats.AddFunction(diversity);
-  common_stats.AddFunction(max_fitness);
-  common_stats.AddFunction(avg_fitness);
+  emp::evo::StatsManager_DefaultStats<BitOrg> common_stats(&pop);
 
   // Build a random initial population
   for (int i = 0; i < POP_SIZE; i++) {
