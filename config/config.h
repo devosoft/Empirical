@@ -273,10 +273,14 @@ namespace emp {
     std::map<std::string, std::function<bool(std::string)> > new_map;
     std::map<std::string, std::function<bool(std::string)> > use_map;
 
+    // Instructions on how config should behave.
+    bool expand_ok;          // Should we expand variables in the config file.
+
   public:
     Config(const std::string & in_version = "")
       : version_id(in_version)
       , delay_warnings(0)
+      , expand_ok(true)
     {
       class_names.push_back("emp::Config");
     }
@@ -294,6 +298,8 @@ namespace emp {
     ConfigEntry * operator[](const std::string & name) { return var_map[name]; }
     auto begin() -> decltype(var_map.begin()) { return var_map.begin(); }
     auto end() -> decltype(var_map.end()) { return var_map.end(); }
+
+    Config & SetExpandOK(bool ok=true) { expand_ok = ok; return *this; }
 
     bool Has(const std::string & setting_name) const {
       return (var_map.find(setting_name) != var_map.end()) ||
@@ -406,19 +412,48 @@ namespace emp {
       out.close();
     }
 
+    // Process a line by:
+    // * Remove excess whitespace
+    // * Expand all variables beginning with a $ in config line.
+    // * If wrap-around, move line to extras
+    void ProcessLine(std::string & cur_line, std::string & extras) {
+      int start_pos = (int) extras.size();       // If there were extras last time, skip them.
+      if (extras.size()) cur_line.insert(0, extras);
+      extras.resize(0);
+      emp::left_justify(cur_line);               // Clear out leading whitespace.
+
+      for (int pos = start_pos; pos < (int) cur_line.size(); pos++) {
+        const char cur_char = cur_line[pos];
+        if (cur_char == '\\') {
+          if (pos+1 == (int) cur_line.size()) {              // If backslash is at end of line...
+            extras = cur_line.substr(0, cur_line.size()-1);  // ...move string to extras
+            cur_line.resize(0);                              // ...don't process current line
+            return;                                          // ...since this is the line end, stop
+          }
+        }
+        else if (cur_char == '#') {
+          cur_line.resize(pos);
+        }
+        else if (cur_char == '$' && expand_ok) {
+          // @CAO CONTINUE
+        }
+      }
+
+    }
+
     // Read in from a text representation (typically a file) to set the state of Config.
     // Return success state.
     bool Read(std::istream & input) {
       // Load in the file one line at a time and process each line.
-      std::string cur_line;
+      std::string cur_line, extras;
       delay_warnings++;
 
       // Loop through the file until eof is hit (does this work for other streams?)
       while (!input.eof()) {
-        std::getline(input, cur_line);             // Get the current input line.
-        cur_line = emp::string_pop(cur_line, '#'); // Deal with commments.
-        emp::left_justify(cur_line);               // Clear out leading whitespace.
-        if (cur_line == "") continue;              // Skip empty lines.
+        std::getline(input, cur_line);         // Get the current input line.
+        ProcessLine(cur_line, extras);         // Clean up line; act on aliases.
+
+        if (cur_line == "") continue;          // Skip empty lines.
 
         std::string command = emp::string_pop_word(cur_line);
         emp::right_justify(cur_line);
