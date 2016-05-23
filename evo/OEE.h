@@ -26,6 +26,13 @@
 namespace emp{
 namespace evo{
 
+  EMP_EXTEND_CONFIG( OEEStatsManagerConfig, StatsManagerConfig,
+                     VALUE(GENERATIONS, int, 50, "How long must a lineage survive to count as persistant")
+                    )
+
+  //Is there a way to avoid making this global but still do inheritance right?
+  OEEStatsManagerConfig OeeConfig;
+
   template <typename ORG, int MAX_ORG_SIZE, typename... MANAGERS>
   class OEEStatsManager : StatsManager_Base {
   private:
@@ -48,11 +55,13 @@ namespace evo{
 
     OEEStatsManager(World<ORG, MANAGERS...>* world,
                     std::string location = "oee_stats.csv")
-                    : StatsManager_Base(location){
+                    : StatsManager_Base(OeeConfig, "OEE_stats.cfg", location){
       // This isn't going to work if generations aren't a multiple of resolution
       emp_assert(generations % resolution == 0 &&
                 "ERROR: Generations required for persistance must be a multiple of resolution.",
                 resolution, generations);
+      generations = OeeConfig.GENERATIONS();
+      OeeConfig.Write("OEE_stats.cfg");
 
       past_snapshots = std::deque<emp::vector<int> >(2*generations/resolution + 1);
 

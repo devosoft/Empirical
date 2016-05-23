@@ -10,10 +10,15 @@
 #include "../tools/vector.h"
 #include "World.h"
 #include "Stats.h"
+#include "../config/config.h"
 
 namespace emp{
 namespace evo{
 
+  EMP_BUILD_CONFIG( StatsManagerConfig,
+    VALUE(RESOLUTION, int, 10, "How often should stats be calculated (updates)"),
+    VALUE(DELIMITER, std::string, " ", "What should fields be separated by in the output")
+  )
 
   //Base stats manager - this mostly exists to be extended into custom
   //stats managers (see the OEEStatsManager for an example). The base
@@ -26,8 +31,22 @@ namespace evo{
     std::ofstream output_location; //Where does output go?
 
     StatsManager_Base(std::string location = "cout"){
+        StatsManagerConfig config;
+        config.Read("StatsConfig.cfg");
+        resolution = config.RESOLUTION();
+        delimiter = config.DELIMITER();
+        config.Write("StatsConfig.cfg");
         SetOutput(location);
     }
+
+    StatsManager_Base(StatsManagerConfig & config, std::string config_location,
+                      std::string location = "cout"){
+        config.Read(config_location);
+        resolution = config.RESOLUTION();
+        delimiter = config.DELIMITER();
+        SetOutput(location);
+    }
+
     ~StatsManager_Base(){
         output_location.close();
     }
