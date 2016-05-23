@@ -38,7 +38,7 @@ NK: NK.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) NK.cc -o NK
 
 replica: replica.cc ../../evo/NK.h $(EVO_DEPEND)
-	$(CXX_native) $(CFLAGS_native) replica.cc -o replica
+	$(CXX_native) $(CFLAGS_native) -g replica.cc -o replica
 
 fast-replica: replica.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 replica.cc -o replica

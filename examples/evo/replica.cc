@@ -12,6 +12,7 @@
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
 #include "../../evo/Stats.h"
+#include "../../evo/StatsManager.h"
 
 // k controls # of hills in the fitness landscape
 constexpr int K = 0;
@@ -24,8 +25,8 @@ constexpr int UD_COUNT = 1000;
 
 using BitOrg = emp::BitVector;
 
-template <typename ORG, typename... MANAGERS>
-using MixedWorld = emp::evo::World<ORG, MANAGERS..., emp::evo::PopulationManager_Base<ORG>>;
+template <typename ORG>
+using MixedWorld = emp::evo::World<ORG, emp::evo::PopulationManager_Base<ORG>>;
 
 int main()
 {
@@ -39,6 +40,12 @@ int main()
 
 
   std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return landscape.GetFitness(*org);};
+
+  // make a couple stats managers
+  emp::evo::StatsManager_DefaultStats<BitOrg, emp::evo::PopulationManager_Base<BitOrg>> 
+      mixed_stats (&mixed_pop, "mixed.csv");
+  emp::evo::StatsManager_DefaultStats<BitOrg, emp::evo::PopulationManager_Grid<BitOrg>> 
+      grid_stats (&grid_pop, "grid.csv");
 
   // Build a random initial population
   for (int i = 0; i < POP_SIZE; i++) {
@@ -66,13 +73,27 @@ int main()
       return mutated;
     } );
 
+  // make them have the same mutation func
+  grid_pop.SetDefaultMutateFun( [](BitOrg* org, emp::Random& random) {
+    bool mutated = false;    
+      for (size_t site = 0; site < N; site++) {
+        if (random.P(MUTATION_RATE)) {
+          (*org)[site] = !(*org)[site];
+          mutated = true;
+//          std::cerr << "ZergRush" << std::endl;
+        }
+      }
+      return mutated;
+    } );
+
+
   // Loop through updates
-  std::cout << "Update,ShannonDiversity,MaxFitness,AvgFitness" << std::endl;
+  //std::cout << "Update,ShannonDiversity,MaxFitness,AvgFitness" << std::endl;
   for (int ud = 0; ud < UD_COUNT; ud++) {
 
-    std::cout << ud  << "," << emp::evo::ShannonDiversity(mixed_pop);
-    std::cout << "," << emp::evo::MaxFitness(fit_func, mixed_pop);
-    std::cout << "," << emp::evo::AverageFitness(fit_func, mixed_pop) << std::endl;
+//    std::cout << ud  << "," << emp::evo::ShannonDiversity(mixed_pop);
+//    std::cout << "," << emp::evo::MaxFitness(fit_func, mixed_pop);
+//    std::cout << "," << emp::evo::AverageFitness(fit_func, mixed_pop) << std::endl;
 
     // Keep the best individual.
     //    mixed_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 5, 10);
@@ -80,7 +101,12 @@ int main()
     // Run a tournament for the rest...
     mixed_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
 			 , TOURNAMENT_SIZE, POP_SIZE);
-    
+    grid_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
+			 , TOURNAMENT_SIZE, POP_SIZE);
+
+    grid_pop.Update();
+    grid_pop.MutatePop();
+
     mixed_pop.Update();
     mixed_pop.MutatePop();
 
