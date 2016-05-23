@@ -267,7 +267,11 @@ namespace evo {
       if (last_mut == -1) last_mut = (int) popM.size();
       int mut_count = 0;
       for (int i = first_mut; i < last_mut; i++) {
-        if (mut_fun(popM[i], *random_ptr)) mut_count++;
+        if (this->IsOccupied(i)){
+          if (mut_fun(popM[i], *random_ptr)) {
+            mut_count++;
+          }
+        }
       }
       return mut_count;
     }
@@ -303,7 +307,9 @@ namespace evo {
       // Load the population into a multimap, sorted by fitness.
       std::multimap<double, int> fit_map;
       for (int i = 0; i < (int) popM.size(); i++) {
-        fit_map.insert( std::make_pair(fit_fun(popM[i]), i) );
+        if (this->IsOccupied(i)){
+          fit_map.insert( std::make_pair(fit_fun(popM[i]), i) );
+        }
       }
 
       // Grab the top fitnesses and move them into the next generation.
