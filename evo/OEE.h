@@ -21,41 +21,47 @@
 #include "World.h"
 #include "PopulationManager.h"
 #include "Stats.h"
+#include "StatsManager.h"
 
 namespace emp{
 namespace evo{
 
+  EMP_EXTEND_CONFIG( OEEStatsManagerConfig, StatsManagerConfig,
+                     VALUE(GENERATIONS, int, 50, "How long must a lineage survive to count as persistant")
+                    )
+
+  //Is there a way to avoid making this global but still do inheritance right?
+  OEEStatsManagerConfig OeeConfig;
+
   template <typename ORG, int MAX_ORG_SIZE, typename... MANAGERS>
-  class OEEStatsManager {
+  class OEEStatsManager : StatsManager_Base {
   private:
     using skeleton_type = emp::array<int, MAX_ORG_SIZE>;
     using pop_manager_type = AdaptTemplate< typename SelectPopManager<MANAGERS..., PopBasic>::type, ORG>;
     static constexpr bool separate_generations = pop_manager_type::emp_has_separate_generations;
-    static constexpr bool emp_is_stats_manager = true;
     //TODO: Make this use existing lineage tracker if there is one
-    LineageTracker<ORG> lineage;
+
     std::set<skeleton_type > novel;
 
-    // The generation we're currently working with - we need this to
-    // track lineage
-    emp::vector<int> generation_since_update;
+    int generations = 50; //How far back do we look for persistance?
 
     // Historical generations needed to count stats. We only need these in
     // proportion to resolution.
-    int generations = 50; //How far back do we look for persistance?
-    int resolution = 10; //With what frequency do we record data?
     std::deque<emp::vector<int> > past_snapshots;
-
-    //int update = 0;
-    int next_parent_id = -1;
-    int next_org_id;
+    using StatsManager_Base::resolution;
 
   public:
+    LineageTracker<ORG, MANAGERS...> * lineage;
 
-    OEEStatsManager(World<ORG, MANAGERS...>* world){
+    OEEStatsManager(World<ORG, MANAGERS...>* world,
+                    std::string location = "oee_stats.csv")
+                    : StatsManager_Base(OeeConfig, "OEE_stats.cfg", location){
       // This isn't going to work if generations aren't a multiple of resolution
       emp_assert(generations % resolution == 0 &&
-          "ERROR: Generations required for persistance must be a multiple of resolution.");
+                "ERROR: Generations required for persistance must be a multiple of resolution.",
+                resolution, generations);
+      generations = OeeConfig.GENERATIONS();
+      OeeConfig.Write("OEE_stats.cfg");
 
       past_snapshots = std::deque<emp::vector<int> >(2*generations/resolution + 1);
 
@@ -63,70 +69,22 @@ namespace evo{
       //this maybe shouldn't be necessary (or at least shouldn't need to happen
       //in the constructor), but for now it is or the compiler throws
       //internal errors
-      std::function<void(int)> RecordParentFun = [this] (int id){
-        RecordParent(id);
-      };
-
-      std::function<void(int)> TrackPlacementFun = [this] (int pos){
-        TrackPlacement(pos);
-      };
-
-      std::function<void(ORG *)> TrackOffspringFun = [this] (ORG * org){
-        TrackOffspring(org);
-      };
-
-      std::function<void(ORG *)> TrackInjectedOffspringFun = [this] (ORG * org){
-        TrackInjectedOffspring(org);
-      };
-
       std::function<void(int)> UpdateFun = [this] (int ud){
         Update(ud);
       };
 
       //Setup signal callbacks
-      world->OnBeforeRepro(RecordParentFun);
-      world->OnOffspringReady(TrackOffspringFun);
-      world->OnInjectReady(TrackInjectedOffspringFun);
       world->OnUpdate(UpdateFun);
-      world->OnOrgPlacement(TrackPlacementFun);
+      //lineage = LineageTracker<ORG, MANAGERS...>(world);
 
       //TODO: Figure out how to make this work automatically
       //fit_fun = world->GetFitFun();
+      output_location << "update" << delimiter << "change" << delimiter
+            << "novelty" << delimiter << "ecology" << delimiter
+            << "complexity" << std::endl;
     }
 
-    //Put newly born organism into the lineage tracker
     std::function<double(ORG * org)> fit_fun;
-    void TrackOffspring(ORG * org) {
-      next_org_id = lineage.AddOrganism(*org, next_parent_id);
-
-    }
-
-    //Put newly injected organism into the lineage tracker
-    void TrackInjectedOffspring(ORG * org) {
-      //std::cout << "Track Injected" << std::endl;
-      next_org_id = lineage.AddOrganism(*org, -1);
-
-    }
-
-    //Keep track of location of all orgs in the population so that
-    //we can translate their ids from the World to ids within the lineage
-    //tracker
-    void TrackPlacement(int pos) {
-      if (pos >= generation_since_update.size()) {
-        generation_since_update.resize(pos+1);
-      }
-      generation_since_update[pos] = next_org_id;
-    }
-
-    //Record the org that's about to have an offspring, so we can know
-    //who the parent of the next org is.
-    void RecordParent(int id) {
-      if (separate_generations){
-        next_parent_id = past_snapshots.back()[id];
-      } else {
-        next_parent_id = generation_since_update[id];
-      }
-    }
 
     //Update callback function handles calculating stats
     void Update(int update) {
@@ -134,15 +92,15 @@ namespace evo{
       int novelty = -1;
       double ecology = -1;
       int complexity = -1;
-      double fittest = -1;
+
       if (update % resolution == 0) {
 
         emp::vector<skeleton_type > persist_skeletons = Skeletonize(
-                                              GetPersistLineage(&lineage,
+                                              GetPersistLineage(lineage,
                                               past_snapshots[0],
                                               past_snapshots[generations/resolution]));
         emp::vector<skeleton_type > prev_persist_skeletons = Skeletonize(
-                                              GetPersistLineage(&lineage,
+                                              GetPersistLineage(lineage,
                                               past_snapshots[generations/resolution],
                                               past_snapshots[2*generations/resolution]));
 
@@ -158,17 +116,10 @@ namespace evo{
                                 int nulls = std::count(skel.begin(), skel.end(), -1);
                                 return (double)(skel.size() - nulls);
                               });
-          fittest = MaxFitness(fit_fun, IDsToGenomes(&lineage, past_snapshots[0]));
         }
-        std::cout << "Update: " << update << ", Change: " << change << ", Novelty: " << novelty << ", Ecology: " << ecology << ", Complexity: " << complexity << ", MaxFitness: " << fittest << std::endl;
+        output_location << update << delimiter << change << delimiter << novelty << delimiter << ecology << delimiter << complexity << std::endl;
         past_snapshots.pop_back();
-        past_snapshots.push_front(generation_since_update);
-      }
-
-      if (separate_generations) {
-        //TODO: This isn't sufficient - need to add signals for any
-        //population change event
-        generation_since_update.resize(0);
+        past_snapshots.push_front(lineage->generation_since_update);
       }
     }
 

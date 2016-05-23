@@ -24,8 +24,8 @@ constexpr int UD_COUNT = 1000;
 
 using BitOrg = emp::BitVector;
 
-//template <typename ORG, typename... MANAGERS>
-//using MixedWorld = emp::evo::World<ORG, MANAGERS..., emp::evo::PopulationManager_Base<ORG>>;
+template <typename ORG, typename... MANAGERS>
+using MixedWorld = emp::evo::World<ORG, MANAGERS..., emp::evo::PopulationManager_Base<ORG>>;
 
 int main()
 {
@@ -33,7 +33,10 @@ int main()
   emp::evo::NKLandscape landscape(N, K, random);
 
 //  MixedWorld<BitOrg> mixed_pop(random);
-  emp::evo::EAWorld<BitOrg> mixed_pop(random);
+//  emp::evo::EAWorld<BitOrg> mixed_pop(random);
+  MixedWorld<BitOrg> mixed_pop(random);
+  emp::evo::GridWorld<BitOrg> grid_pop(random);
+
 
   std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return landscape.GetFitness(*org);};
 
@@ -45,6 +48,7 @@ int main()
     // looking at the Insert() func it looks like it does a deep copy, so we should be safe in
     // doing this. Theoretically...
     mixed_pop.Insert(next_org);
+    grid_pop.Insert(next_org);
   }
 
   // mutation function:

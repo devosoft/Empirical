@@ -8,14 +8,14 @@
 #define EMP_FUNCTION_SET_H
 
 #include <functional>
-#include <vector>
+#include "vector.h"
 
 namespace emp {
 
   template <typename RETURN_TYPE, typename... ARG_TYPES> class FunctionSet {
   private:
-    std::vector<std::function<RETURN_TYPE(ARG_TYPES...)> > fun_set;
-    std::vector<RETURN_TYPE> return_vals;
+    emp::vector<std::function<RETURN_TYPE(ARG_TYPES...)> > fun_set;
+    emp::vector<RETURN_TYPE> return_vals;
 
   public:
     FunctionSet() { ; }
@@ -28,7 +28,7 @@ namespace emp {
       fun_set.push_back(in_fun);
     }
 
-    const std::vector<RETURN_TYPE> & Run(ARG_TYPES... params) {
+    const emp::vector<RETURN_TYPE> & Run(ARG_TYPES... params) {
       const int num_tests = (int) fun_set.size();
       return_vals.resize(num_tests);
       for (int i = 0; i < num_tests; i++) {
@@ -69,7 +69,7 @@ namespace emp {
 
   template <typename... ARG_TYPES> class FunctionSet<void, ARG_TYPES...> {
   private:
-    std::vector<std::function<void(ARG_TYPES...)> > fun_set;
+    emp::vector<std::function<void(ARG_TYPES...)> > fun_set;
 
   public:
     FunctionSet() { ; }

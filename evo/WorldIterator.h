@@ -33,9 +33,9 @@ public:
   }
 
   WorldIterator(WorldIterator * w){
-    world  = w.world;
-    curr = w.curr;
-    size = w.size;
+    world  = w->world;
+    curr = w->curr;
+    size = w->size;
     while (curr < size && !world->IsOccupied(curr)){
       ++curr;
     }

@@ -10,7 +10,7 @@
 //
 // To extend an existing config, simply use:
 //   EMP_EXTEND_CONFIG( NEW_NAME, BASE_CLASS, OPTIONS... )
-// 
+//
 // where options can be:
 //
 // GROUP(group name, group description string) -- Start a new group for configuration
@@ -34,5 +34,6 @@ EMP_BUILD_CONFIG( MyConfig,
   VALUE(TEST_STRING, std::string, "default", "This is a string!"),
   CONST(TEST_CONST, int, 91, "This is an unchanging const!"),
   VALUE(TEST_STRING_SPACE, std::string, "abc def   ghi", "This is a string with spaces."),
-  VALUE(MUTATION_RATE, float, 0.025, "This is my mutation rate.", MUT_RATE),
+  //VALUE(MUTATION_RATE, float, 0.025, "This is my mutation rate.", MUT_RATE),
+  VALUE(MUTATION_RATE, float, 0.025, "This is my mutation rate."),
 )

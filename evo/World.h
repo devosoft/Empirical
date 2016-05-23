@@ -131,7 +131,7 @@ namespace evo {
     Random * random_ptr;
     bool random_owner;
     int update = 0;
-
+    
     friend class WorldIterator<ORG, MANAGERS...>;
     typedef WorldIterator<ORG, MANAGERS...> iterator;
 
