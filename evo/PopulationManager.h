@@ -264,30 +264,49 @@ namespace evo {
     using PopulationManager_Base<ORG>::pop;
     using PopulationManager_Base<ORG>::random_ptr;
 
-    int pool_count; //Test Comment Plz Ignore
+    int pool_count;
     Vector<int> pool_sizes;
-
-    int ToX(int id) const { return id % width; } //gives x-coordinate
-    int ToY(int id) const { return id / width; } //gives y-coordinate
-    int ToID(int x, int y) const { return y*width + x; } // returns organism ID
+    int r_upper;
+    int r_lower;
 
   public:
-    PopulationManager_Pools() { }
+    PopulationManager_Pools() { ConfigPop(5, Vector<int> temp_sizes, 100, 10); }
     ~PopulationManager_Pools() { ; }
 
-    int GetWidth() const { return width; }
-    int GetHeight() const { return height; }
+    int GetPoolCount() const { return pool_count; }
+    Vector<int> GetSizes() const { return pool_sizes ; }
+    int GetUpper() const { return r_upper; }
+    int GetLower() const { return r_lower; }
 
     //resizes vector and fills newly added spots with nullptr
-    void ConfigPop(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }
+    void ConfigPop(int pc, Vector<int> ps, int u, int l) { 
+        pool_count = pc; 
+        pool_sizes = ps;
+        r_upper = u;
+        r_lower = l;
+
+        if(pool_sizes.size() == 0){
+            for( int i = 0; i < pool_count; i++){
+               pool_sizes.push_back( (int)random_ptr->GetDouble(r_lower, r_upper));
+            }
+        }
+        else if(pool_sizes.size() == 1){
+            int temp = pool_sizes[0];
+            for(int i = 1; i < pool_count; i++){
+                pool_sizes.push_back(temp);
+            }
+        }
+    
+    }
 
     // Injected orgs go into a random position.
     int AddOrg(ORG * new_org) {
-      const int pos = random_ptr->GetInt((int) pop.size());
-      if (pop[pos]) delete pop[pos];
-      pop[pos] = new_org;
-      return pos;
-    }
+        const int pos = random_ptr->GetInt((int) pop.size());
+        
+        if (pop[pos]) delete pop[pos];
+        pop[pos] = new_org;
+
+        return pos;
 
     // Newly born orgs go next to their parents.
     int AddOrgBirth(ORG * new_org, int parent_pos) {
