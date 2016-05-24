@@ -264,7 +264,7 @@ namespace evo {
     using PopulationManager_Base<ORG>::pop;
     using PopulationManager_Base<ORG>::random_ptr;
 
-    int pool_count;
+    int pool_count; //Test Comment Plz Ignore
     Vector<int> pool_sizes;
 
     int ToX(int id) const { return id % width; } //gives x-coordinate
