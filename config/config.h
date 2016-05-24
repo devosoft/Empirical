@@ -311,7 +311,9 @@ namespace emp {
             cur_line.replace(pos, var_size+1, new_val);           // Replace var name with value.
             pos += (int) new_val.size();                          // Skip new text.
           } else {
-            // @CAO ERROR!
+            std::stringstream ss;
+            ss << "Unable to process config setting '$" << var_name << "'. Ignoring." << std::endl;
+            emp::NotifyError(ss.str());
           }
           // @CAO CONTINUE
         }
