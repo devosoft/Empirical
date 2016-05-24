@@ -185,16 +185,16 @@ namespace evo {
 
   template <typename ORG=int>
   class PopulationManager_Grid : public PopulationManager_Base<ORG> {
-  public:
+  protected:
     using PopulationManager_Base<ORG>::pop;
     using PopulationManager_Base<ORG>::random_ptr;
 
     int width;
     int height;
 
-    int ToX(int id) const { return id % width; }
-    int ToY(int id) const { return id / width; }
-    int ToID(int x, int y) const { return y*width + x; }
+    int ToX(int id) const { return id % width; } //gives x-coordinate
+    int ToY(int id) const { return id / width; } //gives y-coordinate
+    int ToID(int x, int y) const { return y*width + x; } // returns organism ID
 
   public:
     PopulationManager_Grid() { ConfigPop(10,10); }
@@ -203,6 +203,82 @@ namespace evo {
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
 
+    //resizes vector and fills newly added spots with nullptr
+    void ConfigPop(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }
+
+    // Injected orgs go into a random position.
+    int AddOrg(ORG * new_org) {
+      const int pos = random_ptr->GetInt((int) pop.size());
+      if (pop[pos]) delete pop[pos];
+      pop[pos] = new_org;
+      return pos;
+    }
+
+    // Newly born orgs go next to their parents.
+    int AddOrgBirth(ORG * new_org, int parent_pos) {
+      const int parent_x = ToX(parent_pos);
+      const int parent_y = ToY(parent_pos);
+
+      const int offset = random_ptr->GetInt(9);
+      const int offspring_x = emp::mod(parent_x + offset%3 - 1, width);
+      const int offspring_y = emp::mod(parent_y + offset/3 - 1, height);
+      const int pos = ToID(offspring_x, offspring_y);
+
+      if (pop[pos]) delete pop[pos];
+
+      pop[pos] = new_org;
+
+      return pos;
+    }
+
+    void Print(std::function<std::string(ORG*)> string_fun,
+               std::ostream & os = std::cout,
+               const std::string & empty="-",
+               const std::string & spacer=" ")
+    {
+      emp_assert(string_fun);
+      for (int y=0; y<height; y++) {
+        for (int x = 0; x<width; x++) {
+          ORG * org = pop[ToID(x,y)];
+          if (org) os << string_fun(org) << spacer;
+          else os << empty << spacer;
+        }
+        os << std::endl;
+      }
+    }
+
+    void Print(std::ostream & os = std::cout, std::string empty="X", std::string spacer=" ") {
+      for (int y=0; y<height; y++) {
+        for (int x = 0; x<width; x++) {
+          ORG * org = pop[ToID(x,y)];
+          if (org) os << *org << spacer;
+          else os << empty << spacer;
+        }
+        os << std::endl;
+      }
+    }
+  };
+
+  class PopulationManager_Pools : public PopulationManager_Base<ORG> {
+  protected:
+    using PopulationManager_Base<ORG>::pop;
+    using PopulationManager_Base<ORG>::random_ptr;
+
+    int pool_count;
+    Vector<int> pool_sizes;
+
+    int ToX(int id) const { return id % width; } //gives x-coordinate
+    int ToY(int id) const { return id / width; } //gives y-coordinate
+    int ToID(int x, int y) const { return y*width + x; } // returns organism ID
+
+  public:
+    PopulationManager_Pools() { }
+    ~PopulationManager_Pools() { ; }
+
+    int GetWidth() const { return width; }
+    int GetHeight() const { return height; }
+
+    //resizes vector and fills newly added spots with nullptr
     void ConfigPop(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }
 
     // Injected orgs go into a random position.
@@ -262,6 +338,7 @@ namespace evo {
   using PopEA    = PopulationManager_EA<int>;
   using PopST    = PopulationManager_SerialTransfer<int>;
   using PopGrid  = PopulationManager_Grid<int>;
+  using PopPools = PopulationManager_Pools<int>;
 
 }
 }
