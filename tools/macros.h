@@ -152,6 +152,8 @@
 #define EMP_PACK_PUSH_REAR(NEW, PACK) (EMP_UNPACK_ARGS(PACK),NEW)
 #define EMP_PACK_SIZE(PACK) EMP_COUNT_ARGS PACK
 
+#define EMP_PACKS_PUSH_ALL(NEW, ...) EMP_WRAP_EACH()
+
 // Group the arguments that follow into packs of size S.
 #define EMP_ARGS_TO_PACKS(S, ...) \
   EMP_ARGS_TO_PACKS_impl(S, EMP_DIV(EMP_COUNT_ARGS(__VA_ARGS__), S), __VA_ARGS__)
@@ -282,6 +284,35 @@
 #define EMP_WRAP_EACH_512(W, ...) \
   EMP_WRAP_EACH_256(W, __VA_ARGS__) \
   EMP_EVAL7( EMP_WRAP_EACH_256 EMP_EMPTY() (W, EMP_POP_ARGS_256(__VA_ARGS__)) )
+
+// EMP_WRAP_EACH_1ARG, wraps each argument in the specified macro wrapper, with added first arg.
+#define EMP_WRAP_EACH_1ARG(W, ARG, ...) EMP_CALL_BY_PACKS(EMP_WRAP_EACH_1ARG_, (W, ARG), __VA_ARGS__)
+#define EMP_WRAP_EACH_1ARG_1(P, A, ...) EMP_GET_ARG_1 P (EMP_GET_ARG_2 P, A)
+#define EMP_WRAP_EACH_1ARG_2(P, A,B,...) EMP_WRAP_EACH_1ARG_1(P, A, ~)         \
+                                              EMP_WRAP_EACH_1ARG_1(P, B, ~)
+#define EMP_WRAP_EACH_1ARG_4(P, A,B,...) EMP_WRAP_EACH_1ARG_2(P, A, B, ~)      \
+                                              EMP_WRAP_EACH_1ARG_2(P, __VA_ARGS__)
+#define EMP_WRAP_EACH_1ARG_8(P, ...)                                                \
+  EMP_WRAP_EACH_1ARG_4(P, __VA_ARGS__)                                              \
+  EMP_EVAL1( EMP_WRAP_EACH_1ARG_4 EMP_EMPTY() (P, EMP_POP_ARGS_4(__VA_ARGS__)) )
+#define EMP_WRAP_EACH_1ARG_16(P, ...)                                               \
+  EMP_WRAP_EACH_1ARG_8(P, __VA_ARGS__)                                              \
+  EMP_EVAL2( EMP_WRAP_EACH_1ARG_8 EMP_EMPTY() (P, EMP_POP_ARGS_8(__VA_ARGS__)) )
+#define EMP_WRAP_EACH_1ARG_32(P, ...)                                               \
+  EMP_WRAP_EACH_1ARG_16(P, __VA_ARGS__)                                             \
+  EMP_EVAL3( EMP_WRAP_EACH_1ARG_16 EMP_EMPTY() (P, EMP_POP_ARGS_16(__VA_ARGS__)) )
+#define EMP_WRAP_EACH_1ARG_64(P, ...)                                               \
+  EMP_WRAP_EACH_1ARG_32(P, __VA_ARGS__)                                             \
+  EMP_EVAL4( EMP_WRAP_EACH_1ARG_32 EMP_EMPTY() (P, EMP_POP_ARGS_32(__VA_ARGS__)) )
+#define EMP_WRAP_EACH_1ARG_128(P, ...)                                              \
+  EMP_WRAP_EACH_1ARG_64(P, __VA_ARGS__)                                             \
+  EMP_EVAL5( EMP_WRAP_EACH_1ARG_64 EMP_EMPTY() (P, EMP_POP_ARGS_64(__VA_ARGS__)) )
+#define EMP_WRAP_EACH_1ARG_256(P, ...)                                              \
+  EMP_WRAP_EACH_1ARG_128(P, __VA_ARGS__)                                            \
+  EMP_EVAL6( EMP_WRAP_EACH_1ARG_128 EMP_EMPTY() (P, EMP_POP_ARGS_128(__VA_ARGS__)) )
+#define EMP_WRAP_EACH_1ARG_512(P, ...)                                              \
+  EMP_WRAP_EACH_1ARG_256(P, __VA_ARGS__)                                            \
+  EMP_EVAL7( EMP_WRAP_EACH_1ARG_256 EMP_EMPTY() (P, EMP_POP_ARGS_256(__VA_ARGS__)) )
 
 
 // Replace all of the commas in an argument set with something else (including nothing)
