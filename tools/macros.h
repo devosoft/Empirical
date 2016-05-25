@@ -153,11 +153,11 @@
 #define EMP_PACK_SIZE(PACK) EMP_COUNT_ARGS PACK
 
 // Macros to work on multiple packs at once.
-#define EMP_PACKS_POP_ALL(...) EMP_WRAP_EACH(EMP_PACK_POP, __VA_ARGS__)
-#define EMP_PACKS_TOP_ALL(...) EMP_WRAP_EACH(EMP_PACK_TOP, __VA_ARGS__)
-#define EMP_PACKS_PUSH_ALL(NEW, ...) EMP_WRAP_EACH_1ARG(EMP_PACK_PUSH, NEW, __VA_ARGS__)
-#define EMP_PACKS_PUSH_REAR_ALL(NEW, ...) EMP_WRAP_EACH_1ARG(EMP_PACK_PUSH_REAR, NEW, __VA_ARGS__)
-#define EMP_PACKS_SIZE_ALL(...) EMP_WRAP_EACH(EMP_PACK_SIZE, __VA_ARGS__)
+#define EMP_PACKS_POP_ALL(...) EMP_WRAP_ARGS(EMP_PACK_POP, __VA_ARGS__)
+#define EMP_PACKS_TOP_ALL(...) EMP_WRAP_ARGS(EMP_PACK_TOP, __VA_ARGS__)
+#define EMP_PACKS_PUSH_ALL(NEW, ...) EMP_WRAP_ARGS_1ARG(EMP_PACK_PUSH, NEW, __VA_ARGS__)
+#define EMP_PACKS_PUSH_REAR_ALL(NEW, ...) EMP_WRAP_ARGS_1ARG(EMP_PACK_PUSH_REAR, NEW, __VA_ARGS__)
+#define EMP_PACKS_SIZE_ALL(...) EMP_WRAP_ARGS(EMP_PACK_SIZE, __VA_ARGS__)
 
 // Group the arguments that follow into packs of size S.
 #define EMP_ARGS_TO_PACKS(S, ...) \
@@ -319,6 +319,59 @@
   EMP_WRAP_EACH_1ARG_256(P, __VA_ARGS__)                                            \
   EMP_EVAL7( EMP_WRAP_EACH_1ARG_256 EMP_EMPTY() (P, EMP_POP_ARGS_256(__VA_ARGS__)) )
 
+#define EMP_WRAP_ARGS(W, ...) EMP_POP_ARGS_1( ~ EMP_CALL_BY_PACKS(EMP_WRAP_ARGS_, W, __VA_ARGS__) )
+#define EMP_WRAP_ARGS_1(W, A, ...) , W(A)
+#define EMP_WRAP_ARGS_2(W, A,B,...) EMP_WRAP_ARGS_1(W, A, ~) EMP_WRAP_ARGS_1(W, B, ~)
+#define EMP_WRAP_ARGS_4(W, A,B,...) EMP_WRAP_ARGS_2(W, A, B, ~) EMP_WRAP_ARGS_2(W, __VA_ARGS__)
+#define EMP_WRAP_ARGS_8(W, ...)                                         \
+  EMP_WRAP_ARGS_4(W, __VA_ARGS__)                                       \
+  EMP_EVAL1( EMP_WRAP_ARGS_4 EMP_EMPTY() (W, EMP_POP_ARGS_4(__VA_ARGS__)) )
+#define EMP_WRAP_ARGS_16(W, ...) \
+  EMP_WRAP_ARGS_8(W, __VA_ARGS__) \
+  EMP_EVAL2( EMP_WRAP_ARGS_8 EMP_EMPTY() (W, EMP_POP_ARGS_8(__VA_ARGS__)) )
+#define EMP_WRAP_ARGS_32(W, ...) \
+  EMP_WRAP_ARGS_16(W, __VA_ARGS__) \
+  EMP_EVAL3( EMP_WRAP_ARGS_16 EMP_EMPTY() (W, EMP_POP_ARGS_16(__VA_ARGS__)) )
+#define EMP_WRAP_ARGS_64(W, ...) \
+  EMP_WRAP_ARGS_32(W, __VA_ARGS__) \
+  EMP_EVAL4( EMP_WRAP_ARGS_32 EMP_EMPTY() (W, EMP_POP_ARGS_32(__VA_ARGS__)) )
+#define EMP_WRAP_ARGS_128(W, ...) \
+  EMP_WRAP_ARGS_64(W, __VA_ARGS__) \
+  EMP_EVAL5( EMP_WRAP_ARGS_64 EMP_EMPTY() (W, EMP_POP_ARGS_64(__VA_ARGS__)) )
+#define EMP_WRAP_ARGS_256(W, ...) \
+  EMP_WRAP_ARGS_128(W, __VA_ARGS__) \
+  EMP_EVAL6( EMP_WRAP_ARGS_128 EMP_EMPTY() (W, EMP_POP_ARGS_128(__VA_ARGS__)) )
+#define EMP_WRAP_ARGS_512(W, ...) \
+  EMP_WRAP_ARGS_256(W, __VA_ARGS__) \
+  EMP_EVAL7( EMP_WRAP_ARGS_256 EMP_EMPTY() (W, EMP_POP_ARGS_256(__VA_ARGS__)) )
+
+#define EMP_WRAP_ARGS_1ARG(W, ARG, ...) \
+  EMP_POP_ARGS_1( ~ EMP_CALL_BY_PACKS(EMP_WRAP_ARGS_1ARG_, (W, ARG), __VA_ARGS__) )
+#define EMP_WRAP_ARGS_1ARG_1(P, A, ...) , EMP_GET_ARG_1 P (EMP_GET_ARG_2 P, A)
+#define EMP_WRAP_ARGS_1ARG_2(P, A,B,...) EMP_WRAP_ARGS_1ARG_1(P, A, ~) EMP_WRAP_ARGS_1ARG_1(P, B, ~)
+#define EMP_WRAP_ARGS_1ARG_4(P, A,B,...) EMP_WRAP_ARGS_1ARG_2(P, A, B, ~) EMP_WRAP_ARGS_1ARG_2(P, __VA_ARGS__)
+#define EMP_WRAP_ARGS_1ARG_8(P, ...)                                         \
+  EMP_WRAP_ARGS_1ARG_4(P, __VA_ARGS__)                                       \
+  EMP_EVAL1( EMP_WRAP_ARGS_1ARG_4 EMP_EMPTY() (P, EMP_POP_ARGS_4(__VA_ARGS__)) )
+#define EMP_WRAP_ARGS_1ARG_16(P, ...) \
+  EMP_WRAP_ARGS_1ARG_8(P, __VA_ARGS__) \
+  EMP_EVAL2( EMP_WRAP_ARGS_1ARG_8 EMP_EMPTY() (P, EMP_POP_ARGS_8(__VA_ARGS__)) )
+#define EMP_WRAP_ARGS_1ARG_32(P, ...) \
+  EMP_WRAP_ARGS_1ARG_16(P, __VA_ARGS__) \
+  EMP_EVAL3( EMP_WRAP_ARGS_1ARG_16 EMP_EMPTY() (P, EMP_POP_ARGS_16(__VA_ARGS__)) )
+#define EMP_WRAP_ARGS_1ARG_64(P, ...) \
+  EMP_WRAP_ARGS_1ARG_32(P, __VA_ARGS__) \
+  EMP_EVAL4( EMP_WRAP_ARGS_1ARG_32 EMP_EMPTY() (P, EMP_POP_ARGS_32(__VA_ARGS__)) )
+#define EMP_WRAP_ARGS_1ARG_128(P, ...) \
+  EMP_WRAP_ARGS_1ARG_64(P, __VA_ARGS__) \
+  EMP_EVAL5( EMP_WRAP_ARGS_1ARG_64 EMP_EMPTY() (P, EMP_POP_ARGS_64(__VA_ARGS__)) )
+#define EMP_WRAP_ARGS_1ARG_256(P, ...) \
+  EMP_WRAP_ARGS_1ARG_128(P, __VA_ARGS__) \
+  EMP_EVAL6( EMP_WRAP_ARGS_1ARG_128 EMP_EMPTY() (P, EMP_POP_ARGS_128(__VA_ARGS__)) )
+#define EMP_WRAP_ARGS_1ARG_512(P, ...) \
+  EMP_WRAP_ARGS_1ARG_256(P, __VA_ARGS__) \
+  EMP_EVAL7( EMP_WRAP_ARGS_1ARG_256 EMP_EMPTY() (P, EMP_POP_ARGS_256(__VA_ARGS__)) )
+
 
 // Replace all of the commas in an argument set with something else (including nothing)
 #define EMP_REPLACE_COMMAS(X, ...) EMP_GET_ARG_1(__VA_ARGS__) EMP_CALL_BY_PACKS(EMP_REPLACE_COMMAS_, X, EMP_POP_ARGS_1(__VA_ARGS__) )
@@ -360,6 +413,20 @@
 
 #define EMP_ROTATE_ARGS(A, ...) __VA_ARGS__, A
 #define EMP_RUN_JOIN(A, B) A B
+
+#define EMP_PERMUTE(...) EMP_ASSEMBLE_MACRO(EMP_PERMUTE_, __VA_ARGS__)
+#define EMP_PERMUTE_1(A1) (A1)
+#define EMP_PERMUTE_2(A1,A2) (A1,A2),(A2,A1)
+#define EMP_PERMUTE_3(A1,A2,A3) (A1,A2,A3),(A2,A1,A3),(A1,A3,A2),(A2,A3,A1),(A3,A1,A2),(A3,A2,A1)
+#define EMP_PERMUTE_4(A1,A2,A3,A4) EMP_PACKS_PUSH_ALL(A1, EMP_PERMUTE_3(A2,A3,A4)), \
+                                   EMP_PACKS_PUSH_ALL(A2, EMP_PERMUTE_3(A1,A3,A4)), \
+                                   EMP_PACKS_PUSH_ALL(A3, EMP_PERMUTE_3(A1,A2,A4)), \
+                                   EMP_PACKS_PUSH_ALL(A4, EMP_PERMUTE_3(A1,A2,A3))
+#define EMP_PERMUTE_5(A1,A2,A3,A4,A5) EMP_PACKS_PUSH_ALL(A1, EMP_PERMUTE_4(A2,A3,A4,A5)), \
+                                      EMP_PACKS_PUSH_ALL(A2, EMP_PERMUTE_4(A1,A3,A4,A5)), \
+                                      EMP_PACKS_PUSH_ALL(A3, EMP_PERMUTE_4(A1,A2,A4,A5)), \
+                                      EMP_PACKS_PUSH_ALL(A4, EMP_PERMUTE_4(A1,A2,A3,A5)), \
+                                      EMP_PACKS_PUSH_ALL(A5, EMP_PERMUTE_4(A1,A2,A3,A4))
 
 
 // A generic technique to trim the arguments we have.  In parens, list i or x for each
@@ -542,71 +609,6 @@
 #define EMP_LAYOUT_62(W, P, A, ...) W(A) P EMP_LAYOUT_61(W, P, __VA_ARGS__)
 #define EMP_LAYOUT_63(W, P, A, ...) W(A) P EMP_LAYOUT_62(W, P, __VA_ARGS__)
 
-
-#define EMP_WRAP_ARGS(W, ...) EMP_ASSEMBLE_MACRO_1ARG(EMP_WRAP_ARGS_, W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_1(W, A) W(A)
-#define EMP_WRAP_ARGS_2(W, A, ...) W(A), EMP_WRAP_ARGS_1(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_3(W, A, ...) W(A), EMP_WRAP_ARGS_2(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_4(W, A, ...) W(A), EMP_WRAP_ARGS_3(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_5(W, A, ...) W(A), EMP_WRAP_ARGS_4(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_6(W, A, ...) W(A), EMP_WRAP_ARGS_5(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_7(W, A, ...) W(A), EMP_WRAP_ARGS_6(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_8(W, A, ...) W(A), EMP_WRAP_ARGS_7(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_9(W, A, ...) W(A), EMP_WRAP_ARGS_8(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_10(W, A, ...) W(A), EMP_WRAP_ARGS_9(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_11(W, A, ...) W(A), EMP_WRAP_ARGS_10(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_12(W, A, ...) W(A), EMP_WRAP_ARGS_11(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_13(W, A, ...) W(A), EMP_WRAP_ARGS_12(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_14(W, A, ...) W(A), EMP_WRAP_ARGS_13(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_15(W, A, ...) W(A), EMP_WRAP_ARGS_14(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_16(W, A, ...) W(A), EMP_WRAP_ARGS_15(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_17(W, A, ...) W(A), EMP_WRAP_ARGS_16(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_18(W, A, ...) W(A), EMP_WRAP_ARGS_17(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_19(W, A, ...) W(A), EMP_WRAP_ARGS_18(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_20(W, A, ...) W(A), EMP_WRAP_ARGS_19(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_21(W, A, ...) W(A), EMP_WRAP_ARGS_20(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_22(W, A, ...) W(A), EMP_WRAP_ARGS_21(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_23(W, A, ...) W(A), EMP_WRAP_ARGS_22(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_24(W, A, ...) W(A), EMP_WRAP_ARGS_23(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_25(W, A, ...) W(A), EMP_WRAP_ARGS_24(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_26(W, A, ...) W(A), EMP_WRAP_ARGS_25(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_27(W, A, ...) W(A), EMP_WRAP_ARGS_26(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_28(W, A, ...) W(A), EMP_WRAP_ARGS_27(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_29(W, A, ...) W(A), EMP_WRAP_ARGS_28(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_30(W, A, ...) W(A), EMP_WRAP_ARGS_29(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_31(W, A, ...) W(A), EMP_WRAP_ARGS_30(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_32(W, A, ...) W(A), EMP_WRAP_ARGS_31(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_33(W, A, ...) W(A), EMP_WRAP_ARGS_32(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_34(W, A, ...) W(A), EMP_WRAP_ARGS_33(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_35(W, A, ...) W(A), EMP_WRAP_ARGS_34(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_36(W, A, ...) W(A), EMP_WRAP_ARGS_35(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_37(W, A, ...) W(A), EMP_WRAP_ARGS_36(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_38(W, A, ...) W(A), EMP_WRAP_ARGS_37(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_39(W, A, ...) W(A), EMP_WRAP_ARGS_38(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_40(W, A, ...) W(A), EMP_WRAP_ARGS_39(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_41(W, A, ...) W(A), EMP_WRAP_ARGS_40(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_42(W, A, ...) W(A), EMP_WRAP_ARGS_41(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_43(W, A, ...) W(A), EMP_WRAP_ARGS_42(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_44(W, A, ...) W(A), EMP_WRAP_ARGS_43(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_45(W, A, ...) W(A), EMP_WRAP_ARGS_44(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_46(W, A, ...) W(A), EMP_WRAP_ARGS_45(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_47(W, A, ...) W(A), EMP_WRAP_ARGS_46(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_48(W, A, ...) W(A), EMP_WRAP_ARGS_47(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_49(W, A, ...) W(A), EMP_WRAP_ARGS_48(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_50(W, A, ...) W(A), EMP_WRAP_ARGS_49(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_51(W, A, ...) W(A), EMP_WRAP_ARGS_50(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_52(W, A, ...) W(A), EMP_WRAP_ARGS_51(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_53(W, A, ...) W(A), EMP_WRAP_ARGS_52(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_54(W, A, ...) W(A), EMP_WRAP_ARGS_53(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_55(W, A, ...) W(A), EMP_WRAP_ARGS_54(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_56(W, A, ...) W(A), EMP_WRAP_ARGS_55(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_57(W, A, ...) W(A), EMP_WRAP_ARGS_56(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_58(W, A, ...) W(A), EMP_WRAP_ARGS_57(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_59(W, A, ...) W(A), EMP_WRAP_ARGS_58(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_60(W, A, ...) W(A), EMP_WRAP_ARGS_59(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_61(W, A, ...) W(A), EMP_WRAP_ARGS_60(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_62(W, A, ...) W(A), EMP_WRAP_ARGS_61(W, __VA_ARGS__)
-#define EMP_WRAP_ARGS_63(W, A, ...) W(A), EMP_WRAP_ARGS_62(W, __VA_ARGS__)
 
 // Wrap C different arguments.
 #define EMP_WRAP_ARGSET(W, C, ...) EMP_ASSEMBLE_MACRO_2ARG(EMP_WRAP_ARGS_, W, C, __VA_ARGS__)
