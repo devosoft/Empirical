@@ -152,7 +152,12 @@
 #define EMP_PACK_PUSH_REAR(NEW, PACK) (EMP_UNPACK_ARGS(PACK),NEW)
 #define EMP_PACK_SIZE(PACK) EMP_COUNT_ARGS PACK
 
-#define EMP_PACKS_PUSH_ALL(NEW, ...) EMP_WRAP_EACH()
+// Macros to work on multiple packs at once.
+#define EMP_PACKS_POP_ALL(...) EMP_WRAP_EACH(EMP_PACK_POP, __VA_ARGS__)
+#define EMP_PACKS_TOP_ALL(...) EMP_WRAP_EACH(EMP_PACK_TOP, __VA_ARGS__)
+#define EMP_PACKS_PUSH_ALL(NEW, ...) EMP_WRAP_EACH_1ARG(EMP_PACK_PUSH, NEW, __VA_ARGS__)
+#define EMP_PACKS_PUSH_REAR_ALL(NEW, ...) EMP_WRAP_EACH_1ARG(EMP_PACK_PUSH_REAR, NEW, __VA_ARGS__)
+#define EMP_PACKS_SIZE_ALL(...) EMP_WRAP_EACH(EMP_PACK_SIZE, __VA_ARGS__)
 
 // Group the arguments that follow into packs of size S.
 #define EMP_ARGS_TO_PACKS(S, ...) \
