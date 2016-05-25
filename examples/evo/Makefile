@@ -40,6 +40,9 @@ NK: NK.cc ../../evo/NK.h $(EVO_DEPEND)
 replica: replica.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -g replica.cc -o replica
 
+pool-test: pool-test.cc ../../evo/NK.h $(EVO_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -g pool-test.cc -o pool-test
+
 fast-replica: replica.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 replica.cc -o replica
 

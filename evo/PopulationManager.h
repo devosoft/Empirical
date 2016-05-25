@@ -13,6 +13,7 @@
 #define EMP_EVO_POPULATION_MANAGER_H
 
 #include "../tools/random_utils.h"
+#include "../tools/vector.h"
 
 namespace emp {
 namespace evo {
@@ -258,36 +259,42 @@ namespace evo {
       }
     }
   };
-
-  class PopulationManager_Pools : public PopulationManager_Base<ORG> {
-  protected:
+ template <typename ORG>
+ class PopulationManager_Pools : public PopulationManager_Base<ORG> {
+  public:
     using PopulationManager_Base<ORG>::pop;
     using PopulationManager_Base<ORG>::random_ptr;
 
     int pool_count;
-    Vector<int> pool_sizes;
-    int r_upper;
-    int r_lower;
+    vector<int> pool_sizes;
+    int org_count = 0; // orgs in vector
+    int r_upper; //random upper limit
+    int r_lower;// random lower limit
+    vector<int> pool_end; //end of each pool in array
 
   public:
-    PopulationManager_Pools() { ConfigPop(5, Vector<int> temp_sizes, 100, 10); }
+    PopulationManager_Pools() {
+        vector<int>* temp_sizes = new vector<int>;
+        ConfigPop(5,*temp_sizes, 100, 10);
+    }
     ~PopulationManager_Pools() { ; }
 
     int GetPoolCount() const { return pool_count; }
-    Vector<int> GetSizes() const { return pool_sizes ; }
+    vector<int> GetSizes() const { return pool_sizes ; }
     int GetUpper() const { return r_upper; }
     int GetLower() const { return r_lower; }
 
-    //resizes vector and fills newly added spots with nullptr
-    void ConfigPop(int pc, Vector<int> ps, int u, int l) { 
+    void ConfigPop(int pc, vector<int> ps, int u, int l) { 
         pool_count = pc; 
         pool_sizes = ps;
         r_upper = u;
         r_lower = l;
-
         if(pool_sizes.size() == 0){
             for( int i = 0; i < pool_count; i++){
-               pool_sizes.push_back( (int)random_ptr->GetDouble(r_lower, r_upper));
+                int fin = random_ptr->GetInt(1,100);
+                std::cout<<"Upper "<<r_upper<<" Lower "<<r_lower<<std::endl;
+               pool_sizes.push_back(10);      //random_ptr->GetInt(r_lower, r_upper));
+               std::cout<<"here"<<std::endl;
             }
         }
         else if(pool_sizes.size() == 1){
@@ -296,27 +303,54 @@ namespace evo {
                 pool_sizes.push_back(temp);
             }
         }
+        else if(pool_sizes.size() != pool_count){
+            std::cerr<<" ERROR: Not enough pool sizes"<<std::endl;
+            return;
+        }
+
+        int arr_size = 0;
+        for( auto el : pool_sizes ){
+            arr_size += el;
+            pool_end.push_back(el); // divides vector into pools
+
+        }
+
+        pop.resize(arr_size,nullptr);
     
     }
 
     // Injected orgs go into a random position.
     int AddOrg(ORG * new_org) {
-        const int pos = random_ptr->GetInt((int) pop.size());
+        int range_u;
+        int range_l = 0;
+
+        if(org_count < pool_count){
+            range_u = pool_end[org_count];
+            if(org_count > 0){range_l = pool_end[org_count - 1];}
+        }
+        else{
+            range_u = (int) pop.size();
+        }
+
+        const int pos = (int) random_ptr->GetDouble(range_l, range_u);
         
         if (pop[pos]) delete pop[pos];
         pop[pos] = new_org;
 
         return pos;
+    }
 
     // Newly born orgs go next to their parents.
     int AddOrgBirth(ORG * new_org, int parent_pos) {
-      const int parent_x = ToX(parent_pos);
-      const int parent_y = ToY(parent_pos);
+        int InsertPool, range_l, range_u;
+        for(int i = 0; i < pool_end.size(); i++ ){if(parent_pos < pool_end[i]) InsertPool = i;}
 
-      const int offset = random_ptr->GetInt(9);
-      const int offspring_x = emp::mod(parent_x + offset%3 - 1, width);
-      const int offspring_y = emp::mod(parent_y + offset/3 - 1, height);
-      const int pos = ToID(offspring_x, offspring_y);
+        if(InsertPool == 0){range_l = 0;}
+        else{range_l = pool_end[InsertPool - 1];}
+
+        range_u = pool_end[InsertPool];
+
+        const int pos = (int) random_ptr->GetDouble(range_l, range_u);
 
       if (pop[pos]) delete pop[pos];
 
@@ -324,7 +358,7 @@ namespace evo {
 
       return pos;
     }
-
+/*
     void Print(std::function<std::string(ORG*)> string_fun,
                std::ostream & os = std::cout,
                const std::string & empty="-",
@@ -350,7 +384,7 @@ namespace evo {
         }
         os << std::endl;
       }
-    }
+    }*/
   };
 
   using PopBasic = PopulationManager_Base<int>;
