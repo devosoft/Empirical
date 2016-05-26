@@ -137,6 +137,14 @@ template <typename ORG, typename... MANAGERS>
     return non_total / num_orgs;
   }
 
+  template <typename ORG, typename... MANAGERS>
+  double MutLandscape(std::function<double(ORG * org)> fit_fun, World<ORG, MANAGERS...> & orgs){
+      for (auto org : orgs){
+          double fitness = fit_fun(&org);
+          
+      }
+  }
+
 
 }
 }
