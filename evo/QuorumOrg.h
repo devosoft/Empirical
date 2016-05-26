@@ -144,21 +144,32 @@ public:
   }
 
   // the aforementioned mutate function
-  bool mutate () {
+  bool mutate (Random & random) {
     if (!state.mutate) {return false;} // if mutation is disabled fail out
     bool flag = false;
-    if (random->P(MUTATION_RATE)) {
-      state.genome.quorum_threshold += random->GetRandNormal(0, MUTATION_AMOUNT);
+    if (random.P(MUTATION_RATE)) {
+      state.genome.quorum_threshold += random.GetRandNormal(0, MUTATION_AMOUNT);
       flag = true;
-    } if (random->P(MUTATION_RATE)) {
-      state.genome.ai_gen_prob += random->GetRandNormal(0, MUTATION_AMOUNT);
+    } if (random.P(MUTATION_RATE)) {
+      state.genome.ai_gen_prob += random.GetRandNormal(0, MUTATION_AMOUNT);
       flag = true;
-    } if (random->P(MUTATION_RATE)) {
-      state.genome.co_op_prob += random->GetRandNormal(0, MUTATION_AMOUNT);
+    } if (random.P(MUTATION_RATE)) {
+      state.genome.co_op_prob += random.GetRandNormal(0, MUTATION_AMOUNT);
       flag = true;
     } // that felt silly
 
     return flag;
+  }
+
+  bool mutate() {
+    return mutate(*(this->random));
+  }
+
+  // forcibly mutates all the parameters in a normal range +/- MUTATION_AMOUNT
+  void force_mutation() {
+    state.genome.quorum_threshold += random->GetRandNormal(0, MUTATION_AMOUNT);
+    state.genome.ai_gen_prob += random->GetRandNormal(0, MUTATION_AMOUNT);
+    state.genome.co_op_prob += random->GetRandNormal(0, MUTATION_AMOUNT);
   }
 
   // utility/accessor methods
@@ -167,6 +178,7 @@ public:
   unsigned int get_loc() {return state.loc;}
   unsigned int add_points(unsigned int points) {return state.points += points;}
   bool making_ai () const {return state.producing_ai;}
+  unsigned int get_fitness() {return state.points;}
 
   // methods for interacting with the world / neighbors
   int get_contribution (double current_quorum) {
