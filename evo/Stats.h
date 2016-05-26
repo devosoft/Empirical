@@ -113,6 +113,31 @@ template <typename ORG, typename... MANAGERS>
     return (cumulative_fitness / num_orgs);
   }
 
+  template <typename ORG, typename... MANAGERS>
+  double NonInf(std::function<double(ORG * org)> fit_fun, World<ORG, MANAGERS...> & orgs){
+    double fittest = fit_fun(&(*(orgs.begin())));
+    vector<double> org_fit;
+    for (auto org : orgs){
+      double fitness = fit_fun(&org);
+      org_fit.push_back(fitness);
+      if (fitness > fittest){
+        fittest = fitness;
+      }
+    }
+
+    std::cout<<"Max Fitness: "<<fittest<<std::endl;
+    double non_total = 0;
+    double num_orgs = 0;
+
+    for(auto el : org_fit){
+        std::cout<<"Org Fitness"<<el<<std::endl;
+        num_orgs++;
+        non_total += (el / fittest);
+    }
+    return non_total / num_orgs;
+  }
+
+
 }
 }
 

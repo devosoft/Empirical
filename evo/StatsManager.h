@@ -172,13 +172,17 @@ namespace evo{
         fit_stat_type avg_fitness = [](fit_fun_type fit_func, world_type * world){
             return AverageFitness(fit_func, *world);
         };
+        fit_stat_type non_inf = [](fit_fun_type fit_func, world_type * world){
+            return NonInf(fit_func, *world);
+        };
 
         AddFunction(diversity);
         AddFunction(max_fitness);
         AddFunction(avg_fitness);
+        AddFunction(non_inf);
 
         //Print header
-        output_location << "update, shannon_diversity, max_fitness, avg_fitness" << std::endl;
+        output_location << "update, shannon_diversity, max_fitness, avg_fitness, non_inf" << std::endl;
       }
 
 };
