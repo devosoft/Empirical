@@ -94,6 +94,7 @@
 #include "OrgSignals.h"
 #include "OrgManager.h"
 #include "PopulationManager.h"
+#include "WorldIterator.h"
 
 // Macro to add class elements associated with a dynamic function call.
 // For example, if you wanted to be able to have a dynamic fitness function, you would call:
@@ -111,30 +112,34 @@
 #define EMP_EVO_FORWARD(FUN, TARGET) \
 template <typename... T> void FUN(T &&... args) { TARGET.FUN(std::forward<T>(args)...); }
 
-
 namespace emp {
 namespace evo {
 
   EMP_SETUP_TYPE_SELECTOR(SelectPopManager, emp_is_population_manager);
   EMP_SETUP_TYPE_SELECTOR(SelectOrgManager, emp_is_organism_manager);
 
-  // Main world class...
+  template <typename ORG, typename... MANAGERS> class WorldIterator;
 
+  // Main world class...
   template <typename ORG, typename... MANAGERS>
   class World {
-  protected:
+  public:
     // Build managers...
     AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> popM;
     AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgMDynamic>::type, ORG> orgM;
 
     Random * random_ptr;
     bool random_owner;
+    int update = 0;
+    friend class WorldIterator<ORG, MANAGERS...>;
+    typedef WorldIterator<ORG, MANAGERS...> iterator;
 
     // Signals triggered by the world.
     Signal<int> before_repro_sig;       // Trigger: Immediately prior to producing offspring
     Signal<ORG *> offspring_ready_sig;  // Trigger: Offspring about to enter population
-    Signal<ORG *> inject_ready_sig;     // Trigger: New org about to be added to population
-    Signal<int> org_placement_sig;      // Trigger: Organism has been added to population
+    Signal<ORG *> inject_ready_sig;        // Trigger: New org about to be added to population
+    Signal<int> org_placement_sig;         // Trigger: Organism has been added to population
+    Signal<int> on_update_sig;         // Trigger: Organism has been added to population
 
     // Determine the callback type; by default this will be OrgSignals_NONE, but it can be
     // overridden by setting the type callback_t in the organism class.
@@ -167,6 +172,7 @@ namespace evo {
       , offspring_ready_sig(to_string(pop_name,"::offspring-ready"))
       , inject_ready_sig(to_string(pop_name,"::inject-ready"))
       , org_placement_sig(to_string(pop_name,"::org-placement"))
+      , on_update_sig(to_string(pop_name,"::on-update"))
       , callbacks(pop_name) { SetupWorld(); }
 
     World(int seed=-1, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
@@ -181,6 +187,8 @@ namespace evo {
     ORG & operator[](int i) { return *(popM[i]); }
     const ORG & operator[](int i) const { return *(popM[i]); }
     bool IsOccupied(int i) const { return popM[i] != nullptr; }
+    iterator begin(){return WorldIterator<ORG, MANAGERS...>(this, 0);}
+    iterator end(){return WorldIterator<ORG, MANAGERS...>(this, this->GetSize());}
 
     void Clear() { popM.Clear(); }
 
@@ -197,6 +205,7 @@ namespace evo {
     LinkKey OnOffspringReady(std::function<void(ORG *)> fun) { return offspring_ready_sig.AddAction(fun); }
     LinkKey OnInjectReady(std::function<void(ORG *)> fun) { return inject_ready_sig.AddAction(fun); }
     LinkKey OnOrgPlacement(std::function<void(int)> fun) { return org_placement_sig.AddAction(fun); }
+    LinkKey OnUpdate(std::function<void(int)> fun) { return on_update_sig.AddAction(fun); }
 
     // All additions to the population must go through one of the following Insert methods
 
@@ -219,6 +228,7 @@ namespace evo {
       org_placement_sig.Trigger(pos);
     }
     void InsertBirth(const ORG & mem, int parent_pos, int copy_count=1) {
+      before_repro_sig.Trigger(parent_pos);
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);
         offspring_ready_sig.Trigger(new_org);
@@ -234,6 +244,7 @@ namespace evo {
       // std::cout << "Repro " << id << std::endl;
       before_repro_sig.Trigger(id);
       InsertBirth(*(popM[id]), id, 1);
+
     }
 
     void DoSymbiontRepro(int id) {
@@ -256,7 +267,11 @@ namespace evo {
       if (last_mut == -1) last_mut = (int) popM.size();
       int mut_count = 0;
       for (int i = first_mut; i < last_mut; i++) {
-        if (mut_fun(popM[i], *random_ptr)) mut_count++;
+        if (this->IsOccupied(i)){
+          if (mut_fun(popM[i], *random_ptr)) {
+            mut_count++;
+          }
+        }
       }
       return mut_count;
     }
@@ -267,6 +282,18 @@ namespace evo {
 
     void Print(std::ostream & os=std::cout, const std::string & empty="X", const std::string & spacer=" ") {
       popM.Print(os, empty, spacer);
+    }
+
+    //Helper function to return PopulationManager indices of
+    //all organisms that are not null
+    emp::vector<int> GetValidOrgIndices(){
+      emp::vector<int> valid_orgs(0);
+      for (int i = 0; i < popM.size(); i++){
+        if (this->IsOccupied(i)){
+          valid_orgs.push_back(i);
+        }
+      }
+      return valid_orgs;
     }
 
     // Selection mechanisms choose organisms for the next generation.
@@ -280,7 +307,9 @@ namespace evo {
       // Load the population into a multimap, sorted by fitness.
       std::multimap<double, int> fit_map;
       for (int i = 0; i < (int) popM.size(); i++) {
-        fit_map.insert( std::make_pair(fit_fun(popM[i]), i) );
+        if (this->IsOccupied(i)){
+          fit_map.insert( std::make_pair(fit_fun(popM[i]), i) );
+        }
       }
 
       // Grab the top fitnesses and move them into the next generation.
@@ -307,9 +336,11 @@ namespace evo {
 
       if (precalc_fitness && t_size * tourny_count * 2 >= (int) popM.size()) {
         // Pre-calculate fitnesses.
-        emp::vector<double> fitness(popM.size());
-        for (int i = 0; i < (int) popM.size(); ++i) fitness[i] = fit_fun(popM[i]);
-
+        emp::vector<int> valid_orgs = GetValidOrgIndices();
+        emp::vector<double> fitness(valid_orgs.size());
+        for (int i = 0; i < (int) valid_orgs.size(); ++i){
+             fitness[i] = fit_fun(popM[valid_orgs[i]]);
+         }
         RunTournament(fitness, t_size, tourny_count);
       }
       else RunTournament(fit_fun, t_size, tourny_count);
@@ -323,17 +354,20 @@ namespace evo {
     // Helper function to run a tournament when fitness is pre-calculated
     void RunTournament(const emp::vector<double> & fitness, int t_size, int tourny_count=1){
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
+
+      emp::vector<int> valid_orgs = GetValidOrgIndices();
+
       for (int T = 0; T < tourny_count; T++) {
-        emp::vector<int> entries = Choose(*random_ptr, popM.size(), t_size);
+        emp::vector<int> entries = Choose(*random_ptr, valid_orgs.size(), t_size);
         double best_fit = fitness[entries[0]];
-        int best_id = entries[0];
+        int best_id = valid_orgs[entries[0]];
 
         // Search for a higher fit org in the tournament.
         for (int i = 1; i < t_size; i++) {
           const double cur_fit = fitness[entries[i]];
           if (cur_fit > best_fit) {
             best_fit = cur_fit;
-            best_id = entries[i];
+            best_id = valid_orgs[entries[i]];
           }
         }
 
@@ -345,17 +379,22 @@ namespace evo {
     // Helper function to run a tournament when fitness is NOT pre-calculated
     void RunTournament(std::function<double(ORG*)> fit_fun, int t_size, int tourny_count=1){
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
+
+      //This technique for avoiding null orgs can probably be improved
+      //once org managers are handling that
+      emp::vector<int> valid_orgs = GetValidOrgIndices();
+
       for (int T = 0; T < tourny_count; T++) {
-        emp::vector<int> entries = Choose(*random_ptr, popM.size(), t_size);
-        double best_fit = fit_fun(popM[entries[0]]);
-        int best_id = entries[0];
+        emp::vector<int> entries = Choose(*random_ptr, valid_orgs.size(), t_size);
+        double best_fit = fit_fun(popM[valid_orgs[entries[0]]]);
+        int best_id = valid_orgs[entries[0]];
 
         // Search for a higher fit org in the tournament.
         for (int i = 1; i < t_size; i++) {
-          const double cur_fit = fit_fun(popM[entries[i]]);
+          const double cur_fit = fit_fun(popM[valid_orgs[entries[i]]]);
           if (cur_fit > best_fit) {
             best_fit = cur_fit;
-            best_id = entries[i];
+            best_id = valid_orgs[entries[i]];
           }
         }
 
@@ -403,7 +442,8 @@ namespace evo {
 
     // Update() moves the next population to the current position, managing memory as needed.
     void Update() {
-      // @CAO Setup a trigger here?
+      on_update_sig.Trigger(update);
+      update++;
       popM.Update();
     }
 
