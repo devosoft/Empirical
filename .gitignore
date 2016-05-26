@@ -23,7 +23,7 @@ tests/*.gcno
 tests/*cov.info
 tests/coverage*
 tests/diff_cover.txt
-third-party/doxygen/build/*
+third-party/doxygen/
 Slideshow.js
 incoming/
 */env/*
