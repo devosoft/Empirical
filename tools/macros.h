@@ -58,7 +58,7 @@
 //  * We need to standardize how we handle macros that covert inputs to comma-separated
 //    results vs those that merge them together.  One option is to have comma-separated the
 //    default and then have an EMP_REMOVE_COMMAS (or somesuch)
-//  * EMP_TYPES_TO_ARGS (not yet list above) is poorly named.  Maybe EMP_DECLARE_ARGS?
+//  * EMP_TYPES_TO_ARGS (not yet listed above) is poorly named.  Maybe EMP_DECLARE_ARGS?
 //  * It would be useful to have EMP_WRAP_WITH_ID which passes in the position ID as the
 //    second argument.  This would allow us to, for example, streamline EMP_TYPES_TO_ARGS.
 //
@@ -374,6 +374,7 @@
 
 
 // Replace all of the commas in an argument set with something else (including nothing)
+#define EMP_REMOVE_COMMAS(...) EMP_REPLACE_COMMAS(,__VA_ARGS__)
 #define EMP_REPLACE_COMMAS(X, ...) EMP_GET_ARG_1(__VA_ARGS__) EMP_CALL_BY_PACKS(EMP_REPLACE_COMMAS_, X, EMP_POP_ARGS_1(__VA_ARGS__) )
 
 #define EMP_REPLACE_COMMAS_1(X, A, ...) X A
