@@ -20,9 +20,9 @@ constexpr int K = 0;
 constexpr int N = 400;
 constexpr double MUTATION_RATE = 0.005;
 
-constexpr int TOURNAMENT_SIZE = 20;
-constexpr int POP_SIZE = 200;
-constexpr int UD_COUNT = 1000;
+constexpr int TOURNAMENT_SIZE = 2;
+constexpr int POP_SIZE = 30;
+constexpr int UD_COUNT = 30;
 
 using BitOrg = emp::BitVector;
 
@@ -128,6 +128,7 @@ int main(int argc, char* argv[])
   // Loop through updates
   //std::cout << "Update,ShannonDiversity,MaxFitness,AvgFitness" << std::endl;
   for (int ud = 0; ud < UD_COUNT; ud++) {
+      std::cout<<"hahahaha"<<std::endl;
 
 //    std::cout << ud  << "," << emp::evo::ShannonDiversity(mixed_pop);
 //    std::cout << "," << emp::evo::MaxFitness(fit_func, mixed_pop);
@@ -144,12 +145,21 @@ int main(int argc, char* argv[])
     pool_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
 			 , TOURNAMENT_SIZE, POP_SIZE);
 
+    std::cout<<"HHHHHHHHHHHHHHHH"<<std::endl;
 
     grid_pop.Update();
     grid_pop.MutatePop();
 
     mixed_pop.Update();
     mixed_pop.MutatePop();
+    
+    for(auto el : pool_pop.popM.pop){
+        if(el == nullptr){
+            std::cout<<"0 ";
+        }
+        else{std::cout<<"1 ";}
+    }
+    std::cout<<std::endl;
 
     pool_pop.Update();
     pool_pop.MutatePop();
