@@ -19,13 +19,13 @@ confname+=".config"
 
 # do setup
 echo "Making fast-replica..."
-make fast-replica &> /dev/null
+make pool-test &> /dev/null
 
 echo "Updating list of runs..."
 echo "${prefix}" >> runs/names
 
 # grab config
-head -n 25 ./replica.cc | tail -n 8 > runs/${confname}
+head -n 25 ./pool-test.cc | tail -n 8 > runs/${confname}
 
 # launch the specified number of threads
 for ((i=0; i<"$2"; i++)); do
@@ -36,7 +36,7 @@ for ((i=0; i<"$2"; i++)); do
         sleep 1
     done
     echo "Launching ${fname}"
-    ./replica runs/${fname} && echo -e "\tDone with ${fname}" &
+    ./pool-test runs/${fname} && echo -e "\tDone with ${fname}" &
 done
 
 # wait for threads to join

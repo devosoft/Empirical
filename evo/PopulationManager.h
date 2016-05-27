@@ -43,6 +43,7 @@ namespace evo {
 
     void SetRandom(Random * r) { random_ptr = r; }
 
+    void Setup(Random * r){ SetRandom(r); }
 
     void Print(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout,
               std::string empty="X", std::string spacer=" ") {
@@ -122,6 +123,8 @@ namespace evo {
 
     static constexpr bool emp_has_separate_generations = true;
 
+    void Setup(){ ; }
+
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = next_pop.size();
       next_pop.push_back(new_org);
@@ -155,6 +158,7 @@ namespace evo {
     using PopulationManager_Base<ORG>::pop;
     using PopulationManager_Base<ORG>::random_ptr;
     using PopulationManager_Base<ORG>::DoBottleneck;
+    using PopulationManager_Base<ORG>::SetRandom;
 
     int max_size;
     int bottleneck_size;
@@ -167,6 +171,8 @@ namespace evo {
     int GetMaxSize() const { return max_size; }
     int GetBottleneckSize() const { return bottleneck_size; }
     int GetNumBottlnecks() const { return num_bottlenecks; }
+
+    void Setup(Random * r){ SetRandom(r); }
 
     void SetMaxSize(const int m) { max_size = m; }
     void SetBottleneckSize(const int b) { bottleneck_size = b; }
@@ -189,6 +195,7 @@ namespace evo {
   protected:
     using PopulationManager_Base<ORG>::pop;
     using PopulationManager_Base<ORG>::random_ptr;
+    using PopulationManager_Base<ORG>::SetRandom;
 
     int width;
     int height;
@@ -203,6 +210,8 @@ namespace evo {
 
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
+
+    void Setup(Random * r){ SetRandom(r); }
 
     //resizes vector and fills newly added spots with nullptr
     void ConfigPop(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }
@@ -264,6 +273,7 @@ namespace evo {
   public:
     using PopulationManager_Base<ORG>::pop;
     using PopulationManager_Base<ORG>::random_ptr;
+    using PopulationManager_Base<ORG>::SetRandom;
 
     int pool_count;
     vector<int> pool_sizes;
@@ -273,16 +283,20 @@ namespace evo {
     vector<int> pool_end; //end of each pool in array
 
   public:
-    PopulationManager_Pools() {
-        vector<int>* temp_sizes = new vector<int>;
-        ConfigPop(5,*temp_sizes, 100, 10);
-    }
+    PopulationManager_Pools() { ; }
     ~PopulationManager_Pools() { ; }
 
     int GetPoolCount() const { return pool_count; }
     vector<int> GetSizes() const { return pool_sizes ; }
     int GetUpper() const { return r_upper; }
     int GetLower() const { return r_lower; }
+
+    void Setup(Random * r){
+        vector<int>* temp_sizes = new vector<int>;
+
+        SetRandom(r);
+        ConfigPop(5, *temp_sizes, 100, 10);
+    }
 
     void ConfigPop(int pc, vector<int> ps, int u, int l) { 
         pool_count = pc; 
@@ -291,9 +305,8 @@ namespace evo {
         r_lower = l;
         if(pool_sizes.size() == 0){
             for( int i = 0; i < pool_count; i++){
-                int fin = random_ptr->GetInt(1,100);
-                std::cout<<"Upper "<<r_upper<<" Lower "<<r_lower<<std::endl;
-               pool_sizes.push_back(10);      //random_ptr->GetInt(r_lower, r_upper));
+              std::cout<<"Upper "<<r_upper<<" Lower "<<r_lower<<std::endl;
+               pool_sizes.push_back(random_ptr->GetInt(r_lower, r_upper));
                std::cout<<"here"<<std::endl;
             }
         }

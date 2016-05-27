@@ -164,7 +164,7 @@ namespace evo {
     void SetupWorld() {
       SetupCallbacks(callbacks);
       std::cout<<"AAAAAAAAAA"<<std::endl;
-      popM.SetRandom(random_ptr);
+      popM.Setup(random_ptr);
       std::cout<<"BBBBBBBBBBBBB"<<std::endl;
     }
 
