@@ -20,9 +20,12 @@
 namespace emp{
 namespace evo{
 
+
+
   //Calculates Shannon Entropy of the members of the container passed
-  template <typename C, class = typename C::value_type >
-  double ShannonDiversity(C elements) {
+  template <typename C>
+  typename std::enable_if<!std::is_pointer<typename C::value_type>::value, double>::type
+  ShannonDiversity(C & elements) {
 
     //Count number of each value present
     std::map<typename C::value_type, int> counts;
@@ -42,23 +45,24 @@ namespace evo{
     }
 
     return -1 * result;
-  }
+}
 
   //Calculates Shannon Entropy of the members of a world
-  template <typename ORG, typename... MANAGERS>
-  double ShannonDiversity(emp::evo::World<ORG, MANAGERS...> & elements) {
+  template <typename C>
+  typename std::enable_if<std::is_pointer<typename C::value_type>::value, double>::type
+  ShannonDiversity(C & elements) {
 
+    using pointed_at = typename std::remove_pointer<typename C::value_type>::type;
     //Count number of each value present
-    std::map<ORG, int> counts;
+    std::map<pointed_at, int> counts;
     for (auto element : elements) {
-      if (counts.find(element) != counts.end()) {
-        counts[element]++;
+      if (counts.find(*element) != counts.end()) {
+        counts[*element]++;
       } else {
-        counts[element] = 1;
+        counts[*element] = 1;
       }
 
     }
-
     //Shannon entropy calculation
     double result = 0;
     for (auto element : counts) {
@@ -67,7 +71,7 @@ namespace evo{
     }
 
     return -1 * result;
-  }
+}
 
   //Calculates number of unique elements in the container passed
   template <typename C>
@@ -78,11 +82,11 @@ namespace evo{
     return unique_elements.size();
   }
 
-  template <typename ORG, typename C, class = typename C::value_type >
-  double MaxFitness(std::function<double(ORG * org)> fit_fun, C orgs){
-    double fittest = fit_fun(&orgs[0]);
+  template <typename C, class = typename C::value_type >
+  double MaxFitness(std::function<double(typename C::value_type org)> fit_fun, C orgs){
+    double fittest = fit_fun(orgs[0]);
     for (auto org : orgs){
-      double fitness = fit_fun(&org);
+      double fitness = fit_fun(org);
       if (fitness > fittest){
         fittest = fitness;
       }
@@ -90,7 +94,7 @@ namespace evo{
     return fittest;
   }
 
-  template <typename ORG, typename... MANAGERS>
+/*  template <typename ORG, typename... MANAGERS>
   double MaxFitness(std::function<double(ORG * org)> fit_fun, World<ORG, MANAGERS...> & orgs){
     double fittest = fit_fun(&(*(orgs.begin())));
     for (auto org : orgs){
@@ -101,7 +105,20 @@ namespace evo{
     }
     return fittest;
   }
+*/
 
+template <typename C, class = typename C::value_type>
+  double AverageFitness(std::function<double(typename C::value_type org)> fit_fun, C & orgs){
+    double cumulative_fitness = 0;
+    double num_orgs = 0;
+    for (auto org : orgs){
+        ++num_orgs;
+        cumulative_fitness += fit_fun(org);
+    }
+    return (cumulative_fitness / num_orgs);
+  }
+
+/*
 template <typename ORG, typename... MANAGERS>
   double AverageFitness(std::function<double(ORG * org)> fit_fun, World<ORG, MANAGERS...> & orgs){
     double cumulative_fitness = 0;
@@ -112,7 +129,7 @@ template <typename ORG, typename... MANAGERS>
     }
     return (cumulative_fitness / num_orgs);
   }
-
+*/
 }
 }
 

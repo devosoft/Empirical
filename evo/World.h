@@ -94,7 +94,7 @@
 #include "OrgSignals.h"
 #include "OrgManager.h"
 #include "PopulationManager.h"
-#include "WorldIterator.h"
+#include "StatsManager.h"
 
 // Macro to add class elements associated with a dynamic function call.
 // For example, if you wanted to be able to have a dynamic fitness function, you would call:
@@ -117,8 +117,9 @@ namespace evo {
 
   EMP_SETUP_TYPE_SELECTOR(SelectPopManager, emp_is_population_manager);
   EMP_SETUP_TYPE_SELECTOR(SelectOrgManager, emp_is_organism_manager);
+  EMP_SETUP_TYPE_SELECTOR(SelectStatsManager, emp_is_stats_manager);
 
-  template <typename ORG, typename... MANAGERS> class WorldIterator;
+  template <typename POP_MANAGER> class PopulationIterator;
 
   // Main world class...
   template <typename ORG, typename... MANAGERS>
@@ -128,11 +129,13 @@ namespace evo {
     AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> popM;
     AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgMDynamic>::type, ORG> orgM;
 
+    //Why is it necessary to give a template argument for StatsManager_Base?
+    AdaptTemplate<typename SelectStatsManager<MANAGERS...,StatsManager_Base<decltype(popM)> >::type, decltype(popM)> statsM;
+
     Random * random_ptr;
     bool random_owner;
     int update = 0;
-    friend class WorldIterator<ORG, MANAGERS...>;
-    typedef WorldIterator<ORG, MANAGERS...> iterator;
+    using iterator = PopulationIterator<ORG>;
 
     // Signals triggered by the world.
     Signal<int> before_repro_sig;       // Trigger: Immediately prior to producing offspring
@@ -160,9 +163,10 @@ namespace evo {
       sigs.symbiont_repro_sig.AddAction([this](int id){DoSymbiontRepro(id);});
     }
 
-    void SetupWorld() {
+    void SetupWorld(const std::string & world_name) {
       SetupCallbacks(callbacks);
       popM.SetRandom(random_ptr);
+      statsM.Setup(&popM, world_name);
     }
 
   public:
@@ -173,7 +177,7 @@ namespace evo {
       , inject_ready_sig(to_string(pop_name,"::inject-ready"))
       , org_placement_sig(to_string(pop_name,"::org-placement"))
       , on_update_sig(to_string(pop_name,"::on-update"))
-      , callbacks(pop_name) { SetupWorld(); }
+      , callbacks(pop_name) { SetupWorld(pop_name); }
 
     World(int seed=-1, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
       : World(new Random(seed), pop_name) { random_owner = true; }
@@ -187,8 +191,8 @@ namespace evo {
     ORG & operator[](int i) { return *(popM[i]); }
     const ORG & operator[](int i) const { return *(popM[i]); }
     bool IsOccupied(int i) const { return popM[i] != nullptr; }
-    iterator begin(){return WorldIterator<ORG, MANAGERS...>(this, 0);}
-    iterator end(){return WorldIterator<ORG, MANAGERS...>(this, this->GetSize());}
+    iterator begin(){return PopulationIterator<ORG>(&popM, 0);}
+    iterator end(){return PopulationIterator<ORG>(&popM, popM.size());}
 
     void Clear() { popM.Clear(); }
 
