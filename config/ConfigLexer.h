@@ -31,7 +31,7 @@ namespace emp {
     ~ConfigLexer() { ; }
 
     emp::Token GetToken() {
-      if (next_char == '\0') return Token(Token::NONE);
+      if (next_char <= 0) return Token(Token::NONE);
 
       if (is_digit(next_char)) {       // Must be a number
         cur_lexeme.resize(1);
@@ -47,13 +47,25 @@ namespace emp {
         while (is_idchar(next_char = is.get())) {
           cur_lexeme.push_back(next_char);
         }
-        return Token(Token::INT_LIT, cur_lexeme);
+        return Token(Token::ID, cur_lexeme);
       }
 
-      char unk_char = next_char;
-      next_char = is.get()
+      // Any remaining possibilities are a single character.  Advance next_char now.
+      char prev_char = next_char;
+      next_char = is.get();
 
-      return Token(Token::UNKNOWN, std::string(1, unk_char));
+      switch (prev_char) {
+        case ' ':
+        case '\t':
+        case '\r':
+          return Token(Token::WHITESPACE);
+        case '\n':
+        case ';':
+          return Token(Token::ENDLINE);
+      }
+
+      // std::cout << "[[ Unk_char=" << int(unk_char) << " ]]" << std::endl;
+      return Token(Token::UNKNOWN, std::string(1, prev_char));
     }
   };
 
