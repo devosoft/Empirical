@@ -30,14 +30,14 @@ namespace emp {
       COMMAND_FUNCTION, COMMAND_RETURN };
     Type type;
 
-    Token(Type in_type, const std::string & in_lexeme) : type(in_type), lexeme(in_lexeme) { ; }
+    Token(Type in_type, const std::string & in_lexeme="") : type(in_type), lexeme(in_lexeme) { ; }
     Token(const Token &) = default;
     ~Token() { ; }
 
-    std::string TypeName() {
+    std::string TypeName() const {
       // If this type is an ASCII character, indicate it.
       if (type > 0 && type < UNKNOWN) {
-        return to_string("ASCII('", to_escaped_string(value), "')");
+        return to_string("ASCII('", to_escaped_string(type), "')");
       }
 
       // Otherwise lookup the enum.
