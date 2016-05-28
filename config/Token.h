@@ -29,13 +29,13 @@ namespace emp {
       COMP_EQU, COMP_NEQU, COMP_LESS, COMP_LTE, COMP_GTR, COMP_GTE,
       BOOL_AND, BOOL_OR,
       COMMAND_PRINT, COMMAND_RANDOM,
-      COMMAND_IF, COMMAND_ELSE, COMMAND_WHILE, COMMAND_FOREACH, COMMAND_BREAK,
+      COMMAND_IF, COMMAND_ELSE, COMMAND_WHILE, COMMAND_FOREACH, COMMAND_BREAK, COMMAND_CONTINUE,
       COMMAND_FUNCTION, COMMAND_RETURN,
       // Track how many total token types there are.
       NUM_TYPES };
     Type type;
 
-    Token(Type in_type, const std::string & in_lexeme="") : type(in_type), lexeme(in_lexeme) { ; }
+    Token(Type in_type=NONE, const std::string & in_lexeme="") : type(in_type), lexeme(in_lexeme) { ; }
     Token(const Token &) = default;
     ~Token() { ; }
 
@@ -78,6 +78,7 @@ namespace emp {
         case COMMAND_WHILE: return "COMMAND_WHILE";
         case COMMAND_FOREACH: return "COMMAND_FOREACH";
         case COMMAND_BREAK: return "COMMAND_BREAK";
+        case COMMAND_CONTINUE: return "COMMAND_CONTINUE";
         case COMMAND_FUNCTION: return "COMMAND_FUNCTION";
         case COMMAND_RETURN: return "COMMAND_RETURN";
         default:
