@@ -14,23 +14,65 @@
 #include <iostream>
 #include <string>
 
+#include "../tools/string_utils.h"
+
 namespace emp {
 
   struct Token {
     std::string lexeme;
-    enum TolenTypes { NONE=0, UNKNOWN=256,
-      INT_LIT, FLOAT_LIT, CHAR_LIT, STRING_LIT, ID,
-
-      CASSIGN_ADD, CASSIGN_SUB, CASSIGN_MULT, CASSIGN_DIV, CASSIGN_MOD,
+    enum Type { NONE=0, UNKNOWN=256,                                     // 0-255 are ASCII chars
+      INT_LIT, FLOAT_LIT, CHAR_LIT, STRING_LIT, ID,                      // These need lexemes
+      CASSIGN_ADD, CASSIGN_SUB, CASSIGN_MULT, CASSIGN_DIV, CASSIGN_MOD,  // The rest don't.
       COMP_EQU, COMP_NEQU, COMP_LESS, COMP_LTE, COMP_GTR, COMP_GTE,
       BOOL_AND, BOOL_OR,
       COMMAND_PRINT, COMMAND_RANDOM,
       COMMAND_IF, COMMAND_ELSE, COMMAND_WHILE, COMMAND_FOREACH, COMMAND_BREAK,
       COMMAND_FUNCTION, COMMAND_RETURN };
+    Type type;
 
-    Token(const std::string & in_lexeme) : lexeme(in_lexeme) { ; }
+    Token(Type in_type, const std::string & in_lexeme) : type(in_type), lexeme(in_lexeme) { ; }
     Token(const Token &) = default;
     ~Token() { ; }
+
+    std::string TypeName() {
+      // If this type is an ASCII character, indicate it.
+      if (type > 0 && type < UNKNOWN) {
+        return to_string("ASCII('", to_escaped_string(value), "')");
+      }
+
+      // Otherwise lookup the enum.
+      switch (type) {
+        case NONE: return "NONE";
+        case UNKNOWN: return "UNKNOWN";
+        case INT_LIT: return "INT_LIT";
+        case FLOAT_LIT: return "FLOAT_LIT";
+        case CHAR_LIT: return "CHAR_LIT";
+        case STRING_LIT: return "STRING_LIT";
+        case ID: return "ID";
+        case CASSIGN_ADD: return "CASSIGN_ADD";
+        case CASSIGN_SUB: return "CASSIGN_SUB";
+        case CASSIGN_MULT: return "CASSIGN_MULT";
+        case CASSIGN_DIV: return "CASSIGN_DIV";
+        case CASSIGN_MOD: return "CASSIGN_MOD";
+        case COMP_EQU: return "COMP_EQU";
+        case COMP_NEQU: return "COMP_NEQU";
+        case COMP_LESS: return "COMP_LESS";
+        case COMP_LTE: return "COMP_LTE";
+        case COMP_GTR: return "COMP_GTR";
+        case COMP_GTE: return "COMP_GTE";
+        case BOOL_AND: return "BOOL_AND";
+        case BOOL_OR: return "BOOL_OR";
+        case COMMAND_PRINT: return "COMMAND_PRINT";
+        case COMMAND_RANDOM: return "COMMAND_RANDOM";
+        case COMMAND_IF: return "COMMAND_IF";
+        case COMMAND_ELSE: return "COMMAND_ELSE";
+        case COMMAND_WHILE: return "COMMAND_WHILE";
+        case COMMAND_FOREACH: return "COMMAND_FOREACH";
+        case COMMAND_BREAK: return "COMMAND_BREAK";
+        case COMMAND_FUNCTION: return "COMMAND_FUNCTION";
+        case COMMAND_RETURN: return "COMMAND_RETURN";
+      }
+    }
   };
 
 }
