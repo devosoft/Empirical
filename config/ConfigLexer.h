@@ -12,6 +12,7 @@
 #define EMP_CONFIG_LEXER_H
 
 #include <iostream>
+#include <map>
 #include <string>
 
 #include "Token.h"
@@ -20,52 +21,83 @@ namespace emp {
 
   class ConfigLexer {
   private:
+    std::map<std::string, emp::Token> command_map;
+
     std::istream & is;
     char next_char;
-
     std::string cur_lexeme;
 
   public:
-    ConfigLexer(std::istream & in_stream) : is(in_stream) { is.get(next_char); }
+    ConfigLexer(std::istream & in_stream) : is(in_stream) {
+      command_map["print"] = Token(Token::COMMAND_PRINT);
+      command_map["if"] = Token(Token::COMMAND_IF);
+      command_map["else"] = Token(Token::COMMAND_ELSE);
+      command_map["while"] = Token(Token::COMMAND_WHILE);
+      command_map["break"] = Token(Token::COMMAND_BREAK);
+      command_map["continue"] = Token(Token::COMMAND_CONTINUE);
+      command_map["return"] = Token(Token::COMMAND_RETURN);
+      command_map["function"] = Token(Token::COMMAND_FUNCTION);
+      command_map["foreach"] = Token(Token::COMMAND_FOREACH);
+
+      // Prime the first character so it's ready to go.
+      is.get(next_char);
+    }
     ConfigLexer(ConfigLexer &) = delete;
     ~ConfigLexer() { ; }
 
     emp::Token GetToken() {
-      if (next_char <= 0) return Token(Token::NONE);
-
-      if (is_digit(next_char)) {       // Must be a number
-        cur_lexeme.resize(1);
-        cur_lexeme[0] = next_char;
-        while (is_digit(next_char = is.get())) {
-          cur_lexeme.push_back(next_char);
+      while (next_char > 0) {                      // Keep looping until we find a token or hit EOF.
+        if (is_digit(next_char)) {                 // Must be a number
+          cur_lexeme.resize(1);
+          cur_lexeme[0] = next_char;
+          while (is_digit(next_char = is.get())) {
+            cur_lexeme.push_back(next_char);
+          }
+          if (next_char == '.') {                  // Must be floating point.
+            cur_lexeme.push_back('.');
+            while (is_digit(next_char = is.get())) {
+              cur_lexeme.push_back(next_char);
+            }
+            return Token(Token::FLOAT_LIT, cur_lexeme);
+          }
+          return Token(Token::INT_LIT, cur_lexeme);
         }
-        return Token(Token::INT_LIT, cur_lexeme);
-      }
-      if (is_idchar(next_char)) {                 // Must be ID or Keyword (number already captured)
-        cur_lexeme.resize(1);
-        cur_lexeme[0] = next_char;
-        while (is_idchar(next_char = is.get())) {
-          cur_lexeme.push_back(next_char);
+        if (is_idchar(next_char)) {                 // Must be ID or Keyword (number already captured)
+          cur_lexeme.resize(1);
+          cur_lexeme[0] = next_char;
+          while (is_idchar(next_char = is.get())) {
+            cur_lexeme.push_back(next_char);
+          }
+
+          // Determine if the current lexeme is a command.
+          auto map_ptr = command_map.find(cur_lexeme);
+          if (map_ptr != command_map.end()) {
+            return map_ptr->second;
+          }
+
+          return Token(Token::ID, cur_lexeme);
         }
-        return Token(Token::ID, cur_lexeme);
+
+        // Any remaining possibilities are a single character.  Advance next_char now.
+        char prev_char = next_char;
+        next_char = is.get();
+
+        switch (prev_char) {
+          case ' ':
+          case '\t':
+          case '\r':
+            break;  // Skip WS; don't return token.
+            // return Token(Token::WHITESPACE);
+          case '\n':
+          case ';':
+            return Token(Token::ENDLINE);
+          default:
+            // std::cout << "[[ Unk_char=" << int(unk_char) << " ]]" << std::endl;
+            return Token(Token::UNKNOWN, std::string(1, prev_char));
+        }
       }
 
-      // Any remaining possibilities are a single character.  Advance next_char now.
-      char prev_char = next_char;
-      next_char = is.get();
-
-      switch (prev_char) {
-        case ' ':
-        case '\t':
-        case '\r':
-          return Token(Token::WHITESPACE);
-        case '\n':
-        case ';':
-          return Token(Token::ENDLINE);
-      }
-
-      // std::cout << "[[ Unk_char=" << int(unk_char) << " ]]" << std::endl;
-      return Token(Token::UNKNOWN, std::string(1, prev_char));
+      return Token(Token::NONE);
     }
   };
 
