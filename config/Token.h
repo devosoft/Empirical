@@ -21,18 +21,25 @@ namespace emp {
   struct Token {
     std::string lexeme;
     enum Type { NONE=0, UNKNOWN=256,                                     // 0-255 are ASCII chars
-      INT_LIT, FLOAT_LIT, CHAR_LIT, STRING_LIT, ID,                      // These need lexemes
-      CASSIGN_ADD, CASSIGN_SUB, CASSIGN_MULT, CASSIGN_DIV, CASSIGN_MOD,  // The rest don't.
+      // These tokens need lexemes to be fully specified.
+      INT_LIT, FLOAT_LIT, CHAR_LIT, STRING_LIT, ID,
+      // The rest are completely determined by their type.
+      WHITESPACE, ENDLINE,
+      CASSIGN_ADD, CASSIGN_SUB, CASSIGN_MULT, CASSIGN_DIV, CASSIGN_MOD,
       COMP_EQU, COMP_NEQU, COMP_LESS, COMP_LTE, COMP_GTR, COMP_GTE,
       BOOL_AND, BOOL_OR,
       COMMAND_PRINT, COMMAND_RANDOM,
       COMMAND_IF, COMMAND_ELSE, COMMAND_WHILE, COMMAND_FOREACH, COMMAND_BREAK,
-      COMMAND_FUNCTION, COMMAND_RETURN };
+      COMMAND_FUNCTION, COMMAND_RETURN,
+      // Track how many total token types there are.
+      NUM_TYPES };
     Type type;
 
     Token(Type in_type, const std::string & in_lexeme="") : type(in_type), lexeme(in_lexeme) { ; }
     Token(const Token &) = default;
     ~Token() { ; }
+
+    operator bool() const { return (bool) type; }
 
     std::string TypeName() const {
       // If this type is an ASCII character, indicate it.
@@ -49,6 +56,8 @@ namespace emp {
         case CHAR_LIT: return "CHAR_LIT";
         case STRING_LIT: return "STRING_LIT";
         case ID: return "ID";
+        case WHITESPACE: return "WHITESPACE";
+        case ENDLINE: return "ENDLINE";
         case CASSIGN_ADD: return "CASSIGN_ADD";
         case CASSIGN_SUB: return "CASSIGN_SUB";
         case CASSIGN_MULT: return "CASSIGN_MULT";
@@ -71,8 +80,13 @@ namespace emp {
         case COMMAND_BREAK: return "COMMAND_BREAK";
         case COMMAND_FUNCTION: return "COMMAND_FUNCTION";
         case COMMAND_RETURN: return "COMMAND_RETURN";
+        default:
+          return "Error: Unknown Token Type";
       }
     }
+
+    std::string ToString() const { return to_string(TypeName(), '(', lexeme, ')'); }
+
   };
 
 }
