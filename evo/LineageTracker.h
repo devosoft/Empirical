@@ -16,11 +16,11 @@ namespace evo{
   // Class to keep track of lineages
   // Maintains record of all genomes that ever existed, which organisms
   // they belonged to, and which organisms were the parents of which
-  template <typename ORG, typename... MANAGERS>
+  template <typename POP_MANAGER>
   class LineageTracker {
   private:
-    using pop_manager_type = AdaptTemplate< typename SelectPopManager<MANAGERS..., PopBasic>::type, ORG>;
-    static constexpr bool separate_generations = pop_manager_type::emp_has_separate_generations;
+    using ORG = std::remove_pointer<typename POP_MANAGER::value_type>;
+    static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
   public:
     std::set<ORG> genomes;
     std::map<int, ORG*> org_to_genome;
@@ -33,12 +33,17 @@ namespace evo{
 
     LineageTracker(){;}
 
-    LineageTracker(World<ORG, MANAGERS...> * world) {
+    template <typename WORLD>
+    LineageTracker(WORLD * w) {
 
       //Create std::function objects for all the callbacks. It seems like
       //this maybe shouldn't be necessary (or at least shouldn't need to happen
       //in the constructor), but for now it is or the compiler throws
       //internal errors
+      Setup(&(w->popM), w->world_name);
+    }
+
+    void Setup(POP_MANAGER * p, const std::string & world_name){
       std::function<void(int)> RecordParentFun = [this] (int id){
         RecordParent(id);
       };
@@ -59,11 +64,11 @@ namespace evo{
         Update(ud);
       };
 
-      world->OnBeforeRepro(RecordParentFun);
-      world->OnOffspringReady(TrackOffspringFun);
-      world->OnInjectReady(TrackInjectedOffspringFun);
-      world->OnOrgPlacement(TrackPlacementFun);
-      world->OnUpdate(UpdateFun);
+      emp::LinkSignal(to_string(world_name, "before-repro"), RecordParentFun);
+      emp::LinkSignal(to_string(world_name, "offspring-ready"), TrackOffspringFun);
+      emp::LinkSignal(to_string(world_name, "inject-ready"), TrackInjectedOffspringFun);
+      emp::LinkSignal(to_string(world_name, "org-placement"), TrackPlacementFun);
+      emp::LinkSignal(to_string(world_name, "on-update"), UpdateFun);
     }
 
     ~LineageTracker() {

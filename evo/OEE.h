@@ -27,18 +27,19 @@ namespace emp{
 namespace evo{
 
   EMP_EXTEND_CONFIG( OEEStatsManagerConfig, StatsManagerConfig,
-                     VALUE(GENERATIONS, int, 50, "How long must a lineage survive to count as persistant")
+                     VALUE(GENERATIONS, int, 50, "How long must a lineage survive to count as persistant"),
+                     CONST(ORG_LENGTH, int, 50, "How many sites can a genome have?")
                     )
 
   //Is there a way to avoid making this global but still do inheritance right?
   OEEStatsManagerConfig OeeConfig;
 
-  template <typename ORG, int MAX_ORG_SIZE, typename... MANAGERS>
-  class OEEStatsManager : StatsManager_Base {
+  template <typename POP_MANAGER, int MAX_ORG_SIZE=OeeConfig.ORG_LENGTH()>
+  class OEEStatsManager : StatsManager_Base<POP_MANAGER> {
   private:
+    using ORG = std::remove_pointer<typename POP_MANAGER::value_type>;
     using skeleton_type = emp::array<int, MAX_ORG_SIZE>;
-    using pop_manager_type = AdaptTemplate< typename SelectPopManager<MANAGERS..., PopBasic>::type, ORG>;
-    static constexpr bool separate_generations = pop_manager_type::emp_has_separate_generations;
+    static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
     //TODO: Make this use existing lineage tracker if there is one
 
     std::set<skeleton_type > novel;
@@ -48,15 +49,25 @@ namespace evo{
     // Historical generations needed to count stats. We only need these in
     // proportion to resolution.
     std::deque<emp::vector<int> > past_snapshots;
-    using StatsManager_Base::resolution;
+    using StatsManager_Base<POP_MANAGER>::resolution;
+    using StatsManager_Base<POP_MANAGER>::output_location;
+    using StatsManager_Base<POP_MANAGER>::delimiter;
 
   public:
-    LineageTracker<ORG, MANAGERS...> * lineage;
+    LineageTracker<POP_MANAGER> * lineage;
+    std::function<double(ORG * org)> fit_fun;
 
-    OEEStatsManager(World<ORG, MANAGERS...>* world,
+    template <typename WORLD>
+    OEEStatsManager(WORLD * w,
                     std::string location = "oee_stats.csv")
-                    : StatsManager_Base(OeeConfig, "OEE_stats.cfg", location){
+                    : StatsManager_Base<POP_MANAGER>(OeeConfig, "OEE_stats.cfg", location){
       // This isn't going to work if generations aren't a multiple of resolution
+      Setup(&(w->popM), w->world_name);
+    }
+
+    OEEStatsManager(){;}
+
+    void Setup(POP_MANAGER * p, const std::string & world_name) {
       emp_assert(generations % resolution == 0 &&
                 "ERROR: Generations required for persistance must be a multiple of resolution.",
                 resolution, generations);
@@ -65,26 +76,22 @@ namespace evo{
 
       past_snapshots = std::deque<emp::vector<int> >(2*generations/resolution + 1);
 
-      //Create std::function objects for all the callbacks. It seems like
-      //this maybe shouldn't be necessary (or at least shouldn't need to happen
-      //in the constructor), but for now it is or the compiler throws
-      //internal errors
       std::function<void(int)> UpdateFun = [this] (int ud){
         Update(ud);
       };
 
       //Setup signal callbacks
-      world->OnUpdate(UpdateFun);
-      //lineage = LineageTracker<ORG, MANAGERS...>(world);
+      emp::LinkSignal(to_string(world_name, "on-update"), UpdateFun);
 
       //TODO: Figure out how to make this work automatically
-      //fit_fun = world->GetFitFun();
       output_location << "update" << delimiter << "change" << delimiter
             << "novelty" << delimiter << "ecology" << delimiter
             << "complexity" << std::endl;
     }
 
-    std::function<double(ORG * org)> fit_fun;
+    void SetDefaultFitnessFun(std::function<double(ORG *)> fit){
+        fit_fun = fit;
+    }
 
     //Update callback function handles calculating stats
     void Update(int update) {

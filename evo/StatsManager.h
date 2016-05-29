@@ -107,30 +107,28 @@ namespace evo{
 
   public:
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
-
-    StatsManager_FunctionsOnUpdate(POP_MANAGER * p,
-                                     std::string location) :
-                                     StatsManager_Base<POP_MANAGER>(location){
-      std::function<void(int)> UpdateFun = [this] (int ud){
-          Update(ud);
-      };
-      pop = p;
-      //w->OnUpdate(UpdateFun); //See if we need to calculate stats every update
-    }
-
-    StatsManager_FunctionsOnUpdate(std::string location) :
-                                   StatsManager_Base<POP_MANAGER>(location){
-      std::function<void(int)> UpdateFun = [this] (int ud){
-        Update(ud);
-      };
-      //w->OnUpdate(UpdateFun); //See if we need to calculate stats every update
-    }
-
-    //The fitness function for calculating fitness related stats
     fit_fun_type fit_fun;
 
-    void Setup(POP_MANAGER * p){
+    template <typename WORLD>
+    StatsManager_FunctionsOnUpdate(WORLD * w,
+                                   std::string location = "stats.csv") :
+                                   StatsManager_Base<decltype(w->popM)>(location){
+      Setup(&(w->popM), w->world_name);
+    }
+
+    StatsManager_FunctionsOnUpdate(std::string location = "stats.csv") :
+                                   StatsManager_Base<POP_MANAGER>(location){;}
+
+    //The fitness function for calculating fitness related stats
+
+    void Setup(POP_MANAGER * p, const std::string & world_name){
       pop = p;
+
+      std::function<void(int)> UpdateFun = [&] (int ud){
+          Update(ud);
+      };
+
+      emp::LinkSignal(to_string(world_name, "::on-update"), UpdateFun);
     }
 
     //Function for adding functions that calculate stats to the
@@ -164,6 +162,10 @@ namespace evo{
       }
     }
 
+    void SetDefaultFitnessFun(std::function<double(org_ptr)> fit){
+        fit_fun = fit;
+    }
+
   };
 
   //Calculates some commonly required information: shannon diversity,
@@ -181,23 +183,13 @@ namespace evo{
   public:
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::fit_fun;
       using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::SetDefaultFitnessFun;
 
-      StatsManager_DefaultStats(POP_MANAGER * p, std::string location = "averages.csv")
-       : StatsManager_FunctionsOnUpdate<POP_MANAGER>(p, location){
-        std::function<double(POP_MANAGER*)> diversity = [](POP_MANAGER * pop){
-            return ShannonDiversity(*pop);
-        };
-        fit_stat_type max_fitness = [](fit_fun_type fit_func, POP_MANAGER * pop){
-            return MaxFitness(fit_func, *pop);
-        };
-        fit_stat_type avg_fitness = [](fit_fun_type fit_func, POP_MANAGER * pop){
-            return AverageFitness(fit_func, *pop);
-        };
+      template <typename WORLD>
+      StatsManager_DefaultStats(WORLD * w, std::string location = "averages.csv")
+       : StatsManager_FunctionsOnUpdate<decltype(w->popM)>(w, location){
 
-        AddFunction(diversity);
-        AddFunction(max_fitness);
-        AddFunction(avg_fitness);
-
+        Setup(&(w->popM), w->world_name);
         //Print header
         output_location << "update, shannon_diversity, max_fitness, avg_fitness" << std::endl;
       }
