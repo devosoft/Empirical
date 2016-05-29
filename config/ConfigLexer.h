@@ -78,7 +78,7 @@ namespace emp {
           return Token(Token::ID, cur_lexeme);
         }
 
-        // Any remaining possibilities are a single character.  Advance next_char now.
+        // Any remaining possibilities are one to two characters.  Advance next_char now.
         char prev_char = next_char;
         next_char = is.get();
 
@@ -91,6 +91,56 @@ namespace emp {
           case '\n':
           case ';':
             return Token(Token::ENDLINE);
+          case '+':
+            if (next_char == '=') { next_char = is.get(); return Token(Token::CASSIGN_ADD); }
+            return Token('+');
+          case '-':
+            if (next_char == '=') { next_char = is.get(); return Token(Token::CASSIGN_SUB); }
+            return Token('-');
+          case '*':
+            if (next_char == '=') { next_char = is.get(); return Token(Token::CASSIGN_MULT); }
+            return Token('*');
+          case '/':
+            if (next_char == '=') { next_char = is.get(); return Token(Token::CASSIGN_DIV); }
+            return Token('/');
+          case '%':
+            if (next_char == '=') { next_char = is.get(); return Token(Token::CASSIGN_MOD); }
+            return Token('%');
+          case '=':
+            if (next_char == '=') { next_char = is.get(); return Token(Token::COMP_EQU); }
+            return Token('=');
+          case '<':
+            if (next_char == '=') { next_char = is.get(); return Token(Token::COMP_LTE); }
+            return Token(Token::COMP_LESS);
+          case '>':
+            if (next_char == '=') { next_char = is.get(); return Token(Token::COMP_GTE); }
+            return Token(Token::COMP_GTR);
+          case '!':
+            if (next_char == '=') { next_char = is.get(); return Token(Token::COMP_NEQU); }
+            return Token('!');
+          case '&':
+            if (next_char == '&') { next_char = is.get(); return Token(Token::BOOL_AND); }
+            return Token('&');
+          case '|':
+            if (next_char == '|') { next_char = is.get(); return Token(Token::BOOL_OR); }
+            return Token('|');
+          case '\'':   // Char literal.
+            if (next_char == '\\') {
+              next_char = is.get();
+              switch (next_char) {
+                case 'n': next_char = '\n'; break;
+                case 'r': next_char = '\r'; break;
+                case 't': next_char = '\t'; break;
+                case '\\': next_char = '\\'; break;
+                case '\'': next_char = '\''; break;
+                case '\"': next_char = '\"'; break;
+              }
+            }
+            prev_char = next_char;   // prev_char is now contents.
+            next_char = is.get();
+            if (next_char != '\'') return Token(Token::ERROR);
+            next_char = is.get();
+            return Token(Token::CHAR_LIT, std::string(1,prev_char));
           default:
             // std::cout << "[[ Unk_char=" << int(unk_char) << " ]]" << std::endl;
             return Token(Token::UNKNOWN, std::string(1, prev_char));
