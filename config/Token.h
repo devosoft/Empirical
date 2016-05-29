@@ -23,14 +23,21 @@ namespace emp {
     enum Type { NONE=0, ERROR=256, UNKNOWN,                             // 0-255 are ASCII chars
       // These tokens need lexemes to be fully specified.
       INT_LIT, FLOAT_LIT, CHAR_LIT, STRING_LIT, ID,
+
       // The rest are completely determined by their type.
       WHITESPACE, ENDLINE,
       CASSIGN_ADD, CASSIGN_SUB, CASSIGN_MULT, CASSIGN_DIV, CASSIGN_MOD,
       COMP_EQU, COMP_NEQU, COMP_LESS, COMP_LTE, COMP_GTR, COMP_GTE,
       BOOL_AND, BOOL_OR,
-      COMMAND_PRINT, COMMAND_RANDOM,
+
+      // Statement commands
+      COMMAND_PRINT, COMMAND_INCLUDE,
       COMMAND_IF, COMMAND_ELSE, COMMAND_WHILE, COMMAND_FOREACH, COMMAND_BREAK, COMMAND_CONTINUE,
       COMMAND_FUNCTION, COMMAND_RETURN,
+
+      // Built-in functions.
+      FUN_RANDOM,
+
       // Track how many total token types there are.
       NUM_TYPES };
     int type;
@@ -72,7 +79,7 @@ namespace emp {
         case BOOL_AND: return "BOOL_AND";
         case BOOL_OR: return "BOOL_OR";
         case COMMAND_PRINT: return "COMMAND_PRINT";
-        case COMMAND_RANDOM: return "COMMAND_RANDOM";
+        case COMMAND_INCLUDE: return "COMMAND_INCLUDE";
         case COMMAND_IF: return "COMMAND_IF";
         case COMMAND_ELSE: return "COMMAND_ELSE";
         case COMMAND_WHILE: return "COMMAND_WHILE";
@@ -81,6 +88,7 @@ namespace emp {
         case COMMAND_CONTINUE: return "COMMAND_CONTINUE";
         case COMMAND_FUNCTION: return "COMMAND_FUNCTION";
         case COMMAND_RETURN: return "COMMAND_RETURN";
+        case FUN_RANDOM: return "FUN_RANDOM";
         default:
           return "Error: Unknown Token Type";
       }
