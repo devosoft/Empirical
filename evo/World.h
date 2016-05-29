@@ -112,6 +112,9 @@
 #define EMP_EVO_FORWARD(FUN, TARGET) \
 template <typename... T> void FUN(T &&... args) { TARGET.FUN(std::forward<T>(args)...); }
 
+#define EMP_EVO_FORWARD_TWO(FUN, TARGET1, TARGET2) \
+template <typename... T> void FUN(T &&... args) { TARGET1.FUN(std::forward<T>(args)...); TARGET2.FUN(std::forward<T>(args)...); }
+
 namespace emp {
 namespace evo {
 
@@ -128,8 +131,6 @@ namespace evo {
     // Build managers...
     AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> popM;
     AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgMDynamic>::type, ORG> orgM;
-
-    //Why is it necessary to give a template argument for StatsManager_Base?
     AdaptTemplate<typename SelectStatsManager<MANAGERS...,StatsManager_Base<decltype(popM)> >::type, decltype(popM)> statsM;
 
     Random * random_ptr;
@@ -164,6 +165,7 @@ namespace evo {
     }
 
     void SetupWorld(const std::string & world_name) {
+      this->pop_name = world_name;
       SetupCallbacks(callbacks);
       popM.SetRandom(random_ptr);
       statsM.Setup(&popM, world_name);
@@ -177,7 +179,7 @@ namespace evo {
       , inject_ready_sig(to_string(pop_name,"::inject-ready"))
       , org_placement_sig(to_string(pop_name,"::org-placement"))
       , on_update_sig(to_string(pop_name,"::on-update"))
-      , callbacks(pop_name) { SetupWorld(pop_name); }
+      , callbacks(pop_name) { SetupWorld(pop_name);}
 
     World(int seed=-1, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
       : World(new Random(seed), pop_name) { random_owner = true; }
@@ -187,6 +189,7 @@ namespace evo {
     ~World() { Clear(); if (random_owner) delete random_ptr; }
     World & operator=(const World &) = delete;
 
+    std::string pop_name;
     int GetSize() const { return (int) popM.size(); }
     ORG & operator[](int i) { return *(popM[i]); }
     const ORG & operator[](int i) const { return *(popM[i]); }
@@ -202,7 +205,7 @@ namespace evo {
 
     // Forward function calls to appropriate internal objects
     EMP_EVO_FORWARD(ConfigPop, popM);
-    EMP_EVO_FORWARD(SetDefaultFitnessFun, orgM);
+    EMP_EVO_FORWARD_TWO(SetDefaultFitnessFun, orgM, statsM);
     EMP_EVO_FORWARD(SetDefaultMutateFun, orgM);
 
     LinkKey OnBeforeRepro(std::function<void(int)> fun) { return before_repro_sig.AddAction(fun); }
