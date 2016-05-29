@@ -20,7 +20,7 @@ namespace emp {
 
   struct Token {
     std::string lexeme;
-    enum Type { NONE=0, UNKNOWN=256,                                     // 0-255 are ASCII chars
+    enum Type { NONE=0, ERROR=256, UNKNOWN,                             // 0-255 are ASCII chars
       // These tokens need lexemes to be fully specified.
       INT_LIT, FLOAT_LIT, CHAR_LIT, STRING_LIT, ID,
       // The rest are completely determined by their type.
@@ -33,9 +33,9 @@ namespace emp {
       COMMAND_FUNCTION, COMMAND_RETURN,
       // Track how many total token types there are.
       NUM_TYPES };
-    Type type;
+    int type;
 
-    Token(Type in_type=NONE, const std::string & in_lexeme="") : type(in_type), lexeme(in_lexeme) { ; }
+    Token(int in_type=NONE, const std::string & in_lexeme="") : type(in_type), lexeme(in_lexeme) { ; }
     Token(const Token &) = default;
     ~Token() { ; }
 
