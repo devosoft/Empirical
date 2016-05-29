@@ -30,6 +30,7 @@ namespace emp {
   public:
     ConfigLexer(std::istream & in_stream) : is(in_stream) {
       command_map["print"] = Token(Token::COMMAND_PRINT);
+      command_map["include"] = Token(Token::COMMAND_INCLUDE);
       command_map["if"] = Token(Token::COMMAND_IF);
       command_map["else"] = Token(Token::COMMAND_ELSE);
       command_map["while"] = Token(Token::COMMAND_WHILE);
@@ -38,6 +39,7 @@ namespace emp {
       command_map["return"] = Token(Token::COMMAND_RETURN);
       command_map["function"] = Token(Token::COMMAND_FUNCTION);
       command_map["foreach"] = Token(Token::COMMAND_FOREACH);
+      command_map["random"] = Token(Token::FUN_RANDOM);
 
       // Prime the first character so it's ready to go.
       is.get(next_char);
@@ -78,16 +80,26 @@ namespace emp {
           return Token(Token::ID, cur_lexeme);
         }
 
-        // Any remaining possibilities are one to two characters.  Advance next_char now.
+        // Any remaining possibilities start with a specific chatacter (or small set of options).
+        // Advance next_char now for look-ahead.
         char prev_char = next_char;
         next_char = is.get();
 
         switch (prev_char) {
+          case '#':  // Comment.  Delete to end of line.
+            while (next_char != '\n') next_char = is.get();
+            next_char = is.get();
+            break;   // Comments don't return a token.
+          case '\"':
+            cur_lexeme.resize(0);
+            next_char = is.get();     // Get first char of string.
+            while (next_char != '\"') { cur_lexeme.push_back(next_char); next_char = is.get(); }
+            next_char = is.get();
+            return Token(Token::STRING_LIT, cur_lexeme);
           case ' ':
           case '\t':
           case '\r':
-            break;  // Skip WS; don't return token.
-            // return Token(Token::WHITESPACE);
+            break;   // Skip WS; don't return token.
           case '\n':
           case ';':
             return Token(Token::ENDLINE);
