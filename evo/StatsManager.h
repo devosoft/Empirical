@@ -53,7 +53,8 @@ namespace evo{
         output_location.close();
     }
 
-    void Setup(POP_MANAGER * p, const std::string & world_name){;}
+    template <typename WORLD>
+    void Setup(WORLD * w){;}
 
     //Tells the stats manager where to put output. If location is "cout"
     //(default) or "stdout", stats will get sent to cout. Otherwise, the
@@ -113,7 +114,7 @@ namespace evo{
     StatsManager_FunctionsOnUpdate(WORLD * w,
                                    std::string location = "stats.csv") :
                                    StatsManager_Base<decltype(w->popM)>(location){
-      Setup(&(w->popM), w->world_name);
+      Setup(w);
     }
 
     StatsManager_FunctionsOnUpdate(std::string location = "stats.csv") :
@@ -121,14 +122,15 @@ namespace evo{
 
     //The fitness function for calculating fitness related stats
 
-    void Setup(POP_MANAGER * p, const std::string & world_name){
-      pop = p;
+    template <typename WORLD>
+    void Setup(WORLD * w){
+      pop = &(w->PopM);
 
       std::function<void(int)> UpdateFun = [&] (int ud){
           Update(ud);
       };
 
-      emp::LinkSignal(to_string(world_name, "::on-update"), UpdateFun);
+      w->OnUpdate(UpdateFun);
     }
 
     //Function for adding functions that calculate stats to the
@@ -189,7 +191,7 @@ namespace evo{
       StatsManager_DefaultStats(WORLD * w, std::string location = "averages.csv")
        : StatsManager_FunctionsOnUpdate<decltype(w->popM)>(w, location){
 
-        Setup(&(w->popM), w->world_name);
+        Setup(w);
         //Print header
         output_location << "update, shannon_diversity, max_fitness, avg_fitness" << std::endl;
       }
@@ -200,8 +202,9 @@ namespace evo{
         output_location << "update, shannon_diversity, max_fitness, avg_fitness" << std::endl;
       }
 
-      void Setup(POP_MANAGER * p, const std::string & world_name){
-        pop = p;
+      template <typename WORLD>
+      void Setup(WORLD * w){
+        pop = &(w->popM);
         std::function<double(POP_MANAGER*)> diversity = [](POP_MANAGER * pop){
             return ShannonDiversity(*pop);
         };
@@ -220,7 +223,7 @@ namespace evo{
             Update(ud);
         };
 
-        emp::LinkSignal(to_string(world_name, "::on-update"), UpdateFun);
+        w->OnUpdate(UpdateFun);
       }
 
 };

@@ -95,6 +95,8 @@
 #include "OrgManager.h"
 #include "PopulationManager.h"
 #include "StatsManager.h"
+#include "LineageTracker.h"
+#include "OEE.h"
 
 // Macro to add class elements associated with a dynamic function call.
 // For example, if you wanted to be able to have a dynamic fitness function, you would call:
@@ -112,8 +114,18 @@
 #define EMP_EVO_FORWARD(FUN, TARGET) \
 template <typename... T> void FUN(T &&... args) { TARGET.FUN(std::forward<T>(args)...); }
 
-#define EMP_EVO_FORWARD_TWO(FUN, TARGET1, TARGET2) \
-template <typename... T> void FUN(T &&... args) { TARGET1.FUN(std::forward<T>(args)...); TARGET2.FUN(std::forward<T>(args)...); }
+#define EMP_EVO_FORWARD_2(FUN, TARGET1, TARGET2)  \
+template <typename... T> void FUN(T &&... args) { \
+    TARGET1.FUN(std::forward<T>(args)...);        \
+    TARGET2.FUN(std::forward<T>(args)...);        \
+}
+
+#define EMP_EVO_FORWARD_3(FUN, TARGET1, TARGET2, TARGET3) \
+template <typename... T> void FUN(T &&... args) {         \
+    TARGET1.FUN(std::forward<T>(args)...);                \
+    TARGET2.FUN(std::forward<T>(args)...);                \
+    TARGET3.FUN(std::forward<T>(args)...);                \
+}
 
 namespace emp {
 namespace evo {
@@ -121,6 +133,7 @@ namespace evo {
   EMP_SETUP_TYPE_SELECTOR(SelectPopManager, emp_is_population_manager);
   EMP_SETUP_TYPE_SELECTOR(SelectOrgManager, emp_is_organism_manager);
   EMP_SETUP_TYPE_SELECTOR(SelectStatsManager, emp_is_stats_manager);
+  EMP_SETUP_TYPE_SELECTOR(SelectLineageManager, emp_is_lineage_manager);
 
   template <typename POP_MANAGER> class PopulationIterator;
 
@@ -131,7 +144,10 @@ namespace evo {
     // Build managers...
     AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> popM;
     AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgMDynamic>::type, ORG> orgM;
-    AdaptTemplate<typename SelectStatsManager<MANAGERS...,StatsManager_Base<decltype(popM)> >::type, decltype(popM)> statsM;
+    //AdaptTemplate<typename SelectStatsManager<MANAGERS...,StatsManager_Base<decltype(popM)> >::type, decltype(popM)> statsM;
+    AdaptTemplate<typename SelectLineageManager<MANAGERS..., LineageTracker<PopBasic> >::type, decltype(popM)> lineageM;
+
+    OEEStatsManager<decltype(popM), 20> statsM;
 
     Random * random_ptr;
     bool random_owner;
@@ -168,7 +184,8 @@ namespace evo {
       this->pop_name = world_name;
       SetupCallbacks(callbacks);
       popM.SetRandom(random_ptr);
-      statsM.Setup(&popM, world_name);
+      lineageM.Setup(this);
+      statsM.Setup(this);
     }
 
   public:
@@ -205,7 +222,7 @@ namespace evo {
 
     // Forward function calls to appropriate internal objects
     EMP_EVO_FORWARD(ConfigPop, popM);
-    EMP_EVO_FORWARD_TWO(SetDefaultFitnessFun, orgM, statsM);
+    EMP_EVO_FORWARD_2(SetDefaultFitnessFun, orgM, statsM);
     EMP_EVO_FORWARD(SetDefaultMutateFun, orgM);
 
     LinkKey OnBeforeRepro(std::function<void(int)> fun) { return before_repro_sig.AddAction(fun); }

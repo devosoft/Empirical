@@ -22,22 +22,24 @@
 #include "PopulationManager.h"
 #include "Stats.h"
 #include "StatsManager.h"
+#include "OEE.h"
 
 namespace emp{
 namespace evo{
 
   EMP_EXTEND_CONFIG( OEEStatsManagerConfig, StatsManagerConfig,
                      VALUE(GENERATIONS, int, 50, "How long must a lineage survive to count as persistant"),
-                     CONST(ORG_LENGTH, int, 50, "How many sites can a genome have?")
+                     CONST(ORG_LENGTH, int, 20, "How many sites can a genome have?")
                     )
 
   //Is there a way to avoid making this global but still do inheritance right?
   OEEStatsManagerConfig OeeConfig;
 
-  template <typename POP_MANAGER, int MAX_ORG_SIZE=OeeConfig.ORG_LENGTH()>
+  template <typename POP_MANAGER, int MAX_ORG_SIZE = OeeConfig.ORG_LENGTH()>
   class OEEStatsManager : StatsManager_Base<POP_MANAGER> {
   private:
-    using ORG = std::remove_pointer<typename POP_MANAGER::value_type>;
+    using org_ptr = typename POP_MANAGER::value_type;
+    using ORG = typename std::remove_pointer<org_ptr>::type;
     using skeleton_type = emp::array<int, MAX_ORG_SIZE>;
     static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
     //TODO: Make this use existing lineage tracker if there is one
@@ -54,20 +56,22 @@ namespace evo{
     using StatsManager_Base<POP_MANAGER>::delimiter;
 
   public:
+    using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
     LineageTracker<POP_MANAGER> * lineage;
-    std::function<double(ORG * org)> fit_fun;
+    std::function<double(org_ptr)> fit_fun;
 
     template <typename WORLD>
     OEEStatsManager(WORLD * w,
                     std::string location = "oee_stats.csv")
                     : StatsManager_Base<POP_MANAGER>(OeeConfig, "OEE_stats.cfg", location){
       // This isn't going to work if generations aren't a multiple of resolution
-      Setup(&(w->popM), w->world_name);
+      Setup(w);
     }
 
     OEEStatsManager(){;}
 
-    void Setup(POP_MANAGER * p, const std::string & world_name) {
+    template <typename WORLD>
+    void Setup(WORLD * w) {
       emp_assert(generations % resolution == 0 &&
                 "ERROR: Generations required for persistance must be a multiple of resolution.",
                 resolution, generations);
@@ -81,7 +85,8 @@ namespace evo{
       };
 
       //Setup signal callbacks
-      emp::LinkSignal(to_string(world_name, "on-update"), UpdateFun);
+      w->OnUpdate(UpdateFun);
+      lineage = &(w->lineageM);
 
       //TODO: Figure out how to make this work automatically
       output_location << "update" << delimiter << "change" << delimiter
@@ -89,7 +94,7 @@ namespace evo{
             << "complexity" << std::endl;
     }
 
-    void SetDefaultFitnessFun(std::function<double(ORG *)> fit){
+    void SetDefaultFitnessFun(std::function<double(org_ptr)> fit){
         fit_fun = fit;
     }
 
@@ -229,13 +234,18 @@ namespace evo{
 
   };
 
+
+  //TODO: This is weird and awkward and I don't like it
+  template <typename POP_MANAGER>
+  using ORG = typename std::remove_pointer<typename POP_MANAGER::value_type>::type;
+
   //Here lies the beastiary of functions for dealing with persistant lineages
 
   //Takes a container of ints representing org ids (as assigned by the lineage)
   //tracker, and returns a contatiner of the genomes of those ints.
-  template <typename GENOME, template <typename> class C >
-  C<GENOME> IDsToGenomes(LineageTracker<GENOME>* lineages, C<int> persist_ids) {
-    C<GENOME> persist;
+  template <typename POP_MANAGER, template <typename> class C >
+  C<ORG<POP_MANAGER> > IDsToGenomes(LineageTracker<POP_MANAGER>* lineages, C<int> persist_ids) {
+    C<ORG<POP_MANAGER> > persist;
     for (int id : persist_ids){
       persist.insert(persist.back(), *(lineages->org_to_genome[id]));
     }
@@ -244,9 +254,9 @@ namespace evo{
   }
 
   //Specialization for emp::vector so we can use push_back
-  template <typename GENOME>
-  emp::vector<GENOME> IDsToGenomes(LineageTracker<GENOME>* lineages, emp::vector<int> persist_ids) {
-    emp::vector<GENOME> persist;
+  template <typename POP_MANAGER>
+  emp::vector<ORG<POP_MANAGER> > IDsToGenomes(LineageTracker<POP_MANAGER>* lineages, emp::vector<int> persist_ids) {
+    emp::vector<ORG<POP_MANAGER> > persist;
     for (int id : persist_ids){
       persist.push_back(*(lineages->org_to_genome[id]));
     }
@@ -265,8 +275,8 @@ namespace evo{
   //back in a lineage
 
   //Generic container version
-  template <typename GENOME, template <typename> class C >
-  C<int> GetPersistLineageIDs(LineageTracker<GENOME>* lineages,
+  template <typename POP_MANAGER, template <typename> class C >
+  C<int> GetPersistLineageIDs(LineageTracker<POP_MANAGER>* lineages,
                C<int> curr_generation,
                int generations){
 
@@ -281,8 +291,8 @@ namespace evo{
   }
 
   //emp::vector version so we can use push_back
-  template <typename GENOME>
-  emp::vector<int> GetPersistLineageIDs(LineageTracker<GENOME>* lineages,
+  template <typename POP_MANAGER>
+  emp::vector<int> GetPersistLineageIDs(LineageTracker<POP_MANAGER>* lineages,
                emp::vector<int> curr_generation,
                int generations){
 
@@ -301,8 +311,8 @@ namespace evo{
   //the desired length of time ago, and determines which orgs in the second
   //container have descendants in the first.
 
-  template <typename GENOME, template <typename> class C >
-  C<int> GetPersistLineageIDs(LineageTracker<GENOME>* lineages,
+  template <typename POP_MANAGER, template <typename> class C >
+  C<int> GetPersistLineageIDs(LineageTracker<POP_MANAGER>* lineages,
                 C<int> curr_generation,
                 C<int> prev_generation){
 
@@ -323,8 +333,8 @@ namespace evo{
   }
 
   //Specialization for emp::vector so we can use push_back
-  template <typename GENOME>
-  emp::vector<int> GetPersistLineageIDs(LineageTracker<GENOME>* lineages,
+  template <typename POP_MANAGER>
+  emp::vector<int> GetPersistLineageIDs(LineageTracker<POP_MANAGER>* lineages,
                 emp::vector<int> curr_generation,
                 emp::vector<int> prev_generation){
 
@@ -347,14 +357,14 @@ namespace evo{
   //Whereas GetPersistLineageIDs returns the ids of the orgs that are the
   //ancestors of persistent lineages, GetPersistLineage converts the ids to
   //GENOMEs first.
-  template <typename GENOME, template <typename> class C>
-  C<GENOME> GetPersistLineage(LineageTracker<GENOME>* lineages,
+  template <typename POP_MANAGER, template <typename> class C>
+  C<ORG<POP_MANAGER> > GetPersistLineage(LineageTracker<POP_MANAGER>* lineages,
 				       C<int> curr_generation,
 				       int generations){
 
-    C<GENOME> persist;
+    C<ORG<POP_MANAGER> > persist;
     for (int id : curr_generation){
-      emp::vector<GENOME*> lin = lineages->TraceLineage(id);
+      emp::vector<ORG<POP_MANAGER>*> lin = lineages->TraceLineage(id);
       emp_assert(lin.size() - generations > 0);
       persist.insert(persist.back(), **(lin.begin() + generations));
     }
@@ -363,8 +373,8 @@ namespace evo{
   }
 
   //Version that takes two populations
-  template <typename GENOME, template <typename> class C >
-  C<GENOME> GetPersistLineage(LineageTracker<GENOME>* lineages,
+  template <typename POP_MANAGER, template <typename> class C >
+  C<ORG<POP_MANAGER> > GetPersistLineage(LineageTracker<POP_MANAGER>* lineages,
                 C<int> curr_generation,
                 C<int> prev_generation){
 
@@ -373,8 +383,8 @@ namespace evo{
   }
 
   //Version that takes two populations
-  template <typename GENOME>
-  emp::vector<GENOME> GetPersistLineage(LineageTracker<GENOME>* lineages,
+  template <typename POP_MANAGER>
+  emp::vector<ORG<POP_MANAGER> > GetPersistLineage(LineageTracker<POP_MANAGER>* lineages,
                 emp::vector<int> curr_generation,
                 emp::vector<int> prev_generation){
 

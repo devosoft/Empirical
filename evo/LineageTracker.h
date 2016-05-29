@@ -9,21 +9,31 @@
 #include <set>
 #include "../tools/vector.h"
 #include "World.h"
+#include "PopulationManager.h"
 
 namespace emp{
 namespace evo{
 
+  template <typename POP_MANAGER = PopulationManager_Base<int> >
+  class LineageTracker_Null {
+  public:
+    static constexpr bool emp_is_lineage_manager = true;
+    LineageTracker_Null(){;};
+  };
+
   // Class to keep track of lineages
   // Maintains record of all genomes that ever existed, which organisms
   // they belonged to, and which organisms were the parents of which
-  template <typename POP_MANAGER>
+  template <typename POP_MANAGER = PopulationManager_Base<int> >
   class LineageTracker {
   private:
-    using ORG = std::remove_pointer<typename POP_MANAGER::value_type>;
+    using org_ptr = typename POP_MANAGER::value_type;
+    using ORG = typename std::remove_pointer<org_ptr>::type;
     static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
   public:
+    static constexpr bool emp_is_lineage_manager = true;
     std::set<ORG> genomes;
-    std::map<int, ORG*> org_to_genome;
+    std::map<int, org_ptr> org_to_genome;
     std::map<int, int> parents;
     int next = 1; //0 indicates no parent
     int next_parent_id = -1;
@@ -40,10 +50,11 @@ namespace evo{
       //this maybe shouldn't be necessary (or at least shouldn't need to happen
       //in the constructor), but for now it is or the compiler throws
       //internal errors
-      Setup(&(w->popM), w->world_name);
+      Setup(w);
     }
 
-    void Setup(POP_MANAGER * p, const std::string & world_name){
+    template <typename WORLD>
+    void Setup(WORLD * w){
       std::function<void(int)> RecordParentFun = [this] (int id){
         RecordParent(id);
       };
@@ -52,11 +63,11 @@ namespace evo{
         TrackPlacement(pos);
       };
 
-      std::function<void(ORG *)> TrackOffspringFun = [this] (ORG * org){
+      std::function<void(org_ptr)> TrackOffspringFun = [this] (org_ptr org){
         TrackOffspring(org);
       };
 
-      std::function<void(ORG *)> TrackInjectedOffspringFun = [this] (ORG * org){
+      std::function<void(org_ptr)> TrackInjectedOffspringFun = [this] (org_ptr org){
         TrackInjectedOffspring(org);
       };
 
@@ -64,11 +75,11 @@ namespace evo{
         Update(ud);
       };
 
-      emp::LinkSignal(to_string(world_name, "before-repro"), RecordParentFun);
-      emp::LinkSignal(to_string(world_name, "offspring-ready"), TrackOffspringFun);
-      emp::LinkSignal(to_string(world_name, "inject-ready"), TrackInjectedOffspringFun);
-      emp::LinkSignal(to_string(world_name, "org-placement"), TrackPlacementFun);
-      emp::LinkSignal(to_string(world_name, "on-update"), UpdateFun);
+      w->OnBeforeRepro(RecordParentFun);
+      w->OnOffspringReady(TrackOffspringFun);
+      w->OnInjectReady(TrackInjectedOffspringFun);
+      w->OnOrgPlacement(TrackPlacementFun);
+      w->OnUpdate(UpdateFun);
     }
 
     ~LineageTracker() {
@@ -86,12 +97,12 @@ namespace evo{
       }
     }
 
-    void TrackOffspring(ORG * org) {
+    void TrackOffspring(org_ptr org) {
       next_org_id = this->AddOrganism(*org, next_parent_id);
     }
 
     //Put newly injected organism into the lineage tracker
-    void TrackInjectedOffspring(ORG * org) {
+    void TrackInjectedOffspring(org_ptr org) {
       next_org_id = this->AddOrganism(*org, 0);
     }
 
@@ -124,15 +135,15 @@ namespace evo{
       std::pair<typename std::set<ORG>::iterator, bool> ret;
       ret = genomes.insert(org);
       typename std::set<ORG>::iterator it = ret.first;
-      ORG* genome = (ORG*)&(*it);
+      org_ptr genome = (org_ptr)&(*it);
       this->org_to_genome[id] = genome;
       this->parents[id] = parent;
       return id;
     }
 
     // Return a vector containing the genomes of an organism's ancestors
-    emp::vector<ORG*> TraceLineage(int org_id) {
-      emp::vector<ORG*> lineage;
+    emp::vector<org_ptr> TraceLineage(int org_id) {
+      emp::vector<org_ptr> lineage;
 
       while(org_id) {
         lineage.push_back(this->org_to_genome[org_id]);
@@ -145,7 +156,7 @@ namespace evo{
 
     //Return a vector containing the IDs of an oraganism's ancestors
     emp::vector<int> TraceLineageIDs(int org_id) {
-      emp::vector<ORG*> lineage;
+      emp::vector<org_ptr> lineage;
 
       while(org_id) {
         lineage.push_back(org_id);
