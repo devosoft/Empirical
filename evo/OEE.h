@@ -18,11 +18,8 @@
 #include "../tools/vector.h"
 #include "../tools/array.h"
 #include "LineageTracker.h"
-#include "World.h"
-#include "PopulationManager.h"
 #include "Stats.h"
 #include "StatsManager.h"
-#include "OEE.h"
 
 namespace emp{
 namespace evo{
@@ -35,9 +32,11 @@ namespace evo{
   //Is there a way to avoid making this global but still do inheritance right?
   OEEStatsManagerConfig OeeConfig;
 
-  template <typename POP_MANAGER, int MAX_ORG_SIZE = OeeConfig.ORG_LENGTH()>
+  template <typename POP_MANAGER>
   class OEEStatsManager : StatsManager_Base<POP_MANAGER> {
   private:
+    //This prevents compilation under g++
+    static constexpr int MAX_ORG_SIZE = OeeConfig.ORG_LENGTH();
     using org_ptr = typename POP_MANAGER::value_type;
     using ORG = typename std::remove_pointer<org_ptr>::type;
     using skeleton_type = emp::array<int, MAX_ORG_SIZE>;
@@ -57,7 +56,8 @@ namespace evo{
 
   public:
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
-    LineageTracker<POP_MANAGER> * lineage;
+    using lineage_type = LineageTracker<POP_MANAGER>;
+    lineage_type * lineage;
     std::function<double(org_ptr)> fit_fun;
 
     template <typename WORLD>
@@ -68,7 +68,8 @@ namespace evo{
       Setup(w);
     }
 
-    OEEStatsManager(){;}
+    OEEStatsManager(std::string location = "oee_stats.csv")
+                    : StatsManager_Base<POP_MANAGER>(OeeConfig, "OEE_stats.cfg", location){;}
 
     template <typename WORLD>
     void Setup(WORLD * w) {
@@ -393,6 +394,7 @@ namespace evo{
   }
 
 
+  using OEEStats = OEEStatsManager<PopBasic>;
 }
 }
 

@@ -8,7 +8,6 @@
 #include <map>
 #include <set>
 #include "../tools/vector.h"
-#include "World.h"
 #include "PopulationManager.h"
 
 namespace emp{
@@ -19,6 +18,9 @@ namespace evo{
   public:
     static constexpr bool emp_is_lineage_manager = true;
     LineageTracker_Null(){;};
+
+    template <typename WORLD>
+    void Setup(WORLD * w){;}
   };
 
   // Class to keep track of lineages
@@ -169,6 +171,8 @@ namespace evo{
 
   };
 
+  using LineageNull = LineageTracker_Null<PopBasic>;
+  using LineageStandard = LineageTracker<PopBasic>;
 
 }
 }

@@ -1,9 +1,6 @@
 #ifndef EMP_EVO_POP_ITER_H
 #define EMP_EVO_POP_ITER_H
 
-//#include "World.h"
-#include "PopulationManager.h"
-
 namespace emp{
 namespace evo{
 

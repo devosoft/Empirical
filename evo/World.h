@@ -91,12 +91,13 @@
 #include "../tools/reflection.h"
 #include "../tools/vector.h"
 
+
 #include "OrgSignals.h"
 #include "OrgManager.h"
 #include "PopulationManager.h"
 #include "StatsManager.h"
 #include "LineageTracker.h"
-#include "OEE.h"
+
 
 // Macro to add class elements associated with a dynamic function call.
 // For example, if you wanted to be able to have a dynamic fitness function, you would call:
@@ -130,10 +131,12 @@ template <typename... T> void FUN(T &&... args) {         \
 namespace emp {
 namespace evo {
 
+
   EMP_SETUP_TYPE_SELECTOR(SelectPopManager, emp_is_population_manager);
   EMP_SETUP_TYPE_SELECTOR(SelectOrgManager, emp_is_organism_manager);
   EMP_SETUP_TYPE_SELECTOR(SelectStatsManager, emp_is_stats_manager);
   EMP_SETUP_TYPE_SELECTOR(SelectLineageManager, emp_is_lineage_manager);
+  EMP_SETUP_TYPE_SELECTOR(NeedsLineageManager, lineage);
 
   template <typename POP_MANAGER> class PopulationIterator;
 
@@ -144,10 +147,13 @@ namespace evo {
     // Build managers...
     AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> popM;
     AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgMDynamic>::type, ORG> orgM;
-    //AdaptTemplate<typename SelectStatsManager<MANAGERS...,StatsManager_Base<decltype(popM)> >::type, decltype(popM)> statsM;
-    AdaptTemplate<typename SelectLineageManager<MANAGERS..., LineageTracker<PopBasic> >::type, decltype(popM)> lineageM;
+    AdaptTemplate<typename SelectStatsManager<MANAGERS...,StatsManager_Base<decltype(popM)> >::type, decltype(popM)> statsM;
 
-    OEEStatsManager<decltype(popM), 20> statsM;
+    //Create a lineage manager if the stats manager needs it or if the user asked for it
+    EMP_CHOOSE_MEMBER_TYPE(DefaultLineage, lineage_type, LineageNull, decltype(statsM));
+    AdaptTemplate<typename SelectLineageManager<MANAGERS...,DefaultLineage>::type, decltype(popM)> lineageM;
+
+    //emp::evo::OEEStatsManager<decltype(popM)> statsM;
 
     Random * random_ptr;
     bool random_owner;

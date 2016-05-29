@@ -8,7 +8,6 @@
 
 #include "../tools/FunctionSet.h"
 #include "../tools/vector.h"
-#include "World.h"
 #include "Stats.h"
 #include "../config/config.h"
 #include "PopulationManager.h"
@@ -228,6 +227,8 @@ namespace evo{
 
 };
 
+using NullStats = StatsManager_Base<PopBasic>;
+using DefaultStats = StatsManager_DefaultStats<PopBasic>;
 }
 }
 

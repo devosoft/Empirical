@@ -14,11 +14,11 @@
 #include <functional>
 
 #include "../../evo/NK-const.h"
-#include "../../evo/World.h"
 #include "../../evo/OEE.h"
+#include "../../evo/World.h"
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
-#include "../../evo/Stats.h"
+#include "../../evo/StatsManager.h"
 
 
 constexpr int K = 3;
@@ -35,12 +35,7 @@ int main()
   std::cout << "N: " << N << ", K: " << K << ", POP_SIZE: " << POP_SIZE << ", Selection: " << "Standard_tournament" << ", TournamentSize: " << TOURNAMENT_SIZE << std::endl;
   emp::Random random;
   emp::evo::NKLandscapeConst<N,K> landscape(random);
-  emp::evo::World<BitOrg, emp::evo::StatsManager_DefaultStats<emp::evo::PopulationManager_Base<BitOrg> > > pop(random);
-  //emp::evo::OEEStatsManager<BitOrg, N> oee_stats(&pop, "cout");
-  //emp::evo::LineageTracker<BitOrg> lin(&pop);
-  //oee_stats.lineage = &lin;
-
-  //emp::evo::StatsManager_DefaultStats<BitOrg> common_stats(&pop, "cout");
+  emp::evo::World<BitOrg, emp::evo::OEEStats > pop(random);
 
   //#ifdef EMSCRIPTEN
   //std::cout << n_objects() << std::endl;

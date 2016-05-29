@@ -14,8 +14,9 @@
 #include <cmath>
 #include <vector>
 #include <set>
+#include <functional>
+
 #include "../tools/vector.h"
-#include "World.h"
 
 namespace emp{
 namespace evo{
