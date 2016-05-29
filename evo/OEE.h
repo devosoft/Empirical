@@ -18,7 +18,7 @@
 #include "../tools/vector.h"
 #include "../tools/array.h"
 #include "LineageTracker.h"
-#include "Stats.h"
+#include "../tools/stats.h"
 #include "StatsManager.h"
 
 namespace emp{
@@ -200,7 +200,7 @@ namespace evo{
     //Determine the shannon diversity of the skeletons in the given vector
     double EcologyMetric(emp::vector<skeleton_type> persist){
 
-      return emp::evo::ShannonDiversity(persist);
+      return emp::evo::ShannonEntropy(persist);
 
     }
 

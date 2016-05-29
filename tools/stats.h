@@ -6,8 +6,8 @@
 //  a population.
 //
 
-#ifndef EMP_EVO_STATS_H
-#define EMP_EVO_STATS_H
+#ifndef EMP_STATS_H
+#define EMP_STATS_H
 
 #include <type_traits>
 #include <map>
@@ -21,12 +21,10 @@
 namespace emp{
 namespace evo{
 
-
-
   //Calculates Shannon Entropy of the members of the container passed
   template <typename C>
   typename std::enable_if<!std::is_pointer<typename C::value_type>::value, double>::type
-  ShannonDiversity(C & elements) {
+  ShannonEntropy(C & elements) {
 
     //Count number of each value present
     std::map<typename C::value_type, int> counts;
@@ -46,12 +44,13 @@ namespace evo{
     }
 
     return -1 * result;
-}
+  }
 
-  //Calculates Shannon Entropy of the members of a world
+  //Calculates Shannon Entropy of the members of the container when those members
+  //are pointers
   template <typename C>
   typename std::enable_if<std::is_pointer<typename C::value_type>::value, double>::type
-  ShannonDiversity(C & elements) {
+  ShannonEntropy(C & elements) {
 
     using pointed_at = typename std::remove_pointer<typename C::value_type>::type;
     //Count number of each value present
@@ -72,65 +71,59 @@ namespace evo{
     }
 
     return -1 * result;
-}
+  }
 
   //Calculates number of unique elements in the container passed
   template <typename C>
-  int Richness(C elements) {
+  typename std::enable_if<!std::is_pointer<typename C::value_type>::value, int>::type
+  UniqueCount(C & elements) {
     //Converting to a set will remove duplicates leaving only unique values
     std::set<typename C::value_type> unique_elements(elements.begin(),
-						     elements.end());
+                           elements.end());
     return unique_elements.size();
   }
 
-  template <typename C, class = typename C::value_type >
-  double MaxFitness(std::function<double(typename C::value_type org)> fit_fun, C orgs){
-    double fittest = fit_fun(orgs[0]);
-    for (auto org : orgs){
-      double fitness = fit_fun(org);
-      if (fitness > fittest){
-        fittest = fitness;
+  //Calculates number of unique elements in the container of pointers passed
+  template <typename C>
+  typename std::enable_if<std::is_pointer<typename C::value_type>::value, int>::type
+  UniqueCount(C & elements) {
+    //Converting to a set will remove duplicates leaving only unique values
+    using pointed_at = typename std::remove_pointer<typename C::value_type>::type;
+    std::set<pointed_at> unique_elements;
+    for (auto element : elements) {
+        unique_elements.insert(*element);
+    }
+
+    return unique_elements.size();
+  }
+
+  //Takes a function and a container of items that that function can be run on
+  //and returns the maximum value
+  template <typename C, typename RET_TYPE>
+  RET_TYPE MaxFunctionReturn(std::function<RET_TYPE(typename C::value_type)> fun, C & elements){
+    double highest = fun(elements[0]);
+    for (auto element : elements){
+      double result = fun(element);
+      if (result > highest){
+        highest = result;
       }
     }
-    return fittest;
+    return highest;
   }
 
-/*  template <typename ORG, typename... MANAGERS>
-  double MaxFitness(std::function<double(ORG * org)> fit_fun, World<ORG, MANAGERS...> & orgs){
-    double fittest = fit_fun(&(*(orgs.begin())));
-    for (auto org : orgs){
-      double fitness = fit_fun(&org);
-      if (fitness > fittest){
-        fittest = fitness;
-      }
+  //Takes a function and a container of items that that function can be run on
+  //and returns the average value. Function must return a double.
+  template <typename C>
+  double AverageFunctionReturn(std::function<double(typename C::value_type)> fun, C & elements){
+    double cumulative_value = 0;
+    double count = 0;
+    for (auto element : elements){
+        ++count;
+        cumulative_value += fun(element);
     }
-    return fittest;
-  }
-*/
-
-template <typename C, class = typename C::value_type>
-  double AverageFitness(std::function<double(typename C::value_type org)> fit_fun, C & orgs){
-    double cumulative_fitness = 0;
-    double num_orgs = 0;
-    for (auto org : orgs){
-        ++num_orgs;
-        cumulative_fitness += fit_fun(org);
-    }
-    return (cumulative_fitness / num_orgs);
+    return (cumulative_value / count);
   }
 
-/*
-template <typename ORG, typename... MANAGERS>
-  double AverageFitness(std::function<double(ORG * org)> fit_fun, World<ORG, MANAGERS...> & orgs){
-    double cumulative_fitness = 0;
-    double num_orgs = 0;
-    for (auto org : orgs){
-        ++num_orgs;
-        cumulative_fitness += fit_fun(&org);
-    }
-    return (cumulative_fitness / num_orgs);
-  }
-*/
 }
 }
 

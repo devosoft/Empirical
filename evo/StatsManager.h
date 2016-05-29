@@ -8,7 +8,7 @@
 
 #include "../tools/FunctionSet.h"
 #include "../tools/vector.h"
-#include "Stats.h"
+#include "../tools/stats.h"
 #include "../config/config.h"
 #include "PopulationManager.h"
 
@@ -205,13 +205,13 @@ namespace evo{
       void Setup(WORLD * w){
         pop = &(w->popM);
         std::function<double(POP_MANAGER*)> diversity = [](POP_MANAGER * pop){
-            return ShannonDiversity(*pop);
+            return ShannonEntropy(*pop);
         };
         fit_stat_type max_fitness = [](fit_fun_type fit_func, POP_MANAGER * pop){
-            return MaxFitness(fit_func, *pop);
+            return MaxFunctionReturn(fit_func, *pop);
         };
         fit_stat_type avg_fitness = [](fit_fun_type fit_func, POP_MANAGER * pop){
-            return AverageFitness(fit_func, *pop);
+            return AverageFunctionReturn(fit_func, *pop);
         };
 
         AddFunction(diversity);
