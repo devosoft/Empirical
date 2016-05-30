@@ -47,6 +47,8 @@ namespace emp {
     ConfigLexer(ConfigLexer &) = delete;
     ~ConfigLexer() { ; }
 
+    int GetMaxToken() const { return Token::NUM_TYPES; }
+
     emp::Token GetToken() {
       while (next_char > 0) {                      // Keep looping until we find a token or hit EOF.
         if (is_digit(next_char)) {                 // Must be a number
@@ -153,6 +155,17 @@ namespace emp {
             if (next_char != '\'') return Token(Token::ERROR);
             next_char = is.get();
             return Token(Token::CHAR_LIT, std::string(1,prev_char));
+          case '(':
+          case ')':
+          case ',':
+          case '{':
+          case '}':
+          case '[':
+          case ']':
+          case '.':
+          case ':':
+          case '?':
+            return Token(prev_char);
           default:
             // std::cout << "[[ Unk_char=" << int(unk_char) << " ]]" << std::endl;
             return Token(Token::UNKNOWN, std::string(1, prev_char));
