@@ -27,22 +27,29 @@ namespace emp {
 
   class ConfigParser {
   private:
-    ConfigLexer lexer;
-    emp::vector<ParseRule> rules;
-    std::map<std::string, int> state_ids;
-    int next_state;
+    ConfigLexer lexer;                      // Lexer to provide token stream.
+    emp::vector<ParseRule> rules;           // Vector of all rules linking states to productions.
+    std::map<std::string, int> state_ids;   // Map of state names to their IDs.
+    int next_state;                         // If we add another state, what ID should we use?
 
+    int StateNameToID(const std::string & name) {
+      auto state_ptr = state_ids.find(name);
+      if (state_ptr == state_ids.end()) return next_state++;
+      return state_ptr->second;
+    }
   public:
     ConfigParser(std::istream & in_stream)
       : lexer(in_stream), next_state(lexer.GetMaxToken()) { ; }
     ~ConfigParser() { ; }
 
     // Returns state ID for rule.
+    int AddRule(int state_id, const emp::vector<int> & rhs) {
+      rules.emplace_back(state_id, rhs);
+      return state_id;
+    }
+
     int AddRule(const std::string & state_name, const emp::vector<int> & rhs) {
-      auto state_ptr = state_ids.find(state_name);
-      int result_id = (state_ptr == state_ids.end()) ? (next_state++) : state_ptr->second;
-      rules.emplace_back(result_id, rhs);
-      return result_id;
+      return AddRule( StateNameToID(state_name), rhs );
     }
   };
 
