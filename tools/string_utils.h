@@ -127,6 +127,10 @@ namespace emp {
     return is_letter(test_char) || is_digit(test_char);
   }
 
+  inline bool is_idchar(char test_char) {
+    return is_alphanumeric(test_char) || test_char == '_';
+  }
+
   static bool is_one_of(char test_char, const std::string & char_set) {
     for (char x : char_set) if (test_char == x) return true;
     return false;
