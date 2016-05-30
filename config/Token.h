@@ -5,8 +5,9 @@
 //  A simple lexer for the Empirical configuration language.
 //
 //
-//  Development notes: Initially building the lexer to be language specific, but a
-//  more general lexer will be a good addition to Empirical.
+//  Development notes:
+//  * Building the lexer to be language specific, but a general lexer would be good in Empirical.
+//  * Need to use filename, line, and col for error tracking.
 
 #ifndef EMP_TOKEN_H
 #define EMP_TOKEN_H
@@ -41,6 +42,9 @@ namespace emp {
       // Track how many total token types there are.
       NUM_TYPES };
     int type;
+    int file_id;
+    int line;
+    int col;
 
     Token(int in_type=NONE, const std::string & in_lexeme="") : type(in_type), lexeme(in_lexeme) { ; }
     Token(const Token &) = default;
