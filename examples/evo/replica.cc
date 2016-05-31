@@ -20,8 +20,8 @@ constexpr int K = 0;
 constexpr int N = 400;
 constexpr double MUTATION_RATE = 0.005;
 
-constexpr int TOURNAMENT_SIZE = 2;
-constexpr int POP_SIZE = 3;
+constexpr int TOURNAMENT_SIZE = 20;
+constexpr int POP_SIZE = 300;
 constexpr int UD_COUNT = 10;
 
 using BitOrg = emp::BitVector;
@@ -65,6 +65,7 @@ int main(int argc, char* argv[])
   grid_stats.fit_fun = fit_func;
 
   // Build a random initial population
+  /*
   BitOrg next_orgA(N);
   for(int j = 0; j < N; j++) next_orgA[j] = 0;
   BitOrg next_orgB(N);
@@ -82,7 +83,8 @@ int main(int argc, char* argv[])
   grid_pop.Insert(next_orgB);
   grid_pop.Insert(next_orgC);
 
-  /*
+  */
+  
   for (int i = 0; i < POP_SIZE; i++) {
     BitOrg next_org(N);
     for (int j = 0; j < N; j++) next_org[j] = random.P(0.5);
@@ -92,7 +94,7 @@ int main(int argc, char* argv[])
     // doing this. Theoretically...
     mixed_pop.Insert(next_org);
     grid_pop.Insert(next_org);
-  }*/
+  }
 
   // mutation function:
   // for every site in the gnome there is a MUTATION_RATE chance that the 
@@ -135,7 +137,7 @@ int main(int argc, char* argv[])
     //    mixed_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 5, 10);
 
     // Run a tournament for the rest...
-    /*
+    
     mixed_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
 			 , TOURNAMENT_SIZE, POP_SIZE);
     grid_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
@@ -145,9 +147,13 @@ int main(int argc, char* argv[])
     grid_pop.MutatePop();
 
     mixed_pop.Update();
-    mixed_pop.MutatePop();*/
-    mixed_pop.Update();
-    grid_pop.Update();
+    mixed_pop.MutatePop();
+    MLandscape data = MutLandscape(fit_func, grid_pop);
+    std::cout<<"Benefitial:  "<<data.benefit_avg<<std::endl;
+    std::cout<<"Neutral:     "<<data.neutral_avg<<std::endl;
+    std::cout<<"Detremental: "<<data.det_avg<<std::endl;
+    //mixed_pop.Update();
+    //grid_pop.Update();
   }
 
 }
