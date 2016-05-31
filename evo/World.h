@@ -163,9 +163,7 @@ namespace evo {
 
     void SetupWorld() {
       SetupCallbacks(callbacks);
-      std::cout<<"AAAAAAAAAA"<<std::endl;
       popM.Setup(random_ptr);
-      std::cout<<"BBBBBBBBBBBBB"<<std::endl;
     }
 
   public:
@@ -176,7 +174,7 @@ namespace evo {
       , inject_ready_sig(to_string(pop_name,"::inject-ready"))
       , org_placement_sig(to_string(pop_name,"::org-placement"))
       , on_update_sig(to_string(pop_name,"::on-update"))
-      , callbacks(pop_name) { std::cout<<"HELPME"<<std::endl; SetupWorld(); }
+      , callbacks(pop_name) { SetupWorld(); }
 
     World(int seed=-1, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
       : World(new Random(seed), pop_name) { random_owner = true; }
