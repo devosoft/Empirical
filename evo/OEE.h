@@ -26,7 +26,6 @@ namespace evo{
 
   EMP_EXTEND_CONFIG( OEEStatsManagerConfig, StatsManagerConfig,
                      VALUE(GENERATIONS, int, 50, "How long must a lineage survive to count as persistant"),
-                     CONST(ORG_LENGTH, int, 20, "How many sites can a genome have?")
                     )
 
   //Is there a way to avoid making this global but still do inheritance right?
@@ -36,10 +35,9 @@ namespace evo{
   class OEEStatsManager : StatsManager_Base<POP_MANAGER> {
   private:
     //This prevents compilation under g++
-    static constexpr int MAX_ORG_SIZE = OeeConfig.ORG_LENGTH();
     using org_ptr = typename POP_MANAGER::value_type;
     using ORG = typename std::remove_pointer<org_ptr>::type;
-    using skeleton_type = emp::array<int, MAX_ORG_SIZE>;
+    using skeleton_type = emp::vector<int>;
     static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
     //TODO: Make this use existing lineage tracker if there is one
 
@@ -144,7 +142,7 @@ namespace evo{
       C<skeleton_type> skeletons;
       for (auto org : orgs) {
         double fitness = fit_fun(&org);
-        skeleton_type skeleton;
+        skeleton_type skeleton(org.size());
         ORG test = org;
 
         for (int i = 0; i < org.size(); i++) {
@@ -165,7 +163,7 @@ namespace evo{
       emp::vector<skeleton_type> skeletons;
       for (auto org : orgs) {
         double fitness = fit_fun(&org);
-        skeleton_type skeleton;
+        skeleton_type skeleton(org.size());
         ORG test = org;
 
         for (int i = 0; i < org.size(); i++) {
