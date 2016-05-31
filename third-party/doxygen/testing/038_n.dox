@@ -1,7 +1,0 @@
-// objective: test the \n command
-// check: indexpage.xml
-/** \mainpage
-Text\n
-New line\n
-Another line
-*/
