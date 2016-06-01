@@ -261,7 +261,7 @@ namespace emp {
   }
 
   // Cut up a string based on a deliminator.
-  static void slice_string(const std::string & in_string, emp::vector<std::string> & out_set,
+  static void slice(const std::string & in_string, emp::vector<std::string> & out_set,
                     char delim='\n') {
     const int test_size = (int) in_string.size();
 
@@ -291,9 +291,9 @@ namespace emp {
   }
 
   // A simple way to slice a string without passing in result vector (may be less efficient).
-  static emp::vector<std::string> slice_string(const std::string & in_string, char delim='\n') {
+  static emp::vector<std::string> slice(const std::string & in_string, char delim='\n') {
     emp::vector<std::string> result;
-    slice_string(in_string, result, delim);
+    slice(in_string, result, delim);
     return result;
   }
 
