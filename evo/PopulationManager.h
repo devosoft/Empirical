@@ -305,6 +305,7 @@ namespace evo {
         ConfigPop(5, *temp_sizes, &temp_connect, 150, 10, 0.05, 200);
     }
 
+    //Sets up population based on user specs.
     void ConfigPop(int pc, vector<int> ps, std::map<int, vector<int> > * c, int u, int l, double mg, int pop_size) { 
         pool_count = pc; 
         pool_sizes = ps;
@@ -317,11 +318,14 @@ namespace evo {
 
         // If no pool sizes in vector, defaults to random sizes for each
         if(pool_sizes.size() == 0){
-            while(true){
+            while(true){ 
                 int pool_total = 0;
-                for( int i = 0; i < pool_count - 1; i++){ pool_sizes.push_back(random_ptr->GetInt(r_lower, r_upper)); pool_total += pool_sizes[i]; }
-               // std::cout<<pool_total<<std::endl;
-                if(pool_total < pop_size){
+                for( int i = 0; i < pool_count - 1; i++){
+                    pool_sizes.push_back(random_ptr->GetInt(r_lower, r_upper));
+                    pool_total += pool_sizes[i];
+                }
+
+                if(pool_total < pop_size){ //Keep generating random sizes until true
                     pool_sizes.push_back(pop_size - pool_total);
                     break;
                 }
@@ -341,7 +345,6 @@ namespace evo {
 
         int total = 0;
         for (auto el : pool_sizes){total += el;}
-        //std::cout<<"total: "<<total<<std::endl;
 
         emp_assert(pop_size == total && "POP_SIZE is different than total pool sizes");
 
@@ -350,8 +353,6 @@ namespace evo {
         for( auto el : pool_sizes ){
             arr_size += el;
             pool_end.push_back(arr_size);
-            //std::cout<<"END: "<<arr_size<<std::endl;
-
         }
     
     }
@@ -385,56 +386,32 @@ namespace evo {
         int range_l, range_u;
 
         if(random_ptr->P(mig_rate) && connections[parent_pos].size() > 0){
-            //std::cout<<"NO"<<std::endl;
             int loc = random_ptr->GetInt(0, connections[parent_pos].size());
+
             vector<int> temp  = connections[parent_pos];
             InsertPool = temp[loc];
+
             std::cout<<"Crossing To: "<<InsertPool<<std::endl;
         }
-        else{ for(int i = 0; i < pool_end.size(); i++ ){if(parent_pos < pool_end[i]) {InsertPool = i; break;} }}
-        //std::cout<<"NUM: "<<InsertPool<<std::endl;
+        else{
+            for(int i = 0; i < pool_end.size(); i++ ){
+                if(parent_pos < pool_end[i]) {InsertPool = i; break;} 
+            }
+        }
 
         if(InsertPool == 0){range_l = 0;}
         else{range_l = pool_end[InsertPool - 1];}
-
         range_u = pool_end[InsertPool];
-        //std::cout<<"RU: "<<range_u<<" RL: "<<range_l<<std::endl;
+
         const int pos = (int) random_ptr->GetDouble(range_l, range_u);
 
-       if (pop[pos]) delete pop[pos];
+        if (pop[pos]) delete pop[pos];
 
         pop[pos] = new_org;
 
         return pos;
     }
-/*
-    void Print(std::function<std::string(ORG*)> string_fun,
-               std::ostream & os = std::cout,
-               const std::string & empty="-",
-               const std::string & spacer=" ")
-    {
-      emp_assert(string_fun);
-      for (int y=0; y<height; y++) {
-        for (int x = 0; x<width; x++) {
-          ORG * org = pop[ToID(x,y)];
-          if (org) os << string_fun(org) << spacer;
-          else os << empty << spacer;
-        }
-        os << std::endl;
-      }
-    }
-
-    void Print(std::ostream & os = std::cout, std::string empty="X", std::string spacer=" ") {
-      for (int y=0; y<height; y++) {
-        for (int x = 0; x<width; x++) {
-          ORG * org = pop[ToID(x,y)];
-          if (org) os << *org << spacer;
-          else os << empty << spacer;
-        }
-        os << std::endl;
-      }
-    }*/
-  };
+ };
 
   using PopBasic = PopulationManager_Base<int>;
   using PopEA    = PopulationManager_EA<int>;
