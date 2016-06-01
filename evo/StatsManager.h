@@ -104,11 +104,14 @@ namespace evo{
     using StatsManager_Base<POP_MANAGER>::resolution;
     using StatsManager_Base<POP_MANAGER>::output_location;
     using StatsManager_Base<POP_MANAGER>::delimiter;
+    bool header_printed = false;
+    std::string header = "update";
 
   public:
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
     fit_fun_type fit_fun;
 
+    //Constructor for creating this as a stand-alone object
     template <typename WORLD>
     StatsManager_FunctionsOnUpdate(WORLD * w,
                                    std::string location = "stats.csv") :
@@ -116,11 +119,11 @@ namespace evo{
       Setup(w);
     }
 
+    //Constructor for use by World object
     StatsManager_FunctionsOnUpdate(std::string location = "stats.csv") :
                                    StatsManager_Base<POP_MANAGER>(location){;}
 
     //The fitness function for calculating fitness related stats
-
     template <typename WORLD>
     void Setup(WORLD * w){
       pop = &(w->PopM);
@@ -134,17 +137,31 @@ namespace evo{
 
     //Function for adding functions that calculate stats to the
     //set to be calculated
-    void AddFunction(std::function<double(POP_MANAGER*)> func) {
+    void AddFunction(std::function<double(POP_MANAGER*)> func, std::string label) {
       world_stats.Add(func);
+      if (header_printed){
+        NotifyWarning("Function added to stats manager after initialization.");
+      } else {
+        header += delimiter + label;
+      }
     }
 
     //Version for functions that require a fitness function
-    void AddFunction(std::function<double(fit_fun_type, POP_MANAGER*)> func) {
+    void AddFunction(std::function<double(fit_fun_type, POP_MANAGER*)> func, std::string label) {
       fitness_stats.Add(func);
+      if (header_printed){
+        NotifyWarning("Function added to stats manager after initialization.");
+      } else {
+        header += delimiter + label;
+      }
     }
 
     //If this update matches the resolution, calculate and record all the stats
     void Update(int update) {
+      if (!header_printed) {
+          output_location << header << std::endl;
+          header_printed = true;
+      }
 
       if (update % resolution == 0){
 
@@ -186,24 +203,23 @@ namespace evo{
       using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::SetDefaultFitnessFun;
 
+      //Constructor for use as a stand-alone object
       template <typename WORLD>
       StatsManager_DefaultStats(WORLD * w, std::string location = "averages.csv")
        : StatsManager_FunctionsOnUpdate<decltype(w->popM)>(w, location){
-
         Setup(w);
-        //Print header
-        output_location << "update, shannon_diversity, max_fitness, avg_fitness" << std::endl;
       }
 
+      //Constructor for use as a template parameter for the world
       StatsManager_DefaultStats(std::string location = "averages.csv")
-       : StatsManager_FunctionsOnUpdate<POP_MANAGER>(location){
-        //Print header
-        output_location << "update, shannon_diversity, max_fitness, avg_fitness" << std::endl;
-      }
+       : StatsManager_FunctionsOnUpdate<POP_MANAGER>(location){;}
 
+      //Add appropriate functions to function sets
       template <typename WORLD>
       void Setup(WORLD * w){
         pop = &(w->popM);
+
+        //Create std::function object for all of the stats
         std::function<double(POP_MANAGER*)> diversity = [](POP_MANAGER * pop){
             return ShannonEntropy(*pop);
         };
@@ -214,13 +230,14 @@ namespace evo{
             return AverageFunctionReturn(fit_func, *pop);
         };
 
-        AddFunction(diversity);
-        AddFunction(max_fitness);
-        AddFunction(avg_fitness);
-
         std::function<void(int)> UpdateFun = [&] (int ud){
             Update(ud);
         };
+
+        //Add functions to manager
+        AddFunction(diversity, "shannon_diversity");
+        AddFunction(max_fitness, "max_fitness");
+        AddFunction(avg_fitness, "avg_fitness");
 
         w->OnUpdate(UpdateFun);
       }

@@ -124,6 +124,28 @@ namespace evo{
     return (cumulative_value / count);
   }
 
+  template <typename C, typename RET_TYPE>
+  emp::vector<RET_TYPE> RunFunctionOnContainer(std::function<RET_TYPE(typename C::value_type)> fun, C & elements) {
+      emp::vector<RET_TYPE> results;
+      for (auto element : elements){
+          results.push_back(fun(element));
+      }
+      return results;
+  }
+
+  //This variant is actually super confusing because the value_type of world
+  //and population managers are pointers whereas the type that they're templated
+  //on is not. Also because the insert method for emp::vectors doesn't take an
+  //additional argument?
+  /*template <template <typename> class C, typename RET_TYPE, typename T>
+  C<RET_TYPE> RunFunctionOnContainer(std::function<RET_TYPE(T)> fun, C<T> & elements) {
+      C<RET_TYPE> results;
+      for (auto element : elements){
+          results.insert(fun(element), results.back());
+      }
+      return results;
+  }*/
+
 }
 }
 

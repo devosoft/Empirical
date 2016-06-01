@@ -136,7 +136,6 @@ namespace evo {
   EMP_SETUP_TYPE_SELECTOR(SelectOrgManager, emp_is_organism_manager);
   EMP_SETUP_TYPE_SELECTOR(SelectStatsManager, emp_is_stats_manager);
   EMP_SETUP_TYPE_SELECTOR(SelectLineageManager, emp_is_lineage_manager);
-  EMP_SETUP_TYPE_SELECTOR(NeedsLineageManager, lineage);
 
   template <typename POP_MANAGER> class PopulationIterator;
 
@@ -152,8 +151,6 @@ namespace evo {
     //Create a lineage manager if the stats manager needs it or if the user asked for it
     EMP_CHOOSE_MEMBER_TYPE(DefaultLineage, lineage_type, LineageNull, decltype(statsM));
     AdaptTemplate<typename SelectLineageManager<MANAGERS...,DefaultLineage>::type, decltype(popM)> lineageM;
-
-    //emp::evo::OEEStatsManager<decltype(popM)> statsM;
 
     Random * random_ptr;
     bool random_owner;
@@ -333,7 +330,6 @@ namespace evo {
     void EliteSelect(std::function<double(ORG*)> fit_fun, int e_count=1, int copy_count=1) {
       emp_assert(fit_fun);
       emp_assert(e_count > 0 && e_count <= (int) popM.size());
-
       // Load the population into a multimap, sorted by fitness.
       std::multimap<double, int> fit_map;
       for (int i = 0; i < (int) popM.size(); i++) {

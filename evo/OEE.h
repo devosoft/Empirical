@@ -39,11 +39,10 @@ namespace evo{
     using ORG = typename std::remove_pointer<org_ptr>::type;
     using skeleton_type = emp::vector<int>;
     static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
-    //TODO: Make this use existing lineage tracker if there is one
 
     std::set<skeleton_type > novel;
 
-    int generations = 50; //How far back do we look for persistance?
+    int generations = OeeConfig.GENERATIONS(); //How far back do we look for persistance?
 
     // Historical generations needed to count stats. We only need these in
     // proportion to resolution.
@@ -74,6 +73,8 @@ namespace evo{
       emp_assert(generations % resolution == 0 &&
                 "ERROR: Generations required for persistance must be a multiple of resolution.",
                 resolution, generations);
+
+      OeeConfig.Read("OEE_stats.cfg");
       generations = OeeConfig.GENERATIONS();
       OeeConfig.Write("OEE_stats.cfg");
 
@@ -87,7 +88,6 @@ namespace evo{
       w->OnUpdate(UpdateFun);
       lineage = &(w->lineageM);
 
-      //TODO: Figure out how to make this work automatically
       output_location << "update" << delimiter << "change" << delimiter
             << "novelty" << delimiter << "ecology" << delimiter
             << "complexity" << std::endl;

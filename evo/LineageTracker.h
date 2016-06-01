@@ -28,7 +28,7 @@ namespace evo{
   // they belonged to, and which organisms were the parents of which
   template <typename POP_MANAGER = PopulationManager_Base<int> >
   class LineageTracker {
-  private:
+  protected:
     using org_ptr = typename POP_MANAGER::value_type;
     using ORG = typename std::remove_pointer<org_ptr>::type;
     static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
@@ -41,7 +41,8 @@ namespace evo{
     int next_parent_id = -1;
     int next_org_id = 1;
     emp::vector<int> generation_since_update;
-    emp::vector<int> prev_generation;
+    emp::vector<int> new_generation;
+    bool inject;
 
     LineageTracker(){;}
 
@@ -91,41 +92,47 @@ namespace evo{
     //Put newly born organism into the lineage tracker
 
     void Update(int i) {
-      prev_generation = generation_since_update;
       if (separate_generations) {
         //TODO: This isn't sufficient - need to add signals for any
         //population change event
-        generation_since_update.resize(0);
+        generation_since_update = new_generation;
+        new_generation.resize(0);
       }
     }
 
     void TrackOffspring(org_ptr org) {
       next_org_id = this->AddOrganism(*org, next_parent_id);
+      inject = false;
     }
 
     //Put newly injected organism into the lineage tracker
     void TrackInjectedOffspring(org_ptr org) {
       next_org_id = this->AddOrganism(*org, 0);
+      inject = true;
     }
 
     //Keep track of location of all orgs in the population so that
     //we can translate their ids from the World to ids within the lineage
     //tracker
     void TrackPlacement(int pos) {
-      if (pos >= generation_since_update.size()) {
-        generation_since_update.resize(pos+1);
+      if (separate_generations && !inject){
+        if (pos >= new_generation.size()) {
+          new_generation.resize(pos+1);
+        }
+        new_generation[pos] = next_org_id;
+
+      } else {
+        if (pos >= generation_since_update.size()) {
+          generation_since_update.resize(pos+1);
+        }
+        generation_since_update[pos] = next_org_id;
       }
-      generation_since_update[pos] = next_org_id;
     }
 
     //Record the org that's about to have an offspring, so we can know
     //who the parent of the next org is.
     void RecordParent(int id) {
-      if (separate_generations){
-        next_parent_id = prev_generation[id];
-      } else {
-        next_parent_id = generation_since_update[id];
-      }
+      next_parent_id = generation_since_update[id];
     }
 
     // Add an organism to the tracker - org is the genome of the organism
