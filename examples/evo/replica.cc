@@ -12,7 +12,7 @@
 #include "../../evo/World.h"
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
-#include "../../evo/Stats.h"
+#include "../../evo/EvoStats.h"
 #include "../../evo/StatsManager.h"
 
 // k controls # of hills in the fitness landscape

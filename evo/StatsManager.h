@@ -235,8 +235,8 @@ namespace evo{
         std::function<void(int)> UpdateFun = [&] (int ud){
             Update(ud);
         };
-        fit_stat_type non_inf = [](fit_fun_type fit_func, world_type * world){
-            return NonInf(fit_func, *world);
+        fit_stat_type non_inf = [](fit_fun_type fit_func, POP_MANAGER * pop){
+            return NonInf(fit_func, *pop);
         };
 
         //Add functions to manager
@@ -252,22 +252,51 @@ namespace evo{
 using NullStats = StatsManager_Base<PopBasic>;
 using DefaultStats = StatsManager_DefaultStats<PopBasic>;
 
+  template <typename POP_MANAGER = PopulationManager_Base<int> >
+  class StatsManager_AdvancedStats : StatsManager_DefaultStats<POP_MANAGER> {
+  private:
+      using org_ptr = typename POP_MANAGER::value_type;
+      using fit_fun_type = std::function<double(org_ptr)>;
+      using fit_stat_type = std::function<double(fit_fun_type, POP_MANAGER*)>;
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::AddFunction;
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::pop;
+      using StatsManager_Base<POP_MANAGER>::output_location;
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::Update;
 
-template <typename ORG, typename... MANAGERS>
-class StatsManager_Advanced : StatsManager_DefaultStats<ORG, MANAGERS...> {
-    private:
-        using StatsManager_DefaultStats<ORG,MANAGERS...>::StatsManager_DefaultStats;
-        using world_type = World<ORG, MANAGERS...>;
+  public:
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::fit_fun;
+      using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::SetDefaultFitnessFun;
+      
+      //Constructor for use as a stand alone object
+      template<typename WORLD>
+      StatsManager_AdvancedStats(WORLD * w, std::string location = "averages.cvs")
+       : StatsManager_DefaultStats<POP_MANAGER>(w, location){
+           Setup(w);
+       }
 
-    public:
-        using StatsManager_FunctionsOnUpdate<ORG, MANAGERS...>::fit_fun;
-        StatsManager_Advanced(world_type * w, std::string location = "averages.csv")
-            : StatsManager_DefaultStats<ORG, MANAGERS...>(w, location){
+      //Constructor for use as a template parameter for the world
+      StatsManager_AdvancedStats(std::string location = "averages.csv")
+       : StatsManager_DefaultStats<POP_MANAGER>(location){;}
 
-            }
+      template<typename WORLD>
+      void Setup(WORLD * w){
+          pop = &(w->popM);
 
-};
+          fit_stat_type non_inf = [](fit_fun_type fit_func, POP_MANAGER * pop){
+            return NonInf(fit_func, *pop);
+          };
 
+          std::function<void(int)> UpdateFun = [&] (int ud){
+            Update(ud);
+          };
+
+          AddFunction(non_inf, "non_inf");
+
+          w->OnUpdate(UpdateFun);
+
+      }
+  };
 
 }
 }
