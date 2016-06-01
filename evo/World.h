@@ -91,10 +91,13 @@
 #include "../tools/reflection.h"
 #include "../tools/vector.h"
 
+
 #include "OrgSignals.h"
 #include "OrgManager.h"
 #include "PopulationManager.h"
-#include "WorldIterator.h"
+#include "StatsManager.h"
+#include "LineageTracker.h"
+
 
 // Macro to add class elements associated with a dynamic function call.
 // For example, if you wanted to be able to have a dynamic fitness function, you would call:
@@ -112,13 +115,29 @@
 #define EMP_EVO_FORWARD(FUN, TARGET) \
 template <typename... T> void FUN(T &&... args) { TARGET.FUN(std::forward<T>(args)...); }
 
+#define EMP_EVO_FORWARD_2(FUN, TARGET1, TARGET2)  \
+template <typename... T> void FUN(T &&... args) { \
+    TARGET1.FUN(std::forward<T>(args)...);        \
+    TARGET2.FUN(std::forward<T>(args)...);        \
+}
+
+#define EMP_EVO_FORWARD_3(FUN, TARGET1, TARGET2, TARGET3) \
+template <typename... T> void FUN(T &&... args) {         \
+    TARGET1.FUN(std::forward<T>(args)...);                \
+    TARGET2.FUN(std::forward<T>(args)...);                \
+    TARGET3.FUN(std::forward<T>(args)...);                \
+}
+
 namespace emp {
 namespace evo {
 
+
   EMP_SETUP_TYPE_SELECTOR(SelectPopManager, emp_is_population_manager);
   EMP_SETUP_TYPE_SELECTOR(SelectOrgManager, emp_is_organism_manager);
+  EMP_SETUP_TYPE_SELECTOR(SelectStatsManager, emp_is_stats_manager);
+  EMP_SETUP_TYPE_SELECTOR(SelectLineageManager, emp_is_lineage_manager);
 
-  template <typename ORG, typename... MANAGERS> class WorldIterator;
+  template <typename POP_MANAGER> class PopulationIterator;
 
   // Main world class...
   template <typename ORG, typename... MANAGERS>
@@ -127,12 +146,16 @@ namespace evo {
     // Build managers...
     AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> popM;
     AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgMDynamic>::type, ORG> orgM;
+    AdaptTemplate<typename SelectStatsManager<MANAGERS...,StatsManager_Base<decltype(popM)> >::type, decltype(popM)> statsM;
+
+    //Create a lineage manager if the stats manager needs it or if the user asked for it
+    EMP_CHOOSE_MEMBER_TYPE(DefaultLineage, lineage_type, LineageNull, decltype(statsM));
+    AdaptTemplate<typename SelectLineageManager<MANAGERS...,DefaultLineage>::type, decltype(popM)> lineageM;
 
     Random * random_ptr;
     bool random_owner;
     int update = 0;
-    friend class WorldIterator<ORG, MANAGERS...>;
-    typedef WorldIterator<ORG, MANAGERS...> iterator;
+    using iterator = PopulationIterator<ORG>;
 
     // Signals triggered by the world.
     Signal<int> before_repro_sig;       // Trigger: Immediately prior to producing offspring
@@ -160,9 +183,12 @@ namespace evo {
       sigs.symbiont_repro_sig.AddAction([this](int id){DoSymbiontRepro(id);});
     }
 
-    void SetupWorld() {
+    void SetupWorld(const std::string & world_name) {
+      this->pop_name = world_name;
       SetupCallbacks(callbacks);
       popM.SetRandom(random_ptr);
+      lineageM.Setup(this);
+      statsM.Setup(this);
     }
 
   public:
@@ -173,7 +199,7 @@ namespace evo {
       , inject_ready_sig(to_string(pop_name,"::inject-ready"))
       , org_placement_sig(to_string(pop_name,"::org-placement"))
       , on_update_sig(to_string(pop_name,"::on-update"))
-      , callbacks(pop_name) { SetupWorld(); }
+      , callbacks(pop_name) { SetupWorld(pop_name);}
 
     World(int seed=-1, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
       : World(new Random(seed), pop_name) { random_owner = true; }
@@ -183,12 +209,13 @@ namespace evo {
     ~World() { Clear(); if (random_owner) delete random_ptr; }
     World & operator=(const World &) = delete;
 
+    std::string pop_name;
     int GetSize() const { return (int) popM.size(); }
     ORG & operator[](int i) { return *(popM[i]); }
     const ORG & operator[](int i) const { return *(popM[i]); }
     bool IsOccupied(int i) const { return popM[i] != nullptr; }
-    iterator begin(){return WorldIterator<ORG, MANAGERS...>(this, 0);}
-    iterator end(){return WorldIterator<ORG, MANAGERS...>(this, this->GetSize());}
+    iterator begin(){return PopulationIterator<ORG>(&popM, 0);}
+    iterator end(){return PopulationIterator<ORG>(&popM, popM.size());}
 
     void Clear() { popM.Clear(); }
 
@@ -198,7 +225,7 @@ namespace evo {
 
     // Forward function calls to appropriate internal objects
     EMP_EVO_FORWARD(ConfigPop, popM);
-    EMP_EVO_FORWARD(SetDefaultFitnessFun, orgM);
+    EMP_EVO_FORWARD_2(SetDefaultFitnessFun, orgM, statsM);
     EMP_EVO_FORWARD(SetDefaultMutateFun, orgM);
 
     LinkKey OnBeforeRepro(std::function<void(int)> fun) { return before_repro_sig.AddAction(fun); }
@@ -303,7 +330,6 @@ namespace evo {
     void EliteSelect(std::function<double(ORG*)> fit_fun, int e_count=1, int copy_count=1) {
       emp_assert(fit_fun);
       emp_assert(e_count > 0 && e_count <= (int) popM.size());
-
       // Load the population into a multimap, sorted by fitness.
       std::multimap<double, int> fit_map;
       for (int i = 0; i < (int) popM.size(); i++) {

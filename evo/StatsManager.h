@@ -8,9 +8,9 @@
 
 #include "../tools/FunctionSet.h"
 #include "../tools/vector.h"
-#include "World.h"
-#include "Stats.h"
+#include "../tools/stats.h"
 #include "../config/config.h"
+#include "PopulationManager.h"
 
 namespace emp{
 namespace evo{
@@ -23,6 +23,7 @@ namespace evo{
   //Base stats manager - this mostly exists to be extended into custom
   //stats managers (see the OEEStatsManager for an example). The base
   //stats manager also handles data output.
+  template <typename POP_MANAGER = PopulationManager_Base<int> >
   class StatsManager_Base {
   public:
     std::string delimiter = " "; //Gets inferred from file name
@@ -50,6 +51,9 @@ namespace evo{
     ~StatsManager_Base(){
         output_location.close();
     }
+
+    template <typename WORLD>
+    void Setup(WORLD * w){;}
 
     //Tells the stats manager where to put output. If location is "cout"
     //(default) or "stdout", stats will get sent to cout. Otherwise, the
@@ -84,60 +88,91 @@ namespace evo{
   //Although functions can be added to this manager on the fly, the goal of
   //this class is that it can be extended to track specific sets of functions.
   //(see StatsManager_DefaultStats for an example)
-  template <typename ORG, typename... MANAGERS>
-  class StatsManager_FunctionsOnUpdate : StatsManager_Base {
+  template <typename POP_MANAGER = PopulationManager_Base<int> >
+  class StatsManager_FunctionsOnUpdate : StatsManager_Base<POP_MANAGER> {
   protected:
-    using world_type = World<ORG, MANAGERS...>;
-    using fit_fun_type = std::function<double(ORG*)>;
+    using org_ptr = typename POP_MANAGER::value_type;
+    //using world_type = World<ORG, MANAGERS...>;
+    using fit_fun_type = std::function<double(org_ptr)>;
     //Stats calculated on the world
-    FunctionSet<double, world_type* > world_stats;
+    FunctionSet<double, POP_MANAGER * > world_stats;
     //Stats calculated on the world that require a fitness function
-    FunctionSet<double, std::function<double(ORG * org)>,
-                                           world_type* > fitness_stats;
+    FunctionSet<double, std::function<double(org_ptr)>,
+                                           POP_MANAGER* > fitness_stats;
     //Pointer to the world object on which we're calculating stats
-    World<ORG, MANAGERS...> * world;
-    using StatsManager_Base::resolution;
-    using StatsManager_Base::output_location;
+    POP_MANAGER * pop;
+    using StatsManager_Base<POP_MANAGER>::resolution;
+    using StatsManager_Base<POP_MANAGER>::output_location;
+    using StatsManager_Base<POP_MANAGER>::delimiter;
+    bool header_printed = false;
+    std::string header = "update";
 
   public:
+    using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
+    fit_fun_type fit_fun;
 
-    StatsManager_FunctionsOnUpdate(world_type * w,
-                                   std::string location) :
-                                   StatsManager_Base(location){
-      std::function<void(int)> UpdateFun = [this] (int ud){
-        Update(ud);
-      };
-      world = w;
-      w->OnUpdate(UpdateFun); //See if we need to calculate stats every update
+    //Constructor for creating this as a stand-alone object
+    template <typename WORLD>
+    StatsManager_FunctionsOnUpdate(WORLD * w,
+                                   std::string location = "stats.csv") :
+                                   StatsManager_Base<decltype(w->popM)>(location){
+      Setup(w);
     }
 
+    //Constructor for use by World object
+    StatsManager_FunctionsOnUpdate(std::string location = "stats.csv") :
+                                   StatsManager_Base<POP_MANAGER>(location){;}
+
     //The fitness function for calculating fitness related stats
-    fit_fun_type fit_fun;
+    template <typename WORLD>
+    void Setup(WORLD * w){
+      pop = &(w->PopM);
+
+      std::function<void(int)> UpdateFun = [&] (int ud){
+          Update(ud);
+      };
+
+      w->OnUpdate(UpdateFun);
+    }
 
     //Function for adding functions that calculate stats to the
     //set to be calculated
-    void AddFunction(std::function<double(world_type*)> func) {
+    void AddFunction(std::function<double(POP_MANAGER*)> func, std::string label) {
       world_stats.Add(func);
+      if (header_printed){
+        NotifyWarning("Function added to stats manager after initialization.");
+      } else {
+        header += delimiter + label;
+      }
     }
 
     //Version for functions that require a fitness function
-    void AddFunction(std::function<double(fit_fun_type, world_type*)> func) {
+    void AddFunction(std::function<double(fit_fun_type, POP_MANAGER*)> func, std::string label) {
       fitness_stats.Add(func);
+      if (header_printed){
+        NotifyWarning("Function added to stats manager after initialization.");
+      } else {
+        header += delimiter + label;
+      }
     }
 
     //If this update matches the resolution, calculate and record all the stats
     void Update(int update) {
+      if (!header_printed) {
+          output_location << header << std::endl;
+          header_printed = true;
+      }
 
       if (update % resolution == 0){
 
         output_location << update;
 
-        emp::vector<double> world_results = world_stats.Run(world);
+        emp::vector<double> world_results = world_stats.Run(pop);
         for (double d : world_results) {
           output_location << delimiter << d;
         }
 
-        emp::vector<double> fitness_results = fitness_stats.Run(fit_fun, world);
+        emp::vector<double> fitness_results = fitness_stats.Run(fit_fun, pop);
         for (double d : fitness_results){
             output_location << delimiter << d;
         }
@@ -145,47 +180,78 @@ namespace evo{
       }
     }
 
+    void SetDefaultFitnessFun(std::function<double(org_ptr)> fit){
+        fit_fun = fit;
+    }
+
   };
 
   //Calculates some commonly required information: shannon diversity,
   //max fitness within the population, and average fitness within the population
-  template <typename ORG, typename... MANAGERS>
-  class StatsManager_DefaultStats : StatsManager_FunctionsOnUpdate<ORG, MANAGERS...> {
-  protected:
-      using world_type = World<ORG, MANAGERS...>;
-      using fit_fun_type = std::function<double(ORG*)>;
-      using fit_stat_type = std::function<double(fit_fun_type, world_type*)>;
-      using StatsManager_FunctionsOnUpdate<ORG, MANAGERS...>::AddFunction;
-      using StatsManager_Base::output_location;
+
+  template <typename POP_MANAGER = PopulationManager_Base<int> >
+  class StatsManager_DefaultStats : StatsManager_FunctionsOnUpdate<POP_MANAGER> {
+  private:
+      using org_ptr = typename POP_MANAGER::value_type;
+      using fit_fun_type = std::function<double(org_ptr)>;
+      using fit_stat_type = std::function<double(fit_fun_type, POP_MANAGER*)>;
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::AddFunction;
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::pop;
+      using StatsManager_Base<POP_MANAGER>::output_location;
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::Update;
 
   public:
-      using StatsManager_FunctionsOnUpdate<ORG, MANAGERS...>::fit_fun;
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::fit_fun;
+      using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::SetDefaultFitnessFun;
 
-      StatsManager_DefaultStats(world_type * w, std::string location = "averages.csv")
-       : StatsManager_FunctionsOnUpdate<ORG, MANAGERS...>(w, location){
-        std::function<double(world_type*)> diversity = [](world_type * world){
-            return ShannonDiversity(*world);
+      //Constructor for use as a stand-alone object
+      template <typename WORLD>
+      StatsManager_DefaultStats(WORLD * w, std::string location = "averages.csv")
+       : StatsManager_FunctionsOnUpdate<decltype(w->popM)>(w, location){
+        Setup(w);
+      }
+
+      //Constructor for use as a template parameter for the world
+      StatsManager_DefaultStats(std::string location = "averages.csv")
+       : StatsManager_FunctionsOnUpdate<POP_MANAGER>(location){;}
+
+      //Add appropriate functions to function sets
+      template <typename WORLD>
+      void Setup(WORLD * w){
+        pop = &(w->popM);
+
+        //Create std::function object for all of the stats
+        std::function<double(POP_MANAGER*)> diversity = [](POP_MANAGER * pop){
+            return ShannonEntropy(*pop);
         };
-        fit_stat_type max_fitness = [](fit_fun_type fit_func, world_type * world){
-            return MaxFitness(fit_func, *world);
+        fit_stat_type max_fitness = [](fit_fun_type fit_func, POP_MANAGER * pop){
+            return MaxFunctionReturn(fit_func, *pop);
         };
-        fit_stat_type avg_fitness = [](fit_fun_type fit_func, world_type * world){
-            return AverageFitness(fit_func, *world);
+        fit_stat_type avg_fitness = [](fit_fun_type fit_func, POP_MANAGER * pop){
+            return AverageFunctionReturn(fit_func, *pop);
+        };
+
+        std::function<void(int)> UpdateFun = [&] (int ud){
+            Update(ud);
         };
         fit_stat_type non_inf = [](fit_fun_type fit_func, world_type * world){
             return NonInf(fit_func, *world);
         };
 
-        AddFunction(diversity);
-        AddFunction(max_fitness);
-        AddFunction(avg_fitness);
-        AddFunction(non_inf);
+        //Add functions to manager
+        AddFunction(diversity, "shannon_diversity");
+        AddFunction(max_fitness, "max_fitness");
+        AddFunction(avg_fitness, "avg_fitness");
 
-        //Print header
-        output_location << "update, shannon_diversity, max_fitness, avg_fitness, non_inf" << std::endl;
+        w->OnUpdate(UpdateFun);
+
       }
 
 };
+using NullStats = StatsManager_Base<PopBasic>;
+using DefaultStats = StatsManager_DefaultStats<PopBasic>;
+
 
 template <typename ORG, typename... MANAGERS>
 class StatsManager_Advanced : StatsManager_DefaultStats<ORG, MANAGERS...> {
@@ -201,6 +267,7 @@ class StatsManager_Advanced : StatsManager_DefaultStats<ORG, MANAGERS...> {
             }
 
 };
+
 
 }
 }

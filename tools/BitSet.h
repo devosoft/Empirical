@@ -204,6 +204,10 @@ namespace emp {
     }
 
   public:
+    ///
+    /// Constructor:
+    /// Assume all zeroes in set
+    ///
     BitSet() { Clear(); }
     BitSet(const BitSet & in_set) { Copy(in_set.bit_set); }
     BitSet(Random & random, const double p1=0.5) { Randomize(random, p1); }

@@ -1,0 +1,8 @@
+Since some variables are pre-defined and others are only used in the config file as part of the
+logic, it won't always be clear when settings are intended vs. other types of variables.
+
+Important debugging options might be:
+* Warn if a known setting is not touched in the file.
+* Warn if a non-setting variable is created, but never used.
+
+(each type of warning can be suppressed, either on the command line or in the settings file.)

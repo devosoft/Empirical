@@ -5,15 +5,21 @@
 //
 //  This file explores the template defined in evo::Population.h
 
+
+//#include "../../emtools/init.h"
+//#include "../../emtools/JSWrap.h"
+//#include "../../../d3-emscripten/selection.h"
+
 #include <iostream>
 #include <functional>
 
 #include "../../evo/NK-const.h"
-#include "../../evo/World.h"
 #include "../../evo/OEE.h"
+#include "../../evo/World.h"
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
-#include "../../evo/Stats.h"
+#include "../../evo/StatsManager.h"
+
 
 constexpr int K = 3;
 constexpr int N = 20;
@@ -29,12 +35,12 @@ int main()
   std::cout << "N: " << N << ", K: " << K << ", POP_SIZE: " << POP_SIZE << ", Selection: " << "Standard_tournament" << ", TournamentSize: " << TOURNAMENT_SIZE << std::endl;
   emp::Random random;
   emp::evo::NKLandscapeConst<N,K> landscape(random);
-  emp::evo::World<BitOrg> pop(random);
-  emp::evo::OEEStatsManager<BitOrg, N> oee_stats(&pop);
-  emp::evo::LineageTracker<BitOrg> lin(&pop);
-  oee_stats.lineage = &lin;
+  emp::evo::World<BitOrg, emp::evo::OEEStats > pop(random);
 
-  emp::evo::StatsManager_DefaultStats<BitOrg> common_stats(&pop);
+  //#ifdef EMSCRIPTEN
+  //std::cout << n_objects() << std::endl;
+  //D3::Selection svg = D3::Selection("body").Append("svg");
+  //#endif
 
   // Build a random initial population
   for (int i = 0; i < POP_SIZE; i++) {
@@ -52,8 +58,6 @@ int main()
 
 
 pop.SetDefaultFitnessFun([&landscape](BitOrg * org){ return landscape.GetFitness(*org); });
-oee_stats.fit_fun = [&landscape](BitOrg * org){ return landscape.GetFitness(*org); };
-common_stats.fit_fun = [&landscape](BitOrg * org){ return landscape.GetFitness(*org); };
 
   // Loop through updates
   for (int ud = 0; ud < UD_COUNT+1; ud++) {
