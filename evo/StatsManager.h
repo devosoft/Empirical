@@ -151,7 +151,7 @@ namespace evo{
   //max fitness within the population, and average fitness within the population
   template <typename ORG, typename... MANAGERS>
   class StatsManager_DefaultStats : StatsManager_FunctionsOnUpdate<ORG, MANAGERS...> {
-  private:
+  protected:
       using world_type = World<ORG, MANAGERS...>;
       using fit_fun_type = std::function<double(ORG*)>;
       using fit_stat_type = std::function<double(fit_fun_type, world_type*)>;
@@ -184,6 +184,21 @@ namespace evo{
         //Print header
         output_location << "update, shannon_diversity, max_fitness, avg_fitness, non_inf" << std::endl;
       }
+
+};
+
+template <typename ORG, typename... MANAGERS>
+class StatsManager_Advanced : StatsManager_DefaultStats<ORG, MANAGERS...> {
+    private:
+        using StatsManager_DefaultStats<ORG,MANAGERS...>::StatsManager_DefaultStats;
+        using world_type = World<ORG, MANAGERS...>;
+
+    public:
+        using StatsManager_FunctionsOnUpdate<ORG, MANAGERS...>::fit_fun;
+        StatsManager_Advanced(world_type * w, std::string location = "averages.csv")
+            : StatsManager_DefaultStats<ORG, MANAGERS...>(w, location){
+
+            }
 
 };
 
