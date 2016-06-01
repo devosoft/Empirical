@@ -979,6 +979,11 @@ TEST_CASE("Test string utils", "[tools]")
   REQUIRE(slices[1] == " i");
   REQUIRE(slices[3] == "t ");
 
+  // Try other ways of using slice_string().
+  slices = emp::slice_string("This is a test of a different version of slice.", ' ');
+  
+  REQUIRE(slices.size() == 10);
+  REQUIRE(slices[8] == "of");
 
   std::string cat_a = "ABC";
   bool cat_b = true;
