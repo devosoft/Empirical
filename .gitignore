@@ -32,7 +32,7 @@ incoming/
 */env/*
 tmp/
 build/doxydoc/*
-third-party/doxygen/build/*
+third-party/doxygen
 doc/_build/*
 utils/edit_dist/IO/
 utils/edit_dist/edit_dist
