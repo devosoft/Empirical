@@ -13,9 +13,12 @@
 #define EMP_EVO_POPULATION_MANAGER_H
 
 #include "../tools/random_utils.h"
+#include "PopulationIterator.h"
 
 namespace emp {
 namespace evo {
+
+  template <typename POP_MANAGER> class PopulationIterator;
 
   template <typename ORG=int>
   class PopulationManager_Base {
@@ -31,9 +34,16 @@ namespace evo {
 
     // Allow this and derived classes to be identified as a population manager.
     static constexpr bool emp_is_population_manager = true;
+    static constexpr bool emp_has_separate_generations = false;
+    using value_type = ORG*;
+
+    friend class PopulationIterator<PopulationManager_Base<ORG> >;
+    using iterator = PopulationIterator<PopulationManager_Base<ORG> >;
 
     ptr_t & operator[](int i) { return pop[i]; }
     const ptr_t operator[](int i) const { return pop[i]; }
+    iterator begin(){return iterator(this, 0);}
+    iterator end(){return iterator(this, pop.size());}
 
     uint32_t size() const { return pop.size(); }
     void resize(int new_size) { pop.resize(new_size); }
@@ -117,6 +127,8 @@ namespace evo {
   public:
     PopulationManager_EA() { ; }
     ~PopulationManager_EA() { Clear(); }
+
+    static constexpr bool emp_has_separate_generations = true;
 
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = next_pop.size();
