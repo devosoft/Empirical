@@ -146,7 +146,7 @@ namespace evo {
     // Build managers...
     AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> popM;
     AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgMDynamic>::type, ORG> orgM;
-    AdaptTemplate<typename SelectStatsManager<MANAGERS...,StatsManager_Base<decltype(popM)> >::type, decltype(popM)> statsM;
+    AdaptTemplate<typename SelectStatsManager<MANAGERS...,NullStats >::type, decltype(popM)> statsM;
 
     //Create a lineage manager if the stats manager needs it or if the user asked for it
     EMP_CHOOSE_MEMBER_TYPE(DefaultLineage, lineage_type, LineageNull, decltype(statsM));
@@ -155,7 +155,7 @@ namespace evo {
     Random * random_ptr;
     bool random_owner;
     int update = 0;
-    using iterator = PopulationIterator<ORG>;
+    using iterator = PopulationIterator<decltype(popM)>;
 
     // Signals triggered by the world.
     Signal<int> before_repro_sig;       // Trigger: Immediately prior to producing offspring
@@ -214,8 +214,8 @@ namespace evo {
     ORG & operator[](int i) { return *(popM[i]); }
     const ORG & operator[](int i) const { return *(popM[i]); }
     bool IsOccupied(int i) const { return popM[i] != nullptr; }
-    iterator begin(){return PopulationIterator<ORG>(&popM, 0);}
-    iterator end(){return PopulationIterator<ORG>(&popM, popM.size());}
+    iterator begin(){return PopulationIterator<decltype(popM)>(&popM, 0);}
+    iterator end(){return PopulationIterator<decltype(popM)>(&popM, popM.size());}
 
     void Clear() { popM.Clear(); }
 
