@@ -12,6 +12,7 @@
 #ifndef EMP_EVO_POPULATION_MANAGER_H
 #define EMP_EVO_POPULATION_MANAGER_H
 
+#include <set>
 #include "../tools/random_utils.h"
 #include "PopulationIterator.h"
 
