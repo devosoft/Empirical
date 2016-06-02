@@ -30,8 +30,8 @@ namespace evo{
 
   
   // Calculates the Non-Inferiority of a given container
-template <typename ORG, typename... MANAGERS>
-  double NonInf(std::function<double(ORG * org)> fit_fun, World<ORG, MANAGERS...> & orgs){
+template <typename ORG, typename WORLD>
+  double NonInf(std::function<double(ORG * org)> fit_fun, WORLD & orgs){
     double fittest = fit_fun(&(*(orgs.begin())));
     vector<double> org_fit;
 
@@ -54,8 +54,8 @@ template <typename ORG, typename... MANAGERS>
   }
 
   // Calculates the benefitial, neutral, and detremental mutational landscapes
-template <typename ORG, typename... MANAGERS>
-  MLandscape  MutLandscape(std::function<double(ORG * org)> fit_fun, World<ORG, MANAGERS...> & orgs){
+template <typename ORG, typename WORLD>
+  MLandscape  MutLandscape(std::function<double(ORG * org)> fit_fun, WORLD & orgs){
       double  mut_ben = 0, mut_det = 0, mut_neu = 0;
       int total_orgs = 0;
 

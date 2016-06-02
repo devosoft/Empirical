@@ -51,18 +51,19 @@ int main(int argc, char* argv[])
   MixedWorld<BitOrg> mixed_pop(random);
   emp::evo::GridWorld<BitOrg> grid_pop(random);
 
-
   std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return org-> CountOnes();};
 
+  mixed_pop.SetDefaultFitnessFun(fit_func);
+  grid_pop.SetDefaultFitnessFun(fit_func);
 
   // make a couple stats managers
-  emp::evo::StatsManager_DefaultStats<BitOrg, emp::evo::PopulationManager_Base<BitOrg>> 
+ /* emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Base<BitOrg>> 
       mixed_stats (&mixed_pop, prefix + "mixed.csv");
-  emp::evo::StatsManager_DefaultStats<BitOrg, emp::evo::PopulationManager_Grid<BitOrg>> 
+  emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Grid<BitOrg>> 
       grid_stats (&grid_pop, prefix + "grid.csv");
-
-  mixed_stats.fit_fun = fit_func;
-  grid_stats.fit_fun = fit_func;
+*/
+  //mixed_stats.fit_fun = fit_func;
+  //grid_stats.fit_fun = fit_func;
 
   // Build a random initial population
   /*

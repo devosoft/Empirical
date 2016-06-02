@@ -11,6 +11,7 @@
 #include "../tools/stats.h"
 #include "../config/config.h"
 #include "PopulationManager.h"
+#include "EvoStats.h"
 
 namespace emp{
 namespace evo{
@@ -235,9 +236,7 @@ namespace evo{
         std::function<void(int)> UpdateFun = [&] (int ud){
             Update(ud);
         };
-        fit_stat_type non_inf = [](fit_fun_type fit_func, POP_MANAGER * pop){
-            return NonInf(fit_func, *pop);
-        };
+        
 
         //Add functions to manager
         AddFunction(diversity, "shannon_diversity");
@@ -254,7 +253,7 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
 
   template <typename POP_MANAGER = PopulationManager_Base<int> >
   class StatsManager_AdvancedStats : StatsManager_DefaultStats<POP_MANAGER> {
-  private:
+/*  private:
       using org_ptr = typename POP_MANAGER::value_type;
       using fit_fun_type = std::function<double(org_ptr)>;
       using fit_stat_type = std::function<double(fit_fun_type, POP_MANAGER*)>;
@@ -286,18 +285,34 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
           fit_stat_type non_inf = [](fit_fun_type fit_func, POP_MANAGER * pop){
             return NonInf(fit_func, *pop);
           };
+          fit_stat_type ben_mut = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              MLandscape data = MutLandscape(fit_func, *pop);
+              return data.benefit_avg;
+          };
+          fit_stat_type neu_mut = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              MLandscape data = MutLandscape(fit_func, *pop);
+              return data.neutral_avg;
+          };
+          fit_stat_type det_mut = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              MLandscape data = MutLandscape(fit_func, *pop);
+              return data.det_avg;
+          };
 
           std::function<void(int)> UpdateFun = [&] (int ud){
             Update(ud);
           };
 
           AddFunction(non_inf, "non_inf");
+          AddFunction(ben_mut, "ben_mut");
+          AddFunction(neu_mut, "neu_mut");
+          AddFunction(det_mut, "det_mut");
+
 
           w->OnUpdate(UpdateFun);
 
       }
   };
-
+*/
 }
 }
 
