@@ -32,11 +32,11 @@ namespace evo{
   // Calculates the Non-Inferiority of a given container
 template <typename ORG, typename WORLD>
   double NonInf(std::function<double(ORG * org)> fit_fun, WORLD & orgs){
-    double fittest = fit_fun(&(*(orgs.begin())));
+    double fittest = fit_fun((*(orgs.begin())));
     vector<double> org_fit;
 
     for (auto org : orgs){
-      double fitness = fit_fun(&org);
+      double fitness = fit_fun(org);
       org_fit.push_back(fitness);
 
       if (fitness > fittest){ fittest = fitness; }
@@ -63,10 +63,10 @@ template <typename ORG, typename WORLD>
           total_orgs++; //get a total count of orgs in current population
 
           int benefit = 0, neutral = 0, detremental = 0;
-          double fitness = fit_fun(&org);
-          ORG test = org;
+          double fitness = fit_fun(org);
+          ORG test = *org;
 
-          for(int i = 0; i < org.size(); i++){
+          for(int i = 0; i < org->size(); i++){
               test[i] = !test[i]; //invert genome
 
               if(fit_fun(&test) > fitness){ benefit++; }
@@ -78,9 +78,9 @@ template <typename ORG, typename WORLD>
           
           double org_avg_b = benefit, org_avg_n = neutral, org_avg_d = detremental;
 
-          org_avg_b = org_avg_b / org.size();
-          org_avg_n = org_avg_n / org.size();
-          org_avg_d = org_avg_d / org.size();
+          org_avg_b = org_avg_b / org->size();
+          org_avg_n = org_avg_n / org->size();
+          org_avg_d = org_avg_d / org->size();
 
           mut_ben += org_avg_b;
           mut_neu += org_avg_n;

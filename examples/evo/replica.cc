@@ -57,11 +57,15 @@ int main(int argc, char* argv[])
   grid_pop.SetDefaultFitnessFun(fit_func);
 
   // make a couple stats managers
- /* emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Base<BitOrg>> 
+  emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Base<BitOrg>> 
       mixed_stats (&mixed_pop, prefix + "mixed.csv");
   emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Grid<BitOrg>> 
       grid_stats (&grid_pop, prefix + "grid.csv");
-*/
+
+  mixed_stats.SetDefaultFitnessFun(fit_func);
+  grid_stats.SetDefaultFitnessFun(fit_func);
+
+
   //mixed_stats.fit_fun = fit_func;
   //grid_stats.fit_fun = fit_func;
 

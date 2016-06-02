@@ -129,7 +129,7 @@ namespace evo{
     //The fitness function for calculating fitness related stats
     template <typename WORLD>
     void Setup(WORLD * w){
-      pop = &(w->PopM);
+      pop = &(w->popM);
 
       std::function<void(int)> UpdateFun = [&] (int ud){
           Update(ud);
@@ -194,7 +194,7 @@ namespace evo{
 
   template <typename POP_MANAGER = PopulationManager_Base<int> >
   class StatsManager_DefaultStats : StatsManager_FunctionsOnUpdate<POP_MANAGER> {
-  private:
+  protected:
       using org_ptr = typename POP_MANAGER::value_type;
       using fit_fun_type = std::function<double(org_ptr)>;
       using fit_stat_type = std::function<double(fit_fun_type, POP_MANAGER*)>;
@@ -254,8 +254,8 @@ using NullStats = StatsManager_Base<PopBasic>;
 using DefaultStats = StatsManager_DefaultStats<PopBasic>;
 
   template <typename POP_MANAGER = PopulationManager_Base<int> >
-  class StatsManager_AdvancedStats : StatsManager_DefaultStats<POP_MANAGER> {
-/*  private:
+  class StatsManager_AdvancedStats : protected StatsManager_DefaultStats<POP_MANAGER> {
+  protected:
       using org_ptr = typename POP_MANAGER::value_type;
       using fit_fun_type = std::function<double(org_ptr)>;
       using fit_stat_type = std::function<double(fit_fun_type, POP_MANAGER*)>;
@@ -284,8 +284,9 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
       void Setup(WORLD * w){
           pop = &(w->popM);
 
+          
           fit_stat_type non_inf = [](fit_fun_type fit_func, POP_MANAGER * pop){
-            return NonInf(fit_func, *pop);
+           return NonInf(fit_func, *pop);
           };
           fit_stat_type ben_mut = [](fit_fun_type fit_func, POP_MANAGER * pop){
               MLandscape data = MutLandscape(fit_func, *pop);
@@ -304,15 +305,15 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
             Update(ud);
           };
 
+          
           AddFunction(non_inf, "non_inf");
           AddFunction(ben_mut, "ben_mut");
           AddFunction(neu_mut, "neu_mut");
           AddFunction(det_mut, "det_mut");
-
-
+         
           w->OnUpdate(UpdateFun);
 
-      }*/
+      }
   };
 
 }
