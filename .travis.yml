@@ -1,4 +1,5 @@
-sudo: false
+sudo: required
+dist: trusty
 language: cpp
 
 notifications:
@@ -6,8 +7,11 @@ notifications:
 
 compiler:
     - g++-4.8
+python:
+    - "3.5"
 install:
     - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+    - export python="/usr/bin/python"
 addons:
     apt:
         sources:
@@ -15,17 +19,15 @@ addons:
         - ubuntu-toolchain-r-test
         packages:
         - g++-4.8
-        - gcov
         - cmake
         - bison
         - python-virtualenv
         - python-pip
 
 before_script:
-    - make install-testing-dependencies
+    - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-4.8 90 
 
-script:
-    - source third-party/env/bin/activate
-    - cd tests
+script: 
     - git fetch origin master:refs/remotes/origin/master
+    - make travis
     - make diff-cover
