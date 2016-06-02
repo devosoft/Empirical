@@ -118,15 +118,14 @@ namespace evo{
     template <typename WORLD>
     StatsManager_FunctionsOnUpdate(WORLD * w,
                                    std::string location = "stats.csv") :
-                                   StatsManager_Base<decltype(w->popM)>(location){
-      Setup(w);
-    }
+                                   StatsManager_Base<decltype(w->popM)>(location){}
 
     //Constructor for use by World object
     StatsManager_FunctionsOnUpdate(std::string location = "stats.csv") :
                                    StatsManager_Base<POP_MANAGER>(location){;}
 
-    //The fitness function for calculating fitness related stats
+    //The fitness function for calculating fitness related stats.
+    //Not called by constructor. Must be called by user.
     template <typename WORLD>
     void Setup(WORLD * w){
       pop = &(w->popM);
@@ -254,7 +253,7 @@ using NullStats = StatsManager_Base<PopBasic>;
 using DefaultStats = StatsManager_DefaultStats<PopBasic>;
 
   template <typename POP_MANAGER = PopulationManager_Base<int> >
-  class StatsManager_AdvancedStats : protected StatsManager_DefaultStats<POP_MANAGER> {
+  class StatsManager_AdvancedStats : protected StatsManager_FunctionsOnUpdate<POP_MANAGER> {
   protected:
       using org_ptr = typename POP_MANAGER::value_type;
       using fit_fun_type = std::function<double(org_ptr)>;
@@ -272,21 +271,30 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
       //Constructor for use as a stand alone object
       template<typename WORLD>
       StatsManager_AdvancedStats(WORLD * w, std::string location = "averages.cvs")
-       : StatsManager_DefaultStats<POP_MANAGER>(w, location){
+       : StatsManager_FunctionsOnUpdate<POP_MANAGER>(w, location){
            Setup(w);
        }
 
       //Constructor for use as a template parameter for the world
       StatsManager_AdvancedStats(std::string location = "averages.csv")
-       : StatsManager_DefaultStats<POP_MANAGER>(location){;}
+       : StatsManager_FunctionsOnUpdate<POP_MANAGER>(location){;}
 
       template<typename WORLD>
       void Setup(WORLD * w){
           pop = &(w->popM);
 
-          
+          std::function<double(POP_MANAGER*)> diversity = [](POP_MANAGER * pop){
+              return ShannonEntropy(*pop);
+          };
+          fit_stat_type max_fitness = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              return MaxFunctionReturn(fit_func, *pop);
+          };
+          fit_stat_type avg_fitness = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              return AverageFunctionReturn(fit_func, *pop);
+          };
+
           fit_stat_type non_inf = [](fit_fun_type fit_func, POP_MANAGER * pop){
-           return NonInf(fit_func, *pop);
+              return NonInf(fit_func, *pop);
           };
           fit_stat_type ben_mut = [](fit_fun_type fit_func, POP_MANAGER * pop){
               MLandscape data = MutLandscape(fit_func, *pop);
@@ -300,16 +308,29 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
               MLandscape data = MutLandscape(fit_func, *pop);
               return data.det_avg;
           };
+          fit_stat_type max_ben = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              MLandscape data = MutLandscape(fit_func, *pop);
+              return data.max_ben;
+          };
+          fit_stat_type max_det = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              MLandscape data = MutLandscape(fit_func, *pop);
+              return data.max_det;
+          };
+
 
           std::function<void(int)> UpdateFun = [&] (int ud){
             Update(ud);
           };
 
-          
+          AddFunction(diversity, "shannon_diversity");
+          AddFunction(max_fitness, "max_fitness");
+          AddFunction(avg_fitness, "avg_fitness");
           AddFunction(non_inf, "non_inf");
           AddFunction(ben_mut, "ben_mut");
           AddFunction(neu_mut, "neu_mut");
           AddFunction(det_mut, "det_mut");
+          AddFunction(max_ben, "max_ben");
+          AddFunction(max_det, "max_det");
          
           w->OnUpdate(UpdateFun);
 

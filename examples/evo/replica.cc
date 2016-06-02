@@ -17,12 +17,12 @@
 
 // k controls # of hills in the fitness landscape
 constexpr int K = 0;
-constexpr int N = 400;
+constexpr int N = 10;
 constexpr double MUTATION_RATE = 0.005;
 
 constexpr int TOURNAMENT_SIZE = 20;
 constexpr int POP_SIZE = 300;
-constexpr int UD_COUNT = 10;
+constexpr int UD_COUNT = 1000;
 
 using BitOrg = emp::BitVector;
 
@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
   MixedWorld<BitOrg> mixed_pop(random);
   emp::evo::GridWorld<BitOrg> grid_pop(random);
 
-  std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return org-> CountOnes();};
+  std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return landscape.GetFitness(*org);};
 
   mixed_pop.SetDefaultFitnessFun(fit_func);
   grid_pop.SetDefaultFitnessFun(fit_func);
@@ -153,10 +153,10 @@ int main(int argc, char* argv[])
 
     mixed_pop.Update();
     mixed_pop.MutatePop();
-    MLandscape data = MutLandscape(fit_func, grid_pop);
-    std::cout<<"Benefitial:  "<<data.benefit_avg<<std::endl;
-    std::cout<<"Neutral:     "<<data.neutral_avg<<std::endl;
-    std::cout<<"Detremental: "<<data.det_avg<<std::endl;
+    //MLandscape data = MutLandscape(fit_func, grid_pop);
+    //std::cout<<"Max Benefitial:  "<<data.max_ben<<std::endl;
+    //std::cout<<"Max Detrimental:  "<<data.max_det<<std::endl;
+
     //mixed_pop.Update();
     //grid_pop.Update();
   }
