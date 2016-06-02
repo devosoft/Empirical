@@ -83,6 +83,30 @@ TEST_CASE("Test bitvectors", "[tools]")
   REQUIRE(bm45.CountOnes() == 1);
   REQUIRE(bm45.FindBit() == bm45.GetID(1,2));
 
+  bm45.SetAll();
+  REQUIRE(bm45.All() == true);
+  REQUIRE(bm45.None() == false);
+  bm45.ClearRow(2);
+  REQUIRE(bm45.Get(2,2) == 0);
+  REQUIRE(bm45.Get(2,1) == 1);
+  bm45.ClearCol(1);
+  REQUIRE(bm45.Get(1,1) == 0);
+  bm45.Clear();
+  REQUIRE(bm45.Get(0,2) == 0);
+  bm45.SetRow(2);
+  REQUIRE(bm45.Get(0,2) == 1);
+  REQUIRE(bm45.Get(0,0) == 0);
+  bm45.SetCol(0);
+  REQUIRE(bm45.Get(0,0) == 1);
+  bm45.Clear();
+  bm45.SetRow(2);
+  REQUIRE(bm45.Get(0,2) == 1);
+  REQUIRE(bm45.Get(0,1) == 0);
+  bm45.UpShift();
+  // TODO: figure out how upshift actually works and write a real test for it
+
+
+
 /* This block needs asserts
   bm45 = bm45.GetReach().GetReach();
 
@@ -126,6 +150,13 @@ TEST_CASE("test BitSet", "[tools]")
     REQUIRE((shift_set.CountOnes() == 1) == (i <= 71));
   }
 
+  REQUIRE(bs10[2] == false);
+  bs10.flip(2);
+  REQUIRE(bs10[2] == true);
+
+  for (int i = 3; i < 8; i++) {REQUIRE(bs10[i] == false);}
+  bs10.flip(3, 8);
+  for (int i = 3; i < 8; i++) {REQUIRE(bs10[i] == true);}
 
   // Test importing....
   bs10.Import(bs80 >> 70);
