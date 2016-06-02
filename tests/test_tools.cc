@@ -12,25 +12,28 @@
 #include "../tools/BitSet.h"
 #include "../tools/BitVector.h"
 #include "../tools/DynamicStringSet.h"
-#include "../tools/functions.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/Graph.h"
-#include "../tools/graph_utils.h"
-//#include "../tools/grid.h"
-#include "../tools/mem_track.h"
 #include "../tools/Ptr.h"
 #include "../tools/Random.h"
+#include "../tools/Trait.h"
+
+#include "../tools/assert.h"
+#include "../tools/functions.h"
+#include "../tools/graph_utils.h"
+//#include "../tools/grid.h"
+#include "../tools/macro_math.h"
+#include "../tools/macros.h"
+#include "../tools/mem_track.h"
+#include "../tools/meta.h"
 #include "../tools/reflection.h"
 #include "../tools/sequence_utils.h"
 #include "../tools/serialize.h"
 #include "../tools/string_utils.h"
-#include "../tools/Trait.h"
 #include "../tools/tuple_struct.h"
-#include "../tools/vector.h"
-#include "../tools/macro_math.h"
-#include "../tools/macros.h"
-#include "../tools/assert.h"
 #include "../tools/unit_tests.h"
+#include "../tools/vector.h"
+
 // currently these have no coveage; we include them so we get metrics on them
 // this doesn't actually work--TODO: figure out why this doesn't work
 #include "../tools/alert.h"
@@ -299,7 +302,17 @@ TEST_CASE("Test functions", "[tools]")
   REQUIRE(emp::to_range(12345678, 10, 20) == 20);
   REQUIRE(emp::to_range<double>(12345678, 10, 20.1) == 20.1);
   REQUIRE(emp::to_range(12345678.0, 10.7, 20.1) == 20.1);
+}
 
+
+template <typename A, typename B>
+struct MetaTestClass {
+  A a;
+  B b;
+};
+
+TEST_CASE("Test meta-programming helpers", "[tools]")
+{
 
   // TEST FOR VARIADIC HELPER FUNCTIONS:
 
@@ -319,6 +332,27 @@ TEST_CASE("Test functions", "[tools]")
 
   REQUIRE(result_char == 'g');
 
+  using meta1_t = MetaTestClass<int, double>;
+  using meta2_t = emp::AdaptTemplate<meta1_t, char, bool>;
+  using meta3_t = emp::AdaptTemplate_Arg1<meta1_t, std::string>;
+  
+  meta1_t meta1;
+  meta2_t meta2;
+  meta3_t meta3;
+
+  meta1.a = (decltype(meta1.a)) 65.5;
+  meta1.b = (decltype(meta1.b)) 65.5;
+  meta2.a = (decltype(meta2.a)) 65.5;
+  meta2.b = (decltype(meta2.b)) 65.5;
+  meta3.a = (decltype(meta3.a)) "65.5";
+  meta3.b = (decltype(meta3.b)) 65.5;
+
+  REQUIRE( meta1.a == 65 );
+  REQUIRE( meta1.b == 65.5 );
+  REQUIRE( meta2.a == 'A' );
+  REQUIRE( meta2.b == true );
+  REQUIRE( meta3.a == "65.5" );
+  REQUIRE( meta3.b == 65.5 );
 }
 
 // should migrate these inside the test case, probably

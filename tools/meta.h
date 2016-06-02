@@ -108,6 +108,7 @@ namespace emp {
   template<typename T, typename... U>
   using AdaptTemplate=typename internal::AdaptTemplateHelper<T, U...>::type;
 
+
   // Variation of AdaptTemplate that only adapts first template argument.
   namespace internal {
     template<typename T, typename U> class AdaptTemplateHelper_Arg1;
@@ -119,8 +120,8 @@ namespace emp {
     };
   }
 
-  template<typename T, typename... U>
-  using AdaptTemplate_Arg1=typename internal::AdaptTemplateHelper_Arg1<T, U...>::type;
+  template<typename T, typename U>
+  using AdaptTemplate_Arg1=typename internal::AdaptTemplateHelper_Arg1<T, U>::type;
 
 }
 
