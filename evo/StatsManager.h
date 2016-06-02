@@ -81,6 +81,8 @@ namespace evo{
         }
     }
 
+    template <typename T>
+    void SetDefaultFitnessFun(std::function<double(T)> fit){;}
   };
 
   //A popular type of stats manager is one that prints a set of statistics every
@@ -236,7 +238,7 @@ namespace evo{
         std::function<void(int)> UpdateFun = [&] (int ud){
             Update(ud);
         };
-        
+
 
         //Add functions to manager
         AddFunction(diversity, "shannon_diversity");
@@ -266,7 +268,7 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::fit_fun;
       using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::SetDefaultFitnessFun;
-      
+
       //Constructor for use as a stand alone object
       template<typename WORLD>
       StatsManager_AdvancedStats(WORLD * w, std::string location = "averages.cvs")
@@ -310,9 +312,9 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
 
           w->OnUpdate(UpdateFun);
 
-      }
+      }*/
   };
-*/
+
 }
 }
 
