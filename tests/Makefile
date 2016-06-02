@@ -7,10 +7,7 @@ test: test_driver.cc test_tools.cc
 
 coverage:
 	$(CXX) ${GCOV_FLAGS} -std=c++11 test_driver.cc -o test.o
-	lcov -c -i -b ../ -d . -o Coverage.baseline 
 	./test.o
-	lcov -c -d . -b ../ -o Coverage.out
-	lcov -a Coverage.baseline -a Coverage.out -o Coverage.combined
 	gcov test_driver.cc
 
 coverage-html: coverage
