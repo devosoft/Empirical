@@ -55,6 +55,9 @@ namespace evo{
     template <typename WORLD>
     void Setup(WORLD * w){;}
 
+    template <typename T>
+    void SetDefaultFitnessFun(std::function<double(T)> fit){;}
+
     //Tells the stats manager where to put output. If location is "cout"
     //(default) or "stdout", stats will get sent to cout. Otherwise, the
     //specified file will be used as the location for output. If the file
