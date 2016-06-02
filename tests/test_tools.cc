@@ -52,8 +52,14 @@
   } while (false)
 
 
+// this templating is necessary to force full coverage of templated classes.
+// Since c++ doesn't generate code for templated methods if those methods aren't
+// explicitly called (and thus our profiling doesn't see them), we have to
+// force them all to be included in the comilation.
+template class emp::BitMatrix<4, 5>;
 TEST_CASE("Test bitvectors", "[tools]")
 {
+
   emp::BitMatrix<4,5> bm45;
 
   REQUIRE(bm45.NumCols() == 4);
@@ -101,6 +107,8 @@ TEST_CASE("Test bitvectors", "[tools]")
 */
 }
 
+
+template class emp::BitSet<5>;
 TEST_CASE("test BitSet", "[tools]")
 {
   emp::BitSet<10> bs10;
@@ -437,6 +445,7 @@ TEST_CASE("Test graph", "[tools]")
 }
 
 // TODO: add asserts
+emp::Random grand;
 TEST_CASE("Test Graph utils", "[tools]")
 {
   emp::Random random;
