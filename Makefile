@@ -9,6 +9,10 @@ diff-cover: coverage
 	git diff origin/master > scripts/diff
 	cd scripts && python3 dumb_diff_cover.py -i ignore_list diff
 
+travis: 
+	cd third-party && make travis-install-dependencies
+	make diff-cover
+
 test:
 	cd tests && make test
 
