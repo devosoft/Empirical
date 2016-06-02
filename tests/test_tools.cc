@@ -972,8 +972,13 @@ TEST_CASE("Test string utils", "[tools]")
   emp::compress_whitespace(base_string);
   REQUIRE(base_string == "This is -MY- very best string!!!!");
 
-  emp::vector<std::string> slices;
-  emp::slice_string(base_string, slices, 's');
+  auto slices = emp::slice("This is a test of a different version of slice.", ' ');
+
+  REQUIRE(slices.size() == 10);
+  REQUIRE(slices[8] == "of");
+
+  // Try other ways of using slice().
+  emp::slice(base_string, slices, 's');
 
   REQUIRE(slices.size() == 5);
   REQUIRE(slices[1] == " i");
@@ -1275,7 +1280,7 @@ TEST_CASE("Test macros", "[tools]")
 
   // Test more complex layouts...
   EMP_TEST_MACRO( EMP_LAYOUT(EMP_DECORATE, +, a, b, c, d, e, f, g, h), "[a] + [b] + [c] + [d] + [e] + [f] + [g] + [h]" );
-  EMP_TEST_MACRO( EMP_WRAP_ARGS(EMP_DECORATE, a, b, c, d, e, f, g, h), "[a], [b], [c], [d], [e], [f], [g], [h]" );
+  EMP_TEST_MACRO( EMP_WRAP_ARGS(EMP_DECORATE, a, b, c, d, e, f, g, h), "[a] , [b] , [c] , [d] , [e] , [f] , [g] , [h]" );
   EMP_TEST_MACRO( EMP_WRAP_ARG_PAIRS(EMP_DECORATE_PAIR, A, a, B, b, C, c, D, d, E, e, F, f), "[A-a], [B-b], [C-c], [D-d], [E-e], [F-f]" );
 
 
@@ -1318,7 +1323,7 @@ TEST_CASE("Test macros", "[tools]")
   REQUIRE(test9[4] == "five");
   REQUIRE(test9[7] == "eight");
 
-  EMP_TEST_MACRO( EMP_STRINGIFY_EACH(some, words), "\"some\", \"words\"" );
+  EMP_TEST_MACRO( EMP_STRINGIFY_EACH(some, words), "\"some\" , \"words\"" );
 }
 
 // no idea what these do, but they're probably necessary

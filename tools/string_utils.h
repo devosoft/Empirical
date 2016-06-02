@@ -127,6 +127,10 @@ namespace emp {
     return is_letter(test_char) || is_digit(test_char);
   }
 
+  inline bool is_idchar(char test_char) {
+    return is_alphanumeric(test_char) || test_char == '_';
+  }
+
   static bool is_one_of(char test_char, const std::string & char_set) {
     for (char x : char_set) if (test_char == x) return true;
     return false;
@@ -257,9 +261,9 @@ namespace emp {
   }
 
   // Cut up a string based on a deliminator.
-  static void slice_string(const std::string & in_string, emp::vector<std::string> & out_set,
+  static void slice(const std::string & in_string, emp::vector<std::string> & out_set,
                     char delim='\n') {
-    int test_size = (int) in_string.size();
+    const int test_size = (int) in_string.size();
 
     // Count produced strings
     int out_count = 0;
@@ -267,7 +271,7 @@ namespace emp {
     while (pos < test_size) {
       while (pos < test_size && in_string[pos] != delim) pos++;
       pos++; // Skip over deliminator
-      out_count++;
+      out_count++;  // Increment for each delim plus once at the end (so once if no delims).
     }
 
     // And copy over the strings
@@ -286,6 +290,12 @@ namespace emp {
 
   }
 
+  // A simple way to slice a string without passing in result vector (may be less efficient).
+  static emp::vector<std::string> slice(const std::string & in_string, char delim='\n') {
+    emp::vector<std::string> result;
+    slice(in_string, result, delim);
+    return result;
+  }
 
   // The next functions are not efficient, but they will take any number of inputs and
   // dynamically convert them all into a single, concatanated strings or stringstreams.

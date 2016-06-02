@@ -1,5 +1,0 @@
-// objective: test \addindex command
-// check: indexpage.xml
-/** \mainpage
- *  \addindex keyword
- */

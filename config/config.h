@@ -177,8 +177,7 @@ namespace emp {
         // Print header information with the group name.
         out << "### " << name << " ###" << std::endl;
         // Print group description.
-        emp::vector<std::string> desc_lines;
-        slice_string(desc, desc_lines);
+        auto desc_lines = slice(desc);
         for (int comment_line = 0; comment_line < (int) desc_lines.size(); comment_line++) {
           out << "# " << desc_lines[comment_line] << std::endl;
         }
@@ -202,8 +201,7 @@ namespace emp {
           out << setting_info[i];
 
           // Break the description up over multiple lines.
-          emp::vector<std::string> desc_lines;
-          emp::slice_string(entry_set[i]->GetDescription(), desc_lines);
+          auto desc_lines = emp::slice(entry_set[i]->GetDescription());
 
           int start_col = (int) setting_info[i].size();
           for (int comment_line = 0; comment_line < (int) desc_lines.size(); comment_line++) {
@@ -311,7 +309,9 @@ namespace emp {
             cur_line.replace(pos, var_size+1, new_val);           // Replace var name with value.
             pos += (int) new_val.size();                          // Skip new text.
           } else {
-            // @CAO ERROR!
+            std::stringstream ss;
+            ss << "Unable to process config setting '$" << var_name << "'. Ignoring." << std::endl;
+            emp::NotifyError(ss.str());
           }
           // @CAO CONTINUE
         }
