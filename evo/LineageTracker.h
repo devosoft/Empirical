@@ -7,6 +7,7 @@
 
 #include <map>
 #include <set>
+#include <algorithm>
 #include "../tools/vector.h"
 #include "PopulationManager.h"
 
@@ -182,23 +183,27 @@ namespace evo{
   template <typename POP_MANAGER = PopulationManager_Base<int> >
   class LineageTracker_Pruned : LineageTracker<POP_MANAGER> {
   protected:
-    std::set<int> alive;
-    std::map<int, int> offspring;
-    std::map<int, int> oldest_unique;
     using org_ptr = typename LineageTracker<POP_MANAGER>::org_ptr;
     using ORG = typename LineageTracker<POP_MANAGER>::ORG;
+
+    struct Node {
+      Node* parent;
+      int id;
+      bool alive;
+      org_ptr genome;
+      emp::vector<int> offspring;
+    };
 
     using LineageTracker<POP_MANAGER>::next_org_id;
     using LineageTracker<POP_MANAGER>::next_parent_id;
     using LineageTracker<POP_MANAGER>::generation_since_update;
     using LineageTracker<POP_MANAGER>::separate_generations;
     using LineageTracker<POP_MANAGER>::genomes;
-    using LineageTracker<POP_MANAGER>::parents;
-    using LineageTracker<POP_MANAGER>::org_to_genome;
     using LineageTracker<POP_MANAGER>::new_generation;
 
+    std::map<int, Node> nodes;
     std::map<ORG, int> genome_counts;
-
+    int last_coalesence = 0;
 
   public:
 
@@ -245,9 +250,7 @@ namespace evo{
       w->OnUpdate(UpdateFun);
     }
 
-    ~LineageTracker_Pruned() {
-      //for (GENOME g : genomes) delete &g;
-    }
+    ~LineageTracker_Pruned() {;}
 
 
     void TrackOffspring(org_ptr org) {
@@ -265,39 +268,44 @@ namespace evo{
     void TrackPlacement(int pos) {
 
       //Once things can die we'll need something better here
-      std::cout << "Placing" << std::endl;
+      std::cout << "Placeing..." <<std::endl;
       if (generation_since_update.size() > pos){
-        std::cout << pos << std::endl;
-        int id = generation_since_update[pos];
-        alive.erase(id);
-        std::cout << id << " is being killed" << std::endl;
-        while (!offspring[id] && !alive.count(id)) {
-          std::cout << "Evaluating: " << id << std::endl;
-          offspring[parents[id]]--;
-          std::cout << offspring[parents[id]] << " siblings left" << std::endl;
-          parents.erase(id);
-          org_to_genome.erase(id);
-          ORG genome = *(org_to_genome[id]);
+
+        Node* curr = &(nodes[generation_since_update[pos]]);
+        curr->alive = false;
+
+        std::cout << curr->id << " is being killed" << std::endl;
+        while (curr->offspring.size() > 0 && !curr->alive && curr->id) {
+          curr->parent->offspring.erase( std::remove( curr->parent->offspring.begin(), curr->parent->offspring.end(), curr->id ), curr->parent->offspring.end() );
+          ORG genome = *(curr->genome);
           genome_counts[genome]--;
-          std::cout << genome_counts[genome] << " remaining identical genotypes" << std::endl;
           if (!genome_counts[genome]) {
             genomes.erase(genome);
           }
-          id = parents[id];
-          std::cout << "Parent: " << id << std::endl;
+
+          Node* old = curr;
+          curr = curr->parent;
+          std::cout << old->id <<"'s parent is " << curr->id << "     " << curr->offspring.size() << " siblings left" <<std::endl;
+          nodes.erase(old->id);
+        }
+        std::cout << "Done with loop" << std::endl;
+        if (curr->parent->id == 1){
+            std::cout << "COALESCESED " << curr->id << std::endl;
+            last_coalesence = curr->id;
         }
       }
 
       if (pos >= generation_since_update.size()) {
         generation_since_update.resize(pos+1);
       }
+      std::cout << pos << " " << generation_since_update << std::endl;
       generation_since_update[pos] = next_org_id;
+      std::cout << "Done with funciton" << std::endl;
     }
 
     //Record the org that's about to have an offspring, so we can know
     //who the parent of the next org is.
     void RecordParent(int id) {
-      offspring[id]++;
       next_parent_id = generation_since_update[id];
     }
 
@@ -306,22 +314,30 @@ namespace evo{
     // of assigning ids, and will return an int representing the id of the
     // organism you added
     int AddOrganism(ORG org, int parent) {
+
       int id = this->next++;
+      nodes[id] = Node();
+      Node* curr = &nodes[id];
+      curr->parent = &nodes[parent];
+      curr->parent->offspring.push_back(curr->id);
+      curr->id = id;
+      curr->alive = true;
+
+      std::cout << parent << " gave birth to " << id << std::endl;
       std::pair<typename std::set<ORG>::iterator, bool> ret;
       ret = genomes.insert(org);
       typename std::set<ORG>::iterator it = ret.first;
       org_ptr genome = (org_ptr)&(*it);
-      this->org_to_genome[id] = genome;
+      curr->genome = genome;
 
       if (ret.second) {
-        genome_counts[*genome] = 0;
+        genome_counts[*genome] = 1;
       } else {
         genome_counts[*genome]++;
       }
 
       this->parents[id] = parent;
-      alive.insert(id);
-      offspring[id] = 0;
+
       return id;
     }
 
