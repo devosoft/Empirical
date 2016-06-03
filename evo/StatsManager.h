@@ -12,6 +12,7 @@
 #include "../config/config.h"
 #include "PopulationManager.h"
 #include "EvoStats.h"
+#include "LineageTracker.h"
 
 namespace emp{
 namespace evo{
@@ -262,6 +263,7 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::pop;
       using StatsManager_Base<POP_MANAGER>::output_location;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::Update;
+      using lineage_type = LineageTracker<POP_MANAGER>; 
 
   public:
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::fit_fun;
@@ -316,6 +318,10 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
               MLandscape data = MutLandscape(fit_func, *pop);
               return data.max_det;
           };
+          fit_stat_type last_coal = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              
+
+          };
 
 
           std::function<void(int)> UpdateFun = [&] (int ud){
@@ -331,6 +337,7 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
           AddFunction(det_mut, "det_mut");
           AddFunction(max_ben, "max_ben");
           AddFunction(max_det, "max_det");
+          AddFunction(last_coal, "last_coal");
          
           w->OnUpdate(UpdateFun);
 
