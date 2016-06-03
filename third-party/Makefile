@@ -1,4 +1,5 @@
 install-dependencies: build-doxygen install-pip-deps
+	git submodule update --init
 
 install-testing-dependencies: install-pip-deps
 

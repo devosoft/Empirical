@@ -33,6 +33,8 @@ incoming/
 tmp/
 build/doxydoc/*
 third-party/doxygen
+third-party/breathe
+third-party/catch
 doc/_build/*
 utils/edit_dist/IO/
 utils/edit_dist/edit_dist
