@@ -972,8 +972,13 @@ TEST_CASE("Test string utils", "[tools]")
   emp::compress_whitespace(base_string);
   REQUIRE(base_string == "This is -MY- very best string!!!!");
 
-  emp::vector<std::string> slices;
-  emp::slice_string(base_string, slices, 's');
+  auto slices = emp::slice("This is a test of a different version of slice.", ' ');
+
+  REQUIRE(slices.size() == 10);
+  REQUIRE(slices[8] == "of");
+
+  // Try other ways of using slice().
+  emp::slice(base_string, slices, 's');
 
   REQUIRE(slices.size() == 5);
   REQUIRE(slices[1] == " i");

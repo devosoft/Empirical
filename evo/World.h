@@ -146,7 +146,7 @@ namespace evo {
     // Build managers...
     AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> popM;
     AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgMDynamic>::type, ORG> orgM;
-    AdaptTemplate<typename SelectStatsManager<MANAGERS...,StatsManager_Base<decltype(popM)> >::type, decltype(popM)> statsM;
+    AdaptTemplate<typename SelectStatsManager<MANAGERS...,NullStats >::type, decltype(popM)> statsM;
 
     //Create a lineage manager if the stats manager needs it or if the user asked for it
     EMP_CHOOSE_MEMBER_TYPE(DefaultLineage, lineage_type, LineageNull, decltype(statsM));
