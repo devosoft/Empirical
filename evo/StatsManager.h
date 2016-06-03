@@ -284,6 +284,7 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
       template<typename WORLD>
       void Setup(WORLD * w){
           pop = &(w->popM);
+          lineage_type lin_ptr = LineageTracker(w);
 
           std::function<double(POP_MANAGER*)> diversity = [](POP_MANAGER * pop){
               return ShannonEntropy(*pop);
@@ -318,9 +319,9 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
               MLandscape data = MutLandscape(fit_func, *pop);
               return data.max_det;
           };
-          fit_stat_type last_coal = [](fit_fun_type fit_func, POP_MANAGER * pop){
-              
-
+          fit_stat_type last_coal = [lin_ptr](fit_fun_type fit_func, POP_MANAGER * pop){
+              //auto a_id = lin_ptr->
+              auto depth = lin_ptr->TraceLineage();
           };
 
 
