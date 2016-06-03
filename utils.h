@@ -2,14 +2,14 @@
 #define __UTILS_H__
 
 #include <map>
-#include <emscripten.h>
 #include <string>
+#include "../Empirical/emtools/init.h"
 #include "../Empirical/tools/macros.h"
 #include "../Empirical/emtools/js_utils.h"
 
 //Let's try some awful macro stuff
 
-//This macro finds a function specified by ARG2 in either the d3, emp, or 
+//This macro finds a function specified by ARG2 in either the d3, emp, or
 //window namespace and feeds it to FUNC, which is called on the current
 //selection. ARG1 is the first argument to FUNC. If ARG2 is not found to
 //be a function, it will be passed to FUNC as a string.
@@ -31,7 +31,7 @@
     func_string = window[STRING];					\
     BODY								\
     }
-  
+
 #define DO_IF_FUNCTION_IN_NAMESPACE_1(STRING, BODY, A1)			\
   if IS_JS_FUNCTION(window[A1][STRING]){				\
     func_string = window[A1][STRING];					\
@@ -133,7 +133,7 @@
 	}								\
       }									\
       emp.__new_object = new_sel;					\
-    }, this->id, ARG1);	
+    }, this->id, ARG1);
 
 
 void StoreNewObject(){EM_ASM({js.objects.push(emp.__new_object);});}
@@ -141,7 +141,7 @@ void StoreNewObject(){EM_ASM({js.objects.push(emp.__new_object);});}
 /*
 template <std::size_t SIZE>
 void pass_array_to_cpp(std::array<int32_t, SIZE> & arr) {
-  
+
   emp_assert(SIZE == EM_ASM_INT_V({return emp.__outgoing_array.length}));
 
   int buffer = EM_ASM_INT_V({
@@ -150,20 +150,20 @@ void pass_array_to_cpp(std::array<int32_t, SIZE> & arr) {
       for (i=0; i<emp.__outgoing_array.length; i++){
 	setValue(buffer+(i*4), emp.__outgoing_array[i], "i32");
       }
- 
+
       return buffer;
     });
 
   for (int i=0; i<SIZE; i++){
     arr[i] = *(int*) (buffer + i*4);
   }
-  
+
   free((void*)buffer);
 }
 
 template <std::size_t SIZE>
 void pass_array_to_cpp(std::array<double, SIZE> & arr) {
-  
+
   emp_assert(SIZE == EM_ASM_INT_V({return emp.__outgoing_array.length}));
 
   int buffer = EM_ASM_INT_V({
@@ -172,14 +172,14 @@ void pass_array_to_cpp(std::array<double, SIZE> & arr) {
       for (i=0; i<emp.__outgoing_array.length; i++){
 	setValue(buffer+(i*8), emp.__outgoing_array[i], "double");
       }
- 
+
       return buffer;
     });
 
   for (int i=0; i<SIZE; i++){
     arr[i] = *(double*) (buffer + i*sizeof(double));
   }
-  
+
   free((void*)buffer);
 }
 */

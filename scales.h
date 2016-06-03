@@ -1,33 +1,32 @@
 #ifndef __SCALES_H__
 #define __SCALES_H__
 
+#include "d3_init.h"
 #include "../Empirical/emtools/js_utils.h"
 #include "utils.h"
 
 namespace D3 {
 
-  class Scale {
+  class Scale : public D3_Base {
   protected:
-    int id;
-    Scale(int id);
+    Scale(int id) : D3_Base(id){;};
 
   public:
-    Scale();
+    Scale() { EM_ASM({js.objects.push(d3.scale)}); }
 
-    int GetID() {
-      return this->id;
-    }
-    
+    //Decoy constructor so we don't construct extra base scales
+    Scale(bool derived){;};
+
     template <typename T, size_t SIZE>
     void SetRange(std::array<T,SIZE> values) {
       emp::pass_array_to_javascript(values);
-      EM_ASM_ARGS({js.objects[$0].range(emp.__incoming_array);}, this->id);
+      EM_ASM_ARGS({js.objects[$0].range(emp_i.__incoming_array);}, this->id);
     }
 
     template <typename T, size_t SIZE>
     void SetDomain(std::array<T,SIZE> values) {
       emp::pass_array_to_javascript(values);
-      EM_ASM_ARGS({js.objects[$0].domain(emp.__incoming_array);}, this->id);
+      EM_ASM_ARGS({js.objects[$0].domain(emp_i.__incoming_array);}, this->id);
     }
 
     Scale Copy() {
@@ -46,56 +45,41 @@ namespace D3 {
 
   };
 
-  Scale::Scale(int id) {
-    this->id = id;
-  }
-
-  Scale::Scale() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({js.objects.push(d3.scale)});
-  }
 
   class QuantizeScale : public Scale {
   public:
-    QuantizeScale();
+    QuantizeScale() : Scale(true) {EM_ASM({js.objects.push(d3.scale.quantize())});}
+    QuantizeScale(bool derived) : Scale(true) {;}
 
     template <typename T>
     double InvertExtent(T y) {
-      return EM_ASM_DOUBLE({return js.objects[$0].invertExtent($1);}, 
+      return EM_ASM_DOUBLE({return js.objects[$0].invertExtent($1);},
 			   this->id, y);
     }
   };
 
-  QuantizeScale::QuantizeScale() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({js.objects.push(d3.scale.quantize())});
-  }
-
   class QuantileScale : public QuantizeScale {
   public:
-    QuantileScale();
-    
+    QuantileScale() : QuantizeScale(true) { EM_ASM({js.objects.push(d3.scale.quantile())});}
+    QuantileScale(bool derived) : QuantizeScale(true) {;}
     //TODO: Quantiles()
   };
 
-  QuantileScale::QuantileScale() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({js.objects.push(d3.scale.quantile())});
-  }
-
   class ThresholdScale : public QuantizeScale {
   public:
-    ThresholdScale();
+    ThresholdScale() : QuantizeScale(true) {
+      EM_ASM({js.objects.push(d3.scale.threshold())});
+    }
+    ThresholdScale(bool derived) : QuantizeScale(true) {;}
   };
-
-  ThresholdScale::ThresholdScale() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({js.objects.push(d3.scale.threshold())});
-  }
 
   class IdentityScale : public Scale {
   public:
-    IdentityScale();
+    IdentityScale() : Scale(true) {
+      EM_ASM({js.objects.push(d3.scale.identity())});
+    }
+
+    IdentityScale(bool derived) : Scale(true){;}
 
     template <typename T>
     double Invert(T y) {
@@ -109,19 +93,18 @@ namespace D3 {
     void SetTickFormat(int count, const char * format) {
       //TODO: format is technically optional, but what is the point of this
       //function without it?
-      EM_ASM_ARGS({js.objects[$0].tick($1, Pointer_stringify($2));}, 
+      EM_ASM_ARGS({js.objects[$0].tick($1, Pointer_stringify($2));},
 		  this->id, count, format);
     }
   };
 
-  IdentityScale::IdentityScale() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({js.objects.push(d3.scale.identity())});
-  }
-
   class LinearScale : public IdentityScale {
   public:
-    LinearScale();
+    LinearScale() : IdentityScale(true) {
+      EM_ASM({js.objects.push(d3.scale.linear())});
+    }
+
+    LinearScale(bool derived) : IdentityScale(true) {;}
 
     template <typename T, size_t SIZE>
     void SetRangeRound(std::array<T,SIZE> values) {
@@ -147,106 +130,76 @@ namespace D3 {
 
   };
 
-  LinearScale::LinearScale() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({js.objects.push(d3.scale.linear())});
-  }
-
   class LogScale : public LinearScale {
   public:
-    LogScale();
-  };
+    LogScale() : LinearScale(true) {
+      EM_ASM({js.objects.push(d3.scale.log())});
+    }
 
-  LogScale::LogScale() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({js.objects.push(d3.scale.log())});
-  }
+    LogScale(bool derived) : LinearScale(true){;};
+
+  };
 
   class PowScale : public LinearScale {
   public:
-    PowScale();
+    PowScale() : LinearScale(true) {
+      EM_ASM({js.objects.push(d3.scale.pow())});
+    }
+
+    PowScale(bool derived) : LinearScale(true){;};
 
     //TODO: Exponent()
     //TODO Sqrt constructor
   };
 
-  PowScale::PowScale() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({js.objects.push(d3.scale.pow())});
-  }
-
   class TimeScale : public LinearScale {
   public:
-    TimeScale();
-  };
+    TimeScale() : LinearScale(true) {
+      EM_ASM({js.objects.push(d3.scale.time())});
+    }
 
-  TimeScale::TimeScale() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({js.objects.push(d3.scale.time())});
-  }
+    TimeScale(bool derived) : LinearScale(true){;};
+  };
 
   class OrdinalScale : public QuantizeScale {
   public:
-    OrdinalScale();
+    OrdinalScale() : QuantizeScale(true) {
+      EM_ASM({js.objects.push(d3.scale.ordinal())});
+    }
+
+    OrdinalScale(bool derived) : QuantizeScale(true){;}
   };
 
-  OrdinalScale::OrdinalScale() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({js.objects.push(d3.scale.ordinal())});
-  }
 
-  class Category10Scale {
+  class Category10Scale : D3_Base{
+  public:
+    Category10Scale() {
+      EM_ASM({js.objects.push(d3.scale.category10())});
+    }
+  };
+
+  class Category20Scale : D3_Base {
+  public:
+    Category20Scale() {
+      EM_ASM({js.objects.push(d3.scale.category20())});
+    }
+  };
+
+  class Category20bScale : D3_Base {
+  public:
+    Category20bScale() {
+      EM_ASM({js.objects.push(d3.scale.category20b())});
+    }
+  };
+
+  class Category20cScale : D3_Base {
   protected:
     int id;
   public:
-    Category10Scale();
+    Category20cScale() {
+      EM_ASM({js.objects.push(d3.scale.category20c())});
+    }
   };
-
-  Category10Scale::Category10Scale() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({js.objects.push(d3.scale.category10())});
-  }
-
-  class Category20Scale {
-  protected:
-    int id;
-  public:
-    Category20Scale();
-  };
-
-  Category20Scale::Category20Scale() {
-    this->id = EM_ASM_INT_V({
-	return js.objects.length
-    });
-    EM_ASM({js.objects.push(d3.scale.category20())});
-  }
-
-
-  class Category20bScale {
-  protected:
-    int id;
-  public:
-    Category20bScale();
-  };
-
-  Category20bScale::Category20bScale() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({js.objects.push(d3.scale.category20b())});
-  }
-
-  class Category20cScale {
-  protected:
-    int id;
-  public:
-    Category20cScale();
-  };
-
-  Category20cScale::Category20cScale() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({js.objects.push(d3.scale.category20c())});
-  }
-
-
 }
 
 #endif

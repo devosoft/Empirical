@@ -1,5 +1,5 @@
+
 #include "../Empirical/emtools/init.h"
-#include <emscripten.h>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -48,7 +48,7 @@ void make_graph() {
   group.SetAttr("fill", "none");
   group.SetAttr("stroke", "blue");
   group.SetAttr("stroke-width", 2);
-  
+
   x_axis.Draw(svg);
 }
 
@@ -63,17 +63,17 @@ int main()
   emp::pass_array_to_cpp(new_array);
   std::cout << new_array[0] << " " << new_array[1] << " " << new_array[2] << std::endl;
 
-  D3::CSVDataset csv = D3::CSVDataset("test_no_headers.csv", "make_graph", false);
+  //D3::CSVDataset csv = D3::CSVDataset("test_no_headers.csv", "make_graph", false);
 
   //JSObject();
-  
+
   D3::Selection svg = D3::Selection("body").Append("svg");
   D3::Selection text = D3::Selection("body").Append("text");
   text.SetText("Testing");
   std::cout << text.GetText() << std::endl;
 
   //D3::Selection s = svg.SelectAll("circle");
- 
+
   std::cout << n_objects() << std::endl;
 
   D3::LinearScale s = D3::LinearScale();
@@ -144,8 +144,8 @@ int main()
   t.SetAttr("cx", "return_val");
   t.SetStyle("fill", "green");
   D3::Selection("circle", true).On("mouseover", "mouseover");
-  D3::Selection("circle", true).On("mouseover");
-  
+  //D3::Selection("circle", true).On("mouseover");
+
 }
 
 

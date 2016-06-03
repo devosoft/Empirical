@@ -1,23 +1,23 @@
 #ifndef __AXIS_H__
 #define __AXIS_H__
 
-#include <emscripten.h>
+#include "d3_init.h"
 #include "../Empirical/emtools/js_utils.h"
-
-class Selection;
-class Scale;
+#include "selection.h"
 
 namespace D3 {
 
+  class Scale;
+
   template <typename SCALE_TYPE>
-  class Axis {
+  class Axis : D3_Base {
   private:
-    int id;
     SCALE_TYPE scale;
 
   public:
     Axis() {
-      this->id = EM_ASM_INT_V({return js.objects.length});
+      //The scale got added to th the list of objects before this one
+      this->id++;
       EM_ASM({js.objects.push(d3.svg.axis())});
     }
 
@@ -49,7 +49,7 @@ namespace D3 {
       EM_ASM_ARGS({
 	  js.objects[$0].orient(Pointer_stringify($1));
 	}, this->id, orientation.c_str());
-    }  
+    }
 
     template <typename T, std::size_t SIZE>
     void SetTickValues(std::array<T, SIZE> values) {
@@ -77,7 +77,7 @@ namespace D3 {
 	  js.objects[$0].outerTickSize($1);
 	}, this->id, size);
     }
-    
+
     void SetTickPadding(int padding) {
       EM_ASM_ARGS({
 	  js.objects[$0].tickPadding($1);
@@ -95,7 +95,7 @@ namespace D3 {
   };
 
   //  template <typename SCALE_TYPE>
-  //Axis::Axis() 
+  //Axis::Axis()
 
 }
 
