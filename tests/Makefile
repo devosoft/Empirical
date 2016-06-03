@@ -14,11 +14,14 @@ coverage-html: coverage
 	mkdir -p html
 	genhtml Coverage.combined -o html
 
+diff-cover: coverage
+	git diff origin/master > ../scripts/diff
+	cd ../scripts && python3 vigilance.py -i ignore_list diff
 
 coverage-xml: coverage
 	../third-party/env/bin/gcovr -e "third-party/catch/single_include/catch.hpp" -r ../ --xml-pretty > coverage.xml
 
-diff-cover: coverage-xml
+old-diff-cover: coverage-xml
 	cp coverage.xml ../coverage.xml
 	cd .. && diff-cover coverage.xml > diff_cover.txt
 	cat ../diff_cover.txt

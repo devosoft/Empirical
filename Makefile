@@ -7,7 +7,7 @@ build-doxygen-xml:
 
 diff-cover: coverage
 	git diff origin/master > scripts/diff
-	cd scripts && python3 dumb_diff_cover.py -i ignore_list diff
+	cd scripts && python3 vigilance.py -i ignore_list diff
 
 travis: 
 	cd third-party && make travis-install-dependencies
