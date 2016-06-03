@@ -136,7 +136,7 @@ def parse_gdiff(gdiff_filename):
     return parsed_diff
 
 
-def check_coverage(source_path, diff_lines):
+def check_diff_coverage(source_path, diff_lines):
     sfile_lines = []
     bad_lines = []
     cov_lines = parse_gcov(os.path.basename(source_path))
@@ -156,27 +156,7 @@ def check_coverage(source_path, diff_lines):
     return bad_lines
 
 
-def get_parser():
-    """Builds the parser for the script"""
-
-    parser = argparse.ArgumentParser(description="Script to act as a bad diff-cover agent for"
-                                     " broken gcov")
-    parser.add_argument('-f', '--filename', help="Name of file to include in processing.")
-    parser.add_argument('-p', '--path', default="./",
-                        help="path of the directory to examine (default = '.')")
-
-    # required args
-    parser.add_argument("diff_filename", help="path to the file containing the git diff")
-    parser.add_argument("-i", "--ignorelist", type=argparse.FileType('r'),
-                        help="path to file containing list of filenames to "
-                        "ignore during coverage check.")
-
-    return parser
-
-
-def main():
-    args = get_parser().parse_args()
-
+def diff_cover(args):
     # using the dependency mapper, grab the relevant files
     pseudoargs = argstruct()
     pseudoargs.verbose = False
@@ -226,7 +206,7 @@ def main():
             print("\n\nChecking coverage of {}".format(el), file=sys.stderr)
 
             #uncovered_lines = parse_gcov(os.path.basename(el))
-            bad_lines = check_coverage(el, parsed_diff[el])
+            bad_lines = check_diff_coverage(el, parsed_diff[el])
 
             if len(bad_lines) > 0:
                 print("\tBad lines for {}".format(el), end="\n\n")
@@ -238,6 +218,41 @@ def main():
     if found_uncovered:
         print("** Found uncovered lines, failing!")
         sys.exit(1)
+
+
+def get_parser():
+    """Builds the parser for the script"""
+
+    parser = argparse.ArgumentParser(description="Script to act as a bad diff-cover agent for"
+                                     " broken gcov")
+
+    subparsers = parser.add_subparsers(help="Subcommand help")
+    diff_cover_parser = subparsers.add_parser("diff-cover",
+                                              help="check git diff for uncovered lines")
+
+    diff_cover_parser.add_argument('-f', '--filename', help="Name of file to include in processing.")
+    diff_cover_parser.add_argument('-p', '--path', default="./",
+                        help="path of the directory to examine (default = '.')")
+
+    # required args
+    diff_cover_parser.add_argument("diff_filename", help="path to the file containing the git diff")
+    diff_cover_parser.add_argument("-i", "--ignorelist", type=argparse.FileType('r'),
+                        help="path to file containing list of filenames to "
+                        "ignore during coverage check.")
+    diff_cover_parser.set_defaults(func=diff_cover)
+
+    return parser
+
+
+def main():
+
+    if len(sys.argv) < 2:
+        args = get_parser().parse_args(['--help'])
+
+    args = get_parser().parse_args()
+    # thanks to khmer's oxli for this (https://github.com/dib-lab/khmer/blob/b43907695b86f593487d06a38d702ee70988a6f9/oxli/__init__.py)
+    args.func(args)
+
 
 if __name__ == "__main__":
     main()
