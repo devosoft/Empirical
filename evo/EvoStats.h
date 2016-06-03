@@ -66,7 +66,7 @@ template <typename ORG, typename WORLD>
       for (auto org : orgs){
           total_orgs++; //get a total count of orgs in current population
 
-          double m_ben = 0, m_det = 0;
+          double m_ben = 0, m_det = fit_fun(org);
           int benefit = 0, neutral = 0, detremental = 0;
           double fitness = fit_fun(org);
           ORG test = *org;
@@ -87,7 +87,7 @@ template <typename ORG, typename WORLD>
               else{ 
                   detremental++;
                   //std::cout<<" Fn - F: "<<fit_num - fitness<<std::endl;
-                  if(fit_num - fitness < m_det){m_det = fit_num;}
+                  if(fit_num  < m_det){m_det = fit_num;}
               }
 
               test[i] = !test[i]; //revert genome
