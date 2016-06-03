@@ -95,6 +95,8 @@ public:
   }
 
   void Setup(){
+    EM_ASM({tip = d3.tip().html(function(d, i) { return d; });});
+
     emp::vector<double> fitnesses = RunFunctionOnContainer(info.world->GetFitFun(), info.world->popM);
     double lowest = *(std::min_element(fitnesses.begin(), fitnesses.end()));
     double highest = *(std::max_element(fitnesses.begin(), fitnesses.end()));
@@ -124,6 +126,10 @@ public:
     circles->SetAttr("cx", "scaled_i");
     circles->SetAttr("cy", "scaled_d");
     circles->SetStyle("fill", "green");
+
+    EM_ASM_ARGS({js.objects[$0].call(tip);}, svg->GetID());
+    EM_ASM_ARGS({js.objects[$0].on("mouseover", tip.show).on("mouseout", tip.hide);}, circles->GetID());
+
     info.anim.SetCallback(animate_function);
   }
 
