@@ -80,8 +80,8 @@ namespace emp {
       AddPattern("FLOAT_LIT", "[0-9]+[.]'[0-9]+", Token::FLOAT_LIT);
       AddPattern("CHAR_LIT", "'(.|(\\\\[\\\\'nt]))'", Token::CHAR_LIT);
 
-      AddPattern("STRING_LIT", "", Token::STRING_LIT);
-      AddPattern("ID", "", Token::ID);
+      AddPattern("STRING_LIT", "[\"](\\[nt\"\\]|[^\\\"])*\"", Token::STRING_LIT);
+      AddPattern("ID", "[a-zA-Z0-9_]+", Token::ID);
 
       // The rest are completely determined by their type.
       AddPattern("ENDLINE", "[\n;]", Token::ENDLINE);
@@ -115,7 +115,7 @@ namespace emp {
       AddPattern("FUN_RANDOM", "random", Token::FUN_RANDOM);
     }
 
-    int GetMaxToken() const { return Token::NUM_TYPES; }
+    int GetMaxToken() const { return next_token_id; }
 
     // @CAO For the moment, GetToken is pre-build using the default token set.
     emp::Token GetToken() {
