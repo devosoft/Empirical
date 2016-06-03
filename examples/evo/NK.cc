@@ -12,13 +12,14 @@
 #include "../../evo/World.h"
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
+#include "../../evo/OEE.h"
 
 EMP_BUILD_CONFIG( NKConfig,
   GROUP(DEFAULT, "Default settings for NK model"),
-  VALUE(K, int, 10, "Level of epistasis in the NK model"),
+  VALUE(K, int, 0, "Level of epistasis in the NK model"),
   VALUE(N, int, 50, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
   VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
-  CONST(POP_SIZE, int, 1000, "Number of organisms in the popoulation."),
+  VALUE(POP_SIZE, int, 1000, "Number of organisms in the popoulation."),
   VALUE(MAX_GENS, int, 2000, "How many generations should we process?"),
   VALUE(MUT_COUNT, int, 3, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
 )
@@ -43,7 +44,7 @@ int main(int argc, char* argv[])
 
   emp::Random random(config.SEED());
   emp::evo::NKLandscape landscape(N, K, random);
-  emp::evo::EAWorld<BitOrg> pop(random);
+  emp::evo::World<BitOrg, emp::evo::LineagePruned, emp::evo::DefaultStats> pop(random);
 
   // Build a random initial population
   for (int i = 0; i < config.POP_SIZE(); i++) {
@@ -60,6 +61,7 @@ int main(int argc, char* argv[])
       return true;
     } );
 
+  pop.SetDefaultFitnessFun([&landscape](BitOrg * org){ return landscape.GetFitness(*org); });
 
   // Loop through updates
   for (int ud = 0; ud < MAX_GENS; ud++) {
@@ -67,10 +69,8 @@ int main(int argc, char* argv[])
     // for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
     // std::cout << std::endl;
     std::cout << ud << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
-
     // Keep the best individual.
     pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1);
-
     // Run a tournament for the rest...
     pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
 			 , 5, POP_SIZE-1);
