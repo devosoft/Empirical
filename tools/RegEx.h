@@ -35,9 +35,15 @@ namespace emp {
     constexpr static int NUM_SYMBOLS = 128;
     using opts_t = BitSet<NUM_SYMBOLS>;
     const std::string regex;
-    bool valid;                          // Set to false if cannot be processed.
     emp::vector<std::string> notes;      // Any warnings or errors would be provided here.
+    bool valid;                          // Set to false if regex cannot be processed.
     int pos;                             // Position being read in regex.
+
+    template <typename... T>
+    void Error(T... args) {
+      notes.push_back(emp::to_string(std::forward<T>(args)...));
+      valid = false;
+    }
 
     struct re_base {                     // Also used for empty regex
       virtual void Print(std::ostream & os) { os << "[]"; }
@@ -102,15 +108,10 @@ namespace emp {
     re_block head;
 
     bool EnsureNext(char x) {
-      if (pos >= (int) regex.size()) {
-        notes.push_back(emp::to_string("Expected ", x, " before end."));
-        valid = false;
-      }
-      else if (regex[pos] != x) {
-        notes.push_back(emp::to_string("Expected ", x, " at position ", pos, "."));
-        valid = false;
-      }
-      ++pos;
+      if (pos >= (int) regex.size()) Error("Expected ", x, " before end.");
+      else if (regex[pos] != x) Error("Expected ", x, " at position ", pos,
+                                      "; found ", regex[pos], ".");
+      ++pos;               // We have what we were expecting!  Move on...
       return valid;
     }
 
@@ -121,23 +122,25 @@ namespace emp {
       auto * out = new re_charset;
       while (c != ']' && pos < (int) regex.size()) {
         // @CAO need to add range ('-') functionality.
-        // @CAO Error if we run out of chars before ']'
+        // @CAO need to allow for escaped values: '\n' '\t' '\r' ''\\' '\]' (plus '\^' and '\[' to be safe)
         out->char_set[c] = true;
         c = regex[pos++];
       }
       if (neg) out->char_set.NOT_SELF();
+      if (c == ']') --pos;
       return out;
     }
 
     re_string * ConstructString() {
       char c = regex[pos++];
       auto * out = new re_string;
-      while (c != '"' && pos < (int) regex.size()) {
+      while (c != '\"' && pos < (int) regex.size()) {
         // @CAO Add escape ('\') functionality.
         // @CAO Error if we run out of chars before close '"'
         out->str.push_back(c);
         c = regex[pos++];
       }
+      if (c == '\"') --pos;
       return out;
     }
 
@@ -170,9 +173,7 @@ namespace emp {
         case '+':
         case '?':
         case ')':
-          notes.push_back(emp::to_string("Expected regex segment but got '", c,
-                                         "' at position ", pos, "."));
-          valid = false;
+          Error("Expected regex segment but got '", c, "' at position ", pos, ".");
           break;
 
         default:
