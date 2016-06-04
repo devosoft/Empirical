@@ -20,14 +20,119 @@
 #ifndef EMP_REGEX_H
 #define EMP_REGEX_H
 
+#include <string>
+
+#include "BitSet.h"
+#include "vector.h"
+
 namespace emp {
 
+  template <int NUM_SYMBOLS=128>
   class RegEx {
-    struct re_base { ; };
+  private:
+    using opts_t = BitSet<NUM_SYMBOLS>;
+    const std::string regex;
+    bool valid;                          // Set to false if cannot be processed.
+    emp::vector<std::string> notes;      // Any warnings or errors would be provided here.
+    int pos;                             // Position being read in regex.
 
-    struct re_block : public base_re { emp::vector<base_re *> nodes; };  // Series of re's
-    struct re_charset : public base_re { std::string chars; };           // Any char from set.
-    struct re_or : public base_re { base_re * lhs; base_re * rhs; };     // lhs -or- rhs
+    struct re_base {                     // Also used for empty re
+    };
+    struct re_block : public base_re {   // Series of re's
+      emp::vector<base_re *> nodes;
+    };
+    struct re_string : public base_re {  // Series of specific chars
+      std::string str;
+    }
+    struct re_charset : public base_re { // Any char from set.
+      opts_t char_set;
+      re_charset(char x, bool neg=false) { char_set[x]=true; if (neg) char_Set.NOT_SELF(); }
+      re_charset(const std::string & s, bool neg=false)
+        { for (char x : s) char_set[x]=true; if (neg) char_Set.NOT_SELF(); }
+    };
+    struct re_or : public base_re {      // lhs -or- rhs
+      base_re * lhs; base_re * rhs;
+    };
+    struct re_star : public base_re {    // zero-or-more
+      base_re * child;
+    }
+    struct re_plus : public base_re {    // one-or-more
+      base_re * child;
+    }
+    struct re_qm : public base_re {      // zero-or-one
+      base_re * child;
+    }
+
+    re_block head;
+
+    bool EnsureNext(char x) {
+      if (pos >= (int) regex.size()) {
+        notes.push_back(emp::to_string("Expected ", x, " before end."));
+        valid = false;
+      }
+      else if (regex[pos] != x) {
+        notes.push_back(emp::to_string("Expected ", x, " at position ", pos, "."));
+        valid = false;
+      }
+      ++pos;
+      return valid;
+    }
+
+    // Should only be called when we know we have a single unit to produce.  Build and return it.
+    re_base * ConstructSingle() {
+      re_base * result;
+      char c = regex[pos++];  // Grab the current character and move pos to next.
+      switch (c) {
+        case '.':
+          return new re_charset('\n', true);  // Anything except newline.
+        case '(':
+          re_base * out = Process();   // Process the internal contents of parens.
+          EnsureNext(')');             // Make sure last char is a paren and advance.
+          return out;
+        case '[':
+          c = regex[pos++];
+        case '"':
+        case '\\':
+
+        // Error cases
+        case '|':
+        case '*':
+        case '+':
+        case '?':
+        case ')':
+
+        default:
+      }
+    }
+
+    // Process the input regex into a tree representaion.
+    re_block * Process(re_block * cur_block=nullptr) {
+      emp_assert(pos >= 0 && pos < (int) regex.size(), pos, regex.size());
+
+      // If caller does not provide current block, create one (and return it.)
+      if (cur_block==nullptr) cur_block = new re_block;
+
+      const char c = regex(pos);
+      switch (c) {
+        case '|':
+        case '*':
+        case '+':
+        case '?':
+        case ')':
+
+        default:
+      }
+
+      return cur_block;
+    }
+
+  public:
+    RegEx() = delete;
+    RegEx(const std::string & r) : regex(r), pos(0) { ; }
+    RegEx(const RegEx & r) : regex(r.regex), pos(0) { ; }
+    ~RegEx() { ; }
+
+    const std::string & AsString() const { return regex; }
   };
 
 }
