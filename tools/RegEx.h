@@ -40,12 +40,17 @@ namespace emp {
     };
     struct re_block : public base_re {   // Series of re's
       emp::vector<base_re *> nodes;
+      void push(base_re * x) { nodes.push_back(x); }
+      base_re * pop() { auto * out = nodes.back(); nodes.pop(); return out; }
     };
     struct re_string : public base_re {  // Series of specific chars
       std::string str;
+      re_string() { ; }
+      re_string(const std::string s) : str(s) { ; }
     }
     struct re_charset : public base_re { // Any char from set.
       opts_t char_set;
+      re_charset() { ; }
       re_charset(char x, bool neg=false) { char_set[x]=true; if (neg) char_Set.NOT_SELF(); }
       re_charset(const std::string & s, bool neg=false)
         { for (char x : s) char_set[x]=true; if (neg) char_Set.NOT_SELF(); }
@@ -91,8 +96,31 @@ namespace emp {
           return out;
         case '[':
           c = regex[pos++];
+          bool neg = false;
+          if (c == '^') { neg = true; c = regex[pos++]; }
+          auto * out = new re_charset;
+          while (c != ']' && pos < (int) regex.size()) {
+            // @CAO need to add range ('-') functionality.
+            // @CAO Error if we run out of chars before ']'
+            out->char_set[c] = true;
+            c = regex[pos++];
+          }
+          if (neg) out->char_set.NOT_SELF();
+          pos++;
+          return out;
         case '"':
+          c = regex[pos++];
+          auto * out = new re_string;
+          while (c != '"' && pos < (int) regex.size()) {
+            // @CAO Add escape ('\') functionality.
+            // @CAO Error if we run out of chars before close '"'
+            out->str.push_back(c);
+            c = regex[pos++];
+          }
+          pos++;
+          return out;
         case '\\':
+          // @CAO Add escape ('\') functionality.
 
         // Error cases
         case '|':
@@ -100,6 +128,7 @@ namespace emp {
         case '+':
         case '?':
         case ')':
+          // @CAO These should all be error cases...
 
         default:
       }
@@ -112,15 +141,19 @@ namespace emp {
       // If caller does not provide current block, create one (and return it.)
       if (cur_block==nullptr) cur_block = new re_block;
 
-      const char c = regex(pos);
+      // All blocks need to start with a single token.
+      cur_block->nodes.push_back( ConstructSingle() );
+
+      const char c = regex(pos);   // Don't increment pos in case we don't use c here.
       switch (c) {
-        case '|':
+        case '|': cur_block->push( new re_or{ cur_block->pop(), ConstructSingle() } ); break;
         case '*':
         case '+':
         case '?':
-        case ')':
+        case ')': return cur_block;  // Must be ending segment.
 
-        default:
+        default:     // Must be a regular "segment"
+          cur_block->nodes.push_back( ConstructSingle() );
       }
 
       return cur_block;
