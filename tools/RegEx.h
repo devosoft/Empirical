@@ -28,9 +28,9 @@
 
 namespace emp {
 
-  template <int NUM_SYMBOLS=128>
   class RegEx {
   private:
+    constexpr static int NUM_SYMBOLS = 128;
     using opts_t = BitSet<NUM_SYMBOLS>;
     const std::string regex;
     bool valid;                          // Set to false if cannot be processed.
@@ -42,10 +42,11 @@ namespace emp {
     struct re_block : public re_base {   // Series of re's
       emp::vector<re_base *> nodes;
       void push(re_base * x) { nodes.push_back(x); }
-      re_base * pop() { auto * out = nodes.back(); nodes.pop(); return out; }
+      re_base * pop() { auto * out = nodes.back(); nodes.pop_back(); return out; }
     };
     struct re_char : public re_base {  // Series of specific chars
       char c;
+      re_char(char _c) : c(_c) { ; }
     };
     struct re_string : public re_base {  // Series of specific chars
       std::string str;
@@ -59,15 +60,19 @@ namespace emp {
     };
     struct re_or : public re_base {      // lhs -or- rhs
       re_base * lhs; re_base * rhs;
+      re_or(re_base * l, re_base * r) : lhs(l), rhs(r) { ; }
     };
     struct re_star : public re_base {    // zero-or-more
       re_base * child;
+      re_star(re_base * c) : child(c) { ; }
     };
     struct re_plus : public re_base {    // one-or-more
       re_base * child;
+      re_plus(re_base * c) : child(c) { ; }
     };
     struct re_qm : public re_base {      // zero-or-one
       re_base * child;
+      re_qm(re_base * c) : child(c) { ; }
     };
 
     re_block head;
@@ -164,7 +169,7 @@ namespace emp {
       // All blocks need to start with a single token.
       cur_block->nodes.push_back( ConstructSegment() );
 
-      const char c = regex(pos);   // Don't increment pos in case we don't use c here.
+      const char c = regex[pos];   // Don't increment pos in case we don't use c here.
       switch (c) {
         case '|': cur_block->push( new re_or{ cur_block->pop(), ConstructSegment() } ); ++pos; break;
         case '*': cur_block->push( new re_star{ cur_block->pop() } ); ++pos; break;
