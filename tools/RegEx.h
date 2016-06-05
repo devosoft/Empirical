@@ -120,10 +120,38 @@ namespace emp {
       bool neg = false;
       if (c == '^') { neg = true; c = regex[pos++]; }
       auto * out = new re_charset;
+      char prev_c = -1;
       while (c != ']' && pos < (int) regex.size()) {
         // @CAO need to add range ('-') functionality.
-        // @CAO need to allow for escaped values: '\n' '\t' '\r' ''\\' '\]' (plus '\^' and '\[' to be safe)
+        if (c == '-' && prev_c != -1) {
+          c = regex[pos++];
+          if (c < prev_c) { Error("Invalid character range ", prev_c, '-', c); continue; }
+          for (char x = prev_c; x <= c; x++) {
+            out->char_set[x] = true;
+          }
+          prev_c = -1;
+          c = regex[pos++];
+          continue;
+        }
+        else if (c == '\\') {
+          c = regex[pos++];  // Identify the specific escape char.
+          switch(c) {
+            case 'n': c = '\n'; break;
+            case 'r': c = '\r'; break;
+            case 't': c = '\t'; break;
+            // Any of these characters should just be themselves!
+            case '-':
+            case '\\':
+            case ']':
+            case '[':
+            case '^':
+              break;
+            default:
+              Error("Unknown escape char for char sets: '\\", c, "'.");
+          }
+        }
         out->char_set[c] = true;
+        prev_c = c;
         c = regex[pos++];
       }
       if (neg) out->char_set.NOT_SELF();
@@ -135,8 +163,21 @@ namespace emp {
       char c = regex[pos++];
       auto * out = new re_string;
       while (c != '\"' && pos < (int) regex.size()) {
-        // @CAO Add escape ('\') functionality.
         // @CAO Error if we run out of chars before close '"'
+        if (c == '\\') {
+          c = regex[pos++];  // Identify the specific escape char.
+          switch(c) {
+            case 'n': c = '\n'; break;
+            case 'r': c = '\r'; break;
+            case 't': c = '\t'; break;
+            // Any of these characters should just be themselves!
+            case '\"':
+            case '\\':
+              break;
+            default:
+              Error("Unknown escape char for literal string: '\\", c, "'.");
+          }
+        }
         out->str.push_back(c);
         c = regex[pos++];
       }
@@ -165,7 +206,29 @@ namespace emp {
           EnsureNext('"');            // Make sure last char is a quote and advance.
           break;
         case '\\':
-          // @CAO Add escape ('\') functionality.
+          c = regex[pos++];  // Identify the specific escape char.
+          switch(c) {
+            case 'n': c = '\n'; break;
+            case 'r': c = '\r'; break;
+            case 't': c = '\t'; break;
+            // Any of these characters should just be themselves!
+            case '\\':
+            case '\"':
+            case '*':
+            case '+':
+            case '?':
+            case '.':
+            case '|':
+            case '(':
+            case ')':
+            case '[':
+            case ']':
+              break;
+            default:
+              Error("Unknown escape char for regex: '\\", c, "'.");
+          }
+          break;
+          result = new re_char(c);
 
         // Error cases
         case '|':
