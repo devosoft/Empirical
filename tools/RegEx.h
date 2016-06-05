@@ -46,25 +46,33 @@ namespace emp {
     }
 
     struct re_base {                     // Also used for empty regex
+      virtual ~re_base() { ; }
       virtual void Print(std::ostream & os) { os << "[]"; }
+      virtual bool IsBlock() const { return false; }
     };
-    class re_parent : public re_base {
+    struct re_parent : public re_base {
     protected:
       emp::vector<re_base *> nodes;
     public:
-      void push(re_base * x) { emp_assert(x != nullptr); nodes.push_back(x); }
+      ~re_parent() { for (auto x : nodes) delete x; }
+      virtual void push(re_base * x) { emp_assert(x != nullptr); nodes.push_back(x); }
       re_base * pop() { auto * out = nodes.back(); nodes.pop_back(); return out; }
     };
     struct re_block : public re_parent {   // Series of re's
       void Print(std::ostream & os) { os << "BLOCK["; for (auto x : nodes) x->Print(os); os << "]"; }
-    };
-    struct re_char : public re_base {  // Series of specific chars
-      char c;
-      re_char(char _c) : c(_c) { ; }
-      void Print(std::ostream & os) { os << "CHAR[" << to_escaped_string(c) << "]"; }
+      void push(re_base * x) {
+        emp_assert(x != nullptr);
+        if (nodes.size() && nodes.back()->IsBlock()) {
+
+        }
+        else nodes.push_back(x);
+      }
     };
     struct re_string : public re_base {  // Series of specific chars
       std::string str;
+      re_string() { ; }
+      re_string(char c) { str.push_back(c); }
+      re_string(const std::string & s) : str(s) { ; }
       void Print(std::ostream & os) { os << "STR[" << to_escaped_string(str) << "]"; }
     };
     struct re_charset : public re_base { // Any char from set.
@@ -227,8 +235,8 @@ namespace emp {
             default:
               Error("Unknown escape char for regex: '\\", c, "'.");
           }
+          result = new re_string(c);
           break;
-          result = new re_char(c);
 
         // Error cases
         case '|':
@@ -237,13 +245,15 @@ namespace emp {
         case '?':
         case ')':
           Error("Expected regex segment but got '", c, "' at position ", pos, ".");
+          result = new re_string(c);
           break;
 
         default:
           // Take this char directly.
-          result = new re_char(c);
+          result = new re_string(c);
       }
 
+      emp_assert(result != nullptr);
       return result;
     }
 
