@@ -48,20 +48,24 @@ namespace emp {
     struct re_base {                     // Also used for empty regex
       virtual void Print(std::ostream & os) { os << "[]"; }
     };
-    struct re_block : public re_base {   // Series of re's
+    class re_parent : public re_base {
+    protected:
       emp::vector<re_base *> nodes;
-      void push(re_base * x) { nodes.push_back(x); }
+    public:
+      void push(re_base * x) { emp_assert(x != nullptr); nodes.push_back(x); }
       re_base * pop() { auto * out = nodes.back(); nodes.pop_back(); return out; }
+    };
+    struct re_block : public re_parent {   // Series of re's
       void Print(std::ostream & os) { os << "BLOCK["; for (auto x : nodes) x->Print(os); os << "]"; }
     };
     struct re_char : public re_base {  // Series of specific chars
       char c;
       re_char(char _c) : c(_c) { ; }
-      void Print(std::ostream & os) { os << "CHAR[" << c << "]"; }
+      void Print(std::ostream & os) { os << "CHAR[" << to_escaped_string(c) << "]"; }
     };
     struct re_string : public re_base {  // Series of specific chars
       std::string str;
-      void Print(std::ostream & os) { os << "STR[" << str << "]"; }
+      void Print(std::ostream & os) { os << "STR[" << to_escaped_string(str) << "]"; }
     };
     struct re_charset : public re_base { // Any char from set.
       opts_t char_set;
@@ -75,34 +79,30 @@ namespace emp {
         if (chars.size() > 64) { chars = (~char_set).GetOnes(); use_not = true; }
         os << "SET[";
         if (use_not) os << "NOT ";
-        for (int c : chars) os << (char) c;
+        for (int c : chars) os << to_escaped_string((char) c);
         os << "]";
       }
     };
-    struct re_or : public re_base {      // lhs -or- rhs
-      re_base * lhs; re_base * rhs;
-      re_or(re_base * l, re_base * r) : lhs(l), rhs(r) { ; }
+    struct re_or : public re_parent {      // lhs -or- rhs
+      re_or(re_base * l, re_base * r) { push(l); push(r); }
       void Print(std::ostream & os) {
         os << "|[";
-        lhs->Print(os);
-        rhs->Print(os);
+        nodes[0]->Print(os);
+        nodes[1]->Print(os);
         os << "]";
       }
     };
-    struct re_star : public re_base {    // zero-or-more
-      re_base * child;
-      re_star(re_base * c) : child(c) { ; }
-      void Print(std::ostream & os) { os << "*["; child->Print(os); os << "]"; }
+    struct re_star : public re_parent {    // zero-or-more
+      re_star(re_base * c) { push(c); }
+      void Print(std::ostream & os) { os << "*["; nodes[0]->Print(os); os << "]"; }
     };
-    struct re_plus : public re_base {    // one-or-more
-      re_base * child;
-      re_plus(re_base * c) : child(c) { ; }
-      void Print(std::ostream & os) { os << "+["; child->Print(os); os << "]"; }
+    struct re_plus : public re_parent {    // one-or-more
+      re_plus(re_base * c) { push(c); }
+      void Print(std::ostream & os) { os << "+["; nodes[0]->Print(os); os << "]"; }
     };
-    struct re_qm : public re_base {      // zero-or-one
-      re_base * child;
-      re_qm(re_base * c) : child(c) { ; }
-      void Print(std::ostream & os) { os << "?["; child->Print(os); os << "]"; }
+    struct re_qm : public re_parent {      // zero-or-one
+      re_qm(re_base * c) { push(c); }
+      void Print(std::ostream & os) { os << "?["; nodes[0]->Print(os); os << "]"; }
     };
 
     re_block head;
@@ -255,7 +255,7 @@ namespace emp {
       if (cur_block==nullptr) cur_block = new re_block;
 
       // All blocks need to start with a single token.
-      cur_block->nodes.push_back( ConstructSegment() );
+      cur_block->push( ConstructSegment() );
 
       while (pos < (int) regex.size()) {
         const char c = regex[pos++];
@@ -268,7 +268,7 @@ namespace emp {
 
           default:     // Must be a regular "segment"
             pos--;     // Restore to previous char to construct the next seqment.
-            cur_block->nodes.push_back( ConstructSegment() );
+            cur_block->push( ConstructSegment() );
         }
       }
 
