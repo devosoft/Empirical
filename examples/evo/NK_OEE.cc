@@ -34,7 +34,7 @@ constexpr int UD_COUNT = config.MAX_GENS();
 constexpr int TOURNAMENT_SIZE = config.TOURNAMENT_SIZE();
 
 using BitOrg = emp::BitSet<N>;
-FitnessVisualization<BitOrg > viz;
+GraphVisualization<BitOrg > viz;
 
 
 extern "C" int main()
@@ -48,8 +48,6 @@ extern "C" int main()
   }
 
   viz.info.world->SetDefaultMutateFun( [](BitOrg* org, emp::Random& random) {
-      (*org)[random.GetInt(N)] = random.P(0.5);
-      (*org)[random.GetInt(N)] = random.P(0.5);
       (*org)[random.GetInt(N)] = random.P(0.5);
       return true;
     } );

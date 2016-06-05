@@ -1,5 +1,5 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
+// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
+// Copyright (C) Michigan State University, 2015. It is licensed
 // under the MIT Software license; see doc/LICENSE
 
 #ifndef EMP_JSWRAP_H
@@ -34,8 +34,8 @@
 //  * Add a JSWrap that takes an object and method and does the bind automatically.
 //
 //  Recent changes:
-//  * Made JSWrap compatible with Javascript objects with multiple properties. 
-//    In order do so, you must define the properties of the object as a tuple 
+//  * Made JSWrap compatible with Javascript objects with multiple properties.
+//    In order do so, you must define the properties of the object as a tuple
 //    struct in js_object_struct.h. - @ELD
 //
 
@@ -49,6 +49,7 @@
 #include "../tools/vector.h"
 #include "../tools/tuple_struct.h"
 #include "js_object_struct.h"
+#include "js_utils.h"
 
 #ifdef EMSCRIPTEN
 extern "C" {
@@ -61,29 +62,29 @@ int EMP_GetCBArgCount() { return -1; }
 
 
 namespace emp {
-  
+
   // ----- LoadArg -----
   // Helper functions to individually LOAD ARGUMENTS from JS based on expected type.
   template <int ARG_ID> static void LoadArg(int & arg_var) {
     arg_var = EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
   }
-  
+
   template <int ARG_ID> static void LoadArg(bool & arg_var) {
     arg_var = EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
   }
-  
+
   template <int ARG_ID> static void LoadArg(char & arg_var) {
     arg_var = EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
   }
-  
+
   template <int ARG_ID> static void LoadArg(double & arg_var) {
     arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
   }
-  
+
   template <int ARG_ID> static void LoadArg(float & arg_var) {
     arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
   }
-  
+
   template <int ARG_ID> static void LoadArg(std::string & arg_var) {
     char * tmp_var = (char *) EM_ASM_INT({
         return allocate(intArrayFromString(emp_i.cb_args[$0]), 'i8', ALLOC_STACK);
@@ -91,32 +92,37 @@ namespace emp {
     arg_var = tmp_var;   // @CAO Do we need to free the memory in tmp_var?
   }
 
+  template <int ARG_ID, size_t SIZE, typename T> static void LoadArg(std::array<T, SIZE> & arg_var){
+    EM_ASM_ARGS({emp_i.__outgoing_array = emp_i.cb_args[$0];}, ARG_ID);
+    pass_array_to_cpp(arg_var);
+}
+
   //Helper functions to load arguments from inside Javascript objects by name.
   template <int ARG_ID> static void LoadArg(int & arg_var, std::string var) {
-    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0][Pointer_stringify($1)]; 
+    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0][Pointer_stringify($1)];
       }, ARG_ID, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(bool & arg_var, std::string var) {
-    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0][Pointer_stringify($1)]; 
+    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0][Pointer_stringify($1)];
       }, ARG_ID, var.c_str());
   }
-  
+
   template <int ARG_ID> static void LoadArg(char & arg_var, std::string var) {
-    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0][Pointer_stringify($1)]; 
+    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0][Pointer_stringify($1)];
       }, ARG_ID, var.c_str());
   }
-  
+
   template <int ARG_ID> static void LoadArg(double & arg_var, std::string var) {
-    arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0][Pointer_stringify($1)]; 
+    arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0][Pointer_stringify($1)];
       }, ARG_ID, var.c_str());
   }
-  
+
   template <int ARG_ID> static void LoadArg(float & arg_var, std::string var) {
-    arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0][Pointer_stringify($1)]; 
+    arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0][Pointer_stringify($1)];
       }, ARG_ID, var.c_str());
   }
-  
+
   template <int ARG_ID> static void LoadArg(std::string & arg_var, std::string var) {
     char * tmp_var = (char *) EM_ASM_INT({
         return allocate(intArrayFromString(
@@ -163,9 +169,9 @@ namespace emp {
   //This requires that the user define DATA_OBJECT_SIZE with the struct,
   //which is kind of ugly. Is there a way around it with templating?
   #define LOAD_ARGS_FROM_TUPLE(s) EMP_MERGE(LOAD_TUPLE_ARG_,  s)
-  
+
   //Load a Javascript-style object of the form described in js_object_struct.h
-  //into a JSDataObject struct. 
+  //into a JSDataObject struct.
   template <int ARG_ID> static void LoadArg(JSDataObject & arg_var) {
     LOAD_ARGS_FROM_TUPLE(DATA_OBJECT_SIZE)
   }
@@ -198,7 +204,7 @@ namespace emp {
   }
 
 
-  
+
   // The following code is in the "internal" namespace since it's used only to implement the
   // details of the JSWrap function.
 
@@ -225,10 +231,10 @@ namespace emp {
     public:
       JSWrap_Callback_Base(bool in_disposable=false) : is_disposable(in_disposable) { ; }
       virtual ~JSWrap_Callback_Base() { ; }
-      
+
       bool IsDisposable() const { return is_disposable; }
       void SetDisposable() { is_disposable = true; }
-      
+
       // Base class to be called from Javascript (after storing args) to do a callback.
       virtual void DoCallback() = 0;
 
@@ -241,7 +247,7 @@ namespace emp {
           Collect_impl<TUPLE_TYPE, ARGS_LEFT-1>::CollectArgs(tuple);        // Recurse to next arg
         }
       };
-      
+
       template <typename TUPLE_TYPE>
       struct Collect_impl<TUPLE_TYPE, 0> {
         static void CollectArgs(TUPLE_TYPE & tuple) { (void) tuple; } // End load recursion.
@@ -266,17 +272,17 @@ namespace emp {
         EMP_TRACK_CONSTRUCT(JSWrap_Callback);
       }
       ~JSWrap_Callback() { EMP_TRACK_DESTRUCT(JSWrap_Callback); }
-      
+
       // This function is called from Javascript.  Arguments should be collected and then used
       // to call the target function.
       void DoCallback() {
-        const int num_args = sizeof...(ARG_TYPES);  
+        const int num_args = sizeof...(ARG_TYPES);
 
         // Make sure that we are returning the correct number of arguments.  If this
         // assert fails, it means that we've failed to set the correct number of arguments
         // in emp.cb_args, and need to realign.
         emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() == num_args);
-        
+
         // Collect the values of the arguments in a tuple
         using args_t = std::tuple< typename std::decay<ARG_TYPES>::type... >;
         args_t args;
@@ -307,22 +313,22 @@ namespace emp {
       { EMP_TRACK_CONSTRUCT(JSWrap_Callback_VOID); }
       ~JSWrap_Callback() { EMP_TRACK_DESTRUCT(JSWrap_Callback_VOID); }
 
-      
+
       // This function is called from Javascript.  Arguments should be collected and then used
       // to call the target function.
       void DoCallback() {
-        const int num_args = sizeof...(ARG_TYPES);  
+        const int num_args = sizeof...(ARG_TYPES);
 
         // Make sure that we are returning the correct number of arguments.  If this
         // assert fails, it means that we've failed to set the correct number of arguments
         // in emp.cb_args, and need to realign.
         emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() == num_args);
-        
-        // Collect the values of the arguments in a tuple 
+
+        // Collect the values of the arguments in a tuple
         using args_t = std::tuple< typename std::decay<ARG_TYPES>::type... >;
         args_t args;
         Collect_impl<args_t, num_args>::CollectArgs(args);
-        
+
         // And finally, do the actual callback.
         emp::ApplyTuple(fun, args);
 
@@ -331,7 +337,7 @@ namespace emp {
       }
     };
 
-    
+
     // The following function returns a static callback array; callback ID's all index into
     // this array.
     static emp::vector<JSWrap_Callback_Base *> & CallbackArray() {
@@ -340,13 +346,13 @@ namespace emp {
     }
 
   } // End internal namespace
-  
+
   // The following JSWrap functions take a target function and return an integer id that
   // indexes into a callback array.
 
   // The first version assumes that we already have it enclosed in an std::function, while
   // the second version assumes we have a raw function pointer and wraps it for us.
-  
+
   template <typename RET_TYPE, typename... ARG_TYPES>
   uint32_t JSWrap(const std::function<RET_TYPE(ARG_TYPES...)> & in_fun,
                   const std::string & fun_name="",
@@ -354,13 +360,13 @@ namespace emp {
   {
     // We should never create disposible functions with names!
     emp_assert(fun_name == "" || dispose_on_use == false);
-    
+
     auto * new_cb =
       new emp::internal::JSWrap_Callback<RET_TYPE, ARG_TYPES...>(in_fun, dispose_on_use);
     auto & callback_array = internal::CallbackArray();
     uint32_t out_id = (int) callback_array.size();
     callback_array.push_back(new_cb);
-    
+
     if (fun_name != "") {
       EM_ASM_ARGS({
           var fun_name = Pointer_stringify($1);
@@ -369,7 +375,7 @@ namespace emp {
             for (var i = 0; i < arguments.length; i++) {
               emp_i.cb_args[i] = arguments[i];
             }
-            
+
             // Callback to the original function.
             empCppCallback($0);
 
@@ -378,7 +384,7 @@ namespace emp {
           };
         }, out_id, fun_name.c_str());
     }
-    
+
     return out_id;
   }
 
@@ -433,10 +439,10 @@ extern "C" void empCppCallback(uint32_t cb_id)
   // Convert the uint passed in from 32 bits to 64 and THEN convert it to a pointer.
   auto * cb_obj = emp::internal::CallbackArray()[cb_id];
 
-  // Run DoCallback() on the generic base class type, which is virtual and will call 
+  // Run DoCallback() on the generic base class type, which is virtual and will call
   // the correct template automatically.
   cb_obj->DoCallback();
-  
+
   // If we have indicated that this callback is single use, delete it now.
   if (cb_obj->IsDisposable()) {
     delete cb_obj;
