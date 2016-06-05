@@ -45,43 +45,39 @@ namespace emp {
       valid = false;
     }
 
+    // Pre-declarations
+    struct re_block;
+    struct re_charset;
+    struct re_string;
+
+    // Internal representation of regex
     struct re_base {                     // Also used for empty regex
       virtual ~re_base() { ; }
-      virtual void Print(std::ostream & os) { os << "[]"; }
-      virtual bool IsBlock() const { return false; }
+      virtual void Print(std::ostream & os) const { os << "[]"; }
+      virtual re_block * AsBlock() { return nullptr; }
+      virtual re_charset * AsCharSet() { return nullptr; }
+      virtual re_string * AsString() { return nullptr; }
+      virtual int GetSize() const { return 0; }
+      virtual bool Simplify() { return false; }
     };
-    struct re_parent : public re_base {
-    protected:
-      emp::vector<re_base *> nodes;
-    public:
-      ~re_parent() { for (auto x : nodes) delete x; }
-      virtual void push(re_base * x) { emp_assert(x != nullptr); nodes.push_back(x); }
-      re_base * pop() { auto * out = nodes.back(); nodes.pop_back(); return out; }
-    };
-    struct re_block : public re_parent {   // Series of re's
-      void Print(std::ostream & os) { os << "BLOCK["; for (auto x : nodes) x->Print(os); os << "]"; }
-      void push(re_base * x) {
-        emp_assert(x != nullptr);
-        if (nodes.size() && nodes.back()->IsBlock()) {
 
-        }
-        else nodes.push_back(x);
-      }
-    };
     struct re_string : public re_base {  // Series of specific chars
       std::string str;
       re_string() { ; }
       re_string(char c) { str.push_back(c); }
       re_string(const std::string & s) : str(s) { ; }
-      void Print(std::ostream & os) { os << "STR[" << to_escaped_string(str) << "]"; }
+      void Print(std::ostream & os) const override { os << "STR[" << to_escaped_string(str) << "]"; }
+      re_string * AsString() override { return this; }
+      int GetSize() const override { return (int) str.size(); }
     };
+
     struct re_charset : public re_base { // Any char from set.
       opts_t char_set;
       re_charset() { ; }
       re_charset(char x, bool neg=false) { char_set[x]=true; if (neg) char_set.NOT_SELF(); }
       re_charset(const std::string & s, bool neg=false)
         { for (char x : s) char_set[x]=true; if (neg) char_set.NOT_SELF(); }
-      void Print(std::ostream & os) {
+      void Print(std::ostream & os) const override {
         auto chars = char_set.GetOnes();
         bool use_not = false;
         if (chars.size() > 64) { chars = (~char_set).GetOnes(); use_not = true; }
@@ -90,27 +86,65 @@ namespace emp {
         for (int c : chars) os << to_escaped_string((char) c);
         os << "]";
       }
+      re_charset * AsCharSet() override { return this; }
+      int GetSize() const override { return char_set.CountOnes(); }
+      char First() const { return (char) char_set.FindBit(); }
     };
+
+    struct re_parent : public re_base {
+    protected:
+      emp::vector<re_base *> nodes;
+    public:
+      ~re_parent() { for (auto x : nodes) delete x; }
+      virtual void push(re_base * x) { emp_assert(x != nullptr); nodes.push_back(x); }
+      re_base * pop() { auto * out = nodes.back(); nodes.pop_back(); return out; }
+      int GetSize() const { return (int) nodes.size(); }
+    };
+
+    struct re_block : public re_parent {   // Series of re's
+      void Print(std::ostream & os) const override {
+        os << "BLOCK["; for (auto x : nodes) x->Print(os); os << "]";
+      }
+      re_block * AsBlock() override { return this; }
+      bool Simplify() override {
+        bool modify = false;
+        // Loop through block elements, simplifying when possible.
+        for (size_t i = 0; i < nodes.size(); i++) {
+          // If node is a charset with one option, replace it with a string.
+          if (nodes[i]->AsCharSet() && nodes[i]->GetSize() == 1) {
+            auto new_node = new re_string(nodes[i]->AsCharSet()->First());
+            delete nodes[i];
+            nodes[i] = new_node;
+            modify = true;
+          }
+        }
+        return modify;
+      }
+    };
+
     struct re_or : public re_parent {      // lhs -or- rhs
       re_or(re_base * l, re_base * r) { push(l); push(r); }
-      void Print(std::ostream & os) {
+      void Print(std::ostream & os) const override {
         os << "|[";
         nodes[0]->Print(os);
         nodes[1]->Print(os);
         os << "]";
       }
     };
+
     struct re_star : public re_parent {    // zero-or-more
       re_star(re_base * c) { push(c); }
-      void Print(std::ostream & os) { os << "*["; nodes[0]->Print(os); os << "]"; }
+      void Print(std::ostream & os) const override { os << "*["; nodes[0]->Print(os); os << "]"; }
     };
+
     struct re_plus : public re_parent {    // one-or-more
       re_plus(re_base * c) { push(c); }
-      void Print(std::ostream & os) { os << "+["; nodes[0]->Print(os); os << "]"; }
+      void Print(std::ostream & os) const override { os << "+["; nodes[0]->Print(os); os << "]"; }
     };
+
     struct re_qm : public re_parent {      // zero-or-one
       re_qm(re_base * c) { push(c); }
-      void Print(std::ostream & os) { os << "?["; nodes[0]->Print(os); os << "]"; }
+      void Print(std::ostream & os) const override { os << "?["; nodes[0]->Print(os); os << "]"; }
     };
 
     re_block head;
