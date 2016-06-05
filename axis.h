@@ -90,7 +90,13 @@ namespace D3 {
 	}, this->id, count);
     }
 
-    //TODO: Format, ticks
+    void SetTickFormat(std::string format) {
+        EM_ASM_ARGS({
+            js.objects[$0].tickFormat(d3.format(Pointer_stringify([$1])));
+        }, this->id, format.c_str());
+    }
+
+    //TODO:  ticks
 
   };
 

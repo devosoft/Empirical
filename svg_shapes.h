@@ -2,11 +2,11 @@
 #define __SVG_SHAPES_H__
 
 #include "../Empirical/emtools/js_utils.h"
-
+#include "selection.h"
+#include "scales.h"
+#include "load_data.h"
 
 namespace D3 {
-  class Scale;
-  class Dataset;
 
   class SvgShapeGenerator {
   protected:
@@ -18,13 +18,13 @@ namespace D3 {
     template <typename T, size_t SIZE>
     std::string Generate(std::array<std::array<T, 2>, SIZE> data){
       emp::pass_array_to_javascript(data);
-    
+
       int buffer = EM_ASM_INT({
-	  var result = js.objects[$0](emp.__incoming_array);
+	  var result = js.objects[$0](emp_i.__incoming_array);
 	  var buffer = Module._malloc(result.length+1);
 	  Module.writeStringToMemory(result, buffer);
 	  return buffer;
-	}, this->id);
+  }, this->id);
 
       return (char *)buffer;
     }
@@ -39,7 +39,7 @@ namespace D3 {
 
     //This function actually handles the binding of the path string to the dom
     //without passing the data through C++
-    Selection DrawShape(Dataset data){//, Selection appendto=Select("svg"), 
+    Selection DrawShape(Dataset data){//, Selection appendto=Select("svg"),
       //std::string type = "path") {
       Selection path = Select("svg").Append("path");
       //Selection path = appendto.SelectAll("path");//type.c_str());
@@ -75,11 +75,11 @@ namespace D3 {
   };
 
   SvgShapeGenerator::SvgShapeGenerator() {}
-  
+
   class SymbolGenerator : public SvgShapeGenerator {
   public:
     SymbolGenerator();
-    
+
     void SetType(std::string type){
       //TODO: Should we check that type is in d3.svg.symbolTypes?
       CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(type, type.c_str())
@@ -91,7 +91,7 @@ namespace D3 {
 	  js.objects[$0].size($1);
 	}, this->id, size);
     }
-    
+
     //Otherwise it's a function
     void SetSize(std::string size){
       CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(size, size.c_str())
@@ -110,7 +110,7 @@ namespace D3 {
   class LineGenerator : public SvgShapeGenerator {
   public:
     LineGenerator();
-    
+
     void SetInterpolate(std::string interpolate){
       CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(interpolate,interpolate.c_str())
     }
@@ -148,7 +148,7 @@ namespace D3 {
 	js.objects.push(new_line);
       });
     }
-    
+
     void SetXScale(X_SCALE_TYPE scale){
       this->xscale = scale;
       EM_ASM_ARGS({
@@ -202,7 +202,7 @@ namespace D3 {
     }
 
   };
-  
+
   template <typename X_SCALE_TYPE, typename Y_SCALE_TYPE>
   class AreaGenerator : public CartesianLineGenerator<X_SCALE_TYPE, Y_SCALE_TYPE> {
   public:
@@ -256,7 +256,7 @@ namespace D3 {
     //Handles setting y1 accessor to a function or string
     void SetY1(std::string y) {
       CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(y1, y.c_str())
-    }    
+    }
   };
 
   class RadialLineGenerator : public LineGenerator {
@@ -332,7 +332,7 @@ namespace D3 {
 	js.objects.push(new_line);
       });
   }
- 
+
   class ChordGenerator : public RadialAreaGenerator {
   public:
     ChordGenerator();
@@ -399,7 +399,7 @@ namespace D3 {
   class ArcGenerator : public RadialAreaGenerator {
   public:
     ArcGenerator();
-    
+
     void SetCornerRadius(float radius) {
       EM_ASM_ARGS({js.objects[$0].cornerRadius($1);}, this->id, radius);
     }
