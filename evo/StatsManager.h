@@ -318,11 +318,14 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
           };
           fit_stat_type max_det = [](fit_fun_type fit_func, POP_MANAGER * pop){
               MLandscape data = MutLandscape(fit_func, *pop);
+              std::cout<<"HERE"<<std::endl;
               return data.max_det;
           };
           std::function<double(POP_MANAGER*)> last_coal = [this](POP_MANAGER * pop){
               auto a_id = lin_ptr->last_coalesence;
+              //std::cout<<"COAL: "<<a_id<<std::endl;
               auto depth = lin_ptr->TraceLineage(a_id);
+              std::cout<<"DEPTH: "<<depth.size()<<std::endl;
               return (double)depth.size();
           };
 
