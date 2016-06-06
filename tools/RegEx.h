@@ -130,6 +130,11 @@ namespace emp {
 
           // If blocks are immediately nested, merge them into a single block.
           if (nodes[i]->AsBlock()) {
+            auto * old_node = nodes[i]->AsBlock();
+            nodes.erase(nodes.begin() + i);
+            nodes.insert(nodes.begin() + i, old_node->nodes.begin(), old_node->nodes.end());
+            old_node->nodes.resize(0);  // Don't recurse delete since nodes were moved!
+            delete old_node;
             // @CAO do this.
             i--;
             modify = true;
@@ -354,6 +359,15 @@ namespace emp {
       for (const std::string & n : notes) {
         std::cout << n << std::endl;
       }
+    }
+    void PrintDebug() {
+      if (notes.size()) {
+        std::cout << "NOTES:" << std::endl;
+        PrintNotes();
+      }
+      std::cout << "RegEx: " << to_escaped_string(regex) << std::endl;
+      std::cout << "INTERNAL: ";
+      PrintInternal();
     }
   };
 
