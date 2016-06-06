@@ -98,7 +98,8 @@ namespace emp {
       ~re_parent() { for (auto x : nodes) delete x; }
       virtual void push(re_base * x) { emp_assert(x != nullptr); nodes.push_back(x); }
       re_base * pop() { auto * out = nodes.back(); nodes.pop_back(); return out; }
-      int GetSize() const { return (int) nodes.size(); }
+      int GetSize() const override { return (int) nodes.size(); }
+      bool Simplify() override { bool m=false; for (auto x : nodes) m |= x->Simplify(); return m; }
     };
 
     struct re_block : public re_parent {   // Series of re's
@@ -117,6 +118,26 @@ namespace emp {
             nodes[i] = new_node;
             modify = true;
           }
+          // If two neighboring nodes are strings, merge them.
+          if (i > 0 && nodes[i]->AsString() && nodes[i-1]->AsString()) {
+            nodes[i-1]->AsString()->str += nodes[i]->AsString()->str;
+            delete nodes[i];
+            nodes.erase(nodes.begin()+i);
+            i--;
+            modify = true;
+            continue;
+          }
+
+          // If blocks are immediately nested, merge them into a single block.
+          if (nodes[i]->AsBlock()) {
+            // @CAO do this.
+            i--;
+            modify = true;
+            continue;
+          }
+
+          // Otherwise call recursively!
+          modify |= nodes[i]->Simplify();
         }
         return modify;
       }
@@ -321,8 +342,8 @@ namespace emp {
 
   public:
     RegEx() = delete;
-    RegEx(const std::string & r) : regex(r), pos(0) { Process(&head); }
-    RegEx(const RegEx & r) : regex(r.regex), pos(0) { ; }
+    RegEx(const std::string & r) : regex(r), pos(0) { Process(&head); head.Simplify(); }
+    RegEx(const RegEx & r) : regex(r.regex), pos(0) { Process(&head); head.Simplify(); }
     ~RegEx() { ; }
 
     const std::string & AsString() const { return regex; }
