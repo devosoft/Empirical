@@ -20,6 +20,7 @@
 #ifndef EMP_REGEX_H
 #define EMP_REGEX_H
 
+
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -48,6 +49,7 @@ namespace emp {
     // Pre-declarations
     struct re_block;
     struct re_charset;
+    struct re_parent;
     struct re_string;
 
     // Internal representation of regex
@@ -56,6 +58,7 @@ namespace emp {
       virtual void Print(std::ostream & os) const { os << "[]"; }
       virtual re_block * AsBlock() { return nullptr; }
       virtual re_charset * AsCharSet() { return nullptr; }
+      virtual re_parent * AsParent() { return nullptr; }
       virtual re_string * AsString() { return nullptr; }
       virtual int GetSize() const { return 0; }
       virtual bool Simplify() { return false; }
@@ -99,7 +102,23 @@ namespace emp {
       virtual void push(re_base * x) { emp_assert(x != nullptr); nodes.push_back(x); }
       re_base * pop() { auto * out = nodes.back(); nodes.pop_back(); return out; }
       int GetSize() const override { return (int) nodes.size(); }
-      bool Simplify() override { bool m=false; for (auto x : nodes) m |= x->Simplify(); return m; }
+      re_parent * AsParent() override { return this; }
+      bool Simplify() override {
+        bool m=false;
+        for (auto & x : nodes) {
+          // Recursively simplify children.
+          m |= x->Simplify();
+          // A block with one child can be replaced by child.
+          if (x->AsBlock() && x->GetSize() == 1) {
+            auto * child = x->AsParent()->nodes[0];
+            x->AsParent()->nodes.resize(0);
+            delete x;
+            x = child;
+            m = true;
+          }
+        }
+        return m;
+      }
     };
 
     struct re_block : public re_parent {   // Series of re's
@@ -128,7 +147,7 @@ namespace emp {
             continue;
           }
 
-          // If blocks are immediately nested, merge them into a single block.
+          // If blocks are nested, merge them into a single block.
           if (nodes[i]->AsBlock()) {
             auto * old_node = nodes[i]->AsBlock();
             nodes.erase(nodes.begin() + i);
@@ -140,10 +159,11 @@ namespace emp {
             modify = true;
             continue;
           }
-
-          // Otherwise call recursively!
-          modify |= nodes[i]->Simplify();
         }
+
+        // Also run the default Simplify on nodes.
+        modify |= re_parent::Simplify();
+
         return modify;
       }
     };
@@ -190,7 +210,6 @@ namespace emp {
       auto * out = new re_charset;
       char prev_c = -1;
       while (c != ']' && pos < (int) regex.size()) {
-        // @CAO need to add range ('-') functionality.
         if (c == '-' && prev_c != -1) {
           c = regex[pos++];
           if (c < prev_c) { Error("Invalid character range ", prev_c, '-', c); continue; }
@@ -250,6 +269,7 @@ namespace emp {
         c = regex[pos++];
       }
       if (c == '\"') --pos;
+
       return out;
     }
 
@@ -347,8 +367,8 @@ namespace emp {
 
   public:
     RegEx() = delete;
-    RegEx(const std::string & r) : regex(r), pos(0) { Process(&head); head.Simplify(); }
-    RegEx(const RegEx & r) : regex(r.regex), pos(0) { Process(&head); head.Simplify(); }
+    RegEx(const std::string & r) : regex(r), pos(0) { Process(&head); while(head.Simplify()); }
+    RegEx(const RegEx & r) : regex(r.regex), pos(0) { Process(&head); while(head.Simplify()); }
     ~RegEx() { ; }
 
     const std::string & AsString() const { return regex; }
