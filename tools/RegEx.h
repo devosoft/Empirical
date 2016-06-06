@@ -350,7 +350,8 @@ namespace emp {
       while (pos < (int) regex.size()) {
         const char c = regex[pos++];
         switch (c) {
-          case '|': cur_block->push( new re_or( cur_block->pop(), ConstructSegment() ) ); break;
+          // case '|': cur_block->push( new re_or( cur_block->pop(), ConstructSegment() ) ); break;
+          case '|': cur_block->push( new re_or( cur_block->pop(), Process() ) ); break;
           case '*': cur_block->push( new re_star{ cur_block->pop() } ); break;
           case '+': cur_block->push( new re_plus{ cur_block->pop() } ); break;
           case '?': cur_block->push( new re_qm{ cur_block->pop() } ); break;
