@@ -191,10 +191,7 @@ public:
       D3::LineGenerator * make_line;
 
   void Setup(){
-    EM_ASM({
-        format_round = d3.format(".2f");
-        tip = d3.tip().html(function(d, i) { return format_round(d[1]); });
-    });
+
 
     //Set up scales
     y_scale = new D3::LinearScale();
