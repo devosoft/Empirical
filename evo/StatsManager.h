@@ -285,7 +285,7 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
       template<typename WORLD>
       void Setup(WORLD * w){
           pop = &(w->popM);
-          lin_ptr =&(w->lineageM);
+          lin_ptr = &(w->lineageM);
 
           std::function<double(POP_MANAGER*)> diversity = [](POP_MANAGER * pop){
               return ShannonEntropy(*pop);
@@ -322,8 +322,8 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
           };
           fit_stat_type last_coal = [this](WORLD * w, POP_MANAGER * pop){
               auto a_id = lin_ptr->last_coalesence;
-              //auto depth = lin_ptr->TraceLineage(a_id);
-              return;
+              auto depth = lin_ptr->TraceLineage(a_id);
+              return depth.size();
           };
 
 
