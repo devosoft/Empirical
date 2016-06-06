@@ -397,6 +397,33 @@ namespace evo{
       }
     }
 
+    // Return a vector containing the genomes of an organism's ancestors
+    emp::vector<int> TraceLineageIDs(int org_id) {
+      emp::vector<int> lineage;
+      Node* org = &(nodes[org_id]);
+      while(org->id) {
+        org = org->parent;
+        lineage.push_back(org->id);
+      }
+
+      return lineage;
+
+    }
+
+    //Return a vector containing the IDs of an oraganism's ancestors
+    emp::vector<ORG> TraceLineage(int org_id) {
+      emp::vector<ORG> lineage;
+
+      Node* org = &(nodes[org_id]);
+      while(org->id) {
+        org = org->parent;
+        lineage.push_back(*(org->genome));
+      }
+      return lineage;
+
+    }
+
+
 };
 
 
