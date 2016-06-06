@@ -26,6 +26,9 @@ constexpr int UD_COUNT = 1000;
 
 using BitOrg = emp::BitVector;
 
+template <typename ORG>
+using MixedWorld = emp::evo::World<ORG, emp::evo::PopulationManager_Base<ORG>>;
+
 int main(int argc, char* argv[])
 {
   emp::Random random;
@@ -41,38 +44,37 @@ int main(int argc, char* argv[])
     prefix = std::string(argv[1]) + "-";
   }
   else {
-    std::cerr << "** Usage: ./grid-exp output-prefix";
+    std::cerr << "** Usage: ./mixed-exp output-prefix";
   }
 
-
-  emp::evo::GridWorld<BitOrg> grid_pop(random);
+  // Create World
+  MixedWorld<BitOrg> mixed_pop(random);
 
   std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return landscape.GetFitness(*org);};
 
-  grid_pop.SetDefaultFitnessFun(fit_func);
+  mixed_pop.SetDefaultFitnessFun(fit_func);
 
   // make a stats manager
-  emp::evo::StatsManager_DefaultStats<emp::evo::PopulationManager_Grid<BitOrg>> 
-      grid_stats (&grid_pop, prefix + "grid.csv");
+  emp::evo::StatsManager_DefaultStats<emp::evo::PopulationManager_Base<BitOrg>> 
+      mixed_stats (&mixed_pop, prefix + "mixed.csv");
 
-  grid_stats.SetDefaultFitnessFun(fit_func);
-
-  // Build a random initial population
+  mixed_stats.SetDefaultFitnessFun(fit_func);
   
+  // Insert default organisms into world
   for (int i = 0; i < POP_SIZE; i++) {
     BitOrg next_org(N);
     for (int j = 0; j < N; j++) next_org[j] = random.P(0.5);
     
-
     // looking at the Insert() func it looks like it does a deep copy, so we should be safe in
     // doing this. Theoretically...
-    grid_pop.Insert(next_org);
+    mixed_pop.Insert(next_org);
   }
+
 
   // mutation function:
   // for every site in the gnome there is a MUTATION_RATE chance that the 
   // site will flip it's value.
-  grid_pop.SetDefaultMutateFun( [](BitOrg* org, emp::Random& random) {
+  mixed_pop.SetDefaultMutateFun( [](BitOrg* org, emp::Random& random) {
     bool mutated = false;    
       for (size_t site = 0; site < N; site++) {
         if (random.P(MUTATION_RATE)) {
@@ -88,14 +90,14 @@ int main(int argc, char* argv[])
   for (int ud = 0; ud < UD_COUNT; ud++) {
 
     // Keep the best individual.
-    //    grid_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 5, 10);
+    //    mixed_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 5, 10);
 
-    // Run a tournament for the rest...   
-    grid_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
+    // Run a tournament for the rest... 
+    mixed_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
 			 , TOURNAMENT_SIZE, POP_SIZE);
 
-    grid_pop.Update();
-    grid_pop.MutatePop();
+    mixed_pop.Update();
+    mixed_pop.MutatePop();
 
   }
 

@@ -40,11 +40,20 @@ NK: NK.cc ../../evo/NK.h $(EVO_DEPEND)
 replica: replica.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -g replica.cc -o replica
 
-pool-test: pool-test.cc ../../evo/NK.h $(EVO_DEPEND)
-	$(CXX_native) $(CFLAGS_native) -g pool-test.cc -o pool-test
+grid-exp: grid-exp.cc ../../evo/NK.h $(EVO_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -g grid-exp.cc -o grid-exp
+
+mixed-exp: mixed-exp.cc ../../evo/NK.h $(EVO_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -g mixed-exp.cc -o mixed-exp
 
 fast-replica: replica.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 replica.cc -o replica
+
+fast-grid: grid-exp.cc ../../evo/NK.h $(EVO_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 grid-exp.cc -o grid-exp
+
+fast-mixed: mixed-exp.cc ../../evo/NK.h $(EVO_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 mixed-exp.cc -o mixed-exp
 
 NK-const: NK-const.cc ../../evo/NK-const.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) NK-const.cc -o NK-const

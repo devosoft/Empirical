@@ -15,7 +15,7 @@
 #include <vector>
 #include <set>
 #include "../tools/vector.h"
-#include "World.h"
+//#include "World.h"
 
 struct MLandscape{
     double benefit_avg;
@@ -24,8 +24,7 @@ struct MLandscape{
     double max_ben = 0;
     double max_det = 0;
 
-    MLandscape(){ benefit_avg = 0; neutral_avg = 0; det_avg = 0;}
-};
+    MLandscape(){ benefit_avg = 0; neutral_avg = 0; det_avg = 0;} };
 
 namespace emp{
 namespace evo{
@@ -57,7 +56,7 @@ template <typename ORG, typename WORLD>
 
   // Calculates the benefitial, neutral, and detremental mutational landscapes
 template <typename ORG, typename WORLD>
-  MLandscape  MutLandscape(std::function<double(ORG * org)> fit_fun, WORLD & orgs){
+   MLandscape MutLandscape(std::function<double(ORG * org)> fit_fun, WORLD & orgs){
       double  mut_ben = 0, mut_det = 0, mut_neu = 0;
       int total_orgs = 0;
       MLandscape data;
@@ -87,8 +86,7 @@ template <typename ORG, typename WORLD>
               else{ 
                   detremental++;
                   //std::cout<<" Fn - F: "<<fit_num - fitness<<std::endl;
-                  if(fit_num  < m_det){m_det = fit_num;}
-              }
+                  if(fit_num  < m_det){m_det = fit_num;} }
 
               test[i] = !test[i]; //revert genome
           }
