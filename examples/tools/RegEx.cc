@@ -14,45 +14,48 @@ int main()
   std::cout << "Ping!" << std::endl;
 
   emp::RegEx re1("a|bcdef");
-  re1.PrintNotes();
-  re1.PrintInternal();
+  re1.PrintDebug();
 
   emp::RegEx re2("#[abcdefghijklm]*abc");
-  re2.PrintNotes();
-  re2.PrintInternal();
+  re2.PrintDebug();
 
   emp::RegEx re3("xx(y|z*?)+xx");
-  re3.PrintNotes();
-  re3.PrintInternal();
+  re3.PrintDebug();
 
   std::cout << std::endl;
 
   emp::RegEx re_WHITESPACE("[ \t\r]");
   std::cout << "re_WHITESPACE" << std::endl;
-  re_WHITESPACE.PrintNotes();
-  re_WHITESPACE.PrintInternal();
+  re_WHITESPACE.PrintDebug();
+  std::cout << std::endl;
+
   emp::RegEx re_COMMENT("#.*");
   std::cout << "re_COMMENT" << std::endl;
-  re_COMMENT.PrintNotes();
-  re_COMMENT.PrintInternal();
+  re_COMMENT.PrintDebug();
+  std::cout << std::endl;
+
   emp::RegEx re_INT_LIT("[0-9]+");
   std::cout << "re_INT_LIT" << std::endl;
-  re_INT_LIT.PrintNotes();
-  re_INT_LIT.PrintInternal();
+  re_INT_LIT.PrintDebug();
+  std::cout << std::endl;
+
   emp::RegEx re_FLOAT_LIT("[0-9]+[.]'[0-9]+");
   std::cout << "re_FLOAT_LIT" << std::endl;
-  re_FLOAT_LIT.PrintNotes();
-  re_FLOAT_LIT.PrintInternal();
+  re_FLOAT_LIT.PrintDebug();
+  std::cout << std::endl;
+
   emp::RegEx re_CHAR_LIT("'(.|(\\\\[\\\\'nt]))'");
   std::cout << "re_CHAR_LIT" << std::endl;
-  re_CHAR_LIT.PrintNotes();
-  re_CHAR_LIT.PrintInternal();
+  re_CHAR_LIT.PrintDebug();
+  std::cout << std::endl;
+
   emp::RegEx re_STRING_LIT("[\"](\\[nt\"\\]|[^\\\"])*\"");
   std::cout << "re_STRING_LIT" << std::endl;
-  re_STRING_LIT.PrintNotes();
-  re_STRING_LIT.PrintInternal();
+  re_STRING_LIT.PrintDebug();
+  std::cout << std::endl;
+
   emp::RegEx re_ID("[a-zA-Z0-9_]+");
   std::cout << "re_ID" << std::endl;
-  re_ID.PrintNotes();
-  re_ID.PrintInternal();
+  re_ID.PrintDebug();
+  std::cout << std::endl;
 }
