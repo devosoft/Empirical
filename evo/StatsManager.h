@@ -263,7 +263,7 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::pop;
       using StatsManager_Base<POP_MANAGER>::output_location;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::Update;
-      using lineage_type = LineageTracker_Pruned<POP_MANAGER>; 
+      using lineage_type = LineageTracker_Pruned<POP_MANAGER>;
       lineage_type * lin_ptr;
 
   public:
@@ -320,10 +320,10 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
               MLandscape data = MutLandscape(fit_func, *pop);
               return data.max_det;
           };
-          fit_stat_type last_coal = [this](WORLD * w, POP_MANAGER * pop){
+          std::function<double(POP_MANAGER*)> last_coal = [this](POP_MANAGER * pop){
               auto a_id = lin_ptr->last_coalesence;
               auto depth = lin_ptr->TraceLineage(a_id);
-              return depth.size();
+              return (double)depth.size();
           };
 
 
@@ -341,7 +341,7 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
           AddFunction(max_ben, "max_ben");
           AddFunction(max_det, "max_det");
           AddFunction(last_coal, "last_coal");
-         
+
           w->OnUpdate(UpdateFun);
 
       }
