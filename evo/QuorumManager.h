@@ -63,15 +63,15 @@ namespace evo {
 public:
     // minor override to the parent class to save the orgs location to the org
     unsigned int AddOrg (QuorumOrganism * org) {
-      return org->get_loc() = POP_MANAGER<QuorumOrganism>::AddOrg(org);
+      return org->set_id(POP_MANAGER<QuorumOrganism>::AddOrg(org));
     }
 
     unsigned int AddOrgBirth (QuorumOrganism * offspring, int parent_pos) {
-      return offspring->get_loc() = POP_MANAGER<QuorumOrganism>::AddOrgBirth(offspring, parent_pos);
+      return offspring->set_id(POP_MANAGER<QuorumOrganism>::AddOrgBirth(offspring, parent_pos));
     }
 
     unsigned int AddOrgBirth(QuorumOrganism * offspring, QuorumOrganism * parent) {
-      return AddOrgBirth(offspring, parent->state.loc);
+      return AddOrgBirth(offspring, parent->get_loc());
     }
 
     // function to iterate over the population && generate the next population.
@@ -84,9 +84,12 @@ public:
       int contribution;
 
       for(QuorumOrganism * org : POP_MANAGER<QuorumOrganism>::pop) {
-        auto neighbors = POP_MANAGER<QuorumOrganism>::get_org_neighbors(org->state.loc);
+        if (org == nullptr) {continue;} // don't even try to touch nulls
+        auto neighbors = POP_MANAGER<QuorumOrganism>::get_org_neighbors(org->get_loc());
         if( (contribution = org->get_contribution(calculate_quorum(neighbors)) > 0)){
-          for (QuorumOrganism * neigh : neighbors) {neigh->add_points(contribution);}
+          for (QuorumOrganism * neigh : neighbors) {
+            if (neigh != nullptr) {neigh->add_points(contribution);}
+          }
         }
         org->add_points(1); // metabolize
       }
@@ -97,6 +100,7 @@ public:
       // see QuorumOrg.h:199ish for deets
       QuorumOrganism * offspring = nullptr;
       for(QuorumOrganism * org : POP_MANAGER<QuorumOrganism>::pop) {
+        if (org == nullptr) {continue;} // don't even try to touch nulls
         if( (offspring = org->reproduce()) != nullptr) {
           // overloaded AddOrgBirth will determine parent loc from pointer
           AddOrgBirth(offspring, org);
@@ -104,19 +108,18 @@ public:
       }
     } // end Update()
 
-    // quick and dirty way to spit out the population
-    void Print(std::ostream & out) {
-      for (auto org : POP_MANAGER<QuorumOrganism>::pop) {
-        if (*org != nullptr) {out << "\t{" << *(*org) << "} " << std::endl;}
-      }
-    }
+
 
     void Print(std::function<std::string(QuorumOrganism *)> string_fun, std::ostream & os = std::cout,
               std::string empty="X", std::string spacer=" ") {
       os << "Still no." << std::endl;
     }
+
+    // quick and dirty way to spit out the population
     void Print(std::ostream & os = std::cout, std::string empty="X", std::string spacer=" ") {
-      os << "No." << std::endl;
+      for (auto org : POP_MANAGER<QuorumOrganism>::pop) {
+        if (org != nullptr) {os << "\t{" << *org << "} " << std::endl;}
+      }
     }
 
   };

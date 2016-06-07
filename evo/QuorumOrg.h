@@ -174,7 +174,9 @@ public:
 
   // utility/accessor methods
   void set_state (QuorumOrgState new_state) {state = new_state;}
-  void set_id (unsigned int new_id) {state.loc = new_id;}
+  unsigned int set_id (unsigned int new_id) {
+    if (new_id < 0) {std::cout << "Bad loc!" << std::endl;}
+    return state.loc = new_id;}
   unsigned int get_loc() {return state.loc;}
   unsigned int add_points(unsigned int points) {return state.points += points;}
   bool making_ai () const {return state.producing_ai;}

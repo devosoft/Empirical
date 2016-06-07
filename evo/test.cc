@@ -26,6 +26,7 @@ int main() {
 
     // test reproduction
     QOrg Simon(.5, .5, .5, true, 0, &dice);
+    
 
     int num_ticks = 0;
     QOrg * SimonJr = nullptr;

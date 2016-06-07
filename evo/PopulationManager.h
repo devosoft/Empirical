@@ -215,15 +215,15 @@ namespace evo {
 
     // method to get all the von-neuman (sp?) neighbors of a particular organism
     // does not include the organism itself
-    std::set<ORG> get_org_neighbors (int org_id) {
-      std::set<ORG> neighbors;
+    std::set<ORG *> get_org_neighbors (int org_id) {
+      std::set<ORG *> neighbors;
       int org_x, org_y;
       int possx[3] = {0,0,0}, possy[3] = {0,0,0}; //arrays to hold possible offsets
       org_x = ToX(org_id);
       org_y = ToY(org_id);
 
-      if (org_y > 0) {possy[2] = 1;} // enable going up
-      if (org_y < height - 1) {possy[0] = -1;} // enable going down
+      if (org_y > 0) {possy[2] = -1;} // enable going up
+      if (org_y < height - 1) {possy[0] = 1;} // enable going down
       if (org_x > 0) { possx[0] = -1;} // enable going left
       if (org_x < width - 1) {possx[2] = 1;} // enable going right
 
@@ -232,11 +232,11 @@ namespace evo {
       // multiple times.
       for(int i = 0; i < 3; i++) {
         for(int j = 0; j < 3; j++) {
-          neighbors.add(pop[ToID(org_x + possx[i], org_y + possy[j])]);
+          neighbors.insert(pop[ToID(org_x + possx[i], org_y + possy[j])]);
         }
       }
 
-      neighbors.remove(pop[org_id]); // remove focal node from set
+      neighbors.erase(neighbors.find(pop[org_id])); // remove focal node from set
       return neighbors;
     }
 
