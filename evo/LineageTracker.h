@@ -324,7 +324,8 @@ namespace evo{
         //If we unrolled the lineage although back to the current coalesence point
         //and there is now only one lineage coming out of it, we can move the
         //coalesence point up.
-        while (curr->id == last_coalesence && curr->offspring.size() == 1){
+        while ((curr->id == last_coalesence && curr->offspring.size() == 1) ||
+                curr->parent->id == last_coalesence && curr->parent->offspring.size() == 1){
           curr = curr->offspring[0];
           last_coalesence = curr->id;
         }
