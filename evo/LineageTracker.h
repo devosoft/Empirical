@@ -233,7 +233,6 @@ namespace evo{
 
     template <typename WORLD>
     void Setup(WORLD * w){
-      std::cout << "Setting up" << std::endl;
 
       //Initialize null org to act as parent for inserted orgs
       nodes[0] = Node();
@@ -402,8 +401,8 @@ namespace evo{
       emp::vector<int> lineage;
       Node* org = &(nodes[org_id]);
       while(org->id) {
-        org = org->parent;
         lineage.push_back(org->id);
+        org = org->parent;
       }
 
       return lineage;
@@ -413,11 +412,10 @@ namespace evo{
     //Return a vector containing the IDs of an oraganism's ancestors
     emp::vector<ORG> TraceLineage(int org_id) {
       emp::vector<ORG> lineage;
-
       Node* org = &(nodes[org_id]);
       while(org->id) {
-        org = org->parent;
         lineage.push_back(*(org->genome));
+        org = org->parent;
       }
       return lineage;
 
