@@ -34,7 +34,7 @@ constexpr int UD_COUNT = config.MAX_GENS();
 constexpr int TOURNAMENT_SIZE = config.TOURNAMENT_SIZE();
 
 using BitOrg = emp::BitSet<N>;
-GraphVisualization<BitOrg > viz;
+FitnessVisualization<BitOrg > viz;
 
 
 extern "C" int main()

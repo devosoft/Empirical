@@ -98,7 +98,7 @@ public:
   }
 
   void Setup(){
-    EM_ASM({tip = d3.tip().html(function(d, i) { return d; });});
+    D3::ToolTip tip;
 
     emp::vector<double> fitnesses = RunFunctionOnContainer(info.world->GetFitFun(), info.world->popM);
     double lowest = *(std::min_element(fitnesses.begin(), fitnesses.end()));
@@ -130,9 +130,9 @@ public:
     circles->SetAttr("cy", "scaled_d");
     circles->SetStyle("fill", "green");
 
-    EM_ASM_ARGS({js.objects[$0].call(tip);}, svg->GetID());
-    EM_ASM_ARGS({js.objects[$0].on("mouseover", tip.show).on("mouseout", tip.hide);}, circles->GetID());
-
+    //EM_ASM_ARGS({js.objects[$0].call(tip);}, svg->GetID());
+    //EM_ASM_ARGS({js.objects[$0].on("mouseover", tip.show).on("mouseout", tip.hide);}, circles->GetID());
+    circles->AddToolTip(tip);
     info.anim.SetCallback(animate_function);
   }
 
@@ -153,7 +153,7 @@ private:
   int height = 500;
   int width = 1000;
   double margin = 30;
-  double axis_width = 40;
+  double axis_width = 60;
   double fitness_growth_margin = 1.5;
   double fitness_loss_margin = .8;
 public:
@@ -177,7 +177,12 @@ public:
   };
 
   std::function<void()> animate_function = [this](){Evolve(info.world, circles);};
+  D3::FormatFunction rounded = D3::FormatFunction(".2f");
 
+  std::function<std::string(std::array<double, 2>, int, int)> tooltip_display =
+                                       [this](std::array<double, 2> d, int i, int k) {
+                                         return rounded.Call(d[1]);
+                                     };
   double update = 0;
 
   GraphVisualization(){
@@ -190,8 +195,12 @@ public:
   std::array<std::array<double, 2>, 1> data;
       D3::LineGenerator * make_line;
 
+  D3::ToolTip* tip;
+
   void Setup(){
 
+    emp::JSWrap(tooltip_display, "tooltip_display");
+    tip = new D3::ToolTip("tooltip_display");
 
     //Set up scales
     y_scale = new D3::LinearScale();
@@ -209,6 +218,7 @@ public:
     x_axis->SetOrientation("bottom");
     x_axis->SetTicks(10);
     x_axis->SetTickFormat("g");
+    x_axis_group.Append("text").SetAttr("x", width/2).SetAttr("dy", "3em").SetStyle("text-anchor", "middle").SetText("Update");
     x_axis->Draw(x_axis_group);
     D3::Selection x_axis_path = x_axis_group.SelectAll("line, .domain");
     x_axis_path.SetAttr("stroke-width", 1);
@@ -221,6 +231,7 @@ public:
     y_axis->SetScale(*y_scale);
     y_axis->SetOrientation("left");
     y_axis_group.SetAttr("transform", std::string(std::string("translate(")+emp::to_string(axis_width)+std::string(",0)")).c_str());
+    y_axis_group.Append("text").SetAttr("x", height/-2).SetStyle("text-anchor", "middle").SetAttr("y", "-2em").SetAttr("transform", "rotate(-90)").SetText("Shannon Diversity");
     y_axis->SetTickFormat("g");
     y_axis->Draw(y_axis_group);
     D3::Selection y_axis_path = y_axis_group.SelectAll("line, .domain");
@@ -245,8 +256,9 @@ public:
     circles->SetAttr("cy", "y");
     circles->SetStyle("fill", "green");
 
-    EM_ASM_ARGS({js.objects[$0].call(tip);}, circles->GetID());
-    EM_ASM_ARGS({js.objects[$0].on("mouseover", tip.show).on("mouseout", tip.hide);}, circles->GetID());
+    //EM_ASM_ARGS({js.objects[$0].call(tip);}, circles->GetID());
+    //EM_ASM_ARGS({js.objects[$0].on("mouseover", tip.show).on("mouseout", tip.hide);}, circles->GetID());
+    circles->AddToolTip(*tip);
 
     info.anim.SetCallback(animate_function);
   }
@@ -283,9 +295,9 @@ public:
       enter.SetAttr("cx", "x");
       enter.SetAttr("r", 2);
       enter.SetStyle("fill", "green");
-      EM_ASM_ARGS({js.objects[$0].call(tip);}, circles->GetID());
-      EM_ASM_ARGS({js.objects[$0].on("mouseover", tip.show).on("mouseout", tip.hide);}, circles->GetID());
-
+      //EM_ASM_ARGS({js.objects[$0].call(tip);}, circles->GetID());
+      //EM_ASM_ARGS({js.objects[$0].on("mouseover", tip.show).on("mouseout", tip.hide);}, circles->GetID());
+      enter.AddToolTip(*tip);
     }
   }
 };
