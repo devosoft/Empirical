@@ -58,6 +58,7 @@
 // Bit analysis:
 //  int CountOnes()
 //  int FindBit(int start_bit)   -- Return pos of first 1 after start_bit
+//  emp::vector<int> GetOnes()   -- Return pos of ALL ones.
 //
 // Boolean math functions:
 //  BitSet NOT() const
@@ -98,12 +99,12 @@
 
 #include <assert.h>
 #include <iostream>
-#include <vector>
 
 #include "bitset_utils.h"
 #include "const_utils.h"
 #include "functions.h"
 #include "Random.h"
+#include "vector.h"
 
 namespace emp {
 
@@ -407,9 +408,9 @@ namespace emp {
       }
       return -1;
     }
-    std::vector<int> GetOnes() const {
-      // @CAO -- There are probably better ways to do this with bit tricks.
-      std::vector<int> out_set(CountOnes());
+    emp::vector<int> GetOnes() const {
+      // @CAO -- There are better ways to do this with bit tricks.
+      emp::vector<int> out_set(CountOnes());
       int cur_pos = 0;
       for (int i = 0; i < NUM_BITS; i++) {
         if (Get(i)) out_set[cur_pos++] = i;
