@@ -27,10 +27,10 @@
 
 
 // constants that will eventually be configurable
-const unsigned int NUM_TO_DONATE = 5;
+const unsigned int NUM_TO_DONATE = 45;
 const unsigned int NEEDED_TO_REPRODUCE = 10;
+const unsigned int COST_TO_PRODUCE = 25;
 const double MUTATION_AMOUNT = 0.1;
-const double MUTATION_RATE = 0.005;
 
 
 namespace emp {
@@ -38,21 +38,21 @@ namespace evo {
 
 struct QuorumOrgGenome {
   double co_op_prob;
-  double ai_gen_prob;
+  double ai_radius;
   double quorum_threshold;
 
   QuorumOrgGenome () {
     co_op_prob = 0;
-    ai_gen_prob = 0;
-    quorum_threshold = 1.1;
+    ai_radius = 10;
+    quorum_threshold = 1;
   }
 
-  QuorumOrgGenome(double cprob, double aprob, double qthresh) :
-    co_op_prob(cprob), ai_gen_prob(aprob), quorum_threshold(qthresh) {};
+  QuorumOrgGenome(double cprob, double airad, double qthresh) :
+    co_op_prob(cprob), ai_radius(airad), quorum_threshold(qthresh) {};
 
   // prints co-op prob, ai_gen_prob, quorum_thresh
   void print (std::ostream & out) {
-    out << co_op_prob << ", " << ai_gen_prob << ", " << quorum_threshold;
+    out << co_op_prob << ", " << ai_radius << ", " << quorum_threshold;
   }
 
   std::ostream & operator << (std::ostream & out) {
@@ -75,7 +75,7 @@ std::ostream & operator<< (std::ostream & out, QuorumOrgGenome & genome) {
 struct QuorumOrgState {
   QuorumOrgGenome genome;
 
-  bool producing_ai;
+  bool hi_density;
   bool mutate;    // dunno if we'll want to do this by-org, but eh
 
   unsigned int points;
@@ -84,7 +84,7 @@ struct QuorumOrgState {
   unsigned int num_offspring; // gonna use this as/in a basic fitness function
 
   QuorumOrgState() {
-    producing_ai = false;
+    hi_density = false;
     mutate = false;
   };
 
@@ -99,7 +99,7 @@ struct QuorumOrgState {
   // prints out loc, age, points, if_producing_ai, if_mutation_on, {genome}
   void print (std::ostream & out) {
     out << loc << ", " << age << ", " << points << ", " << num_offspring;
-    out << ", " << producing_ai << ", " << mutate << ", (";
+    out << ", " << hi_density << ", " << mutate << ", (";
     //genome.print(out); // dunno why streaming doesn't work here
     out << genome;
     out << ")";
@@ -120,19 +120,20 @@ std::ostream & operator<< (std::ostream & out, QuorumOrgState & state) {
 class QuorumOrganism {
 
 protected:
-  QuorumOrgState state;
   emp::Random * random;
 
 public:
   // Default Constructor
+  
+  // access specifiers are really annoying. 
+  QuorumOrgState state;
   QuorumOrganism () {};
 
   // Config constructor
-  QuorumOrganism (double cprob, double aprob, double qthresh, bool mut, unsigned int pts,
+  QuorumOrganism (double cprob, double airad, double qthresh, bool mut, unsigned int pts,
           emp::Random * rand) {
-    this->QuorumOrganism::state = QuorumOrgState(cprob, aprob, qthresh, mut, pts);
+    this->QuorumOrganism::state = QuorumOrgState(cprob, airad, qthresh, mut, pts);
     this->random = rand;
-    this->state.producing_ai = random->P(aprob);
   }
 
   // copy constructor; probably the primary way of reproduction will be to
@@ -146,19 +147,10 @@ public:
   // the aforementioned mutate function
   bool mutate (Random & random) {
     if (!state.mutate) {return false;} // if mutation is disabled fail out
-    bool flag = false;
-    if (random.P(MUTATION_RATE)) {
-      state.genome.quorum_threshold += random.GetRandNormal(0, MUTATION_AMOUNT);
-      flag = true;
-    } if (random.P(MUTATION_RATE)) {
-      state.genome.ai_gen_prob += random.GetRandNormal(0, MUTATION_AMOUNT);
-      flag = true;
-    } if (random.P(MUTATION_RATE)) {
+      //state.genome.quorum_threshold += random.GetRandNormal(0, MUTATION_AMOUNT);
+      //state.genome.ai_radius += random.GetRandNormal(0, MUTATION_AMOUNT);
       state.genome.co_op_prob += random.GetRandNormal(0, MUTATION_AMOUNT);
-      flag = true;
-    } // that felt silly
-
-    return flag;
+    return true;
   }
 
   bool mutate() {
@@ -167,20 +159,20 @@ public:
 
   // forcibly mutates all the parameters in a normal range +/- MUTATION_AMOUNT
   void force_mutation() {
-    state.genome.quorum_threshold += random->GetRandNormal(0, MUTATION_AMOUNT);
-    state.genome.ai_gen_prob += random->GetRandNormal(0, MUTATION_AMOUNT);
+    //state.genome.quorum_threshold += random->GetRandNormal(0, MUTATION_AMOUNT);
+    //state.genome.ai_radius += random->GetRandNormal(0, MUTATION_AMOUNT);
     state.genome.co_op_prob += random->GetRandNormal(0, MUTATION_AMOUNT);
   }
 
   // utility/accessor methods
   void set_state (QuorumOrgState new_state) {state = new_state;}
   void increment_age() {state.age++;}
-  unsigned int set_id (unsigned int new_id) {
-    if (new_id < 0) {std::cout << "Bad loc!" << std::endl;}
-    return state.loc = new_id;}
+  unsigned int set_id (unsigned int new_id) {return state.loc = new_id;}
   unsigned int get_loc() {return state.loc;}
   unsigned int add_points(unsigned int points) {return state.points += points;}
-  bool making_ai () const {return state.producing_ai;}
+  void set_density(bool hd) {state.hi_density = hd;}
+  bool set_density(double q) { return state.hi_density = (q > state.genome.quorum_threshold);}
+  bool hi_density () const {return state.hi_density;}
   unsigned int get_fitness() {return state.points;}
 
   // methods for interacting with the world / neighbors
@@ -191,7 +183,7 @@ public:
       // gonna add a check to see if we contribute when we're poor
       // dunno if I should
       if (state.points >= NUM_TO_DONATE) {
-        state.points -= NUM_TO_DONATE;
+        state.points -= COST_TO_PRODUCE;
         return NUM_TO_DONATE;
       }
     }

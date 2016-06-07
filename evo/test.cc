@@ -45,7 +45,7 @@ int main() {
 
     // test AI generating organism
     QOrg Samaritan(.5, 1, .5, true, 5, &dice);
-    std::cout << "Samaritan's AI production is " << Samaritan.making_ai();
+    std::cout << "Samaritan's AI production is " << Samaritan.hi_density();
     std::cout << " (should be true/1)" << std::endl;
     // require to be true/1
 

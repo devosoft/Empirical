@@ -22,6 +22,11 @@
 //using MixedWorld = emp::evo::World<ORG, emp::evo::PopulationManager_Base<ORG>>;
 //MixedWorld<BitOrg> mixed_pop(random);
 
+//TODO@JGF: migrate these to QOrg
+const unsigned int HI_AI_WEIGHT = 4;
+const unsigned int LO_AI_WEIGHT = 1;
+const unsigned int AI_RADIUS = 10;
+
 namespace emp {
 namespace evo {
 
@@ -39,25 +44,30 @@ namespace evo {
     // TODO: determine if this should/does include the target org in quorum calc
 
   protected:
+    
+    /// calculates quorum and updates state.hi_density  
     double calculate_quorum (std::set<QuorumOrganism *> neighbors) {
       unsigned int active_neighbors = 0;
       unsigned int total_neighbors = 0;
 
       for (auto org_iter : neighbors) {
-
-        if ( org_iter != nullptr && org_iter->making_ai()) {active_neighbors++;}
-        total_neighbors++; // could probably get this from neighbors.size() or something
+        if (org_iter == nullptr) {continue;} // ignore nonextant orgs
+        if ( org_iter->hi_density()) {active_neighbors += HI_AI_WEIGHT;}
+        else {active_neighbors += LO_AI_WEIGHT;}
+        total_neighbors += 1; // could probably get this from neighbors.size() or something
       }
 
       return (double) active_neighbors / (double) total_neighbors;
     }
 
     double calculate_quorum (QuorumOrganism * org) {
+      double result;    
       // for an example of an implemented get_org_neighbors see Grid pop manager.
       // PopulationManager.h:209ish
       auto neighbors = POP_MANAGER<QuorumOrganism>::get_org_neighbors(org->get_loc());
 
-      return calculate_quorum(neighbors);
+      org->set_density(result = calculate_quorum(neighbors)); 
+      return result;
     }
 
 public:
@@ -74,6 +84,37 @@ public:
       return AddOrgBirth(offspring, parent->get_loc());
     }
 
+    /// Does public good creation / distrubtion processing for an organism
+    /// DOES NOT CHECK FOR NULL POINTERS
+    void Publicize(QuorumOrganism * org) {
+      auto neighbors = POP_MANAGER<QuorumOrganism>::get_org_neighbors(org->get_loc());
+      auto cluster = POP_MANAGER<QuorumOrganism>::GetClusterByRadius(org->get_loc(),
+                                                                    AI_RADIUS);
+      cluster->erase(org);
+      int contribution;
+      int recipiant = 0;
+      
+      // get contribution and round-robin it out to the various orgs
+      // producer gets first dibs
+      if( (contribution = org->get_contribution(calculate_quorum(*cluster)) > 0)){
+        // TODO: make this mor eefficient. Can easily math who gets who much (probably)
+        auto recipiant = neighbors.end();
+        
+        // iterate over neighbors && give them things, with donator going first
+        while(contribution > 0) {
+          if (recipiant == neighbors.end()) {
+            recipiant = neighbors.begin();
+            org->add_points(1);
+          }
+          else if ((*recipiant) != nullptr) {
+            (*recipiant)->add_points(1);
+          }
+          contribution--;
+          recipiant++;
+        }
+      }
+    }
+
     // function to iterate over the population && generate the next population.
     // will rely heavily on things implemented by the underlying structural class.
     // update works in stages; stage 1: determine who is co-operating
@@ -81,17 +122,10 @@ public:
     void Update() {
 
       // for each org get its contribution to neighbots
-      int contribution;
-
       for(QuorumOrganism * org : POP_MANAGER<QuorumOrganism>::pop) {
         if (org == nullptr) {continue;} // don't even try to touch nulls
-        auto neighbors = POP_MANAGER<QuorumOrganism>::get_org_neighbors(org->get_loc());
-        if( (contribution = org->get_contribution(calculate_quorum(neighbors)) > 0)){
-          for (QuorumOrganism * neigh : neighbors) {
-            if (neigh != nullptr) {neigh->add_points(contribution);}
-          }
-        }
         org->add_points(1); // metabolize
+        Publicize(org);
       }
 
       // now do reproduction

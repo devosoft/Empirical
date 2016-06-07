@@ -240,6 +240,42 @@ namespace evo {
       return neighbors;
     }
 
+    //TODO@JGF: a) make the rest of my todo's @'d to me
+    //          b) make the function naming consistent (e.g. camel, not _'s)
+    
+    /// This function will get all elements in a radius 'depth' from a focal node
+    std::set<ORG *> * GetClusterByRadius(unsigned int focal_id, unsigned int depth, 
+                                       std::set<ORG *> * lump = nullptr) {
+      // if the thing exists, use it. If not, create it.
+      if (lump == nullptr) {lump = new std::set<ORG *>;}
+      // add ourselves
+      if (lump->find(pop[focal_id]) != lump->end()) {return lump;} // stop recursion, we've been here
+      lump->insert(pop[focal_id]);
+
+      // duplicated code--joy
+      // TODO@JGF: fix the duplication
+      int org_x, org_y;
+      int possx[3] = {0,0,0}, possy[3] = {0,0,0}; //arrays to hold possible offsets
+      org_x = ToX(focal_id);
+      org_y = ToY(focal_id);
+
+      if (org_y > 0) {possy[2] = -1;} // enable going up
+      if (org_y < height - 1) {possy[0] = 1;} // enable going down
+      if (org_x > 0) { possx[0] = -1;} // enable going left
+      if (org_x < width - 1) {possx[2] = 1;} // enable going right
+
+      // for all 'enabled' spaces recurse this finder
+      // our base case up top will prevent running in circles
+      if (depth <= 0) {return lump;}
+      for(int i = 0; i < 3; i++) {
+        for(int j = 0; j < 3; j++) {
+          GetClusterByRadius(ToID(org_x + possx[i], org_y + possy[j]), depth - 1, lump);
+        }
+      }
+
+      return lump;
+    }
+
     void ConfigPop(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }
 
     // Injected orgs go into a random position.
