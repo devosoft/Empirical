@@ -11,6 +11,8 @@
 #include "../tools/stats.h"
 #include "../config/config.h"
 #include "PopulationManager.h"
+#include "EvoStats.h"
+#include "LineageTracker.h"
 
 namespace emp{
 namespace evo{
@@ -80,6 +82,8 @@ namespace evo{
         }
     }
 
+    template <typename T>
+    void SetDefaultFitnessFun(std::function<double(T)> fit){;}
   };
 
   //A popular type of stats manager is one that prints a set of statistics every
@@ -115,18 +119,17 @@ namespace evo{
     template <typename WORLD>
     StatsManager_FunctionsOnUpdate(WORLD * w,
                                    std::string location = "stats.csv") :
-                                   StatsManager_Base<decltype(w->popM)>(location){
-      Setup(w);
-    }
+                                   StatsManager_Base<decltype(w->popM)>(location){}
 
     //Constructor for use by World object
     StatsManager_FunctionsOnUpdate(std::string location = "stats.csv") :
                                    StatsManager_Base<POP_MANAGER>(location){;}
 
-    //The fitness function for calculating fitness related stats
+    //The fitness function for calculating fitness related stats.
+    //Not called by constructor. Must be called by user.
     template <typename WORLD>
     void Setup(WORLD * w){
-      pop = &(w->PopM);
+      pop = &(w->popM);
 
       std::function<void(int)> UpdateFun = [&] (int ud){
           Update(ud);
@@ -188,9 +191,10 @@ namespace evo{
 
   //Calculates some commonly required information: shannon diversity,
   //max fitness within the population, and average fitness within the population
+
   template <typename POP_MANAGER = PopulationManager_Base<int> >
   class StatsManager_DefaultStats : StatsManager_FunctionsOnUpdate<POP_MANAGER> {
-  private:
+  protected:
       using org_ptr = typename POP_MANAGER::value_type;
       using fit_fun_type = std::function<double(org_ptr)>;
       using fit_stat_type = std::function<double(fit_fun_type, POP_MANAGER*)>;
@@ -198,6 +202,7 @@ namespace evo{
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::pop;
       using StatsManager_Base<POP_MANAGER>::output_location;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::Update;
+
   public:
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::fit_fun;
       using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
@@ -234,18 +239,124 @@ namespace evo{
             Update(ud);
         };
 
+
         //Add functions to manager
         AddFunction(diversity, "shannon_diversity");
         AddFunction(max_fitness, "max_fitness");
         AddFunction(avg_fitness, "avg_fitness");
 
         w->OnUpdate(UpdateFun);
+
       }
 
 };
-
 using NullStats = StatsManager_Base<PopBasic>;
 using DefaultStats = StatsManager_DefaultStats<PopBasic>;
+
+  template <typename POP_MANAGER = PopulationManager_Base<int> >
+  class StatsManager_AdvancedStats : protected StatsManager_FunctionsOnUpdate<POP_MANAGER> {
+  protected:
+      using org_ptr = typename POP_MANAGER::value_type;
+      using fit_fun_type = std::function<double(org_ptr)>;
+      using fit_stat_type = std::function<double(fit_fun_type, POP_MANAGER*)>;
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::AddFunction;
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::pop;
+      using StatsManager_Base<POP_MANAGER>::output_location;
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::Update;
+      using lineage_type = LineageTracker_Pruned<POP_MANAGER>;
+      lineage_type * lin_ptr;
+
+  public:
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::fit_fun;
+      using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::SetDefaultFitnessFun;
+
+      //Constructor for use as a stand alone object
+      template<typename WORLD>
+      StatsManager_AdvancedStats(WORLD * w, std::string location = "averages.cvs")
+       : StatsManager_FunctionsOnUpdate<POP_MANAGER>(w, location){
+           Setup(w);
+       }
+
+      //Constructor for use as a template parameter for the world
+      StatsManager_AdvancedStats(std::string location = "averages.csv")
+       : StatsManager_FunctionsOnUpdate<POP_MANAGER>(location){;}
+
+      template<typename WORLD>
+      void Setup(WORLD * w){
+          pop = &(w->popM);
+          lin_ptr = &(w->lineageM);
+
+          std::function<double(POP_MANAGER*)> diversity = [](POP_MANAGER * pop){
+              return ShannonEntropy(*pop);
+          };
+          fit_stat_type max_fitness = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              std::cout<<"A"<<std::endl;
+              auto ans =  MaxFunctionReturn(fit_func, *pop);
+              std::cout<<"A1/2"<<std::endl;
+              return ans;
+          };
+          fit_stat_type avg_fitness = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              std::cout<<"B"<<std::endl;
+              return AverageFunctionReturn(fit_func, *pop);
+          };
+
+          fit_stat_type non_inf = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              std::cout<<"C"<<std::endl;
+              return NonInf(fit_func, *pop);
+          };
+          fit_stat_type ben_mut = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              std::cout<<"D"<<std::endl;
+              MLandscape data = MutLandscape(fit_func, *pop);
+              return data.benefit_avg;
+          };
+          fit_stat_type neu_mut = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              MLandscape data = MutLandscape(fit_func, *pop);
+              return data.neutral_avg;
+          };
+          fit_stat_type det_mut = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              MLandscape data = MutLandscape(fit_func, *pop);
+              return data.det_avg;
+          };
+          fit_stat_type max_ben = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              MLandscape data = MutLandscape(fit_func, *pop);
+              return data.max_ben;
+          };
+          fit_stat_type max_det = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              MLandscape data = MutLandscape(fit_func, *pop);
+              std::cout<<"HERE"<<std::endl;
+              return data.max_det;
+          };
+          std::function<double(POP_MANAGER*)> last_coal = [this](POP_MANAGER * pop){
+              auto a_id = lin_ptr->last_coalesence;
+              std::cout<<"COAL: "<<a_id<<std::endl;
+              auto depth = lin_ptr->TraceLineage(a_id);
+              std::cout<<"DEPTH: "<<depth.size()<<std::endl;
+              return (double)depth.size();
+          };
+
+
+          std::function<void(int)> UpdateFun = [&] (int ud){
+            Update(ud);
+          };
+
+          AddFunction(diversity, "shannon_diversity");
+          AddFunction(last_coal, "last_coal");
+          AddFunction(max_fitness, "max_fitness");
+          AddFunction(avg_fitness, "avg_fitness");
+          AddFunction(non_inf, "non_inf");
+          AddFunction(ben_mut, "ben_mut");
+          AddFunction(neu_mut, "neu_mut");
+          AddFunction(det_mut, "det_mut");
+          AddFunction(max_ben, "max_ben");
+          AddFunction(max_det, "max_det");
+          
+          std::cout<<"HEHEHEHEHee"<<std::endl;
+          w->OnUpdate(UpdateFun);
+
+      }
+  };
+
 }
 }
 

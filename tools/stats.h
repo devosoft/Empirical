@@ -101,7 +101,9 @@ namespace evo{
   //and returns the maximum value
   template <typename C, typename RET_TYPE>
   RET_TYPE MaxFunctionReturn(std::function<RET_TYPE(typename C::value_type)> fun, C & elements){
-    double highest = fun(elements[0]);
+      std::cout<<"BROKEN"<<std::endl;
+    double highest = 0;
+    std::cout<<"MAXFIT"<<std::endl;
     for (auto element : elements){
       double result = fun(element);
       if (result > highest){

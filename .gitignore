@@ -1,6 +1,5 @@
 *~
 a.out
-a.out.dSYM
 a.out.js
 *.map
 *.o
@@ -8,10 +7,14 @@ a.out.js
 *.pyc
 *.swp
 *.swo
+*.dSYM
+*tmp.*
 coverage.xml
 diff_cover.txt
 UTests/tools/tmp*.cc
 UTests/emtools/JSWrap.js
+UTests/OLD/UI/ElementSlate.js
+UTests/OLD/UI/Example.js
 UTests/UI/Animate.js
 UTests/UI/ElementSlate.js
 UTests/UI/Example.js
@@ -29,7 +32,7 @@ incoming/
 */env/*
 tmp/
 build/doxydoc/*
-third-party/doxygen/build/*
+third-party/doxygen
 doc/_build/*
 utils/edit_dist/IO/
 utils/edit_dist/edit_dist
@@ -37,5 +40,16 @@ utils/edit_dist/tmp.py
 utils/graphs/downloads/
 utils/graphs/for_web/
 utils/graphs/history/
+utils/graphs/make_graph
 utils/graphs/upload/
 .ycm_extra_conf.py
+OLD/CMakeLists.txt
+OLD/config.h.bak
+examples/evo/NK
+geometry/bak/
+web/bak/
+examples/evo/runs/
+examples/evo/out
+examples/evo/replica
+examples/evo/grid.csv
+examples/evo/mixed.csv*

@@ -185,16 +185,29 @@ namespace emp {
   namespace internal {
     template<typename T, typename ...U> class AdaptTemplateHelper;
 
-    template<template <typename...> class T, typename ...V, typename ...U>
+    template<template <typename...> class T, typename... V, typename... U>
     class AdaptTemplateHelper<T<V...>, U...> {
     public:
-      typedef T<U...> type;
+      using type = T<U...>;
     };
   }
 
-  template<typename T, typename ...U>
+  template<typename T, typename... U>
   using AdaptTemplate=typename internal::AdaptTemplateHelper<T, U...>::type;
 
+  // Variation of AdaptTemplate that only adapts first template argument.
+  namespace internal {
+    template<typename T, typename U> class AdaptTemplateHelper_Arg1;
+
+    template<template <typename...> class T, typename X, typename ...V, typename U>
+    class AdaptTemplateHelper_Arg1<T<X, V...>, U> {
+    public:
+      using type = T<U, V...>;
+    };
+  }
+
+  template<typename T, typename... U>
+  using AdaptTemplate_Arg1=typename internal::AdaptTemplateHelper_Arg1<T, U...>::type;
 
 }
 
