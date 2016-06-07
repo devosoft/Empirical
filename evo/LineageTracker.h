@@ -165,12 +165,12 @@ namespace evo{
     // Return a vector containing the genomes of an organism's ancestors
     emp::vector<org_ptr> TraceLineage(int org_id) {
       emp::vector<org_ptr> lineage;
-
+      std::cout<<"HERE A"<<std::endl;
       while(org_id) {
         lineage.push_back(this->org_to_genome[org_id]);
         org_id = this->parents[org_id];
       }
-
+      std::cout<<"HERE B"<<std::endl;
       return lineage;
 
     }
@@ -233,7 +233,6 @@ namespace evo{
 
     template <typename WORLD>
     void Setup(WORLD * w){
-      std::cout << "Setting up" << std::endl;
 
       //Initialize null org to act as parent for inserted orgs
       nodes[0] = Node();
@@ -402,8 +401,8 @@ namespace evo{
       emp::vector<int> lineage;
       Node* org = &(nodes[org_id]);
       while(org->id) {
-        org = org->parent;
         lineage.push_back(org->id);
+        org = org->parent;
       }
 
       return lineage;
@@ -413,11 +412,10 @@ namespace evo{
     //Return a vector containing the IDs of an oraganism's ancestors
     emp::vector<ORG> TraceLineage(int org_id) {
       emp::vector<ORG> lineage;
-
       Node* org = &(nodes[org_id]);
       while(org->id) {
-        org = org->parent;
         lineage.push_back(*(org->genome));
+        org = org->parent;
       }
       return lineage;
 
