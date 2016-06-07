@@ -20,8 +20,8 @@ constexpr int K = 0;
 constexpr int N = 10;
 constexpr double MUTATION_RATE = 0.005;
 
-constexpr int TOURNAMENT_SIZE = 20;
-constexpr int POP_SIZE = 300;
+constexpr int TOURNAMENT_SIZE = 2;
+constexpr int POP_SIZE = 10;
 constexpr int UD_COUNT = 1000;
 
 using BitOrg = emp::BitVector;
@@ -56,6 +56,9 @@ int main(int argc, char* argv[])
   mixed_pop.SetDefaultFitnessFun(fit_func);
   grid_pop.SetDefaultFitnessFun(fit_func);
 
+  grid_pop.ConfigPop(10,1);
+  //std::cout<<"HELLP"<<std::endl;
+
   // make a couple stats managers
   emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Base<BitOrg>>
       mixed_stats (&mixed_pop, prefix + "mixed.csv");
@@ -89,7 +92,7 @@ int main(int argc, char* argv[])
   grid_pop.Insert(next_orgC);
 
   */
-
+  std::cout<<"WHYME"<<std::endl;
   for (int i = 0; i < POP_SIZE; i++) {
     BitOrg next_org(N);
     for (int j = 0; j < N; j++) next_org[j] = random.P(0.5);
@@ -129,7 +132,7 @@ int main(int argc, char* argv[])
       return mutated;
     } );
 
-
+  std::cout<<"LLLLLLLLLLLLLLLLL"<<std::endl;
   // Loop through updates
   //std::cout << "Update,ShannonDiversity,MaxFitness,AvgFitness" << std::endl;
   for (int ud = 0; ud < UD_COUNT; ud++) {
@@ -151,8 +154,10 @@ int main(int argc, char* argv[])
     std::cout<<"UPDATE________"<<std::endl;
 
     grid_pop.Update();
+    std::cout<<"BETWEEN"<<std::endl;
     grid_pop.MutatePop();
 
+    std::cout<<"GRID DONE"<<std::endl;
     mixed_pop.Update();
     mixed_pop.MutatePop();
     //MLandscape data = MutLandscape(fit_func, grid_pop);

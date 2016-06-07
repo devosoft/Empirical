@@ -291,16 +291,22 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
               return ShannonEntropy(*pop);
           };
           fit_stat_type max_fitness = [](fit_fun_type fit_func, POP_MANAGER * pop){
-              return MaxFunctionReturn(fit_func, *pop);
+              std::cout<<"A"<<std::endl;
+              auto ans =  MaxFunctionReturn(fit_func, *pop);
+              std::cout<<"A1/2"<<std::endl;
+              return ans;
           };
           fit_stat_type avg_fitness = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              std::cout<<"B"<<std::endl;
               return AverageFunctionReturn(fit_func, *pop);
           };
 
           fit_stat_type non_inf = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              std::cout<<"C"<<std::endl;
               return NonInf(fit_func, *pop);
           };
           fit_stat_type ben_mut = [](fit_fun_type fit_func, POP_MANAGER * pop){
+              std::cout<<"D"<<std::endl;
               MLandscape data = MutLandscape(fit_func, *pop);
               return data.benefit_avg;
           };
@@ -323,7 +329,7 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
           };
           std::function<double(POP_MANAGER*)> last_coal = [this](POP_MANAGER * pop){
               auto a_id = lin_ptr->last_coalesence;
-              //std::cout<<"COAL: "<<a_id<<std::endl;
+              std::cout<<"COAL: "<<a_id<<std::endl;
               auto depth = lin_ptr->TraceLineage(a_id);
               std::cout<<"DEPTH: "<<depth.size()<<std::endl;
               return (double)depth.size();
@@ -335,6 +341,7 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
           };
 
           AddFunction(diversity, "shannon_diversity");
+          AddFunction(last_coal, "last_coal");
           AddFunction(max_fitness, "max_fitness");
           AddFunction(avg_fitness, "avg_fitness");
           AddFunction(non_inf, "non_inf");
@@ -343,8 +350,8 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
           AddFunction(det_mut, "det_mut");
           AddFunction(max_ben, "max_ben");
           AddFunction(max_det, "max_det");
-          AddFunction(last_coal, "last_coal");
-
+          
+          std::cout<<"HEHEHEHEHee"<<std::endl;
           w->OnUpdate(UpdateFun);
 
       }

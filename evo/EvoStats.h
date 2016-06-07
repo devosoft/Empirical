@@ -69,13 +69,12 @@ template <typename ORG, typename WORLD>
           int benefit = 0, neutral = 0, detremental = 0;
           double fitness = fit_fun(org);
           ORG test = *org;
-
+          
           for(int i = 0; i < org->size(); i++){
               test[i] = !test[i]; //invert genome
 
               double fit_num = fit_fun(&test);
-              //std::cout<<fit_num<<" : "<<fitness<<" : "<<fit_num - fitness<<std::endl;
-
+              
               if( fit_num > fitness){ 
                   benefit++;
                   if(fit_num > m_ben){m_ben = fit_num;}
@@ -85,7 +84,6 @@ template <typename ORG, typename WORLD>
               }
               else{ 
                   detremental++;
-                  //std::cout<<" Fn - F: "<<fit_num - fitness<<std::endl;
                   if(fit_num  < m_det){m_det = fit_num;} }
 
               test[i] = !test[i]; //revert genome
@@ -104,12 +102,11 @@ template <typename ORG, typename WORLD>
           mut_neu += org_avg_n;
           mut_det += org_avg_d;
 
-          //std::cout<<"MaxBEN: "<<data.max_ben<<std::endl;
       }
       
       data.benefit_avg = mut_ben / total_orgs;
       data.neutral_avg = mut_neu / total_orgs;
-      data.det_avg = mut_det / total_orgs;
+      data.det_avg = mut_det / total_orgs; 
 
       return data;    
   }
