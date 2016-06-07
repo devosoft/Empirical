@@ -148,6 +148,8 @@ int main(int argc, char* argv[])
     grid_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
 			 , TOURNAMENT_SIZE, POP_SIZE);
 
+    std::cout<<"UPDATE________"<<std::endl;
+
     grid_pop.Update();
     grid_pop.MutatePop();
 

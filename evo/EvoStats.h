@@ -74,7 +74,7 @@ template <typename ORG, typename WORLD>
               test[i] = !test[i]; //invert genome
 
               double fit_num = fit_fun(&test);
-              std::cout<<fit_num<<" : "<<fitness<<" : "<<fit_num - fitness<<std::endl;
+              //std::cout<<fit_num<<" : "<<fitness<<" : "<<fit_num - fitness<<std::endl;
 
               if( fit_num > fitness){ 
                   benefit++;
@@ -104,7 +104,7 @@ template <typename ORG, typename WORLD>
           mut_neu += org_avg_n;
           mut_det += org_avg_d;
 
-          std::cout<<"MaxBEN: "<<data.max_ben<<std::endl;
+          //std::cout<<"MaxBEN: "<<data.max_ben<<std::endl;
       }
       
       data.benefit_avg = mut_ben / total_orgs;

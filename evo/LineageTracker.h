@@ -165,12 +165,12 @@ namespace evo{
     // Return a vector containing the genomes of an organism's ancestors
     emp::vector<org_ptr> TraceLineage(int org_id) {
       emp::vector<org_ptr> lineage;
-
+      std::cout<<"HERE A"<<std::endl;
       while(org_id) {
         lineage.push_back(this->org_to_genome[org_id]);
         org_id = this->parents[org_id];
       }
-
+      std::cout<<"HERE B"<<std::endl;
       return lineage;
 
     }
