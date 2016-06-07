@@ -287,6 +287,23 @@ namespace emp {
       else       bit_set[field_id] &= ~pos_mask;
     }
 
+    ///
+    /// Flips all the bits in a range [start, end)
+    ///
+    void flip(int start, int end) {
+      assert(start >= 0 && start <= end && end <= NUM_BITS);
+      for(int index = start; index < end; index++) {
+        Set(index, ~Get(index));
+      }
+    }
+
+    ///
+    /// flip a single bit
+    ///
+    void flip(int index) {
+      Set(index, ~Get(index));
+    }
+
     uint8_t GetByte(int index) const {
       assert(index >= 0 && index < NUM_BYTES);
       const int field_id = Byte2Field(index);
