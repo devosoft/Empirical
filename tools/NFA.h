@@ -75,6 +75,18 @@ namespace emp {
   public:
     NFA_State(NFA & _nfa) : nfa(_nfa) { state.insert(nfa.GetStart()); }
     ~NFA_State() { ; }
+
+    void Next(char sym) {
+      state = nfa.GetNext(sym, state);
+    }
+
+    void Print() {
+      std::cout << "cur states:";
+      for (int s : state) {
+        std::cout << " " << s;
+      }
+      std::cout << std::endl;
+    }
   };
 
 }
