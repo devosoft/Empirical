@@ -105,6 +105,7 @@ public:
           // overloaded AddOrgBirth will determine parent loc from pointer
           AddOrgBirth(offspring, org);
         }
+        org->increment_age();
       }
     } // end Update()
 
