@@ -67,6 +67,11 @@ namespace emp {
 
     T & back() { return a.back(); }
     const T & back() const { return a.back(); }
+
+    template <typename... ARGS>
+    auto fill(ARGS... args) -> decltype(a.fill(std::forward<ARGS>(args)...)) {
+      return a.fill(std::forward<ARGS>(args)...);
+    }
   };
 
 }
