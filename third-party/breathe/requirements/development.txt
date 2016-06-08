@@ -1,3 +1,0 @@
--r production.txt
-
-pip-tools==0.3.5
