@@ -3,9 +3,8 @@
 
 #include "../evo/NK.h"
 #include "../evo/World.h"
-#include "../tools/BitSet.h"
 #include "../tools/Random.h"
-#include "../evo/Stats.h"
+#include "../evo/EvoStats.h"
 #include "../evo/StatsManager.h"
 
 using BitOrg = emp::BitVector;

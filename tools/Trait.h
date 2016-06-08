@@ -1,18 +1,16 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_TRAIT_H
-#define EMP_TRAIT_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  The TraitDef class maintains a category of measuments about another class.
 //
 //  Each trait is associated with a name, a description, and a type.  Instance of that
 //  trait are of type TraitValue.  A TraitManager contains information about a group of
 //  related traits, and a TraitSet is a set of TraitValues.
-//
+
+#ifndef EMP_TRAIT_H
+#define EMP_TRAIT_H
 
 #include <string>
 #include <tuple>
@@ -21,6 +19,7 @@
 
 #include "assert.h"
 #include "functions.h"
+#include "meta.h"
 
 namespace emp {
 
@@ -165,7 +164,7 @@ namespace emp {
     // Lookup a trait by its type and index.
     template <typename IN_TYPE>
     const TraitDef<IN_TYPE> & GetTraitDef(int index) {
-      std::vector< TraitDef<IN_TYPE> > & cur_group = GetTraitGroup<IN_TYPE>();      
+      std::vector< TraitDef<IN_TYPE> > & cur_group = GetTraitGroup<IN_TYPE>();
       emp_assert(index >= 0 && index < (int) cur_group.size());
       return cur_group[index];
     }
@@ -173,7 +172,7 @@ namespace emp {
     // Lookup a trait by its type and index.
     template <typename IN_TYPE>
     const TraitDef<IN_TYPE> & GetTraitDef(TraitKey<IN_TYPE> key) {
-      std::vector< TraitDef<IN_TYPE> > & cur_group = GetTraitGroup<IN_TYPE>();      
+      std::vector< TraitDef<IN_TYPE> > & cur_group = GetTraitGroup<IN_TYPE>();
       return cur_group[key.GetIndex()];
     }
 

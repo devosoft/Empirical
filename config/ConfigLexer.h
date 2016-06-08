@@ -15,6 +15,8 @@
 #include <map>
 #include <string>
 
+#include "../tools/errors.h"
+
 #include "Token.h"
 
 namespace emp {
@@ -27,8 +29,18 @@ namespace emp {
     char next_char;
     std::string cur_lexeme;
 
+    struct Pattern {
+      std::string name;      // Unique name for this token.
+      std::string pattern;   // Regular expression used to identify instances of token.
+      int token_id;          // Unique ID for this token.
+      bool ignore;           // Should we skip over these tokens when looking for the next one?
+    };
+
+    std::map<std::string, Pattern> patterns;
+    int next_token_id;
+
   public:
-    ConfigLexer(std::istream & in_stream) : is(in_stream) {
+    ConfigLexer(std::istream & in_stream) : is(in_stream), next_token_id(256) {
       command_map["print"] = Token(Token::COMMAND_PRINT);
       command_map["include"] = Token(Token::COMMAND_INCLUDE);
       command_map["if"] = Token(Token::COMMAND_IF);
@@ -43,12 +55,69 @@ namespace emp {
 
       // Prime the first character so it's ready to go.
       is.get(next_char);
+
+      AddDefaultPatterns();
     }
     ConfigLexer(ConfigLexer &) = delete;
     ~ConfigLexer() { ; }
 
-    int GetMaxToken() const { return Token::NUM_TYPES; }
+    int AddPattern(const std::string & name, const std::string & pattern, int id=0, bool ignore=false) {
+      if (patterns.find(name) != patterns.end()) {
+        emp::LibraryWarning("Attempting to add multiple lexer patterns for '", name, "'.  Ignoring.");
+        return -1;
+      }
+      if (!id) id = next_token_id++;
+      else if (id >= next_token_id) next_token_id = id+1;
 
+      patterns[name] = { name, pattern, id, ignore };
+      return id;
+    }
+
+    void AddDefaultPatterns() {
+      AddPattern("WHITESPACE", "[ \t\r]", Token::WHITESPACE, true);
+      AddPattern("COMMENT", "#.*", Token::COMMENT, true);
+      AddPattern("INT_LIT", "[0-9]+", Token::INT_LIT);
+      AddPattern("FLOAT_LIT", "[0-9]+[.]'[0-9]+", Token::FLOAT_LIT);
+      AddPattern("CHAR_LIT", "'(.|(\\\\[\\\\'nt]))'", Token::CHAR_LIT);
+
+      AddPattern("STRING_LIT", "[\"](\\[nt\"\\]|[^\\\"])*\"", Token::STRING_LIT);
+      AddPattern("ID", "[a-zA-Z0-9_]+", Token::ID);
+
+      // The rest are completely determined by their type.
+      AddPattern("ENDLINE", "[\n;]", Token::ENDLINE);
+      AddPattern("CASSIGN_ADD", "\"+=\"", Token::CASSIGN_ADD);
+      AddPattern("CASSIGN_SUB", "\"-=\"", Token::CASSIGN_SUB);
+      AddPattern("CASSIGN_MULT", "\"*=\"", Token::CASSIGN_MULT);
+      AddPattern("CASSIGN_DIV", "\"/=\"", Token::CASSIGN_DIV);
+      AddPattern("CASSIGN_MOD", "\"%=\"", Token::CASSIGN_MOD);
+      AddPattern("COMP_EQU", "==", Token::COMP_EQU);
+      AddPattern("COMP_NEQU", "!=", Token::COMP_NEQU);
+      AddPattern("COMP_LESS", "<", Token::COMP_LESS);
+      AddPattern("COMP_LTE", "<=", Token::COMP_LTE);
+      AddPattern("COMP_GTR", ">", Token::COMP_GTR);
+      AddPattern("COMP_GTE", ">=", Token::COMP_GTE);
+      AddPattern("BOOL_AND", "&&", Token::BOOL_AND);
+      AddPattern("BOOL_OR", "||", Token::BOOL_OR);
+
+      // Statement commands
+      AddPattern("COMMAND_PRINT", "print", Token::COMMAND_PRINT);
+      AddPattern("COMMAND_INCLUDE", "include", Token::COMMAND_INCLUDE);
+      AddPattern("COMMAND_IF", "if", Token::COMMAND_IF);
+      AddPattern("COMMAND_ELSE", "else", Token::COMMAND_ELSE);
+      AddPattern("COMMAND_WHILE", "while", Token::COMMAND_WHILE);
+      AddPattern("COMMAND_FOREACH", "foreach", Token::COMMAND_FOREACH);
+      AddPattern("COMMAND_BREAK", "break", Token::COMMAND_BREAK);
+      AddPattern("COMMAND_CONTINUE", "continue", Token::COMMAND_CONTINUE);
+      AddPattern("COMMAND_FUNCTION", "function", Token::COMMAND_FUNCTION);
+      AddPattern("COMMAND_RETURN", "return", Token::COMMAND_RETURN);
+
+      // Built-in functions.
+      AddPattern("FUN_RANDOM", "random", Token::FUN_RANDOM);
+    }
+
+    int GetMaxToken() const { return next_token_id; }
+
+    // @CAO For the moment, GetToken is pre-build using the default token set.
     emp::Token GetToken() {
       while (next_char > 0) {                      // Keep looping until we find a token or hit EOF.
         if (is_digit(next_char)) {                 // Must be a number

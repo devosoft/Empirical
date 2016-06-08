@@ -3,6 +3,7 @@ a.out
 a.out.js
 *.map
 *.o
+*.gcov
 *.js.mem
 *.pyc
 *.swp
@@ -24,16 +25,18 @@ tests/html
 tests/*.gcda
 tests/*.gcno
 tests/*cov.info
-tests/coverage*
+tests/Coverage*
 tests/diff_cover.txt
 third-party/doxygen/build/*
 Slideshow.js
 incoming/
 */env/*
+*/3nv/*
 tmp/
 build/doxydoc/*
 third-party/doxygen
 doc/_build/*
+scripts/diff
 utils/edit_dist/IO/
 utils/edit_dist/edit_dist
 utils/edit_dist/tmp.py
