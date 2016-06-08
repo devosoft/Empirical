@@ -7,6 +7,7 @@
 #ifndef EMP_DFA_H
 #define EMP_DFA_H
 
+#include "array.h"
 #include "vector.h"
 
 namespace emp {
@@ -16,10 +17,18 @@ namespace emp {
     constexpr static int NUM_SYMBOLS = 128;
     emp::vector< emp::array<int, NUM_SYMBOLS> > transitions;
   public:
-    DFA(int num_states=0) : transitions(num_states) { ; }
+    DFA(int num_states=0) : transitions(num_states) {
+      for (auto & t : transitions) t.fill(-1);
+    }
     ~DFA() { ; }
 
-    void SetTransition(int from, int to, char sym) {
+    void Resize(int new_size) {
+      auto old_size = transitions.size();
+      transitions.resize(new_size);
+      for (auto i = old_size; i < transitions.size(); i++) transitions[i].fill(-1);
+    }
+
+    void SetTransition(int from, int to, int sym) {
       emp_assert(from >= 0 && from < (int) transitions.size());
       emp_assert(to >= 0 && to < (int) transitions.size());
       emp_assert(sym >= 0 && sym < NUM_SYMBOLS);
