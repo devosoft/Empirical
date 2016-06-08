@@ -165,7 +165,7 @@ namespace evo{
           output_location << header << std::endl;
           header_printed = true;
       }
-      std::cout << "In update " << update << " " << resolution << " " << update%resolution <<std::endl;
+
       if (update % resolution == 0){
 
         output_location << update;
