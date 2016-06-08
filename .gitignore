@@ -53,3 +53,4 @@ examples/evo/out
 examples/evo/replica
 examples/evo/grid.csv
 examples/evo/mixed.csv*
+examples/evo/.ipynb_checkpoints
