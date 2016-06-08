@@ -363,7 +363,6 @@ namespace evo {
       if (precalc_fitness && t_size * tourny_count * 2 >= (int) popM.size()) {
         // Pre-calculate fitnesses.
         emp::vector<int> valid_orgs = GetValidOrgIndices();
-        std::cout<<"NANANANANA"<<std::endl;
         emp::vector<double> fitness(valid_orgs.size());
         for (int i = 0; i < (int) valid_orgs.size(); ++i){
              fitness[i] = fit_fun(popM[valid_orgs[i]]);

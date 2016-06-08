@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
   grid_pop.Insert(next_orgC);
 
   */
-  std::cout<<"WHYME"<<std::endl;
+  //std::cout<<"WHYME"<<std::endl;
   for (int i = 0; i < POP_SIZE; i++) {
     BitOrg next_org(N);
     for (int j = 0; j < N; j++) next_org[j] = random.P(0.5);
@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
       return mutated;
     } );
 
-  std::cout<<"LLLLLLLLLLLLLLLLL"<<std::endl;
+  //std::cout<<"LLLLLLLLLLLLLLLLL"<<std::endl;
   // Loop through updates
   //std::cout << "Update,ShannonDiversity,MaxFitness,AvgFitness" << std::endl;
   for (int ud = 0; ud < UD_COUNT; ud++) {
@@ -152,13 +152,13 @@ int main(int argc, char* argv[])
     grid_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
 			 , TOURNAMENT_SIZE, POP_SIZE);
 
-    std::cout<<"UPDATE________"<<std::endl;
+    //std::cout<<"UPDATE________"<<std::endl;
 
     grid_pop.Update();
-    std::cout<<"BETWEEN"<<std::endl;
+    //std::cout<<"BETWEEN"<<std::endl;
     grid_pop.MutatePop();
 
-    std::cout<<"GRID DONE"<<std::endl;
+    //std::cout<<"GRID DONE"<<std::endl;
     mixed_pop.Update();
     mixed_pop.MutatePop();
     //MLandscape data = MutLandscape(fit_func, grid_pop);

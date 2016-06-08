@@ -15,7 +15,6 @@
 #include <vector>
 #include <set>
 #include "../tools/vector.h"
-//#include "World.h"
 
 struct MLandscape{
     double benefit_avg;
@@ -39,7 +38,6 @@ template <typename ORG, typename WORLD>
     for (auto org : orgs){
       double fitness = fit_fun(org);
       org_fit.push_back(fitness);
-
       if (fitness > fittest){ fittest = fitness; }
     }
 
@@ -54,13 +52,13 @@ template <typename ORG, typename WORLD>
     return non_total / num_orgs;
   }
 
-  // Calculates the benefitial, neutral, and detremental mutational landscapes
+  // Calculates the benefitial, neutral, and detremental mutational landscapes.
+  // Also calculates the maximum benefital and detremental mutations
 template <typename ORG, typename WORLD>
    MLandscape MutLandscape(std::function<double(ORG * org)> fit_fun, WORLD & orgs){
       double  mut_ben = 0, mut_det = 0, mut_neu = 0;
       int total_orgs = 0;
       MLandscape data;
-      //double m_ben = 0, m_det = 0;
 
       for (auto org : orgs){
           total_orgs++; //get a total count of orgs in current population
@@ -110,7 +108,6 @@ template <typename ORG, typename WORLD>
 
       return data;    
   }
-
 
 }
 }
