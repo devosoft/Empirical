@@ -74,6 +74,7 @@ int main() {
     const unsigned int pop_size = 30;
     const unsigned int runtime = 100;
     QWorld<QOrg, emp::evo::PopulationManager_Grid> Qpop(&dice);
+    Qpop.ConfigPop(60, 60);
 
     std::function<double(QOrg * )>fit_func=[](QOrg* org) {
       if (org != nullptr ) {return (double) org->get_fitness();}
@@ -82,7 +83,7 @@ int main() {
 
     // build random initial Population
     for(unsigned int i = 0; i < pop_size; i++) {
-      QOrg * org = new QOrg(.5, .5, .5, true, 0, &dice);
+      QOrg * org = new QOrg(0, 10, 1, true, 0, &dice);
       org->force_mutation();
       Qpop.Insert(*org);
     }

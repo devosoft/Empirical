@@ -28,7 +28,7 @@
 
 // constants that will eventually be configurable
 const unsigned int NUM_TO_DONATE = 45;
-const unsigned int NEEDED_TO_REPRODUCE = 10;
+const unsigned int NEEDED_TO_REPRODUCE = 50;
 const unsigned int COST_TO_PRODUCE = 25;
 const double MUTATION_AMOUNT = 0.1;
 
@@ -94,6 +94,7 @@ struct QuorumOrgState {
     age = 0;
     loc = 0;
     num_offspring = 0;
+    hi_density = false;
   };
 
   // prints out loc, age, points, if_producing_ai, if_mutation_on, {genome}
@@ -177,6 +178,7 @@ public:
 
   // methods for interacting with the world / neighbors
   int get_contribution (double current_quorum) {
+    set_density(current_quorum);
     if (random->P(state.genome.co_op_prob) &&
       current_quorum >= state.genome.quorum_threshold) {
 

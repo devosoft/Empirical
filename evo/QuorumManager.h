@@ -47,17 +47,16 @@ namespace evo {
     
     /// calculates quorum and updates state.hi_density  
     double calculate_quorum (std::set<QuorumOrganism *> neighbors) {
-      unsigned int active_neighbors = 0;
-      unsigned int total_neighbors = 0;
+      double active_neighbors = 0;
+      //unsigned int total_neighbors = 0;
 
       for (auto org_iter : neighbors) {
         if (org_iter == nullptr) {continue;} // ignore nonextant orgs
         if ( org_iter->hi_density()) {active_neighbors += HI_AI_WEIGHT;}
         else {active_neighbors += LO_AI_WEIGHT;}
-        total_neighbors += 1; // could probably get this from neighbors.size() or something
       }
 
-      return (double) active_neighbors / (double) total_neighbors;
+      return active_neighbors;
     }
 
     double calculate_quorum (QuorumOrganism * org) {
@@ -87,16 +86,15 @@ public:
     /// Does public good creation / distrubtion processing for an organism
     /// DOES NOT CHECK FOR NULL POINTERS
     void Publicize(QuorumOrganism * org) {
-      auto neighbors = POP_MANAGER<QuorumOrganism>::get_org_neighbors(org->get_loc());
+      auto neighbors = POP_MANAGER<QuorumOrganism>::GetOrgNeighbors(org->get_loc());
       auto cluster = POP_MANAGER<QuorumOrganism>::GetClusterByRadius(org->get_loc(),
                                                                     AI_RADIUS);
       cluster->erase(org);
       int contribution;
       int recipiant = 0;
-      
       // get contribution and round-robin it out to the various orgs
       // producer gets first dibs
-      if( (contribution = org->get_contribution(calculate_quorum(*cluster)) > 0)){
+      if( (contribution = org->get_contribution(calculate_quorum(*cluster))) > 0){
         // TODO: make this mor eefficient. Can easily math who gets who much (probably)
         auto recipiant = neighbors.end();
         
