@@ -96,7 +96,10 @@ namespace emp {
   // From: Sam Varshavchik
   // http://stackoverflow.com/questions/36511990/is-it-possible-to-disentangle-a-template-from-its-arguments-in-c
   namespace internal {
-    template<typename T, typename ...U> class AdaptTemplateHelper;
+    template<typename T, typename ...U> class AdaptTemplateHelper {
+    public:
+      using type = T;
+    };
 
     template<template <typename...> class T, typename... V, typename... U>
     class AdaptTemplateHelper<T<V...>, U...> {
@@ -111,7 +114,10 @@ namespace emp {
 
   // Variation of AdaptTemplate that only adapts first template argument.
   namespace internal {
-    template<typename T, typename U> class AdaptTemplateHelper_Arg1;
+    template<typename T, typename U> class AdaptTemplateHelper_Arg1 {
+    public:
+      using type = T;
+    };
 
     template<template <typename...> class T, typename X, typename ...V, typename U>
     class AdaptTemplateHelper_Arg1<T<X, V...>, U> {
