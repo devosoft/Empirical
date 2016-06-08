@@ -9,9 +9,10 @@
 
 //Developer notes:
 // * A lot of this will break once organisms can die other than by being replaced
-// * Not super-well tested with EAWorlds (injecting things into an)
-//   EAWorld in the middle of a run (rather than at the beggining)
-//   may have strange results.
+// * Not super-well tested with EAWorlds (injecting things into an
+//   EAWorld in the middle of a run rather than at the beggining)
+//   may have strange results. This is also true for pruned lineage trackers,
+//   which assume injection is initialization.
 
 #ifndef EMP_LINEAGE_TRACKER_H
 #define EMP_LINEAGE_TRACKER_H
@@ -165,12 +166,10 @@ namespace evo{
     // Return a vector containing the genomes of an organism's ancestors
     emp::vector<org_ptr> TraceLineage(int org_id) {
       emp::vector<org_ptr> lineage;
-      std::cout<<"HERE A"<<std::endl;
       while(org_id) {
         lineage.push_back(this->org_to_genome[org_id]);
         org_id = this->parents[org_id];
       }
-      std::cout<<"HERE B"<<std::endl;
       return lineage;
 
     }
@@ -288,65 +287,51 @@ namespace evo{
 
       //Once things can die we'll need something better here
 
-        //This org is no longer alive
-        if (generation_since_update.size() <= pos){
-            generation_since_update.resize(pos+1);
-        }
-        Node* curr = &(nodes[generation_since_update[pos]]);
-        curr->alive = false;
+      //This org is no longer alive
+      if (generation_since_update.size() <= pos){
+        generation_since_update.resize(pos+1);
+      }
+      Node* curr = &(nodes[generation_since_update[pos]]);
+      curr->alive = false;
 
-        //If this org doesn't have any surviving offspring lineages, we can
-        //remove it from the records. If it was its parent's last surviving
-        //lineage of offspring and its parent isn't alive, we can remove its
-        //parent. And so on, until everything for which that organism was the
-        //only surviving descendant has been removed.
-        std::cout << curr->id << " is being killed" << std::endl;
-        //If we're injecting something, it can't trigger pruning
+      //If this org doesn't have any surviving offspring lineages, we can
+      //remove it from the records. If it was its parent's last surviving
+      //lineage of offspring and its parent isn't alive, we can remove its
+      //parent. And so on, until everything for which that organism was the
+      //only surviving descendant has been removed.
+      //If we're injecting something, it can't trigger pruning
 
-        while (curr->offspring.size() == 0 && !curr->alive) {
+      while (curr->offspring.size() == 0 && !curr->alive) {
 
-          //Remove this organism from its parents list of offspring with
-          //surviving descendants
-          curr->parent->offspring.erase(
+        //Remove this organism from its parents list of offspring with
+        //surviving descendants
+        curr->parent->offspring.erase(
                                   std::remove(curr->parent->offspring.begin(),
                                   curr->parent->offspring.end(), curr ),
                                   curr->parent->offspring.end() );
 
-          //See if we can remove this genome from the record
-          ORG genome = *(curr->genome);
-          genome_counts[genome]--;
-          if (!genome_counts[genome]) {
-            genomes.erase(genome);
-          }
-
-          //See if we can remove parent too
-          Node* old = curr;
-          curr = curr->parent;
-          nodes.erase(old->id);
+        //See if we can remove this genome from the record
+        ORG genome = *(curr->genome);
+        genome_counts[genome]--;
+        if (!genome_counts[genome]) {
+          genomes.erase(genome);
         }
 
-        //If we unrolled the lineage although back to the current coalesence point
-        //and there is now only one lineage coming out of it, we can move the
-        //coalesence point up.
-        std::cout << "Last: " << last_coalesence << " Curr ID: " << curr->id << " " << curr->offspring << std::endl;
-        while (!inject && ((curr->id == last_coalesence && curr->offspring.size() == 1) ||
-                !curr->parent->alive && curr->parent->id == last_coalesence && curr->parent->offspring.size() == 1)){
-                    std::cout << "Updating last coalesence? " << curr->id << " " << last_coalesence <<std::endl;
-          if (curr->id == last_coalesence && !curr->alive){
-            std::cout << "Curr id == last coal" << std::endl;
-            curr = curr->offspring[0];
-            last_coalesence = curr->id;
-          } else {
-              std::cout << "Curr parent id == last coal" << std::endl;
-            if (curr->offspring.size()==1 && last_coalesence != curr->id && !curr->parent->alive) {
-                std::cout << "Curr only has one offspring" << std::endl;
-              last_coalesence = curr->id;
-            } else {
-              break;
-            }
-          }
-        }
+        //See if we can remove parent too
+        Node* old = curr;
+        curr = curr->parent;
+        nodes.erase(old->id);
+      }
 
+      //If we unrolled the lineage although back to the current coalesence point
+      //and there is now only one lineage coming out of it, we can move the
+      //coalesence point up.
+      //!inject is a guard against changing the last_coalesence during initialization.
+      //It's imperfect, though
+      while (!inject && curr->id == last_coalesence && curr->offspring.size() == 1 && !curr->alive){
+        curr = curr->offspring[0];
+        last_coalesence = curr->id;
+      }
 
       //Update mapping of lineage tracker ids to locations in population
       if (separate_generations && !inject){
@@ -376,7 +361,7 @@ namespace evo{
     int AddOrganism(ORG org, int parent) {
 
       int id = this->next++;
-      std::cout << parent << " gave birth to " << id << std::endl;
+
       //Create stuct to store info on this organism
       nodes[id] = Node();
       Node* curr = &nodes[id];
@@ -416,13 +401,11 @@ namespace evo{
     // Return a vector containing the genomes of an organism's ancestors
     emp::vector<int> TraceLineageIDs(int org_id) {
       emp::vector<int> lineage;
+      emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
       Node* org = &(nodes[org_id]);
-      std::cout << "Tracing lineage " << org->id << std::endl;
       while(org->id) {
-
         lineage.push_back(org->id);
         org = org->parent;
-        std::cout << "Tracing lineage " << org->id << std::endl;
       }
 
       return lineage;
@@ -432,6 +415,7 @@ namespace evo{
     //Return a vector containing the IDs of an oraganism's ancestors
     emp::vector<ORG> TraceLineage(int org_id) {
       emp::vector<ORG> lineage;
+      emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
       Node* org = &(nodes[org_id]);
       while(org->id) {
         lineage.push_back(*(org->genome));

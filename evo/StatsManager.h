@@ -18,7 +18,7 @@ namespace emp{
 namespace evo{
 
   EMP_BUILD_CONFIG( StatsManagerConfig,
-    VALUE(RESOLUTION, int, 1, "How often should stats be calculated (updates)"),
+    VALUE(RESOLUTION, int, 10, "How often should stats be calculated (updates)"),
     VALUE(DELIMITER, std::string, " ", "What should fields be separated by in the output")
   )
 
@@ -29,7 +29,7 @@ namespace evo{
   class StatsManager_Base {
   public:
     std::string delimiter = " "; //Gets inferred from file name
-    int resolution = 1; //With what frequency do we record data?
+    int resolution = 10; //With what frequency do we record data?
     static constexpr bool emp_is_stats_manager = true;
     std::ofstream output_location; //Where does output go?
 
