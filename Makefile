@@ -5,8 +5,12 @@ build-doxygen-xml:
 	mkdir -p build/doxydoc/source
 	./third-party/doxygen/build/bin/doxygen Doxyfile
 
-diff-cover:
-	cd tests && make diff-cover
+diff-cover: coverage
+	git diff origin/master > scripts/diff
+	cd scripts && python3 vigilance.py -i ignore_list diff
+
+travis: 
+	make diff-cover
 
 test:
 	cd tests && make test

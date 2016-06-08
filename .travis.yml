@@ -1,31 +1,38 @@
-sudo: false
+sudo: required
+dist: trusty
 language: cpp
 
+branches:
+  only:
+    - master
+
 notifications:
-    email: false
-
+  email: false
+  slack:
+    on_pull_requests: false
+    on_failure: always
+    on_success: change
+    secure: UC8Bsb6n2WAnKdUwzGo/QwDEhSyKbJFUZCVYem11o8JpXz/PB/vLTNIt/0xhbkoAwGMivAH6i6AeLx4HhMShnt5iWq1GK5Toh+uScp1BqT3M4XnoQbmiuhKKeFJhcoFaASGIoylURXAd65fVaojSul0Lx/pztkYzNQ1FUvcwtpA/guxJ9TE5M2Vmp81T5h74InJCW8eh30UJUlWkHdChK4RxnBgDic9vmn6/DGMWBIdGDbceF3PtOHQUk3E363LFDF6Ij0rOx5oXCm0YsSblvNRxFR9MOVX2YAKPy+dM5Kx0IRlIH+yYG9heH207+cfDg4LP7PiV0eCPh5gw8s7FHr89/fM8Mubh6X+l6Wbjla4waAdMhfSdI1vGxxq5uYTEtpfzsaNNQpfMnxe4eLEpdw3FgUA6xUdSS00dkBG1RoLTtqYSGCfEkKBwzmwwbEU77SYCKu+cjtjgBJSiwC0+Dxje4Y3tb5gDLCKbDArbPWiaqaqVPtRtUbSSP7qIt9e1DaAbcJO2nun+G8y1EdHoUNWbCVqZ/70l33Oo4ssm4d38xuAqFcKv1PH+7zv8Yql4uZIDBJz8G8aVvHMlBfrKRghDakWBrKX9rFbNen5IxuV/vMF051tHc0CWlO3HQjphH5ST1/eNjywGl107VLP9HzkZzqDBKcxcSGMLi7QC7F0=
 compiler:
-    - g++-4.8
+- g++-4.8
+python:
+- '3.5'
 install:
-    - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+- if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+- export python="/usr/bin/python"
 addons:
-    apt:
-        sources:
-        - kalakris-cmake
-        - ubuntu-toolchain-r-test
-        packages:
-        - g++-4.8
-        - gcov
-        - cmake
-        - bison
-        - python-virtualenv
-        - python-pip
-
+  apt:
+    sources:
+    - kalakris-cmake
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-4.8
+    - cmake
+    - bison
+    - python-virtualenv
+    - python-pip
 before_script:
-    - make install-testing-dependencies
-
+- sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-4.8 90
 script:
-    - source third-party/env/bin/activate
-    - cd tests
-    - git fetch origin master:refs/remotes/origin/master
-    - make diff-cover
+- git fetch origin master:refs/remotes/origin/master
+- make travis
