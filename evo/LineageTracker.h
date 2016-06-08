@@ -217,7 +217,7 @@ namespace evo{
     std::map<ORG, int> genome_counts;
 
   public:
-      int last_coalesence = 0;
+    int last_coalesence = 0;
     using LineageTracker<POP_MANAGER>::emp_is_lineage_manager;
     LineageTracker_Pruned() {;}
 
@@ -288,9 +288,10 @@ namespace evo{
 
       //Once things can die we'll need something better here
 
-      //If we're injecting something, it can't trigger pruning
-      if (!inject){
         //This org is no longer alive
+        if (generation_since_update.size() <= pos){
+            generation_since_update.resize(pos+1);
+        }
         Node* curr = &(nodes[generation_since_update[pos]]);
         curr->alive = false;
 
@@ -299,6 +300,9 @@ namespace evo{
         //lineage of offspring and its parent isn't alive, we can remove its
         //parent. And so on, until everything for which that organism was the
         //only surviving descendant has been removed.
+        std::cout << curr->id << " is being killed" << std::endl;
+        //If we're injecting something, it can't trigger pruning
+
         while (curr->offspring.size() == 0 && !curr->alive) {
 
           //Remove this organism from its parents list of offspring with
@@ -324,13 +328,25 @@ namespace evo{
         //If we unrolled the lineage although back to the current coalesence point
         //and there is now only one lineage coming out of it, we can move the
         //coalesence point up.
-        while ((curr->id == last_coalesence && curr->offspring.size() == 1) ||
-                curr->parent->id == last_coalesence && curr->parent->offspring.size() == 1){
-          curr = curr->offspring[0];
-          last_coalesence = curr->id;
+        std::cout << "Last: " << last_coalesence << " Curr ID: " << curr->id << " " << curr->offspring << std::endl;
+        while (!inject && ((curr->id == last_coalesence && curr->offspring.size() == 1) ||
+                !curr->parent->alive && curr->parent->id == last_coalesence && curr->parent->offspring.size() == 1)){
+                    std::cout << "Updating last coalesence? " << curr->id << " " << last_coalesence <<std::endl;
+          if (curr->id == last_coalesence && !curr->alive){
+            std::cout << "Curr id == last coal" << std::endl;
+            curr = curr->offspring[0];
+            last_coalesence = curr->id;
+          } else {
+              std::cout << "Curr parent id == last coal" << std::endl;
+            if (curr->offspring.size()==1 && last_coalesence != curr->id && !curr->parent->alive) {
+                std::cout << "Curr only has one offspring" << std::endl;
+              last_coalesence = curr->id;
+            } else {
+              break;
+            }
+          }
         }
 
-      }
 
       //Update mapping of lineage tracker ids to locations in population
       if (separate_generations && !inject){
@@ -360,7 +376,7 @@ namespace evo{
     int AddOrganism(ORG org, int parent) {
 
       int id = this->next++;
-
+      std::cout << parent << " gave birth to " << id << std::endl;
       //Create stuct to store info on this organism
       nodes[id] = Node();
       Node* curr = &nodes[id];
@@ -401,9 +417,12 @@ namespace evo{
     emp::vector<int> TraceLineageIDs(int org_id) {
       emp::vector<int> lineage;
       Node* org = &(nodes[org_id]);
+      std::cout << "Tracing lineage " << org->id << std::endl;
       while(org->id) {
+
         lineage.push_back(org->id);
         org = org->parent;
+        std::cout << "Tracing lineage " << org->id << std::endl;
       }
 
       return lineage;

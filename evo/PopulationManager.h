@@ -231,7 +231,8 @@ namespace evo {
       const int offspring_x = emp::mod(parent_x + offset%3 - 1, width);
       const int offspring_y = emp::mod(parent_y + offset/3 - 1, height);
       const int pos = ToID(offspring_x, offspring_y);
-
+      std::cout << "Offset: " << offset << " X: " << offspring_x << " Y: " << offspring_y << " Pos: " << pos << " Parent pos: " << parent_pos << " Parent X: " << parent_x << " Parent y:" << parent_y << std::endl;
+      std::cout << "Population vector " << pop << std::endl;
       if (pop[pos]) delete pop[pos];
 
       pop[pos] = new_org;

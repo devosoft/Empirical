@@ -20,8 +20,8 @@ constexpr int K = 0;
 constexpr int N = 10;
 constexpr double MUTATION_RATE = 0.005;
 
-constexpr int TOURNAMENT_SIZE = 2;
-constexpr int POP_SIZE = 10;
+constexpr int TOURNAMENT_SIZE = 1;
+constexpr int POP_SIZE = 4;
 constexpr int UD_COUNT = 1000;
 
 using BitOrg = emp::BitVector;
@@ -55,8 +55,9 @@ int main(int argc, char* argv[])
 
   mixed_pop.SetDefaultFitnessFun(fit_func);
   grid_pop.SetDefaultFitnessFun(fit_func);
-
-  grid_pop.ConfigPop(10,1);
+  //std::cout << "Emp Mod test " << emp::mod(-1,2) <<std::endl;
+  //std::cout << "C++ Mod test " << (-1%2) <<std::endl;
+  grid_pop.ConfigPop(2,2);
   //std::cout<<"HELLP"<<std::endl;
 
   // make a couple stats managers
