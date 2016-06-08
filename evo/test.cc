@@ -72,7 +72,7 @@ int main() {
     // I'm using recplica.cc from jgf_learning as a reference for these tests
     //TODO: test integration with stats managers
     const unsigned int pop_size = 30;
-    const unsigned int runtime = 100;
+    const unsigned int runtime = 1000;
     QWorld<QOrg, emp::evo::PopulationManager_Grid> Qpop(&dice);
     Qpop.ConfigPop(60, 60);
 
