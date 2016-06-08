@@ -2,6 +2,7 @@ travis-install-dependencies: build-doxygen
 	sudo pip install -r requirements.txt
 
 install-dependencies: build-doxygen install-pip-deps
+	git submodule update --init
 
 
 download-doxygen:
