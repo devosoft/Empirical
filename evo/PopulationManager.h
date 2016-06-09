@@ -206,10 +206,11 @@ namespace evo {
     int ToX(int id) const { return id % width; }
     int ToY(int id) const { return id / width; }
     int ToID(int x, int y) const { return y*width + x; }
-    constexpr static std::array<int,3> possx = {1,0,-1};
 
   public:
-    PopulationManager_Grid() { ConfigPop(10,10); }
+    PopulationManager_Grid() { 
+      ConfigPop(10,10);
+    }
     ~PopulationManager_Grid() { ; }
 
     int GetWidth() const { return width; }
@@ -227,10 +228,10 @@ namespace evo {
       // j
       // using the set will prevent duplictes, since we *WILL* traverse the same spaces
       // multiple times.
-      for(int i = 0; i < 3; i++) {
-        for(int j = 0; j < 3; j++) {
-          neighbors.insert(pop[ToID((org_x + possx[i] + width) % width, 
-                                    (org_y + possx[j] + height) % height)]);
+      for(int i = -1; i < 2; i++) {
+        for(int j = -1; j < 2; j++) {
+          neighbors.insert(pop[ToID((org_x + i + width) % width, 
+                                    (org_y + j + height) % height)]);
         }
       }
 
@@ -258,10 +259,10 @@ namespace evo {
 
       // for all 'enabled' spaces recurse this finder
       // our base case up top will prevent running in circles
-      for(int i = 0; i < 3; i++) {
-        for(int j = 0; j < 3; j++) {
-          unsigned int target = ToID((org_x + possx[i] + width) % width, 
-                                     (org_y + possx[j] + height) % height);
+      for(int i = -1; i < 2; i++) {
+        for(int j = -1; j < 2; j++) {
+          unsigned int target = ToID((org_x + i + width) % width, 
+                                     (org_y + j + height) % height);
           if(seen.find(target) != seen.end()) { 
             GetClusterByRadius(target, depth - 1, seen);
           }
@@ -272,7 +273,7 @@ namespace evo {
     }
 
     // entry point to recursive search
-    std::set<ORG *> * GetClusterByRadius(unsigned int focal_id, unsigned int depth) {
+    std::set<ORG *> GetClusterByRadius(unsigned int focal_id, unsigned int depth) {
       std::set<unsigned int> sites; 
       std::set<ORG *> orgs;
       GetClusterByRadius(focal_id, depth, sites); 
@@ -280,6 +281,7 @@ namespace evo {
       for (auto site : sites) {
         orgs.insert(pop[site]); 
       }
+      return orgs;
     }
 
     void ConfigPop(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }

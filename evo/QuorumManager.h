@@ -89,12 +89,11 @@ public:
       auto neighbors = POP_MANAGER<QuorumOrganism>::GetOrgNeighbors(org->get_loc());
       auto cluster = POP_MANAGER<QuorumOrganism>::GetClusterByRadius(org->get_loc(),
                                                                     AI_RADIUS);
-      cluster->erase(org);
+      cluster.erase(org);
       int contribution;
-      int recipiant = 0;
       // get contribution and round-robin it out to the various orgs
       // producer gets first dibs
-      if( (contribution = org->get_contribution(calculate_quorum(*cluster))) > 0){
+      if( (contribution = org->get_contribution(calculate_quorum(cluster))) > 0){
         // TODO: make this mor eefficient. Can easily math who gets who much (probably)
         auto recipiant = neighbors.end();
         
