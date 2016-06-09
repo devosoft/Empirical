@@ -7,6 +7,8 @@
 #ifndef EMP_DFA_H
 #define EMP_DFA_H
 
+#include <string>
+
 #include "array.h"
 #include "vector.h"
 
@@ -36,9 +38,14 @@ namespace emp {
     }
 
     int Next(int state, int sym) const {
-      emp_assert(state >= 0 && state < (int) transitions.size());
+      emp_assert(state >= -1 && state < (int) transitions.size());
       emp_assert(sym >= 0 && sym < NUM_SYMBOLS);
-      return transitions[state][sym];
+      return (state == -1) ? -1 : transitions[state][sym];
+    }
+
+    int Next(int state, std::string sym_set) {
+      for (char x : sym_set) state = Next(state, x);
+      return state;
     }
   };
 
