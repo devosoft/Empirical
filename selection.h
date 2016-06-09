@@ -27,6 +27,7 @@ namespace D3 {
     bool exit;
 
   public:
+    Selection(){EM_ASM({js.objects.push(-1)});}; //Null contstructor
     Selection(int id); //append constructor
     Selection(const char* selector, bool all = false);
     //Selection(Selection* selector, bool all = false); //Do we need this?
@@ -353,6 +354,17 @@ namespace D3 {
       return Selection(new_id);
     }
 
+    void Move(int x, int y) {
+      EM_ASM_ARGS({
+        js.objects[$0].attr("transform", "translate("+$1+","+$2+")");
+      }, this->id, x, y);
+    }
+
+    void Rotate(int degrees) {
+      EM_ASM_ARGS({
+        js.objects[$0].attr("transform", "rotate("+$1+")");
+      }, this->id, degrees);
+    }
 
     void Remove(){
       EM_ASM_ARGS({js.objects[$0].remove()},
@@ -507,6 +519,29 @@ namespace D3 {
       CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(filter, selector)
       StoreNewObject();
       return Selection(new_id);
+    }
+
+    //Set the tool tip up for this selection.
+    //This function exists in case you want to bind the tooltip to an
+    //event other than mouseover/out
+    void SetupToolTip(ToolTip tip) {
+      EM_ASM_ARGS({
+       js.objects[$0].call(js.objects[$1]);
+   }, this->id, tip.GetID());
+    }
+
+    //Tell tooltip to appear on mouseover and dissapear on mouseout
+    void BindToolTipMouseover(ToolTip tip) {
+      EM_ASM_ARGS({
+       js.objects[$0].on("mouseover", js.objects[$1].show)
+                     .on("mouseout", js.objects[$1].hide);
+      }, this->id, tip.GetID());
+    }
+
+    //Convenience function for most common tooltip setup
+    void AddToolTip(ToolTip tip) {
+      SetupToolTip(tip);
+      BindToolTipMouseover(tip);
     }
 
     //TODO:
