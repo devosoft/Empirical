@@ -81,20 +81,32 @@ namespace emp {
       // Keep track of where free transitions could have come from and can continue to.
       auto extend_to = states[to].free_to;
       auto extend_from = states[from].free_from;
+      extend_to.insert(to);
+      extend_from.insert(from);
 
-      // Update the immediate free moves with the new transition.
-      states[from].free_to.insert(to);
-      states[to].free_from.insert(from);
+      // Insert all combinations of where new moves can be coming from or going to.
+      for (int x : extend_from) {
+        for (int y : extend_to) {
+          states[x].free_to.insert(y);
+          states[y].free_from.insert(x);
+        }
+      }
 
-      // from can get to all other free moves from to (and vice versa)
-      states[from].free_to.insert(extend_to.begin(), extend_to.end());
-      states[to].free_from.insert(extend_from.begin(), extend_from.end());
+      std::cout << "Adding FREE transition from " << from << " to " << to << std::endl;
+      PrintFreeMoves();
 
-      // everything that can get to from can now get to everything to can get to (and vv).
-      for (int x : extend_from) states[x].free_to.insert(extend_to.begin(), extend_to.end());
-      for (int x : extend_to) states[x].free_from.insert(extend_from.begin(), extend_from.end());
     }
 
+    void PrintFreeMoves() {
+      for (int i = 0; i < (int) states.size(); i++) {
+        std::cout << "Free from ( ";
+        for (int x : states[i].free_from) std::cout << x << " ";
+        std::cout << ") to " << i << std::endl;
+        std::cout << "Free from " << i << " to ( ";
+        for (int x : states[i].free_to) std::cout << x << " ";
+        std::cout << ")" << std::endl;
+      }
+    }
   };
 
   class NFA_State {
