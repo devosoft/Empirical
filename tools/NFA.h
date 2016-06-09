@@ -37,7 +37,7 @@ namespace emp {
     ~NFA() { ; }
 
     int GetStart() const { return start; }
-    std::set<int> GetNext(char sym, int from_id=0) {
+    std::set<int> GetNext(int sym, int from_id=0) {
       std::set<int> to_set;
       for (auto & t : states[from_id].trans) {
         if (t.second.symbols[sym]) {
@@ -47,7 +47,7 @@ namespace emp {
       }
       return to_set;
     }
-    std::set<int> GetNext(char sym, const std::set<int> from_set) {
+    std::set<int> GetNext(int sym, const std::set<int> from_set) {
       std::set<int> to_set;
       for (int from_id : from_set) {
         for (auto & t : states[from_id].trans) {
@@ -61,7 +61,7 @@ namespace emp {
     }
 
     void Resize(int new_size) { states.resize(new_size); }
-    void AddTransition(int from, int to, char sym) {
+    void AddTransition(int from, int to, int sym) {
       emp_assert(from >= 0 && from < (int) states.size(), from, states.size());
       emp_assert(to >= 0 && to < (int) states.size(), to, states.size());
       emp_assert(sym >= 0, sym);
@@ -110,8 +110,12 @@ namespace emp {
 
     void SetStateSet(const std::set<int> & in) { state_set = in; }
 
-    void Next(char sym) {
+    void Next(int sym) {
       state_set = nfa.GetNext(sym, state_set);
+    }
+
+    void Next(const std::string & sym_set) {
+      for (char x : sym_set) Next(x);
     }
 
     void Print() {
