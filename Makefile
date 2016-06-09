@@ -10,7 +10,6 @@ diff-cover: coverage
 	cd scripts && python3 vigilance.py -i ignore_list diff
 
 travis: 
-	cd third-party && make travis-install-dependencies
 	make diff-cover
 
 test:
