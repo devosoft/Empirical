@@ -13,7 +13,6 @@ namespace D3 {
   class Axis : public D3_Base {
   private:
     SCALE_TYPE scale;
-    int orientation = 0;
     std::string label;
 
   public:
@@ -27,6 +26,7 @@ namespace D3 {
       EM_ASM({js.objects.push(d3.svg.axis())});
     }
 
+    //Draw axis on specified selection with intelligent default positioning
     void Draw(Selection selection){
       this->SetTickFormat("g");
 
@@ -40,17 +40,41 @@ namespace D3 {
                                   .attr("id", Pointer_stringify($2)+"_axis")
                                   .call(js.objects[$0]);
 
+        var canvas_width = js.objects[$1].attr("width");
+        var canvas_height = js.objects[$1].attr("height");
+
+        var orient = js.objects[$0].orient();
+        var dy = "3em";
+        var x_divisor = 2.0;
+        var text_orient = 0;
+        js.objects[$3].attr("transform", "translate(0,"+(canvas_height-60)+")");
+        if (orient == "top") {
+          dy = "-3em";
+          x_divisor = 2.0;
+          js.objects[$3].attr("transform", "translate(0,60)");
+        } else if (orient == "left") {
+          dy = "-2em";
+          x_divisor = -2.0;
+          text_orient = -90;
+          js.objects[$3].attr("transform", "translate(60,0)");
+        } else if(orient == "right") {
+          dy = "3em";
+          text_orient = -90;
+          js.objects[$3].attr("transform", "translate("+(canvas_width-60)+",0)");
+        }
+
         js.objects[$3].selectAll("line, .domain")
              .attr("stroke-width", 1)
              .attr("fill", "none")
              .attr("stroke", "black");
         js.objects[$3].append("text")
              .attr("id", "axis_label")
-             .attr("transform", "rotate("+$4+")")
-             .attr("x", (axis_range[1]-axis_range[0])/(($4<0) ? -2.0 : 2.0))
-             .attr("dy", ($4<0) ? "-2em" : "3em").style("text-anchor", "middle")
-             .text(Pointer_stringify($2));
-      }, this->id, selection.GetID(), dom_id.c_str(), group.GetID(), orientation);
+             .attr("transform", "rotate("+text_orient+")")
+             .attr("x", (axis_range[1]-axis_range[0])/x_divisor)
+             .attr("dy", dy).style("text-anchor", "middle")
+             .text(Pointer_stringify($4));
+
+      }, this->id, selection.GetID(), dom_id.c_str(), group.GetID(), label.c_str());
     }
 
     void ApplyAxis(Selection selection) {
@@ -73,16 +97,9 @@ namespace D3 {
 
     //Needs to be called before Draw
     void SetOrientation(std::string orientation) {
-
-      if (orientation == "top" || orientation == "bottom") {
-        this->orientation = 0;
-      } else {
-        this->orientation = -90;
-      }
-
       EM_ASM_ARGS({
 	    js.objects[$0].orient(Pointer_stringify($1));
-      }, this->id, orientation.c_str(), group.GetID(), this->orientation);
+      }, this->id, orientation.c_str(), group.GetID());
     }
 
     template <typename T, std::size_t SIZE>
@@ -134,6 +151,8 @@ namespace D3 {
 
   };
 
+  //Helper function to draw a standard set of x and y axes
+  //Takes the desired x axis, y axis, and the selection on which to draw them
   template <typename SCALE_X_TYPE, typename SCALE_Y_TYPE>
   void DrawAxes(Axis<SCALE_X_TYPE> & x_axis, Axis<SCALE_Y_TYPE> & y_axis, Selection & selection){
     x_axis.Draw(selection);
@@ -148,9 +167,6 @@ namespace D3 {
       js.objects[$3].attr("transform", "translate("+x_range[0]+",0)");
     }, x_axis.GetID(), y_axis.GetID(), x_axis.group.GetID(), y_axis.group.GetID());
   }
-
-  //  template <typename SCALE_TYPE>
-  //Axis::Axis()
 
 }
 
