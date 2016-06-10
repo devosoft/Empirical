@@ -51,3 +51,9 @@ OLD/config.h.bak
 examples/evo/NK
 geometry/bak/
 web/bak/
+examples/evo/runs/
+examples/evo/out
+examples/evo/replica
+examples/evo/grid.csv
+examples/evo/mixed.csv*
+examples/evo/.ipynb_checkpoints
