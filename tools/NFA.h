@@ -32,8 +32,12 @@ namespace emp {
 
     emp::vector<State> states;
     int start;
+    emp::vector< char > is_stop;         // 0=no 1=yes (char instead of bool for speed)
+
   public:
-    NFA(int num_states=0, int start_state=0) : states(num_states), start(start_state) { ; }
+    NFA(int num_states=0, int start_state=0)
+      : states(num_states), start(start_state), is_stop(num_states, 0) { ; }
+    NFA(const NFA &) = default;
     ~NFA() { ; }
 
     int GetStart() const { return start; }
@@ -60,13 +64,16 @@ namespace emp {
       return to_set;
     }
 
-    void Resize(int new_size) { states.resize(new_size); }
+    void Resize(int new_size) { states.resize(new_size); is_stop.resize(new_size, 0); }
     void AddTransition(int from, int to, int sym) {
       emp_assert(from >= 0 && from < (int) states.size(), from, states.size());
       emp_assert(to >= 0 && to < (int) states.size(), to, states.size());
       emp_assert(sym >= 0, sym);
 
       states[from].trans[to].symbols[sym] = true;
+    }
+    void AddTransition(int from, int to, const std::string & sym_set) {
+      for (char x : sym_set) AddTransition(from, to, x);
     }
     void AddTransition(int from, int to, const BitSet<NUM_SYMBOLS> & sym_set) {
       emp_assert(from >= 0 && from < (int) states.size(), from, states.size());
@@ -96,6 +103,9 @@ namespace emp {
       PrintFreeMoves();
 
     }
+
+    void SetStop(int state) { is_stop[state] = 1; }
+    bool IsStop(int state) const { return is_stop[state]; }
 
     void PrintFreeMoves() {
       for (int i = 0; i < (int) states.size(); i++) {
