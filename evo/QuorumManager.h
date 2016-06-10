@@ -8,6 +8,7 @@
 #define EMP_EVO_QUORUM_MANAGER
 
 #include "../tools/Random.h"
+#include "../config/config.h"
 #include "QuorumOrg.h"
 #include "World.h"
 #include <iostream>
@@ -22,10 +23,12 @@
 //using MixedWorld = emp::evo::World<ORG, emp::evo::PopulationManager_Base<ORG>>;
 //MixedWorld<BitOrg> mixed_pop(random);
 
-//TODO@JGF: migrate these to QOrg
-const unsigned int HI_AI_WEIGHT = 4;
-const unsigned int LO_AI_WEIGHT = 1;
-const unsigned int AI_RADIUS = 10;
+EMP_BUILD_CONFIG( QuorumManagerConfig,
+    VALUE(HI_AI_WEIGHT, int, 4, "What value should the AI production be for hi-density?"),
+    VALUE(LO_AI_WEIGHT, int, 1, "What value should the AI production be for lo-density?"),
+    VALUE(AI_RADIUS, int, 10, "What's the radius of AI dispersal?")
+)
+
 
 namespace emp {
 namespace evo {
@@ -44,6 +47,7 @@ namespace evo {
     // TODO: determine if this should/does include the target org in quorum calc
 
   protected:
+    int hi_weight, lo_weight, ai_radius;
     
     /// calculates quorum and updates state.hi_density  
     double calculate_quorum (std::set<QuorumOrganism *> neighbors) {
@@ -52,8 +56,8 @@ namespace evo {
 
       for (auto org_iter : neighbors) {
         if (org_iter == nullptr) {continue;} // ignore nonextant orgs
-        if ( org_iter->hi_density()) {active_neighbors += HI_AI_WEIGHT;}
-        else {active_neighbors += LO_AI_WEIGHT;}
+        if ( org_iter->hi_density()) {active_neighbors += hi_weight;}
+        else {active_neighbors += lo_weight;}
       }
 
       return active_neighbors;
@@ -70,6 +74,15 @@ namespace evo {
     }
 
 public:
+    QuorumManager () {
+      POP_MANAGER<QuorumOrganism>();
+        QuorumManagerConfig config;
+        config.Read("QuorumManagerConfig.cfg");
+        hi_weight = config.HI_AI_WEIGHT();
+        lo_weight = config.LO_AI_WEIGHT();
+        ai_radius = config.AI_RADIUS();
+        config.Write("QuorumManagerConfig.cfg");
+    }
     // minor override to the parent class to save the orgs location to the org
     unsigned int AddOrg (QuorumOrganism * org) {
       return org->set_id(POP_MANAGER<QuorumOrganism>::AddOrg(org));
@@ -88,7 +101,7 @@ public:
     void Publicize(QuorumOrganism * org) {
       auto neighbors = POP_MANAGER<QuorumOrganism>::GetOrgNeighbors(org->get_loc());
       auto cluster = POP_MANAGER<QuorumOrganism>::GetClusterByRadius(org->get_loc(),
-                                                                    AI_RADIUS);
+                                                                    ai_radius);
       cluster.erase(org);
       int contribution;
       // get contribution and round-robin it out to the various orgs

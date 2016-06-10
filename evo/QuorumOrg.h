@@ -8,6 +8,7 @@
 #ifndef EMP_EVO_QUORUM_ORGANISM
 #define EMP_EVO_QUORUM_ORGANISM
 
+#include "../config/config.h"
 #include "../tools/Random.h"
 #include <iostream>
 
@@ -27,11 +28,13 @@
 
 
 // constants that will eventually be configurable
-const unsigned int NUM_TO_DONATE = 45;
-const unsigned int NEEDED_TO_REPRODUCE = 50;
-const unsigned int COST_TO_PRODUCE = 25;
-const double MUTATION_AMOUNT = 0.1;
 
+EMP_BUILD_CONFIG( QuorumOrgConfig,
+    VALUE(NUM_TO_DONATE, int, 45, "Number of points a public good is 'worth'"),
+    VALUE(NEEDED_TO_REPRODUCE, int, 50, "Number of points needed for an organism to reproduce"),
+    VALUE(COST_TO_DONATE, int, 25, "Number of points a public good costs to produce"),
+    VALUE(MUTATION_AMOUNT, double, 0.1, "Standard deviation for the normal distribtion of mutation")
+)
 
 namespace emp {
 namespace evo {
@@ -78,7 +81,7 @@ struct QuorumOrgState {
   bool hi_density;
   bool mutate;    // dunno if we'll want to do this by-org, but eh
 
-  unsigned int points;
+  int points;
   unsigned int age;
   unsigned int loc;
   unsigned int num_offspring; // gonna use this as/in a basic fitness function
@@ -122,6 +125,8 @@ class QuorumOrganism {
 
 protected:
   emp::Random * random;
+  int num_to_donate, needed_to_reproduce, cost_to_donate;
+  double mutation_amount;
 
 public:
   // Default Constructor
@@ -133,6 +138,17 @@ public:
   // Config constructor
   QuorumOrganism (double cprob, double airad, double qthresh, bool mut, unsigned int pts,
           emp::Random * rand) {
+
+ 
+    QuorumOrgConfig config;
+    config.Read("QuorumOrgConfig.cfg");
+    num_to_donate = config.NUM_TO_DONATE();
+    needed_to_reproduce = config.NEEDED_TO_REPRODUCE();
+    cost_to_donate = config.COST_TO_DONATE();
+    mutation_amount = config.MUTATION_AMOUNT();
+    
+    config.Write("QuorumOrgConfig.cfg");
+    
     this->QuorumOrganism::state = QuorumOrgState(cprob, airad, qthresh, mut, pts);
     this->random = rand;
   }
@@ -147,23 +163,17 @@ public:
 
   // the aforementioned mutate function
   bool mutate (Random & random) {
-    if (!state.mutate) {return false;} // if mutation is disabled fail out
       //state.genome.quorum_threshold += random.GetRandNormal(0, MUTATION_AMOUNT);
       //state.genome.ai_radius += random.GetRandNormal(0, MUTATION_AMOUNT);
-      state.genome.co_op_prob += random.GetRandNormal(0, MUTATION_AMOUNT);
+      state.genome.co_op_prob += random.GetRandNormal(0, mutation_amount);
     return true;
   }
+
 
   bool mutate() {
     return mutate(*(this->random));
   }
 
-  // forcibly mutates all the parameters in a normal range +/- MUTATION_AMOUNT
-  void force_mutation() {
-    //state.genome.quorum_threshold += random->GetRandNormal(0, MUTATION_AMOUNT);
-    //state.genome.ai_radius += random->GetRandNormal(0, MUTATION_AMOUNT);
-    state.genome.co_op_prob += random->GetRandNormal(0, MUTATION_AMOUNT);
-  }
 
   // utility/accessor methods
   void set_state (QuorumOrgState new_state) {state = new_state;}
@@ -184,9 +194,9 @@ public:
 
       // gonna add a check to see if we contribute when we're poor
       // dunno if I should
-      if (state.points >= NUM_TO_DONATE) {
-        state.points -= COST_TO_PRODUCE;
-        return NUM_TO_DONATE;
+      if (state.points >= cost_to_donate) {
+        state.points -= cost_to_donate;
+        return num_to_donate;
       }
     }
     return 0;
@@ -208,8 +218,8 @@ public:
   // nullptr otherwise
   // will decrement the points needed to reproduce from state
   QuorumOrganism * reproduce() {
-    if (state.points >= NEEDED_TO_REPRODUCE) {
-      state.points -= NEEDED_TO_REPRODUCE;
+    if (state.points >= needed_to_reproduce) {
+      state.points -= needed_to_reproduce;
       state.num_offspring++;
       return make_offspring();
     }
