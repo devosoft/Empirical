@@ -53,7 +53,7 @@ namespace D3 {
           x_divisor = 2.0;
           js.objects[$3].attr("transform", "translate(0,60)");
         } else if (orient == "left") {
-          dy = "-2em";
+          dy = "-3em";
           x_divisor = -2.0;
           text_orient = -90;
           js.objects[$3].attr("transform", "translate(60,0)");

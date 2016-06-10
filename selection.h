@@ -492,6 +492,18 @@ namespace D3 {
       CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(each, function)
     }
 
+    void Each(const char * time, const char * function){
+      /* Call the given function on each element of the selection. The function
+     is indicated as a string and can either be in the d3 namespace,
+     the emp namespace (as results from JSWrapping C++ functions), or the
+     window namespace. These three options are checked sequentially in that
+     order, so a C++ function with the same name as d3 built-in will not
+     override the built-in. Similarly, a function declared directly in the
+     window will be overriden by a JSWrapped function with the same name.
+       */
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS(each, time, function)
+    }
+
     void Call(const char * function){
       /* Call the given function once on the entire selection. The function
 	 is indicated as a string and can either be in the d3 namespace,

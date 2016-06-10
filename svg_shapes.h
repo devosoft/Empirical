@@ -14,6 +14,7 @@ namespace D3 {
     SvgShapeGenerator();
   public:
 
+    int GetID(){return id;}
     //This function creates a string specifying a path
     template <typename T, size_t SIZE>
     std::string Generate(std::array<std::array<T, 2>, SIZE> data){
@@ -31,17 +32,17 @@ namespace D3 {
 
     //This function actually handles the binding of the path string to the dom
     template <typename T, std::size_t SIZE>
-    Selection DrawShape(std::array<std::array<T, 2>, SIZE> data) {
-      Selection path = Select("svg").Append("path");
+    Selection DrawShape(std::array<std::array<T, 2>, SIZE> data, Selection s) {
+      Selection path = s.Append("path");
       path.SetAttr("d", Generate(data).c_str());
       return path;
     }
 
     //This function actually handles the binding of the path string to the dom
     //without passing the data through C++
-    Selection DrawShape(Dataset data){//, Selection appendto=Select("svg"),
+    Selection DrawShape(Dataset data, Selection s){//, Selection appendto=Select("svg"),
       //std::string type = "path") {
-      Selection path = Select("svg").Append("path");
+      Selection path = s.Append("path");
       //Selection path = appendto.SelectAll("path");//type.c_str());
       //Selection path = Select("svg").SelectAll("path");//type.c_str());
 
