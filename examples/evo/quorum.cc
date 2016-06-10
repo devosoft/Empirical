@@ -43,7 +43,8 @@ EMP_BUILD_CONFIG( QuorumConfig,
     VALUE(TICKS, int, 1000, "Length of simulation"),
     VALUE(INITIAL_SIZE, unsigned int, 30, "Starting population size"),
     VALUE(INITIAL_CONFIG, int, 0, "Index of the QOrg initial config array to use as inital config"),
-    VALUE(ENABLE_MUTATION, bool, true, "If mutation should be enabled")
+    VALUE(ENABLE_MUTATION, bool, true, "If mutation should be enabled"),
+    VALUE(RAND_SEED, int, 238947, "Seed for the random generator")
 )
 
 
@@ -55,17 +56,20 @@ int main(int argc, char* argv[]) {
     emp::Random dice;
     std::string prefix;
 
-    if (argc == 3) { // has prefix
+    auto args = emp::cl::ArgManager(argc, argv);
+    if (args.ProcessConfigOptions(config, std::cout, "quorum.cfg") == false) {exit(0);}
+    if (args.TestUnknown() == false) {exit(0);}
+
+    if (argc == 1) { // program name, no prefix
+      prefix = "";
+    }
+    else if (argc == 2) { // has prefix
       prefix = std::string(argv[1]) + "-";
-      std::istringstream ss(argv[2]);
-      int seed;
-      if (!(ss >> seed)) {std::cerr << "Invalid number " << argv[1] << '\n';}
-      dice.ResetSeed(seed);
     }
     else {
-      std::cerr << "** Usage: ./quorum output-prefix rand_seed";
-      return 1;
+      std::cerr << "** Usage: ./quorum output-prefix";
     }
+
 
     QWorld<QOrg, emp::evo::PopulationManager_Grid> Qpop(&dice);
     Qpop.ConfigPop(config.GRID_X(), config.GRID_Y());
@@ -83,6 +87,7 @@ int main(int argc, char* argv[]) {
     QOrg::random = &dice; // our random is gotten from the world
     unsigned int runtime = config.TICKS();
     unsigned int pop_size = config.INITIAL_SIZE();
+    dice.ResetSeed(config.RAND_SEED());
 
     config.Write("quorum.cfg");
 
