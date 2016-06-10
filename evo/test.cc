@@ -22,49 +22,8 @@ using QWorld = emp::evo::World<QOrg, QM<BASE_PM>>;
 
 
 int main() {
+   
     emp::Random dice;
-
-    // test reproduction
-    QOrg Simon(.5, .5, .5, true, 0, &dice);
-    
-
-    int num_ticks = 0;
-    QOrg * SimonJr = nullptr;
-
-    do {
-        SimonJr = Simon.reproduce();
-        num_ticks++;
-        Simon.add_points(1);
-    } while (SimonJr == nullptr);
-
-    SimonJr->set_id(2);
-
-    std::cout << Simon << std::endl;
-    std::cout << *SimonJr << " (after " << num_ticks - 1<< " ticks; should be 10)." << std::endl;
-    // require offspring to be created after 10 ticks
-
-    // test AI generating organism
-    QOrg Samaritan(.5, 1, .5, true, 5, &dice);
-    std::cout << "Samaritan's AI production is " << Samaritan.hi_density();
-    std::cout << " (should be true/1)" << std::endl;
-    // require to be true/1
-
-    // test forced co-operation
-    QOrg BetterSamaritan(1, 1, .5, true, 3, &dice);
-    std::cout << "BetterSamaritan is doinating " << BetterSamaritan.get_contribution(.6);
-    std::cout << " points (should be 0)." << std::endl;
-
-    // make it able, but keep below quorum
-    BetterSamaritan.add_points(7);
-    std::cout << "BetterSamaritan is doinating " << BetterSamaritan.get_contribution(.4);
-    std::cout << " points (should be 0)." << std::endl;
-
-    std::cout << "BetterSamaritan is doinating " << BetterSamaritan.get_contribution(.6);
-    std::cout << " points (should be 5)." << std::endl;
-    std::cout << "State is: " << BetterSamaritan << " (should be ";
-    std::cout << " '0, 0, 5, 1, 1, (1, 1, 0.5)' " << std::endl;
-
-
     // now to test the actual population manager.
     // note: this will currently ONLY work with the grid pop as a base,
     // since only it has the get_org_neighbors() funciton impelemented.
@@ -83,8 +42,8 @@ int main() {
 
     // build random initial Population
     for(unsigned int i = 0; i < pop_size; i++) {
-      QOrg * org = new QOrg(0, 10, 1, true, 0, &dice);
-      org->force_mutation();
+      QOrg * org = new QOrg(0, 10, 1, true, 0);
+      org->mutate();
       Qpop.Insert(*org);
     }
 

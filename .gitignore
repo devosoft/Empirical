@@ -9,7 +9,10 @@ a.out.js
 *.swp
 *.swo
 *.dSYM
+*.out
+*.debug
 *tmp.*
+*.cfg
 coverage.xml
 diff_cover.txt
 UTests/tools/tmp*.cc

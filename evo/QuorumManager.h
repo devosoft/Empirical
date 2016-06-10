@@ -26,7 +26,11 @@
 EMP_BUILD_CONFIG( QuorumManagerConfig,
     VALUE(HI_AI_WEIGHT, int, 4, "What value should the AI production be for hi-density?"),
     VALUE(LO_AI_WEIGHT, int, 1, "What value should the AI production be for lo-density?"),
-    VALUE(AI_RADIUS, int, 10, "What's the radius of AI dispersal?")
+    VALUE(AI_RADIUS, int, 10, "What's the radius of AI dispersal?"),
+    VALUE(NUM_TO_DONATE, int, 45, "Number of points a public good is 'worth'"),
+    VALUE(NEEDED_TO_REPRODUCE, int, 50, "Number of points needed for an organism to reproduce"),
+    VALUE(COST_TO_DONATE, int, 25, "Number of points a public good costs to produce"),
+    VALUE(MUTATION_AMOUNT, double, 0.1, "Standard deviation for the normal distribtion of mutation")
 )
 
 
@@ -36,15 +40,8 @@ namespace evo {
   // templated QuorumManager class
   template <class QuorumOrganism, template<class> class POP_MANAGER>
   class QuorumManager : public POP_MANAGER<QuorumOrganism> {
-
+    using POP_MANAGER<QuorumOrganism>::random_ptr;
     // we require that the base class has a get_neighbors methods
-
-    // function to calculate if the given organism is at quorum
-    // more accurately, it determines % of neighbors emitting the signal
-    // let's assume the base class implements get_org_neighbors() that returns
-    // an emp_vector of org*'s'
-    // or array, or other iterable container--doesn't matter
-    // TODO: determine if this should/does include the target org in quorum calc
 
   protected:
     int hi_weight, lo_weight, ai_radius;
@@ -78,11 +75,24 @@ public:
       POP_MANAGER<QuorumOrganism>();
         QuorumManagerConfig config;
         config.Read("QuorumManagerConfig.cfg");
+        
         hi_weight = config.HI_AI_WEIGHT();
         lo_weight = config.LO_AI_WEIGHT();
         ai_radius = config.AI_RADIUS();
+        QuorumOrganism::num_to_donate = config.NUM_TO_DONATE();
+        QuorumOrganism::needed_to_reproduce = config.NEEDED_TO_REPRODUCE();
+        QuorumOrganism::cost_to_donate = config.COST_TO_DONATE();
+        QuorumOrganism::mutation_amount = config.MUTATION_AMOUNT();
+        QuorumOrganism::random = this->random_ptr; // our random is gotten from the world
+    
         config.Write("QuorumManagerConfig.cfg");
     }
+
+    void SetRandom(Random * rand) {
+      random_ptr = rand;
+      QuorumOrganism::random = rand;
+    } 
+
     // minor override to the parent class to save the orgs location to the org
     unsigned int AddOrg (QuorumOrganism * org) {
       return org->set_id(POP_MANAGER<QuorumOrganism>::AddOrg(org));

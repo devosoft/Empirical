@@ -27,15 +27,6 @@
  */
 
 
-// constants that will eventually be configurable
-
-EMP_BUILD_CONFIG( QuorumOrgConfig,
-    VALUE(NUM_TO_DONATE, int, 45, "Number of points a public good is 'worth'"),
-    VALUE(NEEDED_TO_REPRODUCE, int, 50, "Number of points needed for an organism to reproduce"),
-    VALUE(COST_TO_DONATE, int, 25, "Number of points a public good costs to produce"),
-    VALUE(MUTATION_AMOUNT, double, 0.1, "Standard deviation for the normal distribtion of mutation")
-)
-
 namespace emp {
 namespace evo {
 
@@ -123,34 +114,18 @@ std::ostream & operator<< (std::ostream & out, QuorumOrgState & state) {
 
 class QuorumOrganism {
 
-protected:
-  emp::Random * random;
-  int num_to_donate, needed_to_reproduce, cost_to_donate;
-  double mutation_amount;
-
 public:
-  // Default Constructor
-  
+  static emp::Random * random;
+  static int num_to_donate, needed_to_reproduce, cost_to_donate;
+  static double mutation_amount;
+
   // access specifiers are really annoying. 
   QuorumOrgState state;
   QuorumOrganism () {};
 
   // Config constructor
-  QuorumOrganism (double cprob, double airad, double qthresh, bool mut, unsigned int pts,
-          emp::Random * rand) {
-
- 
-    QuorumOrgConfig config;
-    config.Read("QuorumOrgConfig.cfg");
-    num_to_donate = config.NUM_TO_DONATE();
-    needed_to_reproduce = config.NEEDED_TO_REPRODUCE();
-    cost_to_donate = config.COST_TO_DONATE();
-    mutation_amount = config.MUTATION_AMOUNT();
-    
-    config.Write("QuorumOrgConfig.cfg");
-    
+  QuorumOrganism (double cprob, double airad, double qthresh, bool mut, unsigned int pts) {
     this->QuorumOrganism::state = QuorumOrgState(cprob, airad, qthresh, mut, pts);
-    this->random = rand;
   }
 
   // copy constructor; probably the primary way of reproduction will be to
@@ -163,10 +138,13 @@ public:
 
   // the aforementioned mutate function
   bool mutate (Random & random) {
+    if (state.mutate) {
       //state.genome.quorum_threshold += random.GetRandNormal(0, MUTATION_AMOUNT);
       //state.genome.ai_radius += random.GetRandNormal(0, MUTATION_AMOUNT);
       state.genome.co_op_prob += random.GetRandNormal(0, mutation_amount);
-    return true;
+      return true;
+    }
+    else {return false;}
   }
 
 
@@ -233,6 +211,12 @@ std::ostream & operator << (std::ostream & out, QuorumOrganism & org) {
    org.print(out);
    return out;
 }
+
+int QuorumOrganism::num_to_donate;
+int QuorumOrganism::cost_to_donate;
+int QuorumOrganism::needed_to_reproduce;
+double QuorumOrganism::mutation_amount;
+emp::Random * QuorumOrganism::random;
 
 } // close evo::
 } // close emp::
