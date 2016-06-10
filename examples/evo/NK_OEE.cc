@@ -9,8 +9,13 @@
 #include "../../web/web_init.h"
 #include "../../web/Animate.h"
 #include "../../emtools/JSWrap.h"
+#include "../../web/canvas_utils.h"
+#include "../../web/web.h"
+#include "../../web/Document.h"
+#include "../../emtools/emfunctions.h"
 
 #include "../../evo/visualization_utils.h"
+#include "../../evo/evo_animation.h"
 #include "../../../d3-emscripten/selection.h"
 #include "../../../d3-emscripten/scales.h"
 #include "../../../d3-emscripten/axis.h"
@@ -34,8 +39,10 @@ constexpr int UD_COUNT = config.MAX_GENS();
 constexpr int TOURNAMENT_SIZE = config.TOURNAMENT_SIZE();
 
 using BitOrg = emp::BitSet<N>;
-FitnessVisualization<BitOrg > viz;
+GraphVisualization graph;
+NKAnimation<BitOrg, emp::evo::DefaultStats> viz;
 
+//emp::web::Document doc("emp_base");
 
 extern "C" int main()
 {
@@ -43,16 +50,26 @@ extern "C" int main()
   // Build a random initial population
   for (int i = 0; i < POP_SIZE; i++) {
     BitOrg next_org;
-    for (int j = 0; j < N; j++) next_org[j] = viz.info.r->P(0.5);
-    viz.info.world->Insert(next_org);
+    for (int j = 0; j < N; j++) next_org[j] = viz.r->P(0.5);
+    viz.world->Insert(next_org);
   }
 
-  viz.info.world->SetDefaultMutateFun( [](BitOrg* org, emp::Random& random) {
+  viz.world->SetDefaultMutateFun( [](BitOrg* org, emp::Random& random) {
       (*org)[random.GetInt(N)] = random.P(0.5);
       return true;
     } );
 
-  viz.Setup();
-  viz.info.anim.Start();
+  graph.Setup(config);
+  viz.world->statsM.ConnectVis(&graph);
+
+  //doc << "<br>";
+  /*doc.AddButton([](){
+      viz.anim.ToggleActive();
+      auto but = doc.Button("toggle");
+      if (viz.anim.GetActive()) but.Label("Pause");
+      else but.Label("Start");
+  }, "Start", "toggle");*/
+
+  viz.anim.Start();
 
 }

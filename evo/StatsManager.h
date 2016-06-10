@@ -11,6 +11,7 @@
 #include "../tools/stats.h"
 #include "../config/config.h"
 #include "PopulationManager.h"
+#include "visualization_utils.h"
 
 namespace emp{
 namespace evo{
@@ -111,6 +112,7 @@ namespace evo{
     std::string header = "update";
 
   public:
+    GraphVisualization * viz_pointer;
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
     fit_fun_type fit_fun;
 
@@ -180,6 +182,10 @@ namespace evo{
             output_location << delimiter << d;
         }
         output_location << std::endl;
+
+        if (viz_pointer) {
+          viz_pointer->AnimateStep(std::array<double, 2>({(double)update, world_results[0]}));
+        }
       }
     }
 
@@ -187,12 +193,16 @@ namespace evo{
         fit_fun = fit;
     }
 
+    void ConnectVis(GraphVisualization * viz) {
+      viz_pointer = viz;
+    }
+
   };
 
   //Calculates some commonly required information: shannon diversity,
   //max fitness within the population, and average fitness within the population
   template <typename POP_MANAGER = PopulationManager_Base<int> >
-  class StatsManager_DefaultStats : StatsManager_FunctionsOnUpdate<POP_MANAGER> {
+  class StatsManager_DefaultStats : public StatsManager_FunctionsOnUpdate<POP_MANAGER> {
   private:
       using org_ptr = typename POP_MANAGER::value_type;
       using fit_fun_type = std::function<double(org_ptr)>;
