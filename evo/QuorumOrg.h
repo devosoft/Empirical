@@ -119,6 +119,7 @@ public:
   static int num_to_donate, needed_to_reproduce, cost_to_donate;
   static double mutation_amount;
 
+  static const double initial_configurations[3][3];
   // access specifiers are really annoying. 
   QuorumOrgState state;
   QuorumOrganism () {};
@@ -158,11 +159,12 @@ public:
   void increment_age() {state.age++;}
   unsigned int set_id (unsigned int new_id) {return state.loc = new_id;}
   unsigned int get_loc() {return state.loc;}
+  unsigned int get_age() {return state.points;}
   unsigned int add_points(unsigned int points) {return state.points += points;}
   void set_density(bool hd) {state.hi_density = hd;}
   bool set_density(double q) { return state.hi_density = (q > state.genome.quorum_threshold);}
   bool hi_density () const {return state.hi_density;}
-  unsigned int get_fitness() {return state.points;}
+  unsigned int get_fitness() {return state.num_offspring;}
 
   // methods for interacting with the world / neighbors
   int get_contribution (double current_quorum) {
@@ -205,12 +207,32 @@ public:
     return nullptr;
   }
 
+  bool operator<(const QuorumOrganism & other) const {
+    return this->state.loc < other.state.loc;
+  }
+
+  bool operator>(const QuorumOrganism & other) const {
+    return this->state.loc > other.state.loc;
+  }
+
+  bool operator==(const QuorumOrganism & other) const {
+    return this->state.loc == other.state.loc;
+  }
+
 };
 
 std::ostream & operator << (std::ostream & out, QuorumOrganism & org) {
    org.print(out);
    return out;
 }
+
+
+/// selection of standardized starting configurations for QOrgs
+const double QuorumOrganism::initial_configurations[3][3]  = {
+    {0.5, 10, 1}, // Standard
+    {0, 10, 1}, // defector
+    {1, 10, 1} // co-operator
+};
 
 int QuorumOrganism::num_to_donate;
 int QuorumOrganism::cost_to_donate;

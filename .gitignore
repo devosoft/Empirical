@@ -13,6 +13,7 @@ a.out.js
 *.debug
 *tmp.*
 *.cfg
+*.csv
 coverage.xml
 diff_cover.txt
 UTests/tools/tmp*.cc

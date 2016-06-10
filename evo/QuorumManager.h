@@ -23,16 +23,6 @@
 //using MixedWorld = emp::evo::World<ORG, emp::evo::PopulationManager_Base<ORG>>;
 //MixedWorld<BitOrg> mixed_pop(random);
 
-EMP_BUILD_CONFIG( QuorumManagerConfig,
-    VALUE(HI_AI_WEIGHT, int, 4, "What value should the AI production be for hi-density?"),
-    VALUE(LO_AI_WEIGHT, int, 1, "What value should the AI production be for lo-density?"),
-    VALUE(AI_RADIUS, int, 10, "What's the radius of AI dispersal?"),
-    VALUE(NUM_TO_DONATE, int, 45, "Number of points a public good is 'worth'"),
-    VALUE(NEEDED_TO_REPRODUCE, int, 50, "Number of points needed for an organism to reproduce"),
-    VALUE(COST_TO_DONATE, int, 25, "Number of points a public good costs to produce"),
-    VALUE(MUTATION_AMOUNT, double, 0.1, "Standard deviation for the normal distribtion of mutation")
-)
-
 
 namespace emp {
 namespace evo {
@@ -44,7 +34,6 @@ namespace evo {
     // we require that the base class has a get_neighbors methods
 
   protected:
-    int hi_weight, lo_weight, ai_radius;
     
     /// calculates quorum and updates state.hi_density  
     double calculate_quorum (std::set<QuorumOrganism *> neighbors) {
@@ -71,22 +60,10 @@ namespace evo {
     }
 
 public:
+    static int hi_weight, lo_weight, ai_radius;
     QuorumManager () {
       POP_MANAGER<QuorumOrganism>();
-        QuorumManagerConfig config;
-        config.Read("QuorumManagerConfig.cfg");
-        
-        hi_weight = config.HI_AI_WEIGHT();
-        lo_weight = config.LO_AI_WEIGHT();
-        ai_radius = config.AI_RADIUS();
-        QuorumOrganism::num_to_donate = config.NUM_TO_DONATE();
-        QuorumOrganism::needed_to_reproduce = config.NEEDED_TO_REPRODUCE();
-        QuorumOrganism::cost_to_donate = config.COST_TO_DONATE();
-        QuorumOrganism::mutation_amount = config.MUTATION_AMOUNT();
-        QuorumOrganism::random = this->random_ptr; // our random is gotten from the world
-    
-        config.Write("QuorumManagerConfig.cfg");
-    }
+      }
 
     void SetRandom(Random * rand) {
       random_ptr = rand;
@@ -178,6 +155,14 @@ public:
     }
 
   };
+
+
+template <class QuorumOrganism, template<class> class POP_MANAGER>
+int QuorumManager<QuorumOrganism, POP_MANAGER>::hi_weight;
+template <class QuorumOrganism, template<class> class POP_MANAGER>
+int QuorumManager<QuorumOrganism, POP_MANAGER>::lo_weight;
+template <class QuorumOrganism, template<class> class POP_MANAGER>
+int QuorumManager<QuorumOrganism, POP_MANAGER>::ai_radius;
 
 template <class QuorumOrganism, template<class> class POP_MANAGER>
 std::ostream & operator<< (std::ostream & out, QuorumManager<QuorumOrganism, POP_MANAGER> & qm) {
