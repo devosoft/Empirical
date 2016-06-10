@@ -44,7 +44,8 @@ EMP_BUILD_CONFIG( QuorumConfig,
     VALUE(INITIAL_SIZE, unsigned int, 30, "Starting population size"),
     VALUE(INITIAL_CONFIG, int, 0, "Index of the QOrg initial config array to use as inital config"),
     VALUE(ENABLE_MUTATION, bool, true, "If mutation should be enabled"),
-    VALUE(RAND_SEED, int, 238947, "Seed for the random generator")
+    VALUE(RAND_SEED, int, 238947, "Seed for the random generator"),
+    VALUE(PREFIX, std::string, "", "Prefix for filenames")
 )
 
 
@@ -59,18 +60,8 @@ int main(int argc, char* argv[]) {
     auto args = emp::cl::ArgManager(argc, argv);
     if (args.ProcessConfigOptions(config, std::cout, "quorum.cfg") == false) {exit(0);}
     if (args.TestUnknown() == false) {exit(0);}
-
-    if (argc == 1) { // program name, no prefix
-      prefix = "";
-    }
-    else if (argc == 2) { // has prefix
-      prefix = std::string(argv[1]) + "-";
-    }
-    else {
-      std::cerr << "** Usage: ./quorum output-prefix";
-    }
-
-
+    
+    if (config.PREFIX() != "") {prefix = config.PREFIX() + "-";}
     QWorld<QOrg, emp::evo::PopulationManager_Grid> Qpop(&dice);
     Qpop.ConfigPop(config.GRID_X(), config.GRID_Y());
 
