@@ -17,10 +17,11 @@
 namespace emp {
 
   class NFA {
-  private:
+  public:
     constexpr static int NUM_SYMBOLS = 128;
     using opts_t = BitSet<NUM_SYMBOLS>;
 
+  private:
     struct Transition {
       opts_t symbols;
     };
@@ -36,11 +37,16 @@ namespace emp {
 
   public:
     NFA(int num_states=0, int start_state=0)
-      : states(num_states), start(start_state), is_stop(num_states, 0) { ; }
+      : states(num_states), start(start_state), is_stop(num_states, 0) {
+        if (num_states > start) states[start].free_to.insert(start);
+      }
     NFA(const NFA &) = default;
     ~NFA() { ; }
 
-    int GetStart() const { return start; }
+    const std::set<int> & GetStart() const {
+      emp_assert(states.size() > start);
+      return states[start].free_to;
+    }
     std::set<int> GetNext(int sym, int from_id=0) {
       std::set<int> to_set;
       for (auto & t : states[from_id].trans) {
@@ -64,7 +70,21 @@ namespace emp {
       return to_set;
     }
 
-    void Resize(int new_size) { states.resize(new_size); is_stop.resize(new_size, 0); }
+    opts_t GetSymbolOptions(const std::set<int> & test_set) const {
+      opts_t options;
+      for (int id : test_set) {
+        for (const auto & t : states[id].trans) {
+          options |= t.second.symbols;
+        }
+      }
+      return options;
+    }
+
+    void Resize(int new_size) {
+      states.resize(new_size);
+      is_stop.resize(new_size, 0);
+      if (new_size > start) states[start].free_to.insert(start);
+    }
     void AddTransition(int from, int to, int sym) {
       emp_assert(from >= 0 && from < (int) states.size(), from, states.size());
       emp_assert(to >= 0 && to < (int) states.size(), to, states.size());
@@ -99,9 +119,6 @@ namespace emp {
         }
       }
 
-      std::cout << "Adding FREE transition from " << from << " to " << to << std::endl;
-      PrintFreeMoves();
-
     }
 
     void SetStop(int state) { is_stop[state] = 1; }
@@ -109,12 +126,12 @@ namespace emp {
 
     void PrintFreeMoves() {
       for (int i = 0; i < (int) states.size(); i++) {
-        std::cout << "Free from ( ";
+        // std::cout << "Free from ( ";
         for (int x : states[i].free_from) std::cout << x << " ";
-        std::cout << ") to " << i << std::endl;
-        std::cout << "Free from " << i << " to ( ";
+        // std::cout << ") to " << i << std::endl;
+        // std::cout << "Free from " << i << " to ( ";
         for (int x : states[i].free_to) std::cout << x << " ";
-        std::cout << ")" << std::endl;
+        // std::cout << ")" << std::endl;
       }
     }
   };
@@ -124,7 +141,7 @@ namespace emp {
     NFA & nfa;
     std::set<int> state_set;
   public:
-    NFA_State(NFA & _nfa) : nfa(_nfa) { state_set.insert(nfa.GetStart()); }
+    NFA_State(NFA & _nfa) : nfa(_nfa) { state_set = nfa.GetStart(); }
     ~NFA_State() { ; }
 
     const NFA & GetNFA() { return nfa; }
