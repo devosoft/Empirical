@@ -38,6 +38,7 @@ namespace emp {
           id_map[next_state] = next_id;
           dfa.Resize(next_id + 1);
           state_stack.emplace_back(next_state);
+          for (int s : next_state) if (nfa.IsStop(s)) { dfa.SetStop(next_id); break; }
         }
 
         // Setup the new connection in the DFA
