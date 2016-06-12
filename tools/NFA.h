@@ -47,7 +47,7 @@ namespace emp {
       emp_assert(states.size() > start);
       return states[start].free_to;
     }
-    std::set<int> GetNext(int sym, int from_id=0) {
+    std::set<int> GetNext(int sym, int from_id=0) const {
       std::set<int> to_set;
       for (auto & t : states[from_id].trans) {
         if (t.second.symbols[sym]) {
@@ -57,7 +57,7 @@ namespace emp {
       }
       return to_set;
     }
-    std::set<int> GetNext(int sym, const std::set<int> from_set) {
+    std::set<int> GetNext(int sym, const std::set<int> from_set) const {
       std::set<int> to_set;
       for (int from_id : from_set) {
         for (auto & t : states[from_id].trans) {
@@ -138,16 +138,23 @@ namespace emp {
 
   class NFA_State {
   private:
-    NFA & nfa;
+    const NFA & nfa;
     std::set<int> state_set;
   public:
-    NFA_State(NFA & _nfa) : nfa(_nfa) { state_set = nfa.GetStart(); }
+    NFA_State(const NFA & _nfa) : nfa(_nfa) { state_set = nfa.GetStart(); }
     ~NFA_State() { ; }
 
-    const NFA & GetNFA() { return nfa; }
+    const NFA & GetNFA() const { return nfa; }
     const std::set<int> & GetStateSet() const { return state_set; }
 
+    bool IsActive() const { return state_set.size(); }
+    bool IsStop() const {
+      for (int s : state_set) if (nfa.IsStop(s)) return true;
+      return false;
+    }
+
     void SetStateSet(const std::set<int> & in) { state_set = in; }
+    void Reset() { state_set = nfa.GetStart(); }
 
     void Next(int sym) {
       state_set = nfa.GetNext(sym, state_set);
