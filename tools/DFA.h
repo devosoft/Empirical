@@ -27,6 +27,8 @@ namespace emp {
     ~DFA() { ; }
     DFA & operator=(const DFA &) = default;
 
+    int GetSize() const { return (int) transitions.size(); }
+
     void Resize(int new_size) {
       auto old_size = transitions.size();
       transitions.resize(new_size);
@@ -41,7 +43,12 @@ namespace emp {
       transitions[from][sym] = to;
     }
 
-    void SetStop(int state) { is_stop[state] = 1; }
+    void SetStop(int state) {
+      emp_assert(state >= -1 && state < (int) transitions.size());
+      is_stop[state] = 1;
+    }
+    bool IsActive(int state) const { return state != -1; }
+    bool IsStop(int state) const { return (state == -1) ? false : is_stop[state]; }
 
     int Next(int state, int sym) const {
       emp_assert(state >= -1 && state < (int) transitions.size());
@@ -49,12 +56,10 @@ namespace emp {
       return (state == -1) ? -1 : transitions[state][sym];
     }
 
-    int Next(int state, std::string sym_set) {
+    int Next(int state, std::string sym_set) const {
       for (char x : sym_set) state = Next(state, x);
       return state;
     }
-
-    bool IsStop(int state) const { return is_stop[state]; }
   };
 
 }
