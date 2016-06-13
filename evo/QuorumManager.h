@@ -36,7 +36,7 @@ namespace evo {
   protected:
     
     /// calculates quorum and updates state.hi_density  
-    double calculate_quorum (std::set<QuorumOrganism *> neighbors) {
+    double calculate_quorum (std::set<QuorumOrganism *> & neighbors) {
       double active_neighbors = 0;
       //unsigned int total_neighbors = 0;
 

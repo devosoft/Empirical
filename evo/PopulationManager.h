@@ -242,44 +242,39 @@ namespace evo {
     //TODO@JGF: a) make the rest of my todo's @'d to me
     //          b) make the function naming consistent (e.g. camel, not _'s)
     
-    /// This function will get all elements in a radius 'depth' from a focal node
-    std::set<unsigned int> GetClusterByRadius(unsigned int focal_id, unsigned int depth, 
-                                       std::set<unsigned int> & seen) {
-      // if the thing exists, use it. If not, create it.
-      // add ourselves
-      if (seen.find(focal_id) != seen.end()) {return seen;} // stop recursion, we've been here
-      seen.insert(focal_id);
-      if (depth <= 0) {return seen;}
-      
-      // duplicated code--joy
-      // TODO@JGF: fix the duplication
-      int org_x, org_y;
-      org_x = ToX(focal_id);
-      org_y = ToY(focal_id);
+    std::set<ORG *> GetClusterByRadius(unsigned int focal_id, unsigned int depth) {
+      std::set<unsigned int> discovered[depth];
+      std::set<unsigned int> explored;
 
-      // for all 'enabled' spaces recurse this finder
-      // our base case up top will prevent running in circles
-      for(int i = -1; i < 2; i++) {
-        for(int j = -1; j < 2; j++) {
-          unsigned int target = ToID((org_x + i + width) % width, 
-                                     (org_y + j + height) % height);
-          if(seen.find(target) != seen.end()) { 
-            GetClusterByRadius(target, depth - 1, seen);
+      unsigned int org_x, org_y, target, level;
+
+      // execute a breadth-first-search, depth nodes deep, from focal_id
+      
+      discovered[--depth].insert(focal_id);
+
+      while(depth > 0) {
+        for (auto element : discovered[depth]) {
+          org_x = ToX(element);
+          org_y = ToY(element);
+          for(int i = -1; i < 2; i++) {
+            for(int j = -1; j < 2; j++){
+              target = ToID((org_x + i + width) % width,
+                            (org_y + j + height) % height);
+              if (discovered[depth].find(target) == discovered[depth].end() && 
+                  explored.find(target) == explored.end()) {
+                discovered[depth - 1].insert(target);
+              }
+            }
           }
+          
+          explored.insert(element);
+          depth--;
         }
       }
 
-      return seen;
-    }
-
-    // entry point to recursive search
-    std::set<ORG *> GetClusterByRadius(unsigned int focal_id, unsigned int depth) {
-      std::set<unsigned int> sites; 
       std::set<ORG *> orgs;
-      GetClusterByRadius(focal_id, depth, sites); 
-
-      for (auto site : sites) {
-        orgs.insert(pop[site]); 
+      for (auto site : explored) {
+        if (pop[site] != nullptr) { orgs.insert(pop[site]); }
       }
       return orgs;
     }

@@ -169,15 +169,12 @@ public:
   // methods for interacting with the world / neighbors
   int get_contribution (double current_quorum) {
     set_density(current_quorum);
-    if (random->P(state.genome.co_op_prob) &&
-      current_quorum >= state.genome.quorum_threshold) {
-
-      // gonna add a check to see if we contribute when we're poor
-      // dunno if I should
+    if (random->P(state.genome.co_op_prob) && current_quorum >= state.genome.quorum_threshold) {
       if (state.points >= cost_to_donate) {
         state.points -= cost_to_donate;
         return num_to_donate;
       }
+  
     }
     return 0;
   }
