@@ -187,6 +187,8 @@ public:
   QuorumOrganism * make_offspring() {
     QuorumOrganism * offspring = new QuorumOrganism(*this);
     offspring->mutate();
+    offspring->state.points = 0;
+    offspring->state.age = 0;
     return offspring;
   }
 
