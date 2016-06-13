@@ -60,6 +60,24 @@ namespace emp {
       for (char x : sym_set) state = Next(state, x);
       return state;
     }
+
+    void Print() {
+      std::cout << "Num states = " << GetSize() << std::endl;
+      std::cout << "Start = 0; Stop =";
+      for (int i = 0; i < GetSize(); i++) if(IsStop(i)) std::cout << " " << i;
+      std::cout << std::endl;
+
+      for (int i = 0; i < (int) transitions.size(); i++) {
+        std::cout << " " << i << " ->";
+        for (int s = 0; s < NUM_SYMBOLS; s++) {
+          if (transitions[i][s] == -1) continue;
+          std::cout << " " << ((char) s) << ":" << transitions[i][s];
+        }
+        std::cout << std::endl;
+      }
+
+    }
+
   };
 
 }
