@@ -28,6 +28,7 @@ namespace evo {
     using ptr_t = ORG *;
     emp::vector<ORG *> pop;
 
+    unsigned int curr_ins_index;
     Random * random_ptr;
 
   public:
@@ -52,7 +53,7 @@ namespace evo {
     int GetSize() const { return (int) pop.size(); }
 
     void SetRandom(Random * r) { random_ptr = r; }
-
+    void SequentialInsert(ORG * org) { pop.push_back(org);}
 
     void Print(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout,
               std::string empty="X", std::string spacer=" ") {
@@ -199,6 +200,7 @@ namespace evo {
   protected:
     using PopulationManager_Base<ORG>::pop;
     using PopulationManager_Base<ORG>::random_ptr;
+    using PopulationManager_Base<ORG>::curr_ins_index;
 
     int width;
     int height;
@@ -210,8 +212,16 @@ namespace evo {
   public:
     PopulationManager_Grid() { 
       ConfigPop(10,10);
+      curr_ins_index = 0;
     }
     ~PopulationManager_Grid() { ; }
+
+    // this method will insert organisms sequentially through the population--used for 
+    // initialization. Automatically wraps insertion point
+    void SequentialInsert(ORG * org) {
+      pop[curr_ins_index++] = org;
+      curr_ins_index %= (width * height);
+    }
 
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
@@ -300,8 +310,7 @@ namespace evo {
       const int pos = ToID(offspring_x, offspring_y);
      
      
-      if (pop[pos]) delete pop[pos];
-
+      if (pop[pos] != nullptr) delete pop[pos];
       pop[pos] = new_org;
 
       return pos;

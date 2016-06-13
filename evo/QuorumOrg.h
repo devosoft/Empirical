@@ -62,8 +62,6 @@ std::ostream & operator<< (std::ostream & out, QuorumOrgGenome & genome) {
 }
 
   /* Simple class to contain the current state of the organism
-   * since everything is a primitive a bitwise copy for the constructor should work fine!
-   * ...right?
    */
 
 struct QuorumOrgState {
@@ -90,6 +88,22 @@ struct QuorumOrgState {
     num_offspring = 0;
     hi_density = false;
   };
+
+  // Copy constructor!
+  QuorumOrgState (const QuorumOrgState & other) : points(0), age(0), loc(-1), num_offspring(0),
+                                                  hi_density(false), mutate(other.mutate),
+                                                  genome(other.genome.co_op_prob,
+                                                         other.genome.ai_radius,
+                                                         other.genome.quorum_threshold) {
+  }
+
+  QuorumOrgState operator= (const QuorumOrgState & rhs) {
+    age = rhs.age;
+    loc = rhs.loc;
+    num_offspring = rhs.num_offspring;
+    hi_density = rhs.hi_density;
+    genome = rhs.genome;
+  }
 
   // prints out loc, age, points, if_producing_ai, if_mutation_on, {genome}
   void print (std::ostream & out) {
@@ -129,12 +143,16 @@ public:
     this->QuorumOrganism::state = QuorumOrgState(cprob, airad, qthresh, mut, pts);
   }
 
-  // copy constructor; probably the primary way of reproduction will be to
-  // copy the current org & call "mutate" on it
-  QuorumOrganism (const QuorumOrganism & source) {
-    // explicit is better than implicit...
-    this->state = source.state;
-    this->random = source.random;
+  QuorumOrganism (const QuorumOrganism & other) {
+    this->state = QuorumOrgState(other.state);
+    this->random = other.random;
+  }
+
+  QuorumOrganism & operator=(const QuorumOrganism & other) {
+    if (&other == this) {return *this;}
+    this->state = *(new QuorumOrgState(other.state));
+    this->random = other.random;
+    return *this;
   }
 
   // the aforementioned mutate function
@@ -185,10 +203,12 @@ public:
 
   // function to make offspring of this org; does mutation, if enabled
   QuorumOrganism * make_offspring() {
-    QuorumOrganism * offspring = new QuorumOrganism(*this);
+    QuorumOrganism * offspring = new QuorumOrganism();
+    //*offspring = *this;
     offspring->mutate();
     offspring->state.points = 0;
     offspring->state.age = 0;
+    assert(offspring != this);
     return offspring;
   }
 

@@ -132,11 +132,12 @@ public:
       QuorumOrganism * offspring = nullptr;
       for(QuorumOrganism * org : POP_MANAGER<QuorumOrganism>::pop) {
         if (org == nullptr) {continue;} // don't even try to touch nulls
-        if( (offspring = org->reproduce()) != nullptr) {
+        org->increment_age();
+        // while able, gen offspring
+        while ( (offspring = org->reproduce()) != nullptr) {
           // overloaded AddOrgBirth will determine parent loc from pointer
           AddOrgBirth(offspring, org);
         }
-        org->increment_age();
       }
     } // end Update()
 

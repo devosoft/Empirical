@@ -236,6 +236,10 @@ namespace evo {
 
     // All additions to the population must go through one of the following Insert methods
 
+    // passthrough method for initialization
+    void SequentialInsert(ORG * org) {
+      popM.SequentialInsert(org);
+    }
     void Insert(const ORG & mem, int copy_count=1) {
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);
