@@ -182,6 +182,15 @@ namespace emp {
 
         return modify;
       }
+      virtual void AddToNFA(NFA & nfa, int start, int stop) override {
+        int prev_id = start;
+        for (auto * x : nodes) {
+          int next_id = nfa.AddNewState();
+          x->AddToNFA(nfa, prev_id, next_id);
+          prev_id = next_id;
+        }
+        nfa.AddFreeTransition(prev_id, stop);
+      }
     };
 
     struct re_or : public re_parent {      // lhs -or- rhs
@@ -192,21 +201,41 @@ namespace emp {
         nodes[1]->Print(os);
         os << "]";
       }
+      virtual void AddToNFA(NFA & nfa, int start, int stop) override {
+        nodes[0]->AddToNFA(nfa, start, stop);
+        nodes[1]->AddToNFA(nfa, start, stop);
+      }
     };
 
     struct re_star : public re_parent {    // zero-or-more
       re_star(re_base * c) { push(c); }
       void Print(std::ostream & os) const override { os << "*["; nodes[0]->Print(os); os << "]"; }
+
+      virtual void AddToNFA(NFA & nfa, int start, int stop) override {
+        const int target = nfa->AddNewState();
+        nodes[0]->AddToNFA(nfa, start, target);
+        nfa->AddFreeTransition(target, start);
+        nfa->AddFreeTransition(start, stop);
+      }
     };
 
     struct re_plus : public re_parent {    // one-or-more
       re_plus(re_base * c) { push(c); }
       void Print(std::ostream & os) const override { os << "+["; nodes[0]->Print(os); os << "]"; }
+      virtual void AddToNFA(NFA & nfa, int start, int stop) override {
+        const int target = nfa->AddNewState();
+        nodes[0]->AddToNFA(nfa, start, target);
+        nfa->AddFreeTransition(target, stop);
+      }
     };
 
     struct re_qm : public re_parent {      // zero-or-one
       re_qm(re_base * c) { push(c); }
       void Print(std::ostream & os) const override { os << "?["; nodes[0]->Print(os); os << "]"; }
+      virtual void AddToNFA(NFA & nfa, int start, int stop) override {
+        nodes[0]->AddToNFA(nfa, start, stop);
+        nfa->AddFreeTransition(start, stop);
+      }
     };
 
     re_block head;
