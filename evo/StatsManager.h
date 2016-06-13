@@ -112,7 +112,7 @@ namespace evo{
     std::string header = "update";
 
   public:
-    GraphVisualization * viz_pointer;
+    web::GraphVisualization * viz_pointer;
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
     fit_fun_type fit_fun;
 
@@ -193,7 +193,7 @@ namespace evo{
         fit_fun = fit;
     }
 
-    void ConnectVis(GraphVisualization * viz) {
+    void ConnectVis(web::GraphVisualization * viz) {
       viz_pointer = viz;
     }
 

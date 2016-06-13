@@ -39,10 +39,10 @@ constexpr int UD_COUNT = config.MAX_GENS();
 constexpr int TOURNAMENT_SIZE = config.TOURNAMENT_SIZE();
 
 using BitOrg = emp::BitSet<N>;
-GraphVisualization graph;
+emp::web::GraphVisualization graph;
 NKAnimation<BitOrg, emp::evo::DefaultStats> viz;
 
-//emp::web::Document doc("emp_base");
+emp::web::Document doc("emp_base");
 
 extern "C" int main()
 {
@@ -59,17 +59,17 @@ extern "C" int main()
       return true;
     } );
 
-  graph.Setup(config);
+  graph.SetupConfigs(config);
   viz.world->statsM.ConnectVis(&graph);
 
-  //doc << "<br>";
-  /*doc.AddButton([](){
+  doc << "<br>";
+  doc.AddButton([](){
       viz.anim.ToggleActive();
       auto but = doc.Button("toggle");
       if (viz.anim.GetActive()) but.Label("Pause");
       else but.Label("Start");
-  }, "Start", "toggle");*/
-
+  }, "Pause", "toggle");
+  doc << graph;
   viz.anim.Start();
 
 }

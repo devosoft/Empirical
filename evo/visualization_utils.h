@@ -21,29 +21,93 @@
 #include "../tools/string_utils.h"
 #include "NKConfig.h"
 
-class D3Visualization {
-public:
-  emp::vector<D3::D3_Base*> d3_objects;
-  D3::Selection * svg;
-  int POP_SIZE = 100;
-  int MAX_GENS = 1000;
+//Pretty sure D3VisualizationInfo can't be shared among multiple D3Visualizations
 
-  D3Visualization(){
-    #ifdef EMSCRIPTEN
-    emp::web::Initialize();
-    n_objects();
-    #endif
-    d3_objects.push_back(new D3::Selection("body"));
-    D3::Selection temp_svg = ((D3::Selection*)(d3_objects[0]))->Append("svg");
-    svg = new D3::Selection(temp_svg);
+namespace emp{
+namespace web{
+class D3Visualization : public internal::WidgetFacet<D3Visualization> {
+    friend class D3VisualizationInfo;
+protected:
+  class D3VisualizationInfo : public internal::WidgetInfo {
+    friend D3Visualization;
+
+    protected:
+      int width;
+      int height;
+      D3Visualization * parent;
+      D3::Selection * svg;
+
+      D3VisualizationInfo(D3Visualization * parent, const std::string & in_id="") : internal::WidgetInfo(in_id) {
+        this->parent = parent;
+      }
+
+      D3VisualizationInfo(const D3VisualizationInfo &) = delete;
+      D3VisualizationInfo & operator=(const D3VisualizationInfo &) = delete;
+      virtual ~D3VisualizationInfo(){;}
+
+      virtual bool IsD3VisualiationInfo() const override {return true;}
+
+      virtual void GetHTML(std::stringstream & HTML) override {
+        HTML.str("");
+        HTML << "<svg id=\"" << id
+             << "\" width=\"" << width
+             << "\" height=\"" << height << "\">";
+
+        HTML << "</svg>";
+      }
+
+      // Trigger any JS code needed on re-draw.
+      void TriggerJS() override {
+        EM_ASM({console.log("TriggerJS");});
+        if (state == Widget::ACTIVE) {            // Only draw on active canvases
+          svg = new D3::Selection(D3::Select("#"+id));
+          EM_ASM({console.log(js.objects);});
+          parent->Setup();
+        }
+      }
+
+    public:
+      virtual std::string GetType() override {return "web::D3VisualizationInfo";}
+
+  };
+
+  // Get a properly cast version of indo.
+  D3VisualizationInfo * Info() { return (D3VisualizationInfo *) info; }
+  const D3VisualizationInfo * Info() const { return (D3VisualizationInfo *) info; }
+
+  D3Visualization(D3VisualizationInfo * in_info) : WidgetFacet(in_info) { ; }
+
+public:
+
+  D3Visualization(int w, int h, const std::string & in_id="")
+        : WidgetFacet(in_id) {
+      #ifdef EMSCRIPTEN
+      Initialize();
+      n_objects();
+      #endif
+
+      info = new D3VisualizationInfo(this, in_id);
+      Info()->width = w;
+      Info()->height = h;
   }
 
+  D3Visualization(const D3Visualization & in) : WidgetFacet(in) { ; }
+  D3Visualization(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsD3VisualiationInfo()); }
+  virtual ~D3Visualization() { ; }
+
+  using INFO_TYPE = D3VisualizationInfo;
+
+  int GetWidth() const { return Info()->width; }
+  int GetHeight() const { return Info()->height; }
+  D3::Selection * GetSVG() {return Info()->svg;}
+
+  int POP_SIZE = 100;
+  int MAX_GENS = 1000;
+  virtual void Setup(){;}
 };
 
 class FitnessVisualization : public D3Visualization {
 private:
-  int height = 500;
-  int width = 500;
   double margin = 10;
   double axis_width = 40;
   double fitness_growth_margin = 1.5;
@@ -53,6 +117,7 @@ public:
   D3::LinearScale * fitness_scale;
   D3::Axis<D3::LinearScale> * ax;
   D3::Selection * circles;
+  D3::ToolTip * tip;
 
   std::function<double(double, int, int)> scaled_d = [&](double d, int i, int k){
       return fitness_scale->ApplyScale(d);
@@ -62,26 +127,22 @@ public:
       return x_scale->ApplyScale(i);
   };
 
-  FitnessVisualization(){
+  FitnessVisualization(int w=500, int h=500) : D3Visualization(w, h){;}
 
-    //Set up svg
-    svg->SetAttr("height", height);
-    svg->SetAttr("width", width);
-  }
+  void Setup(){
 
-  void Setup(emp::vector<double> fitnesses){
-    D3::ToolTip tip;
+    D3::Selection * svg = GetSVG();
 
-    double lowest = *(std::min_element(fitnesses.begin(), fitnesses.end()));
-    double highest = *(std::max_element(fitnesses.begin(), fitnesses.end()));
+    double lowest = 10;//*(std::min_element(fitnesses.begin(), fitnesses.end()));
+    double highest = 20;//*(std::max_element(fitnesses.begin(), fitnesses.end()));
 
     //Set up scales
     fitness_scale = new D3::LinearScale();
     x_scale = new D3::LinearScale();
     fitness_scale->SetDomain(std::array<double, 2>({highest*fitness_growth_margin, lowest*fitness_loss_margin}));
-    fitness_scale->SetRange(std::array<double, 2>({margin, height - margin}));
+    fitness_scale->SetRange(std::array<double, 2>({margin, GetHeight() - margin}));
     x_scale->SetDomain(std::array<double, 2>({0, (double)POP_SIZE-1}));
-    x_scale->SetRange(std::array<double, 2>({axis_width, height-margin}));
+    x_scale->SetRange(std::array<double, 2>({axis_width, GetHeight()-margin}));
 
     //Set up axis
     ax = new D3::Axis<D3::LinearScale>();
@@ -90,21 +151,22 @@ public:
     ax->Draw(*svg);
 
     //Make callback functions
-    emp::JSWrap(scaled_d, "scaled_d");
-    emp::JSWrap(scaled_i, "scaled_i");
-
-    //Draw circles that represent fitnesses
-    circles = new D3::Selection(svg->SelectAll("circle").Data(fitnesses));
-    circles->EnterAppend("circle");
-    circles->SetAttr("r", 5);
-    circles->SetAttr("cx", "scaled_i");
-    circles->SetAttr("cy", "scaled_d");
-    circles->SetStyle("fill", "green");
-
-    circles->AddToolTip(tip);
+    JSWrap(scaled_d, "scaled_d");
+    JSWrap(scaled_i, "scaled_i");
   }
 
   void AnimateStep(emp::vector<double> fitnesses){
+      //Draw circles that represent fitnesses
+      circles = new D3::Selection(GetSVG()->SelectAll("circle").Data(fitnesses));
+      circles->EnterAppend("circle");
+      circles->ExitRemove();
+      circles->SetAttr("r", 5);
+      circles->SetAttr("cx", "scaled_i");
+      circles->SetAttr("cy", "scaled_d");
+      circles->SetStyle("fill", "green");
+
+     // circles->AddToolTip(tip);
+
       circles = new D3::Selection(circles->Data(fitnesses));
       circles->Transition().SetAttr("cy", "scaled_d");
   }
@@ -113,8 +175,6 @@ public:
 
 class GraphVisualization : public D3Visualization {
 private:
-  int height = 500;
-  int width = 1000;
   double margin = 30;
   double axis_width = 60;
   double y_min = 5;
@@ -151,11 +211,7 @@ public:
                                          return rounded.Call(d[1]);
                                      };
 
-  GraphVisualization(){
-    //Set up svg
-    svg->SetAttr("height", height);
-    svg->SetAttr("width", width);
-  }
+  GraphVisualization(int w=800, int h=400) : D3Visualization(w, h){;}
 
   std::array<std::array<double, 2>, 1> data = {-1,-1};
   D3::LineGenerator * make_line;
@@ -163,17 +219,23 @@ public:
   D3::ToolTip* tip;
   D3::Selection t;
 
-  void Setup(const NKConfig & config){
-
+  void SetupConfigs(const NKConfig & config){
     //Setup config parameters
     POP_SIZE = config.POP_SIZE();
     MAX_GENS = config.MAX_GENS();
+  }
+
+  void Setup(){
+
+    D3::Selection * svg = GetSVG();
+
+    EM_ASM_ARGS({console.log("Setting up", js.objects[$0])}, svg->GetID());
 
     //Wrap ncessary callback functions
-    emp::JSWrap(tooltip_display, "tooltip_display");
-    emp::JSWrap(x, "x");
-    emp::JSWrap(y, "y");
-    emp::JSWrap(return_x, "return_x");
+    JSWrap(tooltip_display, "tooltip_display");
+    JSWrap(x, "x");
+    JSWrap(y, "y");
+    JSWrap(return_x, "return_x");
 
     //Create tool top
     tip = new D3::ToolTip("tooltip_display");
@@ -182,9 +244,9 @@ public:
     y_scale = new D3::LinearScale();
     x_scale = new D3::LinearScale();
     y_scale->SetDomain(std::array<double, 2>({y_max, y_min}));
-    y_scale->SetRange(std::array<double, 2>({margin, (double)height - axis_width}));
+    y_scale->SetRange(std::array<double, 2>({margin, (double)GetHeight() - axis_width}));
     x_scale->SetDomain(std::array<double, 2>({0, (double)MAX_GENS}));
-    x_scale->SetRange(std::array<double, 2>({axis_width, width-margin}));
+    x_scale->SetRange(std::array<double, 2>({axis_width, GetWidth()-margin}));
 
     //Set up axes
     x_axis = new D3::Axis<D3::LinearScale>("Update");
@@ -199,18 +261,20 @@ public:
 
   void AnimateStep(std::array<double, 2> data_point) {
 
+    D3::Selection * svg = GetSVG();
+
     if (data_point[1] > y_max || data_point[1] < y_min) {
       std::function<void()> draw_data = [this, data_point](){
         DrawData(data_point);
       };
-      emp::JSWrap(draw_data, "draw_data");
+      JSWrap(draw_data, "draw_data");
 
       y_max = std::max(data_point[1]*1.2, y_max);
       y_min = std::min(data_point[1]*.8, y_min);
       y_scale->SetDomain(std::array<double,2>({y_max, y_min}));
       t = svg->Transition();
       y_axis->ApplyAxis(t.Select("#ShannonEntropy_axis"));
-      int y_id = emp::JSWrap(y, "y");
+      int y_id = JSWrap(y, "y");
       t.SelectAll("circle").SetAttr("cy", "y");
       EM_ASM_ARGS({
         circle_data = js.objects[$0].selectAll(".data-point").data();
@@ -246,7 +310,7 @@ public:
       new_data[0][1] = y(new_data[0],0,0);
       line_data[1] = new_data[0];
 
-      D3::Selection line = make_line->DrawShape(line_data, *svg);
+      D3::Selection line = make_line->DrawShape(line_data, *GetSVG());
       line.SetAttr("fill", "none");
       line.SetAttr("stroke", "green");
       line.SetAttr("stroke-width", 1);
@@ -263,5 +327,6 @@ public:
     enter.AddToolTip(*tip);
   }
 };
-
+}
+}
 #endif
