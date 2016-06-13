@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Since gcov is a box of rocks when it comes to identifying uncovered lines of
@@ -43,7 +43,7 @@ def get_source_without_comments(source_fname):
     """
     gpp_args = ["g++", "-std=c++11", "-dD", "-E", "-fpreprocessed"]
     gpp_args.append(source_fname.rstrip())
-    #print("INFO: Running g++: {}".format(gpp_args))
+    print("INFO: Running g++: {}".format(gpp_args))
 
     proc = subprocess.Popen(gpp_args, stdout=subprocess.PIPE)
     proc_lines = []
@@ -136,12 +136,13 @@ def parse_gdiff(gdiff_filename):
     return parsed_diff
 
 
-def check_coverage(source_path, diff_lines):
+def check_diff_coverage(source_path, diff_lines):
     sfile_lines = []
     bad_lines = []
     cov_lines = parse_gcov(os.path.basename(source_path))
     # get the lines from the source file
     #print("\tGetting relevant source lines for {}".format(source_path), file=sys.stderr)
+    #TODO: add "where is root dir" arg so that "../" can be accurately set
     sfile_lines = purge_unreachable_lines(get_source_without_comments("../" + source_path))
 
     for line in sfile_lines:
@@ -156,27 +157,7 @@ def check_coverage(source_path, diff_lines):
     return bad_lines
 
 
-def get_parser():
-    """Builds the parser for the script"""
-
-    parser = argparse.ArgumentParser(description="Script to act as a bad diff-cover agent for"
-                                     " broken gcov")
-    parser.add_argument('-f', '--filename', help="Name of file to include in processing.")
-    parser.add_argument('-p', '--path', default="./",
-                        help="path of the directory to examine (default = '.')")
-
-    # required args
-    parser.add_argument("diff_filename", help="path to the file containing the git diff")
-    parser.add_argument("-i", "--ignorelist", type=argparse.FileType('r'),
-                        help="path to file containing list of filenames to "
-                        "ignore during coverage check.")
-
-    return parser
-
-
-def main():
-    args = get_parser().parse_args()
-
+def diff_cover(args):
     # using the dependency mapper, grab the relevant files
     pseudoargs = argstruct()
     pseudoargs.verbose = False
@@ -226,7 +207,7 @@ def main():
             print("\n\nChecking coverage of {}".format(el), file=sys.stderr)
 
             #uncovered_lines = parse_gcov(os.path.basename(el))
-            bad_lines = check_coverage(el, parsed_diff[el])
+            bad_lines = check_diff_coverage(el, parsed_diff[el])
 
             if len(bad_lines) > 0:
                 print("\tBad lines for {}".format(el), end="\n\n")
@@ -238,6 +219,139 @@ def main():
     if found_uncovered:
         print("** Found uncovered lines, failing!")
         sys.exit(1)
+
+class CoverageFile(object):
+    def __init__(self, path):
+        self.name = os.path.basename(path)
+        self.path = path
+        self.source_lines = open(path, 'r').readlines()
+        self.executable_lines = purge_unreachable_lines(get_source_without_comments(path))
+
+
+class CoverageModule(object):
+    def __init__(self, modpath):
+        self.file_list = dict()
+        self.total_lines = 0
+        self.total_covered = 0
+        self.module_directory = modpath
+
+    def __str__(self):
+        res = "CoverageModule({})".format(self.module_directory) + ": ["
+        for element in self.file_list:
+            res += element + ", "
+
+        return res + "] ({} / {} lines covered)".format(self.total_covered, self.total_lines)
+
+    def add_file_by_path(self, fpath):
+        rel_fpath = fpath.split(self.module_directory)[1]
+        self.file_list[rel_fpath] = CoverageFile(fpath)
+        self.total_lines += len(self.file_list[rel_fpath].executable_lines)
+        print("Added file {} (now at {} lines)".format(rel_fpath, self.total_lines), file=sys.stderr)
+
+
+def survey_coverage(args):
+    """Function to scan specified directories and compile module test coverage"""
+
+    # lots of duplicated code below
+    #TODO: abstract out this code so it isn't repeated
+
+    survey_dirlist = [fname.strip() for fname in args.dirlist_filename.readlines()]
+    print("Directories to survey: ", file=sys.stderr)
+    print_list(survey_dirlist, 1)
+
+    # using the dependency mapper, grab the relevant files
+    pseudoargs = argstruct()
+    pseudoargs.verbose = False
+    pseudoargs.extension = 'cc'
+    tree = build_tree_from_dir("../tests/", pseudoargs)
+
+    included_files = []
+    flagged_files = []
+    modules = []
+    concern  = []
+    uncovered = []
+    ignore_list = None
+    if args.ignorelist:
+        ignore_list = []
+        for line in args.ignorelist.readlines():
+            ignore_list.append(line.strip())
+    found_uncovered = False
+
+    for element in tree.nodes:
+        # sliced to cut off the leading "../" from all the filenames
+        included_files.append(tree.nodes[element].path[3:])
+
+    # if we're told to ignore files, do so
+    """
+    if args.ignorelist:
+        for name in args.ignorelist.readlines():
+            print("Warning: removing file {} from concern".format(name.strip()), file=sys.stdout)
+            try:
+                included_files.remove(name.strip())
+                parsed_diff.pop(name.strip(), None)
+            except:
+                pass
+    """
+    # we now have a list of files that are covered by tests
+    # now, using the module path, we need to shove filenames into the relevant files
+
+
+    # for each listed directory, build a module
+    for modpath in survey_dirlist:
+        mod = CoverageModule(modpath)
+
+        #TODO: find a way to pass in a list of extensions as args && use those
+        for mod_file in glob.glob(modpath + "*" + ".h"):
+            if ignore_list and not any([ig in mod_file for ig in ignore_list]):
+                mod.add_file_by_path(mod_file)
+            else:
+                print("** Warning: Ignoring {}".format(mod_file))
+        print(mod, file=sys.stderr)
+
+def get_parser():
+    """Builds the parser for the script"""
+
+    parser = argparse.ArgumentParser(description="Script to act as a bad diff-cover agent for"
+                                     " broken gcov")
+
+    # config for subcommands
+    subparsers = parser.add_subparsers(help="Subcommand help")
+
+    # diff-cover subcommand args
+    diff_cover_parser = subparsers.add_parser("diff-cover",
+                                              help="check git diff for uncovered lines")
+    diff_cover_parser.add_argument('-f', '--filename', help="Name of file to include in processing.")
+    diff_cover_parser.add_argument('-p', '--path', default="./",
+                        help="path of the directory to examine (default = '.')")
+    # required args
+    diff_cover_parser.add_argument("diff_filename", help="path to the file containing the git diff")
+    diff_cover_parser.add_argument("-i", "--ignorelist", type=argparse.FileType('r'),
+                        help="path to file containing list of filenames to "
+                        "ignore during coverage check.")
+    diff_cover_parser.set_defaults(func=diff_cover)
+
+    survey_cov_parser = subparsers.add_parser("survey-cov", help="Survey the coverage "
+                                              "of the listed directories and generate"
+                                              " a report.")
+    survey_cov_parser.add_argument("dirlist_filename", help="Filename containing list of "
+                                   "directories to survey", type=argparse.FileType('r'))
+    survey_cov_parser.add_argument("-i", "--ignorelist", type=argparse.FileType('r'),
+                        help="path to file containing list of filenames to "
+                        "ignore during coverage check.")
+    survey_cov_parser.set_defaults(func=survey_coverage)
+
+    return parser
+
+
+def main():
+
+    if len(sys.argv) < 2:
+        args = get_parser().parse_args(['--help'])
+
+    args = get_parser().parse_args()
+    # thanks to khmer's oxli for this (https://github.com/dib-lab/khmer/blob/b43907695b86f593487d06a38d702ee70988a6f9/oxli/__init__.py)
+    args.func(args)
+
 
 if __name__ == "__main__":
     main()

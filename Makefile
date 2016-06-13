@@ -7,7 +7,7 @@ build-doxygen-xml:
 
 diff-cover: coverage
 	git diff origin/master > scripts/diff
-	cd scripts && python3 vigilance.py -i ignore_list diff
+	cd scripts && python3 vigilance.py diff-cover -i ignore_list diff
 
 travis: 
 	make diff-cover
