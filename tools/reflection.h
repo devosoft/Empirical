@@ -8,6 +8,7 @@
 #define EMP_REFLECTION_H
 
 #include "functions.h"
+#include "meta.h"
 
 // The macro below creates a struct capable of detecting if another class possesses a
 // specific member.  From: https://en.wikibooks.org/wiki/More_C++_Idioms/Member_Detector
@@ -219,7 +220,6 @@ template <typename... TYPES> struct NAME {                                      
  EMP_IMPL_TYPE_DEFAULT(EMP_DETECT_ ## NEW_TYPE, ..., DEFAULT);                       \
  using NEW_TYPE = decltype(EMP_DETECT_ ## NEW_TYPE ## _impl<BASE_TYPE>(true))
 
-// Call a function with more args than it can take; ignore extras.
 
 namespace emp {
 
