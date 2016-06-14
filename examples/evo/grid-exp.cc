@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string>
+#include <cmath>
 
 #include "../../config/ArgManager.h"
 #include "../../evo/NK.h"
@@ -16,15 +17,17 @@
 #include "../../evo/EvoStats.h"
 #include "../../evo/StatsManager.h"
 
+
 EMP_BUILD_CONFIG( NKConfig,
   GROUP(DEFAULT, "Default settings for NK model"),
   VALUE(K, int, 10, "Level of epistasis in the NK model"),
   VALUE(N, int, 50, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
   VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
-  CONST(POP_SIZE, int, 1000, "Number of organisms in the popoulation."),
+  VALUE(POP_SIZE, int, 1000, "Number of organisms in the popoulation."),
   VALUE(MAX_GENS, int, 2000, "How many generations should we process?"),
   VALUE(MUT_COUNT, double, 0.005, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
   VALUE(TOUR_SIZE, int, 20, "How many organisms should be picked in each Tournament?"),
+  VALUE(NAME, std::string, "Result-", "Name of file printed to"),
 )
 
 using BitOrg = emp::BitVector;
@@ -37,6 +40,8 @@ int main(int argc, char* argv[])
   auto args = emp::cl::ArgManager(argc, argv);
   if (args.ProcessConfigOptions(config, std::cout, "Grid.cfg", "NK-macros.h") == false) exit(0);
   if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
+
+  config.Write("SetGrid.cfg");
 
   // k controls # of hills in the fitness landscape
   const int K = config.K();
@@ -52,27 +57,19 @@ int main(int argc, char* argv[])
   emp::evo::NKLandscape landscape(N, K, random);
 
   std::string prefix;
+  prefix = config.NAME();
 
 
-  if (argc == 1) { // program name, no prefix
-    prefix = "";
-  }
-  else if (argc == 2) { // has prefix
-    prefix = std::string(argv[1]) + "-";
-  }
-  else {
-    std::cerr << "** Usage: ./grid-exp output-prefix";
-  }
+  emp::evo::GridWorld<BitOrg, emp::evo::LineagePruned > grid_pop(random);
 
-
-  emp::evo::GridWorld<BitOrg> grid_pop(random);
+  grid_pop.ConfigPop(std::sqrt(POP_SIZE), std::sqrt(POP_SIZE));
 
   std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return landscape.GetFitness(*org);};
 
   grid_pop.SetDefaultFitnessFun(fit_func);
 
   // make a stats manager
-  emp::evo::StatsManager_DefaultStats<emp::evo::PopulationManager_Grid<BitOrg>> 
+  emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Grid<BitOrg>> 
       grid_stats (&grid_pop, prefix + "grid.csv");
 
   grid_stats.SetDefaultFitnessFun(fit_func);
