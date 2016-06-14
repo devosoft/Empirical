@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cstdarg>
 
 #include "../tools/FunctionSet.h"
 #include "../tools/vector.h"
@@ -99,7 +100,7 @@ namespace evo{
     //using world_type = World<ORG, MANAGERS...>;
     using fit_fun_type = std::function<double(org_ptr)>;
     //Stats calculated on the world
-    FunctionSet<double, POP_MANAGER*> stats;
+    FunctionSet<double> stats;
 
     //Pointer to the world object on which we're calculating stats
     POP_MANAGER * pop;
@@ -110,7 +111,7 @@ namespace evo{
     std::string header = "update";
     emp::vector<std::string> col_map;
     emp::vector<web::GraphVisualization*> viz_pointers;
-    emp::vector<int> viz_args;
+    emp::vector<emp::vector<int> > viz_args;
 
   public:
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
@@ -142,7 +143,7 @@ namespace evo{
 
     //Function for adding functions that calculate stats to the
     //set to be calculated
-    void AddFunction(std::function<double(POP_MANAGER *)> func, std::string label) {
+    void AddFunction(std::function<double()> func, std::string label) {
       stats.Add(func);
       std::string header_label = label;
       remove_whitespace(header_label);
@@ -165,7 +166,7 @@ namespace evo{
 
         output_location << update;
 
-        emp::vector<double> results = stats.Run(pop);
+        emp::vector<double> results = stats.Run();
         for (double d : results) {
           output_location << delimiter << d;
         }
@@ -173,7 +174,15 @@ namespace evo{
         output_location << std::endl;
 
         for (int i=0; i<viz_pointers.size(); ++i){
-          viz_pointers[i]->AnimateStep(std::array<double, 2>({(double)update, results[viz_args[i]]}));
+          emp::vector<double> values;
+          for (int el : viz_args[i]) {
+            if (el == -1){
+              values.push_back((double)update);
+            } else {
+              values.push_back(results[el]);
+            }
+          }
+          viz_pointers[i]->AnimateStep(values);
         }
       }
     }
@@ -182,12 +191,24 @@ namespace evo{
         fit_fun = fit;
     }
 
-    void ConnectVis(web::GraphVisualization * viz, std::string variable) {
-      auto it = std::find(col_map.begin(), col_map.end(), variable);
-      int pos = std::distance(col_map.begin(), it);
+    void ConnectVis(web::GraphVisualization * viz) {
+      emp::vector<int> vars;
+
+      for (std::string variable : viz->variables) {
+        if (variable == "Update"){
+          vars.push_back(-1);
+        } else {
+          auto it = std::find(col_map.begin(), col_map.end(), variable);
+          if (it == col_map.end()) {
+            NotifyWarning("Invalid graph variable.");
+          }
+          int pos = std::distance(col_map.begin(), it);
+          vars.push_back(pos);
+        }
+      }
 
       viz_pointers.push_back(viz);
-      viz_args.push_back(pos);
+      viz_args.push_back(vars);
     }
 
   };
@@ -227,13 +248,13 @@ namespace evo{
         pop = &(w->popM);
 
         //Create std::function object for all of the stats
-        std::function<double(POP_MANAGER*)> diversity = [](POP_MANAGER * pop){
+        std::function<double()> diversity = [this](){
             return ShannonEntropy(*pop);
         };
-        std::function<double(POP_MANAGER*)> max_fitness = [this](POP_MANAGER * pop){
+        std::function<double()> max_fitness = [this](){
             return MaxFunctionReturn(fit_fun, *pop);
         };
-        std::function<double(POP_MANAGER*)> avg_fitness = [this](POP_MANAGER * pop){
+        std::function<double()> avg_fitness = [this](){
             return AverageFunctionReturn(fit_fun, *pop);
         };
 

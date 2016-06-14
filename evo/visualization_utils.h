@@ -175,13 +175,14 @@ public:
 
 class GraphVisualization : public D3Visualization {
 private:
-  double margin = 30;
+  double y_margin = 10;
+  double x_margin = 30;
   double axis_width = 60;
-  double y_min = 5;
-  double y_max = 10;
+  double y_min = 1000;
+  double y_max = 0;
 
 public:
-  std::string variable;
+  emp::vector<std::string> variables;
   D3::LinearScale * x_scale;
   D3::LinearScale * y_scale;
   D3::Axis<D3::LinearScale> * x_axis;
@@ -212,8 +213,14 @@ public:
                                          return rounded.Call(d[1]);
                                      };
 
-  GraphVisualization(std::string var, int w=800, int h=400) : D3Visualization(w, h){
-    this->variable = var;
+  GraphVisualization(std::string y_var, std::string x_var, int w=800, int h=400) : D3Visualization(w, h){
+    this->variables.push_back(x_var);
+    this->variables.push_back(y_var);
+  }
+
+  GraphVisualization(std::string y_var, int w=800, int h=400) : D3Visualization(w, h){
+    this->variables.push_back("Update");
+    this->variables.push_back(y_var);
   }
 
   std::array<std::array<double, 2>, 1> data = {-1,-1};
@@ -247,14 +254,14 @@ public:
     y_scale = new D3::LinearScale();
     x_scale = new D3::LinearScale();
     y_scale->SetDomain(std::array<double, 2>({y_max, y_min}));
-    y_scale->SetRange(std::array<double, 2>({margin, (double)GetHeight() - axis_width}));
+    y_scale->SetRange(std::array<double, 2>({y_margin, (double)GetHeight() - axis_width}));
     x_scale->SetDomain(std::array<double, 2>({0, (double)MAX_GENS}));
-    x_scale->SetRange(std::array<double, 2>({axis_width, GetWidth()-margin}));
+    x_scale->SetRange(std::array<double, 2>({axis_width, GetWidth()-x_margin}));
 
     //Set up axes
-    x_axis = new D3::Axis<D3::LinearScale>("Update");
+    x_axis = new D3::Axis<D3::LinearScale>(variables[0]);
     x_axis->SetScale(*x_scale);
-    y_axis = new D3::Axis<D3::LinearScale>(variable);
+    y_axis = new D3::Axis<D3::LinearScale>(variables[1]);
     y_axis->SetScale(*y_scale);
     D3::DrawAxes(*x_axis, *y_axis, *svg);
     make_line = new D3::LineGenerator();
@@ -262,7 +269,7 @@ public:
     circles = new D3::Selection(svg->SelectAll("circle"));
   }
 
-  void AnimateStep(std::array<double, 2> data_point) {
+  void AnimateStep(emp::vector<double> data_point) {
 
     D3::Selection * svg = GetSVG();
 
@@ -276,7 +283,7 @@ public:
       y_min = std::min(data_point[1]*.8, y_min);
       y_scale->SetDomain(std::array<double,2>({y_max, y_min}));
       t = svg->Transition();
-      std::string stripped_variable = variable;
+      std::string stripped_variable = variables[1];
       remove_whitespace(stripped_variable);
       y_axis->ApplyAxis(t.Select("#"+stripped_variable+"_axis"));
       int y_id = JSWrap(y, "y");
@@ -298,9 +305,9 @@ public:
     }
   }
 
-  void DrawData(std::array<double, 2> data_point) {
+  void DrawData(emp::vector<double> data_point) {
     std::array<std::array<double, 2>, 1> prev_data = data;
-    data[0] = data_point;
+    data[0] = std::array<double, 2>({data_point[0], data_point[1]});
 
     //We can't draw a line on the first update
     if (prev_data[0][0] >=0 ){

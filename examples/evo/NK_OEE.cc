@@ -39,7 +39,8 @@ constexpr int UD_COUNT = config.MAX_GENS();
 constexpr int TOURNAMENT_SIZE = config.TOURNAMENT_SIZE();
 
 using BitOrg = emp::BitSet<N>;
-emp::web::GraphVisualization graph("Shannon Diversity");
+emp::web::GraphVisualization diversity_graph("Shannon Diversity", 500, 300);
+emp::web::GraphVisualization fitness_graph("Avg Fitness", 500, 300);
 NKAnimation<BitOrg, emp::evo::DefaultStats> viz;
 
 emp::web::Document doc("emp_base");
@@ -59,8 +60,10 @@ extern "C" int main()
       return true;
     } );
 
-  graph.SetupConfigs(config);
-  viz.world->statsM.ConnectVis(&graph, "Shannon Diversity");
+  diversity_graph.SetupConfigs(config);
+  viz.world->statsM.ConnectVis(&diversity_graph);
+  fitness_graph.SetupConfigs(config);
+  viz.world->statsM.ConnectVis(&fitness_graph);
 
   doc << "<br>";
   doc.AddButton([](){
@@ -69,7 +72,9 @@ extern "C" int main()
       if (viz.anim.GetActive()) but.Label("Pause");
       else but.Label("Start");
   }, "Pause", "toggle");
-  doc << graph;
+  doc << "<br>";
+  doc << "<br>";
+  doc << diversity_graph << fitness_graph;
   viz.anim.Start();
 
 }
