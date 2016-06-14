@@ -144,9 +144,7 @@ public:
 
     // function to make offspring of this org; does mutation, if enabled
     QuorumOrganism * make_offspring(QuorumOrganism * parent) {
-      QuorumOrganism * offspring = new QuorumOrganism();
-      //TODO: undo this
-      //*offspring = *this;
+      QuorumOrganism * offspring = new QuorumOrganism(*parent);
       offspring->mutate();
       offspring->state.points = 0;
       assert(offspring != parent);
@@ -166,7 +164,6 @@ public:
 
       return nullptr;
     }
-
 
 
     void Print(std::function<std::string(QuorumOrganism *)> string_fun, std::ostream & os = std::cout,
