@@ -116,7 +116,20 @@ int main(int argc, char* argv[]) {
       return age / (double) num_orgs;
     };
 
+    std::function<double(QM<emp::evo::PopulationManager_Grid> *)>max_age_func=[]
+      (QM<emp::evo::PopulationManager_Grid> * m) {
+      double max = 0;
+
+      for(auto org: (*m)) {
+        if (org != nullptr) {
+          if (org->get_age() > max) {max = org->get_age();};
+        }
+      }
+      return max;
+    };
+
     Qstats.AddFunction(age_func, "avg_age");
+    Qstats.AddFunction(max_age_func, "max_age");
 
     Qpop.SetDefaultFitnessFun(fit_func);
     Qstats.SetDefaultFitnessFun(fit_func); 

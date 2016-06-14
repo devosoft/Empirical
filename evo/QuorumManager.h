@@ -132,12 +132,13 @@ public:
       QuorumOrganism * offspring = nullptr;
       for(QuorumOrganism * org : POP_MANAGER<QuorumOrganism>::pop) {
         if (org == nullptr) {continue;} // don't even try to touch nulls
-        org->increment_age();
+        org->state.bump_age();
         // while able, gen offspring
-        while ( (offspring = reproduce(org)) != nullptr) {
+        if ((offspring = reproduce(org)) != nullptr) {
           // overloaded AddOrgBirth will determine parent loc from pointer
           AddOrgBirth(offspring, org);
         }
+        org->state.bump_age();
       }
     } // end Update()
 
@@ -148,7 +149,6 @@ public:
       //*offspring = *this;
       offspring->mutate();
       offspring->state.points = 0;
-      offspring->state.age = 0;
       assert(offspring != parent);
       return offspring;
     }
@@ -159,8 +159,8 @@ public:
     // will decrement the points needed to reproduce from state
     QuorumOrganism * reproduce(QuorumOrganism * parent) {
       if (parent->state.points >= QuorumOrganism::needed_to_reproduce) {
-        parent->state.points -= QuorumOrganism::needed_to_reproduce;
-        parent->state.num_offspring++;
+        parent->state.points = 0;
+        parent->state.reset_age();
         return make_offspring(parent);
       }
 

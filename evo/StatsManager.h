@@ -198,12 +198,12 @@ namespace evo{
       using org_ptr = typename POP_MANAGER::value_type;
       using fit_fun_type = std::function<double(org_ptr)>;
       using fit_stat_type = std::function<double(fit_fun_type, POP_MANAGER*)>;
-      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::AddFunction;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::pop;
       using StatsManager_Base<POP_MANAGER>::output_location;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::Update;
 
   public:
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::AddFunction;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::fit_fun;
       using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::SetDefaultFitnessFun;

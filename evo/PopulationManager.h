@@ -256,7 +256,7 @@ namespace evo {
       std::set<unsigned int> discovered[depth];
       std::set<unsigned int> explored;
 
-      unsigned int org_x, org_y, target, level;
+      unsigned int org_x, org_y, target;
 
       // execute a breadth-first-search, depth nodes deep, from focal_id
       
