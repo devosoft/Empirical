@@ -12,7 +12,7 @@ coverage:
 
 coverage-html: coverage
 	mkdir -p html
-	genhtml Coverage.combined -o html
+	../third-party/env/bin/gcovr -e "third-party/catch/single_include/catch.hpp" -r ../ --html -o coverage.html
 
 diff-cover: coverage
 	git diff origin/master > ../scripts/diff
