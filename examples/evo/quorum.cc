@@ -88,8 +88,7 @@ int main(int argc, char* argv[]) {
                             QOrg::initial_configurations[config.INITIAL_CONFIG()][1], 
                             QOrg::initial_configurations[config.INITIAL_CONFIG()][2], 
                             config.ENABLE_MUTATION(), 0);
-      org->mutate();
-      Qpop.Insert(*org);
+      Qpop.SequentialInsert(org);
     }
 
     // mutation is handled automatically by the population QPop_Manager, currently
@@ -117,7 +116,7 @@ int main(int argc, char* argv[]) {
       return age / (double) num_orgs;
     };
 
-    Qstats.AddFunction(age_func, "Average age");
+    Qstats.AddFunction(age_func, "avg_age");
 
     Qpop.SetDefaultFitnessFun(fit_func);
     Qstats.SetDefaultFitnessFun(fit_func); 

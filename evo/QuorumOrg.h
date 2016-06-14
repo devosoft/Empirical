@@ -201,31 +201,6 @@ public:
     out << state;
   }
 
-  // function to make offspring of this org; does mutation, if enabled
-  QuorumOrganism * make_offspring() {
-    QuorumOrganism * offspring = new QuorumOrganism();
-    //*offspring = *this;
-    offspring->mutate();
-    offspring->state.points = 0;
-    offspring->state.age = 0;
-    assert(offspring != this);
-    return offspring;
-  }
-
-  // function to handle reproduction of this organism
-  // will return pointer to offspring if capable of reproducing
-  // nullptr otherwise
-  // will decrement the points needed to reproduce from state
-  QuorumOrganism * reproduce() {
-    if (state.points >= needed_to_reproduce) {
-      state.points -= needed_to_reproduce;
-      state.num_offspring++;
-      return make_offspring();
-    }
-
-    return nullptr;
-  }
-
   bool operator<(const QuorumOrganism & other) const {
     return this->state.loc < other.state.loc;
   }

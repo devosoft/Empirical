@@ -134,12 +134,38 @@ public:
         if (org == nullptr) {continue;} // don't even try to touch nulls
         org->increment_age();
         // while able, gen offspring
-        while ( (offspring = org->reproduce()) != nullptr) {
+        while ( (offspring = reproduce(org)) != nullptr) {
           // overloaded AddOrgBirth will determine parent loc from pointer
           AddOrgBirth(offspring, org);
         }
       }
     } // end Update()
+
+    // function to make offspring of this org; does mutation, if enabled
+    QuorumOrganism * make_offspring(QuorumOrganism * parent) {
+      QuorumOrganism * offspring = new QuorumOrganism();
+      //TODO: undo this
+      //*offspring = *this;
+      offspring->mutate();
+      offspring->state.points = 0;
+      offspring->state.age = 0;
+      assert(offspring != parent);
+      return offspring;
+    }
+
+    // function to handle reproduction of this organism
+    // will return pointer to offspring if capable of reproducing
+    // nullptr otherwise
+    // will decrement the points needed to reproduce from state
+    QuorumOrganism * reproduce(QuorumOrganism * parent) {
+      if (parent->state.points >= QuorumOrganism::needed_to_reproduce) {
+        parent->state.points -= QuorumOrganism::needed_to_reproduce;
+        parent->state.num_offspring++;
+        return make_offspring(parent);
+      }
+
+      return nullptr;
+    }
 
 
 
