@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cstdarg>
 
 #include "../tools/FunctionSet.h"
 #include "../tools/vector.h"
@@ -57,6 +58,9 @@ namespace evo{
     template <typename WORLD>
     void Setup(WORLD * w){;}
 
+    template <typename T>
+    void SetDefaultFitnessFun(std::function<double(T)> fit){;}
+
     //Tells the stats manager where to put output. If location is "cout"
     //(default) or "stdout", stats will get sent to cout. Otherwise, the
     //specified file will be used as the location for output. If the file
@@ -99,10 +103,8 @@ namespace evo{
     //using world_type = World<ORG, MANAGERS...>;
     using fit_fun_type = std::function<double(org_ptr)>;
     //Stats calculated on the world
-    FunctionSet<double, POP_MANAGER * > world_stats;
-    //Stats calculated on the world that require a fitness function
-    FunctionSet<double, std::function<double(org_ptr)>,
-                                           POP_MANAGER* > fitness_stats;
+    FunctionSet<double> stats;
+
     //Pointer to the world object on which we're calculating stats
     POP_MANAGER * pop;
     using StatsManager_Base<POP_MANAGER>::resolution;
@@ -110,6 +112,7 @@ namespace evo{
     using StatsManager_Base<POP_MANAGER>::delimiter;
     bool header_printed = false;
     std::string header = "update";
+    emp::vector<std::string> col_map;
 
   public:
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
@@ -140,22 +143,15 @@ namespace evo{
 
     //Function for adding functions that calculate stats to the
     //set to be calculated
-    void AddFunction(std::function<double(POP_MANAGER*)> func, std::string label) {
-      world_stats.Add(func);
+    void AddFunction(std::function<double()> func, std::string label) {
+      stats.Add(func);
+      std::string header_label = label;
+      remove_whitespace(header_label);
+      col_map.push_back(label);
       if (header_printed){
         NotifyWarning("Function added to stats manager after initialization.");
       } else {
-        header += delimiter + label;
-      }
-    }
-
-    //Version for functions that require a fitness function
-    void AddFunction(std::function<double(fit_fun_type, POP_MANAGER*)> func, std::string label) {
-      fitness_stats.Add(func);
-      if (header_printed){
-        NotifyWarning("Function added to stats manager after initialization.");
-      } else {
-        header += delimiter + label;
+        header += delimiter + header_label;
       }
     }
 
@@ -170,15 +166,11 @@ namespace evo{
 
         output_location << update;
 
-        emp::vector<double> world_results = world_stats.Run(pop);
-        for (double d : world_results) {
+        emp::vector<double> results = stats.Run();
+        for (double d : results) {
           output_location << delimiter << d;
         }
 
-        emp::vector<double> fitness_results = fitness_stats.Run(fit_fun, pop);
-        for (double d : fitness_results){
-            output_location << delimiter << d;
-        }
         output_location << std::endl;
       }
     }
@@ -222,17 +214,18 @@ namespace evo{
       //Add appropriate functions to function sets
       template <typename WORLD>
       void Setup(WORLD * w){
+
         pop = &(w->popM);
 
         //Create std::function object for all of the stats
-        std::function<double(POP_MANAGER*)> diversity = [](POP_MANAGER * pop){
+        std::function<double()> diversity = [this](){
             return ShannonEntropy(*pop);
         };
-        fit_stat_type max_fitness = [](fit_fun_type fit_func, POP_MANAGER * pop){
-            return MaxFunctionReturn(fit_func, *pop);
+        std::function<double()> max_fitness = [this](){
+            return MaxFunctionReturn(fit_fun, *pop);
         };
-        fit_stat_type avg_fitness = [](fit_fun_type fit_func, POP_MANAGER * pop){
-            return AverageFunctionReturn(fit_func, *pop);
+        std::function<double()> avg_fitness = [this](){
+            return AverageFunctionReturn(fit_fun, *pop);
         };
 
         std::function<void(int)> UpdateFun = [&] (int ud){
@@ -241,9 +234,9 @@ namespace evo{
 
 
         //Add functions to manager
-        AddFunction(diversity, "shannon_diversity");
-        AddFunction(max_fitness, "max_fitness");
-        AddFunction(avg_fitness, "avg_fitness");
+        AddFunction(diversity, "Shannon Diversity");
+        AddFunction(max_fitness, "Max Fitness");
+        AddFunction(avg_fitness, "Avg Fitness");
 
         w->OnUpdate(UpdateFun);
 

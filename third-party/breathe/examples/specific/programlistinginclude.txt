@@ -1,3 +1,0 @@
-Vector boxCenter = interactionBox.center();
-Vector max = interactionBox.max();
-Vector diff = max - boxCenter;
