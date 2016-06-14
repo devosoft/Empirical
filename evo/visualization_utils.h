@@ -210,7 +210,7 @@ public:
   //Function telling tooltip how to display a data point
   std::function<std::string(std::array<double, 2>, int, int)> tooltip_display =
                                        [this](std::array<double, 2> d, int i, int k) {
-                                         return rounded.Call(d[1]);
+                                         return to_string(rounded.Call(d[1])) + " " + to_string(d[0]);
                                      };
 
   GraphVisualization(std::string y_var, std::string x_var, int w=800, int h=400) : D3Visualization(w, h){
@@ -224,6 +224,7 @@ public:
   }
 
   std::array<std::array<double, 2>, 1> data = {-1,-1};
+  std::array<std::array<double, 2>, 1> prev_data  = {-1,-1};
   D3::LineGenerator * make_line;
 
   D3::ToolTip* tip;
@@ -270,15 +271,14 @@ public:
   }
 
   void AnimateStep(emp::vector<double> data_point) {
-
     D3::Selection * svg = GetSVG();
-
+    std::cout << "Data point: " << data_point[0] << " " <<data_point[1] << std::endl;
     if (data_point[1] > y_max || data_point[1] < y_min) {
       std::function<void()> draw_data = [this, data_point](){
         DrawData(data_point);
       };
       JSWrap(draw_data, "draw_data");
-
+      std::cout << "Resacling" << std::endl;
       y_max = std::max(data_point[1]*1.2, y_max);
       y_min = std::min(data_point[1]*.8, y_min);
       y_scale->SetDomain(std::array<double,2>({y_max, y_min}));
@@ -301,14 +301,14 @@ public:
 
       t.Each("end", "draw_data");
     } else {
+      std::cout << "not Resacling" << std::endl;
       DrawData(data_point);
     }
   }
 
   void DrawData(emp::vector<double> data_point) {
-    std::array<std::array<double, 2>, 1> prev_data = data;
+    prev_data = data;
     data[0] = std::array<double, 2>({data_point[0], data_point[1]});
-
     //We can't draw a line on the first update
     if (prev_data[0][0] >=0 ){
       std::array<std::array<double, 2>, 2> line_data;
