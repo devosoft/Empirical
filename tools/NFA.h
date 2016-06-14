@@ -43,6 +43,7 @@ namespace emp {
     NFA(const NFA &) = default;
     ~NFA() { ; }
 
+    int GetSize() const { return (int) states.size(); }
     const std::set<int> & GetStart() const {
       emp_assert(states.size() > start);
       return states[start].free_to;
@@ -85,6 +86,7 @@ namespace emp {
       is_stop.resize(new_size, 0);
       if (new_size > start) states[start].free_to.insert(start);
     }
+    int AddNewState() { int new_state = GetSize(); Resize(new_state+1); return new_state; }
     void AddTransition(int from, int to, int sym) {
       emp_assert(from >= 0 && from < (int) states.size(), from, states.size());
       emp_assert(to >= 0 && to < (int) states.size(), to, states.size());
