@@ -65,15 +65,22 @@ std::ostream & operator<< (std::ostream & out, QuorumOrgGenome & genome) {
    */
 
 struct QuorumOrgState {
+private:
+  unsigned int age;
+  
+public:
   QuorumOrgGenome genome;
 
   bool hi_density;
   bool mutate;    // dunno if we'll want to do this by-org, but eh
 
   int points;
-  unsigned int age;
   unsigned int loc;
   unsigned int num_offspring; // gonna use this as/in a basic fitness function
+
+  unsigned int get_age() const {return age;}
+  unsigned int bump_age() {return ++age;}
+  void reset_age() {age = 0;}
 
   QuorumOrgState() {
     hi_density = false;
@@ -82,7 +89,7 @@ struct QuorumOrgState {
 
   QuorumOrgState (double cprob, double aprob, double qthresh, bool mut, unsigned int pts) :
     genome(cprob, aprob, qthresh), mutate(mut), points(pts) {
-
+ 
     age = 0;
     loc = 0;
     num_offspring = 0;
@@ -90,11 +97,11 @@ struct QuorumOrgState {
   };
 
   // Copy constructor!
-  QuorumOrgState (const QuorumOrgState & other) : points(0), age(0), loc(-1), num_offspring(0),
-                                                  hi_density(false), mutate(other.mutate),
-                                                  genome(other.genome.co_op_prob,
-                                                         other.genome.ai_radius,
-                                                         other.genome.quorum_threshold) {
+  QuorumOrgState (const QuorumOrgState & other) : genome(other.genome.co_op_prob,
+                                                  other.genome.ai_radius,
+                                                  other.genome.quorum_threshold),
+                                                  hi_density(false), mutate(other.mutate), 
+                                                  points(0), age(0), loc(0), num_offspring(0) {
   }
 
   QuorumOrgState operator= (const QuorumOrgState & rhs) {
@@ -103,6 +110,8 @@ struct QuorumOrgState {
     num_offspring = rhs.num_offspring;
     hi_density = rhs.hi_density;
     genome = rhs.genome;
+    points = rhs.points;
+    return *this;
   }
 
   // prints out loc, age, points, if_producing_ai, if_mutation_on, {genome}
@@ -174,7 +183,6 @@ public:
 
   // utility/accessor methods
   void set_state (QuorumOrgState new_state) {state = new_state;}
-  void increment_age() {state.age++;}
   unsigned int set_id (unsigned int new_id) {return state.loc = new_id;}
   unsigned int get_loc() {return state.loc;}
   unsigned int get_age() {return state.points;}
@@ -182,7 +190,7 @@ public:
   void set_density(bool hd) {state.hi_density = hd;}
   bool set_density(double q) { return state.hi_density = (q > state.genome.quorum_threshold);}
   bool hi_density () const {return state.hi_density;}
-  unsigned int get_fitness() {return state.num_offspring;}
+  unsigned int get_fitness() {return state.points;}
 
   // methods for interacting with the world / neighbors
   int get_contribution (double current_quorum) {
