@@ -102,11 +102,13 @@ int main(int argc, char* argv[]) {
       else {return (double) -1;} // seriously, I have to cast this to make you happy?
     };
 
-    std::function<double(QM<emp::evo::PopulationManager_Grid> *)>age_func=[]
-      (QM<emp::evo::PopulationManager_Grid> * m) {
+    
+    QM<emp::evo::PopulationManager_Grid> * underlying = &Qpop.popM;
+    std::function<double()>age_func=[underlying]
+      () {
       double age = 0;
       int num_orgs = 0;
-      for (auto org : (*m)) {
+      for (auto org : (*underlying)) {
         if (org != nullptr) {
           age += org->get_age();
           num_orgs++;
@@ -116,11 +118,11 @@ int main(int argc, char* argv[]) {
       return age / (double) num_orgs;
     };
 
-    std::function<double(QM<emp::evo::PopulationManager_Grid> *)>max_age_func=[]
-      (QM<emp::evo::PopulationManager_Grid> * m) {
+    std::function<double()>max_age_func=[underlying]
+      () {
       double max = 0;
 
-      for(auto org: (*m)) {
+      for(auto org: (*underlying) ){
         if (org != nullptr) {
           if (org->get_age() > max) {max = org->get_age();};
         }
