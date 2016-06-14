@@ -181,6 +181,7 @@ private:
   double y_max = 10;
 
 public:
+  std::string variable;
   D3::LinearScale * x_scale;
   D3::LinearScale * y_scale;
   D3::Axis<D3::LinearScale> * x_axis;
@@ -211,7 +212,9 @@ public:
                                          return rounded.Call(d[1]);
                                      };
 
-  GraphVisualization(int w=800, int h=400) : D3Visualization(w, h){;}
+  GraphVisualization(std::string var, int w=800, int h=400) : D3Visualization(w, h){
+    this->variable = var;
+  }
 
   std::array<std::array<double, 2>, 1> data = {-1,-1};
   D3::LineGenerator * make_line;
@@ -251,7 +254,7 @@ public:
     //Set up axes
     x_axis = new D3::Axis<D3::LinearScale>("Update");
     x_axis->SetScale(*x_scale);
-    y_axis = new D3::Axis<D3::LinearScale>("Shannon Entropy");
+    y_axis = new D3::Axis<D3::LinearScale>(variable);
     y_axis->SetScale(*y_scale);
     D3::DrawAxes(*x_axis, *y_axis, *svg);
     make_line = new D3::LineGenerator();
@@ -273,7 +276,9 @@ public:
       y_min = std::min(data_point[1]*.8, y_min);
       y_scale->SetDomain(std::array<double,2>({y_max, y_min}));
       t = svg->Transition();
-      y_axis->ApplyAxis(t.Select("#ShannonEntropy_axis"));
+      std::string stripped_variable = variable;
+      remove_whitespace(stripped_variable);
+      y_axis->ApplyAxis(t.Select("#"+stripped_variable+"_axis"));
       int y_id = JSWrap(y, "y");
       t.SelectAll("circle").SetAttr("cy", "y");
       EM_ASM_ARGS({
