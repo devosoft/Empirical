@@ -252,35 +252,23 @@ namespace evo {
     //TODO@JGF: a) make the rest of my todo's @'d to me
     //          b) make the function naming consistent (e.g. camel, not _'s)
     
-    std::set<ORG *> GetClusterByRadius(unsigned int focal_id, unsigned int depth) {
-      std::set<unsigned int> discovered[depth];
+    std::set<ORG *> GetClusterByRadius(unsigned int focal_id, int depth) {
       std::set<unsigned int> explored;
 
       unsigned int org_x, org_y, target;
 
       // execute a breadth-first-search, depth nodes deep, from focal_id
       
-      discovered[--depth].insert(focal_id);
 
-      while(depth > 0) {
-        for (auto element : discovered[depth]) {
-          org_x = ToX(element);
-          org_y = ToY(element);
-          for(int i = -1; i < 2; i++) {
-            for(int j = -1; j < 2; j++){
-              target = ToID((org_x + i + width) % width,
-                            (org_y + j + height) % height);
-              if (discovered[depth].find(target) == discovered[depth].end() && 
-                  explored.find(target) == explored.end()) {
-                discovered[depth - 1].insert(target);
-              }
-            }
-          }
-          
-          explored.insert(element);
-          depth--;
+      org_x = ToX(focal_id);
+      org_y = ToY(focal_id);
+      for(int i = -(depth / 2); i < (depth / 2); i++) {
+        for(int j = -(depth / 2); j < (depth / 2); j++){
+          target = ToID((org_x + i + width) % width, (org_y + j + height) % height);
+          explored.insert(target);
         }
       }
+
 
       std::set<ORG *> orgs;
       for (auto site : explored) {

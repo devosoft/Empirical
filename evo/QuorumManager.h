@@ -138,7 +138,6 @@ public:
           // overloaded AddOrgBirth will determine parent loc from pointer
           AddOrgBirth(offspring, org);
         }
-        org->state.bump_age();
       }
     } // end Update()
 
@@ -146,7 +145,8 @@ public:
     QuorumOrganism * make_offspring(QuorumOrganism * parent) {
       QuorumOrganism * offspring = new QuorumOrganism(*parent);
       offspring->mutate();
-      offspring->state.points = 0;
+      offspring->state.reset_age();
+      offspring->state.reset_points();
       assert(offspring != parent);
       return offspring;
     }
@@ -156,8 +156,8 @@ public:
     // nullptr otherwise
     // will decrement the points needed to reproduce from state
     QuorumOrganism * reproduce(QuorumOrganism * parent) {
-      if (parent->state.points >= QuorumOrganism::needed_to_reproduce) {
-        parent->state.points = 0;
+      if (parent->state.get_points() >= QuorumOrganism::needed_to_reproduce) {
+        parent->state.reset_points();
         parent->state.reset_age();
         return make_offspring(parent);
       }

@@ -18,6 +18,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <iomanip>
 
 using QOrg = emp::evo::QuorumOrganism;
 
@@ -136,9 +137,27 @@ int main(int argc, char* argv[]) {
     Qpop.SetDefaultFitnessFun(fit_func);
     Qstats.SetDefaultFitnessFun(fit_func); 
 
+    unsigned int checkpoint = 0;
+    
+    std::cerr << "Progress:   0% [ . . . . . . . . . .]";
     // loop through the specified number of updates && run the evolution
     for (unsigned int update_num = 0; update_num < runtime; update_num++) {
-      Qpop.TournamentSelect(fit_func, 10, pop_size);
+      //Qpop.TournamentSelect(fit_func, 10, pop_size);
       Qpop.Update();
+      if(( (double) update_num / (double) runtime) * 20 > checkpoint) {
+        ++checkpoint;
+        
+        std::cerr << "\rProgress: " << std::setw(3) << checkpoint * 5 << "% [";
+       
+        unsigned i = 0;
+        for(; i < checkpoint; i++) {
+          std::cerr << "+"; 
+        }
+        for(; i < 20; i++) {
+          if (i % 2 == 0) { std::cerr << " ";}
+          else { std::cerr << ".";}
+        }
+        std::cerr << "]";
+      }
     }
 }

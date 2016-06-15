@@ -160,7 +160,6 @@ namespace evo{
       }
 
       if (update % resolution == 0){
-        std::cerr << "Doing stats output for update " << update << std::endl;
         output_location << update;
 
         emp::vector<double> results = stats.Run();
@@ -189,8 +188,8 @@ namespace evo{
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::pop;
       using StatsManager_Base<POP_MANAGER>::output_location;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::Update;
-      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::AddFunction;
   public:
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::AddFunction;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::fit_fun;
       using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::SetDefaultFitnessFun;
