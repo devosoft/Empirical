@@ -9,6 +9,7 @@
 #define EMP_OEE_H
 
 #include <set>
+#include <unordered_set>
 #include <queue>
 #include <deque>
 #include <algorithm>
@@ -20,6 +21,21 @@
 #include "LineageTracker.h"
 #include "../tools/stats.h"
 #include "StatsManager.h"
+
+namespace std
+{
+    //From http://stackoverflow.com/questions/20511347/a-good-hash-function-for-a-vector
+    template<> struct hash<emp::vector<int> >
+    {
+        std::size_t operator()(emp::vector<int> const& vec) const {
+          std::size_t seed = vec.size();
+          for(auto& i : vec) {
+            seed ^= i + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+          }
+          return seed;
+        }
+    };
+}
 
 namespace emp{
 namespace evo{
@@ -40,7 +56,7 @@ namespace evo{
     using skeleton_type = emp::vector<int>;
     static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
 
-    std::set<skeleton_type > novel;
+    std::unordered_set<skeleton_type > novel;
 
     int generations = OeeConfig.GENERATIONS(); //How far back do we look for persistance?
 
@@ -235,7 +251,7 @@ namespace evo{
 
 
     //Find most complex skeleton in the given vector.
-    double ComplexityMetric(emp::vector<skeleton_type> persist,
+    double ComplexityMetric(emp::vector<skeleton_type> & persist,
                             std::function<double(skeleton_type)> complexity_fun) {
 
       double most_complex = complexity_fun(*(persist.begin()));
@@ -249,7 +265,7 @@ namespace evo{
     }
 
     //Determine the shannon diversity of the skeletons in the given vector
-    double EcologyMetric(emp::vector<skeleton_type> persist){
+    double EcologyMetric(emp::vector<skeleton_type> & persist){
 
       return emp::evo::ShannonEntropy(persist);
 
@@ -257,7 +273,7 @@ namespace evo{
 
     //Determine how many skeletons the given vector contains that have never
     //been seen before
-    int NoveltyMetric(emp::vector<skeleton_type > persist){
+    int NoveltyMetric(emp::vector<skeleton_type > & persist){
 
       int result = 0;
 
@@ -272,13 +288,13 @@ namespace evo{
     }
 
     //How many skeletons are there in the first vector that aren't in the second?
-    int ChangeMetric( emp::vector<skeleton_type > persist,
-                      emp::vector<skeleton_type > prev_persist){
+    int ChangeMetric( emp::vector<skeleton_type > & persist,
+                      emp::vector<skeleton_type > & prev_persist){
 
-      std::set<skeleton_type > curr_set(persist.begin(), persist.end());
-      std::set<skeleton_type > prev_set(prev_persist.begin(), prev_persist.end());
+      std::unordered_set<skeleton_type > curr_set(persist.begin(), persist.end());
+      std::unordered_set<skeleton_type > prev_set(prev_persist.begin(), prev_persist.end());
 
-      std::set<skeleton_type > result;
+      std::unordered_set<skeleton_type > result;
       std::set_difference(persist.begin(), persist.end(), prev_persist.begin(),
       prev_persist.end(), std::inserter(result, result.end()));
       return result.size();
@@ -296,7 +312,7 @@ namespace evo{
   //Takes a container of ints representing org ids (as assigned by the lineage)
   //tracker, and returns a contatiner of the genomes of those ints.
   template <typename POP_MANAGER, template <typename> class C >
-  C<ORG<POP_MANAGER> > IDsToGenomes(LineageTracker<POP_MANAGER>* lineages, C<int> persist_ids) {
+  C<ORG<POP_MANAGER> > IDsToGenomes(LineageTracker<POP_MANAGER>* lineages, C<int> & persist_ids) {
     C<ORG<POP_MANAGER> > persist;
     for (int id : persist_ids){
       persist.insert(persist.back(), *(lineages->org_to_genome[id]));
@@ -307,7 +323,7 @@ namespace evo{
 
   //Specialization for emp::vector so we can use push_back
   template <typename POP_MANAGER>
-  emp::vector<ORG<POP_MANAGER> > IDsToGenomes(LineageTracker<POP_MANAGER>* lineages, emp::vector<int> persist_ids) {
+  emp::vector<ORG<POP_MANAGER> > IDsToGenomes(LineageTracker<POP_MANAGER>* lineages, emp::vector<int> & persist_ids) {
     emp::vector<ORG<POP_MANAGER> > persist;
     for (int id : persist_ids){
       persist.push_back(*(lineages->org_to_genome[id]));
@@ -329,7 +345,7 @@ namespace evo{
   //Generic container version
   template <typename POP_MANAGER, template <typename> class C >
   C<int> GetPersistLineageIDs(LineageTracker<POP_MANAGER>* lineages,
-               C<int> curr_generation,
+               C<int> & curr_generation,
                int generations){
 
     C<int> persist;
@@ -345,7 +361,7 @@ namespace evo{
   //emp::vector version so we can use push_back
   template <typename POP_MANAGER>
   emp::vector<int> GetPersistLineageIDs(LineageTracker<POP_MANAGER>* lineages,
-               emp::vector<int> curr_generation,
+               emp::vector<int> & curr_generation,
                int generations){
 
     emp::vector<int> persist;
@@ -365,8 +381,8 @@ namespace evo{
 
   template <typename POP_MANAGER, template <typename> class C >
   C<int> GetPersistLineageIDs(LineageTracker<POP_MANAGER>* lineages,
-                C<int> curr_generation,
-                C<int> prev_generation){
+                C<int> & curr_generation,
+                C<int> & prev_generation){
 
     C<int> persist;
 
@@ -411,7 +427,7 @@ namespace evo{
   //GENOMEs first.
   template <typename POP_MANAGER, template <typename> class C>
   C<ORG<POP_MANAGER> > GetPersistLineage(LineageTracker<POP_MANAGER>* lineages,
-				       C<int> curr_generation,
+				       C<int> & curr_generation,
 				       int generations){
 
     C<ORG<POP_MANAGER> > persist;

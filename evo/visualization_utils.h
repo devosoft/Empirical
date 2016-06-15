@@ -293,6 +293,17 @@ public:
       x_max = std::max(data_point[0]*1.2, x_max);
       x_min = std::min(data_point[0]*.8, x_min);
 
+      if (y_min == y_max) {
+        y_min -= .2;
+        y_max += .2;
+      }
+
+      if (x_min == x_max) {
+        x_min -= .2;
+        x_max += .2;
+      }
+
+
       t = svg->Transition();
       y_axis->Rescale(y_max, y_min, t);
       x_axis->Rescale(x_min, x_max, t);

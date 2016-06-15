@@ -43,7 +43,7 @@ emp::web::GraphVisualization change_graph("Change", 550, 300);
 emp::web::GraphVisualization novelty_graph("Novelty", 550, 300);
 emp::web::GraphVisualization ecology_graph("Ecology", 550, 300);
 emp::web::GraphVisualization complexity_graph("Complexity", 550, 300);
-NKAnimation<BitOrg, emp::evo::OEEStats> viz;
+NKAnimation<BitOrg, emp::evo::LineageStandard, emp::evo::OEEStats> viz;
 
 emp::web::Document doc("emp_base");
 
