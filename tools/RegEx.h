@@ -64,7 +64,7 @@ namespace emp {
       virtual re_string * AsString() { return nullptr; }
       virtual int GetSize() const { return 0; }
       virtual bool Simplify() { return false; }
-      virtual void AddToNFA(NFA & nfa, int start, int stop) { nfa.AddFreeTransition(start, stop); }
+      virtual void AddToNFA(NFA & nfa, int start, int stop) const { nfa.AddFreeTransition(start, stop); }
     };
 
     struct re_string : public re_base {  // Series of specific chars
@@ -75,7 +75,7 @@ namespace emp {
       void Print(std::ostream & os) const override { os << "STR[" << to_escaped_string(str) << "]"; }
       re_string * AsString() override { return this; }
       int GetSize() const override { return (int) str.size(); }
-      virtual void AddToNFA(NFA & nfa, int start, int stop) override {
+      virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
         nfa.AddFreeTransition(start, stop);
         int prev_id = start;
         for (char x : str) {
@@ -105,7 +105,7 @@ namespace emp {
       re_charset * AsCharSet() override { return this; }
       int GetSize() const override { return char_set.CountOnes(); }
       char First() const { return (char) char_set.FindBit(); }
-      virtual void AddToNFA(NFA & nfa, int start, int stop) override {
+      virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
         for (int i = 0; i < NUM_SYMBOLS; i++) if (char_set[i]) nfa.AddTransition(start, stop, i);
       }
     };
@@ -182,7 +182,7 @@ namespace emp {
 
         return modify;
       }
-      virtual void AddToNFA(NFA & nfa, int start, int stop) override {
+      virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
         int prev_id = start;
         for (auto * x : nodes) {
           int next_id = nfa.AddNewState();
@@ -201,7 +201,7 @@ namespace emp {
         nodes[1]->Print(os);
         os << "]";
       }
-      virtual void AddToNFA(NFA & nfa, int start, int stop) override {
+      virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
         nodes[0]->AddToNFA(nfa, start, stop);
         nodes[1]->AddToNFA(nfa, start, stop);
       }
@@ -211,30 +211,30 @@ namespace emp {
       re_star(re_base * c) { push(c); }
       void Print(std::ostream & os) const override { os << "*["; nodes[0]->Print(os); os << "]"; }
 
-      virtual void AddToNFA(NFA & nfa, int start, int stop) override {
-        const int target = nfa->AddNewState();
+      virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
+        const int target = nfa.AddNewState();
         nodes[0]->AddToNFA(nfa, start, target);
-        nfa->AddFreeTransition(target, start);
-        nfa->AddFreeTransition(start, stop);
+        nfa.AddFreeTransition(target, start);
+        nfa.AddFreeTransition(start, stop);
       }
     };
 
     struct re_plus : public re_parent {    // one-or-more
       re_plus(re_base * c) { push(c); }
       void Print(std::ostream & os) const override { os << "+["; nodes[0]->Print(os); os << "]"; }
-      virtual void AddToNFA(NFA & nfa, int start, int stop) override {
-        const int target = nfa->AddNewState();
+      virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
+        const int target = nfa.AddNewState();
         nodes[0]->AddToNFA(nfa, start, target);
-        nfa->AddFreeTransition(target, stop);
+        nfa.AddFreeTransition(target, stop);
       }
     };
 
     struct re_qm : public re_parent {      // zero-or-one
       re_qm(re_base * c) { push(c); }
       void Print(std::ostream & os) const override { os << "?["; nodes[0]->Print(os); os << "]"; }
-      virtual void AddToNFA(NFA & nfa, int start, int stop) override {
+      virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
         nodes[0]->AddToNFA(nfa, start, stop);
-        nfa->AddFreeTransition(start, stop);
+        nfa.AddFreeTransition(start, stop);
       }
     };
 
@@ -418,6 +418,8 @@ namespace emp {
     ~RegEx() { ; }
 
     const std::string & AsString() const { return regex; }
+
+    virtual void AddToNFA(NFA & nfa, int start, int stop) const { head.AddToNFA(nfa, start, stop); }
 
     // For debugging: print the internal representation of the regex.
     void PrintInternal() { head.Print(std::cout); std::cout << std::endl; }
