@@ -58,10 +58,8 @@ protected:
 
       // Trigger any JS code needed on re-draw.
       void TriggerJS() override {
-        EM_ASM({console.log("TriggerJS");});
         if (state == Widget::ACTIVE) {            // Only draw on active canvases
           svg = new D3::Selection(D3::Select("#"+id));
-          EM_ASM({console.log(js.objects);});
           parent->Setup();
         }
       }
@@ -100,6 +98,7 @@ public:
   int GetWidth() const { return Info()->width; }
   int GetHeight() const { return Info()->height; }
   D3::Selection * GetSVG() {return Info()->svg;}
+  std::string GetID() {return Info()->id;}
 
   int POP_SIZE = 100;
   int MAX_GENS = 1000;
@@ -151,8 +150,8 @@ public:
     ax->Draw(*svg);
 
     //Make callback functions
-    JSWrap(scaled_d, "scaled_d");
-    JSWrap(scaled_i, "scaled_i");
+    JSWrap(scaled_d, GetID()+"scaled_d");
+    JSWrap(scaled_i, GetID()+"scaled_i");
   }
 
   void AnimateStep(emp::vector<double> fitnesses){
@@ -161,14 +160,14 @@ public:
       circles->EnterAppend("circle");
       circles->ExitRemove();
       circles->SetAttr("r", 5);
-      circles->SetAttr("cx", "scaled_i");
-      circles->SetAttr("cy", "scaled_d");
+      circles->SetAttr("cx", GetID()+"scaled_i");
+      circles->SetAttr("cy", GetID()+"scaled_d");
       circles->SetStyle("fill", "green");
 
      // circles->AddToolTip(tip);
 
       circles = new D3::Selection(circles->Data(fitnesses));
-      circles->Transition().SetAttr("cy", "scaled_d");
+      circles->Transition().SetAttr("cy", GetID()+"scaled_d");
   }
 
 };
@@ -210,7 +209,7 @@ public:
   //Function telling tooltip how to display a data point
   std::function<std::string(std::array<double, 2>, int, int)> tooltip_display =
                                        [this](std::array<double, 2> d, int i, int k) {
-                                         return to_string(rounded.Call(d[1])) + " " + to_string(d[0]);
+                                         return to_string(rounded.Call(d[1]));
                                      };
 
   GraphVisualization(std::string y_var, std::string x_var, int w=800, int h=400) : D3Visualization(w, h){
@@ -240,16 +239,14 @@ public:
 
     D3::Selection * svg = GetSVG();
 
-    EM_ASM_ARGS({console.log("Setting up", js.objects[$0])}, svg->GetID());
-
     //Wrap ncessary callback functions
-    JSWrap(tooltip_display, "tooltip_display");
-    JSWrap(x, "x");
-    JSWrap(y, "y");
-    JSWrap(return_x, "return_x");
+    JSWrap(tooltip_display, GetID()+"tooltip_display");
+    JSWrap(x, GetID()+"x");
+    JSWrap(y, GetID()+"y");
+    JSWrap(return_x, GetID()+"return_x");
 
     //Create tool top
-    tip = new D3::ToolTip("tooltip_display");
+    tip = new D3::ToolTip(GetID()+"tooltip_display");
 
     //Set up scales
     y_scale = new D3::LinearScale();
@@ -272,13 +269,11 @@ public:
 
   void AnimateStep(emp::vector<double> data_point) {
     D3::Selection * svg = GetSVG();
-    std::cout << "Data point: " << data_point[0] << " " <<data_point[1] << std::endl;
     if (data_point[1] > y_max || data_point[1] < y_min) {
-      std::function<void()> draw_data = [this, data_point](){
+      std::function<void(int, int)> draw_data = [this, data_point](int i=0, int j=0, int k=0){
         DrawData(data_point);
       };
-      JSWrap(draw_data, "draw_data");
-      std::cout << "Resacling" << std::endl;
+      JSWrap(draw_data, GetID()+"draw_data");
       y_max = std::max(data_point[1]*1.2, y_max);
       y_min = std::min(data_point[1]*.8, y_min);
       y_scale->SetDomain(std::array<double,2>({y_max, y_min}));
@@ -286,22 +281,21 @@ public:
       std::string stripped_variable = variables[1];
       remove_whitespace(stripped_variable);
       y_axis->ApplyAxis(t.Select("#"+stripped_variable+"_axis"));
-      int y_id = JSWrap(y, "y");
-      t.SelectAll("circle").SetAttr("cy", "y");
+      int y_id = JSWrap(y, GetID()+"y");
+      t.SelectAll("circle").SetAttr("cy", GetID()+"y");
       EM_ASM_ARGS({
         circle_data = js.objects[$0].selectAll(".data-point").data();
         path_data = [];
         for (iter=0; iter<circle_data.length-1; iter++){
-          path_data.push(js.objects[$1]([[emp.x(circle_data[iter]), emp.y(circle_data[iter])],
-                         [emp.x(circle_data[iter+1]), emp.y(circle_data[iter+1])]]));
+          path_data.push(js.objects[$1]([[emp[Pointer_stringify($4)+"x"](circle_data[iter],0,0), emp[Pointer_stringify($4)+"y"](circle_data[iter],0,0)],
+                         [emp[Pointer_stringify($4)+"x"](circle_data[iter+1],0,0), emp[Pointer_stringify($4)+"y"](circle_data[iter+1],0,0)]]));
         }
         js.objects[$0].selectAll(".line-seg").data(path_data);
         js.objects[$3].selectAll(".line-seg").attr("d", function(d){return d;});
-      }, svg->GetID(), make_line->GetID(), y_id, t.GetID());
+      }, svg->GetID(), make_line->GetID(), y_id, t.GetID(), this->GetID().c_str());
 
-      t.Each("end", "draw_data");
+      t.Each("end", GetID()+"draw_data");
     } else {
-      std::cout << "not Resacling" << std::endl;
       DrawData(data_point);
     }
   }
@@ -329,10 +323,10 @@ public:
       line.SetAttr("class", "line-seg");
     }
 
-    circles = new D3::Selection(circles->Data(data, "return_x"));
+    circles = new D3::Selection(GetSVG()->SelectAll("circle").Data(data, GetID()+"return_x"));
     D3::Selection enter = circles->EnterAppend("circle");
-    enter.SetAttr("cy", "y");
-    enter.SetAttr("cx", "x");
+    enter.SetAttr("cy", GetID()+"y");
+    enter.SetAttr("cx", GetID()+"x");
     enter.SetAttr("r", 2);
     enter.SetAttr("class", "data-point");
     enter.SetStyle("fill", "green");
