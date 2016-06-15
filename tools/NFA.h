@@ -126,6 +126,21 @@ namespace emp {
     void SetStop(int state) { is_stop[state] = 1; }
     bool IsStop(int state) const { return is_stop[state]; }
 
+    void Print() const {
+      std::cout << states.size() << " States:" << std::endl;
+      for (int i = 0; i < (int) states.size(); i++) {
+        std::cout << " state " << i << " - ";
+        for (const auto & t : states[i].trans) {
+          std::cout << "(";
+          for (int s = 0; s < NUM_SYMBOLS; s++) if (t.second.symbols[s]) std::cout << ((char) s);
+          std::cout << "):" << t.first << " ";
+        }
+        std::cout << "free to:";
+        for (int f : states[i].free_to) std::cout << " " << f;
+        std::cout << std::endl;
+      }
+    }
+
     void PrintFreeMoves() {
       for (int i = 0; i < (int) states.size(); i++) {
         // std::cout << "Free from ( ";
