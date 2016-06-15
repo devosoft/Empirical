@@ -14,6 +14,7 @@ namespace D3 {
   private:
     SCALE_TYPE scale;
     std::string label;
+    std::string dom_id;
 
   public:
     Selection group;
@@ -31,13 +32,14 @@ namespace D3 {
       this->SetTickFormat("g");
 
       //Dom ids can't contain whitespace
-      std::string dom_id = label;
+      dom_id = label;
       emp::remove_whitespace(dom_id);
+      dom_id += "_axis";
 
       EM_ASM_ARGS({
         var axis_range = js.objects[$0].scale().range();
 	    js.objects[$3] = js.objects[$1].append("g")
-                                  .attr("id", Pointer_stringify($2)+"_axis")
+                                  .attr("id", Pointer_stringify($2))
                                   .call(js.objects[$0]);
 
         var canvas_width = js.objects[$1].attr("width");
@@ -70,10 +72,9 @@ namespace D3 {
         js.objects[$3].append("text")
              .attr("id", "axis_label")
              .attr("transform", "rotate("+text_orient+")")
-             .attr("x", (axis_range[1]-axis_range[0])/x_divisor)
+             .attr("x", axis_range[0]+(axis_range[1]-axis_range[0])/x_divisor)
              .attr("dy", dy).style("text-anchor", "middle")
              .text(Pointer_stringify($4));
-
       }, this->id, selection.GetID(), dom_id.c_str(), group.GetID(), label.c_str());
     }
 
@@ -145,6 +146,11 @@ namespace D3 {
       EM_ASM_ARGS({
         js.objects[$0].tickFormat(d3.format(Pointer_stringify([$1])));
       }, this->id, format.c_str());
+    }
+
+    void Rescale(double new_min, double new_max, D3::Selection & svg){
+      this->scale.SetDomain(std::array<double, 2>({new_min, new_max}));
+      ApplyAxis(svg.Select("#"+dom_id));
     }
 
     //TODO:  ticks

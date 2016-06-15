@@ -30,8 +30,9 @@ namespace D3 {
     Selection(){EM_ASM({js.objects.push(-1)});}; //Null contstructor
     Selection(int id); //append constructor
     Selection(const char* selector, bool all = false);
+    Selection(std::string selector, bool all = false);
     //Selection(Selection* selector, bool all = false); //Do we need this?
-    //~Selection(); //tilde is creating demangling issues
+    ~Selection(){}; //tilde is creating demangling issues
 
     Selection Select(const char* selector){
       int new_id = EM_ASM_INT_V({return js.objects.length});
@@ -39,6 +40,15 @@ namespace D3 {
 	  var new_selection = js.objects[$0].select(Pointer_stringify($1));
 	  js.objects.push(new_selection);
 	}, this->id, selector);
+      return Selection(new_id);
+    }
+
+    Selection Select(std::string selector){
+      int new_id = EM_ASM_INT_V({return js.objects.length});
+      EM_ASM_ARGS({
+	  var new_selection = js.objects[$0].select(Pointer_stringify($1));
+	  js.objects.push(new_selection);
+  }, this->id, selector.c_str());
       return Selection(new_id);
     }
 
@@ -51,27 +61,48 @@ namespace D3 {
       return Selection(new_id);
     }
 
+    Selection SelectAll(std::string selector){
+      int new_id = EM_ASM_INT_V({return js.objects.length});
+      EM_ASM_ARGS({
+	  var new_selection = js.objects[$0].selectAll(Pointer_stringify($1));
+	  js.objects.push(new_selection);
+  }, this->id, selector.c_str());
+      return Selection(new_id);
+    }
+
     template <typename T>
-    Selection SetAttr(const char* name, T value){
+    Selection SetAttr(std::string name, T value){
       /* Assigns [value] to the selection's [name] attribute.
 	 This method handles numeric values - use SetAttrString
 	 for non-numeric values. */
 
       EM_ASM_ARGS({js.objects[$0].attr(Pointer_stringify($1), $2)},
-		  this->id, name, value);
+		  this->id, name.c_str(), value);
       return *this;
     }
 
-    Selection SetAttr(const char* name, const char* value){
+    Selection SetAttr(std::string name, std::string value){
       /* Assigns [value] to the selections's [name] attribute.
 
 	 This will break if someone happens to use a string that
 	 is identical to a function name... but that's unlikely, right?
       */
 
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS(attr, name, value)
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS(attr, name.c_str(), value.c_str())
       return *this;
     }
+
+    Selection SetAttr(std::string name, const char * value){
+      /* Assigns [value] to the selections's [name] attribute.
+
+	 This will break if someone happens to use a string that
+	 is identical to a function name... but that's unlikely, right?
+      */
+
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS(attr, name.c_str(), value)
+      return *this;
+    }
+
 
     template <typename T, size_t SIZE>
     Selection SetAttr(const char* name, std::array<T, SIZE> value){
@@ -143,27 +174,26 @@ namespace D3 {
     }
 
     //Option to pass loaded dataset without translating to C++
-    Selection Data(Dataset values, const char* key=""){
+    Selection Data(Dataset values, std::string key=""){
       int update_id = EM_ASM_INT_V({return js.objects.length});
 
       EM_ASM_ARGS({
-	  var in_string = Pointer_stringify($1);
-	  var fn = window["emp"][in_string];
-	  if (typeof fn === "function"){
-	    var update_sel = js.objects[$0].data(js.objects[$2], fn);
-	  } else if (typeof window["d3"][in_string] === "function") {
-	    var update_sel = js.objects[$0].data(js.objects[$2],
+	    var in_string = Pointer_stringify($1);
+	    var fn = window["emp"][in_string];
+	    if (typeof fn === "function"){
+	      var update_sel = js.objects[$0].data(js.objects[$2], fn);
+	    } else if (typeof window["d3"][in_string] === "function") {
+	      var update_sel = js.objects[$0].data(js.objects[$2],
 						 window["d3"][in_string]);
-	  } else if (typeof window[in_string] === "function") {
-	    var update_sel = js.objects[$0].data(js.objects[$2],
+	    } else if (typeof window[in_string] === "function") {
+	      var update_sel = js.objects[$0].data(js.objects[$2],
 						 window[in_string]);
-	  } else {
-	    var update_sel = js.objects[$0].data(js.objects[$2]);
-	  }
+	    } else {
+	      var update_sel = js.objects[$0].data(js.objects[$2]);
+	    }
 
-	  js.objects.push(update_sel);
-	},this->id, key, values.GetID());
-
+	    js.objects.push(update_sel);
+      },this->id, key.c_str(), values.GetID());
 
       Selection update = Selection(update_id);
       update.enter = true;
@@ -172,27 +202,27 @@ namespace D3 {
     }
 
     template<typename C, class = typename C::value_type>
-    Selection Data(C values, const char* key=""){
+    Selection Data(C values, std::string key=""){
       int update_id = EM_ASM_INT_V({return js.objects.length});
       emp::pass_array_to_javascript(values);
 
-	EM_ASM_ARGS({
-	  var in_string = Pointer_stringify($1);
-	  var fn = window["emp"][in_string];
-	  if (typeof fn === "function"){
-	    var update_sel = js.objects[$0].data(emp_i.__incoming_array, fn);
-	  } else if (typeof window["d3"][in_string] === "function") {
-	    var update_sel = js.objects[$0].data(emp_i.__incoming_array,
+  	  EM_ASM_ARGS({
+	    var in_string = Pointer_stringify($1);
+	    var fn = window["emp"][in_string];
+	    if (typeof fn === "function"){
+	      var update_sel = js.objects[$0].data(emp_i.__incoming_array, fn);
+	    } else if (typeof window["d3"][in_string] === "function") {
+	      var update_sel = js.objects[$0].data(emp_i.__incoming_array,
 						 window["d3"][in_string]);
-	  } else if (typeof window[in_string] === "function") {
-	    var update_sel = js.objects[$0].data(emp_i.__incoming_array,
+	    } else if (typeof window[in_string] === "function") {
+	      var update_sel = js.objects[$0].data(emp_i.__incoming_array,
 						 window[in_string]);
-	  } else {
-	    var update_sel = js.objects[$0].data(emp_i.__incoming_array);
-	  }
+	    } else {
+	      var update_sel = js.objects[$0].data(emp_i.__incoming_array);
+	    }
 
-	  js.objects.push(update_sel);
-	},this->id, key);
+	    js.objects.push(update_sel);
+      },this->id, key.c_str());
 
       Selection update = Selection(update_id);
       update.enter = true;
@@ -200,14 +230,14 @@ namespace D3 {
       return update;
     }
 
-    Selection EnterAppend(const char* type){
-      /*This function appends the specified type of nodes to this
-	selection's enter selection, which merges the enter selection
-	with the update selection.
+    /*This function appends the specified type of nodes to this
+    selection's enter selection, which merges the enter selection
+    with the update selection.
 
-	Triggers an assertion error if this selection has no valid enter
-	selection.
-       */
+    Triggers an assertion error if this selection has no valid enter
+    selection.
+    */
+    Selection EnterAppend(const char* type){
 
       int new_id = EM_ASM_INT_V({return js.objects.length});
 
@@ -218,6 +248,23 @@ namespace D3 {
 	    .enter().append(Pointer_stringify($1));
 	  js.objects.push(append_selection);
 	    }, this->id, type);
+
+      this->enter = false;
+
+      return Selection(new_id);
+    }
+
+    Selection EnterAppend(std::string type){
+
+      int new_id = EM_ASM_INT_V({return js.objects.length});
+
+      emp_assert(this->enter);
+
+      EM_ASM_ARGS({
+	  var append_selection = js.objects[$0]
+	    .enter().append(Pointer_stringify($1));
+	  js.objects.push(append_selection);
+  }, this->id, type.c_str());
 
       this->enter = false;
 
@@ -468,67 +515,86 @@ namespace D3 {
       return (char *)buffer;
     }
 
+    /* Sort the selection by the given comparator function. The function
+    is indicated as a string and can either be in the d3 namespace,
+    the emp namespace (as results from JSWrapping C++ functions), or the
+    window namespace. These three options are checked sequentially in that
+    order, so a C++ function with the same name as d3 built-in will not
+    override the built-in. Similarly, a function declared directly in the
+    window will be overriden by a JSWrapped function with the same name.
+    */
+
     void Sort(const char * comparator = "ascending"){
-      /* Sort the selection by the given comparator function. The function
-	 is indicated as a string and can either be in the d3 namespace,
-	 the emp namespace (as results from JSWrapping C++ functions), or the
-	 window namespace. These three options are checked sequentially in that
-	 order, so a C++ function with the same name as d3 built-in will not
-	 override the built-in. Similarly, a function declared directly in the
-	 window will be overriden by a JSWrapped function with the same name.
-       */
       CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(sort, comparator)
     }
 
-    void Each(const char * function){
-      /* Call the given function on each element of the selection. The function
-	 is indicated as a string and can either be in the d3 namespace,
-	 the emp namespace (as results from JSWrapping C++ functions), or the
-	 window namespace. These three options are checked sequentially in that
-	 order, so a C++ function with the same name as d3 built-in will not
-	 override the built-in. Similarly, a function declared directly in the
-	 window will be overriden by a JSWrapped function with the same name.
-       */
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(each, function)
+    void Sort(std::string comparator = "ascending"){
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(sort, comparator.c_str())
     }
 
-    void Each(const char * time, const char * function){
-      /* Call the given function on each element of the selection. The function
-     is indicated as a string and can either be in the d3 namespace,
-     the emp namespace (as results from JSWrapping C++ functions), or the
-     window namespace. These three options are checked sequentially in that
-     order, so a C++ function with the same name as d3 built-in will not
-     override the built-in. Similarly, a function declared directly in the
-     window will be overriden by a JSWrapped function with the same name.
-       */
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS(each, time, function)
-    }
+    /* Call the given function on each element of the selection. The function
+    is indicated as a string and can either be in the d3 namespace,
+    the emp namespace (as results from JSWrapping C++ functions), or the
+    window namespace. These three options are checked sequentially in that
+    order, so a C++ function with the same name as d3 built-in will not
+    override the built-in. Similarly, a function declared directly in the
+    window will be overriden by a JSWrapped function with the same name.
+     */
 
+     void Each(std::string function){
+       CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(each, function.c_str())
+     }
+
+     /* Call the given function on each element of the selection. The function
+    is indicated as a string and can either be in the d3 namespace,
+    the emp namespace (as results from JSWrapping C++ functions), or the
+    window namespace. These three options are checked sequentially in that
+    order, so a C++ function with the same name as d3 built-in will not
+    override the built-in. Similarly, a function declared directly in the
+    window will be overriden by a JSWrapped function with the same name.
+      */
+
+     void Each(std::string time, std::string function){
+       CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS(each, time.c_str(), function.c_str())
+     }
+
+     /* Call the given function once on the entire selection. The function
+    is indicated as a string and can either be in the d3 namespace,
+    the emp namespace (as results from JSWrapping C++ functions), or the
+    window namespace. These three options are checked sequentially in that
+    order, so a C++ function with the same name as d3 built-in will not
+    override the built-in. Similarly, a function declared directly in the
+    window will be overriden by a JSWrapped function with the same name.
+
+    TODO: Allow arguments
+      */
     void Call(const char * function){
-      /* Call the given function once on the entire selection. The function
-	 is indicated as a string and can either be in the d3 namespace,
-	 the emp namespace (as results from JSWrapping C++ functions), or the
-	 window namespace. These three options are checked sequentially in that
-	 order, so a C++ function with the same name as d3 built-in will not
-	 override the built-in. Similarly, a function declared directly in the
-	 window will be overriden by a JSWrapped function with the same name.
-
-	 TODO: Allow arguments
-       */
       CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(call, function)
     }
 
+    void Call(std::string function){
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(call, function.c_str())
+    }
+
+    /* Returns a new selection, representing the current selection
+    filtered by the given string. The string can represent a function
+    in either the d3, emp, or window namespaces (as described in Sort),
+    or it can be a filter selector. Using a filter selector that somehow
+    has the same name as a function in one of the allowed namespaces
+    will create a problem, but shouldn't actually be possible.
+    */
     Selection Filter(const char * selector){
-      /* Returns a new selection, representing the current selection
-	 filtered by the given string. The string can represent a function
-	 in either the d3, emp, or window namespaces (as described in Sort),
-	 or it can be a filter selector. Using a filter selector that somehow
-	 has the same name as a function in one of the allowed namespaces
-	 will create a problem, but shouldn't actually be possible.
-       */
 
       int new_id = EM_ASM_INT_V({return js.objects.length});
       CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(filter, selector)
+      StoreNewObject();
+      return Selection(new_id);
+    }
+
+    Selection Filter(std::string selector){
+
+      int new_id = EM_ASM_INT_V({return js.objects.length});
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(filter, selector.c_str())
       StoreNewObject();
       return Selection(new_id);
     }
@@ -587,6 +653,21 @@ namespace D3 {
     }
   }
 
+  Selection::Selection(std::string selector, bool all){
+    this->enter = false;
+    this->exit = false;
+    if (all){
+      EM_ASM_ARGS({
+	  js.objects[$0] =
+	  d3.selectAll(Pointer_stringify($1))}, this->id, selector.c_str());
+    }
+    else {
+      EM_ASM_ARGS({
+	  js.objects[$0] =
+	  d3.select(Pointer_stringify($1))}, this->id, selector.c_str());
+    }
+  }
+
   Selection::Selection(int id) : D3_Base(id){
     this->enter = false;
     this->exit = false;
@@ -612,15 +693,25 @@ namespace D3 {
 //
 //}
 
-  Selection Select(const char* selector){
-    /*Slightly prettier UI for constructor*/
-    return Selection(selector);
-  }
+Selection Select(const char* selector){
+  /*Slightly prettier UI for constructor*/
+  return Selection(selector);
+}
 
-  Selection SelectAll(const char* selector){
-    /*Slightly prettier UI for constructor*/
-    return Selection(selector, true);
-  }
+Selection Select(std::string selector){
+  /*Slightly prettier UI for constructor*/
+  return Selection(selector);
+}
+
+Selection SelectAll(const char* selector){
+  /*Slightly prettier UI for constructor*/
+  return Selection(selector, true);
+}
+
+Selection SelectAll(std::string selector){
+  /*Slightly prettier UI for constructor*/
+  return Selection(selector, true);
+}
 
   template<std::size_t SIZE>
   Selection ShapesFromData(std::array<int32_t, SIZE> values, const char* shape){
@@ -629,8 +720,20 @@ namespace D3 {
     return s;
   }
 
+  template<std::size_t SIZE>
+  Selection ShapesFromData(std::array<int32_t, SIZE> values, std::string shape){
+    Selection s = Select("svg").SelectAll(shape).Data(values);
+    s.EnterAppend(shape);
+    return s;
+  }
 
   Selection ShapesFromData(Dataset values, const char* shape){
+    Selection s = Select("svg").SelectAll(shape).Data(values);
+    s.EnterAppend(shape);
+    return s;
+  }
+
+  Selection ShapesFromData(Dataset values, std::string shape){
     Selection s = Select("svg").SelectAll(shape).Data(values);
     s.EnterAppend(shape);
     return s;
