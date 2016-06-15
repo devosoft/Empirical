@@ -104,6 +104,9 @@ public:
   int POP_SIZE = 100;
   int MAX_GENS = 1000;
   virtual void Setup(){;}
+
+  virtual void AnimateStep(...){;}
+  virtual void AnimateStep(emp::vector<double>){;}
 };
 
 class FitnessVisualization : public D3Visualization {
@@ -244,7 +247,7 @@ public:
     x_max = MAX_GENS;
   }
 
-  void Setup(){
+  virtual void Setup(){
     EM_ASM({emp["waiting"] = 0});
     D3::Selection * svg = GetSVG();
 
@@ -278,7 +281,7 @@ public:
     circles = new D3::Selection(svg->SelectAll("circle"));
   }
 
-  void AnimateStep(emp::vector<double> data_point) {
+  virtual void AnimateStep(emp::vector<double> data_point) {
     data.push_back(std::array<std::array<double, 2>, 1>({data_point[0], data_point[1]}));
     D3::Selection * svg = GetSVG();
 

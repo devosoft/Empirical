@@ -39,9 +39,11 @@ constexpr int UD_COUNT = config.MAX_GENS();
 constexpr int TOURNAMENT_SIZE = config.TOURNAMENT_SIZE();
 
 using BitOrg = emp::BitSet<N>;
-emp::web::GraphVisualization diversity_graph("Shannon Diversity", 550, 300);
-emp::web::GraphVisualization fitness_graph("Avg Fitness", 550, 300);
-NKAnimation<BitOrg, emp::evo::DefaultStats> viz;
+emp::web::GraphVisualization change_graph("Change", 550, 300);
+emp::web::GraphVisualization novelty_graph("Novelty", 550, 300);
+emp::web::GraphVisualization ecology_graph("Ecology", 550, 300);
+emp::web::GraphVisualization complexity_graph("Complexity", 550, 300);
+NKAnimation<BitOrg, emp::evo::OEEStats> viz;
 
 emp::web::Document doc("emp_base");
 
@@ -60,10 +62,15 @@ int main()
       return true;
     } );
 
-  diversity_graph.SetupConfigs(config);
-  viz.world->statsM.ConnectVis(&diversity_graph);
-  fitness_graph.SetupConfigs(config);
-  viz.world->statsM.ConnectVis(&fitness_graph);
+  change_graph.SetupConfigs(config);
+  viz.world->statsM.ConnectVis(&change_graph);
+  novelty_graph.SetupConfigs(config);
+  viz.world->statsM.ConnectVis(&novelty_graph);
+  ecology_graph.SetupConfigs(config);
+  viz.world->statsM.ConnectVis(&ecology_graph);
+  complexity_graph.SetupConfigs(config);
+  viz.world->statsM.ConnectVis(&complexity_graph);
+
 
   doc << "<br>";
   doc.AddButton([](){
@@ -74,7 +81,7 @@ int main()
   }, "Pause", "toggle");
   doc << "<br>";
   doc << "<br>";
-  doc << diversity_graph << fitness_graph;
+  doc << change_graph << novelty_graph << ecology_graph << complexity_graph;
 
   viz.anim.Start();
 

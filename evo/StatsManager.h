@@ -32,6 +32,11 @@ namespace evo{
     int resolution = 10; //With what frequency do we record data?
     static constexpr bool emp_is_stats_manager = true;
     std::ofstream output_location; //Where does output go?
+    emp::vector<std::string> col_map; //Vector for tracking variables
+
+    //Support for visualization connections
+    emp::vector<web::D3Visualization*> viz_pointers;
+    emp::vector<emp::vector<int> > viz_args;
 
     StatsManager_Base(std::string location = "cout"){
         StatsManagerConfig config;
@@ -85,6 +90,20 @@ namespace evo{
         }
     }
 
+    void SendResultsToViz(int update, emp::vector<double> & results){
+      for (int i=0; i<viz_pointers.size(); ++i){
+        emp::vector<double> values;
+        for (int el : viz_args[i]) {
+          if (el == -1){
+            values.push_back((double)update);
+          } else {
+            values.push_back(results[el]);
+          }
+        }
+        viz_pointers[i]->AnimateStep(values);
+      }
+    }
+
   };
 
   //A popular type of stats manager is one that prints a set of statistics every
@@ -107,11 +126,12 @@ namespace evo{
     using StatsManager_Base<POP_MANAGER>::resolution;
     using StatsManager_Base<POP_MANAGER>::output_location;
     using StatsManager_Base<POP_MANAGER>::delimiter;
+    using StatsManager_Base<POP_MANAGER>::col_map;
+    using StatsManager_Base<POP_MANAGER>::viz_pointers;
+    using StatsManager_Base<POP_MANAGER>::viz_args;
+    using StatsManager_Base<POP_MANAGER>::SendResultsToViz;
     bool header_printed = false;
     std::string header = "update";
-    emp::vector<std::string> col_map;
-    emp::vector<web::GraphVisualization*> viz_pointers;
-    emp::vector<emp::vector<int> > viz_args;
 
   public:
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
@@ -172,18 +192,7 @@ namespace evo{
         }
 
         output_location << std::endl;
-
-        for (int i=0; i<viz_pointers.size(); ++i){
-          emp::vector<double> values;
-          for (int el : viz_args[i]) {
-            if (el == -1){
-              values.push_back((double)update);
-            } else {
-              values.push_back(results[el]);
-            }
-          }
-          viz_pointers[i]->AnimateStep(values);
-        }
+        SendResultsToViz(update, results);
       }
     }
 

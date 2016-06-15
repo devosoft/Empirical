@@ -50,6 +50,9 @@ namespace evo{
     using StatsManager_Base<POP_MANAGER>::resolution;
     using StatsManager_Base<POP_MANAGER>::output_location;
     using StatsManager_Base<POP_MANAGER>::delimiter;
+    using StatsManager_Base<POP_MANAGER>::col_map;
+    using StatsManager_Base<POP_MANAGER>::viz_pointers;
+    using StatsManager_Base<POP_MANAGER>::viz_args;
 
   public:
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
@@ -87,10 +90,16 @@ namespace evo{
       //Setup signal callbacks
       w->OnUpdate(UpdateFun);
       lineage = &(w->lineageM);
+      col_map.push_back("Change");
+      col_map.push_back("Novelty");
+      col_map.push_back("Ecology");
+      col_map.push_back("Complexity");
 
-      output_location << "update" << delimiter << "change" << delimiter
-            << "novelty" << delimiter << "ecology" << delimiter
-            << "complexity" << std::endl;
+      output_location << "update";
+      for (std::string var_name : col_map) {
+        output_location << var_name << delimiter;
+      }
+      output_location << std::endl;
     }
 
     void SetDefaultFitnessFun(std::function<double(org_ptr)> fit){
@@ -128,12 +137,56 @@ namespace evo{
                                 return (double)(skel.size() - nulls);
                               });
         }
-        output_location << update << delimiter << change << delimiter << novelty << delimiter << ecology << delimiter << complexity << std::endl;
+        emp::vector<double> results = emp::vector<double>({(double)change, (double)novelty, (double)ecology, (double)complexity});
+        output_location << update;
+        for (double result : results){
+           output_location << delimiter << result;
+        }
+        output_location << std::endl;
+
         past_snapshots.pop_back();
         past_snapshots.push_front(lineage->generation_since_update);
+        SendResultsToViz(update, results);
       }
     }
 
+    void SendResultsToViz(int update, emp::vector<double> & results){
+      for (int i=0; i<viz_pointers.size(); ++i){
+        emp::vector<double> values;
+        for (int el : viz_args[i]) {
+          if (el == -1){
+            values.push_back((double)update);
+          } else {
+            if (results[el] != -1){
+              values.push_back(results[el]);
+            }
+          }
+        }
+        if (values.size() == viz_args[i].size()){
+          viz_pointers[i]->AnimateStep(values);
+        }
+      }
+    }
+
+    void ConnectVis(web::GraphVisualization * viz) {
+      emp::vector<int> vars;
+
+      for (std::string variable : viz->variables) {
+        if (variable == "Update"){
+          vars.push_back(-1);
+        } else {
+          auto it = std::find(col_map.begin(), col_map.end(), variable);
+          if (it == col_map.end()) {
+            NotifyWarning("Invalid graph variable.");
+          }
+          int pos = std::distance(col_map.begin(), it);
+          vars.push_back(pos);
+        }
+      }
+
+      viz_pointers.push_back(viz);
+      viz_args.push_back(vars);
+    }
 
     //Convert a container of orgs to skeletons containing only informative sites
     //TODO: Currently assumes bit org
