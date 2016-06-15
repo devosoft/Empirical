@@ -12,6 +12,7 @@
 
 #include <functional>
 #include <algorithm>
+#include <deque>
 
 #include "../config/config.h"
 #include "NK-const.h"
@@ -179,6 +180,8 @@ private:
   double axis_width = 60;
   double y_min = 1000;
   double y_max = 0;
+  double x_min = 0;
+  double x_max = 0;
 
 public:
   emp::vector<std::string> variables;
@@ -203,6 +206,11 @@ public:
       return d[0];
   };
 
+  //Callback function for drawing data after rescale animation
+  std::function<void(int, int)> draw_data = [this](int i=0, int j=0, int k=0){
+    DrawData(true);
+  };
+
   //Format function for tooltip
   D3::FormatFunction rounded = D3::FormatFunction(".2f");
 
@@ -222,8 +230,8 @@ public:
     this->variables.push_back(y_var);
   }
 
-  std::array<std::array<double, 2>, 1> data = {-1,-1};
-  std::array<std::array<double, 2>, 1> prev_data  = {-1,-1};
+  std::deque<std::array<std::array<double, 2>, 1> > data;
+  std::array<std::array<double, 2>, 1> prev_data  = {{-1,-1}};
   D3::LineGenerator * make_line;
 
   D3::ToolTip* tip;
@@ -233,10 +241,11 @@ public:
     //Setup config parameters
     POP_SIZE = config.POP_SIZE();
     MAX_GENS = config.MAX_GENS();
+    x_max = MAX_GENS;
   }
 
   void Setup(){
-
+    EM_ASM({emp["waiting"] = 0});
     D3::Selection * svg = GetSVG();
 
     //Wrap ncessary callback functions
@@ -244,6 +253,8 @@ public:
     JSWrap(x, GetID()+"x");
     JSWrap(y, GetID()+"y");
     JSWrap(return_x, GetID()+"return_x");
+    JSWrap(draw_data, GetID()+"draw_data");
+
 
     //Create tool top
     tip = new D3::ToolTip(GetID()+"tooltip_display");
@@ -268,41 +279,54 @@ public:
   }
 
   void AnimateStep(emp::vector<double> data_point) {
+    data.push_back(std::array<std::array<double, 2>, 1>({data_point[0], data_point[1]}));
     D3::Selection * svg = GetSVG();
-    if (data_point[1] > y_max || data_point[1] < y_min) {
-      std::function<void(int, int)> draw_data = [this, data_point](int i=0, int j=0, int k=0){
-        DrawData(data_point);
-      };
-      JSWrap(draw_data, GetID()+"draw_data");
+
+    if (data_point[1] > y_max || data_point[1] < y_min
+        || data_point[0] > x_max || data_point[0] < x_min) {
+
       y_max = std::max(data_point[1]*1.2, y_max);
       y_min = std::min(data_point[1]*.8, y_min);
-      y_scale->SetDomain(std::array<double,2>({y_max, y_min}));
+      x_max = std::max(data_point[0]*1.2, x_max);
+      x_min = std::min(data_point[0]*.8, x_min);
+
       t = svg->Transition();
-      std::string stripped_variable = variables[1];
-      remove_whitespace(stripped_variable);
-      y_axis->ApplyAxis(t.Select("#"+stripped_variable+"_axis"));
-      int y_id = JSWrap(y, GetID()+"y");
-      t.SelectAll("circle").SetAttr("cy", GetID()+"y");
-      EM_ASM_ARGS({
-        circle_data = js.objects[$0].selectAll(".data-point").data();
-        path_data = [];
-        for (iter=0; iter<circle_data.length-1; iter++){
-          path_data.push(js.objects[$1]([[emp[Pointer_stringify($4)+"x"](circle_data[iter],0,0), emp[Pointer_stringify($4)+"y"](circle_data[iter],0,0)],
-                         [emp[Pointer_stringify($4)+"x"](circle_data[iter+1],0,0), emp[Pointer_stringify($4)+"y"](circle_data[iter+1],0,0)]]));
-        }
-        js.objects[$0].selectAll(".line-seg").data(path_data);
-        js.objects[$3].selectAll(".line-seg").attr("d", function(d){return d;});
-      }, svg->GetID(), make_line->GetID(), y_id, t.GetID(), this->GetID().c_str());
+      y_axis->Rescale(y_max, y_min, t);
+      x_axis->Rescale(x_min, x_max, t);
+
+      Redraw(t);
 
       t.Each("end", GetID()+"draw_data");
     } else {
-      DrawData(data_point);
+      DrawData(false);
     }
   }
 
-  void DrawData(emp::vector<double> data_point) {
-    prev_data = data;
-    data[0] = std::array<double, 2>({data_point[0], data_point[1]});
+  void Redraw(D3::Selection & s) {
+    s.SelectAll(".data-point").SetAttr("cy", GetID()+"y");
+    s.SelectAll(".data-point").SetAttr("cx", GetID()+"x");
+
+    EM_ASM_ARGS({
+      circle_data = js.objects[$0].selectAll(".data-point").data();
+      path_data = [];
+      for (iter=0; iter<circle_data.length-1; iter++){
+        path_data.push(js.objects[$1]([[emp[Pointer_stringify($3)+"x"](circle_data[iter],0,0), emp[Pointer_stringify($3)+"y"](circle_data[iter],0,0)],
+                     [emp[Pointer_stringify($3)+"x"](circle_data[iter+1],0,0), emp[Pointer_stringify($3)+"y"](circle_data[iter+1],0,0)]]));
+      }
+      js.objects[$0].selectAll(".line-seg").data(path_data);
+      js.objects[$2].selectAll(".line-seg").attr("d", function(d){return d;});
+    }, GetSVG()->GetID(), make_line->GetID(), s.GetID(), this->GetID().c_str());
+  }
+
+  void DrawData(bool backlog = false) {
+
+    //If there's a backlog, then we're only allowed to clear it if this
+    //was called recursively or from jacascript (since javascript handles)
+    //using this as a callback to asynchronous stuff)
+    if (!backlog && data.size() > 1){
+      return;
+    }
+
     //We can't draw a line on the first update
     if (prev_data[0][0] >=0 ){
       std::array<std::array<double, 2>, 2> line_data;
@@ -311,7 +335,7 @@ public:
       line_data[0] = prev_data[0];
 
       std::array<std::array<double, 2>, 1> new_data;
-      new_data = data;
+      new_data = data[0];
       new_data[0][0] = x(new_data[0],0,0);
       new_data[0][1] = y(new_data[0],0,0);
       line_data[1] = new_data[0];
@@ -323,7 +347,7 @@ public:
       line.SetAttr("class", "line-seg");
     }
 
-    circles = new D3::Selection(GetSVG()->SelectAll("circle").Data(data, GetID()+"return_x"));
+    circles = new D3::Selection(GetSVG()->SelectAll(".data-point").Data(data[0], GetID()+"return_x"));
     D3::Selection enter = circles->EnterAppend("circle");
     enter.SetAttr("cy", GetID()+"y");
     enter.SetAttr("cx", GetID()+"x");
@@ -331,6 +355,12 @@ public:
     enter.SetAttr("class", "data-point");
     enter.SetStyle("fill", "green");
     enter.AddToolTip(*tip);
+    prev_data = data[0];
+    data.pop_front();
+
+    if (data.size() > 0) {
+      DrawData(true);
+    }
   }
 };
 }

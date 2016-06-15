@@ -45,7 +45,7 @@ NKAnimation<BitOrg, emp::evo::DefaultStats> viz;
 
 emp::web::Document doc("emp_base");
 
-extern "C" int main()
+int main()
 {
 
   // Build a random initial population
@@ -67,7 +67,6 @@ extern "C" int main()
 
   doc << "<br>";
   doc.AddButton([](){
-      EM_ASM({console.log("Button clicked");});
       viz.anim.ToggleActive();
       auto but = doc.Button("toggle");
       if (viz.anim.GetActive()) but.Label("Pause");
