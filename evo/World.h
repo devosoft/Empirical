@@ -240,13 +240,14 @@ namespace evo {
     unsigned int  SequentialInsert(ORG * org) {
       return popM.SequentialInsert(org);
     }
-    void Insert(const ORG & mem, int copy_count=1) {
+    int Insert(const ORG & mem, int copy_count=1) {
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);
         inject_ready_sig.Trigger(new_org);
         const int pos = popM.AddOrg(new_org);
         SetupOrg(*new_org, &callbacks, pos);
         org_placement_sig.Trigger(pos);
+        if (copy_count == 1) {return pos;}
       }
     }
     template <typename... ARGS>
