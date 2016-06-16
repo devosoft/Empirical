@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
     QWorld<QOrg, emp::evo::PopulationManager_Grid> Qpop(&dice);
     Qpop.ConfigPop(config.GRID_X(), config.GRID_Y());
 
-    emp::evo::StatsManager_DefaultStats<emp::evo::QuorumManager<QOrg, emp::evo::PopulationManager_Grid>> Qstats(&Qpop, prefix + "quorum.csv"); 
+    emp::evo::StatsManager_FunctionsOnUpdate<emp::evo::QuorumManager<QOrg, emp::evo::PopulationManager_Grid>> Qstats(&Qpop, prefix + "quorum.csv"); 
 
     // Set all the class variables
     QM<emp::evo::PopulationManager_Grid>::hi_weight = config.HI_AI_WEIGHT();
@@ -145,12 +145,26 @@ int main(int argc, char* argv[]) {
       return pop_coop_prob / (double) num_orgs;
     };
 
+    
+   std::function<double()>avg_points=[underlying] () {
+      double points = 0;
+      int num_orgs = 0;
+
+      for(auto org : (*underlying)) {
+        if(org != nullptr) {
+          points += org->state.get_points();
+          num_orgs++;
+        }
+      }
+
+      return points / (double) num_orgs;
+    };
+
+
     Qstats.AddFunction(age_func, "avg_age");
     Qstats.AddFunction(max_age_func, "max_age");
     Qstats.AddFunction(avg_coop_chance, "avg_coop");
-
-    Qpop.SetDefaultFitnessFun(fit_func);
-    Qstats.SetDefaultFitnessFun(fit_func); 
+    Qstats.AddFunction(avg_points, "avg_points"); 
 
     unsigned int checkpoint = 0;
     
