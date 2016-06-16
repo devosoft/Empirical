@@ -155,7 +155,7 @@ int main(int argc, char* argv[]) {
     };
 
     
-   std::function<double()>avg_points=[underlying] () {
+    std::function<double()>avg_points=[underlying] () {
       double points = 0;
       int num_orgs = 0;
 
@@ -169,11 +169,38 @@ int main(int argc, char* argv[]) {
       return points / (double) num_orgs;
     };
 
+    std::function<double()>percent_defector_lin=[underlying] () {
+      int count = 0;
+      int num_orgs = 0;
+
+      for(auto org : (*underlying)) {
+        if(org != nullptr) {
+          if (org->state.genome.get_lineage() == 1) {count++;}
+          num_orgs++;
+        }
+      }
+      return (double) count / (double) num_orgs;
+   };
+
+    std::function<double()>percent_donator_lin=[underlying] () {
+    int count = 0;
+      int num_orgs = 0;
+
+      for(auto org : (*underlying)) {
+        if(org != nullptr) {
+          if (org->state.genome.get_lineage() == 2) {count++;}
+          num_orgs++;
+        }
+      }
+      return (double) count / (double) num_orgs;
+   };
 
     Qstats.AddFunction(age_func, "avg_age");
     Qstats.AddFunction(max_age_func, "max_age");
     Qstats.AddFunction(avg_coop_chance, "avg_coop");
-    Qstats.AddFunction(avg_points, "avg_points"); 
+    Qstats.AddFunction(avg_points, "avg_points");
+    Qstats.AddFunction(percent_defector_lin, "percent_defector");
+    Qstats.AddFunction(percent_donator_lin, "percent_donator");
 
     unsigned int checkpoint = 0;
     
