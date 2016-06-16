@@ -135,8 +135,11 @@ namespace emp {
           for (int s = 0; s < NUM_SYMBOLS; s++) if (t.second.symbols[s]) std::cout << ((char) s);
           std::cout << "):" << t.first << " ";
         }
-        std::cout << "free to:";
-        for (int f : states[i].free_to) std::cout << " " << f;
+        if (states[i].free_to.size()) {
+          std::cout << "free to:";
+          for (int f : states[i].free_to) std::cout << " " << f;
+        }
+        if (IsStop(i)) std::cout << " STOP";
         std::cout << std::endl;
       }
     }
