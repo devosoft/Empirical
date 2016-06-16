@@ -1,0 +1,41 @@
+#!/bin/bash -login
+
+#PBS -l walltime=00:30:00
+#PBS -l nodes=1:ppn=8
+#PBS -l mem=2gb
+#PBS -N quorum-org-PoC
+#PBS -t 0-9
+
+cd /mnt/scratch/fentonj6/quorumorgz/proof-of-concept
+
+cd runs
+
+
+# The idea is we're gonna background each of these jobs so we can run a bunch of them simultaneously
+# to do that, just put a '&' at the end of the line
+# The other problem is that we need to redirect the error output, otherwise the output for this file 
+# will just have all 8 procs' output interleaved. Which is bad.
+# to do THAT, we have '&> somefilename' to redirect error output to somefilename. Stdout will still be written to the terminal.
+# (I don't have any standard out, so this isnt a concern for me)
+# for best performance, make sure you set ppn=# of backgrounded processes
+
+../quorum -PREFIX 50percent-noevo-${PBS_ARRAYID} -RAND_SEED ${PBS_ARRAYID} -INITIAL_CONFIG 0 -TICKS 5000 -INITIAL_SIZE 3600 -ENABLE_MUTATION 0 &> 50-noevo-${PBS_ARRAYID}.errlog &
+../quorum -PREFIX 00percent-noevo-${PBS_ARRAYID} -RAND_SEED ${PBS_ARRAYID} -INITIAL_CONFIG 1 -TICKS 5000 -INITIAL_SIZE 3600 -ENABLE_MUTATION 0 &> 00-noevo-${PBS_ARRAYID}.errlog &
+../quorum -PREFIX 100percent-noevo-${PBS_ARRAYID} -RAND_SEED ${PBS_ARRAYID} -INITIAL_CONFIG 2 -TICKS 5000 -INITIAL_SIZE 3600 -ENABLE_MUTATION 0 &> 100-noevo-${PBS_ARRAYID}.errlog &
+../quorum -PREFIX 015percent-noevo-${PBS_ARRAYID} -RAND_SEED ${PBS_ARRAYID} -INITIAL_CONFIG 3 -TICKS 5000 -INITIAL_SIZE 3600 -ENABLE_MUTATION 0 &> 015-noevo-${PBS_ARRAYID}.errlog &
+
+
+../quorum -PREFIX 50percent-evo-${PBS_ARRAYID} -RAND_SEED ${PBS_ARRAYID} -INITIAL_CONFIG 0 -TICKS 5000 -INITIAL_SIZE 3600 &> 50-evo-${PBS_ARRAYID}.errlog &
+../quorum -PREFIX 00percent-evo-${PBS_ARRAYID} -RAND_SEED ${PBS_ARRAYID} -INITIAL_CONFIG 1 -TICKS 5000 -INITIAL_SIZE 3600 &> 00-evo-${PBS_ARRAYID}.errlog &
+../quorum -PREFIX 100percent-evo-${PBS_ARRAYID} -RAND_SEED ${PBS_ARRAYID} -INITIAL_CONFIG 2 -TICKS 5000 -INITIAL_SIZE 3600 &> 100-evo-${PBS_ARRAYID}.errlog &
+../quorum -PREFIX 015percent-evo-${PBS_ARRAYID} -RAND_SEED ${PBS_ARRAYID} -INITIAL_CONFIG 3 -TICKS 5000 -INITIAL_SIZE 3600 &> 015-evo-${PBS_ARRAYID}.errlog &
+
+
+# this blurb at the bottom is necessary so the HPC doesn't think your jobs finished early 
+# ('cuz after backgrounding all the jobs this script will exit, and the HPCC will think
+# you're done)
+# wait for jobs to finish
+for job in `jobs -p`
+do
+    wait $job
+done
