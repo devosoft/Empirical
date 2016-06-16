@@ -74,6 +74,7 @@ struct QuorumOrgState {
 protected:
   unsigned int age;
   int points;
+  int out, in;
 
 public:
   QuorumOrgGenome genome;
@@ -86,14 +87,21 @@ public:
 
   unsigned int get_age() const {return age;}
   unsigned int get_points() const {return points;}
-  unsigned int add_points(unsigned int add) {return points += add;}
+  unsigned int add_points(unsigned int add) {
+    in += add;
+    return points += add;
+  }
   void reset_points() {points = 0;}
   unsigned int remove_points(unsigned int remove) {
-    if (remove <= points) {return points -= remove;}
+    if (remove <= points) {
+      out += points;
+      return points -= remove;
+    }
     else return points;
   }
   unsigned int bump_age() {return ++age;}
   void reset_age() {age = 0;}
+  void reset_accounting() {out = 0; in = 0;}
 
   QuorumOrgState() {
     hi_density = false;

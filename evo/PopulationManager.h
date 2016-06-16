@@ -53,7 +53,10 @@ namespace evo {
     int GetSize() const { return (int) pop.size(); }
 
     void SetRandom(Random * r) { random_ptr = r; }
-    void SequentialInsert(ORG * org) { pop.push_back(org);}
+    unsigned int SequentialInsert(ORG * org) { 
+      pop.push_back(org);
+      return pop.size() - 1;
+    }
 
     void Print(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout,
               std::string empty="X", std::string spacer=" ") {
@@ -218,9 +221,11 @@ namespace evo {
 
     // this method will insert organisms sequentially through the population--used for 
     // initialization. Automatically wraps insertion point
-    void SequentialInsert(ORG * org) {
+    unsigned int SequentialInsert(ORG * org) {
+      int point = curr_ins_index;
       pop[curr_ins_index++] = org;
       curr_ins_index %= (width * height);
+      return point;
     }
 
     int GetWidth() const { return width; }

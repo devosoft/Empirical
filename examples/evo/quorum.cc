@@ -89,7 +89,7 @@ int main(int argc, char* argv[]) {
                             QOrg::initial_configurations[config.INITIAL_CONFIG()][1], 
                             QOrg::initial_configurations[config.INITIAL_CONFIG()][2], 
                             config.ENABLE_MUTATION(), 0);
-      Qpop.SequentialInsert(org);
+      org->set_id(Qpop.SequentialInsert(org));
     }
 
     // mutation is handled automatically by the population QPop_Manager, currently

@@ -80,7 +80,7 @@ public:
     }
 
     unsigned int AddOrgBirth(QuorumOrganism * offspring, QuorumOrganism * parent) {
-      return AddOrgBirth(offspring, parent->get_loc());
+      return this->AddOrgBirth(offspring, parent->get_loc());
     }
 
     /// Does public good creation / distrubtion processing for an organism
@@ -100,7 +100,7 @@ public:
         // iterate over neighbors && give them things, with donator going first
         while(contribution > 0) {
           if (recipiant == neighbors.end()) {
-            recipiant = neighbors.begin();
+            recipiant = neighbors.begin()--; // will be incremented at the end of the loop
             org->add_points(1);
           }
           else if ((*recipiant) != nullptr) {
@@ -120,6 +120,7 @@ public:
 
       // for each org get its contribution to neighbots
       for(QuorumOrganism * org : POP_MANAGER<QuorumOrganism>::pop) {
+        org->state.reset_accounting();
         if (org == nullptr) {continue;} // don't even try to touch nulls
         org->add_points(1); // metabolize
         Publicize(org);
@@ -137,6 +138,7 @@ public:
         if ((offspring = reproduce(org)) != nullptr) {
           // overloaded AddOrgBirth will determine parent loc from pointer
           AddOrgBirth(offspring, org);
+          auto uselessptr = offspring;
         }
       }
     } // end Update()
