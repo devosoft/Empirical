@@ -124,6 +124,7 @@ public:
     hi_density = rhs.hi_density;
     genome = rhs.genome;
     points = rhs.points;
+    mutate = rhs.mutate;
     return *this;
   }
 

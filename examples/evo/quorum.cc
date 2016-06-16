@@ -44,7 +44,7 @@ EMP_BUILD_CONFIG( QuorumConfig,
     VALUE(TICKS, int, 1000, "Length of simulation"),
     VALUE(INITIAL_SIZE, unsigned int, 30, "Starting population size"),
     VALUE(INITIAL_CONFIG, int, 0, "Index of the QOrg initial config array to use as inital config"),
-    VALUE(ENABLE_MUTATION, bool, true, "If mutation should be enabled"),
+    VALUE(ENABLE_MUTATION, bool, 1, "If mutation should be enabled"),
     VALUE(RAND_SEED, int, 238947, "Seed for the random generator"),
     VALUE(PREFIX, std::string, "", "Prefix for filenames")
 )
@@ -131,8 +131,23 @@ int main(int argc, char* argv[]) {
       return max;
     };
 
+    std::function<double()>avg_coop_chance=[underlying] () {
+      double pop_coop_prob = 0;
+      int num_orgs = 0;
+
+      for(auto org : (*underlying)) {
+        if(org != nullptr) {
+          pop_coop_prob += org->state.genome.co_op_prob;
+          num_orgs++;
+        }
+      }
+
+      return pop_coop_prob / (double) num_orgs;
+    };
+
     Qstats.AddFunction(age_func, "avg_age");
     Qstats.AddFunction(max_age_func, "max_age");
+    Qstats.AddFunction(avg_coop_chance, "avg_coop");
 
     Qpop.SetDefaultFitnessFun(fit_func);
     Qstats.SetDefaultFitnessFun(fit_func); 
@@ -142,7 +157,6 @@ int main(int argc, char* argv[]) {
     std::cerr << "Progress:   0% [ . . . . . . . . . .]";
     // loop through the specified number of updates && run the evolution
     for (unsigned int update_num = 0; update_num < runtime; update_num++) {
-      //Qpop.TournamentSelect(fit_func, 10, pop_size);
       Qpop.Update();
       if(( (double) update_num / (double) runtime) * 20 > checkpoint) {
         ++checkpoint;
