@@ -72,7 +72,7 @@ namespace evo{
     using org_ptr = typename POP_MANAGER::value_type;
     using ORG = typename std::remove_pointer<org_ptr>::type;
     static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
-    emp::vector<web::D3Visualization*> viz_pointers;
+    emp::vector<web::LineageVisualization*> viz_pointers;
 
   public:
     static constexpr bool emp_is_lineage_manager = true;
@@ -240,7 +240,7 @@ namespace evo{
       return genome_group;
     }
 
-    void ConnectVis(web::D3Visualization * viz_pointer) {
+    void ConnectVis(web::LineageVisualization * viz_pointer) {
       viz_pointers.push_back(viz_pointer);
     }
 
@@ -255,7 +255,6 @@ namespace evo{
 
     using LineageTracker<POP_MANAGER>::next_org_id;
     using LineageTracker<POP_MANAGER>::next_parent_id;
-    using LineageTracker<POP_MANAGER>::generation_since_update;
     using LineageTracker<POP_MANAGER>::separate_generations;
     using LineageTracker<POP_MANAGER>::genomes;
     using LineageTracker<POP_MANAGER>::new_generation;
@@ -266,6 +265,7 @@ namespace evo{
     std::map<ORG, int> genome_counts;
 
   public:
+    using LineageTracker<POP_MANAGER>::generation_since_update;
     using LineageTracker<POP_MANAGER>::ConnectVis;
     int last_coalesence = 0;
     using LineageTracker<POP_MANAGER>::emp_is_lineage_manager;
@@ -382,6 +382,7 @@ namespace evo{
       while (!inject && curr->id == last_coalesence && curr->offspring.size() == 1 && !curr->alive){
         curr = curr->offspring[0];
         last_coalesence = curr->id;
+        std::cout << "Last coalesence now " << last_coalesence << std::endl;
       }
 
       //Update mapping of lineage tracker ids to locations in population
@@ -396,6 +397,10 @@ namespace evo{
           generation_since_update.resize(pos+1);
         }
         generation_since_update[pos] = next_org_id;
+      }
+
+      for (auto viz_pointer : viz_pointers) {
+        viz_pointer->RecordPlacement(pos);
       }
     }
 
@@ -435,10 +440,10 @@ namespace evo{
       }
 
       for (auto viz : viz_pointers) {
-        viz->AnimateStep(parent, id);
+        viz->RecordParent(parent, id);
       }
 
-      //this->parents[id] = parent;
+      this->parents[id] = parent;
 
       return id;
     }

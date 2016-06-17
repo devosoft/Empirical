@@ -367,7 +367,6 @@ public:
     enter.AddToolTip(*tip);
     prev_data = data[0];
     data.pop_front();
-
     if (data.size() > 0) {
       DrawData(true);
     }
@@ -391,17 +390,39 @@ public:
   D3::Axis<D3::LinearScale> * x_axis;
   D3::Axis<D3::LinearScale> * y_axis;
   D3::TreeLayout tree;
+  D3::D3Function alive;
+  int next_pos;
+  int next_parent = 0;
+  int next_child;
 
   LineageVisualization(int width, int height) : D3Visualization(width, height){;}
 
   virtual void Setup(){
-    GetSVG()->Move(60,-60);
-
-    tree.SetSize(GetWidth(), GetHeight());
+    GetSVG()->Move(0,0);
+    tree.SetSize(GetHeight(), GetWidth());
+    EM_ASM_ARGS({
+      js.objects[$0] = [js.objects[$1][0]];
+    }, alive.GetID(), tree.data.GetID());
   }
 
   virtual void AnimateStep(int parent, int child){
-    tree.AddNode(parent, child, *GetSVG());
+
+    EM_ASM_ARGS({
+        while (js.objects[$0].length < $1 + 1) {
+          js.objects[$0].push(-1);
+        }
+    }, alive.GetID(), next_pos);
+    tree.AddNode(parent, child, next_pos, *GetSVG(), alive);
+  }
+
+  void RecordPlacement(int pos) {
+    next_pos = pos + 1; //alive array has extra element for null parent
+    AnimateStep(next_parent, next_child);
+  }
+
+  void RecordParent(int parent, int child) {
+    next_parent = parent;
+    next_child = child;
   }
 
 };

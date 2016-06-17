@@ -43,8 +43,8 @@ emp::web::GraphVisualization change_graph("Change", 550, 300);
 emp::web::GraphVisualization novelty_graph("Novelty", 550, 300);
 emp::web::GraphVisualization ecology_graph("Ecology", 550, 300);
 emp::web::GraphVisualization complexity_graph("Complexity", 550, 300);
-emp::web::LineageVisualization lineage_viz(5000, 3000);
-NKAnimation<BitOrg, emp::evo::LineagePruned, emp::evo::OEEStats> viz;
+emp::web::LineageVisualization lineage_viz(5000, 300);
+NKAnimation<BitOrg, emp::evo::GridWorld<BitOrg>, emp::evo::LineagePruned, emp::evo::OEEStats> viz;
 
 emp::web::Document doc("emp_base");
 
@@ -68,24 +68,14 @@ int main()
       auto but = doc.Button("toggle");
       if (viz.anim.GetActive()) but.Label("Pause");
       else but.Label("Start");
-  }, "Pause", "toggle");
+  }, "Start", "toggle");
   doc << "<br>";
   doc << "<br>";
   doc << change_graph << novelty_graph << ecology_graph << complexity_graph;
   doc << lineage_viz;
 
-  // Build a random initial population
-  for (int i = 0; i < POP_SIZE; i++) {
-    BitOrg next_org;
-    for (int j = 0; j < N; j++) next_org[j] = viz.r->P(0.5);
-    viz.world->Insert(next_org);
-  }
 
-  viz.world->SetDefaultMutateFun( [](BitOrg* org, emp::Random& random) {
-      (*org)[random.GetInt(N)] = random.P(0.5);
-      return true;
-    } );
 
-  viz.anim.Start();
+  //viz.anim.Start();
 
 }

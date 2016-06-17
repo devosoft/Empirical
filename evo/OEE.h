@@ -255,10 +255,12 @@ namespace evo{
       double most_complex = complexity_fun(*(persist.begin()));
 
       for (auto org : persist) {
+        std::cout << org << " " << complexity_fun(org) << std::endl;
         if (complexity_fun(org) > most_complex) {
           most_complex = complexity_fun(org);
         }
       }
+      std::cout << "Most complex: " << most_complex << std::endl;
       return most_complex;
     }
 
