@@ -27,7 +27,7 @@ namespace D3 {
     bool exit;
 
   public:
-    Selection(){EM_ASM({js.objects.push(-1)});}; //Null contstructor
+    Selection(){;}; //Null contstructor
     Selection(int id); //append constructor
     Selection(const char* selector, bool all = false);
     Selection(std::string selector, bool all = false);
@@ -602,14 +602,14 @@ namespace D3 {
     //Set the tool tip up for this selection.
     //This function exists in case you want to bind the tooltip to an
     //event other than mouseover/out
-    void SetupToolTip(ToolTip tip) {
+    void SetupToolTip(ToolTip & tip) {
       EM_ASM_ARGS({
        js.objects[$0].call(js.objects[$1]);
    }, this->id, tip.GetID());
     }
 
     //Tell tooltip to appear on mouseover and dissapear on mouseout
-    void BindToolTipMouseover(ToolTip tip) {
+    void BindToolTipMouseover(ToolTip & tip) {
       EM_ASM_ARGS({
        js.objects[$0].on("mouseover", js.objects[$1].show)
                      .on("mouseout", js.objects[$1].hide);
@@ -617,7 +617,7 @@ namespace D3 {
     }
 
     //Convenience function for most common tooltip setup
-    void AddToolTip(ToolTip tip) {
+    void AddToolTip(ToolTip & tip) {
       SetupToolTip(tip);
       BindToolTipMouseover(tip);
     }

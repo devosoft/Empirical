@@ -22,9 +22,7 @@ namespace D3 {
     Axis(std::string label = "") {
       //The scale got added to th the list of objects before this one
       this->label = label;
-      this->id++;
-      this->id++;
-      EM_ASM({js.objects.push(d3.svg.axis())});
+      EM_ASM_ARGS({js.objects[$0] = d3.svg.axis();}, this->id);
     }
 
     //Draw axis on specified selection with intelligent default positioning

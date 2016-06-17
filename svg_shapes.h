@@ -1,6 +1,7 @@
 #ifndef __SVG_SHAPES_H__
 #define __SVG_SHAPES_H__
 
+#include "d3_init.h"
 #include "../Empirical/emtools/js_utils.h"
 #include "selection.h"
 #include "scales.h"
@@ -8,13 +9,11 @@
 
 namespace D3 {
 
-  class SvgShapeGenerator {
+  class SvgShapeGenerator : public D3_Base {
   protected:
-    int id;
     SvgShapeGenerator();
   public:
 
-    int GetID(){return id;}
     //This function creates a string specifying a path
     template <typename T, size_t SIZE>
     std::string Generate(std::array<std::array<T, 2>, SIZE> data){
@@ -47,18 +46,18 @@ namespace D3 {
       //Selection path = Select("svg").SelectAll("path");//type.c_str());
 
       EM_ASM_ARGS({
-	  var accessor = function(data){
-	    for (i=0; i<data.length; i++) {
-	      for (j=0; j<data[i].length; j++) {
-		data[i][j] = +data[i][j];
+	    var accessor = function(data){
+	      for (i=0; i<data.length; i++) {
+	        for (j=0; j<data[i].length; j++) {
+		      data[i][j] = +data[i][j];
+	        }
 	      }
-	    }
-	    return(data);
-	  };
-	  emp.__incoming_data = accessor(emp.__incoming_data);
-	  js.objects[$0].data(emp.__incoming_data).enter().append("path").attr("d", js.objects[$1]);
-	  console.log(d3.selectAll("path"));
-	}, path.GetID(), this->id, data.GetID());
+	      return(data);
+	    };
+	    emp.__incoming_data = accessor(emp.__incoming_data);
+	    js.objects[$0].data(emp.__incoming_data).enter().append("path").attr("d", js.objects[$1]);
+	    console.log(d3.selectAll("path"));
+	  }, path.GetID(), this->id, data.GetID());
       return path;
     }
 
@@ -68,8 +67,8 @@ namespace D3 {
 			 SIZE2>  data) {
       Selection group = Select("svg").Append("g");
       for (auto arr: data) {
-	Selection path = group.Append("path");
-	path.SetAttr("d", Generate(arr).c_str());
+	    Selection path = group.Append("path");
+	    path.SetAttr("d", Generate(arr).c_str());
       }
       return group;
     }
@@ -89,8 +88,8 @@ namespace D3 {
     //If size is a constant, it's in pixels, so an int is reasonable
     void SetSize(int size) {
       EM_ASM_ARGS({
-	  js.objects[$0].size($1);
-	}, this->id, size);
+	    js.objects[$0].size($1);
+	  }, this->id, size);
     }
 
     //Otherwise it's a function
@@ -100,11 +99,11 @@ namespace D3 {
   };
 
   SymbolGenerator::SymbolGenerator() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({
-	var new_line = d3.svg.symbol();
-	js.objects.push(new_line);
-      });
+
+    EM_ASM_ARGS({
+	  var new_line = d3.svg.symbol();
+	  js.objects[$0] = new_line;
+    }, this->id);
   }
 
 
@@ -128,11 +127,10 @@ namespace D3 {
   };
 
   LineGenerator::LineGenerator() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({
-	var new_line = d3.svg.line();
-	js.objects.push(new_line);
-      });
+    EM_ASM_ARGS({
+	  var new_line = d3.svg.line();
+	  js.objects[$0] = new_line;
+    }, this->id);
   }
 
   template <typename X_SCALE_TYPE, typename Y_SCALE_TYPE>
@@ -143,33 +141,32 @@ namespace D3 {
     Y_SCALE_TYPE yscale;
   public:
     CartesianLineGenerator() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({
-	var new_line = d3.svg.line();
-	js.objects.push(new_line);
-      });
+      EM_ASM_ARGS({
+	    var new_line = d3.svg.line();
+	    js.objects[$0] = new_line;
+      }, this->id);
     }
 
     void SetXScale(X_SCALE_TYPE scale){
       this->xscale = scale;
       EM_ASM_ARGS({
-	  var scale = js.objects[$1];
-	  var curr_x = js.objects[$0].x();
+	    var scale = js.objects[$1];
+	    var curr_x = js.objects[$0].x();
 
-	  //Apply scale to whatever the current x axis function is
-	  js.objects[$0].x(function(d, i){return scale(curr_x(d, i))});
-	}, this->id, scale.GetID());
+	    //Apply scale to whatever the current x axis function is
+	    js.objects[$0].x(function(d, i){return scale(curr_x(d, i))});
+	  }, this->id, scale.GetID());
     }
 
     void SetYScale(Y_SCALE_TYPE scale){
       this->yscale = scale;
       EM_ASM_ARGS({
-	  var scale = js.objects[$1];
-	  var curr_y = js.objects[$0].y();
+	    var scale = js.objects[$1];
+	    var curr_y = js.objects[$0].y();
 
-	  //Apply scale on top of whatever the current y axis function is
-	  js.objects[$0].y(function(d, i){return scale(curr_y(d, i))});
-	}, this->id, scale.GetID());
+	    //Apply scale on top of whatever the current y axis function is
+	    js.objects[$0].y(function(d, i){return scale(curr_y(d, i))});
+	  }, this->id, scale.GetID());
     }
 
     X_SCALE_TYPE GetXScale(){
@@ -208,11 +205,10 @@ namespace D3 {
   class AreaGenerator : public CartesianLineGenerator<X_SCALE_TYPE, Y_SCALE_TYPE> {
   public:
     AreaGenerator() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({
-	var new_line = d3.svg.area();
-	js.objects.push(new_line);
-      });
+      EM_ASM_ARGS({
+	    var new_line = d3.svg.area();
+	    js.objects[$0] = new_line;
+      }, this->id);
     }
 
     //Handles setting x0 accessor to a constant
@@ -282,11 +278,10 @@ namespace D3 {
   };
 
   RadialLineGenerator::RadialLineGenerator() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({
-	var new_line = d3.svg.line.radial();
-	js.objects.push(new_line);
-      });
+    EM_ASM_ARGS({
+	  var new_line = d3.svg.line.radial();
+	  js.objects[$0] = new_line;
+  }, this->id);
   }
 
   class RadialAreaGenerator : public RadialLineGenerator {
@@ -327,11 +322,10 @@ namespace D3 {
   };
 
   RadialAreaGenerator::RadialAreaGenerator() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({
-	var new_line = d3.svg.area.radial();
-	js.objects.push(new_line);
-      });
+    EM_ASM_ARGS({
+   	  var new_line = d3.svg.area.radial();
+	  js.objects = new_line;
+    }, this->id);
   }
 
   class ChordGenerator : public RadialAreaGenerator {
@@ -358,11 +352,10 @@ namespace D3 {
   };
 
   ChordGenerator::ChordGenerator() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({
-	var new_line = d3.svg.area.chord();
-	js.objects.push(new_line);
-      });
+    EM_ASM_ARGS({
+  	  var new_line = d3.svg.area.chord();
+	  js.objects[$0] = new_line;
+    }, this->id);
   }
 
   class DiagonalGenerator : public ChordGenerator {
@@ -375,11 +368,10 @@ namespace D3 {
   };
 
   DiagonalGenerator::DiagonalGenerator() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({
-	var new_line = d3.svg.area.diagonal();
-	js.objects.push(new_line);
-      });
+    EM_ASM_ARGS({
+	  var new_line = d3.svg.area.diagonal();
+	  js.objects[$0] = new_line;
+    }, this->id);
   }
 
   //There is no documentation on this class in D3 other than that it exists
@@ -390,11 +382,10 @@ namespace D3 {
   };
 
   DiagonalRadialGenerator::DiagonalRadialGenerator() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({
-	var new_line = d3.svg.area.diagonal.radil();
-	js.objects.push(new_line);
-      });
+    EM_ASM_ARGS({
+	  var new_line = d3.svg.area.diagonal.radil();
+	  js.objects[$0] = new_line;
+    }, this->id);
   }
 
   class ArcGenerator : public RadialAreaGenerator {
@@ -430,11 +421,10 @@ namespace D3 {
   };
 
   ArcGenerator::ArcGenerator() {
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    EM_ASM({
-	var new_line = d3.svg.arc();
-	js.objects.push(new_line);
-      });
+    EM_ASM_ARGS({
+	  var new_line = d3.svg.arc();
+	  js.objects[$0] = new_line;
+    }, this->id);
   }
 
 }

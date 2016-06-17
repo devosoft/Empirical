@@ -7,12 +7,13 @@
 
 namespace D3 {
 
+  //Base class to inherit from - should never be made stand-alone
   class Scale : public D3_Base {
   protected:
     Scale(int id) : D3_Base(id){;};
 
   public:
-    Scale() { EM_ASM({js.objects.push(d3.scale)}); }
+    Scale() {;}
 
     //Decoy constructor so we don't construct extra base scales
     Scale(bool derived){;};
@@ -48,7 +49,7 @@ namespace D3 {
 
   class QuantizeScale : public Scale {
   public:
-    QuantizeScale() : Scale(true) {EM_ASM({js.objects.push(d3.scale.quantize())});}
+    QuantizeScale() : Scale(true) {EM_ASM_ARGS({js.objects[$0]=d3.scale.quantize()},this->id);}
     QuantizeScale(bool derived) : Scale(true) {;}
 
     template <typename T>
@@ -60,7 +61,7 @@ namespace D3 {
 
   class QuantileScale : public QuantizeScale {
   public:
-    QuantileScale() : QuantizeScale(true) { EM_ASM({js.objects.push(d3.scale.quantile())});}
+    QuantileScale() : QuantizeScale(true) { EM_ASM_ARGS({js.objects[$0] = d3.scale.quantile();}, this->id);}
     QuantileScale(bool derived) : QuantizeScale(true) {;}
     //TODO: Quantiles()
   };
@@ -68,7 +69,7 @@ namespace D3 {
   class ThresholdScale : public QuantizeScale {
   public:
     ThresholdScale() : QuantizeScale(true) {
-      EM_ASM({js.objects.push(d3.scale.threshold())});
+      EM_ASM_ARGS({js.objects[$0] = d3.scale.threshold()}, this->id);
     }
     ThresholdScale(bool derived) : QuantizeScale(true) {;}
   };
@@ -76,7 +77,7 @@ namespace D3 {
   class IdentityScale : public Scale {
   public:
     IdentityScale() : Scale(true) {
-      EM_ASM({js.objects.push(d3.scale.identity())});
+      EM_ASM_ARGS({js.objects[$0] = d3.scale.identity();}, this->id);
     }
 
     IdentityScale(bool derived) : Scale(true){;}
@@ -101,7 +102,7 @@ namespace D3 {
   class LinearScale : public IdentityScale {
   public:
     LinearScale() : IdentityScale(true) {
-      EM_ASM({js.objects.push(d3.scale.linear())});
+      EM_ASM_ARGS({js.objects[$0] = d3.scale.linear();}, this->id);
     }
 
     LinearScale(bool derived) : IdentityScale(true) {;}
@@ -133,7 +134,7 @@ namespace D3 {
   class LogScale : public LinearScale {
   public:
     LogScale() : LinearScale(true) {
-      EM_ASM({js.objects.push(d3.scale.log())});
+      EM_ASM_ARGS({js.objects[$0] = d3.scale.log();}, this->id);
     }
 
     LogScale(bool derived) : LinearScale(true){;};
@@ -143,7 +144,7 @@ namespace D3 {
   class PowScale : public LinearScale {
   public:
     PowScale() : LinearScale(true) {
-      EM_ASM({js.objects.push(d3.scale.pow())});
+      EM_ASM_ARGS({js.objects[$0] = d3.scale.pow();}, this->id);
     }
 
     PowScale(bool derived) : LinearScale(true){;};
@@ -155,7 +156,7 @@ namespace D3 {
   class TimeScale : public LinearScale {
   public:
     TimeScale() : LinearScale(true) {
-      EM_ASM({js.objects.push(d3.scale.time())});
+      EM_ASM_ARGS({js.objects[$0] = d3.scale.time();}, this->id);
     }
 
     TimeScale(bool derived) : LinearScale(true){;};
@@ -164,7 +165,7 @@ namespace D3 {
   class OrdinalScale : public QuantizeScale {
   public:
     OrdinalScale() : QuantizeScale(true) {
-      EM_ASM({js.objects.push(d3.scale.ordinal())});
+      EM_ASM({js.objects[$0]= d3.scale.ordinal();}, this->id);
     }
 
     OrdinalScale(bool derived) : QuantizeScale(true){;}
@@ -174,21 +175,21 @@ namespace D3 {
   class Category10Scale : D3_Base{
   public:
     Category10Scale() {
-      EM_ASM({js.objects.push(d3.scale.category10())});
+      EM_ASM({js.objects[$0] = d3.scale.category10();}, this->id);
     }
   };
 
   class Category20Scale : D3_Base {
   public:
     Category20Scale() {
-      EM_ASM({js.objects.push(d3.scale.category20())});
+      EM_ASM({js.objects[$0] = d3.scale.category20();}, this->id);
     }
   };
 
   class Category20bScale : D3_Base {
   public:
     Category20bScale() {
-      EM_ASM({js.objects.push(d3.scale.category20b())});
+      EM_ASM({js.objects[$0] = d3.scale.category20b();}, this->id);
     }
   };
 
@@ -197,7 +198,7 @@ namespace D3 {
     int id;
   public:
     Category20cScale() {
-      EM_ASM({js.objects.push(d3.scale.category20c())});
+      EM_ASM({js.objects[$0] = d3.scale.category20c();}, this->id);
     }
   };
 }
