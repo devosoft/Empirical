@@ -216,6 +216,7 @@ namespace evo {
 
     // Injected orgs go into a random position.
     int AddOrg(ORG * new_org) {
+      std::cout<<"ADDORG"<<std::endl;
       const int pos = random_ptr->GetInt((int) pop.size());
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
@@ -226,7 +227,6 @@ namespace evo {
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int parent_x = ToX(parent_pos);
       const int parent_y = ToY(parent_pos);
-
       const int offset = random_ptr->GetInt(9);
       const int offspring_x = emp::mod(parent_x + offset%3 - 1, width);
       const int offspring_y = emp::mod(parent_y + offset/3 - 1, height);

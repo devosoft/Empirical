@@ -52,8 +52,9 @@ int main(int argc, char* argv[])
   const int POP_SIZE = config.POP_SIZE();
   const int UD_COUNT = config.MAX_GENS();
 
+  emp::Random rand_const(1234567);
   emp::Random random(config.SEED());
-  emp::evo::NKLandscape landscape(N, K, random);
+  emp::evo::NKLandscape landscape(N, K, rand_const);
 
   std::string prefix;
   prefix = config.NAME();
@@ -101,9 +102,9 @@ int main(int argc, char* argv[])
   for (int ud = 0; ud < UD_COUNT; ud++) {
 
     // Keep the best individual.
-    //    mixed_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 5, 10);
-
+    //mixed_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1, 100);
     // Run a tournament for the rest... 
+    
     mixed_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
 			 , TOURNAMENT_SIZE, POP_SIZE);
 

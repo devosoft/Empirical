@@ -52,9 +52,9 @@ int main(int argc, char* argv[])
   const int POP_SIZE = config.POP_SIZE();
   const int UD_COUNT = config.MAX_GENS();
 
-
+  emp::Random rand_const(1234567);
   emp::Random random(config.SEED());
-  emp::evo::NKLandscape landscape(N, K, random);
+  emp::evo::NKLandscape landscape(N, K, rand_const);
 
   std::string prefix;
   prefix = config.NAME();
@@ -73,14 +73,13 @@ int main(int argc, char* argv[])
       grid_stats (&grid_pop, prefix + "grid.csv");
 
   grid_stats.SetDefaultFitnessFun(fit_func);
-
-  // Build a random initial population
   
+
+    // Insert default organisms into world
   for (int i = 0; i < POP_SIZE; i++) {
     BitOrg next_org(N);
     for (int j = 0; j < N; j++) next_org[j] = random.P(0.5);
     
-
     // looking at the Insert() func it looks like it does a deep copy, so we should be safe in
     // doing this. Theoretically...
     grid_pop.Insert(next_org);
@@ -105,11 +104,28 @@ int main(int argc, char* argv[])
   for (int ud = 0; ud < UD_COUNT; ud++) {
 
     // Keep the best individual.
-    //    grid_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 5, 10);
-
+    //grid_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 50, 2);
     // Run a tournament for the rest...   
     grid_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
-			 , TOURNAMENT_SIZE, POP_SIZE);
+            , TOURNAMENT_SIZE, POP_SIZE);
+
+    // Use if you  want a visual map of the grid
+    //auto popTest = &(grid_pop.popM);
+    //long count = 0;
+    //std::ofstream file;
+
+    //file.open("junk/update_" + std::to_string(ud) + ".csv");
+    //file<<std::endl;
+    //for(auto el : *popTest){
+        
+     //   file<<fit_func(el)<<",";
+     //   count++;
+     //   if(count % 10 == 0){
+     //       file<<std::endl;
+     //   }
+
+   // }
+    //file.close();
 
     grid_pop.Update();
     grid_pop.MutatePop();
