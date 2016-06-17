@@ -9,6 +9,7 @@
 #include "../../d3-emscripten/scales.h"
 #include "../../d3-emscripten/axis.h"
 #include "../../d3-emscripten/svg_shapes.h"
+#include "../../d3-emscripten/layout.h"
 
 #include <functional>
 #include <algorithm>
@@ -20,7 +21,6 @@
 #include "../tools/Random.h"
 #include "../tools/stats.h"
 #include "../tools/string_utils.h"
-#include "NKConfig.h"
 
 //Pretty sure D3VisualizationInfo can't be shared among multiple D3Visualizations
 
@@ -107,6 +107,7 @@ public:
 
   virtual void AnimateStep(...){;}
   virtual void AnimateStep(emp::vector<double>){;}
+  virtual void AnimateStep(int parent, int offspring){;}
 };
 
 class FitnessVisualization : public D3Visualization {
@@ -192,7 +193,6 @@ public:
   D3::LinearScale * y_scale;
   D3::Axis<D3::LinearScale> * x_axis;
   D3::Axis<D3::LinearScale> * y_axis;
-  D3::Selection * circles;
 
   //Callback function for taking a datapoint and getting appropriately scaled y val
   std::function<double(std::array<double, 2>, int, int)> y = [this](std::array<double, 2> d, int i=0, int k=0){
@@ -220,7 +220,7 @@ public:
   //Function telling tooltip how to display a data point
   std::function<std::string(std::array<double, 2>, int, int)> tooltip_display =
                                        [this](std::array<double, 2> d, int i, int k) {
-                                         return to_string(rounded.Call(d[1]));
+                                         return to_string(rounded(d[1]));
                                      };
 
   GraphVisualization(std::string y_var, std::string x_var, int w=800, int h=400) : D3Visualization(w, h){
@@ -240,12 +240,12 @@ public:
   D3::ToolTip* tip;
   D3::Selection t;
 
-  void SetupConfigs(const NKConfig & config){
+  /*void SetupConfigs(const NKConfig & config){
     //Setup config parameters
     POP_SIZE = config.POP_SIZE();
     MAX_GENS = config.MAX_GENS();
     x_max = MAX_GENS;
-  }
+}*/
 
   virtual void Setup(){
     EM_ASM({emp["waiting"] = 0});
@@ -277,8 +277,6 @@ public:
     y_axis->SetScale(*y_scale);
     D3::DrawAxes(*x_axis, *y_axis, *svg);
     make_line = new D3::LineGenerator();
-
-    circles = new D3::Selection(svg->SelectAll("circle"));
   }
 
   virtual void AnimateStep(emp::vector<double> data_point) {
@@ -287,7 +285,6 @@ public:
 
     if (data_point[1] > y_max || data_point[1] < y_min
         || data_point[0] > x_max || data_point[0] < x_min) {
-
       y_max = std::max(data_point[1]*1.2, y_max);
       y_min = std::min(data_point[1]*.8, y_min);
       x_max = std::max(data_point[0]*1.2, x_max);
@@ -337,7 +334,7 @@ public:
     //If there's a backlog, then we're only allowed to clear it if this
     //was called recursively or from jacascript (since javascript handles)
     //using this as a callback to asynchronous stuff)
-    if (!backlog && data.size() > 1){
+    if ((!backlog && data.size() > 1) || data.size() == 0){
       return;
     }
 
@@ -361,8 +358,7 @@ public:
       line.SetAttr("class", "line-seg");
     }
 
-    circles = new D3::Selection(GetSVG()->SelectAll(".data-point").Data(data[0], GetID()+"return_x"));
-    D3::Selection enter = circles->EnterAppend("circle");
+    D3::Selection enter = GetSVG()->SelectAll(".data-point").Data(data[0], GetID()+"return_x").EnterAppend("circle");
     enter.SetAttr("cy", GetID()+"y");
     enter.SetAttr("cx", GetID()+"x");
     enter.SetAttr("r", 2);
@@ -377,6 +373,39 @@ public:
     }
   }
 };
+
+class LineageVisualization : public D3Visualization {
+private:
+  double y_margin = 10;
+  double x_margin = 30;
+  double axis_width = 60;
+  double y_min = 1000;
+  double y_max = 0;
+  double x_min = 0;
+  double x_max = 0;
+
+public:
+  emp::vector<std::string> variables;
+  D3::LinearScale * x_scale;
+  D3::LinearScale * y_scale;
+  D3::Axis<D3::LinearScale> * x_axis;
+  D3::Axis<D3::LinearScale> * y_axis;
+  D3::TreeLayout tree;
+
+  LineageVisualization(int width, int height) : D3Visualization(width, height){;}
+
+  virtual void Setup(){
+    GetSVG()->Move(60,-60);
+
+    tree.SetSize(GetWidth(), GetHeight());
+  }
+
+  virtual void AnimateStep(int parent, int child){
+    tree.AddNode(parent, child, *GetSVG());
+  }
+
+};
+
 }
 }
 #endif

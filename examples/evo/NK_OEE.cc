@@ -43,12 +43,36 @@ emp::web::GraphVisualization change_graph("Change", 550, 300);
 emp::web::GraphVisualization novelty_graph("Novelty", 550, 300);
 emp::web::GraphVisualization ecology_graph("Ecology", 550, 300);
 emp::web::GraphVisualization complexity_graph("Complexity", 550, 300);
-NKAnimation<BitOrg, emp::evo::LineageStandard, emp::evo::OEEStats> viz;
+emp::web::LineageVisualization lineage_viz(5000, 3000);
+NKAnimation<BitOrg, emp::evo::LineagePruned, emp::evo::OEEStats> viz;
 
 emp::web::Document doc("emp_base");
 
 int main()
 {
+
+
+  //change_graph.SetupConfigs(config);
+  viz.world->statsM.ConnectVis(&change_graph);
+  //novelty_graph.SetupConfigs(config);
+  viz.world->statsM.ConnectVis(&novelty_graph);
+  //ecology_graph.SetupConfigs(config);
+  viz.world->statsM.ConnectVis(&ecology_graph);
+  //complexity_graph.SetupConfigs(config);
+  viz.world->statsM.ConnectVis(&complexity_graph);
+  viz.world->lineageM.ConnectVis(&lineage_viz);
+
+  doc << "<br>";
+  doc.AddButton([](){
+      viz.anim.ToggleActive();
+      auto but = doc.Button("toggle");
+      if (viz.anim.GetActive()) but.Label("Pause");
+      else but.Label("Start");
+  }, "Pause", "toggle");
+  doc << "<br>";
+  doc << "<br>";
+  doc << change_graph << novelty_graph << ecology_graph << complexity_graph;
+  doc << lineage_viz;
 
   // Build a random initial population
   for (int i = 0; i < POP_SIZE; i++) {
@@ -61,27 +85,6 @@ int main()
       (*org)[random.GetInt(N)] = random.P(0.5);
       return true;
     } );
-
-  change_graph.SetupConfigs(config);
-  viz.world->statsM.ConnectVis(&change_graph);
-  novelty_graph.SetupConfigs(config);
-  viz.world->statsM.ConnectVis(&novelty_graph);
-  ecology_graph.SetupConfigs(config);
-  viz.world->statsM.ConnectVis(&ecology_graph);
-  complexity_graph.SetupConfigs(config);
-  viz.world->statsM.ConnectVis(&complexity_graph);
-
-
-  doc << "<br>";
-  doc.AddButton([](){
-      viz.anim.ToggleActive();
-      auto but = doc.Button("toggle");
-      if (viz.anim.GetActive()) but.Label("Pause");
-      else but.Label("Start");
-  }, "Pause", "toggle");
-  doc << "<br>";
-  doc << "<br>";
-  doc << change_graph << novelty_graph << ecology_graph << complexity_graph;
 
   viz.anim.Start();
 

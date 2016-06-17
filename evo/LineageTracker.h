@@ -23,6 +23,7 @@
 #include <algorithm>
 #include "../tools/vector.h"
 #include "PopulationManager.h"
+#include "visualization_utils.h"
 
 template <typename org_ptr>
 struct Node {
@@ -35,6 +36,8 @@ struct Node {
 
 namespace std
 {
+    //from fredoverflow's answer to
+    //http://stackoverflow.com/questions/8026890/c-how-to-insert-array-into-hash-set
     template<typename T> struct hash<Node<T> >
     {
         typedef Node<T> argument_type;
@@ -69,6 +72,8 @@ namespace evo{
     using org_ptr = typename POP_MANAGER::value_type;
     using ORG = typename std::remove_pointer<org_ptr>::type;
     static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
+    emp::vector<web::D3Visualization*> viz_pointers;
+
   public:
     static constexpr bool emp_is_lineage_manager = true;
     std::set<ORG> genomes;
@@ -184,6 +189,10 @@ namespace evo{
       org_ptr genome = (org_ptr)&(*it);
       this->org_to_genome[id] = genome;
       this->parents[id] = parent;
+
+      for (auto viz : viz_pointers) {
+        viz->AnimateStep(parent, id);
+      }
       return id;
     }
 
@@ -211,6 +220,30 @@ namespace evo{
 
     }
 
+    //Takes a container of ints representing org ids (as assigned by the lineage)
+    //tracker, and returns a contatiner of the genomes of those ints.
+    template <template <typename> class C >
+    C<ORG> IDsToGenomes(C<int> & ids) {
+      C<ORG> genome_group;
+      for (int id : ids){
+        genome_group.insert(genome_group.back(), *(this->org_to_genome[id]));
+      }
+      return genome_group;
+    }
+
+    //Specialization for emp::vector so we can use push_back
+    emp::vector<ORG> IDsToGenomes(emp::vector<int> & ids) {
+      emp::vector<ORG> genome_group;
+      for (int id : ids){
+        genome_group.push_back(*(this->org_to_genome[id]));
+      }
+      return genome_group;
+    }
+
+    void ConnectVis(web::D3Visualization * viz_pointer) {
+      viz_pointers.push_back(viz_pointer);
+    }
+
   };
 
 
@@ -227,11 +260,13 @@ namespace evo{
     using LineageTracker<POP_MANAGER>::genomes;
     using LineageTracker<POP_MANAGER>::new_generation;
     using LineageTracker<POP_MANAGER>::inject;
+    using LineageTracker<POP_MANAGER>::viz_pointers;
 
     std::unordered_map<int, Node<org_ptr> > nodes;
     std::map<ORG, int> genome_counts;
 
   public:
+    using LineageTracker<POP_MANAGER>::ConnectVis;
     int last_coalesence = 0;
     using LineageTracker<POP_MANAGER>::emp_is_lineage_manager;
     LineageTracker_Pruned() {;}
@@ -399,7 +434,11 @@ namespace evo{
         genome_counts[*genome]++;
       }
 
-      this->parents[id] = parent;
+      for (auto viz : viz_pointers) {
+        viz->AnimateStep(parent, id);
+      }
+
+      //this->parents[id] = parent;
 
       return id;
     }
