@@ -19,6 +19,7 @@
 #include <sstream>
 #include <iostream>
 #include <iomanip>
+#include <string>
 
 using QOrg = emp::evo::QuorumOrganism;
 
@@ -47,12 +48,14 @@ EMP_BUILD_CONFIG( QuorumConfig,
     VALUE(GRID_Y, int, 60, "Height of the grid"),
     VALUE(TICKS, int, 1000, "Length of simulation"),
     VALUE(INITIAL_SIZE, unsigned int, 30, "Starting population size"),
-    VALUE(INITIAL_CONFIG, int, 0, "Index of the QOrg initial config array to use as inital config"),
+    VALUE(INITIAL_CONFIG, int, 0, "Which predefined organism to pit against the defector?"),
+    VALUE(PERCENT_DEFECTOR, double, 0.5, "Portion of the starting population to seed as defector"),
     VALUE(ENABLE_MUTATION, bool, 1, "If mutation should be enabled"),
     VALUE(RAND_SEED, int, 238947, "Seed for the random generator"),
     VALUE(PREFIX, std::string, "", "Prefix for filenames")
 )
 
+std::string init_config_names[4] = {"balanced", "defector", "donator", "scrooge"};
 
 int main(int argc, char* argv[]) {
     
@@ -94,22 +97,22 @@ int main(int argc, char* argv[]) {
     config.Write("quorum.cfg");
 
     unsigned int i = 0;
-    for(; i < (pop_size/2); i++) {
+    for(; (double) i / pop_size < config.PERCENT_DEFECTOR(); i++) {
       QOrg * org = new QOrg(QOrg::initial_configurations[1][0], // defector
                             QOrg::initial_configurations[1][1], 
                             QOrg::initial_configurations[1][2], 
                             config.ENABLE_MUTATION(), 0,
                             QOrg::initial_configurations[1][3]); // liniage tag
-      org->set_id(Qpop.Insert(*org));
+      org->set_id(Qpop.SequentialInsert(org));
     }
 
     for(; i < pop_size; i++) {
-      QOrg * org = new QOrg(QOrg::initial_configurations[2][0], // donator
-                            QOrg::initial_configurations[2][1], 
-                            QOrg::initial_configurations[2][2], 
+      QOrg * org = new QOrg(QOrg::initial_configurations[config.INITIAL_CONFIG()][0], // donator
+                            QOrg::initial_configurations[config.INITIAL_CONFIG()][1], 
+                            QOrg::initial_configurations[config.INITIAL_CONFIG()][2], 
                             config.ENABLE_MUTATION(), 0,
-                            QOrg::initial_configurations[2][3]);
-      org->set_id(Qpop.Insert(*org));
+                            QOrg::initial_configurations[config.INITIAL_CONFIG()][3]);
+      org->set_id(Qpop.SequentialInsert(org));
     }
 
     // mutation is handled automatically by the population QPop_Manager, currently
@@ -193,13 +196,14 @@ int main(int argc, char* argv[]) {
       return (double) count / (double) num_orgs;
    };
 
-    std::function<double()>percent_donator_lin=[underlying] () {
+    auto config_ptr = &config; 
+    std::function<double()>percent_donator_lin=[underlying, config_ptr] () {
     int count = 0;
       int num_orgs = 0;
 
       for(auto org : (*underlying)) {
         if(org != nullptr) {
-          if (org->state.genome.get_lineage() == 2) {count++;}
+          if (org->state.genome.get_lineage() == config_ptr->INITIAL_CONFIG()) {count++;}
           num_orgs++;
         }
       }
@@ -211,7 +215,7 @@ int main(int argc, char* argv[]) {
     Qstats.AddFunction(avg_coop_chance, "avg_coop");
     Qstats.AddFunction(avg_points, "avg_points"); 
     Qstats.AddFunction(percent_defector_lin, "percent_defector");
-    Qstats.AddFunction(percent_donator_lin, "percent_donator");
+    Qstats.AddFunction(percent_donator_lin, init_config_names[config.INITIAL_CONFIG()]);
 
     unsigned int checkpoint = 0;
     
