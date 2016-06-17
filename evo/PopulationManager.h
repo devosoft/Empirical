@@ -338,6 +338,42 @@ namespace evo {
   };
 
  template <typename ORG>
+ class PopulationManager_MixedGrid : public PopulationManager_Grid<ORG> {
+  public:
+    using PopulationManager_Base<ORG>::pop;
+    using PopulationManager_Base<ORG>::random_ptr;
+    using PopulationManager_Base<ORG>::SetRandom;
+    using PopulationManager_Base<ORG>::GetSize;
+
+    using PopulationManager_Grid<ORG>::ConfigPop;
+    using PopulationManager_Grid<ORG>::curr_ins_index;
+    using PopulationManager_Grid<ORG>::ToX;
+    using PopulationManager_Grid<ORG>::ToY;
+    using PopulationManager_Grid<ORG>::ToID;
+    using PopulationManager_Grid<ORG>::width;
+    using PopulationManager_Grid<ORG>::height;
+
+
+    PopulationManager_MixedGrid() { 
+      ConfigPop(10,10);
+      curr_ins_index = 0;
+    }
+
+    ~PopulationManager_MixedGrid() { ; }
+
+    // override the add-org-birth method to randomly assign a location
+    int AddOrgBirth(ORG * new_org, int parent_pos) {
+      const int pos = random_ptr->GetInt((int) pop.size());
+     
+      if (pop[pos] != nullptr) delete pop[pos];
+      pop[pos] = new_org;
+
+      return pos;
+    }
+    
+ };
+
+ template <typename ORG>
  class PopulationManager_Pools : public PopulationManager_Base<ORG> {
   public:
     using PopulationManager_Base<ORG>::pop;
