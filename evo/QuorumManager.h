@@ -120,8 +120,8 @@ public:
 
       // for each org get its contribution to neighbots
       for(QuorumOrganism * org : POP_MANAGER<QuorumOrganism>::pop) {
-        org->state.reset_accounting();
         if (org == nullptr) {continue;} // don't even try to touch nulls
+        org->state.reset_accounting();
         org->add_points(1); // metabolize
         Publicize(org);
       }

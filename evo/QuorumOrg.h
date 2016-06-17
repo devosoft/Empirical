@@ -31,6 +31,9 @@ namespace emp {
 namespace evo {
 
 struct QuorumOrgGenome {
+protected:
+  int lineage = -1;
+public: 
   double co_op_prob;
   double ai_radius;
   double quorum_threshold;
@@ -41,8 +44,8 @@ struct QuorumOrgGenome {
     quorum_threshold = 1;
   }
 
-  QuorumOrgGenome(double cprob, double airad, double qthresh) :
-    co_op_prob(cprob), ai_radius(airad), quorum_threshold(qthresh) {};
+  QuorumOrgGenome(double cprob, double airad, double qthresh, int lin) :
+    co_op_prob(cprob), ai_radius(airad), quorum_threshold(qthresh), lineage(lin){};
 
   // prints co-op prob, ai_gen_prob, quorum_thresh
   void print (std::ostream & out) {
@@ -53,6 +56,8 @@ struct QuorumOrgGenome {
     print(out);
     return out;
   }
+
+  int get_lineage() const {return lineage;}
 };
 
 bool operator== (QuorumOrgGenome const & lhs, QuorumOrgGenome const & rhs) {
@@ -109,7 +114,7 @@ public:
   };
 
   QuorumOrgState (double cprob, double aprob, double qthresh, bool mut, unsigned int pts) :
-    genome(cprob, aprob, qthresh), mutate(mut), points(pts) {
+    genome(cprob, aprob, qthresh, -1), mutate(mut), points(pts) {
  
     age = 0;
     loc = 0;
@@ -120,7 +125,8 @@ public:
   // Copy constructor!
   QuorumOrgState (const QuorumOrgState & other) : genome(other.genome.co_op_prob,
                                                   other.genome.ai_radius,
-                                                  other.genome.quorum_threshold),
+                                                  other.genome.quorum_threshold,
+                                                  other.genome.get_lineage()),
                                                   hi_density(false), mutate(other.mutate), 
                                                   points(0), age(0), loc(0), num_offspring(0) {
   }
@@ -164,7 +170,7 @@ public:
   static int num_to_donate, needed_to_reproduce, cost_to_donate;
   static double mutation_amount;
 
-  static const double initial_configurations[4][3];
+  static const double initial_configurations[4][4];
   // access specifiers are really annoying. 
   QuorumOrgState state;
   QuorumOrganism () {};
@@ -253,11 +259,11 @@ std::ostream & operator << (std::ostream & out, QuorumOrganism & org) {
 
 
 /// selection of standardized starting configurations for QOrgs
-const double QuorumOrganism::initial_configurations[4][3]  = {
-    {0.5, 10, 1}, // Standard
-    {0, 10, 1}, // defector
-    {1, 10, 1},// donator (effectively sterile)
-    {0.015, 10, 1} 
+const double QuorumOrganism::initial_configurations[4][4]  = {
+    {0.5, 10, 1, 0}, // Standard
+    {0, 10, 1, 1}, // defector
+    {1, 10, 1, 2},// donator (effectively sterile)
+    {0.015, 10, 1, 3} 
 };
 
 int QuorumOrganism::num_to_donate;
