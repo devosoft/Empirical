@@ -28,6 +28,10 @@ using QM = emp::evo::QuorumManager<QOrg, BASE_PM>;
 template <class QOrg, template<class> class BASE_PM>
 using QWorld = emp::evo::World<QOrg, QM<BASE_PM>>;
 
+// define the underlying population manager here
+template <class QOrg>
+using FOUNDATION = emp::evo::PopulationManager_MixedGrid<QOrg>;
+
 //TODO: find a way to enforce that POP_MANAGER is POP_MANAGER<QOrg>
 // Consult Emily's stats stuff for reference...?
 
@@ -63,15 +67,15 @@ int main(int argc, char* argv[]) {
     if (args.TestUnknown() == false) {exit(0);}
     
     if (config.PREFIX() != "") {prefix = config.PREFIX() + "-";}
-    QWorld<QOrg, emp::evo::PopulationManager_Grid> Qpop(&dice);
+    QWorld<QOrg, FOUNDATION> Qpop(&dice);
     Qpop.ConfigPop(config.GRID_X(), config.GRID_Y());
 
-    emp::evo::StatsManager_FunctionsOnUpdate<emp::evo::QuorumManager<QOrg, emp::evo::PopulationManager_Grid>> Qstats(&Qpop, prefix + "quorum.csv"); 
+    emp::evo::StatsManager_FunctionsOnUpdate<QM<FOUNDATION>> Qstats(&Qpop, prefix + "quorum.csv"); 
 
     // Set all the class variables
-    QM<emp::evo::PopulationManager_Grid>::hi_weight = config.HI_AI_WEIGHT();
-    QM<emp::evo::PopulationManager_Grid>::lo_weight = config.LO_AI_WEIGHT();
-    QM<emp::evo::PopulationManager_Grid>::ai_radius = config.AI_RADIUS();
+    QM<FOUNDATION>::hi_weight = config.HI_AI_WEIGHT();
+    QM<FOUNDATION>::lo_weight = config.LO_AI_WEIGHT();
+    QM<FOUNDATION>::ai_radius = config.AI_RADIUS();
     QOrg::num_to_donate = config.NUM_TO_DONATE();
     QOrg::needed_to_reproduce = config.NEEDED_TO_REPRODUCE();
     QOrg::cost_to_donate = config.COST_TO_DONATE();
@@ -81,23 +85,30 @@ int main(int argc, char* argv[]) {
     unsigned int pop_size = config.INITIAL_SIZE();
     dice.ResetSeed(config.RAND_SEED());
 
+    if (pop_size > (unsigned) (config.GRID_X() * config.GRID_Y()) ) {
+      std::cerr << "** ERROR: Initial population size is larger than the grid!!" << std::endl;
+      std::cerr << "** Aboring--!!" << std::endl;
+      return 2;
+    }
+
     config.Write("quorum.cfg");
 
-        // build random initial Population
-    
-    for(unsigned int i = 0; i < pop_size/2; i++) {
+    unsigned int i = 0;
+    for(; i < (pop_size/2); i++) {
       QOrg * org = new QOrg(QOrg::initial_configurations[1][0], // defector
                             QOrg::initial_configurations[1][1], 
                             QOrg::initial_configurations[1][2], 
-                            config.ENABLE_MUTATION(), 0);
+                            config.ENABLE_MUTATION(), 0,
+                            QOrg::initial_configurations[1][3]); // liniage tag
       org->set_id(Qpop.Insert(*org));
     }
 
-    for(unsigned int i = 0; i < pop_size/2; i++) {
+    for(; i < pop_size; i++) {
       QOrg * org = new QOrg(QOrg::initial_configurations[2][0], // donator
                             QOrg::initial_configurations[2][1], 
                             QOrg::initial_configurations[2][2], 
-                            config.ENABLE_MUTATION(), 0);
+                            config.ENABLE_MUTATION(), 0,
+                            QOrg::initial_configurations[2][3]);
       org->set_id(Qpop.Insert(*org));
     }
 
@@ -113,7 +124,7 @@ int main(int argc, char* argv[]) {
     };
 
     
-    QM<emp::evo::PopulationManager_Grid> * underlying = &Qpop.popM;
+    QM<FOUNDATION> * underlying = &Qpop.popM;
     std::function<double()>age_func=[underlying]
       () {
       double age = 0;
@@ -155,7 +166,7 @@ int main(int argc, char* argv[]) {
     };
 
     
-    std::function<double()>avg_points=[underlying] () {
+   std::function<double()>avg_points=[underlying] () {
       double points = 0;
       int num_orgs = 0;
 
@@ -169,7 +180,7 @@ int main(int argc, char* argv[]) {
       return points / (double) num_orgs;
     };
 
-    std::function<double()>percent_defector_lin=[underlying] () {
+   std::function<double()>percent_defector_lin=[underlying] () {
       int count = 0;
       int num_orgs = 0;
 
@@ -198,7 +209,7 @@ int main(int argc, char* argv[]) {
     Qstats.AddFunction(age_func, "avg_age");
     Qstats.AddFunction(max_age_func, "max_age");
     Qstats.AddFunction(avg_coop_chance, "avg_coop");
-    Qstats.AddFunction(avg_points, "avg_points");
+    Qstats.AddFunction(avg_points, "avg_points"); 
     Qstats.AddFunction(percent_defector_lin, "percent_defector");
     Qstats.AddFunction(percent_donator_lin, "percent_donator");
 

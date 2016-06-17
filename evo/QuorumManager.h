@@ -112,6 +112,32 @@ public:
       }
     }
 
+    // function to make offspring of this org; does mutation, if enabled
+    QuorumOrganism * make_offspring(QuorumOrganism * parent) {
+      QuorumOrganism * offspring = new QuorumOrganism(*parent);
+      offspring->mutate();
+      offspring->state.reset_age();
+      offspring->state.reset_points();
+      assert(offspring != parent);
+      return offspring;
+    }
+
+
+    // function to handle reproduction of this organism
+    // will return pointer to offspring if capable of reproducing
+    // nullptr otherwise
+    // will decrement the points needed to reproduce from state
+    QuorumOrganism * reproduce(QuorumOrganism * parent) {
+      if (parent->state.get_points() >= QuorumOrganism::needed_to_reproduce) {
+        parent->state.reset_points();
+        parent->state.reset_age();
+        return make_offspring(parent);
+      }
+
+      return nullptr;
+    }
+
+
     // function to iterate over the population && generate the next population.
     // will rely heavily on things implemented by the underlying structural class.
     // update works in stages; stage 1: determine who is co-operating
@@ -143,31 +169,7 @@ public:
       }
     } // end Update()
 
-    // function to make offspring of this org; does mutation, if enabled
-    QuorumOrganism * make_offspring(QuorumOrganism * parent) {
-      QuorumOrganism * offspring = new QuorumOrganism(*parent);
-      offspring->mutate();
-      offspring->state.reset_age();
-      offspring->state.reset_points();
-      assert(offspring != parent);
-      return offspring;
-    }
-
-    // function to handle reproduction of this organism
-    // will return pointer to offspring if capable of reproducing
-    // nullptr otherwise
-    // will decrement the points needed to reproduce from state
-    QuorumOrganism * reproduce(QuorumOrganism * parent) {
-      if (parent->state.get_points() >= QuorumOrganism::needed_to_reproduce) {
-        parent->state.reset_points();
-        parent->state.reset_age();
-        return make_offspring(parent);
-      }
-
-      return nullptr;
-    }
-
-
+    
     void Print(std::function<std::string(QuorumOrganism *)> string_fun, std::ostream & os = std::cout,
               std::string empty="X", std::string spacer=" ") {
       os << "Still no." << std::endl;

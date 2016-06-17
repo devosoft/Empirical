@@ -113,8 +113,8 @@ public:
     mutate = false;
   };
 
-  QuorumOrgState (double cprob, double aprob, double qthresh, bool mut, unsigned int pts) :
-    genome(cprob, aprob, qthresh, -1), mutate(mut), points(pts) {
+  QuorumOrgState (double cprob, double aprob, double qthresh, bool mut, unsigned int pts, int lin=-1) :
+    genome(cprob, aprob, qthresh, lin), mutate(mut), points(pts) {
  
     age = 0;
     loc = 0;
@@ -176,8 +176,8 @@ public:
   QuorumOrganism () {};
 
   // Config constructor
-  QuorumOrganism (double cprob, double airad, double qthresh, bool mut, unsigned int pts) {
-    this->QuorumOrganism::state = QuorumOrgState(cprob, airad, qthresh, mut, pts);
+  QuorumOrganism (double cprob, double airad, double qthresh, bool mut, unsigned int pts, int lin=-1) {
+    this->QuorumOrganism::state = QuorumOrgState(cprob, airad, qthresh, mut, pts, lin);
   }
 
   QuorumOrganism (const QuorumOrganism & other) {

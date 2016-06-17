@@ -32,6 +32,9 @@ using QWorld = emp::evo::World<QOrg, QM<BASE_PM>>;
 template <class QOrg>
 using FOUNDATION = emp::evo::PopulationManager_Grid<QOrg>;
 
+//TODO: find a way to enforce that POP_MANAGER is POP_MANAGER<QOrg>
+// Consult Emily's stats stuff for reference...?
+
 EMP_BUILD_CONFIG( QuorumConfig,
     VALUE(HI_AI_WEIGHT, int, 4, "What value should the AI production be for hi-density?"),
     VALUE(LO_AI_WEIGHT, int, 1, "What value should the AI production be for lo-density?"),
@@ -67,7 +70,7 @@ int main(int argc, char* argv[]) {
     QWorld<QOrg, FOUNDATION> Qpop(&dice);
     Qpop.ConfigPop(config.GRID_X(), config.GRID_Y());
 
-    emp::evo::StatsManager_FunctionsOnUpdate<emp::evo::QuorumManager<QOrg, FOUNDATION>> Qstats(&Qpop, prefix + "quorum.csv"); 
+    emp::evo::StatsManager_FunctionsOnUpdate<QM<FOUNDATION>> Qstats(&Qpop, prefix + "quorum.csv"); 
 
     // Set all the class variables
     QM<FOUNDATION>::hi_weight = config.HI_AI_WEIGHT();
@@ -82,15 +85,31 @@ int main(int argc, char* argv[]) {
     unsigned int pop_size = config.INITIAL_SIZE();
     dice.ResetSeed(config.RAND_SEED());
 
+    if (pop_size > (unsigned) (config.GRID_X() * config.GRID_Y()) ) {
+      std::cerr << "** ERROR: Initial population size is larger than the grid!!" << std::endl;
+      std::cerr << "** Aboring--!!" << std::endl;
+      return 2;
+    }
+
     config.Write("quorum.cfg");
 
-        // build random initial Population
-    for(unsigned int i = 0; i < pop_size; i++) {
-      QOrg * org = new QOrg(QOrg::initial_configurations[config.INITIAL_CONFIG()][0], 
-                            QOrg::initial_configurations[config.INITIAL_CONFIG()][1], 
-                            QOrg::initial_configurations[config.INITIAL_CONFIG()][2], 
-                            config.ENABLE_MUTATION(), 0);
-      org->set_id(Qpop.SequentialInsert(org));
+    unsigned int i = 0;
+    for(; i < (pop_size/2); i++) {
+      QOrg * org = new QOrg(QOrg::initial_configurations[1][0], // defector
+                            QOrg::initial_configurations[1][1], 
+                            QOrg::initial_configurations[1][2], 
+                            config.ENABLE_MUTATION(), 0,
+                            QOrg::initial_configurations[1][3]); // liniage tag
+      org->set_id(Qpop.Insert(*org));
+    }
+
+    for(; i < pop_size; i++) {
+      QOrg * org = new QOrg(QOrg::initial_configurations[2][0], // donator
+                            QOrg::initial_configurations[2][1], 
+                            QOrg::initial_configurations[2][2], 
+                            config.ENABLE_MUTATION(), 0,
+                            QOrg::initial_configurations[2][3]);
+      org->set_id(Qpop.Insert(*org));
     }
 
     // mutation is handled automatically by the population QPop_Manager, currently
@@ -161,11 +180,38 @@ int main(int argc, char* argv[]) {
       return points / (double) num_orgs;
     };
 
+   std::function<double()>percent_defector_lin=[underlying] () {
+      int count = 0;
+      int num_orgs = 0;
+
+      for(auto org : (*underlying)) {
+        if(org != nullptr) {
+          if (org->state.genome.get_lineage() == 1) {count++;}
+          num_orgs++;
+        }
+      }
+      return (double) count / (double) num_orgs;
+   };
+
+    std::function<double()>percent_donator_lin=[underlying] () {
+    int count = 0;
+      int num_orgs = 0;
+
+      for(auto org : (*underlying)) {
+        if(org != nullptr) {
+          if (org->state.genome.get_lineage() == 2) {count++;}
+          num_orgs++;
+        }
+      }
+      return (double) count / (double) num_orgs;
+   };
 
     Qstats.AddFunction(age_func, "avg_age");
     Qstats.AddFunction(max_age_func, "max_age");
     Qstats.AddFunction(avg_coop_chance, "avg_coop");
     Qstats.AddFunction(avg_points, "avg_points"); 
+    Qstats.AddFunction(percent_defector_lin, "percent_defector");
+    Qstats.AddFunction(percent_donator_lin, "percent_donator");
 
     unsigned int checkpoint = 0;
     
