@@ -216,7 +216,6 @@ namespace evo {
 
     // Injected orgs go into a random position.
     int AddOrg(ORG * new_org) {
-      std::cout<<"ADDORG"<<std::endl;
       const int pos = random_ptr->GetInt((int) pop.size());
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
