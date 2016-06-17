@@ -11,6 +11,7 @@
 
 #include "DFA.h"
 #include "NFA.h"
+#include "RegEx.h"
 
 namespace emp {
 
@@ -50,10 +51,20 @@ namespace emp {
 
     }
 
-
     return dfa;
   }
 
+  static NFA to_NFA(const RegEx & regex) {
+    NFA nfa(2);  // State 0 = start, state 1 = stop.
+    nfa.SetStop(1);
+    regex.AddToNFA(nfa, 0, 1);
+    return nfa;
+  }
+
+  static DFA to_DFA(const RegEx & regex) {
+    NFA nfa = to_NFA(regex);
+    return to_DFA(nfa);
+  }
 }
 
 #endif
