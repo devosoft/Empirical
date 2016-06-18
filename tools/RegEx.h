@@ -76,7 +76,6 @@ namespace emp {
       re_string * AsString() override { return this; }
       int GetSize() const override { return (int) str.size(); }
       virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
-        nfa.AddFreeTransition(start, stop);
         int prev_id = start;
         for (char x : str) {
           int next_id = nfa.AddNewState();
