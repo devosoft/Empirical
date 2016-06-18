@@ -79,11 +79,17 @@ namespace D3 {
       }
   };
 
-  //Currently only supports functions with no args or returns
-  class D3Function : public D3_Base {
+  //Catch-all object for storing references to things created in JS
+  class JSObject : public D3_Base {
   public:
-    D3Function() {;}
-    D3Function(std::string name) {
+    JSObject(){;};
+};
+
+  //Wrapper for creating functions in javascript and calling them there
+  class JSFunction : public D3_Base {
+  public:
+    JSFunction() {;}
+    JSFunction(std::string name) {
       int fail = EM_ASM_INT({
         var fn = window["d3"][Pointer_stringify($2)];
         if (typeof fn === "function") {
@@ -110,6 +116,7 @@ namespace D3 {
       }
     }
 
+    //Only works if function has no arguments or returns
     void operator() () {
         EM_ASM_ARGS({
           js.objects[$0]();

@@ -10,7 +10,7 @@
 #include "../Empirical/emtools/js_object_struct.h"
 #include "../Empirical/emtools/js_utils.h"
 #include "utils.h"
-#include "load_data.h"
+#include "dataset.h"
 #include "d3_init.h"
 
 extern "C" {

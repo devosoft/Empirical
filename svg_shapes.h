@@ -5,7 +5,7 @@
 #include "../Empirical/emtools/js_utils.h"
 #include "selection.h"
 #include "scales.h"
-#include "load_data.h"
+#include "dataset.h"
 
 namespace D3 {
 

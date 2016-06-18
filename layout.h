@@ -2,7 +2,7 @@
 #define __LAYOUT_H__
 
 #include "d3_init.h"
-#include "load_data.h"
+#include "dataset.h"
 #include "selection.h"
 
 namespace D3{
@@ -17,22 +17,15 @@ namespace D3{
   protected:
 
   public:
-    //Since no one wants to deal with JSON in C++
     JSONDataset data;
-    D3Function link_fun;
-    D3Function update_fun;
-    D3Function find_parent;
-    D3Function ToolTip; //TODO: this shouldn't be handled by the layout, once EMP_CLASS works
+    JSFunction link_fun;
+    JSFunction update_fun;
+    JSObject ToolTip; //TODO: this shouldn't be handled by the layout, once EMP_CLASS works
 
 
     TreeLayout(){
         //Create layout object
         EM_ASM_ARGS({js.objects[$0] = d3.layout.tree();}, this->id);
-        //Initialize data
-        EM_ASM_ARGS({
-            treeData = ([{"name": 0, "parent": "null", "alive":false, "persist":false, "genome":"none", "children" : []}]);
-            js.objects[$0] = treeData;
-        }, data.GetID());
 
         EM_ASM_ARGS({
           js.objects[$0] = d3.svg.diagonal()
@@ -48,31 +41,7 @@ namespace D3{
         }, ToolTip.GetID());
 
         EM_ASM_ARGS({
-          //Inspired by Niels' answer to
-          //http://stackoverflow.com/questions/12899609/how-to-add-an-object-to-a-nested-javascript-object-using-a-parent-id/37888800#37888800
-          js.objects[$0] = function(root, id) {
-            if (root.name == id){
-              return root;
-            }
-            if (root.children) {
-              for (var k in root.children) {
-                if (root.children[k].name == id) {
-                  return root.children[k];
-                }
-                else if (root.children[k].children) {
-                  result = js.objects[$0](root.children[k], id);
-                  if (result) {
-                    return result;
-                  }
-                }
-              }
-            }
-          };
-        }, find_parent.GetID());
-
-
-        EM_ASM_ARGS({
-          js.objects[$3] = (function(source, svg, tooltip) {
+          js.objects[$3] = (function(svg, tooltip) {
 
               // Compute the new tree layout.
               var nodes = js.objects[$0].nodes(js.objects[$1][0]).reverse(),
@@ -162,28 +131,12 @@ namespace D3{
       EM_ASM_ARGS({js.objects[$0].size([$1,$2]);}, this->id, w, h);
     }
 
-
-    void AddNode(int parent, int child, int pos, Selection & svg, D3Function & alive) {
+    void Update(Selection & svg) {
 
       EM_ASM_ARGS({
-        var child_node = ({"name":$2, "parent":$1, "alive":true, "persist":false, "genome":emp_i.__incoming_bitorg, "children":[]});
-        //var parent_node = js.objects[$3](js.objects[$0][0], $1);
-        var parent_node = null;
-        for (var item in js.objects[$7]) {
-          if (js.objects[$7][item].name == $1) {
-            parent_node = js.objects[$7][item];
-          }
-        }
+        js.objects[$1](js.objects[$0], js.objects[$2]);
 
-        js.objects[$7][$8].alive = false;
-        js.objects[$7][$8] = child_node;
-        if (!parent_node.hasOwnProperty("children")){
-          parent_node.children = [];
-        }
-        parent_node.children.push(child_node);
-        js.objects[$5](parent_node, js.objects[$4], js.objects[$6]);
-
-    }, data.GetID(), parent, child, find_parent.GetID(), svg.GetID(), update_fun.GetID(), ToolTip.GetID(), alive.GetID(), pos);
+      }, svg.GetID(), update_fun.GetID(), ToolTip.GetID());
     }
 
   };

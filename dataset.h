@@ -14,7 +14,91 @@ namespace D3 {
 
   class JSONDataset : public Dataset {
   public:
-    JSONDataset(){;};
+    //This should probably be static, but emscripten complains when it is
+    JSFunction FindInHierarchy;
+
+    JSONDataset() {
+      EM_ASM_ARGS({js.objects[$0] = [];}, this->id);
+
+      //Useful function for dealing with nested JSON data structures
+      //Assumes nested objects are stored in an array called children
+      EM_ASM_ARGS({
+        //Inspired by Niels' answer to
+        //http://stackoverflow.com/questions/12899609/how-to-add-an-object-to-a-nested-javascript-object-using-a-parent-id/37888800#37888800
+        js.objects[$0] = function(root, id) {
+          if (root.name == id){
+            return root;
+          }
+          if (root.children) {
+            for (var k in root.children) {
+              if (root.children[k].name == id) {
+                return root.children[k];
+              }
+              else if (root.children[k].children) {
+                result = js.objects[$0](root.children[k], id);
+                if (result) {
+                  return result;
+                }
+              }
+            }
+          }
+        };
+      }, FindInHierarchy.GetID());
+    };
+
+    void Append(std::string json) {
+      EM_ASM_ARGS({
+        js.objects[$0].push(JSON.parse(Pointer_stringify($1)));
+      }, this->id, json.c_str());
+    }
+
+    void AppendNested(std::string json) {
+
+      int fail = EM_ASM_INT({
+        var result = null;
+        for (var i in js.objects[$0]) {
+          result = js.objects[$1](js.objects[$0][i]);
+          if (result) {
+            break;
+          }
+        }
+        if (!result) {
+          return 1;
+        }
+        result.children.append(JSON.parse(Pointer_stringify($2)));
+        return 0;
+    }, this->id, FindInHierarchy.GetID(), json.c_str());
+
+      if (fail) {
+        emp::NotifyWarning("Append to JSON failed - parent not found");
+      }
+    }
+
+    //Appends into large trees can be sped up by maintaining a list of
+    //possible parent nodes
+    int AppendNestedFromList(std::string json, JSObject & options) {
+      int pos = EM_ASM_INT({
+        var parent_node = null;
+        var pos = -1;
+        var child_node = JSON.parse(Pointer_stringify($1));
+        for (var item in js.objects[$0]) {
+          if (js.objects[$0][item].name == child_node.parent) {
+            parent_node = js.objects[$0][item];
+            pos = item;
+            break;
+          }
+        }
+
+        if (!parent_node.hasOwnProperty("children")){
+          parent_node.children = [];
+        }
+        parent_node.children.push(child_node);
+        return pos;
+      }, options.GetID(), json.c_str());
+
+      return pos;
+    }
+
   };
 
   class CSVDataset : public Dataset {
