@@ -72,7 +72,7 @@ namespace evo{
 
   public:
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
-    using lineage_type = LineageTracker<POP_MANAGER>;
+    using lineage_type = LineageTracker_Pruned<POP_MANAGER>;
     lineage_type * lineage;
     std::function<double(org_ptr)> fit_fun;
 
@@ -158,9 +158,9 @@ namespace evo{
         }
         output_location << std::endl;
 
+        SendResultsToViz(update, results);
         past_snapshots.pop_back();
         past_snapshots.push_front(lineage->generation_since_update);
-        SendResultsToViz(update, results);
       }
     }
 
@@ -170,24 +170,31 @@ namespace evo{
         for (int el : viz_args[i]) {
           if (el == -1){
             values.push_back((double)update);
+          } else if (el == -2){
+            emp::vector<int> persist = GetPersistLineageIDs(past_snapshots[0],
+                                         past_snapshots[generations/resolution]);
+            for (int id : persist){
+              values.push_back((double)id);
+            }
           } else {
             if (results[el] != -1){
               values.push_back(results[el]);
             }
           }
         }
-        if (values.size() == viz_args[i].size()){
+        if (values.size() == viz_args[i].size() || viz_args[i][0]==-2){
           viz_pointers[i]->AnimateStep(values);
         }
       }
     }
 
-    void ConnectVis(web::GraphVisualization * viz) {
+    void ConnectVis(web::D3Visualization * viz) {
       emp::vector<int> vars;
-
       for (std::string variable : viz->variables) {
         if (variable == "Update"){
           vars.push_back(-1);
+        } else if (variable == "Persist") {
+          vars.push_back(-2);
         } else {
           auto it = std::find(col_map.begin(), col_map.end(), variable);
           if (it == col_map.end()) {
@@ -232,7 +239,6 @@ namespace evo{
         double fitness = fit_fun(&org);
         skeleton_type skeleton(org.size());
         ORG test = org;
-
         for (int i = 0; i < org.size(); i++) {
           test[i] = !test[i];
           if (fit_fun(&test) >= fitness){
@@ -255,12 +261,10 @@ namespace evo{
       double most_complex = complexity_fun(*(persist.begin()));
 
       for (auto org : persist) {
-        std::cout << org << " " << complexity_fun(org) << std::endl;
         if (complexity_fun(org) > most_complex) {
           most_complex = complexity_fun(org);
         }
       }
-      std::cout << "Most complex: " << most_complex << std::endl;
       return most_complex;
     }
 
@@ -360,7 +364,6 @@ namespace evo{
     emp::vector<int> GetPersistLineageIDs(emp::vector<int> curr_generation,
                                           emp::vector<int> prev_generation){
       emp::vector<int> persist;
-
       for (auto id : curr_generation){
         while(id) {
 

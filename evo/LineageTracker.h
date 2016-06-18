@@ -169,6 +169,10 @@ namespace evo{
         }
         generation_since_update[pos] = next_org_id;
       }
+
+      for (auto viz_pointer : viz_pointers) {
+        viz_pointer->RecordPlacement(pos);
+      }
     }
 
     //Record the org that's about to have an offspring, so we can know
@@ -191,8 +195,9 @@ namespace evo{
       this->parents[id] = parent;
 
       for (auto viz : viz_pointers) {
-        viz->AnimateStep(parent, id);
+        viz->RecordParent(parent, id, genome);
       }
+
       return id;
     }
 
@@ -382,7 +387,6 @@ namespace evo{
       while (!inject && curr->id == last_coalesence && curr->offspring.size() == 1 && !curr->alive){
         curr = curr->offspring[0];
         last_coalesence = curr->id;
-        std::cout << "Last coalesence now " << last_coalesence << std::endl;
       }
 
       //Update mapping of lineage tracker ids to locations in population
@@ -440,7 +444,7 @@ namespace evo{
       }
 
       for (auto viz : viz_pointers) {
-        viz->RecordParent(parent, id);
+        viz->RecordParent(parent, id, genome);
       }
 
       this->parents[id] = parent;
@@ -483,6 +487,26 @@ namespace evo{
       }
       return lineage;
 
+    }
+
+    //Takes a container of ints representing org ids (as assigned by the lineage)
+    //tracker, and returns a contatiner of the genomes of those ints.
+    template <template <typename> class C >
+    C<ORG> IDsToGenomes(C<int> & ids) {
+      C<ORG> genome_group;
+      for (int id : ids){
+        genome_group.insert(genome_group.back(), *(this->nodes[id].genome));
+      }
+      return genome_group;
+    }
+
+    //Specialization for emp::vector so we can use push_back
+    emp::vector<ORG> IDsToGenomes(emp::vector<int> & ids) {
+      emp::vector<ORG> genome_group;
+      for (int id : ids){
+        genome_group.push_back(*(this->nodes[id].genome));
+      }
+      return genome_group;
     }
 
 

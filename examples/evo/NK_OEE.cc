@@ -44,7 +44,7 @@ emp::web::GraphVisualization novelty_graph("Novelty", 550, 300);
 emp::web::GraphVisualization ecology_graph("Ecology", 550, 300);
 emp::web::GraphVisualization complexity_graph("Complexity", 550, 300);
 emp::web::LineageVisualization lineage_viz(5000, 300);
-NKAnimation<BitOrg, emp::evo::GridWorld<BitOrg>, emp::evo::LineagePruned, emp::evo::OEEStats> viz;
+NKAnimation<BitOrg, emp::evo::LineagePruned, emp::evo::OEEStats> viz;
 
 emp::web::Document doc("emp_base");
 
@@ -60,6 +60,7 @@ int main()
   viz.world->statsM.ConnectVis(&ecology_graph);
   //complexity_graph.SetupConfigs(config);
   viz.world->statsM.ConnectVis(&complexity_graph);
+  viz.world->statsM.ConnectVis(&lineage_viz);
   viz.world->lineageM.ConnectVis(&lineage_viz);
 
   doc << "<br>";

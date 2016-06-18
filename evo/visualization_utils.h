@@ -103,6 +103,7 @@ public:
 
   int POP_SIZE = 100;
   int MAX_GENS = 1000;
+  emp::vector<std::string> variables;
   virtual void Setup(){;}
 
   virtual void AnimateStep(...){;}
@@ -188,7 +189,6 @@ private:
   double x_max = 0;
 
 public:
-  emp::vector<std::string> variables;
   D3::LinearScale * x_scale;
   D3::LinearScale * y_scale;
   D3::Axis<D3::LinearScale> * x_axis;
@@ -384,7 +384,6 @@ private:
   double x_max = 0;
 
 public:
-  emp::vector<std::string> variables;
   D3::LinearScale * x_scale;
   D3::LinearScale * y_scale;
   D3::Axis<D3::LinearScale> * x_axis;
@@ -395,7 +394,7 @@ public:
   int next_parent = 0;
   int next_child;
 
-  LineageVisualization(int width, int height) : D3Visualization(width, height){;}
+  LineageVisualization(int width, int height) : D3Visualization(width, height){variables.push_back("Persist");}
 
   virtual void Setup(){
     GetSVG()->Move(0,0);
@@ -403,6 +402,16 @@ public:
     EM_ASM_ARGS({
       js.objects[$0] = [js.objects[$1][0]];
     }, alive.GetID(), tree.data.GetID());
+  }
+
+  virtual void AnimateStep(emp::vector<double> persist) {
+
+    for (double val : persist) {
+      EM_ASM_ARGS({
+        js.objects[$1](js.objects[$0][0], $2).persist = true;
+      }, tree.data.GetID(), tree.find_parent.GetID(), val);
+
+    }
   }
 
   virtual void AnimateStep(int parent, int child){
@@ -420,9 +429,14 @@ public:
     AnimateStep(next_parent, next_child);
   }
 
-  void RecordParent(int parent, int child) {
+  template <typename ORG>
+  void RecordParent(int parent, int child, ORG* org) {
     next_parent = parent;
     next_child = child;
+    EM_ASM({emp_i.__incoming_bitorg = "";});
+    for (int i = 0; i < org->size() ; ++i) {
+      EM_ASM_ARGS({emp_i.__incoming_bitorg+=$0;}, (int)(*org)[i]);
+    }
   }
 
 };
