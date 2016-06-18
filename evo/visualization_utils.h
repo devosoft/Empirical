@@ -389,15 +389,17 @@ public:
   D3::Axis<D3::LinearScale> * x_axis;
   D3::Axis<D3::LinearScale> * y_axis;
   D3::TreeLayout tree;
-  D3::D3Function alive;
+  D3::JSObject alive;
   int next_pos;
   int next_parent = 0;
   int next_child;
+  std::string next_genome;
 
   LineageVisualization(int width, int height) : D3Visualization(width, height){variables.push_back("Persist");}
 
-  virtual void Setup(){
+  virtual void Setup() {
     GetSVG()->Move(0,0);
+    tree.data.Append(std::string("{\"name\": 0, \"parent\": \"null\", \"alive\":false, \"persist\":false, \"genome\":\"none\", \"children\" : []}"));
     tree.SetSize(GetHeight(), GetWidth());
     EM_ASM_ARGS({
       js.objects[$0] = [js.objects[$1][0]];
@@ -409,19 +411,24 @@ public:
     for (double val : persist) {
       EM_ASM_ARGS({
         js.objects[$1](js.objects[$0][0], $2).persist = true;
-      }, tree.data.GetID(), tree.find_parent.GetID(), val);
+      }, tree.data.GetID(), tree.data.FindInHierarchy.GetID(), val);
 
     }
   }
 
   virtual void AnimateStep(int parent, int child){
+    std::string child_json = std::string("{\"name\":" + to_string(child) + ", \"parent\":" + to_string(parent) + ", \"alive\":true, \"persist\":false, \"genome\":\"" + next_genome + "\", \"children\":[]}");
+    int pos = tree.data.AppendNestedFromList(child_json, alive);
 
     EM_ASM_ARGS({
         while (js.objects[$0].length < $1 + 1) {
           js.objects[$0].push(-1);
         }
-    }, alive.GetID(), next_pos);
-    tree.AddNode(parent, child, next_pos, *GetSVG(), alive);
+        js.objects[$0][$1].alive = false;
+        js.objects[$0][$1] = js.objects[$0][$2].children[js.objects[$0][$2].children.length-1];
+    }, alive.GetID(), next_pos, pos);
+
+    tree.Update(*GetSVG());
   }
 
   void RecordPlacement(int pos) {
@@ -433,12 +440,8 @@ public:
   void RecordParent(int parent, int child, ORG* org) {
     next_parent = parent;
     next_child = child;
-    EM_ASM({emp_i.__incoming_bitorg = "";});
-    for (int i = 0; i < org->size() ; ++i) {
-      EM_ASM_ARGS({emp_i.__incoming_bitorg+=$0;}, (int)(*org)[i]);
-    }
+    next_genome = to_string(*org);
   }
-
 };
 
 }
