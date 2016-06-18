@@ -22,6 +22,7 @@ namespace emp {
     state_stack.emplace_back(nfa.GetStart()); // Place the starting point in the state_stack.
     id_map[state_stack[0]] = 0;               // Give starting point ID 0.
 
+    // Loop through all states not full explored; remove top state and add new states.
     while (state_stack.size()) {
       // Get the next state to test.
       std::set<int> cur_state = state_stack.back();
@@ -35,6 +36,12 @@ namespace emp {
       for (int sym = 0; sym < NFA::NUM_SYMBOLS; sym++) {
         std::set<int> next_state = nfa.GetNext(sym, cur_state);
         if (next_state.size() == 0 && !keep_invalid) continue;  // Discard invalid transitions.
+
+        // Remove NFA states with ONLY free transisions (they will all have been taken already)
+        // @CAO do more elegantly!
+        emp::vector<int> remove_set;
+        for (int x : next_state) if (nfa.HasSymTransitions(x) == false) remove_set.push_back(x);
+        for (int x : remove_set) next_state.erase(x);
 
         // Determine if we have a new state in the DFA.
         if (id_map.find(next_state) == id_map.end()) {
