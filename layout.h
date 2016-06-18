@@ -30,7 +30,7 @@ namespace D3{
         EM_ASM_ARGS({js.objects[$0] = d3.layout.tree();}, this->id);
         //Initialize data
         EM_ASM_ARGS({
-            treeData = ([{"name": 0, "parent": "null", "alive":false, "children" : []}]);
+            treeData = ([{"name": 0, "parent": "null", "alive":false, "persist":false, "genome":"none", "children" : []}]);
             js.objects[$0] = treeData;
         }, data.GetID());
 
@@ -44,7 +44,7 @@ namespace D3{
         EM_ASM_ARGS({
             js.objects[$0] = d3.tip().attr('class', 'd3-tip')
                                       .offset([-10, 0])
-                                      .html(function(d, i) { return d.name; });
+                                      .html(function(d, i) { return "Name: " + d.name + "<br>" + "Persist: " + d.persist + "<br>" + "Genome:"+d.genome; });
         }, ToolTip.GetID());
 
         EM_ASM_ARGS({
@@ -96,6 +96,8 @@ namespace D3{
                   .style("fill", function(d){
                     if (d.alive){
                       return "red";
+                    } else if (d.persist) {
+                      return "blue";
                     } else {
                       return "black";
                     }});
@@ -115,10 +117,12 @@ namespace D3{
                 node.selectAll("circle").style("fill", function(d){
                       if (d.alive){
                         return "red";
+                      } else if (d.persist) {
+                        return "blue";
                       } else {
                         return "black";
                     }});
-                    
+
                 node.attr("transform", function(d) {
                 		  return "translate(" + d.y + "," + d.x + ")"; });
 
@@ -162,7 +166,7 @@ namespace D3{
     void AddNode(int parent, int child, int pos, Selection & svg, D3Function & alive) {
 
       EM_ASM_ARGS({
-        var child_node = ({"name":$2, "parent":$1, "alive":true, "children":[]});
+        var child_node = ({"name":$2, "parent":$1, "alive":true, "persist":false, "genome":emp_i.__incoming_bitorg, "children":[]});
         //var parent_node = js.objects[$3](js.objects[$0][0], $1);
         var parent_node = null;
         for (var item in js.objects[$7]) {
