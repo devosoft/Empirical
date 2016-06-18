@@ -71,6 +71,9 @@ namespace emp {
       return to_set;
     }
 
+    bool HasFreeTransitions(int id) const { return (int) states[id].free_to.size(); }
+    bool HasSymTransitions(int id) const { return states[id].trans.size(); }
+
     opts_t GetSymbolOptions(const std::set<int> & test_set) const {
       opts_t options;
       for (int id : test_set) {
