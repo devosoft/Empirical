@@ -62,9 +62,13 @@ int main()
   TestDFA(dfa2c, "ccbabab");
   TestDFA(dfa2c, "ccbababc");
 
-  // emp::RegEx re2f("[de]*f[de]*f[de]*");
-  emp::RegEx re2f("([de]*)f([de]*)f([de]*)");
-  emp::DFA dfa2f = to_DFA(re2f);
+  emp::RegEx re2f("[de]*f[de]*f[de]*");
+  // emp::RegEx re2f("([de]*)f([de]*)f([de]*)");
+  emp::NFA nfa2f = to_NFA(re2f);
+  emp::DFA dfa2f = to_DFA(nfa2f);
+  re2f.PrintDebug();
+  std::cout << "RegEx NFA size = " << nfa2f.GetSize() << std::endl;
+  nfa2f.Print();
   std::cout << "RegEx DFA size = " << dfa2f.GetSize() << std::endl;
   dfa2f.Print();
 
