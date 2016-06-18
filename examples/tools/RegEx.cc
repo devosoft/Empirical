@@ -39,7 +39,7 @@ int main()
   re_INT_LIT.PrintDebug();
   std::cout << std::endl;
 
-  emp::RegEx re_FLOAT_LIT("[0-9]+[.]'[0-9]+");
+  emp::RegEx re_FLOAT_LIT("[0-9]+[.][0-9]+");
   std::cout << "re_FLOAT_LIT" << std::endl;
   re_FLOAT_LIT.PrintDebug();
   std::cout << std::endl;
@@ -49,7 +49,8 @@ int main()
   re_CHAR_LIT.PrintDebug();
   std::cout << std::endl;
 
-  emp::RegEx re_STRING_LIT("[\"](\\[nt\"\\]|[^\\\"])*\"");
+  //emp::RegEx re_STRING_LIT("[\"](\\[nt\"\\]|[^\\\"])*\"");
+  emp::RegEx re_STRING_LIT("[\"]((\\\\[nt\"\\\\])|[^\"])*\\\"");
   std::cout << "re_STRING_LIT" << std::endl;
   re_STRING_LIT.PrintDebug();
   std::cout << std::endl;
