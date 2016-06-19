@@ -10,7 +10,7 @@ diff-cover: coverage
 	cd scripts && python3 vigilance.py -i ignore_list diff
 
 travis: 
-	make diff-cover
+	make test
 
 test:
 	cd tests && make test
