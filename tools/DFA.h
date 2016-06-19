@@ -14,18 +14,18 @@
 
 namespace emp {
 
-  class DFA {
+  template <int NUM_SYMBOLS=128>
+  class tDFA {
   private:
-    constexpr static int NUM_SYMBOLS = 128;
     emp::vector< emp::array<int, NUM_SYMBOLS> > transitions;
     emp::vector< char > is_stop;  // 0=no 1=yes (char instead of bool for speed)
   public:
-    DFA(int num_states=0) : transitions(num_states), is_stop(num_states, 0) {
+    tDFA(int num_states=0) : transitions(num_states), is_stop(num_states, 0) {
       for (auto & t : transitions) t.fill(-1);
     }
-    DFA(const DFA &) = default;
-    ~DFA() { ; }
-    DFA & operator=(const DFA &) = default;
+    tDFA(const tDFA<NUM_SYMBOLS> &) = default;
+    ~tDFA() { ; }
+    tDFA<NUM_SYMBOLS> & operator=(const tDFA<NUM_SYMBOLS> &) = default;
 
     int GetSize() const { return (int) transitions.size(); }
 
@@ -79,6 +79,8 @@ namespace emp {
     }
 
   };
+
+  using DFA = tDFA<128>;
 
 }
 
