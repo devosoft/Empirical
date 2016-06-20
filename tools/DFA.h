@@ -45,10 +45,11 @@ namespace emp {
       transitions[from][sym] = to;
     }
 
-    void SetStop(int state) {
+    void SetStop(int state, stop_t stop_val=1) {
       emp_assert(state >= -1 && state < (int) transitions.size());
-      is_stop[state] = 1;
+      is_stop[state] = stop_val;
     }
+    stop_t GetStop(int state) const { return (state == -1) ? 0 : is_stop[state]; }
     bool IsActive(int state) const { return state != -1; }
     bool IsStop(int state) const { return (state == -1) ? false : is_stop[state]; }
 
