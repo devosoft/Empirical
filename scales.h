@@ -91,11 +91,11 @@ namespace D3 {
       EM_ASM_ARGS({js.objects[$0].ticks($1);}, this->id, count);
     }
 
-    void SetTickFormat(int count, const char * format) {
+    void SetTickFormat(int count, std::string format) {
       //TODO: format is technically optional, but what is the point of this
       //function without it?
       EM_ASM_ARGS({js.objects[$0].tick($1, Pointer_stringify($2));},
-		  this->id, count, format);
+		  this->id, count, format.c_str());
     }
   };
 
@@ -113,8 +113,8 @@ namespace D3 {
       EM_ASM_ARGS({js.objects[$0].rangeRound(emp.__incoming_array);}, this->id);
     }
 
-    void SetInterpolate(const char * factory) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(interpolate, factory)
+    void SetInterpolate(std::string factory) {
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(interpolate, factory.c_str())
     }
 
     void Clamp(bool clamp) {
@@ -123,9 +123,9 @@ namespace D3 {
 
     void Nice(int count = -1) {
       if (count != -1){
-	EM_ASM_ARGS({js.objects[$0].nice($1);}, this->id, count);
+	    EM_ASM_ARGS({js.objects[$0].nice($1);}, this->id, count);
       } else {
-	EM_ASM_ARGS({js.objects[$0].nice();}, this->id);
+	    EM_ASM_ARGS({js.objects[$0].nice();}, this->id);
       }
     }
 

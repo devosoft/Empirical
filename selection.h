@@ -105,7 +105,7 @@ namespace D3 {
 
 
     template <typename T, size_t SIZE>
-    Selection SetAttr(const char* name, std::array<T, SIZE> value){
+    Selection SetAttr(std::string name, std::array<T, SIZE> value){
       /* Assigns [value] to the selections's [name] attribute.
 
 	 This will break if someone happens to use a string that
@@ -115,61 +115,82 @@ namespace D3 {
 
       EM_ASM_ARGS({
 	  js.objects[$0].attr(Pointer_stringify($1), emp_i.__incoming_array);
-	}, this->id, name);
+  }, this->id, name.c_str());
 
       return *this;
     }
 
-    Selection Append(const char* name){
+    Selection Append(std::string name){
       int new_id = EM_ASM_INT_V({return js.objects.length});
 
       EM_ASM_ARGS({
 	  var new_selection = js.objects[$0].append(Pointer_stringify($1));
 	  js.objects.push(new_selection);
-	}, this->id, name);
+  }, this->id, name.c_str());
       return Selection(new_id);
     }
 
-    Selection SetStyle(const char* name, const char* value, bool priority=false){
+    Selection SetStyle(std::string name, const char* value, bool priority=false){
       if (priority){
-	EM_ASM_ARGS({
-	    var in_string = Pointer_stringify($2);
-	    var fn = window["emp"][in_string];
-	    if (typeof fn === "function"){
-	      js.objects[$0].style(Pointer_stringify($1), fn, "important");
-	    } else {
-	      js.objects[$0].style(Pointer_stringify($1),
+  	    EM_ASM_ARGS({
+	      var in_string = Pointer_stringify($2);
+	      var fn = window["emp"][in_string];
+	      if (typeof fn === "function"){
+	        js.objects[$0].style(Pointer_stringify($1), fn, "important");
+	      } else {
+	        js.objects[$0].style(Pointer_stringify($1),
 				      in_string, "important");
-	    }}, this->id, name, value);
+	    }}, this->id, name.c_str(), value);
+      } else {
+	    CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS(style, name.c_str(), value)
       }
-      else {
-	CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS(style, name, value)
+      return *this;
+    }
+
+    Selection SetStyle(std::string name, std::string value, bool priority=false){
+      if (priority){
+  	    EM_ASM_ARGS({
+	      var in_string = Pointer_stringify($2);
+	      var fn = window["emp"][in_string];
+	      if (typeof fn === "function"){
+	        js.objects[$0].style(Pointer_stringify($1), fn, "important");
+	      } else {
+	        js.objects[$0].style(Pointer_stringify($1),
+				      in_string, "important");
+	    }}, this->id, name.c_str(), value.c_str());
+      } else {
+	    CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS(style, name.c_str(), value.c_str())
       }
       return *this;
     }
 
     template <typename T>
-    Selection SetStyle(const char* name, T value, bool priority=false){
+    Selection SetStyle(std::string name, T value, bool priority=false){
       if (priority){
 	EM_ASM_ARGS({js.objects[$0].style(Pointer_stringify($1),
-	$2, "important")}, this->id, name, value);
+	$2, "important")}, this->id, name.c_str(), value);
       }
       else {
 	EM_ASM_ARGS({js.objects[$0].style(Pointer_stringify($1),
-	$2)}, this->id, name, value);
+	$2)}, this->id, name.c_str(), value);
       }
       return *this;
     }
 
-    Selection SetProperty(const char* name, const char* value){
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS(property, name, value)
+    Selection SetProperty(std::string name, const char* value){
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS(property, name.c_str(), value)
+      return *this;
+    }
+
+    Selection SetProperty(std::string name, std::string value){
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS(property, name.c_str(), value.c_str())
       return *this;
     }
 
     template <typename T>
-    Selection SetProperty(const char* name, T value){
+    Selection SetProperty(std::string name, T value){
       EM_ASM_ARGS({js.objects[$0].property(Pointer_stringify($1),
-					   $2)}, this->id, name);
+					   $2)}, this->id, name.c_str());
       return *this;
     }
 
@@ -261,10 +282,10 @@ namespace D3 {
       emp_assert(this->enter);
 
       EM_ASM_ARGS({
-	  var append_selection = js.objects[$0]
-	    .enter().append(Pointer_stringify($1));
-	  js.objects.push(append_selection);
-  }, this->id, type.c_str());
+	    var append_selection = js.objects[$0].enter()
+                               .append(Pointer_stringify($1));
+	    js.objects.push(append_selection);
+      }, this->id, type.c_str());
 
       this->enter = false;
 
@@ -286,9 +307,9 @@ namespace D3 {
       this->exit = false;
 
       EM_ASM_ARGS({
-	  var exit_selection = js.objects[$0].exit().remove();
-	  js.objects.push(exit_selection);
-	    }, this->id);
+	    var exit_selection = js.objects[$0].exit().remove();
+	    js.objects.push(exit_selection);
+	  }, this->id);
       return Selection(new_id);
     }
 
@@ -307,95 +328,95 @@ namespace D3 {
       emp_assert(this->exit);
 
       EM_ASM_ARGS({
-	  var exit_selection = js.objects[$0].exit();
-	  js.objects.push(exit_selection);
-	    }, this->id);
+	    var exit_selection = js.objects[$0].exit();
+	    js.objects.push(exit_selection);
+      }, this->id);
       return Selection(new_id);
     }
 
 
-    int GetAttrInt(const char* name){
+    int GetAttrInt(std::string name){
       return EM_ASM_INT({
-	  return js.objects[$0].attr(Pointer_stringify($1));
-	}, this->id, name);
+	    return js.objects[$0].attr(Pointer_stringify($1));
+      }, this->id, name.c_str());
     }
 
-    double GetAttrDouble(const char* name){
+    double GetAttrDouble(std::string name){
       return EM_ASM_DOUBLE({
-	  return js.objects[$0].attr(Pointer_stringify($1));
-	}, this->id, name);
+	    return js.objects[$0].attr(Pointer_stringify($1));
+      }, this->id, name.c_str());
     }
 
-    int GetStyleInt(const char* name){
+    int GetStyleInt(std::string name){
       return EM_ASM_INT({
-	  return js.objects[$0].style(Pointer_stringify($1));
-	}, this->id, name);
+	    return js.objects[$0].style(Pointer_stringify($1));
+      }, this->id, name.c_str());
     }
 
-    double GetStyleDouble(const char* name){
+    double GetStyleDouble(std::string name){
       return EM_ASM_INT({
-	  return js.objects[$0].style(Pointer_stringify($1));
-	}, this->id, name);
+	    return js.objects[$0].style(Pointer_stringify($1));
+      }, this->id, name.c_str());
     }
 
-    void SetText(const char* text){
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(text, text)
+    void SetText(std::string text){
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(text, text.c_str())
     }
 
-    void SetHtml(const char* value){
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(html, value)
+    void SetHtml(std::string value){
+      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(html, value.c_str())
     }
 
-    Selection Transition(const char* name=""){
+    Selection Transition(std::string name=""){
       int new_id = EM_ASM_INT_V({return js.objects.length});
       EM_ASM_ARGS({
-	  var transition = js.objects[$0].transition(Pointer_stringify($1));
-	  js.objects.push(transition);
-	}, this->id, name);
+ 	    var transition = js.objects[$0].transition(Pointer_stringify($1));
+	    js.objects.push(transition);
+  	  }, this->id, name.c_str());
       return Selection(new_id);
     }
 
-    void Interrupt(const char* name=""){
+    void Interrupt(std::string name=""){
       EM_ASM_ARGS({
-	  js.objects[$0].interrupt(Pointer_stringify($1));
-	}, this->id, name);
+	    js.objects[$0].interrupt(Pointer_stringify($1));
+ 	  }, this->id, name.c_str());
     }
 
-    Selection Insert(const char* name, const char* before=NULL){
+    Selection Insert(std::string name, std::string before=NULL){
       int new_id = EM_ASM_INT_V({return js.objects.length});
 
-      if (before){
-	EM_ASM_ARGS({
-	    var new = js.objects[$0].insert(Pointer_stringify($1),
+      if (before.c_str()){
+	    EM_ASM_ARGS({
+	      var new = js.objects[$0].insert(Pointer_stringify($1),
 						  Pointer_stringify($2));
-	    js.objects.push(new);
-	  }, this->id, name, before);
+	      js.objects.push(new);
+        }, this->id, name.c_str(), before.c_str());
       } else {
-	EM_ASM_ARGS({
-	    var new = js.objects[$0].insert(Pointer_stringify($1));
-	    js.objects.push(new);
-	  }, this->id, name);
+  	    EM_ASM_ARGS({
+	      var new = js.objects[$0].insert(Pointer_stringify($1));
+	      js.objects.push(new);
+	    }, this->id, name.c_str());
       }
       return Selection(new_id);
     }
 
 
-    Selection EnterInsert(const char* name, const char* before=NULL){
+    Selection EnterInsert(std::string name, std::string before=NULL){
       int new_id = EM_ASM_INT_V({return js.objects.length});
 
       emp_assert(this->enter);
 
-      if (before){
-	EM_ASM_ARGS({
-	    var new = js.objects[$0].enter().insert(Pointer_stringify($1),
+      if (before.c_str()){
+	    EM_ASM_ARGS({
+	      var new = js.objects[$0].enter().insert(Pointer_stringify($1),
 						  Pointer_stringify($2));
-	    js.objects.push(new);
-	  }, this->id, name, before);
+	      js.objects.push(new);
+	    }, this->id, name.c_str(), before.c_str());
       } else {
-	EM_ASM_ARGS({
-	    var new = js.objects[$0].enter().insert(Pointer_stringify($1));
-	    js.objects.push(new);
-	  }, this->id, name);
+	    EM_ASM_ARGS({
+	      var new = js.objects[$0].enter().insert(Pointer_stringify($1));
+	      js.objects.push(new);
+	    }, this->id, name.c_str());
       }
       this->enter = false;
       return Selection(new_id);
@@ -434,60 +455,60 @@ namespace D3 {
 			this->id);
     }
 
-    void On(const char* type, const char* listener="null", bool capture=false){
+    void On(std::string type, std::string listener="null", bool capture=false){
 
       EM_ASM_ARGS({
-	  var in_string = Pointer_stringify($2);
-	  var fn = window["emp"][in_string];
-	  if (typeof fn === "function"){
-	    js.objects[$0].on(Pointer_stringify($1),
-		function(){
+	    var in_string = Pointer_stringify($2);
+	    var fn = window["emp"][in_string];
+	    if (typeof fn === "function"){
+	      js.objects[$0].on(Pointer_stringify($1),
+		  function(){
 		     var new_id = js.objects.length;
 		     js.objects.push(d3.select(this));
 		     fn(new_id);}, $3);
-	  } else {
-	    //if this isn't the name of a function, then it should be null
-	    //otherwise, the user passed an invalid listener
-	    //emp_assert(in_string == "null");
+	    } else {
+	      //if this isn't the name of a function, then it should be null
+	      //otherwise, the user passed an invalid listener
+	      //emp_assert(in_string == "null");
 
-	    js.objects[$0].on(Pointer_stringify($1), null);
-	  }
+	      js.objects[$0].on(Pointer_stringify($1), null);
+	    }
 
-	}, this->id, type, listener, capture);
+      }, this->id, type.c_str(), listener.c_str(), capture);
     }
 
     char* GetText(){
 
       int buffer = EM_ASM_INT({
-	  var text = js.objects[$0].text();
-	  var buffer = Module._malloc(text.length+1);
-	  Module.writeStringToMemory(text, buffer);
-	  return buffer;
-	}, this->id);
+	    var text = js.objects[$0].text();
+	    var buffer = Module._malloc(text.length+1);
+	    Module.writeStringToMemory(text, buffer);
+	    return buffer;
+	  }, this->id);
 
       return (char *)buffer;
     }
 
 
-    char* GetAttrString(const char* name){
+    char* GetAttrString(std::string name){
       int buffer = EM_ASM_INT({
-	  var text = js.objects[$0].attr(Pointer_stringify($1));
-	  var buffer = Module._malloc(text.length+1);
-	  Module.writeStringToMemory(text, buffer);
-	  return buffer;
-	}, this->id, name);
+	    var text = js.objects[$0].attr(Pointer_stringify($1));
+	    var buffer = Module._malloc(text.length+1);
+	    Module.writeStringToMemory(text, buffer);
+	    return buffer;
+      }, this->id, name.c_str());
 
       return (char *)buffer;
     }
 
 
-    char* GetStyleString(const char* name){
+    char* GetStyleString(std::string name){
       int buffer = EM_ASM_INT({
-	  var text = js.objects[$0].style(Pointer_stringify($1));
-	  var buffer = Module._malloc(text.length+1);
-	  Module.writeStringToMemory(text, buffer);
-	  return buffer;
-	}, this->id, name);
+	    var text = js.objects[$0].style(Pointer_stringify($1));
+	    var buffer = Module._malloc(text.length+1);
+	    Module.writeStringToMemory(text, buffer);
+	    return buffer;
+      }, this->id, name.c_str());
 
       return (char *)buffer;
     }
@@ -495,22 +516,22 @@ namespace D3 {
 
     char* GetHtml(){
       int buffer = EM_ASM_INT({
-	  var text = js.objects[$0].html();
-	  var buffer = Module._malloc(text.length+1);
-	  Module.writeStringToMemory(text, buffer);
-	  return buffer;
-	}, this->id);
+	    var text = js.objects[$0].html();
+	    var buffer = Module._malloc(text.length+1);
+	    Module.writeStringToMemory(text, buffer);
+	    return buffer;
+	  }, this->id);
 
       return (char *)buffer;
     }
 
-    char* GetProperty(const char* name){
+    char* GetProperty(std::string name){
       int buffer = EM_ASM_INT({
-	  var text = js.objects[$0].property(Pointer_stringify($1));
-	  var buffer = Module._malloc(text.length+1);
-	  Module.writeStringToMemory(text, buffer);
-	  return buffer;
-	}, this->id, name);
+	    var text = js.objects[$0].property(Pointer_stringify($1));
+	    var buffer = Module._malloc(text.length+1);
+	    Module.writeStringToMemory(text, buffer);
+	    return buffer;
+	  }, this->id, name.c_str());
 
       return (char *)buffer;
     }
@@ -672,26 +693,6 @@ namespace D3 {
     this->enter = false;
     this->exit = false;
   }
-
-  /* I don't know why you'd actually want to do this
-  Selection::Selection(Selection* selector, bool all){
-    this->id = EM_ASM_INT_V({return js.objects.length});
-    if (all){
-      EM_ASM_ARGS({
-	  js.objects[$0] =
-	  d3.selectAll($1.id)}, this->id, selector);
-    }
-    else {
-      EM_ASM_ARGS({
-	  js.objects[$0] =
-	  d3.select(Pointer_stringify($1))}, this->id, selector);
-    }
-  }
-  */
-
-//void bind_data(std::vector data){
-//
-//}
 
 Selection Select(const char* selector){
   /*Slightly prettier UI for constructor*/

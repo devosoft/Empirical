@@ -324,7 +324,7 @@ namespace D3 {
   RadialAreaGenerator::RadialAreaGenerator() {
     EM_ASM_ARGS({
    	  var new_line = d3.svg.area.radial();
-	  js.objects = new_line;
+	  js.objects[$0] = new_line;
     }, this->id);
   }
 
@@ -353,7 +353,7 @@ namespace D3 {
 
   ChordGenerator::ChordGenerator() {
     EM_ASM_ARGS({
-  	  var new_line = d3.svg.area.chord();
+  	  var new_line = d3.svg.chord();
 	  js.objects[$0] = new_line;
     }, this->id);
   }
@@ -369,7 +369,7 @@ namespace D3 {
 
   DiagonalGenerator::DiagonalGenerator() {
     EM_ASM_ARGS({
-	  var new_line = d3.svg.area.diagonal();
+	  var new_line = d3.svg.diagonal();
 	  js.objects[$0] = new_line;
     }, this->id);
   }
