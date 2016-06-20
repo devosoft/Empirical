@@ -16,10 +16,12 @@
 
 namespace emp {
 
-  class NFA {
+  template <int S=128, typename STOP_TYPE=uint8_t>
+  class tNFA {
   public:
-    constexpr static int NUM_SYMBOLS = 128;
+    static const constexpr int NUM_SYMBOLS = S;
     using opts_t = BitSet<NUM_SYMBOLS>;
+    using stop_t = STOP_TYPE;
 
   private:
     struct Transition {
@@ -33,15 +35,16 @@ namespace emp {
 
     emp::vector<State> states;
     int start;
-    emp::vector< char > is_stop;         // 0=no 1=yes (char instead of bool for speed)
+    emp::vector< STOP_TYPE > is_stop;         // 0=no 1=yes (char instead of bool for speed)
 
   public:
-    NFA(int num_states=0, int start_state=0)
+    tNFA(int num_states=0, int start_state=0)
       : states(num_states), start(start_state), is_stop(num_states, 0) {
         if (num_states > start) states[start].free_to.insert(start);
       }
-    NFA(const NFA &) = default;
-    ~NFA() { ; }
+    tNFA(const tNFA<NUM_SYMBOLS,STOP_TYPE> &) = default;
+    ~tNFA() { ; }
+    tNFA<NUM_SYMBOLS,STOP_TYPE> & operator=(const tNFA<NUM_SYMBOLS,STOP_TYPE> &) = default;
 
     int GetSize() const { return (int) states.size(); }
     const std::set<int> & GetStart() const {
@@ -126,7 +129,8 @@ namespace emp {
 
     }
 
-    void SetStop(int state) { is_stop[state] = 1; }
+    void SetStop(int state, stop_t stop_val=1) { is_stop[state] = stop_val; }
+    stop_t GetStop(int state) const { return is_stop[state]; }
 
     // Testing types of states:
     //  START -> This is where the NFA begins (may have free transitions to other states)
@@ -149,7 +153,7 @@ namespace emp {
           std::cout << "free to:";
           for (int f : states[i].free_to) std::cout << " " << f;
         }
-        if (IsStop(i)) std::cout << " STOP";
+        if (IsStop(i)) std::cout << " STOP(" << GetStop(i) << ")";
         std::cout << std::endl;
       }
     }
@@ -166,15 +170,16 @@ namespace emp {
     }
   };
 
-  class NFA_State {
+  template <int NUM_SYMBOLS=128, typename STOP_TYPE=uint8_t>
+  class tNFA_State {
   private:
-    const NFA & nfa;
+    const tNFA<NUM_SYMBOLS,STOP_TYPE> & nfa;
     std::set<int> state_set;
   public:
-    NFA_State(const NFA & _nfa) : nfa(_nfa) { state_set = nfa.GetStart(); }
-    ~NFA_State() { ; }
+    tNFA_State(const tNFA<NUM_SYMBOLS,STOP_TYPE> & _nfa) : nfa(_nfa) { state_set = nfa.GetStart(); }
+    ~tNFA_State() { ; }
 
-    const NFA & GetNFA() const { return nfa; }
+    const tNFA<NUM_SYMBOLS,STOP_TYPE> & GetNFA() const { return nfa; }
     const std::set<int> & GetStateSet() const { return state_set; }
 
     bool IsActive() const { return state_set.size(); }
@@ -203,6 +208,9 @@ namespace emp {
     }
   };
 
+
+  using NFA = tNFA<128, char>;
+  using NFA_State = tNFA_State<128, char>;
 }
 
 #endif
