@@ -127,7 +127,14 @@ namespace emp {
     }
 
     void SetStop(int state) { is_stop[state] = 1; }
+
+    // Testing types of states:
+    //  START -> This is where the NFA begins (may have free transitions to other states)
+    //  STOP -> A legal endpoint for the NFA.
+    //  EMPTY -> A state with only empty transitions from it, and not stop state.
+    bool IsStart(int state) const { return state == start; }
     bool IsStop(int state) const { return is_stop[state]; }
+    bool IsEmpty(int state) const { return !HasSymTransitions(state) && !IsStop(state); }
 
     void Print() const {
       std::cout << states.size() << " States:" << std::endl;
