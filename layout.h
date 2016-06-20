@@ -4,8 +4,23 @@
 #include "d3_init.h"
 #include "dataset.h"
 #include "selection.h"
+#include "svg_shapes.h"
+#include "../Empirical/tools/tuple_struct.h"
+#include "../Empirical/emtools/JSWrap.h"
+
+#include <functional>
+#include <array>
 
 namespace D3{
+
+  struct JSONTreeNode {
+    EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
+				   int, name,
+				   int, parent,
+                   double, y,
+                   int, depth
+				   )
+  };
 
   class Layout : public D3_Base {
   protected:
@@ -13,130 +28,78 @@ namespace D3{
     Layout() {;};
   };
 
+  template <typename NODE_TYPE = JSONTreeNode>
   class TreeLayout : public Layout {
   protected:
 
   public:
-    JSONDataset data;
-    JSFunction link_fun;
-    JSFunction update_fun;
-    JSObject ToolTip; //TODO: this shouldn't be handled by the layout, once EMP_CLASS works
-
+    JSONDataset * data;
+    DiagonalGenerator * make_line;
 
     TreeLayout(){
         //Create layout object
         EM_ASM_ARGS({js.objects[$0] = d3.layout.tree();}, this->id);
 
-        EM_ASM_ARGS({
-          js.objects[$0] = d3.svg.diagonal()
-    	                         .projection(function(d) {
-                                              return [d.y, d.x];
-                                            });
-        }, link_fun.GetID());
+        make_line = new D3::DiagonalGenerator();
 
-        EM_ASM_ARGS({
-            js.objects[$0] = d3.tip().attr('class', 'd3-tip')
-                                      .offset([-10, 0])
-                                      .html(function(d, i) { return "Name: " + d.name + "<br>" + "Persist: " + d.persist + "<br>" + "Genome:"+d.genome; });
-        }, ToolTip.GetID());
+        std::function<std::array<double, 2>(NODE_TYPE, int, int)> projection = [](NODE_TYPE n, int i=0, int k=0){
+          return std::array<double, 2>({n.y(), n.x()});
+        };
 
-        EM_ASM_ARGS({
-          js.objects[$3] = (function(svg, tooltip) {
-
-              // Compute the new tree layout.
-              var nodes = js.objects[$0].nodes(js.objects[$1][0]).reverse(),
-            	  links = js.objects[$0].links(nodes);
-
-              // Normalize for fixed-depth.
-              nodes.forEach(function(d) { d.y = d.depth * 20; });
-
-              // Declare the nodesâ€¦
-              var node = svg.selectAll("g.node")
-            	  .data(nodes, function(d) { return d.name; });
-
-              // Enter the nodes.
-              var nodeEnter = node.enter().append("g")
-            	  .attr("class", "node")
-            	  .attr("transform", function(d) {
-            		  return "translate(" + d.y + "," + d.x + ")"; });
-
-              nodeEnter.append("circle")
-            	  .attr("r", 2)
-                  .style("fill", function(d){
-                    if (d.alive){
-                      return "red";
-                    } else if (d.persist) {
-                      return "blue";
-                    } else {
-                      return "black";
-                    }});
-
-              nodeEnter.call(tooltip);
-              nodeEnter.on("mouseover", tooltip.show).on("mouseout", tooltip.hide);
-
-              /*nodeEnter.append("text")
-            	  .attr("x", function(d) {
-            		  return d.children || d._children ? -13 : 13; })
-            	  .attr("dy", ".35em")
-            	  .attr("text-anchor", function(d) {
-            		  return d.children || d._children ? "end" : "start"; })
-            	  .text(function(d) { return d.name; })
-            	  .style("fill-opacity", 1);*/
-
-                node.selectAll("circle").style("fill", function(d){
-                      if (d.alive){
-                        return "red";
-                      } else if (d.persist) {
-                        return "blue";
-                      } else {
-                        return "black";
-                    }});
-
-                node.attr("transform", function(d) {
-                		  return "translate(" + d.y + "," + d.x + ")"; });
-
-
-              /*node.selectAll("text").attr("x", function(d) {
-              		  return d.children || d._children ? -13 : 13; })
-              	  .attr("dy", ".35em")
-              	  .attr("text-anchor", function(d) {
-              		  return d.children || d._children ? "end" : "start"; })
-              	  .text(function(d) { return d.name; })
-              	  .style("fill-opacity", 1).style("font-size", "xx-small");*/
-
-
-              // Declare the linksâ€¦
-              var link = svg.selectAll("path.link")
-            	  .data(links, function(d) { return d.target.name; });
-
-              // Enter the links.
-              link.enter().insert("path", "g")
-            	  .attr("class", "link")
-            	  .attr("d", js.objects[$2])
-                .attr("fill", "none")
-                .attr("stroke", "black")
-                .attr("stroke-width", 1);
-
-                link.attr("class", "link")
-              	  .attr("d", js.objects[$2])
-                  .attr("fill", "none")
-                  .attr("stroke", "black")
-                  .attr("stroke-width", 1);
-
-          });
-        }, this->id, data.GetID(), link_fun.GetID(), update_fun.GetID());
+        emp::JSWrap(projection, "projection");
+        make_line->SetProjection("projection");
     };
+
+    void SetDataset(JSONDataset * dataset) {
+      this->data = dataset;
+    }
+
+    //Returns the enter selection for the nodes in case the user wants
+    //to do more with it. It would be nice to return the enter selection for
+    //links too, but C++ makes that super cumbersome, and it's definitely the less
+    //common use case
+    Selection GenerateNodesAndLinks(Selection svg) {
+      int sel_id = EM_ASM_INT_V({return js.objects.length});
+
+      EM_ASM_ARGS({
+        var nodes = js.objects[$0].nodes(js.objects[$1][0]).reverse();
+        links = js.objects[$0].links(nodes);
+
+        nodes.forEach(function(d) { d.y = d.depth * 20; });
+
+        // Declare the nodesâ€¦
+        var node = js.objects[$3].selectAll("g.node")
+            .data(nodes, function(d) { return d.name; });
+
+        var nodeEnter = node.enter().append("g")
+                .attr("class", "node")
+                .attr("transform", function(d) {
+                    return "translate(" + d.y + "," + d.x + ")"; });
+
+        node.attr("transform", function(d) {
+        		  return "translate(" + d.y + "," + d.x + ")"; });
+
+        var link = js.objects[$3].selectAll("path.link")
+      	  .data(links, function(d) { return d.target.name; });
+
+        // Enter the links.
+        link.enter().insert("path", "g")
+      	    .attr("class", "link")
+      	    .attr("d", js.objects[$2])
+            .attr("fill", "none")
+            .attr("stroke", "black")
+            .attr("stroke-width", 1);
+
+        link.attr("class", "link")
+            .attr("d", js.objects[$2]);
+
+        js.objects.push(nodeEnter);
+    }, this->id, data->GetID(), make_line->GetID(), svg.GetID());
+      return Selection(sel_id);
+    }
 
     void SetSize(int w, int h) {
       EM_ASM_ARGS({js.objects[$0].size([$1,$2]);}, this->id, w, h);
-    }
-
-    void Update(Selection & svg) {
-
-      EM_ASM_ARGS({
-        js.objects[$1](js.objects[$0], js.objects[$2]);
-
-      }, svg.GetID(), update_fun.GetID(), ToolTip.GetID());
     }
 
   };
