@@ -132,9 +132,9 @@ namespace emp {
 
   template <typename JSON_TYPE, int ARG_ID, int FIELD>
   struct LoadTuple {
-    static constexpr void LoadJSDataArg(JSON_TYPE & arg_var) {
+    static void LoadJSDataArg(JSON_TYPE & arg_var) {
       LoadArg<ARG_ID>(std::get<FIELD-1>(arg_var.emp__tuple_body), arg_var.var_names[FIELD-1]);
-      LoadTuple<JSON_TYPE, ARG_ID, FIELD-1> load_tuple;
+      LoadTuple<JSON_TYPE, ARG_ID, FIELD-1> load_tuple = LoadTuple<JSON_TYPE, ARG_ID, FIELD-1>();
       load_tuple.LoadJSDataArg(arg_var);
     }
 
@@ -142,14 +142,14 @@ namespace emp {
 
   template <typename JSON_TYPE, int ARG_ID>
   struct LoadTuple<JSON_TYPE, ARG_ID, 0> {
-    static constexpr void LoadJSDataArg(JSON_TYPE & arg_var) {;}
+    static void LoadJSDataArg(JSON_TYPE & arg_var) {;}
   };
 
 
-  template <int ARG_ID, typename JSON_TYPE> constexpr static
+  template <int ARG_ID, typename JSON_TYPE> static
   typename std::enable_if<JSON_TYPE::n_fields != -1, void>::type
   LoadArg(JSON_TYPE & arg_var) {
-    LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields> load_tuple;
+    LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields> load_tuple = LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields>();
     load_tuple.LoadJSDataArg(arg_var);
   }
 
