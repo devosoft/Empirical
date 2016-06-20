@@ -1,5 +1,5 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
+// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
+// Copyright (C) Michigan State University, 2015. It is licensed
 // under the MIT Software license; see doc/LICENSE
 
 #ifndef JS_OBJECT_STUCT_H
@@ -13,9 +13,9 @@
 //  This header is the place for the user to do that.
 //
 //  The tuple struct builder macro takes type,variable-name pairs. If variable
-//  names are chosen to match the names of properties of a type of object in 
+//  names are chosen to match the names of properties of a type of object in
 //  Javascript, JSWrap will be able to wrap functions that contain variables of
-//  type JSDataObject. 
+//  type JSDataObject.
 //
 //  Currently, in order for JSWrap to work with these structs, you also need
 //  to tell the compiler the number of variables in the tuple struct by
@@ -26,16 +26,16 @@
 
 #include "../tools/tuple_struct.h"
 
-
-#define DATA_OBJECT_SIZE 3
-
 struct JSDataObject{
+  //constexpr const static int n_fields = 3;
   EMP_BUILD_INTROSPECTIVE_TUPLE( int, val,
 				   std::string, word,
-				   float, val2
+				   float, val2,
+                   int, x,
+                   int, y
 				   )
- 
- 
-  
+
+
+
 };
 #endif

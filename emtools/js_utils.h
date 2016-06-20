@@ -139,7 +139,7 @@ namespace emp {
       }, values.size(), recursive_el.data());
 
     for (int j = 0; j<SIZE; j++) { //iterate over array
-      for (int i = 0; i<DATA_OBJECT_SIZE; i++) { //iterate over object members
+      for (int i = 0; i<values[j].var_names.size(); i++) { //iterate over object members
 
 	//Get variable name and type for this member variable
 	std::string var_name = values[j].var_names[i];
