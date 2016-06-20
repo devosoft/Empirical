@@ -40,7 +40,7 @@ namespace emp {
         // Remove NFA states with ONLY free transisions (they will all have been taken already)
         // @CAO do more elegantly!
         emp::vector<int> remove_set;
-        for (int x : next_state) if (nfa.HasSymTransitions(x) == false) remove_set.push_back(x);
+        for (int x : next_state) if (nfa.IsEmpty(x)) remove_set.push_back(x);
         for (int x : remove_set) next_state.erase(x);
 
         // Determine if we have a new state in the DFA.
