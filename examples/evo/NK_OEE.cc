@@ -7,6 +7,7 @@
 
 
 #include "../../web/web_init.h"
+#include "../../tools/BitSet.h"
 #include "../../web/Animate.h"
 #include "../../emtools/JSWrap.h"
 #include "../../web/canvas_utils.h"
@@ -27,7 +28,6 @@
 #include "../../evo/NK-const.h"
 #include "../../evo/OEE.h"
 #include "../../evo/World.h"
-#include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
 #include "../../evo/StatsManager.h"
 

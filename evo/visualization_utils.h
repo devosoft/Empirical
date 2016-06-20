@@ -377,33 +377,62 @@ class LineageVisualization : public D3Visualization {
 private:
   double y_margin = 10;
   double x_margin = 30;
-  double axis_width = 60;
-  double y_min = 1000;
-  double y_max = 0;
-  double x_min = 0;
-  double x_max = 0;
 
 public:
-  D3::LinearScale * x_scale;
-  D3::LinearScale * y_scale;
-  D3::Axis<D3::LinearScale> * x_axis;
-  D3::Axis<D3::LinearScale> * y_axis;
-  D3::TreeLayout tree;
+
+  struct LineageTreeNode {
+    EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
+                                   double, y,
+                                   int, name,
+				                   int, parent,
+                                   int, depth,
+                                   //std::string, genome,
+                                   bool, alive,
+                                   bool, persist
+                                )
+  };
+
+
+  D3::TreeLayout<LineageTreeNode> tree;
   D3::JSObject alive;
+  D3::ToolTip * tip;
+  D3::JSONDataset * data;
+
   int next_pos;
   int next_parent = 0;
   int next_child;
   std::string next_genome;
 
+  std::function<std::string(LineageTreeNode, int, int)> color_fun = [](LineageTreeNode d, int i = 0, int k = 0){
+    if (d.alive()){
+      return "red";
+    } else if (d.persist()) {
+      return "blue";
+    } else {
+      return "black";
+    }
+  };
+
+  std::function<std::string(LineageTreeNode, int, int)> tooltip_display = [](LineageTreeNode d, int i = 0, int k = 0) {
+    return "Name: " + to_string(d.name());
+};
+
   LineageVisualization(int width, int height) : D3Visualization(width, height){variables.push_back("Persist");}
 
   virtual void Setup() {
+    JSWrap(color_fun, GetID()+"color_fun");
+    JSWrap(tooltip_display, GetID()+"tooltip_display");
+
+    data = new D3::JSONDataset();
+    tip = new D3::ToolTip(GetID()+"tooltip_display");
     GetSVG()->Move(0,0);
-    tree.data.Append(std::string("{\"name\": 0, \"parent\": \"null\", \"alive\":false, \"persist\":false, \"genome\":\"none\", \"children\" : []}"));
+    data->Append(std::string("{\"name\": 0, \"parent\": \"null\", \"alive\":false, \"persist\":false, \"genome\":\"none\", \"children\" : []}"));
+    tree.SetDataset(data);
     tree.SetSize(GetHeight(), GetWidth());
+
     EM_ASM_ARGS({
       js.objects[$0] = [js.objects[$1][0]];
-    }, alive.GetID(), tree.data.GetID());
+  }, alive.GetID(), data->GetID());
   }
 
   virtual void AnimateStep(emp::vector<double> persist) {
@@ -411,14 +440,14 @@ public:
     for (double val : persist) {
       EM_ASM_ARGS({
         js.objects[$1](js.objects[$0][0], $2).persist = true;
-      }, tree.data.GetID(), tree.data.FindInHierarchy.GetID(), val);
+    }, data->GetID(), data->FindInHierarchy.GetID(), val);
 
     }
   }
 
   virtual void AnimateStep(int parent, int child){
     std::string child_json = std::string("{\"name\":" + to_string(child) + ", \"parent\":" + to_string(parent) + ", \"alive\":true, \"persist\":false, \"genome\":\"" + next_genome + "\", \"children\":[]}");
-    int pos = tree.data.AppendNestedFromList(child_json, alive);
+    int pos = data->AppendNestedFromList(child_json, alive);
 
     EM_ASM_ARGS({
         while (js.objects[$0].length < $1 + 1) {
@@ -428,7 +457,9 @@ public:
         js.objects[$0][$1] = js.objects[$0][$2].children[js.objects[$0][$2].children.length-1];
     }, alive.GetID(), next_pos, pos);
 
-    tree.Update(*GetSVG());
+    D3::Selection nodeEnter = tree.GenerateNodesAndLinks(*GetSVG());
+    nodeEnter.Append("circle").SetAttr("r", 2).AddToolTip(*tip);
+    GetSVG()->SelectAll("g.node").SelectAll("circle").SetStyle("fill", GetID()+"color_fun");
   }
 
   void RecordPlacement(int pos) {
