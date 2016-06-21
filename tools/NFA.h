@@ -3,6 +3,97 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  A Non-deterministic Finite Automata simulator
+//
+//
+//  To build a standard NFA, use emp::NFA.  If you want to have more symbols or more stop states,
+//  use emp::tNFA<S,T> where S is the number of symbols and T is the type used for stop.
+//  (defaults are 128 for ASCII-128 and uint8_t respectively.)
+//
+//  The constructor can take as parameters the number of states and the id of the start state (both
+//  default to 0)
+//
+//  int GetSize() const
+//    return the current number of states.
+//
+//  std::set<int> GetStart() const
+//    return start state and all others reachable through empty transitions.
+//
+//  std::set<int> GetNext(int sym, int from_id=0) const
+//  std::set<int> GetNext(int sym, const std::set<int> from_set) const
+//    return the states reachable from the current state or set of state given the provided symbol.
+//
+//  bool HasFreeTransitions(int id) const
+//  bool HasSymTransitions(int id) const
+//    Does the provided state has free transitions or symbol-transitions (respecitvely)?
+//
+//  opts_t GetSymbolOptions(const std::set<int> & test_set) const
+//    Return an emp::BitSet indicating the symbols available from the provided set of states.
+//
+//  void Resize(int new_size)
+//    Change the number of available states.
+//
+//  int AddNewState()
+//    Add a new state into the NFA and return its id.
+//
+//  void AddTransition(int from, int to, int sym)
+//  void AddTransition(int from, int to, const std::string & sym_set)
+//  void AddTransition(int from, int to, const BitSet<NUM_SYMBOLS> & sym_set)
+//    Add a transition between states 'from' and 'to' that can be taken with the provided symbols.
+//
+//  void AddFreeTransition(int from, int to)
+//    Create a free transition between 'from' and 'to'.
+//
+//  void SetStop(int state, stop_t stop_val=1)
+//    Set the specified state to be a stop state (with an optional stop value.)
+//
+//  stop_t GetStop(int state) const
+//     Return the stop value associated with the specified state.
+//
+//  bool IsStart(int state) const
+//  bool IsStop(int state) const
+//  bool IsEmpty(int state) const
+//    Testing types of states:
+//    START -> This is where the NFA begins (may have free transitions to other states)
+//    STOP -> A legal endpoint for the NFA.
+//    EMPTY -> A state with only empty transitions from it, and not stop state.
+//
+//  void Print() const
+//    Output the structure of this NFA.
+//
+//
+//  NFAs can also be manipulated using emp::NFA_State objects (or emp::tNFA_State).  Its
+//  constructor must be provided with the NFA it should track and it will being in the start state.
+//
+//  const tNFA<NUM_SYMBOLS,STOP_TYPE> & GetNFA() const
+//    Return the NFA being used.
+//
+//  const std::set<int> & GetStateSet() const
+//    Return the current set of states accessible with the symbols provided.
+//
+//  bool IsActive() const
+//    Are the current set of states "active" (that is, legal)
+//
+//  bool IsStop() const
+//    Are any of the current states STOP states?
+//
+//  void SetStateSet(const std::set<int> & in)
+//    Change the current set of state to the ones specified.
+//
+//  void Reset()
+//    Reset to the start state.
+//
+//  void Next(int sym)
+//  void Next(const std::string & sym_set)
+//    From the current set of states advance to the next set of states that would be possible
+//    given the symbols provided.
+//
+//  void Print()
+//    Output the current set of states being used.
+// 
+//
+//  Note: DFA's use SetTransition(), but NFA's use AddTransition.  This distinction is intentional
+//        since in a DFA a second SetTransition with the same start state and symbol will override
+//        first, while in an NFA a second AddTransition will always add a new option.
 
 #ifndef EMP_NFA_H
 #define EMP_NFA_H
@@ -153,19 +244,19 @@ namespace emp {
           std::cout << "free to:";
           for (int f : states[i].free_to) std::cout << " " << f;
         }
-        if (IsStop(i)) std::cout << " STOP(" << GetStop(i) << ")";
+        if (IsStop(i)) std::cout << " STOP(" << (int) GetStop(i) << ")";
         std::cout << std::endl;
       }
     }
 
     void PrintFreeMoves() {
       for (int i = 0; i < (int) states.size(); i++) {
-        // std::cout << "Free from ( ";
+        std::cout << "Free from ( ";
         for (int x : states[i].free_from) std::cout << x << " ";
-        // std::cout << ") to " << i << std::endl;
-        // std::cout << "Free from " << i << " to ( ";
+        std::cout << ") to " << i << std::endl;
+        std::cout << "Free from " << i << " to ( ";
         for (int x : states[i].free_to) std::cout << x << " ";
-        // std::cout << ")" << std::endl;
+        std::cout << ")" << std::endl;
       }
     }
   };
