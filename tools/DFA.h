@@ -38,6 +38,8 @@ namespace emp {
       for (auto i = old_size; i < transitions.size(); i++) transitions[i].fill(-1);
     }
 
+    const emp::array<int, NUM_SYMBOLS> & GetTransitions(int from) const { return transitions[from]; }
+
     void SetTransition(int from, int to, int sym) {
       emp_assert(from >= 0 && from < (int) transitions.size());
       emp_assert(to >= 0 && to < (int) transitions.size());
