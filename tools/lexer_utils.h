@@ -15,6 +15,11 @@
 
 namespace emp {
 
+  // Simple echo's
+  static DFA to_DFA(const DFA & dfa) { return dfa; }
+  static NFA to_NFA(const NFA & nfa) { return nfa; }
+
+  // Systematic conversion of NFA to DFA...
   static DFA to_DFA(const NFA & nfa, int keep_invalid=false) {
     DFA dfa(1);                               // Setup zero to be the start state.
     std::map<std::set<int>, int> id_map;      // How do nfa state sets map to dfa states?
@@ -61,6 +66,20 @@ namespace emp {
     return dfa;
   }
 
+  // Systematic up-conversion of DFA to NFA...
+  static NFA to_NFA(const DFA & dfa) {
+    NFA nfa(dfa.GetSize());
+    for (int from = 0; from < dfa.GetSize(); from++) {
+      auto t = dfa.GetTransitions(from);
+      for (int sym = 0; sym < (int) t.size(); sym++) {
+        if (t[sym] == -1) continue;
+        nfa.AddTransition(from, t[sym], sym);
+      }
+    }
+    return nfa;
+  }
+
+  // Simple conversion of RegEx to NFA (mostly implemented in RegEx)
   static NFA to_NFA(const RegEx & regex) {
     NFA nfa(2);  // State 0 = start, state 1 = stop.
     nfa.SetStop(1);
@@ -68,9 +87,9 @@ namespace emp {
     return nfa;
   }
 
+  // Conversion of RegEx to DFA, via NFA intermediate.
   static DFA to_DFA(const RegEx & regex) {
-    NFA nfa = to_NFA(regex);
-    return to_DFA(nfa);
+    return to_DFA( to_NFA(regex) );
   }
 }
 
