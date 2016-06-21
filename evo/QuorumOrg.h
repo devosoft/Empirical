@@ -31,21 +31,22 @@ namespace emp {
 namespace evo {
 
 struct QuorumOrgGenome {
-protected:
   int lineage = -1;
-public: 
   double co_op_prob;
   double ai_radius;
   double quorum_threshold;
+  bool can_make_HiAI;
 
   QuorumOrgGenome () {
     co_op_prob = 0;
     ai_radius = 10;
     quorum_threshold = 1;
+    can_make_HiAI = false;
   }
 
-  QuorumOrgGenome(double cprob, double airad, double qthresh, int lin) :
-    co_op_prob(cprob), ai_radius(airad), quorum_threshold(qthresh), lineage(lin){};
+  QuorumOrgGenome(double cprob, double airad, double qthresh, int lin, bool cmha) :
+    co_op_prob(cprob), ai_radius(airad), quorum_threshold(qthresh), lineage(lin),
+    can_make_HiAI(cmha){};
 
   // prints co-op prob, ai_gen_prob, quorum_thresh
   void print (std::ostream & out) {
@@ -63,7 +64,8 @@ public:
 bool operator== (QuorumOrgGenome const & lhs, QuorumOrgGenome const & rhs) {
   return (lhs.co_op_prob == rhs.co_op_prob &&
           lhs.ai_radius == rhs.ai_radius &&
-          lhs.quorum_threshold == rhs.quorum_threshold);
+          lhs.quorum_threshold == rhs.quorum_threshold &&
+          lhs.can_make_HiAI == rhs.can_make_HiAI);
 }
 
 
@@ -113,8 +115,9 @@ public:
     mutate = false;
   };
 
-  QuorumOrgState (double cprob, double aprob, double qthresh, bool mut, unsigned int pts, int lin=-1) :
-    genome(cprob, aprob, qthresh, lin), mutate(mut), points(pts) {
+  QuorumOrgState (double cprob, double aprob, double qthresh, bool mut, 
+                  unsigned int pts, int lin=-1, bool cmha = false) :
+    genome(cprob, aprob, qthresh, lin, cmha), mutate(mut), points(pts) {
  
     age = 0;
     loc = 0;
@@ -126,7 +129,8 @@ public:
   QuorumOrgState (const QuorumOrgState & other) : genome(other.genome.co_op_prob,
                                                   other.genome.ai_radius,
                                                   other.genome.quorum_threshold,
-                                                  other.genome.get_lineage()),
+                                                  other.genome.get_lineage(),
+                                                  other.genome.can_make_HiAI),
                                                   hi_density(false), mutate(other.mutate), 
                                                   points(0), age(0), loc(0), num_offspring(0) {
   }
@@ -167,17 +171,18 @@ class QuorumOrganism {
 
 public:
   static emp::Random * random;
-  static int num_to_donate, needed_to_reproduce, cost_to_donate;
+  static unsigned int num_to_donate, needed_to_reproduce, cost_to_donate;
   static double mutation_amount;
 
-  static const double initial_configurations[4][4];
+  static const QuorumOrgGenome initial_configurations[4];
   // access specifiers are really annoying. 
   QuorumOrgState state;
   QuorumOrganism () {};
 
   // Config constructor
-  QuorumOrganism (double cprob, double airad, double qthresh, bool mut, unsigned int pts, int lin=-1) {
-    this->QuorumOrganism::state = QuorumOrgState(cprob, airad, qthresh, mut, pts, lin);
+  QuorumOrganism (double cprob, double airad, double qthresh, bool mut, 
+                  unsigned int pts, int lin=-1, bool cmha = false) {
+    this->QuorumOrganism::state = QuorumOrgState(cprob, airad, qthresh, mut, pts, lin, cmha);
   }
 
   QuorumOrganism (const QuorumOrganism & other) {
@@ -203,11 +208,9 @@ public:
     else {return false;}
   }
 
-
   bool mutate() {
     return mutate(*(this->random));
   }
-
 
   // utility/accessor methods
   void set_state (QuorumOrgState new_state) {state = new_state;}
@@ -217,7 +220,10 @@ public:
   unsigned int add_points(unsigned int points) {return state.add_points(points);}
   unsigned int get_points() {return state.get_points();}
   void set_density(bool hd) {state.hi_density = hd;}
-  bool set_density(double q) { return state.hi_density = (q > state.genome.quorum_threshold);}
+  bool set_density(double q) { 
+    state.hi_density = (q > state.genome.quorum_threshold);
+    return state.hi_density = state.hi_density && state.genome.can_make_HiAI;
+  }
   bool hi_density () const {return state.hi_density;}
   unsigned int get_fitness() {return state.get_points();}
 
@@ -258,17 +264,22 @@ std::ostream & operator << (std::ostream & out, QuorumOrganism & org) {
 }
 
 
+const QuorumOrgGenome standard_genome = QuorumOrgGenome(0.5, 10, 1, 0, true);
+const QuorumOrgGenome defector_genome = QuorumOrgGenome(0, 10, 1, 1, false);
+const QuorumOrgGenome cooperator_genome = QuorumOrgGenome(1, 10, 1, 2, true);
+const QuorumOrgGenome scrooge_genome = QuorumOrgGenome(0.015, 10, 1, 3, true);
+
 /// selection of standardized starting configurations for QOrgs
-const double QuorumOrganism::initial_configurations[4][4]  = {
-    {0.5, 10, 1, 0}, // Standard
-    {0, 10, 1, 1}, // defector
-    {1, 10, 1, 2},// donator (effectively sterile)
-    {0.015, 10, 1, 3} 
+const QuorumOrgGenome QuorumOrganism::initial_configurations[4] = {
+  standard_genome,
+  defector_genome,
+  cooperator_genome,
+  scrooge_genome
 };
 
-int QuorumOrganism::num_to_donate;
-int QuorumOrganism::cost_to_donate;
-int QuorumOrganism::needed_to_reproduce;
+unsigned int QuorumOrganism::num_to_donate;
+unsigned int QuorumOrganism::cost_to_donate;
+unsigned int QuorumOrganism::needed_to_reproduce;
 double QuorumOrganism::mutation_amount;
 emp::Random * QuorumOrganism::random;
 

@@ -98,20 +98,23 @@ int main(int argc, char* argv[]) {
 
     unsigned int i = 0;
     for(; (double) i / pop_size < config.PERCENT_DEFECTOR(); i++) {
-      QOrg * org = new QOrg(QOrg::initial_configurations[1][0], // defector
-                            QOrg::initial_configurations[1][1], 
-                            QOrg::initial_configurations[1][2], 
+      QOrg * org = new QOrg(QOrg::initial_configurations[1].co_op_prob, // defector
+                            QOrg::initial_configurations[1].ai_radius, 
+                            QOrg::initial_configurations[1].quorum_threshold, 
                             config.ENABLE_MUTATION(), 0,
-                            QOrg::initial_configurations[1][3]); // liniage tag
+                            QOrg::initial_configurations[1].lineage,
+                            QOrg::initial_configurations[1].can_make_HiAI); // liniage tag
       org->set_id(Qpop.SequentialInsert(org));
     }
 
+    unsigned chosen = config.INITIAL_CONFIG();
     for(; i < pop_size; i++) {
-      QOrg * org = new QOrg(QOrg::initial_configurations[config.INITIAL_CONFIG()][0], // donator
-                            QOrg::initial_configurations[config.INITIAL_CONFIG()][1], 
-                            QOrg::initial_configurations[config.INITIAL_CONFIG()][2], 
+      QOrg * org = new QOrg(QOrg::initial_configurations[chosen].co_op_prob, // donator
+                            QOrg::initial_configurations[chosen].ai_radius, 
+                            QOrg::initial_configurations[chosen].quorum_threshold, 
                             config.ENABLE_MUTATION(), 0,
-                            QOrg::initial_configurations[config.INITIAL_CONFIG()][3]);
+                            QOrg::initial_configurations[chosen].lineage,
+                            QOrg::initial_configurations[chosen].can_make_HiAI);
       org->set_id(Qpop.SequentialInsert(org));
     }
 
