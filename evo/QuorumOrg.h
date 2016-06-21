@@ -264,10 +264,10 @@ std::ostream & operator << (std::ostream & out, QuorumOrganism & org) {
 }
 
 
-const QuorumOrgGenome standard_genome = QuorumOrgGenome(0.5, 10, 1, 0, true);
-const QuorumOrgGenome defector_genome = QuorumOrgGenome(0, 10, 1, 1, false);
-const QuorumOrgGenome cooperator_genome = QuorumOrgGenome(1, 10, 1, 2, true);
-const QuorumOrgGenome scrooge_genome = QuorumOrgGenome(0.015, 10, 1, 3, true);
+const QuorumOrgGenome standard_genome = QuorumOrgGenome(0.5, 10, 8, 0, true);
+const QuorumOrgGenome defector_genome = QuorumOrgGenome(0, 10, 8, 1, false);
+const QuorumOrgGenome cooperator_genome = QuorumOrgGenome(1, 10, 8, 2, true);
+const QuorumOrgGenome scrooge_genome = QuorumOrgGenome(0.015, 10, 8, 3, true);
 
 /// selection of standardized starting configurations for QOrgs
 const QuorumOrgGenome QuorumOrganism::initial_configurations[4] = {
