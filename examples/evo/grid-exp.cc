@@ -52,9 +52,8 @@ int main(int argc, char* argv[])
   const int POP_SIZE = config.POP_SIZE();
   const int UD_COUNT = config.MAX_GENS();
 
-  emp::Random rand_const(1234567);
   emp::Random random(config.SEED());
-  emp::evo::NKLandscape landscape(N, K, rand_const);
+  emp::evo::NKLandscape landscape(N, K, random);
 
   std::string prefix;
   prefix = config.NAME();
