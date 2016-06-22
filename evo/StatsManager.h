@@ -292,6 +292,7 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
       void Setup(WORLD * w){
           pop = &(w->popM);
           lin_ptr = &(w->lineageM);
+          MLandscape * data = new MLandscape();
 
           // Create std::function object for all stats
           std::function<double(POP_MANAGER*)> diversity = [](POP_MANAGER * pop){
@@ -307,25 +308,21 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
           fit_stat_type non_inf = [](fit_fun_type fit_func, POP_MANAGER * pop){
               return NonInf(fit_func, *pop);
           };
-          fit_stat_type ben_mut = [](fit_fun_type fit_func, POP_MANAGER * pop){
-              MLandscape data = MutLandscape(fit_func, *pop);
-              return data.benefit_avg;
+          fit_stat_type ben_mut = [data](fit_fun_type fit_func, POP_MANAGER * pop){
+              *data = MutLandscape(fit_func, *pop);
+              return data->benefit_avg;
           };
-          fit_stat_type neu_mut = [](fit_fun_type fit_func, POP_MANAGER * pop){
-              MLandscape data = MutLandscape(fit_func, *pop);
-              return data.neutral_avg;
+          fit_stat_type neu_mut = [data](fit_fun_type fit_func, POP_MANAGER * pop){
+              return data->neutral_avg;
           };
-          fit_stat_type det_mut = [](fit_fun_type fit_func, POP_MANAGER * pop){
-              MLandscape data = MutLandscape(fit_func, *pop);
-              return data.det_avg;
+          fit_stat_type det_mut = [data](fit_fun_type fit_func, POP_MANAGER * pop){
+              return data->det_avg;
           };
-          fit_stat_type max_ben = [](fit_fun_type fit_func, POP_MANAGER * pop){
-              MLandscape data = MutLandscape(fit_func, *pop);
-              return data.max_ben;
+          fit_stat_type max_ben = [data](fit_fun_type fit_func, POP_MANAGER * pop){
+              return data->max_ben;
           };
-          fit_stat_type max_det = [](fit_fun_type fit_func, POP_MANAGER * pop){
-              MLandscape data = MutLandscape(fit_func, *pop);
-              return data.max_det;
+          fit_stat_type max_det = [data](fit_fun_type fit_func, POP_MANAGER * pop){
+              return data->max_det;
           };
           std::function<double(POP_MANAGER*)> last_coal = [this](POP_MANAGER * pop){
               int a_id = this->lin_ptr->last_coalesence;
