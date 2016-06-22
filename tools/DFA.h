@@ -14,18 +14,22 @@
 
 namespace emp {
 
-  class DFA {
+  template <int NUM_SYMBOLS=128, typename STOP_TYPE=uint8_t>
+  class tDFA {
   private:
-    constexpr static int NUM_SYMBOLS = 128;
     emp::vector< emp::array<int, NUM_SYMBOLS> > transitions;
-    emp::vector< char > is_stop;  // 0=no 1=yes (char instead of bool for speed)
+    emp::vector< STOP_TYPE > is_stop;  // 0=not stop; other values for STOP return value.
   public:
-    DFA(int num_states=0) : transitions(num_states), is_stop(num_states, 0) {
+    tDFA(int num_states=0) : transitions(num_states), is_stop(num_states, 0) {
       for (auto & t : transitions) t.fill(-1);
     }
-    DFA(const DFA &) = default;
-    ~DFA() { ; }
-    DFA & operator=(const DFA &) = default;
+    tDFA(const tDFA<NUM_SYMBOLS, STOP_TYPE> &) = default;
+    ~tDFA() { ; }
+    tDFA<NUM_SYMBOLS, STOP_TYPE> & operator=(const tDFA<NUM_SYMBOLS, STOP_TYPE> &) = default;
+
+    using stop_t = STOP_TYPE;
+
+    int GetSize() const { return (int) transitions.size(); }
 
     void Resize(int new_size) {
       auto old_size = transitions.size();
@@ -34,6 +38,8 @@ namespace emp {
       for (auto i = old_size; i < transitions.size(); i++) transitions[i].fill(-1);
     }
 
+    const emp::array<int, NUM_SYMBOLS> & GetTransitions(int from) const { return transitions[from]; }
+
     void SetTransition(int from, int to, int sym) {
       emp_assert(from >= 0 && from < (int) transitions.size());
       emp_assert(to >= 0 && to < (int) transitions.size());
@@ -41,7 +47,13 @@ namespace emp {
       transitions[from][sym] = to;
     }
 
-    void SetStop(int state) { is_stop[state] = 1; }
+    void SetStop(int state, stop_t stop_val=1) {
+      emp_assert(state >= -1 && state < (int) transitions.size());
+      is_stop[state] = stop_val;
+    }
+    stop_t GetStop(int state) const { return (state == -1) ? 0 : is_stop[state]; }
+    bool IsActive(int state) const { return state != -1; }
+    bool IsStop(int state) const { return (state == -1) ? false : is_stop[state]; }
 
     int Next(int state, int sym) const {
       emp_assert(state >= -1 && state < (int) transitions.size());
@@ -49,13 +61,31 @@ namespace emp {
       return (state == -1) ? -1 : transitions[state][sym];
     }
 
-    int Next(int state, std::string sym_set) {
+    int Next(int state, std::string sym_set) const {
       for (char x : sym_set) state = Next(state, x);
       return state;
     }
 
-    bool IsStop(int state) const { return is_stop[state]; }
+    void Print() {
+      std::cout << "Num states = " << GetSize() << std::endl;
+      std::cout << "Start = 0; Stop =";
+      for (int i = 0; i < GetSize(); i++) if(IsStop(i)) std::cout << " " << i;
+      std::cout << std::endl;
+
+      for (int i = 0; i < (int) transitions.size(); i++) {
+        std::cout << " " << i << " ->";
+        for (int s = 0; s < NUM_SYMBOLS; s++) {
+          if (transitions[i][s] == -1) continue;
+          std::cout << " " << ((char) s) << ":" << transitions[i][s];
+        }
+        std::cout << std::endl;
+      }
+
+    }
+
   };
+
+  using DFA = tDFA<128, char>;
 
 }
 

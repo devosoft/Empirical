@@ -80,7 +80,7 @@ namespace emp {
       AddPattern("FLOAT_LIT", "[0-9]+[.]'[0-9]+", Token::FLOAT_LIT);
       AddPattern("CHAR_LIT", "'(.|(\\\\[\\\\'nt]))'", Token::CHAR_LIT);
 
-      AddPattern("STRING_LIT", "[\"](\\[nt\"\\]|[^\\\"])*\"", Token::STRING_LIT);
+      AddPattern("STRING_LIT", "[\"](\\\\[nt\"\\]|[^\\\"])*\"", Token::STRING_LIT);
       AddPattern("ID", "[a-zA-Z0-9_]+", Token::ID);
 
       // The rest are completely determined by their type.
