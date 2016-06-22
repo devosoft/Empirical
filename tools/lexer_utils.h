@@ -3,6 +3,18 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  A set of utilities to convert among RegEx, NFA, DFA, and fully lexers.
+//
+//  Available conversions:
+//
+//   static DFA to_DFA(const DFA & dfa)
+//   static DFA to_DFA(const NFA & nfa, int keep_invalid=false)
+//   static DFA to_DFA(const RegEx & regex)
+//
+//   static NFA to_NFA(const DFA & dfa)
+//   static NFA to_NFA(const NFA & nfa)}
+//   static NFA to_NFA(const RegEx & regex, int stop_id=1)
+
+
 
 #ifndef EMP_LEXER_UTILS_H
 #define EMP_LEXER_UTILS_H
@@ -34,8 +46,8 @@ namespace emp {
       const int cur_id = id_map[cur_state];
       state_stack.pop_back();
 
-      // Dtermine is this state should be a STOP state.
-      for (int s : cur_state) if (nfa.IsStop(s)) { dfa.SetStop(cur_id, nfa.GetStop(s)); break; }
+      // Determine is this state should be a STOP state and always use HIGHEST stop value.
+      for (int s : cur_state) dfa.AddStop(cur_id, nfa.GetStop(s));
 
       // Run through all possible transitions
       for (int sym = 0; sym < NFA::NUM_SYMBOLS; sym++) {
