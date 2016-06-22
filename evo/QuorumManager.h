@@ -34,7 +34,9 @@ namespace evo {
     // we require that the base class has a get_neighbors methods
 
   protected:
-    
+    using POP_MANAGER<QuorumOrganism>::pop;
+    int spacing = -1;
+
     /// calculates quorum and updates state.hi_density  
     double calculate_quorum (std::set<QuorumOrganism *> & neighbors) {
       double active_neighbors = 0;
@@ -60,7 +62,9 @@ namespace evo {
     }
 
 public:
+
     static int hi_weight, lo_weight, ai_radius;
+    
     QuorumManager () {
       POP_MANAGER<QuorumOrganism>();
       }
@@ -68,7 +72,35 @@ public:
     void SetRandom(Random * rand) {
       random_ptr = rand;
       QuorumOrganism::random = rand;
-    } 
+    }
+
+    void SpacedSeed(double grid_density, int num_locs, QuorumOrgGenome const * seed, bool mut,
+                    double alt_density = 0, QuorumOrgGenome const * alt_seed = nullptr) {
+      // sanity check
+      if(alt_density > 0) { assert(alt_seed != nullptr && "Must have non-null alt-seed when alt-density specified!");}
+      
+      int spacing = grid_density * num_locs; // determine how far to space seeded organisms
+      int position = 0, num_placed = 0, num_alt = 0;
+      num_alt = spacing * alt_density;
+      QuorumOrganism * org;
+
+      while(position < pop.size()) {
+        if(alt_density > 0 && num_placed % num_alt == 0) {
+          org = new QuorumOrganism(alt_seed->co_op_prob, alt_seed->ai_radius, 
+                                   alt_seed->quorum_threshold, mut, 0, alt_seed->lineage, 
+                                   alt_seed->can_make_HiAI);
+        } else {
+          org = new QuorumOrganism(seed->co_op_prob, seed->ai_radius,seed->quorum_threshold, mut, 
+                                   0, seed->lineage, seed->can_make_HiAI);
+        }
+
+        pop[position] = org;
+        pop[position]->set_id(position);
+        position += spacing;
+        num_placed++;
+      }
+
+    }
 
     // minor override to the parent class to save the orgs location to the org
     unsigned int AddOrg (QuorumOrganism * org) {

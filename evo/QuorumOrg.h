@@ -224,7 +224,7 @@ public:
     state.hi_density = (q > state.genome.quorum_threshold);
     return state.hi_density = state.hi_density && state.genome.can_make_HiAI;
   }
-  bool hi_density () const {return state.hi_density;}
+  bool hi_density () const {return state.hi_density && state.genome.can_make_HiAI;}
   unsigned int get_fitness() {return state.get_points();}
 
   // methods for interacting with the world / neighbors
@@ -264,10 +264,10 @@ std::ostream & operator << (std::ostream & out, QuorumOrganism & org) {
 }
 
 
-const QuorumOrgGenome standard_genome = QuorumOrgGenome(0.5, 10, 8, 0, true);
-const QuorumOrgGenome defector_genome = QuorumOrgGenome(0, 10, 8, 1, false);
-const QuorumOrgGenome cooperator_genome = QuorumOrgGenome(1, 10, 8, 2, true);
-const QuorumOrgGenome scrooge_genome = QuorumOrgGenome(0.015, 10, 8, 3, true);
+const QuorumOrgGenome standard_genome = QuorumOrgGenome(0.5, 10, 80, 0, true);
+const QuorumOrgGenome defector_genome = QuorumOrgGenome(0, 10, 80, 1, false);
+const QuorumOrgGenome cooperator_genome = QuorumOrgGenome(1, 10, 80, 2, true);
+const QuorumOrgGenome scrooge_genome = QuorumOrgGenome(0.015, 10, 80, 3, true);
 
 /// selection of standardized starting configurations for QOrgs
 const QuorumOrgGenome QuorumOrganism::initial_configurations[4] = {

@@ -96,27 +96,11 @@ int main(int argc, char* argv[]) {
 
     config.Write("quorum.cfg");
 
-    unsigned int i = 0;
-    for(; (double) i / pop_size < config.PERCENT_DEFECTOR(); i++) {
-      QOrg * org = new QOrg(QOrg::initial_configurations[1].co_op_prob, // defector
-                            QOrg::initial_configurations[1].ai_radius, 
-                            QOrg::initial_configurations[1].quorum_threshold, 
-                            config.ENABLE_MUTATION(), 0,
-                            QOrg::initial_configurations[1].lineage,
-                            QOrg::initial_configurations[1].can_make_HiAI); // liniage tag
-      org->set_id(Qpop.SequentialInsert(org));
-    }
-
-    unsigned chosen = config.INITIAL_CONFIG();
-    for(; i < pop_size; i++) {
-      QOrg * org = new QOrg(QOrg::initial_configurations[chosen].co_op_prob, // donator
-                            QOrg::initial_configurations[chosen].ai_radius, 
-                            QOrg::initial_configurations[chosen].quorum_threshold, 
-                            config.ENABLE_MUTATION(), 0,
-                            QOrg::initial_configurations[chosen].lineage,
-                            QOrg::initial_configurations[chosen].can_make_HiAI);
-      org->set_id(Qpop.SequentialInsert(org));
-    }
+    // seed the grid
+    Qpop.popM.SpacedSeed(0.1, config.GRID_X() * config.GRID_Y(), 
+                         &QOrg::initial_configurations[config.INITIAL_CONFIG()],
+                         config.ENABLE_MUTATION(), config.PERCENT_DEFECTOR(), 
+                         &QOrg::initial_configurations[1]);
 
     // mutation is handled automatically by the population QPop_Manager, currently
     // I'm getting the sense that it probably shouldn't be.
@@ -200,6 +184,7 @@ int main(int argc, char* argv[]) {
    };
 
     auto config_ptr = &config; 
+    
     std::function<double()>percent_donator_lin=[underlying, config_ptr] () {
     int count = 0;
       int num_orgs = 0;
@@ -213,12 +198,24 @@ int main(int argc, char* argv[]) {
       return (double) count / (double) num_orgs;
    };
 
+  std::function<double()>used_grid_capacity=[underlying, config_ptr] () {
+    int num_orgs = 0;
+
+    for(auto org : (*underlying)) {
+      if(org != nullptr) {
+        num_orgs++;
+      }
+    }
+    return (double) num_orgs / (config_ptr->GRID_X() * config_ptr->GRID_Y());
+  };
+
     Qstats.AddFunction(age_func, "avg_age");
     Qstats.AddFunction(max_age_func, "max_age");
     Qstats.AddFunction(avg_coop_chance, "avg_coop");
     Qstats.AddFunction(avg_points, "avg_points"); 
     Qstats.AddFunction(percent_defector_lin, "percent_defector");
     Qstats.AddFunction(percent_donator_lin, init_config_names[config.INITIAL_CONFIG()]);
+    Qstats.AddFunction(used_grid_capacity, "grid_usage");
 
     unsigned int checkpoint = 0;
     
