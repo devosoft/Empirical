@@ -6,12 +6,12 @@
 //
 //  Available conversions:
 //
-//   static DFA to_DFA(const DFA & dfa)
+//   static const DFA & to_DFA(const DFA & dfa)
 //   static DFA to_DFA(const NFA & nfa, int keep_invalid=false)
 //   static DFA to_DFA(const RegEx & regex)
 //
 //   static NFA to_NFA(const DFA & dfa)
-//   static NFA to_NFA(const NFA & nfa)}
+//   static const NFA & to_NFA(const NFA & nfa)}
 //   static NFA to_NFA(const RegEx & regex, int stop_id=1)
 
 
@@ -28,8 +28,8 @@
 namespace emp {
 
   // Simple echo's
-  static DFA to_DFA(const DFA & dfa) { return dfa; }
-  static NFA to_NFA(const NFA & nfa) { return nfa; }
+  static const DFA & to_DFA(const DFA & dfa) { return dfa; }
+  static const NFA & to_NFA(const NFA & nfa) { return nfa; }
 
   // Systematic conversion of NFA to DFA...
   static DFA to_DFA(const NFA & nfa, int keep_invalid=false) {
@@ -46,7 +46,7 @@ namespace emp {
       const int cur_id = id_map[cur_state];
       state_stack.pop_back();
 
-      // Determine is this state should be a STOP state and always use HIGHEST stop value.
+      // Determine if this state should be a STOP state and always use HIGHEST stop value.
       for (int s : cur_state) dfa.AddStop(cur_id, nfa.GetStop(s));
 
       // Run through all possible transitions
@@ -103,6 +103,13 @@ namespace emp {
   // Conversion of RegEx to DFA, via NFA intermediate.
   static DFA to_DFA(const RegEx & regex) {
     return to_DFA( to_NFA(regex) );
+  }
+
+  // Merge two NFAs into one.
+  static NFA to_NFA(const NFA & nfa1, const NFA & nfa2) {
+    NFA nfa_out(nfa1);   // Start out identical to nfa1.
+    nfa_out.Merge(nfa2); // Merge in nfa2;
+    return nfa_out;
   }
 }
 
