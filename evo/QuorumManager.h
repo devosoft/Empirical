@@ -78,17 +78,26 @@ public:
                     double alt_density = 0, QuorumOrgGenome const * alt_seed = nullptr) {
       // sanity check
       if(alt_density > 0) { assert(alt_seed != nullptr && "Must have non-null alt-seed when alt-density specified!");}
-      
-      int spacing = grid_density * num_locs; // determine how far to space seeded organisms
-      int position = 0, num_placed = 0, num_alt = 0;
-      num_alt = spacing * alt_density;
+     
+      int num_placed = 0, position = 0, num_alt_placed = 0;
+      // there are (num_locs * grid_density) # of slots that'll be occupied w/ orgs
+      // they are `spacing` distance apart
+      int num_to_place = num_locs * grid_density;
+      int spacing = num_locs / num_to_place;
+
+      // there are (num_locs * grid_density * alt_density) # spaces that'll be occupied
+      // w/ alt orgs
+      int num_alt = num_to_place * alt_density;
+      int alt_spacing = 3;
+
       QuorumOrganism * org;
 
       while(position < pop.size()) {
-        if(alt_density > 0 && num_placed % num_alt == 0) {
+        if(alt_density > 0 && (double) num_alt_placed / (double) num_to_place < alt_density) {
           org = new QuorumOrganism(alt_seed->co_op_prob, alt_seed->ai_radius, 
                                    alt_seed->quorum_threshold, mut, 0, alt_seed->lineage, 
                                    alt_seed->can_make_HiAI);
+          num_alt_placed++;
         } else {
           org = new QuorumOrganism(seed->co_op_prob, seed->ai_radius,seed->quorum_threshold, mut, 
                                    0, seed->lineage, seed->can_make_HiAI);

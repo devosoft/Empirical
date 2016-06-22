@@ -20,6 +20,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <fstream>
 
 using QOrg = emp::evo::QuorumOrganism;
 
@@ -70,6 +71,9 @@ int main(int argc, char* argv[]) {
     if (args.TestUnknown() == false) {exit(0);}
     
     if (config.PREFIX() != "") {prefix = config.PREFIX() + "-";}
+    
+    
+
     QWorld<QOrg, FOUNDATION> Qpop(&dice);
     Qpop.ConfigPop(config.GRID_X(), config.GRID_Y());
 
@@ -97,7 +101,7 @@ int main(int argc, char* argv[]) {
     config.Write("quorum.cfg");
 
     // seed the grid
-    Qpop.popM.SpacedSeed(0.1, config.GRID_X() * config.GRID_Y(), 
+    Qpop.popM.SpacedSeed(0.15, config.GRID_X() * config.GRID_Y(), 
                          &QOrg::initial_configurations[config.INITIAL_CONFIG()],
                          config.ENABLE_MUTATION(), config.PERCENT_DEFECTOR(), 
                          &QOrg::initial_configurations[1]);
