@@ -35,7 +35,7 @@ namespace emp {
       state_stack.pop_back();
 
       // Dtermine is this state should be a STOP state.
-      for (int s : cur_state) if (nfa.IsStop(s)) { dfa.SetStop(cur_id); break; }
+      for (int s : cur_state) if (nfa.IsStop(s)) { dfa.SetStop(cur_id, nfa.GetStop(s)); break; }
 
       // Run through all possible transitions
       for (int sym = 0; sym < NFA::NUM_SYMBOLS; sym++) {
@@ -75,14 +75,15 @@ namespace emp {
         if (t[sym] == -1) continue;
         nfa.AddTransition(from, t[sym], sym);
       }
+      if (dfa.IsStop(from)) nfa.SetStop(from, dfa.GetStop(from));
     }
     return nfa;
   }
 
   // Simple conversion of RegEx to NFA (mostly implemented in RegEx)
-  static NFA to_NFA(const RegEx & regex) {
+  static NFA to_NFA(const RegEx & regex, int stop_id=1) {
     NFA nfa(2);  // State 0 = start, state 1 = stop.
-    nfa.SetStop(1);
+    nfa.SetStop(1, stop_id);
     regex.AddToNFA(nfa, 0, 1);
     return nfa;
   }
