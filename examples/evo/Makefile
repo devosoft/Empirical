@@ -22,6 +22,7 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 TARGETS := Fitness_Share_NK link_test NK NK-const NK-Serial Symbulation World bit_evolve replica
 
 EVO_DEPEND := ../../evo/PopulationManager.h ../../evo/World.h
+QUORUM_DEPEND := ../../evo/QuorumOrganism.h ../../evo/QuorumManager.h ../../evo/PopulationManager.h
 
 default: native
 
@@ -54,6 +55,12 @@ fast-grid: grid-exp.cc ../../evo/NK.h $(EVO_DEPEND)
 
 fast-mixed: mixed-exp.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 mixed-exp.cc -o mixed-exp
+
+fast-quorum-mixed: gladiator-mixed-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 gladiator-mixed-grid-quorum.cc -o gladiator-mixed.out
+
+fast-quorum-standard: gladiator-standard-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 gladiator-standard-grid-quorum.cc -o gladiator-standard.out
 
 NK-const: NK-const.cc ../../evo/NK-const.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) NK-const.cc -o NK-const
