@@ -106,11 +106,11 @@ namespace emp {
   }
 
   // Merge two NFAs into one.
-  template <typename... T>
-  static NFA to_NFA(const NFA & nfa1, const NFA & nfa2, T &&... others ) {
-    NFA nfa_out(nfa1);   // Start out identical to nfa1.
-    nfa_out.Merge(nfa2); // Merge in nfa2;
-    return to_NFA(nfa_out, std::forward<T>(others)...);
+  template <typename T1, typename T2, typename... Ts>
+  static NFA to_NFA(T1 && in1, T2 && in2, Ts &&... others ) {
+    NFA nfa_out( to_NFA(std::forward<T1>(in1)) );   // Start out identical to nfa1.
+    nfa_out.Merge( to_NFA(std::forward<T2>(in2)) ); // Merge in nfa2;
+    return to_NFA(nfa_out, std::forward<Ts>(others)...);
   }
 }
 
