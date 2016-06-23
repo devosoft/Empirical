@@ -88,7 +88,6 @@ public:
       // there are (num_locs * grid_density * alt_density) # spaces that'll be occupied
       // w/ alt orgs
       int num_alt = num_to_place * alt_density;
-      int alt_spacing = 3;
 
       QuorumOrganism * org;
 
