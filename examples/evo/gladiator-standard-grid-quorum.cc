@@ -20,6 +20,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <fstream>
 
 using QOrg = emp::evo::QuorumOrganism;
 
@@ -37,8 +38,8 @@ using FOUNDATION = emp::evo::PopulationManager_Grid<QOrg>;
 // Consult Emily's stats stuff for reference...?
 
 EMP_BUILD_CONFIG( QuorumConfig,
-    VALUE(HI_AI_WEIGHT, int, 4, "What value should the AI production be for hi-density?"),
-    VALUE(LO_AI_WEIGHT, int, 1, "What value should the AI production be for lo-density?"),
+    VALUE(HI_AI_WEIGHT, double, .3, "What value should the AI production be for hi-density?"),
+    VALUE(LO_AI_WEIGHT, double, .1, "What value should the AI production be for lo-density?"),
     VALUE(AI_RADIUS, int, 10, "What's the radius of AI dispersal?"),
     VALUE(NUM_TO_DONATE, int, 45, "Number of points a public good is 'worth'"),
     VALUE(NEEDED_TO_REPRODUCE, int, 50, "Number of points needed for an organism to reproduce"),
@@ -70,6 +71,9 @@ int main(int argc, char* argv[]) {
     if (args.TestUnknown() == false) {exit(0);}
     
     if (config.PREFIX() != "") {prefix = config.PREFIX() + "-";}
+    
+    
+
     QWorld<QOrg, FOUNDATION> Qpop(&dice);
     Qpop.ConfigPop(config.GRID_X(), config.GRID_Y());
 
@@ -97,7 +101,7 @@ int main(int argc, char* argv[]) {
     config.Write("quorum.cfg");
 
     // seed the grid
-    Qpop.popM.SpacedSeed(0.1, config.GRID_X() * config.GRID_Y(), 
+    Qpop.popM.SpacedSeed(0.15, config.GRID_X() * config.GRID_Y(), 
                          &QOrg::initial_configurations[config.INITIAL_CONFIG()],
                          config.ENABLE_MUTATION(), config.PERCENT_DEFECTOR(), 
                          &QOrg::initial_configurations[1]);

@@ -38,8 +38,8 @@ using FOUNDATION = emp::evo::PopulationManager_MixedGrid<QOrg>;
 // Consult Emily's stats stuff for reference...?
 
 EMP_BUILD_CONFIG( QuorumConfig,
-    VALUE(HI_AI_WEIGHT, int, 4, "What value should the AI production be for hi-density?"),
-    VALUE(LO_AI_WEIGHT, int, 1, "What value should the AI production be for lo-density?"),
+    VALUE(HI_AI_WEIGHT, double, .3, "What value should the AI production be for hi-density?"),
+    VALUE(LO_AI_WEIGHT, double, .1, "What value should the AI production be for lo-density?"),
     VALUE(AI_RADIUS, int, 10, "What's the radius of AI dispersal?"),
     VALUE(NUM_TO_DONATE, int, 45, "Number of points a public good is 'worth'"),
     VALUE(NEEDED_TO_REPRODUCE, int, 50, "Number of points needed for an organism to reproduce"),

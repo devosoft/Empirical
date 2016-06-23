@@ -213,6 +213,8 @@ namespace evo {
     int ToID(int x, int y) const { return y*width + x; }
 
   public:
+    static int GetMaxPossibleInRadius(ORG * org, int radius) { return radius * radius;}
+    
     PopulationManager_Grid() { 
       ConfigPop(10,10);
       curr_ins_index = 0;
@@ -256,7 +258,8 @@ namespace evo {
 
     //TODO@JGF: a) make the rest of my todo's @'d to me
     //          b) make the function naming consistent (e.g. camel, not _'s)
-    
+
+
     std::set<ORG *> GetClusterByRadius(unsigned int focal_id, int depth) {
       std::set<unsigned int> explored;
 
