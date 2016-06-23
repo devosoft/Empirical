@@ -219,7 +219,7 @@ public:
   unsigned int get_age() {return state.get_age();}
   unsigned int add_points(unsigned int points) {return state.add_points(points);}
   unsigned int get_points() {return state.get_points();}
-  void set_density(bool hd) {state.hi_density = hd;}
+  void set_density(bool hd) {state.hi_density = hd && state.genome.can_make_HiAI;}
   bool set_density(double q) { 
     state.hi_density = (q > state.genome.quorum_threshold);
     return state.hi_density = state.hi_density && state.genome.can_make_HiAI;
@@ -228,9 +228,9 @@ public:
   unsigned int get_fitness() {return state.get_points();}
 
   // methods for interacting with the world / neighbors
-  int get_contribution (double current_quorum) {
+  int get_contribution (bool current_quorum) {
     set_density(current_quorum);
-    if (random->P(state.genome.co_op_prob) && current_quorum >= state.genome.quorum_threshold) {
+    if (random->P(state.genome.co_op_prob) && current_quorum && state.hi_density) {
       if (state.get_points() >= cost_to_donate) {
         state.remove_points(cost_to_donate);
         return num_to_donate;

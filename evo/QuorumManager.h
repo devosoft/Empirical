@@ -38,21 +38,24 @@ namespace evo {
     int spacing = -1;
 
     /// calculates quorum and updates state.hi_density  
-    double calculate_quorum (std::set<QuorumOrganism *> & neighbors) {
-      double active_neighbors = 0;
-      //unsigned int total_neighbors = 0;
+    bool calculate_quorum (std::set<QuorumOrganism *> & neighbors) {
+      int active_neighbors = 0;
+      int num_hi = 0;
+      int potential = POP_MANAGER<QuorumOrganism>::GetMaxPossibleInRadius(nullptr, ai_radius);
 
       for (auto org_iter : neighbors) {
         if (org_iter == nullptr) {continue;} // ignore nonextant orgs
-        if ( org_iter->hi_density()) {active_neighbors += hi_weight;}
-        else {active_neighbors += lo_weight;}
+        if ( org_iter->hi_density()) {num_hi++;}
+        active_neighbors++;
       }
 
-      return active_neighbors;
+      // consider quoorum to be enough hi or enough lo in potential radius
+      return (double) active_neighbors / (double) potential > lo_weight || 
+             (double) num_hi / (double) potential < hi_weight;
     }
 
     double calculate_quorum (QuorumOrganism * org) {
-      double result;    
+      bool result;    
       // for an example of an implemented get_org_neighbors see Grid pop manager.
       // PopulationManager.h:209ish
       auto neighbors = POP_MANAGER<QuorumOrganism>::get_org_neighbors(org->get_loc());
