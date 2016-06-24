@@ -21,45 +21,45 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 
 TARGETS := array DFA lexer_utils macros meta NFA Random reflection RegEx signal vector
 
-
-TOOL_DEPEND := ../../tools/assert.h
+TOOLS := ../../tools
+TOOL_DEPEND := $(TOOLS)/assert.h
 
 default: native
 
 native: $(TARGETS)
 
 
-array: array.cc ../../tools/array.h $(TOOL_DEPEND)
+array: array.cc $(TOOLS)/array.h $(TOOL_DEPEND)
 	$(CXX_native) $(CFLAGS_native) array.cc -o array
 
-DFA: DFA.cc ../../tools/DFA.h $(TOOL_DEPEND)
+DFA: DFA.cc $(TOOLS)/DFA.h $(TOOL_DEPEND)
 	$(CXX_native) $(CFLAGS_native) DFA.cc -o DFA
 
-lexer_utils: lexer_utils.cc ../../tools/lexer_utils.h $(TOOL_DEPEND)
+lexer_utils: lexer_utils.cc $(TOOLS)/lexer_utils.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
 	$(CXX_native) $(CFLAGS_native) lexer_utils.cc -o lexer_utils
 
-macros: macros.cc ../../tools/macros.h $(TOOL_DEPEND)
+macros: macros.cc $(TOOLS)/macros.h $(TOOL_DEPEND)
 	$(CXX_native) $(CFLAGS_native) macros.cc -o macros
 
-meta: meta.cc ../../tools/meta.h $(TOOL_DEPEND)
+meta: meta.cc $(TOOLS)/meta.h $(TOOL_DEPEND)
 	$(CXX_native) $(CFLAGS_native) meta.cc -o meta
 
-NFA: NFA.cc ../../tools/NFA.h $(TOOL_DEPEND)
+NFA: NFA.cc $(TOOLS)/NFA.h $(TOOL_DEPEND)
 	$(CXX_native) $(CFLAGS_native) NFA.cc -o NFA
 
-Random: Random.cc ../../tools/Random.h $(TOOL_DEPEND)
+Random: Random.cc $(TOOLS)/Random.h $(TOOL_DEPEND)
 	$(CXX_native) $(CFLAGS_native) Random.cc -o Random
 
-reflection: reflection.cc ../../tools/reflection.h $(TOOL_DEPEND)
+reflection: reflection.cc $(TOOLS)/reflection.h $(TOOL_DEPEND)
 	$(CXX_native) $(CFLAGS_native) reflection.cc -o reflection
 
-RegEx: RegEx.cc ../../tools/RegEx.h $(TOOL_DEPEND)
+RegEx: RegEx.cc $(TOOLS)/RegEx.h $(TOOL_DEPEND)
 	$(CXX_native) $(CFLAGS_native) RegEx.cc -o RegEx
 
-signal: signal.cc ../../tools/signal.h $(TOOL_DEPEND)
+signal: signal.cc $(TOOLS)/signal.h $(TOOL_DEPEND)
 	$(CXX_native) $(CFLAGS_native) signal.cc -o signal
 
-vector: vector.cc ../../tools/vector.h $(TOOL_DEPEND)
+vector: vector.cc $(TOOLS)/vector.h $(TOOL_DEPEND)
 	$(CXX_native) $(CFLAGS_native) vector.cc -o vector
 
 
