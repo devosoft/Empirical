@@ -47,10 +47,19 @@ namespace emp {
       transitions[from][sym] = to;
     }
 
+    // Function to set the stop value (no matter what it currently is)
     void SetStop(int state, stop_t stop_val=1) {
       emp_assert(state >= -1 && state < (int) transitions.size());
       is_stop[state] = stop_val;
     }
+
+    // Function to set the stop value only if it's higher than the current stop value.
+    void AddStop(int state, stop_t stop_val=1) {
+      emp_assert(state >= -1 && state < (int) transitions.size());
+      // If we are given a stop value and its higher than our previous stop, use it!
+      if (stop_val > is_stop[state]) is_stop[state] = stop_val;
+    }
+
     stop_t GetStop(int state) const { return (state == -1) ? 0 : is_stop[state]; }
     bool IsActive(int state) const { return state != -1; }
     bool IsStop(int state) const { return (state == -1) ? false : is_stop[state]; }

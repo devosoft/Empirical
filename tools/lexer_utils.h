@@ -3,6 +3,18 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  A set of utilities to convert among RegEx, NFA, DFA, and fully lexers.
+//
+//  Available conversions:
+//
+//   static const DFA & to_DFA(const DFA & dfa)
+//   static DFA to_DFA(const NFA & nfa, int keep_invalid=false)
+//   static DFA to_DFA(const RegEx & regex)
+//
+//   static NFA to_NFA(const DFA & dfa)
+//   static const NFA & to_NFA(const NFA & nfa)}
+//   static NFA to_NFA(const RegEx & regex, int stop_id=1)
+
+
 
 #ifndef EMP_LEXER_UTILS_H
 #define EMP_LEXER_UTILS_H
@@ -16,8 +28,8 @@
 namespace emp {
 
   // Simple echo's
-  static DFA to_DFA(const DFA & dfa) { return dfa; }
-  static NFA to_NFA(const NFA & nfa) { return nfa; }
+  static const DFA & to_DFA(const DFA & dfa) { return dfa; }
+  static const NFA & to_NFA(const NFA & nfa) { return nfa; }
 
   // Systematic conversion of NFA to DFA...
   static DFA to_DFA(const NFA & nfa, int keep_invalid=false) {
@@ -34,8 +46,8 @@ namespace emp {
       const int cur_id = id_map[cur_state];
       state_stack.pop_back();
 
-      // Dtermine is this state should be a STOP state.
-      for (int s : cur_state) if (nfa.IsStop(s)) { dfa.SetStop(cur_id); break; }
+      // Determine if this state should be a STOP state and always use HIGHEST stop value.
+      for (int s : cur_state) dfa.AddStop(cur_id, nfa.GetStop(s));
 
       // Run through all possible transitions
       for (int sym = 0; sym < NFA::NUM_SYMBOLS; sym++) {
@@ -75,14 +87,15 @@ namespace emp {
         if (t[sym] == -1) continue;
         nfa.AddTransition(from, t[sym], sym);
       }
+      if (dfa.IsStop(from)) nfa.SetStop(from, dfa.GetStop(from));
     }
     return nfa;
   }
 
   // Simple conversion of RegEx to NFA (mostly implemented in RegEx)
-  static NFA to_NFA(const RegEx & regex) {
+  static NFA to_NFA(const RegEx & regex, int stop_id=1) {
     NFA nfa(2);  // State 0 = start, state 1 = stop.
-    nfa.SetStop(1);
+    nfa.SetStop(1, stop_id);
     regex.AddToNFA(nfa, 0, 1);
     return nfa;
   }
@@ -90,6 +103,14 @@ namespace emp {
   // Conversion of RegEx to DFA, via NFA intermediate.
   static DFA to_DFA(const RegEx & regex) {
     return to_DFA( to_NFA(regex) );
+  }
+
+  // Merge two NFAs into one.
+  template <typename T1, typename T2, typename... Ts>
+  static NFA to_NFA(T1 && in1, T2 && in2, Ts &&... others ) {
+    NFA nfa_out( to_NFA(std::forward<T1>(in1)) );   // Start out identical to nfa1.
+    nfa_out.Merge( to_NFA(std::forward<T2>(in2)) ); // Merge in nfa2;
+    return to_NFA(nfa_out, std::forward<Ts>(others)...);
   }
 }
 
