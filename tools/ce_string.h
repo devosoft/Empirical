@@ -19,14 +19,31 @@ namespace emp {
   private:
     char str[SIZE];
   public:
-    template <class T>
-    constexpr ce_string(T && S) {
-      static_assert(SIZE == ::size(S), "ce_string must be initialized with correct size string!");
+    constexpr ce_string(const ce_string<SIZE> & S) {
       for (int i=0; i < SIZE; i++) str[i] = S[i];
     }
-    
+
+    template <class T>
+    constexpr ce_string(T && S) {
+      // static_assert(SIZE == emp::size(S), "ce_string must be initialized with correct size string!");
+      for (int i=0; i < SIZE; i++) str[i] = S[i];
+    }
+
     constexpr int size() const { return SIZE; }
+
+    constexpr char operator[](int i) { return str[i]; }
   };
+
+  // template <typename T>
+  // constexpr auto const_string(T && S) {
+  //   constexpr const int SIZE =
+  //   return ce_string<SIZE>(std::forward<T>(S));
+  // }
+
+  template <typename T, size_t N>
+  constexpr auto const_string(T (&str)[N]) {
+    return ce_string<N>(str);
+  }
 
 }
 
