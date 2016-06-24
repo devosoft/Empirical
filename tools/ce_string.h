@@ -23,22 +23,21 @@ namespace emp {
       for (int i=0; i < SIZE; i++) str[i] = S[i];
     }
 
-    template <class T>
-    constexpr ce_string(T && S) {
-      // static_assert(SIZE == emp::size(S), "ce_string must be initialized with correct size string!");
+    template <typename T, size_t N>
+    constexpr ce_string(T (&S)[N]) {
+      static_assert(N == SIZE, "ce_string must be initialized with correct size string!");
+      for (int i=0; i < N; i++) str[i] = S[i];
+    }
+
+    constexpr ce_string & operator=(const ce_string & S) {
       for (int i=0; i < SIZE; i++) str[i] = S[i];
+      return *this;
     }
 
     constexpr int size() const { return SIZE; }
 
-    constexpr char operator[](int i) { return str[i]; }
+    constexpr char operator[](int i) const { return str[i]; }
   };
-
-  // template <typename T>
-  // constexpr auto const_string(T && S) {
-  //   constexpr const int SIZE =
-  //   return ce_string<SIZE>(std::forward<T>(S));
-  // }
 
   template <typename T, size_t N>
   constexpr auto const_string(T (&str)[N]) {
