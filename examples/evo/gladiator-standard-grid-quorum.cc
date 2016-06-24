@@ -32,7 +32,7 @@ using QWorld = emp::evo::World<QOrg, QM<BASE_PM>>;
 
 // define the underlying population manager here
 template <class QOrg>
-using FOUNDATION = emp::evo::PopulationManager_Grid<QOrg>;
+using FOUNDATION = emp::evo::PopulationManager_MixedGrid<QOrg>;
 
 //TODO: find a way to enforce that POP_MANAGER is POP_MANAGER<QOrg>
 // Consult Emily's stats stuff for reference...?
@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
       return 2;
     }
 
-    config.Write("quorum.cfg");
+    config.Write(prefix + "quorum.cfg");
 
     // seed the grid
     Qpop.popM.SpacedSeed(0.15, config.GRID_X() * config.GRID_Y(), 

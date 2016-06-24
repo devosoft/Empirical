@@ -59,8 +59,14 @@ fast-mixed: mixed-exp.cc ../../evo/NK.h $(EVO_DEPEND)
 fast-quorum-mixed: gladiator-mixed-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 gladiator-mixed-grid-quorum.cc -o gladiator-mixed.out
 
+debug-quorum-mixed: gladiator-mixed-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -g gladiator-mixed-grid-quorum.cc -o gladiator-mixed.out
+
 fast-quorum-standard: gladiator-standard-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 gladiator-standard-grid-quorum.cc -o gladiator-standard.out
+
+debug-quorum-standard: gladiator-standard-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -g gladiator-standard-grid-quorum.cc -o gladiator-standard.out
 
 NK-const: NK-const.cc ../../evo/NK-const.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) NK-const.cc -o NK-const

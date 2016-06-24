@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
       return 2;
     }
 
-    config.Write("quorum.cfg");
+    config.Write(prefix + "quorum.cfg");
 
     // seed the grid
     Qpop.popM.SpacedSeed(0.15, config.GRID_X() * config.GRID_Y(), 
