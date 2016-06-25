@@ -16,8 +16,8 @@ namespace emp {
 
   class ce_string {
   private:
-    const char * const m_str;
-    const int m_size;
+    const char * m_str;
+    int m_size;
 
   public:
     template<std::size_t N>
@@ -31,7 +31,13 @@ namespace emp {
 
     constexpr int size() const { return m_size; }
 
-    // constexpr char operator[](int i) const { return str[i]; }
+    template<std::size_t N>
+    constexpr bool Set(const char (&in)[N]) { m_str = in; m_size = N; }
+
+    // constexpr void Set(const int pos, const char val) {
+    //   // static_assert(pos < m_size, "ce_array index out of range.");
+    //   return m_str[pos] = val;
+    // }
     constexpr char operator[](const int pos) const {
       // static_assert(pos < m_size, "ce_array index out of range.");
       return m_str[pos];
