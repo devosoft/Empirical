@@ -14,35 +14,29 @@
 
 namespace emp {
 
-  template <int SIZE>
   class ce_string {
   private:
-    char str[SIZE];
+    const char * const m_str;
+    const int m_size;
+
   public:
-    constexpr ce_string(const ce_string<SIZE> & S) {
-      for (int i=0; i < SIZE; i++) str[i] = S[i];
+    template<std::size_t N>
+    constexpr ce_string(const char (&in)[N]) : m_str(in), m_size(N-1) { ; }
+    constexpr ce_string(const ce_string & in) = default;
+
+    // constexpr ce_string & operator=(const ce_string & S) {
+    //   for (int i=0; i < SIZE; i++) str[i] = S[i];
+    //   return *this;
+    // }
+
+    constexpr int size() const { return m_size; }
+
+    // constexpr char operator[](int i) const { return str[i]; }
+    constexpr char operator[](const int pos) const {
+      // static_assert(pos < m_size, "ce_array index out of range.");
+      return m_str[pos];
     }
-
-    template <typename T, size_t N>
-    constexpr ce_string(T (&S)[N]) {
-      static_assert(N == SIZE, "ce_string must be initialized with correct size string!");
-      for (int i=0; i < N; i++) str[i] = S[i];
-    }
-
-    constexpr ce_string & operator=(const ce_string & S) {
-      for (int i=0; i < SIZE; i++) str[i] = S[i];
-      return *this;
-    }
-
-    constexpr int size() const { return SIZE; }
-
-    constexpr char operator[](int i) const { return str[i]; }
   };
-
-  template <typename T, size_t N>
-  constexpr auto const_string(T (&str)[N]) {
-    return ce_string<N>(str);
-  }
 
 }
 
