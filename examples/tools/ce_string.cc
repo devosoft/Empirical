@@ -8,10 +8,17 @@
 #include <iostream>
 
 #include "../../tools/ce_string.h"
+#include "../../tools/BitSet.h"
+
 
 int main()
 {
-  constexpr auto s = emp::const_string("abc");
-  
-  std::cout << "Test." << std::endl;
+  constexpr emp::ce_string s("abc");
+  emp::BitSet<s.size()> b1;
+  emp::BitSet<(int) s[0]> b2;
+
+
+  std::cout << "Test..."
+            << "b2 size=" << b2.size()
+            << std::endl;
 }
