@@ -13,6 +13,12 @@
 //   static NFA to_NFA(const DFA & dfa)
 //   static const NFA & to_NFA(const NFA & nfa)}
 //   static NFA to_NFA(const RegEx & regex, int stop_id=1)
+//
+//  Available merges:
+//
+//   static NFA MergeNFA( ... )  - Convert two or more (DFA, NFA or RegEx) to a single NFA.
+//   static DFA MergeDFA( ... )  - Convert two or more (DFA, NFA or RegEx) to a single DFA.
+
 
 
 
@@ -107,7 +113,7 @@ namespace emp {
 
   // Merge two or more NFAs into one.
   template <typename T1, typename T2, typename... Ts>
-  static NFA to_NFA(T1 && in1, T2 && in2, Ts &&... others ) {
+  static NFA MergeNFA(T1 && in1, T2 && in2, Ts &&... others ) {
     NFA nfa_out( to_NFA(std::forward<T1>(in1)) );   // Start out identical to nfa1.
     nfa_out.Merge( to_NFA(std::forward<T2>(in2)) ); // Merge in nfa2;
     return to_NFA(nfa_out, std::forward<Ts>(others)...);
@@ -115,7 +121,7 @@ namespace emp {
 
 
   template <typename T1, typename T2, typename... Ts>
-  static DFA to_DFA(T1 && in1, T2 && in2, Ts &&... others ) {
+  static DFA MergeDFA(T1 && in1, T2 && in2, Ts &&... others ) {
     return to_DFA( to_NFA(in1, in2, others...) );
   }
 }
