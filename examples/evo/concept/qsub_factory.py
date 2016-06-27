@@ -68,7 +68,7 @@ def build_qsub(config, args, path):
         for el in config['unchanging']:
             print("{} {} ".format(el, config['unchanging'][el]), end="", file=qfile)
 
-        print("")
+        print("\n\n", file=qfile)
 
         print("{binpath}/gladiator-standard.out -PREFIX standard-${{PBS_ARRAYID}} -RAND_SEED"
               " ${{PBS_ARRAYID}} ".format(binpath=config['basepath']), end="", file=qfile)
@@ -78,7 +78,7 @@ def build_qsub(config, args, path):
         for el in config['unchanging']:
             print("{} {} ".format(el, config['unchanging'][el]), end="", file=qfile)
 
-        print("""
+        print("""\n\n
         for job in `jobs -p`
         do
         wait $job
@@ -96,7 +96,7 @@ def generate_folder_level(index, prefixes, currbase, config, fqc = None):
             fqc[index] = (el[1], el[2])
             if not os.path.exists(currbase + el[0]):
                 print("Creating directory {}".format(currbase + el[0]))
-                os.makedirs(currbase + el[0])
+                os.makedirs(currbase + '/' + el[0])
                 build_qsub(config, fqc, currbase + el[0])
     else:
         # build this level of the tree
@@ -129,7 +129,7 @@ def main():
     if not os.path.exists(config['name']):
         os.makedirs(config['name'])
 
-    generate_folder_tree(config['basepath'] + config['name'] + '/', 
+    generate_folder_tree(config['basepath'] + '/' + config['name'] + '/', 
                          config['parameters'], 
                          config)
 
