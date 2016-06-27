@@ -111,18 +111,23 @@ namespace emp {
     return to_DFA( to_NFA(regex) );
   }
 
-  // Merge two or more NFAs into one.
+  // Merge multiple NFAs into one.
+  template <typename T1>
+  static NFA MergeNFA(T1 && in) {
+    return to_NFA(std::forward<T1>(in));
+  }
+
   template <typename T1, typename T2, typename... Ts>
   static NFA MergeNFA(T1 && in1, T2 && in2, Ts &&... others ) {
     NFA nfa_out( to_NFA(std::forward<T1>(in1)) );   // Start out identical to nfa1.
     nfa_out.Merge( to_NFA(std::forward<T2>(in2)) ); // Merge in nfa2;
-    return to_NFA(nfa_out, std::forward<Ts>(others)...);
+    return MergeNFA(nfa_out, std::forward<Ts>(others)...);
   }
 
 
   template <typename T1, typename T2, typename... Ts>
   static DFA MergeDFA(T1 && in1, T2 && in2, Ts &&... others ) {
-    return to_DFA( to_NFA(in1, in2, others...) );
+    return to_DFA( MergeNFA(in1, in2, others...) );
   }
 }
 
