@@ -14,6 +14,8 @@
 #include <cmath>
 #include <vector>
 #include <set>
+#include <map>
+
 #include "../tools/vector.h"
 
 struct MLandscape{
@@ -59,9 +61,19 @@ template <typename ORG, typename WORLD>
       double  mut_ben = 0, mut_det = 0, mut_neu = 0;
       int total_orgs = 0;
       MLandscape data;
+      MLandscape info;
+      std::map<ORG, MLandscape> table;
 
       for (auto org : orgs){
           total_orgs++; //get a total count of orgs in current population
+
+          auto find_org = table.find(*org);
+          if(find_org != table.end()){
+             mut_ben += table[*org].benefit_avg;
+             mut_neu += table[*org].neutral_avg;
+             mut_det += table[*org].det_avg;
+             continue;
+          }
 
           double m_ben = 0, m_det = fit_fun(org);
           int benefit = 0, neutral = 0, detremental = 0;
@@ -95,6 +107,12 @@ template <typename ORG, typename WORLD>
           org_avg_b = org_avg_b / org->size();
           org_avg_n = org_avg_n / org->size();
           org_avg_d = org_avg_d / org->size();
+          
+          info.benefit_avg = org_avg_b;
+          info.neutral_avg = org_avg_n;
+          info.det_avg = org_avg_d;
+
+          table[*org] = info;
 
           mut_ben += org_avg_b;
           mut_neu += org_avg_n;
