@@ -54,29 +54,33 @@ def build_qsub(config, args, path):
     with open(path + "makeitgo.qsub", 'w') as qfile:
         print("#!/bin/bash -login", file=qfile)
         print("#PBS -l walltime={}".format(config['walltime']), file=qfile)
-        print("#PBS -l nodes=1:ppn=2", file=qfile)
-        print("#PBS -l mem={}gb".format(config['mem_per_thread']), file=qfile)
+        print("#PBS -l nodes=1:ppn={num}".format(num=(int(config['num_replicants'])*2)), 
+             file=qfile)
+        print("#PBS -l mem={}gb".format(int(config['mem_per_thread']) *
+                                        int(config['num_replicants'] * 2)), 
+                                file=qfile)
         print("#PBS -N {}".format(config['name']), file=qfile)
-        if int(config['num_replicants']) > 0:
-            print("#PBS -t 0-{}".format(config['num_replicants']), file=qfile)
 
-        print("", file=qfile)
-        print("{binpath}/gladiator-mixed.out -PREFIX mixed-${{PBS_ARRAYID}} -RAND_SEED"
-              " ${{PBS_ARRAYID}} ".format(binpath=config['basepath']), end="", file=qfile)
-        for el in args:
-            print("{} {} ".format(args[el][0], args[el][1]), end="", file=qfile)
-        for el in config['unchanging']:
-            print("{} {} ".format(el, config['unchanging'][el]), end="", file=qfile)
+        for i in range(0, int(config['num_replicants'])):
+            print("", file=qfile)
+            print("{binpath}/gladiator-mixed.out -PREFIX mixed-{repnum} -RAND_SEED"
+                  " {repnum} ".format(binpath=config['basepath'], repnum=i), end="", file=qfile)
+            for el in args:
+                print("{} {} ".format(args[el][0], args[el][1]), end="", file=qfile)
+            for el in config['unchanging']:
+                print("{} {} ".format(el, config['unchanging'][el]), end="", file=qfile)
 
-        print("\n\n", file=qfile)
+            print(" & ", file=qfile)
 
-        print("{binpath}/gladiator-standard.out -PREFIX standard-${{PBS_ARRAYID}} -RAND_SEED"
-              " ${{PBS_ARRAYID}} ".format(binpath=config['basepath']), end="", file=qfile)
-        for el in args:
-            print("{} {} ".format(args[el][0], args[el][1]), end="", file=qfile)
+            print("{binpath}/gladiator-standard.out -PREFIX standard-{repnum} -RAND_SEED"
+                  " {repnum} ".format(binpath=config['basepath'], repnum=i), end="", file=qfile)
+            for el in args:
+                print("{} {} ".format(args[el][0], args[el][1]), end="", file=qfile)
 
-        for el in config['unchanging']:
-            print("{} {} ".format(el, config['unchanging'][el]), end="", file=qfile)
+            for el in config['unchanging']:
+                print("{} {} ".format(el, config['unchanging'][el]), end="", file=qfile)
+
+            print(" & \n\n", file=qfile)
 
         print("""\n\n
         for job in `jobs -p`
