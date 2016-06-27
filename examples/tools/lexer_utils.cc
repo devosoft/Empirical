@@ -12,7 +12,7 @@
 #include "../../tools/NFA.h"
 #include "../../tools/lexer_utils.h"
 
-void TestDFA(const emp::DFA & dfa, const std::string & str) {
+void Test(const emp::DFA & dfa, const std::string & str) {
   int out_state = dfa.Next(0, str);
   std::cout << "String: " << str
             << "  valid=" << (out_state != -1)
@@ -20,7 +20,7 @@ void TestDFA(const emp::DFA & dfa, const std::string & str) {
             << std::endl;
 }
 
-void TestNFA(const emp::NFA & nfa, const std::string & str) {
+void Test(const emp::NFA & nfa, const std::string & str) {
   emp::NFA_State nfa_state(nfa);
   nfa_state.Next(str);
   std::cout << "String: " << str
@@ -40,27 +40,27 @@ int main()
   nfa2c.AddFreeTransition(0,2);
   nfa2c.SetStop(2);
 
-  std::cout << "NFA size = " << nfa2c.GetSize() << std::endl;
-  TestNFA(nfa2c, "ababaabbab");
-  TestNFA(nfa2c, "cc");
-  TestNFA(nfa2c, "ccc");
-  TestNFA(nfa2c, "ababcbc");
-  TestNFA(nfa2c, "cbabab");
-  TestNFA(nfa2c, "ccbabab");
-  TestNFA(nfa2c, "ccbababc");
+  // std::cout << "NFA size = " << nfa2c.GetSize() << std::endl;
+  // Test(nfa2c, "ababaabbab");
+  // Test(nfa2c, "cc");
+  // Test(nfa2c, "ccc");
+  // Test(nfa2c, "ababcbc");
+  // Test(nfa2c, "cbabab");
+  // Test(nfa2c, "ccbabab");
+  // Test(nfa2c, "ccbababc");
 
-  std::cout << std::endl;
-  auto dfa2c = to_DFA(nfa2c);
-  dfa2c.Print();
+  // std::cout << std::endl;
+  // auto dfa2c = to_DFA(nfa2c);
+  // dfa2c.Print();
 
-  std::cout << "DFA size = " << dfa2c.GetSize() << std::endl;
-  TestDFA(dfa2c, "ababaabbab");
-  TestDFA(dfa2c, "cc");
-  TestDFA(dfa2c, "ccc");
-  TestDFA(dfa2c, "ababcbc");
-  TestDFA(dfa2c, "cbabab");
-  TestDFA(dfa2c, "ccbabab");
-  TestDFA(dfa2c, "ccbababc");
+  // std::cout << "DFA size = " << dfa2c.GetSize() << std::endl;
+  // Test(dfa2c, "ababaabbab");
+  // Test(dfa2c, "cc");
+  // Test(dfa2c, "ccc");
+  // Test(dfa2c, "ababcbc");
+  // Test(dfa2c, "cbabab");
+  // Test(dfa2c, "ccbabab");
+  // Test(dfa2c, "ccbababc");
 
   emp::RegEx re2f("[de]*f[de]*f[de]*");
   // emp::RegEx re2f("([de]*)f([de]*)f([de]*)");
@@ -72,12 +72,45 @@ int main()
   std::cout << "RegEx DFA size = " << dfa2f.GetSize() << std::endl;
   dfa2f.Print();
 
-  TestDFA(dfa2f, "a");
-  TestDFA(dfa2f, "d");
-  TestDFA(dfa2f, "defdef");
-  TestDFA(dfa2f, "fedfed");
-  TestDFA(dfa2f, "ffed");
-  TestDFA(dfa2f, "edffed");
-  TestDFA(dfa2f, "edffedf");
-  TestDFA(dfa2f, "ff");
+  Test(dfa2f, "a");
+  Test(dfa2f, "d");
+  Test(dfa2f, "defdef");
+  Test(dfa2f, "fedfed");
+  Test(dfa2f, "ffed");
+  Test(dfa2f, "edffed");
+  Test(dfa2f, "edffedf");
+  Test(dfa2f, "defed");
+  Test(dfa2f, "ff");
+
+  std::cout << "\nAll same case tests..." << std::endl;
+  emp::RegEx re_lower("[a-z]+");
+  emp::RegEx re_upper("[A-Z]+");
+  emp::RegEx re_inc("[a-z]+[A-Z]+");
+  emp::NFA nfa_lower = to_NFA(re_lower);
+  emp::NFA nfa_upper = to_NFA(re_upper);
+  emp::NFA nfa_inc = to_NFA(re_inc);
+  emp::NFA nfa_all = to_NFA(nfa_lower, nfa_upper, nfa_inc);
+  emp::DFA dfa_all = to_DFA(nfa_all);
+
+  re_lower.PrintDebug();
+  nfa_lower.Print();
+  nfa_all.Print();
+  dfa_all.Print();
+  std::cout << "=== nfa_lower ===" << std::endl;
+  Test(nfa_lower, "abc");
+  Test(nfa_lower, "DEF");
+  Test(nfa_lower, "abcDEF");
+  Test(nfa_lower, "ABDdef");
+  Test(nfa_lower, "ABCDEF");
+  Test(nfa_lower, "abcdefghijklmnopqrstuvwxyz");
+  Test(nfa_lower, "ABC-DEF");
+
+  std::cout << "=== dfa_all ===" << std::endl;
+  Test(dfa_all, "abc");
+  Test(dfa_all, "DEF");
+  Test(dfa_all, "abcDEF");
+  Test(dfa_all, "ABDdef");
+  Test(dfa_all, "ABCDEF");
+  Test(dfa_all, "abcdefghijklmnopqrstuvwxyz");
+  Test(dfa_all, "ABC-DEF");
 }

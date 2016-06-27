@@ -89,7 +89,7 @@
 //
 //  void Print()
 //    Output the current set of states being used.
-// 
+//
 //
 //  Note: DFA's use SetTransition(), but NFA's use AddTransition.  This distinction is intentional
 //        since in a DFA a second SetTransition with the same start state and symbol will override
@@ -230,6 +230,27 @@ namespace emp {
     bool IsStart(int state) const { return state == start; }
     bool IsStop(int state) const { return is_stop[state]; }
     bool IsEmpty(int state) const { return !HasSymTransitions(state) && !IsStop(state); }
+
+    void Merge(const tNFA<NUM_SYMBOLS,STOP_TYPE> & nfa2) {
+      const int offset = GetSize();                    // How far should we offset new NFA states?
+      const int new_start = offset + nfa2.GetSize();   // Locate the new start node.
+      Resize(offset + nfa2.GetSize() + 1);             // Make room for new NFA states + new start.
+      AddFreeTransition(new_start, start);             // Free transition from new start to
+      AddFreeTransition(new_start, nfa2.start+offset); //    starts of both original NFAs.
+      start = new_start;                               // Set the new start node.
+
+      // Loop through new states and add them in.
+      for (int i = 0; i < nfa2.GetSize(); i++) {
+        // Move transitions.
+        for (const auto & t : nfa2.states[i].trans) {
+          AddTransition(i+offset, t.first+offset, t.second.symbols);
+        }
+        for (int to : nfa2.states[i].free_to) {
+          AddFreeTransition(i+offset, to+offset);
+        }
+        SetStop(i+offset, nfa2.is_stop[i]);   // Maintain the stop value for this state.
+      }
+    }
 
     void Print() const {
       std::cout << states.size() << " States:" << std::endl;

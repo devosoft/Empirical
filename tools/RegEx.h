@@ -224,6 +224,8 @@ namespace emp {
       virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
         const int target = nfa.AddNewState();
         nodes[0]->AddToNFA(nfa, start, target);
+        // From the target, can either go back to start and repeat, or straight to stop.
+        nfa.AddFreeTransition(target, start);
         nfa.AddFreeTransition(target, stop);
       }
     };
