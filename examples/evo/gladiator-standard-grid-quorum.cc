@@ -78,6 +78,8 @@ int main(int argc, char* argv[]) {
     Qpop.ConfigPop(config.GRID_X(), config.GRID_Y());
 
     emp::evo::StatsManager_FunctionsOnUpdate<QM<FOUNDATION>> Qstats(&Qpop, prefix + "quorum.csv"); 
+    emp::evo::StatsManager_Mapper<QM<FOUNDATION>> Qmapper(&Qpop, config.GRID_X(), config.GRID_Y(),
+                                                          prefix + "quorum-map.csv");
 
     // Set all the class variables
     QM<FOUNDATION>::hi_weight = config.HI_AI_WEIGHT();

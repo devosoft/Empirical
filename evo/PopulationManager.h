@@ -51,6 +51,7 @@ namespace evo {
     uint32_t size() const { return pop.size(); }
     void resize(int new_size) { pop.resize(new_size); }
     int GetSize() const { return (int) pop.size(); }
+    ORG const * GetPos(size_t pos) { return pop[pos];} 
 
     void SetRandom(Random * r) { random_ptr = r; }
     unsigned int SequentialInsert(ORG * org) { 

@@ -175,6 +175,12 @@ public:
   static double mutation_amount;
 
   static const QuorumOrgGenome initial_configurations[4];
+
+  static int classify (QuorumOrganism const * org) {
+    if (org == nullptr) { return -1;}
+    return (int) org->state.genome.co_op_prob * 10;
+  }
+  
   // access specifiers are really annoying. 
   QuorumOrgState state;
   QuorumOrganism () {};
@@ -262,6 +268,7 @@ std::ostream & operator << (std::ostream & out, QuorumOrganism & org) {
    org.print(out);
    return out;
 }
+
 
 
 const QuorumOrgGenome standard_genome = QuorumOrgGenome(0.5, 10, 40, 0, true);

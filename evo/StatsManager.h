@@ -17,7 +17,7 @@ namespace emp{
 namespace evo{
 
   EMP_BUILD_CONFIG( StatsManagerConfig,
-    VALUE(RESOLUTION, int, 10, "How often should stats be calculated (updates)"),
+    VALUE(RESOLUTION, int, 3, "How often should stats be calculated (updates)"),
     VALUE(DELIMITER, std::string, " ", "What should fields be separated by in the output")
   )
 
@@ -233,6 +233,85 @@ namespace evo{
       }
 
 };
+
+  template <typename POP_MANAGER = PopulationManager_Base<int> >
+  class StatsManager_Mapper : StatsManager_Base<POP_MANAGER> {
+  protected:
+    using org_ptr = typename POP_MANAGER::value_type;
+    //using world_type = World<ORG, MANAGERS...>;
+    using fit_fun_type = std::function<double(org_ptr)>;
+
+    //Pointer to the world object on which we're calculating stats
+    POP_MANAGER * popM;
+    using StatsManager_Base<POP_MANAGER>::resolution;
+    using StatsManager_Base<POP_MANAGER>::output_location;
+    using StatsManager_Base<POP_MANAGER>::delimiter;
+    bool header_printed = false;
+    std::string header = "update, state";
+    emp::vector<std::string> col_map;
+    unsigned int width, height;
+
+  public:
+    using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
+    fit_fun_type fit_fun;
+
+    //Constructor for creating this as a stand-alone object
+    template <typename WORLD>
+    StatsManager_Mapper(WORLD * w, unsigned int map_width, unsigned int map_height,
+                                   std::string location = "stats.csv") :
+                                   StatsManager_Base<decltype(w->popM)>(location),
+                                   width(map_width), height(map_height) {
+      Setup(w);
+    }
+
+    //Constructor for use by World object
+    StatsManager_Mapper(unsigned int map_width, unsigned int map_height, 
+                        std::string location = "stats.csv") :
+                                   StatsManager_Base<POP_MANAGER>(location),
+                                   width(map_width), height(map_height){;}
+
+    //The fitness function for calculating fitness related stats
+    template <typename WORLD>
+    void Setup(WORLD * w){
+      popM = &(w->popM);
+
+      std::function<void(int)> UpdateFun = [&] (int ud){
+          Update(ud);
+      };
+
+      w->OnUpdate(UpdateFun);
+    }
+
+    //If this update matches the resolution, calculate and record all the stats
+    void Update(int update) {
+      if (!header_printed) {
+          output_location << header << std::endl;
+          header_printed = true;
+      }
+
+      if (update % resolution == 0){
+        output_location << update;
+
+        output_location << delimiter << "{ [";
+        //iterate over the population
+        for(size_t i = 0; i < popM->GetSize(); i++) {
+          
+          if (i > 0 && i % width == 0) {
+            output_location << ", [";
+           }
+           output_location << popM->classify(popM->GetPos(i)) << delimiter;
+
+          if (i > 1 && i % width == width - 1) {
+            output_location << "]";
+          }
+        }
+
+        output_location << "] } " << std::endl;
+      }
+    }
+
+  };
+
 
 using NullStats = StatsManager_Base<PopBasic>;
 using DefaultStats = StatsManager_DefaultStats<PopBasic>;

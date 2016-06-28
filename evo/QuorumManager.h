@@ -113,6 +113,10 @@ public:
 
     }
 
+    int classify (QuorumOrganism const * org) {
+      return QuorumOrganism::classify(org);
+    }
+
     // minor override to the parent class to save the orgs location to the org
     unsigned int AddOrg (QuorumOrganism * org) {
       return org->set_id(POP_MANAGER<QuorumOrganism>::AddOrg(org));
