@@ -434,7 +434,7 @@ namespace emp {
       return *this;
     }
 
-    const std::string & AsString() const { return regex; }
+    std::string AsString() const { return to_literal(regex); }
 
     virtual void AddToNFA(NFA & nfa, int start, int stop) const { head.AddToNFA(nfa, start, stop); }
 
