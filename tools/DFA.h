@@ -129,7 +129,7 @@ namespace emp {
 
   };
 
-  using DFA = tDFA<128, char>;
+  using DFA = tDFA<128, uint8_t>;
 
 }
 

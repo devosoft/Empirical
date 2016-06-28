@@ -321,8 +321,8 @@ namespace emp {
   };
 
 
-  using NFA = tNFA<128, char>;
-  using NFA_State = tNFA_State<128, char>;
+  using NFA = tNFA<128, uint8_t>;
+  using NFA_State = tNFA_State<128, uint8_t>;
 }
 
 #endif
