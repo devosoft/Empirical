@@ -27,26 +27,26 @@ namespace emp {
       : name(n), regex(r), id(i), save_lexeme(s) { ; }
     TokenInfo(const TokenInfo &) = default;
     TokenInfo & operator=(const TokenInfo &) = default;
+
+    void Print(std::ostream & os=std::cout) const {
+      os << "Name:" << name
+         << "  RegEx:" << regex.AsString()
+         << "  ID:" << id
+         << "  save_lexeme:" << save_lexeme
+         << std::endl;
+    }
   };
 
   class Lexer {
   private:
-    emp::vector<TokenInfo> token_set;      // List of all active tokens.
-    int cur_token_id;                      // Which ID should the next token get?
-    bool generate_lexer;                   // Do we need to regenerate the lexer?
-    DFA lexer_dfa;                         // Table driven lexer implementation.
-    std::string lexeme;                    // Current state of lexeme being generated.
+    emp::vector<TokenInfo> token_set;     // List of all active tokens.
+    int cur_token_id;                     // Which ID should the next token get?
+    mutable bool generate_lexer;          // Do we need to regenerate the lexer?
+    mutable DFA lexer_dfa;                // Table driven lexer implementation.
+    std::string lexeme;                   // Current state of lexeme being generated.
 
-    static const int MAX_TOKEN_ID = 65536; // How many token IDs are possible?
+    static const int MAX_TOKEN_ID = 256;  // How many token IDs are possible?
 
-    void Generate() {
-      NFA lexer_nfa;
-      for (const auto & t : token_set) {
-        lexer_nfa.Merge( to_NFA(t.regex, t.id) );
-      }
-      generate_lexer = false; // We just generated it!  Don't again unless another change is made.
-      lexer_dfa = to_DFA(lexer_nfa);
-    }
   public:
     Lexer() : cur_token_id(MAX_TOKEN_ID), generate_lexer(false) { ; }
     ~Lexer() { ; }
@@ -79,6 +79,15 @@ namespace emp {
       return TokenInfo("", "", -1);
     }
 
+    void Generate() const {
+      NFA lexer_nfa;
+      for (const auto & t : token_set) {
+        lexer_nfa.Merge( to_NFA(t.regex, t.id) );
+      }
+      generate_lexer = false; // We just generated it!  Don't again unless another change is made.
+      lexer_dfa = to_DFA(lexer_nfa);
+    }
+
     // Get the next token found in an input stream.
     int Process(std::istream & is) {
       if (generate_lexer) Generate();
@@ -109,7 +118,13 @@ namespace emp {
     // Get the lexeme associated with the last token.
     const std::string & GetLexeme() { return lexeme; }
 
+    void Print(std::ostream & os=std::cout) const{
+      for (const auto & t : token_set) t.Print(os);
+      if (generate_lexer) Generate();                   // Do we need to regenerate the lexer?
+      lexer_dfa.Print(os);                         // Table driven lexer implementation.
+    }
   };
+
 
 }
 
