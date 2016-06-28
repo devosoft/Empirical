@@ -44,6 +44,7 @@
 #include <string>
 
 #include "array.h"
+#include "string_utils.h"
 #include "vector.h"
 
 namespace emp {
@@ -109,19 +110,19 @@ namespace emp {
       return state;
     }
 
-    void Print() {
-      std::cout << "Num states = " << GetSize() << std::endl;
-      std::cout << "Start = 0; Stop =";
-      for (int i = 0; i < GetSize(); i++) if(IsStop(i)) std::cout << " " << i;
-      std::cout << std::endl;
+    void Print(std::ostream & os=std::cout) {
+      os << "Num states = " << GetSize() << std::endl;
+      os << "Start = 0; Stop =";
+      for (int i = 0; i < GetSize(); i++) if(IsStop(i)) os << " " << i;
+      os << std::endl;
 
       for (int i = 0; i < (int) transitions.size(); i++) {
-        std::cout << " " << i << " ->";
+        os << " " << i << " ->";
         for (int s = 0; s < NUM_SYMBOLS; s++) {
           if (transitions[i][s] == -1) continue;
-          std::cout << " " << ((char) s) << ":" << transitions[i][s];
+          os << " " << to_literal((char) s) << ":" << transitions[i][s];
         }
-        std::cout << std::endl;
+        os << std::endl;
       }
 
     }
