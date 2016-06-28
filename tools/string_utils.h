@@ -25,24 +25,45 @@ namespace emp {
       return ss.str();
     }
     switch (value) {
-    case '\\':
-      return "\\\\";
-      break;
-    case '\'':
-      return "\\\'";
-      break;
-    case '\"':
-      return "\\\"";
-      break;
-    case '\n':
-      return "\\n";
-      break;
-    case '\r':
-      return "\\r";
-      break;
-    case '\t':
-      return "\\t";
-      break;
+    case '\0': return "\\0";
+    case 1: return "\\001";
+    case 2: return "\\002";
+    case 3: return "\\003";
+    case 4: return "\\004";
+    case 5: return "\\005";
+    case 6: return "\\006";
+    case '\a': return "\\a";  // case  7 (audible bell)
+    case '\b': return "\\b";  // case  8 (backspace)
+    case '\t': return "\\t";  // case  9 (tab)
+    case '\n': return "\\n";  // case 10 (newline)
+    case '\v': return "\\v";  // case 11 (vertical tab)
+    case '\f': return "\\f";  // case 12 (form feed - new page)
+    case '\r': return "\\r";  // case 13 (carriage return)
+    case 14: return "\\016";
+    case 15: return "\\017";
+    case 16: return "\\020";
+    case 17: return "\\021";
+    case 18: return "\\022";
+    case 19: return "\\023";
+    case 20: return "\\024";
+    case 21: return "\\025";
+    case 22: return "\\026";
+    case 23: return "\\027";
+    case 24: return "\\030";
+    case 25: return "\\031";
+    case 26: return "\\032";
+    case '\e': return "\\e";  // case 27 (ESC)
+    case 28: return "\\034";
+    case 29: return "\\035";
+    case 30: return "\\036";
+    case 31: return "\\037";
+
+    case '\"': return "\\\"";  // case 34
+    case '\'': return "\\\'";  // case 39
+    case '\\': return "\\\\";  // case 92
+    case 127: return "\\177";  // (delete)
+
+    // case '\?': return "\\\?";
     default:
       ss << value;
       return ss.str();
@@ -63,7 +84,7 @@ namespace emp {
   }
   static std::string to_literal(char value) {
     std::stringstream ss;
-    ss << "'" << to_escaped_string(value) << "'";
+    ss << "'" << to_escaped_string(value) << "'"; // << "(" << ((int) value) << ")";
     return ss.str();
   }
   static std::string to_literal(const std::string & value) {
