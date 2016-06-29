@@ -101,8 +101,8 @@ namespace emp {
 
     int Next(int state, int sym) const {
       emp_assert(state >= -1 && state < (int) transitions.size());
-      emp_assert(sym >= 0 && sym < NUM_SYMBOLS, sym, (char) sym);
-      return (state == -1) ? -1 : transitions[state][sym];
+      // emp_assert(sym >= 0 && sym < NUM_SYMBOLS, sym, (char) sym);
+      return (state < 0 || sym >= NUM_SYMBOLS) ? -1 : transitions[state][sym];
     }
 
     int Next(int state, std::string sym_set) const {
