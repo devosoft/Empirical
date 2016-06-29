@@ -45,8 +45,8 @@ namespace evo {
 
       for (auto org_iter : neighbors) {
         if (org_iter == nullptr) {continue;} // ignore nonextant orgs
-        if ( org_iter->hi_density()) {num_hi++;}
-        active_neighbors++;
+        if (org_iter->hi_density()) {num_hi++;}
+        if (org_iter->lo_density()) {active_neighbors++;}
       }
 
       // consider quoorum to be enough hi or enough lo in potential radius

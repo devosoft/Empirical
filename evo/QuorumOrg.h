@@ -36,17 +36,19 @@ struct QuorumOrgGenome {
   double ai_radius;
   double quorum_threshold;
   bool can_make_HiAI;
+  bool can_make_LoAI;
 
   QuorumOrgGenome () {
     co_op_prob = 0;
     ai_radius = 10;
     quorum_threshold = 1;
     can_make_HiAI = false;
+    can_make_LoAI = false;
   }
 
-  QuorumOrgGenome(double cprob, double airad, double qthresh, int lin, bool cmha) :
+  QuorumOrgGenome(double cprob, double airad, double qthresh, int lin, bool cmha, bool cmla) :
     co_op_prob(cprob), ai_radius(airad), quorum_threshold(qthresh), lineage(lin),
-    can_make_HiAI(cmha){};
+    can_make_HiAI(cmha), can_make_LoAI(cmla) {};
 
   // prints co-op prob, ai_gen_prob, quorum_thresh
   void print (std::ostream & out) {
@@ -65,7 +67,8 @@ bool operator== (QuorumOrgGenome const & lhs, QuorumOrgGenome const & rhs) {
   return (lhs.co_op_prob == rhs.co_op_prob &&
           lhs.ai_radius == rhs.ai_radius &&
           lhs.quorum_threshold == rhs.quorum_threshold &&
-          lhs.can_make_HiAI == rhs.can_make_HiAI);
+          lhs.can_make_HiAI == rhs.can_make_HiAI && 
+          lhs.can_make_LoAI == rhs.can_make_HiAI);
 }
 
 
@@ -116,8 +119,8 @@ public:
   };
 
   QuorumOrgState (double cprob, double aprob, double qthresh, bool mut, 
-                  unsigned int pts, int lin=-1, bool cmha = false) :
-    genome(cprob, aprob, qthresh, lin, cmha), mutate(mut), points(pts) {
+                  unsigned int pts, int lin=-1, bool cmha = false, bool cmla = false) :
+    genome(cprob, aprob, qthresh, lin, cmha, cmla), mutate(mut), points(pts) {
  
     age = 0;
     loc = 0;
@@ -130,7 +133,8 @@ public:
                                                   other.genome.ai_radius,
                                                   other.genome.quorum_threshold,
                                                   other.genome.get_lineage(),
-                                                  other.genome.can_make_HiAI),
+                                                  other.genome.can_make_HiAI,
+                                                  other.genome.can_make_LoAI),
                                                   hi_density(false), mutate(other.mutate), 
                                                   points(0), age(0), loc(0), num_offspring(0) {
   }
@@ -174,7 +178,7 @@ public:
   static unsigned int num_to_donate, needed_to_reproduce, cost_to_donate;
   static double mutation_amount;
 
-  static const QuorumOrgGenome initial_configurations[4];
+  static const QuorumOrgGenome initial_configurations[5];
 
   static int classify (QuorumOrganism const * org) {
     if (org == nullptr) { return -1;}
@@ -231,6 +235,7 @@ public:
     return state.hi_density = state.hi_density && state.genome.can_make_HiAI;
   }
   bool hi_density () const {return state.hi_density && state.genome.can_make_HiAI;}
+  bool lo_density () const {return state.genome.can_make_LoAI;}
   unsigned int get_fitness() {return state.get_points();}
 
   // methods for interacting with the world / neighbors
@@ -271,17 +276,20 @@ std::ostream & operator << (std::ostream & out, QuorumOrganism & org) {
 
 
 
-const QuorumOrgGenome standard_genome = QuorumOrgGenome(0.5, 10, 40, 0, true);
-const QuorumOrgGenome defector_genome = QuorumOrgGenome(0, 10, 40, 1, false);
-const QuorumOrgGenome cooperator_genome = QuorumOrgGenome(1, 10, 40, 2, true);
-const QuorumOrgGenome scrooge_genome = QuorumOrgGenome(0.015, 10, 40, 3, true);
+const QuorumOrgGenome standard_genome = QuorumOrgGenome(0.5, 10, 40, 0, true, true);
+const QuorumOrgGenome lying_defector_genome = QuorumOrgGenome(0, 10, 40, 1, false, true);
+const QuorumOrgGenome cooperator_genome = QuorumOrgGenome(1, 10, 40, 2, true, true);
+const QuorumOrgGenome scrooge_genome = QuorumOrgGenome(0.015, 10, 40, 3, true, true);
+const QuorumOrgGenome truthful_defector_genome = QuorumOrgGenome(0, 10, 40, 1, false, false);
+
 
 /// selection of standardized starting configurations for QOrgs
-const QuorumOrgGenome QuorumOrganism::initial_configurations[4] = {
+const QuorumOrgGenome QuorumOrganism::initial_configurations[5] = {
   standard_genome,
-  defector_genome,
+  lying_defector_genome,
   cooperator_genome,
-  scrooge_genome
+  scrooge_genome,
+  truthful_defector_genome
 };
 
 unsigned int QuorumOrganism::num_to_donate;

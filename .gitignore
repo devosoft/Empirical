@@ -14,6 +14,8 @@ a.out.js
 *tmp.*
 *.cfg
 *.csv
+scripts/*.png
+scripts/*.mp4
 examples/evo/concept
 coverage.xml
 diff_cover.txt

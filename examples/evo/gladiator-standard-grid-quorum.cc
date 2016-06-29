@@ -32,7 +32,7 @@ using QWorld = emp::evo::World<QOrg, QM<BASE_PM>>;
 
 // define the underlying population manager here
 template <class QOrg>
-using FOUNDATION = emp::evo::PopulationManager_MixedGrid<QOrg>;
+using FOUNDATION = emp::evo::PopulationManager_Grid<QOrg>;
 
 //TODO: find a way to enforce that POP_MANAGER is POP_MANAGER<QOrg>
 // Consult Emily's stats stuff for reference...?
@@ -50,13 +50,15 @@ EMP_BUILD_CONFIG( QuorumConfig,
     VALUE(TICKS, int, 1000, "Length of simulation"),
     VALUE(INITIAL_SIZE, unsigned int, 30, "Starting population size"),
     VALUE(INITIAL_CONFIG, int, 0, "Which predefined organism to pit against the defector?"),
-    VALUE(PERCENT_DEFECTOR, double, 0.5, "Portion of the starting population to seed as defector"),
+    VALUE(PERCENT_OTHER, double, 0.5, "Portion of the starting population to seed as 'other'"),
+    VALUE(WHICH_OTHER, int, 1, "Index of predefined org to use as the 'other'"),
     VALUE(ENABLE_MUTATION, bool, 1, "If mutation should be enabled"),
     VALUE(RAND_SEED, int, 238947, "Seed for the random generator"),
     VALUE(PREFIX, std::string, "", "Prefix for filenames")
 )
 
-std::string init_config_names[4] = {"balanced", "defector", "donator", "scrooge"};
+std::string init_config_names[5] = {"balanced", "lying_defector", "donator", "scrooge", 
+                                    "truthful_defector"};
 
 int main(int argc, char* argv[]) {
     
@@ -105,8 +107,8 @@ int main(int argc, char* argv[]) {
     // seed the grid
     Qpop.popM.SpacedSeed(0.15, config.GRID_X() * config.GRID_Y(), 
                          &QOrg::initial_configurations[config.INITIAL_CONFIG()],
-                         config.ENABLE_MUTATION(), config.PERCENT_DEFECTOR(), 
-                         &QOrg::initial_configurations[1]);
+                         config.ENABLE_MUTATION(), config.PERCENT_OTHER(), 
+                         &QOrg::initial_configurations[config.WHICH_OTHER()]);
 
     // mutation is handled automatically by the population QPop_Manager, currently
     // I'm getting the sense that it probably shouldn't be.
@@ -176,20 +178,20 @@ int main(int argc, char* argv[]) {
       return points / (double) num_orgs;
     };
 
-   std::function<double()>percent_defector_lin=[underlying] () {
+  auto config_ptr = &config; 
+   std::function<double()>percent_defector_lin=[underlying, config_ptr] () {
       int count = 0;
       int num_orgs = 0;
 
       for(auto org : (*underlying)) {
         if(org != nullptr) {
-          if (org->state.genome.get_lineage() == 1) {count++;}
+          if (org->state.genome.get_lineage() == config_ptr->WHICH_OTHER()) {count++;}
           num_orgs++;
         }
       }
       return (double) count / (double) num_orgs;
    };
 
-    auto config_ptr = &config; 
     
     std::function<double()>percent_donator_lin=[underlying, config_ptr] () {
     int count = 0;
@@ -219,8 +221,8 @@ int main(int argc, char* argv[]) {
     Qstats.AddFunction(max_age_func, "max_age");
     Qstats.AddFunction(avg_coop_chance, "avg_coop");
     Qstats.AddFunction(avg_points, "avg_points"); 
-    Qstats.AddFunction(percent_defector_lin, "percent_defector");
-    Qstats.AddFunction(percent_donator_lin, init_config_names[config.INITIAL_CONFIG()]);
+    Qstats.AddFunction(percent_defector_lin, "percent " + init_config_names[config.WHICH_OTHER()]);
+    Qstats.AddFunction(percent_donator_lin, "percent " + init_config_names[config.INITIAL_CONFIG()]);
     Qstats.AddFunction(used_grid_capacity, "grid_usage");
 
     unsigned int checkpoint = 0;
