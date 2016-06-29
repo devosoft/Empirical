@@ -106,6 +106,52 @@ namespace evo{
 
   };
 
+  template <typename POP_MANAGER = PopulationManager_Base<int> >
+  class StatsManager_WholePopulation : StatsManager_Base<POP_MANAGER> {
+  protected:
+    POP_MANAGER * pop;
+    using StatsManager_Base<POP_MANAGER>::resolution;
+    using StatsManager_Base<POP_MANAGER>::output_location;
+    using StatsManager_Base<POP_MANAGER>::delimiter;
+    using StatsManager_Base<POP_MANAGER>::col_map;
+    using StatsManager_Base<POP_MANAGER>::viz_pointers;
+    using StatsManager_Base<POP_MANAGER>::viz_args;
+
+  public:
+    using org_ptr = typename POP_MANAGER::value_type;
+
+    //Constructor for creating this as a stand-alone object
+    template <typename WORLD>
+    StatsManager_WholePopulation(WORLD * w,
+                                   std::string location = "stats.csv") :
+                                   StatsManager_Base<decltype(w->popM)>(location){
+      Setup(w);
+    }
+
+    //Constructor for use by World object
+    StatsManager_WholePopulation(std::string location = "stats.csv") :
+                                   StatsManager_Base<POP_MANAGER>(location){;}
+
+    //The fitness function for calculating fitness related stats
+    template <typename WORLD>
+    void Setup(WORLD * w){
+      pop = &(w->popM);
+
+      std::function<void(int)> UpdateFun = [&] (int ud){
+         Update(ud);
+       };
+
+       w->OnUpdate(UpdateFun);
+    }
+
+    void Update(int update) {
+      if (update % resolution == 0) {
+
+      }
+    }
+
+  };
+
   //A popular type of stats manager is one that prints a set of statistics every
   //so many updates. This is a generic stats manager of that variety, which
   //maintains FunctionSets containing all of the functions to be run.

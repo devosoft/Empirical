@@ -38,13 +38,13 @@ namespace emp {
   // }, pointer, type_string.c_str()
   //
 
-  std::map<const char *, std::string> get_type_to_string_map() {
+  std::map<std::string, std::string> get_type_to_string_map() {
     //Using typeid().name() could potentially create problems
     //because it varies by implementation. All that matters is consistency,
     //but there could technically be obscure types that are given the same
     //name. So far it seems that's not an issue with emscripten though.
     //And that's really the only compiler anyone would be using here.
-    std::map<const char *, std::string> map_type_names;
+    std::map<std::string, std::string> map_type_names;
     map_type_names[typeid(int8_t).name()] = "i8";
     map_type_names[typeid(int16_t).name()] = "i16";
     map_type_names[typeid(int32_t).name()] = "i32";
@@ -67,7 +67,8 @@ namespace emp {
   // The array will be stored in emp.__incoming_array. Currently supports
   // arrays containing all of the types defined in get_type_to_string_map, which
   // are also all of the types that emscripten supports getting via pointer.
-  // This function also supports nested arrays, and arrays of JSDataObject.
+  // This function also supports nested arrays, and arrays of objects created with
+  // introspective tuple structs.
 
   //This now works for all containers, but it will break if they don't
   //store data contiguously
@@ -77,7 +78,7 @@ namespace emp {
 
     using T = typename C::value_type;
     //Figure out what string to use for the type we've been given
-    std::map<const char *, std::string> map_type_names = \
+    std::map<std::string, std::string> map_type_names = \
       get_type_to_string_map();
     emp_assert((map_type_names.find(typeid(T).name()) != map_type_names.end()));
     int type_size = sizeof(T);
@@ -89,29 +90,31 @@ namespace emp {
     }
 
     EM_ASM_ARGS({
-	var curr_array = emp_i.__incoming_array;
-	var depth = 0;
+	  var curr_array = emp_i.__incoming_array;
+	  var depth = 0;
 
-	//Make sure that we're at the right depth, in case of recursive call.
-	while (curr_array.length > 0) {
-	  var next_index = getValue($4+(depth*4), "i32");
-	  depth += 1;
-	  curr_array = curr_array[next_index];
-	}
+	  //Make sure that we're at the right depth, in case of recursive call.
+	  while (curr_array.length > 0) {
+	    var next_index = getValue($4+(depth*4), "i32");
+	    depth += 1;
+	    curr_array = curr_array[next_index];
+	  }
 
-	//Iterate over array, get values, and add them to incoming array.
-	for (i=0; i<$1; i++) {
-	  curr_array.push(getValue($0+(i*$2), Pointer_stringify($3)));
-	}
+	  //Iterate over array, get values, and add them to incoming array.
+	  for (i=0; i<$1; i++) {
+	    curr_array.push(getValue($0+(i*$2), Pointer_stringify($3)));
+	  }
     }, &values[0], values.size(), type_size, type_string.c_str(), \
       recursive_el.data());
   }
 
 
-  template<std::size_t SIZE>
-  void pass_array_to_javascript(std::array<JSDataObject,SIZE> values,	\
+  template<typename JSON_TYPE, template<typename> class C>
+  typename std::enable_if<JSON_TYPE::n_fields != -1, void>::type
+  pass_array_to_javascript(C<JSON_TYPE> values,	\
 			   std::vector<int> recursive_el) {
-    std::map<const char *, std::string> map_type_names = \
+
+    std::map<std::string, std::string> map_type_names = \
       get_type_to_string_map();
 
     //Initialize array in Javascript
@@ -121,60 +124,60 @@ namespace emp {
 
     //Initialize objects in Javascript
     EM_ASM_ARGS({
-	var curr_array = emp_i.__incoming_array;
-	var depth = 0;
+	  var curr_array = emp_i.__incoming_array;
+	  var depth = 0;
 
-	//Make sure that we're at the right depth, in case of recursive call.
-	while (curr_array.length > 0) {
-	  var next_index = getValue($1+(depth*4), "i32");
-	  depth += 1;
-	  curr_array = curr_array[next_index];
-	}
+	  //Make sure that we're at the right depth, in case of recursive call.
+	  while (curr_array.length > 0) {
+	    var next_index = getValue($1+(depth*4), "i32");
+	    depth += 1;
+	    curr_array = curr_array[next_index];
+	  }
 
-	//Append empty objects
-	for (i=0; i<$0; i++) {
-	  var new_obj = {};
-	  curr_array.push(new_obj);
-	}
-      }, values.size(), recursive_el.data());
+	  //Append empty objects
+	  for (i=0; i<$0; i++) {
+	    var new_obj = {};
+	    curr_array.push(new_obj);
+	  }
+    }, values.size(), recursive_el.data());
 
-    for (int j = 0; j<SIZE; j++) { //iterate over array
+    for (int j = 0; j<values.size(); j++) { //iterate over array
       for (int i = 0; i<values[j].var_names.size(); i++) { //iterate over object members
 
-	//Get variable name and type for this member variable
-	std::string var_name = values[j].var_names[i];
-	std::string type_string = map_type_names[values[j].var_types[i].name()];
+	    //Get variable name and type for this member variable
+	    std::string var_name = values[j].var_names[i];
+	    std::string type_string = map_type_names[values[j].var_types[i].name()];
 
-	//Make sure member variable is an allowed type
-	emp_assert((map_type_names.find(values[j].var_types[i].name())	\
+	    //Make sure member variable is an allowed type
+	    emp_assert((map_type_names.find(values[j].var_types[i].name())	\
 		    != map_type_names.end()));
 
-	//Load data into array of objects
-	EM_ASM_ARGS({
-	    var curr_array = emp_i.__incoming_array;
-	    var depth = 0;
+	    //Load data into array of objects
+	    EM_ASM_ARGS({
+	      var curr_array = emp_i.__incoming_array;
+          var depth = 0;
 
-	    //Make sure we're at the right depth, in case of recursive call.
-	    while (curr_array[0].length > 0) {
-	      var next_index = getValue($4+(depth*4), "i32");
-	      depth += 1;
-	      curr_array = curr_array[next_index];
-	    }
+          //Make sure we're at the right depth, in case of recursive call.
+          while (curr_array[0].length > 0) {
+            var next_index = getValue($4+(depth*4), "i32");
+            depth += 1;
+            curr_array = curr_array[next_index];
+	      }
 
-	    if (Pointer_stringify($1) == "string"){
-	      curr_array[$3][Pointer_stringify($2)] =	\
-		Pointer_stringify($0);
-	    } else{
-	      curr_array[$3][Pointer_stringify($2)] =	\
-		getValue($0, Pointer_stringify($1));
-	    }
-	  }, values[j].pointers[i], type_string.c_str(), var_name.c_str(), \
-	  j, recursive_el.data());
+          if (Pointer_stringify($1) == "string"){
+            curr_array[$3][Pointer_stringify($2)] =	\
+            Pointer_stringify($0);
+          } else {
+            curr_array[$3][Pointer_stringify($2)] =	\
+            getValue($0, Pointer_stringify($1));
+          }
+	    }, values[j].pointers[i], type_string.c_str(), var_name.c_str(), \
+                     j, recursive_el.data());
       }
     }
   }
 
-  //This version of the function handles non-nested arrays
+  //This version of the function handles non-nested containers
   template<typename C, class = typename C::value_type>
   void pass_array_to_javascript(C values) {
     pass_array_to_javascript(values, std::vector<int>(0));
@@ -193,21 +196,21 @@ namespace emp {
 
     //Append empty arrays to array that we are currently handling in recursion
     EM_ASM_ARGS({
-	var curr_array = emp_i.__incoming_array;
-	var depth = 0;
-	while (curr_array.length > 0) {
-	  var next_index = getValue($0+(depth*4), "i32");
-	  depth += 1;
-	  curr_array = curr_array[next_index];
-	}
-	for (i=0; i<$1; i++) {
-	  curr_array.push([]);
-	}
-      }, recursive_el.data(), SIZE2);
+	  var curr_array = emp_i.__incoming_array;
+	  var depth = 0;
+	  while (curr_array.length > 0) {
+	    var next_index = getValue($0+(depth*4), "i32");
+        depth += 1;
+        curr_array = curr_array[next_index];
+	  }
+      for (i=0; i<$1; i++) {
+	    curr_array.push([]);
+      }
+  }, recursive_el.data(), values.size());
 
     //Make recursive calls - recursive_els specifies coordinates of array we're
     //currently operating on
-    for (int i = 0; i<SIZE2; i++) {
+    for (int i = 0; i<values.size(); i++) {
       std::vector<int> new_recursive_el (recursive_el);
       new_recursive_el.push_back(i);
       pass_array_to_javascript(values[i], new_recursive_el);
@@ -228,29 +231,29 @@ namespace emp {
     void pass_array_to_cpp(std::array<T, SIZE> & arr, bool recurse = false) {
 
     //Figure out type stuff
-    std::map<const char *, std::string> map_type_names =\
+    std::map<std::string, std::string> map_type_names =\
       get_type_to_string_map();
     emp_assert((map_type_names.find(typeid(T).name()) != map_type_names.end()));
     int type_size = sizeof(T);
     std::string type_string = map_type_names[typeid(T).name()];
 
     //Make sure arrays have the same length
-    emp_assert(SIZE == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
+    emp_assert(arr.size() == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
 
     //Write emp.__outgoing_array contents to a buffer
     int buffer = EM_ASM_INT({
-	var buffer = Module._malloc(emp_i.__outgoing_array.length*$0);
+	  var buffer = Module._malloc(emp_i.__outgoing_array.length*$0);
 
-	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-	  setValue(buffer+(i*$0), emp_i.__outgoing_array[i],\
+	  for (i=0; i<emp_i.__outgoing_array.length; i++) {
+	    setValue(buffer+(i*$0), emp_i.__outgoing_array[i],\
 		   Pointer_stringify($1));
-	}
+	  }
 
-	return buffer;
-      }, type_size, type_string.c_str());
+      return buffer;
+    }, type_size, type_string.c_str());
 
     //Populate array from buffer
-    for (int i=0; i<SIZE; i++) {
+    for (int i=0; i<arr.size(); i++) {
       arr[i] = *(T*) (buffer + i*type_size);
     }
 
@@ -263,22 +266,22 @@ namespace emp {
   template <std::size_t SIZE>
     void pass_array_to_cpp(std::array<char, SIZE> & arr, bool recurse = false) {
 
-    emp_assert(SIZE == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
+    emp_assert(arr.size() == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
 
     int buffer = EM_ASM_INT_V({
 
-	//Since we're treating each char as it's own string, each one
-	//will be null-termianted. So we malloc length*2 addresses.
-	var buffer = Module._malloc(emp_i.__outgoing_array.length*2);
+	  //Since we're treating each char as it's own string, each one
+	  //will be null-termianted. So we malloc length*2 addresses.
+	  var buffer = Module._malloc(emp_i.__outgoing_array.length*2);
 
-	for (i=0; i<emp_i.__outgoing_array.length; i++){
-	  writeStringToMemory(emp_i.__outgoing_array[i], buffer+(i*2));
-	}
+	  for (i=0; i<emp_i.__outgoing_array.length; i++){
+	    writeStringToMemory(emp_i.__outgoing_array[i], buffer+(i*2));
+	  }
 
-	return buffer;
-      });
+	  return buffer;
+    });
 
-    for (int i=0; i<SIZE; i++){
+    for (int i=0; i<arr.size(); i++){
       arr[i] = *(char*) (buffer + i*2);
     }
 
@@ -290,32 +293,32 @@ namespace emp {
     void pass_array_to_cpp(std::array<std::string, SIZE> & arr, \
 			   bool recurse = false) {
 
-    emp_assert(SIZE == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
+    emp_assert(arr.size() == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
 
     int buffer = EM_ASM_INT_V({
 
-	//Figure how much memory to allocate
-	var arr_size = 0;
-	for (i=0; i<emp_i.__outgoing_array.length; i++){
-	  arr_size += emp_i.__outgoing_array[i].length + 1;
-	}
+	  //Figure how much memory to allocate
+	  var arr_size = 0;
+	  for (i=0; i<emp_i.__outgoing_array.length; i++){
+	    arr_size += emp_i.__outgoing_array[i].length + 1;
+	  }
 
-	var buffer = Module._malloc(arr_size);
+	  var buffer = Module._malloc(arr_size);
 
-	//Track place in memory to write too
-	var cumulative_size = 0;
-	for (i=0; i<emp_i.__outgoing_array.length; i++){
-	  writeStringToMemory(emp_i.__outgoing_array[i], buffer + \
+	  //Track place in memory to write too
+	  var cumulative_size = 0;
+	  for (i=0; i<emp_i.__outgoing_array.length; i++){
+	    writeStringToMemory(emp_i.__outgoing_array[i], buffer + \
 			      (cumulative_size));
-	  cumulative_size += emp_i.__outgoing_array[i].length + 1;
-	}
+	    cumulative_size += emp_i.__outgoing_array[i].length + 1;
+	  }
 
-	return buffer;
-      });
+	  return buffer;
+    });
 
     //Track place in memory to read from
     int cumulative_size = 0;
-    for (int i=0; i<SIZE; i++){
+    for (int i=0; i<arr.size(); i++){
       //Since std::string constructor reads to null terminator, this just works.
       arr[i] = std::string((char*) (buffer + cumulative_size));
       cumulative_size += arr[i].size() + 1;
@@ -330,7 +333,7 @@ namespace emp {
     void pass_array_to_cpp(std::array<std::array<T, SIZE2>, SIZE> & arr,\
 			   bool recurse = false) {
 
-    emp_assert(SIZE == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
+    emp_assert(arr.size() == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
 
     //Create temp array to hold whole array while pieces are passed in
     if (recurse == 0) {
@@ -341,11 +344,11 @@ namespace emp {
       EM_ASM({emp_i.__temp_array.push(emp_i.__outgoing_array);});
     }
 
-    for (int i = 0; i < SIZE; i++) {
+    for (int i = 0; i < arr.size(); i++) {
       EM_ASM_ARGS({
-	  emp_i.__outgoing_array\
+	    emp_i.__outgoing_array\
 	    = emp_i.__temp_array[emp_i.__temp_array.length - 1][$0];
-	}, i);
+	  }, i);
       pass_array_to_cpp(arr[i], true);
     }
 

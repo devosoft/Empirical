@@ -261,7 +261,7 @@ public:
 
     //Create tool top
     tip = new D3::ToolTip(GetID()+"tooltip_display");
-
+    GetSVG()->SetupToolTip(*tip);
     //Set up scales
     y_scale = new D3::LinearScale();
     x_scale = new D3::LinearScale();
@@ -364,7 +364,7 @@ public:
     enter.SetAttr("r", 2);
     enter.SetAttr("class", "data-point");
     enter.SetStyle("fill", "green");
-    enter.AddToolTip(*tip);
+    enter.BindToolTipMouseover(*tip);
     prev_data = data[0];
     data.pop_front();
     if (data.size() > 0) {
@@ -432,7 +432,7 @@ public:
 
     EM_ASM_ARGS({
       js.objects[$0] = [js.objects[$1][0]];
-  }, alive.GetID(), data->GetID());
+    }, alive.GetID(), data->GetID());
   }
 
   virtual void AnimateStep(emp::vector<double> persist) {

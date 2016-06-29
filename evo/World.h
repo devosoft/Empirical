@@ -256,7 +256,7 @@ namespace evo {
       SetupOrg(*new_org, &callbacks, pos);
       org_placement_sig.Trigger(pos);
     }
-    void InsertBirth(const ORG & mem, int parent_pos, int copy_count=1) {
+    void InsertBirth(const ORG mem, int parent_pos, int copy_count=1) {
       before_repro_sig.Trigger(parent_pos);
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);
@@ -387,6 +387,7 @@ namespace evo {
 
       for (int T = 0; T < tourny_count; T++) {
         emp::vector<int> entries = Choose(*random_ptr, valid_orgs.size(), t_size);
+        Shuffle(*random_ptr, entries);
         double best_fit = fitness[entries[0]];
         int best_id = valid_orgs[entries[0]];
 

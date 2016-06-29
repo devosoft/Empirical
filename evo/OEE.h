@@ -72,7 +72,7 @@ namespace evo{
 
   public:
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
-    using lineage_type = LineageTracker_Pruned<POP_MANAGER>;
+    using lineage_type = LineageTracker<POP_MANAGER>;
     lineage_type * lineage;
     std::function<double(org_ptr)> fit_fun;
 

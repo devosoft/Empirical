@@ -61,7 +61,7 @@ namespace evo {
       return total;
     }
     double GetFitness(BitVector genome) const {
-      emp_assert(genome.GetSize() == N);
+      emp_assert(genome.GetSize() == N, genome.GetSize(), N, genome);
 
       // Use a double-length genome to easily handle wrap-around.
       genome.Resize(N*2);
