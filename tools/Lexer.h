@@ -97,8 +97,8 @@ namespace emp {
       int best_pos = 0;
       int best_stop = -1;
       lexeme.resize(0);
-      while (cur_stop >= 0 && cur_state >= 0) {
-        const char next_char = is.get();
+      while (cur_stop >= 0 && cur_state >= 0 && !is.eof()) {
+        const uint8_t next_char = is.get();
         cur_pos++;
         cur_state = lexer_dfa.Next(cur_state, next_char);
         cur_stop = lexer_dfa.GetStop(cur_state);
