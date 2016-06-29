@@ -236,6 +236,8 @@ namespace evo {
 
     // All additions to the population must go through one of the following Insert methods
 
+    void set_available_points (long pts) {popM.set_available_points(pts);}
+    
     // passthrough method for initialization
     unsigned int  SequentialInsert(ORG * org) {
       return popM.SequentialInsert(org);

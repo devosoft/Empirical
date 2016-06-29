@@ -54,7 +54,8 @@ EMP_BUILD_CONFIG( QuorumConfig,
     VALUE(WHICH_OTHER, int, 1, "Index of predefined org to use as the 'other'"),
     VALUE(ENABLE_MUTATION, bool, 1, "If mutation should be enabled"),
     VALUE(RAND_SEED, int, 238947, "Seed for the random generator"),
-    VALUE(PREFIX, std::string, "", "Prefix for filenames")
+    VALUE(PREFIX, std::string, "", "Prefix for filenames"),
+    VALUE(AVAILABLE_PRIVATE_PTS, long, 180000, "Number of available private points")
 )
 
 std::string init_config_names[5] = {"balanced", "lying_defector", "donator", "scrooge", 
@@ -95,6 +96,7 @@ int main(int argc, char* argv[]) {
     unsigned int runtime = config.TICKS();
     unsigned int pop_size = config.INITIAL_SIZE();
     dice.ResetSeed(config.RAND_SEED());
+    Qpop.set_available_points(config.AVAILABLE_PRIVATE_PTS());
 
     if (pop_size > (unsigned) (config.GRID_X() * config.GRID_Y()) ) {
       std::cerr << "** ERROR: Initial population size is larger than the grid!!" << std::endl;
@@ -221,8 +223,8 @@ int main(int argc, char* argv[]) {
     Qstats.AddFunction(max_age_func, "max_age");
     Qstats.AddFunction(avg_coop_chance, "avg_coop");
     Qstats.AddFunction(avg_points, "avg_points"); 
-    Qstats.AddFunction(percent_defector_lin, "percent " + init_config_names[config.WHICH_OTHER()]);
-    Qstats.AddFunction(percent_donator_lin, "percent " + init_config_names[config.INITIAL_CONFIG()]);
+    Qstats.AddFunction(percent_defector_lin, "percent" + init_config_names[config.WHICH_OTHER()]);
+    Qstats.AddFunction(percent_donator_lin, "percent" + init_config_names[config.INITIAL_CONFIG()]);
     Qstats.AddFunction(used_grid_capacity, "grid_usage");
 
     unsigned int checkpoint = 0;

@@ -36,6 +36,7 @@ namespace evo {
   protected:
     using POP_MANAGER<QuorumOrganism>::pop;
     int spacing = -1;
+    long available_private_points = 16000;
 
     /// calculates quorum and updates state.hi_density  
     bool calculate_quorum (std::set<QuorumOrganism *> & neighbors) {
@@ -87,7 +88,8 @@ public:
       // they are `spacing` distance apart
       int num_to_place = num_locs * grid_density;
       int spacing = num_locs / num_to_place;
-
+      
+      
       // there are (num_locs * grid_density * alt_density) # spaces that'll be occupied
       // w/ alt orgs
       int num_alt = num_to_place * alt_density;
@@ -98,11 +100,12 @@ public:
         if(alt_density > 0 && (double) num_alt_placed / (double) num_to_place < alt_density) {
           org = new QuorumOrganism(alt_seed->co_op_prob, alt_seed->ai_radius, 
                                    alt_seed->quorum_threshold, mut, 0, alt_seed->lineage, 
-                                   alt_seed->can_make_HiAI);
+                                   alt_seed->can_make_HiAI, alt_seed->can_make_LoAI);
           num_alt_placed++;
         } else {
           org = new QuorumOrganism(seed->co_op_prob, seed->ai_radius,seed->quorum_threshold, mut, 
-                                   0, seed->lineage, seed->can_make_HiAI);
+                                   0, seed->lineage, seed->can_make_HiAI,
+                                   seed->can_make_LoAI);
         }
 
         pop[position] = org;
@@ -112,6 +115,10 @@ public:
       }
 
     }
+
+    void set_available_points(long pts) {available_private_points = pts;}
+    long get_available_points () const {return available_private_points;}
+
 
     int classify (QuorumOrganism const * org) {
       return QuorumOrganism::classify(org);
@@ -195,7 +202,10 @@ public:
       for(QuorumOrganism * org : POP_MANAGER<QuorumOrganism>::pop) {
         if (org == nullptr) {continue;} // don't even try to touch nulls
         org->state.reset_accounting();
-        org->add_points(1); // metabolize
+        if (available_private_points > 0) {
+          org->add_points(1); // metabolize
+          available_private_points--;
+        }
         Publicize(org);
       }
 
