@@ -89,7 +89,7 @@ int main()
   emp::NFA nfa_lower = to_NFA(re_lower);
   emp::NFA nfa_upper = to_NFA(re_upper);
   emp::NFA nfa_inc = to_NFA(re_inc);
-  emp::NFA nfa_all = to_NFA(nfa_lower, nfa_upper, nfa_inc);
+  emp::NFA nfa_all = MergeNFA(nfa_lower, nfa_upper, nfa_inc);
   emp::DFA dfa_all = to_DFA(nfa_all);
 
   re_lower.PrintDebug();
