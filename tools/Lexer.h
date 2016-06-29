@@ -97,7 +97,12 @@ namespace emp {
       int best_pos = 0;
       int best_stop = -1;
       lexeme.resize(0);
-      while (cur_stop >= 0 && cur_state >= 0 && !is.eof()) {
+
+      // Keep looking as long as:
+      // 1: We may still be able to contine the current lexeme.
+      // 2: We have not entered an invalid state.
+      // 3: Our input stream has more symbols.
+      while (cur_stop >= 0 && cur_state >= 0 && is) {
         const uint8_t next_char = is.get();
         cur_pos++;
         cur_state = lexer_dfa.Next(cur_state, next_char);
@@ -107,10 +112,13 @@ namespace emp {
       }
 
       // If best_pos < cur_pos, we need to rewind the input stream and adjust the lexeme.
-      if (best_pos < cur_pos) {
+      if (best_pos > 0 && best_pos < cur_pos) {
         lexeme.resize(best_pos);
         while (best_pos < cur_pos) { is.unget(); cur_pos--; }
       }
+
+      // If we are at the end of this input stream (with no token to return) give back a 0.
+      if (best_stop == -1 && !is) return 0;
 
       return best_stop;
     }
