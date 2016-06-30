@@ -2,6 +2,9 @@
 #define __LOAD_DATA_H__
 
 #include "d3_init.h"
+#include <functional>
+#include "../Empirical/emtools/JSWrap.h"
+#include "../Empirical/tools/string_utils.h"
 
 namespace D3 {
 
@@ -45,6 +48,36 @@ namespace D3 {
         };
       }, FindInHierarchy.GetID());
     };
+
+    void LoadDataFromFile(std::string filename) {
+      EM_ASM_ARGS ({
+        d3.json(Pointer_stringify($1), function(data){js.objects[$0]=data;});
+      }, id, filename.c_str());
+    }
+
+    template <typename DATA_TYPE>
+    void LoadDataFromFile(std::string filename, std::function<void(DATA_TYPE)> fun) {
+      emp::JSWrap(fun, "__json_load_fun__"+emp::to_string(id));
+
+      EM_ASM_ARGS ({
+        d3.json(Pointer_stringify($1), function(data){
+            js.objects[$0]=data;
+            emp["__json_load_fun__"+$0](data);
+        });
+      }, id, filename.c_str());
+    }
+
+    void LoadDataFromFile(std::string filename, std::function<void(void)> fun) {
+      emp::JSWrap(fun, "__json_load_fun__"+emp::to_string(id));
+
+      EM_ASM_ARGS ({
+        d3.json(Pointer_stringify($1), function(data){
+            js.objects[$0]=data;
+            emp["__json_load_fun__"+$0]();
+        });
+      }, id, filename.c_str());
+    }
+
 
     void Append(std::string json) {
       EM_ASM_ARGS({

@@ -44,21 +44,21 @@ namespace D3 {
         var canvas_height = js.objects[$1].attr("height");
 
         var orient = js.objects[$0].orient();
-        var dy = "3em";
+        var dy = "2em";
         var x_divisor = 2.0;
         var text_orient = 0;
         js.objects[$3].attr("transform", "translate(0,"+(canvas_height-60)+")");
         if (orient == "top") {
-          dy = "-3em";
+          dy = "-2em";
           x_divisor = 2.0;
           js.objects[$3].attr("transform", "translate(0,60)");
         } else if (orient == "left") {
-          dy = "-3em";
+          dy = "-2em";
           x_divisor = -2.0;
           text_orient = -90;
           js.objects[$3].attr("transform", "translate(60,0)");
         } else if(orient == "right") {
-          dy = "3em";
+          dy = "2em";
           text_orient = -90;
           js.objects[$3].attr("transform", "translate("+(canvas_width-60)+",0)");
         }
