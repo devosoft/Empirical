@@ -216,10 +216,11 @@ namespace evo {
 
     // Injected orgs go into a random position.
     int AddOrg(ORG * new_org) {
-      const int pos = random_ptr->GetInt((int) pop.size());
-      if (pop[pos]) delete pop[pos];
-      pop[pos] = new_org;
-      return pos;
+      emp::vector<int> empty_spots = GetValidOrgIndices();
+      const int pos = random_ptr->GetInt((int) empty_spots.size());
+      
+      pop[empty_spots[pos]] = new_org;
+      return empty_spots[pos];
     }
 
     // Newly born orgs go next to their parents.
@@ -238,6 +239,17 @@ namespace evo {
 
       return pos;
     }
+
+    emp::vector<int> GetValidOrgIndices(){
+      emp::vector<int> valid_orgs(0);
+      for (int i = 0; i < pop.size(); i++){
+        if (pop[i] == nullptr){
+          valid_orgs.push_back(i);
+        }
+      }
+      return valid_orgs;
+    }
+
 
     void Print(std::function<std::string(ORG*)> string_fun,
                std::ostream & os = std::cout,

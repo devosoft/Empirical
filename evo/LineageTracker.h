@@ -425,6 +425,15 @@ namespace evo{
 
     }
 
+    //aaa
+    emp::vector<int> CoalMap() {
+        emp::vector<int> depths;
+        for(int i = 0; i < generation_since_update.size(); i++){
+          int id =  generation_since_update[i];
+          depths.push_back(TraceLineageIDs(id).size());
+        }
+        return depths;
+    }
 
 };
 

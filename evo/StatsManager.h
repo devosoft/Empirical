@@ -328,16 +328,16 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
           };
 
           // Add functions to mananger
-          AddFunction(diversity, "shannon_diversity");
+          //AddFunction(diversity, "shannon_diversity");
           AddFunction(last_coal, "last_coal");
-          AddFunction(max_fitness, "max_fitness");
-          AddFunction(avg_fitness, "avg_fitness");
-          AddFunction(non_inf, "non_inf");
-          AddFunction(ben_mut, "ben_mut");
-          AddFunction(neu_mut, "neu_mut");
-          AddFunction(det_mut, "det_mut");
-          AddFunction(max_ben, "max_ben");
-          AddFunction(max_det, "max_det");
+          //AddFunction(max_fitness, "max_fitness");
+          //AddFunction(avg_fitness, "avg_fitness");
+          //AddFunction(non_inf, "non_inf");
+          //AddFunction(ben_mut, "ben_mut");
+          //AddFunction(neu_mut, "neu_mut");
+          //AddFunction(det_mut, "det_mut");
+          //AddFunction(max_ben, "max_ben");
+          //AddFunction(max_det, "max_det");
 
           w->OnUpdate(UpdateFun);
 

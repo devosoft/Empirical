@@ -16,6 +16,7 @@
 #include "../../tools/Random.h"
 #include "../../evo/EvoStats.h"
 #include "../../evo/StatsManager.h"
+#include "../../evo/LineageTracker.h"
 
 
 EMP_BUILD_CONFIG( NKConfig,
@@ -107,24 +108,6 @@ int main(int argc, char* argv[])
     // Run a tournament for the rest...   
     grid_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
             , TOURNAMENT_SIZE, POP_SIZE);
-
-    // Use if you  want a visual map of the grid
-    //auto popTest = &(grid_pop.popM);
-    //long count = 0;
-    //std::ofstream file;
-
-    //file.open("junk/update_" + std::to_string(ud) + ".csv");
-    //file<<std::endl;
-    //for(auto el : *popTest){
-        
-     //   file<<fit_func(el)<<",";
-     //   count++;
-     //   if(count % 10 == 0){
-     //       file<<std::endl;
-     //   }
-
-   // }
-    //file.close();
 
     grid_pop.Update();
     grid_pop.MutatePop();
