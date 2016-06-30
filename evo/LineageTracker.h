@@ -509,6 +509,42 @@ namespace evo{
       return genome_group;
     }
 
+    void WriteDataToFile(std::string filename) {
+      std::ofstream output_location;
+      output_location.open(filename);
+      std::string output = node_to_json(&nodes[0]);
+      output_location << "[" << output << "]" << std::endl;
+      output_location.close();
+    }
+
+    std::string node_to_json(Node<org_ptr> * node) {
+      std::stringstream ss;
+      ss << "{\"name\":";
+      ss << to_string(node->id);
+      ss << ", \"parent\":";
+      ss << to_string(node->parent->id);
+      ss << ", \"alive\":";
+      if (node->alive){
+        ss << "true";
+      } else {
+        ss << "false";
+      }
+      ss << ", \"persist\":false, \"genome\":\"";
+      if (node->genome != nullptr) {
+        ss << to_string(*(node->genome));
+      } else {
+        ss << "null";
+      }
+      ss << "\", \"children\":[";
+      for (int i=0; i < node->offspring.size(); ++i) {
+        ss << node_to_json(node->offspring[i]);
+        if (i < node->offspring.size()-1) {
+          ss << ", ";
+        }
+      }
+      ss << "]}";
+      return ss.str();
+    }
 
 };
 

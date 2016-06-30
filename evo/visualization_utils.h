@@ -21,6 +21,7 @@
 #include "../tools/Random.h"
 #include "../tools/stats.h"
 #include "../tools/string_utils.h"
+#include "../tools/FunctionSet.h"
 
 //Pretty sure D3VisualizationInfo can't be shared among multiple D3Visualizations
 
@@ -397,7 +398,9 @@ public:
   D3::JSObject alive;
   D3::ToolTip * tip;
   D3::JSONDataset * data;
+  FunctionSet<void> pending_funcs;
 
+  bool init = false;
   int next_pos;
   int next_parent = 0;
   int next_child;
@@ -433,6 +436,23 @@ public:
     EM_ASM_ARGS({
       js.objects[$0] = [js.objects[$1][0]];
     }, alive.GetID(), data->GetID());
+
+    init = true;
+    pending_funcs.Run();
+  }
+
+  void LoadDataFromFile(std::string filename) {
+    if (init) {
+      data->LoadDataFromFile(filename, [this](){DrawTree();});
+    } else {
+      pending_funcs.Add([this, filename](){
+          data->LoadDataFromFile(filename, [this](){
+              //tree.SetDataset(data);
+              DrawTree();
+
+          });
+      });
+    }
   }
 
   virtual void AnimateStep(emp::vector<double> persist) {
@@ -456,7 +476,12 @@ public:
         js.objects[$0][$1].alive = false;
         js.objects[$0][$1] = js.objects[$0][$2].children[js.objects[$0][$2].children.length-1];
     }, alive.GetID(), next_pos, pos);
+    DrawTree();
+  }
 
+  void DrawTree() {
+      std::cout << "Drawing tree" << std::endl;
+      std::cout << "Svg: " << GetSVG()->GetID()<< std::endl;
     D3::Selection nodeEnter = tree.GenerateNodesAndLinks(*GetSVG());
     nodeEnter.Append("circle").SetAttr("r", 2).AddToolTip(*tip);
     GetSVG()->SelectAll("g.node").SelectAll("circle").SetStyle("fill", GetID()+"color_fun");
