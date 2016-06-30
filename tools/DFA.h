@@ -110,6 +110,11 @@ namespace emp {
       return state;
     }
 
+    stop_t Test(const std::string & str) const {
+      int out = Next(0, str);
+      return GetStop(out);
+    }
+
     void Print(std::ostream & os=std::cout) {
       os << "Num states = " << GetSize() << std::endl;
       os << "Start = 0; Stop =";
