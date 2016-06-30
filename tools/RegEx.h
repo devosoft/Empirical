@@ -17,6 +17,13 @@
 //   '[' and ']'  - character set -- choose ONE character
 //                  ^ as first char negates contents ; - indicates range UNLESS first or last.
 //
+//
+//  Additional overloads for functions in lexer_utils.h:
+//
+//    static NFA to_NFA(const RegEx & regex, int stop_id=1);
+//    static DFA to_DFA(const RegEx & regex);
+//
+//
 //  Developer Notes:
 //   * Need to implement  ^ and $ (beginning and end of line)
 //   * Need to implement {n}, {n,} and {n,m} (exactly n, at least n, and n-m copies, respecitvely)
@@ -30,6 +37,7 @@
 #include <string>
 
 #include "BitSet.h"
+#include "lexer_utils.h"
 #include "NFA.h"
 #include "string_utils.h"
 #include "vector.h"
@@ -455,6 +463,20 @@ namespace emp {
       PrintInternal();
     }
   };
+
+
+  // Simple conversion of RegEx to NFA (mostly implemented in RegEx)
+  static NFA to_NFA(const RegEx & regex, int stop_id=1) {
+    NFA nfa(2);  // State 0 = start, state 1 = stop.
+    nfa.SetStop(1, stop_id);
+    regex.AddToNFA(nfa, 0, 1);
+    return nfa;
+  }
+
+  // Conversion of RegEx to DFA, via NFA intermediate.
+  static DFA to_DFA(const RegEx & regex) {
+    return to_DFA( to_NFA(regex) );
+  }
 
 }
 

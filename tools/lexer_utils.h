@@ -2,24 +2,22 @@
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
-//  A set of utilities to convert among RegEx, NFA, DFA, and fully lexers.
+//  A set of utilities to convert between NFAs and DFAs
 //
 //  Available conversions:
 //
 //   static const DFA & to_DFA(const DFA & dfa)
 //   static DFA to_DFA(const NFA & nfa, int keep_invalid=false)
-//   static DFA to_DFA(const RegEx & regex)
 //
 //   static NFA to_NFA(const DFA & dfa)
 //   static const NFA & to_NFA(const NFA & nfa)}
-//   static NFA to_NFA(const RegEx & regex, int stop_id=1)
+//
+//   (additional to_NFA and to_DFA functions are defined in RegEx.h)
 //
 //  Available merges:
 //
 //   static NFA MergeNFA( ... )  - Convert two or more (DFA, NFA or RegEx) to a single NFA.
 //   static DFA MergeDFA( ... )  - Convert two or more (DFA, NFA or RegEx) to a single DFA.
-
-
 
 
 #ifndef EMP_LEXER_UTILS_H
@@ -29,7 +27,6 @@
 
 #include "DFA.h"
 #include "NFA.h"
-#include "RegEx.h"
 
 namespace emp {
 
@@ -98,18 +95,6 @@ namespace emp {
     return nfa;
   }
 
-  // Simple conversion of RegEx to NFA (mostly implemented in RegEx)
-  static NFA to_NFA(const RegEx & regex, int stop_id=1) {
-    NFA nfa(2);  // State 0 = start, state 1 = stop.
-    nfa.SetStop(1, stop_id);
-    regex.AddToNFA(nfa, 0, 1);
-    return nfa;
-  }
-
-  // Conversion of RegEx to DFA, via NFA intermediate.
-  static DFA to_DFA(const RegEx & regex) {
-    return to_DFA( to_NFA(regex) );
-  }
 
   // Merge multiple NFAs into one.
   template <typename T1>
