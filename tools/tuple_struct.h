@@ -1,5 +1,5 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
+// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
+// Copyright (C) Michigan State University, 2015. It is licensed
 // under the MIT Software license; see doc/LICENSE
 
 #ifndef EMP_TUPLE_STRUCT_H
@@ -35,6 +35,22 @@
 //  call EMP_BUILD_NAMED_TUPLE, which is identical to EMP_BUILD_TUPLE, but takes the
 //  name to be used for the tuple as its first argument.
 //
+//  Example of using an introspective tuple:
+//
+//    struct JSONObject {
+//    EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
+//				   int, name,
+// 				   int, parent,
+//                 double, y,
+//                 int, depth
+// 	  	   )
+//    };
+//
+//  This struct can now be used as a C++ stand-in for Javscript objects for use with
+//  JSWrap.
+//
+//  Introspective tuple structs have a static member n_fields that indicates how
+//  many variables they have.
 //
 //  Development notes:
 //  * Add static member function to help with reflection?
@@ -155,6 +171,7 @@
 //Also can be called directly if you want a tuple with a name other than
 //emp__tuple_body with stored variables.
 #define EMP_BUILD_INTROSPECTIVE_NAMED_TUPLE(TUPLE_NAME, ...)            \
+  const static int n_fields = EMP_COUNT_ARGS(EMP_GET_ODD_ARGS(__VA_ARGS__)); \
   std::tuple< EMP_GET_ODD_ARGS(__VA_ARGS__) > TUPLE_NAME;               \
   EMP_BUILD_TUPLE_IMPL(TUPLE_NAME, __VA_ARGS__);                        \
   std::array<std::string, EMP_COUNT_ARGS(EMP_GET_EVEN_ARGS(__VA_ARGS__))> \
@@ -164,14 +181,14 @@
   std::array<void *, EMP_COUNT_ARGS(EMP_GET_EVEN_ARGS(__VA_ARGS__))>    \
   pointers{{EMP_WRAP_ARGS(GET_POINTER, EMP_GET_EVEN_ARGS(__VA_ARGS__))}};
 
-//This varient of the tuple building macro can be used in situations where 
+//This varient of the tuple building macro can be used in situations where
 //access to stringified versions of variable names is necessary.
-//It stores an array of stringified variable names called var_names in the 
+//It stores an array of stringified variable names called var_names in the
 //struct this macro was called from.
 //
 // For instance:
 // MyStruct.var_names[0] <- returns the name of the first variable
-// 
+//
 #define EMP_BUILD_INTROSPECTIVE_TUPLE(...) EMP_BUILD_INTROSPECTIVE_NAMED_TUPLE(emp__tuple_body, __VA_ARGS__)
 
 

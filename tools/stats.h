@@ -11,9 +11,11 @@
 
 #include <type_traits>
 #include <map>
+#include <unordered_map>
 #include <cmath>
 #include <vector>
 #include <set>
+#include <unordered_set>
 #include <functional>
 
 #include "../tools/vector.h"
@@ -100,7 +102,8 @@ namespace evo{
   //Takes a function and a container of items that that function can be run on
   //and returns the maximum value
   template <typename C, typename RET_TYPE>
-  RET_TYPE MaxFunctionReturn(std::function<RET_TYPE(typename C::value_type)> fun, C & elements){
+
+  RET_TYPE MaxFunctionReturn(std::function<RET_TYPE(typename C::value_type)> & fun, C & elements){
     double highest = 0;
     for (auto element : elements){
       double result = fun(element);
@@ -114,7 +117,7 @@ namespace evo{
   //Takes a function and a container of items that that function can be run on
   //and returns the average value. Function must return a double.
   template <typename C>
-  double AverageFunctionReturn(std::function<double(typename C::value_type)> fun, C & elements){
+  double AverageFunctionReturn(std::function<double(typename C::value_type)> & fun, C & elements){
     double cumulative_value = 0;
     double count = 0;
     for (auto element : elements){
@@ -125,7 +128,7 @@ namespace evo{
   }
 
   template <typename C, typename RET_TYPE>
-  emp::vector<RET_TYPE> RunFunctionOnContainer(std::function<RET_TYPE(typename C::value_type)> fun, C & elements) {
+  emp::vector<RET_TYPE> RunFunctionOnContainer(std::function<RET_TYPE(typename C::value_type)> & fun, C & elements) {
       emp::vector<RET_TYPE> results;
       for (auto element : elements){
           results.push_back(fun(element));

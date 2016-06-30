@@ -1,7 +1,10 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
+
+// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
+// Copyright (C) Michigan State University, 2015. It is licensed
+// under the MIT Software license; see doc/LICENSE
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
 //
 //  Wrap a C++ function and convert it to an integer that can be called from Javascript
 //
@@ -38,7 +41,6 @@
 #ifndef EMP_JSWRAP_H
 #define EMP_JSWRAP_H
 
-
 #include <functional>
 #include <tuple>
 #include <array>
@@ -49,7 +51,7 @@
 #include "../tools/meta.h"
 #include "../tools/vector.h"
 #include "../tools/tuple_struct.h"
-#include "js_object_struct.h"
+#include "js_utils.h"
 
 #ifdef EMSCRIPTEN
 extern "C" {
@@ -59,7 +61,6 @@ extern "C" {
 // When NOT in Emscripten, need a stub for this function.
 int EMP_GetCBArgCount() { return -1; }
 #endif
-
 
 namespace emp {
 
@@ -91,6 +92,11 @@ namespace emp {
       }, ARG_ID);
     arg_var = tmp_var;   // @CAO Do we need to free the memory in tmp_var?
   }
+
+  template <int ARG_ID, size_t SIZE, typename T> static void LoadArg(std::array<T, SIZE> & arg_var){
+    EM_ASM_ARGS({emp_i.__outgoing_array = emp_i.cb_args[$0];}, ARG_ID);
+    pass_array_to_cpp(arg_var);
+}
 
   //Helper functions to load arguments from inside Javascript objects by name.
   template <int ARG_ID> static void LoadArg(int & arg_var, std::string var) {
@@ -126,51 +132,29 @@ namespace emp {
     arg_var = tmp_var;   // Free memory here?
   }
 
-  //Helper macros to make sure that every piece of a tuple_struct gets loaded
-  #define LOAD_TUPLE_ARG_1 LoadArg<ARG_ID>(std::get<0>(arg_var.emp__tuple_body)\
-                        , arg_var.var_names[0]);
-  #define LOAD_TUPLE_ARG_2 LOAD_TUPLE_ARG_1 LoadArg<ARG_ID>(std::get<1>(\
-			arg_var.emp__tuple_body),arg_var.var_names[1]);
-  #define LOAD_TUPLE_ARG_3 LOAD_TUPLE_ARG_2 LoadArg<ARG_ID>(std::get<2>(\
-			arg_var.emp__tuple_body),arg_var.var_names[2]);
-  #define LOAD_TUPLE_ARG_4 LOAD_TUPLE_ARG_3 LoadArg<ARG_ID>(std::get<3>(\
-			arg_var.emp__tuple_body),arg_var.var_names[3]);
-  #define LOAD_TUPLE_ARG_5 LOAD_TUPLE_ARG_4 LoadArg<ARG_ID>(std::get<4>(\
-			arg_var.emp__tuple_body),arg_var.var_names[4]);
-  #define LOAD_TUPLE_ARG_6 LOAD_TUPLE_ARG_5 LoadArg<ARG_ID>(std::get<5>(\
-			arg_var.emp__tuple_body),arg_var.var_names[5]);
-  #define LOAD_TUPLE_ARG_7 LOAD_TUPLE_ARG_6 LoadArg<ARG_ID>(std::get<6>(\
-			arg_var.emp__tuple_body),arg_var.var_names[6]);
-  #define LOAD_TUPLE_ARG_8 LOAD_TUPLE_ARG_7 LoadArg<ARG_ID>(std::get<7>(\
-			arg_var.emp__tuple_body),arg_var.var_names[7]);
-  #define LOAD_TUPLE_ARG_9 LOAD_TUPLE_ARG_8 LoadArg<ARG_ID>(std::get<8>(\
-			arg_var.emp__tuple_body),arg_var.var_names[8]);
-  #define LOAD_TUPLE_ARG_10 LOAD_TUPLE_ARG_9 LoadArg<ARG_ID>(std::get<9>(\
-			arg_var.emp__tuple_body),arg_var.var_names[9]);
-  #define LOAD_TUPLE_ARG_11 LOAD_TUPLE_ARG_10 LoadArg<ARG_ID>(std::get<10>(\
-			arg_var.emp__tuple_body),arg_var.var_names[10]);
-  #define LOAD_TUPLE_ARG_12 LOAD_TUPLE_ARG_11 LoadArg<ARG_ID>(std::get<11>(\
-			arg_var.emp__tuple_body),arg_var.var_names[11]);
-  #define LOAD_TUPLE_ARG_13 LOAD_TUPLE_ARG_12 LoadArg<ARG_ID>(std::get<12>(\
-			arg_var.emp__tuple_body),arg_var.var_names[12]);
-  #define LOAD_TUPLE_ARG_14 LOAD_TUPLE_ARG_13 LoadArg<ARG_ID>(std::get<13>(\
-			arg_var.emp__tuple_body),arg_var.var_names[13]);
-  #define LOAD_TUPLE_ARG_15 LOAD_TUPLE_ARG_14 LoadArg<ARG_ID>(std::get<14>(\
-			arg_var.emp__tuple_body),arg_var.var_names[14]);
-  #define LOAD_TUPLE_ARG_16 LOAD_TUPLE_ARG_15 LoadArg<ARG_ID>(std::get<15>(\
-			arg_var.emp__tuple_body),arg_var.var_names[15]);
+  template <typename JSON_TYPE, int ARG_ID, int FIELD>
+  struct LoadTuple {
+    static void LoadJSDataArg(JSON_TYPE & arg_var) {
+      LoadArg<ARG_ID>(std::get<FIELD-1>(arg_var.emp__tuple_body), arg_var.var_names[FIELD-1]);
+      LoadTuple<JSON_TYPE, ARG_ID, FIELD-1> load_tuple = LoadTuple<JSON_TYPE, ARG_ID, FIELD-1>();
+      load_tuple.LoadJSDataArg(arg_var);
+    }
 
-  //Macro to load the right set of args into the tuple
-  //This requires that the user define DATA_OBJECT_SIZE with the struct,
-  //which is kind of ugly. Is there a way around it with templating?
-  #define LOAD_ARGS_FROM_TUPLE(s) EMP_MERGE(LOAD_TUPLE_ARG_,  s)
+  };
 
-  //Load a Javascript-style object of the form described in js_object_struct.h
-  //into a JSDataObject struct.
-  template <int ARG_ID> static void LoadArg(JSDataObject & arg_var) {
-    LOAD_ARGS_FROM_TUPLE(DATA_OBJECT_SIZE)
+
+  template <typename JSON_TYPE, int ARG_ID>
+  struct LoadTuple<JSON_TYPE, ARG_ID, 0> {
+    static void LoadJSDataArg(JSON_TYPE & arg_var) {;}
+  };
+
+
+  template <int ARG_ID, typename JSON_TYPE> static
+  typename std::enable_if<JSON_TYPE::n_fields != -1, void>::type
+  LoadArg(JSON_TYPE & arg_var) {
+    LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields> load_tuple = LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields>();
+    load_tuple.LoadJSDataArg(arg_var);
   }
-
 
   // ----- StoreReturn -----
   // Helper functions to individually store return values to JS
@@ -189,6 +173,12 @@ namespace emp {
 
   static void StoreReturn(const std::string & ret_var) {
     EM_ASM_ARGS({ emp_i.cb_return = Pointer_stringify($0); }, ret_var.c_str());
+  }
+
+  template <typename T, size_t N>
+  static void StoreReturn(const std::array<T, N> & ret_var) {
+    pass_array_to_javascript(ret_var);
+    EM_ASM({ emp_i.cb_return = emp_i.__incoming_array; });
   }
 
   // If the return type has a personalized function to handle the return, use it!
@@ -276,7 +266,8 @@ namespace emp {
         // Make sure that we are returning the correct number of arguments.  If this
         // assert fails, it means that we've failed to set the correct number of arguments
         // in emp.cb_args, and need to realign.
-        emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() == num_args);
+
+        emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() == num_args, EMP_GetCBArgCount(), num_args);
 
         // Collect the values of the arguments in a tuple
         using args_t = std::tuple< typename std::decay<ARG_TYPES>::type... >;
@@ -317,7 +308,9 @@ namespace emp {
         // Make sure that we are returning the correct number of arguments.  If this
         // assert fails, it means that we've failed to set the correct number of arguments
         // in emp.cb_args, and need to realign.
-        emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() == num_args);
+
+
+        emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() == num_args, EMP_GetCBArgCount(), num_args);
 
         // Collect the values of the arguments in a tuple
         using args_t = std::tuple< typename std::decay<ARG_TYPES>::type... >;

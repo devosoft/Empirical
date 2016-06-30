@@ -234,6 +234,8 @@ namespace evo {
     LinkKey OnOrgPlacement(std::function<void(int)> fun) { return org_placement_sig.AddAction(fun); }
     LinkKey OnUpdate(std::function<void(int)> fun) { return on_update_sig.AddAction(fun); }
 
+    std::function<double(ORG *)> GetFitFun(){return orgM.GetFitFun();}
+
     // All additions to the population must go through one of the following Insert methods
 
     void Insert(const ORG & mem, int copy_count=1) {
@@ -254,7 +256,8 @@ namespace evo {
       SetupOrg(*new_org, &callbacks, pos);
       org_placement_sig.Trigger(pos);
     }
-    void InsertBirth(const ORG  mem, int parent_pos, int copy_count=1) {
+
+    void InsertBirth(const ORG mem, int parent_pos, int copy_count=1) {
       before_repro_sig.Trigger(parent_pos);
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);

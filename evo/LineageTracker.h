@@ -17,11 +17,41 @@
 #ifndef EMP_LINEAGE_TRACKER_H
 #define EMP_LINEAGE_TRACKER_H
 
+#include <unordered_map>
 #include <map>
 #include <set>
 #include <algorithm>
 #include "../tools/vector.h"
 #include "PopulationManager.h"
+
+#ifdef EMSCRIPTEN
+#include "visualization_utils.h"
+#endif
+
+template <typename org_ptr>
+struct Node {
+  Node* parent;
+  int id;
+  bool alive;
+  org_ptr genome;
+  emp::vector<Node*> offspring;
+};
+
+namespace std
+{
+    //from fredoverflow's answer to
+    //http://stackoverflow.com/questions/8026890/c-how-to-insert-array-into-hash-set
+    template<typename T> struct hash<Node<T> >
+    {
+        typedef Node<T> argument_type;
+        typedef std::size_t result_type;
+        result_type operator()(argument_type const& s) const
+        {
+            result_type const h1 ( std::hash<int>()(s.id) );
+            return h1;
+        }
+    };
+}
 
 namespace emp{
 namespace evo{
@@ -45,11 +75,15 @@ namespace evo{
     using org_ptr = typename POP_MANAGER::value_type;
     using ORG = typename std::remove_pointer<org_ptr>::type;
     static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
+#ifdef EMSCRIPTEN
+    emp::vector<web::LineageVisualization*> viz_pointers;
+#endif
+
   public:
     static constexpr bool emp_is_lineage_manager = true;
     std::set<ORG> genomes;
     std::map<int, org_ptr> org_to_genome;
-    std::map<int, int> parents;
+    std::unordered_map<int, int> parents;
     int next = 1; //0 indicates no parent
     int next_parent_id = -1;
     int next_org_id = 1;
@@ -140,6 +174,11 @@ namespace evo{
         }
         generation_since_update[pos] = next_org_id;
       }
+#ifdef EMSCRIPTEN
+      for (auto viz_pointer : viz_pointers) {
+        viz_pointer->RecordPlacement(pos);
+      }
+#endif
     }
 
     //Record the org that's about to have an offspring, so we can know
@@ -160,6 +199,12 @@ namespace evo{
       org_ptr genome = (org_ptr)&(*it);
       this->org_to_genome[id] = genome;
       this->parents[id] = parent;
+#ifdef EMSCRIPTEN
+      for (auto viz : viz_pointers) {
+        viz->RecordParent(parent, id, genome);
+      }
+#endif
+
       return id;
     }
 
@@ -187,6 +232,31 @@ namespace evo{
 
     }
 
+    //Takes a container of ints representing org ids (as assigned by the lineage)
+    //tracker, and returns a contatiner of the genomes of those ints.
+    template <template <typename> class C >
+    C<ORG> IDsToGenomes(C<int> & ids) {
+      C<ORG> genome_group;
+      for (int id : ids){
+        genome_group.insert(genome_group.back(), *(this->org_to_genome[id]));
+      }
+      return genome_group;
+    }
+
+    //Specialization for emp::vector so we can use push_back
+    emp::vector<ORG> IDsToGenomes(emp::vector<int> & ids) {
+      emp::vector<ORG> genome_group;
+      for (int id : ids){
+        genome_group.push_back(*(this->org_to_genome[id]));
+      }
+      return genome_group;
+    }
+#ifdef EMSCRIPTEN
+    void ConnectVis(web::LineageVisualization * viz_pointer) {
+      viz_pointers.push_back(viz_pointer);
+    }
+#endif
+
   };
 
 
@@ -196,6 +266,7 @@ namespace evo{
     using org_ptr = typename LineageTracker<POP_MANAGER>::org_ptr;
     using ORG = typename LineageTracker<POP_MANAGER>::ORG;
 
+    template<typename ORG>
     struct Node {
       Node* parent;
       int id;
@@ -205,17 +276,22 @@ namespace evo{
     };
 
     using LineageTracker<POP_MANAGER>::next_org_id;
-    using LineageTracker<POP_MANAGER>::next_parent_id;
-    using LineageTracker<POP_MANAGER>::generation_since_update;
+    using LineageTracker<POP_MANAGER>::next_parent_id; 
     using LineageTracker<POP_MANAGER>::separate_generations;
     using LineageTracker<POP_MANAGER>::genomes;
     using LineageTracker<POP_MANAGER>::new_generation;
     using LineageTracker<POP_MANAGER>::inject;
-
-    std::map<int, Node> nodes;
+#ifdef EMSCRIPTEN
+    using LineageTracker<POP_MANAGER>::viz_pointers;
+#endif
+    std::unordered_map<int, Node<org_ptr> > nodes;
     std::map<ORG, int> genome_counts;
 
   public:
+    using LineageTracker<POP_MANAGER>::generation_since_update;
+#ifdef EMSCRIPTEN
+    using LineageTracker<POP_MANAGER>::ConnectVis;
+#endif
     int last_coalesence = 0;
     using LineageTracker<POP_MANAGER>::emp_is_lineage_manager;
     LineageTracker_Pruned() {;}
@@ -234,7 +310,7 @@ namespace evo{
     void Setup(WORLD * w){
 
       //Initialize null org to act as parent for inserted orgs
-      nodes[0] = Node();
+      nodes[0] = Node<org_ptr>();
       nodes[0].id = 0;
       nodes[0].parent = &nodes[0];
       nodes[0].alive = false;
@@ -291,7 +367,7 @@ namespace evo{
       if (generation_since_update.size() <= pos){
         generation_since_update.resize(pos+1);
       }
-      Node* curr = &(nodes[generation_since_update[pos]]);
+      Node<org_ptr>* curr = &(nodes[generation_since_update[pos]]);
       curr->alive = false;
 
       //If this org doesn't have any surviving offspring lineages, we can
@@ -318,7 +394,7 @@ namespace evo{
         }
 
         //See if we can remove parent too
-        Node* old = curr;
+        Node<org_ptr>* old = curr;
         curr = curr->parent;
         nodes.erase(old->id);
       }
@@ -346,6 +422,12 @@ namespace evo{
         }
         generation_since_update[pos] = next_org_id;
       }
+#ifdef EMSCRIPTEN
+      for (auto viz_pointer : viz_pointers) {
+        viz_pointer->RecordPlacement(pos);
+      }
+#endif
+
     }
 
     //Record the org that's about to have an offspring, so we can know
@@ -363,8 +445,10 @@ namespace evo{
       int id = this->next++;
 
       //Create stuct to store info on this organism
-      nodes[id] = Node();
-      Node* curr = &nodes[id];
+
+      nodes[id] = Node<org_ptr>();
+      Node<org_ptr>* curr = &nodes[id];
+
       curr->parent = &nodes[parent];
       curr->parent->offspring.push_back(&nodes[id]);
       curr->id = id;
@@ -382,7 +466,11 @@ namespace evo{
       } else {
         genome_counts[*genome]++;
       }
-
+#ifdef EMSCRIPTEN
+      for (auto viz : viz_pointers) {
+        viz->RecordParent(parent, id, genome);
+      }
+#endif
       this->parents[id] = parent;
 
       return id;
@@ -402,7 +490,9 @@ namespace evo{
     emp::vector<int> TraceLineageIDs(int org_id) {
       emp::vector<int> lineage;
       emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
-      Node* org = &(nodes[org_id]);
+
+      Node<org_ptr>* org = &(nodes[org_id]);
+
       while(org->id) {
         lineage.push_back(org->id);
         org = org->parent;
@@ -416,7 +506,8 @@ namespace evo{
     emp::vector<ORG> TraceLineage(int org_id) {
       emp::vector<ORG> lineage;
       emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
-      Node* org = &(nodes[org_id]);
+
+      Node<org_ptr>* org = &(nodes[org_id]);
       while(org->id) {
         lineage.push_back(*(org->genome));
         org = org->parent;
@@ -425,7 +516,7 @@ namespace evo{
 
     }
 
-    //aaa
+    //Gets the lineage depth of each organism in the container and returns a vector
     emp::vector<int> CoalMap() {
         emp::vector<int> depths;
         for(int i = 0; i < generation_since_update.size(); i++){
@@ -433,6 +524,63 @@ namespace evo{
           depths.push_back(TraceLineageIDs(id).size());
         }
         return depths;
+    }
+
+    //Takes a container of ints representing org ids (as assigned by the lineage)
+    //tracker, and returns a contatiner of the genomes of those ints.
+    template <template <typename> class C >
+    C<ORG> IDsToGenomes(C<int> & ids) {
+      C<ORG> genome_group;
+      for (int id : ids){
+        genome_group.insert(genome_group.back(), *(this->nodes[id].genome));
+      }
+      return genome_group;
+    }
+
+    //Specialization for emp::vector so we can use push_back
+    emp::vector<ORG> IDsToGenomes(emp::vector<int> & ids) {
+      emp::vector<ORG> genome_group;
+      for (int id : ids){
+        genome_group.push_back(*(this->nodes[id].genome));
+      }
+      return genome_group;
+    }
+
+    void WriteDataToFile(std::string filename) {
+      std::ofstream output_location;
+      output_location.open(filename);
+      std::string output = node_to_json(&nodes[0]);
+      output_location << "[" << output << "]" << std::endl;
+      output_location.close();
+    }
+
+    std::string node_to_json(Node<org_ptr> * node) {
+      std::stringstream ss;
+      ss << "{\"name\":";
+      ss << to_string(node->id);
+      ss << ", \"parent\":";
+      ss << to_string(node->parent->id);
+      ss << ", \"alive\":";
+      if (node->alive){
+        ss << "true";
+      } else {
+        ss << "false";
+      }
+      ss << ", \"persist\":false, \"genome\":\"";
+      if (node->genome != nullptr) {
+        ss << to_string(*(node->genome));
+      } else {
+        ss << "null";
+      }
+      ss << "\", \"children\":[";
+      for (int i=0; i < node->offspring.size(); ++i) {
+        ss << node_to_json(node->offspring[i]);
+        if (i < node->offspring.size()-1) {
+          ss << ", ";
+        }
+      }
+      ss << "]}";
+      return ss.str();
     }
 
 };

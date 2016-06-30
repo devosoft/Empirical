@@ -14,6 +14,7 @@
 #include "PopulationManager.h"
 #include "EvoStats.h"
 #include "LineageTracker.h"
+#include "visualization_utils.h"
 
 namespace emp{
 namespace evo{
@@ -33,6 +34,11 @@ namespace evo{
     int resolution = 10; //With what frequency do we record data?
     static constexpr bool emp_is_stats_manager = true;
     std::ofstream output_location; //Where does output go?
+    emp::vector<std::string> col_map; //Vector for tracking variables
+
+    //Support for visualization connections
+    emp::vector<web::D3Visualization*> viz_pointers;
+    emp::vector<emp::vector<int> > viz_args;
 
     StatsManager_Base(std::string location = "cout"){
         StatsManagerConfig config;
@@ -86,6 +92,66 @@ namespace evo{
         }
     }
 
+    void SendResultsToViz(int update, emp::vector<double> & results){
+      for (int i=0; i<viz_pointers.size(); ++i){
+        emp::vector<double> values;
+        for (int el : viz_args[i]) {
+          if (el == -1){
+            values.push_back((double)update);
+          } else {
+            values.push_back(results[el]);
+          }
+        }
+        viz_pointers[i]->AnimateStep(values);
+      }
+    }
+
+  };
+
+  template <typename POP_MANAGER = PopulationManager_Base<int> >
+  class StatsManager_WholePopulation : StatsManager_Base<POP_MANAGER> {
+  protected:
+    POP_MANAGER * pop;
+    using StatsManager_Base<POP_MANAGER>::resolution;
+    using StatsManager_Base<POP_MANAGER>::output_location;
+    using StatsManager_Base<POP_MANAGER>::delimiter;
+    using StatsManager_Base<POP_MANAGER>::col_map;
+    using StatsManager_Base<POP_MANAGER>::viz_pointers;
+    using StatsManager_Base<POP_MANAGER>::viz_args;
+
+  public:
+    using org_ptr = typename POP_MANAGER::value_type;
+
+    //Constructor for creating this as a stand-alone object
+    template <typename WORLD>
+    StatsManager_WholePopulation(WORLD * w,
+                                   std::string location = "stats.csv") :
+                                   StatsManager_Base<decltype(w->popM)>(location){
+      Setup(w);
+    }
+
+    //Constructor for use by World object
+    StatsManager_WholePopulation(std::string location = "stats.csv") :
+                                   StatsManager_Base<POP_MANAGER>(location){;}
+
+    //The fitness function for calculating fitness related stats
+    template <typename WORLD>
+    void Setup(WORLD * w){
+      pop = &(w->popM);
+
+      std::function<void(int)> UpdateFun = [&] (int ud){
+         Update(ud);
+       };
+
+       w->OnUpdate(UpdateFun);
+    }
+
+    void Update(int update) {
+      if (update % resolution == 0) {
+
+      }
+    }
+
   };
 
   //A popular type of stats manager is one that prints a set of statistics every
@@ -108,10 +174,13 @@ namespace evo{
     using StatsManager_Base<POP_MANAGER>::resolution;
     using StatsManager_Base<POP_MANAGER>::output_location;
     using StatsManager_Base<POP_MANAGER>::delimiter;
+    using StatsManager_Base<POP_MANAGER>::col_map;
+    using StatsManager_Base<POP_MANAGER>::viz_pointers;
+    using StatsManager_Base<POP_MANAGER>::viz_args;
+    using StatsManager_Base<POP_MANAGER>::SendResultsToViz;
     bool header_printed = false;
     std::string header = "update";
-    emp::vector<std::string> col_map;
-
+    
   public:
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
     fit_fun_type fit_fun;
@@ -170,11 +239,32 @@ namespace evo{
         }
 
         output_location << std::endl;
+        SendResultsToViz(update, results);
       }
     }
 
     void SetDefaultFitnessFun(std::function<double(org_ptr)> fit){
         fit_fun = fit;
+    }
+
+    void ConnectVis(web::GraphVisualization * viz) {
+      emp::vector<int> vars;
+
+      for (std::string variable : viz->variables) {
+        if (variable == "Update"){
+          vars.push_back(-1);
+        } else {
+          auto it = std::find(col_map.begin(), col_map.end(), variable);
+          if (it == col_map.end()) {
+            NotifyWarning("Invalid graph variable.");
+          }
+          int pos = std::distance(col_map.begin(), it);
+          vars.push_back(pos);
+        }
+      }
+
+      viz_pointers.push_back(viz);
+      viz_args.push_back(vars);
     }
 
   };
