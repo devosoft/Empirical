@@ -49,10 +49,13 @@ namespace emp {
   private:
     constexpr static int NUM_SYMBOLS = 128;
     using opts_t = BitSet<NUM_SYMBOLS>;
-    std::string regex;
-    emp::vector<std::string> notes;      // Any warnings or errors would be provided here.
-    bool valid;                          // Set to false if regex cannot be processed.
-    int pos;                             // Position being read in regex.
+    std::string regex;                     // Original string to define this RegEx.
+    emp::vector<std::string> notes;        // Any warnings or errors would be provided here.
+    bool valid;                            // Set to false if regex cannot be processed.
+    int pos;                               // Position being read in regex.
+
+    mutable DFA dfa;                       // DFA that this RegEx translates to.
+    mutable bool dfa_ready;                // Is the dfa ready? (or does it need to be generated?)
 
     template <typename... T>
     void Error(T... args) {
@@ -427,8 +430,14 @@ namespace emp {
 
   public:
     RegEx() = delete;
-    RegEx(const std::string & r) : regex(r), valid(true), pos(0) { Process(&head); while(head.Simplify()); }
-    RegEx(const RegEx & r) : regex(r.regex), valid(true), pos(0) { Process(&head); while(head.Simplify()); }
+    RegEx(const std::string & r) : regex(r), valid(true), pos(0), dfa_ready(false) {
+      Process(&head);
+      while(head.Simplify());
+    }
+    RegEx(const RegEx & r) : regex(r.regex), valid(true), pos(0), dfa_ready(false) {
+      Process(&head);
+      while(head.Simplify());
+    }
     ~RegEx() { ; }
 
     RegEx & operator=(const RegEx & r) {
@@ -445,6 +454,13 @@ namespace emp {
     std::string AsString() const { return to_literal(regex); }
 
     virtual void AddToNFA(NFA & nfa, int start, int stop) const { head.AddToNFA(nfa, start, stop); }
+
+    void Generate() const;
+
+    bool Test(const std::string & str) const {
+      if (!dfa_ready) Generate();
+      return dfa.Test(str);
+    }
 
     // For debugging: print the internal representation of the regex.
     void PrintInternal() { head.Print(std::cout); std::cout << std::endl; }
@@ -478,6 +494,10 @@ namespace emp {
     return to_DFA( to_NFA(regex) );
   }
 
+  void RegEx::Generate() const {
+    dfa = to_DFA(*this);
+    dfa_ready = true;
+  }
 }
 
 #endif
