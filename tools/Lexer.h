@@ -40,7 +40,7 @@ namespace emp {
   class Lexer {
   private:
     emp::vector<TokenInfo> token_set;     // List of all active tokens.
-    int cur_token_id;                     // Which ID should the next token get?
+    int cur_token_id;                     // Which ID should the next new token get?
     mutable bool generate_lexer;          // Do we need to regenerate the lexer?
     mutable DFA lexer_dfa;                // Table driven lexer implementation.
     std::string lexeme;                   // Current state of lexeme being generated.
@@ -58,6 +58,7 @@ namespace emp {
       return cur_token_id;
     }
 
+    constexpr static int MaxTokenID() { return MAX_TOKEN_ID; }
     int GetTokenID(const std::string & name) const {
       for (const auto & t : token_set) {
         if (t.name == name) return t.id;
