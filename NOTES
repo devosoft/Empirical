@@ -1,3 +1,14 @@
+-= STEPS to a minimal working Avida 5 =-
+Disentangle genome and organism in evo tools
+Hook Virtual CPUs into evo tools
+Setup dynamic phenotype object
+
+Setup dynamic stats tracker
+Setup configuration object
+Setup proper event system
+Setup environments
+
+
 -= NEXT STEPS =-
 Working on Singals/Actions
 * In the case of physics, each body shouldn't need its own signal.
@@ -10,6 +21,7 @@ Working on Singals/Actions
 TubeCode
 PuzzleEngine (was EvoPuzzler)
 Evoke
+Compiler education tools
 
 -= Questions =-
 Best way to convert to a c++ literal independent of type?
@@ -34,7 +46,7 @@ Change HardwareCPU to something like Hardware_SimpleCPU and Instruction to Instr
 
 -= New Elements =-
 Forms
-JQuerryUI Tabs?
+JQuerryUI Tabs? (or other UI Elements?)
 Span (?) for future manual references
 Dynamic web link? (Easy to change and verify, rather than embeded in text.)
 
@@ -68,10 +80,17 @@ Fix how sectors are handled in surfaces to be more dynamic based on sizes of org
 * See about uniting library user config file and end user config file into consistent format.
 
 -= Documentation =-
+* Goals of Empirical
 * Overview of web framework with examples.
+* How to use evo tools
 * How to setup and use the config tools.
+* Geometry
+* Reflection
+* string_utils
+* debugging (emp::vector, etc.)
 
 -= Librarys to consider wrapping =-
+D3
 FabricJS
 PaperJS -- VERY impressive demos!!  (PLUS best benchmarks next to native canvas)
 oCanvas
@@ -83,7 +102,6 @@ ChartJS
 jqPlot
 JQuery Sparklines -- Inline graphs
 
-D3
 
 -= Frameworks to consider wrapping =-
 Ionic
