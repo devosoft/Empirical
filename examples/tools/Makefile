@@ -19,7 +19,7 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 
-TARGETS := array DFA Lexer lexer_utils macros meta NFA Random reflection RegEx signal vector
+TARGETS := array DFA Lexer lexer_utils macros meta NFA Parser Random reflection RegEx signal vector
 
 TOOLS := ../../tools
 TOOL_DEPEND := $(TOOLS)/assert.h
@@ -49,6 +49,9 @@ meta: meta.cc $(TOOLS)/meta.h $(TOOL_DEPEND)
 
 NFA: NFA.cc $(TOOLS)/NFA.h $(TOOL_DEPEND)
 	$(CXX_native) $(CFLAGS_native) NFA.cc -o NFA
+
+Parser: Parser.cc $(TOOLS)/Parser.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
+	$(CXX_native) $(CFLAGS_native) Parser.cc -o Parser
 
 Random: Random.cc $(TOOLS)/Random.h $(TOOL_DEPEND)
 	$(CXX_native) $(CFLAGS_native) Random.cc -o Random
