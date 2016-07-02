@@ -31,7 +31,7 @@ namespace emp {
     template <typename T, typename... EXTRAS>
     void BuildRule(ParseRule & new_rule, T && arg, EXTRAS... extras) {
       new_rule.pattern.push_back( GetID(std::forward<T>(arg)) );
-      BuildRule(new_rule, std::forward<EXTRAS>(extras)...)
+      BuildRule(new_rule, std::forward<EXTRAS>(extras)...);
     }
   public:
     Parser(Lexer & in_lexer) : lexer(in_lexer), cur_rule_id(in_lexer.MaxTokenID()) { ; }
@@ -40,11 +40,12 @@ namespace emp {
     Lexer & GetLexer() { return lexer; }
 
     // Simple conversions to find an ID...
-    int GetID(int in_id) const { return id; }
+    int GetID(int id) const { return id; }
     int GetID(const std::string & name) const {
       // @CAO Check existing rules.
       // @CAO Else, check lexer
       // @CAO Else, add rule to declaration list
+      return 0;
     }
 
     template <typename... STATES>
