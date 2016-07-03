@@ -28,14 +28,17 @@ public:
   NKConfig config;
   emp::Random * r;
   emp::evo::NKLandscape * landscape;
+  emp::evo::NKLandscape * alternate;
   emp::evo::World<ORG, MANAGERS...> * world;
   emp::web::Animate anim;
   bool initialized = false;
+  bool use_alternate = false;
 
   NKAnimation(){
     r = new emp::Random();
     std::cout << "Random seed " << r->GetSeed() << std::endl;
     landscape = new emp::evo::NKLandscape(config.N(), config.K(), *r);
+    alternate = new emp::evo::NKLandscape(config.N(), config.K(), *r);
     world = new emp::evo::World<ORG, MANAGERS...>(*r);
     std::function<double(ORG*)> fit_fun = [this](ORG * org){ return landscape->GetFitness(*org); };
     world->SetDefaultFitnessFun(fit_fun);
@@ -53,8 +56,10 @@ public:
   void NewWorld() {
     delete world;
     delete landscape;
+    delete alternate;
     initialized = false;
     landscape = new emp::evo::NKLandscape(config.N(), config.K(),*r);
+    alternate = new emp::evo::NKLandscape(config.N(), config.K(), *r);
     world = new emp::evo::World<ORG, MANAGERS...>(*r);
     std::function<double(ORG*)> fit_fun = [this](ORG * org){ return landscape->GetFitness(*org); };
     world->SetDefaultFitnessFun(fit_fun);
@@ -74,8 +79,21 @@ public:
       Initialize();
       initialized = true;
     }
-    world->TournamentSelect(config.TOURNAMENT_SIZE(), config.POP_SIZE());
+    if (config.FIT_SHARE() && use_alternate && config.CHANGE_ENV()){
+      world->FitnessSharingTournamentSelect([this](ORG * org){ return alternate->GetFitness(*org); }, [](ORG* org1, ORG* org2){ return (double)(org1->XOR(*org2)).CountOnes();}, 10, 1, config.TOURNAMENT_SIZE(), config.POP_SIZE());
+    } else if (config.FIT_SHARE()) {
+      world->FitnessSharingTournamentSelect([this](ORG * org){ return landscape->GetFitness(*org); }, [](ORG* org1, ORG* org2){ return (double)(org1->XOR(*org2)).CountOnes();}, 10, 1, config.TOURNAMENT_SIZE(), config.POP_SIZE());
+  } else if (use_alternate && config.CHANGE_ENV()) {
+      world->TournamentSelect([this](ORG * org){ return alternate->GetFitness(*org); }, config.TOURNAMENT_SIZE(), config.POP_SIZE());
+    } else {
+      world->TournamentSelect([this](ORG * org){ return landscape->GetFitness(*org); }, config.TOURNAMENT_SIZE(), config.POP_SIZE());
+    }
     world->Update();
+
+    if (config.CHANGE_ENV() && world->update%100 == 0 ) {
+      use_alternate = !use_alternate;
+    }
+
     world->MutatePop();
   }
 

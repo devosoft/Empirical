@@ -106,33 +106,71 @@ int main()
   std::function<void(double)> set_mut = [](double mut){simple_example_evo.config.MUT_RATE(mut);};
   emp::JSWrap(set_mut, "set_mut");
 
+  std::function<void(bool)> set_sharing = [](bool sharing){simple_example_evo.config.FIT_SHARE(sharing);};
+  emp::JSWrap(set_sharing, "set_sharing");
 
-  simple_example << "<h2>Interactive Example</h1>";
-  simple_example << "N: <input id=\"set_n\" name=\"set_n\" type=range min=1 max=500 value=50>";
+  std::function<void(bool)> set_change = [](bool change){simple_example_evo.config.CHANGE_ENV(change);};
+  emp::JSWrap(set_change, "set_change");
+
+  //simple_example << "<h2>Interactive Example</h1>";
+  simple_example << "<h8>Fitness sharing: <input id=\"set_sharing\" name=\"set_sharing\" type=checkbox>";
+
+  EM_ASM({d3.select("#set_sharing").on("change", function(){
+    emp.set_sharing(this.checked);});
+  });
+
+  simple_example << "    Changing Environment: <input id=\"set_change\" name=\"set_change\" type=checkbox>";
+
+  EM_ASM({d3.select("#set_change").on("change", function(){
+      emp.set_change(this.checked);});
+  });
+
+
+  simple_example << "    N(<span id=\"n_disp\">50</span>): <input id=\"set_n\" name=\"set_n\" type=range min=1 max=500 value=50 onchange=\"emp.updateN(this.value)\">";
+
+  EM_ASM({emp.updateN = function(val){
+      document.getElementById("n_disp").innerHTML=val;};
+  });
 
   EM_ASM({d3.select("#set_n").on("input", function(){
     emp.set_n(parseInt(this.value));})
   });
 
-  simple_example << "K: <input id=\"set_k\" name=\"set_k\" type=range min=0 max=20 value=0>";
+  simple_example << "K(<span id=\"k_disp\">0</span>): <input id=\"set_k\" name=\"set_k\" type=range min=0 max=20 value=0 onchange=\"emp.updateK(this.value)\">";
+
+  EM_ASM({emp.updateK = function(val){
+      document.getElementById("k_disp").innerHTML=val;};
+  });
 
   EM_ASM({d3.select("#set_k").on("input", function(){
     emp.set_k(parseInt(this.value));})
   });
 
-  simple_example << "Mutation Rate: <input id=\"set_mut\" name=\"set_mut\" type=range min=.00001 max=.01 step=.0001 value=.0001>";
+  simple_example << "Mutation Rate(<span id=\"mut_disp\">.0001</span>): <input id=\"set_mut\" name=\"set_mut\" type=range min=.00001 max=.1 step=.0001 value=.0001 onchange=\"emp.updateMut(this.value)\">";
+
+  EM_ASM({emp.updateMut = function(val){
+      document.getElementById("mut_disp").innerHTML=val;};
+  });
 
   EM_ASM({d3.select("#set_mut").on("input", function(){
     emp.set_mut(parseFloat(this.value));})
   });
 
-  simple_example << "<br>Pop Size: <input id=\"set_pop\" name=\"set_pop\" type=range min=5 max=1000 value=100>";
+  simple_example << "<br>Pop Size(<span id=\"pop_disp\">100</span>): <input id=\"set_pop\" name=\"set_pop\" type=range min=5 max=1000 value=100 onchange=\"emp.updatePop(this.value)\">";
+
+  EM_ASM({emp.updatePop = function(val){
+      document.getElementById("pop_disp").innerHTML=val;};
+  });
 
   EM_ASM({d3.select("#set_pop").on("input", function(){
     emp.set_pop_size(parseInt(this.value));})
   });
 
-  simple_example << "Tournament Size: <input id=\"set_tourn\" name=\"set_tourn\" type=range min=1 max=100 value=10>";
+  simple_example << "Tournament Size(<span id=\"tourn_disp\">10</span>): <input id=\"set_tourn\" name=\"set_tourn\" type=range min=1 max=100 value=10 onchange=\"emp.updateTourn(this.value)\"></h8>";
+
+  EM_ASM({emp.updateTourn = function(val){
+      document.getElementById("tourn_disp").innerHTML=val;};
+  });
 
   EM_ASM({d3.select("#set_tourn").on("input", function(){
     emp.set_tourn(parseInt(this.value));})
