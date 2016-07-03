@@ -15,22 +15,22 @@
 
 namespace emp {
 
-  struct ParseRule {
+  struct ParseSymbol {
     std::string name;
-    emp::vector<int> pattern;
+    emp::vector< emp::vector<int> > patterns;
     int id;
   };
 
   class Parser {
   private:
     Lexer & lexer;                  // Default input lexer.
-    emp::vector<ParseRule> rules;   // Set of rules that make up this grammar.
+    emp::vector<ParseSymbol> rules;   // Set of rules that make up this grammar.
     int cur_rule_id;                // Which id should the next new rule get?
 
-    void BuildRule(ParseRule & new_rule) { ; }
+    void BuildRule(emp::vector<int> & new_rule) { ; }
     template <typename T, typename... EXTRAS>
-    void BuildRule(ParseRule & new_rule, T && arg, EXTRAS... extras) {
-      new_rule.pattern.push_back( GetID(std::forward<T>(arg)) );
+    void BuildRule(emp::vector<int> & new_rule, T && arg, EXTRAS... extras) {
+      new_rule.push_back( GetID(std::forward<T>(arg)) );
       BuildRule(new_rule, std::forward<EXTRAS>(extras)...);
     }
   public:
@@ -50,11 +50,13 @@ namespace emp {
 
     template <typename... STATES>
     int AddRule(const std::string & name, STATES... states) {
-      ParseRule new_rule;
+      // @CAO See if this name already exists.
+      ParseSymbol new_rule;
       new_rule.name = name;
       new_rule.id = cur_rule_id++;
-      BuildRule(new_rule, states...);
-      rules.emplace_back(new_rule);
+      const auto pos = new_rule.patterns.size();
+      new_rule.patterns.resize(pos+1);
+      BuildRule(new_rule.patterns[pos], states...);
       return new_rule.id;
     }
 
