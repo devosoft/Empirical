@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../config/ArgManager.h"
+//#include "../../config/ArgManager.h"
 #include "../../evo/NK.h"
 #include "../../evo/World.h"
 #include "../../tools/BitSet.h"
@@ -18,10 +18,11 @@ EMP_BUILD_CONFIG( NKConfig,
   VALUE(K, int, 10, "Level of epistasis in the NK model"),
   VALUE(N, int, 50, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
   VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
-  CONST(POP_SIZE, int, 1000, "Number of organisms in the popoulation."),
-  VALUE(MAX_GENS, int, 2000, "How many generations should we process?"),
+  CONST(POP_SIZE, int, 100, "Number of organisms in the popoulation."),
+  VALUE(MAX_GENS, int, 100, "How many generations should we process?"),
   VALUE(MUT_COUNT, int, 3, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
 )
+
 
 
 using BitOrg = emp::BitVector;
@@ -31,9 +32,9 @@ int main(int argc, char* argv[])
   NKConfig config;
   config.Read("NK.cfg");
 
-  auto args = emp::cl::ArgManager(argc, argv);
-  if (args.ProcessConfigOptions(config, std::cout, "NK.cfg", "NK-macros.h") == false) exit(0);
-  if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
+  //auto args = emp::cl::ArgManager(argc, argv);
+  //if (args.ProcessConfigOptions(config, std::cout, "NK.cfg", "NK-macros.h") == false) exit(0);
+  //if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
 
   const int N = config.N();
   const int K = config.K();
@@ -43,7 +44,7 @@ int main(int argc, char* argv[])
 
   emp::Random random(config.SEED());
   emp::evo::NKLandscape landscape(N, K, random);
-  emp::evo::EAWorld<BitOrg> pop(random);
+  emp::evo::World<BitOrg, emp::evo::LineagePruned> pop(random);
 
   // Build a random initial population
   for (int i = 0; i < config.POP_SIZE(); i++) {
@@ -73,11 +74,11 @@ int main(int argc, char* argv[])
 
     // Run a tournament for the rest...
     pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
-			 , 5, POP_SIZE-1);
+			 , 15, POP_SIZE-1);
     pop.Update();
     pop.MutatePop();
   }
 
-
+  pop.lineageM.WriteDataToFile("test.json");
   std::cout << MAX_GENS << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 }

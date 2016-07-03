@@ -50,6 +50,7 @@ namespace emp {
     ~vector() = default;
 
     size_type size() const noexcept { return v.size(); }
+    void clear() { v.clear(); }
     void resize(int new_size) { emp_assert(new_size >= 0, new_size); v.resize(new_size); }
     void resize(int new_size, const T & val) {
       emp_assert(new_size >= 0, new_size);

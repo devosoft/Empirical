@@ -194,9 +194,9 @@ namespace evo{
       this->org_to_genome[id] = genome;
       this->parents[id] = parent;
 
-      for (auto viz : viz_pointers) {
+      /*for (auto viz : viz_pointers) {
         viz->RecordParent(parent, id, genome);
-      }
+    }*/
 
       return id;
     }
