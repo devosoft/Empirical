@@ -67,7 +67,8 @@ namespace evo {
 
 public:
 
-    static int hi_weight, lo_weight, ai_radius;
+    static int ai_radius;
+    static double hi_weight, lo_weight;
     
     QuorumManager () {
       POP_MANAGER<QuorumOrganism>();
@@ -243,9 +244,9 @@ public:
 
 
 template <class QuorumOrganism, template<class> class POP_MANAGER>
-int QuorumManager<QuorumOrganism, POP_MANAGER>::hi_weight;
+double QuorumManager<QuorumOrganism, POP_MANAGER>::hi_weight;
 template <class QuorumOrganism, template<class> class POP_MANAGER>
-int QuorumManager<QuorumOrganism, POP_MANAGER>::lo_weight;
+double QuorumManager<QuorumOrganism, POP_MANAGER>::lo_weight;
 template <class QuorumOrganism, template<class> class POP_MANAGER>
 int QuorumManager<QuorumOrganism, POP_MANAGER>::ai_radius;
 
