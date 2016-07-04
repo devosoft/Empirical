@@ -4,11 +4,20 @@
 //
 //  A general-purpose, fast parser.
 //
+//
 //  Development notes:
 //  * Make sure to warn if a symbol has no patterns associated with it.
 //  * ...or if a symbol has no path to terminals.
 //  * ...of if a symbol is never use in another pattern (and is not a start state)
 //  * Should we change Parser to a template that takes in the type for the lexer?
+//
+//  Setup -> and | and || operators on Parse symbol to all do the same thing: take a pattern of
+//  either string or int (or ideally mixed??) and add a new rule.
+//
+//    parser("expression") -> { "literal_int" }
+//                          | { "expression", '+', "expression"}
+//                          | { "expression", '*', "expression"}
+//                          | { '(', expression, ')'}
 
 #ifndef EMP_PARSER_H
 #define EMP_PARSER_H
