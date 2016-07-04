@@ -4,7 +4,7 @@ CFLAGS_all := -Wall -Wno-unused-function -std=c++11 -I../../ -I./
 
 # Emscripten compiler information
 CXX_web := emcc
-CXX_native := g++
+CXX_native := clang++
 
 OFLAGS_native := -g -pedantic
 #OFLAGS_native := -O3 -DNDEBUG

@@ -113,5 +113,6 @@ int main(int argc, char* argv[])
     grid_pop.MutatePop();
 
   }
+  grid_pop.lineageM.WriteDataToFile("test.json");
 
 }
