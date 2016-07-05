@@ -17,7 +17,7 @@ namespace emp{
 namespace evo{
 
   EMP_BUILD_CONFIG( StatsManagerConfig,
-    VALUE(RESOLUTION, int, 3, "How often should stats be calculated (updates)"),
+    VALUE(RESOLUTION, int, 10, "How often should stats be calculated (updates)"),
     VALUE(DELIMITER, std::string, " ", "What should fields be separated by in the output")
   )
 
