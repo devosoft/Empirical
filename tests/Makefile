@@ -2,6 +2,7 @@ GCOV_FLAGS = -o0 -g --coverage
 
 test: test_driver.cc test_tools.cc
 	$(CXX) -std=c++11 test_driver.cc -o test.o
+	mkdir -p temp
 	# Execute tests
 	./test.o
 
@@ -38,3 +39,4 @@ clean:
 	rm -f *.info
 	rm -f *.gcov
 	rm -f ./Coverage*
+	rm -rf ./temp
