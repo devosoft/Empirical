@@ -83,6 +83,12 @@ namespace emp {
       return symbols[spos].id;
     }
 
+    std::string GetName(int symbol_id) const {
+      if (symbol_id < lexer.MaxTokenID()) return lexer.GetTokenName(symbol_id);
+      const int spos = symbol_id - lexer.MaxTokenID();
+      return symbols[spos].name;
+    }
+
     Parser & operator()(const std::string & name) {
       active_pos = GetSymbolPos(name);
       if (active_pos == -1) active_pos = AddSymbol(name);
@@ -122,7 +128,7 @@ namespace emp {
            << s.patterns.size() << " patterns." << std::endl;
         for (const auto & p : s.patterns) {
           os << " ";
-          for (int x : p) os << " " << x;
+          for (int x : p) os << " " << GetName(x) << "(" << x << ")";
           os << std::endl;
         }
       }
