@@ -31,6 +31,16 @@ namespace emp {
     std::string name;
     emp::vector< emp::vector<int> > patterns;
     int id;
+
+    void Print(std::ostream & os=std::cout) const {
+      os << "symbol '" << name << "' (id " << id << ") has "
+         << patterns.size() << " patterns." << std::endl;
+      for (const auto p : patterns) {
+        os << " ";
+        for (int x : p) os << " " << x;
+        os << std::endl;
+      }
+    }
   };
 
   class Parser {
@@ -113,6 +123,11 @@ namespace emp {
       symbols[pos].patterns.resize(ppos+1);
       BuildRule(symbols[pos].patterns[ppos], states...);
       return id;
+    }
+
+    void Print(std::ostream & os=std::cout) const {
+      os << symbols.size() << " parser symbols available." << std::endl;
+      for (const auto & s : symbols) s.Print();
     }
 
   };
