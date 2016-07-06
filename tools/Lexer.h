@@ -65,9 +65,10 @@ namespace emp {
       }
       return -1;
     }
-    std::string GetTokenName(int id) {
+    std::string GetTokenName(int id) const {
       if (id == -1) return "Error";
       if (id == 0) return "EOF";
+      if (id < 128) return emp::to_escaped_string((char) id);  // Individual characters.
       for (const auto & t : token_set) {
         if (t.id == id) return t.name;
       }
@@ -127,7 +128,7 @@ namespace emp {
     // Get the lexeme associated with the last token.
     const std::string & GetLexeme() { return lexeme; }
 
-    void Print(std::ostream & os=std::cout) const{
+    void Print(std::ostream & os=std::cout) const {
       for (const auto & t : token_set) t.Print(os);
       if (generate_lexer) Generate();                   // Do we need to regenerate the lexer?
       lexer_dfa.Print(os);                         // Table driven lexer implementation.
