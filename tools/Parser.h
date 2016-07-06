@@ -74,7 +74,7 @@ namespace emp {
     int GetID(int id) const { return id; }
     int GetID(const std::string & name) {
       int spos = GetSymbolPos(name);       // First check if parse symbol exists.
-      if (spos >= 0) return spos;          // ...if so, return it.
+      if (spos >= 0) return symbols[spos].id;          // ...if so, return it.
       int tid = lexer.GetTokenID(name);    // Otherwise, check for token name.
       if (tid >= 0) return tid;            // ...if so, return id.
 
