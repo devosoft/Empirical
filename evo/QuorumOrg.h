@@ -182,7 +182,7 @@ public:
 
   static int classify (QuorumOrganism const * org) {
     if (org == nullptr) { return -1;}
-    return (int) org->state.genome.co_op_prob * 10;
+    return (int) (org->state.genome.co_op_prob * 100);
   }
   
   // access specifiers are really annoying. 
@@ -213,6 +213,8 @@ public:
       //state.genome.quorum_threshold += random.GetRandNormal(0, MUTATION_AMOUNT);
       //state.genome.ai_radius += random.GetRandNormal(0, MUTATION_AMOUNT);
       state.genome.co_op_prob += random.GetRandNormal(0, mutation_amount);
+      if (state.genome.co_op_prob < 0) {state.genome.co_op_prob = 0;}
+      else if (state.genome.co_op_prob > 1) { state.genome.co_op_prob = 1;}
       return true;
     }
     else {return false;}

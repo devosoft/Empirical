@@ -190,6 +190,7 @@ namespace evo {
       lineageM.Setup(this);
       statsM.Setup(this);
     }
+    decltype(popM) & ExposeManager() {return popM;}
 
   public:
     World(emp::Random * r_ptr, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
@@ -237,6 +238,7 @@ namespace evo {
     // All additions to the population must go through one of the following Insert methods
 
     void set_available_points (long pts) {popM.set_available_points(pts);}
+    long get_available_points () {return popM.get_available_points();}
     
     // passthrough method for initialization
     unsigned int  SequentialInsert(ORG * org) {

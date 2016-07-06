@@ -38,7 +38,7 @@ namespace evo {
     int spacing = -1;
     long available_private_points = 16000;
 
-    /// calculates quorum and updates state.hi_density  
+    /// calculates quorum and updates state.hi_density
     bool calculate_quorum (std::set<QuorumOrganism *> & neighbors) {
       int active_neighbors = 0;
       int num_hi = 0;
@@ -51,17 +51,17 @@ namespace evo {
       }
 
       // consider quoorum to be enough hi or enough lo in potential radius
-      return (double) active_neighbors / (double) potential > lo_weight || 
+      return (double) active_neighbors / (double) potential > lo_weight ||
              (double) num_hi / (double) potential < hi_weight;
     }
 
     double calculate_quorum (QuorumOrganism * org) {
-      bool result;    
+      bool result;
       // for an example of an implemented get_org_neighbors see Grid pop manager.
       // PopulationManager.h:209ish
       auto neighbors = POP_MANAGER<QuorumOrganism>::get_org_neighbors(org->get_loc());
 
-      org->set_density(result = calculate_quorum(neighbors)); 
+      org->set_density(result = calculate_quorum(neighbors));
       return result;
     }
 
@@ -69,7 +69,7 @@ public:
 
     static int ai_radius;
     static double hi_weight, lo_weight;
-    
+
     QuorumManager () {
       POP_MANAGER<QuorumOrganism>();
       }
@@ -83,14 +83,14 @@ public:
                     double alt_density = 0, QuorumOrgGenome const * alt_seed = nullptr) {
       // sanity check
       if(alt_density > 0) { assert(alt_seed != nullptr && "Must have non-null alt-seed when alt-density specified!");}
-     
+
       int num_placed = 0, position = 0, num_alt_placed = 0;
       // there are (num_locs * grid_density) # of slots that'll be occupied w/ orgs
       // they are `spacing` distance apart
       int num_to_place = num_locs * grid_density;
       int spacing = num_locs / num_to_place;
-      
-      
+
+
       // there are (num_locs * grid_density * alt_density) # spaces that'll be occupied
       // w/ alt orgs
       int num_alt = num_to_place * alt_density;
@@ -99,12 +99,12 @@ public:
 
       while(position < pop.size()) {
         if(alt_density > 0 && (double) num_alt_placed / (double) num_to_place < alt_density) {
-          org = new QuorumOrganism(alt_seed->co_op_prob, alt_seed->ai_radius, 
-                                   alt_seed->quorum_threshold, mut, 0, alt_seed->lineage, 
+          org = new QuorumOrganism(alt_seed->co_op_prob, alt_seed->ai_radius,
+                                   alt_seed->quorum_threshold, mut, 0, alt_seed->lineage,
                                    alt_seed->can_make_HiAI, alt_seed->can_make_LoAI);
           num_alt_placed++;
         } else {
-          org = new QuorumOrganism(seed->co_op_prob, seed->ai_radius,seed->quorum_threshold, mut, 
+          org = new QuorumOrganism(seed->co_op_prob, seed->ai_radius,seed->quorum_threshold, mut,
                                    0, seed->lineage, seed->can_make_HiAI,
                                    seed->can_make_LoAI);
         }
@@ -138,12 +138,30 @@ public:
       return this->AddOrgBirth(offspring, parent->get_loc());
     }
 
+    unsigned int BottleneckEvent(double lethality) {
+      unsigned murdered = 0;
+      for(size_t i = 0; i < pop.size(); i++) {
+        if(pop[i] != nullptr) {
+          if(random_ptr->P(lethality)) {
+            delete pop[i];
+            pop[i] = nullptr;
+            murdered++;
+          }
+        }
+      }
+
+      return murdered;
+    }
+
     /// Does public good creation / distrubtion processing for an organism
     /// DOES NOT CHECK FOR NULL POINTERS
     void Publicize(QuorumOrganism * org) {
+      if (org == nullptr) { return;}
+      
       auto neighbors = POP_MANAGER<QuorumOrganism>::GetOrgNeighbors(org->get_loc());
       auto cluster = POP_MANAGER<QuorumOrganism>::GetClusterByRadius(org->get_loc(),
                                                                     ai_radius);
+      
       cluster.erase(org);
       int contribution;
       // get contribution and round-robin it out to the various orgs
@@ -151,7 +169,7 @@ public:
       if( (contribution = org->get_contribution(calculate_quorum(cluster))) > 0){
         // TODO: make this mor eefficient. Can easily math who gets who much (probably)
         auto recipiant = neighbors.end();
-        
+
         // iterate over neighbors && give them things, with donator going first
         while(contribution > 0) {
           if (recipiant == neighbors.end()) {
@@ -227,7 +245,7 @@ public:
       }
     } // end Update()
 
-    
+
     void Print(std::function<std::string(QuorumOrganism *)> string_fun, std::ostream & os = std::cout,
               std::string empty="X", std::string spacer=" ") {
       os << "Still no." << std::endl;

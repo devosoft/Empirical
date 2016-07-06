@@ -23,6 +23,8 @@ def parse_map_file(fname):
     """
     grid_timeline = []
 
+    needed_mappings = set()
+
     num_lines = 0
 
     with open(fname, 'r') as mapfile:
@@ -42,13 +44,14 @@ def parse_map_file(fname):
                         filtered = subel.replace("]", "").replace("{", "").strip()
                         if len(filtered) > 0:
                             gridline.append(int(filtered))
+                            needed_mappings.add(int(filtered))
                     
                     if len(gridline) > 0:
                         current_state.append(gridline)
                 
                 grid_timeline.append(current_state)
 
-    return grid_timeline
+    return grid_timeline, needed_mappings
 
 
 def fill_square(px, x, y, pixwidth, coloring):
@@ -82,12 +85,14 @@ def gen_image(grid, mapping, pixwidth = 10):
     return img
 
 
-def file_to_frames(gridfname, prefix, mapping, pixwidth):
+def file_to_frames(gridfname, prefix, mapping, pixwidth, grid = None):
     """
     Esentially a wrapper for a loop--take a given CSV file and make the frames for all the grid
     states listed in the file. See gen_image's docstring for deets on mapping and grid format.
     """
-    grid = parse_map_file(gridfname)
+
+    if grid == None:
+        grid, _ = parse_map_file(gridfname)
 
     framenum = 0
     for snapshot in grid:
@@ -113,6 +118,7 @@ def main():
     """
     print("Enter name of map file: ", end="")
     fname = input().strip()
+    grid, needed_mappings = parse_map_file(fname)
     #print("Enter prefix for frame image files: ", end="")
     #prefix = input().strip()
     print("Enter width of each grid cell (in pixels): ", end="")
@@ -120,18 +126,17 @@ def main():
     
     mapping = dict()
 
-    print("Enter symbol -> RGB mapping, e.g. '10, 255, 0, 0'")
-    print("This will display all '10's in the map as red squares.")
-    print("Blank to continue.")
+    print("Symbols to map: {}".format(needed_mappings)) 
+    print("For each symbol enter RGB mapping, e.g. '255, 0, 0'")
 
-    while True:
-        print("Symbol -> Mapping: ", end = "")
+    for symbol in needed_mappings:
+        print("{} -> Mapping: ".format(symbol), end = "")
         line = input().strip()
         if len(line) == 0:
             break
         line = line.split(',')
         
-        mapping[int(line[0])] = (int(line[1]), int(line[2]), int(line[3]))
+        mapping[symbol] = (int(line[0]), int(line[1]), int(line[2]))
 
     print("Building frames....")
     file_to_frames(fname, 'frame', mapping, int(width))
