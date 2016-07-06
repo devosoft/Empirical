@@ -199,6 +199,7 @@ namespace evo{
       org_ptr genome = (org_ptr)&(*it);
       this->org_to_genome[id] = genome;
       this->parents[id] = parent;
+
 #ifdef EMSCRIPTEN
       for (auto viz : viz_pointers) {
         viz->RecordParent(parent, id, genome);

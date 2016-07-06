@@ -11,7 +11,9 @@ EMP_BUILD_CONFIG( NKConfig,
   VALUE(POP_SIZE, int, 100, "Number of organisms in the popoulation."),
   VALUE(MAX_GENS, int, 2000, "How many generations should we process?"),
   VALUE(TOURNAMENT_SIZE, int, 10, "How many orgs are chosen per tournament?"),
-  VALUE(MUT_RATE, double, .0001, "Per-site mutation rate")
+  VALUE(MUT_RATE, double, .0001, "Per-site mutation rate"),
+  VALUE(FIT_SHARE, bool, false, "Per-site mutation rate"),
+  VALUE(CHANGE_ENV, bool, false, "Per-site mutation rate")
 )
 
 #endif

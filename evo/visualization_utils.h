@@ -372,6 +372,19 @@ public:
       DrawData(true);
     }
   }
+
+  void Clear() {
+    data.clear();
+    GetSVG()->SelectAll(".data-point").Data({}).ExitRemove();
+    GetSVG()->SelectAll(".line-seg").Data({}).ExitRemove();
+    y_axis->Rescale(0, 1000, *(GetSVG()));
+    x_axis->Rescale(0, 0, *(GetSVG()));
+    y_min = 1000;
+    y_max = 0;
+    x_min = 0;
+    x_max = 0;
+    prev_data  = {{-1,-1}};
+  }
 };
 
 class LineageVisualization : public D3Visualization {
