@@ -6,6 +6,7 @@
 //
 //
 //  Development notes:
+//  * Patterns should include functions that are called when that point of rule is triggered.
 //  * Make sure to warn if a symbol has no patterns associated with it.
 //  * ...or if a symbol has no path to terminals.
 //  * ...of if a symbol is never use in another pattern (and is not a start state)
@@ -15,9 +16,9 @@
 //  either string or int (or ideally mixed??) and add a new rule.
 //
 //    parser("expression") -> { "literal_int" }
-//                         -> { "expression", "+", "expression"}
-//                         -> { "expression", "*", "expression"}
-//                         -> { "(", "expression", ")"}
+//                         |  { "expression", "+", "expression"}
+//                         |  { "expression", "*", "expression"}
+//                         |  { "(", "expression", ")"}
 
 #ifndef EMP_PARSER_H
 #define EMP_PARSER_H
@@ -27,10 +28,18 @@
 
 namespace emp {
 
+  // A single symbol in a grammer including the patterns that generate it.
   struct ParseSymbol {
     std::string name;
     emp::vector< emp::vector<int> > patterns;
     int id;
+  };
+
+  // A single node in a parse tree.
+  struct ParseNode {
+    int symbol_id;
+    int rule_pos;
+    emp::vector< ParseNode * > children;
   };
 
   class Parser {
@@ -128,6 +137,7 @@ namespace emp {
            << s.patterns.size() << " patterns." << std::endl;
         for (const auto & p : s.patterns) {
           os << " ";
+          if (p.size() == 0) os << " [empty]";
           for (int x : p) os << " " << GetName(x) << "(" << x << ")";
           os << std::endl;
         }
