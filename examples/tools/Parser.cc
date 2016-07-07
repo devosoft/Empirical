@@ -22,5 +22,14 @@ int main()
   lexer.AddToken("Other", ".");
 
   emp::Parser parser(lexer);
-  
+  parser("program").Rule() // empty is okay.
+                   .Rule("program", "statement");
+  parser("statement").Rule("expr");
+  parser("expr").Rule("Integer")
+                .Rule("expr", '+', "expr")
+                .Rule("expr", '*', "expr")
+                .Rule('(', "expr", ')');
+
+
+  parser.Print();
 }
