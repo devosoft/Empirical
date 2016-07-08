@@ -31,12 +31,15 @@ namespace emp {
 namespace evo {
 
 struct QuorumOrgGenome {
+private:
+  bool can_make_HiAI;
+  bool can_make_LoAI;
+
+public:
   int lineage = -1;
   double co_op_prob;
   double ai_radius;
   double quorum_threshold;
-  bool can_make_HiAI;
-  bool can_make_LoAI;
 
   QuorumOrgGenome () {
     co_op_prob = 0;
@@ -61,6 +64,12 @@ struct QuorumOrgGenome {
   }
 
   int get_lineage() const {return lineage;}
+  bool get_hi_ai() const {return can_make_HiAI;}
+  bool get_lo_ai() const {return can_make_LoAI;}
+
+  friend bool operator== (QuorumOrgGenome const & lhs, QuorumOrgGenome const & rhs);
+  friend struct QuorumOrgState;
+  friend class QuorumOrganism;
 };
 
 bool operator== (QuorumOrgGenome const & lhs, QuorumOrgGenome const & rhs) {
@@ -215,6 +224,9 @@ public:
       state.genome.co_op_prob += random.GetRandNormal(0, mutation_amount);
       if (state.genome.co_op_prob < 0) {state.genome.co_op_prob = 0;}
       else if (state.genome.co_op_prob > 1) { state.genome.co_op_prob = 1;}
+
+      state.genome.can_make_HiAI = random.P(state.genome.co_op_prob);
+      state.genome.can_make_LoAI = state.genome.can_make_LoAI && random.P(state.genome.co_op_prob);
       return true;
     }
     else {return false;}
@@ -236,8 +248,12 @@ public:
     state.hi_density = (q > state.genome.quorum_threshold);
     return state.hi_density = state.hi_density && state.genome.can_make_HiAI;
   }
-  bool hi_density () const {return state.hi_density && state.genome.can_make_HiAI;}
-  bool lo_density () const {return state.genome.can_make_LoAI;}
+  bool hi_density () const {
+    return state.hi_density && state.genome.can_make_HiAI;
+  }
+  bool lo_density () const {
+    return state.genome.can_make_LoAI;
+  }
   unsigned int get_fitness() {return state.get_points();}
 
   // methods for interacting with the world / neighbors

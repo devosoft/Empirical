@@ -101,12 +101,11 @@ public:
         if(alt_density > 0 && (double) num_alt_placed / (double) num_to_place < alt_density) {
           org = new QuorumOrganism(alt_seed->co_op_prob, alt_seed->ai_radius,
                                    alt_seed->quorum_threshold, mut, 0, alt_seed->lineage,
-                                   alt_seed->can_make_HiAI, alt_seed->can_make_LoAI);
+                                   alt_seed->get_hi_ai(), alt_seed->get_lo_ai());
           num_alt_placed++;
         } else {
           org = new QuorumOrganism(seed->co_op_prob, seed->ai_radius,seed->quorum_threshold, mut,
-                                   0, seed->lineage, seed->can_make_HiAI,
-                                   seed->can_make_LoAI);
+                                   0, seed->lineage, seed->get_hi_ai(), seed->get_lo_ai());
         }
 
         pop[position] = org;
@@ -141,8 +140,8 @@ public:
     unsigned int BottleneckEvent(double lethality) {
       unsigned murdered = 0;
       for(size_t i = 0; i < pop.size(); i++) {
-        if(pop[i] != nullptr) {
-          if(random_ptr->P(lethality)) {
+        if(random_ptr->P(lethality)) {
+          if(pop[i] != nullptr) {
             delete pop[i];
             pop[i] = nullptr;
             murdered++;

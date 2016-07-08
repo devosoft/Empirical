@@ -44,7 +44,7 @@ EMP_BUILD_CONFIG( QuorumConfig,
     VALUE(NUM_TO_DONATE, int, 45, "Number of points a public good is 'worth'"),
     VALUE(NEEDED_TO_REPRODUCE, int, 50, "Number of points needed for an organism to reproduce"),
     VALUE(COST_TO_DONATE, int, 25, "Number of points a public good costs to produce"),
-    VALUE(MUTATION_AMOUNT, double, 0.01, "Standard deviation of distribution to mutate by"),
+    VALUE(MUTATION_AMOUNT, double, 0.001, "Standard deviation of distribution to mutate by"),
     VALUE(GRID_X, int, 60, "Width of the grid"),
     VALUE(GRID_Y, int, 60, "Height of the grid"),
     VALUE(TICKS, int, 1000, "Length of simulation"),
@@ -109,7 +109,7 @@ int main(int argc, char* argv[]) {
     config.Write(prefix + "quorum.cfg");
 
     // seed the grid
-    Qpop.popM.SpacedSeed(0.15, config.GRID_X() * config.GRID_Y(),
+    Qpop.popM.SpacedSeed(0.01, config.GRID_X() * config.GRID_Y(),
                          &QOrg::initial_configurations[config.INITIAL_CONFIG()],
                          config.ENABLE_MUTATION(), config.PERCENT_OTHER(),
                          &QOrg::initial_configurations[config.WHICH_OTHER()]);
