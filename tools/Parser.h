@@ -71,6 +71,14 @@ namespace emp {
       return -1;
     }
 
+    // @CAO Should be made MUCH more efficient.
+    int GetIDPos(int id) const {
+      for (auto i = 0; i < symbols.size(); i++) {
+        if (symbols[i].id == id) return i;
+      }
+      return -1;
+    }
+
     // Create a new symbol and return its POSITION.
     int AddSymbol(const std::string & name) {
       ParseSymbol new_symbol;
@@ -80,6 +88,7 @@ namespace emp {
       symbols.emplace_back(new_symbol);
       return out_pos;
     }
+
   public:
     Parser(Lexer & in_lexer) : lexer(in_lexer), cur_symbol_id(in_lexer.MaxTokenID()) { ; }
     ~Parser() { ; }
@@ -137,21 +146,42 @@ namespace emp {
       return id;
     }
 
-    // Scan through the current grammar and try to spot any problems.
-    bool Validate(std::ostream & os=std::cerr) {
-      bool valid = true;
-      return valid;
-    }
-
     void Process(std::istream & is, bool test_valid=true) {
-      if (test_valid) Validate();
+      // Scan through the current grammar and try to spot any problems.
+      if (test_valid) {
+        // @CAO: Any symbols with no rules?
+        // @CAO: Any inaccessible symbols?
+        // @CAO: Ideally, any shift-reduce or reduce-reduce errors? (maybe later?)
+      }
+
+      // Determine which symbols are nullable.
+      bool progress = true;
+      while (progress) {
+        progress = false;
+        // Scan all symbols.
+        for (auto & s : symbols) {
+          if (s.nullable) continue; // If a symbol is already nullable, skip it.
+          // For each remaining symbol, scan all patterns.
+          for (auto & p : s.patterns) {
+            // For each pattern, see if all internal symbols are nullable.
+            bool nullable = true;
+            for (int sid : p) {
+              int pos = GetIDPos(sid);
+              if (pos < 0 || symbols[pos].nullable == false) { nullable = false; break; }
+            }
+            if (nullable) { s.nullable = true; progress = true; break; }
+          }
+        }
+      }
     }
 
     void Print(std::ostream & os=std::cout) const {
       os << symbols.size() << " parser symbols available." << std::endl;
       for (const auto & s : symbols) {
         os << "symbol '" << s.name << "' (id " << s.id << ") has "
-           << s.patterns.size() << " patterns." << std::endl;
+           << s.patterns.size() << " patterns.";
+        if (s.nullable) os << " [NULLABLE]";
+        os << std::endl;
         for (const auto & p : s.patterns) {
           os << " ";
           if (p.size() == 0) os << " [empty]";
