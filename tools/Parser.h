@@ -33,6 +33,10 @@ namespace emp {
     std::string name;
     emp::vector< emp::vector<int> > patterns;
     int id;
+    emp::vector<int> first;   // What tokens can begin this symbol?
+    emp::vector<int> follow;  // What tokens can come after this symbol?
+
+    ParseSymbol() : first(Lexer::MaxTokenID(), -1), follow(Lexer::MaxTokenID(), -1) { ; }
   };
 
   // A single node in a parse tree.
@@ -128,6 +132,16 @@ namespace emp {
       symbols[pos].patterns.resize(ppos+1);
       BuildRule(symbols[pos].patterns[ppos], states...);
       return id;
+    }
+
+    // Scan through the current grammar and try to spot any problems.
+    bool Validate(std::ostream & os=std::cerr) {
+      bool valid = true;
+      return valid;
+    }
+
+    void Process(std::istream & is, bool test_valid=true) {
+      if (test_valid) Validate();
     }
 
     void Print(std::ostream & os=std::cout) const {
