@@ -38,7 +38,8 @@ namespace emp {
     emp::vector<int> follow;  // What tokens can come after this symbol?
     bool nullable;            // Can this symbol be converted to nothing?
 
-    ParseSymbol() : first(Lexer::MaxTokenID(), -1), follow(Lexer::MaxTokenID(), -1) { ; }
+    ParseSymbol()
+     : first(Lexer::MaxTokenID(), -1), follow(Lexer::MaxTokenID(), -1), nullable(false) { ; }
   };
 
   // A single node in a parse tree.
@@ -123,6 +124,7 @@ namespace emp {
       const auto ppos = symbols[active_pos].patterns.size();
       symbols[active_pos].patterns.resize(ppos+1);
       BuildRule(symbols[active_pos].patterns[ppos], states...);
+      if (symbols[active_pos].patterns[ppos].size() == 0) symbols[active_pos].nullable = true;
       return *this;
     }
 
