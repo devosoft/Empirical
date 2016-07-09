@@ -22,14 +22,18 @@ int main()
   lexer.AddToken("Other", ".");
 
   emp::Parser parser(lexer);
-  parser("program").Rule() // empty is okay.
-                   .Rule("program", "statement");
-  parser("statement").Rule("expr");
+  parser("program").Rule("statement_list");
+  parser("statement_list").Rule() // empty is okay.
+                         .Rule("statement_list", "statement");
+  parser("statement").Rule("expr", ';');
   parser("expr").Rule("Integer")
                 .Rule("expr", '+', "expr")
                 .Rule("expr", '*', "expr")
                 .Rule('(', "expr", ')');
 
+  std::stringstream ss;
+  ss << "This is a 123 TEST.  It should also have 1. .2 123.456 789 FLOATING point NUMbers!";
+  parser.Process(ss);
 
   parser.Print();
 }
