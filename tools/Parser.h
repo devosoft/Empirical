@@ -33,8 +33,10 @@ namespace emp {
     std::string name;
     emp::vector< emp::vector<int> > patterns;
     int id;
+
     emp::vector<int> first;   // What tokens can begin this symbol?
     emp::vector<int> follow;  // What tokens can come after this symbol?
+    bool nullable;            // Can this symbol be converted to nothing?
 
     ParseSymbol() : first(Lexer::MaxTokenID(), -1), follow(Lexer::MaxTokenID(), -1) { ; }
   };
@@ -113,6 +115,7 @@ namespace emp {
       return symbols[pos];
     }
 
+    // Use the currently active symbol and attach a rule to it.
     template <typename... STATES>
     Parser & Rule(STATES... states) {
       emp_assert(active_pos >= 0 && active_pos < (int) symbols.size(), active_pos);
@@ -123,14 +126,12 @@ namespace emp {
       return *this;
     }
 
+    // Specify the name of the symbol and add a rule to it, returning the symbol id.
     template <typename... STATES>
     int AddRule(const std::string & name, STATES... states) {
       const int id = GetID(name);
-      const int pos = GetSymbolPos(name);  // @CAO We just did this, so can be faster.
-
-      const auto ppos = symbols[pos].patterns.size();
-      symbols[pos].patterns.resize(ppos+1);
-      BuildRule(symbols[pos].patterns[ppos], states...);
+      active_pos = GetSymbolPos(name);  // @CAO We just did this, so can be faster.
+      Rule(std::forward<STATES>(states)...);
       return id;
     }
 
