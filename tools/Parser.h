@@ -31,7 +31,7 @@ namespace emp {
   // A single symbol in a grammer including the patterns that generate it.
   struct ParseSymbol {
     std::string name;
-    emp::vector< emp::vector<int> > patterns;
+    emp::vector< int > rule_ids;
     int id;
 
     emp::vector<int> first;   // What tokens can begin this symbol?
@@ -42,25 +42,33 @@ namespace emp {
      : first(Lexer::MaxTokenID(), -1), follow(Lexer::MaxTokenID(), -1), nullable(false) { ; }
   };
 
-  // A single node in a parse tree.
-  struct ParseNode {
+  struct ParseRule {
     int symbol_id;
-    int rule_pos;
-    emp::vector< ParseNode * > children;
+    emp::vector<int> pattern;
+
+    ParseRule(int sid) : symbol_id(sid) { ; }
   };
+
+  // // A single node in a parse tree.
+  // struct ParseNode {
+  //   int symbol_id;
+  //   int rule_pos;
+  //   emp::vector< ParseNode * > children;
+  // };
 
   class Parser {
   private:
     Lexer & lexer;                     // Default input lexer.
     emp::vector<ParseSymbol> symbols;  // Set of symbols that make up this grammar.
+    emp::vector<ParseRule> rules;      // Set of rules that make up the parser.
     int cur_symbol_id;                 // Which id should the next new symbol get?
     int active_pos;                    // Which symbol pos is active?
 
-    void BuildRule(emp::vector<int> & new_rule) { ; }
+    void BuildRule(emp::vector<int> & new_pattern) { ; }
     template <typename T, typename... EXTRAS>
-    void BuildRule(emp::vector<int> & new_rule, T && arg, EXTRAS... extras) {
-      new_rule.push_back( GetID(std::forward<T>(arg)) );
-      BuildRule(new_rule, std::forward<EXTRAS>(extras)...);
+    void BuildRule(emp::vector<int> & new_pattern, T && arg, EXTRAS... extras) {
+      new_pattern.push_back( GetID(std::forward<T>(arg)) );
+      BuildRule(new_pattern, std::forward<EXTRAS>(extras)...);
     }
 
     // Return the position in the symbols vector where this name is found; else return -1.
@@ -128,10 +136,11 @@ namespace emp {
     Parser & Rule(STATES... states) {
       emp_assert(active_pos >= 0 && active_pos < (int) symbols.size(), active_pos);
 
-      const auto ppos = symbols[active_pos].patterns.size();
-      symbols[active_pos].patterns.resize(ppos+1);
-      BuildRule(symbols[active_pos].patterns[ppos], states...);
-      if (symbols[active_pos].patterns[ppos].size() == 0) symbols[active_pos].nullable = true;
+      auto rule_id = rules.size();
+      symbols[active_pos].rule_ids.push_back(rule_id);
+      rules.emplace_back(active_pos);
+      BuildRule(rules.back().pattern, states...);
+      if (rules.back().pattern.size() == 0) symbols[active_pos].nullable = true;
       return *this;
     }
 
@@ -157,18 +166,17 @@ namespace emp {
       while (progress) {
         progress = false;
         // Scan all symbols.
-        for (auto & s : symbols) {
+        for (auto & r : rules) {
+          auto & s = symbols[r.symbol_id];
           if (s.nullable) continue; // If a symbol is already nullable, skip it.
-          // For each remaining symbol, scan all patterns.
-          for (auto & p : s.patterns) {
-            // For each pattern, see if all internal symbols are nullable.
-            bool nullable = true;
-            for (int sid : p) {
-              int pos = GetIDPos(sid);
-              if (pos < 0 || symbols[pos].nullable == false) { nullable = false; break; }
-            }
-            if (nullable) { s.nullable = true; progress = true; break; }
+
+          // For each pattern, see if all internal symbols are nullable.
+          bool cur_nullable = true;
+          for (int sid : r.pattern) {
+            int pos = GetIDPos(sid);
+            if (pos < 0 || symbols[pos].nullable == false) { cur_nullable = false; break; }
           }
+          if (cur_nullable) { s.nullable = true; progress = true; break; }
         }
       }
 
@@ -184,10 +192,11 @@ namespace emp {
       os << symbols.size() << " parser symbols available." << std::endl;
       for (const auto & s : symbols) {
         os << "symbol '" << s.name << "' (id " << s.id << ") has "
-           << s.patterns.size() << " patterns.";
+           << s.rule_ids.size() << " patterns.";
         if (s.nullable) os << " [NULLABLE]";
         os << std::endl;
-        for (const auto & p : s.patterns) {
+        for (int rid : s.rule_ids) {
+          const emp::vector<int> & p = rules[rid].pattern;
           os << " ";
           if (p.size() == 0) os << " [empty]";
           for (int x : p) os << " " << GetName(x) << "(" << x << ")";
