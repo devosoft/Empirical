@@ -71,12 +71,10 @@ namespace emp {
       return -1;
     }
 
-    // @CAO Should be made MUCH more efficient.
+    // Convert a symbol ID into its position in the symbols[] vector.
     int GetIDPos(int id) const {
-      for (auto i = 0; i < symbols.size(); i++) {
-        if (symbols[i].id == id) return i;
-      }
-      return -1;
+      if (id < lexer.MaxTokenID()) return -1;
+      return id - lexer.MaxTokenID();
     }
 
     // Create a new symbol and return its POSITION.
@@ -172,6 +170,13 @@ namespace emp {
             if (nullable) { s.nullable = true; progress = true; break; }
           }
         }
+      }
+
+      // Determine FIRST of each symbol.
+      progress = true;
+      while (progress) {
+        progress = false;
+        // @CAO Continue here.
       }
     }
 
