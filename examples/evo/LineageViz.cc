@@ -31,5 +31,5 @@ emp::web::Document doc("lineage_viz");
 
 int main() {
   doc << lineage_viz;
-  lineage_viz.LoadDataFromFile("test.json");
+  lineage_viz.LoadDataFromFile("test1.json");
 }

@@ -113,6 +113,7 @@ int main(int argc, char* argv[])
     grid_pop.MutatePop();
 
   }
-  grid_pop.lineageM.WriteDataToFile("test.json");
+  std::cout<<"hahahahahahah"<<std::endl;
+  grid_pop.lineageM.WriteDataToFile("test1.json");
 
 }
