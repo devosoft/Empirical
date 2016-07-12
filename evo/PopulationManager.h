@@ -410,6 +410,107 @@ namespace evo {
     }
  };
 
+  template <typename ORG>
+ class PopulationManager_GridPools : public PopulationManager_Base<ORG> {
+  public:
+    using PopulationManager_Base<ORG>::pop;
+    using PopulationManager_Base<ORG>::random_ptr;
+    using PopulationManager_Base<ORG>::SetRandom;
+    using PopulationManager_Base<ORG>::GetSize;
+
+    int pool_count;
+    int width;
+    int height;
+    int tot_pop;
+    int org_count = 0; // orgs in vector
+    vector<int> pool_end; //end of each pool in array
+
+    int ToX(int id) const { return id % width; }
+    int ToY(int id) const { return id / width; }
+    int ToID(int x, int y) const { return y*width + x; }
+
+  public:
+    PopulationManager_GridPools() { ; }
+    ~PopulationManager_GridPools() { ; }
+
+    int GetPoolCount() const { return pool_count; }
+
+    void Setup(Random * r){
+
+        SetRandom(r);
+        ConfigPop(5, 4, 5, 100);
+    }
+
+    //Sets up population based on user specs.
+    void ConfigPop(int pc, int w, int h, int pop_size) { 
+        pool_count = pc; 
+        width = w;
+        height = h;
+        tot_pop = pop_size;
+
+        pop.resize(width * height * pool_count, nullptr);
+
+        // Divide World into pools
+        int arr_size = 0;
+        for( int i = 0 ; i < pool_count; i++){
+            arr_size += width * height;
+            pool_end.push_back(arr_size);
+        }
+    
+    }
+
+    // Injected orgs go into a random pool.
+    int AddOrg(ORG * new_org) {
+        int range_u;
+        int range_l = 0;
+
+        //Each pool is guarenteed to have 1 org.
+        if(org_count < pool_count){
+            range_u = pool_end[org_count];
+            if(org_count > 0){range_l = pool_end[org_count - 1];}
+        }
+        else{
+            range_u = (int) pop.size();
+        }
+
+        const int pos = (int) random_ptr->GetDouble(range_l, range_u);
+         
+        if (pop[pos]) delete pop[pos];
+        pop[pos] = new_org;
+        org_count++;
+
+        return pos;
+    }
+
+    // Newly born orgs have a chance to migrate to a connected pool.
+    int AddOrgBirth(ORG * new_org, int parent_pos) {
+        int InsertPool = 0;
+        int range_l, range_u;
+
+        for(int i = 0; i < pool_end.size(); i++ ){
+            if(parent_pos < pool_end[i]) {InsertPool = i; break;} 
+        }
+
+        if(InsertPool == 0){range_l = 0;}
+        else{range_l = pool_end[InsertPool - 1];}
+        range_u = pool_end[InsertPool];
+
+        const int parent_x = ToX(parent_pos- range_l);
+        const int parent_y = ToY(parent_pos - range_l);
+        const int offset = random_ptr->GetInt(9);
+        const int offspring_x = emp::mod(parent_x + offset%3 - 1, width);
+        const int offspring_y = emp::mod(parent_y + offset/3 - 1, height);
+        const int pos = ToID(offspring_x, offspring_y) + range_l;
+
+        if (pop[pos]) delete pop[pos];
+
+        pop[pos] = new_org;
+
+        return pos;
+    }
+ };
+
+
   using PopBasic = PopulationManager_Base<int>;
   using PopEA    = PopulationManager_EA<int>;
   using PopST    = PopulationManager_SerialTransfer<int>;
