@@ -23,6 +23,7 @@
 #ifndef EMP_PARSER_H
 #define EMP_PARSER_H
 
+#include "BitVector.h"
 #include "Lexer.h"
 #include "vector.h"
 
@@ -34,12 +35,12 @@ namespace emp {
     emp::vector< int > rule_ids;
     int id;
 
-    emp::vector<int> first;   // What tokens can begin this symbol?
-    emp::vector<int> follow;  // What tokens can come after this symbol?
+    emp::BitVector first;   // What tokens can begin this symbol?
+    emp::BitVector follow;  // What tokens can come after this symbol?
     bool nullable;            // Can this symbol be converted to nothing?
 
     ParseSymbol()
-     : first(Lexer::MaxTokenID(), -1), follow(Lexer::MaxTokenID(), -1), nullable(false) { ; }
+     : first(Lexer::MaxTokenID()), follow(Lexer::MaxTokenID()), nullable(false) { ; }
   };
 
   struct ParseRule {
@@ -181,6 +182,7 @@ namespace emp {
       }
 
       // Determine FIRST of each symbol.
+      // @CAO Can speed up by ignoring a rule if it can't provide new information.
       progress = true;
       while (progress) {
         progress = false;
