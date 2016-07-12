@@ -24,9 +24,12 @@
 #define EMP_LEXER_UTILS_H
 
 #include <map>
+#include <utility> // std::pair
 
+#include "BitVector.h"
 #include "DFA.h"
 #include "NFA.h"
+#include "vector.h"
 
 namespace emp {
 
@@ -85,7 +88,7 @@ namespace emp {
   static NFA to_NFA(const DFA & dfa) {
     NFA nfa(dfa.GetSize());
     for (int from = 0; from < dfa.GetSize(); from++) {
-      auto t = dfa.GetTransitions(from);
+      const auto & t = dfa.GetTransitions(from);
       for (int sym = 0; sym < (int) t.size(); sym++) {
         if (t[sym] == -1) continue;
         nfa.AddTransition(from, t[sym], sym);
@@ -113,6 +116,32 @@ namespace emp {
   template <typename T1, typename T2, typename... Ts>
   static DFA MergeDFA(T1 && in1, T2 && in2, Ts &&... others ) {
     return to_DFA( MergeNFA(in1, in2, others...) );
+  }
+
+
+  // Method to find an example string that satisfies a DFA.
+  std::string FindExample(const DFA & dfa, const int min_size=1) {
+    emp::vector< std::pair<int, std::string> > traverse_set;
+    traverse_set.emplace_back(0, "");
+    int next_id = 0;
+    BitVector state_found(dfa.GetSize());
+    state_found[0] = true;
+
+    while (next_id < traverse_set.size()) {
+      const auto & t_state = traverse_set[next_id++];
+      auto t = dfa.GetTransitions(t_state.first);
+      for (int sym = 0; sym < (int) t.size(); sym++) {
+        const int dfa_state = t[sym];
+        if (dfa_state == -1 || state_found[dfa_state]) continue;
+        std::string cur_str = t_state.second + (char) sym;
+        if (dfa.IsStop(dfa_state) && cur_str.size() >= min_size) return cur_str;
+        traverse_set.emplace_back(dfa_state, cur_str);
+        state_found[dfa_state] = true;
+      }
+    }
+
+    // if (dfa.IsStop(from)) nfa.SetStop(from, dfa.GetStop(from));
+    return "";
   }
 }
 
