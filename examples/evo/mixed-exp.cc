@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 
-#include "../../config/ArgManager.h"
+//#include "../../config/ArgManager.h"
 #include "../../evo/NK.h"
 #include "../../evo/World.h"
 #include "../../tools/BitSet.h"
@@ -39,9 +39,9 @@ int main(int argc, char* argv[])
   NKConfig config;
   config.Read("Mixed.cfg");
 
-  auto args = emp::cl::ArgManager(argc, argv);
-  if (args.ProcessConfigOptions(config, std::cout, "Mixed.cfg", "NK-macros.h") == false) exit(0);
-  if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
+  //auto args = emp::cl::ArgManager(argc, argv);
+  //if (args.ProcessConfigOptions(config, std::cout, "Mixed.cfg", "NK-macros.h") == false) exit(0);
+  //if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
 
   // k controls # of hills in the fitness landscape
   const int K = config.K();
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
   const int POP_SIZE = config.POP_SIZE();
   const int UD_COUNT = config.MAX_GENS();
 
-  emp::Random random(config.SEED());
+  emp::Random random(1234);
   emp::evo::NKLandscape landscape(N, K, random);
 
   std::string prefix;
