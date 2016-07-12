@@ -119,5 +119,9 @@ int main()
   Test(dfa_all, "ABC-DEF");
 
   // Generate examples of DFAs
-
+  std::cout << "DFA Examples:\n"
+            << "dfa_lower example: " << emp::FindExample(dfa_lower) << std::endl
+            << "dfa_upper example: " << emp::FindExample(dfa_upper) << std::endl
+            << "dfa_inc example:   " << emp::FindExample(dfa_inc) << std::endl
+            << "dfa_all example:   " << emp::FindExample(dfa_all) << std::endl;
 }
