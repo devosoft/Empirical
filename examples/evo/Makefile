@@ -50,7 +50,7 @@ fast-replica: replica.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 replica.cc -o replica
 
 fast-grid: grid-exp.cc ../../evo/NK.h $(EVO_DEPEND)
-	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 grid-exp.cc -o grid-exp
+	$(CXX_native) $(CFLAGS_native) -g -DNDEBUG -O3 grid-exp.cc -o grid-exp
 
 fast-mixed: mixed-exp.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 mixed-exp.cc -o mixed-exp
