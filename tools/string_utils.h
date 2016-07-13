@@ -52,7 +52,7 @@ namespace emp {
     case 24: return "\\030";
     case 25: return "\\031";
     case 26: return "\\032";
-    case '\e': return "\\e";  // case 27 (ESC)
+    case 27: return "\\033";  // case 27 (ESC), sometimes \e
     case 28: return "\\034";
     case 29: return "\\035";
     case 30: return "\\036";
