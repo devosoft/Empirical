@@ -33,6 +33,9 @@ EMP_BUILD_CONFIG( NKConfig,
 
 using BitOrg = emp::BitVector;
 
+template <typename ORG>
+using GPWorld = emp::evo::World<ORG, emp::evo::PopulationManager_GridPools<ORG>, emp::evo::LineagePruned >;
+
 int main(int argc, char* argv[])
 {
   NKConfig config;
@@ -60,16 +63,16 @@ int main(int argc, char* argv[])
   prefix = config.NAME();
 
 
-  emp::evo::GridWorld<BitOrg, emp::evo::LineagePruned > grid_pop(random);
+  GPWorld<BitOrg> grid_pop(random);
 
-  grid_pop.ConfigPop(std::sqrt(POP_SIZE), std::sqrt(POP_SIZE));
+  grid_pop.ConfigPop(5, 4, 5, 100);
 
   std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return landscape.GetFitness(*org);};
 
   grid_pop.SetDefaultFitnessFun(fit_func);
 
   // make a stats manager
-  emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Grid<BitOrg>>
+  emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_GridPools<BitOrg>>
       grid_stats (&grid_pop, prefix + "grid.csv");
 
   grid_stats.SetDefaultFitnessFun(fit_func);
@@ -113,7 +116,5 @@ int main(int argc, char* argv[])
     grid_pop.MutatePop();
 
   }
-  std::cout<<"hahahahahahah"<<std::endl;
-  grid_pop.lineageM.WriteDataToFile("test1.json");
 
 }
