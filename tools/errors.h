@@ -46,6 +46,10 @@ namespace emp {
 
   // Library user has made an error in how they are using the library.
   template <typename... Ts>
+  void LibraryWarning(Ts... msg) { Notify("EMPIRICAL USE WARNING: ", msg...); }
+
+  // Library user has made an error in how they are using the library.
+  template <typename... Ts>
   void LibraryError(Ts... msg) { Notify("EMPIRICAL USE ERROR: ", msg...); }
 
   // Library implementers must have made an error.

@@ -51,7 +51,7 @@ fast-replica: replica.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 replica.cc -o replica
 
 fast-grid: grid-exp.cc ../../evo/NK.h $(EVO_DEPEND)
-	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 grid-exp.cc -o grid-exp
+	$(CXX_native) $(CFLAGS_native) -g -DNDEBUG -O3 grid-exp.cc -o grid-exp
 
 fast-mixed: mixed-exp.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 mixed-exp.cc -o mixed-exp
@@ -67,6 +67,12 @@ fast-quorum-standard: gladiator-standard-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_D
 
 debug-quorum-standard: gladiator-standard-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -g gladiator-standard-grid-quorum.cc -o gladiator-standard.debug
+
+test-mixed: test-stats-mixed.cc ../../evo/NK.h $(EVO_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 test-stats-mixed.cc -o test-mixed
+
+test-grid: test-stats-grid.cc ../../evo/NK.h $(EVO_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 test-stats-grid.cc -o test-grid
 
 NK-const: NK-const.cc ../../evo/NK-const.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) NK-const.cc -o NK-const

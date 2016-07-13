@@ -101,9 +101,9 @@ int main(int argc, char* argv[])
   for (int ud = 0; ud < UD_COUNT; ud++) {
 
     // Keep the best individual.
-    //    mixed_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 5, 10);
-
+    //mixed_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1, 100);
     // Run a tournament for the rest... 
+    
     mixed_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
 			 , TOURNAMENT_SIZE, POP_SIZE);
 
