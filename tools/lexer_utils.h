@@ -119,28 +119,36 @@ namespace emp {
   }
 
 
+  struct DFAStatus {
+    int state;
+    std::string sequence;
+    DFAStatus(int _state, const std::string & _seq) : state(_state), sequence(_seq) { ; }
+  };
+
   // Method to find an example string that satisfies a DFA.
   std::string FindExample(const DFA & dfa, const int min_size=1) {
-    emp::vector< std::pair<int, std::string> > traverse_set;
+    emp::vector< DFAStatus > traverse_set;
     traverse_set.emplace_back(0, "");
-    int next_id = 0;
-    BitVector state_found(dfa.GetSize());
-    state_found[0] = true;
+    // BitVector state_found(dfa.GetSize());
 
+    int next_id = 0;
     while (next_id < traverse_set.size()) {
-      const auto & t_state = traverse_set[next_id++];
-      auto t = dfa.GetTransitions(t_state.first);
+      const auto cur_status = traverse_set[next_id++];     // pair: cur state and cur string
+      const auto & t = dfa.GetTransitions(cur_status.state); // int array of TO states (or -1 if none)
       for (int sym = 0; sym < (int) t.size(); sym++) {
-        const int dfa_state = t[sym];
-        if (dfa_state == -1 || state_found[dfa_state]) continue;
-        std::string cur_str = t_state.second + (char) sym;
-        if (dfa.IsStop(dfa_state) && cur_str.size() >= min_size) return cur_str;
-        traverse_set.emplace_back(dfa_state, cur_str);
-        state_found[dfa_state] = true;
+        const int next_state = t[sym];
+        if (next_state == -1) continue;                     // Ignore non-transitions
+        std::string cur_str(cur_status.sequence);
+        cur_str += (char) sym;                              // Figure out current string
+        if (cur_str.size() >= min_size) {                   // If the DFA is big enough...
+          // if (state_found[next_state]) continue;            //  skip if we've already made it here
+          if (dfa.IsStop(next_state)) return cur_str;       //  return if this is a legal answer
+          // state_found[next_state] = true;                   //  else, don't come again.
+        }
+        traverse_set.emplace_back(next_state, cur_str);     // Continue searching from here.
       }
     }
 
-    // if (dfa.IsStop(from)) nfa.SetStop(from, dfa.GetStop(from));
     return "";
   }
 }
