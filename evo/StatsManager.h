@@ -12,7 +12,8 @@
 #include "../tools/stats.h"
 #include "../config/config.h"
 #include "PopulationManager.h"
-
+#include "LineageTracker.h"
+#include "EvoStats.h"
 namespace emp{
 namespace evo{
 
