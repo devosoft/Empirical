@@ -75,10 +75,11 @@ namespace evo{
     emp::vector<web::LineageVisualization*> viz_pointers;
 
   public:
+    std::unordered_map<int, Node<org_ptr> > nodes;
     static constexpr bool emp_is_lineage_manager = true;
     std::set<ORG> genomes;
-    std::map<int, org_ptr> org_to_genome;
-    std::unordered_map<int, int> parents;
+    // std::map<int, org_ptr> org_to_genome;
+    // std::unordered_map<int, int> parents;
     int next = 1; //0 indicates no parent
     int next_parent_id = -1;
     int next_org_id = 1;
@@ -100,6 +101,12 @@ namespace evo{
 
     template <typename WORLD>
     void Setup(WORLD * w){
+
+      nodes[0] = Node<org_ptr>();
+      nodes[0].id = 0;
+      nodes[0].parent = &nodes[0];
+      nodes[0].alive = false;
+
       std::function<void(int)> RecordParentFun = [this] (int id){
         RecordParent(id);
       };
@@ -137,6 +144,9 @@ namespace evo{
       if (separate_generations) {
         //TODO: This isn't sufficient - need to add signals for any
         //population change event
+        for (int id : generation_since_update) {
+          nodes[id].alive = false;
+        }
         generation_since_update = new_generation;
         new_generation.resize(0);
       }
@@ -157,6 +167,7 @@ namespace evo{
     //we can translate their ids from the World to ids within the lineage
     //tracker
     void TrackPlacement(int pos) {
+
       if (separate_generations && !inject){
         if (pos >= new_generation.size()) {
           new_generation.resize(pos+1);
@@ -167,6 +178,7 @@ namespace evo{
         if (pos >= generation_since_update.size()) {
           generation_since_update.resize(pos+1);
         }
+        nodes[generation_since_update[pos]].alive = false;
         generation_since_update[pos] = next_org_id;
       }
 
@@ -191,36 +203,44 @@ namespace evo{
       ret = genomes.insert(org);
       typename std::set<ORG>::iterator it = ret.first;
       org_ptr genome = (org_ptr)&(*it);
-      this->org_to_genome[id] = genome;
-      this->parents[id] = parent;
+
+      Node<org_ptr>* curr = &nodes[id];
+      curr->parent = &nodes[parent];
+      curr->parent->offspring.push_back(&nodes[id]);
+      curr->id = id;
+      curr->alive = true;
+      curr->genome = genome;
 
       /*for (auto viz : viz_pointers) {
         viz->RecordParent(parent, id, genome);
-    }*/
+      }*/
 
       return id;
     }
 
     // Return a vector containing the genomes of an organism's ancestors
-    emp::vector<org_ptr> TraceLineage(int org_id) {
-      emp::vector<org_ptr> lineage;
-      while(org_id) {
-        lineage.push_back(this->org_to_genome[org_id]);
-        org_id = this->parents[org_id];
+    emp::vector<int> TraceLineageIDs(int org_id) {
+      emp::vector<int> lineage;
+      emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
+      Node<org_ptr>* org = &(nodes[org_id]);
+      while(org->id) {
+        lineage.push_back(org->id);
+        org = org->parent;
       }
+
       return lineage;
 
     }
 
     //Return a vector containing the IDs of an oraganism's ancestors
-    emp::vector<int> TraceLineageIDs(int org_id) {
-      emp::vector<org_ptr> lineage;
-
-      while(org_id) {
-        lineage.push_back(org_id);
-        org_id = this->parents[org_id];
+    emp::vector<ORG> TraceLineage(int org_id) {
+      emp::vector<ORG> lineage;
+      emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
+      Node<org_ptr>* org = &(nodes[org_id]);
+      while(org->id) {
+        lineage.push_back(*(org->genome));
+        org = org->parent;
       }
-
       return lineage;
 
     }
@@ -231,7 +251,7 @@ namespace evo{
     C<ORG> IDsToGenomes(C<int> & ids) {
       C<ORG> genome_group;
       for (int id : ids){
-        genome_group.insert(genome_group.back(), *(this->org_to_genome[id]));
+        genome_group.insert(genome_group.back(), *(this->nodes[id].genome));
       }
       return genome_group;
     }
@@ -240,13 +260,50 @@ namespace evo{
     emp::vector<ORG> IDsToGenomes(emp::vector<int> & ids) {
       emp::vector<ORG> genome_group;
       for (int id : ids){
-        genome_group.push_back(*(this->org_to_genome[id]));
+        genome_group.push_back(*(this->nodes[id].genome));
       }
       return genome_group;
     }
 
     void ConnectVis(web::LineageVisualization * viz_pointer) {
       viz_pointers.push_back(viz_pointer);
+    }
+
+    std::string node_to_json(Node<org_ptr> * node) {
+      std::stringstream ss;
+      ss << "{\"name\":";
+      ss << to_string(node->id);
+      ss << ", \"parent\":";
+      ss << to_string(node->parent->id);
+      ss << ", \"alive\":";
+      if (node->alive){
+        ss << "true";
+      } else {
+        ss << "false";
+      }
+      ss << ", \"persist\":false, \"genome\":\"";
+      if (node->genome != nullptr) {
+        ss << to_string(*(node->genome));
+      } else {
+        ss << "null";
+      }
+      ss << "\", \"children\":[";
+      for (int i=0; i < node->offspring.size(); ++i) {
+        ss << node_to_json(node->offspring[i]);
+        if (i < node->offspring.size()-1) {
+          ss << ", ";
+        }
+      }
+      ss << "]}";
+      return ss.str();
+    }
+
+    void WriteDataToFile(std::string filename) {
+      std::ofstream output_location;
+      output_location.open(filename);
+      std::string output = node_to_json(&nodes[0]);
+      output_location << "[" << output << "]" << std::endl;
+      output_location.close();
     }
 
   };
@@ -265,8 +322,7 @@ namespace evo{
     using LineageTracker<POP_MANAGER>::new_generation;
     using LineageTracker<POP_MANAGER>::inject;
     using LineageTracker<POP_MANAGER>::viz_pointers;
-
-    std::unordered_map<int, Node<org_ptr> > nodes;
+    using LineageTracker<POP_MANAGER>::nodes;
     std::map<ORG, int> genome_counts;
 
   public:
@@ -447,105 +503,24 @@ namespace evo{
         viz->RecordParent(parent, id, genome);
       }
 
-      this->parents[id] = parent;
+    //   this->parents[id] = parent;
 
       return id;
     }
 
 
     void Update(int i) {
+
       if (separate_generations) {
         //TODO: This isn't sufficient - need to add signals for any
         //population change event
+        for (int id : generation_since_update) {
+          nodes[generation_since_update[id]].alive = false;
+        }
         generation_since_update = new_generation;
         new_generation.resize(0);
       }
     }
-
-    // Return a vector containing the genomes of an organism's ancestors
-    emp::vector<int> TraceLineageIDs(int org_id) {
-      emp::vector<int> lineage;
-      emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
-      Node<org_ptr>* org = &(nodes[org_id]);
-      while(org->id) {
-        lineage.push_back(org->id);
-        org = org->parent;
-      }
-
-      return lineage;
-
-    }
-
-    //Return a vector containing the IDs of an oraganism's ancestors
-    emp::vector<ORG> TraceLineage(int org_id) {
-      emp::vector<ORG> lineage;
-      emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
-      Node<org_ptr>* org = &(nodes[org_id]);
-      while(org->id) {
-        lineage.push_back(*(org->genome));
-        org = org->parent;
-      }
-      return lineage;
-
-    }
-
-    //Takes a container of ints representing org ids (as assigned by the lineage)
-    //tracker, and returns a contatiner of the genomes of those ints.
-    template <template <typename> class C >
-    C<ORG> IDsToGenomes(C<int> & ids) {
-      C<ORG> genome_group;
-      for (int id : ids){
-        genome_group.insert(genome_group.back(), *(this->nodes[id].genome));
-      }
-      return genome_group;
-    }
-
-    //Specialization for emp::vector so we can use push_back
-    emp::vector<ORG> IDsToGenomes(emp::vector<int> & ids) {
-      emp::vector<ORG> genome_group;
-      for (int id : ids){
-        genome_group.push_back(*(this->nodes[id].genome));
-      }
-      return genome_group;
-    }
-
-    void WriteDataToFile(std::string filename) {
-      std::ofstream output_location;
-      output_location.open(filename);
-      std::string output = node_to_json(&nodes[0]);
-      output_location << "[" << output << "]" << std::endl;
-      output_location.close();
-    }
-
-    std::string node_to_json(Node<org_ptr> * node) {
-      std::stringstream ss;
-      ss << "{\"name\":";
-      ss << to_string(node->id);
-      ss << ", \"parent\":";
-      ss << to_string(node->parent->id);
-      ss << ", \"alive\":";
-      if (node->alive){
-        ss << "true";
-      } else {
-        ss << "false";
-      }
-      ss << ", \"persist\":false, \"genome\":\"";
-      if (node->genome != nullptr) {
-        ss << to_string(*(node->genome));
-      } else {
-        ss << "null";
-      }
-      ss << "\", \"children\":[";
-      for (int i=0; i < node->offspring.size(); ++i) {
-        ss << node_to_json(node->offspring[i]);
-        if (i < node->offspring.size()-1) {
-          ss << ", ";
-        }
-      }
-      ss << "]}";
-      return ss.str();
-    }
-
 };
 
 
