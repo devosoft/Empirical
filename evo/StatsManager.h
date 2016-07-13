@@ -231,6 +231,7 @@ namespace evo{
         AddFunction(diversity, "Shannon Diversity");
         AddFunction(max_fitness, "Max Fitness");
         AddFunction(avg_fitness, "Avg Fitness");
+        
       }
 
 };
@@ -401,8 +402,6 @@ namespace evo{
           AddFunction(det_mut, "det_mut");
           AddFunction(max_ben, "max_ben");
           AddFunction(max_det, "max_det");
-
-          w->OnUpdate(UpdateFun);
 
       }
   };
