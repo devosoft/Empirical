@@ -60,3 +60,10 @@ examples/evo/grid.csv
 examples/evo/mixed.csv*
 examples/evo/.ipynb_checkpoints
 tests/temp/
+examples/evo/Result*
+examples/evo/grid-exp
+examples/evo/mixed-exp
+examples/evo/SetGrid.cfg
+examples/evo/StatsConfig.cfg
+examples/evo/replica.cc
+tests/StatsConfig.cfg
