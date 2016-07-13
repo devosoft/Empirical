@@ -57,7 +57,8 @@ EMP_BUILD_CONFIG( QuorumConfig,
     VALUE(PREFIX, std::string, "", "Prefix for filenames"),
     VALUE(AVAILABLE_PRIVATE_PTS, long, 180000, "Number of available private points"),
     VALUE(BOTTLENECK_SPACING, unsigned int, 500, "Number of ticks between kill events"),
-    VALUE(BOTTLENECK_LETHALITY, double, 10, "Percentage of organisms to kill during a bottleneck")
+    VALUE(BOTTLENECK_LETHALITY, double, 10, "Percentage of organisms to kill during a bottleneck"),
+    VALUE(PERCENT_STARTING, double, 0.2, "Percentage of grid to seed with starting config")
 )
 
 std::string init_config_names[5] = {"balanced", "lying_defector", "donator", "scrooge",
@@ -109,7 +110,7 @@ int main(int argc, char* argv[]) {
     config.Write(prefix + "quorum.cfg");
 
     // seed the grid
-    Qpop.popM.SpacedSeed(0.01, config.GRID_X() * config.GRID_Y(),
+    Qpop.popM.SpacedSeed(config.PERCENT_STARTING(), config.GRID_X() * config.GRID_Y(),
                          &QOrg::initial_configurations[config.INITIAL_CONFIG()],
                          config.ENABLE_MUTATION(), config.PERCENT_OTHER(),
                          &QOrg::initial_configurations[config.WHICH_OTHER()]);
