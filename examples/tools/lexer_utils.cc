@@ -123,5 +123,6 @@ int main()
             << "dfa_lower example: " << emp::FindExample(dfa_lower) << std::endl
             << "dfa_upper example: " << emp::FindExample(dfa_upper) << std::endl
             << "dfa_inc example:   " << emp::FindExample(dfa_inc) << std::endl
-            << "dfa_all example:   " << emp::FindExample(dfa_all) << std::endl;
+            << "dfa_all example:   " << emp::FindExample(dfa_all) << std::endl
+            << "dfa_inc size 10 example: " << emp::FindExample(dfa_inc, 10) << std::endl;
 }
