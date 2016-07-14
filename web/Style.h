@@ -1,12 +1,12 @@
 //  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2015.
+//  Copyright (C) Michigan State University, 2015-2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
 //  A CSS class for tracking font style, etc.
 //
-//  This class maintains a map of setting names to values that can be easily
-//  ported over to JavaScript.
+//  This class maintains a map of setting names to values that can be easily ported
+//  over to JavaScript.  A companial class, Attributes, also exists.
 //
 //  int GetSize() const
 //    Return a count of the number of settings that have been set.
@@ -37,7 +37,7 @@
 //                    const std::string & value)
 //    Apply "setting: value" to widget_id.
 
-      
+
 #ifndef EMP_WEB_STYLE_H
 #define EMP_WEB_STYLE_H
 
@@ -57,19 +57,19 @@ namespace web {
   class Style {
   private:
     std::map<std::string, std::string> settings;
-    
+
   public:
     Style() { ; }
     Style(const Style &) = default;
     Style & operator=(const Style &) = default;
-    
+
     int GetSize() const { return (int) settings.size(); }
-    
+
     Style & DoSet(const std::string & in_set, const std::string & in_val) {
       settings[in_set] = in_val;
       return *this;
     }
-    
+
     template <typename SET_TYPE>
     Style & Set(const std::string & s, SET_TYPE v) {
       return DoSet(s, emp::to_string(v));
@@ -94,12 +94,12 @@ namespace web {
     }
 
     void Clear() { settings.clear(); }
-    
+
     // Apply ALL of the style settings.
     void Apply(const std::string & widget_id) {
       // Stop immediately if nothing to set.
       if (settings.size() == 0) return;
-      
+
       // Find the current object only once.
 #ifdef EMSCRIPTEN
       EM_ASM_ARGS({
@@ -126,7 +126,7 @@ namespace web {
     // Apply onlay a SPECIFIC style setting from the setting library.
     void Apply(const std::string & widget_id, const std::string & setting) {
       emp_assert(Has(setting));
-      
+
 #ifdef EMSCRIPTEN
       EM_ASM_ARGS({
           var id = Pointer_stringify($0);
@@ -139,7 +139,7 @@ namespace web {
                 << "' to '" << settings[setting] << "'.";
 #endif
     }
-    
+
     // Apply onlay a SPECIFIC style setting with a specifid value!
     static void Apply(const std::string & widget_id, const std::string & setting,
                       const std::string & value) {
@@ -155,7 +155,7 @@ namespace web {
                 << "' to '" << value << "'.";
 #endif
     }
-    
+
   };
 
 
