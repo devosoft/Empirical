@@ -235,7 +235,7 @@ public:
   }
 
   std::deque<std::array<std::array<double, 2>, 1> > data;
-  std::array<std::array<double, 2>, 1> prev_data  = {{-1,-1}};
+  std::array<std::array<double, 2>, 1> prev_data  = std::array<std::array<double, 2>, 1>({std::array<double, 2>({-1,-1})});
   D3::LineGenerator * make_line;
 
   D3::ToolTip* tip;

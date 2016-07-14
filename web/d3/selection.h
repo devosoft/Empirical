@@ -481,7 +481,7 @@ namespace D3 {
 
     std::string GetText(){
 
-      char * buffer = EM_ASM_INT({
+      char * buffer = (char *)EM_ASM_INT({
 	    var text = js.objects[$0].text();
 	    var buffer = Module._malloc(text.length+1);
 	    Module.writeStringToMemory(text, buffer);
@@ -495,7 +495,7 @@ namespace D3 {
 
 
     std::string GetAttrString(std::string name){
-      char * buffer = EM_ASM_INT({
+      char * buffer = (char *)EM_ASM_INT({
 	    var text = js.objects[$0].attr(Pointer_stringify($1));
 	    var buffer = Module._malloc(text.length+1);
 	    Module.writeStringToMemory(text, buffer);
@@ -509,7 +509,7 @@ namespace D3 {
 
 
     std::string GetStyleString(std::string name){
-      char * buffer = EM_ASM_INT({
+      char * buffer = (char *)EM_ASM_INT({
 	    var text = js.objects[$0].style(Pointer_stringify($1));
 	    var buffer = Module._malloc(text.length+1);
 	    Module.writeStringToMemory(text, buffer);
@@ -523,7 +523,7 @@ namespace D3 {
 
 
     std::string GetHtml(){
-      char * buffer = EM_ASM_INT({
+      char * buffer = (char *)EM_ASM_INT({
 	    var text = js.objects[$0].html();
 	    var buffer = Module._malloc(text.length+1);
 	    Module.writeStringToMemory(text, buffer);
@@ -536,13 +536,13 @@ namespace D3 {
     }
 
     std::string GetProperty(std::string name){
-      char * buffer = EM_ASM_INT({
+      char * buffer = (char *)EM_ASM_INT({
 	    var text = js.objects[$0].property(Pointer_stringify($1));
 	    var buffer = Module._malloc(text.length+1);
 	    Module.writeStringToMemory(text, buffer);
 	    return buffer;
 	  }, this->id, name.c_str());
-      
+
       std::string result = std::string(buffer);
       free(buffer);
       return result;

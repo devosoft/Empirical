@@ -20,7 +20,7 @@ namespace D3 {
     std::string Generate(std::array<std::array<T, 2>, SIZE> data){
       emp::pass_array_to_javascript(data);
 
-      char * buffer = EM_ASM_INT({
+      char * buffer = (char *)EM_ASM_INT({
 	    var result = js.objects[$0](emp_i.__incoming_array);
 	    var buffer = Module._malloc(result.length+1);
 	    Module.writeStringToMemory(result, buffer);
