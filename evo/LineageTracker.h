@@ -225,7 +225,6 @@ namespace evo{
         lineage.push_back(org->id);
         org = org->parent;
       }
-
       return lineage;
 
     }

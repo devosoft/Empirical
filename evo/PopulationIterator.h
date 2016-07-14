@@ -65,7 +65,7 @@ public:
   ORG & operator*() {return (*pop)[curr];}
 
   PopulationIterator<POP_MANAGER> begin() {
-    return PopulationIterator<ORG>(pop, 0);
+    return PopulationIterator<POP_MANAGER>(pop, 0);
   }
 
   PopulationIterator<POP_MANAGER> end() {

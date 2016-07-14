@@ -1,9 +1,6 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
-// Copyright (C) Michigan State University, 2015. It is licensed
+// This file is part of Empirical, https://github.com/devosoft/Empirical/, and is
+// Copyright (C) Michigan State University, 2016. It is licensed
 // under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_JSWRAP_H
-#define EMP_JSWRAP_H
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -39,6 +36,10 @@
 //    struct in js_object_struct.h. - @ELD
 //
 
+#ifndef EMP_JSWRAP_H
+#define EMP_JSWRAP_H
+
+
 #include <functional>
 #include <tuple>
 #include <array>
@@ -46,6 +47,7 @@
 #include "../tools/assert.h"
 #include "../tools/functions.h"
 #include "../tools/mem_track.h"
+#include "../tools/meta.h"
 #include "../tools/vector.h"
 #include "../tools/tuple_struct.h"
 #include "js_utils.h"

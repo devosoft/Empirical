@@ -5,6 +5,10 @@
 //This file defines an object that will listen to the signals given by a World
 //object, calculate metrics of open-ended evolution, and print them out.
 
+//Developer notes:
+// * Currently assumes BitOrgs
+// * Currently incompatible with pruned lineage tracker
+
 #ifndef EMP_OEE_H
 #define EMP_OEE_H
 

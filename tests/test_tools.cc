@@ -12,25 +12,28 @@
 #include "../tools/BitSet.h"
 #include "../tools/BitVector.h"
 #include "../tools/DynamicStringSet.h"
-#include "../tools/functions.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/Graph.h"
-#include "../tools/graph_utils.h"
-//#include "../tools/grid.h"
-#include "../tools/mem_track.h"
 #include "../tools/Ptr.h"
 #include "../tools/Random.h"
+#include "../tools/Trait.h"
+
+#include "../tools/assert.h"
+#include "../tools/functions.h"
+#include "../tools/graph_utils.h"
+//#include "../tools/grid.h"
+#include "../tools/macro_math.h"
+#include "../tools/macros.h"
+#include "../tools/mem_track.h"
+#include "../tools/meta.h"
 #include "../tools/reflection.h"
 #include "../tools/sequence_utils.h"
 #include "../tools/serialize.h"
 #include "../tools/string_utils.h"
-#include "../tools/Trait.h"
 #include "../tools/tuple_struct.h"
-#include "../tools/vector.h"
-#include "../tools/macro_math.h"
-#include "../tools/macros.h"
-#include "../tools/assert.h"
 #include "../tools/unit_tests.h"
+#include "../tools/vector.h"
+
 // currently these have no coveage; we include them so we get metrics on them
 // this doesn't actually work--TODO: figure out why this doesn't work
 #include "../tools/alert.h"
@@ -52,8 +55,14 @@
   } while (false)
 
 
+// this templating is necessary to force full coverage of templated classes.
+// Since c++ doesn't generate code for templated methods if those methods aren't
+// explicitly called (and thus our profiling doesn't see them), we have to
+// force them all to be included in the comilation.
+template class emp::BitMatrix<4, 5>;
 TEST_CASE("Test bitvectors", "[tools]")
 {
+
   emp::BitMatrix<4,5> bm45;
 
   REQUIRE(bm45.NumCols() == 4);
@@ -76,6 +85,30 @@ TEST_CASE("Test bitvectors", "[tools]")
   REQUIRE(bm45.Get(1,2) == 1);
   REQUIRE(bm45.CountOnes() == 1);
   REQUIRE(bm45.FindBit() == bm45.GetID(1,2));
+
+  bm45.SetAll();
+  REQUIRE(bm45.All() == true);
+  REQUIRE(bm45.None() == false);
+  bm45.ClearRow(2);
+  REQUIRE(bm45.Get(2,2) == 0);
+  REQUIRE(bm45.Get(2,1) == 1);
+  bm45.ClearCol(1);
+  REQUIRE(bm45.Get(1,1) == 0);
+  bm45.Clear();
+  REQUIRE(bm45.Get(0,2) == 0);
+  bm45.SetRow(2);
+  REQUIRE(bm45.Get(0,2) == 1);
+  REQUIRE(bm45.Get(0,0) == 0);
+  bm45.SetCol(0);
+  REQUIRE(bm45.Get(0,0) == 1);
+  bm45.Clear();
+  bm45.SetRow(2);
+  REQUIRE(bm45.Get(0,2) == 1);
+  REQUIRE(bm45.Get(0,1) == 0);
+  bm45.UpShift();
+  // TODO: figure out how upshift actually works and write a real test for it
+
+
 
 /* This block needs asserts
   bm45 = bm45.GetReach().GetReach();
@@ -101,6 +134,8 @@ TEST_CASE("Test bitvectors", "[tools]")
 */
 }
 
+
+template class emp::BitSet<5>;
 TEST_CASE("test BitSet", "[tools]")
 {
   emp::BitSet<10> bs10;
@@ -118,6 +153,13 @@ TEST_CASE("test BitSet", "[tools]")
     REQUIRE((shift_set.CountOnes() == 1) == (i <= 71));
   }
 
+  REQUIRE(bs10[2] == false);
+  bs10.flip(2);
+  REQUIRE(bs10[2] == true);
+
+  for (int i = 3; i < 8; i++) {REQUIRE(bs10[i] == false);}
+  bs10.flip(3, 8);
+  for (int i = 3; i < 8; i++) {REQUIRE(bs10[i] == true);}
 
   // Test importing....
   bs10.Import(bs80 >> 70);
@@ -299,7 +341,17 @@ TEST_CASE("Test functions", "[tools]")
   REQUIRE(emp::to_range(12345678, 10, 20) == 20);
   REQUIRE(emp::to_range<double>(12345678, 10, 20.1) == 20.1);
   REQUIRE(emp::to_range(12345678.0, 10.7, 20.1) == 20.1);
+}
 
+
+template <typename A, typename B>
+struct MetaTestClass {
+  A a;
+  B b;
+};
+
+TEST_CASE("Test meta-programming helpers", "[tools]")
+{
 
   // TEST FOR VARIADIC HELPER FUNCTIONS:
 
@@ -319,6 +371,27 @@ TEST_CASE("Test functions", "[tools]")
 
   REQUIRE(result_char == 'g');
 
+  using meta1_t = MetaTestClass<int, double>;
+  using meta2_t = emp::AdaptTemplate<meta1_t, char, bool>;
+  using meta3_t = emp::AdaptTemplate_Arg1<meta1_t, std::string>;
+  
+  meta1_t meta1;
+  meta2_t meta2;
+  meta3_t meta3;
+
+  meta1.a = (decltype(meta1.a)) 65.5;
+  meta1.b = (decltype(meta1.b)) 65.5;
+  meta2.a = (decltype(meta2.a)) 65.5;
+  meta2.b = (decltype(meta2.b)) 65.5;
+  meta3.a = (decltype(meta3.a)) "65.5";
+  meta3.b = (decltype(meta3.b)) 65.5;
+
+  REQUIRE( meta1.a == 65 );
+  REQUIRE( meta1.b == 65.5 );
+  REQUIRE( meta2.a == 'A' );
+  REQUIRE( meta2.b == true );
+  REQUIRE( meta3.a == "65.5" );
+  REQUIRE( meta3.b == 65.5 );
 }
 
 // should migrate these inside the test case, probably
@@ -437,6 +510,7 @@ TEST_CASE("Test graph", "[tools]")
 }
 
 // TODO: add asserts
+emp::Random grand;
 TEST_CASE("Test Graph utils", "[tools]")
 {
   emp::Random random;
@@ -972,8 +1046,13 @@ TEST_CASE("Test string utils", "[tools]")
   emp::compress_whitespace(base_string);
   REQUIRE(base_string == "This is -MY- very best string!!!!");
 
-  emp::vector<std::string> slices;
-  emp::slice_string(base_string, slices, 's');
+  auto slices = emp::slice("This is a test of a different version of slice.", ' ');
+
+  REQUIRE(slices.size() == 10);
+  REQUIRE(slices[8] == "of");
+
+  // Try other ways of using slice().
+  emp::slice(base_string, slices, 's');
 
   REQUIRE(slices.size() == 5);
   REQUIRE(slices[1] == " i");

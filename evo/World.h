@@ -155,7 +155,7 @@ namespace evo {
     Random * random_ptr;
     bool random_owner;
     int update = 0;
-    using iterator = PopulationIterator<ORG>;
+    using iterator = PopulationIterator<decltype(popM)>;
 
     // Signals triggered by the world.
     Signal<int> before_repro_sig;       // Trigger: Immediately prior to producing offspring
@@ -214,8 +214,8 @@ namespace evo {
     ORG & operator[](int i) { return *(popM[i]); }
     const ORG & operator[](int i) const { return *(popM[i]); }
     bool IsOccupied(int i) const { return popM[i] != nullptr; }
-    iterator begin(){return PopulationIterator<ORG>(&popM, 0);}
-    iterator end(){return PopulationIterator<ORG>(&popM, popM.size());}
+    iterator begin(){return PopulationIterator<decltype(popM)>(&popM, 0);}
+    iterator end(){return PopulationIterator<decltype(popM)>(&popM, popM.size());}
 
     void Clear() { popM.Clear(); }
 
@@ -415,6 +415,7 @@ namespace evo {
 
       for (int T = 0; T < tourny_count; T++) {
         emp::vector<int> entries = Choose(*random_ptr, valid_orgs.size(), t_size);
+        Shuffle(*random_ptr, entries);
         double best_fit = fit_fun(popM[valid_orgs[entries[0]]]);
         int best_id = valid_orgs[entries[0]];
 

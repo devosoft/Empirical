@@ -1,6 +1,8 @@
 install-dependencies: build-doxygen install-pip-deps
+	git submodule update --init
 
-install-testing-dependencies: install-pip-deps
+travis-install-dependencies: build-doxygen
+	sudo pip install -r requirements.txt
 
 download-doxygen:
 	bash download_doxygen.sh

@@ -1,5 +1,0 @@
-// objective: test the \b command
-// check: indexpage.xml
-/** \mainpage
- *  Text \b bold normal text.
- */

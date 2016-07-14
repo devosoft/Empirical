@@ -1,5 +1,5 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
+// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
+// Copyright (C) Michigan State University, 2015. It is licensed
 // under the MIT Software license; see doc/LICENSE
 
 #ifndef EMP_BIT_MATRIX_H
@@ -19,6 +19,7 @@
 //
 
 #include <iostream>
+#include <typeinfo>
 
 #include "BitSet.h"
 
@@ -50,7 +51,7 @@ namespace emp {
       return mask;
       // return mask_pattern<COLS*ROWS, COL_ID, COLS, COLS*ROWS-1>();
     }
-      
+
     template <int ROW_ID> static const BitSet<COLS*ROWS> & MaskRow() {
       static bool init = false;
       static BitSet<COLS*ROWS> mask;
@@ -60,8 +61,8 @@ namespace emp {
       }
       return mask;
     }
-      
-  public:
+
+//  public:
     BitMatrix() { ; }
     BitMatrix(const BitSet<COLS*ROWS> & in_bits) : bits(in_bits) { ; }
     BitMatrix(const BitMatrix & in_matrix) : bits(in_matrix.bits) { ; }
@@ -81,7 +82,7 @@ namespace emp {
 
     bool Get(int col, int row) const { return bits[GetID(col,row)]; }
     bool Get(int id) const { return bits[id]; }
-    
+
     void Set(int col, int row, bool val=true) { bits[GetID(col, row)] = val; }
     void Set(int id) { bits[id] = true; }
     void Unset(int col, int row) { bits[GetID(col, row)] = false; }
@@ -89,12 +90,12 @@ namespace emp {
     void Flip(int col, int row) { bits.flip(GetID(col, row)); }
     void Flip(int id) { bits.flip(id); }
 
-    void SetAll() { bits.set(); }
-    void SetCol(int col) { bits |= (MaskCol<0> << col); }
-    void SetRow(int row) { bits |= (MaskRow<0> << (row * COLS)); }
-    void Clear() { bits.clear(); }
-    void ClearCol(int col) { bits &= ~(MaskCol<0> << col); }
-    void ClearRow(int row) { bits &= ~(MaskRow<0> << (row * COLS)); }
+    void SetAll() { bits.SetAll(); }
+    void SetCol(int col) { bits |= MaskCol<0>() << col;}
+    void SetRow(int row) { bits |= (MaskRow<0>() << (row * COLS)); }
+    void Clear() { bits.Clear(); }
+    void ClearCol(int col) { bits &= ~(MaskCol<0>() << col); }
+    void ClearRow(int row) { bits &= ~(MaskRow<0>() << (row * COLS)); }
 
     // Count the number of set bits in the matrix.
     int CountOnes() const { return bits.count(); }
@@ -107,9 +108,9 @@ namespace emp {
     // Shift the whole matrix in the specified direction.
     BitMatrix LeftShift() const { return ((bits & ~MaskCol<0>()) >> 1); }
     BitMatrix RightShift() const { return ((bits << 1) & ~MaskCol<0>()); }
-    BitMatrix UpShift() const { return bits >> COLS; } 
+    BitMatrix UpShift() const { return bits >> COLS; }
     BitMatrix DownShift() const { return bits << COLS; }
-    BitMatrix ULShift() const { return ((bits & ~MaskCol<0>()) >> (COLS+1)); }    
+    BitMatrix ULShift() const { return ((bits & ~MaskCol<0>()) >> (COLS+1)); }
     BitMatrix DLShift() const { return ((bits & ~MaskCol<0>()) << (COLS-1)); }
     BitMatrix URShift() const { return ((bits >> (COLS-1)) & ~MaskCol<0>()); }
     BitMatrix DRShift() const { return ((bits << (COLS+1)) & ~MaskCol<0>()); }

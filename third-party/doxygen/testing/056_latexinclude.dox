@@ -1,7 +1,0 @@
-// objective: test the \latexinclude command
-// check: indexpage.xml
-/** \mainpage
- * Some text.
- * \latexinclude sample.tex
- * More text.
- */

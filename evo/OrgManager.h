@@ -10,6 +10,8 @@
 
 #include <unordered_map>
 
+#include "../tools/meta.h"
+
 #define EMP_SETUP_EVO_DEFAULT(FUN_VAR, NAME, TEST, ACTION, RTYPE)              \
   std::function<RTYPE(ORG*)> FUN_VAR;                                          \
   template <class T> void Setup_ ## FUN_VAR ## _impl(emp_bool_decoy(TEST)) {   \
