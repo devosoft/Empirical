@@ -11,6 +11,7 @@
 #include "../../tools/DFA.h"
 #include "../../tools/NFA.h"
 #include "../../tools/lexer_utils.h"
+#include "../../tools/RegEx.h"
 
 void Test(const emp::DFA & dfa, const std::string & str) {
   int out_state = dfa.Next(0, str);
@@ -90,6 +91,9 @@ int main()
   emp::NFA nfa_upper = to_NFA(re_upper);
   emp::NFA nfa_inc = to_NFA(re_inc);
   emp::NFA nfa_all = MergeNFA(nfa_lower, nfa_upper, nfa_inc);
+  emp::DFA dfa_lower = to_DFA(nfa_lower);
+  emp::DFA dfa_upper = to_DFA(nfa_upper);
+  emp::DFA dfa_inc = to_DFA(nfa_inc);
   emp::DFA dfa_all = to_DFA(nfa_all);
 
   re_lower.PrintDebug();
@@ -113,4 +117,12 @@ int main()
   Test(dfa_all, "ABCDEF");
   Test(dfa_all, "abcdefghijklmnopqrstuvwxyz");
   Test(dfa_all, "ABC-DEF");
+
+  // Generate examples of DFAs
+  std::cout << "DFA Examples:\n"
+            << "dfa_lower example: " << emp::FindExample(dfa_lower) << std::endl
+            << "dfa_upper example: " << emp::FindExample(dfa_upper) << std::endl
+            << "dfa_inc example:   " << emp::FindExample(dfa_inc) << std::endl
+            << "dfa_all example:   " << emp::FindExample(dfa_all) << std::endl
+            << "dfa_inc size 10 example: " << emp::FindExample(dfa_inc, 10) << std::endl;
 }

@@ -24,9 +24,12 @@
 #define EMP_LEXER_UTILS_H
 
 #include <map>
+#include <utility> // std::pair
 
+#include "BitVector.h"
 #include "DFA.h"
 #include "NFA.h"
+#include "vector.h"
 
 namespace emp {
 
@@ -85,7 +88,7 @@ namespace emp {
   static NFA to_NFA(const DFA & dfa) {
     NFA nfa(dfa.GetSize());
     for (int from = 0; from < dfa.GetSize(); from++) {
-      auto t = dfa.GetTransitions(from);
+      const auto & t = dfa.GetTransitions(from);
       for (int sym = 0; sym < (int) t.size(); sym++) {
         if (t[sym] == -1) continue;
         nfa.AddTransition(from, t[sym], sym);
@@ -113,6 +116,40 @@ namespace emp {
   template <typename T1, typename T2, typename... Ts>
   static DFA MergeDFA(T1 && in1, T2 && in2, Ts &&... others ) {
     return to_DFA( MergeNFA(in1, in2, others...) );
+  }
+
+
+  struct DFAStatus {
+    int state;
+    std::string sequence;
+    DFAStatus(int _state, const std::string & _seq) : state(_state), sequence(_seq) { ; }
+  };
+
+  // Method to find an example string that satisfies a DFA.
+  std::string FindExample(const DFA & dfa, const int min_size=1) {
+    emp::vector< DFAStatus > traverse_set;
+    traverse_set.emplace_back(0, "");
+    // BitVector state_found(dfa.GetSize());
+
+    int next_id = 0;
+    while (next_id < traverse_set.size()) {
+      const auto cur_status = traverse_set[next_id++];     // pair: cur state and cur string
+      const auto & t = dfa.GetTransitions(cur_status.state); // int array of TO states (or -1 if none)
+      for (int sym = 0; sym < (int) t.size(); sym++) {
+        const int next_state = t[sym];
+        if (next_state == -1) continue;                     // Ignore non-transitions
+        std::string cur_str(cur_status.sequence);
+        cur_str += (char) sym;                              // Figure out current string
+        if (cur_str.size() >= min_size) {                   // If the DFA is big enough...
+          // if (state_found[next_state]) continue;            //  skip if we've already made it here
+          if (dfa.IsStop(next_state)) return cur_str;       //  return if this is a legal answer
+          // state_found[next_state] = true;                   //  else, don't come again.
+        }
+        traverse_set.emplace_back(next_state, cur_str);     // Continue searching from here.
+      }
+    }
+
+    return "";
   }
 }
 
