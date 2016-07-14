@@ -60,13 +60,19 @@ fast-quorum-mixed: mixed-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 mixed-grid-quorum.cc -o mixed-grid-quorum.out
 
 debug-quorum-mixed: mixed-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
-	$(CXX_native) $(CFLAGS_native) -DNDEBUG -g mixed-grid-quorum.cc -o mixed-grid-quorum.debug
+	$(CXX_native) $(CFLAGS_native) -g mixed-grid-quorum.cc -o mixed-grid-quorum.debug
 
 fast-quorum-standard: standard-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 standard-grid-quorum.cc -o standard-grid-quorum.out
 
 debug-quorum-standard: standard-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
-	$(CXX_native) $(CFLAGS_native) -DNDEBUG -g standard-grid-quorum.cc -o standard-grid-quorum.debug
+	$(CXX_native) $(CFLAGS_native) -g standard-grid-quorum.cc -o standard-grid-quorum.debug
+
+fast-quorum-grid-pools: grid-pools-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 grid-pools-quorum.cc -o grid-pools-quorum.out
+
+debug-quorum-grid-pools: grid-pools-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -g grid-pools-quorum.cc -o grid-pools-quorum.debug
 
 test-mixed: test-stats-mixed.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 test-stats-mixed.cc -o test-mixed

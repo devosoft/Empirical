@@ -138,18 +138,7 @@ public:
     }
 
     unsigned int BottleneckEvent(double lethality) {
-      unsigned murdered = 0;
-      for(size_t i = 0; i < pop.size(); i++) {
-        if(random_ptr->P(lethality)) {
-          if(pop[i] != nullptr) {
-            delete pop[i];
-            pop[i] = nullptr;
-            murdered++;
-          }
-        }
-      }
-
-      return murdered;
+      POP_MANAGER<QuorumOrganism>::DoBottleneckEvent(lethality);
     }
 
     /// Does public good creation / distrubtion processing for an organism

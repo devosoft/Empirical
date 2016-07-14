@@ -231,6 +231,22 @@ namespace evo {
       return point;
     }
 
+    int DoBottleneckEvent(double lethality) {
+    unsigned murdered = 0;
+      for(size_t i = 0; i < pop.size(); i++) {
+        if(random_ptr->P(lethality)) {
+          if(pop[i] != nullptr) {
+            delete pop[i];
+            pop[i] = nullptr;
+            murdered++;
+          }
+        }
+      }
+
+      return murdered;
+    }
+
+
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
 
@@ -355,6 +371,7 @@ namespace evo {
     using PopulationManager_Grid<ORG>::ToID;
     using PopulationManager_Grid<ORG>::width;
     using PopulationManager_Grid<ORG>::height;
+    using PopulationManager_Grid<ORG>::DoBottleneckEvent;
 
 
     PopulationManager_MixedGrid() { 
@@ -644,8 +661,30 @@ namespace evo {
     }
 
 
+    int DoBottleneckEvent(double lethality) {
+      unsigned murdered = 0;
+      std::set<ORG *> survivors;
+      for(size_t i = 0; i < pop.size(); i++) {
+        if(random_ptr->P(lethality)) {
+          if(pop[i] != nullptr) {
+            delete pop[i];
+            pop[i] = nullptr;
+            murdered++;
+          }
+        }
+        else {
+          if (pop[i] == nullptr) {continue;}
+          survivors.insert(pop[i]);
+          pop[i] = nullptr;
+        }
+      }
 
-    //TODO@JGF: Finish this
+      // reseed 
+      for (auto org : survivors) {org->set_id(AddOrg(org));}
+
+      return murdered;
+    }
+
     // get the organisms within a certian radius of another org
     std::set<ORG *> GetClusterByRadius(unsigned int focal_id, int depth) {
       // determine which subgrid we're on
@@ -674,6 +713,8 @@ namespace evo {
       }
       return orgs;
     }
+
+
 
  };
 
