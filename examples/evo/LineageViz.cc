@@ -26,7 +26,7 @@
 
 
 
-emp::web::LineageVisualization lineage_viz(5000, 300);
+emp::web::LineageVisualization lineage_viz(5000, 1000);
 emp::web::Document doc("lineage_viz");
 
 int main() {

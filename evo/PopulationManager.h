@@ -47,7 +47,6 @@ namespace evo {
 
     uint32_t size() const { return pop.size(); }
     void resize(int new_size) { pop.resize(new_size); }
-    void clear() { pop.clear(); }
     int GetSize() const { return (int) pop.size(); }
 
     void SetRandom(Random * r) { random_ptr = r; }
@@ -148,8 +147,8 @@ namespace evo {
 
     void Update() {
       for (ORG * m : pop) delete m;   // Delete the current population.
-      pop = next_pop;                    // Move over the next generation.
-      next_pop.resize(0);                // Clear out the next pop to refill again.
+      pop = next_pop;                 // Move over the next generation.
+      next_pop.resize(0);             // Clear out the next pop to refill again.
     }
   };
 
@@ -217,11 +216,10 @@ namespace evo {
 
     // Injected orgs go into a random position.
     int AddOrg(ORG * new_org) {
-      emp::vector<int> empty_spots = GetValidOrgIndices();
-      const int pos = random_ptr->GetInt((int) empty_spots.size());
-      
-      pop[empty_spots[pos]] = new_org;
-      return empty_spots[pos];
+      const int pos = random_ptr->GetInt((int) pop.size());
+      if (pop[pos]) delete pop[pos];
+      pop[pos] = new_org;
+      return pos;
     }
 
     // Newly born orgs go next to their parents.
@@ -232,25 +230,14 @@ namespace evo {
       const int offspring_x = emp::mod(parent_x + offset%3 - 1, width);
       const int offspring_y = emp::mod(parent_y + offset/3 - 1, height);
       const int pos = ToID(offspring_x, offspring_y);
-     
-     
+
+
       if (pop[pos]) delete pop[pos];
 
       pop[pos] = new_org;
 
       return pos;
     }
-
-    emp::vector<int> GetValidOrgIndices(){
-      emp::vector<int> valid_orgs(0);
-      for (int i = 0; i < pop.size(); i++){
-        if (pop[i] == nullptr){
-          valid_orgs.push_back(i);
-        }
-      }
-      return valid_orgs;
-    }
-
 
     void Print(std::function<std::string(ORG*)> string_fun,
                std::ostream & os = std::cout,
@@ -280,146 +267,146 @@ namespace evo {
     }
   };
 
- template <typename ORG>
- class PopulationManager_Pools : public PopulationManager_Base<ORG> {
+  template <typename ORG>
+  class PopulationManager_Pools : public PopulationManager_Base<ORG> {
   public:
     using PopulationManager_Base<ORG>::pop;
     using PopulationManager_Base<ORG>::random_ptr;
     using PopulationManager_Base<ORG>::SetRandom;
     using PopulationManager_Base<ORG>::GetSize;
 
-    int pool_count;
-    vector<int> pool_sizes;
-    std::map<int, vector<int> > connections; //connected pool numbers, starting at 0.
-    int org_count = 0; // orgs in vector
-    int r_upper; //random upper limit
-    int r_lower;// random lower limit
-    vector<int> pool_end; //end of each pool in array
+    int pool_count;                           // How many pools are in the population?
+    vector<int> pool_sizes;                   // How large is each pool?
+    std::map<int, vector<int> > connections;  // Which other pools can each position access?
+
+    int org_count;                            // orgs in vector              @CAO: What vector?
+    int r_upper;                              // random upper limit          @CAO: Limit of what?
+    int r_lower;                              // random lower limit
+    vector<int> pool_end;                     // end of each pool in array   @CAO: Last element?
     double mig_rate;
 
   public:
-    PopulationManager_Pools() { ; }
+    PopulationManager_Pools() : org_count(0) { ; }
     ~PopulationManager_Pools() { ; }
 
     int GetPoolCount() const { return pool_count; }
-    vector<int> GetSizes() const { return pool_sizes ; }
+    const vector<int> & GetSizes() const { return pool_sizes ; }
     int GetUpper() const { return r_upper; }
     int GetLower() const { return r_lower; }
 
-    void Setup(Random * r){
-        vector<int>* temp_sizes = new vector<int>;
-        std::map<int, vector<int> > temp_connect;
-        for(int i = 0; i < 5; i++){ temp_connect[i].resize(0); }
+    void Setup(Random * r) {
+      vector<int>* temp_sizes = new vector<int>;
+      std::map<int, vector<int> > temp_connect;
+      for (int i = 0; i < 5; i++) { temp_connect[i].resize(0); }  // @CAO: Why 5?  What is it?
 
-        SetRandom(r);
-        ConfigPop(5, *temp_sizes, &temp_connect, 150, 10, 0.05, 200);
+      SetRandom(r);
+      ConfigPop(5, *temp_sizes, &temp_connect, 150, 10, 0.05, 200);
     }
 
     //Sets up population based on user specs.
-    void ConfigPop(int pc, vector<int> ps, std::map<int, vector<int> > * c, int u, int l, double mg, int pop_size) { 
-        pool_count = pc; 
-        pool_sizes = ps;
-        r_upper = u;
-        r_lower = l;
-        connections = *c;
-        mig_rate = mg;
+    void ConfigPop(int pc, vector<int> ps, std::map<int, vector<int> > * c, int u, int l,
+                   double mg, int pop_size) {
+      pool_count = pc;
+      pool_sizes = ps;
+      r_upper = u;
+      r_lower = l;
+      connections = *c;
+      mig_rate = mg;
 
-        pop.resize(pop_size, nullptr);
+      pop.resize(pop_size, nullptr);
 
-        // If no pool sizes in vector, defaults to random sizes for each
-        if(pool_sizes.size() == 0){
-            while(true){ 
-                int pool_total = 0;
-                for( int i = 0; i < pool_count - 1; i++){
-                    pool_sizes.push_back(random_ptr->GetInt(r_lower, r_upper));
-                    pool_total += pool_sizes[i];
-                }
+      // If no pool sizes in vector, defaults to random sizes for each
+      if (pool_sizes.size() == 0) {
+        while (true) {
+          int pool_total = 0;
+          for( int i = 0; i < pool_count - 1; i++){
+            pool_sizes.push_back(random_ptr->GetInt(r_lower, r_upper));
+            pool_total += pool_sizes[i];
+          }
 
-                if(pool_total < pop_size){ //Keep generating random sizes until true
-                    pool_sizes.push_back(pop_size - pool_total);
-                    break;
-                }
+          if (pool_total < pop_size){ //Keep generating random sizes until true
+            pool_sizes.push_back(pop_size - pool_total);
+            break;
+          }
 
-                for( int i = 0; i < pool_count - 1; i++ ){pool_sizes.pop_back();}
-            }
+          for (int i = 0; i < pool_count - 1; i++) { pool_sizes.pop_back(); }
         }
-        // If only one pool size in vector, uses that size for all pools
-        else if(pool_sizes.size() == 1){
-            int temp = pool_sizes[0];
-            for(int i = 1; i < pool_count; i++){ pool_sizes.push_back(temp); }
-        }
-        else if(pool_sizes.size() != pool_count){
-            std::cerr<<" ERROR: Not enough pool sizes"<<std::endl;
-            return;
-        }
+      }
+      // If only one pool size in vector, uses that size for all pools
+      else if (pool_sizes.size() == 1) {
+        int temp = pool_sizes[0];
+        for (int i = 1; i < pool_count; i++) { pool_sizes.push_back(temp); }
+      }
+      else if (pool_sizes.size() != pool_count) {
+        std::cerr << " ERROR: Not enough pool sizes" << std::endl;
+        return;
+      }
 
-        int total = 0;
-        for (auto el : pool_sizes){total += el;}
+      int total = 0;
+      for (auto el : pool_sizes) { total += el; }
 
-        emp_assert(pop_size == total && "POP_SIZE is different than total pool sizes");
+      emp_assert(pop_size == total && "POP_SIZE is different than total pool sizes");
 
-        // Divide World into pools
-        int arr_size = 0;
-        for( auto el : pool_sizes ){
-            arr_size += el;
-            pool_end.push_back(arr_size);
-        }
-    
+      // Divide World into pools
+      int arr_size = 0;
+      for (auto el : pool_sizes) {
+        arr_size += el;
+        pool_end.push_back(arr_size);
+      }
+
     }
 
     // Injected orgs go into a random pool.
     int AddOrg(ORG * new_org) {
-        int range_u;
-        int range_l = 0;
+      int range_u;
+      int range_l = 0;
 
-        //Each pool is guarenteed to have 1 org.
-        if(org_count < pool_count){
-            range_u = pool_end[org_count];
-            if(org_count > 0){range_l = pool_end[org_count - 1];}
-        }
-        else{
-            range_u = (int) pop.size();
-        }
+      // Ensure that each pool has at least one organism before adding to old pools.
+      if (org_count < pool_count) {
+        range_u = pool_end[org_count];
+        if (org_count > 0) { range_l = pool_end[org_count-1]; }
+        // @CAO: Shouldn't we just insert the organism in the new pool and return?
+      }
+      else {
+        range_u = (int) pop.size();
+      }
 
-        const int pos = (int) random_ptr->GetDouble(range_l, range_u);
-         
-        if (pop[pos]) delete pop[pos];
-        pop[pos] = new_org;
-        org_count++;
+      const int pos = (int) random_ptr->GetDouble(range_l, range_u);
 
-        return pos;
+      if (pop[pos]) delete pop[pos];
+      pop[pos] = new_org;
+      org_count++;
+
+      return pos;
     }
 
     // Newly born orgs have a chance to migrate to a connected pool.
     int AddOrgBirth(ORG * new_org, int parent_pos) {
-        int InsertPool = 0;
-        int range_l, range_u;
+      int insert_pool = 0;  // Which pool should new org be born into?
 
-        if(random_ptr->P(mig_rate) && connections[parent_pos].size() > 0){
-            int loc = random_ptr->GetInt(0, connections[parent_pos].size());
+      // Test if a migration should happen ; if so, determine new pool.
+      const auto & parent_conns = connections[parent_pos];
+      if (random_ptr->P(mig_rate) && parent_conns.size() > 0) {
+        int conn_id = random_ptr->GetInt(0, parent_conns.size());
+        insert_pool = parent_conns[conn_id];
 
-            vector<int> temp  = connections[parent_pos];
-            InsertPool = temp[loc];
-
-            std::cout<<"Crossing To: "<<InsertPool<<std::endl;
+        std::cout << "Crossing To: " << insert_pool << std::endl;  // @CAO: Remove?
+      }
+      else {
+        // @CAO: The below is inefficient.  Keep a chart like connections to look up in const time.
+        for (int i = 0; i < pool_end.size(); i++) {
+          if (parent_pos < pool_end[i]) { insert_pool = i; break; }
         }
-        else{
-            for(int i = 0; i < pool_end.size(); i++ ){
-                if(parent_pos < pool_end[i]) {InsertPool = i; break;} 
-            }
-        }
+      }
 
-        if(InsertPool == 0){range_l = 0;}
-        else{range_l = pool_end[InsertPool - 1];}
-        range_u = pool_end[InsertPool];
+      int range_l = insert_pool ? pool_end[insert_pool-1] : 0;
+      int range_u = pool_end[insert_pool];
 
-        const int pos = (int) random_ptr->GetDouble(range_l, range_u);
+      const int pos = (int) random_ptr->GetDouble(range_l, range_u);  // @CAO Why GetDouble not GetInt?
+      if (pop[pos]) delete pop[pos];
+      pop[pos] = new_org;
 
-        if (pop[pos]) delete pop[pos];
-
-        pop[pos] = new_org;
-
-        return pos;
+      return pos;
     }
  };
 
