@@ -51,7 +51,7 @@ EMP_BUILD_CONFIG( QuorumConfigBase,
     VALUE(PREFIX, std::string, "", "Prefix for filenames"),
     VALUE(AVAILABLE_PRIVATE_PTS, long, 180000, "Number of available private points"),
     VALUE(BOTTLENECK_SPACING, unsigned int, 500, "Number of ticks between kill events"),
-    VALUE(BOTTLENECK_LETHALITY, double, 10, "Percentage of organisms to kill during a bottleneck"),
+    VALUE(BOTTLENECK_LETHALITY, double, .10, "Percentage of organisms to kill during a bottleneck"),
     VALUE(PERCENT_STARTING, double, 0.2, "Percentage of grid to seed with starting config")
 )
 

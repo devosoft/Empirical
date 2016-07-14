@@ -543,6 +543,9 @@ namespace evo {
     ~PopulationManager_GridPools() { ; }
 
     int GetPoolCount() const { return pool_count; }
+    int GetMaxPossibleInRadius (ORG * ptr, int radius) {
+      return (width * height > radius * radius) ? width * height : radius * radius;
+    }
 
     void Setup(Random * r){
 
@@ -618,10 +621,60 @@ namespace evo {
         return pos;
     }
 
+    int ToSubX(int id) { return id % (width * height) % width;}
+    int ToSubY(int id) { return id % (width * height) / width;}
+    int ToSubID(int x, int y) {return y*width + x;}
+
+    std::set<ORG *> GetOrgNeighbors (int org_id) {
+      std::set<ORG *> neighbors;
+      int org_sx = ToSubX(org_id);
+      int org_sy = ToSubY(org_id);
+      int org_grid = org_id / (width * height);
+      
+      for (int i = -1; i < 2; ++i) {
+        for (int j = -1; j < 2; ++j) {
+          neighbors.insert(pop[ToID((org_sx + i + width) % width,
+                                    (org_sy + j + height) % height) + org_grid * width * height]);
+        }
+      }
+
+      // remove the focal node
+      neighbors.erase(neighbors.find(pop[org_id]));
+      return neighbors; 
+    }
+
+
+
+    //TODO@JGF: Finish this
     // get the organisms within a certian radius of another org
     std::set<ORG *> GetClusterByRadius(unsigned int focal_id, int depth) {
-    
+      // determine which subgrid we're on
+      unsigned int grid = focal_id / (width * height);
+
+      std::set<unsigned int> explored;
+
+      unsigned int org_sx, org_sy, target;
+
+      // execute a breadth-first-search, depth nodes deep, from focal_id
+      
+
+      org_sx = ToSubX(focal_id);
+      org_sy = ToSubY(focal_id);
+      for(int i = -(depth / 2); i < (depth / 2); i++) {
+        for(int j = -(depth / 2); j < (depth / 2); j++){
+          target = ToSubID((org_sx + i + width) % width, (org_sy + j + height) % height);
+          explored.insert(target);
+        }
+      }
+
+
+      std::set<ORG *> orgs;
+      for (auto site : explored) {
+        if (pop[site] != nullptr) { orgs.insert(pop[site + width * height * grid]); }
+      }
+      return orgs;
     }
+
  };
 
 
