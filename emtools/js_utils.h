@@ -241,7 +241,7 @@ namespace emp {
     emp_assert(arr.size() == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
 
     //Write emp.__outgoing_array contents to a buffer
-    int buffer = EM_ASM_INT({
+    T * buffer = EM_ASM_INT({
 	  var buffer = Module._malloc(emp_i.__outgoing_array.length*$0);
 
 	  for (i=0; i<emp_i.__outgoing_array.length; i++) {
@@ -254,11 +254,11 @@ namespace emp {
 
     //Populate array from buffer
     for (int i=0; i<arr.size(); i++) {
-      arr[i] = *(T*) (buffer + i*type_size);
+      arr[i] = *(buffer + i*type_size);
     }
 
     //Free the memory we allocated in Javascript
-    free((void*)buffer);
+    free(buffer);
   }
 
   //Chars aren't one of the types supported by setValue, but by treating them
@@ -268,7 +268,7 @@ namespace emp {
 
     emp_assert(arr.size() == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
 
-    int buffer = EM_ASM_INT_V({
+    char * buffer = EM_ASM_INT_V({
 
 	  //Since we're treating each char as it's own string, each one
 	  //will be null-termianted. So we malloc length*2 addresses.
@@ -282,10 +282,10 @@ namespace emp {
     });
 
     for (int i=0; i<arr.size(); i++){
-      arr[i] = *(char*) (buffer + i*2);
+      arr[i] = *(buffer + i*2);
     }
 
-    free((void*)buffer);
+    free(buffer);
   }
 
   //We can handle strings in a similar way
@@ -295,7 +295,7 @@ namespace emp {
 
     emp_assert(arr.size() == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
 
-    int buffer = EM_ASM_INT_V({
+    char * buffer = EM_ASM_INT_V({
 
 	  //Figure how much memory to allocate
 	  var arr_size = 0;
@@ -320,11 +320,11 @@ namespace emp {
     int cumulative_size = 0;
     for (int i=0; i<arr.size(); i++){
       //Since std::string constructor reads to null terminator, this just works.
-      arr[i] = std::string((char*) (buffer + cumulative_size));
+      arr[i] = std::string(buffer + cumulative_size);
       cumulative_size += arr[i].size() + 1;
     }
 
-    free((void*)buffer);
+    free(buffer);
   }
 
 

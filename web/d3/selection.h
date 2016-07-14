@@ -479,63 +479,73 @@ namespace D3 {
       }, this->id, type.c_str(), listener.c_str(), capture);
     }
 
-    char* GetText(){
+    std::string GetText(){
 
-      int buffer = EM_ASM_INT({
+      char * buffer = EM_ASM_INT({
 	    var text = js.objects[$0].text();
 	    var buffer = Module._malloc(text.length+1);
 	    Module.writeStringToMemory(text, buffer);
 	    return buffer;
 	  }, this->id);
 
-      return (char *)buffer;
+      std::string result = std::string(buffer);
+      free(buffer);
+      return result;
     }
 
 
-    char* GetAttrString(std::string name){
-      int buffer = EM_ASM_INT({
+    std::string GetAttrString(std::string name){
+      char * buffer = EM_ASM_INT({
 	    var text = js.objects[$0].attr(Pointer_stringify($1));
 	    var buffer = Module._malloc(text.length+1);
 	    Module.writeStringToMemory(text, buffer);
 	    return buffer;
       }, this->id, name.c_str());
 
-      return (char *)buffer;
+      std::string result = std::string(buffer);
+      free(buffer);
+      return result;
     }
 
 
-    char* GetStyleString(std::string name){
-      int buffer = EM_ASM_INT({
+    std::string GetStyleString(std::string name){
+      char * buffer = EM_ASM_INT({
 	    var text = js.objects[$0].style(Pointer_stringify($1));
 	    var buffer = Module._malloc(text.length+1);
 	    Module.writeStringToMemory(text, buffer);
 	    return buffer;
       }, this->id, name.c_str());
 
-      return (char *)buffer;
+      std::string result = std::string(buffer);
+      free(buffer);
+      return result;
     }
 
 
-    char* GetHtml(){
-      int buffer = EM_ASM_INT({
+    std::string GetHtml(){
+      char * buffer = EM_ASM_INT({
 	    var text = js.objects[$0].html();
 	    var buffer = Module._malloc(text.length+1);
 	    Module.writeStringToMemory(text, buffer);
 	    return buffer;
 	  }, this->id);
 
-      return (char *)buffer;
+      std::string result = std::string(buffer);
+      free(buffer);
+      return result;
     }
 
-    char* GetProperty(std::string name){
-      int buffer = EM_ASM_INT({
+    std::string GetProperty(std::string name){
+      char * buffer = EM_ASM_INT({
 	    var text = js.objects[$0].property(Pointer_stringify($1));
 	    var buffer = Module._malloc(text.length+1);
 	    Module.writeStringToMemory(text, buffer);
 	    return buffer;
 	  }, this->id, name.c_str());
-
-      return (char *)buffer;
+      
+      std::string result = std::string(buffer);
+      free(buffer);
+      return result;
     }
 
     /* Sort the selection by the given comparator function. The function

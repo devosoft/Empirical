@@ -69,13 +69,15 @@ namespace D3 {
       }
 
       std::string operator() (double d){
-        int buffer = EM_ASM_INT({
+        char * buffer = EM_ASM_INT({
           var text = js.objects[$0]($1);
           var buffer = Module._malloc(text.length+1);
     	  Module.writeStringToMemory(text, buffer);
     	  return buffer;
         }, this->id, d);
-        return std::string((char *)buffer);
+        std::string result = std::string(buffer);
+        free(buffer);
+        return result;
       }
   };
 

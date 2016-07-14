@@ -241,13 +241,6 @@ public:
   D3::ToolTip* tip;
   D3::Selection t;
 
-  /*void SetupConfigs(const NKConfig & config){
-    //Setup config parameters
-    POP_SIZE = config.POP_SIZE();
-    MAX_GENS = config.MAX_GENS();
-    x_max = MAX_GENS;
-}*/
-
   virtual void Setup(){
     EM_ASM({emp["waiting"] = 0});
     D3::Selection * svg = GetSVG();

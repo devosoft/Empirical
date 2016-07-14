@@ -20,14 +20,16 @@ namespace D3 {
     std::string Generate(std::array<std::array<T, 2>, SIZE> data){
       emp::pass_array_to_javascript(data);
 
-      int buffer = EM_ASM_INT({
-	  var result = js.objects[$0](emp_i.__incoming_array);
-	  var buffer = Module._malloc(result.length+1);
-	  Module.writeStringToMemory(result, buffer);
-	  return buffer;
-  }, this->id);
+      char * buffer = EM_ASM_INT({
+	    var result = js.objects[$0](emp_i.__incoming_array);
+	    var buffer = Module._malloc(result.length+1);
+	    Module.writeStringToMemory(result, buffer);
+	    return buffer;
+      }, this->id);
 
-      return (char *)buffer;
+      std::string result = std::string(buffer);
+      free(buffer);
+      return result;
     }
 
     //This function actually handles the binding of the path string to the dom
@@ -118,8 +120,8 @@ namespace D3 {
 
     void SetTension(float tension){
       EM_ASM_ARGS({
-	  js.objects[$0].tension($1);
-	}, this->id, tension);
+	    js.objects[$0].tension($1);
+	  }, this->id, tension);
     }
 
     void SetDefined(std::string defined){
