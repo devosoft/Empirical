@@ -180,7 +180,6 @@ namespace evo{
     using StatsManager_Base<POP_MANAGER>::SendResultsToViz;
     bool header_printed = false;
     std::string header = "update";
-    emp::vector<std::string> col_map;
 
   public:
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
