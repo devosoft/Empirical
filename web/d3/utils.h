@@ -3,9 +3,10 @@
 
 #include <map>
 #include <string>
-#include "../Empirical/emtools/init.h"
-#include "../Empirical/tools/macros.h"
-#include "../Empirical/emtools/js_utils.h"
+
+#include "../../emtools/init.h"
+#include "../../tools/macros.h"
+#include "../../emtools/js_utils.h"
 
 //Let's try some awful macro stuff
 

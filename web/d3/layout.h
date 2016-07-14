@@ -5,8 +5,9 @@
 #include "dataset.h"
 #include "selection.h"
 #include "svg_shapes.h"
-#include "../Empirical/tools/tuple_struct.h"
-#include "../Empirical/emtools/JSWrap.h"
+
+#include "../../tools/tuple_struct.h"
+#include "../../emtools/JSWrap.h"
 
 #include <functional>
 #include <array>

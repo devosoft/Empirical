@@ -4,20 +4,20 @@
 #include "../web/web_init.h"
 #include "../web/Animate.h"
 #include "../emtools/JSWrap.h"
+#include "../tools/BitSet.h"
+#include "../tools/Random.h"
+#include "../tools/stats.h"
+#include "../tools/string_utils.h"
 
-#include "../../d3-emscripten/selection.h"
-#include "../../d3-emscripten/scales.h"
-#include "../../d3-emscripten/axis.h"
-#include "../../d3-emscripten/svg_shapes.h"
+#include "../web/d3/selection.h"
+#include "../web/d3/scales.h"
+#include "../web/d3/axis.h"
+#include "../web/d3/svg_shapes.h"
 
 #include <functional>
 #include <algorithm>
 
 #include "NK.h"
-#include "../tools/BitSet.h"
-#include "../tools/Random.h"
-#include "../tools/stats.h"
-#include "../tools/string_utils.h"
 #include "visualization_utils.h"
 #include "World.h"
 #include "NKConfig.h"

@@ -1,17 +1,19 @@
 #ifndef __SELECTION_H__
 #define __SELECTION_H__
 
+#include "d3_init.h"
+#include "utils.h"
+#include "dataset.h"
+
 #include <iostream>
 #include <string>
 #include <typeinfo>
 #include <map>
-#include "../Empirical/tools/assert.h"
 #include <array>
-#include "../Empirical/emtools/js_object_struct.h"
-#include "../Empirical/emtools/js_utils.h"
-#include "utils.h"
-#include "dataset.h"
-#include "d3_init.h"
+
+#include "../../tools/assert.h"
+#include "../../emtools/js_object_struct.h"
+#include "../../emtools/js_utils.h"
 
 extern "C" {
   extern int n_objects();

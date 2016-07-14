@@ -4,24 +4,24 @@
 #include "../web/web_init.h"
 #include "../web/Animate.h"
 #include "../emtools/JSWrap.h"
-
-#include "../../d3-emscripten/selection.h"
-#include "../../d3-emscripten/scales.h"
-#include "../../d3-emscripten/axis.h"
-#include "../../d3-emscripten/svg_shapes.h"
-#include "../../d3-emscripten/layout.h"
-
-#include <functional>
-#include <algorithm>
-#include <deque>
-
 #include "../config/config.h"
-#include "NK-const.h"
 #include "../tools/BitSet.h"
 #include "../tools/Random.h"
 #include "../tools/stats.h"
 #include "../tools/string_utils.h"
 #include "../tools/FunctionSet.h"
+
+#include "../web/d3/selection.h"
+#include "../web/d3/scales.h"
+#include "../web/d3/axis.h"
+#include "../web/d3/svg_shapes.h"
+#include "../web/d3/layout.h"
+
+#include <functional>
+#include <algorithm>
+#include <deque>
+
+#include "NK-const.h"
 
 //Pretty sure D3VisualizationInfo can't be shared among multiple D3Visualizations
 

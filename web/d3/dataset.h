@@ -1,10 +1,12 @@
 #ifndef __LOAD_DATA_H__
 #define __LOAD_DATA_H__
 
-#include "d3_init.h"
 #include <functional>
-#include "../Empirical/emtools/JSWrap.h"
-#include "../Empirical/tools/string_utils.h"
+
+#include "d3_init.h"
+
+#include "../../emtools/JSWrap.h"
+#include "../../tools/string_utils.h"
 
 namespace D3 {
 

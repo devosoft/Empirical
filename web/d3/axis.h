@@ -1,9 +1,10 @@
 #ifndef __AXIS_H__
 #define __AXIS_H__
 
+#include "../../emtools/js_utils.h"
+#include "../../tools/string_utils.h"
+
 #include "d3_init.h"
-#include "../Empirical/emtools/js_utils.h"
-#include "../Empirical/tools/string_utils.h"
 #include "selection.h"
 #include "scales.h"
 

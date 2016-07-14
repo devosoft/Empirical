@@ -2,10 +2,11 @@
 #define __SVG_SHAPES_H__
 
 #include "d3_init.h"
-#include "../Empirical/emtools/js_utils.h"
 #include "selection.h"
 #include "scales.h"
 #include "dataset.h"
+
+#include "../../emtools/js_utils.h"
 
 namespace D3 {
 

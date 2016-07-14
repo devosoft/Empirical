@@ -2,8 +2,9 @@
 #define __SCALES_H__
 
 #include "d3_init.h"
-#include "../Empirical/emtools/js_utils.h"
 #include "utils.h"
+
+#include "../../emtools/js_utils.h"
 
 namespace D3 {
 

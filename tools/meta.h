@@ -7,6 +7,7 @@
 #ifndef EMP_META_H
 #define EMP_META_H
 
+#include <tuple>
 
 namespace emp {
 

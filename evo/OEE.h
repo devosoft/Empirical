@@ -22,8 +22,8 @@
 
 #include "../tools/vector.h"
 #include "../tools/array.h"
-#include "LineageTracker.h"
 #include "../tools/stats.h"
+#include "LineageTracker.h"
 #include "StatsManager.h"
 
 namespace std
@@ -358,7 +358,7 @@ namespace evo{
             persist.insert(persist.back(), id);
             break;
           }
-          id = lineage->nodes[id]->parent->id;
+          id = lineage->nodes[id].parent->id;
         }
       }
       return persist;
@@ -375,7 +375,7 @@ namespace evo{
             persist.push_back(id);
             break;
           }
-          id = lineage->nodes[id]->parent->id;
+          id = lineage->nodes[id].parent->id;
         }
       }
       return persist;
