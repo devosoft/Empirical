@@ -354,7 +354,7 @@ namespace evo{
             persist.insert(persist.back(), id);
             break;
           }
-          id = lineage->parents[id];
+          id = lineage->nodes[id]->parent->id;
         }
       }
       return persist;
@@ -371,7 +371,7 @@ namespace evo{
             persist.push_back(id);
             break;
           }
-          id = lineage->parents[id];
+          id = lineage->nodes[id]->parent->id;
         }
       }
       return persist;

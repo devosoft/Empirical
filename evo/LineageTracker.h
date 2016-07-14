@@ -78,8 +78,6 @@ namespace evo{
     std::unordered_map<int, Node<org_ptr> > nodes;
     static constexpr bool emp_is_lineage_manager = true;
     std::set<ORG> genomes;
-    // std::map<int, org_ptr> org_to_genome;
-    // std::unordered_map<int, int> parents;
     int next = 1; //0 indicates no parent
     int next_parent_id = -1;
     int next_org_id = 1;
@@ -211,9 +209,9 @@ namespace evo{
       curr->alive = true;
       curr->genome = genome;
 
-      /*for (auto viz : viz_pointers) {
+      for (auto viz : viz_pointers) {
         viz->RecordParent(parent, id, genome);
-      }*/
+      }
 
       return id;
     }
@@ -502,8 +500,6 @@ namespace evo{
       for (auto viz : viz_pointers) {
         viz->RecordParent(parent, id, genome);
       }
-
-    //   this->parents[id] = parent;
 
       return id;
     }
