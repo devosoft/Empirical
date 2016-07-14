@@ -31,10 +31,6 @@ using QM = emp::evo::QuorumManager<QOrg, BASE_PM>;
 template <class QOrg, template<class> class BASE_PM>
 using QWorld = emp::evo::World<QOrg, QM<BASE_PM>>;
 
-// define the underlying population manager here
-template <class QOrg>
-using FOUNDATION = emp::evo::PopulationManager_Grid<QOrg>;
-
 EMP_BUILD_CONFIG( QuorumConfig,
     VALUE(HI_AI_WEIGHT, double, .3, "What value should the AI production be for hi-density?"),
     VALUE(LO_AI_WEIGHT, double, .1, "What value should the AI production be for lo-density?"),

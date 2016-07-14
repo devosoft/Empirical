@@ -56,17 +56,17 @@ fast-grid: grid-exp.cc ../../evo/NK.h $(EVO_DEPEND)
 fast-mixed: mixed-exp.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 mixed-exp.cc -o mixed-exp
 
-fast-quorum-mixed: gladiator-mixed-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
-	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 gladiator-mixed-grid-quorum.cc -o gladiator-mixed.out
+fast-quorum-mixed: mixed-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 mixed-grid-quorum.cc -o mixed-grid-quorum.out
 
-debug-quorum-mixed: gladiator-mixed-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
-	$(CXX_native) $(CFLAGS_native) -DNDEBUG -g gladiator-mixed-grid-quorum.cc -o gladiator-mixed.debug
+debug-quorum-mixed: mixed-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -g mixed-grid-quorum.cc -o mixed-grid-quorum.debug
 
-fast-quorum-standard: gladiator-standard-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
-	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 gladiator-standard-grid-quorum.cc -o gladiator-standard.out
+fast-quorum-standard: standard-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 standard-grid-quorum.cc -o standard-grid-quorum.out
 
-debug-quorum-standard: gladiator-standard-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
-	$(CXX_native) $(CFLAGS_native) -DNDEBUG -g gladiator-standard-grid-quorum.cc -o gladiator-standard.debug
+debug-quorum-standard: standard-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -g standard-grid-quorum.cc -o standard-grid-quorum.debug
 
 test-mixed: test-stats-mixed.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 test-stats-mixed.cc -o test-mixed
