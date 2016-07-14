@@ -31,7 +31,7 @@ using QM = emp::evo::QuorumManager<QOrg, BASE_PM>;
 template <class QOrg, template<class> class BASE_PM>
 using QWorld = emp::evo::World<QOrg, QM<BASE_PM>>;
 
-EMP_BUILD_CONFIG( QuorumConfig,
+EMP_BUILD_CONFIG( QuorumConfigBase,
     VALUE(HI_AI_WEIGHT, double, .3, "What value should the AI production be for hi-density?"),
     VALUE(LO_AI_WEIGHT, double, .1, "What value should the AI production be for lo-density?"),
     VALUE(AI_RADIUS, int, 10, "What's the radius of AI dispersal?"),
@@ -59,9 +59,9 @@ std::string init_config_names[5] = {"balanced", "lying_defector", "donator", "sc
                                     "truthful_defector"};
 
 // it's tempaltes all the way down...
-template<template<class> class FOUNDATION>
+template<template<class> class FOUNDATION, typename FOUNDATION_CONF>
 struct QuorumRunState {
-  QuorumConfig * config;
+  FOUNDATION_CONF * config;
   emp::Random dice;
   std::string prefix;
   unsigned int runtime, pop_size;
@@ -70,7 +70,7 @@ struct QuorumRunState {
   emp::evo::StatsManager_FunctionsOnUpdate<QM<FOUNDATION>> * Qstats;
   emp::evo::StatsManager_Mapper<QM<FOUNDATION>> * Qmapper;
 
-  QuorumRunState(QuorumConfig & conf, std::string & prefix) {
+  QuorumRunState(FOUNDATION_CONF & conf, std::string & prefix) {
 
     dice = *(new emp::Random());
     config = &conf;
@@ -102,9 +102,10 @@ struct QuorumRunState {
 };
 
 // process command line config args
-QuorumConfig * get_config(int & argc, char * argv[], std::string & prefix) {
+template<typename FOUNDATION_CONF>
+FOUNDATION_CONF * get_config(int & argc, char * argv[], std::string & prefix) {
     
-  QuorumConfig * config = new QuorumConfig();
+  FOUNDATION_CONF * config = new FOUNDATION_CONF();
   config->Read("quorum.cfg");
 
   auto args = emp::cl::ArgManager(argc, argv);
@@ -118,8 +119,8 @@ QuorumConfig * get_config(int & argc, char * argv[], std::string & prefix) {
   return config;
 }
 
-template <template <class> class FOUNDATION>
-void configure_stats_manager(QuorumRunState<FOUNDATION> & state) {
+template <template <class> class FOUNDATION, typename FOUNDATION_CONF>
+void configure_stats_manager(QuorumRunState<FOUNDATION, FOUNDATION_CONF> & state) {
 
   state.Qpop->SetDefaultMutateFun([](QOrg * org, emp::Random & random) {
       return org->mutate(random);
@@ -253,8 +254,8 @@ void configure_stats_manager(QuorumRunState<FOUNDATION> & state) {
 // This will allow the individual structures to do population-specific setup. 
 //
 // the state will then get passed to here, which will process the actual run
-template <template<class> class FOUNDATION>
-int execute(QuorumRunState<FOUNDATION> & state) {
+template <template<class> class FOUNDATION, typename FOUNDATION_CONF>
+int execute(QuorumRunState<FOUNDATION, FOUNDATION_CONF> & state) {
 
     auto config = state.config;
     // seed the grid

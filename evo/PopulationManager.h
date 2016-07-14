@@ -617,6 +617,11 @@ namespace evo {
 
         return pos;
     }
+
+    // get the organisms within a certian radius of another org
+    std::set<ORG *> GetClusterByRadius(unsigned int focal_id, int depth) {
+    
+    }
  };
 
 
