@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 
   emp::evo::GridWorld<BitOrg, emp::evo::LineagePruned > grid_pop(random);
 
-  grid_pop.ConfigPop(10, 10);
+  grid_pop.ConfigPop(std::sqrt(POP_SIZE), std::sqrt(POP_SIZE));
 
   std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return landscape.GetFitness(*org);};
 
