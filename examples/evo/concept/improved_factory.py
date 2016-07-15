@@ -40,7 +40,7 @@ def process_config(fname):
             elif phase == 5:
                 if len(line) > 0: 
                     chopped = line.split(' ', 1)
-                    parameters[chopped[0]] = chopped[1].split(',')
+                    parameters[chopped[0]] = chopped[1].replace(' ', '').split(',')
                 else:
                     phase += 1
 
