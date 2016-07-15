@@ -8,8 +8,8 @@
 #include <iostream>
 #include <string>
 
-#include "../../evo/EvoStats.h"
 #include "../../evo/StatsManager.h"
+#include "../../evo/EvoStats.h"
 
 #include <sstream>
 #include <iostream>
