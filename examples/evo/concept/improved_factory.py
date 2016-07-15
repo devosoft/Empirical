@@ -85,7 +85,8 @@ def regurgitate(config, args, path):
                                          binary=el,
                                          rep=i,
                                          args=argstring),
-                                 end=" \n\n") # print \ and newline
+                                 end=" \n\n",
+                                 file=qfile) # print \ and newline
 
 
 def generate_folder_level(index, prefixes, currbase, config, fqc = None):
