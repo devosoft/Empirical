@@ -87,7 +87,11 @@ def regurgitate(config, args, path):
                                          args=argstring),
                                  end=" \n\n",
                                  file=qfile) # print \ and newline
-
+        print("""\n\n
+for job in `jobs -p
+do
+wait $job
+done""", file=qfile)
 
 def generate_folder_level(index, prefixes, currbase, config, fqc = None):
     if fqc == None:
