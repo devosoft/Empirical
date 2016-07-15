@@ -8,7 +8,7 @@ expecting = ["name", "walltime", "total_mem", "total_replicants",
 
 PBS_lines = ["#PBS -N {}",
              "#PBS -l walltime={}",
-             "PBS -l mem={}gb",
+             "#PBS -l mem={}gb",
              "#PBS -l nodes=1:ppn={}"]
 
 def process_config(fname):
