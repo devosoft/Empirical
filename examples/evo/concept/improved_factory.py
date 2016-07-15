@@ -63,7 +63,7 @@ def process_config(fname):
     return config
 
 # base formatting string used to call binary from qsub file
-base_string = "{base}/{binary} -PREFIX {binary}-{rep} -RAND {rep} {args}"
+base_string = "{base}/{binary} -PREFIX {binary}-{rep} -RAND_SEED {rep} {args}"
 
 def regurgitate(config, args, path):
     with open(path + "makeitgo.qsub", 'w') as qfile:
