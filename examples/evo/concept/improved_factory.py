@@ -70,6 +70,8 @@ def regurgitate(config, args, path):
         # PBS
         for i in range(0, 4):
             print(PBS_lines[i].format(config[expecting[i]]), file=qfile)
+        
+        print("cd {}".format(path), file=qfile)
 
         # args have been fully defined by this point--build the string to save time
         argstring = ""
@@ -85,7 +87,7 @@ def regurgitate(config, args, path):
                                          binary=el,
                                          rep=i,
                                          args=argstring),
-                                 end=" \n\n",
+                                 end="& \n\n",
                                  file=qfile) # print \ and newline
         print("""\n\n
 for job in `jobs -p
