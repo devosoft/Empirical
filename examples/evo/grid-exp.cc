@@ -24,7 +24,7 @@ EMP_BUILD_CONFIG( NKConfig,
   VALUE(K, int, 10, "Level of epistasis in the NK model"),
   VALUE(N, int, 50, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
   VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
-  VALUE(POP_SIZE, int, 1000, "Number of organisms in the popoulation."),
+  VALUE(POP_SIZE, int, 100, "Number of organisms in the popoulation."),
   VALUE(MAX_GENS, int, 2000, "How many generations should we process?"),
   VALUE(MUT_COUNT, double, 0.005, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
   VALUE(TOUR_SIZE, int, 20, "How many organisms should be picked in each Tournament?"),
@@ -32,9 +32,6 @@ EMP_BUILD_CONFIG( NKConfig,
 )
 
 using BitOrg = emp::BitVector;
-
-template <typename ORG>
-using GPWorld = emp::evo::World<ORG, emp::evo::PopulationManager_GridPools<ORG>, emp::evo::LineagePruned >;
 
 int main(int argc, char* argv[])
 {
@@ -63,16 +60,16 @@ int main(int argc, char* argv[])
   prefix = config.NAME();
 
 
-  GPWorld<BitOrg> grid_pop(random);
+  emp::evo::GridWorld<BitOrg, emp::evo::LineagePruned > grid_pop(random);
 
-  grid_pop.ConfigPop(5, 4, 5, 100);
+  grid_pop.ConfigPop(10, 10);
 
   std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return landscape.GetFitness(*org);};
 
   grid_pop.SetDefaultFitnessFun(fit_func);
 
   // make a stats manager
-  emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_GridPools<BitOrg>>
+  emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Grid<BitOrg>>
       grid_stats (&grid_pop, prefix + "grid.csv");
 
   grid_stats.SetDefaultFitnessFun(fit_func);
@@ -114,7 +111,6 @@ int main(int argc, char* argv[])
 
     grid_pop.Update();
     grid_pop.MutatePop();
-
-  }
+}
 
 }
