@@ -80,17 +80,21 @@ namespace web {
       return *this;
     }
 
-    bool Has(const std::string setting) const {
+    bool Has(const std::string & setting) const {
       return settings.find(setting) != settings.end();
     }
 
-    const std::string & Get(const std::string setting) {
+    const std::string & Get(const std::string & setting) {
       // Note: if setting did not exist, this does create an empty entry.
       return settings[setting];
     }
 
     const std::map<std::string, std::string> & GetMap() const {
       return settings;
+    }
+
+    void Remove(const std::string & setting) {
+      settings.erase(setting);
     }
 
     void Clear() { settings.clear(); }

@@ -95,6 +95,10 @@ namespace web {
 
     void Clear() { settings.clear(); }
 
+    void Remove(const std::string & setting) {
+      settings.erase(setting);
+    }
+
     // Apply ALL of the style settings.
     void Apply(const std::string & widget_id) {
       // Stop immediately if nothing to set.
