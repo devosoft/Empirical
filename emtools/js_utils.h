@@ -12,7 +12,6 @@
 #include <vector>
 
 #include "init.h"
-#include "js_object_struct.h"
 #include "../tools/assert.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -73,10 +72,12 @@ namespace emp {
   //This now works for all containers, but it will break if they don't
   //store data contiguously
   template<typename C, class = typename C::value_type>
-  void pass_array_to_javascript(C values,	\
+  typename std::enable_if<std::is_fundamental<typename C::value_type>::value, void>::type
+  pass_array_to_javascript(C values,	\
 				std::vector<int> recursive_el) {
 
     using T = typename C::value_type;
+    std::cout << "NOt JSON" << std::endl;
     //Figure out what string to use for the type we've been given
     std::map<std::string, std::string> map_type_names = \
       get_type_to_string_map();
@@ -109,14 +110,15 @@ namespace emp {
   }
 
 
-  template<typename JSON_TYPE, template<typename> class C>
-  typename std::enable_if<JSON_TYPE::n_fields != -1, void>::type
-  pass_array_to_javascript(C<JSON_TYPE> values,	\
+  template<typename C, class = typename C::value_type>
+  //template<typename JSON_TYPE, template<typename> class C>
+  typename std::enable_if<C::value_type::n_fields != -1, void>::type
+  pass_array_to_javascript(C values,	\
 			   std::vector<int> recursive_el) {
 
     std::map<std::string, std::string> map_type_names = \
       get_type_to_string_map();
-
+    std::cout << "JSON" << std::endl;
     //Initialize array in Javascript
     if (recursive_el.size() == 0) {
       EM_ASM({emp_i.__incoming_array = [];});
@@ -239,7 +241,7 @@ namespace emp {
 
     //Make sure arrays have the same length
     emp_assert(arr.size() == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
-
+    std::cout << "Size: " << type_size << std::endl;
     //Write emp.__outgoing_array contents to a buffer
     T * buffer = (T*) EM_ASM_INT({
 	  var buffer = Module._malloc(emp_i.__outgoing_array.length*$0);
@@ -254,7 +256,7 @@ namespace emp {
 
     //Populate array from buffer
     for (int i=0; i<arr.size(); i++) {
-      arr[i] = *(buffer + i*type_size);
+      arr[i] = *(buffer + i);
     }
 
     //Free the memory we allocated in Javascript
