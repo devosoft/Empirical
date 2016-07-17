@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2015.
+//  Copyright (C) Michigan State University, 2015-2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -36,6 +36,7 @@ namespace web {
       TextInfo & operator=(const TextInfo &) = delete;   // No copies of INFO allowed
       virtual ~TextInfo() { ; }
 
+      std::string TypeName() const override { return "TextInfo"; }
       virtual bool IsTextInfo() const override { return true; }
 
       Widget Append(const std::string & in_text) override;

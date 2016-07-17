@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2015.
+//  Copyright (C) Michigan State University, 2015-2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -27,7 +27,6 @@
 //    const std::string & GetTitle() const
 //    bool HasAutofocus() const
 //    bool IsDisabled() const
-//
 
 #ifndef EMP_WEB_BUTTON_H
 #define EMP_WEB_BUTTON_H
@@ -61,6 +60,8 @@ namespace web {
       virtual ~ButtonInfo() {
         if (callback_id) emp::JSDelete(callback_id);         // Delete callback wrapper.
       }
+
+      std::string TypeName() const override { return "ButtonInfo"; }
 
       virtual bool IsButtonInfo() const override { return true; }
 

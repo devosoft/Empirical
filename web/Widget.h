@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2015-2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -99,13 +99,17 @@ namespace web {
 
     bool IsNull() const { return info == nullptr; }
 
+    // Some debugging helpers...
+    virtual std::string TypeName() const { return "Widget base"; }
+    std::string InfoTypeName() const;
+
     bool IsInactive() const;
     bool IsWaiting() const;
     bool IsFrozen() const;
     bool IsActive() const;
 
     virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
-    virtual void PreventAppend() { emp_assert(false); } // This isn't meaningful to most widgets.
+    virtual void PreventAppend() { emp_assert(false, InfoTypeName()); } // This isn't meaningful to most widgets.
 
     virtual bool IsSlate() const { return false; }
     virtual bool IsTable() const { return false; }
@@ -193,6 +197,9 @@ namespace web {
       virtual ~WidgetInfo() {
         EMP_TRACK_DESTRUCT(WebWidgetInfo);
       }
+
+      // Some debugging helpers...
+      virtual std::string TypeName() const { return "WidgetInfo base"; }
 
       virtual bool IsButtonInfo() const { return false; }
       virtual bool IsCanvasInfo() const { return false; }
@@ -326,6 +333,8 @@ namespace web {
     }
     EMP_TRACK_DESTRUCT(WebWidget);
   }
+
+  std::string Widget::InfoTypeName() const { if (IsNull()) return "NULL"; return info->TypeName(); }
 
   Widget & Widget::SetInfo(WidgetInfo * in_info) {
     // If the widget is already set correctly, stop here.
