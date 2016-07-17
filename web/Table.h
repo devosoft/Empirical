@@ -726,8 +726,6 @@ namespace web {
 
     using INFO_TYPE = internal::TableInfo;
 
-    bool IsTable() const override { return true; }
-
     int GetNumCols() const { return Info()->col_count; }
     int GetNumRows() const { return Info()->row_count; }
     int GetNumCells() const { return Info()->col_count*Info()->row_count; }

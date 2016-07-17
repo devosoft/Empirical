@@ -69,7 +69,6 @@ namespace web {
     Text(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsTextInfo()); }
     ~Text() { ; }
 
-    virtual bool IsText() const override { return true; }
     using INFO_TYPE = TextInfo;
 
     bool AppendOK() const override { return Info()->append_ok; }

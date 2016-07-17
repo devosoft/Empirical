@@ -238,7 +238,6 @@ namespace web {
     Slate(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsSlateInfo()); }
     ~Slate() { ; }
 
-    virtual bool IsSlate() const override { return true; }
     using INFO_TYPE = internal::SlateInfo;
 
     bool AppendOK() const override { return Info()->append_ok; }

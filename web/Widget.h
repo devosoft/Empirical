@@ -111,11 +111,7 @@ namespace web {
     virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
     virtual void PreventAppend() { emp_assert(false, InfoTypeName()); } // This isn't meaningful to most widgets.
 
-    virtual bool IsSlate() const { return false; }
-    virtual bool IsTable() const { return false; }
-    virtual bool IsText() const { return false; }
-
-    // Checks to see if this widget can be converted to other types...
+    // Checks to see if this widget can be trivially converted to other types...
     bool ButtonOK() const;
     bool CanvasOK() const;
     bool ImageOK() const;
@@ -123,6 +119,10 @@ namespace web {
     bool SlateOK() const;
     bool TableOK() const;
     bool TextOK() const;
+
+    bool IsSlate() const { return SlateOK(); }
+    bool IsTable() const { return TableOK(); }
+    bool IsText() const { return TextOK(); }
 
     std::string GetID() const;
 
