@@ -100,7 +100,6 @@ namespace web {
     bool IsNull() const { return info == nullptr; }
 
     // Some debugging helpers...
-    virtual std::string TypeName() const { return "Widget base"; }
     std::string InfoTypeName() const;
 
     bool IsInactive() const;
@@ -108,8 +107,8 @@ namespace web {
     bool IsFrozen() const;
     bool IsActive() const;
 
-    virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
-    virtual void PreventAppend() { emp_assert(false, InfoTypeName()); } // This isn't meaningful to most widgets.
+    bool AppendOK() const;
+    void PreventAppend();
 
     // Checks to see if this widget can be trivially converted to other types...
     bool ButtonOK() const;
@@ -243,6 +242,8 @@ namespace web {
         if (top_level) ReplaceHTML();   // Print full contents to document.
       }
 
+      virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
+      virtual void PreventAppend() { emp_assert(false, TypeName()); } // Only for appendable widgets.
 
       // By default, elements should forward unknown appends to their parents.
       virtual Widget Append(const std::string & text) { return ForwardAppend(text); }
@@ -357,6 +358,9 @@ namespace web {
   bool Widget::IsWaiting() const { if (!info) return false; return info->state == WAITING; }
   bool Widget::IsFrozen() const { if (!info) return false; return info->state == FROZEN; }
   bool Widget::IsActive() const { if (!info) return false; return info->state == ACTIVE; }
+
+  bool Widget::AppendOK() const { if (!info) return false; return info->AppendOK(); }
+  void Widget::PreventAppend() { emp_assert(info); info->PreventAppend(); }
 
   std::string Widget::GetID() const { return info ? info->id : "(none)"; }
 

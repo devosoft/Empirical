@@ -152,6 +152,8 @@ namespace web {
         return (Text &) m_children.back();
       }
 
+      bool AppendOK() const override { return append_ok; }
+      void PreventAppend() override { append_ok = false; }
 
       // Add additional children on to this element.
       Widget Append(const std::string & text) override {
@@ -239,9 +241,6 @@ namespace web {
     ~Slate() { ; }
 
     using INFO_TYPE = internal::SlateInfo;
-
-    bool AppendOK() const override { return Info()->append_ok; }
-    void PreventAppend() override { Info()->append_ok = false; }
 
     double ScrollTop() const { return Info()->scroll_top; }
     Slate & ScrollTop(double in_top) { Info()->scroll_top = in_top; return *this; }

@@ -39,6 +39,9 @@ namespace web {
       std::string TypeName() const override { return "TextInfo"; }
       virtual bool IsTextInfo() const override { return true; }
 
+      bool AppendOK() const override { return append_ok; }
+      void PreventAppend() override { append_ok = false; }
+
       Widget Append(const std::string & in_text) override;
       Widget Append(const std::function<std::string()> & in_fun) override;
 
@@ -70,9 +73,6 @@ namespace web {
     ~Text() { ; }
 
     using INFO_TYPE = TextInfo;
-
-    bool AppendOK() const override { return Info()->append_ok; }
-    void PreventAppend() override { Info()->append_ok = false; }
 
     Text & Clear() { Info()->strings.Clear(); return *this; }
   };
