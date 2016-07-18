@@ -53,7 +53,7 @@ def process_config(fname):
                     phase += 1
 
     config['num_replicants'] = config['total_replicants']
-    config['total_replicants'] = len(config['binaries']))
+    config['total_replicants'] = len(config['binaries'])
     config['total_mem'] = int(config['total_mem']) * config['total_replicants']
 
     config['unchanging'] = unchanging
