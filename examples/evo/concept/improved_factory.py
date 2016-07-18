@@ -53,7 +53,7 @@ def process_config(fname):
                     phase += 1
 
     config['num_replicants'] = config['total_replicants']
-    config['total_replicants'] = int(int(config['num_replicants']) * len(config['binaries']))
+    config['total_replicants'] = len(config['binaries']))
     config['total_mem'] = int(config['total_mem']) * config['total_replicants']
 
     config['unchanging'] = unchanging
@@ -63,7 +63,7 @@ def process_config(fname):
     return config
 
 # base formatting string used to call binary from qsub file
-base_string = "{base}/{binary} -PREFIX {binary}-{rep} -RAND_SEED {rep} {args}"
+base_string = "{base}/{binary} -PREFIX {binary}-${PBS_ARRAYID} -RAND_SEED ${PBS_ARRAYID} {args}"
 
 def regurgitate(config, args, path):
     with open(path + "makeitgo.qsub", 'w') as qfile:
@@ -71,6 +71,8 @@ def regurgitate(config, args, path):
         for i in range(0, 4):
             print(PBS_lines[i].format(config[expecting[i]]), file=qfile)
         
+        print("#PBS -t 0-{}".format(config['num_replicants']), file=qfile)
+
         print("cd {}".format(path), file=qfile)
 
         # args have been fully defined by this point--build the string to save time
@@ -82,13 +84,12 @@ def regurgitate(config, args, path):
             argstring += "\\\n\t\t" + arg + " " + config['unchanging'][arg]
 
         for el in config['binaries']:
-            for i in range(0, int(config['num_replicants'])):
-                print(base_string.format(base=config['basepath'],
-                                         binary=el,
-                                         rep=i,
-                                         args=argstring),
-                                 end="& \n\n",
-                                 file=qfile) # print \ and newline
+            print(base_string.format(base=config['basepath'],
+                                     binary=el,
+                                     rep=i,
+                                     args=argstring),
+                             end="& \n\n",
+                             file=qfile) # print \ and newline
         print("""\n\n
 for job in `jobs -p
 do
