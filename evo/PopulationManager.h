@@ -696,8 +696,7 @@ namespace evo {
 
       // population can be reset
       // can't use the inherited 'clear' method, might delete things we still want
-      pop.resize(tot_pop, nullptr);
-
+      for (size_t i = 0; i < pop.size(); i++) {pop[i] = nullptr;}
       // reseed 
       for (auto org : chosen) {org->set_id(AddOrg(org));}
 
