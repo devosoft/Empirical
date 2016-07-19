@@ -23,46 +23,45 @@ namespace emp {
     TYPE y;
 
   public:
-    Point() : x(0.0), y(0.0) { ; }                      // Default = 0,0
-    Point(const Point & _in) : x(_in.x), y(_in.y) { ; } // Copy constructor
-    Point(TYPE _x, TYPE _y) : x(_x), y(_y) { ; }        // Two ints -> x and y
-    Point(const Point & _in, TYPE new_magnitude) {
-      const double mag_shift = ((double) new_magnitude) / ((double) _in.Magnitude());
-      x = _in.x * mag_shift;
-      y = _in.y * mag_shift;
-    }
-    ~Point() { ; }
+    constexpr Point() : x(0.0), y(0.0) { ; }                      // Default = 0,0
+    constexpr Point(const Point & _in) : x(_in.x), y(_in.y) { ; } // Copy constructor
+    constexpr Point(TYPE _x, TYPE _y) : x(_x), y(_y) { ; }        // Two ints -> x and y
+    constexpr Point(const Point & _in, TYPE new_magnitude)
+      : x(_in.x * ((double) new_magnitude) / ((double) _in.Magnitude()))
+      , y(_in.y * ((double) new_magnitude) / ((double) _in.Magnitude()))
+     { ; }
+    // ~Point() { ; }
 
     const Point & operator=(const Point & _in) { x = _in.x; y = _in.y; return *this; }
-    bool operator==(const Point & _in) const { return (x == _in.x) && (y == _in.y); }
-    bool operator!=(const Point & _in) const { return (x != _in.x) || (y != _in.y); }
+    constexpr bool operator==(const Point & _in) const { return (x == _in.x) && (y == _in.y); }
+    constexpr bool operator!=(const Point & _in) const { return (x != _in.x) || (y != _in.y); }
 
-    inline TYPE GetX() const { return x; }
-    inline TYPE GetY() const { return y; }
+    constexpr inline TYPE GetX() const { return x; }
+    constexpr inline TYPE GetY() const { return y; }
     inline Point & SetX(TYPE in_x) { x = in_x; return *this; }
     inline Point & SetY(TYPE in_y) { y = in_y; return *this; }
     Point & Set(TYPE _x, TYPE _y) { x=_x; y=_y; return *this; }
 
-    double SquareMagnitude() const { return x*x + y*y; }
-    double Magnitude() const { return sqrt( x*x + y*y ); }
-    bool AtOrigin() { return x == 0 && y == 0; }
-    bool NonZero() { return x != 0 || y != 0; }
+    constexpr double SquareMagnitude() const { return x*x + y*y; }
+    constexpr double Magnitude() const { return sqrt( x*x + y*y ); }
+    constexpr bool AtOrigin() const { return x == 0 && y == 0; }
+    constexpr bool NonZero() const { return x != 0 || y != 0; }
 
     // Determine a new point, but don't change this one
-    Point GetMidpoint(const Point & p2) const { return Point((x+p2.x)/2, (y+p2.y)/2); }
-    Point GetRot90() const { return Point(y, -x); }
-    Point GetRot180() const { return Point(-x, -y); }
-    Point GetRot270() const { return Point(-y, x); }
+    constexpr Point GetMidpoint(const Point & p2) const { return Point((x+p2.x)/2, (y+p2.y)/2); }
+    constexpr Point GetRot90() const { return Point(y, -x); }
+    constexpr Point GetRot180() const { return Point(-x, -y); }
+    constexpr Point GetRot270() const { return Point(-y, x); }
 
-    Point operator+(const Point & _in) const { return Point(x + _in.x , y + _in.y); }
-    Point operator-(const Point & _in) const { return Point(x - _in.x , y - _in.y); }
-    Point operator*(double mult) const { return Point(((double) x) * mult, ((double) y) * mult); }
-    Point operator/(double div) const { return Point(((double) x) / div, ((double) y) / div); }
-    Point operator*(int mult) const { return Point(x * mult, y * mult); }
-    Point operator/(int div) const { return Point(x / div, y / div); }
-    Point operator-() const { return Point(-x, -y); } // Unary minus
+    constexpr Point operator+(const Point & _in) const { return Point(x + _in.x , y + _in.y); }
+    constexpr Point operator-(const Point & _in) const { return Point(x - _in.x , y - _in.y); }
+    constexpr Point operator*(double mult) const { return Point(((double) x) * mult, ((double) y) * mult); }
+    constexpr Point operator/(double div) const { return Point(((double) x) / div, ((double) y) / div); }
+    constexpr Point operator*(int mult) const { return Point(x * mult, y * mult); }
+    constexpr Point operator/(int div) const { return Point(x / div, y / div); }
+    constexpr Point operator-() const { return Point(-x, -y); } // Unary minus
 
-    Point Abs() const { return Point(std::abs(x), std::abs(y)); } // Absolute value
+    constexpr Point Abs() const { return Point(std::abs(x), std::abs(y)); } // Absolute value
 
     // Modify this point.
     Point & Translate(TYPE shift_x, TYPE shift_y) { x += shift_x; y += shift_y; return *this; }
@@ -71,7 +70,7 @@ namespace emp {
     Point & ToOrigin() { x = 0; y = 0; return *this; }
     Point & NegateX() { x = -x; return *this; }
     Point & NegateY() { y = -y; return *this; }
-    
+
     Point & operator+=(const Point & _in) { x += _in.x; y += _in.y; return *this; }
     Point & operator-=(const Point & _in) { x -= _in.x; y -= _in.y; return *this; }
     Point & operator*=(double mult) { x *= mult; y *= mult; return *this; }
@@ -98,7 +97,7 @@ namespace emp {
 
 // Overload ostream to work with points.
 template <typename TYPE> std::ostream & operator<<(std::ostream & os,
-                                                   const emp::Point<TYPE> & point) { 
+                                                   const emp::Point<TYPE> & point) {
   return os << "(" << point.GetX() << "," << point.GetY() << ")";
 }
 
