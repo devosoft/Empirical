@@ -17,6 +17,8 @@ namespace emp {
   constexpr const uint32_t MAX_3BYTE = 16777215;      // (2^24 - 1)
   constexpr const uint32_t MAX_UINT  = 4294967295;    // (2^32 - 1)
   constexpr const uint32_t MAX_4BYTE = 4294967295;    // (2^32 - 1)
+
+  constexpr const int32_t MIN_INT = -2147483648;      // (- 2^31)
 };
 
 #endif
