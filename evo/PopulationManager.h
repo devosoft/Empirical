@@ -698,6 +698,7 @@ namespace evo {
       // can't use the inherited 'clear' method, might delete things we still want
       for (size_t i = 0; i < pop.size(); i++) {pop[i] = nullptr;}
       // reseed 
+      org_count = 0;
       for (auto org : chosen) {org->set_id(AddOrg(org));}
 
       return -1;
