@@ -231,19 +231,23 @@ namespace evo {
       return point;
     }
 
-    int DoBottleneckEvent(double lethality) {
-    unsigned murdered = 0;
+    std::set<ORG *>  DoBottleneckEvent(double lethality) {
+      std::set<ORG *> deck;
+
       for(size_t i = 0; i < pop.size(); i++) {
         if(random_ptr->P(lethality)) {
           if(pop[i] != nullptr) {
             delete pop[i];
             pop[i] = nullptr;
-            murdered++;
           }
+        }
+        else {
+          deck.insert(pop[i]);
+          pop[i] = nullptr;
         }
       }
 
-      return murdered;
+      return deck;
     }
 
 
@@ -661,7 +665,7 @@ namespace evo {
     }
 
 
-    int DoBottleneckEvent(double lethality) {
+    std::set<ORG *> DoBottleneckEvent(double lethality) {
       // get complement of lethality--will tell us how many to save
       double immune = 1.0 - lethality;
       unsigned int num_immune = tot_pop * immune;
@@ -699,9 +703,8 @@ namespace evo {
       for (size_t i = 0; i < pop.size(); i++) {pop[i] = nullptr;}
       // reseed 
       org_count = 0;
-      for (auto org : chosen) {org->set_id(AddOrg(org));}
-
-      return -1;
+      //for (auto org : chosen) {org->set_id(AddOrg(org));}
+      return chosen;
     }
 
     // get the organisms within a certian radius of another org

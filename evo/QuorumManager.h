@@ -138,7 +138,8 @@ public:
     }
 
     unsigned int BottleneckEvent(double lethality) {
-      POP_MANAGER<QuorumOrganism>::DoBottleneckEvent(lethality);
+      std::set<QuorumOrganism * > deck = POP_MANAGER<QuorumOrganism>::DoBottleneckEvent(lethality);
+      for (auto org : deck) { org->set_id(POP_MANAGER<QuorumOrganism>::AddOrg(org));}
     }
 
     /// Does public good creation / distrubtion processing for an organism
