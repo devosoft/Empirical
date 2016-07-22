@@ -231,25 +231,47 @@ namespace evo {
       return point;
     }
 
-    std::set<ORG *>  DoBottleneckEvent(double lethality) {
-      std::set<ORG *> deck;
+    std::set<ORG *> DoBottleneckEvent(double lethality) {
+      // get complement of lethality--will tell us how many to save
+      double immune = 1.0 - lethality;
+      unsigned int num_immune = width * height * immune;
 
-      for(size_t i = 0; i < pop.size(); i++) {
-        if(random_ptr->P(lethality)) {
-          if(pop[i] != nullptr) {
-            delete pop[i];
-            pop[i] = nullptr;
-          }
-        }
-        else {
-          deck.insert(pop[i]);
-          pop[i] = nullptr;
+      vector<ORG *> choices;
+      std::set<ORG *> chosen;
+      // build a list of non-null organisms
+      for (auto org : pop) { if (org) choices.push_back(org);}
+
+      // impossible to get sufficient organisms to meet bottleneck requirement
+      // grab as many as we can and return them
+      if (choices.size() < num_immune) {
+        for (auto org : choices) {chosen.insert(org);}
+        choices.resize(0);
+      }
+      else {
+        // otherwise, build a collection of organisms of the specified size,
+        // randomly chosen from available organisms
+        while (chosen.size() < num_immune) {
+          size_t choice = random_ptr->GetUInt(0, choices.size());
+
+          // insert the new org into the 'next' pool
+          // then shrink the size of the choice pool
+          chosen.insert(choices[choice]);
+          choices[choice] = choices[choices.size() - 1];
+          choices.pop_back();
         }
       }
 
-      return deck;
-    }
+      // everything left in 'choices' should now be killed
+      for (auto org : choices) {delete org;}
 
+      // population can be reset
+      // can't use the inherited 'clear' method, might delete things we still want
+      for (size_t i = 0; i < pop.size(); i++) {pop[i] = nullptr;}
+      // reseed 
+      //for (auto org : chosen) {org->set_id(AddOrg(org));}
+      return chosen;
+    }
+  
 
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
