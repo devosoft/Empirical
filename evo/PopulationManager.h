@@ -288,14 +288,14 @@ namespace evo {
     using PopulationManager_Base<ORG>::SetRandom;
     using PopulationManager_Base<ORG>::GetSize;
 
-    int pool_count;
-    vector<int> pool_sizes;
-    std::map<int, vector<int> > connections; //connected pool numbers, starting at 0.
-    int org_count = 0; // orgs in vector
-    int r_upper; //random upper limit
-    int r_lower;// random lower limit
-    vector<int> pool_end; //end of each pool in array
-    double mig_rate;
+    int pool_count;                             //How many pools are in the population?
+    vector<int> pool_sizes;                     // How large is each pool?
+    std::map<int, vector<int> > connections;    // Which other pools can each position access?
+    int org_count = 0;                          // How many organisms have beeen inserted into the population?
+    int r_upper;                                // How large can a random pool size be?
+    int r_lower;                                // How small can a random pool size be?
+    vector<int> pool_end;                       // Where does the next pool begin? First pool begins at 0.
+    double mig_rate;                            // How often do organisms migrate to a connected pool?
 
   public:
     PopulationManager_Pools() { ; }
@@ -309,7 +309,6 @@ namespace evo {
     void Setup(Random * r){
         vector<int>* temp_sizes = new vector<int>;
         std::map<int, vector<int> > temp_connect;
-        for(int i = 0; i < 5; i++){ temp_connect[i].resize(0); }
 
         SetRandom(r);
         ConfigPop(5, *temp_sizes, &temp_connect, 150, 10, 0.05, 200);
@@ -411,7 +410,7 @@ namespace evo {
         else{range_l = pool_end[InsertPool - 1];}
         range_u = pool_end[InsertPool];
 
-        const int pos = (int) random_ptr->GetDouble(range_l, range_u);
+        const int pos = random_ptr->GetInt(range_l, range_u);
 
         if (pop[pos]) delete pop[pos];
 
