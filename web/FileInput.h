@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2015.
+//  Copyright (C) Michigan State University, 2015-2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -30,20 +30,22 @@ namespace web {
       friend FileInput;
     protected:
       std::string title;
-      
+
       bool autofocus;
       bool disabled;
-      
+
       std::function<void(const std::string &)> callback;
       uint32_t callback_id;
-      
+
       FileInputInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
       FileInputInfo(const FileInputInfo &) = delete;               // No copies of INFO allowed
       FileInputInfo & operator=(const FileInputInfo &) = delete;   // No copies of INFO allowed
       virtual ~FileInputInfo() {
         if (callback_id) emp::JSDelete(callback_id);               // Delete callback wrapper.
       }
-      
+
+      std::string TypeName() const override { return "FileInputInfo"; }
+
       void DoCallback(const std::string & file_body) {
         callback(file_body);
         UpdateDependants();
@@ -59,7 +61,7 @@ namespace web {
         HTML << " onchange=\"emp.LoadFileEvent(this.files, " << callback_id <<  ")\"";
         HTML << ">";
       }
-      
+
       void UpdateCallback(const std::function<void(const std::string &)> & in_cb) {
         callback = in_cb;
       }
@@ -76,16 +78,16 @@ namespace web {
         disabled = in_dis;
         if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
       }
-      
+
     public:
       virtual std::string GetType() override { return "web::FileInputInfo"; }
     }; // End of FileInputInfo definition
-    
-    
-    // Get a properly cast version of indo.  
+
+
+    // Get a properly cast version of indo.
     FileInputInfo * Info() { return (FileInputInfo *) info; }
     const FileInputInfo * Info() const { return (FileInputInfo *) info; }
- 
+
     FileInput(FileInputInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:
@@ -94,11 +96,11 @@ namespace web {
       : WidgetFacet(in_id)
     {
       info = new FileInputInfo(in_id);
-    
+
       Info()->title = "";
       Info()->autofocus = false;
       Info()->disabled = false;
-      
+
       Info()->callback = in_cb;
       FileInputInfo * w_info = Info();
       Info()->callback_id = JSWrap( std::function<void(std::string & file_body)>( [w_info](std::string & file_body){w_info->DoCallback(file_body);} )  );
@@ -116,7 +118,7 @@ namespace web {
     FileInput & Title(const std::string & in_t) { Info()->UpdateTitle(in_t); return *this; }
     FileInput & Autofocus(bool in_af) { Info()->UpdateAutofocus(in_af); return *this; }
     FileInput & Disabled(bool in_dis) { Info()->UpdateDisabled(in_dis); return *this; }
-    
+
     const std::string & GetTitle() const { return Info()->title; }
     bool HasAutofocus() const { return Info()->autofocus; }
     bool IsDisabled() const { return Info()->disabled; }

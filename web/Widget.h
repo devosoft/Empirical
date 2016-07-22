@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2015-2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -30,6 +30,7 @@
 #include "../tools/mem_track.h"
 #include "../tools/vector.h"
 
+#include "Attributes.h"
 #include "events.h"
 #include "Style.h"
 
@@ -98,6 +99,9 @@ namespace web {
 
     bool IsNull() const { return info == nullptr; }
 
+    // Some debugging helpers...
+    std::string InfoTypeName() const;
+
     bool IsInactive() const;
     bool IsWaiting() const;
     bool IsFrozen() const;
@@ -119,11 +123,18 @@ namespace web {
     bool TableOK() const;
     bool TextOK() const;
 
+    bool IsSlate() const { return SlateOK(); }
+    bool IsTable() const { return TableOK(); }
+    bool IsText() const { return TextOK(); }
     std::string GetID() const;
 
     // CSS-related options may be overridden in derived classes that have multiple styles.
     virtual std::string GetCSS(const std::string & setting);
     virtual bool HasCSS(const std::string & setting);
+
+    // And other attribute-related options
+    virtual std::string GetAttr(const std::string & setting);
+    virtual bool HasAttr(const std::string & setting);
 
     bool operator==(const Widget & in) const { return info == in.info; }
     bool operator!=(const Widget & in) const { return info != in.info; }
@@ -165,6 +176,7 @@ namespace web {
       // Basic info about a widget
       std::string id;                 // ID used for associated DOM element.
       Style style;                    // CSS Style
+      Attributes attr;                // HTML Attributes about a class.
 
       // Track hiearchy
       WidgetInfo * parent;            // Which WidgetInfo is this one contained within?
@@ -187,6 +199,9 @@ namespace web {
       virtual ~WidgetInfo() {
         EMP_TRACK_DESTRUCT(WebWidgetInfo);
       }
+
+      // Some debugging helpers...
+      virtual std::string TypeName() const { return "WidgetInfo base"; }
 
       virtual bool IsButtonInfo() const { return false; }
       virtual bool IsCanvasInfo() const { return false; }
@@ -230,7 +245,8 @@ namespace web {
         state = Widget::ACTIVE;         // Activate this widget and its children.
         if (top_level) ReplaceHTML();   // Print full contents to document.
       }
-
+      virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
+      virtual void PreventAppend() { emp_assert(false, TypeName()); } // Only for appendable widgets.
 
       // By default, elements should forward unknown appends to their parents.
       virtual Widget Append(const std::string & text) { return ForwardAppend(text); }
@@ -284,6 +300,7 @@ namespace web {
         if (state == Widget::ACTIVE) {
           // Update the style
           style.Apply(id);
+          attr.Apply(id);
 
           // Run associated Javascript code, if any (e.g., to fill out a canvas)
           TriggerJS();
@@ -321,6 +338,8 @@ namespace web {
     EMP_TRACK_DESTRUCT(WebWidget);
   }
 
+  std::string Widget::InfoTypeName() const { if (IsNull()) return "NULL"; return info->TypeName(); }
+
   Widget & Widget::SetInfo(WidgetInfo * in_info) {
     // If the widget is already set correctly, stop here.
     if (info == in_info) return *this;
@@ -343,6 +362,8 @@ namespace web {
   bool Widget::IsFrozen() const { if (!info) return false; return info->state == FROZEN; }
   bool Widget::IsActive() const { if (!info) return false; return info->state == ACTIVE; }
 
+  bool Widget::AppendOK() const { if (!info) return false; return info->AppendOK(); }
+  void Widget::PreventAppend() { emp_assert(info); info->PreventAppend(); }
   std::string Widget::GetID() const { return info ? info->id : "(none)"; }
 
   bool Widget::ButtonOK() const { if (!info) return false; return info->IsButtonInfo(); }
@@ -358,6 +379,13 @@ namespace web {
   }
   bool Widget::HasCSS(const std::string & setting) {
     return info ? info->style.Has(setting) : false;
+  }
+
+  std::string Widget::GetAttr(const std::string & setting) {
+    return info ? info->attr.Get(setting) : "";
+  }
+  bool Widget::HasAttr(const std::string & setting) {
+    return info ? info->attr.Has(setting) : false;
   }
 
 
@@ -429,6 +457,11 @@ namespace web {
         info->style.DoSet(setting, value);
         if (IsActive()) Style::Apply(info->id, setting, value);
       }
+      // Attr-related options may be overridden in derived classes that have multiple styles.
+      virtual void DoAttr(const std::string & setting, const std::string & value) {
+        info->attr.DoSet(setting, value);
+        if (IsActive()) Attributes::Apply(info->id, setting, value);
+      }
 
     public:
       template <typename SETTING_TYPE>
@@ -437,8 +470,14 @@ namespace web {
         DoCSS(setting, emp::to_string(value));
         return (RETURN_TYPE &) *this;
       }
+      template <typename SETTING_TYPE>
+      RETURN_TYPE & SetAttr(const std::string & setting, SETTING_TYPE && value) {
+        emp_assert(info != nullptr);
+        DoAttr(setting, emp::to_string(value));
+        return (RETURN_TYPE &) *this;
+      }
 
-      // Allow multiple CSS settings to be grouped.
+      // Allow multiple CSS or Attr settings to be grouped.
       template <typename T1, typename T2, typename... OTHER_SETTINGS>
       RETURN_TYPE & SetCSS(const std::string & setting1, T1 && val1,
                         const std::string & setting2, T2 && val2,
@@ -446,9 +485,16 @@ namespace web {
         SetCSS(setting1, val1);                      // Set the first CSS value.
         return SetCSS(setting2, val2, others...);    // Recurse to the others.
       }
+      template <typename T1, typename T2, typename... OTHER_SETTINGS>
+      RETURN_TYPE & SetAttr(const std::string & setting1, T1 && val1,
+                            const std::string & setting2, T2 && val2,
+                            OTHER_SETTINGS... others) {
+        SetAttr(setting1, val1);                      // Set the first CSS value.
+        return SetAttr(setting2, val2, others...);    // Recurse to the others.
+      }
 
-      // Allow multiple CSS settigns as a single style object.
-      // (still go through DoCSS given need for virtual re-routing.)
+      // Allow multiple CSS or Attr settigns as a single object.
+      // (still go through DoCSS/DoAttr given need for virtual re-routing.)
       RETURN_TYPE & SetCSS(const Style & in_style) {
         emp_assert(info != nullptr);
         for (const auto & s : in_style.GetMap()) {
@@ -456,12 +502,13 @@ namespace web {
         }
         return (RETURN_TYPE &) *this;
       }
-
-      // @CAO This seems like a bigger deal than just changing the id...
-      // RETURN_TYPE & ID(const std::string & in_id) {
-      //   info->id = in_id;
-      //   return (RETURN_TYPE &) *this;
-      // }
+      RETURN_TYPE & SetAttr(const Attributes & in_attr) {
+        emp_assert(info != nullptr);
+        for (const auto & a : in_attr.GetMap()) {
+          DoAttr(a.first, a.second);
+        }
+        return (RETURN_TYPE &) *this;
+      }
 
 
       // Size Manipulation

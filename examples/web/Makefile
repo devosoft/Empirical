@@ -22,7 +22,7 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 
-JS_TARGETS := Animate.js Example.js keypress.js Slate.js Sudoku.js Table.js TextArea.js Tween.js Web.js
+JS_TARGETS := Animate.js Attributes.js Example.js keypress.js Slate.js Sudoku.js Table.js TextArea.js Tween.js Web.js
 
 default: web
 
@@ -31,6 +31,9 @@ native: debug-Animate debug-keypress debug-Slate debug-web
 
 Animate.js: Animate.cc
 	$(CXX_web) $(CFLAGS_web) Animate.cc -o Animate.js
+
+Attributes.js: Attributes.cc
+	$(CXX_web) $(CFLAGS_web) Attributes.cc -o Attributes.js
 
 Example.js: Example.cc
 	$(CXX_web) $(CFLAGS_web) Example.cc -o Example.js

@@ -1,6 +1,8 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
+//
+//  A collection of broadly-useful functions.
 
 #ifndef EMP_FUNCTIONS_H
 #define EMP_FUNCTIONS_H
@@ -101,6 +103,11 @@ namespace emp {
     return dst;
   }
 
+
+  // Build a function to determine the size of a built-in array.
+  template <typename T, size_t N>
+  constexpr size_t size(T (&)[N]) { return N; }
+  
 }
 
 #endif

@@ -129,7 +129,7 @@ namespace emp {
     emp::vector< STOP_TYPE > is_stop;         // 0=no 1=yes (char instead of bool for speed)
 
   public:
-    tNFA(int num_states=0, int start_state=0)
+    tNFA(int num_states=1, int start_state=0)
       : states(num_states), start(start_state), is_stop(num_states, 0) {
         if (num_states > start) states[start].free_to.insert(start);
       }
@@ -321,8 +321,8 @@ namespace emp {
   };
 
 
-  using NFA = tNFA<128, char>;
-  using NFA_State = tNFA_State<128, char>;
+  using NFA = tNFA<128, uint8_t>;
+  using NFA_State = tNFA_State<128, uint8_t>;
 }
 
 #endif

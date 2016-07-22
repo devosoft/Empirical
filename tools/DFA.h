@@ -3,6 +3,40 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  A Deterministic Finite Automata simulator
+//
+//  Member functions:
+//   int GetSize() const
+//     How many states is this DFA using?
+//
+//   void Resize(int new_size)
+//     Add Additional empty states.
+//
+//   const emp::array<int, NUM_SYMBOLS> & GetTransitions(int from) const
+//     Return an array of all transitions associated with a specified state.
+//
+//   void SetTransition(int from, int to, int sym) {
+//     Add a specific transition associated with an input symbol.
+//
+//   void SetStop(int state, stop_t stop_val=1)
+//   void AddStop(int state, stop_t stop_val=1)
+//     Either set the stop value or add an additional stop value (only max stop is returned).
+//
+//   bool IsStop(int state) const
+//   stop_t GetStop(int state) const
+//     Test if a state has a stop or get the stop value associated with that state.
+//
+//   bool IsActive(int state) const
+//     Test if a state is still valid.
+//
+//   int Next(int state, int sym) const
+//   int Next(int state, std::string sym_set) const
+//     Return the new state after a single symbol or a string of symbols.
+//
+//   void Print()
+//     Output the state of the DFA. (still mostly debug)
+//
+//  Details for number of possible input symbols and stop type can be specified with tDFA, but:
+//   using DFA = tDFA<128, char>;
 
 #ifndef EMP_DFA_H
 #define EMP_DFA_H
@@ -10,6 +44,7 @@
 #include <string>
 
 #include "array.h"
+#include "string_utils.h"
 #include "vector.h"
 
 namespace emp {
@@ -66,8 +101,8 @@ namespace emp {
 
     int Next(int state, int sym) const {
       emp_assert(state >= -1 && state < (int) transitions.size());
-      emp_assert(sym >= 0 && sym < NUM_SYMBOLS);
-      return (state == -1) ? -1 : transitions[state][sym];
+      // emp_assert(sym >= 0 && sym < NUM_SYMBOLS, sym, (char) sym);
+      return (state < 0 || sym >= NUM_SYMBOLS) ? -1 : transitions[state][sym];
     }
 
     int Next(int state, std::string sym_set) const {
@@ -75,26 +110,31 @@ namespace emp {
       return state;
     }
 
-    void Print() {
-      std::cout << "Num states = " << GetSize() << std::endl;
-      std::cout << "Start = 0; Stop =";
-      for (int i = 0; i < GetSize(); i++) if(IsStop(i)) std::cout << " " << i;
-      std::cout << std::endl;
+    stop_t Test(const std::string & str) const {
+      int out = Next(0, str);
+      return GetStop(out);
+    }
+
+    void Print(std::ostream & os=std::cout) {
+      os << "Num states = " << GetSize() << std::endl << "Stop IDs:";
+      for (int i = 0; i < GetSize(); i++) if(IsStop(i)) os << " " << i;
+      os << std::endl;
 
       for (int i = 0; i < (int) transitions.size(); i++) {
-        std::cout << " " << i << " ->";
+        os << " " << i << " ->";
         for (int s = 0; s < NUM_SYMBOLS; s++) {
           if (transitions[i][s] == -1) continue;
-          std::cout << " " << ((char) s) << ":" << transitions[i][s];
+          os << " " << to_literal((char) s) << ":" << transitions[i][s];
         }
-        std::cout << std::endl;
+        if (IsStop(i)) os << " [STOP=" << ((int) GetStop(i)) << "]";
+        os << std::endl;
       }
 
     }
 
   };
 
-  using DFA = tDFA<128, char>;
+  using DFA = tDFA<128, uint8_t>;
 
 }
 
