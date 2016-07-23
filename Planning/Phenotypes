@@ -1,0 +1,12 @@
+Goals of a phenotype object
+* Easy to add traits, simialar to config settings.
+* Phenotypic traits should know how they get updated in different circumstances - insertoin vs. birth vs divide.
+* Traits should know what date needs to be kept (value at previous divide? number of updates?)
+* Trait updating should be able to link to signals.
+* Updating or accessing a phenotype my happen frequently and should be fast.
+* There may be many organisms, so each individual phenotype should be as small as reasonable, but not at the cost of sacrificing the above.
+
+Possibilities:
+* Customized traits.  Each trait object has speciatized functions built-in that behave properly (depending on what was passed into the macro.
+* Master controller.  A contoller knows how to replicate a phenotype or apply other operations to it.  Each phenotype instance is just a set of traits.
+* Static class information.
