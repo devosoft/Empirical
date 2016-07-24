@@ -1,12 +1,20 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
+// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
+// Copyright (C) Michigan State University, 2015. It is licensed
 // under the MIT Software license; see doc/LICENSE
 
-#include <emscripten.h>
+#include "../../emtools/init.h"
 
 #include "../../tools/alert.h"
 #include "../../emtools/JSWrap.h"
 #include "../../emtools/init.h"
+
+struct JSDataObject {
+    EMP_BUILD_INTROSPECTIVE_TUPLE(
+        int, val,
+        std::string, word,
+        double, val2
+    )
+};
 
 void TestFun1(int w, int x, int y, double z) {
   emp::Alert(w + x*y*z);
@@ -50,9 +58,10 @@ int main() {
   uint32_t fun_id4 = emp::JSWrap(TestFun4, "TestName4", false);
   uint32_t fun_id5 = emp::JSWrap(TestFun5, "TestName5", false);
   uint32_t fun_id6 = emp::JSWrap(TestFun6, "TestName6", false);
-  // uint32_t fun_id7 = emp::JSWrap(TestFun7, "TestName7", false);
+  uint32_t fun_id7 = emp::JSWrap(TestFun7, "TestName7", false);
   (void) fun_id4;
   (void) fun_id6;
+  (void) fun_id7;
 
 
   double in1 = 4.5;
@@ -88,5 +97,5 @@ int main() {
   EM_ASM({
       emp.TestName7({val:5, word:"hi", val2:6.3});
     });
-  
+
 }

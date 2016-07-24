@@ -4,13 +4,14 @@
 
 #include "../../emtools/init.h"
 #include <string>
-#include <array>
 
 #include "../../config/command_line.h"
 #include "../../emtools/JSWrap.h"
 #include "../../emtools/js_utils.h"
 #include "../../tools/unit_tests.h"
 #include "../../tools/assert.h"
+#include "../../tools/array.h"
+#include "../../tools/vector.h"
 
 struct JSDataObject {
     EMP_BUILD_INTROSPECTIVE_TUPLE(
@@ -21,7 +22,7 @@ struct JSDataObject {
 };
 
 int main(int argc, char* argv[]) {
-  //std::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
+  //emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
   //const bool verbose = emp::cl::use_arg(args, "-v");
   bool verbose = true;
 
@@ -46,6 +47,32 @@ int main(int argc, char* argv[]) {
 
   std::array<std::array<JSDataObject, 2>, 2> test_data_4 = {{{test_obj_1, test_obj_2}, {test_obj_2, test_obj_2}}};
 
+  std::array<std::array<std::string, 5>, 1> string_arr = {{"do", "strings", "work", "in", "arrays?"}};
+
+  emp::vector<int> int_vec = {5,1,2,3,6};
+
+  emp::vector<std::string> string_vec = {"a", "vector", "of", "strings"};
+
+  emp::vector<emp::vector<emp::vector<double> > > nested_vec = {{{1,2,3},{4,5,6}}};
+
+  emp::pass_array_to_javascript(nested_vec);
+  EMP_TEST_VALUE(
+		 EM_ASM_INT_V({return emp_i.__incoming_array[0][1][1];})
+		 , "5");
+
+  emp::pass_array_to_javascript(int_vec);
+  EMP_TEST_VALUE(
+		 EM_ASM_INT_V({return emp_i.__incoming_array[4];})
+		 , "6");
+
+  emp::pass_array_to_javascript(string_vec);
+  EMP_TEST_VALUE(
+          (char *) EM_ASM_INT_V({
+              var buffer = Module._malloc(emp_i.__incoming_array[1].length*2);
+              writeStringToMemory(emp_i.__incoming_array[1], buffer);
+              return buffer;
+          })
+		 , "vector");
 
   emp::pass_array_to_javascript(test_data);
   EMP_TEST_VALUE(
@@ -59,6 +86,14 @@ int main(int argc, char* argv[]) {
   EMP_TEST_VALUE(
 		 EM_ASM_DOUBLE_V({return emp_i.__incoming_array[1].val2;})
 		 , "11.2");
+
+  emp::pass_array_to_javascript(string_arr);
+  EMP_TEST_VALUE(
+        (char *) EM_ASM_INT_V({
+            var buffer = Module._malloc(emp_i.__incoming_array[0][3].length*2);
+            writeStringToMemory(emp_i.__incoming_array[0][3], buffer);
+            return buffer;
+        }), "in");
 
   emp::pass_array_to_javascript(horrible_array);
   EMP_TEST_VALUE(
@@ -98,6 +133,14 @@ int main(int argc, char* argv[]) {
   EMP_TEST_VALUE(test_arr_3[1], "1.5");
   EMP_TEST_VALUE(test_arr_3[2], "3.1");
 
+  //Test doubles in vector
+  EM_ASM({emp_i.__outgoing_array = [5.3, 1.6, 3.2]});
+  emp::vector<double> test_vec;
+  emp::pass_vector_to_cpp(test_vec);
+  EMP_TEST_VALUE(test_vec[0], "5.3");
+  EMP_TEST_VALUE(test_vec[1], "1.6");
+  EMP_TEST_VALUE(test_vec[2], "3.2");
+
   //Test chars
   EM_ASM({emp_i.__outgoing_array = ["h", "i", "!"]});
   std::array<char, 3> test_arr_4;
@@ -105,6 +148,12 @@ int main(int argc, char* argv[]) {
   EMP_TEST_VALUE(test_arr_4[0], "h");
   EMP_TEST_VALUE(test_arr_4[1], "i");
   EMP_TEST_VALUE(test_arr_4[2], "!");
+  emp::vector<char> test_vec_4;
+  emp::pass_vector_to_cpp(test_vec_4);
+  EMP_TEST_VALUE(test_vec_4[0], "h");
+  EMP_TEST_VALUE(test_vec_4[1], "i");
+  EMP_TEST_VALUE(test_vec_4[2], "!");
+
 
   //Test std::strings
   EM_ASM({emp_i.__outgoing_array = ["jello", "world", "!!"]});
@@ -113,6 +162,11 @@ int main(int argc, char* argv[]) {
   EMP_TEST_VALUE(test_arr_5[0], "jello");
   EMP_TEST_VALUE(test_arr_5[1], "world");
   EMP_TEST_VALUE(test_arr_5[2], "!!");
+  emp::vector<std::string> test_vec_5;
+  emp::pass_vector_to_cpp(test_vec_5);
+  EMP_TEST_VALUE(test_vec_5[0], "jello");
+  EMP_TEST_VALUE(test_vec_5[1], "world");
+  EMP_TEST_VALUE(test_vec_5[2], "!!");
 
   //Test nested arrays
   EM_ASM({emp_i.__outgoing_array = [[4,5], [3,1], [7,8]]});
@@ -124,6 +178,16 @@ int main(int argc, char* argv[]) {
   EMP_TEST_VALUE(test_arr_6[1][1], "1");
   EMP_TEST_VALUE(test_arr_6[2][0], "7");
   EMP_TEST_VALUE(test_arr_6[2][1], "8");
+
+  EM_ASM({emp_i.__outgoing_array = [[4,5], [3,1], [7,8]]});
+  emp::vector<emp::vector<int> > test_vec_6;
+  emp::pass_vector_to_cpp(test_vec_6);
+  EMP_TEST_VALUE(test_vec_6[0][0], "4");
+  EMP_TEST_VALUE(test_vec_6[0][1], "5");
+  EMP_TEST_VALUE(test_vec_6[1][0], "3");
+  EMP_TEST_VALUE(test_vec_6[1][1], "1");
+  EMP_TEST_VALUE(test_vec_6[2][0], "7");
+  EMP_TEST_VALUE(test_vec_6[2][1], "8");
 
   //Test more deeply nested arrays
   EM_ASM({emp_i.__outgoing_array = [[["Sooo", "many"], ["strings", "here"]],
