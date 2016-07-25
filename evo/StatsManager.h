@@ -321,6 +321,10 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
               emp::vector<int> depth = this->lin_ptr->TraceLineageIDs(a_id);
               return (double)depth.size();
           };
+          std::function<double()> coal_count = [this](){
+              long count = this->lin_ptr->lin_count;
+              return count;
+          };
 
 
           std::function<void(int)> UpdateFun = [&] (int ud){
@@ -338,6 +342,7 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
           AddFunction(det_mut, "det_mut");
           AddFunction(max_ben, "max_ben");
           AddFunction(max_det, "max_det");
+          AddFunction(coal_count, "coal_count");
 
           w->OnUpdate(UpdateFun);
 

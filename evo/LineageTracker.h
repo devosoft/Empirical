@@ -293,6 +293,7 @@ namespace evo{
     using LineageTracker<POP_MANAGER>::ConnectVis;
 #endif
     int last_coalesence = 0;
+    long lin_count = 0;
     using LineageTracker<POP_MANAGER>::emp_is_lineage_manager;
     LineageTracker_Pruned() {;}
 
@@ -404,9 +405,12 @@ namespace evo{
       //coalesence point up.
       //!inject is a guard against changing the last_coalesence during initialization.
       //It's imperfect, though
+      bool count_flag = 0;
       while (!inject && curr->id == last_coalesence && curr->offspring.size() == 1 && !curr->alive){
         curr = curr->offspring[0];
         last_coalesence = curr->id;
+        if(!count_flag){lin_count++;}
+        count_flag = 1;
       }
 
       //Update mapping of lineage tracker ids to locations in population
