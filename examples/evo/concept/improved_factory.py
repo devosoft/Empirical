@@ -72,6 +72,7 @@ def regurgitate(config, args, path):
             print(PBS_lines[i].format(config[expecting[i]]), file=qfile)
         
         print("#PBS -t 0-{}".format(config['num_replicants']), file=qfile)
+        #print("#PBS -l feature=intel16", file=qfile)
 
         print("cd {}".format(path), file=qfile)
 
@@ -88,13 +89,9 @@ def regurgitate(config, args, path):
                                      binary=el,
                                      rep=i,
                                      args=argstring),
-                             end="& \n\n",
+                             end=" \n\n",
                              file=qfile) # print \ and newline
-        print("""\n\n
-for job in `jobs -p
-do
-wait $job
-done""", file=qfile)
+        print("sleep 60", file=qfile)
 
 def generate_folder_level(index, prefixes, currbase, config, fqc = None):
     if fqc == None:
