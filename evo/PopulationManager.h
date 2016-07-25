@@ -52,6 +52,8 @@ namespace evo {
 
     void SetRandom(Random * r) { random_ptr = r; }
 
+    void Setup(Random * r){ SetRandom(r); }
+
 
     void Print(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout,
               std::string empty="X", std::string spacer=" ") {
@@ -131,6 +133,8 @@ namespace evo {
 
     static constexpr bool emp_has_separate_generations = true;
 
+    void Setup(){ ; }
+
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = next_pop.size();
       next_pop.push_back(new_org);
@@ -164,6 +168,7 @@ namespace evo {
     using PopulationManager_Base<ORG>::pop;
     using PopulationManager_Base<ORG>::random_ptr;
     using PopulationManager_Base<ORG>::DoBottleneck;
+    using PopulationManager_Base<ORG>::SetRandom;
 
     int max_size;
     int bottleneck_size;
@@ -176,6 +181,8 @@ namespace evo {
     int GetMaxSize() const { return max_size; }
     int GetBottleneckSize() const { return bottleneck_size; }
     int GetNumBottlnecks() const { return num_bottlenecks; }
+
+    void Setup(Random *r){ SetRandom(r); }
 
     void SetMaxSize(const int m) { max_size = m; }
     void SetBottleneckSize(const int b) { bottleneck_size = b; }
@@ -198,6 +205,7 @@ namespace evo {
   protected:
     using PopulationManager_Base<ORG>::pop;
     using PopulationManager_Base<ORG>::random_ptr;
+    using PopulationManager_Base<ORG>::SetRandom;
 
     int width;
     int height;
@@ -212,6 +220,8 @@ namespace evo {
 
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
+
+    void Setup(Random * r){SetRandom(r); }
 
     void ConfigPop(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }
 
@@ -296,6 +306,7 @@ namespace evo {
     int r_lower;                                // How small can a random pool size be?
     vector<int> pool_end;                       // Where does the next pool begin? First pool begins at 0.
     double mig_rate;                            // How often do organisms migrate to a connected pool?
+    vector<int> pool_id;
 
   public:
     PopulationManager_Pools() : org_count(0) { ; }
@@ -307,10 +318,10 @@ namespace evo {
     int GetLower() const { return r_lower; }
 
     void Setup(Random * r){
+        SetRandom(r);
         vector<int>* temp_sizes = new vector<int>;
         std::map<int, vector<int> > temp_connect;
 
-      SetRandom(r);
       ConfigPop(5, *temp_sizes, &temp_connect, 150, 10, 0.05, 200);
     }
 
@@ -323,6 +334,10 @@ namespace evo {
       r_lower = l;
       connections = *c;
       mig_rate = mg;
+      pool_end = {};
+      
+      vector<int> temp (pop_size, 0);
+      pool_id = temp;
 
       pop.resize(pop_size, nullptr);
 
@@ -331,7 +346,7 @@ namespace evo {
         while (true) {
           int pool_total = 0;
           for( int i = 0; i < pool_count - 1; i++){
-            pool_sizes.push_back(random_ptr->GetInt(r_lower, r_upper));
+            pool_sizes.push_back(40);
             pool_total += pool_sizes[i];
           }
 
@@ -360,11 +375,18 @@ namespace evo {
 
       // Divide World into pools
       int arr_size = 0;
+      int prev_size = 0;
+      int pool_num = 0;
       for (auto el : pool_sizes) {
         arr_size += el;
+        for( int i = prev_size; i < arr_size; i++){
+            pool_id[i] = pool_num;
+        }
+        prev_size = arr_size;
+        pool_num++;
         pool_end.push_back(arr_size);
       }
-
+      return;
     }
 
     // Injected orgs go into a random pool.
@@ -382,12 +404,11 @@ namespace evo {
         range_u = (int) pop.size();
       }
 
-      const int pos = (int) random_ptr->GetDouble(range_l, range_u);
+      const int pos = random_ptr->GetInt(range_l, range_u);
 
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
       org_count++;
-
       return pos;
     }
 
@@ -401,11 +422,7 @@ namespace evo {
         int conn_id = random_ptr->GetInt(0, parent_conns.size());
         InsertPool = parent_conns[conn_id];
         }
-        else{
-            for(int i = 0; i < pool_end.size(); i++ ){
-                if(parent_pos < pool_end[i]) {InsertPool = i; break;} 
-            }
-        }
+        else{ InsertPool = pool_id[parent_pos]; }
       
       int range_l = InsertPool ? pool_end[InsertPool-1] : 0;
       int range_u = pool_end[InsertPool];
