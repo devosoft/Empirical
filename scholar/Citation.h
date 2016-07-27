@@ -1,26 +1,27 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  Information about a citation for a single paper / book / etc.
 
 #ifndef EMP_CITATION_H
 #define EMP_CITATION_H
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-//  Information about a single citation for a paper.
-//
-
 #include <set>
 #include <string>
-#include <vector>
 
+#include "..tools/vector.h"
 #include "Author.h"
 
 namespace emp {
 
   class Citation {
+  public:
+    enum CITE_TYPE { UNKNOWN=0, ARTICLE, BOOK, BOOKLET, CONFERENCE, IN_BOOK, IN_COLLECTION, MANUAL,
+                     MASTERS_THESIS, MISC, PHD_THESIS, PROCEEDINGS, TECH_REPORT, UNPUBLISHED }
   private:
-    std::vector<Author> author_list;
+    emp::vector<Author> author_list;
     std::string title;
     std::string journal;
     std::string volume;
