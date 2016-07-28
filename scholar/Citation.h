@@ -35,20 +35,22 @@ namespace emp {
     Citation & operator=(const Citation &) = default;
 
     void AddAuthor(const Author & author) { author_list.push_back(author); }
+    void AddNote(const std::string & note) { notes.push_back(note); }
+    void AddKeyword(const std::string & kw) { keywords.insert(kw); }
 
     template <class T> void SetVal(const std::string & setting, T && val) {
       setting_map[setting] = to_string(val);
     }
-    
-    template <class T> void SetTitle(T && val) { setting_map["title"] = to_string(val); }
-    template <class T> void SetJournal(T && val) { setting_map["journal"] = to_string(val); }
-    template <class T> void SetBookTitle(T && val) { setting_map["book_title"] = to_string(val); }
-    template <class T> void SetVolume(T && val) { setting_map["volume"] = to_string(val); }
-    template <class T> void SetYear(T && val) { setting_map["year"] = to_string(val); }
-    template <class T> void SetNumber(T && val) { setting_map["number"] = to_string(val); }
-    template <class T> void SetMonth(T && val) { setting_map["month"] = to_string(val); }
-    template <class T> void SetStartPage(T && val) { setting_map["start_page"] = to_string(val); }
-    template <class T> void SetEndPage(T && val) { setting_map["end_page"] = to_string(val); }
+
+    template <class T> void SetTitle(T && val) { SetVal("title", val); }
+    template <class T> void SetJournal(T && val) { SetVal("journal", val); }      // If in journal
+    template <class T> void SetBookTitle(T && val) { SetVal("book_title", val); } // If in book
+    template <class T> void SetVolume(T && val) { SetVal("volume", val); }
+    template <class T> void SetYear(T && val) { SetVal("year", val); }
+    template <class T> void SetNumber(T && val) { SetVal("number", val); }
+    template <class T> void SetMonth(T && val) { SetVal("month", val); }
+    template <class T> void SetStartPage(T && val) { SetVal("start_page", val); }
+    template <class T> void SetEndPage(T && val) { SetVal("end_page", val); }
   };
 
 };
