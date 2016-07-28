@@ -11,7 +11,8 @@
 #include <set>
 #include <string>
 
-#include "..tools/vector.h"
+#include "../tools/string_utils.h"
+#include "../tools/vector.h"
 #include "Author.h"
 
 namespace emp {
@@ -22,13 +23,10 @@ namespace emp {
                      MASTERS_THESIS, MISC, PHD_THESIS, PROCEEDINGS, TECH_REPORT, UNPUBLISHED }
   private:
     emp::vector<Author> author_list;
-    std::string title;
-    std::string journal;
-    std::string volume;
-    int year;
-    int start_page;
-    int end_page;
-    std::set<std::string> keywords;
+    std::vector<std::string> notes;   // An optional note.
+    std::set<std::string> keywords;   // Optional keywords.
+
+    std::map<std::string, std::string> setting_map;
   public:
     Citation() { ; }
     Citation(const Citation &) = default;
@@ -37,6 +35,20 @@ namespace emp {
     Citation & operator=(const Citation &) = default;
 
     void AddAuthor(const Author & author) { author_list.push_back(author); }
+
+    template <class T> void SetVal(const std::string & setting, T && val) {
+      setting_map[setting] = to_string(val);
+    }
+    
+    template <class T> void SetTitle(T && val) { setting_map["title"] = to_string(val); }
+    template <class T> void SetJournal(T && val) { setting_map["journal"] = to_string(val); }
+    template <class T> void SetBookTitle(T && val) { setting_map["book_title"] = to_string(val); }
+    template <class T> void SetVolume(T && val) { setting_map["volume"] = to_string(val); }
+    template <class T> void SetYear(T && val) { setting_map["year"] = to_string(val); }
+    template <class T> void SetNumber(T && val) { setting_map["number"] = to_string(val); }
+    template <class T> void SetMonth(T && val) { setting_map["month"] = to_string(val); }
+    template <class T> void SetStartPage(T && val) { setting_map["start_page"] = to_string(val); }
+    template <class T> void SetEndPage(T && val) { setting_map["end_page"] = to_string(val); }
   };
 
 };
