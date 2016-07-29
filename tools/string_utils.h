@@ -98,6 +98,21 @@ namespace emp {
     return ss.str();
   }
 
+  static std::string to_upper(std::string value) {
+    constexpr auto char_shift = 'a' - 'A';
+    for (auto & x : value) {
+      if (x >= 'a' && x <= 'z') x -= char_shift;
+    }
+    return value;
+  }
+
+  static std::string to_lower(std::string value) {
+    constexpr auto char_shift = 'a' - 'A';
+    for (auto & x : value) {
+      if (x >= 'A' && x <= 'Z') x += char_shift;
+    }
+    return value;
+  }
 
   // Convert to roman numerals
   static std::string to_roman_numeral(int val, const std::string & prefix="") {
