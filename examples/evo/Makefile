@@ -55,6 +55,9 @@ fast-grid: grid-exp.cc ../../evo/NK.h $(EVO_DEPEND)
 fast-mixed: mixed-exp.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 mixed-exp.cc -o mixed-exp
 
+fast-pool: pool-exp.cc ../../evo/NK.h $(EVO_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 pool-exp.cc -o pool-exp
+
 test-mixed: test-stats-mixed.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 test-stats-mixed.cc -o test-mixed
 
