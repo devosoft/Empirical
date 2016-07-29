@@ -10,6 +10,7 @@
 #include "../tools/stats.h"
 #include "../tools/string_utils.h"
 #include "../tools/FunctionSet.h"
+#include "../tools/const.h"
 
 #include "../web/d3/selection.h"
 #include "../web/d3/scales.h"
@@ -381,7 +382,7 @@ public:
 };
 
 class LineageVisualization : public D3Visualization {
-private:
+protected:
   double y_margin = 10;
   double x_margin = 30;
 
@@ -394,11 +395,17 @@ public:
 				                   int, parent,
                                    int, depth,
                                    //std::string, genome,
+                                   int, loc,
                                    bool, alive,
                                    bool, persist
                                 )
   };
 
+
+  struct LineageTreeEdge {
+    EMP_BUILD_INTROSPECTIVE_TUPLE( LineageTreeNode, source,
+                                     LineageTreeNode, target)
+  };
 
   D3::TreeLayout<LineageTreeNode> tree;
   D3::JSObject alive;
@@ -422,9 +429,13 @@ public:
     }
   };
 
+  std::function<std::string(LineageTreeEdge, int, int)> color_fun_link = [this](LineageTreeEdge d, int i = 0, int k = 0){
+    return "black";
+  };
+
   std::function<std::string(LineageTreeNode, int, int)> tooltip_display = [](LineageTreeNode d, int i = 0, int k = 0) {
     return "Name: " + to_string(d.name());
-};
+  };
 
   LineageVisualization(int width, int height) : D3Visualization(width, height){variables.push_back("Persist");}
 
@@ -435,7 +446,7 @@ public:
     data = new D3::JSONDataset();
     tip = new D3::ToolTip(GetID()+"tooltip_display");
     GetSVG()->Move(0,0);
-    data->Append(std::string("{\"name\": 0, \"parent\": \"null\", \"alive\":false, \"persist\":false, \"genome\":\"none\", \"children\" : []}"));
+    data->Append(std::string("{\"name\": 0, \"parent\": \"null\", \"alive\":false, \"loc\": -1, \"persist\":false, \"genome\":\"none\", \"children\" : []}"));
     tree.SetDataset(data);
     tree.SetSize(GetHeight(), GetWidth());
 
@@ -472,7 +483,7 @@ public:
   }
 
   virtual void AnimateStep(int parent, int child){
-    std::string child_json = std::string("{\"name\":" + to_string(child) + ", \"parent\":" + to_string(parent) + ", \"alive\":true, \"persist\":false, \"genome\":\"" + next_genome + "\", \"children\":[]}");
+    std::string child_json = std::string("{\"name\":" + to_string(child) + ", \"parent\":" + to_string(parent) + ", \"alive\":true, \"loc\":" + to_string(next_pos) + ", \"persist\":false, \"genome\":\"" + next_genome + "\", \"children\":[]}");
     int pos = data->AppendNestedFromList(child_json, alive);
 
     EM_ASM_ARGS({
@@ -485,12 +496,13 @@ public:
     DrawTree();
   }
 
-  void DrawTree() {
+  virtual void DrawTree() {
       std::cout << "Drawing tree" << std::endl;
       std::cout << "Svg: " << GetSVG()->GetID()<< std::endl;
     D3::Selection nodeEnter = tree.GenerateNodesAndLinks(*GetSVG());
     nodeEnter.Append("circle").SetAttr("r", 2).AddToolTip(*tip);
     GetSVG()->SelectAll("g.node").SelectAll("circle").SetStyle("fill", GetID()+"color_fun");
+    GetSVG()->SelectAll(".link").SetStyle("stroke", GetID()+"color_fun_link");
   }
 
   void RecordPlacement(int pos) {
@@ -504,6 +516,93 @@ public:
     next_child = child;
     next_genome = to_string(*org);
   }
+};
+
+//ASSUMES TOROIDAL GRID
+class SpatialGridLineageVisualization : public LineageVisualization {
+
+public:
+
+  const int grid_width = 10;
+  const int grid_height = 10;
+
+  struct LegendNode {
+    EMP_BUILD_INTROSPECTIVE_TUPLE( int, loc)
+  };
+
+  std::function<std::string(LineageTreeNode, int, int)> color_fun = [this](LineageTreeNode d, int i = 0, int k = 0){
+    if (d.loc() < 0) {
+      return std::string("white");
+    }
+
+    double x = (d.loc() % grid_width) - grid_width/2;
+    double y = (d.loc() / grid_width) - grid_height/2;
+
+    double r = sqrt(emp::pow(x,2)+emp::pow(y,2)) / sqrt(emp::pow(grid_width,2)+emp::pow(grid_height,2));
+
+    //atan2 takes sign into account
+    double theta = atan2(y, x)*(180/emp::PI);
+
+    char * color = (char *) EM_ASM_INT({
+        var text = d3.hcl($1, 150, $0*175).toString();
+	    var buffer = Module._malloc(text.length+1);
+	    Module.writeStringToMemory(text, buffer);
+	    return buffer;
+    }, r, theta);
+
+    std::string result = std::string(color);
+    free(color);
+    return result;
+  };
+
+  std::function<std::string(LineageTreeEdge, int, int)> color_fun_link = [this](LineageTreeEdge d, int i = 0, int k = 0){
+    return this->color_fun(d.source(),0,0);
+  };
+
+  std::function<std::string(LineageTreeNode, int, int)> tooltip_display = [this](LineageTreeNode d, int i = 0, int k = 0) {
+    return "Name: " + to_string(d.name()) + ", Pos: (" + to_string(d.loc()% grid_width) + ", " + to_string(d.loc()/grid_width) + ")";
+  };
+
+  std::function<int(LegendNode, int, int)> get_x = [this](LegendNode d, int i = 0, int k = 0) {
+    return 25*(d.loc() % grid_width);
+  };
+
+  std::function<int(LegendNode, int, int)> get_y = [this](LegendNode d, int i = 0, int k = 0) {
+    return 25*(d.loc() / grid_width);
+  };
+
+  SpatialGridLineageVisualization(int width, int height) : LineageVisualization(width, height){;}
+
+  virtual void Setup() {
+    LineageVisualization::Setup();
+    JSWrap(color_fun, GetID()+"color_fun");
+    JSWrap(color_fun_link, GetID()+"color_fun_link");
+    JSWrap(tooltip_display, GetID()+"tooltip_display");
+    JSWrap(get_x, GetID()+"get_x");
+    JSWrap(get_y, GetID()+"get_y");
+    delete tip;
+    tip = new D3::ToolTip(GetID()+"tooltip_display");
+    D3::Selection legend = GetSVG()->Append("svg");
+
+
+    legend.SetAttr("x", 1000).SetAttr("y", 0).SetAttr("width", 2500).SetAttr("height", 2500);
+
+    emp::vector<LegendNode> legend_data(grid_width*grid_height);
+    for (int i = 0; i < grid_width*grid_height; ++i) {
+      legend_data[i].loc(i);
+    }
+
+    legend.SelectAll("rect").Data(legend_data)
+                            .EnterAppend("rect")
+                            .SetStyle("fill", GetID()+"color_fun")
+                            .SetStyle("stroke", GetID()+"color_fun")
+                            .SetStyle("stroke-width", 1)
+                            .SetAttr("width", 25)
+                            .SetAttr("height", 25)
+                            .SetAttr("x", GetID()+"get_x")
+                            .SetAttr("y", GetID()+"get_y");
+  }
+
 };
 
 }

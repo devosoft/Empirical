@@ -29,6 +29,7 @@ template <typename org_ptr>
 struct Node {
   Node* parent;
   int id;
+  int loc;
   bool alive;
   org_ptr genome;
   emp::vector<Node*> offspring;
@@ -104,6 +105,7 @@ namespace evo{
       nodes[0].id = 0;
       nodes[0].parent = &nodes[0];
       nodes[0].alive = false;
+      nodes[0].loc = -1;
 
       std::function<void(int)> RecordParentFun = [this] (int id){
         RecordParent(id);
@@ -165,6 +167,7 @@ namespace evo{
     //we can translate their ids from the World to ids within the lineage
     //tracker
     void TrackPlacement(int pos) {
+      nodes[next_org_id].loc = pos;
 
       if (separate_generations && !inject){
         if (pos >= new_generation.size()) {
@@ -278,6 +281,8 @@ namespace evo{
       } else {
         ss << "false";
       }
+      ss << ", \"loc\":";
+      ss << to_string(node->loc);
       ss << ", \"persist\":false, \"genome\":\"";
       if (node->genome != nullptr) {
         ss << to_string(*(node->genome));
@@ -347,6 +352,7 @@ namespace evo{
       nodes[0].id = 0;
       nodes[0].parent = &nodes[0];
       nodes[0].alive = false;
+      nodes[0].loc = -1;
 
       std::function<void(int)> RecordParentFun = [this] (int id){
         RecordParent(id);
@@ -395,6 +401,8 @@ namespace evo{
     void TrackPlacement(int pos) {
 
       //Once things can die we'll need something better here
+
+      nodes[next_org_id].loc = pos;
 
       //This org is no longer alive
       if (generation_since_update.size() <= pos){

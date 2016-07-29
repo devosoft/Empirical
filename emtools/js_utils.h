@@ -178,7 +178,6 @@ namespace emp {
 	    //Get variable name and type for this member variable
 	    std::string var_name = values[j].var_names[i];
 	    std::string type_string = map_type_names[values[j].var_types[i].name()];
-
 	    //Make sure member variable is an allowed type
 	    emp_assert((map_type_names.find(values[j].var_types[i].name())	\
 		    != map_type_names.end()));
@@ -282,41 +281,6 @@ namespace emp {
     }
   }
 
-  //This version of the function handles nested std::vectors with recursive calls
-  //until a non-array type is found.
-  template<typename T>
-  void pass_array_to_javascript(std::vector<std::vector<T> > \
-		values, emp::vector<int> recursive_el = emp::vector<int>()) {
-
-    //Initialize if this is the first call to this function
-    if (recursive_el.size() == 0) {
-      EM_ASM({emp_i.__incoming_array = [];});
-    }
-
-    //Append empty arrays to array that we are currently handling in recursion
-    EM_ASM_ARGS({
-	  var curr_array = emp_i.__incoming_array;
-	  var depth = 0;
-	  while (curr_array.length > 0) {
-	    var next_index = getValue($0+(depth*4), "i32");
-        depth += 1;
-        curr_array = curr_array[next_index];
-	  }
-      for (i=0; i<$1; i++) {
-	    curr_array.push([]);
-      }
-    }, recursive_el.data(), values.size());
-
-    //Make recursive calls - recursive_els specifies coordinates of array we're
-    //currently operating on
-    for (int i = 0; i<values.size(); i++) {
-      emp::vector<int> new_recursive_el (recursive_el);
-      new_recursive_el.push_back(i);
-      pass_array_to_javascript(values[i], new_recursive_el);
-    }
-  }
-
-
   //This function lets you pass an array from javascript to C++!
   //It takes a reference to the array as an argument and populates it
   //with the contents of emp.__outgoing_array.
@@ -364,38 +328,6 @@ namespace emp {
   //Pass outgoing array to a vector (appends to the end of the given vector)
   template <typename T>
   void pass_vector_to_cpp(emp::vector<T> & arr, bool recurse = false) {
-
-    //Figure out type stuff
-    std::map<std::string, std::string> map_type_names =\
-      get_type_to_string_map();
-    emp_assert((map_type_names.find(typeid(T).name()) != map_type_names.end()));
-    int type_size = sizeof(T);
-    std::string type_string = map_type_names[typeid(T).name()];
-
-    //Write emp.__outgoing_array contents to a buffer
-    T * buffer = (T*) EM_ASM_INT({
-	  var buffer = Module._malloc(emp_i.__outgoing_array.length*$0);
-
-	  for (i=0; i<emp_i.__outgoing_array.length; i++) {
-	    setValue(buffer+(i*$0), emp_i.__outgoing_array[i],\
-		   Pointer_stringify($1));
-	  }
-
-      return buffer;
-    }, type_size, type_string.c_str());
-
-    //Populate array from buffer
-    for (int i=0; i<EM_ASM_INT_V({return emp_i.__outgoing_array.length}); i++) {
-      arr.push_back(*(buffer + i));
-    }
-
-    //Free the memory we allocated in Javascript
-    free(buffer);
-  }
-
-  //Pass outgoing array to a vector (appends to the end of the given vector)
-  template <typename T>
-  void pass_vector_to_cpp(std::vector<T> & arr, bool recurse = false) {
 
     //Figure out type stuff
     std::map<std::string, std::string> map_type_names =\

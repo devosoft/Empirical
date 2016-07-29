@@ -16,6 +16,23 @@ struct JSDataObject {
     )
 };
 
+struct NestedJSDataObject {
+    EMP_BUILD_INTROSPECTIVE_TUPLE(
+        JSDataObject, obj1,
+        JSDataObject, obj2,
+        JSDataObject, obj3
+    )
+};
+
+struct DoubleNestedJSDataObject {
+    EMP_BUILD_INTROSPECTIVE_TUPLE(
+        NestedJSDataObject, obj1,
+        NestedJSDataObject, obj2,
+        NestedJSDataObject, obj3
+    )
+};
+
+
 void TestFun1(int w, int x, int y, double z) {
   emp::Alert(w + x*y*z);
 }
@@ -40,13 +57,24 @@ bool TestFun6(char in_char) {
   return in_char >= 'a' && in_char <= 'z';
 }
 
-//Test JSDataObject integration
+//Test user-defined JSON integration
 float TestFun7(JSDataObject d) {
   emp::Alert( d.val2() );
   emp::Alert( d.word() );
   emp::Alert( d.val() );
   return d.val2();
 }
+
+//Test recursive JSON objects
+void TestFun8(DoubleNestedJSDataObject d) {
+  //Should be 8.8
+  emp::Alert( d.obj2().obj2().val2() );
+  //should be "a"
+  emp::Alert( d.obj1().obj3().word() );
+  //Should be 7
+  emp::Alert( d.obj3().obj1().val() );
+}
+
 
 int main() {
 
@@ -59,9 +87,11 @@ int main() {
   uint32_t fun_id5 = emp::JSWrap(TestFun5, "TestName5", false);
   uint32_t fun_id6 = emp::JSWrap(TestFun6, "TestName6", false);
   uint32_t fun_id7 = emp::JSWrap(TestFun7, "TestName7", false);
+  uint32_t fun_id8 = emp::JSWrap(TestFun8, "TestName8", false);
   (void) fun_id4;
   (void) fun_id6;
   (void) fun_id7;
+  (void) fun_id8;
 
 
   double in1 = 4.5;
@@ -97,5 +127,10 @@ int main() {
   EM_ASM({
       emp.TestName7({val:5, word:"hi", val2:6.3});
     });
+
+  EM_ASM({
+      emp.TestName8( {obj1:{obj1:{val:1, word:"this", val2:6.3}, obj2:{val:2, word:"is", val2:6.3}, obj3:{val:3, word:"a", val2:6.3}},obj2:{obj1:{val:4, word:"lot", val2:6.3}, obj2:{val:5, word:"of", val2:8.8}, obj3:{val:6, word:"nested", val2:6.3}}, obj3:{obj1:{val:7, word:"json", val2:6.3}, obj2:{val:8, word:"objects", val2:6.3}, obj3:{val:9, word:"yay", val2:6.3}}});
+  });
+
 
 }

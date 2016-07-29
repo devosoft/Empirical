@@ -96,61 +96,91 @@ namespace emp {
   template <int ARG_ID, size_t SIZE, typename T> static void LoadArg(std::array<T, SIZE> & arg_var){
     EM_ASM_ARGS({emp_i.__outgoing_array = emp_i.cb_args[$0];}, ARG_ID);
     pass_array_to_cpp(arg_var);
-}
+  }
+
+  template <int ARG_ID, typename T> static void LoadArg(emp::vector<T> & arg_var){
+    EM_ASM_ARGS({emp_i.__outgoing_array = emp_i.cb_args[$0];}, ARG_ID);
+    pass_vector_to_cpp(arg_var);
+  }
 
   //Helper functions to load arguments from inside Javascript objects by name.
   template <int ARG_ID> static void LoadArg(int & arg_var, std::string var) {
-    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0][Pointer_stringify($1)];
-      }, ARG_ID, var.c_str());
+    arg_var = EM_ASM_INT({ return emp_i.curr_obj[Pointer_stringify($0)];
+      }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(bool & arg_var, std::string var) {
-    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0][Pointer_stringify($1)];
-      }, ARG_ID, var.c_str());
+    arg_var = EM_ASM_INT({ return emp_i.curr_obj[Pointer_stringify($0)];
+      }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(char & arg_var, std::string var) {
-    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0][Pointer_stringify($1)];
-      }, ARG_ID, var.c_str());
+    arg_var = EM_ASM_INT({ return emp_i.curr_obj[Pointer_stringify($0)];
+      }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(double & arg_var, std::string var) {
-    arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0][Pointer_stringify($1)];
-      }, ARG_ID, var.c_str());
+    arg_var = EM_ASM_DOUBLE({ return emp_i.curr_obj[Pointer_stringify($0)];
+      }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(float & arg_var, std::string var) {
-    arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0][Pointer_stringify($1)];
-      }, ARG_ID, var.c_str());
+    arg_var = EM_ASM_DOUBLE({ return emp_i.curr_obj[Pointer_stringify($0)];
+      }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(std::string & arg_var, std::string var) {
     char * tmp_var = (char *) EM_ASM_INT({
         return allocate(intArrayFromString(
-		emp_i.cb_args[$0][Pointer_stringify($1)]), 'i8', ALLOC_STACK);
-      }, ARG_ID, var.c_str());
+		emp_i.curr_obj[Pointer_stringify($0)]), 'i8', ALLOC_STACK);
+      }, var.c_str());
     arg_var = tmp_var;   // Free memory here?
+  }
+
+  template <typename JSON_TYPE, int ARG_ID, int FIELD>
+  struct LoadTuple;
+
+  //This needs to go before LoadTuple is defined, in case
+  //There are nested tuple structs
+  template <int ARG_ID, typename JSON_TYPE> static
+  typename std::enable_if<JSON_TYPE::n_fields != -1, void>::type
+  LoadArg(JSON_TYPE & arg_var, std::string var) {
+    //std::cout << "Loading " << var << " ARGNID: " << ARG_ID << std::endl;
+    //LoadArg<ARG_ID>(std::get<ARG_ID>(arg_var.emp__tuple_body));
+    EM_ASM_ARGS({
+      emp_i.object_queue.push(emp_i.curr_obj);
+      emp_i.curr_obj = emp_i.curr_obj[Pointer_stringify($0)];
+    }, var.c_str());
+    LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields> load_tuple = LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields>();
+    load_tuple.LoadJSDataArg(arg_var);
   }
 
   template <typename JSON_TYPE, int ARG_ID, int FIELD>
   struct LoadTuple {
     static void LoadJSDataArg(JSON_TYPE & arg_var) {
+    //std::cout << "LoadingJS " << arg_var.var_names[FIELD-1] << " FIeLd: " << FIELD-1 << std::endl;
       LoadArg<ARG_ID>(std::get<FIELD-1>(arg_var.emp__tuple_body), arg_var.var_names[FIELD-1]);
       LoadTuple<JSON_TYPE, ARG_ID, FIELD-1> load_tuple = LoadTuple<JSON_TYPE, ARG_ID, FIELD-1>();
       load_tuple.LoadJSDataArg(arg_var);
     }
-
   };
 
   template <typename JSON_TYPE, int ARG_ID>
   struct LoadTuple<JSON_TYPE, ARG_ID, 0> {
-    static void LoadJSDataArg(JSON_TYPE & arg_var) {;}
+    static void LoadJSDataArg(JSON_TYPE & arg_var) {
+        EM_ASM({emp_i.curr_obj = emp_i.object_queue.pop();});
+    }
   };
 
 
   template <int ARG_ID, typename JSON_TYPE> static
   typename std::enable_if<JSON_TYPE::n_fields != -1, void>::type
   LoadArg(JSON_TYPE & arg_var) {
+    //std::cout << "Loading ARGNID: " << ARG_ID << std::endl;
+    EM_ASM_ARGS({
+      emp_i.object_queue = [];
+      emp_i.curr_obj = emp_i.cb_args[$0];
+    }, ARG_ID);
     LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields> load_tuple = LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields>();
     load_tuple.LoadJSDataArg(arg_var);
   }
