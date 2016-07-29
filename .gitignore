@@ -69,3 +69,4 @@ examples/evo/replica.cc
 tests/StatsConfig.cfg
 examples/evo/Grid.cfg
 examples/evo/Mixed.cfg
+examples/evo/pool-exp
