@@ -20,7 +20,7 @@ namespace emp {
 
   class Citation {
   public:
-    enum CITE_TYPE { UNKNOWN=0, ARTICLE, BOOK, BOOKLET, CONFERENCE, IN_BOOK, IN_COLLECTION, MANUAL,
+    enum CITE_TYPE { ERROR=-1, UNKNOWN=0, ARTICLE, BOOK, BOOKLET, CONFERENCE, IN_BOOK, IN_COLLECTION, MANUAL,
                      MASTERS_THESIS, MISC, PHD_THESIS, PROCEEDINGS, TECH_REPORT, UNPUBLISHED };
   private:
     CITE_TYPE type;
@@ -51,7 +51,7 @@ namespace emp {
       return name_map;
     }
   public:
-    Citation() : type(UNKNOWN) { ; }
+    Citation(CITE_TYPE in_type=UNKNOWN) : type(in_type) { ; }
     Citation(const Citation &) = default;
     ~Citation() { ; }
 
@@ -75,8 +75,12 @@ namespace emp {
     template <class T> void SetStartPage(T && val) { SetVal("start_page", val); }
     template <class T> void SetEndPage(T && val) { SetVal("end_page", val); }
 
-    void SetType(std::string type) {
-      type = to_lower(type);       // <Make sure type is lowercase.
+    void SetType(CITE_TYPE in_type) { type = in_type; }
+    void SetType(std::string in_type) {
+      in_type = to_lower(in_type);       // <Make sure type is lowercase.
+      auto & name_map = GetNameMap();
+      if (name_map.find(in_type) == name_map.end()) type = ERROR;
+      else type = name_map[in_type];
     }
   };
 
