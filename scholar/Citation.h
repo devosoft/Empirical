@@ -8,6 +8,7 @@
 #ifndef EMP_CITATION_H
 #define EMP_CITATION_H
 
+#include <map>
 #include <set>
 #include <string>
 
@@ -20,15 +21,37 @@ namespace emp {
   class Citation {
   public:
     enum CITE_TYPE { UNKNOWN=0, ARTICLE, BOOK, BOOKLET, CONFERENCE, IN_BOOK, IN_COLLECTION, MANUAL,
-                     MASTERS_THESIS, MISC, PHD_THESIS, PROCEEDINGS, TECH_REPORT, UNPUBLISHED }
+                     MASTERS_THESIS, MISC, PHD_THESIS, PROCEEDINGS, TECH_REPORT, UNPUBLISHED };
   private:
+    CITE_TYPE type;
     emp::vector<Author> author_list;
     std::vector<std::string> notes;   // An optional note.
     std::set<std::string> keywords;   // Optional keywords.
 
     std::map<std::string, std::string> setting_map;
+
+    static std::map<std::string, CITE_TYPE> & GetNameMap() {
+      static std::map<std::string, CITE_TYPE> name_map;
+      if (name_map.size() == 0) {
+        name_map["unknown"] = UNKNOWN;
+        name_map["article"] = ARTICLE;
+        name_map["book"] = BOOK;
+        name_map["booklet"] = BOOKLET;
+        name_map["conference"] = CONFERENCE;
+        name_map["inbook"] = IN_BOOK;
+        name_map["incollection"] = IN_COLLECTION;
+        name_map["manual"] = MANUAL;
+        name_map["mastersthesis"] = MASTERS_THESIS;
+        name_map["misc"] = MISC;
+        name_map["phdthesis"] = PHD_THESIS;
+        name_map["proceedings"] = PROCEEDINGS;
+        name_map["techreport"] = TECH_REPORT;
+        name_map["unpublished"] = UNPUBLISHED;
+      }
+      return name_map;
+    }
   public:
-    Citation() { ; }
+    Citation() : type(UNKNOWN) { ; }
     Citation(const Citation &) = default;
     ~Citation() { ; }
 
@@ -39,7 +62,7 @@ namespace emp {
     void AddKeyword(const std::string & kw) { keywords.insert(kw); }
 
     template <class T> void SetVal(const std::string & setting, T && val) {
-      setting_map[setting] = to_string(val);
+      setting_map[to_lower(setting)] = to_string(val);
     }
 
     template <class T> void SetTitle(T && val) { SetVal("title", val); }
@@ -51,6 +74,10 @@ namespace emp {
     template <class T> void SetMonth(T && val) { SetVal("month", val); }
     template <class T> void SetStartPage(T && val) { SetVal("start_page", val); }
     template <class T> void SetEndPage(T && val) { SetVal("end_page", val); }
+
+    void SetType(std::string type) {
+      type = to_lower(type);       // <Make sure type is lowercase.
+    }
   };
 
 };
