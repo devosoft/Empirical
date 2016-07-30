@@ -24,9 +24,9 @@ namespace emp {
       : first_name(first), last_name(last) { ; }
     Author(const std::string & last)
       : last_name(last) { ; }
-    Author(const Author &) = delete;
+    Author(const Author &) = default;
     ~Author() { ; }
-    Author & operator=(const Author &) = delete;
+    Author & operator=(const Author &) = default;
 
     bool operator==(const Author & other) const {
       return (first_name == other.first_name) &&
