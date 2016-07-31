@@ -17,6 +17,11 @@
 
 namespace emp {
 
+  static const std::string & empty_string() {
+    static std::string empty = "";
+    return empty;
+  }
+
   static std::string to_escaped_string(char value) {
     // Start by quickly returning a string if it's easy.
     std::stringstream ss;
