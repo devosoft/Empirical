@@ -25,7 +25,7 @@ namespace emp {
   private:
     CITE_TYPE type;
     emp::vector<Author> author_list;
-    std::vector<std::string> notes;   // An optional note.
+    emp::vector<std::string> notes;   // An optional note.
     std::set<std::string> keywords;   // Optional keywords.
 
     std::map<std::string, std::string> setting_map;
@@ -54,8 +54,23 @@ namespace emp {
     Citation(CITE_TYPE in_type=UNKNOWN) : type(in_type) { ; }
     Citation(const Citation &) = default;
     ~Citation() { ; }
-
     Citation & operator=(const Citation &) = default;
+
+    CITE_TYPE GetType() const { return type; }
+    const emp::vector<Author> & GetAuthors() const { return author_list; }
+    const emp::vector<std::string> & GetNotes() const { return notes; }
+    const std::set<std::string> & GetKeywords() const { return keywords; }
+    const bool HasKeyword(const std::string & kw) const {
+      return keywords.find(kw) != keywords.end();
+    }
+
+    const std::string & GetVal(const std::string & setting) const {
+      const auto & setting_it = setting_map.find(setting);
+      if (setting_it == setting_map.end()) return emp::empty_string();
+      return setting_it->second;
+    }
+
+    const std::string & GetTitle() { return GetVal("title"); }
 
     void AddAuthor(const Author & author) { author_list.push_back(author); }
     void AddNote(const std::string & note) { notes.push_back(note); }
