@@ -70,7 +70,15 @@ namespace emp {
       return setting_it->second;
     }
 
-    const std::string & GetTitle() { return GetVal("title"); }
+    const std::string & GetTitle() const { return GetVal("title"); }
+    const std::string & GetJournal() const { return GetVal("journal"); }      // If in journal
+    const std::string & GetBookTitle() const { return GetVal("book_title"); } // If in book
+    const std::string & GetVolume() const { return GetVal("volume"); }
+    const std::string & GetYear() const { return GetVal("year"); }
+    const std::string & GetNumber() const { return GetVal("number"); }
+    const std::string & GetMonth() const { return GetVal("month"); }
+    const std::string & GetStartPage() const { return GetVal("start_page"); }
+    const std::string & GetEndPage() const { return GetVal("end_page"); }
 
     void AddAuthor(const Author & author) { author_list.push_back(author); }
     void AddNote(const std::string & note) { notes.push_back(note); }
