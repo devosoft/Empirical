@@ -12,6 +12,7 @@
 #include <set>
 #include <string>
 
+#include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
 #include "../tools/vector.h"
 #include "Author.h"
@@ -65,9 +66,7 @@ namespace emp {
     }
 
     const std::string & GetVal(const std::string & setting) const {
-      const auto & setting_it = setting_map.find(setting);
-      if (setting_it == setting_map.end()) return emp::empty_string();
-      return setting_it->second;
+      return emp::Find(setting_map, setting, emp::empty_string());
     }
 
     const std::string & GetTitle() const { return GetVal("title"); }
