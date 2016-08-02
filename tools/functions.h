@@ -10,9 +10,7 @@
 #include <ctime>
 #include <functional>
 #include <initializer_list>
-#include <map>
-#include <string>
-#include <sstream>
+#include <iostream>
 #include <type_traits>
 #include <vector>
 
@@ -89,25 +87,10 @@ namespace emp {
   }
 
 
-  // The following two functions are from:
-  // http://stackoverflow.com/questions/5056645/sorting-stdmap-using-value
-  template<typename A, typename B> constexpr std::pair<B,A> flip_pair(const std::pair<A,B> &p)
-  {
-    return std::pair<B,A>(p.second, p.first);
-  }
-
-  template<typename A, typename B> std::multimap<B,A> flip_map(const std::map<A,B> &src)
-  {
-    std::multimap<B,A> dst;
-    for (const auto & x : src) dst.insert( flip_pair(x) );
-    return dst;
-  }
-
-
   // Build a function to determine the size of a built-in array.
   template <typename T, size_t N>
   constexpr size_t size(T (&)[N]) { return N; }
-  
+
 }
 
 #endif
