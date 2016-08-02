@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2015-2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -290,6 +290,7 @@ namespace web {
       TableInfo & operator=(const TableInfo &) = delete;   // No copies of INFO allowed
       virtual ~TableInfo() { ; }
 
+      std::string TypeName() const override { return "TableInfo"; }
       virtual bool IsTableInfo() const override { return true; }
 
       void Resize(int new_rows, int new_cols) {
@@ -724,8 +725,6 @@ namespace web {
     virtual ~Table() { ; }
 
     using INFO_TYPE = internal::TableInfo;
-
-    bool IsTable() const override { return true; }
 
     int GetNumCols() const { return Info()->col_count; }
     int GetNumRows() const { return Info()->row_count; }

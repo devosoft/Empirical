@@ -1,0 +1,54 @@
+OPTION 0: All lines begin with a clear command; $ translates a var to its contents.
+
+       set WORLD_X   1000
+       set WORLD_Y   1000
+       set CAPACITY  0.01
+
+       set MAX_ORGS  ($WOLRD_X * $WORLD_Y * $CAPACITY)
+
+       event trigger=immediate action=Inject filename=default-heads.org
+
+       set CONFIG_DIR ../config
+       include $CONFIG_DIR /opt1-events.cfg
+
+
+OPTION 1: Use a colon instead of "set", objects in parens with configuration.
+
+       WORLD_X:   1000
+       WORLD_Y:   1000
+       CAPACITY:  0.01
+
+       MAX_ORGS:  ($WOLRD_X * $WORLD_Y * $CAPACITY)
+
+       event { trigger:immediate ; action:Inject ; filename:default-heads.org }
+
+       CONFIG_DIR: ../config
+       include $CONFIG_DIR + "/opt1-events.cfg"
+
+
+OPTION 2: Equals for assignments; strings in quotes, so vars don't need $ to translate
+
+       WORLD_X = 1000
+       WORLD_Y = 1000
+       CAPACITY = 0.01
+
+       MAX_ORGS = WOLRD_X * WORLD_Y * CAPACITY
+
+       event { trigger="immediate" ; action="Inject" ; filename="default-heads.org" }
+
+       CONFIG_DIR = "../config"
+       include CONFIG_DIR + "/opt1-events.cfg"
+
+
+OPTION 3: 
+
+       WORLD_X = 1000
+       WORLD_Y = 1000
+       CAPACITY = 0.01
+
+       MAX_ORGS = WOLRD_X * WORLD_Y * CAPACITY
+
+       events.init = { trigger="immediate" ; action="Inject" ; filename="default-heads.org" }
+
+       CONFIG_DIR = "../config"
+       include CONFIG_DIR + "/opt1-events.cfg"

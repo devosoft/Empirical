@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2015-2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -52,26 +52,28 @@ namespace web {
       bool append_ok;                            // Can we add more children?
       std::map<std::string, Widget> widget_dict; // By-name lookup for child widgets
 
-      
+
       SlateInfo(const std::string & in_id="")
         : internal::WidgetInfo(in_id), scroll_top(0.0), append_ok(true) { ; }
       SlateInfo(const SlateInfo &) = delete;               // No copies of INFO allowed
       SlateInfo & operator=(const SlateInfo &) = delete;   // No copies of INFO allowed
       virtual ~SlateInfo() { ; }
 
+      std::string TypeName() const override { return "SlateInfo"; }
+
       virtual bool IsSlateInfo() const override { return true; }
 
-      
+
       bool IsRegistered(const std::string & test_name) const {
         return (widget_dict.find(test_name) != widget_dict.end());
       }
-    
+
       Widget & GetRegistered(const std::string & find_name) {
         emp_assert(IsRegistered(find_name), find_name, widget_dict.size());
         return widget_dict[find_name];
       }
-      
-      void Register_recurse(Widget & new_widget) override { 
+
+      void Register_recurse(Widget & new_widget) override {
         emp_assert(IsRegistered(new_widget.GetID()) == false, new_widget.GetID());
         widget_dict[new_widget.GetID()] = new_widget;     // Track widget by name
         if (parent) parent->Register_recurse(new_widget); // Also register in parent, if available
@@ -87,7 +89,7 @@ namespace web {
         for (Widget & child : m_children) regestrar->Register(child);
       }
 
-      void Unregister_recurse(Widget & old_widget) override { 
+      void Unregister_recurse(Widget & old_widget) override {
         emp_assert(IsRegistered(old_widget.GetID()) == true, old_widget.GetID());
         widget_dict.erase(old_widget.GetID());
         if (parent) parent->Unregister_recurse(old_widget); // Unregister in parent, if available
@@ -107,7 +109,7 @@ namespace web {
         for (Widget & child : m_children) Unregister(child);
         m_children.resize(0);
       }
-      
+
       void AddChild(Widget in) {
         // If the inserted widget is already active, remove it from its old position.
         emp_assert(in->parent == nullptr && "Cannot insert widget if already has parent!", in->id);
@@ -137,7 +139,7 @@ namespace web {
         internal::WidgetInfo::DoActivate(top_level);
       }
 
-      
+
       // Return a text element for appending.  Use the last element unless there are no elements,
       // the last element is not text, or it is not appendable (instead, build a new one).
       web::Text & GetTextWidget() {
@@ -149,7 +151,9 @@ namespace web {
         }
         return (Text &) m_children.back();
       }
-      
+
+      bool AppendOK() const override { return append_ok; }
+      void PreventAppend() override { append_ok = false; }
 
       // Add additional children on to this element.
       Widget Append(const std::string & text) override {
@@ -160,13 +164,13 @@ namespace web {
         if (!append_ok) return ForwardAppend(in_fun);
         return GetTextWidget() << in_fun;
       }
-      
+
       Widget Append(Widget info) override {
         if (!append_ok) return ForwardAppend(info);
         AddChild(info);
         return info;
       }
-      
+
       // All derived widgets must suply a mechanism for providing associated HTML code.
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");       // Clear the current text.
@@ -178,7 +182,7 @@ namespace web {
         }
         HTML << "</div>";
       }
-      
+
 
       void ReplaceHTML() override {
         // Replace Slate's HTML...
@@ -236,31 +240,27 @@ namespace web {
     Slate(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsSlateInfo()); }
     ~Slate() { ; }
 
-    virtual bool IsSlate() const override { return true; }
     using INFO_TYPE = internal::SlateInfo;
-   
-    bool AppendOK() const override { return Info()->append_ok; }
-    void PreventAppend() override { Info()->append_ok = false; }
 
     double ScrollTop() const { return Info()->scroll_top; }
     Slate & ScrollTop(double in_top) { Info()->scroll_top = in_top; return *this; }
-    
+
     void ClearChildren() {
       if (info) Info()->ClearChildren();
     }
-    
+
     bool HasChild(const Widget & test_child) const {
       if (!info) return false;
       for (const Widget & c : Info()->m_children) if (c == test_child) return true;
       return false;
     }
-    
+
     void Deactivate(bool top_level) override {
       // Deactivate children before this node.
       for (auto & child : Info()->m_children) child.Deactivate(false);
       Widget::Deactivate(top_level);
     }
-    
+
     Widget & Find(const std::string & test_name) {
       emp_assert(info);
       return Info()->GetRegistered(test_name);

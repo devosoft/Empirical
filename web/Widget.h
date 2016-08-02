@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2015-2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -99,19 +99,18 @@ namespace web {
 
     bool IsNull() const { return info == nullptr; }
 
+    // Some debugging helpers...
+    std::string InfoTypeName() const;
+
     bool IsInactive() const;
     bool IsWaiting() const;
     bool IsFrozen() const;
     bool IsActive() const;
 
-    virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
-    virtual void PreventAppend() { emp_assert(false); } // This isn't meaningful to most widgets.
+    bool AppendOK() const;
+    void PreventAppend();
 
-    virtual bool IsSlate() const { return false; }
-    virtual bool IsTable() const { return false; }
-    virtual bool IsText() const { return false; }
-
-    // Checks to see if this widget can be converted to other types...
+    // Checks to see if this widget can be trivially converted to other types...
     bool ButtonOK() const;
     bool CanvasOK() const;
     bool ImageOK() const;
@@ -119,6 +118,10 @@ namespace web {
     bool SlateOK() const;
     bool TableOK() const;
     bool TextOK() const;
+
+    bool IsSlate() const { return SlateOK(); }
+    bool IsTable() const { return TableOK(); }
+    bool IsText() const { return TextOK(); }
 
     std::string GetID() const;
 
@@ -194,6 +197,9 @@ namespace web {
         EMP_TRACK_DESTRUCT(WebWidgetInfo);
       }
 
+      // Some debugging helpers...
+      virtual std::string TypeName() const { return "WidgetInfo base"; }
+
       virtual bool IsButtonInfo() const { return false; }
       virtual bool IsCanvasInfo() const { return false; }
       virtual bool IsImageInfo() const { return false; }
@@ -237,6 +243,8 @@ namespace web {
         if (top_level) ReplaceHTML();   // Print full contents to document.
       }
 
+      virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
+      virtual void PreventAppend() { emp_assert(false, TypeName()); } // Only for appendable widgets.
 
       // By default, elements should forward unknown appends to their parents.
       virtual Widget Append(const std::string & text) { return ForwardAppend(text); }
@@ -328,6 +336,8 @@ namespace web {
     EMP_TRACK_DESTRUCT(WebWidget);
   }
 
+  std::string Widget::InfoTypeName() const { if (IsNull()) return "NULL"; return info->TypeName(); }
+
   Widget & Widget::SetInfo(WidgetInfo * in_info) {
     // If the widget is already set correctly, stop here.
     if (info == in_info) return *this;
@@ -349,6 +359,9 @@ namespace web {
   bool Widget::IsWaiting() const { if (!info) return false; return info->state == WAITING; }
   bool Widget::IsFrozen() const { if (!info) return false; return info->state == FROZEN; }
   bool Widget::IsActive() const { if (!info) return false; return info->state == ACTIVE; }
+
+  bool Widget::AppendOK() const { if (!info) return false; return info->AppendOK(); }
+  void Widget::PreventAppend() { emp_assert(info); info->PreventAppend(); }
 
   std::string Widget::GetID() const { return info ? info->id : "(none)"; }
 
