@@ -186,9 +186,9 @@ namespace evo {
     void SetupWorld(const std::string & world_name) {
       this->pop_name = world_name;
       SetupCallbacks(callbacks);
-      popM.SetRandom(random_ptr);
       lineageM.Setup(this);
       statsM.Setup(this);
+      popM.Setup(random_ptr);
     }
 
   public:
