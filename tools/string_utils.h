@@ -17,7 +17,7 @@
 
 namespace emp {
 
-  static const std::string & empty_string() {
+  static inline const std::string & empty_string() {
     static std::string empty = "";
     return empty;
   }
