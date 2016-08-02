@@ -79,23 +79,27 @@ namespace emp {
     const std::string & GetStartPage() const { return GetVal("start_page"); }
     const std::string & GetEndPage() const { return GetVal("end_page"); }
 
-    void AddAuthor(const Author & author) { author_list.push_back(author); }
-    void AddNote(const std::string & note) { notes.push_back(note); }
-    void AddKeyword(const std::string & kw) { keywords.insert(kw); }
+    Citation & AddAuthor(const Author & author) { author_list.push_back(author); return *this; }
+    template <typename... ARGS>
+    Citation & AddAuthor(ARGS &&... args) { return AddAuthor(Author(std::forward<ARGS>(args)...)); }
+    Citation & AddNote(const std::string & note) { notes.push_back(note); return *this; }
+    Citation & AddKeyword(const std::string & kw) { keywords.insert(kw); return *this; }
 
-    template <class T> void SetVal(const std::string & setting, T && val) {
+    template <class T> Citation & SetVal(const std::string & setting, T && val) {
       setting_map[to_lower(setting)] = to_string(val);
+      return *this;
     }
 
-    template <class T> void SetTitle(T && val) { SetVal("title", val); }
-    template <class T> void SetJournal(T && val) { SetVal("journal", val); }      // If in journal
-    template <class T> void SetBookTitle(T && val) { SetVal("book_title", val); } // If in book
-    template <class T> void SetVolume(T && val) { SetVal("volume", val); }
-    template <class T> void SetYear(T && val) { SetVal("year", val); }
-    template <class T> void SetNumber(T && val) { SetVal("number", val); }
-    template <class T> void SetMonth(T && val) { SetVal("month", val); }
-    template <class T> void SetStartPage(T && val) { SetVal("start_page", val); }
-    template <class T> void SetEndPage(T && val) { SetVal("end_page", val); }
+    template <class T> Citation & SetTitle(T && val) { return SetVal("title", val); }
+    template <class T> Citation & SetJournal(T && val) { return SetVal("journal", val); }      // If in journal
+    template <class T> Citation & SetBookTitle(T && val) { return SetVal("book_title", val); } // If in book
+    template <class T> Citation & SetVolume(T && val) { return SetVal("volume", val); }
+    template <class T> Citation & SetYear(T && val) { return SetVal("year", val); }
+    template <class T> Citation & SetNumber(T && val) { return SetVal("number", val); }
+    template <class T> Citation & SetMonth(T && val) { return SetVal("month", val); }
+    template <class T> Citation & SetStartPage(T && val) { return SetVal("start_page", val); }
+    template <class T> Citation & SetEndPage(T && val) { return SetVal("end_page", val); }
+    template <class T> Citation & SetPages(T && p1, T && p2) { SetStartPage(p1); return SetEndPage(p2); }
 
     void SetType(CITE_TYPE in_type) { type = in_type; }
     void SetType(std::string in_type) {
