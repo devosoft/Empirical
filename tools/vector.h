@@ -4,6 +4,11 @@
 //
 //  This class is a drop-in wrapper for std::vector, adding on bounds checking.
 //  If EMP_NDEBUG is set then it reverts back to std::vector.
+//
+//
+//  Developer Notes:
+//   * Need an automatic conversion from emp::vector to std::vector and back to interface with
+//     non-empirical code.
 
 
 #ifndef EMP_VECTOR_H
