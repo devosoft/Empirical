@@ -107,7 +107,7 @@ namespace emp {
   // Build a function to determine the size of a built-in array.
   template <typename T, size_t N>
   constexpr size_t size(T (&)[N]) { return N; }
-  
+
 }
 
 #endif

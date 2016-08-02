@@ -457,7 +457,7 @@ namespace D3 {
 			this->id);
     }
 
-    void On(std::string type, std::string listener="null", bool capture=false){
+    Selection On(std::string type, std::string listener="null", bool capture=false){
 
       EM_ASM_ARGS({
 	    var in_string = Pointer_stringify($2);
@@ -477,6 +477,8 @@ namespace D3 {
 	    }
 
       }, this->id, type.c_str(), listener.c_str(), capture);
+
+      return (*this);
     }
 
     std::string GetText(){
@@ -653,6 +655,12 @@ namespace D3 {
     void AddToolTip(ToolTip & tip) {
       SetupToolTip(tip);
       BindToolTipMouseover(tip);
+    }
+
+    void SetClassed(std::string classname, bool value) {
+      EM_ASM_ARGS({
+        js.objects[$0].classed(Pointer_stringify($1), $2);
+      }, this->id, classname.c_str(), value);
     }
 
     //TODO:

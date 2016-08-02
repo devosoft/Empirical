@@ -33,6 +33,9 @@ namespace emp {
     std::array<T, N> a;
 
   public:
+
+    using value_type = T;
+
     array() = default;
     array(const emp::array<T,N> &) = default;
     array(std::initializer_list<T> in_list) : a(in_list) { ; }
@@ -42,6 +45,8 @@ namespace emp {
     constexpr uint32_t size() const noexcept { return N; }
 
     emp::array<T,N> & operator=(const emp::array<T,N> &) = default;
+
+    operator std::array<T,N>() const {return a;};
 
     bool operator==(const emp::array<T,N> & in) const { return a == in.a; }
     bool operator!=(const emp::array<T,N> & in) const { return a != in.a; }

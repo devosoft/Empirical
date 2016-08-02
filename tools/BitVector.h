@@ -15,10 +15,10 @@
 #ifndef EMP_BIT_VECTOR_H
 #define EMP_BIT_VECTOR_H
 
-#include <assert.h>
 #include <iostream>
 #include <vector>
 
+#include "assert.h"
 #include "bitset_utils.h"
 #include "const_utils.h"
 #include "functions.h"
@@ -62,11 +62,11 @@ namespace emp {
     friend class BitProxy;
 
     inline static int FieldID(const int index)  {
-      assert(index >= 0);
+      emp_assert(index >= 0);
       return index / FIELD_BITS;
     }
     inline static int FieldPos(const int index) {
-      assert(index >= 0);
+      emp_assert(index >= 0);
       return index & (FIELD_BITS-1);
     }
 
@@ -83,7 +83,7 @@ namespace emp {
 
     // Helper: call SHIFT with positive number
     void ShiftLeft(const int shift_size) {
-      assert(shift_size > 0);
+      emp_assert(shift_size > 0);
       const int field_shift = shift_size / FIELD_BITS;
       const int bit_shift = shift_size % FIELD_BITS;
       const int bit_overflow = FIELD_BITS - bit_shift;
@@ -115,7 +115,7 @@ namespace emp {
 
     // Helper for calling SHIFT with negative number
     void ShiftRight(const int shift_size) {
-      assert(shift_size > 0);
+      emp_assert(shift_size > 0);
       const int field_shift = shift_size / FIELD_BITS;
       const int bit_shift = shift_size % FIELD_BITS;
       const int bit_overflow = FIELD_BITS - bit_shift;
@@ -141,7 +141,7 @@ namespace emp {
 
   public:
     BitVector(int in_num_bits=0, bool init_val=false) : num_bits(in_num_bits) {
-      assert(num_bits >= 0);
+      emp_assert(num_bits >= 0);
       bit_set = new field_type[NumFields()];
       if (init_val) SetAll(); else Clear();
     }
@@ -243,14 +243,14 @@ namespace emp {
     int GetSize() const { return num_bits; }
 
     bool Get(int index) const {
-      assert(index >= 0 && index < num_bits);
+      emp_assert(index >= 0 && index < num_bits);
       const int field_id = FieldID(index);
       const int pos_id = FieldPos(index);
       return (bit_set[field_id] & (static_cast<field_type>(1) << pos_id)) != 0;
     }
 
     void Set(int index, bool value) {
-      assert(index >= 0 && index < num_bits);
+      emp_assert(index >= 0 && index < num_bits);
       const int field_id = FieldID(index);
       const int pos_id = FieldPos(index);
       const field_type pos_mask = static_cast<field_type>(1) << pos_id;
@@ -260,14 +260,14 @@ namespace emp {
     }
 
     uint8_t GetByte(int index) const {
-      assert(index >= 0 && index < NumBytes());
+      emp_assert(index >= 0 && index < NumBytes());
       const int field_id = Byte2Field(index);
       const int pos_id = Byte2FieldPos(index);
       return (bit_set[field_id] >> pos_id) & 255U;
     }
 
     void SetByte(int index, uint8_t value) {
-      assert(index >= 0 && index < NumBytes());
+      emp_assert(index >= 0 && index < NumBytes());
       const int field_id = Byte2Field(index);
       const int pos_id = Byte2FieldPos(index);
       const field_type val_uint = value;
@@ -403,7 +403,7 @@ namespace emp {
     }
 
     int FindBit(const int start_pos) const {
-      assert(start_pos >= 0);
+      emp_assert(start_pos >= 0);
       if (start_pos >= num_bits) return -1;
       int field_id  = FieldID(start_pos);     // What field do we start in?
       const int field_pos = FieldPos(start_pos);    // What position in that field?

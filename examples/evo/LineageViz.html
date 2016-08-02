@@ -2,12 +2,13 @@
 <html>
 <head>
 <style>
+
 .d3-tip {
   line-height: 1;
   font-weight: bold;
   padding: 12px;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.8);
+  color: #000;
   border-radius: 2px;
 }
 
@@ -18,7 +19,7 @@
   font-size: 10px;
   width: 100%;
   line-height: 1;
-  color: rgba(0, 0, 0, 0.8);
+  color: rgba(255, 255, 255, 0.8);
   content: "\25BC";
   position: absolute;
   text-align: center;
@@ -30,13 +31,18 @@
   top: 100%;
   left: 0;
 }
+
+.faded {
+    opacity: .1;
+}
+
 </style>
 <script src="../web/jquery-1.11.2.min.js"></script>
 <script src="../../web/d3/d3.min.js" charset="utf-8"></script>
 <script src="../../web/d3/d3-tip.js" charset="utf-8"></script>
 
 </head>
-<body>
+<body bgcolor="#000000">
   <div id="lineage_viz"></div>
   <script type="text/javascript" src="LineageViz.js"></script>
 </body>

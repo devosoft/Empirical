@@ -57,11 +57,11 @@ namespace evo {
     double GetFitness( std::vector<uint32_t> states ) const {
       emp_assert(states.size() == N);
       double total = landscape[0][states[0]];
-      for (int i = 1; i < N; i++) total += GetFitness(i,states[i]);
+      for (uint32_t i = 1; i < N; i++) total += GetFitness(i,states[i]);
       return total;
     }
     double GetFitness(BitVector genome) const {
-      emp_assert(genome.GetSize() == N, genome.GetSize(), N, genome);
+      emp_assert((uint32_t) genome.GetSize() == N, genome.GetSize(), N, genome);
 
       // Use a double-length genome to easily handle wrap-around.
       genome.Resize(N*2);
@@ -69,7 +69,7 @@ namespace evo {
 
       double total = 0.0;
       uint32_t mask = emp::constant::MaskLow<uint32_t>(K+1);
-      for (int i = 0; i < N; i++) {
+      for (uint32_t i = 0; i < N; i++) {
         const uint32_t cur_val = (genome >> i).GetUInt(0) & mask;
 	      const double cur_fit = GetFitness(i, cur_val);
         total += cur_fit;

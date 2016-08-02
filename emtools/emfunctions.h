@@ -1,5 +1,5 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
+// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
+// Copyright (C) Michigan State University, 2015. It is licensed
 // under the MIT Software license; see doc/LICENSE
 
 #ifndef EMP_EM_FUNCTIONS_H
@@ -17,6 +17,7 @@ namespace emp {
 
   void DelayCall(const std::function<void()> & in_fun, int delay) {
     uint32_t callback_id = JSWrapOnce(in_fun); // Wrap and dispose when called.
+    (void)callback_id;
     EM_ASM_ARGS({
         window.setTimeout(function() { emp.Callback($0); }, $1);
       }, callback_id, delay);
@@ -26,6 +27,7 @@ namespace emp {
 
   void OnResize(const std::function<void()> & in_fun) {
     uint32_t callback_id = JSWrap(in_fun);
+    (void)callback_id;
     EM_ASM_ARGS({
         window.addEventListener("resize", function() { emp.Callback($0); });
       }, callback_id);
@@ -33,6 +35,7 @@ namespace emp {
 
   void OnResize(const std::function<void(int,int)> & in_fun) {
     uint32_t callback_id = JSWrap(in_fun);
+    (void)callback_id;
     EM_ASM_ARGS({
         window.addEventListener("resize", function() {
             emp.Callback($0, window.innerWidth, window.innerHeight);
@@ -51,14 +54,14 @@ namespace emp {
         $("body").first().css("background-color", color);
       }, color.c_str());
   }
-  
+
   void SetColor(const std::string color) {
     EM_ASM_ARGS({
         var color = Pointer_stringify($0);
         $("body").first().css("color", color);
       }, color.c_str());
   }
-  
+
   // These may already be in HTML5 for Emscripten
   void SetCursor(const char * type) {
     EM_ASM_ARGS({

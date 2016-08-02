@@ -170,13 +170,13 @@ namespace evo{
       nodes[next_org_id].loc = pos;
 
       if (separate_generations && !inject){
-        if (pos >= new_generation.size()) {
+        if (pos >= (int) new_generation.size()) {
           new_generation.resize(pos+1);
         }
         new_generation[pos] = next_org_id;
 
       } else {
-        if (pos >= generation_since_update.size()) {
+        if (pos >= (int) generation_since_update.size()) {
           generation_since_update.resize(pos+1);
         }
         nodes[generation_since_update[pos]].alive = false;
@@ -290,7 +290,7 @@ namespace evo{
         ss << "null";
       }
       ss << "\", \"children\":[";
-      for (int i=0; i < node->offspring.size(); ++i) {
+      for (size_t i=0; i < node->offspring.size(); ++i) {
         ss << node_to_json(node->offspring[i]);
         if (i < node->offspring.size()-1) {
           ss << ", ";
@@ -405,7 +405,7 @@ namespace evo{
       nodes[next_org_id].loc = pos;
 
       //This org is no longer alive
-      if (generation_since_update.size() <= pos){
+      if ( (int) generation_since_update.size() <= pos){
         generation_since_update.resize(pos+1);
       }
       Node<org_ptr>* curr = &(nodes[generation_since_update[pos]]);
@@ -452,13 +452,13 @@ namespace evo{
 
       //Update mapping of lineage tracker ids to locations in population
       if (separate_generations && !inject){
-        if (pos >= new_generation.size()) {
+        if (pos >= (int) new_generation.size()) {
           new_generation.resize(pos+1);
         }
         new_generation[pos] = next_org_id;
 
       } else {
-        if (pos >= generation_since_update.size()) {
+        if (pos >= (int) generation_since_update.size()) {
           generation_since_update.resize(pos+1);
         }
         generation_since_update[pos] = next_org_id;

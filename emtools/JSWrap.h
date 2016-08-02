@@ -131,6 +131,9 @@ namespace emp {
 
   template <int ARG_ID> static void LoadArg(std::string & arg_var, std::string var) {
     char * tmp_var = (char *) EM_ASM_INT({
+        if (emp_i.curr_obj[Pointer_stringify($0)] == null){
+          emp_i.curr_obj[Pointer_stringify($0)] = "undefined";
+        }
         return allocate(intArrayFromString(
 		emp_i.curr_obj[Pointer_stringify($0)]), 'i8', ALLOC_STACK);
       }, var.c_str());

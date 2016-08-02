@@ -88,7 +88,11 @@ int main() {
   uint32_t fun_id6 = emp::JSWrap(TestFun6, "TestName6", false);
   uint32_t fun_id7 = emp::JSWrap(TestFun7, "TestName7", false);
   uint32_t fun_id8 = emp::JSWrap(TestFun8, "TestName8", false);
+  (void) fun_id1;
+  (void) fun_id2;
+  (void) fun_id3;
   (void) fun_id4;
+  (void) fun_id5;
   (void) fun_id6;
   (void) fun_id7;
   (void) fun_id8;

@@ -183,7 +183,7 @@ namespace evo {
     void ConfigPop(int m, int b) { max_size = m; bottleneck_size = b; }
 
     int AddOrgBirth(ORG * new_org, int parent_pos) {
-      if (pop.size() >= max_size) {
+      if ((int) pop.size() >= max_size) {
         DoBottleneck(bottleneck_size);
         ++num_bottlenecks;
       }

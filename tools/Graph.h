@@ -7,9 +7,9 @@
 #ifndef EMP_GRAPH_H
 #define EMP_GRAPH_H
 
-#include <assert.h>
 #include <iostream>
 
+#include "assert.h"
 #include "BitVector.h"
 #include "vector.h"
 
@@ -55,53 +55,53 @@ namespace emp {
     }
 
     const BitVector & GetEdgeSet(int id) const {
-      assert(id >= 0 && id < (int) nodes.size());
+      emp_assert(id >= 0 && id < (int) nodes.size());
       return nodes[id].GetEdgeSet();
     }
     int GetDegree(int id) const {
-      assert(id >= 0 && id < (int) nodes.size());
+      emp_assert(id >= 0 && id < (int) nodes.size());
       return nodes[id].GetDegree();
     }
     int GetMaskedDegree(int id, const BitVector & mask) const {
-      assert(id >= 0 && id < (int) nodes.size());
+      emp_assert(id >= 0 && id < (int) nodes.size());
       return nodes[id].GetMaskedDegree(mask);
     }
 
 
     bool HasEdge(int from, int to) const {
-      assert(from >= 0 && from < (int) nodes.size() && to >= 0 && to < (int)nodes.size());
+      emp_assert(from >= 0 && from < (int) nodes.size() && to >= 0 && to < (int)nodes.size());
       return nodes[from].HasEdge(to);
     }
     void AddEdge(int from, int to) {
-      assert(from >= 0 && from < (int) nodes.size() && to >= 0 && to < (int) nodes.size());
+      emp_assert(from >= 0 && from < (int) nodes.size() && to >= 0 && to < (int) nodes.size());
       nodes[from].AddEdge(to);
     }
     void RemoveEdge(int from, int to) {
-      assert(from >= 0 && from < (int) nodes.size() && to >= 0 && to < (int) nodes.size());
+      emp_assert(from >= 0 && from < (int) nodes.size() && to >= 0 && to < (int) nodes.size());
       nodes[from].RemoveEdge(to);
     }
     void SetEdge(int from, int to, bool val) {
-      assert(from >= 0 && from < (int) nodes.size() && to >= 0 && to < (int) nodes.size());
+      emp_assert(from >= 0 && from < (int) nodes.size() && to >= 0 && to < (int) nodes.size());
       nodes[from].SetEdge(to, val);
     }
 
 
     bool HasEdgePair(int from, int to) const {
-      assert(from >= 0 && from < (int) nodes.size() && to >= 0 && to < (int) nodes.size());
+      emp_assert(from >= 0 && from < (int) nodes.size() && to >= 0 && to < (int) nodes.size());
       return nodes[from].HasEdge(to) && nodes[to].HasEdge(from);
     }
     void AddEdgePair(int from, int to) {
-      assert(from >= 0 && from < (int) nodes.size() && to >= 0 && to < (int) nodes.size());
+      emp_assert(from >= 0 && from < (int) nodes.size() && to >= 0 && to < (int) nodes.size());
       nodes[from].AddEdge(to);
       nodes[to].AddEdge(from);
     }
     void RemoveEdgePair(int from, int to) {
-      assert(from >= 0 && from < (int) nodes.size() && to >= 0 && to < (int) nodes.size());
+      emp_assert(from >= 0 && from < (int) nodes.size() && to >= 0 && to < (int) nodes.size());
       nodes[from].RemoveEdge(to);
       nodes[to].RemoveEdge(from);
     }
     void SetEdgePairs(int from, int to, bool val) {
-      assert(from >= 0 && from < (int) nodes.size() && to >= 0 && to < (int) nodes.size());
+      emp_assert(from >= 0 && from < (int) nodes.size() && to >= 0 && to < (int) nodes.size());
       nodes[from].SetEdge(to, val);
       nodes[to].SetEdge(from, val);
     }

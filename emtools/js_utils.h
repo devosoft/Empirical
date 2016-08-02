@@ -82,6 +82,7 @@ namespace emp {
       get_type_to_string_map();
     emp_assert((map_type_names.find(typeid(T).name()) != map_type_names.end()));
     int type_size = sizeof(T);
+    (void) type_size;
     std::string type_string = map_type_names[typeid(T).name()];
 
     //clear array, if this isn't a recursive call
@@ -172,8 +173,8 @@ namespace emp {
 	  }
     }, values.size(), recursive_el.data());
 
-    for (int j = 0; j<values.size(); j++) { //iterate over array
-      for (int i = 0; i<values[j].var_names.size(); i++) { //iterate over object members
+    for (std::size_t j = 0; j<values.size(); j++) { //iterate over array
+      for (std::size_t i = 0; i<values[j].var_names.size(); i++) { //iterate over object members
 
 	    //Get variable name and type for this member variable
 	    std::string var_name = values[j].var_names[i];
@@ -240,7 +241,7 @@ namespace emp {
 
     //Make recursive calls - recursive_els specifies coordinates of array we're
     //currently operating on
-    for (int i = 0; i<values.size(); i++) {
+    for (std::size_t i = 0; i<values.size(); i++) {
       emp::vector<int> new_recursive_el (recursive_el);
       new_recursive_el.push_back(i);
       pass_array_to_javascript(values[i], new_recursive_el);
@@ -274,7 +275,7 @@ namespace emp {
 
     //Make recursive calls - recursive_els specifies coordinates of array we're
     //currently operating on
-    for (int i = 0; i<values.size(); i++) {
+    for (std::size_t i = 0; i<values.size(); i++) {
       emp::vector<int> new_recursive_el (recursive_el);
       new_recursive_el.push_back(i);
       pass_array_to_javascript(values[i], new_recursive_el);
@@ -299,6 +300,7 @@ namespace emp {
       get_type_to_string_map();
     emp_assert((map_type_names.find(typeid(T).name()) != map_type_names.end()));
     int type_size = sizeof(T);
+    (void) type_size;
     std::string type_string = map_type_names[typeid(T).name()];
 
     //Make sure arrays have the same length
@@ -317,7 +319,7 @@ namespace emp {
     }, type_size, type_string.c_str());
 
     //Populate array from buffer
-    for (int i=0; i<arr.size(); i++) {
+    for (std::size_t i=0; i<arr.size(); i++) {
       arr[i] = *(buffer + i);
     }
 
@@ -334,6 +336,7 @@ namespace emp {
       get_type_to_string_map();
     emp_assert((map_type_names.find(typeid(T).name()) != map_type_names.end()));
     int type_size = sizeof(T);
+    (void) type_size;
     std::string type_string = map_type_names[typeid(T).name()];
 
     //Write emp.__outgoing_array contents to a buffer

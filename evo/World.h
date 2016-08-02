@@ -317,7 +317,7 @@ namespace evo {
     //all organisms that are not null
     emp::vector<int> GetValidOrgIndices(){
       emp::vector<int> valid_orgs(0);
-      for (int i = 0; i < popM.size(); i++){
+      for (int i = 0; i < (int) popM.size(); i++){
         if (this->IsOccupied(i)){
           valid_orgs.push_back(i);
         }
