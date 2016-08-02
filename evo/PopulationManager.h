@@ -47,9 +47,12 @@ namespace evo {
 
     uint32_t size() const { return pop.size(); }
     void resize(int new_size) { pop.resize(new_size); }
+    void clear() { pop.clear(); }
     int GetSize() const { return (int) pop.size(); }
 
     void SetRandom(Random * r) { random_ptr = r; }
+
+    void Setup(Random * r){ SetRandom(r); }
 
 
     void Print(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout,
@@ -130,6 +133,8 @@ namespace evo {
 
     static constexpr bool emp_has_separate_generations = true;
 
+    void Setup(){ ; }
+
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = next_pop.size();
       next_pop.push_back(new_org);
@@ -163,6 +168,7 @@ namespace evo {
     using PopulationManager_Base<ORG>::pop;
     using PopulationManager_Base<ORG>::random_ptr;
     using PopulationManager_Base<ORG>::DoBottleneck;
+    using PopulationManager_Base<ORG>::SetRandom;
 
     int max_size;
     int bottleneck_size;
@@ -175,6 +181,8 @@ namespace evo {
     int GetMaxSize() const { return max_size; }
     int GetBottleneckSize() const { return bottleneck_size; }
     int GetNumBottlnecks() const { return num_bottlenecks; }
+
+    void Setup(Random *r){ SetRandom(r); }
 
     void SetMaxSize(const int m) { max_size = m; }
     void SetBottleneckSize(const int b) { bottleneck_size = b; }
@@ -197,6 +205,7 @@ namespace evo {
   protected:
     using PopulationManager_Base<ORG>::pop;
     using PopulationManager_Base<ORG>::random_ptr;
+    using PopulationManager_Base<ORG>::SetRandom;
 
     int width;
     int height;
@@ -212,14 +221,17 @@ namespace evo {
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
 
+    void Setup(Random * r){SetRandom(r); }
+
     void ConfigPop(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }
 
     // Injected orgs go into a random position.
     int AddOrg(ORG * new_org) {
-      const int pos = random_ptr->GetInt((int) pop.size());
-      if (pop[pos]) delete pop[pos];
-      pop[pos] = new_org;
-      return pos;
+      emp::vector<int> empty_spots = GetValidOrgIndices();
+      const int pos = random_ptr->GetInt((int) empty_spots.size());
+      
+      pop[empty_spots[pos]] = new_org;
+      return empty_spots[pos];
     }
 
     // Newly born orgs go next to their parents.
@@ -238,6 +250,17 @@ namespace evo {
 
       return pos;
     }
+
+    emp::vector<int> GetValidOrgIndices(){
+      emp::vector<int> valid_orgs(0);
+      for (int i = 0; i < pop.size(); i++){
+        if (pop[i] == nullptr){
+          valid_orgs.push_back(i);
+        }
+      }
+      return valid_orgs;
+    }
+
 
     void Print(std::function<std::string(ORG*)> string_fun,
                std::ostream & os = std::cout,
@@ -275,15 +298,15 @@ namespace evo {
     using PopulationManager_Base<ORG>::SetRandom;
     using PopulationManager_Base<ORG>::GetSize;
 
-    int pool_count;                           // How many pools are in the population?
-    vector<int> pool_sizes;                   // How large is each pool?
-    std::map<int, vector<int> > connections;  // Which other pools can each position access?
-
-    int org_count;                            // orgs in vector              @CAO: What vector?
-    int r_upper;                              // random upper limit          @CAO: Limit of what?
-    int r_lower;                              // random lower limit
-    vector<int> pool_end;                     // end of each pool in array   @CAO: Last element?
-    double mig_rate;
+    int pool_count;                             //How many pools are in the population?
+    vector<int> pool_sizes;                     // How large is each pool?
+    std::map<int, vector<int> > connections;    // Which other pools can each position access?
+    int org_count = 0;                          // How many organisms have beeen inserted into the population?
+    int r_upper;                                // How large can a random pool size be?
+    int r_lower;                                // How small can a random pool size be?
+    vector<int> pool_end;                       // Where does the next pool begin? First pool begins at 0.
+    double mig_rate;                            // How often do organisms migrate to a connected pool?
+    vector<int> pool_id;
 
   public:
     PopulationManager_Pools() : org_count(0) { ; }
@@ -294,12 +317,11 @@ namespace evo {
     int GetUpper() const { return r_upper; }
     int GetLower() const { return r_lower; }
 
-    void Setup(Random * r) {
-      vector<int>* temp_sizes = new vector<int>;
-      std::map<int, vector<int> > temp_connect;
-      for (int i = 0; i < 5; i++) { temp_connect[i].resize(0); }  // @CAO: Why 5?  What is it?
+    void Setup(Random * r){
+        SetRandom(r);
+        vector<int>* temp_sizes = new vector<int>;
+        std::map<int, vector<int> > temp_connect;
 
-      SetRandom(r);
       ConfigPop(5, *temp_sizes, &temp_connect, 150, 10, 0.05, 200);
     }
 
@@ -312,6 +334,10 @@ namespace evo {
       r_lower = l;
       connections = *c;
       mig_rate = mg;
+      pool_end = {};
+      
+      vector<int> temp (pop_size, 0);
+      pool_id = temp;
 
       pop.resize(pop_size, nullptr);
 
@@ -320,7 +346,7 @@ namespace evo {
         while (true) {
           int pool_total = 0;
           for( int i = 0; i < pool_count - 1; i++){
-            pool_sizes.push_back(random_ptr->GetInt(r_lower, r_upper));
+            pool_sizes.push_back(40);
             pool_total += pool_sizes[i];
           }
 
@@ -349,11 +375,18 @@ namespace evo {
 
       // Divide World into pools
       int arr_size = 0;
+      int prev_size = 0;
+      int pool_num = 0;
       for (auto el : pool_sizes) {
         arr_size += el;
+        for( int i = prev_size; i < arr_size; i++){
+            pool_id[i] = pool_num;
+        }
+        prev_size = arr_size;
+        pool_num++;
         pool_end.push_back(arr_size);
       }
-
+      return;
     }
 
     // Injected orgs go into a random pool.
@@ -371,38 +404,30 @@ namespace evo {
         range_u = (int) pop.size();
       }
 
-      const int pos = (int) random_ptr->GetDouble(range_l, range_u);
+      const int pos = random_ptr->GetInt(range_l, range_u);
 
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
       org_count++;
-
       return pos;
     }
 
     // Newly born orgs have a chance to migrate to a connected pool.
     int AddOrgBirth(ORG * new_org, int parent_pos) {
-      int insert_pool = 0;  // Which pool should new org be born into?
+      int InsertPool = 0;  // Which pool should new org be born into?
 
       // Test if a migration should happen ; if so, determine new pool.
       const auto & parent_conns = connections[parent_pos];
       if (random_ptr->P(mig_rate) && parent_conns.size() > 0) {
         int conn_id = random_ptr->GetInt(0, parent_conns.size());
-        insert_pool = parent_conns[conn_id];
-
-        std::cout << "Crossing To: " << insert_pool << std::endl;  // @CAO: Remove?
-      }
-      else {
-        // @CAO: The below is inefficient.  Keep a chart like connections to look up in const time.
-        for (int i = 0; i < pool_end.size(); i++) {
-          if (parent_pos < pool_end[i]) { insert_pool = i; break; }
+        InsertPool = parent_conns[conn_id];
         }
-      }
+        else{ InsertPool = pool_id[parent_pos]; }
+      
+      int range_l = InsertPool ? pool_end[InsertPool-1] : 0;
+      int range_u = pool_end[InsertPool];
 
-      int range_l = insert_pool ? pool_end[insert_pool-1] : 0;
-      int range_u = pool_end[insert_pool];
-
-      const int pos = (int) random_ptr->GetDouble(range_l, range_u);  // @CAO Why GetDouble not GetInt?
+      const int pos = random_ptr->GetInt(range_l, range_u);
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
 
