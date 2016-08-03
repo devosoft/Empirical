@@ -20,8 +20,10 @@ int main()
   std::cout << EMP_STRINGIFY( EMP_PERMUTE(XYZ) ) << std::endl << std::endl;
   std::cout << EMP_STRINGIFY( EMP_PERMUTE(A,B) ) << std::endl << std::endl;
   std::cout << EMP_STRINGIFY( EMP_PERMUTE(1,2,3) ) << std::endl << std::endl;
-  std::cout << EMP_STRINGIFY( EMP_PERMUTE(a,b,c,d) ) << std::endl << std::endl;
-  std::cout << EMP_STRINGIFY( EMP_PERMUTE(v,w,x,y,z) ) << std::endl << std::endl;
+
+  // @CAO PERMUTE needs more work!
+  // std::cout << EMP_STRINGIFY( EMP_PERMUTE(a,b,c,d) ) << std::endl << std::endl;
+  // std::cout << EMP_STRINGIFY( EMP_PERMUTE(v,w,x,y,z) ) << std::endl << std::endl;
 
   // EMP_WRAP_EACH_1ARG(;testing, 1, 10, 20, 30);
   //
