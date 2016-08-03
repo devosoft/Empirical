@@ -86,9 +86,11 @@ namespace emp {
     const std::string & GetStartPage() const { return GetVal("start_page"); }
     const std::string & GetEndPage() const { return GetVal("end_page"); }
 
-    Citation & AddAuthor(const Author & author) { author_list.push_back(author); return *this; }
     template <typename... ARGS>
-    Citation & AddAuthor(ARGS &&... args) { return AddAuthor(Author(std::forward<ARGS>(args)...)); }
+    Citation & AddAuthor(ARGS &&... args) {
+      author_list.emplace_back(std::forward<ARGS>(args)...);
+      return *this;
+    }
     Citation & AddNote(const std::string & note) { notes.push_back(note); return *this; }
     Citation & AddKeyword(const std::string & kw) { keywords.insert(kw); return *this; }
 
