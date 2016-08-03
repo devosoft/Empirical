@@ -31,7 +31,7 @@ namespace emp {
 
     std::map<std::string, std::string> setting_map;
 
-    static std::map<std::string, CITE_TYPE> & GetNameMap() {
+    static const std::map<std::string, CITE_TYPE> & GetNameMap() {
       static std::map<std::string, CITE_TYPE> name_map;
       if (name_map.size() == 0) {
         name_map["unknown"] = UNKNOWN;
@@ -51,6 +51,13 @@ namespace emp {
       }
       return name_map;
     }
+
+    // Name map in opposite direction (enum -> name)
+    static const std::multimap<CITE_TYPE, std::string> & GetRNameMap() {
+      static const auto rname_map = emp::flip_map(GetNameMap());
+      return rname_map;
+    }
+
   public:
     Citation(CITE_TYPE in_type=UNKNOWN) : type(in_type) { ; }
     Citation(const Citation &) = default;
@@ -104,9 +111,10 @@ namespace emp {
     void SetType(CITE_TYPE in_type) { type = in_type; }
     void SetType(std::string in_type) {
       in_type = to_lower(in_type);       // <Make sure type is lowercase.
-      auto & name_map = GetNameMap();
-      if (name_map.find(in_type) == name_map.end()) type = ERROR;
-      else type = name_map[in_type];
+      const auto & name_map = GetNameMap();
+      auto map_it = name_map.find(in_type);
+      if (map_it == name_map.end()) type = ERROR;
+      else type = map_it->second;
     }
   };
 
