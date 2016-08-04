@@ -3,7 +3,15 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  Basic information about an author
+//  Basic information about an author.
+//
+//
+//  Developer notes:
+//  * Any number of middle names should be allowed
+//  * Prefixs (Dr., Prof., etc) and Suffixes (Jr., Sr., III, etc.) should be allowed.
+//  * Most parts of names can be auto-detected.
+//  * GetName() (with formatting) needs to be implemented (notes below)
+//  * Set functiions need to be added for precise configuration.
 
 #ifndef EMP_AUTHOR_H
 #define EMP_AUTHOR_H
@@ -77,6 +85,26 @@ namespace emp {
       if (HasLastName()) inits.push_back(last_name[0]);
       return inits;
     }
+
+    //  A generic GetName() function that takes a string to produce the final format.
+    //    F = first name     f = first initial
+    //    M = middle names   m = middle initials
+    //    L = last name      l = last initial
+    //    P = prefix         S = suffix
+    //    x = an empty breakpoint to ensure certain puctuation exists.
+    //
+    //  Allowable punctuation = [ ,.-:] and is associated with the prior name key, so it will
+    //  appear only if the name does (and in the case of the middle name, will appear with each).
+    //
+    //  For example, if the person's name is "Abraham Bartholomew Carmine Davidson" then...
+    //    GetName("FML") would return "Abraham Bartholomew Carmine Davidson"
+    //    GetName("fml") would return "ABCD"
+    //    GetName("L, fm") would return "Davidson, ABC"
+    //    GetName("f.m.x L") would return "A.B.C. Davidson"
+    //
+    //  Note that without the 'x', the space would be associated with all middle names:
+    //
+    //    GetName("f.m. L") would return "A.B. C. Davidson"
   };
 
 };
