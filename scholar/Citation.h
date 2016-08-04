@@ -8,6 +8,7 @@
 #ifndef EMP_CITATION_H
 #define EMP_CITATION_H
 
+#include <ostream>
 #include <map>
 #include <set>
 #include <string>
@@ -118,8 +119,59 @@ namespace emp {
       if (map_it == name_map.end()) type = ERROR;
       else type = map_it->second;
     }
+
+    // Printing helpers...
+    void PrintAuthors(std::ostream & out=std::cout) {
+      if (author_list.size() == 0) return;   // Stop if no authors.
+      out << author_list[0].GetReverseName();   // Print first author.
+
+      // Print middle authors...
+      for (int i = 1; i < author_list.size() - 1; i++) {
+        out << ", " << author_list[i].GetFullName();
+      }
+
+      // Print last author.
+      if (author_list.size() > 1) out << ", and " << author_list.back().GetFullName();
+    }
+
+    // By default, print a standard citation style.
+    void PrintERROR(std::ostream & out=std::cout) { out << "ERROR with printing citation."; }
+    void PrintUNKNOWN(std::ostream & out=std::cout) { (void) out; } // Dynamically guess type?
+    void PrintARTICLE(std::ostream & out=std::cout) { PrintAuthors(out); out << std::endl; }
+    void PrintBOOK(std::ostream & out=std::cout) { (void) out; }
+    void PrintBOOKLET(std::ostream & out=std::cout) { (void) out; }
+    void PrintCONFERENCE(std::ostream & out=std::cout) { (void) out; }
+    void PrintIN_BOOK(std::ostream & out=std::cout) { (void) out; }
+    void PrintIN_COLLECTION(std::ostream & out=std::cout) { (void) out; }
+    void PrintMANUAL(std::ostream & out=std::cout) { (void) out; }
+    void PrintMASTERS_THESIS(std::ostream & out=std::cout) { (void) out; }
+    void PrintMISC(std::ostream & out=std::cout) { (void) out; }
+    void PrintPHD_THESIS(std::ostream & out=std::cout) { (void) out; }
+    void PrintPROCEEDINGS(std::ostream & out=std::cout) { (void) out; }
+    void PrintTECH_REPORT(std::ostream & out=std::cout) { (void) out; }
+    void PrintUNPUBLISHED(std::ostream & out=std::cout) { (void) out; }
+
+    void Print(std::ostream & out=std::cout) {
+      switch (type) {
+        case ERROR: PrintERROR(out); break;
+        case UNKNOWN: PrintUNKNOWN(out); break;
+        case ARTICLE: PrintARTICLE(out); break;
+        case BOOK: PrintBOOK(out); break;
+        case BOOKLET: PrintBOOKLET(out); break;
+        case CONFERENCE: PrintCONFERENCE(out); break;
+        case IN_BOOK: PrintIN_BOOK(out); break;
+        case IN_COLLECTION: PrintIN_COLLECTION(out); break;
+        case MANUAL: PrintMANUAL(out); break;
+        case MASTERS_THESIS: PrintMASTERS_THESIS(out); break;
+        case MISC: PrintMISC(out); break;
+        case PHD_THESIS: PrintPHD_THESIS(out); break;
+        case PROCEEDINGS: PrintPROCEEDINGS(out); break;
+        case TECH_REPORT: PrintTECH_REPORT(out); break;
+        case UNPUBLISHED: PrintUNPUBLISHED(out); break;
+      }
+    }
   };
 
-};
+}
 
 #endif
