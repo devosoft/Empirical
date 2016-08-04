@@ -58,6 +58,14 @@ namespace emp {
       full_name += last_name;
       return full_name;
     }
+    std::string GetReverseName() const {
+      std::string full_name(last_name);
+      if (full_name.size() && HasFirstName()) full_name += ", ";
+      full_name += first_name;
+      if (full_name.size() && HasMiddleName()) full_name += " ";
+      full_name += middle_name;
+      return full_name;
+    }
 
     char GetFirstInitial() const { return HasFirstName() ? first_name[0] : 0; }
     char GetMiddleInitial() const { return HasMiddleName() ? middle_name[0] : 0; }
