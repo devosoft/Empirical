@@ -21,9 +21,11 @@ namespace emp {
 
   class Author {
   private:
+    std::string prefix;
     std::string first_name;
     emp::vector<std::string> middle_names;
     std::string last_name;
+    std::string suffix;
   public:
     Author(const std::string & first, const std::string & middle, const std::string & last)
       : first_name(first), last_name(last) { middle_names.push_back(middle); }
@@ -36,9 +38,9 @@ namespace emp {
     Author & operator=(const Author &) = default;
 
     bool operator==(const Author & other) const {
-      return (first_name == other.first_name) &&
+      return (prefix == other.prefix) && (first_name == other.first_name) &&
         (middle_names == other.middle_names) &&
-        (last_name == other.last_name);
+        (last_name == other.last_name) && (suffix == other.suffix);
     }
     bool operator!=(const Author & other) const { return !(*this == other); }
     bool operator<(const Author & other) const {
@@ -51,30 +53,41 @@ namespace emp {
         }
       }
       if (middle_names.size() < other.middle_names.size()) return true;
+      if (suffix != other.suffix) return (suffix < other.suffix);
+      if (prefix != other.prefix) return (prefix < other.prefix);
       return false; // Must be equal!
     }
     bool operator>(const Author & other) const { return other < *this; }
     bool operator>=(const Author & other) const { return !(*this < other); }
     bool operator<=(const Author & other) const { return !(*this > other); }
 
+    bool HasPrefix() const { return prefix.size(); }
     bool HasFirstName() const { return first_name.size(); }
     bool HasMiddleName() const { return middle_names.size(); }
     bool HasLastName() const { return last_name.size(); }
+    bool HasSuffix() const { return suffix.size(); }
 
+    const std::string & GetPrefix() const { return prefix; }
     const std::string & GetFirstName() const { return first_name; }
     const std::string & GetMiddleName(int id=0) const {
       if (middle_names.size() == 0) return emp::empty_string();
       return middle_names[id];
     }
     const std::string & GetLastName() const { return last_name; }
+    const std::string & GetSuffix() const { return suffix; }
+
     std::string GetFullName() const {
-      std::string full_name(first_name);
+      std::string full_name(prefix);
+      if (full_name.size() && HasFirstName()) full_name += " ";
+      full_name += last_name;
       for (const auto & middle_name : middle_names) {
         if (full_name.size()) full_name += " ";
         full_name += middle_name;
       }
       if (full_name.size() && HasLastName()) full_name += " ";
       full_name += last_name;
+      if (full_name.size() && HasSuffix()) full_name += " ";
+      full_name += suffix;
       return full_name;
     }
     std::string GetReverseName() const {
@@ -85,6 +98,8 @@ namespace emp {
         if (full_name.size()) full_name += " ";
         full_name += middle_name;
       }
+      if (full_name.size() && HasSuffix()) full_name += ", ";
+      full_name += suffix;
       return full_name;
     }
 
@@ -129,7 +144,10 @@ namespace emp {
 
 
 
-    Author & Clear() { first_name = ""; last_name=""; middle_names.resize(0); return *this; }
+    Author & Clear() {
+      prefix=""; first_name=""; last_name=""; middle_names.resize(0); suffix="";
+      return *this;
+    }
     Author & SetFirst(const std::string & str) { first_name = str; return *this; }
     Author & SetLast(const std::string & str) { last_name = str; return *this; }
     Author & AddMiddle(const std::string & str) { middle_names.push_back(str); return *this; }
