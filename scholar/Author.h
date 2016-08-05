@@ -10,7 +10,6 @@
 //  * Prefixs (Dr., Prof., etc) and Suffixes (Jr., Sr., III, etc.) should be allowed.
 //  * Most parts of names can be auto-detected.
 //  * GetName() (with formatting) needs to be implemented (notes below)
-//  * Set functiions need to be added for precise configuration.
 //  * Consider using ce_string for inputs?  And making other aspects const experession?
 
 #ifndef EMP_AUTHOR_H
@@ -89,13 +88,17 @@ namespace emp {
       return full_name;
     }
 
-    std::string GetFirstInitial() const { return HasFirstName() ? to_string(first_name[0]) : emp::empty_string(); }
+    std::string GetFirstInitial() const {
+      return HasFirstName() ? to_string(first_name[0]) : emp::empty_string();
+    }
     std::string GetMiddleInitials() const {
       std::string out;
       for (const auto & m : middle_names) out += m[0];
       return out;
     }
-    std::string GetLastInitial() const { return HasLastName() ? to_string(last_name[0]) : emp::empty_string(); }
+    std::string GetLastInitial() const {
+      return HasLastName() ? to_string(last_name[0]) : emp::empty_string();
+    }
     std::string GetInitials() const {
       std::string inits;
       inits += GetFirstInitial();
@@ -123,6 +126,13 @@ namespace emp {
     //  Note that without the 'x', the space would be associated with all middle names:
     //
     //    GetName("f.m. L") would return "A.B. C. Davidson"
+
+
+
+    Author & Clear() { first_name = ""; last_name=""; middle_names.resize(0); return *this; }
+    Author & SetFirst(const std::string & str) { first_name = str; return *this; }
+    Author & SetLast(const std::string & str) { last_name = str; return *this; }
+    Author & AddMiddle(const std::string & str) { middle_names.push_back(str); return *this; }
   };
 
 };
