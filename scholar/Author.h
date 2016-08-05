@@ -79,7 +79,7 @@ namespace emp {
     std::string GetFullName() const {
       std::string full_name(prefix);
       if (full_name.size() && HasFirstName()) full_name += " ";
-      full_name += last_name;
+      full_name += first_name;
       for (const auto & middle_name : middle_names) {
         if (full_name.size()) full_name += " ";
         full_name += middle_name;
