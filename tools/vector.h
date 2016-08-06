@@ -54,6 +54,9 @@ namespace emp {
     vector(const std::vector<T> & in) : v(in) { ; }         // Emergency fallback conversion.
     ~vector() = default;
 
+    operator std::vector<T> &() { return v; }
+    operator const std::vector<T> &() const { return v; }
+
     size_type size() const noexcept { return v.size(); }
     void resize(int new_size) { emp_assert(new_size >= 0, new_size); v.resize(new_size); }
     void resize(int new_size, const T & val) {
