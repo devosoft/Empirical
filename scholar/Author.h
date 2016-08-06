@@ -17,6 +17,8 @@
 
 #include <string>
 
+#include "../tools/Lexer.h"
+
 namespace emp {
 
   class Author {
@@ -26,6 +28,15 @@ namespace emp {
     emp::vector<std::string> middle_names;
     std::string last_name;
     std::string suffix;
+
+    static Lexer & GetFormatLexer() {
+      static Lexer lexer;
+      if (lexer.GetNumTokens() == 0) {
+        lexer.AddToken("type", "[FMLfmlPSx]");
+        lexer.AddToken("spacing", "[- ,.:]+");
+      }
+      return lexer;
+    }
   public:
     Author(const std::string & first, const std::string & middle, const std::string & last)
       : first_name(first), last_name(last) { middle_names.push_back(middle); }
@@ -142,7 +153,12 @@ namespace emp {
     //
     //    GetName("f.m. L") would return "A.B. C. Davidson"
 
-
+    std::string GetName(std::string pattern="FML") {
+      std::string out_name;
+      Lexer & lexer = GetFormatLexer();
+      lexer.Process(pattern);
+      return out_name;
+    }
 
     Author & Clear() {
       prefix=""; first_name=""; last_name=""; middle_names.resize(0); suffix="";
