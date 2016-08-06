@@ -26,7 +26,7 @@
 
 namespace emp {
 
-  static double time_fun(std::function<void()> test_fun) {
+  static inline double time_fun(std::function<void()> test_fun) {
     std::clock_t start_time = std::clock();
     test_fun();
     std::clock_t tot_time = std::clock() - start_time;
@@ -76,7 +76,7 @@ namespace emp {
   }
 
 
-  static std::vector<int> build_range(int min, int max, int step=1) {
+  static inline std::vector<int> build_range(int min, int max, int step=1) {
     int size = (max-min) / step;
     std::vector<int> out_v(size);
     int pos = 0;
