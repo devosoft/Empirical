@@ -37,6 +37,13 @@ namespace emp {
     }
   };
 
+  struct Lexeme {
+    std::string lexeme;
+    int token_id;
+
+    operator int() { return token_id; }
+  };
+
   class Lexer {
   private:
     emp::vector<TokenInfo> token_set;     // List of all active tokens.
