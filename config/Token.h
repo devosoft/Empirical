@@ -26,7 +26,7 @@ namespace emp {
       INT_LIT, FLOAT_LIT, CHAR_LIT, STRING_LIT, ID,
 
       // The rest are completely determined by their type.
-      WHITESPACE, ENDLINE,
+      WHITESPACE, COMMENT, ENDLINE,
       CASSIGN_ADD, CASSIGN_SUB, CASSIGN_MULT, CASSIGN_DIV, CASSIGN_MOD,
       COMP_EQU, COMP_NEQU, COMP_LESS, COMP_LTE, COMP_GTR, COMP_GTE,
       BOOL_AND, BOOL_OR,
