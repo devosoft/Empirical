@@ -38,10 +38,11 @@ namespace emp {
   };
 
   struct Lexeme {
-    std::string lexeme;
     int token_id;
+    std::string lexeme;
 
     operator int() { return token_id; }
+    operator const std::string &() { return lexeme; }
   };
 
   class Lexer {
@@ -100,7 +101,7 @@ namespace emp {
     }
 
     // Get the next token found in an input stream.
-    int Process(std::istream & is) {
+    Lexeme Process(std::istream & is) {
       if (generate_lexer) Generate();
       int cur_state = 0;
       int cur_stop = 0;
@@ -129,9 +130,9 @@ namespace emp {
       }
 
       // If we are at the end of this input stream (with no token to return) give back a 0.
-      if (best_stop == -1 && !is) return 0;
+      if (best_stop == -1 && !is) return { 0, "" };
 
-      return best_stop;
+      return { best_stop, lexeme };
     }
 
     // Shortcut to process a string rather than a stream.
