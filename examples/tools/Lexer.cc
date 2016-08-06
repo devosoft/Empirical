@@ -25,9 +25,9 @@ int main()
   std::stringstream ss;
   ss << "This is a 123 TEST.  It should also have 1. .2 123.456 789 FLOATING point NUMbers!";
 
-  int token_id = 1;
-  while (token_id > 0) {
-    token_id = lexer.Process(ss);
-    std::cout << lexer.GetTokenName(token_id) << " : \"" << lexer.GetLexeme() << "\"" << std::endl;
+  emp::Lexeme token = 1;
+  while (token > 0) {
+    token = lexer.Process(ss);
+    std::cout << lexer.GetTokenName(token) << " : \"" << token.lexeme << "\"" << std::endl;
   }
 }
