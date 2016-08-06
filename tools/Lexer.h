@@ -41,6 +41,10 @@ namespace emp {
     int token_id;
     std::string lexeme;
 
+    Lexeme(int id, const std::string & str="") : token_id(id), lexeme(str) { ; }
+    Lexeme(const Lexeme &) = default;
+    Lexeme & operator=(const Lexeme &) = default;
+
     operator int() { return token_id; }
     operator const std::string &() { return lexeme; }
   };
@@ -136,7 +140,7 @@ namespace emp {
     }
 
     // Shortcut to process a string rather than a stream.
-    int Process(std::string & in_str) {
+    Lexeme Process(std::string & in_str) {
       std::stringstream ss;
       ss << in_str;
       int out_val = Process(ss);
