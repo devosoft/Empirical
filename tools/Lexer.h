@@ -37,13 +37,13 @@ namespace emp {
     }
   };
 
-  struct Lexeme {
+  struct Token {
     int token_id;
     std::string lexeme;
 
-    Lexeme(int id, const std::string & str="") : token_id(id), lexeme(str) { ; }
-    Lexeme(const Lexeme &) = default;
-    Lexeme & operator=(const Lexeme &) = default;
+    Token(int id, const std::string & str="") : token_id(id), lexeme(str) { ; }
+    Token(const Token &) = default;
+    Token & operator=(const Token &) = default;
 
     operator int() { return token_id; }
     operator const std::string &() { return lexeme; }
@@ -105,7 +105,7 @@ namespace emp {
     }
 
     // Get the next token found in an input stream.
-    Lexeme Process(std::istream & is) {
+    Token Process(std::istream & is) {
       if (generate_lexer) Generate();
       int cur_state = 0;
       int cur_stop = 0;
@@ -140,7 +140,7 @@ namespace emp {
     }
 
     // Shortcut to process a string rather than a stream.
-    Lexeme Process(std::string & in_str) {
+    Token Process(std::string & in_str) {
       std::stringstream ss;
       ss << in_str;
       int out_val = Process(ss);
