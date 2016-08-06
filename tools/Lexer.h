@@ -51,6 +51,8 @@ namespace emp {
     Lexer() : cur_token_id(MAX_TOKEN_ID), generate_lexer(false) { ; }
     ~Lexer() { ; }
 
+    int GetNumTokens() const { return token_set.size(); }
+
     int AddToken(const std::string & in_name, const std::string & in_regex) {
       --cur_token_id;
       generate_lexer = true;
@@ -123,6 +125,15 @@ namespace emp {
       if (best_stop == -1 && !is) return 0;
 
       return best_stop;
+    }
+
+    // Shortcut to process a string rather than a stream.
+    int Process(std::string & in_str) {
+      std::stringstream ss;
+      ss << in_str;
+      int out_val = Process(ss);
+      in_str = ss.str();
+      return out_val;
     }
 
     // Get the lexeme associated with the last token.
