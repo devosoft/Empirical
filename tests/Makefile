@@ -1,13 +1,13 @@
-GCOV_FLAGS = -o0 -g --coverage 
+GCOV_FLAGS = -o0 -g --coverage
 
 test: test_driver.cc test_tools.cc
-	$(CXX) -std=c++11 test_driver.cc -o test.o
+	$(CXX) -std=c++14 test_driver.cc -o test.o
 	mkdir -p temp
 	# Execute tests
 	./test.o
 
 coverage:
-	$(CXX) ${GCOV_FLAGS} -std=c++11 test_driver.cc -o test.o
+	$(CXX) ${GCOV_FLAGS} -std=c++14 test_driver.cc -o test.o
 	./test.o
 	gcov test_driver.cc
 
