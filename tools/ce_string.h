@@ -39,18 +39,10 @@ namespace emp {
 
     constexpr bool operator==(const ce_string & in) const {
       return IsEqual(in);
-      // if (m_size != in.m_size) return false;
-      // for (auto i = 0; i < m_size; i++) if (m_str[i] != in.m_str[i]) return false;
-      // return true;
     }
     constexpr bool operator!=(const ce_string & in) const { return !(*this == in); }
     constexpr bool operator<(const ce_string & in) const {
       return IsLess(in);
-      // auto min_size = std::min(m_size, in.m_size);
-      // for (auto i = 0; i < min_size; i++) {
-      //   if (m_str[i] != in.m_str[i]) return (m_str[i] < in.m_str[i]);
-      // }
-      // return m_size < in.m_size;
     }
     constexpr bool operator>(const ce_string & in) const { return (in < *this); }
     constexpr bool operator<=(const ce_string & in) const { return !(in < *this); }
