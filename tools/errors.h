@@ -35,6 +35,11 @@ namespace emp {
     bool default_to_error;  // Should we default to an error (or a warning) if not resolved?
   };
 
+  static const FailureInfo & GetEmptyFailure() {
+    static FailureInfo fail_info{"","",false};
+    return fail_info;
+  }
+
   static std::multimap<std::string, FailureInfo> & GetFailureMap() {
     static std::multimap<std::string, FailureInfo> failure_map;
     return failure_map;
@@ -42,6 +47,16 @@ namespace emp {
 
   void TriggerFailure(const std::string & in_id, const std::string & in_desc, bool in_error=true) {
     GetFailureMap().emplace(in_id, FailureInfo({in_id, in_desc, in_error}));
+  }
+
+  int CountFailures() { return GetFailureMap().size(); }
+  bool HasFailure() { return CountFailures(); }
+  bool HasFailure(const std::string & id) { return GetFailureMap().count(id); }
+  void ClearFailures() { GetFailureMap().clear(); }
+  void ClearFailure(const std::string & id) {
+    auto & fail_map = GetFailureMap();
+    auto it = fail_map->find(id);
+    if (it != fail_map.end()) fail_map->erase(it);
   }
 
   template <typename... Ts>
