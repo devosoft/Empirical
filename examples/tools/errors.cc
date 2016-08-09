@@ -27,4 +27,7 @@ int main()
             << emp::HasFailure("test_fail2") << std::endl;
   std::cout << "Do we have a test_fail3? "
             << emp::HasFailure("test_fail3") << std::endl;
+
+  emp::ClearFailures();
+  std::cout << "And after a clear, failure cout = " << emp::CountFailures() << std::endl;
 }
