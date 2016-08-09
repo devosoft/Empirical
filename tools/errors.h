@@ -21,23 +21,27 @@
 #define EMP_ERRORS_H
 
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
 
 #include "meta.h"
-#include "vector.h"
 
 namespace emp {
 
-  struct FailueInfo {
+  struct FailureInfo {
     std::string id;
     std::string desc;
     bool default_to_error;  // Should we default to an error (or a warning) if not resolved?
   };
 
-  static emp::vector<FailureInfo> & GetFailureList {
-    static emp::vector<FailureInfo> failure_list;
-    return failure_list;
+  static std::multimap<std::string, FailureInfo> & GetFailureMap() {
+    static std::multimap<std::string, FailureInfo> failure_map;
+    return failure_map;
+  }
+
+  void TriggerFailure(const std::string & in_id, const std::string & in_desc, bool in_error=true) {
+    GetFailureMap().emplace(in_id, FailureInfo({in_id, in_desc, in_error}));
   }
 
   template <typename... Ts>
