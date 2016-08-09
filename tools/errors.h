@@ -16,6 +16,20 @@
 //
 //  Whenever possible, failues should be preferred.  They are more specific than warnings, but
 //  don't halt execution like errors.
+//
+//
+//  Development Notes:
+//  * Errors should probably be asserts, unless being reported to the end user (even then, we want
+//    a graceful exit...)
+//  * Warnings should also only be relevant for end-users.  Certainly they should be handled
+//    differently when triggered during development.
+//  * We should move over to a pure replacement for exceptions.
+//    - Different types of exceptions can trigger a signal.  Actions should return a bool
+//      indicating whether the exception was fixed.
+//    - Remaining exceptions are recorded and passed back up the chain to (hopefully) be caught.
+//    - Uncaught exceptions should have a default behavior when Resolved.  Exceptions could have
+//      various resolve times: Next exception added, Next exception check, when ResolveExceptions()
+//      is run, End of program, or ASAP. (perhaps)
 
 #ifndef EMP_ERRORS_H
 #define EMP_ERRORS_H
