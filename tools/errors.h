@@ -49,14 +49,27 @@ namespace emp {
     GetFailureMap().emplace(in_id, FailureInfo({in_id, in_desc, in_error}));
   }
 
+  const FailureInfo & GetFailure(const std::string & id) {
+    auto & fail_map = GetFailureMap();
+    auto it = fail_map.find(id);
+    if (it != fail_map.end()) return it->second;
+    return GetEmptyFailure();
+  }
+  FailureInfo PopFailure(const std::string & id) {
+    auto & fail_map = GetFailureMap();
+    auto it = fail_map.find(id);
+    auto out = GetEmptyFailure();
+    if (it != fail_map.end()) { out = it->second; fail_map.erase(it); }
+    return out;
+  }
   int CountFailures() { return GetFailureMap().size(); }
   bool HasFailure() { return CountFailures(); }
   bool HasFailure(const std::string & id) { return GetFailureMap().count(id); }
   void ClearFailures() { GetFailureMap().clear(); }
   void ClearFailure(const std::string & id) {
     auto & fail_map = GetFailureMap();
-    auto it = fail_map->find(id);
-    if (it != fail_map.end()) fail_map->erase(it);
+    auto it = fail_map.find(id);
+    if (it != fail_map.end()) fail_map.erase(it);
   }
 
   template <typename... Ts>
