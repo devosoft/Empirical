@@ -8,6 +8,14 @@
 //  * The end-user if the problem stems from inputs they provided to the executable.
 //  * The library user if the problem is due to mis-use of library functionality.
 //  * The library developers if something that should be impossible occurs.
+//
+//  There are also three types of problmes to notify about:
+//  * Warnings if something looks suspicious, but isn't technically a problem.
+//  * Errors if something has gone so horribly wrong that it is impossible to recover from.
+//  * Failures if something didn't go the way we expected, but we can still recover.
+//
+//  Whenever possible, failues should be preferred.  They are more specific than warnings, but
+//  don't halt execution like errors.
 
 #ifndef EMP_ERRORS_H
 #define EMP_ERRORS_H
@@ -17,13 +25,20 @@
 #include <string>
 
 #include "meta.h"
+#include "vector.h"
 
 namespace emp {
 
-  // namespace internal {
-  //   template <typename T>
-  //   Notify_append(T in)
-  // }
+  struct FailueInfo {
+    std::string id;
+    std::string desc;
+    bool default_to_error;  // Should we default to an error (or a warning) if not resolved?
+  };
+
+  static emp::vector<FailureInfo> & GetFailureList {
+    static emp::vector<FailureInfo> failure_list;
+    return failure_list;
+  }
 
   template <typename... Ts>
   void Notify(Ts... args) {
@@ -40,7 +55,7 @@ namespace emp {
   template <typename... Ts>
   void NotifyWarning(Ts... msg) { Notify("WARNING: ", msg...); }
 
-  // End user has done something definitely a problem.
+  // End user has done something resulting in an non-recoverable problem.
   template <typename... Ts>
   void NotifyError(Ts... msg) { Notify("ERROR: ", msg...); }
 
@@ -52,7 +67,7 @@ namespace emp {
   template <typename... Ts>
   void LibraryError(Ts... msg) { Notify("EMPIRICAL USE ERROR: ", msg...); }
 
-  // Library implementers must have made an error.
+  // Original library implementers must have made an error.
   template <typename... Ts>
   void InternalError(Ts... msg) { Notify("INTERNAL EMPIRICAL ERROR: ", msg...); }
 
