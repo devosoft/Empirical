@@ -16,8 +16,8 @@ namespace emp {
 
   // Entropy assumes that you are given a vector of weights, calculates the probability of
   // each, and returns the entropy.
-  template<typename T>
-  double Entropy(const emp::vector<T> & weights) {
+  template<typename CONTAINER>
+  double Entropy(const CONTAINER & weights) {
     double total = 0.0;
     double entropy = 0.0;
     for (auto w : weights) total += w;
