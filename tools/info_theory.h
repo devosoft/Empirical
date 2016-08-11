@@ -4,6 +4,13 @@
 //
 //
 //  Tools to calculate Information Theory metrics.
+//
+//
+//  Developer notes:
+//  * Input may come as WEIGHTS or as ELEMENTS (or both!).
+//    ELEMENTS need to be converted to WEIGHTS for calculations.
+//  * Want basic info theory functions, as well as tools (for channels, error-correction,
+//    compression, etc.)
 
 #ifndef EMP_INFO_THEORY_H
 #define EMP_INFO_THEORY_H
@@ -29,8 +36,25 @@ namespace emp {
   }
 
   // Allow for entropy of arbitrary objects with a converter.
-  template<typename CONTAINER, typename FUNCTION>
-  double Entropy(const CONTAINER & objs, FUNCTION fun) {
+  template<typename CONTAINER, typename WEIGHT_FUN>
+  double Entropy(const CONTAINER & objs, WEIGHT_FUN fun) {
+    double total = 0.0;
+    double entropy = 0.0;
+    for (auto & o : objs) total += fun(o);
+    for (auto & o : objs) {
+      double p = ((double) fun(o)) / total;
+      entropy -= p * log2(p);
+    }
+    return entropy;
+  }
+
+  // Conitional Entropy: H(X|Y)
+  // Allow for entropy of arbitrary objects with a converter.
+  template<typename CONTAINER, typename CAT_FUN_X, typename CAT_FUN_Y, typename WEIGHT_FUN>
+  double Entropy(const CONTAINER & objs, CAT_FUN_X funX, CAT_FUN_Y funY, WEIGHT_FUN funW) {
+    // @CAO Categorize all XY and all Y (maybe with helper function?) and count each.
+    // @CAO Run each through Entropy function.
+
     double total = 0.0;
     double entropy = 0.0;
     for (auto & o : objs) total += fun(o);
