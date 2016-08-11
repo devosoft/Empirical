@@ -28,6 +28,18 @@ namespace emp {
     return entropy;
   }
 
+  // Allow for entropy of arbitrary objects with a converter.
+  template<typename CONTAINER, typename FUNCTION>
+  double Entropy(const CONTAINER & objs, FUNCTION fun) {
+    double total = 0.0;
+    double entropy = 0.0;
+    for (auto & o : objs) total += fun(o);
+    for (auto & o : objs) {
+      double p = ((double) fun(o)) / total;
+      entropy -= p * log2(p);
+    }
+    return entropy;
+  }
 }
 
 #endif
