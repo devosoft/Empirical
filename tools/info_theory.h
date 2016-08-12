@@ -5,6 +5,11 @@
 //
 //  Tools to calculate Information Theory metrics.
 //
+//  Info-theory formulas:
+//    H(X)   = -SUM(X: p[x] log2 p[x])
+//    H(X|Y) = H(XY) - H(Y)
+//    I(X:Y) = H(X) - H(X|Y)
+//    H2(p)  = -p log2(p) - (1-p)log2(1-p)  = H({p, 1-p})
 //
 //  Developer notes:
 //  * Input may come as WEIGHTS or as ELEMENTS (or both!).
@@ -46,6 +51,10 @@ namespace emp {
       entropy -= p * log2(p);
     }
     return entropy;
+  }
+
+  double Entropy2(const double p) {
+    return -(p * log2(p) + (1.0-p)*log2(1.0-p));
   }
 
   // Conitional Entropy: H(X|Y)
