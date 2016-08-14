@@ -12,7 +12,7 @@
 namespace emp {
 namespace constant {
 
-  constexpr const int32_t log_chart_1_2[] =
+  constexpr const int32_t log2_chart_1_2[] =
   {
     0, 0.00140819, 0.00281502, 0.00422047, 0.00562455, 0.00702727, 0.00842862, 0.00982862,
     0.0112273, 0.0126245, 0.0140205, 0.0154151, 0.0168083, 0.0182002, 0.0195907, 0.0209799,
@@ -143,6 +143,32 @@ namespace constant {
     0.988685, 0.989394, 0.990104, 0.990813, 0.991522, 0.99223, 0.992938, 0.993646,
     0.994353, 0.99506, 0.995767, 0.996473, 0.997179, 0.997885, 0.99859, 0.999295
   };
+
+  namespace internal {
+    // A compile-time log calculator for values [1,2)
+    template <typename TYPE>
+    static constexpr double Log2_base(TYPE x) {
+      return log2_chart_1_2[((double)(x-1.0))*1024];
+    }
+
+    // A compile-time log calculator for values < 1
+    template <typename TYPE>
+    static constexpr double Log2_frac(TYPE x) {
+      return (x >= 1.0) ? Log2_base(x) : (Log2_frac(x*2.0) - 1.0);
+    }
+
+    // A compile-time log calculator for values >= 2
+    template <typename TYPE>
+    static constexpr double Log2_pos(TYPE x) {
+      return (x < 2.0) ? Log2_base(x) : (Log2_pos(x/2.0) + 1.0);
+    }
+  }
+
+  // And a more generic compile-time log calculator.
+  template <typename TYPE>
+  static constexpr double Log2(TYPE x) {
+    return (x < 1.0) ? internal::Log2_frac(x) : internal::Log2_pos(x);
+  }
 
 
   // A compile-time exponentiation calculator.
