@@ -12,7 +12,7 @@
 namespace emp {
 namespace constant {
 
-  constexpr const int32_t log2_chart_1_2[] =
+  constexpr const double log2_chart_1_2[] =
   {
     0, 0.00140819, 0.00281502, 0.00422047, 0.00562455, 0.00702727, 0.00842862, 0.00982862,
     0.0112273, 0.0126245, 0.0140205, 0.0154151, 0.0168083, 0.0182002, 0.0195907, 0.0209799,
@@ -146,22 +146,20 @@ namespace constant {
 
   namespace internal {
     // A compile-time log calculator for values [1,2)
-    template <typename TYPE>
-    static constexpr double Log2_base(TYPE x) {
-      return log2_chart_1_2[((double)(x-1.0))*1024];
+    static constexpr double Log2_base(double x) {
+      return log2_chart_1_2[(int)((x-1.0)*1024)];
     }
 
     // A compile-time log calculator for values < 1
-    template <typename TYPE>
-    static constexpr double Log2_frac(TYPE x) {
+    static constexpr double Log2_frac(double x) {
       return (x >= 1.0) ? Log2_base(x) : (Log2_frac(x*2.0) - 1.0);
     }
 
     // A compile-time log calculator for values >= 2
-    template <typename TYPE>
-    static constexpr double Log2_pos(TYPE x) {
+    static constexpr double Log2_pos(double x) {
       return (x < 2.0) ? Log2_base(x) : (Log2_pos(x/2.0) + 1.0);
     }
+
   }
 
   // And a more generic compile-time log calculator.
