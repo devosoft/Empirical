@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_GRID_H
-#define EMP_GRID_H
-
-///////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  Tools for building grids that can be easily navigated and have state associated with
 //  grid cells, edges, and/or intersection points.
@@ -29,7 +25,9 @@
 //
 //  Grid::StateSet is a helper templated class the holds a collection of states, or is
 //  empty if given a template type of void.
-//  
+
+#ifndef EMP_GRID_H
+#define EMP_GRID_H
 
 #include <vector>
 
@@ -225,9 +223,9 @@ namespace Grid {
     POINT_TYPE GetValue() const { return board.GetPointValue(id); }
     void SetValue(POINT_TYPE value) { board.SetPointValue(id, value); }
   };
-  
-};
-};
+
+}
+}
 
 
 #endif

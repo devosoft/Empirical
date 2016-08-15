@@ -4,6 +4,11 @@
 //
 //  This class is a drop-in wrapper for std::vector, adding on bounds checking.
 //  If EMP_NDEBUG is set then it reverts back to std::vector.
+//
+//
+//  Developer Notes:
+//   * Need an automatic conversion from emp::vector to std::vector and back to interface with
+//     non-empirical code.
 
 
 #ifndef EMP_VECTOR_H
@@ -48,6 +53,9 @@ namespace emp {
     vector(std::initializer_list<T> in_list) : v(in_list) { ; }
     vector(const std::vector<T> & in) : v(in) { ; }         // Emergency fallback conversion.
     ~vector() = default;
+
+    operator std::vector<T> &() { return v; }
+    operator const std::vector<T> &() const { return v; }
 
     size_type size() const noexcept { return v.size(); }
     void resize(int new_size) { emp_assert(new_size >= 0, new_size); v.resize(new_size); }

@@ -1,18 +1,16 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_WEB_IMAGE_H
-#define EMP_WEB_IMAGE_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015-2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  The Image widget will load an image from a specified URL.  For example, you can use
 //  emp::web::Image("http://kripken.github.io/emscripten-site/_static/Emscripten_logo_full.png")
 //  to load the emscripten logo from its website.
 //
 //  You can also set the Alt-text with the Alt() function.
-//
+
+#ifndef EMP_WEB_IMAGE_H
+#define EMP_WEB_IMAGE_H
 
 #include "Widget.h"
 
@@ -22,19 +20,20 @@ namespace web {
   class Image : public internal::WidgetFacet<Image> {
     friend class ImageInfo;
   protected:
-    
+
     class ImageInfo : public internal::WidgetInfo {
       friend Image;
-      
+
     protected:
       std::string url;
       std::string alt_text;
-            
+
       ImageInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
       ImageInfo(const ImageInfo &) = delete;               // No copies of INFO allowed
       ImageInfo & operator=(const ImageInfo &) = delete;   // No copies of INFO allowed
       virtual ~ImageInfo() { ; }
-      
+
+      std::string TypeName() const override { return "ImageInfo"; }
       virtual bool IsImageInfo() const override { return true; }
 
       virtual void GetHTML(std::stringstream & HTML) override {
@@ -43,7 +42,7 @@ namespace web {
              << " alt=\"" << alt_text << "\""
              << " id=\"" << id << "\">";
       }
-      
+
       void UpdateURL(const std::string & in_url) {
         url = in_url;
         if (state == Widget::ACTIVE) ReplaceHTML();
@@ -52,16 +51,16 @@ namespace web {
         alt_text = in_alt;
         if (state == Widget::ACTIVE) ReplaceHTML();
       }
-      
+
     public:
       virtual std::string GetType() override { return "web::ButtonInfo"; }
     };
 
 
-    // Get a properly cast version of indo.  
+    // Get a properly cast version of indo.
     ImageInfo * Info() { return (ImageInfo *) info; }
     const ImageInfo * Info() const { return (ImageInfo *) info; }
- 
+
     Image(ImageInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:

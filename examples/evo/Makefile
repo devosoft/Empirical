@@ -74,6 +74,9 @@ fast-quorum-grid-pools: grid-pools-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
 debug-quorum-grid-pools: grid-pools-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -g grid-pools-quorum.cc -o grid-pools-quorum.debug
 
+fast-pool: pool-exp.cc ../../evo/NK.h $(EVO_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 pool-exp.cc -o pool-exp
+
 test-mixed: test-stats-mixed.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 test-stats-mixed.cc -o test-mixed
 

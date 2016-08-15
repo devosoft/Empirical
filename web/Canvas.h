@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2015.
+//  Copyright (C) Michigan State University, 2015-2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -50,14 +50,16 @@ namespace web {
     protected:
       int width;
       int height;
-      
+
       emp::vector<CanvasAction *> actions;
 
       CanvasInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
       CanvasInfo(const CanvasInfo &) = delete;               // No copies of INFO allowed
       CanvasInfo & operator=(const CanvasInfo &) = delete;   // No copies of INFO allowed
       virtual ~CanvasInfo() { ClearActions(); }
-      
+
+      std::string TypeName() const override { return "CanvasInfo"; }
+
       virtual bool IsCanvasInfo() const override { return true; }
 
       virtual void GetHTML(std::stringstream & HTML) override {
@@ -104,12 +106,12 @@ namespace web {
       virtual std::string GetType() override { return "web::CanvasInfo"; }
 
     };  // End of ButtonInfo definition.
-    
 
-    // Get a properly cast version of indo.  
+
+    // Get a properly cast version of indo.
     CanvasInfo * Info() { return (CanvasInfo *) info; }
     const CanvasInfo * Info() const { return (CanvasInfo *) info; }
- 
+
     Canvas(CanvasInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:

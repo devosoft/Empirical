@@ -186,9 +186,9 @@ namespace evo {
     void SetupWorld(const std::string & world_name) {
       this->pop_name = world_name;
       SetupCallbacks(callbacks);
-      popM.SetRandom(random_ptr);
       lineageM.Setup(this);
       statsM.Setup(this);
+      popM.Setup(random_ptr);
     }
     decltype(popM) & ExposeManager() {return popM;}
 
@@ -235,6 +235,8 @@ namespace evo {
     LinkKey OnOrgPlacement(std::function<void(int)> fun) { return org_placement_sig.AddAction(fun); }
     LinkKey OnUpdate(std::function<void(int)> fun) { return on_update_sig.AddAction(fun); }
 
+    std::function<double(ORG *)> GetFitFun(){return orgM.GetFitFun();}
+
     // All additions to the population must go through one of the following Insert methods
 
     void set_available_points (long pts) {popM.set_available_points(pts);}
@@ -263,7 +265,8 @@ namespace evo {
       SetupOrg(*new_org, &callbacks, pos);
       org_placement_sig.Trigger(pos);
     }
-    void InsertBirth(const ORG  mem, int parent_pos, int copy_count=1) {
+
+    void InsertBirth(const ORG mem, int parent_pos, int copy_count=1) {
       before_repro_sig.Trigger(parent_pos);
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);

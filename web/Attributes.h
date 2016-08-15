@@ -3,25 +3,25 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  A CSS class for tracking font style, etc.
+//  An Attributes class for tracking non-style features about HTML objects
 //
-//  This class maintains a map of setting names to values that can be easily ported
-//  over to JavaScript.  A companial class, Attributes, also exists.
+//  This class maintains a map of attribute names to values that can be easily ported
+//  over to JavaScript.  It is closely related to Style.h, which is for CSS-values.
 //
 //  int GetSize() const
-//    Return a count of the number of settings that have been set.
+//    Return a count of the number of attributes that have been set.
 //
-//  Style & Set(const std::string & s, SET_TYPE v)
-//    Record that setting "s" is set to value "v" (converted to string) and return this object.
+//  Attributes & Set(const std::string & a, SET_TYPE v)
+//    Record that attribute "a" is set to value "v" (converted to string) and return this object.
 //
-//  Style & Insert(const Style & in_css)
-//    Set all values from in_css here as well.  Return this object.
+//  Attributes & Insert(const Attributes & in_attr)
+//    Set all values from in_attr here as well.  Return this object.
 //
 //  bool Has(const std::string setting) const
-//    Return true/false based on whether "setting" has been given a value in this Style.
+//    Return true/false based on whether "setting" has been given a value in this Attributes obj.
 //
 //  const std::string & Get(const std::string setting)
-//    Return the (string) value of "setting" that has been recorded in this Style.
+//    Return the (string) value of "setting" that has been recorded in this Attributes obj.
 //    If setting did not exist, this does create an empty entry and return it.
 //
 //  void Clear()
@@ -38,8 +38,8 @@
 //    Apply "setting: value" to widget_id.
 
 
-#ifndef EMP_WEB_STYLE_H
-#define EMP_WEB_STYLE_H
+#ifndef EMP_WEB_ATTRIBUTES_H
+#define EMP_WEB_ATTRIBUTES_H
 
 
 #ifdef EMSCRIPTEN
@@ -54,37 +54,37 @@
 namespace emp {
 namespace web {
 
-  class Style {
+  class Attributes {
   private:
     std::map<std::string, std::string> settings;
 
   public:
-    Style() { ; }
-    Style(const Style &) = default;
-    Style & operator=(const Style &) = default;
+    Attributes() { ; }
+    Attributes(const Attributes &) = default;
+    Attributes & operator=(const Attributes &) = default;
 
     int GetSize() const { return (int) settings.size(); }
 
-    Style & DoSet(const std::string & in_set, const std::string & in_val) {
+    Attributes & DoSet(const std::string & in_set, const std::string & in_val) {
       settings[in_set] = in_val;
       return *this;
     }
 
     template <typename SET_TYPE>
-    Style & Set(const std::string & s, SET_TYPE v) {
+    Attributes & Set(const std::string & s, SET_TYPE v) {
       return DoSet(s, emp::to_string(v));
     }
 
-    Style & Insert(const Style & in_css) {
-      settings.insert(in_css.settings.begin(), in_css.settings.end());
+    Attributes & Insert(const Attributes & in_attr) {
+      settings.insert(in_attr.settings.begin(), in_attr.settings.end());
       return *this;
     }
 
-    bool Has(const std::string setting) const {
+    bool Has(const std::string & setting) const {
       return settings.find(setting) != settings.end();
     }
 
-    const std::string & Get(const std::string setting) {
+    const std::string & Get(const std::string & setting) {
       // Note: if setting did not exist, this does create an empty entry.
       return settings[setting];
     }
@@ -93,13 +93,13 @@ namespace web {
       return settings;
     }
 
-    void Clear() { settings.clear(); }
-
     void Remove(const std::string & setting) {
       settings.erase(setting);
     }
 
-    // Apply ALL of the style settings.
+    void Clear() { settings.clear(); }
+
+    // Apply ALL of the Attributes settings.
     void Apply(const std::string & widget_id) {
       // Stop immediately if nothing to set.
       if (settings.size() == 0) return;
@@ -112,22 +112,22 @@ namespace web {
         }, widget_id.c_str());
 #endif
 
-      for (auto css_pair : settings) {
-        if (css_pair.second == "") continue; // Ignore empty entries.
+      for (auto attr_pair : settings) {
+        if (attr_pair.second == "") continue; // Ignore empty entries.
 #ifdef EMSCRIPTEN
         EM_ASM_ARGS({
             var name = Pointer_stringify($0);
             var value = Pointer_stringify($1);
-            emp_i.cur_obj.css( name, value);
-          }, css_pair.first.c_str(), css_pair.second.c_str());
+            emp_i.cur_obj.attr( name, value);
+          }, attr_pair.first.c_str(), attr_pair.second.c_str());
 #else
-        std::cout << "Setting '" << widget_id << "' attribute '" << css_pair.first
-                  << "' to '" << css_pair.second << "'.";
+        std::cout << "Setting '" << widget_id << "' attribute '" << attr_pair.first
+                  << "' to '" << attr_pair.second << "'.";
 #endif
       }
     }
 
-    // Apply onlay a SPECIFIC style setting from the setting library.
+    // Apply onlay a SPECIFIC attributes setting from the setting library.
     void Apply(const std::string & widget_id, const std::string & setting) {
       emp_assert(Has(setting));
 
@@ -136,7 +136,7 @@ namespace web {
           var id = Pointer_stringify($0);
           var setting = Pointer_stringify($1);
           var value = Pointer_stringify($2);
-          $( '#' + id ).css( setting, value);
+          $( '#' + id ).attr( setting, value);
         }, widget_id.c_str(), setting.c_str(), settings[setting].c_str());
 #else
       std::cout << "Setting '" << widget_id << "' attribute '" << setting
@@ -144,7 +144,7 @@ namespace web {
 #endif
     }
 
-    // Apply onlay a SPECIFIC style setting with a specifid value!
+    // Apply onlay a SPECIFIC attributes setting with a specifid value!
     static void Apply(const std::string & widget_id, const std::string & setting,
                       const std::string & value) {
 #ifdef EMSCRIPTEN
@@ -152,7 +152,7 @@ namespace web {
           var id = Pointer_stringify($0);
           var setting = Pointer_stringify($1);
           var value = Pointer_stringify($2);
-          $( '#' + id ).css( setting, value);
+          $( '#' + id ).attr( setting, value);
         }, widget_id.c_str(), setting.c_str(), value.c_str());
 #else
       std::cout << "Setting '" << widget_id << "' attribute '" << setting

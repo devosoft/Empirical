@@ -1,13 +1,13 @@
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -Wno-unused-function -std=c++11 -I../../ -I./
+CFLAGS_all := -Wall -Wno-unused-function -std=c++11 -I../../
 #CFLAGS_all := -Wall -Wno-unused-variable -Wno-unused-function -Wno-extra-semi -std=c++11 -I../../ -I./
 
 # Emscripten compiler information
 CXX_web := emcc
 CXX_native := g++
 
-#OFLAGS_native := -g -pedantic
-OFLAGS_native := -O3 -DNDEBUG
+OFLAGS_native := -g -pedantic
+#OFLAGS_native := -O3 -DNDEBUG
 
 OFLAGS_web := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864 -s ASSERTIONS=2 -s DEMANGLE_SUPPORT=1 # -s SAFE_HEAP=1
 #OFLAGS_web := -Os -DNDEBUG -s TOTAL_MEMORY=67108864
@@ -19,7 +19,7 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 
-TARGETS := array DFA Lexer lexer_utils macros meta NFA Parser Random reflection RegEx signal vector
+TARGETS := array DFA errors Lexer lexer_utils macros meta NFA Parser Random reflection RegEx signal vector
 
 TOOLS := ../../tools
 TOOL_DEPEND := $(TOOLS)/assert.h
@@ -34,6 +34,9 @@ array: array.cc $(TOOLS)/array.h $(TOOL_DEPEND)
 
 DFA: DFA.cc $(TOOLS)/DFA.h $(TOOL_DEPEND)
 	$(CXX_native) $(CFLAGS_native) DFA.cc -o DFA
+
+errors: errors.cc $(TOOLS)/errors.h $(TOOL_DEPEND)
+	$(CXX_native) $(CFLAGS_native) errors.cc -o errors
 
 Lexer: Lexer.cc $(TOOLS)/Lexer.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
 	$(CXX_native) $(CFLAGS_native) Lexer.cc -o Lexer

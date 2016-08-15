@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2015-2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -30,6 +30,7 @@
 #include "../tools/mem_track.h"
 #include "../tools/vector.h"
 
+#include "Attributes.h"
 #include "events.h"
 #include "Style.h"
 
@@ -42,7 +43,7 @@ namespace web {
     class WidgetInfo;
     class SlateInfo;
     class TableInfo;
-    
+
     // Quick method for generating unique IDs when not otherwise specified.
     static int NextWidgetNum(bool inc_num=true) {
       static int next_id = 0;
@@ -52,15 +53,15 @@ namespace web {
     static std::string NextWidgetID() {
       return emp::to_string("emp__", NextWidgetNum());
     }
-    
+
     // Base class for command-objects that can be fed into widgets.
     class WidgetCommand {
     public:
       virtual bool Trigger(WidgetInfo &) const = 0;
     };
   }
-  
-  
+
+
 
   // Widget is a smart pointer to a WidgetInfo object, plus some basic accessors.
   class Widget {
@@ -68,24 +69,24 @@ namespace web {
   protected:
     using WidgetInfo = internal::WidgetInfo;
     WidgetInfo * info;
-    
+
     // If an Append doesn't work with current class, forward it to the parent.
     template <typename FWD_TYPE> Widget & ForwardAppend(FWD_TYPE && arg);
-    
+
     Widget & SetInfo(WidgetInfo * in_info);
-    
+
     // Internally, we can treat a Widget as a pointer to its WidgetInfo.
     WidgetInfo * operator->() { return info; }
-    
+
     // Give derived classes the ability to access widget info.
     static WidgetInfo * Info(const Widget & w) { return w.info; }
-    
+
     // Four activity states for any widget.
     //   INACTIVE - Not be in DOM at all.
     //   WAITING  - Will become active once the page finishes loading.
     //   FROZEN   - Part of DOM, but not updating on the screen.
     //   ACTIVE   - Fully active; changes are reflected as they happen.
-    
+
     enum ActivityState { INACTIVE, WAITING, FROZEN, ACTIVE };
 
   public:
@@ -93,24 +94,23 @@ namespace web {
     Widget(WidgetInfo * in_info=nullptr);
     Widget(const Widget & in) : Widget(in.info) { ; }
     Widget & operator=(const Widget & in) { return SetInfo(in.info); }
-    
+
     virtual ~Widget();
-    
+
     bool IsNull() const { return info == nullptr; }
+
+    // Some debugging helpers...
+    std::string InfoTypeName() const;
 
     bool IsInactive() const;
     bool IsWaiting() const;
     bool IsFrozen() const;
     bool IsActive() const;
-    
-    virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
-    virtual void PreventAppend() { emp_assert(false); } // This isn't meaningful to most widgets.
-    
-    virtual bool IsSlate() const { return false; }
-    virtual bool IsTable() const { return false; }
-    virtual bool IsText() const { return false; }
 
-    // Checks to see if this widget can be converted to other types...
+    bool AppendOK() const;
+    void PreventAppend();
+
+    // Checks to see if this widget can be trivially converted to other types...
     bool ButtonOK() const;
     bool CanvasOK() const;
     bool ImageOK() const;
@@ -118,17 +118,25 @@ namespace web {
     bool SlateOK() const;
     bool TableOK() const;
     bool TextOK() const;
-    
+
+    bool IsSlate() const { return SlateOK(); }
+    bool IsTable() const { return TableOK(); }
+    bool IsText() const { return TextOK(); }
+
     std::string GetID() const;
-    
+
     // CSS-related options may be overridden in derived classes that have multiple styles.
     virtual std::string GetCSS(const std::string & setting);
     virtual bool HasCSS(const std::string & setting);
-    
+
+    // And other attribute-related options
+    virtual std::string GetAttr(const std::string & setting);
+    virtual bool HasAttr(const std::string & setting);
+
     bool operator==(const Widget & in) const { return info == in.info; }
     bool operator!=(const Widget & in) const { return info != in.info; }
-    operator bool() const { return info != nullptr; }      
-    
+    operator bool() const { return info != nullptr; }
+
     // An active widget makes live changes to the webpage (once document is ready)
     // An inactive widget just records changes internally.
     void Activate();
@@ -138,39 +146,40 @@ namespace web {
 
     // Clear and redraw the current widget on the screen.
     void Redraw();
-      
+
     // Methods to look up previously created elements, by type.
     Widget & Find(const std::string & test_name);
 
     Widget & AddDependant(const Widget & w);
-    
+
     // Setup << operator to redirect to Append; option preparation can be overridden.
     virtual void PrepareAppend() { ; }
     template <typename IN_TYPE> Widget operator<<(IN_TYPE && in_val);
-    
+
     // Debug...
     std::string GetInfoType() const;
   };
-  
+
   namespace internal {
 
     // WidgetInfo is a base class containing information needed by all GUI widget classes
     // (Buttons, Images, etc...).  It take in a return type to be cast to for accessors.
-    
+
     class WidgetInfo {
     public:
       // Smart-pointer info
       int ptr_count;                  // How many widgets are pointing to this info?
-      
+
       // Basic info about a widget
       std::string id;                 // ID used for associated DOM element.
       Style style;                    // CSS Style
+      Attributes attr;                // HTML Attributes about a class.
 
       // Track hiearchy
       WidgetInfo * parent;            // Which WidgetInfo is this one contained within?
       emp::vector<Widget> dependants; // Widgets to be refreshed if this one is triggered
       Widget::ActivityState state;    // Is this element active in DOM?
-    
+
 
       // WidgetInfo cannot be built unless within derived class, so constructor is protected
       WidgetInfo(const std::string & in_id="")
@@ -185,9 +194,12 @@ namespace web {
       WidgetInfo & operator=(const WidgetInfo &) = delete;
 
       virtual ~WidgetInfo() {
-        EMP_TRACK_DESTRUCT(WebWidgetInfo); 
+        EMP_TRACK_DESTRUCT(WebWidgetInfo);
       }
- 
+
+      // Some debugging helpers...
+      virtual std::string TypeName() const { return "WidgetInfo base"; }
+
       virtual bool IsButtonInfo() const { return false; }
       virtual bool IsCanvasInfo() const { return false; }
       virtual bool IsImageInfo() const { return false; }
@@ -223,13 +235,15 @@ namespace web {
 
       void UpdateDependants() { for (auto & d : dependants) d->ReplaceHTML(); }
 
-      
+
       // Activate is delayed until the document is ready, when DoActivate will be called.
       virtual void DoActivate(bool top_level=true) {
         state = Widget::ACTIVE;         // Activate this widget and its children.
         if (top_level) ReplaceHTML();   // Print full contents to document.
       }
-      
+
+      virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
+      virtual void PreventAppend() { emp_assert(false, TypeName()); } // Only for appendable widgets.
 
       // By default, elements should forward unknown appends to their parents.
       virtual Widget Append(const std::string & text) { return ForwardAppend(text); }
@@ -271,18 +285,19 @@ namespace web {
         std::stringstream ss;
         if (state == Widget::ACTIVE) GetHTML(ss);
         else ss << "<span id='" << id << "'></span>";
-        
+
         // Now do the replacement.
         EM_ASM_ARGS({
             var widget_id = Pointer_stringify($0);
             var out_html = Pointer_stringify($1);
             $('#' + widget_id).replaceWith(out_html);
           }, id.c_str(), ss.str().c_str());
-        
+
         // If active update style, trigger JS, and recurse to children!
         if (state == Widget::ACTIVE) {
           // Update the style
           style.Apply(id);
+          attr.Apply(id);
 
           // Run associated Javascript code, if any (e.g., to fill out a canvas)
           TriggerJS();
@@ -304,13 +319,13 @@ namespace web {
     // ... NOT to increment info->ptr_count since it's initialized to 1.
     EMP_TRACK_CONSTRUCT(WebWidget);
   }
-  
+
   Widget::Widget(WidgetInfo * in_info) {
     info = in_info;
     if (info) info->ptr_count++;
     EMP_TRACK_CONSTRUCT(WebWidget);
   }
-  
+
   Widget::~Widget() {
     // We are deleting a widget.
     if (info) {
@@ -320,10 +335,12 @@ namespace web {
     EMP_TRACK_DESTRUCT(WebWidget);
   }
 
+  std::string Widget::InfoTypeName() const { if (IsNull()) return "NULL"; return info->TypeName(); }
+
   Widget & Widget::SetInfo(WidgetInfo * in_info) {
     // If the widget is already set correctly, stop here.
     if (info == in_info) return *this;
-    
+
     // Clean up the old info that was previously pointed to.
     if (info) {
       info->ptr_count--;
@@ -333,17 +350,20 @@ namespace web {
     // Setup new info.
     info = in_info;
     if (info) info->ptr_count++;
-    
+
     return *this;
   }
 
-  bool Widget::IsInactive() const { if (!info) return false; return info->state == INACTIVE; }  
+  bool Widget::IsInactive() const { if (!info) return false; return info->state == INACTIVE; }
   bool Widget::IsWaiting() const { if (!info) return false; return info->state == WAITING; }
   bool Widget::IsFrozen() const { if (!info) return false; return info->state == FROZEN; }
   bool Widget::IsActive() const { if (!info) return false; return info->state == ACTIVE; }
-  
+
+  bool Widget::AppendOK() const { if (!info) return false; return info->AppendOK(); }
+  void Widget::PreventAppend() { emp_assert(info); info->PreventAppend(); }
+
   std::string Widget::GetID() const { return info ? info->id : "(none)"; }
-  
+
   bool Widget::ButtonOK() const { if (!info) return false; return info->IsButtonInfo(); }
   bool Widget::CanvasOK() const { if (!info) return false; return info->IsCanvasInfo(); }
   bool Widget::ImageOK() const { if (!info) return false; return info->IsImageInfo(); }
@@ -358,8 +378,15 @@ namespace web {
   bool Widget::HasCSS(const std::string & setting) {
     return info ? info->style.Has(setting) : false;
   }
-  
-  
+
+  std::string Widget::GetAttr(const std::string & setting) {
+    return info ? info->attr.Get(setting) : "";
+  }
+  bool Widget::HasAttr(const std::string & setting) {
+    return info ? info->attr.Has(setting) : false;
+  }
+
+
   void Widget::Activate() {
     auto * cur_info = info;
     info->state = WAITING;
@@ -369,7 +396,7 @@ namespace web {
   void Widget::Freeze() {
     info->state = FROZEN;
   }
-  
+
   void Widget::Deactivate(bool top_level) {
     if (!info || info->state == INACTIVE) return;  // Skip if we are not active.
     info->state = INACTIVE;
@@ -387,12 +414,12 @@ namespace web {
     emp_assert(info);
     info->ReplaceHTML();
   }
-  
+
   Widget & Widget::AddDependant(const Widget & w) {
     info->AddDependant(w);
     return *this;
   }
-  
+
   template <typename IN_TYPE>
   Widget Widget::operator<<(IN_TYPE && in_val) {
     PrepareAppend();
@@ -403,14 +430,14 @@ namespace web {
     if (!info) return "UNINITIALIZED";
     return info->GetType();
   }
-  
-  
+
+
   namespace internal {
     // WidgetFacet is a template that provides accessors into Widget with a derived return type.
-  
+
     template <typename RETURN_TYPE>
     class WidgetFacet : public Widget {
-    protected: 
+    protected:
       // WidgetFacet cannot be built unless within derived class, so constructors are protected
       WidgetFacet(const std::string & in_id="") : Widget(in_id) { ; }
       WidgetFacet(const WidgetFacet & in) : Widget(in) { ; }
@@ -428,6 +455,11 @@ namespace web {
         info->style.DoSet(setting, value);
         if (IsActive()) Style::Apply(info->id, setting, value);
       }
+      // Attr-related options may be overridden in derived classes that have multiple styles.
+      virtual void DoAttr(const std::string & setting, const std::string & value) {
+        info->attr.DoSet(setting, value);
+        if (IsActive()) Attributes::Apply(info->id, setting, value);
+      }
 
     public:
       template <typename SETTING_TYPE>
@@ -436,8 +468,14 @@ namespace web {
         DoCSS(setting, emp::to_string(value));
         return (RETURN_TYPE &) *this;
       }
+      template <typename SETTING_TYPE>
+      RETURN_TYPE & SetAttr(const std::string & setting, SETTING_TYPE && value) {
+        emp_assert(info != nullptr);
+        DoAttr(setting, emp::to_string(value));
+        return (RETURN_TYPE &) *this;
+      }
 
-      // Allow multiple CSS settings to be grouped.
+      // Allow multiple CSS or Attr settings to be grouped.
       template <typename T1, typename T2, typename... OTHER_SETTINGS>
       RETURN_TYPE & SetCSS(const std::string & setting1, T1 && val1,
                         const std::string & setting2, T2 && val2,
@@ -445,9 +483,16 @@ namespace web {
         SetCSS(setting1, val1);                      // Set the first CSS value.
         return SetCSS(setting2, val2, others...);    // Recurse to the others.
       }
+      template <typename T1, typename T2, typename... OTHER_SETTINGS>
+      RETURN_TYPE & SetAttr(const std::string & setting1, T1 && val1,
+                            const std::string & setting2, T2 && val2,
+                            OTHER_SETTINGS... others) {
+        SetAttr(setting1, val1);                      // Set the first CSS value.
+        return SetAttr(setting2, val2, others...);    // Recurse to the others.
+      }
 
-      // Allow multiple CSS settigns as a single style object.
-      // (still go through DoCSS given need for virtual re-routing.)
+      // Allow multiple CSS or Attr settigns as a single object.
+      // (still go through DoCSS/DoAttr given need for virtual re-routing.)
       RETURN_TYPE & SetCSS(const Style & in_style) {
         emp_assert(info != nullptr);
         for (const auto & s : in_style.GetMap()) {
@@ -455,12 +500,13 @@ namespace web {
         }
         return (RETURN_TYPE &) *this;
       }
-
-      // @CAO This seems like a bigger deal than just changing the id...
-      // RETURN_TYPE & ID(const std::string & in_id) {
-      //   info->id = in_id;
-      //   return (RETURN_TYPE &) *this;
-      // }
+      RETURN_TYPE & SetAttr(const Attributes & in_attr) {
+        emp_assert(info != nullptr);
+        for (const auto & a : in_attr.GetMap()) {
+          DoAttr(a.first, a.second);
+        }
+        return (RETURN_TYPE &) *this;
+      }
 
 
       // Size Manipulation
@@ -501,7 +547,7 @@ namespace web {
       // Positioning
       RETURN_TYPE & SetFloat(const std::string & f) { return SetCSS("float", f); }
       RETURN_TYPE & SetOverflow(const std::string & o) { return SetCSS("overflow", o); }
-      
+
       // Text Manipulation
       RETURN_TYPE & SetFont(const std::string & font) { return SetCSS("font-family", font); }
       RETURN_TYPE & SetFontSize(int s) { return SetCSS("font-size", emp::to_string(s, "px")); }
@@ -521,7 +567,7 @@ namespace web {
         return SetCSS("padding", emp::to_string(p, unit));
       }
     };
-    
+
   }
 
 }
@@ -529,4 +575,3 @@ namespace web {
 
 
 #endif
-
