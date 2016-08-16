@@ -165,8 +165,7 @@ namespace constant {
   }
 
   // And a more generic compile-time log calculator.
-  template <typename TYPE>
-  static constexpr double Log2(TYPE x) {
+  static constexpr double Log2(double x) {
     return (x < 1.0) ? internal::Log2_frac(x) : internal::Log2_pos(x);
   }
 
@@ -174,6 +173,14 @@ namespace constant {
   static constexpr double Log(double x, double base) { return Log2(x) / Log2(base); }
   static constexpr double Ln(double x) { return Log(x, emp::E); }   // Natural Log...
   static constexpr double Log10(double x) { return Log(x, 10.0); }
+
+  static constexpr double Pow2(double exp) {
+    return (exp >= 1.0) ? (2*Pow2(exp-1.0)) : 1.0;
+  }
+
+  static constexpr double Pow(double base, double exp) {
+    return Pow2(Log2(base) * exp);  // convert to a base of 2.
+  }
 
   // A compile-time exponentiation calculator.
   template <typename TYPE>
