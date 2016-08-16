@@ -7,14 +7,19 @@
 
 #include <iostream>
 
+#include "../../tools/const.h"
 #include "../../tools/const_utils.h"
 
 int main()
 {
+  std::cout.setf( std::ios::fixed, std::ios::floatfield );
   for (int i = 1; i <= 20; i++) {
     std::cout << "Log2(" << i << ") = " << emp::constant::Log2(i)
-      //              << "   Log2(" << i << ".0) = " << emp::constant::Log2((double) i)
               << "   Log(10, " << i << ") = " << emp::constant::Log(10, i)
+              << "   Pow(" << i << ", 3.0) = " << emp::constant::Pow(i, 3.0)
               << std::endl;
   }
+
+  constexpr double x = emp::constant::Log(10, emp::E);
+  std::cout << "x = " << x << std::endl;
 }
