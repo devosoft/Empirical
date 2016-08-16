@@ -9,6 +9,8 @@
 #ifndef EMP_CONST_UTILS_H
 #define EMP_CONST_UTILS_H
 
+#include "const.h"
+
 namespace emp {
 namespace constant {
 
@@ -168,11 +170,10 @@ namespace constant {
     return (x < 1.0) ? internal::Log2_frac(x) : internal::Log2_pos(x);
   }
 
-  // An arbitraty base, compile time log
-  static constexpr double Log(double x, double base) {
-    return Log2(x) / Log2(base);
-  }
-
+  // Log varients
+  static constexpr double Log(double x, double base) { return Log2(x) / Log2(base); }
+  static constexpr double Ln(double x) { return Log(x, emp::E); }   // Natural Log...
+  static constexpr double Log10(double x) { return Log(x, 10.0); }
 
   // A compile-time exponentiation calculator.
   template <typename TYPE>
