@@ -37,6 +37,18 @@ namespace emp {
     }
   };
 
+  struct Token {
+    int token_id;
+    std::string lexeme;
+
+    Token(int id, const std::string & str="") : token_id(id), lexeme(str) { ; }
+    Token(const Token &) = default;
+    Token & operator=(const Token &) = default;
+
+    operator int() { return token_id; }
+    operator const std::string &() { return lexeme; }
+  };
+
   class Lexer {
   private:
     emp::vector<TokenInfo> token_set;     // List of all active tokens.
@@ -50,6 +62,8 @@ namespace emp {
   public:
     Lexer() : cur_token_id(MAX_TOKEN_ID), generate_lexer(false) { ; }
     ~Lexer() { ; }
+
+    int GetNumTokens() const { return token_set.size(); }
 
     int AddToken(const std::string & in_name, const std::string & in_regex) {
       --cur_token_id;
@@ -91,7 +105,7 @@ namespace emp {
     }
 
     // Get the next token found in an input stream.
-    int Process(std::istream & is) {
+    Token Process(std::istream & is) {
       if (generate_lexer) Generate();
       int cur_state = 0;
       int cur_stop = 0;
@@ -120,9 +134,18 @@ namespace emp {
       }
 
       // If we are at the end of this input stream (with no token to return) give back a 0.
-      if (best_stop == -1 && !is) return 0;
+      if (best_stop == -1 && !is) return { 0, "" };
 
-      return best_stop;
+      return { best_stop, lexeme };
+    }
+
+    // Shortcut to process a string rather than a stream.
+    Token Process(std::string & in_str) {
+      std::stringstream ss;
+      ss << in_str;
+      int out_val = Process(ss);
+      in_str = ss.str();
+      return out_val;
     }
 
     // Get the lexeme associated with the last token.

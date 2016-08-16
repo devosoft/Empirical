@@ -8,11 +8,34 @@
 //  * The end-user if the problem stems from inputs they provided to the executable.
 //  * The library user if the problem is due to mis-use of library functionality.
 //  * The library developers if something that should be impossible occurs.
+//
+//  There are also three types of problmes to notify about:
+//  * Warnings if something looks suspicious, but isn't technically a problem.
+//  * Errors if something has gone so horribly wrong that it is impossible to recover from.
+//  * Failures if something didn't go the way we expected, but we can still recover.
+//
+//  Whenever possible, failues should be preferred.  They are more specific than warnings, but
+//  don't halt execution like errors.
+//
+//
+//  Development Notes:
+//  * Errors should probably be asserts, unless being reported to the end user (even then, we want
+//    a graceful exit...)
+//  * Warnings should also only be relevant for end-users.  Certainly they should be handled
+//    differently when triggered during development.
+//  * We should move over to a pure replacement for exceptions.
+//    - Different types of exceptions can trigger a signal.  Actions should return a bool
+//      indicating whether the exception was fixed.
+//    - Remaining exceptions are recorded and passed back up the chain to (hopefully) be caught.
+//    - Uncaught exceptions should have a default behavior when Resolved.  Exceptions could have
+//      various resolve times: Next exception added, Next exception check, when ResolveExceptions()
+//      is run, End of program, or ASAP. (perhaps)
 
 #ifndef EMP_ERRORS_H
 #define EMP_ERRORS_H
 
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
 
@@ -20,10 +43,48 @@
 
 namespace emp {
 
-  // namespace internal {
-  //   template <typename T>
-  //   Notify_append(T in)
-  // }
+  struct FailureInfo {
+    std::string id;
+    std::string desc;
+    bool default_to_error;  // Should we default to an error (or a warning) if not resolved?
+  };
+
+  static const FailureInfo & GetEmptyFailure() {
+    static FailureInfo fail_info{"","",false};
+    return fail_info;
+  }
+
+  static std::multimap<std::string, FailureInfo> & GetFailureMap() {
+    static std::multimap<std::string, FailureInfo> failure_map;
+    return failure_map;
+  }
+
+  void TriggerFailure(const std::string & in_id, const std::string & in_desc, bool in_error=true) {
+    GetFailureMap().emplace(in_id, FailureInfo({in_id, in_desc, in_error}));
+  }
+
+  const FailureInfo & GetFailure(const std::string & id) {
+    auto & fail_map = GetFailureMap();
+    auto it = fail_map.find(id);
+    if (it != fail_map.end()) return it->second;
+    return GetEmptyFailure();
+  }
+  FailureInfo PopFailure(const std::string & id) {
+    auto & fail_map = GetFailureMap();
+    auto it = fail_map.find(id);
+    auto out = GetEmptyFailure();
+    if (it != fail_map.end()) { out = it->second; fail_map.erase(it); }
+    return out;
+  }
+  int CountFailures() { return GetFailureMap().size(); }
+  bool HasFailure() { return CountFailures(); }
+  bool HasFailure(const std::string & id) { return GetFailureMap().count(id); }
+  void ClearFailures() { GetFailureMap().clear(); }
+  void ClearFailure(const std::string & id) {
+    auto & fail_map = GetFailureMap();
+    auto it = fail_map.find(id);
+    if (it != fail_map.end()) fail_map.erase(it);
+  }
 
   template <typename... Ts>
   void Notify(Ts... args) {
@@ -40,7 +101,7 @@ namespace emp {
   template <typename... Ts>
   void NotifyWarning(Ts... msg) { Notify("WARNING: ", msg...); }
 
-  // End user has done something definitely a problem.
+  // End user has done something resulting in an non-recoverable problem.
   template <typename... Ts>
   void NotifyError(Ts... msg) { Notify("ERROR: ", msg...); }
 
@@ -52,7 +113,7 @@ namespace emp {
   template <typename... Ts>
   void LibraryError(Ts... msg) { Notify("EMPIRICAL USE ERROR: ", msg...); }
 
-  // Library implementers must have made an error.
+  // Original library implementers must have made an error.
   template <typename... Ts>
   void InternalError(Ts... msg) { Notify("INTERNAL EMPIRICAL ERROR: ", msg...); }
 

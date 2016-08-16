@@ -34,11 +34,11 @@
 namespace emp {
 
   // Simple echo's
-  static const DFA & to_DFA(const DFA & dfa) { return dfa; }
-  static const NFA & to_NFA(const NFA & nfa) { return nfa; }
+  static inline const DFA & to_DFA(const DFA & dfa) { return dfa; }
+  static inline const NFA & to_NFA(const NFA & nfa) { return nfa; }
 
   // Systematic conversion of NFA to DFA...
-  static DFA to_DFA(const NFA & nfa, int keep_invalid=false) {
+  static inline DFA to_DFA(const NFA & nfa, int keep_invalid=false) {
     DFA dfa(1);                               // Setup zero to be the start state.
     std::map<std::set<int>, int> id_map;      // How do nfa state sets map to dfa states?
     std::vector<std::set<int>> state_stack;   // Which states still need to be explored?
@@ -85,7 +85,7 @@ namespace emp {
   }
 
   // Systematic up-conversion of DFA to NFA...
-  static NFA to_NFA(const DFA & dfa) {
+  static inline NFA to_NFA(const DFA & dfa) {
     NFA nfa(dfa.GetSize());
     for (int from = 0; from < dfa.GetSize(); from++) {
       const auto & t = dfa.GetTransitions(from);

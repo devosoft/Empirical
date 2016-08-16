@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2015-2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -27,7 +27,10 @@
 //
 //  Development notes:
 //  * Make sure JSWrap can take function objects, lambdas, or just function names.
+//    On possibility is to make multiple versions of the function.
 //  * Add a JSWrap that takes an object and method and does the bind automatically.
+//  * Build a non-enscripten version; it should still be callable from the C++ side, but
+//    mostly to be able to test programs without Emscripten.
 //
 //  Recent changes:
 //  * Made JSWrap compatible with Javascript objects with multiple properties.
