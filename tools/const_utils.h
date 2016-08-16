@@ -168,6 +168,11 @@ namespace constant {
     return (x < 1.0) ? internal::Log2_frac(x) : internal::Log2_pos(x);
   }
 
+  // An arbitraty base, compile time log
+  static constexpr double Log(double x, double base) {
+    return Log2(x) / Log2(base);
+  }
+
 
   // A compile-time exponentiation calculator.
   template <typename TYPE>
