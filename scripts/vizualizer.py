@@ -42,9 +42,10 @@ def parse_map_file(fname):
                     gridline = []
                     for subel in element.split(","):
                         filtered = subel.replace("]", "").replace("{", "").strip()
-                        if len(filtered) > 0:
-                            gridline.append(int(filtered))
-                            needed_mappings.add(int(filtered))
+                        for org in filtered.split(' '):
+                            if len(org) > 0:
+                                gridline.append(int(org))
+                                needed_mappings.add(int(org))
                     
                     if len(gridline) > 0:
                         current_state.append(gridline)
@@ -99,7 +100,46 @@ def file_to_frames(gridfname, prefix, mapping, pixwidth, grid = None):
         img = gen_image(snapshot, mapping, pixwidth)
         img.save(prefix + "%05d.png" % framenum)
         framenum += 1
+       
+
+def load_config_from_file(fname):
+    """
+    Things we need: 
+        name of the map.csv file
+        width of each cell (pix)
+        symbol -> {rgb} mappings
+
+    ways we'll do it:
+        a stupid simple flat text file with a bunch of lines
+    """
+    with open(fname, 'r') as cfile:
+        conflines = cfile.readlines()
         
+        config = {}
+        config['mapping'] = {}
+        readlines = 0
+
+        for line in conflines:
+            if line.strip().startswith('#'):
+                continue
+            else:
+                if readlines == 0:
+                    config['mapfile_name'] = line.strip()
+                elif readlines == 1:
+                    config['cell_width'] = int(line.strip())
+                elif readlines >= 2:
+                    chopped = line.strip().split()
+                    if len(chopped) == 0:
+                        continue
+                    try:
+                        config['mapping'][int(chopped[0])] = (int(chopped[1]), int(chopped[2]),
+                            int(chopped[3]))
+                    except IndexError as err:
+                        print("Bad index--chopped is '{}', from line {}".format(chopped, line))
+            readlines += 1
+
+        return config
+
 
 def main():
     """
