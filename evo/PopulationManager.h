@@ -304,9 +304,6 @@ namespace evo {
       return neighbors;
     }
 
-    //TODO@JGF: a) make the rest of my todo's @'d to me
-    //          b) make the function naming consistent (e.g. camel, not _'s)
-
 
     std::set<ORG *> GetClusterByRadius(unsigned int focal_id, int depth) {
       std::set<unsigned int> explored;
@@ -332,6 +329,7 @@ namespace evo {
       }
       return orgs;
     }
+
     void Setup(Random * r){SetRandom(r); }
 
     void ConfigPop(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }

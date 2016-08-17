@@ -13,16 +13,6 @@
 #include "World.h"
 #include <iostream>
 
-/* TODO: determine if MUTATION_RATE etc. should be config'd here or QuorumOrg.h
- *
- * This class will handle all the quorum-specific handling of QOrgs (public goods creation,
- * sensing/informing orgs about quorums) and will template an underlying structural
- * population manager to handle the physical location / neighbors of the orgs.
- */
-
-//using MixedWorld = emp::evo::World<ORG, emp::evo::PopulationManager_Base<ORG>>;
-//MixedWorld<BitOrg> mixed_pop(random);
-
 
 namespace emp {
 namespace evo {
@@ -156,7 +146,6 @@ public:
       // get contribution and round-robin it out to the various orgs
       // producer gets first dibs
       if( (contribution = org->get_contribution(calculate_quorum(cluster))) > 0){
-        // TODO: make this mor eefficient. Can easily math who gets who much (probably)
         auto recipiant = neighbors.end();
 
         // iterate over neighbors && give them things, with donator going first

@@ -12,20 +12,12 @@
 #include "../tools/Random.h"
 #include <iostream>
 
-/* TODO: Implement the config stuff
- *    - # pts donated when co-operating
- * TODO: implement actual use of the org's id in the state object
- * TODO: impelement some kind of 'tick' processing function, to handle
- *     tracking cost of AI production && if co-operating
- */
-
 /* Simple class to contain the genome for a QuorumOrg
  * Shoved in here in case we decide to use the fancy liniage tracker I saw
  * in this directory.
  *
  * Also because it'll be easy to make specific types of orgs.
  */
-
 
 namespace emp {
 namespace evo {
@@ -219,8 +211,6 @@ public:
   // the aforementioned mutate function
   bool mutate (Random & random) {
     if (state.mutate) {
-      //state.genome.quorum_threshold += random.GetRandNormal(0, MUTATION_AMOUNT);
-      //state.genome.ai_radius += random.GetRandNormal(0, MUTATION_AMOUNT);
       state.genome.co_op_prob += random.GetRandNormal(0, mutation_amount);
       if (state.genome.co_op_prob < 0) {state.genome.co_op_prob = 0;}
       else if (state.genome.co_op_prob > 1) { state.genome.co_op_prob = 1;}
