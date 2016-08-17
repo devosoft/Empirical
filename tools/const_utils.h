@@ -19,6 +19,7 @@ namespace constant {
     // A compile-time log calculator for values [1,2)
     static constexpr double Log2_base(double x) {
       return log2_chart_1_2[(int)((x-1.0)*1024)];
+      // return InterpolateTable(log2_chart_1_2, x-1.0, 1024);
     }
 
     // A compile-time log calculator for values < 1
@@ -44,7 +45,8 @@ namespace constant {
   static constexpr double Log10(double x) { return Log(x, 10.0); }
 
   static constexpr double Pow2(double exp) {
-    return (exp >= 1.0) ? (2*Pow2(exp-1.0)) : pow2_chart_0_1[(int)(exp*1024)];
+    //return (exp >= 1.0) ? (2.0*Pow2(exp-1.0)) : pow2_chart_0_1[(int)(exp*1024.0)];
+    return (exp >= 1.0) ? (2.0*Pow2(exp-1.0)) : internal::InterpolateTable(pow2_chart_0_1, exp, 1024);
   }
 
   static constexpr double Pow(double base, double exp) {
