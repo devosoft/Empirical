@@ -359,7 +359,7 @@ namespace evo {
     // User provides the fitness function, the tournament size, and (optionally) the
     // number of tournaments to run.
     void TournamentSelect(std::function<double(ORG*)> fit_fun, int t_size,
-        int tourny_count=1, bool precalc_fitness=true) {
+        int tourny_count=1, bool precalc_fitness=true, bool competitive=false) {
       emp_assert(fit_fun);
       emp_assert(t_size > 0 && t_size <= (int) popM.size(), t_size, popM.size());
 
@@ -372,7 +372,14 @@ namespace evo {
          }
         RunTournament(fitness, t_size, tourny_count);
       }
-      else RunTournament(fit_fun, t_size, tourny_count);
+      else if(!competitive){ RunTournament(fit_fun, t_size, tourny_count); }
+      else{
+          emp::vector<int> valid_orgs = GetValidOrgIndices();
+
+          for(int org : valid_orgs){
+              RunCompetition(fit_fun, 9, tourny_count,org);
+          }
+      }
     }
 
     // Tournament Selection can use the default fitness function.
@@ -434,6 +441,35 @@ namespace evo {
       }
     }
 
+    // Helper function to run a selection based on neighbors fitness
+    void RunCompetition(std::function<double(ORG*)> fit_fun, int t_size, int tourny_count=1, int org_id=false){
+      emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
+
+      emp::vector<int> neighbors;
+      double best_fit = fit_fun(popM[org_id]);
+      int best_id = org_id;
+      int org_x = popM.ToX(org_id);
+      int org_y = popM.ToY(org_id);
+
+      for(int offset = 0; offset < 9; offset++){         
+          int neighbor_x = emp::mod(org_x + offset%3 - 1, popM.GetWidth());
+          int neighbor_y = emp::mod(org_y + offset/3 - 1, popM.GetHeight());
+          neighbors.push_back(popM.ToID(neighbor_x, neighbor_y));
+      }
+
+      // Search for a higher fit org in the neighbors.
+      for(auto id : neighbors){
+          if(popM[id] == nullptr){continue;}
+          double curr_fit = fit_fun(popM[id]);
+          if (best_fit < curr_fit){
+              best_fit = curr_fit;
+              best_id = id;
+          }
+      }
+                
+        // Place the highest fitness into the next generation!
+        InsertBirth( *(popM[best_id]), best_id, 1 );
+      }
 
     // Run tournament selection with fitnesses adjusted by Goldberg and
     // Richardson's fitness sharing function (1987)

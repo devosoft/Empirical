@@ -202,10 +202,11 @@ namespace evo {
 
   template <typename ORG=int>
   class PopulationManager_Grid : public PopulationManager_Base<ORG> {
-  protected:
+  public:
     using PopulationManager_Base<ORG>::pop;
     using PopulationManager_Base<ORG>::random_ptr;
     using PopulationManager_Base<ORG>::SetRandom;
+    using PopulationManager_Base<ORG>::Update;
 
     int width;
     int height;

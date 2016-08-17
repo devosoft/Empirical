@@ -33,6 +33,9 @@ EMP_BUILD_CONFIG( NKConfig,
 
 using BitOrg = emp::BitVector;
 
+template <typename ORG>
+using GridWorld = emp::evo::World<ORG, emp::evo::PopulationManager_Grid<ORG>, emp::evo::LineagePruned >;
+
 int main(int argc, char* argv[])
 {
   NKConfig config;
@@ -60,7 +63,7 @@ int main(int argc, char* argv[])
   prefix = config.NAME();
 
 
-  emp::evo::GridWorld<BitOrg, emp::evo::LineagePruned > grid_pop(random);
+  GridWorld<BitOrg> grid_pop(random);
 
   grid_pop.ConfigPop(std::sqrt(POP_SIZE), std::sqrt(POP_SIZE));
 
@@ -107,7 +110,7 @@ int main(int argc, char* argv[])
     //grid_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 50, 2);
     // Run a tournament for the rest...   
     grid_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
-            , TOURNAMENT_SIZE, POP_SIZE);
+            , TOURNAMENT_SIZE, POP_SIZE, true);
 
     grid_pop.Update();
     grid_pop.MutatePop();
