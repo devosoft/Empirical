@@ -141,7 +141,8 @@ namespace constant {
     0.97728, 0.977995, 0.97871, 0.979425, 0.98014, 0.980854, 0.981567, 0.982281,
     0.982994, 0.983706, 0.984418, 0.98513, 0.985842, 0.986553, 0.987264, 0.987975,
     0.988685, 0.989394, 0.990104, 0.990813, 0.991522, 0.99223, 0.992938, 0.993646,
-    0.994353, 0.99506, 0.995767, 0.996473, 0.997179, 0.997885, 0.99859, 0.999295
+    0.994353, 0.99506, 0.995767, 0.996473, 0.997179, 0.997885, 0.99859, 0.999295,
+    1.0
   };
 
   constexpr const double pow2_chart_0_1[] =
@@ -273,9 +274,32 @@ namespace constant {
     1.95714, 1.95847, 1.9598, 1.96112, 1.96245, 1.96378, 1.96511, 1.96644,
     1.96777, 1.9691, 1.97044, 1.97177, 1.97311, 1.97444, 1.97578, 1.97712,
     1.97846, 1.9798, 1.98114, 1.98248, 1.98382, 1.98516, 1.98651, 1.98785,
-    1.9892, 1.99055, 1.99189, 1.99324, 1.99459, 1.99594, 1.99729, 1.99865
+    1.9892, 1.99055, 1.99189, 1.99324, 1.99459, 1.99594, 1.99729, 1.99865,
+    2.0
   };
 
+  namespace internal {
+    // The following function takes a table and a position [0.0, 1.0) and intepolates a value.
+    template <typename T>
+    constexpr double InterpolateTable(T && table, double pos, double tsize) {
+      // auto p1 = (int)(pos*tsize);
+      // auto w1 = 1.0-pos+((double)((int)(pos*tsize)))/tsize;
+      // auto p2 = (int)(pos*tsize)+1;
+      // auto w2 = pos-((double)((int)(pos*tsize)))/tsize;
+      // std::cout << "[[ "
+      //           << "pos=" << pos
+      //           << " p1=" << p1
+      //           << " v1=" << table[p1]
+      //           << " w1=" << w1
+      //           << " p2=" << p2
+      //           << " v2=" << table[p2]
+      //           << " w2=" << w2
+      //           << " ]]";
+      // return table[p1] * w1 + table[p2] * w2;
+      return table[(int)(pos*tsize)] * (1.0-pos+((double)((int)(pos*tsize)))/tsize)
+      + table[(int)(pos*tsize)+1] * (pos-((double)((int)(pos*tsize)))/tsize);
+    }
+  }
 }
 }
 
