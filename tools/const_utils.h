@@ -44,10 +44,18 @@ namespace constant {
   static constexpr double Ln(double x) { return Log(x, emp::E); }   // Natural Log...
   static constexpr double Log10(double x) { return Log(x, 10.0); }
 
-  static constexpr double Pow2(double exp) {
-    //return (exp >= 1.0) ? (2.0*Pow2(exp-1.0)) : pow2_chart_0_1[(int)(exp*1024.0)];
-    return (exp >= 1.0) ? (2.0*Pow2(exp-1.0)) : internal::InterpolateTable(pow2_chart_0_1, exp, 1024);
+  namespace internal {
+    static constexpr double Pow2_impl(double exp) {
+      //return (exp >= 1.0) ? (2.0*Pow2(exp-1.0)) : pow2_chart_0_1[(int)(exp*1024.0)];
+      return (exp >= 1.0) ? (2.0*Pow2_impl(exp-1.0)) : internal::InterpolateTable(pow2_chart_0_1, exp, 1024);
+    }
   }
+
+  static constexpr double Pow2(double exp) {
+    return (exp >= 0.0) ? (1.0/internal::Pow2_impl(-exp)) : internal::Pow2_impl(exp);
+  }
+
+//pow2_chart_bits
 
   static constexpr double Pow(double base, double exp) {
     return Pow2(Log2(base) * exp);  // convert to a base of 2.
