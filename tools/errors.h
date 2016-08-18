@@ -117,7 +117,7 @@ namespace emp {
   template <typename... Ts>
   void InternalError(Ts... msg) { Notify("INTERNAL EMPIRICAL ERROR: ", msg...); }
 
-};
+}
 
 
 #endif
