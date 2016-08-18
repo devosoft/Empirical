@@ -47,7 +47,7 @@ namespace constant {
   namespace internal {
     static constexpr double Pow2_lt1(double exp, int id=0) {
       // return internal::InterpolateTable(pow2_chart_0_1, exp, 1024);
-      return (id==16) ? 1.0 :
+      return (id==32) ? 1.0 :
         ( (exp > 0.5) ? (pow2_chart_bits[id]*Pow2_lt1(exp*2.0-1.0,id+1)) : Pow2_lt1(exp*2.0,id+1) );
     }
 
