@@ -610,7 +610,7 @@ namespace emp {
 // Check that all of the commands are legal so that sensible errors can be produced.
 // (legal commands convert to two arguments; illeagal ones stay as one, so second arg is error!)
 #define EMP_CONFIG__ERROR_CHECK(CMD) EMP_GET_ARG(2, EMP_CONFIG__ARG_OKAY_ ## CMD, \
-                                     static_assert(false, "Unknown Config option: " #CMD), ~);
+                                     static_assert(false, "Unknown Config option: " #CMD);, ~)
 #define EMP_CONFIG__ARG_OKAY_VALUE(...) ~,
 #define EMP_CONFIG__ARG_OKAY_CONST(...) ~,
 #define EMP_CONFIG__ARG_OKAY_GROUP(...) ~,

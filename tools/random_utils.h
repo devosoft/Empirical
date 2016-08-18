@@ -20,7 +20,7 @@ namespace emp {
   void Shuffle(Random & random, emp::vector<T> & v, int max_count=-1)
   {
     if (max_count < 0) max_count = (int) v.size();
-    for (uint32_t i = 0; i < max_count; i++) {
+    for (uint32_t i = 0; i < (uint32_t) max_count; i++) {
       const uint32_t pos = random.GetUInt(i, v.size());
       if (pos == i) continue;
       std::swap(v[i], v[pos]);

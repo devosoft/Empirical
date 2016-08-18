@@ -132,10 +132,10 @@ namespace emp {
 namespace evo {
 
 
-  EMP_SETUP_TYPE_SELECTOR(SelectPopManager, emp_is_population_manager);
-  EMP_SETUP_TYPE_SELECTOR(SelectOrgManager, emp_is_organism_manager);
-  EMP_SETUP_TYPE_SELECTOR(SelectStatsManager, emp_is_stats_manager);
-  EMP_SETUP_TYPE_SELECTOR(SelectLineageManager, emp_is_lineage_manager);
+  EMP_SETUP_TYPE_SELECTOR(SelectPopManager, emp_is_population_manager)
+  EMP_SETUP_TYPE_SELECTOR(SelectOrgManager, emp_is_organism_manager)
+  EMP_SETUP_TYPE_SELECTOR(SelectStatsManager, emp_is_stats_manager)
+  EMP_SETUP_TYPE_SELECTOR(SelectLineageManager, emp_is_lineage_manager)
 
   template <typename POP_MANAGER> class PopulationIterator;
 
@@ -199,7 +199,7 @@ namespace evo {
       , inject_ready_sig(to_string(pop_name,"::inject-ready"))
       , org_placement_sig(to_string(pop_name,"::org-placement"))
       , on_update_sig(to_string(pop_name,"::on-update"))
-      , callbacks(pop_name) { SetupWorld(pop_name);}
+      , callbacks(pop_name) { SetupWorld(pop_name); }
 
     World(int seed=-1, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
       : World(new Random(seed), pop_name) { random_owner = true; }
@@ -224,9 +224,9 @@ namespace evo {
     void ResetRandom(int seed=-1) { SetRandom(*(new Random(seed))); }
 
     // Forward function calls to appropriate internal objects
-    EMP_EVO_FORWARD(ConfigPop, popM);
-    EMP_EVO_FORWARD_2(SetDefaultFitnessFun, orgM, statsM);
-    EMP_EVO_FORWARD(SetDefaultMutateFun, orgM);
+    EMP_EVO_FORWARD(ConfigPop, popM)
+    EMP_EVO_FORWARD_2(SetDefaultFitnessFun, orgM, statsM)
+    EMP_EVO_FORWARD(SetDefaultMutateFun, orgM)
 
     LinkKey OnBeforeRepro(std::function<void(int)> fun) { return before_repro_sig.AddAction(fun); }
     LinkKey OnOffspringReady(std::function<void(ORG *)> fun) { return offspring_ready_sig.AddAction(fun); }
@@ -318,7 +318,7 @@ namespace evo {
     //all organisms that are not null
     emp::vector<int> GetValidOrgIndices(){
       emp::vector<int> valid_orgs(0);
-      for (int i = 0; i < popM.size(); i++){
+      for (int i = 0; i < (int) popM.size(); i++){
         if (this->IsOccupied(i)){
           valid_orgs.push_back(i);
         }
