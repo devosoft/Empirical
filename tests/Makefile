@@ -1,7 +1,8 @@
 GCOV_FLAGS = -o0 -g --coverage
 
-test: test_driver.cc test_tools.cc
-	$(CXX) -std=c++11 test_driver.cc -o test.o
+test: test_driver.cc test_tools.cc test_geometry.cc test_evo.cc test_scholar.cc
+	$(CXX) -std=c++11 test_driver.cc test_geometry.cc test_evo.cc test_scholar.cc \
+		test_tools.cc -o test.o
 	mkdir -p temp
 	# Execute tests
 	./test.o

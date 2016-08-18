@@ -4,6 +4,8 @@
 #undef NDEBUG
 #define TDEBUG 1
 
+#include "../third-party/Catch/single_include/catch.hpp"
+
 #include <array>
 #include <sstream>
 #include <string>
