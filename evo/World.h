@@ -112,6 +112,9 @@
 //   GetDefaultFitnessFun()  -- Return the current default fitness function being used.
 //   SetDefaultFitnessFun(new_fun)  -- Set the default fitness function to be new_fun.
 
+
+// @CAO Setup to dynamically choose correct version based on arg count.
+
 #define EMP_EVO_FORWARD(FUN, TARGET) \
 template <typename... T> void FUN(T &&... args) { TARGET.FUN(std::forward<T>(args)...); }
 
