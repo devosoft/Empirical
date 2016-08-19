@@ -144,13 +144,13 @@ namespace evo {
   class World {
   public:
     // Build managers...
-    AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> popM;
-    AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgMDynamic>::type, ORG> orgM;
-    AdaptTemplate<typename SelectStatsManager<MANAGERS...,NullStats >::type, decltype(popM)> statsM;
+    AdaptTemplate_Arg1<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> popM;
+    AdaptTemplate_Arg1<typename SelectOrgManager<MANAGERS...,OrgMDynamic>::type, ORG> orgM;
+    AdaptTemplate_Arg1<typename SelectStatsManager<MANAGERS...,NullStats >::type, decltype(popM)> statsM;
 
     //Create a lineage manager if the stats manager needs it or if the user asked for it
     EMP_CHOOSE_MEMBER_TYPE(DefaultLineage, lineage_type, LineageNull, decltype(statsM));
-    AdaptTemplate<typename SelectLineageManager<MANAGERS...,DefaultLineage>::type, decltype(popM)> lineageM;
+    AdaptTemplate_Arg1<typename SelectLineageManager<MANAGERS...,DefaultLineage>::type, decltype(popM)> lineageM;
 
     Random * random_ptr;
     bool random_owner;
@@ -190,6 +190,7 @@ namespace evo {
       statsM.Setup(this);
       popM.Setup(random_ptr);
     }
+    decltype(popM) & ExposeManager() {return popM;}
 
   public:
     World(emp::Random * r_ptr, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
@@ -238,13 +239,21 @@ namespace evo {
 
     // All additions to the population must go through one of the following Insert methods
 
-    void Insert(const ORG & mem, int copy_count=1) {
+    void set_available_points (long pts) {popM.set_available_points(pts);}
+    long get_available_points () {return popM.get_available_points();}
+    
+    // passthrough method for initialization
+    unsigned int  SequentialInsert(ORG * org) {
+      return popM.SequentialInsert(org);
+    }
+    int Insert(const ORG & mem, int copy_count=1) {
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);
         inject_ready_sig.Trigger(new_org);
         const int pos = popM.AddOrg(new_org);
         SetupOrg(*new_org, &callbacks, pos);
         org_placement_sig.Trigger(pos);
+        if (copy_count == 1) {return pos;}
       }
     }
     template <typename... ARGS>
@@ -318,6 +327,7 @@ namespace evo {
     //all organisms that are not null
     emp::vector<int> GetValidOrgIndices(){
       emp::vector<int> valid_orgs(0);
+      valid_orgs.reserve(popM.size());
       for (int i = 0; i < popM.size(); i++){
         if (this->IsOccupied(i)){
           valid_orgs.push_back(i);
