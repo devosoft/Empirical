@@ -59,7 +59,8 @@ namespace evo{
     void Setup(WORLD * w){;}
 
     template <typename T>
-    void SetDefaultFitnessFun(std::function<double(T)> fit){;}
+    //void SetDefaultFitnessFun(const std::function<double(T*)> &) {;}
+    void SetDefaultFitnessFun(const T &) {;}
 
     //Tells the stats manager where to put output. If location is "cout"
     //(default) or "stdout", stats will get sent to cout. Otherwise, the
@@ -173,7 +174,7 @@ namespace evo{
       }
     }
 
-    void SetDefaultFitnessFun(std::function<double(org_ptr)> fit){
+    void SetDefaultFitnessFun(const std::function<double(org_ptr)> & fit){
         fit_fun = fit;
     }
 
@@ -246,10 +247,10 @@ namespace evo{
 using NullStats = StatsManager_Base<PopBasic>;
 using DefaultStats = StatsManager_DefaultStats<PopBasic>;
 
-  // Calculates Default stats plus some other less frequently used stats: Non-Inferiority, 
+  // Calculates Default stats plus some other less frequently used stats: Non-Inferiority,
   // Benefitial/Neutral/Detremental Mutational Landscape average, max benefit/max detremental
   // mutation, and last coalescence depth
-  
+
   template <typename POP_MANAGER = PopulationManager_Base<int> >
   class StatsManager_AdvancedStats : protected StatsManager_FunctionsOnUpdate<POP_MANAGER> {
   protected:
