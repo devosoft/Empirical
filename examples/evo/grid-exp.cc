@@ -9,7 +9,7 @@
 #include <string>
 #include <cmath>
 
-#include "../../config/ArgManager.h"
+//#include "../../config/ArgManager.h"
 #include "../../evo/NK.h"
 #include "../../evo/World.h"
 #include "../../tools/BitSet.h"
@@ -32,14 +32,17 @@ EMP_BUILD_CONFIG( NKConfig,
 
 using BitOrg = emp::BitVector;
 
+template <typename ORG>
+using GPWorld = emp::evo::World<ORG, emp::evo::PopulationManager_GridPools<ORG>, emp::evo::LineagePruned >;
+
 int main(int argc, char* argv[])
 {
   NKConfig config;
   config.Read("Grid.cfg");
 
-  auto args = emp::cl::ArgManager(argc, argv);
-  if (args.ProcessConfigOptions(config, std::cout, "Grid.cfg", "NK-macros.h") == false) exit(0);
-  if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
+  //auto args = emp::cl::ArgManager(argc, argv);
+  //if (args.ProcessConfigOptions(config, std::cout, "Grid.cfg", "NK-macros.h") == false) exit(0);
+  //if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
 
   config.Write("SetGrid.cfg");
 
@@ -59,19 +62,19 @@ int main(int argc, char* argv[])
   prefix = config.NAME();
 
 
-  emp::evo::GridWorld<BitOrg, emp::evo::LineagePruned > grid_pop(random);
+  GPWorld<BitOrg> gridpool_pop(random);
 
-  grid_pop.ConfigPop(std::sqrt(POP_SIZE), std::sqrt(POP_SIZE));
+  gridpool_pop.ConfigPop(5,4,5,100);
 
   std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return landscape.GetFitness(*org);};
 
-  grid_pop.SetDefaultFitnessFun(fit_func);
+  gridpool_pop.SetDefaultFitnessFun(fit_func);
 
   // make a stats manager
-  emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Grid<BitOrg>>
-      grid_stats (&grid_pop, prefix + "grid.csv");
+  //emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Grid<BitOrg>>
+  //    grid_stats (&gridpool_pop, prefix + "grid.csv");
 
-  grid_stats.SetDefaultFitnessFun(fit_func);
+ // grid_stats.SetDefaultFitnessFun(fit_func);
   
 
     // Insert default organisms into world
@@ -81,13 +84,13 @@ int main(int argc, char* argv[])
     
     // looking at the Insert() func it looks like it does a deep copy, so we should be safe in
     // doing this. Theoretically...
-    grid_pop.Insert(next_org);
+    gridpool_pop.Insert(next_org);
   }
 
   // mutation function:
   // for every site in the gnome there is a MUTATION_RATE chance that the 
   // site will flip it's value.
-  grid_pop.SetDefaultMutateFun( [MUTATION_RATE, N](BitOrg* org, emp::Random& random) {
+  gridpool_pop.SetDefaultMutateFun( [MUTATION_RATE, N](BitOrg* org, emp::Random& random) {
     bool mutated = false;    
       for (size_t site = 0; site < N; site++) {
         if (random.P(MUTATION_RATE)) {
@@ -105,7 +108,7 @@ int main(int argc, char* argv[])
     // Keep the best individual.
     //grid_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 50, 2);
     // Run a tournament for the rest...   
-    grid_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
+    gridpool_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
             , TOURNAMENT_SIZE, POP_SIZE);
 
     // Use if you  want a visual map of the grid
@@ -126,8 +129,8 @@ int main(int argc, char* argv[])
    // }
     //file.close();
 
-    grid_pop.Update();
-    grid_pop.MutatePop();
+    gridpool_pop.Update();
+    gridpool_pop.MutatePop();
 
   }
 
