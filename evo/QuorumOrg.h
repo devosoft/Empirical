@@ -211,7 +211,8 @@ public:
   // the aforementioned mutate function
   bool mutate (Random & random) {
     if (state.mutate) {
-      state.genome.co_op_prob += random.GetRandNormal(0, mutation_amount);
+      //state.genome.co_op_prob += random.GetRandNormal(0, mutation_amount);
+      state.genome.co_op_prob += random.GetDouble(0, 1);
       if (state.genome.co_op_prob < 0) {state.genome.co_op_prob = 0;}
       else if (state.genome.co_op_prob > 1) { state.genome.co_op_prob = 1;}
 
