@@ -22,6 +22,7 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 TARGETS := Fitness_Share_NK link_test NK NK-const NK-Serial Symbulation World bit_evolve replica
 
 EVO_DEPEND := ../../evo/PopulationManager.h ../../evo/World.h
+QUORUM_DEPEND := ../../evo/QuorumOrg.h ../../evo/QuorumManager.h ../../evo/PopulationManager.h
 
 default: native
 
@@ -50,10 +51,28 @@ fast-replica: replica.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 replica.cc -o replica
 
 fast-grid: grid-exp.cc ../../evo/NK.h $(EVO_DEPEND)
-	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 grid-exp.cc -o grid-exp
+	$(CXX_native) $(CFLAGS_native) -g -DNDEBUG -O3 grid-exp.cc -o grid-exp
 
 fast-mixed: mixed-exp.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 mixed-exp.cc -o mixed-exp
+
+fast-quorum-mixed: mixed-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 mixed-grid-quorum.cc -o mixed-grid-quorum.out
+
+debug-quorum-mixed: mixed-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -g mixed-grid-quorum.cc -o mixed-grid-quorum.debug
+
+fast-quorum-standard: standard-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 standard-grid-quorum.cc -o standard-grid-quorum.out
+
+debug-quorum-standard: standard-grid-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -g standard-grid-quorum.cc -o standard-grid-quorum.debug
+
+fast-quorum-grid-pools: grid-pools-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 grid-pools-quorum.cc -o grid-pools-quorum.out
+
+debug-quorum-grid-pools: grid-pools-quorum.cc $(EVO_DEPEND) $(QUORUM_DEPEND)
+	$(CXX_native) $(CFLAGS_native) -g grid-pools-quorum.cc -o grid-pools-quorum.debug
 
 fast-pool: pool-exp.cc ../../evo/NK.h $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) -DNDEBUG -O3 pool-exp.cc -o pool-exp
