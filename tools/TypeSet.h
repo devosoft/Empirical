@@ -22,6 +22,9 @@ namespace emp {
     constexpr static int GetSize() { return sizeof...(Ts); }
 
     constexpr static bool IsUnique() { return has_unique_types<Ts...>(); }
+
+    template <typename T>
+    using AddType = TypeSet<Ts...,T>;
   };
 
 };
