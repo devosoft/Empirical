@@ -139,7 +139,7 @@ namespace emp {
 
     int GetSize() const { return (int) states.size(); }
     const std::set<int> & GetStart() const {
-      emp_assert(states.size() > start);
+      emp_assert(start < (int) states.size());
       return states[start].free_to;
     }
     std::set<int> GetNext(int sym, int from_id=0) const {

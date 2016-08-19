@@ -1,11 +1,14 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
-// Copyright (C) Michigan State University, 2015. It is licensed
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015-2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//  Commonly used values...
 
 #ifndef EMP_CONST_H
 #define EMP_CONST_H
 
 namespace emp {
+
   constexpr const double E      = 2.71828;                // e
   constexpr const double PHI    = 1.61803398874;          // Golden ratio
   constexpr const double PI     = 3.14159265358979;       // pi
@@ -19,6 +22,7 @@ namespace emp {
   constexpr const uint32_t MAX_4BYTE = 4294967295;    // (2^32 - 1)
 
   constexpr const int32_t MIN_INT = -2147483648;      // (- 2^31)
-};
+
+}
 
 #endif
