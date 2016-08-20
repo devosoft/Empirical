@@ -10,7 +10,6 @@
 #define EMP_MATH_H
 
 #include "const.h"
-#include "const_tables.h"
 
 namespace emp {
 
