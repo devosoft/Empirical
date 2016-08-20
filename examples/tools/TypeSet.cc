@@ -18,5 +18,6 @@ int main()
   std::cout << "Num types = " << test_t::GetSize() << std::endl;
   std::cout << "float pos = " << test_t::GetID<float>() << std::endl;
 
-  std::cout << "Num types (with add) = " << test_t::AddType<long long>::GetSize() << std::endl;
+  std::cout << "Num types (with add) = " << test_t::add_t<long long>::GetSize() << std::endl;
+  std::cout << "float pos (with pop) = " << test_t::pop_front_t::GetID<float>() << std::endl;
 }
