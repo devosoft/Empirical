@@ -14,12 +14,12 @@ int main()
 {
   std::cout.setf( std::ios::fixed, std::ios::floatfield );
   for (int i = 1; i <= 20; i++) {
-    std::cout << "Log2(" << i << ") = " << emp::constant::Log2(i)
-              << "   Log(10, " << i << ") = " << emp::constant::Log(10, i)
-              << "   Pow(" << i << ", 3.0) = " << emp::constant::Pow(i, 3.0)
+    std::cout << "Log2(" << i << ") = " << emp::Log2(i)
+              << "   Log(10, " << i << ") = " << emp::Log(10, i)
+              << "   Pow(" << i << ", 3.0) = " << emp::Pow(i, 3.0)
               << std::endl;
   }
 
-  constexpr double x = emp::constant::Log(10, emp::E);
+  constexpr double x = emp::Log(10, emp::E);
   std::cout << "x = " << x << std::endl;
 }

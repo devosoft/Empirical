@@ -13,7 +13,6 @@
 #include "const_tables.h"
 
 namespace emp {
-namespace constant {
 
   namespace internal {
     // A compile-time log calculator for values [1,2)
@@ -95,7 +94,6 @@ namespace constant {
   }
 
 
-}
 }
 
 #endif

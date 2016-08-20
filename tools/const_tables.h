@@ -10,7 +10,6 @@
 #define EMP_CONST_TABLES_H
 
 namespace emp {
-namespace constant {
 
   constexpr const double log2_chart_1_2[] =
   {
@@ -316,7 +315,7 @@ namespace constant {
       + table[(int)(pos*tsize)+1] * (pos-((double)((int)(pos*tsize)))/tsize);
     }
   }
-}
+
 }
 
 #endif
