@@ -52,7 +52,7 @@ namespace emp {
     return entropy;
   }
 
-  double Entropy2(const double p) {
+  constexpr double Entropy2(const double p) {
     return -(p * Log2(p) + (1.0-p)*Log2(1.0-p));
   }
 
