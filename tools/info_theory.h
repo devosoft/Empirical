@@ -20,7 +20,7 @@
 #ifndef EMP_INFO_THEORY_H
 #define EMP_INFO_THEORY_H
 
-#include "const_utils.h"
+#include "math.h"
 #include "vector.h"
 
 namespace emp {

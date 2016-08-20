@@ -101,8 +101,8 @@
 #include <iostream>
 
 #include "bitset_utils.h"
-#include "const_utils.h"
 #include "functions.h"
+#include "math.h"
 #include "Random.h"
 #include "vector.h"
 

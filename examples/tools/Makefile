@@ -19,7 +19,7 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 
-TARGETS := array const_utils DFA errors info_theory Lexer lexer_utils macros meta NFA Parser Random reflection RegEx signal vector
+TARGETS := array DFA errors info_theory Lexer lexer_utils macros math meta NFA Parser Random reflection RegEx signal vector
 
 TOOLS := ../../tools
 TOOL_DEPEND := $(TOOLS)/assert.h
@@ -31,9 +31,6 @@ native: $(TARGETS)
 
 array: array.cc $(TOOLS)/array.h $(TOOL_DEPEND)
 	$(CXX_native) $(CFLAGS_native) array.cc -o array
-
-const_utils: const_utils.cc $(TOOLS)/const_utils.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) const_utils.cc -o const_utils
 
 DFA: DFA.cc $(TOOLS)/DFA.h $(TOOL_DEPEND)
 	$(CXX_native) $(CFLAGS_native) DFA.cc -o DFA
@@ -52,6 +49,9 @@ lexer_utils: lexer_utils.cc $(TOOLS)/lexer_utils.h $(TOOL_DEPEND) $(TOOLS)/DFA.h
 
 macros: macros.cc $(TOOLS)/macros.h $(TOOL_DEPEND)
 	$(CXX_native) $(CFLAGS_native) macros.cc -o macros
+
+math: math.cc $(TOOLS)/math.h $(TOOL_DEPEND)
+	$(CXX_native) $(CFLAGS_native) math.cc -o math
 
 meta: meta.cc $(TOOLS)/meta.h $(TOOL_DEPEND)
 	$(CXX_native) $(CFLAGS_native) meta.cc -o meta

@@ -3,12 +3,11 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  Some examples code for using const_utils functions.
+//  Some examples code for using math functions.
 
 #include <iostream>
 
-#include "../../tools/const.h"
-#include "../../tools/const_utils.h"
+#include "../../tools/math.h"
 
 int main()
 {

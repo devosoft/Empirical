@@ -6,8 +6,8 @@
 //  This file contains functions that all run at compile time to produce a constant value.
 
 
-#ifndef EMP_CONST_UTILS_H
-#define EMP_CONST_UTILS_H
+#ifndef EMP_MATH_H
+#define EMP_MATH_H
 
 #include "const.h"
 #include "const_tables.h"
