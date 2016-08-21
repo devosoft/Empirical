@@ -3,7 +3,7 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  This file contains functions that all run at compile time to produce a constant value.
+//  This file contains useful mathematical functions (that are constexpr when possible.)
 
 
 #ifndef EMP_MATH_H
@@ -44,13 +44,11 @@ namespace emp {
 
   namespace internal {
     static constexpr double Pow2_lt1(double exp, int id=0) {
-      // return internal::InterpolateTable(pow2_chart_0_1, exp, 1024);
       return (id==32) ? 1.0 :
         ( (exp > 0.5) ? (pow2_chart_bits[id]*Pow2_lt1(exp*2.0-1.0,id+1)) : Pow2_lt1(exp*2.0,id+1) );
     }
 
     static constexpr double Pow2_impl(double exp) {
-      //return (exp >= 1.0) ? (2.0*Pow2_impl(exp-1.0)) : pow2_chart_0_1[(int)(exp*1024.0)];
       return (exp >= 1.0) ? (2.0*Pow2_impl(exp-1.0)) : Pow2_lt1(exp);
     }
   }
@@ -71,15 +69,11 @@ namespace emp {
 
   // A compile-time int-log calculator (aka, significant bits)
   template <typename TYPE>
-  static constexpr int IntLog2(TYPE x) {
-    return x <= 1 ? 0 : (IntLog2(x/2) + 1);
-  }
+  static constexpr int IntLog2(TYPE x) { return x <= 1 ? 0 : (IntLog2(x/2) + 1); }
 
   // A compile-time bit counter.
   template <typename TYPE>
-  static constexpr int CountOnes(TYPE x) {
-    return x == 0 ? 0 : (CountOnes(x/2) + (x&1));
-  }
+  static constexpr int CountOnes(TYPE x) { return x == 0 ? 0 : (CountOnes(x/2) + (x&1)); }
 
   // Quick bit-mask generators...
   template <typename TYPE>
