@@ -1,5 +1,6 @@
 Geometry needs to be able to handle a range of SHAPE and a range of OWNERS for those bodies.
 
+-- PLAN A: Double-dispatch varient --
 Body_Base is a base class, containing info unrelated to its shape or its owner.
 It *does* contain the set of signals that might need to be triggered, such as
 specific types of collisions.
@@ -28,3 +29,31 @@ Concerns
 * It's tricky to have both types at once.  We need to be careful that we don't
   make thousands of copies of each signal and instead only one for each owner
   type
+
+
+-- PLAN B: MACROS --
+PhysicsBody will be the base class, and there will be an explicity-created
+derived classes that know how to interact with each possible owner type.
+
+If you run the macro EMP_BUILD_BODY_OWNERS(A, B, C) it will build the classes
+PhysicsBody_A, PhysicsBody_B, and PhysicsBody_C.  Each of those classes will
+have the explicitly-defined member functions for dealing with the collisions of
+different types.  In this example, the base class will be built with:
+
+  virtual void PhysicsBody::HandleCollision(PhysicsBody * other) = 0;
+  virtual void PhysicsBody::HandleCollision(PhysicsBody_A * other) = 0;
+  virtual void PhysicsBody::HandleCollision(PhysicsBody_B * other) = 0;
+  virtual void PhysicsBody::HandleCollision(PhysicsBody_C * other) = 0;
+
+...while PhysicsBody_A will have:
+
+  void PhysicsBody_A::HandleCollision(PhysicsBody * other) { other->HandleCollision(this); }
+  void PhysicsBody_A::HandleCollision(PhysicsBody_A * other) override { ... }
+  void PhysicsBody_A::HandleCollision(PhysicsBody_B * other) override { ... }
+  void PhysicsBody_A::HandleCollision(PhysicsBody_C * other) override { ... }
+
+With the ... presumably being sending out a signal?  
+
+Concerns
+* OWNER types cannot be templated or they will screw up the macro.
+* All of PhysicsBody and its child classes will be defined in the macro.
