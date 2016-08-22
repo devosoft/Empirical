@@ -12,7 +12,7 @@
 
 #include "../tools/assert.h"
 #include "../tools/BitSet.h"
-#include "../tools/const_utils.h"
+#include "../tools/math.h"
 #include "../tools/Random.h"
 
 namespace emp {
@@ -21,7 +21,7 @@ namespace evo {
   template <int N, int K>
   class NKLandscapeConst {
   private:
-    static constexpr int state_count = emp::constant::IntPow(2,K+1);
+    static constexpr int state_count = emp::IntPow(2,K+1);
     static constexpr int total_count = N * state_count;
     std::array< std::array<double, state_count>, N > landscape;
 
@@ -59,7 +59,7 @@ namespace evo {
       genome2 |= (genome2 << N);
 
       double total = 0.0;
-      constexpr uint32_t mask = emp::constant::MaskLow<uint32_t>(K+1);
+      constexpr uint32_t mask = emp::MaskLow<uint32_t>(K+1);
       for (int i = 0; i < N; i++) {
 	      const uint32_t cur_val = (genome2 >> i).GetUInt(0) & mask;
 	      const double cur_fit = GetFitness(i, cur_val);

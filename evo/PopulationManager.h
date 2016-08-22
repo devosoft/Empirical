@@ -136,7 +136,7 @@ namespace evo {
 
     static constexpr bool emp_has_separate_generations = true;
 
-    void Setup(){ ; }
+    // void Setup() { ; }
 
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = next_pop.size();
@@ -193,7 +193,7 @@ namespace evo {
     void ConfigPop(int m, int b) { max_size = m; bottleneck_size = b; }
 
     int AddOrgBirth(ORG * new_org, int parent_pos) {
-      if (pop.size() >= max_size) {
+      if ((int) pop.size() >= max_size) {
         DoBottleneck(bottleneck_size);
         ++num_bottlenecks;
       }
@@ -338,7 +338,7 @@ namespace evo {
     int AddOrg(ORG * new_org) {
       emp::vector<int> empty_spots = GetValidOrgIndices();
       const int pos = random_ptr->GetInt((int) empty_spots.size());
-      
+
       pop[empty_spots[pos]] = new_org;
       return empty_spots[pos];
     }
@@ -480,7 +480,7 @@ namespace evo {
       connections = *c;
       mig_rate = mg;
       pool_end = {};
-      
+
       vector<int> temp (pop_size, 0);
       pool_id = temp;
 
@@ -568,7 +568,7 @@ namespace evo {
         InsertPool = parent_conns[conn_id];
         }
         else{ InsertPool = pool_id[parent_pos]; }
-      
+
       int range_l = InsertPool ? pool_end[InsertPool-1] : 0;
       int range_u = pool_end[InsertPool];
 

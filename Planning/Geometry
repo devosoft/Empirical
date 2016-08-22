@@ -1,0 +1,30 @@
+Geometry needs to be able to handle a range of SHAPE and a range of OWNERS for those bodies.
+
+Body_Base is a base class, containing info unrelated to its shape or its owner.
+It *does* contain the set of signals that might need to be triggered, such as
+specific types of collisions.
+
+Body is a template class that takes SHAPE and OWNER as template arguments.
+It creates an intenral instance of SHAPE (which has a pointer back to Body_Base)
+and a pointer back to OWNER.
+
+A Surface has a collection of SHAPE objects on it.  For now, all objects on a
+surface must be of the same shape (multiple surfaces should be able to be part
+of a physics or drawn on a canvas... eventually.)
+
+When a physics identifies that two objects have collided it calls
+  Body_Base::SingnalCollide(Body_Base * other)
+
+...which is a pure virtual class.  As such it jumps to:
+  Body<SHAPE,OWNER>::SingnalCollide(Body_Base * other)
+
+Since we now know the OWNER type, this allows us to trigger the collision signal
+in the other base class with the correct type.
+
+
+Concerns
+* Several indirect references occur with each collision.  In the scheme of
+  things, this is probably not too much overhead though.
+* It's tricky to have both types at once.  We need to be careful that we don't
+  make thousands of copies of each signal and instead only one for each owner
+  type

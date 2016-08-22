@@ -20,8 +20,7 @@
 #ifndef EMP_INFO_THEORY_H
 #define EMP_INFO_THEORY_H
 
-#include <cmath>
-
+#include "math.h"
 #include "vector.h"
 
 namespace emp {
@@ -35,7 +34,7 @@ namespace emp {
     for (auto w : weights) total += w;
     for (auto w : weights) {
       double p = ((double) w) / total;
-      entropy -= p * log2(p);
+      entropy -= p * Log2(p);
     }
     return entropy;
   }
@@ -48,13 +47,13 @@ namespace emp {
     for (auto & o : objs) total += fun(o);
     for (auto & o : objs) {
       double p = ((double) fun(o)) / total;
-      entropy -= p * log2(p);
+      entropy -= p * Log2(p);
     }
     return entropy;
   }
 
-  double Entropy2(const double p) {
-    return -(p * log2(p) + (1.0-p)*log2(1.0-p));
+  constexpr double Entropy2(const double p) {
+    return -(p * Log2(p) + (1.0-p)*Log2(1.0-p));
   }
 
   // Conitional Entropy: H(X|Y)
@@ -69,7 +68,7 @@ namespace emp {
     for (auto & o : objs) total += fun(o);
     for (auto & o : objs) {
       double p = ((double) fun(o)) / total;
-      entropy -= p * log2(p);
+      entropy -= p * Log2(p);
     }
     return entropy;
   }

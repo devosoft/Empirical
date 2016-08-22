@@ -7,11 +7,30 @@
 #ifndef EMP_META_H
 #define EMP_META_H
 
+#include <tuple>
 
 namespace emp {
 
   // Effectively create a function (via constructor) where all args are computed, then ignored.
   struct run_and_ignore { template <typename... T> run_and_ignore(T&&...) {} };
+
+  // Trim off the first type from a pack.
+  template <typename T, typename... Ts> using first_type = T;
+
+
+  namespace internal {
+    template <int ID, typename T, typename... Ts>
+    struct pack_id_impl { using type = typename pack_id_impl<ID-1,Ts...>::type; };
+
+    template <typename T, typename... Ts>
+    struct pack_id_impl<0,T,Ts...> { using type = T; };
+  }
+
+  template <int ID, typename ...Ts>
+  using pack_id = typename internal::pack_id_impl<ID,Ts...>::type;
+
+  // Trim off the last type from a pack.
+  template <typename... Ts> using last_type = pack_id<sizeof...(Ts)-1,Ts...>;
 
   // Trick to call a function using each entry in a parameter pack.
 #define EMP_EXPAND_PPACK(PPACK) ::emp::run_and_ignore{ 0, ((PPACK), void(), 0)... }
