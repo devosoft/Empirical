@@ -22,6 +22,8 @@ coverage-html:
 	cd tests && make coverage-html
 
 install-dependencies:
+	git submodule init
+	git submodule update
 	cd third-party && make
 
 install-testing-dependencies:

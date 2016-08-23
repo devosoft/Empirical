@@ -40,7 +40,7 @@ One-time Preparation
 
    (We use GitHub to manage Empirical contributions.)
 
-#. Fork `github.com/mercere99/Empirical <https://github.com/mercere99/Empirical>`__.
+#. Fork `github.com/mercere99/Empirical <https://github.com/devosoft/Empirical>`__.
 
    Visit that page, and then click on the 'fork' button (upper right).
 
