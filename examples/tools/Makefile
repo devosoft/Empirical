@@ -29,53 +29,17 @@ default: native
 native: $(TARGETS)
 
 
-array: array.cc $(TOOLS)/array.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) array.cc -o array
+$(TARGETS): % : %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
+	$(CXX_native) $(CFLAGS_native) $< -o $@
 
-DFA: DFA.cc $(TOOLS)/DFA.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) DFA.cc -o DFA
+# Lexer: Lexer.cc $(TOOLS)/Lexer.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
+#	$(CXX_native) $(CFLAGS_native) Lexer.cc -o Lexer
 
-errors: errors.cc $(TOOLS)/errors.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) errors.cc -o errors
+# lexer_utils: lexer_utils.cc $(TOOLS)/lexer_utils.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
+# 	$(CXX_native) $(CFLAGS_native) lexer_utils.cc -o lexer_utils
 
-info_theory: info_theory.cc $(TOOLS)/info_theory.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) info_theory.cc -o info_theory
-
-Lexer: Lexer.cc $(TOOLS)/Lexer.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
-	$(CXX_native) $(CFLAGS_native) Lexer.cc -o Lexer
-
-lexer_utils: lexer_utils.cc $(TOOLS)/lexer_utils.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
-	$(CXX_native) $(CFLAGS_native) lexer_utils.cc -o lexer_utils
-
-macros: macros.cc $(TOOLS)/macros.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) macros.cc -o macros
-
-math: math.cc $(TOOLS)/math.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) math.cc -o math
-
-meta: meta.cc $(TOOLS)/meta.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) meta.cc -o meta
-
-NFA: NFA.cc $(TOOLS)/NFA.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) NFA.cc -o NFA
-
-Parser: Parser.cc $(TOOLS)/Parser.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
-	$(CXX_native) $(CFLAGS_native) Parser.cc -o Parser
-
-Random: Random.cc $(TOOLS)/Random.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) Random.cc -o Random
-
-reflection: reflection.cc $(TOOLS)/reflection.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) reflection.cc -o reflection
-
-RegEx: RegEx.cc $(TOOLS)/RegEx.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) RegEx.cc -o RegEx
-
-signal: signal.cc $(TOOLS)/signal.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) signal.cc -o signal
-
-vector: vector.cc $(TOOLS)/vector.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) vector.cc -o vector
+# Parser: Parser.cc $(TOOLS)/Parser.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
+# 	$(CXX_native) $(CFLAGS_native) Parser.cc -o Parser
 
 
 debug-%: $*.cc
