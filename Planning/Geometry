@@ -57,3 +57,17 @@ With the ... presumably being sending out a signal?
 Concerns
 * OWNER types cannot be templated or they will screw up the macro.
 * All of PhysicsBody and its child classes will be defined in the macro.
+
+-- PLAN C: Lookup Table --
+All derived objects must be provided from the beginning and assinged a unique value.
+Both values are collected an used to index into a function lookup table.
+
+Since all values are known at compile time, this technique should work consistently
+and quickly.
+
+We may even be able to build this technique with a wrapper that publicly inherets from
+the owner type
+
+Concerns:
+* The interface may be a bit complicated.
+* All OWNER types must be able to know and return their unique id.
