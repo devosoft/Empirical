@@ -1,0 +1,9 @@
+2015-11-06  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * Makefile: added testing maketargets
+    * doc/dev/{index,guide-to-testing}.rst,examples/testing_demo.cc: 
+	added docs on writing/using tests
+    * tests/*: added unit tests using Catch
+    * utests/{tools,geometry,scholar}: migrated all viable tests to Catch
+    * third-party/catch/*: implemented catch
+

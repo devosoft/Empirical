@@ -1,0 +1,47 @@
+2015-11-17  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * ChangeLog, Makefile, changelog/*: added changelog system
+
+2015-11-13  Jacob Fenton  <bocajnotnef@gmail.com>
+
+	* Makefile, tests/Makefile: Implemented diff-cover maketargets
+	* third-party/{install_sphinx.sh,install_pip_deps.sh,requirements.txt}:
+	Switched to the pip dependency list install system instead of some
+	convoluted method.
+	* doc/dev/contribution-guidelines-and-review.rst: added diff-cover
+	maketarget to the review checklist.
+	* .gitignore: added diff-cover stuff to gitignore
+
+2015-11-10  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * {Utests,config,scholar,emtools,geometry,hardware,kinetic,web}/*.h:
+	added copyright header
+    * LICESNE: added symlink to doc/LICENSE
+    * doc/dev/adding-documentation.rst: added doc on writing docs
+    * doc/user*, doc/library*: renamed 'user' to 'library'
+
+2015-11-07  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * doc/LICENSE: added MIT software license
+    * tools/*.h: added license header
+
+2015-11-06  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * Makefile: added testing maketargets
+    * doc/dev/{index,guide-to-testing}.rst,examples/testing_demo.cc: 
+	added docs on writing/using tests
+    * tests/*: added unit tests using Catch
+    * utests/{tools,geometry,scholar}: migrated all viable tests to Catch
+    * third-party/catch/*: implemented catch
+
+2015-11-05  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * third-party/{doxygen,breathe}/*: added doxygen/breathe autodoc system
+    * Makefile: added doc and install-dep maketargets
+    * doc/{Makefile,conf.py,: added sphinx
+
+2014-10-09  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * tools/{LEVEL_MAP,level_detection.py}: added dependency level mapping
+	script
+

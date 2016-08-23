@@ -1,0 +1,4 @@
+2015-11-17  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * ChangeLog, Makefile, changelog/*: added changelog system
+

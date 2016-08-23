@@ -1,0 +1,5 @@
+2015-11-07  Jacob Fenton  <bocajnotnef@gmail.com>
+
+    * doc/LICENSE: added MIT software license
+    * tools/*.h: added license header
+

@@ -15,6 +15,10 @@ travis:
 test:
 	cd tests && make test
 
+ChangeLog: changelog/*
+	cd changelog && make
+	mv changelog/log ChangeLog
+
 coverage:
 	cd tests && make coverage
 
