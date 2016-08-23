@@ -18,7 +18,7 @@ compiler:
 python:
 - '3.5'
 install:
-- if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+- if [ "$CXX" = "g++" ]; then export CXX="g++-5.0" CC="gcc-5.0"; fi
 - export python="/usr/bin/python"
 addons:
   apt:
@@ -26,7 +26,7 @@ addons:
     - kalakris-cmake
     - ubuntu-toolchain-r-test
     packages:
-    - g++-4.8
+    - g++-5.0
     - cmake
     - bison
     - python-virtualenv
