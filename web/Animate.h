@@ -44,11 +44,11 @@
 
 #include <functional>
 
-#include "../emtools/emfunctions.h"
-#include "../emtools/JSWrap.h"
 #include "../tools/assert.h"
 #include "../tools/vector.h"
 
+#include "emfunctions.h"
+#include "JSWrap.h"
 #include "Widget.h"
 
 

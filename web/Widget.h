@@ -26,9 +26,9 @@
 
 #include <string>
 
-#include "../emtools/init.h"
 #include "../tools/mem_track.h"
 #include "../tools/vector.h"
+#include "init.h"
 
 #include "Attributes.h"
 #include "events.h"

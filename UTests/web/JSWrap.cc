@@ -5,8 +5,8 @@
 #include <emscripten.h>
 
 #include "../../tools/alert.h"
-#include "../../emtools/JSWrap.h"
-#include "../../emtools/init.h"
+#include "../../web/JSWrap.h"
+#include "../../web/init.h"
 
 void TestFun1(int w, int x, int y, double z) {
   emp::Alert(w + x*y*z);

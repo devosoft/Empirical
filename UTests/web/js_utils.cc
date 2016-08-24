@@ -7,9 +7,9 @@
 #include <array>
 
 #include "../../config/command_line.h"
-#include "../../emtools/init.h"
-#include "../../emtools/JSWrap.h"
-#include "../../emtools/js_utils.h"
+#include "../../web/init.h"
+#include "../../web/JSWrap.h"
+#include "../../web/js_utils.h"
 #include "../../tools/unit_tests.h"
 #include "../../tools/assert.h"
 
