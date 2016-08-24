@@ -1,8 +1,11 @@
 #define EMP_TRACK_MEM
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]
+#define CATCH_CONFIG_MAIN
 #undef NDEBUG
 #define TDEBUG 1
+
+#include "../third-party/Catch/single_include/catch.hpp"
 
 #include <array>
 #include <sstream>
@@ -16,7 +19,7 @@
 #include "../tools/Graph.h"
 #include "../tools/Ptr.h"
 #include "../tools/Random.h"
-#include "../tools/Trait.h"
+// #include "../tools/Trait.h"
 
 #include "../tools/assert.h"
 #include "../tools/ce_string.h"
@@ -40,8 +43,8 @@
 #include "../tools/alert.h"
 #include "../tools/const.h"
 #include "../tools/errors.h"
-#include "../tools/class.h"
-#include "../tools/fixed.h"
+// #include "../tools/class.h"
+// #include "../tools/fixed.h"
 #include "../tools/SolveState.h"
 #include "../tools/ProbSchedule.h"
 #include "../tools/serialize_macros.h"
@@ -1128,17 +1131,17 @@ TEST_CASE("Test ce_string", "[tools]")
 }
 
 
-TEST_CASE("Test trait", "[tools]")
-{
-  emp::TraitManager<int, double, emp::vector<bool>, char, std::string> tm;
+// TEST_CASE("Test trait", "[tools]")
+// {
+//   emp::TraitManager<int, double, emp::vector<bool>, char, std::string> tm;
 
-  tm.AddTrait<int>("test_trait", "This is a test trait", 42);
-  tm.AddTrait<std::string>("test2", "This is technically our second test trait.", "VALUE");
-  tm.AddTrait<int>("test3", "And we need another int trait to test", 1000);
+//   tm.AddTrait<int>("test_trait", "This is a test trait", 42);
+//   tm.AddTrait<std::string>("test2", "This is technically our second test trait.", "VALUE");
+//   tm.AddTrait<int>("test3", "And we need another int trait to test", 1000);
 
 
-  //emp::TraitSet trait_set(tm);
-}
+//   //emp::TraitSet trait_set(tm);
+// }
 
 
 TEST_CASE("Test vector", "[tools]")

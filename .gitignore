@@ -13,10 +13,12 @@ a.out.js
 *.debug
 *tmp.*
 *.cfg
-*.csv
-scripts/*.png
-scripts/*.mp4
+*.png
 examples/evo/concept
+*.out
+*.debug
+*.mp4
+*.csv
 coverage.xml
 diff_cover.txt
 UTests/tools/tmp*.cc
