@@ -7,7 +7,7 @@
 #ifndef EMP_TYPE_SET_H
 #define EMP_TYPE_SET_H
 
-#include "../tools/meta.h"
+#include "meta.h"
 
 namespace emp {
 
