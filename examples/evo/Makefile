@@ -23,6 +23,7 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 TARGETS := Fitness_Share_NK link_test NK NK-const NK-Serial Symbulation World bit_evolve
 
 EVO_DEPEND := ../../evo/PopulationManager.h ../../evo/World.h
+QUORUM_DEPEND := ../../evo/QuorumOrg.h ../../evo/QuorumManager.h ../../evo/PopulationManager.h
 
 default: native
 

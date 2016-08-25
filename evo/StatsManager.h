@@ -12,9 +12,8 @@
 #include "../tools/stats.h"
 #include "../config/config.h"
 #include "PopulationManager.h"
-#include "EvoStats.h"
 #include "LineageTracker.h"
-
+#include "EvoStats.h"
 namespace emp{
 namespace evo{
 
@@ -121,7 +120,9 @@ namespace evo{
     template <typename WORLD>
     StatsManager_FunctionsOnUpdate(WORLD * w,
                                    std::string location = "stats.csv") :
-                                   StatsManager_Base<decltype(w->popM)>(location){}
+                                   StatsManager_Base<decltype(w->popM)>(location){
+      Setup(w);
+    }
 
     //Constructor for use by World object
     StatsManager_FunctionsOnUpdate(std::string location = "stats.csv") :
@@ -190,12 +191,11 @@ namespace evo{
       using org_ptr = typename POP_MANAGER::value_type;
       using fit_fun_type = std::function<double(org_ptr)>;
       using fit_stat_type = std::function<double(fit_fun_type, POP_MANAGER*)>;
-      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::AddFunction;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::pop;
       using StatsManager_Base<POP_MANAGER>::output_location;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::Update;
-
   public:
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::AddFunction;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::fit_fun;
       using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::SetDefaultFitnessFun;
@@ -232,20 +232,92 @@ namespace evo{
             Update(ud);
         };
 
-
         //Add functions to manager
         AddFunction(diversity, "Shannon Diversity");
         AddFunction(max_fitness, "Max Fitness");
         AddFunction(avg_fitness, "Avg Fitness");
-
-        w->OnUpdate(UpdateFun);
-
+        
       }
 
 };
 
-using NullStats = StatsManager_Base<PopBasic>;
-using DefaultStats = StatsManager_DefaultStats<PopBasic>;
+  template <typename POP_MANAGER = PopulationManager_Base<int> >
+  class StatsManager_Mapper : StatsManager_Base<POP_MANAGER> {
+  protected:
+    using org_ptr = typename POP_MANAGER::value_type;
+    //using world_type = World<ORG, MANAGERS...>;
+    using fit_fun_type = std::function<double(org_ptr)>;
+
+    //Pointer to the world object on which we're calculating stats
+    POP_MANAGER * popM;
+    using StatsManager_Base<POP_MANAGER>::resolution;
+    using StatsManager_Base<POP_MANAGER>::output_location;
+    using StatsManager_Base<POP_MANAGER>::delimiter;
+    bool header_printed = false;
+    std::string header = "update, state";
+    emp::vector<std::string> col_map;
+    unsigned int width, height;
+
+  public:
+    using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
+    fit_fun_type fit_fun;
+
+    //Constructor for creating this as a stand-alone object
+    template <typename WORLD>
+    StatsManager_Mapper(WORLD * w, unsigned int map_width, unsigned int map_height,
+                                   std::string location = "stats.csv") :
+                                   StatsManager_Base<decltype(w->popM)>(location),
+                                   width(map_width), height(map_height) {
+      Setup(w);
+    }
+
+    //Constructor for use by World object
+    StatsManager_Mapper(unsigned int map_width, unsigned int map_height, 
+                        std::string location = "stats.csv") :
+                                   StatsManager_Base<POP_MANAGER>(location),
+                                   width(map_width), height(map_height){;}
+
+    //The fitness function for calculating fitness related stats
+    template <typename WORLD>
+    void Setup(WORLD * w){
+      popM = &(w->popM);
+
+      std::function<void(int)> UpdateFun = [&] (int ud){
+          Update(ud);
+      };
+
+      w->OnUpdate(UpdateFun);
+    }
+
+    //If this update matches the resolution, calculate and record all the stats
+    void Update(int update) {
+      if (!header_printed) {
+          output_location << header << std::endl;
+          header_printed = true;
+      }
+
+      if (update % resolution == 0){
+        output_location << update;
+        output_location << delimiter << "{ [";
+        //iterate over the population
+        for(size_t i = 0; i < popM->GetSize(); i++) {
+          
+          if (i > 0 && i % width == 0) {
+            output_location << ", [";
+           }
+           output_location << popM->classify(popM->GetPos(i)) << delimiter;
+
+          if (i > 1 && i % width == width - 1) {
+            output_location << "]";
+          }
+        }
+
+        output_location << "] } " << std::endl;
+      }
+    }
+
+  };
+
 
   // Calculates Default stats plus some other less frequently used stats: Non-Inferiority,
   // Benefitial/Neutral/Detremental Mutational Landscape average, max benefit/max detremental
@@ -340,11 +412,11 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
           AddFunction(max_ben, "max_ben");
           AddFunction(max_det, "max_det");
 
-          w->OnUpdate(UpdateFun);
-
       }
   };
 
+using NullStats = StatsManager_Base<PopBasic>;
+using DefaultStats = StatsManager_DefaultStats<PopBasic>;
 }
 }
 

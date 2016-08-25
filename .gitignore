@@ -9,7 +9,12 @@ a.out.js
 *.swp
 *.swo
 *.dSYM
+*.out
+*.debug
 *tmp.*
+*.cfg
+*.png
+examples/evo/concept
 *.out
 *.debug
 *.mp4
