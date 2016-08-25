@@ -9,7 +9,7 @@
 #define EMP_TYPE_TRACKER_H
 
 #include "assert.h"
-#include "TypeSet.h"
+#include "meta.h"
 
 namespace emp {
 
@@ -33,12 +33,12 @@ namespace emp {
   };
 
   template <typename BASE, typename T1, typename... Ts>
-  struct TypeTracker : public TypeSet<T1,Ts...> {
-    using TypeSet<T1,Ts...>::GetID;
+  struct TypeTracker {
     using base_t = TypeTracker_Base<BASE>;
-    template <typename OWNER> using wrap = TypeTracker_Class< BASE, OWNER, GetID<OWNER>() >;
+    template <typename OWNER>
+    using wrap = TypeTracker_Class< BASE, OWNER, get_type_index<OWNER,T1,Ts...>() >;
   };
 
-};
+}
 
 #endif
