@@ -58,6 +58,13 @@ namespace emp {
       };
       return *this;
     }
+
+    void RunFunction( base_t * b1, base_t * b2 ) {
+      const int id1 = b1->GetTypeTrackerID();
+      const int id2 = b2->GetTypeTrackerID();
+      const int pos = id1 * GetNumTypes() + id2;
+      if (redirects[pos]) redirects[pos](b1,b2);  // If a redirect exists, use it!
+    }
   };
 
 }
