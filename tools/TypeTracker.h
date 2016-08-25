@@ -13,8 +13,9 @@
 
 namespace emp {
 
-  // The base class of the types to be tracked should publically inherert from TypeTracker_Base
-  struct TypeTracker_Base {
+  // The base class of the types to be tracked; derived from BASE which can include any common info.
+  template <typename BASE>
+  struct TypeTracker_Base : public BASE {
     virtual int GetTypeTrackerID() const noexcept {
       emp_assert(false); // Should never run GetTypeTrackerID from the base class!
       return -1;
@@ -24,13 +25,18 @@ namespace emp {
   // The derived classes to be tracked should inherit from TypeTracker_Class<ID>
   // where ID is the position in the type list for TypeTracker.  Note that this value can
   // be obtained dyanmically at compile type by using TypeTracker<...>::GetID<TYPE>()
-  template <int ID>
-  struct TypeTracker_Class : public TypeTracker_Base {
+  template <typename BASE, typename OWNER, int ID>
+  struct TypeTracker_Class : public TypeTracker_Base<BASE> {
+    using owner_t = OWNER;
+    OWNER * owner;
     virtual int GetTypeTrackerID() const noexcept { return ID; }
   };
 
-  template <typename T1, typename... Ts>
+  template <typename BASE, typename T1, typename... Ts>
   struct TypeTracker : public TypeSet<T1,Ts...> {
+    using TypeSet<T1,Ts...>::GetID;
+    using base_t = TypeTracker_Base<BASE>;
+    template <typename OWNER> using wrap = TypeTracker_Class< BASE, OWNER, GetID<OWNER>() >;
   };
 
 };
