@@ -29,6 +29,14 @@ namespace emp {
   struct TypeTracker_Class : public TypeTracker_Base {
     using owner_t = OWNER;
     OWNER owner;
+
+    TypeTracker_Class(OWNER in) : owner(in) { ; }
+    TypeTracker_Class(OWNER & in) : owner(in) { ; }
+    TypeTracker_Class(OWNER && in) : owner(std::forward<OWNER>(in)) { ; }
+    TypeTracker_Class(const TypeTracker_Class &) = default;
+    TypeTracker_Class(TypeTracker_Class &&) = default;
+    TypeTracker_Class & operator=(const TypeTracker_Class &) = default;
+    TypeTracker_Class & operator=(TypeTracker_Class &&) = default;
     virtual int GetTypeTrackerID() const noexcept { return ID; }
   };
 
@@ -37,7 +45,8 @@ namespace emp {
     using this_t = TypeTracker<FIRST_T, OTHER_Ts...>;
     using base_t = TypeTracker_Base;
     template <typename OWNER>
-    using wrap = TypeTracker_Class< OWNER, get_type_index<OWNER,FIRST_T,OTHER_Ts...>() >;
+    using wrap_t = TypeTracker_Class< OWNER, get_type_index<OWNER,FIRST_T,OTHER_Ts...>() >;
+
     constexpr static int GetNumTypes() { return sizeof...(OTHER_Ts)+1; }
     constexpr static int GetNumCombos() { return GetNumTypes() * GetNumTypes(); }
 
@@ -47,6 +56,7 @@ namespace emp {
     TypeTracker(const TypeTracker &) = default;
     TypeTracker(TypeTracker &&) = default;
     TypeTracker & operator=(const TypeTracker &) = default;
+    TypeTracker & operator=(TypeTracker &&) = default;
 
     // template <typename T1, typename T2>
     // this_t & AddFunction( std::function<void(T1*,T2*)> fun ) {
@@ -54,7 +64,7 @@ namespace emp {
     //   constexpr int ID2 = get_type_index<T2,FIRST_T,OTHER_Ts...>();
     //   constexpr int POS = ID1 * GetNumTypes() + ID2;
     //   redirects[POS] = [fun](base_t* b1, base_t* b2) {
-    //     fun(((wrap<T1> *) b1)->owner, ((wrap<T2> *) b2)->owner);
+    //     fun(((wrap_t<T1> *) b1)->owner, ((wrap_t<T2> *) b2)->owner);
     //   };
     //   return *this;
     // }
@@ -65,7 +75,7 @@ namespace emp {
       constexpr int ID2 = get_type_index<T2,FIRST_T,OTHER_Ts...>();
       constexpr int POS = ID1 * GetNumTypes() + ID2;
       redirects[POS] = [fun](base_t* b1, base_t* b2) {
-        fun( ((wrap<T1> *) b1)->owner, ((wrap<T2> *) b2)->owner );
+        fun( ((wrap_t<T1> *) b1)->owner, ((wrap_t<T2> *) b2)->owner );
       };
       return *this;
     }
