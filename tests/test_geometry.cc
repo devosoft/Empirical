@@ -1,4 +1,6 @@
 #include <vector>
+#define CATCH_CONFIG_MAIN
+#include "../third-party/Catch/single_include/catch.hpp"
 
 #include "../geometry/Body2D.h"
 #include "../geometry/Circle2D.h"

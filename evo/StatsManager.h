@@ -58,7 +58,8 @@ namespace evo{
     void Setup(WORLD * w){;}
 
     template <typename T>
-    void SetDefaultFitnessFun(std::function<double(T)> fit){;}
+    //void SetDefaultFitnessFun(const std::function<double(T*)> &) {;}
+    void SetDefaultFitnessFun(const T &) {;}
 
     //Tells the stats manager where to put output. If location is "cout"
     //(default) or "stdout", stats will get sent to cout. Otherwise, the
@@ -127,7 +128,8 @@ namespace evo{
     StatsManager_FunctionsOnUpdate(std::string location = "stats.csv") :
                                    StatsManager_Base<POP_MANAGER>(location){;}
 
-    //The fitness function for calculating fitness related stats
+    //The fitness function for calculating fitness related stats.
+    //Not called by constructor. Must be called by user.
     template <typename WORLD>
     void Setup(WORLD * w){
       pop = &(w->popM);
@@ -161,6 +163,7 @@ namespace evo{
       }
 
       if (update % resolution == 0){
+
         output_location << update;
 
         emp::vector<double> results = stats.Run();
@@ -172,7 +175,7 @@ namespace evo{
       }
     }
 
-    void SetDefaultFitnessFun(std::function<double(org_ptr)> fit){
+    void SetDefaultFitnessFun(const std::function<double(org_ptr)> & fit){
         fit_fun = fit;
     }
 
@@ -180,7 +183,9 @@ namespace evo{
 
   //Calculates some commonly required information: shannon diversity,
   //max fitness within the population, and average fitness within the population
+
   template <typename POP_MANAGER = PopulationManager_Base<int> >
+
   class StatsManager_DefaultStats : StatsManager_FunctionsOnUpdate<POP_MANAGER> {
   protected:
       using org_ptr = typename POP_MANAGER::value_type;
@@ -313,6 +318,10 @@ namespace evo{
 
   };
 
+
+  // Calculates Default stats plus some other less frequently used stats: Non-Inferiority,
+  // Benefitial/Neutral/Detremental Mutational Landscape average, max benefit/max detremental
+  // mutation, and last coalescence depth
 
   template <typename POP_MANAGER = PopulationManager_Base<int> >
   class StatsManager_AdvancedStats : protected StatsManager_FunctionsOnUpdate<POP_MANAGER> {
