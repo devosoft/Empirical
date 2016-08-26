@@ -67,6 +67,8 @@ namespace emp {
       constexpr int ID2 = get_type_index<T2,TYPES...>();
       constexpr int POS = ID1 * GetNumTypes() + ID2;
       redirects[POS] = [fun](TrackedType* b1, TrackedType* b2) {
+        emp_assert(dynamic_cast<wrap_t<T1> *>(b1) != nullptr);
+        emp_assert(dynamic_cast<wrap_t<T2> *>(b2) != nullptr);
         fun( ((wrap_t<T1> *) b1)->value, ((wrap_t<T2> *) b2)->value );
       };
       return *this;
