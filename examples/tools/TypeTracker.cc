@@ -17,9 +17,8 @@ void fun_string_double(std::string x, int y) { std::cout << x << " -> " << y << 
 
 int main()
 {
-  using tracker_t = emp::TypeTracker<int, std::string, double>;  // Tracker must know all types.
-  tracker_t tt;                                                  // Build the tracker.
-  tt.AddFunction(fun_int_int);                                   // Add the functions...
+  emp::TypeTracker<int, std::string, double> tt;     // Build the tracker.
+  tt.AddFunction(fun_int_int);                       // Add the functions...
   tt.AddFunction(fun_int_double);
   tt.AddFunction(fun_string_double);
 
@@ -36,4 +35,18 @@ int main()
       tt.RunFunction(x,y);
     }
   }
+
+  // Cleanup objects.
+  for (auto x : objs) delete x;
+  objs.resize(0);
+
+
+  // Try another tracker with pointers.
+  emp::TypeTracker<int*, std::string*, double*> tt2;
+  int * int_ptr = new int(12);
+  std::string * str_ptr = new std::string("allocated string");
+  double * double_ptr = new double(1.25);
+  objs.push_back( tt2.New<int*>(int_ptr) );
+  objs.push_back( tt2.New<std::string*>(str_ptr) );
+  objs.push_back( tt2.New<double*>(double_ptr) );
 }
