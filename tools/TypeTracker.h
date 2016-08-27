@@ -20,6 +20,7 @@ namespace emp {
       emp_assert(false); // Should never run GetTypeTrackerID from the base class!
       return -1;
     }
+    virtual ~TrackedType() = default;
   };
 
   // The derived classes to be tracked should inherit from TypeTracker_Class<ID>
