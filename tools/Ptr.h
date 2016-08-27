@@ -136,9 +136,9 @@ namespace emp {
 
 #undef EMP_IF_MEMTRACK
 #ifdef EMP_TRACK_MEM
-#define EMP_IF_MEMTRACK(STATEMENTS) { STATEMENTS }
+#define EMP_IF_MEMTRACK(...) { __VA_ARGS__ }
 #else
-#define EMP_IF_MEMTRACK(STATEMENTS)
+#define EMP_IF_MEMTRACK(...)
 #endif
 
   template <typename TYPE>
@@ -151,8 +151,10 @@ namespace emp {
 #endif
   public:
     Ptr() : ptr(nullptr) { ; }
-    Ptr(TYPE * in_ptr) : ptr(in_ptr) { EMP_IF_MEMTRACK( Tracker().New(ptr); ); }
-    Ptr(TYPE & obj) : ptr(&obj) { EMP_IF_MEMTRACK( Tracker().Old(ptr); ); }
+    Ptr(TYPE * in_ptr, bool is_new=true) : ptr(in_ptr) {
+      EMP_IF_MEMTRACK( if (is_new) Tracker().New(ptr); else Tracker().Old(ptr); );
+    }
+    Ptr(TYPE & obj) : Ptr(&obj, false) {;}  // Pre-existing objects are NOT tracked.
     Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) { EMP_IF_MEMTRACK( Tracker().Inc(ptr); ); }
     ~Ptr() { EMP_IF_MEMTRACK( Tracker().Dec(ptr); ); }
 
@@ -191,6 +193,7 @@ namespace emp {
 
     TYPE & operator*() { return *ptr; }
     TYPE * operator->() { return ptr; }
+    operator TYPE *() { return ptr; }
 
     bool operator==(const Ptr<TYPE> & in_ptr) { return ptr == in_ptr.ptr; }
     bool operator!=(const Ptr<TYPE> & in_ptr) { return ptr != in_ptr.ptr; }
