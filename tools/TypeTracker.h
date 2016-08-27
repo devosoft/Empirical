@@ -58,11 +58,23 @@ namespace emp {
     TypeTracker & operator=(TypeTracker &&) = default;
 
     template <typename REAL_T>
-    wrap_t<REAL_T> Wrap(REAL_T && val) { return wrap_t<REAL_T>(std::forward<REAL_T>(val)); }
+    wrap_t<REAL_T> Wrap(REAL_T && val) {
+      constexpr bool type_ok = has_type<REAL_T, TYPES...>();
+      emp_assert(type_ok);    // Make sure we're wrapping a legal type.
+      return wrap_t<REAL_T>(std::forward<REAL_T>(val));
+    }
     template <typename REAL_T>
-    wrap_t<REAL_T> * New(REAL_T && val) { return new wrap_t<REAL_T>(std::forward<REAL_T>(val)); }
+    wrap_t<REAL_T> * New(REAL_T && val) {
+      constexpr bool type_ok = has_type<REAL_T, TYPES...>();
+      emp_assert(type_ok);    // Make sure we're wrapping a legal type.
+      return new wrap_t<REAL_T>(std::forward<REAL_T>(val));
+    }
     template <typename REAL_T>
-    wrap_t<REAL_T> * New(REAL_T & val) { return new wrap_t<REAL_T>(std::forward<REAL_T>(val)); }
+    wrap_t<REAL_T> * New(REAL_T & val) {
+      constexpr bool type_ok = has_type<REAL_T, TYPES...>();
+      emp_assert(type_ok);    // Make sure we're wrapping a legal type.
+      return new wrap_t<REAL_T>(std::forward<REAL_T>(val));
+    }
 
     template <typename T1, typename T2>
     this_t & AddFunction( std::function<void(T1,T2)> fun ) {
