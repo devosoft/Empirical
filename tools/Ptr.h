@@ -147,7 +147,9 @@ namespace emp {
     TYPE * ptr;
 
 #ifdef EMP_TRACK_MEM
-    static PtrTracker<TYPE> & Tracker() { return PtrTracker<TYPE>::Get(); }
+    static PtrTracker<TYPE> & Tracker() {
+      return PtrTracker<TYPE>::Get();
+    }
 #endif
   public:
     Ptr() : ptr(nullptr) { ; }
@@ -158,7 +160,7 @@ namespace emp {
     Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) { EMP_IF_MEMTRACK( Tracker().Inc(ptr); ); }
     ~Ptr() { EMP_IF_MEMTRACK( Tracker().Dec(ptr); ); }
 
-    bool IsNull() { return ptr == nullptr; }
+    bool IsNull() const { return ptr == nullptr; }
 
     void New() {
       EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
@@ -175,7 +177,6 @@ namespace emp {
     void New(T... args) {
       EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
       ptr = new TYPE(std::forward<T>(args)...);
-      // ptr = new TYPE(args...);
       EMP_IF_MEMTRACK(Tracker().New(ptr););
     }
     void Delete() {
@@ -190,17 +191,21 @@ namespace emp {
       EMP_IF_MEMTRACK(Tracker().Inc(ptr););
       return *this;
     }
-
     TYPE & operator*() { return *ptr; }
     TYPE * operator->() { return ptr; }
     operator TYPE *() { return ptr; }
 
-    bool operator==(const Ptr<TYPE> & in_ptr) { return ptr == in_ptr.ptr; }
-    bool operator!=(const Ptr<TYPE> & in_ptr) { return ptr != in_ptr.ptr; }
-    bool operator<(const Ptr<TYPE> & in_ptr)  { return ptr < in_ptr.ptr; }
-    bool operator<=(const Ptr<TYPE> & in_ptr) { return ptr <= in_ptr.ptr; }
-    bool operator>(const Ptr<TYPE> & in_ptr)  { return ptr > in_ptr.ptr; }
-    bool operator>=(const Ptr<TYPE> & in_ptr) { return ptr >= in_ptr.ptr; }
+    // Allow Ptr to be treated as an array?
+    // @CAO commented out for now; would need to track array status to call delete[]
+    // TYPE & operator[](int pos) { return ptr[pos]; }
+    // const TYPE & operator[](int pos) const { return ptr[pos]; }
+
+    bool operator==(const Ptr<TYPE> & in_ptr) const { return ptr == in_ptr.ptr; }
+    bool operator!=(const Ptr<TYPE> & in_ptr) const { return ptr != in_ptr.ptr; }
+    bool operator<(const Ptr<TYPE> & in_ptr)  const { return ptr < in_ptr.ptr; }
+    bool operator<=(const Ptr<TYPE> & in_ptr) const { return ptr <= in_ptr.ptr; }
+    bool operator>(const Ptr<TYPE> & in_ptr)  const { return ptr > in_ptr.ptr; }
+    bool operator>=(const Ptr<TYPE> & in_ptr) const { return ptr >= in_ptr.ptr; }
 
     // Some debug testing functions
 #ifdef EMP_TRACK_MEM
