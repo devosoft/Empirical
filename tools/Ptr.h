@@ -31,33 +31,33 @@ namespace emp {
     bool IsActive() const { return active; }
     bool IsOwner() const { return owner; }
 
-    void Inc() { emp_assert(active); count++; }
+    void Inc() { emp_assert(active, "Incrementing deleted pointer!"); count++; }
     void Dec() {
       // If this pointer is not active, it doesn't matter how many copies we have.
       if (active == false) return;
 
-      emp_assert(count > 0);        // Do not decrement more copies than we have!
+      emp_assert(count > 0, "Decrementing Ptr count; already zero!");        // Do not decrement more copies than we have!
 
       // Make sure one of these conditions is true:
       // * We are not getting rid of the last copy, -or-
       // * We've already deleted this pointer, -or-
       // * We're not responsible for deleting this pointer.
-      emp_assert(count > 1 || owner == false);
+      emp_assert(count > 1 || owner == false, "Removing last reference to owned Ptr!");
       count--;
     }
 
     void MarkDeleted() {
-      emp_assert(active == true);   // Do not delete a pointer more than once!
-      emp_assert(owner == true);    // We should only be deleting pointers we own!
+      emp_assert(active == true, "Deleting same emp::Ptr a second time!");
+      emp_assert(owner == true, "Deleting emp::Ptr we don't own!");
       active = false;
     }
     void Claim() {
-      emp_assert(owner == false);    // We can only claim pointer we don't already own!
+      emp_assert(owner == false, "Claiming an emp::Ptr that we already own!");
       owner = true;
     }
     void Surrender() {
-      emp_assert(active == true);   // Do not surrender an inactive pointer!
-      emp_assert(owner == true);    // We can only surrender a pointer we own!
+      emp_assert(active == true, "Surrendering emp::Ptr that was deallocated!");
+      emp_assert(owner == true, "Surrendering emp::Ptr that we don't own!");
       owner = false;
     }
   };
