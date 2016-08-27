@@ -35,6 +35,11 @@ namespace emp {
   // Trick to call a function using each entry in a parameter pack.
 #define EMP_EXPAND_PPACK(PPACK) ::emp::run_and_ignore{ 0, ((PPACK), void(), 0)... }
 
+  // Check to see if a specified type is part of a set of types.
+  template <typename TEST> constexpr bool has_type() { return false; }
+  template <typename TEST, typename FIRST, typename... OTHERS>
+  constexpr bool has_type() { return std::is_same<TEST, FIRST>() || has_type<TEST,OTHERS...>(); }
+
   // The following functions take a test type and a list of types and return the index that
   // matches the test type in question.
   template <typename TEST_TYPE>
