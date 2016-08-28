@@ -38,9 +38,9 @@ namespace emp {
     field_t * bit_set;
 
     // NOTE: due to math edge cases, when num_bits=0 a minimum of 1 field/byte is returned.
-    constexpr int LastBitID() const { return num_bits & (FIELD_BITS - 1); }
-    constexpr int NumFields() const { return 1 + ((num_bits - 1) / FIELD_BITS); }
-    constexpr int NumBytes()  const { return 1 + ((num_bits - 1) >> 3); }
+    int LastBitID() const { return num_bits & (FIELD_BITS - 1); }
+    int NumFields() const { return 1 + ((num_bits - 1) / FIELD_BITS); }
+    int NumBytes()  const { return 1 + ((num_bits - 1) >> 3); }
 
     // Setup a bit proxy so that we can use operator[] on bit sets as an lvalue.
     class BitProxy {
@@ -237,7 +237,7 @@ namespace emp {
     bool operator>(const BitVector & in_set) const { return !operator<=(in_set); }
     bool operator>=(const BitVector & in_set) const { return !operator<(in_set); }
 
-    constexpr int GetSize() const { return num_bits; }
+    int GetSize() const { return num_bits; }
 
     bool Get(int index) const {
       emp_assert(index >= 0 && index < num_bits);
