@@ -113,8 +113,9 @@ namespace emp {
     // This pointer was already created, but given to Ptr.
     void Old(TYPE * ptr) {
       if (verbose) std::cout << "Old:    " << ((uint64_t) ptr) << std::endl;
-      emp_assert(!HasPtr(ptr) || !IsActive(ptr)); // Make sure pointer is not already stored!
-      ptr_count[ptr] = PtrInfo(false);
+      // If we already have this pointer, just increment the count.  Otherwise track it now.
+      if (HasPtr(ptr) && IsActive(ptr)) Inc(ptr);
+      else ptr_count[ptr] = PtrInfo(false);
     }
     void Inc(TYPE * ptr) {
       if (verbose) std::cout << "Inc:    " << ((uint64_t) ptr) << std::endl;
