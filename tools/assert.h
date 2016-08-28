@@ -36,6 +36,18 @@
 #endif
 
 
+// It's normally not possible to put an assert in a constexpr function because printing is not
+// available at compile time.  As such, we've added emp_constexpr which is empty in debug more
+// but becomes constexpr with NDEBUG.  Of course, this requires testing with NDEBUG turned on!
+
+#ifdef EMP_NDEBUG
+#define emp_constexpr constexpr
+#else
+#define emp_constexpr
+#endif
+
+
+// Turn off all asserts in EMP_NDEBUG
 #ifdef EMP_NDEBUG
 namespace emp {
   const bool assert_on = false;
