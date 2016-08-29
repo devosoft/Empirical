@@ -186,7 +186,8 @@ namespace emp {
       delete ptr;
     }
 
-    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
+    template <typename T2>
+    Ptr<TYPE> & operator=(const Ptr<T2> & _in) {
       EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
       ptr=_in.ptr;
       EMP_IF_MEMTRACK(Tracker().Inc(ptr););
@@ -194,7 +195,9 @@ namespace emp {
     }
     TYPE & operator*() { return *ptr; }
     TYPE * operator->() { return ptr; }
+    const TYPE * const operator->() const { return ptr; }
     operator TYPE *() { return ptr; }
+    operator bool() { return ptr != nullptr; }
 
     // Allow Ptr to be treated as an array?
     // @CAO commented out for now; would need to track array status to call delete[]
@@ -207,6 +210,13 @@ namespace emp {
     bool operator<=(const Ptr<TYPE> & in_ptr) const { return ptr <= in_ptr.ptr; }
     bool operator>(const Ptr<TYPE> & in_ptr)  const { return ptr > in_ptr.ptr; }
     bool operator>=(const Ptr<TYPE> & in_ptr) const { return ptr >= in_ptr.ptr; }
+
+    bool operator==(const TYPE * in_ptr) const { return ptr == in_ptr; }
+    bool operator!=(const TYPE * in_ptr) const { return ptr != in_ptr; }
+    bool operator<(const TYPE * in_ptr)  const { return ptr < in_ptr; }
+    bool operator<=(const TYPE * in_ptr) const { return ptr <= in_ptr; }
+    bool operator>(const TYPE * in_ptr)  const { return ptr > in_ptr; }
+    bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
 
     // Some debug testing functions
 #ifdef EMP_TRACK_MEM
