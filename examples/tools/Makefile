@@ -6,7 +6,7 @@ CFLAGS_all := -Wall -Wno-unused-function -std=c++11 -I../../
 CXX_web := emcc
 CXX_native := g++
 
-OFLAGS_native_debug := -g -pedantic
+OFLAGS_native_debug := -g -pedantic -DEMP_TRACK_MEM
 OFLAGS_native_opt := -O3 -DNDEBUG
 
 OFLAGS_web_debug := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864 -s ASSERTIONS=2 -s DEMANGLE_SUPPORT=1 # -s SAFE_HEAP=1
