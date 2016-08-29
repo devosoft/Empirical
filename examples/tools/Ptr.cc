@@ -14,12 +14,15 @@
 
 #include "../../tools/Ptr.h"
 
+struct TestBase { int x; TestBase(int _x):x(_x){;} virtual int Val(){return x;} };
+struct TestDerived : public TestBase { TestDerived(int _x):TestBase(_x){;} int Val(){return 2*x;} };
+
 int main()
 {
   std::string test_str = "Test String!";
   std::cout << test_str << std::endl;
 
-  emp::Ptr<std::string> test_ptr(test_str);
+  emp::Ptr<std::string> test_ptr(test_str);   // false -> don't track!
   std::cout << "From Ptr: " << *test_ptr << std::endl;
   std::cout << "  with size = " << test_ptr->size() << std::endl;
 
@@ -31,4 +34,9 @@ int main()
   int_ptr.New(123456);
   std::cout << "*int_ptr = " << *int_ptr << std::endl;
   int_ptr.Delete();
+
+
+  // Examples with base and derived classes.
+  emp::Ptr<TestBase> ptr_base = new TestDerived(5);
+  emp::Ptr<TestDerived> ptr_derived(ptr_base.Cast<TestDerived>());
 }
