@@ -154,10 +154,13 @@ namespace emp {
 #endif
   public:
     Ptr() : ptr(nullptr) { ; }
-    Ptr(TYPE * in_ptr, bool is_new=true) : ptr(in_ptr) {
+    template <typename T2>
+    Ptr(T2 * in_ptr, bool is_new=true) : ptr(in_ptr) {
       EMP_IF_MEMTRACK( if (is_new) Tracker().New(ptr); else Tracker().Old(ptr); );
     }
-    Ptr(TYPE & obj) : Ptr(&obj, false) {;}  // Pre-existing objects are NOT tracked.
+    template <typename T2>
+    Ptr(T2 & obj) : Ptr(&obj, false) {;}  // Pre-existing objects are NOT tracked.
+    Ptr(std::nullptr_t) : Ptr() { ; }
     Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) { EMP_IF_MEMTRACK( Tracker().Inc(ptr); ); }
     ~Ptr() { EMP_IF_MEMTRACK( Tracker().Dec(ptr); ); }
 
