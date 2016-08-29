@@ -63,16 +63,17 @@ namespace emp {
   };
 
 
-  template <typename TYPE>
   class PtrTracker {
   private:
-    std::map<TYPE *, PtrInfo> ptr_count;
+    std::map<void *, PtrInfo> ptr_info;
     bool verbose;
 
     // Make sure trackers can't be built outside of this class.
-    PtrTracker() : verbose (false) { ; }
-    PtrTracker(const PtrTracker<int> &) = delete;
-    PtrTracker<int> & operator=(const PtrTracker<TYPE> &) = delete;
+    PtrTracker() : verbose(false) { ; }
+    PtrTracker(const PtrTracker &) = delete;
+    PtrTracker(PtrTracker &&) = delete;
+    PtrTracker & operator=(const PtrTracker &) = delete;
+    PtrTracker & operator=(PtrTracker &&) = delete;
   public:
     ~PtrTracker() { ; }
 
@@ -80,57 +81,57 @@ namespace emp {
     void SetVerbose(bool v=true) { verbose = v; }
 
     // Treat this class as a singleton with a single Get() method to retrieve it.
-    static PtrTracker<TYPE> & Get() { static PtrTracker<TYPE> tracker; return tracker; }
+    static PtrTracker & Get() { static PtrTracker tracker; return tracker; }
 
     // Some simple accessors
-    bool HasPtr(TYPE * ptr) const {
+    bool HasPtr(void * ptr) const {
       if (verbose) std::cout << "HasPtr: " << ((uint64_t) ptr) << std::endl;
-      return ptr_count.find(ptr) != ptr_count.end();
+      return ptr_info.find(ptr) != ptr_info.end();
     }
-    bool IsActive(TYPE * ptr) const {
+    bool IsActive(void * ptr) const {
       if (verbose) std::cout << "Active: " << ((uint64_t) ptr) << std::endl;
       if (!HasPtr(ptr)) return false;
-      return ptr_count.find(ptr)->second.IsActive();
+      return ptr_info.find(ptr)->second.IsActive();
     }
-    bool IsOwner(TYPE * ptr) const {
+    bool IsOwner(void * ptr) const {
       if (verbose) std::cout << "Owner:  " << ((uint64_t) ptr) << std::endl;
       if (!HasPtr(ptr)) return false;
-      return ptr_count.find(ptr)->second.IsOwner();
+      return ptr_info.find(ptr)->second.IsOwner();
     }
-    int GetCount(TYPE * ptr) const {
+    int GetCount(void * ptr) const {
       if (verbose) std::cout << "Count:  " << ((uint64_t) ptr) << std::endl;
       if (!HasPtr(ptr)) return 0;
-      return ptr_count.find(ptr)->second.GetCount();
+      return ptr_info.find(ptr)->second.GetCount();
     }
 
     // This pointer was just created as a Ptr!
-    void New(TYPE * ptr) {
+    void New(void * ptr) {
       if (verbose) std::cout << "New:    " << ((uint64_t) ptr) << std::endl;
       emp_assert(!HasPtr(ptr) || !IsActive(ptr)); // Make sure pointer is not already stored!
-      ptr_count[ptr] = PtrInfo(true);
+      ptr_info[ptr] = PtrInfo(true);
     }
 
     // This pointer was already created, but given to Ptr.
-    void Old(TYPE * ptr) {
+    void Old(void * ptr) {
       if (verbose) std::cout << "Old:    " << ((uint64_t) ptr) << std::endl;
       // If we already have this pointer, just increment the count.  Otherwise track it now.
       if (HasPtr(ptr) && IsActive(ptr)) Inc(ptr);
-      else ptr_count[ptr] = PtrInfo(false);
+      else ptr_info[ptr] = PtrInfo(false);
     }
-    void Inc(TYPE * ptr) {
+    void Inc(void * ptr) {
       if (verbose) std::cout << "Inc:    " << ((uint64_t) ptr) << std::endl;
       emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
-      ptr_count[ptr].Inc();
+      ptr_info[ptr].Inc();
     }
-    void Dec(TYPE * ptr) {
+    void Dec(void * ptr) {
       if (verbose) std::cout << "Dec:    " << ((uint64_t) ptr) << std::endl;
       emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
-      ptr_count[ptr].Dec();
+      ptr_info[ptr].Dec();
     }
-    void MarkDeleted(TYPE * ptr) {
+    void MarkDeleted(void * ptr) {
       if (verbose) std::cout << "Delete: " << ((uint64_t) ptr) << std::endl;
       emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
-      ptr_count[ptr].MarkDeleted();
+      ptr_info[ptr].MarkDeleted();
     }
   };
 
@@ -148,9 +149,7 @@ namespace emp {
     TYPE * ptr;
 
 #ifdef EMP_TRACK_MEM
-    static PtrTracker<TYPE> & Tracker() {
-      return PtrTracker<TYPE>::Get();
-    }
+    static PtrTracker & Tracker() { return PtrTracker::Get(); }
 #endif
   public:
     Ptr() : ptr(nullptr) { ; }
