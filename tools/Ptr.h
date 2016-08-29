@@ -153,17 +153,26 @@ namespace emp {
 #endif
   public:
     Ptr() : ptr(nullptr) { ; }
-    template <typename T2>
-    Ptr(T2 * in_ptr, bool is_new=true) : ptr(in_ptr) {
+    template <typename T2> Ptr(T2 * in_ptr, bool is_new=true) : ptr(in_ptr) {
+      (void) is_new;  // Avoid unused parameter error when EMP_IF_MEMTRACK is off.
       EMP_IF_MEMTRACK( if (is_new) Tracker().New(ptr); else Tracker().Old(ptr); );
     }
-    template <typename T2>
-    Ptr(T2 & obj) : Ptr(&obj, false) {;}  // Pre-existing objects are NOT tracked.
+    template <typename T2> Ptr(Ptr<T2> _in) : ptr(_in.Raw()) {
+      EMP_IF_MEMTRACK( Tracker().Inc(ptr); );
+    }
     Ptr(std::nullptr_t) : Ptr() { ; }
-    Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) { EMP_IF_MEMTRACK( Tracker().Inc(ptr); ); }
+    Ptr(TYPE & obj) : Ptr(&obj, false) {;} // Pre-existing objects NOT tracked
     ~Ptr() { EMP_IF_MEMTRACK( Tracker().Dec(ptr); ); }
 
     bool IsNull() const { return ptr == nullptr; }
+    TYPE * Raw() { return ptr; }
+    const TYPE * const Raw() const { return ptr; }
+    template <typename T2> T2 * Cast() { return (T2*) ptr; }
+    template <typename T2> const T2 * const Cast() const { return (T2*) ptr; }
+    template <typename T2> T2 * DynamicCast() {
+      emp_assert(dynamic_cast<T2>(ptr) != nullptr);
+      return (T2*) ptr;
+    }
 
     void New() {
       EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
@@ -189,7 +198,7 @@ namespace emp {
     }
 
     template <typename T2>
-    Ptr<TYPE> & operator=(const Ptr<T2> & _in) {
+    Ptr<TYPE> & operator=(Ptr<T2> _in) {
       EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
       ptr=_in.ptr;
       EMP_IF_MEMTRACK(Tracker().Inc(ptr););
