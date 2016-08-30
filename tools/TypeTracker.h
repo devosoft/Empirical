@@ -16,11 +16,8 @@ namespace emp {
 
   // The base class of the types to be tracked.
   struct TrackedType {
-    virtual int GetTypeTrackerID() const noexcept {
-      emp_assert(false); // Should never run GetTypeTrackerID from the base class!
-      return -1;
-    }
-    virtual ~TrackedType() = default;
+    virtual int GetTypeTrackerID() const noexcept = 0;
+    virtual ~TrackedType() {;}
   };
 
   // The derived classes to be tracked should inherit from TypeTracker_Class<ID>
@@ -57,22 +54,16 @@ namespace emp {
     TypeTracker & operator=(const TypeTracker &) = default;
     TypeTracker & operator=(TypeTracker &&) = default;
 
-    template <typename REAL_T>
-    wrap_t<REAL_T> Wrap(REAL_T && val) {
-      constexpr bool type_ok = has_type<REAL_T, TYPES...>();
-      emp_assert(type_ok);    // Make sure we're wrapping a legal type.
+    template <typename REAL_T> wrap_t<REAL_T> Wrap(REAL_T && val) {
+      emp_assert((has_type<REAL_T,TYPES...>()));    // Make sure we're wrapping a legal type.
       return wrap_t<REAL_T>(std::forward<REAL_T>(val));
     }
-    template <typename REAL_T>
-    wrap_t<REAL_T> * New(REAL_T && val) {
-      constexpr bool type_ok = has_type<REAL_T, TYPES...>();
-      emp_assert(type_ok);    // Make sure we're wrapping a legal type.
+    template <typename REAL_T> wrap_t<REAL_T> * New(REAL_T && val) {
+      emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
       return new wrap_t<REAL_T>(std::forward<REAL_T>(val));
     }
-    template <typename REAL_T>
-    wrap_t<REAL_T> * New(REAL_T & val) {
-      constexpr bool type_ok = has_type<REAL_T, TYPES...>();
-      emp_assert(type_ok);    // Make sure we're wrapping a legal type.
+    template <typename REAL_T> wrap_t<REAL_T> * New(REAL_T & val) {
+      emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
       return new wrap_t<REAL_T>(std::forward<REAL_T>(val));
     }
 
