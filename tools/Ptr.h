@@ -106,6 +106,7 @@ namespace emp {
 
     // This pointer was just created as a Ptr!
     void New(void * ptr) {
+      if (ptr == nullptr) return;
       if (verbose) std::cout << "New:    " << ((uint64_t) ptr) << std::endl;
       emp_assert(!HasPtr(ptr) || !IsActive(ptr)); // Make sure pointer is not already stored!
       ptr_info[ptr] = PtrInfo(true);
@@ -113,17 +114,20 @@ namespace emp {
 
     // This pointer was already created, but given to Ptr.
     void Old(void * ptr) {
+      if (ptr == nullptr) return;
       if (verbose) std::cout << "Old:    " << ((uint64_t) ptr) << std::endl;
       // If we already have this pointer, just increment the count.  Otherwise track it now.
       if (HasPtr(ptr) && IsActive(ptr)) Inc(ptr);
       else ptr_info[ptr] = PtrInfo(false);
     }
     void Inc(void * ptr) {
+      if (ptr == nullptr) return;
       if (verbose) std::cout << "Inc:    " << ((uint64_t) ptr) << std::endl;
       emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
       ptr_info[ptr].Inc();
     }
     void Dec(void * ptr) {
+      if (ptr == nullptr) return;
       if (verbose) std::cout << "Dec:    " << ((uint64_t) ptr) << std::endl;
       emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
       ptr_info[ptr].Dec();
@@ -162,6 +166,8 @@ namespace emp {
     }
     Ptr(std::nullptr_t) : Ptr() { ; }
     Ptr(TYPE & obj) : Ptr(&obj, false) {;} // Pre-existing objects NOT tracked
+    Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) { EMP_IF_MEMTRACK( Tracker().Inc(ptr); ); }
+    Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr) { _in.ptr=nullptr; }
     ~Ptr() { EMP_IF_MEMTRACK( Tracker().Dec(ptr); ); }
 
     bool IsNull() const { return ptr == nullptr; }
@@ -198,10 +204,28 @@ namespace emp {
     }
 
     template <typename T2>
+    Ptr<TYPE> & operator=(T2 * _in) {
+      EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
+      ptr = _in;
+      EMP_IF_MEMTRACK(Tracker().New(ptr););
+      return *this;
+    }
+    template <typename T2>
     Ptr<TYPE> & operator=(Ptr<T2> _in) {
       EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
-      ptr=_in.ptr;
+      ptr=_in.Raw();
       EMP_IF_MEMTRACK(Tracker().Inc(ptr););
+      return *this;
+    }
+    Ptr<TYPE> & operator=(Ptr<TYPE> & _in) {
+      EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
+      ptr=_in.Raw();
+      EMP_IF_MEMTRACK(Tracker().Inc(ptr););
+      return *this;
+    }
+    Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
+      ptr = _in.ptr;
+      _in.ptr = nullptr;
       return *this;
     }
     TYPE & operator*() { return *ptr; }
