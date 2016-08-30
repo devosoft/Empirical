@@ -260,6 +260,10 @@ namespace emp {
 
   };
 
+
+    // Create a helper to replace & operator.
+    template <typename T> Ptr<T> to_ptr(T & _in) { return Ptr<T>(_in); }
+
 }
 
 #endif // EMP_PTR_H
