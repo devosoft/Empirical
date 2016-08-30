@@ -39,6 +39,7 @@
 #include "BitSet.h"
 #include "lexer_utils.h"
 #include "NFA.h"
+#include "Ptr.h"
 #include "string_utils.h"
 #include "vector.h"
 
@@ -73,10 +74,10 @@ namespace emp {
     struct re_base {                     // Also used for empty regex
       virtual ~re_base() { ; }
       virtual void Print(std::ostream & os) const { os << "[]"; }
-      virtual re_block * AsBlock() { return nullptr; }
-      virtual re_charset * AsCharSet() { return nullptr; }
-      virtual re_parent * AsParent() { return nullptr; }
-      virtual re_string * AsString() { return nullptr; }
+      virtual Ptr<re_block> AsBlock() { return nullptr; }
+      virtual Ptr<re_charset> AsCharSet() { return nullptr; }
+      virtual Ptr<re_parent> AsParent() { return nullptr; }
+      virtual Ptr<re_string> AsString() { return nullptr; }
       virtual int GetSize() const { return 0; }
       virtual bool Simplify() { return false; }
       virtual void AddToNFA(NFA & nfa, int start, int stop) const { nfa.AddFreeTransition(start, stop); }
@@ -88,7 +89,7 @@ namespace emp {
       re_string(char c) { str.push_back(c); }
       re_string(const std::string & s) : str(s) { ; }
       void Print(std::ostream & os) const override { os << "STR[" << to_escaped_string(str) << "]"; }
-      re_string * AsString() override { return this; }
+      Ptr<re_string> AsString() override { return to_ptr(this); }
       int GetSize() const override { return (int) str.size(); }
       virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
         int prev_id = start;
@@ -116,7 +117,7 @@ namespace emp {
         for (int c : chars) os << to_escaped_string((char) c);
         os << "]";
       }
-      re_charset * AsCharSet() override { return this; }
+      Ptr<re_charset> AsCharSet() override { return to_ptr(this); }
       int GetSize() const override { return char_set.CountOnes(); }
       char First() const { return (char) char_set.FindBit(); }
       virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
@@ -126,14 +127,14 @@ namespace emp {
 
     struct re_parent : public re_base {
     protected:
-      emp::vector<re_base *> nodes;
+      emp::vector<Ptr<re_base>> nodes;
     public:
-      ~re_parent() { for (auto x : nodes) delete x; }
-      void Clear() { for (auto x : nodes) delete x; nodes.resize(0); }
-      virtual void push(re_base * x) { emp_assert(x != nullptr); nodes.push_back(x); }
-      re_base * pop() { auto * out = nodes.back(); nodes.pop_back(); return out; }
+      ~re_parent() { for (auto x : nodes) x.Delete(); }
+      void Clear() { for (auto x : nodes) x.Delete(); nodes.resize(0); }
+      virtual void push(Ptr<re_base> x) { emp_assert(x != nullptr); nodes.push_back(x); }
+      Ptr<re_base> pop() { auto out = nodes.back(); nodes.pop_back(); return out; }
       int GetSize() const override { return (int) nodes.size(); }
-      re_parent * AsParent() override { return this; }
+      Ptr<re_parent> AsParent() override { return to_ptr(this); }
       bool Simplify() override {
         bool m=false;
         for (auto & x : nodes) {
@@ -141,9 +142,9 @@ namespace emp {
           m |= x->Simplify();
           // A block with one child can be replaced by child.
           if (x->AsBlock() && x->GetSize() == 1) {
-            auto * child = x->AsParent()->nodes[0];
+            auto child = x->AsParent()->nodes[0];
             x->AsParent()->nodes.resize(0);
-            delete x;
+            x.Delete();
             x = child;
             m = true;
           }
@@ -156,7 +157,7 @@ namespace emp {
       void Print(std::ostream & os) const override {
         os << "BLOCK["; for (auto x : nodes) x->Print(os); os << "]";
       }
-      re_block * AsBlock() override { return this; }
+      Ptr<re_block> AsBlock() override { return to_ptr(this); }
       bool Simplify() override {
         bool modify = false;
         // Loop through block elements, simplifying when possible.
@@ -164,14 +165,14 @@ namespace emp {
           // If node is a charset with one option, replace it with a string.
           if (nodes[i]->AsCharSet() && nodes[i]->GetSize() == 1) {
             auto new_node = new re_string(nodes[i]->AsCharSet()->First());
-            delete nodes[i];
+            nodes[i].Delete();
             nodes[i] = new_node;
             modify = true;
           }
           // If two neighboring nodes are strings, merge them.
           if (i > 0 && nodes[i]->AsString() && nodes[i-1]->AsString()) {
             nodes[i-1]->AsString()->str += nodes[i]->AsString()->str;
-            delete nodes[i];
+            nodes[i].Delete();
             nodes.erase(nodes.begin()+i);
             i--;
             modify = true;
@@ -180,11 +181,11 @@ namespace emp {
 
           // If blocks are nested, merge them into a single block.
           if (nodes[i]->AsBlock()) {
-            auto * old_node = nodes[i]->AsBlock();
+            auto old_node = nodes[i]->AsBlock();
             nodes.erase(nodes.begin() + i);
             nodes.insert(nodes.begin() + i, old_node->nodes.begin(), old_node->nodes.end());
             old_node->nodes.resize(0);  // Don't recurse delete since nodes were moved!
-            delete old_node;
+            old_node.Delete();
             // @CAO do this.
             i--;
             modify = true;
@@ -199,7 +200,7 @@ namespace emp {
       }
       virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
         int prev_id = start;
-        for (auto * x : nodes) {
+        for (auto x : nodes) {
           int next_id = nfa.AddNewState();
           x->AddToNFA(nfa, prev_id, next_id);
           prev_id = next_id;
@@ -209,7 +210,7 @@ namespace emp {
     };
 
     struct re_or : public re_parent {      // lhs -or- rhs
-      re_or(re_base * l, re_base * r) { push(l); push(r); }
+      re_or(Ptr<re_base> l, Ptr<re_base> r) { push(l); push(r); }
       void Print(std::ostream & os) const override {
         os << "|[";
         nodes[0]->Print(os);
@@ -223,7 +224,7 @@ namespace emp {
     };
 
     struct re_star : public re_parent {    // zero-or-more
-      re_star(re_base * c) { push(c); }
+      re_star(Ptr<re_base> c) { push(c); }
       void Print(std::ostream & os) const override { os << "*["; nodes[0]->Print(os); os << "]"; }
 
       virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
@@ -235,7 +236,7 @@ namespace emp {
     };
 
     struct re_plus : public re_parent {    // one-or-more
-      re_plus(re_base * c) { push(c); }
+      re_plus(Ptr<re_base> c) { push(c); }
       void Print(std::ostream & os) const override { os << "+["; nodes[0]->Print(os); os << "]"; }
       virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
         const int target = nfa.AddNewState();
@@ -247,7 +248,7 @@ namespace emp {
     };
 
     struct re_qm : public re_parent {      // zero-or-one
-      re_qm(re_base * c) { push(c); }
+      re_qm(Ptr<re_base> c) { push(c); }
       void Print(std::ostream & os) const override { os << "?["; nodes[0]->Print(os); os << "]"; }
       virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
         nodes[0]->AddToNFA(nfa, start, stop);
@@ -265,11 +266,11 @@ namespace emp {
       return valid;
     }
 
-    re_charset * ConstructSet() {
+    Ptr<re_charset> ConstructSet() {
       char c = regex[pos++];
       bool neg = false;
       if (c == '^') { neg = true; c = regex[pos++]; }
-      auto * out = new re_charset;
+      auto out = new re_charset;
       char prev_c = -1;
       while (c != ']' && pos < (int) regex.size()) {
         if (c == '-' && prev_c != -1) {
@@ -308,9 +309,9 @@ namespace emp {
       return out;
     }
 
-    re_string * ConstructString() {
+    Ptr<re_string> ConstructString() {
       char c = regex[pos++];
-      auto * out = new re_string;
+      auto out = new re_string;
       while (c != '\"' && pos < (int) regex.size()) {
         // @CAO Error if we run out of chars before close '"'
         if (c == '\\') {
@@ -336,8 +337,8 @@ namespace emp {
     }
 
     // Should only be called when we know we have a single unit to produce.  Build and return it.
-    re_base * ConstructSegment() {
-      re_base * result;
+    Ptr<re_base> ConstructSegment() {
+      Ptr<re_base> result;
       char c = regex[pos++];  // Grab the current character and move pos to next.
       switch (c) {
         case '.':
@@ -400,7 +401,7 @@ namespace emp {
     }
 
     // Process the input regex into a tree representaion.
-    re_block * Process(re_block * cur_block=nullptr) {
+    Ptr<re_block> Process(Ptr<re_block> cur_block=nullptr) {
       emp_assert(pos >= 0 && pos < (int) regex.size(), pos, regex.size());
 
       // If caller does not provide current block, create one (and return it.)
@@ -431,11 +432,11 @@ namespace emp {
   public:
     RegEx() = delete;
     RegEx(const std::string & r) : regex(r), valid(true), pos(0), dfa_ready(false) {
-      Process(&head);
+      Process(to_ptr(head));
       while(head.Simplify());
     }
     RegEx(const RegEx & r) : regex(r.regex), valid(true), pos(0), dfa_ready(false) {
-      Process(&head);
+      Process(to_ptr(head));
       while(head.Simplify());
     }
     ~RegEx() { ; }
@@ -446,7 +447,7 @@ namespace emp {
       valid = true;
       pos = 0;
       head.Clear();
-      Process(&head);
+      Process(to_ptr(head));
       while (head.Simplify());
       return *this;
     }
