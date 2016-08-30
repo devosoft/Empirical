@@ -7,7 +7,11 @@
 //  if a program is compiled with EMP_TRACK_MEM set, then these pointers perform extra
 //  tests to ensure that they point to valid memory and that memory is freed before
 //  pointers are released.
-
+//
+//  Developer Notes:
+//  * Switch pointer tracking to unordered_map?  (shouild be faster and smaller)
+//  * Add on tracking for arrays (to allow indexing and know when to call delete[])
+//  * Make operator delete (and operator new?) work with Ptr.
 
 #ifndef EMP_PTR_H
 #define EMP_PTR_H
@@ -68,7 +72,7 @@ namespace emp {
     std::map<void *, PtrInfo> ptr_info;
     bool verbose;
 
-    // Make sure trackers can't be built outside of this class.
+    // Make PtrTracker a singleton.
     PtrTracker() : verbose(false) { ; }
     PtrTracker(const PtrTracker &) = delete;
     PtrTracker(PtrTracker &&) = delete;
@@ -239,6 +243,7 @@ namespace emp {
     // TYPE & operator[](int pos) { return ptr[pos]; }
     // const TYPE & operator[](int pos) const { return ptr[pos]; }
 
+    // Comparisons to other Ptr objects
     bool operator==(const Ptr<TYPE> & in_ptr) const { return ptr == in_ptr.ptr; }
     bool operator!=(const Ptr<TYPE> & in_ptr) const { return ptr != in_ptr.ptr; }
     bool operator<(const Ptr<TYPE> & in_ptr)  const { return ptr < in_ptr.ptr; }
@@ -246,6 +251,7 @@ namespace emp {
     bool operator>(const Ptr<TYPE> & in_ptr)  const { return ptr > in_ptr.ptr; }
     bool operator>=(const Ptr<TYPE> & in_ptr) const { return ptr >= in_ptr.ptr; }
 
+    // Comparisons to raw pointers.
     bool operator==(const TYPE * in_ptr) const { return ptr == in_ptr; }
     bool operator!=(const TYPE * in_ptr) const { return ptr != in_ptr; }
     bool operator<(const TYPE * in_ptr)  const { return ptr < in_ptr; }
@@ -263,6 +269,8 @@ namespace emp {
 
     // Create a helper to replace & operator.
     template <typename T> Ptr<T> to_ptr(T & _in) { return Ptr<T>(_in); }
+    template <typename T> Ptr<T> to_ptr(T * _in, bool own=false) { return Ptr<T>(_in, own); }
+    template <typename T> Ptr<T> new_ptr(T * _in, bool own=true) { return Ptr<T>(_in, own); }
 
 }
 
