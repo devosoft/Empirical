@@ -553,9 +553,6 @@ TEST_CASE("Test mem_track", "[tools]")
 
 TEST_CASE("Test Ptr", "[tools]")
 {
-  emp::PtrTracker<char>::Get();
-  emp::PtrTracker<int>::Get();
-
   // Test default constructor.
   emp::Ptr<int> ptr1;
   ptr1.New();
@@ -618,7 +615,7 @@ TEST_CASE("Test Ptr", "[tools]")
   int * real_ptr2 = new int(2);  // Deleted in tracker
   int * real_ptr3 = new int(3);  // Unknown to tracker
   int * real_ptr4 = new int(4);  // Passively known to tracker (marked non-owner)
-  emp::PtrTracker<int> & tracker = emp::PtrTracker<int>::Get();
+  auto & tracker = emp::PtrTracker::Get();
 
   tracker.New(real_ptr1);
   tracker.Inc(real_ptr1);
