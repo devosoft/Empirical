@@ -14,6 +14,7 @@
 #include "../tools/BitMatrix.h"
 #include "../tools/BitSet.h"
 #include "../tools/BitVector.h"
+#include "../tools/DFA.h"
 #include "../tools/DynamicStringSet.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/Graph.h"
@@ -292,6 +293,33 @@ TEST_CASE("Test ce_string", "[tools]")
   REQUIRE(z4 == true);
   REQUIRE(z5 == false);
   REQUIRE(z6 == true);
+}
+
+
+TEST_CASE("Test DFA", "[tools]")
+{
+  emp::DFA dfa(10);
+  dfa.SetTransition(0, 1, 'a');
+  dfa.SetTransition(1, 2, 'a');
+  dfa.SetTransition(2, 0, 'a');
+  dfa.SetTransition(0, 3, 'b');
+
+  int state = 0;
+  std::cout << (state = dfa.Next(state, 'a')) << std::endl;
+  std::cout << (state = dfa.Next(state, 'a')) << std::endl;
+  std::cout << (state = dfa.Next(state, 'a')) << std::endl;
+  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
+  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
+  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
+  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
+
+  REQUIRE(dfa.Next(0, "aaaaaab") == 3);
+  REQUIRE(dfa.Next(0, "aaaaab") == -1);
+  REQUIRE(dfa.Next(0, "aaaaaabb") == -1);
+  REQUIRE(dfa.Next(0, "a") == 1);
+  REQUIRE(dfa.Next(0, "aa") == 2);
+  REQUIRE(dfa.Next(0, "aaa") == 0);
+  REQUIRE(dfa.Next(0, "b")  == 3);
 }
 
 TEST_CASE("Test DynamicStringSet", "[tools]")
