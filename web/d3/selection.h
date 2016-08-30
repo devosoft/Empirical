@@ -14,6 +14,7 @@
 #include "../../tools/assert.h"
 #include "../../emtools/js_object_struct.h"
 #include "../../emtools/js_utils.h"
+#include "../../emtools/JSWrap.h"
 
 extern "C" {
   extern int n_objects();
@@ -36,101 +37,145 @@ namespace D3 {
     //Selection(Selection* selector, bool all = false); //Do we need this?
     ~Selection(){}; //tilde is creating demangling issues
 
-    Selection Select(const char* selector){
+    Selection Select(const char* selector) {
       int new_id = EM_ASM_INT_V({return js.objects.length});
       EM_ASM_ARGS({
-	  var new_selection = js.objects[$0].select(Pointer_stringify($1));
-	  js.objects.push(new_selection);
-	}, this->id, selector);
+	    var new_selection = js.objects[$0].select(Pointer_stringify($1));
+	    js.objects.push(new_selection);
+	  }, this->id, selector);
       return Selection(new_id);
     }
 
-    Selection Select(std::string selector){
+    Selection Select(std::string selector) {
       int new_id = EM_ASM_INT_V({return js.objects.length});
       EM_ASM_ARGS({
-	  var new_selection = js.objects[$0].select(Pointer_stringify($1));
-	  js.objects.push(new_selection);
-  }, this->id, selector.c_str());
+	    var new_selection = js.objects[$0].select(Pointer_stringify($1));
+	    js.objects.push(new_selection);
+      }, this->id, selector.c_str());
       return Selection(new_id);
     }
 
-    Selection SelectAll(const char* selector){
+    Selection SelectAll(const char* selector) {
       int new_id = EM_ASM_INT_V({return js.objects.length});
       EM_ASM_ARGS({
-	  var new_selection = js.objects[$0].selectAll(Pointer_stringify($1));
-	  js.objects.push(new_selection);
-	}, this->id, selector);
+	    var new_selection = js.objects[$0].selectAll(Pointer_stringify($1));
+	    js.objects.push(new_selection);
+	  }, this->id, selector);
       return Selection(new_id);
     }
 
-    Selection SelectAll(std::string selector){
+    Selection SelectAll(std::string selector) {
       int new_id = EM_ASM_INT_V({return js.objects.length});
       EM_ASM_ARGS({
-	  var new_selection = js.objects[$0].selectAll(Pointer_stringify($1));
-	  js.objects.push(new_selection);
-  }, this->id, selector.c_str());
+	    var new_selection = js.objects[$0].selectAll(Pointer_stringify($1));
+	    js.objects.push(new_selection);
+      }, this->id, selector.c_str());
       return Selection(new_id);
     }
 
+
+    //From jrok's answer to http://stackoverflow.com/questions/15393938/find-out-if-a-c-object-is-callable
     template <typename T>
-    Selection SetAttr(std::string name, T value){
-      /* Assigns [value] to the selection's [name] attribute.
-	 This method handles numeric values - use SetAttrString
-	 for non-numeric values. */
+    class is_callable {
+    private:
+        struct Fallback { int operator()(); };
+        struct Derived : T, Fallback { };
+
+        template<typename U, U> struct Check;
+
+        typedef char ArrayOfOne[1];
+        typedef char ArrayOfTwo[2];
+
+        template <typename U>
+        static ArrayOfOne & func(Check<int Fallback::*,&U::operator()> *);
+        template <typename U> static ArrayOfTwo & func(...);
+
+    public:
+        typedef is_callable type;
+        enum { value = (sizeof(func<Derived>(0)) == 2) };
+    };
+
+    /** Assigns [value] to the selection's [name] attribute. Value can be any primitive
+    type, a string, a function object, or a lambda*/
+    //This version handles values that are not functions or strings
+    template <typename T>
+    typename std::enable_if<std::is_fundamental<T>::value, Selection>::type
+    SetAttr(std::string name, T value) {
 
       EM_ASM_ARGS({js.objects[$0].attr(Pointer_stringify($1), $2)},
 		  this->id, name.c_str(), value);
       return *this;
     }
 
-    Selection SetAttr(std::string name, std::string value){
-      /* Assigns [value] to the selections's [name] attribute.
+    //This version handles values that are functions and wraps them with JSWrap
+    template <typename T>
+    typename emp::sfinae_decoy<Selection, decltype(&T::operator())>::type
+    SetAttr(std::string name, T value) {
 
-	 This will break if someone happens to use a string that
-	 is identical to a function name... but that's unlikely, right?
-      */
+      //This should probably be JSWrapOnce, but that breaks the visualization
+      uint32_t fun_id = emp::JSWrap(value, "", false);
+
+      EM_ASM_ARGS({
+        js.objects[$0].attr(Pointer_stringify($1), function(d, i, k) {
+                                                      return emp.Callback($2, d, i, k);
+                                                    });
+      }, this->id, name.c_str(), fun_id);
+
+      emp::JSDelete(fun_id);
+
+      return *this;
+    }
+
+    /* Version for strings
+    This will break if someone happens to use a string that
+    is identical to a function name
+    */
+
+    Selection SetAttr(std::string name, std::string value) {
 
       CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS(attr, name.c_str(), value.c_str())
       return *this;
     }
 
-    Selection SetAttr(std::string name, const char * value){
-      /* Assigns [value] to the selections's [name] attribute.
 
-	 This will break if someone happens to use a string that
-	 is identical to a function name... but that's unlikely, right?
-      */
+    /* We also need a const char * version, because the template version will be a
+    better match for raw strings than the std::string version
+    */
+
+    Selection SetAttr(std::string name, const char * value) {
 
       CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_2_ARGS(attr, name.c_str(), value)
       return *this;
     }
 
+    /* Version for arrays */
 
     template <typename T, size_t SIZE>
-    Selection SetAttr(std::string name, std::array<T, SIZE> value){
-      /* Assigns [value] to the selections's [name] attribute.
-
-	 This will break if someone happens to use a string that
-	 is identical to a function name... but that's unlikely, right?
-      */
+    Selection SetAttr(std::string name, std::array<T, SIZE> value) {
       emp::pass_array_to_javascript(value);
 
       EM_ASM_ARGS({
-	  js.objects[$0].attr(Pointer_stringify($1), emp_i.__incoming_array);
-  }, this->id, name.c_str());
+	    js.objects[$0].attr(Pointer_stringify($1), emp_i.__incoming_array);
+      }, this->id, name.c_str());
 
       return *this;
     }
+
+    //TODO: Add version for vectors
+
+    /** Append DOM element(s) of the type specified by [name] to this selection.*/
 
     Selection Append(std::string name){
       int new_id = EM_ASM_INT_V({return js.objects.length});
 
       EM_ASM_ARGS({
-	  var new_selection = js.objects[$0].append(Pointer_stringify($1));
-	  js.objects.push(new_selection);
-  }, this->id, name.c_str());
+	    var new_selection = js.objects[$0].append(Pointer_stringify($1));
+	    js.objects.push(new_selection);
+      }, this->id, name.c_str());
       return Selection(new_id);
     }
+
+    /** Sets the selection's [name] style to [value]. */
 
     Selection SetStyle(std::string name, const char* value, bool priority=false){
       if (priority){
