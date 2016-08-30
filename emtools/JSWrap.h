@@ -422,6 +422,12 @@ namespace emp {
     return JSWrap(fun_ptr, fun_name, dispose_on_use);
   }
 
+  template <typename FUN_TYPE>
+  uint32_t JSWrap(const FUN_TYPE & in_fun, const std::string & fun_name="", bool dispose_on_use=false)
+  {
+    return JSWrap(to_function(in_fun), fun_name, dispose_on_use);
+  }
+
   // template <typename FUN_TYPE>
   // uint32_t JSWrap(const FUN_TYPE & in_fun, const std::string & fun_name="", bool dispose_on_use=false)
   // {

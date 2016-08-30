@@ -7,6 +7,7 @@
 #include "../../tools/alert.h"
 #include "../../emtools/JSWrap.h"
 #include "../../emtools/init.h"
+#include <functional>
 
 struct JSDataObject {
     EMP_BUILD_INTROSPECTIVE_TUPLE(
@@ -80,6 +81,11 @@ int main() {
 
   emp::Initialize();
 
+  int x = 10;
+  auto lambda = [x](){emp::Alert(x);};
+
+  std::function<void(int)> TestFun11 = [](int i){emp::Alert(i);};
+
   uint32_t fun_id1 = emp::JSWrap(TestFun1, "TestName1", false);
   uint32_t fun_id2 = emp::JSWrap(TestFun2, "TestName2", false);
   uint32_t fun_id3 = emp::JSWrap(TestFun3, "TestName3", false);
@@ -88,6 +94,9 @@ int main() {
   uint32_t fun_id6 = emp::JSWrap(TestFun6, "TestName6", false);
   uint32_t fun_id7 = emp::JSWrap(TestFun7, "TestName7", false);
   uint32_t fun_id8 = emp::JSWrap(TestFun8, "TestName8", false);
+  uint32_t fun_id9 = emp::JSWrap(lambda, "TestName9", false);
+  uint32_t fun_id10 = emp::JSWrap([](std::string msg){emp::Alert(msg);}, "TestName10", false);
+  uint32_t fun_id11 = emp::JSWrap(TestFun11, "TestName11", false);
   (void) fun_id1;
   (void) fun_id2;
   (void) fun_id3;
@@ -96,7 +105,9 @@ int main() {
   (void) fun_id6;
   (void) fun_id7;
   (void) fun_id8;
-
+  (void) fun_id9;
+  (void) fun_id10;
+  (void) fun_id11;
 
   double in1 = 4.5;
   double in2 = 1.5;
@@ -136,5 +147,16 @@ int main() {
       emp.TestName8( {obj1:{obj1:{val:1, word:"this", val2:6.3}, obj2:{val:2, word:"is", val2:6.3}, obj3:{val:3, word:"a", val2:6.3}},obj2:{obj1:{val:4, word:"lot", val2:6.3}, obj2:{val:5, word:"of", val2:8.8}, obj3:{val:6, word:"nested", val2:6.3}}, obj3:{obj1:{val:7, word:"json", val2:6.3}, obj2:{val:8, word:"objects", val2:6.3}, obj3:{val:9, word:"yay", val2:6.3}}});
   });
 
+  EM_ASM({
+    emp.TestName9();
+  });
+
+  EM_ASM({
+    emp.TestName10("This is a lambda with an rvalue!");
+  });
+
+  EM_ASM({
+    emp.TestName11(134);
+  });
 
 }
