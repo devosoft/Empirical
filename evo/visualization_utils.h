@@ -110,6 +110,7 @@ public:
 
   virtual void AnimateStep(...){;}
   virtual void AnimateStep(emp::vector<double>){;}
+  virtual void AnimateStep(int update, emp::vector<double>){;}
   virtual void AnimateStep(int parent, int offspring){;}
 };
 
@@ -162,7 +163,7 @@ public:
     JSWrap(scaled_i, GetID()+"scaled_i");
   }
 
-  void AnimateStep(emp::vector<double> fitnesses){
+  virtual void AnimateStep(int update, emp::vector<double> fitnesses){
       //Draw circles that represent fitnesses
       circles = new D3::Selection(GetSVG()->SelectAll("circle").Data(fitnesses));
       circles->EnterAppend("circle");

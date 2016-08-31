@@ -108,6 +108,10 @@ namespace evo{
 
   };
 
+
+  //Right now, this is just an interface for sending a population pointer to a visualization
+  //Eventually it should probably call all organisms' serialization function
+  //Eventually there should be probably also be a way to turn off outputting to files.
   template <typename POP_MANAGER = PopulationManager_Base<int> >
   class StatsManager_WholePopulation : StatsManager_Base<POP_MANAGER> {
   protected:
@@ -121,6 +125,7 @@ namespace evo{
 
   public:
     using org_ptr = typename POP_MANAGER::value_type;
+    using StatsManager_Base<POP_MANAGER>::SetDefaultFitnessFun;
 
     //Constructor for creating this as a stand-alone object
     template <typename WORLD>
@@ -146,12 +151,87 @@ namespace evo{
        w->OnUpdate(UpdateFun);
     }
 
-    void Update(int update) {
-      if (update % resolution == 0) {
+    void ConnectVis(web::GraphVisualization * viz) {
+      viz_pointers.push_back(viz);
+    }
 
+    void SendResultsToViz(int update) {
+      for (auto viz_pointer : viz_pointers) {
+        viz_pointer->AnimateStep(update, pop);
       }
     }
 
+    void Update(int update) {
+      if (update % resolution == 0) {
+        SendResultsToViz(update);
+      }
+    }
+
+  };
+
+  //This should be templated so the function can return things other than double
+  //But that will currently screw up the templating on world
+  template <typename POP_MANAGER = PopulationManager_Base<int> >
+  class StatsManager_WholePopulation_Function : StatsManager_WholePopulation<POP_MANAGER> {
+  protected:
+    POP_MANAGER * pop;
+    using StatsManager_Base<POP_MANAGER>::resolution;
+    using StatsManager_Base<POP_MANAGER>::output_location;
+    using StatsManager_Base<POP_MANAGER>::delimiter;
+    using StatsManager_Base<POP_MANAGER>::col_map;
+    using StatsManager_Base<POP_MANAGER>::viz_pointers;
+    using StatsManager_Base<POP_MANAGER>::viz_args;
+
+  public:
+    using org_ptr = typename POP_MANAGER::value_type;
+    using fun_type = std::function<double(org_ptr)>;
+    using StatsManager_Base<POP_MANAGER>::SetDefaultFitnessFun;
+    fun_type func;
+
+    //Constructor for creating this as a stand-alone object
+    template <typename WORLD>
+    StatsManager_WholePopulation_Function(WORLD * w,
+                                   std::string location = "stats.csv") :
+                                   StatsManager_WholePopulation<decltype(w->popM)>(location){
+      Setup(w);
+    }
+
+    //Constructor for use by World object
+    StatsManager_WholePopulation_Function(std::string location = "stats.csv") :
+                                   StatsManager_WholePopulation<POP_MANAGER>(location){;}
+
+    //The fitness function for calculating fitness related stats
+    template <typename WORLD>
+    void Setup(WORLD * w){
+      pop = &(w->popM);
+
+      std::function<void(int)> UpdateFun = [&] (int ud){
+         Update(ud);
+       };
+
+       w->OnUpdate(UpdateFun);
+    }
+
+    template <typename T>
+    void SendResultsToViz(int update, emp::vector<T> results) {
+      for (auto viz_pointer : viz_pointers) {
+        viz_pointer->AnimateStep(update, results);
+      }
+    }
+
+    template <typename T>
+    void SetFunc(std::function<double(T)> f){func = f;}
+
+    void Update(int update) {
+      if (update % resolution == 0) {
+        emp::vector<double> results = RunFunctionOnContainer(func, pop);
+        output_location << update << ": ";
+        for (auto result : results) {
+          output_location << result << " ";
+        }
+        SendResultsToViz(update, results);
+      }
+    }
   };
 
   //A popular type of stats manager is one that prints a set of statistics every
