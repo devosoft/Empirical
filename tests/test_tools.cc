@@ -28,6 +28,7 @@
 #include "../tools/functions.h"
 #include "../tools/graph_utils.h"
 //#include "../tools/grid.h"
+#include "../tools/info_theory.h"
 #include "../tools/macro_math.h"
 #include "../tools/macros.h"
 #include "../tools/mem_track.h"
@@ -559,6 +560,17 @@ TEST_CASE("Test Graph utils", "[tools]")
   //TODO: moar asserts
 }*/
 
+
+TEST_CASE("Test info_theory", "[tools]")
+{
+  emp::vector<int> weights = { 100, 100, 200 };
+  REQUIRE( emp::Entropy(weights) == 1.5 );
+
+  emp::vector<double> dweights = { 10.5, 10.5, 10.5, 10.5, 21.0, 21.0 };
+  REQUIRE( emp::Entropy(dweights) == 2.5 );
+
+  REQUIRE( emp::Entropy2(0.5) == 1.0 );
+}
 
 TEST_CASE("Test macro_math", "[tools]")
 {
