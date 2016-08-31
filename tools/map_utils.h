@@ -13,13 +13,19 @@ namespace emp {
 
   // A common test it to determine if an element is present in a map.
   template <class KEY, class T, class Compare, class Alloc>
-  inline bool Has( std::map<KEY,T,Compare,Alloc> in_map, const KEY & key ) {
+  inline bool Has( std::map<KEY,T,Compare,Alloc> & in_map, const KEY & key ) {
+    return in_map.find(key) != in_map.end();
+  }
+
+  // Setup Has() for multimap as well.
+  template <class KEY, class T, class Compare, class Alloc>
+  inline bool Has( std::multimap<KEY,T,Compare,Alloc> & in_map, const KEY & key ) {
     return in_map.find(key) != in_map.end();
   }
 
   // A class to retrieve a map element if it exists, otherwise return a default.
   template <class KEY, class T, class Compare, class Alloc>
-  inline const T & Find( std::map<KEY,T,Compare,Alloc> in_map, const KEY & key, const T & dval) {
+  inline const T & Find( std::map<KEY,T,Compare,Alloc> & in_map, const KEY & key, const T & dval) {
     auto val_it = in_map.find(key);
     if (val_it == in_map.end()) return dval;
     return val_it->second;
