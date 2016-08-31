@@ -32,6 +32,7 @@
 #include "../tools/macro_math.h"
 #include "../tools/macros.h"
 #include "../tools/map_utils.h"
+#include "../tools/math.h"
 #include "../tools/mem_track.h"
 #include "../tools/meta.h"
 #include "../tools/reflection.h"
@@ -891,6 +892,19 @@ TEST_CASE("Test map_utils", "[tools]")
   REQUIRE( emp::Has(flipped, 'u') == true);      // And the reversed map should have proper info.
   REQUIRE( emp::Has(flipped, 'x') == false);
 }
+
+TEST_CASE("Test math", "[tools]")
+{
+  constexpr auto a1 = emp::Log2(3.14);           REQUIRE( a1 > 1.650);   REQUIRE( a1 < 1.651);
+  constexpr auto a2 = emp::Log2(0.125);          REQUIRE( a2 == -3.0 );
+  constexpr auto a3 = emp::Log(1000, 10);        REQUIRE( a3 == 3.0 );
+  constexpr auto a4 = emp::Log(10, 1000);        REQUIRE( a4 > 0.333 );  REQUIRE( a4 < 0.334 );
+  constexpr auto a5 = emp::Log10(100);           REQUIRE( a5 == 2.0 );
+  constexpr auto a6 = emp::Ln(3.33);             REQUIRE( a6 > 1.202 );  REQUIRE( a6 < 1.204 );
+  constexpr auto a7 = emp::Pow2(2.345);          REQUIRE( a7 > 5.080 );  REQUIRE( a7 < 5.081 );
+  constexpr auto a8 = emp::Pow(emp::PI, emp::E); REQUIRE( a8 > 22.440 ); REQUIRE( a8 < 22.441 );
+}
+
 
 struct TestClass1 {
   TestClass1() {
