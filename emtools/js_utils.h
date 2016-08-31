@@ -133,6 +133,7 @@ namespace emp {
 
     //Iterate over array, get values, and add them to incoming array.
     for (auto val : values) {
+      (void) val;
       EM_ASM_ARGS({
         emp_i.__curr_array.push(Pointer_stringify($0));
       }, val.c_str());
@@ -380,7 +381,7 @@ namespace emp {
 	  return buffer;
     });
 
-    for (int i=0; i<arr.size(); i++){
+    for (size_t i=0; i<arr.size(); i++){
       arr[i] = *(buffer + i*2);
     }
 
@@ -442,7 +443,7 @@ namespace emp {
 
     //Track place in memory to read from
     int cumulative_size = 0;
-    for (int i=0; i<arr.size(); i++){
+    for (size_t i=0; i<arr.size(); i++){
       //Since std::string constructor reads to null terminator, this just works.
       arr[i] = std::string(buffer + cumulative_size);
       cumulative_size += arr[i].size() + 1;
@@ -503,7 +504,7 @@ namespace emp {
       EM_ASM({emp_i.__temp_array.push(emp_i.__outgoing_array);});
     }
 
-    for (int i = 0; i < arr.size(); i++) {
+    for (size_t i = 0; i < arr.size(); i++) {
       EM_ASM_ARGS({
 	    emp_i.__outgoing_array\
 	    = emp_i.__temp_array[emp_i.__temp_array.length - 1][$0];
@@ -540,7 +541,7 @@ namespace emp {
 	    emp_i.__outgoing_array\
 	    = emp_i.__temp_array[emp_i.__temp_array.length - 1][$0];
 	  }, i);
-      while (arr.size() <= i) {
+      while ((int)arr.size() <= i) {
         arr.push_back(emp::vector<T>());
       }
       pass_vector_to_cpp(arr[i], true);

@@ -85,7 +85,7 @@ namespace D3 {
 
     void SetType(std::string type){
       //TODO: Should we check that type is in d3.svg.symbolTypes?
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(type, type.c_str())
+      D3_CALLBACK_METHOD_1_ARG(type, type.c_str())
     }
 
     //If size is a constant, it's in pixels, so an int is reasonable
@@ -97,7 +97,7 @@ namespace D3 {
 
     //Otherwise it's a function
     void SetSize(std::string size){
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(size, size.c_str())
+      D3_CALLBACK_METHOD_1_ARG(size, size.c_str())
     }
   };
 
@@ -115,7 +115,7 @@ namespace D3 {
     LineGenerator();
 
     void SetInterpolate(std::string interpolate){
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(interpolate,interpolate.c_str())
+      D3_CALLBACK_METHOD_1_ARG(interpolate,interpolate.c_str())
     }
 
     void SetTension(float tension){
@@ -125,7 +125,7 @@ namespace D3 {
     }
 
     void SetDefined(std::string defined){
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(defined, defined.c_str())
+      D3_CALLBACK_METHOD_1_ARG(defined, defined.c_str())
     }
   };
 
@@ -194,12 +194,12 @@ namespace D3 {
 
     //Handles setting x accessor to a function or string
     void SetX(std::string x) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(x, x.c_str())
+      D3_CALLBACK_METHOD_1_ARG(x, x.c_str())
     }
 
     //Handles setting x accessor to a function or string
     void SetY(std::string y) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(y, y.c_str())
+      D3_CALLBACK_METHOD_1_ARG(y, y.c_str())
     }
 
   };
@@ -228,12 +228,12 @@ namespace D3 {
 
     //Handles setting x0 accessor to a function or string
     void SetX0(std::string x) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(x0, x.c_str())
+      D3_CALLBACK_METHOD_1_ARG(x0, x.c_str())
     }
 
     //Handles setting y0 accessor to a function or string
     void SetY0(std::string y) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(y0, y.c_str())
+      D3_CALLBACK_METHOD_1_ARG(y0, y.c_str())
     }
 
     //Handles setting x1 accessor to a constant
@@ -250,12 +250,12 @@ namespace D3 {
 
     //Handles setting x1 accessor to a function or string
     void SetX1(std::string x) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(x1, x.c_str())
+      D3_CALLBACK_METHOD_1_ARG(x1, x.c_str())
     }
 
     //Handles setting y1 accessor to a function or string
     void SetY1(std::string y) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(y1, y.c_str())
+      D3_CALLBACK_METHOD_1_ARG(y1, y.c_str())
     }
   };
 
@@ -268,7 +268,7 @@ namespace D3 {
     }
 
     void SetRadius(std::string radius) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(radius, radius.c_str())
+      D3_CALLBACK_METHOD_1_ARG(radius, radius.c_str())
     }
 
     void SetAngle(float angle) {
@@ -276,7 +276,7 @@ namespace D3 {
     }
 
     void SetAngle(std::string angle) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(angle, angle.c_str())
+      D3_CALLBACK_METHOD_1_ARG(angle, angle.c_str())
     }
   };
 
@@ -296,7 +296,7 @@ namespace D3 {
     }
 
     void SetInnerRadius(std::string radius) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(innerRadius, radius.c_str())
+      D3_CALLBACK_METHOD_1_ARG(innerRadius, radius.c_str())
     }
 
     void SetOuterRadius(float radius) {
@@ -304,7 +304,7 @@ namespace D3 {
     }
 
     void SetOuterRadius(std::string radius) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(outerRadius, radius.c_str())
+      D3_CALLBACK_METHOD_1_ARG(outerRadius, radius.c_str())
     }
 
     void SetStartAngle(float angle) {
@@ -312,7 +312,7 @@ namespace D3 {
     }
 
     void SetStartAngle(std::string angle) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(startAngle, angle.c_str())
+      D3_CALLBACK_METHOD_1_ARG(startAngle, angle.c_str())
     }
 
     void SetEndAngle(float angle) {
@@ -320,7 +320,7 @@ namespace D3 {
     }
 
     void SetEndAngle(std::string angle) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(endAngle, angle.c_str())
+      D3_CALLBACK_METHOD_1_ARG(endAngle, angle.c_str())
     }
   };
 
@@ -341,7 +341,7 @@ namespace D3 {
     }
 
     void SetSource(std::string source) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(source, source.c_str())
+      D3_CALLBACK_METHOD_1_ARG(source, source.c_str())
     }
 
     template <typename T>
@@ -350,7 +350,7 @@ namespace D3 {
     }
 
     void SetTarget(std::string target) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(target, target.c_str())
+      D3_CALLBACK_METHOD_1_ARG(target, target.c_str())
     }
   };
 
@@ -366,7 +366,7 @@ namespace D3 {
     DiagonalGenerator();
 
    void SetProjection(std::string projection) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(projection, projection.c_str())
+      D3_CALLBACK_METHOD_1_ARG(projection, projection.c_str())
     }
   };
 
@@ -400,7 +400,7 @@ namespace D3 {
     }
 
     void SetCornerRadius(std::string radius) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(cornerRadius, radius.c_str())
+      D3_CALLBACK_METHOD_1_ARG(cornerRadius, radius.c_str())
     }
 
     void SetPadRadius(float radius) {
@@ -408,7 +408,7 @@ namespace D3 {
     }
 
     void SetPadRadius(std::string radius) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(padRadius, radius.c_str())
+      D3_CALLBACK_METHOD_1_ARG(padRadius, radius.c_str())
     }
 
     void SetPadAngle(float angle) {
@@ -416,7 +416,7 @@ namespace D3 {
     }
 
     void SetPadAngle(std::string angle) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(padAngle, angle.c_str())
+      D3_CALLBACK_METHOD_1_ARG(padAngle, angle.c_str())
     }
 
     //TODO: Centroid (requires passing array back)

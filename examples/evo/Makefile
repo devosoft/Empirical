@@ -16,10 +16,11 @@ OFLAGS_web := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=
 CFLAGS_native := $(CFLAGS_all) $(OFLAGS_native)
 
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_viz := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js --js-library ../../web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 
-TARGETS := Fitness_Share_NK link_test NK NK-const NK-Serial Symbulation World bit_evolve replica
+TARGETS := Fitness_Share_NK link_test NK NK-const NK-Serial Symbulation World bit_evolve LineageViz.js
 
 EVO_DEPEND := ../../evo/PopulationManager.h ../../evo/World.h
 
@@ -79,7 +80,8 @@ World: World.cc $(EVO_DEPEND)
 bit_evolve: bit_evolve.cc $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) bit_evolve.cc -o bit_evolve
 
-
+LineageViz.js: LineageViz.cc
+	$(CXX_web) $(CFLAGS_web_viz) LineageViz.cc -o LineageViz.js -O3 -DNDEBUG
 
 debug-%: $*.cc
 	$(CXX_native) $(CFLAGS_native) $< -o $@

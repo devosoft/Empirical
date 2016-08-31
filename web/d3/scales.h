@@ -115,7 +115,7 @@ namespace D3 {
     }
 
     void SetInterpolate(std::string factory) {
-      CALL_FUNCTION_THAT_ACCEPTS_FUNCTION_1_ARG(interpolate, factory.c_str())
+      D3_CALLBACK_METHOD_1_ARG(interpolate, factory.c_str())
     }
 
     void Clamp(bool clamp) {
