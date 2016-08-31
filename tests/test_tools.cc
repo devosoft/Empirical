@@ -325,13 +325,13 @@ TEST_CASE("Test DFA", "[tools]")
   dfa.SetTransition(0, 3, 'b');
 
   int state = 0;
-  std::cout << (state = dfa.Next(state, 'a')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'a')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'a')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
+  REQUIRE( (state = dfa.Next(state, 'a')) == 1 );
+  REQUIRE( (state = dfa.Next(state, 'a')) == 2 );
+  REQUIRE( (state = dfa.Next(state, 'a')) == 0 );
+  REQUIRE( (state = dfa.Next(state, 'b')) == 3 );
+  REQUIRE( (state = dfa.Next(state, 'b')) == -1 );
+  REQUIRE( (state = dfa.Next(state, 'b')) == -1 );
+  REQUIRE( (state = dfa.Next(state, 'b')) == -1 );
 
   REQUIRE(dfa.Next(0, "aaaaaab") == 3);
   REQUIRE(dfa.Next(0, "aaaaab") == -1);
