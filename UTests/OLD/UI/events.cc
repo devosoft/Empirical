@@ -1,7 +1,7 @@
 #include <emscripten.h>
 
 #include "../../tools/alert.h"
-#include "../../emtools/init.h"
+#include "../../web/init.h"
 #include "../../UI/events.h"
 
 void TestAlert() {

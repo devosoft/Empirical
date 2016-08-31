@@ -1,11 +1,11 @@
 
-#include "../Empirical/emtools/init.h"
+#include "../Empirical/web/init.h"
 #include <iostream>
 #include <vector>
 #include <string>
 #include <typeinfo>
 #include "selection.h"
-#include "../Empirical/emtools/JSWrap.h"
+#include "../Empirical/web/JSWrap.h"
 #include "../Empirical/tools/tuple_struct.h"
 #include "scales.h"
 #include "svg_shapes.h"

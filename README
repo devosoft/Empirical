@@ -4,7 +4,7 @@ building web interfaces using the Emscripten compiler (from C++ to high efficien
 Top-level directory structure:
 
 tools/    - Basic tools that are generally useful for scientific software.
-emtools/  - Tools that make use of being compiled with emscripten.
+web/  - Tools that make use of being compiled with emscripten.
 
 config/   - Tools to setup a simple configuration system.
 geometry/ - Geometry and physics-based tools for implementing simple virtual worlds.

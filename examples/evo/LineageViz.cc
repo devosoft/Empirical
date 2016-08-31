@@ -5,8 +5,8 @@
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
 
-#include "../../emtools/JSWrap.h"
-#include "../../emtools/emfunctions.h"
+#include "../../web/JSWrap.h"
+#include "../../web/emfunctions.h"
 
 #include "../../web/canvas_utils.h"
 #include "../../web/web.h"

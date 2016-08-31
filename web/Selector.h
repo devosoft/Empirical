@@ -23,8 +23,8 @@
 #define EMP_WEB_SELECTOR_H
 
 
-#include "../emtools/JSWrap.h"
 #include "../tools/vector.h"
+#include "JSWrap.h"
 
 #include "Widget.h"
 

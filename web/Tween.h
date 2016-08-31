@@ -33,7 +33,7 @@
 #ifndef EMP_WEB_TWEEN_H
 #define EMP_WEB_TWEEN_H
 
-#include "../emtools/emfunctions.h"
+#include "emfunctions.h"
 
 #include "Widget.h"
 

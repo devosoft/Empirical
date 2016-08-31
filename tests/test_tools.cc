@@ -1,8 +1,11 @@
 #define EMP_TRACK_MEM
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]
+#define CATCH_CONFIG_MAIN
 #undef NDEBUG
 #define TDEBUG 1
+
+#include "../third-party/Catch/single_include/catch.hpp"
 
 #include <array>
 #include <sstream>
@@ -11,19 +14,24 @@
 #include "../tools/BitMatrix.h"
 #include "../tools/BitSet.h"
 #include "../tools/BitVector.h"
+#include "../tools/DFA.h"
 #include "../tools/DynamicStringSet.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/Graph.h"
 #include "../tools/Ptr.h"
 #include "../tools/Random.h"
-#include "../tools/Trait.h"
+// #include "../tools/Trait.h"
 
+#include "../tools/array.h"
 #include "../tools/assert.h"
+#include "../tools/ce_string.h"
 #include "../tools/functions.h"
 #include "../tools/graph_utils.h"
 //#include "../tools/grid.h"
+#include "../tools/info_theory.h"
 #include "../tools/macro_math.h"
 #include "../tools/macros.h"
+#include "../tools/map_utils.h"
 #include "../tools/mem_track.h"
 #include "../tools/meta.h"
 #include "../tools/reflection.h"
@@ -39,8 +47,8 @@
 #include "../tools/alert.h"
 #include "../tools/const.h"
 #include "../tools/errors.h"
-#include "../tools/class.h"
-#include "../tools/fixed.h"
+// #include "../tools/class.h"
+// #include "../tools/fixed.h"
 #include "../tools/SolveState.h"
 #include "../tools/ProbSchedule.h"
 #include "../tools/serialize_macros.h"
@@ -55,12 +63,29 @@
   } while (false)
 
 
+TEST_CASE("Test array", "[tools]")
+{
+  constexpr int A_SIZE = 50;
+  emp::array<int, A_SIZE> test_array;
+
+  for (int i = 0; i < A_SIZE; i++) {
+    test_array[i] = i * i;
+  }
+
+  int sum = 0;
+  for (int i = 0; i < A_SIZE; i++) {
+    sum += test_array[i];
+  }
+
+  REQUIRE(sum == 40425);
+}
+
 // this templating is necessary to force full coverage of templated classes.
 // Since c++ doesn't generate code for templated methods if those methods aren't
 // explicitly called (and thus our profiling doesn't see them), we have to
 // force them all to be included in the comilation.
 template class emp::BitMatrix<4, 5>;
-TEST_CASE("Test bitvectors", "[tools]")
+TEST_CASE("Test BitMatrix", "[tools]")
 {
 
   emp::BitMatrix<4,5> bm45;
@@ -136,7 +161,7 @@ TEST_CASE("Test bitvectors", "[tools]")
 
 
 template class emp::BitSet<5>;
-TEST_CASE("test BitSet", "[tools]")
+TEST_CASE("Test BitSet", "[tools]")
 {
   emp::BitSet<10> bs10;
   emp::BitSet<32> bs32;
@@ -173,7 +198,7 @@ TEST_CASE("test BitSet", "[tools]")
 }
 
 
-TEST_CASE("test BitSet timing", "[tools]")
+TEST_CASE("Test BitSet timing", "[tools]")
 {
   const int set_size = 100000;
   typedef emp::BitSet<set_size> TEST_TYPE;
@@ -209,7 +234,7 @@ TEST_CASE("test BitSet timing", "[tools]")
 }
 
 
-TEST_CASE( "Testing BitVectors", "[tools]")
+TEST_CASE("Test BitVector", "[tools]")
 {
   emp::BitVector bv10(10);
   emp::BitVector bv32(32);
@@ -235,39 +260,86 @@ TEST_CASE( "Testing BitVectors", "[tools]")
   REQUIRE(bv80.GetValueAtBit<5>(64) == 2);
 }
 
-TEST_CASE("Test BitVector timing", "[tools]")
+TEST_CASE("Test ce_string", "[tools]")
 {
+  constexpr emp::ce_string s = "abc";
+  constexpr emp::ce_string s2 = "abc";
+  constexpr emp::ce_string s3 = "abcdef";
+  constexpr emp::ce_string s4 = "aba";
+  emp::BitSet<s.size()> b1;
+  emp::BitSet<(int) s[0]> b2;
 
-  const int set_size = 100000;
-  typedef emp::BitVector TEST_TYPE;
+  REQUIRE(b2.size() == 97);
+  REQUIRE(s.size() == 3);
 
-  TEST_TYPE set1(set_size);
-  TEST_TYPE set2(set_size);
+  constexpr bool x1 = (s == s2);
+  constexpr bool x2 = (s != s2);
+  constexpr bool x3 = (s < s2);
+  constexpr bool x4 = (s > s2);
+  constexpr bool x5 = (s <= s2);
+  constexpr bool x6 = (s >= s2);
 
-  for (int i = 0; i < set_size; i++) {
-    if (!(i%2) && (i%5)) set1[i] = 1;
-    if (!(i%3) && (i%7)) set2.Set(i, true);
-  }
+  REQUIRE(x1 == true);
+  REQUIRE(x2 == false);
+  REQUIRE(x3 == false);
+  REQUIRE(x4 == false);
+  REQUIRE(x5 == true);
+  REQUIRE(x6 == true);
 
-  // TIMING!!!!!
-  std::clock_t emp_start_time = std::clock();
+  constexpr bool y1 = (s == s3);
+  constexpr bool y2 = (s != s3);
+  constexpr bool y3 = (s < s3);
+  constexpr bool y4 = (s > s3);
+  constexpr bool y5 = (s <= s3);
+  constexpr bool y6 = (s >= s3);
 
-  TEST_TYPE set3(set1 & set2);
-  TEST_TYPE set4 = (set1 | set2);
-  int total = 0;
-  for (int i = 0; i < 100000; i++) {
-    set3 |= (set4 << 3);
-    set4 &= (set3 >> 3);
-    auto set5 = set3 & set4;
-    total += set5.CountOnes();
-  }
+  REQUIRE(y1 == false);
+  REQUIRE(y2 == true);
+  REQUIRE(y3 == true);
+  REQUIRE(y4 == false);
+  REQUIRE(y5 == true);
+  REQUIRE(y6 == false);
 
-  std::clock_t emp_tot_time = std::clock() - emp_start_time;
+  constexpr bool z1 = (s == s4);
+  constexpr bool z2 = (s != s4);
+  constexpr bool z3 = (s < s4);
+  constexpr bool z4 = (s > s4);
+  constexpr bool z5 = (s <= s4);
+  constexpr bool z6 = (s >= s4);
 
-  double time = 1000.0 * ((double) emp_tot_time) / (double) CLOCKS_PER_SEC;
-  //REQUIRE(time < 9000); // NOTE: WILL VARY INTENSELY ON VARIOUS SYSTEMS
-  // SHOULD PROBABLY CHANGE
+  REQUIRE(z1 == false);
+  REQUIRE(z2 == true);
+  REQUIRE(z3 == false);
+  REQUIRE(z4 == true);
+  REQUIRE(z5 == false);
+  REQUIRE(z6 == true);
+}
 
+
+TEST_CASE("Test DFA", "[tools]")
+{
+  emp::DFA dfa(10);
+  dfa.SetTransition(0, 1, 'a');
+  dfa.SetTransition(1, 2, 'a');
+  dfa.SetTransition(2, 0, 'a');
+  dfa.SetTransition(0, 3, 'b');
+
+  int state = 0;
+  std::cout << (state = dfa.Next(state, 'a')) << std::endl;
+  std::cout << (state = dfa.Next(state, 'a')) << std::endl;
+  std::cout << (state = dfa.Next(state, 'a')) << std::endl;
+  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
+  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
+  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
+  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
+
+  REQUIRE(dfa.Next(0, "aaaaaab") == 3);
+  REQUIRE(dfa.Next(0, "aaaaab") == -1);
+  REQUIRE(dfa.Next(0, "aaaaaabb") == -1);
+  REQUIRE(dfa.Next(0, "a") == 1);
+  REQUIRE(dfa.Next(0, "aa") == 2);
+  REQUIRE(dfa.Next(0, "aaa") == 0);
+  REQUIRE(dfa.Next(0, "b")  == 3);
 }
 
 TEST_CASE("Test DynamicStringSet", "[tools]")
@@ -341,57 +413,6 @@ TEST_CASE("Test functions", "[tools]")
   REQUIRE(emp::to_range(12345678, 10, 20) == 20);
   REQUIRE(emp::to_range<double>(12345678, 10, 20.1) == 20.1);
   REQUIRE(emp::to_range(12345678.0, 10.7, 20.1) == 20.1);
-}
-
-
-template <typename A, typename B>
-struct MetaTestClass {
-  A a;
-  B b;
-};
-
-TEST_CASE("Test meta-programming helpers", "[tools]")
-{
-
-  // TEST FOR VARIADIC HELPER FUNCTIONS:
-
-  REQUIRE((emp::get_type_index<char, char, bool, int, double>()) == 0);
-  REQUIRE((emp::get_type_index<int, char, bool, int, double>()) == 2);
-  REQUIRE((emp::get_type_index<double, char, bool, int, double>()) == 3);
-  REQUIRE((emp::get_type_index<std::string, char, bool, int, double>()) < 0);
-
-  REQUIRE((emp::has_unique_first_type<int, bool, std::string, bool, char>()) == true);
-  REQUIRE((emp::has_unique_first_type<bool, int, std::string, bool, char>()) == false);
-  REQUIRE((emp::has_unique_types<bool, int, std::string, emp::vector<bool>, char>()) == true);
-  REQUIRE((emp::has_unique_types<int, bool, std::string, bool, char>()) == false);
-
-
-  std::tuple<int, int, char> test_tuple(3,2,'a');
-  emp::ApplyTuple(TestFun, test_tuple);
-
-  REQUIRE(result_char == 'g');
-
-  using meta1_t = MetaTestClass<int, double>;
-  using meta2_t = emp::AdaptTemplate<meta1_t, char, bool>;
-  using meta3_t = emp::AdaptTemplate_Arg1<meta1_t, std::string>;
-  
-  meta1_t meta1;
-  meta2_t meta2;
-  meta3_t meta3;
-
-  meta1.a = (decltype(meta1.a)) 65.5;
-  meta1.b = (decltype(meta1.b)) 65.5;
-  meta2.a = (decltype(meta2.a)) 65.5;
-  meta2.b = (decltype(meta2.b)) 65.5;
-  meta3.a = (decltype(meta3.a)) "65.5";
-  meta3.b = (decltype(meta3.b)) 65.5;
-
-  REQUIRE( meta1.a == 65 );
-  REQUIRE( meta1.b == 65.5 );
-  REQUIRE( meta2.a == 'A' );
-  REQUIRE( meta2.b == true );
-  REQUIRE( meta3.a == "65.5" );
-  REQUIRE( meta3.b == 65.5 );
 }
 
 // should migrate these inside the test case, probably
@@ -541,6 +562,336 @@ TEST_CASE("Test Graph utils", "[tools]")
 }*/
 
 
+TEST_CASE("Test info_theory", "[tools]")
+{
+  emp::vector<int> weights = { 100, 100, 200 };
+  REQUIRE( emp::Entropy(weights) == 1.5 );
+
+  emp::vector<double> dweights = { 10.5, 10.5, 10.5, 10.5, 21.0, 21.0 };
+  REQUIRE( emp::Entropy(dweights) == 2.5 );
+
+  REQUIRE( emp::Entropy2(0.5) == 1.0 );
+}
+
+TEST_CASE("Test macro_math", "[tools]")
+{
+
+  // Test converting between binary, decimal, and sum formats.
+  EMP_TEST_MACRO( EMP_DEC_TO_BIN(9), "0, 0, 0, 0, 0, 0, 1, 0, 0, 1");
+  EMP_TEST_MACRO( EMP_DEC_TO_BIN(91), "0, 0, 0, 1, 0, 1, 1, 0, 1, 1");
+  EMP_TEST_MACRO( EMP_DEC_TO_BIN(999), "1, 1, 1, 1, 1, 0, 0, 1, 1, 1");
+
+  EMP_TEST_MACRO( EMP_BIN_TO_DEC(0,0,0,0,0,0,1,0,1,1), "11");
+  EMP_TEST_MACRO( EMP_BIN_TO_DEC(0,0,0,1,0,1,1,0,1,1), "91");
+  EMP_TEST_MACRO( EMP_BIN_TO_DEC(1,0,1,0,1,0,1,0,1,0), "682");
+
+  EMP_TEST_MACRO( EMP_BIN_TO_SUM(0,0,0,1,0,1,1,0,1,1), "0, 0, 0, 64, 0, 16, 8, 0, 2, 1");
+  EMP_TEST_MACRO( EMP_DEC_TO_SUM(91), "0, 0, 0, 64, 0, 16, 8, 0, 2, 1");
+
+  EMP_TEST_MACRO( EMP_BIN_TO_PACK(0,0,0,1,0,1,1,0,1,1), "(64, 16, 8, 2, 1)");
+  EMP_TEST_MACRO( EMP_DEC_TO_PACK(91), "(64, 16, 8, 2, 1)");
+
+  // Test Boolean logic
+  EMP_TEST_MACRO( EMP_NOT(0), "1" );
+  EMP_TEST_MACRO( EMP_NOT(EMP_NOT(0)), "0" );
+
+  EMP_TEST_MACRO( EMP_BIT_EQU(0,0), "1" );
+  EMP_TEST_MACRO( EMP_BIT_EQU(0,1), "0" );
+  EMP_TEST_MACRO( EMP_BIT_EQU(1,0), "0" );
+  EMP_TEST_MACRO( EMP_BIT_EQU(1,1), "1" );
+
+  EMP_TEST_MACRO( EMP_BIT_LESS(0,0), "0" );
+  EMP_TEST_MACRO( EMP_BIT_LESS(0,1), "1" );
+  EMP_TEST_MACRO( EMP_BIT_LESS(1,0), "0" );
+  EMP_TEST_MACRO( EMP_BIT_LESS(1,1), "0" );
+
+  EMP_TEST_MACRO( EMP_BIT_GTR(0,0), "0" );
+  EMP_TEST_MACRO( EMP_BIT_GTR(0,1), "0" );
+  EMP_TEST_MACRO( EMP_BIT_GTR(1,0), "1" );
+  EMP_TEST_MACRO( EMP_BIT_GTR(1,1), "0" );
+
+  // Test conditionals.
+  EMP_TEST_MACRO( EMP_IF_impl_0(abc), "~, abc" );
+  EMP_TEST_MACRO( EMP_IF_impl_1(abc), "EMP_IF_impl_1(abc)" );
+  EMP_TEST_MACRO( EMP_IF(0, A, B), "B" );
+  EMP_TEST_MACRO( EMP_IF(1, A, B), "A" );
+
+  // Test comparisons
+  EMP_TEST_MACRO( EMP_COMPARE(10,20), "B" );
+  EMP_TEST_MACRO( EMP_COMPARE(1023,1022), "A" );
+  EMP_TEST_MACRO( EMP_COMPARE(1000,999), "A" );
+  EMP_TEST_MACRO( EMP_COMPARE(678,678), "X" );
+
+  EMP_TEST_MACRO( EMP_EQU(5,5), "1" );
+  EMP_TEST_MACRO( EMP_EQU(2,5), "0" );
+  EMP_TEST_MACRO( EMP_EQU(5,8), "0" );
+  EMP_TEST_MACRO( EMP_EQU(8,5), "0" );
+  EMP_TEST_MACRO( EMP_EQU(5,2), "0" );
+
+  EMP_TEST_MACRO( EMP_LESS(5,5), "0" );
+  EMP_TEST_MACRO( EMP_LESS(2,5), "1" );
+  EMP_TEST_MACRO( EMP_LESS(5,8), "1" );
+  EMP_TEST_MACRO( EMP_LESS(8,5), "0" );
+  EMP_TEST_MACRO( EMP_LESS(5,2), "0" );
+
+  EMP_TEST_MACRO( EMP_LESS_EQU(5,5), "1" );
+  EMP_TEST_MACRO( EMP_LESS_EQU(2,5), "1" );
+  EMP_TEST_MACRO( EMP_LESS_EQU(5,8), "1" );
+  EMP_TEST_MACRO( EMP_LESS_EQU(8,5), "0" );
+  EMP_TEST_MACRO( EMP_LESS_EQU(5,2), "0" );
+
+  EMP_TEST_MACRO( EMP_GTR(5,5), "0" );
+  EMP_TEST_MACRO( EMP_GTR(2,5), "0" );
+  EMP_TEST_MACRO( EMP_GTR(5,8), "0" );
+  EMP_TEST_MACRO( EMP_GTR(8,5), "1" );
+  EMP_TEST_MACRO( EMP_GTR(5,2), "1" );
+
+  EMP_TEST_MACRO( EMP_GTR_EQU(5,5), "1" );
+  EMP_TEST_MACRO( EMP_GTR_EQU(2,5), "0" );
+  EMP_TEST_MACRO( EMP_GTR_EQU(5,8), "0" );
+  EMP_TEST_MACRO( EMP_GTR_EQU(8,5), "1" );
+  EMP_TEST_MACRO( EMP_GTR_EQU(5,2), "1" );
+
+  EMP_TEST_MACRO( EMP_NEQU(5,5), "0" );
+  EMP_TEST_MACRO( EMP_NEQU(2,5), "1" );
+  EMP_TEST_MACRO( EMP_NEQU(5,8), "1" );
+  EMP_TEST_MACRO( EMP_NEQU(8,5), "1" );
+  EMP_TEST_MACRO( EMP_NEQU(5,2), "1" );
+
+
+
+  // Test other helper math functions.
+  EMP_TEST_MACRO( EMP_MATH_VAL_TIMES_0(222), "0" );
+  EMP_TEST_MACRO( EMP_MATH_VAL_TIMES_1(222), "222" );
+
+  EMP_TEST_MACRO( EMP_MATH_BIN_TIMES_0(0,0,1,0,1,0,1,0,1,0), "0, 0, 0, 0, 0, 0, 0, 0, 0, 0" );
+  EMP_TEST_MACRO( EMP_MATH_BIN_TIMES_1(0,0,1,0,1,0,1,0,1,0), "0, 0, 1, 0, 1, 0, 1, 0, 1, 0" );
+
+  EMP_TEST_MACRO( EMP_MATH_COUNT_BITS(1, 1), "2");
+  EMP_TEST_MACRO( EMP_MATH_COUNT_BITS(1, N), "0");
+  EMP_TEST_MACRO( EMP_MATH_COUNT_BITS(0, N), "N");
+
+  EMP_TEST_MACRO( EMP_MATH_GET_CARRY(2), "1");
+  EMP_TEST_MACRO( EMP_MATH_CLEAR_CARRY(2), "0");
+
+  // Now in combination...
+  EMP_TEST_MACRO( EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(1), EMP_MATH_GET_CARRY(2)), "2" );
+
+  // Basic Addition...
+  EMP_TEST_MACRO( EMP_ADD(1, 2), "3");
+  EMP_TEST_MACRO( EMP_ADD(5, 5), "10");
+  EMP_TEST_MACRO( EMP_ADD(7, 7), "14");
+  EMP_TEST_MACRO( EMP_ADD(111, 112), "223");
+  EMP_TEST_MACRO( EMP_ADD(127, 1), "128");
+  EMP_TEST_MACRO( EMP_ADD(123, 789), "912");
+  EMP_TEST_MACRO( EMP_ADD(1023, 1), "0");      // Overflow
+
+  EMP_TEST_MACRO( EMP_ADD_10(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), "55" );
+
+  // Basic Subtraction...
+  EMP_TEST_MACRO( EMP_SUB(10, 7), "3");
+  EMP_TEST_MACRO( EMP_SUB(128, 1), "127");
+  EMP_TEST_MACRO( EMP_SUB(250, 250), "0");
+  EMP_TEST_MACRO( EMP_SUB(250, 100), "150");
+  EMP_TEST_MACRO( EMP_SUB(91, 66), "25");
+  EMP_TEST_MACRO( EMP_SUB(99, 100), "1023");   // Underflow
+
+  // Combination of add and sub
+  EMP_TEST_MACRO( EMP_ADD( EMP_SUB(250, 100), EMP_SUB(91, 66)), "175");
+
+  // Shifting
+  EMP_TEST_MACRO( EMP_SHIFTL(17), "34");
+  EMP_TEST_MACRO( EMP_SHIFTL(111), "222");
+  EMP_TEST_MACRO( EMP_SHIFTL(444), "888");
+  EMP_TEST_MACRO( EMP_SHIFTL(1023), "1022");   // Overflow...
+
+  EMP_TEST_MACRO( EMP_SHIFTR(100), "50");
+  EMP_TEST_MACRO( EMP_SHIFTR(151), "75");
+
+  EMP_TEST_MACRO( EMP_SHIFTL_X(0, 700), "700");
+  EMP_TEST_MACRO( EMP_SHIFTL_X(5, 17),  "544");
+  EMP_TEST_MACRO( EMP_SHIFTL_X(1, 111), "222");
+  EMP_TEST_MACRO( EMP_SHIFTR_X(1, 100), "50");
+  EMP_TEST_MACRO( EMP_SHIFTR_X(3, 151), "18");
+
+  // Inc, dec, half...
+  EMP_TEST_MACRO( EMP_INC(20), "21");
+  EMP_TEST_MACRO( EMP_INC(55), "56");
+  EMP_TEST_MACRO( EMP_INC(63), "64");
+  EMP_TEST_MACRO( EMP_INC(801), "802");
+
+  EMP_TEST_MACRO( EMP_DEC(20), "19");
+  EMP_TEST_MACRO( EMP_DEC(55), "54");
+  EMP_TEST_MACRO( EMP_DEC(63), "62");
+  EMP_TEST_MACRO( EMP_DEC(900), "899");
+
+  EMP_TEST_MACRO( EMP_HALF(17), "8");
+  EMP_TEST_MACRO( EMP_HALF(18), "9");
+  EMP_TEST_MACRO( EMP_HALF(60), "30");
+  EMP_TEST_MACRO( EMP_HALF(1001), "500");
+
+  // Multiply!
+  EMP_TEST_MACRO( EMP_MULT(1, 1), "1");
+  EMP_TEST_MACRO( EMP_MULT(200, 0), "0");
+  EMP_TEST_MACRO( EMP_MULT(201, 1), "201");
+  EMP_TEST_MACRO( EMP_MULT(10, 7), "70");
+  EMP_TEST_MACRO( EMP_MULT(25, 9), "225");
+  EMP_TEST_MACRO( EMP_MULT(65, 3), "195");
+  EMP_TEST_MACRO( EMP_MULT(65, 15), "975");
+
+  // Bit Manipulation!
+  EMP_TEST_MACRO( EMP_COUNT_ONES(0), "0");
+  EMP_TEST_MACRO( EMP_COUNT_ONES(509), "8");
+  EMP_TEST_MACRO( EMP_COUNT_ONES(1023), "10");
+
+  EMP_TEST_MACRO( EMP_LOG2(0), "0" );
+  EMP_TEST_MACRO( EMP_LOG2(1), "1" );
+  EMP_TEST_MACRO( EMP_LOG2(3), "2" );
+  EMP_TEST_MACRO( EMP_LOG2(5), "3" );
+  EMP_TEST_MACRO( EMP_LOG2(10), "4" );
+  EMP_TEST_MACRO( EMP_LOG2(20), "5" );
+  EMP_TEST_MACRO( EMP_LOG2(40), "6" );
+  EMP_TEST_MACRO( EMP_LOG2(75), "7" );
+  EMP_TEST_MACRO( EMP_LOG2(150), "8" );
+  EMP_TEST_MACRO( EMP_LOG2(300), "9" );
+  EMP_TEST_MACRO( EMP_LOG2(600), "10" );
+
+  // Division!
+  EMP_TEST_MACRO( EMP_DIV_start(2), "8" );
+  EMP_TEST_MACRO( EMP_DIV(8, 2), "4" );
+  EMP_TEST_MACRO( EMP_DIV(100, 5), "20" );
+  EMP_TEST_MACRO( EMP_DIV(1000, 17), "58" );
+
+  // Modulus!
+  EMP_TEST_MACRO( EMP_MOD(10, 3), "1" );
+  EMP_TEST_MACRO( EMP_MOD(127, 10), "7" );
+  EMP_TEST_MACRO( EMP_MOD(127, 1000), "127" );
+  EMP_TEST_MACRO( EMP_MOD(102, 3), "0" );
+}
+
+
+
+TEST_CASE("Test macros", "[tools]")
+{
+  EMP_TEST_MACRO( EMP_POP_ARGS_32(1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0), "3,4,5,6,7,8,9,0");
+  EMP_TEST_MACRO( EMP_POP_ARGS(32, 1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0), "3,4,5,6,7,8,9,0");
+  EMP_TEST_MACRO( EMP_POP_ARGS(39, 1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0), "0");
+
+  // Test getting a specific argument.
+  EMP_TEST_MACRO( EMP_POP_ARGS( EMP_DEC(5), 11,12,13,14,15,16,17 ), "15,16,17");
+  EMP_TEST_MACRO( EMP_GET_ARG(5, 11,12,13,14,15,16,17), "15");
+
+  // Test counting number of arguments.
+  EMP_TEST_MACRO( EMP_COUNT_ARGS(a, b, c), "3" );
+  EMP_TEST_MACRO( EMP_COUNT_ARGS(x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x), "600" );
+
+  // Make sure EMP_STRINGIFY can process macros before running
+  EMP_TEST_MACRO( EMP_STRINGIFY(EMP_MERGE(ab, c, de, f)), "\"abcdef\"");
+  EMP_TEST_MACRO( EMP_STRINGIFY("abcdef"), "\"\\\"abcdef\\\"\"" );
+
+
+  // Test PACK manipulation
+  EMP_TEST_MACRO( EMP_PACK_ARGS(a,b,c), "(a,b,c)");
+  EMP_TEST_MACRO( EMP_UNPACK_ARGS((a,b,c)), "a,b,c");
+  EMP_TEST_MACRO( EMP_PACK_POP((a,b,c)), "(b,c)");
+  EMP_TEST_MACRO( EMP_PACK_TOP((a,b,c)), "a");
+  EMP_TEST_MACRO( EMP_PACK_PUSH(x, (a,b,c)), "(x,a,b,c)");
+  EMP_TEST_MACRO( EMP_PACK_SIZE((a,b,c)), "3");
+
+  // BAD TEST: EMP_TEST_MACRO( EMP_ARGS_TO_PACKS_1(4, a,b,c,d,e,f,g), "(a , b , c , d)" );
+
+
+  EMP_TEST_MACRO( EMP_CALL_BY_PACKS(TST_, (Fixed), a,b,c,d,e,f,g,h,i,j,k,l,m), "TST_8((Fixed), a,b,c,d,e,f,g,h,i,j,k,l,m, ~) TST_4((Fixed), i,j,k,l,m, ~) TST_1((Fixed), m, ~)" );
+
+  // Make sure we can wrap each argument in a macro.
+  EMP_TEST_MACRO( EMP_WRAP_EACH(EMP_DECORATE, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p), "[a] [b] [c] [d] [e] [f] [g] [h] [i] [j] [k] [l] [m] [n] [o] [p]" );
+  EMP_TEST_MACRO( EMP_WRAP_EACH(EMP_DECORATE, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o), "[a] [b] [c] [d] [e] [f] [g] [h] [i] [j] [k] [l] [m] [n] [o]" );
+  EMP_TEST_MACRO( EMP_WRAP_EACH(EMP_DECORATE, a, b, c, d, e, f, g, h, i, j, k, l, m), "[a] [b] [c] [d] [e] [f] [g] [h] [i] [j] [k] [l] [m]" );
+
+
+  // Test replacement of commas
+  EMP_TEST_MACRO( EMP_REPLACE_COMMAS(~, x,x,x,x,x,x,x), "x ~ x ~ x ~ x ~ x ~ x ~ x" );
+  EMP_TEST_MACRO( EMP_REPLACE_COMMAS(%, x,x,x,x,x,x,x,x), "x % x % x % x % x % x % x % x" );
+
+
+  // Simple argument manipulation
+  EMP_TEST_MACRO( EMP_ROTATE_ARGS(a, b, c), "b, c, a" );
+
+  // Test trimming argument lists.
+  EMP_TEST_MACRO( EMP_SELECT_ARGS( (i,x,i), a ), "a" );
+  EMP_TEST_MACRO( EMP_SELECT_ARGS( (i,x,i), a,b ), "a" );
+  EMP_TEST_MACRO( EMP_SELECT_ARGS( (i,x,i), a,b,c,d,e,f,g,h,i ), "a, c, d, f, g, i" );
+  EMP_TEST_MACRO( EMP_SELECT_ARGS( (i,x), 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50 ), "1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49" );
+
+
+  // Test more complex layouts...
+  EMP_TEST_MACRO( EMP_LAYOUT(EMP_DECORATE, +, a, b, c, d, e, f, g, h), "[a] + [b] + [c] + [d] + [e] + [f] + [g] + [h]" );
+  EMP_TEST_MACRO( EMP_WRAP_ARGS(EMP_DECORATE, a, b, c, d, e, f, g, h), "[a] , [b] , [c] , [d] , [e] , [f] , [g] , [h]" );
+  EMP_TEST_MACRO( EMP_WRAP_ARG_PAIRS(EMP_DECORATE_PAIR, A, a, B, b, C, c, D, d, E, e, F, f), "[A-a], [B-b], [C-c], [D-d], [E-e], [F-f]" );
+
+
+  // Rest controlling argument number.
+  EMP_TEST_MACRO( EMP_DUPLICATE_ARGS(15, x), "x, x, x, x, x, x, x, x, x, x, x, x, x, x, x" );
+  EMP_TEST_MACRO( EMP_DUPLICATE_ARGS(5, x,y,z), "x,y,z, x,y,z, x,y,z, x,y,z, x,y,z" );
+  EMP_TEST_MACRO( EMP_DUPLICATE_ARGS(63, 123), "123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123" );
+
+  EMP_TEST_MACRO( EMP_CROP_ARGS_TO(26, x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x),
+                  "x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x" );
+
+  EMP_TEST_MACRO( EMP_CROP_ARGS_TO(5, a, b, c, d, e, f, g, h, i, j), "a , b , c , d , e" );
+  EMP_TEST_MACRO( EMP_CROP_ARGS_TO(4, a, b, c, d, e, f, g, h, i, j), "a , b , c , d" );
+  EMP_TEST_MACRO( EMP_CROP_ARGS_TO(4, a, b, c, d), "a , b , c , d" );
+
+  EMP_TEST_MACRO( EMP_FORCE_ARGS_TO(3, x, a, b, c, d), "a , b , c" );
+  EMP_TEST_MACRO( EMP_FORCE_ARGS_TO(4, x, a, b, c, d), "a , b , c , d" );
+  EMP_TEST_MACRO( EMP_FORCE_ARGS_TO(7, x, a, b, c, d), "a , b , c , d , x , x , x" );
+
+  // Test collect only-odd or only-even arguments.
+  EMP_TEST_MACRO( EMP_GET_ODD_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), "1, 3, 5, 7, 9, 11");
+  EMP_TEST_MACRO( EMP_GET_EVEN_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), "2, 4, 6, 8, 10, 12");
+  EMP_TEST_MACRO( EMP_GET_ODD_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), "1, 3, 5, 7, 9, 11, 13");
+  EMP_TEST_MACRO( EMP_GET_EVEN_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), "2, 4, 6, 8, 10, 12");
+
+
+  EMP_TEST_MACRO( EMP_REVERSE_ARGS(a,b,c, d), "d, c, b, a" );
+  EMP_TEST_MACRO( EMP_TYPES_TO_ARGS(int, char, bool, std::string),
+                  "int arg1, char arg2, bool arg3, std::string arg4" );
+
+
+  // Test EMP_STRINGIFY_EACH
+  std::array<std::string, 2> test = {EMP_STRINGIFY_EACH(some, words)};
+  std::array<std::string, 9> test9 = {EMP_STRINGIFY_EACH(one, two, three, four, five, six, seven, eight, nine)};
+
+  REQUIRE(test.size() == 2);
+  REQUIRE(test[0] == "some");
+  REQUIRE(test[1] == "words");
+  REQUIRE(test9.size() == 9);
+  REQUIRE(test9[4] == "five");
+  REQUIRE(test9[7] == "eight");
+
+  EMP_TEST_MACRO( EMP_STRINGIFY_EACH(some, words), "\"some\" , \"words\"" );
+}
+
+TEST_CASE("Test map_utils", "[tools]")
+{
+  std::map<int, char> test_map;
+  test_map[0] = 'a';
+  test_map[4] = 'e';
+  test_map[8] = 'i';
+  test_map[14] = 'o';
+  test_map[20] = 'u';
+
+  REQUIRE( emp::Has(test_map, 8) == true );
+  REQUIRE( emp::Has(test_map, 18) == false );
+  REQUIRE( emp::Find(test_map, 14, 'x') == 'o'); // 14 should be there as 'o'
+  REQUIRE( emp::Find(test_map, 15, 'x') == 'x'); // 15 shouldn't be there, so return default.
+  REQUIRE( emp::Has(test_map, 15) == false );    // Make sure 15 hasn't been added to the map.
+
+  auto flipped = emp::flip_map(test_map);        // Make sure we can reverse the map.
+  REQUIRE( emp::Has(flipped, 'u') == true);      // And the reversed map should have proper info.
+  REQUIRE( emp::Has(flipped, 'x') == false);
+}
+
 struct TestClass1 {
   TestClass1() {
     EMP_TRACK_CONSTRUCT(TestClass1);
@@ -582,11 +933,58 @@ TEST_CASE("Test mem_track", "[tools]")
 
 }
 
+
+template <typename A, typename B>
+struct MetaTestClass {
+  A a;
+  B b;
+};
+
+TEST_CASE("Test meta-programming helpers", "[tools]")
+{
+  // TEST FOR VARIADIC HELPER FUNCTIONS:
+
+  REQUIRE((emp::get_type_index<char, char, bool, int, double>()) == 0);
+  REQUIRE((emp::get_type_index<int, char, bool, int, double>()) == 2);
+  REQUIRE((emp::get_type_index<double, char, bool, int, double>()) == 3);
+  REQUIRE((emp::get_type_index<std::string, char, bool, int, double>()) < 0);
+
+  REQUIRE((emp::has_unique_first_type<int, bool, std::string, bool, char>()) == true);
+  REQUIRE((emp::has_unique_first_type<bool, int, std::string, bool, char>()) == false);
+  REQUIRE((emp::has_unique_types<bool, int, std::string, emp::vector<bool>, char>()) == true);
+  REQUIRE((emp::has_unique_types<int, bool, std::string, bool, char>()) == false);
+
+
+  std::tuple<int, int, char> test_tuple(3,2,'a');
+  emp::ApplyTuple(TestFun, test_tuple);
+
+  REQUIRE(result_char == 'g');
+
+  using meta1_t = MetaTestClass<int, double>;
+  using meta2_t = emp::AdaptTemplate<meta1_t, char, bool>;
+  using meta3_t = emp::AdaptTemplate_Arg1<meta1_t, std::string>;
+
+  meta1_t meta1;
+  meta2_t meta2;
+  meta3_t meta3;
+
+  meta1.a = (decltype(meta1.a)) 65.5;
+  meta1.b = (decltype(meta1.b)) 65.5;
+  meta2.a = (decltype(meta2.a)) 65.5;
+  meta2.b = (decltype(meta2.b)) 65.5;
+  meta3.a = (decltype(meta3.a)) "65.5";
+  meta3.b = (decltype(meta3.b)) 65.5;
+
+  REQUIRE( meta1.a == 65 );
+  REQUIRE( meta1.b == 65.5 );
+  REQUIRE( meta2.a == 'A' );
+  REQUIRE( meta2.b == true );
+  REQUIRE( meta3.a == "65.5" );
+  REQUIRE( meta3.b == 65.5 );
+}
+
 TEST_CASE("Test Ptr", "[tools]")
 {
-  emp::PtrTracker<char>::Get();
-  emp::PtrTracker<int>::Get();
-
   // Test default constructor.
   emp::Ptr<int> ptr1;
   ptr1.New();
@@ -649,7 +1047,7 @@ TEST_CASE("Test Ptr", "[tools]")
   int * real_ptr2 = new int(2);  // Deleted in tracker
   int * real_ptr3 = new int(3);  // Unknown to tracker
   int * real_ptr4 = new int(4);  // Passively known to tracker (marked non-owner)
-  emp::PtrTracker<int> & tracker = emp::PtrTracker<int>::Get();
+  auto & tracker = emp::PtrTracker::Get();
 
   tracker.New(real_ptr1);
   tracker.Inc(real_ptr1);
@@ -1071,17 +1469,17 @@ TEST_CASE("Test string utils", "[tools]")
 
 
 
-TEST_CASE("Test trait", "[tools]")
-{
-  emp::TraitManager<int, double, emp::vector<bool>, char, std::string> tm;
+// TEST_CASE("Test trait", "[tools]")
+// {
+//   emp::TraitManager<int, double, emp::vector<bool>, char, std::string> tm;
 
-  tm.AddTrait<int>("test_trait", "This is a test trait", 42);
-  tm.AddTrait<std::string>("test2", "This is technically our second test trait.", "VALUE");
-  tm.AddTrait<int>("test3", "And we need another int trait to test", 1000);
+//   tm.AddTrait<int>("test_trait", "This is a test trait", 42);
+//   tm.AddTrait<std::string>("test2", "This is technically our second test trait.", "VALUE");
+//   tm.AddTrait<int>("test3", "And we need another int trait to test", 1000);
 
 
-  //emp::TraitSet trait_set(tm);
-}
+//   //emp::TraitSet trait_set(tm);
+// }
 
 
 TEST_CASE("Test vector", "[tools]")
@@ -1101,304 +1499,6 @@ TEST_CASE("Test vector", "[tools]")
 }
 
 
-TEST_CASE("Test macro math", "[tools]")
-{
-
-  // Test converting between binary, decimal, and sum formats.
-  EMP_TEST_MACRO( EMP_DEC_TO_BIN(9), "0, 0, 0, 0, 0, 0, 1, 0, 0, 1");
-  EMP_TEST_MACRO( EMP_DEC_TO_BIN(91), "0, 0, 0, 1, 0, 1, 1, 0, 1, 1");
-  EMP_TEST_MACRO( EMP_DEC_TO_BIN(999), "1, 1, 1, 1, 1, 0, 0, 1, 1, 1");
-
-  EMP_TEST_MACRO( EMP_BIN_TO_DEC(0,0,0,0,0,0,1,0,1,1), "11");
-  EMP_TEST_MACRO( EMP_BIN_TO_DEC(0,0,0,1,0,1,1,0,1,1), "91");
-  EMP_TEST_MACRO( EMP_BIN_TO_DEC(1,0,1,0,1,0,1,0,1,0), "682");
-
-  EMP_TEST_MACRO( EMP_BIN_TO_SUM(0,0,0,1,0,1,1,0,1,1), "0, 0, 0, 64, 0, 16, 8, 0, 2, 1");
-  EMP_TEST_MACRO( EMP_DEC_TO_SUM(91), "0, 0, 0, 64, 0, 16, 8, 0, 2, 1");
-
-  EMP_TEST_MACRO( EMP_BIN_TO_PACK(0,0,0,1,0,1,1,0,1,1), "(64, 16, 8, 2, 1)");
-  EMP_TEST_MACRO( EMP_DEC_TO_PACK(91), "(64, 16, 8, 2, 1)");
-
-  // Test Boolean logic
-  EMP_TEST_MACRO( EMP_NOT(0), "1" );
-  EMP_TEST_MACRO( EMP_NOT(EMP_NOT(0)), "0" );
-
-  EMP_TEST_MACRO( EMP_BIT_EQU(0,0), "1" );
-  EMP_TEST_MACRO( EMP_BIT_EQU(0,1), "0" );
-  EMP_TEST_MACRO( EMP_BIT_EQU(1,0), "0" );
-  EMP_TEST_MACRO( EMP_BIT_EQU(1,1), "1" );
-
-  EMP_TEST_MACRO( EMP_BIT_LESS(0,0), "0" );
-  EMP_TEST_MACRO( EMP_BIT_LESS(0,1), "1" );
-  EMP_TEST_MACRO( EMP_BIT_LESS(1,0), "0" );
-  EMP_TEST_MACRO( EMP_BIT_LESS(1,1), "0" );
-
-  EMP_TEST_MACRO( EMP_BIT_GTR(0,0), "0" );
-  EMP_TEST_MACRO( EMP_BIT_GTR(0,1), "0" );
-  EMP_TEST_MACRO( EMP_BIT_GTR(1,0), "1" );
-  EMP_TEST_MACRO( EMP_BIT_GTR(1,1), "0" );
-
-  // Test conditionals.
-  EMP_TEST_MACRO( EMP_IF_impl_0(abc), "~, abc" );
-  EMP_TEST_MACRO( EMP_IF_impl_1(abc), "EMP_IF_impl_1(abc)" );
-  EMP_TEST_MACRO( EMP_IF(0, A, B), "B" );
-  EMP_TEST_MACRO( EMP_IF(1, A, B), "A" );
-
-  // Test comparisons
-  EMP_TEST_MACRO( EMP_COMPARE(10,20), "B" );
-  EMP_TEST_MACRO( EMP_COMPARE(1023,1022), "A" );
-  EMP_TEST_MACRO( EMP_COMPARE(1000,999), "A" );
-  EMP_TEST_MACRO( EMP_COMPARE(678,678), "X" );
-
-  EMP_TEST_MACRO( EMP_EQU(5,5), "1" );
-  EMP_TEST_MACRO( EMP_EQU(2,5), "0" );
-  EMP_TEST_MACRO( EMP_EQU(5,8), "0" );
-  EMP_TEST_MACRO( EMP_EQU(8,5), "0" );
-  EMP_TEST_MACRO( EMP_EQU(5,2), "0" );
-
-  EMP_TEST_MACRO( EMP_LESS(5,5), "0" );
-  EMP_TEST_MACRO( EMP_LESS(2,5), "1" );
-  EMP_TEST_MACRO( EMP_LESS(5,8), "1" );
-  EMP_TEST_MACRO( EMP_LESS(8,5), "0" );
-  EMP_TEST_MACRO( EMP_LESS(5,2), "0" );
-
-  EMP_TEST_MACRO( EMP_LESS_EQU(5,5), "1" );
-  EMP_TEST_MACRO( EMP_LESS_EQU(2,5), "1" );
-  EMP_TEST_MACRO( EMP_LESS_EQU(5,8), "1" );
-  EMP_TEST_MACRO( EMP_LESS_EQU(8,5), "0" );
-  EMP_TEST_MACRO( EMP_LESS_EQU(5,2), "0" );
-
-  EMP_TEST_MACRO( EMP_GTR(5,5), "0" );
-  EMP_TEST_MACRO( EMP_GTR(2,5), "0" );
-  EMP_TEST_MACRO( EMP_GTR(5,8), "0" );
-  EMP_TEST_MACRO( EMP_GTR(8,5), "1" );
-  EMP_TEST_MACRO( EMP_GTR(5,2), "1" );
-
-  EMP_TEST_MACRO( EMP_GTR_EQU(5,5), "1" );
-  EMP_TEST_MACRO( EMP_GTR_EQU(2,5), "0" );
-  EMP_TEST_MACRO( EMP_GTR_EQU(5,8), "0" );
-  EMP_TEST_MACRO( EMP_GTR_EQU(8,5), "1" );
-  EMP_TEST_MACRO( EMP_GTR_EQU(5,2), "1" );
-
-  EMP_TEST_MACRO( EMP_NEQU(5,5), "0" );
-  EMP_TEST_MACRO( EMP_NEQU(2,5), "1" );
-  EMP_TEST_MACRO( EMP_NEQU(5,8), "1" );
-  EMP_TEST_MACRO( EMP_NEQU(8,5), "1" );
-  EMP_TEST_MACRO( EMP_NEQU(5,2), "1" );
-
-
-
-  // Test other helper math functions.
-  EMP_TEST_MACRO( EMP_MATH_VAL_TIMES_0(222), "0" );
-  EMP_TEST_MACRO( EMP_MATH_VAL_TIMES_1(222), "222" );
-
-  EMP_TEST_MACRO( EMP_MATH_BIN_TIMES_0(0,0,1,0,1,0,1,0,1,0), "0, 0, 0, 0, 0, 0, 0, 0, 0, 0" );
-  EMP_TEST_MACRO( EMP_MATH_BIN_TIMES_1(0,0,1,0,1,0,1,0,1,0), "0, 0, 1, 0, 1, 0, 1, 0, 1, 0" );
-
-  EMP_TEST_MACRO( EMP_MATH_COUNT_BITS(1, 1), "2");
-  EMP_TEST_MACRO( EMP_MATH_COUNT_BITS(1, N), "0");
-  EMP_TEST_MACRO( EMP_MATH_COUNT_BITS(0, N), "N");
-
-  EMP_TEST_MACRO( EMP_MATH_GET_CARRY(2), "1");
-  EMP_TEST_MACRO( EMP_MATH_CLEAR_CARRY(2), "0");
-
-  // Now in combination...
-  EMP_TEST_MACRO( EMP_MATH_COUNT_BITS(EMP_MATH_CLEAR_CARRY(1), EMP_MATH_GET_CARRY(2)), "2" );
-
-  // Basic Addition...
-  EMP_TEST_MACRO( EMP_ADD(1, 2), "3");
-  EMP_TEST_MACRO( EMP_ADD(5, 5), "10");
-  EMP_TEST_MACRO( EMP_ADD(7, 7), "14");
-  EMP_TEST_MACRO( EMP_ADD(111, 112), "223");
-  EMP_TEST_MACRO( EMP_ADD(127, 1), "128");
-  EMP_TEST_MACRO( EMP_ADD(123, 789), "912");
-  EMP_TEST_MACRO( EMP_ADD(1023, 1), "0");      // Overflow
-
-  EMP_TEST_MACRO( EMP_ADD_10(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), "55" );
-
-  // Basic Subtraction...
-  EMP_TEST_MACRO( EMP_SUB(10, 7), "3");
-  EMP_TEST_MACRO( EMP_SUB(128, 1), "127");
-  EMP_TEST_MACRO( EMP_SUB(250, 250), "0");
-  EMP_TEST_MACRO( EMP_SUB(250, 100), "150");
-  EMP_TEST_MACRO( EMP_SUB(91, 66), "25");
-  EMP_TEST_MACRO( EMP_SUB(99, 100), "1023");   // Underflow
-
-  // Combination of add and sub
-  EMP_TEST_MACRO( EMP_ADD( EMP_SUB(250, 100), EMP_SUB(91, 66)), "175");
-
-  // Shifting
-  EMP_TEST_MACRO( EMP_SHIFTL(17), "34");
-  EMP_TEST_MACRO( EMP_SHIFTL(111), "222");
-  EMP_TEST_MACRO( EMP_SHIFTL(444), "888");
-  EMP_TEST_MACRO( EMP_SHIFTL(1023), "1022");   // Overflow...
-
-  EMP_TEST_MACRO( EMP_SHIFTR(100), "50");
-  EMP_TEST_MACRO( EMP_SHIFTR(151), "75");
-
-  EMP_TEST_MACRO( EMP_SHIFTL_X(0, 700), "700");
-  EMP_TEST_MACRO( EMP_SHIFTL_X(5, 17),  "544");
-  EMP_TEST_MACRO( EMP_SHIFTL_X(1, 111), "222");
-  EMP_TEST_MACRO( EMP_SHIFTR_X(1, 100), "50");
-  EMP_TEST_MACRO( EMP_SHIFTR_X(3, 151), "18");
-
-  // Inc, dec, half...
-  EMP_TEST_MACRO( EMP_INC(20), "21");
-  EMP_TEST_MACRO( EMP_INC(55), "56");
-  EMP_TEST_MACRO( EMP_INC(63), "64");
-  EMP_TEST_MACRO( EMP_INC(801), "802");
-
-  EMP_TEST_MACRO( EMP_DEC(20), "19");
-  EMP_TEST_MACRO( EMP_DEC(55), "54");
-  EMP_TEST_MACRO( EMP_DEC(63), "62");
-  EMP_TEST_MACRO( EMP_DEC(900), "899");
-
-  EMP_TEST_MACRO( EMP_HALF(17), "8");
-  EMP_TEST_MACRO( EMP_HALF(18), "9");
-  EMP_TEST_MACRO( EMP_HALF(60), "30");
-  EMP_TEST_MACRO( EMP_HALF(1001), "500");
-
-  // Multiply!
-  EMP_TEST_MACRO( EMP_MULT(1, 1), "1");
-  EMP_TEST_MACRO( EMP_MULT(200, 0), "0");
-  EMP_TEST_MACRO( EMP_MULT(201, 1), "201");
-  EMP_TEST_MACRO( EMP_MULT(10, 7), "70");
-  EMP_TEST_MACRO( EMP_MULT(25, 9), "225");
-  EMP_TEST_MACRO( EMP_MULT(65, 3), "195");
-  EMP_TEST_MACRO( EMP_MULT(65, 15), "975");
-
-  // Bit Manipulation!
-  EMP_TEST_MACRO( EMP_COUNT_ONES(0), "0");
-  EMP_TEST_MACRO( EMP_COUNT_ONES(509), "8");
-  EMP_TEST_MACRO( EMP_COUNT_ONES(1023), "10");
-
-  EMP_TEST_MACRO( EMP_LOG2(0), "0" );
-  EMP_TEST_MACRO( EMP_LOG2(1), "1" );
-  EMP_TEST_MACRO( EMP_LOG2(3), "2" );
-  EMP_TEST_MACRO( EMP_LOG2(5), "3" );
-  EMP_TEST_MACRO( EMP_LOG2(10), "4" );
-  EMP_TEST_MACRO( EMP_LOG2(20), "5" );
-  EMP_TEST_MACRO( EMP_LOG2(40), "6" );
-  EMP_TEST_MACRO( EMP_LOG2(75), "7" );
-  EMP_TEST_MACRO( EMP_LOG2(150), "8" );
-  EMP_TEST_MACRO( EMP_LOG2(300), "9" );
-  EMP_TEST_MACRO( EMP_LOG2(600), "10" );
-
-  // Division!
-  EMP_TEST_MACRO( EMP_DIV_start(2), "8" );
-  EMP_TEST_MACRO( EMP_DIV(8, 2), "4" );
-  EMP_TEST_MACRO( EMP_DIV(100, 5), "20" );
-  EMP_TEST_MACRO( EMP_DIV(1000, 17), "58" );
-
-  // Modulus!
-  EMP_TEST_MACRO( EMP_MOD(10, 3), "1" );
-  EMP_TEST_MACRO( EMP_MOD(127, 10), "7" );
-  EMP_TEST_MACRO( EMP_MOD(127, 1000), "127" );
-  EMP_TEST_MACRO( EMP_MOD(102, 3), "0" );
-}
-
-
-
-TEST_CASE("Test macros", "[tools]")
-{
-  EMP_TEST_MACRO( EMP_POP_ARGS_32(1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0), "3,4,5,6,7,8,9,0");
-  EMP_TEST_MACRO( EMP_POP_ARGS(32, 1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0), "3,4,5,6,7,8,9,0");
-  EMP_TEST_MACRO( EMP_POP_ARGS(39, 1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0), "0");
-
-  // Test getting a specific argument.
-  EMP_TEST_MACRO( EMP_POP_ARGS( EMP_DEC(5), 11,12,13,14,15,16,17 ), "15,16,17");
-  EMP_TEST_MACRO( EMP_GET_ARG(5, 11,12,13,14,15,16,17), "15");
-
-  // Test counting number of arguments.
-  EMP_TEST_MACRO( EMP_COUNT_ARGS(a, b, c), "3" );
-  EMP_TEST_MACRO( EMP_COUNT_ARGS(x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x), "600" );
-
-  // Make sure EMP_STRINGIFY can process macros before running
-  EMP_TEST_MACRO( EMP_STRINGIFY(EMP_MERGE(ab, c, de, f)), "\"abcdef\"");
-  EMP_TEST_MACRO( EMP_STRINGIFY("abcdef"), "\"\\\"abcdef\\\"\"" );
-
-
-  // Test PACK manipulation
-  EMP_TEST_MACRO( EMP_PACK_ARGS(a,b,c), "(a,b,c)");
-  EMP_TEST_MACRO( EMP_UNPACK_ARGS((a,b,c)), "a,b,c");
-  EMP_TEST_MACRO( EMP_PACK_POP((a,b,c)), "(b,c)");
-  EMP_TEST_MACRO( EMP_PACK_TOP((a,b,c)), "a");
-  EMP_TEST_MACRO( EMP_PACK_PUSH(x, (a,b,c)), "(x,a,b,c)");
-  EMP_TEST_MACRO( EMP_PACK_SIZE((a,b,c)), "3");
-
-  // BAD TEST: EMP_TEST_MACRO( EMP_ARGS_TO_PACKS_1(4, a,b,c,d,e,f,g), "(a , b , c , d)" );
-
-
-  EMP_TEST_MACRO( EMP_CALL_BY_PACKS(TST_, (Fixed), a,b,c,d,e,f,g,h,i,j,k,l,m), "TST_8((Fixed), a,b,c,d,e,f,g,h,i,j,k,l,m, ~) TST_4((Fixed), i,j,k,l,m, ~) TST_1((Fixed), m, ~)" );
-
-  // Make sure we can wrap each argument in a macro.
-  EMP_TEST_MACRO( EMP_WRAP_EACH(EMP_DECORATE, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p), "[a] [b] [c] [d] [e] [f] [g] [h] [i] [j] [k] [l] [m] [n] [o] [p]" );
-  EMP_TEST_MACRO( EMP_WRAP_EACH(EMP_DECORATE, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o), "[a] [b] [c] [d] [e] [f] [g] [h] [i] [j] [k] [l] [m] [n] [o]" );
-  EMP_TEST_MACRO( EMP_WRAP_EACH(EMP_DECORATE, a, b, c, d, e, f, g, h, i, j, k, l, m), "[a] [b] [c] [d] [e] [f] [g] [h] [i] [j] [k] [l] [m]" );
-
-
-  // Test replacement of commas
-  EMP_TEST_MACRO( EMP_REPLACE_COMMAS(~, x,x,x,x,x,x,x), "x ~ x ~ x ~ x ~ x ~ x ~ x" );
-  EMP_TEST_MACRO( EMP_REPLACE_COMMAS(%, x,x,x,x,x,x,x,x), "x % x % x % x % x % x % x % x" );
-
-
-  // Simple argument manipulation
-  EMP_TEST_MACRO( EMP_ROTATE_ARGS(a, b, c), "b, c, a" );
-
-  // Test trimming argument lists.
-  EMP_TEST_MACRO( EMP_SELECT_ARGS( (i,x,i), a ), "a" );
-  EMP_TEST_MACRO( EMP_SELECT_ARGS( (i,x,i), a,b ), "a" );
-  EMP_TEST_MACRO( EMP_SELECT_ARGS( (i,x,i), a,b,c,d,e,f,g,h,i ), "a, c, d, f, g, i" );
-  EMP_TEST_MACRO( EMP_SELECT_ARGS( (i,x), 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50 ), "1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49" );
-
-
-  // Test more complex layouts...
-  EMP_TEST_MACRO( EMP_LAYOUT(EMP_DECORATE, +, a, b, c, d, e, f, g, h), "[a] + [b] + [c] + [d] + [e] + [f] + [g] + [h]" );
-  EMP_TEST_MACRO( EMP_WRAP_ARGS(EMP_DECORATE, a, b, c, d, e, f, g, h), "[a] , [b] , [c] , [d] , [e] , [f] , [g] , [h]" );
-  EMP_TEST_MACRO( EMP_WRAP_ARG_PAIRS(EMP_DECORATE_PAIR, A, a, B, b, C, c, D, d, E, e, F, f), "[A-a], [B-b], [C-c], [D-d], [E-e], [F-f]" );
-
-
-  // Rest controlling argument number.
-  EMP_TEST_MACRO( EMP_DUPLICATE_ARGS(15, x), "x, x, x, x, x, x, x, x, x, x, x, x, x, x, x" );
-  EMP_TEST_MACRO( EMP_DUPLICATE_ARGS(5, x,y,z), "x,y,z, x,y,z, x,y,z, x,y,z, x,y,z" );
-  EMP_TEST_MACRO( EMP_DUPLICATE_ARGS(63, 123), "123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123, 123" );
-
-  EMP_TEST_MACRO( EMP_CROP_ARGS_TO(26, x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x),
-                  "x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x , x" );
-
-  EMP_TEST_MACRO( EMP_CROP_ARGS_TO(5, a, b, c, d, e, f, g, h, i, j), "a , b , c , d , e" );
-  EMP_TEST_MACRO( EMP_CROP_ARGS_TO(4, a, b, c, d, e, f, g, h, i, j), "a , b , c , d" );
-  EMP_TEST_MACRO( EMP_CROP_ARGS_TO(4, a, b, c, d), "a , b , c , d" );
-
-  EMP_TEST_MACRO( EMP_FORCE_ARGS_TO(3, x, a, b, c, d), "a , b , c" );
-  EMP_TEST_MACRO( EMP_FORCE_ARGS_TO(4, x, a, b, c, d), "a , b , c , d" );
-  EMP_TEST_MACRO( EMP_FORCE_ARGS_TO(7, x, a, b, c, d), "a , b , c , d , x , x , x" );
-
-  // Test collect only-odd or only-even arguments.
-  EMP_TEST_MACRO( EMP_GET_ODD_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), "1, 3, 5, 7, 9, 11");
-  EMP_TEST_MACRO( EMP_GET_EVEN_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), "2, 4, 6, 8, 10, 12");
-  EMP_TEST_MACRO( EMP_GET_ODD_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), "1, 3, 5, 7, 9, 11, 13");
-  EMP_TEST_MACRO( EMP_GET_EVEN_ARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13), "2, 4, 6, 8, 10, 12");
-
-
-  EMP_TEST_MACRO( EMP_REVERSE_ARGS(a,b,c, d), "d, c, b, a" );
-  EMP_TEST_MACRO( EMP_TYPES_TO_ARGS(int, char, bool, std::string),
-                  "int arg1, char arg2, bool arg3, std::string arg4" );
-
-
-  // Test EMP_STRINGIFY_EACH
-  std::array<std::string, 2> test = {EMP_STRINGIFY_EACH(some, words)};
-  std::array<std::string, 9> test9 = {EMP_STRINGIFY_EACH(one, two, three, four, five, six, seven, eight, nine)};
-
-  REQUIRE(test.size() == 2);
-  REQUIRE(test[0] == "some");
-  REQUIRE(test[1] == "words");
-  REQUIRE(test9.size() == 9);
-  REQUIRE(test9[4] == "five");
-  REQUIRE(test9[7] == "eight");
-
-  EMP_TEST_MACRO( EMP_STRINGIFY_EACH(some, words), "\"some\" , \"words\"" );
-}
 
 // no idea what these do, but they're probably necessary
 

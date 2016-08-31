@@ -2,10 +2,10 @@
 // Copyright (C) Michigan State University, 2015. It is licensed                
 // under the MIT Software license; see doc/LICENSE
 
-#include "../../emtools/emfunctions.h"
 #include "../../tools/Random.h"
 #include "../../web/Animate.h"
 #include "../../web/canvas_utils.h"
+#include "../../web/emfunctions.h"
 #include "../../web/web.h"
 
 namespace web = emp::web;

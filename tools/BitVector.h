@@ -8,7 +8,7 @@
 //
 // To implement: append(), resize()...
 //
-// Note, this class is about 15-20% slower than BitSet, but is not fixed size and does
+// Note, this class is about 15-20% slower than emp::BitSet, but is not fixed size and does
 // not require knowledge of the size at compile time.
 //
 
@@ -20,23 +20,22 @@
 
 #include "assert.h"
 #include "bitset_utils.h"
-#include "const_utils.h"
 #include "functions.h"
+#include "math.h"
 
 namespace emp {
 
   class BitVector {
   private:
 #ifdef EMSCRIPTEN
-    typedef uint32_t field_type;
+    using field_t = uint32_t;
 #else
-    // typedef uint32_t field_type;
-    typedef uint64_t field_type;
+    using field_t = uint64_t;
 #endif
 
-    static const int FIELD_BITS = sizeof(field_type)*8;
+    static constexpr int FIELD_BITS = sizeof(field_t)*8;
     int num_bits;
-    field_type * bit_set;
+    field_t * bit_set;
 
     // NOTE: due to math edge cases, when num_bits=0 a minimum of 1 field/byte is returned.
     int LastBitID() const { return num_bits & (FIELD_BITS - 1); }
@@ -61,22 +60,22 @@ namespace emp {
     };
     friend class BitProxy;
 
-    inline static int FieldID(const int index)  {
-      emp_assert(index >= 0);
+    emp_constexpr static int FieldID(const int index)  {
+      emp_assert(index >= 0, index);
       return index / FIELD_BITS;
     }
-    inline static int FieldPos(const int index) {
+    emp_constexpr static int FieldPos(const int index) {
       emp_assert(index >= 0);
       return index & (FIELD_BITS-1);
     }
 
-    inline static int Byte2Field(const int index) { return index/sizeof(field_type); }
-    inline static int Byte2FieldPos(const int index) { return (index & (sizeof(field_type)-1)) << 3; }
+    static constexpr int Byte2Field(const int index) { return index/sizeof(field_t); }
+    static constexpr int Byte2FieldPos(const int index) { return (index & (sizeof(field_t)-1)) << 3; }
 
     // The following function assumes that the size of the bit_set has already been adjusted
     // to be the same as the size of the one being copied and only the fields need to be
     // copied over.
-    inline void RawCopy(const field_type * in_set) {
+    void RawCopy(const field_t * in_set) {
       const int NUM_FIELDS = NumFields();
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
     }
@@ -142,11 +141,11 @@ namespace emp {
   public:
     BitVector(int in_num_bits=0, bool init_val=false) : num_bits(in_num_bits) {
       emp_assert(num_bits >= 0);
-      bit_set = new field_type[NumFields()];
+      bit_set = new field_t[NumFields()];
       if (init_val) SetAll(); else Clear();
     }
     BitVector(const BitVector & in_set) : num_bits(in_set.num_bits) {
-      bit_set = new field_type[NumFields()];
+      bit_set = new field_t[NumFields()];
       RawCopy(in_set.bit_set);
     }
     BitVector(BitVector && in_set) : num_bits(in_set.num_bits) {
@@ -154,8 +153,7 @@ namespace emp {
       in_set.bit_set = nullptr;
     }
     ~BitVector() {
-      // NOTE: A move constructor may have left bit_set == nullptr
-      if (bit_set) delete [] bit_set;
+      if (bit_set) delete [] bit_set;  // A move constructor cane make bit_set == nullptr
     }
 
     BitVector & operator=(const BitVector & in_set) {
@@ -165,7 +163,7 @@ namespace emp {
 
       if (in_num_fields != prev_num_fields) {
         delete [] bit_set;
-	bit_set = new field_type[NumFields()];
+	bit_set = new field_t[NumFields()];
       }
 
       if (num_bits > 0) RawCopy(in_set.bit_set);
@@ -191,12 +189,12 @@ namespace emp {
       if (NUM_FIELDS == old_num_fields) {   // We can use our existing bit field
         num_bits = new_bits;
         // If there are extra bits, zero them out.
-        if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= constant::MaskLow<field_type>(LastBitID());
+        if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
       }
 
       else {  // We have to change the number of bitfields.  Resize & copy old info.
-        field_type * old_bit_set = bit_set;
-        bit_set = new field_type[NUM_FIELDS];
+        field_t * old_bit_set = bit_set;
+        bit_set = new field_t[NUM_FIELDS];
         const int min_fields = std::min(old_num_fields, NUM_FIELDS);
         for (int i = 0; i < min_fields; i++) bit_set[i] = old_bit_set[i];
         for (int i = min_fields; i < NUM_FIELDS; i++) bit_set[i] = 0U;
@@ -239,21 +237,20 @@ namespace emp {
     bool operator>(const BitVector & in_set) const { return !operator<=(in_set); }
     bool operator>=(const BitVector & in_set) const { return !operator<(in_set); }
 
-
     int GetSize() const { return num_bits; }
 
     bool Get(int index) const {
       emp_assert(index >= 0 && index < num_bits);
       const int field_id = FieldID(index);
       const int pos_id = FieldPos(index);
-      return (bit_set[field_id] & (static_cast<field_type>(1) << pos_id)) != 0;
+      return (bit_set[field_id] & (static_cast<field_t>(1) << pos_id)) != 0;
     }
 
     void Set(int index, bool value) {
       emp_assert(index >= 0 && index < num_bits);
       const int field_id = FieldID(index);
       const int pos_id = FieldPos(index);
-      const field_type pos_mask = static_cast<field_type>(1) << pos_id;
+      const field_t pos_mask = static_cast<field_t>(1) << pos_id;
 
       if (value) bit_set[field_id] |= pos_mask;
       else       bit_set[field_id] &= ~pos_mask;
@@ -270,25 +267,25 @@ namespace emp {
       emp_assert(index >= 0 && index < NumBytes());
       const int field_id = Byte2Field(index);
       const int pos_id = Byte2FieldPos(index);
-      const field_type val_uint = value;
-      bit_set[field_id] = (bit_set[field_id] & ~(static_cast<field_type>(255) << pos_id)) | (val_uint << pos_id);
+      const field_t val_uint = value;
+      bit_set[field_id] = (bit_set[field_id] & ~(static_cast<field_t>(255) << pos_id)) | (val_uint << pos_id);
     }
 
     uint32_t GetUInt(int index) const {
       // @CAO Need proper assert for variable bit fields!
-      // assert(index >= 0 && index < NumFields());
+      // emp_assert(index >= 0 && index < NumFields());
       return ((uint32_t *) bit_set)[index];
     }
 
-    void SetUInt(int index, field_type value) {
+    void SetUInt(int index, field_t value) {
       // @CAO Need proper assert for variable bit fields!
-      // assert(index >= 0 && index < NumFields());
+      // emp_assert(index >= 0 && index < NumFields());
       ((uint32_t *) bit_set)[index] = value;
     }
 
     uint32_t GetUIntAtBit(int index) {
       // @CAO Need proper assert for non-32-size bit fields!
-      // assert(index >= 0 && index < num_bits);
+      // emp_assert(index >= 0 && index < num_bits);
       const int field_id = FieldID(index);
       const int pos_id = FieldPos(index);
       if (pos_id == 0) return (uint32_t) bit_set[field_id];
@@ -298,13 +295,11 @@ namespace emp {
     }
 
     template <int OUT_BITS>
-    field_type GetValueAtBit(int index) {
-      // @CAO This function needs to be generalized to return more then sizeof(field_type)*8 bits.
-      static_assert(OUT_BITS <= sizeof(field_type)*8, "Requesting too many bits to fit in a UInt");
-      return GetUIntAtBit(index) & constant::MaskLow<field_type>(OUT_BITS);
+    field_t GetValueAtBit(int index) {
+      // @CAO This function needs to be generalized to return more then sizeof(field_t)*8 bits.
+      static_assert(OUT_BITS <= sizeof(field_t)*8, "Requesting too many bits to fit in a UInt");
+      return GetUIntAtBit(index) & MaskLow<field_t>(OUT_BITS);
     }
-
-
 
 
     bool Any() const {
@@ -325,7 +320,7 @@ namespace emp {
     void SetAll() {
       const int NUM_FIELDS = NumFields();
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(0U);
-      if (LastBitID() > 0) { bit_set[NUM_FIELDS - 1] &= constant::MaskLow<field_type>(LastBitID()); }
+      if (LastBitID() > 0) { bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID()); }
     }
 
 
@@ -358,7 +353,7 @@ namespace emp {
       const int NUM_FIELDS = NumFields();
       int bit_count = 0;
       for (int i = 0; i < NUM_FIELDS; i++) {
-        field_type cur_field = bit_set[i];
+        field_t cur_field = bit_set[i];
         while (cur_field) {
           cur_field &= (cur_field-1);       // Peel off a single 1.
           bit_count++;      // And increment the counter
@@ -370,7 +365,7 @@ namespace emp {
     // Count 1's in semi-parallel; fastest for even 0's & 1's
     int CountOnes_Mixed() const {
       // const int NUM_FIELDS = NumFields();
-      const int NUM_FIELDS = NumFields() * sizeof(field_type)/4;
+      const int NUM_FIELDS = NumFields() * sizeof(field_t)/4;
       uint32_t * uint_bit_set = (uint32_t *) bit_set;
       int bit_count = 0;
       for (int i = 0; i < NUM_FIELDS; i++) {
@@ -407,8 +402,8 @@ namespace emp {
       if (start_pos >= num_bits) return -1;
       int field_id  = FieldID(start_pos);     // What field do we start in?
       const int field_pos = FieldPos(start_pos);    // What position in that field?
-      if (field_pos && (bit_set[field_id] & ~(constant::MaskLow<field_type>(field_pos)))) {  // First field hit!
-        return find_bit(bit_set[field_id] & ~(constant::MaskLow<field_type>(field_pos))) + (field_id * FIELD_BITS);
+      if (field_pos && (bit_set[field_id] & ~(MaskLow<field_t>(field_pos)))) {  // First field hit!
+        return find_bit(bit_set[field_id] & ~(MaskLow<field_t>(field_pos))) + (field_id * FIELD_BITS);
       }
 
       // Search other fields...
@@ -432,7 +427,7 @@ namespace emp {
       const int NUM_FIELDS = NumFields();
       BitVector out_set(*this);
       for (int i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~bit_set[i];
-      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= constant::MaskLow<field_type>(LastBitID());
+      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
       return out_set;
     }
 
@@ -454,7 +449,7 @@ namespace emp {
       const int NUM_FIELDS = NumFields();
       BitVector out_set(*this);
       for (int i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= constant::MaskLow<field_type>(LastBitID());
+      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
       return out_set;
     }
 
@@ -462,7 +457,7 @@ namespace emp {
       const int NUM_FIELDS = NumFields();
       BitVector out_set(*this);
       for (int i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= constant::MaskLow<field_type>(LastBitID());
+      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
       return out_set;
     }
 
@@ -477,7 +472,7 @@ namespace emp {
       const int NUM_FIELDS = NumFields();
       BitVector out_set(*this);
       for (int i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= constant::MaskLow<field_type>(LastBitID());
+      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
       return out_set;
     }
 
@@ -486,7 +481,7 @@ namespace emp {
     BitVector & NOT_SELF() {
       const int NUM_FIELDS = NumFields();
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
-      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= constant::MaskLow<field_type>(LastBitID());
+      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
       return *this;
     }
 
@@ -505,14 +500,14 @@ namespace emp {
     BitVector & NAND_SELF(const BitVector & set2) {
       const int NUM_FIELDS = NumFields();
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= constant::MaskLow<field_type>(LastBitID());
+      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
       return *this;
     }
 
     BitVector & NOR_SELF(const BitVector & set2) {
       const int NUM_FIELDS = NumFields();
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= constant::MaskLow<field_type>(LastBitID());
+      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
       return *this;
     }
 
@@ -525,7 +520,7 @@ namespace emp {
     BitVector & EQU_SELF(const BitVector & set2) {
       const int NUM_FIELDS = NumFields();
       for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= constant::MaskLow<field_type>(LastBitID());
+      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
       return *this;
     }
 
@@ -558,11 +553,11 @@ namespace emp {
     const BitVector & operator>>=(const int shift_size) { return SHIFT_SELF(shift_size); }
 
     // For compatability with std::vector<bool>.
-    inline size_t size() const { return num_bits; }
-    inline bool all() const { return All(); }
-    inline bool any() const { return Any(); }
-    inline bool none() const { return !Any(); }
-    inline size_t count() const { return CountOnes_Mixed(); }
+    size_t size() const { return num_bits; }
+    bool all() const { return All(); }
+    bool any() const { return Any(); }
+    bool none() const { return !Any(); }
+    size_t count() const { return CountOnes_Mixed(); }
   };
 
 }

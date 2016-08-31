@@ -7,7 +7,7 @@ Contents:
    :maxdepth: 0
 
    config
-   emtools
+   web
    geometry
    hardware
    kinetic

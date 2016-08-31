@@ -11,8 +11,8 @@
 #include "../../tools/BitVector.h"
 #include "../../tools/Random.h"
 
-#include "../../emtools/JSWrap.h"
-#include "../../emtools/emfunctions.h"
+#include "../../web/JSWrap.h"
+#include "../../web/emfunctions.h"
 
 #include "../../evo/visualization_utils.h"
 #include "../../evo/evo_animation.h"

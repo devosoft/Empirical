@@ -10,10 +10,14 @@ a.out.js
 *.swo
 *.dSYM
 *tmp.*
+*.out
+*.debug
+*.mp4
+*.csv
 coverage.xml
 diff_cover.txt
 UTests/tools/tmp*.cc
-UTests/emtools/JSWrap.js
+UTests/web/JSWrap.js
 UTests/OLD/UI/ElementSlate.js
 UTests/OLD/UI/Example.js
 UTests/UI/Animate.js

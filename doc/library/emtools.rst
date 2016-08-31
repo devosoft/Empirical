@@ -1,56 +1,56 @@
-The Empirical Emtools Module Documentation
+The Empirical web Module Documentation
 ==========================================
 
-**emtools/color_map.h**
+**web/color_map.h**
 
-.. doxygenfile:: emtools/color_map.h
+.. doxygenfile:: web/color_map.h
    :project: Empirical
 
 
-**emtools/emfunctions.h**
+**web/emfunctions.h**
 
-.. doxygenfile:: emtools/emfunctions.h
+.. doxygenfile:: web/emfunctions.h
    :project: Empirical
 
 
-**emtools/Font.h**
+**web/Font.h**
 
-.. doxygenfile:: emtools/Font.h
+.. doxygenfile:: web/Font.h
    :project: Empirical
 
 
-**emtools/html5_events.h**
+**web/html5_events.h**
 
-.. doxygenfile:: emtools/html5_events.h
+.. doxygenfile:: web/html5_events.h
    :project: Empirical
 
 
-**emtools/init.h**
+**web/init.h**
 
-.. doxygenfile:: emtools/init.h
+.. doxygenfile:: web/init.h
    :project: Empirical
 
 
-**emtools/js_object_struct.h**
+**web/js_object_struct.h**
 
-.. doxygenfile:: emtools/js_object_struct.h
+.. doxygenfile:: web/js_object_struct.h
    :project: Empirical
 
 
-**emtools/js_utils.h**
+**web/js_utils.h**
 
-.. doxygenfile:: emtools/js_utils.h
+.. doxygenfile:: web/js_utils.h
    :project: Empirical
 
 
-**emtools/JSWrap.h**
+**web/JSWrap.h**
 
-.. doxygenfile:: emtools/JSWrap.h
+.. doxygenfile:: web/JSWrap.h
    :project: Empirical
 
 
-**emtools/RawImage.h**
+**web/RawImage.h**
 
-.. doxygenfile:: emtools/RawImage.h
+.. doxygenfile:: web/RawImage.h
    :project: Empirical
 

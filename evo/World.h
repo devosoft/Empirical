@@ -112,6 +112,9 @@
 //   GetDefaultFitnessFun()  -- Return the current default fitness function being used.
 //   SetDefaultFitnessFun(new_fun)  -- Set the default fitness function to be new_fun.
 
+
+// @CAO Setup to dynamically choose correct version based on arg count.
+
 #define EMP_EVO_FORWARD(FUN, TARGET) \
 template <typename... T> void FUN(T &&... args) { TARGET.FUN(std::forward<T>(args)...); }
 
@@ -132,10 +135,10 @@ namespace emp {
 namespace evo {
 
 
-  EMP_SETUP_TYPE_SELECTOR(SelectPopManager, emp_is_population_manager);
-  EMP_SETUP_TYPE_SELECTOR(SelectOrgManager, emp_is_organism_manager);
-  EMP_SETUP_TYPE_SELECTOR(SelectStatsManager, emp_is_stats_manager);
-  EMP_SETUP_TYPE_SELECTOR(SelectLineageManager, emp_is_lineage_manager);
+  EMP_SETUP_TYPE_SELECTOR(SelectPopManager, emp_is_population_manager)
+  EMP_SETUP_TYPE_SELECTOR(SelectOrgManager, emp_is_organism_manager)
+  EMP_SETUP_TYPE_SELECTOR(SelectStatsManager, emp_is_stats_manager)
+  EMP_SETUP_TYPE_SELECTOR(SelectLineageManager, emp_is_lineage_manager)
 
   template <typename POP_MANAGER> class PopulationIterator;
 
@@ -186,9 +189,9 @@ namespace evo {
     void SetupWorld(const std::string & world_name) {
       this->pop_name = world_name;
       SetupCallbacks(callbacks);
-      popM.SetRandom(random_ptr);
       lineageM.Setup(this);
       statsM.Setup(this);
+      popM.Setup(random_ptr);
     }
 
   public:
@@ -199,7 +202,7 @@ namespace evo {
       , inject_ready_sig(to_string(pop_name,"::inject-ready"))
       , org_placement_sig(to_string(pop_name,"::org-placement"))
       , on_update_sig(to_string(pop_name,"::on-update"))
-      , callbacks(pop_name) { SetupWorld(pop_name);}
+      , callbacks(pop_name) { SetupWorld(pop_name); }
 
     World(int seed=-1, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
       : World(new Random(seed), pop_name) { random_owner = true; }
@@ -224,9 +227,9 @@ namespace evo {
     void ResetRandom(int seed=-1) { SetRandom(*(new Random(seed))); }
 
     // Forward function calls to appropriate internal objects
-    EMP_EVO_FORWARD(ConfigPop, popM);
-    EMP_EVO_FORWARD_2(SetDefaultFitnessFun, orgM, statsM);
-    EMP_EVO_FORWARD(SetDefaultMutateFun, orgM);
+    EMP_EVO_FORWARD(ConfigPop, popM)
+    EMP_EVO_FORWARD_2(SetDefaultFitnessFun, orgM, statsM)
+    EMP_EVO_FORWARD(SetDefaultMutateFun, orgM)
 
     LinkKey OnBeforeRepro(std::function<void(int)> fun) { return before_repro_sig.AddAction(fun); }
     LinkKey OnOffspringReady(std::function<void(ORG *)> fun) { return offspring_ready_sig.AddAction(fun); }
@@ -256,6 +259,7 @@ namespace evo {
       SetupOrg(*new_org, &callbacks, pos);
       org_placement_sig.Trigger(pos);
     }
+
     void InsertBirth(const ORG mem, int parent_pos, int copy_count=1) {
       before_repro_sig.Trigger(parent_pos);
       for (int i = 0; i < copy_count; i++) {

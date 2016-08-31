@@ -15,10 +15,10 @@
 #include "../../geometry/Circle2D.h"
 #include "../../geometry/Point2D.h"
 
-#include "../../emtools/emfunctions.h"
-#include "../../emtools/Color.h"
-#include "../../emtools/Font.h"
-#include "../../emtools/RawImage.h"
+#include "../../web/emfunctions.h"
+#include "../../web/Color.h"
+#include "../../web/Font.h"
+#include "../../web/RawImage.h"
 
 #include "../../kinetic/Kinetic.h"
 

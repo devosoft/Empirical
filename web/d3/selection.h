@@ -12,9 +12,9 @@
 #include <array>
 
 #include "../../tools/assert.h"
-#include "../../emtools/js_object_struct.h"
-#include "../../emtools/js_utils.h"
-#include "../../emtools/JSWrap.h"
+#include "../../web/js_object_struct.h"
+#include "../../web/js_utils.h"
+#include "../../web/JSWrap.h"
 
 extern "C" {
   extern int n_objects();

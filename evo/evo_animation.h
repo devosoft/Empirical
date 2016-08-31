@@ -3,7 +3,7 @@
 
 #include "../web/web_init.h"
 #include "../web/Animate.h"
-#include "../emtools/JSWrap.h"
+#include "../web/JSWrap.h"
 #include "../tools/BitSet.h"
 #include "../tools/Random.h"
 #include "../tools/stats.h"

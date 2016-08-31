@@ -4,7 +4,7 @@
 
 #include "../../web/web.h"
 #include "../../web/commands.h"
-#include "../../emtools/emfunctions.h"
+#include "../../web/emfunctions.h"
 
 namespace UI = emp::web;
 UI::Document doc("emp_base");

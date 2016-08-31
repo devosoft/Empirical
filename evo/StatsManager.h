@@ -65,7 +65,8 @@ namespace evo{
     void Setup(WORLD * w){;}
 
     template <typename T>
-    void SetDefaultFitnessFun(std::function<double(T)> fit){;}
+    //void SetDefaultFitnessFun(const std::function<double(T*)> &) {;}
+    void SetDefaultFitnessFun(const T &) {;}
 
     //Tells the stats manager where to put output. If location is "cout"
     //(default) or "stdout", stats will get sent to cout. Otherwise, the
@@ -323,7 +324,7 @@ namespace evo{
       }
     }
 
-    void SetDefaultFitnessFun(std::function<double(org_ptr)> fit){
+    void SetDefaultFitnessFun(const std::function<double(org_ptr)> & fit){
         fit_fun = fit;
     }
 

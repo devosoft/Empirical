@@ -133,13 +133,13 @@ namespace emp {
       : states(num_states), start(start_state), is_stop(num_states, 0) {
         if (num_states > start) states[start].free_to.insert(start);
       }
-    tNFA(const tNFA<NUM_SYMBOLS,STOP_TYPE> &) = default;
+    tNFA(const tNFA<S,STOP_TYPE> &) = default;
     ~tNFA() { ; }
-    tNFA<NUM_SYMBOLS,STOP_TYPE> & operator=(const tNFA<NUM_SYMBOLS,STOP_TYPE> &) = default;
+    tNFA<S,STOP_TYPE> & operator=(const tNFA<S,STOP_TYPE> &) = default;
 
     int GetSize() const { return (int) states.size(); }
     const std::set<int> & GetStart() const {
-      emp_assert(states.size() > start);
+      emp_assert(start < (int) states.size());
       return states[start].free_to;
     }
     std::set<int> GetNext(int sym, int from_id=0) const {

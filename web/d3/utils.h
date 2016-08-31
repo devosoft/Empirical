@@ -10,10 +10,10 @@
 #include <map>
 #include <string>
 
-#include "../../emtools/init.h"
+#include "../../web/init.h"
 #include "../../tools/macros.h"
-#include "../../emtools/js_utils.h"
-#include "../../emtools/JSWrap.h"
+#include "../../web/js_utils.h"
+#include "../../web/JSWrap.h"
 
 // Helper macros
 

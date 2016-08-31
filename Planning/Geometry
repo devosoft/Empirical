@@ -1,0 +1,73 @@
+Geometry needs to be able to handle a range of SHAPE and a range of OWNERS for those bodies.
+
+-- PLAN A: Double-dispatch varient --
+Body_Base is a base class, containing info unrelated to its shape or its owner.
+It *does* contain the set of signals that might need to be triggered, such as
+specific types of collisions.
+
+Body is a template class that takes SHAPE and OWNER as template arguments.
+It creates an intenral instance of SHAPE (which has a pointer back to Body_Base)
+and a pointer back to OWNER.
+
+A Surface has a collection of SHAPE objects on it.  For now, all objects on a
+surface must be of the same shape (multiple surfaces should be able to be part
+of a physics or drawn on a canvas... eventually.)
+
+When a physics identifies that two objects have collided it calls
+  Body_Base::SingnalCollide(Body_Base * other)
+
+...which is a pure virtual class.  As such it jumps to:
+  Body<SHAPE,OWNER>::SingnalCollide(Body_Base * other)
+
+Since we now know the OWNER type, this allows us to trigger the collision signal
+in the other base class with the correct type.
+
+
+Concerns
+* Several indirect references occur with each collision.  In the scheme of
+  things, this is probably not too much overhead though.
+* It's tricky to have both types at once.  We need to be careful that we don't
+  make thousands of copies of each signal and instead only one for each owner
+  type
+
+
+-- PLAN B: MACROS --
+PhysicsBody will be the base class, and there will be an explicity-created
+derived classes that know how to interact with each possible owner type.
+
+If you run the macro EMP_BUILD_BODY_OWNERS(A, B, C) it will build the classes
+PhysicsBody_A, PhysicsBody_B, and PhysicsBody_C.  Each of those classes will
+have the explicitly-defined member functions for dealing with the collisions of
+different types.  In this example, the base class will be built with:
+
+  virtual void PhysicsBody::HandleCollision(PhysicsBody * other) = 0;
+  virtual void PhysicsBody::HandleCollision(PhysicsBody_A * other) = 0;
+  virtual void PhysicsBody::HandleCollision(PhysicsBody_B * other) = 0;
+  virtual void PhysicsBody::HandleCollision(PhysicsBody_C * other) = 0;
+
+...while PhysicsBody_A will have:
+
+  void PhysicsBody_A::HandleCollision(PhysicsBody * other) { other->HandleCollision(this); }
+  void PhysicsBody_A::HandleCollision(PhysicsBody_A * other) override { ... }
+  void PhysicsBody_A::HandleCollision(PhysicsBody_B * other) override { ... }
+  void PhysicsBody_A::HandleCollision(PhysicsBody_C * other) override { ... }
+
+With the ... presumably being sending out a signal?  
+
+Concerns
+* OWNER types cannot be templated or they will screw up the macro.
+* All of PhysicsBody and its child classes will be defined in the macro.
+
+-- PLAN C: Lookup Table --
+All derived objects must be provided from the beginning and assinged a unique value.
+Both values are collected an used to index into a function lookup table.
+
+Since all values are known at compile time, this technique should work consistently
+and quickly.
+
+We may even be able to build this technique with a wrapper that publicly inherets from
+the owner type
+
+Concerns:
+* The interface may be a bit complicated.
+* All OWNER types must be able to know and return their unique id.

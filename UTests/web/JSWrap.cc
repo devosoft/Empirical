@@ -2,11 +2,9 @@
 // Copyright (C) Michigan State University, 2015. It is licensed
 // under the MIT Software license; see doc/LICENSE
 
-#include "../../emtools/init.h"
-
+#include "../../web/init.h"
 #include "../../tools/alert.h"
-#include "../../emtools/JSWrap.h"
-#include "../../emtools/init.h"
+#include "../../web/JSWrap.h"
 #include <functional>
 
 struct JSDataObject {

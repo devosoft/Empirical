@@ -6,7 +6,7 @@
 #include "scales.h"
 #include "dataset.h"
 
-#include "../../emtools/js_utils.h"
+#include "../../web/js_utils.h"
 
 namespace D3 {
 

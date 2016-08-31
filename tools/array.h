@@ -56,12 +56,12 @@ namespace emp {
     bool operator>=(const emp::array<T,N> & in) const { return a >= in.a; }
 
     T & operator[](int pos) {
-      emp_assert(pos >= 0 && pos < N, pos);
+      emp_assert(pos >= 0 && pos < (int) N, pos);
       return a[pos];
     }
 
     const T & operator[](int pos) const {
-      emp_assert(pos >= 0 && pos < N, pos);
+      emp_assert(pos >= 0 && pos < (int) N, pos);
       return a[pos];
     }
 

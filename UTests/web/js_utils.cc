@@ -2,15 +2,15 @@
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#include "../../emtools/init.h"
 #include <string>
+#include <array>
 
+#include "../../web/init.h"
 #include "../../config/command_line.h"
-#include "../../emtools/JSWrap.h"
-#include "../../emtools/js_utils.h"
+#include "../../web/JSWrap.h"
+#include "../../web/js_utils.h"
 #include "../../tools/unit_tests.h"
 #include "../../tools/assert.h"
-#include "../../tools/array.h"
 #include "../../tools/vector.h"
 
 struct JSDataObject {
