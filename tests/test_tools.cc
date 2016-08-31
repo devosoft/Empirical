@@ -22,6 +22,7 @@
 #include "../tools/Random.h"
 // #include "../tools/Trait.h"
 
+#include "../tools/array.h"
 #include "../tools/assert.h"
 #include "../tools/ce_string.h"
 #include "../tools/functions.h"
@@ -59,6 +60,23 @@
     REQUIRE(result == EXP_RESULT);                                      \
   } while (false)
 
+
+TEST_CASE("Test array", "[tools]")
+{
+  constexpr int A_SIZE = 50;
+  emp::array<int, A_SIZE> test_array;
+
+  for (int i = 0; i < A_SIZE; i++) {
+    test_array[i] = i * i;
+  }
+
+  int sum = 0;
+  for (int i = 0; i < A_SIZE; i++) {
+    sum += test_array[i];
+  }
+
+  REQUIRE(sum == 40425);
+}
 
 // this templating is necessary to force full coverage of templated classes.
 // Since c++ doesn't generate code for templated methods if those methods aren't
