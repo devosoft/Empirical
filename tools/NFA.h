@@ -299,6 +299,8 @@ namespace emp {
       for (int s : state_set) if (nfa.IsStop(s)) return true;
       return false;
     }
+    bool HasState(int id) { return state_set.count(id); }
+    int GetSize() { return (int) state_set.size(); }
 
     void SetStateSet(const std::set<int> & in) { state_set = in; }
     void Reset() { state_set = nfa.GetStart(); }
