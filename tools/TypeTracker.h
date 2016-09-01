@@ -58,13 +58,30 @@ namespace emp {
       emp_assert((has_type<REAL_T,TYPES...>()));    // Make sure we're wrapping a legal type.
       return wrap_t<REAL_T>(std::forward<REAL_T>(val));
     }
+    template <typename REAL_T> wrap_t<REAL_T> * New(REAL_T & val) {
+      emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
+      return new wrap_t<REAL_T>(std::forward<REAL_T>(val));
+    }
     template <typename REAL_T> wrap_t<REAL_T> * New(REAL_T && val) {
       emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
       return new wrap_t<REAL_T>(std::forward<REAL_T>(val));
     }
-    template <typename REAL_T> wrap_t<REAL_T> * New(REAL_T & val) {
-      emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
-      return new wrap_t<REAL_T>(std::forward<REAL_T>(val));
+
+    // Test if the tracked type is TEST_T
+    template <typename TEST_T>
+    bool IsType( TrackedType & tracked ) {
+      return tracked.GetTypeTrackerID() == get_type_index<TEST_T,TYPES...>();
+    }
+    // Convert the tracked type back to REAL_T.  Assert that this is type safe!
+    template <typename REAL_T>
+    REAL_T ToType( TrackedType & tracked ) {
+      emp_assert(IsType<REAL_T>(tracked));
+      return ((wrap_t<REAL_T> *) &tracked)->value;
+    }
+    // Cast the tracked type to OUT_T.  Try to do so even if NOT original type!
+    template <typename OUT_T>
+    OUT_T Cast( TrackedType & tracked ) {
+      return ((wrap_t<OUT_T> *) &tracked)->value;
     }
 
     template <typename T1, typename T2>
