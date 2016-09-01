@@ -38,7 +38,7 @@ namespace emp {
   }
 
   // Log varients
-  static constexpr double Log(double x, double base) { return Log2(x) / Log2(base); }
+  static constexpr double Log(double x, double base=10.0) { return Log2(x) / Log2(base); }
   static constexpr double Ln(double x) { return Log(x, emp::E); }   // Natural Log...
   static constexpr double Log10(double x) { return Log(x, 10.0); }
 
