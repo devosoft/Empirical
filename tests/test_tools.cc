@@ -18,6 +18,7 @@
 #include "../tools/DynamicStringSet.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/Graph.h"
+#include "../tools/NFA.h"
 #include "../tools/Ptr.h"
 #include "../tools/Random.h"
 // #include "../tools/Trait.h"
@@ -995,6 +996,52 @@ TEST_CASE("Test meta-programming helpers", "[tools]")
   REQUIRE( meta2.b == true );
   REQUIRE( meta3.a == "65.5" );
   REQUIRE( meta3.b == 65.5 );
+}
+
+TEST_CASE("Test NFA", "[tools]")
+{
+  emp::NFA nfa(10);
+  nfa.AddTransition(0, 1, 'a');
+  nfa.AddTransition(0, 2, 'a');
+  nfa.AddTransition(0, 3, 'a');
+  nfa.AddTransition(0, 4, 'a');
+
+  nfa.AddTransition(1, 2, 'b');
+  nfa.AddTransition(2, 3, 'c');
+  nfa.AddTransition(3, 4, 'd');
+
+  nfa.AddTransition(0, 1, 'e');
+  nfa.AddTransition(0, 1, 'f');
+  nfa.AddTransition(0, 1, 'g');
+
+  nfa.AddTransition(2, 3, 'a');
+  nfa.AddTransition(3, 4, 'a');
+  nfa.AddTransition(2, 4, 'a');
+
+  nfa.AddTransition(2, 2, 'e');
+  nfa.AddTransition(3, 3, 'e');
+  nfa.AddTransition(4, 4, 'e');
+
+  nfa.AddFreeTransition(1,5);
+
+  nfa.AddTransition(5, 6, 'a');
+
+  nfa.AddFreeTransition(6,7);
+  nfa.AddFreeTransition(6,8);
+  nfa.AddFreeTransition(6,9);
+  nfa.AddFreeTransition(9,0);
+
+  emp::NFA_State state(nfa);
+  REQUIRE(state.GetSize() == 1);
+  state.Next('a');
+  REQUIRE(state.GetSize() == 5);
+  state.Next('a');
+  REQUIRE(state.GetSize() == 7);
+
+  emp::NFA_State state2(nfa);
+  REQUIRE(state2.GetSize() == 1);
+  state2.Next("aaaa");
+  REQUIRE(state2.GetSize() == 7);
 }
 
 TEST_CASE("Test Ptr", "[tools]")
