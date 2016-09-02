@@ -11,7 +11,9 @@
 #ifndef EMP_CS_STRING_HH
 #define EMP_CS_STRING_HH
 
+#include <string>
 #include <type_traits>
+
 #include "functions.h"
 
 namespace emp {
@@ -54,7 +56,14 @@ namespace emp {
       // static_assert(pos < m_size, "ce_array index out of range.");
       return m_str[pos];
     }
+
+    operator std::string() const { return std::string(m_str); }
   };
+
+  std::ostream & operator<<(std::ostream & out, const emp::ce_string & str) {
+    out << (std::string) str;
+    return out;
+  }
 
 }
 
