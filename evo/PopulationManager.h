@@ -71,9 +71,9 @@ namespace evo {
       }
     }
 
-    // AddOrg and ReplaceOrg should be the only ways new organisms come into a population.
-    // AddOrg inserts them into the end of the designated population.
-    // ReplaceOrg places them at a specific position, replacing anyone who may already be there.
+    // AddOrg and AddOrgBirth should be the only ways new organisms come into a population.
+    // AddOrg inserts an organism from OUTSIDE of the population.
+    // AddOrgBirth inserts an organism that was born INSIDE the population.
     int AddOrg(ORG * new_org) {
       const int pos = pop.size();
       pop.push_back(new_org);
