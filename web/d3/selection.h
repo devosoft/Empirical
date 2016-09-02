@@ -834,41 +834,25 @@ Selection Select(std::string selector){
   return Selection(selector);
 }
 
-Selection SelectAll(const char* selector){
-  /*Slightly prettier UI for constructor*/
-  return Selection(selector, true);
-}
-
 Selection SelectAll(std::string selector){
   /*Slightly prettier UI for constructor*/
   return Selection(selector, true);
 }
 
-  template<std::size_t SIZE>
-  Selection ShapesFromData(std::array<int32_t, SIZE> values, const char* shape){
-    Selection s = Select("svg").SelectAll(shape).Data(values);
-    s.EnterAppend(shape);
-    return s;
-  }
 
-  template<std::size_t SIZE>
-  Selection ShapesFromData(std::array<int32_t, SIZE> values, std::string shape){
-    Selection s = Select("svg").SelectAll(shape).Data(values);
-    s.EnterAppend(shape);
-    return s;
-  }
+template<std::size_t SIZE>
+Selection ShapesFromData(std::array<int32_t, SIZE> values, std::string shape){
+  Selection s = Select("svg").SelectAll(shape).Data(values);
+  s.EnterAppend(shape);
+  return s;
+}
 
-  Selection ShapesFromData(Dataset values, const char* shape){
-    Selection s = Select("svg").SelectAll(shape).Data(values);
-    s.EnterAppend(shape);
-    return s;
-  }
 
-  Selection ShapesFromData(Dataset values, std::string shape){
-    Selection s = Select("svg").SelectAll(shape).Data(values);
-    s.EnterAppend(shape);
-    return s;
-  }
+Selection ShapesFromData(Dataset values, std::string shape){
+  Selection s = Select("svg").SelectAll(shape).Data(values);
+  s.EnterAppend(shape);
+  return s;
+}
 
 }
 #endif

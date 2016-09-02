@@ -1,0 +1,382 @@
+Using Empirical's D3.js Wrapper
+===============================
+
+If you're writing scientific code that runs on the web, you'll probably want to visualize the
+results (either as your program runs or after it's done). To make this as easy as possible,
+Empirical includes a C++ wrapper for d3.js, a wildly popular and powerful Javascript data
+visualization library. Using the wrapper, you can create visualizations directly from C++.
+
+At a base level, the wrapper provides C++ equivalents for all objects, methods, and functions in
+d3.js. So, if you're used to using d3, using the wrapper should be very similar. However, d3.js is
+a library that you use to build visualizations rather than a library of pre-built visualizations (a
+ fact that has lead to the proliferation of many very similar libraries built on top of d3 that
+provide pre-built graphs). Where possible, we have tried to provide short-cut functions and
+pre-built graph objects in an effort to help those new to Javascript visualization get started
+fast. This is an ongoing process and we're always open to suggestions!
+
+A Minimal Example
+=================
+
+D3 visualizations run in web browsers. That means that to use this wrapper, you need to compile
+your C++ code to Javascript. To see the visualization, you need to have an html file that loads
+your Javascript. Then you need to open that html file in a web browser. Optionally, you might also
+have a CSS file that contains rules for how elements of your web page should look.
+
+Here are the basics of what you need in order to get up and running. The easiest way to make a
+visualization is to use one of the pre-built visualizations. Later we'll get into writing your own.
+Either way, you'll need:
+
+C++ File
+--------
+
+The C++ file that you'll compile to Javascript. For this example, we'll use the
+Empirical web module to build the whole web page::
+
+
+  // The document object is in charge of all of the Javascript and html that goes in the
+  // <div> element in the html. It gets created before main so that it stays in scope
+  // when main ends
+  emp::web::Document doc("my_visualization");
+
+  // The visualization object needs to be declared globally for the same reason.
+  // For this example, we'll use a LineageVisualization, which is a type of D3 visualization
+  // object. It takes two arguemnets: the width and the height of the visualization.
+  emp::web::LineageVisualization lineage_viz(6000, 5000);
+
+  int main {
+    // Add visualization to the document
+    doc << lineage_viz;
+
+    // Load pre-existing data file, example.json, into the visualization
+    lineage_viz.LoadDataFromFile("example.json");
+  }
+
+Now we need to compile it::
+
+  emcc my_program.cc -o my_program.js \ #.js extension tells Emscripten to compile to Javascript
+       --js-library Empirical/web/library_emp.js    \ #Include the Empirical Javascript library
+       --js-library Empirical/web/d3/library_d3.js  \ #Include Javascript library for D3 wrapper
+       -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" \ #Tells Emscripten to export from C++
+       -s ASSERTIONS=2 \ #Emscripten needs to know this
+       -s DEMANGLE_SUPPORT=1 \ #Make names of variables in Javascript more readable
+       -s TOTAL_MEMORY=67108864 \ #The exact number doesn't matter, but default is too small
+       -s NO_EXIT_RUNTIME=1 \ #Make the page keep working after main() is done running
+       -O3 -DNDEBUG #Turn on optimizations and turn off debugging (improves speed - only do this
+                    #once you're done debugging)
+
+HTML File
+---------
+
+To tell the browser what to do with your Javascript, you need an html file::
+
+    <!-- This is an html comment -->
+    <!DOCTYPE html>
+    <html>
+
+        <!-- The head is for stuff that needs to get set up first, like metadata and styles -->
+        <head>
+            <title> My D3/Empirical visualization! </title>
+
+            <!-- Optional - load a stylesheet -->
+            <link rel="stylesheet" type="text/css" href="my_style_sheet.css" />
+        </head>
+
+        <!-- Everything else goes in the body -->
+        <body>
+            <!-- Include necessary javascript libraries (jquery, d3, and a d3 tooltip library) -->
+            <script src="Empirical/web/jquery-1.11.2.min.js"></script>
+            <script src="Empirical/web/d3/d3.min.js" charset="utf-8"></script>
+            <script src="Empirical/web/d3/d3-tip.js" charset="utf-8"></script>
+
+            <!-- Include the Javascript file you compiled your C++ code to -->
+            <script src="my_program.js"></script>
+
+            <!-- We told the emp::document that it was in charge of something called
+                 "my_visualization," so we need to create that element -->
+            <div id="my_visualization"></div>
+
+        </body>
+    </html>
+
+CSS File
+--------
+
+Optionally, a CSS file can be used to make elements look the way you want them to. Here's one that
+includes the necessary styles to make tooltips work (the html file above assumes it's called
+my_style_sheet.css, and is in the same directory as the html file)::
+
+  .d3-tip {
+    line-height: 1;
+    font-weight: bold;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.8);
+    color: #000;
+    border-radius: 2px;
+  }
+
+  /* Creates a small triangle extender for the tooltip */
+  .d3-tip:after {
+    box-sizing: border-box;
+    display: inline;
+    font-size: 10px;
+    width: 100%;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.8);
+    content: "\25BC";
+    position: absolute;
+    text-align: center;
+  }
+
+  /* Style northward tooltips differently */
+  .d3-tip.n:after {
+    margin: -1px 0 0 0;
+    top: 100%;
+    left: 0;
+  }
+
+Running your visualization
+--------------------------
+
+Now to open up the page in a browser! Some browsers will let you open it up directly, but some will
+complain about the fact that you're trying to access a file on your computer (example.json) with
+Javascript. The easiest way around this is with the Python simpleHTTPServer library. Run the
+following command from the directory containing your html file::
+
+    python -m SimpleHTTPServer
+
+You can now open a browser to the server (http://localhost:8000, replacing 8000 with whatever port
+SimpleHTTPServer told you it was serving on).
+
+Ta-da! There's your visualization.
+
+It's convenient to have a visualization of data you've already generated, but the real power of
+D3 visualization objects is that they can update in real time while your code runs. Here's an
+example C++ file that does that::
+
+    Example here
+
+So that's how you use out-of-the-box D3 visualizations in Empirical. Sometimes, though, you want
+to do something new and exciting. Which brings us to the next section...
+
+Writing Your Own Visualization
+==============================
+
+In order to build your own visualization, you need to understand a bit about how D3 works. Which
+means you need to understand a bit about how Javascript and HTML work. I know, I know, the reason
+you're doing this all in C++ is that you want to avoid that, but I promise it's worth it if you
+want to make interactive visualizations that run on the web.
+
+When your browser loads a website, it takes the html for that page and turns it into a tree.
+[Picture here]. This tree is called the Document Object Model (DOM) and every set of tags (things
+in angle brackets, like <head></head>) in the html is an element in it. Elements that are nested
+inside other elements are represented as children of those elements in the tree.
+
+Javascript manipulates the DOM. It adds elements, it removes elements, it moves them around, and it
+changes information about them. D3's primary innovation is that it binds data to DOM elements
+and lets you manipulate them based on that data. So, for instance, you can add a bunch of circle
+elements representing all of your data points. With the D3 C++ wrapper, you're doing the same thing,
+but from C++.
+
+Let's take a tour of the main components of D3:
+
+Selections
+----------
+
+Selections are a way to work with groups of DOM elements. For instance, let's say we have this html
+file::
+
+      <!DOCTYPE html>
+      <html>
+
+          <head>
+              <title> My D3/Empirical visualization! </title>
+          </head>
+
+          <body>
+              <!-- Include necessary javascript libraries (jquery, d3, and a d3 tooltip library) -->
+              <script src="Empirical/web/jquery-1.11.2.min.js"></script>
+              <script src="Empirical/web/d3/d3.min.js" charset="utf-8"></script>
+
+              <!-- Include the Javascript file you compiled your C++ code to -->
+              <script src="my_program.js"></script>
+
+              <div id="my_visualization">
+                <svg id = "graph">
+                  <circle cx="10" cy="10" r="5">
+                  <circle cx="20" cy="20" r="5">
+                </svg>
+              </div>
+
+          </body>
+      </html>
+
+Notice that we've added two types of elements: an SVG canvas and two circles. SVG stands for
+Scalable Vector Graphics, which is the type of graphics the D3 works with (the other type of
+graphics in Javascript are canvas graphics). In SVG graphics, every shape is its own element,
+nested inside an SVG canvas element, so each shape can be manipulated independently. Here we
+have two circle elements on our SVG canvas. We've set three attributes for the circles: the x
+coordinate of their center points (cx), the y coordinate of their center points (cy), and their
+radii (r).
+
+If we want to operate on the circles, we can create a selection object that contains them::
+
+    //s is a container that contains both circle elements in the DOM
+    D3::Selection s = D3::SelectAll("circle");
+
+We can then do things to all of the circles, like turn them purple::
+
+    // Set the "fill" style of everything in the s selection to "purple"
+    // "fill" is the color of the inside of a shape
+    // We'll talk more about modifying shapes a bit later
+    s.SetStyle("fill", "purple");
+
+What if there are other circles outside the graph area that we don't want to affect? We can
+select an element with a specific id using the "#", and then take a sub-selection by calling the
+`SelectAll` method on it::
+
+  // Select will create a selection containing the first matching element, whereas SelectAll
+  // creates a selection containing all matching elements
+  D3::Selection svg = D3::Select("#graph");
+  D3::Selection graph_circles = svg.SelectAll("circle");
+
+Advanced note: You can also make selections based on classes with `D3::Select(.classname)`.
+
+Binding Data
+------------
+
+Changing Elements' Traits
+-------------------------
+
+There are three types of traits that a DOM element might have: attributes, styles, and properties.
+For the most part, attributes are fundamental pieces of information about the element, styles deal
+with the element's appearance (they are all things you could set with CSS), and properties are rare
+and specific to certain types of elements. Here are some examples of commonly used traits in each
+category:
+
+**Attributes (use SetAttr()):**
+
+- **id** - an element's unique identifier
+- **width** - in pixels, by default
+- **height** - in pixels, by default
+- **x** - the location of an element on the x axis (in pixels)
+- **y** - the location of an element on the y axis (in pixels)
+- **cx** - the location of a circle's center on the x axis (in pixels)
+- **cy** - the location of a circle's center on the y axis (in pixels)
+- **r** - a circle's radius (in pixels)
+- **transform** - a string indicating how to position the element. The Move and Rotate methods
+  of selections are a convenient shortcut for this.
+
+**Styles (use SetStyle()):**
+
+- **fill** - the color an SVG shape is filled with
+- **stroke** - the color of a line (either the border of an SVG shape or a path object)
+- **stroke-width** - the length of a path or SVG shape border
+
+**Properties (use SetProperty()):**
+
+- **checked** - a property indicating whether or not a checkbox is checked
+
+Transitions
+-----------
+
+
+[Either a bunch of stuff about D3 goes here, or a bunch of links to other resources]
+
+Writing Callback Functions
+==========================
+
+D3.js makes heavy use of callback functions. Most commonly, this happens when you're trying to set
+attributes of graphical elements based on the data that is bound to them; you pass a function that
+takes a piece of data as an argument and returns the attribute value.
+
+In Empirical, there are a number of ways to pass callback functions into d3 methods:
+
+- Write the callback function as a regular C++ function, a
+  `C++ lambda function <http://en.cppreference.com/w/cpp/language/lambda>`_,
+  or a `std::function object<http://en.cppreference.com/w/cpp/utility/functional/function>`_
+  and pass it into the d3 method. ::
+
+      int times_two(int d, int i, int j) {return d*2;};
+
+      int main() {
+        // Create a selection of circles on an svg canvas (assumes svg is already created)
+        // Bind data [1,2,3] to selection, and add a circle for each data point
+        D3::Selection s = Select("svg")
+                            .SelectAll("circle")
+                            .Data(emp::vector({1,2,3}))
+                            .EnterAppend("circle");
+
+        // We can use either of the following two lines to set the circles' radii to be equal
+        // to two times their data point (1, 2, or 3):
+        s.SetAttr("r", times_two); //Use normal function (could also be a std::function object)
+        s.SetAttr("r", [](int d, int i, int j){return d * 2;});
+
+
+- Pass the d3 method a string containing the name of a function that exists in Javascript (either
+  one that has been created by empirical, one that you defined globally on the current webpage, or
+  a d3 built-in function). ::
+
+      // For instance, if we wanted to sort our selection from the previous example, we could use
+      // d3's built-in "ascending" function:
+      s.sort("ascending");
+- If you're going to be repeatedly using a C++ function as a callback, you may improve the efficiency
+  of your code by combining the two previous approaches, using Empirical's JSWrap function. ::
+
+    // Creates a function in Javascript called "times_two" that calls times_two
+    emp::JSWrap(times_two, "times_two");
+
+    // Call the Javascript version of times_two
+    s.SetAttr("r", "times_two");
+
+- Advanced users may also wish to write functions directly in Javascript, which is possible using
+  Emscripten's macros. ::
+
+    // Put the function in global scope by adding it to the current window
+    EM_ASM({window["times_two"] = function(d, i, j){return d*2;};});
+    // Call the Javascript version of times_two
+    s.SetAttr("r", "times_two");
+
+All of these examples have assumed that the data points you've bound to your selection are ints.
+But most real-world data points are more complex than that (e.g. they may contain values for
+multiple variables). Javascript handles such data nicely by using
+`JSON objects <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON>`_.
+You can write functions in C++ that accept JSON data from Javascript, but you have to tell C++
+what data it should be expecting. Empirical introspective tuple structs provide a convenient way to
+do that. ::
+
+  struct JSONData {
+    EMP_BUILD_INTROSPECTIVE_TUPLE( int, x,
+                                   int, y,
+                                   std::string, name
+                                  )
+  };
+
+  int get_x(JSONData d, int i, int j) {return d.X();};
+
+  //Assume s is a selection with a JSON dataset already bound to it
+  s.SetAttr("x", get_x);
+
+
+Under the Hood (for the curious, developers, and people trying to do weird stuff)
+=================================================================================
+
+For the most part, Empirical's d3 wrapper isn't that complicated under the hood. All C++ objects in
+the d3 module have a unique integer id. Most of them don't actually store much more information.
+Instead, they serve as an interface to an object stored in Javascript. All Javascript objects
+that are being represented in C++ are stored in a Javascript array called `js.objects`. An object's
+id is actually the index of the corresponding Javascript object in the `js.objects` array. Methods
+of that object reach into Javascript and call the corresponding method on the appropriate object.
+Some higher-level functions may call more than one d3 function.
+
+Things to watch out for:
+
+- D3 object creation order - be careful of the order your constructors for d3 objects get called
+  in. It's hard to make this happen, but if you're constructing objects in the constructors for other
+  objects, it's possible for the ids to get mixed up.
+- Errors in Javascript usually won't show up on compilation - you need to actually run the code.
+- Main is a function that gets run like any other. When main finishes running, its local variables
+  will go out of scope. This means that everything needed for an ongoing animation needs to live in
+  global scope.
+- Javascript is designed to work asynchronously in a lot of contexts (especially when loading
+  outside resources or updating the graphics on the screen). This can change the way you need to
+  structure your code.

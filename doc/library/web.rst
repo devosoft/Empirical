@@ -126,9 +126,8 @@ The Empirical Web Module Documentation
 .. doxygenfile:: web/web_init.h
    :project: Empirical
 
+**web/d3/selection.h**
 
-**web/Widget.h**
-
-.. doxygenfile:: web/Widget.h
+.. doxygenfile:: web/d3/selection.h
    :project: Empirical
 
