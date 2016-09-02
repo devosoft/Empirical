@@ -4,6 +4,13 @@
 //
 //  TypeTracker is attached to other classes to easily convert them to their derived version
 //  to facilitate type-specific operations.
+//
+//
+//  Developer notes:
+//  * Should use std::is_convertible<X,Y>::value to determine if casting on base type is allowed.
+//  * AddFunction and RunFunction should be able to take any number of args.
+//  * Functions should be able to have fixed type values mixed in.
+//  * RunFunction should be able to have the function passed in at call time.
 
 #ifndef EMP_TYPE_TRACKER_H
 #define EMP_TYPE_TRACKER_H
