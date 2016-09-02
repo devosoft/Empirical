@@ -21,7 +21,7 @@ CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../emtools/lib
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 
-TARGETS := array BitVector DFA errors info_theory Lexer lexer_utils macros math meta NFA Parser Ptr Random reflection RegEx signal TypeSet TypeTracker vector
+TARGETS := array BitVector ce_string DFA errors info_theory Lexer lexer_utils macros math meta NFA Parser Ptr Random reflection RegEx signal TypeSet TypeTracker vector
 
 TOOLS := ../../tools
 TOOL_DEPEND := $(TOOLS)/assert.h
