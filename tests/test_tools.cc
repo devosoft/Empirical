@@ -26,6 +26,7 @@
 #include "../tools/array.h"
 #include "../tools/assert.h"
 #include "../tools/ce_string.h"
+#include "../tools/errors.h"
 #include "../tools/functions.h"
 #include "../tools/graph_utils.h"
 //#include "../tools/grid.h"
@@ -48,7 +49,6 @@
 // this doesn't actually work--TODO: figure out why this doesn't work
 #include "../tools/alert.h"
 #include "../tools/const.h"
-#include "../tools/errors.h"
 // #include "../tools/class.h"
 // #include "../tools/fixed.h"
 #include "../tools/SolveState.h"
@@ -383,6 +383,21 @@ TEST_CASE("Test DynamicStringSet", "[tools]")
   REQUIRE(test_set[4] == "Line 4");
 }
 
+TEST_CASE("Test errors", "[tools]")
+{
+  emp::TriggerExcept("test_fail", "The test failed.  *sob*");
+  emp::TriggerExcept("test_fail2", "The second test failed too.  But it's not quite as aweful.", false);
+  emp::TriggerExcept("test_fail2", "The third test is just test 2 again, but worse", true);
+
+  REQUIRE( emp::CountExcepts() == 3 );
+  auto except = emp::PopExcept("test_fail2");
+  REQUIRE( emp::CountExcepts() == 2 );
+  REQUIRE( except.desc == "The second test failed too.  But it's not quite as aweful." );
+  REQUIRE( emp::HasExcept("test_fail2") == true );
+  REQUIRE( emp::HasExcept("test_fail3") == false );
+  emp::ClearExcepts();
+  REQUIRE( emp::CountExcepts() == 0 );
+}
 
 char result_char;
 void TestFun(int x, int y, char z) {
