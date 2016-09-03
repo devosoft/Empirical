@@ -76,20 +76,23 @@ namespace emp {
 
     // Test if the tracked type is TEST_T
     template <typename TEST_T>
-    bool IsType( TrackedType & tracked ) {
-      return tracked.GetTypeTrackerID() == get_type_index<TEST_T,TYPES...>();
+    bool IsType( TrackedType & tt ) {
+      return tt.GetTypeTrackerID() == get_type_index<TEST_T,TYPES...>();
     }
+    template <typename TEST_T> bool IsType( TrackedType * tt ) { return IsType(*tt); }
+
     // Convert the tracked type back to REAL_T.  Assert that this is type safe!
     template <typename REAL_T>
-    REAL_T ToType( TrackedType & tracked ) {
-      emp_assert(IsType<REAL_T>(tracked));
-      return ((wrap_t<REAL_T> *) &tracked)->value;
+    REAL_T ToType( TrackedType & tt ) {
+      emp_assert(IsType<REAL_T>(tt));
+      return ((wrap_t<REAL_T> *) &tt)->value;
     }
+    template <typename REAL_T> REAL_T ToType( TrackedType * tt ) { return ToType(*tt); }
+
     // Cast the tracked type to OUT_T.  Try to do so even if NOT original type!
     template <typename OUT_T>
-    OUT_T Cast( TrackedType & tracked ) {
-      return ((wrap_t<OUT_T> *) &tracked)->value;
-    }
+    OUT_T Cast( TrackedType & tt ) { return ((wrap_t<OUT_T> *) &tt)->value; }
+    template <typename OUT_T> OUT_T Cast( TrackedType * tt ) { return Cast(*tt); }
 
     template <typename T1, typename T2>
     this_t & AddFunction( std::function<void(T1,T2)> fun ) {
