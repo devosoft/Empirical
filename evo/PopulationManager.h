@@ -54,7 +54,6 @@ namespace evo {
 
     void Setup(Random * r){ SetRandom(r); }
 
-
     void Print(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout,
               std::string empty="X", std::string spacer=" ") {
       for (ORG * org : pop) {
@@ -133,8 +132,6 @@ namespace evo {
 
     static constexpr bool emp_has_separate_generations = true;
 
-    // void Setup() { ; }
-
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = next_pop.size();
       next_pop.push_back(new_org);
@@ -182,8 +179,6 @@ namespace evo {
     int GetBottleneckSize() const { return bottleneck_size; }
     int GetNumBottlnecks() const { return num_bottlenecks; }
 
-    void Setup(Random *r){ SetRandom(r); }
-
     void SetMaxSize(const int m) { max_size = m; }
     void SetBottleneckSize(const int b) { bottleneck_size = b; }
 
@@ -220,8 +215,6 @@ namespace evo {
 
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
-
-    void Setup(Random * r){SetRandom(r); }
 
     void ConfigPop(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }
 
