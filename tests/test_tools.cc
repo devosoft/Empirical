@@ -18,6 +18,7 @@
 #include "../tools/DynamicStringSet.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/Graph.h"
+#include "../tools/Lexer.h"
 #include "../tools/NFA.h"
 #include "../tools/Ptr.h"
 #include "../tools/RegEx.h"
@@ -649,6 +650,35 @@ TEST_CASE("Test lexer_utils", "[tools]")
     REQUIRE( dfa_all.Next(0, "ABCDEF") == 1 );
     REQUIRE( dfa_all.Next(0, "abcdefghijklmnopqrstuvwxyz") == 2 );
     REQUIRE( dfa_all.Next(0, "ABC-DEF") == -1 );
+}
+
+
+TEST_CASE("Test Lexer", "[tools]")
+{
+  emp::Lexer lexer;
+  lexer.AddToken("Integer", "[0-9]+");
+  lexer.AddToken("Float", "[0-9]*\\.[0-9]+");
+  lexer.AddToken("Lower", "[a-z]+");
+  lexer.AddToken("Upper", "[A-Z]+");
+  lexer.AddToken("Mixed", "[a-zA-Z]+");
+  lexer.AddToken("Whitespace", "[ \t\n\r]");
+  lexer.AddToken("Other", ".");
+
+  std::stringstream ss;
+  ss << "This is a 123 TEST.  It should also have 1. .2 123.456 789 FLOATING point NUMbers!";
+
+  REQUIRE(lexer.Process(ss).lexeme == "This");  //REQUIRE(lexer.GetTokenName(token) == "Mixed");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == "is");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == "a");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == "123");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == "TEST");
+  REQUIRE(lexer.Process(ss).lexeme == ".");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
 }
 
 TEST_CASE("Test macro_math", "[tools]")
