@@ -667,7 +667,7 @@ TEST_CASE("Test Lexer", "[tools]")
   std::stringstream ss;
   ss << "This is a 123 TEST.  It should also have 1. .2 123.456 789 FLOATING point NUMbers!";
 
-  REQUIRE(lexer.Process(ss).lexeme == "This");  //REQUIRE(lexer.GetTokenName(token) == "Mixed");
+  REQUIRE(lexer.Process(ss).lexeme == "This");
   REQUIRE(lexer.Process(ss).lexeme == " ");
   REQUIRE(lexer.Process(ss).lexeme == "is");
   REQUIRE(lexer.Process(ss).lexeme == " ");
@@ -1353,6 +1353,36 @@ TEST_CASE("Test reflection", "[tools]")
 
 }
 
+TEST_CASE("Test regular expressions (RegEx)", "[tools]")
+{
+  emp::RegEx re1("a|bcdef");
+  REQUIRE(re1.Test("a") == true);
+  REQUIRE(re1.Test("bc") == false);
+  REQUIRE(re1.Test("bcdef") == true);
+  REQUIRE(re1.Test("bcdefg") == false);
+
+  emp::RegEx re2("#[abcdefghijklm]*abc");
+  REQUIRE(re2.Test("") == false);
+  REQUIRE(re2.Test("#a") == false);
+  REQUIRE(re2.Test("#aaaabc") == true);
+  REQUIRE(re2.Test("#abcabc") == true);
+  REQUIRE(re2.Test("#abcabcd") == false);
+
+  emp::RegEx re3("xx(y|(z*)?)+xx");
+  REQUIRE(re3.Test("xxxx") == true);
+  REQUIRE(re3.Test("xxxxx") == false);
+  REQUIRE(re3.Test("xxyxx") == true);
+  REQUIRE(re3.Test("xxyyxx") == true);
+  REQUIRE(re3.Test("xxzzzxx") == true);
+
+  emp::RegEx re_WHITESPACE("[ \t\r]");
+  emp::RegEx re_COMMENT("#.*");
+  emp::RegEx re_INT_LIT("[0-9]+");
+  emp::RegEx re_FLOAT_LIT("[0-9]+[.][0-9]+");
+  emp::RegEx re_CHAR_LIT("'(.|(\\\\[\\\\'nt]))'");
+  emp::RegEx re_STRING_LIT("[\"]((\\\\[nt\"\\\\])|[^\"])*\\\"");
+  emp::RegEx re_ID("[a-zA-Z0-9_]+");
+}
 
 TEST_CASE("Test sequence utils", "[tools]")
 {
