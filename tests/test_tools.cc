@@ -679,6 +679,10 @@ TEST_CASE("Test Lexer", "[tools]")
   REQUIRE(lexer.Process(ss).lexeme == ".");
   REQUIRE(lexer.Process(ss).lexeme == " ");
   REQUIRE(lexer.Process(ss).lexeme == " ");
+
+  REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Mixed");
+  REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Whitespace");
+  REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Lower");
 }
 
 TEST_CASE("Test macro_math", "[tools]")
