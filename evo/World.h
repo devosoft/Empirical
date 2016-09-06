@@ -187,7 +187,6 @@ namespace evo {
     }
 
     void SetupWorld(const std::string & w_name) {
-      this->world_name = w_name;
       SetupCallbacks(callbacks);
       lineageM.Setup(this);
       statsM.Setup(this);
@@ -195,14 +194,19 @@ namespace evo {
     }
 
   public:
+    std::string world_name;
+
     World(emp::Random * r_ptr, const std::string & w_name=GenerateSignalName("emp::evo::World"))
-      : random_ptr(r_ptr), random_owner(false)
+      :
+        random_ptr(r_ptr), random_owner(false)
       , before_repro_sig(to_string(w_name,"::before-repro"))
       , offspring_ready_sig(to_string(w_name,"::offspring-ready"))
       , inject_ready_sig(to_string(w_name,"::inject-ready"))
       , org_placement_sig(to_string(w_name,"::org-placement"))
       , on_update_sig(to_string(w_name,"::on-update"))
-      , callbacks(w_name) { SetupWorld(w_name); }
+      , callbacks(w_name)
+      , world_name(w_name)
+    { SetupWorld(w_name); }
 
     World(int seed=-1, const std::string & w_name=GenerateSignalName("emp::evo::World"))
       : World(new Random(seed), w_name) { random_owner = true; }
@@ -212,7 +216,6 @@ namespace evo {
     ~World() { Clear(); if (random_owner) delete random_ptr; }
     World & operator=(const World &) = delete;
 
-    std::string world_name;
     int GetSize() const { return (int) popM.size(); }
     ORG & operator[](int i) { return *(popM[i]); }
     const ORG & operator[](int i) const { return *(popM[i]); }
