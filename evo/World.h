@@ -416,14 +416,13 @@ namespace evo {
     void RunTournament(std::function<double(ORG*)> fit_fun, int t_size, int tourny_count=1){
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
 
-      //This technique for avoiding null orgs can probably be improved
-      //once org managers are handling that
-      emp::vector<int> valid_orgs = GetValidOrgIndices();
-
       for (int T = 0; T < tourny_count; T++) {
+        // @CAO - looking up valid orgs each time is very slow.
+        emp::vector<int> valid_orgs = GetValidOrgIndices();
+
         emp::vector<int> entries = Choose(*random_ptr, valid_orgs.size(), t_size);
         Shuffle(*random_ptr, entries);
-        double best_fit = fit_fun(popM[valid_orgs[entries[0]]]);
+        double best_fit = fit_fun( popM[valid_orgs[entries[0]]] );
         int best_id = valid_orgs[entries[0]];
 
         // Search for a higher fit org in the tournament.
