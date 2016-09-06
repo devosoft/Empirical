@@ -186,8 +186,8 @@ namespace evo {
       sigs.symbiont_repro_sig.AddAction([this](int id){DoSymbiontRepro(id);});
     }
 
-    void SetupWorld(const std::string & world_name) {
-      this->pop_name = world_name;
+    void SetupWorld(const std::string & w_name) {
+      this->world_name = w_name;
       SetupCallbacks(callbacks);
       lineageM.Setup(this);
       statsM.Setup(this);
@@ -195,24 +195,24 @@ namespace evo {
     }
 
   public:
-    World(emp::Random * r_ptr, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
+    World(emp::Random * r_ptr, const std::string & w_name=GenerateSignalName("emp::evo::World"))
       : random_ptr(r_ptr), random_owner(false)
-      , before_repro_sig(to_string(pop_name,"::before-repro"))
-      , offspring_ready_sig(to_string(pop_name,"::offspring-ready"))
-      , inject_ready_sig(to_string(pop_name,"::inject-ready"))
-      , org_placement_sig(to_string(pop_name,"::org-placement"))
-      , on_update_sig(to_string(pop_name,"::on-update"))
-      , callbacks(pop_name) { SetupWorld(pop_name); }
+      , before_repro_sig(to_string(w_name,"::before-repro"))
+      , offspring_ready_sig(to_string(w_name,"::offspring-ready"))
+      , inject_ready_sig(to_string(w_name,"::inject-ready"))
+      , org_placement_sig(to_string(w_name,"::org-placement"))
+      , on_update_sig(to_string(w_name,"::on-update"))
+      , callbacks(w_name) { SetupWorld(w_name); }
 
-    World(int seed=-1, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
-      : World(new Random(seed), pop_name) { random_owner = true; }
-    World(emp::Random & random, const std::string & pop_name=GenerateSignalName("emp::evo::World"))
-      : World(&random, pop_name) { ; }
+    World(int seed=-1, const std::string & w_name=GenerateSignalName("emp::evo::World"))
+      : World(new Random(seed), w_name) { random_owner = true; }
+    World(emp::Random & random, const std::string & w_name=GenerateSignalName("emp::evo::World"))
+      : World(&random, w_name) { ; }
     World(const World &) = delete;
     ~World() { Clear(); if (random_owner) delete random_ptr; }
     World & operator=(const World &) = delete;
 
-    std::string pop_name;
+    std::string world_name;
     int GetSize() const { return (int) popM.size(); }
     ORG & operator[](int i) { return *(popM[i]); }
     const ORG & operator[](int i) const { return *(popM[i]); }
