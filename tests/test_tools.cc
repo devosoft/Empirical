@@ -1382,6 +1382,20 @@ TEST_CASE("Test regular expressions (RegEx)", "[tools]")
   emp::RegEx re_CHAR_LIT("'(.|(\\\\[\\\\'nt]))'");
   emp::RegEx re_STRING_LIT("[\"]((\\\\[nt\"\\\\])|[^\"])*\\\"");
   emp::RegEx re_ID("[a-zA-Z0-9_]+");
+
+  REQUIRE(re_INT_LIT.Test("1234") == true);
+  REQUIRE(re_FLOAT_LIT.Test("1234") == false);
+  REQUIRE(re_ID.Test("1234") == true);
+  REQUIRE(re_INT_LIT.Test("1234.56") == false);
+  REQUIRE(re_FLOAT_LIT.Test("1234.56") == true);
+  REQUIRE(re_ID.Test("1234.56") == false);
+
+  std::string test_str = "\"1234\"";
+  REQUIRE(re_STRING_LIT.Test(test_str) == true);
+  REQUIRE(re_INT_LIT.Test(test_str) == false);
+
+  std::string test_str2 = "\"1234\", \"5678\"";
+  REQUIRE(re_STRING_LIT.Test(test_str2) == false);
 }
 
 TEST_CASE("Test sequence utils", "[tools]")
