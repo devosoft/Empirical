@@ -186,13 +186,6 @@ namespace evo {
       sigs.symbiont_repro_sig.AddAction([this](int id){DoSymbiontRepro(id);});
     }
 
-    void SetupWorld(const std::string & w_name) {
-      SetupCallbacks(callbacks);
-      lineageM.Setup(this);
-      statsM.Setup(this);
-      popM.Setup(random_ptr);
-    }
-
   public:
     std::string world_name;
 
@@ -206,7 +199,12 @@ namespace evo {
       , on_update_sig(to_string(w_name,"::on-update"))
       , callbacks(w_name)
       , world_name(w_name)
-    { SetupWorld(w_name); }
+    {
+      SetupCallbacks(callbacks);
+      lineageM.Setup(this);
+      statsM.Setup(this);
+      popM.Setup(random_ptr);
+    }
 
     World(int seed=-1, const std::string & w_name=GenerateSignalName("emp::evo::World"))
       : World(new Random(seed), w_name) { random_owner = true; }
