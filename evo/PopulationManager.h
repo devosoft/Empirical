@@ -29,7 +29,7 @@ namespace evo {
     Random * random_ptr;
 
   public:
-    PopulationManager_Base() { ; }
+    PopulationManager_Base(const std::string & world_name) { (void) world_name; }
     ~PopulationManager_Base() { ; }
 
     // Allow this and derived classes to be identified as a population manager.
@@ -127,7 +127,8 @@ namespace evo {
     using PopulationManager_Base<ORG>::pop;
 
   public:
-    PopulationManager_EA() { ; }
+    PopulationManager_EA(const std::string & world_name)
+    : PopulationManager_Base<ORG>(world_name) { ; }
     ~PopulationManager_EA() { Clear(); }
 
     static constexpr bool emp_has_separate_generations = true;
@@ -171,8 +172,9 @@ namespace evo {
     int bottleneck_size;
     int num_bottlenecks;
   public:
-    PopulationManager_SerialTransfer()
-      : max_size(1000), bottleneck_size(100), num_bottlenecks(0) { ; }
+    PopulationManager_SerialTransfer(const std::string & world_name)
+    : PopulationManager_Base<ORG>(world_name)
+    , max_size(1000), bottleneck_size(100), num_bottlenecks(0) { ; }
     ~PopulationManager_SerialTransfer() { ; }
 
     int GetMaxSize() const { return max_size; }
@@ -210,7 +212,10 @@ namespace evo {
     int ToID(int x, int y) const { return y*width + x; }
 
   public:
-    PopulationManager_Grid() { ConfigPop(10,10); }
+    PopulationManager_Grid(const std::string & world_name)
+    : PopulationManager_Base<ORG>(world_name) {
+      ConfigPop(10,10);
+    }
     ~PopulationManager_Grid() { ; }
 
     int GetWidth() const { return width; }
@@ -294,7 +299,7 @@ namespace evo {
     int pool_count;                             //How many pools are in the population?
     vector<int> pool_sizes;                     // How large is each pool?
     std::map<int, vector<int> > connections;    // Which other pools can each position access?
-    int org_count = 0;                          // How many organisms have beeen inserted into the population?
+    int org_count;                              // How many organisms have beeen inserted into the population?
     int r_upper;                                // How large can a random pool size be?
     int r_lower;                                // How small can a random pool size be?
     vector<int> pool_end;                       // Where does the next pool begin? First pool begins at 0.
@@ -302,7 +307,8 @@ namespace evo {
     vector<int> pool_id;
 
   public:
-    PopulationManager_Pools() : org_count(0) { ; }
+    PopulationManager_Pools(const std::string & world_name)
+    : PopulationManager_Base<ORG>(world_name), org_count(0) { ; }
     ~PopulationManager_Pools() { ; }
 
     int GetPoolCount() const { return pool_count; }
