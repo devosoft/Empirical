@@ -190,8 +190,8 @@ namespace evo {
     std::string world_name;
 
     World(emp::Random * r_ptr, const std::string & w_name=GenerateSignalName("emp::evo::World"))
-      :
-        random_ptr(r_ptr), random_owner(false)
+      : popM(w_name)
+      , random_ptr(r_ptr), random_owner(false)
       , before_repro_sig(to_string(w_name,"::before-repro"))
       , offspring_ready_sig(to_string(w_name,"::offspring-ready"))
       , inject_ready_sig(to_string(w_name,"::inject-ready"))
