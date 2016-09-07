@@ -126,6 +126,9 @@ namespace evo {
   protected:
     using PopulationManager_Base<ORG>::pop;
 
+    // Most of the key functions in the population manager can be interfaced with symbols.  If you
+    // need to modify the more complex behaviors (such as Execute) you need to create a new
+    // derrived class from PopulationManager_Base, which is also legal in a plugin.
     Signal<emp::vector<ORG*> &> sig_clear;
     Signal<emp::vector<ORG*> &> sig_update;
     Signal<emp::vector<ORG*> &, ORG *, int &> sig_add_org;            // args: new org, return: offspring pos
