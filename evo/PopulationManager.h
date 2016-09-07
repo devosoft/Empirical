@@ -24,26 +24,27 @@ namespace evo {
   class PopulationManager_Base {
   protected:
     using ptr_t = ORG *;
-    emp::vector<ORG *> pop;
+    using pop_t = emp::vector<ORG *>;
+    pop_t pop;
 
     Random * random_ptr;
 
   public:
     PopulationManager_Base(const std::string & world_name) { (void) world_name; }
-    ~PopulationManager_Base() { ; }
+    ~PopulationManager_Base() { Clear(); }
 
     // Allow this and derived classes to be identified as a population manager.
     static constexpr bool emp_is_population_manager = true;
     static constexpr bool emp_has_separate_generations = false;
     using value_type = ORG*;
 
-    friend class PopulationIterator<PopulationManager_Base<ORG> >;
+    friend class PopulationIterator< PopulationManager_Base<ORG> >;
     using iterator = PopulationIterator<PopulationManager_Base<ORG> >;
 
     ptr_t & operator[](int i) { return pop[i]; }
     const ptr_t operator[](int i) const { return pop[i]; }
-    iterator begin(){return iterator(this, 0);}
-    iterator end(){return iterator(this, pop.size());}
+    iterator begin() { return iterator(this, 0); }
+    iterator end() { return iterator(this, pop.size()); }
 
     uint32_t size() const { return pop.size(); }
     void resize(int new_size) { pop.resize(new_size); }
@@ -87,7 +88,7 @@ namespace evo {
 
     void Clear() {
       // Delete all organisms.
-      for (ORG * m : pop) delete m;
+      for (ORG * org : pop) if (org) delete org;
       pop.resize(0);
     }
 
@@ -96,8 +97,8 @@ namespace evo {
     // Execute() redirect to all organisms in the population, forwarding arguments.
     template <typename... ARGS>
     void Execute(ARGS... args) {
-      for (ORG * m : pop) {
-        if (m) m->Execute(std::forward<ARGS>(args)...);
+      for (ORG * org : pop) {
+        if (org) org->Execute(std::forward<ARGS>(args)...);
       }
     }
 
@@ -114,6 +115,39 @@ namespace evo {
       // Delete all of the organisms we are removing and resize the population.
       for (int i = new_size; i < (int) pop.size(); ++i) delete pop[i];
       pop.resize(new_size);
+    }
+  };
+
+
+  // A population manager that is defined elsewhere, for use with plugins.
+
+  template <typename ORG=int>
+  class PopulationManager_Plugin : public PopulationManager_Base<ORG> {
+  protected:
+    using PopulationManager_Base<ORG>::pop;
+
+    Signal<emp::vector<ORG*> &> sig_clear;
+    Signal<emp::vector<ORG*> &> sig_update;
+    Signal<emp::vector<ORG*> &, ORG *, int &> sig_add_org;            // args: new org, return: offspring pos
+    Signal<emp::vector<ORG*> &, ORG *, int, int &> sig_add_org_birth; // args: new org, parent pos, return: offspring pos
+
+  public:
+    PopulationManager_Plugin(const std::string & world_name)
+    : PopulationManager_Base<ORG>(world_name) { ; }
+    ~PopulationManager_Plugin() { Clear(); }
+
+    void Clear() { sig_clear.Trigger(pop); }
+    void Update() { sig_update.Trigger(pop); }
+
+    int AddOrg(ORG * new_org) {
+      int new_pos;
+      sig_add_org.Trigger(pop, new_org, new_pos);
+      return new_pos;
+    }
+    int AddOrgBirth(ORG * new_org, int parent_pos) {
+      int offspring_pos;
+      sig_add_org_birth.Trigger(pop, new_org, parent_pos, offspring_pos);
+      return offspring_pos;
     }
   };
 
