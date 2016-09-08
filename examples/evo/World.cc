@@ -84,4 +84,7 @@ int main()
   }
   std::cout << std::endl;
   grid_world.Print();
+
+
+  evo::World<int, evo::PopPlugin> pi_world(random);
 }
