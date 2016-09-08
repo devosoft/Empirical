@@ -47,6 +47,6 @@ int main()
   //REQUIRE(time < 9000); // NOTE: WILL VARY INTENSELY ON VARIOUS SYSTEMS
   // SHOULD PROBABLY CHANGE
 
-  std::cout << "Time = " << time;
+  std::cout << "Time = " << time << std::endl;
 }
 

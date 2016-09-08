@@ -163,9 +163,9 @@ namespace evo {
     // Signals triggered by the world.
     Signal<int> before_repro_sig;       // Trigger: Immediately prior to producing offspring
     Signal<ORG *> offspring_ready_sig;  // Trigger: Offspring about to enter population
-    Signal<ORG *> inject_ready_sig;        // Trigger: New org about to be added to population
-    Signal<int> org_placement_sig;         // Trigger: Organism has been added to population
-    Signal<int> on_update_sig;         // Trigger: Organism has been added to population
+    Signal<ORG *> inject_ready_sig;     // Trigger: New org about to be added to population
+    Signal<int> org_placement_sig;      // Trigger: Organism has been added to population
+    Signal<int> on_update_sig;          // Trigger: Organism has been added to population
 
     // Determine the callback type; by default this will be OrgSignals_NONE, but it can be
     // overridden by setting the type callback_t in the organism class.

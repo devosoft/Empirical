@@ -161,5 +161,4 @@ template <typename T> std::istream & operator>>(std::istream & is, emp::vector<T
 #endif
 
 
-
 #endif
