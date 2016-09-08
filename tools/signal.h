@@ -270,6 +270,8 @@ namespace emp {
     }
     ~Signal() { ; }
 
+    int GetNumActions() const { return actions.GetSize(); }
+
     inline void Trigger(ARGS... args) { actions.Run(args...); }
 
     // Add an action that takes the proper arguments.
@@ -309,6 +311,8 @@ namespace emp {
       if (name != "") SignalManager::Get().Register(name, this);
     }
     ~Signal() { ; }
+
+    int GetNumActions() const { return actions.GetSize(); }
 
     inline void Trigger() { actions.Run(); }
 
