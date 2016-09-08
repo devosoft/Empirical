@@ -139,7 +139,13 @@ namespace evo {
     : PopulationManager_Base<ORG>(world_name) { ; }
     ~PopulationManager_Plugin() { Clear(); }
 
-    void Clear() { sig_clear.Trigger(pop); }
+    void Clear() {
+      if (sig_clear.GetNumActions()) {
+        sig_clear.Trigger(pop);
+      } else { // If no actions are linked to sig_clear, use default.
+        PopulationManager_Base<ORG>::Clear();
+      }
+     }
     void Update() { sig_update.Trigger(pop); }
 
     int AddOrg(ORG * new_org) {
