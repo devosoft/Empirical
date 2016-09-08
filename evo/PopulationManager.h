@@ -136,7 +136,12 @@ namespace evo {
 
   public:
     PopulationManager_Plugin(const std::string & world_name)
-    : PopulationManager_Base<ORG>(world_name) { ; }
+    : PopulationManager_Base<ORG>(world_name)
+    , sig_clear(to_string(world_name, "::pop_clear"))
+    , sig_update(to_string(world_name, "::pop_update"))
+    , sig_add_org(to_string(world_name, "::pop_add_org"))
+    , sig_add_org_birth(to_string(world_name, "::pop_add_org_birth"))
+    { ; }
     ~PopulationManager_Plugin() { Clear(); }
 
     void Clear() {
@@ -145,7 +150,7 @@ namespace evo {
       } else { // If no actions are linked to sig_clear, use default.
         PopulationManager_Base<ORG>::Clear();
       }
-     }
+    }
     void Update() { sig_update.Trigger(pop); }
 
     int AddOrg(ORG * new_org) {
@@ -477,11 +482,12 @@ namespace evo {
     }
  };
 
-  using PopBasic = PopulationManager_Base<int>;
-  using PopEA    = PopulationManager_EA<int>;
-  using PopST    = PopulationManager_SerialTransfer<int>;
-  using PopGrid  = PopulationManager_Grid<int>;
-  using PopPool  = PopulationManager_Pools<int>;
+  using PopBasic  = PopulationManager_Base<int>;
+  using PopPlugin = PopulationManager_Plugin<int>;
+  using PopEA     = PopulationManager_EA<int>;
+  using PopST     = PopulationManager_SerialTransfer<int>;
+  using PopGrid   = PopulationManager_Grid<int>;
+  using PopPool   = PopulationManager_Pools<int>;
 
 }
 }
