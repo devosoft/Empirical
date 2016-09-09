@@ -77,7 +77,8 @@ namespace D3 {
       }, this->id, selection.GetID(), dom_id.c_str(), group.GetID(), label.c_str());
     }
 
-    void ApplyAxis(Selection selection) {
+    template <typename T>
+    void ApplyAxis(SelectionOrTransition<T> selection) {
       EM_ASM_ARGS({
 	    js.objects[$1].call(js.objects[$0]);
 	  }, this->id, selection.GetID());
@@ -147,7 +148,8 @@ namespace D3 {
       }, this->id, format.c_str());
     }
 
-    void Rescale(double new_min, double new_max, D3::Selection & svg){
+    template <typename T>
+    void Rescale(double new_min, double new_max, D3::SelectionOrTransition<T> & svg){
       this->scale.SetDomain(std::array<double, 2>({new_min, new_max}));
       ApplyAxis(svg.Select("#"+dom_id));
     }

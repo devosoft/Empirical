@@ -121,8 +121,8 @@ D3_CALLBACK_METHOD_1_ARG_IMPL(CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_
   uint32_t fun_id = emp::JSWrap(CPP_FUN, "", false);                       \
   EM_ASM_ARGS({                                                            \
     emp.__new_object = js.objects[$0].FUNC(Pointer_stringify($1),          \
-                                    function(d, i, k) {                    \
-                                      return emp.Callback($2, d, i, k);    \
+                                    function(d, i, j) {                    \
+                                      return emp.Callback($2, d, i, j);    \
                                     });                                    \
   }, this->id, ARG1, fun_id);                                              \
   emp::JSDelete(fun_id);
@@ -132,8 +132,8 @@ D3_CALLBACK_METHOD_1_ARG_IMPL(CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_
   #define D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(FUNC, CPP_FUN)               \
     uint32_t fun_id = emp::JSWrap(CPP_FUN, "", false);                       \
     EM_ASM_ARGS({                                                            \
-      emp.__new_object = js.objects[$0].FUNC(function(d, i, k) {             \
-                                            return emp.Callback($1, d, i, k);\
+      emp.__new_object = js.objects[$0].FUNC(function(d, i, j) {             \
+                                            return emp.Callback($1, d, i, j);\
                                             });                              \
     }, this->id, fun_id);                                                    \
     emp::JSDelete(fun_id);

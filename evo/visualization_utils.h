@@ -176,7 +176,7 @@ public:
      // circles->AddToolTip(tip);
 
       circles = new D3::Selection(circles->Data(fitnesses));
-      circles->Transition().SetAttr("cy", GetID()+"scaled_d");
+      circles->MakeTransition().SetAttr("cy", GetID()+"scaled_d");
   }
 
 };
@@ -198,22 +198,22 @@ public:
   D3::Axis<D3::LinearScale> * y_axis;
 
   //Callback function for taking a datapoint and getting appropriately scaled y val
-  std::function<double(std::array<double, 2>, int, int)> y = [this](std::array<double, 2> d, int i=0, int k=0){
+  std::function<double(std::array<double, 2>, int, int)> y = [this](std::array<double, 2> d, int i, int k){
       return y_scale->ApplyScale(d[1]);
   };
 
   //Callback function for taking a datapoint and getting appropriately scaled x val
-  std::function<double(std::array<double,2>, int, int)> x = [this](std::array<double, 2> d, int i=0, int k=0){
+  std::function<double(std::array<double,2>, int, int)> x = [this](std::array<double, 2> d, int i, int k){
       return x_scale->ApplyScale(d[0]);
   };
 
   //Callback function for getting unscaled x value of data point (used as key function for data binding)
-  std::function<double(std::array<double,2>, int)> return_x = [&](std::array<double, 2> d, int i=0){
+  std::function<double(std::array<double,2>, int)> return_x = [&](std::array<double, 2> d, int i){
       return d[0];
   };
 
   //Callback function for drawing data after rescale animation
-  std::function<void(int, int)> draw_data = [this](int i=0, int j=0, int k=0){
+  std::function<void(int, int, int)> draw_data = [this](int i, int j, int k) {
     DrawData(true);
   };
 
@@ -241,7 +241,7 @@ public:
   D3::LineGenerator * make_line;
 
   D3::ToolTip* tip;
-  D3::Selection t;
+  D3::Transition t;
 
   virtual void Setup(){
     EM_ASM({emp["waiting"] = 0});
@@ -297,7 +297,7 @@ public:
       }
 
 
-      t = svg->Transition();
+      t = svg->MakeTransition();
       y_axis->Rescale(y_max, y_min, t);
       x_axis->Rescale(x_min, x_max, t);
 
@@ -309,7 +309,8 @@ public:
     }
   }
 
-  void Redraw(D3::Selection & s) {
+  template <typename T>
+  void Redraw(D3::SelectionOrTransition<T> & s) {
     s.SelectAll(".data-point").SetAttr("cy", GetID()+"y");
     s.SelectAll(".data-point").SetAttr("cx", GetID()+"x");
 
@@ -420,7 +421,7 @@ public:
   int next_child;
   std::string next_genome;
 
-  std::function<std::string(LineageTreeNode, int, int)> color_fun = [](LineageTreeNode d, int i = 0, int k = 0){
+  std::function<std::string(LineageTreeNode, int, int)> color_fun = [](LineageTreeNode d, int i, int k){
     if (d.alive()){
       return "red";
     } else if (d.persist()) {
@@ -430,11 +431,11 @@ public:
     }
   };
 
-  std::function<std::string(LineageTreeEdge, int, int)> color_fun_link = [this](LineageTreeEdge d, int i = 0, int k = 0){
+  std::function<std::string(LineageTreeEdge, int, int)> color_fun_link = [this](LineageTreeEdge d, int i, int k){
     return "black";
   };
 
-  std::function<std::string(LineageTreeNode, int, int)> tooltip_display = [](LineageTreeNode d, int i = 0, int k = 0) {
+  std::function<std::string(LineageTreeNode, int, int)> tooltip_display = [](LineageTreeNode d, int i, int k) {
     return "Name: " + to_string(d.name()) + "<br>Genome: " + to_string(d.genome());
   };
 
@@ -531,7 +532,7 @@ public:
     EMP_BUILD_INTROSPECTIVE_TUPLE( int, loc)
   };
 
-  std::function<std::string(LineageTreeNode, int, int)> color_fun = [this](LineageTreeNode d, int i = 0, int k = 0){
+  std::function<std::string(LineageTreeNode, int, int)> color_fun = [this](LineageTreeNode d, int i, int k){
     if (d.loc() < 0) {
       return std::string("black");
     }
@@ -558,7 +559,7 @@ public:
     return result;
   };
 
-  std::function<std::string(LineageTreeNode, int, int)> dark_color_fun = [this](LineageTreeNode d, int i = 0, int k = 0){
+  std::function<std::string(LineageTreeNode, int, int)> dark_color_fun = [this](LineageTreeNode d, int i, int k){
     if (d.loc() < 0) {
       return std::string("black");
     }
@@ -585,35 +586,38 @@ public:
     return result;
   };
 
-  std::function<std::string(LineageTreeEdge, int, int)> color_fun_link = [this](LineageTreeEdge d, int i = 0, int k = 0){
+  std::function<std::string(LineageTreeEdge, int, int)> color_fun_link = [this](LineageTreeEdge d, int i, int k){
     return this->color_fun(d.source(),0,0);
   };
 
-  std::function<std::string(LineageTreeNode, int, int)> tooltip_display = [this](LineageTreeNode d, int i = 0, int k = 0) {
+  std::function<std::string(LineageTreeNode, int, int)> tooltip_display = [this](LineageTreeNode d, int i, int k) {
     return "ID: " + to_string(d.name()) + ", Pos: (" + to_string(d.loc()% grid_width) + ", " + to_string(d.loc()/grid_width) + ")" + "<br>Genome: " + to_string(d.genome());
   };
 
-  std::function<int(LegendNode, int, int)> get_x = [this](LegendNode d, int i = 0, int k = 0) {
+  std::function<int(LegendNode, int, int)> get_x = [this](LegendNode d, int i, int k) {
     return legend_cell_size*(d.loc() % grid_width);
   };
 
-  std::function<int(LegendNode, int, int)> get_y = [this](LegendNode d, int i = 0, int k = 0) {
+  std::function<int(LegendNode, int, int)> get_y = [this](LegendNode d, int i, int k) {
     return legend_cell_size*(d.loc() / grid_width);
   };
 
-  std::function<void(int)> legend_mouseover = [this](D3::Selection d) {
-    EM_ASM_ARGS({emp.filter_fun = function(d){return d.loc != js.objects[$0].data()[0].loc;}}, d.GetID());
-    legend.SelectAll("rect").Filter("filter_fun").SetClassed("faded", true);
-    GetSVG()->SelectAll(".node").Filter("filter_fun").SetClassed("faded", true);
-    EM_ASM_ARGS({emp.filter_fun = function(d){return d.source.loc != js.objects[$0].data()[0].loc;}}, d.GetID());
+  std::function<void(LegendNode, int, int)> legend_mouseover = [this](LegendNode d, int i, D3::Selection s) {
+    legend.SelectAll("rect").Filter([d](LegendNode in_data, int i, int k){return d.loc() != in_data.loc();}).SetClassed("faded", true);
+    GetSVG()->SelectAll(".node").Filter([d](LegendNode in_data, int i, int k){return d.loc() != in_data.loc();}).SetClassed("faded", true);
+    EM_ASM_ARGS({emp.filter_fun = function(d){return d.source.loc != $0;}}, d.loc());
     GetSVG()->SelectAll(".link").Filter("filter_fun").SetClassed("faded", true);
   };
 
-  std::function<void(int)> legend_mouseout = [this](D3::Selection d) {
-    EM_ASM_ARGS({emp.filter_fun = function(d){return d.loc != js.objects[$0].data()[0].loc;}}, d.GetID());
-    legend.SelectAll("rect").Filter("filter_fun").SetClassed("faded", false);
-    GetSVG()->SelectAll(".node").Filter("filter_fun").SetClassed("faded", false);
-    EM_ASM_ARGS({emp.filter_fun = function(d){return d.source.loc != js.objects[$0].data()[0].loc;}}, d.GetID());
+  std::function<void(LegendNode, int, int)> legend_mouseout = [this](LegendNode d, int i, D3::Selection s) {
+    legend.SelectAll("rect")
+          .Filter([d](LegendNode in_data, int i, int k){return d.loc() != in_data.loc();})
+          .SetClassed("faded", false);
+    GetSVG()->SelectAll(".node")
+             .Filter([d](LegendNode in_data, int i, int k){return d.loc() != in_data.loc();})
+             .SetClassed("faded", false);
+
+    EM_ASM_ARGS({emp.filter_fun = function(d){return d.source.loc != $0}}, d.loc());
     GetSVG()->SelectAll(".link").Filter("filter_fun").SetClassed("faded", false);
   };
 

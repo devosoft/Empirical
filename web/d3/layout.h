@@ -43,7 +43,7 @@ namespace D3{
 
         make_line = new D3::DiagonalGenerator();
 
-        std::function<std::array<double, 2>(NODE_TYPE, int, int)> projection = [](NODE_TYPE n, int i=0, int k=0){
+        std::function<std::array<double, 2>(NODE_TYPE, int, int)> projection = [](NODE_TYPE n, int i, int k){
           return std::array<double, 2>({n.y(), n.x()});
         };
 
