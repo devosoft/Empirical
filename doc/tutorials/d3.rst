@@ -250,8 +250,9 @@ Changing Elements' Traits
 There are three types of traits that a DOM element might have: attributes, styles, and properties.
 For the most part, attributes are fundamental pieces of information about the element, styles deal
 with the element's appearance (they are all things you could set with CSS), and properties are rare
-and specific to certain types of elements. Here are some examples of commonly used traits in each
-category:
+and specific to certain types of elements. The distinction mostly only matters because it
+determines which functions you call to set and get the values of a trait. Here are some examples
+of commonly used traits in each category:
 
 **Attributes (use SetAttr()):**
 
@@ -275,6 +276,8 @@ category:
 **Properties (use SetProperty()):**
 
 - **checked** - a property indicating whether or not a checkbox is checked
+
+
 
 Transitions
 -----------
