@@ -102,7 +102,9 @@ int main()
   emp::LinkSignal("pi_world::pop_add_org_birth", fun_add_birth);
 
   for (int i = 0; i < 20; i++) pi_world.Insert(i+100);
-  std::cout << "PIWorld size: " << pi_world.GetSize() << std::endl;
+  std::cout << "Starting PIWorld size: " << pi_world.GetSize() << std::endl;
+  for (int i = 0; i < pi_world.GetSize(); i++) std::cout << pi_world[i] << " ";
+  std::cout << std::endl;
 
   pi_world.TournamentSelect([](int * i){ return (double) *i; }, 2, 100);
   std::cout << "Post-Tourney Size = " << pi_world.GetSize() << std::endl;
