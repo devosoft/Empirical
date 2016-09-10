@@ -20,7 +20,7 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 
-TARGETS := Fitness_Share_NK link_test NK NK-const NK-Serial Symbulation World bit_evolve
+TARGETS := Fitness_Share_NK link_test NK NK-constexpr NK-Serial Symbulation World bit_evolve
 
 EVO_DEPEND := ../../evo/PopulationManager.h ../../evo/World.h
 
