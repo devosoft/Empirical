@@ -98,10 +98,17 @@ int main()
       if (pop[pos]) delete pop[pos];
       pop[pos] = org;
     };
+  std::function<void(emp::vector<int*> &)> fun_clear =
+    [](emp::vector<int*> & pop) {
+      for (auto org : pop) if (org) delete org;
+      pop.resize(0);
+      for (int i = 0; i < 20; i++) pop.push_back(new int (i+100));
+    };
   emp::LinkSignal("pi_world::pop_add_org", fun_add);
   emp::LinkSignal("pi_world::pop_add_org_birth", fun_add_birth);
+  emp::LinkSignal("pi_world::pop_clear", fun_clear);
 
-  for (int i = 0; i < 20; i++) pi_world.Insert(i+100);
+  pi_world.Clear();
   std::cout << "Starting PIWorld size: " << pi_world.GetSize() << std::endl;
   for (int i = 0; i < pi_world.GetSize(); i++) std::cout << pi_world[i] << " ";
   std::cout << std::endl;
