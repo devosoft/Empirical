@@ -232,11 +232,11 @@ namespace evo {
     EMP_EVO_FORWARD_2(SetDefaultFitnessFun, orgM, statsM)
     EMP_EVO_FORWARD(SetDefaultMutateFun, orgM)
 
-    LinkKey OnBeforeRepro(std::function<void(int)> fun) { return before_repro_sig.AddAction(fun); }
-    LinkKey OnOffspringReady(std::function<void(ORG *)> fun) { return offspring_ready_sig.AddAction(fun); }
-    LinkKey OnInjectReady(std::function<void(ORG *)> fun) { return inject_ready_sig.AddAction(fun); }
-    LinkKey OnOrgPlacement(std::function<void(int)> fun) { return org_placement_sig.AddAction(fun); }
-    LinkKey OnUpdate(std::function<void(int)> fun) { return on_update_sig.AddAction(fun); }
+    LinkKey OnBeforeRepro(const std::function<void(int)> & fun) { return before_repro_sig.AddAction(fun); }
+    LinkKey OnOffspringReady(const std::function<void(ORG *)> & fun) { return offspring_ready_sig.AddAction(fun); }
+    LinkKey OnInjectReady(const std::function<void(ORG *)> & fun) { return inject_ready_sig.AddAction(fun); }
+    LinkKey OnOrgPlacement(const std::function<void(int)> & fun) { return org_placement_sig.AddAction(fun); }
+    LinkKey OnUpdate(const std::function<void(int)> & fun) { return on_update_sig.AddAction(fun); }
 
     std::function<double(ORG *)> GetFitFun(){return orgM.GetFitFun();}
 
@@ -358,7 +358,7 @@ namespace evo {
       EliteSelect(orgM.GetFitFun(), e_count, copy_count);
     }
 
-    // Tournament Selection create a tournament with a random sub-set of organisms,
+    // Tournament Selection creates a tournament with a random sub-set of organisms,
     // finds the one with the highest fitness, and moves it to the next generation.
     // User provides the fitness function, the tournament size, and (optionally) the
     // number of tournaments to run.
