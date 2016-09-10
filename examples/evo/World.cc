@@ -90,20 +90,21 @@ int main()
   // Let's try to build a world with a plug-in population manager.
   // We will have each organism replaced on birth be on the left side of parent.
   evo::World<int, evo::PopPlugin> pi_world(random, "pi_world");
-  std::function<void(emp::vector<int*> &, int*, int&)> fun_add =
-    [](emp::vector<int*> & pop, int* org, int& pos) { pos=pop.size(); pop.push_back(org); };
-  std::function<void(emp::vector<int*> &, int*, int, int&)> fun_add_birth =
-    [](emp::vector<int*> & pop, int* org, int parent_pos, int& pos) {
-      pos=parent_pos-1; if (pos < 0) pos = pop.size() - 1;
-      if (pop[pos]) delete pop[pos];
-      pop[pos] = org;
-    };
-  emp::LinkSignal("pi_world::pop_add_org", fun_add);
-  emp::LinkSignal("pi_world::pop_add_org_birth", fun_add_birth);
-  pi_world.popM.OnClear([](emp::vector<int*>& pop) {
+
+  pi_world.popM.OnClear( [](emp::vector<int*>& pop) {
     for (auto x:pop) if(x) delete x;
     pop.resize(0);
     for (int i=0;i<20;i++) pop.push_back(new int (i+100));
+  });
+
+  pi_world.popM.OnAddOrg( [](emp::vector<int*>& pop, int* org, int& pos) {
+    pos=pop.size(); pop.push_back(org);
+  });
+
+  pi_world.popM.OnAddOrgBirth( [](emp::vector<int*>& pop, int* org, int parent_pos, int& pos) {
+    pos=parent_pos-1; if (pos < 0) pos = pop.size() - 1;
+    if (pop[pos]) delete pop[pos];
+    pop[pos] = org;
   });
 
   pi_world.Clear();
