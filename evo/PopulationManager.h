@@ -144,6 +144,10 @@ namespace evo {
     { ; }
     ~PopulationManager_Plugin() { Clear(); }
 
+    LinkKey OnClear(std::function<void(emp::vector<ORG*> &)> fun) {
+      return sig_clear.AddAction(fun);
+    }
+
     void Clear() {
       if (sig_clear.GetNumActions()) {
         sig_clear.Trigger(pop);
