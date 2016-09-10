@@ -129,10 +129,10 @@ namespace evo {
     // Most of the key functions in the population manager can be interfaced with symbols.  If you
     // need to modify the more complex behaviors (such as Execute) you need to create a new
     // derrived class from PopulationManager_Base, which is also legal in a plugin.
-    Signal<emp::vector<ORG*> &> sig_clear;
-    Signal<emp::vector<ORG*> &> sig_update;
-    Signal<emp::vector<ORG*> &, ORG *, int &> sig_add_org;            // args: new org, return: offspring pos
-    Signal<emp::vector<ORG*> &, ORG *, int, int &> sig_add_org_birth; // args: new org, parent pos, return: offspring pos
+    Signal<emp::vector<ORG*>&> sig_clear;
+    Signal<emp::vector<ORG*>&> sig_update;
+    Signal<emp::vector<ORG*>&, ORG*, int&> sig_add_org;            // args: new org, return: offspring pos
+    Signal<emp::vector<ORG*>&, ORG*, int, int&> sig_add_org_birth; // args: new org, parent pos, return: offspring pos
 
   public:
     PopulationManager_Plugin(const std::string & world_name)
@@ -144,8 +144,17 @@ namespace evo {
     { ; }
     ~PopulationManager_Plugin() { Clear(); }
 
-    LinkKey OnClear(std::function<void(emp::vector<ORG*> &)> fun) {
+    LinkKey OnClear(const std::function<void(emp::vector<ORG*>&)> & fun) {
       return sig_clear.AddAction(fun);
+    }
+    LinkKey OnUpdate(const std::function<void(emp::vector<ORG*>&)> & fun) {
+      return sig_update.AddAction(fun);
+    }
+    LinkKey OnAddOrg(const std::function<void(emp::vector<ORG*>&, ORG*, int&)> & fun) {
+      return sig_add_org.AddAction(fun);
+    }
+    LinkKey OnAddOrgBirth(const std::function<void(emp::vector<ORG*>&, ORG*, int, int&)> & fun) {
+      return sig_add_org_birth.AddAction(fun);
     }
 
     void Clear() {
