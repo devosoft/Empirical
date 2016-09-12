@@ -65,6 +65,9 @@ opt-%: %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
 debug-%: %.cc
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
 
+cpp14-%: %.cc
+	$(CXX) -std=c++14 $(CFLAGS_native_debug) $< -o $@
+
 clean:
 	rm -rf debug-* *~ *.dSYM $(TARGETS)
 
