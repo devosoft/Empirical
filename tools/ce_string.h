@@ -58,6 +58,7 @@ namespace emp {
     }
 
     operator std::string() const { return std::string(m_str); }
+    std::string ToString() const { return std::string(m_str); }
   };
 
   // @CAO Grrr...  not sure why this operator breaks everything....
