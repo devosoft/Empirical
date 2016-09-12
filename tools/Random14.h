@@ -74,6 +74,9 @@ namespace emp14 {
     // Setup, called on initialization and seed reset.
     constexpr void init()
     {
+      // Clear variables
+      for (int i = 0; i < 56; ++i) ma[i] = 0;
+
       int mj = (_RAND_MSEED - seed) % _RAND_MBIG;
       ma[55] = mj;
       int mk = 1;
@@ -119,7 +122,7 @@ namespace emp14 {
      * A negative seed means that the random number generator gets its
      * seed from the actual system time.
      **/
-    constexpr Random(const int _seed) : seed(0), original_seed(0), inext(0), inextp(0), expRV(0) {
+    constexpr Random(const int _seed=-1) : seed(0), original_seed(0), inext(0), inextp(0), expRV(0) {
       for (int i = 0; i < 56; ++i) ma[i] = 0;
       ResetSeed(_seed);  // Calls init()
     }
@@ -129,12 +132,12 @@ namespace emp14 {
     /**
      * @return The seed that was actually used to start the random sequence.
      **/
-    inline int GetSeed() const { return seed; }
+    constexpr int GetSeed() const { return seed; }
 
     /**
      * @return The seed that was originally provided by the user.
      **/
-    inline int GetOriginalSeed() const { return original_seed; }
+    constexpr int GetOriginalSeed() const { return original_seed; }
 
     /**
      * Starts a new sequence of pseudo random numbers.
@@ -168,7 +171,7 @@ namespace emp14 {
      *
      * @return The pseudo random number.
      **/
-    double GetDouble() { return Get() / (double) _RAND_MBIG; }
+    constexpr double GetDouble() { return Get() / (double) _RAND_MBIG; }
 
     /**
      * Generate a double between 0 and a given number.
@@ -176,7 +179,7 @@ namespace emp14 {
      * @return The pseudo random number.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    double GetDouble(const double max) { return GetDouble() * max; }
+    constexpr double GetDouble(const double max) { return GetDouble() * max; }
 
     /**
      * Generate a double out of a given interval.
@@ -185,7 +188,7 @@ namespace emp14 {
      * @param min The lower bound for the random numbers.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    double GetDouble(const double min, const double max) { return GetDouble() * (max - min) + min; }
+    constexpr double GetDouble(const double min, const double max) { return GetDouble() * (max - min) + min; }
 
     /**
      * Generate an uint32_t.
@@ -193,7 +196,7 @@ namespace emp14 {
      * @return The pseudo random number.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    uint32_t GetUInt(const uint32_t max) { return static_cast<int>(GetDouble() * static_cast<double>(max)); }
+    constexpr uint32_t GetUInt(const uint32_t max) { return static_cast<int>(GetDouble() * static_cast<double>(max)); }
 
     /**
      * Generate an uint32_t out of an interval.
@@ -202,7 +205,7 @@ namespace emp14 {
      * @param min The lower bound for the random numbers.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    uint32_t GetUInt(const uint32_t min, const uint32_t max) { return GetUInt(max - min) + min; }
+    constexpr uint32_t GetUInt(const uint32_t min, const uint32_t max) { return GetUInt(max - min) + min; }
 
     /**
      * Generate an int out of an interval.
@@ -211,14 +214,14 @@ namespace emp14 {
      * @param min The lower bound for the random numbers.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    int GetInt(const int max) { return static_cast<int>(GetUInt(max)); }
-    int GetInt(const int min, const int max) { return static_cast<int>(GetUInt(max - min)) + min; }
+    constexpr int32_t GetInt(const int max) { return static_cast<int>(GetUInt(max)); }
+    constexpr int32_t GetInt(const int min, const int max) { return static_cast<int>(GetUInt(max - min)) + min; }
 
 
     // Random Event Generation //////////////////////////////////////////////////
 
     // P(p) => if p < [0,1) random variable
-    bool P(const double _p) { return (Get() < (_p * _RAND_MBIG));}
+    constexpr bool P(const double _p) { return (Get() < (_p * _RAND_MBIG));}
 
 
     // Statistical functions ////////////////////////////////////////////////////
@@ -228,15 +231,15 @@ namespace emp14 {
     /**
      * Generate a random variable drawn from a unit normal distribution.
      **/
-    double GetRandNormal() {
+    constexpr double GetRandNormal() {
       // Draw from a Unit Normal Dist
       // Using Rejection Method and saving of initial exponential random variable
-      double expRV2;
+      double expRV2 = -emp::Ln(GetDouble());
       while (1) {
-        expRV2 = -log(GetDouble());
         expRV -= (expRV2-1)*(expRV2-1)/2;
         if (expRV > 0) break;
-        expRV = -log(GetDouble());
+        expRV = -emp::Ln(GetDouble());
+        expRV2 = -emp::Ln(GetDouble());
       }
       if (P(.5)) return expRV2;
       return -expRV2;
@@ -246,26 +249,17 @@ namespace emp14 {
      * Generate a random variable drawn from a distribution with given
      * mean and standard deviation.
      **/
-    double GetRandNormal(const double mean, const double std) { return mean + GetRandNormal() * std; }
-
-    /**
-     * Generate a random variable drawn from a Poisson distribution.
-     **/
-    uint32_t GetRandPoisson(const double n, double p) {
-      // Optimizes for speed and calculability using symetry of the distribution
-      if (p > .5) return (uint32_t)n - GetRandPoisson(n * (1 - p));
-      else return GetRandPoisson(n * p);
-    }
+    constexpr double GetRandNormal(const double mean, const double std) { return mean + GetRandNormal() * std; }
 
     /**
      * Generate a random variable drawn from a Poisson distribution.
      *
      * @param mean The mean of the distribution.
      **/
-    uint32_t GetRandPoisson(const double mean) {
+    constexpr uint32_t GetRandPoisson(const double mean) {
       // Draw from a Poisson Dist with mean; if cannot calculate, return UINT_MAX.
       // Uses Rejection Method
-      const double a = exp(-mean);
+      const double a = emp::Exp(-mean);
       if (a <= 0) return UINT_MAX; // cannot calculate, so return UINT_MAX
       uint32_t k = 0;
       double u = GetDouble();
@@ -277,12 +271,21 @@ namespace emp14 {
     }
 
     /**
+     * Generate a random variable drawn from a Poisson distribution.
+     **/
+    constexpr uint32_t GetRandPoisson(const double n, double p) {
+      // Optimizes for speed and calculability using symetry of the distribution
+      if (p > .5) return (uint32_t) n - GetRandPoisson(n * (1 - p));
+      else return GetRandPoisson(n * p);
+    }
+
+    /**
      * Generate a random variable drawn from a Binomial distribution.
      *
      * This function is exact, but slow.
      * @see Random::GetRandBinomial
      **/
-    uint32_t GetFullRandBinomial(const double n, const double p) { // Exact
+    constexpr uint32_t GetFullRandBinomial(const double n, const double p) { // Exact
       // Actually try n Bernoulli events with probability p
       uint32_t k = 0;
       for (uint32_t i = 0; i < n; ++i) if (P(p)) k++;
@@ -297,7 +300,7 @@ namespace emp14 {
      *
      * @see Random::GetFullRandBinomial
      **/
-    uint32_t GetRandBinomial(const double n, const double p) { // Approx
+    constexpr uint32_t GetRandBinomial(const double n, const double p) { // Approx
       // Approximate Binomial if appropriate
       // if np(1-p) is large, use a Normal approx
       if (n * p * (1 - p) >= _BINOMIAL_TO_NORMAL) {
