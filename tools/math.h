@@ -61,6 +61,10 @@ namespace emp {
     return Pow2(Log2(base) * exp);  // convert to a base of 2.
   }
 
+  static constexpr double Exp(double exp) {
+    return Pow2(Log2(emp::E) * exp);  // convert to a base of e.
+  }
+
   // A compile-time exponentiation calculator.
   template <typename TYPE>
   static constexpr TYPE IntPow(TYPE base, TYPE exp) {
