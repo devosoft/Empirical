@@ -56,5 +56,5 @@ int main()
             << std::endl;
 
   constexpr std::array<emp::ce_string, 3> test_array = {{ "abc", "def", "ghijkl" }};
-  std::cout << test_array[1] << std::endl;
+  std::cout << test_array[1].ToString() << std::endl;
 }
