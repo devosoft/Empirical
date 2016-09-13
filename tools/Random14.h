@@ -148,18 +148,9 @@ namespace emp14 {
      **/
     constexpr void ResetSeed(const int _seed) {
       original_seed = _seed;
-
-      if (_seed <= 0) {
-        int seed_time = (int) time(NULL);
-        int seed_mem = (int) ((uint64_t) this);
-        seed = seed_time ^ seed_mem;
-      } else {
-        seed = _seed;
-      }
-
+      seed = _seed;
       if (seed < 0) seed *= -1;
       seed %= _RAND_MSEED;
-
       init();
     }
 
