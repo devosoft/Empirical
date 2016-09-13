@@ -62,10 +62,10 @@ $(TARGETS): % : %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
 opt-%: %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_opt) $< -o $@
 
-debug-%: %.cc
+debug-%: %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
 
-cpp14-%: %.cc
+cpp14-%: %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
 	$(CXX) -std=c++14 $(CFLAGS_native_debug) $< -o $@
 
 clean:
