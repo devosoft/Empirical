@@ -12,17 +12,17 @@
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
 
-constexpr int K = 13;
-constexpr int N = 50;
+constexpr int K = 10;
+constexpr int N = 200;
 
 constexpr int POP_SIZE = 1000;
-constexpr int UD_COUNT = 2000;
+constexpr int UD_COUNT = 500;
 
 using BitOrg = emp::BitSet<N>;
 
 int main()
 {
-  emp::Random random;
+  emp::Random random(1);
   emp::evo::NKLandscapeConst<N,K> landscape(random);
   emp::evo::EAWorld<BitOrg> pop(random);
 
