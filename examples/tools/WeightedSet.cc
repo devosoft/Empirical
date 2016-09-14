@@ -12,5 +12,6 @@
 
 int main()
 {
+  emp::WeightedSet test_set(10);
   std::cout << "Ping!" << std::endl;
 }
