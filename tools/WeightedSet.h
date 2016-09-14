@@ -39,6 +39,18 @@ namespace emp {
     int RightID(int id) const { return 2*id + 2; }
     bool IsLeaf(int id) const { return 2*id >= (int) weight.size(); }
 
+    class Proxy {
+    private:
+      WeightedSet & ws;  // Which set is this proxy from?
+      int id;            // Which id does it represent?
+
+    public:
+      Proxy(WeightedSet & _ws, int _id) : ws(_ws), id(_id) { ; }
+
+      operator double() { return ws.GetWeight(id); }
+      Proxy & operator=(double new_weight) { ws.Adjust(id, new_weight); return *this; }
+    };
+
   public:
     WeightedSet(int num_items) : weight(num_items) {;}
     WeightedSet(const WeightedSet &) = default;
@@ -48,6 +60,7 @@ namespace emp {
     WeightedSet & operator=(WeightedSet &&) = default;
 
     int GetSize() const { return (int) weight.size(); }
+    double GetWeight() const { return weight[0].tree; }
     double GetWeight(int id) const { return weight[id].item; }
 
     // Standard library compatibility
@@ -79,7 +92,29 @@ namespace emp {
       return (index < left_weight) ? Index(index, left_id) : Index(index-left_weight, left_id+1);
     }
 
-    int operator[](double index) { return Index(index,0); }
+    // int operator[](double index) { return Index(index,0); }
+    Proxy operator[](int id) { return Proxy(*this,id); }
+    double operator[](int id) const { return weight[id].item; }
+
+    // Update all tree-weights to cleanup accumulated round-off error.
+    double Refresh() {
+      const double old_total = weight[0].tree;
+      const int first_leaf = GetSize()/2;
+      const int pivot = first_leaf-1;
+      // All leaves have a tree weight equal to their item weight.
+      for (int i = weight.size()-1; i >= first_leaf; i--) weight[i].tree = weight[i].item;
+      // Be careful with the pivot node since it may have one or two sub-trees.
+      if (pivot > 0) {
+        weight[pivot].tree = weight[pivot].item + weight[LeftID(pivot)].tree;
+        if (RightID(pivot) < GetSize()) weight[pivot].tree += weight[RightID(pivot)].tree;
+      }
+      // All internal nodes sum their two sub-tree and their own weight.
+      for (int i = pivot-1; i >= 0; i--) {
+        weight[i].tree = weight[i].item + weight[LeftID(i)].tree + weight[RightID(i)].tree;
+      }
+
+      return weight[0].tree / old_total;
+    }
 
   };
 };
