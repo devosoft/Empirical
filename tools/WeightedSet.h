@@ -25,58 +25,62 @@
 #ifndef EMP_WEIGHTED_SET_H
 #define EMP_WEIGHTED_SET_H
 
-#include <vector>
+#include "vector.h"
 
 namespace emp {
 
   class WeightedSet {
   private:
-    const int num_items;
-    std::vector<double> weights;
-    std::vector<double> tree_weights;
+    struct WeightInfo { double item=0.0; double tree=0.0; };
+    emp::vector<WeightInfo> weight;
+
+    int ParentID(int id) const { return (id-1) / 2; }
+    int LeftID(int id) const { return 2*id + 1; }
+    int RightID(int id) const { return 2*id + 2; }
+    bool IsLeaf(int id) const { return 2*id >= (int) weight.size(); }
 
   public:
-    WeightedSet(int _items) : num_items(_items), weights(_items+1), tree_weights(_items+1) {
-      for (int i = 0; i < (int) weights.size(); i++)  weights[i] = tree_weights[i] = 0.0;
-    }
+    WeightedSet(int num_items) : weight(num_items) {;}
+    WeightedSet(const WeightedSet &) = default;
+    WeightedSet(WeightedSet &&) = default;
     ~WeightedSet() = default;
+    WeightedSet & operator=(const WeightedSet &) = default;
+    WeightedSet & operator=(WeightedSet &&) = default;
 
-    double GetWeight(int id) const { return weights[id]; }
-    double GetSubtreeWeight(int id) const { return tree_weights[id]; }
+    int GetSize() const { return (int) weight.size(); }
+    double GetWeight(int id) const { return weight[id].item; }
 
-    void Adjust(int id, const double _weight) {
-      weights[id] = _weight;
+    // Standard library compatibility
+    size_t size() const { return weight.size(); }
 
-      // Determine the child ids to adjust subtree weight.
-      const int left_id = 2*id + 1;
-      const int right_id = 2*id + 2;
+    void Adjust(int id, const double new_weight) {
+      // Update this node.
+      double weight_diff = new_weight - weight[id].item;
+      weight[id].item = new_weight;       // Update item weight
+      weight[id].tree += weight_diff;
 
-      // Make sure the subtrees looked for haven't fallen off the end of this tree.
-      const double st1_weight = (left_id < num_items) ? tree_weights[left_id] : 0.0;
-      const double st2_weight = (right_id < num_items) ? tree_weights[right_id] : 0.0;
-      tree_weights[id] = _weight + st1_weight + st2_weight;
-
-      // Cascade the change up the tree to the root.
-      while (id) {
-        id = (id-1) / 2;
-        tree_weights[id] = weights[id] + tree_weights[id*2+1] + tree_weights[id*2+2];
+      // Update tree to root.
+      while (id > 0) {
+        id = ParentID(id);
+        weight[id].tree += weight_diff;
       }
     }
 
     int Index(double index, int cur_id=0) {
       // If our target is in the current node, return it!
-      const double cur_weight = weights[cur_id];
+      const double cur_weight = weight[cur_id].item;
       if (index < cur_weight) return cur_id;
 
       // Otherwise determine if we need to recurse left or right.
       index -= cur_weight;
-      const int left_id = cur_id*2 + 1;
-      const double left_weight = tree_weights[left_id];
+      const int left_id = LeftID(cur_id);
+      const double left_weight = weight[left_id].tree;
 
       return (index < left_weight) ? Index(index, left_id) : Index(index-left_weight, left_id+1);
     }
 
     int operator[](double index) { return Index(index,0); }
+
   };
 };
 
