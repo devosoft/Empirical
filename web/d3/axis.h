@@ -10,6 +10,8 @@
 
 namespace D3 {
 
+  /// Axis objects are in charge of drawing graphical axes onto svg canvases. An axis depicts a
+  /// scale, so every axis has a scale, and is templated off of the type of that scale.
   template <typename SCALE_TYPE>
   class Axis : public D3_Base {
   private:
@@ -18,15 +20,28 @@ namespace D3 {
     std::string dom_id;
 
   public:
+
+    /// There are a lot of graphical elements associated with an axis, so it's best to group them
+    /// all together into an html group element. This selection holds a pointer to the group for
+    /// this axis
     Selection group;
 
+    /// Consruct an axis - this doesn't draw anything yet, but sets up the necessary infrastructure
+    /// to draw it when you call the Draw method. Optionally takes a label to label the axis with.
+    /// This label will also be used to create an id for the axis, to make it easier to select it
+    /// later. The id will be the same as [label], but with all whitespace removed and "_axis"
+    /// appended to the end.
+    ///
+    /// For example, if your label was "Per capita mortality", you could select the axis with:
+    /// `D3::Select("#Percapitamortality_axis");`.
     Axis(std::string label = "") {
       //The scale got added to th the list of objects before this one
       this->label = label;
       EM_ASM_ARGS({js.objects[$0] = d3.svg.axis();}, this->id);
     }
 
-    //Draw axis on specified selection with intelligent default positioning
+    /// Draw axis on [selection] (must contain a single SVG element) with intelligent default
+    /// positioning
     void Draw(Selection selection){
       this->SetTickFormat("g");
 
@@ -84,6 +99,9 @@ namespace D3 {
 	  }, this->id, selection.GetID());
     }
 
+    /// An axis must have a scale. By default, a scale of SCALE_TYPE will be constructed, but
+    /// usually you want an axis to depict a specific scale. This method points this object's
+    /// scale member variable at [scale].
     void SetScale(SCALE_TYPE & scale) {
       this->scale = scale;
 
@@ -92,10 +110,14 @@ namespace D3 {
 	  }, this->id, scale.GetID());
     }
 
-    SCALE_TYPE GetScale(){
+    /// Get a reference to this object's scale.
+    SCALE_TYPE& GetScale(){
       return this->scale;
     }
 
+    /// Set orientation of this axis to [orientation] (must be "bottom", "top", "left", or "right")
+    /// Controls default placement on SVG, whether main line is vertical or horizontal, and which
+    /// side the ticks and label show up on.
     //Needs to be called before Draw
     void SetOrientation(std::string orientation) {
       EM_ASM_ARGS({
@@ -136,18 +158,25 @@ namespace D3 {
 	  }, this->id, padding);
     }
 
+    /// Set the number of ticks along the axis
     void SetTicks(int count){
       EM_ASM_ARGS({
 	    js.objects[$0].ticks($1);
 	  }, this->id, count);
     }
 
+    /// Set the format for displaying numbers assoiated with ticks. [format] should be a format
+    /// following
+    /// [the rules for d3.format()](https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format)
     void SetTickFormat(std::string format) {
       EM_ASM_ARGS({
         js.objects[$0].tickFormat(d3.format(Pointer_stringify([$1])));
       }, this->id, format.c_str());
     }
 
+    /// Adjust scale and axis to accomodate the new range of data specified by [new_min],
+    /// and [new_max]. [svg] is a Selection or Transition containing the current axis. If it's a
+    /// transition, then the rescaling will be animated.
     template <typename T>
     void Rescale(double new_min, double new_max, D3::SelectionOrTransition<T> & svg){
       this->scale.SetDomain(std::array<double, 2>({new_min, new_max}));
@@ -158,8 +187,8 @@ namespace D3 {
 
   };
 
-  //Helper function to draw a standard set of x and y axes
-  //Takes the desired x axis, y axis, and the selection on which to draw them
+  /// Helper function to draw a standard set of x and y axes
+  /// Takes the desired x axis, y axis, and the selection on which to draw them
   template <typename SCALE_X_TYPE, typename SCALE_Y_TYPE>
   void DrawAxes(Axis<SCALE_X_TYPE> & x_axis, Axis<SCALE_Y_TYPE> & y_axis, Selection & selection){
     x_axis.Draw(selection);

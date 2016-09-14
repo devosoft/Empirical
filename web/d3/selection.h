@@ -26,6 +26,10 @@ namespace D3 {
 
   /// You probably never want to instantiate this class. Its sole purpose is to hold code for
   /// methods that are common to selections and transitions
+  ///
+  /// Developer note: It's also handy if you want to allow a function to accept either a selection
+  /// or transition. This is a good idea any time you are only using methods that are applicable to
+  /// either, and the person calling the function may want to animate its results.
   template <typename DERIVED>
   class SelectionOrTransition : public D3_Base {
   public:
@@ -737,7 +741,7 @@ namespace D3 {
           }
         }
         return (typeof func_string === "function");
-      }, value.c_str()) == 1 && "String passed to SetClassed is not a Javascript function", value);
+      }, value.c_str()) && "String passed to SetClassed is not a Javascript function", value);
 
       EM_ASM_ARGS({
         var arg1 = Pointer_stringify($1);				                              	\
@@ -943,8 +947,8 @@ namespace D3 {
 
   	  EM_ASM_ARGS({
         var update_sel = js.objects[$0].data(js.objects[$2],
-                                                function(d,i,k) {
-                                                  return emp.Callback($1, d, i, k);
+                                                function(d,i) {
+                                                  return emp.Callback($1, d, i);
                                             });
 	    js.objects.push(update_sel);
       },this->id, fun_id, values.GetID());
@@ -1234,7 +1238,7 @@ namespace D3 {
           }
         }
         return (typeof func_string === "function");
-      }, value.c_str()) == 1 && "String passed to SetClassed is not a Javascript function", value);
+      }, value.c_str()) && "String passed to SetClassed is not a Javascript function", value);
       D3_CALLBACK_METHOD_2_ARGS(classed, classname.c_str(), value.c_str())
       return *this;
     }
@@ -1415,7 +1419,7 @@ namespace D3 {
           }
         }
         return (typeof func_string === "function");
-      }, listener.c_str()) == 1 \
+      }, listener.c_str()) \
       && "String passed to On is not s Javascript function or null", listener);
 
 
@@ -1445,7 +1449,7 @@ namespace D3 {
 
       return (*this);
     }
- //function($0, $1, $2, $3) { { var func_string = Pointer_stringify($2); CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_WINDOW("emp", "d3"); if (typeof func_string === "function") { js.objects[$0].on(Pointer_stringify($1), function(){ var new_id = js.objects.length; js.objects.push(d3.select(this)); fn(d, i, new_id);}, $3); } else { js.objects[$0].on(Pointer_stringify($1), null); } } },
+
     /// @cond TEMPLATES
 
     /// Version for C++ functions

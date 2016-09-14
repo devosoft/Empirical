@@ -112,17 +112,26 @@ namespace D3{
 
     /// This function does the heavy lifting of visualizing your data. It generates nodes and links
     /// between them based on this object's dataset. [svg] must be a selection containing a single
-    /// svg element on which to draw the the visualization. Returns a pair of selections: the
-    /// enter selection for nodes and the enter selection for links.
+    /// svg element on which to draw the the visualization.
+    ///
+    /// In case you want to further customize the tree, this method returns an array of selections,
+    /// containing: the enter selection for nodes (i.e. a selection containing all nodes that were
+    /// just added to the tree), the exit selection for nodes (i.e. a selection containing any
+    /// nodes that are currently drawn but are no longer in the dataset), the enter selection for
+    /// links, and the exit selection for links.
     //Returns the enter selection for the nodes in case the user wants
     //to do more with it. It would be nice to return the enter selection for
     //links too, but C++ makes that super cumbersome, and it's definitely the less
     //common use case
-    std::pair<Selection, Selection> GenerateNodesAndLinks(Selection svg) {
+    std::array<Selection, 4> GenerateNodesAndLinks(Selection svg) {
       int node_enter = EM_ASM_INT_V({return js.objects.length});
-      int link_enter = node_enter + 1;
+      int node_exit = node_enter + 1;
+      int link_enter = node_exit + 1;
+      int link_exit = link_enter + 1;
 
       EM_ASM_ARGS({
+
+        // Based on code from http://www.d3noob.org/2014/01/tree-diagrams-in-d3js_11.html
         var nodes = js.objects[$0].nodes(js.objects[$1][0]).reverse();
         links = js.objects[$0].links(nodes);
 
@@ -132,6 +141,7 @@ namespace D3{
         var node = js.objects[$3].selectAll("g.node")
             .data(nodes, function(d) { return d.name; });
 
+        var nodeExit = node.exit();
         var nodeEnter = node.enter().append("g")
                 .attr("class", "node")
                 .attr("transform", function(d) {
@@ -143,6 +153,7 @@ namespace D3{
         var link = js.objects[$3].selectAll("path.link")
       	  .data(links, function(d) { return d.target.name; });
 
+        var linkExit = link.exit();
         // Enter the links.
         var linkEnter = link.enter().insert("path", "g")
       	    .attr("class", "link")
@@ -155,10 +166,14 @@ namespace D3{
             .attr("d", js.objects[$2]);
 
         js.objects.push(nodeEnter);
+        js.objects.push(nodeExit);
         js.objects.push(linkEnter);
+        js.objects.push(linkExit);
       }, this->id, data->GetID(), make_line->GetID(), svg.GetID());
-      return std::pair<Selection, Selection>(Selection(node_enter), Selection(link_enter));
+      return std::array<Selection, 4>({Selection(node_enter), Selection(node_exit),
+                                       Selection(link_enter), Selection(link_exit)});
     }
+
 
     /// Set the width of the tree area to [w] and the height to [h]
     void SetSize(int w, int h) {

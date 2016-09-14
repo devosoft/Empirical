@@ -499,7 +499,7 @@ public:
   }
 
   virtual void DrawTree() {
-    D3::Selection nodeEnter = tree.GenerateNodesAndLinks(*GetSVG()).first;
+    D3::Selection nodeEnter = tree.GenerateNodesAndLinks(*GetSVG())[0];
     nodeEnter.Append("circle").SetAttr("r", 2).AddToolTip(*tip);
     GetSVG()->SelectAll("g.node").SelectAll("circle").SetStyle("fill", GetID()+"color_fun");
     GetSVG()->SelectAll(".link").SetStyle("stroke", GetID()+"color_fun_link");

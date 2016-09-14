@@ -10,12 +10,23 @@
 
 namespace D3 {
 
+  /// A few particularly common shapes (circles, rectangles, and ellipses) have corresponding SVG
+  /// elements that you can create directly. All other shapes (including lines) must be created by
+  /// specifying a "path" describing their outline. Paths are defined with
+  /// [a mini-language] (https://www.w3.org/TR/SVG/paths.html#PathData) that
+  /// describes how you would draw the shape with a pen. You could write them by hand, but that's
+  /// rarely desirable (especially when you're trying to systematically represent data). So d3
+  /// provides functions for generating functions that will convert data to paths.
+  /// This is a base clase for all objects that manage such functions to inherit from.
+  /// You probably want to instantiate derived versions, rather than this class directly.
   class SvgShapeGenerator : public D3_Base {
   protected:
-    SvgShapeGenerator();
+    SvgShapeGenerator(){;};
   public:
 
-    //This function creates a string specifying a path
+    /// Generate the string describing the path associated with [data]
+    /// Assumes [data] is an array of 2-element arrays describing (x,y) coordinates and makes
+    /// the line that connects them
     template <typename T, size_t SIZE>
     std::string Generate(std::array<std::array<T, 2>, SIZE> data){
       emp::pass_array_to_javascript(data);
@@ -32,7 +43,8 @@ namespace D3 {
       return result;
     }
 
-    //This function actually handles the binding of the path string to the dom
+    /// Draws the path associated with [data] onto the [s] selection (must contain a single SVG)
+    /// element).
     template <typename T, std::size_t SIZE>
     Selection DrawShape(std::array<std::array<T, 2>, SIZE> data, Selection s) {
       Selection path = s.Append("path");
@@ -40,13 +52,10 @@ namespace D3 {
       return path;
     }
 
-    //This function actually handles the binding of the path string to the dom
-    //without passing the data through C++
-    Selection DrawShape(Dataset data, Selection s){//, Selection appendto=Select("svg"),
-      //std::string type = "path") {
+    /// DrawShape will also accept a D3::Dataset
+    Selection DrawShape(Dataset data, Selection s){
+
       Selection path = s.Append("path");
-      //Selection path = appendto.SelectAll("path");//type.c_str());
-      //Selection path = Select("svg").SelectAll("path");//type.c_str());
 
       EM_ASM_ARGS({
 	    var accessor = function(data){
@@ -59,14 +68,14 @@ namespace D3 {
 	    };
 	    emp.__incoming_data = accessor(emp.__incoming_data);
 	    js.objects[$0].data(emp.__incoming_data).enter().append("path").attr("d", js.objects[$1]);
-	    console.log(d3.selectAll("path"));
+
 	  }, path.GetID(), this->id, data.GetID());
       return path;
     }
 
-   //This function draws an array of lines
+   /// If you pass a triple-nested array, it will be treated as an array of paths
     template <typename T, std::size_t SIZE, std::size_t SIZE2>
-    Selection DrawShapes(std::array<std::array<std::array<T, 2>, SIZE>,\
+    Selection DrawShape(std::array<std::array<std::array<T, 2>, SIZE>,\
 			 SIZE2>  data) {
       Selection group = Select("svg").Append("g");
       for (auto arr: data) {
@@ -77,17 +86,44 @@ namespace D3 {
     }
   };
 
-  SvgShapeGenerator::SvgShapeGenerator() {}
-
+  /// Generate symbols ("circle", "cross" "diamond", "square", "triangle-down", "triangle-up").
+  /// Often useful for making scatter plots.
   class SymbolGenerator : public SvgShapeGenerator {
   public:
-    SymbolGenerator();
+    SymbolGenerator() {
+      EM_ASM_ARGS({
+  	    var new_line = d3.svg.symbol();
+  	    js.objects[$0] = new_line;
+      }, this->id);
+    }
 
+    /// Set the type of symbol generated. Must be a C++ function, a string containing the name of
+    /// a Javascript function (in the current window, d3, or emp namespaces), or a string
+    /// specifying a type ("circle", "cross" "diamond", "square", "triangle-down", "triangle-up").
     void SetType(std::string type){
-      //TODO: Should we check that type is in d3.svg.symbolTypes?
+      emp_assert (
+        EM_ASM_INT({
+          return d3.svg.symbolTypes.includes(Pointer_stringify($0)) ||
+          window[Pointer_stringify($0)] === "function" ||
+          window["d3"][Pointer_stringify($0)] === "function" ||
+          window["emp"][Pointer_stringify($0)] === "function";
+        }, type.c_str())
+      );
       D3_CALLBACK_METHOD_1_ARG(type, type.c_str())
     }
 
+    /// @cond TEMPLATES
+
+    template <typename T>
+    typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+    SetType(T type){
+      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(type, type)
+    }
+
+    /// @endcond
+
+    /// Set size in pixels to [size] - can be an int, a C++ function, or string naming a Javascript
+    /// function in the current window, the emp namespace, or the d3 namespace.
     //If size is a constant, it's in pixels, so an int is reasonable
     void SetSize(int size) {
       EM_ASM_ARGS({
@@ -95,63 +131,76 @@ namespace D3 {
 	  }, this->id, size);
     }
 
+    /// @cond TEMPLATES
     //Otherwise it's a function
     void SetSize(std::string size){
       D3_CALLBACK_METHOD_1_ARG(size, size.c_str())
     }
+
+    template <typename T>
+    typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+    SetSize(T type){
+      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(size, type)
+    }
+    /// @endcond
+
+
   };
 
-  SymbolGenerator::SymbolGenerator() {
-
-    EM_ASM_ARGS({
-	  var new_line = d3.svg.symbol();
-	  js.objects[$0] = new_line;
-    }, this->id);
-  }
-
-
-  class LineGenerator : public SvgShapeGenerator {
+  /// Base class for generating both cartesian and radial lines
+  /// You don't normally want to instantiate this - use LineGenerator or RadialLineGenerator
+  /// instead.
+  class BaseLineGenerator : public SvgShapeGenerator {
   public:
-    LineGenerator();
+    BaseLineGenerator() {;}
 
+    /// Set the method used to interpolate between points in the line.
+    /// For allowed options, see the
+    /// [d3 documntation](https://github.com/d3/d3-3.x-api-reference/blob/master/SVG-Shapes.md#line_interpolate)
     void SetInterpolate(std::string interpolate){
       D3_CALLBACK_METHOD_1_ARG(interpolate,interpolate.c_str())
     }
 
+    /// If interpolation is "bundle", "cardinal", "cardinal-open", or "cardinal-closed", a tension
+    /// parameter is used.
     void SetTension(float tension){
       EM_ASM_ARGS({
 	    js.objects[$0].tension($1);
 	  }, this->id, tension);
     }
 
+    /// Set a function indicating where the line is defined (i.e. valid)
+    /// Can be a C++ function or a string indicating a Javascript function
     void SetDefined(std::string defined){
       D3_CALLBACK_METHOD_1_ARG(defined, defined.c_str())
     }
+
+    /// @cond TEMPLATES
+    template <typename T>
+    typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+    SetDefined(T defined){
+      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(defined, defined)
+    }
+    /// @endcond
   };
 
-  LineGenerator::LineGenerator() {
-    EM_ASM_ARGS({
-	  var new_line = d3.svg.line();
-	  js.objects[$0] = new_line;
-    }, this->id);
-  }
-
-  template <typename X_SCALE_TYPE, typename Y_SCALE_TYPE>
-  class CartesianLineGenerator : public LineGenerator {
-
-  private:
-    X_SCALE_TYPE xscale;
-    Y_SCALE_TYPE yscale;
+  /// Generator for regular old (cartesian) lines.
+  class LineGenerator : public BaseLineGenerator {
   public:
-    CartesianLineGenerator() {
+    LineGenerator() {
       EM_ASM_ARGS({
 	    var new_line = d3.svg.line();
 	    js.objects[$0] = new_line;
       }, this->id);
     }
 
-    void SetXScale(X_SCALE_TYPE scale){
-      this->xscale = scale;
+    /// Often, when you're drawing cartesion lines, you want to use a scale to transform numbers
+    /// from range of your data to the range of pixels on your screen. Adding an X scale will
+    /// cause the x-coordinates of all points on the line to be passed through that scale function.
+    /// This stacks on top of whatever the current function for accessing x is (which means scales
+    /// will also stack).
+    template <typename X_SCALE_TYPE>
+    void AddXScale(X_SCALE_TYPE & scale){
       EM_ASM_ARGS({
 	    var scale = js.objects[$1];
 	    var curr_x = js.objects[$0].x();
@@ -161,8 +210,13 @@ namespace D3 {
 	  }, this->id, scale.GetID());
     }
 
-    void SetYScale(Y_SCALE_TYPE scale){
-      this->yscale = scale;
+    /// Often, when you're drawing cartesion lines, you want to use a scale to transform numbers
+    /// from range of your data to the range of pixels on your screen. Adding a Y scale will
+    /// cause the y-coordinates of all points on the line to be passed through that scale function.
+    /// This stacks on top of whatever the current function for accessing y is (which means scales
+    /// will also stack).
+    template <typename Y_SCALE_TYPE>
+    void AddYScale(Y_SCALE_TYPE & scale){
       EM_ASM_ARGS({
 	    var scale = js.objects[$1];
 	    var curr_y = js.objects[$0].y();
@@ -172,40 +226,105 @@ namespace D3 {
 	  }, this->id, scale.GetID());
     }
 
-    X_SCALE_TYPE GetXScale(){
-      return this->xscale;
-    }
-
-    Y_SCALE_TYPE GetYScale(){
-      return this->yscale;
-    }
-
-    //Handles setting x accessor to a constant
-    template <typename T>
-    void SetX(T x) {
-      EM_ASM_ARGS({js.objects[$0].x($1);}, this->id, x);
-    }
-
-    //Handles setting y accessor to a constant
-    template <typename T>
-    void SetY(T y) {
-      EM_ASM_ARGS({js.objects[$0].y($1);}, this->id, y);
-    }
-
-    //Handles setting x accessor to a function or string
+    /// If the data that you are generating lines from is anything more complicated than a sequence
+    /// of pairs of numbers, representing x and y (in that order), you need to tell the line
+    /// generator how it should figure out what the x coordinate of a point in the line is. The
+    /// parameter you pass to SetX should be instructions for doing so. It can either be a function
+    /// (as a string indicating a Javascript function or as a literal C++ function) that accepts
+    /// an element of the data sequence you are generating the line from, or it can be a constant,
+    /// in which case the x coordinate of every point will be that constant.
+    ///
+    /// Note: This function will re-set any scales that you've added to the X coordinate
+    ///
+    /// As an example, the default function expects data like this (array of arrays):
+    /// [[0,0], [1,1], [2,2]]
+    /// And has (a Javascript equivalent of) this accessor:
+    /// int x(std::array<int, 2> d) {return d[0];}
+    ///
+    /// If your data instead looked like this (array of Javascript objects with x and y values):
+    /// [{x:0, y:0}, {x:1, y:1}, {x:2, y:2}]
+    /// You might want to use an accessor like this:
+    /// int x(JSONObject d) {return d.x();}
+    /// Where JSONObject is a struct designed to hold necessary data from the Javascript object:
+    ///  struct JSONObject {
+    ///    EMP_BUILD_INTROSPECTIVE_TUPLE( int, x,
+    ///                                   int, y
+    ///                                  )
+    ///  };
+    // Handles setting x accessor to a function or string
     void SetX(std::string x) {
       D3_CALLBACK_METHOD_1_ARG(x, x.c_str())
     }
 
+    /// @cond TEMPLATES
+    // Handles setting x to a constant
+    template <typename T>
+    typename std::enable_if<std::is_fundamental<T>::value, void>::type
+    SetX(T x) {
+      EM_ASM_ARGS({js.objects[$0].x($1);}, this->id, x);
+    }
+
+    // handles C++ functions
+    template <typename T>
+    typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+    SetX(T x) {
+      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARGS(x, x);
+    }
+
+    /// @endcond
+
+    /// If the data that you are generating lines from is anything more complicated than a sequence
+    /// of pairs of numbers, representing x and y (in that order), you need to tell the line
+    /// generator how it should figure out what the y coordinate of a point in the line is. The
+    /// parameter you pass to SetY should be instructions for doing so. It can either be a function
+    /// (as a string indicating a Javascript function or as a literal C++ function) that accepts
+    /// an element of the data sequence you are generating the line from, or it can be a constant,
+    /// in which case the y coordinate of every point will be that constant.
+    ///
+    /// Note: This function will re-set any scales that you've added to the Y coordinate
+    ///
+    /// As an example, the default function expects data like this (array of arrays):
+    /// [[0,0], [1,1], [2,2]]
+    /// And has (a Javascript equivalent of) this accessor:
+    /// int x(std::array<int, 2> d) {return d[1];}
+    ///
+    /// If your data instead looked like this (array of Javascript objects with x and y values):
+    /// [{x:0, y:0}, {x:1, y:1}, {x:2, y:2}]
+    /// You might want to use an accessor like this:
+    /// int x(JSONObject d) {return d.y();}
+    /// Where JSONObject is a struct designed to hold necessary data from the Javascript object:
+    ///  struct JSONObject {
+    ///    EMP_BUILD_INTROSPECTIVE_TUPLE( int, x,
+    ///                                   int, y
+    ///                                  )
+    ///  };
     //Handles setting x accessor to a function or string
     void SetY(std::string y) {
       D3_CALLBACK_METHOD_1_ARG(y, y.c_str())
     }
 
+    /// @cond TEMPLATES
+
+    // Handles constants
+    template <typename T>
+    typename std::enable_if<std::is_fundamental<T>::value, void>::type
+    SetY(T y) {
+      EM_ASM_ARGS({js.objects[$0].y($1);}, this->id, y);
+    }
+
+    // handles C++ functions
+    template <typename T>
+    typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+    SetY(T y) {
+      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARGS(y, y);
+    }
+
+    /// @endcond
+
   };
 
-  template <typename X_SCALE_TYPE, typename Y_SCALE_TYPE>
-  class AreaGenerator : public CartesianLineGenerator<X_SCALE_TYPE, Y_SCALE_TYPE> {
+  /// An area is defined by two lines, with the area in between shaded
+  class AreaGenerator : public LineGenerator {
   public:
     AreaGenerator() {
       EM_ASM_ARGS({
@@ -259,9 +378,14 @@ namespace D3 {
     }
   };
 
-  class RadialLineGenerator : public LineGenerator {
+  class RadialLineGenerator : public BaseLineGenerator {
   public:
-    RadialLineGenerator();
+    RadialLineGenerator(){
+      EM_ASM_ARGS({
+  	    var new_line = d3.svg.line.radial();
+  	    js.objects[$0] = new_line;
+      }, this->id);
+    }
 
     void SetRadius(float radius) {
       EM_ASM_ARGS({js.objects[$0].radius($1);}, this->id, radius);
@@ -280,16 +404,14 @@ namespace D3 {
     }
   };
 
-  RadialLineGenerator::RadialLineGenerator() {
-    EM_ASM_ARGS({
-	  var new_line = d3.svg.line.radial();
-	  js.objects[$0] = new_line;
-  }, this->id);
-  }
-
   class RadialAreaGenerator : public RadialLineGenerator {
   public:
-    RadialAreaGenerator();
+    RadialAreaGenerator() {
+      EM_ASM_ARGS({
+     	var new_line = d3.svg.area.radial();
+  	    js.objects[$0] = new_line;
+      }, this->id);
+    }
 
     void SetInnerRadius(float radius) {
       EM_ASM_ARGS({js.objects[$0].innerRadius($1);}, this->id, radius);
@@ -324,16 +446,14 @@ namespace D3 {
     }
   };
 
-  RadialAreaGenerator::RadialAreaGenerator() {
-    EM_ASM_ARGS({
-   	  var new_line = d3.svg.area.radial();
-	  js.objects[$0] = new_line;
-    }, this->id);
-  }
-
   class ChordGenerator : public RadialAreaGenerator {
   public:
-    ChordGenerator();
+    ChordGenerator()  {
+      EM_ASM_ARGS({
+    	var new_line = d3.svg.chord();
+  	    js.objects[$0] = new_line;
+      }, this->id);
+    }
 
     template <typename T>
     void SetSource(T source) {
@@ -354,46 +474,40 @@ namespace D3 {
     }
   };
 
-  ChordGenerator::ChordGenerator() {
-    EM_ASM_ARGS({
-  	  var new_line = d3.svg.chord();
-	  js.objects[$0] = new_line;
-    }, this->id);
-  }
-
   class DiagonalGenerator : public ChordGenerator {
   public:
-    DiagonalGenerator();
+    DiagonalGenerator() {
+      EM_ASM_ARGS({
+  	    var new_line = d3.svg.diagonal();
+  	    js.objects[$0] = new_line;
+      }, this->id);
+    }
 
    void SetProjection(std::string projection) {
       D3_CALLBACK_METHOD_1_ARG(projection, projection.c_str())
     }
   };
 
-  DiagonalGenerator::DiagonalGenerator() {
-    EM_ASM_ARGS({
-	  var new_line = d3.svg.diagonal();
-	  js.objects[$0] = new_line;
-    }, this->id);
-  }
-
   //There is no documentation on this class in D3 other than that it exists
   //so I'm just making it exist here too.
   class DiagonalRadialGenerator : public ChordGenerator {
   public:
-    DiagonalRadialGenerator();
+    DiagonalRadialGenerator() {
+      EM_ASM_ARGS({
+  	    var new_line = d3.svg.area.diagonal.radil();
+  	    js.objects[$0] = new_line;
+      }, this->id);
+    }
   };
-
-  DiagonalRadialGenerator::DiagonalRadialGenerator() {
-    EM_ASM_ARGS({
-	  var new_line = d3.svg.area.diagonal.radil();
-	  js.objects[$0] = new_line;
-    }, this->id);
-  }
 
   class ArcGenerator : public RadialAreaGenerator {
   public:
-    ArcGenerator();
+    ArcGenerator()  {
+      EM_ASM_ARGS({
+  	    var new_line = d3.svg.arc();
+  	    js.objects[$0] = new_line;
+      }, this->id);
+    }
 
     void SetCornerRadius(float radius) {
       EM_ASM_ARGS({js.objects[$0].cornerRadius($1);}, this->id, radius);
@@ -422,13 +536,6 @@ namespace D3 {
     //TODO: Centroid (requires passing array back)
 
   };
-
-  ArcGenerator::ArcGenerator() {
-    EM_ASM_ARGS({
-	  var new_line = d3.svg.arc();
-	  js.objects[$0] = new_line;
-    }, this->id);
-  }
 
 }
 

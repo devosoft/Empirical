@@ -18,9 +18,19 @@ A Minimal Example
 =================
 
 D3 visualizations run in web browsers. That means that to use this wrapper, you need to compile
-your C++ code to Javascript. To see the visualization, you need to have an html file that loads
+your C++ code to Javascript, using Emscripten. To see the visualization, you need to have an html
+file that loads
 your Javascript. Then you need to open that html file in a web browser. Optionally, you might also
 have a CSS file that contains rules for how elements of your web page should look.
+
+This example assumes the following file structure:
+
+.. image:: images/d3_file_tree.png
+
+    :width: 200px
+    :align: center
+    :height: 100px
+    :alt: Directory structure for this example
 
 Here are the basics of what you need in order to get up and running. The easiest way to make a
 visualization is to use one of the pre-built visualizations. Later we'll get into writing your own.
@@ -32,6 +42,15 @@ C++ File
 The C++ file that you'll compile to Javascript. For this example, we'll use the
 Empirical web module to build the whole web page::
 
+  // Always include web_init.h when you're doing web stuff - it makes sure everything
+  // gets initialized right
+  #include "../Empirical/web/web_init.h"
+
+  // We're using a document object to arrange everything we're drawing.
+  #include "../Empirical/web/Document.h"
+
+  //Contains pre-built visualizations
+  #include "../Empirical/web/d3/visualizations.h"
 
   // The document object is in charge of all of the Javascript and html that goes in the
   // <div> element in the html. It gets created before main so that it stays in scope
@@ -54,8 +73,8 @@ Empirical web module to build the whole web page::
 Now we need to compile it::
 
   emcc my_program.cc -o my_program.js \ #.js extension tells Emscripten to compile to Javascript
-       --js-library Empirical/web/library_emp.js    \ #Include the Empirical Javascript library
-       --js-library Empirical/web/d3/library_d3.js  \ #Include Javascript library for D3 wrapper
+       --js-library ../Empirical/web/library_emp.js    \ #Include the Empirical Javascript library
+       --js-library ../Empirical/web/d3/library_d3.js  \ #Include Javascript library for D3 wrapper
        -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" \ #Tells Emscripten to export from C++
        -s ASSERTIONS=2 \ #Emscripten needs to know this
        -s DEMANGLE_SUPPORT=1 \ #Make names of variables in Javascript more readable
@@ -78,7 +97,7 @@ To tell the browser what to do with your Javascript, you need an html file::
             <title> My D3/Empirical visualization! </title>
 
             <!-- Optional - load a stylesheet -->
-            <link rel="stylesheet" type="text/css" href="my_style_sheet.css" />
+            <link rel="stylesheet" type="text/css" href="style_sheet.css" />
         </head>
 
         <!-- Everything else goes in the body -->
@@ -103,7 +122,7 @@ CSS File
 
 Optionally, a CSS file can be used to make elements look the way you want them to. Here's one that
 includes the necessary styles to make tooltips work (the html file above assumes it's called
-my_style_sheet.css, and is in the same directory as the html file)::
+style_sheet.css, and is in the same directory as the html file)::
 
   .d3-tip {
     line-height: 1;
@@ -137,15 +156,38 @@ my_style_sheet.css, and is in the same directory as the html file)::
 Running your visualization
 --------------------------
 
-Now to open up the page in a browser! Some browsers will let you open it up directly, but some will
+Now to open up the page in a browser! Some browsers will let you open the page up directly, but some will
 complain about the fact that you're trying to access a file on your computer (example.json) with
-Javascript. The easiest way around this is with the Python simpleHTTPServer library. Run the
-following command from the directory containing your html file::
+Javascript. The easiest way around this is with the Python simpleHTTPServer library. If you're using
+Python 2.x, run the following command from the directory containing your html file::
 
     python -m SimpleHTTPServer
 
-You can now open a browser to the server (http://localhost:8000, replacing 8000 with whatever port
-SimpleHTTPServer told you it was serving on).
+  .. image:: images/SimpleHTTPServer.png
+
+      :width: 200px
+      :align: center
+      :height: 100px
+      :alt: Using SimpleHTTPServer with Python2
+
+If you're running Python 3.x, use this command instead::
+
+    python -m http.server
+
+  .. image:: images/python3HTTPserver.png
+
+      :width: 200px
+      :align: center
+      :height: 100px
+      :alt: Using SimpleHTTPServer with Python3
+
+
+You can now open a browser to the server (http://localhost:8000, replacing 8000 with whatever
+number was after "port" in the output from the command). You should see a list of file names
+in the directory your terminal was open to when you ran the HTTP Server command (unless you
+happen to have a file named index.html, in which case you'll see the contents of that file).
+Assuming you ran this command from the "example" directory in the directory structure shown above,
+you should see "my_html.html" (or whatever you called your html file) on the list. Click on it.
 
 Ta-da! There's your visualization.
 
@@ -161,15 +203,34 @@ to do something new and exciting. Which brings us to the next section...
 Writing Your Own Visualization
 ==============================
 
-In order to build your own visualization, you need to understand a bit about how D3 works. Which
+To build your own visualization, you need to understand a bit about how D3 works. Which
 means you need to understand a bit about how Javascript and HTML work. I know, I know, the reason
 you're doing this all in C++ is that you want to avoid that, but I promise it's worth it if you
 want to make interactive visualizations that run on the web.
 
-When your browser loads a website, it takes the html for that page and turns it into a tree.
-[Picture here]. This tree is called the Document Object Model (DOM) and every set of tags (things
+When your browser loads a website, it takes the html for that page and turns it into a tree:
+
+.. image:: images/DOM.png
+
+  :width: 200px
+  :align: center
+  :height: 100px
+  :alt: The tree your browser builds from an html file
+
+
+This tree is called the Document Object Model (DOM) and every set of tags (things
 in angle brackets, like <head></head>) in the html is an element in it. Elements that are nested
-inside other elements are represented as children of those elements in the tree.
+inside other elements are represented as children of those elements in the tree. For instance, the
+tree pictured above is representing the following html ::
+
+  <html>
+    <head>
+    </head>
+    <body>
+      <div></div>
+      <div></div>
+    </body>
+  </html>
 
 Javascript manipulates the DOM. It adds elements, it removes elements, it moves them around, and it
 changes information about them. D3's primary innovation is that it binds data to DOM elements
@@ -244,6 +305,146 @@ Advanced note: You can also make selections based on classes with `D3::Select(.c
 Binding Data
 ------------
 
+In D3, you bind data to selections. Usually, you are binding that data because you to visualize it
+with SVG elements. So, usually the selection that we're binding data to is a selection of some type
+of SVG element on an SVG canvas. Something like this::
+
+  // Here we're using D3 to add the svg canvas to the document. We could also have
+  // Selected a pre-existing svg canvas that we put in the html, as we did in previous examples.
+  D3::Selection svg = D3::Select("body").Append("svg");
+
+  D3::Selection data_points = svg.SelectAll("circle");
+
+Wait, what? Why did we select all of the circles on the SVG canvas when we know for a fact that
+there aren't any, because we just created it? It turns out that D3 pays attention to the type of
+elements a selection contains. It knows that this is an empty selection for circles. So now we
+can bind our data to this selection and D3 will understand that each point should correspond to a
+circle. That means it can tell which data points don't have corresponding circles (in this case all
+of them). These data points make up the "enter selection," which we can access with the
+`selection.enter()` method. Most commonly, we use the enter selection to append elements for every
+data point. Here's what that all looks like together::
+
+  // Create example data
+  emp::vector<int> data = {1,2,3,4,5};
+
+  // Bind the data to the selection. We'll explain why this variable is named update in moment
+  D3::Selection update = data_points.Data(data);
+
+  // Get the enter selection (data without a DOM element)
+  D3::Selection enter = update.Enter();
+
+  // Give each data point in the enter selection a circle
+  // (as a shortcut, we could also have just used EnterAppend("circle") on the previous line)
+  enter.Append("circle");
+
+Our circles won't show up if we don't give them cx, cy, and r attributes. Let's set them to be
+equal to each element's corresponding data value. We can do this by passing `SetAttr()` a function
+as its second object. Since passing functions around it much more common in Javascript than in C++,
+we'll talk a bit more about the ins and outs a bit later. For now, you just need to know that
+`SetAttr()` accepts a function that takes the data bound to the element and returns the value you
+want to set an attribute to. Technically,
+Javascript is going to pass it three arguements, so you should write your C++ function to accept
+three parameters, or your compiler will probably throw a tantrum ::
+
+  // For now, we're going to use the simplest calllback function of the simple:
+  // one that returns exactly the data value that it was given.
+  std::function<int(int, int, int)> return_d = [](int d, int i, int j){return d;};
+
+  // Set cx (the x coordinate of the circle's center), cy (the y coordinate of the circle's
+  // center), and r (the radius) to all be the return of the return_d function (i.e. the bound data)
+  enter.SetAttr("cx", return_d).SetAttr("cy", return_d).SetAttr("r", return_d);
+
+Now we have 5 circles, with the numbers from 1-5 bound to them as data (one number per circle).
+
+What if we get more data? ::
+
+  // Change data
+  data = {1, 2, 3, 4, 5, 6, 7};
+
+  // Select all of the circles and bind the new data
+  update = svg.SelectAll("circle").Data(data);
+
+  // This time the enter selection only contains two data points: 6 and 7
+  enter = update.Enter();
+
+  // Add new circles for the new data and set attributes appropriately
+  enter.Append("circle").SetAttr("cx", return_d).SetAttr("cy", return_d).SetAttr("r", return_d);
+
+Now we have 7 circles. We added circles for the ones that didn't already have circles.
+
+What happens if our dataset shrinks? We can use the `selection.Exit()` method. This returns the
+"exit selection". In the same way the enter selection contains all of the data points without
+circles, the exit selection contains all of the circles without data points. Usually we want to
+remove them::
+
+  // Change data
+  data = {1,2,3,4};
+
+  // Select all of the circles and bind the new data
+  update = svg.SelectAll("circle").Data(data);
+
+  // The enter selection would be empty, but the exit selection has three things in it: 5, 6, and 7
+  exit = update.Exit();
+
+  // Remove everything in the exit selection from the DOM
+  // (as a shortcut, we could have just used ExitRemove() on the previous line)
+  exit.Remove();
+
+Now we're down to four circles.
+
+What happens if our data is replaced with four completely different numbers? The enter and exit
+selections will be empty (every data point has a circle and every circle has a data point), but
+the circles' attributes won't correspond to the right data anymore.
+Now it's finally time to use that "update"
+variable we keep making. That variable has been holding what's called the "update selection."
+The update selection is directly returned by the `selection.data()` method, and it contains all of
+the data points associated with circles that already existed before the data was bound. We can
+use it to re-set the circles' attributes, based on the new data::
+
+  // Change data
+  data = {10, 11, 12, 13};
+
+  // Select all of the circles and bind the new data
+  update = svg.SelectAll("circle").Data(data);
+
+  // Reset the attributes of the update selection
+  update.SetAttr("cx", return_d).SetAttr("cy", return_d).SetAttr("r", return_d);
+
+Congratulations! You've now used d3's popular enter-update-exit pattern. For a more thorough
+discussion, see [this article](https://bost.ocks.org/mike/join/) by the creator of d3.js.
+
+There's one other thing you should know about binding data. Thus far, we've been matching data with
+DOM elements sequentially (the first data point in the array gets paired with the first circle in
+the selection, and so on). But sometimes you'd like to keep the same circle corresponding to the
+same data point (this is especially important if you're applying transitions). To acheive this,
+you can pass `selection.Data()` a "key" function that takes a piece of data (and optionally a
+position in the array/selection) and returns a string. Data points are then matched with DOM
+elements based on whether the string returned by running the function on the data point matches
+the string returned by running the function on the data bound to the element. ::
+
+  // Change data (re-arrange three elements and replace the fourth)
+  data = {13, 12, 11, 8}
+
+  // Select all of the circles and bind the new data with a key function
+  // The key function supplied here is a lambda function that, like the return_d function
+  // we already wrote, just returns the value of the bound data
+  // The update selection contains circles for 11, 12, and 13, still associated
+  // with the correct data (so we don't need to reset the attributes)
+  update = svg.SelectAll("circle").Data(data, [](int d, int i){return d};);
+
+  // The enter selection contains 8
+  // EnterAppend just combines Enter() and Append()
+  // In Javascript, it's common to chain methods, as is done below. Most Selection methods in the
+  // D3 wrapper return the selection, so that we can chain methods here too
+  // The code below does exactly the same thing we did to the other enter selections
+  update.EnterAppend("circle")
+        .SetAttr("cx", return_d)
+        .SetAttr("cy", return_d)
+        .SetAttr("r", return_d);
+
+  // The exit selection contains 10
+  update.ExitRemove();
+
 Changing Elements' Traits
 -------------------------
 
@@ -277,22 +478,51 @@ of commonly used traits in each category:
 
 - **checked** - a property indicating whether or not a checkbox is checked
 
-
+All of these functions take two arguemnts: a string indicating the name of the trait being changed
+and the value to change it to. This vale can be a constant, such as a number, string, or color
+(depending on the trait). They also accept functions (simple example above, explained in more
+detail below) that allow you to set the trait based off of each element's bound data. Javascript
+will pass these functions three parameters: the value bound as data, the index of the element in
+the selection, and a third element that we don't currently have a good way to translate to C++
+(use an int as a placeholder in your function definition so C++ doesn't throw a tantrum).
 
 Transitions
 -----------
 
+One of the most powerful parts of D3 is the ease with which it allows you to animate your data.
+This is accomplished with transitions. The most common way to make a transition is to call the
+`selection.MakeTransition()` method on a selection containing all of the elements you want to
+animate (note: in Javascript, the method is just selection.transition(), because Javascript is
+less finicky about name collisions). You can then use the `attr()` and `style()` methods on the
+transition, just as you would on a selection, and the change will be animated. Note that the
+wrapper also allows you to set properties, html, and classes on a transition, but D3 doesn't know
+how to animate changes in these, so they will just happen at the end of the transition. Other
+operations, such as appending new elements, are not allowed on transitions, because there isn't a
+clear way to animate them.
 
-[Either a bunch of stuff about D3 goes here, or a bunch of links to other resources]
+Some functions in Empirical's D3 wrapper that accept selections will also select transitions,
+allowing you to choose to have their effects be animated, rather than occuring instantaneously
+(which can look choppy in many visualizations).
 
-Writing Callback Functions
-==========================
+Passing Functions as Arguments
+==============================
 
-D3.js makes heavy use of callback functions. Most commonly, this happens when you're trying to set
-attributes of graphical elements based on the data that is bound to them; you pass a function that
+In Javascript, it's very common to pass functions as arguments to other functions in order to
+customize their behavior. This comes, in part, from the fact that a lot of Javascript code is
+exectured asynchronously. Since the goal of most Javscript is to run a web page, Javascript needs
+to respond to events such as user interactions (clicking, scrolling, etc.). It also needs to avoid
+delaying everything on the page just because there's a picture it's trying to load from a server
+that's down. As a result, functions that require waiting for something to happen often accept a
+"callback function" as an argument. This function will get run when the function it was passed to
+is done. This way of programming can take some getting used to for people who are more used to
+more linear programming languages, but it's hard to avoid when writing web code.
+
+D3.js makes heavy use of functions-as-arguments. Most commonly, this happens when you're trying to
+set attributes of graphical elements based on the data that is bound to them (as demonstrated in
+the section on binding data); you pass a function that
 takes a piece of data as an argument and returns the attribute value.
 
-In Empirical, there are a number of ways to pass callback functions into d3 methods:
+In Empirical, there are a number of ways to pass functions as arguments into d3 methods:
 
 - Write the callback function as a regular C++ function, a
   `C++ lambda function <http://en.cppreference.com/w/cpp/language/lambda>`_,
@@ -302,7 +532,7 @@ In Empirical, there are a number of ways to pass callback functions into d3 meth
       int times_two(int d, int i, int j) {return d*2;};
 
       int main() {
-        // Create a selection of circles on an svg canvas (assumes svg is already created)
+        // Create an empty selection for circles on an svg canvas (assumes svg is already created)
         // Bind data [1,2,3] to selection, and add a circle for each data point
         D3::Selection s = Select("svg")
                             .SelectAll("circle")
@@ -312,6 +542,11 @@ In Empirical, there are a number of ways to pass callback functions into d3 meth
         // We can use either of the following two lines to set the circles' radii to be equal
         // to two times their data point (1, 2, or 3):
         s.SetAttr("r", times_two); //Use normal function (could also be a std::function object)
+
+        // Javascript will pass this function three things: the data (d) bound to an element (an int,
+        // in this case), an int (i) indicating the position of the element in the selection, and a
+        // third item that you don't need to worry about yet, but that requires an
+        // int parameter (j) as a placeholder
         s.SetAttr("r", [](int d, int i, int j){return d * 2;});
 
 
@@ -344,8 +579,8 @@ But most real-world data points are more complex than that (e.g. they may contai
 multiple variables). Javascript handles such data nicely by using
 `JSON objects <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON>`_.
 You can write functions in C++ that accept JSON data from Javascript, but you have to tell C++
-what data it should be expecting. Empirical introspective tuple structs provide a convenient way to
-do that. ::
+what data it should be expecting. An Empirical feature called introspective tuple structs provide a
+convenient way to do that. ::
 
   struct JSONData {
     EMP_BUILD_INTROSPECTIVE_TUPLE( int, x,
@@ -354,10 +589,14 @@ do that. ::
                                   )
   };
 
-  int get_x(JSONData d, int i, int j) {return d.X();};
+  int get_x(JSONData d, int i, int j) {return d.x();};
 
-  //Assume s is a selection with a JSON dataset already bound to it
-  s.SetAttr("x", get_x);
+  // Assume s is a selection with a dataset already bound to it, and that that dataset contains
+  // JSON objects with the attributes described in the JSONData struct (x, y, and name).
+  // Set the "cx" attribute of the circle (the x position of the circle on your screen, in pixels)
+  // to the return of calling get_x on the data bound to each circle (i.e. the x value stored in
+  // the data point bound to a given circle)
+  s.SetAttr("cx", get_x);
 
 
 Under the Hood (for the curious, developers, and people trying to do weird stuff)
@@ -370,6 +609,16 @@ that are being represented in C++ are stored in a Javascript array called `js.ob
 id is actually the index of the corresponding Javascript object in the `js.objects` array. Methods
 of that object reach into Javascript and call the corresponding method on the appropriate object.
 Some higher-level functions may call more than one d3 function.
+
+The other piece of complexity that is hidden from the user is the translation between JSON objects
+in Javascript and objects created with EMP_BUILD_INTROSPECTIVE_TUPLE. This is all handled by
+JSWrap, which identifies objects created with EMP_BUILD_INTROSPECTIVE_TUPLE by looking for a member
+called n_fields. n_fields is created by EMP_BUILD_INTROSPECTIVE_TUPLE and indicates how many fields
+an object has. All conversion from C++ functions to javascript functions is handled by JSWrap (if
+you pass a function directly to a d3 method, JSWrap is called behind the scenes). This is why it is
+potentially more efficient to wrap functions once and pass the Javascript name as a string than to
+keep passing them as C++ functions and re-wrapping them every time. Rigorous tests on how much of a
+slow-down this introduces have not been conducted.
 
 Things to watch out for:
 

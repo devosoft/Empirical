@@ -8,7 +8,10 @@
 
 namespace D3 {
 
-  //Base class to inherit from - should never be made stand-alone
+  /// Scales in D3 are functions that take input values and map them to output based on
+  /// a scaling function. They are often used to map data calues to x, y coordinates in pixels
+  /// describing where on the screen elements should be placed.
+  /// This is a base class to inherit from - should never be made stand-alone
   class Scale : public D3_Base {
   protected:
     Scale(int id) : D3_Base(id){;};
@@ -16,29 +19,36 @@ namespace D3 {
   public:
     Scale() {;}
 
-    //Decoy constructor so we don't construct extra base scales
+    /// Decoy constructor so we don't construct extra base scales
     Scale(bool derived){;};
 
+    /// Set the output values corresponding to values in the domain. Output for values in between
+    /// will be interpolated with a function determined by the type of the scale.
+    /// Array should contain same number of elements as the one used to set the domain.
     template <typename T, size_t SIZE>
     void SetRange(std::array<T,SIZE> values) {
       emp::pass_array_to_javascript(values);
       EM_ASM_ARGS({js.objects[$0].range(emp_i.__incoming_array);}, this->id);
     }
 
+    /// Set the input values corresponding to values in the range.
+    /// Array should contain same number of elements as the one used to set the range.
     template <typename T, size_t SIZE>
     void SetDomain(std::array<T,SIZE> values) {
       emp::pass_array_to_javascript(values);
       EM_ASM_ARGS({js.objects[$0].domain(emp_i.__incoming_array);}, this->id);
     }
 
+    /// Make a copy of this scale
     Scale Copy() {
       int new_id = EM_ASM_INT_V({return js.objects.length});
       EM_ASM_ARGS({
-	  js.objects.push(js.objects[$0].copy());
-	}, this->id);
+	    js.objects.push(js.objects[$0].copy());
+	  }, this->id);
       return Scale(new_id);
     }
 
+    /// Calculate the ouput for [input], based on the scale's scaling function
     double ApplyScale(double input) {
       //TODO: make this work for other types
       return EM_ASM_DOUBLE({return js.objects[$0]($1);},this->id, input);
