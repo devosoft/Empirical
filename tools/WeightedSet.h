@@ -63,8 +63,14 @@ namespace emp {
     double GetWeight() const { return weight[0].tree; }
     double GetWeight(int id) const { return weight[id].item; }
 
+    void Resize(int new_size) {
+      weight.resize(new_size);  // Update the size (new weights default to zero)
+      Refresh();                // Update the tree weights.
+    }
+
     // Standard library compatibility
     size_t size() const { return weight.size(); }
+    void resize(int new_size) { Resize(new_size); }
 
     void Adjust(int id, const double new_weight) {
       // Update this node.
