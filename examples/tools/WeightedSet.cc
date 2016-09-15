@@ -12,7 +12,9 @@
 
 int main()
 {
-  emp::WeightedSet test_set(10);
+  const int SET_SIZE = 10000;
+
+  emp::WeightedSet test_set(SET_SIZE);
   test_set[0] = 0.0;
   test_set[1] = 0.5;
   test_set[2] = 1.0;
@@ -34,4 +36,18 @@ int main()
   for (int id = 0; id < 10; id++) {
     std::cout << id << " : " << count[id] << std::endl;
   }
+
+  std::cout << "Start weight = " << test_set.GetWeight() << std::endl
+            << "Refresh ratio = " << test_set.Refresh() << std::endl
+            << "End weight = " << test_set.GetWeight() << std::endl;
+
+  std::cout << "\n... adjusting set weights ...\n";
+  for (int i = 0; i < 100'000'000; i++) {
+    test_set[random.GetInt(SET_SIZE)] = random.GetDouble(0.0,5000.0);
+  }
+
+  std::cout << "Start weight = " << test_set.GetWeight() << std::endl
+            << "Refresh ratio = " << test_set.Refresh() << std::endl
+            << "End weight = " << test_set.GetWeight() << std::endl;
+
 }
