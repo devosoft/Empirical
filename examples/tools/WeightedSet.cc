@@ -42,7 +42,7 @@ int main()
             << "End weight = " << test_set.GetWeight() << std::endl;
 
   std::cout << "\n... adjusting set weights ...\n";
-  for (int i = 0; i < 100'000'000; i++) {
+  for (int i = 0; i < 100000000; i++) {
     test_set[random.GetInt(SET_SIZE)] = random.GetDouble(0.0,5000.0);
   }
 
