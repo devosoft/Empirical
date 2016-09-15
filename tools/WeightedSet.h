@@ -102,6 +102,23 @@ namespace emp {
     Proxy operator[](int id) { return Proxy(*this,id); }
     double operator[](int id) const { return weight[id].item; }
 
+    WeightedSet & operator+=(WeightedSet & in_set) {
+      emp_assert(weight.size() == in_set.weight.size());
+      for (auto i = 0; i < in_set.size(); i++) {
+        weight[i].item += in_set.weight[i].item;
+      }
+      Refresh();
+      return *this;
+    }
+    WeightedSet & operator-=(WeightedSet & in_set) {
+      emp_assert(weight.size() == in_set.weight.size());
+      for (auto i = 0; i < in_set.size(); i++) {
+        weight[i].item -= in_set.weight[i].item;
+      }
+      Refresh();
+      return *this;
+    }
+
     // Update all tree-weights to cleanup accumulated round-off error.
     double Refresh() {
       const double old_total = weight[0].tree;
