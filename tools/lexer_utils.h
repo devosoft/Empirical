@@ -34,11 +34,11 @@
 namespace emp {
 
   // Simple echo's
-  static const DFA & to_DFA(const DFA & dfa) { return dfa; }
-  static const NFA & to_NFA(const NFA & nfa) { return nfa; }
+  static inline const DFA & to_DFA(const DFA & dfa) { return dfa; }
+  static inline const NFA & to_NFA(const NFA & nfa) { return nfa; }
 
   // Systematic conversion of NFA to DFA...
-  static DFA to_DFA(const NFA & nfa, int keep_invalid=false) {
+  static inline DFA to_DFA(const NFA & nfa, int keep_invalid=false) {
     DFA dfa(1);                               // Setup zero to be the start state.
     std::map<std::set<int>, int> id_map;      // How do nfa state sets map to dfa states?
     std::vector<std::set<int>> state_stack;   // Which states still need to be explored?
@@ -85,7 +85,7 @@ namespace emp {
   }
 
   // Systematic up-conversion of DFA to NFA...
-  static NFA to_NFA(const DFA & dfa) {
+  static inline NFA to_NFA(const DFA & dfa) {
     NFA nfa(dfa.GetSize());
     for (int from = 0; from < dfa.GetSize(); from++) {
       const auto & t = dfa.GetTransitions(from);
@@ -132,7 +132,7 @@ namespace emp {
     // BitVector state_found(dfa.GetSize());
 
     int next_id = 0;
-    while (next_id < traverse_set.size()) {
+    while (next_id < (int) traverse_set.size()) {
       const auto cur_status = traverse_set[next_id++];     // pair: cur state and cur string
       const auto & t = dfa.GetTransitions(cur_status.state); // int array of TO states (or -1 if none)
       for (int sym = 0; sym < (int) t.size(); sym++) {
@@ -140,7 +140,7 @@ namespace emp {
         if (next_state == -1) continue;                     // Ignore non-transitions
         std::string cur_str(cur_status.sequence);
         cur_str += (char) sym;                              // Figure out current string
-        if (cur_str.size() >= min_size) {                   // If the DFA is big enough...
+        if (min_size <= (int) cur_str.size() ) {                   // If the DFA is big enough...
           // if (state_found[next_state]) continue;            //  skip if we've already made it here
           if (dfa.IsStop(next_state)) return cur_str;       //  return if this is a legal answer
           // state_found[next_state] = true;                   //  else, don't come again.

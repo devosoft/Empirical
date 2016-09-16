@@ -24,26 +24,27 @@ namespace evo {
   class PopulationManager_Base {
   protected:
     using ptr_t = ORG *;
-    emp::vector<ORG *> pop;
+    using pop_t = emp::vector<ORG *>;
+    pop_t pop;
 
     Random * random_ptr;
 
   public:
-    PopulationManager_Base() { ; }
-    ~PopulationManager_Base() { ; }
+    PopulationManager_Base(const std::string & world_name) { (void) world_name; }
+    ~PopulationManager_Base() { Clear(); }
 
     // Allow this and derived classes to be identified as a population manager.
     static constexpr bool emp_is_population_manager = true;
     static constexpr bool emp_has_separate_generations = false;
     using value_type = ORG*;
 
-    friend class PopulationIterator<PopulationManager_Base<ORG> >;
+    friend class PopulationIterator< PopulationManager_Base<ORG> >;
     using iterator = PopulationIterator<PopulationManager_Base<ORG> >;
 
     ptr_t & operator[](int i) { return pop[i]; }
     const ptr_t operator[](int i) const { return pop[i]; }
-    iterator begin(){return iterator(this, 0);}
-    iterator end(){return iterator(this, pop.size());}
+    iterator begin() { return iterator(this, 0); }
+    iterator end() { return iterator(this, pop.size()); }
 
     uint32_t size() const { return pop.size(); }
     void resize(int new_size) { pop.resize(new_size); }
@@ -53,7 +54,6 @@ namespace evo {
     void SetRandom(Random * r) { random_ptr = r; }
 
     void Setup(Random * r){ SetRandom(r); }
-
 
     void Print(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout,
               std::string empty="X", std::string spacer=" ") {
@@ -71,9 +71,9 @@ namespace evo {
       }
     }
 
-    // AddOrg and ReplaceOrg should be the only ways new organisms come into a population.
-    // AddOrg inserts them into the end of the designated population.
-    // ReplaceOrg places them at a specific position, replacing anyone who may already be there.
+    // AddOrg and AddOrgBirth should be the only ways new organisms come into a population.
+    // AddOrg inserts an organism from OUTSIDE of the population.
+    // AddOrgBirth inserts an organism that was born INSIDE the population.
     int AddOrg(ORG * new_org) {
       const int pos = pop.size();
       pop.push_back(new_org);
@@ -88,7 +88,7 @@ namespace evo {
 
     void Clear() {
       // Delete all organisms.
-      for (ORG * m : pop) delete m;
+      for (ORG * org : pop) if (org) delete org;
       pop.resize(0);
     }
 
@@ -97,8 +97,8 @@ namespace evo {
     // Execute() redirect to all organisms in the population, forwarding arguments.
     template <typename... ARGS>
     void Execute(ARGS... args) {
-      for (ORG * m : pop) {
-        if (m) m->Execute(std::forward<ARGS>(args)...);
+      for (ORG * org : pop) {
+        if (org) org->Execute(std::forward<ARGS>(args)...);
       }
     }
 
@@ -118,6 +118,66 @@ namespace evo {
     }
   };
 
+
+  // A population manager that is defined elsewhere, for use with plugins.
+
+  template <typename ORG=int>
+  class PopulationManager_Plugin : public PopulationManager_Base<ORG> {
+  protected:
+    using PopulationManager_Base<ORG>::pop;
+
+    // Most of the key functions in the population manager can be interfaced with symbols.  If you
+    // need to modify the more complex behaviors (such as Execute) you need to create a new
+    // derrived class from PopulationManager_Base, which is also legal in a plugin.
+    Signal<emp::vector<ORG*>&> sig_clear;
+    Signal<emp::vector<ORG*>&> sig_update;
+    Signal<emp::vector<ORG*>&, ORG*, int&> sig_add_org;            // args: new org, return: offspring pos
+    Signal<emp::vector<ORG*>&, ORG*, int, int&> sig_add_org_birth; // args: new org, parent pos, return: offspring pos
+
+  public:
+    PopulationManager_Plugin(const std::string & world_name)
+    : PopulationManager_Base<ORG>(world_name)
+    , sig_clear(to_string(world_name, "::pop_clear"))
+    , sig_update(to_string(world_name, "::pop_update"))
+    , sig_add_org(to_string(world_name, "::pop_add_org"))
+    , sig_add_org_birth(to_string(world_name, "::pop_add_org_birth"))
+    { ; }
+    ~PopulationManager_Plugin() { Clear(); }
+
+    LinkKey OnClear(const std::function<void(emp::vector<ORG*>&)> & fun) {
+      return sig_clear.AddAction(fun);
+    }
+    LinkKey OnUpdate(const std::function<void(emp::vector<ORG*>&)> & fun) {
+      return sig_update.AddAction(fun);
+    }
+    LinkKey OnAddOrg(const std::function<void(emp::vector<ORG*>&, ORG*, int&)> & fun) {
+      return sig_add_org.AddAction(fun);
+    }
+    LinkKey OnAddOrgBirth(const std::function<void(emp::vector<ORG*>&, ORG*, int, int&)> & fun) {
+      return sig_add_org_birth.AddAction(fun);
+    }
+
+    void Clear() {
+      if (sig_clear.GetNumActions()) {
+        sig_clear.Trigger(pop);
+      } else { // If no actions are linked to sig_clear, use default.
+        PopulationManager_Base<ORG>::Clear();
+      }
+    }
+    void Update() { sig_update.Trigger(pop); }
+
+    int AddOrg(ORG * new_org) {
+      int new_pos;
+      sig_add_org.Trigger(pop, new_org, new_pos);
+      return new_pos;
+    }
+    int AddOrgBirth(ORG * new_org, int parent_pos) {
+      int offspring_pos;
+      sig_add_org_birth.Trigger(pop, new_org, parent_pos, offspring_pos);
+      return offspring_pos;
+    }
+  };
+
   // A standard population manager for using synchronous generations in a traditional
   // evolutionary algorithm setup.
 
@@ -128,7 +188,8 @@ namespace evo {
     using PopulationManager_Base<ORG>::pop;
 
   public:
-    PopulationManager_EA() { ; }
+    PopulationManager_EA(const std::string & world_name)
+    : PopulationManager_Base<ORG>(world_name) { ; }
     ~PopulationManager_EA() { Clear(); }
 
     static constexpr bool emp_has_separate_generations = true;
@@ -174,8 +235,9 @@ namespace evo {
     int bottleneck_size;
     int num_bottlenecks;
   public:
-    PopulationManager_SerialTransfer()
-      : max_size(1000), bottleneck_size(100), num_bottlenecks(0) { ; }
+    PopulationManager_SerialTransfer(const std::string & world_name)
+    : PopulationManager_Base<ORG>(world_name)
+    , max_size(1000), bottleneck_size(100), num_bottlenecks(0) { ; }
     ~PopulationManager_SerialTransfer() { ; }
 
     int GetMaxSize() const { return max_size; }
@@ -190,7 +252,7 @@ namespace evo {
     void ConfigPop(int m, int b) { max_size = m; bottleneck_size = b; }
 
     int AddOrgBirth(ORG * new_org, int parent_pos) {
-      if (pop.size() >= max_size) {
+      if ((int) pop.size() >= max_size) {
         DoBottleneck(bottleneck_size);
         ++num_bottlenecks;
       }
@@ -216,7 +278,10 @@ namespace evo {
     int ToID(int x, int y) const { return y*width + x; }
 
   public:
-    PopulationManager_Grid() { ConfigPop(10,10); }
+    PopulationManager_Grid(const std::string & world_name)
+    : PopulationManager_Base<ORG>(world_name) {
+      ConfigPop(10,10);
+    }
     ~PopulationManager_Grid() { ; }
 
     int GetWidth() const { return width; }
@@ -230,7 +295,7 @@ namespace evo {
     int AddOrg(ORG * new_org) {
       emp::vector<int> empty_spots = GetValidOrgIndices();
       const int pos = random_ptr->GetInt((int) empty_spots.size());
-      
+
       pop[empty_spots[pos]] = new_org;
       return empty_spots[pos];
     }
@@ -303,6 +368,7 @@ namespace evo {
     vector<int> pool_sizes;                     // How large is each pool?
     std::map<int, vector<int> > connections;    // Which other pools can each position access?
     int org_count = 0;                          // How many organisms have beeen inserted into the population?
+    int org_count;                              // How many organisms have beeen inserted into the population?
     int r_upper;                                // How large can a random pool size be?
     int r_lower;                                // How small can a random pool size be?
     vector<int> pool_end;                       // Where does the next pool begin? First pool begins at 0.
@@ -310,7 +376,8 @@ namespace evo {
     vector<int> pool_id;
 
   public:
-    PopulationManager_Pools() : org_count(0) { ; }
+    PopulationManager_Pools(const std::string & world_name)
+    : PopulationManager_Base<ORG>(world_name), org_count(0) { ; }
     ~PopulationManager_Pools() { ; }
 
     int GetPoolCount() const { return pool_count; }
@@ -336,7 +403,6 @@ namespace evo {
       connections = *c;
       mig_rate = mg;
       pool_end = {};
-      
       vector<int> temp (pop_size, 0);
       pool_id = temp;
 
@@ -424,7 +490,7 @@ namespace evo {
         InsertPool = parent_conns[conn_id];
         }
         else{ InsertPool = pool_id[parent_pos]; }
-      
+
       int range_l = InsertPool ? pool_end[InsertPool-1] : 0;
       int range_u = pool_end[InsertPool];
 
@@ -436,11 +502,12 @@ namespace evo {
     }
  };
 
-  using PopBasic = PopulationManager_Base<int>;
-  using PopEA    = PopulationManager_EA<int>;
-  using PopST    = PopulationManager_SerialTransfer<int>;
-  using PopGrid  = PopulationManager_Grid<int>;
-  using PopPool  = PopulationManager_Pools<int>;
+  using PopBasic  = PopulationManager_Base<int>;
+  using PopPlugin = PopulationManager_Plugin<int>;
+  using PopEA     = PopulationManager_EA<int>;
+  using PopST     = PopulationManager_SerialTransfer<int>;
+  using PopGrid   = PopulationManager_Grid<int>;
+  using PopPool   = PopulationManager_Pools<int>;
 
 }
 }

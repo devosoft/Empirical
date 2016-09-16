@@ -84,4 +84,36 @@ int main()
   }
   std::cout << std::endl;
   grid_world.Print();
+  std::cout << std::endl;
+
+
+  // Let's try to build a world with a plug-in population manager.
+  // We will have each organism replaced on birth be on the left side of parent.
+  evo::World<int, evo::PopPlugin> pi_world(random, "pi_world");
+
+  pi_world.popM.OnClear( [](emp::vector<int*>& pop) {
+    for (auto x:pop) if(x) delete x;
+    pop.resize(0);
+    for (int i=0;i<20;i++) pop.push_back(new int (i+100));
+  });
+
+  pi_world.popM.OnAddOrg( [](emp::vector<int*>& pop, int* org, int& pos) {
+    pos=pop.size(); pop.push_back(org);
+  });
+
+  pi_world.popM.OnAddOrgBirth( [](emp::vector<int*>& pop, int* org, int parent_pos, int& pos) {
+    pos=parent_pos-1; if (pos < 0) pos = pop.size() - 1;
+    if (pop[pos]) delete pop[pos];
+    pop[pos] = org;
+  });
+
+  pi_world.Clear();
+  std::cout << "Starting PIWorld size: " << pi_world.GetSize() << std::endl;
+  for (int i = 0; i < pi_world.GetSize(); i++) std::cout << pi_world[i] << " ";
+  std::cout << std::endl;
+
+  pi_world.TournamentSelect([](int * i){ return (double) *i; }, 2, 100);
+  std::cout << "Post-Tourney Size = " << pi_world.GetSize() << std::endl;
+  for (int i = 0; i < pi_world.GetSize(); i++) std::cout << pi_world[i] << " ";
+  std::cout << std::endl;
 }

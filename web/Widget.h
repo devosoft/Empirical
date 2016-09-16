@@ -26,9 +26,9 @@
 
 #include <string>
 
-#include "../emtools/init.h"
 #include "../tools/mem_track.h"
 #include "../tools/vector.h"
+#include "init.h"
 
 #include "Attributes.h"
 #include "events.h"
@@ -138,6 +138,7 @@ namespace web {
 
     bool operator==(const Widget & in) const { return info == in.info; }
     bool operator!=(const Widget & in) const { return info != in.info; }
+
     operator bool() const { return info != nullptr; }
 
     // An active widget makes live changes to the webpage (once document is ready)

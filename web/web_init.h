@@ -10,7 +10,7 @@
 #ifndef EMP_WEB_INIT_H
 #define EMP_WEB_INIT_H
 
-#include "../emtools/init.h"
+#include "init.h"
 
 namespace emp {
 namespace web {

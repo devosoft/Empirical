@@ -69,7 +69,7 @@ namespace emp {
         for (const auto & name : arg_names) {
           if (max_name_size < (int) name.size()) max_name_size = (int) name.size();
         }
-        for (int i = 0; i < arg_names.size(); i++) {
+        for (int i = 0; i < (int) arg_names.size(); i++) {
           os << arg_names[i]
              << std::string(max_name_size + 1 - (int) arg_names[i].size(), ' ')
              << arg_descs[i]
@@ -82,7 +82,7 @@ namespace emp {
       bool TestUnknown(std::ostream & os=std::cerr) {
         if (args.size() > 1) {
           os << "Unknown args:";
-          for (int i = 1; i < args.size(); i++) os << " " << args[i];
+          for (int i = 1; i < (int) args.size(); i++) os << " " << args[i];
           os << std::endl;
           PrintHelp(os);
           return false;

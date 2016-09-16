@@ -41,8 +41,8 @@
 #include <functional>
 #include <map>
 
-#include "../emtools/html5_events.h"
-#include "../emtools/JSWrap.h"
+#include "html5_events.h"
+#include "JSWrap.h"
 
 namespace emp {
 namespace web {

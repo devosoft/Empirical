@@ -74,7 +74,7 @@ namespace emp {
 
     // Return the position in the symbols vector where this name is found; else return -1.
     int GetSymbolPos(const std::string & name) const {
-      for (auto i = 0; i < symbols.size(); i++) {
+      for (int i = 0; i < (int) symbols.size(); i++) {
         if (symbols[i].name == name) return i;
       }
       return -1;

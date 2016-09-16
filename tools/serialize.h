@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_SERIALIZE_H
-#define EMP_SERIALIZE_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  Tools to save and load data from classes.
 //
@@ -50,7 +46,9 @@
 //  * Setup a (compressed) binary saved form in DataPods.
 //  * Setup promised synergistic interactions with config and tuple_struct to auto
 //    store and load without any additional effort on the part of the library user.
-//
+
+#ifndef EMP_SERIALIZE_H
+#define EMP_SERIALIZE_H
 
 #include <iostream>
 
@@ -66,7 +64,7 @@ namespace serialize {
     bool own_os;
     bool own_is;
 
-    void ClearData() { 
+    void ClearData() {
       if (own_os && os) delete os;
       if (own_is && is) delete is;
     }
@@ -95,7 +93,7 @@ namespace serialize {
     std::ostream & OStream() { return *os; }
     std::istream & IStream() { return *is; }
   };
-  
+
 
   // The StoreVar function takes a DataPod and a variable and stores that vatiable to
   // the pod.  The third argument (bool vs. int) will receive a bool, and thus bool versions
@@ -121,7 +119,7 @@ namespace serialize {
     pod.OStream() << ':';
     emp_assert(pod.OStream());
   }
-  
+
   // As a fallback, just send the saved object to the DataPod's output stream.
   template <typename T>
   void StoreVar(DataPod & pod, const T & var, int) {
@@ -129,7 +127,7 @@ namespace serialize {
     pod.OStream() << var << ':';
     emp_assert(pod.OStream());
   }
-  
+
 
   // The SetupLoad() function determines what type of information a constructor needs from
   // a DataPod (based on the objects types) and returns that information.  By default, the
@@ -160,12 +158,12 @@ namespace serialize {
     emp_assert(pod.IStream() && "Make sure the DataPod is still okay.");
     return var;
   }
-  
+
   // Use special load for vectors of arbitrary type.
   template <typename T>
   std::vector<T> SetupLoad(DataPod & pod, std::vector<T> *, bool) {
     const uint32_t v_size(SetupLoad(pod, &v_size, true));
-    std::vector<T> var; 
+    std::vector<T> var;
 
     // Create vector of correct size and create elements with pod.
     for (int i = 0; i < v_size; i++) {
@@ -174,7 +172,7 @@ namespace serialize {
     emp_assert(pod.IStream() && "Make sure the DataPod is still okay.");
     return var;
   }
-  
+
 
 
   // Setup for a variadic Store() function that systematically save all variables in a DataPod.
@@ -182,8 +180,8 @@ namespace serialize {
   namespace internal {
 
     // Base implementaion to specialize on.
-    template <typename... IGNORE> struct serial_impl;  
-  
+    template <typename... IGNORE> struct serial_impl;
+
     // Specialized to recurse, storing or loading individual vars.
     template <typename FIRST_TYPE, typename... OTHER_TYPES>
     struct serial_impl<FIRST_TYPE, OTHER_TYPES...> {
@@ -192,18 +190,18 @@ namespace serialize {
         serial_impl<OTHER_TYPES...>::Store(pod, others...);
       }
     };
-    
+
     // End condition for recursion when no vars remaining.
     template <> struct serial_impl<> {
       static void Store(DataPod &) { ; }
     };
   }
-  
+
   template <typename... ARG_TYPES>
   void Store(DataPod & pod, ARG_TYPES&... args) {
     internal::serial_impl<ARG_TYPES...>::Store(pod, args...);
   }
-  
+
 }
 }
 

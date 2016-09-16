@@ -118,11 +118,14 @@ int main()
   Test(dfa_all, "abcdefghijklmnopqrstuvwxyz");
   Test(dfa_all, "ABC-DEF");
 
+  std::cout << "DFA Inc:\n";
+  dfa_inc.Print();
+
   // Generate examples of DFAs
   std::cout << "DFA Examples:\n"
             << "dfa_lower example: " << emp::FindExample(dfa_lower) << std::endl
             << "dfa_upper example: " << emp::FindExample(dfa_upper) << std::endl
             << "dfa_inc example:   " << emp::FindExample(dfa_inc) << std::endl
             << "dfa_all example:   " << emp::FindExample(dfa_all) << std::endl
-            << "dfa_inc size 10 example: " << emp::FindExample(dfa_inc, 10) << std::endl;
+            << "dfa_inc size 5 example: " << emp::FindExample(dfa_inc, 5) << std::endl;
 }

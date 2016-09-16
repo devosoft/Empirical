@@ -52,6 +52,9 @@ namespace emp {
       }
       return rhs;
     }
+    emp::vector<int> ToRHS(const std::string & str_rhs) {
+      return ToRHS(emp::slice(str_rhs, ' '));
+    }
     emp::vector<int> ToRHS(const emp::vector<int> & rhs) { return rhs; }
 
     int AddRule_impl(int state_id, const emp::vector<int> & rhs) {

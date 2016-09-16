@@ -10,6 +10,10 @@ a.out.js
 *.swo
 *.dSYM
 *tmp.*
+*.out
+*.debug
+*.mp4
+*.csv
 coverage.xml
 diff_cover.txt
 UTests/tools/tmp*.cc

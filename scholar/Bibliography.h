@@ -1,22 +1,21 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  A collection of references.
 
 #ifndef EMP_BIBLIOGRAPHY_H
 #define EMP_BIBLIOGRAPHY_H
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-//
-//  A collection of references.
-//
-
+#include "../tools/vector.h"
 #include "Citation.h"
 
 namespace emp {
 
   class Bibliography {
   private:
-    std::vector<Citation> refs;
+    emp::vector<Citation> refs;
     std::set<std::string> keywords;
   public:
     Bibliography() { ; }

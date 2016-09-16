@@ -13,9 +13,6 @@ Contents:
    adding-documentation
    guide-to-testing
 
-Indices and tables
-==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+:ref:`genindex`
+:ref:`search`

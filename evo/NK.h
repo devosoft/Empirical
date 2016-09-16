@@ -11,7 +11,7 @@
 #include <array>
 
 #include "../tools/BitVector.h"
-#include "../tools/const_utils.h"
+#include "../tools/math.h"
 #include "../tools/Random.h"
 #include "../tools/vector.h"
 
@@ -31,7 +31,7 @@ namespace evo {
     NKLandscape(const NKLandscape &) = delete;
     NKLandscape(int _N, int _K, emp::Random & random)
      : N(_N), K(_K)
-     , state_count(emp::constant::IntPow<uint32_t>(2,K+1))
+     , state_count(emp::IntPow<uint32_t>(2,K+1))
      , total_count(N * state_count)
      , landscape(N)
     {
@@ -57,19 +57,20 @@ namespace evo {
     double GetFitness( std::vector<uint32_t> states ) const {
       emp_assert(states.size() == N);
       double total = landscape[0][states[0]];
-      for (int i = 1; i < N; i++) total += GetFitness(i,states[i]);
+      for (int i = 1; i < (int) N; i++) total += GetFitness(i,states[i]);
       return total;
     }
     double GetFitness(BitVector genome) const {
-      emp_assert(genome.GetSize() == N, genome.GetSize(), N, genome);
+
+      emp_assert(genome.GetSize() == (int) N);
 
       // Use a double-length genome to easily handle wrap-around.
       genome.Resize(N*2);
       genome |= (genome << N);
 
       double total = 0.0;
-      uint32_t mask = emp::constant::MaskLow<uint32_t>(K+1);
-      for (int i = 0; i < N; i++) {
+      uint32_t mask = emp::MaskLow<uint32_t>(K+1);
+      for (int i = 0; i < (int) N; i++) {
         const uint32_t cur_val = (genome >> i).GetUInt(0) & mask;
 	      const double cur_fit = GetFitness(i, cur_val);
         total += cur_fit;

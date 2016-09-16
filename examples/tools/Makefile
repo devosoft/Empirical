@@ -1,76 +1,72 @@
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -Wno-unused-function -std=c++11 -I../../ -I./
-#CFLAGS_all := -Wall -Wno-unused-variable -Wno-unused-function -Wno-extra-semi -std=c++11 -I../../ -I./
+CFLAGS_all := -Wall -Wno-unused-function -I../../
+CFLAGS_version := -std=c++11
 
 # Emscripten compiler information
 CXX_web := emcc
 CXX_native := g++
 
-#OFLAGS_native := -g -pedantic
-OFLAGS_native := -O3 -DNDEBUG
+OFLAGS_native_debug := -g -pedantic -DEMP_TRACK_MEM
+OFLAGS_native_opt := -O3 -DNDEBUG
 
-OFLAGS_web := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864 -s ASSERTIONS=2 -s DEMANGLE_SUPPORT=1 # -s SAFE_HEAP=1
-#OFLAGS_web := -Os -DNDEBUG -s TOTAL_MEMORY=67108864
+OFLAGS_web_debug := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864 -s ASSERTIONS=2 -s DEMANGLE_SUPPORT=1 # -s SAFE_HEAP=1
+OFLAGS_web_opt := -Os -DNDEBUG -s TOTAL_MEMORY=67108864
 
+CFLAGS_native_debug := $(CFLAGS_all) $(OFLAGS_native_debug)
+CFLAGS_native_opt := $(CFLAGS_all) $(OFLAGS_native_opt)
 
-CFLAGS_native := $(CFLAGS_all) $(OFLAGS_native)
-
-CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
-
-TARGETS := array DFA Lexer lexer_utils macros meta NFA Parser Random reflection RegEx signal vector
+TARGETS := array BitVector ce_string DFA errors info_theory Lexer lexer_utils macros math meta NFA Parser Ptr Random reflection RegEx signal TypeSet TypeTracker vector WeightedSet
 
 TOOLS := ../../tools
 TOOL_DEPEND := $(TOOLS)/assert.h
 
 default: native
 
-native: $(TARGETS)
+CXX := $(CXX_native)
+CFLAGS := $(CFLAGS_native_opt)
 
+debug: CFLAGS := $(CFLAGS_native_debug)
+debug: all
 
-array: array.cc $(TOOLS)/array.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) array.cc -o array
+cpp14: CFLAGS_version := -std=c++14
+cpp14: all
 
-DFA: DFA.cc $(TOOLS)/DFA.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) DFA.cc -o DFA
+web: CXX := $(CXX_web)
+web: CFLAGS := $(CFLAGS_web_opt)
+web: all
 
-Lexer: Lexer.cc $(TOOLS)/Lexer.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
-	$(CXX_native) $(CFLAGS_native) Lexer.cc -o Lexer
+web-debug: CXX := $(CXX_web)
+web-debug: CFLAGS := $(CFLAGS_web_debug)
+web-debug: all
 
-lexer_utils: lexer_utils.cc $(TOOLS)/lexer_utils.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
-	$(CXX_native) $(CFLAGS_native) lexer_utils.cc -o lexer_utils
+native: all
 
-macros: macros.cc $(TOOLS)/macros.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) macros.cc -o macros
+all: $(TARGETS)
 
-meta: meta.cc $(TOOLS)/meta.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) meta.cc -o meta
+$(TARGETS): % : %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
+	$(CXX) $(CFLAGS_version) $(CFLAGS) $< -o $@
 
-NFA: NFA.cc $(TOOLS)/NFA.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) NFA.cc -o NFA
+# Lexer: Lexer.cc $(TOOLS)/Lexer.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
+#	$(CXX) $(CFLAGS) Lexer.cc -o Lexer
 
-Parser: Parser.cc $(TOOLS)/Parser.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
-	$(CXX_native) $(CFLAGS_native) Parser.cc -o Parser
+# lexer_utils: lexer_utils.cc $(TOOLS)/lexer_utils.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
+# 	$(CXX) $(CFLAGS) lexer_utils.cc -o lexer_utils
 
-Random: Random.cc $(TOOLS)/Random.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) Random.cc -o Random
+# Parser: Parser.cc $(TOOLS)/Parser.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
+# 	$(CXX) $(CFLAGS) Parser.cc -o Parser
 
-reflection: reflection.cc $(TOOLS)/reflection.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) reflection.cc -o reflection
+opt-%: %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
+	$(CXX) $(CFLAGS_version) $(CFLAGS_native_opt) $< -o $@
 
-RegEx: RegEx.cc $(TOOLS)/RegEx.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) RegEx.cc -o RegEx
+debug-%: %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
+	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
 
-signal: signal.cc $(TOOLS)/signal.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) signal.cc -o signal
-
-vector: vector.cc $(TOOLS)/vector.h $(TOOL_DEPEND)
-	$(CXX_native) $(CFLAGS_native) vector.cc -o vector
-
-
-debug-%: $*.cc
-	$(CXX_native) $(CFLAGS_native) $< -o $@
+cpp14-%: %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
+	$(CXX) -std=c++14 $(CFLAGS_native_debug) $< -o $@
 
 clean:
 	rm -rf debug-* *~ *.dSYM $(TARGETS)

@@ -1,8 +1,11 @@
 #define EMP_TRACK_MEM
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]
+#define CATCH_CONFIG_MAIN
 #undef NDEBUG
 #define TDEBUG 1
+
+#include "../third-party/Catch/single_include/catch.hpp"
 
 #include <array>
 #include <sstream>
@@ -11,19 +14,30 @@
 #include "../tools/BitMatrix.h"
 #include "../tools/BitSet.h"
 #include "../tools/BitVector.h"
+#include "../tools/DFA.h"
 #include "../tools/DynamicStringSet.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/Graph.h"
+#include "../tools/Lexer.h"
+#include "../tools/NFA.h"
 #include "../tools/Ptr.h"
+#include "../tools/RegEx.h"
 #include "../tools/Random.h"
-#include "../tools/Trait.h"
+// #include "../tools/Trait.h"
 
+#include "../tools/array.h"
 #include "../tools/assert.h"
+#include "../tools/ce_string.h"
+#include "../tools/errors.h"
 #include "../tools/functions.h"
 #include "../tools/graph_utils.h"
 //#include "../tools/grid.h"
+#include "../tools/info_theory.h"
+#include "../tools/lexer_utils.h"
 #include "../tools/macro_math.h"
 #include "../tools/macros.h"
+#include "../tools/map_utils.h"
+#include "../tools/math.h"
 #include "../tools/mem_track.h"
 #include "../tools/meta.h"
 #include "../tools/reflection.h"
@@ -38,9 +52,8 @@
 // this doesn't actually work--TODO: figure out why this doesn't work
 #include "../tools/alert.h"
 #include "../tools/const.h"
-#include "../tools/errors.h"
-#include "../tools/class.h"
-#include "../tools/fixed.h"
+// #include "../tools/class.h"
+// #include "../tools/fixed.h"
 #include "../tools/SolveState.h"
 #include "../tools/ProbSchedule.h"
 #include "../tools/serialize_macros.h"
@@ -55,12 +68,29 @@
   } while (false)
 
 
+TEST_CASE("Test array", "[tools]")
+{
+  constexpr int A_SIZE = 50;
+  emp::array<int, A_SIZE> test_array;
+
+  for (int i = 0; i < A_SIZE; i++) {
+    test_array[i] = i * i;
+  }
+
+  int sum = 0;
+  for (int i = 0; i < A_SIZE; i++) {
+    sum += test_array[i];
+  }
+
+  REQUIRE(sum == 40425);
+}
+
 // this templating is necessary to force full coverage of templated classes.
 // Since c++ doesn't generate code for templated methods if those methods aren't
 // explicitly called (and thus our profiling doesn't see them), we have to
 // force them all to be included in the comilation.
 template class emp::BitMatrix<4, 5>;
-TEST_CASE("Test bitvectors", "[tools]")
+TEST_CASE("Test BitMatrix", "[tools]")
 {
 
   emp::BitMatrix<4,5> bm45;
@@ -136,7 +166,7 @@ TEST_CASE("Test bitvectors", "[tools]")
 
 
 template class emp::BitSet<5>;
-TEST_CASE("test BitSet", "[tools]")
+TEST_CASE("Test BitSet", "[tools]")
 {
   emp::BitSet<10> bs10;
   emp::BitSet<32> bs32;
@@ -173,7 +203,7 @@ TEST_CASE("test BitSet", "[tools]")
 }
 
 
-TEST_CASE("test BitSet timing", "[tools]")
+TEST_CASE("Test BitSet timing", "[tools]")
 {
   const int set_size = 100000;
   typedef emp::BitSet<set_size> TEST_TYPE;
@@ -209,7 +239,7 @@ TEST_CASE("test BitSet timing", "[tools]")
 }
 
 
-TEST_CASE( "Testing BitVectors", "[tools]")
+TEST_CASE("Test BitVector", "[tools]")
 {
   emp::BitVector bv10(10);
   emp::BitVector bv32(32);
@@ -235,39 +265,86 @@ TEST_CASE( "Testing BitVectors", "[tools]")
   REQUIRE(bv80.GetValueAtBit<5>(64) == 2);
 }
 
-TEST_CASE("Test BitVector timing", "[tools]")
+TEST_CASE("Test ce_string", "[tools]")
 {
+  constexpr emp::ce_string s = "abc";
+  constexpr emp::ce_string s2 = "abc";
+  constexpr emp::ce_string s3 = "abcdef";
+  constexpr emp::ce_string s4 = "aba";
+  emp::BitSet<s.size()> b1;
+  emp::BitSet<(int) s[0]> b2;
 
-  const int set_size = 100000;
-  typedef emp::BitVector TEST_TYPE;
+  REQUIRE(b2.size() == 97);
+  REQUIRE(s.size() == 3);
 
-  TEST_TYPE set1(set_size);
-  TEST_TYPE set2(set_size);
+  constexpr bool x1 = (s == s2);
+  constexpr bool x2 = (s != s2);
+  constexpr bool x3 = (s < s2);
+  constexpr bool x4 = (s > s2);
+  constexpr bool x5 = (s <= s2);
+  constexpr bool x6 = (s >= s2);
 
-  for (int i = 0; i < set_size; i++) {
-    if (!(i%2) && (i%5)) set1[i] = 1;
-    if (!(i%3) && (i%7)) set2.Set(i, true);
-  }
+  REQUIRE(x1 == true);
+  REQUIRE(x2 == false);
+  REQUIRE(x3 == false);
+  REQUIRE(x4 == false);
+  REQUIRE(x5 == true);
+  REQUIRE(x6 == true);
 
-  // TIMING!!!!!
-  std::clock_t emp_start_time = std::clock();
+  constexpr bool y1 = (s == s3);
+  constexpr bool y2 = (s != s3);
+  constexpr bool y3 = (s < s3);
+  constexpr bool y4 = (s > s3);
+  constexpr bool y5 = (s <= s3);
+  constexpr bool y6 = (s >= s3);
 
-  TEST_TYPE set3(set1 & set2);
-  TEST_TYPE set4 = (set1 | set2);
-  int total = 0;
-  for (int i = 0; i < 100000; i++) {
-    set3 |= (set4 << 3);
-    set4 &= (set3 >> 3);
-    auto set5 = set3 & set4;
-    total += set5.CountOnes();
-  }
+  REQUIRE(y1 == false);
+  REQUIRE(y2 == true);
+  REQUIRE(y3 == true);
+  REQUIRE(y4 == false);
+  REQUIRE(y5 == true);
+  REQUIRE(y6 == false);
 
-  std::clock_t emp_tot_time = std::clock() - emp_start_time;
+  constexpr bool z1 = (s == s4);
+  constexpr bool z2 = (s != s4);
+  constexpr bool z3 = (s < s4);
+  constexpr bool z4 = (s > s4);
+  constexpr bool z5 = (s <= s4);
+  constexpr bool z6 = (s >= s4);
 
-  double time = 1000.0 * ((double) emp_tot_time) / (double) CLOCKS_PER_SEC;
-  //REQUIRE(time < 9000); // NOTE: WILL VARY INTENSELY ON VARIOUS SYSTEMS
-  // SHOULD PROBABLY CHANGE
+  REQUIRE(z1 == false);
+  REQUIRE(z2 == true);
+  REQUIRE(z3 == false);
+  REQUIRE(z4 == true);
+  REQUIRE(z5 == false);
+  REQUIRE(z6 == true);
+}
 
+
+TEST_CASE("Test DFA", "[tools]")
+{
+  emp::DFA dfa(10);
+  dfa.SetTransition(0, 1, 'a');
+  dfa.SetTransition(1, 2, 'a');
+  dfa.SetTransition(2, 0, 'a');
+  dfa.SetTransition(0, 3, 'b');
+
+  int state = 0;
+  REQUIRE( (state = dfa.Next(state, 'a')) == 1 );
+  REQUIRE( (state = dfa.Next(state, 'a')) == 2 );
+  REQUIRE( (state = dfa.Next(state, 'a')) == 0 );
+  REQUIRE( (state = dfa.Next(state, 'b')) == 3 );
+  REQUIRE( (state = dfa.Next(state, 'b')) == -1 );
+  REQUIRE( (state = dfa.Next(state, 'b')) == -1 );
+  REQUIRE( (state = dfa.Next(state, 'b')) == -1 );
+
+  REQUIRE(dfa.Next(0, "aaaaaab") == 3);
+  REQUIRE(dfa.Next(0, "aaaaab") == -1);
+  REQUIRE(dfa.Next(0, "aaaaaabb") == -1);
+  REQUIRE(dfa.Next(0, "a") == 1);
+  REQUIRE(dfa.Next(0, "aa") == 2);
+  REQUIRE(dfa.Next(0, "aaa") == 0);
+  REQUIRE(dfa.Next(0, "b")  == 3);
 }
 
 TEST_CASE("Test DynamicStringSet", "[tools]")
@@ -309,6 +386,21 @@ TEST_CASE("Test DynamicStringSet", "[tools]")
   REQUIRE(test_set[4] == "Line 4");
 }
 
+TEST_CASE("Test errors", "[tools]")
+{
+  emp::TriggerExcept("test_fail", "The test failed.  *sob*");
+  emp::TriggerExcept("test_fail2", "The second test failed too.  But it's not quite as aweful.", false);
+  emp::TriggerExcept("test_fail2", "The third test is just test 2 again, but worse", true);
+
+  REQUIRE( emp::CountExcepts() == 3 );
+  auto except = emp::PopExcept("test_fail2");
+  REQUIRE( emp::CountExcepts() == 2 );
+  REQUIRE( except.desc == "The second test failed too.  But it's not quite as aweful." );
+  REQUIRE( emp::HasExcept("test_fail2") == true );
+  REQUIRE( emp::HasExcept("test_fail3") == false );
+  emp::ClearExcepts();
+  REQUIRE( emp::CountExcepts() == 0 );
+}
 
 char result_char;
 void TestFun(int x, int y, char z) {
@@ -341,57 +433,6 @@ TEST_CASE("Test functions", "[tools]")
   REQUIRE(emp::to_range(12345678, 10, 20) == 20);
   REQUIRE(emp::to_range<double>(12345678, 10, 20.1) == 20.1);
   REQUIRE(emp::to_range(12345678.0, 10.7, 20.1) == 20.1);
-}
-
-
-template <typename A, typename B>
-struct MetaTestClass {
-  A a;
-  B b;
-};
-
-TEST_CASE("Test meta-programming helpers", "[tools]")
-{
-
-  // TEST FOR VARIADIC HELPER FUNCTIONS:
-
-  REQUIRE((emp::get_type_index<char, char, bool, int, double>()) == 0);
-  REQUIRE((emp::get_type_index<int, char, bool, int, double>()) == 2);
-  REQUIRE((emp::get_type_index<double, char, bool, int, double>()) == 3);
-  REQUIRE((emp::get_type_index<std::string, char, bool, int, double>()) < 0);
-
-  REQUIRE((emp::has_unique_first_type<int, bool, std::string, bool, char>()) == true);
-  REQUIRE((emp::has_unique_first_type<bool, int, std::string, bool, char>()) == false);
-  REQUIRE((emp::has_unique_types<bool, int, std::string, emp::vector<bool>, char>()) == true);
-  REQUIRE((emp::has_unique_types<int, bool, std::string, bool, char>()) == false);
-
-
-  std::tuple<int, int, char> test_tuple(3,2,'a');
-  emp::ApplyTuple(TestFun, test_tuple);
-
-  REQUIRE(result_char == 'g');
-
-  using meta1_t = MetaTestClass<int, double>;
-  using meta2_t = emp::AdaptTemplate<meta1_t, char, bool>;
-  using meta3_t = emp::AdaptTemplate_Arg1<meta1_t, std::string>;
-  
-  meta1_t meta1;
-  meta2_t meta2;
-  meta3_t meta3;
-
-  meta1.a = (decltype(meta1.a)) 65.5;
-  meta1.b = (decltype(meta1.b)) 65.5;
-  meta2.a = (decltype(meta2.a)) 65.5;
-  meta2.b = (decltype(meta2.b)) 65.5;
-  meta3.a = (decltype(meta3.a)) "65.5";
-  meta3.b = (decltype(meta3.b)) 65.5;
-
-  REQUIRE( meta1.a == 65 );
-  REQUIRE( meta1.b == 65.5 );
-  REQUIRE( meta2.a == 'A' );
-  REQUIRE( meta2.b == true );
-  REQUIRE( meta3.a == "65.5" );
-  REQUIRE( meta3.b == 65.5 );
 }
 
 // should migrate these inside the test case, probably
@@ -541,567 +582,110 @@ TEST_CASE("Test Graph utils", "[tools]")
 }*/
 
 
-struct TestClass1 {
-  TestClass1() {
-    EMP_TRACK_CONSTRUCT(TestClass1);
-  }
-  ~TestClass1() {
-    EMP_TRACK_DESTRUCT(TestClass1);
-  }
-};
-
-struct TestClass2 {
-  TestClass2() {
-    EMP_TRACK_CONSTRUCT(TestClass2);
-  }
-  ~TestClass2() {
-    EMP_TRACK_DESTRUCT(TestClass2);
-  }
-};
-
-TEST_CASE("Test mem_track", "[tools]")
+TEST_CASE("Test info_theory", "[tools]")
 {
-  emp::vector<TestClass1 *> test_v;
-  TestClass2 class2_mem;
+  emp::vector<int> weights = { 100, 100, 200 };
+  REQUIRE( emp::Entropy(weights) == 1.5 );
 
-  REQUIRE(EMP_TRACK_COUNT(TestClass1) == 0);
+  emp::vector<double> dweights = { 10.5, 10.5, 10.5, 10.5, 21.0, 21.0 };
+  REQUIRE( emp::Entropy(dweights) == 2.5 );
 
-  for (int i = 0; i < 1000; i++) {
-    test_v.push_back( new TestClass1 );
-  }
-
-  REQUIRE(EMP_TRACK_COUNT(TestClass1) == 1000);
-
-
-  for (int i = 500; i < 1000; i++) {
-    delete test_v[i];
-  }
-
-  REQUIRE(EMP_TRACK_COUNT(TestClass1) == 500);
-  //REQUIRE(EMP_TRACK_STATUS == 0);
-
+  REQUIRE( emp::Entropy2(0.5) == 1.0 );
 }
 
-TEST_CASE("Test Ptr", "[tools]")
+TEST_CASE("Test lexer_utils", "[tools]")
 {
-  emp::PtrTracker<char>::Get();
-  emp::PtrTracker<int>::Get();
+    emp::NFA nfa2c(3);  // Must have zero or two c's with any number of a's or b's.
+    nfa2c.AddTransition(0,0,"ab");
+    nfa2c.AddTransition(0,1,"c");
+    nfa2c.AddTransition(1,1,"ab");
+    nfa2c.AddTransition(1,2,"c");
+    nfa2c.AddTransition(2,2,"ab");
+    nfa2c.AddFreeTransition(0,2);
+    nfa2c.SetStop(2);
 
-  // Test default constructor.
-  emp::Ptr<int> ptr1;
-  ptr1.New();
-  *ptr1 = 5;
-  REQUIRE(*ptr1 == 5);
-  ptr1.Delete();
+    emp::RegEx re2f("[de]*f[de]*f[de]*");
+    // emp::RegEx re2f("([de]*)f([de]*)f([de]*)");
+    emp::NFA nfa2f = to_NFA(re2f);
+    emp::DFA dfa2f = to_DFA(nfa2f);
+    REQUIRE( nfa2f.GetSize() == 12 );
+    REQUIRE( dfa2f.GetSize() == 3 );
 
-  // Test pointer constructor
-  int * temp_int = new int;
-  emp::Ptr<int> ptr2(temp_int);
-  *ptr2 = 10;
-  REQUIRE(*ptr2 == 10);
-  ptr2.Delete();
+    int state;
+    state = dfa2f.Next(0, "a");        REQUIRE(state == -1); REQUIRE(dfa2f.IsStop(state) == false);
+    state = dfa2f.Next(0, "d");        REQUIRE(state == 0); REQUIRE(dfa2f.IsStop(state) == false);
+    state = dfa2f.Next(0, "defdef");   REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
+    state = dfa2f.Next(0, "fedfed");   REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
+    state = dfa2f.Next(0, "ffed");     REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
+    state = dfa2f.Next(0, "edffed");   REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
+    state = dfa2f.Next(0, "edffedf");  REQUIRE(state == -1); REQUIRE(dfa2f.IsStop(state) == false);
+    state = dfa2f.Next(0, "defed");    REQUIRE(state == 1); REQUIRE(dfa2f.IsStop(state) == false);
+    state = dfa2f.Next(0, "ff");       REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
 
-  // Test non-pointer object constructor
-  int base_val = 15;
-  emp::Ptr<int> ptr3(base_val);
-  REQUIRE(*ptr3 == 15);
-  base_val = 20;                 // Make sure pointed to value changes with original variable.
-  REQUIRE(*ptr3 == 20);
+    emp::RegEx re_lower("[a-z]+");
+    emp::RegEx re_upper("[A-Z]+");
+    emp::RegEx re_inc("[a-z]+[A-Z]+");
+    emp::NFA nfa_lower = to_NFA(re_lower);
+    emp::NFA nfa_upper = to_NFA(re_upper);
+    emp::NFA nfa_inc = to_NFA(re_inc);
+    emp::NFA nfa_all = MergeNFA(nfa_lower, nfa_upper, nfa_inc);
+    emp::DFA dfa_lower = to_DFA(nfa_lower);
+    emp::DFA dfa_upper = to_DFA(nfa_upper);
+    emp::DFA dfa_inc = to_DFA(nfa_inc);
+    emp::DFA dfa_all = to_DFA(nfa_all);
 
-  // Test copy-constructor.
-  emp::Ptr<int> ptr4(ptr3);
-  REQUIRE(*ptr4 == 20);
-  *ptr4 = 25;                    // Change this new pointer...
-  REQUIRE(*ptr4 == 25);       // ...make sure it actually changed.
-  REQUIRE(*ptr3 == 25);       // ...make sure the other pointer reflects the change.
-  REQUIRE(base_val == 25);    // ...make sure the original variable changed.
+    emp::NFA_State lstate(nfa_lower);
+    lstate.Reset(); lstate.Next("abc");      REQUIRE(lstate.IsActive() == true);
+    lstate.Reset(); lstate.Next("DEF");      REQUIRE(lstate.IsActive() == false);
+    lstate.Reset(); lstate.Next("abcDEF");   REQUIRE(lstate.IsActive() == false);
+    lstate.Reset(); lstate.Next("ABDdef");   REQUIRE(lstate.IsActive() == false);
+    lstate.Reset(); lstate.Next("ABCDEF");   REQUIRE(lstate.IsActive() == false);
+    lstate.Reset(); lstate.Next("abcdefghijklmnopqrstuvwxyz");  REQUIRE(lstate.IsActive() == true);
+    lstate.Reset(); lstate.Next("ABC-DEF");  REQUIRE(lstate.IsActive() == false);
 
-  // -- Test count tracking on emp::Ptr --
-  // A bit of an odd set of test... we need to create and destory pointers to make sure
-  // that all of the counts are correct, so we're going to use arrays of pointers to them.
-
-  emp::vector<emp::Ptr<char> *> ptr_set(10);
-  ptr_set[0] = new emp::Ptr<char>;
-  ptr_set[0]->New(42);
-  for (int i = 1; i < 10; i++) ptr_set[i] = new emp::Ptr<char>(*(ptr_set[0]));
-
-  // Do we have a proper count of 10?
-  REQUIRE(ptr_set[0]->DebugGetCount() == 10);
-  ptr_set[1]->New(91);
-  REQUIRE(ptr_set[0]->DebugGetCount() == 9);
-  *(ptr_set[2]) = *(ptr_set[1]);
-  REQUIRE(ptr_set[0]->DebugGetCount() == 8);
-  REQUIRE(ptr_set[1]->DebugGetCount() == 2);
-
-  ptr_set[3]->Delete();
-
-  // std::cout << ptr_set[0]->DebugGetCount() << std::endl;
-
-  // @CAO Make sure we don't delete below 0
-  // @CAO Make sure we don't delete below 1 if we own it
-  // @CAO Make sure we only delete if you own it
-  // @CAO Make sure not to delete twice!
-  // @CAO Make sure we don't add (as owner) a pointer we already own
-
-  // -- Do some direct tests on pointer trackers --
-
-  int * real_ptr1 = new int(1);  // Count of 2 in tracker
-  int * real_ptr2 = new int(2);  // Deleted in tracker
-  int * real_ptr3 = new int(3);  // Unknown to tracker
-  int * real_ptr4 = new int(4);  // Passively known to tracker (marked non-owner)
-  emp::PtrTracker<int> & tracker = emp::PtrTracker<int>::Get();
-
-  tracker.New(real_ptr1);
-  tracker.Inc(real_ptr1);
-  tracker.Inc(real_ptr1);
-  tracker.Dec(real_ptr1);
-
-  tracker.New(real_ptr2);
-  tracker.MarkDeleted(real_ptr2);
-
-  tracker.Old(real_ptr4);
-
-  REQUIRE(tracker.HasPtr(real_ptr1) == true);
-  REQUIRE(tracker.HasPtr(real_ptr2) == true);
-  REQUIRE(tracker.HasPtr(real_ptr3) == false);
-  REQUIRE(tracker.HasPtr(real_ptr4) == true);
-
-  REQUIRE(tracker.IsActive(real_ptr1) == true);
-  REQUIRE(tracker.IsActive(real_ptr2) == false);
-  REQUIRE(tracker.IsActive(real_ptr3) == false);
-  REQUIRE(tracker.IsActive(real_ptr4) == true);
-
-  REQUIRE(tracker.IsOwner(real_ptr1) == true);
-  REQUIRE(tracker.IsOwner(real_ptr2) == true);
-  REQUIRE(tracker.IsOwner(real_ptr3) == false);
-  REQUIRE(tracker.IsOwner(real_ptr4) == false);
-
-  REQUIRE(tracker.GetCount(real_ptr1) == 2);
-  REQUIRE(tracker.GetCount(real_ptr2) == 1);
-  REQUIRE(tracker.GetCount(real_ptr3) == 0);
-  REQUIRE(tracker.GetCount(real_ptr4) == 1);
+    REQUIRE( dfa_all.Next(0, "abc") == 2 );
+    REQUIRE( dfa_all.Next(0, "DEF") == 1 );
+    REQUIRE( dfa_all.Next(0, "abcDEF") == 3 );
+    REQUIRE( dfa_all.Next(0, "ABDdef") == -1 );
+    REQUIRE( dfa_all.Next(0, "ABCDEF") == 1 );
+    REQUIRE( dfa_all.Next(0, "abcdefghijklmnopqrstuvwxyz") == 2 );
+    REQUIRE( dfa_all.Next(0, "ABC-DEF") == -1 );
 }
 
 
-
-TEST_CASE("Test random", "[tools]")
+TEST_CASE("Test Lexer", "[tools]")
 {
-  emp::Random rng;
+  emp::Lexer lexer;
+  lexer.AddToken("Integer", "[0-9]+");
+  lexer.AddToken("Float", "[0-9]*\\.[0-9]+");
+  lexer.AddToken("Lower", "[a-z]+");
+  lexer.AddToken("Upper", "[A-Z]+");
+  lexer.AddToken("Mixed", "[a-zA-Z]+");
+  lexer.AddToken("Whitespace", "[ \t\n\r]");
+  lexer.AddToken("Other", ".");
 
-  // Test GetDouble with the law of large numbers.
-  emp::vector<int> val_counts(10);
-  for (int i = 0; i < (int) val_counts.size(); i++) val_counts[i] = 0;
-
-  const int num_tests = 100000;
-  const double min_value = 2.5;
-  const double max_value = 8.7;
-  double total = 0.0;
-  for (int i = 0; i < num_tests; i++) {
-    const double cur_value = rng.GetDouble(min_value, max_value);
-    total += cur_value;
-    val_counts[(int) cur_value]++;
-  }
-
-  {
-    const double expected_mean = (min_value + max_value) / 2.0;
-    const double min_threshold = (expected_mean*0.997);
-    const double max_threshold = (expected_mean*1.004);
-    double mean_value = total/(double) num_tests;
-
-    REQUIRE(mean_value > min_threshold);
-    REQUIRE(mean_value < max_threshold);
-  }
-
-  // Test GetInt
-  for (int i = 0; i < (int) val_counts.size(); i++) val_counts[i] = 0;
-  total = 0.0;
-
-  for (int i = 0; i < num_tests; i++) {
-    const int cur_value = rng.GetInt((int) min_value, (int) max_value);
-    total += cur_value;
-    val_counts[cur_value]++;
-  }
-
-  {
-    const double expected_mean = (double) (((int) min_value) + ((int) max_value) - 1) / 2.0;
-    const double min_threshold = (expected_mean*0.997);
-    const double max_threshold = (expected_mean*1.004);
-    double mean_value = total/(double) num_tests;
-
-    REQUIRE(mean_value > min_threshold);
-    REQUIRE(mean_value < max_threshold);
-  }
-
-  // Test P
-  double flip_prob = 0.56789;
-  int hit_count = 0;
-  for (int i = 0; i < num_tests; i++) {
-    if (rng.P(flip_prob)) hit_count++;
-  }
-
-  double actual_prob = ((double) hit_count) / (double) num_tests;
-
-  REQUIRE(actual_prob < flip_prob + 0.005);
-  REQUIRE(actual_prob > flip_prob - 0.005);
-
-
-  // Mimimal test of Choose()
-  emp::vector<int> choices = Choose(rng,100,10);
-
-  REQUIRE(choices.size() == 10);
-}
-
-struct TestTrue {
-  int test_member;
-  int TestFun(int a, int b) { return a*b; }
-};
-
-struct TestFalse {
-  int other_stuff;
-};
-
-struct TestTrueMethod {
-  int test_member() { return 4; }
-};
-
-template <typename T>
-int TestExternalFun(T & obj, int a, int b) { return a+b; }
-
-EMP_CREATE_MEMBER_DETECTOR(test_member);
-EMP_CREATE_METHOD_FALLBACK(DynamicFun, TestFun, TestExternalFun, int);
-
-TEST_CASE("Test reflection", "[tools]")
-{
-
-  REQUIRE(EMP_Detect_test_member<TestTrue>::value == 1);
-  REQUIRE(EMP_Detect_test_member<TestFalse>::value == 0);
-  REQUIRE(EMP_Detect_test_member<TestTrueMethod>::value == 1);
-
-  TestTrue t;
-  TestFalse f;
-  REQUIRE(DynamicFun(t, 20, 20) == 400);
-  REQUIRE(DynamicFun(f, 20, 20) == 40);
-
-}
-
-
-TEST_CASE("Test sequence utils", "[tools]")
-{
-  std::string s1 = "This is the first test string.";
-  std::string s2 = "This is the second test string.";
-
-  REQUIRE(emp::calc_hamming_distance(s1,s2) == 19);
-  REQUIRE(emp::calc_edit_distance(s1,s2) == 6);
-
-  // std::string s3 = "abcdefghijklmnopqrstuvwWxyz";
-  // std::string s4 = "abBcdefghijXXmnopqrstuvwxyz";
-
-  // std::string s3 = "lmnopqrstuv";
-  // std::string s4 = "abcdefghijklmnopqrstuvwxyz";
-
-  std::string s3 = "adhlmnopqrstuvxy";
-  std::string s4 = "abcdefghijklmnopqrstuvwxyz";
-
-  emp::align(s3, s4, '_');
-
-  REQUIRE(s3 == "a__d___h___lmnopqrstuv_xy_");
-
-  emp::vector<int> v1 = { 1,2,3,4,5,6,7,8,9 };
-  emp::vector<int> v2 = { 1,4,5,6,8 };
-
-  emp::align(v1,v2,0);
-
-  REQUIRE((v2 == emp::vector<int>({1,0,0,4,5,6,0,8,0})));
-}
-
-
-
-struct SerializeTest {
-  int a;
-  float b;        // unimportant data!
-  std::string c;
-
-  SerializeTest(int _a, float _b, std::string _c) : a(_a), b(_b), c(_c) { ; }
-  EMP_SETUP_DATAPOD(SerializeTest, a, c);
-};
-
-struct SerializeTest_D : public SerializeTest {
-  char d = '$';
-
-  SerializeTest_D(int _a, float _b, std::string _c, char _d)
-    : SerializeTest(_a, _b, _c), d(_d) { ; }
-  EMP_SETUP_DATAPOD_D(SerializeTest_D, SerializeTest, d);
-};
-
-struct ExtraBase {
-  double e;
-
-  ExtraBase(double _e) : e(_e) { ; }
-  EMP_SETUP_DATAPOD(ExtraBase, e);
-};
-
-struct MultiTest : public SerializeTest, public ExtraBase {
-  bool f;
-
-  MultiTest(int _a, float _b, std::string _c, double _e, bool _f)
-    : SerializeTest(_a, _b, _c), ExtraBase(_e), f(_f) { ; }
-  EMP_SETUP_DATAPOD_D2(MultiTest, SerializeTest, ExtraBase, f);
-};
-
-struct NestedTest {
-  SerializeTest st;
-  std::string name;
-  SerializeTest_D std;
-  MultiTest mt;
-
-  NestedTest(int a1, float b1, std::string c1,
-             int a2, float b2, std::string c2, char d2,
-             int a3, float b3, std::string c3, double e3, bool f3)
-    : st(a1, b1, c1), name("my_class"), std(a2, b2, c2, d2), mt(a3, b3, c3, e3, f3) { ; }
-
-  EMP_SETUP_DATAPOD(NestedTest, st, name, std, mt);
-};
-
-struct BuiltInTypesTest {
-  const int a;
-  emp::vector<int> int_v;
-
-  BuiltInTypesTest(int _a, int v_size) : a(_a), int_v(v_size) {
-    for (int i = 0; i < v_size; i++) int_v[i] = i*i;
-  }
-
-  EMP_SETUP_DATAPOD(BuiltInTypesTest, a, int_v);
-};
-
-TEST_CASE("Test serialize", "[tools]")
-{
   std::stringstream ss;
-  emp::serialize::DataPod pod(ss);
+  ss << "This is a 123 TEST.  It should also have 1. .2 123.456 789 FLOATING point NUMbers!";
 
+  REQUIRE(lexer.Process(ss).lexeme == "This");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == "is");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == "a");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == "123");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == "TEST");
+  REQUIRE(lexer.Process(ss).lexeme == ".");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
 
-  // Basic test...
-
-  SerializeTest st(7, 2.34, "my_test_string");
-  st.EMP_Store(pod);
-
-  SerializeTest st2(pod);
-
-  REQUIRE(st2.a == 7);                 // Make sure a was reloaded correctly.
-  REQUIRE(st2.c == "my_test_string");  // Make sure c was reloaded correctly.
-
-
-  // Derived class Test
-
-  SerializeTest_D stD(10,0.2,"three",'D');
-  stD.EMP_Store(pod);
-
-  SerializeTest_D stD2(pod);
-
-  REQUIRE(stD2.a == 10);
-  REQUIRE(stD2.c == "three");
-  REQUIRE(stD2.d == 'D');
-
-  // Multiply-derived class Test
-
-  MultiTest stM(111,2.22,"ttt",4.5,true);
-  stM.EMP_Store(pod);
-
-  MultiTest stM2(pod);
-
-
-  REQUIRE(stM2.a == 111);
-  REQUIRE(stM2.c == "ttt");
-  REQUIRE(stM2.e == 4.5);
-  REQUIRE(stM2.f == true);
-
-
-  // Nested objects test...
-
-  NestedTest nt(91, 3.14, "magic numbers",
-                100, 0.01, "powers of 10", '1',
-                1001, 1.001, "ones and zeros", 0.125, true);
-  nt.EMP_Store(pod);
-
-  NestedTest nt2(pod);
-
-  REQUIRE(nt2.st.a == 91);
-  REQUIRE(nt2.st.c == "magic numbers");
-  REQUIRE(nt2.name == "my_class");
-  REQUIRE(nt2.std.a == 100);
-  REQUIRE(nt2.std.c == "powers of 10");
-  REQUIRE(nt2.std.d == '1');
-  REQUIRE(nt2.mt.a == 1001);
-  REQUIRE(nt2.mt.c == "ones and zeros");
-  REQUIRE(nt2.mt.e == 0.125);
-  REQUIRE(nt2.mt.f == true);
-
-
-  // If we made it this far, everything must have worked!;
-
-  const int v_size = 43;
-  BuiltInTypesTest bitt(91, v_size);
-  bitt.EMP_Store(pod);
-
-
-  BuiltInTypesTest bitt2(pod);
+  REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Mixed");
+  REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Whitespace");
+  REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Lower");
 }
 
-
-
-TEST_CASE("Test string utils", "[tools]")
-{
-
-  // TEST1: lets test our conversion to an escaped string.
-  const std::string special_string = "This\t5tr1ng\nis\non THREE (3) \"lines\".";
-  std::string escaped_string = emp::to_escaped_string(special_string);
-
-  // note: we had to double-escape the test to make sure this worked.
-  REQUIRE(escaped_string == "This\\t5tr1ng\\nis\\non THREE (3) \\\"lines\\\".");
-
-  // TEST2: Test more general conversion to literals.
-  REQUIRE(emp::to_literal(42) == "42");
-  REQUIRE(emp::to_literal('a') == "'a'");
-  REQUIRE(emp::to_literal('\t') == "'\\t'");
-  REQUIRE(emp::to_literal(1.234) == "1.234000");
-
-  // TEST3: Make sure that we can properly identify different types of characters.
-  int num_ws = 0;
-  int num_cap = 0;
-  int num_lower = 0;
-  int num_let = 0;
-  int num_num = 0;
-  int num_alphanum = 0;
-  int num_i = 0;
-  int num_vowel = 0;
-  for (char cur_char : special_string) {
-    if (emp::is_whitespace(cur_char)) num_ws++;
-    if (emp::is_upper_letter(cur_char)) num_cap++;
-    if (emp::is_lower_letter(cur_char)) num_lower++;
-    if (emp::is_letter(cur_char)) num_let++;
-    if (emp::is_digit(cur_char)) num_num++;
-    if (emp::is_alphanumeric(cur_char)) num_alphanum++;
-    if (emp::is_valid(cur_char, [](char c){ return c=='i'; })) num_i++;
-    if (emp::is_valid(cur_char, [](char c){return c=='a' || c=='A';},
-                      [](char c){return c=='e' || c=='E';},
-                      [](char c){return c=='i' || c=='I';},
-                      [](char c){return c=='o' || c=='O';},
-                      [](char c){return c=='u' || c=='U';},
-                      [](char c){return c=='y';}
-                      )) num_vowel++;
-  }
-  int num_other = ((int) special_string.size()) - num_alphanum - num_ws;
-
-
-  REQUIRE(num_ws == 6);
-  REQUIRE(num_cap == 6);
-  REQUIRE(num_lower == 16);
-  REQUIRE(num_let == 22);
-  REQUIRE(num_num == 3);
-  REQUIRE(num_alphanum == 25);
-  REQUIRE(num_other == 5);
-  REQUIRE(num_i == 3);
-  REQUIRE(num_vowel == 7);
-
-  std::string base_string = "This is an okay string.\n  \tThis\nis   -MY-    very best string!!!!   ";
-
-  std::string first_line = emp::string_pop_line(base_string);
-
-  REQUIRE(first_line == "This is an okay string.");
-  REQUIRE(emp::string_get_word(first_line) == "This");
-
-  emp::string_pop_word(first_line);
-
-  REQUIRE(first_line == "is an okay string.");
-
-  emp::remove_whitespace(first_line);
-
-  REQUIRE(first_line == "isanokaystring.");
-
-  std::string popped_str = emp::string_pop(first_line, "ns");
-
-  REQUIRE(popped_str == "i");
-  REQUIRE(first_line == "anokaystring.");
-
-
-
-  popped_str = emp::string_pop(first_line, "ns");
-
-
-  REQUIRE(popped_str == "a");
-  REQUIRE(first_line == "okaystring.");
-
-
-
-  popped_str = emp::string_pop(first_line, 'y');
-
-  REQUIRE(popped_str == "oka");
-  REQUIRE(first_line == "string.");
-
-  emp::left_justify(base_string);
-  REQUIRE(base_string == "This\nis   -MY-    very best string!!!!   ");
-
-  emp::right_justify(base_string);
-  REQUIRE(base_string == "This\nis   -MY-    very best string!!!!");
-
-  emp::compress_whitespace(base_string);
-  REQUIRE(base_string == "This is -MY- very best string!!!!");
-
-  auto slices = emp::slice("This is a test of a different version of slice.", ' ');
-
-  REQUIRE(slices.size() == 10);
-  REQUIRE(slices[8] == "of");
-
-  // Try other ways of using slice().
-  emp::slice(base_string, slices, 's');
-
-  REQUIRE(slices.size() == 5);
-  REQUIRE(slices[1] == " i");
-  REQUIRE(slices[3] == "t ");
-
-
-  std::string cat_a = "ABC";
-  bool cat_b = true;
-  char cat_c = '2';
-  int cat_d = 3;
-
-  std::string cat_full = emp::to_string(cat_a, cat_b, cat_c, cat_d);
-
-  REQUIRE(cat_full == "ABC123");
-}
-
-
-
-TEST_CASE("Test trait", "[tools]")
-{
-  emp::TraitManager<int, double, emp::vector<bool>, char, std::string> tm;
-
-  tm.AddTrait<int>("test_trait", "This is a test trait", 42);
-  tm.AddTrait<std::string>("test2", "This is technically our second test trait.", "VALUE");
-  tm.AddTrait<int>("test3", "And we need another int trait to test", 1000);
-
-
-  //emp::TraitSet trait_set(tm);
-}
-
-
-TEST_CASE("Test vector", "[tools]")
-{
-  emp::vector<int> v(20);
-
-  for (int i = 0; i < 20; i++) {
-    v[i] = i * i;
-  }
-
-  int total = 0;
-  for (int i : v) {
-    total += i;
-  }
-
-  REQUIRE(total == 2470);
-}
-
-
-TEST_CASE("Test macro math", "[tools]")
+TEST_CASE("Test macro_math", "[tools]")
 {
 
   // Test converting between binary, decimal, and sum formats.
@@ -1399,6 +983,737 @@ TEST_CASE("Test macros", "[tools]")
 
   EMP_TEST_MACRO( EMP_STRINGIFY_EACH(some, words), "\"some\" , \"words\"" );
 }
+
+TEST_CASE("Test map_utils", "[tools]")
+{
+  std::map<int, char> test_map;
+  test_map[0] = 'a';
+  test_map[4] = 'e';
+  test_map[8] = 'i';
+  test_map[14] = 'o';
+  test_map[20] = 'u';
+
+  REQUIRE( emp::Has(test_map, 8) == true );
+  REQUIRE( emp::Has(test_map, 18) == false );
+  REQUIRE( emp::Find(test_map, 14, 'x') == 'o'); // 14 should be there as 'o'
+  REQUIRE( emp::Find(test_map, 15, 'x') == 'x'); // 15 shouldn't be there, so return default.
+  REQUIRE( emp::Has(test_map, 15) == false );    // Make sure 15 hasn't been added to the map.
+
+  auto flipped = emp::flip_map(test_map);        // Make sure we can reverse the map.
+  REQUIRE( emp::Has(flipped, 'u') == true);      // And the reversed map should have proper info.
+  REQUIRE( emp::Has(flipped, 'x') == false);
+}
+
+TEST_CASE("Test math", "[tools]")
+{
+  constexpr auto a1 = emp::Log2(3.14);           REQUIRE( a1 > 1.650);   REQUIRE( a1 < 1.651);
+  constexpr auto a2 = emp::Log2(0.125);          REQUIRE( a2 == -3.0 );
+  constexpr auto a3 = emp::Log(1000, 10);        REQUIRE( a3 == 3.0 );
+  constexpr auto a4 = emp::Log(10, 1000);        REQUIRE( a4 > 0.333 );  REQUIRE( a4 < 0.334 );
+  constexpr auto a5 = emp::Log10(100);           REQUIRE( a5 == 2.0 );
+  constexpr auto a6 = emp::Ln(3.33);             REQUIRE( a6 > 1.202 );  REQUIRE( a6 < 1.204 );
+  constexpr auto a7 = emp::Pow2(2.345);          REQUIRE( a7 > 5.080 );  REQUIRE( a7 < 5.081 );
+  constexpr auto a8 = emp::Pow(emp::PI, emp::E); REQUIRE( a8 > 22.440 ); REQUIRE( a8 < 22.441 );
+}
+
+
+struct TestClass1 {
+  TestClass1() {
+    EMP_TRACK_CONSTRUCT(TestClass1);
+  }
+  ~TestClass1() {
+    EMP_TRACK_DESTRUCT(TestClass1);
+  }
+};
+
+struct TestClass2 {
+  TestClass2() {
+    EMP_TRACK_CONSTRUCT(TestClass2);
+  }
+  ~TestClass2() {
+    EMP_TRACK_DESTRUCT(TestClass2);
+  }
+};
+
+TEST_CASE("Test mem_track", "[tools]")
+{
+  emp::vector<TestClass1 *> test_v;
+  TestClass2 class2_mem;
+
+  REQUIRE(EMP_TRACK_COUNT(TestClass1) == 0);
+
+  for (int i = 0; i < 1000; i++) {
+    test_v.push_back( new TestClass1 );
+  }
+
+  REQUIRE(EMP_TRACK_COUNT(TestClass1) == 1000);
+
+
+  for (int i = 500; i < 1000; i++) {
+    delete test_v[i];
+  }
+
+  REQUIRE(EMP_TRACK_COUNT(TestClass1) == 500);
+  //REQUIRE(EMP_TRACK_STATUS == 0);
+
+}
+
+
+template <typename A, typename B>
+struct MetaTestClass {
+  A a;
+  B b;
+};
+
+TEST_CASE("Test meta-programming helpers", "[tools]")
+{
+  // TEST FOR VARIADIC HELPER FUNCTIONS:
+
+  REQUIRE((emp::get_type_index<char, char, bool, int, double>()) == 0);
+  REQUIRE((emp::get_type_index<int, char, bool, int, double>()) == 2);
+  REQUIRE((emp::get_type_index<double, char, bool, int, double>()) == 3);
+  REQUIRE((emp::get_type_index<std::string, char, bool, int, double>()) < 0);
+
+  REQUIRE((emp::has_unique_first_type<int, bool, std::string, bool, char>()) == true);
+  REQUIRE((emp::has_unique_first_type<bool, int, std::string, bool, char>()) == false);
+  REQUIRE((emp::has_unique_types<bool, int, std::string, emp::vector<bool>, char>()) == true);
+  REQUIRE((emp::has_unique_types<int, bool, std::string, bool, char>()) == false);
+
+
+  std::tuple<int, int, char> test_tuple(3,2,'a');
+  emp::ApplyTuple(TestFun, test_tuple);
+
+  REQUIRE(result_char == 'g');
+
+  using meta1_t = MetaTestClass<int, double>;
+  using meta2_t = emp::AdaptTemplate<meta1_t, char, bool>;
+  using meta3_t = emp::AdaptTemplate_Arg1<meta1_t, std::string>;
+
+  meta1_t meta1;
+  meta2_t meta2;
+  meta3_t meta3;
+
+  meta1.a = (decltype(meta1.a)) 65.5;
+  meta1.b = (decltype(meta1.b)) 65.5;
+  meta2.a = (decltype(meta2.a)) 65.5;
+  meta2.b = (decltype(meta2.b)) 65.5;
+  meta3.a = (decltype(meta3.a)) "65.5";
+  meta3.b = (decltype(meta3.b)) 65.5;
+
+  REQUIRE( meta1.a == 65 );
+  REQUIRE( meta1.b == 65.5 );
+  REQUIRE( meta2.a == 'A' );
+  REQUIRE( meta2.b == true );
+  REQUIRE( meta3.a == "65.5" );
+  REQUIRE( meta3.b == 65.5 );
+}
+
+TEST_CASE("Test NFA", "[tools]")
+{
+  emp::NFA nfa(10);
+  nfa.AddTransition(0, 1, 'a');
+  nfa.AddTransition(0, 2, 'a');
+  nfa.AddTransition(0, 3, 'a');
+  nfa.AddTransition(0, 4, 'a');
+
+  nfa.AddTransition(1, 2, 'b');
+  nfa.AddTransition(2, 3, 'c');
+  nfa.AddTransition(3, 4, 'd');
+
+  nfa.AddTransition(0, 1, 'e');
+  nfa.AddTransition(0, 1, 'f');
+  nfa.AddTransition(0, 1, 'g');
+
+  nfa.AddTransition(2, 3, 'a');
+  nfa.AddTransition(3, 4, 'a');
+  nfa.AddTransition(2, 4, 'a');
+
+  nfa.AddTransition(2, 2, 'e');
+  nfa.AddTransition(3, 3, 'e');
+  nfa.AddTransition(4, 4, 'e');
+
+  nfa.AddFreeTransition(1,5);
+
+  nfa.AddTransition(5, 6, 'a');
+
+  nfa.AddFreeTransition(6,7);
+  nfa.AddFreeTransition(6,8);
+  nfa.AddFreeTransition(6,9);
+  nfa.AddFreeTransition(9,0);
+
+  emp::NFA_State state(nfa);
+  REQUIRE(state.GetSize() == 1);
+  state.Next('a');
+  REQUIRE(state.GetSize() == 5);
+  state.Next('a');
+  REQUIRE(state.GetSize() == 7);
+
+  emp::NFA_State state2(nfa);
+  REQUIRE(state2.GetSize() == 1);
+  state2.Next("aaaa");
+  REQUIRE(state2.GetSize() == 7);
+}
+
+TEST_CASE("Test Ptr", "[tools]")
+{
+  // Test default constructor.
+  emp::Ptr<int> ptr1;
+  ptr1.New();
+  *ptr1 = 5;
+  REQUIRE(*ptr1 == 5);
+  ptr1.Delete();
+
+  // Test pointer constructor
+  int * temp_int = new int;
+  emp::Ptr<int> ptr2(temp_int);
+  *ptr2 = 10;
+  REQUIRE(*ptr2 == 10);
+  ptr2.Delete();
+
+  // Test non-pointer object constructor
+  int base_val = 15;
+  emp::Ptr<int> ptr3(base_val);
+  REQUIRE(*ptr3 == 15);
+  base_val = 20;                 // Make sure pointed to value changes with original variable.
+  REQUIRE(*ptr3 == 20);
+
+  // Test copy-constructor.
+  emp::Ptr<int> ptr4(ptr3);
+  REQUIRE(*ptr4 == 20);
+  *ptr4 = 25;                    // Change this new pointer...
+  REQUIRE(*ptr4 == 25);       // ...make sure it actually changed.
+  REQUIRE(*ptr3 == 25);       // ...make sure the other pointer reflects the change.
+  REQUIRE(base_val == 25);    // ...make sure the original variable changed.
+
+  // -- Test count tracking on emp::Ptr --
+  // A bit of an odd set of test... we need to create and destory pointers to make sure
+  // that all of the counts are correct, so we're going to use arrays of pointers to them.
+
+  emp::vector<emp::Ptr<char> *> ptr_set(10);
+  ptr_set[0] = new emp::Ptr<char>;
+  ptr_set[0]->New(42);
+  for (int i = 1; i < 10; i++) ptr_set[i] = new emp::Ptr<char>(*(ptr_set[0]));
+
+  // Do we have a proper count of 10?
+  REQUIRE(ptr_set[0]->DebugGetCount() == 10);
+  ptr_set[1]->New(91);
+  REQUIRE(ptr_set[0]->DebugGetCount() == 9);
+  *(ptr_set[2]) = *(ptr_set[1]);
+  REQUIRE(ptr_set[0]->DebugGetCount() == 8);
+  REQUIRE(ptr_set[1]->DebugGetCount() == 2);
+
+  ptr_set[3]->Delete();
+
+  // std::cout << ptr_set[0]->DebugGetCount() << std::endl;
+
+  // @CAO Make sure we don't delete below 0
+  // @CAO Make sure we don't delete below 1 if we own it
+  // @CAO Make sure we only delete if you own it
+  // @CAO Make sure not to delete twice!
+  // @CAO Make sure we don't add (as owner) a pointer we already own
+
+  // -- Do some direct tests on pointer trackers --
+
+  int * real_ptr1 = new int(1);  // Count of 2 in tracker
+  int * real_ptr2 = new int(2);  // Deleted in tracker
+  int * real_ptr3 = new int(3);  // Unknown to tracker
+  int * real_ptr4 = new int(4);  // Passively known to tracker (marked non-owner)
+  auto & tracker = emp::PtrTracker::Get();
+
+  tracker.New(real_ptr1);
+  tracker.Inc(real_ptr1);
+  tracker.Inc(real_ptr1);
+  tracker.Dec(real_ptr1);
+
+  tracker.New(real_ptr2);
+  tracker.MarkDeleted(real_ptr2);
+
+  tracker.Old(real_ptr4);
+
+  REQUIRE(tracker.HasPtr(real_ptr1) == true);
+  REQUIRE(tracker.HasPtr(real_ptr2) == true);
+  REQUIRE(tracker.HasPtr(real_ptr3) == false);
+  REQUIRE(tracker.HasPtr(real_ptr4) == true);
+
+  REQUIRE(tracker.IsActive(real_ptr1) == true);
+  REQUIRE(tracker.IsActive(real_ptr2) == false);
+  REQUIRE(tracker.IsActive(real_ptr3) == false);
+  REQUIRE(tracker.IsActive(real_ptr4) == true);
+
+  REQUIRE(tracker.IsOwner(real_ptr1) == true);
+  REQUIRE(tracker.IsOwner(real_ptr2) == true);
+  REQUIRE(tracker.IsOwner(real_ptr3) == false);
+  REQUIRE(tracker.IsOwner(real_ptr4) == false);
+
+  REQUIRE(tracker.GetCount(real_ptr1) == 2);
+  REQUIRE(tracker.GetCount(real_ptr2) == 1);
+  REQUIRE(tracker.GetCount(real_ptr3) == 0);
+  REQUIRE(tracker.GetCount(real_ptr4) == 1);
+}
+
+
+
+TEST_CASE("Test random", "[tools]")
+{
+  emp::Random rng;
+
+  // Test GetDouble with the law of large numbers.
+  emp::vector<int> val_counts(10);
+  for (int i = 0; i < (int) val_counts.size(); i++) val_counts[i] = 0;
+
+  const int num_tests = 100000;
+  const double min_value = 2.5;
+  const double max_value = 8.7;
+  double total = 0.0;
+  for (int i = 0; i < num_tests; i++) {
+    const double cur_value = rng.GetDouble(min_value, max_value);
+    total += cur_value;
+    val_counts[(int) cur_value]++;
+  }
+
+  {
+    const double expected_mean = (min_value + max_value) / 2.0;
+    const double min_threshold = (expected_mean*0.997);
+    const double max_threshold = (expected_mean*1.004);
+    double mean_value = total/(double) num_tests;
+
+    REQUIRE(mean_value > min_threshold);
+    REQUIRE(mean_value < max_threshold);
+  }
+
+  // Test GetInt
+  for (int i = 0; i < (int) val_counts.size(); i++) val_counts[i] = 0;
+  total = 0.0;
+
+  for (int i = 0; i < num_tests; i++) {
+    const int cur_value = rng.GetInt((int) min_value, (int) max_value);
+    total += cur_value;
+    val_counts[cur_value]++;
+  }
+
+  {
+    const double expected_mean = (double) (((int) min_value) + ((int) max_value) - 1) / 2.0;
+    const double min_threshold = (expected_mean*0.997);
+    const double max_threshold = (expected_mean*1.004);
+    double mean_value = total/(double) num_tests;
+
+    REQUIRE(mean_value > min_threshold);
+    REQUIRE(mean_value < max_threshold);
+  }
+
+  // Test P
+  double flip_prob = 0.56789;
+  int hit_count = 0;
+  for (int i = 0; i < num_tests; i++) {
+    if (rng.P(flip_prob)) hit_count++;
+  }
+
+  double actual_prob = ((double) hit_count) / (double) num_tests;
+
+  REQUIRE(actual_prob < flip_prob + 0.005);
+  REQUIRE(actual_prob > flip_prob - 0.005);
+
+
+  // Mimimal test of Choose()
+  emp::vector<int> choices = Choose(rng,100,10);
+
+  REQUIRE(choices.size() == 10);
+}
+
+struct TestTrue {
+  int test_member;
+  int TestFun(int a, int b) { return a*b; }
+};
+
+struct TestFalse {
+  int other_stuff;
+};
+
+struct TestTrueMethod {
+  int test_member() { return 4; }
+};
+
+template <typename T>
+int TestExternalFun(T & obj, int a, int b) { return a+b; }
+
+EMP_CREATE_MEMBER_DETECTOR(test_member);
+EMP_CREATE_METHOD_FALLBACK(DynamicFun, TestFun, TestExternalFun, int);
+
+TEST_CASE("Test reflection", "[tools]")
+{
+
+  REQUIRE(EMP_Detect_test_member<TestTrue>::value == 1);
+  REQUIRE(EMP_Detect_test_member<TestFalse>::value == 0);
+  REQUIRE(EMP_Detect_test_member<TestTrueMethod>::value == 1);
+
+  TestTrue t;
+  TestFalse f;
+  REQUIRE(DynamicFun(t, 20, 20) == 400);
+  REQUIRE(DynamicFun(f, 20, 20) == 40);
+
+}
+
+TEST_CASE("Test regular expressions (RegEx)", "[tools]")
+{
+  emp::RegEx re1("a|bcdef");
+  REQUIRE(re1.Test("a") == true);
+  REQUIRE(re1.Test("bc") == false);
+  REQUIRE(re1.Test("bcdef") == true);
+  REQUIRE(re1.Test("bcdefg") == false);
+
+  emp::RegEx re2("#[abcdefghijklm]*abc");
+  REQUIRE(re2.Test("") == false);
+  REQUIRE(re2.Test("#a") == false);
+  REQUIRE(re2.Test("#aaaabc") == true);
+  REQUIRE(re2.Test("#abcabc") == true);
+  REQUIRE(re2.Test("#abcabcd") == false);
+
+  emp::RegEx re3("xx(y|(z*)?)+xx");
+  REQUIRE(re3.Test("xxxx") == true);
+  REQUIRE(re3.Test("xxxxx") == false);
+  REQUIRE(re3.Test("xxyxx") == true);
+  REQUIRE(re3.Test("xxyyxx") == true);
+  REQUIRE(re3.Test("xxzzzxx") == true);
+
+  emp::RegEx re_WHITESPACE("[ \t\r]");
+  emp::RegEx re_COMMENT("#.*");
+  emp::RegEx re_INT_LIT("[0-9]+");
+  emp::RegEx re_FLOAT_LIT("[0-9]+[.][0-9]+");
+  emp::RegEx re_CHAR_LIT("'(.|(\\\\[\\\\'nt]))'");
+  emp::RegEx re_STRING_LIT("[\"]((\\\\[nt\"\\\\])|[^\"])*\\\"");
+  emp::RegEx re_ID("[a-zA-Z0-9_]+");
+
+  REQUIRE(re_INT_LIT.Test("1234") == true);
+  REQUIRE(re_FLOAT_LIT.Test("1234") == false);
+  REQUIRE(re_ID.Test("1234") == true);
+  REQUIRE(re_INT_LIT.Test("1234.56") == false);
+  REQUIRE(re_FLOAT_LIT.Test("1234.56") == true);
+  REQUIRE(re_ID.Test("1234.56") == false);
+
+  std::string test_str = "\"1234\"";
+  REQUIRE(re_STRING_LIT.Test(test_str) == true);
+  REQUIRE(re_INT_LIT.Test(test_str) == false);
+
+  std::string test_str2 = "\"1234\", \"5678\"";
+  REQUIRE(re_STRING_LIT.Test(test_str2) == false);
+}
+
+TEST_CASE("Test sequence utils", "[tools]")
+{
+  std::string s1 = "This is the first test string.";
+  std::string s2 = "This is the second test string.";
+
+  REQUIRE(emp::calc_hamming_distance(s1,s2) == 19);
+  REQUIRE(emp::calc_edit_distance(s1,s2) == 6);
+
+  // std::string s3 = "abcdefghijklmnopqrstuvwWxyz";
+  // std::string s4 = "abBcdefghijXXmnopqrstuvwxyz";
+
+  // std::string s3 = "lmnopqrstuv";
+  // std::string s4 = "abcdefghijklmnopqrstuvwxyz";
+
+  std::string s3 = "adhlmnopqrstuvxy";
+  std::string s4 = "abcdefghijklmnopqrstuvwxyz";
+
+  emp::align(s3, s4, '_');
+
+  REQUIRE(s3 == "a__d___h___lmnopqrstuv_xy_");
+
+  emp::vector<int> v1 = { 1,2,3,4,5,6,7,8,9 };
+  emp::vector<int> v2 = { 1,4,5,6,8 };
+
+  emp::align(v1,v2,0);
+
+  REQUIRE((v2 == emp::vector<int>({1,0,0,4,5,6,0,8,0})));
+}
+
+
+
+struct SerializeTest {
+  int a;
+  float b;        // unimportant data!
+  std::string c;
+
+  SerializeTest(int _a, float _b, std::string _c) : a(_a), b(_b), c(_c) { ; }
+  EMP_SETUP_DATAPOD(SerializeTest, a, c);
+};
+
+struct SerializeTest_D : public SerializeTest {
+  char d = '$';
+
+  SerializeTest_D(int _a, float _b, std::string _c, char _d)
+    : SerializeTest(_a, _b, _c), d(_d) { ; }
+  EMP_SETUP_DATAPOD_D(SerializeTest_D, SerializeTest, d);
+};
+
+struct ExtraBase {
+  double e;
+
+  ExtraBase(double _e) : e(_e) { ; }
+  EMP_SETUP_DATAPOD(ExtraBase, e);
+};
+
+struct MultiTest : public SerializeTest, public ExtraBase {
+  bool f;
+
+  MultiTest(int _a, float _b, std::string _c, double _e, bool _f)
+    : SerializeTest(_a, _b, _c), ExtraBase(_e), f(_f) { ; }
+  EMP_SETUP_DATAPOD_D2(MultiTest, SerializeTest, ExtraBase, f);
+};
+
+struct NestedTest {
+  SerializeTest st;
+  std::string name;
+  SerializeTest_D std;
+  MultiTest mt;
+
+  NestedTest(int a1, float b1, std::string c1,
+             int a2, float b2, std::string c2, char d2,
+             int a3, float b3, std::string c3, double e3, bool f3)
+    : st(a1, b1, c1), name("my_class"), std(a2, b2, c2, d2), mt(a3, b3, c3, e3, f3) { ; }
+
+  EMP_SETUP_DATAPOD(NestedTest, st, name, std, mt);
+};
+
+struct BuiltInTypesTest {
+  const int a;
+  emp::vector<int> int_v;
+
+  BuiltInTypesTest(int _a, int v_size) : a(_a), int_v(v_size) {
+    for (int i = 0; i < v_size; i++) int_v[i] = i*i;
+  }
+
+  EMP_SETUP_DATAPOD(BuiltInTypesTest, a, int_v);
+};
+
+TEST_CASE("Test serialize", "[tools]")
+{
+  std::stringstream ss;
+  emp::serialize::DataPod pod(ss);
+
+
+  // Basic test...
+
+  SerializeTest st(7, 2.34, "my_test_string");
+  st.EMP_Store(pod);
+
+  SerializeTest st2(pod);
+
+  REQUIRE(st2.a == 7);                 // Make sure a was reloaded correctly.
+  REQUIRE(st2.c == "my_test_string");  // Make sure c was reloaded correctly.
+
+
+  // Derived class Test
+
+  SerializeTest_D stD(10,0.2,"three",'D');
+  stD.EMP_Store(pod);
+
+  SerializeTest_D stD2(pod);
+
+  REQUIRE(stD2.a == 10);
+  REQUIRE(stD2.c == "three");
+  REQUIRE(stD2.d == 'D');
+
+  // Multiply-derived class Test
+
+  MultiTest stM(111,2.22,"ttt",4.5,true);
+  stM.EMP_Store(pod);
+
+  MultiTest stM2(pod);
+
+
+  REQUIRE(stM2.a == 111);
+  REQUIRE(stM2.c == "ttt");
+  REQUIRE(stM2.e == 4.5);
+  REQUIRE(stM2.f == true);
+
+
+  // Nested objects test...
+
+  NestedTest nt(91, 3.14, "magic numbers",
+                100, 0.01, "powers of 10", '1',
+                1001, 1.001, "ones and zeros", 0.125, true);
+  nt.EMP_Store(pod);
+
+  NestedTest nt2(pod);
+
+  REQUIRE(nt2.st.a == 91);
+  REQUIRE(nt2.st.c == "magic numbers");
+  REQUIRE(nt2.name == "my_class");
+  REQUIRE(nt2.std.a == 100);
+  REQUIRE(nt2.std.c == "powers of 10");
+  REQUIRE(nt2.std.d == '1');
+  REQUIRE(nt2.mt.a == 1001);
+  REQUIRE(nt2.mt.c == "ones and zeros");
+  REQUIRE(nt2.mt.e == 0.125);
+  REQUIRE(nt2.mt.f == true);
+
+
+  // If we made it this far, everything must have worked!;
+
+  const int v_size = 43;
+  BuiltInTypesTest bitt(91, v_size);
+  bitt.EMP_Store(pod);
+
+
+  BuiltInTypesTest bitt2(pod);
+}
+
+
+
+TEST_CASE("Test string utils", "[tools]")
+{
+
+  // TEST1: lets test our conversion to an escaped string.
+  const std::string special_string = "This\t5tr1ng\nis\non THREE (3) \"lines\".";
+  std::string escaped_string = emp::to_escaped_string(special_string);
+
+  // note: we had to double-escape the test to make sure this worked.
+  REQUIRE(escaped_string == "This\\t5tr1ng\\nis\\non THREE (3) \\\"lines\\\".");
+
+  // TEST2: Test more general conversion to literals.
+  REQUIRE(emp::to_literal(42) == "42");
+  REQUIRE(emp::to_literal('a') == "'a'");
+  REQUIRE(emp::to_literal('\t') == "'\\t'");
+  REQUIRE(emp::to_literal(1.234) == "1.234000");
+
+  // TEST3: Make sure that we can properly identify different types of characters.
+  int num_ws = 0;
+  int num_cap = 0;
+  int num_lower = 0;
+  int num_let = 0;
+  int num_num = 0;
+  int num_alphanum = 0;
+  int num_i = 0;
+  int num_vowel = 0;
+  for (char cur_char : special_string) {
+    if (emp::is_whitespace(cur_char)) num_ws++;
+    if (emp::is_upper_letter(cur_char)) num_cap++;
+    if (emp::is_lower_letter(cur_char)) num_lower++;
+    if (emp::is_letter(cur_char)) num_let++;
+    if (emp::is_digit(cur_char)) num_num++;
+    if (emp::is_alphanumeric(cur_char)) num_alphanum++;
+    if (emp::is_valid(cur_char, [](char c){ return c=='i'; })) num_i++;
+    if (emp::is_valid(cur_char, [](char c){return c=='a' || c=='A';},
+                      [](char c){return c=='e' || c=='E';},
+                      [](char c){return c=='i' || c=='I';},
+                      [](char c){return c=='o' || c=='O';},
+                      [](char c){return c=='u' || c=='U';},
+                      [](char c){return c=='y';}
+                      )) num_vowel++;
+  }
+  int num_other = ((int) special_string.size()) - num_alphanum - num_ws;
+
+
+  REQUIRE(num_ws == 6);
+  REQUIRE(num_cap == 6);
+  REQUIRE(num_lower == 16);
+  REQUIRE(num_let == 22);
+  REQUIRE(num_num == 3);
+  REQUIRE(num_alphanum == 25);
+  REQUIRE(num_other == 5);
+  REQUIRE(num_i == 3);
+  REQUIRE(num_vowel == 7);
+
+  std::string base_string = "This is an okay string.\n  \tThis\nis   -MY-    very best string!!!!   ";
+
+  std::string first_line = emp::string_pop_line(base_string);
+
+  REQUIRE(first_line == "This is an okay string.");
+  REQUIRE(emp::string_get_word(first_line) == "This");
+
+  emp::string_pop_word(first_line);
+
+  REQUIRE(first_line == "is an okay string.");
+
+  emp::remove_whitespace(first_line);
+
+  REQUIRE(first_line == "isanokaystring.");
+
+  std::string popped_str = emp::string_pop(first_line, "ns");
+
+  REQUIRE(popped_str == "i");
+  REQUIRE(first_line == "anokaystring.");
+
+
+
+  popped_str = emp::string_pop(first_line, "ns");
+
+
+  REQUIRE(popped_str == "a");
+  REQUIRE(first_line == "okaystring.");
+
+
+
+  popped_str = emp::string_pop(first_line, 'y');
+
+  REQUIRE(popped_str == "oka");
+  REQUIRE(first_line == "string.");
+
+  emp::left_justify(base_string);
+  REQUIRE(base_string == "This\nis   -MY-    very best string!!!!   ");
+
+  emp::right_justify(base_string);
+  REQUIRE(base_string == "This\nis   -MY-    very best string!!!!");
+
+  emp::compress_whitespace(base_string);
+  REQUIRE(base_string == "This is -MY- very best string!!!!");
+
+  auto slices = emp::slice("This is a test of a different version of slice.", ' ');
+
+  REQUIRE(slices.size() == 10);
+  REQUIRE(slices[8] == "of");
+
+  // Try other ways of using slice().
+  emp::slice(base_string, slices, 's');
+
+  REQUIRE(slices.size() == 5);
+  REQUIRE(slices[1] == " i");
+  REQUIRE(slices[3] == "t ");
+
+
+  std::string cat_a = "ABC";
+  bool cat_b = true;
+  char cat_c = '2';
+  int cat_d = 3;
+
+  std::string cat_full = emp::to_string(cat_a, cat_b, cat_c, cat_d);
+
+  REQUIRE(cat_full == "ABC123");
+}
+
+
+
+// TEST_CASE("Test trait", "[tools]")
+// {
+//   emp::TraitManager<int, double, emp::vector<bool>, char, std::string> tm;
+
+//   tm.AddTrait<int>("test_trait", "This is a test trait", 42);
+//   tm.AddTrait<std::string>("test2", "This is technically our second test trait.", "VALUE");
+//   tm.AddTrait<int>("test3", "And we need another int trait to test", 1000);
+
+
+//   //emp::TraitSet trait_set(tm);
+// }
+
+
+TEST_CASE("Test vector", "[tools]")
+{
+  emp::vector<int> v(20);
+
+  for (int i = 0; i < 20; i++) {
+    v[i] = i * i;
+  }
+
+  int total = 0;
+  for (int i : v) {
+    total += i;
+  }
+
+  REQUIRE(total == 2470);
+}
+
+
 
 // no idea what these do, but they're probably necessary
 
