@@ -37,6 +37,18 @@ kind of comment::
                 // note how it only has two leading slashes, like a normal comment
                 /// This is a comment that will be included in the documentation
                 /// Note the extra leading slash
+                /// Huzzah, documentation
+
+One thing to note, Doxygen requires a minimum of three triple slash'd lines before a block is
+considered documentation::
+
+                /// this line will be ignored
+                int somefunc() { return 5;}
+                
+                ///
+                /// This line will be included
+                ///
+                void otherfunc() {;};
 
 If you wish to make a more visible comment block, e.g. a header for a class, then you may do
 something like the following::
@@ -85,3 +97,31 @@ XML files to construct the docs.
 Additional directives exist to include autodocumentaiton from different levels, the full breakdown
 of which is available within the `Breathe Documentation
 <https://breathe.readthedocs.org/en/latest/directives.html>`__.
+
+
+How to add docs to the Sphinx documentation
+-------------------------------------------
+
+Sphinx is the system used to generate the developer guide and similar reference documentation. A
+primer to using ReStructured Text, the markup language used by Sphinx, can be found `here
+<http://docutils.sourceforge.net/docs/user/rst/quickstart.html>`__. You can also look at any of the
+`.rst` files in the `doc/` directory to get a feel for how thinks work.
+
+New documents must be included in the 'toctree' in the ``index.rst`` file for the directory the added
+file lives in. For example, if you add ``CowFacts.rst`` to the ``CoolFacts/`` directory you must add
+``CowFacts.rst`` to the toctree found in ``CoolFacts/CowFacts.rst``::
+
+    Cool Facts
+    ==========
+
+    A bunch of cool facts!
+
+    .. toctree ::
+       AnteaterFacts
+       BirdFacts
+       CowFacts
+
+To build the documentation, you must make sure you source the python virtual environment where
+Sphinx lives. If you used the ``install-dependencies`` maketarget (recommended) then you should just
+have to do ``source third-party/env/bin/activate`` and then ``make doc`` and the documentation will
+regenerate.
