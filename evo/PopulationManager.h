@@ -53,8 +53,7 @@ namespace evo {
     int GetSize() const { return (int) pop.size(); }
 
     void SetRandom(Random * r) { random_ptr = r; }
-
-    void Setup(Random * r){ SetRandom(r); }
+    void Setup(Random * r) { SetRandom(r); }
 
     void Print(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout,
               std::string empty="X", std::string spacer=" ") {
@@ -78,12 +77,14 @@ namespace evo {
     int AddOrg(ORG * new_org) {
       const int pos = pop.size();
       pop.push_back(new_org);
+      ClearCache(pos);
       return pos;
     }
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = random_ptr->GetInt((int) pop.size());
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
+      ClearCache(pos);
       return pos;
     }
 
@@ -91,6 +92,7 @@ namespace evo {
       // Delete all organisms.
       for (ORG * org : pop) if (org) delete org;
       pop.resize(0);
+      ClearCache();
     }
 
     void Update() { ; } // Basic version of Update() does nothing, but World may trigger actions.
@@ -104,11 +106,13 @@ namespace evo {
     }
 
     // --- FITNESS CHACHING ---
-    bool CacheOk(size_t id) { return (fitness_cache.size() > id) && (fitness_cache[id] >= 0.0); }
-    double GetCache(size_t id) { return fitness_cache[id]; }
+    bool CacheOk(size_t id) const { return (fitness_cache.size() > id) && (fitness_cache[id] >= 0.0); }
+    double GetCache(size_t id) const { return fitness_cache[id]; }
+    size_t GetCacheSize() const { return fitness_cache.size(); }
+
     void CacheFitness(size_t id, double fitness) { fitness_cache[id] = fitness; }
     void ClearCache() { fitness_cache.resize(0); }
-    void ClearCache(size_t id) { fitness_cache[id] = -1.0; }
+    void ClearCache(size_t id) { if (id < fitness_cache.size()) fitness_cache[id] = -1.0; }
     void ResizeCache(size_t new_size) { fitness_cache.resize(new_size); }
     void ResizeCache(size_t new_size, double def_val) { fitness_cache.resize(new_size, def_val); }
 
