@@ -14,7 +14,7 @@
 #include <cmath>
 #include <vector>
 #include <set>
-#include <map>
+#include <unordered_map>
 
 #include "../tools/vector.h"
 
@@ -57,12 +57,11 @@ template <typename ORG, typename WORLD>
   // Calculates the benefitial, neutral, and detremental mutational landscapes.
   // Also calculates the maximum benefital and detremental mutations
 template <typename ORG, typename WORLD>
-   MLandscape MutLandscape(std::function<double(ORG * org)> fit_fun, WORLD & orgs){
+   MLandscape MutLandscape(std::function<double(ORG * org)> fit_fun, WORLD & orgs, std::unordered_map<ORG, MLandscape> &table){
       double  mut_ben = 0, mut_det = 0, mut_neu = 0;
       int total_orgs = 0;
       MLandscape data;
       MLandscape info;
-      std::map<ORG, MLandscape> table;
 
       for (auto org : orgs){
           total_orgs++; //get a total count of orgs in current population

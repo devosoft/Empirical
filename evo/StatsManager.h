@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <cstdarg>
+#include <unordered_map>
 
 #include "../tools/FunctionSet.h"
 #include "../tools/vector.h"
@@ -14,6 +15,7 @@
 #include "PopulationManager.h"
 #include "EvoStats.h"
 #include "LineageTracker.h"
+#include "../tools/BitVector.h"
 
 namespace emp{
 namespace evo{
@@ -262,6 +264,8 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::Update;
       using lineage_type = LineageTracker_Pruned<POP_MANAGER>;
       lineage_type * lin_ptr;
+      using ORG = typename std::remove_pointer<org_ptr>::type;
+      std::unordered_map<ORG, MLandscape> table;
 
   public:
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::fit_fun;
@@ -301,7 +305,7 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
               return NonInf(fit_fun, *pop);
           };
           std::function<double()> ben_mut = [data, this](){
-              *data = MutLandscape(fit_fun, *pop);
+              *data = MutLandscape(fit_fun, *pop, table);
               return data->benefit_avg;
           };
           std::function<double()> neu_mut = [data](){
