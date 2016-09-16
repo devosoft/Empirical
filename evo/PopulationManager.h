@@ -28,7 +28,7 @@ namespace evo {
     pop_t pop;
 
     Random * random_ptr;
-    emp::vector<double> fitness_cache;  // vector size == 0 when not caching; invalid values == -1.
+    emp::vector<double> fit_cache;  // vector size == 0 when not caching; invalid values == -1.
 
   public:
     PopulationManager_Base(const std::string & world_name) { (void) world_name; }
@@ -106,15 +106,15 @@ namespace evo {
     }
 
     // --- FITNESS CHACHING ---
-    bool CacheOk(size_t id) const { return (fitness_cache.size() > id) && (fitness_cache[id] >= 0.0); }
-    double GetCache(size_t id) const { return fitness_cache[id]; }
-    size_t GetCacheSize() const { return fitness_cache.size(); }
+    bool CacheOk(size_t id) const { return (id < fit_cache.size()) && (fit_cache[id] >= 0.0); }
+    double GetCache(size_t id) const { return (id < fit_cache.size()) ? fit_cache[id] : -1.0; }
+    size_t GetCacheSize() const { return fit_cache.size(); }
 
-    void CacheFitness(size_t id, double fitness) { fitness_cache[id] = fitness; }
-    void ClearCache() { fitness_cache.resize(0); }
-    void ClearCache(size_t id) { if (id < fitness_cache.size()) fitness_cache[id] = -1.0; }
-    void ResizeCache(size_t new_size) { fitness_cache.resize(new_size); }
-    void ResizeCache(size_t new_size, double def_val) { fitness_cache.resize(new_size, def_val); }
+    void CacheFitness(size_t id, double fitness) { fit_cache[id] = fitness; }
+    void ClearCache() { fit_cache.resize(0); }
+    void ClearCache(size_t id) { if (id < fit_cache.size()) fit_cache[id] = -1.0; }
+    void ResizeCache(size_t new_size) { fit_cache.resize(new_size); }
+    void ResizeCache(size_t new_size, double def_val) { fit_cache.resize(new_size, def_val); }
 
     // --- POPULATION MANIPULATIONS ---
 
