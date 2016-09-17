@@ -146,26 +146,32 @@ namespace evo {
   template <typename ORG, typename... MANAGERS>
   class World {
   public:
-    // Build managers...
-    AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG> popM;
-    AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgMDynamic>::type, ORG> orgM;
-    AdaptTemplate<typename SelectStatsManager<MANAGERS...,NullStats >::type, decltype(popM)> statsM;
+    // Determine manager types...
+    using popM_t = AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG>;
+    using orgM_t = AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgMDynamic>::type, ORG>;
+    using statsM_t = AdaptTemplate<typename SelectStatsManager<MANAGERS...,NullStats >::type, popM_t>;
 
     //Create a lineage manager if the stats manager needs it or if the user asked for it
-    EMP_CHOOSE_MEMBER_TYPE(DefaultLineage, lineage_type, LineageNull, decltype(statsM));
-    AdaptTemplate<typename SelectLineageManager<MANAGERS...,DefaultLineage>::type, decltype(popM)> lineageM;
+    EMP_CHOOSE_MEMBER_TYPE(DefaultLineage, lineage_type, LineageNull, statsM_t);
+    using lineageM_t = AdaptTemplate<typename SelectLineageManager<MANAGERS...,DefaultLineage>::type, popM_t>;
+
+    // Now that we've determined all of the manager types, build them!
+    popM_t popM;
+    orgM_t orgM;
+    statsM_t statsM;
+    lineageM_t lineageM;
 
     Random * random_ptr;
     bool random_owner;
     int update = 0;
-    using iterator = PopulationIterator<decltype(popM)>;
+    using iterator = PopulationIterator<popM_t>;
 
     // Signals triggered by the world.
     Signal<int> before_repro_sig;       // Trigger: Immediately prior to producing offspring
     Signal<ORG *> offspring_ready_sig;  // Trigger: Offspring about to enter population
     Signal<ORG *> inject_ready_sig;     // Trigger: New org about to be added to population
     Signal<int> org_placement_sig;      // Trigger: Organism has been added to population
-    Signal<int> on_update_sig;          // Trigger: Organism has been added to population
+    Signal<int> on_update_sig;          // Trigger: New update is starting.
 
     // Determine the callback type; by default this will be OrgSignals_NONE, but it can be
     // overridden by setting the type callback_t in the organism class.
@@ -218,8 +224,8 @@ namespace evo {
     ORG & operator[](int i) { return *(popM[i]); }
     const ORG & operator[](int i) const { return *(popM[i]); }
     bool IsOccupied(int i) const { return popM[i] != nullptr; }
-    iterator begin(){return PopulationIterator<decltype(popM)>(&popM, 0);}
-    iterator end(){return PopulationIterator<decltype(popM)>(&popM, popM.size());}
+    iterator begin(){ return PopulationIterator<popM_t>(&popM, 0); }
+    iterator end(){ return PopulationIterator<popM_t>(&popM, popM.size()); }
 
     void Clear() { popM.Clear(); }
 
@@ -356,6 +362,13 @@ namespace evo {
     // Elite Selection can use the default fitness function.
     void EliteSelect(int e_count=1, int copy_count=1) {
       EliteSelect(orgM.GetFitFun(), e_count, copy_count);
+    }
+
+    // Roulette Selection (aka Fitness-Proportional Selection) chooses organisms to
+    // reproduce based on their current fitness.
+    // @CAO Can UPDATE weighted array rather than keep rebuilding it (use signals?)
+    void RouletteSelect(std::function<double(ORG*)> fit_fun) {
+
     }
 
     // Tournament Selection creates a tournament with a random sub-set of organisms,
