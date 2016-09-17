@@ -134,13 +134,10 @@ template <typename... T> void FUN(T &&... args) {         \
 namespace emp {
 namespace evo {
 
-
   EMP_SETUP_TYPE_SELECTOR(SelectPopManager, emp_is_population_manager)
   EMP_SETUP_TYPE_SELECTOR(SelectOrgManager, emp_is_organism_manager)
   EMP_SETUP_TYPE_SELECTOR(SelectStatsManager, emp_is_stats_manager)
   EMP_SETUP_TYPE_SELECTOR(SelectLineageManager, emp_is_lineage_manager)
-
-  template <typename POP_MANAGER> class PopulationIterator;
 
   // Main world class...
   template <typename ORG, typename... MANAGERS>
@@ -150,6 +147,7 @@ namespace evo {
     using popM_t = AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG>;
     using orgM_t = AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgMDynamic>::type, ORG>;
     using statsM_t = AdaptTemplate<typename SelectStatsManager<MANAGERS...,NullStats >::type, popM_t>;
+    using iterator_t = PopulationIterator<popM_t>;
 
     //Create a lineage manager if the stats manager needs it or if the user asked for it
     EMP_CHOOSE_MEMBER_TYPE(DefaultLineage, lineage_type, LineageNull, statsM_t);
@@ -164,7 +162,6 @@ namespace evo {
     Random * random_ptr;
     bool random_owner;
     int update = 0;
-    using iterator = PopulationIterator<popM_t>;
 
     // Signals triggered by the world.
     Signal<int> before_repro_sig;       // Trigger: Immediately prior to producing offspring
@@ -224,8 +221,8 @@ namespace evo {
     ORG & operator[](int i) { return *(popM[i]); }
     const ORG & operator[](int i) const { return *(popM[i]); }
     bool IsOccupied(int i) const { return popM[i] != nullptr; }
-    iterator begin(){ return PopulationIterator<popM_t>(&popM, 0); }
-    iterator end(){ return PopulationIterator<popM_t>(&popM, popM.size()); }
+    iterator_t begin(){ return iterator_t(&popM, 0); }
+    iterator_t end(){ return iterator_t(&popM, popM.size()); }
 
     void Clear() { popM.Clear(); }
 
