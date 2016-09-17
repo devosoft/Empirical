@@ -62,6 +62,7 @@ namespace emp {
     int GetSize() const { return (int) weight.size(); }
     double GetWeight() const { return weight[0].tree; }
     double GetWeight(int id) const { return weight[id].item; }
+    double GetProb(int id) const { return weight[id].item / weight[0].tree; }
 
     void Resize(int new_size) {
       weight.resize(new_size);  // Update the size (new weights default to zero)
