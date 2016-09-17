@@ -52,7 +52,7 @@ namespace emp {
     };
 
   public:
-    WeightedSet(int num_items) : weight(num_items) {;}
+    WeightedSet(int num_items=0) : weight(num_items) {;}
     WeightedSet(const WeightedSet &) = default;
     WeightedSet(WeightedSet &&) = default;
     ~WeightedSet() = default;
@@ -84,6 +84,13 @@ namespace emp {
         id = ParentID(id);
         weight[id].tree += weight_diff;
       }
+    }
+
+    size_t Insert(double in_weight) {
+      size_t id = weight.size();
+      weight.emplace_back();
+      Adjust(id, in_weight);
+      return id;
     }
 
     int Index(double index, int cur_id=0) {
