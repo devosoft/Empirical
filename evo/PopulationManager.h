@@ -25,11 +25,11 @@ namespace evo {
   protected:
     using ptr_t = ORG *;
     using pop_t = emp::vector<ORG *>;
+
     pop_t pop;
     FIT_MANAGER fitM;
 
     Random * random_ptr;
-    emp::vector<double> fit_cache;  // vector size == 0 when not caching; invalid values == -1.
 
   public:
     PopulationManager_Base(const std::string & world_name) { (void) world_name; }
@@ -78,14 +78,14 @@ namespace evo {
     int AddOrg(ORG * new_org) {
       const int pos = pop.size();
       pop.push_back(new_org);
-      ClearCache(pos);
+      fitM.ClearCache(pos);
       return pos;
     }
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = random_ptr->GetInt((int) pop.size());
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
-      ClearCache(pos);
+      fitM.ClearCache(pos);
       return pos;
     }
 
@@ -93,7 +93,7 @@ namespace evo {
       // Delete all organisms.
       for (ORG * org : pop) if (org) delete org;
       pop.resize(0);
-      ClearCache();
+      fitM.ClearCache();
     }
 
     void Update() { ; } // Basic version of Update() does nothing, but World may trigger actions.
@@ -106,17 +106,6 @@ namespace evo {
       }
     }
 
-    // --- FITNESS CHACHING ---
-    bool CacheOk(size_t id) const { return (id < fit_cache.size()) && (fit_cache[id] >= 0.0); }
-    double GetCache(size_t id) const { return (id < fit_cache.size()) ? fit_cache[id] : -1.0; }
-    size_t GetCacheSize() const { return fit_cache.size(); }
-
-    void CacheFitness(size_t id, double fitness) { fit_cache[id] = fitness; }
-    void ClearCache() { fit_cache.resize(0); }
-    void ClearCache(size_t id) { if (id < fit_cache.size()) fit_cache[id] = -1.0; }
-    void ResizeCache(size_t new_size) { fit_cache.resize(new_size); }
-    void ResizeCache(size_t new_size, double def_val) { fit_cache.resize(new_size, def_val); }
-
     // --- POPULATION MANIPULATIONS ---
 
     // Run population through a bottleneck to (potentiall) shrink it.
@@ -127,8 +116,10 @@ namespace evo {
       if (choose_random) emp::Shuffle<ptr_t>(*random_ptr, pop, new_size);
 
       // Delete all of the organisms we are removing and resize the population.
-      for (int i = new_size; i < (int) pop.size(); ++i) delete pop[i];
+      for (int i = new_size; i < (int) pop.size(); ++i) { delete pop[i]; }
       pop.resize(new_size);
+
+      fitM.ClearCache();  // Everyone is either deleted or in the wrong place!
     }
   };
 
@@ -196,9 +187,11 @@ namespace evo {
   template <typename ORG=int, typename FIT_MANAGER=int>
   class PopulationManager_EA : public PopulationManager_Base<ORG,FIT_MANAGER> {
   protected:
-    emp::vector<ORG *> next_pop;
     using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
     using base_t::pop;
+    using base_t::fitM;
+
+    emp::vector<ORG *> next_pop;
 
   public:
     PopulationManager_EA(const std::string & world_name) : base_t(world_name) { ; }
@@ -219,12 +212,14 @@ namespace evo {
 
       pop.resize(0);
       next_pop.resize(0);
+      fitM.ClearCache();
     }
 
     void Update() {
-      for (ORG * m : pop) delete m;   // Delete the current population.
-      pop = next_pop;                 // Move over the next generation.
-      next_pop.resize(0);             // Clear out the next pop to refill again.
+      for (ORG * m : pop) delete m;  // Delete the current population.
+      pop = next_pop;                // Move over the next generation.
+      next_pop.resize(0);            // Clear out the next pop to refill again.
+      fitM.ClearCache();             // Clear the fitness cache.
     }
   };
 
@@ -238,6 +233,7 @@ namespace evo {
   protected:
     using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
     using base_t::pop;
+    using base_t::fitM;
     using base_t::random_ptr;
     using base_t::DoBottleneck;
     using base_t::SetRandom;
@@ -276,6 +272,7 @@ namespace evo {
   protected:
     using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
     using base_t::pop;
+    using base_t::fitM;
     using base_t::random_ptr;
     using base_t::SetRandom;
 
@@ -300,10 +297,11 @@ namespace evo {
     // Injected orgs go into a random position.
     int AddOrg(ORG * new_org) {
       emp::vector<int> empty_spots = GetValidOrgIndices();
-      const int pos = random_ptr->GetInt((int) empty_spots.size());
+      const int pos = empty_spots[ random_ptr->GetInt((int) empty_spots.size()) ];
 
-      pop[empty_spots[pos]] = new_org;
-      return empty_spots[pos];
+      pop[pos] = new_org;
+      fitM.ClearCache(pos);
+      return pos;
     }
 
     // Newly born orgs go next to their parents.
@@ -315,10 +313,10 @@ namespace evo {
       const int offspring_y = emp::mod(parent_y + offset/3 - 1, height);
       const int pos = ToID(offspring_x, offspring_y);
 
-
       if (pop[pos]) delete pop[pos];
 
       pop[pos] = new_org;
+      fitM.ClearCache(pos);
 
       return pos;
     }
@@ -332,7 +330,6 @@ namespace evo {
       }
       return valid_orgs;
     }
-
 
     void Print(std::function<std::string(ORG*)> string_fun,
                std::ostream & os = std::cout,
@@ -367,6 +364,7 @@ namespace evo {
   public:
     using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
     using base_t::pop;
+    using base_t::fitM;
     using base_t::random_ptr;
     using base_t::SetRandom;
     using base_t::GetSize;
@@ -398,7 +396,7 @@ namespace evo {
       ConfigPop(5, *temp_sizes, &temp_connect, 150, 10, 0.05, 200);
     }
 
-    //Sets up population based on user specs.
+    // Sets up population based on user specs.
     void ConfigPop(int pc, vector<int> ps, std::map<int, vector<int> > * c, int u, int l,
                    double mg, int pop_size) {
       pool_count = pc;
@@ -482,6 +480,7 @@ namespace evo {
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
       org_count++;
+      fitM.ClearCache(pos);
       return pos;
     }
 
@@ -504,6 +503,7 @@ namespace evo {
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
 
+      fitM.ClearCache(pos);
       return pos;
     }
  };
