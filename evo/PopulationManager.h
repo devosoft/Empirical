@@ -8,6 +8,9 @@
 //  Developer notes:
 //  * Rather than deleting organisms ourright, run all deletions through a ClearCell function
 //    so that a common signal system can also be run.
+//  * Grids always add injected organisms to empty cells; may have trouble if there are none.
+//  * Population iterators and indexing should either be const OR work with proxies to ensure
+//    that fitness caching and signals are handled correctly.
 
 #ifndef EMP_EVO_POPULATION_MANAGER_H
 #define EMP_EVO_POPULATION_MANAGER_H
@@ -18,13 +21,11 @@
 namespace emp {
 namespace evo {
 
-  template <typename POP_MANAGER> class PopulationIterator;
-
   template <typename ORG=int, typename FIT_MANAGER=int>
   class PopulationManager_Base {
   protected:
     using ptr_t = ORG *;
-    using pop_t = emp::vector<ORG *>;
+    using pop_t = emp::vector<ptr_t>;
 
     pop_t pop;
     FIT_MANAGER fitM;
@@ -40,17 +41,9 @@ namespace evo {
     static constexpr bool emp_has_separate_generations = false;
     using value_type = ORG*;
 
-    friend class PopulationIterator< PopulationManager_Base<ORG,FIT_MANAGER> >;
-    using iterator = PopulationIterator<PopulationManager_Base<ORG,FIT_MANAGER> >;
+    using iterator_t = PopulationIterator<PopulationManager_Base<ORG,FIT_MANAGER> >;
+    friend class interator_t;
 
-    ptr_t & operator[](int i) { return pop[i]; }
-    const ptr_t operator[](int i) const { return pop[i]; }
-    iterator begin() { return iterator(this, 0); }
-    iterator end() { return iterator(this, pop.size()); }
-
-    uint32_t size() const { return pop.size(); }
-    void resize(int new_size) { pop.resize(new_size); }
-    void clear() { pop.clear(); }
     int GetSize() const { return (int) pop.size(); }
 
     void SetRandom(Random * r) { random_ptr = r; }
@@ -95,6 +88,15 @@ namespace evo {
       pop.resize(0);
       fitM.ClearCache();
     }
+    void Resize(size_t new_size) {
+      emp_assert(new_size >= 0);
+      const auto old_size = pop.size();
+      for (int i = new_size; i < old_size; i++) {
+        delete pop[i];      // Delete organisms being removed.
+        fitM.ClearCache(i); // Clear fitness cache for removed cells.
+      }
+      pop.resize(new_size, nullptr);  // Initialize new orgs as null.
+    }
 
     void Update() { ; } // Basic version of Update() does nothing, but World may trigger actions.
 
@@ -121,6 +123,17 @@ namespace evo {
 
       fitM.ClearCache();  // Everyone is either deleted or in the wrong place!
     }
+
+    // --- FOR VECTOR COMPATIBILITY ---
+    size_t size() const { return pop.size(); }
+    void resize(int new_size) { Resize(new_size); }
+    void clear() { Clear(); }
+
+    // @CAO: these need work to make sure we send correct signals on changes & update fitness cache.
+    ptr_t & operator[](int i) { return pop[i]; }
+    const ptr_t operator[](int i) const { return pop[i]; }
+    iterator_t begin() { return iterator_t(this, 0); }
+    iterator_t end() { return iterator_t(this, pop.size()); }
   };
 
 
