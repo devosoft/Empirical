@@ -16,59 +16,44 @@ namespace evo{
     using ORG = typename POP_MANAGER::value_type;
 
     POP_MANAGER * pop;
-    int curr = 0;
-    int size;
+    int pos;
+
+    // The MakeValid() function moves an iterator to t next non-null position (or the end)
+    void MakeValid() {
+      while ((pos < pop->size()) && (((*pop)[pos]) == nullptr)) ++pos;
+    }
 
   public:
-
-    PopulationIterator(POP_MANAGER * pm, int ind=0) : pop(pm), curr(ind) {
-      size = pop->size();
-      while ((curr < size) && (((*pop)[curr]) == nullptr)){
-        ++curr;
-      }
-    }
-
-    PopulationIterator(PopulationIterator * w){
-      pop  = w->pop;
-      curr = w->curr;
-      size = w->size;
-      while (curr < size && (((*pop)[curr]) == nullptr)) {
-        ++curr;
-      }
-    }
+    PopulationIterator(POP_MANAGER * pm, int ind=0) : pop(pm), pos(ind) { MakeValid(); }
+    PopulationIterator(PopulationIterator * _in) : pop(_in->pop), pos(_in->pos) { MakeValid(); }
 
     PopulationIterator<POP_MANAGER> & operator++() {
-      ++curr;
-      while (curr < size && (((*pop)[curr]) == nullptr)) {
-        ++curr;
-      }
+      ++pos;
+      MakeValid();
       return *this;
     }
 
     PopulationIterator<POP_MANAGER> & operator--() {
-      --curr;
-      while (curr < size && (((*pop)[curr]) == nullptr)) {
-        --curr;
-      }
+      --pos;
+      while (pos < pop->size() && (((*pop)[pos]) == nullptr)) { --pos; }
       return *this;
     }
 
-    bool operator==(const PopulationIterator<POP_MANAGER>& rhs) {
-      return curr == rhs.curr;
-    }
+    bool operator==(const PopulationIterator<POP_MANAGER>& rhs) { return pos == rhs.pos; }
+    bool operator!=(const PopulationIterator<POP_MANAGER>& rhs) { return pos != rhs.pos; }
+    bool operator< (const PopulationIterator<POP_MANAGER>& rhs) { return pos <  rhs.pos; }
+    bool operator<=(const PopulationIterator<POP_MANAGER>& rhs) { return pos <= rhs.pos; }
+    bool operator> (const PopulationIterator<POP_MANAGER>& rhs) { return pos >  rhs.pos; }
+    bool operator>=(const PopulationIterator<POP_MANAGER>& rhs) { return pos >= rhs.pos; }
 
-    bool operator!=(const PopulationIterator<POP_MANAGER>& rhs) {
-      return curr != rhs.curr;
-    }
-
-    ORG & operator*() { return (*pop)[curr]; }
+    ORG & operator*() { return (*pop)[pos]; }
 
     PopulationIterator<POP_MANAGER> begin() {
       return PopulationIterator<POP_MANAGER>(pop, 0);
     }
 
     PopulationIterator<POP_MANAGER> end() {
-      return PopulationIterator<POP_MANAGER>(pop, size);
+      return PopulationIterator<POP_MANAGER>(pop, pop->size());
     }
 
   };
