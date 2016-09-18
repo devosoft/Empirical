@@ -156,6 +156,7 @@ namespace evo {
     using lineageM_t = AdaptTemplate<SelectLineageManager<MANAGERS...,DefaultLineage>, popM_t>;
 
     // Now that we've determined all of the manager types, build them!
+    fitM_t fitM;
     popM_t popM;
     orgM_t orgM;
     statsM_t statsM;
@@ -195,7 +196,8 @@ namespace evo {
     std::string world_name;
 
     World(emp::Random * r_ptr, const std::string & w_name=GenerateSignalName("emp::evo::World"))
-      : popM(w_name)
+      : fitM()
+      , popM(w_name, fitM)
       , random_ptr(r_ptr), random_owner(false)
       , before_repro_sig(to_string(w_name,"::before-repro"))
       , offspring_ready_sig(to_string(w_name,"::offspring-ready"))

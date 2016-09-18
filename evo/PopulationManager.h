@@ -28,12 +28,14 @@ namespace evo {
     using pop_t = emp::vector<ptr_t>;
 
     pop_t pop;
-    FIT_MANAGER fitM;
+    FIT_MANAGER & fitM;
 
     Random * random_ptr;
 
   public:
-    PopulationManager_Base(const std::string & world_name) { (void) world_name; }
+    PopulationManager_Base(const std::string & _w_name, FIT_MANAGER & _fm) : fitM(_fm) {
+      (void) _w_name;   // Prevent unused parameter warning.
+    }
     ~PopulationManager_Base() { Clear(); }
 
     // Allow this and derived classes to be identified as a population manager.
@@ -154,12 +156,12 @@ namespace evo {
     Signal<emp::vector<ORG*>&, ORG*, int, int&> sig_add_org_birth; // args: new org, parent pos, return: offspring pos
 
   public:
-    PopulationManager_Plugin(const std::string & world_name)
-    : base_t(world_name)
-    , sig_clear(to_string(world_name, "::pop_clear"))
-    , sig_update(to_string(world_name, "::pop_update"))
-    , sig_add_org(to_string(world_name, "::pop_add_org"))
-    , sig_add_org_birth(to_string(world_name, "::pop_add_org_birth"))
+    PopulationManager_Plugin(const std::string & _w_name, FIT_MANAGER & _fm)
+    : base_t(_w_name, _fm)
+    , sig_clear(to_string(_w_name, "::pop_clear"))
+    , sig_update(to_string(_w_name, "::pop_update"))
+    , sig_add_org(to_string(_w_name, "::pop_add_org"))
+    , sig_add_org_birth(to_string(_w_name, "::pop_add_org_birth"))
     { ; }
     ~PopulationManager_Plugin() { Clear(); }
 
@@ -207,7 +209,8 @@ namespace evo {
     emp::vector<ORG *> next_pop;
 
   public:
-    PopulationManager_EA(const std::string & world_name) : base_t(world_name) { ; }
+    PopulationManager_EA(const std::string & _w_name, FIT_MANAGER & _fm)
+    : base_t(_w_name, _fm) { ; }
     ~PopulationManager_EA() { Clear(); }
 
     static constexpr bool emp_has_separate_generations = true;
@@ -255,8 +258,8 @@ namespace evo {
     int bottleneck_size;
     int num_bottlenecks;
   public:
-    PopulationManager_SerialTransfer(const std::string & world_name)
-    : base_t(world_name)
+    PopulationManager_SerialTransfer(const std::string & _w_name, FIT_MANAGER & _fm)
+    : base_t(_w_name, _fm)
     , max_size(1000), bottleneck_size(100), num_bottlenecks(0) { ; }
     ~PopulationManager_SerialTransfer() { ; }
 
@@ -297,7 +300,8 @@ namespace evo {
     int ToID(int x, int y) const { return y*width + x; }
 
   public:
-    PopulationManager_Grid(const std::string & world_name) : base_t(world_name) {
+    PopulationManager_Grid(const std::string & _w_name, FIT_MANAGER & _fm)
+    : base_t(_w_name, _fm) {
       ConfigPop(10,10);
     }
     ~PopulationManager_Grid() { ; }
@@ -393,7 +397,8 @@ namespace evo {
     vector<int> pool_id;
 
   public:
-    PopulationManager_Pools(const std::string & world_name) : base_t(world_name), org_count(0) { ; }
+    PopulationManager_Pools(const std::string & _w_name, FIT_MANAGER & _fm)
+    : base_t(_w_name, _fm), org_count(0) { ; }
     ~PopulationManager_Pools() { ; }
 
     int GetPoolCount() const { return pool_count; }
