@@ -20,12 +20,13 @@ namespace evo {
 
   template <typename POP_MANAGER> class PopulationIterator;
 
-  template <typename ORG=int>
+  template <typename ORG=int, typename FIT_MANAGER=int>
   class PopulationManager_Base {
   protected:
     using ptr_t = ORG *;
     using pop_t = emp::vector<ORG *>;
     pop_t pop;
+    FIT_MANAGER fitM;
 
     Random * random_ptr;
     emp::vector<double> fit_cache;  // vector size == 0 when not caching; invalid values == -1.
@@ -39,8 +40,8 @@ namespace evo {
     static constexpr bool emp_has_separate_generations = false;
     using value_type = ORG*;
 
-    friend class PopulationIterator< PopulationManager_Base<ORG> >;
-    using iterator = PopulationIterator<PopulationManager_Base<ORG> >;
+    friend class PopulationIterator< PopulationManager_Base<ORG,FIT_MANAGER> >;
+    using iterator = PopulationIterator<PopulationManager_Base<ORG,FIT_MANAGER> >;
 
     ptr_t & operator[](int i) { return pop[i]; }
     const ptr_t operator[](int i) const { return pop[i]; }
@@ -134,10 +135,11 @@ namespace evo {
 
   // A population manager that is defined elsewhere, for use with plugins.
 
-  template <typename ORG=int>
-  class PopulationManager_Plugin : public PopulationManager_Base<ORG> {
+  template <typename ORG=int, typename FIT_MANAGER=int>
+  class PopulationManager_Plugin : public PopulationManager_Base<ORG, FIT_MANAGER> {
   protected:
-    using PopulationManager_Base<ORG>::pop;
+    using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
+    using base_t::pop;
 
     // Most of the key functions in the population manager can be interfaced with symbols.  If you
     // need to modify the more complex behaviors (such as Execute) you need to create a new
@@ -149,7 +151,7 @@ namespace evo {
 
   public:
     PopulationManager_Plugin(const std::string & world_name)
-    : PopulationManager_Base<ORG>(world_name)
+    : base_t(world_name)
     , sig_clear(to_string(world_name, "::pop_clear"))
     , sig_update(to_string(world_name, "::pop_update"))
     , sig_add_org(to_string(world_name, "::pop_add_org"))
@@ -171,11 +173,8 @@ namespace evo {
     }
 
     void Clear() {
-      if (sig_clear.GetNumActions()) {
-        sig_clear.Trigger(pop);
-      } else { // If no actions are linked to sig_clear, use default.
-        PopulationManager_Base<ORG>::Clear();
-      }
+      if (sig_clear.GetNumActions()) sig_clear.Trigger(pop);
+      else base_t::Clear();  // If no actions are linked to sig_clear, use default.
     }
     void Update() { sig_update.Trigger(pop); }
 
@@ -194,15 +193,15 @@ namespace evo {
   // A standard population manager for using synchronous generations in a traditional
   // evolutionary algorithm setup.
 
-  template <typename ORG=int>
-  class PopulationManager_EA : public PopulationManager_Base<ORG> {
+  template <typename ORG=int, typename FIT_MANAGER=int>
+  class PopulationManager_EA : public PopulationManager_Base<ORG,FIT_MANAGER> {
   protected:
     emp::vector<ORG *> next_pop;
-    using PopulationManager_Base<ORG>::pop;
+    using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
+    using base_t::pop;
 
   public:
-    PopulationManager_EA(const std::string & world_name)
-    : PopulationManager_Base<ORG>(world_name) { ; }
+    PopulationManager_EA(const std::string & world_name) : base_t(world_name) { ; }
     ~PopulationManager_EA() { Clear(); }
 
     static constexpr bool emp_has_separate_generations = true;
@@ -234,20 +233,21 @@ namespace evo {
   // organisms get inserted into the main population; once it is full the population
   // is shrunk down.
 
-  template <typename ORG=int>
-  class PopulationManager_SerialTransfer : public PopulationManager_Base<ORG> {
+  template <typename ORG=int, typename FIT_MANAGER=int>
+  class PopulationManager_SerialTransfer : public PopulationManager_Base<ORG,FIT_MANAGER> {
   protected:
-    using PopulationManager_Base<ORG>::pop;
-    using PopulationManager_Base<ORG>::random_ptr;
-    using PopulationManager_Base<ORG>::DoBottleneck;
-    using PopulationManager_Base<ORG>::SetRandom;
+    using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
+    using base_t::pop;
+    using base_t::random_ptr;
+    using base_t::DoBottleneck;
+    using base_t::SetRandom;
 
     int max_size;
     int bottleneck_size;
     int num_bottlenecks;
   public:
     PopulationManager_SerialTransfer(const std::string & world_name)
-    : PopulationManager_Base<ORG>(world_name)
+    : base_t(world_name)
     , max_size(1000), bottleneck_size(100), num_bottlenecks(0) { ; }
     ~PopulationManager_SerialTransfer() { ; }
 
@@ -271,12 +271,13 @@ namespace evo {
     }
   };
 
-  template <typename ORG=int>
-  class PopulationManager_Grid : public PopulationManager_Base<ORG> {
+  template <typename ORG=int, typename FIT_MANAGER=int>
+  class PopulationManager_Grid : public PopulationManager_Base<ORG,FIT_MANAGER> {
   protected:
-    using PopulationManager_Base<ORG>::pop;
-    using PopulationManager_Base<ORG>::random_ptr;
-    using PopulationManager_Base<ORG>::SetRandom;
+    using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
+    using base_t::pop;
+    using base_t::random_ptr;
+    using base_t::SetRandom;
 
     int width;
     int height;
@@ -286,8 +287,7 @@ namespace evo {
     int ToID(int x, int y) const { return y*width + x; }
 
   public:
-    PopulationManager_Grid(const std::string & world_name)
-    : PopulationManager_Base<ORG>(world_name) {
+    PopulationManager_Grid(const std::string & world_name) : base_t(world_name) {
       ConfigPop(10,10);
     }
     ~PopulationManager_Grid() { ; }
@@ -362,27 +362,27 @@ namespace evo {
     }
   };
 
-  template <typename ORG>
-  class PopulationManager_Pools : public PopulationManager_Base<ORG> {
+  template <typename ORG=int, typename FIT_MANAGER=int>
+  class PopulationManager_Pools : public PopulationManager_Base<ORG,FIT_MANAGER> {
   public:
-    using PopulationManager_Base<ORG>::pop;
-    using PopulationManager_Base<ORG>::random_ptr;
-    using PopulationManager_Base<ORG>::SetRandom;
-    using PopulationManager_Base<ORG>::GetSize;
+    using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
+    using base_t::pop;
+    using base_t::random_ptr;
+    using base_t::SetRandom;
+    using base_t::GetSize;
 
-    int pool_count;                             //How many pools are in the population?
-    vector<int> pool_sizes;                     // How large is each pool?
-    std::map<int, vector<int> > connections;    // Which other pools can each position access?
-    int org_count;                              // How many organisms have beeen inserted into the population?
-    int r_upper;                                // How large can a random pool size be?
-    int r_lower;                                // How small can a random pool size be?
-    vector<int> pool_end;                       // Where does the next pool begin? First pool begins at 0.
-    double mig_rate;                            // How often do organisms migrate to a connected pool?
+    int pool_count;                            // How many pools are in the population?
+    vector<int> pool_sizes;                    // How large is each pool?
+    std::map<int, vector<int> > connections;   // Which other pools can each position access?
+    int org_count;                             // How many organisms have beeen inserted into population?
+    int r_upper;                               // How large can a random pool size be?
+    int r_lower;                               // How small can a random pool size be?
+    vector<int> pool_end;                      // Where does the next pool begin? First begins at 0.
+    double mig_rate;                           // How often do organisms migrate to a connected pool?
     vector<int> pool_id;
 
   public:
-    PopulationManager_Pools(const std::string & world_name)
-    : PopulationManager_Base<ORG>(world_name), org_count(0) { ; }
+    PopulationManager_Pools(const std::string & world_name) : base_t(world_name), org_count(0) { ; }
     ~PopulationManager_Pools() { ; }
 
     int GetPoolCount() const { return pool_count; }
@@ -390,7 +390,7 @@ namespace evo {
     int GetUpper() const { return r_upper; }
     int GetLower() const { return r_lower; }
 
-    void Setup(Random * r){
+    void Setup(Random * r) {
         SetRandom(r);
         vector<int>* temp_sizes = new vector<int>;
         std::map<int, vector<int> > temp_connect;
