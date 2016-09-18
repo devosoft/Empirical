@@ -91,7 +91,7 @@
 #include "../tools/reflection.h"
 #include "../tools/vector.h"
 
-
+#include "FitnessManager.h"
 #include "OrgSignals.h"
 #include "OrgManager.h"
 #include "PopulationManager.h"
@@ -134,24 +134,26 @@ template <typename... T> void FUN(T &&... args) {         \
 namespace emp {
 namespace evo {
 
-  EMP_SETUP_TYPE_SELECTOR(SelectPopManager, emp_is_population_manager)
-  EMP_SETUP_TYPE_SELECTOR(SelectOrgManager, emp_is_organism_manager)
-  EMP_SETUP_TYPE_SELECTOR(SelectStatsManager, emp_is_stats_manager)
+  EMP_SETUP_TYPE_SELECTOR(SelectFitnessManager, emp_is_fitness_manager)
   EMP_SETUP_TYPE_SELECTOR(SelectLineageManager, emp_is_lineage_manager)
+  EMP_SETUP_TYPE_SELECTOR(SelectOrgManager, emp_is_organism_manager)
+  EMP_SETUP_TYPE_SELECTOR(SelectPopManager, emp_is_population_manager)
+  EMP_SETUP_TYPE_SELECTOR(SelectStatsManager, emp_is_stats_manager)
 
   // Main world class...
   template <typename ORG, typename... MANAGERS>
   class World {
   public:
     // Determine manager types...
-    using popM_t = AdaptTemplate<typename SelectPopManager<MANAGERS...,PopBasic>::type, ORG>;
-    using orgM_t = AdaptTemplate<typename SelectOrgManager<MANAGERS...,OrgMDynamic>::type, ORG>;
-    using statsM_t = AdaptTemplate<typename SelectStatsManager<MANAGERS...,NullStats >::type, popM_t>;
+    using fitM_t = SelectFitnessManager<MANAGERS...,CacheOff>;
+    using popM_t = AdaptTemplate<SelectPopManager<MANAGERS...,PopBasic>, ORG, fitM_t>;
+    using orgM_t = AdaptTemplate<SelectOrgManager<MANAGERS...,OrgMDynamic>, ORG>;
+    using statsM_t = AdaptTemplate<SelectStatsManager<MANAGERS...,NullStats >, popM_t>;
     using iterator_t = PopulationIterator<popM_t>;
 
     //Create a lineage manager if the stats manager needs it or if the user asked for it
     EMP_CHOOSE_MEMBER_TYPE(DefaultLineage, lineage_type, LineageNull, statsM_t);
-    using lineageM_t = AdaptTemplate<typename SelectLineageManager<MANAGERS...,DefaultLineage>::type, popM_t>;
+    using lineageM_t = AdaptTemplate<SelectLineageManager<MANAGERS...,DefaultLineage>, popM_t>;
 
     // Now that we've determined all of the manager types, build them!
     popM_t popM;
