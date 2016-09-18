@@ -21,16 +21,18 @@ namespace evo {
     WeightedSet roulette_info; // Data structure to use for roulette selection.
 
   public:
-    // All caching functions should get ignored at compile time.
-    constexpr static bool HasCache(size_t id) { return false; }
-    constexpr static double GetCache(size_t id) { return -1.0; }
-    constexpr static size_t GetCacheSize() { return 0.0; }
+    static constexpr bool emp_is_fitness_manager = true;
 
-    constexpr static bool CacheFitness(size_t, double) { return false; }
-    constexpr static bool ClearCache() { return false; }
-    constexpr static bool ClearCache(size_t) { return false; }
-    constexpr static bool ResizeCache(size_t) { return false; }
-    constexpr static bool ResizeCache(size_t, double) { return false; }
+    // All caching functions should get ignored at compile time.
+    static constexpr bool HasCache(size_t id) { return false; }
+    static constexpr double GetCache(size_t id) { return -1.0; }
+    static constexpr size_t GetCacheSize() { return 0.0; }
+
+    static constexpr bool CacheFitness(size_t, double) { return false; }
+    static constexpr bool ClearCache() { return false; }
+    static constexpr bool ClearCache(size_t) { return false; }
+    static constexpr bool ResizeCache(size_t) { return false; }
+    static constexpr bool ResizeCache(size_t, double) { return false; }
   };
 
   class FitnessManager_CacheOrg : public FitnessManager_Base {
@@ -49,6 +51,8 @@ namespace evo {
     void ResizeCache(size_t new_size, double def_val) { fit_cache.resize(new_size, def_val); }
   };
 
+  using CacheOff = FitnessManager_Base;
+  using CacheOrgs = FitnessManager_CacheOrg;
 }
 }
 
