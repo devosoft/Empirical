@@ -25,7 +25,14 @@ namespace evo{
 
   public:
     PopulationIterator(POP_MANAGER * pm, int ind=0) : pop(pm), pos(ind) { MakeValid(); }
-    PopulationIterator(PopulationIterator * _in) : pop(_in->pop), pos(_in->pos) { MakeValid(); }
+    PopulationIterator(const PopulationIterator & _in) : pop(_in.pop), pos(_in.pos) { MakeValid(); }
+
+    PopulationIterator<POP_MANAGER> & operator=(const PopulationIterator & _in) {
+      pop = _in.pop;
+      pos = _in.pos;
+      MakeValid();
+      return *this;
+    }
 
     PopulationIterator<POP_MANAGER> & operator++() {
       ++pos;
@@ -39,20 +46,29 @@ namespace evo{
       return *this;
     }
 
-    bool operator==(const PopulationIterator<POP_MANAGER>& rhs) { return pos == rhs.pos; }
-    bool operator!=(const PopulationIterator<POP_MANAGER>& rhs) { return pos != rhs.pos; }
-    bool operator< (const PopulationIterator<POP_MANAGER>& rhs) { return pos <  rhs.pos; }
-    bool operator<=(const PopulationIterator<POP_MANAGER>& rhs) { return pos <= rhs.pos; }
-    bool operator> (const PopulationIterator<POP_MANAGER>& rhs) { return pos >  rhs.pos; }
-    bool operator>=(const PopulationIterator<POP_MANAGER>& rhs) { return pos >= rhs.pos; }
+    bool operator==(const PopulationIterator<POP_MANAGER>& rhs) const { return pos == rhs.pos; }
+    bool operator!=(const PopulationIterator<POP_MANAGER>& rhs) const { return pos != rhs.pos; }
+    bool operator< (const PopulationIterator<POP_MANAGER>& rhs) const { return pos <  rhs.pos; }
+    bool operator<=(const PopulationIterator<POP_MANAGER>& rhs) const { return pos <= rhs.pos; }
+    bool operator> (const PopulationIterator<POP_MANAGER>& rhs) const { return pos >  rhs.pos; }
+    bool operator>=(const PopulationIterator<POP_MANAGER>& rhs) const { return pos >= rhs.pos; }
 
-    ORG & operator*() { return (*pop)[pos]; }
+    ORG & operator*() { MakeValid(); return (*pop)[pos]; }
+    const ORG & operator*() const { MakeValid(); return (*pop)[pos]; }
+
+    operator bool() const { MakeValid(); return pos < pop->size(); }
 
     PopulationIterator<POP_MANAGER> begin() {
       return PopulationIterator<POP_MANAGER>(pop, 0);
     }
+    const PopulationIterator<POP_MANAGER> begin() const {
+      return PopulationIterator<POP_MANAGER>(pop, 0);
+    }
 
     PopulationIterator<POP_MANAGER> end() {
+      return PopulationIterator<POP_MANAGER>(pop, pop->size());
+    }
+    const PopulationIterator<POP_MANAGER> end() const {
       return PopulationIterator<POP_MANAGER>(pop, pop->size());
     }
 
