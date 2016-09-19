@@ -144,6 +144,10 @@ namespace evo {
   template <typename ORG, typename... MANAGERS>
   class World {
   public:
+    // Some useful types...
+    using fit_fun_t = std::function<double(ORG*)>;
+    using dist_fun_t = std::function<double(ORG*,ORG*)>;
+
     // Determine manager types...
     using fitM_t = SelectFitnessManager<MANAGERS...,CacheOff>;
     using popM_t = AdaptTemplate<SelectPopManager<MANAGERS...,PopBasic>, ORG, fitM_t>;
@@ -245,7 +249,7 @@ namespace evo {
     LinkKey OnOrgPlacement(const std::function<void(int)> & fun) { return org_placement_sig.AddAction(fun); }
     LinkKey OnUpdate(const std::function<void(int)> & fun) { return on_update_sig.AddAction(fun); }
 
-    std::function<double(ORG *)> GetFitFun(){return orgM.GetFitFun();}
+    fit_fun_t GetFitFun() { return orgM.GetFitFun(); }
 
     // All additions to the population must go through one of the following Insert methods
 
@@ -279,7 +283,6 @@ namespace evo {
       }
     }
 
-
     void DoRepro(int id) {
       emp_assert(random_ptr != nullptr && "DoRepro() requires a random number generator.");
       // std::cout << "Repro " << id << std::endl;
@@ -311,6 +314,7 @@ namespace evo {
         if (this->IsOccupied(i)){
           if (mut_fun(popM[i], *random_ptr)) {
             mut_count++;
+            fitM.ClearCache(i);
           }
         }
       }
@@ -341,7 +345,7 @@ namespace evo {
 
     // Elite Selection picks a set of the most fit individuals from the population to move to
     // the next generation.  Find top e_count individuals and make copy_count copies of each.
-    void EliteSelect(std::function<double(ORG*)> fit_fun, int e_count=1, int copy_count=1) {
+    void EliteSelect(const fit_fun_t & fit_fun, int e_count=1, int copy_count=1) {
       emp_assert(fit_fun);
       emp_assert(e_count > 0 && e_count <= (int) popM.size());
       // Load the population into a multimap, sorted by fitness.
@@ -368,7 +372,7 @@ namespace evo {
     // Roulette Selection (aka Fitness-Proportional Selection) chooses organisms to
     // reproduce based on their current fitness.
     // @CAO Can UPDATE weighted array rather than keep rebuilding it (use signals?)
-    void RouletteSelect(std::function<double(ORG*)> fit_fun) {
+    void RouletteSelect(const fit_fun_t & fit_fun) {
 
     }
 
@@ -376,12 +380,11 @@ namespace evo {
     // finds the one with the highest fitness, and moves it to the next generation.
     // User provides the fitness function, the tournament size, and (optionally) the
     // number of tournaments to run.
-    void TournamentSelect(std::function<double(ORG*)> fit_fun, int t_size,
-        int tourny_count=1, bool precalc_fitness=true) {
+    void TournamentSelect(const fit_fun_t & fit_fun, int t_size, int tourny_count=1) {
       emp_assert(fit_fun);
       emp_assert(t_size > 0 && t_size <= (int) popM.size(), t_size, popM.size());
 
-      if (precalc_fitness && t_size * tourny_count * 2 >= (int) popM.size()) {
+      if (t_size * tourny_count * 2 >= (int) popM.size()) {
         // Pre-calculate fitnesses.
         emp::vector<int> valid_orgs = GetValidOrgIndices();
         emp::vector<double> fitness(valid_orgs.size());
@@ -425,7 +428,7 @@ namespace evo {
     }
 
     // Helper function to run a tournament when fitness is NOT pre-calculated
-    void RunTournament(std::function<double(ORG*)> fit_fun, int t_size, int tourny_count=1){
+    void RunTournament(const fit_fun_t & fit_fun, int t_size, int tourny_count=1){
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
 
       for (int T = 0; T < tourny_count; T++) {
@@ -458,10 +461,8 @@ namespace evo {
     // a sharing threshold (sigma share) that defines which members are
     // in the same niche, and a value of alpha (which controls the shape of
     // the fitness sharing curve
-    void FitnessSharingTournamentSelect(std::function<double(ORG*)> fit_fun,
-          std::function<double(ORG*, ORG*)> dist_fun,
-          double sharing_threshhold, double alpha,
-          int t_size, int tourny_count=1)
+    void FitnessSharingTournamentSelect(const fit_fun_t & fit_fun, const dist_fun_t & dist_fun,
+          double sharing_threshhold, double alpha, int t_size, int tourny_count=1)
     {
       emp_assert(t_size > 0 && t_size <= (int) popM.size());
 
@@ -480,10 +481,8 @@ namespace evo {
     }
 
     // Fitness sharing Tournament Selection can use the default fitness function
-    void FitnessSharingTournamentSelect(std::function<double(ORG*, ORG*)>
-          dist_fun, double sharing_threshold,
-          double alpha, int t_size,
-          int tourny_count=1) {
+    void FitnessSharingTournamentSelect(const dist_fun_t & dist_fun, double sharing_threshold,
+          double alpha, int t_size, int tourny_count=1) {
       TournamentSelect(orgM.GetFitFun(), dist_fun, sharing_threshold, alpha, t_size, tourny_count);
     }
 
