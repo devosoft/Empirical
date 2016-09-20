@@ -16,6 +16,7 @@
 #define EMP_EVO_POPULATION_MANAGER_H
 
 #include "../tools/random_utils.h"
+#include "../tools/signal.h"
 #include "PopulationIterator.h"
 
 namespace emp {
