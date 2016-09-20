@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-//#include "../../config/ArgManager.h"
+#include "../../config/ArgManager.h"
 #include "../../evo/NK.h"
 #include "../../evo/World.h"
 #include "../../tools/BitSet.h"
@@ -15,15 +15,14 @@
 
 EMP_BUILD_CONFIG( NKConfig,
   GROUP(DEFAULT, "Default settings for NK model"),
-  VALUE(K, int, 10, "Level of epistasis in the NK model"),
-  VALUE(N, int, 200, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
-  VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
-  VALUE(POP_SIZE, int, 1000, "Number of organisms in the popoulation."),
-  VALUE(MAX_GENS, int, 2000, "How many generations should we process?"),
-  VALUE(MUT_COUNT, int, 3, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
+  CONST(K, int, 10, "Level of epistasis in the NK model"),
+  CONST(N, int, 200, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
+  CONST(SEED, int, 1, "Random number seed (0 for based on time)"),
+  CONST(POP_SIZE, int, 1000, "Number of organisms in the popoulation."),
+  CONST(MAX_GENS, int, 500, "How many generations should we process?"),
+  CONST(MUT_COUNT, int, 3, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
   VALUE(TEST, std::string, "TestString", "This is a test string.")
 )
-
 
 
 using BitOrg = emp::BitVector;
@@ -33,15 +32,15 @@ int main(int argc, char* argv[])
   NKConfig config;
   config.Read("NK.cfg");
 
-  //auto args = emp::cl::ArgManager(argc, argv);
-  //if (args.ProcessConfigOptions(config, std::cout, "NK.cfg", "NK-macros.h") == false) exit(0);
-  //if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
+  auto args = emp::cl::ArgManager(argc, argv);
+  if (args.ProcessConfigOptions(config, std::cout, "NK.cfg", "NK-macros.h") == false) exit(0);
+  if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
 
-  const int N = config.N();
-  const int K = config.K();
-  const int POP_SIZE = config.POP_SIZE();
-  const int MAX_GENS = config.MAX_GENS();
-  const int MUT_COUNT = config.MUT_COUNT();
+  constexpr int N = config.N();
+  constexpr int K = config.K();
+  constexpr int POP_SIZE = config.POP_SIZE();
+  constexpr int MAX_GENS = config.MAX_GENS();
+  constexpr int MUT_COUNT = config.MUT_COUNT();
 
   emp::Random random(config.SEED());
   emp::evo::NKLandscape landscape(N, K, random);
@@ -77,12 +76,12 @@ int main(int argc, char* argv[])
 
     // Run a tournament for the rest...
     pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
-			 , 15, POP_SIZE-1);
+			 , 5, POP_SIZE-1);
     pop.Update();
     pop.MutatePop();
   }
 
-  pop.lineageM.WriteDataToFile("test.json");
+
   std::cout << MAX_GENS << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 
   emp::PrintSignalInfo();

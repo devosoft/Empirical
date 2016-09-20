@@ -2,6 +2,8 @@ GCOV_FLAGS = -o0 -g --coverage
 
 TEST_NAMES = tools geometry evo scholar
 
+default: test
+
 test-prep:
 	mkdir -p temp
 

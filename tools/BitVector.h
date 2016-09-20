@@ -41,6 +41,7 @@ namespace emp {
     int LastBitID() const { return num_bits & (FIELD_BITS - 1); }
     int NumFields() const { return 1 + ((num_bits - 1) / FIELD_BITS); }
     int NumBytes()  const { return 1 + ((num_bits - 1) >> 3); }
+    int NumSizeFields() const { return NumFields() * sizeof(field_t) / sizeof(std::size_t); }
 
     // Setup a bit proxy so that we can use operator[] on bit sets as an lvalue.
     class BitProxy {
@@ -163,7 +164,7 @@ namespace emp {
 
       if (in_num_fields != prev_num_fields) {
         delete [] bit_set;
-	bit_set = new field_t[NumFields()];
+	      bit_set = new field_t[NumFields()];
       }
 
       if (num_bits > 0) RawCopy(in_set.bit_set);
@@ -254,6 +255,15 @@ namespace emp {
 
       if (value) bit_set[field_id] |= pos_mask;
       else       bit_set[field_id] &= ~pos_mask;
+    }
+
+    std::size_t Hash() const {
+      const int num_sfields = NumSizeFields();
+      std::size_t hash_val = 0;
+      for (int i = 0; i < num_sfields; i++) {
+        hash_val ^= ((std::size_t*) bit_set)[i];
+      }
+      return hash_val ^ ((97*num_bits) << 8);
     }
 
     uint8_t GetByte(int index) const {
@@ -560,6 +570,15 @@ namespace emp {
     size_t count() const { return CountOnes_Mixed(); }
   };
 
+}
+
+namespace std {
+  template <>
+  struct hash<emp::BitVector> {
+    std::size_t operator()(const emp::BitVector & b) const {
+      return b.Hash();
+    }
+  };
 }
 
 std::ostream & operator<<(std::ostream & out, const emp::BitVector & _bit_set) {

@@ -1,15 +1,4 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
-// Copyright (C) Michigan State University, 2015. It is licensed
-// under the MIT Software license; see doc/LICENSE
 
-#ifndef EMP_PROB_SCHEDULE_H
-#define EMP_PROB_SCHEDULE_H
-
-#include <vector>
-
-#include "Random.h"
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // A simple class to choose items with a probability proportional to their weight.
 //
@@ -32,8 +21,12 @@
 //     giving the ability to perform a weighted random choice.
 //   * We should allow the structure to be resized, either dynamically or through a Resize()
 //     method.
-//
 
+#ifndef EMP_PROB_SCHEDULE_H
+#define EMP_PROB_SCHEDULE_H
+
+#include "Random.h"
+#include "vector"
 
 namespace emp {
 
@@ -41,8 +34,8 @@ namespace emp {
   class ProbSchedule {
   private:
     const int num_items;
-    std::vector<double> weights;
-    std::vector<double> tree_weights;
+    emp::vector<double> weights;
+    emp::vector<double> tree_weights;
     Random m_rng;
 
     ProbSchedule(const ProbSchedule&); // @not_implemented
@@ -70,11 +63,15 @@ namespace emp {
     }
     ~ProbSchedule() { ; }
 
+    int GetSize() const { return num_items; }
+
+    // Standard library compatibility
+    int size() const { return num_items; }
+
     double GetWeight(int id) const { return weights[id]; }
     double GetSubtreeWeight(int id) const { return tree_weights[id]; }
 
-    /// id is the identification number of the item whose weight is being adjusted.
-    /// weight is the new weight for that entry.
+
     void Adjust(int id, const double _weight) {
       weights[id] = _weight;
 

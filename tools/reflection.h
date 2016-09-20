@@ -147,10 +147,8 @@ struct EMP_ResolveType__ ## NAME {                                              
   using type = decltype(GetType<EMP__T>(true));                                        \
 };                                                                                     \
 template <> struct EMP_ResolveType__ ## NAME<void> { using type = void; };             \
-template <typename... TYPES> struct NAME {                                             \
-  using type = typename EMP_ResolveType__ ## NAME<TYPES..., void>::type;               \
-};
-
+template <typename... TYPES>                                                           \
+using NAME = typename EMP_ResolveType__ ## NAME<TYPES..., void>::type;
 
 
 //  Given a list of classes, pick the first one that has the type MEMBER_NAME defined and

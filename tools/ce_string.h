@@ -5,13 +5,15 @@
 //  ce_string defines a limited string object for use within a constexpr class or function.
 //
 //  Developer note:
-//   @CAO: Not ready from prime time-- for some reason I can't get Set to work as constexpr.
-//  REQUIRES: C++14
+//   @CAO: Not ready from prime time-- for some reason I can't get Set to work as constexpr
+//         (when compiled with C++14).
 
-#ifndef EMP_CS_STRING_HH
-#define EMP_CS_STRING_HH
+#ifndef EMP_CE_STRING_H
+#define EMP_CE_STRING_H
 
+#include <string>
 #include <type_traits>
+
 #include "functions.h"
 
 namespace emp {
@@ -54,7 +56,16 @@ namespace emp {
       // static_assert(pos < m_size, "ce_array index out of range.");
       return m_str[pos];
     }
+
+    operator std::string() const { return std::string(m_str); }
+    std::string ToString() const { return std::string(m_str); }
   };
+
+  // @CAO Grrr...  not sure why this operator breaks everything....
+  // std::ostream & operator<<(std::ostream & out, const emp::ce_string & str) {
+  //   out << (std::string) str;
+  //   return out;
+  // }
 
 }
 

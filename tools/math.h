@@ -41,9 +41,9 @@ namespace emp {
     return (x < 1.0) ? internal::Log2_frac(x) : internal::Log2_pos(x);
   }
 
-  /// Compile-time log calculator.
-  static constexpr double Log(double x, double base) { return Log2(x) / Log2(base); }
-  /// Compile-time natural log calculator.
+  /// Compile-time log calculator
+  static constexpr double Log(double x, double base=10.0) { return Log2(x) / Log2(base); }
+  /// Compile-time natural log calculator
   static constexpr double Ln(double x) { return Log(x, emp::E); }   // Natural Log...
   /// Compile-time log base 10 calculator.
   static constexpr double Log10(double x) { return Log(x, 10.0); }
@@ -65,6 +65,10 @@ namespace emp {
 
   static constexpr double Pow(double base, double exp) {
     return Pow2(Log2(base) * exp);  // convert to a base of 2.
+  }
+
+  static constexpr double Exp(double exp) {
+    return Pow2(Log2(emp::E) * exp);  // convert to a base of e.
   }
 
   /// A compile-time exponentiation calculator.

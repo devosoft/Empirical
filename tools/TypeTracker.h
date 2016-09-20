@@ -4,6 +4,13 @@
 //
 //  TypeTracker is attached to other classes to easily convert them to their derived version
 //  to facilitate type-specific operations.
+//
+//
+//  Developer notes:
+//  * Should use std::is_convertible<X,Y>::value to determine if casting on base type is allowed.
+//  * AddFunction and RunFunction should be able to take any number of args.
+//  * Functions should be able to have fixed type values mixed in.
+//  * RunFunction should be able to have the function passed in at call time.
 
 #ifndef EMP_TYPE_TRACKER_H
 #define EMP_TYPE_TRACKER_H
@@ -58,14 +65,34 @@ namespace emp {
       emp_assert((has_type<REAL_T,TYPES...>()));    // Make sure we're wrapping a legal type.
       return wrap_t<REAL_T>(std::forward<REAL_T>(val));
     }
-    template <typename REAL_T> wrap_t<REAL_T> * New(REAL_T && val) {
-      emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
-      return new wrap_t<REAL_T>(std::forward<REAL_T>(val));
-    }
     template <typename REAL_T> wrap_t<REAL_T> * New(REAL_T & val) {
       emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
       return new wrap_t<REAL_T>(std::forward<REAL_T>(val));
     }
+    template <typename REAL_T> wrap_t<REAL_T> * New(REAL_T && val) {
+      emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
+      return new wrap_t<REAL_T>(std::forward<REAL_T>(val));
+    }
+
+    // Test if the tracked type is TEST_T
+    template <typename TEST_T>
+    bool IsType( TrackedType & tt ) {
+      return tt.GetTypeTrackerID() == get_type_index<TEST_T,TYPES...>();
+    }
+    template <typename TEST_T> bool IsType( TrackedType * tt ) { return IsType(*tt); }
+
+    // Convert the tracked type back to REAL_T.  Assert that this is type safe!
+    template <typename REAL_T>
+    REAL_T ToType( TrackedType & tt ) {
+      emp_assert(IsType<REAL_T>(tt));
+      return ((wrap_t<REAL_T> *) &tt)->value;
+    }
+    template <typename REAL_T> REAL_T ToType( TrackedType * tt ) { return ToType(*tt); }
+
+    // Cast the tracked type to OUT_T.  Try to do so even if NOT original type!
+    template <typename OUT_T>
+    OUT_T Cast( TrackedType & tt ) { return ((wrap_t<OUT_T> *) &tt)->value; }
+    template <typename OUT_T> OUT_T Cast( TrackedType * tt ) { return Cast(*tt); }
 
     template <typename T1, typename T2>
     this_t & AddFunction( std::function<void(T1,T2)> fun ) {

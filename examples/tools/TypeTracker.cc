@@ -31,10 +31,17 @@ int main()
 
   // Now run the appropriate function for any pair of objects.  Undefined ones should be skipped.
   for (auto x : objs) {
+    if (tt.IsType<int>(*x)) std::cout << "INT" << std::endl;
+    if (tt.IsType<double>(*x)) std::cout << "DOUBLE" << std::endl;
+    if (tt.IsType<std::string>(*x)) std::cout << "STRING" << std::endl;
     for (auto y : objs) {
       tt.RunFunction(x,y);
     }
   }
+
+  // Let's convert one back!
+  int x = tt.ToType<int>(*(objs[1]));
+  std::cout << "And the second value was " << x << std::endl;
 
   // Cleanup objects.
   for (auto x : objs) delete x;

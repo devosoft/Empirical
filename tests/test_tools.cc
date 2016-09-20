@@ -18,20 +18,26 @@
 #include "../tools/DynamicStringSet.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/Graph.h"
+#include "../tools/Lexer.h"
+#include "../tools/NFA.h"
 #include "../tools/Ptr.h"
+#include "../tools/RegEx.h"
 #include "../tools/Random.h"
 // #include "../tools/Trait.h"
 
 #include "../tools/array.h"
 #include "../tools/assert.h"
 #include "../tools/ce_string.h"
+#include "../tools/errors.h"
 #include "../tools/functions.h"
 #include "../tools/graph_utils.h"
 //#include "../tools/grid.h"
 #include "../tools/info_theory.h"
+#include "../tools/lexer_utils.h"
 #include "../tools/macro_math.h"
 #include "../tools/macros.h"
 #include "../tools/map_utils.h"
+#include "../tools/math.h"
 #include "../tools/mem_track.h"
 #include "../tools/meta.h"
 #include "../tools/reflection.h"
@@ -46,7 +52,6 @@
 // this doesn't actually work--TODO: figure out why this doesn't work
 #include "../tools/alert.h"
 #include "../tools/const.h"
-#include "../tools/errors.h"
 // #include "../tools/class.h"
 // #include "../tools/fixed.h"
 #include "../tools/SolveState.h"
@@ -325,13 +330,13 @@ TEST_CASE("Test DFA", "[tools]")
   dfa.SetTransition(0, 3, 'b');
 
   int state = 0;
-  std::cout << (state = dfa.Next(state, 'a')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'a')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'a')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
-  std::cout << (state = dfa.Next(state, 'b')) << std::endl;
+  REQUIRE( (state = dfa.Next(state, 'a')) == 1 );
+  REQUIRE( (state = dfa.Next(state, 'a')) == 2 );
+  REQUIRE( (state = dfa.Next(state, 'a')) == 0 );
+  REQUIRE( (state = dfa.Next(state, 'b')) == 3 );
+  REQUIRE( (state = dfa.Next(state, 'b')) == -1 );
+  REQUIRE( (state = dfa.Next(state, 'b')) == -1 );
+  REQUIRE( (state = dfa.Next(state, 'b')) == -1 );
 
   REQUIRE(dfa.Next(0, "aaaaaab") == 3);
   REQUIRE(dfa.Next(0, "aaaaab") == -1);
@@ -381,6 +386,21 @@ TEST_CASE("Test DynamicStringSet", "[tools]")
   REQUIRE(test_set[4] == "Line 4");
 }
 
+TEST_CASE("Test errors", "[tools]")
+{
+  emp::TriggerExcept("test_fail", "The test failed.  *sob*");
+  emp::TriggerExcept("test_fail2", "The second test failed too.  But it's not quite as aweful.", false);
+  emp::TriggerExcept("test_fail2", "The third test is just test 2 again, but worse", true);
+
+  REQUIRE( emp::CountExcepts() == 3 );
+  auto except = emp::PopExcept("test_fail2");
+  REQUIRE( emp::CountExcepts() == 2 );
+  REQUIRE( except.desc == "The second test failed too.  But it's not quite as aweful." );
+  REQUIRE( emp::HasExcept("test_fail2") == true );
+  REQUIRE( emp::HasExcept("test_fail3") == false );
+  emp::ClearExcepts();
+  REQUIRE( emp::CountExcepts() == 0 );
+}
 
 char result_char;
 void TestFun(int x, int y, char z) {
@@ -571,6 +591,98 @@ TEST_CASE("Test info_theory", "[tools]")
   REQUIRE( emp::Entropy(dweights) == 2.5 );
 
   REQUIRE( emp::Entropy2(0.5) == 1.0 );
+}
+
+TEST_CASE("Test lexer_utils", "[tools]")
+{
+    emp::NFA nfa2c(3);  // Must have zero or two c's with any number of a's or b's.
+    nfa2c.AddTransition(0,0,"ab");
+    nfa2c.AddTransition(0,1,"c");
+    nfa2c.AddTransition(1,1,"ab");
+    nfa2c.AddTransition(1,2,"c");
+    nfa2c.AddTransition(2,2,"ab");
+    nfa2c.AddFreeTransition(0,2);
+    nfa2c.SetStop(2);
+
+    emp::RegEx re2f("[de]*f[de]*f[de]*");
+    // emp::RegEx re2f("([de]*)f([de]*)f([de]*)");
+    emp::NFA nfa2f = to_NFA(re2f);
+    emp::DFA dfa2f = to_DFA(nfa2f);
+    REQUIRE( nfa2f.GetSize() == 12 );
+    REQUIRE( dfa2f.GetSize() == 3 );
+
+    int state;
+    state = dfa2f.Next(0, "a");        REQUIRE(state == -1); REQUIRE(dfa2f.IsStop(state) == false);
+    state = dfa2f.Next(0, "d");        REQUIRE(state == 0); REQUIRE(dfa2f.IsStop(state) == false);
+    state = dfa2f.Next(0, "defdef");   REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
+    state = dfa2f.Next(0, "fedfed");   REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
+    state = dfa2f.Next(0, "ffed");     REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
+    state = dfa2f.Next(0, "edffed");   REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
+    state = dfa2f.Next(0, "edffedf");  REQUIRE(state == -1); REQUIRE(dfa2f.IsStop(state) == false);
+    state = dfa2f.Next(0, "defed");    REQUIRE(state == 1); REQUIRE(dfa2f.IsStop(state) == false);
+    state = dfa2f.Next(0, "ff");       REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
+
+    emp::RegEx re_lower("[a-z]+");
+    emp::RegEx re_upper("[A-Z]+");
+    emp::RegEx re_inc("[a-z]+[A-Z]+");
+    emp::NFA nfa_lower = to_NFA(re_lower);
+    emp::NFA nfa_upper = to_NFA(re_upper);
+    emp::NFA nfa_inc = to_NFA(re_inc);
+    emp::NFA nfa_all = MergeNFA(nfa_lower, nfa_upper, nfa_inc);
+    emp::DFA dfa_lower = to_DFA(nfa_lower);
+    emp::DFA dfa_upper = to_DFA(nfa_upper);
+    emp::DFA dfa_inc = to_DFA(nfa_inc);
+    emp::DFA dfa_all = to_DFA(nfa_all);
+
+    emp::NFA_State lstate(nfa_lower);
+    lstate.Reset(); lstate.Next("abc");      REQUIRE(lstate.IsActive() == true);
+    lstate.Reset(); lstate.Next("DEF");      REQUIRE(lstate.IsActive() == false);
+    lstate.Reset(); lstate.Next("abcDEF");   REQUIRE(lstate.IsActive() == false);
+    lstate.Reset(); lstate.Next("ABDdef");   REQUIRE(lstate.IsActive() == false);
+    lstate.Reset(); lstate.Next("ABCDEF");   REQUIRE(lstate.IsActive() == false);
+    lstate.Reset(); lstate.Next("abcdefghijklmnopqrstuvwxyz");  REQUIRE(lstate.IsActive() == true);
+    lstate.Reset(); lstate.Next("ABC-DEF");  REQUIRE(lstate.IsActive() == false);
+
+    REQUIRE( dfa_all.Next(0, "abc") == 2 );
+    REQUIRE( dfa_all.Next(0, "DEF") == 1 );
+    REQUIRE( dfa_all.Next(0, "abcDEF") == 3 );
+    REQUIRE( dfa_all.Next(0, "ABDdef") == -1 );
+    REQUIRE( dfa_all.Next(0, "ABCDEF") == 1 );
+    REQUIRE( dfa_all.Next(0, "abcdefghijklmnopqrstuvwxyz") == 2 );
+    REQUIRE( dfa_all.Next(0, "ABC-DEF") == -1 );
+}
+
+
+TEST_CASE("Test Lexer", "[tools]")
+{
+  emp::Lexer lexer;
+  lexer.AddToken("Integer", "[0-9]+");
+  lexer.AddToken("Float", "[0-9]*\\.[0-9]+");
+  lexer.AddToken("Lower", "[a-z]+");
+  lexer.AddToken("Upper", "[A-Z]+");
+  lexer.AddToken("Mixed", "[a-zA-Z]+");
+  lexer.AddToken("Whitespace", "[ \t\n\r]");
+  lexer.AddToken("Other", ".");
+
+  std::stringstream ss;
+  ss << "This is a 123 TEST.  It should also have 1. .2 123.456 789 FLOATING point NUMbers!";
+
+  REQUIRE(lexer.Process(ss).lexeme == "This");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == "is");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == "a");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == "123");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == "TEST");
+  REQUIRE(lexer.Process(ss).lexeme == ".");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+
+  REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Mixed");
+  REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Whitespace");
+  REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Lower");
 }
 
 TEST_CASE("Test macro_math", "[tools]")
@@ -892,6 +1004,19 @@ TEST_CASE("Test map_utils", "[tools]")
   REQUIRE( emp::Has(flipped, 'x') == false);
 }
 
+TEST_CASE("Test math", "[tools]")
+{
+  constexpr auto a1 = emp::Log2(3.14);           REQUIRE( a1 > 1.650);   REQUIRE( a1 < 1.651);
+  constexpr auto a2 = emp::Log2(0.125);          REQUIRE( a2 == -3.0 );
+  constexpr auto a3 = emp::Log(1000, 10);        REQUIRE( a3 == 3.0 );
+  constexpr auto a4 = emp::Log(10, 1000);        REQUIRE( a4 > 0.333 );  REQUIRE( a4 < 0.334 );
+  constexpr auto a5 = emp::Log10(100);           REQUIRE( a5 == 2.0 );
+  constexpr auto a6 = emp::Ln(3.33);             REQUIRE( a6 > 1.202 );  REQUIRE( a6 < 1.204 );
+  constexpr auto a7 = emp::Pow2(2.345);          REQUIRE( a7 > 5.080 );  REQUIRE( a7 < 5.081 );
+  constexpr auto a8 = emp::Pow(emp::PI, emp::E); REQUIRE( a8 > 22.440 ); REQUIRE( a8 < 22.441 );
+}
+
+
 struct TestClass1 {
   TestClass1() {
     EMP_TRACK_CONSTRUCT(TestClass1);
@@ -981,6 +1106,52 @@ TEST_CASE("Test meta-programming helpers", "[tools]")
   REQUIRE( meta2.b == true );
   REQUIRE( meta3.a == "65.5" );
   REQUIRE( meta3.b == 65.5 );
+}
+
+TEST_CASE("Test NFA", "[tools]")
+{
+  emp::NFA nfa(10);
+  nfa.AddTransition(0, 1, 'a');
+  nfa.AddTransition(0, 2, 'a');
+  nfa.AddTransition(0, 3, 'a');
+  nfa.AddTransition(0, 4, 'a');
+
+  nfa.AddTransition(1, 2, 'b');
+  nfa.AddTransition(2, 3, 'c');
+  nfa.AddTransition(3, 4, 'd');
+
+  nfa.AddTransition(0, 1, 'e');
+  nfa.AddTransition(0, 1, 'f');
+  nfa.AddTransition(0, 1, 'g');
+
+  nfa.AddTransition(2, 3, 'a');
+  nfa.AddTransition(3, 4, 'a');
+  nfa.AddTransition(2, 4, 'a');
+
+  nfa.AddTransition(2, 2, 'e');
+  nfa.AddTransition(3, 3, 'e');
+  nfa.AddTransition(4, 4, 'e');
+
+  nfa.AddFreeTransition(1,5);
+
+  nfa.AddTransition(5, 6, 'a');
+
+  nfa.AddFreeTransition(6,7);
+  nfa.AddFreeTransition(6,8);
+  nfa.AddFreeTransition(6,9);
+  nfa.AddFreeTransition(9,0);
+
+  emp::NFA_State state(nfa);
+  REQUIRE(state.GetSize() == 1);
+  state.Next('a');
+  REQUIRE(state.GetSize() == 5);
+  state.Next('a');
+  REQUIRE(state.GetSize() == 7);
+
+  emp::NFA_State state2(nfa);
+  REQUIRE(state2.GetSize() == 1);
+  state2.Next("aaaa");
+  REQUIRE(state2.GetSize() == 7);
 }
 
 TEST_CASE("Test Ptr", "[tools]")
@@ -1182,6 +1353,50 @@ TEST_CASE("Test reflection", "[tools]")
 
 }
 
+TEST_CASE("Test regular expressions (RegEx)", "[tools]")
+{
+  emp::RegEx re1("a|bcdef");
+  REQUIRE(re1.Test("a") == true);
+  REQUIRE(re1.Test("bc") == false);
+  REQUIRE(re1.Test("bcdef") == true);
+  REQUIRE(re1.Test("bcdefg") == false);
+
+  emp::RegEx re2("#[abcdefghijklm]*abc");
+  REQUIRE(re2.Test("") == false);
+  REQUIRE(re2.Test("#a") == false);
+  REQUIRE(re2.Test("#aaaabc") == true);
+  REQUIRE(re2.Test("#abcabc") == true);
+  REQUIRE(re2.Test("#abcabcd") == false);
+
+  emp::RegEx re3("xx(y|(z*)?)+xx");
+  REQUIRE(re3.Test("xxxx") == true);
+  REQUIRE(re3.Test("xxxxx") == false);
+  REQUIRE(re3.Test("xxyxx") == true);
+  REQUIRE(re3.Test("xxyyxx") == true);
+  REQUIRE(re3.Test("xxzzzxx") == true);
+
+  emp::RegEx re_WHITESPACE("[ \t\r]");
+  emp::RegEx re_COMMENT("#.*");
+  emp::RegEx re_INT_LIT("[0-9]+");
+  emp::RegEx re_FLOAT_LIT("[0-9]+[.][0-9]+");
+  emp::RegEx re_CHAR_LIT("'(.|(\\\\[\\\\'nt]))'");
+  emp::RegEx re_STRING_LIT("[\"]((\\\\[nt\"\\\\])|[^\"])*\\\"");
+  emp::RegEx re_ID("[a-zA-Z0-9_]+");
+
+  REQUIRE(re_INT_LIT.Test("1234") == true);
+  REQUIRE(re_FLOAT_LIT.Test("1234") == false);
+  REQUIRE(re_ID.Test("1234") == true);
+  REQUIRE(re_INT_LIT.Test("1234.56") == false);
+  REQUIRE(re_FLOAT_LIT.Test("1234.56") == true);
+  REQUIRE(re_ID.Test("1234.56") == false);
+
+  std::string test_str = "\"1234\"";
+  REQUIRE(re_STRING_LIT.Test(test_str) == true);
+  REQUIRE(re_INT_LIT.Test(test_str) == false);
+
+  std::string test_str2 = "\"1234\", \"5678\"";
+  REQUIRE(re_STRING_LIT.Test(test_str2) == false);
+}
 
 TEST_CASE("Test sequence utils", "[tools]")
 {

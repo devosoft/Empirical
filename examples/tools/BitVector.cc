@@ -8,6 +8,7 @@
 #include <ctime>
 #include <iostream>
 #include <string>
+#include <unordered_set>
 
 // EMP_TRACK_MEM must be defined in order to use the extra capabilities of emp::Ptr.
 // Normally this would be done at the command line with -DEMP_TRACK_MEM
@@ -42,11 +43,27 @@ int main()
   }
 
   std::clock_t emp_tot_time = std::clock() - emp_start_time;
-
   double time = 1000.0 * ((double) emp_tot_time) / (double) CLOCKS_PER_SEC;
-  //REQUIRE(time < 9000); // NOTE: WILL VARY INTENSELY ON VARIOUS SYSTEMS
-  // SHOULD PROBABLY CHANGE
+  std::cout << "Time = " << time << std::endl;
 
-  std::cout << "Time = " << time;
+  std::unordered_set<emp::BitVector> bv_set;
+  bv_set.insert(set1);
+  bv_set.insert(set2);
+
+  emp::BitVector bv(10);
+  std::cout << bv.Hash() << "  (initial, 10 bits)" << std::endl;
+  bv[3] = true;
+  std::cout << bv.Hash() << "  (bit 3 set to true)" << std::endl;
+  bv.Resize(9);
+  std::cout << bv.Hash() << "  (resized to 9.)" << std::endl;
+  std::cout << bv.Hash() << "  (same as previous)" << std::endl;
+  emp::BitVector bv2(12);
+  std::cout << bv2.Hash() << "  (new bv with 12 bits)" << std::endl;
+  bv2[3] = true;
+  bv2[11] = true;
+  std::cout << bv2.Hash() << "  (bits 3 and 11 set true)" << std::endl;
+  bv2.Resize(9);
+  std::cout << bv2.Hash() << "  (resized new bv to 9)" << std::endl;
+
 }
 

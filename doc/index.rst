@@ -27,10 +27,4 @@ Contents:
    tutorials/index
    dev/index
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+:ref:`genindex`

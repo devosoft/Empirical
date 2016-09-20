@@ -18,3 +18,5 @@ evo/      - Tools for building evolution-based software, such as genetic algorit
 examples/ - Example code for many of the above tools
 tests/    - Unit tests
 utils/    - mini projects using Empirical with broad utility.
+
+See https://empirical.readthedocs.io for full documentation
