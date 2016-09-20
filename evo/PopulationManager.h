@@ -71,29 +71,29 @@ namespace evo {
     int AddOrg(ORG * new_org) {
       const int pos = pop.size();
       pop.push_back(new_org);
-      fitM.ClearCache(pos);
+      fitM.Clear(pos);
       return pos;
     }
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = random_ptr->GetInt((int) pop.size());
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
-      fitM.ClearCache(pos);
+      fitM.Clear(pos);
       return pos;
     }
 
     void Clear() {
       // Delete all organisms.
-      for (ORG * org : pop) if (org) delete org;
-      pop.resize(0);
-      fitM.ClearCache();
+      for (ORG * org : pop) if (org) delete org;  // Delete current organisms.
+      pop.resize(0);                              // Remove deleted organisms.
+      fitM.Clear();                               // Clear the fitness manager cache.
     }
     void Resize(size_t new_size) {
       emp_assert(new_size >= 0);
       const auto old_size = pop.size();
       for (int i = new_size; i < old_size; i++) {
-        delete pop[i];      // Delete organisms being removed.
-        fitM.ClearCache(i); // Clear fitness cache for removed cells.
+        delete pop[i];                            // Delete organisms being removed.
+        fitM.Clear(i);                            // Clear fitness cache for Deleted cells.
       }
       pop.resize(new_size, nullptr);  // Initialize new orgs as null.
     }
@@ -121,7 +121,7 @@ namespace evo {
       for (int i = new_size; i < (int) pop.size(); ++i) { delete pop[i]; }
       pop.resize(new_size);
 
-      fitM.ClearCache();  // Everyone is either deleted or in the wrong place!
+      fitM.Clear();  // Everyone is either deleted or in the wrong place!
     }
 
     // --- FOR VECTOR COMPATIBILITY ---
@@ -226,14 +226,14 @@ namespace evo {
 
       pop.resize(0);
       next_pop.resize(0);
-      fitM.ClearCache();
+      fitM.Clear();
     }
 
     void Update() {
       for (ORG * m : pop) delete m;  // Delete the current population.
       pop = next_pop;                // Move over the next generation.
       next_pop.resize(0);            // Clear out the next pop to refill again.
-      fitM.ClearCache();             // Clear the fitness cache.
+      fitM.Clear();                  // Clear the fitness given new cells.
     }
   };
 
@@ -315,7 +315,7 @@ namespace evo {
       const int pos = empty_spots[ random_ptr->GetInt((int) empty_spots.size()) ];
 
       pop[pos] = new_org;
-      fitM.ClearCache(pos);
+      fitM.Clear(pos);
       return pos;
     }
 
@@ -331,7 +331,7 @@ namespace evo {
       if (pop[pos]) delete pop[pos];
 
       pop[pos] = new_org;
-      fitM.ClearCache(pos);
+      fitM.Clear(pos);
 
       return pos;
     }
@@ -496,7 +496,7 @@ namespace evo {
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
       org_count++;
-      fitM.ClearCache(pos);
+      fitM.Clear(pos);
       return pos;
     }
 
@@ -519,7 +519,7 @@ namespace evo {
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
 
-      fitM.ClearCache(pos);
+      fitM.Clear(pos);
       return pos;
     }
  };

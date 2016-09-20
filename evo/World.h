@@ -314,7 +314,7 @@ namespace evo {
         if (this->IsOccupied(i)){
           if (mut_fun(popM[i], *random_ptr)) {
             mut_count++;
-            fitM.ClearCache(i);
+            fitM.Clear(i);
           }
         }
       }
@@ -436,7 +436,7 @@ namespace evo {
         fitness[i] = fit_fun(popM[i])/niche_count;
       }
 
-      fitM.SetCache(fitness);
+      fitM.Set(fitness);                                // Cache all calculated fitnesses.
       TournamentSelect(fit_fun, t_size, tourny_count);
     }
 
