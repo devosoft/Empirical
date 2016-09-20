@@ -308,7 +308,7 @@ namespace emp {
   };
 
   namespace internal {
-    // The following function takes a table and a position [0.0, 1.0) and intepolates a value.
+    /// The following function takes a table and a position [0.0, 1.0) and intepolates a value.
     template <typename T>
     constexpr double InterpolateTable(T && table, double pos, double tsize) {
       // auto p1 = (int)(pos*tsize);

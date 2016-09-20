@@ -13,9 +13,9 @@
 
 namespace emp {
 
-  // Shuffle all of the elements in a vector.
-  // If max_count is provided, just make sure that the first max_count entries are randomly
-  // drawn from entire vector.
+  /// Shuffle all of the elements in a vector.
+  /// If max_count is provided, just make sure that the first max_count entries are randomly
+  /// drawn from entire vector.
   template <typename T>
   void Shuffle(Random & random, emp::vector<T> & v, int max_count=-1)
   {
@@ -28,7 +28,7 @@ namespace emp {
   }
 
 
-  // Return an emp::vector<int> numbered 0 through size-1 in a random order.
+  /// Return an emp::vector<int> numbered 0 through size-1 in a random order.
 
   emp::vector<int> GetPermutation(Random & random, int size) {
     emp::vector<int> seq(size);
@@ -41,7 +41,7 @@ namespace emp {
     return seq;
   }
 
-  // Choose K positions from N possibilities.
+  /// Choose K positions from N possibilities.
 
   void Choose(Random & random, int N, int K, std::vector<int> & choices) {
     if (N < K || K < 0) return;  // @CAO Should be an assert!
@@ -60,7 +60,7 @@ namespace emp {
   }
 
 
-  // Generate a random bit vector of the specified size.
+  /// Generate a random bit vector of the specified size.
 
   BitVector RandomBitVector(Random & random, int size, double p=0.5)
   {

@@ -1,5 +1,5 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
+// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
+// Copyright (C) Michigan State University, 2015. It is licensed
 // under the MIT Software license; see doc/LICENSE
 
 #ifndef EMP_MACRO_MATH_H
@@ -31,6 +31,8 @@
 //   HEX - Hexidecimal representation (e.g., 0x5B)  [todo]
 //
 
+/// @cond MACROS
+
 #define EMP_EMPTY()
 
 // Several versions of eval...  these simply make sure arguments are evaluated before use.
@@ -56,11 +58,14 @@
 #define EMP_EVAL19(...) __VA_ARGS__
 #define EMP_EVAL20(...) __VA_ARGS__
 
+/// @endcond
 
-// Full set of conversions from Decimal representations of numbers to their
-// binary versions (up to 1024).
-  
+/// Full set of conversions from Decimal representations of numbers to their
+/// binary versions (up to 1024).
+
 #define EMP_DEC_TO_BIN(VAL) EMP_DEC_TO_BIN_ ## VAL
+
+/// @cond MACROS
 
 #define EMP_DEC_TO_BIN_0    0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 #define EMP_DEC_TO_BIN_1    0, 0, 0, 0, 0, 0, 0, 0, 0, 1
@@ -1087,113 +1092,117 @@
 #define EMP_DEC_TO_BIN_1022  1, 1, 1, 1, 1, 1, 1, 1, 1, 0
 #define EMP_DEC_TO_BIN_1023  1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 
+/// @endcond
 
-// Convert binary values back to decimal (10 bits).
+/// Convert binary values back to decimal (10 bits).
 
 #define EMP_BIN_TO_DEC(...) EMP_BIN_TO_DEC_IMPL EMP_EMPTY() (__VA_ARGS__)
+
+/// @cond MACROS
+
 #define EMP_BIN_TO_DEC_IMPL(B0,B1,B2,B3,B4,B5,B6,B7,B8,B9)              \
   EMP_BIN_TO_DEC_ ## B0 ## B1 ## B2 ## B3 ## B4 ## B5 ## B6 ## B7 ## B8 ## B9
 
-#define EMP_BIN_TO_DEC_0000000000  0  
-#define EMP_BIN_TO_DEC_0000000001  1  
-#define EMP_BIN_TO_DEC_0000000010  2  
-#define EMP_BIN_TO_DEC_0000000011  3  
-#define EMP_BIN_TO_DEC_0000000100  4  
-#define EMP_BIN_TO_DEC_0000000101  5  
-#define EMP_BIN_TO_DEC_0000000110  6  
-#define EMP_BIN_TO_DEC_0000000111  7  
-#define EMP_BIN_TO_DEC_0000001000  8  
-#define EMP_BIN_TO_DEC_0000001001  9  
-#define EMP_BIN_TO_DEC_0000001010  10 
-#define EMP_BIN_TO_DEC_0000001011  11 
-#define EMP_BIN_TO_DEC_0000001100  12 
-#define EMP_BIN_TO_DEC_0000001101  13 
-#define EMP_BIN_TO_DEC_0000001110  14 
-#define EMP_BIN_TO_DEC_0000001111  15 
-#define EMP_BIN_TO_DEC_0000010000  16 
-#define EMP_BIN_TO_DEC_0000010001  17 
-#define EMP_BIN_TO_DEC_0000010010  18 
-#define EMP_BIN_TO_DEC_0000010011  19 
-#define EMP_BIN_TO_DEC_0000010100  20 
-#define EMP_BIN_TO_DEC_0000010101  21 
-#define EMP_BIN_TO_DEC_0000010110  22 
-#define EMP_BIN_TO_DEC_0000010111  23 
-#define EMP_BIN_TO_DEC_0000011000  24 
-#define EMP_BIN_TO_DEC_0000011001  25 
-#define EMP_BIN_TO_DEC_0000011010  26 
-#define EMP_BIN_TO_DEC_0000011011  27 
-#define EMP_BIN_TO_DEC_0000011100  28 
-#define EMP_BIN_TO_DEC_0000011101  29 
-#define EMP_BIN_TO_DEC_0000011110  30 
-#define EMP_BIN_TO_DEC_0000011111  31 
-#define EMP_BIN_TO_DEC_0000100000  32 
-#define EMP_BIN_TO_DEC_0000100001  33 
-#define EMP_BIN_TO_DEC_0000100010  34 
-#define EMP_BIN_TO_DEC_0000100011  35 
-#define EMP_BIN_TO_DEC_0000100100  36 
-#define EMP_BIN_TO_DEC_0000100101  37 
-#define EMP_BIN_TO_DEC_0000100110  38 
-#define EMP_BIN_TO_DEC_0000100111  39 
-#define EMP_BIN_TO_DEC_0000101000  40 
-#define EMP_BIN_TO_DEC_0000101001  41 
-#define EMP_BIN_TO_DEC_0000101010  42 
-#define EMP_BIN_TO_DEC_0000101011  43 
-#define EMP_BIN_TO_DEC_0000101100  44 
-#define EMP_BIN_TO_DEC_0000101101  45 
-#define EMP_BIN_TO_DEC_0000101110  46 
-#define EMP_BIN_TO_DEC_0000101111  47 
-#define EMP_BIN_TO_DEC_0000110000  48 
-#define EMP_BIN_TO_DEC_0000110001  49 
-#define EMP_BIN_TO_DEC_0000110010  50 
-#define EMP_BIN_TO_DEC_0000110011  51 
-#define EMP_BIN_TO_DEC_0000110100  52 
-#define EMP_BIN_TO_DEC_0000110101  53 
-#define EMP_BIN_TO_DEC_0000110110  54 
-#define EMP_BIN_TO_DEC_0000110111  55 
-#define EMP_BIN_TO_DEC_0000111000  56 
-#define EMP_BIN_TO_DEC_0000111001  57 
-#define EMP_BIN_TO_DEC_0000111010  58 
-#define EMP_BIN_TO_DEC_0000111011  59 
-#define EMP_BIN_TO_DEC_0000111100  60 
-#define EMP_BIN_TO_DEC_0000111101  61 
-#define EMP_BIN_TO_DEC_0000111110  62 
-#define EMP_BIN_TO_DEC_0000111111  63 
-#define EMP_BIN_TO_DEC_0001000000  64 
-#define EMP_BIN_TO_DEC_0001000001  65 
-#define EMP_BIN_TO_DEC_0001000010  66 
-#define EMP_BIN_TO_DEC_0001000011  67 
-#define EMP_BIN_TO_DEC_0001000100  68 
-#define EMP_BIN_TO_DEC_0001000101  69 
-#define EMP_BIN_TO_DEC_0001000110  70 
-#define EMP_BIN_TO_DEC_0001000111  71 
-#define EMP_BIN_TO_DEC_0001001000  72 
-#define EMP_BIN_TO_DEC_0001001001  73 
-#define EMP_BIN_TO_DEC_0001001010  74 
-#define EMP_BIN_TO_DEC_0001001011  75 
-#define EMP_BIN_TO_DEC_0001001100  76 
-#define EMP_BIN_TO_DEC_0001001101  77 
-#define EMP_BIN_TO_DEC_0001001110  78 
-#define EMP_BIN_TO_DEC_0001001111  79 
-#define EMP_BIN_TO_DEC_0001010000  80 
-#define EMP_BIN_TO_DEC_0001010001  81 
-#define EMP_BIN_TO_DEC_0001010010  82 
-#define EMP_BIN_TO_DEC_0001010011  83 
-#define EMP_BIN_TO_DEC_0001010100  84 
-#define EMP_BIN_TO_DEC_0001010101  85 
-#define EMP_BIN_TO_DEC_0001010110  86 
-#define EMP_BIN_TO_DEC_0001010111  87 
-#define EMP_BIN_TO_DEC_0001011000  88 
-#define EMP_BIN_TO_DEC_0001011001  89 
-#define EMP_BIN_TO_DEC_0001011010  90 
-#define EMP_BIN_TO_DEC_0001011011  91 
-#define EMP_BIN_TO_DEC_0001011100  92 
-#define EMP_BIN_TO_DEC_0001011101  93 
-#define EMP_BIN_TO_DEC_0001011110  94 
-#define EMP_BIN_TO_DEC_0001011111  95 
-#define EMP_BIN_TO_DEC_0001100000  96 
-#define EMP_BIN_TO_DEC_0001100001  97 
-#define EMP_BIN_TO_DEC_0001100010  98 
-#define EMP_BIN_TO_DEC_0001100011  99 
+#define EMP_BIN_TO_DEC_0000000000  0
+#define EMP_BIN_TO_DEC_0000000001  1
+#define EMP_BIN_TO_DEC_0000000010  2
+#define EMP_BIN_TO_DEC_0000000011  3
+#define EMP_BIN_TO_DEC_0000000100  4
+#define EMP_BIN_TO_DEC_0000000101  5
+#define EMP_BIN_TO_DEC_0000000110  6
+#define EMP_BIN_TO_DEC_0000000111  7
+#define EMP_BIN_TO_DEC_0000001000  8
+#define EMP_BIN_TO_DEC_0000001001  9
+#define EMP_BIN_TO_DEC_0000001010  10
+#define EMP_BIN_TO_DEC_0000001011  11
+#define EMP_BIN_TO_DEC_0000001100  12
+#define EMP_BIN_TO_DEC_0000001101  13
+#define EMP_BIN_TO_DEC_0000001110  14
+#define EMP_BIN_TO_DEC_0000001111  15
+#define EMP_BIN_TO_DEC_0000010000  16
+#define EMP_BIN_TO_DEC_0000010001  17
+#define EMP_BIN_TO_DEC_0000010010  18
+#define EMP_BIN_TO_DEC_0000010011  19
+#define EMP_BIN_TO_DEC_0000010100  20
+#define EMP_BIN_TO_DEC_0000010101  21
+#define EMP_BIN_TO_DEC_0000010110  22
+#define EMP_BIN_TO_DEC_0000010111  23
+#define EMP_BIN_TO_DEC_0000011000  24
+#define EMP_BIN_TO_DEC_0000011001  25
+#define EMP_BIN_TO_DEC_0000011010  26
+#define EMP_BIN_TO_DEC_0000011011  27
+#define EMP_BIN_TO_DEC_0000011100  28
+#define EMP_BIN_TO_DEC_0000011101  29
+#define EMP_BIN_TO_DEC_0000011110  30
+#define EMP_BIN_TO_DEC_0000011111  31
+#define EMP_BIN_TO_DEC_0000100000  32
+#define EMP_BIN_TO_DEC_0000100001  33
+#define EMP_BIN_TO_DEC_0000100010  34
+#define EMP_BIN_TO_DEC_0000100011  35
+#define EMP_BIN_TO_DEC_0000100100  36
+#define EMP_BIN_TO_DEC_0000100101  37
+#define EMP_BIN_TO_DEC_0000100110  38
+#define EMP_BIN_TO_DEC_0000100111  39
+#define EMP_BIN_TO_DEC_0000101000  40
+#define EMP_BIN_TO_DEC_0000101001  41
+#define EMP_BIN_TO_DEC_0000101010  42
+#define EMP_BIN_TO_DEC_0000101011  43
+#define EMP_BIN_TO_DEC_0000101100  44
+#define EMP_BIN_TO_DEC_0000101101  45
+#define EMP_BIN_TO_DEC_0000101110  46
+#define EMP_BIN_TO_DEC_0000101111  47
+#define EMP_BIN_TO_DEC_0000110000  48
+#define EMP_BIN_TO_DEC_0000110001  49
+#define EMP_BIN_TO_DEC_0000110010  50
+#define EMP_BIN_TO_DEC_0000110011  51
+#define EMP_BIN_TO_DEC_0000110100  52
+#define EMP_BIN_TO_DEC_0000110101  53
+#define EMP_BIN_TO_DEC_0000110110  54
+#define EMP_BIN_TO_DEC_0000110111  55
+#define EMP_BIN_TO_DEC_0000111000  56
+#define EMP_BIN_TO_DEC_0000111001  57
+#define EMP_BIN_TO_DEC_0000111010  58
+#define EMP_BIN_TO_DEC_0000111011  59
+#define EMP_BIN_TO_DEC_0000111100  60
+#define EMP_BIN_TO_DEC_0000111101  61
+#define EMP_BIN_TO_DEC_0000111110  62
+#define EMP_BIN_TO_DEC_0000111111  63
+#define EMP_BIN_TO_DEC_0001000000  64
+#define EMP_BIN_TO_DEC_0001000001  65
+#define EMP_BIN_TO_DEC_0001000010  66
+#define EMP_BIN_TO_DEC_0001000011  67
+#define EMP_BIN_TO_DEC_0001000100  68
+#define EMP_BIN_TO_DEC_0001000101  69
+#define EMP_BIN_TO_DEC_0001000110  70
+#define EMP_BIN_TO_DEC_0001000111  71
+#define EMP_BIN_TO_DEC_0001001000  72
+#define EMP_BIN_TO_DEC_0001001001  73
+#define EMP_BIN_TO_DEC_0001001010  74
+#define EMP_BIN_TO_DEC_0001001011  75
+#define EMP_BIN_TO_DEC_0001001100  76
+#define EMP_BIN_TO_DEC_0001001101  77
+#define EMP_BIN_TO_DEC_0001001110  78
+#define EMP_BIN_TO_DEC_0001001111  79
+#define EMP_BIN_TO_DEC_0001010000  80
+#define EMP_BIN_TO_DEC_0001010001  81
+#define EMP_BIN_TO_DEC_0001010010  82
+#define EMP_BIN_TO_DEC_0001010011  83
+#define EMP_BIN_TO_DEC_0001010100  84
+#define EMP_BIN_TO_DEC_0001010101  85
+#define EMP_BIN_TO_DEC_0001010110  86
+#define EMP_BIN_TO_DEC_0001010111  87
+#define EMP_BIN_TO_DEC_0001011000  88
+#define EMP_BIN_TO_DEC_0001011001  89
+#define EMP_BIN_TO_DEC_0001011010  90
+#define EMP_BIN_TO_DEC_0001011011  91
+#define EMP_BIN_TO_DEC_0001011100  92
+#define EMP_BIN_TO_DEC_0001011101  93
+#define EMP_BIN_TO_DEC_0001011110  94
+#define EMP_BIN_TO_DEC_0001011111  95
+#define EMP_BIN_TO_DEC_0001100000  96
+#define EMP_BIN_TO_DEC_0001100001  97
+#define EMP_BIN_TO_DEC_0001100010  98
+#define EMP_BIN_TO_DEC_0001100011  99
 #define EMP_BIN_TO_DEC_0001100100  100
 #define EMP_BIN_TO_DEC_0001100101  101
 #define EMP_BIN_TO_DEC_0001100110  102
@@ -2198,19 +2207,29 @@
 #define EMP_BIT_LESS(X, Y) EMP_BOOL_IMPL(LESS, X, Y)
 #define EMP_BIT_GTR(X, Y) EMP_BOOL_IMPL(LESS, Y, X)
 
-// EMP_IF examines the first argument; if it's 0, it resolves to the third argument, otherwise
-// it resolves to the second argument.  We do this by converting a 0 into two arguments, with
-// F being the second one.  Anything else stays as one argument, and the default second is T
+/// @endcond
+
+/// EMP_IF examines the first argument; if it's 0, it resolves to the third argument, otherwise
+/// it resolves to the second argument.  We do this by converting a 0 into two arguments, with
+/// F being the second one.  Anything else stays as one argument, and the default second is T
 #define EMP_IF(TEST, T, F) EMP_IF_impl(TEST, T, F)
+
+/// @cond MACROS
+
 #define EMP_IF_impl(TEST, T, F) EMP_EVAL( EMP_IF_impl_get_2 EMP_EMPTY() ( EMP_IF_impl_##TEST(F), T, ~) )
 #define EMP_IF_impl_get_2(A, B, ...) B
 #define EMP_IF_impl_0(A) ~, A
 
-// Tools to handle comparisons
-// This macro will create a list of comparisons only when difference occur, and then always
-// grab the first one.  If the values are equal, the result will be an X.
+/// @endcond
+
+/// Tools to handle comparisons
+/// This macro will create a list of comparisons only when difference occur, and then always
+/// grab the first one.  If the values are equal, the result will be an X.
 #define EMP_COMPARE(VAL_A, VAL_B)                                       \
   EMP_EVAL( EMP_COMPARE_IMPL( EMP_DEC_TO_BIN(VAL_A), EMP_DEC_TO_BIN(VAL_B) ) )
+
+/// @cond MACROS
+
 #define EMP_COMPARE_IMPL(...) EMP_COMPARE_BIN_IMPL( __VA_ARGS__ )
 
 #define EMP_COMPARE_BIN(...) EMP_COMPARE_BIN_IMPL EMP_EMPTY() (__VA_ARGS__)
@@ -2423,6 +2442,7 @@
     A8,                                                               \
     A9
 
+/// @endcond
 
 ///////////////////////////
 //
@@ -2430,7 +2450,7 @@
 //
 
 // --- Shifting ---
-
+/// @cond MACROS
 #define EMP_SHIFTL_BIN(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A1, A2, A3, A4, A5, A6, A7, A8, A9, 0
 #define EMP_SHIFTR_BIN(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, A0, A1, A2, A3, A4, A5, A6, A7, A8
 
@@ -2467,21 +2487,34 @@
 #define EMP_SHIFTL_BIN_10(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 #define EMP_SHIFTR_BIN_10(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
+/// @endcond
 
+/// Shift A left (i.e. multiply by 2)
 #define EMP_SHIFTL(A) EMP_SHIFTL_IMPL( EMP_DEC_TO_BIN(A) )
+/// @cond MACROS
 #define EMP_SHIFTL_IMPL(...) EMP_BIN_TO_DEC( EMP_SHIFTL_BIN( __VA_ARGS__ ) )
+/// @endcond
 
+/// Shift A left by X
 #define EMP_SHIFTL_X(X, A) EMP_SHIFTL_X_IMPL( X, EMP_DEC_TO_BIN(A) )
+/// @cond MACROS
 #define EMP_SHIFTL_X_IMPL(X, ...) EMP_BIN_TO_DEC( EMP_SHIFTL_BIN_##X( __VA_ARGS__ ) )
+/// @endcond
 
+/// Shift A  (i.e. divide by 2)
 #define EMP_SHIFTR(A) EMP_SHIFTR_IMPL( EMP_DEC_TO_BIN(A) )
+/// @cond MACROS
 #define EMP_SHIFTR_IMPL(...) EMP_BIN_TO_DEC( EMP_SHIFTR_BIN( __VA_ARGS__ ) )
+/// @endcond
 
+/// Shift A right by X
 #define EMP_SHIFTR_X(X, A) EMP_SHIFTR_X_IMPL( X, EMP_DEC_TO_BIN(A) )
+/// @cond MACROS
 #define EMP_SHIFTR_X_IMPL(X, ...) EMP_BIN_TO_DEC( EMP_EVAL(EMP_SHIFTR_BIN_##X( __VA_ARGS__ )) )
-
+/// @endcond
 
 // --- Addition ---
+/// @cond MACROS
 #define EMP_ADD_BIN(...) EMP_ADD_BIN_IMPL EMP_EMPTY() (__VA_ARGS__)
 
 #define EMP_ADD_BIN_IMPL(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9,        \
@@ -2510,14 +2543,21 @@
                        B0, B1, B2, B3, B4, B5, B6, B7, B8, B9, ...)     \
   EMP_ADD_BIN( EMP_ADD_BIN(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9,B0,B1,B2,B3,B4,B5,B6,B7,B8,B9), \
                EMP_ADD_BIN_8(__VA_ARGS__) )
+/// @endcond
 
+/// Add A to B
 #define EMP_ADD(A, B) EMP_EVAL( EMP_ADD_IMPL( EMP_DEC_TO_BIN(A), EMP_DEC_TO_BIN(B) ) )
+
+/// @cond MACROS
 #define EMP_ADD_IMPL(...) EMP_BIN_TO_DEC( EMP_ADD_BIN_IMPL( __VA_ARGS__ ) )
 
 #define EMP_ADD_10(A,B,C,D,E,F,G,H,I,J) EMP_EVAL( EMP_ADD_10_IMPL( EMP_DEC_TO_BIN(A), EMP_DEC_TO_BIN(B), EMP_DEC_TO_BIN(C), EMP_DEC_TO_BIN(D), EMP_DEC_TO_BIN(E), EMP_DEC_TO_BIN(F), EMP_DEC_TO_BIN(G), EMP_DEC_TO_BIN(H), EMP_DEC_TO_BIN(I), EMP_DEC_TO_BIN(J) ) )
 #define EMP_ADD_10_IMPL(...) EMP_BIN_TO_DEC( EMP_ADD_BIN_10( __VA_ARGS__ ) )
+/// @endcond
 
 // --- Subtraction ---
+
+/// @cond MACROS
 #define EMP_SUB_BIN(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9,             \
                     B0, B1, B2, B3, B4, B5, B6, B7, B8, B9)             \
   EMP_MATH_RESTORE_BIN( EMP_MATH_DIFF_BITS(A0, B0), EMP_MATH_DIFF_BITS(A1, B1), \
@@ -2526,17 +2566,25 @@
                         EMP_MATH_DIFF_BITS(A6, B6), EMP_MATH_DIFF_BITS(A7, B7), \
                         EMP_MATH_DIFF_BITS(A8, B8), EMP_MATH_DIFF_BITS(A9, B9)  \
                         )
-
+/// @endcond
+/// Combute A - B
 #define EMP_SUB(A, B) EMP_EVAL( EMP_SUB_IMPL( EMP_DEC_TO_BIN(A), EMP_DEC_TO_BIN(B) ) )
+
+/// @cond MACROS
 #define EMP_SUB_IMPL(...) EMP_BIN_TO_DEC( EMP_SUB_BIN( __VA_ARGS__ ) )
+/// @endcond
 
 // --- Increment and Decrement ---
+/// Increment A
 #define EMP_INC(A) EMP_ADD(A, 1)
+/// Decrement A
 #define EMP_DEC(A) EMP_SUB(A, 1)
+/// Cut A in half
 #define EMP_HALF(A) EMP_SHIFTR(A)
 
 
 // --- Multiply ---
+/// @cond MACROS
 #define EMP_MULT_BIN(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9,   \
                      B0, B1, B2, B3, B4, B5, B6, B7, B8, B9)   \
   EMP_ADD_BIN_10 EMP_EMPTY() (                                          \
@@ -2551,30 +2599,42 @@
                  EMP_MATH_BIN_TIMES_ ## B1 (A8, A9,  0,  0,  0,  0,  0,  0,  0,  0), \
                  EMP_MATH_BIN_TIMES_ ## B0 (A9,  0,  0,  0,  0,  0,  0,  0,  0,  0) \
   )
-
+/// @endcond
+/// Compute A * B
 #define EMP_MULT(A, B) EMP_EVAL( EMP_MULT_IMPL( EMP_DEC_TO_BIN(A), EMP_DEC_TO_BIN(B) ) )
-#define EMP_MULT_IMPL(...) EMP_BIN_TO_DEC EMP_EMPTY() ( EMP_MULT_BIN( __VA_ARGS__ ) )
 
+/// @cond MACROS
+#define EMP_MULT_IMPL(...) EMP_BIN_TO_DEC EMP_EMPTY() ( EMP_MULT_BIN( __VA_ARGS__ ) )
+/// @endcond
 
 // --- Bit Manipulation ---
+/// Use bit magic to count the number of 1s in the binary representation of A
 #define EMP_COUNT_ONES(A) EMP_ADD_10 EMP_EMPTY() ( EMP_DEC_TO_BIN_ ## A )
 
 // --- Log2 ---
+/// @cond MACROS
 #define EMP_LOG2_BIN(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) EMP_IF(A0, 10, EMP_IF(A1, 9, EMP_IF(A2, 8, EMP_IF(A3, 7, EMP_IF(A4, 6, EMP_IF(A5, 5, EMP_IF(A6, 4, EMP_IF(A7, 3, EMP_IF(A8, 2, EMP_IF(A9, 1, 0) ) ) ) ) ) ) ) ) )
-
+/// @endcond
+/// Compute log base 2 of A
 #define EMP_LOG2(A) EMP_EVAL( EMP_LOG2_IMPL( EMP_DEC_TO_BIN(A) ) )
-#define EMP_LOG2_IMPL(...) EMP_LOG2_BIN( __VA_ARGS__)
 
+/// @cond MACROS
+#define EMP_LOG2_IMPL(...) EMP_LOG2_BIN( __VA_ARGS__)
+/// @endcond
 
 // --- Division ---
-#define EMP_DIV_start(B) EMP_SUB(10, EMP_LOG2(B))
 
+/// @cond MACROS
+#define EMP_DIV_start(B) EMP_SUB(10, EMP_LOG2(B))
+/// @endcond
+/// Compute A / B
 #define EMP_DIV(A, B) EMP_IF( EMP_EQU(B,0), DIV_BY_ZERO_ERROR,          \
                               EMP_DIV_impl(EMP_DIV_start(B), A,B) )
 
+/// @cond MACROS
 #define EMP_DIV_impl(START, A, B) EMP_DIV_implB(START, A, B)
 #define EMP_DIV_implB(START, A, B) EMP_DIV_impl_ ## START(A, EMP_SHIFTL_X(START, B) )
-  
+
 
 #define EMP_DIV_impl_0(A, B) EMP_IF( EMP_LESS(A, B), 0, 1)
 #define EMP_DIV_impl_1(A, B) EMP_IF( EMP_LESS(A, B),                    \
@@ -2604,11 +2664,18 @@
 #define EMP_DIV_impl_9(A, B) EMP_IF( EMP_LESS(A, B),                    \
                                      EMP_DIV_impl_8(A, EMP_SHIFTR(B)),  \
                                      EMP_ADD(512, EMP_DIV_impl_8( EMP_SUB(A,B), EMP_SHIFTR(B) )) )
-                                    
 
-/// --- Modulus ---
+/// @endcond
+
+// --- Modulus ---
+/// Compute A % B
 #define EMP_MOD(A, B) EMP_MOD_impl(A, B, EMP_DIV(A, B))
+
+/// @cond MACROS
+
 #define EMP_MOD_impl(A, B, D) EMP_MOD_impl2( A, EMP_MULT(D, B))
 #define EMP_MOD_impl2(A, M) EMP_SUB(A, M)
+
+/// @endcond
 
 #endif

@@ -12,13 +12,14 @@
 #include <array>
 
 #include "../../tools/assert.h"
-#include "../../web/js_object_struct.h"
 #include "../../web/js_utils.h"
 #include "../../web/JSWrap.h"
 
+/// @cond EMSCRIPTEN_STUFF
 extern "C" {
   extern int n_objects();
 }
+/// @endcond
 
 namespace D3 {
 
@@ -521,7 +522,7 @@ namespace D3 {
 
   };
 
-  /// [Transitions](https://github.com/d3/d3-3.x-api-reference/blob/master/Transitions.md)
+  /// [Transitions](https://github.com/d3/d3-3.x-api-reference/blob/master/Transitions.md/)
   /// are similar to selections, but when you make a change to them (attr or style), it will be
   /// animated. For additional discussion of transitions in d3, see
   /// [this article](https://bost.ocks.org/mike/transition/).
@@ -832,7 +833,7 @@ namespace D3 {
 
   };
 
-  /// [Selections] (https://github.com/d3/d3-3.x-api-reference/blob/master/Selections.md)
+  /// [Selections](https://github.com/d3/d3-3.x-api-reference/blob/master/Selections.md/)
   /// are the primary way that d3 allows you to operate on DOM elements
   /// (i.e. objects on your webpage). A selection is effectively an array of DOM elements
   /// that you can act on at the same time and bind a collection of data to.

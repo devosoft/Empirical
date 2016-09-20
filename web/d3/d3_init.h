@@ -9,25 +9,34 @@
 
 namespace D3 {
 
+  /// A base object that all D3 objects inherit from. Handles storing the object in Javascript
+  /// You probably don't want to instantiate this directly
   class D3_Base {
   protected:
     int id;
+
+    /// Default constructor - adds placeholder to js.objects array in Javascript
     D3_Base(){
       this->id = EM_ASM_INT_V({return js.objects.length});
       EM_ASM({js.objects.push(-1);});
     }
+
+    /// Construct an object pointing to a pre-determined location in js.objects.
     D3_Base(int id){
       this->id = id;
     }
 
   public:
+    // Get this object's ID (i.e. it's location in the js.objects array in Javascript)
     int GetID() {
       return this->id;
     }
   };
 
+  /// Create a tooltup using the d3.tip Javascript library
   class ToolTip : public D3_Base {
   public:
+    /// Default constructor - displays whatever data is bound on mouseover
     ToolTip() {
       EM_ASM_ARGS({
           js.objects[$0] = d3.tip().attr('class', 'd3-tip')
@@ -36,6 +45,25 @@ namespace D3 {
       }, this->id);
     }
 
+    /// Cosntructor that allows you to specify a function that returns the html for the tooltip.
+    /// As input, this function should take 3 parameters: the bound data, the index of this item
+    /// in the selection (int), and a placeholder (int).
+    ///
+    /// Example:
+    ///
+    /// `D3::FormatFunction rounded = D3::FormatFunction(".2f");
+    ///
+    ///  std::function<double, int, int)> tooltip_display =
+    ///    [this](double d, int i, int k) {return "Data: " + to_string(rounded(d));}
+    ///
+    ///  D3::ToolTip tip = D3::ToolTip(tooltip_display);
+    ///
+    ///  D3::Selection example_selection = D3::SelectAll("circle");
+    ///
+    ///  example_selection.SetupToolTip(tip);'
+    ///
+    /// Mousing over a circle in the example selection will display
+    /// "Data: " followed by the value of d, rounded to two decimal points.
     ToolTip(std::string func) {
       EM_ASM_ARGS({
         var in_string = Pointer_stringify($1);
@@ -56,16 +84,17 @@ namespace D3 {
           }
         }
         js.objects[$0] = new_sel;
-    }, this->id, func.c_str());
+      }, this->id, func.c_str());
     }
   };
 
+  /// A callable string d3.format() string formatting function
   class FormatFunction : public D3_Base {
   public:
       FormatFunction(std::string format = "") {
         EM_ASM_ARGS({
           js.objects[$1] = d3.format(Pointer_stringify($0));
-      }, format.c_str(), this->id);
+        }, format.c_str(), this->id);
       }
 
       std::string operator() (double d){
@@ -81,13 +110,13 @@ namespace D3 {
       }
   };
 
-  //Catch-all object for storing references to things created in JS
+  /// Catch-all object for storing references to things created in JS
   class JSObject : public D3_Base {
   public:
     JSObject(){;};
 };
 
-  //Wrapper for creating functions in javascript and calling them there
+  /// Wrapper for creating functions in javascript and calling them there
   class JSFunction : public D3_Base {
   public:
     JSFunction() {;}
@@ -114,11 +143,11 @@ namespace D3 {
       }, this->id, name.c_str());
 
       if (fail) {
-        emp::NotifyWarning("Invalid function name passed to D3Function");
+        emp::NotifyWarning("Invalid function name passed to JSFunction");
       }
     }
 
-    //Only works if function has no arguments or returns
+    /// Only works if function has no arguments or returns
     void operator() () {
         EM_ASM_ARGS({
           js.objects[$0]();

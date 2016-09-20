@@ -24,6 +24,7 @@ Contents:
    :maxdepth: 1
 
    library/index
+   tutorials/index
    dev/index
 
 Indices and tables

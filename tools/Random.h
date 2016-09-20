@@ -45,6 +45,8 @@
 #include <unistd.h>
 
 namespace emp {
+
+  //  A versatile and non-patterned pseudo-random-number generator.
   class Random {
   protected:
     // Internal members

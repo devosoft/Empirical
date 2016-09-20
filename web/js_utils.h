@@ -22,20 +22,19 @@
 
 namespace emp {
 
-  //This function returns a std::map mapping typeid names to the appropriate
-  //strings to describe those types in Javscript. This is useful when using
-  //getValue() from within EM_ASM macros.
+  /// This function returns a std::map mapping typeid names to the appropriate
+  /// strings to describe those types in Javscript. This is useful when using
+  /// getValue() from within EM_ASM macros.
   //
-  // For example, say we have a templated function that takes a pointer to type
-  // T. We find out the appropriate string for type T:
-  // std::map<const char*, std::string> type_map = GetTypeToStringMap();
-  // std::string type_string = type_map[typeid(T).name()];
-  //
-  // Now we can pass type_string.c_str() into EM_ASM_ARGS:
-  // EM_ASM_ARGS({
-  //    var value = getValue($0, $1);
-  // }, pointer, type_string.c_str()
-  //
+  ///  For example, say we have a templated function that takes a pointer to type
+  /// T. We find out the appropriate string for type T:
+  /// std::map<const char*, std::string> type_map = GetTypeToStringMap();
+  /// std::string type_string = type_map[typeid(T).name()];
+  ///
+  /// Now we can pass type_string.c_str() into EM_ASM_ARGS:
+  /// `EM_ASM_ARGS({
+  ///    var value = getValue($0, $1);
+  /// }, pointer, type_string.c_str();`
 
   std::map<std::string, std::string> get_type_to_string_map() {
     //Using typeid().name() could potentially create problems
@@ -62,12 +61,15 @@ namespace emp {
     return map_type_names;
   }
 
-  // This function can be called to pass an array into Javascript.
-  // The array will be stored in emp.__incoming_array. Currently supports
-  // arrays containing all of the types defined in get_type_to_string_map, which
-  // are also all of the types that emscripten supports getting via pointer.
-  // This function also supports nested arrays, and arrays of objects created with
-  // introspective tuple structs.
+  /// This function can be called to pass an array, vector, or other container with contiguously
+  /// stored data into Javascript.
+  /// The array will be stored in emp.__incoming_array. Currently supports
+  /// arrays containing all of the types defined in get_type_to_string_map, which
+  /// are also all of the types that emscripten supports getting via pointer.
+  /// This function also supports nested arrays, and arrays of objects created with
+  /// introspective tuple structs.
+
+  /// @cond TEMPLATEs
 
   //This now works for all containers, but it will break if they don't
   //store data contiguously
@@ -209,11 +211,15 @@ namespace emp {
     }
   }
 
+  /// @endcond
+
   //This version of the function handles non-nested containers
   template<typename C, class = typename C::value_type>
   void pass_array_to_javascript(C values) {
     pass_array_to_javascript(values, emp::vector<int>(0));
   }
+
+  /// @cond TEMPLATES
 
   //This version of the function handles nested arrays with recursive calls
   //until a non-array type is found.
@@ -283,18 +289,20 @@ namespace emp {
     }
   }
 
-  //This function lets you pass an array from javascript to C++!
-  //It takes a reference to the array as an argument and populates it
-  //with the contents of emp.__outgoing_array.
-  //
-  //Currently accepts arrays of ints, floats, doubles, chars, and std::strings
-  //The size of the passed array must be equal to the size of the array stored
-  //in emp.__outgoing_array
+  /// @endcond
+
+  /// This function lets you pass an array from javascript to C++!
+  /// It takes a reference to the array as an argument and populates it
+  /// with the contents of emp.__outgoing_array.
+  ///
+  /// Currently accepts arrays of ints, floats, doubles, chars, and std::strings
+  /// The size of the passed array must be equal to the size of the array stored
+  /// in emp.__outgoing_array
   //
   //Don't worry about the recurse argument - it's for handling nested arrays
   //internally
   template <std::size_t SIZE, typename T>
-    void pass_array_to_cpp(std::array<T, SIZE> & arr, bool recurse = false) {
+  void pass_array_to_cpp(std::array<T, SIZE> & arr, bool recurse = false) {
 
     //Figure out type stuff
     std::map<std::string, std::string> map_type_names =\
@@ -328,7 +336,7 @@ namespace emp {
     free(buffer);
   }
 
-  //Pass outgoing array to a vector (appends to the end of the given vector)
+  /// Same as pass_array_to_cpp, but lets you store values in a vector instead
   template <typename T>
   void pass_vector_to_cpp(emp::vector<T> & arr, bool recurse = false) {
 
@@ -360,6 +368,8 @@ namespace emp {
     //Free the memory we allocated in Javascript
     free(buffer);
   }
+
+  /// @cond TEMPLATES
 
   //Chars aren't one of the types supported by setValue, but by treating them
   //as strings in Javascript we can pass them out to a C++ array
@@ -554,6 +564,8 @@ namespace emp {
       EM_ASM({emp_i.__temp_array.pop();});
     }
   }
+
+/// @endcond
 
 }
 

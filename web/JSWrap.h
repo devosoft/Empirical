@@ -3,31 +3,33 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  Wrap a C++ function and convert it to an integer that can be called from Javascript
-//
-//  To wrap a function, call:
-//     uint32_t fun_id = emp::JSWrap(FunctionToBeWrapped, "JS_Function_Name");
-//
-//  To manually callback a function from Javascript, first set emp_i.cb_args to an array of
-//  function arguments, then call empCppCallback( fun_id );   This all happens automatically
-//  if you use the emp.Callback(fun_id, args...) function from Javascript.
-//
-//  The JS_Function_Name string is optional, but if you use it, the appropriate function will
-//  be automatically generated in Javascript by JSWrap, in the emp class.
-//
-//  For example, if you have:
-//     int AddPair(int x, int y) { return x + y; }
-//
-//  You can wrap it with:
-//     uint32_t fun_id = emp::JSWrap(AddPair, "AddPair");
-//
-//  And then in Javascript, you can simply call it as:
-//     emp.AddPair(4, 5); // will return 9.
+///  Wrap a C++ function and convert it to an integer that can be called from Javascript
+///
+///  To wrap a function, call:
+///
+///     `uint32_t fun_id = emp::JSWrap(FunctionToBeWrapped, "JS_Function_Name");``
+///
+///  To manually callback a function from Javascript, first set `emp_i.cb_args` to an array of
+///  function arguments, then call `empCppCallback( fun_id );`   This all happens automatically
+///  if you use the `emp.Callback(fun_id, args...)` function from Javascript.
+///
+///  The JS_Function_Name string is optional, but if you use it, the appropriate function will
+///  be automatically generated in Javascript by JSWrap, in the emp class.
+///
+///  For example, if you have:
+///
+///     `int AddPair(int x, int y) { return x + y; }``
+///
+///  You can wrap it with:
+///
+///     `uint32_t fun_id = emp::JSWrap(AddPair, "AddPair");`
+///
+///  And then in Javascript, you can simply call it as:
+///
+///     `emp.AddPair(4, 5); // will return 9.`
 //
 //
 //  Development notes:
-//  * Make sure JSWrap can take function objects, lambdas, or just function names.
-//    On possibility is to make multiple versions of the function.
 //  * Add a JSWrap that takes an object and method and does the bind automatically.
 //  * Build a non-enscripten version; it should still be callable from the C++ side, but
 //    mostly to be able to test programs without Emscripten.
@@ -36,6 +38,8 @@
 //  * Made JSWrap compatible with Javascript objects with multiple properties.
 //    In order do so, you must define the properties of the object as a tuple
 //    struct in js_object_struct.h. - @ELD
+//  * Made sure JSWrap can take function objects, lambdas, or just function names.
+//
 //
 
 #ifndef EMP_JSWRAP_H
@@ -54,6 +58,8 @@
 #include "../tools/tuple_struct.h"
 #include "js_utils.h"
 
+/// @cond SIMPLIFY
+
 #ifdef EMSCRIPTEN
 extern "C" {
   extern int EMP_GetCBArgCount();  // Get the number of arguments associated with a callback.
@@ -62,7 +68,6 @@ extern "C" {
 // When NOT in Emscripten, need a stub for this function.
 int EMP_GetCBArgCount() { return -1; }
 #endif
-
 
 namespace emp {
 
@@ -422,6 +427,8 @@ namespace emp {
     return JSWrap(fun_ptr, fun_name, dispose_on_use);
   }
 
+  /// @endcond
+
   template <typename FUN_TYPE>
   uint32_t JSWrap(const FUN_TYPE & in_fun, const std::string & fun_name="", bool dispose_on_use=false)
   {
@@ -437,12 +444,12 @@ namespace emp {
 
 
 
-  // If we want a quick, unnammed, disposable function, use JSWrapOnce
+  /// If we want a quick, unnammed, disposable function, use JSWrapOnce
   template <typename FUN_TYPE>
   uint32_t JSWrapOnce(FUN_TYPE && in_fun) { return JSWrap(std::forward<FUN_TYPE>(in_fun), "", true); }
 
 
-  // Cleanup a function pointer when finished with it.
+  /// Cleanup a function pointer when finished with it.
   void JSDelete( uint32_t fun_id ) {
     emp_assert(fun_id > 0);  // Make sure this isn't a null pointer!
     // @CAO -- Should make sure to clean up named functions on JS side if they exist.
@@ -451,10 +458,8 @@ namespace emp {
     callback_array[fun_id] = nullptr;
   }
 
+  /// @cond SIMPLIFY
 }
-
-
-
 
 // Once you use JSWrap to create an ID, you can call the wrapped function from Javascript
 // by supplying CPPCallback with the id and all args.
@@ -475,5 +480,6 @@ extern "C" void empCppCallback(uint32_t cb_id)
   }
 }
 
+/// @endcond
 
 #endif

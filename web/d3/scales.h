@@ -31,12 +31,20 @@ namespace D3 {
       EM_ASM_ARGS({js.objects[$0].range(emp_i.__incoming_array);}, this->id);
     }
 
+    void SetRange(double min, double max) {
+      EM_ASM_ARGS({js.objects[$0].range([$1, $2]);}, this->id, min, max);
+    }
+
     /// Set the input values corresponding to values in the range.
     /// Array should contain same number of elements as the one used to set the range.
     template <typename T, size_t SIZE>
     void SetDomain(std::array<T,SIZE> values) {
       emp::pass_array_to_javascript(values);
       EM_ASM_ARGS({js.objects[$0].domain(emp_i.__incoming_array);}, this->id);
+    }
+
+    void SetDomain(double min, double max) {
+      EM_ASM_ARGS({js.objects[$0].domain([$1, $2]);}, this->id, min, max);
     }
 
     /// Make a copy of this scale
