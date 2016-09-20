@@ -352,7 +352,7 @@ namespace evo {
       std::multimap<double, int> fit_map;
       for (int i = 0; i < (int) popM.size(); i++) {
         if (this->IsOccupied(i)){
-          fit_map.insert( std::make_pair(fit_fun(popM[i]), i) );
+          fit_map.insert( std::make_pair( fitM.CalcFitness(i,popM[i],fit_fun), i) );
         }
       }
 
@@ -383,52 +383,6 @@ namespace evo {
     void TournamentSelect(const fit_fun_t & fit_fun, int t_size, int tourny_count=1) {
       emp_assert(fit_fun);
       emp_assert(t_size > 0 && t_size <= (int) popM.size(), t_size, popM.size());
-
-      if (t_size * tourny_count * 2 >= (int) popM.size()) {
-        // Pre-calculate fitnesses.
-        emp::vector<int> valid_orgs = GetValidOrgIndices();
-        emp::vector<double> fitness(valid_orgs.size());
-        for (int i = 0; i < (int) valid_orgs.size(); ++i){
-             fitness[i] = fit_fun(popM[valid_orgs[i]]);
-         }
-        RunTournament(fitness, t_size, tourny_count);
-      }
-      else RunTournament(fit_fun, t_size, tourny_count);
-    }
-
-    // Tournament Selection can use the default fitness function.
-    void TournamentSelect(int t_size, int tourny_count=1) {
-      TournamentSelect(orgM.GetFitFun(), t_size, tourny_count);
-    }
-
-    // Helper function to run a tournament when fitness is pre-calculated
-    void RunTournament(const emp::vector<double> & fitness, int t_size, int tourny_count=1){
-      emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
-
-      emp::vector<int> valid_orgs = GetValidOrgIndices();
-
-      for (int T = 0; T < tourny_count; T++) {
-        emp::vector<int> entries = Choose(*random_ptr, valid_orgs.size(), t_size);
-        Shuffle(*random_ptr, entries);
-        double best_fit = fitness[entries[0]];
-        int best_id = valid_orgs[entries[0]];
-
-        // Search for a higher fit org in the tournament.
-        for (int i = 1; i < t_size; i++) {
-          const double cur_fit = fitness[entries[i]];
-          if (cur_fit > best_fit) {
-            best_fit = cur_fit;
-            best_id = valid_orgs[entries[i]];
-          }
-        }
-
-        // Place the highest fitness into the next generation!
-        InsertBirth( *(popM[best_id]), best_id, 1 );
-      }
-    }
-
-    // Helper function to run a tournament when fitness is NOT pre-calculated
-    void RunTournament(const fit_fun_t & fit_fun, int t_size, int tourny_count=1){
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
 
       for (int T = 0; T < tourny_count; T++) {
@@ -454,6 +408,11 @@ namespace evo {
       }
     }
 
+    // Tournament Selection can use the default fitness function.
+    void TournamentSelect(int t_size, int tourny_count=1) {
+      TournamentSelect(orgM.GetFitFun(), t_size, tourny_count);
+    }
+
 
     // Run tournament selection with fitnesses adjusted by Goldberg and
     // Richardson's fitness sharing function (1987)
@@ -477,13 +436,14 @@ namespace evo {
         fitness[i] = fit_fun(popM[i])/niche_count;
       }
 
-      RunTournament(fitness, t_size, tourny_count);
+      fitM.SetCache(fitness);
+      TournamentSelect(fit_fun, t_size, tourny_count);
     }
 
     // Fitness sharing Tournament Selection can use the default fitness function
     void FitnessSharingTournamentSelect(const dist_fun_t & dist_fun, double sharing_threshold,
           double alpha, int t_size, int tourny_count=1) {
-      TournamentSelect(orgM.GetFitFun(), dist_fun, sharing_threshold, alpha, t_size, tourny_count);
+      FitnessSharingTournamentSelect(orgM.GetFitFun(), dist_fun, sharing_threshold, alpha, t_size, tourny_count);
     }
 
 
