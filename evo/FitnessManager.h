@@ -25,10 +25,15 @@ namespace evo {
 
     // All caching functions should get ignored at compile time.
     static constexpr bool HasCache(size_t id) { return false; }
-    static constexpr double GetCache(size_t id) { return -1.0; }
+    static constexpr double GetCache(size_t id) { return 0.0; }
     static constexpr size_t GetCacheSize() { return 0.0; }
 
-    static constexpr bool CacheFitness(size_t, double) { return false; }
+    template <typename ORG>
+    static double CalcFitness(int id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
+      return fit_fun(org);
+    }
+
+    static constexpr bool SetCache(size_t, double) { return false; }
     static constexpr bool ClearCache() { return false; }
     static constexpr bool ClearCache(size_t) { return false; }
     static constexpr bool ResizeCache(size_t) { return false; }
@@ -37,16 +42,26 @@ namespace evo {
 
   class FitnessManager_CacheOrg : public FitnessManager_Base {
   protected:
-    emp::vector<double> fit_cache;  // vector size == 0 when not caching; invalid values == -1.
+    emp::vector<double> fit_cache;  // vector size == 0 when not caching; invalid values == 0.
 
   public:
     bool HasCache(size_t id) const { return (id < fit_cache.size()) && (fit_cache[id] >= 0.0); }
-    double GetCache(size_t id) const { return (id < fit_cache.size()) ? fit_cache[id] : -1.0; }
+    double GetCache(size_t id) const { return (id < fit_cache.size()) ? fit_cache[id] : 0.0; }
     size_t GetCacheSize() const { return fit_cache.size(); }
 
-    void CacheFitness(size_t id, double fitness) { fit_cache[id] = fitness; }
+    template <typename ORG>
+    double CalcFitness(int id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
+      double cur_fit = GetCache(id);
+      if (!cur_fit) {
+        cur_fit = fit_fun(org);
+        fit_cache[id] = cur_fit;
+      }
+      return cur_fit;
+    }
+
+    void SetCache(size_t id, double fitness) { fit_cache[id] = fitness; }
     void ClearCache() { fit_cache.resize(0); }
-    void ClearCache(size_t id) { if (id < fit_cache.size()) fit_cache[id] = -1.0; }
+    void ClearCache(size_t id) { if (id < fit_cache.size()) fit_cache[id] = 0.0; }
     void ResizeCache(size_t new_size) { fit_cache.resize(new_size); }
     void ResizeCache(size_t new_size, double def_val) { fit_cache.resize(new_size, def_val); }
   };
