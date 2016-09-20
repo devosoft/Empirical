@@ -34,6 +34,7 @@ namespace evo {
     }
 
     static constexpr bool SetCache(size_t, double) { return false; }
+    static constexpr bool SetCache(const emp::vector<double> &) { return false; }
     static constexpr bool ClearCache() { return false; }
     static constexpr bool ClearCache(size_t) { return false; }
     static constexpr bool ResizeCache(size_t) { return false; }
@@ -59,11 +60,12 @@ namespace evo {
       return cur_fit;
     }
 
-    void SetCache(size_t id, double fitness) { fit_cache[id] = fitness; }
-    void ClearCache() { fit_cache.resize(0); }
-    void ClearCache(size_t id) { if (id < fit_cache.size()) fit_cache[id] = 0.0; }
-    void ResizeCache(size_t new_size) { fit_cache.resize(new_size); }
-    void ResizeCache(size_t new_size, double def_val) { fit_cache.resize(new_size, def_val); }
+    bool SetCache(size_t id, double fitness) { fit_cache[id] = fitness; return true; }
+    bool SetCache(const emp::vector<double> & in_cache) { fit_cache = in_cache; return true; }
+    bool ClearCache() { fit_cache.resize(0); return true; }
+    bool ClearCache(size_t id) { if (id < fit_cache.size()) fit_cache[id] = 0.0; return true; }
+    bool ResizeCache(size_t new_size) { fit_cache.resize(new_size); return true; }
+    bool ResizeCache(size_t new_size, double def_val) { fit_cache.resize(new_size, def_val); return true; }
   };
 
   using CacheOff = FitnessManager_Base;
