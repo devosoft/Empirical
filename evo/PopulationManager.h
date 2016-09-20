@@ -33,9 +33,7 @@ namespace evo {
     Random * random_ptr;
 
   public:
-    PopulationManager_Base(const std::string & _w_name, FIT_MANAGER & _fm) : fitM(_fm) {
-      (void) _w_name;   // Prevent unused parameter warning.
-    }
+    PopulationManager_Base(const std::string &, FIT_MANAGER & _fm) : fitM(_fm) { ; }
     ~PopulationManager_Base() { Clear(); }
 
     // Allow this and derived classes to be identified as a population manager.
