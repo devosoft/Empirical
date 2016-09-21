@@ -13,7 +13,7 @@ subtest-%: test_%.cc
 	# execute test
 	./$@.out
 
-test: test-prep $(addprefix subtest-, $(TEST_NAMES))
+test: test-web test-prep $(addprefix subtest-, $(TEST_NAMES))
 	rm -rf subtest*.out
 
 test-web: 
