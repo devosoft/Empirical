@@ -1156,6 +1156,11 @@ TEST_CASE("Test NFA", "[tools]")
 
 TEST_CASE("Test Ptr", "[tools]")
 {
+  
+  int * real_ptr1 = new int(1);  // Count of 2 in tracker
+  int * real_ptr2 = new int(2);  // Deleted in tracker
+  int * real_ptr3 = new int(3);  // Unknown to tracker
+  int * real_ptr4 = new int(4);  // Passively known to tracker (marked non-owner)
   // Test default constructor.
   emp::Ptr<int> ptr1;
   ptr1.New();
@@ -1214,10 +1219,6 @@ TEST_CASE("Test Ptr", "[tools]")
 
   // -- Do some direct tests on pointer trackers --
 
-  int * real_ptr1 = new int(1);  // Count of 2 in tracker
-  int * real_ptr2 = new int(2);  // Deleted in tracker
-  int * real_ptr3 = new int(3);  // Unknown to tracker
-  int * real_ptr4 = new int(4);  // Passively known to tracker (marked non-owner)
   auto & tracker = emp::PtrTracker::Get();
 
   tracker.New(real_ptr1);

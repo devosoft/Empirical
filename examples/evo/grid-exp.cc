@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
     //grid_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 50, 2);
     // Run a tournament for the rest...   
     grid_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
-            , TOURNAMENT_SIZE, POP_SIZE, true);
+            , TOURNAMENT_SIZE, POP_SIZE);
 
     grid_pop.Update();
     grid_pop.MutatePop();
