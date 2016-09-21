@@ -28,6 +28,7 @@ addons:
     packages:
     - g++-5
     - cmake
+    - build-essential
     - bison
     - python-virtualenv
     - python-pip
