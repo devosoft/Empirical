@@ -6,7 +6,7 @@
 //
 //
 //  Developer notes:
-//  * Rather than deleting organisms ourright, run all deletions through a ClearCell function
+//  * Rather than deleting organisms outright, run all deletions through a ClearCell function
 //    so that a common signal system can also be run.
 //  * Grids always add injected organisms to empty cells; may have trouble if there are none.
 //  * Population iterators and indexing should either be const OR work with proxies to ensure
