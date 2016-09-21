@@ -666,7 +666,7 @@ representation of a scale:
   // the type of scale we're depicting
   // We pass the constructor a string to tell it
   // how to label the axis.
-  D3::Axis<D3::LinearScale> ax = D3::Axis<D3::LinearScale>("y var");
+  D3::Axis<D3::LinearScale> ax = D3::Axis<D3::LinearScale>("yvar");
 
   // Set the axis to use our y scale
   ax.SetScale(y_scale);
@@ -689,7 +689,7 @@ continuous range of colors, try a categorical scale. The `Category10Scale` will 
 up to 10 different categorical values. The `Category20Scale` can handle 20.
 
 Passing Functions as Arguments
-==============================
+------------------------------
 
 In Javascript, it's very common to pass functions as arguments to other functions in order to
 customize their behavior. This comes, in part, from the fact that a lot of Javascript code is

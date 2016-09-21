@@ -313,7 +313,8 @@ namespace emp {
     std::string type_string = map_type_names[typeid(T).name()];
 
     //Make sure arrays have the same length
-    emp_assert(arr.size() == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
+    emp_assert(arr.size() == EM_ASM_INT_V({return emp_i.__outgoing_array.length}),
+               arr.size(), EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
 
     //Write emp.__outgoing_array contents to a buffer
     T * buffer = (T*) EM_ASM_INT({

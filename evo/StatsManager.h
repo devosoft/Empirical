@@ -152,7 +152,7 @@ namespace evo{
        w->OnUpdate(UpdateFun);
     }
 
-    void ConnectVis(web::GraphVisualization * viz) {
+    void ConnectVis(web::LineGraph * viz) {
       viz_pointers.push_back(viz);
     }
 
@@ -328,7 +328,7 @@ namespace evo{
         fit_fun = fit;
     }
 
-    void ConnectVis(web::GraphVisualization * viz) {
+    void ConnectVis(web::LineGraph * viz) {
       emp::vector<int> vars;
 
       for (std::string variable : viz->variables) {

@@ -13,7 +13,11 @@ namespace D3 {
   class Dataset : public D3_Base {
   public:
     Dataset(){;};
-    Dataset(bool incoming){EM_ASM({js.objects[$0] = emp.__incoming_data;}, this->id);};
+    Dataset(int i) : D3_Base(i) {;};
+
+    void CaptureIncoming(){
+        EM_ASM({js.objects[$0] = emp.__incoming_data;}, this->id);
+    };
   };
 
 
@@ -22,6 +26,7 @@ namespace D3 {
     //This should probably be static, but emscripten complains when it is
     JSFunction FindInHierarchy;
 
+    JSONDataset(int i) : Dataset(i) {;}
     JSONDataset() {
       EM_ASM_ARGS({js.objects[$0] = [];}, this->id);
 
@@ -138,72 +143,40 @@ namespace D3 {
 
   class CSVDataset : public Dataset {
   public:
-    CSVDataset(std::string location, std::string callback, bool header) {
-      if (header){
-        EM_ASM_ARGS({
+    CSVDataset(){;}
+    CSVDataset(int i) : Dataset(i) {;}
+
+
+    void LoadDataFromFile(std::string location, std::string callback, bool header=true) {
+        std::cout << "In loaddata " << callback << std::endl;
+      EM_ASM_ARGS({
+        var acc = function(d){
+            return ([+d[0], +d[1]]);
+        };
+
         var arg1 = Pointer_stringify($0);
         var in_string = Pointer_stringify($1);
-        var fn = window["d3"][in_string];
-        if (typeof fn === "function"){
-          d3.csv(arg1, function(d){
-            emp.__incoming_data = d;
-            js.objects[$2] = d;
-            fn();
-          }
-            );
-        } else {
-          var fn = window["emp"][in_string];
-          if (typeof fn === "function"){
-            d3.csv(arg1, function(d){
-            emp.__incoming_data = d;
-            js.objects[$2] = d;
-            fn();
-          });
-          } else {
-            var fn = window[in_string];
-            if (typeof fn === "function"){
-          d3.csv(arg1, function(d){
-              emp.__incoming_data = d;
-              js.objects[$2] = d;
-              fn();
-            });
-            }
-          }
+        console.log("about to convert to function", in_string);
+        if (typeof window[in_string] === "function"){
+          in_string = window[in_string];
+        } else if (typeof window["d3"][in_string] === "function") {
+          in_string = window["d3"][in_string];
+        } else if (typeof window["emp"][in_string] === "function") {
+          in_string = window["emp"][in_string];
         }
-      }, location.c_str(), callback.c_str(), this->id);
-
-      } else {
-      EM_ASM_ARGS({
-      var arg1 = Pointer_stringify($0);
-      var in_string = Pointer_stringify($1);
-      var fn = window["d3"][in_string];
-      if (typeof fn === "function"){
-        d3.text(arg1, function(d){
-            emp.__incoming_data = d3.csv.parseRows(d);
-            js.objects[$2] = emp.__incoming_data;
-            fn();
+        console.log(in_string);
+        if ($3) {
+          d3.csv(arg1, acc, function(d){
+            js.objects[$2] = d;
+            in_string($2);
           });
-      } else {
-        var fn = window["emp"][in_string];
-        if (typeof fn === "function"){
+        } else {
           d3.text(arg1, function(d){
-          emp.__incoming_data = d3.csv.parseRows(d);
-          js.objects[$2] = emp.__incoming_data;
-          fn();
-            });
-        } else {
-          var fn = window[in_string];
-          if (typeof fn === "function"){
-            d3.text(arg1, function(d){
-              emp.__incoming_data = d3.csv.parseRows(d);
-              js.objects[$2] = emp.__incoming_data;
-              fn();
+            js.objects[$2] = d3.csv.parseRows(d, acc);
+            in_string($2);
           });
-          }
         }
-      }
-        }, location.c_str(), callback.c_str(), this->id);
-      }
+      }, location.c_str(), callback.c_str(), this->id, header);
     }
 
     void Parse(std::string contents, std::string accessor){

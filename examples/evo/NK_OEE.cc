@@ -33,20 +33,20 @@
 #include <iostream>
 #include <functional>
 
-emp::web::GraphVisualization change_graph_1("Change", 400, 240);
-emp::web::GraphVisualization novelty_graph_1("Novelty", 400, 240);
-emp::web::GraphVisualization ecology_graph_1("Ecology", 400, 240);
-emp::web::GraphVisualization complexity_graph_1("Complexity", 400, 240);
+emp::web::LineGraph change_graph_1("Change", 400, 240);
+emp::web::LineGraph novelty_graph_1("Novelty", 400, 240);
+emp::web::LineGraph ecology_graph_1("Ecology", 400, 240);
+emp::web::LineGraph complexity_graph_1("Complexity", 400, 240);
 
-// emp::web::GraphVisualization change_graph_2("Change", 400, 250);
-// emp::web::GraphVisualization novelty_graph_2("Novelty", 400, 250);
-// emp::web::GraphVisualization ecology_graph_2("Ecology", 400, 250);
-// emp::web::GraphVisualization complexity_graph_2("Complexity", 400, 250);
+// emp::web::LineGraph change_graph_2("Change", 400, 250);
+// emp::web::LineGraph novelty_graph_2("Novelty", 400, 250);
+// emp::web::LineGraph ecology_graph_2("Ecology", 400, 250);
+// emp::web::LineGraph complexity_graph_2("Complexity", 400, 250);
 //
-// emp::web::GraphVisualization change_graph_3("Change", 400, 250);
-// emp::web::GraphVisualization novelty_graph_3("Novelty", 400, 250);
-// emp::web::GraphVisualization ecology_graph_3("Ecology", 400, 250);
-// emp::web::GraphVisualization complexity_graph_3("Complexity", 400, 250);
+// emp::web::LineGraph change_graph_3("Change", 400, 250);
+// emp::web::LineGraph novelty_graph_3("Novelty", 400, 250);
+// emp::web::LineGraph ecology_graph_3("Ecology", 400, 250);
+// emp::web::LineGraph complexity_graph_3("Complexity", 400, 250);
 
 //emp::web::LineageVisualization lineage_viz(5000, 300);
 NKAnimation<emp::BitVector, emp::evo::LineageStandard, emp::evo::OEEStats> simple_example_evo;

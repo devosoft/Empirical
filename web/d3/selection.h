@@ -914,11 +914,11 @@ namespace D3 {
       EM_ASM_ARGS({
         //We could make this slightly prettier with macros, but would
         //add an extra comparison
-	    var func_string = Pointer_stringify($1);
+	    var in_string = Pointer_stringify($1);
 	    var fn = window["emp"][in_string];
 	    if (typeof fn === "function"){
 	      var update_sel = js.objects[$0].data(js.objects[$2], fn);
-	    } else if (typeof window["d3"][in_string] === "function") {
+        } else if (typeof window["d3"][in_string] === "function") {
 	      var update_sel = js.objects[$0].data(js.objects[$2],
 						 window["d3"][in_string]);
 	    } else if (typeof window[in_string] === "function") {

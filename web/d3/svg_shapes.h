@@ -55,22 +55,14 @@ namespace D3 {
     /// DrawShape will also accept a D3::Dataset
     Selection DrawShape(Dataset data, Selection s){
 
-      Selection path = s.Append("path");
+      s = s.Append("path");
 
       EM_ASM_ARGS({
-	    var accessor = function(data){
-	      for (i=0; i<data.length; i++) {
-	        for (j=0; j<data[i].length; j++) {
-		      data[i][j] = +data[i][j];
-	        }
-	      }
-	      return(data);
-	    };
-	    emp.__incoming_data = accessor(emp.__incoming_data);
-	    js.objects[$0].data(emp.__incoming_data).enter().append("path").attr("d", js.objects[$1]);
-
-	  }, path.GetID(), this->id, data.GetID());
-      return path;
+        console.log(js.objects[$1], $1);
+	    var sel = js.objects[$0].attr("d", js.objects[$1](js.objects[$2]));
+        console.log(sel);
+    }, s.GetID(), this->id, data.GetID());
+      return s;
     }
 
    /// If you pass a triple-nested array, it will be treated as an array of paths

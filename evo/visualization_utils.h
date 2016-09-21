@@ -22,8 +22,6 @@
 #include <algorithm>
 #include <deque>
 
-#include "NK-const.h"
-
 //Pretty sure D3VisualizationInfo can't be shared among multiple D3Visualizations
 
 namespace emp{
@@ -103,9 +101,10 @@ public:
   D3::Selection * GetSVG() {return Info()->svg;}
   std::string GetID() {return Info()->id;}
 
-  int POP_SIZE = 100;
-  int MAX_GENS = 1000;
   emp::vector<std::string> variables;
+  FunctionSet<void> pending_funcs;
+  bool init = false;
+
   virtual void Setup(){;}
 
   virtual void AnimateStep(...){;}
@@ -143,13 +142,14 @@ public:
 
     double lowest = 10;//*(std::min_element(fitnesses.begin(), fitnesses.end()));
     double highest = 20;//*(std::max_element(fitnesses.begin(), fitnesses.end()));
+    double x_max = 100;
 
     //Set up scales
     fitness_scale = new D3::LinearScale();
     x_scale = new D3::LinearScale();
     fitness_scale->SetDomain(std::array<double, 2>({highest*fitness_growth_margin, lowest*fitness_loss_margin}));
     fitness_scale->SetRange(std::array<double, 2>({margin, GetHeight() - margin}));
-    x_scale->SetDomain(std::array<double, 2>({0, (double)POP_SIZE-1}));
+    x_scale->SetDomain(std::array<double, 2>({0, x_max}));
     x_scale->SetRange(std::array<double, 2>({axis_width, GetHeight()-margin}));
 
     //Set up axis
@@ -161,6 +161,7 @@ public:
     //Make callback functions
     JSWrap(scaled_d, GetID()+"scaled_d");
     JSWrap(scaled_i, GetID()+"scaled_i");
+    this->pending_funcs.Run();
   }
 
   virtual void AnimateStep(int update, emp::vector<double> fitnesses){
@@ -181,35 +182,41 @@ public:
 
 };
 
-class GraphVisualization : public D3Visualization {
+class LineGraph : public D3Visualization {
 private:
   double y_margin = 10;
   double x_margin = 30;
   double axis_width = 60;
   double y_min = 1000;
   double y_max = 0;
-  double x_min = 0;
+  double x_min = 1000;
   double x_max = 0;
 
 public:
+
   D3::LinearScale * x_scale;
   D3::LinearScale * y_scale;
   D3::Axis<D3::LinearScale> * x_axis;
   D3::Axis<D3::LinearScale> * y_axis;
 
   //Callback function for taking a datapoint and getting appropriately scaled y val
-  std::function<double(std::array<double, 2>, int, int)> y = [this](std::array<double, 2> d, int i, int k){
+  std::function<double(std::array<double, 2>)> y = [this](std::array<double, 2> d){
       return y_scale->ApplyScale(d[1]);
   };
 
   //Callback function for taking a datapoint and getting appropriately scaled x val
-  std::function<double(std::array<double,2>, int, int)> x = [this](std::array<double, 2> d, int i, int k){
+  std::function<double(std::array<double,2>)> x = [this](std::array<double, 2> d){
       return x_scale->ApplyScale(d[0]);
   };
 
   //Callback function for getting unscaled x value of data point (used as key function for data binding)
   std::function<double(std::array<double,2>, int)> return_x = [&](std::array<double, 2> d, int i){
       return d[0];
+  };
+
+  //Callback function for getting unscaled x value of data point (used as key function for data binding)
+  std::function<double(std::array<double,2>, int)> return_y = [&](std::array<double, 2> d, int i){
+      return d[1];
   };
 
   //Callback function for drawing data after rescale animation
@@ -226,13 +233,8 @@ public:
                                          return to_string(rounded(d[1]));
                                      };
 
-  GraphVisualization(std::string y_var, std::string x_var, int w=800, int h=400) : D3Visualization(w, h){
+  LineGraph(std::string y_var="", std::string x_var="", int w=800, int h=400) : D3Visualization(w, h){
     this->variables.push_back(x_var);
-    this->variables.push_back(y_var);
-  }
-
-  GraphVisualization(std::string y_var, int w=800, int h=400) : D3Visualization(w, h){
-    this->variables.push_back("Update");
     this->variables.push_back(y_var);
   }
 
@@ -243,8 +245,10 @@ public:
   D3::ToolTip* tip;
   D3::Transition t;
 
+  // In case we need to store a dataset
+  D3::CSVDataset dataset;
+
   virtual void Setup(){
-    EM_ASM({emp["waiting"] = 0});
     D3::Selection * svg = GetSVG();
 
     //Wrap ncessary callback functions
@@ -252,10 +256,11 @@ public:
     JSWrap(x, GetID()+"x");
     JSWrap(y, GetID()+"y");
     JSWrap(return_x, GetID()+"return_x");
+    JSWrap(return_y, GetID()+"return_y");
     JSWrap(draw_data, GetID()+"draw_data");
 
 
-    //Create tool top
+    //Create tool tip
     tip = new D3::ToolTip(GetID()+"tooltip_display");
     GetSVG()->SetupToolTip(*tip);
     //Set up scales
@@ -263,7 +268,7 @@ public:
     x_scale = new D3::LinearScale();
     y_scale->SetDomain(std::array<double, 2>({y_max, y_min}));
     y_scale->SetRange(std::array<double, 2>({y_margin, (double)GetHeight() - axis_width}));
-    x_scale->SetDomain(std::array<double, 2>({0, (double)MAX_GENS}));
+    x_scale->SetDomain(std::array<double, 2>({x_min,x_max}));
     x_scale->SetRange(std::array<double, 2>({axis_width, GetWidth()-x_margin}));
 
     //Set up axes
@@ -272,7 +277,70 @@ public:
     y_axis = new D3::Axis<D3::LinearScale>(variables[1]);
     y_axis->SetScale(*y_scale);
     D3::DrawAxes(*x_axis, *y_axis, *svg);
+
     make_line = new D3::LineGenerator();
+    make_line->SetX(GetID()+"x");
+    make_line->SetY(GetID()+"y");
+    init = true;
+    this->pending_funcs.Run();
+    std::cout << "ending setup" << std::endl;
+  }
+
+  std::function<void(int)> DrawMultiplePoints = [this](int d) {
+    std::cout << "Drawing points" << std::endl;
+
+    x_min = std::min(EM_ASM_DOUBLE({
+        return d3.min(js.objects[$0], window["emp"][Pointer_stringify($1)+"return_x"]);
+    }, dataset.GetID(), this->GetID().c_str()), x_min);
+
+    x_max = std::max(EM_ASM_DOUBLE({
+        return d3.max(js.objects[$0], window["emp"][Pointer_stringify($1)+"return_x"]);
+    }, dataset.GetID(), this->GetID().c_str()), x_max);
+
+    y_min = std::min(EM_ASM_DOUBLE({
+        return d3.min(js.objects[$0], window["emp"][Pointer_stringify($1)+"return_y"]);
+    }, dataset.GetID(), this->GetID().c_str()), y_min);
+
+    y_max = std::max(EM_ASM_DOUBLE({
+        return d3.max(js.objects[$0], window["emp"][Pointer_stringify($1)+"return_y"]);
+    }, dataset.GetID(), this->GetID().c_str()), y_max);
+
+    std::cout << x_min << " " << x_max << " " << y_min << " " << y_max << std::endl;
+
+    y_scale->SetDomain(std::array<double, 2>({y_max, y_min}));
+    x_scale->SetDomain(std::array<double, 2>({x_min, x_max}));
+
+    y_axis->Rescale(y_max, y_min, *GetSVG());
+    x_axis->Rescale(x_min, x_max, *GetSVG());
+
+    D3::Selection update = GetSVG()->SelectAll(".data-point")
+                                  .Data(dataset, GetID()+"return_x");
+    update.EnterAppend("circle");
+    update.SetAttr("cy", GetID()+"y")
+          .SetAttr("cx", GetID()+"x")
+          .SetAttr("r", 2)
+          .SetAttr("class", "data-point")
+          .SetStyle("fill", "green")
+          .BindToolTipMouseover(*tip);
+
+    D3::Selection line = make_line->DrawShape(dataset, *GetSVG());
+    line.SetAttr("fill", "none")
+        .SetAttr("stroke", "green")
+        .SetAttr("stroke-width", 1)
+        .SetAttr("class", "line-seg");
+
+  };
+
+  void LoadDataFromFile(std::string filename) {
+    emp::JSWrap(DrawMultiplePoints, "draw");
+    if (this->init) {
+      dataset.LoadDataFromFile(filename, "draw", false);
+    } else {
+      this->pending_funcs.Add([this, filename](){
+          dataset.LoadDataFromFile(filename, "draw", false);
+      });
+    }
+    std::cout << "loaddata done" << std::endl;
   }
 
   virtual void AnimateStep(emp::vector<double> data_point) {
@@ -338,14 +406,14 @@ public:
     //We can't draw a line on the first update
     if (prev_data[0][0] >=0 ){
       std::array<std::array<double, 2>, 2> line_data;
-      prev_data[0][0] = x(prev_data[0], 0, 0);
-      prev_data[0][1] = y(prev_data[0],0 ,0);
+      prev_data[0][0] = x(prev_data[0]);
+      prev_data[0][1] = y(prev_data[0]);
       line_data[0] = prev_data[0];
 
       std::array<std::array<double, 2>, 1> new_data;
       new_data = data[0];
-      new_data[0][0] = x(new_data[0],0,0);
-      new_data[0][1] = y(new_data[0],0,0);
+      new_data[0][0] = x(new_data[0]);
+      new_data[0][1] = y(new_data[0]);
       line_data[1] = new_data[0];
 
       D3::Selection line = make_line->DrawShape(line_data, *GetSVG());
@@ -413,9 +481,7 @@ public:
   D3::JSObject alive;
   D3::ToolTip * tip;
   D3::JSONDataset * data;
-  FunctionSet<void> pending_funcs;
 
-  bool init = false;
   int next_pos;
   int next_parent = 0;
   int next_child;
@@ -456,15 +522,15 @@ public:
       js.objects[$0] = [js.objects[$1][0]];
     }, alive.GetID(), data->GetID());
 
-    init = true;
-    pending_funcs.Run();
+    this->init = true;
+    this->pending_funcs.Run();
   }
 
   void LoadDataFromFile(std::string filename) {
-    if (init) {
+    if (this->init) {
       data->LoadDataFromFile(filename, [this](){DrawTree();});
     } else {
-      pending_funcs.Add([this, filename](){
+      this->pending_funcs.Add([this, filename](){
           data->LoadDataFromFile(filename, [this](){
               DrawTree();
           });

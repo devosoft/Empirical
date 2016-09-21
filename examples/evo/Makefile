@@ -15,12 +15,13 @@ OFLAGS_web := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=
 
 CFLAGS_native := $(CFLAGS_all) $(OFLAGS_native)
 
-CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
-CFLAGS_web_viz := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../web/library_emp.js --js-library ../../web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../web/library_emp.js --js-library ../../web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 
-TARGETS := Fitness_Share_NK link_test NK NK-constexpr NK-const-config NK-Serial Symbulation World  LineageViz
+TARGETS := Fitness_Share_NK link_test NK NK-constexpr NK-const-config NK-Serial Symbulation World 
+
+JS_TARGETS :=  LineageViz.js LineGraph.js
 
 EVO_DEPEND := ../../evo/PopulationManager.h ../../evo/World.h
 
@@ -28,15 +29,20 @@ default: native
 
 native: $(TARGETS)
 
+web: $(JS_TARGETS)
+
 $(TARGETS): % : %.cc $(EVO_DEPEND)
 	$(CXX_native) $(CFLAGS_native) $< -o $@
 
+$(JS_TARGETS): %.js : %.cc
+	$(CXX_web) $(CFLAGS_web) $< -o $@
 
 debug-%: $*.cc
 	$(CXX_native) $(CFLAGS_native) $< -o $@
 
 clean:
 	rm -rf debug-* *~ *.dSYM $(TARGETS)
+	rm -rf debug-* *~ *.dSYM $(JS_TARGETS)
 
 # Debugging information
 #print-%: ; @echo $*=$($*)

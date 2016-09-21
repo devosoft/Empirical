@@ -227,7 +227,73 @@ namespace emp {
     ret_var.template StoreAsReturn();
   }
 
+  // Helper functions to store values inside JSON objects
 
+  static void StoreReturn(const int & ret_var, std::string var) {
+    EM_ASM_ARGS({ emp_i.curr_obj[Pointer_stringify($1)] = $0; }, ret_var, var.c_str());
+  }
+
+  static void StoreReturn(const double & ret_var, std::string var) {
+    EM_ASM_ARGS({ emp_i.curr_obj[Pointer_stringify($1)] = $0; }, ret_var, var.c_str());
+  }
+
+  static void StoreReturn(const std::string & ret_var, std::string var) {
+    EM_ASM_ARGS({ emp_i.curr_obj[Pointer_stringify($1)] = Pointer_stringify($0); }
+                                                    , ret_var.c_str(), var.c_str());
+  }
+
+  template <typename T, size_t N>
+  static void StoreReturn(const std::array<T, N> & ret_var, std::string var) {
+    pass_array_to_javascript(ret_var);
+    EM_ASM_ARGS({ emp_i.curr_obj[Pointer_stringify($0)] = emp_i.__incoming_array;}, var.c_str());
+  }
+
+  template <typename JSON_TYPE, int FIELD>
+  struct StoreTuple;
+
+  // Tuple struct
+  template <typename RETURN_TYPE>
+  static typename emp::sfinae_decoy<void, decltype(RETURN_TYPE::n_fields)>::type
+  StoreReturn(const RETURN_TYPE & ret_var) {
+    EM_ASM({
+      emp_i.cb_return = {};
+      emp_i.object_queue = [];
+      emp_i.curr_obj = emp_i.cb_return;
+    });
+
+    StoreTuple<RETURN_TYPE, RETURN_TYPE::n_fields> store_tuple = StoreTuple<RETURN_TYPE, RETURN_TYPE::n_fields>();
+    store_tuple.StoreJSDataArg(ret_var);
+  }
+
+  // Nested tuple struct
+  template <typename RETURN_TYPE>
+  static typename emp::sfinae_decoy<void, decltype(RETURN_TYPE::n_fields)>::type
+  StoreReturn(const RETURN_TYPE & ret_var, std::string var) {
+    EM_ASM_ARGS({
+      emp_i.curr_obj[Pointer_stringify($0)] = {};
+      emp_i.object_queue.push(emp_i.curr_obj);
+      emp_i.curr_obj = emp_i.curr_obj[Pointer_stringify($0)];
+    }, var.c_str());
+
+    StoreTuple<RETURN_TYPE, RETURN_TYPE::n_fields> store_tuple = StoreTuple<RETURN_TYPE, RETURN_TYPE::n_fields>();
+    store_tuple.StoreJSDataArg(ret_var);
+  }
+
+  template <typename JSON_TYPE, int FIELD>
+  struct StoreTuple {
+    static void StoreJSDataArg(const JSON_TYPE & ret_var) {
+      StoreReturn(std::get<FIELD-1>(ret_var.emp__tuple_body), ret_var.var_names[FIELD-1]);
+      StoreTuple<JSON_TYPE, FIELD-1> store_tuple = StoreTuple<JSON_TYPE, FIELD-1>();
+      store_tuple.StoreJSDataArg(ret_var);
+    }
+  };
+
+  template <typename JSON_TYPE>
+  struct StoreTuple<JSON_TYPE, 0> {
+    static void StoreJSDataArg(const JSON_TYPE & ret_var) {
+      EM_ASM({emp_i.curr_obj = emp_i.object_queue.pop();});
+    }
+  };
 
   // The following code is in the "internal" namespace since it's used only to implement the
   // details of the JSWrap function.
