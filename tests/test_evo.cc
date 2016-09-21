@@ -44,42 +44,48 @@ TEST_CASE("Test Stats/NK-Grid", "[stats]"){
 
   grid_pop.SetDefaultFitnessFun(fit_func);
 
-  // make a stats manager
-  emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Grid<BitOrg>> 
-      grid_stats (&grid_pop, prefix + "grid.csv");
+
+  // Setup some types...
+  using fitM_t = emp::evo::FitnessManager_Base;
+  using popM_t = emp::evo::PopulationManager_Grid<BitOrg, fitM_t>;
+
+  // Make a fitness manager.
+  fitM_t fitM;
+
+  // Make a stats manager
+  emp::evo::StatsManager_AdvancedStats<popM_t> grid_stats (&grid_pop, prefix + "grid.csv");
 
   grid_stats.SetDefaultFitnessFun(fit_func);
-  
 
     // Insert default organisms into world
   for (int i = 0; i < POP_SIZE; i++) {
     BitOrg next_org(N);
     for (int j = 0; j < N; j++) next_org[j] = random.P(0.5);
-    
+
     // looking at the Insert() func it looks like it does a deep copy, so we should be safe in
     // doing this. Theoretically...
     grid_pop.Insert(next_org);
   }
 
   // mutation function:
-  // for every site in the gnome there is a MUTATION_RATE chance that the 
+  // for every site in the gnome there is a MUTATION_RATE chance that the
   // site will flip it's value.
   grid_pop.SetDefaultMutateFun( [MUTATION_RATE, N](BitOrg* org, emp::Random& random) {
-    bool mutated = false;    
+      bool mutated = false;
       for (size_t site = 0; site < N; site++) {
         if (random.P(MUTATION_RATE)) {
           (*org)[site] = !(*org)[site];
           mutated = true;
         }
       }
-      return mutated;
+        return mutated;
     } );
 
 
   // Loop through updates
   for (int ud = 0; ud < UD_COUNT; ud++) {
 
-    // Run a tournament  
+    // Run a tournament
     grid_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
             , TOURNAMENT_SIZE, POP_SIZE);
 
@@ -96,18 +102,18 @@ TEST_CASE("Test Stats/NK-Grid", "[stats]"){
   std::string line = "";
   std::vector<std::string> file1, file2;
 
-  while(getline(correct, line) ){
-      file1.push_back(line);
+  while(getline(correct, line) ) {
+    file1.push_back(line);
   }
-  while(getline(test, line)){
-      file2.push_back(line);
+  while(getline(test, line)) {
+    file2.push_back(line);
   }
 
   REQUIRE(file1.size() == file2.size());
-  if(file1.size() == file2.size()){
-      for(size_t i = 0; i < file1.size(); i++){
-          REQUIRE(file1[i] == file2[i]);
-      }
+  if (file1.size() == file2.size()) {
+    for (size_t i = 0; i < file1.size(); i++) {
+      REQUIRE(file1[i] == file2[i]);
+    }
   }
 }
 
@@ -134,17 +140,23 @@ TEST_CASE("Test-stats-NK-Mixed","[stats]"){
 
   mixed_pop.SetDefaultFitnessFun(fit_func);
 
-  // make a stats manager
-  emp::evo::StatsManager_DefaultStats<emp::evo::PopulationManager_Base<BitOrg>> 
-      mixed_stats (&mixed_pop, prefix + "mixed.csv");
+  // Setup some types...
+  using fitM_t = emp::evo::FitnessManager_Base;
+  using popM_t = emp::evo::PopulationManager_Base<BitOrg, fitM_t>;
+
+  // Make a fitness manager.
+  fitM_t fitM;
+
+  // Make a stats manager
+  emp::evo::StatsManager_DefaultStats<popM_t> mixed_stats (&mixed_pop, prefix + "mixed.csv");
 
   mixed_stats.SetDefaultFitnessFun(fit_func);
-  
+
   // Insert default organisms into world
   for (int i = 0; i < POP_SIZE; i++) {
     BitOrg next_org(N);
     for (int j = 0; j < N; j++) next_org[j] = random.P(0.5);
-    
+
     // looking at the Insert() func it looks like it does a deep copy, so we should be safe in
     // doing this. Theoretically...
     mixed_pop.Insert(next_org);
@@ -152,10 +164,10 @@ TEST_CASE("Test-stats-NK-Mixed","[stats]"){
 
 
   // mutation function:
-  // for every site in the gnome there is a MUTATION_RATE chance that the 
+  // for every site in the gnome there is a MUTATION_RATE chance that the
   // site will flip it's value.
   mixed_pop.SetDefaultMutateFun( [MUTATION_RATE, N](BitOrg* org, emp::Random& random) {
-    bool mutated = false;    
+    bool mutated = false;
       for (size_t site = 0; site < N; site++) {
         if (random.P(MUTATION_RATE)) {
           (*org)[site] = !(*org)[site];
@@ -171,8 +183,8 @@ TEST_CASE("Test-stats-NK-Mixed","[stats]"){
 
     // Keep the best individual.
     //mixed_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1, 100);
-    // Run a tournament for the rest... 
-    
+    // Run a tournament for the rest...
+
     mixed_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
 			 , TOURNAMENT_SIZE, POP_SIZE);
 
@@ -180,7 +192,7 @@ TEST_CASE("Test-stats-NK-Mixed","[stats]"){
     mixed_pop.MutatePop();
 
   }
-  
+
 
   std::ifstream correct, test;
 
@@ -204,5 +216,3 @@ TEST_CASE("Test-stats-NK-Mixed","[stats]"){
   }
 
 }
-
-
