@@ -52,7 +52,7 @@ namespace emp {
     };
 
   public:
-    WeightedSet(int num_items) : weight(num_items) {;}
+    WeightedSet(int num_items=0) : weight(num_items) {;}
     WeightedSet(const WeightedSet &) = default;
     WeightedSet(WeightedSet &&) = default;
     ~WeightedSet() = default;
@@ -62,6 +62,7 @@ namespace emp {
     int GetSize() const { return (int) weight.size(); }
     double GetWeight() const { return weight[0].tree; }
     double GetWeight(int id) const { return weight[id].item; }
+    double GetProb(int id) const { return weight[id].item / weight[0].tree; }
 
     void Resize(int new_size) {
       weight.resize(new_size);  // Update the size (new weights default to zero)
@@ -85,6 +86,13 @@ namespace emp {
       }
     }
 
+    size_t Insert(double in_weight) {
+      size_t id = weight.size();
+      weight.emplace_back();
+      Adjust(id, in_weight);
+      return id;
+    }
+
     int Index(double index, int cur_id=0) {
       // If our target is in the current node, return it!
       const double cur_weight = weight[cur_id].item;
@@ -101,6 +109,23 @@ namespace emp {
     // int operator[](double index) { return Index(index,0); }
     Proxy operator[](int id) { return Proxy(*this,id); }
     double operator[](int id) const { return weight[id].item; }
+
+    WeightedSet & operator+=(WeightedSet & in_set) {
+      emp_assert(weight.size() == in_set.weight.size());
+      for (auto i = 0; i < in_set.size(); i++) {
+        weight[i].item += in_set.weight[i].item;
+      }
+      Refresh();
+      return *this;
+    }
+    WeightedSet & operator-=(WeightedSet & in_set) {
+      emp_assert(weight.size() == in_set.weight.size());
+      for (auto i = 0; i < in_set.size(); i++) {
+        weight[i].item -= in_set.weight[i].item;
+      }
+      Refresh();
+      return *this;
+    }
 
     // Update all tree-weights to cleanup accumulated round-off error.
     double Refresh() {

@@ -52,18 +52,6 @@ int TestFun(int x, int y, int z) {
   return x+y+z;
 }
 
-/*
- * template <typename EMP__T, typename... EXTRAS>
-struct ABC {
-  template <typename T> static EMP__T GetType(typename emp::sfinae_decoy<bool, decltype(T::use_this)>::type);
-  template <typename T> static typename ABC<EXTRAS...>::type GetType(...);
-
-  using type = decltype(GetType<EMP__T>(true));
-};
-template <> struct ABC<void> { using type = void; };
-using auto_type = typename ABC<int, bool, F, G, D, E, C, D, E, void>::type;
-*/
-
 template <typename T> struct has_XY {
   EMP_ADD_TYPE_FROM_MEMBER(type_X, T, X, double);  // has_XY<A>::type_X = int
   EMP_ADD_TYPE_FROM_MEMBER(type_Y, T, Y, double);  // has_XY<A>::type_Y = double since A::Y does not exist.
@@ -74,13 +62,15 @@ int main()
   // Continuing test of EMP_CHOOSE_MEMBER_TYPE...
   Wrapper<A> wrap_A;
   Wrapper<B> wrap_B;
+  (void) wrap_A;
+  (void) wrap_B;
 
   std::cout << Wrapper<A>::VALUE/2 << std::endl;  // 2.5
   std::cout << Wrapper<B>::VALUE/2 << std::endl;  // 2
 
   // Continuing test of EMP_SETUP_TYPE_SELECTOR...
 
-  std::cout << auto_type<int, C, D, E>::type::class_id << std::endl;
+  std::cout << auto_type<int, C, D, E>::class_id << std::endl;
 
   std::cout << TestFun(1,2,3) << std::endl;
   std::cout << emp::internal::SubsetCall_impl<int,int,int,int>::Call<>(TestFun, 4,5,6,7.5,8.5) << std::endl;
