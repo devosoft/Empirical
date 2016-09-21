@@ -338,7 +338,7 @@ namespace evo {
 
     emp::vector<int> GetValidOrgIndices(){
       emp::vector<int> valid_orgs(0);
-      for (int i = 0; i < pop.size(); i++){
+      for (size_t i = 0; i < pop.size(); i++){
         if (pop[i] == nullptr){
           valid_orgs.push_back(i);
         }

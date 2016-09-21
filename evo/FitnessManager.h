@@ -49,7 +49,7 @@ namespace evo {
     size_t GetSize() const { return fit_cache.size(); }
 
     template <typename ORG>
-    double CalcFitness(int id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
+    double CalcFitness(size_t id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
       double cur_fit = GetCache(id);
       if (!cur_fit) {
         if (id >= fit_cache.size()) fit_cache.resize(id+1, 0.0);

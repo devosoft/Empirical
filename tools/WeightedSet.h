@@ -112,7 +112,7 @@ namespace emp {
 
     WeightedSet & operator+=(WeightedSet & in_set) {
       emp_assert(weight.size() == in_set.weight.size());
-      for (auto i = 0; i < in_set.size(); i++) {
+      for (size_t i = 0; i < in_set.size(); i++) {
         weight[i].item += in_set.weight[i].item;
       }
       Refresh();
@@ -120,7 +120,7 @@ namespace emp {
     }
     WeightedSet & operator-=(WeightedSet & in_set) {
       emp_assert(weight.size() == in_set.weight.size());
-      for (auto i = 0; i < in_set.size(); i++) {
+      for (size_t i = 0; i < in_set.size(); i++) {
         weight[i].item -= in_set.weight[i].item;
       }
       Refresh();
