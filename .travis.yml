@@ -31,6 +31,7 @@ addons:
     - bison
     - python-virtualenv
     - python-pip
+    - nodejs
 script:
 - git fetch origin master:refs/remotes/origin/master
 - make travis
