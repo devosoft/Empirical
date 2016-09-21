@@ -33,6 +33,8 @@ addons:
     - python-virtualenv
     - python-pip
     - nodejs
+    - tar
+    - gzip
 script:
 - git fetch origin master:refs/remotes/origin/master
 - make travis
