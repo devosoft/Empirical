@@ -44,12 +44,18 @@ TEST_CASE("Test Stats/NK-Grid", "[stats]"){
 
   grid_pop.SetDefaultFitnessFun(fit_func);
 
-  // make a stats manager
-  emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Grid<BitOrg>>
-      grid_stats (&grid_pop, prefix + "grid.csv");
+
+  // Setup some types...
+  using fitM_t = emp::evo::FitnessManager_Base;
+  using popM_t = emp::evo::PopulationManager_Grid<BitOrg, fitM_t>;
+
+  // Make a fitness manager.
+  fitM_t fitM;
+
+  // Make a stats manager
+  emp::evo::StatsManager_AdvancedStats<popM_t> grid_stats (&grid_pop, prefix + "grid.csv");
 
   grid_stats.SetDefaultFitnessFun(fit_func);
-
 
     // Insert default organisms into world
   for (int i = 0; i < POP_SIZE; i++) {
@@ -65,14 +71,14 @@ TEST_CASE("Test Stats/NK-Grid", "[stats]"){
   // for every site in the gnome there is a MUTATION_RATE chance that the
   // site will flip it's value.
   grid_pop.SetDefaultMutateFun( [MUTATION_RATE, N](BitOrg* org, emp::Random& random) {
-    bool mutated = false;
+      bool mutated = false;
       for (size_t site = 0; site < N; site++) {
         if (random.P(MUTATION_RATE)) {
           (*org)[site] = !(*org)[site];
           mutated = true;
         }
       }
-      return mutated;
+        return mutated;
     } );
 
 
@@ -96,18 +102,18 @@ TEST_CASE("Test Stats/NK-Grid", "[stats]"){
   std::string line = "";
   std::vector<std::string> file1, file2;
 
-  while(getline(correct, line) ){
-      file1.push_back(line);
+  while(getline(correct, line) ) {
+    file1.push_back(line);
   }
-  while(getline(test, line)){
-      file2.push_back(line);
+  while(getline(test, line)) {
+    file2.push_back(line);
   }
 
   REQUIRE(file1.size() == file2.size());
-  if(file1.size() == file2.size()){
-      for(size_t i = 0; i < file1.size(); i++){
-          REQUIRE(file1[i] == file2[i]);
-      }
+  if (file1.size() == file2.size()) {
+    for (size_t i = 0; i < file1.size(); i++) {
+      REQUIRE(file1[i] == file2[i]);
+    }
   }
 }
 
@@ -134,9 +140,15 @@ TEST_CASE("Test-stats-NK-Mixed","[stats]"){
 
   mixed_pop.SetDefaultFitnessFun(fit_func);
 
-  // make a stats manager
-  emp::evo::StatsManager_DefaultStats<emp::evo::PopulationManager_Base<BitOrg>>
-      mixed_stats (&mixed_pop, prefix + "mixed.csv");
+  // Setup some types...
+  using fitM_t = emp::evo::FitnessManager_Base;
+  using popM_t = emp::evo::PopulationManager_Base<BitOrg, fitM_t>;
+
+  // Make a fitness manager.
+  fitM_t fitM;
+
+  // Make a stats manager
+  emp::evo::StatsManager_DefaultStats<popM_t> mixed_stats (&mixed_pop, prefix + "mixed.csv");
 
   mixed_stats.SetDefaultFitnessFun(fit_func);
 

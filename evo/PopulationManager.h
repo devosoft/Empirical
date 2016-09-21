@@ -29,12 +29,12 @@ namespace evo {
     using pop_t = emp::vector<ptr_t>;
 
     pop_t pop;
-    FIT_MANAGER fitM;
+    FIT_MANAGER & fitM;
 
     Random * random_ptr;
 
   public:
-    PopulationManager_Base(const std::string & world_name) { (void) world_name; }
+    PopulationManager_Base(const std::string &, FIT_MANAGER & _fm) : fitM(_fm) { ; }
     ~PopulationManager_Base() { Clear(); }
 
     // Allow this and derived classes to be identified as a population manager.
@@ -72,29 +72,29 @@ namespace evo {
     int AddOrg(ORG * new_org) {
       const int pos = pop.size();
       pop.push_back(new_org);
-      fitM.ClearCache(pos);
+      fitM.Clear(pos);
       return pos;
     }
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = random_ptr->GetInt((int) pop.size());
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
-      fitM.ClearCache(pos);
+      fitM.Clear(pos);
       return pos;
     }
 
     void Clear() {
       // Delete all organisms.
-      for (ORG * org : pop) if (org) delete org;
-      pop.resize(0);
-      fitM.ClearCache();
+      for (ORG * org : pop) if (org) delete org;  // Delete current organisms.
+      pop.resize(0);                              // Remove deleted organisms.
+      fitM.Clear();                               // Clear the fitness manager cache.
     }
     void Resize(size_t new_size) {
       emp_assert(new_size >= 0);
       const auto old_size = pop.size();
       for (int i = new_size; i < old_size; i++) {
-        delete pop[i];      // Delete organisms being removed.
-        fitM.ClearCache(i); // Clear fitness cache for removed cells.
+        delete pop[i];                            // Delete organisms being removed.
+        fitM.Clear(i);                            // Clear fitness cache for Deleted cells.
       }
       pop.resize(new_size, nullptr);  // Initialize new orgs as null.
     }
@@ -122,7 +122,7 @@ namespace evo {
       for (int i = new_size; i < (int) pop.size(); ++i) { delete pop[i]; }
       pop.resize(new_size);
 
-      fitM.ClearCache();  // Everyone is either deleted or in the wrong place!
+      fitM.Clear();  // Everyone is either deleted or in the wrong place!
     }
 
     // --- FOR VECTOR COMPATIBILITY ---
@@ -155,12 +155,12 @@ namespace evo {
     Signal<emp::vector<ORG*>&, ORG*, int, int&> sig_add_org_birth; // args: new org, parent pos, return: offspring pos
 
   public:
-    PopulationManager_Plugin(const std::string & world_name)
-    : base_t(world_name)
-    , sig_clear(to_string(world_name, "::pop_clear"))
-    , sig_update(to_string(world_name, "::pop_update"))
-    , sig_add_org(to_string(world_name, "::pop_add_org"))
-    , sig_add_org_birth(to_string(world_name, "::pop_add_org_birth"))
+    PopulationManager_Plugin(const std::string & _w_name, FIT_MANAGER & _fm)
+    : base_t(_w_name, _fm)
+    , sig_clear(to_string(_w_name, "::pop_clear"))
+    , sig_update(to_string(_w_name, "::pop_update"))
+    , sig_add_org(to_string(_w_name, "::pop_add_org"))
+    , sig_add_org_birth(to_string(_w_name, "::pop_add_org_birth"))
     { ; }
     ~PopulationManager_Plugin() { Clear(); }
 
@@ -208,7 +208,8 @@ namespace evo {
     emp::vector<ORG *> next_pop;
 
   public:
-    PopulationManager_EA(const std::string & world_name) : base_t(world_name) { ; }
+    PopulationManager_EA(const std::string & _w_name, FIT_MANAGER & _fm)
+    : base_t(_w_name, _fm) { ; }
     ~PopulationManager_EA() { Clear(); }
 
     static constexpr bool emp_has_separate_generations = true;
@@ -226,14 +227,14 @@ namespace evo {
 
       pop.resize(0);
       next_pop.resize(0);
-      fitM.ClearCache();
+      fitM.Clear();
     }
 
     void Update() {
       for (ORG * m : pop) delete m;  // Delete the current population.
       pop = next_pop;                // Move over the next generation.
       next_pop.resize(0);            // Clear out the next pop to refill again.
-      fitM.ClearCache();             // Clear the fitness cache.
+      fitM.Clear();                  // Clear the fitness given new cells.
     }
   };
 
@@ -256,8 +257,8 @@ namespace evo {
     int bottleneck_size;
     int num_bottlenecks;
   public:
-    PopulationManager_SerialTransfer(const std::string & world_name)
-    : base_t(world_name)
+    PopulationManager_SerialTransfer(const std::string & _w_name, FIT_MANAGER & _fm)
+    : base_t(_w_name, _fm)
     , max_size(1000), bottleneck_size(100), num_bottlenecks(0) { ; }
     ~PopulationManager_SerialTransfer() { ; }
 
@@ -298,7 +299,8 @@ namespace evo {
     int ToID(int x, int y) const { return y*width + x; }
 
   public:
-    PopulationManager_Grid(const std::string & world_name) : base_t(world_name) {
+    PopulationManager_Grid(const std::string & _w_name, FIT_MANAGER & _fm)
+    : base_t(_w_name, _fm) {
       ConfigPop(10,10);
     }
     ~PopulationManager_Grid() { ; }
@@ -314,7 +316,7 @@ namespace evo {
       const int pos = empty_spots[ random_ptr->GetInt((int) empty_spots.size()) ];
 
       pop[pos] = new_org;
-      fitM.ClearCache(pos);
+      fitM.Clear(pos);
       return pos;
     }
 
@@ -330,7 +332,7 @@ namespace evo {
       if (pop[pos]) delete pop[pos];
 
       pop[pos] = new_org;
-      fitM.ClearCache(pos);
+      fitM.Clear(pos);
 
       return pos;
     }
@@ -394,7 +396,8 @@ namespace evo {
     vector<int> pool_id;
 
   public:
-    PopulationManager_Pools(const std::string & world_name) : base_t(world_name), org_count(0) { ; }
+    PopulationManager_Pools(const std::string & _w_name, FIT_MANAGER & _fm)
+    : base_t(_w_name, _fm), org_count(0) { ; }
     ~PopulationManager_Pools() { ; }
 
     int GetPoolCount() const { return pool_count; }
@@ -494,7 +497,7 @@ namespace evo {
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
       org_count++;
-      fitM.ClearCache(pos);
+      fitM.Clear(pos);
       return pos;
     }
 
@@ -517,7 +520,7 @@ namespace evo {
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
 
-      fitM.ClearCache(pos);
+      fitM.Clear(pos);
       return pos;
     }
  };

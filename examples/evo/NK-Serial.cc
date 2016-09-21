@@ -50,7 +50,7 @@ int main()
 
     // Run a tournament for the rest...
     world.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
-			 , 5, 1000, false);
+			 , 5, 1000);
   }
 
 

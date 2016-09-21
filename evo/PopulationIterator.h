@@ -3,6 +3,10 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  This file defines iterators for use with a PopulationManager in an emp::evo::World
+//
+//
+//  Developer notes:
+//  * It may be worth building a Const interator type to avoid unintended modifications.
 
 #ifndef EMP_EVO_POP_ITER_H
 #define EMP_EVO_POP_ITER_H
