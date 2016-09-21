@@ -3,7 +3,8 @@
 // under the MIT Software license; see doc/LICENSE
 
 #include "../../web/init.h"
-#include "../../tools/alert.h"
+#include "../../tools/assert.h"
+#include "../../tools/unit_tests.h"
 #include "../../web/JSWrap.h"
 #include <functional>
 
@@ -33,17 +34,17 @@ struct DoubleNestedJSDataObject {
 
 
 void TestFun1(int w, int x, int y, double z) {
-  emp::Alert(w + x*y*z);
+  std::cout << w + x*y*z << std::endl;
 }
 
 void TestFun2(double a, double b) {
-  emp::Alert( a - b );
+  std::cout <<  a - b  << std::endl;
 }
 
 void TestFun3(std::string str1, int copies) {
   std::string out_str;
   for (int i = 0; i < copies; i++) out_str += str1;
-  emp::Alert( out_str );
+  std::cout << out_str << std::endl;
 }
 
 double TestFun4(double a, double b) {
@@ -58,31 +59,40 @@ bool TestFun6(char in_char) {
 
 //Test user-defined JSON integration
 float TestFun7(JSDataObject d) {
-  emp::Alert( d.val2() );
-  emp::Alert( d.word() );
-  emp::Alert( d.val() );
+  emp_assert( d.val2() == 6.3 );
+  emp_assert( d.word() == "hi");
+  emp_assert( d.val() == 5 );
   return d.val2();
 }
 
 //Test recursive JSON objects
 void TestFun8(DoubleNestedJSDataObject d) {
   //Should be 8.8
-  emp::Alert( d.obj2().obj2().val2() );
+  emp_assert( d.obj2().obj2().val2() == 8.8 );
   //should be "a"
-  emp::Alert( d.obj1().obj3().word() );
+  emp_assert( d.obj1().obj3().word() == "a" );
   //Should be 7
-  emp::Alert( d.obj3().obj1().val() );
+  emp_assert( d.obj3().obj1().val() == 7 );
 }
 
+//Test recursive JSON objects
+JSDataObject TestFun12(JSDataObject d) {
+  return d;
+}
+
+//Test recursive JSON objects
+DoubleNestedJSDataObject TestFun13(DoubleNestedJSDataObject d) {
+  return d;
+}
 
 int main() {
 
   emp::Initialize();
-
+  bool verbose = true;
   int x = 10;
-  auto lambda = [x](){emp::Alert(x);};
+  auto lambda = [&verbose, x](){EMP_TEST_VALUE(x, "10");};
 
-  std::function<void(int)> TestFun11 = [](int i){emp::Alert(i);};
+  std::function<int(int)> TestFun11 = [](int i){return i*i;};
 
   uint32_t fun_id1 = emp::JSWrap(TestFun1, "TestName1", false);
   uint32_t fun_id2 = emp::JSWrap(TestFun2, "TestName2", false);
@@ -93,8 +103,10 @@ int main() {
   uint32_t fun_id7 = emp::JSWrap(TestFun7, "TestName7", false);
   uint32_t fun_id8 = emp::JSWrap(TestFun8, "TestName8", false);
   uint32_t fun_id9 = emp::JSWrap(lambda, "TestName9", false);
-  uint32_t fun_id10 = emp::JSWrap([](std::string msg){emp::Alert(msg);}, "TestName10", false);
+  uint32_t fun_id10 = emp::JSWrap([](std::string msg){std::cout << msg << std::endl; return "yes";}, "TestName10", false);
   uint32_t fun_id11 = emp::JSWrap(TestFun11, "TestName11", false);
+  uint32_t fun_id12 = emp::JSWrap(TestFun12, "TestName12", false);
+  uint32_t fun_id13 = emp::JSWrap(TestFun13, "TestName13", false);
   (void) fun_id1;
   (void) fun_id2;
   (void) fun_id3;
@@ -106,15 +118,17 @@ int main() {
   (void) fun_id9;
   (void) fun_id10;
   (void) fun_id11;
+  (void) fun_id12;
+  (void) fun_id13;
 
   double in1 = 4.5;
   double in2 = 1.5;
   double val = EM_ASM_INT({ return emp.TestName4($0, $1); }, in1, in2);
-  emp::Alert(in1, " / ", in2, " = ", val);
+  emp_assert(in1/in2 == val);
 
-  EM_ASM_ARGS({
-      alert( emp.Callback($0) );
-    }, fun_id5);
+  EMP_TEST_VALUE(EM_ASM_DOUBLE({
+      return emp.Callback($0);
+  }, fun_id5), "10000.1");
 
 
   EM_ASM_ARGS({
@@ -150,11 +164,31 @@ int main() {
   });
 
   EM_ASM({
-    emp.TestName10("This is a lambda with an rvalue!");
+    console.assert(emp.TestName10("This is a lambda with an rvalue!") == "yes");
+  });
+
+  EMP_TEST_VALUE(EM_ASM_INT_V({
+    return emp.TestName11(5);
+  }), "25");
+
+  EM_ASM({
+    ret = emp.TestName12({val:5, word:"hi", val2:6.3});
+    console.assert(ret.val == 5, ret);
+    console.assert(ret.word == "hi", ret);
+    console.assert(ret.val2 == 6.3, ret);
   });
 
   EM_ASM({
-    emp.TestName11(134);
+    ret = emp.TestName13( {obj1:{obj1:{val:1, word:"this", val2:6.3}, obj2:{val:2, word:"is", val2:6.3}, obj3:{val:3, word:"a", val2:6.3}},obj2:{obj1:{val:4, word:"lot", val2:6.3}, obj2:{val:5, word:"of", val2:8.8}, obj3:{val:6, word:"nested", val2:6.3}}, obj3:{obj1:{val:7, word:"json", val2:6.3}, obj2:{val:8, word:"objects", val2:6.3}, obj3:{val:9, word:"yay", val2:6.3}}});
+    console.assert(ret.obj1.obj1.val == 1, ret);
+    console.assert(ret.obj2.obj1.val == 4, ret);
+    console.assert(ret.obj3.obj1.val == 7, ret);
+    console.assert(ret.obj1.obj2.word == "is", ret);
+    console.assert(ret.obj2.obj3.word == "nested", ret);
+    console.assert(ret.obj2.obj2.val2 == 8.8, ret);
+    console.assert(ret.obj3.obj3.val2 == 6.3, ret);
+
   });
+
 
 }

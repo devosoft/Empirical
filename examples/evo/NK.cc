@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-//#include "../../config/ArgManager.h"
+#include "../../config/ArgManager.h"
 #include "../../evo/NK.h"
 #include "../../evo/World.h"
 #include "../../tools/BitSet.h"
@@ -25,7 +25,6 @@ EMP_BUILD_CONFIG( NKConfig,
 )
 
 
-
 using BitOrg = emp::BitVector;
 
 int main(int argc, char* argv[])
@@ -33,9 +32,9 @@ int main(int argc, char* argv[])
   NKConfig config;
   config.Read("NK.cfg");
 
-  //auto args = emp::cl::ArgManager(argc, argv);
-  //if (args.ProcessConfigOptions(config, std::cout, "NK.cfg", "NK-macros.h") == false) exit(0);
-  //if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
+  auto args = emp::cl::ArgManager(argc, argv);
+  if (args.ProcessConfigOptions(config, std::cout, "NK.cfg", "NK-macros.h") == false) exit(0);
+  if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
 
   const int N = config.N();
   const int K = config.K();
@@ -77,12 +76,12 @@ int main(int argc, char* argv[])
 
     // Run a tournament for the rest...
     pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
-			 , 15, POP_SIZE-1);
+			 , 5, POP_SIZE-1);
     pop.Update();
     pop.MutatePop();
   }
 
-  pop.lineageM.WriteDataToFile("test.json");
+
   std::cout << MAX_GENS << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 
   emp::PrintSignalInfo();
