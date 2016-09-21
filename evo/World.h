@@ -240,8 +240,6 @@ namespace evo {
 
     std::function<double(ORG *)> GetFitFun(){return orgM.GetFitFun();}
 
-    std::function<double(ORG *)> GetFitFun(){return orgM.GetFitFun();}
-
     // All additions to the population must go through one of the following Insert methods
 
     void Insert(const ORG & mem, int copy_count=1) {

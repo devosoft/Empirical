@@ -368,7 +368,6 @@ namespace evo {
     vector<int> pool_sizes;                     // How large is each pool?
     std::map<int, vector<int> > connections;    // Which other pools can each position access?
     int org_count = 0;                          // How many organisms have beeen inserted into the population?
-    int org_count;                              // How many organisms have beeen inserted into the population?
     int r_upper;                                // How large can a random pool size be?
     int r_lower;                                // How small can a random pool size be?
     vector<int> pool_end;                       // Where does the next pool begin? First pool begins at 0.
