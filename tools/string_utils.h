@@ -369,6 +369,7 @@ namespace emp {
     inline std::string to_string_impl(bool, double v) { return std::to_string(v); }
     inline std::string to_string_impl(bool, char c) { return std::string(1,c); }
     inline std::string to_string_impl(bool, unsigned char c) { return std::string(1,c); }
+    inline std::string to_string_impl(bool, std::array<double,3> arr) { return "[ " + std::to_string(arr[0]) + " " + std::to_string(arr[1]) + " " + std::to_string(arr[2]) + " ]"; }
   }
 
   template <typename... ALL_TYPES>
