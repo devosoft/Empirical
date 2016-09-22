@@ -9,5 +9,5 @@
 
 git clone https://github.com/emilydolson/emsdk_portable_repo.git
 cd emsdk_portable_repo/emsdk_portable
-emsdk activate
+./emsdk activate
 source ./emsdk_env.sh
