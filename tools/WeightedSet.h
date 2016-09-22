@@ -69,9 +69,25 @@ namespace emp {
       Refresh();                // Update the tree weights.
     }
 
+    void Resize(int new_size, double def_value) {
+      const int old_size = weight.size();
+      weight.resize(new_size);  // Update the size (new weights default to zero)
+      for (int i=old_size; i < new_size; i++) weight[i].item = def_value;
+      Refresh();                // Update the tree weights.
+    }
+
     // Standard library compatibility
     size_t size() const { return weight.size(); }
     void resize(int new_size) { Resize(new_size); }
+
+    void Clear() {
+      for (auto & x : weight) { x.item = 0.0; x.tree = 0.0; }
+    }
+
+    void ResizeClear(size_t new_size) {
+      weight.resize(new_size);
+      for (auto & x : weight) { x.item = 0.0; x.tree = 0.0; }
+    }
 
     void Adjust(int id, const double new_weight) {
       // Update this node.
@@ -84,6 +100,14 @@ namespace emp {
         id = ParentID(id);
         weight[id].tree += weight_diff;
       }
+    }
+
+    void Adjust(const emp::vector<double> & new_weights) {
+      weight.resize(new_weights.size());
+      for (size_t i=0; i < weight.size(); i++) {
+        weight[i].item = new_weights[i];
+      }
+      Refresh();
     }
 
     size_t Insert(double in_weight) {
