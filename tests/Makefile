@@ -17,7 +17,7 @@ test: test-web test-prep $(addprefix subtest-, $(TEST_NAMES))
 	rm -rf subtest*.out
 
 test-web: 
-	  cd web && make && for filename in *.js; do node $$filename; if [ $$? -gt 0 ]; then exit 1; fi; done
+	  cd web && make && bash run_tests.sh
 
 clean:
 	rm -f *.out
