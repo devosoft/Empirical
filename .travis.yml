@@ -27,6 +27,7 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-5
+    - clang-3.2
     - cmake
     - build-essential
     - bison
