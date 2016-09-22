@@ -6,7 +6,7 @@ build-doxygen-xml:
 	./third-party/doxygen/build/bin/doxygen Doxyfile
 
 travis: 
-	cd third-party && bash install_emscripten.sh
+	cd third-party
 	make test
 
 test:

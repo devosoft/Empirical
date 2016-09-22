@@ -37,4 +37,5 @@ addons:
     - gzip
 script:
 - git fetch origin master:refs/remotes/origin/master
+- sudo apt-get install emscripten
 - make travis
