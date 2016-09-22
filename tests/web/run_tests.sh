@@ -1,5 +1,7 @@
-make
 source ../../third-party/emsdk_portable_repo/emsdk_portable/emsdk_env.sh
+echo "Source loaded"
+make
+echo "compilation done"
 for filename in *.js; 
 do 
     node $filename; 
