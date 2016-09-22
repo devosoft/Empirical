@@ -2,7 +2,7 @@
 CFLAGS_all := -Wall -Wno-unused-function -std=c++11 -I../../
 
 # Emscripten compiler information
-CXX_web := emcc
+CXX_web := ../../third-party/emsdk_portable_repo/emsdk_portable/emscripten/master/emcc
 OFLAGS_web := -g4 -Werror -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864
 
 #A bug in llvm compilers causes them to erroneously warn about braces around
