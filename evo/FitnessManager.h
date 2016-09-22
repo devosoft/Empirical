@@ -18,7 +18,6 @@ namespace evo {
 
   class FitnessManager_Base {
   protected:
-    WeightedSet roulette_info; // Data structure to use for roulette selection.
 
   public:
     static constexpr bool emp_is_fitness_manager = true;
@@ -67,8 +66,33 @@ namespace evo {
     bool Resize(size_t new_size, double def_val) { fit_cache.resize(new_size, def_val); return true; }
   };
 
+  // FitnessManager_Proportion requires the user to maintain fitness.
+  class FitnessManager_Weights : public FitnessManager_Base {
+  protected:
+    WeightedSet weight_info; // Data structure to use for roulette selection.
+
+  public:
+    double GetCache(size_t id) const { return weight_info[id]; }
+    size_t GetSize() const { return weight_info.size(); }
+
+    template <typename ORG>
+    double CalcFitness(size_t id, ORG*, const std::function<double(ORG*)> &) {
+      // We shouldn't need to call this version frequently; it should always return cache info.
+      return weight_info[id];
+    }
+
+    // bool Set(size_t id, double fitness) { fit_cache[id] = fitness; return true; }
+    bool Set(const emp::vector<double> & in_cache) { weight_info.Adjust(in_cache); return true; }
+    bool Clear() { weight_info.Clear(); return true; }
+    bool Clear(size_t id) { weight_info.ResizeClear(id); return true; }
+    bool Resize(size_t new_size) { weight_info.Resize(new_size); return true; }
+    bool Resize(size_t new_size, double def_val) { weight_info.Resize(new_size, def_val); return true; }
+  };
+
+
   using CacheOff = FitnessManager_Base;
   using CacheOrgs = FitnessManager_CacheOrg;
+  using FitWeights = FitnessManager_Weights;
 }
 }
 
