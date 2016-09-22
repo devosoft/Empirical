@@ -17,7 +17,7 @@ test: test-web test-prep $(addprefix subtest-, $(TEST_NAMES))
 	rm -rf subtest*.out
 
 test-web: 
-	  cd web && make && bash run_tests.sh
+	  cd web && bash run_tests.sh
 
 clean:
 	rm -f *.out
