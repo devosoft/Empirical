@@ -27,7 +27,6 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-5
-    - clang-3.2
     - cmake
     - build-essential
     - bison
@@ -38,5 +37,4 @@ addons:
     - gzip
 script:
 - git fetch origin master:refs/remotes/origin/master
-- sudo apt-get install emscripten
 - make travis
