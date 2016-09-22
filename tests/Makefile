@@ -17,7 +17,7 @@ test: test-web test-prep $(addprefix subtest-, $(TEST_NAMES))
 	rm -rf subtest*.out
 
 test-web: 
-	  source ../third-party/emsdk_portable_repo/emsdk_portable/emsdk_env.sh && cd web && make && for filename in *.js; do node $$filename; if [ $$? -gt 0 ]; then exit 1; fi; done
+	  cd web && make && for filename in *.js; do node $$filename; if [ $$? -gt 0 ]; then exit 1; fi; done
 
 clean:
 	rm -f *.out
