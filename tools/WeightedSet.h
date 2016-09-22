@@ -15,6 +15,10 @@
 //
 //
 // Development NOTES:
+//   * We are now using lazy evaluation for refreshing tree weights.  When a Refresh is run,
+//     it just sets needs_refresh to true.  Any time a tree weight is requested, the refreshing
+//     will actually be performed.
+//
 //   * We should probably change the name to something like WeightedRandom since it does not
 //     have to be used just for scheduling.
 //   * We could easily convert this structure to a template that acts as a glorified vector
@@ -33,6 +37,7 @@ namespace emp {
   private:
     struct WeightInfo { double item=0.0; double tree=0.0; };
     emp::vector<WeightInfo> weight;
+    bool needs_refresh;
 
     int ParentID(int id) const { return (id-1) / 2; }
     int LeftID(int id) const { return 2*id + 1; }
@@ -51,8 +56,28 @@ namespace emp {
       Proxy & operator=(double new_weight) { ws.Adjust(id, new_weight); return *this; }
     };
 
+    // Check if we need to do a refresh, and if so do it!
+    void ResolveRefresh() {
+      if (!needs_refresh) return;
+
+      const int pivot = GetSize()/2 - 1; // Transition between internal and leaf nodes.
+      // For a leaf, tree weight = item weight.
+      for (int i = weight.size()-1; i > pivot; i--) weight[i].tree = weight[i].item;
+      // The pivot node may have one or two sub-trees.
+      if (pivot > 0) {
+        weight[pivot].tree = weight[pivot].item + weight[LeftID(pivot)].tree;
+        if (RightID(pivot) < GetSize()) weight[pivot].tree += weight[RightID(pivot)].tree;
+      }
+      // Internal nodes sum their two sub-tree and their own weight.
+      for (int i = pivot-1; i >= 0; i--) {
+        weight[i].tree = weight[i].item + weight[LeftID(i)].tree + weight[RightID(i)].tree;
+      }
+
+      needs_refresh = false;
+    }
+
   public:
-    WeightedSet(int num_items=0) : weight(num_items) {;}
+    WeightedSet(int num_items=0) : weight(num_items), needs_refresh(false) {;}
     WeightedSet(const WeightedSet &) = default;
     WeightedSet(WeightedSet &&) = default;
     ~WeightedSet() = default;
@@ -60,13 +85,14 @@ namespace emp {
     WeightedSet & operator=(WeightedSet &&) = default;
 
     int GetSize() const { return (int) weight.size(); }
-    double GetWeight() const { return weight[0].tree; }
+    double GetWeight() const { ResolveRefresh(); return weight[0].tree; }
     double GetWeight(int id) const { return weight[id].item; }
-    double GetProb(int id) const { return weight[id].item / weight[0].tree; }
+    double GetProb(int id) const { ResolveRefresh(); return weight[id].item / weight[0].tree; }
 
     void Resize(int new_size) {
-      weight.resize(new_size);  // Update the size (new weights default to zero)
-      Refresh();                // Update the tree weights.
+      const int old_size = weight.size();
+      weight.resize(new_size);             // Update the size (new weights default to zero)
+      if (new_size < old_size) Refresh();  // Update the tree weights if some have disappeared.
     }
 
     void Resize(int new_size, double def_value) {
@@ -82,19 +108,23 @@ namespace emp {
 
     void Clear() {
       for (auto & x : weight) { x.item = 0.0; x.tree = 0.0; }
+      needs_refresh = false;  // If all weights are zero, no refresh needed.
     }
 
     void ResizeClear(size_t new_size) {
       weight.resize(new_size);
       for (auto & x : weight) { x.item = 0.0; x.tree = 0.0; }
+      needs_refresh = false;  // If all weights are zero, no refresh needed.
     }
 
     void Adjust(int id, const double new_weight) {
       // Update this node.
-      double weight_diff = new_weight - weight[id].item;
+      const double weight_diff = new_weight - weight[id].item;
       weight[id].item = new_weight;       // Update item weight
-      weight[id].tree += weight_diff;
 
+      if (needs_refresh) return;          // If we already need a refresh don't update tree weights!
+
+      weight[id].tree += weight_diff;
       // Update tree to root.
       while (id > 0) {
         id = ParentID(id);
@@ -118,6 +148,9 @@ namespace emp {
     }
 
     int Index(double index, int cur_id=0) {
+      ResolveRefresh();
+      emp_assert(index < weight[0].tree);  // Cannot index beyond end of set.
+
       // If our target is in the current node, return it!
       const double cur_weight = weight[cur_id].item;
       if (index < cur_weight) return cur_id;
@@ -151,24 +184,10 @@ namespace emp {
       return *this;
     }
 
-    // Update all tree-weights to cleanup accumulated round-off error.
-    double Refresh() {
-      const double old_total = weight[0].tree;
-      const int first_leaf = GetSize()/2;
-      const int pivot = first_leaf-1;
-      // All leaves have a tree weight equal to their item weight.
-      for (int i = weight.size()-1; i >= first_leaf; i--) weight[i].tree = weight[i].item;
-      // Be careful with the pivot node since it may have one or two sub-trees.
-      if (pivot > 0) {
-        weight[pivot].tree = weight[pivot].item + weight[LeftID(pivot)].tree;
-        if (RightID(pivot) < GetSize()) weight[pivot].tree += weight[RightID(pivot)].tree;
-      }
-      // All internal nodes sum their two sub-tree and their own weight.
-      for (int i = pivot-1; i >= 0; i--) {
-        weight[i].tree = weight[i].item + weight[LeftID(i)].tree + weight[RightID(i)].tree;
-      }
-
-      return weight[0].tree / old_total;
+    // Refesh used to immediately update all tree weights, but not we just indicate that we
+    // need to update them before accessing them in the future.
+    void Refresh() {
+      needs_refresh = true;
     }
 
   };
