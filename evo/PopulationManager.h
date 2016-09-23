@@ -66,6 +66,15 @@ namespace evo {
         os << spacer;
       }
     }
+    void PrintOrgCounts(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout) {
+      std::map<ORG,int> org_counts;
+      for (ORG * org : pop) if (org) org_counts[*org] = 0;
+      for (ORG * org : pop) if (org) org_counts[*org] += 1;
+      for (auto x : org_counts) {
+        ORG cur_org = x.first;
+        os << string_fun(&cur_org) << " : " << x.second << std::endl;
+      }
+    }
 
     // AddOrg and AddOrgBirth should be the only ways new organisms come into a population.
     // AddOrg inserts an organism from OUTSIDE of the population.

@@ -346,6 +346,10 @@ namespace evo {
       popM.Print(os, empty, spacer);
     }
 
+    void PrintOrgCounts(const std::function<std::string(ORG*)> & print_fun, std::ostream & os=std::cout) {
+      popM.PrintOrgCounts(print_fun, os);
+    }
+
     //Helper function to return PopulationManager indices of
     //all organisms that are not null
     emp::vector<int> GetValidOrgIndices(){
