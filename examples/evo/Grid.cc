@@ -31,7 +31,8 @@ int main()
 
   evo::GridWorld<int> grid_world(random);
   grid_world.ConfigPop(std::sqrt(POP_SIZE), std::sqrt(POP_SIZE));
-  for (int i = 0; i < 63; i++) grid_world.Insert(i);
+  // for (int i = 0; i < 63; i++) grid_world.Insert(i);
+  for (int i = 0; i < POP_SIZE; i++) grid_world.InsertAt(i,i);
   grid_world.Print(print_fun);
 
   for (int g = 0; g < GENS; g++) {
