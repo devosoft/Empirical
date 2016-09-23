@@ -36,8 +36,8 @@ namespace emp {
   class WeightedSet {
   private:
     emp::vector<double> item_weight;
-    emp::vector<double> tree_weight;
-    bool needs_refresh;
+    mutable emp::vector<double> tree_weight;
+    mutable bool needs_refresh;
 
     int ParentID(int id) const { return (id-1) / 2; }
     int LeftID(int id) const { return 2*id + 1; }
@@ -57,7 +57,7 @@ namespace emp {
     };
 
     // Check if we need to do a refresh, and if so do it!
-    void ResolveRefresh() {
+    void ResolveRefresh() const {
       if (!needs_refresh) return;
 
       const int pivot = GetSize()/2 - 1; // Transition between internal and leaf nodes.
