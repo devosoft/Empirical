@@ -84,6 +84,14 @@ namespace evo {
       return pos;
     }
 
+    int AddOrgAt(ORG * new_org, int pos) {
+      emp_assert(pos < (int) pop.size());   // Make sure we are placing into a legal position.
+      if (pop[pos]) delete pop[pos];
+      pop[pos] = new_org;
+      fitM.Clear(pos);
+      return pos;
+    }
+
     void Clear() {
       // Delete all organisms.
       for (ORG * org : pop) if (org) delete org;  // Delete current organisms.
