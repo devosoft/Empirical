@@ -5,7 +5,7 @@ echo "compilation done"
 for filename in *.js; 
 do 
     node $filename; 
-    if [ $$? -gt 0 ]; 
+    if [ $? -gt 0 ]; 
     then 
 	exit 1; 
     fi; 
