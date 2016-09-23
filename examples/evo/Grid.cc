@@ -45,5 +45,7 @@ int main()
 
   std::cout << std::endl;
   grid_world.Print(print_fun);
+  std::cout << "Final Org Counts:\n";
+  grid_world.PrintOrgCounts(print_fun);
   std::cout << std::endl;
 }
