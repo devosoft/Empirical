@@ -13,6 +13,7 @@
 #include <sstream>
 #include <string>
 
+#include "reflection.h"
 #include "vector.h"
 
 namespace emp {
@@ -369,7 +370,20 @@ namespace emp {
     inline std::string to_string_impl(bool, double v) { return std::to_string(v); }
     inline std::string to_string_impl(bool, char c) { return std::string(1,c); }
     inline std::string to_string_impl(bool, unsigned char c) { return std::string(1,c); }
-    inline std::string to_string_impl(bool, std::array<double,3> arr) { return "[ " + std::to_string(arr[0]) + " " + std::to_string(arr[1]) + " " + std::to_string(arr[2]) + " ]"; }
+
+    // Operate on std::containers
+    template <typename T>
+    inline typename emp::sfinae_decoy<std::string, typename T::value_type>::type
+    to_string_impl(bool, T container) {
+      std::stringstream ss;
+      ss << "[ ";
+      for (auto el : container) {
+        ss << to_string_impl(true, el);
+        ss << " ";
+      }
+      ss << "]";
+      return ss.str();
+    }
   }
 
   template <typename... ALL_TYPES>

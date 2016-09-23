@@ -1680,6 +1680,8 @@ TEST_CASE("Test string utils", "[tools]")
   std::string cat_full = emp::to_string(cat_a, cat_b, cat_c, cat_d);
 
   REQUIRE(cat_full == "ABC123");
+  std::array<int, 3> test_arr({4, 2, 5});
+  REQUIRE(emp::to_string(test_arr) == "[ 4 2 5 ]");
 }
 
 
