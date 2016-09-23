@@ -37,4 +37,5 @@ addons:
     - gzip
 script:
 - git fetch origin master:refs/remotes/origin/master
+- npm install source-map
 - make travis
