@@ -48,9 +48,10 @@
 //  void SetDefaultMutationFun(const std::function<bool(ORG*)> & f)
 //
 // Population Building
-//  void Clear()                                           - Clear all organisms in population
+//  void Clear()                                        - Clear all organisms in population
 //  void Insert(const ORG & mem, int copy_count=1)      - Insert a copy of an individual
-//  void Insert(Random & random, ARGS... args)             - Insert a random organism
+//  void InsertAt(const ORG & mem, int pos)             - Insert an individual at specified pos
+//  void Insert(Random & random, ARGS... args)          - Insert a random organism
 //  void InsertRandomOrg(ARGS... args)
 //  void InsertNext(const ORG & mem, int copy_count=1)  - Insert into NEXT GENERATION of pop
 //
@@ -262,6 +263,15 @@ namespace evo {
         org_placement_sig.Trigger(pos);
       }
     }
+
+    void InsertAt(const ORG & mem, const int pos) {
+      ORG * new_org = new ORG(mem);
+      inject_ready_sig.Trigger(new_org);
+      popM.AddOrgAt(new_org, pos);
+      SetupOrg(*new_org, &callbacks, pos);
+      org_placement_sig.Trigger(pos);
+    }
+
     template <typename... ARGS>
     void InsertRandomOrg(ARGS... args) {
       emp_assert(random_ptr != nullptr && "InsertRandomOrg() requires active random_ptr");
@@ -329,7 +339,7 @@ namespace evo {
                std::ostream & os=std::cout,
                const std::string & empty="X",
                const std::string & spacer=" ") {
-      popM.Print(print_fun, os, empty, spacer);             
+      popM.Print(print_fun, os, empty, spacer);
     }
 
     void Print(std::ostream & os=std::cout, const std::string & empty="X", const std::string & spacer=" ") {
