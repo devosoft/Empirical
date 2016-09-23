@@ -325,6 +325,13 @@ namespace evo {
       return MutatePop(orgM.GetMutFun(), first_mut, last_mut);
     }
 
+    void Print(const std::function<std::string(ORG*)> & print_fun,
+               std::ostream & os=std::cout,
+               const std::string & empty="X",
+               const std::string & spacer=" ") {
+      popM.Print(print_fun, os, empty, spacer);             
+    }
+
     void Print(std::ostream & os=std::cout, const std::string & empty="X", const std::string & spacer=" ") {
       popM.Print(os, empty, spacer);
     }
