@@ -1,6 +1,9 @@
 GCOV_FLAGS = -o0 -g --coverage
 
+EMC = emcc
+
 TEST_NAMES = tools geometry evo scholar
+EMCC_TEST_NAMES = tools geometry scholar
 
 default: test
 
@@ -13,8 +16,20 @@ subtest-%: test_%.cc
 	# execute test
 	./$@.out
 
+emcc-subtest-%: test_%.cc
+	$(EMC) -std=c++11 $< -o $@.js
+	#echo "running $@.out"
+	# execute test
+	node $@.js
+
+#native
 test: test-prep $(addprefix subtest-, $(TEST_NAMES))
 	rm -rf subtest*.out
+
+# emcc
+emcc-test: test-prep $(addprefix emcc-subtest-, $(EMCC_TEST_NAMES))
+	rm -rf emcc-subtest*.js
+
 
 clean:
 	rm -f *.out
@@ -25,3 +40,4 @@ clean:
 	rm -f *.gcov
 	rm -f ./Coverage*
 	rm -rf ./temp
+	rm -rf *.js

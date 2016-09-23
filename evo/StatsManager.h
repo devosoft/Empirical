@@ -75,7 +75,7 @@ namespace evo{
         } else {
             output_location.open(location);
             if (!output_location.good()){
-                std::cout << "Invalid output file. Exiting." << std::endl;
+                std::cout << "Invalid output file '" << location << "'. Exiting." << std::endl;
                 exit(0);
             }
             string_pop(location, ".");
