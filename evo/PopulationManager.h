@@ -76,7 +76,7 @@ namespace evo {
       }
     }
 
-    // AddOrg and AddOrgBirth should be the only ways new organisms come into a population.
+    // AddOrg, AddOrgAt and AddOrgBirth are the only ways new organisms come into a population.
     // AddOrg inserts an organism from OUTSIDE of the population.
     // AddOrgBirth inserts an organism that was born INSIDE the population.
     int AddOrg(ORG * new_org) {
@@ -85,19 +85,17 @@ namespace evo {
       fitM.Clear(pos);
       return pos;
     }
-    int AddOrgBirth(ORG * new_org, int parent_pos) {
-      const int pos = random_ptr->GetInt((int) pop.size());
-      if (pop[pos]) delete pop[pos];
-      pop[pos] = new_org;
-      fitM.Clear(pos);
-      return pos;
-    }
 
-    int AddOrgAt(ORG * new_org, int pos) {
+    void AddOrgAt(ORG * new_org, int pos) {
       emp_assert(pos < (int) pop.size());   // Make sure we are placing into a legal position.
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
       fitM.Clear(pos);
+    }
+
+    int AddOrgBirth(ORG * new_org, int parent_pos) {
+      const int pos = random_ptr->GetInt((int) pop.size());
+      AddOrgAt(new_org, pos);
       return pos;
     }
 
@@ -267,9 +265,6 @@ namespace evo {
     using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
     using base_t::pop;
     using base_t::fitM;
-    using base_t::random_ptr;
-    using base_t::DoBottleneck;
-    using base_t::SetRandom;
 
     int max_size;
     int bottleneck_size;
@@ -291,7 +286,7 @@ namespace evo {
 
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       if ((int) pop.size() >= max_size) {
-        DoBottleneck(bottleneck_size);
+        base_t::DoBottleneck(bottleneck_size);
         ++num_bottlenecks;
       }
       const int pos = pop.size();
@@ -307,7 +302,6 @@ namespace evo {
     using base_t::pop;
     using base_t::fitM;
     using base_t::random_ptr;
-    using base_t::SetRandom;
 
     int width;
     int height;
@@ -340,17 +334,12 @@ namespace evo {
 
     // Newly born orgs go next to their parents.
     int AddOrgBirth(ORG * new_org, int parent_pos) {
-      const int parent_x = ToX(parent_pos);
-      const int parent_y = ToY(parent_pos);
       const int offset = random_ptr->GetInt(9);
-      const int offspring_x = emp::mod(parent_x + offset%3 - 1, width);
-      const int offspring_y = emp::mod(parent_y + offset/3 - 1, height);
+      const int offspring_x = emp::mod(ToX(parent_pos) + offset%3 - 1, width);
+      const int offspring_y = emp::mod(ToY(parent_pos) + offset/3 - 1, height);
       const int pos = ToID(offspring_x, offspring_y);
 
-      if (pop[pos]) delete pop[pos];
-
-      pop[pos] = new_org;
-      fitM.Clear(pos);
+      base_t::AddOrgAt(new_org, pos);
 
       return pos;
     }
@@ -365,11 +354,8 @@ namespace evo {
       return valid_orgs;
     }
 
-    void Print(std::function<std::string(ORG*)> string_fun,
-               std::ostream & os = std::cout,
-               const std::string & empty="-",
-               const std::string & spacer=" ")
-    {
+    void Print(std::function<std::string(ORG*)> string_fun, std::ostream& os=std::cout,
+               const std::string & empty="-", const std::string & spacer=" ") {
       emp_assert(string_fun);
       for (int y=0; y<height; y++) {
         for (int x = 0; x<width; x++) {
@@ -381,15 +367,8 @@ namespace evo {
       }
     }
 
-    void Print(std::ostream & os = std::cout, std::string empty="X", std::string spacer=" ") {
-      for (int y=0; y<height; y++) {
-        for (int x = 0; x<width; x++) {
-          ORG * org = pop[ToID(x,y)];
-          if (org) os << *org << spacer;
-          else os << empty << spacer;
-        }
-        os << std::endl;
-      }
+    void Print(std::ostream& os=std::cout, const std::string & empty="X", std::string spacer=" ") {
+      Print( [](ORG * org){return emp::to_string(*org);}, os, empty, spacer);
     }
   };
 
@@ -400,8 +379,6 @@ namespace evo {
     using base_t::pop;
     using base_t::fitM;
     using base_t::random_ptr;
-    using base_t::SetRandom;
-    using base_t::GetSize;
 
     int pool_count;                            // How many pools are in the population?
     vector<int> pool_sizes;                    // How large is each pool?
@@ -424,7 +401,7 @@ namespace evo {
     int GetLower() const { return r_lower; }
 
     void Setup(Random * r) {
-        SetRandom(r);
+        base_t::SetRandom(r);
         vector<int>* temp_sizes = new vector<int>;
         std::map<int, vector<int> > temp_connect;
 
@@ -512,10 +489,8 @@ namespace evo {
 
       const int pos = random_ptr->GetInt(range_l, range_u);
 
-      if (pop[pos]) delete pop[pos];
-      pop[pos] = new_org;
+      AddOrgAt(new_org, pos);
       org_count++;
-      fitM.Clear(pos);
       return pos;
     }
 
