@@ -86,17 +86,17 @@ namespace evo {
       return pos;
     }
 
-    void AddOrgAt(ORG * new_org, int pos) {
+    int AddOrgAt(ORG * new_org, int pos) {
       emp_assert(pos < (int) pop.size());   // Make sure we are placing into a legal position.
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
       fitM.Clear(pos);
+      return pos;
     }
 
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = random_ptr->GetInt((int) pop.size());
-      AddOrgAt(new_org, pos);
-      return pos;
+      return AddOrgAt(new_org, pos);
     }
 
     void Clear() {
@@ -124,6 +124,18 @@ namespace evo {
         if (org) org->Execute(std::forward<ARGS>(args)...);
       }
     }
+
+    // --- POPULATION ANALYSIS ---
+
+    emp::vector<int> FindCellIDs(const std::function<bool(ORG*)> & filter) {
+      emp::vector<int> valid_IDs(0);
+      for (size_t i = 0; i < pop.size(); i++) {
+        if (filter(pop[i])) valid_IDs.push_back(i);
+      }
+      return valid_IDs;
+    }
+    emp::vector<int> GetValidOrgIDs() { return FindCellIDs([](ORG*org){ return org != nullptr; }); }
+    emp::vector<int> GetEmptyPopIDs() { return FindCellIDs([](ORG*org){ return org == nullptr; }); }
 
     // --- POPULATION MANIPULATIONS ---
 
@@ -306,10 +318,6 @@ namespace evo {
     int width;
     int height;
 
-    int ToX(int id) const { return id % width; }
-    int ToY(int id) const { return id / width; }
-    int ToID(int x, int y) const { return y*width + x; }
-
   public:
     PopulationManager_Grid(const std::string & _w_name, FIT_MANAGER & _fm)
     : base_t(_w_name, _fm) {
@@ -324,8 +332,9 @@ namespace evo {
 
     // Injected orgs go into a random position.
     int AddOrg(ORG * new_org) {
-      emp::vector<int> empty_spots = GetValidOrgIndices();
-      const int pos = empty_spots[ random_ptr->GetInt((int) empty_spots.size()) ];
+      emp::vector<int> empty_spots = base_t::GetEmptyPopIDs();
+      const int pos = (empty_spots.size()) ?
+        empty_spots[ random_ptr->GetUInt(empty_spots.size()) ] : random_ptr->GetUInt(pop.size());
 
       pop[pos] = new_org;
       fitM.Clear(pos);
@@ -335,23 +344,11 @@ namespace evo {
     // Newly born orgs go next to their parents.
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int offset = random_ptr->GetInt(9);
-      const int offspring_x = emp::mod(ToX(parent_pos) + offset%3 - 1, width);
-      const int offspring_y = emp::mod(ToY(parent_pos) + offset/3 - 1, height);
-      const int pos = ToID(offspring_x, offspring_y);
+      const int offspring_x = emp::mod(parent_pos%width + offset%3 - 1, width);
+      const int offspring_y = emp::mod(parent_pos/width + offset/3 - 1, height);
+      const int pos = offspring_x + offspring_y*width;
 
-      base_t::AddOrgAt(new_org, pos);
-
-      return pos;
-    }
-
-    emp::vector<int> GetValidOrgIndices(){
-      emp::vector<int> valid_orgs(0);
-      for (size_t i = 0; i < pop.size(); i++){
-        if (pop[i] == nullptr){
-          valid_orgs.push_back(i);
-        }
-      }
-      return valid_orgs;
+      return base_t::AddOrgAt(new_org, pos);
     }
 
     void Print(std::function<std::string(ORG*)> string_fun, std::ostream& os=std::cout,
@@ -359,7 +356,7 @@ namespace evo {
       emp_assert(string_fun);
       for (int y=0; y<height; y++) {
         for (int x = 0; x<width; x++) {
-          ORG * org = pop[ToID(x,y)];
+          ORG * org = pop[x+y*width];
           if (org) os << string_fun(org) << spacer;
           else os << empty << spacer;
         }
@@ -489,9 +486,8 @@ namespace evo {
 
       const int pos = random_ptr->GetInt(range_l, range_u);
 
-      AddOrgAt(new_org, pos);
       org_count++;
-      return pos;
+      return AddOrgAt(new_org, pos);
     }
 
     // Newly born orgs have a chance to migrate to a connected pool.

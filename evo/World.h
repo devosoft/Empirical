@@ -350,18 +350,6 @@ namespace evo {
       popM.PrintOrgCounts(print_fun, os);
     }
 
-    //Helper function to return PopulationManager indices of
-    //all organisms that are not null
-    emp::vector<int> GetValidOrgIndices(){
-      emp::vector<int> valid_orgs(0);
-      for (int i = 0; i < (int) popM.size(); i++){
-        if (this->IsOccupied(i)){
-          valid_orgs.push_back(i);
-        }
-      }
-      return valid_orgs;
-    }
-
     // Selection mechanisms choose organisms for the next generation.
 
     // Elite Selection picks a set of the most fit individuals from the population to move to
@@ -408,7 +396,7 @@ namespace evo {
 
       for (int T = 0; T < tourny_count; T++) {
         // @CAO - looking up valid orgs each time is very slow.
-        emp::vector<int> valid_orgs = GetValidOrgIndices();
+        emp::vector<int> valid_orgs = popM.GetValidOrgIDs();
 
         emp::vector<int> entries = Choose(*random_ptr, valid_orgs.size(), t_size);
         Shuffle(*random_ptr, entries);
