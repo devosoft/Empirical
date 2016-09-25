@@ -352,10 +352,7 @@ namespace evo {
       emp::vector<int> empty_spots = base_t::GetEmptyPopIDs();
       const int pos = (empty_spots.size()) ?
         empty_spots[ random_ptr->GetUInt(empty_spots.size()) ] : random_ptr->GetUInt(pop.size());
-
-      pop[pos] = new_org;
-      fitM.Clear(pos);
-      return pos;
+      return base_t::AddOrgAt(new_org, pos);
     }
 
     // Newly born orgs go next to their parents.
@@ -415,9 +412,9 @@ namespace evo {
     int GetLower() const { return r_lower; }
 
     void Setup(Random * r) {
-        base_t::SetRandom(r);
-        vector<int>* temp_sizes = new vector<int>;
-        std::map<int, vector<int> > temp_connect;
+      base_t::SetRandom(r);
+      vector<int>* temp_sizes = new vector<int>;
+      std::map<int, vector<int> > temp_connect;
 
       ConfigPop(5, *temp_sizes, &temp_connect, 150, 10, 0.05, 200);
     }
@@ -523,11 +520,7 @@ namespace evo {
       int range_u = pool_end[InsertPool];
 
       const int pos = random_ptr->GetInt(range_l, range_u);
-      if (pop[pos]) delete pop[pos];
-      pop[pos] = new_org;
-
-      fitM.Clear(pos);
-      return pos;
+      return AddOrgAt(new_org, pos);
     }
  };
 
