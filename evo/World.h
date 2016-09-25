@@ -361,7 +361,7 @@ namespace evo {
       std::multimap<double, int> fit_map;
       for (int i = 0; i < (int) popM.size(); i++) {
         if (this->IsOccupied(i)){
-          fit_map.insert( std::make_pair( fitM.CalcFitness(i,popM[i],fit_fun), i) );
+          fit_map.insert( std::make_pair( fitM.CalcFitness(i,(ORG*) popM[i],fit_fun), i) );
         }
       }
 
@@ -400,7 +400,7 @@ namespace evo {
 
         emp::vector<int> entries = Choose(*random_ptr, valid_orgs.size(), t_size);
         Shuffle(*random_ptr, entries);
-        double best_fit = fit_fun( popM[valid_orgs[entries[0]]] );
+        double best_fit = fit_fun( (ORG*) popM[valid_orgs[entries[0]]] );
         int best_id = valid_orgs[entries[0]];
 
         // Search for a higher fit org in the tournament.
