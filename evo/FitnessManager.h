@@ -34,7 +34,7 @@ namespace evo {
     // static constexpr bool Set(size_t, double) { return false; }
     static constexpr bool Set(const emp::vector<double> &) { return false; }
     static constexpr bool Clear() { return false; }
-    static constexpr bool Clear(size_t) { return false; }
+    static constexpr bool ClearAt(size_t) { return false; }
     static constexpr bool Resize(size_t) { return false; }
     static constexpr bool Resize(size_t, double) { return false; }
   };
@@ -61,7 +61,7 @@ namespace evo {
     // bool Set(size_t id, double fitness) { fit_cache[id] = fitness; return true; }
     bool Set(const emp::vector<double> & in_cache) { fit_cache = in_cache; return true; }
     bool Clear() { fit_cache.resize(0); return true; }
-    bool Clear(size_t id) { if (id < fit_cache.size()) fit_cache[id] = 0.0; return true; }
+    bool ClearAt(size_t id) { if (id < fit_cache.size()) fit_cache[id] = 0.0; return true; }
     bool Resize(size_t new_size) { fit_cache.resize(new_size); return true; }
     bool Resize(size_t new_size, double def_val) { fit_cache.resize(new_size, def_val); return true; }
   };
@@ -84,7 +84,7 @@ namespace evo {
     // bool Set(size_t id, double fitness) { fit_cache[id] = fitness; return true; }
     bool Set(const emp::vector<double> & in_cache) { weight_info.Adjust(in_cache); return true; }
     bool Clear() { weight_info.Clear(); return true; }
-    bool Clear(size_t id) { weight_info.ResizeClear(id); return true; }
+    bool ClearAt(size_t id) { weight_info.Adjust(id, 0.0); return true; }
     bool Resize(size_t new_size) { weight_info.Resize(new_size); return true; }
     bool Resize(size_t new_size, double def_val) { weight_info.Resize(new_size, def_val); return true; }
   };
