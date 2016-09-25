@@ -11,6 +11,8 @@
 //  * Grids always add injected organisms to empty cells; may have trouble if there are none.
 //  * Population iterators and indexing should either be const OR work with proxies to ensure
 //    that fitness caching and signals are handled correctly.
+//  * Should we do something to link Proxy and iterator; in both cases they represent a position
+//    in the populaiton vector, but iterator can only point to valid cells...
 
 #ifndef EMP_EVO_POPULATION_MANAGER_H
 #define EMP_EVO_POPULATION_MANAGER_H
@@ -53,7 +55,7 @@ namespace evo {
     // Allow this and derived classes to be identified as a population manager.
     static constexpr bool emp_is_population_manager = true;
     static constexpr bool emp_has_separate_generations = false;
-    using value_type = ORG*;
+    using value_type = ptr_t;
 
     using iterator_t = PopulationIterator<PopulationManager_Base<ORG,FIT_MANAGER> >;
     friend class interator_t;
@@ -63,40 +65,8 @@ namespace evo {
     void SetRandom(Random * r) { random_ptr = r; }
     void Setup(Random * r) { SetRandom(r); }
 
-    void Print(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout,
-              std::string empty="X", std::string spacer=" ") {
-      for (ORG * org : pop) {
-        if (org) os << string_fun(org);
-        else os << empty;
-        os << spacer;
-      }
-    }
-    void Print(std::ostream & os = std::cout, std::string empty="X", std::string spacer=" ") {
-      for (ORG * org : pop) {
-        if (org) os << *org;
-        else os << empty;
-        os << spacer;
-      }
-    }
-    void PrintOrgCounts(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout) {
-      std::map<ORG,int> org_counts;
-      for (ORG * org : pop) if (org) org_counts[*org] = 0;
-      for (ORG * org : pop) if (org) org_counts[*org] += 1;
-      for (auto x : org_counts) {
-        ORG cur_org = x.first;
-        os << string_fun(&cur_org) << " : " << x.second << std::endl;
-      }
-    }
-
-    // AddOrg, AddOrgAt and AddOrgBirth are the only ways new organisms come into a population.
-    // AddOrg inserts an organism from OUTSIDE of the population.
-    // AddOrgBirth inserts an organism that was born INSIDE the population.
-    int AddOrg(ORG * new_org) {
-      const int pos = pop.size();
-      pop.push_back(new_org);
-      fitM.Clear(pos);
-      return pos;
-    }
+    // AddOrgAt and AddOrgAppend are the only ways new organisms come into a population (all others
+    // go through these)
 
     int AddOrgAt(ORG * new_org, int pos) {
       emp_assert(pos < (int) pop.size());   // Make sure we are placing into a legal position.
@@ -105,6 +75,20 @@ namespace evo {
       fitM.Clear(pos);
       return pos;
     }
+
+    int AddOrgAppend(ORG * new_org) {
+      const int pos = pop.size();
+      pop.push_back(new_org);
+      fitM.Clear(pos);
+      return pos;
+    }
+
+    // In practice, we should always use AddOrg and AddOrgBirth which are setup appropriately
+    // for each population type.
+    // AddOrg inserts an organism from OUTSIDE of the population.
+    // AddOrgBirth inserts an organism that was born INSIDE the population.
+
+    int AddOrg(ORG * new_org) { return AddOrgAppend(new_org); }
 
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       const int pos = random_ptr->GetInt((int) pop.size());
@@ -163,6 +147,29 @@ namespace evo {
       pop.resize(new_size);
 
       fitM.Clear();  // Everyone is either deleted or in the wrong place!
+    }
+
+    // --- PRINTING ---
+
+    void Print(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout,
+              std::string empty="X", std::string spacer=" ") {
+      for (ORG * org : pop) {
+        if (org) os << string_fun(org);
+        else os << empty;
+        os << spacer;
+      }
+    }
+    void Print(std::ostream & os = std::cout, std::string empty="X", std::string spacer=" ") {
+      Print( [](ORG * org){return emp::to_string(*org);}, os, empty, spacer);
+    }
+    void PrintOrgCounts(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout) {
+      std::map<ORG,int> org_counts;
+      for (ORG * org : pop) if (org) org_counts[*org] = 0;  // Initialize needed entries
+      for (ORG * org : pop) if (org) org_counts[*org] += 1; // Count actual types.
+      for (auto x : org_counts) {
+        ORG cur_org = x.first;
+        os << string_fun(&cur_org) << " : " << x.second << std::endl;
+      }
     }
 
     // --- FOR VECTOR COMPATIBILITY ---
@@ -313,9 +320,7 @@ namespace evo {
         base_t::DoBottleneck(bottleneck_size);
         ++num_bottlenecks;
       }
-      const int pos = pop.size();
-      pop.push_back(new_org);
-      return pos;
+      return AddOrgAppend(new_org);
     }
   };
 
