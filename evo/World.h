@@ -324,7 +324,7 @@ namespace evo {
         if (this->IsOccupied(i)){
           if (mut_fun(popM[i], *random_ptr)) {
             mut_count++;
-            fitM.Clear(i);
+            fitM.ClearAt(i);
           }
         }
       }

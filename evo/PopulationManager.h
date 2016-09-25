@@ -65,22 +65,41 @@ namespace evo {
     void SetRandom(Random * r) { random_ptr = r; }
     void Setup(Random * r) { SetRandom(r); }
 
-    // AddOrgAt and AddOrgAppend are the only ways new organisms come into a population (all others
-    // go through these)
+    // AddOrgAt, AddOrgAppend, and SetOrgs are the only ways new organisms come into a population
+    // (all others go through these)
 
     int AddOrgAt(ORG * new_org, int pos) {
       emp_assert(pos < (int) pop.size());   // Make sure we are placing into a legal position.
       if (pop[pos]) delete pop[pos];
       pop[pos] = new_org;
-      fitM.Clear(pos);
+      fitM.ClearAt(pos);
       return pos;
     }
 
     int AddOrgAppend(ORG * new_org) {
       const int pos = pop.size();
       pop.push_back(new_org);
-      fitM.Clear(pos);
+      fitM.ClearAt(pos);
       return pos;
+    }
+
+    void SetOrgs(const emp::vector<ORG*> & new_pop) {
+      Clear();
+      pop = new_pop;
+    }
+
+    // Likewise, Clear and ClearOrgAt are the only ways to remove organisms...
+    void Clear() {
+      // Delete all organisms.
+      for (ORG * org : pop) if (org) delete org;  // Delete current organisms.
+      pop.resize(0);                              // Remove deleted organisms.
+      fitM.Clear();                               // Clear the fitness manager cache.
+    }
+
+    void ClearOrgAt(int pos) {
+      // Delete all organisms.
+      if (pop[pos]) delete pop[pos];  // Delete current organisms.
+      fitM.ClearAt(pos);
     }
 
     // In practice, we should always use AddOrg and AddOrgBirth which are setup appropriately
@@ -95,19 +114,9 @@ namespace evo {
       return AddOrgAt(new_org, pos);
     }
 
-    void Clear() {
-      // Delete all organisms.
-      for (ORG * org : pop) if (org) delete org;  // Delete current organisms.
-      pop.resize(0);                              // Remove deleted organisms.
-      fitM.Clear();                               // Clear the fitness manager cache.
-    }
     void Resize(size_t new_size) {
       emp_assert(new_size >= 0);
-      const auto old_size = pop.size();
-      for (int i = new_size; i < old_size; i++) {
-        delete pop[i];                            // Delete organisms being removed.
-        fitM.Clear(i);                            // Clear fitness cache for Deleted cells.
-      }
+      for (int i = new_size; i < (int) pop.size(); i++) ClearOrgAt(i); // Remove orgs out or range.
       pop.resize(new_size, nullptr);  // Initialize new orgs as null.
     }
 
@@ -142,11 +151,11 @@ namespace evo {
       // If we are supposed to keep only random organisms, shuffle the beginning into place!
       if (choose_random) emp::Shuffle<ptr_t>(*random_ptr, pop, new_size);
 
-      // Delete all of the organisms we are removing and resize the population.
-      for (int i = new_size; i < (int) pop.size(); ++i) { delete pop[i]; }
+      // Clear out all of the organisms we are removing and resize the population.
+      for (int i = new_size; i < (int) pop.size(); ++i) ClearOrgAt(i);
       pop.resize(new_size);
 
-      fitM.Clear();  // Everyone is either deleted or in the wrong place!
+      fitM.Clear();  // Everyone is either removed or in the wrong place!
     }
 
     // --- PRINTING ---
@@ -257,7 +266,7 @@ namespace evo {
   public:
     PopulationManager_EA(const std::string & _w_name, FIT_MANAGER & _fm)
     : base_t(_w_name, _fm) { ; }
-    ~PopulationManager_EA() { Clear(); }
+    ~PopulationManager_EA() { base_t::Clear(); ClearNext(); }
 
     static constexpr bool emp_has_separate_generations = true;
 
@@ -267,21 +276,14 @@ namespace evo {
       return pos;
     }
 
-    void Clear() {
-      // Delete all organisms.
-      for (ORG * m : pop) delete m;
-      for (ORG * m : next_pop) delete m;
-
-      pop.resize(0);
+    void ClearNext() {
+      for (ORG * m : next_pop) if (m) delete m;
       next_pop.resize(0);
-      fitM.Clear();
     }
 
     void Update() {
-      for (ORG * m : pop) delete m;  // Delete the current population.
-      pop = next_pop;                // Move over the next generation.
-      next_pop.resize(0);            // Clear out the next pop to refill again.
-      fitM.Clear();                  // Clear the fitness given new cells.
+      base_t::SetOrgs(next_pop);  // Move over the next generation.
+      next_pop.resize(0);         // Clear out the next pop to refill again.
     }
   };
 
@@ -320,7 +322,7 @@ namespace evo {
         base_t::DoBottleneck(bottleneck_size);
         ++num_bottlenecks;
       }
-      return AddOrgAppend(new_org);
+      return base_t::AddOrgAppend(new_org);
     }
   };
 
