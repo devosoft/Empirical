@@ -34,6 +34,18 @@ namespace evo {
 
     Random * random_ptr;
 
+    class Proxy {
+    private:
+      PopulationManager_Base<ORG,FIT_MANAGER> & popM;  // Which pop manager is this proxy from?
+      int id;                                          // Which position does it represent?
+    public:
+      Proxy(PopulationManager_Base & _p, int _id) : popM(_p), id(_id) { ; }
+      operator ORG*() const { return popM.pop[id]; }
+      ORG * operator->() const { return popM.pop[id]; }
+      ORG & operator*() const { return *(popM.pop[id]); }
+      Proxy & operator=(ORG * new_org) { popM.AddOrgAt(new_org,id); return *this; }
+    };
+
   public:
     PopulationManager_Base(const std::string &, FIT_MANAGER & _fm) : fitM(_fm) { ; }
     ~PopulationManager_Base() { Clear(); }
@@ -159,7 +171,7 @@ namespace evo {
     void clear() { Clear(); }
 
     // @CAO: these need work to make sure we send correct signals on changes & update fitness cache.
-    ptr_t & operator[](int i) { return pop[i]; }
+    Proxy operator[](int i) { return Proxy(*this, i); }
     const ptr_t operator[](int i) const { return pop[i]; }
     iterator_t begin() { return iterator_t(this, 0); }
     iterator_t end() { return iterator_t(this, pop.size()); }
