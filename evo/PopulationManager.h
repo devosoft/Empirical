@@ -19,7 +19,7 @@
 
 #include "../tools/random_utils.h"
 #include "../tools/Range.h"
-#include "../tools/Signal.h"
+#include "../tools/signal.h"
 
 #include "PopulationIterator.h"
 
