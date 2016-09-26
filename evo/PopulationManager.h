@@ -18,6 +18,7 @@
 #define EMP_EVO_POPULATION_MANAGER_H
 
 #include "../tools/random_utils.h"
+#include "../tools/Range.h"
 #include "../tools/Signal.h"
 
 #include "PopulationIterator.h"
@@ -404,8 +405,7 @@ namespace evo {
     int pool_count;                            // How many pools are in the population?
     vector<int> pool_sizes;                    // How large is each pool?
     std::map<int, vector<int> > connections;   // Which other pools can each position access?
-    int r_upper;                               // How large can a random pool size be?
-    int r_lower;                               // How small can a random pool size be?
+    emp::Range<int> pool_range;                // What are the limits on pool size?
     vector<int> pool_end;                      // Where does the next pool begin? First begins at 0.
     double mig_rate;                           // How often do organisms migrate to a connected pool?
     vector<int> pool_id;
@@ -417,8 +417,8 @@ namespace evo {
 
     int GetPoolCount() const { return pool_count; }
     const vector<int> & GetSizes() const { return pool_sizes ; }
-    int GetUpper() const { return r_upper; }
-    int GetLower() const { return r_lower; }
+    int GetUpper() const { return pool_range.upper; }   // @CAO: These are pooly named!!
+    int GetLower() const { return pool_range.lower; }
 
     void Setup(Random * r) {
       base_t::SetRandom(r);
@@ -429,20 +429,17 @@ namespace evo {
     }
 
     // Sets up population based on user specs.
-    void ConfigPop(int pc, vector<int> ps, std::map<int, vector<int> > * c, int u, int l,
-                   double mg, int pop_size) {
-      pool_count = pc;
-      pool_sizes = ps;
-      r_upper = u;
-      r_lower = l;
-      connections = *c;
-      mig_rate = mg;
+    void ConfigPop(int _pc, vector<int> _ps, std::map<int, vector<int> > * _c, int _u, int _l,
+                   double _mg, int _pop_size) {
+      pool_count = _pc;
+      pool_sizes = _ps;
+      pool_range.Set(_l,_u);
+      connections = *_c;
+      mig_rate = _mg;
       pool_end = {};
 
-      vector<int> temp (pop_size, 0);
-      pool_id = temp;
-
-      pop.resize(pop_size, nullptr);
+      base_t::Resize(_pop_size);
+      pool_id.resize(_pop_size, 0);
 
       // If no pool sizes in vector, defaults to random sizes for each
       if (pool_sizes.size() == 0) {
@@ -453,8 +450,8 @@ namespace evo {
             pool_total += pool_sizes[i];
           }
 
-          if (pool_total < pop_size){ //Keep generating random sizes until true
-            pool_sizes.push_back(pop_size - pool_total);
+          if (pool_total < _pop_size){ // Keep generating random sizes until true
+            pool_sizes.push_back(_pop_size - pool_total);
             break;
           }
 
@@ -474,7 +471,7 @@ namespace evo {
       int total = 0;
       for (auto el : pool_sizes) { total += el; }
 
-      emp_assert(pop_size == total && "POP_SIZE is different than total pool sizes");
+      emp_assert(pop_size == total && "POP_SIZE must equal total pool sizes");
 
       // Divide World into pools
       int arr_size = 0;
@@ -482,8 +479,8 @@ namespace evo {
       int pool_num = 0;
       for (auto el : pool_sizes) {
         arr_size += el;
-        for( int i = prev_size; i < arr_size; i++){
-            pool_id[i] = pool_num;
+        for( int i = prev_size; i < arr_size; i++) {
+          pool_id[i] = pool_num;
         }
         prev_size = arr_size;
         pool_num++;
@@ -516,8 +513,8 @@ namespace evo {
       if (random_ptr->P(mig_rate) && parent_conns.size() > 0) {
         int conn_id = random_ptr->GetInt(0, parent_conns.size());
         InsertPool = parent_conns[conn_id];
-        }
-        else{ InsertPool = pool_id[parent_pos]; }
+      }
+      else { InsertPool = pool_id[parent_pos]; }
 
       int range_l = InsertPool ? pool_end[InsertPool-1] : 0;
       int range_u = pool_end[InsertPool];
