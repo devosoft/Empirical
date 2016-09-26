@@ -8,6 +8,8 @@
 #ifndef EMP_RANGE_H
 #define EMP_RANGE_H
 
+#include "assert.h"
+
 namespace emp {
 
   template <typename T>
@@ -15,8 +17,13 @@ namespace emp {
     T lower;
     T upper;
 
-    Range(T _l, T _u) : lower(_l), upper(_u) { ; }
-    
+    Range(T _l, T _u) : lower(_l), upper(_u) { emp_assert(_l < _u); }
+
+    Range & operator=(const Range&) = default;
+    bool operator==(const Range& _in) const { return lower==_in.lower && upper==_in.upper; }
+    bool operator!=(const Range& _in) const { return lower!=_in.lower || upper!=_in.upper; }
+
+    void Set(T _l, T _u) { emp_assert(_l < _u); lower = _l; upper = _u; }
     bool Valid(T value) { return value >= lower && value < upper; }
   };
 
