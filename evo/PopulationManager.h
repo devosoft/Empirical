@@ -471,7 +471,7 @@ namespace evo {
       int total = 0;
       for (auto el : pool_sizes) { total += el; }
 
-      emp_assert(pop_size == total && "POP_SIZE must equal total pool sizes");
+      emp_assert(_pop_size == total && "POP_SIZE must equal total pool sizes");
 
       // Divide World into pools
       int arr_size = 0;
@@ -491,16 +491,15 @@ namespace evo {
 
     // Injected orgs go into a random pool.
     int AddOrg(ORG * new_org) {
-      size_t range_u = pop.size();
-      size_t range_l = 0;
+      Range<int> id_range(0, pop.size);
 
       // If any pools are empty, choose org from the next pool.
       if (num_orgs < pool_count) {
-        range_u = pool_end[num_orgs];
-        if (num_orgs > 0) { range_l = pool_end[num_orgs-1]; }
+        id_range.upper = pool_end[num_orgs];
+        if (num_orgs > 0) { id_range.lower = pool_end[num_orgs-1]; }
       }
 
-      const int pos = random_ptr->GetInt(range_l, range_u);
+      const int pos = random_ptr->GetInt(id_range);
       return AddOrgAt(new_org, pos);
     }
 

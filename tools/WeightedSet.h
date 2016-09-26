@@ -46,13 +46,11 @@ namespace emp {
 
     class Proxy {
     private:
-      WeightedSet & ws;  // Which set is this proxy from?
-      int id;            // Which id does it represent?
-
+      WeightedSet & ws;   // Which set is this proxy from?
+      int id;             // Which id does it represent?
     public:
       Proxy(WeightedSet & _ws, int _id) : ws(_ws), id(_id) { ; }
-
-      operator double() { return ws.GetWeight(id); }
+      operator double() const { return ws.GetWeight(id); }
       Proxy & operator=(double new_weight) { ws.Adjust(id, new_weight); return *this; }
     };
 

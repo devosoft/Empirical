@@ -226,7 +226,8 @@ namespace evo {
     ~World() { Clear(); if (random_owner) delete random_ptr; }
     World & operator=(const World &) = delete;
 
-    int GetSize() const { return (int) popM.size(); }
+    int GetSize() const { return popM.GetSize(); }
+    int GetNumOrgs() const { return popM.GetNumOrgs(); }
     ORG & operator[](int i) { return *(popM[i]); }
     const ORG & operator[](int i) const { return *(popM[i]); }
     bool IsOccupied(int i) const { return popM[i] != nullptr; }
