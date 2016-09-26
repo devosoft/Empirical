@@ -15,6 +15,8 @@ namespace emp {
     T lower;
     T upper;
 
+    Range(T _l, T _u) : lower(_l), upper(_u) { ; }
+    
     bool Valid(T value) { return value >= lower && value < upper; }
   };
 
