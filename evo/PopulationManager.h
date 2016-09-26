@@ -32,7 +32,6 @@ namespace evo {
     using ptr_t = ORG *;
     using pop_t = emp::vector<ptr_t>;
 
-    pop_t pop;
     FIT_MANAGER & fitM;
     int num_orgs;
 
@@ -50,6 +49,9 @@ namespace evo {
       Proxy & operator=(ORG * new_org) { popM.AddOrgAt(new_org,id); return *this; }
     };
 
+  private:
+    pop_t pop;
+
   public:
     PopulationManager_Base(const std::string &, FIT_MANAGER & _fm) : fitM(_fm), num_orgs(0) { ; }
     ~PopulationManager_Base() { Clear(); }
@@ -64,6 +66,7 @@ namespace evo {
 
     int GetSize() const { return (int) pop.size(); }
     int GetNumOrgs() const { return num_orgs; }
+    ptr_t GetOrg(int id) const { return pop[id]; }
 
     void SetRandom(Random * r) { random_ptr = r; }
     void Setup(Random * r) { SetRandom(r); }
@@ -106,7 +109,7 @@ namespace evo {
 
     void ClearOrgAt(int pos) {
       // Delete all organisms.
-      if (pop[pos]) { delete pop[pos]; num_orgs--; }  // Delete current organisms.
+      if (pop[pos]) { delete pop[pos]; pop[pos]=nullptr; num_orgs--; }  // Delete current organisms.
       fitM.ClearAt(pos);
     }
 
@@ -208,15 +211,14 @@ namespace evo {
   class PopulationManager_Plugin : public PopulationManager_Base<ORG, FIT_MANAGER> {
   protected:
     using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
-    using base_t::pop;
 
     // Most of the key functions in the population manager can be interfaced with symbols.  If you
     // need to modify the more complex behaviors (such as Execute) you need to create a new
     // derrived class from PopulationManager_Base, which is also legal in a plugin.
-    Signal<emp::vector<ORG*>&> sig_clear;
-    Signal<emp::vector<ORG*>&> sig_update;
-    Signal<emp::vector<ORG*>&, ORG*, int&> sig_add_org;            // args: new org, return: offspring pos
-    Signal<emp::vector<ORG*>&, ORG*, int, int&> sig_add_org_birth; // args: new org, parent pos, return: offspring pos
+    Signal<> sig_clear;
+    Signal<> sig_update;
+    Signal<ORG*, int&> sig_add_org;            // args: new org, return: offspring pos
+    Signal<ORG*, int, int&> sig_add_org_birth; // args: new org, parent pos, return: offspring pos
 
   public:
     PopulationManager_Plugin(const std::string & _w_name, FIT_MANAGER & _fm)
@@ -228,33 +230,34 @@ namespace evo {
     { ; }
     ~PopulationManager_Plugin() { Clear(); }
 
-    LinkKey OnClear(const std::function<void(emp::vector<ORG*>&)> & fun) {
+    LinkKey OnClear(const std::function<void()> & fun) {
       return sig_clear.AddAction(fun);
     }
-    LinkKey OnUpdate(const std::function<void(emp::vector<ORG*>&)> & fun) {
+    LinkKey OnUpdate(const std::function<void()> & fun) {
       return sig_update.AddAction(fun);
     }
-    LinkKey OnAddOrg(const std::function<void(emp::vector<ORG*>&, ORG*, int&)> & fun) {
+    LinkKey OnAddOrg(const std::function<void(ORG*, int&)> & fun) {
       return sig_add_org.AddAction(fun);
     }
-    LinkKey OnAddOrgBirth(const std::function<void(emp::vector<ORG*>&, ORG*, int, int&)> & fun) {
+    LinkKey OnAddOrgBirth(const std::function<void(ORG*, int, int&)> & fun) {
       return sig_add_org_birth.AddAction(fun);
     }
 
     void Clear() {
-      if (sig_clear.GetNumActions()) sig_clear.Trigger(pop);
+      if (sig_clear.GetNumActions()) sig_clear.Trigger();
       else base_t::Clear();  // If no actions are linked to sig_clear, use default.
     }
-    void Update() { sig_update.Trigger(pop); }
+
+    void Update() { sig_update.Trigger(); }
 
     int AddOrg(ORG * new_org) {
       int new_pos;
-      sig_add_org.Trigger(pop, new_org, new_pos);
+      sig_add_org.Trigger(new_org, new_pos);
       return new_pos;
     }
     int AddOrgBirth(ORG * new_org, int parent_pos) {
       int offspring_pos;
-      sig_add_org_birth.Trigger(pop, new_org, parent_pos, offspring_pos);
+      sig_add_org_birth.Trigger(new_org, parent_pos, offspring_pos);
       return offspring_pos;
     }
   };
@@ -266,7 +269,6 @@ namespace evo {
   class PopulationManager_EA : public PopulationManager_Base<ORG,FIT_MANAGER> {
   protected:
     using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
-    using base_t::pop;
     using base_t::fitM;
 
     emp::vector<ORG *> next_pop;
@@ -338,7 +340,6 @@ namespace evo {
   class PopulationManager_Grid : public PopulationManager_Base<ORG,FIT_MANAGER> {
   protected:
     using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
-    using base_t::pop;
     using base_t::fitM;
     using base_t::random_ptr;
 
@@ -354,25 +355,27 @@ namespace evo {
 
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
+    int GetRandomNeighbor(int id) const {
+      const int offset = random_ptr->GetInt(9);
+      const int rand_x = emp::mod(id%width + offset%3 - 1, width);
+      const int rand_y = emp::mod(id/width + offset/3 - 1, height);
+      return rand_x + rand_y*width;
+    }
 
-    void ConfigPop(int w, int h) { width = w; height = h; pop.resize(width*height, nullptr); }
+    void ConfigPop(int w, int h) { width = w; height = h; base_t::Resize(width*height); }
 
     // Injected orgs go into a random position.
     int AddOrg(ORG * new_org) {
       emp::vector<int> empty_spots = base_t::GetEmptyPopIDs();
       const int pos = (empty_spots.size()) ?
-        empty_spots[ random_ptr->GetUInt(empty_spots.size()) ] : random_ptr->GetUInt(pop.size());
+        empty_spots[ random_ptr->GetUInt(empty_spots.size()) ] :
+        random_ptr->GetUInt(base_t::GetSize());
       return base_t::AddOrgAt(new_org, pos);
     }
 
     // Newly born orgs go next to their parents.
     int AddOrgBirth(ORG * new_org, int parent_pos) {
-      const int offset = random_ptr->GetInt(9);
-      const int offspring_x = emp::mod(parent_pos%width + offset%3 - 1, width);
-      const int offspring_y = emp::mod(parent_pos/width + offset/3 - 1, height);
-      const int pos = offspring_x + offspring_y*width;
-
-      return base_t::AddOrgAt(new_org, pos);
+      return base_t::AddOrgAt(new_org, GetRandomNeighbor(parent_pos));
     }
 
     void Print(std::function<std::string(ORG*)> string_fun, std::ostream& os=std::cout,
@@ -380,7 +383,7 @@ namespace evo {
       emp_assert(string_fun);
       for (int y=0; y<height; y++) {
         for (int x = 0; x<width; x++) {
-          ORG * org = pop[x+y*width];
+          ORG * org = base_t::GetOrg(x+y*width);
           if (org) os << string_fun(org) << spacer;
           else os << empty << spacer;
         }
