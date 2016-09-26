@@ -33,6 +33,7 @@ namespace evo {
 
     pop_t pop;
     FIT_MANAGER & fitM;
+    int num_orgs;
 
     Random * random_ptr;
 
@@ -49,7 +50,7 @@ namespace evo {
     };
 
   public:
-    PopulationManager_Base(const std::string &, FIT_MANAGER & _fm) : fitM(_fm) { ; }
+    PopulationManager_Base(const std::string &, FIT_MANAGER & _fm) : fitM(_fm), num_orgs(0) { ; }
     ~PopulationManager_Base() { Clear(); }
 
     // Allow this and derived classes to be identified as a population manager.
@@ -61,6 +62,7 @@ namespace evo {
     friend class interator_t;
 
     int GetSize() const { return (int) pop.size(); }
+    int GetNumOrgs() const { return num_orgs; }
 
     void SetRandom(Random * r) { random_ptr = r; }
     void Setup(Random * r) { SetRandom(r); }
@@ -70,9 +72,10 @@ namespace evo {
 
     int AddOrgAt(ORG * new_org, int pos) {
       emp_assert(pos < (int) pop.size());   // Make sure we are placing into a legal position.
-      if (pop[pos]) delete pop[pos];
+      if (pop[pos]) { delete pop[pos]; --num_orgs; }
       pop[pos] = new_org;
       fitM.ClearAt(pos);
+      ++num_orgs;
       return pos;
     }
 
@@ -80,12 +83,15 @@ namespace evo {
       const int pos = pop.size();
       pop.push_back(new_org);
       fitM.ClearAt(pos);
+      ++num_orgs;
       return pos;
     }
 
     void SetOrgs(const emp::vector<ORG*> & new_pop) {
       Clear();
       pop = new_pop;
+      num_orgs = 0;
+      for (ptr_t x : pop) if (x) num_orgs++;
     }
 
     // Likewise, Clear and ClearOrgAt are the only ways to remove organisms...
@@ -94,11 +100,12 @@ namespace evo {
       for (ORG * org : pop) if (org) delete org;  // Delete current organisms.
       pop.resize(0);                              // Remove deleted organisms.
       fitM.Clear();                               // Clear the fitness manager cache.
+      num_orgs = 0;
     }
 
     void ClearOrgAt(int pos) {
       // Delete all organisms.
-      if (pop[pos]) delete pop[pos];  // Delete current organisms.
+      if (pop[pos]) { delete pop[pos]; num_orgs--; }  // Delete current organisms.
       fitM.ClearAt(pos);
     }
 
