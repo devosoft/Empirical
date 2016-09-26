@@ -399,11 +399,11 @@ namespace evo {
     using base_t::pop;
     using base_t::fitM;
     using base_t::random_ptr;
+    using base_t::num_orgs;
 
     int pool_count;                            // How many pools are in the population?
     vector<int> pool_sizes;                    // How large is each pool?
     std::map<int, vector<int> > connections;   // Which other pools can each position access?
-    int org_count;                             // How many organisms have beeen inserted into population?
     int r_upper;                               // How large can a random pool size be?
     int r_lower;                               // How small can a random pool size be?
     vector<int> pool_end;                      // Where does the next pool begin? First begins at 0.
@@ -412,8 +412,8 @@ namespace evo {
 
   public:
     PopulationManager_Pools(const std::string & _w_name, FIT_MANAGER & _fm)
-    : base_t(_w_name, _fm), org_count(0) { ; }
-    ~PopulationManager_Pools() { ; }
+      : base_t(_w_name, _fm) {;}
+    ~PopulationManager_Pools() {;}
 
     int GetPoolCount() const { return pool_count; }
     const vector<int> & GetSizes() const { return pool_sizes ; }
@@ -494,22 +494,16 @@ namespace evo {
 
     // Injected orgs go into a random pool.
     int AddOrg(ORG * new_org) {
-      int range_u;
-      int range_l = 0;
+      size_t range_u = pop.size();
+      size_t range_l = 0;
 
-      // Ensure that each pool has at least one organism before adding to old pools.
-      if (org_count < pool_count) {
-        range_u = pool_end[org_count];
-        if (org_count > 0) { range_l = pool_end[org_count-1]; }
-        // @CAO: Shouldn't we just insert the organism in the new pool and return?
-      }
-      else {
-        range_u = (int) pop.size();
+      // If any pools are empty, choose org from the next pool.
+      if (num_orgs < pool_count) {
+        range_u = pool_end[num_orgs];
+        if (num_orgs > 0) { range_l = pool_end[num_orgs-1]; }
       }
 
       const int pos = random_ptr->GetInt(range_l, range_u);
-
-      org_count++;
       return AddOrgAt(new_org, pos);
     }
 
