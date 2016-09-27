@@ -71,6 +71,11 @@ namespace evo {
     void SetRandom(Random * r) { random_ptr = r; }
     void Setup(Random * r) { SetRandom(r); }
 
+    // By default, assume a well-mixed population so random neighbors can be anyone.
+    int GetRandomNeighbor(int id) const {
+      return random_ptr->GetInt(0, pop.size());
+    }
+
     // AddOrgAt, AddOrgAppend, and SetOrgs are the only ways new organisms come into a population
     // (all others go through these)
 
