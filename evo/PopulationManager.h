@@ -6,11 +6,6 @@
 //
 //
 //  Developer notes:
-//  * Rather than deleting organisms outright, run all deletions through a ClearCell function
-//    so that a common signal system can also be run.
-//  * Grids always add injected organisms to empty cells; may have trouble if there are none.
-//  * Population iterators and indexing should either be const OR work with proxies to ensure
-//    that fitness caching and signals are handled correctly.
 //  * Should we do something to link Proxy and iterator; in both cases they represent a position
 //    in the populaiton vector, but iterator can only point to valid cells...
 
@@ -34,8 +29,10 @@ namespace evo {
 
     FIT_MANAGER & fitM;
     int num_orgs;
-
     Random * random_ptr;
+
+  private:
+    pop_t pop;
 
     class Proxy {
     private:
@@ -48,9 +45,6 @@ namespace evo {
       ORG & operator*() const { return *(popM.pop[id]); }
       Proxy & operator=(ORG * new_org) { popM.AddOrgAt(new_org,id); return *this; }
     };
-
-  private:
-    pop_t pop;
 
   public:
     PopulationManager_Base(const std::string &, FIT_MANAGER & _fm) : fitM(_fm), num_orgs(0) { ; }
@@ -202,7 +196,6 @@ namespace evo {
     void resize(int new_size) { Resize(new_size); }
     void clear() { Clear(); }
 
-    // @CAO: these need work to make sure we send correct signals on changes & update fitness cache.
     Proxy operator[](int i) { return Proxy(*this, i); }
     const ptr_t operator[](int i) const { return pop[i]; }
     iterator_t begin() { return iterator_t(this, 0); }
@@ -311,7 +304,6 @@ namespace evo {
   class PopulationManager_SerialTransfer : public PopulationManager_Base<ORG,FIT_MANAGER> {
   protected:
     using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
-    using base_t::pop;
     using base_t::fitM;
 
     int max_size;
@@ -333,7 +325,7 @@ namespace evo {
     void ConfigPop(int m, int b) { max_size = m; bottleneck_size = b; }
 
     int AddOrgBirth(ORG * new_org, int parent_pos) {
-      if ((int) pop.size() >= max_size) {
+      if (base_t::GetSize() >= max_size) {
         base_t::DoBottleneck(bottleneck_size);
         ++num_bottlenecks;
       }
