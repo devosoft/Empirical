@@ -1,5 +1,5 @@
 GCOV_FLAGS = -o0 -g --coverage
-
+CXX = g++-5
 TEST_NAMES = tools geometry evo scholar config
 
 default: test

@@ -14,7 +14,7 @@
 #include "PopulationManager.h"
 #include "EvoStats.h"
 #include "LineageTracker.h"
-#include "visualization_utils.h"
+#include "../web/d3/visualizations.h"
 
 namespace emp{
 namespace evo{
@@ -152,7 +152,8 @@ namespace evo{
        w->OnUpdate(UpdateFun);
     }
 
-    void ConnectVis(web::LineGraph * viz) {
+    template <typename T>
+    void ConnectVis(web::LineGraph<T> * viz) {
       viz_pointers.push_back(viz);
     }
 
@@ -328,7 +329,8 @@ namespace evo{
         fit_fun = fit;
     }
 
-    void ConnectVis(web::LineGraph * viz) {
+    template <typename T>
+    void ConnectVis(web::LineGraph<T> * viz) {
       emp::vector<int> vars;
 
       for (std::string variable : viz->variables) {

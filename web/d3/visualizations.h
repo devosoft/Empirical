@@ -1,22 +1,22 @@
 #ifndef VISUALIZATION_UTILS_H
 #define VISUALIZATION_UTILS_H
 
-#include "../web/web_init.h"
-#include "../web/Animate.h"
-#include "../web/JSWrap.h"
-#include "../config/config.h"
-#include "../tools/BitSet.h"
-#include "../tools/Random.h"
-#include "../tools/stats.h"
-#include "../tools/string_utils.h"
-#include "../tools/FunctionSet.h"
-#include "../tools/const.h"
+#include "../../web/web_init.h"
+#include "../../web/Animate.h"
+#include "../../web/JSWrap.h"
+#include "../../config/config.h"
+#include "../../tools/BitSet.h"
+#include "../../tools/Random.h"
+#include "../../tools/stats.h"
+#include "../../tools/string_utils.h"
+#include "../../tools/FunctionSet.h"
+#include "../../tools/const.h"
 
-#include "../web/d3/selection.h"
-#include "../web/d3/scales.h"
-#include "../web/d3/axis.h"
-#include "../web/d3/svg_shapes.h"
-#include "../web/d3/layout.h"
+#include "../../web/d3/selection.h"
+#include "../../web/d3/scales.h"
+#include "../../web/d3/axis.h"
+#include "../../web/d3/svg_shapes.h"
+#include "../../web/d3/layout.h"
 
 #include <functional>
 #include <algorithm>
@@ -587,7 +587,7 @@ protected:
   double x_margin = 30;
 
   void InitializeVariables() {
-    JSWrap(color_fun, GetID()+"color_fun");
+    JSWrap(color_fun_node, GetID()+"color_fun_node");
     JSWrap(tooltip_display, GetID()+"tooltip_display");
 
     data = new D3::JSONDataset();
@@ -619,15 +619,15 @@ public:
   D3::ToolTip * tip;
   D3::JSONDataset * data;
 
-  std::function<std::string(TreeNode, int, int)> color_fun = [](TreeNode d, int i, int k){
+  std::function<std::string(TreeNode, int)> color_fun_node = [](TreeNode d, int i){
     return "black";
   };
 
-  std::function<std::string(TreeEdge, int, int)> color_fun_link = [this](TreeEdge d, int i, int k){
+  std::function<std::string(TreeEdge, int)> color_fun_link = [this](TreeEdge d, int i){
     return "black";
   };
 
-  std::function<std::string(TreeNode, int, int)> tooltip_display = [](TreeNode d, int i, int k) {
+  std::function<std::string(TreeNode, int)> tooltip_display = [](TreeNode d, int i) {
     return "Name: " + to_string(d.name());
   };
 
@@ -661,7 +661,7 @@ public:
   virtual void DrawTree() {
     D3::Selection nodeEnter = tree.GenerateNodesAndLinks(*GetSVG())[0];
     nodeEnter.Append("circle").SetAttr("r", 2).AddToolTip(*tip);
-    GetSVG()->SelectAll("g.node").SelectAll("circle").SetStyle("fill", GetID()+"color_fun");
+    GetSVG()->SelectAll("g.node").SelectAll("circle").SetStyle("fill", GetID()+"color_fun_node");
     GetSVG()->SelectAll(".link").SetStyle("stroke", GetID()+"color_fun_link");
   }
 
@@ -744,7 +744,7 @@ public:
     EMP_BUILD_INTROSPECTIVE_TUPLE( int, loc)
   };
 
-  std::function<std::string(TreeNode, int, int)> color_fun = [this](TreeNode d, int i, int k){
+  std::function<std::string(TreeNode, int, int)> color_fun_node = [this](TreeNode d, int i, int k){
     if (d.loc() < 0) {
       return std::string("black");
     }
@@ -799,7 +799,7 @@ public:
   };
 
   std::function<std::string(TreeEdge, int, int)> color_fun_link = [this](TreeEdge d, int i, int k){
-    return this->color_fun(d.source(),0,0);
+    return this->color_fun_node(d.source(),0,0);
   };
 
   std::function<std::string(TreeNode, int, int)> tooltip_display = [this](TreeNode d, int i, int k) {
@@ -837,7 +837,7 @@ public:
 
   virtual void Setup() {
     TreeVisualization::Setup();
-    JSWrap(color_fun, GetID()+"color_fun");
+    JSWrap(color_fun_node, GetID()+"color_fun_node");
     JSWrap(dark_color_fun, GetID()+"dark_color_fun");
     JSWrap(color_fun_link, GetID()+"color_fun_link");
     JSWrap(tooltip_display, GetID()+"tooltip_display");
@@ -858,8 +858,8 @@ public:
 
     legend.SelectAll("rect").Data(legend_data)
                             .EnterAppend("rect")
-                            .SetStyle("fill", GetID()+"color_fun")
-                            .SetStyle("stroke", GetID()+"color_fun")
+                            .SetStyle("fill", GetID()+"color_fun_node")
+                            .SetStyle("stroke", GetID()+"color_fun_node")
                             .SetStyle("stroke-width", 1)
                             .SetAttr("width", legend_cell_size)
                             .SetAttr("height", legend_cell_size)

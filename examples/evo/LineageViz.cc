@@ -20,7 +20,7 @@
 #include "../../evo/OEE.h"
 #include "../../evo/World.h"
 #include "../../evo/StatsManager.h"
-#include "../../evo/visualization_utils.h"
+#include "../../web/d3/visualizations.h"
 #include "../../evo/evo_animation.h"
 
 #include <iostream>

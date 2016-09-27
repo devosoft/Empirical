@@ -14,7 +14,7 @@
 #include "../../web/JSWrap.h"
 #include "../../web/emfunctions.h"
 
-#include "../../evo/visualization_utils.h"
+#include "../../web/d3/visualizations.h"
 #include "../../evo/evo_animation.h"
 #include "../../evo/NK-const.h"
 #include "../../evo/OEE.h"

@@ -6,6 +6,7 @@
 #include "d3_init.h"
 
 #include "../../web/JSWrap.h"
+#include "../../web/js_utils.h"
 #include "../../tools/string_utils.h"
 
 namespace D3 {
@@ -188,6 +189,17 @@ namespace D3 {
       D3_CALLBACK_FUNCTION_2_ARGS(d3.csv.parseRows, contents.c_str(),	\
 				  accessor.c_str())
 	}
+
+    /// Put the last row of the array into arr
+    template <std::size_t N, typename T>
+    void GetLastRow(std::array<T, N> & arr) {
+      EM_ASM_ARGS({
+        emp_i.__outgoing_array = js.objects[$0][js.objects[$0].length - 1];
+        console.log(emp_i.__outgoing_array);
+      }, GetID());
+      emp::pass_array_to_cpp(arr);
+      std::cout << emp::to_string(arr) << std::endl;
+    }
 
     //TODO Format and FormatRows
 

@@ -201,7 +201,7 @@ namespace emp {
   }
 
 
-  // Pop a segment from the beginning of a string as another string, shortening original.
+  /// Pop a segment from the beginning of a string as another string, shortening original.
   static inline std::string string_pop_fixed(std::string & in_string, std::size_t end_pos, int delim_size=0)
   {
     std::string out_string = "";
@@ -218,7 +218,7 @@ namespace emp {
     return out_string;
   }
 
-  // Get a segment from the beginning of a string as another string, leaving original untouched.
+  /// Get a segment from the beginning of a string as another string, leaving original untouched.
   static inline std::string string_get_range(const std::string & in_string, std::size_t start_pos,
                                              std::size_t end_pos) {
     if (end_pos == std::string::npos) end_pos = in_string.size() - start_pos;
@@ -339,6 +339,8 @@ namespace emp {
     return result;
   }
 
+  /// @cond TEMPLATES
+
   // The next functions are not efficient, but they will take any number of inputs and
   // dynamically convert them all into a single, concatanated strings or stringstreams.
 
@@ -386,6 +388,11 @@ namespace emp {
     }
   }
 
+  /// @endcond
+
+  /// This function does its very best to convert everything it's to a string. Takes any number
+  /// of arguments and returns a single string containing all of them concatenated. Objects can be
+  /// any normal (POD) data type, container, or anything that can be passed into a stringstream.
   template <typename... ALL_TYPES>
   inline std::string to_string(ALL_TYPES... all_values) {
     return internal::to_string_impl(true, std::forward<ALL_TYPES>(all_values)...);

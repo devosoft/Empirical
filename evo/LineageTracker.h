@@ -23,7 +23,7 @@
 #include <algorithm>
 #include "../tools/vector.h"
 #include "PopulationManager.h"
-#include "visualization_utils.h"
+#include "../web/d3/visualizations.h"
 
 template <typename org_ptr>
 struct Node {
@@ -73,7 +73,7 @@ namespace evo{
     using org_ptr = typename POP_MANAGER::value_type;
     using ORG = typename std::remove_pointer<org_ptr>::type;
     static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
-    emp::vector<web::LineageVisualization*> viz_pointers;
+    emp::vector<web::TreeVisualization*> viz_pointers;
 
   public:
     std::unordered_map<int, Node<org_ptr> > nodes;
@@ -265,7 +265,7 @@ namespace evo{
       return genome_group;
     }
 
-    void ConnectVis(web::LineageVisualization * viz_pointer) {
+    void ConnectVis(web::TreeVisualization * viz_pointer) {
       viz_pointers.push_back(viz_pointer);
     }
 
@@ -332,6 +332,7 @@ namespace evo{
     using LineageTracker<POP_MANAGER>::ConnectVis;
     int last_coalesence = 0;
     using LineageTracker<POP_MANAGER>::emp_is_lineage_manager;
+    // Add WriteDataToFile
     LineageTracker_Pruned() {;}
 
     template <typename WORLD>

@@ -1,7 +1,7 @@
 #ifndef D3_INIT_H
 #define D3_INIT_H
 
-#include "..//web_init.h"
+#include "../web_init.h"
 #include "../../tools/errors.h"
 #include "utils.h"
 

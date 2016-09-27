@@ -18,7 +18,7 @@
 #include <algorithm>
 
 #include "NK.h"
-#include "visualization_utils.h"
+#include "../web/d3/visualizations.h"
 #include "World.h"
 #include "NKConfig.h"
 
