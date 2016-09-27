@@ -107,54 +107,56 @@ public:
 
   virtual void Setup(){;}
 
+  /*
   virtual void AnimateStep(...){;}
   virtual void AnimateStep(emp::vector<double>){;}
   virtual void AnimateStep(int update, emp::vector<double>){;}
   virtual void AnimateStep(int parent, int offspring){;}
+  */
 };
 
-class FitnessVisualization : public D3Visualization {
+class DotPlot : public D3Visualization {
 private:
   double margin = 10;
   double axis_width = 40;
-  double fitness_growth_margin = 1.5;
-  double fitness_loss_margin = .8;
+  double value_growth_margin = 1.5;
+  double value_loss_margin = .8;
 public:
   D3::LinearScale * x_scale;
-  D3::LinearScale * fitness_scale;
+  D3::LinearScale * y_scale;
   D3::Axis<D3::LinearScale> * ax;
   D3::Selection * circles;
   D3::ToolTip * tip;
 
   std::function<double(double, int, int)> scaled_d = [&](double d, int i, int k){
-      return fitness_scale->ApplyScale(d);
+      return y_scale->ApplyScale(d);
   };
 
   std::function<double(double, int, int)> scaled_i = [&](double d, int i, int k){
       return x_scale->ApplyScale(i);
   };
 
-  FitnessVisualization(int w=500, int h=500) : D3Visualization(w, h){;}
+  DotPlot(int w=500, int h=500) : D3Visualization(w, h){;}
 
   void Setup(){
 
     D3::Selection * svg = GetSVG();
 
-    double lowest = 10;//*(std::min_element(fitnesses.begin(), fitnesses.end()));
-    double highest = 20;//*(std::max_element(fitnesses.begin(), fitnesses.end()));
+    double lowest = 10;//*(std::min_element(values.begin(), values.end()));
+    double highest = 20;//*(std::max_element(values.begin(), values.end()));
     double x_max = 100;
 
     //Set up scales
-    fitness_scale = new D3::LinearScale();
+    y_scale = new D3::LinearScale();
     x_scale = new D3::LinearScale();
-    fitness_scale->SetDomain(std::array<double, 2>({highest*fitness_growth_margin, lowest*fitness_loss_margin}));
-    fitness_scale->SetRange(std::array<double, 2>({margin, GetHeight() - margin}));
+    y_scale->SetDomain(std::array<double, 2>({highest*value_growth_margin, lowest*value_loss_margin}));
+    y_scale->SetRange(std::array<double, 2>({margin, GetHeight() - margin}));
     x_scale->SetDomain(std::array<double, 2>({0, x_max}));
     x_scale->SetRange(std::array<double, 2>({axis_width, GetHeight()-margin}));
 
     //Set up axis
     ax = new D3::Axis<D3::LinearScale>();
-    ax->SetScale(*fitness_scale);
+    ax->SetScale(*y_scale);
     ax->SetOrientation("right");
     ax->Draw(*svg);
 
@@ -164,26 +166,27 @@ public:
     this->pending_funcs.Run();
   }
 
-  virtual void AnimateStep(int update, emp::vector<double> fitnesses){
-      //Draw circles that represent fitnesses
-      circles = new D3::Selection(GetSVG()->SelectAll("circle").Data(fitnesses));
+  virtual void AnimateStep(int update, emp::vector<double> values){
+      //Draw circles that represent values
+      circles = new D3::Selection(GetSVG()->SelectAll("circle").Data(values));
       circles->EnterAppend("circle");
       circles->ExitRemove();
       circles->SetAttr("r", 5);
       circles->SetAttr("cx", GetID()+"scaled_i");
       circles->SetAttr("cy", GetID()+"scaled_d");
-      circles->SetStyle("fill", "green");
 
      // circles->AddToolTip(tip);
 
-      circles = new D3::Selection(circles->Data(fitnesses));
+      circles = new D3::Selection(circles->Data(values));
       circles->MakeTransition().SetAttr("cy", GetID()+"scaled_d");
   }
 
 };
 
+template <typename DATA_TYPE = std::array<double, 2> >
 class LineGraph : public D3Visualization {
-private:
+protected:
+  // Formatting constants
   double y_margin = 10;
   double x_margin = 30;
   double axis_width = 60;
@@ -192,77 +195,86 @@ private:
   double x_min = 1000;
   double x_max = 0;
 
-public:
-
+  // Components of the graph
   D3::LinearScale * x_scale;
   D3::LinearScale * y_scale;
   D3::Axis<D3::LinearScale> * x_axis;
   D3::Axis<D3::LinearScale> * y_axis;
+  D3::LineGenerator * line_gen;
+  D3::ToolTip * tip;
+  // In case we need to store a dataset
+  D3::CSVDataset * dataset;
+
+  // Containers to keep track of data state
+  std::deque<DATA_TYPE> data;
+  DATA_TYPE prev_data  = {-1,-1};
+
+  // Callback functions for accessing and scaling data
+
+  //Callback function for getting unscaled x value of data point (used as key function for data binding)
+  std::function<double(DATA_TYPE)> return_x = [](DATA_TYPE d){ return d[0]; };
+
+  //Callback function for getting unscaled x value of data point (used as key function for data binding)
+  std::function<double(DATA_TYPE)> return_y = [](DATA_TYPE d){ return d[1]; };
 
   //Callback function for taking a datapoint and getting appropriately scaled y val
-  std::function<double(std::array<double, 2>)> y = [this](std::array<double, 2> d){
-      return y_scale->ApplyScale(d[1]);
+  std::function<double(DATA_TYPE)> y = [this](DATA_TYPE d){
+      return y_scale->ApplyScale(this->return_y(d));
   };
 
   //Callback function for taking a datapoint and getting appropriately scaled x val
-  std::function<double(std::array<double,2>)> x = [this](std::array<double, 2> d){
-      return x_scale->ApplyScale(d[0]);
-  };
-
-  //Callback function for getting unscaled x value of data point (used as key function for data binding)
-  std::function<double(std::array<double,2>, int)> return_x = [&](std::array<double, 2> d, int i){
-      return d[0];
-  };
-
-  //Callback function for getting unscaled x value of data point (used as key function for data binding)
-  std::function<double(std::array<double,2>, int)> return_y = [&](std::array<double, 2> d, int i){
-      return d[1];
+  std::function<double(DATA_TYPE)> x = [this](DATA_TYPE d){
+      return x_scale->ApplyScale(this->return_x(d));
   };
 
   //Callback function for drawing data after rescale animation
-  std::function<void(int, int, int)> draw_data = [this](int i, int j, int k) {
+  std::string draw_data_callback = "";
+  std::function<void()> draw_data = [this]() {
     DrawData(true);
   };
 
-  //Format function for tooltip
-  D3::FormatFunction rounded = D3::FormatFunction(".2f");
 
-  //Function telling tooltip how to display a data point
-  std::function<std::string(std::array<double, 2>, int, int)> tooltip_display =
-                                       [this](std::array<double, 2> d, int i, int k) {
-                                         return to_string(rounded(d[1]));
-                                     };
+public:
 
-  LineGraph(std::string y_var="", std::string x_var="", int w=800, int h=400) : D3Visualization(w, h){
+  LineGraph(std::string x_var="", std::string y_var="", int w=800, int h=400) : D3Visualization(w, h){
     this->variables.push_back(x_var);
     this->variables.push_back(y_var);
   }
 
-  std::deque<std::array<std::array<double, 2>, 1> > data;
-  std::array<std::array<double, 2>, 1> prev_data  = std::array<std::array<double, 2>, 1>({std::array<double, 2>({-1,-1})});
-  D3::LineGenerator * make_line;
+  ~LineGraph() {
+    delete x_scale;
+    delete y_scale;
+    delete x_axis;
+    delete y_axis;
+    delete line_gen;
+    delete tip;
+    delete dataset;
+  }
 
-  D3::ToolTip* tip;
-  D3::Transition t;
+  /// Helper function for formatting numbers in the tooltip
+  /// To change the format, simply replaces this with a new D3::FormatFunction
+  D3::FormatFunction format_data = D3::FormatFunction(".2f");
 
-  // In case we need to store a dataset
-  D3::CSVDataset dataset;
+  /// Function telling tooltip how to display a data point
+  /// The returned string must be html, which will be displayed in the tooltip.
+  /// To change the appearance of the tooltip, change this function.
+  std::function<std::string(DATA_TYPE)> tooltip_display = [this](DATA_TYPE d) {
+                                         return to_string(format_data(return_y(d)));
+                                     };
 
+  /// Initializes the graph. This function is called automatically when the
+  /// emp::Document this has been added to is ready.
   virtual void Setup(){
     D3::Selection * svg = GetSVG();
 
     //Wrap ncessary callback functions
     JSWrap(tooltip_display, GetID()+"tooltip_display");
-    JSWrap(x, GetID()+"x");
-    JSWrap(y, GetID()+"y");
-    JSWrap(return_x, GetID()+"return_x");
-    JSWrap(return_y, GetID()+"return_y");
     JSWrap(draw_data, GetID()+"draw_data");
-
 
     //Create tool tip
     tip = new D3::ToolTip(GetID()+"tooltip_display");
     GetSVG()->SetupToolTip(*tip);
+
     //Set up scales
     y_scale = new D3::LinearScale();
     x_scale = new D3::LinearScale();
@@ -278,34 +290,148 @@ public:
     y_axis->SetScale(*y_scale);
     D3::DrawAxes(*x_axis, *y_axis, *svg);
 
-    make_line = new D3::LineGenerator();
-    make_line->SetX(GetID()+"x");
-    make_line->SetY(GetID()+"y");
+    line_gen = new D3::LineGenerator();
+
+    // Set up accessors (for retriving coords from data points)
+    SetXAccessor(return_x);
+    SetYAccessor(return_y);
+
+    dataset = new D3::CSVDataset();
+
+    // In case functions were called before initilization
     init = true;
     this->pending_funcs.Run();
-    std::cout << "ending setup" << std::endl;
   }
 
-  std::function<void(int)> DrawMultiplePoints = [this](int d) {
-    std::cout << "Drawing points" << std::endl;
+  D3::LinearScale * GetXScale() {return x_scale;}
+  D3::LinearScale * GetYScale() {return y_scale;}
+  D3::Axis<D3::LinearScale> * GetXAxis() {return x_axis;}
+  D3::Axis<D3::LinearScale> * GetYAxis() {return y_axis;}
+  D3::LineGenerator * GetLineGenerator() {return line_gen;}
+  D3::CSVDataset GetDataset() {return dataset;}
+  std::function<double(DATA_TYPE)> GetXAccessor() {return return_x;}
+  std::function<double(DATA_TYPE)> GetYAccessor() {return return_y;}
+  std::function<double(DATA_TYPE)> GetScaledX() {return x;}
+  std::function<double(DATA_TYPE)> GetScaledY() {return y;}
 
+  void SetXScale(D3::LinearScale * scale) {x_scale = scale;}
+  void SetYScale(D3::LinearScale * scale) {y_scale = scale;}
+  void SetXAxis(D3::Axis<D3::LinearScale> * ax) {x_axis = ax;}
+  void SetYAxis(D3::Axis<D3::LinearScale> * ax) {y_axis = ax;}
+  void SetLineGenerator(D3::LineGenerator * line) {line_gen = line;}
+  void SetDataset(D3::CSVDataset * d) {dataset = d;}
+
+  /// @cond TEMPLATES
+  template <typename T>
+  typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+  SetXAccessor(T func) {
+    return_x = func;
+    JSWrap(return_x, GetID()+"return_x");
+    JSWrap(x, GetID()+"x");
+    line_gen->SetX(GetID()+"x");
+  }
+  /// @endcond
+
+  /// Set the function that is used to get the x variable from within a DATA_TYPE object.
+  /// For instance, the default accessor assumes that DATA_TYPE is an array with two elements
+  /// (x, y): `[](DATA_TYPE d) {return d[0];}`
+  /// This accessor will be fed into the x_scale to get x values scaled to the plotting area.
+  /// Can be a string represnting the name of a function in Javascript (can be in the current
+  /// window, the emp namespace, or the d3 namespace)
+
+  void SetXAccessor(std::string func) {
+    return_x = [](DATA_TYPE d){
+      return EM_ASM_DOUBLE({
+        var func_string = Pointer_stringify($0);
+        if (typeof window[func_string] === function) {
+          func_string = window[func_string];
+        } else if (typeof window["emp"][func_string] === function) {
+          func_string = window["emp"][func_string];
+        } else if (typeof window["d3"][func_string] === function) {
+          func_string = window["d3"][func_string];
+        }
+        return func_string();
+      }, d);
+    };
+
+    JSWrap(return_x, GetID()+"return_x");
+    JSWrap(x, GetID()+"x");
+    line_gen->SetX(GetID()+"x");
+  }
+
+  /// @cond TEMPLATES
+  template <typename T>
+  typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+  SetYAccessor(T func) {
+    return_y = func;
+    JSWrap(return_y, GetID()+"return_y");
+    JSWrap(y, GetID()+"y");
+    line_gen->SetY(GetID()+"y");
+  }
+  /// @endcond
+
+  /// Set the function that is used to get the y variable from within a DATA_TYPE object.
+  /// For instance, the default accessor assumes that DATA_TYPE is an array with two elements
+  /// (x, y): `[](DATA_TYPE d) {return d[1];}`
+  /// This accessor will be fed into the y_scale to get y values scaled to the plotting area.
+  /// Can be a string represnting the name of a function in Javascript (can be in the current
+  /// window, the emp namespace, or the d3 namespace)
+  void SetYAccessor(std::string func) {
+    return_y = [](DATA_TYPE d){
+      return EM_ASM_DOUBLE({
+        var func_string = Pointer_stringify($0);
+        if (typeof window[func_string] === function) {
+          func_string = window[func_string];
+        } else if (typeof window["emp"][func_string] === function) {
+          func_string = window["emp"][func_string];
+        } else if (typeof window["d3"][func_string] === function) {
+          func_string = window["d3"][func_string];
+        }
+
+        return func_string();
+      }, d);
+    };
+    JSWrap(return_y, GetID()+"return_y");
+    JSWrap(y, GetID()+"y");
+    line_gen->SetY(GetID()+"y");
+  }
+
+  /// @cond TEMPLATES
+  template <typename T>
+  typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+  SetDrawCallback(T func) {
+    emp::JSWrap(func, GetID()+"draw_data_callback");
+    draw_data_callback = GetID()+"draw_data_callback";
+  }
+  /// @endcond
+
+  /// This callback function will be called every time data is done being drawn.
+  /// Can be a string represnting the name of a function in Javascript (can be in the current
+  /// window, the emp namespace, or the d3 namespace)
+  void SetDrawCallback(std::string func) {
+    draw_data_callback = func;
+  }
+
+  /// Draw points and lines for data in this object's dataset object
+  // Needs to be a std::function object or else JSWrap complains
+  std::function<void()> DrawPointsFromDataset = [this]() {
+
+    // Adjust axes
     x_min = std::min(EM_ASM_DOUBLE({
         return d3.min(js.objects[$0], window["emp"][Pointer_stringify($1)+"return_x"]);
-    }, dataset.GetID(), this->GetID().c_str()), x_min);
+    }, dataset->GetID(), this->GetID().c_str()), x_min);
 
     x_max = std::max(EM_ASM_DOUBLE({
         return d3.max(js.objects[$0], window["emp"][Pointer_stringify($1)+"return_x"]);
-    }, dataset.GetID(), this->GetID().c_str()), x_max);
+    }, dataset->GetID(), this->GetID().c_str()), x_max);
 
     y_min = std::min(EM_ASM_DOUBLE({
         return d3.min(js.objects[$0], window["emp"][Pointer_stringify($1)+"return_y"]);
-    }, dataset.GetID(), this->GetID().c_str()), y_min);
+    }, dataset->GetID(), this->GetID().c_str()), y_min);
 
     y_max = std::max(EM_ASM_DOUBLE({
         return d3.max(js.objects[$0], window["emp"][Pointer_stringify($1)+"return_y"]);
-    }, dataset.GetID(), this->GetID().c_str()), y_max);
-
-    std::cout << x_min << " " << x_max << " " << y_min << " " << y_max << std::endl;
+    }, dataset->GetID(), this->GetID().c_str()), y_max);
 
     y_scale->SetDomain(std::array<double, 2>({y_max, y_min}));
     x_scale->SetDomain(std::array<double, 2>({x_min, x_max}));
@@ -313,38 +439,44 @@ public:
     y_axis->Rescale(y_max, y_min, *GetSVG());
     x_axis->Rescale(x_min, x_max, *GetSVG());
 
+    // Bind data and update graphics
     D3::Selection update = GetSVG()->SelectAll(".data-point")
-                                  .Data(dataset, GetID()+"return_x");
+                                    .Data(*dataset, GetID()+"return_x");
     update.EnterAppend("circle");
     update.SetAttr("cy", GetID()+"y")
           .SetAttr("cx", GetID()+"x")
           .SetAttr("r", 2)
           .SetAttr("class", "data-point")
-          .SetStyle("fill", "green")
           .BindToolTipMouseover(*tip);
 
-    D3::Selection line = make_line->DrawShape(dataset, *GetSVG());
+    D3::Selection line = line_gen->DrawShape(*dataset, *GetSVG());
     line.SetAttr("fill", "none")
-        .SetAttr("stroke", "green")
         .SetAttr("stroke-width", 1)
+        .SetAttr("stroke", "black")
         .SetAttr("class", "line-seg");
 
+    // Set prev_data appropriately
+    dataset->GetLastRow(prev_data);
+    EM_ASM_ARGS({window["emp"][Pointer_stringify($0)]()}, draw_data_callback.c_str());
   };
 
+  /// Load data from the file at [filename]. Expected to be a CSV dataset
   void LoadDataFromFile(std::string filename) {
-    emp::JSWrap(DrawMultiplePoints, "draw");
+    emp::JSWrap(DrawPointsFromDataset, "draw");
+
     if (this->init) {
-      dataset.LoadDataFromFile(filename, "draw", false);
+      dataset->LoadDataFromFile(filename, "draw", false);
+
     } else {
       this->pending_funcs.Add([this, filename](){
-          dataset.LoadDataFromFile(filename, "draw", false);
+          dataset->LoadDataFromFile(filename, "draw", false);
       });
     }
-    std::cout << "loaddata done" << std::endl;
   }
 
-  virtual void AnimateStep(emp::vector<double> data_point) {
-    data.push_back(std::array<std::array<double, 2>, 1>({data_point[0], data_point[1]}));
+  /// Smoothly (i.e. with animation) add data_point to the graph
+  void AddDataPoint(DATA_TYPE data_point) {
+    data.push_back(data_point);
     D3::Selection * svg = GetSVG();
 
     if (data_point[1] > y_max || data_point[1] < y_min
@@ -364,8 +496,7 @@ public:
         x_max += .2;
       }
 
-
-      t = svg->MakeTransition();
+      D3::Transition t = svg->MakeTransition();
       y_axis->Rescale(y_max, y_min, t);
       x_axis->Rescale(x_min, x_max, t);
 
@@ -377,6 +508,8 @@ public:
     }
   }
 
+  /// Redraws all data on the given selection or transition, which should contain an SVG canvas.
+  /// Useful if you've adjusted scales.
   template <typename T>
   void Redraw(D3::SelectionOrTransition<T> & s) {
     s.SelectAll(".data-point").SetAttr("cy", GetID()+"y");
@@ -384,56 +517,53 @@ public:
 
     EM_ASM_ARGS({
       circle_data = js.objects[$0].selectAll(".data-point").data();
-      path_data = [];
-      for (iter=0; iter<circle_data.length-1; iter++){
-        path_data.push(js.objects[$1]([[emp[Pointer_stringify($3)+"x"](circle_data[iter],0,0), emp[Pointer_stringify($3)+"y"](circle_data[iter],0,0)],
-                     [emp[Pointer_stringify($3)+"x"](circle_data[iter+1],0,0), emp[Pointer_stringify($3)+"y"](circle_data[iter+1],0,0)]]));
-      }
-      js.objects[$0].selectAll(".line-seg").data(path_data);
-      js.objects[$2].selectAll(".line-seg").attr("d", function(d){return d;});
-    }, GetSVG()->GetID(), make_line->GetID(), s.GetID(), this->GetID().c_str());
+      js.objects[$0].selectAll(".line-seg").data([circle_data]);
+      js.objects[$2].selectAll(".line-seg").attr("d", function(d){return js.objects[$1](d);});
+    }, GetSVG()->GetID(), line_gen->GetID(), s.GetID());
   }
 
   void DrawData(bool backlog = false) {
 
     //If there's a backlog, then we're only allowed to clear it if this
-    //was called recursively or from jacascript (since javascript handles)
+    //was called recursively or from javascript (since javascript handles)
     //using this as a callback to asynchronous stuff)
     if ((!backlog && data.size() > 1) || data.size() == 0){
+      //EM_ASM_ARGS({window["emp"][Pointer_stringify($0)]()}, draw_data_callback.c_str());
       return;
     }
 
     //We can't draw a line on the first update
-    if (prev_data[0][0] >=0 ){
-      std::array<std::array<double, 2>, 2> line_data;
-      prev_data[0][0] = x(prev_data[0]);
-      prev_data[0][1] = y(prev_data[0]);
-      line_data[0] = prev_data[0];
+    if (prev_data[0] >= 0 ){
+      std::array<DATA_TYPE, 2> line_data;
+      line_data[0] = prev_data;
+      line_data[1] = data[0];
 
-      std::array<std::array<double, 2>, 1> new_data;
-      new_data = data[0];
-      new_data[0][0] = x(new_data[0]);
-      new_data[0][1] = y(new_data[0]);
-      line_data[1] = new_data[0];
-
-      D3::Selection line = make_line->DrawShape(line_data, *GetSVG());
+      D3::Selection line = line_gen->DrawShape(line_data, *GetSVG());
       line.SetAttr("fill", "none");
-      line.SetAttr("stroke", "green");
       line.SetAttr("stroke-width", 1);
+      line.SetAttr("stroke", "black");
       line.SetAttr("class", "line-seg");
     }
 
-    D3::Selection enter = GetSVG()->SelectAll(".data-point").Data(data[0], GetID()+"return_x").EnterAppend("circle");
+    // If it isn't nested, D3 will think it's 2 separate points
+    std::array<DATA_TYPE, 1> new_point = {data[0]};
+
+    D3::Selection enter = GetSVG()->SelectAll(".data-point").Data(new_point, GetID()+"return_x").EnterAppend("circle");
     enter.SetAttr("cy", GetID()+"y");
     enter.SetAttr("cx", GetID()+"x");
     enter.SetAttr("r", 2);
     enter.SetAttr("class", "data-point");
-    enter.SetStyle("fill", "green");
     enter.BindToolTipMouseover(*tip);
     prev_data = data[0];
     data.pop_front();
+
     if (data.size() > 0) {
       DrawData(true);
+    }
+
+    // Call callback
+    if (data.size() == 0) {
+      EM_ASM_ARGS({window["emp"][Pointer_stringify($0)]()}, draw_data_callback.c_str());
     }
   }
 
@@ -447,84 +577,68 @@ public:
     y_max = 0;
     x_min = 0;
     x_max = 0;
-    prev_data  = {{-1,-1}};
+    prev_data  = {-1,-1};
   }
 };
 
-class LineageVisualization : public D3Visualization {
+class TreeVisualization : public D3Visualization {
 protected:
   double y_margin = 10;
   double x_margin = 30;
 
-public:
-
-  struct LineageTreeNode {
-    EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
-                                   double, y,
-                                   int, name,
-				                   int, parent,
-                                   int, depth,
-                                   std::string, genome,
-                                   int, loc,
-                                   bool, alive,
-                                   bool, persist
-                                )
-  };
-
-
-  struct LineageTreeEdge {
-    EMP_BUILD_INTROSPECTIVE_TUPLE( LineageTreeNode, source,
-                                     LineageTreeNode, target)
-  };
-
-  D3::TreeLayout<LineageTreeNode> tree;
-  D3::JSObject alive;
-  D3::ToolTip * tip;
-  D3::JSONDataset * data;
-
-  int next_pos;
-  int next_parent = 0;
-  int next_child;
-  std::string next_genome;
-
-  std::function<std::string(LineageTreeNode, int, int)> color_fun = [](LineageTreeNode d, int i, int k){
-    if (d.alive()){
-      return "red";
-    } else if (d.persist()) {
-      return "blue";
-    } else {
-      return "black";
-    }
-  };
-
-  std::function<std::string(LineageTreeEdge, int, int)> color_fun_link = [this](LineageTreeEdge d, int i, int k){
-    return "black";
-  };
-
-  std::function<std::string(LineageTreeNode, int, int)> tooltip_display = [](LineageTreeNode d, int i, int k) {
-    return "Name: " + to_string(d.name()) + "<br>Genome: " + to_string(d.genome());
-  };
-
-  LineageVisualization(int width, int height) : D3Visualization(width, height){variables.push_back("Persist");}
-
-  virtual void Setup() {
+  void InitializeVariables() {
     JSWrap(color_fun, GetID()+"color_fun");
     JSWrap(tooltip_display, GetID()+"tooltip_display");
 
     data = new D3::JSONDataset();
     tip = new D3::ToolTip(GetID()+"tooltip_display");
     GetSVG()->Move(0,0);
-    data->Append(std::string("{\"name\": 0, \"parent\": \"null\", \"alive\":false, \"loc\": -1, \"persist\":false, \"genome\":\"none\", \"children\" : []}"));
+    data->Append(std::string("{\"name\": 0, \"parent\": \"null\" \"children\" : []}"));
     tree.SetDataset(data);
     tree.SetSize(GetHeight(), GetWidth());
+  }
 
-    EM_ASM_ARGS({
-      js.objects[$0] = [js.objects[$1][0]];
-    }, alive.GetID(), data->GetID());
+public:
 
+  struct TreeNode {
+    EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
+                                   double, y,
+                                   int, name,
+				                   int, parent,
+                                   int, depth
+                                )
+  };
+
+
+  struct TreeEdge {
+    EMP_BUILD_INTROSPECTIVE_TUPLE( TreeNode, source,
+                                     TreeNode, target)
+  };
+
+  D3::TreeLayout<TreeNode> tree;
+  D3::ToolTip * tip;
+  D3::JSONDataset * data;
+
+  std::function<std::string(TreeNode, int, int)> color_fun = [](TreeNode d, int i, int k){
+    return "black";
+  };
+
+  std::function<std::string(TreeEdge, int, int)> color_fun_link = [this](TreeEdge d, int i, int k){
+    return "black";
+  };
+
+  std::function<std::string(TreeNode, int, int)> tooltip_display = [](TreeNode d, int i, int k) {
+    return "Name: " + to_string(d.name());
+  };
+
+  TreeVisualization(int width, int height) : D3Visualization(width, height){variables.push_back("Persist");}
+
+  virtual void Setup() {
+    InitializeVariables();
     this->init = true;
     this->pending_funcs.Run();
   }
+
 
   void LoadDataFromFile(std::string filename) {
     if (this->init) {
@@ -538,29 +652,9 @@ public:
     }
   }
 
-  virtual void AnimateStep(emp::vector<double> persist) {
-
-    for (double val : persist) {
-      (void) val;
-      EM_ASM_ARGS({
-        js.objects[$1](js.objects[$0][0], $2).persist = true;
-      }, data->GetID(), data->FindInHierarchy.GetID(), val);
-
-    }
-  }
-
   virtual void AnimateStep(int parent, int child){
-    std::string child_json = std::string("{\"name\":" + to_string(child) + ", \"parent\":" + to_string(parent) + ", \"alive\":true, \"loc\":" + to_string(next_pos) + ", \"persist\":false, \"genome\":\"" + next_genome + "\", \"children\":[]}");
-    int pos = data->AppendNestedFromList(child_json, alive);
-    (void) pos;
-
-    EM_ASM_ARGS({
-        while (js.objects[$0].length < $1 + 1) {
-          js.objects[$0].push(-1);
-        }
-        js.objects[$0][$1].alive = false;
-        js.objects[$0][$1] = js.objects[$0][$2].children[js.objects[$0][$2].children.length-1];
-    }, alive.GetID(), next_pos, pos);
+    std::string child_json = std::string("{\"name\":" + to_string(child) + ", \"parent\":" + to_string(parent) + ", \"children\":[]}");
+    data->AppendNested(child_json);
     DrawTree();
   }
 
@@ -571,20 +665,56 @@ public:
     GetSVG()->SelectAll(".link").SetStyle("stroke", GetID()+"color_fun_link");
   }
 
+};
+
+class TreeVisualizationReplacement : public TreeVisualization {
+public:
+
+  int next_pos;
+  int next_parent = 0;
+  int next_child;
+   D3::JSObject possible_parents;
+
+  TreeVisualizationReplacement(int width, int height) : TreeVisualization(width, height){variables.push_back("Persist");}
+
+  virtual void Setup() {
+    InitializeVariables();
+
+    EM_ASM_ARGS({
+      js.objects[$0] = [js.objects[$1][0]];
+    }, possible_parents.GetID(), data->GetID());
+
+    this->init = true;
+    this->pending_funcs.Run();
+  }
+
+  virtual void AnimateStep(int parent, int child){
+    std::string child_json = std::string("{\"name\":" + to_string(child) + ", \"parent\":" + to_string(parent) + ", \"children\":[]}");
+    int pos = data->AppendNestedFromList(child_json, possible_parents);
+    (void) pos;
+
+    EM_ASM_ARGS({
+        while (js.objects[$0].length < $1 + 1) {
+          js.objects[$0].push(-1);
+        }
+        js.objects[$0][$1] = js.objects[$0][$2].children[js.objects[$0][$2].children.length-1];
+    }, possible_parents.GetID(), next_pos, pos);
+    DrawTree();
+  }
+
   void RecordPlacement(int pos) {
-    next_pos = pos + 1; //alive array has extra element for null parent
+    next_pos = pos + 1;
     AnimateStep(next_parent, next_child);
   }
 
-  template <typename ORG>
-  void RecordParent(int parent, int child, ORG* org) {
+  void RecordParent(int parent, int child) {
     next_parent = parent;
     next_child = child;
-    next_genome = to_string(*org);
   }
 };
 
-class SpatialGridLineageVisualization : public LineageVisualization {
+
+class SpatialGridTreeVisualization : public TreeVisualization {
 
 public:
 
@@ -594,11 +724,27 @@ public:
 
   D3::Selection legend;
 
+  struct TreeNode {
+    EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
+                                   double, y,
+                                   int, name,
+				                   int, parent,
+                                   int, depth,
+                                   int, loc
+                                )
+  };
+
+
+  struct TreeEdge {
+    EMP_BUILD_INTROSPECTIVE_TUPLE( TreeNode, source,
+                                     TreeNode, target)
+  };
+
   struct LegendNode {
     EMP_BUILD_INTROSPECTIVE_TUPLE( int, loc)
   };
 
-  std::function<std::string(LineageTreeNode, int, int)> color_fun = [this](LineageTreeNode d, int i, int k){
+  std::function<std::string(TreeNode, int, int)> color_fun = [this](TreeNode d, int i, int k){
     if (d.loc() < 0) {
       return std::string("black");
     }
@@ -625,7 +771,7 @@ public:
     return result;
   };
 
-  std::function<std::string(LineageTreeNode, int, int)> dark_color_fun = [this](LineageTreeNode d, int i, int k){
+  std::function<std::string(TreeNode, int, int)> dark_color_fun = [this](TreeNode d, int i, int k){
     if (d.loc() < 0) {
       return std::string("black");
     }
@@ -652,12 +798,12 @@ public:
     return result;
   };
 
-  std::function<std::string(LineageTreeEdge, int, int)> color_fun_link = [this](LineageTreeEdge d, int i, int k){
+  std::function<std::string(TreeEdge, int, int)> color_fun_link = [this](TreeEdge d, int i, int k){
     return this->color_fun(d.source(),0,0);
   };
 
-  std::function<std::string(LineageTreeNode, int, int)> tooltip_display = [this](LineageTreeNode d, int i, int k) {
-    return "ID: " + to_string(d.name()) + ", Pos: (" + to_string(d.loc()% grid_width) + ", " + to_string(d.loc()/grid_width) + ")" + "<br>Genome: " + to_string(d.genome());
+  std::function<std::string(TreeNode, int, int)> tooltip_display = [this](TreeNode d, int i, int k) {
+    return "ID: " + to_string(d.name()) + ", Pos: (" + to_string(d.loc()% grid_width) + ", " + to_string(d.loc()/grid_width) + ")";
   };
 
   std::function<int(LegendNode, int, int)> get_x = [this](LegendNode d, int i, int k) {
@@ -687,10 +833,10 @@ public:
     GetSVG()->SelectAll(".link").Filter("filter_fun").SetClassed("faded", false);
   };
 
-  SpatialGridLineageVisualization(int width, int height) : LineageVisualization(width, height){;}
+  SpatialGridTreeVisualization(int width, int height) : TreeVisualization(width, height){;}
 
   virtual void Setup() {
-    LineageVisualization::Setup();
+    TreeVisualization::Setup();
     JSWrap(color_fun, GetID()+"color_fun");
     JSWrap(dark_color_fun, GetID()+"dark_color_fun");
     JSWrap(color_fun_link, GetID()+"color_fun_link");
