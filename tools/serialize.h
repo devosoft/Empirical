@@ -43,7 +43,7 @@
 //  * To deal with pointers we should recurse, but keep map to new pointer locations.
 //  * Setup a more robust method for dealing with arbitrary strings so we don't have
 //    to worry about collisions in streams (JSon format??)
-//  * Setup a (compressed) binary saved form in DataPods.
+//  * Setup a (compressed) binary save formmat in DataPods in addition to JSon.
 //  * Setup promised synergistic interactions with config and tuple_struct to auto
 //    store and load without any additional effort on the part of the library user.
 

@@ -37,17 +37,13 @@ int main()
     std::cout << id << " : " << count[id] << std::endl;
   }
 
-  std::cout << "Start weight = " << test_set.GetWeight() << std::endl
-            << "Refresh ratio = " << test_set.Refresh() << std::endl
-            << "End weight = " << test_set.GetWeight() << std::endl;
+  std::cout << "Start weight = " << test_set.GetWeight() << std::endl;
 
   std::cout << "\n... adjusting set weights ...\n";
   for (int i = 0; i < 100000000; i++) {
     test_set[random.GetInt(SET_SIZE)] = random.GetDouble(0.0,5000.0);
   }
 
-  std::cout << "Start weight = " << test_set.GetWeight() << std::endl
-            << "Refresh ratio = " << test_set.Refresh() << std::endl
-            << "End weight = " << test_set.GetWeight() << std::endl;
+  std::cout << "End weight = " << test_set.GetWeight() << std::endl;
 
 }

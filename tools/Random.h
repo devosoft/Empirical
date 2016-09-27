@@ -44,6 +44,8 @@
 #include <iterator>
 #include <unistd.h>
 
+#include "Range.h"
+
 namespace emp {
 
   //  A versatile and non-patterned pseudo-random-number generator.
@@ -191,6 +193,14 @@ namespace emp {
     double GetDouble(const double min, const double max) { return GetDouble() * (max - min) + min; }
 
     /**
+     * Generate a double out of a given interval.
+     *
+     * @return The pseudo random number.
+     * @param range The upper and lower bounds for the random numbers [lower, upper)
+     **/
+    double GetDouble(const Range<double> range) { return GetDouble(range.lower, range.upper); }
+
+    /**
      * Generate an uint32_t.
      *
      * @return The pseudo random number.
@@ -208,6 +218,14 @@ namespace emp {
     uint32_t GetUInt(const uint32_t min, const uint32_t max) { return GetUInt(max - min) + min; }
 
     /**
+     * Generate a uint32_t out of a given interval.
+     *
+     * @return The pseudo random number.
+     * @param range The upper and lower bounds for the random numbers [lower, upper)
+     **/
+    uint32_t GetUInt(const Range<uint32_t> range) { return GetUInt(range.lower, range.upper); }
+
+    /**
      * Generate an int out of an interval.
      *
      * @return The pseudo random number.
@@ -216,6 +234,7 @@ namespace emp {
      **/
     int GetInt(const int max) { return static_cast<int>(GetUInt(max)); }
     int GetInt(const int min, const int max) { return static_cast<int>(GetUInt(max - min)) + min; }
+    int GetInt(const Range<int> range) { return GetInt(range.lower, range.upper); }
 
 
     // Random Event Generation //////////////////////////////////////////////////

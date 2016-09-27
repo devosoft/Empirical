@@ -73,7 +73,6 @@ int main()
 
 
   // Test grid Populations
-//  evo::World<int, evo::PopGrid> grid_world(random);
   evo::GridWorld<int> grid_world(random);
   for (int i = 0; i < 10; i++) grid_world.Insert(i);
   grid_world.Print();
@@ -84,6 +83,7 @@ int main()
   }
   std::cout << std::endl;
   grid_world.Print();
+  std::cout << "Num orgs=" << grid_world.GetNumOrgs() << std::endl;
   std::cout << std::endl;
 
 
@@ -91,20 +91,19 @@ int main()
   // We will have each organism replaced on birth be on the left side of parent.
   evo::World<int, evo::PopPlugin> pi_world(random, "pi_world");
 
-  pi_world.popM.OnClear( [](emp::vector<int*>& pop) {
-    for (auto x:pop) if(x) delete x;
-    pop.resize(0);
-    for (int i=0;i<20;i++) pop.push_back(new int (i+100));
+  pi_world.popM.OnClear( [&pi_world]() {
+    pi_world.popM.Resize(0);
+    for (int i=0;i<20;i++) pi_world.popM.AddOrgAppend(new int (i+100));
   });
 
-  pi_world.popM.OnAddOrg( [](emp::vector<int*>& pop, int* org, int& pos) {
-    pos=pop.size(); pop.push_back(org);
+  pi_world.popM.OnAddOrg( [&pi_world](int* org, int& pos) {
+    pos = pi_world.popM.AddOrgAppend(org);
   });
 
-  pi_world.popM.OnAddOrgBirth( [](emp::vector<int*>& pop, int* org, int parent_pos, int& pos) {
-    pos=parent_pos-1; if (pos < 0) pos = pop.size() - 1;
-    if (pop[pos]) delete pop[pos];
-    pop[pos] = org;
+  pi_world.popM.OnAddOrgBirth( [&pi_world](int* org, int parent_pos, int& pos) {
+    pos=parent_pos-1;
+    if (pos < 0) pos = pi_world.popM.size() - 1;
+    pi_world.popM.AddOrgAt(org, pos);
   });
 
   pi_world.Clear();

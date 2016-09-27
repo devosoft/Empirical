@@ -3,8 +3,8 @@ CFLAGS_all := -Wall -Wno-unused-function -std=c++11 -I../../ -I./
 
 # Emscripten compiler information
 CXX_web := emcc
-CXX_native := g++
-#CXX_native := g++-5
+#CXX_native := g++
+CXX_native := g++-5
 
 #OFLAGS_native := -g -pedantic
 OFLAGS_native := -O3 -DNDEBUG
@@ -19,9 +19,7 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../web/library_emp.js 
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 
-TARGETS := Fitness_Share_NK link_test NK NK-constexpr NK-const-config NK-Serial Symbulation World 
-
-JS_TARGETS :=  LineageViz.js LineGraph.js
+TARGETS := Fitness_Share_NK Grid link_test NK NK-constexpr NK-const-config NK-Serial Symbulation World bit_evolve
 
 EVO_DEPEND := ../../evo/PopulationManager.h ../../evo/World.h
 

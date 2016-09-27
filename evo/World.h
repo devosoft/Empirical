@@ -48,9 +48,10 @@
 //  void SetDefaultMutationFun(const std::function<bool(ORG*)> & f)
 //
 // Population Building
-//  void Clear()                                           - Clear all organisms in population
+//  void Clear()                                        - Clear all organisms in population
 //  void Insert(const ORG & mem, int copy_count=1)      - Insert a copy of an individual
-//  void Insert(Random & random, ARGS... args)             - Insert a random organism
+//  void InsertAt(const ORG & mem, int pos)             - Insert an individual at specified pos
+//  void Insert(Random & random, ARGS... args)          - Insert a random organism
 //  void InsertRandomOrg(ARGS... args)
 //  void InsertNext(const ORG & mem, int copy_count=1)  - Insert into NEXT GENERATION of pop
 //
@@ -225,7 +226,8 @@ namespace evo {
     ~World() { Clear(); if (random_owner) delete random_ptr; }
     World & operator=(const World &) = delete;
 
-    int GetSize() const { return (int) popM.size(); }
+    int GetSize() const { return popM.GetSize(); }
+    int GetNumOrgs() const { return popM.GetNumOrgs(); }
     ORG & operator[](int i) { return *(popM[i]); }
     const ORG & operator[](int i) const { return *(popM[i]); }
     bool IsOccupied(int i) const { return popM[i] != nullptr; }
@@ -262,6 +264,15 @@ namespace evo {
         org_placement_sig.Trigger(pos);
       }
     }
+
+    void InsertAt(const ORG & mem, const int pos) {
+      ORG * new_org = new ORG(mem);
+      inject_ready_sig.Trigger(new_org);
+      popM.AddOrgAt(new_org, pos);
+      SetupOrg(*new_org, &callbacks, pos);
+      org_placement_sig.Trigger(pos);
+    }
+
     template <typename... ARGS>
     void InsertRandomOrg(ARGS... args) {
       emp_assert(random_ptr != nullptr && "InsertRandomOrg() requires active random_ptr");
@@ -314,7 +325,7 @@ namespace evo {
         if (this->IsOccupied(i)){
           if (mut_fun(popM[i], *random_ptr)) {
             mut_count++;
-            fitM.Clear(i);
+            fitM.ClearAt(i);
           }
         }
       }
@@ -325,20 +336,19 @@ namespace evo {
       return MutatePop(orgM.GetMutFun(), first_mut, last_mut);
     }
 
+    void Print(const std::function<std::string(ORG*)> & print_fun,
+               std::ostream & os=std::cout,
+               const std::string & empty="X",
+               const std::string & spacer=" ") {
+      popM.Print(print_fun, os, empty, spacer);
+    }
+
     void Print(std::ostream & os=std::cout, const std::string & empty="X", const std::string & spacer=" ") {
       popM.Print(os, empty, spacer);
     }
 
-    //Helper function to return PopulationManager indices of
-    //all organisms that are not null
-    emp::vector<int> GetValidOrgIndices(){
-      emp::vector<int> valid_orgs(0);
-      for (int i = 0; i < (int) popM.size(); i++){
-        if (this->IsOccupied(i)){
-          valid_orgs.push_back(i);
-        }
-      }
-      return valid_orgs;
+    void PrintOrgCounts(const std::function<std::string(ORG*)> & print_fun, std::ostream & os=std::cout) {
+      popM.PrintOrgCounts(print_fun, os);
     }
 
     // Selection mechanisms choose organisms for the next generation.
@@ -352,7 +362,7 @@ namespace evo {
       std::multimap<double, int> fit_map;
       for (int i = 0; i < (int) popM.size(); i++) {
         if (this->IsOccupied(i)){
-          fit_map.insert( std::make_pair( fitM.CalcFitness(i,popM[i],fit_fun), i) );
+          fit_map.insert( std::make_pair( fitM.CalcFitness(i,(ORG*) popM[i],fit_fun), i) );
         }
       }
 
@@ -387,11 +397,11 @@ namespace evo {
 
       for (int T = 0; T < tourny_count; T++) {
         // @CAO - looking up valid orgs each time is very slow.
-        emp::vector<int> valid_orgs = GetValidOrgIndices();
+        emp::vector<int> valid_orgs = popM.GetValidOrgIDs();
 
         emp::vector<int> entries = Choose(*random_ptr, valid_orgs.size(), t_size);
         Shuffle(*random_ptr, entries);
-        double best_fit = fit_fun( popM[valid_orgs[entries[0]]] );
+        double best_fit = fit_fun( (ORG*) popM[valid_orgs[entries[0]]] );
         int best_id = valid_orgs[entries[0]];
 
         // Search for a higher fit org in the tournament.

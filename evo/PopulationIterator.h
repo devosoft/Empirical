@@ -57,8 +57,8 @@ namespace evo{
     bool operator> (const PopulationIterator<POP_MANAGER>& rhs) const { return pos >  rhs.pos; }
     bool operator>=(const PopulationIterator<POP_MANAGER>& rhs) const { return pos >= rhs.pos; }
 
-    ORG & operator*() { MakeValid(); return (*pop)[pos]; }
-    const ORG & operator*() const { MakeValid(); return (*pop)[pos]; }
+    auto operator*() -> decltype((*pop)[pos]) { MakeValid(); return (*pop)[pos]; }
+    const ORG & operator*() const { MakeValid(); return (ORG)(*pop)[pos]; }
 
     operator bool() const { MakeValid(); return pos < pop->size(); }
 
