@@ -21,9 +21,9 @@
 #include <map>
 #include <set>
 #include <algorithm>
+#include <fstream>
 #include "../tools/vector.h"
 #include "PopulationManager.h"
-#include "../web/d3/visualizations.h"
 
 template <typename org_ptr>
 struct Node {
@@ -73,7 +73,6 @@ namespace evo{
     using org_ptr = typename POP_MANAGER::value_type;
     using ORG = typename std::remove_pointer<org_ptr>::type;
     static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
-    emp::vector<web::TreeVisualization*> viz_pointers;
 
   public:
     std::unordered_map<int, Node<org_ptr> > nodes;
@@ -183,9 +182,6 @@ namespace evo{
         generation_since_update[pos] = next_org_id;
       }
 
-      for (auto viz_pointer : viz_pointers) {
-        viz_pointer->RecordPlacement(pos);
-      }
     }
 
     //Record the org that's about to have an offspring, so we can know
@@ -211,10 +207,6 @@ namespace evo{
       curr->id = id;
       curr->alive = true;
       curr->genome = genome;
-
-      for (auto viz : viz_pointers) {
-        viz->RecordParent(parent, id, genome);
-      }
 
       return id;
     }
@@ -263,10 +255,6 @@ namespace evo{
         genome_group.push_back(*(this->nodes[id].genome));
       }
       return genome_group;
-    }
-
-    void ConnectVis(web::TreeVisualization * viz_pointer) {
-      viz_pointers.push_back(viz_pointer);
     }
 
     std::string node_to_json(Node<org_ptr> * node) {
@@ -323,13 +311,11 @@ namespace evo{
     using LineageTracker<POP_MANAGER>::genomes;
     using LineageTracker<POP_MANAGER>::new_generation;
     using LineageTracker<POP_MANAGER>::inject;
-    using LineageTracker<POP_MANAGER>::viz_pointers;
     using LineageTracker<POP_MANAGER>::nodes;
     std::map<ORG, int> genome_counts;
 
   public:
     using LineageTracker<POP_MANAGER>::generation_since_update;
-    using LineageTracker<POP_MANAGER>::ConnectVis;
     int last_coalesence = 0;
     using LineageTracker<POP_MANAGER>::emp_is_lineage_manager;
     // Add WriteDataToFile
@@ -465,9 +451,6 @@ namespace evo{
         generation_since_update[pos] = next_org_id;
       }
 
-      for (auto viz_pointer : viz_pointers) {
-        viz_pointer->RecordPlacement(pos);
-      }
     }
 
     //Record the org that's about to have an offspring, so we can know
@@ -505,9 +488,6 @@ namespace evo{
         genome_counts[*genome]++;
       }
 
-      for (auto viz : viz_pointers) {
-        viz->RecordParent(parent, id, genome);
-      }
 
       return id;
     }

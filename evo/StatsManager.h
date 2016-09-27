@@ -14,7 +14,6 @@
 #include "PopulationManager.h"
 #include "EvoStats.h"
 #include "LineageTracker.h"
-#include "../web/d3/visualizations.h"
 
 namespace emp{
 namespace evo{
@@ -35,10 +34,6 @@ namespace evo{
     static constexpr bool emp_is_stats_manager = true;
     std::ofstream output_location; //Where does output go?
     emp::vector<std::string> col_map; //Vector for tracking variables
-
-    //Support for visualization connections
-    emp::vector<web::D3Visualization*> viz_pointers;
-    emp::vector<emp::vector<int> > viz_args;
 
     StatsManager_Base(std::string location = "cout") {
       StatsManagerConfig config;
@@ -93,20 +88,6 @@ namespace evo{
       }
     }
 
-    void SendResultsToViz(int update, emp::vector<double> & results){
-      for (int i=0; i<viz_pointers.size(); ++i){
-        emp::vector<double> values;
-        for (int el : viz_args[i]) {
-          if (el == -1){
-            values.push_back((double)update);
-          } else {
-            values.push_back(results[el]);
-          }
-        }
-        viz_pointers[i]->AnimateStep(values);
-      }
-    }
-
   };
 
 
@@ -121,9 +102,6 @@ namespace evo{
     using StatsManager_Base<POP_MANAGER>::output_location;
     using StatsManager_Base<POP_MANAGER>::delimiter;
     using StatsManager_Base<POP_MANAGER>::col_map;
-    using StatsManager_Base<POP_MANAGER>::viz_pointers;
-    using StatsManager_Base<POP_MANAGER>::viz_args;
-
   public:
     using org_ptr = typename POP_MANAGER::value_type;
     using StatsManager_Base<POP_MANAGER>::SetDefaultFitnessFun;
@@ -152,22 +130,8 @@ namespace evo{
        w->OnUpdate(UpdateFun);
     }
 
-    template <typename T>
-    void ConnectVis(web::LineGraph<T> * viz) {
-      viz_pointers.push_back(viz);
-    }
 
-    void SendResultsToViz(int update) {
-      for (auto viz_pointer : viz_pointers) {
-        viz_pointer->AnimateStep(update, pop);
-      }
-    }
-
-    void Update(int update) {
-      if (update % resolution == 0) {
-        SendResultsToViz(update);
-      }
-    }
+    void Update(int update) {}
 
   };
 
@@ -181,8 +145,6 @@ namespace evo{
     using StatsManager_Base<POP_MANAGER>::output_location;
     using StatsManager_Base<POP_MANAGER>::delimiter;
     using StatsManager_Base<POP_MANAGER>::col_map;
-    using StatsManager_Base<POP_MANAGER>::viz_pointers;
-    using StatsManager_Base<POP_MANAGER>::viz_args;
 
   public:
     using org_ptr = typename POP_MANAGER::value_type;
@@ -214,26 +176,11 @@ namespace evo{
        w->OnUpdate(UpdateFun);
     }
 
-    template <typename T>
-    void SendResultsToViz(int update, emp::vector<T> results) {
-      for (auto viz_pointer : viz_pointers) {
-        viz_pointer->AnimateStep(update, results);
-      }
-    }
 
     template <typename T>
     void SetFunc(std::function<double(T)> f){func = f;}
 
-    void Update(int update) {
-      if (update % resolution == 0) {
-        emp::vector<double> results = RunFunctionOnContainer(func, pop);
-        output_location << update << ": ";
-        for (auto result : results) {
-          output_location << result << " ";
-        }
-        SendResultsToViz(update, results);
-      }
-    }
+    void Update(int update) {;}
   };
 
   // A popular type of stats manager is one that prints a set of statistics every
@@ -257,9 +204,6 @@ namespace evo{
     using StatsManager_Base<POP_MANAGER>::output_location;
     using StatsManager_Base<POP_MANAGER>::delimiter;
     using StatsManager_Base<POP_MANAGER>::col_map;
-    using StatsManager_Base<POP_MANAGER>::viz_pointers;
-    using StatsManager_Base<POP_MANAGER>::viz_args;
-    using StatsManager_Base<POP_MANAGER>::SendResultsToViz;
     bool header_printed = false;
     std::string header = "update";
 
@@ -321,33 +265,11 @@ namespace evo{
         }
 
         output_location << std::endl;
-        SendResultsToViz(update, results);
       }
     }
 
     void SetDefaultFitnessFun(const std::function<double(org_ptr)> & fit) {
       fit_fun = fit;
-    }
-
-    template <typename T>
-    void ConnectVis(web::LineGraph<T> * viz) {
-      emp::vector<int> vars;
-
-      for (std::string variable : viz->variables) {
-        if (variable == "Update"){
-          vars.push_back(-1);
-        } else {
-          auto it = std::find(col_map.begin(), col_map.end(), variable);
-          if (it == col_map.end()) {
-            NotifyWarning("Invalid graph variable.");
-          }
-          int pos = std::distance(col_map.begin(), it);
-          vars.push_back(pos);
-        }
-      }
-
-      viz_pointers.push_back(viz);
-      viz_args.push_back(vars);
     }
 
   };
