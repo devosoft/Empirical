@@ -395,21 +395,20 @@ namespace evo {
       emp_assert(t_size > 0 && t_size <= (int) popM.size(), t_size, popM.size());
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
 
+      emp::vector<int> entries;
       for (int T = 0; T < tourny_count; T++) {
-        // @CAO - looking up valid orgs each time is very slow.
-        emp::vector<int> valid_orgs = popM.GetValidOrgIDs();
+        entries.resize(0);
+        for (int i=0; i<t_size; i++) entries.push_back( popM.GetRandomOrg() ); // Allows replacement!
 
-        emp::vector<int> entries = Choose(*random_ptr, valid_orgs.size(), t_size);
-        Shuffle(*random_ptr, entries);
-        double best_fit = fit_fun( (ORG*) popM[valid_orgs[entries[0]]] );
-        int best_id = valid_orgs[entries[0]];
+        double best_fit = fit_fun( (ORG*) popM[entries[0]] );
+        int best_id = entries[0];
 
         // Search for a higher fit org in the tournament.
         for (int i = 1; i < t_size; i++) {
-          const double cur_fit = fit_fun(popM[valid_orgs[entries[i]]]);
+          const double cur_fit = fit_fun(popM[entries[i]]);
           if (cur_fit > best_fit) {
             best_fit = cur_fit;
-            best_id = valid_orgs[entries[i]];
+            best_id = entries[i];
           }
         }
 
