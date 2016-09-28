@@ -400,12 +400,12 @@ namespace evo {
         entries.resize(0);
         for (int i=0; i<t_size; i++) entries.push_back( popM.GetRandomOrg() ); // Allows replacement!
 
-        double best_fit = fit_fun( (ORG*) popM[entries[0]] );
+        double best_fit = popM.CalcFitness(entries[0], fit_fun);
         int best_id = entries[0];
 
         // Search for a higher fit org in the tournament.
         for (int i = 1; i < t_size; i++) {
-          const double cur_fit = fit_fun(popM[entries[i]]);
+          const double cur_fit = popM.CalcFitness(entries[i], fit_fun);
           if (cur_fit > best_fit) {
             best_fit = cur_fit;
             best_id = entries[i];
