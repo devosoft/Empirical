@@ -34,7 +34,7 @@ EMP_BUILD_CONFIG( NKConfig,
 using BitOrg = emp::BitVector;
 
 template <typename ORG>
-using GridWorld = emp::evo::World<ORG, emp::evo::PopulationManager_Grid<ORG>, emp::evo::LineagePruned >;
+using GridWorld = emp::evo::World<ORG, emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Grid<BitOrg> >,emp::evo::PopulationManager_Grid<ORG>, emp::evo::LineagePruned >;
 
 int main(int argc, char* argv[])
 {
@@ -72,10 +72,18 @@ int main(int argc, char* argv[])
   grid_pop.SetDefaultFitnessFun(fit_func);
 
   // make a stats manager
-  emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Grid<BitOrg>>
-      grid_stats (&grid_pop, prefix + "grid.csv");
+  
+  grid_pop.statsM.SetDefaultFitnessFun(fit_func);
+  grid_pop.statsM.SetOutput(prefix + "grid.csv");
 
-  grid_stats.SetDefaultFitnessFun(fit_func);
+  //grid_pop.statsM(prefix + "grid.csv");
+
+
+  //emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Grid<BitOrg>> 
+  //    grid_stats  (prefix + "grid.csv");
+
+
+  //grid_stats.SetDefaultFitnessFun(fit_func);
   
 
     // Insert default organisms into world

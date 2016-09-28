@@ -36,77 +36,77 @@ namespace evo{
     static constexpr bool emp_is_stats_manager = true;
     std::ofstream output_location; //Where does output go?
 
-    StatsManager_Base(std::string location = "cout"){
-        StatsManagerConfig config;
-        config.Read("StatsConfig.cfg");
-        resolution = config.RESOLUTION();
-        delimiter = config.DELIMITER();
-        config.Write("StatsConfig.cfg");
-        SetOutput(location);
+    StatsManager_Base(std::string location = "cout") {
+      StatsManagerConfig config;
+      config.Read("StatsConfig.cfg");
+      resolution = config.RESOLUTION();
+      delimiter = config.DELIMITER();
+      config.Write("StatsConfig.cfg");
+      SetOutput(location);
     }
 
     StatsManager_Base(StatsManagerConfig & config, std::string config_location,
-                      std::string location = "cout"){
-        config.Read(config_location);
-        resolution = config.RESOLUTION();
-        delimiter = config.DELIMITER();
-        SetOutput(location);
+                      std::string location = "cout") {
+      config.Read(config_location);
+      resolution = config.RESOLUTION();
+      delimiter = config.DELIMITER();
+      SetOutput(location);
     }
 
-    ~StatsManager_Base(){
-        output_location.close();
+    ~StatsManager_Base() {
+      output_location.close();
     }
 
     template <typename WORLD>
-    void Setup(WORLD * w){;}
+    void Setup(WORLD * w) {;}
 
     template <typename T>
     //void SetDefaultFitnessFun(const std::function<double(T*)> &) {;}
     void SetDefaultFitnessFun(const T &) {;}
 
-    //Tells the stats manager where to put output. If location is "cout"
-    //(default) or "stdout", stats will get sent to cout. Otherwise, the
-    //specified file will be used as the location for output. If the file
-    //has the extension "csv" or "tsv", the appropriate delimiter will be used.
-    //If the location is invalid, the program will exit with an error.
-    void SetOutput(std::string location){
-        if (location == "cout" || location == "stdout"){
-            output_location.copyfmt(std::cout);
-            output_location.clear(std::cout.rdstate());
-            output_location.basic_ios<char>::rdbuf(std::cout.rdbuf());
-        } else {
-            output_location.open(location);
-            if (!output_location.good()){
-                std::cout << "Invalid output file. Exiting." << std::endl;
-                exit(0);
-            }
-            string_pop(location, ".");
-            if (location == "csv") {
-                delimiter = ", ";
-            } else if (location == "tsv") {
-                delimiter = "\t";
-            }
+    // Tells the stats manager where to put output. If location is "cout"
+    // (default) or "stdout", stats will get sent to cout. Otherwise, the
+    // specified file will be used as the location for output. If the file
+    // has the extension "csv" or "tsv", the appropriate delimiter will be used.
+    // If the location is invalid, the program will exit with an error.
+    void SetOutput(std::string location) {
+      if (location == "cout" || location == "stdout") {
+        output_location.copyfmt(std::cout);
+        output_location.clear(std::cout.rdstate());
+        output_location.basic_ios<char>::rdbuf(std::cout.rdbuf());
+      } else {
+        output_location.open(location);
+        if (!output_location.good()) {
+          std::cout << "Invalid output file. Exiting." << std::endl;
+          exit(0);
         }
+        string_pop(location, ".");
+        if (location == "csv") {
+          delimiter = ", ";
+        } else if (location == "tsv") {
+          delimiter = "\t";
+        }
+      }
     }
 
   };
 
-  //A popular type of stats manager is one that prints a set of statistics every
-  //so many updates. This is a generic stats manager of that variety, which
-  //maintains FunctionSets containing all of the functions to be run.
-  //Although functions can be added to this manager on the fly, the goal of
-  //this class is that it can be extended to track specific sets of functions.
-  //(see StatsManager_DefaultStats for an example)
+  // A popular type of stats manager is one that prints a set of statistics every
+  // so many updates. This is a generic stats manager of that variety, which
+  // maintains FunctionSets containing all of the functions to be run.
+  // Although functions can be added to this manager on the fly, the goal of
+  // this class is that it can be extended to track specific sets of functions.
+  // (see StatsManager_DefaultStats for an example)
   template <typename POP_MANAGER = PopulationManager_Base<int> >
   class StatsManager_FunctionsOnUpdate : StatsManager_Base<POP_MANAGER> {
   protected:
     using org_ptr = typename POP_MANAGER::value_type;
-    //using world_type = World<ORG, MANAGERS...>;
+    // using world_type = World<ORG, MANAGERS...>;
     using fit_fun_type = std::function<double(org_ptr)>;
-    //Stats calculated on the world
+    // Stats calculated on the world
     FunctionSet<double> stats;
 
-    //Pointer to the world object on which we're calculating stats
+    // Pointer to the world object on which we're calculating stats
     POP_MANAGER * pop;
     using StatsManager_Base<POP_MANAGER>::resolution;
     using StatsManager_Base<POP_MANAGER>::output_location;
@@ -119,24 +119,24 @@ namespace evo{
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
     fit_fun_type fit_fun;
 
-    //Constructor for creating this as a stand-alone object
+    // Constructor for creating this as a stand-alone object
     template <typename WORLD>
     StatsManager_FunctionsOnUpdate(WORLD * w,
                                    std::string location = "stats.csv") :
-                                   StatsManager_Base<decltype(w->popM)>(location){}
+                                   StatsManager_Base<decltype(w->popM)>(location) {}
 
     //Constructor for use by World object
     StatsManager_FunctionsOnUpdate(std::string location = "stats.csv") :
-                                   StatsManager_Base<POP_MANAGER>(location){;}
+                                   StatsManager_Base<POP_MANAGER>(location) {;}
 
     //The fitness function for calculating fitness related stats.
     //Not called by constructor. Must be called by user.
     template <typename WORLD>
-    void Setup(WORLD * w){
+    void Setup(WORLD * w) {
       pop = &(w->popM);
 
-      std::function<void(int)> UpdateFun = [&] (int ud){
-          Update(ud);
+      std::function<void(int)> UpdateFun = [&] (int ud) {
+        Update(ud);
       };
 
       w->OnUpdate(UpdateFun);
@@ -149,7 +149,7 @@ namespace evo{
       std::string header_label = label;
       remove_whitespace(header_label);
       col_map.push_back(label);
-      if (header_printed){
+      if (header_printed) {
         NotifyWarning("Function added to stats manager after initialization.");
       } else {
         header += delimiter + header_label;
@@ -159,11 +159,11 @@ namespace evo{
     //If this update matches the resolution, calculate and record all the stats
     void Update(int update) {
       if (!header_printed) {
-          output_location << header << std::endl;
-          header_printed = true;
+        output_location << header << std::endl;
+        header_printed = true;
       }
 
-      if (update % resolution == 0){
+      if (update % resolution == 0) {
 
         output_location << update;
 
@@ -176,8 +176,8 @@ namespace evo{
       }
     }
 
-    void SetDefaultFitnessFun(const std::function<double(org_ptr)> & fit){
-        fit_fun = fit;
+    void SetDefaultFitnessFun(const std::function<double(org_ptr)> & fit) {
+      fit_fun = fit;
     }
 
   };
@@ -189,65 +189,64 @@ namespace evo{
 
   class StatsManager_DefaultStats : StatsManager_FunctionsOnUpdate<POP_MANAGER> {
   protected:
-      using org_ptr = typename POP_MANAGER::value_type;
-      using fit_fun_type = std::function<double(org_ptr)>;
-      using fit_stat_type = std::function<double(fit_fun_type, POP_MANAGER*)>;
-      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::AddFunction;
-      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::pop;
-      using StatsManager_Base<POP_MANAGER>::output_location;
-      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::Update;
+    using org_ptr = typename POP_MANAGER::value_type;
+    using fit_fun_type = std::function<double(org_ptr)>;
+    using fit_stat_type = std::function<double(fit_fun_type, POP_MANAGER*)>;
+    using StatsManager_FunctionsOnUpdate<POP_MANAGER>::AddFunction;
+    using StatsManager_FunctionsOnUpdate<POP_MANAGER>::pop;
+    using StatsManager_Base<POP_MANAGER>::output_location;
+    using StatsManager_FunctionsOnUpdate<POP_MANAGER>::Update;
 
   public:
-      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::fit_fun;
-      using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
-      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::SetDefaultFitnessFun;
+    using StatsManager_FunctionsOnUpdate<POP_MANAGER>::fit_fun;
+    using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
+    using StatsManager_FunctionsOnUpdate<POP_MANAGER>::SetDefaultFitnessFun;
 
-      //Constructor for use as a stand-alone object
-      template <typename WORLD>
-      StatsManager_DefaultStats(WORLD * w, std::string location = "averages.csv")
-       : StatsManager_FunctionsOnUpdate<decltype(w->popM)>(w, location){
-        Setup(w);
-      }
+    //Constructor for use as a stand-alone object
+    template <typename WORLD>
+    StatsManager_DefaultStats(WORLD * w, std::string location = "averages.csv")
+     : StatsManager_FunctionsOnUpdate<decltype(w->popM)>(w, location) {
+      Setup(w);
+    }
 
-      //Constructor for use as a template parameter for the world
-      StatsManager_DefaultStats(std::string location = "averages.csv")
-       : StatsManager_FunctionsOnUpdate<POP_MANAGER>(location){;}
+    //Constructor for use as a template parameter for the world
+    StatsManager_DefaultStats(std::string location = "averages.csv")
+     : StatsManager_FunctionsOnUpdate<POP_MANAGER>(location) {;}
 
-      //Add appropriate functions to function sets
-      template <typename WORLD>
-      void Setup(WORLD * w){
+    //Add appropriate functions to function sets
+    template <typename WORLD>
+    void Setup(WORLD * w) {
+      pop = &(w->popM);
 
-        pop = &(w->popM);
+      //Create std::function object for all of the stats
+      std::function<double()> diversity = [this]() {
+        return ShannonEntropy(*pop);
+      };
+      std::function<double()> max_fitness = [this]() {
+        return MaxFunctionReturn(fit_fun, *pop);
+      };
+      std::function<double()> avg_fitness = [this]() {
+        return AverageFunctionReturn(fit_fun, *pop);
+      };
 
-        //Create std::function object for all of the stats
-        std::function<double()> diversity = [this](){
-            return ShannonEntropy(*pop);
-        };
-        std::function<double()> max_fitness = [this](){
-            return MaxFunctionReturn(fit_fun, *pop);
-        };
-        std::function<double()> avg_fitness = [this](){
-            return AverageFunctionReturn(fit_fun, *pop);
-        };
-
-        std::function<void(int)> UpdateFun = [&] (int ud){
-            Update(ud);
-        };
+      std::function<void(int)> UpdateFun = [&] (int ud) {
+        Update(ud);
+      };
 
 
-        //Add functions to manager
-        AddFunction(diversity, "Shannon Diversity");
-        AddFunction(max_fitness, "Max Fitness");
-        AddFunction(avg_fitness, "Avg Fitness");
+      //Add functions to manager
+      AddFunction(diversity, "Shannon Diversity");
+      AddFunction(max_fitness, "Max Fitness");
+      AddFunction(avg_fitness, "Avg Fitness");
 
-        w->OnUpdate(UpdateFun);
+      w->OnUpdate(UpdateFun);
 
-      }
+    }
 
-};
+  };
 
-using NullStats = StatsManager_Base<PopBasic>;
-using DefaultStats = StatsManager_DefaultStats<PopBasic>;
+  using NullStats = StatsManager_Base<PopBasic>;
+  using DefaultStats = StatsManager_DefaultStats<PopBasic>;
 
   // Calculates Default stats plus some other less frequently used stats: Non-Inferiority,
   // Benefitial/Neutral/Detremental Mutational Landscape average, max benefit/max detremental
@@ -261,7 +260,7 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
       using fit_stat_type = std::function<double(fit_fun_type, POP_MANAGER*)>;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::AddFunction;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::pop;
-      using StatsManager_Base<POP_MANAGER>::output_location;
+      using StatsManager_Base<POP_MANAGER>::output_location;      
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::Update;
       using lineage_type = LineageTracker_Pruned<POP_MANAGER>;
       lineage_type * lin_ptr;
@@ -272,6 +271,7 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::fit_fun;
       using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::SetDefaultFitnessFun;
+      using StatsManager_Base<POP_MANAGER>::SetOutput;
 
       //Constructor for use as a stand alone object
       template<typename WORLD>
@@ -350,7 +350,7 @@ using DefaultStats = StatsManager_DefaultStats<PopBasic>;
           AddFunction(coal_count, "coal_count");
 
           w->OnUpdate(UpdateFun);
-
+      
       }
   };
 

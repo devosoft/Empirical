@@ -1233,7 +1233,7 @@ TEST_CASE("Test Ptr", "[tools]")
 
   REQUIRE(tracker.HasPtr(real_ptr1) == true);
   REQUIRE(tracker.HasPtr(real_ptr2) == true);
-  REQUIRE(tracker.HasPtr(real_ptr3) == false);
+//  REQUIRE(tracker.HasPtr(real_ptr3) == false);  // Technically may be previous pointer re-used!
   REQUIRE(tracker.HasPtr(real_ptr4) == true);
 
   REQUIRE(tracker.IsActive(real_ptr1) == true);

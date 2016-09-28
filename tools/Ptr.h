@@ -112,7 +112,9 @@ namespace emp {
     void New(void * ptr) {
       if (ptr == nullptr) return;
       if (verbose) std::cout << "New:    " << ((uint64_t) ptr) << std::endl;
-      emp_assert(!HasPtr(ptr) || !IsActive(ptr)); // Make sure pointer is not already stored!
+      // Make sure pointer is not already stored -OR- if it was stored, that it's been
+      // deleted (since re-use is possible).
+      emp_assert(!HasPtr(ptr) || !IsActive(ptr));
       ptr_info[ptr] = PtrInfo(true);
     }
 

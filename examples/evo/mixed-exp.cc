@@ -32,7 +32,7 @@ EMP_BUILD_CONFIG( NKConfig,
 using BitOrg = emp::BitVector;
 
 template <typename ORG>
-using MixedWorld = emp::evo::World<ORG, emp::evo::PopulationManager_Base<ORG>, emp::evo::LineagePruned >;
+using MixedWorld = emp::evo::World<ORG, emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Base<BitOrg> >,emp::evo::PopulationManager_Base<ORG>, emp::evo::LineagePruned >;
 
 int main(int argc, char* argv[])
 {
@@ -65,11 +65,13 @@ int main(int argc, char* argv[])
 
   mixed_pop.SetDefaultFitnessFun(fit_func);
 
-  // make a stats manager
-  emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Base<BitOrg>> 
-      mixed_stats (&mixed_pop, prefix + "mixed.csv");
+  mixed_pop.statsM.SetDefaultFitnessFun(fit_func);
 
-  mixed_stats.SetDefaultFitnessFun(fit_func);
+  // make a stats manager
+  //emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Base<BitOrg>> 
+  //    mixed_stats (&mixed_pop, prefix + "mixed.csv");
+
+  //mixed_stats.SetDefaultFitnessFun(fit_func);
   
   // Insert default organisms into world
   for (int i = 0; i < POP_SIZE; i++) {
