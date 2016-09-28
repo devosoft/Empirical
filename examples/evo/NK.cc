@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 
   emp::Random random(config.SEED());
   emp::evo::NKLandscape landscape(N, K, random);
-  emp::evo::EAWorld<BitOrg> pop(random, "NKWorld");
+  emp::evo::EAWorld<BitOrg, emp::evo::CacheOrgs> pop(random, "NKWorld");
 
   // Build a random initial population
   for (int i = 0; i < config.POP_SIZE(); i++) {
