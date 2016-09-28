@@ -61,6 +61,9 @@ namespace evo {
     int GetSize() const { return (int) pop.size(); }
     int GetNumOrgs() const { return num_orgs; }
     ptr_t GetOrg(int id) const { return pop[id]; }
+    double CalcFitness(int id, const std::function<double(ORG*)> & fit_fun) const {
+      return fitM.CalcFitness(id, pop[id], fit_fun);
+    }
 
     void SetRandom(Random * r) { random_ptr = r; }
     void Setup(Random * r) { SetRandom(r); }
@@ -145,6 +148,7 @@ namespace evo {
 
     // Get random *occupied* cell.
     int GetRandomOrg() const {
+      emp_assert(num_orgs > 0); // Make sure it's possible to find an organism!
       int pos = random_ptr->GetInt(0, pop.size());
       while (pop[pos] == nullptr) pos = random_ptr->GetInt(0, pop.size());
       return pos;
