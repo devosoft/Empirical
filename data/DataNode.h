@@ -9,28 +9,25 @@
 //  internal classes.  By default, the stored type may be anything, but stats require a type that
 //  math can be performed on.  The internal classed are:
 //
-//  DataStore   : What information should be kept about the values passing through?
 //  DataCollect : How should new input data be found?
-//  DataProcess : How should data be processed on Reset?
-//  DataRecord  : What should be done with previous data after a Reset?
+//  DataStore   : What information should be kept about the values passing through?
+//  DataProcess : How should data be processed on Reset or stored in hte long term?
 //
 //  More details on the specific options for each:
 //
-//  DataStore        : Keep the most recent input value and a count of inputs since the last Reset()
-//  DataStore_Full   : Stores ALL values that are provided since last Reset()
-//  DataStore_Stats  : Maintain basic stats (min, max, input count, mean, standard deviation,
-//                     skew, kertosis), as values are supplied, but not individual values.
-//
-//  DataCollect      : All data needs to be pushed from where it is generated.
+//  DataCollect      : All data needs to be sent from where it is generated.
 //  DataCollect_Pull : Maintain a function to request new data (either individual values or sets)
 //
-//  DataProcess      : Keep raw data.
-//  DataProcess_Fun  : Maintain a Signal to trigger with collected data at Reset.  // @CAO: Default?
+//  DataStore        : Keep the most recent input value and a count of inputs since the last Reset()
+//  DataStore_Stats  : Maintain basic stats (min, max, input count, mean, standard deviation,
+//                     skew, kertosis), as values are supplied, but not individual values.
+//  DataStore_Full   : Stores ALL values that are provided since last Reset()
 //
-//  DataRecord        : Discard all data on Reset
-//  DataRecord_Prev   : Maintain previous values of data from last Reset // @CAO: Or X prev values?
-//  DataRecord_Store  : Maintain ALL previous data.
-//  DataRecord_Stream : Send all data into a stream of some kind.
+//  DataProcess      : Setup a signal to trigger on each reset.
+//                     * Actions can clean up data.
+//                     * Actions can control prior update's data stored.
+//                     * Actions can send data to a stream
+//                       (or stats automatically have a stream that, if non-null data is sent to?)
 
 #ifndef EMP_DATA_NODE_H
 #define EMP_DATA_NODE_H
