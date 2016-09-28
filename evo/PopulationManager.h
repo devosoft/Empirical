@@ -419,7 +419,6 @@ namespace evo {
     int pool_count;                            // How many pools are in the population?
     vector<int> pool_sizes;                    // How large is each pool?
     std::map<int, vector<int> > connections;   // Which other pools can each position access?
-    emp::Range<int> pool_range;                // What are the limits on pool size?
     vector<int> pool_end;                      // Where does the next pool begin? First begins at 0.
     double mig_rate;                           // How often do organisms migrate to a connected pool?
     vector<int> pool_id;
@@ -431,8 +430,6 @@ namespace evo {
 
     int GetPoolCount() const { return pool_count; }
     const vector<int> & GetSizes() const { return pool_sizes ; }
-    int GetUpper() const { return pool_range.upper; }   // @CAO: These are pooly named!!
-    int GetLower() const { return pool_range.lower; }
 
     void Setup(Random * r) {
       base_t::SetRandom(r);
@@ -443,11 +440,9 @@ namespace evo {
     }
 
     // Sets up population based on user specs.
-    void ConfigPop(int _pc, vector<int> _ps, std::map<int, vector<int> > * _c, int _u, int _l,
-                   double _mg, int _pop_size) {
+    void ConfigPop(int _pc, vector<int> _ps, std::map<int, vector<int> > * _c, double _mg, int _pop_size) {
       pool_count = _pc;
       pool_sizes = _ps;
-      pool_range.Set(_l,_u);
       connections = *_c;
       mig_rate = _mg;
       pool_end = {};
@@ -455,28 +450,17 @@ namespace evo {
       base_t::Resize(_pop_size);
       pool_id.resize(_pop_size, 0);
 
-      // If no pool sizes in vector, defaults to random sizes for each
+      // If no pool sizes in vector, error out
       if (pool_sizes.size() == 0) {
-        while (true) {
-          int pool_total = 0;
-          for( int i = 0; i < pool_count - 1; i++){
-            pool_sizes.push_back(40);
-            pool_total += pool_sizes[i];
-          }
-
-          if (pool_total < _pop_size){ // Keep generating random sizes until true
-            pool_sizes.push_back(_pop_size - pool_total);
-            break;
-          }
-
-          for (int i = 0; i < pool_count - 1; i++) { pool_sizes.pop_back(); }
-        }
+          std::cerr << "ERROR: No Pool sizes specified" <<std::endl;
+          return;
       }
       // If only one pool size in vector, uses that size for all pools
       else if (pool_sizes.size() == 1) {
         int temp = pool_sizes[0];
         for (int i = 1; i < pool_count; i++) { pool_sizes.push_back(temp); }
       }
+      // If not enough pool sizes given, error out
       else if (pool_sizes.size() != pool_count) {
         std::cerr << " ERROR: Not enough pool sizes" << std::endl;
         return;
