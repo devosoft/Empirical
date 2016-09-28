@@ -65,11 +65,6 @@ namespace evo {
     void SetRandom(Random * r) { random_ptr = r; }
     void Setup(Random * r) { SetRandom(r); }
 
-    // By default, assume a well-mixed population so random neighbors can be anyone.
-    int GetRandomNeighbor(int id) const {
-      return random_ptr->GetInt(0, pop.size());
-    }
-
     // AddOrgAt, AddOrgAppend, and SetOrgs are the only ways new organisms come into a population
     // (all others go through these)
 
@@ -138,6 +133,21 @@ namespace evo {
       for (ORG * org : pop) {
         if (org) org->Execute(std::forward<ARGS>(args)...);
       }
+    }
+
+    // -- Random Access --
+
+    // Get any cell, at random
+    int GetRandomCell() const { return random_ptr->GetInt(0, pop.size()); }
+
+    // By default, assume a well-mixed population so random neighbors can be anyone.
+    int GetRandomNeighbor(int /*id*/) const { return random_ptr->GetInt(0, pop.size()); }
+
+    // Get random *occupied* cell.
+    int GetRandomOrg() const {
+      int pos = random_ptr->GetInt(0, pop.size());
+      while (pop[pos] == nullptr) pos = random_ptr->GetInt(0, pop.size());
+      return pos;
     }
 
     // --- POPULATION ANALYSIS ---
