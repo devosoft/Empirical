@@ -100,7 +100,7 @@ namespace evo {
       // Delete all organisms.
       for (ORG * org : pop) if (org) delete org;  // Delete current organisms.
       pop.resize(0);                              // Remove deleted organisms.
-      fitM.Clear();                               // Clear the fitness manager cache.
+      fitM.ClearPop();                               // Clear the fitness manager cache.
       num_orgs = 0;
     }
 
@@ -179,7 +179,7 @@ namespace evo {
       for (int i = new_size; i < (int) pop.size(); ++i) ClearOrgAt(i);
       pop.resize(new_size);
 
-      fitM.Clear();  // Everyone is either removed or in the wrong place!
+      fitM.ClearPop();  // Everyone is either removed or in the wrong place!
     }
 
     // --- PRINTING ---
