@@ -96,6 +96,37 @@ namespace evo {
     bool Clear() { gen_map.clear(); return true; }
   };
 
+  // Assuming landscape is static, cache all we can!
+  template <typename GENOME>
+  class FitnessManager_Static : public FitnessManager_CacheOrg {
+  protected:
+    std::unordered_map<GENOME, double> gen_map;
+  public:
+    double CalcFitness(size_t id, GENOME* gen, const std::function<double(GENOME*)> & fit_fun) {
+      if (!gen) return 0.0;             // If genome is nullptr, fitness is 0.0
+      double cur_fit = GetCache(id);    // Try to get fitness from the cache.
+      if (cur_fit) return cur_fit;      // If fitness was cahced, return it!
+
+      // If fitness is not cached in the population, check if its genome is cached.
+      auto gen_it = gen_map.find(*gen);
+      if (gen_it == gen_map.end()) {    // If genome has no cached fitness..
+        cur_fit = fit_fun(gen);         // ...calculate it!
+        gen_map[*gen] = cur_fit;        // ...and cached the genome value.
+      }
+      else cur_fit = gen_it->second;
+
+      // Cache the fitness for this position in the population.
+      if (id >= fit_cache.size()) fit_cache.resize(id+1, 0.0);
+      fit_cache[id] = cur_fit;
+
+      // Finally, return the calculated value.
+      return cur_fit;
+    }
+
+    bool Clear() { fit_cache.resize(0); gen_map.clear(); return true; }
+  };
+
+
   // FitnessManager_Proportion requires the user to maintain fitness.
   class FitnessManager_Weights : public FitnessManager_Base {
   protected:
@@ -124,6 +155,7 @@ namespace evo {
   using CacheOff = FitnessManager_Base;
   using CacheOrgs = FitnessManager_CacheOrg;
   template <typename GENOME> using CacheGenome = FitnessManager_CacheGenome<GENOME>;
+  template <typename GENOME> using StaticFit = FitnessManager_Static<GENOME>;
   using FitWeights = FitnessManager_Weights;
 }
 }
