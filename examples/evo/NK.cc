@@ -44,7 +44,10 @@ int main(int argc, char* argv[])
 
   emp::Random random(config.SEED());
   emp::evo::NKLandscape landscape(N, K, random);
-  emp::evo::EAWorld<BitOrg, emp::evo::CacheOrgs> pop(random, "NKWorld");
+  // emp::evo::EAWorld<BitOrg, emp::evo::CacheOff> pop(random, "NKWorld");
+  // emp::evo::EAWorld<BitOrg, emp::evo::CacheOrgs> pop(random, "NKWorld");
+  // emp::evo::EAWorld<BitOrg, emp::evo::CacheGenome<BitOrg> > pop(random, "NKWorld");
+  emp::evo::EAWorld<BitOrg, emp::evo::StaticFit<BitOrg> > pop(random, "NKWorld");
 
   // Build a random initial population
   for (int i = 0; i < config.POP_SIZE(); i++) {
@@ -61,8 +64,6 @@ int main(int argc, char* argv[])
       return true;
     } );
 
-
-  // emp::LinkSignal("NKWorld::org-placement", std::function<void()>([](){ std::cout << "Placed." << std::endl; }) );
 
   // Loop through updates
   for (int ud = 0; ud < MAX_GENS; ud++) {
