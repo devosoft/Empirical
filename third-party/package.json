@@ -10,7 +10,7 @@
       "testee" : "0.2.5"
   },
   "scripts": {
-    "test": "cd ../tests/web && make"
+    "test": "cd ../tests && make test-web"
   },
   "author": "Devosoft",
   "license": "MIT"
