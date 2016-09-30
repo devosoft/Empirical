@@ -15,6 +15,13 @@
             mocha.reporter('html');
             var assert = chai.assert;
         </script>
+        <script type="text/javascript">
+          window.Testee = {
+            provider: {
+              type: 'rest'
+            }
+          };
+        </script>
         <div id="line_graph"></div>
         <div id="tree_viz"></div>
         <script src="test_visualizations.js"></script>
