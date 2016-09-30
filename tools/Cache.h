@@ -13,11 +13,11 @@
 
 namespace emp {
 
-  template <class Key,                                    // Cache::key_type
-	    class T,                                      // Cache::mapped_type
-	    class Hash = hash<Key>,                       // Cache::hasher
-	    class Pred = equal_to<Key>,                   // Cache::key_equal
-	    class Alloc = allocator< pair<const Key,T> >  // Cache::allocator_type
+  template <class Key,                                        // Cache::key_type
+	    class T,                                                // Cache::mapped_type
+	    class Hash = std::hash<Key>,                            // Cache::hasher
+	    class Pred = std::equal_to<Key>,                        // Cache::key_equal
+	    class Alloc = std::allocator< std::pair<const Key,T> >  // Cache::allocator_type
 	   >
   class Cache {
   private:
