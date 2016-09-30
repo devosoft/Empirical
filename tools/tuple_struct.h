@@ -76,7 +76,7 @@
 #define EMP_BUILD_TUPLE_ACCESSORS(TUPLE_NAME, POS, TYPE, NAME)     \
   const TYPE & NAME() const { return std::get<POS>(TUPLE_NAME); }  \
   TYPE & NAME() { return std::get<POS>(TUPLE_NAME); }              \
-  TYPE & NAME(const std::decay<TYPE>::type & _in) {                \
+  TYPE & NAME(const typename std::decay<TYPE>::type & _in) {                \
     std::get<POS>(TUPLE_NAME) = _in;                               \
     return std::get<POS>(TUPLE_NAME);                              \
   }								   \
