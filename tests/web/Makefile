@@ -13,20 +13,22 @@ OFLAGS_web_braces := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_
 #OFLAGS_web := -O3 -Werror -DNDEBUG -s TOTAL_MEMORY=67108864
 
 
-CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
-CFLAGS_web_braces := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s DEMANGLE_SUPPORT=1
+CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../web/library_emp.js --js-library ../../web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 default: all
-all: JSWrap.js js_utils.js
+all: JSWrap.js js_utils.js test_visualizations.js
 
 JSWrap.js: JSWrap.cc
 	$(CXX_web) $(CFLAGS_web) JSWrap.cc -o JSWrap.js
 
 js_utils.js: js_utils.cc
-	$(CXX_web) $(CFLAGS_web_braces) js_utils.cc -o js_utils.js
+	$(CXX_web) $(CFLAGS_web) js_utils.cc -o js_utils.js
+
+test_visualizations.js: test_visualizations.cc
+	$(CXX_web) $(CFLAGS_web) test_visualizations.cc -o test_visualizations.js
 
 clean:
-	rm -f JSWrap.js js_utils.js *.js.map *~
+	rm -f JSWrap.js js_utils.js test_visualizations.js *.js.map *.js.mem *~
 
 # Debugging information
 #print-%: ; @echo $*=$($*)

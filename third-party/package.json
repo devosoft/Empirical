@@ -1,0 +1,17 @@
+{
+  "name": "empirical-dev-dependencies",
+  "version": "1.0.0",
+  "description": "Dev dependencies for Empirical",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+      "mocha" : "^3.1.0",
+      "chai" : "3.5.0",
+      "testee" : "0.2.5"
+  },
+  "scripts": {
+    "test": "cd ../tests/web && make"
+  },
+  "author": "Devosoft",
+  "license": "MIT"
+}

@@ -1,7 +1,7 @@
 install-dependencies: build-doxygen install-pip-deps
 	git submodule update --init
 
-travis-install-dependencies: build-doxygen
+travis-install-dependencies: build-doxygen install-npm-deps
 	sudo pip install -r requirements.txt
 
 download-doxygen:
@@ -15,6 +15,9 @@ prepare-virtualenv:
 
 install-pip-deps: prepare-virtualenv
 	bash ./install_pip_deps.sh
+
+install-npm-deps: 
+	npm install
 
 clean:
 	rm -rf doxygen/build/*

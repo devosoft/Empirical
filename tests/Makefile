@@ -18,6 +18,7 @@ test: test-web test-prep $(addprefix subtest-, $(TEST_NAMES))
 
 test-web: 
 	  cd web && bash run_tests.sh
+	  cd .. && third-party/node_modules/testee/bin/testee --browsers firefox tests/web/TestRunner.html
 
 clean:
 	rm -f *.out
