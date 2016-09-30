@@ -2,6 +2,7 @@
 #define D3_INIT_H
 
 #include "../web_init.h"
+#include "../JSWrap.h"
 #include "../../tools/errors.h"
 #include "utils.h"
 
@@ -67,25 +68,56 @@ namespace D3 {
     ToolTip(std::string func) {
       EM_ASM_ARGS({
         var in_string = Pointer_stringify($1);
-        var fn = window["d3"][in_string];
-        if (typeof fn === "function"){
-          var new_sel = d3.tip().attr('class', 'd3-tip').offset([-10, 0]).html(fn);
-        } else {
-          var fn = window["emp"][in_string];
-          if (typeof fn === "function"){
-            var new_sel = d3.tip().attr('class', 'd3-tip').offset([-10, 0]).html(fn);
-          } else {
-            var fn = window[in_string];
-            if (typeof fn === "function"){
-              var new_sel = d3.tip().attr('class', 'd3-tip').offset([-10, 0]).html(fn);
-            } else {
-              var new_sel = d3.tip().attr('class', 'd3-tip').offset([-10, 0]).html(in_string);
-            }
-          }
+        if (typeof window["d3"][in_string] === "function"){
+          in_string = window["d3"][in_string];
+        } else if (typeof window["emp"][in_string] === "function"){
+          in_string = window["emp"][in_string];
+        } else if (typeof window[in_string] === "function"){
+          in_string = window[in_string];
         }
-        js.objects[$0] = new_sel;
+
+        js.objects[$0] = d3.tip().attr('class', 'd3-tip').offset([-10, 0]).html(in_string);
       }, this->id, func.c_str());
     }
+
+    /// @cond TEMPLATES
+    template <typename T>
+    ToolTip(T func) {
+      emp::JSWrap(func, emp::to_string(this->id)+"_html_func");
+      EM_ASM_ARGS({
+          js.objects[$0] = d3.tip().attr('class', 'd3-tip')
+                                   .offset([-10, 0])
+                                   .html(emp[$0+"_html_func"]);
+      }, id);
+
+    }
+    /// @endcond
+
+    void SetHtml(std::string func) {
+      EM_ASM_ARGS({
+        var in_string = Pointer_stringify($1);
+        if (typeof window["d3"][in_string] === "function"){
+          in_string = window["d3"][in_string];
+        } else if (typeof window["emp"][in_string] === "function"){
+          in_string = window["emp"][in_string];
+        } else if (typeof window[in_string] === "function"){
+          in_string = window[in_string];
+        }
+
+        js.objects[$0].html(in_string);
+      }, this->id, func.c_str());
+    }
+
+    /// @cond TEMPLATES
+    template <typename T>
+    typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+    SetHtml(T func) {
+      int id = emp::JSWrap(func, emp::to_string(id)+"_html_func");
+      EM_ASM_ARGS({js.objects[$0].html(emp[$0+"_html_func"]);}, id);
+      emp::JSDelete(id);
+    }
+    /// @endcond
+
   };
 
   /// A callable string d3.format() string formatting function

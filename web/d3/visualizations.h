@@ -105,7 +105,30 @@ public:
   FunctionSet<void> pending_funcs;
   bool init = false;
 
+  /// Callback function for drawing data after rescale animation
+  std::string draw_data_callback = "";
+
   virtual void Setup(){;}
+
+  /// @cond TEMPLATES
+  template <typename T>
+  typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+  SetDrawCallback(T func) {
+    emp::JSWrap(func, GetID()+"draw_data_callback");
+    draw_data_callback = GetID()+"draw_data_callback";
+  }
+  /// @endcond
+
+  /// This callback function will be called every time data is done being drawn.
+  /// Can be a string represnting the name of a function in Javascript (can be in the current
+  /// window, the emp namespace, or the d3 namespace)
+  void SetDrawCallback(std::string func) {
+    draw_data_callback = func;
+  }
+
+  void CallDrawCallback() {
+    EM_ASM_ARGS({window["emp"][Pointer_stringify($0)]()}, draw_data_callback.c_str());
+  }
 
   /*
   virtual void AnimateStep(...){;}
@@ -166,7 +189,7 @@ public:
     this->pending_funcs.Run();
   }
 
-  virtual void AnimateStep(int update, emp::vector<double> values){
+  virtual void AddDataPoint(int update, emp::vector<double> values){
       //Draw circles that represent values
       circles = new D3::Selection(GetSVG()->SelectAll("circle").Data(values));
       circles->EnterAppend("circle");
@@ -227,12 +250,9 @@ protected:
       return x_scale->ApplyScale(this->return_x(d));
   };
 
-  //Callback function for drawing data after rescale animation
-  std::string draw_data_callback = "";
   std::function<void()> draw_data = [this]() {
     DrawData(true);
   };
-
 
 public:
 
@@ -251,28 +271,16 @@ public:
     delete dataset;
   }
 
-  /// Helper function for formatting numbers in the tooltip
-  /// To change the format, simply replaces this with a new D3::FormatFunction
-  D3::FormatFunction format_data = D3::FormatFunction(".2f");
-
-  /// Function telling tooltip how to display a data point
-  /// The returned string must be html, which will be displayed in the tooltip.
-  /// To change the appearance of the tooltip, change this function.
-  std::function<std::string(DATA_TYPE)> tooltip_display = [this](DATA_TYPE d) {
-                                         return to_string(format_data(return_y(d)));
-                                     };
-
   /// Initializes the graph. This function is called automatically when the
   /// emp::Document this has been added to is ready.
   virtual void Setup(){
     D3::Selection * svg = GetSVG();
 
     //Wrap ncessary callback functions
-    JSWrap(tooltip_display, GetID()+"tooltip_display");
     JSWrap(draw_data, GetID()+"draw_data");
 
     //Create tool tip
-    tip = new D3::ToolTip(GetID()+"tooltip_display");
+    tip = new D3::ToolTip([this](DATA_TYPE d) {return D3::FormatFunction(".2f")(return_y(d));});
     GetSVG()->SetupToolTip(*tip);
 
     //Set up scales
@@ -308,7 +316,8 @@ public:
   D3::Axis<D3::LinearScale> * GetXAxis() {return x_axis;}
   D3::Axis<D3::LinearScale> * GetYAxis() {return y_axis;}
   D3::LineGenerator * GetLineGenerator() {return line_gen;}
-  D3::CSVDataset GetDataset() {return dataset;}
+  D3::CSVDataset * GetDataset() {return dataset;}
+  D3::ToolTip * GetToolTip() {return tip;}
   std::function<double(DATA_TYPE)> GetXAccessor() {return return_x;}
   std::function<double(DATA_TYPE)> GetYAccessor() {return return_y;}
   std::function<double(DATA_TYPE)> GetScaledX() {return x;}
@@ -320,6 +329,19 @@ public:
   void SetYAxis(D3::Axis<D3::LinearScale> * ax) {y_axis = ax;}
   void SetLineGenerator(D3::LineGenerator * line) {line_gen = line;}
   void SetDataset(D3::CSVDataset * d) {dataset = d;}
+
+  void SetTooltipFunction(std::string func) {
+    tip->SetHtml(func);
+  }
+
+  /// @cond TEMPLATES
+  template <typename T>
+  typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+  SetTooltipFunction(T func) {
+    tip->SetHtml(func);
+  }
+  /// @endcond
+
 
   /// @cond TEMPLATES
   template <typename T>
@@ -340,7 +362,8 @@ public:
   /// window, the emp namespace, or the d3 namespace)
 
   void SetXAccessor(std::string func) {
-    return_x = [](DATA_TYPE d){
+    return_x = [func](DATA_TYPE d){
+      emp::StoreReturn(d);
       return EM_ASM_DOUBLE({
         var func_string = Pointer_stringify($0);
         if (typeof window[func_string] === function) {
@@ -350,8 +373,8 @@ public:
         } else if (typeof window["d3"][func_string] === function) {
           func_string = window["d3"][func_string];
         }
-        return func_string();
-      }, d);
+        return func_string(emp_i.cb_return);
+      }, func.c_str());
     };
 
     JSWrap(return_x, GetID()+"return_x");
@@ -377,7 +400,8 @@ public:
   /// Can be a string represnting the name of a function in Javascript (can be in the current
   /// window, the emp namespace, or the d3 namespace)
   void SetYAccessor(std::string func) {
-    return_y = [](DATA_TYPE d){
+    return_y = [func](DATA_TYPE d){
+      emp::StoreReturn(d);
       return EM_ASM_DOUBLE({
         var func_string = Pointer_stringify($0);
         if (typeof window[func_string] === function) {
@@ -388,28 +412,12 @@ public:
           func_string = window["d3"][func_string];
         }
 
-        return func_string();
-      }, d);
+        return func_string(emp_i.cb_return);
+      }, func.c_str());
     };
     JSWrap(return_y, GetID()+"return_y");
     JSWrap(y, GetID()+"y");
     line_gen->SetY(GetID()+"y");
-  }
-
-  /// @cond TEMPLATES
-  template <typename T>
-  typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
-  SetDrawCallback(T func) {
-    emp::JSWrap(func, GetID()+"draw_data_callback");
-    draw_data_callback = GetID()+"draw_data_callback";
-  }
-  /// @endcond
-
-  /// This callback function will be called every time data is done being drawn.
-  /// Can be a string represnting the name of a function in Javascript (can be in the current
-  /// window, the emp namespace, or the d3 namespace)
-  void SetDrawCallback(std::string func) {
-    draw_data_callback = func;
   }
 
   /// Draw points and lines for data in this object's dataset object
@@ -457,7 +465,7 @@ public:
 
     // Set prev_data appropriately
     dataset->GetLastRow(prev_data);
-    EM_ASM_ARGS({window["emp"][Pointer_stringify($0)]()}, draw_data_callback.c_str());
+    CallDrawCallback();
   };
 
   /// Load data from the file at [filename]. Expected to be a CSV dataset
@@ -563,7 +571,7 @@ public:
 
     // Call callback
     if (data.size() == 0) {
-      EM_ASM_ARGS({window["emp"][Pointer_stringify($0)]()}, draw_data_callback.c_str());
+      CallDrawCallback();
     }
   }
 
@@ -581,45 +589,40 @@ public:
   }
 };
 
+struct TreeNode {
+  EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
+                                 double, y,
+                                 int, name,
+                                 int, parent,
+                                 int, depth
+                              )
+};
+
+template <typename NODE = TreeNode>
 class TreeVisualization : public D3Visualization {
 protected:
   double y_margin = 10;
   double x_margin = 30;
 
+  struct TreeEdge {
+    EMP_BUILD_INTROSPECTIVE_TUPLE( NODE, source,
+                                   NODE, target)
+  };
+
+  D3::ToolTip * tip;
+
   void InitializeVariables() {
     JSWrap(color_fun_node, GetID()+"color_fun_node");
-    JSWrap(tooltip_display, GetID()+"tooltip_display");
-
+    JSWrap(color_fun_link, GetID()+"color_fun_link");
     data = new D3::JSONDataset();
-    tip = new D3::ToolTip(GetID()+"tooltip_display");
+    tip = new D3::ToolTip([](NODE d, int i){return "Name: " + to_string(d.name());});
     GetSVG()->Move(0,0);
-    data->Append(std::string("{\"name\": 0, \"parent\": \"null\" \"children\" : []}"));
+    data->Append(std::string("{\"name\": 0, \"parent\": \"null\", \"children\" : []}"));
     tree.SetDataset(data);
     tree.SetSize(GetHeight(), GetWidth());
   }
 
-public:
-
-  struct TreeNode {
-    EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
-                                   double, y,
-                                   int, name,
-				                   int, parent,
-                                   int, depth
-                                )
-  };
-
-
-  struct TreeEdge {
-    EMP_BUILD_INTROSPECTIVE_TUPLE( TreeNode, source,
-                                     TreeNode, target)
-  };
-
-  D3::TreeLayout<TreeNode> tree;
-  D3::ToolTip * tip;
-  D3::JSONDataset * data;
-
-  std::function<std::string(TreeNode, int)> color_fun_node = [](TreeNode d, int i){
+  std::function<std::string(NODE, int)> color_fun_node = [](NODE d, int i){
     return "black";
   };
 
@@ -627,9 +630,9 @@ public:
     return "black";
   };
 
-  std::function<std::string(TreeNode, int)> tooltip_display = [](TreeNode d, int i) {
-    return "Name: " + to_string(d.name());
-  };
+public:
+  D3::TreeLayout<NODE> tree;
+  D3::JSONDataset * data;
 
   TreeVisualization(int width, int height) : D3Visualization(width, height){variables.push_back("Persist");}
 
@@ -639,12 +642,30 @@ public:
     this->pending_funcs.Run();
   }
 
+  void SetTooltipFunction(std::string func) {
+    tip->SetHtml(func);
+  }
+
+  /// @cond TEMPLATES
+  template <typename T>
+  typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+  SetTooltipFunction(T func) {
+    tip->SetHtml(func);
+  }
+  /// @endcond
+
+  D3::TreeLayout<NODE> * GetTreeLayout() {return &tree;}
+  D3::JSONDataset * GetDataset() {return data;}
+  D3::ToolTip * GetToolTip() {return tip;}
+
+  void SetDataset(D3::JSONDataset * d) {data = d;}
 
   void LoadDataFromFile(std::string filename) {
     if (this->init) {
       data->LoadDataFromFile(filename, [this](){DrawTree();});
     } else {
       this->pending_funcs.Add([this, filename](){
+          std::cout << "loading data" << std::endl;
           data->LoadDataFromFile(filename, [this](){
               DrawTree();
           });
@@ -652,7 +673,7 @@ public:
     }
   }
 
-  virtual void AnimateStep(int parent, int child){
+  virtual void AddDataPoint(int parent, int child){
     std::string child_json = std::string("{\"name\":" + to_string(child) + ", \"parent\":" + to_string(parent) + ", \"children\":[]}");
     data->AppendNested(child_json);
     DrawTree();
@@ -663,19 +684,30 @@ public:
     nodeEnter.Append("circle").SetAttr("r", 2).AddToolTip(*tip);
     GetSVG()->SelectAll("g.node").SelectAll("circle").SetStyle("fill", GetID()+"color_fun_node");
     GetSVG()->SelectAll(".link").SetStyle("stroke", GetID()+"color_fun_link");
+    CallDrawCallback();
   }
 
 };
 
-class TreeVisualizationReplacement : public TreeVisualization {
+template <typename NODE = TreeNode>
+class TreeVisualizationReplacement : public TreeVisualization<NODE> {
+protected:
+  using TreeVisualization<NODE>::GetID;
+  using TreeVisualization<NODE>::GetSVG;
+  using TreeVisualization<NODE>::InitializeVariables;
+  using TreeVisualization<NODE>::DrawTree;
+  using TreeVisualization<NODE>::tip;
+  using TreeVisualization<NODE>::variables;
+  using TreeVisualization<NODE>::data;
+
 public:
 
   int next_pos;
   int next_parent = 0;
   int next_child;
-   D3::JSObject possible_parents;
+  D3::JSObject possible_parents;
 
-  TreeVisualizationReplacement(int width, int height) : TreeVisualization(width, height){variables.push_back("Persist");}
+  TreeVisualizationReplacement(int width, int height) : TreeVisualization<NODE>(width, height){variables.push_back("Persist");}
 
   virtual void Setup() {
     InitializeVariables();
@@ -688,7 +720,7 @@ public:
     this->pending_funcs.Run();
   }
 
-  virtual void AnimateStep(int parent, int child){
+  virtual void AddDataPoint(int parent, int child){
     std::string child_json = std::string("{\"name\":" + to_string(child) + ", \"parent\":" + to_string(parent) + ", \"children\":[]}");
     int pos = data->AppendNestedFromList(child_json, possible_parents);
     (void) pos;
@@ -704,7 +736,7 @@ public:
 
   void RecordPlacement(int pos) {
     next_pos = pos + 1;
-    AnimateStep(next_parent, next_child);
+    AddDataPoint(next_parent, next_child);
   }
 
   void RecordParent(int parent, int child) {
@@ -713,8 +745,24 @@ public:
   }
 };
 
+struct SpatialGridTreeNode {
+  EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
+                                 double, y,
+                                 int, name,
+                                 int, parent,
+                                 int, depth,
+                                 int, loc
+                              )
+};
 
-class SpatialGridTreeVisualization : public TreeVisualization {
+template <typename NODE = SpatialGridTreeNode, template <typename> class TREE_TYPE = TreeVisualization>
+class SpatialGridTreeVisualization : public TREE_TYPE<NODE> {
+protected:
+  using TREE_TYPE<NODE>::GetID;
+  using TREE_TYPE<NODE>::GetSVG;
+  using TREE_TYPE<NODE>::InitializeVariables;
+  using TREE_TYPE<NODE>::DrawTree;
+  using TREE_TYPE<NODE>::tip;
 
 public:
 
@@ -724,27 +772,16 @@ public:
 
   D3::Selection legend;
 
-  struct TreeNode {
-    EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
-                                   double, y,
-                                   int, name,
-				                   int, parent,
-                                   int, depth,
-                                   int, loc
-                                )
-  };
-
-
   struct TreeEdge {
-    EMP_BUILD_INTROSPECTIVE_TUPLE( TreeNode, source,
-                                     TreeNode, target)
+    EMP_BUILD_INTROSPECTIVE_TUPLE( NODE, source,
+                                   NODE, target)
   };
 
   struct LegendNode {
     EMP_BUILD_INTROSPECTIVE_TUPLE( int, loc)
   };
 
-  std::function<std::string(TreeNode, int, int)> color_fun_node = [this](TreeNode d, int i, int k){
+  std::function<std::string(NODE, int)> color_fun_node = [this](NODE d, int i){
     if (d.loc() < 0) {
       return std::string("black");
     }
@@ -771,7 +808,7 @@ public:
     return result;
   };
 
-  std::function<std::string(TreeNode, int, int)> dark_color_fun = [this](TreeNode d, int i, int k){
+  std::function<std::string(NODE, int)> dark_color_fun = [this](NODE d, int i){
     if (d.loc() < 0) {
       return std::string("black");
     }
@@ -798,55 +835,54 @@ public:
     return result;
   };
 
-  std::function<std::string(TreeEdge, int, int)> color_fun_link = [this](TreeEdge d, int i, int k){
-    return this->color_fun_node(d.source(),0,0);
+  std::function<std::string(TreeEdge, int)> color_fun_link = [this](TreeEdge d, int i){
+    return this->color_fun_node(d.source(), i);
   };
 
-  std::function<std::string(TreeNode, int, int)> tooltip_display = [this](TreeNode d, int i, int k) {
-    return "ID: " + to_string(d.name()) + ", Pos: (" + to_string(d.loc()% grid_width) + ", " + to_string(d.loc()/grid_width) + ")";
-  };
-
-  std::function<int(LegendNode, int, int)> get_x = [this](LegendNode d, int i, int k) {
+  std::function<int(LegendNode)> get_x = [this](LegendNode d) {
     return legend_cell_size*(d.loc() % grid_width);
   };
 
-  std::function<int(LegendNode, int, int)> get_y = [this](LegendNode d, int i, int k) {
+  std::function<int(LegendNode)> get_y = [this](LegendNode d) {
     return legend_cell_size*(d.loc() / grid_width);
   };
 
   std::function<void(LegendNode, int, int)> legend_mouseover = [this](LegendNode d, int i, D3::Selection s) {
-    legend.SelectAll("rect").Filter([d](LegendNode in_data, int i, int k){return d.loc() != in_data.loc();}).SetClassed("faded", true);
-    GetSVG()->SelectAll(".node").Filter([d](LegendNode in_data, int i, int k){return d.loc() != in_data.loc();}).SetClassed("faded", true);
+    legend.SelectAll("rect").Filter([d](LegendNode in_data){return d.loc() != in_data.loc();}).SetClassed("faded", true);
+    GetSVG()->SelectAll(".node").Filter([d](LegendNode in_data){return d.loc() != in_data.loc();}).SetClassed("faded", true);
     EM_ASM_ARGS({emp.filter_fun = function(d){return d.source.loc != $0;}}, d.loc());
     GetSVG()->SelectAll(".link").Filter("filter_fun").SetClassed("faded", true);
   };
 
   std::function<void(LegendNode, int, int)> legend_mouseout = [this](LegendNode d, int i, D3::Selection s) {
     legend.SelectAll("rect")
-          .Filter([d](LegendNode in_data, int i, int k){return d.loc() != in_data.loc();})
+          .Filter([d](LegendNode in_data){return d.loc() != in_data.loc();})
           .SetClassed("faded", false);
     GetSVG()->SelectAll(".node")
-             .Filter([d](LegendNode in_data, int i, int k){return d.loc() != in_data.loc();})
+             .Filter([d](LegendNode in_data){return d.loc() != in_data.loc();})
              .SetClassed("faded", false);
 
     EM_ASM_ARGS({emp.filter_fun = function(d){return d.source.loc != $0}}, d.loc());
     GetSVG()->SelectAll(".link").Filter("filter_fun").SetClassed("faded", false);
   };
 
-  SpatialGridTreeVisualization(int width, int height) : TreeVisualization(width, height){;}
+  SpatialGridTreeVisualization(int width, int height) : TreeVisualization<NODE>(width, height){;}
 
   virtual void Setup() {
-    TreeVisualization::Setup();
+    TREE_TYPE<NODE>::Setup();
     JSWrap(color_fun_node, GetID()+"color_fun_node");
     JSWrap(dark_color_fun, GetID()+"dark_color_fun");
     JSWrap(color_fun_link, GetID()+"color_fun_link");
-    JSWrap(tooltip_display, GetID()+"tooltip_display");
     JSWrap(legend_mouseover, GetID()+"legend_mouseover");
     JSWrap(legend_mouseout, GetID()+"legend_mouseout");
     JSWrap(get_x, GetID()+"get_x");
     JSWrap(get_y, GetID()+"get_y");
-    delete tip;
-    tip = new D3::ToolTip(GetID()+"tooltip_display");
+    tip.SetHtml(D3::ToolTip([this](NODE d){
+                    return "ID: " + to_string(d.name()) + ", Pos: ("
+                           + to_string(d.loc()% grid_width) + ", "
+                           + to_string(d.loc()/grid_width) + ")";
+                }));
+
     legend = D3::Select("body").Append("svg");
 
     legend.SetAttr("x", 1000).SetAttr("y", 0).SetAttr("width", legend_cell_size*grid_width).SetAttr("height", legend_cell_size*grid_height);

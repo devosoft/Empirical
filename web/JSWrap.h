@@ -412,7 +412,7 @@ namespace emp {
         // Make sure that we are returning the correct number of arguments.  If this
         // assert fails, it means that we've failed to set the correct number of arguments
         // in emp.cb_args, and need to realign.
-        emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() == num_args, EMP_GetCBArgCount(), num_args);
+        emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() >= num_args, EMP_GetCBArgCount(), num_args);
 
         // Collect the values of the arguments in a tuple
         using args_t = std::tuple< typename std::decay<ARG_TYPES>::type... >;

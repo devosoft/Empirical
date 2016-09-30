@@ -1,4 +1,4 @@
-install-dependencies: build-doxygen install-pip-deps
+install-dependencies: build-doxygen install-pip-deps install-npm-deps
 	git submodule update --init
 
 travis-install-dependencies: build-doxygen install-npm-deps

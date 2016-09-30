@@ -58,9 +58,7 @@ namespace D3 {
       s = s.Append("path");
 
       EM_ASM_ARGS({
-        console.log(js.objects[$1], $1);
 	    var sel = js.objects[$0].attr("d", js.objects[$1](js.objects[$2]));
-        console.log(sel);
     }, s.GetID(), this->id, data.GetID());
       return s;
     }

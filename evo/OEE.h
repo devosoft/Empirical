@@ -192,27 +192,6 @@ namespace evo{
       }
     }
 
-    void ConnectVis(web::D3Visualization * viz) {
-      emp::vector<int> vars;
-      for (std::string variable : viz->variables) {
-        if (variable == "Update"){
-          vars.push_back(-1);
-        } else if (variable == "Persist") {
-          vars.push_back(-2);
-        } else {
-          auto it = std::find(col_map.begin(), col_map.end(), variable);
-          if (it == col_map.end()) {
-            NotifyWarning("Invalid graph variable.");
-          }
-          int pos = std::distance(col_map.begin(), it);
-          vars.push_back(pos);
-        }
-      }
-
-      viz_pointers.push_back(viz);
-      viz_args.push_back(vars);
-    }
-
     //Convert a container of orgs to skeletons containing only informative sites
     //TODO: Currently assumes bit org
     template <template <typename> class C >

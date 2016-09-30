@@ -96,9 +96,12 @@ namespace D3 {
     void AppendNested(std::string json) {
 
       int fail = EM_ASM_INT({
+
+        var obj = JSON.parse(Pointer_stringify($2));
+
         var result = null;
         for (var i in js.objects[$0]) {
-          result = js.objects[$1](js.objects[$0][i]);
+          result = js.objects[$1](js.objects[$0][i], obj.parent);
           if (result) {
             break;
           }
@@ -106,7 +109,7 @@ namespace D3 {
         if (!result) {
           return 1;
         }
-        result.children.append(JSON.parse(Pointer_stringify($2)));
+        result.children.push(obj);
         return 0;
     }, this->id, FindInHierarchy.GetID(), json.c_str());
 
@@ -149,7 +152,6 @@ namespace D3 {
 
 
     void LoadDataFromFile(std::string location, std::string callback, bool header=true) {
-        std::cout << "In loaddata " << callback << std::endl;
       EM_ASM_ARGS({
         var acc = function(d){
             return ([+d[0], +d[1]]);
@@ -157,7 +159,6 @@ namespace D3 {
 
         var arg1 = Pointer_stringify($0);
         var in_string = Pointer_stringify($1);
-        console.log("about to convert to function", in_string);
         if (typeof window[in_string] === "function"){
           in_string = window[in_string];
         } else if (typeof window["d3"][in_string] === "function") {
@@ -165,7 +166,7 @@ namespace D3 {
         } else if (typeof window["emp"][in_string] === "function") {
           in_string = window["emp"][in_string];
         }
-        console.log(in_string);
+
         if ($3) {
           d3.csv(arg1, acc, function(d){
             js.objects[$2] = d;
@@ -195,10 +196,8 @@ namespace D3 {
     void GetLastRow(std::array<T, N> & arr) {
       EM_ASM_ARGS({
         emp_i.__outgoing_array = js.objects[$0][js.objects[$0].length - 1];
-        console.log(emp_i.__outgoing_array);
       }, GetID());
       emp::pass_array_to_cpp(arr);
-      std::cout << emp::to_string(arr) << std::endl;
     }
 
     //TODO Format and FormatRows
