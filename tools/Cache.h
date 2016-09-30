@@ -36,13 +36,15 @@ namespace emp {
     void Clear() { cache_map.clear(); }
     void Erase(const Key & k) { cache_map.erase(k); }
 
-    const T & Get(const Key & k, const std::function<T(const Key & k)> & calc_fun) {
-      auto & cache_it = cache_map.find(k);
+    T Get(Key k, const std::function<T(Key k)> & calc_fun) {
+      auto cache_it = cache_map.find(k);
       if (cache_it != cache_map.end()) return cache_it->second;
       return cache_map.emplace(k, calc_fun(k)).first->second;
     }
-    T Get(Key k, const std::function<T(Key k)> & calc_fun) {
-      auto & cache_it = cache_map.find(k);
+
+    // A version of Get that allows calls with const references instead of pass-by-value.
+    const T & GetRef(const Key & k, const std::function<T(const Key & k)> & calc_fun) {
+      auto cache_it = cache_map.find(k);
       if (cache_it != cache_map.end()) return cache_it->second;
       return cache_map.emplace(k, calc_fun(k)).first->second;
     }
