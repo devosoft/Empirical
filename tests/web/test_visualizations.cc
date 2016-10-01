@@ -135,11 +135,13 @@ int main() {
   //   });
   // });
 
+emp::JSWrap([](std::string draw_data_callback){EM_ASM_ARGS({window["emp"][Pointer_stringify($0)]()}, draw_data_callback.c_str());}, "call_callback");
+
   EM_ASM({
     describe("Test", function(){
         before(function(done){
             emp.done = done;
-            emp.MakeTreeViz("done");
+            emp.call_callback("done");
         });
         it ('should assert correctly', function(){
             chai.assert.equal(1,1);
