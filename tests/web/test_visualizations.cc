@@ -136,7 +136,7 @@ int main() {
   // });
 
 emp::JSWrap([](std::string callback){tree_viz << tree; tree.SetDrawCallback(callback);}, "test");
-emp::JSWrap([](){tree.CallDrawCallback();}, "call_callback");
+emp::JSWrap([](){tree.LoadDataFromFile("../test-data/lineage-example.json");}, "call_callback");
   EM_ASM({
     describe("Test", function(){
         before(function(done){
