@@ -49,7 +49,7 @@ void TestAnimateStep_Tree(std::string callback) {
 int main() {
   // emp::JSWrap(MakeLineGraph, "MakeLineGraph");
   // emp::JSWrap(TestAnimateStep_LineGraph, "TestAnimateStep_LineGraph");
-  // emp::JSWrap(MakeTreeViz, "MakeTreeViz");
+  emp::JSWrap(MakeTreeViz, "MakeTreeViz");
   // emp::JSWrap(TestAnimateStep_Tree, "TestAnimateStep_Tree");
   //
   // EM_ASM({
@@ -138,7 +138,8 @@ int main() {
   EM_ASM({
     describe("Test", function(){
         before(function(done){
-            d3.text("../test-data/test-line-graph.csv", function(d){done()});
+            emp.done = done;
+            emp.MakeTreeViz("done");
         });
         it ('should assert correctly', function(){
             chai.assert.equal(1,1);
