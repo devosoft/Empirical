@@ -135,7 +135,7 @@ int main() {
   //   });
   // });
 
-emp::JSWrap([](std::string draw_data_callback){EM_ASM_ARGS({window["emp"][Pointer_stringify($0)]()}, draw_data_callback.c_str());}, "call_callback");
+emp::JSWrap([](std::string draw_data_callback){tree_viz << tree; EM_ASM_ARGS({window["emp"][Pointer_stringify($0)]()}, draw_data_callback.c_str());}, "call_callback");
 
   EM_ASM({
     describe("Test", function(){
