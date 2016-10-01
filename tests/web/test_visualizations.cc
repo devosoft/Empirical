@@ -137,6 +137,9 @@ int main() {
 
   EM_ASM({
     describe("Test", function(){
+        before(function(done){
+            d3.text("../test-data/test-line-graph.csv", function(d){done()});
+        });
         it ('should assert correctly', function(){
             chai.assert.equal(1,1);
         });
