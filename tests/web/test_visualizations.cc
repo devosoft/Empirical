@@ -140,7 +140,7 @@ emp::JSWrap([](){tree.GetDataset()->LoadDataFromFile("../test-data/lineage-examp
     EM_ASM_ARGS({
 
       // Based on code from http://www.d3noob.org/2014/01/tree-diagrams-in-d3js_11.html
-      var nodes = js.objects[$0].nodes(js.objects[$1][0]).reverse();
+    //  var nodes = js.objects[$0].nodes(js.objects[$1][0]).reverse();
     //   links = js.objects[$0].links(nodes);
       //
     //   nodes.forEach(function(d) { d.y = d.depth * 20; });
