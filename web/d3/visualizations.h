@@ -509,7 +509,7 @@ public:
       x_axis->Rescale(x_min, x_max, t);
       t.Each("end", GetID()+"draw_data");
       Redraw(t);
-
+      CallDrawCallback();
     } else {
       DrawData(false);
     }
@@ -530,7 +530,7 @@ public:
   }
 
   void DrawData(bool backlog = false) {
-      CallDrawCallback();
+
     //If there's a backlog, then we're only allowed to clear it if this
     //was called recursively or from javascript (since javascript handles)
     //using this as a callback to asynchronous stuff)
