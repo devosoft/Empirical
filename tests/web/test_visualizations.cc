@@ -136,14 +136,13 @@ int main() {
   // });
 
 emp::JSWrap([](std::string callback){tree_viz << tree; tree.SetDrawCallback(callback);}, "test");
-emp::JSWrap([](){tree.GetDataset()->LoadDataFromFile("../test-data/lineage-example.json", [](){tree.CallDrawCallback();});}, "call_callback");
+emp::JSWrap([](){tree.GetDataset()->LoadDataFromFile("../test-data/lineage-example.json", [](){tree.DrawTree(); tree.CallDrawCallback();});}, "call_callback");
   EM_ASM({
     describe("Test", function(){
         before(function(done){
             emp.done = done;
             emp.test("done");
-            //emp.call_callback();
-            d3.json("../test-data/lineage-example.json", function(d){emp.done()});
+            emp.call_callback();
         });
         it ('should assert correctly', function(){
             chai.assert.equal(1,1);
