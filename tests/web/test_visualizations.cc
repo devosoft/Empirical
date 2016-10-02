@@ -142,7 +142,8 @@ emp::JSWrap([](){tree.GetDataset()->LoadDataFromFile("../test-data/lineage-examp
         before(function(done){
             emp.done = done;
             emp.test("done");
-            emp.call_callback();
+            //emp.call_callback();
+            d3.json("../test-data/lineage-example.json", function(d){emp.done()});
         });
         it ('should assert correctly', function(){
             chai.assert.equal(1,1);
