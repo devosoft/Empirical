@@ -530,7 +530,7 @@ public:
   }
 
   void DrawData(bool backlog = false) {
-
+      CallDrawCallback();
     //If there's a backlog, then we're only allowed to clear it if this
     //was called recursively or from javascript (since javascript handles)
     //using this as a callback to asynchronous stuff)
