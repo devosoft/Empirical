@@ -140,7 +140,7 @@ emp::JSWrap([](){tree.GetDataset()->LoadDataFromFile("../test-data/lineage-examp
     EM_ASM_ARGS({
 
       // Based on code from http://www.d3noob.org/2014/01/tree-diagrams-in-d3js_11.html
-      var nodes = js.objects[$1][0];//.reverse();
+      //console.log(js.objects[$1]);//.reverse();
     //   links = js.objects[$0].links(nodes);
       //
     //   nodes.forEach(function(d) { d.y = d.depth * 20; });
@@ -187,10 +187,11 @@ emp::JSWrap([](){tree.GetDataset()->LoadDataFromFile("../test-data/lineage-examp
         before(function(done){
             emp.done = done;
             emp.test("done");
-            emp.call_callback();
+            d3.json("../test-data/lineage-example.json", function(d){emp.data = d; done()})
+            //emp.call_callback();
         });
         it ('should assert correctly', function(){
-            chai.assert.equal(1,1);
+            chai.assert.equal(emp.data[0].name, 0);
         });
     });
 });
