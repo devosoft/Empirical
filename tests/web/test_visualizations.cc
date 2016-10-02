@@ -137,7 +137,49 @@ int main() {
 
 emp::JSWrap([](std::string callback){tree_viz << tree; tree.SetDrawCallback(callback);}, "test");
 emp::JSWrap([](){tree.GetDataset()->LoadDataFromFile("../test-data/lineage-example.json", [](){
-    D3::Selection nodeEnter = tree.GetTreeLayout()->GenerateNodesAndLinks(*(tree.GetSVG()))[0];
+    EM_ASM_ARGS({
+
+      // Based on code from http://www.d3noob.org/2014/01/tree-diagrams-in-d3js_11.html
+      var nodes = js.objects[$0].nodes(js.objects[$1][0]).reverse();
+      links = js.objects[$0].links(nodes);
+
+      nodes.forEach(function(d) { d.y = d.depth * 20; });
+
+      // Declare the nodesâ€¦
+      var node = js.objects[$3].selectAll("g.node")
+          .data(nodes, function(d) { return d.name; });
+
+      var nodeExit = node.exit();
+      var nodeEnter = node.enter().append("g")
+              .attr("class", "node")
+              .attr("transform", function(d) {
+                  return "translate(" + d.y + "," + d.x + ")"; });
+
+      node.attr("transform", function(d) {
+                return "translate(" + d.y + "," + d.x + ")"; });
+
+      var link = js.objects[$3].selectAll("path.link")
+        .data(links, function(d) { return d.target.name; });
+
+      var linkExit = link.exit();
+      // Enter the links.
+      var linkEnter = link.enter().insert("path", "g")
+          .attr("class", "link")
+          .attr("d", js.objects[$2])
+          .attr("fill", "none")
+          .attr("stroke", "black")
+          .attr("stroke-width", 1);
+
+      link.attr("class", "link")
+          .attr("d", js.objects[$2]);
+
+      js.objects.push(nodeEnter);
+      js.objects.push(nodeExit);
+      js.objects.push(linkEnter);
+      js.objects.push(linkExit);
+  }, tree.GetTreeLayout()->GetID(), tree.GetDataset()->GetID(), tree.GetTreeLayout()->make_line->GetID(), tree.GetSVG()->GetID());
+
+
     tree.CallDrawCallback();
 });}, "call_callback");
   EM_ASM({
