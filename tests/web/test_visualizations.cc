@@ -27,7 +27,7 @@ emp::web::TreeVisualization<LineageTreeNode> tree(500, 250);
 void MakeLineGraph(std::string callback) {
   doc << line_graph;
   line_graph.SetDrawCallback(callback);
-  //line_graph.LoadDataFromFile("../test-data/test-line-graph.csv");
+  line_graph.LoadDataFromFile("../test-data/test-line-graph.csv");
 }
 
 void TestAnimateStep_LineGraph(std::string callback) {
@@ -59,7 +59,7 @@ int main() {
       before( function(done) {
         emp.done = done;
         emp.MakeLineGraph("done");
-        done();
+        //done();
       });
 
       it('should have data-points for each piece of test data', function() {
