@@ -8,6 +8,7 @@
 #define EMP_META_H
 
 #include <tuple>
+#include <utility>
 
 namespace emp {
 
@@ -108,8 +109,8 @@ namespace emp {
   size_t CombineHash(const T & x) { return std::hash<T>()(x); }
 
   template<typename T1, typename T2, typename... EXTRA>
-  size_t CombineHash(const T1 & x1, const T2 & x2, EXTRA... x_extra) {
-    size_t h2 = CombineHash(x2, x_extra...);
+  size_t CombineHash(const T1 & x1, const T2 & x2, const EXTRA &... x_extra) {
+    const size_t h2 = CombineHash(x2, x_extra...);
     return std::hash<T1>()(x1) + 0x9e3779b9 + (h2 << 19) + (h2 >> 13);
   }
 
