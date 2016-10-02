@@ -184,14 +184,8 @@ emp::JSWrap([](){tree.GetDataset()->LoadDataFromFile("../test-data/lineage-examp
 });}, "call_callback");
   EM_ASM({
     describe("Test", function(){
-        before(function(done){
-            emp.done = done;
-            emp.test("done");
-            d3.json("../test-data/lineage-example.json", function(d){emp.data = d; done()})
-            //emp.call_callback();
-        });
-        it ('should assert correctly', function(){
-            chai.assert.equal(emp.data[0].name, 0);
+        it ('should assert correctly', function(done){
+            d3.json("../test-data/lineage-example.json", function(d){chai.assert.equal(d[0].name, 0); done()})
         });
     });
 });
