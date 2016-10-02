@@ -138,7 +138,6 @@ int main() {
 emp::JSWrap([](std::string callback){tree_viz << tree; tree.SetDrawCallback(callback);}, "test");
 emp::JSWrap([](){tree.GetDataset()->LoadDataFromFile("../test-data/lineage-example.json", [](){
     D3::Selection nodeEnter = tree.GetTreeLayout()->GenerateNodesAndLinks(*(tree.GetSVG()))[0];
-    nodeEnter.Append("circle").SetAttr("r", 2).AddToolTip(*(tree.GetToolTip())); 
     tree.CallDrawCallback();
 });}, "call_callback");
   EM_ASM({
