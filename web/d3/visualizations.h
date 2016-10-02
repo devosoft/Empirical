@@ -509,6 +509,7 @@ public:
       x_axis->Rescale(x_min, x_max, t);
       t.Each("end", GetID()+"draw_data");
       Redraw(t);
+      CallDrawCallback();
 
     } else {
       DrawData(false);
