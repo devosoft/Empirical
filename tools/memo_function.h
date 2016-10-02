@@ -11,6 +11,8 @@
 
 #include <unordered_map>
 
+#include "meta.h"
+
 namespace emp {
 
   template <class T> class memo_function;    // Not defined.
@@ -18,26 +20,26 @@ namespace emp {
   template <class R, class... ARGS>
   class memo_function<R(ARGS...)> {
   public:
-    using key_type = std::tuple<ARGS...>;
-    using mapped_type = R;
+    using size_t = std::size_t;
+    using return_t = R;
     using fun_t = std::function<R(ARGS...)>;
 
   private:
-    std::unordered_map<key_type, R> cache_map;
+    std::unordered_map<size_t, return_t> cache_map;
+    fun_t fun;
 
   public:
     size_t size() const { return cache_map.size(); }
 
-    bool Has(const ARGS &... k) const {
-      return cache_map.find(key_type(k...)) != cache_map.end();
-    }
+    inline static size_t Hash(const ARGS &... k) { return CombineHash(k...); }
+    bool Has(const ARGS &... k) const { return cache_map.find(Hash(k...)) != cache_map.end(); }
     void Clear() { cache_map.clear(); }
-    void Erase(const ARGS &... k) { cache_map.erase(key_type(k...)); }
+    void Erase(const ARGS &... k) { cache_map.erase(Hash(k...)); }
 
     R Get(ARGS... k, const fun_t & calc_fun) {
-      auto cache_it = cache_map.find(key_type(k...));
+      auto cache_it = cache_map.find(Hash(k...));
       if (cache_it != cache_map.end()) return cache_it->second;
-      return cache_map.emplace(key_type(k...), calc_fun(k...)).first->second;
+      return cache_map.emplace(Hash(k...), calc_fun(k...)).first->second;
     }
 
   };
