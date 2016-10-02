@@ -665,7 +665,6 @@ public:
       data->LoadDataFromFile(filename, [this](){DrawTree();});
     } else {
       this->pending_funcs.Add([this, filename](){
-          std::cout << "loading data" << std::endl;
           data->LoadDataFromFile(filename, [this](){
               DrawTree();
           });
@@ -673,13 +672,13 @@ public:
     }
   }
 
-  virtual void AddDataPoint(int parent, int child){
+  void AddDataPoint(int parent, int child){
     std::string child_json = std::string("{\"name\":" + to_string(child) + ", \"parent\":" + to_string(parent) + ", \"children\":[]}");
     data->AppendNested(child_json);
     DrawTree();
   }
 
-  virtual void DrawTree() {
+  void DrawTree() {
     D3::Selection nodeEnter = tree.GenerateNodesAndLinks(*GetSVG())[0];
     nodeEnter.Append("circle").SetAttr("r", 2).AddToolTip(*tip);
     GetSVG()->SelectAll("g.node").SelectAll("circle").SetStyle("fill", GetID()+"color_fun_node");
@@ -720,7 +719,7 @@ public:
     this->pending_funcs.Run();
   }
 
-  virtual void AddDataPoint(int parent, int child){
+  void AddDataPoint(int parent, int child){
     std::string child_json = std::string("{\"name\":" + to_string(child) + ", \"parent\":" + to_string(parent) + ", \"children\":[]}");
     int pos = data->AppendNestedFromList(child_json, possible_parents);
     (void) pos;
