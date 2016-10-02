@@ -89,6 +89,7 @@ int main() {
         });
 
         it('should let you add data and rescale accordingly', function() {
+          emp.emp__0draw_data();
           var data_points = d3.select("#line_graph").selectAll(".data-point");
           chai.assert.equal(data_points[0].length, 6);
           chai.assert.deepEqual(data_points.data(), [[1, 5], [2, 3], [3, 6], [4, 1], [5, 10], [6,12]]);
