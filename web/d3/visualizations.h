@@ -535,10 +535,10 @@ public:
     //If there's a backlog, then we're only allowed to clear it if this
     //was called recursively or from javascript (since javascript handles)
     //using this as a callback to asynchronous stuff)
-    // if ((!backlog && data.size() > 1) || data.size() == 0){
-    //   //EM_ASM_ARGS({window["emp"][Pointer_stringify($0)]()}, draw_data_callback.c_str());
-    //   return;
-    // }
+    if ((!backlog && data.size() > 1) || data.size() == 0){
+      //EM_ASM_ARGS({window["emp"][Pointer_stringify($0)]()}, draw_data_callback.c_str());
+      return;
+    }
     //
     // //We can't draw a line on the first update
     // if (prev_data[0] >= 0 ){
@@ -565,14 +565,14 @@ public:
     prev_data = data[0];
     data.pop_front();
 
-    // if (data.size() > 0) {
-    //   DrawData(true);
-    // }
-    //
-    // // Call callback
-    // if (data.size() == 0) {
-    //   CallDrawCallback();
-    // }
+    if (data.size() > 0) {
+      DrawData(true);
+    }
+
+    // Call callback
+    if (data.size() == 0) {
+      CallDrawCallback();
+    }
   }
 
   void Clear() {
