@@ -103,6 +103,18 @@ namespace emp {
   }
 
 
+  // Combine multiple keys into a single hash value.
+  template<typename T>
+  size_t CombineHash(const T & x) { return std::hash<T>()(x); }
+
+  template<typename T1, typename T2, typename... EXTRA>
+  size_t CombineHash(const T1 & x1, const T2 & x2, EXTRA... x_extra) {
+    size_t h2 = CombineHash(x2, x_extra...);
+    return std::hash<T1>()(x1) + 0x9e3779b9 + (h2 << 19) + (h2 >> 13);
+  }
+
+
+
   // The following template takes two parameters; the real type you want it to be and a decoy
   // type that should just be evaluated for use in SFINAE.
   // To use: typename sfinae_decoy<X,Y>::type
