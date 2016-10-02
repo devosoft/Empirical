@@ -535,23 +535,23 @@ public:
     //If there's a backlog, then we're only allowed to clear it if this
     //was called recursively or from javascript (since javascript handles)
     //using this as a callback to asynchronous stuff)
-    if ((!backlog && data.size() > 1) || data.size() == 0){
-      //EM_ASM_ARGS({window["emp"][Pointer_stringify($0)]()}, draw_data_callback.c_str());
-      return;
-    }
-
-    //We can't draw a line on the first update
-    if (prev_data[0] >= 0 ){
-      std::array<DATA_TYPE, 2> line_data;
-      line_data[0] = prev_data;
-      line_data[1] = data[0];
-
-      D3::Selection line = line_gen->DrawShape(line_data, *GetSVG());
-      line.SetAttr("fill", "none");
-      line.SetAttr("stroke-width", 1);
-      line.SetAttr("stroke", "black");
-      line.SetAttr("class", "line-seg");
-    }
+    // if ((!backlog && data.size() > 1) || data.size() == 0){
+    //   //EM_ASM_ARGS({window["emp"][Pointer_stringify($0)]()}, draw_data_callback.c_str());
+    //   return;
+    // }
+    //
+    // //We can't draw a line on the first update
+    // if (prev_data[0] >= 0 ){
+    //   std::array<DATA_TYPE, 2> line_data;
+    //   line_data[0] = prev_data;
+    //   line_data[1] = data[0];
+    //
+    //   D3::Selection line = line_gen->DrawShape(line_data, *GetSVG());
+    //   line.SetAttr("fill", "none");
+    //   line.SetAttr("stroke-width", 1);
+    //   line.SetAttr("stroke", "black");
+    //   line.SetAttr("class", "line-seg");
+    // }
 
     // If it isn't nested, D3 will think it's 2 separate points
     std::array<DATA_TYPE, 1> new_point = {data[0]};
@@ -565,14 +565,14 @@ public:
     prev_data = data[0];
     data.pop_front();
 
-    if (data.size() > 0) {
-      DrawData(true);
-    }
-
-    // Call callback
-    if (data.size() == 0) {
-      CallDrawCallback();
-    }
+    // if (data.size() > 0) {
+    //   DrawData(true);
+    // }
+    //
+    // // Call callback
+    // if (data.size() == 0) {
+    //   CallDrawCallback();
+    // }
   }
 
   void Clear() {
