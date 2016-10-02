@@ -11,6 +11,7 @@
 
 #include <unordered_map>
 
+#include "assert.h"
 #include "meta.h"
 
 namespace emp {
@@ -29,6 +30,9 @@ namespace emp {
     fun_t fun;
 
   public:
+    template <typename... Ts>
+    memo_function(Ts &&... args) : fun(std::forward<Ts>(args)...) { ; }
+
     size_t size() const { return cache_map.size(); }
 
     inline static size_t Hash(const ARGS &... k) { return CombineHash(k...); }
@@ -36,12 +40,12 @@ namespace emp {
     void Clear() { cache_map.clear(); }
     void Erase(const ARGS &... k) { cache_map.erase(Hash(k...)); }
 
-    R Get(ARGS... k, const fun_t & calc_fun) {
+    return_t operator()(ARGS... k) {
+      emp_assert(fun); // Function must be specified with Get() -or- already set.
       auto cache_it = cache_map.find(Hash(k...));
       if (cache_it != cache_map.end()) return cache_it->second;
-      return cache_map.emplace(Hash(k...), calc_fun(k...)).first->second;
+      return cache_map.emplace(Hash(k...), fun(std::forward<ARGS>(k)...)).first->second;
     }
-
   };
 
 }
