@@ -507,10 +507,9 @@ public:
       D3::Transition t = svg->MakeTransition();
       y_axis->Rescale(y_max, y_min, t);
       x_axis->Rescale(x_min, x_max, t);
-
+      t.Each("end", GetID()+"draw_data");
       Redraw(t);
 
-      t.Each("end", GetID()+"draw_data");
     } else {
       DrawData(false);
     }
