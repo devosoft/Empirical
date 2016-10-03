@@ -509,7 +509,6 @@ public:
       x_axis->Rescale(x_min, x_max, t);
       t.Each("end", GetID()+"draw_data");
       Redraw(t);
-      CallDrawCallback();
 
     } else {
       DrawData(false);
@@ -539,19 +538,19 @@ public:
       //EM_ASM_ARGS({window["emp"][Pointer_stringify($0)]()}, draw_data_callback.c_str());
       return;
     }
-    //
-    // //We can't draw a line on the first update
-    // if (prev_data[0] >= 0 ){
-    //   std::array<DATA_TYPE, 2> line_data;
-    //   line_data[0] = prev_data;
-    //   line_data[1] = data[0];
-    //
-    //   D3::Selection line = line_gen->DrawShape(line_data, *GetSVG());
-    //   line.SetAttr("fill", "none");
-    //   line.SetAttr("stroke-width", 1);
-    //   line.SetAttr("stroke", "black");
-    //   line.SetAttr("class", "line-seg");
-    // }
+
+    //We can't draw a line on the first update
+    if (prev_data[0] >= 0 ){
+      std::array<DATA_TYPE, 2> line_data;
+      line_data[0] = prev_data;
+      line_data[1] = data[0];
+
+      D3::Selection line = line_gen->DrawShape(line_data, *GetSVG());
+      line.SetAttr("fill", "none");
+      line.SetAttr("stroke-width", 1);
+      line.SetAttr("stroke", "black");
+      line.SetAttr("class", "line-seg");
+    }
 
     // If it isn't nested, D3 will think it's 2 separate points
     std::array<DATA_TYPE, 1> new_point = {data[0]};

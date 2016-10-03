@@ -6,10 +6,6 @@
 #include <iostream>
 #include <functional>
 
-emp::web::Document doc("line_graph");
-emp::web::Document tree_viz("tree_viz");
-emp::web::LineGraph<std::array<double, 2> > line_graph("x", "y", 500, 250);
-
 struct LineageTreeNode {
   EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
                                  double, y,
@@ -22,31 +18,43 @@ struct LineageTreeNode {
                               )
 };
 
+emp::web::Document doc("line_graph");
+emp::web::Document tree_viz("tree_viz");
+emp::web::LineGraph<std::array<double, 2> > line_graph("x", "y", 500, 250);
+
 emp::web::TreeVisualization<LineageTreeNode> tree(500, 250);
 
 void MakeLineGraph(std::string callback) {
   doc << line_graph;
+  std::cout << callback << std::endl;
   line_graph.SetDrawCallback(callback);
-  line_graph.LoadDataFromFile("../test-data/test-line-graph.csv");
-}
+  std::cout << "loading data" << std::endl;
+  line_graph.LoadDataFromFile("/base/tests/test-data/test-line-graph.csv");
+};
 
 void TestAnimateStep_LineGraph(std::string callback) {
   line_graph.SetDrawCallback(callback);
   line_graph.AddDataPoint({6,12});
-}
+};
 
 void MakeTreeViz(std::string callback) {
   tree_viz << tree;
   tree.SetDrawCallback(callback);
-  tree.LoadDataFromFile("../test-data/lineage-example.json");
-}
+  tree.LoadDataFromFile("/base/tests/test-data/lineage-example.json");
+};
 
 void TestAnimateStep_Tree(std::string callback) {
   tree.SetDrawCallback(callback);
   tree.AddDataPoint(0,10);
-}
+};
+
+
 
 int main() {
+  EM_ASM({
+      console.log(d3.select("#line_graph"));
+  });
+
   emp::JSWrap(MakeLineGraph, "MakeLineGraph");
   emp::JSWrap(TestAnimateStep_LineGraph, "TestAnimateStep_LineGraph");
   emp::JSWrap(MakeTreeViz, "MakeTreeViz");
