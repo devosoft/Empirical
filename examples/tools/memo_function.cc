@@ -15,13 +15,26 @@ double F(int N) {
   return val;
 }
 
+double G(int N) {
+  return 0.00005 * (double) N;
+}
+
 int main()
 {
   std::cout << "Testing.  " << std::endl;
 
   emp::memo_function<double(int)> test_fun(F);
 
-  for (int i = 0; i < 400; i++) {
+  for (int i = 0; i < 200; i++) {
+    std::cout << i%100 << ":" << test_fun(i%100+10000000) << " ";
+    if (i%8 == 7) std::cout << std::endl;
+  }
+
+  // Change the test function; make sure we get a new set of results!
+  test_fun = std::function<double(int)>(G);
+
+  std::cout << std::endl; // Skip a line...
+  for (int i = 0; i < 200; i++) {
     std::cout << i%100 << ":" << test_fun(i%100+10000000) << " ";
     if (i%8 == 7) std::cout << std::endl;
   }
