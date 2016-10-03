@@ -24,6 +24,7 @@ namespace emp {
     using size_t = std::size_t;
     using return_t = R;
     using fun_t = std::function<R(ARGS...)>;
+    using this_t = memo_function<R(ARGS...)>;
 
   private:
     std::unordered_map<size_t, return_t> cache_map;
@@ -32,6 +33,13 @@ namespace emp {
   public:
     template <typename... Ts>
     memo_function(Ts &&... args) : fun(std::forward<Ts>(args)...) { ; }
+
+    this_t & operator=(const this_t &) = default;
+    this_t & operator=(this_t &&) = default;
+    this_t & operator=(const fun_t & _f) { cache_map.clear(); fun=_f; return *this; }
+    this_t & operator=(fun_t && _f) { cache_map.clear(); fun=std::move(_f); return *this; }
+    template <typename T>
+    this_t & operator=(T && arg) { fun = std::forward<T>(arg); return *this; }
 
     size_t size() const { return cache_map.size(); }
 
@@ -46,6 +54,8 @@ namespace emp {
       if (cache_it != cache_map.end()) return cache_it->second;
       return cache_map.emplace(Hash(k...), fun(std::forward<ARGS>(k)...)).first->second;
     }
+
+    operator bool() { return (bool) fun; }
   };
 
 }
