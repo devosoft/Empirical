@@ -15,10 +15,13 @@ struct Temp2Type {
   B b;
 };
 
+int Sum3(int x, int y, int z) { return x+y+z; }
+
 int main()
 {
   std::cout << "Ping!" << std::endl;
 
+  // Test AdaptTepmplate()
   emp::AdaptTemplate_Arg1< Temp2Type<std::string, std::string>, double > map2;
 
   map2.a = 3.45;
@@ -26,4 +29,26 @@ int main()
 
   std::cout << map2.a << std::endl;
   std::cout << map2.b << std::endl;
+
+
+  // Test CombineHash()
+  std::cout << "\nHash results...:\n";
+  std::cout << "hash(2) = " << std::hash<int>()(2) << std::endl
+	    << "hash(3) = " << std::hash<int>()(3) << std::endl
+	    << "hash(4) = " << std::hash<int>()(4) << std::endl
+	    << "CombineHash(4) = " << emp::CombineHash(4) << std::endl
+	    << "CombineHash(2,3) = " << emp::CombineHash(2,3) << std::endl
+	    << "CombineHash(2,3) = " << emp::CombineHash(2,3) << std::endl
+	    << "CombineHash(3,2) = " << emp::CombineHash(3,2) << std::endl
+	    << "CombineHash(3,4) = " << emp::CombineHash(3,4) << std::endl
+	    << "CombineHash(2,3,4) = " << emp::CombineHash(2,3,4) << std::endl;
+
+  // Test ApplyTuple
+  std::cout << "\nApply results...:\n";
+  int x = 10;
+  int y = 13;
+  int z = 22;
+  auto test_tup = std::make_tuple(x,y,z);
+  std::cout << "Sum(" << x << "," << y << "," << z << ") = "
+	    << emp::ApplyTuple(Sum3, test_tup) << std::endl;
 }

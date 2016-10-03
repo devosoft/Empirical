@@ -6,11 +6,6 @@
 //
 //
 //  Developer notes:
-//  * Rather than deleting organisms outright, run all deletions through a ClearCell function
-//    so that a common signal system can also be run.
-//  * Grids always add injected organisms to empty cells; may have trouble if there are none.
-//  * Population iterators and indexing should either be const OR work with proxies to ensure
-//    that fitness caching and signals are handled correctly.
 //  * Should we do something to link Proxy and iterator; in both cases they represent a position
 //    in the populaiton vector, but iterator can only point to valid cells...
 
@@ -34,8 +29,10 @@ namespace evo {
 
     FIT_MANAGER & fitM;
     int num_orgs;
-
     Random * random_ptr;
+
+  private:
+    pop_t pop;
 
     class Proxy {
     private:
@@ -48,9 +45,6 @@ namespace evo {
       ORG & operator*() const { return *(popM.pop[id]); }
       Proxy & operator=(ORG * new_org) { popM.AddOrgAt(new_org,id); return *this; }
     };
-
-  private:
-    pop_t pop;
 
   public:
     PopulationManager_Base(const std::string &, FIT_MANAGER & _fm) : fitM(_fm), num_orgs(0) { ; }
@@ -67,14 +61,12 @@ namespace evo {
     int GetSize() const { return (int) pop.size(); }
     int GetNumOrgs() const { return num_orgs; }
     ptr_t GetOrg(int id) const { return pop[id]; }
+    double CalcFitness(int id, const std::function<double(ORG*)> & fit_fun) const {
+      return fitM.CalcFitness(id, pop[id], fit_fun);
+    }
 
     void SetRandom(Random * r) { random_ptr = r; }
     void Setup(Random * r) { SetRandom(r); }
-
-    // By default, assume a well-mixed population so random neighbors can be anyone.
-    int GetRandomNeighbor(int id) const {
-      return random_ptr->GetInt(0, pop.size());
-    }
 
     // AddOrgAt, AddOrgAppend, and SetOrgs are the only ways new organisms come into a population
     // (all others go through these)
@@ -108,7 +100,7 @@ namespace evo {
       // Delete all organisms.
       for (ORG * org : pop) if (org) delete org;  // Delete current organisms.
       pop.resize(0);                              // Remove deleted organisms.
-      fitM.Clear();                               // Clear the fitness manager cache.
+      fitM.ClearPop();                               // Clear the fitness manager cache.
       num_orgs = 0;
     }
 
@@ -146,6 +138,22 @@ namespace evo {
       }
     }
 
+    // -- Random Access --
+
+    // Get any cell, at random
+    int GetRandomCell() const { return random_ptr->GetInt(0, pop.size()); }
+
+    // By default, assume a well-mixed population so random neighbors can be anyone.
+    int GetRandomNeighbor(int /*id*/) const { return random_ptr->GetInt(0, pop.size()); }
+
+    // Get random *occupied* cell.
+    int GetRandomOrg() const {
+      emp_assert(num_orgs > 0); // Make sure it's possible to find an organism!
+      int pos = random_ptr->GetInt(0, pop.size());
+      while (pop[pos] == nullptr) pos = random_ptr->GetInt(0, pop.size());
+      return pos;
+    }
+
     // --- POPULATION ANALYSIS ---
 
     emp::vector<int> FindCellIDs(const std::function<bool(ORG*)> & filter) {
@@ -171,7 +179,7 @@ namespace evo {
       for (int i = new_size; i < (int) pop.size(); ++i) ClearOrgAt(i);
       pop.resize(new_size);
 
-      fitM.Clear();  // Everyone is either removed or in the wrong place!
+      fitM.ClearPop();  // Everyone is either removed or in the wrong place!
     }
 
     // --- PRINTING ---
@@ -202,7 +210,6 @@ namespace evo {
     void resize(int new_size) { Resize(new_size); }
     void clear() { Clear(); }
 
-    // @CAO: these need work to make sure we send correct signals on changes & update fitness cache.
     Proxy operator[](int i) { return Proxy(*this, i); }
     const ptr_t operator[](int i) const { return pop[i]; }
     iterator_t begin() { return iterator_t(this, 0); }
@@ -311,7 +318,6 @@ namespace evo {
   class PopulationManager_SerialTransfer : public PopulationManager_Base<ORG,FIT_MANAGER> {
   protected:
     using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
-    using base_t::pop;
     using base_t::fitM;
 
     int max_size;
@@ -333,7 +339,7 @@ namespace evo {
     void ConfigPop(int m, int b) { max_size = m; bottleneck_size = b; }
 
     int AddOrgBirth(ORG * new_org, int parent_pos) {
-      if ((int) pop.size() >= max_size) {
+      if (base_t::GetSize() >= max_size) {
         base_t::DoBottleneck(bottleneck_size);
         ++num_bottlenecks;
       }
@@ -413,7 +419,6 @@ namespace evo {
     int pool_count;                            // How many pools are in the population?
     vector<int> pool_sizes;                    // How large is each pool?
     std::map<int, vector<int> > connections;   // Which other pools can each position access?
-    emp::Range<int> pool_range;                // What are the limits on pool size?
     vector<int> pool_end;                      // Where does the next pool begin? First begins at 0.
     double mig_rate;                           // How often do organisms migrate to a connected pool?
     vector<int> pool_id;
@@ -425,8 +430,6 @@ namespace evo {
 
     int GetPoolCount() const { return pool_count; }
     const vector<int> & GetSizes() const { return pool_sizes ; }
-    int GetUpper() const { return pool_range.upper; }   // @CAO: These are pooly named!!
-    int GetLower() const { return pool_range.lower; }
 
     void Setup(Random * r) {
       base_t::SetRandom(r);
@@ -437,11 +440,9 @@ namespace evo {
     }
 
     // Sets up population based on user specs.
-    void ConfigPop(int _pc, vector<int> _ps, std::map<int, vector<int> > * _c, int _u, int _l,
-                   double _mg, int _pop_size) {
+    void ConfigPop(int _pc, vector<int> _ps, std::map<int, vector<int> > * _c, double _mg, int _pop_size) {
       pool_count = _pc;
       pool_sizes = _ps;
-      pool_range.Set(_l,_u);
       connections = *_c;
       mig_rate = _mg;
       pool_end = {};
@@ -449,28 +450,17 @@ namespace evo {
       base_t::Resize(_pop_size);
       pool_id.resize(_pop_size, 0);
 
-      // If no pool sizes in vector, defaults to random sizes for each
+      // If no pool sizes in vector, error out
       if (pool_sizes.size() == 0) {
-        while (true) {
-          int pool_total = 0;
-          for( int i = 0; i < pool_count - 1; i++){
-            pool_sizes.push_back(40);
-            pool_total += pool_sizes[i];
-          }
-
-          if (pool_total < _pop_size){ // Keep generating random sizes until true
-            pool_sizes.push_back(_pop_size - pool_total);
-            break;
-          }
-
-          for (int i = 0; i < pool_count - 1; i++) { pool_sizes.pop_back(); }
-        }
+          std::cerr << "ERROR: No Pool sizes specified" <<std::endl;
+          return;
       }
       // If only one pool size in vector, uses that size for all pools
       else if (pool_sizes.size() == 1) {
         int temp = pool_sizes[0];
         for (int i = 1; i < pool_count; i++) { pool_sizes.push_back(temp); }
       }
+      // If not enough pool sizes given, error out
       else if (pool_sizes.size() != pool_count) {
         std::cerr << " ERROR: Not enough pool sizes" << std::endl;
         return;

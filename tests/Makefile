@@ -8,7 +8,7 @@ test-prep:
 	mkdir -p temp
 
 subtest-%: test_%.cc
-	$(CXX) -std=c++11 $< -o $@.out
+	$(CXX) -std=c++14 $< -o $@.out
 	#echo "running $@.out"
 	# execute test
 	./$@.out

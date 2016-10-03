@@ -9,6 +9,7 @@
 
 #include <tuple>
 #include <functional>
+#include <utility>
 
 namespace emp {
 
@@ -81,27 +82,42 @@ namespace emp {
   // Based on Kerrek SB in http://stackoverflow.com/questions/10766112/c11-i-can-go-from-multiple-args-to-tuple-but-can-i-go-from-tuple-to-multiple
 
   namespace internal {
-    template <typename FUN_TYPE, typename TUPLE_TYPE, bool is_done, int TOTAL, int... N>
+    template <typename FUN_T, typename TUPLE_T, bool is_done, int TOTAL, int... N>
     struct apply_impl {
-      static void apply(FUN_TYPE fun, TUPLE_TYPE && t) {
-        apply_impl<FUN_TYPE, TUPLE_TYPE, TOTAL == 1 + sizeof...(N), TOTAL, N..., sizeof...(N)>::apply(fun, std::forward<TUPLE_TYPE>(t));
+      static auto apply(FUN_T fun, TUPLE_T && t) {
+        return apply_impl<FUN_T, TUPLE_T, TOTAL == 1+sizeof...(N), TOTAL, N..., sizeof...(N)>
+                 ::apply(fun, std::forward<TUPLE_T>(t));
       }
     };
 
-    template <typename FUN_TYPE, typename TUPLE_TYPE, int TOTAL, int... N>
-    struct apply_impl<FUN_TYPE, TUPLE_TYPE, true, TOTAL, N...> {
-      static void apply(FUN_TYPE fun, TUPLE_TYPE && t) {
-        fun(std::get<N>(std::forward<TUPLE_TYPE>(t))...);
+    template <typename FUN_T, typename TUPLE_T, int TOTAL, int... N>
+    struct apply_impl<FUN_T, TUPLE_T, true, TOTAL, N...> {
+      static auto apply(FUN_T fun, TUPLE_T && t) {
+        return fun(std::get<N>(std::forward<TUPLE_T>(t))...);
       }
     };
   }
 
   // user invokes this
-  template <typename FUN_TYPE, typename TUPLE_TYPE>
-  void ApplyTuple(FUN_TYPE fun, TUPLE_TYPE && tuple) {
-    typedef typename std::decay<TUPLE_TYPE>::type TUPLE_DECAY_TYPE;
-    internal::apply_impl<FUN_TYPE, TUPLE_TYPE, 0 == std::tuple_size<TUPLE_DECAY_TYPE>::value, std::tuple_size<TUPLE_DECAY_TYPE>::value>::apply(fun, std::forward<TUPLE_TYPE>(tuple));
+  template <typename FUN_T, typename TUPLE_T>
+  auto ApplyTuple(FUN_T fun, TUPLE_T && tuple) {
+    using tuple_decay_t = typename std::decay<TUPLE_T>::type;
+    constexpr auto tup_size = std::tuple_size<tuple_decay_t>::value;
+    constexpr bool no_args = (tup_size == 0);
+    return internal::apply_impl<FUN_T, TUPLE_T, no_args, tup_size>::apply(fun, std::forward<TUPLE_T>(tuple));
   }
+
+
+  // Combine multiple keys into a single hash value.
+  template <typename T>
+  size_t CombineHash(const T & x) { return std::hash<T>()(x); }
+
+  template<typename T1, typename T2, typename... EXTRA>
+  size_t CombineHash(const T1 & x1, const T2 & x2, const EXTRA &... x_extra) {
+    const size_t h2 = CombineHash(x2, x_extra...);
+    return std::hash<T1>()(x1) + 0x9e3779b9 + (h2 << 19) + (h2 >> 13);
+  }
+
 
 
   // The following template takes two parameters; the real type you want it to be and a decoy
