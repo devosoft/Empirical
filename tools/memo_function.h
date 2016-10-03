@@ -39,7 +39,7 @@ namespace emp {
     this_t & operator=(const fun_t & _f) { cache_map.clear(); fun=_f; return *this; }
     this_t & operator=(fun_t && _f) { cache_map.clear(); fun=std::move(_f); return *this; }
     template <typename T>
-    this_t & operator=(T && arg) { fun = std::forward<T>(arg); return *this; }
+    this_t & operator=(T && arg) { cache_map.clear(); fun = std::forward<T>(arg); return *this; }
 
     size_t size() const { return cache_map.size(); }
 
