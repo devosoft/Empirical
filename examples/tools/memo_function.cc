@@ -31,7 +31,8 @@ int main()
   }
 
   // Change the test function; make sure we get a new set of results!
-  test_fun = std::function<double(int)>(G);
+  // test_fun = std::function<double(int)>(G);
+  test_fun = G;
 
   std::cout << std::endl; // Skip a line...
   for (int i = 0; i < 200; i++) {
@@ -39,4 +40,15 @@ int main()
     if (i%8 == 7) std::cout << std::endl;
   }
 
+  // Build a recursive memo_function...
+  test_fun = [&test_fun](int N) {
+    if (N<=1) return (double) N;
+    return test_fun(N-1) + test_fun(N-2);
+  };
+
+  std::cout << std::endl; // Skip a line...
+  for (int i = 80; i < 90; i++) {
+    std::cout << i << ":" << test_fun(i) << " ";
+    if (i%8 == 7) std::cout << std::endl;
+  }
 }
