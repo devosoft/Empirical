@@ -685,6 +685,11 @@ public:
     CallDrawCallback();
   }
 
+  void Clear() {
+    GetSVG()->SelectAll(".node").Data({}).ExitRemove();
+    GetSVG()->SelectAll(".link").Data({}).ExitRemove();
+  }
+
 };
 
 template <typename NODE = TreeNode>

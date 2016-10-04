@@ -1,3 +1,6 @@
+// This file is a monstrosity, because including multiple emscripten-generated
+// Javascript files in karma will cause horrible problems.
+
 
 #include "../../web/Document.h"
 #include "../../web/d3/visualizations.h"
@@ -23,12 +26,12 @@ emp::web::Document tree_viz("tree_viz");
 emp::web::LineGraph<std::array<double, 2> > line_graph("x", "y", 500, 250);
 
 emp::web::TreeVisualization<LineageTreeNode> tree(500, 250);
+D3::Selection example_selection;
+D3::Selection circles;
 
 void MakeLineGraph(std::string callback) {
   doc << line_graph;
-  std::cout << callback << std::endl;
   line_graph.SetDrawCallback(callback);
-  std::cout << "loading data" << std::endl;
   line_graph.LoadDataFromFile("/base/tests/test-data/test-line-graph.csv");
 };
 
@@ -36,6 +39,10 @@ void TestAnimateStep_LineGraph(std::string callback) {
   line_graph.SetDrawCallback(callback);
   line_graph.AddDataPoint({6,12});
 };
+
+void ClearLineGraph() {
+  line_graph.Clear();
+}
 
 void MakeTreeViz(std::string callback) {
   tree_viz << tree;
@@ -48,17 +55,73 @@ void TestAnimateStep_Tree(std::string callback) {
   tree.AddDataPoint(0,10);
 };
 
+void ClearTreeViz() {
+  tree.Clear();
+}
+
+int MakeSVG(){
+  example_selection = D3::Select("body").Append("svg");
+  return example_selection.GetID();
+}
+
+int BindData() {
+  circles = example_selection.SelectAll("circle").Data(std::array<int, 4>({8,3,5,2})).Enter().Append("circle");
+  return circles.GetID();
+}
+
+void TestSetAttrString(){
+  circles.SetAttr("transform", "skewX(10)");
+}
+
+void TestSetAttrInt(){
+  circles.SetAttr("r", 3);
+}
+
+void TestSetAttrFunc(){
+  circles.SetAttr("cx", [](int d){return d;});
+  circles.SetAttr("cy", [](int d){return d;});
+}
+
+void TestSetStyleString(){
+  circles.SetStyle("fill", "purple");
+}
+
+void TestSetStyleInt(){
+  circles.SetStyle("stroke-width", 5);
+}
+
+void TestSetStyleFunc(){
+  circles.SetStyle("stroke", [](int d){
+      if (d>4) {
+        return "green";
+      } else {
+        return "blue";
+      }
+  });
+}
+
+int TestFilterByFunc(){
+  D3::Selection filtered = circles.Filter([](int d){return d > 4;});
+  return filtered.GetID();
+}
+
+int TestFilterBySel(){
+  example_selection.Append("div").SetAttr("id", "example_id");
+  D3::Selection filtered = D3::SelectAll("div").Filter("#example_id");
+  return filtered.GetID();
+}
 
 
 int main() {
-  EM_ASM({
-      console.log(d3.select("#line_graph"));
-  });
 
   emp::JSWrap(MakeLineGraph, "MakeLineGraph");
   emp::JSWrap(TestAnimateStep_LineGraph, "TestAnimateStep_LineGraph");
   emp::JSWrap(MakeTreeViz, "MakeTreeViz");
   emp::JSWrap(TestAnimateStep_Tree, "TestAnimateStep_Tree");
+  emp::JSWrap(MakeSVG, "MakeSVG");
+  emp::JSWrap(BindData, "BindData");
+  emp::JSWrap(ClearLineGraph, "ClearLineGraph");
+  emp::JSWrap(ClearTreeViz, "ClearTreeViz");
 
   EM_ASM({
 
@@ -67,7 +130,6 @@ int main() {
       before( function(done) {
         emp.done = done;
         emp.MakeLineGraph("done");
-        //done();
       });
 
       it('should have data-points for each piece of test data', function() {
@@ -108,6 +170,10 @@ int main() {
 
       });
 
+      after(function(){
+        emp.ClearLineGraph();
+      });
+
     });
   });
 
@@ -142,8 +208,89 @@ int main() {
 
       });
 
+      after(function(){
+        emp.ClearTreeViz();
+      });
+
     });
   });
+
+  emp::JSWrap(TestSetAttrString, "TestSetAttrString");
+  emp::JSWrap(TestSetAttrInt, "TestSetAttrInt");
+  emp::JSWrap(TestSetAttrFunc, "TestSetAttrFunc");
+  emp::JSWrap(TestSetStyleString, "TestSetStyleString");
+  emp::JSWrap(TestSetStyleInt, "TestSetStyleInt");
+  emp::JSWrap(TestSetStyleFunc, "TestSetStyleFunc");
+  emp::JSWrap(TestFilterByFunc, "TestFilterByFunc");
+  emp::JSWrap(TestFilterBySel, "TestFilterBySel");
+
+  EM_ASM({
+    emp.svg_id = -1;
+    emp.id = -1;
+
+    describe('Selections', function(){
+        before(function(){
+          emp.svg_id = emp.MakeSVG();
+          emp.id = emp.BindData();
+        });
+
+        it('should be possible to make and append to', function() {
+            chai.assert.isNotNull(js.objects[emp.svg_id], "Selection created!");
+        });
+
+        it('should let you bind data to it', function(){
+            chai.assert.equal(js.objects[emp.id][0].length, 4);
+        });
+
+        it('should correctly set attributes to strings', function(){
+            emp.TestSetAttrString();
+            chai.assert.equal(js.objects[emp.id].attr("transform"), "skewX(10)");
+        });
+
+        it('should correctly set attributes to ints', function(){
+            emp.TestSetAttrInt();
+            chai.assert.equal(js.objects[emp.id].attr("r"), 3);
+        });
+
+        it('should correctly set attributes with callback functions', function(){
+            emp.TestSetAttrFunc();
+            chai.assert.equal(js.objects[emp.id].attr("cx"), 8);
+            chai.assert.equal(js.objects[emp.id].attr("cy"), 8);
+            chai.assert.equal(js.objects[emp.id].filter(function(d,i){return i==2}).attr("cx"), 5);
+            chai.assert.equal(js.objects[emp.id].filter(function(d,i){return i==2}).attr("cy"), 5);
+        });
+
+        it('should correctly set styles to strings', function(){
+            emp.TestSetStyleString();
+            chai.assert.equal(js.objects[emp.id].style("fill"), "rgb(128, 0, 128)");
+        });
+
+        it('should correctly set styles to ints', function(){
+            emp.TestSetStyleInt();
+            chai.assert.equal(js.objects[emp.id].style("stroke-width"), 5);
+        });
+
+        it('should correctly set styles with callback functions', function(){
+            emp.TestSetStyleFunc();
+            chai.assert.equal(js.objects[emp.id].style("stroke"), "rgb(0, 128, 0)");
+            chai.assert.equal(js.objects[emp.id].filter(function(d,i){return i==3}).style("stroke"), "rgb(0, 0, 255)");
+        });
+
+        it('should support filtering by function', function(){
+            var id = emp.TestFilterByFunc();
+            chai.assert.deepEqual(js.objects[id].data(), [8, 5]);
+        });
+
+        it('should support filtering by selector', function(){
+            var id = emp.TestFilterBySel();
+            chai.assert.equal(js.objects[id].attr("id"), "example_id");
+        });
+
+
+    });
+
+
+});
 
 
 }
