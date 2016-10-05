@@ -76,34 +76,34 @@ namespace emp {
 
 
   // Apply a tuple as arguments to a function!
-
-  // implementation details, users never invoke these directly
+  // Unroll all IDs for the tuple, then get all of them at once, calling function.
   // Based on Kerrek SB in http://stackoverflow.com/questions/10766112/c11-i-can-go-from-multiple-args-to-tuple-but-can-i-go-from-tuple-to-multiple
 
-  namespace internal {
+  // Hidden namespace for implementation details, users never invoke these directly
+  namespace {
     template <typename FUN_T, typename TUPLE_T, bool is_done, int TOTAL, int... N>
     struct apply_impl {
-      static auto apply(FUN_T fun, TUPLE_T && t) {
-        return apply_impl<FUN_T, TUPLE_T, TOTAL == 1+sizeof...(N), TOTAL, N..., sizeof...(N)>
-                 ::apply(fun, std::forward<TUPLE_T>(t));
+      static auto apply(FUN_T & fun, const TUPLE_T & tup) {
+        constexpr auto num_ids = sizeof...(N);
+        constexpr bool done = (TOTAL==1+num_ids);
+        return apply_impl<FUN_T, TUPLE_T, done, TOTAL, N..., num_ids>::apply(fun, tup);
       }
     };
 
     template <typename FUN_T, typename TUPLE_T, int TOTAL, int... N>
     struct apply_impl<FUN_T, TUPLE_T, true, TOTAL, N...> {
-      static auto apply(FUN_T fun, TUPLE_T && t) {
-        return fun(std::get<N>(std::forward<TUPLE_T>(t))...);
+      static auto apply(FUN_T & fun, const TUPLE_T & tup) {
+        return fun(std::get<N>(tup)...);
       }
     };
   }
 
   // user invokes this
   template <typename FUN_T, typename TUPLE_T>
-  auto ApplyTuple(FUN_T fun, TUPLE_T && tuple) {
-    using tuple_decay_t = typename std::decay<TUPLE_T>::type;
+  auto ApplyTuple(FUN_T fun, const TUPLE_T & tup) {
+    using tuple_decay_t = std::decay_t<TUPLE_T>;
     constexpr auto tup_size = std::tuple_size<tuple_decay_t>::value;
-    constexpr bool no_args = (tup_size == 0);
-    return internal::apply_impl<FUN_T, TUPLE_T, no_args, tup_size>::apply(fun, std::forward<TUPLE_T>(tuple));
+    return apply_impl<FUN_T, TUPLE_T, tup_size==0, tup_size>::apply(fun, tup);
   }
 
 
