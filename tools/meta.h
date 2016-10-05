@@ -109,12 +109,12 @@ namespace emp {
 
   // Combine multiple keys into a single hash value.
   template <typename T>
-  size_t CombineHash(const T & x) { return std::hash<T>()(x); }
+  std::size_t CombineHash(const T & x) { return std::hash<T>()(x); }
 
   template<typename T1, typename T2, typename... EXTRA>
-  size_t CombineHash(const T1 & x1, const T2 & x2, const EXTRA &... x_extra) {
-    const size_t h2 = CombineHash(x2, x_extra...);
-    return std::hash<T1>()(x1) + 0x9e3779b9 + (h2 << 19) + (h2 >> 13);
+  std::size_t CombineHash(const T1 & x1, const T2 & x2, const EXTRA &... x_extra) {
+    const std::size_t hash2 = CombineHash(x2, x_extra...);
+    return std::hash<T1>()(x1) + 0x9e3779b9 + (hash2 << 19) + (hash2 >> 13);
   }
 
 
