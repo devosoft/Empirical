@@ -13,6 +13,7 @@
 
 #include "assert.h"
 #include "meta.h"
+#include "tuple_utils.h"
 
 namespace emp {
 
@@ -24,10 +25,12 @@ namespace emp {
     using size_t = std::size_t;
     using return_t = R;
     using fun_t = std::function<R(ARGS...)>;
+    using hash_t = emp::TupleHash<ARGS...>;
     using this_t = memo_function<R(ARGS...)>;
+    using tuple_t = std::tuple<std::decay_t<ARGS>...>;
 
   private:
-    std::unordered_map<size_t, return_t> cache_map;
+    std::unordered_map<tuple_t, return_t, hash_t> cache_map;
     fun_t fun;
 
   public:
@@ -44,15 +47,15 @@ namespace emp {
     size_t size() const { return cache_map.size(); }
 
     inline static size_t Hash(const ARGS &... k) { return CombineHash(k...); }
-    bool Has(const ARGS &... k) const { return cache_map.find(Hash(k...)) != cache_map.end(); }
+    bool Has(const ARGS &... k) const { return cache_map.find(std::make_tuple(k...)) != cache_map.end(); }
     void Clear() { cache_map.clear(); }
-    void Erase(const ARGS &... k) { cache_map.erase(Hash(k...)); }
+    void Erase(const ARGS &... k) { cache_map.erase(std::make_tuple(k...)); }
 
     return_t operator()(ARGS... k) {
       emp_assert(fun); // Function must be specified with Get() -or- already set.
-      auto cache_it = cache_map.find(Hash(k...));
+      auto cache_it = cache_map.find(std::make_tuple(k...));
       if (cache_it != cache_map.end()) return cache_it->second;
-      return cache_map.emplace(Hash(k...), fun(std::forward<ARGS>(k)...)).first->second;
+      return cache_map.emplace(std::make_tuple(k...), fun(std::forward<ARGS>(k)...)).first->second;
     }
 
     operator bool() { return (bool) fun; }
