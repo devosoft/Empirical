@@ -19,7 +19,7 @@ namespace emp {
   template <typename T, typename... Ts> using first_type = T;
 
 
-  namespace internal {
+  namespace {
     template <int ID, typename T, typename... Ts>
     struct pack_id_impl { using type = typename pack_id_impl<ID-1,Ts...>::type; };
 
@@ -28,7 +28,7 @@ namespace emp {
   }
 
   template <int ID, typename ...Ts>
-  using pack_id = typename internal::pack_id_impl<ID,Ts...>::type;
+  using pack_id = typename pack_id_impl<ID,Ts...>::type;
 
   // Trim off the last type from a pack.
   template <typename... Ts> using last_type = pack_id<sizeof...(Ts)-1,Ts...>;
@@ -119,23 +119,21 @@ namespace emp {
 
 
 
-  // The following template takes two parameters; the real type you want it to be and a decoy
-  // type that should just be evaluated for use in SFINAE.
-  // To use: typename sfinae_decoy<X,Y>::type
-  // This will always evaluate to X no matter what Y is.
+  // sfinae_decoy<X,Y> will always evaluate to X no matter what Y is.
+  // X is type you want it to be; Y is a decoy trigger potential substituion failue.
   template <typename REAL_TYPE, typename EVAL_TYPE>
-  struct sfinae_decoy { using type = REAL_TYPE; };
+  using sfinae_decoy = REAL_TYPE;
 
   // Most commonly we will use a decoy to determine if a member exists, but be treated as a
   // bool value.
 
-#define emp_bool_decoy(TEST) typename emp::sfinae_decoy<bool, decltype(TEST)>::type
-#define emp_int_decoy(TEST) typename emp::sfinae_decoy<int, decltype(TEST)>::type
+#define emp_bool_decoy(TEST) emp::sfinae_decoy<bool, decltype(TEST)>
+#define emp_int_decoy(TEST) emp::sfinae_decoy<int, decltype(TEST)>
 
   // Change the internal type arguments on a template...
   // From: Sam Varshavchik
   // http://stackoverflow.com/questions/36511990/is-it-possible-to-disentangle-a-template-from-its-arguments-in-c
-  namespace internal {
+  namespace {
     template<typename T, typename ...U> class AdaptTemplateHelper {
     public:
       using type = T;
@@ -149,11 +147,11 @@ namespace emp {
   }
 
   template<typename T, typename... U>
-  using AdaptTemplate=typename internal::AdaptTemplateHelper<T, U...>::type;
+  using AdaptTemplate = typename AdaptTemplateHelper<T, U...>::type;
 
 
   // Variation of AdaptTemplate that only adapts first template argument.
-  namespace internal {
+  namespace {
     template<typename T, typename U> class AdaptTemplateHelper_Arg1 {
     public:
       using type = T;
@@ -167,7 +165,7 @@ namespace emp {
   }
 
   template<typename T, typename U>
-  using AdaptTemplate_Arg1=typename internal::AdaptTemplateHelper_Arg1<T, U>::type;
+  using AdaptTemplate_Arg1 = typename AdaptTemplateHelper_Arg1<T, U>::type;
 
 }
 
