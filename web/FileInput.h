@@ -103,7 +103,8 @@ namespace web {
 
       Info()->callback = in_cb;
       FileInputInfo * w_info = Info();
-      Info()->callback_id = JSWrap( std::function<void(std::string & file_body)>( [w_info](std::string & file_body){w_info->DoCallback(file_body);} )  );
+      using callback_t = std::function<void(const std::string & file_body)>;
+      Info()->callback_id = JSWrap( callback_t( [w_info](const std::string & file_body){w_info->DoCallback(file_body);} )  );
     }
     FileInput(const FileInput & in) : WidgetFacet(in) { ; }
     FileInput(const Widget & in) : WidgetFacet(in) { ; }
