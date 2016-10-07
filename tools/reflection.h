@@ -48,7 +48,7 @@
   namespace internal {                                                       \
     template <typename T, typename... ARG_TYPES>                             \
     RETURN_TYPE RelayCall_ ## NEW_NAME(                                      \
-      emp::sfinae_decoy<bool, decltype(&T::METHOD)>,                         \
+      emp::bool_decoy<decltype(&T::METHOD)>,                                 \
       T & target, ARG_TYPES... ARGS) {                                       \
         return target.METHOD(ARGS...);                                       \
     }                                                                        \
@@ -69,7 +69,7 @@
 #define EMP_CREATE_OPTIONAL_METHOD(NEW_NAME, METHOD)              \
   template <typename T, typename... ARG_TYPES>                    \
   void internal__RelayCall_ ## NEW_NAME(                          \
-    emp::sfinae_decoy<bool, decltype(&T::METHOD)>,                \
+    emp::bool_decoy<decltype(&T::METHOD)>,                        \
     T & target, ARG_TYPES... ARGS)                                \
   {                                                               \
     target.METHOD(ARGS...);                                       \
@@ -89,7 +89,7 @@
 #define EMP_CREATE_OPTIONAL_METHOD_RT(NEW_NAME, METHOD, RTYPE, DEFAULT)	\
   template <typename T, typename... ARG_TYPES>	                        \
   RTYPE internal__RelayCall_ ## NEW_NAME(                               \
-    emp::sfinae_decoy<bool, decltype(&T::METHOD)>,                      \
+    emp::bool_decoy<decltype(&T::METHOD)>,                              \
     T & target, ARG_TYPES... ARGS) {                                    \
     return target.METHOD(ARGS...);                                      \
   }                                                                     \
@@ -110,7 +110,7 @@
 #define EMP_CREATE_EVAL_SELECT(NEW_NAME, TEST, RTYPE, EVAL1, EVAL2)  \
   template <typename... ARG_TYPES>                                   \
   RTYPE internal__RelayCall_ ## NEW_NAME(                            \
-    emp::sfinae_decoy<bool, decltype(TEST)>,                         \
+    emp::bool_decoy<decltype(TEST)>,                                 \
     ARG_TYPES... args) {                                             \
     return EVAL1(args...);                                           \
   }                                                                  \
@@ -141,7 +141,7 @@
 template <typename EMP__T, typename... EXTRAS>                               \
 struct EMP_ResolveType__ ## NAME {                                           \
   template <typename T>                                                      \
-  static EMP__T GetType(emp::sfinae_decoy<bool, decltype(T::MEMBER)>);       \
+  static EMP__T GetType(emp::bool_decoy<decltype(T::MEMBER)>);               \
   template <typename T>                                                      \
   static typename EMP_ResolveType__ ## NAME<EXTRAS...>::type GetType(...);   \
   using type = decltype(GetType<EMP__T>(true));                              \
@@ -164,13 +164,13 @@ using NAME = typename EMP_ResolveType__ ## NAME<TYPES..., void>::type;
 
 #define EMP_CHOOSE_MEMBER_TYPE(NAME, MEMBER_NAME, FALLBACK_TYPE, ...)                           \
   template <typename EMP__T>                                                                    \
-  static auto ResolveType__ ## NAME(emp::sfinae_decoy<bool, typename EMP__T::MEMBER_NAME>)      \
+  static auto ResolveType__ ## NAME(emp::bool_decoy<typename EMP__T::MEMBER_NAME>)              \
     -> typename EMP__T::MEMBER_NAME;                                                            \
   template <typename EMP__T>                                                                    \
   static auto ResolveType__ ## NAME(int) -> FALLBACK_TYPE;                                      \
   \
   template <typename EMP__T, typename EMP__T2, typename... EXTRAS>                              \
-  static auto ResolveType__ ## NAME(emp::sfinae_decoy<bool, typename EMP__T::MEMBER_NAME>)      \
+  static auto ResolveType__ ## NAME(emp::bool_decoy<typename EMP__T::MEMBER_NAME>)              \
     -> typename EMP__T::MEMBER_NAME;                                                            \
   template <typename EMP__T, typename EMP__T2, typename... EXTRAS>                              \
   static auto ResolveType__ ## NAME(int) -> decltype(ResolveType__ ## NAME<EMP__T2, EXTRAS...>(true)); \
