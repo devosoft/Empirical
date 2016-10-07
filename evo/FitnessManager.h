@@ -13,6 +13,7 @@
 
 #include <unordered_map>
 
+#include "../tools/memo_function.h"
 #include "../tools/WeightedSet.h"
 
 namespace emp {
@@ -30,6 +31,10 @@ namespace evo {
 
     template <typename ORG>
     static double CalcFitness(int id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
+      return org ? fit_fun(org) : 0.0;
+    }
+    template <typename ORG>
+    static double CalcFitness(int id, ORG* org, emp::memo_function<double(ORG*)> & fit_fun) {
       return org ? fit_fun(org) : 0.0;
     }
 
