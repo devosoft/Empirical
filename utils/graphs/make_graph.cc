@@ -9,8 +9,12 @@
 #include "../../tools/Graph.h"
 #include "../../tools/graph_utils.h"
 #include "../../tools/string_utils.h"
+#include "../../tools/vector.h"
 
-int GetValue(const std::string & query, std::vector<std::string> & args, unsigned int & cur_arg, int max_val=-1)
+int GetValue(const std::string & query,
+	     emp::vector<std::string> & args,
+	     uint32_t & cur_arg,
+	     int max_val=-1)
 {
   if (cur_arg < args.size()) {  // We already have value from the command line!
     return std::stoi( args[cur_arg++] );
@@ -27,9 +31,9 @@ int GetValue(const std::string & query, std::vector<std::string> & args, unsigne
 
 int main(int argc, char* argv[])
 {
-  std::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
+  emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
 
-  unsigned int cur_arg = 1;
+  uint32_t cur_arg = 1;
 
   // First, determine what type of graph we need to make.
   int graph_type = 0;
