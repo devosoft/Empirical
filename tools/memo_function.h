@@ -36,6 +36,8 @@ namespace emp {
   public:
     template <typename... Ts>
     memo_function(Ts &&... args) : fun(std::forward<Ts>(args)...) { ; }
+    memo_function(const memo_function &) = default;
+    memo_function(memo_function &&) = default;
 
     this_t & operator=(const this_t &) = default;
     this_t & operator=(this_t &&) = default;
@@ -59,6 +61,14 @@ namespace emp {
     }
 
     operator bool() { return (bool) fun; }
+
+    // A memo_function can be converted to a regular std::function for function calls.
+    operator std::function<R(ARGS...)>() {
+      return [this](ARGS... args){ return operator()(std::forward<ARGS>(args)...); };
+    }
+    std::function<R(ARGS...)> to_function() {
+      return [this](ARGS... args){ return operator()(std::forward<ARGS>(args)...); };
+    }
   };
 
 }
