@@ -19,16 +19,16 @@ namespace emp {
 
     class ArgManager {
     private:
-      std::vector<std::string> args;
-      std::vector<std::string> arg_names;
-      std::vector<std::string> arg_descs;
+      emp::vector<std::string> args;
+      emp::vector<std::string> arg_names;
+      emp::vector<std::string> arg_descs;
 
     public:
       ArgManager() { ; }
       ArgManager(int argc, char* argv[]) : args(args_to_strings(argc, argv)) { ; }
       ~ArgManager() { ; }
 
-      int size() { return (int) args.size(); }
+      int size() const { return (int) args.size(); }
       auto begin() -> decltype(args.begin()) { return args.begin(); }
       auto end() -> decltype(args.end()) { return args.end(); }
       std::string & operator[](int i) { return args[i]; }
@@ -64,7 +64,7 @@ namespace emp {
         return use_flag(args, name);
       }
 
-      void PrintHelp(std::ostream & os) {
+      void PrintHelp(std::ostream & os) const {
         int max_name_size = 0;
         for (const auto & name : arg_names) {
           if (max_name_size < (int) name.size()) max_name_size = (int) name.size();
@@ -79,7 +79,7 @@ namespace emp {
 
       // Test Unknown sees if there are any unprocessed arguments, and if so, gives and error.
       // Return bool for "should program proceed" (i.e., true=continue, false=exit).
-      bool TestUnknown(std::ostream & os=std::cerr) {
+      bool TestUnknown(std::ostream & os=std::cerr) const {
         if (args.size() > 1) {
           os << "Unknown args:";
           for (int i = 1; i < (int) args.size(); i++) os << " " << args[i];
@@ -93,7 +93,8 @@ namespace emp {
       // ProcessConfigOptions converts settings from a configure object to command-line arguments.
       // Return bool for "should program proceed" (i.e., true=continue, false=exit).
       bool ProcessConfigOptions(Config & config, std::ostream & os,
-                            const std::string & cfg_file="", const std::string & macro_file="") {
+				const std::string & cfg_file="",
+				const std::string & macro_file="") {
         for (auto e : config) {
           auto entry = e.second;
           std::string desc = emp::to_string( entry->GetDescription(),
