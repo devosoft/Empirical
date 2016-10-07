@@ -184,7 +184,7 @@ namespace emp {
 
   // If the return type has a personalized function to handle the return, use it!
   template <typename RETURN_TYPE>
-  static typename emp::sfinae_decoy<void, decltype(&RETURN_TYPE::StoreAsReturn)>::type
+  static emp::sfinae_decoy<void, decltype(&RETURN_TYPE::StoreAsReturn)>
   StoreReturn(const RETURN_TYPE & ret_var) {
     ret_var.template StoreAsReturn();
   }
@@ -197,7 +197,7 @@ namespace emp {
   namespace internal {
 
     template <typename T, int ARG_ID>
-    void LoadArg_impl(typename emp::sfinae_decoy<bool, decltype(&T::template LoadFromArg<ARG_ID>)>::type,
+    void LoadArg_impl(emp::sfinae_decoy<bool, decltype(&T::template LoadFromArg<ARG_ID>)>,
                       T & target) {
       target.template LoadFromArg<ARG_ID>();
     }

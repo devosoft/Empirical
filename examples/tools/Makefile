@@ -1,6 +1,6 @@
 # Flags to use regardless of compiler
 CFLAGS_all := -Wall -Wno-unused-function -I../../
-CFLAGS_version := -std=c++11
+CFLAGS_version := -std=c++14
 
 # Emscripten compiler information
 CXX_web := emcc
@@ -19,7 +19,7 @@ CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../emtools
 CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../emtools/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
-TARGETS := array BitVector ce_string DFA errors info_theory Lexer lexer_utils macros math meta NFA Parser Ptr Random reflection RegEx signal TypeSet TypeTracker vector WeightedSet
+TARGETS := array BitVector ce_string DFA errors info_theory Lexer lexer_utils macros math memo_function meta NFA Parser Ptr Random reflection RegEx signal tuple_utils TypeSet TypeTracker vector WeightedSet
 
 TOOLS := ../../tools
 TOOL_DEPEND := $(TOOLS)/assert.h

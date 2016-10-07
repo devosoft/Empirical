@@ -8,6 +8,7 @@
 #define EMP_META_H
 
 #include <tuple>
+#include <utility>
 
 namespace emp {
 
@@ -18,7 +19,7 @@ namespace emp {
   template <typename T, typename... Ts> using first_type = T;
 
 
-  namespace internal {
+  namespace {
     template <int ID, typename T, typename... Ts>
     struct pack_id_impl { using type = typename pack_id_impl<ID-1,Ts...>::type; };
 
@@ -27,7 +28,7 @@ namespace emp {
   }
 
   template <int ID, typename ...Ts>
-  using pack_id = typename internal::pack_id_impl<ID,Ts...>::type;
+  using pack_id = typename pack_id_impl<ID,Ts...>::type;
 
   // Trim off the last type from a pack.
   template <typename... Ts> using last_type = pack_id<sizeof...(Ts)-1,Ts...>;
@@ -75,51 +76,64 @@ namespace emp {
 
 
   // Apply a tuple as arguments to a function!
-
-  // implementation details, users never invoke these directly
+  // Unroll all IDs for the tuple, then get all of them at once, calling function.
   // Based on Kerrek SB in http://stackoverflow.com/questions/10766112/c11-i-can-go-from-multiple-args-to-tuple-but-can-i-go-from-tuple-to-multiple
 
-  namespace internal {
-    template <typename FUN_TYPE, typename TUPLE_TYPE, bool is_done, int TOTAL, int... N>
+  // Hidden namespace for implementation details, users never invoke these directly
+  namespace {
+    template <typename FUN_T, typename TUPLE_T, bool is_done, int TOTAL, int... N>
     struct apply_impl {
-      static void apply(FUN_TYPE fun, TUPLE_TYPE && t) {
-        apply_impl<FUN_TYPE, TUPLE_TYPE, TOTAL == 1 + sizeof...(N), TOTAL, N..., sizeof...(N)>::apply(fun, std::forward<TUPLE_TYPE>(t));
+      static auto apply(FUN_T & fun, const TUPLE_T & tup) {
+        constexpr auto num_ids = sizeof...(N);
+        constexpr bool done = (TOTAL==1+num_ids);
+        return apply_impl<FUN_T, TUPLE_T, done, TOTAL, N..., num_ids>::apply(fun, tup);
       }
     };
 
-    template <typename FUN_TYPE, typename TUPLE_TYPE, int TOTAL, int... N>
-    struct apply_impl<FUN_TYPE, TUPLE_TYPE, true, TOTAL, N...> {
-      static void apply(FUN_TYPE fun, TUPLE_TYPE && t) {
-        fun(std::get<N>(std::forward<TUPLE_TYPE>(t))...);
+    template <typename FUN_T, typename TUPLE_T, int TOTAL, int... N>
+    struct apply_impl<FUN_T, TUPLE_T, true, TOTAL, N...> {
+      static auto apply(FUN_T & fun, const TUPLE_T & tup) {
+        return fun(std::get<N>(tup)...);
       }
     };
   }
 
   // user invokes this
-  template <typename FUN_TYPE, typename TUPLE_TYPE>
-  void ApplyTuple(FUN_TYPE fun, TUPLE_TYPE && tuple) {
-    typedef typename std::decay<TUPLE_TYPE>::type TUPLE_DECAY_TYPE;
-    internal::apply_impl<FUN_TYPE, TUPLE_TYPE, 0 == std::tuple_size<TUPLE_DECAY_TYPE>::value, std::tuple_size<TUPLE_DECAY_TYPE>::value>::apply(fun, std::forward<TUPLE_TYPE>(tuple));
+  template <typename FUN_T, typename TUPLE_T>
+  auto ApplyTuple(FUN_T fun, const TUPLE_T & tup) {
+    using tuple_decay_t = std::decay_t<TUPLE_T>;
+    constexpr auto tup_size = std::tuple_size<tuple_decay_t>::value;
+    return apply_impl<FUN_T, TUPLE_T, tup_size==0, tup_size>::apply(fun, tup);
   }
 
 
-  // The following template takes two parameters; the real type you want it to be and a decoy
-  // type that should just be evaluated for use in SFINAE.
-  // To use: typename sfinae_decoy<X,Y>::type
-  // This will always evaluate to X no matter what Y is.
+  // Combine multiple keys into a single hash value.
+  template <typename T>
+  std::size_t CombineHash(const T & x) { return std::hash<T>()(x); }
+
+  template<typename T1, typename T2, typename... EXTRA>
+  std::size_t CombineHash(const T1 & x1, const T2 & x2, const EXTRA &... x_extra) {
+    const std::size_t hash2 = CombineHash(x2, x_extra...);
+    return std::hash<T1>()(x1) + 0x9e3779b9 + (hash2 << 19) + (hash2 >> 13);
+  }
+
+
+
+  // sfinae_decoy<X,Y> will always evaluate to X no matter what Y is.
+  // X is type you want it to be; Y is a decoy trigger potential substituion failue.
   template <typename REAL_TYPE, typename EVAL_TYPE>
-  struct sfinae_decoy { using type = REAL_TYPE; };
+  using sfinae_decoy = REAL_TYPE;
 
   // Most commonly we will use a decoy to determine if a member exists, but be treated as a
   // bool value.
 
-#define emp_bool_decoy(TEST) typename emp::sfinae_decoy<bool, decltype(TEST)>::type
-#define emp_int_decoy(TEST) typename emp::sfinae_decoy<int, decltype(TEST)>::type
+#define emp_bool_decoy(TEST) emp::sfinae_decoy<bool, decltype(TEST)>
+#define emp_int_decoy(TEST) emp::sfinae_decoy<int, decltype(TEST)>
 
   // Change the internal type arguments on a template...
   // From: Sam Varshavchik
   // http://stackoverflow.com/questions/36511990/is-it-possible-to-disentangle-a-template-from-its-arguments-in-c
-  namespace internal {
+  namespace {
     template<typename T, typename ...U> class AdaptTemplateHelper {
     public:
       using type = T;
@@ -133,11 +147,11 @@ namespace emp {
   }
 
   template<typename T, typename... U>
-  using AdaptTemplate=typename internal::AdaptTemplateHelper<T, U...>::type;
+  using AdaptTemplate = typename AdaptTemplateHelper<T, U...>::type;
 
 
   // Variation of AdaptTemplate that only adapts first template argument.
-  namespace internal {
+  namespace {
     template<typename T, typename U> class AdaptTemplateHelper_Arg1 {
     public:
       using type = T;
@@ -151,7 +165,7 @@ namespace emp {
   }
 
   template<typename T, typename U>
-  using AdaptTemplate_Arg1=typename internal::AdaptTemplateHelper_Arg1<T, U>::type;
+  using AdaptTemplate_Arg1 = typename AdaptTemplateHelper_Arg1<T, U>::type;
 
 }
 

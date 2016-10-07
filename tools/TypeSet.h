@@ -13,7 +13,7 @@ namespace emp {
 
   template <typename T1, typename... Ts>
   struct TypeSet {
-    template <typename T> constexpr static int Has() { return has_type<T,T1,Ts>(); }
+    template <typename T> constexpr static int Has() { return has_type<T,T1,Ts...>(); }
 
     // Type ID's can be retrieved with
     //   GetID<my_type>() to get the ID associated with specific type my_type
