@@ -271,7 +271,6 @@ namespace evo{
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::fit_fun;
       using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::SetDefaultFitnessFun;
-      using StatsManager_Base<POP_MANAGER>::SetOutput;
 
       //Constructor for use as a stand alone object
       template<typename WORLD>
