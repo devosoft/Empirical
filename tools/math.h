@@ -13,7 +13,7 @@
 
 namespace emp {
 
-  namespace internal {
+  namespace {
     // A compile-time log calculator for values [1,2)
     static constexpr double Log2_base(double x) {
       return log2_chart_1_2[(int)((x-1.0)*1024)];
@@ -34,7 +34,7 @@ namespace emp {
 
   // And a more generic compile-time log calculator.
   static constexpr double Log2(double x) {
-    return (x < 1.0) ? internal::Log2_frac(x) : internal::Log2_pos(x);
+    return (x < 1.0) ? Log2_frac(x) : Log2_pos(x);
   }
 
   // Log varients
@@ -42,7 +42,7 @@ namespace emp {
   static constexpr double Ln(double x) { return Log(x, emp::E); }   // Natural Log...
   static constexpr double Log10(double x) { return Log(x, 10.0); }
 
-  namespace internal {
+  namespace {
     static constexpr double Pow2_lt1(double exp, int id=0) {
       return (id==32) ? 1.0 :
         ( (exp > 0.5) ? (pow2_chart_bits[id]*Pow2_lt1(exp*2.0-1.0,id+1)) : Pow2_lt1(exp*2.0,id+1) );
@@ -54,7 +54,7 @@ namespace emp {
   }
 
   static constexpr double Pow2(double exp) {
-    return (exp < 0.0) ? (1.0/internal::Pow2_impl(-exp)) : internal::Pow2_impl(exp);
+    return (exp < 0.0) ? (1.0/Pow2_impl(-exp)) : Pow2_impl(exp);
   }
 
   static constexpr double Pow(double base, double exp) {
