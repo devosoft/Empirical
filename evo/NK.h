@@ -12,6 +12,7 @@
 
 #include "../tools/BitVector.h"
 #include "../tools/math.h"
+#include "../tools/memo_function.h"
 #include "../tools/Random.h"
 #include "../tools/vector.h"
 
@@ -58,6 +59,51 @@ namespace evo {
       emp_assert(states.size() == N);
       double total = landscape[0][states[0]];
       for (int i = 1; i < (int) N; i++) total += GetFitness(i,states[i]);
+      return total;
+    }
+    double GetFitness(BitVector genome) const {
+      emp_assert(genome.GetSize() == (int) N);
+
+      // Use a double-length genome to easily handle wrap-around.
+      genome.Resize(N*2);
+      genome |= (genome << N);
+
+      double total = 0.0;
+      uint32_t mask = emp::MaskLow<uint32_t>(K+1);
+      for (int i = 0; i < (int) N; i++) {
+        const uint32_t cur_val = (genome >> i).GetUInt(0) & mask;
+	      const double cur_fit = GetFitness(i, cur_val);
+        total += cur_fit;
+      }
+      return total;
+    }
+  };
+
+  class NKLandscapeMemo {
+  private:
+    const uint32_t N;
+    const uint32_t K;
+    mutable emp::vector< emp::memo_function<double(uint32_t)> > landscape;
+
+  public:
+    NKLandscapeMemo() = delete;
+    NKLandscapeMemo(const NKLandscapeMemo &) = delete;
+    NKLandscapeMemo(int _N, int _K, emp::Random & random) : N(_N), K(_K), landscape(N)
+    {
+      // Each position in the landscape shouild have its own memo_function.
+      for (auto & lfun : landscape) lfun = [&random](uint32_t){ return random.GetDouble(); };
+    }
+    ~NKLandscapeMemo() { ; }
+    NKLandscapeMemo & operator=(const NKLandscapeMemo &) = delete;
+
+    int GetN() const { return N; }
+    int GetK() const { return K; }
+
+    double GetFitness(int n, uint32_t state) const { return landscape[n](state); }
+    double GetFitness( std::vector<uint32_t> states ) const {
+      emp_assert(states.size() == N);
+      double total = 0.0;
+      for (int i = 0; i < (int) N; i++) total += GetFitness(i,states[i]);
       return total;
     }
     double GetFitness(BitVector genome) const {
