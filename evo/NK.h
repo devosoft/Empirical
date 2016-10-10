@@ -30,12 +30,14 @@ namespace evo {
   public:
     NKLandscape() = delete;
     NKLandscape(const NKLandscape &) = delete;
+    NKLandscape(NKLandscape &&) = default;
     NKLandscape(int _N, int _K, emp::Random & random)
      : N(_N), K(_K)
      , state_count(emp::IntPow<uint32_t>(2,K+1))
      , total_count(N * state_count)
      , landscape(N)
     {
+      emp_assert(K < 32, K); // Genes will be stored in a 32-bit int; consider using NKLandscape Memo!
       for ( auto & ltable : landscape) {
         ltable.resize(state_count);
         for (double & pos : ltable) {
@@ -45,6 +47,7 @@ namespace evo {
     }
     ~NKLandscape() { ; }
     NKLandscape & operator=(const NKLandscape &) = delete;
+    NKLandscape & operator=(NKLandscape &&) = default;
 
     int GetN() const { return N; }
     int GetK() const { return K; }
@@ -81,26 +84,29 @@ namespace evo {
 
   class NKLandscapeMemo {
   private:
-    const uint32_t N;
-    const uint32_t K;
-    mutable emp::vector< emp::memo_function<double(uint32_t)> > landscape;
+    const int N;
+    const int K;
+    mutable emp::vector< emp::memo_function<double(uint64_t)> > landscape;
 
   public:
     NKLandscapeMemo() = delete;
     NKLandscapeMemo(const NKLandscapeMemo &) = delete;
+    NKLandscapeMemo(NKLandscapeMemo &&) = default;
     NKLandscapeMemo(int _N, int _K, emp::Random & random) : N(_N), K(_K), landscape(N)
     {
+      emp_assert(K < 64, K); // Genes will be stored in a 64-bit int.
       // Each position in the landscape shouild have its own memo_function.
-      for (auto & lfun : landscape) lfun = [&random](uint32_t){ return random.GetDouble(); };
+      for (auto & lfun : landscape) lfun = [&random](uint64_t){ return random.GetDouble(); };
     }
     ~NKLandscapeMemo() { ; }
     NKLandscapeMemo & operator=(const NKLandscapeMemo &) = delete;
+    NKLandscapeMemo & operator=(NKLandscapeMemo &&) = default;
 
     int GetN() const { return N; }
     int GetK() const { return K; }
 
-    double GetFitness(int n, uint32_t state) const { return landscape[n](state); }
-    double GetFitness( std::vector<uint32_t> states ) const {
+    double GetFitness(int n, uint64_t state) const { return landscape[n](state); }
+    double GetFitness( std::vector<uint64_t> states ) const {
       emp_assert(states.size() == N);
       double total = 0.0;
       for (int i = 0; i < (int) N; i++) total += GetFitness(i,states[i]);
@@ -114,9 +120,9 @@ namespace evo {
       genome |= (genome << N);
 
       double total = 0.0;
-      uint32_t mask = emp::MaskLow<uint32_t>(K+1);
+      uint64_t mask = emp::MaskLow<uint64_t>(K+1);
       for (int i = 0; i < (int) N; i++) {
-        const uint32_t cur_val = (genome >> i).GetUInt(0) & mask;
+        const uint64_t cur_val = (genome >> i).GetUInt(0) & mask;
 	      const double cur_fit = GetFitness(i, cur_val);
         total += cur_fit;
       }
