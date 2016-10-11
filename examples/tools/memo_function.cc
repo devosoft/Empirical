@@ -25,6 +25,16 @@ int Mult2(int in1, int in2) {
   return in1 * in2;
 }
 
+int Compute() {
+  int value = 0;
+  for (int i = 0; i < 1000000000; i++) {
+    value += 111111;
+    value *= 2;
+    value %= 837645781;
+  }
+  return value;
+}
+
 int main()
 {
   std::cout << "Testing.  " << std::endl;
@@ -70,4 +80,12 @@ int main()
     std::cout << test_fun2(x,y) << " ";
   }
   std::cout << std::endl;
+
+  emp::memo_function<double()> no_arg_fun(Compute);
+  
+  std::cout << no_arg_fun() << "  Long..." << std::endl;
+  std::cout << no_arg_fun() << "  Quick!" << std::endl;
+  std::cout << no_arg_fun() << "  Quick!" << std::endl;
+  no_arg_fun = Compute;
+  std::cout << no_arg_fun() << "  Long..." << std::endl;
 }
