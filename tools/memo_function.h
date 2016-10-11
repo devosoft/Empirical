@@ -60,7 +60,7 @@ namespace emp {
       return cache_map.emplace(k, fun(k)).first->second;
     }
 
-    operator bool() { return (bool) fun; }
+    operator bool() const { return (bool) fun; }
 
     // A memo_function can be converted to a regular std::function for function calls.
     operator std::function<R(ARG)>() {
@@ -121,15 +121,15 @@ namespace emp {
                                fun(k1, k2, k_extra...)).first->second;
     }
 
-    operator bool() { return (bool) fun; }
+    operator bool() const { return (bool) fun; }
 
     // A memo_function can be converted to a regular std::function for function calls.
-    operator std::function<R(A1,A2,EXTRA...)>() {
+    operator std::function<R(A1,A2,EXTRA...)>() const {
       return [this](A1 k1, A2 k2, EXTRA... k_extra) {
          return operator()(k1, k2, k_extra...);
       };
     }
-    std::function<R(A1,A2,EXTRA...)> to_function() {
+    std::function<R(A1,A2,EXTRA...)> to_function() const {
       return [this](A1 k1, A2 k2, EXTRA... k_extra) {
          return operator()(k1, k2, k_extra...);
       };
@@ -173,9 +173,7 @@ namespace emp {
 
     return_t operator()() {
       emp_assert(fun);
-//      std::cout << "Ping! has_cache=" << has_cache << std::endl;
       if (has_cache == false) { cached_value = fun(); has_cache = true; }
-//      std::cout << "Ping! has_cache=" << has_cache << std::endl;
       return cached_value;
     }
 
