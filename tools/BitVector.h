@@ -564,6 +564,7 @@ namespace emp {
 
     // For compatability with std::vector<bool>.
     size_t size() const { return num_bits; }
+    void resize(std::size_t new_size) { Resize(new_size); }
     bool all() const { return All(); }
     bool any() const { return Any(); }
     bool none() const { return !Any(); }
