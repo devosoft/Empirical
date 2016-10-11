@@ -136,6 +136,60 @@ namespace emp {
     }
   };
 
+  // Single argument functions don't need a tuple...
+  template <class R>
+  class memo_function<R()> {
+  public:
+    using size_t = std::size_t;
+    using return_t = R;
+    using index_t = void;
+    using fun_t = std::function<R()>;
+    using this_t = memo_function<R()>;
+
+  private:
+    return_t cached_value;
+    bool has_cache;
+    fun_t fun;
+
+  public:
+    template <typename T>
+    memo_function(T && fun_info) : has_cache(false), fun(std::forward<T>(fun_info)) { ; }
+    memo_function(const this_t &) = default;
+    memo_function(this_t &&) = default;
+    memo_function() : has_cache(false) { ; }
+
+    this_t & operator=(const this_t &) = default;
+    this_t & operator=(this_t &&) = default;
+    this_t & operator=(const fun_t & _f) { has_cache=false; fun=_f; return *this; }
+    this_t & operator=(fun_t && _f) { has_cache=false; fun=std::move(_f); return *this; }
+    template <typename T>
+    this_t & operator=(T && arg) { has_cache=false; fun = std::forward<T>(arg); return *this; }
+
+    size_t size() const { return (size_t) has_cache; }
+
+    bool Has() const { return has_cache; }
+    void Clear() { has_cache=false; }
+    void Erase() { has_cache=false; }
+
+    return_t operator()() {
+      emp_assert(fun);
+//      std::cout << "Ping! has_cache=" << has_cache << std::endl;
+      if (has_cache == false) { cached_value = fun(); has_cache = true; }
+//      std::cout << "Ping! has_cache=" << has_cache << std::endl;
+      return cached_value;
+    }
+
+    operator bool() { return (bool) fun; }
+
+    // A memo_function can be converted to a regular std::function for function calls.
+    operator std::function<R()>() {
+      return [this](){ return operator()(); };
+    }
+    std::function<R()> to_function() {
+      return [this](){ return operator()(); };
+    }
+  };
+
 }
 
 #endif
