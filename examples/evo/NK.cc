@@ -77,10 +77,10 @@ int main(int argc, char* argv[])
       [&landscape](BitOrg * org){ return landscape.GetFitness(*org); };
 
     // Keep the best individual.
-    pop.EliteSelect(fit_fun.to_function(), 1);
+    pop.EliteSelect(fit_fun, 1, 1);
 
     // Run a tournament for the rest...
-    pop.TournamentSelect(fit_fun.to_function(), 5, POP_SIZE-1);
+    pop.TournamentSelect(fit_fun, 5, POP_SIZE-1);
     pop.Update();
     pop.MutatePop();
   }
