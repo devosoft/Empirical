@@ -87,8 +87,8 @@ namespace evo {
     const int N;
     const int K;
     mutable emp::vector< emp::memo_function<double(const BitVector &)> > landscape;
+    mutable std::unordered_map<BitVector, double> fit_cache;
     emp::vector<BitVector> masks;
-    emp::memo_function<double(const BitVector &)> fit_fun;
 
   public:
     NKLandscapeMemo() = delete;
@@ -104,15 +104,6 @@ namespace evo {
         masks[n].Resize(N);
         for (int k = 0; k < K; k++) masks[n][(n+k)%N] = 1;
       }
-
-      // Setup the fitness function
-      fit_fun = [this](const BitVector & genome) {
-        double total = 0.0;
-        for (int n = 0; n < N; n++) {
-          total += landscape[n](genome & masks[n]);
-        }
-        return total;
-      };
     }
     ~NKLandscapeMemo() { ; }
     NKLandscapeMemo & operator=(const NKLandscapeMemo &) = delete;
@@ -127,7 +118,18 @@ namespace evo {
     }
     double GetFitness(const BitVector & genome) const {
       emp_assert(genome.GetSize() == N);
-      return fit_fun(genome);
+
+      // If this fitness is cached, return it!
+      const auto it = fit_cache.find(genome);
+      if (it != fit_cache.end()) return it->second;
+
+      // Otherwise calculate it.
+      double total = 0.0;
+      for (int n = 0; n < N; n++) {
+        total += landscape[n](genome & masks[n]);
+      }
+      fit_cache[genome] = total;
+      return total;
     }
   };
 
