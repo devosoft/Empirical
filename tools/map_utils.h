@@ -8,6 +8,7 @@
 #define EMP_MAP_UTILS_H
 
 #include <map>
+#include <unordered_map>
 
 namespace emp {
 
@@ -20,6 +21,12 @@ namespace emp {
   // Setup Has() for multimap as well.
   template <class KEY, class T, class Compare, class Alloc>
   inline bool Has( const std::multimap<KEY,T,Compare,Alloc> & in_map, const KEY & key ) {
+    return in_map.find(key) != in_map.end();
+  }
+
+  // ...and an unordered_map
+  template <class KEY, class T, class Compare, class Alloc>
+  inline bool Has( const std::unordered_map<KEY,T,Compare,Alloc> & in_map, const KEY & key ) {
     return in_map.find(key) != in_map.end();
   }
 
