@@ -30,7 +30,7 @@ namespace emp {
     using this_t = memo_function<R(ARG)>;
 
   private:
-    std::unordered_map<index_t, return_t> cache_map;
+    mutable std::unordered_map<index_t, return_t> cache_map;
     fun_t fun;
 
   public:
@@ -53,11 +53,13 @@ namespace emp {
     void Clear() { cache_map.clear(); }
     void Erase(const ARG & k) { cache_map.erase(k); }
 
-    return_t operator()(const ARG & k) {
+    template <class KEY>
+    return_t operator()(KEY && k) const {
       emp_assert(fun);
       auto cache_it = cache_map.find(k);
       if (cache_it != cache_map.end()) return cache_it->second;
-      return cache_map.emplace(k, fun(k)).first->second;
+      const return_t result = fun(k);
+      return cache_map.emplace(std::forward<KEY>(k), result).first->second;
     }
 
     operator bool() const { return (bool) fun; }
