@@ -115,13 +115,13 @@ namespace evo {
       emp_assert(state == (state & masks[n]));
       return landscape[n](state);
     }
-    double GetFitness( const BitVector & genome) const {
-      emp_assert(genome.GetSize() == (int) N);
+    double GetFitness(const BitVector & genome) const {
+      emp_assert(genome.GetSize() == N);
 
       // Use a double-length genome to easily handle wrap-around.
       double total = 0.0;
-      for (int n = 0; n < (int) N; n++) {
-	      total += GetFitness(n, genome & masks[n]);
+      for (int n = 0; n < N; n++) {
+        total += landscape[n](genome & masks[n]);
       }
       return total;
     }
