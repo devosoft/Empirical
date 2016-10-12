@@ -88,6 +88,7 @@ namespace evo {
     const int K;
     mutable emp::vector< emp::memo_function<double(const BitVector &)> > landscape;
     emp::vector<BitVector> masks;
+    emp::memo_function<double(const BitVector &)> fit_fun;
 
   public:
     NKLandscapeMemo() = delete;
@@ -103,6 +104,15 @@ namespace evo {
         masks[n].Resize(N);
         for (int k = 0; k < K; k++) masks[n][(n+k)%N] = 1;
       }
+
+      // Setup the fitness function
+      fit_fun = [this](const BitVector & genome) {
+        double total = 0.0;
+        for (int n = 0; n < N; n++) {
+          total += landscape[n](genome & masks[n]);
+        }
+        return total;
+      };
     }
     ~NKLandscapeMemo() { ; }
     NKLandscapeMemo & operator=(const NKLandscapeMemo &) = delete;
@@ -117,63 +127,9 @@ namespace evo {
     }
     double GetFitness(const BitVector & genome) const {
       emp_assert(genome.GetSize() == N);
-
-      // Use a double-length genome to easily handle wrap-around.
-      double total = 0.0;
-      for (int n = 0; n < N; n++) {
-        total += landscape[n](genome & masks[n]);
-      }
-      return total;
+      return fit_fun(genome);
     }
   };
-
-  // class NKLandscapeMemo {
-  // private:
-  //   const int N;
-  //   const int K;
-  //   mutable emp::vector< emp::memo_function<double(uint64_t)> > landscape;
-  //
-  // public:
-  //   NKLandscapeMemo() = delete;
-  //   NKLandscapeMemo(const NKLandscapeMemo &) = delete;
-  //   NKLandscapeMemo(NKLandscapeMemo &&) = default;
-  //   NKLandscapeMemo(int _N, int _K, emp::Random & random) : N(_N), K(_K), landscape(N)
-  //   {
-  //     emp_assert(K < 64, K); // Genes will be stored in a 64-bit int.
-  //     // Each position in the landscape shouild have its own memo_function.
-  //     for (auto & lfun : landscape) lfun = [&random](uint64_t){ return random.GetDouble(); };
-  //   }
-  //   ~NKLandscapeMemo() { ; }
-  //   NKLandscapeMemo & operator=(const NKLandscapeMemo &) = delete;
-  //   NKLandscapeMemo & operator=(NKLandscapeMemo &&) = default;
-  //
-  //   int GetN() const { return N; }
-  //   int GetK() const { return K; }
-  //
-  //   double GetFitness(int n, uint64_t state) const { return landscape[n](state); }
-  //   double GetFitness( std::vector<uint64_t> states ) const {
-  //     emp_assert(states.size() == N);
-  //     double total = 0.0;
-  //     for (int i = 0; i < (int) N; i++) total += GetFitness(i,states[i]);
-  //     return total;
-  //   }
-  //   double GetFitness(BitVector genome) const {
-  //     emp_assert(genome.GetSize() == (int) N);
-  //
-  //     // Use a double-length genome to easily handle wrap-around.
-  //     genome.Resize(N*2);
-  //     genome |= (genome << N);
-  //
-  //     double total = 0.0;
-  //     uint64_t mask = emp::MaskLow<uint64_t>(K+1);
-  //     for (int i = 0; i < (int) N; i++) {
-  //       const uint64_t cur_val = (genome >> i).GetUInt(0) & mask;
-	//       const double cur_fit = GetFitness(i, cur_val);
-  //       total += cur_fit;
-  //     }
-  //     return total;
-  //   }
-  // };
 
 }
 }
