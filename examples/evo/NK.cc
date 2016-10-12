@@ -43,12 +43,11 @@ int main(int argc, char* argv[])
   const int MUT_COUNT = config.MUT_COUNT();
 
   emp::Random random(config.SEED());
-  // emp::evo::NKLandscape landscape(N, K, random);
-  emp::evo::NKLandscapeMemo landscape(N, K, random);
-  emp::evo::EAWorld<BitOrg, emp::evo::CacheOff> pop(random, "NKWorld");
-  // emp::evo::EAWorld<BitOrg, emp::evo::CacheOrgs> pop(random, "NKWorld");
-  // emp::evo::EAWorld<BitOrg, emp::evo::CacheGenome<BitOrg> > pop(random, "NKWorld");
-  // emp::evo::EAWorld<BitOrg, emp::evo::StaticFit<BitOrg> > pop(random, "NKWorld");
+  emp::evo::NKLandscape landscape(N, K, random);
+  // emp::evo::NKLandscapeMemo landscape(N, K, random);
+
+  // emp::evo::EAWorld<BitOrg, emp::evo::CacheOff> pop(random, "NKWorld");
+  emp::evo::EAWorld<BitOrg, emp::evo::CacheOrgs> pop(random, "NKWorld");
 
   // Build a random initial population
   for (int i = 0; i < config.POP_SIZE(); i++) {
