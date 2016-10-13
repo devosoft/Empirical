@@ -26,11 +26,11 @@ namespace emp {
     const char * m_str;
     size_t m_size;
 
-    constexpr bool IsEqual(const ce_string & in, int first=0) const {
+    constexpr bool IsEqual(const ce_string & in, size_t first=0) const {
       return (m_size == in.m_size) &&
              ((m_size == first) || (m_str[first] == in.m_str[first] && IsEqual(in, first+1)));
     }
-    constexpr bool IsLess(const ce_string & in, int first=0) const {
+    constexpr bool IsLess(const ce_string & in, size_t first=0) const {
       return (first == in.m_size) ? false :
              ((first == m_size) || (m_str[first] < in.m_str[first] || IsLess(in, first+1)));
     }
