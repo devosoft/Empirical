@@ -7,6 +7,7 @@
 #ifndef EMP_TUPLE_UTILS_H
 #define EMP_TUPLE_UTILS_H
 
+#include <functional>
 #include <tuple>
 
 #include "meta.h"
