@@ -24,23 +24,25 @@ namespace emp {
     ce_array<T, N-1> next;   // Additional values.
 
   public:
-    constexpr ce_array() = default;
+    constexpr ce_array(const T & default_val) : value(default_val), next(default_val) {;}
 
     using size_t = std::size_t;
     using value_type = T;
 
-    T & operator[](int id) { return (id==0) ? value : next.operator[](id-1); }
+    constexpr T & operator[](int id) { return (id==0) ? value : next.operator[](id-1); }
   };
 
   // Specialized version of ce_array for an empty array.
   template <typename T>
   class ce_array<T,0> {
   public:
+    constexpr ce_array(const T &) {;}
+
     using size_t = std::size_t;
     using value_type = T;
 
     // Cannot index into an empty array!
-    T & operator[](int id) { emp_assert(false); return std::declval<int>; }
+    constexpr T & operator[](int id) { emp_assert(false); return *((T*) nullptr); }
   };
 
 }
