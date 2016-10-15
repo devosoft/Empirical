@@ -11,15 +11,27 @@
 
 constexpr int CETest() {
   emp::ce_array<int, 20> test_array(0);
-  int total = 0;
 
   for (int i = 0; i < 20; i++) {
     test_array[i] = i*i;
   }
+
+  int total = 0;
+  emp::ce_array<int, 20> test2(test_array);
   for (int i = 0; i < 20; i++) {
-    total += test_array[i];
+    total += test2[i];
   }
 
+  if (test_array == test2) total += 100000000;
+
+  return total;
+}
+
+constexpr double CETest2() {
+  emp::ce_array<double, 101> test_array(8.8);
+  test_array.fill(4.1);
+  double total = 0.0;
+  for (size_t i = 0; i < test_array.size(); i++) total += test_array[i];
   return total;
 }
 
@@ -29,4 +41,7 @@ int main()
 
   constexpr int result = CETest();
   std::cout << "CETest() = " << result << std::endl;
+
+  constexpr double result2 = CETest2();
+  std::cout << "CETest2() = " << result2 << std::endl;
 }
