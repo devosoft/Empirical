@@ -42,6 +42,10 @@ namespace emp {
     constexpr bool operator!=(const ce_array<T,N> & _in) { return !operator==(_in); }
 
     constexpr T & operator[](int id) { return (id==0) ? value : next.operator[](id-1); }
+    const constexpr T & operator[](int id) const { return (id==0) ? value : next.operator[](id-1); }
+
+    constexpr T & back() { return operator[](N-1); }
+    constexpr void fill(const T & v) { value = v; next.fill(v); }
   };
 
   // Specialized version of ce_array for an empty array.
@@ -62,6 +66,11 @@ namespace emp {
 
     // Cannot index into an empty array!
     constexpr T & operator[](int id) { emp_assert(false); return *((T*) nullptr); }
+    const constexpr T & operator[](int id) const { emp_assert(false); return *((T*) nullptr); }
+
+    // No back in an empty array.
+    constexpr T & back() { emp_assert(false); return *((T*) nullptr); }
+    constexpr void fill(const T &) { ; }
   };
 
 }
