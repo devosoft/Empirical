@@ -30,7 +30,17 @@ namespace emp {
     constexpr ce_array(const T & default_val) : value(default_val), next(default_val) {;}
     constexpr ce_array(const ce_array<T,N> & _in) : value(_in.value), next(_in.next) {;}
 
-    size_t size() { return N; }
+    constexpr void operator=(const ce_array<T,N> & _in) {
+      value = _in.value;
+      next = _in.next;
+    }
+
+    constexpr size_t size() { return N; }
+    constexpr bool operator==(const ce_array<T,N> & _in) {
+      return (value==_in.value) ? (next==_in.next) : false;
+    }
+    constexpr bool operator!=(const ce_array<T,N> & _in) { return !operator==(_in); }
+
     constexpr T & operator[](int id) { return (id==0) ? value : next.operator[](id-1); }
   };
 
@@ -43,6 +53,12 @@ namespace emp {
 
     constexpr ce_array(const T &) {;}
     constexpr ce_array(const ce_array<T,0> &) {;}
+
+    constexpr void operator=(const ce_array<T,0> &) { ; }
+
+    constexpr size_t size() { return 0; }
+    constexpr bool operator==(const ce_array<T,0> &) { return true; }
+    constexpr bool operator!=(const ce_array<T,0> &) { return false; }
 
     // Cannot index into an empty array!
     constexpr T & operator[](int id) { emp_assert(false); return *((T*) nullptr); }
