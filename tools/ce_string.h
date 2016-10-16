@@ -3,10 +3,7 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  ce_string defines a limited string object for use within a constexpr class or function.
-//
-//  Developer note:
-//   @CAO: Not ready from prime time-- for some reason I can't get Set to work as constexpr
-//         (when compiled with C++14).
+
 
 #ifndef EMP_CE_STRING_H
 #define EMP_CE_STRING_H
@@ -39,21 +36,17 @@ namespace emp {
     constexpr ce_string(const char (&in)[N]) : m_str(in), m_size(N-1) { ; }
     constexpr ce_string(const ce_string & in) = default;
 
-    constexpr bool operator==(const ce_string & in) const {
-      return IsEqual(in);
-    }
-    constexpr bool operator!=(const ce_string & in) const { return !(*this == in); }
-    constexpr bool operator<(const ce_string & in) const {
-      return IsLess(in);
-    }
-    constexpr bool operator>(const ce_string & in) const { return (in < *this); }
-    constexpr bool operator<=(const ce_string & in) const { return !(in < *this); }
-    constexpr bool operator>=(const ce_string & in) const { return !(*this < in); }
+    constexpr bool operator==(const ce_string & in) const { return IsEqual(in); }
+    constexpr bool operator!=(const ce_string & in) const { return !IsEqual(in); }
+    constexpr bool operator<(const ce_string & in) const { return IsLess(in); }
+    constexpr bool operator>(const ce_string & in) const { return in.IsLess(*this); }
+    constexpr bool operator<=(const ce_string & in) const { return !in.IsLess(*this); }
+    constexpr bool operator>=(const ce_string & in) const { return !IsLess(in); }
 
     constexpr size_t size() const { return m_size; }
 
     constexpr char operator[](const size_t pos) const {
-      // static_assert(pos < m_size, "ce_array index out of range.");
+      // ASSERT IN RANGE?
       return m_str[pos];
     }
 
