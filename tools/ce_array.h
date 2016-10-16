@@ -35,17 +35,20 @@ namespace emp {
       next = _in.next;
     }
 
-    constexpr size_t size() { return N; }
-    constexpr bool operator==(const ce_array<T,N> & _in) {
+    constexpr size_t size() const { return N; }
+    constexpr bool operator==(const ce_array<T,N> & _in) const {
       return (value==_in.value) ? (next==_in.next) : false;
     }
-    constexpr bool operator!=(const ce_array<T,N> & _in) { return !operator==(_in); }
+    constexpr bool operator!=(const ce_array<T,N> & _in) const { return !operator==(_in); }
 
     constexpr T & operator[](int id) { return (id==0) ? value : next.operator[](id-1); }
-    const constexpr T & operator[](int id) const { return (id==0) ? value : next.operator[](id-1); }
+    constexpr const T & operator[](int id) const { return (id==0) ? value : next.operator[](id-1); }
 
     constexpr T & back() { return operator[](N-1); }
+    constexpr const T & back() const { return operator[](N-1); }
     constexpr void fill(const T & v) { value = v; next.fill(v); }
+
+    constexpr bool Has(const T & t) const { return (value == t) || next.Has(t); }
   };
 
   // Specialized version of ce_array for an empty array.
@@ -60,17 +63,20 @@ namespace emp {
 
     constexpr void operator=(const ce_array<T,0> &) { ; }
 
-    constexpr size_t size() { return 0; }
-    constexpr bool operator==(const ce_array<T,0> &) { return true; }
-    constexpr bool operator!=(const ce_array<T,0> &) { return false; }
+    constexpr size_t size() const { return 0; }
+    constexpr bool operator==(const ce_array<T,0> &) const { return true; }
+    constexpr bool operator!=(const ce_array<T,0> &) const { return false; }
 
     // Cannot index into an empty array!
     constexpr T & operator[](int id) { emp_assert(false); return *((T*) nullptr); }
-    const constexpr T & operator[](int id) const { emp_assert(false); return *((T*) nullptr); }
+    constexpr const T & operator[](int id) const { emp_assert(false); return *((T*) nullptr); }
 
     // No back in an empty array.
     constexpr T & back() { emp_assert(false); return *((T*) nullptr); }
+    constexpr const T & back() const { emp_assert(false); return *((T*) nullptr); }
     constexpr void fill(const T &) { ; }
+
+    constexpr bool Has(const T & t) const { return false; }
   };
 
 }
