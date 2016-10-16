@@ -117,10 +117,10 @@ namespace emp {
     void ShiftRight(const int shift_size) {
       emp_assert(shift_size > 0);
       const int field_shift = shift_size / FIELD_BITS;
-      const int field_shift2 = NUM_FIELDS - field_shift;
       const int bit_shift = shift_size % FIELD_BITS;
       const int bit_overflow = FIELD_BITS - bit_shift;
       const int NUM_FIELDS = NumFields();
+      const int field_shift2 = NUM_FIELDS - field_shift;
 
       // account for field_shift
       if (field_shift) {
