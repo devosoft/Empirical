@@ -51,6 +51,34 @@ namespace emp {
     constexpr bool Has(const T & t) const { return (value == t) || next.Has(t); }
   };
 
+  // Specialized version of ce_array for a single element.
+  template <typename T>
+  class ce_array<T,1> {
+  private:
+    T m_val;     // Value at this position.
+  public:
+    using size_t = std::size_t;
+    using value_type = T;
+
+    constexpr ce_array(const T & default_val) : m_val(default_val) {;}
+    constexpr ce_array(const ce_array<T,1> & _in) : m_val(_in.m_val) {;}
+
+    constexpr void operator=(const ce_array<T,1> & _in) { m_val = _in.m_val; }
+
+    constexpr size_t size() const { return 1; }
+    constexpr bool operator==(const ce_array<T,1> & _in) const { return m_val == _in.m_val; }
+    constexpr bool operator!=(const ce_array<T,1> & _in) const { return m_val != _in.m_val; }
+
+    constexpr T & operator[](int id) { emp_assert(id==0); return m_val; }
+    constexpr const T & operator[](int id) const { emp_assert(id==0); return m_val; }
+
+    constexpr T & back() { return m_val; }
+    constexpr const T & back() const { return m_val; }
+    constexpr void fill(const T & v) { m_val = v; }
+
+    constexpr bool Has(const T & t) const { return m_val == t; }
+  };
+
   // Specialized version of ce_array for an empty array.
   template <typename T>
   class ce_array<T,0> {
