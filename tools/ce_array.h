@@ -20,35 +20,34 @@ namespace emp {
   template <typename T, size_t N>
   class ce_array {
   private:
-    T value;                 // Current value.
-    ce_array<T, N-1> next;   // Additional values.
+    static constexpr int p1_size = N/2;
+    static constexpr int p2_size = N - p1_size;
+    ce_array<T, p1_size> p1;   // First half of values.
+    ce_array<T, p2_size> p2;   // Second half of values.
 
   public:
     using size_t = std::size_t;
     using value_type = T;
 
-    constexpr ce_array(const T & default_val) : value(default_val), next(default_val) {;}
-    constexpr ce_array(const ce_array<T,N> & _in) : value(_in.value), next(_in.next) {;}
+    constexpr ce_array(const T & default_val) : p1(default_val), p2(default_val) {;}
+    constexpr ce_array(const ce_array<T,N> & _in) : p1(_in.p1), p2(_in.p2) {;}
 
-    constexpr void operator=(const ce_array<T,N> & _in) {
-      value = _in.value;
-      next = _in.next;
-    }
+    constexpr void operator=(const ce_array<T,N> & _in) { p1 = _in.p1; p2 = _in.p2; }
 
     constexpr size_t size() const { return N; }
     constexpr bool operator==(const ce_array<T,N> & _in) const {
-      return (value==_in.value) ? (next==_in.next) : false;
+      return p1 == _in.p1 && p2 == _in.p2;
     }
     constexpr bool operator!=(const ce_array<T,N> & _in) const { return !operator==(_in); }
 
-    constexpr T & operator[](int id) { return (id==0) ? value : next.operator[](id-1); }
-    constexpr const T & operator[](int id) const { return (id==0) ? value : next.operator[](id-1); }
+    constexpr T & operator[](int id) { return (id < p1_size) ? p1[id] : p2[id-p1_size]; }
+    constexpr const T & operator[](int id) const { return (id < p1_size) ? p1[id] : p2[id-p1_size]; }
 
-    constexpr T & back() { return operator[](N-1); }
-    constexpr const T & back() const { return operator[](N-1); }
-    constexpr void fill(const T & v) { value = v; next.fill(v); }
+    constexpr T & back() { return p2.back(); }
+    constexpr const T & back() const { return p2.back(); }
+    constexpr void fill(const T & v) { p1.fill(v); p2.fill(v); }
 
-    constexpr bool Has(const T & t) const { return (value == t) || next.Has(t); }
+    constexpr bool Has(const T & t) const { return p1.Has(t) || p2.Has(t); }
   };
 
   // Specialized version of ce_array for a single element.
