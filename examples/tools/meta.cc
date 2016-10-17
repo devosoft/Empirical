@@ -54,4 +54,10 @@ int main()
 
   std::cout << "CombineHash(" << x << "," << y << "," << z << ") = "
       << emp::ApplyTuple(emp::CombineHash<int,int,int>, test_tup) << std::endl;
+
+  // Test Math...
+  using math_t = emp::tIntMath<1, 2, 3, 4>;
+  std::cout << "\nMath Tests:\n";
+  std::cout << "Sum = " << math_t::Sum() << std::endl;
+  std::cout << "Prod = " << math_t::Product() << std::endl;
 }
