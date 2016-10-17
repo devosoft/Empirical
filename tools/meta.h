@@ -15,8 +15,10 @@ namespace emp {
   // Effectively create a function (via constructor) where all args are computed, then ignored.
   struct run_and_ignore { template <typename... T> run_and_ignore(T&&...) {} };
 
-  // Trim off the first type from a pack.
-  template <typename T, typename... Ts> using first_type = T;
+  // Trim off a specific type from a pack.
+  template <typename T1, typename... Ts> using first_type = T1;
+  template <typename T1, typename T2, typename... Ts> using second_type = T2;
+  template <typename T1, typename T2, typename T3, typename... Ts> using third_type = T3;
 
 
   namespace {
@@ -168,6 +170,17 @@ namespace emp {
   template<typename T, typename U>
   using AdaptTemplate_Arg1 = typename AdaptTemplateHelper_Arg1<T, U>::type;
 
+
+  // Some math inside templates...
+  template <int I, int... Is> struct tIntMath {
+    static constexpr int Sum() { return I + tIntMath<Is...>::Sum(); }
+    static constexpr int Product() { return I * tIntMath<Is...>::Product(); }
+  };
+
+  template <int I> struct tIntMath<I> {
+    static constexpr int Sum() { return I; }
+    static constexpr int Product() { return I; }
+  };
 }
 
 
