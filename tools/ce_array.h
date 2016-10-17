@@ -48,6 +48,15 @@ namespace emp {
     constexpr void fill(const T & v) { p1.fill(v); p2.fill(v); }
 
     constexpr bool Has(const T & t) const { return p1.Has(t) || p2.Has(t); }
+
+    template <int i> constexpr T & Get() {
+      static_assert(i < N, "ce_array::Get<id> must have inded in range.");
+      return (i < p1_size) ? p1.Get<i>() : p2.Get<i-p1_size>();
+    }
+    template <int i> constexpr const T & Get() const {
+      static_assert(i < N, "ce_array::Get<id> must have inded in range.");
+      return (i < p1_size) ? p1.Get<i>() : p2.Get<i-p1_size>();
+    }
   };
 
   // Specialized version of ce_array for a single element.
@@ -76,6 +85,15 @@ namespace emp {
     constexpr void fill(const T & v) { m_val = v; }
 
     constexpr bool Has(const T & t) const { return m_val == t; }
+
+    template <int i> constexpr T & Get() {
+      static_assert(i==0, "ce_array::Get<id> must have inded in range.");
+      return m_val;
+    }
+    template <int i> constexpr const T & Get() const {
+      static_assert(i==0, "ce_array::Get<id> must have inded in range.");
+      return m_val;
+    }
   };
 
   // Specialized version of ce_array for an empty array.
