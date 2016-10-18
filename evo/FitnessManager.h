@@ -96,9 +96,11 @@ namespace evo {
     size_t GetSize() const { return weight_info.size(); }
 
     template <typename ORG>
-    double CalcFitness(size_t id, ORG*, const std::function<double(ORG*)> &) {
-      // We shouldn't need to call this version frequently; it should always return cache info.
-      return weight_info[id];
+    double CalcFitness(size_t id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
+      if (weight_info.GetWeight(id) == 0.0) {
+        weight_info[id] = fit_fun(org);
+      }
+      return weight_info.GetWeight(id);
     }
 
     bool Set(const emp::vector<double> & in_cache) { weight_info.Adjust(in_cache); return true; }
