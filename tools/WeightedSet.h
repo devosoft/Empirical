@@ -90,9 +90,9 @@ namespace emp {
 
     void Resize(int new_size) {
       const int old_size = item_weight.size();
-      item_weight.resize(new_size, 0.0);   // Update the size (new weights default to zero)
-      tree_weight.resize(new_size, 0.0);   // Update the size (new weights default to zero)
-      if (new_size < old_size) Refresh();  // Update the tree weights if some have disappeared.
+      item_weight.resize(new_size, 0.0);             // Update size (new weights default to zero)
+      tree_weight.resize(new_size, 0.0);             // Update size (new weights default to zero)
+      if (new_size < old_size) needs_refresh = true; // Update the tree weights if some disappeared.
     }
 
     void Resize(int new_size, double def_value) {
@@ -100,7 +100,7 @@ namespace emp {
       item_weight.resize(new_size, 0.0);   // Update the size (new weights default to zero)
       tree_weight.resize(new_size, 0.0);   // Update the size (new weights default to zero)
       for (int i=old_size; i < new_size; i++) item_weight[i] = def_value;
-      Refresh();                // Update the tree weights.
+      needs_refresh = true;                // Update the tree weights when needed.
     }
 
     // Standard library compatibility
@@ -136,7 +136,7 @@ namespace emp {
 
     void Adjust(const emp::vector<double> & new_weights) {
       item_weight = new_weights;
-      Refresh();
+      needs_refresh = true;
     }
 
     size_t Insert(double in_weight) {
@@ -172,7 +172,7 @@ namespace emp {
       for (size_t i = 0; i < in_set.size(); i++) {
         item_weight[i] += in_set.item_weight[i];
       }
-      Refresh();
+      needs_refresh = true;
       return *this;
     }
     WeightedSet & operator-=(WeightedSet & in_set) {
@@ -180,13 +180,14 @@ namespace emp {
       for (size_t i = 0; i < in_set.size(); i++) {
         item_weight[i] -= in_set.item_weight[i];
       }
-      Refresh();
+      needs_refresh = true;
       return *this;
     }
 
-    // Refesh used to immediately update all tree weights, but not we just indicate that we
-    // need to update them before accessing them in the future.
-    void Refresh() {
+    // Indicate that we need to adjust weights before relying on them in the future; this will
+    // prevent refreshes from occuring immediately and is useful when many updates to weights are
+    // likely to be done before any are accessed again.
+    void DeferRefresh() {
       needs_refresh = true;
     }
 
