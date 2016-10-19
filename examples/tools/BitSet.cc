@@ -12,9 +12,33 @@
 
 #include "../../tools/BitSet.h"
 
+constexpr int set_size = 100000;
+
+double BitSetMath() {
+  using TEST_TYPE = emp::BitSet<set_size>;
+
+  TEST_TYPE set1, set2;
+
+  for (int i = 0; i < set_size; i++) {
+    if (!(i%2) && (i%5)) set1[i] = 1;
+    if (!(i%3) && (i%7)) set2.Set(i, true);
+  }
+
+  TEST_TYPE set3(set1 & set2);
+  TEST_TYPE set4 = (set1 | set2);
+  double total = 0.0;
+  for (int i = 0; i < set_size; i++) {
+    set3 |= (set4 << 3);
+    set4 &= (set3 >> 3);
+    auto set5 = set3 & set4;
+    total += set5.CountOnes();
+  }
+
+  return total;
+}
+
 int main()
 {
-  constexpr int set_size = 100000;
   using TEST_TYPE = emp::BitSet<set_size>;
 
   TEST_TYPE set1, set2;
@@ -35,6 +59,8 @@ int main()
   }
 
   std::cout << "total = " << total << std::endl;
+  double bsm = BitSetMath();
+  std::cout << "BitSetMath() = " << bsm << std::endl;
 
 //   emp::BitVector bv(10);
 //   std::cout << bv.Hash() << "  (initial, 10 bits)" << std::endl;
