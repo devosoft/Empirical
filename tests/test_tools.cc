@@ -29,6 +29,7 @@
 #include "../tools/assert.h"
 #include "../tools/ce_string.h"
 #include "../tools/errors.h"
+#include "../tools/flex_function.h"
 #include "../tools/functions.h"
 #include "../tools/graph_utils.h"
 //#include "../tools/grid.h"
@@ -39,6 +40,7 @@
 #include "../tools/map_utils.h"
 #include "../tools/math.h"
 #include "../tools/mem_track.h"
+#include "../tools/memo_function.h"
 #include "../tools/meta.h"
 #include "../tools/reflection.h"
 #include "../tools/sequence_utils.h"
@@ -402,9 +404,20 @@ TEST_CASE("Test errors", "[tools]")
   REQUIRE( emp::CountExcepts() == 0 );
 }
 
-char result_char;
-void TestFun(int x, int y, char z) {
-  result_char = z + x*y;
+int Sum4(int a1, int a2, int a3, int a4) {
+  return a1 + a2 + a3 + a4;
+}
+
+TEST_CASE("Test flex_function", "[tools]")
+{
+  emp::flex_function<int(int,int,int,int)> ff = Sum4;
+  ff.SetDefaults(10, 100,1000,10000);
+
+  REQUIRE( ff(1,2,3,4) == 10 );
+  REQUIRE( ff(1,2,3) == 10006 );
+  REQUIRE( ff(1,2) == 11003 );
+  REQUIRE( ff(1) == 11101 );
+  REQUIRE( ff() == 11110 );
 }
 
 TEST_CASE("Test functions", "[tools]")
@@ -1058,6 +1071,11 @@ TEST_CASE("Test mem_track", "[tools]")
 
 }
 
+
+char result_char;
+void TestFun(int x, int y, char z) {
+  result_char = z + x*y;
+}
 
 template <typename A, typename B>
 struct MetaTestClass {
