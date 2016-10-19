@@ -17,5 +17,10 @@ int main()
   std::cout << "Testing.  " << std::endl;
 
   emp::flex_function<int(int,int,int,int)> ff = Sum4;
+  ff.SetDefaults(10, 100,1000,10000);
   std::cout << "ff(1,2,3,4) = " << ff(1,2,3,4) << std::endl;
+  std::cout << "ff(1,2,3) = " << ff(1,2,3) << std::endl;
+  std::cout << "ff(1,2) = " << ff(1,2) << std::endl;
+  std::cout << "ff(1) = " << ff(1) << std::endl;
+  std::cout << "ff() = " << ff() << std::endl;
 }
