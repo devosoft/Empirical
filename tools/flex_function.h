@@ -27,12 +27,13 @@ namespace emp {
     using return_t = R;
     using fun_t = std::function<R(ARGS...)>;
     using this_t = flex_function<R(ARGS...)>;
+    using tuple_t = std::tuple<std::decay<ARGS>...>;
 
     static constexpr int num_args = sizeof...(ARGS);
 
   private:
     fun_t fun;
-    std::tuple<ARGS...> default_args;
+    tuple_t default_args;
 
   public:
     template <typename T>
@@ -47,6 +48,18 @@ namespace emp {
     this_t & operator=(fun_t && _f) { fun=std::move(_f); return *this; }
     template <typename T>
     this_t & operator=(T && arg) { fun = std::forward<T>(arg); return *this; }
+
+    template <int ID> void SetDefault(const std::decay<pack_id<ID,ARGS...>> & in_default) {
+      std::get<ID>(default_args) = in_default;
+    }
+
+    template <class... IN_ARGS>
+    return_t operator()(IN_ARGS &&... k) const {
+      emp_assert(fun);
+      return fun(k...);
+    }
+
+    operator bool() const { return (bool) fun; }
 
   };
 
