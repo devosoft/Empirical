@@ -1072,6 +1072,20 @@ TEST_CASE("Test mem_track", "[tools]")
 }
 
 
+TEST_CASE("Test emp::memo_function", "[tools]")
+{
+  emp::memo_function<uint64_t(int)> test_fun;
+
+  // Build a Fibonacchi function...
+  test_fun = [&test_fun](int N) {
+    if (N<=1) return (uint64_t) N;
+    return test_fun(N-1) + test_fun(N-2);
+  };
+
+  REQUIRE( test_fun(80) == 0x533163ef0321e5 );
+}
+
+
 char result_char;
 void TestFun(int x, int y, char z) {
   result_char = z + x*y;
