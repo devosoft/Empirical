@@ -23,12 +23,14 @@ constexpr int CETest() {
   }
 
   if (test_array == test2) total += 100000000;
+  if (test_array.Has(100)) total += 100000000;
+  if (test_array.Has(101)) total += 100000000;
 
   return total;
 }
 
 constexpr double CETest2() {
-  emp::ce_array<double, 101> test_array(8.8);
+  emp::ce_array<double, 10001> test_array(8.8);
   test_array.fill(4.1);
   double total = 0.0;
   for (size_t i = 0; i < test_array.size(); i++) total += test_array[i];
@@ -44,4 +46,6 @@ int main()
 
   constexpr double result2 = CETest2();
   std::cout << "CETest2() = " << result2 << std::endl;
+
+  constexpr emp::ce_array<char, 1> x('x');
 }
