@@ -60,4 +60,10 @@ int main()
   std::cout << "\nMath Tests:\n";
   std::cout << "Sum = " << math_t::Sum() << std::endl;
   std::cout << "Prod = " << math_t::Product() << std::endl;
+
+  std::cout << "\nTruncateCall Tests:\n";
+  std::function<int(int,int,int)> fun(Sum3);
+  std:: cout << "emp::TruncateCall(fun, 1,2,3,4,5) = "
+	     << emp::TruncateCall(fun, 1,2,3,4,5)
+	     << std::endl;
 }
