@@ -7,6 +7,7 @@
 #ifndef EMP_META_H
 #define EMP_META_H
 
+#include <functional>
 #include <tuple>
 #include <utility>
 
@@ -77,6 +78,33 @@ namespace emp {
   }
 
 
+  namespace {
+    template <bool args_ready, int args_needed, typename... KNOWN_ARGS>
+    struct tcall_impl {
+      template <typename FUN_T, typename NEXT_ARG, typename... EXTRA>
+      static auto call(FUN_T && fun, KNOWN_ARGS... args, NEXT_ARG next, EXTRA... extra) {
+        constexpr bool ready_next = (sizeof...(KNOWN_ARGS) + 1 == args_needed);
+        using next_t = tcall_impl<ready_next, args_needed, KNOWN_ARGS..., NEXT_ARG>;
+        return next_t::call(std::forward<FUN_T>(fun), args..., next, extra...);
+      }
+    };
+
+    template <int args_needed, typename... KNOWN_ARGS>
+    struct tcall_impl<true, args_needed, KNOWN_ARGS...> {
+      template <typename FUN_T, typename... EXTRA>
+      static auto call(FUN_T fun, KNOWN_ARGS... args, EXTRA... extra) {
+        return fun(args...);
+      }
+    };
+  }
+
+  // Truncate the arguments provided, using only the relevant ones for a function call.
+  template <typename R, typename... PARAMS, typename... ARGS>
+  auto TruncateCall(std::function<R(PARAMS...)> fun, ARGS... args) {
+    constexpr int num_params = sizeof...(PARAMS);
+    return tcall_impl<num_params==0, num_params>::call(fun, args...);
+  }
+
   // Apply a tuple as arguments to a function!
   // Unroll all IDs for the tuple, then get all of them at once, calling function.
   // Based on Kerrek SB in http://stackoverflow.com/questions/10766112/c11-i-can-go-from-multiple-args-to-tuple-but-can-i-go-from-tuple-to-multiple
@@ -100,7 +128,7 @@ namespace emp {
     };
   }
 
-  // user invokes this
+  // User invokes ApplyTuple
   template <typename FUN_T, typename TUPLE_T>
   auto ApplyTuple(FUN_T fun, const TUPLE_T & tup) {
     using tuple_decay_t = std::decay_t<TUPLE_T>;
