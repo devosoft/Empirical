@@ -115,8 +115,6 @@ namespace evo {
 
   using CacheOff = FitnessManager_Base;
   using CacheOrgs = FitnessManager_CacheOrg;
-  // template <typename GENOME> using CacheGenome = FitnessManager_CacheGenome<GENOME>;
-  // template <typename GENOME> using StaticFit = FitnessManager_Static<GENOME>;
   using FitWeights = FitnessManager_Weights;
 }
 }

@@ -29,7 +29,7 @@ namespace emp {
     struct pack_id_impl<0,T,Ts...> { using type = T; };
   }
 
-  template <int ID, typename ...Ts>
+  template <int ID, typename... Ts>
   using pack_id = typename pack_id_impl<ID,Ts...>::type;
 
   // Trim off the last type from a pack.

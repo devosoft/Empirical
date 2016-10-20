@@ -11,8 +11,8 @@
 #ifndef EMP_EVO_POP_ITER_H
 #define EMP_EVO_POP_ITER_H
 
-namespace emp{
-namespace evo{
+namespace emp {
+namespace evo {
 
   template <typename POP_MANAGER>
   class PopulationIterator {
