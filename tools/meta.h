@@ -79,20 +79,10 @@ namespace emp {
 
 
   namespace {
-    template <bool args_ready, int args_needed, typename... KNOWN_ARGS>
+    template <typename... KNOWN_ARGS>
     struct tcall_impl {
-      template <typename FUN_T, typename NEXT_ARG, typename... EXTRA>
-      static auto call(FUN_T && fun, KNOWN_ARGS... args, NEXT_ARG next, EXTRA... extra) {
-        constexpr bool ready_next = (sizeof...(KNOWN_ARGS) + 1 == args_needed);
-        using next_t = tcall_impl<ready_next, args_needed, KNOWN_ARGS..., NEXT_ARG>;
-        return next_t::call(std::forward<FUN_T>(fun), args..., next, extra...);
-      }
-    };
-
-    template <int args_needed, typename... KNOWN_ARGS>
-    struct tcall_impl<true, args_needed, KNOWN_ARGS...> {
       template <typename FUN_T, typename... EXTRA>
-      static auto call(FUN_T fun, KNOWN_ARGS... args, EXTRA... extra) {
+      static auto call(FUN_T fun, KNOWN_ARGS... args, EXTRA...) {
         return fun(args...);
       }
     };
@@ -101,8 +91,7 @@ namespace emp {
   // Truncate the arguments provided, using only the relevant ones for a function call.
   template <typename R, typename... PARAMS, typename... ARGS>
   auto TruncateCall(std::function<R(PARAMS...)> fun, ARGS &&... args) {
-    constexpr int num_params = sizeof...(PARAMS);
-    return tcall_impl<num_params==0, num_params>::call(fun, std::forward<ARGS>(args)...);
+    return tcall_impl<PARAMS...>::call(fun, std::forward<ARGS>(args)...);
   }
 
   // Apply a tuple as arguments to a function!
