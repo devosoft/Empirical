@@ -100,9 +100,9 @@ namespace emp {
 
   // Truncate the arguments provided, using only the relevant ones for a function call.
   template <typename R, typename... PARAMS, typename... ARGS>
-  auto TruncateCall(std::function<R(PARAMS...)> fun, ARGS... args) {
+  auto TruncateCall(std::function<R(PARAMS...)> fun, ARGS &&... args) {
     constexpr int num_params = sizeof...(PARAMS);
-    return tcall_impl<num_params==0, num_params>::call(fun, args...);
+    return tcall_impl<num_params==0, num_params>::call(fun, std::forward<ARGS>(args)...);
   }
 
   // Apply a tuple as arguments to a function!
