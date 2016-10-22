@@ -79,10 +79,10 @@ namespace emp {
 
 
   namespace {
-    template <typename... KNOWN_ARGS>
+    template <typename... PARAMS>
     struct tcall_impl {
       template <typename FUN_T, typename... EXTRA>
-      static auto call(FUN_T fun, KNOWN_ARGS... args, EXTRA...) {
+      static auto call(FUN_T fun, PARAMS... args, EXTRA...) {
         return fun(args...);
       }
     };
@@ -93,6 +93,16 @@ namespace emp {
   auto TruncateCall(std::function<R(PARAMS...)> fun, ARGS &&... args) {
     return tcall_impl<PARAMS...>::call(fun, std::forward<ARGS>(args)...);
   }
+
+  // Expand a function to take (and ignore) extra arguments.
+  template <typename R, typename... ARGS>
+  struct AdaptFunction {
+    template <typename... EXTRA_ARGS>
+    static auto Expand(const std::function<R(ARGS...)> & fun) {
+      return [fun](ARGS... args, EXTRA_ARGS...){ return fun(args...); };
+    }
+  };
+  
 
   // Apply a tuple as arguments to a function!
   // Unroll all IDs for the tuple, then get all of them at once, calling function.
