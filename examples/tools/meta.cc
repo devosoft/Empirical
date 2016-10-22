@@ -66,4 +66,8 @@ int main()
   std:: cout << "emp::TruncateCall(fun, 1,2,3,4,5) = "
 	     << emp::TruncateCall(fun, 1,2,3,4,5)
 	     << std::endl;
+
+  std::cout << "\nAdaptFunction Tests:\n";
+  auto fun2 = emp::AdaptFunction<int,int,int,int>::Expand<double, char>(fun);
+  std::cout << "expanded fun = " << fun2(100,200,300,1.234,'a') << std::endl;
 }
