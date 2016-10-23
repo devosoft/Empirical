@@ -51,6 +51,8 @@ namespace emp {
     template <typename T> using push_back_t = TypeSet<T1,Ts...,T>;
     template <typename T> using add_t = TypeSet<T1,Ts...,T>;           // Same as push_back_t...
     template <typename IN> using merge_t = typename ts_merge_impl<IN, T1, Ts...>::type;
+
+    template <typename RETURN_T> using to_function_t = RETURN_T(T1,Ts...);
   };
 
   // Specialized TypeSet with no types.
@@ -70,6 +72,8 @@ namespace emp {
     template <typename T> using push_back_t = TypeSet<T>;
     template <typename T> using add_t = TypeSet<T>;
     template <typename IN> using merge_t = IN;
+
+    template <typename RETURN_T> using to_function_t = RETURN_T();
   };
 }
 
