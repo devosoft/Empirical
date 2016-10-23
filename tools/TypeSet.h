@@ -47,7 +47,9 @@ namespace emp {
     using last_t = last_type<T1,Ts...>;
     using pop_front_t = TypeSet<Ts...>;
 
-    template <typename T> using add_t = TypeSet<T1,Ts...,T>;
+    template <typename T> using push_front_t = TypeSet<T,T1,Ts...>;
+    template <typename T> using push_back_t = TypeSet<T1,Ts...,T>;
+    template <typename T> using add_t = TypeSet<T1,Ts...,T>;           // Same as push_back_t...
     template <typename IN> using merge_t = typename ts_merge_impl<IN, T1, Ts...>::type;
   };
 
@@ -64,6 +66,8 @@ namespace emp {
     // first_t, last_t, and pop_front_t not implemented, since no types are available.
     // (could implement with null_t)
 
+    template <typename T> using push_front_t = TypeSet<T>;
+    template <typename T> using push_back_t = TypeSet<T>;
     template <typename T> using add_t = TypeSet<T>;
     template <typename IN> using merge_t = IN;
   };
