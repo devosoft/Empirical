@@ -16,11 +16,27 @@ namespace emp {
 
   // Anonymous helpers for TypeSet
   namespace {
+    // Helper for merge.
     template <typename... Ts> struct ts_merge_impl;
-
     template <typename... IN, typename... Ts>
     struct ts_merge_impl<TypeSet<IN...>, Ts...> {
       using type = TypeSet<Ts..., IN...>;
+    };
+
+    // Helper for shifting between typeset (e.g., for crop)
+    template <int S, typename T1, typename T2> struct ts_shift;
+    template <int S, typename... Ts1, typename... Ts2>
+    struct ts_shift<int S, TypeSet<Ts1...>, TypeSet<Ts2...>> {
+      using move_t = TypeSet<Ts2...>::first_t;
+      using inc_t = TypeSet<Ts1...>::add_t<move_t>;
+      using dec_t = TypeSet<Ts2...>::pop_t;
+      using type1 = ts_shift<S-1, inc_t, dec_t>::type1;
+      using type2 = ts_shift<S-1, inc_t, dec_t>::type2;
+    };
+    template <typename... Ts1, typename... Ts2>
+    struct ts_shift<0, TypeSet<Ts1...>, TypeSet<Ts2...>> {
+      using type1 = TypeSet<Ts1...>;
+      using type2 = TypeSet<Ts2...>;
     };
   }
 
@@ -42,6 +58,9 @@ namespace emp {
 
     constexpr static bool IsEmpty() { return false; }
     constexpr static bool IsUnique() { return has_unique_types<T1,Ts...>(); }
+
+    // Get the type associated with a specified position in the pack.
+    template <int POS> using type = pack_id<POS, T1, Ts...>;
 
     using first_t = T1;
     using last_t = last_type<T1,Ts...>;
