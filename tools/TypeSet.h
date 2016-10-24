@@ -56,18 +56,22 @@ namespace emp {
     // Get the type associated with a specified position in the pack.
     template <int POS> using type = pack_id<POS, T1, Ts...>;
 
+    // Other type lookups
     using this_t = TypeSet<T1, Ts...>;
     using first_t = T1;
     using last_t = last_type<T1,Ts...>;
+
+    // Modifications
     using pop_t = TypeSet<Ts...>;
-
     template <int S> using crop_t = typename ts_shift<S, TypeSet<>, this_t>::type1;
-
     template <typename T> using push_front_t = TypeSet<T,T1,Ts...>;
     template <typename T> using push_back_t = TypeSet<T1,Ts...,T>;
     template <typename T> using add_t = TypeSet<T1,Ts...,T>;           // Same as push_back_t...
     template <typename IN> using merge_t = typename ts_shift<IN::GetSize(), this_t, IN>::type1;
+    using reverse_t = typename pop_t::reverse_t::template push_back_t<T1>;
+    using rotate_t = typename pop_t::template push_back_t<T1>;
 
+    // Conversions
     template <typename RETURN_T> using to_function_t = RETURN_T(T1,Ts...);
     template <template <typename...> class TEMPLATE>
     using apply_t = TEMPLATE<T1, Ts...>;
@@ -84,12 +88,16 @@ namespace emp {
     constexpr static bool IsUnique() { return true; }
 
     // first_t, last_t, and pop_t not implemented, since no types are available.
-    // (could implement with null_t)
+    // (@CAO: could implement with null_t)
+
+    using this_t = TypeSet<>;
 
     template <typename T> using push_front_t = TypeSet<T>;
     template <typename T> using push_back_t = TypeSet<T>;
     template <typename T> using add_t = TypeSet<T>;
     template <typename IN> using merge_t = IN;
+    using reverse_t = this_t;
+    using rotate_t = this_t;
 
     template <typename RETURN_T> using to_function_t = RETURN_T();
   };
