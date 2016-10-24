@@ -14,6 +14,9 @@ namespace emp {
   // Pre-declaration of TypeSet
   template <typename... Ts> struct TypeSet;
 
+  // Create a null type for padding.
+  struct null_t {};
+
   // Anonymous helpers for TypeSet
   namespace {
     // Create add N copies of the same type to the end of a typeset.
@@ -54,7 +57,8 @@ namespace emp {
     template <typename T> constexpr static int GetID() { return get_type_index<T,T1,Ts...>(); }
     template <typename T> constexpr static int GetID(const T &) { return get_type_index<T,T1,Ts...>(); }
 
-    constexpr static int GetSize() { return 1+sizeof...(Ts); }
+    constexpr static int SIZE = 1+sizeof...(Ts);
+    constexpr static int GetSize() { return SIZE; }
 
     constexpr static bool IsEmpty() { return false; }
     constexpr static bool IsUnique() { return has_unique_types<T1,Ts...>(); }
@@ -68,16 +72,21 @@ namespace emp {
     using last_t = last_type<T1,Ts...>;
 
     // Modifications
+    template <typename... T> using push_front_t = TypeSet<T...,T1,Ts...>;
+    template <typename... T> using push_back_t = TypeSet<T1,Ts...,T...>;
+    template <typename... T> using add_t = TypeSet<T1,Ts...,T...>;    // Same as push_back_t...
+
     using pop_t = TypeSet<Ts...>;
     template <int N> using popN_t = typename ts_shift<N, this_t, TypeSet<>>::type2;
     template <int N> using crop_t = typename ts_shift<N, TypeSet<>, this_t>::type1;
-    template <typename T> using push_front_t = TypeSet<T,T1,Ts...>;
-    template <typename T> using push_back_t = TypeSet<T1,Ts...,T>;
-    template <typename T> using add_t = TypeSet<T1,Ts...,T>;           // Same as push_back_t...
-    template <typename IN> using merge_t = typename ts_shift<IN::GetSize(), this_t, IN>::type1;
+
+    template <typename T, int N=1> using pad_t = typename ts_pad<this_t,T,N>::type;
+    template <int N, typename DEFAULT=null_t>
+      using resize_t = typename pad_t<DEFAULT,(N>SIZE)?(N-SIZE):0>::template crop_t<N>;
+    template <typename IN> using merge_t = typename ts_shift<IN::SIZE, this_t, IN>::type1;
     using reverse_t = typename pop_t::reverse_t::template push_back_t<T1>;
     using rotate_t = typename pop_t::template push_back_t<T1>;
-//    template <int R> using rotateM_t =
+//    template <int R> using rotateN_t =
 
     // Conversions
     template <typename RETURN_T> using to_function_t = RETURN_T(T1,Ts...);
@@ -91,6 +100,7 @@ namespace emp {
     template <typename T> constexpr static int Has() { return false; }
 
     // GetID() NOT IMPLEMENTED since no ID's are available.
+    constexpr static int SIZE = 0;
     constexpr static int GetSize() { return 0; }
     constexpr static bool IsEmpty() { return true; }
     constexpr static bool IsUnique() { return true; }
@@ -100,9 +110,13 @@ namespace emp {
 
     using this_t = TypeSet<>;
 
-    template <typename T> using push_front_t = TypeSet<T>;
-    template <typename T> using push_back_t = TypeSet<T>;
-    template <typename T> using add_t = TypeSet<T>;
+    template <typename... T> using push_front_t = TypeSet<T...>;
+    template <typename... T> using push_back_t = TypeSet<T...>;
+    template <typename... T> using add_t = TypeSet<T...>;
+
+    template <typename T, int N=1> using pad_t = typename ts_pad<this_t,T,N>::type;
+    template <int N, typename DEFAULT=null_t> using resize_t = pad_t<DEFAULT,N>;
+
     template <typename IN> using merge_t = IN;
     using reverse_t = this_t;
     using rotate_t = this_t;
