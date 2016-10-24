@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "../../tools/TypeSet.h"
 
@@ -40,4 +41,12 @@ int main()
   std::cout << "After crop_t<2>, size of type = " << test4_t::GetSize() << std::endl;
   std::cout << "After merge of t1 and t2, size = "
 	    << test_t::merge_t<test2_t>::GetSize() << std::endl;
+
+  // IF applied correctly, v will be a vector of uint64_t.
+  test3_t::apply_t<std::vector> v;
+  v.push_back(1);
+
+  // If reverse works correctly, str will be a string.
+  test_t::reverse_t::type<3> str("It worked!");
+  std::cout << "Can we reverse a TypeSet? -> " << str << std::endl;
 }
