@@ -69,6 +69,8 @@ namespace emp {
     template <typename IN> using merge_t = typename ts_shift<IN::GetSize(), this_t, IN>::type1;
 
     template <typename RETURN_T> using to_function_t = RETURN_T(T1,Ts...);
+    template <template <typename...> class TEMPLATE>
+    using apply_t = TEMPLATE<T1, Ts...>;
   };
 
   // Specialized TypeSet with no types.
