@@ -16,6 +16,12 @@ namespace emp {
 
   // Anonymous helpers for TypeSet
   namespace {
+    // Create add N copies of the same type to the end of a typeset.
+    template <typename START, typename T, int N>
+    struct ts_pad { using type = typename ts_pad<START,T,N-1>::type::template add_t<T>; };
+    template <typename START, typename T>
+    struct ts_pad<START, T,0> { using type = START; };
+
     // Helper for shifting a specified number of types to TypeSet T1 from TypeSet T2.
     // Example: to crop, move a specified number of types to empty TypeSet and return it.
     //          to merge, move all of one typeset over to the other and return it.
@@ -32,10 +38,10 @@ namespace emp {
       using type1 = T1;
       using type2 = T2;
     };
+
   }
 
-  // Generic TypeSet (not implemented since specializations cover all cases)
-  template <typename... Ts> struct TypeSet;
+  template <typename T, int N> using TypeSetFill = typename ts_pad<TypeSet<>,T,N>::type;
 
   // Specialized TypeSet with at least one type.
   template <typename T1, typename... Ts>
@@ -63,13 +69,15 @@ namespace emp {
 
     // Modifications
     using pop_t = TypeSet<Ts...>;
-    template <int S> using crop_t = typename ts_shift<S, TypeSet<>, this_t>::type1;
+    template <int N> using popN_t = typename ts_shift<N, this_t, TypeSet<>>::type2;
+    template <int N> using crop_t = typename ts_shift<N, TypeSet<>, this_t>::type1;
     template <typename T> using push_front_t = TypeSet<T,T1,Ts...>;
     template <typename T> using push_back_t = TypeSet<T1,Ts...,T>;
     template <typename T> using add_t = TypeSet<T1,Ts...,T>;           // Same as push_back_t...
     template <typename IN> using merge_t = typename ts_shift<IN::GetSize(), this_t, IN>::type1;
     using reverse_t = typename pop_t::reverse_t::template push_back_t<T1>;
     using rotate_t = typename pop_t::template push_back_t<T1>;
+//    template <int R> using rotateM_t =
 
     // Conversions
     template <typename RETURN_T> using to_function_t = RETURN_T(T1,Ts...);
