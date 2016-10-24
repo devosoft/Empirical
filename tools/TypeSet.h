@@ -16,27 +16,21 @@ namespace emp {
 
   // Anonymous helpers for TypeSet
   namespace {
-    // Helper for merge.
-    template <typename... Ts> struct ts_merge_impl;
-    template <typename... IN, typename... Ts>
-    struct ts_merge_impl<TypeSet<IN...>, Ts...> {
-      using type = TypeSet<Ts..., IN...>;
+    // Helper for shifting a specified number of types to TypeSet T1 from TypeSet T2.
+    // Example: to crop, move a specified number of types to empty TypeSet and return it.
+    //          to merge, move all of one typeset over to the other and return it.
+    template <int S, typename T1, typename T2>
+    struct ts_shift {
+      using move_t = typename T2::first_t;
+      using inc_t = typename T1::template add_t<move_t>;
+      using dec_t = typename T2::pop_t;
+      using type1 = typename ts_shift<S-1, inc_t, dec_t>::type1;
+      using type2 = typename ts_shift<S-1, inc_t, dec_t>::type2;
     };
-
-    // Helper for shifting between typeset (e.g., for crop)
-    template <int S, typename T1, typename T2> struct ts_shift;
-    template <int S, typename... Ts1, typename... Ts2>
-    struct ts_shift<int S, TypeSet<Ts1...>, TypeSet<Ts2...>> {
-      using move_t = TypeSet<Ts2...>::first_t;
-      using inc_t = TypeSet<Ts1...>::add_t<move_t>;
-      using dec_t = TypeSet<Ts2...>::pop_t;
-      using type1 = ts_shift<S-1, inc_t, dec_t>::type1;
-      using type2 = ts_shift<S-1, inc_t, dec_t>::type2;
-    };
-    template <typename... Ts1, typename... Ts2>
-    struct ts_shift<0, TypeSet<Ts1...>, TypeSet<Ts2...>> {
-      using type1 = TypeSet<Ts1...>;
-      using type2 = TypeSet<Ts2...>;
+    template <typename T1, typename T2>
+    struct ts_shift<0, T1, T2> {
+      using type1 = T1;
+      using type2 = T2;
     };
   }
 
@@ -62,14 +56,17 @@ namespace emp {
     // Get the type associated with a specified position in the pack.
     template <int POS> using type = pack_id<POS, T1, Ts...>;
 
+    using this_t = TypeSet<T1, Ts...>;
     using first_t = T1;
     using last_t = last_type<T1,Ts...>;
-    using pop_front_t = TypeSet<Ts...>;
+    using pop_t = TypeSet<Ts...>;
+
+    template <int S> using crop_t = typename ts_shift<S, TypeSet<>, this_t>::type1;
 
     template <typename T> using push_front_t = TypeSet<T,T1,Ts...>;
     template <typename T> using push_back_t = TypeSet<T1,Ts...,T>;
     template <typename T> using add_t = TypeSet<T1,Ts...,T>;           // Same as push_back_t...
-    template <typename IN> using merge_t = typename ts_merge_impl<IN, T1, Ts...>::type;
+    template <typename IN> using merge_t = typename ts_shift<IN::GetSize(), this_t, IN>::type1;
 
     template <typename RETURN_T> using to_function_t = RETURN_T(T1,Ts...);
   };
@@ -84,7 +81,7 @@ namespace emp {
     constexpr static bool IsEmpty() { return true; }
     constexpr static bool IsUnique() { return true; }
 
-    // first_t, last_t, and pop_front_t not implemented, since no types are available.
+    // first_t, last_t, and pop_t not implemented, since no types are available.
     // (could implement with null_t)
 
     template <typename T> using push_front_t = TypeSet<T>;
