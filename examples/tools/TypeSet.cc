@@ -49,4 +49,9 @@ int main()
   // If reverse works correctly, str will be a string.
   test_t::reverse_t::type<3> str("It worked!");
   std::cout << "Can we reverse a TypeSet? -> " << str << std::endl;
+
+  // Let's try filtering!
+  using test_filtered = test_t::filter_t<std::is_integral>;
+  std::cout << "Number of integral types in test_t = " << test_filtered::GetSize() << std::endl;
+  
 }
