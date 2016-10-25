@@ -147,6 +147,9 @@ namespace emp {
     using rotate_t = this_t;
 
     template <typename RETURN_T> using to_function_t = RETURN_T();
+
+    // There's nothing to filter, so all filters should return this_t (TypeSet<>)
+    template <template <typename> class FILTER> using filter_t = this_t;
   };
 }
 
