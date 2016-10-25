@@ -16,7 +16,7 @@ namespace emp {
   // Effectively create a function (via constructor) where all args are computed, then ignored.
   struct run_and_ignore { template <typename... T> run_and_ignore(T&&...) {} };
 
-  // Trim off a specific type from a pack.
+  // Trim off a specific type position from a pack.
   template <typename T1, typename... Ts> using first_type = T1;
   template <typename T1, typename T2, typename... Ts> using second_type = T2;
   template <typename T1, typename T2, typename T3, typename... Ts> using third_type = T3;
@@ -43,6 +43,11 @@ namespace emp {
   template <typename TEST> constexpr bool has_type() { return false; }
   template <typename TEST, typename FIRST, typename... OTHERS>
   constexpr bool has_type() { return std::is_same<TEST, FIRST>() || has_type<TEST,OTHERS...>(); }
+
+  // Count how many times a specified type appears in a set of types.
+  template <typename TEST> constexpr int count_type() { return 0; }
+  template <typename TEST, typename FIRST, typename... OTHERS>
+  constexpr int count_type() { return count_type<TEST,OTHERS...>() + (std::is_same<TEST, FIRST>()?1:0) }
 
   // The following functions take a test type and a list of types and return the index that
   // matches the test type in question.
@@ -102,7 +107,7 @@ namespace emp {
       return [fun](ARGS... args, EXTRA_ARGS...){ return fun(args...); };
     }
   };
-  
+
 
   // Apply a tuple as arguments to a function!
   // Unroll all IDs for the tuple, then get all of them at once, calling function.
@@ -161,17 +166,15 @@ namespace emp {
 #define emp_int_decoy(TEST) emp::sfinae_decoy<int, decltype(TEST)>
 
   // Change the internal type arguments on a template...
-  // From: Sam Varshavchik
+  // Adapted from: Sam Varshavchik
   // http://stackoverflow.com/questions/36511990/is-it-possible-to-disentangle-a-template-from-its-arguments-in-c
   namespace {
-    template<typename T, typename ...U> class AdaptTemplateHelper {
-    public:
+    template<typename T, typename ...U> struct AdaptTemplateHelper {
       using type = T;
     };
 
     template<template <typename...> class T, typename... V, typename... U>
-    class AdaptTemplateHelper<T<V...>, U...> {
-    public:
+    struct AdaptTemplateHelper<T<V...>, U...> {
       using type = T<U...>;
     };
   }
