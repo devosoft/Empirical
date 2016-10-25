@@ -42,6 +42,26 @@ namespace emp {
       using type2 = T2;
     };
 
+    // Filters create a TypeSet with the element if the filter is true, empty if false.
+    template <typename T, bool> struct ts_filter1 { using type=TypeSet<T>; };
+    template <typename T> struct ts_filter1<T,false> { using type=TypeSet<>; };
+
+    template <typename T, template <typename> class FILTER, int N>
+    struct ts_filter {
+      using cur_t = typename T::first_t;
+      constexpr static bool cur_result = FILTER<cur_t>::value;
+      using this_ts = typename ts_filter1<cur_t, cur_result>::type;
+      using other_ts = typename ts_filter<typename T::pop_t, FILTER, N-1>::type;
+      using type = typename this_ts::template merge_t< other_ts >;
+    };
+
+    template <typename T, template <typename> class FILTER>
+    struct ts_filter <T,FILTER,0> {
+      using type = TypeSet<>;
+    };
+
+    template <typename T, template <typename> class FILTER>
+    using ts_filter_t = typename ts_filter<T,FILTER,T::SIZE>::type;
   }
 
   template <typename T, int N> using TypeSetFill = typename ts_pad<TypeSet<>,T,N>::type;
@@ -93,6 +113,9 @@ namespace emp {
     template <template <typename...> class TEMPLATE>
     using apply_t = TEMPLATE<T1, Ts...>;
 
+    // Filters
+    template <template <typename> class FILTER>
+    using filter_t = ts_filter_t<this_t, FILTER>;
   };
 
   // Specialized TypeSet with no types.
