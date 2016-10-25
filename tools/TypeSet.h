@@ -49,7 +49,8 @@ namespace emp {
   // Specialized TypeSet with at least one type.
   template <typename T1, typename... Ts>
   struct TypeSet<T1, Ts...> {
-    template <typename T> constexpr static int Has() { return has_type<T,T1,Ts...>(); }
+    template <typename T> constexpr static bool Has() { return has_type<T,T1,Ts...>(); }
+    template <typename T> constexpr static int Count() { return count_type<T,T1,Ts...>(); }
 
     // Type ID's can be retrieved with
     //   GetID<my_type>() to get the ID associated with specific type my_type
@@ -86,18 +87,19 @@ namespace emp {
     template <typename IN> using merge_t = typename ts_shift<IN::SIZE, this_t, IN>::type1;
     using reverse_t = typename pop_t::reverse_t::template push_back_t<T1>;
     using rotate_t = typename pop_t::template push_back_t<T1>;
-//    template <int R> using rotateN_t =
 
     // Conversions
     template <typename RETURN_T> using to_function_t = RETURN_T(T1,Ts...);
     template <template <typename...> class TEMPLATE>
     using apply_t = TEMPLATE<T1, Ts...>;
+
   };
 
   // Specialized TypeSet with no types.
   template <>
   struct TypeSet<> {
-    template <typename T> constexpr static int Has() { return false; }
+    template <typename T> constexpr static bool Has() { return false; }
+    template <typename T> constexpr static int Count() { return 0; }
 
     // GetID() NOT IMPLEMENTED since no ID's are available.
     constexpr static int SIZE = 0;
