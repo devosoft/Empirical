@@ -47,7 +47,7 @@ namespace emp {
   // Count how many times a specified type appears in a set of types.
   template <typename TEST> constexpr int count_type() { return 0; }
   template <typename TEST, typename FIRST, typename... OTHERS>
-  constexpr int count_type() { return count_type<TEST,OTHERS...>() + (std::is_same<TEST, FIRST>()?1:0) }
+  constexpr int count_type() { return count_type<TEST,OTHERS...>() + (std::is_same<TEST, FIRST>()?1:0); }
 
   // The following functions take a test type and a list of types and return the index that
   // matches the test type in question.
