@@ -66,9 +66,25 @@ namespace D3 {
       /// Call the given function once on the entire selection/transition. [function] can either
       /// be a C++ function or a string with the name of a Javascript function in the d3, emp, or
       /// current window namespace.
+      /// To get around the problem of passing selections into C++, this function assumes that the
+      /// function you are passing expects a single argument: an int, representing the id of the
+      /// selection to be operated on (which you can then convert to a selection object with
+      /// `D3::Selection(i)`).
       // TODO: Allow arguments
       DERIVED Call(std::string function){
-        D3_CALLBACK_METHOD_1_ARG(call, function.c_str())
+        EM_ASM_ARGS({
+          var func_string = Pointer_stringify($1);
+          if (typeof window[func_string] === "function") {
+            func_string = window[func_string];
+          } else if (typeof window["emp"][func_string] === "function") {
+            func_string = window["emp"][func_string];
+          } else if (typeof window["d3"][func_string] === "function") {
+            func_string = window["d3"][func_string];
+          }
+
+          emp.__new_object = js.objects[$0].call(function(sel){return func_string($0);});
+        }, this->id, function.c_str());
+
         return *(static_cast<DERIVED *>(this));
       }
 
@@ -77,7 +93,14 @@ namespace D3 {
       template <typename T>
       typename emp::sfinae_decoy<DERIVED, decltype(&T::operator())>::type
       Call(T function){
-        D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(call, function)
+        uint32_t fun_id = emp::JSWrap(function, "", false);
+        EM_ASM_ARGS({
+          emp.__new_object = js.objects[$0].call(function(selection) {
+                                                  return emp.Callback($1, $0);
+                                                 });
+        }, this->id, fun_id);
+        emp::JSDelete(fun_id);
+
         return *(static_cast<DERIVED *>(this));
       }
 
@@ -338,7 +361,7 @@ namespace D3 {
       /// specified function on the element's bound data
       DERIVED SetText(std::string text){
         D3_CALLBACK_METHOD_1_ARG(text, text.c_str())
-        return *this;
+        return *(static_cast<DERIVED *>(this));
       }
 
       /// @cond TEMPLATES

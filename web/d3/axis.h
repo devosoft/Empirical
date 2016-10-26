@@ -12,12 +12,13 @@ namespace D3 {
 
   /// Axis objects are in charge of drawing graphical axes onto svg canvases. An axis depicts a
   /// scale, so every axis has a scale, and is templated off of the type of that scale.
-  template <typename SCALE_TYPE>
+  template <typename SCALE_TYPE = LinearScale>
   class Axis : public D3_Base {
   private:
     SCALE_TYPE scale;
     std::string label;
-    std::string dom_id;
+    std::string dom_id = "";
+    std::string label_offset = "";
 
   public:
 
@@ -43,7 +44,7 @@ namespace D3 {
     /// Draw axis on [selection] (must contain a single SVG element) with intelligent default
     /// positioning
     void Draw(Selection selection){
-      this->SetTickFormat("g");
+      //this->SetTickFormat("g");
 
       //Dom ids can't contain whitespace
       dom_id = label;
@@ -79,6 +80,10 @@ namespace D3 {
           js.objects[$3].attr("transform", "translate("+(canvas_width-60)+",0)");
         }
 
+        if (Pointer_stringify($5) != "") {
+          dy = Pointer_stringify($5);
+        }
+
         js.objects[$3].selectAll("line, .domain")
              .attr("stroke-width", 1)
              .attr("fill", "none")
@@ -89,7 +94,8 @@ namespace D3 {
              .attr("x", axis_range[0]+(axis_range[1]-axis_range[0])/x_divisor)
              .attr("dy", dy).style("text-anchor", "middle")
              .text(Pointer_stringify($4));
-      }, this->id, selection.GetID(), dom_id.c_str(), group.GetID(), label.c_str());
+      }, this->id, selection.GetID(), dom_id.c_str(), group.GetID(), label.c_str(),
+      label_offset.c_str());
     }
 
     template <typename T>
@@ -115,6 +121,22 @@ namespace D3 {
       return this->scale;
     }
 
+    /// Adjust the location of the label text relative to the axis
+    /// (helpful if numbers are overlapping it). Can be negative.
+    /// Use "em" (e.g. "2em") to specify distance relative to font size.
+    void AdjustLabelOffset(std::string offset) {
+      label_offset = offset;
+      if (dom_id != "") { //We've already drawn stuff
+        group.Select("#axis_label").SetAttr("dy", label_offset);
+      }
+    }
+
+    /// Draw tries to make a good guess about where to place the axis, but sometimes you want to
+    /// scoot it over. This method will move the axis to the x,y location specified.
+    void Move(int x, int y) {
+      group.Move(x,y);
+    }
+
     /// Set orientation of this axis to [orientation] (must be "bottom", "top", "left", or "right")
     /// Controls default placement on SVG, whether main line is vertical or horizontal, and which
     /// side the ticks and label show up on.
@@ -127,17 +149,17 @@ namespace D3 {
 
     template <typename T, std::size_t SIZE>
     void SetTickValues(std::array<T, SIZE> values) {
-      pass_array_to_javascript(values);
+      emp::pass_array_to_javascript(values);
 
       EM_ASM_ARGS({
-  	    js.objects[$0].tickValues(emp.__incoming_array);
+  	    js.objects[$0].tickValues(emp_i.__incoming_array);
 	  }, this->id);
     }
 
-    void SetTickSize(float inner, float outer) {
+    void SetTickSize(float size) {
       EM_ASM_ARGS({
-	    js.objects[$0].innerTickSize($1, $2);
-	  }, this->id, inner, outer);
+	    js.objects[$0].tickSize($1);
+      }, this->id, size);
     }
 
     void SetInnerTickSize(float size) {
@@ -170,7 +192,7 @@ namespace D3 {
     /// [the rules for d3.format()](https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format)
     void SetTickFormat(std::string format) {
       EM_ASM_ARGS({
-        js.objects[$0].tickFormat(d3.format(Pointer_stringify([$1])));
+        js.objects[$0].tickFormat(d3.format(Pointer_stringify($1)));
       }, this->id, format.c_str());
     }
 
@@ -189,7 +211,7 @@ namespace D3 {
 
   /// Helper function to draw a standard set of x and y axes
   /// Takes the desired x axis, y axis, and the selection on which to draw them
-  template <typename SCALE_X_TYPE, typename SCALE_Y_TYPE>
+  template <typename SCALE_X_TYPE = D3::LinearScale, typename SCALE_Y_TYPE = D3::LinearScale>
   void DrawAxes(Axis<SCALE_X_TYPE> & x_axis, Axis<SCALE_Y_TYPE> & y_axis, Selection & selection){
     x_axis.Draw(selection);
     y_axis.SetOrientation("left");

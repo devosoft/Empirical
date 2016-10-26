@@ -28,6 +28,10 @@ emp::web::LineGraph<std::array<double, 2> > line_graph("x", "y", 500, 250);
 emp::web::TreeVisualization<LineageTreeNode> tree(500, 250);
 D3::Selection example_selection;
 D3::Selection circles;
+D3::Axis<> ax = D3::Axis<>("example axis");
+D3::LinearScale scale;
+D3::Selection svg = D3::Select("body").Append("svg");
+
 
 void MakeLineGraph(std::string callback) {
   doc << line_graph;
@@ -86,11 +90,11 @@ void TestSetStyleString(){
   circles.SetStyle("fill", "purple");
 }
 
-void TestSetStyleInt(){
+void TestSetStyleInt() {
   circles.SetStyle("stroke-width", 5);
 }
 
-void TestSetStyleFunc(){
+void TestSetStyleFunc() {
   circles.SetStyle("stroke", [](int d){
       if (d>4) {
         return "green";
@@ -100,17 +104,60 @@ void TestSetStyleFunc(){
   });
 }
 
-int TestFilterByFunc(){
+int TestFilterByFunc() {
   D3::Selection filtered = circles.Filter([](int d){return d > 4;});
   return filtered.GetID();
 }
 
-int TestFilterBySel(){
+int TestFilterBySel() {
   example_selection.Append("div").SetAttr("id", "example_id");
   D3::Selection filtered = D3::SelectAll("div").Filter("#example_id");
   return filtered.GetID();
 }
 
+
+int TestSelectionCall() {
+  // Example function from D3 documentation
+  example_selection.Call([](int selection){D3::Selection(selection).SetAttr("first-name", "John").SetAttr("last-name", "Snow");});
+  return example_selection.GetID();
+}
+
+int TestSubSelection() {
+  // Make extraneous div
+  D3::Select("body").Append("div");
+  D3::Selection sub_div = example_selection.SelectAll("div");
+  return sub_div.GetID();
+}
+
+int TestSetText() {
+  example_selection.SetText("Look! Text!");
+  return example_selection.GetID();
+}
+
+int TestMove() {
+  example_selection.Move(6,7);
+  return example_selection.GetID();
+}
+
+int TestRotate() {
+  example_selection.Rotate(-10);
+  return example_selection.GetID();
+}
+
+std::string TestGetAttrString() {
+  circles.SetAttr("test", "some text");
+  return circles.GetAttrString("test");
+}
+
+int TestGetAttrInt() {
+  circles.SetAttr("test", 4);
+  return circles.GetAttrInt("test");
+}
+
+double TestGetAttrDouble() {
+  circles.SetAttr("test", 5.4);
+  return circles.GetAttrDouble("test");
+}
 
 int main() {
 
@@ -223,6 +270,14 @@ int main() {
   emp::JSWrap(TestSetStyleFunc, "TestSetStyleFunc");
   emp::JSWrap(TestFilterByFunc, "TestFilterByFunc");
   emp::JSWrap(TestFilterBySel, "TestFilterBySel");
+  emp::JSWrap(TestSelectionCall, "TestSelectionCall");
+  emp::JSWrap(TestSubSelection, "TestSubSelection");
+  emp::JSWrap(TestSetText, "TestSetText");
+  emp::JSWrap(TestGetAttrString, "TestGetAttrString");
+  emp::JSWrap(TestGetAttrInt, "TestGetAttrInt");
+  emp::JSWrap(TestGetAttrDouble, "TestGetAttrDouble");
+  emp::JSWrap(TestMove, "TestMove");
+  emp::JSWrap(TestRotate, "TestRotate");
 
   EM_ASM({
     emp.svg_id = -1;
@@ -286,11 +341,142 @@ int main() {
             chai.assert.equal(js.objects[id].attr("id"), "example_id");
         });
 
+        it('should support the call method', function(){
+            var id = emp.TestSelectionCall();
+            chai.assert.equal(js.objects[id].attr("first-name"), "John");
+            chai.assert.equal(js.objects[id].attr("last-name"), "Snow");
+        });
 
+        it('should support sub-selections', function(){
+            var id = emp.TestSubSelection();
+            chai.assert.equal(js.objects[id][0].length, 1);
+        });
+
+        it('should support setting text', function(){
+            var id = emp.TestSetText();
+            chai.assert.equal(js.objects[id].text(), "Look! Text!");
+        });
+
+        it('should support getting string attrs', function(){
+            chai.assert.equal(emp.TestGetAttrString(), "some text");
+        });
+
+        it('should support getting int attrs', function(){
+            chai.assert.equal(emp.TestGetAttrInt(), 4);
+        });
+
+        it('should support getting double attrs', function(){
+            chai.assert.equal(emp.TestGetAttrDouble(), 5.4);
+        });
+
+        it('should support the move method', function(){
+            var id = emp.TestMove();
+            chai.assert.equal(js.objects[id].attr("transform"), "translate(6,7)");
+        });
+
+        it('should support the rotate method', function(){
+            var id = emp.TestRotate();
+            chai.assert.equal(js.objects[id].attr("transform"), "rotate(-10)");
+        });
     });
 
+  });
 
-});
+  scale.SetDomain(0, 1);
+  scale.SetRange(30, 300);
+  svg.SetAttr("height", 500);
 
+  emp::JSWrap([](){ax.SetOrientation("left");}, "TestSetOrientation");
+  emp::JSWrap([](){ax.SetScale(scale);}, "TestSetScale");
+  emp::JSWrap([](){return ax.GetScale().GetID();}, "TestGetScale");
+  emp::JSWrap([](){ax.SetTickValues(std::array<int, 3>({4,5,7}));}, "TestSetTickValues");
+  emp::JSWrap([](){ax.SetTickSize(.2);}, "TestSetTickSize");
+  emp::JSWrap([](){ax.SetInnerTickSize(.7);}, "TestSetInnerTickSize");
+  emp::JSWrap([](){ax.SetOuterTickSize(1.1);}, "TestSetOuterTickSize");
+  emp::JSWrap([](){ax.SetTicks(7);}, "TestSetTicks");
+  emp::JSWrap([](){ax.SetTickPadding(3);}, "TestSetTickPadding");
+  emp::JSWrap([](){ax.SetTickFormat(".3f");}, "TestSetTickFormat");
+  emp::JSWrap([](){ax.Draw(svg);}, "TestDraw");
+  emp::JSWrap([](){ax.Rescale(20, 30, svg);}, "TestRescale");
+  emp::JSWrap([](){ax.AdjustLabelOffset("-4em");ax.Move(100,0);}, "TestAdjustLabelOffset");
+
+  EM_ASM_ARGS({
+    describe("axes", function(){
+
+      it("should support setting orientation", function(){
+        emp.TestSetOrientation();
+        chai.assert.equal(js.objects[$0].orient(), "left");
+      });
+
+      it("should support setting scale", function(){
+        emp.TestSetScale();
+        chai.assert.deepEqual(js.objects[$0].scale().range(), [30,300]);
+      });
+
+      it("should support getting scale", function(){
+        var id = emp.TestGetScale();
+        chai.assert.equal(js.objects[id], js.objects[$0].scale());
+      });
+
+      it("should support setting tick values", function(){
+        emp.TestSetTickValues();
+        chai.assert.deepEqual(js.objects[$0].tickValues(), [4,5,7]);
+        js.objects[$0].tickValues(null);
+      });
+
+
+      it("should support setting tick size", function(){
+        emp.TestSetTickSize();
+        chai.assert.approximately(js.objects[$0].tickSize(), .2, .00001);
+        chai.assert.approximately(js.objects[$0].innerTickSize(), .2, .00001);
+        chai.assert.approximately(js.objects[$0].outerTickSize(), .2, .00001);
+      });
+
+      it("should support setting tick count", function(){
+        emp.TestSetTicks();
+        chai.assert.equal(js.objects[$0].ticks()['0'], 7);
+      });
+
+      it("should support setting inner tick size", function(){
+        emp.TestSetInnerTickSize();
+        chai.assert.approximately(js.objects[$0].innerTickSize(), .7, .00001);
+      });
+
+      it("should support setting outer tick size", function(){
+        emp.TestSetOuterTickSize();
+        chai.assert.approximately(js.objects[$0].outerTickSize(), 1.1, .00001);
+      });
+
+      it("should support setting tick padding", function(){
+        emp.TestSetTickPadding();
+        chai.assert.equal(js.objects[$0].tickPadding(), 3);
+      });
+
+      it("should support setting tick format", function(){
+        emp.TestSetTickFormat();
+        chai.assert.equal(js.objects[$0].tickFormat()(3.45365), "3.454");
+      });
+
+      it("should support drawing", function(){
+        emp.TestDraw();
+        chai.assert.equal(d3.select("#exampleaxis_axis")
+                            .select("#axis_label").text(), "example axis");
+        chai.assert(d3.select("#exampleaxis_axis")
+                            .select("#axis_label").attr("transform"), "rotate(-90)");
+      });
+
+      it("should support rescaling", function(){
+        emp.TestRescale();
+        chai.assert.equal(d3.select("#exampleaxis_axis").selectAll("text").text(), "20.000");
+      });
+
+      it("should support adjusting label offset and moving axis", function(){
+        emp.TestAdjustLabelOffset();
+        chai.assert.equal(d3.select("#exampleaxis_axis").select("#axis_label").attr("dy"), "-4em");
+        chai.assert.equal(js.objects[$1].attr("transform"), "translate(100,0)");
+      });
+
+    });
+  }, ax.GetID(), ax.group.GetID());
 
 }
