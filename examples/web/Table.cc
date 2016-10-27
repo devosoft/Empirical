@@ -1,6 +1,6 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2016.
+//  Released under the MIT Software license; see doc/LICENSE
 
 #include "../../web/web.h"
 
@@ -10,7 +10,7 @@ UI::Document doc("emp_base");
 
 int r = 4;
 int c = 4;
-  
+
 void IncR() {
   r++;
   UI::Table test_table = doc.Table("test");
@@ -23,28 +23,28 @@ void IncR() {
   std::stringstream ss;
   if (!test_table.OK(ss)) emp::Alert(ss.str());
 }
-  
+
 void DecR() {
   r--;
   UI::Table test_table = doc.Table("test");
   test_table.Rows(r);
   doc.Redraw();
 }
-  
+
 void IncC() {
   c++;
   UI::Table test_table = doc.Table("test");
   test_table.Cols(c);
   doc.Redraw();
 }
-  
+
 void DecC() {
   c--;
   UI::Table test_table = doc.Table("test");
   test_table.Cols(c);
   doc.Redraw();
 }
-  
+
 int main()
 {
   doc << "<h1>This is my file!</h1>"
@@ -67,7 +67,7 @@ int main()
   test_table.GetCell(3,0) << "Test2";
 
   doc << "<p>";
-  
+
   doc << UI::Button(IncR, "Inc Rows!");
   doc << UI::Button(DecR, "Dec Rows!");
   doc << UI::Button(IncC, "Inc Cols!");

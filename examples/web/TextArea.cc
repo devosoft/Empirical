@@ -1,6 +1,6 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2016.
+//  Released under the MIT Software license; see doc/LICENSE
 
 #include "../../web/web.h"
 
@@ -9,7 +9,7 @@ UI::Document doc("emp_base");
 
 UI::TextArea text_area([](const std::string &){ });
 
-int main() 
+int main()
 {
   doc << "<h1>Testing!</h1>";
 
@@ -19,4 +19,3 @@ int main()
 
   doc << text_area.SetSize(300,300);
 }
-
