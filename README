@@ -3,17 +3,13 @@ building web interfaces using the Emscripten compiler (from C++ to high efficien
 
 Top-level directory structure:
 
-tools/    - Basic tools that are generally useful for scientific software.
-emtools/  - Tools that make use of being compiled with emscripten.
-
-config/   - Tools to setup a simple configuration system.
+config/   - Tools to build a simple configuration system (including compile-time optimizations)
+evo/      - Tools for building Artificial Life or Evolutionary Computation projects
 geometry/ - Geometry and physics-based tools for implementing simple virtual worlds.
 hardware/ - Implementation of basic virtual hardware that is easy to configure.
 scholar/  - Tools for tracking authors, citations, and bibliographies
+tools/    - Many basic tools that are generally useful for scientific software.
 web/      - Tools for builing web interfaces
-
-evo/      - Tools for building evolution-based software, such as genetic algorithms, digital
-            evolution systems, or agent-based simulations.
 
 examples/ - Example code for many of the above tools
 tests/    - Unit tests
