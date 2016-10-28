@@ -48,11 +48,12 @@ namespace emp {
 
     template <typename T, template <typename> class FILTER, int N>
     struct ts_filter {
-      using cur_t = typename T::first_t;
-      constexpr static bool cur_result = FILTER<cur_t>::value;
-      using this_ts = typename ts_filter1<cur_t, cur_result>::type;
-      using other_ts = typename ts_filter<typename T::pop_t, FILTER, N-1>::type;
-      using type = typename this_ts::template merge_t< other_ts >;
+      using cur_t = typename T::first_t;                                 // Isolate the first type
+      using other_ts = typename T::pop_t;                                // Isolate remaining types
+      constexpr static bool cur_result = FILTER<cur_t>::value;           // Run filter of cur type
+      using cur_fts = typename ts_filter1<cur_t, cur_result>::type;      // Use cur type if true
+      using other_fts = typename ts_filter<other_ts, FILTER, N-1>::type; // Recurse
+      using type = typename cur_fts::template merge_t< other_fts >;      // Merge
     };
 
     template <typename T, template <typename> class FILTER>
@@ -62,6 +63,11 @@ namespace emp {
 
     template <typename T, template <typename> class FILTER>
     using ts_filter_t = typename ts_filter<T,FILTER,T::SIZE>::type;
+
+    template <template <typename> class FILTER, typename T>
+    constexpr bool ts_exist(bool_decoy<FILTER<T>> x) { return true; }
+    template <template <typename> class FILTER, typename T>
+    constexpr bool ts_exist(...) { return false; }
   }
 
   template <typename T, int N> using TypeSetFill = typename ts_pad<TypeSet<>,T,N>::type;
@@ -114,8 +120,12 @@ namespace emp {
     using apply_t = TEMPLATE<T1, Ts...>;
 
     // Filters
+    template <template <typename> class FILTER> using filter_t = ts_filter_t<this_t, FILTER>;
+
+    // template <template <typename> class FILTER>
+    // using filter_exist_t =
     template <template <typename> class FILTER>
-    using filter_t = ts_filter_t<this_t, FILTER>;
+    static constexpr bool Test() { return ts_exist<FILTER, T1>(true); }
   };
 
   // Specialized TypeSet with no types.
