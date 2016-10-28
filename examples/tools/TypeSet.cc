@@ -13,6 +13,10 @@
 
 int Sum4(int a, int b, int c, int d) { return a+b+c+d; }
 
+struct HasA { static int A; };
+struct HasA2 { static char A; };
+template <typename T> using MemberA = decltype(T::A);
+
 int main()
 {
   std::cout << "Testing!" << std::endl;
@@ -53,5 +57,11 @@ int main()
   // Let's try filtering!
   using test_filtered = test_t::filter_t<std::is_integral>;
   std::cout << "Number of integral types in test_t = " << test_filtered::GetSize() << std::endl;
-  
+
+
+  using test_A = emp::TypeSet<HasA, std::string, bool, HasA2, HasA, int>;
+  std::cout << test_A::Test<MemberA>() << std::endl;
+
+  using test_exist = test_A::filter_exist_t<MemberA>;
+  std::cout << test_exist::GetSize() << std::endl;
 }
