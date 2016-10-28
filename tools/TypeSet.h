@@ -47,27 +47,40 @@ namespace emp {
     template <typename T> struct ts_filter1<T,false> { using type=TypeSet<>; };
 
     template <typename T, template <typename> class FILTER, int N>
-    struct ts_filter {
+    struct ts_filter_val {
       using cur_t = typename T::first_t;                                 // Isolate the first type
       using other_ts = typename T::pop_t;                                // Isolate remaining types
       constexpr static bool cur_result = FILTER<cur_t>::value;           // Run filter of cur type
       using cur_fts = typename ts_filter1<cur_t, cur_result>::type;      // Use cur type if true
-      using other_fts = typename ts_filter<other_ts, FILTER, N-1>::type; // Recurse
-      using type = typename cur_fts::template merge_t< other_fts >;      // Merge
+      using other_fts = typename ts_filter_val<other_ts, FILTER, N-1>::type; // Recurse
+      using type = typename cur_fts::template merge_t< other_fts >;          // Merge
     };
+    template <typename T, template <typename> class FILTER>
+    struct ts_filter_val <T,FILTER,0> { using type = TypeSet<>; };
 
     template <typename T, template <typename> class FILTER>
-    struct ts_filter <T,FILTER,0> {
-      using type = TypeSet<>;
-    };
-
-    template <typename T, template <typename> class FILTER>
-    using ts_filter_t = typename ts_filter<T,FILTER,T::SIZE>::type;
+    using ts_filter_t = typename ts_filter_val<T,FILTER,T::SIZE>::type;
 
     template <template <typename> class FILTER, typename T>
     constexpr bool ts_exist(bool_decoy<FILTER<T>> x) { return true; }
     template <template <typename> class FILTER, typename T>
     constexpr bool ts_exist(...) { return false; }
+
+    // Filter on "Does tempalte conversion exist?"
+    template <typename T, template <typename> class FILTER, int N>
+    struct ts_filter_exist {
+      using cur_t = typename T::first_t;                                 // Isolate the first type
+      using other_ts = typename T::pop_t;                                // Isolate remaining types
+      constexpr static bool cur_result = ts_exist<FILTER,cur_t>(true);   // Run filter of cur type
+      using cur_fts = typename ts_filter1<cur_t, cur_result>::type;      // Use cur type if true
+      using other_fts = typename ts_filter_exist<other_ts, FILTER, N-1>::type; // Recurse
+      using type = typename cur_fts::template merge_t< other_fts >;            // Merge
+    };
+    template <typename T, template <typename> class FILTER>
+    struct ts_filter_exist <T,FILTER,0> { using type = TypeSet<>; };
+
+    template <typename T, template <typename> class FILTER>
+    using ts_filter_exist_t = typename ts_filter_exist<T,FILTER,T::SIZE>::type;
   }
 
   template <typename T, int N> using TypeSetFill = typename ts_pad<TypeSet<>,T,N>::type;
@@ -122,8 +135,8 @@ namespace emp {
     // Filters
     template <template <typename> class FILTER> using filter_t = ts_filter_t<this_t, FILTER>;
 
-    // template <template <typename> class FILTER>
-    // using filter_exist_t =
+    template <template <typename> class FILTER>
+    using filter_exist_t = ts_filter_exist_t<this_t, FILTER>;
     template <template <typename> class FILTER>
     static constexpr bool Test() { return ts_exist<FILTER, T1>(true); }
   };
