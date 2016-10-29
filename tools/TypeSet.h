@@ -127,6 +127,9 @@ namespace emp {
     using reverse_t = typename pop_t::reverse_t::template push_back_t<T1>;
     using rotate_t = typename pop_t::template push_back_t<T1>;
 
+    template <int ID, typename T>
+    using set_t = typename crop_t<ID>::template push_back_t<T>::template merge_t<popN_t<ID+1>>;
+
     // Conversions
     template <typename RETURN_T> using to_function_t = RETURN_T(T1,Ts...);
     template <template <typename...> class TEMPLATE>
@@ -153,10 +156,11 @@ namespace emp {
     constexpr static bool IsEmpty() { return true; }
     constexpr static bool IsUnique() { return true; }
 
-    // first_t, last_t, and pop_t not implemented, since no types are available.
-    // (@CAO: could implement with null_t)
+    // pop_t not implemented, since no types are available.
 
     using this_t = TypeSet<>;
+    using first_t = null_t;
+    using last_t = null_t;
 
     template <typename... T> using push_front_t = TypeSet<T...>;
     template <typename... T> using push_back_t = TypeSet<T...>;
