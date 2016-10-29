@@ -3,6 +3,9 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  TypeSet represents a collection of types for manipulation (typically for metaprogramming)
+//
+//  TypeSets are static structues that provide a large set of mechanisms to access and adjust
+//  the included types.
 
 #ifndef EMP_TYPE_SET_H
 #define EMP_TYPE_SET_H
@@ -59,7 +62,7 @@ namespace emp {
     struct ts_filter_val <T,FILTER,0> { using type = TypeSet<>; };
 
     template <typename T, template <typename> class FILTER>
-    using ts_filter_t = typename ts_filter_val<T,FILTER,T::SIZE>::type;
+    using ts_filter_val_t = typename ts_filter_val<T,FILTER,T::SIZE>::type;
 
     template <template <typename> class FILTER, typename T>
     constexpr bool ts_exist(bool_decoy<FILTER<T>> x) { return true; }
@@ -136,7 +139,8 @@ namespace emp {
     using apply_t = TEMPLATE<T1, Ts...>;
 
     // Filters
-    template <template <typename> class FILTER> using filter_t = ts_filter_t<this_t, FILTER>;
+    template <template <typename> class FILTER>
+    using filter_val_t = ts_filter_val_t<this_t, FILTER>;
 
     template <template <typename> class FILTER>
     using filter_exist_t = ts_filter_exist_t<this_t, FILTER>;
@@ -176,6 +180,8 @@ namespace emp {
     template <typename RETURN_T> using to_function_t = RETURN_T();
 
     // There's nothing to filter, so all filters should return this_t (TypeSet<>)
+    template <template <typename> class FILTER> using filter_val_t = this_t;
+    template <template <typename> class FILTER> using filter_exist_t = this_t;
     template <template <typename> class FILTER> using filter_t = this_t;
   };
 }
