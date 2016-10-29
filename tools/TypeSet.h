@@ -117,7 +117,7 @@ namespace emp {
     template <typename... T> using add_t = TypeSet<T1,Ts...,T...>;    // Same as push_back_t...
 
     using pop_t = TypeSet<Ts...>;
-    template <int N> using popN_t = typename ts_shift<N, this_t, TypeSet<>>::type2;
+    template <int N> using popN_t = typename ts_shift<N, TypeSet<>, this_t>::type2;
     template <int N> using crop_t = typename ts_shift<N, TypeSet<>, this_t>::type1;
 
     template <typename T, int N=1> using pad_t = typename ts_pad<this_t,T,N>::type;
