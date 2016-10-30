@@ -82,6 +82,41 @@ namespace emp {
   }
 
 
+  // sfinae_decoy<X,Y> will always evaluate to X no matter what Y is.
+  // X is type you want it to be; Y is a decoy trigger potential substituion failue.
+  template <typename REAL_TYPE, typename EVAL_TYPE> using sfinae_decoy = REAL_TYPE;
+  template <typename EVAL_TYPE>                     using bool_decoy = bool;
+  template <typename EVAL_TYPE>                     using int_decoy = int;
+
+  // Deprecated macros
+#define emp_bool_decoy(TEST) emp::sfinae_decoy<bool, decltype(TEST)>
+#define emp_int_decoy(TEST) emp::sfinae_decoy<int, decltype(TEST)>
+
+
+  // constexpr bool test_type<TEST,T>() returns true if T passes the TEST, false otherwise.
+  //
+  // TEST is a template.  TEST will fail if TEST<T> fails to resolve (substitution failure) -OR-
+  // if TEST<T> does resolve, but TEST<T>::value == false.  Otherwise the test passes.
+  //
+  // Two helper functions exist to test each part: test_type_exist and test_type_value.
+
+  namespace {
+    template <template <typename> class FILTER, typename T>
+    constexpr bool tt_exist_impl(bool_decoy<FILTER<T>> x) { return true; }
+    template <template <typename> class FILTER, typename T>
+    constexpr bool tt_exist_impl(...) { return false; }
+  }
+
+  template <template <typename> class TEST, typename T>
+  constexpr bool test_type_exist() { return tt_exist_impl<TEST, T>(true); }
+
+
+
+
+
+  // TruncateCall reduces the number of arguments for calling a function if too many are used.
+  // @CAO: This should be simplified using TypeSet
+
   namespace {
     template <typename... PARAMS>
     struct tcall_impl {
@@ -151,18 +186,6 @@ namespace emp {
   }
 
 
-
-  // sfinae_decoy<X,Y> will always evaluate to X no matter what Y is.
-  // X is type you want it to be; Y is a decoy trigger potential substituion failue.
-  template <typename REAL_TYPE, typename EVAL_TYPE>
-  using sfinae_decoy = REAL_TYPE;
-
-  template <typename EVAL_TYPE> using bool_decoy = bool;
-  template <typename EVAL_TYPE> using int_decoy = int;
-
-  // Deprecated macros
-#define emp_bool_decoy(TEST) emp::sfinae_decoy<bool, decltype(TEST)>
-#define emp_int_decoy(TEST) emp::sfinae_decoy<int, decltype(TEST)>
 
   // Change the internal type arguments on a template...
   // Adapted from: Sam Varshavchik
