@@ -110,6 +110,8 @@ namespace emp {
   template <template <typename> class TEST, typename T>
   constexpr bool test_type_exist() { return tt_exist_impl<TEST, T>(true); }
 
+  template <template <typename> class TEST, typename T>
+  constexpr bool test_type_value() { return TEST<T>::value; }
 
 
 
