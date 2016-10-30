@@ -11,6 +11,7 @@
 
 #include "../../tools/TypeSet.h"
 
+
 int Sum4(int a, int b, int c, int d) { return a+b+c+d; }
 
 struct HasA { static int A; };
@@ -55,7 +56,7 @@ int main()
   std::cout << "Can we reverse a TypeSet? -> " << str << std::endl;
 
   // Let's try filtering!
-  using test_filtered = test_t::filter_t<std::is_integral>;
+  using test_filtered = test_t::filter_val_t<std::is_integral>;
   std::cout << "Number of integral types in test_t = " << test_filtered::GetSize() << std::endl;
 
 
@@ -64,4 +65,8 @@ int main()
 
   using test_exist = test_A::filter_exist_t<MemberA>;
   std::cout << test_exist::GetSize() << std::endl;
+
+  using test_print = test_exist::set_t<1,int>;
+  test_print x;
+  (void) x;
 }
