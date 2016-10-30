@@ -21,7 +21,7 @@ namespace emp {
   template <typename T1, typename T2, typename... Ts> using second_type = T2;
   template <typename T1, typename T2, typename T3, typename... Ts> using third_type = T3;
 
-
+  // Index into a template parameter pack to grab a specific type.
   namespace {
     template <int ID, typename T, typename... Ts>
     struct pack_id_impl { using type = typename pack_id_impl<ID-1,Ts...>::type; };
@@ -49,20 +49,19 @@ namespace emp {
   template <typename TEST, typename FIRST, typename... OTHERS>
   constexpr int count_type() { return count_type<TEST,OTHERS...>() + (std::is_same<TEST, FIRST>()?1:0); }
 
-  // The following functions take a test type and a list of types and return the index that
-  // matches the test type in question.
-  template <typename TEST_TYPE>
-  constexpr int get_type_index() {
-    // @CAO We don't have a type that matches, so ideally trigger a compile time error.
-    // Given we need this to be constexpr, we can't easily put even a static assert here
-    // until we require C++14.
-    // static_assert(false && "trying to find index of non-existant type");
-    return -1000000;
+  // Return the index of a test type in a set of types.
+  namespace {
+    template <typename TEST_T> constexpr int get_type_index_impl() { return -1; } // Not found!
+    template <typename TEST_T, typename T1, typename... Ts>
+    constexpr int get_type_index_impl() {
+      if (std::is_same<TEST_T, T1>()) return 0;                     // Found here!
+      constexpr int next_id = get_type_index_impl<TEST_T,Ts...>();  // Keep looking...
+      if (next_id < 0) return -1;                                   // Not found!
+      return next_id + 1;                                           // Found later!
+    }
   }
-  template <typename TEST_TYPE, typename FIRST_TYPE, typename... TYPE_LIST>
-  constexpr int get_type_index() {
-    return (std::is_same<TEST_TYPE, FIRST_TYPE>()) ? 0 : (get_type_index<TEST_TYPE,TYPE_LIST...>() + 1);
-  }
+  template <typename TEST_T, typename... Ts>
+  constexpr int get_type_index() { return get_type_index_impl<TEST_T, Ts...>(); }
 
 
   // These functions can be used to test if a type-set has all unique types or not.
