@@ -70,4 +70,21 @@ int main()
   std::cout << "\nAdaptFunction Tests:\n";
   auto fun2 = emp::AdaptFunction<int,int,int,int>::Expand<double, char>(fun);
   std::cout << "expanded fun = " << fun2(100,200,300,1.234,'a') << std::endl;
+
+  // Test type tests...
+  std::cout << "\nTest type examples:\n";
+  std::cout << "std::is_integral<int> value = "
+	    << emp::test_type_value<std::is_integral, int>()
+	    << std::endl;
+  std::cout << "std::is_integral<double> value = "
+	    << emp::test_type_value<std::is_integral, double>()
+	    << std::endl;
+
+  std::cout << "std::is_integral<int> exists = "
+	    << emp::test_type_exist<std::is_integral, int>()
+	    << std::endl;
+  std::cout << "std::is_integral<double> exists = "
+	    << emp::test_type_exist<std::is_integral, double>()
+	    << std::endl;
+
 }
