@@ -113,7 +113,34 @@ namespace emp {
   template <template <typename> class TEST, typename T>
   constexpr bool test_type_value() { return TEST<T>::value; }
 
+  namespace {
+    // If a test does have a value field, that value determines success.
+    template <typename RESULT, bool value_exist>
+    struct test_type_v_impl { constexpr static bool Test() { return RESULT::value; } };
+    // If a test does not have a value field, the fact it resolved at all indicates success.
+    template <typename RESULT>
+    struct test_type_v_impl<RESULT,0> { constexpr static bool Test() { return true; } };
 
+    template <typename T> using value_member = decltype(T::value);
+    // If TEST<T> *does* resolve, check the value field to determine test success.
+    template <template <typename> class TEST, typename T, bool exist>
+    struct test_type_e_impl {
+      constexpr static bool Test() {
+        using result_t = TEST<T>;
+        constexpr bool has_value = test_type_exist<value_member, result_t>();
+        return test_type_v_impl<result_t,has_value>::Test();
+      }
+    };
+    // If TEST<T> does *not* resolve, test fails, so return false.
+    template <template <typename> class TEST, typename T>
+    struct test_type_e_impl<TEST,T,0> { constexpr static bool Test() { return false; } };
+  }
+
+  // Function to actually perform a universal test.
+  template <template <typename> class TEST, typename T>
+  constexpr bool test_type() {
+    return test_type_e_impl<TEST,T,test_type_exist<TEST,T>()>::Test();
+  }
 
 
   // TruncateCall reduces the number of arguments for calling a function if too many are used.
