@@ -56,17 +56,24 @@ int main()
   std::cout << "Can we reverse a TypeSet? -> " << str << std::endl;
 
   // Let's try filtering!
-  using test_filtered = test_t::filter_val_t<std::is_integral>;
+  using test_filtered = test_t::filter_t<std::is_integral>;
   std::cout << "Number of integral types in test_t = " << test_filtered::GetSize() << std::endl;
 
 
   using test_A = emp::TypeSet<HasA, std::string, bool, HasA2, HasA, int>;
-  std::cout << test_A::Test<MemberA>() << std::endl;
-
-  using test_exist = test_A::filter_exist_t<MemberA>;
-  std::cout << test_exist::GetSize() << std::endl;
+  using test_exist = test_A::filter_t<MemberA>;
+  std::cout << "Number that have a member A = " << test_exist::GetSize() << std::endl;
 
   using test_print = test_exist::set_t<1,int>;
   test_print x;
   (void) x;
+
+  std::cout << "\nMore filter tests...\n";
+  std::cout << "emp::test_type<MemberA, int>() = " << emp::test_type<MemberA, int>() << std::endl;
+  std::cout << "emp::test_type<MemberA, HasA>() = " << emp::test_type<MemberA, HasA>() << std::endl;
+  std::cout << "emp::test_type<MemberA, HasA2>(); = " << emp::test_type<MemberA, HasA2>() << std::endl;
+  std::cout << "emp::test_type<std::is_integral, int>() = " << emp::test_type<std::is_integral, int>() << std::endl;
+  std::cout << "emp::test_type<std::is_integral, HasA>() = " << emp::test_type<std::is_integral, HasA>() << std::endl;
+  std::cout << "emp::test_type<std::is_integral, HasA2>() = " << emp::test_type<std::is_integral, HasA2>() << std::endl;
+
 }
