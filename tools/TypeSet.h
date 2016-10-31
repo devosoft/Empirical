@@ -87,7 +87,7 @@ namespace emp {
     constexpr static bool IsUnique() { return has_unique_types<T1,Ts...>(); }
 
     // Get the type associated with a specified position in the pack.
-    template <int POS> using type = pack_id<POS, T1, Ts...>;
+    template <int POS> using get = pack_id<POS, T1, Ts...>;
 
     // Other type lookups
     using this_t = TypeSet<T1, Ts...>;
