@@ -20,12 +20,14 @@ struct A {
   static const int X = 1;
 
   int Test1(int x, int y) { return x + y; }
+  void Print(int x, int y) { std::cout << "A:" << Test1(x,y) << std::endl; }
 };
 
 struct B {
   static const int X = 2;
 
   int Test1(int x, int y) { return x + 2*y; }
+  void Print(int x, int y) { std::cout << "B:" << Test1(x,y) << std::endl; }
 };
 
 template <typename T>
@@ -39,6 +41,7 @@ struct C {
   static constexpr int class_id = 3;
   bool use_this;
   int Test1(int x, int y) { return x + 3*y; }
+  void Print(int x, int y) { std::cout << "C:" << Test1(x,y) << std::endl; }
 };
 struct D {
   static constexpr int class_id = 4;
@@ -57,7 +60,8 @@ struct G {
 template <typename T>
 int Test1_Fallback(T&, int x, int y) { return x * y; }
 
-EMP_CREATE_METHOD_FALLBACK(Test1, Test1, Test1_Fallback, int);
+EMP_CREATE_METHOD_FALLBACK(Test1, Test1, Test1_Fallback);
+EMP_CREATE_OPTIONAL_METHOD(Print, Print);
 
 EMP_SETUP_TYPE_SELECTOR(auto_type, use_this);
 
@@ -89,6 +93,14 @@ int main()
   std::cout << "Test1(e, " << x << ", " << y << ") = " << Test1(e, x, y) << std::endl;
   std::cout << "Test1(f, " << x << ", " << y << ") = " << Test1(f, x, y) << std::endl;
   std::cout << "Test1(g, " << x << ", " << y << ") = " << Test1(g, x, y) << std::endl;
+
+  Print(a,x,y);
+  Print(b,x,y);
+  Print(c,x,y);
+  Print(d,x,y);
+  Print(e,x,y);
+  Print(f,x,y);
+  Print(g,x,y);
 
   // Continuing test of EMP_CHOOSE_MEMBER_TYPE...
   Wrapper<A> wrap_A;
