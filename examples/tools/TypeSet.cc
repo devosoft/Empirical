@@ -26,8 +26,8 @@ int main()
   std::cout << "Num types = " << test_t::GetSize() << std::endl;
   std::cout << "float pos = " << test_t::GetID<float>() << std::endl;
 
-  std::cout << "Num types (with add) = " << test_t::add_t<long long>::GetSize() << std::endl;
-  std::cout << "float pos (with pop) = " << test_t::pop_t::GetID<float>() << std::endl;
+  std::cout << "Num types (with add) = " << test_t::add<long long>::GetSize() << std::endl;
+  std::cout << "float pos (with pop) = " << test_t::pop::GetID<float>() << std::endl;
 
   using test2_t = emp::TypeSetFill<int, 4>;
   using test3_t = emp::TypeSet<uint64_t>;
@@ -42,29 +42,29 @@ int main()
   std::function< fun_t > fun(Sum4);
   std::cout << "Sum4(1,2,3,4) = " << fun(1,2,3,4) << std::endl;
 
-  using test4_t = test2_t::crop_t<2>;
-  std::cout << "After crop_t<2>, size of type = " << test4_t::GetSize() << std::endl;
+  using test4_t = test2_t::shrink<2>;
+  std::cout << "After shrink<2>, size of type = " << test4_t::GetSize() << std::endl;
   std::cout << "After merge of t1 and t2, size = "
-	    << test_t::merge_t<test2_t>::GetSize() << std::endl;
+	    << test_t::merge<test2_t>::GetSize() << std::endl;
 
   // IF applied correctly, v will be a vector of uint64_t.
-  test3_t::apply_t<std::vector> v;
+  test3_t::apply<std::vector> v;
   v.push_back(1);
 
   // If reverse works correctly, str will be a string.
-  test_t::reverse_t::type<3> str("It worked!");
+  test_t::reverse::type<3> str("It worked!");
   std::cout << "Can we reverse a TypeSet? -> " << str << std::endl;
 
   // Let's try filtering!
-  using test_filtered = test_t::filter_t<std::is_integral>;
+  using test_filtered = test_t::filter<std::is_integral>;
   std::cout << "Number of integral types in test_t = " << test_filtered::GetSize() << std::endl;
 
 
   using test_A = emp::TypeSet<HasA, std::string, bool, HasA2, HasA, int>;
-  using test_exist = test_A::filter_t<MemberA>;
+  using test_exist = test_A::filter<MemberA>;
   std::cout << "Number that have a member A = " << test_exist::GetSize() << std::endl;
 
-  using test_print = test_exist::set_t<1,int>;
+  using test_print = test_exist::set<1,int>;
   test_print x;
   (void) x;
 
