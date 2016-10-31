@@ -1352,37 +1352,21 @@ TEST_CASE("Test random", "[tools]")
   REQUIRE(choices.size() == 10);
 }
 
-struct TestTrue {
-  int test_member;
-  int TestFun(int a, int b) { return a*b; }
-};
 
-struct TestFalse {
-  int other_stuff;
-};
-
-struct TestTrueMethod {
-  int test_member() { return 4; }
-};
-
-template <typename T>
-int TestExternalFun(T & obj, int a, int b) { return a+b; }
-
-EMP_CREATE_MEMBER_DETECTOR(test_member);
-EMP_CREATE_METHOD_FALLBACK(DynamicFun, TestFun, TestExternalFun, int);
+struct HasA { static int A; };
+struct HasA2 { static char A; };
+template <typename T> using MemberA = decltype(T::A);
 
 TEST_CASE("Test reflection", "[tools]")
 {
-
-  REQUIRE(EMP_Detect_test_member<TestTrue>::value == 1);
-  REQUIRE(EMP_Detect_test_member<TestFalse>::value == 0);
-  REQUIRE(EMP_Detect_test_member<TestTrueMethod>::value == 1);
-
-  TestTrue t;
-  TestFalse f;
-  REQUIRE(DynamicFun(t, 20, 20) == 400);
-  REQUIRE(DynamicFun(f, 20, 20) == 40);
-
+  REQUIRE((emp::test_type<MemberA,int>()) == false);
+  REQUIRE((emp::test_type<MemberA,HasA>()) == true);
+  REQUIRE((emp::test_type<MemberA,HasA2>()) == true);
+  REQUIRE((emp::test_type<std::is_integral,int>()) == true);
+  REQUIRE((emp::test_type<std::is_integral,HasA>()) == false);
+  REQUIRE((emp::test_type<std::is_integral, HasA2>()) == false);
+  
+  // @CAO Need to build more reflection tests, once reflection is restructured.
 }
 
 TEST_CASE("Test regular expressions (RegEx)", "[tools]")
