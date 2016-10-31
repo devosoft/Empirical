@@ -9,15 +9,23 @@
 
 #include "../../tools/reflection.h"
 
-// Testing EMP_CHOOSE_MEMBER_TYPE...
+// Testing:
+//   EMP_CREATE_METHOD_FALLBACK
+//   EMP_CREATE_OPTIONAL_METHOD
+//   EMP_CHOOSE_MEMBER_TYPE
+//   EMP_CHOOSE_TYPE_WITH_MEMBER
 struct A {
   using test_type = double;
 
   static const int X = 1;
+
+  int Test1(int x, int y) { return x + y; }
 };
 
 struct B {
   static const int X = 2;
+
+  int Test1(int x, int y) { return x + 2*y; }
 };
 
 template <typename T>
@@ -27,10 +35,10 @@ struct Wrapper {
   static constexpr new_type VALUE = 5;
 };
 
-// Testing EMP_CHOOSE_TYPE_WITH_MEMBER...
 struct C {
   static constexpr int class_id = 3;
   bool use_this;
+  int Test1(int x, int y) { return x + 3*y; }
 };
 struct D {
   static constexpr int class_id = 4;
@@ -46,6 +54,11 @@ struct G {
   static constexpr int class_id = 7;
 };
 
+template <typename T>
+int Test1_Fallback(T&, int x, int y) { return x * y; }
+
+EMP_CREATE_METHOD_FALLBACK(Test1, Test1, Test1_Fallback, int);
+
 EMP_SETUP_TYPE_SELECTOR(auto_type, use_this);
 
 int TestFun(int x, int y, int z) {
@@ -59,6 +72,24 @@ template <typename T> struct has_XY {
 
 int main()
 {
+  A a;
+  B b;
+  C c;
+  D d;
+  E e;
+  F f;
+  G g;
+
+  int x = 10;
+  int y = 10;
+  std::cout << "Test1(a, " << x << ", " << y << ") = " << Test1(a, x, y) << std::endl;
+  std::cout << "Test1(b, " << x << ", " << y << ") = " << Test1(b, x, y) << std::endl;
+  std::cout << "Test1(c, " << x << ", " << y << ") = " << Test1(c, x, y) << std::endl;
+  std::cout << "Test1(d, " << x << ", " << y << ") = " << Test1(d, x, y) << std::endl;
+  std::cout << "Test1(e, " << x << ", " << y << ") = " << Test1(e, x, y) << std::endl;
+  std::cout << "Test1(f, " << x << ", " << y << ") = " << Test1(f, x, y) << std::endl;
+  std::cout << "Test1(g, " << x << ", " << y << ") = " << Test1(g, x, y) << std::endl;
+
   // Continuing test of EMP_CHOOSE_MEMBER_TYPE...
   Wrapper<A> wrap_A;
   Wrapper<B> wrap_B;
