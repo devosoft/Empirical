@@ -10,78 +10,40 @@
 #include "functions.h"
 #include "meta.h"
 
-// The macro below creates a struct capable of detecting if another class possesses a
-// specific member.  From: https://en.wikibooks.org/wiki/More_C++_Idioms/Member_Detector
-
-#define EMP_CREATE_MEMBER_DETECTOR(MEMBER_NAME)                         \
-  template <typename T>                                                 \
-  class EMP_Detect_ ## MEMBER_NAME {                                    \
-  private:                                                              \
-    struct Fallback { int MEMBER_NAME; };                               \
-    struct Derived : T, Fallback { };                                   \
-                                                                        \
-    template<typename U, U> struct Check;                               \
-                                                                        \
-    typedef char ArrayOfOne[1];                                         \
-    typedef char ArrayOfTwo[2];                                         \
-                                                                        \
-    template <typename U>                                               \
-    static ArrayOfOne & func(Check<int Fallback::*,&U::MEMBER_NAME> *); \
-    template <typename U> static ArrayOfTwo & func(...);                \
-  public:                                                               \
-    typedef EMP_Detect_##MEMBER_NAME type;                              \
-    enum { value = (sizeof(func<Derived>(0)) == 2) };                   \
-  }
-
-
 // This macro will generate a function that calls a member function on a given object IF that
 // member exists, but otherwise pass the object as an arguent to a function fallback.
 //
 // NEW_NAME - name of the function to be generated.
 // METHOD - name of the member function that should be attempted.
 // FALLBACK - function to call if no such member function exists.
-// RETURN_TYPE - type that should be returned by whichever function is called.
-//
-// @CAO - RETURN_TYPE should be deducible from FALLBACK
 
-#define EMP_CREATE_METHOD_FALLBACK(NEW_NAME, METHOD, FALLBACK, RETURN_TYPE)  \
-  namespace internal {                                                       \
-    template <typename T, typename... ARG_TYPES>                             \
-    RETURN_TYPE RelayCall_ ## NEW_NAME(                                      \
-      emp::bool_decoy<decltype(&T::METHOD)>,                                 \
-      T & target, ARG_TYPES... ARGS) {                                       \
-        return target.METHOD(ARGS...);                                       \
-    }                                                                        \
-    template <typename T, typename... ARG_TYPES>                             \
-    RETURN_TYPE RelayCall_ ## NEW_NAME(int, T & target, ARG_TYPES... ARGS) { \
-      return FALLBACK(target, ARGS...);                                      \
-    }                                                                        \
-  }                                                                          \
-  template <typename T, typename... ARG_TYPES>                               \
-  RETURN_TYPE NEW_NAME(T & target, ARG_TYPES... ARGS) {                      \
-    return internal::RelayCall_ ## NEW_NAME(true, target, ARGS...);          \
-  } int ignore_semicolon_to_follow_ ## NEW_NAME = 0
+#define EMP_CREATE_METHOD_FALLBACK(NAME, METHOD, FALLBACK)                                   \
+  namespace {                                                                                \
+    template <class T, class... ARGS>    /* T::METHOD exists! */                             \
+    auto EMPCall_ ## NAME(emp::bool_decoy<decltype(&T::METHOD)>, T & target, ARGS... args)   \
+     { return target.METHOD(std::forward<ARGS>(args)...); }                                  \
+    template <class T, class... ARGS>    /* T::METHOD does NOT exist! */                     \
+    auto EMPCall_ ## NAME(int, T & target, ARGS... args)                                     \
+     { return FALLBACK(target, std::forward<ARGS>(args)...); }                               \
+  }                                                                                          \
+  template <class T, class... ARGS> auto NAME(T & target, ARGS... args) {                    \
+    return EMPCall_ ## NAME(true, target, std::forward<ARGS>(args)...);                      \
+  } int ignore_semicolon_to_follow_ ## NAME = 0
 
 
 // Similar to EMP_CREATE_METHOD_FALLBACK, but only calls method if it exists, otherwise
 // does nothing.  Note, must have a void return type to facilitate doing nothing.
 
-#define EMP_CREATE_OPTIONAL_METHOD(NEW_NAME, METHOD)              \
-  template <typename T, typename... ARG_TYPES>                    \
-  void internal__RelayCall_ ## NEW_NAME(                          \
-    emp::bool_decoy<decltype(&T::METHOD)>,                        \
-    T & target, ARG_TYPES... ARGS)                                \
-  {                                                               \
-    target.METHOD(ARGS...);                                       \
-  }                                                               \
-  template <typename T, typename... ARG_TYPES>                    \
-  void internal__RelayCall_ ## NEW_NAME(int, T &, ARG_TYPES...) { \
-  }                                                               \
-                                                                  \
-  template <typename T, typename... ARG_TYPES>                    \
-  void NEW_NAME(T & target, ARG_TYPES... ARGS) {                  \
-    internal__RelayCall_ ## NEW_NAME(true, target, ARGS...);      \
-  } int ignore_semicolon_to_follow_ ## NEW_NAME = 0
+#define EMP_CREATE_OPTIONAL_METHOD(NAME, METHOD)                                            \
+  namespace {                                                                               \
+    template <typename T, typename... ARGS>                                                 \
+    void EMPCall_ ## NAME(emp::bool_decoy<decltype(&T::METHOD)>, T & target, ARGS... args)  \
+     { target.METHOD(std::forward<ARGS>(args)...); }                                        \
+    void EMPCall_ ## NAME(...) {;}                                                          \
+  }                                                                                         \
+  template <typename T, typename... ARGS> void NAME(T & target, ARGS... args) {             \
+    EMPCall_ ## NAME(true, target, args...);                                                \
+  } int ignore_semicolon_to_follow_ ## NAME = 0
 
 
 // Same as above, but a return type and default value are specified.
