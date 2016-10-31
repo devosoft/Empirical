@@ -24,18 +24,18 @@ namespace emp {
   namespace {
     // Create add N copies of the same type to the end of a typeset.
     template <typename START, typename T, int N>
-    struct ts_pad { using type = typename ts_pad<START,T,N-1>::type::template add_t<T>; };
+    struct ts_pad { using type = typename ts_pad<START,T,N-1>::type::template add<T>; };
     template <typename START, typename T>
     struct ts_pad<START, T,0> { using type = START; };
 
     // Helper for shifting a specified number of types to TypeSet T1 from TypeSet T2.
-    // Example: to crop, move a specified number of types to empty TypeSet and return it.
+    // Example: to shrink, move the specified number of types to empty TypeSet and return it.
     //          to merge, move all of one typeset over to the other and return it.
     template <int S, typename T1, typename T2>
     struct ts_shift {
       using move_t = typename T2::first_t;
-      using inc_t = typename T1::template add_t<move_t>;
-      using dec_t = typename T2::pop_t;
+      using inc_t = typename T1::template add<move_t>;
+      using dec_t = typename T2::pop;
       using type1 = typename ts_shift<S-1, inc_t, dec_t>::type1;
       using type2 = typename ts_shift<S-1, inc_t, dec_t>::type2;
     };
@@ -52,11 +52,11 @@ namespace emp {
     template <typename T, template <typename> class FILTER, int N>
     struct ts_filter {
       using cur_t = typename T::first_t;                                 // Isolate the first type
-      using other_ts = typename T::pop_t;                                // Isolate remaining types
+      using other_ts = typename T::pop;                                  // Isolate remaining types
       constexpr static bool cur_result = test_type<FILTER,cur_t>();      // Run filter of cur type
       using cur_fts = typename ts_filter1<cur_t, cur_result>::type;      // Use cur type if true
       using other_fts = typename ts_filter<other_ts, FILTER, N-1>::type; // Recurse
-      using type = typename cur_fts::template merge_t< other_fts >;      // Merge
+      using type = typename cur_fts::template merge< other_fts >;        // Merge
     };
     template <typename T, template <typename> class FILTER>
     struct ts_filter<T,FILTER,0> { using type = TypeSet<>; };
@@ -95,32 +95,30 @@ namespace emp {
     using last_t = last_type<T1,Ts...>;
 
     // Modifications
-    template <typename... T> using push_front_t = TypeSet<T...,T1,Ts...>;
-    template <typename... T> using push_back_t = TypeSet<T1,Ts...,T...>;
-    template <typename... T> using add_t = TypeSet<T1,Ts...,T...>;    // Same as push_back_t...
+    template <typename... T> using push_front = TypeSet<T...,T1,Ts...>;
+    template <typename... T> using push_back = TypeSet<T1,Ts...,T...>;
+    template <typename... T> using add = TypeSet<T1,Ts...,T...>;    // Same as push_back_t...
 
-    using pop_t = TypeSet<Ts...>;
-    template <int N> using popN_t = typename ts_shift<N, TypeSet<>, this_t>::type2;
-    template <int N> using crop_t = typename ts_shift<N, TypeSet<>, this_t>::type1;
+    using pop = TypeSet<Ts...>;
+    template <int N> using popN = typename ts_shift<N, TypeSet<>, this_t>::type2;
+    template <int N> using shrink = typename ts_shift<N, TypeSet<>, this_t>::type1;
 
-    template <typename T, int N=1> using pad_t = typename ts_pad<this_t,T,N>::type;
+    template <typename T, int N=1> using pad = typename ts_pad<this_t,T,N>::type;
     template <int N, typename DEFAULT=null_t>
-      using resize_t = typename pad_t<DEFAULT,(N>SIZE)?(N-SIZE):0>::template crop_t<N>;
-    template <typename IN> using merge_t = typename ts_shift<IN::SIZE, this_t, IN>::type1;
-    using reverse_t = typename pop_t::reverse_t::template push_back_t<T1>;
-    using rotate_t = typename pop_t::template push_back_t<T1>;
+      using resize = typename pad<DEFAULT,(N>SIZE)?(N-SIZE):0>::template shrink<N>;
+    template <typename IN> using merge = typename ts_shift<IN::SIZE, this_t, IN>::type1;
+    using reverse = typename pop::reverse::template push_back<T1>;
+    using rotate = typename pop::template push_back<T1>;
 
     template <int ID, typename T>
-    using set_t = typename crop_t<ID>::template push_back_t<T>::template merge_t<popN_t<ID+1>>;
+    using set = typename shrink<ID>::template push_back<T>::template merge<popN<ID+1>>;
 
     // Conversions
     template <typename RETURN_T> using to_function_t = RETURN_T(T1,Ts...);
-    template <template <typename...> class TEMPLATE>
-    using apply_t = TEMPLATE<T1, Ts...>;
+    template <template <typename...> class TEMPLATE> using apply = TEMPLATE<T1, Ts...>;
 
     // Filters
-    template <template <typename> class FILTER>
-    using filter_t = ts_filter_t<this_t, FILTER>;
+    template <template <typename> class FILTER> using filter = ts_filter_t<this_t, FILTER>;
   };
 
   // Specialized TypeSet with no types.
@@ -141,21 +139,23 @@ namespace emp {
     using first_t = null_t;
     using last_t = null_t;
 
-    template <typename... T> using push_front_t = TypeSet<T...>;
-    template <typename... T> using push_back_t = TypeSet<T...>;
-    template <typename... T> using add_t = TypeSet<T...>;
+    template <typename... T> using push_front = TypeSet<T...>;
+    template <typename... T> using push_back = TypeSet<T...>;
+    template <typename... T> using add = TypeSet<T...>;
 
-    template <typename T, int N=1> using pad_t = typename ts_pad<this_t,T,N>::type;
-    template <int N, typename DEFAULT=null_t> using resize_t = pad_t<DEFAULT,N>;
+    template <typename T, int N=1> using pad = typename ts_pad<this_t,T,N>::type;
+    template <int N, typename DEFAULT=null_t> using resize = pad<DEFAULT,N>;
 
-    template <typename IN> using merge_t = IN;
-    using reverse_t = this_t;
-    using rotate_t = this_t;
+    template <typename IN> using merge = IN;
+    using reverse = this_t;
+    using rotate = this_t;
 
     template <typename RETURN_T> using to_function_t = RETURN_T();
 
+    template <template <typename...> class TEMPLATE> using apply = TEMPLATE<>;
+
     // There's nothing to filter, so return this_t (TypeSet<>)
-    template <template <typename> class FILTER> using filter_t = this_t;
+    template <template <typename> class FILTER> using filter = this_t;
   };
 }
 
