@@ -48,21 +48,17 @@
 
 // Same as above, but a return type and default value are specified.
 
-#define EMP_CREATE_OPTIONAL_METHOD_RT(NEW_NAME, METHOD, RTYPE, DEFAULT)	\
-  template <typename T, typename... ARG_TYPES>	                        \
-  RTYPE internal__RelayCall_ ## NEW_NAME(                               \
-    emp::bool_decoy<decltype(&T::METHOD)>,                              \
-    T & target, ARG_TYPES... ARGS) {                                    \
-    return target.METHOD(ARGS...);                                      \
-  }                                                                     \
-  template <typename T, typename... ARG_TYPES>                          \
-  RTYPE internal__RelayCall_ ## NEW_NAME(int, T &, ARG_TYPES...) {      \
-    return DEFAULT;                                                     \
-  }                                                                     \
-  template <typename T, typename... ARG_TYPES>                          \
-  RTYPE NEW_NAME(T & target, ARG_TYPES... ARGS) {                       \
-    return internal__RelayCall_ ## NEW_NAME(true, target, ARGS...);     \
-  } int ignore_semicolon_to_follow_ ## NEW_NAME = 0
+#define EMP_CREATE_METHOD_FALLBACK_VAL(NAME, METHOD, DEFAULT)	                             \
+namespace {                                                                                \
+  template <class T, class... ARGS>    /* T::METHOD exists! */                             \
+  auto EMPCall_ ## NAME(emp::bool_decoy<decltype(&T::METHOD)>, T & target, ARGS... args)   \
+   { return target.METHOD(std::forward<ARGS>(args)...); }                                  \
+  auto EMPCall_ ## NAME(...)           /* T::METHOD does NOT exist! */                     \
+   { return DEFAULT; }                                                                     \
+}                                                                                          \
+template <class T, class... ARGS> auto NAME(T & target, ARGS... args) {                    \
+  return EMPCall_ ## NAME(true, target, std::forward<ARGS>(args)...);                      \
+} int ignore_semicolon_to_follow_ ## NAME = 0
 
 
 // Try to perform operation EVAL1 if TEST exists, otherwise do EVAL2.
