@@ -31,18 +31,17 @@
   } int ignore_semicolon_to_follow_ ## NAME = 0
 
 
-// Similar to EMP_CREATE_METHOD_FALLBACK, but only calls method if it exists, otherwise
-// does nothing.  Note, must have a void return type to facilitate doing nothing.
+// Similar to EMP_CREATE_METHOD_FALLBACK: call method if it exists, otherwise do nothing.
+// @CAO: for some reason can't use namespace or else it breaks...
 
-#define EMP_CREATE_OPTIONAL_METHOD(NAME, METHOD)                                            \
-  namespace {                                                                               \
-    template <typename T, typename... ARGS>                                                 \
-    void EMPCall_ ## NAME(emp::bool_decoy<decltype(&T::METHOD)>, T & target, ARGS... args)  \
-     { target.METHOD(std::forward<ARGS>(args)...); }                                        \
-    void EMPCall_ ## NAME(...) {;}                                                          \
-  }                                                                                         \
-  template <typename T, typename... ARGS> void NAME(T & target, ARGS... args) {             \
-    EMPCall_ ## NAME(true, target, args...);                                                \
+#define EMP_CREATE_OPTIONAL_METHOD(NAME, METHOD)                                          \
+  template <typename T, typename... ARGS>                                                 \
+  void EMPCall_ ## NAME(emp::bool_decoy<decltype(&T::METHOD)>, T & target, ARGS... args)  \
+   { target.METHOD(std::forward<ARGS>(args)...); }                                        \
+  template <typename T, typename... ARGS>                                                 \
+  void EMPCall_ ## NAME(int, T&, ARGS...) {;}                                             \
+  template <typename T, typename... ARGS> void NAME(T & target, ARGS... args) {           \
+    EMPCall_ ## NAME(true, target, std::forward<ARGS>(args)...);                          \
   } int ignore_semicolon_to_follow_ ## NAME = 0
 
 
