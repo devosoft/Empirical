@@ -13,7 +13,6 @@
 #include <type_traits>
 
 #include "assert.h"
-#include "functions.h"
 
 namespace emp {
 
@@ -51,11 +50,11 @@ namespace emp {
 
     template <int i> constexpr T & Get() {
       static_assert(i < N, "ce_array::Get<id> must have inded in range.");
-      return (i < p1_size) ? p1.Get<i>() : p2.Get<i-p1_size>();
+      return (i < p1_size) ? p1.template Get<i>(0) : p2.template Get<i-p1_size>(0);
     }
     template <int i> constexpr const T & Get() const {
       static_assert(i < N, "ce_array::Get<id> must have inded in range.");
-      return (i < p1_size) ? p1.Get<i>() : p2.Get<i-p1_size>();
+      return (i < p1_size) ? p1.template Get<i>(0) : p2.template Get<i-p1_size>(0);
     }
   };
 
