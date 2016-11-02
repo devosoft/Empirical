@@ -21,6 +21,8 @@ struct A {
 
   int Test1(int x, int y) { return x + y; }
   void Print(int x, int y) { std::cout << "A:" << Test1(x,y) << std::endl; }
+
+  static std::string GetName() { return "A"; }
 };
 
 struct B {
@@ -28,6 +30,8 @@ struct B {
 
   int Test1(int x, int y) { return x + 2*y; }
   void Print(int x, int y) { std::cout << "B:" << Test1(x,y) << std::endl; }
+
+  static std::string GetName() { return "B"; }
 };
 
 template <typename T>
@@ -42,19 +46,33 @@ struct C {
   bool use_this;
   int Test1(int x, int y) { return x + 3*y; }
   void Print(int x, int y) { std::cout << "C:" << Test1(x,y) << std::endl; }
+
+  static std::string GetName() { return "C"; }
 };
+
 struct D {
   static constexpr int class_id = 4;
+
+  static std::string GetName() { return "D"; }
 };
+
 struct E {
   static constexpr int class_id = 5;
   bool use_this;
+
+  static std::string GetName() { return "E"; }
 };
+
 struct F {
   static constexpr int class_id = 6;
+
+  static std::string GetName() { return "F"; }
 };
+
 struct G {
   static constexpr int class_id = 7;
+
+  static std::string GetName() { return "G"; }
 };
 
 template <typename T>
@@ -123,7 +141,10 @@ int main()
 
   // Continuing test of EMP_SETUP_TYPE_SELECTOR...
 
-  std::cout << auto_type<int, C, D, E>::class_id << std::endl;
+  // CE
+  std::cout << "Selected (C): " << auto_type<int, C, D, E>::GetName() << std::endl;
+  std::cout << "Selected (E): " << auto_type<int, D, E>::GetName() << std::endl;
+  std::cout << "Selected (C): " << auto_type<C, D, E>::GetName() << std::endl;
 
   std::cout << TestFun(1,2,3) << std::endl;
   std::cout << emp::internal::SubsetCall_impl<int,int,int,int>::Call<>(TestFun, 4,5,6,7.5,8.5) << std::endl;
