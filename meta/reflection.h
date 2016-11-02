@@ -7,7 +7,7 @@
 #ifndef EMP_REFLECTION_H
 #define EMP_REFLECTION_H
 
-#include "functions.h"
+#include "../tools/functions.h"
 #include "meta.h"
 #include "TypeSet.h"
 

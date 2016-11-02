@@ -52,7 +52,7 @@ int main()
   v.push_back(1);
 
   // If reverse works correctly, str will be a string.
-  test_t::reverse::type<3> str("It worked!");
+  test_t::reverse::get<3> str("It worked!");
   std::cout << "Can we reverse a TypeSet? -> " << str << std::endl;
 
   // Let's try filtering!

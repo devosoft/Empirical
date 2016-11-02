@@ -14,6 +14,8 @@
 //   EMP_CREATE_OPTIONAL_METHOD
 //   EMP_CHOOSE_MEMBER_TYPE
 //   EMP_CHOOSE_TYPE_WITH_MEMBER
+//   EMP_SETUP_TYPE_SELECTOR
+
 struct A {
   using test_type = double;
 
@@ -84,7 +86,7 @@ EMP_CREATE_METHOD_FALLBACK_VAL(Test2, Test1, 888);
 
 EMP_SETUP_TYPE_SELECTOR(auto_type, use_this);
 
-int TestFun(int x, int y, int z) {
+int Add3(int x, int y, int z) {
   return x+y+z;
 }
 
@@ -146,11 +148,11 @@ int main()
   std::cout << "Selected (E): " << auto_type<int, D, E>::GetName() << std::endl;
   std::cout << "Selected (C): " << auto_type<C, D, E>::GetName() << std::endl;
 
-  std::cout << TestFun(1,2,3) << std::endl;
-  std::cout << emp::internal::SubsetCall_impl<int,int,int,int>::Call<>(TestFun, 4,5,6,7.5,8.5) << std::endl;
+  std::cout << "Add3(1,2,3) = " << Add3(1,2,3) << std::endl;
 
-  std::function<int(int,int,int)> tfun(TestFun);
-  std::cout << emp::SubsetCall(tfun, 4,5,6,7.5,8.5) << std::endl;
+  std::function<int(int,int,int)> add3(Add3);
+  std::cout << "emp::SubsetCall(add3, 4,5,6,7.5,8.5) = "
+	    << emp::SubsetCall(add3, 4,5,6,7.5,8.5) << std::endl;
 
   has_XY<A>::type_X test_val = (has_XY<A>::type_X) 2.5;
   std::cout << "has_XY<A>::type_X = " << test_val << std::endl;
