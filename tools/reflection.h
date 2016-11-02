@@ -9,6 +9,7 @@
 
 #include "functions.h"
 #include "meta.h"
+#include "TypeSet.h"
 
 // This macro will generate a function that calls a member function on a given object IF that
 // member exists, but otherwise pass the object as an arguent to a function fallback.
@@ -95,17 +96,9 @@ template <class T, class... ARGS> auto NAME(T & target, ARGS... args) {         
 //  will be void.
 
 #define EMP_SETUP_TYPE_SELECTOR(NAME, MEMBER)                                \
-template <typename EMP__T, typename... EXTRAS>                               \
-struct EMP_ResolveType__ ## NAME {                                           \
-  template <typename T>                                                      \
-  static EMP__T GetType(emp::bool_decoy<decltype(T::MEMBER)>);               \
-  template <typename T>                                                      \
-  static typename EMP_ResolveType__ ## NAME<EXTRAS...>::type GetType(...);   \
-  using type = decltype(GetType<EMP__T>(true));                              \
-};                                                                           \
-template <> struct EMP_ResolveType__ ## NAME<void> { using type = void; };   \
-template <typename... TYPES>                                                 \
-using NAME = typename EMP_ResolveType__ ## NAME<TYPES..., void>::type;
+template <typename T> using Detect_ ## NAME = decltype(T::MEMBER);           \
+template <typename... Ts>                                                    \
+using NAME = typename emp::TypeSet<Ts...>::template filter<Detect_ ## NAME>::first_t;
 
 
 //  Given a list of classes, pick the first one that has the type MEMBER_NAME defined and
