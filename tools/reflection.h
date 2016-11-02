@@ -95,10 +95,10 @@ template <class T, class... ARGS> auto NAME(T & target, ARGS... args) {         
 //  Otherwise, if S does not and T does, new_type will be T.  If neither has it, the new test_type
 //  will be void.
 
-#define EMP_SETUP_TYPE_SELECTOR(NAME, MEMBER)                                \
-template <typename T> using Detect_ ## NAME = decltype(T::MEMBER);           \
-template <typename... Ts>                                                    \
-using NAME = typename emp::TypeSet<Ts...>::template filter<Detect_ ## NAME>::first_t;
+#define EMP_SETUP_TYPE_SELECTOR(NAME, MEMBER)                                    \
+template <typename T> using EMPDetect_ ## NAME = decltype(T::MEMBER);            \
+template <typename... Ts>                                                        \
+using NAME = typename emp::TypeSet<Ts...>::template find_t<EMPDetect_ ## NAME>;
 
 
 //  Given a list of classes, pick the first one that has the type MEMBER_NAME defined and
@@ -171,7 +171,8 @@ using NAME = typename emp::TypeSet<Ts...>::template filter<Detect_ ## NAME>::fir
 
 namespace emp {
 
-  namespace internal {
+  // Identify the number of parameters in a function and pass in correct number of argument.
+  namespace {
     template <typename RETURN, typename... FUN_ARGS>
     struct SubsetCall_impl {
       template <typename... EXTRA_ARGS>
@@ -179,12 +180,11 @@ namespace emp {
         return fun(args...);
       }
     };
-
   }
 
   template <typename RETURN, typename... FUN_ARGS, typename... CALL_ARGS>
   auto SubsetCall(std::function<RETURN(FUN_ARGS...)> fun, CALL_ARGS... args) -> RETURN {
-    return internal::SubsetCall_impl<RETURN, FUN_ARGS...>::Call(fun, args...);
+    return SubsetCall_impl<RETURN, FUN_ARGS...>::Call(fun, args...);
   }
 
 }
