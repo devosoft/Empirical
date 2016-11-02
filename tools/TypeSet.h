@@ -119,6 +119,9 @@ namespace emp {
 
     // Filters
     template <template <typename> class FILTER> using filter = ts_filter_t<this_t, FILTER>;
+    template <template <typename> class FILTER>
+    using find_t = typename ts_filter_t<this_t, FILTER>::first_t;
+
   };
 
   // Specialized TypeSet with no types.
