@@ -62,6 +62,7 @@ int Test1_Fallback(T&, int x, int y) { return x * y; }
 
 EMP_CREATE_METHOD_FALLBACK(Test1, Test1, Test1_Fallback);
 EMP_CREATE_OPTIONAL_METHOD(Print, Print);
+EMP_CREATE_METHOD_FALLBACK_VAL(Test2, Test1, 888);
 
 EMP_SETUP_TYPE_SELECTOR(auto_type, use_this);
 
@@ -101,6 +102,15 @@ int main()
   Print(e,x,y);
   Print(f,x,y);
   Print(g,x,y);
+
+  std::cout << "Test2(a, " << x << ", " << y << ") = " << Test2(a, x, y) << std::endl;
+  std::cout << "Test2(b, " << x << ", " << y << ") = " << Test2(b, x, y) << std::endl;
+  std::cout << "Test2(c, " << x << ", " << y << ") = " << Test2(c, x, y) << std::endl;
+  std::cout << "Test2(d, " << x << ", " << y << ") = " << Test2(d, x, y) << std::endl;
+  std::cout << "Test2(e, " << x << ", " << y << ") = " << Test2(e, x, y) << std::endl;
+  std::cout << "Test2(f, " << x << ", " << y << ") = " << Test2(f, x, y) << std::endl;
+  std::cout << "Test2(g, " << x << ", " << y << ") = " << Test2(g, x, y) << std::endl;
+
 
   // Continuing test of EMP_CHOOSE_MEMBER_TYPE...
   Wrapper<A> wrap_A;
