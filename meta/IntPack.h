@@ -13,14 +13,16 @@
 namespace emp {
 
   // Pre-declaration of IntPack
-  template <typename... Ts> struct IntPack;
+  template <int... Ts> struct IntPack;
 
   // IntPack with at least one value.
   template <int V, int... Vs>
-  struct IntPack {
+  struct IntPack<V,Vs...> {
   };
 
   // IntPack with no values.
   template <> struct IntPack<> {
   };
 }
+
+#endif
