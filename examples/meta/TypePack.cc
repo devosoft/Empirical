@@ -3,13 +3,13 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  Some example code for using TypeSet
+//  Some example code for using TypePack
 
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "../../meta/TypeSet.h"
+#include "../../meta/TypePack.h"
 
 
 int Sum4(int a, int b, int c, int d) { return a+b+c+d; }
@@ -22,22 +22,22 @@ int main()
 {
   std::cout << "Testing!" << std::endl;
 
-  using test_t = emp::TypeSet<int, std::string, float, bool, double>;
+  using test_t = emp::TypePack<int, std::string, float, bool, double>;
   std::cout << "Num types = " << test_t::GetSize() << std::endl;
   std::cout << "float pos = " << test_t::GetID<float>() << std::endl;
 
   std::cout << "Num types (with add) = " << test_t::add<long long>::GetSize() << std::endl;
   std::cout << "float pos (with pop) = " << test_t::pop::GetID<float>() << std::endl;
 
-  using test2_t = emp::TypeSetFill<int, 4>;
-  using test3_t = emp::TypeSet<uint64_t>;
+  using test2_t = emp::TypePackFill<int, 4>;
+  using test3_t = emp::TypePack<uint64_t>;
 
   std::cout << std::endl;
   std::cout << "Num test_t types:  " << test_t::GetSize() << std::endl;
   std::cout << "Num test2_t types: " << test2_t::GetSize() << std::endl;
   std::cout << "Num test3_t types: " << test3_t::GetSize() << std::endl;
 
-  // Make sure we can use a TypeSet to properly set a function type.
+  // Make sure we can use a TypePack to properly set a function type.
   using fun_t = test2_t::to_function_t<int>;
   std::function< fun_t > fun(Sum4);
   std::cout << "Sum4(1,2,3,4) = " << fun(1,2,3,4) << std::endl;
@@ -53,14 +53,14 @@ int main()
 
   // If reverse works correctly, str will be a string.
   test_t::reverse::get<3> str("It worked!");
-  std::cout << "Can we reverse a TypeSet? -> " << str << std::endl;
+  std::cout << "Can we reverse a TypePack? -> " << str << std::endl;
 
   // Let's try filtering!
   using test_filtered = test_t::filter<std::is_integral>;
   std::cout << "Number of integral types in test_t = " << test_filtered::GetSize() << std::endl;
 
 
-  using test_A = emp::TypeSet<HasA, std::string, bool, HasA2, HasA, int>;
+  using test_A = emp::TypePack<HasA, std::string, bool, HasA2, HasA, int>;
   using test_exist = test_A::filter<MemberA>;
   std::cout << "Number that have a member A = " << test_exist::GetSize() << std::endl;
 

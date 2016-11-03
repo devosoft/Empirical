@@ -9,7 +9,7 @@
 
 #include "../tools/functions.h"
 #include "meta.h"
-#include "TypeSet.h"
+#include "TypePack.h"
 
 // This macro will generate a function that calls a member function on a given object IF that
 // member exists, but otherwise pass the object as an arguent to a function fallback.
@@ -98,7 +98,7 @@ template <class T, class... ARGS> auto NAME(T & target, ARGS... args) {         
 #define EMP_SETUP_TYPE_SELECTOR(NAME, MEMBER)                                    \
 template <typename T> using EMPDetect_ ## NAME = decltype(T::MEMBER);            \
 template <typename... Ts>                                                        \
-using NAME = typename emp::TypeSet<Ts...>::template find_t<EMPDetect_ ## NAME>;
+using NAME = typename emp::TypePack<Ts...>::template find_t<EMPDetect_ ## NAME>;
 
 
 //  Given a list of classes, pick the first one that has the type MEMBER_NAME defined and
