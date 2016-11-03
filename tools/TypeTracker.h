@@ -15,8 +15,9 @@
 #ifndef EMP_TYPE_TRACKER_H
 #define EMP_TYPE_TRACKER_H
 
+#include "../meta/meta.h"
+
 #include "assert.h"
-#include "meta.h"
 #include "array.h"
 
 namespace emp {

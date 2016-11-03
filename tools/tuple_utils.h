@@ -10,7 +10,7 @@
 #include <functional>
 #include <tuple>
 
-#include "meta.h"
+#include "../meta/meta.h"
 
 namespace emp {
 

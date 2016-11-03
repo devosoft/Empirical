@@ -12,8 +12,8 @@
 #include <functional>
 #include <tuple>
 
+#include "../meta/meta.h"
 #include "assert.h"
-#include "meta.h"
 
 namespace emp {
 

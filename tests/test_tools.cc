@@ -11,6 +11,9 @@
 #include <sstream>
 #include <string>
 
+#include "../meta/meta.h"
+#include "../meta/reflection.h"
+
 #include "../tools/BitMatrix.h"
 #include "../tools/BitSet.h"
 #include "../tools/BitVector.h"
@@ -41,8 +44,6 @@
 #include "../tools/math.h"
 #include "../tools/mem_track.h"
 #include "../tools/memo_function.h"
-#include "../tools/meta.h"
-#include "../tools/reflection.h"
 #include "../tools/sequence_utils.h"
 #include "../tools/serialize.h"
 #include "../tools/string_utils.h"

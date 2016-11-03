@@ -11,8 +11,9 @@
 
 #include <unordered_map>
 
+#include "../meta/meta.h"
+
 #include "assert.h"
-#include "meta.h"
 #include "tuple_utils.h"
 
 namespace emp {

@@ -87,9 +87,9 @@
 #include <functional>
 #include <map>
 
+#include "../meta/reflection.h"
 #include "../tools/assert.h"
 #include "../tools/Random.h"
-#include "../tools/reflection.h"
 #include "../tools/vector.h"
 
 #include "FitnessManager.h"
@@ -198,8 +198,7 @@ namespace evo {
     EMP_CHOOSE_MEMBER_TYPE(callback_t, callback_t, OrgSignals_NONE, ORG);
     callback_t callbacks;
 
-    // Build a Setup method in world that calls .Setup() on whatever is passed in, but
-    // only if it exists.
+    // Build a Setup method in world that calls ::Setup() on whatever is passed in if it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
 

@@ -39,7 +39,7 @@
 #include <sstream>
 #include <string>
 
-#include "meta.h"
+#include "../meta/meta.h"
 
 namespace emp {
 
