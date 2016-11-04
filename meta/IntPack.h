@@ -15,9 +15,26 @@ namespace emp {
   // Pre-declaration of IntPack
   template <int... Ts> struct IntPack;
 
+  namespace {
+    template <bool DONE, int START, int END, int STEP, int... VALS>
+    struct ip_range {
+      static constexpr int NEXT = START + STEP;
+      using type = typename ip_range<(NEXT >= END), NEXT, END, STEP, VALS..., START>::type;
+    };
+    template <int START, int END, int STEP, int... VALS>
+    struct ip_range <true, START, END, STEP, VALS...> {
+      using type = IntPack<VALS...>;
+    };
+  }
+
+  template <int START, int END, int STEP=1>
+  using IntPackRange = typename ip_range<(START >= END), START, END, STEP>::type;
+
   // IntPack with at least one value.
   template <int V1, int... Vs>
   struct IntPack<V1,Vs...> {
+    static constexpr int first = V1;
+
     using pop = IntPack<Vs...>;
 
     template <int V> using push = IntPack<V, V1, Vs...>;
