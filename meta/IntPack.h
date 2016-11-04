@@ -18,29 +18,37 @@ namespace emp {
   // IntPack with at least one value.
   template <int V1, int... Vs>
   struct IntPack<V1,Vs...> {
-    template <int V> constexpr static bool Has() { return (V==V1) | IntPack<Vs...>::template Has<V>(); }
-    constexpr static bool Has(int V) { return (V==V1) | IntPack<Vs...>::Has(V); }
-    template <int V> constexpr static int Count() { return IntPack<Vs...>::template Count<V>() + (V==V1); }
-    constexpr static int Count(int V) { return IntPack<Vs...>::Count(V) + (V==V1); }
+    using pop = IntPack<Vs...>;
+
+    template <int V> using push = IntPack<V, V1, Vs...>;
+    template <int V> using push_back = IntPack<V1, Vs..., V>;
+
+    template <int V> constexpr static bool Has() { return (V==V1) | pop::template Has<V>(); }
+    constexpr static bool Has(int V) { return (V==V1) | pop::Has(V); }
+    template <int V> constexpr static int Count() { return pop::template Count<V>() + (V==V1); }
+    constexpr static int Count(int V) { return pop::Count(V) + (V==V1); }
 
     // Type ID's can be retrieved with
     //   GetID<my_type>() to get the ID associated with specific type my_type
     //   GetID(owner) to get the ID associated with the type of 'owner'
-    template <int V> constexpr static int GetID() { return (V==V1) ? 0 : (1+IntPack<Vs...>::template GetID<V>()); }
-    constexpr static int GetID(int V) { return (V==V1) ? 0 : (1+IntPack<Vs...>::GetID(V)); }
+    template <int V> constexpr static int GetID() { return (V==V1) ? 0 : (1+pop::template GetID<V>()); }
+    constexpr static int GetID(int V) { return (V==V1) ? 0 : (1+pop::GetID(V)); }
 
     constexpr static int SIZE = 1+sizeof...(Vs);
     constexpr static int GetSize() { return SIZE; }
 
     constexpr static bool IsEmpty() { return false; }
+    constexpr static bool IsUnique() { return pop::IsUnique() && !pop::Has(V1); }
 
-    //constexpr static bool IsUnique() { return has_unique_types<T1,Ts...>(); }
-    // Sum()
-    // Product()
+    constexpr static int Sum() { return V1 + pop::Sum(); }
+    constexpr static int Product() { return V1 * pop::Product(); }
   };
 
   // IntPack with no values.
   template <> struct IntPack<> {
+    template <int V> using push = IntPack<V>;
+    template <int V> using push_back = IntPack<V>;
+
     template <int V> constexpr static bool Has() { return false; }
     constexpr static bool Has(int) { return false; }
     template <int V> constexpr static int Count() { return 0; }
@@ -56,6 +64,10 @@ namespace emp {
     constexpr static int GetSize() { return 0; }
 
     constexpr static bool IsEmpty() { return true; }
+    constexpr static bool IsUnique() { return true; }
+
+    constexpr static int Sum() { return 0; }
+    constexpr static int Product() { return 1; }
   };
 }
 
