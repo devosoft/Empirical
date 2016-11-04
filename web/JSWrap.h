@@ -47,11 +47,14 @@
 #include <array>
 
 #include "../meta/meta.h"
+
 #include "../tools/assert.h"
 #include "../tools/functions.h"
 #include "../tools/mem_track.h"
 #include "../tools/vector.h"
 #include "../tools/tuple_struct.h"
+#include "../tools/tuple_utils.h"
+
 #include "js_object_struct.h"
 
 #ifdef EMSCRIPTEN

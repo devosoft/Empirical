@@ -43,18 +43,6 @@ int main()
 	    << "CombineHash(3,4) = " << emp::CombineHash(3,4) << std::endl
 	    << "CombineHash(2,3,4) = " << emp::CombineHash(2,3,4) << std::endl;
 
-  // Test ApplyTuple
-  std::cout << "\nApplyTuple results...:\n";
-  int x = 10;
-  int y = 13;
-  int z = 22;
-  auto test_tup = std::make_tuple(x,y,z);
-  std::cout << "Sum3(" << x << "," << y << "," << z << ") = "
-	    << emp::ApplyTuple(Sum3, test_tup) << std::endl;
-
-  std::cout << "CombineHash(" << x << "," << y << "," << z << ") = "
-      << emp::ApplyTuple(emp::CombineHash<int,int,int>, test_tup) << std::endl;
-
   // Test Math...
   using math_t = emp::tIntMath<1, 2, 3, 4>;
   std::cout << "\nMath Tests:\n";
