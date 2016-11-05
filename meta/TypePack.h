@@ -157,8 +157,9 @@ namespace emp {
 
     template <template <typename...> class TEMPLATE> using apply = TEMPLATE<>;
 
-    // There's nothing to filter, so return this_t (TypePack<>)
+    // There's nothing to filter, so return this_t (TypePack<>) or null_t
     template <template <typename> class FILTER> using filter = this_t;
+    template <template <typename> class FILTER> using find_t = null_t;
   };
 }
 
