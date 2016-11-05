@@ -112,21 +112,11 @@ using NAME = typename emp::TypePack<Ts...>::template find_t<EMPDetect_ ## NAME>;
 //  If T does NOT have a member type called test_type, this is the same as:
 //     using new_type = int;
 
-#define EMP_CHOOSE_MEMBER_TYPE(NAME, MEMBER_NAME, FALLBACK_TYPE, ...)                           \
-  template <typename EMP__T>                                                                    \
-  static auto ResolveType__ ## NAME(emp::bool_decoy<typename EMP__T::MEMBER_NAME>)              \
-    -> typename EMP__T::MEMBER_NAME;                                                            \
-  template <typename EMP__T>                                                                    \
-  static auto ResolveType__ ## NAME(int) -> FALLBACK_TYPE;                                      \
-  \
-  template <typename EMP__T, typename EMP__T2, typename... EXTRAS>                              \
-  static auto ResolveType__ ## NAME(emp::bool_decoy<typename EMP__T::MEMBER_NAME>)              \
-    -> typename EMP__T::MEMBER_NAME;                                                            \
-  template <typename EMP__T, typename EMP__T2, typename... EXTRAS>                              \
-  static auto ResolveType__ ## NAME(int) -> decltype(ResolveType__ ## NAME<EMP__T2, EXTRAS...>(true)); \
-  \
-  using NAME = decltype(ResolveType__ ## NAME<__VA_ARGS__>(true))
-
+#define EMP_CHOOSE_MEMBER_TYPE(NAME, MEMBER, FALLBACK_T, ...)                     \
+  template <typename EMP_T> using EMP_Filter_ ## NAME = typename EMP_T::MEMBER;   \
+  struct EMP_Fallback_ ## NAME { using MEMBER = FALLBACK_T; };                    \
+  using NAME = typename emp::TypePack<__VA_ARGS__, EMP_Fallback_ ## NAME>         \
+    ::template find_t<EMP_Filter_ ## NAME>::MEMBER;
 
 
 // Return a type based on features in a class.
