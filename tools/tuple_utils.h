@@ -10,39 +10,31 @@
 #include <functional>
 #include <tuple>
 
+#include "../meta/IntPack.h"
 #include "../meta/meta.h"
 
 namespace emp {
 
+  // Quick way to calculate tuple size.
+  template <typename TUPLE_T>
+  constexpr inline int tuple_size() { return std::tuple_size<TUPLE_T>::value; }
+
+
+
   // Apply a tuple as arguments to a function!
-  // Unroll all IDs for the tuple, then get all of them at once, calling function.
-  // Based on Kerrek SB in http://stackoverflow.com/questions/10766112/c11-i-can-go-from-multiple-args-to-tuple-but-can-i-go-from-tuple-to-multiple
-
-  namespace {
-    template <typename FUN_T, typename TUPLE_T, bool is_done, int TOTAL, int... N>
-    struct apply_impl {
-      static auto apply(FUN_T & fun, const TUPLE_T & tup) {
-        constexpr auto num_ids = sizeof...(N);
-        constexpr bool done = (TOTAL==1+num_ids);
-        return apply_impl<FUN_T, TUPLE_T, done, TOTAL, N..., num_ids>::apply(fun, tup);
-      }
-    };
-
-    template <typename FUN_T, typename TUPLE_T, int TOTAL, int... N>
-    struct apply_impl<FUN_T, TUPLE_T, true, TOTAL, N...> {
-      static auto apply(FUN_T & fun, const TUPLE_T & tup) {
-        return fun(std::get<N>(tup)...);
-      }
-    };
+  template < typename FUN_T, typename TUPLE_T, int... N >   // Specify positions to apply...
+  auto ApplyTuple(const FUN_T & fun, const TUPLE_T & tup, IntPack<N...>) {
+    return fun(std::get<N>(tup)...);
   }
 
-  // User invokes ApplyTuple
-  template <typename FUN_T, typename TUPLE_T>
-  auto ApplyTuple(FUN_T fun, const TUPLE_T & tup) {
-    using tuple_decay_t = std::decay_t<TUPLE_T>;
-    constexpr auto tup_size = std::tuple_size<tuple_decay_t>::value;
-    return apply_impl<FUN_T, TUPLE_T, tup_size==0, tup_size>::apply(fun, tup);
+  template <typename FUN_T, typename TUPLE_T>              // Apply whole tuple
+  auto ApplyTuple(const FUN_T & fun, const TUPLE_T & tup) {
+    return ApplyTuple(fun, tup, IntPackRange<0,tuple_size<TUPLE_T>()>());
   }
+
+
+
+  // Setup tuples to be able to be used in hash tables.
 
   template <typename... TYPES>
   struct TupleHash {
