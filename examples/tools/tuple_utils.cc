@@ -29,6 +29,8 @@ int main()
   auto test_tup = std::make_tuple(x,y,z);
   std::cout << "Sum3(" << x << "," << y << "," << z << ") = "
 	    << emp::ApplyTuple(Sum3, test_tup) << std::endl;
+  std::cout << "Prod3(" << x << "," << y << "," << z << ") = "
+	    << emp::ApplyTuple([](int x, int y, int z){ return x*y*z; }, test_tup) << std::endl;
 
   std::cout << "CombineHash(" << x << "," << y << "," << z << ") = "
       << emp::ApplyTuple(emp::CombineHash<int,int,int>, test_tup) << std::endl;
