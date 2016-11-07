@@ -30,14 +30,32 @@ template<> struct TypeID<std::string> { static std::string GetName() { return "s
 template<> struct TypeID<HasA> { static std::string GetName() { return "HasA"; } };
 template<> struct TypeID<HasA2> { static std::string GetName() { return "HasA2"; } };
 
-template<typename... Ts> struct TypeID<emp::TypePack<Ts...>> { };
+template<typename T, typename... Ts> struct TypeID<emp::TypePack<T,Ts...>> { 
+  static std::string GetTypes() {
+    std::string out = TypeID<T>::GetName();
+    if (sizeof...(Ts) > 0) out += ",";
+    out += TypeID<emp::TypePack<Ts...>>::GetTypes();
+    return out;
+  }
+  static std::string GetName() {
+    std::string out = "emp::TypePack<";
+    out += GetTypes();
+    out += ">";
+    return out;
+  }
+};
+template<> struct TypeID< emp::TypePack<> > { 
+  static std::string GetTypes() { return ""; }
+  static std::string GetName() { return "emp::TypePack<>"; }
+};
 
 
 int main()
 {
-  std::cout << "Testing!" << std::endl;
-
   using test_t = emp::TypePack<int, std::string, float, bool, double>;
+
+  std::cout << "test_t = " << TypeID<test_t>::GetName() << std::endl;
+  
   std::cout << "Num types = " << test_t::GetSize() << std::endl;
   std::cout << "float pos = " << test_t::GetID<float>() << std::endl;
 
