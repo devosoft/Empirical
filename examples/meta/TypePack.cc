@@ -11,12 +11,27 @@
 
 #include "../../meta/TypePack.h"
 
-
 int Sum4(int a, int b, int c, int d) { return a+b+c+d; }
 
 struct HasA { static int A; };
 struct HasA2 { static char A; };
 template <typename T> using MemberA = decltype(T::A);
+
+template<typename T> struct TypeID { std::string name = "Unknown"; };
+template<> struct TypeID<bool> { std::string name = "bool"; };
+template<> struct TypeID<char> { std::string name = "char"; };
+template<> struct TypeID<double> { std::string name = "double"; };
+template<> struct TypeID<float> { std::string name = "float"; };
+template<> struct TypeID<int> { std::string name = "int"; };
+template<> struct TypeID<int64_t> { std::string name = "int64_t"; };
+
+template<> struct TypeID<std::string> { std::string name = "std::string"; };
+
+template<> struct TypeID<HasA> { std::string name = "HasA"; };
+template<> struct TypeID<HasA2> { std::string name = "HasA2"; };
+
+template<typename... Ts> struct TypeID<emp::TypePack<Ts...>> { };
+
 
 int main()
 {
