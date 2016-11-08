@@ -19,11 +19,21 @@ template <typename T> using MemberA = decltype(T::A);
 
 template<typename T> struct TypeID { static std::string GetName() { return "Unknown"; } };
 template<> struct TypeID<bool> { static std::string GetName() { return "bool"; } };
-template<> struct TypeID<char> { static std::string GetName() { return "char"; } };
 template<> struct TypeID<double> { static std::string GetName() { return "double"; } };
 template<> struct TypeID<float> { static std::string GetName() { return "float"; } };
-template<> struct TypeID<int> { static std::string GetName() { return "int"; } };
+
+template<> struct TypeID<char> { static std::string GetName() { return "char"; } };
+template<> struct TypeID<char16_t> { static std::string GetName() { return "char16_t"; } };
+template<> struct TypeID<char32_t> { static std::string GetName() { return "char32_t"; } };
+
+template<> struct TypeID<int8_t>  { static std::string GetName() { return "int8_t"; } };
+template<> struct TypeID<int16_t> { static std::string GetName() { return "int16_t"; } };
+template<> struct TypeID<int32_t> { static std::string GetName() { return "int32_t"; } };
 template<> struct TypeID<int64_t> { static std::string GetName() { return "int64_t"; } };
+template<> struct TypeID<uint8_t>  { static std::string GetName() { return "uint8_t"; } };
+template<> struct TypeID<uint16_t> { static std::string GetName() { return "uint16_t"; } };
+template<> struct TypeID<uint32_t> { static std::string GetName() { return "uint32_t"; } };
+template<> struct TypeID<uint64_t> { static std::string GetName() { return "uint64_t"; } };
 
 template<> struct TypeID<std::string> { static std::string GetName() { return "std::string"; } };
 
