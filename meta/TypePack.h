@@ -6,6 +6,13 @@
 //
 //  TypePacks are static structues that provide a large set of mechanisms to access and adjust
 //  the included types.
+//
+//
+//  Developer notes:
+//  * If IntPack is at a lower level than TypePack, we'll be able to have slightly more complex
+//    functions below.  For example, returning sets of positions OR providing sets of positions
+//    for the purposes of reorganizing types.
+//    - GetIDPack could return ALL ID's for a type that appears more than once.
 
 #ifndef EMP_TYPE_PACK_H
 #define EMP_TYPE_PACK_H
@@ -130,7 +137,7 @@ namespace emp {
     using rotate = typename pop::template push_back<T1>;
 
     template <int ID, typename T>
-    using set = typename shrink<ID>::template push_back<T>::template merge<popN<ID+1>>;
+      using set = typename shrink<ID>::template push_back<T>::template merge<popN<ID+1>>;
 
     // Conversions
     template <typename RETURN_T> using to_function_t = RETURN_T(T1,Ts...);
