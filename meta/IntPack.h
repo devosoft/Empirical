@@ -4,6 +4,11 @@
 //
 //  IntPack represents a collection of integers for easy manipulation and use in
 //  template specification (typically for metaprogramming)
+//
+//
+//  Developer Notes:
+//  * Can we shift this to a ValPack where the type is specified and then the values?  then
+//    we would be able to create an IntPack as a specialty on ValPack.
 
 #ifndef EMP_INT_PACK_H
 #define EMP_INT_PACK_H
