@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+#include "../../meta/TypeID.h"
 #include "../../meta/TypePack.h"
 
 int Sum4(int a, int b, int c, int d) { return a+b+c+d; }
@@ -17,54 +18,16 @@ struct HasA { static int A; };
 struct HasA2 { static char A; };
 template <typename T> using MemberA = decltype(T::A);
 
-template<typename T> struct TypeID { static std::string GetName() { return "Unknown"; } };
-template<> struct TypeID<bool> { static std::string GetName() { return "bool"; } };
-template<> struct TypeID<double> { static std::string GetName() { return "double"; } };
-template<> struct TypeID<float> { static std::string GetName() { return "float"; } };
-
-template<> struct TypeID<char> { static std::string GetName() { return "char"; } };
-template<> struct TypeID<char16_t> { static std::string GetName() { return "char16_t"; } };
-template<> struct TypeID<char32_t> { static std::string GetName() { return "char32_t"; } };
-
-template<> struct TypeID<int8_t>  { static std::string GetName() { return "int8_t"; } };
-template<> struct TypeID<int16_t> { static std::string GetName() { return "int16_t"; } };
-template<> struct TypeID<int32_t> { static std::string GetName() { return "int32_t"; } };
-template<> struct TypeID<int64_t> { static std::string GetName() { return "int64_t"; } };
-template<> struct TypeID<uint8_t>  { static std::string GetName() { return "uint8_t"; } };
-template<> struct TypeID<uint16_t> { static std::string GetName() { return "uint16_t"; } };
-template<> struct TypeID<uint32_t> { static std::string GetName() { return "uint32_t"; } };
-template<> struct TypeID<uint64_t> { static std::string GetName() { return "uint64_t"; } };
-
-template<> struct TypeID<std::string> { static std::string GetName() { return "std::string"; } };
-
-template<> struct TypeID<HasA> { static std::string GetName() { return "HasA"; } };
-template<> struct TypeID<HasA2> { static std::string GetName() { return "HasA2"; } };
-
-template<typename T, typename... Ts> struct TypeID<emp::TypePack<T,Ts...>> { 
-  static std::string GetTypes() {
-    std::string out = TypeID<T>::GetName();
-    if (sizeof...(Ts) > 0) out += ",";
-    out += TypeID<emp::TypePack<Ts...>>::GetTypes();
-    return out;
-  }
-  static std::string GetName() {
-    std::string out = "emp::TypePack<";
-    out += GetTypes();
-    out += ">";
-    return out;
-  }
-};
-template<> struct TypeID< emp::TypePack<> > { 
-  static std::string GetTypes() { return ""; }
-  static std::string GetName() { return "emp::TypePack<>"; }
-};
-
+namespace emp {
+  template<> struct TypeID<HasA> { static std::string GetName() { return "HasA"; } };
+  template<> struct TypeID<HasA2> { static std::string GetName() { return "HasA2"; } };
+}
 
 int main()
 {
   using test_t = emp::TypePack<int, std::string, float, bool, double>;
 
-  std::cout << "test_t = " << TypeID<test_t>::GetName() << std::endl;
+  std::cout << "test_t = " << emp::TypeID<test_t>::GetName() << std::endl;
   
   std::cout << "Num types = " << test_t::GetSize() << std::endl;
   std::cout << "float pos = " << test_t::GetID<float>() << std::endl;
