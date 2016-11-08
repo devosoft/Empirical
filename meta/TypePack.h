@@ -56,7 +56,7 @@ namespace emp {
     template <typename T, bool> struct tp_filter1 { using type=TypePack<T>; };
     template <typename T> struct tp_filter1<T,false> { using type=TypePack<>; };
 
-    template <typename T, template <typename> class FILTER, int N>
+    template <typename T, template <typename...> class FILTER, int N>
     struct tp_filter {
       using cur_t = typename T::first_t;                                 // Isolate the first type
       using other_tp = typename T::pop;                                  // Isolate remaining types
@@ -65,19 +65,19 @@ namespace emp {
       using other_ftp = typename tp_filter<other_tp, FILTER, N-1>::type; // Recurse
       using type = typename cur_ftp::template merge< other_ftp >;        // Merge
     };
-    template <typename T, template <typename> class FILTER>
+    template <typename T, template <typename...> class FILTER>
       struct tp_filter<T,FILTER,0> { using type = TypePack<>; };
 
-    template <typename T, template <typename> class FILTER>
+    template <typename T, template <typename...> class FILTER>
       using tp_filter_t = typename tp_filter<T,FILTER,T::SIZE>::type;
 
     // Wrappers create a TypePack with the wrapped element if the filter is true, empty if false.
-    template <typename T, template <typename> class W, bool> struct tp_wrap1
+    template <typename T, template <typename...> class W, bool> struct tp_wrap1
       { using type=TypePack<W<T>>; };
-    template <typename T, template <typename> class W> struct tp_wrap1<T,W,false>
+    template <typename T, template <typename...> class W> struct tp_wrap1<T,W,false>
       { using type=TypePack<>; };
 
-    template <typename T, template <typename> class W, int N> struct tp_wrap {
+    template <typename T, template <typename...> class W, int N> struct tp_wrap {
       using cur_t = typename T::first_t;                               // Isolate the first type
       using other_tp = typename T::pop;                                // Isolate remaining types
       constexpr static bool cur_result = test_type<W,cur_t>();         // Use wrap to filter cur type
@@ -85,10 +85,10 @@ namespace emp {
       using other_ftp = typename tp_wrap<other_tp, W, N-1>::type;      // Recurse
       using type = typename cur_ftp::template merge< other_ftp >;      // Merge
     };
-    template <typename T, template <typename> class W>
+    template <typename T, template <typename...> class W>
       struct tp_wrap<T,W,0> { using type = TypePack<>; };
 
-    template <typename T, template <typename> class W>
+    template <typename T, template <typename...> class W>
       using tp_wrap_t = typename tp_wrap<T,W,T::SIZE>::type;
   }
 
@@ -144,10 +144,10 @@ namespace emp {
     template <template <typename...> class TEMPLATE> using apply = TEMPLATE<T1, Ts...>;
 
     // Filters
-    template <template <typename> class FILTER> using filter = tp_filter_t<this_t, FILTER>;
-    template <template <typename> class FILTER>
+    template <template <typename...> class FILTER> using filter = tp_filter_t<this_t, FILTER>;
+    template <template <typename...> class FILTER>
       using find_t = typename tp_filter_t<this_t, FILTER>::first_t;
-    template <template <typename> class WRAPPER> using wrap = tp_wrap_t<this_t, WRAPPER>;
+    template <template <typename...> class WRAPPER> using wrap = tp_wrap_t<this_t, WRAPPER>;
   };
 
   // Specialized TypePack with no types.
@@ -184,8 +184,9 @@ namespace emp {
     template <template <typename...> class TEMPLATE> using apply = TEMPLATE<>;
 
     // There's nothing to filter, so return this_t (TypePack<>) or null_t
-    template <template <typename> class FILTER> using filter = this_t;
-    template <template <typename> class FILTER> using find_t = null_t;
+    template <template <typename...> class FILTER> using filter = this_t;
+    template <template <typename...> class FILTER> using find_t = null_t;
+    template <template <typename...> class WRAPPER> using wrap = this_t;
   };
 }
 
