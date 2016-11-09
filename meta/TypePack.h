@@ -135,9 +135,11 @@ namespace emp {
     template <typename IN> using merge = typename tp_shift<IN::SIZE, this_t, IN>::type1;
     using reverse = typename pop::reverse::template push_back<T1>;
     using rotate = typename pop::template push_back<T1>;
-
     template <int ID, typename T>
       using set = typename shrink<ID>::template push_back<T>::template merge<popN<ID+1>>;
+
+    // Choose a set of specific positions.
+    template <int... Ps> using select = TypePack< get<Ps>... >;
 
     // Conversions
     template <typename RETURN_T> using to_function_t = RETURN_T(T1,Ts...);
