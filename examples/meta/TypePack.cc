@@ -14,12 +14,11 @@
 
 int Sum4(int a, int b, int c, int d) { return a+b+c+d; }
 
-struct HasA { static int A; };
+struct HasA { static int A; static std::string TypeID() { return "HasA"; } };
 struct HasA2 { static char A; };
 template <typename T> using MemberA = decltype(T::A);
 
 namespace emp {
-  template<> struct TypeID<HasA> { static std::string GetName() { return "HasA"; } };
   template<> struct TypeID<HasA2> { static std::string GetName() { return "HasA2"; } };
 }
 
@@ -28,7 +27,7 @@ int main()
   using test_t = emp::TypePack<int, std::string, float, bool, double>;
 
   std::cout << "test_t = " << emp::TypeID<test_t>::GetName() << std::endl;
-  
+
   std::cout << "Num types = " << test_t::GetSize() << std::endl;
   std::cout << "float pos = " << test_t::GetID<float>() << std::endl;
 
@@ -67,6 +66,8 @@ int main()
 
 
   using test_A = emp::TypePack<HasA, std::string, bool, HasA2, HasA, int>;
+  std::cout << "test_A = " << emp::TypeID<test_A>::GetName() << std::endl;
+
   using test_exist = test_A::filter<MemberA>;
   std::cout << "Number that have a member A = " << test_exist::GetSize() << std::endl;
 
@@ -82,4 +83,6 @@ int main()
   std::cout << "emp::test_type<std::is_integral, HasA>() = " << emp::test_type<std::is_integral, HasA>() << std::endl;
   std::cout << "emp::test_type<std::is_integral, HasA2>() = " << emp::test_type<std::is_integral, HasA2>() << std::endl;
 
+  using wrap_t = test_t::wrap<std::vector>;
+  std::cout << "wrap_t = " << emp::TypeID<wrap_t>::GetName() << std::endl;
 }
