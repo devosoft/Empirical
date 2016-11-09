@@ -11,13 +11,18 @@
 
 #include "TypePack.h"
 
-// Pre-declare any std types being used.
-namespace std {
-}
 
 namespace emp {
 
-  template<typename T> struct TypeID { static std::string GetName() { return "Unknown"; } };
+  // Generic TypeID structure for when none of the specialty cases trigger.
+  template<typename T> struct TypeID {
+    template<typename TEST> using TypeIDFilter = decltype(&TEST::TypeID);
+    struct UnknownID { static std::string TypeID() { return "Unknown"; } };
+    static std::string GetName() {
+      using print_t = typename TypePack<T,UnknownID>::template find_t<TypeIDFilter>;
+      return print_t::TypeID();
+    }
+  };
 
   // Build-in types.
   template<> struct TypeID<bool> { static std::string GetName() { return "bool"; } };
@@ -57,8 +62,21 @@ namespace emp {
     static std::string GetName() { return "emp::TypePack<>"; }
   };
 
+}
+
+// Pre-declare any std types being used.
+namespace std {
+}
+
+#include <vector>
+
+namespace emp{
+
   // Standard library types.
   template<> struct TypeID<std::string> { static std::string GetName() { return "std::string"; } };
+  template<typename... Ts> struct TypeID< std::vector<Ts...> > { static std::string GetName() {
+    return "std::vector<" + TypeID<TypePack<Ts...>>::GetTypes() + ">"; }
+  };
 
 }
 
