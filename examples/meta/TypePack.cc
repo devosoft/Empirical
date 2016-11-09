@@ -83,6 +83,12 @@ int main()
   std::cout << "emp::test_type<std::is_integral, HasA>() = " << emp::test_type<std::is_integral, HasA>() << std::endl;
   std::cout << "emp::test_type<std::is_integral, HasA2>() = " << emp::test_type<std::is_integral, HasA2>() << std::endl;
 
-  using wrap_t = test_t::wrap<std::vector>;
-  std::cout << "wrap_t = " << emp::TypeID<wrap_t>::GetName() << std::endl;
+  using wrap_v_t = test_t::wrap<std::vector>;
+  std::cout << "wrap_v_t = " << emp::TypeID<wrap_v_t>::GetName() << std::endl;
+  using wrap_A_t = test_A::wrap<MemberA>;
+  std::cout << "wrap_A_t = " << emp::TypeID<wrap_A_t>::GetName() << std::endl;
+
+  std::cout << std::endl;
+  using shuffle_t = test_t::select<2,3,4,1,3,3,3,0>;
+  std::cout << "Shuffle with test_t::select<>:" << emp::TypeID<shuffle_t>::GetName() << std::endl;
 }
