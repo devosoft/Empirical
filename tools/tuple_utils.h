@@ -20,6 +20,12 @@ namespace emp {
   constexpr inline int tuple_size() { return std::tuple_size<TUPLE_T>::value; }
 
 
+  // Reorganize the entries in tuple.
+  template <typename... Ts, int... Ps>
+  auto shuffle_tuple(const std::tuple<Ts...> & tup, IntPack<Ps...>) {
+    return std::make_tuple( std::get<Ps>(tup)... );
+  }
+
 
   // Apply a tuple as arguments to a function!
   template < typename FUN_T, typename TUPLE_T, int... N >   // Specify positions to apply...
