@@ -93,12 +93,14 @@ namespace emp {
       Signal_Base(const std::string & n) : name(n) { ; }
       virtual ~Signal_Base() { ; }
 
-      // Don't allow Signals to be copied.
+      // Don't allow Signals to be copied or moved.
       Signal_Base(const Signal_Base &) = delete;
+      Signal_Base(Signal_Base &&) = delete;
       Signal_Base & operator=(const Signal_Base &) = delete;
+      Signal_Base & operator=(Signal_Base &&) = delete;
 
-      // NOTE: Trigger must have specialized arguments!  Convert the signal assuming that
-      // the args map to the correct types (defined below with a dynamic cast to ensure
+      // NOTE: Triggers typically have specialized arguments!  Convert the signal assuming
+      // that the args map to the correct types (defined below with a dynamic cast to ensure
       // correctness)
       template <typename... ARGS> void BaseTrigger(ARGS... args);
 
@@ -122,13 +124,14 @@ namespace emp {
 
       // Don't allow Actions to be copied.
       Action_Base(const Action_Base &) = delete;
+      Action_Base(Action_Base &&) = delete;
       Action_Base & operator=(const Action_Base &) = delete;
+      Action_Base & operator=(Action_Base &&) = delete;
     };
    }
 
-  // The SignalManager creates signals and handles all proper associations, but
-  // is not involved once a run gets started.  As such, it does not need to be
-  // overly optimized.
+  // The SignalManager creates signals and handles all proper associations, but does nothing
+  // once signals and actions are attached.  As such, it does not need to be overly optimized.
 
   class SignalManager {
   private:
@@ -141,6 +144,7 @@ namespace emp {
 
     SignalManager() : next_link_key(0), next_name_id(0) { ; }
     SignalManager(const SignalManager &) = delete;
+    SignalManager(SignalManager &&) = delete;
   public:
     void Register(const std::string & name, internal::Signal_Base * s) {
       emp_assert(name != "" && "Cannot register a signal without a name!");
