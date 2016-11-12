@@ -192,14 +192,14 @@ namespace emp {
     template <typename A>
     LinkKey LinkSignal(const std::string & s_name, A && a) {
       emp_assert(signals.find(s_name) != signals.end());
-      return LinkSignal(signals[s_name], std::forward<A>(a));
+      return LinkSignal(signals[s_name], std::forward<A>(a));  // Lookup signal name and forward.
     }
 
     // If a name is passed in for the action, convert it to an Action_Base pointer.
     // (signal names were handled in the previous overloaded version of this function)
     LinkKey LinkSignal(internal::Signal_Base * s, const std::string & a_name) {
       emp_assert(actions.find(a_name) != actions.end());
-      return s->AddAction(actions[a_name]);
+      return s->AddAction(actions[a_name]);  // Lookup action name and add it to the signal.
     }
 
     // We now know we have base classes for both signals and actions.  Convert them to
@@ -209,6 +209,7 @@ namespace emp {
     }
 
     // One final pair of cases: if we were provided with a function object; pass it through!
+    // (Defined near bottom)
     template <typename... ARGS>
     LinkKey LinkSignal(internal::Signal_Base * s, const std::function<void(ARGS...)> & fun);
 
@@ -224,7 +225,7 @@ namespace emp {
       return next_link_key;
     }
 
-    // Signals and actions should also be able to be found by name.
+    // Signals and actions should be searchable by name.
     internal::Signal_Base * FindSignal(const std::string & name) {
       if (signals.find(name) == signals.end()) return nullptr;
       return signals[name];
@@ -286,11 +287,13 @@ namespace emp {
       return link_id;
     }
 
+    // @CAO: Add an action that takes a sub-set of actions.
+
     // Add an action that takes no arguments.
     LinkKey AddAction(const std::function<void()> & in_fun) override {
       const LinkKey link_id = SignalManager::Get().RegisterLink(this);
       link_key_map[link_id] = (int) actions.size();
-      actions.Add( [in_fun](ARGS...){in_fun();} );
+      actions.Add( [in_fun](ARGS...){ in_fun(); } );
       return link_id;
     }
 
