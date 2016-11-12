@@ -289,21 +289,11 @@ namespace emp {
       return link_id;
     }
 
-    // @CAO: Add an action that takes a sub-set of actions.
-    // Add an action that takes the proper arguments.
+    // Add an action that takes too few arguments... but provide specific padding info.
     template <typename... FUN_ARGS, typename... EXTRA_ARGS>
     LinkKey AddAction(const std::function<void(FUN_ARGS...)> & in_fun,
-                      TypePack<EXTRA_ARGS...> extra=TypePack<>())
+                      TypePack<EXTRA_ARGS...> extra)
     {
-      // The function provided does not have enough parameters, so we need to pad it with
-      // extras.  If those were not provided, recursively call with the extra padding.
-      static constexpr int args_found = sizeof...(FUN_ARGS) + sizeof...(EXTRA_ARGS);
-      static constexpr int args_needed = arg_count - args_found;
-      if (args_needed) {
-        using extra_type = typename TypePack<ARGS...>::template popN<args_found>;
-        return AddAction(in_fun, extra_type());
-      }
-
       // If we made it here, we know the extra arguments that we need to throw away when
       // calling this function.  Call it correctly.
       const LinkKey link_id = SignalManager::Get().RegisterLink(this);
@@ -313,6 +303,15 @@ namespace emp {
       actions.Add(in_fun);
       return link_id;
     }
+
+    // Add an action that takes too few arguments... we need to figure out how to pad it out.
+    template <typename... FUN_ARGS>
+    LinkKey AddAction(const std::function<void(FUN_ARGS...)> & in_fun) {
+      // Trim off the args we have... any extras should be accepted, but ignored.
+      using extra_type = typename TypePack<ARGS...>::template popN<sizeof...(FUN_ARGS)>;
+      return AddAction(in_fun, extra_type());
+    }
+
 
     // Add an action that takes no arguments.
     LinkKey AddAction(const std::function<void()> & in_fun) override {
