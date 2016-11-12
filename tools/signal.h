@@ -42,6 +42,7 @@
 #include "assert.h"
 #include "FunctionSet.h"
 #include "string_utils.h"
+#include "../meta/TypePack.h"
 
 namespace emp {
 
@@ -269,6 +270,7 @@ namespace emp {
   class Signal : public internal::Signal_Base {
   private:
     FunctionSet<void, ARGS...> actions;
+    static constexpr int arg_count = sizeof...(ARGS);
   public:
     Signal(const std::string & name="") : internal::Signal_Base(name) {
       if (name != "") SignalManager::Get().Register(name, this);
@@ -288,6 +290,29 @@ namespace emp {
     }
 
     // @CAO: Add an action that takes a sub-set of actions.
+    // Add an action that takes the proper arguments.
+    template <typename... FUN_ARGS, typename... EXTRA_ARGS>
+    LinkKey AddAction(const std::function<void(FUN_ARGS...)> & in_fun,
+                      TypePack<EXTRA_ARGS...> extra=TypePack<>())
+    {
+      // The function provided does not have enough parameters, so we need to pad it with
+      // extras.  If those were not provided, recursively call with the extra padding.
+      static constexpr int args_found = sizeof...(FUN_ARGS) + sizeof...(EXTRA_ARGS);
+      static constexpr int args_needed = arg_count - args_found;
+      if (args_needed) {
+        using extra_type = typename TypePack<ARGS...>::template popN<args_found>;
+        return AddAction(in_fun, extra_type());
+      }
+
+      // If we made it here, we know the extra arguments that we need to throw away when
+      // calling this function.  Call it correctly.
+      const LinkKey link_id = SignalManager::Get().RegisterLink(this);
+      link_key_map[link_id] = (int) actions.size();
+      std::function<void(ARGS...)> full_fun =
+        [in_fun](FUN_ARGS... args, EXTRA_ARGS...){ in_fun(args...); };
+      actions.Add(in_fun);
+      return link_id;
+    }
 
     // Add an action that takes no arguments.
     LinkKey AddAction(const std::function<void()> & in_fun) override {
