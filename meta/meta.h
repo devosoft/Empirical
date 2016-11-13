@@ -3,6 +3,12 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  A bunch of C++ Template Meta-programming tricks.
+//
+//
+//  Developer notes:
+//  * Right now test_type<> returns false if a template can't resolve, but if it's true it checks
+//    if a value field is present; if so that determines success.  The reason for this choice was
+//    to make sure that true_type and false_type are handled correctly (with built-in type_tratis)
 
 #ifndef EMP_META_H
 #define EMP_META_H
