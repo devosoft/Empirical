@@ -299,7 +299,7 @@ namespace emp {
       const LinkKey link_id = SignalManager::Get().RegisterLink(this);
       link_key_map[link_id] = (int) actions.size();
       std::function<void(ARGS...)> full_fun =
-        [in_fun](FUN_ARGS... args, EXTRA_ARGS...){ in_fun(args...); };
+        [in_fun](FUN_ARGS... args, EXTRA_ARGS...){ in_fun(std::forward<ARGS>(args)...); };
       actions.Add(in_fun);
       return link_id;
     }
