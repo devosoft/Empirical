@@ -9,10 +9,7 @@
 //
 //
 //  Developer notes:
-//  * If IntPack is at a lower level than TypePack, we'll be able to have slightly more complex
-//    functions below.  For example, returning sets of positions OR providing sets of positions
-//    for the purposes of reorganizing types.
-//    - GetIDPack could return ALL ID's for a type that appears more than once.
+//    - GetIDPack could return an IntPack of ALL ID's for a type that appears more than once.
 
 #ifndef EMP_TYPE_PACK_H
 #define EMP_TYPE_PACK_H
