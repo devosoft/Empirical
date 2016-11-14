@@ -24,7 +24,7 @@ namespace emp {
     }
   };
 
-  // Build-in types.
+  // Built-in types.
   template<> struct TypeID<bool> { static std::string GetName() { return "bool"; } };
   template<> struct TypeID<double> { static std::string GetName() { return "double"; } };
   template<> struct TypeID<float> { static std::string GetName() { return "float"; } };
@@ -41,6 +41,11 @@ namespace emp {
   template<> struct TypeID<uint16_t> { static std::string GetName() { return "uint16_t"; } };
   template<> struct TypeID<uint32_t> { static std::string GetName() { return "uint32_t"; } };
   template<> struct TypeID<uint64_t> { static std::string GetName() { return "uint64_t"; } };
+
+  // Check for type attributes...
+  template<typename T> struct TypeID<T*> {
+    static std::string GetName() { return TypeID<T>::GetName() + '*'; }
+  };
 
   // Tools for using TypePack
   template<typename T, typename... Ts> struct TypeID<emp::TypePack<T,Ts...>> {
