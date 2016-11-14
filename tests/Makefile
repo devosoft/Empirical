@@ -7,14 +7,14 @@ default: test
 test-prep:
 	mkdir -p temp
 
-subtest-%: test_%.cc
+test-%: test_%.cc
 	$(CXX) -std=c++14 $< -o $@.out
 	#echo "running $@.out"
 	# execute test
 	./$@.out
 
-test: test-prep $(addprefix subtest-, $(TEST_NAMES))
-	rm -rf subtest*.out
+test: test-prep $(addprefix test-, $(TEST_NAMES))
+	rm -rf test*.out
 
 clean:
 	rm -f *.out
