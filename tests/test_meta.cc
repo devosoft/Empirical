@@ -21,10 +21,21 @@ void TestFun(int x, int y, char z) {
   result_char = z + x*y;
 }
 
+struct HasA { static int A; static std::string TypeID() { return "HasA"; } };
+struct HasA2 { static char A; };
+template <typename T> using MemberA = decltype(T::A);
+
 template <typename A, typename B>
 struct MetaTestClass { A a; B b; };
 
-TEST_CASE("Test meta-programming helpers", "[meta]")
+int Sum4(int a, int b, int c, int d) { return a+b+c+d; }
+namespace emp {
+  template<> struct TypeID<HasA2> { static std::string GetName() { return "HasA2"; } };
+}
+
+
+
+TEST_CASE("Test meta-programming helpers (meta.h)", "[meta]")
 {
   // TEST FOR VARIADIC HELPER FUNCTIONS:
 
@@ -68,10 +79,6 @@ TEST_CASE("Test meta-programming helpers", "[meta]")
 }
 
 
-struct HasA { static int A; static std::string TypeID() { return "HasA"; } };
-struct HasA2 { static char A; };
-template <typename T> using MemberA = decltype(T::A);
-
 TEST_CASE("Test reflection", "[meta]")
 {
   REQUIRE((emp::test_type<MemberA,int>()) == false);
@@ -84,9 +91,12 @@ TEST_CASE("Test reflection", "[meta]")
   // @CAO Need to build more reflection tests, once reflection is restructured.
 }
 
-int Sum4(int a, int b, int c, int d) { return a+b+c+d; }
-namespace emp {
-  template<> struct TypeID<HasA2> { static std::string GetName() { return "HasA2"; } };
+TEST_CASE("Test TypeID", "[meta]")
+{
+  REQUIRE(emp::TypeID<int>::GetName() == "int32_t");
+  REQUIRE(emp::TypeID<char>::GetName() == "char");
+  REQUIRE(emp::TypeID<std::string>::GetName() == "std::string");
+  REQUIRE(emp::TypeID<std::vector<double>>::GetName() == "std::vector<double,Unknown>");
 }
 
 TEST_CASE("Test TypePack", "[meta]")
