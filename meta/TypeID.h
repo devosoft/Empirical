@@ -25,6 +25,8 @@ namespace emp {
   };
 
   // Built-in types.
+  template<> struct TypeID<void> { static std::string GetName() { return "void"; } };
+
   template<> struct TypeID<bool> { static std::string GetName() { return "bool"; } };
   template<> struct TypeID<double> { static std::string GetName() { return "double"; } };
   template<> struct TypeID<float> { static std::string GetName() { return "float"; } };
