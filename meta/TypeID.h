@@ -69,6 +69,18 @@ namespace emp {
     static std::string GetName() { return "emp::TypePack<>"; }
   };
 
+  // Generic TemplateID structure for when none of the specialty cases trigger.
+  template<template <typename...> class TEMPLATE, typename... Ts> struct TemplateID {
+    static std::string GetName() { return "UnknownTemplate"; }
+  };
+
+  template<template <typename...> class TEMPLATE, typename... Ts>
+  struct TypeID<TEMPLATE<Ts...>> {
+    static std::string GetName() {
+      return TemplateID<TEMPLATE,Ts...>::GetName()
+            + '<' + TypeID<emp::TypePack<Ts...>>::GetTypes() + '>';
+    }
+  };
 }
 
 // Pre-declare any std types being used.
