@@ -93,8 +93,17 @@ namespace emp{
 
   // Standard library types.
   template<> struct TypeID<std::string> { static std::string GetName() { return "std::string"; } };
-  template<typename... Ts> struct TypeID< std::vector<Ts...> > { static std::string GetName() {
-    return "std::vector<" + TypeID<TypePack<Ts...>>::GetTypes() + ">"; }
+
+  // Standard library templates.
+  template<typename T, typename... Ts> struct TypeID< std::vector<T,Ts...> > {
+    static std::string GetName() {
+      using simple_vt = std::vector<T>;
+      using full_vt = std::vector<T,Ts...>;
+      if (std::is_same<simple_vt,full_vt>::value) {
+        return "std::vector<" + TypeID<T>::GetName() + ">";
+      }
+      return "std::vector<" + TypeID<TypePack<T,Ts...>>::GetTypes() + ">";
+    }
   };
 
 }
