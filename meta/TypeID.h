@@ -70,14 +70,14 @@ namespace emp {
   };
 
   // Generic TemplateID structure for when none of the specialty cases trigger.
-  template<template <typename...> class TEMPLATE, typename... Ts> struct TemplateID {
+  template <typename T> struct TemplateID {
     static std::string GetName() { return "UnknownTemplate"; }
   };
 
   template<template <typename...> class TEMPLATE, typename... Ts>
   struct TypeID<TEMPLATE<Ts...>> {
     static std::string GetName() {
-      return TemplateID<TEMPLATE,Ts...>::GetName()
+      return TemplateID<TEMPLATE<Ts...>>::GetName()
             + '<' + TypeID<emp::TypePack<Ts...>>::GetTypes() + '>';
     }
   };
@@ -87,6 +87,8 @@ namespace emp {
 namespace std {
 }
 
+#include <array>
+#include <sstream>
 #include <vector>
 
 namespace emp{
@@ -95,6 +97,14 @@ namespace emp{
   template<> struct TypeID<std::string> { static std::string GetName() { return "std::string"; } };
 
   // Standard library templates.
+  template <typename T, size_t N> struct TypeID<std::array<T,N>> {
+    static std::string GetName() {
+      std::stringstream ss;
+      ss << "std::array<" << TypeID<T>::GetName() << "," << N << ">";
+      return ss.str();
+    }
+  };
+//  template <typename... Ts> struct TemplateID<std::array<Ts...>> { static std::string GetName() { return "array"; } };
   template<typename T, typename... Ts> struct TypeID< std::vector<T,Ts...> > {
     static std::string GetName() {
       using simple_vt = std::vector<T>;
