@@ -13,6 +13,7 @@
 #include <array>
 
 #include "assert.h"
+#include "../meta/TypeID.h"
 
 
 #ifdef EMP_NDEBUG
@@ -77,6 +78,17 @@ namespace emp {
 }
 
 #endif
+
+namespace emp{
+  // Ensure that emp::array works with TypeID
+  template <typename T, size_t N> struct TypeID<emp::array<T,N>> {
+    static std::string GetName() {
+      std::stringstream ss;
+      ss << "emp::array<" << TypeID<T>::GetName() << "," << N << ">";
+      return ss.str();
+    }
+  };
+}
 
 
 
