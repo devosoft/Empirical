@@ -3,10 +3,10 @@
 
 #include "../third-party/Catch/single_include/catch.hpp"
 
-#include <array>
 #include <sstream>
 #include <string>
 
+#include "../tools/array.h"
 #include "../tools/tuple_utils.h"
 #include "../tools/vector.h"
 
@@ -97,7 +97,9 @@ TEST_CASE("Test TypeID", "[meta]")
   REQUIRE(emp::TypeID<void>::GetName() == "void");
   REQUIRE(emp::TypeID<int>::GetName() == "int32_t");
   REQUIRE(emp::TypeID<std::string>::GetName() == "std::string");
-  REQUIRE(emp::TypeID<std::vector<double>>::GetName() == "std::vector<double>");
+
+  REQUIRE((emp::TypeID<emp::array<double,7>>::GetName()) == ("emp::array<double,7>"));
+  REQUIRE(emp::TypeID<emp::vector<double>>::GetName() == "emp::vector<double>");
 
   REQUIRE(emp::TypeID<char*>::GetName() == "char*");
 
@@ -128,7 +130,7 @@ TEST_CASE("Test TypePack", "[meta]")
   REQUIRE(test_t::merge<test2_t>::GetSize() == 9);
 
   // IF applied correctly, v will be a vector of uint64_t.
-  test3_t::apply<std::vector> v;
+  test3_t::apply<emp::vector> v;
   v.push_back(1);
   v.push_back(2);
   REQUIRE(v.size() == 2);
@@ -150,8 +152,8 @@ TEST_CASE("Test TypePack", "[meta]")
   using test_print = test_exist::set<1,int>;
   REQUIRE(test_print::Count<int>() == 1);
 
-  using wrap_v_t = test_t::wrap<std::vector>;
-  REQUIRE(emp::TypeID<wrap_v_t>::GetName() == "emp::TypePack<std::vector<int32_t>,std::vector<std::string>,std::vector<float>,std::vector<bool>,std::vector<double>>");
+  using wrap_v_t = test_t::wrap<emp::vector>;
+  REQUIRE(emp::TypeID<wrap_v_t>::GetName() == "emp::TypePack<emp::vector<int32_t>,emp::vector<std::string>,emp::vector<float>,emp::vector<bool>,emp::vector<double>>");
 
   using wrap_A_t = test_A::wrap<MemberA>;
   REQUIRE(emp::TypeID<wrap_A_t>::GetName() == "emp::TypePack<int32_t,char,int32_t>");
