@@ -19,13 +19,14 @@
 #include <vector>
 
 #include "assert.h"
+#include "../meta/TypeID.h"
 
 
 #ifdef EMP_NDEBUG
 
 namespace emp {
-  template <typename T>
-    using vector = std::vector<T>;
+  template <typename... Ts>
+    using vector = std::vector<Ts...>;
 }
 
 
@@ -33,29 +34,30 @@ namespace emp {
 
 namespace emp {
 
-  template <typename T>
+  template <typename T, typename... Ts>
   class vector {
   private:
-    std::vector<T> v;
+    using stdv_t = std::vector<T,Ts...>;
+    stdv_t v;
 
   public:
-    using iterator = typename std::vector<T>::iterator;
-    using const_iterator = typename std::vector<T>::const_iterator;
+    using iterator = typename stdv_t::iterator;
+    using const_iterator = typename stdv_t::const_iterator;
     using value_type = T;
-    using size_type = typename std::vector<T>::size_type;
-    using reference = typename std::vector<T>::reference;
-    using const_reference = typename std::vector<T>::const_reference;
+    using size_type = typename stdv_t::size_type;
+    using reference = typename stdv_t::reference;
+    using const_reference = typename stdv_t::const_reference;
 
     vector() = default;
     vector(const emp::vector<T> &) = default;
     vector(int size) : v(size) { emp_assert(size >= 0, size); }
     vector(int size, const T & val) : v(size, val) { emp_assert(size >= 0, size); }
     vector(std::initializer_list<T> in_list) : v(in_list) { ; }
-    vector(const std::vector<T> & in) : v(in) { ; }         // Emergency fallback conversion.
+    vector(const stdv_t & in) : v(in) { ; }         // Emergency fallback conversion.
     ~vector() = default;
 
-    operator std::vector<T> &() { return v; }
-    operator const std::vector<T> &() const { return v; }
+    operator stdv_t &() { return v; }
+    operator const stdv_t &() const { return v; }
 
     size_type size() const noexcept { return v.size(); }
     void resize(int new_size) { emp_assert(new_size >= 0, new_size); v.resize(new_size); }
@@ -70,14 +72,14 @@ namespace emp {
     void shrink_to_fit() { v.shrink_to_fit(); }
 
     emp::vector<T> & operator=(const emp::vector<T> &) = default;
-    emp::vector<T> & operator=(const std::vector<T> & x) { v = x; return *this; }
+    emp::vector<T> & operator=(const stdv_t & x) { v = x; return *this; }
     emp::vector<T> & operator=(const std::initializer_list<value_type> & il) {
       v.operator=(il);
       return *this;
     }
 
     void swap(emp::vector<T> & x) { v.swap(x.v); }
-    void swap(std::vector<T> & x) { v.swap(x); }
+    void swap(stdv_t & x) { v.swap(x); }
 
     bool operator==(const emp::vector<T> & in) const { return v == in.v; }
     bool operator!=(const emp::vector<T> & in) const { return v != in.v; }
@@ -160,5 +162,17 @@ template <typename T> std::istream & operator>>(std::istream & is, emp::vector<T
 
 #endif
 
+namespace emp {
+  template<typename T, typename... Ts> struct TypeID< emp::vector<T,Ts...> > {
+    static std::string GetName() {
+      using simple_vt = emp::vector<T>;
+      using full_vt = emp::vector<T,Ts...>;
+      if (std::is_same<simple_vt,full_vt>::value) {
+        return "emp::vector<" + TypeID<T>::GetName() + ">";
+      }
+      return "emp::vector<" + TypeID<TypePack<T,Ts...>>::GetTypes() + ">";
+    }
+  };
+}
 
 #endif
