@@ -93,10 +93,14 @@ TEST_CASE("Test reflection", "[meta]")
 
 TEST_CASE("Test TypeID", "[meta]")
 {
-  REQUIRE(emp::TypeID<int>::GetName() == "int32_t");
   REQUIRE(emp::TypeID<char>::GetName() == "char");
+  REQUIRE(emp::TypeID<void>::GetName() == "void");
+  REQUIRE(emp::TypeID<int>::GetName() == "int32_t");
   REQUIRE(emp::TypeID<std::string>::GetName() == "std::string");
-  REQUIRE(emp::TypeID<std::vector<double>>::GetName() == "std::vector<double,Unknown>");
+  REQUIRE(emp::TypeID<std::vector<double>>::GetName() == "std::vector<double,UnknownTemplate<double>>");
+
+  REQUIRE(emp::TypeID<char*>::GetName() == "char*");
+
 }
 
 TEST_CASE("Test TypePack", "[meta]")
@@ -147,7 +151,7 @@ TEST_CASE("Test TypePack", "[meta]")
   REQUIRE(test_print::Count<int>() == 1);
 
   using wrap_v_t = test_t::wrap<std::vector>;
-  REQUIRE(emp::TypeID<wrap_v_t>::GetName() == "emp::TypePack<std::vector<int32_t,Unknown>,std::vector<std::string,Unknown>,std::vector<float,Unknown>,std::vector<bool,Unknown>,std::vector<double,Unknown>>");
+  REQUIRE(emp::TypeID<wrap_v_t>::GetName() == "emp::TypePack<std::vector<int32_t,UnknownTemplate<int32_t>>,std::vector<std::string,UnknownTemplate<std::string>>,std::vector<float,UnknownTemplate<float>>,std::vector<bool,UnknownTemplate<bool>>,std::vector<double,UnknownTemplate<double>>>");
   using wrap_A_t = test_A::wrap<MemberA>;
   REQUIRE(emp::TypeID<wrap_A_t>::GetName() == "emp::TypePack<int32_t,char,int32_t>");
 
