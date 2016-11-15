@@ -7,6 +7,7 @@
 #ifndef EMP_TYPE_ID_H
 #define EMP_TYPE_ID_H
 
+#include <sstream>
 #include <string>
 
 #include "TypePack.h"
@@ -83,13 +84,6 @@ namespace emp {
   };
 }
 
-// Pre-declare any std types being used.
-namespace std {
-}
-
-#include <array>
-#include <sstream>
-#include <vector>
 
 namespace emp{
 
@@ -97,24 +91,7 @@ namespace emp{
   template<> struct TypeID<std::string> { static std::string GetName() { return "std::string"; } };
 
   // Standard library templates.
-  template <typename T, size_t N> struct TypeID<std::array<T,N>> {
-    static std::string GetName() {
-      std::stringstream ss;
-      ss << "std::array<" << TypeID<T>::GetName() << "," << N << ">";
-      return ss.str();
-    }
-  };
-//  template <typename... Ts> struct TemplateID<std::array<Ts...>> { static std::string GetName() { return "array"; } };
-  template<typename T, typename... Ts> struct TypeID< std::vector<T,Ts...> > {
-    static std::string GetName() {
-      using simple_vt = std::vector<T>;
-      using full_vt = std::vector<T,Ts...>;
-      if (std::is_same<simple_vt,full_vt>::value) {
-        return "std::vector<" + TypeID<T>::GetName() + ">";
-      }
-      return "std::vector<" + TypeID<TypePack<T,Ts...>>::GetTypes() + ">";
-    }
-  };
+  //  template <typename... Ts> struct TemplateID<std::array<Ts...>> { static std::string GetName() { return "array"; } };
 
 }
 
