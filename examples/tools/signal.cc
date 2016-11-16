@@ -40,7 +40,7 @@ int main()
   int total=0;
   emp::Action<int> act1([&total](int inc){total+=inc;}, "sum");
   emp::Action<int> act2(PrintInt, "iprint");
-  emp::Action<int,int>(MultInt, "mint");
+  emp::Action<int,int> act_mint(MultInt, "mint");
 
   emp::Signal<int> test_sig3("test3");
   test_sig3.AddAction(act1);
@@ -59,4 +59,17 @@ int main()
   // Trigger by signal name!
   std::cout << "Phase 5: Trigger original signal with some of values calculated so far!\n";
   emp::TriggerSignal("test", total);
+
+  // Build a signal setup to provide many arguments.
+  std::cout << "Phase 6: Sum 1,2,3,4!\n";
+  emp::Signal<int,int,int,int,int&> sum4_sig;
+  sum4_sig.AddAction(Sum4);
+  int result=0;
+  sum4_sig.Trigger(1,2,3,4,result);
+  std::cout << "result variable is now set to " << result << std::endl;
+
+  std::cout << "Phase 7: Add mult 2 to prev signal... using only two args!  Call with 2,3,4,5\n";
+  //sum4_sig.AddAction(act_mint);
+  sum4_sig.Trigger(2,3,4,5,result);
+  std::cout << "result variable is now set to " << result << std::endl;
 }
