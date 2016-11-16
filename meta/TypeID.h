@@ -3,6 +3,11 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  TypeID provides an easy way to convert types to strings.
+//
+//
+//  Developer notes:
+//  * Fill out remaining standard library classes (as possible)
+//  * Default to type_traits typeid rather than Unknown
 
 #ifndef EMP_TYPE_ID_H
 #define EMP_TYPE_ID_H
