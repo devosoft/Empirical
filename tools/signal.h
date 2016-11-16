@@ -90,8 +90,11 @@ namespace emp {
     protected:
       std::string name;                     // What is the unique name of this signal?
       std::map<LinkKey, int> link_key_map;  // Map unique link keys to link index for actions.
+      const int num_args;                   // How many arguments does this signal provide?
+
+      // Signal_Base should only be constructable from derrived classes.
+      Signal_Base(const std::string & n, int a) : name(n), num_args(a) { ; }
     public:
-      Signal_Base(const std::string & n) : name(n) { ; }
       virtual ~Signal_Base() { ; }
 
       // Don't allow Signals to be copied or moved.
@@ -99,6 +102,9 @@ namespace emp {
       Signal_Base(Signal_Base &&) = delete;
       Signal_Base & operator=(const Signal_Base &) = delete;
       Signal_Base & operator=(Signal_Base &&) = delete;
+
+      const std::string & GetName() const { return name; }
+      int GetNumArgs() const { return num_args; }
 
       // NOTE: Triggers typically have specialized arguments!  Convert the signal assuming
       // that the args map to the correct types (defined below with a dynamic cast to ensure
@@ -112,15 +118,17 @@ namespace emp {
       virtual LinkKey AddAction(const std::function<void()> & in_fun) = 0;
 
       // Add an action using an Action object.
-      virtual LinkKey AddAction(internal::Action_Base *) = 0;
+      virtual LinkKey AddAction(internal::Action_Base &) = 0;
     };
 
     // BASE CLASS for all Actions
     class Action_Base {
     protected:
-      std::string name;
+      std::string name;          // Unique name for this action.
+      const int num_params;      // How many paramaters does this action have?
+
+      Action_Base(const std::string & n, int p) : name(n), num_params(p) { ; }
     public:
-      Action_Base(const std::string & n) : name(n) { ; }
       virtual ~Action_Base() { ; }
 
       // Don't allow Actions to be copied.
@@ -200,13 +208,13 @@ namespace emp {
     // (signal names were handled in the previous overloaded version of this function)
     LinkKey LinkSignal(internal::Signal_Base * s, const std::string & a_name) {
       emp_assert(actions.find(a_name) != actions.end());
-      return s->AddAction(actions[a_name]);  // Lookup action name and add it to the signal.
+      return s->AddAction(*(actions[a_name]));  // Lookup action name and add it to the signal.
     }
 
     // We now know we have base classes for both signals and actions.  Convert them to
     // the derrived versions!
     LinkKey LinkSignal(internal::Signal_Base * s, internal::Action_Base * a) {
-      return s->AddAction(a);
+      return s->AddAction(*a);
     }
 
     // One final pair of cases: if we were provided with a function object; pass it through!
@@ -259,7 +267,7 @@ namespace emp {
     std::function<void(ARGS...)> fun;
 
     Action(const std::function<void(ARGS...)> & f, const std::string & name="")
-      : internal::Action_Base(name), fun(f) {
+      : internal::Action_Base(name,sizeof...(ARGS)), fun(f) {
       if (name != "") SignalManager::Get().Register(name, this);
     }
   };
@@ -272,7 +280,7 @@ namespace emp {
     FunctionSet<void, ARGS...> actions;
     static constexpr int arg_count = sizeof...(ARGS);
   public:
-    Signal(const std::string & name="") : internal::Signal_Base(name) {
+    Signal(const std::string & name="") : internal::Signal_Base(name,sizeof...(ARGS)) {
       if (name != "") SignalManager::Get().Register(name, this);
     }
     ~Signal() { ; }
@@ -322,8 +330,8 @@ namespace emp {
     }
 
     // Add an action from an Action object using Action_Base.
-    LinkKey AddAction(internal::Action_Base * a_base) override {
-      Action<ARGS...> * a = dynamic_cast< Action<ARGS...>* >(a_base);
+    LinkKey AddAction(internal::Action_Base & a_base) override {
+      Action<ARGS...> * a = dynamic_cast< Action<ARGS...>* >(&a_base);
       emp_assert( a != nullptr && "action type must match signal type." );
       return AddAction(a->fun);
     }
@@ -338,7 +346,7 @@ namespace emp {
   private:
     FunctionSet<void> actions;
   public:
-    Signal(const std::string & name="") : internal::Signal_Base(name) {
+    Signal(const std::string & name="") : internal::Signal_Base(name,0) {
       if (name != "") SignalManager::Get().Register(name, this);
     }
     ~Signal() { ; }
@@ -355,8 +363,8 @@ namespace emp {
       return link_id;
     }
 
-    LinkKey AddAction(internal::Action_Base * a_base) override {
-      Action<> * a = dynamic_cast< Action<>* >(a_base);
+    LinkKey AddAction(internal::Action_Base & a_base) override {
+      Action<> * a = dynamic_cast< Action<>* >(&a_base);
       emp_assert( a != nullptr && "action type must match signal type." );
       return AddAction(a->fun);
     }
