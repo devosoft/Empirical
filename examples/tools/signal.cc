@@ -69,7 +69,8 @@ int main()
   std::cout << "result variable is now set to " << result << std::endl;
 
   std::cout << "Phase 7: Add mult 2 to prev signal... using only two args!  Call with 2,3,4,5\n";
-  //sum4_sig.AddAction(act_mint);
+  std::function<void(int,int)> mult_pair = [](int x, int y){std::cout << x << "*" << y << "=" << x*y << std::endl;};
+  sum4_sig.AddAction(mult_pair);
   sum4_sig.Trigger(2,3,4,5,result);
   std::cout << "result variable is now set to " << result << std::endl;
 }
