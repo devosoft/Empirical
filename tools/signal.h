@@ -106,9 +106,8 @@ namespace emp {
       const std::string & GetName() const { return name; }
       int GetNumArgs() const { return num_args; }
 
-      // NOTE: Triggers typically have specialized arguments!  Convert the signal assuming
-      // that the args map to the correct types (defined below with a dynamic cast to ensure
-      // correctness)
+      // NOTE: If a Trigger is called on a base class, convert the signal assuming that the args
+      // map to the correct types (defined below with a dynamic cast to ensure correctness)
       template <typename... ARGS> void BaseTrigger(ARGS... args);
 
       // Add a previously-defined action by name and return a unique key for the pairing.
@@ -249,7 +248,8 @@ namespace emp {
   // Definition for method to trigger a signal object from the BASE CLASS, declared above.
   template <typename... ARGS>
   void internal::Signal_Base::BaseTrigger(ARGS... args) {
-    // Make sure this base class is really of the correct derrived type.
+    // Make sure this base class is really of the correct derrived type (but do so in an
+    // assert since triggers may be called frequently and should be fast!)
     emp_assert(dynamic_cast< Signal<ARGS...> * >(this));
     ((Signal<ARGS...> *) this)->Trigger(args...);
   }
@@ -307,8 +307,8 @@ namespace emp {
       const LinkKey link_id = SignalManager::Get().RegisterLink(this);
       link_key_map[link_id] = (int) actions.size();
       std::function<void(ARGS...)> full_fun =
-        [in_fun](FUN_ARGS... args, EXTRA_ARGS...){ in_fun(std::forward<ARGS>(args)...); };
-      actions.Add(in_fun);
+        [in_fun](FUN_ARGS... args, EXTRA_ARGS...){ in_fun(std::forward<FUN_ARGS>(args)...); };
+      actions.Add(full_fun);
       return link_id;
     }
 
@@ -390,6 +390,7 @@ namespace emp {
   void TriggerSignal(const std::string & name, ARGS... args) {
     auto * base_signal = SignalManager::Get().FindSignal(name);
     auto * signal = dynamic_cast< Signal<ARGS...>* >(base_signal);
+    emp_assert( signal != nullptr && "invalid signal conversion!" );
     signal->Trigger(args...);
   }
 
