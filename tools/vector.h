@@ -37,6 +37,7 @@ namespace emp {
   template <typename T, typename... Ts>
   class vector {
   private:
+    using this_t = emp::vector<T,Ts...>;
     using stdv_t = std::vector<T,Ts...>;
     stdv_t v;
 
@@ -49,7 +50,7 @@ namespace emp {
     using const_reference = typename stdv_t::const_reference;
 
     vector() = default;
-    vector(const emp::vector<T> &) = default;
+    vector(const this_t &) = default;
     vector(int size) : v(size) { emp_assert(size >= 0, size); }
     vector(int size, const T & val) : v(size, val) { emp_assert(size >= 0, size); }
     vector(std::initializer_list<T> in_list) : v(in_list) { ; }
@@ -71,22 +72,22 @@ namespace emp {
     void reserve(size_type n) { v.reserve(n); }
     void shrink_to_fit() { v.shrink_to_fit(); }
 
-    emp::vector<T> & operator=(const emp::vector<T> &) = default;
-    emp::vector<T> & operator=(const stdv_t & x) { v = x; return *this; }
-    emp::vector<T> & operator=(const std::initializer_list<value_type> & il) {
+    this_t & operator=(const emp::vector<T,Ts...> &) = default;
+    this_t & operator=(const stdv_t & x) { v = x; return *this; }
+    this_t & operator=(const std::initializer_list<value_type> & il) {
       v.operator=(il);
       return *this;
     }
 
-    void swap(emp::vector<T> & x) { v.swap(x.v); }
+    void swap(this_t & x) { v.swap(x.v); }
     void swap(stdv_t & x) { v.swap(x); }
 
-    bool operator==(const emp::vector<T> & in) const { return v == in.v; }
-    bool operator!=(const emp::vector<T> & in) const { return v != in.v; }
-    bool operator<(const emp::vector<T> & in)  const { return v < in.v; }
-    bool operator<=(const emp::vector<T> & in) const { return v <= in.v; }
-    bool operator>(const emp::vector<T> & in)  const { return v > in.v; }
-    bool operator>=(const emp::vector<T> & in) const { return v >= in.v; }
+    bool operator==(const this_t & in) const { return v == in.v; }
+    bool operator!=(const this_t & in) const { return v != in.v; }
+    bool operator<(const this_t & in)  const { return v < in.v; }
+    bool operator<=(const this_t & in) const { return v <= in.v; }
+    bool operator>(const this_t & in)  const { return v > in.v; }
+    bool operator>=(const this_t & in) const { return v >= in.v; }
 
     T & operator[](int pos) {
       emp_assert(pos >= 0 && pos < (int) v.size(), pos, v.size());
@@ -150,12 +151,14 @@ namespace emp {
 }
 
 // A crude, generic printing function for vectors.
-template <typename T> std::ostream & operator<<(std::ostream & out, const emp::vector<T> & v) {
+template <typename T, typename... Ts>
+std::ostream & operator<<(std::ostream & out, const emp::vector<T,Ts...> & v) {
   for (const T & x : v) out << x << " ";
   return out;
 }
 
-template <typename T> std::istream & operator>>(std::istream & is, emp::vector<T> & v) {
+template <typename T, typename... Ts>
+std::istream & operator>>(std::istream & is, emp::vector<T,Ts...> & v) {
   for (T & x : v) is >> x;
   return is;
 }
