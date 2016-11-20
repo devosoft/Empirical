@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_HARDWARE_CPU_BASE_H
-#define EMP_HARDWARE_CPU_BASE_H
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  HardwareCPU_Base is a base class for all CPU-style hardware types, with a number of helper
 //  classes and member functions.
@@ -15,8 +11,10 @@
 //  These include:
 //    CPUStack<STACK_SIZE> - a templated class that builds a fast, roll-over integer stack.
 //    CPUHead - a class that points to a position in a vector of instructions
-//
 
+
+#ifndef EMP_HARDWARE_CPU_BASE_H
+#define EMP_HARDWARE_CPU_BASE_H
 
 #include <vector>
 
