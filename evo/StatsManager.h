@@ -359,7 +359,7 @@ namespace evo{
           AddFunction(det_mut, "det_mut");
           //AddFunction(max_ben, "max_ben");
           //AddFunction(max_det, "max_det");
-          //AddFunction(coal_count, "coal_count");
+          AddFunction(coal_count, "coal_count");
 
           w->OnUpdate(UpdateFun);
       

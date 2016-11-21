@@ -397,11 +397,12 @@ namespace evo {
 
       emp::vector<int> entries;
       for (int T = 0; T < tourny_count; T++) {
+        entries.resize(0);
 
         if(!competitive)
             for (int i=0; i<t_size; i++) entries.push_back( popM.GetRandomOrg() ); // Allows replacement!
         else{
-            t_size = 9;
+            t_size = 9; // neighborhood size
             if(!popM.CheckValidOrg(T))
                 continue;
             entries = popM.GetNeighbors(t_size, T);

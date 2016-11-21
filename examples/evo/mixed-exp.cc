@@ -55,6 +55,7 @@ int main(int argc, char* argv[])
   emp::evo::NKLandscape landscape(N, K, random);
   std::string prefix;
   prefix = config.NAME();
+  bool competitive = 1;
 
   // Create World
   MixedWorld<BitOrg> mixed_pop(random);
@@ -89,7 +90,7 @@ int main(int argc, char* argv[])
   for (int ud = 0; ud < UD_COUNT; ud++) {
     
     mixed_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
-			 , TOURNAMENT_SIZE, POP_SIZE);
+			 , TOURNAMENT_SIZE, POP_SIZE, competitive);
 
     mixed_pop.Update();
     mixed_pop.MutatePop();
