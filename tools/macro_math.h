@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
-// Copyright (C) Michigan State University, 2015. It is licensed
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_MACRO_MATH_H
-#define EMP_MACRO_MATH_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  These macros build a pre-processor calculator system.
 //
@@ -18,6 +14,21 @@
 //   EMP_ADD(A,B)  : converts to result of A+B
 //   EMP_SUB(A,B)  : converts to result of A-B
 //   EMP_MULT(A,B) : converts to result of A*B
+//   EMP_DIV(A,B)  : converts to result of A/B
+//   EMP_MOD(A,B)  : converts to result of A%B
+//   EMP_LOG2(A)   : converts to (int) log2(A)
+//
+//   EMP_NOT(X)     : Logical NOT
+//   EMP_AND(X, Y)  : Logical AND
+//   EMP_OR(X, Y)   : Logical OR
+//   EMP_NAND(X, Y) : Logical NAND
+//   EMP_NOR(X, Y)  : Logical NOR
+//   EMP_XOR(X, Y)  : Logical XOR
+//
+//   EMP_COUNT_ONES(A) : count the number of ones in the binary representation of A
+//
+//   EMP_IF(TEST, T, F) examines the first argument; if it's 0, it resolves to the third
+//   argument, otherwise it resolves to the second argument.
 //
 //  The core idea behind these macros is that we can use brute-force to convert numbers
 //  to binary, but once there we can easily perform math on them, or convert them to
@@ -29,7 +40,10 @@
 //   SUM - Like BIN, but stored as zero or magnitude.    (e.g., 0, 0, 0, 64, 0, 16, 8, 0, 2, 1 )
 //   PACK - Like SUM, but without zeros and in parens    (e.g., (64,16,8,2,1) )
 //   HEX - Hexidecimal representation (e.g., 0x5B)  [todo]
-//
+
+
+#ifndef EMP_MACRO_MATH_H
+#define EMP_MACRO_MATH_H
 
 /// @cond MACROS
 

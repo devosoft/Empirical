@@ -50,15 +50,15 @@
 #include <tuple>
 #include <array>
 
+#include "../meta/meta.h"
+
 #include "../tools/assert.h"
 #include "../tools/functions.h"
 #include "../tools/mem_track.h"
-#include "../tools/meta.h"
 #include "../tools/vector.h"
 #include "../tools/tuple_struct.h"
-#include "js_utils.h"
-
-/// @cond SIMPLIFY
+#include "../tools/tuple_utils.h"
+#include "js_object_struct.h"
 
 #ifdef EMSCRIPTEN
 extern "C" {
@@ -222,7 +222,7 @@ namespace emp {
 
   // If the return type has a personalized function to handle the return, use it!
   template <typename RETURN_TYPE>
-  static typename emp::sfinae_decoy<void, decltype(&RETURN_TYPE::StoreAsReturn)>::type
+  static emp::sfinae_decoy<void, decltype(&RETURN_TYPE::StoreAsReturn)>
   StoreReturn(const RETURN_TYPE & ret_var) {
     ret_var.template StoreAsReturn();
   }
@@ -301,7 +301,7 @@ namespace emp {
   namespace internal {
 
     template <typename T, int ARG_ID>
-    void LoadArg_impl(typename emp::sfinae_decoy<bool, decltype(&T::template LoadFromArg<ARG_ID>)>::type,
+    void LoadArg_impl(emp::sfinae_decoy<bool, decltype(&T::template LoadFromArg<ARG_ID>)>,
                       T & target) {
       target.template LoadFromArg<ARG_ID>();
     }

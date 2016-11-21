@@ -1,3 +1,7 @@
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2016.
+//  Released under the MIT Software license; see doc/LICENSE
+
 mergeInto(LibraryManager.library, {
     // Data accessible to library users.
     $emp: {
@@ -27,7 +31,7 @@ mergeInto(LibraryManager.library, {
             }
             return r.join(i+'\n');
         },
-            
+
         LoadFileEvent: function(files, callback_id) {
             var reader = new FileReader();            // Reader object
             reader.onload = function(e) {             // Fun to run when file loaded
@@ -35,9 +39,9 @@ mergeInto(LibraryManager.library, {
             };
             reader.readAsText(files[0]);   // Load file!
         }
-        
+
     },
-    
+
     // Data internal to EMP
     $emp_i: { cb_args:[], cb_return:0
             },

@@ -205,14 +205,11 @@ namespace emp {
     }
 
   public:
-    ///
-    /// Constructor:
-    /// Assume all zeroes in set
-    ///
+    /// Constructor: Assume all zeroes in set
     BitSet() { Clear(); }
     BitSet(const BitSet & in_set) { Copy(in_set.bit_set); }
     BitSet(Random & random, const double p1=0.5) { Randomize(random, p1); }
-    ~BitSet() { ; }
+    ~BitSet() = default;
 
     BitSet & operator=(const BitSet<NUM_BITS> & in_set) {
       Copy(in_set.bit_set);
@@ -287,9 +284,7 @@ namespace emp {
       else       bit_set[field_id] &= ~pos_mask;
     }
 
-    ///
     /// Flips all the bits in a range [start, end)
-    ///
     void flip(int start, int end) {
       emp_assert(start >= 0 && start <= end && end <= NUM_BITS);
       for(int index = start; index < end; index++) {
@@ -297,9 +292,7 @@ namespace emp {
       }
     }
 
-    ///
     /// flip a single bit
-    ///
     void flip(int index) {
       Set(index, ~Get(index));
     }
@@ -345,7 +338,6 @@ namespace emp {
     }
 
 
-
     bool Any() const { for (auto i : bit_set) if (i) return true; return false; }
     bool None() const { return !Any(); }
     bool All() const { return (~(*this)).None(); }
@@ -364,7 +356,6 @@ namespace emp {
     void Print(std::ostream & out=std::cout) const {
       for (int i = NUM_BITS - 1; i >= 0; i--) {
         out << Get(i);
-        // if (i % 32 == 0) out << ' ';
       }
     }
     void PrintArray(std::ostream & out=std::cout) const {

@@ -1,19 +1,19 @@
 A library of tools for scientific software development, with emphasis on compiling to the web and
 building web interfaces using the Emscripten compiler (from C++ to high efficiency JavaScript).
 
-Top-level directory structure:
+--== Source files directories ==--
 
-tools/    - Basic tools that are generally useful for scientific software.
-web/  - Tools that make use of being compiled with emscripten.
+meta/     - Helpful tools for template meta-programming.
+tools/    - Many basic tools that are generally useful for scientific software.
 
-config/   - Tools to setup a simple configuration system.
+config/   - Tools to build a simple configuration system (including compile-time optimizations)
+evo/      - Tools for building Artificial Life or Evolutionary Computation projects
 geometry/ - Geometry and physics-based tools for implementing simple virtual worlds.
 hardware/ - Implementation of basic virtual hardware that is easy to configure.
 scholar/  - Tools for tracking authors, citations, and bibliographies
 web/      - Tools for builing web interfaces
 
-evo/      - Tools for building evolution-based software, such as genetic algorithms, digital
-            evolution systems, or agent-based simulations.
+--== Executables directories ==--
 
 examples/ - Example code for many of the above tools
 tests/    - Unit tests

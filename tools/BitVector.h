@@ -120,22 +120,23 @@ namespace emp {
       const int bit_shift = shift_size % FIELD_BITS;
       const int bit_overflow = FIELD_BITS - bit_shift;
       const int NUM_FIELDS = NumFields();
+      const int field_shift2 = NUM_FIELDS - field_shift;
 
       // account for field_shift
       if (field_shift) {
-        for (int i = 0; i < (NUM_FIELDS - field_shift); ++i) {
+        for (int i = 0; i < field_shift2; ++i) {
           bit_set[i] = bit_set[i + field_shift];
         }
-        for (int i = NUM_FIELDS - field_shift; i < NUM_FIELDS; i++) bit_set[i] = 0U;
+        for (int i = field_shift2; i < NUM_FIELDS; i++) bit_set[i] = 0U;
       }
 
       // account for bit_shift
       if (bit_shift) {
-        for (int i = 0; i < (NUM_FIELDS - 1 - field_shift); ++i) {
+        for (int i = 0; i < (field_shift2 - 1); ++i) {
           bit_set[i] >>= bit_shift;
           bit_set[i] |= (bit_set[i+1] << bit_overflow);
         }
-        bit_set[NUM_FIELDS - 1 - field_shift] >>= bit_shift;
+        bit_set[field_shift2 - 1] >>= bit_shift;
       }
     }
 
@@ -564,6 +565,7 @@ namespace emp {
 
     // For compatability with std::vector<bool>.
     size_t size() const { return num_bits; }
+    void resize(std::size_t new_size) { Resize(new_size); }
     bool all() const { return All(); }
     bool any() const { return Any(); }
     bool none() const { return !Any(); }

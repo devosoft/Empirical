@@ -1,16 +1,14 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
+//
+//  These functions focus on dealing with generic sequence types.
 
 #ifndef EMP_SEQUENCE_UTILS_H
 #define EMP_SEQUENCE_UTILS_H
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-//  These functions focus on dealing with generic sequence types.
-//
-
 #include "functions.h"
+#include "vector.h"
 
 namespace emp {
 
@@ -49,8 +47,8 @@ namespace emp {
     if (size1 == 0) return size2;
     if (size2 == 0) return size1;
 
-    std::vector<int> cur_row(size1);   // The row we are calculating
-    std::vector<int> prev_row(size1);  // The previous row we calculated
+    emp::vector<int> cur_row(size1);   // The row we are calculating
+    emp::vector<int> prev_row(size1);  // The previous row we calculated
 
     // Initialize the previous row to record the differece from nothing.
     for (int i = 0; i < size1; i++) prev_row[i] = i + 1;
@@ -92,9 +90,9 @@ namespace emp {
     if (size1 == 0) return size2;
     if (size2 == 0) return size1;
 
-    std::vector<int> cur_row(size1);   // The row we are calculating
-    std::vector<int> prev_row(size1);  // The previous row we calculated
-    std::vector<std::vector<char> > edit_info(size2, std::vector<char>(size1));
+    emp::vector<int> cur_row(size1);   // The row we are calculating
+    emp::vector<int> prev_row(size1);  // The previous row we calculated
+    emp::vector<emp::vector<char> > edit_info(size2, emp::vector<char>(size1));
 
     // Initialize the previous row to record the differece from nothing.
     for (int i = 0; i < size1; i++) {

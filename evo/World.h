@@ -87,9 +87,9 @@
 #include <functional>
 #include <map>
 
+#include "../meta/reflection.h"
 #include "../tools/assert.h"
 #include "../tools/Random.h"
-#include "../tools/reflection.h"
 #include "../tools/vector.h"
 
 #include "FitnessManager.h"
@@ -171,20 +171,34 @@ namespace evo {
     bool random_owner;
     int update = 0;
 
-    // Signals triggered by the world.
-    Signal<int> before_repro_sig;       // Trigger: Immediately prior to producing offspring
-    Signal<ORG *> offspring_ready_sig;  // Trigger: Offspring about to enter population
-    Signal<ORG *> inject_ready_sig;     // Trigger: New org about to be added to population
-    Signal<int> org_placement_sig;      // Trigger: Organism has been added to population
-    Signal<int> on_update_sig;          // Trigger: New update is starting.
+    // We have a set of signals that are triggered by the world.
+
+    // Trigger:  Immediately prior to parent producing offspring
+    // Argument: Parent position in population
+    Signal<int> before_repro_sig;
+
+    // Trigger: Offspring about to enter population
+    // Argument: Pointer to organism about to be placed in population.
+    Signal<ORG *> offspring_ready_sig;
+
+    // Trigger: New org about to be added to population
+    // Argument: Pointer to organism about to be placed in population.
+    Signal<ORG *> inject_ready_sig;
+
+    // Trigger: Organism has been added to population
+    // Argument: Position of organism placed in the population.
+    Signal<int> org_placement_sig;
+
+    // Trigger: New update is starting.
+    // Argument: Update number (sequentially increasing)
+    Signal<int> on_update_sig;
 
     // Determine the callback type; by default this will be OrgSignals_NONE, but it can be
     // overridden by setting the type callback_t in the organism class.
     EMP_CHOOSE_MEMBER_TYPE(callback_t, callback_t, OrgSignals_NONE, ORG);
     callback_t callbacks;
 
-    // Build a Setup method in world that calls .Setup() on whatever is passed in, but
-    // only if it exists.
+    // Build a Setup method in world that calls ::Setup() on whatever is passed in if it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
 

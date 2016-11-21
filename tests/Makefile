@@ -1,22 +1,22 @@
 GCOV_FLAGS = -o0 -g --coverage
-CXX = g++-5
-TEST_NAMES = tools geometry evo scholar config
+
+TEST_NAMES = evo geometry meta scholar tools
 
 default: test
 
 test-prep:
 	mkdir -p temp
 
-subtest-%: test_%.cc
+test-%: test_%.cc
 	$(CXX) -std=c++14 $< -o $@.out
 	#echo "running $@.out"
 	# execute test
 	./$@.out
 
-test: test-web test-prep $(addprefix subtest-, $(TEST_NAMES))
-	rm -rf subtest*.out
+test: test-prep $(addprefix test-, $(TEST_NAMES))
+	rm -rf test*.out
 
-test-web: 
+test-web:
 	  cd web && bash run_tests.sh
 	  cd .. && third-party/node_modules/karma/bin/karma start tests/web/karma.conf.js
 

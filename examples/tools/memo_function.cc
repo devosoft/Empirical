@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include "../../tools/memo_function.h"
+#include "../../tools/Random.h"
 
 double F(int N) {
   double PI = 3.14159;
@@ -17,6 +18,21 @@ double F(int N) {
 
 double G(int N) {
   return 0.00005 * (double) N;
+}
+
+int Mult2(int in1, int in2) {
+  std::cout << "!";
+  return in1 * in2;
+}
+
+int Compute() {
+  int value = 0;
+  for (int i = 0; i < 1000000000; i++) {
+    value += 111111;
+    value *= 2;
+    value %= 837645781;
+  }
+  return value;
 }
 
 int main()
@@ -51,4 +67,25 @@ int main()
     std::cout << i << ":" << test_fun(i) << " ";
     if (i%8 == 7) std::cout << std::endl;
   }
+
+  emp::memo_function<int(int,int)> test_fun2(Mult2);
+  emp::Random random;
+
+  std::cout << std::endl; // Skip a line...
+  std::cout << std::endl << "Multi-argument functions!";
+  for (int i = 0; i < 1000; i++) {
+    if (i % 20 == 0) std::cout << std::endl;
+    int x = random.GetInt(30);
+    int y = random.GetInt(30);
+    std::cout << test_fun2(x,y) << " ";
+  }
+  std::cout << std::endl;
+
+  emp::memo_function<double()> no_arg_fun(Compute);
+  
+  std::cout << no_arg_fun() << "  Long..." << std::endl;
+  std::cout << no_arg_fun() << "  Quick!" << std::endl;
+  std::cout << no_arg_fun() << "  Quick!" << std::endl;
+  no_arg_fun = Compute;
+  std::cout << no_arg_fun() << "  Long..." << std::endl;
 }

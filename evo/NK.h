@@ -12,6 +12,7 @@
 
 #include "../tools/BitVector.h"
 #include "../tools/math.h"
+#include "../tools/memo_function.h"
 #include "../tools/Random.h"
 #include "../tools/vector.h"
 
@@ -46,6 +47,7 @@ namespace evo {
   public:
     NKLandscape() = delete;
     NKLandscape(const NKLandscape &) = delete;
+    NKLandscape(NKLandscape &&) = default;
 
     /// N is the length of bitstrings in your population, K is the number of neighboring sites
     /// the affect the fitness contribution of each site (i.e. epistasis or ruggedness), random
@@ -56,6 +58,7 @@ namespace evo {
      , total_count(N * state_count)
      , landscape(N)
     {
+      emp_assert(K < 32, K); // Genes will be stored in a 32-bit int; consider using NKLandscape Memo!
       for ( auto & ltable : landscape) {
         ltable.resize(state_count);
         for (double & pos : ltable) {
@@ -65,6 +68,7 @@ namespace evo {
     }
     ~NKLandscape() { ; }
     NKLandscape & operator=(const NKLandscape &) = delete;
+    NKLandscape & operator=(NKLandscape &&) = default;
 
     /// Returns N
     int GetN() const { return N; }
@@ -106,6 +110,57 @@ namespace evo {
 	      const double cur_fit = GetFitness(i, cur_val);
         total += cur_fit;
       }
+      return total;
+    }
+  };
+
+  class NKLandscapeMemo {
+  private:
+    const int N;
+    const int K;
+    mutable emp::vector< emp::memo_function<double(const BitVector &)> > landscape;
+    mutable std::unordered_map<BitVector, double> fit_cache;
+    emp::vector<BitVector> masks;
+
+  public:
+    NKLandscapeMemo() = delete;
+    NKLandscapeMemo(const NKLandscapeMemo &) = delete;
+    NKLandscapeMemo(NKLandscapeMemo &&) = default;
+    NKLandscapeMemo(int _N, int _K, emp::Random & random) : N(_N), K(_K), landscape(N), masks(N)
+    {
+      // Each position in the landscape...
+      for (int n = 0; n < N; n++) {
+        // ...should have its own memo_function
+        landscape[n] = [&random](const BitVector &){ return random.GetDouble(); };
+        // ...and its own mask.
+        masks[n].Resize(N);
+        for (int k = 0; k < K; k++) masks[n][(n+k)%N] = 1;
+      }
+    }
+    ~NKLandscapeMemo() { ; }
+    NKLandscapeMemo & operator=(const NKLandscapeMemo &) = delete;
+    NKLandscapeMemo & operator=(NKLandscapeMemo &&) = default;
+
+    int GetN() const { return N; }
+    int GetK() const { return K; }
+
+    double GetFitness(int n, const BitVector & state) const {
+      emp_assert(state == (state & masks[n]));
+      return landscape[n](state);
+    }
+    double GetFitness(const BitVector & genome) const {
+      emp_assert(genome.GetSize() == N);
+
+      // If this fitness is cached, return it!
+      const auto it = fit_cache.find(genome);
+      if (it != fit_cache.end()) return it->second;
+
+      // Otherwise calculate it.
+      double total = 0.0;
+      for (int n = 0; n < N; n++) {
+        total += landscape[n](genome & masks[n]);
+      }
+      fit_cache[genome] = total;
       return total;
     }
   };

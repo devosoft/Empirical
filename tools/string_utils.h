@@ -13,7 +13,7 @@
 #include <sstream>
 #include <string>
 
-#include "reflection.h"
+#include "../meta/reflection.h"
 #include "vector.h"
 
 namespace emp {
@@ -344,7 +344,7 @@ namespace emp {
   // The next functions are not efficient, but they will take any number of inputs and
   // dynamically convert them all into a single, concatanated strings or stringstreams.
 
-  namespace internal {
+  namespace {
     inline void append_sstream(std::stringstream & ss) { (void) ss; }
 
     template <typename TYPE, typename... OTHER_TYPES>
@@ -375,7 +375,7 @@ namespace emp {
 
     // Operate on std::containers
     template <typename T>
-    inline typename emp::sfinae_decoy<std::string, typename T::value_type>::type
+    inline typename emp::sfinae_decoy<std::string, typename T::value_type>
     to_string_impl(bool, T container) {
       std::stringstream ss;
       ss << "[ ";
@@ -395,7 +395,7 @@ namespace emp {
   /// any normal (POD) data type, container, or anything that can be passed into a stringstream.
   template <typename... ALL_TYPES>
   inline std::string to_string(ALL_TYPES... all_values) {
-    return internal::to_string_impl(true, std::forward<ALL_TYPES>(all_values)...);
+    return to_string_impl(true, std::forward<ALL_TYPES>(all_values)...);
   }
 }
 

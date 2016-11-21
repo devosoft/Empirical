@@ -1,6 +1,6 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2016.
+//  Released under the MIT Software license; see doc/LICENSE
 
 #include "../../tools/alert.h"
 #include "../../web/web.h"
@@ -39,7 +39,7 @@ int main()
 
   sel.SetOption("Option 1");
   sel.SetOption("Option B");
-  sel.SetOption("Option the Forth");
+  sel.SetOption("Option the Third");
   sel.SetOption("Option IV");
 
   doc << canvas << sel << "<br>" << tab;

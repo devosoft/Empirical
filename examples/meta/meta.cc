@@ -7,7 +7,7 @@
 #include <map>
 #include <string>
 
-#include "../../tools/meta.h"
+#include "../../meta/meta.h"
 
 template <typename A, typename B>
 struct Temp2Type {
@@ -43,12 +43,36 @@ int main()
 	    << "CombineHash(3,4) = " << emp::CombineHash(3,4) << std::endl
 	    << "CombineHash(2,3,4) = " << emp::CombineHash(2,3,4) << std::endl;
 
-  // Test ApplyTuple
-  std::cout << "\nApply results...:\n";
-  int x = 10;
-  int y = 13;
-  int z = 22;
-  auto test_tup = std::make_tuple(x,y,z);
-  std::cout << "Sum(" << x << "," << y << "," << z << ") = "
-	    << emp::ApplyTuple(Sum3, test_tup) << std::endl;
+  // Test Math...
+  using math_t = emp::tIntMath<1, 2, 3, 4>;
+  std::cout << "\nMath Tests:\n";
+  std::cout << "Sum = " << math_t::Sum() << std::endl;
+  std::cout << "Prod = " << math_t::Product() << std::endl;
+
+  std::cout << "\nTruncateCall Tests:\n";
+  std::function<int(int,int,int)> fun(Sum3);
+  std:: cout << "emp::TruncateCall(fun, 1,2,3,4,5) = "
+	     << emp::TruncateCall(fun, 1,2,3,4,5)
+	     << std::endl;
+
+  std::cout << "\nAdaptFunction Tests:\n";
+  auto fun2 = emp::AdaptFunction<int,int,int,int>::Expand<double, char>(fun);
+  std::cout << "expanded fun = " << fun2(100,200,300,1.234,'a') << std::endl;
+
+  // Test type tests...
+  std::cout << "\nTest type examples:\n";
+  std::cout << "std::is_integral<int> value = "
+	    << emp::test_type_value<std::is_integral, int>()
+	    << std::endl;
+  std::cout << "std::is_integral<double> value = "
+	    << emp::test_type_value<std::is_integral, double>()
+	    << std::endl;
+
+  std::cout << "std::is_integral<int> exists = "
+	    << emp::test_type_exist<std::is_integral, int>()
+	    << std::endl;
+  std::cout << "std::is_integral<double> exists = "
+	    << emp::test_type_exist<std::is_integral, double>()
+	    << std::endl;
+
 }
