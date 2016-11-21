@@ -554,8 +554,8 @@ namespace emp {
     BitVector operator&(const BitVector & ar2) const { return AND(ar2); }
     BitVector operator|(const BitVector & ar2) const { return OR(ar2); }
     BitVector operator^(const BitVector & ar2) const { return XOR(ar2); }
-    BitVector operator<<(const int shift_size) const { return SHIFT(-shift_size); }
-    BitVector operator>>(const int shift_size) const { return SHIFT(shift_size); }
+    inline BitVector operator<<(const int shift_size) const { return SHIFT(-shift_size); }
+    inline BitVector operator>>(const int shift_size) const { return SHIFT(shift_size); }
     const BitVector & operator&=(const BitVector & ar2) { return AND_SELF(ar2); }
     const BitVector & operator|=(const BitVector & ar2) { return OR_SELF(ar2); }
     const BitVector & operator^=(const BitVector & ar2) { return XOR_SELF(ar2); }
@@ -581,7 +581,7 @@ namespace std {
   };
 }
 
-std::ostream & operator<<(std::ostream & out, const emp::BitVector & _bit_set) {
+inline std::ostream & operator<<(std::ostream & out, const emp::BitVector & _bit_set) {
   _bit_set.Print(out);
   return out;
 }

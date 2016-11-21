@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include <map>
 #include <set>
+#include <unordered_set>
 #include <algorithm>
 #include <fstream>
 #include "../tools/vector.h"
@@ -77,7 +78,7 @@ namespace evo{
   public:
     std::unordered_map<int, Node<org_ptr> > nodes;
     static constexpr bool emp_is_lineage_manager = true;
-    std::set<ORG> genomes;
+    std::unordered_set<ORG> genomes;
     int next = 1; //0 indicates no parent
     int next_parent_id = -1;
     int next_org_id = 1;
@@ -114,11 +115,11 @@ namespace evo{
         TrackPlacement(pos);
       };
 
-      std::function<void(org_ptr)> TrackOffspringFun = [this] (org_ptr org){
+      const std::function<void(const org_ptr)> TrackOffspringFun = [this] (const org_ptr org){
         TrackOffspring(org);
       };
 
-      std::function<void(org_ptr)> TrackInjectedOffspringFun = [this] (org_ptr org){
+      const std::function<void(const org_ptr)> TrackInjectedOffspringFun = [this] (const org_ptr org){
         TrackInjectedOffspring(org);
       };
 
@@ -157,7 +158,7 @@ namespace evo{
     }
 
     //Put newly injected organism into the lineage tracker
-    void TrackInjectedOffspring(org_ptr org) {
+    void TrackInjectedOffspring(const org_ptr org) {
       next_org_id = this->AddOrganism(*org, 0);
       inject = true;
     }
@@ -196,9 +197,9 @@ namespace evo{
     // organism you added
     int AddOrganism(ORG org, int parent) {
       int id = this->next++;
-      std::pair<typename std::set<ORG>::iterator, bool> ret;
+      std::pair<typename std::unordered_set<ORG>::iterator, bool> ret;
       ret = genomes.insert(org);
-      typename std::set<ORG>::iterator it = ret.first;
+      typename std::unordered_set<ORG>::iterator it = ret.first;
       org_ptr genome = (org_ptr)&(*it);
 
       Node<org_ptr>* curr = &nodes[id];
@@ -298,6 +299,26 @@ namespace evo{
 
   };
 
+  /// A lineage tracker object to be used outside of the Empirical evol framework
+  template <typename ORG>
+  class LineageTracker_Standalone : public LineageTracker<PopulationManager_Base<ORG> > {
+  protected:
+    using org_ptr = ORG*;
+    bool separate_generations;
+
+  public:
+
+    /// Construct a stand-alone lineage tracker. You must specify whether or not your
+    /// system has separated generations (i.e. generations which are separated, rather than
+    /// having a steady-state population in which there is a death for every birth)
+    // Development note: There is no default value for separate_generations, because both
+    // set-ups are common, and making the wrong assumption would produce wrong results in either
+    // direction
+    LineageTracker_Standalone(bool has_separate_generations) :
+        separate_generations(has_separate_generations) {;}
+
+  };
+
 
   template <typename POP_MANAGER = PopulationManager_Base<int> >
   class LineageTracker_Pruned : public LineageTracker<POP_MANAGER> {
@@ -341,23 +362,23 @@ namespace evo{
       nodes[0].alive = false;
       nodes[0].loc = -1;
 
-      std::function<void(int)> RecordParentFun = [this] (int id){
+      const std::function<void(int)> RecordParentFun = [this] (int id){
         RecordParent(id);
       };
 
-      std::function<void(int)> TrackPlacementFun = [this] (int pos){
+      const std::function<void(int)> TrackPlacementFun = [this] (int pos){
         TrackPlacement(pos);
       };
 
-      std::function<void(org_ptr)> TrackOffspringFun = [this] (org_ptr org){
+      const std::function<void(const org_ptr)> TrackOffspringFun = [this] (const org_ptr org){
         TrackOffspring(org);
       };
 
-      std::function<void(org_ptr)> TrackInjectedOffspringFun = [this] (org_ptr org){
+      const std::function<void(const org_ptr)> TrackInjectedOffspringFun = [this] (const org_ptr org){
         TrackInjectedOffspring(org);
       };
 
-      std::function<void(int)> UpdateFun = [this] (int ud){
+      const std::function<void(int)> UpdateFun = [this] (int ud){
         Update(ud);
       };
 
@@ -371,13 +392,13 @@ namespace evo{
     ~LineageTracker_Pruned() {;}
 
 
-    void TrackOffspring(org_ptr org) {
+    void TrackOffspring(const org_ptr org) {
       next_org_id = this->AddOrganism(*org, next_parent_id);
       inject = false;
     }
 
     //Put newly injected organism into the lineage tracker
-    void TrackInjectedOffspring(org_ptr org) {
+    void TrackInjectedOffspring(const org_ptr org) {
       next_org_id = this->AddOrganism(*org, 0);
       inject = true;
     }
@@ -463,7 +484,7 @@ namespace evo{
     // and parent is the id of the parent. The lineage tracker is in charge
     // of assigning ids, and will return an int representing the id of the
     // organism you added
-    int AddOrganism(ORG org, int parent) {
+    int AddOrganism(const ORG org, int parent) {
 
       int id = this->next++;
 

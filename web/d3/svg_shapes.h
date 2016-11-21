@@ -194,9 +194,10 @@ namespace D3 {
       EM_ASM_ARGS({
 	    var scale = js.objects[$1];
 	    var curr_x = js.objects[$0].x();
+        js.objects.push(curr_x);
 
 	    //Apply scale to whatever the current x axis function is
-	    js.objects[$0].x(function(d, i){return scale(curr_x(d, i))});
+	    js.objects[$0].x(function(d, i){return scale(js.objects[js.objects.length-1](d, i));});
 	  }, this->id, scale.GetID());
     }
 
@@ -258,7 +259,7 @@ namespace D3 {
     template <typename T>
     typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
     SetX(T x) {
-      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARGS(x, x);
+      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(x, x);
     }
 
     /// @endcond
@@ -306,7 +307,7 @@ namespace D3 {
     template <typename T>
     typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
     SetY(T y) {
-      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARGS(y, y);
+      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(y, y);
     }
 
     /// @endcond

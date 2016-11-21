@@ -49,7 +49,7 @@ namespace evo{
                     )
 
   //Is there a way to avoid making this global but still do inheritance right?
-  OEEStatsManagerConfig OeeConfig;
+  static OEEStatsManagerConfig OeeConfig;
 
   template <typename POP_MANAGER>
   class OEEStatsManager : StatsManager_Base<POP_MANAGER> {
@@ -71,8 +71,6 @@ namespace evo{
     using StatsManager_Base<POP_MANAGER>::output_location;
     using StatsManager_Base<POP_MANAGER>::delimiter;
     using StatsManager_Base<POP_MANAGER>::col_map;
-    using StatsManager_Base<POP_MANAGER>::viz_pointers;
-    using StatsManager_Base<POP_MANAGER>::viz_args;
 
   public:
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
@@ -162,36 +160,35 @@ namespace evo{
         }
         output_location << std::endl;
 
-        SendResultsToViz(update, results);
         past_snapshots.pop_back();
         past_snapshots.push_front(lineage->generation_since_update);
       }
     }
 
-    void SendResultsToViz(int update, emp::vector<double> & results){
-      for (int i=0; i < (int)viz_pointers.size(); ++i){
-        emp::vector<double> values;
-        for (int el : viz_args[i]) {
-          if (el == -1){
-            values.push_back((double)update);
-          } else if (el == -2){
-            emp::vector<int> persist = GetPersistLineageIDs(past_snapshots[0],
-                                         past_snapshots[generations/resolution]);
-            for (int id : persist){
-              values.push_back((double)id);
-            }
-          } else {
-            if (results[el] != -1){
-              values.push_back(results[el]);
-            }
-          }
-        }
-        if (values.size() == viz_args[i].size() || viz_args[i][0]==-2){
-          viz_pointers[i]->AnimateStep(values);
-        }
-      }
-    }
-
+    // void SendResultsToViz(int update, emp::vector<double> & results){
+    //   for (int i=0; i < (int)viz_pointers.size(); ++i){
+    //     emp::vector<double> values;
+    //     for (int el : viz_args[i]) {
+    //       if (el == -1){
+    //         values.push_back((double)update);
+    //       } else if (el == -2){
+    //         emp::vector<int> persist = GetPersistLineageIDs(past_snapshots[0],
+    //                                      past_snapshots[generations/resolution]);
+    //         for (int id : persist){
+    //           values.push_back((double)id);
+    //         }
+    //       } else {
+    //         if (results[el] != -1){
+    //           values.push_back(results[el]);
+    //         }
+    //       }
+    //     }
+    //     if (values.size() == viz_args[i].size() || viz_args[i][0]==-2){
+    //       viz_pointers[i]->AnimateStep(values);
+    //     }
+    //   }
+    // }
+    //
     //Convert a container of orgs to skeletons containing only informative sites
     //TODO: Currently assumes bit org
     template <template <typename> class C >

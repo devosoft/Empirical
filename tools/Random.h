@@ -148,7 +148,7 @@ namespace emp {
      * A negative seed means that the random number generator gets its
      * seed from the actual system time and the process ID.
      **/
-    void ResetSeed(const int _seed) {
+    inline void ResetSeed(const int _seed) {
       original_seed = _seed;
 
       if (_seed <= 0) {
@@ -173,7 +173,7 @@ namespace emp {
      *
      * @return The pseudo random number.
      **/
-    double GetDouble() { return Get() / (double) _RAND_MBIG; }
+    inline double GetDouble() { return Get() / (double) _RAND_MBIG; }
 
     /**
      * Generate a double between 0 and a given number.
@@ -181,7 +181,7 @@ namespace emp {
      * @return The pseudo random number.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    double GetDouble(const double max) { return GetDouble() * max; }
+    inline double GetDouble(const double max) { return GetDouble() * max; }
 
     /**
      * Generate a double out of a given interval.
@@ -190,7 +190,7 @@ namespace emp {
      * @param min The lower bound for the random numbers.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    double GetDouble(const double min, const double max) { return GetDouble() * (max - min) + min; }
+    inline double GetDouble(const double min, const double max) { return GetDouble() * (max - min) + min; }
 
     /**
      * Generate a double out of a given interval.
@@ -198,7 +198,7 @@ namespace emp {
      * @return The pseudo random number.
      * @param range The upper and lower bounds for the random numbers [lower, upper)
      **/
-    double GetDouble(const Range<double> range) { return GetDouble(range.lower, range.upper); }
+    inline double GetDouble(const Range<double> range) { return GetDouble(range.lower, range.upper); }
 
     /**
      * Generate an uint32_t.
@@ -206,7 +206,7 @@ namespace emp {
      * @return The pseudo random number.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    uint32_t GetUInt(const uint32_t max) { return static_cast<int>(GetDouble() * static_cast<double>(max)); }
+    inline uint32_t GetUInt(const uint32_t max) { return static_cast<int>(GetDouble() * static_cast<double>(max)); }
 
     /**
      * Generate an uint32_t out of an interval.
@@ -215,7 +215,7 @@ namespace emp {
      * @param min The lower bound for the random numbers.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    uint32_t GetUInt(const uint32_t min, const uint32_t max) { return GetUInt(max - min) + min; }
+    inline uint32_t GetUInt(const uint32_t min, const uint32_t max) { return GetUInt(max - min) + min; }
 
     /**
      * Generate a uint32_t out of a given interval.
@@ -223,7 +223,7 @@ namespace emp {
      * @return The pseudo random number.
      * @param range The upper and lower bounds for the random numbers [lower, upper)
      **/
-    uint32_t GetUInt(const Range<uint32_t> range) { return GetUInt(range.lower, range.upper); }
+    inline uint32_t GetUInt(const Range<uint32_t> range) { return GetUInt(range.lower, range.upper); }
 
     /**
      * Generate an int out of an interval.
@@ -232,15 +232,15 @@ namespace emp {
      * @param min The lower bound for the random numbers.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    int GetInt(const int max) { return static_cast<int>(GetUInt(max)); }
-    int GetInt(const int min, const int max) { return static_cast<int>(GetUInt(max - min)) + min; }
-    int GetInt(const Range<int> range) { return GetInt(range.lower, range.upper); }
+    inline int GetInt(const int max) { return static_cast<int>(GetUInt(max)); }
+    inline int GetInt(const int min, const int max) { return static_cast<int>(GetUInt(max - min)) + min; }
+    inline int GetInt(const Range<int> range) { return GetInt(range.lower, range.upper); }
 
 
     // Random Event Generation //////////////////////////////////////////////////
 
     // P(p) => if p < [0,1) random variable
-    bool P(const double _p) { return (Get() < (_p * _RAND_MBIG));}
+    inline bool P(const double _p) { return (Get() < (_p * _RAND_MBIG));}
 
 
     // Statistical functions ////////////////////////////////////////////////////
@@ -250,7 +250,7 @@ namespace emp {
     /**
      * Generate a random variable drawn from a unit normal distribution.
      **/
-    double GetRandNormal() {
+    inline double GetRandNormal() {
       // Draw from a Unit Normal Dist
       // Using Rejection Method and saving of initial exponential random variable
       double expRV2;
@@ -268,12 +268,12 @@ namespace emp {
      * Generate a random variable drawn from a distribution with given
      * mean and standard deviation.
      **/
-    double GetRandNormal(const double mean, const double std) { return mean + GetRandNormal() * std; }
+    inline double GetRandNormal(const double mean, const double std) { return mean + GetRandNormal() * std; }
 
     /**
      * Generate a random variable drawn from a Poisson distribution.
      **/
-    uint32_t GetRandPoisson(const double n, double p) {
+    inline uint32_t GetRandPoisson(const double n, double p) {
       // Optimizes for speed and calculability using symetry of the distribution
       if (p > .5) return (uint32_t)n - GetRandPoisson(n * (1 - p));
       else return GetRandPoisson(n * p);
@@ -284,7 +284,7 @@ namespace emp {
      *
      * @param mean The mean of the distribution.
      **/
-    uint32_t GetRandPoisson(const double mean) {
+    inline uint32_t GetRandPoisson(const double mean) {
       // Draw from a Poisson Dist with mean; if cannot calculate, return UINT_MAX.
       // Uses Rejection Method
       const double a = exp(-mean);
@@ -304,7 +304,7 @@ namespace emp {
      * This function is exact, but slow.
      * @see Random::GetRandBinomial
      **/
-    uint32_t GetFullRandBinomial(const double n, const double p) { // Exact
+    inline uint32_t GetFullRandBinomial(const double n, const double p) { // Exact
       // Actually try n Bernoulli events with probability p
       uint32_t k = 0;
       for (uint32_t i = 0; i < n; ++i) if (P(p)) k++;
@@ -319,7 +319,7 @@ namespace emp {
      *
      * @see Random::GetFullRandBinomial
      **/
-    uint32_t GetRandBinomial(const double n, const double p) { // Approx
+    inline uint32_t GetRandBinomial(const double n, const double p) { // Approx
       // Approximate Binomial if appropriate
       // if np(1-p) is large, use a Normal approx
       if (n * p * (1 - p) >= _BINOMIAL_TO_NORMAL) {

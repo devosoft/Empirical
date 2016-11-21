@@ -479,4 +479,37 @@ int main() {
     });
   }, ax.GetID(), ax.group.GetID());
 
+  emp::JSWrap([](){D3::SymbolGenerator g;
+                   g.SetType("diamond");
+                   g.SetSize(2);
+                   return g.GetID();}, "TestSymbolGenerator");
+
+  emp::JSWrap([](){D3::LineGenerator g;
+                  g.SetX([](int d){return d;});
+                  //g.SetY([](int d){return d;});
+                  g.AddXScale(scale);
+                  g.AddYScale(scale);
+                  return g.GetID();}, "TestLineGenerator");
+
+
+  EM_ASM({
+    describe("paths", function(){
+
+      it("can be a symbol generator", function(){
+        var id = emp.TestSymbolGenerator();
+        console.log(id);
+        chai.assert.equal(js.objects[id].type()([1,2]), "diamond");
+        chai.assert.equal(js.objects[id].size()([1,2]), 2);
+      });
+
+      it("can be a line generator", function(){
+        var id = emp.TestLineGenerator();
+        console.log(id);
+        chai.assert.equal(js.objects[id]([[25]]), "M165,165");
+        chai.assert.equal(js.objects[id].size(), 2);
+      });
+
+    });
+  });
+
 }

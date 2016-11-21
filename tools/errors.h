@@ -59,28 +59,30 @@ namespace emp {
     return except_map;
   }
 
-  void TriggerExcept(const std::string & in_id, const std::string & in_desc, bool in_error=true) {
+  inline void TriggerExcept(const std::string & in_id, const std::string & in_desc, bool in_error=true) {
     GetExceptMap().emplace(in_id, ExceptInfo({in_id, in_desc, in_error}));
   }
 
-  const ExceptInfo & GetExcept(const std::string & id) {
+  inline const ExceptInfo & GetExcept(const std::string & id) {
     auto & fail_map = GetExceptMap();
     auto it = fail_map.find(id);
     if (it != fail_map.end()) return it->second;
     return GetEmptyExcept();
   }
-  ExceptInfo PopExcept(const std::string & id) {
+
+  inline ExceptInfo PopExcept(const std::string & id) {
     auto & fail_map = GetExceptMap();
     auto it = fail_map.find(id);
     auto out = GetEmptyExcept();
     if (it != fail_map.end()) { out = it->second; fail_map.erase(it); }
     return out;
   }
-  int CountExcepts() { return GetExceptMap().size(); }
-  bool HasExcept() { return CountExcepts(); }
-  bool HasExcept(const std::string & id) { return GetExceptMap().count(id); }
-  void ClearExcepts() { GetExceptMap().clear(); }
-  void ClearExcept(const std::string & id) {
+
+  inline int CountExcepts() { return GetExceptMap().size(); }
+  inline bool HasExcept() { return CountExcepts(); }
+  inline bool HasExcept(const std::string & id) { return GetExceptMap().count(id); }
+  inline void ClearExcepts() { GetExceptMap().clear(); }
+  inline void ClearExcept(const std::string & id) {
     auto & fail_map = GetExceptMap();
     auto it = fail_map.find(id);
     if (it != fail_map.end()) fail_map.erase(it);
