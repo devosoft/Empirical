@@ -498,7 +498,7 @@ namespace evo{
 
       //Store genomes in a set so we don't need to have a bunch
       //of duplicates lying around
-      std::pair<typename std::set<ORG>::iterator, bool> ret;
+      std::pair<typename std::unordered_set<ORG>::iterator, bool> ret;
       ret = genomes.insert(org);
       typename std::set<ORG>::iterator it = ret.first;
       org_ptr genome = (org_ptr)&(*it);
