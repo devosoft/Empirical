@@ -88,6 +88,18 @@ namespace evo {
       return pos;
     }
 
+    virtual emp::vector<int> GetNeighbors(int t_size, int id) {
+        emp::vector<int> neighbors;
+        for(int i = 0; i < t_size; i++) neighbors.push_back(GetRandomOrg());
+        return neighbors;
+    }
+
+    bool CheckValidOrg(int org_pos){
+        if (pop[org_pos] == nullptr)
+            return false;
+        return true;
+    }
+
     void SetOrgs(const emp::vector<ORG*> & new_pop) {
       Clear();
       pop = new_pop;
@@ -105,7 +117,7 @@ namespace evo {
     }
 
     void ClearOrgAt(int pos) {
-      // Delete all organisms.
+      // Delete given organism.
       if (pop[pos]) { delete pop[pos]; pop[pos]=nullptr; num_orgs--; }  // Delete current organisms.
       fitM.ClearAt(pos);
     }
@@ -129,7 +141,6 @@ namespace evo {
     }
 
     void Update() { ; } // Basic version of Update() does nothing, but World may trigger actions.
-
     // Execute() redirect to all organisms in the population, forwarding arguments.
     template <typename... ARGS>
     void Execute(ARGS... args) {
@@ -362,6 +373,7 @@ namespace evo {
     int height;
 
   public:
+    using base_t::CheckValidOrg;
     PopulationManager_Grid(const std::string & _w_name, FIT_MANAGER & _fm)
     : base_t(_w_name, _fm) {
       ConfigPop(10,10);
@@ -375,6 +387,18 @@ namespace evo {
       const int rand_x = emp::mod(id%width + offset%3 - 1, width);
       const int rand_y = emp::mod(id/width + offset/3 - 1, height);
       return rand_x + rand_y*width;
+    }
+
+    emp::vector<int> GetNeighbors(int t_size, int id){
+        emp::vector<int> neighbors;
+        for (int offset = 0; offset < t_size; offset++){
+            int x_pos = emp::mod(id%width + offset%3 - 1, width);
+            int y_pos = emp::mod(id/width + offset/3 - 1, height);
+            int pos = x_pos + y_pos*width;
+            if(CheckValidOrg(pos))
+                    neighbors.push_back(pos);
+        }
+        return neighbors;
     }
 
     void ConfigPop(int w, int h) { width = w; height = h; base_t::Resize(width*height); }

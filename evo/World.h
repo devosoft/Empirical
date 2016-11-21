@@ -390,21 +390,28 @@ namespace evo {
     // finds the one with the highest fitness, and moves it to the next generation.
     // User provides the fitness function, the tournament size, and (optionally) the
     // number of tournaments to run.
-    void TournamentSelect(const fit_fun_t & fit_fun, int t_size, int tourny_count=1) {
+    void TournamentSelect(const fit_fun_t & fit_fun, int t_size, int tourny_count=1, bool competitive=0) {
       emp_assert(fit_fun);
       emp_assert(t_size > 0 && t_size <= (int) popM.size(), t_size, popM.size());
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
 
       emp::vector<int> entries;
       for (int T = 0; T < tourny_count; T++) {
-        entries.resize(0);
-        for (int i=0; i<t_size; i++) entries.push_back( popM.GetRandomOrg() ); // Allows replacement!
+
+        if(!competitive)
+            for (int i=0; i<t_size; i++) entries.push_back( popM.GetRandomOrg() ); // Allows replacement!
+        else{
+            t_size = 9;
+            if(!popM.CheckValidOrg(T))
+                continue;
+            entries = popM.GetNeighbors(t_size, T);
+        }
 
         double best_fit = popM.CalcFitness(entries[0], fit_fun);
         int best_id = entries[0];
 
         // Search for a higher fit org in the tournament.
-        for (int i = 1; i < t_size; i++) {
+        for (int i = 1; i < entries.size(); i++) {
           const double cur_fit = popM.CalcFitness(entries[i], fit_fun);
           if (cur_fit > best_fit) {
             best_fit = cur_fit;
@@ -417,41 +424,11 @@ namespace evo {
       }
     }
 
-    // Helper function to run a selection based on neighbors fitness
-    void RunCompetition(std::function<double(ORG*)> fit_fun, int t_size, int tourny_count=1, int org_id=false){
-      emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
-
-      emp::vector<int> neighbors;
-      double best_fit = fit_fun(popM[org_id]);
-      int best_id = org_id;
-      int org_x = popM.ToX(org_id);
-      int org_y = popM.ToY(org_id);
-
-      for(int offset = 0; offset < 9; offset++){         
-          int neighbor_x = emp::mod(org_x + offset%3 - 1, popM.GetWidth());
-          int neighbor_y = emp::mod(org_y + offset/3 - 1, popM.GetHeight());
-          neighbors.push_back(popM.ToID(neighbor_x, neighbor_y));
-      }
-
-      // Search for a higher fit org in the neighbors.
-      for(auto id : neighbors){
-          if(popM[id] == nullptr){continue;}
-          double curr_fit = fit_fun(popM[id]);
-          if (best_fit < curr_fit){
-              best_fit = curr_fit;
-              best_id = id;
-            }
-        }
-                
-        // Place the highest fitness into the next generation!
-        InsertBirth( *(popM[best_id]), best_id, 1 );
-      }
-
-
     // Tournament Selection can use the default fitness function.
     void TournamentSelect(int t_size, int tourny_count=1) {
       TournamentSelect(orgM.GetFitFun(), t_size, tourny_count);
     }
+
 
     // Run tournament selection with fitnesses adjusted by Goldberg and
     // Richardson's fitness sharing function (1987)

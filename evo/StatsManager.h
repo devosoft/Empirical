@@ -71,10 +71,17 @@ namespace evo{
     // If the location is invalid, the program will exit with an error.
     void SetOutput(std::string location) {
       if (location == "cout" || location == "stdout") {
+          
+        if (output_location.is_open()){
+           output_location.close();
+        }
         output_location.copyfmt(std::cout);
         output_location.clear(std::cout.rdstate());
         output_location.basic_ios<char>::rdbuf(std::cout.rdbuf());
       } else {
+        if (output_location.is_open()){
+           output_location.close();
+        }
         output_location.open(location);
         if (!output_location.good()) {
           std::cout << "Invalid output file. Exiting." << std::endl;
@@ -103,6 +110,8 @@ namespace evo{
     using org_ptr = typename POP_MANAGER::value_type;
     // using world_type = World<ORG, MANAGERS...>;
     using fit_fun_type = std::function<double(org_ptr)>;
+    using StatsManager_Base<POP_MANAGER>::SetOutput;
+
     // Stats calculated on the world
     FunctionSet<double> stats;
 
@@ -196,6 +205,7 @@ namespace evo{
     using StatsManager_FunctionsOnUpdate<POP_MANAGER>::pop;
     using StatsManager_Base<POP_MANAGER>::output_location;
     using StatsManager_FunctionsOnUpdate<POP_MANAGER>::Update;
+    using StatsManager_FunctionsOnUpdate<POP_MANAGER>::SetOutput;
 
   public:
     using StatsManager_FunctionsOnUpdate<POP_MANAGER>::fit_fun;
@@ -266,11 +276,14 @@ namespace evo{
       lineage_type * lin_ptr;
       using ORG = typename std::remove_pointer<org_ptr>::type;
       std::unordered_map<ORG, MLandscape> table;
+      
+
 
   public:
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::fit_fun;
       using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
       using StatsManager_FunctionsOnUpdate<POP_MANAGER>::SetDefaultFitnessFun;
+      using StatsManager_FunctionsOnUpdate<POP_MANAGER>::SetOutput;
 
       //Constructor for use as a stand alone object
       template<typename WORLD>
@@ -344,8 +357,8 @@ namespace evo{
           AddFunction(ben_mut, "ben_mut");
           AddFunction(neu_mut, "neu_mut");
           AddFunction(det_mut, "det_mut");
-          AddFunction(max_ben, "max_ben");
-          AddFunction(max_det, "max_det");
+          //AddFunction(max_ben, "max_ben");
+          //AddFunction(max_det, "max_det");
           //AddFunction(coal_count, "coal_count");
 
           w->OnUpdate(UpdateFun);

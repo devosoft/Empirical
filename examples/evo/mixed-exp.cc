@@ -2,6 +2,7 @@
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//  Author: Steven Jorgensen
 //
 //  This file explores the template defined in evo::Population.h
 
@@ -21,7 +22,7 @@ EMP_BUILD_CONFIG( NKConfig,
   VALUE(K, int, 10, "Level of epistasis in the NK model"),
   VALUE(N, int, 50, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
   VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
-  VALUE(POP_SIZE, int, 1000, "Number of organisms in the popoulation."),
+  VALUE(POP_SIZE, int, 100, "Number of organisms in the popoulation."),
   VALUE(MAX_GENS, int, 2000, "How many generations should we process?"),
   VALUE(MUT_COUNT, double, 0.005, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
   VALUE(TOUR_SIZE, int, 20, "How many organisms should be picked in each Tournament?"),
@@ -47,42 +48,27 @@ int main(int argc, char* argv[])
   const int K = config.K();
   const int N = config.N();
   const double MUTATION_RATE = config.MUT_COUNT();
-
   const int TOURNAMENT_SIZE = config.TOUR_SIZE();
   const int POP_SIZE = config.POP_SIZE();
   const int UD_COUNT = config.MAX_GENS();
-
   emp::Random random(config.SEED());
   emp::evo::NKLandscape landscape(N, K, random);
-
   std::string prefix;
   prefix = config.NAME();
 
   // Create World
   MixedWorld<BitOrg> mixed_pop(random);
-
   std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return landscape.GetFitness(*org);};
-
   mixed_pop.SetDefaultFitnessFun(fit_func);
-
-  mixed_pop.statsM.SetDefaultFitnessFun(fit_func);
-
-  // make a stats manager
-  //emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Base<BitOrg>> 
-  //    mixed_stats (&mixed_pop, prefix + "mixed.csv");
-
-  //mixed_stats.SetDefaultFitnessFun(fit_func);
+  mixed_pop.statsM.SetOutput(prefix + "mixed.csv");
   
   // Insert default organisms into world
   for (int i = 0; i < POP_SIZE; i++) {
     BitOrg next_org(N);
     for (int j = 0; j < N; j++) next_org[j] = random.P(0.5);
     
-    // looking at the Insert() func it looks like it does a deep copy, so we should be safe in
-    // doing this. Theoretically...
     mixed_pop.Insert(next_org);
   }
-
 
   // mutation function:
   // for every site in the gnome there is a MUTATION_RATE chance that the 
@@ -101,10 +87,6 @@ int main(int argc, char* argv[])
 
   // Loop through updates
   for (int ud = 0; ud < UD_COUNT; ud++) {
-
-    // Keep the best individual.
-    //mixed_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1, 100);
-    // Run a tournament for the rest... 
     
     mixed_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
 			 , TOURNAMENT_SIZE, POP_SIZE);
