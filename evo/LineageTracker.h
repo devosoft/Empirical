@@ -500,7 +500,7 @@ namespace evo{
       //of duplicates lying around
       std::pair<typename std::unordered_set<ORG>::iterator, bool> ret;
       ret = genomes.insert(org);
-      typename std::set<ORG>::iterator it = ret.first;
+      typename std::unordered_set<ORG>::iterator it = ret.first;
       org_ptr genome = (org_ptr)&(*it);
       curr->genome = genome;
       if (ret.second) {
