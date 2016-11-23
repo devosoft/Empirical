@@ -1,16 +1,15 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_HARDWARE_CPU_TUBECODE_H
-#define EMP_HARDWARE_CPU_TUBECODE_H
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  HardwareCPU_TubeCode is a basic virtual CPU intended to represent and idealized Hardware
 //  for use in classroom projects.  It was originally developed for "CSE 450: Translation of
 //  Programming Languages" at Michigan State University.
-//
+
+
+#ifndef EMP_HARDWARE_CPU_TUBECODE_H
+#define EMP_HARDWARE_CPU_TUBECODE_H
 
 #include <functional>
 #include <map>
@@ -24,19 +23,20 @@ using namespace std::placeholders;
 
 namespace emp {
 
-  template <int NUM_REGS=8, int MEM_SIZE=65536, typename VAL_TYPE=double> class HardwareCPU_TubeCode
+  template <int NUM_REGS=8, int MEM_SIZE=65536, typename VAL_T=double>
+  class HardwareCPU_TubeCode
     : public HardwareCPU_Base<Instruction_TubeCode> {
   protected:
     // Hardware components...
-    typedef std::vector<emp::Instruction_TubeCode> CODE_TYPE;
-    typedef HardwareCPU_TubeCode<NUM_REGS, MEM_SIZE> HARDWARE_TYPE;
+    using code_t = std::vector<emp::Instruction_TubeCode>;
+    using hardware_t = HardwareCPU_TubeCode<NUM_REGS, MEM_SIZE>;
 
-    CODE_TYPE code;
-    VAL_TYPE memory[MEM_SIZE];                         // Memory!
-    VAL_TYPE regs[NUM_REGS];                           // Registers!
-    std::map<int, VAL_TYPE> var_map;                   // Variables!
-    std::map<int, std::vector<VAL_TYPE> > array_map;   // Arrays!
-    CPUHead IP;                                        // Instruction Pointer!
+    code_t code;
+    VAL_T memory[MEM_SIZE];                         // Memory!
+    VAL_T regs[NUM_REGS];                           // Registers!
+    std::map<int, VAL_T> var_map;                   // Variables!
+    std::map<int, std::vector<VAL_T> > array_map;   // Arrays!
+    CPUHead IP;                                     // Instruction Pointer!
 
     const InstLib<HardwareCPU_TubeCode, Instruction_TubeCode> & inst_lib;
 
@@ -45,8 +45,8 @@ namespace emp {
       : inst_lib(_inst_lib)
     {
       // Initialize all registers and memory.
-      for (VAL_TYPE & x : memory) x = 0;
-      for (VAL_TYPE & x : regs) x = 0;
+      for (VAL_T & x : memory) x = 0;
+      for (VAL_T & x : regs) x = 0;
       IP.Set(memory, 0);
     }
     HardwareCPU_TubeCode(const HardwareCPU_TubeCode & prototype)
@@ -57,8 +57,8 @@ namespace emp {
     void Clear() {
       // Initialize all registers and memory.
       code.resize(0);
-      for (VAL_TYPE & x : memory) x = 0;
-      for (VAL_TYPE & x : regs) x = 0;
+      for (VAL_T & x : memory) x = 0;
+      for (VAL_T & x : regs) x = 0;
       var_map.clear();
       array_map.clear();
       IP.Set(memory, 0);
@@ -85,9 +85,6 @@ namespace emp {
 
 
 
-
-
-
     // ===============  Instruction Definitions  ===============
     //
     // NOTE: Any arguments need to be bound during instruction library construction.
@@ -107,9 +104,9 @@ namespace emp {
       return true;
     }
 
-    static std::function<bool(HARDWARE_TYPE &)> BuildMathInst(const std::function<int(int)> & math_fun)
+    static std::function<bool(hardware_t &)> BuildMathInst(const std::function<int(int)> & math_fun)
     {
-      return [math_fun](HARDWARE_TYPE & hw){ return hw.Inst_1I_Math(math_fun); };
+      return [math_fun](hardware_t & hw){ return hw.Inst_1I_Math(math_fun); };
     }
     
 
@@ -128,16 +125,14 @@ namespace emp {
       return true;
     }
 
-    static std::function<bool(HARDWARE_TYPE&)>
-    BuildMathInst(const std::function<int(int,int)> & math_fun)
-    {
-      return [math_fun](HARDWARE_TYPE & hw){ return hw.Inst_2I_Math(math_fun); };
+    static std::function<bool(hardware_t&)>
+    BuildMathInst(const std::function<int(int,int)> & math_fun) {
+      return [math_fun](hardware_t & hw){ return hw.Inst_2I_Math(math_fun); };
     }
 
-    static std::function<bool(HARDWARE_TYPE&)>
-    BuildTestInst(const std::function<int(int,int)> & test_fun)
-    {
-      return [test_fun](HARDWARE_TYPE & hw){ return hw.template Inst_2I_Math<1,1,3>(test_fun); };
+    static std::function<bool(hardware_t&)>
+    BuildTestInst(const std::function<int(int,int)> & test_fun) {
+      return [test_fun](hardware_t & hw){ return hw.template Inst_2I_Math<1,1,3>(test_fun); };
     }
 
 
@@ -161,7 +156,8 @@ namespace emp {
       return true;
     }
 
-    template <int default_head_to_move, int default_mem_target> bool Inst_MoveHeadToMem() {
+    template <int default_head_to_move, int default_mem_target>
+    bool Inst_MoveHeadToMem() {
       const int head_move = ChooseTarget(default_head_to_move);
       const int mem_target = ChooseTarget(default_mem_target);
       if (memory[mem_target].size() == 0) return false; // Memory spaces must exist before jump.
@@ -207,87 +203,87 @@ namespace emp {
 
     // The following function generates a map of known instruction names to their definitions.
 
-    static const std::map<std::string, InstDefinition<HARDWARE_TYPE> > & GetInstDefs()
+    static const std::map<std::string, InstDefinition<hardware_t> > & GetInstDefs()
     {
       // This function will produce a unique defs map.  If we already have it, just return it.
-      static std::map<std::string, InstDefinition<HARDWARE_TYPE> > defs;
+      static std::map<std::string, InstDefinition<hardware_t> > defs;
       if (defs.size()) return defs;
 
       defs["Nop"]        = { "No-operation instruction; usable as modifier.",
-                             [](HARDWARE_TYPE & hw){ return hw.Inst_Nop(); } };
+                             [](hardware_t & hw){ return hw.Inst_Nop(); } };
       
       // Add single-argument math operations.
       defs["Inc"]        = { "Increment top of ?Stack-B? by one",
-                             HARDWARE_TYPE::BuildMathInst([](int a){ return a+1;}) };
+                             hardware_t::BuildMathInst([](int a){ return a+1;}) };
       
       defs["Dec"]        = { "Decrement top of ?Stack-B? by one",
-                             HARDWARE_TYPE::BuildMathInst([](int a){ return a-1;}) };
+                             hardware_t::BuildMathInst([](int a){ return a-1;}) };
       
       defs["Shift-L"]    = { "Shift bits of top of ?Stack-B? left by one",
-                             HARDWARE_TYPE::BuildMathInst([](int a){ return a<<1;}) };
+                             hardware_t::BuildMathInst([](int a){ return a<<1;}) };
       
       defs["Shift-R"]    = { "Shift bits of top of ?Stack-B? right by one",
-                             HARDWARE_TYPE::BuildMathInst([](int a){ return a>>1;}) };
+                             hardware_t::BuildMathInst([](int a){ return a>>1;}) };
       
       // Add double-argument math operations.
       defs["Nand"]       = { "Compute: ?Stack-B?-top nand ?Stack-C?-top and push result to ?Stack-B?",
-                             HARDWARE_TYPE::BuildMathInst([](int a, int b){ return ~(a&b); }) };
+                             hardware_t::BuildMathInst([](int a, int b){ return ~(a&b); }) };
       
       defs["Add"]        = { "Compute: ?Stack-B?-top plus ?Stack-C?-top and push result to ?Stack-B?",
-                             HARDWARE_TYPE::BuildMathInst([](int a, int b){ return a+b; }) };
+                             hardware_t::BuildMathInst([](int a, int b){ return a+b; }) };
       
       defs["Sub"]        = { "Compute: ?Stack-B?-top minus ?Stack-C?-top and push result to ?Stack-B?",
-                             HARDWARE_TYPE::BuildMathInst([](int a, int b){ return a-b; }) };
+                             hardware_t::BuildMathInst([](int a, int b){ return a-b; }) };
       
       defs["Mult"]       = { "Compute: ?Stack-B?-top times ?Stack-C?-top and push result to ?Stack-B?",
-                             HARDWARE_TYPE::BuildMathInst([](int a, int b){ return a*b; }) };
+                             hardware_t::BuildMathInst([](int a, int b){ return a*b; }) };
       
       // @CAO For the next two, ideally if b==0, we should have the instruction return false...
       defs["Div"]        = { "Compute: ?Stack-B?-top div ?Stack-C?-top and push result to ?Stack-B?",
-                             HARDWARE_TYPE::BuildMathInst([](int a, int b){ return b?a/b:0; }) };
+                             hardware_t::BuildMathInst([](int a, int b){ return b?a/b:0; }) };
       
       defs["Mod"]        = { "Compute: ?Stack-B?-top mod ?Stack-C?-top and push result to ?Stack-B?",
-                             HARDWARE_TYPE::BuildMathInst([](int a, int b){ return b?a%b:0; }) };
+                             hardware_t::BuildMathInst([](int a, int b){ return b?a%b:0; }) };
       
       // Conditionals
       defs["Test-Equal"] = { "Test if ?Stack-B?-top == ?Stack-C?-top and push result to ?Stack-D?",
-                             HARDWARE_TYPE::BuildTestInst([](int a, int b){ return a==b; }) };
+                             hardware_t::BuildTestInst([](int a, int b){ return a==b; }) };
       
       defs["Test-NEqual"] = { "Test if ?Stack-B?-top != ?Stack-C?-top and push result to ?Stack-D?",
-                              HARDWARE_TYPE::BuildTestInst([](int a, int b){ return a!=b; }) };
+                              hardware_t::BuildTestInst([](int a, int b){ return a!=b; }) };
       
       defs["Test-Less"]  = { "Test if ?Stack-B?-top < ?Stack-C?-top and push result to ?Stack-D?",
-                             HARDWARE_TYPE::BuildTestInst([](int a, int b){ return a<b; }) };
+                             hardware_t::BuildTestInst([](int a, int b){ return a<b; }) };
       
       defs["Test-AtStart"] = { "Test if ?Head-Read? is at mem position 0 and push result to ?Stack-D?",
-                               std::mem_fn(&HARDWARE_TYPE::Inst_TestAtStart) };
+                               std::mem_fn(&hardware_t::Inst_TestAtStart) };
       
       // Load in Jump operations  [we neeed to do better...  push and pop heads?]
       defs["Jump"]       = { "Move ?Head-IP? to position of ?Head-Flow?",
-                             std::mem_fn(&HARDWARE_TYPE::template Inst_MoveHeadToHead<0, 3>) };
+                             std::mem_fn(&hardware_t::template Inst_MoveHeadToHead<0, 3>) };
       defs["Jump-If0"]   = { "Move ?Head-IP? to position of ?Head-Flow? only if ?Stack-D?-top == 0",
-                             [](HARDWARE_TYPE & hw){return hw.template Inst_MoveHeadToHeadIf<0,3,3>([](int a){ return a==0; }); } };
+                             [](hardware_t & hw){return hw.template Inst_MoveHeadToHeadIf<0,3,3>([](int a){ return a==0; }); } };
       defs["Jump-IfN0"]  = { "Move ?Head-IP? to position of ?Head-Flow? only if ?Stack-D?-top != 0",
-                             [](HARDWARE_TYPE & hw){return hw.template Inst_MoveHeadToHeadIf<0,3,3>([](int a){ return a!= 0; }); } };
+                             [](hardware_t & hw){return hw.template Inst_MoveHeadToHeadIf<0,3,3>([](int a){ return a!= 0; }); } };
       defs["Bookmark"]   = { "Move ?Head-Flow? to position of ?Head-IP?",
-                             std::mem_fn(&HARDWARE_TYPE::template Inst_MoveHeadToHead<3, 0>) };
+                             std::mem_fn(&hardware_t::template Inst_MoveHeadToHead<3, 0>) };
       defs["Set-Memory"] = { "Move ?Head-Write? to position 0 in ?Memory-1?",
-                             std::mem_fn(&HARDWARE_TYPE::template Inst_MoveHeadToMem<2, 1>) };
+                             std::mem_fn(&hardware_t::template Inst_MoveHeadToMem<2, 1>) };
       // "Find-Label" ********** - Jumps the flow head to a complement label (?...) in current memory.
       
       // Juggle stack contents
       defs["Val-Move"]   = { "Pop ?Stack-B? and push value onto ?Stack-C?",
-                             [](HARDWARE_TYPE & hw){return hw.template Inst_1I_Math<1,1>([](int a){ return a; }); } };
+                             [](hardware_t & hw){return hw.template Inst_1I_Math<1,1>([](int a){ return a; }); } };
       defs["Val-Copy"]   = { "Copy top of ?Stack-B? onto ?Stack-C?",
-                             [](HARDWARE_TYPE & hw){return hw.template Inst_1I_Math<1,1,false>([](int a){ return a; }); } };
+                             [](hardware_t & hw){return hw.template Inst_1I_Math<1,1,false>([](int a){ return a; }); } };
       defs["Val-Delete"] = { "Pop ?Stack-B? and discard value",
-                             std::mem_fn(&HARDWARE_TYPE::Inst_ValDelete) };
+                             std::mem_fn(&hardware_t::Inst_ValDelete) };
       defs["PushConst"]  = { "Push a specified value onto ?Stack-B?",
-                             [](HARDWARE_TYPE & hw, int value){ return hw.Inst_PushConst(value); } };
+                             [](hardware_t & hw, int value){ return hw.Inst_PushConst(value); } };
       
       // Check for "Biological" instructions
       defs["Build-Inst"] = { "Add new instruction to end of ?Memory-1? copied from ?Head-Read?",
-                             std::mem_fn(&HARDWARE_TYPE::Inst_BuildInst) };
+                             std::mem_fn(&hardware_t::Inst_BuildInst) };
       // "Divide" **********      - Moves memory space 1 (?1) into its own hardware.  Needs callback!
       // "Get-Input" **********   - Needs callback
       // "Get-Output" **********  - Needs callback
