@@ -48,5 +48,10 @@ namespace emp {
       
     using return_t = RETURN;   // Make return type easily accessible.
   };
-  
+
+
+  template <typename RETURN, typename... ARGS>
+  auto make_action(const std::function<RETURN(ARGS...)> & in_fun, const std::string & name) {
+    return Action<RETURN, ARGS...>(in_fun, name);
+  }
 }
