@@ -15,5 +15,6 @@ int main()
 
   emp::Action<int,int,int> sum_action(sum_fun, "sum");
   std::cout << "Ping!" << std::endl;
+  std::cout << "5+6 = " << sum_action.Call(5,6) << std::endl;
 }
 
