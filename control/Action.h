@@ -15,27 +15,34 @@
 namespace emp {
 
   class ActionBase {
-  private:
+  protected:
     std::string name;
-  public:
+
     ActionBase(const std::string & in_name) : name(in_name) { ; }
+
+    ActionBase(const ActionBase &) = default;
+    ActionBase(ActionBase &&) = default;
+    ActionBase & operator=(const ActionBase &) = default;
+    ActionBase & operator=(ActionBase &&) = default;
+  public:
     virtual ~ActionBase() { ; }
 
     const std::string & GetName() { return name; }
     virtual int GetArgCount() const = 0;
+
   };
 
   template <int ARG_COUNT>
   class ActionSize : public ActionBase {
-  public:
+  protected:
     ActionSize(const std::string & in_name) : ActionBase(in_name) { ; }
-    
+  public:
     int GetArgCount() const { return ARG_COUNT; }
   };
 
   template <typename RETURN, typename... ARGS>
   class Action : public ActionSize<sizeof...(ARGS)> {
-  private:
+  protected:
     std::function<RETURN(ARGS...)> fun;
     using parent_t = ActionSize<sizeof...(ARGS)>;
   public:
