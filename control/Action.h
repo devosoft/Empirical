@@ -40,20 +40,19 @@ namespace emp {
     int GetArgCount() const { return ARG_COUNT; }
   };
 
-  template <typename RETURN, typename... ARGS>
+  template <typename... ARGS>
   class Action : public ActionSize<sizeof...(ARGS)> {
   protected:
-    std::function<RETURN(ARGS...)> fun;
+    std::function<void(ARGS...)> fun;
     using parent_t = ActionSize<sizeof...(ARGS)>;
   public:
-    Action(const std::function<RETURN(ARGS...)> & in_fun, const std::string & in_name)
-      : parent_t(in_name), fun(in_fun) { ; }    
-    
-    RETURN Call(ARGS... args) {
+    Action(const std::function<void(ARGS...)> & in_fun, const std::string & in_name)
+      : parent_t(in_name), fun(in_fun) { ; }
+
+    void Call(ARGS... args) {
       return fun(std::forward<ARGS>(args)...);
     }
-      
-    using return_t = RETURN;   // Make return type easily accessible.
+
   };
 
 
