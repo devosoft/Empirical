@@ -49,10 +49,9 @@ namespace emp {
     Action(const std::function<void(ARGS...)> & in_fun, const std::string & in_name)
       : parent_t(in_name), fun(in_fun) { ; }
 
-    void Call(ARGS... args) {
-      return fun(std::forward<ARGS>(args)...);
-    }
+    const std::function<void(ARGS...)> & GetFun() const { return fun; };
 
+    void Call(ARGS... args) { return fun(std::forward<ARGS>(args)...); }
   };
 
 
