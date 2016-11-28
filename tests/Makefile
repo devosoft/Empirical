@@ -16,6 +16,10 @@ test-%: test_%.cc
 test: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
+test-web:
+	  cd web && bash run_tests.sh
+	  cd .. && third-party/node_modules/karma/bin/karma start tests/web/karma.conf.js
+
 clean:
 	rm -f *.out
 	rm -f *.o
@@ -25,3 +29,4 @@ clean:
 	rm -f *.gcov
 	rm -f ./Coverage*
 	rm -rf ./temp
+	cd web && make clean

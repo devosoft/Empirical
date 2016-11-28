@@ -420,8 +420,8 @@ namespace web {
 
 
       virtual void GetHTML(std::stringstream & HTML) override {
-        emp_assert(cols.size() == 0 || cols.size() == col_count);
-        emp_assert(col_groups.size() == 0 || col_groups.size() == col_count);
+        emp_assert(cols.size() == 0 || cols.size() == (std::size_t) col_count);
+        emp_assert(col_groups.size() == 0 || col_groups.size() == (std::size_t) col_count);
 
         HTML.str("");                                           // Clear the current text.
         HTML << "<table id=\"" << id << "\">";
@@ -598,9 +598,9 @@ namespace web {
 
 
       void ReplaceHTML() override {
-        emp_assert(cols.size() == 0 || cols.size() == col_count);
-        emp_assert(col_groups.size() == 0 || col_groups.size() == col_count);
-        emp_assert(row_groups.size() == 0 || row_groups.size() == row_count);
+        emp_assert(cols.size() == 0 || cols.size() == (std::size_t) col_count);
+        emp_assert(col_groups.size() == 0 || col_groups.size() == (std::size_t) col_count);
+        emp_assert(row_groups.size() == 0 || row_groups.size() == (std::size_t) row_count);
 
         // Replace Table's HTML...
         internal::WidgetInfo::ReplaceHTML();

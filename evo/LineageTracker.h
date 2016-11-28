@@ -17,11 +17,40 @@
 #ifndef EMP_LINEAGE_TRACKER_H
 #define EMP_LINEAGE_TRACKER_H
 
+#include <unordered_map>
 #include <map>
 #include <set>
+#include <unordered_set>
 #include <algorithm>
+#include <fstream>
 #include "../tools/vector.h"
 #include "PopulationManager.h"
+
+template <typename org_ptr>
+struct Node {
+  Node* parent;
+  int id;
+  int loc;
+  bool alive;
+  org_ptr genome;
+  emp::vector<Node*> offspring;
+};
+
+namespace std
+{
+    //from fredoverflow's answer to
+    //http://stackoverflow.com/questions/8026890/c-how-to-insert-array-into-hash-set
+    template<typename T> struct hash<Node<T> >
+    {
+        typedef Node<T> argument_type;
+        typedef std::size_t result_type;
+        result_type operator()(argument_type const& s) const
+        {
+            result_type const h1 ( std::hash<int>()(s.id) );
+            return h1;
+        }
+    };
+}
 
 namespace emp{
 namespace evo{
@@ -45,11 +74,11 @@ namespace evo{
     using org_ptr = typename POP_MANAGER::value_type;
     using ORG = typename std::remove_pointer<org_ptr>::type;
     static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
+
   public:
+    std::unordered_map<int, Node<org_ptr> > nodes;
     static constexpr bool emp_is_lineage_manager = true;
-    std::set<ORG> genomes;
-    std::map<int, org_ptr> org_to_genome;
-    std::map<int, int> parents;
+    std::unordered_set<ORG> genomes;
     int next = 1; //0 indicates no parent
     int next_parent_id = -1;
     int next_org_id = 1;
@@ -71,19 +100,34 @@ namespace evo{
 
     template <typename WORLD>
     void Setup(WORLD * w){
+
+      nodes[0] = Node<org_ptr>();
+      nodes[0].id = 0;
+      nodes[0].parent = &nodes[0];
+      nodes[0].alive = false;
+      nodes[0].loc = -1;
+
       std::function<void(int)> RecordParentFun = [this] (int id){
+        // std::cout << "Record parent" << std::endl;
         RecordParent(id);
       };
 
       std::function<void(int)> TrackPlacementFun = [this] (int pos){
+        // std::cout << "Record place" << std::endl;
         TrackPlacement(pos);
       };
 
-      std::function<void(org_ptr)> TrackOffspringFun = [this] (org_ptr org){
+      std::function<void(int)> TrackDeathFun = [this] (int pos){
+        TrackDeath(pos);
+      };
+
+      const std::function<void(const ORG*)> TrackOffspringFun = [this] (const ORG* org){
+        // std::cout << "Record offspring" << std::endl;
         TrackOffspring(org);
       };
 
-      std::function<void(org_ptr)> TrackInjectedOffspringFun = [this] (org_ptr org){
+      const std::function<void(const ORG*)> TrackInjectedOffspringFun = [this] (const ORG* org){
+        // std::cout << "Record offspring inject" << std::endl;
         TrackInjectedOffspring(org);
       };
 
@@ -95,6 +139,7 @@ namespace evo{
       w->OnOffspringReady(TrackOffspringFun);
       w->OnInjectReady(TrackInjectedOffspringFun);
       w->OnOrgPlacement(TrackPlacementFun);
+      w->OnOrgDeath(TrackDeathFun);
       w->OnUpdate(UpdateFun);
     }
 
@@ -104,22 +149,34 @@ namespace evo{
 
     //Put newly born organism into the lineage tracker
 
+    void TrackDeath(int pos) {
+      if (pos < 0) {
+        return;
+      }
+      int id = generation_since_update[pos];
+      nodes[id].alive = false;
+      generation_since_update[pos] = 0;
+    }
+
     void Update(int i) {
       if (separate_generations) {
         //TODO: This isn't sufficient - need to add signals for any
         //population change event
+        for (int id : generation_since_update) {
+          nodes[id].alive = false;
+        }
         generation_since_update = new_generation;
         new_generation.resize(0);
       }
     }
 
-    void TrackOffspring(org_ptr org) {
+    void TrackOffspring(const ORG* org) {
       next_org_id = this->AddOrganism(*org, next_parent_id);
       inject = false;
     }
 
     //Put newly injected organism into the lineage tracker
-    void TrackInjectedOffspring(org_ptr org) {
+    void TrackInjectedOffspring(const ORG* org) {
       next_org_id = this->AddOrganism(*org, 0);
       inject = true;
     }
@@ -128,18 +185,22 @@ namespace evo{
     //we can translate their ids from the World to ids within the lineage
     //tracker
     void TrackPlacement(int pos) {
+      nodes[next_org_id].loc = pos;
+
       if (separate_generations && !inject){
-        if (pos >= new_generation.size()) {
+        if (pos >= (int) new_generation.size()) {
           new_generation.resize(pos+1);
         }
         new_generation[pos] = next_org_id;
 
       } else {
-        if (pos >= generation_since_update.size()) {
+        if (pos >= (int) generation_since_update.size()) {
           generation_since_update.resize(pos+1);
         }
+        nodes[generation_since_update[pos]].alive = false;
         generation_since_update[pos] = next_org_id;
       }
+
     }
 
     //Record the org that's about to have an offspring, so we can know
@@ -154,38 +215,124 @@ namespace evo{
     // organism you added
     int AddOrganism(ORG org, int parent) {
       int id = this->next++;
-      std::pair<typename std::set<ORG>::iterator, bool> ret;
+      std::pair<typename std::unordered_set<ORG>::iterator, bool> ret;
       ret = genomes.insert(org);
-      typename std::set<ORG>::iterator it = ret.first;
+      typename std::unordered_set<ORG>::iterator it = ret.first;
       org_ptr genome = (org_ptr)&(*it);
-      this->org_to_genome[id] = genome;
-      this->parents[id] = parent;
+
+      Node<org_ptr>* curr = &nodes[id];
+      curr->parent = &nodes[parent];
+      curr->parent->offspring.push_back(&nodes[id]);
+      curr->id = id;
+      curr->alive = true;
+      curr->genome = genome;
+
       return id;
     }
 
     // Return a vector containing the genomes of an organism's ancestors
-    emp::vector<org_ptr> TraceLineage(int org_id) {
-      emp::vector<org_ptr> lineage;
-      while(org_id) {
-        lineage.push_back(this->org_to_genome[org_id]);
-        org_id = this->parents[org_id];
+    emp::vector<int> TraceLineageIDs(int org_id) {
+      emp::vector<int> lineage;
+      emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
+      Node<org_ptr>* org = &(nodes[org_id]);
+      while(org->id) {
+        lineage.push_back(org->id);
+        org = org->parent;
       }
       return lineage;
 
     }
 
     //Return a vector containing the IDs of an oraganism's ancestors
-    emp::vector<int> TraceLineageIDs(int org_id) {
-      emp::vector<org_ptr> lineage;
-
-      while(org_id) {
-        lineage.push_back(org_id);
-        org_id = this->parents[org_id];
+    emp::vector<ORG> TraceLineage(int org_id) {
+      emp::vector<ORG> lineage;
+      emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
+      Node<org_ptr>* org = &(nodes[org_id]);
+      while(org->id) {
+        lineage.push_back(*(org->genome));
+        org = org->parent;
       }
-
       return lineage;
 
     }
+
+    //Takes a container of ints representing org ids (as assigned by the lineage)
+    //tracker, and returns a contatiner of the genomes of those ints.
+    template <template <typename> class C >
+    C<ORG> IDsToGenomes(C<int> & ids) {
+      C<ORG> genome_group;
+      for (int id : ids){
+        genome_group.insert(genome_group.back(), *(this->nodes[id].genome));
+      }
+      return genome_group;
+    }
+
+    //Specialization for emp::vector so we can use push_back
+    emp::vector<ORG> IDsToGenomes(emp::vector<int> & ids) {
+      emp::vector<ORG> genome_group;
+      for (int id : ids){
+        genome_group.push_back(*(this->nodes[id].genome));
+      }
+      return genome_group;
+    }
+
+    std::string node_to_json(Node<org_ptr> * node) {
+      std::stringstream ss;
+      ss << "{\"name\":";
+      ss << to_string(node->id);
+      ss << ", \"parent\":";
+      ss << to_string(node->parent->id);
+      ss << ", \"alive\":";
+      if (node->alive){
+        ss << "true";
+      } else {
+        ss << "false";
+      }
+      ss << ", \"loc\":";
+      ss << to_string(node->loc);
+      ss << ", \"persist\":false, \"genome\":\"";
+      if (node->genome != nullptr) {
+        ss << to_string(*(node->genome));
+      } else {
+        ss << "null";
+      }
+      ss << "\", \"children\":[";
+      for (size_t i=0; i < node->offspring.size(); ++i) {
+        ss << node_to_json(node->offspring[i]);
+        if (i < node->offspring.size()-1) {
+          ss << ", ";
+        }
+      }
+      ss << "]}";
+      return ss.str();
+    }
+
+    void WriteDataToFile(std::string filename) {
+      std::ofstream output_location;
+      output_location.open(filename);
+      std::string output = node_to_json(&nodes[0]);
+      output_location << "[" << output << "]" << std::endl;
+      output_location.close();
+    }
+
+  };
+
+  /// A lineage tracker object to be used outside of the Empirical evol framework
+  template <typename ORG>
+  class LineageTracker_Standalone : public LineageTracker<PopulationManager_Base<ORG> > {
+  protected:
+    bool separate_generations;
+
+  public:
+
+    /// Construct a stand-alone lineage tracker. You must specify whether or not your
+    /// system has separated generations (i.e. generations which are separated, rather than
+    /// having a steady-state population in which there is a death for every birth)
+    // Development note: There is no default value for separate_generations, because both
+    // set-ups are common, and making the wrong assumption would produce wrong results in either
+    // direction
+    LineageTracker_Standalone(bool has_separate_generations) :
+        separate_generations(has_separate_generations) {;}
 
   };
 
@@ -196,28 +343,20 @@ namespace evo{
     using org_ptr = typename LineageTracker<POP_MANAGER>::org_ptr;
     using ORG = typename LineageTracker<POP_MANAGER>::ORG;
 
-    struct Node {
-      Node* parent;
-      int id;
-      bool alive;
-      org_ptr genome;
-      emp::vector<Node*> offspring;
-    };
-
     using LineageTracker<POP_MANAGER>::next_org_id;
     using LineageTracker<POP_MANAGER>::next_parent_id;
-    using LineageTracker<POP_MANAGER>::generation_since_update;
     using LineageTracker<POP_MANAGER>::separate_generations;
     using LineageTracker<POP_MANAGER>::genomes;
     using LineageTracker<POP_MANAGER>::new_generation;
     using LineageTracker<POP_MANAGER>::inject;
-
-    std::map<int, Node> nodes;
+    using LineageTracker<POP_MANAGER>::nodes;
     std::map<ORG, int> genome_counts;
 
   public:
+    using LineageTracker<POP_MANAGER>::generation_since_update;
     int last_coalesence = 0;
     using LineageTracker<POP_MANAGER>::emp_is_lineage_manager;
+    // Add WriteDataToFile
     LineageTracker_Pruned() {;}
 
     template <typename WORLD>
@@ -234,28 +373,29 @@ namespace evo{
     void Setup(WORLD * w){
 
       //Initialize null org to act as parent for inserted orgs
-      nodes[0] = Node();
+      nodes[0] = Node<org_ptr>();
       nodes[0].id = 0;
       nodes[0].parent = &nodes[0];
       nodes[0].alive = false;
+      nodes[0].loc = -1;
 
-      std::function<void(int)> RecordParentFun = [this] (int id){
+      const std::function<void(int)> RecordParentFun = [this] (int id){
         RecordParent(id);
       };
 
-      std::function<void(int)> TrackPlacementFun = [this] (int pos){
+      const std::function<void(int)> TrackPlacementFun = [this] (int pos){
         TrackPlacement(pos);
       };
 
-      std::function<void(org_ptr)> TrackOffspringFun = [this] (org_ptr org){
+      const std::function<void(const org_ptr)> TrackOffspringFun = [this] (const org_ptr org){
         TrackOffspring(org);
       };
 
-      std::function<void(org_ptr)> TrackInjectedOffspringFun = [this] (org_ptr org){
+      const std::function<void(const org_ptr)> TrackInjectedOffspringFun = [this] (const org_ptr org){
         TrackInjectedOffspring(org);
       };
 
-      std::function<void(int)> UpdateFun = [this] (int ud){
+      const std::function<void(int)> UpdateFun = [this] (int ud){
         Update(ud);
       };
 
@@ -269,13 +409,13 @@ namespace evo{
     ~LineageTracker_Pruned() {;}
 
 
-    void TrackOffspring(org_ptr org) {
+    void TrackOffspring(const org_ptr org) {
       next_org_id = this->AddOrganism(*org, next_parent_id);
       inject = false;
     }
 
     //Put newly injected organism into the lineage tracker
-    void TrackInjectedOffspring(org_ptr org) {
+    void TrackInjectedOffspring(const org_ptr org) {
       next_org_id = this->AddOrganism(*org, 0);
       inject = true;
     }
@@ -287,11 +427,13 @@ namespace evo{
 
       //Once things can die we'll need something better here
 
+      nodes[next_org_id].loc = pos;
+
       //This org is no longer alive
-      if (generation_since_update.size() <= pos){
+      if ( (int) generation_since_update.size() <= pos){
         generation_since_update.resize(pos+1);
       }
-      Node* curr = &(nodes[generation_since_update[pos]]);
+      Node<org_ptr>* curr = &(nodes[generation_since_update[pos]]);
       curr->alive = false;
 
       //If this org doesn't have any surviving offspring lineages, we can
@@ -318,7 +460,7 @@ namespace evo{
         }
 
         //See if we can remove parent too
-        Node* old = curr;
+        Node<org_ptr>* old = curr;
         curr = curr->parent;
         nodes.erase(old->id);
       }
@@ -335,17 +477,18 @@ namespace evo{
 
       //Update mapping of lineage tracker ids to locations in population
       if (separate_generations && !inject){
-        if (pos >= new_generation.size()) {
+        if (pos >= (int) new_generation.size()) {
           new_generation.resize(pos+1);
         }
         new_generation[pos] = next_org_id;
 
       } else {
-        if (pos >= generation_since_update.size()) {
+        if (pos >= (int) generation_since_update.size()) {
           generation_since_update.resize(pos+1);
         }
         generation_since_update[pos] = next_org_id;
       }
+
     }
 
     //Record the org that's about to have an offspring, so we can know
@@ -358,13 +501,13 @@ namespace evo{
     // and parent is the id of the parent. The lineage tracker is in charge
     // of assigning ids, and will return an int representing the id of the
     // organism you added
-    int AddOrganism(ORG org, int parent) {
+    int AddOrganism(const ORG org, int parent) {
 
       int id = this->next++;
 
       //Create stuct to store info on this organism
-      nodes[id] = Node();
-      Node* curr = &nodes[id];
+      nodes[id] = Node<org_ptr>();
+      Node<org_ptr>* curr = &nodes[id];
       curr->parent = &nodes[parent];
       curr->parent->offspring.push_back(&nodes[id]);
       curr->id = id;
@@ -372,9 +515,9 @@ namespace evo{
 
       //Store genomes in a set so we don't need to have a bunch
       //of duplicates lying around
-      std::pair<typename std::set<ORG>::iterator, bool> ret;
+      std::pair<typename std::unordered_set<ORG>::iterator, bool> ret;
       ret = genomes.insert(org);
-      typename std::set<ORG>::iterator it = ret.first;
+      typename std::unordered_set<ORG>::iterator it = ret.first;
       org_ptr genome = (org_ptr)&(*it);
       curr->genome = genome;
       if (ret.second) {
@@ -383,49 +526,23 @@ namespace evo{
         genome_counts[*genome]++;
       }
 
-      this->parents[id] = parent;
 
       return id;
     }
 
 
     void Update(int i) {
+
       if (separate_generations) {
         //TODO: This isn't sufficient - need to add signals for any
         //population change event
+        for (int id : generation_since_update) {
+          nodes[generation_since_update[id]].alive = false;
+        }
         generation_since_update = new_generation;
         new_generation.resize(0);
       }
     }
-
-    // Return a vector containing the genomes of an organism's ancestors
-    emp::vector<int> TraceLineageIDs(int org_id) {
-      emp::vector<int> lineage;
-      emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
-      Node* org = &(nodes[org_id]);
-      while(org->id) {
-        lineage.push_back(org->id);
-        org = org->parent;
-      }
-
-      return lineage;
-
-    }
-
-    //Return a vector containing the IDs of an oraganism's ancestors
-    emp::vector<ORG> TraceLineage(int org_id) {
-      emp::vector<ORG> lineage;
-      emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
-      Node* org = &(nodes[org_id]);
-      while(org->id) {
-        lineage.push_back(*(org->genome));
-        org = org->parent;
-      }
-      return lineage;
-
-    }
-
-
 };
 
 

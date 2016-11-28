@@ -1,7 +1,4 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
+
 //
 // A simple class to choose items with a probability proportional to their weight.
 //
@@ -33,6 +30,7 @@
 
 namespace emp {
 
+  /// A simple class to choose items with a probability proportional to their weight.
   class ProbSchedule {
   private:
     const int num_items;
@@ -57,6 +55,9 @@ namespace emp {
     }
 
   public:
+
+    /// num_items is the maximum number of items that can be placed into the data structure.
+    /// random_seed is the seed for the random number generator used; values < 0 base seed on time.
     ProbSchedule(int _items, int seed=-1) : num_items(_items), weights(_items+1), tree_weights(_items+1), m_rng(seed) {
       for (int i = 0; i < (int) weights.size(); i++)  weights[i] = tree_weights[i] = 0.0;
     }
@@ -69,6 +70,7 @@ namespace emp {
 
     double GetWeight(int id) const { return weights[id]; }
     double GetSubtreeWeight(int id) const { return tree_weights[id]; }
+
 
     void Adjust(int id, const double _weight) {
       weights[id] = _weight;
@@ -89,6 +91,7 @@ namespace emp {
       }
     }
 
+    /// Returns a random id based on the weights provided.
     int NextID() {
       const double total_weight = tree_weights[0];
 

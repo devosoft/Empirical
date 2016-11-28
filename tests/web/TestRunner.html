@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <title> Tests </title>
+        <link rel="stylesheet" href="../../third-party/node_modules/mocha/mocha.css" />
+    </head>
+    <body>
+        <div id="mocha"></div>
+        <script src="../../third-party/node_modules/mocha/mocha.js"></script>
+        <script src="../../third-party/node_modules/chai/chai.js"></script>
+        <script src="../../web/d3/d3.min.js"></script>
+        <script src="../../web/d3/d3-tip.js"></script>
+        <script src="../../examples/web/jquery-1.11.2.min.js"></script>
+        <script>
+            mocha.ui('bdd');
+            mocha.reporter('html');
+            var assert = chai.assert;
+        </script>
+        <script type="text/javascript">
+          window.Testee = {
+            provider: {
+              type: 'rest'
+            }
+          };
+        </script>
+        <div id="line_graph"></div>
+        <div id="tree_viz"></div>
+        <script src="test_visualizations.js"></script>
+        <script>
+        onload = function(){
+          mocha.run();
+        };
+        </script>
+    </body>
+</html>

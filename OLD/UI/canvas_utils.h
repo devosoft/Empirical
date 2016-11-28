@@ -13,7 +13,7 @@
 
 #include "Canvas.h"
 
-#include "../emtools/color_map.h"
+#include "../web/color_map.h"
 #include "../geometry/Circle2D.h"
 #include "../geometry/Surface2D.h"
 #include "../tools/BitMatrix.h"

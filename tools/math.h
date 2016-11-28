@@ -32,14 +32,18 @@ namespace emp {
 
   }
 
-  // And a more generic compile-time log calculator.
+  /// @endcond
+
+  /// Compile-time log base 2 calculator.
   static constexpr double Log2(double x) {
     return (x < 1.0) ? Log2_frac(x) : Log2_pos(x);
   }
 
-  // Log varients
+  /// Compile-time log calculator
   static constexpr double Log(double x, double base=10.0) { return Log2(x) / Log2(base); }
+  /// Compile-time natural log calculator
   static constexpr double Ln(double x) { return Log(x, emp::E); }   // Natural Log...
+  /// Compile-time log base 10 calculator.
   static constexpr double Log10(double x) { return Log(x, 10.0); }
 
   namespace {
@@ -65,21 +69,21 @@ namespace emp {
     return Pow2(Log2(emp::E) * exp);  // convert to a base of e.
   }
 
-  // A compile-time exponentiation calculator.
+  /// A compile-time exponentiation calculator.
   template <typename TYPE>
   static constexpr TYPE IntPow(TYPE base, TYPE exp) {
     return exp < 1 ? 1 : (base * IntPow(base, exp-1));
   }
 
-  // A compile-time int-log calculator (aka, significant bits)
+  /// A compile-time int-log calculator (aka, significant bits)
   template <typename TYPE>
   static constexpr int IntLog2(TYPE x) { return x <= 1 ? 0 : (IntLog2(x/2) + 1); }
 
-  // A compile-time bit counter.
+  /// A compile-time bit counter.
   template <typename TYPE>
   static constexpr int CountOnes(TYPE x) { return x == 0 ? 0 : (CountOnes(x/2) + (x&1)); }
 
-  // Quick bit-mask generators...
+  /// Quick bit-mask generators...
   template <typename TYPE>
   static constexpr TYPE MaskLow(int num_bits) {
     return (num_bits == 8*sizeof(TYPE)) ? -1 : ((((TYPE)1) << num_bits) - 1);

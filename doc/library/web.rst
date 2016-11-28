@@ -36,6 +36,11 @@ The Empirical Web Module Documentation
 .. doxygenfile:: web/canvas_utils.h
    :project: Empirical
 
+**web/color_map.h**
+
+.. doxygenfile:: web/color_map.h
+  :project: Empirical
+
 
 **web/commands.h**
 
@@ -48,6 +53,10 @@ The Empirical Web Module Documentation
 .. doxygenfile:: web/Document.h
    :project: Empirical
 
+**web/emfunctions.h**
+
+.. doxygenfile:: web/emfunctions.h
+  :project: Empirical
 
 **web/events.h**
 
@@ -60,17 +69,49 @@ The Empirical Web Module Documentation
 .. doxygenfile:: web/FileInput.h
    :project: Empirical
 
+**web/Font.h**
+
+.. doxygenfile:: web/Font.h
+  :project: Empirical
+
+
+**web/html5_events.h**
+
+.. doxygenfile:: web/html5_events.h
+   :project: Empirical
+
 
 **web/Image.h**
 
 .. doxygenfile:: web/Image.h
    :project: Empirical
 
+**web/init.h**
+
+.. doxygenfile:: web/init.h
+  :project: Empirical
+
+**web/js_utils.h**
+
+.. doxygenfile:: web/js_utils.h
+   :project: Empirical
+
+.. _JSWrap:
+
+**web/JSWrap.h**
+
+.. doxygenfile:: web/JSWrap.h
+  :project: Empirical
 
 **web/keypress.h**
 
 .. doxygenfile:: web/keypress.h
    :project: Empirical
+
+**web/RawImage.h**
+
+.. doxygenfile:: web/RawImage.h
+  :project: Empirical
 
 
 **web/Selector.h**
@@ -125,10 +166,3 @@ The Empirical Web Module Documentation
 
 .. doxygenfile:: web/web_init.h
    :project: Empirical
-
-
-**web/Widget.h**
-
-.. doxygenfile:: web/Widget.h
-   :project: Empirical
-

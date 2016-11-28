@@ -28,9 +28,18 @@ addons:
     packages:
     - g++-5
     - cmake
+    - build-essential
     - bison
     - python-virtualenv
     - python-pip
+    - nodejs
+    - tar
+    - gzip
+before_script:
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
+- sleep 3 # give xvfb some time to start
 script:
 - git fetch origin master:refs/remotes/origin/master
+- npm install source-map
 - make travis

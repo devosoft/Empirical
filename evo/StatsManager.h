@@ -33,6 +33,7 @@ namespace evo{
     int resolution = 10; //With what frequency do we record data?
     static constexpr bool emp_is_stats_manager = true;
     std::ofstream output_location; //Where does output go?
+    emp::vector<std::string> col_map; //Vector for tracking variables
 
     StatsManager_Base(std::string location = "cout") {
       StatsManagerConfig config;
@@ -89,6 +90,99 @@ namespace evo{
 
   };
 
+
+  //Right now, this is just an interface for sending a population pointer to a visualization
+  //Eventually it should probably call all organisms' serialization function
+  //Eventually there should be probably also be a way to turn off outputting to files.
+  template <typename POP_MANAGER = PopulationManager_Base<int> >
+  class StatsManager_WholePopulation : StatsManager_Base<POP_MANAGER> {
+  protected:
+    POP_MANAGER * pop;
+    using StatsManager_Base<POP_MANAGER>::resolution;
+    using StatsManager_Base<POP_MANAGER>::output_location;
+    using StatsManager_Base<POP_MANAGER>::delimiter;
+    using StatsManager_Base<POP_MANAGER>::col_map;
+  public:
+    using org_ptr = typename POP_MANAGER::value_type;
+    using StatsManager_Base<POP_MANAGER>::SetDefaultFitnessFun;
+
+    //Constructor for creating this as a stand-alone object
+    template <typename WORLD>
+    StatsManager_WholePopulation(WORLD * w,
+                                   std::string location = "stats.csv") :
+                                   StatsManager_Base<decltype(w->popM)>(location){
+      Setup(w);
+    }
+
+    //Constructor for use by World object
+    StatsManager_WholePopulation(std::string location = "stats.csv") :
+                                   StatsManager_Base<POP_MANAGER>(location){;}
+
+    //The fitness function for calculating fitness related stats
+    template <typename WORLD>
+    void Setup(WORLD * w){
+      pop = &(w->popM);
+
+      std::function<void(int)> UpdateFun = [&] (int ud){
+         Update(ud);
+       };
+
+       w->OnUpdate(UpdateFun);
+    }
+
+
+    void Update(int update) {}
+
+  };
+
+  //This should be templated so the function can return things other than double
+  //But that will currently screw up the templating on world
+  template <typename POP_MANAGER = PopulationManager_Base<int> >
+  class StatsManager_WholePopulation_Function : StatsManager_WholePopulation<POP_MANAGER> {
+  protected:
+    POP_MANAGER * pop;
+    using StatsManager_Base<POP_MANAGER>::resolution;
+    using StatsManager_Base<POP_MANAGER>::output_location;
+    using StatsManager_Base<POP_MANAGER>::delimiter;
+    using StatsManager_Base<POP_MANAGER>::col_map;
+
+  public:
+    using org_ptr = typename POP_MANAGER::value_type;
+    using fun_type = std::function<double(org_ptr)>;
+    using StatsManager_Base<POP_MANAGER>::SetDefaultFitnessFun;
+    fun_type func;
+
+    //Constructor for creating this as a stand-alone object
+    template <typename WORLD>
+    StatsManager_WholePopulation_Function(WORLD * w,
+                                   std::string location = "stats.csv") :
+                                   StatsManager_WholePopulation<decltype(w->popM)>(location){
+      Setup(w);
+    }
+
+    //Constructor for use by World object
+    StatsManager_WholePopulation_Function(std::string location = "stats.csv") :
+                                   StatsManager_WholePopulation<POP_MANAGER>(location){;}
+
+    //The fitness function for calculating fitness related stats
+    template <typename WORLD>
+    void Setup(WORLD * w){
+      pop = &(w->popM);
+
+      std::function<void(int)> UpdateFun = [&] (int ud){
+         Update(ud);
+       };
+
+       w->OnUpdate(UpdateFun);
+    }
+
+
+    template <typename T>
+    void SetFunc(std::function<double(T)> f){func = f;}
+
+    void Update(int update) {;}
+  };
+
   // A popular type of stats manager is one that prints a set of statistics every
   // so many updates. This is a generic stats manager of that variety, which
   // maintains FunctionSets containing all of the functions to be run.
@@ -109,9 +203,9 @@ namespace evo{
     using StatsManager_Base<POP_MANAGER>::resolution;
     using StatsManager_Base<POP_MANAGER>::output_location;
     using StatsManager_Base<POP_MANAGER>::delimiter;
+    using StatsManager_Base<POP_MANAGER>::col_map;
     bool header_printed = false;
     std::string header = "update";
-    emp::vector<std::string> col_map;
 
   public:
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
@@ -184,8 +278,7 @@ namespace evo{
   //max fitness within the population, and average fitness within the population
 
   template <typename POP_MANAGER = PopulationManager_Base<int> >
-
-  class StatsManager_DefaultStats : StatsManager_FunctionsOnUpdate<POP_MANAGER> {
+  class StatsManager_DefaultStats : public StatsManager_FunctionsOnUpdate<POP_MANAGER> {
   protected:
     using org_ptr = typename POP_MANAGER::value_type;
     using fit_fun_type = std::function<double(org_ptr)>;

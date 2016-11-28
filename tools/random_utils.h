@@ -13,11 +13,11 @@
 
 namespace emp {
 
-  // Shuffle all of the elements in a vector.
-  // If max_count is provided, just make sure that the first max_count entries are randomly
-  // drawn from entire vector.
+  /// Shuffle all of the elements in a vector.
+  /// If max_count is provided, just make sure that the first max_count entries are randomly
+  /// drawn from entire vector.
   template <typename T>
-  void Shuffle(Random & random, emp::vector<T> & v, int max_count=-1)
+  inline void Shuffle(Random & random, emp::vector<T> & v, int max_count=-1)
   {
     if (max_count < 0) max_count = (int) v.size();
     for (uint32_t i = 0; i < (uint32_t) max_count; i++) {
@@ -28,9 +28,9 @@ namespace emp {
   }
 
 
-  // Return an emp::vector<int> numbered 0 through size-1 in a random order.
+  /// Return an emp::vector<int> numbered 0 through size-1 in a random order.
 
-  emp::vector<int> GetPermutation(Random & random, int size) {
+  inline emp::vector<int> GetPermutation(Random & random, int size) {
     emp::vector<int> seq(size);
     seq[0] = 0;
     for (int i = 1; i < size; i++) {
@@ -41,9 +41,9 @@ namespace emp {
     return seq;
   }
 
-  // Choose K positions from N possibilities.
+  /// Choose K positions from N possibilities.
 
-  void Choose(Random & random, int N, int K, std::vector<int> & choices) {
+  inline void Choose(Random & random, int N, int K, std::vector<int> & choices) {
     if (N < K || K < 0) return;  // @CAO Should be an assert!
 
     choices.resize(K);
@@ -53,16 +53,16 @@ namespace emp {
     }
   }
 
-  std::vector<int> Choose(Random & random, int N, int K) {
+  inline std::vector<int> Choose(Random & random, int N, int K) {
     std::vector<int> choices;
     Choose(random,N,K,choices);
     return choices;
   }
 
 
-  // Generate a random bit vector of the specified size.
+  /// Generate a random bit vector of the specified size.
 
-  BitVector RandomBitVector(Random & random, int size, double p=0.5)
+  inline BitVector RandomBitVector(Random & random, int size, double p=0.5)
   {
     BitVector bits(size);
     for (int i = 0; i < size; i++) bits[i] = random.P(p);

@@ -3,14 +3,20 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  This file is a replacement for the system-level assert.h, called "emp_assert"
-//  It behaves nearly identically, but with some additional functionality:
-//  - If compiled with Emscripten, will provide pop-up alerts in a web browser.
-//  - emp_assert can take additional arguments.  If the assert is triggered, those arguments
-//    will be evaluated and printed.
-//  - if NDEBUG -or- EMP_NDEBUG is defined, the expression in emp_assert() is not evaluated.
-//  - if EMP_TDEBUG is defined, emp_assert() goes into test mode and records failures, but
-//    does not abort.  (useful for unit tests of asserts)
+///  A replacement for the system-level assert.h, called "emp_assert"
+///  It behaves nearly identically, but with some additional functionality:
+///  - If compiled with Emscripten, will provide pop-up alerts in a web browser.
+///  - emp_assert can take additional arguments.  If the assert is triggered, those arguments
+///    will be evaluated and printed.
+///  - if NDEBUG -or- EMP_NDEBUG is defined, the expression in emp_assert() is not evaluated.
+///  - if EMP_TDEBUG is defined, emp_assert() goes into test mode and records failures, but
+///    does not abort.  (useful for unit tests of asserts)
+///
+///  Example:
+///  `int a = 6;
+///  emp_assert(a==5, a);`
+///  When compiled in debug mode (i.e. without the -DNDEBUG flag), this will trigger an assertion
+///  error and print the value of a.
 
 #ifndef EMP_ASSERT_H
 #define EMP_ASSERT_H
@@ -20,6 +26,8 @@
 #include <sstream>
 
 #include "macros.h"
+
+/// @cond DEFINES
 
 // If we are in emscripten, make sure to include the header.
 #ifdef EMSCRIPTEN
@@ -158,6 +166,8 @@ namespace emp {
 #define emp_assert_impl_11(X, VAR, ...) emp_assert_var(VAR); emp_assert_impl_10(X,__VA_ARGS__);
 #define emp_assert_impl_12(X, VAR, ...) emp_assert_var(VAR); emp_assert_impl_11(X,__VA_ARGS__);
 
+/// @endcond
+
 #define emp_assert(...)                                                                 \
   do { if ( !(EMP_GET_ARG_1(__VA_ARGS__, ~)) ) {                                        \
       std::cerr << "Assert Error (In " << __FILE__                                      \
@@ -168,8 +178,11 @@ namespace emp {
     }                                                                                   \
   } while(0)
 
+/// @cond DEFINES
 
 #endif // NDEBUG
 
 
 #endif // Include guard
+
+/// @endcond
