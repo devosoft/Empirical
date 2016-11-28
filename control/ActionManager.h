@@ -19,6 +19,7 @@ namespace emp {
   private:
     std::map<std::string, ActionBase *> action_map;
     int next_id=0;
+    std::string prefix = "emp_action_";
 
   public:
     ActionManager() = default;
@@ -26,8 +27,15 @@ namespace emp {
     ActionManager(ActionManager &&) = default;     // Normal juggle is okay for move constructor
     ~ActionManager() { for (auto & x : action_map) delete x.second; }
 
+    int GetNextID() const { return next_id; }
+
+    ActionBase & Get(const std::string & name) {
+      emp_assert(action_map.find(name) != action_map.end());
+      return *(action_map[name]);
+    }
+
     template <typename RETURN, typename... ARGS>
-    auto & Insert(const std::function<RETURN(ARGS...)> & in_fun, const std::string & name) {
+    auto & Add(const std::function<RETURN(ARGS...)> & in_fun, const std::string & name) {
       // Create the new action, save it, and return it.
       auto * new_action = new Action<RETURN, ARGS...>(in_fun, name);
       action_map[name] = in_fun;
@@ -35,10 +43,10 @@ namespace emp {
     }
 
     template <typename RETURN, typename... ARGS>
-    auto & Insert(const std::function<RETURN(ARGS...)> & in_fun) {
-      std::string name("emp_action_");
+    auto & Add(const std::function<RETURN(ARGS...)> & in_fun) {
+      std::string name(prefix);
       name += emp::to_string(next_id++);
-      return Insert(in_fun, name);
+      return Add(in_fun, name);
     }
 
   };
