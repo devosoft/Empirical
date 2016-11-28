@@ -29,7 +29,6 @@ namespace emp {
 
     const std::string & GetName() { return name; }
     virtual int GetArgCount() const = 0;
-
   };
 
   template <int ARG_COUNT>
@@ -46,7 +45,7 @@ namespace emp {
     std::function<void(ARGS...)> fun;
     using parent_t = ActionSize<sizeof...(ARGS)>;
   public:
-    Action(const std::function<void(ARGS...)> & in_fun, const std::string & in_name)
+    Action(const std::function<void(ARGS...)> & in_fun, const std::string & in_name="")
       : parent_t(in_name), fun(in_fun) { ; }
 
     const std::function<void(ARGS...)> & GetFun() const { return fun; };
@@ -56,7 +55,7 @@ namespace emp {
 
 
   template <typename RETURN, typename... ARGS>
-  auto make_action(const std::function<RETURN(ARGS...)> & in_fun, const std::string & name) {
+  auto make_action(const std::function<RETURN(ARGS...)> & in_fun, const std::string & name="") {
     return Action<RETURN, ARGS...>(in_fun, name);
   }
 }
