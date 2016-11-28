@@ -110,7 +110,7 @@ namespace D3 {
 
     /// @cond TEMPLATES
     template <typename T>
-    typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+    emp::sfinae_decoy<void, decltype(&T::operator())>
     SetHtml(T func) {
       int id = emp::JSWrap(func, emp::to_string(id)+"_html_func");
       EM_ASM_ARGS({js.objects[$0].html(emp[$0+"_html_func"]);}, id);

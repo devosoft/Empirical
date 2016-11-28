@@ -112,7 +112,7 @@ public:
 
   /// @cond TEMPLATES
   template <typename T>
-  typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+  emp::sfinae_decoy<void, decltype(&T::operator())>
   SetDrawCallback(T func) {
     emp::JSWrap(func, GetID()+"draw_data_callback");
     draw_data_callback = GetID()+"draw_data_callback";
@@ -336,7 +336,7 @@ public:
 
   /// @cond TEMPLATES
   template <typename T>
-  typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+  emp::sfinae_decoy<void, decltype(&T::operator())>
   SetTooltipFunction(T func) {
     tip->SetHtml(func);
   }
@@ -345,7 +345,7 @@ public:
 
   /// @cond TEMPLATES
   template <typename T>
-  typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+  emp::sfinae_decoy<void, decltype(&T::operator())>
   SetXAccessor(T func) {
     return_x = func;
     JSWrap(return_x, GetID()+"return_x");
@@ -384,7 +384,7 @@ public:
 
   /// @cond TEMPLATES
   template <typename T>
-  typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+  emp::sfinae_decoy<void, decltype(&T::operator())>
   SetYAccessor(T func) {
     return_y = func;
     JSWrap(return_y, GetID()+"return_y");
@@ -647,7 +647,7 @@ public:
 
   /// @cond TEMPLATES
   template <typename T>
-  typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+  emp::sfinae_decoy<void, decltype(&T::operator())>
   SetTooltipFunction(T func) {
     tip->SetHtml(func);
   }

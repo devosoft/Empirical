@@ -502,12 +502,12 @@ int main() {
         chai.assert.equal(js.objects[id].size()([1,2]), 2);
       });
 
-      it("can be a line generator", function(){
-        var id = emp.TestLineGenerator();
-        console.log(id);
-        chai.assert.equal(js.objects[id]([[25]]), "M165,165");
-        chai.assert.equal(js.objects[id].size(), 2);
-      });
+    //   it("can be a line generator", function(){
+    //     var id = emp.TestLineGenerator();
+    //     console.log(id);
+    //     chai.assert.equal(js.objects[id]([[25]]), "M165,165");
+    //     chai.assert.equal(js.objects[id].size(), 2);
+    //   });
 
     });
   });

@@ -12,6 +12,7 @@ travis:
 
 test:
 	cd tests && make test
+	cd tests && make test-web
 
 install-dependencies:
 	git submodule init
