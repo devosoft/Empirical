@@ -108,18 +108,26 @@ namespace evo{
       nodes[0].loc = -1;
 
       std::function<void(int)> RecordParentFun = [this] (int id){
+        // std::cout << "Record parent" << std::endl;
         RecordParent(id);
       };
 
       std::function<void(int)> TrackPlacementFun = [this] (int pos){
+        // std::cout << "Record place" << std::endl;
         TrackPlacement(pos);
       };
 
-      const std::function<void(const org_ptr)> TrackOffspringFun = [this] (const org_ptr org){
+      std::function<void(int)> TrackDeathFun = [this] (int pos){
+        TrackDeath(pos);
+      };
+
+      const std::function<void(const ORG*)> TrackOffspringFun = [this] (const ORG* org){
+        // std::cout << "Record offspring" << std::endl;
         TrackOffspring(org);
       };
 
-      const std::function<void(const org_ptr)> TrackInjectedOffspringFun = [this] (const org_ptr org){
+      const std::function<void(const ORG*)> TrackInjectedOffspringFun = [this] (const ORG* org){
+        // std::cout << "Record offspring inject" << std::endl;
         TrackInjectedOffspring(org);
       };
 
@@ -131,6 +139,7 @@ namespace evo{
       w->OnOffspringReady(TrackOffspringFun);
       w->OnInjectReady(TrackInjectedOffspringFun);
       w->OnOrgPlacement(TrackPlacementFun);
+      w->OnOrgDeath(TrackDeathFun);
       w->OnUpdate(UpdateFun);
     }
 
@@ -139,6 +148,15 @@ namespace evo{
     }
 
     //Put newly born organism into the lineage tracker
+
+    void TrackDeath(int pos) {
+      if (pos < 0) {
+        return;
+      }
+      int id = generation_since_update[pos];
+      nodes[id].alive = false;
+      generation_since_update[pos] = 0;
+    }
 
     void Update(int i) {
       if (separate_generations) {
@@ -152,13 +170,13 @@ namespace evo{
       }
     }
 
-    void TrackOffspring(org_ptr org) {
+    void TrackOffspring(const ORG* org) {
       next_org_id = this->AddOrganism(*org, next_parent_id);
       inject = false;
     }
 
     //Put newly injected organism into the lineage tracker
-    void TrackInjectedOffspring(const org_ptr org) {
+    void TrackInjectedOffspring(const ORG* org) {
       next_org_id = this->AddOrganism(*org, 0);
       inject = true;
     }
@@ -303,7 +321,6 @@ namespace evo{
   template <typename ORG>
   class LineageTracker_Standalone : public LineageTracker<PopulationManager_Base<ORG> > {
   protected:
-    using org_ptr = ORG*;
     bool separate_generations;
 
   public:

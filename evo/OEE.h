@@ -57,7 +57,10 @@ namespace evo{
     //This prevents compilation under g++
     using org_ptr = typename POP_MANAGER::value_type;
     using ORG = typename std::remove_pointer<org_ptr>::type;
-    using skeleton_type = emp::vector<int>;
+
+    using GENOME_ELEMENT = typename std::remove_reference<decltype(ORG()[0])>::type;
+    using skeleton_type = emp::vector<GENOME_ELEMENT>;
+
     static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
 
     std::unordered_set<skeleton_type > novel;
@@ -73,6 +76,7 @@ namespace evo{
     using StatsManager_Base<POP_MANAGER>::col_map;
 
   public:
+    GENOME_ELEMENT NULL_VAL;
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
     using lineage_type = LineageTracker<POP_MANAGER>;
     lineage_type * lineage;
@@ -115,7 +119,7 @@ namespace evo{
 
       output_location << "update";
       for (std::string var_name : col_map) {
-        output_location << var_name << delimiter;
+        output_location << delimiter << var_name;
       }
       output_location << std::endl;
     }
@@ -136,23 +140,29 @@ namespace evo{
         emp::vector<skeleton_type > persist_skeletons = Skeletonize(
                                               GetPersistLineage(past_snapshots[0],
                                               past_snapshots[generations/resolution]));
+
         emp::vector<skeleton_type > prev_persist_skeletons = Skeletonize(
                                               GetPersistLineage(past_snapshots[generations/resolution],
                                               past_snapshots[2*generations/resolution]));
 
         if (past_snapshots[2*generations/resolution].size() > 0){
+
           change = ChangeMetric(persist_skeletons, prev_persist_skeletons);
         }
 
         if (past_snapshots[generations/resolution].size() > 0){
+
           novelty = NoveltyMetric(persist_skeletons);
+
           ecology = EcologyMetric(persist_skeletons);
+
           complexity = ComplexityMetric(persist_skeletons,
-                              [](skeleton_type skel){
-                                int nulls = std::count(skel.begin(), skel.end(), -1);
+                              [this](skeleton_type skel){
+                                int nulls = std::count(skel.begin(), skel.end(), NULL_VAL);
                                 return (double)(skel.size() - nulls);
                               });
         }
+
         emp::vector<double> results = emp::vector<double>({(double)change, (double)novelty, (double)ecology, (double)complexity});
         output_location << update;
         for (double result : results){
@@ -193,6 +203,7 @@ namespace evo{
     //TODO: Currently assumes bit org
     template <template <typename> class C >
     C<skeleton_type> Skeletonize (C<ORG> orgs){
+      std::cout << "in C<> Skeletonize" << std::endl;
       C<skeleton_type> skeletons;
       for (auto org : orgs) {
         double fitness = fit_fun(&org);
@@ -200,13 +211,13 @@ namespace evo{
         ORG test = org;
 
         for (int i = 0; i < org.size(); i++) {
-          test[i] = !test[i];
+          test[i] = NULL_VAL;
           if (fit_fun(&test) >= fitness){
-            skeleton[i] = -1;
+            skeleton[i] = NULL_VAL;
           } else {
             skeleton[i] = org[i];
           }
-          test[i] = !test[i];
+          test[i] = org[i];
         }
         skeletons.insert(skeleton);
       }
@@ -218,21 +229,20 @@ namespace evo{
       for (auto org : orgs) {
         double fitness = fit_fun(&org);
         skeleton_type skeleton(org.size());
-        ORG test = org;
+        ORG test = ORG(org);
         for (int i = 0; i < (int) org.size(); i++) {
-          test[i] = !test[i];
+          test[i] = NULL_VAL;
           if (fit_fun(&test) >= fitness){
-            skeleton[i] = -1;
+            skeleton[i] = NULL_VAL;
           } else {
             skeleton[i] = org[i];
           }
-          test[i] = !test[i];
+          test[i] = org[i];
         }
         skeletons.push_back(skeleton);
       }
       return skeletons;
     }
-
 
     //Find most complex skeleton in the given vector.
     double ComplexityMetric(emp::vector<skeleton_type> & persist,
@@ -241,8 +251,9 @@ namespace evo{
       double most_complex = complexity_fun(*(persist.begin()));
 
       for (auto org : persist) {
-        if (complexity_fun(org) > most_complex) {
-          most_complex = complexity_fun(org);
+        double comp = complexity_fun(org);
+        if (comp > most_complex) {
+          most_complex = comp;
         }
       }
       return most_complex;
