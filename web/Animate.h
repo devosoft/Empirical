@@ -1,5 +1,5 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2015.
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-16.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //

@@ -1,18 +1,15 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  This file contains the emp::Initialize() function, which should usually be run when
+//  the Empirical library is in use to build an Emscripten project.
 
 #ifndef EMP_INIT_H
 #define EMP_INIT_H
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-//  This file contains the emp::Initialize() function, which should usually be run when
-//  the Empirical library is in use to build an Emscripten project.
-//
-
 // If EMSCRIPTEN is defined, initialize everything.  Otherwise create useful stubs.
-
 #ifdef EMSCRIPTEN
 
 #include <emscripten.h>

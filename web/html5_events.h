@@ -1,14 +1,12 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  Event handling for browser interfaces.
 
 #ifndef EMP_HTML5_EVENTS_H
 #define EMP_HTML5_EVENTS_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-//  This file provides event handling for browser interfaces.
-//
 
 #include "JSWrap.h"
 
