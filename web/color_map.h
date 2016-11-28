@@ -1,5 +1,5 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
+// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
+// Copyright (C) Michigan State University, 2015. It is licensed
 // under the MIT Software license; see doc/LICENSE
 
 #ifndef EMP_COLOR_MAP_H
@@ -55,7 +55,7 @@ namespace emp {
     emp_assert(g >= 0 && g < 255);
     emp_assert(b >= 0 && b < 255);
     std::stringstream ss;
-    ss << "rgba(" << r << ',' << g << ',' << b << ',' << a << ')';    
+    ss << "rgba(" << r << ',' << g << ',' << b << ',' << a << ')';
     return ss.str();
   }
 
@@ -67,8 +67,8 @@ namespace emp {
     emp::vector<std::string> & cur_map = internal::hue_maps[map_key];
 
     // If we've already asked for an identical map before, skip map generation!
-    if (cur_map.size() != map_size) {
-      
+    if (cur_map.size() != (std::size_t) map_size) {
+
       // Otherwise generate this map...
       cur_map.resize(map_size);
       double step_size = (max_h - min_h) / (double) map_size;

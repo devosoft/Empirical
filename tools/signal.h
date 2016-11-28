@@ -167,14 +167,14 @@ namespace emp {
       actions[name] = a;
     }
 
-    void PrintSignalNames(int indent=0) {
+    inline void PrintSignalNames(int indent=0) {
       for (const auto & s : signals) {
         for (int i = 0; i < indent; i++) std::cout << " ";
         std::cout << s.first << std::endl;
       }
     }
 
-    void PrintActionNames(int indent=0) {
+    inline void PrintActionNames(int indent=0) {
       for (const auto & s : actions) {
         for (int i = 0; i < indent; i++) std::cout << " ";
         std::cout << s.first << std::endl;
@@ -183,7 +183,7 @@ namespace emp {
 
 
     // Generate a unique signal name to prevent duplicates.
-    std::string GenerateSignalName(const std::string & prefix) {
+    inline std::string GenerateSignalName(const std::string & prefix) {
       return emp::to_string(prefix, '.', next_name_id++);
     }
 
@@ -247,7 +247,8 @@ namespace emp {
 
   // Definition for method to trigger a signal object from the BASE CLASS, declared above.
   template <typename... ARGS>
-  void internal::Signal_Base::BaseTrigger(ARGS... args) {
+
+  inline void internal::Signal_Base::BaseTrigger(ARGS... args) {
     // Make sure this base class is really of the correct derrived type (but do so in an
     // assert since triggers may be called frequently and should be fast!)
     emp_assert(dynamic_cast< Signal<ARGS...> * >(this));
@@ -255,7 +256,7 @@ namespace emp {
   }
 
   // Method to add an action by name to a Signal object
-  LinkKey internal::Signal_Base::AddAction(const std::string & name)
+  inline LinkKey internal::Signal_Base::AddAction(const std::string & name)
   {
     return SignalManager::Get().LinkSignal(this, name);
   }
@@ -290,7 +291,7 @@ namespace emp {
     inline void Trigger(ARGS... args) { actions.Run(args...); }
 
     // Add an action that takes the proper arguments.
-    LinkKey AddAction(const std::function<void(ARGS...)> & in_fun) {
+    inline LinkKey AddAction(const std::function<void(ARGS...)> & in_fun) {
       const LinkKey link_id = SignalManager::Get().RegisterLink(this);
       link_key_map[link_id] = (int) actions.size();
       actions.Add(in_fun);
@@ -322,7 +323,7 @@ namespace emp {
 
 
     // Add an action that takes no arguments.
-    LinkKey AddAction(const std::function<void()> & in_fun) override {
+    inline LinkKey AddAction(const std::function<void()> & in_fun) override {
       const LinkKey link_id = SignalManager::Get().RegisterLink(this);
       link_key_map[link_id] = (int) actions.size();
       actions.Add( [in_fun](ARGS...){ in_fun(); } );
@@ -330,14 +331,14 @@ namespace emp {
     }
 
     // Add an action from an Action object using Action_Base.
-    LinkKey AddAction(internal::Action_Base & a_base) override {
+    inline LinkKey AddAction(internal::Action_Base & a_base) override {
       Action<ARGS...> * a = dynamic_cast< Action<ARGS...>* >(&a_base);
       emp_assert( a != nullptr && "action type must match signal type." );
       return AddAction(a->fun);
     }
 
     // Add an action object directly.
-    LinkKey AddAction(Action<ARGS...> & a) { return AddAction(a.fun); }
+    inline LinkKey AddAction(Action<ARGS...> & a) { return AddAction(a.fun); }
   };
 
   // A specialized version of Signal for functions with no arguments.
@@ -351,19 +352,19 @@ namespace emp {
     }
     ~Signal() { ; }
 
-    int GetNumActions() const { return actions.GetSize(); }
+    inline int GetNumActions() const { return actions.GetSize(); }
 
     inline void Trigger() { actions.Run(); }
 
     // Add an action that takes the proper arguments.
-    LinkKey AddAction(const std::function<void()> & in_fun) override {
+    inline LinkKey AddAction(const std::function<void()> & in_fun) override {
       const LinkKey link_id = SignalManager::Get().RegisterLink(this);
       link_key_map[link_id] = (int) actions.size();
       actions.Add(in_fun);
       return link_id;
     }
 
-    LinkKey AddAction(internal::Action_Base & a_base) override {
+    inline LinkKey AddAction(internal::Action_Base & a_base) override {
       Action<> * a = dynamic_cast< Action<>* >(&a_base);
       emp_assert( a != nullptr && "action type must match signal type." );
       return AddAction(a->fun);
@@ -394,9 +395,9 @@ namespace emp {
     signal->Trigger(args...);
   }
 
-  void PrintSignalNames(int indent=0) { SignalManager::Get().PrintSignalNames(indent); }
-  void PrintActionNames(int indent=0) { SignalManager::Get().PrintActionNames(indent); }
-  void PrintSignalInfo(int indent=0) {
+  inline void PrintSignalNames(int indent=0) { SignalManager::Get().PrintSignalNames(indent); }
+  inline void PrintActionNames(int indent=0) { SignalManager::Get().PrintActionNames(indent); }
+  inline void PrintSignalInfo(int indent=0) {
     if (indent) std::cout << std::string(indent, ' ');
     std::cout << "SIGNAL NAMES:" << std::endl;
     SignalManager::Get().PrintSignalNames(indent+2);
@@ -405,7 +406,7 @@ namespace emp {
     SignalManager::Get().PrintActionNames(indent+2);
   }
 
-  std::string GenerateSignalName(const std::string & prefix) {
+  inline std::string GenerateSignalName(const std::string & prefix) {
     return SignalManager::Get().GenerateSignalName(prefix);
   }
 }

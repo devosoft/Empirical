@@ -4,17 +4,16 @@ The Empirical Library Documentation
 Contents:
 
 .. toctree::
-   :maxdepth: 0
+   :maxdepth: 1
 
    config
-   emtools
    geometry
    hardware
    kinetic
    scholar
    tools
    web
+   d3
 
 * :ref:`genindex`
 * :ref:`search`
-

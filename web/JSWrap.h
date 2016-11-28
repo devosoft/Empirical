@@ -3,31 +3,33 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  Wrap a C++ function and convert it to an integer that can be called from Javascript
-//
-//  To wrap a function, call:
-//     uint32_t fun_id = emp::JSWrap(FunctionToBeWrapped, "JS_Function_Name");
-//
-//  To manually callback a function from Javascript, first set emp_i.cb_args to an array of
-//  function arguments, then call empCppCallback( fun_id );   This all happens automatically
-//  if you use the emp.Callback(fun_id, args...) function from Javascript.
-//
-//  The JS_Function_Name string is optional, but if you use it, the appropriate function will
-//  be automatically generated in Javascript by JSWrap, in the emp class.
-//
-//  For example, if you have:
-//     int AddPair(int x, int y) { return x + y; }
-//
-//  You can wrap it with:
-//     uint32_t fun_id = emp::JSWrap(AddPair, "AddPair");
-//
-//  And then in Javascript, you can simply call it as:
-//     emp.AddPair(4, 5); // will return 9.
+///  Wrap a C++ function and convert it to an integer that can be called from Javascript
+///
+///  To wrap a function, call:
+///
+///     `uint32_t fun_id = emp::JSWrap(FunctionToBeWrapped, "JS_Function_Name");``
+///
+///  To manually callback a function from Javascript, first set `emp_i.cb_args` to an array of
+///  function arguments, then call `empCppCallback( fun_id );`   This all happens automatically
+///  if you use the `emp.Callback(fun_id, args...)` function from Javascript.
+///
+///  The JS_Function_Name string is optional, but if you use it, the appropriate function will
+///  be automatically generated in Javascript by JSWrap, in the emp class.
+///
+///  For example, if you have:
+///
+///     `int AddPair(int x, int y) { return x + y; }``
+///
+///  You can wrap it with:
+///
+///     `uint32_t fun_id = emp::JSWrap(AddPair, "AddPair");`
+///
+///  And then in Javascript, you can simply call it as:
+///
+///     `emp.AddPair(4, 5); // will return 9.`
 //
 //
 //  Development notes:
-//  * Make sure JSWrap can take function objects, lambdas, or just function names.
-//    On possibility is to make multiple versions of the function.
 //  * Add a JSWrap that takes an object and method and does the bind automatically.
 //  * Build a non-enscripten version; it should still be callable from the C++ side, but
 //    mostly to be able to test programs without Emscripten.
@@ -36,6 +38,8 @@
 //  * Made JSWrap compatible with Javascript objects with multiple properties.
 //    In order do so, you must define the properties of the object as a tuple
 //    struct in js_object_struct.h. - @ELD
+//  * Made sure JSWrap can take function objects, lambdas, or just function names.
+//
 //
 
 #ifndef EMP_JSWRAP_H
@@ -54,7 +58,6 @@
 #include "../tools/vector.h"
 #include "../tools/tuple_struct.h"
 #include "../tools/tuple_utils.h"
-
 #include "js_object_struct.h"
 
 #ifdef EMSCRIPTEN
@@ -65,7 +68,6 @@ extern "C" {
 // When NOT in Emscripten, need a stub for this function.
 int EMP_GetCBArgCount() { return -1; }
 #endif
-
 
 namespace emp {
 
@@ -98,85 +100,100 @@ namespace emp {
     arg_var = tmp_var;   // @CAO Do we need to free the memory in tmp_var?
   }
 
+  template <int ARG_ID, size_t SIZE, typename T> static void LoadArg(std::array<T, SIZE> & arg_var){
+    EM_ASM_ARGS({emp_i.__outgoing_array = emp_i.cb_args[$0];}, ARG_ID);
+    pass_array_to_cpp(arg_var);
+  }
+
+  template <int ARG_ID, typename T> static void LoadArg(emp::vector<T> & arg_var){
+    EM_ASM_ARGS({emp_i.__outgoing_array = emp_i.cb_args[$0];}, ARG_ID);
+    pass_vector_to_cpp(arg_var);
+  }
+
   //Helper functions to load arguments from inside Javascript objects by name.
   template <int ARG_ID> static void LoadArg(int & arg_var, std::string var) {
-    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0][Pointer_stringify($1)];
-      }, ARG_ID, var.c_str());
+    arg_var = EM_ASM_INT({ return emp_i.curr_obj[Pointer_stringify($0)];
+      }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(bool & arg_var, std::string var) {
-    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0][Pointer_stringify($1)];
-      }, ARG_ID, var.c_str());
+    arg_var = EM_ASM_INT({ return emp_i.curr_obj[Pointer_stringify($0)];
+      }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(char & arg_var, std::string var) {
-    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0][Pointer_stringify($1)];
-      }, ARG_ID, var.c_str());
+    arg_var = EM_ASM_INT({ return emp_i.curr_obj[Pointer_stringify($0)];
+      }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(double & arg_var, std::string var) {
-    arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0][Pointer_stringify($1)];
-      }, ARG_ID, var.c_str());
+    arg_var = EM_ASM_DOUBLE({ return emp_i.curr_obj[Pointer_stringify($0)];
+      }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(float & arg_var, std::string var) {
-    arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0][Pointer_stringify($1)];
-      }, ARG_ID, var.c_str());
+    arg_var = EM_ASM_DOUBLE({ return emp_i.curr_obj[Pointer_stringify($0)];
+      }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(std::string & arg_var, std::string var) {
     char * tmp_var = (char *) EM_ASM_INT({
+        if (emp_i.curr_obj[Pointer_stringify($0)] == null){
+          emp_i.curr_obj[Pointer_stringify($0)] = "undefined";
+        }
         return allocate(intArrayFromString(
-		emp_i.cb_args[$0][Pointer_stringify($1)]), 'i8', ALLOC_STACK);
-      }, ARG_ID, var.c_str());
+		emp_i.curr_obj[Pointer_stringify($0)]), 'i8', ALLOC_STACK);
+      }, var.c_str());
     arg_var = tmp_var;   // Free memory here?
   }
 
-  //Helper macros to make sure that every piece of a tuple_struct gets loaded
-  #define LOAD_TUPLE_ARG_1 LoadArg<ARG_ID>(std::get<0>(arg_var.emp__tuple_body)\
-                        , arg_var.var_names[0]);
-  #define LOAD_TUPLE_ARG_2 LOAD_TUPLE_ARG_1 LoadArg<ARG_ID>(std::get<1>(\
-			arg_var.emp__tuple_body),arg_var.var_names[1]);
-  #define LOAD_TUPLE_ARG_3 LOAD_TUPLE_ARG_2 LoadArg<ARG_ID>(std::get<2>(\
-			arg_var.emp__tuple_body),arg_var.var_names[2]);
-  #define LOAD_TUPLE_ARG_4 LOAD_TUPLE_ARG_3 LoadArg<ARG_ID>(std::get<3>(\
-			arg_var.emp__tuple_body),arg_var.var_names[3]);
-  #define LOAD_TUPLE_ARG_5 LOAD_TUPLE_ARG_4 LoadArg<ARG_ID>(std::get<4>(\
-			arg_var.emp__tuple_body),arg_var.var_names[4]);
-  #define LOAD_TUPLE_ARG_6 LOAD_TUPLE_ARG_5 LoadArg<ARG_ID>(std::get<5>(\
-			arg_var.emp__tuple_body),arg_var.var_names[5]);
-  #define LOAD_TUPLE_ARG_7 LOAD_TUPLE_ARG_6 LoadArg<ARG_ID>(std::get<6>(\
-			arg_var.emp__tuple_body),arg_var.var_names[6]);
-  #define LOAD_TUPLE_ARG_8 LOAD_TUPLE_ARG_7 LoadArg<ARG_ID>(std::get<7>(\
-			arg_var.emp__tuple_body),arg_var.var_names[7]);
-  #define LOAD_TUPLE_ARG_9 LOAD_TUPLE_ARG_8 LoadArg<ARG_ID>(std::get<8>(\
-			arg_var.emp__tuple_body),arg_var.var_names[8]);
-  #define LOAD_TUPLE_ARG_10 LOAD_TUPLE_ARG_9 LoadArg<ARG_ID>(std::get<9>(\
-			arg_var.emp__tuple_body),arg_var.var_names[9]);
-  #define LOAD_TUPLE_ARG_11 LOAD_TUPLE_ARG_10 LoadArg<ARG_ID>(std::get<10>(\
-			arg_var.emp__tuple_body),arg_var.var_names[10]);
-  #define LOAD_TUPLE_ARG_12 LOAD_TUPLE_ARG_11 LoadArg<ARG_ID>(std::get<11>(\
-			arg_var.emp__tuple_body),arg_var.var_names[11]);
-  #define LOAD_TUPLE_ARG_13 LOAD_TUPLE_ARG_12 LoadArg<ARG_ID>(std::get<12>(\
-			arg_var.emp__tuple_body),arg_var.var_names[12]);
-  #define LOAD_TUPLE_ARG_14 LOAD_TUPLE_ARG_13 LoadArg<ARG_ID>(std::get<13>(\
-			arg_var.emp__tuple_body),arg_var.var_names[13]);
-  #define LOAD_TUPLE_ARG_15 LOAD_TUPLE_ARG_14 LoadArg<ARG_ID>(std::get<14>(\
-			arg_var.emp__tuple_body),arg_var.var_names[14]);
-  #define LOAD_TUPLE_ARG_16 LOAD_TUPLE_ARG_15 LoadArg<ARG_ID>(std::get<15>(\
-			arg_var.emp__tuple_body),arg_var.var_names[15]);
+  template <typename JSON_TYPE, int ARG_ID, int FIELD>
+  struct LoadTuple;
 
-  //Macro to load the right set of args into the tuple
-  //This requires that the user define DATA_OBJECT_SIZE with the struct,
-  //which is kind of ugly. Is there a way around it with templating?
-  #define LOAD_ARGS_FROM_TUPLE(s) EMP_MERGE(LOAD_TUPLE_ARG_,  s)
-
-  //Load a Javascript-style object of the form described in js_object_struct.h
-  //into a JSDataObject struct.
-  template <int ARG_ID> static void LoadArg(JSDataObject & arg_var) {
-    LOAD_ARGS_FROM_TUPLE(DATA_OBJECT_SIZE)
+  //This needs to go before LoadTuple is defined, in case
+  //There are nested tuple structs
+  template <int ARG_ID, typename JSON_TYPE> static
+  typename std::enable_if<JSON_TYPE::n_fields != -1, void>::type
+  LoadArg(JSON_TYPE & arg_var, std::string var) {
+    //std::cout << "Loading " << var << " ARGNID: " << ARG_ID << std::endl;
+    //LoadArg<ARG_ID>(std::get<ARG_ID>(arg_var.emp__tuple_body));
+    EM_ASM_ARGS({
+      emp_i.object_queue.push(emp_i.curr_obj);
+      emp_i.curr_obj = emp_i.curr_obj[Pointer_stringify($0)];
+    }, var.c_str());
+    LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields> load_tuple = LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields>();
+    load_tuple.LoadJSDataArg(arg_var);
   }
 
+  template <typename JSON_TYPE, int ARG_ID, int FIELD>
+  struct LoadTuple {
+    static void LoadJSDataArg(JSON_TYPE & arg_var) {
+    //std::cout << "LoadingJS " << arg_var.var_names[FIELD-1] << " FIeLd: " << FIELD-1 << std::endl;
+      LoadArg<ARG_ID>(std::get<FIELD-1>(arg_var.emp__tuple_body), arg_var.var_names[FIELD-1]);
+      LoadTuple<JSON_TYPE, ARG_ID, FIELD-1> load_tuple = LoadTuple<JSON_TYPE, ARG_ID, FIELD-1>();
+      load_tuple.LoadJSDataArg(arg_var);
+    }
+  };
+
+  template <typename JSON_TYPE, int ARG_ID>
+  struct LoadTuple<JSON_TYPE, ARG_ID, 0> {
+    static void LoadJSDataArg(JSON_TYPE & arg_var) {
+        EM_ASM({emp_i.curr_obj = emp_i.object_queue.pop();});
+    }
+  };
+
+
+  template <int ARG_ID, typename JSON_TYPE> static
+  typename std::enable_if<JSON_TYPE::n_fields != -1, void>::type
+  LoadArg(JSON_TYPE & arg_var) {
+    //std::cout << "Loading ARGNID: " << ARG_ID << std::endl;
+    EM_ASM_ARGS({
+      emp_i.object_queue = [];
+      emp_i.curr_obj = emp_i.cb_args[$0];
+    }, ARG_ID);
+    LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields> load_tuple = LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields>();
+    load_tuple.LoadJSDataArg(arg_var);
+  }
 
   // ----- StoreReturn -----
   // Helper functions to individually store return values to JS
@@ -197,6 +214,12 @@ namespace emp {
     EM_ASM_ARGS({ emp_i.cb_return = Pointer_stringify($0); }, ret_var.c_str());
   }
 
+  template <typename T, size_t N>
+  static void StoreReturn(const std::array<T, N> & ret_var) {
+    pass_array_to_javascript(ret_var);
+    EM_ASM({ emp_i.cb_return = emp_i.__incoming_array; });
+  }
+
   // If the return type has a personalized function to handle the return, use it!
   template <typename RETURN_TYPE>
   static emp::sfinae_decoy<void, decltype(&RETURN_TYPE::StoreAsReturn)>
@@ -204,7 +227,73 @@ namespace emp {
     ret_var.template StoreAsReturn();
   }
 
+  // Helper functions to store values inside JSON objects
 
+  static void StoreReturn(const int & ret_var, std::string var) {
+    EM_ASM_ARGS({ emp_i.curr_obj[Pointer_stringify($1)] = $0; }, ret_var, var.c_str());
+  }
+
+  static void StoreReturn(const double & ret_var, std::string var) {
+    EM_ASM_ARGS({ emp_i.curr_obj[Pointer_stringify($1)] = $0; }, ret_var, var.c_str());
+  }
+
+  static void StoreReturn(const std::string & ret_var, std::string var) {
+    EM_ASM_ARGS({ emp_i.curr_obj[Pointer_stringify($1)] = Pointer_stringify($0); }
+                                                    , ret_var.c_str(), var.c_str());
+  }
+
+  template <typename T, size_t N>
+  static void StoreReturn(const std::array<T, N> & ret_var, std::string var) {
+    pass_array_to_javascript(ret_var);
+    EM_ASM_ARGS({ emp_i.curr_obj[Pointer_stringify($0)] = emp_i.__incoming_array;}, var.c_str());
+  }
+
+  template <typename JSON_TYPE, int FIELD>
+  struct StoreTuple;
+
+  // Tuple struct
+  template <typename RETURN_TYPE>
+  static typename emp::sfinae_decoy<void, decltype(RETURN_TYPE::n_fields)>::type
+  StoreReturn(const RETURN_TYPE & ret_var) {
+    EM_ASM({
+      emp_i.cb_return = {};
+      emp_i.object_queue = [];
+      emp_i.curr_obj = emp_i.cb_return;
+    });
+
+    StoreTuple<RETURN_TYPE, RETURN_TYPE::n_fields> store_tuple = StoreTuple<RETURN_TYPE, RETURN_TYPE::n_fields>();
+    store_tuple.StoreJSDataArg(ret_var);
+  }
+
+  // Nested tuple struct
+  template <typename RETURN_TYPE>
+  static typename emp::sfinae_decoy<void, decltype(RETURN_TYPE::n_fields)>::type
+  StoreReturn(const RETURN_TYPE & ret_var, std::string var) {
+    EM_ASM_ARGS({
+      emp_i.curr_obj[Pointer_stringify($0)] = {};
+      emp_i.object_queue.push(emp_i.curr_obj);
+      emp_i.curr_obj = emp_i.curr_obj[Pointer_stringify($0)];
+    }, var.c_str());
+
+    StoreTuple<RETURN_TYPE, RETURN_TYPE::n_fields> store_tuple = StoreTuple<RETURN_TYPE, RETURN_TYPE::n_fields>();
+    store_tuple.StoreJSDataArg(ret_var);
+  }
+
+  template <typename JSON_TYPE, int FIELD>
+  struct StoreTuple {
+    static void StoreJSDataArg(const JSON_TYPE & ret_var) {
+      StoreReturn(std::get<FIELD-1>(ret_var.emp__tuple_body), ret_var.var_names[FIELD-1]);
+      StoreTuple<JSON_TYPE, FIELD-1> store_tuple = StoreTuple<JSON_TYPE, FIELD-1>();
+      store_tuple.StoreJSDataArg(ret_var);
+    }
+  };
+
+  template <typename JSON_TYPE>
+  struct StoreTuple<JSON_TYPE, 0> {
+    static void StoreJSDataArg(const JSON_TYPE & ret_var) {
+      EM_ASM({emp_i.curr_obj = emp_i.object_queue.pop();});
+    }
+  };
 
   // The following code is in the "internal" namespace since it's used only to implement the
   // details of the JSWrap function.
@@ -282,7 +371,7 @@ namespace emp {
         // Make sure that we are returning the correct number of arguments.  If this
         // assert fails, it means that we've failed to set the correct number of arguments
         // in emp.cb_args, and need to realign.
-        emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() == num_args);
+        emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() >= num_args, EMP_GetCBArgCount(), num_args);
 
         // Collect the values of the arguments in a tuple
         using args_t = std::tuple< typename std::decay<ARG_TYPES>::type... >;
@@ -323,7 +412,7 @@ namespace emp {
         // Make sure that we are returning the correct number of arguments.  If this
         // assert fails, it means that we've failed to set the correct number of arguments
         // in emp.cb_args, and need to realign.
-        emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() == num_args);
+        emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() >= num_args, EMP_GetCBArgCount(), num_args);
 
         // Collect the values of the arguments in a tuple
         using args_t = std::tuple< typename std::decay<ARG_TYPES>::type... >;
@@ -404,6 +493,14 @@ namespace emp {
     return JSWrap(fun_ptr, fun_name, dispose_on_use);
   }
 
+  /// @endcond
+
+  template <typename FUN_TYPE>
+  uint32_t JSWrap(const FUN_TYPE & in_fun, const std::string & fun_name="", bool dispose_on_use=false)
+  {
+    return JSWrap(to_function(in_fun), fun_name, dispose_on_use);
+  }
+
   // template <typename FUN_TYPE>
   // uint32_t JSWrap(const FUN_TYPE & in_fun, const std::string & fun_name="", bool dispose_on_use=false)
   // {
@@ -413,12 +510,12 @@ namespace emp {
 
 
 
-  // If we want a quick, unnammed, disposable function, use JSWrapOnce
+  /// If we want a quick, unnammed, disposable function, use JSWrapOnce
   template <typename FUN_TYPE>
   uint32_t JSWrapOnce(FUN_TYPE && in_fun) { return JSWrap(std::forward<FUN_TYPE>(in_fun), "", true); }
 
 
-  // Cleanup a function pointer when finished with it.
+  /// Cleanup a function pointer when finished with it.
   void JSDelete( uint32_t fun_id ) {
     emp_assert(fun_id > 0);  // Make sure this isn't a null pointer!
     // @CAO -- Should make sure to clean up named functions on JS side if they exist.
@@ -427,10 +524,8 @@ namespace emp {
     callback_array[fun_id] = nullptr;
   }
 
+  /// @cond SIMPLIFY
 }
-
-
-
 
 // Once you use JSWrap to create an ID, you can call the wrapped function from Javascript
 // by supplying CPPCallback with the id and all args.
@@ -451,5 +546,6 @@ extern "C" void empCppCallback(uint32_t cb_id)
   }
 }
 
+/// @endcond
 
 #endif

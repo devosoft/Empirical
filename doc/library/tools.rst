@@ -37,27 +37,9 @@ The Empirical Tools Documentation
    :project: Empirical
 
 
-**tools/class.h**
-
-.. doxygenfile:: tools/class.h
-   :project: Empirical
-
-
-**tools/command_line.h**
-
-.. doxygenfile:: tools/command_line.h
-   :project: Empirical
-
-
 **tools/const.h**
 
 .. doxygenfile:: tools/const.h
-   :project: Empirical
-
-
-**tools/const_utils.h**
-
-.. doxygenfile:: tools/const_utils.h
    :project: Empirical
 
 
@@ -70,12 +52,6 @@ The Empirical Tools Documentation
 **tools/errors.h**
 
 .. doxygenfile:: tools/errors.h
-   :project: Empirical
-
-
-**tools/fixed.h**
-
-.. doxygenfile:: tools/fixed.h
    :project: Empirical
 
 
@@ -187,11 +163,7 @@ The Empirical Tools Documentation
    :project: Empirical
 
 
-**tools/Trait.h**
-
-.. doxygenfile:: tools/Trait.h
-   :project: Empirical
-
+.. _tuple_struct:
 
 **tools/tuple_struct.h**
 
@@ -209,4 +181,3 @@ The Empirical Tools Documentation
 
 .. doxygenfile:: tools/vector.h
    :project: Empirical
-

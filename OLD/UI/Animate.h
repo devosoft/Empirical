@@ -14,8 +14,8 @@
 
 #include <functional>
 
-#include "../emtools/emfunctions.h"
-#include "../emtools/JSWrap.h"
+#include "../web/emfunctions.h"
+#include "../web/JSWrap.h"
 #include "../tools/assert.h"
 #include "../tools/vector.h"
 

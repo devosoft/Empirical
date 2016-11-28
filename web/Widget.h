@@ -209,6 +209,7 @@ namespace web {
       virtual bool IsTableInfo() const { return false; }
       virtual bool IsTextInfo() const { return false; }
       virtual bool IsTextAreaInfo() const { return false; }
+      virtual bool IsD3VisualiationInfo() const { return false; }
 
       // If not overloaded, pass along widget registration to parent.
       virtual void Register_recurse(Widget & w) { if (parent) parent->Register_recurse(w); }
