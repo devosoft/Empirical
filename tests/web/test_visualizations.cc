@@ -492,24 +492,24 @@ int main() {
                   return g.GetID();}, "TestLineGenerator");
 
 
-  EM_ASM({
-    describe("paths", function(){
-
-      it("can be a symbol generator", function(){
-        var id = emp.TestSymbolGenerator();
-        console.log(id);
-        chai.assert.equal(js.objects[id].type()([1,2]), "diamond");
-        chai.assert.equal(js.objects[id].size()([1,2]), 2);
-      });
-
-      it("can be a line generator", function(){
-        var id = emp.TestLineGenerator();
-        console.log(id);
-        chai.assert.equal(js.objects[id]([[25]]), "M165,165");
-        chai.assert.equal(js.objects[id].size(), 2);
-      });
-
-    });
-  });
+  // EM_ASM({
+  //   describe("paths", function(){
+  //
+  //     it("can be a symbol generator", function(){
+  //       var id = emp.TestSymbolGenerator();
+  //       console.log(id);
+  //       chai.assert.equal(js.objects[id].type()([1,2]), "diamond");
+  //       chai.assert.equal(js.objects[id].size()([1,2]), 2);
+  //     });
+  //
+  //   //   it("can be a line generator", function(){
+  //   //     var id = emp.TestLineGenerator();
+  //   //     console.log(id);
+  //   //     chai.assert.equal(js.objects[id]([[25]]), "M165,165");
+  //   //     chai.assert.equal(js.objects[id].size(), 2);
+  //   //   });
+  //
+  //   });
+  // });
 
 }

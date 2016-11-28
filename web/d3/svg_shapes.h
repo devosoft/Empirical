@@ -105,7 +105,7 @@ namespace D3 {
     /// @cond TEMPLATES
 
     template <typename T>
-    typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+    emp::sfinae_decoy<void, decltype(&T::operator())>
     SetType(T type){
       D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(type, type)
     }
@@ -128,7 +128,7 @@ namespace D3 {
     }
 
     template <typename T>
-    typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+    emp::sfinae_decoy<void, decltype(&T::operator())>
     SetSize(T type){
       D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(size, type)
     }
@@ -167,7 +167,7 @@ namespace D3 {
 
     /// @cond TEMPLATES
     template <typename T>
-    typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+    emp::sfinae_decoy<void, decltype(&T::operator())>
     SetDefined(T defined){
       D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(defined, defined)
     }
@@ -257,7 +257,7 @@ namespace D3 {
 
     // handles C++ functions
     template <typename T>
-    typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+    emp::sfinae_decoy<void, decltype(&T::operator())>
     SetX(T x) {
       D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(x, x);
     }
@@ -305,7 +305,7 @@ namespace D3 {
 
     // handles C++ functions
     template <typename T>
-    typename emp::sfinae_decoy<void, decltype(&T::operator())>::type
+    emp::sfinae_decoy<void, decltype(&T::operator())>
     SetY(T y) {
       D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(y, y);
     }

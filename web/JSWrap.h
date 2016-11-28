@@ -50,6 +50,7 @@
 #include <tuple>
 #include <array>
 
+#include "../web/web_init.h"
 #include "../meta/meta.h"
 
 #include "../tools/assert.h"
@@ -58,7 +59,7 @@
 #include "../tools/vector.h"
 #include "../tools/tuple_struct.h"
 #include "../tools/tuple_utils.h"
-#include "js_object_struct.h"
+#include "js_utils.h"
 
 #ifdef EMSCRIPTEN
 extern "C" {
@@ -253,7 +254,7 @@ namespace emp {
 
   // Tuple struct
   template <typename RETURN_TYPE>
-  static typename emp::sfinae_decoy<void, decltype(RETURN_TYPE::n_fields)>::type
+  static typename std::enable_if<RETURN_TYPE::n_fields != -1, void>::type
   StoreReturn(const RETURN_TYPE & ret_var) {
     EM_ASM({
       emp_i.cb_return = {};
@@ -267,7 +268,7 @@ namespace emp {
 
   // Nested tuple struct
   template <typename RETURN_TYPE>
-  static typename emp::sfinae_decoy<void, decltype(RETURN_TYPE::n_fields)>::type
+  static emp::sfinae_decoy<void, decltype(RETURN_TYPE::n_fields)>
   StoreReturn(const RETURN_TYPE & ret_var, std::string var) {
     EM_ASM_ARGS({
       emp_i.curr_obj[Pointer_stringify($0)] = {};

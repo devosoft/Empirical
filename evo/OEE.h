@@ -158,7 +158,11 @@ namespace evo{
 
           complexity = ComplexityMetric(persist_skeletons,
                               [this](skeleton_type skel){
+                                // for (auto el : skel) {
+                                //   std::cout << el.GetSymbol();
+                                // }
                                 int nulls = std::count(skel.begin(), skel.end(), NULL_VAL);
+                                // std::cout << " Nulls: " << nulls << std::endl;
                                 return (double)(skel.size() - nulls);
                               });
         }
@@ -203,12 +207,11 @@ namespace evo{
     //TODO: Currently assumes bit org
     template <template <typename> class C >
     C<skeleton_type> Skeletonize (C<ORG> orgs){
-      std::cout << "in C<> Skeletonize" << std::endl;
       C<skeleton_type> skeletons;
       for (auto org : orgs) {
         double fitness = fit_fun(&org);
         skeleton_type skeleton(org.size());
-        ORG test = org;
+        ORG test = ORG(org);
 
         for (int i = 0; i < org.size(); i++) {
           test[i] = NULL_VAL;
@@ -232,13 +235,16 @@ namespace evo{
         ORG test = ORG(org);
         for (int i = 0; i < (int) org.size(); i++) {
           test[i] = NULL_VAL;
-          if (fit_fun(&test) >= fitness){
+          double fit = fit_fun(&test);
+          //std::cout << i << " " << fit << " " << fitness << std::endl;
+          if (fit >= fitness){
             skeleton[i] = NULL_VAL;
           } else {
             skeleton[i] = org[i];
           }
           test[i] = org[i];
         }
+        // std::cout << "skeletonized" << std::endl;
         skeletons.push_back(skeleton);
       }
       return skeletons;
@@ -398,6 +404,11 @@ namespace evo{
                                        emp::vector<int> prev_generation){
 
       emp::vector<int> persist_ids = GetPersistLineageIDs(curr_generation, prev_generation);
+    //   std::cout << persist_ids.size() << " persist ids: ";
+    //   for (int i = 0; i < persist_ids.size(); i++) {
+    //     std::cout  << persist_ids[i] << " ";
+    //   }
+    //   std::cout  << std::endl;
       return lineage->IDsToGenomes(persist_ids);
     }
 

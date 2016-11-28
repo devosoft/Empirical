@@ -236,6 +236,36 @@ namespace emp {
     static constexpr int Sum() { return I; }
     static constexpr int Product() { return I; }
   };
+
+  //This bit of magic is from
+  //http://meh.schizofreni.co/programming/magic/2013/01/23/function-pointer-from-lambda.html
+  //and is useful for fixing lambda function woes
+  template <typename Function>
+  struct function_traits
+    : public function_traits<decltype(&Function::operator())>
+  {};
+
+  template <typename ClassType, typename ReturnType, typename... Args>
+  struct function_traits<ReturnType(ClassType::*)(Args...) const>
+  {
+    typedef ReturnType (*pointer)(Args...);
+    typedef std::function<ReturnType(Args...)> function;
+  };
+
+  template <typename Function>
+  typename function_traits<Function>::pointer
+  to_function_pointer (Function& lambda)
+  {
+    return static_cast<typename function_traits<Function>::pointer>(lambda);
+  }
+
+  template <typename Function>
+  typename function_traits<Function>::function
+  to_function (Function& lambda)
+  {
+    return static_cast<typename function_traits<Function>::function>(lambda);
+  }
+
 }
 
 

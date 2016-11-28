@@ -132,6 +132,7 @@ namespace evo{
       };
 
       std::function<void(int)> UpdateFun = [this] (int ud){
+        WriteDataToFile("lineage.json");
         Update(ud);
       };
 
@@ -291,11 +292,11 @@ namespace evo{
       ss << ", \"loc\":";
       ss << to_string(node->loc);
       ss << ", \"persist\":false, \"genome\":\"";
-      if (node->genome != nullptr) {
-        ss << to_string(*(node->genome));
-      } else {
-        ss << "null";
-      }
+    //   if (node->genome != nullptr) {
+    //     ss << to_string(*(node->genome));
+    //   } else {
+    //     ss << "null";
+    //   }
       ss << "\", \"children\":[";
       for (size_t i=0; i < node->offspring.size(); ++i) {
         ss << node_to_json(node->offspring[i]);

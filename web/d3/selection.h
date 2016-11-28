@@ -91,7 +91,7 @@ namespace D3 {
       /// @cond TEMPLATES
 
       template <typename T>
-      typename emp::sfinae_decoy<DERIVED, decltype(&T::operator())>::type
+      emp::sfinae_decoy<DERIVED, decltype(&T::operator())>
       Call(T function){
         uint32_t fun_id = emp::JSWrap(function, "", false);
         EM_ASM_ARGS({
@@ -124,7 +124,7 @@ namespace D3 {
       /// @cond TEMPLATES
 
       template <typename T>
-      typename emp::sfinae_decoy<DERIVED, decltype(&T::operator())>::type
+      emp::sfinae_decoy<DERIVED, decltype(&T::operator())>
       Filter(T selector){
 
         int new_id = EM_ASM_INT_V({return js.objects.length});
@@ -147,7 +147,7 @@ namespace D3 {
       /// @cond TEMPLATES
 
       template <typename T>
-      typename emp::sfinae_decoy<DERIVED, decltype(&T::operator())>::type
+      emp::sfinae_decoy<DERIVED, decltype(&T::operator())>
       Each(T function){
         D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(each, function)
         return *(static_cast<DERIVED *>(this));
@@ -168,7 +168,7 @@ namespace D3 {
       /// @cond TEMPLATES
 
       template <typename T>
-      typename emp::sfinae_decoy<DERIVED, decltype(&T::operator())>::type
+      emp::sfinae_decoy<DERIVED, decltype(&T::operator())>
       Each(std::string time, T function){
         D3_CALLBACK_METHOD_CPP_FUNCTION_2_ARGS(each, time.c_str(), function)
         return *(static_cast<DERIVED *>(this));
@@ -233,7 +233,7 @@ namespace D3 {
       //If a function is being used repeatedly, it may be more efficient to wrap it
       //once and then pass the name as a string.
       template <typename T>
-      typename emp::sfinae_decoy<DERIVED, decltype(&T::operator())>::type
+      emp::sfinae_decoy<DERIVED, decltype(&T::operator())>
       SetAttr(std::string name, T value) {
 
         //This should probably be JSWrapOnce, but that breaks the visualization
@@ -262,7 +262,7 @@ namespace D3 {
 
       /* Version for containers */
       template <typename T>
-      typename emp::sfinae_decoy<DERIVED, typename T::value_type>::type
+      typename std::enable_if<T::value_type != "", DERIVED>::type
       SetAttr(std::string name, T value) {
         emp::pass_array_to_javascript(value);
 
@@ -334,7 +334,7 @@ namespace D3 {
       //If a function is being used repeatedly, it may be more efficient to wrap it
       //once and then pass the name as a string.
       template <typename T>
-      typename emp::sfinae_decoy<DERIVED, decltype(&T::operator())>::type
+      emp::sfinae_decoy<DERIVED, decltype(&T::operator())>
       SetStyle(std::string name, T value) {
         D3_CALLBACK_METHOD_CPP_FUNCTION_2_ARGS(style, name.c_str(), value);
         return *(static_cast<DERIVED *>(this));
@@ -367,7 +367,7 @@ namespace D3 {
       /// @cond TEMPLATES
 
       template <typename T>
-      typename emp::sfinae_decoy<DERIVED, decltype(&T::operator())>::type
+      emp::sfinae_decoy<DERIVED, decltype(&T::operator())>
       SetText(T func){
         D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(text, func)
         return *(static_cast<DERIVED *>(this));
@@ -664,7 +664,7 @@ namespace D3 {
     //If a function is being used repeatedly, it may be more efficient to wrap it
     //once and then pass the name as a string.
     template <typename T>
-    typename emp::sfinae_decoy<Transition, decltype(&T::operator())>::type
+    emp::sfinae_decoy<Transition, decltype(&T::operator())>
     SetProperty(std::string name, T value) {
       uint32_t fun_id = emp::JSWrap(value, "", false);
       EM_ASM_ARGS({
@@ -704,7 +704,7 @@ namespace D3 {
     /// @cond TEMPLATES
 
     template <typename T>
-    typename emp::sfinae_decoy<Transition, decltype(&T::operator())>::type
+    emp::sfinae_decoy<Transition, decltype(&T::operator())>
     SetHtml(T func){
       uint32_t fun_id = emp::JSWrap(func, "", false);
       EM_ASM_ARGS({
@@ -736,7 +736,7 @@ namespace D3 {
 
     // Version for C++ function
     template <typename T>
-    typename emp::sfinae_decoy<Transition, decltype(&T::operator())>::type
+    emp::sfinae_decoy<Transition, decltype(&T::operator())>
     SetClassed(std::string, std::string classname, T func){
       uint32_t fun_id = emp::JSWrap(func, "", false);
       EM_ASM_ARGS({
@@ -964,7 +964,7 @@ namespace D3 {
 
     // Accepts Dataset and C++ function as key
     template<typename T>
-    typename emp::sfinae_decoy<Selection, decltype(&T::operator())>::type
+    emp::sfinae_decoy<Selection, decltype(&T::operator())>
     Data(Dataset values, T key){
       int update_id = EM_ASM_INT_V({return js.objects.length});
       uint32_t fun_id = emp::JSWrap(key, "", false);
@@ -1017,7 +1017,7 @@ namespace D3 {
 
     // Accepts C++ function as key
     template<typename C, class = typename C::value_type, typename T>
-    typename emp::sfinae_decoy<Selection, decltype(&T::operator())>::type
+    emp::sfinae_decoy<Selection, decltype(&T::operator())>
     Data(C values, T key){
       int update_id = EM_ASM_INT_V({return js.objects.length});
       emp::pass_array_to_javascript(values);
@@ -1203,7 +1203,7 @@ namespace D3 {
     //If a function is being used repeatedly, it may be more efficient to wrap it
     //once and then pass the name as a string.
     template <typename T>
-    typename emp::sfinae_decoy<Selection, decltype(&T::operator())>::type
+    emp::sfinae_decoy<Selection, decltype(&T::operator())>
     SetProperty(std::string name, T value) {
       D3_CALLBACK_METHOD_CPP_FUNCTION_2_ARGS(property, name.c_str(), value);
       return *this;
@@ -1221,7 +1221,7 @@ namespace D3 {
     /// @cond TEMPLATES
 
     template <typename T>
-    typename emp::sfinae_decoy<Selection, decltype(&T::operator())>::type
+    emp::sfinae_decoy<Selection, decltype(&T::operator())>
     SetHtml(T func){
       D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(html, func)
       return *this;
@@ -1243,7 +1243,7 @@ namespace D3 {
 
     // Version for C++ function
     template <typename T>
-    typename emp::sfinae_decoy<Selection, decltype(&T::operator())>::type
+    emp::sfinae_decoy<Selection, decltype(&T::operator())>
     SetClassed(std::string, std::string classname, T func){
       D3_CALLBACK_METHOD_CPP_FUNCTION_2_ARGS(classed, classname.c_str(), func)
       return *this;
@@ -1478,7 +1478,7 @@ namespace D3 {
 
     /// Version for C++ functions
     template <typename T>
-    typename emp::sfinae_decoy<Selection, decltype(&T::operator())>::type
+    emp::sfinae_decoy<Selection, decltype(&T::operator())>
     On(std::string type, T listener, bool capture=false){
 
       uint32_t fun_id = emp::JSWrap(listener, "", false);
@@ -1514,7 +1514,7 @@ namespace D3 {
     /// @cond TEMPLATES
 
     template <typename T>
-    typename emp::sfinae_decoy<Selection, decltype(&T::operator())>::type
+    emp::sfinae_decoy<Selection, decltype(&T::operator())>
     Sort(T comparator){
       D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(sort, comparator)
       return (*this);
