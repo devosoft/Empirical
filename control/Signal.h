@@ -29,24 +29,32 @@ namespace emp {
 
     uint64_t GetID() const { return id; }
     bool IsActive() const { return id > 0; }
-
-    // These functions require additional classes and are defined later in this file...
-    // internal::Signal_Base * GetSignal();
-    // void Delete();
-    // void Replace(internal::Action_Base & new_action);
-    // template <typename... ARGS> void Replace(const std::function<void(ARGS...)> & fun);
   };
 
   class SignalBase {
   protected:
     std::string name;                      // What is the unique name of this signal?
     std::map<SignalKey, int> link_key_map; // Map unique link keys to link index for actions.
-    const int num_args;                    // How many arguments does this signal provide?
 
     // SignalBase should only be constructable from derrived classes.
-    SignalBase(const std::string & n, int a) : name(n), num_args(a) { ; }
+    SignalBase(const std::string & n) : name(n) { ; }
   public:
     virtual ~SignalBase() { ; }
+
+    const std::string & GetName() const { return name; }
+    virtual int GetNumArgs() const = 0;
+
+    // NOTE: If a Trigger is called on a base class, convert the signal assuming that the args
+    // map to the correct types (defined below with a dynamic cast to ensure correctness)
+    template <typename... ARGS>
+    void BaseTrigger(ARGS... args);
+
+    // Actions without arguments or a return type can be associated with any signal.
+    template <typename... ARGS>
+    SignalKey AddAction(const std::function<void(ARGS...)> & in_fun);
+
+    // Add an action using an Action object.
+    // virtual SignalKey AddAction(ActionBase &) = 0;
   };
 
   template <typename... ARGS>
