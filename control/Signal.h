@@ -8,6 +8,8 @@
 #include <map>
 #include <string>
 
+#include "Action.h"
+
 namespace emp {
 
   // SignalKey tracks a specific function triggered by a signal. For now, its just an integer.
@@ -54,11 +56,14 @@ namespace emp {
     SignalKey AddAction(const std::function<void(ARGS...)> & in_fun);
 
     // Add an action using an Action object.
-    // virtual SignalKey AddAction(ActionBase &) = 0;
+    virtual SignalKey AddAction(ActionBase &) = 0;
   };
 
   template <typename... ARGS>
   class Signal : public SignalBase {
+  protected:
+  public:
+    int GetNumArgs() const { return sizeof...(ARGS); }
   };
 
 }
