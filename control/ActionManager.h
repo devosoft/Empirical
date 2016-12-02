@@ -6,8 +6,8 @@
 //  This file defines the ActionManager class, which collects sets of Actions to be looked up
 //  or manipulated later.
 
-#include <map>
 #include <string>
+#include <unordered_map>
 
 #include "../tools/string_utils.h"
 
@@ -17,7 +17,7 @@ namespace emp {
 
   class ActionManager {
   private:
-    std::map<std::string, ActionBase *> action_map;
+    std::unordered_map<std::string, ActionBase *> action_map;
     int next_id=0;
     std::string prefix = "emp_action_";
 
