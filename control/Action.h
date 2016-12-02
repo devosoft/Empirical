@@ -53,6 +53,9 @@ namespace emp {
 
     Action(const std::function<void(ARGS...)> & in_fun, const std::string & in_name="")
       : parent_t(in_name), fun(in_fun) { ; }
+    template <typename RETURN>
+    Action(const std::function<RETURN(ARGS...)> & in_fun, const std::string & in_name="")
+      : parent_t(in_name), fun([in_fun](ARGS... args){in_fun(std::forward<ARGS>(args)...);}) { ; }
     Action(const this_t &) = default;
     Action(this_t &&) = default;
 
@@ -69,6 +72,6 @@ namespace emp {
 
   template <typename RETURN, typename... ARGS>
   auto make_action(const std::function<RETURN(ARGS...)> & in_fun, const std::string & name="") {
-    return Action<RETURN, ARGS...>(in_fun, name);
+    return Action<ARGS...>(in_fun, name);
   }
 }
