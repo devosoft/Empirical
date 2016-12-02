@@ -6,6 +6,9 @@
 //  This file defines the ActionManager class, which collects sets of Actions to be looked up
 //  or manipulated later.
 
+#ifndef EMP_CONTROL_ACTION_MANAGER
+#define EMP_CONTROL_ACTION_MANAGER
+
 #include <string>
 #include <unordered_map>
 
@@ -58,3 +61,5 @@ namespace emp {
   };
 
 }
+
+#endif

@@ -6,6 +6,9 @@
 //  This file defines the SignalManager class, which collects sets of Signals to be looked up
 //  or manipulated later.
 
+#ifndef EMP_CONTROL_SIGNAL_MANAGER
+#define EMP_CONTROL_SIGNAL_MANAGER
+
 #include <string>
 #include <unordered_map>
 
@@ -43,3 +46,5 @@ namespace emp {
   };
 
 }
+
+#endif

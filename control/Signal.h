@@ -5,6 +5,9 @@
 //
 //  The Signal class allows functions to be bundled and triggered enmasse.
 
+#ifndef EMP_CONTROL_SIGNAL
+#define EMP_CONTROL_SIGNAL
+
 #include <map>
 #include <string>
 
@@ -77,3 +80,5 @@ namespace emp {
   };
 
 }
+
+#endif

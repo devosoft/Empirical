@@ -9,6 +9,9 @@
 //  Actions can be a bit heavyweight, but can easily be converted to more lightweight
 //  std:function objects.
 
+#ifndef EMP_CONTROL_ACTION
+#define EMP_CONTROL_ACTION
+
 #include <functional>
 #include <string>
 
@@ -75,3 +78,5 @@ namespace emp {
     return Action<ARGS...>(in_fun, name);
   }
 }
+
+#endif

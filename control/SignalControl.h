@@ -6,6 +6,9 @@
 //  The SignalControl class manages all of the signals and actions, linking them together
 //  upon request (by name, base class, or derived class).
 
+#ifndef EMP_CONTROL_SIGNAL_CONTROL
+#define EMP_CONTROL_SIGNAL_CONTROL
+
 #include <string>
 #include <unordered_map>
 
@@ -30,3 +33,5 @@ namespace emp {
   };
 
 }
+
+#endif
