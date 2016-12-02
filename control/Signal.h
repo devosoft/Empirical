@@ -15,22 +15,32 @@ namespace emp {
   // SignalKey tracks a specific function triggered by a signal. For now, its just an integer.
   class SignalKey {
   private:
-    uint64_t id;
+    uint32_t signal_id;
+    uint32_t key_id;
+
+    int Compare(const SignalKey& in) const {
+      if (signal_id < in.signal_id) return -1;
+      if (signal_id > in.signal_id) return 1;
+      if (key_id < in.key_id) return -1;
+      if (key_id > in.key_id) return 1;
+      return 0;
+    }
   public:
-    SignalKey(uint64_t _id=0) : id(_id) { ; }
+    SignalKey(uint32_t _kid=0, uint32_t _sid=0) : signal_id(_sid), key_id(_kid) { ; }
     SignalKey(const SignalKey &) = default;
     SignalKey & operator=(const SignalKey &) = default;
     ~SignalKey() { ; }
 
-    bool operator==(const SignalKey& in) const { return id == in.id; }
-    bool operator!=(const SignalKey& in) const { return id != in.id; }
-    bool operator<(const SignalKey& in)  const { return id < in.id; }
-    bool operator>(const SignalKey& in)  const { return id > in.id; }
-    bool operator<=(const SignalKey& in) const { return id <= in.id; }
-    bool operator>=(const SignalKey& in) const { return id >= in.id; }
+    bool operator==(const SignalKey& in) const { return Compare(in) == 0; }
+    bool operator!=(const SignalKey& in) const { return Compare(in) != 0; }
+    bool operator<(const SignalKey& in)  const { return Compare(in) < 0; }
+    bool operator>(const SignalKey& in)  const { return Compare(in) > 0; }
+    bool operator<=(const SignalKey& in) const { return Compare(in) <= 0; }
+    bool operator>=(const SignalKey& in) const { return Compare(in) >= 0; }
 
-    uint64_t GetID() const { return id; }
-    bool IsActive() const { return id > 0; }
+    uint64_t GetID() const { return key_id; }
+    uint64_t GetSignalID() const { return signal_id; }
+    bool IsActive() const { return key_id > 0; }
   };
 
   class SignalBase {
