@@ -57,7 +57,7 @@ namespace emp {
     Action(this_t &&) = default;
 
     this_t & operator=(const this_t &) = default;
-    this_t & operator=(const this_t &&) = default;
+    this_t & operator=(this_t &&) = default;
 
     const std::function<void(ARGS...)> & GetFun() const { return fun; };
 
