@@ -23,11 +23,17 @@ namespace emp {
 
   public:
     ActionManager() = default;
-    ActionManager(const ActionManager &) = delete; // No copy constructor; can't duplicate Action*
     ActionManager(ActionManager &&) = default;     // Normal juggle is okay for move constructor
+    ActionManager(const ActionManager & in) : next_id(in.next_id), prefix(in.prefix) {
+      // Copy all actions from input manager.
+      for (const auto & x : in.action_map) {
+        action_map[x.first] = x.second->Clone();
+      }
+    }
     ~ActionManager() { for (auto & x : action_map) delete x.second; }
 
     int GetNextID() const { return next_id; }
+    size_t GetSize() const { return action_map.size(); }
 
     ActionBase & Get(const std::string & name) {
       emp_assert(action_map.find(name) != action_map.end());
