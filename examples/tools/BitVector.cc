@@ -12,19 +12,21 @@
 
 // EMP_TRACK_MEM must be defined in order to use the extra capabilities of emp::Ptr.
 // Normally this would be done at the command line with -DEMP_TRACK_MEM
+#ifndef EMP_TRACK_MEM
 #define EMP_TRACK_MEM
+#endif
 
 #include "../../tools/BitVector.h"
 
 int main()
 {
-  const int set_size = 100000;
+  const size_t set_size = 100000;
   using TEST_TYPE = emp::BitVector;  // Change this to use std::vector<bool> instead.
 
   TEST_TYPE set1(set_size);
   TEST_TYPE set2(set_size);
 
-  for (int i = 0; i < set_size; i++) {
+  for (size_t i = 0; i < set_size; i++) {
     if (!(i%2) && (i%5)) set1[i] = 1;
     if (!(i%3) && (i%7)) set2.Set(i, true);
   }
@@ -35,7 +37,7 @@ int main()
   TEST_TYPE set3(set1 & set2);
   TEST_TYPE set4 = (set1 | set2);
   int total = 0;
-  for (int i = 0; i < 100000; i++) {
+  for (size_t i = 0; i < 100000; i++) {
     set3 |= (set4 << 3);
     set4 &= (set3 >> 3);
     auto set5 = set3 & set4;
@@ -66,4 +68,3 @@ int main()
   std::cout << bv2.Hash() << "  (resized new bv to 9)" << std::endl;
 
 }
-
