@@ -19,7 +19,7 @@ double BitSetMath() {
 
   TEST_TYPE set1, set2;
 
-  for (int i = 0; i < set_size; i++) {
+  for (size_t i = 0; i < set_size; i++) {
     if (!(i%2) && (i%5)) set1[i] = 1;
     if (!(i%3) && (i%7)) set2.Set(i, true);
   }
@@ -43,7 +43,7 @@ int main()
 
   TEST_TYPE set1, set2;
 
-  for (int i = 0; i < set_size; i++) {
+  for (size_t i = 0; i < set_size; i++) {
     if (!(i%2) && (i%5)) set1[i] = 1;
     if (!(i%3) && (i%7)) set2.Set(i, true);
   }
@@ -51,7 +51,7 @@ int main()
   TEST_TYPE set3(set1 & set2);
   TEST_TYPE set4 = (set1 | set2);
   double total = 0.0;
-  for (int i = 0; i < set_size; i++) {
+  for (size_t i = 0; i < set_size; i++) {
     set3 |= (set4 << 3);
     set4 &= (set3 >> 3);
     auto set5 = set3 & set4;
