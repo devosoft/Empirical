@@ -413,10 +413,10 @@ namespace emp {
       }
       return -1;
     }
-    emp::vector<int> GetOnes() const {
+    emp::vector<size_t> GetOnes() const {
       // @CAO -- There are better ways to do this with bit tricks.
-      emp::vector<int> out_set(CountOnes());
-      int cur_pos = 0;
+      emp::vector<size_t> out_set(CountOnes());
+      size_t cur_pos = 0;
       for (size_t i = 0; i < NUM_BITS; i++) {
         if (Get(i)) out_set[cur_pos++] = i;
       }
