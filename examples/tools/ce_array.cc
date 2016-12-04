@@ -12,13 +12,13 @@
 constexpr int CETest() {
   emp::ce_array<int, 20> test_array(0);
 
-  for (int i = 0; i < 20; i++) {
-    test_array[i] = i*i;
+  for (size_t i = 0; i < 20; i++) {
+    test_array[i] = (int) (i*i);
   }
 
   int total = 0;
   emp::ce_array<int, 20> test2(test_array);
-  for (int i = 0; i < 20; i++) {
+  for (size_t i = 0; i < 20; i++) {
     total += test2[i];
   }
 
