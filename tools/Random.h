@@ -63,12 +63,12 @@ namespace emp {
 
     // Constants ////////////////////////////////////////////////////////////////
     // Statistical Approximation
-    static const uint32_t _BINOMIAL_TO_NORMAL = 50;     // if < n*p*(1-p)
-    static const uint32_t _BINOMIAL_TO_POISSON = 1000;  // if < n && !Normal approx Engine
+    static const int32_t _BINOMIAL_TO_NORMAL = 50;     // if < n*p*(1-p)
+    static const int32_t _BINOMIAL_TO_POISSON = 1000;  // if < n && !Normal approx Engine
 
     // Engine
-    static const uint32_t _RAND_MBIG = 1000000000;
-    static const uint32_t _RAND_MSEED = 161803398;
+    static const int32_t _RAND_MBIG = 1000000000;
+    static const int32_t _RAND_MSEED = 161803398;
 
     // Internal functions
 
@@ -78,20 +78,20 @@ namespace emp {
       // Clear variables
       for (int i = 0; i < 56; ++i) ma[i] = 0;
 
-      int mj = (_RAND_MSEED - seed) % _RAND_MBIG;
+      int32_t mj = (_RAND_MSEED - seed) % _RAND_MBIG;
       ma[55] = mj;
-      int mk = 1;
+      int32_t mk = 1;
 
-      for (int i = 1; i < 55; ++i) {
-        int ii = (21 * i) % 55;
+      for (int32_t i = 1; i < 55; ++i) {
+        int32_t ii = (21 * i) % 55;
         ma[ii] = mk;
         mk = mj - mk;
         if (mk < 0) mk += _RAND_MBIG;
         mj = ma[ii];
       }
 
-      for (int k = 0; k < 4; ++k) {
-        for (int j = 1; j < 55; ++j) {
+      for (int32_t k = 0; k < 4; ++k) {
+        for (int32_t j = 1; j < 55; ++j) {
           ma[j] -= ma[1 + (j + 30) % 55];
           if (ma[j] < 0) ma[j] += _RAND_MBIG;
         }
@@ -106,7 +106,7 @@ namespace emp {
 
     // Basic Random number
     // Returns a random number [0,_RAND_MBIG)
-    uint32_t Get() {
+    int32_t Get() {
       if (++inext == 56) inext = 0;
       if (++inextp == 56) inextp = 0;
       int mj = ma[inext] - ma[inextp];
@@ -206,7 +206,7 @@ namespace emp {
      * @return The pseudo random number.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    inline uint32_t GetUInt(const uint32_t max) { return static_cast<int>(GetDouble() * static_cast<double>(max)); }
+    inline uint32_t GetUInt(const uint32_t max) { return static_cast<uint32_t>(GetDouble() * static_cast<double>(max)); }
 
     /**
      * Generate an uint32_t out of an interval.
@@ -232,8 +232,8 @@ namespace emp {
      * @param min The lower bound for the random numbers.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    inline int GetInt(const int max) { return static_cast<int>(GetUInt(max)); }
-    inline int GetInt(const int min, const int max) { return static_cast<int>(GetUInt(max - min)) + min; }
+    inline int GetInt(const int max) { return static_cast<int>(GetUInt((uint32_t) max)); }
+    inline int GetInt(const int min, const int max) { return GetInt(max - min) + min; }
     inline int GetInt(const Range<int> range) { return GetInt(range.lower, range.upper); }
 
 
