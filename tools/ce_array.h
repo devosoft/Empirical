@@ -19,8 +19,8 @@ namespace emp {
   template <typename T, size_t N>
   class ce_array {
   private:
-    static constexpr int p1_size = N/2;
-    static constexpr int p2_size = N - p1_size;
+    static constexpr size_t p1_size = N/2;
+    static constexpr size_t p2_size = N - p1_size;
     ce_array<T, p1_size> p1;   // First half of values.
     ce_array<T, p2_size> p2;   // Second half of values.
 
@@ -39,8 +39,8 @@ namespace emp {
     }
     constexpr bool operator!=(const ce_array<T,N> & _in) const { return !operator==(_in); }
 
-    constexpr T & operator[](int id) { return (id < p1_size) ? p1[id] : p2[id-p1_size]; }
-    constexpr const T & operator[](int id) const { return (id < p1_size) ? p1[id] : p2[id-p1_size]; }
+    constexpr T & operator[](size_t id) { return (id < p1_size) ? p1[id] : p2[id-p1_size]; }
+    constexpr const T & operator[](size_t id) const { return (id < p1_size) ? p1[id] : p2[id-p1_size]; }
 
     constexpr T & back() { return p2.back(); }
     constexpr const T & back() const { return p2.back(); }
@@ -48,11 +48,11 @@ namespace emp {
 
     constexpr bool Has(const T & t) const { return p1.Has(t) || p2.Has(t); }
 
-    template <int i> constexpr T & Get() {
+    template <size_t i> constexpr T & Get() {
       static_assert(i < N, "ce_array::Get<id> must have inded in range.");
       return (i < p1_size) ? p1.template Get<i>(0) : p2.template Get<i-p1_size>(0);
     }
-    template <int i> constexpr const T & Get() const {
+    template <size_t i> constexpr const T & Get() const {
       static_assert(i < N, "ce_array::Get<id> must have inded in range.");
       return (i < p1_size) ? p1.template Get<i>(0) : p2.template Get<i-p1_size>(0);
     }
@@ -76,8 +76,8 @@ namespace emp {
     constexpr bool operator==(const ce_array<T,1> & _in) const { return m_val == _in.m_val; }
     constexpr bool operator!=(const ce_array<T,1> & _in) const { return m_val != _in.m_val; }
 
-    constexpr T & operator[](int id) { emp_assert(id==0); return m_val; }
-    constexpr const T & operator[](int id) const { emp_assert(id==0); return m_val; }
+    constexpr T & operator[](size_t id) { emp_assert(id==0); return m_val; }
+    constexpr const T & operator[](size_t id) const { emp_assert(id==0); return m_val; }
 
     constexpr T & back() { return m_val; }
     constexpr const T & back() const { return m_val; }
@@ -85,11 +85,11 @@ namespace emp {
 
     constexpr bool Has(const T & t) const { return m_val == t; }
 
-    template <int i> constexpr T & Get() {
+    template <size_t i> constexpr T & Get() {
       static_assert(i==0, "ce_array::Get<id> must have inded in range.");
       return m_val;
     }
-    template <int i> constexpr const T & Get() const {
+    template <size_t i> constexpr const T & Get() const {
       static_assert(i==0, "ce_array::Get<id> must have inded in range.");
       return m_val;
     }
@@ -112,8 +112,8 @@ namespace emp {
     constexpr bool operator!=(const ce_array<T,0> &) const { return false; }
 
     // Cannot index into an empty array!
-    constexpr T & operator[](int id) { emp_assert(false); return *((T*) nullptr); }
-    constexpr const T & operator[](int id) const { emp_assert(false); return *((T*) nullptr); }
+    constexpr T & operator[](size_t id) { emp_assert(false); return *((T*) nullptr); }
+    constexpr const T & operator[](size_t id) const { emp_assert(false); return *((T*) nullptr); }
 
     // No back in an empty array.
     constexpr T & back() { emp_assert(false); return *((T*) nullptr); }
