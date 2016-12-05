@@ -85,12 +85,12 @@ namespace emp {
 
   /// Quick bit-mask generators...
   template <typename TYPE>
-  static constexpr TYPE MaskLow(int num_bits) {
-    return (num_bits == 8*sizeof(TYPE)) ? -1 : ((((TYPE)1) << num_bits) - 1);
+  static constexpr TYPE MaskLow(size_t num_bits) {
+    return (num_bits == 8*sizeof(TYPE)) ? ((TYPE)-1) : ((((TYPE)1) << num_bits) - 1);
   }
 
   template <typename TYPE>
-  static constexpr TYPE MaskHigh(int num_bits) {
+  static constexpr TYPE MaskHigh(size_t num_bits) {
     return MaskLow<TYPE>(num_bits) << (8*sizeof(TYPE)-num_bits);
   }
 
