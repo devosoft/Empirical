@@ -14,6 +14,8 @@
 #include <type_traits>
 #include <vector>
 
+#include "assert.h"
+
 #define EMP_FUNCTION_TIMER(TEST_FUN) {                                       \
     std::clock_t emp_start_time = std::clock();                              \
     auto emp_result = TEST_FUN;                                              \
@@ -78,8 +80,9 @@ namespace emp {
 
   static inline std::vector<int> build_range(int min, int max, int step=1) {
     int size = (max-min) / step;
-    std::vector<int> out_v(size);
-    int pos = 0;
+    emp_assert(size >= 0);
+    std::vector<int> out_v((size_t) size);
+    size_t pos = 0;
     for (int i = min; i < max; i += step) {
       out_v[pos++] = i;
     }
