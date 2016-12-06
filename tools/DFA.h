@@ -64,16 +64,18 @@ namespace emp {
 
     using stop_t = STOP_TYPE;
 
-    int GetSize() const { return (int) transitions.size(); }
+    size_t GetSize() const { return transitions.size(); }
 
-    void Resize(int new_size) {
+    void Resize(size_t new_size) {
       auto old_size = transitions.size();
       transitions.resize(new_size);
       is_stop.resize(new_size, 0);
       for (auto i = old_size; i < transitions.size(); i++) transitions[i].fill(-1);
     }
 
-    const emp::array<int, NUM_SYMBOLS> & GetTransitions(int from) const { return transitions[from]; }
+    const emp::array<int, NUM_SYMBOLS> & GetTransitions(size_t from) const {
+      return transitions[from];
+    }
 
     void SetTransition(size_t from, size_t to, size_t sym) {
       emp_assert(from < transitions.size());
@@ -98,6 +100,11 @@ namespace emp {
     stop_t GetStop(int state) const { return (state == -1) ? 0 : is_stop[(size_t)state]; }
     bool IsActive(int state) const { return state != -1; }
     bool IsStop(int state) const { return (state == -1) ? false : is_stop[(size_t)state]; }
+
+    // If a size_t is passed in, it can't be -1...
+    stop_t GetStop(size_t state) const { return is_stop[state]; }
+    bool IsActive(size_t state) const { return true; }
+    bool IsStop(size_t state) const { return is_stop[state]; }
 
     int Next(int state, size_t sym) const {
       emp_assert(state >= -1 && state < (int) transitions.size());
