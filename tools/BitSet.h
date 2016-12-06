@@ -56,7 +56,7 @@
 //  void PrintOneIDs(ostream & out=cout) const    -- Just print the IDs of the set bits.
 //
 // Bit analysis:
-//  int CountOnes()
+//  size_t CountOnes()
 //  int FindBit(int start_bit)   -- Return pos of first 1 after start_bit
 //  emp::vector<int> GetOnes()   -- Return pos of ALL ones.
 //
@@ -364,8 +364,8 @@ namespace emp {
 
 
     // Count 1's by looping through once for each bit equal to 1
-    int CountOnes_Sparse() const {
-      int bit_count = 0;
+    size_t CountOnes_Sparse() const {
+      size_t bit_count = 0;
       for (auto i : bit_set) {
         while (i) {
           i &= (i-1);       // Peel off a single 1.
@@ -376,8 +376,8 @@ namespace emp {
     }
 
     // Count 1's in semi-parallel; fastest for even 0's & 1's
-    int CountOnes_Mixed() const {
-      int bit_count = 0;
+    size_t CountOnes_Mixed() const {
+      size_t bit_count = 0;
       for (const auto v : bit_set) {
         const uint32_t t1 = v - ((v >> 1) & 0x55555555);
         const uint32_t t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
@@ -386,7 +386,7 @@ namespace emp {
       return bit_count;
     }
 
-    int CountOnes() const { return CountOnes_Mixed(); }
+    size_t CountOnes() const { return CountOnes_Mixed(); }
 
     int FindBit() const {
       size_t field_id = 0;
