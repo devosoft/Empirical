@@ -129,7 +129,7 @@ namespace emp {
 
       for (size_t i = 0; i < transitions.size(); i++) {
         os << " " << i << " ->";
-        for (int s = 0; s < NUM_SYMBOLS; s++) {
+        for (size_t s = 0; s < NUM_SYMBOLS; s++) {
           if (transitions[i][s] == -1) continue;
           os << " " << to_literal((char) s) << ":" << transitions[i][s];
         }
