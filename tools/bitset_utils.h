@@ -18,7 +18,7 @@ namespace emp {
   constexpr uint32_t UIntMaskFirst<0>() { return 0; }
 
   // Dealing with bits in uint64_t variables
-  constexpr int ByteCount[256] = {
+  constexpr size_t ByteCount[256] = {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
@@ -29,7 +29,7 @@ namespace emp {
     3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
   };
 
-  inline constexpr int count_bits(uint64_t val) {
+  inline constexpr size_t count_bits(uint64_t val) {
     return
       ByteCount[  val >> 56         ] +
       ByteCount[ (val >> 48) & 0xFF ] +
@@ -41,7 +41,7 @@ namespace emp {
       ByteCount[  val        & 0xFF ];
   }
 
-  inline constexpr int count_bits(uint32_t val) {
+  inline constexpr size_t count_bits(uint32_t val) {
     return
       ByteCount[  val >> 24         ] +
       ByteCount[ (val >> 16) & 0xFF ] +
@@ -49,8 +49,8 @@ namespace emp {
       ByteCount[  val        & 0xFF ];
   }
 
-  inline constexpr int find_bit(const uint64_t & val) { return count_bits( (~val) & (val-1) ); }
-  inline constexpr int find_bit(const uint32_t & val) { return count_bits( (~val) & (val-1) ); }
+  inline constexpr size_t find_bit(const uint64_t & val) { return count_bits( (~val) & (val-1) ); }
+  inline constexpr size_t find_bit(const uint32_t & val) { return count_bits( (~val) & (val-1) ); }
 
   /*
   // Returns the position of the first set (one) bit or a -1 if none exist.
