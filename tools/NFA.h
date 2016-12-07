@@ -191,7 +191,7 @@ namespace emp {
       states[from].trans[to].symbols[sym] = true;
     }
     void AddTransition(size_t from, size_t to, const std::string & sym_set) {
-      for (char x : sym_set) AddTransition(from, to, x);
+      for (char x : sym_set) AddTransition(from, to, (size_t) x);
     }
     void AddTransition(size_t from, size_t to, const BitSet<NUM_SYMBOLS> & sym_set) {
       emp_assert(from < states.size(), from, states.size());
@@ -219,7 +219,7 @@ namespace emp {
 
     }
 
-    template <typename T>
+    template <typename T=stop_t>
     void SetStop(size_t state, T stop_val=1) { is_stop[state] = (stop_t) stop_val; }
     stop_t GetStop(size_t state) const { return is_stop[state]; }
 
@@ -310,7 +310,7 @@ namespace emp {
     }
 
     void Next(const std::string & sym_set) {
-      for (char x : sym_set) Next(x);
+      for (char x : sym_set) Next((size_t) x);
     }
 
     void Print() {
