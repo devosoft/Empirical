@@ -108,10 +108,8 @@
 
 namespace emp {
 
-  template <int NUM_BITS> class BitSet {
+  template <size_t NUM_BITS> class BitSet {
   private:
-    static_assert(NUM_BITS > 0, "BitSet templates must have a positive number of bits");
-
     static const uint32_t NUM_FIELDS = 1 + ((NUM_BITS - 1) >> 5);
     static const uint32_t LAST_BIT = NUM_BITS & 31;
     static const uint32_t NUM_BYTES = 1 + ((NUM_BITS - 1) >> 3);
@@ -266,12 +264,12 @@ namespace emp {
     bool operator>(const BitSet & in_set) const { return !operator<=(in_set); }
     bool operator>=(const BitSet & in_set) const { return !operator<(in_set); }
 
-    constexpr static int GetSize() { return NUM_BITS; }
+    constexpr static size_t GetSize() { return NUM_BITS; }
 
     bool Get(size_t index) const {
       emp_assert(index >= 0 && index < NUM_BITS);
-      const int field_id = FieldID(index);
-      const int pos_id = FieldPos(index);
+      const size_t field_id = FieldID(index);
+      const size_t pos_id = FieldPos(index);
       return (bit_set[field_id] & (1 << pos_id)) != 0;
     }
 
@@ -298,15 +296,15 @@ namespace emp {
 
     uint8_t GetByte(size_t index) const {
       emp_assert(index < NUM_BYTES);
-      const int field_id = Byte2Field(index);
-      const int pos_id = Byte2FieldPos(index);
+      const size_t field_id = Byte2Field(index);
+      const size_t pos_id = Byte2FieldPos(index);
       return (bit_set[field_id] >> pos_id) & 255;
     }
 
     void SetByte(size_t index, uint8_t value) {
       emp_assert(index < NUM_BYTES);
-      const int field_id = Byte2Field(index);
-      const int pos_id = Byte2FieldPos(index);
+      const size_t field_id = Byte2Field(index);
+      const size_t pos_id = Byte2FieldPos(index);
       const uint32_t val_uint = value;
       bit_set[field_id] = (bit_set[field_id] & ~(255U << pos_id)) | (val_uint << pos_id);
     }
@@ -323,14 +321,14 @@ namespace emp {
 
     uint32_t GetUIntAtBit(size_t index) {
       emp_assert(index < NUM_BITS);
-      const int field_id = FieldID(index);
-      const int pos_id = FieldPos(index);
+      const size_t field_id = FieldID(index);
+      const size_t pos_id = FieldPos(index);
       if (pos_id == 0) return bit_set[field_id];
       return (bit_set[field_id] >> pos_id) |
         ((field_id+1 < NUM_FIELDS) ? bit_set[field_id+1] << (32-pos_id) : 0);
     }
 
-    template <int OUT_BITS>
+    template <size_t OUT_BITS>
     uint32_t GetValueAtBit(size_t index) {
       static_assert(OUT_BITS <= 32, "Requesting too many bits to fit in a UInt");
       return GetUIntAtBit(index) & MaskLow<uint32_t>(OUT_BITS);
@@ -391,7 +389,7 @@ namespace emp {
     int FindBit() const {
       size_t field_id = 0;
       while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
-      return (field_id < NUM_FIELDS) ? find_bit(bit_set[field_id]) + (field_id << 5) : -1;
+      return (field_id < NUM_FIELDS) ? (int) (find_bit(bit_set[field_id]) + (field_id << 5)) : -1;
     }
 
     int PopBit() {
@@ -547,7 +545,7 @@ namespace emp {
     inline size_t count() const { return CountOnes_Mixed(); }
   };
 
-  template <int NUM_BITS1, int NUM_BITS2>
+  template <size_t NUM_BITS1, size_t NUM_BITS2>
   BitSet<NUM_BITS1+NUM_BITS2> join(const BitSet<NUM_BITS1> & in1, const BitSet<NUM_BITS2> & in2) {
     BitSet<NUM_BITS1+NUM_BITS2> out_bits;
     out_bits.Import(in2);
@@ -557,7 +555,7 @@ namespace emp {
 
 }
 
-template <int NUM_BITS> std::ostream & operator<<(std::ostream & out, const emp::BitSet<NUM_BITS> & _bit_set) {
+template <size_t NUM_BITS> std::ostream & operator<<(std::ostream & out, const emp::BitSet<NUM_BITS> & _bit_set) {
   _bit_set.Print(out);
   return out;
 }
