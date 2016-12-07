@@ -391,7 +391,7 @@ namespace emp {
       size_t field_id = 0;
       while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
       return (field_id < NUM_FIELDS) ?
-        (find_bit(bit_set[field_id]) + (int) (field_id * FIELD_BITS))  :  -1;
+        (int) (find_bit(bit_set[field_id]) + (field_id * FIELD_BITS))  :  -1;
     }
 
     int PopBit() {
@@ -400,9 +400,9 @@ namespace emp {
       while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
       if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
 
-      const int pos_found = find_bit(bit_set[field_id]);
+      const size_t pos_found = find_bit(bit_set[field_id]);
       bit_set[field_id] &= ~(1U << pos_found);
-      return pos_found + (int) (field_id * FIELD_BITS);
+      return (int) (pos_found + (field_id * FIELD_BITS));
     }
 
     int FindBit(const size_t start_pos) const {
@@ -410,7 +410,8 @@ namespace emp {
       size_t field_id  = FieldID(start_pos);     // What field do we start in?
       const size_t field_pos = FieldPos(start_pos);    // What position in that field?
       if (field_pos && (bit_set[field_id] & ~(MaskLow<field_t>(field_pos)))) {  // First field hit!
-        return find_bit(bit_set[field_id] & ~(MaskLow<field_t>(field_pos))) + (int) (field_id * FIELD_BITS);
+        return (int) (find_bit(bit_set[field_id] & ~(MaskLow<field_t>(field_pos))) +
+                      field_id * FIELD_BITS);
       }
 
       // Search other fields...
@@ -418,7 +419,7 @@ namespace emp {
       if (field_pos) field_id++;
       while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
       return (field_id < NUM_FIELDS) ?
-        find_bit(bit_set[field_id]) + (int)(field_id * FIELD_BITS) : -1;
+        (int) (find_bit(bit_set[field_id]) + (field_id * FIELD_BITS)) : -1;
     }
     std::vector<size_t> GetOnes() const {
       // @CAO -- There are probably better ways to do this with bit tricks.
