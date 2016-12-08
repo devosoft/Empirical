@@ -220,28 +220,28 @@ namespace emp {
     }
 
     // Assign from a BitSet of a different size.
-    template <int NUM_BITS2>
+    template <size_t NUM_BITS2>
     BitSet & Import(const BitSet<NUM_BITS2> & in_set) {
-      static const int NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> 5);
-      static const int MIN_FIELDS = (NUM_FIELDS < NUM_FIELDS2) ? NUM_FIELDS : NUM_FIELDS2;
-      for (int i = 0; i < MIN_FIELDS; i++) bit_set[i] = in_set.GetUInt(i);  // Copy avail fields
-      for (int i = MIN_FIELDS; i < NUM_FIELDS; i++) bit_set[i] = 0;         // Zero extra fields
+      static const size_t NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> 5);
+      static const size_t MIN_FIELDS = (NUM_FIELDS < NUM_FIELDS2) ? NUM_FIELDS : NUM_FIELDS2;
+      for (size_t i = 0; i < MIN_FIELDS; i++) bit_set[i] = in_set.GetUInt(i);  // Copy avail fields
+      for (size_t i = MIN_FIELDS; i < NUM_FIELDS; i++) bit_set[i] = 0;         // Zero extra fields
       return *this;
     }
 
     // Convert to a Bitset of a different size.
-    template <int NUM_BITS2>
+    template <size_t NUM_BITS2>
     BitSet<NUM_BITS2> Export() const {
-      static const int NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> 5);
-      static const int MIN_FIELDS = (NUM_FIELDS < NUM_FIELDS2) ? NUM_FIELDS : NUM_FIELDS2;
+      static const size_t NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> 5);
+      static const size_t MIN_FIELDS = (NUM_FIELDS < NUM_FIELDS2) ? NUM_FIELDS : NUM_FIELDS2;
       BitSet<NUM_BITS2> out_bits;
-      for (int i = 0; i < MIN_FIELDS; i++) out_bits.SetUInt(i, bit_set[i]);  // Copy avail fields
-      for (int i = MIN_FIELDS; i < NUM_FIELDS; i++) out_bits.SetUInt(i, 0);  // Zero extra fields
+      for (size_t i = 0; i < MIN_FIELDS; i++) out_bits.SetUInt(i, bit_set[i]);  // Copy avail fields
+      for (size_t i = MIN_FIELDS; i < NUM_FIELDS; i++) out_bits.SetUInt(i, 0);  // Zero extra fields
       return out_bits;
     }
 
     bool operator==(const BitSet & in_set) const {
-      for (int i = 0; i < NUM_FIELDS; ++i) {
+      for (size_t i = 0; i < NUM_FIELDS; ++i) {
         if (bit_set[i] != in_set.bit_set[i]) return false;
       }
       return true;
