@@ -23,7 +23,7 @@ namespace emp {
 
     using return_t = RETURN_T;
 
-    int GetSize() const { return (int) fun_set.size(); }
+    size_t GetSize() const { return fun_set.size(); }
     size_t size() const { return fun_set.size(); }        // For standard lib compatability
 
     void Add(const std::function<RETURN_T(ARG_TYPES...)> & in_fun) {
@@ -48,7 +48,7 @@ namespace emp {
       Run(params...);
 
       RETURN_T best_found = return_vals[0];
-      for (int i = 1; i < return_vals.size(); i++) {
+      for (size_t i = 1; i < return_vals.size(); i++) {
         best_found = comp_fun(best_found, return_vals[i]);
       }
 
@@ -77,7 +77,7 @@ namespace emp {
     FunctionSet() { ; }
     ~FunctionSet() { ; }
 
-    int GetSize() const { return (int) fun_set.size(); }
+    size_t GetSize() const { return fun_set.size(); }
     size_t size() const { return fun_set.size(); }     // For compatability with STL
 
     void Add(const std::function<void(ARG_TYPES...)> & in_fun) {
