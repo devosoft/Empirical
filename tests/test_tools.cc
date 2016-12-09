@@ -1291,7 +1291,7 @@ TEST_CASE("Test random", "[tools]")
 
 
   // Mimimal test of Choose()
-  emp::vector<int> choices = Choose(rng,100,10);
+  emp::vector<size_t> choices = Choose(rng,100,10);
 
   REQUIRE(choices.size() == 10);
 }
