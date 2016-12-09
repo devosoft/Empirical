@@ -34,21 +34,21 @@
 //  bool operator!=(const BitSet & in_set) const  --
 //
 // Sizing:
-//  int GetSize() const
+//  size_t GetSize() const
 //
 // Accessors for bits:
-//  void Set(int index, bool value)
-//  bool Get(int index) const
-//  bool operator[](int index) const
-//  BitProxy operator[](int index)
+//  void Set(size_t index, bool value)
+//  bool Get(size_t index) const
+//  bool operator[](size_t index) const
+//  BitProxy operator[](size_t index)
 //
 // Accessors for larger chunks:
 //  void Clear()                                  -- Set all bits to zero
 //  void SetAll()                                 -- Set all bits to one
-//  uint8_t GetByte(int byte_id) const            -- Read a full byte of bits
-//  void SetByte(int byte_id, uint8_t value)      -- Set a full byte of bits
-//  uint32_t GetUInt(int uint_id) const           -- Read 32 bits at once
-//  void SetUInt(int uint_id, uint32_t value)     -- Set 32 bits at once
+//  uint8_t GetByte(size_t byte_id) const            -- Read a full byte of bits
+//  void SetByte(size_t byte_id, uint8_t value)      -- Set a full byte of bits
+//  uint32_t GetUInt(size_t uint_id) const           -- Read 32 bits at once
+//  void SetUInt(size_t uint_id, uint32_t value)     -- Set 32 bits at once
 //
 // Printing:
 //  void Print(ostream & out=cout) const          -- Print BitSet (least significant on right)
@@ -57,8 +57,8 @@
 //
 // Bit analysis:
 //  size_t CountOnes()
-//  int FindBit(int start_bit)   -- Return pos of first 1 after start_bit
-//  emp::vector<int> GetOnes()   -- Return pos of ALL ones.
+//  int FindBit(size_t start_bit)  -- Return pos of first 1 after start_bit
+//  emp::vector<size_t> GetOnes()  -- Return pos of ALL ones.
 //
 // Boolean math functions:
 //  BitSet NOT() const
@@ -85,13 +85,13 @@
 //  BitSet operator&(const BitSet & ar2) const
 //  BitSet operator|(const BitSet & ar2) const
 //  BitSet operator^(const BitSet & ar2) const
-//  BitSet operator>>(const int) const
-//  BitSet operator<<(const int) const
+//  BitSet operator>>(const size_t) const
+//  BitSet operator<<(const size_t) const
 //  const BitSet & operator&=(const BitSet & ar2)
 //  const BitSet & operator|=(const BitSet & ar2)
 //  const BitSet & operator^=(const BitSet & ar2)
-//  const BitSet & operator>>=(const int)
-//  const BitSet & operator<<=(const int)
+//  const BitSet & operator>>=(const size_t)
+//  const BitSet & operator<<=(const size_t)
 
 
 #ifndef EMP_BIT_SET_H
