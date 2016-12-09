@@ -376,7 +376,7 @@ namespace emp {
   LinkKey SignalManager::LinkSignal(internal::Signal_Base * s,
                                     const std::function<void(ARGS...)> & fun) {
     emp::Action<ARGS...> action(fun);
-    return s->AddAction(&action);
+    return s->AddAction(action);
   }
 
 
