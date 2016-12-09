@@ -44,6 +44,7 @@
 #include <iterator>
 #include <unistd.h>
 
+#include "assert.h"
 #include "Range.h"
 
 namespace emp {
@@ -181,7 +182,10 @@ namespace emp {
      * @return The pseudo random number.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    inline double GetDouble(const double max) { return GetDouble() * max; }
+    inline double GetDouble(const double max) {
+      emp_assert(max <= (double) _RAND_MBIG);  // Previcision will be too low past this point...
+      return GetDouble() * max;
+    }
 
     /**
      * Generate a double out of a given interval.
@@ -190,7 +194,10 @@ namespace emp {
      * @param min The lower bound for the random numbers.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    inline double GetDouble(const double min, const double max) { return GetDouble() * (max - min) + min; }
+    inline double GetDouble(const double min, const double max) {
+      emp_assert((max-min) <= (double) _RAND_MBIG);  // Precision will be too low past this point...
+      return GetDouble() * (max - min) + min;
+    }
 
     /**
      * Generate a double out of a given interval.
@@ -198,7 +205,9 @@ namespace emp {
      * @return The pseudo random number.
      * @param range The upper and lower bounds for the random numbers [lower, upper)
      **/
-    inline double GetDouble(const Range<double> range) { return GetDouble(range.lower, range.upper); }
+    inline double GetDouble(const Range<double> range) {
+      return GetDouble(range.lower, range.upper);
+     }
 
     /**
      * Generate an uint32_t.
@@ -206,7 +215,11 @@ namespace emp {
      * @return The pseudo random number.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    inline uint32_t GetUInt(const uint32_t max) { return static_cast<uint32_t>(GetDouble() * static_cast<double>(max)); }
+    template <typename T>
+    inline uint32_t GetUInt(const T max) {
+      emp_assert(max <= (T) _RAND_MBIG);  // Precision will be too low past this point...
+      return static_cast<uint32_t>(GetDouble() * static_cast<double>(max));
+    }
 
     /**
      * Generate an uint32_t out of an interval.
@@ -215,7 +228,10 @@ namespace emp {
      * @param min The lower bound for the random numbers.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    inline uint32_t GetUInt(const uint32_t min, const uint32_t max) { return GetUInt(max - min) + min; }
+    template <typename T1, typename T2>
+    inline uint32_t GetUInt(const T1 min, const T2 max) {
+      return GetUInt<uint32_t>((uint32_t) max - (uint32_t) min) + (uint32_t) min;
+    }
 
     /**
      * Generate a uint32_t out of a given interval.
@@ -223,7 +239,8 @@ namespace emp {
      * @return The pseudo random number.
      * @param range The upper and lower bounds for the random numbers [lower, upper)
      **/
-    inline uint32_t GetUInt(const Range<uint32_t> range) { return GetUInt(range.lower, range.upper); }
+    template <typename T>
+    inline uint32_t GetUInt(const Range<T> range) { return GetUInt(range.lower, range.upper); }
 
     /**
      * Generate an int out of an interval.
