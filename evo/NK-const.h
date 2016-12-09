@@ -36,11 +36,11 @@ namespace evo {
   /// Note: Overly large Ns and Ks currently trigger a seg-fault, caused by trying to build a table
   /// that is larger than will fit in memory. You can use larger values of N and K (for slightly
   /// reduced speed) of you use an NKLandscape object instead.
-  template <int N, int K>
+  template <size_t N, size_t K>
   class NKLandscapeConst {
   private:
-    static constexpr int state_count = emp::IntPow(2,K+1);
-    static constexpr int total_count = N * state_count;
+    static constexpr size_t state_count = emp::IntPow<size_t>(2,K+1);
+    static constexpr size_t total_count = N * state_count;
     std::array< std::array<double, state_count>, N > landscape;
 
   public:
@@ -59,27 +59,27 @@ namespace evo {
     NKLandscapeConst & operator=(const NKLandscapeConst &) = delete;
 
     /// Returns N
-    constexpr int GetN() const { return N; }
+    constexpr size_t GetN() const { return N; }
     /// Returns K
-    constexpr int GetK() const { return K; }
+    constexpr size_t GetK() const { return K; }
     /// Get the number of posssible states for a given site
-    constexpr int GetStateCount() const { return state_count; }
+    constexpr size_t GetStateCount() const { return state_count; }
     /// Get the total number of states possible in the landscape
     /// (i.e. the number of different fitness contributions in the table)
-    constexpr int GetTotalCount() const { return total_count; }
+    constexpr size_t GetTotalCount() const { return total_count; }
 
     /// Get the fitness contribution of position [n] when it (and its K neighbors) have the value
     /// [state]
-    double GetFitness(int n, uint32_t state) const {
+    double GetFitness(size_t n, size_t state) const {
       emp_assert(state < state_count, state, state_count);
       // std::cout << n << " : " << state << " : " << landscape[n][state] << std::endl;
       return landscape[n][state];
     }
 
     /// Get the fitness of a whole  bitstring
-    double GetFitness( std::array<uint32_t, N> states ) const {
+    double GetFitness( std::array<size_t, N> states ) const {
       double total = landscape[0][states[0]];
-      for (int i = 1; i < N; i++) total += GetFitness(i,states[i]);
+      for (size_t i = 1; i < N; i++) total += GetFitness(i,states[i]);
       return total;
     }
 
@@ -90,9 +90,9 @@ namespace evo {
       genome2 |= (genome2 << N);
 
       double total = 0.0;
-      constexpr uint32_t mask = emp::MaskLow<uint32_t>(K+1);
-      for (int i = 0; i < N; i++) {
-	      const uint32_t cur_val = (genome2 >> i).GetUInt(0) & mask;
+      constexpr size_t mask = emp::MaskLow<size_t>(K+1);
+      for (size_t i = 0; i < N; i++) {
+	      const size_t cur_val = (genome2 >> (int)i).GetUInt(0) & mask;
 	      const double cur_fit = GetFitness(i, cur_val);
 	      total += cur_fit;
       }
