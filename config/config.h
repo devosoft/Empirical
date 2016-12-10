@@ -167,8 +167,8 @@ namespace emp {
       { ; }
       ~ConfigGroup() { ; }
 
-      int GetSize() const { return (int) entry_set.size(); }
-      ConfigEntry * GetEntry(int id) { return entry_set[id]; }
+      size_t GetSize() const { return entry_set.size(); }
+      ConfigEntry * GetEntry(size_t id) { return entry_set[id]; }
       ConfigEntry * GetLastEntry() { emp_assert(GetSize() > 0); return entry_set.back(); }
 
       void Add(ConfigEntry * new_entry) { entry_set.push_back(new_entry); }
@@ -178,34 +178,34 @@ namespace emp {
         out << "### " << name << " ###" << std::endl;
         // Print group description.
         auto desc_lines = slice(desc);
-        for (int comment_line = 0; comment_line < (int) desc_lines.size(); comment_line++) {
+        for (size_t comment_line = 0; comment_line < desc_lines.size(); comment_line++) {
           out << "# " << desc_lines[comment_line] << std::endl;
         }
         out << std::endl;
 
-        const int entry_count = entry_set.size();
+        const size_t entry_count = entry_set.size();
         emp::vector<std::string> setting_info(entry_count);
-        int max_length = 0;
+        size_t max_length = 0;
 
         // Loop through once to figure out non-comment output
-        for (int i = 0; i < entry_count; i++) {
+        for (size_t i = 0; i < entry_count; i++) {
           setting_info[i] = "set ";
           setting_info[i] += entry_set[i]->GetName();
           setting_info[i] += " ";
           setting_info[i] += entry_set[i]->GetValue();
-          if (max_length < (int) setting_info[i].size()) max_length = (int) setting_info[i].size();
+          if (max_length < setting_info[i].size()) max_length = setting_info[i].size();
         }
 
         max_length += 2;
-        for (int i = 0; i < entry_count; i++) {
+        for (size_t i = 0; i < entry_count; i++) {
           out << setting_info[i];
 
           // Break the description up over multiple lines.
           auto desc_lines = emp::slice(entry_set[i]->GetDescription());
 
-          int start_col = (int) setting_info[i].size();
-          for (int comment_line = 0; comment_line < (int) desc_lines.size(); comment_line++) {
-            for (int ws = start_col; ws < max_length; ws++) out << ' ';
+          size_t start_col = setting_info[i].size();
+          for (size_t comment_line = 0; comment_line < desc_lines.size(); comment_line++) {
+            for (size_t ws = start_col; ws < max_length; ws++) out << ' ';
             out << "# " << desc_lines[comment_line] << std::endl;
             start_col = 0;
           }
@@ -268,16 +268,16 @@ namespace emp {
     // * Expand all variables beginning with a $ in config line.
     // * If wrap-around, move line to extras
     void ProcessLine(std::string & cur_line, std::string & extras) {
-      int start_pos = (int) extras.size();       // If there were extras last time, skip them.
+      size_t start_pos = extras.size();          // If there were extras last time, skip them.
       if (extras.size()) cur_line.insert(0, extras);
       extras.resize(0);
       emp::left_justify(cur_line);               // Clear out leading whitespace.
 
-      for (int pos = start_pos; pos < (int) cur_line.size(); pos++) {
+      for (size_t pos = start_pos; pos < cur_line.size(); pos++) {
         const char cur_char = cur_line[pos];
         // Check for escape characters and convert them appropriately.
         if (cur_char == '\\') {
-          if (pos+1 == (int) cur_line.size()) {              // If backslash is at end of line...
+          if (pos+1 == cur_line.size()) {                    // If backslash is at end of line...
             extras = cur_line.substr(0, cur_line.size()-1);  // ...move string to extras
             cur_line.resize(0);                              // ...don't process current line
             return;                                          // ...since this is the line end, stop
@@ -299,15 +299,15 @@ namespace emp {
         }
         // A '$' indicates that we should expand a variable in place.
         else if (cur_char == '$' && expand_ok) {
-          int end_pos = pos+1;
-          while (end_pos < (int) cur_line.size() && IsVarChar(cur_line[end_pos])) end_pos++;
-          const int var_size = end_pos - pos - 1;
+          size_t end_pos = pos+1;
+          while (end_pos < cur_line.size() && IsVarChar(cur_line[end_pos])) end_pos++;
+          const size_t var_size = end_pos - pos - 1;
           std::string var_name(cur_line, pos+1, var_size);
 
           if (ResolveAlias(var_name)) {
             std::string new_val = var_map[var_name]->GetValue();  // Lookup variable value.
             cur_line.replace(pos, var_size+1, new_val);           // Replace var name with value.
-            pos += (int) new_val.size();                          // Skip new text.
+            pos += new_val.size();                                // Skip new text.
           } else {
             std::stringstream ss;
             ss << "Unable to process config setting '$" << var_name << "'. Ignoring." << std::endl;
