@@ -36,6 +36,7 @@ namespace evo {
   /// Note: Overly large Ns and Ks currently trigger a seg-fault, caused by trying to build a table
   /// that is larger than will fit in memory. If you are using small values for N and K,
   /// you can get better performance by using an NKLandscapeConst instead.
+
   class NKLandscape {
   private:
     const size_t N;
