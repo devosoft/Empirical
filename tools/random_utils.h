@@ -44,7 +44,7 @@ namespace emp {
   /// Choose K positions from N possibilities.
 
   inline void Choose(Random & random, size_t N, size_t K, std::vector<size_t> & choices) {
-    if (K > N) return;  // @CAO Should be an assert!
+    emp_assert (N >= K) return;
 
     choices.resize(K);
     while (K) {
@@ -64,6 +64,7 @@ namespace emp {
 
   inline BitVector RandomBitVector(Random & random, size_t size, double p=0.5)
   {
+    emp_assert(p >= 0.0 && p <= 1.0);
     BitVector bits(size);
     for (size_t i = 0; i < size; i++) bits[i] = random.P(p);
     return bits;
