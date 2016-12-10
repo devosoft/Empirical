@@ -12,11 +12,11 @@
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
 
-constexpr int K = 10;
-constexpr int N = 200;
+constexpr uint32_t K = 10;
+constexpr uint32_t N = 200;
 
-constexpr int POP_SIZE = 1000;
-constexpr int UD_COUNT = 500;
+constexpr uint32_t POP_SIZE = 1000;
+constexpr uint32_t UD_COUNT = 500;
 
 using BitOrg = emp::BitSet<N>;
 
@@ -27,24 +27,24 @@ int main()
   emp::evo::EAWorld<BitOrg> pop(random);
 
   // Build a random initial population
-  for (int i = 0; i < POP_SIZE; i++) {
+  for (uint32_t i = 0; i < POP_SIZE; i++) {
     BitOrg next_org;
-    for (int j = 0; j < N; j++) next_org[j] = random.P(0.5);
+    for (uint32_t j = 0; j < N; j++) next_org[j] = random.P(0.5);
     pop.Insert(next_org);
   }
 
   pop.SetDefaultMutateFun( [](BitOrg* org, emp::Random& random) {
-      (*org)[random.GetInt(N)] = random.P(0.5);
-      (*org)[random.GetInt(N)] = random.P(0.5);
-      (*org)[random.GetInt(N)] = random.P(0.5);
+      (*org)[random.GetUInt(N)] = random.P(0.5);
+      (*org)[random.GetUInt(N)] = random.P(0.5);
+      (*org)[random.GetUInt(N)] = random.P(0.5);
       return true;
     } );
 
 
   // Loop through updates
-  for (int ud = 0; ud < UD_COUNT; ud++) {
+  for (uint32_t ud = 0; ud < UD_COUNT; ud++) {
     // Print current state.
-    // for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
+    // for (uint32_t i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
     // std::cout << std::endl;
     std::cout << ud << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 
