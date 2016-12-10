@@ -44,15 +44,15 @@ namespace emp {
     emp::vector<std::string> args_to_strings(int argc, char* argv[]) {
       emp::vector<std::string> args;
       for (int i = 0; i < argc; i++) {
-        args.push_back(argv[i]);
+        args.push_back(argv[(size_t)i]);
       }
       return args;
     }
 
     // Search through args to find a specific value.
     int find_arg(const emp::vector<std::string> & args, const std::string & pattern) {
-      for (int i = 0; i < (int) args.size(); i++) {
-        if (args[i] == pattern) return i;
+      for (size_t i = 0; i < args.size(); i++) {
+        if (args[i] == pattern) return (int) i;
       }
       return -1;
     }
@@ -75,7 +75,7 @@ namespace emp {
       const int pos = find_arg(args, pattern);
       if (pos == -1) return 0;                      // Arg not found.
       if (pos >= (int) args.size() - 1) return -1;  // No room for a value!
-      var = args[pos+1];
+      var = args[(size_t)pos+1];
       return 1;
     }
 
@@ -85,8 +85,8 @@ namespace emp {
       const int pos = find_arg(args, pattern);
       if (pos == -1) return 0;                      // Arg not found.
       if (pos >= (int) args.size() - 2) return -1;  // No room for both values!
-      var1 = args[pos+1];
-      var2 = args[pos+2];
+      var1 = args[(size_t)pos+1];
+      var2 = args[(size_t)pos+2];
       return 1;
     }
 
@@ -95,7 +95,7 @@ namespace emp {
       const int pos = find_arg(args, pattern);
       if (pos == -1) return 0;                      // Arg not found.
       if (pos >= (int) args.size() - 1) return -1;  // No room for a value!
-      var = stoi(args[pos+1]);
+      var = stoi(args[(size_t)pos+1]);
       return 1;
     }
 
@@ -104,7 +104,7 @@ namespace emp {
       const int pos = find_arg(args, pattern);
       if (pos == -1) return 0;                      // Arg not found.
       if (pos >= (int) args.size() - 1) return -1;  // No room for a value!
-      var = stod(args[pos+1]);
+      var = stod(args[(size_t)pos+1]);
       return 1;
     }
 
