@@ -257,7 +257,10 @@ namespace emp {
     // Random Event Generation //////////////////////////////////////////////////
 
     // P(p) => if p < [0,1) random variable
-    inline bool P(const double _p) { return (Get() < (_p * _RAND_MBIG));}
+    inline bool P(const double p) {
+      emp_assert(p >= 0.0 && p <= 1.0);
+      return (Get() < (p * _RAND_MBIG));
+    }
 
 
     // Statistical functions ////////////////////////////////////////////////////
@@ -291,6 +294,7 @@ namespace emp {
      * Generate a random variable drawn from a Poisson distribution.
      **/
     inline uint32_t GetRandPoisson(const double n, double p) {
+      emp_assert(p >= 0.0 && p <= 1.0);
       // Optimizes for speed and calculability using symetry of the distribution
       if (p > .5) return (uint32_t)n - GetRandPoisson(n * (1 - p));
       else return GetRandPoisson(n * p);
@@ -322,6 +326,7 @@ namespace emp {
      * @see Random::GetRandBinomial
      **/
     inline uint32_t GetFullRandBinomial(const double n, const double p) { // Exact
+      emp_assert(p >= 0.0 && p <= 1.0);
       // Actually try n Bernoulli events with probability p
       uint32_t k = 0;
       for (uint32_t i = 0; i < n; ++i) if (P(p)) k++;
@@ -337,6 +342,8 @@ namespace emp {
      * @see Random::GetFullRandBinomial
      **/
     inline uint32_t GetRandBinomial(const double n, const double p) { // Approx
+      emp_assert(p >= 0.0 && p <= 1.0);
+      emp_assert(n >= 0.0);
       // Approximate Binomial if appropriate
       // if np(1-p) is large, use a Normal approx
       if (n * p * (1 - p) >= _BINOMIAL_TO_NORMAL) {
