@@ -33,9 +33,6 @@ CFLAGS := $(CFLAGS_native_opt)
 debug: CFLAGS := $(CFLAGS_native_debug)
 debug: all
 
-cpp14: CFLAGS_version := -std=c++14
-cpp14: all
-
 web: CXX := $(CXX_web)
 web: CFLAGS := $(CFLAGS_web_opt)
 web: all
@@ -65,9 +62,6 @@ opt-%: %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
 
 debug-%: %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
-
-cpp14-%: %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
-	$(CXX) -std=c++14 $(CFLAGS_native_debug) $< -o $@
 
 clean:
 	rm -rf debug-* *~ *.dSYM $(TARGETS)
