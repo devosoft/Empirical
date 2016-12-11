@@ -37,10 +37,9 @@ namespace emp {
     size_t num_bits;
     field_t * bit_set;
 
-    // NOTE: due to math edge cases, when num_bits=0 a minimum of 1 field/byte is returned.
     size_t LastBitID() const { return num_bits & (FIELD_BITS - 1); }
-    size_t NumFields() const { return 1 + ((num_bits - 1) / FIELD_BITS); }
-    size_t NumBytes()  const { return 1 + ((num_bits - 1) >> 3); }
+    size_t NumFields() const { return num_bits ? (1 + ((num_bits - 1) / FIELD_BITS)) : 0; }
+    size_t NumBytes()  const { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
     size_t NumSizeFields() const { return NumFields() * sizeof(field_t) / sizeof(std::size_t); }
 
     // Setup a bit proxy so that we can use operator[] on bit sets as an lvalue.
@@ -136,11 +135,13 @@ namespace emp {
 
   public:
     BitVector(size_t in_num_bits=0, bool init_val=false) : num_bits(in_num_bits) {
-      bit_set = new field_t[NumFields()];
+      if (num_bits) bit_set = new field_t[NumFields()];
+      else bit_set = nullptr;
       if (init_val) SetAll(); else Clear();
     }
     BitVector(const BitVector & in_set) : num_bits(in_set.num_bits) {
-      bit_set = new field_t[NumFields()];
+      if (num_bits) bit_set = new field_t[NumFields()];
+      else bit_set = nullptr;
       RawCopy(in_set.bit_set);
     }
     BitVector(BitVector && in_set) : num_bits(in_set.num_bits) {
@@ -158,10 +159,11 @@ namespace emp {
 
       if (in_num_fields != prev_num_fields) {
         delete [] bit_set;
-	      bit_set = new field_t[NumFields()];
+	      if (num_bits) bit_set = new field_t[NumFields()];
+        else bit_set = nullptr;
       }
 
-      if (num_bits > 0) RawCopy(in_set.bit_set);
+      if (num_bits) RawCopy(in_set.bit_set);
 
       return *this;
     }
@@ -189,7 +191,8 @@ namespace emp {
 
       else {  // We have to change the number of bitfields.  Resize & copy old info.
         field_t * old_bit_set = bit_set;
-        bit_set = new field_t[NUM_FIELDS];
+        if (num_bits > 0) bit_set = new field_t[NUM_FIELDS];
+        else bit_set = nullptr;
         const size_t min_fields = std::min(old_num_fields, NUM_FIELDS);
         for (size_t i = 0; i < min_fields; i++) bit_set[i] = old_bit_set[i];
         for (size_t i = min_fields; i < NUM_FIELDS; i++) bit_set[i] = 0U;
