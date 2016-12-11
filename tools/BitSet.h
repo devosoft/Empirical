@@ -216,7 +216,7 @@ namespace emp {
     }
 
     void Randomize(Random & random, const double p1=0.5) {
-      for (int i = 0; i < NUM_BITS; i++) Set(i, random.P(p1));
+      for (size_t i = 0; i < NUM_BITS; i++) Set(i, random.P(p1));
     }
 
     // Assign from a BitSet of a different size.
