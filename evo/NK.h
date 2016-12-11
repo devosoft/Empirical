@@ -115,12 +115,15 @@ namespace evo {
     }
   };
 
+  /// The NKLandscapeMemo class is simialar to NKLandscape, but it does not pre-calculate all
+  /// of the landscape states.  Instead it determines the value of each gene combination on first
+  /// use and memorizes it.
+
   class NKLandscapeMemo {
   private:
     const size_t N;
     const size_t K;
     mutable emp::vector< emp::memo_function<double(const BitVector &)> > landscape;
-    mutable std::unordered_map<BitVector, double> fit_cache;
     emp::vector<BitVector> masks;
 
   public:
@@ -153,16 +156,11 @@ namespace evo {
     double GetFitness(const BitVector & genome) const {
       emp_assert(genome.GetSize() == N);
 
-      // If this fitness is cached, return it!
-      const auto it = fit_cache.find(genome);
-      if (it != fit_cache.end()) return it->second;
-
       // Otherwise calculate it.
       double total = 0.0;
       for (size_t n = 0; n < N; n++) {
         total += landscape[n](genome & masks[n]);
       }
-      fit_cache[genome] = total;
       return total;
     }
   };
