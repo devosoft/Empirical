@@ -19,10 +19,10 @@ namespace emp {
 namespace web {
 
   template <typename FUN_TYPE> void OnDocumentReady(FUN_TYPE && fun) {
-    // const int fun_id = JSWrapOnce(fun);
-    const int fun_id = JSWrap(std::forward<FUN_TYPE>(fun), "", true);
+    // const size_t fun_id = JSWrapOnce(fun);
+    const size_t fun_id = JSWrap(std::forward<FUN_TYPE>(fun), "", true);
     (void) fun_id;
-    
+
     EM_ASM_ARGS({  $( document ).ready(function() { emp.Callback($0); });  }, fun_id);
   }
 
