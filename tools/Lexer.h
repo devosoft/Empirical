@@ -19,11 +19,11 @@ namespace emp {
   struct TokenInfo {
     std::string name;    // Name of this token type.
     RegEx regex;         // Pattern to describe token type.
-    int id;              // Unique id for token.
+    size_t id;              // Unique id for token.
     bool save_lexeme;    // Should we preserve the lexeme for this token?
 
-    TokenInfo() : name(""), regex(""), id(-1), save_lexeme(false) { ; }
-    TokenInfo(const std::string & n, const std::string & r, int i, bool s=false)
+    // TokenInfo() : name(""), regex(""), id(-1), save_lexeme(false) { ; }
+    TokenInfo(const std::string & n, const std::string & r, size_t i, bool s=false)
       : name(n), regex(r), id(i), save_lexeme(s) { ; }
     TokenInfo(const TokenInfo &) = default;
     TokenInfo & operator=(const TokenInfo &) = default;
@@ -38,49 +38,51 @@ namespace emp {
   };
 
   struct Token {
-    int token_id;
+    size_t token_id;
     std::string lexeme;
 
-    Token(int id, const std::string & str="") : token_id(id), lexeme(str) { ; }
+    Token(size_t id, const std::string & str="") : token_id(id), lexeme(str) { ; }
     Token(const Token &) = default;
     Token & operator=(const Token &) = default;
 
-    operator int() { return token_id; }
+    operator size_t() { return token_id; }
     operator const std::string &() { return lexeme; }
   };
 
   class Lexer {
   private:
     emp::vector<TokenInfo> token_set;     // List of all active tokens.
-    int cur_token_id;                     // Which ID should the next new token get?
+    size_t cur_token_id;                  // Which ID should the next new token get?
     mutable bool generate_lexer;          // Do we need to regenerate the lexer?
     mutable DFA lexer_dfa;                // Table driven lexer implementation.
     std::string lexeme;                   // Current state of lexeme being generated.
 
-    static const int MAX_TOKEN_ID = 256;  // How many token IDs are possible?
-
   public:
+    static const size_t MAX_TOKEN_ID = 256;      // How many token IDs are possible?
+    static const size_t ERROR_ID = MAX_TOKEN_ID; // Code for unknown token ID.
+    static inline bool TokenOK(size_t id) { return id < MAX_TOKEN_ID; }
+
     Lexer() : cur_token_id(MAX_TOKEN_ID), generate_lexer(false) { ; }
     ~Lexer() { ; }
 
-    int GetNumTokens() const { return token_set.size(); }
+    size_t GetNumTokens() const { return token_set.size(); }
 
-    int AddToken(const std::string & in_name, const std::string & in_regex) {
+    size_t AddToken(const std::string & in_name, const std::string & in_regex) {
       --cur_token_id;
       generate_lexer = true;
       token_set.emplace_back( in_name, in_regex, cur_token_id );
       return cur_token_id;
     }
 
-    constexpr static int MaxTokenID() { return MAX_TOKEN_ID; }
-    int GetTokenID(const std::string & name) const {
+    constexpr static size_t MaxTokenID() { return MAX_TOKEN_ID; }
+    size_t GetTokenID(const std::string & name) const {
       for (const auto & t : token_set) {
         if (t.name == name) return t.id;
       }
-      return -1;
+      return ERROR_ID;
     }
-    std::string GetTokenName(int id) const {
-      if (id == -1) return "Error";
+    std::string GetTokenName(size_t id) const {
+      if (id >= MAX_TOKEN_ID) return "Error";
       if (id == 0) return "EOF";
       if (id < 128) return emp::to_escaped_string((char) id);  // Individual characters.
       for (const auto & t : token_set) {
@@ -92,7 +94,7 @@ namespace emp {
       for (const auto & t : token_set) {
         if (t.name == name) return t;
       }
-      return TokenInfo("", "", -1);
+      return TokenInfo("", "", ERROR_ID);
     }
 
     void Generate() const {
@@ -107,10 +109,10 @@ namespace emp {
     // Get the next token found in an input stream.
     Token Process(std::istream & is) {
       if (generate_lexer) Generate();
+      size_t cur_pos = 0;
+      size_t best_pos = 0;
       int cur_state = 0;
       int cur_stop = 0;
-      int cur_pos = 0;
-      int best_pos = 0;
       int best_stop = -1;
       lexeme.resize(0);
 
@@ -119,9 +121,9 @@ namespace emp {
       // 2: We have not entered an invalid state.
       // 3: Our input stream has more symbols.
       while (cur_stop >= 0 && cur_state >= 0 && is) {
-        const uint8_t next_char = is.get();
+        const char next_char = (char) is.get();
         cur_pos++;
-        cur_state = lexer_dfa.Next(cur_state, next_char);
+        cur_state = lexer_dfa.Next(cur_state, (size_t) next_char);
         cur_stop = lexer_dfa.GetStop(cur_state);
         if (cur_stop > 0) { best_pos = cur_pos; best_stop = cur_stop; }
         lexeme.push_back( next_char );
@@ -134,16 +136,19 @@ namespace emp {
       }
 
       // If we are at the end of this input stream (with no token to return) give back a 0.
-      if (best_stop == -1 && !is) return { 0, "" };
+      if (best_stop < 0) {
+        if (!is) return { 0, "" };
+        return { ERROR_ID, lexeme };
+      }
 
-      return { best_stop, lexeme };
+      return { (size_t) best_stop, lexeme };
     }
 
     // Shortcut to process a string rather than a stream.
     Token Process(std::string & in_str) {
       std::stringstream ss;
       ss << in_str;
-      int out_val = Process(ss);
+      auto out_val = Process(ss);
       in_str = ss.str();
       return out_val;
     }
