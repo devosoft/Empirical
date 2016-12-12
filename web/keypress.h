@@ -115,7 +115,7 @@ namespace web {
 
       fun_map[order] =
         [key_set, cb_fun](const html5::KeyboardEvent & evt)
-        { if (key_set.find(evt.keyCode) == std::string::npos) return false; cb_fun(); return true;};
+        { if (key_set.find((char)evt.keyCode) == std::string::npos) return false; cb_fun(); return true;};
     }
 
     void AddKeydownCallback(const std::string & key_set, const std::function<void()> & cb_fun)
