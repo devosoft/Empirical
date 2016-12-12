@@ -32,8 +32,8 @@ namespace emp {
   // A single symbol in a grammer including the patterns that generate it.
   struct ParseSymbol {
     std::string name;
-    emp::vector< int > rule_ids;
-    int id;
+    emp::vector< size_t > rule_ids;
+    size_t id;
 
     emp::BitVector first;   // What tokens can begin this symbol?
     emp::BitVector follow;  // What tokens can come after this symbol?
@@ -44,54 +44,47 @@ namespace emp {
   };
 
   struct ParseRule {
-    int symbol_id;
-    emp::vector<int> pattern;
+    size_t symbol_id;
+    emp::vector<size_t> pattern;
 
-    ParseRule(int sid) : symbol_id(sid) { ; }
+    ParseRule(size_t sid) : symbol_id(sid) { ; }
   };
-
-  // // A single node in a parse tree.
-  // struct ParseNode {
-  //   int symbol_id;
-  //   int rule_pos;
-  //   emp::vector< ParseNode * > children;
-  // };
 
   class Parser {
   private:
     Lexer & lexer;                     // Default input lexer.
     emp::vector<ParseSymbol> symbols;  // Set of symbols that make up this grammar.
     emp::vector<ParseRule> rules;      // Set of rules that make up the parser.
-    int cur_symbol_id;                 // Which id should the next new symbol get?
+    size_t cur_symbol_id;                 // Which id should the next new symbol get?
     int active_pos;                    // Which symbol pos is active?
 
-    void BuildRule(emp::vector<int> & new_pattern) { ; }
+    void BuildRule(emp::vector<size_t> & new_pattern) { ; }
     template <typename T, typename... EXTRAS>
-    void BuildRule(emp::vector<int> & new_pattern, T && arg, EXTRAS... extras) {
-      new_pattern.push_back( GetID(std::forward<T>(arg)) );
+    void BuildRule(emp::vector<size_t> & new_pattern, T && arg, EXTRAS... extras) {
+      new_pattern.push_back( GetID((size_t) std::forward<T>(arg)) );
       BuildRule(new_pattern, std::forward<EXTRAS>(extras)...);
     }
 
     // Return the position in the symbols vector where this name is found; else return -1.
     int GetSymbolPos(const std::string & name) const {
-      for (int i = 0; i < (int) symbols.size(); i++) {
-        if (symbols[i].name == name) return i;
+      for (size_t i = 0; i < symbols.size(); i++) {
+        if (symbols[i].name == name) return (int) i;
       }
       return -1;
     }
 
     // Convert a symbol ID into its position in the symbols[] vector.
-    int GetIDPos(int id) const {
+    int GetIDPos(size_t id) const {
       if (id < lexer.MaxTokenID()) return -1;
-      return id - lexer.MaxTokenID();
+      return (int) (id - lexer.MaxTokenID());
     }
 
     // Create a new symbol and return its POSITION.
-    int AddSymbol(const std::string & name) {
+    size_t AddSymbol(const std::string & name) {
       ParseSymbol new_symbol;
       new_symbol.name = name;
       new_symbol.id = cur_symbol_id++;
-      const int out_pos = (int) symbols.size();
+      const size_t out_pos = symbols.size();
       symbols.emplace_back(new_symbol);
       return out_pos;
     }
@@ -103,32 +96,32 @@ namespace emp {
     Lexer & GetLexer() { return lexer; }
 
     // Simple conversions to find an ID...
-    int GetID(int id) const { return id; }
-    int GetID(const std::string & name) {
-      int spos = GetSymbolPos(name);       // First check if parse symbol exists.
-      if (spos >= 0) return symbols[spos].id;          // ...if so, return it.
-      int tid = lexer.GetTokenID(name);    // Otherwise, check for token name.
-      if (tid >= 0) return tid;            // ...if so, return id.
+    size_t GetID(size_t id) const { return id; }
+    size_t GetID(const std::string & name) {
+      int spos = GetSymbolPos(name);                  // First check if parse symbol exists.
+      if (spos >= 0) return symbols[(size_t)spos].id; // ...if so, return it.
+      size_t tid = lexer.GetTokenID(name);            // Otherwise, check for token name.
+      if (Lexer::TokenOK(tid)) return tid;            // ...if so, return id.
 
       // Else, add symbol to declaration list
-      spos = AddSymbol(name);
-      return symbols[spos].id;
+      size_t new_spos = AddSymbol(name);
+      return symbols[new_spos].id;
     }
 
-    std::string GetName(int symbol_id) const {
-      if (symbol_id < lexer.MaxTokenID()) return lexer.GetTokenName(symbol_id);
-      const int spos = symbol_id - lexer.MaxTokenID();
+    std::string GetName(size_t symbol_id) const {
+      if (Lexer::TokenOK(symbol_id)) return lexer.GetTokenName(symbol_id);
+      const size_t spos = symbol_id - lexer.MaxTokenID();
       return symbols[spos].name;
     }
 
     Parser & operator()(const std::string & name) {
       active_pos = GetSymbolPos(name);
-      if (active_pos == -1) active_pos = AddSymbol(name);
+      if (active_pos == -1) active_pos = (int) AddSymbol(name);
       return *this;
     }
 
     ParseSymbol & GetParseSymbol(const std::string & name) {
-      int pos = GetSymbolPos( name );
+      size_t pos = (size_t) GetSymbolPos( name );
       return symbols[pos];
     }
 
@@ -138,17 +131,17 @@ namespace emp {
       emp_assert(active_pos >= 0 && active_pos < (int) symbols.size(), active_pos);
 
       auto rule_id = rules.size();
-      symbols[active_pos].rule_ids.push_back(rule_id);
+      symbols[(size_t)active_pos].rule_ids.push_back(rule_id);
       rules.emplace_back(active_pos);
       BuildRule(rules.back().pattern, states...);
-      if (rules.back().pattern.size() == 0) symbols[active_pos].nullable = true;
+      if (rules.back().pattern.size() == 0) symbols[(size_t)active_pos].nullable = true;
       return *this;
     }
 
     // Specify the name of the symbol and add a rule to it, returning the symbol id.
     template <typename... STATES>
-    int AddRule(const std::string & name, STATES... states) {
-      const int id = GetID(name);
+    size_t AddRule(const std::string & name, STATES... states) {
+      const size_t id = GetID(name);
       active_pos = GetSymbolPos(name);  // @CAO We just did this, so can be faster.
       Rule(std::forward<STATES>(states)...);
       return id;
@@ -173,9 +166,9 @@ namespace emp {
 
           // For each pattern, see if all internal symbols are nullable.
           bool cur_nullable = true;
-          for (int sid : r.pattern) {
+          for (size_t sid : r.pattern) {
             int pos = GetIDPos(sid);
-            if (pos < 0 || symbols[pos].nullable == false) { cur_nullable = false; break; }
+            if (pos < 0 || symbols[(size_t)pos].nullable == false) { cur_nullable = false; break; }
           }
           if (cur_nullable) { s.nullable = true; progress = true; break; }
         }
@@ -197,11 +190,11 @@ namespace emp {
            << s.rule_ids.size() << " patterns.";
         if (s.nullable) os << " [NULLABLE]";
         os << std::endl;
-        for (int rid : s.rule_ids) {
-          const emp::vector<int> & p = rules[rid].pattern;
+        for (size_t rid : s.rule_ids) {
+          const emp::vector<size_t> & p = rules[rid].pattern;
           os << " ";
           if (p.size() == 0) os << " [empty]";
-          for (int x : p) os << " " << GetName(x) << "(" << x << ")";
+          for (size_t x : p) os << " " << GetName(x) << "(" << x << ")";
           os << std::endl;
         }
       }
