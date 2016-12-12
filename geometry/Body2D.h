@@ -82,8 +82,8 @@ namespace emp {
     int GetReproCount() const { return repro_count; }
     Point<double> GetShift() const { return shift; }
     double GetPressure() const { return pressure; }
-    
-    
+
+
     void SetBirthTime(double in_time) { birth_time = in_time; }
     void SetColorID(uint32_t in_id) { color_id = in_id; }
 
@@ -100,24 +100,24 @@ namespace emp {
 
     // Shift to apply next update.
     void AddShift(const Point<double> & s) { shift += s; total_abs_shift += s.Abs(); }
-};
-  
+  };
+
   class CircleBody2D : public Body2D_Base {
   private:
     Circle<double> perimeter;  // Includes position and size.
     double target_radius;      // For growing/shrinking
-    
+
     // Information about other bodies that this one is linked to.
     emp::vector< BodyLink<CircleBody2D> * > from_links;   // Active links initiated by body
     emp::vector< BodyLink<CircleBody2D> * > to_links;   // Active links targeting body
 
-    void RemoveFromLink(int link_id) {
-      emp_assert(link_id >= 0 && link_id < (int) from_links.size());
+    void RemoveFromLink(size_t link_id) {
+      emp_assert(link_id < from_links.size());
       from_links[link_id] = from_links.back();
       from_links.pop_back();
     }
-    void RemoveToLink(int link_id) {
-      emp_assert(link_id >= 0 && link_id < (int) to_links.size());
+    void RemoveToLink(size_t link_id) {
+      emp_assert(link_id < to_links.size());
       to_links[link_id] = to_links.back();
       to_links.pop_back();
     }
@@ -141,11 +141,11 @@ namespace emp {
     const Point<double> & GetCenter() const { return perimeter.GetCenter(); }
     double GetRadius() const { return perimeter.GetRadius(); }
     double GetTargetRadius() const { return target_radius; }
-    
+
     void SetPosition(const Point<double> & p) { perimeter.SetCenter(p); }
     void SetRadius(double r) { perimeter.SetRadius(r); }
     void SetTargetRadius(double t) { target_radius = t; }
-    
+
     // Translate immediately (ignoring physics)
     void Translate(const Point<double> & t) { perimeter.Translate(t); }
 
@@ -159,7 +159,7 @@ namespace emp {
       return IsLinkedFrom(link_org) || IsLinkedTo(link_org);
     }
 
-    int GetLinkCount() const { return (int) (from_links.size() + to_links.size()); }
+    size_t GetLinkCount() const { return from_links.size() + to_links.size(); }
 
     void AddLink(LINK_TYPE type, CircleBody2D & link_org, double cur_dist, double target_dist) {
       emp_assert(!IsLinked(link_org));  // Don't link twice!
@@ -178,13 +178,13 @@ namespace emp {
       }
 
       // Remove the FROM link.
-      for (int i = 0; i < (int) from_links.size(); i++) {
+      for (size_t i = 0; i < from_links.size(); i++) {
         if (from_links[i]->to == link->to) { RemoveFromLink(i); break; }
       }
 
       // Remove the TO link.
-      const int to_size = (int) link->to->to_links.size();
-      for (int i = 0; i < to_size; i++) {
+      const size_t to_size = link->to->to_links.size();
+      for (size_t i = 0; i < to_size; i++) {
         if (link->to->to_links[i]->from == this) { link->to->RemoveToLink(i); break; }
       }
 
@@ -196,13 +196,13 @@ namespace emp {
       for (auto * link : from_links) if ( link->to == &link_org) return *link;
       return link_org.FindLink(*this);
     }
-    
+
     BodyLink<CircleBody2D> & FindLink(CircleBody2D & link_org)  {
       emp_assert(IsLinked(link_org));
       for (auto * link : from_links) if ( link->to == &link_org) return *link;
       return link_org.FindLink(*this);
     }
-    
+
     double GetLinkDist(const CircleBody2D & link_org) const {
       emp_assert(IsLinked(link_org));
       return FindLink(link_org).cur_dist;
@@ -225,7 +225,7 @@ namespace emp {
       AddLink(LINK_TYPE::REPRODUCTION, *offspring, offset.Magnitude(), perimeter.GetRadius()*2.0);
       offspring->Translate(offset);
       repro_count++;
-      
+
       return offspring;
     }
 
@@ -236,10 +236,10 @@ namespace emp {
       else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - change_factor);
 
       // Test if the link distance for this body needs to be updated
-      for (int i = 0; i < (int) from_links.size(); i++) {
+      for (size_t i = 0; i < from_links.size(); i++) {
         auto * link = from_links[i];
         if (link->cur_dist == link->target_dist) continue; // No adjustment needed.
-        
+
         // If we're within the change_factor, just set pair_dist to target.
         if (std::abs(link->cur_dist - link->target_dist) <= change_factor) {
           link->cur_dist = link->target_dist;
@@ -258,7 +258,7 @@ namespace emp {
         }
       }
 
-      
+
     }
 
 
@@ -273,7 +273,7 @@ namespace emp {
 
         // Otherwise slow it down proportionately in the x and y directions.
         else { velocity *= 1.0 - ((double) friction) / ((double) velocity_mag); }
-      }   
+      }
     }
 
 
@@ -293,27 +293,27 @@ namespace emp {
       pressure = (total_abs_shift - shift.Abs()).SquareMagnitude();
       shift.ToOrigin();              // Clear out the shift for the next round.
       total_abs_shift.ToOrigin();
-        
+
       // If this body is linked to another, enforce the distance between them.
       for (auto * link : from_links) {
         if (GetAnchor() == link->to->GetAnchor()) {
           // If two organisms are on top of each other... shift one.
           Translate(emp::Point<double>(0.01, 0.01));
         }
-        
+
         // Figure out how much each oragnism should move so that they will be properly spaced.
         const double start_dist = GetAnchor().Distance(link->to->GetAnchor());
         const double link_dist = link->cur_dist;
         const double frac_change = (1.0 - ((double) link_dist) / ((double) start_dist)) / 2.0;
-        
+
         emp::Point<double> dist_move = (GetAnchor() - link->to->GetAnchor()) * frac_change;
-        
+
         perimeter.Translate(-dist_move);
         link->to->perimeter.Translate(dist_move);
       }
-      
+
       // Adjust the organism so it stays within the bounding box of the world.
-      if (GetCenter().GetX() < GetRadius()) { 
+      if (GetCenter().GetX() < GetRadius()) {
         perimeter.SetCenterX(GetRadius());     // Put back in range...
         velocity.NegateX();                    // Bounce off left side.
       } else if (GetCenter().GetX() > max_x) {
@@ -321,7 +321,7 @@ namespace emp {
         velocity.NegateX();                    // Bounce off right side.
       }
 
-      if (GetCenter().GetY() < GetRadius()) { 
+      if (GetCenter().GetY() < GetRadius()) {
         perimeter.SetCenterY(GetRadius());     // Put back in range...
         velocity.NegateY();                    // Bounce off top.
       } else if (GetCenter().GetY() > max_y) {
@@ -329,7 +329,7 @@ namespace emp {
         velocity.NegateY();                    // Bounce off bottom.
       }
     }
-    
+
     // Check to make sure there are no obvious issues with this object.
     bool OK() {
       for (auto * link : from_links) {
