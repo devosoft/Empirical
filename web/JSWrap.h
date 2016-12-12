@@ -74,16 +74,36 @@ namespace emp {
 
   // ----- LoadArg -----
   // Helper functions to individually LOAD ARGUMENTS from JS based on expected type.
-  template <int ARG_ID> static void LoadArg(int & arg_var) {
-    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
+  template <int ARG_ID> static void LoadArg(int16_t & arg_var) {
+    arg_var = (int16_t) EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
+  }
+
+  template <int ARG_ID> static void LoadArg(int32_t & arg_var) {
+    arg_var = (int32_t) EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
+  }
+
+  template <int ARG_ID> static void LoadArg(int64_t & arg_var) {
+    arg_var = (int64_t) EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
+  }
+
+  template <int ARG_ID> static void LoadArg(uint16_t & arg_var) {
+    arg_var = (uint16_t) EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
+  }
+
+  template <int ARG_ID> static void LoadArg(uint32_t & arg_var) {
+    arg_var = (uint32_t) EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
+  }
+
+  template <int ARG_ID> static void LoadArg(uint64_t & arg_var) {
+    arg_var = (uint64_t) EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
   }
 
   template <int ARG_ID> static void LoadArg(bool & arg_var) {
-    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
+    arg_var = (bool) EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
   }
 
   template <int ARG_ID> static void LoadArg(char & arg_var) {
-    arg_var = EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
+    arg_var = (char) EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
   }
 
   template <int ARG_ID> static void LoadArg(double & arg_var) {
@@ -91,7 +111,7 @@ namespace emp {
   }
 
   template <int ARG_ID> static void LoadArg(float & arg_var) {
-    arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
+    arg_var = (float) EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
   }
 
   template <int ARG_ID> static void LoadArg(std::string & arg_var) {
@@ -112,39 +132,74 @@ namespace emp {
   }
 
   //Helper functions to load arguments from inside Javascript objects by name.
-  template <int ARG_ID> static void LoadArg(int & arg_var, std::string var) {
-    arg_var = EM_ASM_INT({ return emp_i.curr_obj[Pointer_stringify($0)];
-      }, var.c_str());
+  template <int ARG_ID> static void LoadArg(int16_t & arg_var, std::string var) {
+    arg_var = (int16_t) EM_ASM_INT({
+      return emp_i.curr_obj[Pointer_stringify($0)];
+    }, var.c_str());
+  }
+
+  template <int ARG_ID> static void LoadArg(int32_t & arg_var, std::string var) {
+    arg_var = (int32_t) EM_ASM_INT({
+      return emp_i.curr_obj[Pointer_stringify($0)];
+    }, var.c_str());
+  }
+
+  template <int ARG_ID> static void LoadArg(int64_t & arg_var, std::string var) {
+    arg_var = (int64_t) EM_ASM_DOUBLE({
+      return emp_i.curr_obj[Pointer_stringify($0)];
+    }, var.c_str());
+  }
+
+  template <int ARG_ID> static void LoadArg(uint16_t & arg_var, std::string var) {
+    arg_var = (uint16_t) EM_ASM_INT({
+      return emp_i.curr_obj[Pointer_stringify($0)];
+    }, var.c_str());
+  }
+
+  template <int ARG_ID> static void LoadArg(uint32_t & arg_var, std::string var) {
+    arg_var = (uint32_t) EM_ASM_INT({
+      return emp_i.curr_obj[Pointer_stringify($0)];
+    }, var.c_str());
+  }
+
+  template <int ARG_ID> static void LoadArg(uint64_t & arg_var, std::string var) {
+    arg_var = (uint64_t) EM_ASM_DOUBLE({
+      return emp_i.curr_obj[Pointer_stringify($0)];
+    }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(bool & arg_var, std::string var) {
-    arg_var = EM_ASM_INT({ return emp_i.curr_obj[Pointer_stringify($0)];
-      }, var.c_str());
+    arg_var = (bool) EM_ASM_INT({
+      return emp_i.curr_obj[Pointer_stringify($0)];
+    }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(char & arg_var, std::string var) {
-    arg_var = EM_ASM_INT({ return emp_i.curr_obj[Pointer_stringify($0)];
-      }, var.c_str());
+    arg_var = (char) EM_ASM_INT({
+      return emp_i.curr_obj[Pointer_stringify($0)];
+    }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(double & arg_var, std::string var) {
-    arg_var = EM_ASM_DOUBLE({ return emp_i.curr_obj[Pointer_stringify($0)];
-      }, var.c_str());
+    arg_var = EM_ASM_DOUBLE({
+      return emp_i.curr_obj[Pointer_stringify($0)];
+    }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(float & arg_var, std::string var) {
-    arg_var = EM_ASM_DOUBLE({ return emp_i.curr_obj[Pointer_stringify($0)];
-      }, var.c_str());
+    arg_var = (float) EM_ASM_DOUBLE({
+      return emp_i.curr_obj[Pointer_stringify($0)];
+    }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(std::string & arg_var, std::string var) {
     char * tmp_var = (char *) EM_ASM_INT({
-        if (emp_i.curr_obj[Pointer_stringify($0)] == null){
-          emp_i.curr_obj[Pointer_stringify($0)] = "undefined";
-        }
-        return allocate(intArrayFromString(
-		emp_i.curr_obj[Pointer_stringify($0)]), 'i8', ALLOC_STACK);
-      }, var.c_str());
+      if (emp_i.curr_obj[Pointer_stringify($0)] == null){
+        emp_i.curr_obj[Pointer_stringify($0)] = "undefined";
+      }
+      return allocate(intArrayFromString(emp_i.curr_obj[Pointer_stringify($0)]),
+                      'i8', ALLOC_STACK);
+    }, var.c_str());
     arg_var = tmp_var;   // Free memory here?
   }
 
@@ -445,7 +500,7 @@ namespace emp {
   // the second version assumes we have a raw function pointer and wraps it for us.
 
   template <typename RET_TYPE, typename... ARG_TYPES>
-  uint32_t JSWrap(const std::function<RET_TYPE(ARG_TYPES...)> & in_fun,
+  size_t JSWrap(const std::function<RET_TYPE(ARG_TYPES...)> & in_fun,
                   const std::string & fun_name="",
                   bool dispose_on_use=false)
   {
@@ -455,7 +510,7 @@ namespace emp {
     auto * new_cb =
       new emp::internal::JSWrap_Callback<RET_TYPE, ARG_TYPES...>(in_fun, dispose_on_use);
     auto & callback_array = internal::CallbackArray();
-    uint32_t out_id = (int) callback_array.size();
+    size_t out_id = callback_array.size();
     callback_array.push_back(new_cb);
 
     if (fun_name != "") {
