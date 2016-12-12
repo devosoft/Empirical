@@ -40,14 +40,15 @@ namespace web {
     protected:
       emp::vector<std::string> options;               // What are the options to choose from?
       emp::vector<std::function<void()> > callbacks;  // Which funtion to run for each option?
-      int select_id;                                  // Which index is currently selected?
+      size_t select_id;                               // Which index is currently selected?
 
       bool autofocus;
       bool disabled;
 
-      uint32_t callback_id;
+      size_t callback_id;
 
-      SelectorInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
+      SelectorInfo(const std::string & in_id="")
+        : internal::WidgetInfo(in_id), select_id(0), autofocus(false), disabled(false) { ; }
       SelectorInfo(const SelectorInfo &) = delete;               // No copies of INFO allowed
       SelectorInfo & operator=(const SelectorInfo &) = delete;   // No copies of INFO allowed
       virtual ~SelectorInfo() {
@@ -57,23 +58,20 @@ namespace web {
       std::string TypeName() const override { return "SelectorInfo"; }
       virtual bool IsSelectorInfo() const override { return true; }
 
-      void SetOption(const std::string & in_option,
-                     const std::function<void()> & in_cb,
-                     int opt_id=-1) {
-        // If no option id was specified, choose the next one.
-        if (opt_id < 0) opt_id = (int) options.size();
-
+      void SetOption(const std::string & name, const std::function<void()> & cb, size_t id) {
         // If we need more room for options, increase the array size.
-        if (opt_id >= (int) options.size()) {
-          options.resize(opt_id+1);
-          callbacks.resize(opt_id+1);
+        if (id >= options.size()) {
+          options.resize(id+1);
+          callbacks.resize(id+1);
         }
-        options[opt_id] = in_option;
-        callbacks[opt_id] = in_cb;
+        options[id] = name;
+        callbacks[id] = cb;
+      }
+      void SetOption(const std::string & name, const std::function<void()> & cb) {
+        SetOption(name, cb, options.size()); // No option id specified, so choose the next one.
       }
 
-      void DoChange(int new_id) {
-        // emp::Alert("Changing to ", new_id);
+      void DoChange(size_t new_id) {
         select_id = new_id;
         if (callbacks[new_id]) callbacks[new_id]();
       }
@@ -87,7 +85,7 @@ namespace web {
         HTML << " onchange=\"emp.Callback(" << callback_id << ", this.selectedIndex)\">";
 
         // List out options
-        for (int i = 0; i < (int) options.size(); i++) {
+        for (size_t i = 0; i < options.size(); i++) {
           HTML << "<option value=\"" << i << "\"";
           if (i == select_id) HTML << " selected";
           HTML << ">" << options[i] << "</option>";
@@ -126,7 +124,7 @@ namespace web {
 
       SelectorInfo * s_info = Info();
       Info()->callback_id =
-        JSWrap( std::function<void(int)>([s_info](int new_id){s_info->DoChange(new_id);}) );
+        JSWrap( std::function<void(size_t)>([s_info](size_t new_id){s_info->DoChange(new_id);}) );
     }
     Selector(const Selector & in) : WidgetFacet(in) { ; }
     Selector(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsSelectorInfo()); }
@@ -135,22 +133,30 @@ namespace web {
     using INFO_TYPE = SelectorInfo;
 
 
-    int GetSelectID() const { return Info()->select_id; }
-    int GetNumOptions() const { return (int) Info()->options.size(); }
-    const std::string & GetOption(int id) const { return Info()->options[id]; }
+    size_t GetSelectID() const { return Info()->select_id; }
+    size_t GetNumOptions() const { return Info()->options.size(); }
+    const std::string & GetOption(size_t id) const { return Info()->options[id]; }
     bool HasAutofocus() const { return Info()->autofocus; }
     bool IsDisabled() const { return Info()->disabled; }
 
-    Selector & SelectID(int id) { Info()->select_id = id; return *this; }
+    Selector & SelectID(size_t id) { Info()->select_id = id; return *this; }
 
     Selector & SetOption(const std::string & in_option,
+                         const std::function<void()> & in_cb) {
+      Info()->SetOption(in_option, in_cb);
+      return *this;
+    }
+    Selector & SetOption(const std::string & in_option,
                          const std::function<void()> & in_cb,
-                         int opt_id=-1) {
+                         size_t opt_id) {
       Info()->SetOption(in_option, in_cb, opt_id);
       return *this;
     }
 
-    Selector & SetOption(const std::string & in_option, int opt_id=-1) {
+    Selector & SetOption(const std::string & in_option) {
+      return SetOption(in_option, std::function<void()>([](){}));
+    }
+    Selector & SetOption(const std::string & in_option, size_t opt_id) {
       return SetOption(in_option, std::function<void()>([](){}), opt_id);
     }
 
