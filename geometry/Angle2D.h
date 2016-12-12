@@ -77,29 +77,29 @@ namespace emp {
 
   class Angle {
   private:
-    int angle;    // Int representation of an angle
+    uint32_t angle;    // Int representation of an angle
 
-    static const int ANGLE_CAP = 65536;
-    static const int UP        = 0;
-    static const int RIGHT     = 16384;
-    static const int DOWN      = 32768;
-    static const int LEFT      = 49152;
+    static constexpr double ANGLE_CAP  = 65536.0;
+    static constexpr uint32_t UP       = 0;
+    static constexpr uint32_t RIGHT    = 16384;
+    static constexpr uint32_t DOWN     = 32768;
+    static constexpr uint32_t LEFT     = 49152;
 
   public:
     constexpr Angle() : angle(0) { ; }
     constexpr Angle(const Angle & in_angle) : angle(in_angle.angle) { ; }
-    constexpr Angle(double radians) : angle(radians * ANGLE_CAP / (2.0*PI)) { ; }
-    constexpr Angle(int in_angle, bool) : angle(in_angle) { ; } // directly set internal value
+    constexpr Angle(double radians) : angle((uint32_t)(radians * ANGLE_CAP / (2.0*PI))) { ; }
+    constexpr Angle(uint32_t in_angle, bool) : angle(in_angle) { ; } // directly set internal value
 
-    constexpr double AsRadians() const { return ((double) angle) * 2.0 * PI / ((double) ANGLE_CAP); }
-    constexpr double AsDegrees() const { return ((double) angle) * 360.0 / ((double) ANGLE_CAP); }
+    constexpr double AsRadians() const { return ((double) angle) * 2.0 * PI / ANGLE_CAP; }
+    constexpr double AsDegrees() const { return ((double) angle) * 360.0 / ANGLE_CAP; }
 
     Angle & SetRadians(double radians) {
-      angle = radians * ((double) ANGLE_CAP) / (2.0 * PI);
+      angle = (uint32_t) (radians * ANGLE_CAP / (2.0 * PI));
       return *this;
     }
     Angle & SetDegrees(double degrees) {
-      angle = degrees * ((double) ANGLE_CAP) / 360.0;
+      angle = (uint32_t) (degrees * ANGLE_CAP / 360.0);
       return *this;
     }
     Angle & PointUp()    { angle = UP;    return *this; }
@@ -108,23 +108,23 @@ namespace emp {
     Angle & PointLeft()  { angle = LEFT;  return *this; }
 
     // Chop off full circles
-    Angle & Truncate() { angle &= (ANGLE_CAP - 1); return *this; }
+    Angle & Truncate() { angle &= 0xFFFF; return *this; }
 
     // Count full circles
-    int CountFullCircles() { return angle >> 16; }
+    uint32_t CountFullCircles() { return angle >> 16; }
 
     // Some basic rotations...
     Angle & RotateRight() { angle += RIGHT; return *this; }
     Angle & RotateLeft()  { angle -= RIGHT; return *this; }
     Angle & RotateUTurn() { angle += DOWN; return *this; }
-    Angle & RotateFull(int turns=1)  { angle += turns << 16; return *this; }
+    Angle & RotateFull(uint32_t turns=1)  { angle += turns << 16; return *this; }
 
     Angle & RotateRadians(double radians) {
-      angle += radians * ((double) ANGLE_CAP) / (2.0 * PI);
+      angle += (uint32_t) (radians * ANGLE_CAP / (2.0 * PI));
       return *this;
     }
     Angle & RotateDegrees(double degrees) {
-      angle += degrees * ((double) ANGLE_CAP) / 360.0;
+      angle += (uint32_t) (degrees * ANGLE_CAP / 360.0);
       return *this;
     }
 
@@ -139,17 +139,18 @@ namespace emp {
 
     constexpr Angle operator+(const Angle & _in) const { return Angle(angle + _in.angle, true); }
     constexpr Angle operator-(const Angle & _in) const { return Angle(angle - _in.angle, true); }
-    constexpr Angle operator*(double _in)        const { return Angle(angle * _in, true); }
-    constexpr Angle operator*(int _in)           const { return Angle(angle * _in, true); }
-    constexpr Angle operator/(double _in)        const { return Angle(angle / _in, true); }
-    constexpr Angle operator/(int _in)           const { return Angle(angle / _in, true); }
+
+    constexpr Angle operator*(double _in)  const { return Angle((uint32_t) (angle * _in), true); }
+    constexpr Angle operator/(double _in)  const { return Angle((uint32_t) (angle / _in), true); }
+    // constexpr Angle operator*(int _in)     const { return Angle(angle * _in, true); }
+    // constexpr Angle operator/(int _in)     const { return Angle(angle / _in, true); }
 
     Angle & operator+=(const Angle & _in) { angle += _in.angle; return *this; }
     Angle & operator-=(const Angle & _in) { angle -= _in.angle; return *this; }
     Angle & operator*=(double _in)        { angle *= _in; return *this; }
-    Angle & operator*=(int _in)           { angle *= _in; return *this; }
     Angle & operator/=(double _in)        { angle /= _in; return *this; }
-    Angle & operator/=(int _in)           { angle /= _in; return *this; }
+    // Angle & operator*=(int _in)           { angle *= _in; return *this; }
+    // Angle & operator/=(int _in)           { angle /= _in; return *this; }
 
     double Sin() const { return sin(AsRadians()); }
     double Cos() const { return cos(AsRadians()); }
