@@ -35,7 +35,7 @@ namespace web {
 
 
   // Draw a BitMatrix!
-  template <int COLS, int ROWS>
+  template <size_t COLS, size_t ROWS>
   void Draw(Canvas canvas, const BitMatrix<COLS,ROWS> & matrix, double w, double h)
   {
     canvas.Clear();
@@ -43,8 +43,8 @@ namespace web {
     double cell_w = w / (double) COLS;
     double cell_h = h / (double) ROWS;
 
-    for (int x = 0; x < COLS; x++) {
-      for (int y = 0; y < ROWS; y++) {
+    for (size_t x = 0; x < COLS; x++) {
+      for (size_t y = 0; y < ROWS; y++) {
         if (matrix.Get(x,y)) {
           canvas.Rect(x*cell_w, y*cell_h, cell_w, cell_h, "black");
         }
@@ -52,7 +52,7 @@ namespace web {
     }
   }
 
-  
+
   // Draw a Surface2D, specifying the full colormap to be used.
   template <typename BODY_TYPE>
   void Draw(Canvas canvas,
@@ -78,7 +78,7 @@ namespace web {
 
   // Draw a Surface2D, just specifying the number of colors.
   template <typename BODY_TYPE>
-  void Draw(Canvas canvas, const Surface2D<BODY_TYPE> & surface, int num_colors)
+  void Draw(Canvas canvas, const Surface2D<BODY_TYPE> & surface, size_t num_colors)
   {
     Draw(canvas, surface, GetHueMap(num_colors));
   }
@@ -86,50 +86,61 @@ namespace web {
 
   // Draw a grid.
   void Draw(Canvas canvas,
-            const emp::vector<emp::vector<int>> & grid,
+            const emp::vector<emp::vector<size_t>> & grid,
             const emp::vector<std::string> & color_map,
-            std::string line_color="black",
-            bool square_cells=true,
-            int cell_width=-1,
-            int cell_height=-1,
-            bool auto_offsets=true,
-            int offset_x=0,
-            int offset_y=0) {
+            std::string line_color,
+            size_t cell_width, size_t cell_height,
+            size_t offset_x, size_t offset_y)
+  {
     canvas.Clear();
-    const int canvas_width = canvas.GetWidth();
-    const int canvas_height = canvas.GetHeight();
-    const int grid_rows = (int) grid.size();
-    const int grid_cols = (int) grid[0].size();
-
-    // Determine the cell width & height
-    if (cell_width < 0) cell_width = canvas_width / grid_cols;
-    if (cell_height < 0) cell_height = canvas_height / grid_rows;
-
-    if (square_cells && cell_width != cell_height) {
-      cell_width = std::min(cell_width, cell_height);
-      cell_height = cell_width;
-    }
-
-
-    // Determine the offsets to center the grid.
-    if (auto_offsets) {
-      offset_x = (canvas_width - grid_cols * cell_width) / 2;
-      offset_y = (canvas_height - grid_rows * cell_height) / 2;
-    }
 
     // Setup a black background for the grid.
-    canvas.Rect(0, 0, canvas_width, canvas_height, "black");
+    canvas.Rect(0, 0, canvas.GetWidth(), canvas.GetHeight(), "black");
 
     // Fill out the grid!
-    for (int row = 0; row < grid_rows; row++) {
-      const int cur_y = offset_y + row*cell_height;
-      for (int col = 0; col < grid_cols; col++) {
-        const int cur_x = offset_x + col*cell_width;
+    const size_t grid_rows = grid.size();
+    const size_t grid_cols = grid[0].size();
+    for (size_t row = 0; row < grid_rows; row++) {
+      const size_t cur_y = offset_y + row*cell_height;
+      for (size_t col = 0; col < grid_cols; col++) {
+        const size_t cur_x = offset_x + col*cell_width;
         const std::string & cur_color = color_map[grid[row][col]];
         canvas.Rect(cur_x, cur_y, cell_width, cell_height, cur_color, line_color);
       }
     }
+  }
 
+  // If offset is not provided for Draw, calculate it to CENTER the grid.
+  void Draw(Canvas canvas,
+            const emp::vector<emp::vector<size_t>> & grid,
+            const emp::vector<std::string> & color_map,
+            std::string line_color,
+            size_t cell_w, size_t cell_h)
+  {
+    const size_t canvas_w = canvas.GetWidth();
+    const size_t canvas_h = canvas.GetHeight();
+    const size_t grid_w = cell_w * grid[0].size();
+    const size_t grid_h = cell_h * grid.size();
+
+    // Center the grid on the canvas if there's extra room.
+    const size_t offset_x = (canvas_w <= grid_w) ? 0 : (canvas_w - grid_w) / 2;
+    const size_t offset_y = (canvas_h <= grid_h) ? 0 : (canvas_h - grid_h) / 2;
+
+    // Call Draw with all of the extra details.
+    Draw(canvas, grid, color_map, line_color, cell_w, cell_h, offset_x, offset_y);
+  }
+
+  // If cell width and height are not provided for grid Draw, calculate largest possible.
+  void Draw(Canvas canvas,
+            const emp::vector<emp::vector<size_t>> & grid,
+            const emp::vector<std::string> & color_map,
+            std::string line_color="black")
+  {
+    // Determine the cell width & height
+    const size_t cell_w = canvas.GetWidth() / grid[0].size();
+    const size_t cell_h = canvas.GetHeight() / grid.size();
+
+    Draw(canvas, grid, color_map, line_color, cell_w, cell_h);
   }
 
 }
