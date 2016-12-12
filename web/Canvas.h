@@ -10,8 +10,8 @@
 //
 //  As of now, only circles and rectangles are supported, but more soon:
 //
-//    int GetWidth() const
-//    int GetHeight() const
+//    size_t GetWidth() const
+//    size_t GetHeight() const
 //
 //    Canvas & Circle(double x, double y, double r,
 //                    const std::string & fc="", const std::string & lc="")
@@ -48,8 +48,8 @@ namespace web {
       friend Canvas;
 
     protected:
-      int width;
-      int height;
+      size_t width;
+      size_t height;
 
       emp::vector<CanvasAction *> actions;
 
@@ -115,7 +115,7 @@ namespace web {
     Canvas(CanvasInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:
-    Canvas(int w, int h, const std::string & in_id="")
+    Canvas(size_t w, size_t h, const std::string & in_id="")
       : WidgetFacet(in_id)
     {
       info = new CanvasInfo(in_id);
@@ -128,8 +128,8 @@ namespace web {
 
     using INFO_TYPE = CanvasInfo;
 
-    int GetWidth() const { return Info()->width; }
-    int GetHeight() const { return Info()->height; }
+    size_t GetWidth() const { return Info()->width; }
+    size_t GetHeight() const { return Info()->height; }
 
     // Setup Canvas Actions
     Canvas & Circle(double x, double y, double r,
