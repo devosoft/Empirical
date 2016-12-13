@@ -422,28 +422,28 @@ TEST_CASE("Test functions", "[tools]")
 {
 
   bool test_bool = true;
-  emp::toggle(test_bool);
+  emp::Toggle(test_bool);
   REQUIRE(test_bool == false);
 
-  REQUIRE(emp::mod(10, 7) == 3);
-  REQUIRE(emp::mod(3, 7) == 3);
-  REQUIRE(emp::mod(-4, 7) == 3);
-  REQUIRE(emp::mod(-11, 7) == 3);
+  REQUIRE(emp::Mod(10, 7) == 3);
+  REQUIRE(emp::Mod(3, 7) == 3);
+  REQUIRE(emp::Mod(-4, 7) == 3);
+  REQUIRE(emp::Mod(-11, 7) == 3);
 
-  REQUIRE(emp::pow(2,3) == 8);
-  REQUIRE(emp::pow(-2,2) == 4);
-  REQUIRE(emp::pow(3,4) == 81);
+  REQUIRE(emp::Pow(2,3) == 8);
+  REQUIRE(emp::Pow(-2,2) == 4);
+  REQUIRE(emp::Pow(3,4) == 81);
 
-  REQUIRE(emp::to_range(-10000, 10, 20) == 10);
-  REQUIRE(emp::to_range(9, 10, 20) == 10);
-  REQUIRE(emp::to_range(10, 10, 20) == 10);
-  REQUIRE(emp::to_range(11, 10, 20) == 11);
-  REQUIRE(emp::to_range(17, 10, 20) == 17);
-  REQUIRE(emp::to_range(20, 10, 20) == 20);
-  REQUIRE(emp::to_range(21, 10, 20) == 20);
-  REQUIRE(emp::to_range(12345678, 10, 20) == 20);
-  REQUIRE(emp::to_range<double>(12345678, 10, 20.1) == 20.1);
-  REQUIRE(emp::to_range(12345678.0, 10.7, 20.1) == 20.1);
+  REQUIRE(emp::ToRange(-10000, 10, 20) == 10);
+  REQUIRE(emp::ToRange(9, 10, 20) == 10);
+  REQUIRE(emp::ToRange(10, 10, 20) == 10);
+  REQUIRE(emp::ToRange(11, 10, 20) == 11);
+  REQUIRE(emp::ToRange(17, 10, 20) == 17);
+  REQUIRE(emp::ToRange(20, 10, 20) == 20);
+  REQUIRE(emp::ToRange(21, 10, 20) == 20);
+  REQUIRE(emp::ToRange(12345678, 10, 20) == 20);
+  REQUIRE(emp::ToRange<double>(12345678, 10, 20.1) == 20.1);
+  REQUIRE(emp::ToRange(12345678.0, 10.7, 20.1) == 20.1);
 }
 
 // should migrate these inside the test case, probably

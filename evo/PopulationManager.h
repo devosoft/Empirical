@@ -369,7 +369,7 @@ namespace evo {
       const int offset = random_ptr->GetInt(9);
       const int rand_x = (int) (id%width) + offset%3 - 1;
       const int rand_y = (int) (id/width) + offset/3 - 1;
-      return (size_t) (emp::mod(rand_x, (int) width) + emp::mod(rand_y, (int) height) * (int)width);
+      return (size_t) (emp::Mod(rand_x, (int) width) + emp::Mod(rand_y, (int) height) * (int)width);
     }
 
     void ConfigPop(size_t w, size_t h) { width = w; height = h; base_t::Resize(width*height); }
