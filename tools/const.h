@@ -1,4 +1,4 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2015-2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
@@ -22,6 +22,18 @@ namespace emp {
   constexpr const uint32_t MAX_4BYTE = 4294967295;    // (2^32 - 1)
 
   constexpr const int32_t MIN_INT = -2147483648;      // (- 2^31)
+
+  // Determine the maximum value for any type.
+  // @CAO: Prevent inf to get more realistic numbers for double/float?
+  template <typename T>
+  constexpr T MaxValue() {
+    T val=1, next=3;
+    while (next > val) {
+      val = next;
+      next = next*2 + 1;
+    }
+    return val;
+  }
 
   // Some constant tables...
 
