@@ -1,11 +1,7 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_INSTRUCTION_LIB_H
-#define EMP_INSTRUCTION_LIB_H
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  The InstLib class maintains a library of all instructions available to a particular type
 //  of virtual CPU, including the functions associated with them, their costs, etc.
@@ -13,7 +9,10 @@
 //  Note: This class is templated on a HARDWARE_TYPE and an INST_TYPE, and thus can be flexible.
 //  * HARDWARE_TYPE& is used for the first input for all instruction functions
 //  * INST_TYPE must have a working GetID() to transform it into a unique integer.
-//
+
+
+#ifndef EMP_INSTRUCTION_LIB_H
+#define EMP_INSTRUCTION_LIB_H
 
 #include <functional>
 #include <map>
@@ -34,13 +33,13 @@ namespace emp {
   template <class HARDWARE_TYPE> class InstDefinition {
   private:
     std::string desc;
-    
+
     union {
       std::function<bool(HARDWARE_TYPE&)>         call_base;
       std::function<bool(HARDWARE_TYPE&, int)>    call_int;
       std::function<bool(HARDWARE_TYPE&, double)> call_double;
     };
-    
+
     enum {CALL_NULL, CALL_BASE, CALL_INT, CALL_DOUBLE} call_type;
 
   public:
@@ -67,15 +66,20 @@ namespace emp {
       case CALL_BASE:   call_base   = in_def.call_base;   break;
       case CALL_INT:    call_int    = in_def.call_int;    break;
       case CALL_DOUBLE: call_double = in_def.call_double; break;
+      case CALL_NULL:   emp_assert(false);
       };
+      return *this;
     }
 
     const std::string & GetDesc() const { emp_assert(call_type != CALL_NULL); return desc; }
+
     std::function<bool(HARDWARE_TYPE&)> GetCall(const std::string & in_arg) const {
       emp_assert(call_type != CALL_NULL);
       if (call_type == CALL_BASE)        return call_base;
-      else if (call_type == CALL_INT)    return std::bind(call_int, _1, std::stoi(in_arg));
-      else if (call_type == CALL_DOUBLE) return std::bind(call_int, _1, std::stod(in_arg));
+      if (call_type == CALL_INT)    return std::bind(call_int, _1, std::stoi(in_arg));
+
+      emp_assert(call_type == CALL_DOUBLE);
+      return std::bind(call_int, _1, std::stod(in_arg));
     }
   };
 
@@ -107,10 +111,10 @@ namespace emp {
     { ; }
   };
 
-  const char inst_char_chart[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 
-                                   'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 
+  const char inst_char_chart[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+                                   'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
                                    'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-                                   'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 
+                                   'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
                                    'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7',
                                    '8', '9', '!', '@', '$', '%', '^', '&', '*', '_', '=', '-',
                                    '+' };
@@ -131,7 +135,7 @@ namespace emp {
 
     int GetSize() const { return (int) inst_info.size(); }
 
-    // Indexing into an InstLib (by id, name, or symbol) will return  an example instruction 
+    // Indexing into an InstLib (by id, name, or symbol) will return  an example instruction
     const INST_TYPE & operator[](int index) {
       emp_assert(index >= 0 && index < (int) inst_info.size());
       return inst_info[index].prototype;
@@ -198,7 +202,7 @@ namespace emp {
 
     // Convert an INST_TYPE into a single character (only works perfectly if inst lib size < 72)
     char AsChar(const INST_TYPE & inst) const { return inst_info[inst.GetID()].short_name; }
-    
+
     //Convert an instruction vector into a series of characters.
     std::string AsString(const std::vector<INST_TYPE> & inst_vector) const {
       const int vector_size = inst_vector.GetSize();
@@ -230,7 +234,7 @@ namespace emp {
     //       (type=double; range=0.0-1.0; default = 0.0)
     //   weight - The relative probability of errors shifting to this instruction.
     //       (type=double; range=0.0+; default = 1.0)
-    // 
+    //
     // For example...
     //
     //    PushValue:3 name=Push-3 stability=1.0 weight=0.01
@@ -239,7 +243,7 @@ namespace emp {
     // a stack.  It would also be unlikely to mutate to (low weight), but impossible to mutate
     // away from once it was in place (max stability).  It would cost 1 CPU cycle to execute
     // and not modify other instructions since neither of those values were set.
-   
+
 
     bool LoadInst(std::string inst_info)
     {
@@ -260,7 +264,7 @@ namespace emp {
       while(inst_info.size() > 0) {
         std::string arg_info = string_pop_word(inst_info);  // Value assigned to (rhs)
         std::string arg_name = string_pop(arg_info, '=');   // Variable name.
-        
+
         if (arg_name == "cycle_cost") {
           cycle_cost = std::stoi(arg_info);
           if (cycle_cost < 1) {
@@ -289,7 +293,7 @@ namespace emp {
           if (stability < 0.0 || stability > 1.0) {
             std::stringstream ss;
             ss << "Trying to set '" << full_name << "' stability to " << stability;
-            stability = to_range(stability, 0.0, 1.0);
+            stability = ToRange(stability, 0.0, 1.0);
             ss << ". Using extreme of " << stability << " instead.";
             NotifyError(ss.str());
           }
@@ -316,10 +320,10 @@ namespace emp {
         std::stringstream ss;
         ss << "Failed to find instruction '" << name_base << "'.  Ignoring.";
         NotifyError(ss.str());
-        
+
         return false;
       }
-    
+
       const auto & cur_def = inst_defs.at(name_base);
 
       Add(name_final, cur_def.GetDesc(), cur_def.GetCall(name_spec),
@@ -334,7 +338,7 @@ namespace emp {
         LoadInst(inst_name);
       }
     }
-    
+
 
   };
 };
