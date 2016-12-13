@@ -21,7 +21,7 @@ namespace emp {
   class ActionManager {
   private:
     std::unordered_map<std::string, ActionBase *> action_map;
-    int next_id=0;
+    int next_id=1;
     std::string prefix = "emp_action_";
 
   public:
@@ -38,9 +38,14 @@ namespace emp {
     int GetNextID() const { return next_id; }
     size_t GetSize() const { return action_map.size(); }
 
-    ActionBase & Get(const std::string & name) {
+    ActionBase & operator[](const std::string & name) {
       emp_assert(action_map.find(name) != action_map.end());
       return *(action_map[name]);
+    }
+    const ActionBase & operator[](const std::string & name) const {
+      auto it = action_map.find(name);
+      emp_assert(it != action_map.end());
+      return *(it->second);
     }
 
     template <typename RETURN, typename... ARGS>
