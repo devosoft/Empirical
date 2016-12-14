@@ -11,10 +11,10 @@
 #include "../../evo/World.h"
 #include "../../tools/Random.h"
 
-constexpr int POP_SIZE  = 14000;
-constexpr int ORG_SIZE  = 100;
-constexpr int SYMB_SIZE = 50;
-constexpr int UD_COUNT  = 20000;
+constexpr uint32_t POP_SIZE  = 14000;
+constexpr uint32_t ORG_SIZE  = 100;
+constexpr uint32_t SYMB_SIZE = 50;
+constexpr uint32_t UD_COUNT  = 20000;
 
 
 int main()
@@ -22,7 +22,7 @@ int main()
   emp::Random random;
   emp::evo::World<emp::evo::SymbulationOrg> world(random);
 
-  for (int i = 0; i < POP_SIZE; i++) {
+  for (uint32_t i = 0; i < POP_SIZE; i++) {
     world.InsertRandomOrg(ORG_SIZE, 0.5, ORG_SIZE, SYMB_SIZE);// Fill population with random organisms
     world[i].SetSymbiont(RandomBitVector(random, SYMB_SIZE, 0.5));
   }
@@ -30,7 +30,7 @@ int main()
   world.Print(std::cout, "X", "\n");
 
   std::cout << "Start!" << std::endl;
-  for (int ud = 0; ud < UD_COUNT; ud++) {
+  for (uint32_t ud = 0; ud < UD_COUNT; ud++) {
     world.Execute();
     std::cout << "UPDATE " << ud << std::endl;
   }
