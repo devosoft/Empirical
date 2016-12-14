@@ -12,11 +12,11 @@
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
 
-constexpr int K = 3;
-constexpr int N = 50;
+constexpr size_t K = 3;
+constexpr size_t N = 50;
 
-constexpr int POP_SIZE = 100;
-constexpr int UD_COUNT = 1000;
+constexpr size_t POP_SIZE = 100;
+constexpr size_t UD_COUNT = 1000;
 
 using BitOrg = emp::BitSet<N>;
 
@@ -27,14 +27,14 @@ int main()
   emp::evo::EAWorld<BitOrg> pop(random);
 
   // Build a random initial population
-  for (int i = 0; i < POP_SIZE; i++) {
+  for (size_t i = 0; i < POP_SIZE; i++) {
     BitOrg next_org;
-    for (int j = 0; j < N; j++) next_org[j] = random.P(0.5);
+    for (size_t j = 0; j < N; j++) next_org[j] = random.P(0.5);
     pop.Insert(next_org);
   }
 
   // Loop through updates
-  for (int ud = 0; ud < UD_COUNT; ud++) {
+  for (size_t ud = 0; ud < UD_COUNT; ud++) {
     // Print current state.
     // for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
     // std::cout << std::endl;
@@ -48,10 +48,10 @@ int main()
     pop.Update();
 
     // Do mutations...
-    for (int i = 1; i < pop.GetSize(); i++) {
-      pop[i][random.GetInt(N)] = random.P(0.5);
-      pop[i][random.GetInt(N)] = random.P(0.5);
-      pop[i][random.GetInt(N)] = random.P(0.5);
+    for (size_t i = 1; i < pop.GetSize(); i++) {
+      pop[i][random.GetUInt(N)] = random.P(0.5);
+      pop[i][random.GetUInt(N)] = random.P(0.5);
+      pop[i][random.GetUInt(N)] = random.P(0.5);
     }
 
   }
