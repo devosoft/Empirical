@@ -88,21 +88,21 @@ namespace emp {
     }
 
     EM_ASM_ARGS({
-	var curr_array = emp_i.__incoming_array;
-	var depth = 0;
-	
-	// Make sure that we're at the right depth, in case of recursive call.
-	while (curr_array.length > 0) {
-	  var next_index = getValue($4+(depth*4), "i32");
-	  depth += 1;
-	  curr_array = curr_array[next_index];
-	}
+    	var curr_array = emp_i.__incoming_array;
+    	var depth = 0;
 
-	// Iterate over array, get values, and add them to incoming array.
-	for (i=0; i<$1; i++) {
-	  curr_array.push(getValue($0+(i*$2), Pointer_stringify($3)));
-	}
-      }, &values[0], values.size(), type_size, type_string.c_str(), recursive_el.data());
+    	// Make sure that we're at the right depth, in case of recursive call.
+    	while (curr_array.length > 0) {
+    	  var next_index = getValue($4+(depth*4), "i32");
+    	  depth += 1;
+    	  curr_array = curr_array[next_index];
+    	}
+
+    	// Iterate over array, get values, and add them to incoming array.
+    	for (i=0; i<$1; i++) {
+    	  curr_array.push(getValue($0+(i*$2), Pointer_stringify($3)));
+    	}
+    }, &values[0], values.size(), type_size, type_string.c_str(), recursive_el.data());
   }
 
   // Specialization for strings
@@ -151,52 +151,52 @@ namespace emp {
 
     // Initialize objects in Javascript
     EM_ASM_ARGS({
-	var curr_array = emp_i.__incoming_array;
-	var depth = 0;
+    	var curr_array = emp_i.__incoming_array;
+    	var depth = 0;
 
-	// Make sure that we're at the right depth, in case of recursive call.
-	while (curr_array.length > 0) {
-	  var next_index = getValue($1+(depth*4), "i32");
-	  depth += 1;
-	  curr_array = curr_array[next_index];
-	}
+    	// Make sure that we're at the right depth, in case of recursive call.
+    	while (curr_array.length > 0) {
+    	  var next_index = getValue($1+(depth*4), "i32");
+    	  depth += 1;
+    	  curr_array = curr_array[next_index];
+    	}
 
-	// Append empty objects
-	for (i=0; i<$0; i++) {
-	  var new_obj = {};
-	  curr_array.push(new_obj);
-	}
-      }, values.size(), recursive_el.data());
+    	// Append empty objects
+    	for (i=0; i<$0; i++) {
+    	  var new_obj = {};
+    	  curr_array.push(new_obj);
+    	}
+    }, values.size(), recursive_el.data());
 
     for (std::size_t j = 0; j<values.size(); j++) { // Iterate over array
       for (std::size_t i = 0; i<values[j].var_names.size(); i++) { // Iterate over object members
 
-	// Get variable name and type for this member variable
-	std::string var_name = values[j].var_names[i];
-	std::string type_string = map_type_names[values[j].var_types[i].name()];
-	// Make sure member variable is an allowed type
-	emp_assert((map_type_names.find(values[j].var_types[i].name())
-		    != map_type_names.end()));
-	
-	// Load data into array of objects
-	EM_ASM_ARGS({
-	    var curr_array = emp_i.__incoming_array;
-	    var depth = 0;
-	    
-	    // Make sure we are at the right depth, in case of recursive call.
-	    while (curr_array[0].length > 0) {
-	      var next_index = getValue($4+(depth*4), "i32");
-	      depth += 1;
-	      curr_array = curr_array[next_index];
-	    }
-	    
-	    if (Pointer_stringify($1) == "string") {
-	      curr_array[$3][Pointer_stringify($2)] = Pointer_stringify($0);
-	    } else {
-	      curr_array[$3][Pointer_stringify($2)] = getValue($0, Pointer_stringify($1));
-	    }
-	  }, values[j].pointers[i], type_string.c_str(), var_name.c_str(),
-	  j, recursive_el.data());
+      	// Get variable name and type for this member variable
+      	std::string var_name = values[j].var_names[i];
+      	std::string type_string = map_type_names[values[j].var_types[i].name()];
+      	// Make sure member variable is an allowed type
+      	emp_assert((map_type_names.find(values[j].var_types[i].name())
+      		    != map_type_names.end()));
+
+      	// Load data into array of objects
+      	EM_ASM_ARGS({
+    	    var curr_array = emp_i.__incoming_array;
+    	    var depth = 0;
+
+    	    // Make sure we are at the right depth, in case of recursive call.
+    	    while (curr_array[0].length > 0) {
+    	      var next_index = getValue($4+(depth*4), "i32");
+    	      depth += 1;
+    	      curr_array = curr_array[next_index];
+    	    }
+
+    	    if (Pointer_stringify($1) == "string") {
+    	      curr_array[$3][Pointer_stringify($2)] = Pointer_stringify($0);
+    	    } else {
+    	      curr_array[$3][Pointer_stringify($2)] = getValue($0, Pointer_stringify($1));
+    	    }
+    	  }, values[j].pointers[i], type_string.c_str(), var_name.c_str(),
+    	  j, recursive_el.data());
       }
     }
   }
@@ -224,18 +224,18 @@ namespace emp {
 
     // Append empty arrays to array that we are currently handling in recursion
     EM_ASM_ARGS({
-	var curr_array = emp_i.__incoming_array;
-	var depth = 0;
-	while (curr_array.length > 0) {
-	  var next_index = getValue($0+(depth*4), "i32");
-	  depth += 1;
-	  curr_array = curr_array[next_index];
-	}
-	for (i=0; i<$1; i++) {
-	  curr_array.push([]);
-	}
-      }, recursive_el.data(), values.size());
-    
+    	var curr_array = emp_i.__incoming_array;
+    	var depth = 0;
+    	while (curr_array.length > 0) {
+    	  var next_index = getValue($0+(depth*4), "i32");
+    	  depth += 1;
+    	  curr_array = curr_array[next_index];
+    	}
+    	for (i=0; i<$1; i++) {
+    	  curr_array.push([]);
+    	}
+    }, recursive_el.data(), values.size());
+
     // Make recursive calls - recursive_els specifies coordinates of array we're
     // currently operating on
     for (std::size_t i = 0; i<values.size(); i++) {
@@ -258,18 +258,18 @@ namespace emp {
 
     // Append empty arrays to array that we are currently handling in recursion
     EM_ASM_ARGS({
-	var curr_array = emp_i.__incoming_array;
-	var depth = 0;
-	while (curr_array.length > 0) {
-	  var next_index = getValue($0+(depth*4), "i32");
-	  depth += 1;
-	  curr_array = curr_array[next_index];
-	}
-	for (i=0; i<$1; i++) {
-	  curr_array.push([]);
-	}
-      }, recursive_el.data(), values.size());
-    
+    	var curr_array = emp_i.__incoming_array;
+    	var depth = 0;
+    	while (curr_array.length > 0) {
+    	  var next_index = getValue($0+(depth*4), "i32");
+    	  depth += 1;
+    	  curr_array = curr_array[next_index];
+    	}
+    	for (i=0; i<$1; i++) {
+    	  curr_array.push([]);
+    	}
+    }, recursive_el.data(), values.size());
+
     // Make recursive calls - recursive_els specifies coordinates of array we are
     // currently operating on
     for (std::size_t i = 0; i<values.size(); i++) {
@@ -307,11 +307,11 @@ namespace emp {
 
     //Write emp.__outgoing_array contents to a buffer
     T * buffer = (T*) EM_ASM_INT({
-	var buffer = Module._malloc(emp_i.__outgoing_array.length*$0);
-	
-	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-	  setValue(buffer+(i*$0), emp_i.__outgoing_array[i], Pointer_stringify($1));
-	}
+    	var buffer = Module._malloc(emp_i.__outgoing_array.length*$0);
+
+    	for (i=0; i<emp_i.__outgoing_array.length; i++) {
+    	  setValue(buffer+(i*$0), emp_i.__outgoing_array[i], Pointer_stringify($1));
+    	}
 
       return buffer;
     }, type_size, type_string.c_str());
@@ -338,15 +338,15 @@ namespace emp {
 
     // Write emp.__outgoing_array contents to a buffer
     T * buffer = (T*) EM_ASM_INT({
-	var buffer = Module._malloc(emp_i.__outgoing_array.length*$0);
-	
-	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-	  setValue(buffer+(i*$0), emp_i.__outgoing_array[i], Pointer_stringify($1));
-	}
-	
-	return buffer;
-      }, type_size, type_string.c_str());
-    
+    	var buffer = Module._malloc(emp_i.__outgoing_array.length*$0);
+
+    	for (i=0; i<emp_i.__outgoing_array.length; i++) {
+    	  setValue(buffer+(i*$0), emp_i.__outgoing_array[i], Pointer_stringify($1));
+    	}
+
+    	return buffer;
+    }, type_size, type_string.c_str());
+
     // Populate array from buffer
     for (int i=0; i < EM_ASM_INT_V({return emp_i.__outgoing_array.length}); i++) {
       arr.push_back(*(buffer + i));
@@ -365,17 +365,17 @@ namespace emp {
 
     emp_assert(arr.size() == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
 
-    char * buffer = (char *) EM_ASM_INT_V({	
-	// Since we're treating each char as it's own string, each one
-	// will be null-termianted. So we malloc length*2 addresses.
-	var buffer = Module._malloc(emp_i.__outgoing_array.length*2);
+    char * buffer = (char *) EM_ASM_INT_V({
+    	// Since we're treating each char as it's own string, each one
+    	// will be null-termianted. So we malloc length*2 addresses.
+    	var buffer = Module._malloc(emp_i.__outgoing_array.length*2);
 
-	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-	  writeStringToMemory(emp_i.__outgoing_array[i], buffer+(i*2));
-	}
-	
-	return buffer;
-      });
+    	for (i=0; i<emp_i.__outgoing_array.length; i++) {
+    	  writeStringToMemory(emp_i.__outgoing_array[i], buffer+(i*2));
+    	}
+
+    	return buffer;
+    });
 
     for (size_t i=0; i<arr.size(); i++) {
       arr[i] = *(buffer + i*2);
@@ -390,17 +390,17 @@ namespace emp {
   void pass_vector_to_cpp(emp::vector<char> & arr, bool recurse = false) {
 
     char * buffer = (char *) EM_ASM_INT_V({
-	// Since we're treating each char as it's own string, each one
-	// will be null-termianted. So we malloc length*2 addresses.
-	var buffer = Module._malloc(emp_i.__outgoing_array.length*2);
+    	// Since we're treating each char as it's own string, each one
+    	// will be null-termianted. So we malloc length*2 addresses.
+    	var buffer = Module._malloc(emp_i.__outgoing_array.length*2);
 
-	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-	  writeStringToMemory(emp_i.__outgoing_array[i], buffer+(i*2));
-	}
-	
-	return buffer;
-      });
-    
+    	for (i=0; i<emp_i.__outgoing_array.length; i++) {
+    	  writeStringToMemory(emp_i.__outgoing_array[i], buffer+(i*2));
+    	}
+
+    	return buffer;
+    });
+
     for (int i=0; i<EM_ASM_INT_V({return emp_i.__outgoing_array.length}); i++) {
       arr.push_back(*(buffer + i*2));
     }
@@ -415,24 +415,23 @@ namespace emp {
     emp_assert(arr.size() == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
 
     char * buffer = (char *) EM_ASM_INT_V({
+    	// Figure how much memory to allocate
+    	var arr_size = 0;
+    	for (i=0; i<emp_i.__outgoing_array.length; i++) {
+    	  arr_size += emp_i.__outgoing_array[i].length + 1;
+    	}
 
-	// Figure how much memory to allocate
-	var arr_size = 0;
-	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-	  arr_size += emp_i.__outgoing_array[i].length + 1;
-	}
-	
-	var buffer = Module._malloc(arr_size);
-	
-	// Track place in memory to write too
-	var cumulative_size = 0;
-	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-	  writeStringToMemory(emp_i.__outgoing_array[i], buffer + (cumulative_size));
-	    cumulative_size += emp_i.__outgoing_array[i].length + 1;
-	}
-	
-	return buffer;
-      });
+    	var buffer = Module._malloc(arr_size);
+
+    	// Track place in memory to write too
+    	var cumulative_size = 0;
+    	for (i=0; i<emp_i.__outgoing_array.length; i++) {
+    	  writeStringToMemory(emp_i.__outgoing_array[i], buffer + (cumulative_size));
+    	    cumulative_size += emp_i.__outgoing_array[i].length + 1;
+    	}
+
+    	return buffer;
+    });
 
     // Track place in memory to read from
     int cumulative_size = 0;
@@ -449,30 +448,30 @@ namespace emp {
   void pass_vector_to_cpp(emp::vector<std::string> & arr, bool recurse = false) {
 
     char * buffer = (char *) EM_ASM_INT_V({
-	// Figure how much memory to allocate
-	var arr_size = 0;
-	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-	  arr_size += emp_i.__outgoing_array[i].length + 1;
-	}
+    	// Figure how much memory to allocate
+    	var arr_size = 0;
+    	for (i=0; i<emp_i.__outgoing_array.length; i++) {
+    	  arr_size += emp_i.__outgoing_array[i].length + 1;
+    	}
 
-	var buffer = Module._malloc(arr_size);
+    	var buffer = Module._malloc(arr_size);
 
-	// Track place in memory to write too
-	var cumulative_size = 0;
-	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-	  writeStringToMemory(emp_i.__outgoing_array[i], buffer + (cumulative_size));
-	  cumulative_size += emp_i.__outgoing_array[i].length + 1;
-	}
+    	// Track place in memory to write too
+    	var cumulative_size = 0;
+    	for (i=0; i<emp_i.__outgoing_array.length; i++) {
+    	  writeStringToMemory(emp_i.__outgoing_array[i], buffer + (cumulative_size));
+    	  cumulative_size += emp_i.__outgoing_array[i].length + 1;
+    	}
 
-	return buffer;
-      });
+    	return buffer;
+    });
 
     // Track place in memory to read from
     int cumulative_size = 0;
     for (int i=0; i<EM_ASM_INT_V({return emp_i.__outgoing_array.length}); i++) {
       // Since std::string constructor reads to null terminator, this just works.
       arr.push_back(std::string(buffer + cumulative_size));
-      cumulative_size += arr[i].size() + 1;
+      cumulative_size += arr[(size_t)i].size() + 1;
     }
 
     free(buffer);
@@ -495,8 +494,8 @@ namespace emp {
 
     for (size_t i = 0; i < arr.size(); i++) {
       EM_ASM_ARGS({
-	  emp_i.__outgoing_array = emp_i.__temp_array[emp_i.__temp_array.length - 1][$0];
-	}, i);
+	      emp_i.__outgoing_array = emp_i.__temp_array[emp_i.__temp_array.length - 1][$0];
+	    }, i);
       pass_array_to_cpp(arr[i], true);
     }
 
@@ -513,7 +512,10 @@ namespace emp {
     int size = EM_ASM_INT_V({return emp_i.__outgoing_array.length});
 
     if (recurse == 0) {
-      EM_ASM({emp_i.__temp_array = [emp_i.__outgoing_array];      console.log(emp_i.__outgoing_array);});
+      EM_ASM({
+        emp_i.__temp_array = [emp_i.__outgoing_array];
+        console.log(emp_i.__outgoing_array);
+      });
     } else {
       // This is a little wasteful of space, but the alternatives are
       // surprisingly ugly
@@ -522,8 +524,8 @@ namespace emp {
 
     for (int i = 0; i < size; i++) {
       EM_ASM_ARGS({
-	  emp_i.__outgoing_array = emp_i.__temp_array[emp_i.__temp_array.length - 1][$0];
-	}, i);
+	      emp_i.__outgoing_array = emp_i.__temp_array[emp_i.__temp_array.length - 1][$0];
+      }, i);
       while ((int)arr.size() <= i) {
         arr.push_back(emp::vector<T>());
       }

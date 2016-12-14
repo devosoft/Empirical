@@ -36,12 +36,13 @@ namespace evo {
   /// Note: Overly large Ns and Ks currently trigger a seg-fault, caused by trying to build a table
   /// that is larger than will fit in memory. If you are using small values for N and K,
   /// you can get better performance by using an NKLandscapeConst instead.
+
   class NKLandscape {
   private:
-    const uint32_t N;
-    const uint32_t K;
-    const uint32_t state_count;
-    const uint32_t total_count;
+    const size_t N;
+    const size_t K;
+    const size_t state_count;
+    const size_t total_count;
     emp::vector< emp::vector<double> > landscape;
 
   public:
@@ -52,9 +53,9 @@ namespace evo {
     /// N is the length of bitstrings in your population, K is the number of neighboring sites
     /// the affect the fitness contribution of each site (i.e. epistasis or ruggedness), random
     /// is the random number generator to use to generate this landscape.
-    NKLandscape(int _N, int _K, emp::Random & random)
+    NKLandscape(size_t _N, size_t _K, emp::Random & random)
      : N(_N), K(_K)
-     , state_count(emp::IntPow<uint32_t>(2,K+1))
+     , state_count(emp::IntPow<size_t>(2,K+1))
      , total_count(N * state_count)
      , landscape(N)
     {
@@ -71,42 +72,42 @@ namespace evo {
     NKLandscape & operator=(NKLandscape &&) = default;
 
     /// Returns N
-    int GetN() const { return N; }
+    size_t GetN() const { return N; }
     /// Returns K
-    int GetK() const { return K; }
+    size_t GetK() const { return K; }
     /// Get the number of posssible states for a given site
-    int GetStateCount() const { return state_count; }
+    size_t GetStateCount() const { return state_count; }
     /// Get the total number of states possible in the landscape
     /// (i.e. the number of different fitness contributions in the table)
-    int GetTotalCount() const { return total_count; }
+    size_t GetTotalCount() const { return total_count; }
 
     /// Get the fitness contribution of position [n] when it (and its K neighbors) have the value
     /// [state]
-    double GetFitness(int n, uint32_t state) const {
+    double GetFitness(size_t n, size_t state) const {
       emp_assert(state < state_count, state, state_count);
       return landscape[n][state];
     }
 
     /// Get the fitness of a whole  bitstring
-    double GetFitness( std::vector<uint32_t> states ) const {
+    double GetFitness( std::vector<size_t> states ) const {
       emp_assert(states.size() == N);
       double total = landscape[0][states[0]];
-      for (int i = 1; i < (int) N; i++) total += GetFitness(i,states[i]);
+      for (size_t i = 1; i < N; i++) total += GetFitness(i,states[i]);
       return total;
     }
 
     /// Get the fitness of a whole  bitstring
     double GetFitness(BitVector genome) const {
-      emp_assert(genome.GetSize() == (int) N);
+      emp_assert(genome.GetSize() == N);
 
       // Use a double-length genome to easily handle wrap-around.
       genome.Resize(N*2);
-      genome |= (genome << N);
+      genome |= (genome << (int) N);
 
       double total = 0.0;
-      uint32_t mask = emp::MaskLow<uint32_t>(K+1);
-      for (int i = 0; i < (int) N; i++) {
-        const uint32_t cur_val = (genome >> i).GetUInt(0) & mask;
+      size_t mask = emp::MaskLow<size_t>(K+1);
+      for (size_t i = 0; i < N; i++) {
+        const size_t cur_val = (genome >> (int) i).GetUInt(0) & mask;
 	      const double cur_fit = GetFitness(i, cur_val);
         total += cur_fit;
       }
@@ -114,53 +115,52 @@ namespace evo {
     }
   };
 
+  /// The NKLandscapeMemo class is simialar to NKLandscape, but it does not pre-calculate all
+  /// of the landscape states.  Instead it determines the value of each gene combination on first
+  /// use and memorizes it.
+
   class NKLandscapeMemo {
   private:
-    const int N;
-    const int K;
+    const size_t N;
+    const size_t K;
     mutable emp::vector< emp::memo_function<double(const BitVector &)> > landscape;
-    mutable std::unordered_map<BitVector, double> fit_cache;
     emp::vector<BitVector> masks;
 
   public:
     NKLandscapeMemo() = delete;
     NKLandscapeMemo(const NKLandscapeMemo &) = delete;
     NKLandscapeMemo(NKLandscapeMemo &&) = default;
-    NKLandscapeMemo(int _N, int _K, emp::Random & random) : N(_N), K(_K), landscape(N), masks(N)
+    NKLandscapeMemo(size_t _N, size_t _K, emp::Random & random)
+      : N(_N), K(_K), landscape(N), masks(N)
     {
       // Each position in the landscape...
-      for (int n = 0; n < N; n++) {
+      for (size_t n = 0; n < N; n++) {
         // ...should have its own memo_function
         landscape[n] = [&random](const BitVector &){ return random.GetDouble(); };
         // ...and its own mask.
         masks[n].Resize(N);
-        for (int k = 0; k < K; k++) masks[n][(n+k)%N] = 1;
+        for (size_t k = 0; k < K; k++) masks[n][(n+k)%N] = 1;
       }
     }
     ~NKLandscapeMemo() { ; }
     NKLandscapeMemo & operator=(const NKLandscapeMemo &) = delete;
     NKLandscapeMemo & operator=(NKLandscapeMemo &&) = default;
 
-    int GetN() const { return N; }
-    int GetK() const { return K; }
+    size_t GetN() const { return N; }
+    size_t GetK() const { return K; }
 
-    double GetFitness(int n, const BitVector & state) const {
+    double GetFitness(size_t n, const BitVector & state) const {
       emp_assert(state == (state & masks[n]));
       return landscape[n](state);
     }
     double GetFitness(const BitVector & genome) const {
       emp_assert(genome.GetSize() == N);
 
-      // If this fitness is cached, return it!
-      const auto it = fit_cache.find(genome);
-      if (it != fit_cache.end()) return it->second;
-
       // Otherwise calculate it.
       double total = 0.0;
-      for (int n = 0; n < N; n++) {
+      for (size_t n = 0; n < N; n++) {
         total += landscape[n](genome & masks[n]);
       }
-      fit_cache[genome] = total;
       return total;
     }
   };

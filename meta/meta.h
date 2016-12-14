@@ -29,14 +29,14 @@ namespace emp {
 
   // Index into a template parameter pack to grab a specific type.
   namespace {
-    template <int ID, typename T, typename... Ts>
+    template <size_t ID, typename T, typename... Ts>
     struct pack_id_impl { using type = typename pack_id_impl<ID-1,Ts...>::type; };
 
     template <typename T, typename... Ts>
     struct pack_id_impl<0,T,Ts...> { using type = T; };
   }
 
-  template <int ID, typename... Ts>
+  template <size_t ID, typename... Ts>
   using pack_id = typename pack_id_impl<ID,Ts...>::type;
 
   // Trim off the last type from a pack.
@@ -51,9 +51,9 @@ namespace emp {
   constexpr bool has_type() { return std::is_same<TEST, FIRST>() || has_type<TEST,OTHERS...>(); }
 
   // Count how many times a specified type appears in a set of types.
-  template <typename TEST> constexpr int count_type() { return 0; }
+  template <typename TEST> constexpr size_t count_type() { return 0; }
   template <typename TEST, typename FIRST, typename... OTHERS>
-  constexpr int count_type() { return count_type<TEST,OTHERS...>() + (std::is_same<TEST, FIRST>()?1:0); }
+  constexpr size_t count_type() { return count_type<TEST,OTHERS...>() + (std::is_same<TEST, FIRST>()?1:0); }
 
   // Return the index of a test type in a set of types.
   namespace {

@@ -50,7 +50,7 @@ namespace web {
       double scroll_top;                         // Where should slate scroll to? (0.0 to 1.0)
       emp::vector<Widget> m_children;            // Widgets contained in this one.
       bool append_ok;                            // Can we add more children?
-      std::map<std::string, Widget> widget_dict; // By-name lookup for child widgets
+      std::map<std::string, Widget> widget_dict; // By-name lookup for descendent widgets
 
 
       SlateInfo(const std::string & in_id="")

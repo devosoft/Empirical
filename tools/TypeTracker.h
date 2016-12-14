@@ -24,14 +24,14 @@ namespace emp {
 
   // The base class of the types to be tracked.
   struct TrackedType {
-    virtual int GetTypeTrackerID() const noexcept = 0;
+    virtual size_t GetTypeTrackerID() const noexcept = 0;
     virtual ~TrackedType() {;}
   };
 
   // The derived classes to be tracked should inherit from TypeTracker_Class<ID>
   // where ID is the position in the type list for TypeTracker.  Note that this value can
   // be obtained dyanmically at compile type by using TypeTracker<...>::GetID<TYPE>()
-  template <typename REAL_T, int ID>
+  template <typename REAL_T, size_t ID>
   struct TypeTracker_Class : public TrackedType {
     using real_t = REAL_T;
     REAL_T value;
@@ -42,7 +42,7 @@ namespace emp {
     TypeTracker_Class(TypeTracker_Class &&) = default;
     TypeTracker_Class & operator=(const TypeTracker_Class &) = default;
     TypeTracker_Class & operator=(TypeTracker_Class &&) = default;
-    virtual int GetTypeTrackerID() const noexcept { return ID; }
+    virtual size_t GetTypeTrackerID() const noexcept { return ID; }
   };
 
   template <typename... TYPES>
@@ -51,8 +51,8 @@ namespace emp {
     template <typename REAL_T>
     using wrap_t = TypeTracker_Class< REAL_T, get_type_index<REAL_T,TYPES...>() >;
 
-    constexpr static int GetNumTypes() { return sizeof...(TYPES)+1; }
-    constexpr static int GetNumCombos() { return GetNumTypes() * GetNumTypes(); }
+    constexpr static size_t GetNumTypes() { return sizeof...(TYPES)+1; }
+    constexpr static size_t GetNumCombos() { return GetNumTypes() * GetNumTypes(); }
 
     emp::array< std::function<void(TrackedType*, TrackedType*)>, GetNumCombos() > redirects;
 
@@ -97,9 +97,9 @@ namespace emp {
 
     template <typename T1, typename T2>
     this_t & AddFunction( std::function<void(T1,T2)> fun ) {
-      constexpr int ID1 = get_type_index<T1,TYPES...>();
-      constexpr int ID2 = get_type_index<T2,TYPES...>();
-      constexpr int POS = ID1 * GetNumTypes() + ID2;
+      constexpr size_t ID1 = get_type_index<T1,TYPES...>();
+      constexpr size_t ID2 = get_type_index<T2,TYPES...>();
+      constexpr size_t POS = ID1 * GetNumTypes() + ID2;
       redirects[POS] = [fun](TrackedType* b1, TrackedType* b2) {
         emp_assert(dynamic_cast<wrap_t<T1> *>(b1) != nullptr);
         emp_assert(dynamic_cast<wrap_t<T2> *>(b2) != nullptr);
@@ -114,9 +114,9 @@ namespace emp {
     }
 
     void RunFunction( TrackedType * b1, TrackedType * b2 ) {
-      const int id1 = b1->GetTypeTrackerID();
-      const int id2 = b2->GetTypeTrackerID();
-      const int pos = id1 * GetNumTypes() + id2;
+      const size_t id1 = b1->GetTypeTrackerID();
+      const size_t id2 = b2->GetTypeTrackerID();
+      const size_t pos = id1 * GetNumTypes() + id2;
       if (redirects[pos]) redirects[pos](b1,b2);  // If a redirect exists, use it!
     }
   };

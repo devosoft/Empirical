@@ -67,7 +67,7 @@ namespace emp {
         // Otherwise, set the current position the the minimal of the three
         // numbers to the upper right in the chart plus one.
         else {
-          cur_row[col] = emp::min(prev_row[col], prev_row[col-1], cur_row[col-1]) + 1;
+          cur_row[col] = emp::Min(prev_row[col], prev_row[col-1], cur_row[col-1]) + 1;
         }
       }
 
@@ -114,7 +114,7 @@ namespace emp {
         // Otherwise, set the current position to the minimum of the three
         // numbers to the left, upper, or upper left in the chart plus one.
         else {
-          cur_row[col] = emp::min(prev_row[col], prev_row[col-1], cur_row[col-1]) + 1;
+          cur_row[col] = emp::Min(prev_row[col], prev_row[col-1], cur_row[col-1]) + 1;
           if (cur_row[col] == prev_row[col]+1)   { edit_info[row][col] = 'd'; }
           if (cur_row[col] == prev_row[col-1]+1) { edit_info[row][col] = 's'; }
           if (cur_row[col] == cur_row[col-1]+1)  { edit_info[row][col] = 'i'; }

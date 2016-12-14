@@ -1,24 +1,26 @@
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -Wno-unused-function -std=c++14 -I../../ -I./
+CFLAGS_all := -Wall -Wno-unused-function -I../../
+CFLAGS_version := -std=c++14
 
 # Emscripten compiler information
 CXX_web := emcc
-#CXX_native := g++
 CXX_native := g++
+#CXX_native := g++-5
 
-#OFLAGS_native := -g -pedantic
-#OFLAGS_native := -g -pg -pedantic
-OFLAGS_native := -O3 -DNDEBUG
+OFLAGS_native_opt := -O3 -DNDEBUG
+OFLAGS_native_debug := -g -pedantic -DEMP_TRACK_MEM  -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual
+OFLAGS_native_grumpy := -g -pedantic -DEMP_TRACK_MEM  -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
 
-OFLAGS_web := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864 -s ASSERTIONS=2 -s DEMANGLE_SUPPORT=1 # -s SAFE_HEAP=1
-#OFLAGS_web := -Os -DNDEBUG -s TOTAL_MEMORY=67108864
+OFLAGS_web_opt := -Os -DNDEBUG -s TOTAL_MEMORY=67108864
+OFLAGS_web_debug := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864 -s ASSERTIONS=2 -s DEMANGLE_SUPPORT=1 # -s SAFE_HEAP=1
 
+CFLAGS_native_opt := $(CFLAGS_all) $(OFLAGS_native_opt)
+CFLAGS_native_debug := $(CFLAGS_all) $(OFLAGS_native_debug)
+CFLAGS_native_grumpy := $(CFLAGS_all) $(OFLAGS_native_grumpy)
 
-CFLAGS_native := $(CFLAGS_all) $(OFLAGS_native)
-
-CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../web/library_emp.js --js-library ../../web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
-
 
 TARGETS := Fitness_Share_NK Grid link_test NK NK-constexpr NK-const-config NK-Serial Symbulation World bit_evolve
 
@@ -26,18 +28,35 @@ EVO_DEPEND := ../../evo/PopulationManager.h ../../evo/World.h
 
 default: native
 
-native: $(TARGETS)
+CXX := $(CXX_native)
+CFLAGS := $(CFLAGS_native_opt)
 
-web: $(JS_TARGETS)
+debug: CFLAGS := $(CFLAGS_native_debug)
+debug: all
+
+grumpy: CFLAGS := $(CFLAGS_native_grumpy)
+grumpy: all
+
+web: CXX := $(CXX_web)
+web: CFLAGS := $(CFLAGS_web_opt)
+web: all
+
+web-debug: CXX := $(CXX_web)
+web-debug: CFLAGS := $(CFLAGS_web_debug)
+web-debug: all
+
+native: all
+
+all: $(TARGETS)
 
 $(TARGETS): % : %.cc $(EVO_DEPEND)
-	$(CXX_native) $(CFLAGS_native) $< -o $@
+	$(CXX) $(CFLAGS_version) $(CFLAGS) $< -o $@
 
 $(JS_TARGETS): %.js : %.cc
 	$(CXX_web) $(CFLAGS_web) $< -o $@
 
-debug-%: $*.cc
-	$(CXX_native) $(CFLAGS_native) $< -o $@
+debug-%: $*.cc $(EVO_DEPEND)
+	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
 
 clean:
 	rm -rf debug-* *~ *.dSYM $(TARGETS)

@@ -58,7 +58,7 @@ namespace emp {
   }
 
   const emp::vector<std::string> &
-  GetHueMap(int map_size, double min_h=0.0, double max_h=360.0, int s=100, int l=50) {
+  GetHueMap(size_t map_size, double min_h=0.0, double max_h=360.0, int s=100, int l=50) {
     dHueMapKey map_key = std::make_tuple(map_size, min_h, max_h, s, l);
 
     // Grab the current map out of the cache.
@@ -70,7 +70,7 @@ namespace emp {
       // Otherwise generate this map...
       cur_map.resize(map_size);
       double step_size = (max_h - min_h) / (double) map_size;
-      for (int i = 0; i < map_size; ++i) {
+      for (size_t i = 0; i < map_size; ++i) {
         double h = min_h + step_size * i;
         cur_map[i] = ColorHSL(h, s, l);
       }

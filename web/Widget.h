@@ -57,6 +57,7 @@ namespace web {
     // Base class for command-objects that can be fed into widgets.
     class WidgetCommand {
     public:
+      virtual ~WidgetCommand() { ; }
       virtual bool Trigger(WidgetInfo &) const = 0;
     };
   }
