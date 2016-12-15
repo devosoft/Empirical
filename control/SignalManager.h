@@ -38,9 +38,14 @@ namespace emp {
     int GetNextID() const { return next_id; }
     size_t GetSize() const { return signal_map.size(); }
 
-    SignalBase & Get(const std::string & name) {
+    SignalBase & operator[](const std::string & name) {
       emp_assert(signal_map.find(name) != signal_map.end());
       return *(signal_map[name]);
+    }
+    const SignalBase & operator[](const std::string & name) const {
+      auto it = signal_map.find(name);
+      emp_assert(it != signal_map.end());
+      return *(it->second);
     }
 
   };
