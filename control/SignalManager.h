@@ -24,6 +24,10 @@ namespace emp {
     int next_id=0;
     std::string prefix = "emp_signal_";
 
+    // Generate a unique signal name to prevent duplicates.
+    inline std::string GenerateSignalName(const std::string & _pre=prefix) {
+      return emp::to_string(prefix, next_id++);
+    }
   public:
     SignalManager() = default;
     SignalManager(SignalManager &&) = default;     // Normal juggle is okay for move constructor
@@ -48,6 +52,12 @@ namespace emp {
       return *(it->second);
     }
 
+    template <typename... ARGS>
+    auto & Add(const std::string & name) {
+      auto * new_signal = new Signal<ARGS...>(name);
+      signal_map[name] = new_signal;
+      return signal_map[name];
+    }
   };
 
 }
