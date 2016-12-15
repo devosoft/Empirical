@@ -55,6 +55,7 @@ namespace emp {
     SignalBase(const std::string & n) : name(n) { ; }
   public:
     virtual ~SignalBase() { ; }
+    virtual SignalBase * Clone() const = 0;
 
     const std::string & GetName() const { return name; }
     virtual int GetNumArgs() const = 0;
@@ -75,11 +76,25 @@ namespace emp {
   template <typename... ARGS>
   class Signal : public SignalBase {
   protected:
+    using this_t = Signal<ARGS...>;
   public:
     Signal(const std::string & name) : SignalBase(name) { ; }
-    
+    virtual this_t * Clone() const {
+      this_t * new_copy = new this_t(name);
+      // @CAO: Make sure to copy over actions into new copy.
+      return new_copy;
+    }
+
     int GetNumArgs() const { return sizeof...(ARGS); }
   };
+
+  template<typename... ARGS>
+  inline void SignalBase::BaseTrigger(ARGS... args) {
+    // Make sure this base class is really of the correct derrived type (but do so in an
+    // assert since triggers may be called frequently and should be fast!)
+    emp_assert(dynamic_cast< Signal<ARGS...> * >(this));
+    ((Signal<ARGS...> *) this)->Trigger(args...);
+  }
 
 }
 
