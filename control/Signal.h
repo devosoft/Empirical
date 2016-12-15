@@ -76,6 +76,8 @@ namespace emp {
   class Signal : public SignalBase {
   protected:
   public:
+    Signal(const std::string & name) : SignalBase(name) { ; }
+    
     int GetNumArgs() const { return sizeof...(ARGS); }
   };
 
