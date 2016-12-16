@@ -13,7 +13,7 @@
 #include <unordered_map>
 
 #include "ActionManager.h"
-#include "Signal.h"
+#include "SignalManager.h"
 
 namespace emp {
 
@@ -31,8 +31,8 @@ namespace emp {
     size_t GetNumActions() const { return action_m.GetSize(); }
     size_t GetNumSignals() const { return signal_m.GetSize(); }
 
-    ActionBase & GetAction(const std::string & name) const { return action_m.Get(name); }
-    SignalBase & GetSignal(const std::string & name) const { return signal_m.Get(name); }
+    const ActionBase & GetAction(const std::string & name) const { return action_m[name]; }
+    const SignalBase & GetSignal(const std::string & name) const { return signal_m[name]; }
 
     template <typename RETURN, typename... ARGS>
     auto & AddAction(const std::function<RETURN(ARGS...)> & fun, const std::string & name) {
