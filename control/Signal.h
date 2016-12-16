@@ -51,7 +51,7 @@ namespace emp {
   class SignalBase {
   protected:
     std::string name;                      // What is the unique name of this signal?
-    std::map<SignalKey, int> link_key_map; // Map unique link keys to link index for actions.
+    std::map<SignalKey, size_t> link_key_map; // Map unique link keys to link index for actions.
 
     // Helper Functions
     // @CAO FIX!!!
@@ -64,7 +64,7 @@ namespace emp {
     virtual SignalBase * Clone() const = 0;
 
     const std::string & GetName() const { return name; }
-    virtual int GetNumArgs() const = 0;
+    virtual size_t GetNumArgs() const = 0;
 
     // NOTE: If a Trigger is called on a base class, convert the signal assuming that the args
     // map to the correct types (defined below with a dynamic cast to ensure correctness)
@@ -92,7 +92,7 @@ namespace emp {
       return new_copy;
     }
 
-    int GetNumArgs() const { return sizeof...(ARGS); }
+    size_t GetNumArgs() const { return sizeof...(ARGS); }
 
     void Trigger(ARGS... args) { actions.Run(args...); }
 
