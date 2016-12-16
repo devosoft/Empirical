@@ -109,6 +109,38 @@ namespace emp {
       emp_assert( a != nullptr && "action type must match signal type." );
       return AddAction(a->GetFun());
     }
+
+    // Add an action that takes too few arguments... but provide specific padding info.
+    template <typename... FUN_ARGS, typename... EXTRA_ARGS>
+    SignalKey AddAction(const std::function<void(FUN_ARGS...)> & in_fun, TypePack<EXTRA_ARGS...>)
+    {
+      // If we made it here, we have isolated the extra arguments that we need to throw away to
+      // call this function correctly.
+      const SignalKey link_id = NextSignalKey();
+      link_key_map[link_id] = actions.size();
+      std::function<void(ARGS...)> expand_fun =
+        [in_fun](FUN_ARGS... args, EXTRA_ARGS...){ in_fun(std::forward<FUN_ARGS>(args)...); };
+      actions.Add(expand_fun);
+      return link_id;
+    }
+
+    // Add an std::function that takes the wrong number of arguments.  For now, we will assume
+    // that there are too few and we need to figure out how to pad it out.
+    template <typename... FUN_ARGS>
+    SignalKey AddAction(const std::function<void(FUN_ARGS...)> & in_fun) {
+      // Identify the extra arguments by removing the ones that we know about.
+      using extra_type = typename TypePack<ARGS...>::template popN<sizeof...(FUN_ARGS)>;
+      return AddAction(in_fun, extra_type());
+    }
+
+    // Add a regular function that takes the wrong number of arguments.  For now, we will assume
+    // that there are too few and we need to figure out how to pad it out.
+    template <typename... FUN_ARGS>
+    SignalKey AddAction(void in_fun(FUN_ARGS...)) {
+      // Identify the extra arguments by removing the ones that we know about.
+      using extra_type = typename TypePack<ARGS...>::template popN<sizeof...(FUN_ARGS)>;
+      return AddAction(std::function<void(FUN_ARGS...)>(in_fun), extra_type());
+    }
   };
 
   template<typename... ARGS>
