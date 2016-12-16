@@ -25,8 +25,9 @@ namespace emp {
     std::string prefix = "emp_signal_";
 
     // Generate a unique signal name to prevent duplicates.
-    inline std::string GenerateSignalName(const std::string & _pre=prefix) {
-      return emp::to_string(prefix, next_id++);
+    inline std::string GenerateSignalName(const std::string & pre="") {
+      if (pre=="") return emp::to_string(prefix, next_id++);  // Use default version.
+      return emp::to_string(pre, next_id++);
     }
   public:
     SignalManager() = default;
