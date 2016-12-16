@@ -11,6 +11,8 @@
 #include <map>
 #include <string>
 
+#include "../tools/FunctionSet.h"
+
 #include "Action.h"
 
 namespace emp {
@@ -51,6 +53,10 @@ namespace emp {
     std::string name;                      // What is the unique name of this signal?
     std::map<SignalKey, int> link_key_map; // Map unique link keys to link index for actions.
 
+    // Helper Functions
+    // @CAO FIX!!!
+    SignalKey NextSignalKey() { return SignalKey(0,0); }
+
     // SignalBase should only be constructable from derrived classes.
     SignalBase(const std::string & n) : name(n) { ; }
   public:
@@ -77,6 +83,7 @@ namespace emp {
   class Signal : public SignalBase {
   protected:
     using this_t = Signal<ARGS...>;
+    FunctionSet<void, ARGS...> actions;
   public:
     Signal(const std::string & name) : SignalBase(name) { ; }
     virtual this_t * Clone() const {
@@ -86,6 +93,22 @@ namespace emp {
     }
 
     int GetNumArgs() const { return sizeof...(ARGS); }
+
+    void Trigger(ARGS... args) { actions.Run(args...); }
+
+    // Add an action that takes the proper arguments.
+    SignalKey AddAction(const std::function<void(ARGS...)> & in_fun) {
+      const SignalKey link_id = NextSignalKey();
+      link_key_map[link_id] = actions.size();
+      actions.Add(in_fun);
+      return link_id;
+    }
+
+    SignalKey AddAction(ActionBase & in_action) {
+      Action<ARGS...> * a = dynamic_cast< Action<ARGS...>* >(&in_action);
+      emp_assert( a != nullptr && "action type must match signal type." );
+      return AddAction(a->GetFun());
+    }
   };
 
   template<typename... ARGS>
