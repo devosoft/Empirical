@@ -85,7 +85,7 @@ namespace emp {
     using this_t = Signal<ARGS...>;
     FunctionSet<void, ARGS...> actions;
   public:
-    Signal(const std::string & name) : SignalBase(name) { ; }
+    Signal(const std::string & name="") : SignalBase(name) { ; }
     virtual this_t * Clone() const {
       this_t * new_copy = new this_t(name);
       // @CAO: Make sure to copy over actions into new copy.
