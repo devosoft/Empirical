@@ -31,11 +31,11 @@ namespace emp {
   public:
     virtual ~ActionBase() { ; }
 
-    const std::string & GetName() { return name; }
+    const std::string & GetName() const { return name; }
     virtual int GetArgCount() const = 0;
 
     // Clone() will produce a pointer to a full copy of an Action, going through derived version.
-    virtual ActionBase * Clone() = 0;
+    virtual ActionBase * Clone() const = 0;
   };
 
   template <int ARG_COUNT>
@@ -69,7 +69,7 @@ namespace emp {
 
     void Call(ARGS... args) { return fun(std::forward<ARGS>(args)...); }
 
-    this_t * Clone() { return new this_t(*this); }
+    this_t * Clone() const { return new this_t(*this); }
   };
 
 
