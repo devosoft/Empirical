@@ -27,30 +27,31 @@ int main()
   test_sig.Trigger(12);
   test_sig.Trigger(-1);
 
-  // // Signals dont need to take arguments or have names.
-  // std::cout << "Phase 2: Create and trigger a signal with no args; added action to print ***\n";
-  // emp::Signal<> test_sig2;
-  // test_sig2.AddAction(PrintVoid);
-  // test_sig2.Trigger();
-  //
-  //
-  // // Actions can be turned into named objects as well.
-  // std::cout << "Phase 3: Create action objects and link them to signals by name.\n"
-  //           << "...setup three actions (print val three times, and track sum of vals so far)\n";
-  // int total=0;
-  // emp::Action<int> act1([&total](int inc){total+=inc;}, "sum");
-  // emp::Action<int> act2(PrintInt, "iprint");
-  // emp::Action<int,int> act_mint(MultInt, "mint");
-  //
-  // emp::Signal<int> test_sig3("test3");
-  // test_sig3.AddAction(act1);
-  //
-  // emp::LinkSignal("test3", "iprint");
-  // emp::LinkSignal("test3", "iprint");
-  // test_sig3.AddAction(act2);
-  //
-  // test_sig3.Trigger(10);
-  //
+  // Signals dont need to take arguments or have names.
+  std::cout << "Phase 2: Create and trigger a signal with no args; added action to print ***\n";
+  emp::Signal<> test_sig2;
+  test_sig2.AddAction(PrintVoid);
+  test_sig2.Trigger();
+
+  // Actions can be turned into named objects as well.
+  std::cout << "Phase 3: Create action objects in SignalControl and link them to signals by name.\n"
+            << "...setup three actions (print val three times, and track sum of vals so far)\n";
+  int total=0;
+  emp::Action<int> act1([&total](int inc){total+=inc;}, "sum");
+  emp::Action<int> act2(PrintInt, "iprint");
+  emp::Action<int,int> act_mint(MultInt, "mint");
+
+  emp::SignalControl control;
+  auto & test_sig3 = control.AddSignal<int>("test3");
+  test_sig3.AddAction(act1);
+
+  control.AddAction(act2);
+  control.Link("test3", "iprint");
+  control.Link("test3", "iprint");
+  test_sig3.AddAction(act2);
+
+  test_sig3.Trigger(10);
+
   // std::cout << "Phase 4: Trigger again from BASE SIGNAL CLASS with 20!\n";
   // emp::internal::Signal_Base * base_sig = &test_sig3;
   // //test_sig3.Trigger(20);
