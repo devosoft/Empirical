@@ -52,7 +52,7 @@ namespace emp {
     auto & Add(const std::function<RETURN(ARGS...)> & in_fun, const std::string & name) {
       // Create the new action, save it, and return it.
       auto * new_action = new Action<RETURN, ARGS...>(in_fun, name);
-      action_map[name] = in_fun;
+      action_map[name] = new_action;
       return *new_action;
     }
 
@@ -61,6 +61,12 @@ namespace emp {
       std::string name(prefix);
       name += emp::to_string(next_id++);
       return Add(in_fun, name);
+    }
+
+    auto & Add(const ActionBase & action) {
+      auto * new_action = action.Clone();
+      action_map[action.GetName()] = new_action;
+      return *new_action;
     }
 
   };
