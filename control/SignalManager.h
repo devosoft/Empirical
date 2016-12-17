@@ -57,7 +57,12 @@ namespace emp {
     auto & Add(const std::string & name) {
       auto * new_signal = new Signal<ARGS...>(name);
       signal_map[name] = new_signal;
-      return signal_map[name];
+      return *new_signal;
+    }
+
+    void PrintNames(std::ostream & os=std::cout) {
+      os << signal_map.size() << " signals found:\n";
+      for (auto & x : signal_map) os << "  " << x.first << std::endl;
     }
   };
 
