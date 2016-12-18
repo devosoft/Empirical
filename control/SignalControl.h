@@ -49,11 +49,7 @@ namespace emp {
     // If a name is passed in for the signal, convert it to a SignalBase.
     // Pass through anything for actions and return a unique key for the pairing.
     template <typename A>
-    auto Link(const std::string & s, A && a) {
-      std::cout << "NAME = " << s << std::endl;
-      signal_m.PrintNames();
-      return Link(signal_m[s], std::forward<A>(a));
-    }
+    auto Link(const std::string & s, A && a) { return Link(signal_m[s], std::forward<A>(a)); }
 
     // If a name is passed in for the action, convert it to an ActionBase.
     // (signal names were handled in the previous overload of this function)
