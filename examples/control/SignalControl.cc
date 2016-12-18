@@ -35,7 +35,7 @@ int main()
 
   // Actions can be turned into named objects as well.
   std::cout << "Phase 3: Create action objects in SignalControl and link them to signals by name.\n"
-            << "...setup three actions (print val three times, and track sum of vals so far)\n";
+            << "...setup three actions (print val three times while tracking sum of vals so far)\n";
   int total=0;
   emp::Action<int> act1([&total](int inc){total+=inc;}, "sum");
   emp::Action<int> act2(PrintInt, "iprint");
@@ -52,15 +52,15 @@ int main()
 
   test_sig3.Trigger(10);
 
-  // std::cout << "Phase 4: Trigger again from BASE SIGNAL CLASS with 20!\n";
-  // emp::internal::Signal_Base * base_sig = &test_sig3;
-  // //test_sig3.Trigger(20);
-  // base_sig->BaseTrigger(20);
-  //
-  // // Trigger by signal name!
-  // std::cout << "Phase 5: Trigger original signal with some of values calculated so far!\n";
-  // emp::TriggerSignal("test", total);
-  //
+  std::cout << "Phase 4: Trigger again from BASE SIGNAL CLASS with 20!\n";
+  emp::SignalBase * base_sig = &test_sig3;
+  base_sig->BaseTrigger(20);
+
+  // Trigger by signal name!
+  std::cout << "Phase 5: Trigger original signal from control with sum calculated so far!\n";
+  control.AddSignal<int>(test_sig);
+  control.Trigger("test", total);
+
   // // Build a signal setup to provide many arguments.
   // std::cout << "Phase 6: Sum 1,2,3,4!\n";
   // emp::Signal<int,int,int,int,int&> sum4_sig;
