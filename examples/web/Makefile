@@ -1,71 +1,52 @@
 # Flags to use regardless of compiler
-#CFLAGS_all := -Wall -Wno-unused-function -std=c++14 -I../../ -I./
-CFLAGS_all := -Wall -Wno-unused-variable -Wno-unused-function -std=c++14 -I../../ -I./
+CFLAGS_all := -std=c++14 -Wall -Wno-unused-function -I../../
 
 # Emscripten compiler information
 CXX_web := emcc
 CXX_native := g++
 
-OFLAGS_native := -g -pedantic
+OFLAGS_native_debug := -g -pedantic -DEMP_TRACK_MEM  -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
+OFLAGS_native_opt := -O3 -DNDEBUG
 
-OFLAGS_web := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864 -s ASSERTIONS=2 -s DEMANGLE_SUPPORT=1 # -s SAFE_HEAP=1
-#OFLAGS_web := -g4 -DEMP_NDEBUG -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864 -s ASSERTIONS=2 -s DEMANGLE_SUPPORT=1 # -s SAFE_HEAP=1
-#OFLAGS_web := -g4 -DNDEBUG -s TOTAL_MEMORY=67108864 -s DEMANGLE_SUPPORT=1 # -s SAFE_HEAP=1
-#OFLAGS_web := -Werror -DNDEBUG -s TOTAL_MEMORY=67108864
-#OFLAGS_web := -Oz -DNDEBUG -s TOTAL_MEMORY=67108864 -s ASSERTIONS=1
-#OFLAGS_web := -Os -DNDEBUG -s TOTAL_MEMORY=67108864
+OFLAGS_web_debug := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864 -s ASSERTIONS=2 -s DEMANGLE_SUPPORT=1  -DEMP_TRACK_MEM  -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
+ # -s SAFE_HEAP=1
+OFLAGS_web_opt := -Os -DNDEBUG -s TOTAL_MEMORY=67108864
 
+CFLAGS_native_debug := $(CFLAGS_all) $(OFLAGS_native_debug)
+CFLAGS_native_opt := $(CFLAGS_all) $(OFLAGS_native_opt)
+CFLAGS_native := $(CFLAGS_native_opt)
 
-CFLAGS_native := $(CFLAGS_all) $(OFLAGS_native)
-
-CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
-#CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
+CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
 
 
 JS_TARGETS := Animate.js Attributes.js Example.js keypress.js Slate.js Sudoku.js Table.js TextArea.js Tween.js Web.js
 
+TARGETS := debug-Animate debug-keypress debug-Slate debug-web
+
 default: web
 
+CXX := $(CXX_native)
+CFLAGS := $(CFLAGS_native_opt)
+
+debug: CFLAGS_web := $(CFLAGS_web_debug)
+debug: $(JS_TARGETS)
+
+web: CXX := $(CXX_web)
+web: CFLAGS_web := $(CFLAGS_web_opt)
 web: $(JS_TARGETS)
-native: debug-Animate debug-keypress debug-Slate debug-web
 
-# %.js: $*.cc
-# 	$(CXX_web) $(CFLAGS_web) $< -o $@
+web-debug: CXX := $(CXX_web)
+web-debug: CFLAGS := $(CFLAGS_web_debug)
+web-debug: all
 
+native: all
+
+all: $(TARGETS)
 
 $(JS_TARGETS): %.js : %.cc
 	$(CXX_web) $(CFLAGS_web) $< -o $@
 
-
-# Animate.js: Animate.cc
-# 	$(CXX_web) $(CFLAGS_web) Animate.cc -o Animate.js
-
-# Attributes.js: Attributes.cc
-# 	$(CXX_web) $(CFLAGS_web) Attributes.cc -o Attributes.js
-
-# Example.js: Example.cc
-# 	$(CXX_web) $(CFLAGS_web) Example.cc -o Example.js
-
-# keypress.js: keypress.cc
-# 	$(CXX_web) $(CFLAGS_web) keypress.cc -o keypress.js
-
-# Slate.js: Slate.cc
-# 	$(CXX_web) $(CFLAGS_web) Slate.cc -o Slate.js
-
-# Sudoku.js: Sudoku.cc
-# 	$(CXX_web) $(CFLAGS_web) Sudoku.cc -o Sudoku.js
-
-# Table.js: Table.cc
-# 	$(CXX_web) $(CFLAGS_web) Table.cc -o Table.js
-
-# TextArea.js: TextArea.cc
-# 	$(CXX_web) $(CFLAGS_web) TextArea.cc -o TextArea.js
-
-# Tween.js: Tween.cc
-# 	$(CXX_web) $(CFLAGS_web) Tween.cc -o Tween.js
-
-# Web.js: Web.cc
-# 	$(CXX_web) $(CFLAGS_web) Web.cc -o Web.js
 
 debug-%: $*.cc
 	$(CXX_native) $(CFLAGS_native) $< -o $@
