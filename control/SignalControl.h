@@ -5,6 +5,14 @@
 //
 //  The SignalControl class manages all of the signals and actions, linking them together
 //  upon request (by name, base class, or derived class).
+//
+//
+//  Developer notes:
+//  * Right now SignalControl can only link to signals that it creates.  Ideally, external signals
+//    should also be able to be added to it.  The question is, how should this be done?
+//    - They could be copied.  But should we copy existing actions?  How do we provide keys?
+//    - They could use a smart pointer style, so only deleted with final version (slow down?)
+//    - They could reference the originally and automatically clean up if its deleted (confusing?)
 
 #ifndef EMP_SIGNAL_CONTROL
 #define EMP_SIGNAL_CONTROL
