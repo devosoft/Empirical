@@ -17,7 +17,8 @@ void Sum4(int w, int x, int y, int z, int & result) { result=w+x+y+z; PrintInt(r
 int main()
 {
   // A simple signal that sends an int.
-  emp::Signal<int> test_sig("test");
+  emp::SignalControl control;
+  emp::Signal<int> & test_sig = control.AddSignal<int>("test");
   test_sig.AddAction(PrintInt);
   test_sig.AddAction(PrintVoid);
   test_sig.AddAction([](int x){ std::cout << "---:" << x << "\n\n"; });
@@ -41,7 +42,6 @@ int main()
   emp::Action<int> act2(PrintInt, "iprint");
   emp::Action<int,int> act_mint(MultInt, "mint");
 
-  emp::SignalControl control;
   auto & test_sig3 = control.AddSignal<int>("test3");
   test_sig3.AddAction(act1);
 
@@ -58,20 +58,19 @@ int main()
 
   // Trigger by signal name!
   std::cout << "Phase 5: Trigger original signal from control with sum calculated so far!\n";
-  control.AddSignal<int>(test_sig);
   control.Trigger("test", total);
 
-  // // Build a signal setup to provide many arguments.
-  // std::cout << "Phase 6: Sum 1,2,3,4!\n";
-  // emp::Signal<int,int,int,int,int&> sum4_sig;
-  // sum4_sig.AddAction(Sum4);
-  // int result=0;
-  // sum4_sig.Trigger(1,2,3,4,result);
-  // std::cout << "result variable is now set to " << result << std::endl;
-  //
-  // std::cout << "Phase 7: Add mult 2 to prev signal... using only two args!  Call with 2,3,4,5\n";
-  // std::function<void(int,int)> mult_pair = [](int x, int y){std::cout << x << "*" << y << "=" << x*y << std::endl;};
-  // sum4_sig.AddAction(mult_pair);
-  // sum4_sig.Trigger(2,3,4,5,result);
-  // std::cout << "result variable is now set to " << result << std::endl;
+  // Build a signal setup to provide many arguments.
+  std::cout << "Phase 6: Sum 1,2,3,4!\n";
+  emp::Signal<int,int,int,int,int&> sum4_sig;
+  sum4_sig.AddAction(Sum4);
+  int result=0;
+  sum4_sig.Trigger(1,2,3,4,result);
+  std::cout << "result variable is now set to " << result << std::endl;
+
+  std::cout << "Phase 7: Add mult 2 to prev signal... using only two args!  Call with 2,3,4,5\n";
+  std::function<void(int,int)> mult_pair = [](int x, int y){std::cout << x << "*" << y << "=" << x*y << std::endl;};
+  sum4_sig.AddAction(mult_pair);
+  sum4_sig.Trigger(2,3,4,5,result);
+  std::cout << "result variable is now set to " << result << std::endl;
 }
