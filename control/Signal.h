@@ -43,14 +43,18 @@ namespace emp {
     bool operator<=(const SignalKey& in) const { return Compare(in) <= 0; }
     bool operator>=(const SignalKey& in) const { return Compare(in) >= 0; }
 
-    uint64_t GetID() const { return key_id; }
-    uint64_t GetSignalID() const { return signal_id; }
+    uint32_t GetID() const { return key_id; }
+    uint32_t GetSignalID() const { return signal_id; }
     bool IsActive() const { return key_id > 0; }
   };
 
+  class SignalManager;  // forward declaration for signal managers to setup friend status.
+
   class SignalBase {
+    friend class SignalManager;  // Allow SignalManager to alter internals of a signal.
   protected:
-    std::string name;                      // What is the unique name of this signal?
+    std::string name;                         // What is the unique name of this signal?
+    uint32_t signal_id;                       // What is the unique ID of this signal?
     std::map<SignalKey, size_t> link_key_map; // Map unique link keys to link index for actions.
 
     // Helper Functions
