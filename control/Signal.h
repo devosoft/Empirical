@@ -55,14 +55,15 @@ namespace emp {
   protected:
     std::string name;                         // What is the unique name of this signal?
     uint32_t signal_id;                       // What is the unique ID of this signal?
+    uint32_t next_link_id;                         // What ID shouild the next link have?
     std::map<SignalKey, size_t> link_key_map; // Map unique link keys to link index for actions.
 
     // Helper Functions
     // @CAO FIX!!!
-    SignalKey NextSignalKey() { return SignalKey(0,0); }
+    SignalKey NextSignalKey() { return SignalKey(signal_id,next_link_id++); }
 
     // SignalBase should only be constructable from derrived classes.
-    SignalBase(const std::string & n) : name(n) { ; }
+    SignalBase(const std::string & n) : name(n), next_link_id(1) { ; }
   public:
     virtual ~SignalBase() { ; }
     virtual SignalBase * Clone() const = 0;
