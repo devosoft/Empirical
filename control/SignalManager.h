@@ -21,7 +21,7 @@ namespace emp {
   class SignalManager {
   private:
     std::unordered_map<std::string, SignalBase *> signal_map;
-    int next_id=0;
+    int next_id=1;
     std::string prefix = "emp_signal_";
 
     // Generate a unique signal name to prevent duplicates.
@@ -57,6 +57,7 @@ namespace emp {
     auto & Add(const std::string & name) {
       auto * new_signal = new Signal<ARGS...>(name);
       signal_map[name] = new_signal;
+      new_signal->signal_id = next_id++;
       return *new_signal;
     }
 
