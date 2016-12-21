@@ -166,6 +166,11 @@ namespace emp {
       }
     }
 
+    size_t GetPriority(SignalKey key) {
+      emp_assert(emp::Has(link_key_map, key));
+      return link_key_map[key];
+    }
+
   };
 
   template<typename... ARGS>
