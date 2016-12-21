@@ -12,6 +12,7 @@
 #include <string>
 
 #include "../tools/FunctionSet.h"
+#include "../tools/map_utils.h"
 
 #include "Action.h"
 
@@ -55,7 +56,7 @@ namespace emp {
   protected:
     std::string name;                         // What is the unique name of this signal?
     uint32_t signal_id;                       // What is the unique ID of this signal?
-    uint32_t next_link_id;                         // What ID shouild the next link have?
+    uint32_t next_link_id;                    // What ID shouild the next link have?
     std::map<SignalKey, size_t> link_key_map; // Map unique link keys to link index for actions.
 
     // Helper Functions
@@ -82,6 +83,9 @@ namespace emp {
 
     // Add an action using an Action object.
     virtual SignalKey AddAction(ActionBase &) = 0;
+    virtual void Remove(SignalKey key) = 0;
+
+    bool Has(SignalKey key) const { return emp::Has(link_key_map, key); }
   };
 
   template <typename... ARGS>
@@ -146,6 +150,22 @@ namespace emp {
       using extra_type = typename TypePack<ARGS...>::template popN<sizeof...(FUN_ARGS)>;
       return AddAction(std::function<void(FUN_ARGS...)>(in_fun), extra_type());
     }
+
+    void Remove(SignalKey key) {
+      // Find the action associate with this key.
+      emp_assert(emp::Has(link_key_map, key));
+      size_t pos = link_key_map[key];
+
+      // Remove the action
+      actions.Remove(pos);
+      link_key_map.erase(key);
+
+      // Adjust all of the positions of the actions that came after this one.
+      for (auto & x : link_key_map) {
+        if (x.second > pos) x.second = x.second - 1;
+      }
+    }
+
   };
 
   template<typename... ARGS>
