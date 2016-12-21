@@ -479,6 +479,15 @@ TEST_CASE("Test FunctionSet", "[tools]")
   REQUIRE(global_var3 == 20);
   REQUIRE(global_var4 == 5);
 
+  fun_set.Remove(2);           // What if we remove a function
+
+  fun_set.Run(20, 5);
+
+  REQUIRE(global_var1 == 25);
+  REQUIRE(global_var2 == 15);
+  REQUIRE(global_var3 == 20);  // Same as last time!!
+  REQUIRE(global_var4 == 4);
+
   // Test 2: Functions with non-void returns.
   emp::FunctionSet<double, double> fun_set2;
   fun_set2.Add(&fun5);
