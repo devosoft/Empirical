@@ -26,9 +26,8 @@ namespace emp {
     size_t GetSize() const { return fun_set.size(); }
     size_t size() const { return fun_set.size(); }        // For standard lib compatability
 
-    void Add(const std::function<RETURN_T(ARG_TYPES...)> & in_fun) {
-      fun_set.push_back(in_fun);
-    }
+    void Add(const std::function<RETURN_T(ARG_TYPES...)> & in_fun) { fun_set.push_back(in_fun); }
+    void Remove(size_t pos) { fun_set.erase(fun_set.begin()+pos); }
 
     const emp::vector<RETURN_T> & Run(ARG_TYPES... args) const {
       const size_t num_tests = fun_set.size();
@@ -80,9 +79,8 @@ namespace emp {
     size_t GetSize() const { return fun_set.size(); }
     size_t size() const { return fun_set.size(); }     // For compatability with STL
 
-    void Add(const std::function<void(ARG_TYPES...)> & in_fun) {
-      fun_set.push_back(in_fun);
-    }
+    void Add(const std::function<void(ARG_TYPES...)> & in_fun) { fun_set.push_back(in_fun); }
+    void Remove(size_t pos) { fun_set.erase(fun_set.begin()+pos); }
 
     void Run(ARG_TYPES... params) const {
       for (const std::function<void(ARG_TYPES...)> & cur_fun : fun_set) {
