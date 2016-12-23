@@ -18,7 +18,7 @@
 
 char result_char;
 void TestFun(int x, int y, char z) {
-  result_char = z + x*y;
+  result_char = z + (char) (x*y);
 }
 
 struct HasA { static int A; static std::string TypeID() { return "HasA"; } };
