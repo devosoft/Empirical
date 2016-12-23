@@ -172,10 +172,10 @@ public:
     //Set up scales
     y_scale = new D3::LinearScale();
     x_scale = new D3::LinearScale();
-    y_scale->SetDomain(std::array<double, 2>({highest*value_growth_margin, lowest*value_loss_margin}));
-    y_scale->SetRange(std::array<double, 2>({margin, GetHeight() - margin}));
-    x_scale->SetDomain(std::array<double, 2>({0, x_max}));
-    x_scale->SetRange(std::array<double, 2>({axis_width, GetHeight()-margin}));
+    y_scale->SetDomain(std::array<double, 2>({{highest*value_growth_margin, lowest*value_loss_margin}}));
+    y_scale->SetRange(std::array<double, 2>({{margin, GetHeight() - margin}}));
+    x_scale->SetDomain(std::array<double, 2>({{0, x_max}}));
+    x_scale->SetRange(std::array<double, 2>({{axis_width, GetHeight()-margin}}));
 
     //Set up axis
     ax = new D3::Axis<D3::LinearScale>();
@@ -230,7 +230,7 @@ protected:
 
   // Containers to keep track of data state
   std::deque<DATA_TYPE> data;
-  DATA_TYPE prev_data  = {-1,-1};
+  DATA_TYPE prev_data  = {{-1,-1}};
 
   // Callback functions for accessing and scaling data
 
@@ -286,10 +286,10 @@ public:
     //Set up scales
     y_scale = new D3::LinearScale();
     x_scale = new D3::LinearScale();
-    y_scale->SetDomain(std::array<double, 2>({y_max, y_min}));
-    y_scale->SetRange(std::array<double, 2>({y_margin, (double)GetHeight() - axis_width}));
-    x_scale->SetDomain(std::array<double, 2>({x_min,x_max}));
-    x_scale->SetRange(std::array<double, 2>({axis_width, GetWidth()-x_margin}));
+    y_scale->SetDomain(std::array<double, 2>({{y_max, y_min}}));
+    y_scale->SetRange(std::array<double, 2>({{y_margin, (double)GetHeight() - axis_width}}));
+    x_scale->SetDomain(std::array<double, 2>({{x_min,x_max}}));
+    x_scale->SetRange(std::array<double, 2>({{axis_width, GetWidth()-x_margin}}));
 
     //Set up axes
     x_axis = new D3::Axis<D3::LinearScale>(variables[0]);
@@ -441,8 +441,8 @@ public:
         return d3.max(js.objects[$0], window["emp"][Pointer_stringify($1)+"return_y"]);
     }, dataset->GetID(), this->GetID().c_str()), y_max);
 
-    y_scale->SetDomain(std::array<double, 2>({y_max, y_min}));
-    x_scale->SetDomain(std::array<double, 2>({x_min, x_max}));
+    y_scale->SetDomain(std::array<double, 2>({{y_max, y_min}}));
+    x_scale->SetDomain(std::array<double, 2>({{x_min, x_max}}));
 
     y_axis->Rescale(y_max, y_min, *GetSVG());
     x_axis->Rescale(x_min, x_max, *GetSVG());
@@ -553,7 +553,7 @@ public:
     }
 
     // If it isn't nested, D3 will think it's 2 separate points
-    std::array<DATA_TYPE, 1> new_point = {data[0]};
+    std::array<DATA_TYPE, 1> new_point = {{data[0]}};
 
     D3::Selection enter = GetSVG()->SelectAll(".data-point").Data(new_point, GetID()+"return_x").EnterAppend("circle");
     enter.SetAttr("cy", GetID()+"y");
@@ -584,7 +584,7 @@ public:
     y_max = 0;
     x_min = 0;
     x_max = 0;
-    prev_data  = {-1,-1};
+    prev_data  = {{-1,-1}};
   }
 };
 
@@ -792,7 +792,7 @@ public:
     double x = (d.loc() % grid_width) - grid_width/2;
     double y = (d.loc() / grid_width) - grid_height/2;
 
-    double r = sqrt(emp::pow(x,2)+emp::pow(y,2)) / sqrt(emp::pow(grid_width,2)+emp::pow(grid_height,2));
+    double r = sqrt(emp::Pow(x,2.0)+emp::Pow(y,2.0)) / sqrt(emp::Pow(grid_width,2.0)+emp::Pow(grid_height,2.0));
     (void) r;
 
     //atan2 takes sign into account
@@ -819,7 +819,7 @@ public:
     double x = (d.loc() % grid_width) - grid_width/2;
     double y = (d.loc() / grid_width) - grid_height/2;
 
-    double r = sqrt(emp::pow(x,2)+emp::pow(y,2)) / sqrt(emp::pow(grid_width,2)+emp::pow(grid_height,2));
+    double r = sqrt(emp::Pow(x,2.0)+emp::Pow(y,2.0)) / sqrt(emp::Pow(grid_width,2.0)+emp::Pow(grid_height,2.0));
     (void) r;
 
     //atan2 takes sign into account
