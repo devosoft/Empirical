@@ -40,6 +40,7 @@
 #include <string>
 
 #include "assert.h"
+#include "../debug/debug.h"
 #include "FunctionSet.h"
 #include "string_utils.h"
 #include "../meta/TypePack.h"
@@ -93,7 +94,9 @@ namespace emp {
       const size_t num_args;                   // How many arguments does this signal provide?
 
       // Signal_Base should only be constructable from derrived classes.
-      Signal_Base(const std::string & n, size_t a) : name(n), num_args(a) { ; }
+      Signal_Base(const std::string & n, size_t a) : name(n), num_args(a) {
+        Depricated("signal.h", "Instead use reimplementation in control/ folder.");
+      }
     public:
       virtual ~Signal_Base() { ; }
 
