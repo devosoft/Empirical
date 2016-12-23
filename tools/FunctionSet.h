@@ -15,7 +15,7 @@ namespace emp {
 
   template <typename RETURN_T, typename... ARGS>
   class FunctionSet : public emp::vector<std::function<RETURN_T(ARGS...)>> {
-  private:
+  protected:
     mutable emp::vector<RETURN_T> return_vals;
 
   public:
@@ -43,7 +43,7 @@ namespace emp {
     // If you want to provide a filter function, you can retrieve a specific return value.
     // The filter should take in two return values and indicate which is "better".
     RETURN_T Run(ARGS... args, std::function<RETURN_T(RETURN_T, RETURN_T)> comp_fun,
-                    RETURN_T default_val=0) const {
+                 RETURN_T default_val=0) const {
       if (base_t::size() == 0) return default_val;  // If we have no entries, return the default.
 
       Run(args...);
@@ -64,6 +64,9 @@ namespace emp {
     }
     RETURN_T FindSum(ARGS... args, RETURN_T default_val=0) const {
       return Run(args..., [](double i1, double i2){ return i1 + i2; }, default_val);
+    }
+    RETURN_T FindProduct(ARGS... args, RETURN_T default_val=1) const {
+      return Run(args..., [](double i1, double i2){ return i1 * i2; }, default_val);
     }
   };
 
