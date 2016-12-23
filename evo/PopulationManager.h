@@ -212,7 +212,7 @@ namespace evo {
     Proxy operator[](size_t i) { return Proxy(*this, i); }
     const ptr_t operator[](size_t i) const { return pop[i]; }
     iterator_t begin() { return iterator_t(this, 0); }
-    iterator_t end() { return iterator_t(this, pop.size()); }
+    iterator_t end() { return iterator_t(this, (int) pop.size()); }
   };
 
 
