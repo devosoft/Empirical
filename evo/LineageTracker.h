@@ -176,15 +176,14 @@ namespace evo{
       inject = false;
     }
 
-    //Put newly injected organism into the lineage tracker
+    // Put newly injected organism into the lineage tracker
     void TrackInjectedOffspring(const ORG* org) {
       next_org_id = this->AddOrganism(*org, 0);
       inject = true;
     }
 
-    //Keep track of location of all orgs in the population so that
-    //we can translate their ids from the World to ids within the lineage
-    //tracker
+    // Keep track of location of all orgs in the population so that we can
+    // translate their ids from the World to ids within the lineage tracker
     void TrackPlacement(int pos) {
       nodes[next_org_id].loc = pos;
 
@@ -380,25 +379,18 @@ namespace evo{
       nodes[0].alive = false;
       nodes[0].loc = -1;
 
-      const std::function<void(int)> RecordParentFun = [this] (int id){
-        RecordParent(id);
-      };
+      const std::function<void(int)> RecordParentFun = [this](int id) { RecordParent(id); };
+      const std::function<void(int)> TrackPlacementFun = [this](int pos) { TrackPlacement(pos); };
 
-      const std::function<void(int)> TrackPlacementFun = [this] (int pos){
-        TrackPlacement(pos);
-      };
-
-      const std::function<void(const org_ptr)> TrackOffspringFun = [this] (const org_ptr org){
+      const std::function<void(const org_ptr)> TrackOffspringFun = [this](const org_ptr org) {
         TrackOffspring(org);
       };
 
-      const std::function<void(const org_ptr)> TrackInjectedOffspringFun = [this] (const org_ptr org){
+      const std::function<void(const org_ptr)> TrackInjectedOffspringFun = [this](const org_ptr org){
         TrackInjectedOffspring(org);
       };
 
-      const std::function<void(int)> UpdateFun = [this] (int ud){
-        Update(ud);
-      };
+      const std::function<void(int)> UpdateFun = [this](int ud) { Update(ud); };
 
       w->OnBeforeRepro(RecordParentFun);
       w->OnOffspringReady(TrackOffspringFun);
@@ -432,9 +424,9 @@ namespace evo{
 
       //This org is no longer alive
       if ( (int) generation_since_update.size() <= pos){
-        generation_since_update.resize(pos+1);
+        generation_since_update.resize((size_t)pos+1);
       }
-      Node<org_ptr>* curr = &(nodes[generation_since_update[pos]]);
+      Node<org_ptr>* curr = &(nodes[generation_since_update[(size_t)pos]]);
       curr->alive = false;
 
       //If this org doesn't have any surviving offspring lineages, we can
@@ -479,15 +471,15 @@ namespace evo{
       //Update mapping of lineage tracker ids to locations in population
       if (separate_generations && !inject){
         if (pos >= (int) new_generation.size()) {
-          new_generation.resize(pos+1);
+          new_generation.resize((size_t)pos+1);
         }
-        new_generation[pos] = next_org_id;
+        new_generation[(size_t) pos] = next_org_id;
 
       } else {
         if (pos >= (int) generation_since_update.size()) {
-          generation_since_update.resize(pos+1);
+          generation_since_update.resize((size_t)pos+1);
         }
-        generation_since_update[pos] = next_org_id;
+        generation_since_update[(size_t)pos] = next_org_id;
       }
 
     }
@@ -495,7 +487,8 @@ namespace evo{
     //Record the org that's about to have an offspring, so we can know
     //who the parent of the next org is.
     void RecordParent(int id) {
-      next_parent_id = generation_since_update[id];
+      emp_assert(id>=0);
+      next_parent_id = generation_since_update[(size_t)id];
     }
 
     // Add an organism to the tracker - org is the genome of the organism
@@ -538,7 +531,7 @@ namespace evo{
         //TODO: This isn't sufficient - need to add signals for any
         //population change event
         for (int id : generation_since_update) {
-          nodes[generation_since_update[id]].alive = false;
+          nodes[generation_since_update[(size_t)id]].alive = false;
         }
         generation_since_update = new_generation;
         new_generation.resize(0);
