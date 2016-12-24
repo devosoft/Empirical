@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
   emp::Initialize();
 
   //Test passing arrays to Javascript
-  std::array<int32_t, 3> test_data = {10,30,60};
+  std::array<int32_t, 3> test_data = {{10,30,60}};
 
   JSDataObject test_obj_1;
   test_obj_1.val() = 10;
@@ -41,13 +41,13 @@ int main(int argc, char* argv[]) {
   test_obj_2.word() = "hi2";
   test_obj_2.val2() = 11.2;
 
-  std::array<JSDataObject, 2> test_data_2 = {test_obj_1, test_obj_2};
+  std::array<JSDataObject, 2> test_data_2 = {{test_obj_1, test_obj_2}};
 
-  std::array<std::array<std::array<int, 2>, 1>, 5> horrible_array = {{{{0,0}}, {{0,10}}, {{10,10}}, {{20,20}}, {{30, 30}}}};
+  std::array<std::array<std::array<int, 2>, 1>, 5> horrible_array = {{{{{{0,0}}}}, {{{{0,10}}}}, {{{{10,10}}}}, {{{{20,20}}}}, {{{{30, 30}}}}}};
 
-  std::array<std::array<JSDataObject, 2>, 2> test_data_4 = {{{test_obj_1, test_obj_2}, {test_obj_2, test_obj_2}}};
+  std::array<std::array<JSDataObject, 2>, 2> test_data_4 = {{{{test_obj_1, test_obj_2}}, {{test_obj_2, test_obj_2}}}};
 
-  std::array<std::array<std::string, 5>, 1> string_arr = {{"do", "strings", "work", "in", "arrays?"}};
+  std::array<std::array<std::string, 5>, 1> string_arr = {{{{"do", "strings", "work", "in", "arrays?"}}}};
 
   emp::vector<int> int_vec = {5,1,2,3,6};
 
