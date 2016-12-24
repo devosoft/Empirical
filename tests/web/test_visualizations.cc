@@ -41,7 +41,7 @@ void MakeLineGraph(std::string callback) {
 
 void TestAnimateStep_LineGraph(std::string callback) {
   line_graph.SetDrawCallback(callback);
-  line_graph.AddDataPoint({6,12});
+  line_graph.AddDataPoint({{6,12}});
 };
 
 void ClearLineGraph() {
@@ -69,7 +69,7 @@ int MakeSVG(){
 }
 
 int BindData() {
-  circles = example_selection.SelectAll("circle").Data(std::array<int, 4>({8,3,5,2})).Enter().Append("circle");
+  circles = example_selection.SelectAll("circle").Data(std::array<int, 4>({{8,3,5,2}})).Enter().Append("circle");
   return circles.GetID();
 }
 
@@ -389,7 +389,7 @@ int main() {
   emp::JSWrap([](){ax.SetOrientation("left");}, "TestSetOrientation");
   emp::JSWrap([](){ax.SetScale(scale);}, "TestSetScale");
   emp::JSWrap([](){return ax.GetScale().GetID();}, "TestGetScale");
-  emp::JSWrap([](){ax.SetTickValues(std::array<int, 3>({4,5,7}));}, "TestSetTickValues");
+  emp::JSWrap([](){ax.SetTickValues(std::array<int, 3>({{4,5,7}}));}, "TestSetTickValues");
   emp::JSWrap([](){ax.SetTickSize(.2);}, "TestSetTickSize");
   emp::JSWrap([](){ax.SetInnerTickSize(.7);}, "TestSetInnerTickSize");
   emp::JSWrap([](){ax.SetOuterTickSize(1.1);}, "TestSetOuterTickSize");
