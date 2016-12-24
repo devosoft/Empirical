@@ -97,7 +97,7 @@ namespace D3{
         make_line = new D3::DiagonalGenerator();
 
         std::function<std::array<double, 2>(NODE_TYPE, int, int)> projection = [](NODE_TYPE n, int i, int k){
-          return std::array<double, 2>({n.y(), n.x()});
+          return std::array<double, 2>({{n.y(), n.x()}});
         };
 
         emp::JSWrap(projection, "projection");
@@ -170,8 +170,8 @@ namespace D3{
         js.objects.push(linkEnter);
         js.objects.push(linkExit);
       }, this->id, data->GetID(), make_line->GetID(), svg.GetID());
-      return std::array<Selection, 4>({Selection(node_enter), Selection(node_exit),
-                                       Selection(link_enter), Selection(link_exit)});
+      return std::array<Selection, 4>({{Selection(node_enter), Selection(node_exit),
+                                        Selection(link_enter), Selection(link_exit)}});
     }
 
 
