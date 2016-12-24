@@ -54,28 +54,47 @@ namespace emp {
     bool IsActive() const { return key_id > 0; }
   };
 
-  class SignalManager;  // forward declaration for signal managers to setup friend status.
+  // Forward declarations.
+  class SignalBase;     // ...for pointers to signals.
+  class SignalManager;  // ...for setting up as friend.
 
+  // Mechanisms for Signals to report to a manager.
+  namespace internal {
+    struct SignalManager_Base {
+      virtual void NotifyDestruct(SignalBase * sig_ptr) = 0;
+    };
+  }
+
+  // Base class for all signals.
   class SignalBase {
     friend class SignalManager;  // Allow SignalManager to alter internals of a signal.
   protected:
-    std::string name;                         // What is the unique name of this signal?
-    uint32_t signal_id;                       // What is the unique ID of this signal?
-    uint32_t next_link_id;                    // What ID shouild the next link have?
-    std::map<SignalKey, size_t> link_key_map; // Map unique link keys to link index for actions.
+    using man_t = internal::SignalManager_Base;
+
+    std::string name;                          // What is the unique name of this signal?
+    uint32_t signal_id;                        // What is the unique ID of this signal?
+    uint32_t next_link_id;                     // What ID shouild the next link have?
+    std::map<SignalKey, size_t> link_key_map;  // Map unique link keys to link index for actions.
+    emp::vector<man_t *> managers;             // What manager is handling this signal?
+    man_t * prime_manager;                     // Which manager leads deletion? (nullptr for self)
 
     // Helper Functions
     // @CAO FIX!!!
     SignalKey NextSignalKey() { return SignalKey(signal_id,next_link_id++); }
 
     // SignalBase should only be constructable from derrived classes.
-    SignalBase(const std::string & n) : name(n), next_link_id(1) { ; }
+    SignalBase(const std::string & n)
+    : name(n), signal_id(0), next_link_id(1), prime_manager(nullptr) { ; }
   public:
-    virtual ~SignalBase() { ; }
+    virtual ~SignalBase() {
+      // Let all managers other than prime know about destruction (prime must have triggered it.)
+      for (auto * m : managers) if (m != prime_manager) m->NotifyDestruct(this);
+    }
     virtual SignalBase * Clone() const = 0;
 
     const std::string & GetName() const { return name; }
     virtual size_t GetNumArgs() const = 0;
+    virtual size_t GetNumActions() const = 0;
 
     // NOTE: If a Trigger is called on a base class, convert the signal assuming that the args
     // map to the correct types (defined below with a dynamic cast to ensure correctness)
@@ -107,6 +126,7 @@ namespace emp {
     }
 
     size_t GetNumArgs() const { return sizeof...(ARGS); }
+    size_t GetNumActions() const { return actions.GetSize(); }
 
     void Trigger(ARGS... args) { actions.Run(args...); }
 
