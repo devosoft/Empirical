@@ -10,7 +10,8 @@
 
 #include <string>
 
-#include "../tools/signal.h"
+#include "../control/Action.h"
+#include "../control/Signal.h"
 #include "../tools/string_utils.h"
 
 namespace emp {
