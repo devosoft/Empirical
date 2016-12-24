@@ -4,6 +4,11 @@
 //
 //
 //  The Signal class allows functions to be bundled and triggered enmasse.
+//
+//
+//  Developer notes:
+//  * Setup easier mechanism to control the order in which actions are triggered.
+//  * Signals should have default parameters so not all need be supplied when triggered.
 
 #ifndef EMP_CONTROL_SIGNAL
 #define EMP_CONTROL_SIGNAL

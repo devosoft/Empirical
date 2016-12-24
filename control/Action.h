@@ -8,6 +8,11 @@
 //
 //  Actions can be a bit heavyweight, but can easily be converted to more lightweight
 //  std:function objects.
+//
+//
+//  Developer notes:
+//  * Create an ActionDefaults class that can take fewer args than expected and fill in rest.
+//  * Allow for named arguments?
 
 #ifndef EMP_CONTROL_ACTION
 #define EMP_CONTROL_ACTION
