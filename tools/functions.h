@@ -12,6 +12,7 @@
 #include <initializer_list>
 #include <iostream>
 #include <type_traits>
+#include <sstream>
 #include <vector>
 
 #include "assert.h"
@@ -103,6 +104,12 @@ namespace emp {
     return val++;
   }
 
+  static std::string UniqueName(const std::string & prefix="",
+                                        const std::string & postfix="") {
+    std::stringstream ss;
+    ss << prefix << UniqueVal() << postfix;
+    return ss.str();
+  }
 }
 
 #endif
