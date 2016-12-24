@@ -18,7 +18,7 @@
 
 namespace emp {
 
-  class SignalManager {
+  class SignalManager : public internal::SignalManager_Base {
   private:
     std::unordered_map<std::string, SignalBase *> signal_map;
     int next_id=1;
@@ -58,7 +58,22 @@ namespace emp {
       auto * new_signal = new Signal<ARGS...>(name);
       signal_map[name] = new_signal;
       new_signal->signal_id = next_id++;
+      new_signal->managers.push_back(this);
+      new_signal->prime_manager = this;
       return *new_signal;
+    }
+
+    template <typename... ARGS>
+    auto & Add(Signal<ARGS...> & signal) {
+      signal_map[signal.name] = &signal;
+      signal.signal_id = next_id++;      // @CAO: Who should control the signal id?
+      signal.managers.push_back(this);
+      return signal;
+    }
+
+    void NotifyDestruct(SignalBase * signal) override {
+      // This signal is no longer valid and needs to be removed from this manager.
+      signal_map.erase(signal->name);
     }
 
     void PrintNames(std::ostream & os=std::cout) {
