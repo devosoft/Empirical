@@ -14,7 +14,6 @@
 
 #include "../tools/random_utils.h"
 #include "../tools/Range.h"
-#include "../tools/signal.h"
 
 #include "PopulationIterator.h"
 
@@ -241,16 +240,16 @@ namespace evo {
     { ; }
     ~PopulationManager_Plugin() { Clear(); }
 
-    LinkKey OnClear(const std::function<void()> & fun) {
+    SignalKey OnClear(const std::function<void()> & fun) {
       return sig_clear.AddAction(fun);
     }
-    LinkKey OnUpdate(const std::function<void()> & fun) {
+    SignalKey OnUpdate(const std::function<void()> & fun) {
       return sig_update.AddAction(fun);
     }
-    LinkKey OnAddOrg(const std::function<void(ORG*, size_t&)> & fun) {
+    SignalKey OnAddOrg(const std::function<void(ORG*, size_t&)> & fun) {
       return sig_add_org.AddAction(fun);
     }
-    LinkKey OnAddOrgBirth(const std::function<void(ORG*, size_t, size_t&)> & fun) {
+    SignalKey OnAddOrgBirth(const std::function<void(ORG*, size_t, size_t&)> & fun) {
       return sig_add_org_birth.AddAction(fun);
     }
 
