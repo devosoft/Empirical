@@ -214,7 +214,7 @@ namespace evo {
   public:
     std::string world_name;
 
-    World(emp::Random * r_ptr, const std::string & w_name=GenerateSignalName("emp::evo::World"))
+    World(emp::Random * r_ptr, const std::string & w_name=UniqueName("emp::evo::World"))
       : fitM()
       , popM(w_name, fitM)
       , random_ptr(r_ptr), random_owner(false)
@@ -232,9 +232,9 @@ namespace evo {
       popM.Setup(random_ptr);
     }
 
-    World(int seed=-1, const std::string & w_name=GenerateSignalName("emp::evo::World"))
+    World(int seed=-1, const std::string & w_name=UniqueName("emp::evo::World"))
       : World(new Random(seed), w_name) { random_owner = true; }
-    World(emp::Random & random, const std::string & w_name=GenerateSignalName("emp::evo::World"))
+    World(emp::Random & random, const std::string & w_name=UniqueName("emp::evo::World"))
       : World(&random, w_name) { ; }
     World(const World &) = delete;
     ~World() { Clear(); if (random_owner) delete random_ptr; }
@@ -259,11 +259,11 @@ namespace evo {
     EMP_EVO_FORWARD_2(SetDefaultFitnessFun, orgM, statsM)
     EMP_EVO_FORWARD(SetDefaultMutateFun, orgM)
 
-    LinkKey OnBeforeRepro(const std::function<void(size_t)> & fun) { return before_repro_sig.AddAction(fun); }
-    LinkKey OnOffspringReady(const std::function<void(ORG *)> & fun) { return offspring_ready_sig.AddAction(fun); }
-    LinkKey OnInjectReady(const std::function<void(ORG *)> & fun) { return inject_ready_sig.AddAction(fun); }
-    LinkKey OnOrgPlacement(const std::function<void(size_t)> & fun) { return org_placement_sig.AddAction(fun); }
-    LinkKey OnUpdate(const std::function<void(size_t)> & fun) { return on_update_sig.AddAction(fun); }
+    SignalKey OnBeforeRepro(const std::function<void(size_t)> & fun) { return before_repro_sig.AddAction(fun); }
+    SignalKey OnOffspringReady(const std::function<void(ORG *)> & fun) { return offspring_ready_sig.AddAction(fun); }
+    SignalKey OnInjectReady(const std::function<void(ORG *)> & fun) { return inject_ready_sig.AddAction(fun); }
+    SignalKey OnOrgPlacement(const std::function<void(size_t)> & fun) { return org_placement_sig.AddAction(fun); }
+    SignalKey OnUpdate(const std::function<void(size_t)> & fun) { return on_update_sig.AddAction(fun); }
 
     fit_fun_t GetFitFun() { return orgM.GetFitFun(); }
 
