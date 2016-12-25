@@ -87,6 +87,7 @@
 #include <functional>
 #include <map>
 
+#include "../control/SignalControl.h"
 #include "../meta/reflection.h"
 #include "../tools/assert.h"
 #include "../tools/Random.h"
@@ -172,6 +173,7 @@ namespace evo {
     size_t update = 0;
 
     // We have a set of signals that are triggered by the world.
+    SignalControl control;
 
     // Trigger:  Immediately prior to parent producing offspring
     // Argument: Parent position in population
@@ -230,6 +232,12 @@ namespace evo {
       lineageM.Setup(this);
       statsM.Setup(this);
       popM.Setup(random_ptr);
+
+      control.AddSignal(before_repro_sig);
+      control.AddSignal(offspring_ready_sig);
+      control.AddSignal(inject_ready_sig);
+      control.AddSignal(org_placement_sig);
+      control.AddSignal(on_update_sig);
     }
 
     World(int seed=-1, const std::string & w_name=UniqueName("emp::evo::World"))
