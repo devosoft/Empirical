@@ -61,6 +61,7 @@ namespace emp {
   // Mechanisms for Signals to report to a manager.
   namespace internal {
     struct SignalManager_Base {
+      virtual void NotifyConstruct(SignalBase * sig_ptr) = 0;
       virtual void NotifyDestruct(SignalBase * sig_ptr) = 0;
     };
   }
@@ -83,8 +84,11 @@ namespace emp {
     SignalKey NextSignalKey() { return SignalKey(signal_id,next_link_id++); }
 
     // SignalBase should only be constructable from derrived classes.
-    SignalBase(const std::string & n)
-    : name(n), signal_id(0), next_link_id(1), prime_manager(nullptr) { ; }
+    SignalBase(const std::string & n, internal::SignalManager_Base * manager=nullptr)
+    : name(n), signal_id(0), next_link_id(1), prime_manager(nullptr)
+    {
+      if (manager) manager->NotifyConstruct(this);
+    }
   public:
     virtual ~SignalBase() {
       // Let all managers other than prime know about destruction (prime must have triggered it.)
@@ -118,7 +122,8 @@ namespace emp {
     using this_t = Signal<ARGS...>;
     FunctionSet<void, ARGS...> actions;
   public:
-    Signal(const std::string & name="") : SignalBase(name) { ; }
+    Signal(const std::string & name="", internal::SignalManager_Base * manager=nullptr)
+     : SignalBase(name, manager) { ; }
     virtual this_t * Clone() const {
       this_t * new_copy = new this_t(name);
       // @CAO: Make sure to copy over actions into new copy.
