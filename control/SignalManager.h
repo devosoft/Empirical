@@ -66,9 +66,16 @@ namespace emp {
     template <typename... ARGS>
     auto & Add(Signal<ARGS...> & signal) {
       signal_map[signal.name] = &signal;
-      signal.signal_id = next_id++;      // @CAO: Who should control the signal id?
+      signal.signal_id = next_id++;       // @CAO: Who should control the signal id?
       signal.managers.push_back(this);
       return signal;
+    }
+
+    void NotifyConstruct(SignalBase * signal) override {
+      // This signal is currently being constructed and should be added to this manager.
+      signal_map[signal->name] = signal;
+      signal->signal_id = next_id++;      // @CAO: Who should control the signal id?
+      signal->managers.push_back(this);
     }
 
     void NotifyDestruct(SignalBase * signal) override {
