@@ -42,12 +42,20 @@ namespace emp {
     const ActionBase & GetAction(const std::string & name) const { return action_m[name]; }
     const SignalBase & GetSignal(const std::string & name) const { return signal_m[name]; }
 
+    ActionManager & GetActionManager() { return action_m; }
+    SignalManager & GetSignalManager() { return signal_m; }
+
     template <typename... Ts>
     auto & AddAction(Ts &&... act) { return action_m.Add( std::forward<Ts>(act)... ); }
 
     template <typename... ARGS>
     auto & AddSignal(const std::string & name="") {
       return signal_m.Add<ARGS...>(name);
+    }
+
+    template <typename... ARGS>
+    auto & AddSignal(Signal<ARGS...> & signal) {
+      return signal_m.Add<ARGS...>(signal);
     }
 
     // Link a specified signal to a specified function.
