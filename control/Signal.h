@@ -64,6 +64,10 @@ namespace emp {
       virtual void NotifyConstruct(SignalBase * sig_ptr) = 0;
       virtual void NotifyDestruct(SignalBase * sig_ptr) = 0;
     };
+    struct SignalControl_Base {
+      virtual SignalManager_Base & GetSignalManager() = 0;
+      virtual void NotifyConstruct(SignalBase * sig_ptr) = 0;
+    };
   }
 
   // Base class for all signals.
@@ -124,6 +128,8 @@ namespace emp {
   public:
     Signal(const std::string & name="", internal::SignalManager_Base * manager=nullptr)
      : SignalBase(name, manager) { ; }
+     Signal(const std::string & name, internal::SignalControl_Base & control)
+      : this_t(name, &(control.GetSignalManager())) { ; }
     virtual this_t * Clone() const {
       this_t * new_copy = new this_t(name);
       // @CAO: Make sure to copy over actions into new copy.
