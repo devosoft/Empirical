@@ -220,11 +220,11 @@ namespace evo {
       : fitM()
       , popM(w_name, fitM)
       , random_ptr(r_ptr), random_owner(false)
-      , before_repro_sig(to_string(w_name,"::before-repro"))
-      , offspring_ready_sig(to_string(w_name,"::offspring-ready"))
-      , inject_ready_sig(to_string(w_name,"::inject-ready"))
-      , org_placement_sig(to_string(w_name,"::org-placement"))
-      , on_update_sig(to_string(w_name,"::on-update"))
+      , before_repro_sig(to_string(w_name,"::before-repro"), control)
+      , offspring_ready_sig(to_string(w_name,"::offspring-ready"), control)
+      , inject_ready_sig(to_string(w_name,"::inject-ready"), control)
+      , org_placement_sig(to_string(w_name,"::org-placement"), control)
+      , on_update_sig(to_string(w_name,"::on-update"), control)
       , callbacks(w_name)
       , world_name(w_name)
     {
@@ -232,12 +232,6 @@ namespace evo {
       lineageM.Setup(this);
       statsM.Setup(this);
       popM.Setup(random_ptr);
-
-      control.AddSignal(before_repro_sig);
-      control.AddSignal(offspring_ready_sig);
-      control.AddSignal(inject_ready_sig);
-      control.AddSignal(org_placement_sig);
-      control.AddSignal(on_update_sig);
     }
 
     World(int seed=-1, const std::string & w_name=UniqueName("emp::evo::World"))
