@@ -25,7 +25,7 @@
 
 namespace emp {
 
-  class SignalControl {
+  class SignalControl : public internal::SignalControl_Base {
   private:
     ActionManager action_m;
     SignalManager signal_m;
@@ -43,7 +43,7 @@ namespace emp {
     const SignalBase & GetSignal(const std::string & name) const { return signal_m[name]; }
 
     ActionManager & GetActionManager() { return action_m; }
-    SignalManager & GetSignalManager() { return signal_m; }
+    SignalManager & GetSignalManager() override { return signal_m; }
 
     template <typename... Ts>
     auto & AddAction(Ts &&... act) { return action_m.Add( std::forward<Ts>(act)... ); }
@@ -82,6 +82,9 @@ namespace emp {
       emp_assert( signal != nullptr && "invalid signal conversion!" );
       signal->Trigger(std::forward<ARGS>(args)...);
     }
+
+
+    void NotifyConstruct(SignalBase * sig_ptr) override { signal_m.NotifyConstruct(sig_ptr); }
   };
 
 }
