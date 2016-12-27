@@ -261,11 +261,18 @@ namespace evo {
     EMP_EVO_FORWARD_2(SetDefaultFitnessFun, orgM, statsM)
     EMP_EVO_FORWARD(SetDefaultMutateFun, orgM)
 
+    // Deal with Signals
     SignalKey OnBeforeRepro(const std::function<void(size_t)> & fun) { return before_repro_sig.AddAction(fun); }
     SignalKey OnOffspringReady(const std::function<void(ORG *)> & fun) { return offspring_ready_sig.AddAction(fun); }
     SignalKey OnInjectReady(const std::function<void(ORG *)> & fun) { return inject_ready_sig.AddAction(fun); }
     SignalKey OnOrgPlacement(const std::function<void(size_t)> & fun) { return org_placement_sig.AddAction(fun); }
     SignalKey OnUpdate(const std::function<void(size_t)> & fun) { return on_update_sig.AddAction(fun); }
+
+    // Forward any link requests to the SignalControl object.
+    template <typename... ARGS>
+    SignalKey Link(ARGS &&... args) { return control.Link(std::forward<ARGS>(args)...); }
+
+    SignalControl & GetSignalControl() { return control; }
 
     fit_fun_t GetFitFun() { return orgM.GetFitFun(); }
 
