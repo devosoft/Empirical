@@ -88,5 +88,5 @@ int main(int argc, char* argv[])
 
 //  std::cout << MAX_GENS << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 
-  emp::PrintSignalInfo();
+  pop.GetSignalControl().PrintNames();
 }
