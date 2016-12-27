@@ -69,6 +69,10 @@ namespace emp {
       return *new_action;
     }
 
+    void PrintNames(std::ostream & os=std::cout) {
+      os << action_map.size() << " actions found:\n";
+      for (auto & x : action_map) os << "  " << x.first << std::endl;
+    }
   };
 
 }

@@ -85,6 +85,12 @@ namespace emp {
 
 
     void NotifyConstruct(SignalBase * sig_ptr) override { signal_m.NotifyConstruct(sig_ptr); }
+
+
+    void PrintNames(std::ostream & os=std::cout) {
+      action_m.PrintNames(os);
+      signal_m.PrintNames(os);
+    }
   };
 
 }
