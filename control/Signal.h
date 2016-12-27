@@ -63,10 +63,12 @@ namespace emp {
     struct SignalManager_Base {
       virtual void NotifyConstruct(SignalBase * sig_ptr) = 0;
       virtual void NotifyDestruct(SignalBase * sig_ptr) = 0;
+      virtual ~SignalManager_Base() { ; }
     };
     struct SignalControl_Base {
       virtual SignalManager_Base & GetSignalManager() = 0;
       virtual void NotifyConstruct(SignalBase * sig_ptr) = 0;
+      virtual ~SignalControl_Base() { ; }
     };
   }
 
