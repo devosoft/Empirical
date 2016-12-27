@@ -219,6 +219,12 @@ namespace emp {
     ((Signal<ARGS...> *) this)->Trigger(args...);
   }
 
+  template <typename... ARGS>
+  inline SignalKey SignalBase::AddAction(const std::function<void(ARGS...)> & in_fun) {
+    emp_assert(dynamic_cast< Signal<ARGS...> * >(this));
+    return ((Signal<ARGS...> *) this)->AddAction(in_fun);
+  }
+
 }
 
 #endif
