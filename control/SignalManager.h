@@ -21,7 +21,7 @@ namespace emp {
   class SignalManager : public internal::SignalManager_Base {
   private:
     std::unordered_map<std::string, SignalBase *> signal_map;
-    int next_id=1;
+    uint32_t next_id=1;
     std::string prefix = "emp_signal_";
 
     // Generate a unique signal name to prevent duplicates.
@@ -40,7 +40,7 @@ namespace emp {
     }
     ~SignalManager() { for (auto & x : signal_map) delete x.second; }
 
-    int GetNextID() const { return next_id; }
+    uint32_t GetNextID() const { return next_id; }
     size_t GetSize() const { return signal_map.size(); }
 
     SignalBase & operator[](const std::string & name) {

@@ -85,7 +85,7 @@ namespace emp {
 
     size_t GetSize() const { return base_t::size(); }
     void Add(const std::function<void(ARGS...)> & in_fun) { base_t::push_back(in_fun); }
-    void Remove(size_t pos) { base_t::erase(base_t::begin()+pos); }
+    void Remove(size_t pos) { base_t::erase(base_t::begin()+(int)pos); }
 
     void Run(ARGS... args) const {
       for (const std::function<void(ARGS...)> & cur_fun : *this) {
