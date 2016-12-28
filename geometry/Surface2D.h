@@ -4,7 +4,7 @@
 //
 //
 //  This file defines a templated class to represent a 2D suface capable of maintaining data
-//  about which 2D bodies are currently on that surface and rapidly identifying if they are 
+//  about which 2D bodies are currently on that surface and rapidly identifying if they are
 //  overlapping.
 //
 //  BODY_TYPE is the class that represents the body geometry.
@@ -40,7 +40,7 @@ namespace emp {
     std::vector<BODY_TYPE *> body_set;  // Set of all bodies on surface
 
   public:
-    Surface2D(double _width, double _height) 
+    Surface2D(double _width, double _height)
       : max_pos(_width, _height)
     {
     }
@@ -83,7 +83,7 @@ namespace emp {
       const int num_rows = std::min<int>(max_pos.GetY() / (max_radius * 2.0), 32);
       const int max_col = num_cols-1;
       const int max_row = num_rows-1;
-      
+
       const int num_sectors = num_cols * num_rows;
       const double sector_width = max_pos.GetX() / (double) num_cols;
       const double sector_height = max_pos.GetY() / (double) num_rows;
@@ -93,14 +93,14 @@ namespace emp {
 
       int hit_count = 0;
       int test_count = 0;
-      
+
       // Loop through all of the bodies on this surface placing them in sectors and testing for
       // collisions with other bodies already in nearby sectors.
       for (auto * body : body_set) {
         emp_assert(body);
         // Determine which sector the current body is in.
-        const int cur_col = emp::to_range<int>(body->GetCenter().GetX()/sector_width, 0, max_col);
-        const int cur_row = emp::to_range<int>(body->GetCenter().GetY()/sector_height, 0, max_row);
+        const int cur_col = emp::ToRange<int>(body->GetCenter().GetX()/sector_width, 0, max_col);
+        const int cur_row = emp::ToRange<int>(body->GetCenter().GetY()/sector_height, 0, max_row);
 
         // See if this body may collide with any of the bodies previously put into sectors.
         for (int i = std::max(0, cur_col-1); i <= std::min(cur_col+1, num_cols-1); i++) {
@@ -111,7 +111,7 @@ namespace emp {
             for (auto body2 : sector_set[sector_id]) {
               test_count++;
               if (collide_fun(*body, *body2)) hit_count++;
-            }            
+            }
 
           }
         }
