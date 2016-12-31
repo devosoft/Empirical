@@ -126,7 +126,7 @@ namespace emp {
       out << author_list[0].GetReverseName();   // Print first author.
 
       // Print middle authors...
-      for (int i = 1; i < author_list.size() - 1; i++) {
+      for (size_t i = 1; i < author_list.size() - 1; i++) {
         out << ", " << author_list[i].GetFullName();
       }
 
