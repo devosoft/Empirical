@@ -1,6 +1,6 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //
 //
 //  Some examples of code using reflection techniques.
@@ -38,7 +38,7 @@ struct B {
 
 template <typename T>
 struct Wrapper {
-  EMP_CHOOSE_MEMBER_TYPE(new_type, test_type, int, T);
+  EMP_CHOOSE_MEMBER_TYPE(new_type, test_type, int, T)
 
   static constexpr new_type VALUE = 5;
 };
