@@ -1,5 +1,5 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
+// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
+// Copyright (C) Michigan State University, 2015. It is licensed
 // under the MIT Software license; see doc/LICENSE
 
 #include "../../tools/Random.h"
@@ -12,10 +12,10 @@ namespace web = emp::web;
 
 web::Document doc("emp_base");
 
-int cx = 150;
-int cy = 150;
-int cr = 50;
-int can_size = 400;
+size_t cx = 150;
+size_t cy = 150;
+size_t cr = 50;
+size_t can_size = 400;
 
 void CanvasAnim(double time) {
   auto mycanvas = doc.Canvas("can");
@@ -35,8 +35,8 @@ void CanvasAnim(double time) {
 int main()
 {
   // How big should each canvas be?
-  const int w = can_size;
-  const int h = can_size;
+  const size_t w = can_size;
+  const size_t h = can_size;
 
   emp::Random random;
 
