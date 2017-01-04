@@ -45,6 +45,11 @@ namespace evo {
     static constexpr bool ClearPop() { return false; }            // Clear cache for all orgs
     static constexpr bool Resize(size_t) { return false; }
     static constexpr bool Resize(size_t, double) { return false; }
+
+    static constexpr bool WeightsTracked() { return false; }
+
+    // These functions only work properly in FitnessManager_Weights...
+    static constexpr double GetTotalFitness() { emp_assert(false); return 0.0; }
   };
 
   class FitnessManager_CacheOrg : public FitnessManager_Base {
@@ -110,6 +115,10 @@ namespace evo {
     bool ClearPop() { weight_info.Clear(); return true; }
     bool Resize(size_t new_size) { weight_info.Resize(new_size); return true; }
     bool Resize(size_t new_size, double def_val) { weight_info.Resize(new_size, def_val); return true; }
+
+    static constexpr bool WeightsTracked() { return true; }
+
+    double GetTotalFitness() const { return weight_info.GetWeight(); }
   };
 
 
