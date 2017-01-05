@@ -52,6 +52,8 @@ namespace emp {
     uint32_t GetID() const { return key_id; }
     uint32_t GetSignalID() const { return signal_id; }
     bool IsActive() const { return key_id > 0; }
+
+    operator bool() { return signal_id != 0; }
   };
 
   // Forward declarations.
@@ -221,6 +223,7 @@ namespace emp {
 
   template <typename... ARGS>
   inline SignalKey SignalBase::AddAction(const std::function<void(ARGS...)> & in_fun) {
+    // @CAO: Assert for now; ideally try to find solution with fewer args.
     emp_assert(dynamic_cast< Signal<ARGS...> * >(this));
     return ((Signal<ARGS...> *) this)->AddAction(in_fun);
   }
