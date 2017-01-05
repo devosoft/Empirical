@@ -53,7 +53,10 @@ namespace emp {
     uint32_t GetSignalID() const { return signal_id; }
     bool IsActive() const { return key_id > 0; }
 
-    operator bool() { return signal_id != 0; }
+    void Set(uint32_t _kid=0, uint32_t _sid=0) { signal_id = _sid; key_id = _kid; }
+    void Clear() { signal_id = 0; key_id = 0; }
+
+    operator bool() { return key_id > 0; }
   };
 
   // Forward declarations.
