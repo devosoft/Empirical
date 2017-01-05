@@ -147,7 +147,7 @@ namespace emp {
       return id;
     }
 
-    size_t Index(double index, size_t cur_id=0) {
+    size_t Index(double index, size_t cur_id=0) const {
       ResolveRefresh();
       emp_assert(index < tree_weight[0]);  // Cannot index beyond end of set.
 
