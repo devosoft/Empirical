@@ -50,7 +50,7 @@ namespace evo {
 
     // These functions only work properly in FitnessManager_Weights...
     static double GetTotalFitness() { emp_assert(false); return 0.0; }
-    static size_t IndexFitness(double index) { emp_assert(false); return 0; }
+    static size_t At(double index) { emp_assert(false); return 0; }
   };
 
   class FitnessManager_CacheOrg : public FitnessManager_Base {
@@ -120,7 +120,7 @@ namespace evo {
     static constexpr bool WeightsTracked() { return true; }
 
     double GetTotalFitness() const { return weight_info.GetWeight(); }
-    size_t IndexFitness(double index) const { return weight_info.Index(index); }
+    size_t At(double index) const { return weight_info.Index(index); }
   };
 
 
