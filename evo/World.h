@@ -417,6 +417,15 @@ namespace evo {
       emp_assert(fit_fun);
       emp_assert(count > 0);
       emp_assert(random_ptr != nullptr && "RouletteSelect() requires active random_ptr");
+
+      // @CAO: need to make sure all fitnesses are up to date...
+
+      for (size_t n = 0; n < count; n++) {
+        const double fit_pos = random_ptr->GetDouble(fitM.GetTotalFitness());
+        size_t id = fitM.At(fit_pos);
+        InsertBirth( *(popM[id]), id, 1 );
+        // @CAO: Update fitnesses if needed???
+      }
     }
 
     // Tournament Selection creates a tournament with a random sub-set of organisms,
