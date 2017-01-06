@@ -413,8 +413,10 @@ namespace evo {
     // Roulette Selection (aka Fitness-Proportional Selection) chooses organisms to
     // reproduce based on their current fitness.
     // @CAO Can UPDATE weighted array rather than keep rebuilding it (use signals?)
-    void RouletteSelect(const fit_fun_t & fit_fun) {
-
+    void RouletteSelect(const fit_fun_t & fit_fun, size_t count=1) {
+      emp_assert(fit_fun);
+      emp_assert(count > 0);
+      emp_assert(random_ptr != nullptr && "RouletteSelect() requires active random_ptr");
     }
 
     // Tournament Selection creates a tournament with a random sub-set of organisms,
