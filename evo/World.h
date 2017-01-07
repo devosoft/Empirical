@@ -317,6 +317,19 @@ namespace evo {
       }
     }
 
+    // If InsertBirth is provided with a fitness function, use it to calculate fitness of new org.
+    void InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count,
+                     const fit_fun_t & fit_fun) {
+      before_repro_sig.Trigger(parent_pos);
+      for (size_t i = 0; i < copy_count; i++) {
+        ORG * new_org = new ORG(mem);
+        offspring_ready_sig.Trigger(new_org);
+        const size_t pos = popM.AddOrgBirth(new_org, parent_pos);
+        SetupOrg(*new_org, &callbacks, pos);
+        org_placement_sig.Trigger(pos);
+      }
+    }
+
     void DoRepro(size_t id) {
       emp_assert(random_ptr != nullptr && "DoRepro() requires a random number generator.");
       // std::cout << "Repro " << id << std::endl;
