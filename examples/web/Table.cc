@@ -8,8 +8,8 @@ namespace UI = emp::web;
 
 UI::Document doc("emp_base");
 
-int r = 4;
-int c = 4;
+size_t r = 4;
+size_t c = 4;
 
 void IncR() {
   r++;
