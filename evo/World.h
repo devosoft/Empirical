@@ -325,6 +325,8 @@ namespace evo {
         ORG * new_org = new ORG(mem);
         offspring_ready_sig.Trigger(new_org);
         const size_t pos = popM.AddOrgBirth(new_org, parent_pos);
+        // If we offspring are placed into the same population, recalculate fitness.
+        if (popM_t::emp_has_separate_generations == false) popM.CalcFitness(pos, fit_fun);
         SetupOrg(*new_org, &callbacks, pos);
         org_placement_sig.Trigger(pos);
       }
