@@ -334,10 +334,8 @@ namespace evo {
 
     void DoRepro(size_t id) {
       emp_assert(random_ptr != nullptr && "DoRepro() requires a random number generator.");
-      // std::cout << "Repro " << id << std::endl;
       before_repro_sig.Trigger(id);
       InsertBirth(*(popM[id]), id, 1);
-
     }
 
     void DoSymbiontRepro(size_t id) {
@@ -427,7 +425,6 @@ namespace evo {
 
     // Roulette Selection (aka Fitness-Proportional Selection) chooses organisms to
     // reproduce based on their current fitness.
-    // @CAO Can UPDATE weighted array rather than keep rebuilding it (use signals?)
     void RouletteSelect(const fit_fun_t & fit_fun, size_t count=1) {
       emp_assert(fit_fun);
       emp_assert(count > 0);
@@ -439,7 +436,6 @@ namespace evo {
         const double fit_pos = random_ptr->GetDouble(fitM.GetTotalFitness());
         size_t id = fitM.At(fit_pos);
         InsertBirth( *(popM[id]), id, 1 );
-        // @CAO: Update fitnesses if needed???
       }
     }
 
