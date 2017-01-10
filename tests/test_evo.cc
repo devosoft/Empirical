@@ -38,7 +38,8 @@ TEST_CASE("Test Stats/NK-Grid", "[stats]"){
 
   emp::evo::GridWorld<BitOrg, emp::evo::LineagePruned > grid_pop(random);
 
-  grid_pop.ConfigPop(std::sqrt(POP_SIZE), std::sqrt(POP_SIZE));
+  const size_t side_size = (size_t) std::sqrt((double)POP_SIZE);
+  grid_pop.ConfigPop(side_size, side_size);
 
   std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return landscape.GetFitness(*org);};
 
@@ -58,9 +59,9 @@ TEST_CASE("Test Stats/NK-Grid", "[stats]"){
   grid_stats.SetDefaultFitnessFun(fit_func);
 
     // Insert default organisms into world
-  for (int i = 0; i < POP_SIZE; i++) {
+  for (size_t i = 0; i < POP_SIZE; i++) {
     BitOrg next_org(N);
-    for (int j = 0; j < N; j++) next_org[j] = random.P(0.5);
+    for (size_t j = 0; j < N; j++) next_org[j] = random.P(0.5);
 
     // looking at the Insert() func it looks like it does a deep copy, so we should be safe in
     // doing this. Theoretically...
@@ -153,9 +154,9 @@ TEST_CASE("Test-stats-NK-Mixed","[stats]"){
   mixed_stats.SetDefaultFitnessFun(fit_func);
 
   // Insert default organisms into world
-  for (int i = 0; i < POP_SIZE; i++) {
+  for (size_t i = 0; i < POP_SIZE; i++) {
     BitOrg next_org(N);
-    for (int j = 0; j < N; j++) next_org[j] = random.P(0.5);
+    for (size_t j = 0; j < N; j++) next_org[j] = random.P(0.5);
 
     // looking at the Insert() func it looks like it does a deep copy, so we should be safe in
     // doing this. Theoretically...

@@ -1,14 +1,12 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  A string handler where sections update dynamically based on functions.
 
 #ifndef EMP_DYNAMIC_STRING_SET_H
 #define EMP_DYNAMIC_STRING_SET_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-//  A string handler where sections update dynamically based on functions.
-//
 
 #include <functional>
 #include <string>
@@ -24,9 +22,9 @@ namespace emp {
     DynamicStringSet() { ; }
     DynamicStringSet(const DynamicStringSet &) = default;
 
-    int GetSize() const { return (int) fun_set.size(); }
-    std::string operator[](int id) const { return fun_set[id](); }
-    const std::function<std::string()> & GetFunction(int id) const { return fun_set[id]; }
+    size_t GetSize() const { return fun_set.size(); }
+    std::string operator[](size_t id) const { return fun_set[id](); }
+    const std::function<std::string()> & GetFunction(size_t id) const { return fun_set[id]; }
     DynamicStringSet & Clear() { fun_set.resize(0); return *this; }
 
     std::string str() {
@@ -35,12 +33,12 @@ namespace emp {
       return ss.str();
     }
 
-    DynamicStringSet & Set(int id, const std::function<std::string()> & in_fun) {
+    DynamicStringSet & Set(size_t id, const std::function<std::string()> & in_fun) {
       fun_set[id] = in_fun;
       return *this;
     }
 
-    DynamicStringSet & Set(int id, const std::string & in_text) {
+    DynamicStringSet & Set(size_t id, const std::string & in_text) {
       return Set( id, [in_text](){ return in_text; } );
     }
 
@@ -63,8 +61,8 @@ namespace emp {
 
 
 std::ostream & operator<<( std::ostream & os, const emp::DynamicStringSet & strings )
-{ 
-  for (int i = 0; i < (int) strings.GetSize(); ++i) {
+{
+  for (size_t i = 0; i < strings.GetSize(); ++i) {
     os << strings[i];
   }
   return os;

@@ -41,6 +41,9 @@ namespace emp {
     using stdv_t = std::vector<T,Ts...>;
     stdv_t v;
 
+    // Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
+    constexpr static const size_t MAX_SIZE = 2000000001;
+
   public:
     using iterator = typename stdv_t::iterator;
     using const_iterator = typename stdv_t::const_iterator;
@@ -51,8 +54,8 @@ namespace emp {
 
     vector() = default;
     vector(const this_t &) = default;
-    vector(int size) : v(size) { emp_assert(size >= 0, size); }
-    vector(int size, const T & val) : v(size, val) { emp_assert(size >= 0, size); }
+    vector(size_t size) : v(size) { emp_assert(size < MAX_SIZE, size); }
+    vector(size_t size, const T & val) : v(size, val) { emp_assert(size < MAX_SIZE, size); }
     vector(std::initializer_list<T> in_list) : v(in_list) { ; }
     vector(const stdv_t & in) : v(in) { ; }         // Emergency fallback conversion.
     ~vector() = default;
@@ -62,9 +65,9 @@ namespace emp {
 
     size_type size() const noexcept { return v.size(); }
     void clear() { v.clear(); }
-    void resize(int new_size) { emp_assert(new_size >= 0, new_size); v.resize(new_size); }
-    void resize(int new_size, const T & val) {
-      emp_assert(new_size >= 0, new_size);
+    void resize(size_t new_size) { emp_assert(new_size < MAX_SIZE, new_size); v.resize(new_size); }
+    void resize(size_t new_size, const T & val) {
+      emp_assert(new_size < MAX_SIZE, new_size);
       v.resize(new_size, val);
     }
     bool empty() const noexcept { return v.empty(); }
@@ -90,13 +93,13 @@ namespace emp {
     bool operator>(const this_t & in)  const { return v > in.v; }
     bool operator>=(const this_t & in) const { return v >= in.v; }
 
-    T & operator[](int pos) {
-      emp_assert(pos >= 0 && pos < (int) v.size(), pos, v.size());
+    T & operator[](size_t pos) {
+      emp_assert(pos < v.size(), pos, v.size());
       return v[pos];
     }
 
-    const T & operator[](int pos) const {
-      emp_assert(pos >= 0 && pos < (int) v.size(), pos, v.size());
+    const T & operator[](size_t pos) const {
+      emp_assert(pos < v.size(), pos, v.size());
       return v[pos];
     }
 

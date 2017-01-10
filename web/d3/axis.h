@@ -201,7 +201,7 @@ namespace D3 {
     /// transition, then the rescaling will be animated.
     template <typename T>
     void Rescale(double new_min, double new_max, D3::SelectionOrTransition<T> & svg){
-      this->scale.SetDomain(std::array<double, 2>({new_min, new_max}));
+      this->scale.SetDomain(std::array<double, 2>({{new_min, new_max}}));
       ApplyAxis(svg.Select("#"+dom_id));
     }
 

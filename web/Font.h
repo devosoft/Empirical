@@ -1,6 +1,9 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  Maintains basic information about a font to be used in HTML.
 
 #ifndef EMP_FONT_H
 #define EMP_FONT_H
@@ -11,6 +14,7 @@
 #include "color_map.h"
 
 namespace emp {
+
   class Font {
   private:
     std::string family;
@@ -21,18 +25,17 @@ namespace emp {
     bool is_italic;
 
   public:
-    Font(const Font & _in) : family(_in.family), size(_in.size), color(_in.color), is_bold(_in.is_bold), is_italic(_in.is_italic) { ; }
-    Font(const std::string & _family="Helvetica", int _size=30, const std::string & _color="black", bool _bold=false, bool _italic=false)
+    Font(const Font &) = default;
+    Font(Font &&) = default;
+    Font(const std::string & _family="Helvetica", int _size=30,
+	 const std::string & _color="black", bool _bold=false, bool _italic=false)
       : family(_family), size(_size), color(_color), is_bold(_bold), is_italic(_italic)  { ; }
     Font(int _size, const std::string & _color="black", bool _bold=false, bool _italic=false)
       : family("Helvetica"), size(_size), color(_color), is_bold(_bold), is_italic(_italic)  { ; }
     ~Font() { ; }
 
-    const Font & operator=(const Font & _in) { 
-      family = _in.family;   size = _in.size;   color = _in.color;
-      is_bold = _in.is_bold;   is_italic = _in.is_italic;
-      return *this;
-    }
+    const Font & operator=(const Font &) = default;
+    const Font & operator=(Font &&) = default;
 
     const std::string & GetFamily() const { return family; }
     int GetSize() const { return size; }
@@ -59,7 +62,8 @@ namespace emp {
     std::string GetHTMLEnd() { return "</span>"; }
 
     bool operator==(const Font & _in) const {
-      return (family == _in.family) && (size == _in.size) && (color == _in.color) && (is_bold == _in.is_bold) && (is_italic == _in.is_italic);
+      return (family == _in.family) && (size == _in.size) && (color == _in.color)
+      && (is_bold == _in.is_bold) && (is_italic == _in.is_italic);
     }
     bool operator!=(const Font & _in) const { return !operator==(_in); }
   };

@@ -1,5 +1,5 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2015.
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-16.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -19,19 +19,19 @@
 //
 //  Control methods:
 //    void Start()
-//    void Stop() 
-//    void Step() 
+//    void Stop()
+//    void Step()
 //    void ToggleActive()
 //
 //  Access methods:
-//    bool GetActive() const 
-//    bool GetDoStep() const 
+//    bool GetActive() const
+//    bool GetDoStep() const
 //    double GetStartTime() const
-//    double GetPrevTime() const 
-//    double GetCurTime() const 
+//    double GetPrevTime() const
+//    double GetCurTime() const
 //    double GetStepTime() const
-//    double GetRunTime() const 
-//    int GetFrameCount() const 
+//    double GetRunTime() const
+//    int GetFrameCount() const
 //
 //  Config methods:
 //    void SetCallback(const std::function<void(const Animate &)> & fun)
@@ -61,7 +61,7 @@ namespace web {
     emp::vector<web::Widget> targets;   // What widgets should be refreshed on each frame?
     bool active;                        // Is this animation running?
     bool do_step;                       // Should this animation take a single step?
-    int callback_id;
+    size_t callback_id;
 
     double start_time;                  // At what time did this animation most recently start?
     double prev_time;                   // What was the time point of the previous frame?
@@ -100,7 +100,7 @@ namespace web {
 
   public:
     template <typename... W_TYPES>
-    Animate(const std::function<void(const Animate &)> & fun, W_TYPES&... targets) 
+    Animate(const std::function<void(const Animate &)> & fun, W_TYPES&... targets)
       : anim_fun(fun), active(false), do_step(false), run_time(0.0), frame_count(0)
     {
       LoadTargets(targets...);
@@ -108,11 +108,11 @@ namespace web {
     }
 
     template <typename... W_TYPES>
-    Animate(const std::function<void(double)> & fun, W_TYPES&... targets) 
+    Animate(const std::function<void(double)> & fun, W_TYPES&... targets)
       : Animate([fun,this](const Animate &){fun(GetStepTime());}, targets...) { ; }
 
     template <typename... W_TYPES>
-    Animate(const std::function<void()> & fun, W_TYPES&... targets) 
+    Animate(const std::function<void()> & fun, W_TYPES&... targets)
       : Animate([fun](const Animate &){fun();}, targets...) { ; }
 
     Animate()

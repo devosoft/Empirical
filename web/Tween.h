@@ -1,4 +1,4 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2015.
 //  Released under the MIT Software license; see doc/LICENSE
 //
@@ -68,7 +68,7 @@ namespace web {
     emp::vector<Widget> dependants;                 // Widgets to be refreshed at each frame.
 
     bool running;
-    int callback_id;
+    size_t callback_id;
 
     double start_time;  // When did the most recent run start?
     double cur_time;    // What time is it now?
@@ -118,10 +118,10 @@ namespace web {
       for (auto * p : paths) delete p;
       for (auto * e : events) delete e;
     }
-    
+
     double GetDuration() const { return duration; }
     Widget GetDefaultTarget() const { return default_target; }
-    
+
     Tween & SetDuration(double d) { duration = d*1000; return *this; }
     Tween & SetDefaultTarget(const Widget & w) { default_target = w; return *this; }
 

@@ -12,12 +12,12 @@
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
 
-constexpr int K = 3;
-constexpr int N = 50;
+constexpr uint32_t K = 3;
+constexpr uint32_t N = 50;
 
-constexpr int MIN_POP_SIZE = 100;
-constexpr int MAX_POP_SIZE = 10000;
-constexpr int UD_COUNT = 1000;
+constexpr uint32_t MIN_POP_SIZE = 100;
+constexpr uint32_t MAX_POP_SIZE = 10000;
+constexpr uint32_t UD_COUNT = 1000;
 
 using BitOrg = emp::BitSet<N>;
 using STWorld = emp::evo::World<BitOrg, emp::evo::PopulationManager_SerialTransfer<BitOrg>>;
@@ -34,14 +34,14 @@ int main()
 
   // Trigger mutations on organisms when they are born.
   world.OnOffspringReady( [&random](BitOrg* org) {
-      (*org)[random.GetInt(N)] = random.P(0.5);
-      (*org)[random.GetInt(N)] = random.P(0.5);
-      (*org)[random.GetInt(N)] = random.P(0.5);
+      (*org)[random.GetUInt(N)] = random.P(0.5);
+      (*org)[random.GetUInt(N)] = random.P(0.5);
+      (*org)[random.GetUInt(N)] = random.P(0.5);
     } );
 
 
   // Loop through updates
-  for (int ud = 0; ud < UD_COUNT; ud++) {
+  for (uint32_t ud = 0; ud < UD_COUNT; ud++) {
     // Print current state.
     std::cout << ud << " : " << world[0]
               << " : " << landscape.GetFitness(world[0])

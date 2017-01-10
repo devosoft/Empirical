@@ -6,10 +6,10 @@
 // A simple class to weight items differently within a container.
 //
 // Constructor:
-// WeightedSet(int num_items)
+// WeightedSet(size_t num_items)
 //     num_items is the maximum number of items that can be placed into the data structure.
 //
-// void Adjust(int id, double weight)
+// void Adjust(size_t id, double weight)
 //     id is the identification number of the item whose weight is being adjusted.
 //     weight is the new weight for that entry.
 //
@@ -39,17 +39,17 @@ namespace emp {
     mutable emp::vector<double> tree_weight;
     mutable bool needs_refresh;
 
-    int ParentID(int id) const { return (id-1) / 2; }
-    int LeftID(int id) const { return 2*id + 1; }
-    int RightID(int id) const { return 2*id + 2; }
-    bool IsLeaf(int id) const { return 2*id >= (int) item_weight.size(); }
+    size_t ParentID(size_t id) const { return (id-1) / 2; }
+    size_t LeftID(size_t id) const { return 2*id + 1; }
+    size_t RightID(size_t id) const { return 2*id + 2; }
+    bool IsLeaf(size_t id) const { return 2*id >= item_weight.size(); }
 
     class Proxy {
     private:
       WeightedSet & ws;   // Which set is this proxy from?
-      int id;             // Which id does it represent?
+      size_t id;             // Which id does it represent?
     public:
-      Proxy(WeightedSet & _ws, int _id) : ws(_ws), id(_id) { ; }
+      Proxy(WeightedSet & _ws, size_t _id) : ws(_ws), id(_id) { ; }
       operator double() const { return ws.GetWeight(id); }
       Proxy & operator=(double new_weight) { ws.Adjust(id, new_weight); return *this; }
     };
@@ -58,16 +58,16 @@ namespace emp {
     void ResolveRefresh() const {
       if (!needs_refresh) return;
 
-      const int pivot = GetSize()/2 - 1; // Transition between internal and leaf nodes.
+      const size_t pivot = GetSize()/2 - 1; // Transition between internal and leaf nodes.
       // For a leaf, tree weight = item weight.
-      for (int i = item_weight.size()-1; i > pivot; i--) tree_weight[i] = item_weight[i];
+      for (size_t i = item_weight.size()-1; i > pivot; i--) tree_weight[i] = item_weight[i];
       // The pivot node may have one or two sub-trees.
       if (pivot > 0) {
         tree_weight[pivot] = item_weight[pivot] + tree_weight[LeftID(pivot)];
         if (RightID(pivot) < GetSize()) tree_weight[pivot] += tree_weight[RightID(pivot)];
       }
       // Internal nodes sum their two sub-tree and their own weight.
-      for (int i = pivot-1; i >= 0; i--) {
+      for (size_t i = pivot-1; i < pivot; i--) {
         tree_weight[i] = item_weight[i] + tree_weight[LeftID(i)] + tree_weight[RightID(i)];
       }
 
@@ -75,7 +75,7 @@ namespace emp {
     }
 
   public:
-    WeightedSet(int num_items=0)
+    WeightedSet(size_t num_items=0)
       : item_weight(num_items), tree_weight(num_items), needs_refresh(false) {;}
     WeightedSet(const WeightedSet &) = default;
     WeightedSet(WeightedSet &&) = default;
@@ -83,29 +83,29 @@ namespace emp {
     WeightedSet & operator=(const WeightedSet &) = default;
     WeightedSet & operator=(WeightedSet &&) = default;
 
-    int GetSize() const { return (int) item_weight.size(); }
+    size_t GetSize() const { return item_weight.size(); }
     double GetWeight() const { ResolveRefresh(); return tree_weight[0]; }
-    double GetWeight(int id) const { return item_weight[id]; }
-    double GetProb(int id) const { ResolveRefresh(); return item_weight[id] / tree_weight[0]; }
+    double GetWeight(size_t id) const { return item_weight[id]; }
+    double GetProb(size_t id) const { ResolveRefresh(); return item_weight[id] / tree_weight[0]; }
 
-    void Resize(int new_size) {
-      const int old_size = item_weight.size();
+    void Resize(size_t new_size) {
+      const size_t old_size = item_weight.size();
       item_weight.resize(new_size, 0.0);             // Update size (new weights default to zero)
       tree_weight.resize(new_size, 0.0);             // Update size (new weights default to zero)
       if (new_size < old_size) needs_refresh = true; // Update the tree weights if some disappeared.
     }
 
-    void Resize(int new_size, double def_value) {
-      const int old_size = item_weight.size();
+    void Resize(size_t new_size, double def_value) {
+      const size_t old_size = item_weight.size();
       item_weight.resize(new_size, 0.0);   // Update the size (new weights default to zero)
       tree_weight.resize(new_size, 0.0);   // Update the size (new weights default to zero)
-      for (int i=old_size; i < new_size; i++) item_weight[i] = def_value;
+      for (size_t i=old_size; i < new_size; i++) item_weight[i] = def_value;
       needs_refresh = true;                // Update the tree weights when needed.
     }
 
     // Standard library compatibility
     size_t size() const { return item_weight.size(); }
-    void resize(int new_size) { Resize(new_size); }
+    void resize(size_t new_size) { Resize(new_size); }
 
     void Clear() {
       for (auto & x : item_weight) { x = 0.0; }
@@ -119,7 +119,7 @@ namespace emp {
       Clear();
     }
 
-    void Adjust(int id, const double new_weight) {
+    void Adjust(size_t id, const double new_weight) {
       // Update this node.
       const double weight_diff = new_weight - item_weight[id];
       item_weight[id] = new_weight;  // Update item weight
@@ -147,7 +147,7 @@ namespace emp {
       return id;
     }
 
-    int Index(double index, int cur_id=0) {
+    size_t Index(double index, size_t cur_id=0) const {
       ResolveRefresh();
       emp_assert(index < tree_weight[0]);  // Cannot index beyond end of set.
 
@@ -157,15 +157,15 @@ namespace emp {
 
       // Otherwise determine if we need to recurse left or right.
       index -= cur_weight;
-      const int left_id = LeftID(cur_id);
+      const size_t left_id = LeftID(cur_id);
       const double left_weight = tree_weight[left_id];
 
       return (index < left_weight) ? Index(index, left_id) : Index(index-left_weight, left_id+1);
     }
 
-    // int operator[](double index) { return Index(index,0); }
-    Proxy operator[](int id) { return Proxy(*this,id); }
-    double operator[](int id) const { return item_weight[id]; }
+    // size_t operator[](double index) { return Index(index,0); }
+    Proxy operator[](size_t id) { return Proxy(*this,id); }
+    double operator[](size_t id) const { return item_weight[id]; }
 
     WeightedSet & operator+=(WeightedSet & in_set) {
       emp_assert(size() == in_set.size());

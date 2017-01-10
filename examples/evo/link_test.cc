@@ -25,16 +25,13 @@ int main()
   emp::Random random;
   World<Org, PopEA> world(random, "loud");
 
-  // world.pop.Config(10, 100);
-
-  // world.OffspringReady( [&random](Org * org) { org->Print(); std::cout << " born!" << std::endl;});
   std::function<void(Org*)> fun = [&random](Org * org) { org->Print(); std::cout << " born!" << std::endl;};
-  emp::LinkSignal( "loud::offspring-ready", fun );
+  world.Link( "loud::offspring-ready", fun );
 
   for (int i = 0; i < 36; i++) world.Insert( random.GetInt(100, 1000) );
 
   // Print world
-  for (int i = 0; i < world.GetSize(); i++) {
+  for (size_t i = 0; i < world.GetSize(); i++) {
     world[i].Print();
     std::cout << " ";
   }
@@ -49,12 +46,12 @@ int main()
     std::cout << "GEN " << gen
 	      << "  size=" << world.GetSize()
 	      << std::endl;
-    for (int i = 0; i < world.GetSize(); i++) {
+    for (size_t i = 0; i < world.GetSize(); i++) {
       world[i].Print();
       std::cout << " ";
     }
     std::cout << std::endl;
   }
 
-  emp::PrintSignalInfo(2);
+  world.GetSignalControl().PrintNames();
 }

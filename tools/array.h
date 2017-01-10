@@ -19,8 +19,7 @@
 #ifdef EMP_NDEBUG
 
 namespace emp {
-  template <typename T, size_t N>
-    using array = std::array<T,N>;
+  template <typename T, size_t N> using array = std::array<T,N>;
 }
 
 
@@ -56,13 +55,13 @@ namespace emp {
     bool operator>(const emp::array<T,N> & in)  const { return a > in.a; }
     bool operator>=(const emp::array<T,N> & in) const { return a >= in.a; }
 
-    T & operator[](int pos) {
-      emp_assert(pos >= 0 && pos < (int) N, pos);
+    T & operator[](size_t pos) {
+      emp_assert(pos < (int) N, pos);
       return a[pos];
     }
 
-    const T & operator[](int pos) const {
-      emp_assert(pos >= 0 && pos < (int) N, pos);
+    const T & operator[](size_t pos) const {
+      emp_assert(pos < (int) N, pos);
       return a[pos];
     }
 

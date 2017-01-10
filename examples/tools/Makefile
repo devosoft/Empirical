@@ -5,9 +5,8 @@ CFLAGS_version := -std=c++14
 # Emscripten compiler information
 CXX_web := emcc
 CXX_native := g++
-#CXX_native := g++-5
 
-OFLAGS_native_debug := -g -pedantic -DEMP_TRACK_MEM
+OFLAGS_native_debug := -g -pedantic -DEMP_TRACK_MEM  -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
 OFLAGS_native_opt := -O3 -DNDEBUG
 
 OFLAGS_web_debug := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864 -s ASSERTIONS=2 -s DEMANGLE_SUPPORT=1 # -s SAFE_HEAP=1
@@ -32,9 +31,6 @@ CFLAGS := $(CFLAGS_native_opt)
 
 debug: CFLAGS := $(CFLAGS_native_debug)
 debug: all
-
-cpp14: CFLAGS_version := -std=c++14
-cpp14: all
 
 web: CXX := $(CXX_web)
 web: CFLAGS := $(CFLAGS_web_opt)
@@ -65,9 +61,6 @@ opt-%: %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
 
 debug-%: %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
-
-cpp14-%: %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
-	$(CXX) -std=c++14 $(CFLAGS_native_debug) $< -o $@
 
 clean:
 	rm -rf debug-* *~ *.dSYM $(TARGETS)

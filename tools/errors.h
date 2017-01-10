@@ -78,7 +78,7 @@ namespace emp {
     return out;
   }
 
-  inline int CountExcepts() { return GetExceptMap().size(); }
+  inline size_t CountExcepts() { return GetExceptMap().size(); }
   inline bool HasExcept() { return CountExcepts(); }
   inline bool HasExcept(const std::string & id) { return GetExceptMap().count(id); }
   inline void ClearExcepts() { GetExceptMap().clear(); }

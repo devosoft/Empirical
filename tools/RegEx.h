@@ -48,12 +48,12 @@ namespace emp {
 
   class RegEx {
   private:
-    constexpr static int NUM_SYMBOLS = 128;
+    constexpr static size_t NUM_SYMBOLS = 128;
     using opts_t = BitSet<NUM_SYMBOLS>;
     std::string regex;                     // Original string to define this RegEx.
     emp::vector<std::string> notes;        // Any warnings or errors would be provided here.
     bool valid;                            // Set to false if regex cannot be processed.
-    int pos;                               // Position being read in regex.
+    size_t pos;                               // Position being read in regex.
 
     mutable DFA dfa;                       // DFA that this RegEx translates to.
     mutable bool dfa_ready;                // Is the dfa ready? (or does it need to be generated?)
@@ -78,9 +78,9 @@ namespace emp {
       virtual Ptr<re_charset> AsCharSet() { return nullptr; }
       virtual Ptr<re_parent> AsParent() { return nullptr; }
       virtual Ptr<re_string> AsString() { return nullptr; }
-      virtual int GetSize() const { return 0; }
+      virtual size_t GetSize() const { return 0; }
       virtual bool Simplify() { return false; }
-      virtual void AddToNFA(NFA & nfa, int start, int stop) const { nfa.AddFreeTransition(start, stop); }
+      virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const { nfa.AddFreeTransition(start, stop); }
     };
 
     struct re_string : public re_base {  // Series of specific chars
@@ -90,12 +90,12 @@ namespace emp {
       re_string(const std::string & s) : str(s) { ; }
       void Print(std::ostream & os) const override { os << "STR[" << to_escaped_string(str) << "]"; }
       Ptr<re_string> AsString() override { return to_ptr(this); }
-      int GetSize() const override { return (int) str.size(); }
-      virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
-        int prev_id = start;
+      size_t GetSize() const override { return str.size(); }
+      virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+        size_t prev_id = start;
         for (char x : str) {
-          int next_id = nfa.AddNewState();
-          nfa.AddTransition(prev_id, next_id, x);
+          size_t next_id = nfa.AddNewState();
+          nfa.AddTransition(prev_id, next_id, (size_t) x);
           prev_id = next_id;
         }
         nfa.AddFreeTransition(prev_id, stop);
@@ -105,23 +105,23 @@ namespace emp {
     struct re_charset : public re_base { // Any char from set.
       opts_t char_set;
       re_charset() { ; }
-      re_charset(char x, bool neg=false) { char_set[x]=true; if (neg) char_set.NOT_SELF(); }
+      re_charset(char x, bool neg=false) { char_set[(size_t)x]=true; if (neg) char_set.NOT_SELF(); }
       re_charset(const std::string & s, bool neg=false)
-        { for (char x : s) char_set[x]=true; if (neg) char_set.NOT_SELF(); }
+        { for (char x : s) char_set[(size_t)x]=true; if (neg) char_set.NOT_SELF(); }
       void Print(std::ostream & os) const override {
         auto chars = char_set.GetOnes();
         bool use_not = false;
         if (chars.size() > 64) { chars = (~char_set).GetOnes(); use_not = true; }
         os << "SET[";
         if (use_not) os << "NOT ";
-        for (int c : chars) os << to_escaped_string((char) c);
+        for (auto c : chars) os << to_escaped_string((char) c);
         os << "]";
       }
       Ptr<re_charset> AsCharSet() override { return to_ptr(this); }
-      int GetSize() const override { return char_set.CountOnes(); }
+      size_t GetSize() const override { return char_set.CountOnes(); }
       char First() const { return (char) char_set.FindBit(); }
-      virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
-        for (int i = 0; i < NUM_SYMBOLS; i++) if (char_set[i]) nfa.AddTransition(start, stop, i);
+      virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+        for (size_t i = 0; i < NUM_SYMBOLS; i++) if (char_set[i]) nfa.AddTransition(start, stop, i);
       }
     };
 
@@ -133,7 +133,7 @@ namespace emp {
       void Clear() { for (auto x : nodes) x.Delete(); nodes.resize(0); }
       virtual void push(Ptr<re_base> x) { emp_assert(x != nullptr); nodes.push_back(x); }
       Ptr<re_base> pop() { auto out = nodes.back(); nodes.pop_back(); return out; }
-      int GetSize() const override { return (int) nodes.size(); }
+      size_t GetSize() const override { return nodes.size(); }
       Ptr<re_parent> AsParent() override { return to_ptr(this); }
       bool Simplify() override {
         bool m=false;
@@ -173,7 +173,7 @@ namespace emp {
           if (i > 0 && nodes[i]->AsString() && nodes[i-1]->AsString()) {
             nodes[i-1]->AsString()->str += nodes[i]->AsString()->str;
             nodes[i].Delete();
-            nodes.erase(nodes.begin()+i);
+            nodes.erase(nodes.begin() + (long) i);
             i--;
             modify = true;
             continue;
@@ -182,8 +182,8 @@ namespace emp {
           // If blocks are nested, merge them into a single block.
           if (nodes[i]->AsBlock()) {
             auto old_node = nodes[i]->AsBlock();
-            nodes.erase(nodes.begin() + i);
-            nodes.insert(nodes.begin() + i, old_node->nodes.begin(), old_node->nodes.end());
+            nodes.erase(nodes.begin() + (long) i);
+            nodes.insert(nodes.begin() + (long) i, old_node->nodes.begin(), old_node->nodes.end());
             old_node->nodes.resize(0);  // Don't recurse delete since nodes were moved!
             old_node.Delete();
             // @CAO do this.
@@ -198,10 +198,10 @@ namespace emp {
 
         return modify;
       }
-      virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
-        int prev_id = start;
+      virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+        size_t prev_id = start;
         for (auto x : nodes) {
-          int next_id = nfa.AddNewState();
+          size_t next_id = nfa.AddNewState();
           x->AddToNFA(nfa, prev_id, next_id);
           prev_id = next_id;
         }
@@ -217,7 +217,7 @@ namespace emp {
         nodes[1]->Print(os);
         os << "]";
       }
-      virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
+      virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
         nodes[0]->AddToNFA(nfa, start, stop);
         nodes[1]->AddToNFA(nfa, start, stop);
       }
@@ -227,8 +227,8 @@ namespace emp {
       re_star(Ptr<re_base> c) { push(c); }
       void Print(std::ostream & os) const override { os << "*["; nodes[0]->Print(os); os << "]"; }
 
-      virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
-        const int target = nfa.AddNewState();
+      virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+        const size_t target = nfa.AddNewState();
         nodes[0]->AddToNFA(nfa, start, target);
         nfa.AddFreeTransition(target, start);
         nfa.AddFreeTransition(start, stop);
@@ -238,8 +238,8 @@ namespace emp {
     struct re_plus : public re_parent {    // one-or-more
       re_plus(Ptr<re_base> c) { push(c); }
       void Print(std::ostream & os) const override { os << "+["; nodes[0]->Print(os); os << "]"; }
-      virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
-        const int target = nfa.AddNewState();
+      virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+        const size_t target = nfa.AddNewState();
         nodes[0]->AddToNFA(nfa, start, target);
         // From the target, can either go back to start and repeat, or straight to stop.
         nfa.AddFreeTransition(target, start);
@@ -250,7 +250,7 @@ namespace emp {
     struct re_qm : public re_parent {      // zero-or-one
       re_qm(Ptr<re_base> c) { push(c); }
       void Print(std::ostream & os) const override { os << "?["; nodes[0]->Print(os); os << "]"; }
-      virtual void AddToNFA(NFA & nfa, int start, int stop) const override {
+      virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
         nodes[0]->AddToNFA(nfa, start, stop);
         nfa.AddFreeTransition(start, stop);
       }
@@ -259,7 +259,7 @@ namespace emp {
     re_block head;
 
     bool EnsureNext(char x) {
-      if (pos >= (int) regex.size()) Error("Expected ", x, " before end.");
+      if (pos >= regex.size()) Error("Expected ", x, " before end.");
       else if (regex[pos] != x) Error("Expected ", x, " at position ", pos,
                                       "; found ", regex[pos], ".");
       ++pos;               // We have what we were expecting!  Move on...
@@ -272,12 +272,12 @@ namespace emp {
       if (c == '^') { neg = true; c = regex[pos++]; }
       auto out = new re_charset;
       char prev_c = -1;
-      while (c != ']' && pos < (int) regex.size()) {
+      while (c != ']' && pos < regex.size()) {
         if (c == '-' && prev_c != -1) {
           c = regex[pos++];
           if (c < prev_c) { Error("Invalid character range ", prev_c, '-', c); continue; }
           for (char x = prev_c; x <= c; x++) {
-            out->char_set[x] = true;
+            out->char_set[(size_t)x] = true;
           }
           prev_c = -1;
           c = regex[pos++];
@@ -300,7 +300,7 @@ namespace emp {
               Error("Unknown escape char for char sets: '\\", c, "'.");
           }
         }
-        out->char_set[c] = true;
+        out->char_set[(size_t)c] = true;
         prev_c = c;
         c = regex[pos++];
       }
@@ -312,7 +312,7 @@ namespace emp {
     Ptr<re_string> ConstructString() {
       char c = regex[pos++];
       auto out = new re_string;
-      while (c != '\"' && pos < (int) regex.size()) {
+      while (c != '\"' && pos < regex.size()) {
         // @CAO Error if we run out of chars before close '"'
         if (c == '\\') {
           c = regex[pos++];  // Identify the specific escape char.
@@ -402,7 +402,7 @@ namespace emp {
 
     // Process the input regex into a tree representaion.
     Ptr<re_block> Process(Ptr<re_block> cur_block=nullptr) {
-      emp_assert(pos >= 0 && pos < (int) regex.size(), pos, regex.size());
+      emp_assert(pos >= 0 && pos < regex.size(), pos, regex.size());
 
       // If caller does not provide current block, create one (and return it.)
       if (cur_block==nullptr) cur_block = new re_block;
@@ -410,7 +410,7 @@ namespace emp {
       // All blocks need to start with a single token.
       cur_block->push( ConstructSegment() );
 
-      while (pos < (int) regex.size()) {
+      while (pos < regex.size()) {
         const char c = regex[pos++];
         switch (c) {
           // case '|': cur_block->push( new re_or( cur_block->pop(), ConstructSegment() ) ); break;
@@ -454,7 +454,7 @@ namespace emp {
 
     std::string AsString() const { return to_literal(regex); }
 
-    virtual void AddToNFA(NFA & nfa, int start, int stop) const { head.AddToNFA(nfa, start, stop); }
+    void AddToNFA(NFA & nfa, size_t start, size_t stop) const { head.AddToNFA(nfa, start, stop); }
 
     void Generate() const;
 
@@ -483,7 +483,7 @@ namespace emp {
 
 
   // Simple conversion of RegEx to NFA (mostly implemented in RegEx)
-  static NFA to_NFA(const RegEx & regex, int stop_id=1) {
+  static NFA to_NFA(const RegEx & regex, size_t stop_id=1) {
     NFA nfa(2);  // State 0 = start, state 1 = stop.
     nfa.SetStop(1, stop_id);
     regex.AddToNFA(nfa, 0, 1);

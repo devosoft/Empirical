@@ -15,12 +15,12 @@
 
 EMP_BUILD_CONFIG( NKConfig,
   GROUP(DEFAULT, "Default settings for NK model"),
-  CONST(K, int, 10, "Level of epistasis in the NK model"),
-  CONST(N, int, 200, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
+  CONST(K, uint32_t, 10, "Level of epistasis in the NK model"),
+  CONST(N, uint32_t, 200, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
   CONST(SEED, int, 1, "Random number seed (0 for based on time)"),
-  CONST(POP_SIZE, int, 1000, "Number of organisms in the popoulation."),
-  CONST(MAX_GENS, int, 500, "How many generations should we process?"),
-  CONST(MUT_COUNT, int, 3, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
+  CONST(POP_SIZE, uint32_t, 1000, "Number of organisms in the popoulation."),
+  CONST(MAX_GENS, uint32_t, 500, "How many generations should we process?"),
+  CONST(MUT_COUNT, uint32_t, 3, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
   VALUE(TEST, std::string, "TestString", "This is a test string.")
 )
 
@@ -36,26 +36,26 @@ int main(int argc, char* argv[])
   if (args.ProcessConfigOptions(config, std::cout, "NK.cfg", "NK-macros.h") == false) exit(0);
   if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
 
-  constexpr int N = config.N();
-  constexpr int K = config.K();
-  constexpr int POP_SIZE = config.POP_SIZE();
-  constexpr int MAX_GENS = config.MAX_GENS();
-  constexpr int MUT_COUNT = config.MUT_COUNT();
+  constexpr uint32_t N = config.N();
+  constexpr uint32_t K = config.K();
+  constexpr uint32_t POP_SIZE = config.POP_SIZE();
+  constexpr uint32_t MAX_GENS = config.MAX_GENS();
+  constexpr uint32_t MUT_COUNT = config.MUT_COUNT();
 
   emp::Random random(config.SEED());
   emp::evo::NKLandscape landscape(N, K, random);
   emp::evo::EAWorld<BitOrg> pop(random, "NKWorld");
 
   // Build a random initial population
-  for (int i = 0; i < config.POP_SIZE(); i++) {
+  for (uint32_t i = 0; i < config.POP_SIZE(); i++) {
     BitOrg next_org(N);
-    for (int j = 0; j < N; j++) next_org[j] = random.P(0.5);
+    for (uint32_t j = 0; j < N; j++) next_org[j] = random.P(0.5);
     pop.Insert(next_org);
   }
 
   pop.SetDefaultMutateFun( [MUT_COUNT, N](BitOrg* org, emp::Random& random) {
-      for (int m = 0; m < MUT_COUNT; m++) {
-        const int pos = random.GetInt(N);
+      for (uint32_t m = 0; m < MUT_COUNT; m++) {
+        const uint32_t pos = random.GetUInt(N);
         (*org)[pos] = random.P(0.5);
       }
       return true;
@@ -65,9 +65,9 @@ int main(int argc, char* argv[])
   // emp::LinkSignal("NKWorld::org-placement", std::function<void()>([](){ std::cout << "Placed." << std::endl; }) );
 
   // Loop through updates
-  for (int ud = 0; ud < MAX_GENS; ud++) {
+  for (uint32_t ud = 0; ud < MAX_GENS; ud++) {
     // Print current state.
-    // for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
+    // for (uint32_t i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
     // std::cout << std::endl;
     std::cout << ud << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 
@@ -84,5 +84,5 @@ int main(int argc, char* argv[])
 
   std::cout << MAX_GENS << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 
-  emp::PrintSignalInfo();
+  pop.GetSignalControl().PrintNames();
 }

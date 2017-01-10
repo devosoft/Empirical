@@ -25,7 +25,7 @@ namespace emp {
     assert(v_count >= 0);
     Graph graph(v_count);
 
-    emp::vector<int> v_map = build_range(0, v_count);
+    emp::vector<int> v_map = BuildRange(0, v_count);
     Shuffle(random, v_map);
 
     for (int i = 1; i < v_count; i++) {
@@ -43,7 +43,7 @@ namespace emp {
     assert(v_count >= 0);
     Graph graph(v_count);
 
-    emp::vector<int> v_map = build_range(0, v_count);
+    emp::vector<int> v_map = BuildRange(0, v_count);
     Shuffle(random, v_map);
 
     for (int i = 1; i < v_count; i++) {
@@ -96,7 +96,7 @@ namespace emp {
 
     Graph graph(v_count);
 
-    emp::vector<int> v_map = build_range(0, v_count);
+    emp::vector<int> v_map = BuildRange(0, v_count);
     Shuffle(random, v_map);
 
     for (int x=0; x < width; ++x) {
@@ -123,7 +123,7 @@ namespace emp {
     const int v_count = clique_size * clique_count;
     Graph graph(v_count);
 
-    emp::vector<int> v_map = build_range(0, v_count);
+    emp::vector<int> v_map = BuildRange(0, v_count);
     Shuffle(random, v_map);
 
     // Fill out all of the edges within a clique

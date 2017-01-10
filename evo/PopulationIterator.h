@@ -24,7 +24,7 @@ namespace evo {
 
     // The MakeValid() function moves an iterator to t next non-null position (or the end)
     void MakeValid() {
-      while ((pos < pop->size()) && (((*pop)[pos]) == nullptr)) ++pos;
+      while ((pos < (int) pop->size()) && (((*pop)[(size_t)pos]) == nullptr)) ++pos;
     }
 
   public:
@@ -46,7 +46,7 @@ namespace evo {
 
     PopulationIterator<POP_MANAGER> & operator--() {
       --pos;
-      while (pos < pop->size() && (((*pop)[pos]) == nullptr)) { --pos; }
+      while (pos < pop->size() && (((*pop)[(size_t)pos]) == nullptr)) { --pos; }
       return *this;
     }
 
@@ -57,8 +57,8 @@ namespace evo {
     bool operator> (const PopulationIterator<POP_MANAGER>& rhs) const { return pos >  rhs.pos; }
     bool operator>=(const PopulationIterator<POP_MANAGER>& rhs) const { return pos >= rhs.pos; }
 
-    auto operator*() -> decltype((*pop)[pos]) { MakeValid(); return (*pop)[pos]; }
-    const ORG & operator*() const { MakeValid(); return (ORG)(*pop)[pos]; }
+    auto operator*() -> decltype((*pop)[(size_t)pos]) { MakeValid(); return (*pop)[(size_t)pos]; }
+    const ORG & operator*() const { MakeValid(); return (ORG)(*pop)[(size_t)pos]; }
 
     operator bool() const { MakeValid(); return pos < pop->size(); }
 

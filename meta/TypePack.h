@@ -171,6 +171,10 @@ namespace emp {
     template <typename... T> using push_back = TypePack<T...>;
     template <typename... T> using add = TypePack<T...>;
 
+    // In both of these cases, N had better be zero... but no easy way to assert.
+    template <int N> using popN = this_t;
+    template <int N> using shrink = this_t;
+
     template <typename T, int N=1> using pad = typename tp_pad<this_t,T,N>::type;
     template <int N, typename DEFAULT=null_t> using resize = pad<DEFAULT,N>;
 

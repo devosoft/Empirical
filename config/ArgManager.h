@@ -28,11 +28,11 @@ namespace emp {
       ArgManager(int argc, char* argv[]) : args(args_to_strings(argc, argv)) { ; }
       ~ArgManager() { ; }
 
-      int size() const { return (int) args.size(); }
+      size_t size() const { return args.size(); }
       auto begin() -> decltype(args.begin()) { return args.begin(); }
       auto end() -> decltype(args.end()) { return args.end(); }
-      std::string & operator[](int i) { return args[i]; }
-      const std::string & operator[](int i) const { return args[i]; }
+      std::string & operator[](size_t i) { return args[i]; }
+      const std::string & operator[](size_t i) const { return args[i]; }
 
       // UseArg takes a name, a variable and an optional description.  If the name exists,
       // it uses the next argument to change the value of the variable.
@@ -65,13 +65,13 @@ namespace emp {
       }
 
       void PrintHelp(std::ostream & os) const {
-        int max_name_size = 0;
+        size_t max_name_size = 0;
         for (const auto & name : arg_names) {
-          if (max_name_size < (int) name.size()) max_name_size = (int) name.size();
+          if (max_name_size < name.size()) max_name_size = name.size();
         }
-        for (int i = 0; i < (int) arg_names.size(); i++) {
+        for (size_t i = 0; i < arg_names.size(); i++) {
           os << arg_names[i]
-             << std::string(max_name_size + 1 - (int) arg_names[i].size(), ' ')
+             << std::string(max_name_size + 1 - arg_names[i].size(), ' ')
              << arg_descs[i]
              << std::endl;
         }
@@ -82,7 +82,7 @@ namespace emp {
       bool TestUnknown(std::ostream & os=std::cerr) const {
         if (args.size() > 1) {
           os << "Unknown args:";
-          for (int i = 1; i < (int) args.size(); i++) os << " " << args[i];
+          for (size_t i = 1; i < args.size(); i++) os << " " << args[i];
           os << std::endl;
           PrintHelp(os);
           return false;

@@ -57,7 +57,7 @@ namespace emp {
     bool operator<(const Author & other) const {
       if (last_name != other.last_name) return (last_name < other.last_name);
       if (first_name != other.first_name) return (first_name < other.first_name);
-      for (auto i = 0; i < middle_names.size(); i++) {
+      for (size_t i = 0; i < middle_names.size(); i++) {
         if (other.middle_names.size() <= i) return false;
         if (middle_names[i] != other.middle_names[i]) {
           return (middle_names[i] < other.middle_names[i]);
@@ -80,7 +80,7 @@ namespace emp {
 
     const std::string & GetPrefix() const { return prefix; }
     const std::string & GetFirstName() const { return first_name; }
-    const std::string & GetMiddleName(int id=0) const {
+    const std::string & GetMiddleName(size_t id=0) const {
       if (middle_names.size() == 0) return emp::empty_string();
       return middle_names[id];
     }

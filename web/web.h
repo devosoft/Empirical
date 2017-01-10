@@ -1,5 +1,5 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2015.
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -25,8 +25,7 @@ namespace web {
 
   // Some helper functions.
   // Live keyword means that whatever is passed in needs to be re-evaluated every update.
-  namespace internal {
-
+  namespace {
     // If a variable is passed in to live, construct a function to look up its current value.
     template <typename VAR_TYPE>
     std::function<std::string()> Live_impl(VAR_TYPE & var, bool) {
@@ -42,7 +41,7 @@ namespace web {
 
   template <typename T>
   std::function<std::string()> Live(T && val) {
-    return internal::Live_impl(std::forward<T>(val), true);
+    return Live_impl(std::forward<T>(val), true);
   }
 
 } // END web namespace

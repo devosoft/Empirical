@@ -17,24 +17,24 @@ namespace emp {
   /// If max_count is provided, just make sure that the first max_count entries are randomly
   /// drawn from entire vector.
   template <typename T>
-  inline void Shuffle(Random & random, emp::vector<T> & v, int max_count=-1)
+  inline void Shuffle(Random & random, emp::vector<T> & v, size_t max_count)
   {
-    if (max_count < 0) max_count = (int) v.size();
-    for (uint32_t i = 0; i < (uint32_t) max_count; i++) {
-      const uint32_t pos = random.GetUInt(i, v.size());
+    for (size_t i = 0; i < max_count; i++) {
+      const size_t pos = random.GetUInt(i, v.size());
       if (pos == i) continue;
       std::swap(v[i], v[pos]);
     }
   }
-
+  template <typename T>
+  inline void Shuffle(Random & random, emp::vector<T> & v) { Shuffle(random, v, v.size()); }
 
   /// Return an emp::vector<int> numbered 0 through size-1 in a random order.
 
-  inline emp::vector<int> GetPermutation(Random & random, int size) {
-    emp::vector<int> seq(size);
+  inline emp::vector<size_t> GetPermutation(Random & random, size_t size) {
+    emp::vector<size_t> seq(size);
     seq[0] = 0;
-    for (int i = 1; i < size; i++) {
-      uint32_t val_pos = random.GetUInt(i+1);
+    for (size_t i = 1; i < size; i++) {
+      size_t val_pos = random.GetUInt(i+1);
       seq[i] = seq[val_pos];
       seq[val_pos] = i;
     }
@@ -43,8 +43,8 @@ namespace emp {
 
   /// Choose K positions from N possibilities.
 
-  inline void Choose(Random & random, int N, int K, std::vector<int> & choices) {
-    if (N < K || K < 0) return;  // @CAO Should be an assert!
+  inline void Choose(Random & random, size_t N, size_t K, std::vector<size_t> & choices) {
+    emp_assert (N >= K);
 
     choices.resize(K);
     while (K) {
@@ -53,8 +53,8 @@ namespace emp {
     }
   }
 
-  inline std::vector<int> Choose(Random & random, int N, int K) {
-    std::vector<int> choices;
+  inline std::vector<size_t> Choose(Random & random, size_t N, size_t K) {
+    std::vector<size_t> choices;
     Choose(random,N,K,choices);
     return choices;
   }
@@ -62,10 +62,11 @@ namespace emp {
 
   /// Generate a random bit vector of the specified size.
 
-  inline BitVector RandomBitVector(Random & random, int size, double p=0.5)
+  inline BitVector RandomBitVector(Random & random, size_t size, double p=0.5)
   {
+    emp_assert(p >= 0.0 && p <= 1.0);
     BitVector bits(size);
-    for (int i = 0; i < size; i++) bits[i] = random.P(p);
+    for (size_t i = 0; i < size; i++) bits[i] = random.P(p);
     return bits;
   }
 }

@@ -55,7 +55,7 @@ namespace emp {
     emp::vector< emp::array<int, NUM_SYMBOLS> > transitions;
     emp::vector< STOP_TYPE > is_stop;  // 0=not stop; other values for STOP return value.
   public:
-    tDFA(int num_states=0) : transitions(num_states), is_stop(num_states, 0) {
+    tDFA(size_t num_states=0) : transitions(num_states), is_stop(num_states, 0) {
       for (auto & t : transitions) t.fill(-1);
     }
     tDFA(const tDFA<NUM_SYMBOLS, STOP_TYPE> &) = default;
@@ -64,49 +64,56 @@ namespace emp {
 
     using stop_t = STOP_TYPE;
 
-    int GetSize() const { return (int) transitions.size(); }
+    size_t GetSize() const { return transitions.size(); }
 
-    void Resize(int new_size) {
+    void Resize(size_t new_size) {
       auto old_size = transitions.size();
       transitions.resize(new_size);
       is_stop.resize(new_size, 0);
       for (auto i = old_size; i < transitions.size(); i++) transitions[i].fill(-1);
     }
 
-    const emp::array<int, NUM_SYMBOLS> & GetTransitions(int from) const { return transitions[from]; }
+    const emp::array<int, NUM_SYMBOLS> & GetTransitions(size_t from) const {
+      return transitions[from];
+    }
 
-    void SetTransition(int from, int to, int sym) {
-      emp_assert(from >= 0 && from < (int) transitions.size());
-      emp_assert(to >= 0 && to < (int) transitions.size());
-      emp_assert(sym >= 0 && sym < NUM_SYMBOLS);
-      transitions[from][sym] = to;
+    void SetTransition(size_t from, size_t to, size_t sym) {
+      emp_assert(from < transitions.size());
+      emp_assert(to < transitions.size());
+      emp_assert(sym < NUM_SYMBOLS);
+      transitions[from][sym] = (int) to;
     }
 
     // Function to set the stop value (no matter what it currently is)
-    void SetStop(int state, stop_t stop_val=1) {
-      emp_assert(state >= -1 && state < (int) transitions.size());
+    void SetStop(size_t state, stop_t stop_val=1) {
+      emp_assert(state < transitions.size());
       is_stop[state] = stop_val;
     }
 
     // Function to set the stop value only if it's higher than the current stop value.
-    void AddStop(int state, stop_t stop_val=1) {
-      emp_assert(state >= -1 && state < (int) transitions.size());
+    void AddStop(size_t state, stop_t stop_val=1) {
+      emp_assert(state < transitions.size());
       // If we are given a stop value and its higher than our previous stop, use it!
       if (stop_val > is_stop[state]) is_stop[state] = stop_val;
     }
 
-    stop_t GetStop(int state) const { return (state == -1) ? 0 : is_stop[state]; }
+    stop_t GetStop(int state) const { return (state == -1) ? 0 : is_stop[(size_t)state]; }
     bool IsActive(int state) const { return state != -1; }
-    bool IsStop(int state) const { return (state == -1) ? false : is_stop[state]; }
+    bool IsStop(int state) const { return (state == -1) ? false : is_stop[(size_t)state]; }
 
-    int Next(int state, int sym) const {
+    // If a size_t is passed in, it can't be -1...
+    stop_t GetStop(size_t state) const { return is_stop[state]; }
+    bool IsActive(size_t state) const { return true; }
+    bool IsStop(size_t state) const { return is_stop[state]; }
+
+    int Next(int state, size_t sym) const {
       emp_assert(state >= -1 && state < (int) transitions.size());
       // emp_assert(sym >= 0 && sym < NUM_SYMBOLS, sym, (char) sym);
-      return (state < 0 || sym >= NUM_SYMBOLS) ? -1 : transitions[state][sym];
+      return (state < 0 || sym >= NUM_SYMBOLS) ? -1 : transitions[(size_t)state][sym];
     }
 
     int Next(int state, std::string sym_set) const {
-      for (char x : sym_set) state = Next(state, x);
+      for (char x : sym_set) state = Next(state, (size_t) x);
       return state;
     }
 
@@ -120,9 +127,9 @@ namespace emp {
       for (int i = 0; i < GetSize(); i++) if(IsStop(i)) os << " " << i;
       os << std::endl;
 
-      for (int i = 0; i < (int) transitions.size(); i++) {
+      for (size_t i = 0; i < transitions.size(); i++) {
         os << " " << i << " ->";
-        for (int s = 0; s < NUM_SYMBOLS; s++) {
+        for (size_t s = 0; s < NUM_SYMBOLS; s++) {
           if (transitions[i][s] == -1) continue;
           os << " " << to_literal((char) s) << ":" << transitions[i][s];
         }

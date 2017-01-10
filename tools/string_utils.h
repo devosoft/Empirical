@@ -90,7 +90,7 @@ namespace emp {
   }
   static inline std::string to_literal(char value) {
     std::stringstream ss;
-    ss << "'" << to_escaped_string(value) << "'"; // << "(" << ((int) value) << ")";
+    ss << "'" << to_escaped_string(value) << "'";
     return ss.str();
   }
   static inline std::string to_literal(const std::string & value) {
@@ -202,7 +202,7 @@ namespace emp {
 
 
   /// Pop a segment from the beginning of a string as another string, shortening original.
-  static inline std::string string_pop_fixed(std::string & in_string, std::size_t end_pos, int delim_size=0)
+  static inline std::string string_pop_fixed(std::string & in_string, std::size_t end_pos, size_t delim_size=0)
   {
     std::string out_string = "";
     if (end_pos == 0);                        // Not popping anything!
@@ -230,7 +230,7 @@ namespace emp {
     return string_pop_fixed(in_string, in_string.find(delim), 1);
   }
 
-  inline std::string string_get(const std::string & in_string, const char delim, int start_pos=0) {
+  inline std::string string_get(const std::string & in_string, const char delim, size_t start_pos=0) {
     return string_get_range(in_string, start_pos, in_string.find(delim, start_pos));
   }
 
@@ -238,7 +238,7 @@ namespace emp {
     return string_pop_fixed(in_string, in_string.find_first_of(delim_set), 1);
   }
 
-  inline std::string string_get(const std::string & in_string, const std::string & delim_set, int start_pos=0) {
+  inline std::string string_get(const std::string & in_string, const std::string & delim_set, size_t start_pos=0) {
     return string_get_range(in_string, start_pos, in_string.find_first_of(delim_set, start_pos));
   }
 
@@ -247,7 +247,7 @@ namespace emp {
     return string_pop(in_string, " \n\r\t");
   }
 
-  inline std::string string_get_word(const std::string & in_string, int start_pos=0) {
+  inline std::string string_get_word(const std::string & in_string, size_t start_pos=0) {
     // Whitespace = ' ' '\n' '\r' or '\t'
     return string_get(in_string, " \n\r\t", start_pos);
   }
@@ -256,7 +256,7 @@ namespace emp {
     return string_pop(in_string, '\n');
   }
 
-  inline std::string string_get_line(const std::string & in_string, int start_pos=0) {
+  inline std::string string_get_line(const std::string & in_string, size_t start_pos=0) {
     return string_get(in_string, '\n', start_pos);
   }
 
@@ -271,45 +271,45 @@ namespace emp {
   }
 
   static inline void compress_whitespace(std::string & in_string) {
-    const int strlen = (int) in_string.size();
+    const size_t strlen = in_string.size();
     bool last_whitespace = true;
-    int next_char = 0;
+    size_t pos = 0;
 
-    for (int i = 0; i < strlen; i++) {
+    for (size_t i = 0; i < strlen; i++) {
       if (is_whitespace(in_string[i])) {  // This char is whitespace
         if (last_whitespace) continue;
-        in_string[next_char++] = ' ';
+        in_string[pos++] = ' ';
         last_whitespace = true;
       }
       else {  // Not whitespace
-        in_string[next_char++] = in_string[i];
+        in_string[pos++] = in_string[i];
         last_whitespace = false;
       }
     }
 
-    in_string.resize(next_char);
+    in_string.resize(pos);
   }
 
   static inline void remove_whitespace(std::string & in_string) {
-    const int strlen = (int) in_string.size();
-    int next_char = 0;
+    const size_t strlen = in_string.size();
+    size_t pos = 0;
 
-    for (int i = 0; i < strlen; i++) {
+    for (size_t i = 0; i < strlen; i++) {
       if (is_whitespace(in_string[i])) continue;
-      in_string[next_char++] = in_string[i];
+      in_string[pos++] = in_string[i];
     }
 
-    in_string.resize(next_char);
+    in_string.resize(pos);
   }
 
   // Cut up a string based on a deliminator.
   static inline void slice(const std::string & in_string, emp::vector<std::string> & out_set,
                            char delim='\n') {
-    const int test_size = (int) in_string.size();
+    const size_t test_size = in_string.size();
 
     // Count produced strings
-    int out_count = 0;
-    int pos = 0;
+    size_t out_count = 0;
+    size_t pos = 0;
     while (pos < test_size) {
       while (pos < test_size && in_string[pos] != delim) pos++;
       pos++; // Skip over deliminator
@@ -319,7 +319,7 @@ namespace emp {
     // And copy over the strings
     out_set.resize(out_count);
     pos = 0;
-    int string_id = 0;
+    size_t string_id = 0;
     while (pos < test_size) {
       out_set[string_id] = "";
       while (pos < test_size && in_string[pos] != delim) {
@@ -371,7 +371,7 @@ namespace emp {
     inline std::string to_string_impl(bool, float v) { return std::to_string(v); }
     inline std::string to_string_impl(bool, double v) { return std::to_string(v); }
     inline std::string to_string_impl(bool, char c) { return std::string(1,c); }
-    inline std::string to_string_impl(bool, unsigned char c) { return std::string(1,c); }
+    inline std::string to_string_impl(bool, unsigned char c) { return std::string(1,(char)c); }
 
     // Operate on std::containers
     template <typename T>

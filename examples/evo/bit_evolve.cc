@@ -18,26 +18,26 @@ int main()
   emp::Random random;
   emp::evo::EAWorld<BitOrg> pop(random);
 
-  // Build a random initial population
-  for (int i = 0; i < 100; i++) {
+  // Build a random initial
+  for (size_t i = 0; i < 100; i++) {
     BitOrg next_org;
-    for (int j = 0; j < 100; j++) next_org[j] = random.P(0.3);
+    for (size_t j = 0; j < 100; j++) next_org[j] = random.P(0.3);
     pop.Insert(next_org);
   }
 
   std::cout << "Start Size = " << pop.GetSize() << std::endl;
-  for (int i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
+  for (size_t i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
   std::cout << std::endl;
 
   // Loop through 100 updates
-  for (int ud = 0; ud < 100; ud++) {
+  for (size_t ud = 0; ud < 100; ud++) {
     // Run a tournament...
     pop.TournamentSelect([](BitOrg * org){ return (double) org->CountOnes(); }, 5, 100);
     pop.Update();
 
     // Do mutations...
-    for (int i = 0; i < pop.GetSize(); i++) {
-      pop[i][random.GetInt(100)] = random.P(0.3);
+    for (size_t i = 0; i < pop.GetSize(); i++) {
+      pop[i][random.GetUInt(100)] = random.P(0.3);
     }
 
     // Print results

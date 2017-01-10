@@ -1,4 +1,4 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2015-2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
@@ -57,6 +57,7 @@ namespace web {
     // Base class for command-objects that can be fed into widgets.
     class WidgetCommand {
     public:
+      virtual ~WidgetCommand() { ; }
       virtual bool Trigger(WidgetInfo &) const = 0;
     };
   }

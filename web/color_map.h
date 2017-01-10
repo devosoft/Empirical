@@ -1,14 +1,12 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
-// Copyright (C) Michigan State University, 2015. It is licensed
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2016.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  Tools to dynamically build (and cache) color maps.
 
 #ifndef EMP_COLOR_MAP_H
 #define EMP_COLOR_MAP_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-//  Tools to dynamically build (and cache) color maps.
-//
 
 #include <iomanip>
 #include <map>
@@ -20,7 +18,7 @@
 
 namespace emp {
 
-  namespace internal {
+  namespace {
     using dHueMapKey = std::tuple<int, double, double, int, int>;
     using dHueMap = std::map<dHueMapKey, emp::vector<std::string> >;
 
@@ -60,11 +58,11 @@ namespace emp {
   }
 
   const emp::vector<std::string> &
-  GetHueMap(int map_size, double min_h=0.0, double max_h=360.0, int s=100, int l=50) {
-    internal::dHueMapKey map_key = std::make_tuple(map_size, min_h, max_h, s, l);
+  GetHueMap(size_t map_size, double min_h=0.0, double max_h=360.0, int s=100, int l=50) {
+    dHueMapKey map_key = std::make_tuple(map_size, min_h, max_h, s, l);
 
     // Grab the current map out of the cache.
-    emp::vector<std::string> & cur_map = internal::hue_maps[map_key];
+    emp::vector<std::string> & cur_map = hue_maps[map_key];
 
     // If we've already asked for an identical map before, skip map generation!
     if (cur_map.size() != (std::size_t) map_size) {
@@ -72,7 +70,7 @@ namespace emp {
       // Otherwise generate this map...
       cur_map.resize(map_size);
       double step_size = (max_h - min_h) / (double) map_size;
-      for (int i = 0; i < map_size; ++i) {
+      for (size_t i = 0; i < map_size; ++i) {
         double h = min_h + step_size * i;
         cur_map[i] = ColorHSL(h, s, l);
       }

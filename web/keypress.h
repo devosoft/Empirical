@@ -1,5 +1,5 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2015.
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -32,7 +32,6 @@
 //
 //      Same as the previous method, but will respond to any of the keys in the provided
 //      string.
-//
 
 
 #ifndef EMP_WEB_KEYPRESS_H
@@ -109,14 +108,19 @@ namespace web {
         { if (evt.keyCode == key) { cb_fun(); return true; } return false; };
     }
 
-    void AddKeydownCallback(const std::string & key_set, std::function<void()> cb_fun, int order=-1)
+    void AddKeydownCallback(const std::string & key_set, const std::function<void()> & cb_fun,
+                            int order)
     {
-      if (order == -1) order = next_order;
       if (order >= next_order) next_order = order+1;
 
       fun_map[order] =
         [key_set, cb_fun](const html5::KeyboardEvent & evt)
-        { if (key_set.find(evt.keyCode) == std::string::npos) return false; cb_fun(); return true;};
+        { if (key_set.find((char)evt.keyCode) == std::string::npos) return false; cb_fun(); return true;};
+    }
+
+    void AddKeydownCallback(const std::string & key_set, const std::function<void()> & cb_fun)
+    {
+      AddKeydownCallback(key_set, cb_fun, next_order);
     }
   };
 

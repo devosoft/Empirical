@@ -12,46 +12,46 @@
 //  The constructor can take as parameters the number of states and the id of the start state (both
 //  default to 0)
 //
-//  int GetSize() const
+//  size_t GetSize() const
 //    return the current number of states.
 //
-//  std::set<int> GetStart() const
+//  std::set<size_t> GetStart() const
 //    return start state and all others reachable through empty transitions.
 //
-//  std::set<int> GetNext(int sym, int from_id=0) const
-//  std::set<int> GetNext(int sym, const std::set<int> from_set) const
+//  std::set<size_t> GetNext(size_t sym, size_t from_id=0) const
+//  std::set<size_t> GetNext(size_t sym, const std::set<size_t> from_set) const
 //    return the states reachable from the current state or set of state given the provided symbol.
 //
-//  bool HasFreeTransitions(int id) const
-//  bool HasSymTransitions(int id) const
+//  bool HasFreeTransitions(size_t id) const
+//  bool HasSymTransitions(size_t id) const
 //    Does the provided state has free transitions or symbol-transitions (respecitvely)?
 //
-//  opts_t GetSymbolOptions(const std::set<int> & test_set) const
+//  opts_t GetSymbolOptions(const std::set<size_t> & test_set) const
 //    Return an emp::BitSet indicating the symbols available from the provided set of states.
 //
-//  void Resize(int new_size)
+//  void Resize(size_t new_size)
 //    Change the number of available states.
 //
-//  int AddNewState()
+//  size_t AddNewState()
 //    Add a new state into the NFA and return its id.
 //
-//  void AddTransition(int from, int to, int sym)
-//  void AddTransition(int from, int to, const std::string & sym_set)
-//  void AddTransition(int from, int to, const BitSet<NUM_SYMBOLS> & sym_set)
+//  void AddTransition(size_t from, size_t to, size_t sym)
+//  void AddTransition(size_t from, size_t to, const std::string & sym_set)
+//  void AddTransition(size_t from, size_t to, const BitSet<NUM_SYMBOLS> & sym_set)
 //    Add a transition between states 'from' and 'to' that can be taken with the provided symbols.
 //
-//  void AddFreeTransition(int from, int to)
+//  void AddFreeTransition(size_t from, size_t to)
 //    Create a free transition between 'from' and 'to'.
 //
-//  void SetStop(int state, stop_t stop_val=1)
+//  void SetStop(size_t state, stop_t stop_val=1)
 //    Set the specified state to be a stop state (with an optional stop value.)
 //
-//  stop_t GetStop(int state) const
+//  stop_t GetStop(size_t state) const
 //     Return the stop value associated with the specified state.
 //
-//  bool IsStart(int state) const
-//  bool IsStop(int state) const
-//  bool IsEmpty(int state) const
+//  bool IsStart(size_t state) const
+//  bool IsStop(size_t state) const
+//  bool IsEmpty(size_t state) const
 //    Testing types of states:
 //    START -> This is where the NFA begins (may have free transitions to other states)
 //    STOP -> A legal endpoint for the NFA.
@@ -67,7 +67,7 @@
 //  const tNFA<NUM_SYMBOLS,STOP_TYPE> & GetNFA() const
 //    Return the NFA being used.
 //
-//  const std::set<int> & GetStateSet() const
+//  const std::set<size_t> & GetStateSet() const
 //    Return the current set of states accessible with the symbols provided.
 //
 //  bool IsActive() const
@@ -76,13 +76,13 @@
 //  bool IsStop() const
 //    Are any of the current states STOP states?
 //
-//  void SetStateSet(const std::set<int> & in)
+//  void SetStateSet(const std::set<size_t> & in)
 //    Change the current set of state to the ones specified.
 //
 //  void Reset()
 //    Reset to the start state.
 //
-//  void Next(int sym)
+//  void Next(size_t sym)
 //  void Next(const std::string & sym_set)
 //    From the current set of states advance to the next set of states that would be possible
 //    given the symbols provided.
@@ -107,10 +107,10 @@
 
 namespace emp {
 
-  template <int S=128, typename STOP_TYPE=uint8_t>
+  template <size_t S=128, typename STOP_TYPE=uint8_t>
   class tNFA {
   public:
-    static const constexpr int NUM_SYMBOLS = S;
+    static const constexpr size_t NUM_SYMBOLS = S;
     using opts_t = BitSet<NUM_SYMBOLS>;
     using stop_t = STOP_TYPE;
 
@@ -119,17 +119,17 @@ namespace emp {
       opts_t symbols;
     };
     struct State {
-      std::map<int, Transition> trans;   // What symbol transitions are available?
-      std::set<int> free_to;             // What other states can you move to for free?
-      std::set<int> free_from;           // What other states can move here for free?
+      std::map<size_t, Transition> trans;   // What symbol transitions are available?
+      std::set<size_t> free_to;             // What other states can you move to for free?
+      std::set<size_t> free_from;           // What other states can move here for free?
     };
 
     emp::vector<State> states;
-    int start;
+    size_t start;
     emp::vector< STOP_TYPE > is_stop;         // 0=no 1=yes (char instead of bool for speed)
 
   public:
-    tNFA(int num_states=1, int start_state=0)
+    tNFA(size_t num_states=1, size_t start_state=0)
       : states(num_states), start(start_state), is_stop(num_states, 0) {
         if (num_states > start) states[start].free_to.insert(start);
       }
@@ -137,13 +137,13 @@ namespace emp {
     ~tNFA() { ; }
     tNFA<S,STOP_TYPE> & operator=(const tNFA<S,STOP_TYPE> &) = default;
 
-    int GetSize() const { return (int) states.size(); }
-    const std::set<int> & GetStart() const {
-      emp_assert(start < (int) states.size());
+    size_t GetSize() const { return states.size(); }
+    const std::set<size_t> & GetStart() const {
+      emp_assert(start < states.size());
       return states[start].free_to;
     }
-    std::set<int> GetNext(int sym, int from_id=0) const {
-      std::set<int> to_set;
+    std::set<size_t> GetNext(size_t sym, size_t from_id=0) const {
+      std::set<size_t> to_set;
       for (auto & t : states[from_id].trans) {
         if (t.second.symbols[sym]) {
           to_set.insert(t.first);
@@ -152,9 +152,9 @@ namespace emp {
       }
       return to_set;
     }
-    std::set<int> GetNext(int sym, const std::set<int> from_set) const {
-      std::set<int> to_set;
-      for (int from_id : from_set) {
+    std::set<size_t> GetNext(size_t sym, const std::set<size_t> from_set) const {
+      std::set<size_t> to_set;
+      for (size_t from_id : from_set) {
         for (auto & t : states[from_id].trans) {
           if (t.second.symbols[sym]) {
             to_set.insert(t.first);
@@ -165,12 +165,12 @@ namespace emp {
       return to_set;
     }
 
-    bool HasFreeTransitions(int id) const { return (int) states[id].free_to.size(); }
-    bool HasSymTransitions(int id) const { return states[id].trans.size(); }
+    bool HasFreeTransitions(size_t id) const { return states[id].free_to.size(); }
+    bool HasSymTransitions(size_t id) const { return states[id].trans.size(); }
 
-    opts_t GetSymbolOptions(const std::set<int> & test_set) const {
+    opts_t GetSymbolOptions(const std::set<size_t> & test_set) const {
       opts_t options;
-      for (int id : test_set) {
+      for (size_t id : test_set) {
         for (const auto & t : states[id].trans) {
           options |= t.second.symbols;
         }
@@ -178,31 +178,30 @@ namespace emp {
       return options;
     }
 
-    void Resize(int new_size) {
+    void Resize(size_t new_size) {
       states.resize(new_size);
       is_stop.resize(new_size, 0);
       if (new_size > start) states[start].free_to.insert(start);
     }
-    int AddNewState() { int new_state = GetSize(); Resize(new_state+1); return new_state; }
-    void AddTransition(int from, int to, int sym) {
-      emp_assert(from >= 0 && from < (int) states.size(), from, states.size());
-      emp_assert(to >= 0 && to < (int) states.size(), to, states.size());
-      emp_assert(sym >= 0, sym);
+    size_t AddNewState() { size_t new_state = GetSize(); Resize(new_state+1); return new_state; }
+    void AddTransition(size_t from, size_t to, size_t sym) {
+      emp_assert(from < states.size(), from, states.size());
+      emp_assert(to < states.size(), to, states.size());
 
       states[from].trans[to].symbols[sym] = true;
     }
-    void AddTransition(int from, int to, const std::string & sym_set) {
-      for (char x : sym_set) AddTransition(from, to, x);
+    void AddTransition(size_t from, size_t to, const std::string & sym_set) {
+      for (char x : sym_set) AddTransition(from, to, (size_t) x);
     }
-    void AddTransition(int from, int to, const BitSet<NUM_SYMBOLS> & sym_set) {
-      emp_assert(from >= 0 && from < (int) states.size(), from, states.size());
-      emp_assert(to >= 0 && to < (int) states.size(), to, states.size());
+    void AddTransition(size_t from, size_t to, const BitSet<NUM_SYMBOLS> & sym_set) {
+      emp_assert(from < states.size(), from, states.size());
+      emp_assert(to < states.size(), to, states.size());
 
       states[from].trans[to].symbols |= sym_set;
     }
-    void AddFreeTransition(int from, int to) {
-      emp_assert(from >= 0 && from < (int) states.size(), from, states.size());
-      emp_assert(to >= 0 && to < (int) states.size(), to, states.size());
+    void AddFreeTransition(size_t from, size_t to) {
+      emp_assert(from < states.size(), from, states.size());
+      emp_assert(to < states.size(), to, states.size());
 
       // Keep track of where free transitions could have come from and can continue to.
       auto extend_to = states[to].free_to;
@@ -211,8 +210,8 @@ namespace emp {
       extend_from.insert(from);
 
       // Insert all combinations of where new moves can be coming from or going to.
-      for (int x : extend_from) {
-        for (int y : extend_to) {
+      for (auto x : extend_from) {
+        for (auto y : extend_to) {
           states[x].free_to.insert(y);
           states[y].free_from.insert(x);
         }
@@ -220,32 +219,33 @@ namespace emp {
 
     }
 
-    void SetStop(int state, stop_t stop_val=1) { is_stop[state] = stop_val; }
-    stop_t GetStop(int state) const { return is_stop[state]; }
+    template <typename T=stop_t>
+    void SetStop(size_t state, T stop_val=1) { is_stop[state] = (stop_t) stop_val; }
+    stop_t GetStop(size_t state) const { return is_stop[state]; }
 
     // Testing types of states:
     //  START -> This is where the NFA begins (may have free transitions to other states)
     //  STOP -> A legal endpoint for the NFA.
     //  EMPTY -> A state with only empty transitions from it, and not stop state.
-    bool IsStart(int state) const { return state == start; }
-    bool IsStop(int state) const { return is_stop[state]; }
-    bool IsEmpty(int state) const { return !HasSymTransitions(state) && !IsStop(state); }
+    bool IsStart(size_t state) const { return state == start; }
+    bool IsStop(size_t state) const { return is_stop[state]; }
+    bool IsEmpty(size_t state) const { return !HasSymTransitions(state) && !IsStop(state); }
 
     void Merge(const tNFA<NUM_SYMBOLS,STOP_TYPE> & nfa2) {
-      const int offset = GetSize();                    // How far should we offset new NFA states?
-      const int new_start = offset + nfa2.GetSize();   // Locate the new start node.
-      Resize(offset + nfa2.GetSize() + 1);             // Make room for new NFA states + new start.
-      AddFreeTransition(new_start, start);             // Free transition from new start to
-      AddFreeTransition(new_start, nfa2.start+offset); //    starts of both original NFAs.
-      start = new_start;                               // Set the new start node.
+      const size_t offset = GetSize();                  // How far should we offset new NFA states?
+      const size_t new_start = offset + nfa2.GetSize(); // Locate the new start node.
+      Resize(offset + nfa2.GetSize() + 1);              // Make room for new NFA states + new start.
+      AddFreeTransition(new_start, start);              // Free transition from new start to
+      AddFreeTransition(new_start, nfa2.start+offset);  //    starts of both original NFAs.
+      start = new_start;                                // Set the new start node.
 
       // Loop through new states and add them in.
-      for (int i = 0; i < nfa2.GetSize(); i++) {
+      for (size_t i = 0; i < nfa2.GetSize(); i++) {
         // Move transitions.
         for (const auto & t : nfa2.states[i].trans) {
           AddTransition(i+offset, t.first+offset, t.second.symbols);
         }
-        for (int to : nfa2.states[i].free_to) {
+        for (auto to : nfa2.states[i].free_to) {
           AddFreeTransition(i+offset, to+offset);
         }
         SetStop(i+offset, nfa2.is_stop[i]);   // Maintain the stop value for this state.
@@ -254,16 +254,16 @@ namespace emp {
 
     void Print() const {
       std::cout << states.size() << " States:" << std::endl;
-      for (int i = 0; i < (int) states.size(); i++) {
+      for (size_t i = 0; i < states.size(); i++) {
         std::cout << " state " << i << " - ";
         for (const auto & t : states[i].trans) {
           std::cout << "(";
-          for (int s = 0; s < NUM_SYMBOLS; s++) if (t.second.symbols[s]) std::cout << ((char) s);
+          for (size_t s = 0; s < NUM_SYMBOLS; s++) if (t.second.symbols[s]) std::cout << ((char) s);
           std::cout << "):" << t.first << " ";
         }
         if (states[i].free_to.size()) {
           std::cout << "free to:";
-          for (int f : states[i].free_to) std::cout << " " << f;
+          for (auto f : states[i].free_to) std::cout << " " << f;
         }
         if (IsStop(i)) std::cout << " STOP(" << (int) GetStop(i) << ")";
         std::cout << std::endl;
@@ -271,51 +271,51 @@ namespace emp {
     }
 
     void PrintFreeMoves() {
-      for (int i = 0; i < (int) states.size(); i++) {
+      for (int i = 0; i < states.size(); i++) {
         std::cout << "Free from ( ";
-        for (int x : states[i].free_from) std::cout << x << " ";
+        for (auto x : states[i].free_from) std::cout << x << " ";
         std::cout << ") to " << i << std::endl;
         std::cout << "Free from " << i << " to ( ";
-        for (int x : states[i].free_to) std::cout << x << " ";
+        for (auto x : states[i].free_to) std::cout << x << " ";
         std::cout << ")" << std::endl;
       }
     }
   };
 
-  template <int NUM_SYMBOLS=128, typename STOP_TYPE=uint8_t>
+  template <size_t NUM_SYMBOLS=128, typename STOP_TYPE=uint8_t>
   class tNFA_State {
   private:
     const tNFA<NUM_SYMBOLS,STOP_TYPE> & nfa;
-    std::set<int> state_set;
+    std::set<size_t> state_set;
   public:
     tNFA_State(const tNFA<NUM_SYMBOLS,STOP_TYPE> & _nfa) : nfa(_nfa) { state_set = nfa.GetStart(); }
     ~tNFA_State() { ; }
 
     const tNFA<NUM_SYMBOLS,STOP_TYPE> & GetNFA() const { return nfa; }
-    const std::set<int> & GetStateSet() const { return state_set; }
+    const std::set<size_t> & GetStateSet() const { return state_set; }
 
     bool IsActive() const { return state_set.size(); }
     bool IsStop() const {
-      for (int s : state_set) if (nfa.IsStop(s)) return true;
+      for (auto s : state_set) if (nfa.IsStop(s)) return true;
       return false;
     }
-    bool HasState(int id) { return state_set.count(id); }
-    int GetSize() { return (int) state_set.size(); }
+    bool HasState(size_t id) { return state_set.count(id); }
+    size_t GetSize() { return state_set.size(); }
 
-    void SetStateSet(const std::set<int> & in) { state_set = in; }
+    void SetStateSet(const std::set<size_t> & in) { state_set = in; }
     void Reset() { state_set = nfa.GetStart(); }
 
-    void Next(int sym) {
+    void Next(size_t sym) {
       state_set = nfa.GetNext(sym, state_set);
     }
 
     void Next(const std::string & sym_set) {
-      for (char x : sym_set) Next(x);
+      for (char x : sym_set) Next((size_t) x);
     }
 
     void Print() {
       std::cout << "cur states:";
-      for (int s : state_set) {
+      for (auto s : state_set) {
         std::cout << " " << s;
       }
       std::cout << std::endl;

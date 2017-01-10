@@ -36,41 +36,43 @@ namespace evo {
   private:
     // Fixed members
     callback_t * callbacks; // Callbacks to population
-    int id;                 // Organism ID
+    size_t id;            // Organism ID
 
     BitVector host;         // Current host genome
     BitVector symbiont;     // Current symbiont genome
 
-    int host_cost;          // Score needed for host to replicate.
-    int symb_cost;          // Score needed for symbiont to replicate.
+    uint32_t host_cost;     // Score needed for host to replicate.
+    uint32_t symb_cost;     // Score needed for symbiont to replicate.
 
     // Active members
-    int host_pos;           // What bit position to execute next in the host?
-    int symb_pos;           // What bit position to execute next in the symbiont?
+    uint32_t host_pos;      // What bit position to execute next in the host?
+    uint32_t symb_pos;      // What bit position to execute next in the symbiont?
 
-    int host_score;         // Current host score, toward replication
-    int symb_score;         // Current symbiont score, toward horizontal transmission
+    uint32_t host_score;    // Current host score, toward replication
+    uint32_t symb_score;    // Current symbiont score, toward horizontal transmission
 
-    int streak_00;           // Number of consecutive zeros executed by symbiont.
-    int streak_01;           // Number of consecutive zeros executed by symbiont.
-    int streak_1;           // Number of consecutive ones executed by symbiont.
+    uint32_t streak_00;     // Number of consecutive zeros executed by symbiont.
+    uint32_t streak_01;     // Number of consecutive zeros executed by symbiont.
+    uint32_t streak_1;      // Number of consecutive ones executed by symbiont.
 
   public:
-    SymbulationOrg(const BitVector & genome, int h_cost=-1, int s_cost=-1)
-      : callbacks(nullptr), id(-1), host(genome)
-      , host_cost((s_cost<0) ? host.size() : h_cost), symb_cost(s_cost)
+    SymbulationOrg(const BitVector & genome, uint32_t h_cost, uint32_t s_cost=0)
+      : callbacks(nullptr), id(0), host(genome), host_cost(h_cost), symb_cost(s_cost)
       , host_pos(0), symb_pos(0), host_score(0), symb_score(0)
       , streak_00(0), streak_01(0), streak_1(0)
     {
-      emp_assert(host.GetSize() > 0);
+      emp_assert(genome.GetSize() > 0);
     }
-    SymbulationOrg(Random & random, int size, double p=0.5, int h_cost=-1, int s_cost=-1)
+    SymbulationOrg(const BitVector & genome) : SymbulationOrg(genome, (uint32_t)genome.size()) { ; }
+    SymbulationOrg(Random & random, size_t size, double p, uint32_t h_cost, uint32_t s_cost)
       : SymbulationOrg(RandomBitVector(random, size, p), h_cost, s_cost) { ; }
+    SymbulationOrg(Random & random, size_t size, double p=0.5)
+      : SymbulationOrg(RandomBitVector(random, size, p), (uint32_t)size, 0) { ; }
     SymbulationOrg() = delete;
     SymbulationOrg(const SymbulationOrg &) = default;
     ~SymbulationOrg() { ; }
 
-    void Setup(callback_t * in_callbacks, int in_id) {
+    void Setup(callback_t * in_callbacks, size_t in_id) {
       callbacks = in_callbacks;
       id = in_id;
     }
@@ -84,10 +86,10 @@ namespace evo {
     const BitVector & GetHost() const { return host; }
     const BitVector & GetSymbiont() const { return symbiont; }
 
-    int GetHostCost() const { return host_cost; }
-    int GetSymbiontCost() const { return symb_cost; }
-    int GetHostScore() const { return host_score; }
-    int GetSymbiontScore() const { return symb_score; }
+    uint32_t GetHostCost() const { return host_cost; }
+    uint32_t GetSymbiontCost() const { return symb_cost; }
+    uint32_t GetHostScore() const { return host_score; }
+    uint32_t GetSymbiontScore() const { return symb_score; }
 
     void SetHost(const BitVector & genome, bool clear_symbiont=true) {
       host = genome;
@@ -135,11 +137,11 @@ namespace evo {
     }
 
     void Execute(bool align_symbiont=false,
-                 const std::function<int(int)> & symb_bonus00=[](int streak){ return streak; },
-                 const std::function<int(int)> & host_bonus01=[](int streak){ return streak; },
-                 const std::function<int(int)> & host_bonus1=[](int streak){ return 1; },
-                 const std::function<int(int)> & symb_bonus01=[](int streak){ return 0; },
-                 const std::function<int(int)> & host_bonus00=[](int streak){ return 0; }
+                 const std::function<uint32_t(uint32_t)> & symb_bonus00=[](uint32_t streak){ return streak; },
+                 const std::function<uint32_t(uint32_t)> & host_bonus01=[](uint32_t streak){ return streak; },
+                 const std::function<uint32_t(uint32_t)> & host_bonus1=[](uint32_t streak){ return 1; },
+                 const std::function<uint32_t(uint32_t)> & symb_bonus01=[](uint32_t streak){ return 0; },
+                 const std::function<uint32_t(uint32_t)> & host_bonus00=[](uint32_t streak){ return 0; }
                )
     {
       emp_assert(callbacks != nullptr);

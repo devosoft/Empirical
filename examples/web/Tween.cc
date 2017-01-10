@@ -1,5 +1,5 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
+// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
+// Copyright (C) Michigan State University, 2015. It is licensed
 // under the MIT Software license; see doc/LICENSE
 
 #include "../../web/web.h"
@@ -39,7 +39,7 @@ int main()
   doc << UI::Button([](){tween.Start();}, "Start!");
 
   doc << "<br>";
-  auto mycanvas = doc.AddCanvas(can_size, can_size, "can");
+  auto mycanvas = doc.AddCanvas((size_t) can_size, (size_t) can_size, "can");
   mycanvas.Circle(cx, cy, cr, "green", "purple");
   tween.AddPath(cx, cr, can_size-cr);
   tween.AddPath(cy, cr, can_size-cr);

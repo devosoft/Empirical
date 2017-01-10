@@ -40,6 +40,7 @@
 #include <string>
 
 #include "assert.h"
+#include "../debug/debug.h"
 #include "FunctionSet.h"
 #include "string_utils.h"
 #include "../meta/TypePack.h"
@@ -88,12 +89,14 @@ namespace emp {
     // BASE CLASS for all Signals
     class Signal_Base {
     protected:
-      std::string name;                     // What is the unique name of this signal?
-      std::map<LinkKey, int> link_key_map;  // Map unique link keys to link index for actions.
-      const int num_args;                   // How many arguments does this signal provide?
+      std::string name;                        // What is the unique name of this signal?
+      std::map<LinkKey, size_t> link_key_map;  // Map unique link keys to link index for actions.
+      const size_t num_args;                   // How many arguments does this signal provide?
 
       // Signal_Base should only be constructable from derrived classes.
-      Signal_Base(const std::string & n, int a) : name(n), num_args(a) { ; }
+      Signal_Base(const std::string & n, size_t a) : name(n), num_args(a) {
+        Depricated("signal.h", "Instead use reimplementation in control/ folder.");
+      }
     public:
       virtual ~Signal_Base() { ; }
 
@@ -104,7 +107,7 @@ namespace emp {
       Signal_Base & operator=(Signal_Base &&) = delete;
 
       const std::string & GetName() const { return name; }
-      int GetNumArgs() const { return num_args; }
+      size_t GetNumArgs() const { return num_args; }
 
       // NOTE: If a Trigger is called on a base class, convert the signal assuming that the args
       // map to the correct types (defined below with a dynamic cast to ensure correctness)
@@ -124,9 +127,9 @@ namespace emp {
     class Action_Base {
     protected:
       std::string name;          // Unique name for this action.
-      const int num_params;      // How many paramaters does this action have?
+      const size_t num_params;   // How many paramaters does this action have?
 
-      Action_Base(const std::string & n, int p) : name(n), num_params(p) { ; }
+      Action_Base(const std::string & n, size_t p) : name(n), num_params(p) { ; }
     public:
       virtual ~Action_Base() { ; }
 
@@ -143,12 +146,12 @@ namespace emp {
 
   class SignalManager {
   private:
-    std::map<std::string, internal::Signal_Base *> signals;         // Map names to signals
-    std::map<std::string, internal::Action_Base *> actions;         // Map names to actions
-    std::map<uint64_t, internal::Signal_Base*> link_key_to_signal;  // Map keys to signals
+    std::map<std::string, internal::Signal_Base *> signals;       // Map names to signals
+    std::map<std::string, internal::Action_Base *> actions;       // Map names to actions
+    std::map<size_t, internal::Signal_Base*> link_key_to_signal;  // Map keys to signals
 
-    uint64_t next_link_key;     // Each signal-action link should have a unique key id
-    uint64_t next_name_id;      // Used in order to build unique signal names
+    size_t next_link_key;     // Each signal-action link should have a unique key id
+    size_t next_name_id;      // Used in order to build unique signal names
 
     SignalManager() : next_link_key(0), next_name_id(0) { ; }
     SignalManager(const SignalManager &) = delete;
@@ -167,16 +170,16 @@ namespace emp {
       actions[name] = a;
     }
 
-    inline void PrintSignalNames(int indent=0) {
+    inline void PrintSignalNames(size_t indent=0) {
       for (const auto & s : signals) {
-        for (int i = 0; i < indent; i++) std::cout << " ";
+        for (size_t i = 0; i < indent; i++) std::cout << " ";
         std::cout << s.first << std::endl;
       }
     }
 
-    inline void PrintActionNames(int indent=0) {
+    inline void PrintActionNames(size_t indent=0) {
       for (const auto & s : actions) {
-        for (int i = 0; i < indent; i++) std::cout << " ";
+        for (size_t i = 0; i < indent; i++) std::cout << " ";
         std::cout << s.first << std::endl;
       }
     }
@@ -279,21 +282,21 @@ namespace emp {
   class Signal : public internal::Signal_Base {
   private:
     FunctionSet<void, ARGS...> actions;
-    static constexpr int arg_count = sizeof...(ARGS);
+    static constexpr size_t arg_count = sizeof...(ARGS);
   public:
     Signal(const std::string & name="") : internal::Signal_Base(name,sizeof...(ARGS)) {
       if (name != "") SignalManager::Get().Register(name, this);
     }
     ~Signal() { ; }
 
-    int GetNumActions() const { return actions.GetSize(); }
+    size_t GetNumActions() const { return actions.GetSize(); }
 
     inline void Trigger(ARGS... args) { actions.Run(args...); }
 
     // Add an action that takes the proper arguments.
     inline LinkKey AddAction(const std::function<void(ARGS...)> & in_fun) {
       const LinkKey link_id = SignalManager::Get().RegisterLink(this);
-      link_key_map[link_id] = (int) actions.size();
+      link_key_map[link_id] = actions.size();
       actions.Add(in_fun);
       return link_id;
     }
@@ -306,7 +309,7 @@ namespace emp {
       // If we made it here, we know the extra arguments that we need to throw away when
       // calling this function.  Call it correctly.
       const LinkKey link_id = SignalManager::Get().RegisterLink(this);
-      link_key_map[link_id] = (int) actions.size();
+      link_key_map[link_id] = actions.size();
       std::function<void(ARGS...)> full_fun =
         [in_fun](FUN_ARGS... args, EXTRA_ARGS...){ in_fun(std::forward<FUN_ARGS>(args)...); };
       actions.Add(full_fun);
@@ -325,7 +328,7 @@ namespace emp {
     // Add an action that takes no arguments.
     inline LinkKey AddAction(const std::function<void()> & in_fun) override {
       const LinkKey link_id = SignalManager::Get().RegisterLink(this);
-      link_key_map[link_id] = (int) actions.size();
+      link_key_map[link_id] = actions.size();
       actions.Add( [in_fun](ARGS...){ in_fun(); } );
       return link_id;
     }
@@ -352,14 +355,14 @@ namespace emp {
     }
     ~Signal() { ; }
 
-    inline int GetNumActions() const { return actions.GetSize(); }
+    inline size_t GetNumActions() const { return actions.GetSize(); }
 
     inline void Trigger() { actions.Run(); }
 
     // Add an action that takes the proper arguments.
     inline LinkKey AddAction(const std::function<void()> & in_fun) override {
       const LinkKey link_id = SignalManager::Get().RegisterLink(this);
-      link_key_map[link_id] = (int) actions.size();
+      link_key_map[link_id] = actions.size();
       actions.Add(in_fun);
       return link_id;
     }
@@ -376,7 +379,7 @@ namespace emp {
   LinkKey SignalManager::LinkSignal(internal::Signal_Base * s,
                                     const std::function<void(ARGS...)> & fun) {
     emp::Action<ARGS...> action(fun);
-    return s->AddAction(&action);
+    return s->AddAction(action);
   }
 
 
@@ -395,9 +398,9 @@ namespace emp {
     signal->Trigger(args...);
   }
 
-  inline void PrintSignalNames(int indent=0) { SignalManager::Get().PrintSignalNames(indent); }
-  inline void PrintActionNames(int indent=0) { SignalManager::Get().PrintActionNames(indent); }
-  inline void PrintSignalInfo(int indent=0) {
+  inline void PrintSignalNames(size_t indent=0) { SignalManager::Get().PrintSignalNames(indent); }
+  inline void PrintActionNames(size_t indent=0) { SignalManager::Get().PrintActionNames(indent); }
+  inline void PrintSignalInfo(size_t indent=0) {
     if (indent) std::cout << std::string(indent, ' ');
     std::cout << "SIGNAL NAMES:" << std::endl;
     SignalManager::Get().PrintSignalNames(indent+2);

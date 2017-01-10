@@ -10,12 +10,22 @@
 
 // EMP_TRACK_MEM must be defined in order to use the extra capabilities of emp::Ptr.
 // Normally this would be done at the command line with -DEMP_TRACK_MEM
+#ifndef EMP_TRACK_MEM
 #define EMP_TRACK_MEM
+#endif
 
 #include "../../tools/Ptr.h"
 
-struct TestBase { int x; TestBase(int _x):x(_x){;} virtual int Val(){return x;} };
-struct TestDerived : public TestBase { TestDerived(int _x):TestBase(_x){;} int Val(){return 2*x;} };
+struct TestBase {
+  int x;
+  TestBase(int _x) : x(_x) { ; }
+  virtual ~TestBase() { ; }
+  virtual int Val() { return x; }
+};
+struct TestDerived : public TestBase {
+  TestDerived(int _x) : TestBase(_x) { ; }
+  int Val(){return 2*x;}
+};
 
 int main()
 {
