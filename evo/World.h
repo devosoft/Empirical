@@ -430,7 +430,7 @@ namespace evo {
       emp_assert(count > 0);
       emp_assert(random_ptr != nullptr && "RouletteSelect() requires active random_ptr");
 
-      // @CAO: need to make sure all fitnesses are up to date...
+      popM.CalcFitnessAll(fit_fun);
 
       for (size_t n = 0; n < count; n++) {
         const double fit_pos = random_ptr->GetDouble(fitM.GetTotalFitness());
