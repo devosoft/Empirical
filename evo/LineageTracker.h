@@ -323,7 +323,6 @@ namespace evo{
   class LineageTracker_Standalone : public LineageTracker<PopulationManager_Base<ORG> > {
   protected:
     bool separate_generations;
-
   public:
 
     /// Construct a stand-alone lineage tracker. You must specify whether or not your
@@ -344,17 +343,17 @@ namespace evo{
     using org_ptr = typename LineageTracker<POP_MANAGER>::org_ptr;
     using ORG = typename LineageTracker<POP_MANAGER>::ORG;
 
-    using LineageTracker<POP_MANAGER>::next_org_id;
-    using LineageTracker<POP_MANAGER>::next_parent_id;
     using LineageTracker<POP_MANAGER>::separate_generations;
     using LineageTracker<POP_MANAGER>::genomes;
     using LineageTracker<POP_MANAGER>::new_generation;
-    using LineageTracker<POP_MANAGER>::inject;
     using LineageTracker<POP_MANAGER>::nodes;
     std::map<ORG, int> genome_counts;
 
   public:
     using LineageTracker<POP_MANAGER>::generation_since_update;
+    using LineageTracker<POP_MANAGER>::inject;
+    using LineageTracker<POP_MANAGER>::next_org_id;
+    using LineageTracker<POP_MANAGER>::next_parent_id;
     int last_coalesence = 0;
     using LineageTracker<POP_MANAGER>::emp_is_lineage_manager;
     // Add WriteDataToFile
@@ -388,11 +387,11 @@ namespace evo{
         TrackPlacement(pos);
       };
 
-      const std::function<void(const org_ptr)> TrackOffspringFun = [this] (const org_ptr org){
+      const std::function<void(const ORG*)> TrackOffspringFun = [this] (const ORG* org){
         TrackOffspring(org);
       };
 
-      const std::function<void(const org_ptr)> TrackInjectedOffspringFun = [this] (const org_ptr org){
+      const std::function<void(const ORG*)> TrackInjectedOffspringFun = [this] (const ORG* org){
         TrackInjectedOffspring(org);
       };
 
@@ -400,23 +399,38 @@ namespace evo{
         Update(ud);
       };
 
+      std::function<void(int)> TrackDeathFun = [this] (int pos){
+        TrackDeath(pos);
+      };
+
       w->OnBeforeRepro(RecordParentFun);
       w->OnOffspringReady(TrackOffspringFun);
       w->OnInjectReady(TrackInjectedOffspringFun);
       w->OnOrgPlacement(TrackPlacementFun);
+      w->OnOrgDeath(TrackDeathFun);
       w->OnUpdate(UpdateFun);
     }
 
     ~LineageTracker_Pruned() {;}
 
+    void TrackDeath(int pos) {
+      if (pos < 0) {
+        return;
+      }
+      int id = generation_since_update[pos];
+      nodes[id].alive = false;
+      generation_since_update[pos] = 0;
+      HandleDeath(pos);
+    }
 
-    void TrackOffspring(const org_ptr org) {
+
+    void TrackOffspring(const ORG* org) {
       next_org_id = this->AddOrganism(*org, next_parent_id);
       inject = false;
     }
 
     //Put newly injected organism into the lineage tracker
-    void TrackInjectedOffspring(const org_ptr org) {
+    void TrackInjectedOffspring(const ORG* org) {
       next_org_id = this->AddOrganism(*org, 0);
       inject = true;
     }
@@ -431,9 +445,30 @@ namespace evo{
       nodes[next_org_id].loc = pos;
 
       //This org is no longer alive
+      HandleDeath(pos);
+
+      //Update mapping of lineage tracker ids to locations in population
+      if (separate_generations && !inject){
+        if (pos >= (int) new_generation.size()) {
+          new_generation.resize(pos+1);
+        }
+        new_generation[pos] = next_org_id;
+
+      } else {
+        if (pos >= (int) generation_since_update.size()) {
+          generation_since_update.resize(pos+1);
+        }
+        generation_since_update[pos] = next_org_id;
+      }
+
+    }
+
+    void HandleDeath(int pos){
+
       if ( (int) generation_since_update.size() <= pos){
         generation_since_update.resize(pos+1);
       }
+
       Node<org_ptr>* curr = &(nodes[generation_since_update[pos]]);
       curr->alive = false;
 
@@ -449,9 +484,9 @@ namespace evo{
         //Remove this organism from its parents list of offspring with
         //surviving descendants
         curr->parent->offspring.erase(
-                                  std::remove(curr->parent->offspring.begin(),
-                                  curr->parent->offspring.end(), curr ),
-                                  curr->parent->offspring.end() );
+                                    std::remove(curr->parent->offspring.begin(),
+                                    curr->parent->offspring.end(), curr ),
+                                    curr->parent->offspring.end() );
 
         //See if we can remove this genome from the record
         ORG genome = *(curr->genome);
@@ -475,21 +510,6 @@ namespace evo{
         curr = curr->offspring[0];
         last_coalesence = curr->id;
       }
-
-      //Update mapping of lineage tracker ids to locations in population
-      if (separate_generations && !inject){
-        if (pos >= (int) new_generation.size()) {
-          new_generation.resize(pos+1);
-        }
-        new_generation[pos] = next_org_id;
-
-      } else {
-        if (pos >= (int) generation_since_update.size()) {
-          generation_since_update.resize(pos+1);
-        }
-        generation_since_update[pos] = next_org_id;
-      }
-
     }
 
     //Record the org that's about to have an offspring, so we can know
@@ -507,8 +527,8 @@ namespace evo{
       int id = this->next++;
 
       //Create stuct to store info on this organism
-      nodes[id] = Node<org_ptr>();
-      Node<org_ptr>* curr = &nodes[id];
+      //nodes[id] = Node<org_ptr>();
+      Node<ORG*>* curr = &nodes[id];
       curr->parent = &nodes[parent];
       curr->parent->offspring.push_back(&nodes[id]);
       curr->id = id;
@@ -517,9 +537,9 @@ namespace evo{
       //Store genomes in a set so we don't need to have a bunch
       //of duplicates lying around
       std::pair<typename std::unordered_set<ORG>::iterator, bool> ret;
-      ret = genomes.insert(org);
+      ret = genomes.insert(ORG(org));
       typename std::unordered_set<ORG>::iterator it = ret.first;
-      org_ptr genome = (org_ptr)&(*it);
+      ORG* genome = (ORG*)&(*it);
       curr->genome = genome;
       if (ret.second) {
         genome_counts[*genome] = 1;
@@ -544,6 +564,24 @@ namespace evo{
         new_generation.resize(0);
       }
     }
+};
+
+/// A lineage tracker object to be used outside of the Empirical evol framework
+template <typename ORG>
+class LineageTrackerPruned_Standalone : public LineageTracker_Pruned<PopulationManager_Base<ORG> > {
+protected:
+  bool separate_generations;
+public:
+
+  /// Construct a stand-alone lineage tracker. You must specify whether or not your
+  /// system has separated generations (i.e. generations which are separated, rather than
+  /// having a steady-state population in which there is a death for every birth)
+  // Development note: There is no default value for separate_generations, because both
+  // set-ups are common, and making the wrong assumption would produce wrong results in either
+  // direction
+  LineageTrackerPruned_Standalone(bool has_separate_generations) :
+      separate_generations(has_separate_generations) {;}
+
 };
 
 

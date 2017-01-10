@@ -27,7 +27,7 @@
 #include <functional>
 
 
-emp::web::SpatialGridLineageVisualization lineage_viz(6000, 5000);
+emp::web::SpatialGridTreeVisualization<> lineage_viz(6000, 5000);
 emp::web::Document doc("lineage_viz");
 
 int main() {

@@ -17,6 +17,7 @@
 #include "../../web/d3/axis.h"
 #include "../../web/d3/svg_shapes.h"
 #include "../../web/d3/layout.h"
+#include "../../web/d3/visual_elements.h"
 
 #include <functional>
 #include <algorithm>
@@ -88,6 +89,8 @@ public:
       info = new D3VisualizationInfo(this, in_id);
       Info()->width = w;
       Info()->height = h;
+      EM_ASM({window["emp"]["__default_draw_data_callback"] =
+              function(){console.log("drawing data");};});
   }
 
   D3Visualization(const D3Visualization & in) : WidgetFacet(in) { ; }
@@ -106,9 +109,9 @@ public:
   bool init = false;
 
   /// Callback function for drawing data after rescale animation
-  std::string draw_data_callback = "";
+  std::string draw_data_callback = "__default_draw_data_callback";
 
-  virtual void Setup(){;}
+  virtual void Setup(){}
 
   /// @cond TEMPLATES
   template <typename T>
@@ -137,6 +140,7 @@ public:
   virtual void AnimateStep(int parent, int offspring){;}
   */
 };
+
 
 class DotPlot : public D3Visualization {
 private:
@@ -842,22 +846,15 @@ public:
     return this->color_fun_node(d.source(), i);
   };
 
-  std::function<int(LegendNode)> get_x = [this](LegendNode d) {
-    return legend_cell_size*(d.loc() % grid_width);
-  };
 
-  std::function<int(LegendNode)> get_y = [this](LegendNode d) {
-    return legend_cell_size*(d.loc() / grid_width);
-  };
-
-  std::function<void(LegendNode, int, int)> legend_mouseover = [this](LegendNode d, int i, D3::Selection s) {
+  std::function<void(LegendNode, int)> legend_mouseover = [this](LegendNode d, int il) {
     legend.SelectAll("rect").Filter([d](LegendNode in_data){return d.loc() != in_data.loc();}).SetClassed("faded", true);
     GetSVG()->SelectAll(".node").Filter([d](LegendNode in_data){return d.loc() != in_data.loc();}).SetClassed("faded", true);
     EM_ASM_ARGS({emp.filter_fun = function(d){return d.source.loc != $0;}}, d.loc());
     GetSVG()->SelectAll(".link").Filter("filter_fun").SetClassed("faded", true);
   };
 
-  std::function<void(LegendNode, int, int)> legend_mouseout = [this](LegendNode d, int i, D3::Selection s) {
+  std::function<void(LegendNode, int)> legend_mouseout = [this](LegendNode d, int i) {
     legend.SelectAll("rect")
           .Filter([d](LegendNode in_data){return d.loc() != in_data.loc();})
           .SetClassed("faded", false);
@@ -878,32 +875,22 @@ public:
     JSWrap(color_fun_link, GetID()+"color_fun_link");
     JSWrap(legend_mouseover, GetID()+"legend_mouseover");
     JSWrap(legend_mouseout, GetID()+"legend_mouseout");
-    JSWrap(get_x, GetID()+"get_x");
-    JSWrap(get_y, GetID()+"get_y");
-    tip.SetHtml(D3::ToolTip([this](NODE d){
+
+    tip->SetHtml([this](NODE d){
                     return "ID: " + to_string(d.name()) + ", Pos: ("
                            + to_string(d.loc()% grid_width) + ", "
                            + to_string(d.loc()/grid_width) + ")";
-                }));
+                });
 
     legend = D3::Select("body").Append("svg");
 
-    legend.SetAttr("x", 1000).SetAttr("y", 0).SetAttr("width", legend_cell_size*grid_width).SetAttr("height", legend_cell_size*grid_height);
+    legend.SetAttr("x", 1000).SetAttr("y", 0);//.SetAttr("width", legend_cell_size*grid_width).SetAttr("height", legend_cell_size*grid_height);
     legend.SetStyle("position", "fixed").SetStyle("right", "10px").SetStyle("top", "10px");//.SetStyle("width", "10%");//.SetStyle("height", "10%");
-    emp::vector<LegendNode> legend_data(grid_width*grid_height);
-    for (int i = 0; i < grid_width*grid_height; ++i) {
-      legend_data[i].loc(i);
-    }
 
-    legend.SelectAll("rect").Data(legend_data)
-                            .EnterAppend("rect")
-                            .SetStyle("fill", GetID()+"color_fun_node")
+    D3::TileGrid<LegendNode> legend_grid(grid_width, grid_height, legend_cell_size, legend);
+
+    legend.SelectAll("rect").SetStyle("fill", GetID()+"color_fun_node")
                             .SetStyle("stroke", GetID()+"color_fun_node")
-                            .SetStyle("stroke-width", 1)
-                            .SetAttr("width", legend_cell_size)
-                            .SetAttr("height", legend_cell_size)
-                            .SetAttr("x", GetID()+"get_x")
-                            .SetAttr("y", GetID()+"get_y")
                             .On("mouseover", GetID()+"legend_mouseover")
                             .On("mouseout", GetID()+"legend_mouseout");
   }
