@@ -12,8 +12,11 @@
 #ifndef EMP_EVO_POPULATION_MANAGER_H
 #define EMP_EVO_POPULATION_MANAGER_H
 
+#include <map>
+
 #include "../tools/random_utils.h"
 #include "../tools/Range.h"
+#include "../control/SignalManager.h"
 
 #include "PopulationIterator.h"
 
