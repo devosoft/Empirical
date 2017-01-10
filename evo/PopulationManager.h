@@ -62,6 +62,9 @@ namespace evo {
     double CalcFitness(size_t id, const std::function<double(ORG*)> & fit_fun) const {
       return fitM.CalcFitness(id, pop[id], fit_fun);
     }
+    void CalcFitnessAll(const std::function<double(ORG*)> & fit_fun) const {
+      for (size_t id = 0; id < pop.size; id++) fitM.CalcFitness(id, pop[id], fit_fun);
+    }
 
     void SetRandom(Random * r) { random_ptr = r; }
     void Setup(Random * r) { SetRandom(r); }
