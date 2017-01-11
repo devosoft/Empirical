@@ -127,6 +127,7 @@ namespace evo {
       emp_assert(new_size >= 0);
       for (size_t i = new_size; i < pop.size(); i++) ClearOrgAt(i); // Remove orgs out or range.
       pop.resize(new_size, nullptr);  // Initialize new orgs as null.
+      fitM.Resize(new_size);
     }
 
     void Update() { ; } // Basic version of Update() does nothing, but World may trigger actions.
