@@ -49,8 +49,8 @@ namespace evo {
     static constexpr bool WeightsTracked() { return false; }
 
     // These functions only work properly in FitnessManager_Weights...
-    static double GetTotalFitness() { emp_assert(false); return 0.0; }
-    static size_t At(double index) { emp_assert(false); return 0; }
+    static double GetTotalFitness() { emp_assert(false, "Use FitnessManager_Weights"); return 0.0; }
+    static size_t At(double index) { emp_assert(false, "Use FitnessManager_Weights"); return 0; }
   };
 
   class FitnessManager_CacheOrg : public FitnessManager_Base {
@@ -103,9 +103,15 @@ namespace evo {
 
     template <typename ORG>
     double CalcFitness(size_t id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
+      // Organisms that don't exist should have a zero fitness.
+      if (!org) return 0.0;
+
+      // If we don't have a fitness cached calculate it an PUT IT IN THE CACHE.
       if (weight_info.GetWeight(id) == 0.0) {
         weight_info[id] = fit_fun(org);
       }
+
+      // Return the fitness in the cache.
       return weight_info.GetWeight(id);
     }
 
