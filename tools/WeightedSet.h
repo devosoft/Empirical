@@ -149,7 +149,9 @@ namespace emp {
 
     size_t Index(double index, size_t cur_id=0) const {
       ResolveRefresh();
-      emp_assert(index < tree_weight[0]);  // Cannot index beyond end of set.
+
+      // Make sure we don't try to index beyond end of set.
+      emp_assert(index < tree_weight[0], index, tree_weight.size(), tree_weight[0]);
 
       // If our target is in the current node, return it!
       const double cur_weight = item_weight[cur_id];
