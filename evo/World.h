@@ -435,7 +435,7 @@ namespace evo {
       for (size_t n = 0; n < count; n++) {
         const double fit_pos = random_ptr->GetDouble(fitM.GetTotalFitness());
         size_t id = fitM.At(fit_pos);
-        InsertBirth( *(popM[id]), id, 1 );
+        InsertBirth( *(popM[id]), id, 1, fit_fun );
       }
     }
 
