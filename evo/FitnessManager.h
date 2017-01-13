@@ -46,11 +46,12 @@ namespace evo {
     static constexpr bool Resize(size_t) { return false; }
     static constexpr bool Resize(size_t, double) { return false; }
 
-    static constexpr bool WeightsTracked() { return false; }
+    static constexpr bool IsCached() { return false; } // Is this FitnessManager_Cached or Tracker?
+    static constexpr bool IsTracked() { return false; } // Is this FitnessManager_Tracker?
 
-    // These functions only work properly in FitnessManager_Weights...
-    static double GetTotalFitness() { emp_assert(false, "Use FitnessManager_Weights"); return 0.0; }
-    static size_t At(double index) { emp_assert(false, "Use FitnessManager_Weights"); return 0; }
+    // These functions only work properly in FitnessManager_Tracker...
+    static double GetTotalFitness() { emp_assert(false, "Use FitnessManager_Tracker"); return 0.0; }
+    static size_t At(double index) { emp_assert(false, "Use FitnessManager_Tracker"); return 0; }
   };
 
   class FitnessManager_CacheOrg : public FitnessManager_Base {
@@ -89,11 +90,13 @@ namespace evo {
     bool ClearPop() { fit_cache.resize(0); return true; }
     bool Resize(size_t new_size) { fit_cache.resize(new_size); return true; }
     bool Resize(size_t new_size, double def_val) { fit_cache.resize(new_size, def_val); return true; }
+
+    static constexpr bool IsCached() { return true; } // Is this FitnessManager_Cached or Tracker?
   };
 
 
   // FitnessManager_Proportion requires the user to maintain fitness.
-  class FitnessManager_Weights : public FitnessManager_Base {
+  class FitnessManager_Tracker : public FitnessManager_Base {
   protected:
     WeightedSet weight_info; // Data structure to use for roulette selection.
 
@@ -123,16 +126,17 @@ namespace evo {
     bool Resize(size_t new_size) { weight_info.Resize(new_size); return true; }
     bool Resize(size_t new_size, double def_val) { weight_info.Resize(new_size, def_val); return true; }
 
-    static constexpr bool WeightsTracked() { return true; }
+    static constexpr bool IsCached() { return true; } // Is this FitnessManager_Cached or Tracker?
+    static constexpr bool IsTracked() { return true; } // Is this FitnessManager_Tracker?
 
     double GetTotalFitness() const { return weight_info.GetWeight(); }
     size_t At(double index) const { return weight_info.Index(index); }
   };
 
 
-  using CacheOff = FitnessManager_Base;
-  using CacheOrgs = FitnessManager_CacheOrg;
-  using FitWeights = FitnessManager_Weights;
+  using FitCacheOff = FitnessManager_Base;
+  using FitCacheOn = FitnessManager_CacheOrg;
+  using FitTrack = FitnessManager_Tracker;
 }
 }
 
