@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
   // emp::evo::NKLandscapeMemo landscape(N, K, random);
 
   // emp::evo::EAWorld<BitOrg, emp::evo::CacheOff> pop(random, "NKWorld");
-  emp::evo::EAWorld<BitOrg, emp::evo::CacheOrgs> pop(random, "NKWorld");
+  emp::evo::EAWorld<BitOrg, emp::evo::FitCacheOn> pop(random, "NKWorld");
 
   // Build a random initial population
   for (uint32_t i = 0; i < POP_SIZE; i++) {

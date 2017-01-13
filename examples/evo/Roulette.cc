@@ -29,7 +29,7 @@ int main()
     return emp::to_string(out_char);
   };
 
-  evo::GridWorld<int, emp::evo::FitWeights> grid_world(random);
+  evo::GridWorld<int, emp::evo::FitTrack> grid_world(random);
   const size_t side = (size_t) std::sqrt(POP_SIZE);
   grid_world.ConfigPop(side, side);
   emp_assert(grid_world.GetSize() == POP_SIZE); // POP_SIZE needs to be a perfect square.
