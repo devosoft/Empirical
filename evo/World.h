@@ -151,7 +151,7 @@ namespace evo {
     using dist_fun_t = std::function<double(ORG*,ORG*)>;
 
     // Determine manager types...
-    using fitM_t = SelectFitnessManager<MANAGERS...,CacheOff>;
+    using fitM_t = SelectFitnessManager<MANAGERS...,FitCacheOff>;
     using popM_t = AdaptTemplate<SelectPopManager<MANAGERS...,PopBasic>, ORG, fitM_t>;
     using orgM_t = AdaptTemplate<SelectOrgManager<MANAGERS...,OrgMDynamic>, ORG>;
     using statsM_t = AdaptTemplate<SelectStatsManager<MANAGERS...,NullStats >, popM_t>;
