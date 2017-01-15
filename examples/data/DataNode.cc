@@ -11,7 +11,7 @@
 
 int main()
 {
-  emp::DataNode<int, emp::DataCurrent, emp::DataStats> data;
+  emp::DataNode<int, emp::data::Current, emp::data::Range> data;
   data.Add(27, 28, 29);
 
   std::cout << "=> Added 27, 28, and 29" << std::endl;

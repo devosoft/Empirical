@@ -8,10 +8,11 @@
 //  @CAO: Pehaps each of the functions below can be part of an add-on module?
 //
 //  Collection: New data can be pushed or pulled.
-//   PushData(VAL v) provides data to a node
-//      - can be used as an action for a signal
-//      - triggers a signal to inform others that a datum has been collected
-//   PullData() triggers a signal that can be monitored to collect data.
+//   Add(VAL... v) pushes data to a node
+//   AddDatum(VAL v) pushes just one datum, but can be used as an action for a signal.
+//   @CAO: Should Add trigger a signal to inform others that a datum has been collected?
+
+//   @CAO: PullData() triggers a signal that can be monitored to collect data.
 //
 //  Storage: Three types of storage. By default, the stored type may be anything, but stats
 //           require a type that math can be performed on.
@@ -33,11 +34,13 @@
 
 namespace emp {
 
-  class DataCurrent;    // Track most recent value
-  class DataStats;      // Track min, max, mean, total
-  class DataStatsFull;  // Track DataStats + variance, standard deviation, skew, kertosis
-  class DataPrev;
-  class DataArchive;
+  namespace data {
+    class Current;   // Track most recent value
+    class Range;     // Track min, max, mean, total
+    // class Stats;     // Track Range + variance, standard deviation, skew, kertosis
+    // class Prev;      // Track values stored before previous reset.
+    // class Archive;   // Track ALL values (or last N?)
+  }
 
   // Generic form of DataNodeModule (should never be used; trigger error!)
   template <typename VAL_TYPE, typename... MODS> class DataNodeModule {
@@ -62,12 +65,13 @@ namespace emp {
   };
 
   // Specialized forms of DataNodeModule
+  // == data::Current ==
   template <typename VAL_TYPE, typename... MODS>
-  class DataNodeModule<VAL_TYPE, DataCurrent, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  class DataNodeModule<VAL_TYPE, data::Current, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
     VAL_TYPE cur_val;
 
-    using this_t = DataNodeModule<VAL_TYPE, DataCurrent, MODS...>;
+    using this_t = DataNodeModule<VAL_TYPE, data::Current, MODS...>;
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
     using base_t = DataNodeModule<VAL_TYPE>;
   public:
@@ -79,13 +83,13 @@ namespace emp {
   };
 
   template <typename VAL_TYPE, typename... MODS>
-  class DataNodeModule<VAL_TYPE, DataStats, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  class DataNodeModule<VAL_TYPE, data::Range, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
     double total;
     double min;
     double max;
 
-    using this_t = DataNodeModule<VAL_TYPE, DataCurrent, MODS...>;
+    using this_t = DataNodeModule<VAL_TYPE, data::Range, MODS...>;
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
     using base_t = DataNodeModule<VAL_TYPE>;
 
