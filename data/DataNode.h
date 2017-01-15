@@ -54,11 +54,11 @@ namespace emp {
 
     using value_t = VAL_TYPE;
 
-    void Reset() { ; }
-
     size_t GetCount() const { return val_count; }
 
     void AddDatum(const VAL_TYPE & val) { val_count++; }
+
+    void Reset() { val_count = 0; }
   };
 
   // Specialized forms of DataNodeModule
@@ -104,6 +104,13 @@ namespace emp {
       if (!val_count || val > max) max = val;
       parent_t::AddDatum(val);
     }
+
+    void Reset() {
+      total = 0.0;
+      min = 0.0;
+      max = 0.0;
+      parent_t::Reset();
+    }
   };
 
   template <typename VAL_TYPE, typename... MODS>
@@ -112,11 +119,17 @@ namespace emp {
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
 
   public:
-    void AddDatum(const VAL_TYPE & val) { parent_t::AddDatum(val); }
-    void Add() { ; }
+
+    // Methods to retrieve new data.
+    inline void Add() { ; }
 
     template <typename... Ts>
-    void Add(const VAL_TYPE & val, const Ts &... extras) { AddDatum(val); Add(extras...); }
+    inline void Add(const VAL_TYPE & val, const Ts &... extras) {
+      parent_t::AddDatum(val); Add(extras...);
+    }
+
+    // Methods to reset data.
+    void Reset() { parent_t::Reset(); }
   };
 
 }
