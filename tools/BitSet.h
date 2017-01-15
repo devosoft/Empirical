@@ -399,7 +399,7 @@ namespace emp {
 
       const int pos_found = find_bit(bit_set[field_id]);
       bit_set[field_id] &= ~(1U << pos_found);
-      return pos_found + (field_id << 5);
+      return pos_found + (int)(field_id << 5);
     }
 
 
@@ -407,7 +407,7 @@ namespace emp {
       // @CAO -- There are better ways to do this with bit tricks
       //         (but start_pos is tricky...)
       for (size_t i = start_pos; i < NUM_BITS; i++) {
-        if (Get(i)) return i;
+        if (Get(i)) return (int) i;
       }
       return -1;
     }
