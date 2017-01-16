@@ -30,6 +30,7 @@
 #ifndef EMP_DATA_NODE_H
 #define EMP_DATA_NODE_H
 
+#include "../base/vector.h"
 #include "../tools/assert.h"
 
 namespace emp {
@@ -86,6 +87,32 @@ namespace emp {
 
     void AddDatum(const VAL_TYPE & val) { cur_val = val; parent_t::AddDatum(val); }
   };
+
+
+  template <typename VAL_TYPE, typename... MODS>
+  class DataNodeModule<VAL_TYPE, data::Log, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  protected:
+    emp::vector<VAL_TYPE> val_set;
+
+    using this_t = DataNodeModule<VAL_TYPE, data::Log, MODS...>;
+    using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
+    using base_t = DataNodeModule<VAL_TYPE>;
+
+    using base_t::val_count;
+  public:
+    DataNodeModule() { ; }
+
+    void AddDatum(const VAL_TYPE & val) {
+      val_set.push_back(val);
+      parent_t::AddDatum(val);
+    }
+
+    void Reset() {
+      val_set.resize(0);
+      parent_t::Reset();
+    }
+  };
+
 
   template <typename VAL_TYPE, typename... MODS>
   class DataNodeModule<VAL_TYPE, data::Range, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
