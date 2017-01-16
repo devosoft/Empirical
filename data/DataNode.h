@@ -34,12 +34,17 @@
 
 namespace emp {
 
+  // A set of modifiers are available do describe DataNode
   namespace data {
     class Current;   // Track most recent value
+
+    class Log;       // Track all values since last Reset()
+    // class Prev;      // Track Log + values from previous Reset().
+    // class Archive;   // Track Log + ALL values over time (with purge options)
+
     class Range;     // Track min, max, mean, total
     // class Stats;     // Track Range + variance, standard deviation, skew, kertosis
-    // class Prev;      // Track values stored before previous reset.
-    // class Archive;   // Track ALL values (or last N?)
+    // class FullStats; // Track States + ALL values over time (with purge/merge options)
   }
 
   // Generic form of DataNodeModule (should never be used; trigger error!)
