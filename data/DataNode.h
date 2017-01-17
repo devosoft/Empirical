@@ -70,6 +70,7 @@ namespace emp {
     size_t GetCount() const { return val_count; }
 
     void AddDatum(const VAL_TYPE & val) { val_count++; }
+    void PullData_impl() { ; }
 
     void Reset() { val_count = 0; }
   };
@@ -174,15 +175,16 @@ namespace emp {
       for (const auto & x : pull_sets) {
         in_vals.insert(in_vals.end(), x.begin(), x.end());
       }
-      // @CAO do something with in_vals?
     }
-    void AddPull();
+    void AddPull(const std::function<VAL_TYPE()> & fun) { pull_funs.Add(fun); }
+    void AddPullSet(const std::function<emp::vector<VAL_TYPE>()> & fun) { pull_set_funs.Add(fun); }
   };
 
   template <typename VAL_TYPE, typename... MODS>
   class DataNode : public DataNodeModule<VAL_TYPE, MODS...> {
   private:
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
+    using parent_t::in_vals;
 
   public:
 
@@ -192,6 +194,11 @@ namespace emp {
     template <typename... Ts>
     inline void Add(const VAL_TYPE & val, const Ts &... extras) {
       parent_t::AddDatum(val); Add(extras...);
+    }
+
+    void PullData() {
+      parent_t::PullData_impl();                                     // Pull all data into in_vals.
+      for (const VAL_TYPE & val : in_vals) parent_t::AddDatum(val);  // Actually add the data.
     }
 
     // Methods to reset data.
