@@ -30,29 +30,31 @@
 namespace emp {
 
   // A set of modifiers are available do describe DataNode
-  namespace data {
-    class Current;   // Track most recent value
+  enum class data {
+    Current,      // Track most recent value
 
-    class Log;       // Track all values since last Reset()
-    // class Prev;      // Track Log + values from previous Reset().
-    // class Archive;   // Track Log + ALL values over time (with purge options)
+    Log,          // Track all values since last Reset()
+    // Prev,         // Track Log + values from previous Reset().
+    // Archive,      // Track Log + ALL values over time (with purge options)
 
-    class Range;     // Track min, max, mean, total
-    // class Stats;     // Track Range + variance, standard deviation, skew, kertosis
-    // class FullStats; // Track States + ALL values over time (with purge/merge options)
+    Range,        // Track min, max, mean, total
+    // Stats,        // Track Range + variance, standard deviation, skew, kertosis
+    // FullStats,    // Track States + ALL values over time (with purge/merge options)
 
-    class Pull;      // Enable data collection on request.
+    Pull,         // Enable data collection on request.
 
     // Various signals are possible:
-    class SignalReset;  // Include a signal that triggers BEFORE Reset() to process data.
-    class SignalData;   // Include a signal when new data is added (as a group)
-    class SignalDatum;  // Include a signal when each datum is added.
-    class SignalRange;  // Include a signal for data in a range.
-    class SignalLimits; // Include a signal for data OUTSIDE a range.
-  }
+    SignalReset,  // Include a signal that triggers BEFORE Reset() to process data.
+    SignalData,   // Include a signal when new data is added (as a group)
+    SignalDatum,  // Include a signal when each datum is added.
+    SignalRange,  // Include a signal for data in a range.
+    SignalLimits, // Include a signal for data OUTSIDE a range.
+
+    UNKNOWN       // Unknown modifier; will trigger error.
+  };
 
   // Generic form of DataNodeModule (should never be used; trigger error!)
-  template <typename VAL_TYPE, typename... MODS> class DataNodeModule {
+  template <typename VAL_TYPE, emp::data... MODS> class DataNodeModule {
   public:  DataNodeModule() { emp_assert(false, "Unknown module used in DataNode!"); }
   };
 
@@ -78,7 +80,7 @@ namespace emp {
   // Specialized forms of DataNodeModule
 
   // == data::Current ==
-  template <typename VAL_TYPE, typename... MODS>
+  template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Current, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
     VAL_TYPE cur_val;
@@ -96,7 +98,7 @@ namespace emp {
 
 
   // == data::Log ==
-  template <typename VAL_TYPE, typename... MODS>
+  template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Log, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
     emp::vector<VAL_TYPE> val_set;
@@ -121,7 +123,7 @@ namespace emp {
   };
 
   // == data::Range ==
-  template <typename VAL_TYPE, typename... MODS>
+  template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Range, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
     double total;
@@ -157,7 +159,7 @@ namespace emp {
   };
 
   // == data::Pull ==
-  template <typename VAL_TYPE, typename... MODS>
+  template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Pull, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
     emp::FunctionSet<VAL_TYPE> pull_funs;
@@ -180,7 +182,7 @@ namespace emp {
     void AddPullSet(const std::function<emp::vector<VAL_TYPE>()> & fun) { pull_set_funs.Add(fun); }
   };
 
-  template <typename VAL_TYPE, typename... MODS>
+  template <typename VAL_TYPE, emp::data... MODS>
   class DataNode : public DataNodeModule<VAL_TYPE, MODS...> {
   private:
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
