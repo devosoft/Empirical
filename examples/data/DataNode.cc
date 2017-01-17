@@ -11,7 +11,7 @@
 
 int main()
 {
-  emp::DataNode<int, emp::data::Current, emp::data::Range> data;
+  emp::DataNode<int, emp::data::Current, emp::data::Range, emp::data::Pull> data;
   data.Add(27, 28, 29);
 
   std::cout << "=> Added 27, 28, and 29" << std::endl;
@@ -40,6 +40,15 @@ int main()
 
   data.Add(100,200,300,400,500);
   std::cout << "\nAdded 100,200,300,400,500" << std::endl;
+  std::cout << "Current = " << data.GetCurrent() << std::endl;
+  std::cout << "Total   = " << data.GetTotal() << std::endl;
+  std::cout << "Mean    = " << data.GetMean() << std::endl;
+  std::cout << "Min     = " << data.GetMin() << std::endl;
+  std::cout << "Max     = " << data.GetMax() << std::endl;
+
+  data.AddPull([](){return -800;});
+  data.PullData();
+  std::cout << "\nAdded -800 via PullData()" << std::endl;
   std::cout << "Current = " << data.GetCurrent() << std::endl;
   std::cout << "Total   = " << data.GetTotal() << std::endl;
   std::cout << "Mean    = " << data.GetMean() << std::endl;
