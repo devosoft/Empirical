@@ -54,4 +54,13 @@ int main()
   std::cout << "Mean    = " << data.GetMean() << std::endl;
   std::cout << "Min     = " << data.GetMin() << std::endl;
   std::cout << "Max     = " << data.GetMax() << std::endl;
+
+  data.AddPullSet([](){return emp::vector<int>({1600,0,0});});
+  data.PullData();
+  std::cout << "\nAdded another -800, +800, and two 0's via PullData()" << std::endl;
+  std::cout << "Current = " << data.GetCurrent() << std::endl;
+  std::cout << "Total   = " << data.GetTotal() << std::endl;
+  std::cout << "Mean    = " << data.GetMean() << std::endl;
+  std::cout << "Min     = " << data.GetMin() << std::endl;
+  std::cout << "Max     = " << data.GetMax() << std::endl;
 }
