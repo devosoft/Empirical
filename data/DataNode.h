@@ -25,6 +25,7 @@
 
 #include "../base/vector.h"
 #include "../tools/assert.h"
+#include "../tools/FunctionSet.h"
 
 namespace emp {
 
@@ -40,7 +41,7 @@ namespace emp {
     // class Stats;     // Track Range + variance, standard deviation, skew, kertosis
     // class FullStats; // Track States + ALL values over time (with purge/merge options)
 
-    class PullData;     // Enable data collection on request.
+    class Pull;      // Enable data collection on request.
 
     // Various signals are possible:
     class SignalReset;  // Include a signal that triggers BEFORE Reset() to process data.
@@ -73,6 +74,7 @@ namespace emp {
   };
 
   // Specialized forms of DataNodeModule
+
   // == data::Current ==
   template <typename VAL_TYPE, typename... MODS>
   class DataNodeModule<VAL_TYPE, data::Current, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
@@ -91,6 +93,7 @@ namespace emp {
   };
 
 
+  // == data::Log ==
   template <typename VAL_TYPE, typename... MODS>
   class DataNodeModule<VAL_TYPE, data::Log, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
@@ -115,7 +118,7 @@ namespace emp {
     }
   };
 
-
+  // == data::Range ==
   template <typename VAL_TYPE, typename... MODS>
   class DataNodeModule<VAL_TYPE, data::Range, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
@@ -149,6 +152,31 @@ namespace emp {
       max = 0.0;
       parent_t::Reset();
     }
+  };
+
+  // == data::Pull ==
+  template <typename VAL_TYPE, typename... MODS>
+  class DataNodeModule<VAL_TYPE, data::Pull, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  protected:
+    emp::FunctionSet<VAL_TYPE> pull_funs;
+    emp::FunctionSet<emp::vector<VAL_TYPE>> pull_set_funs;
+    emp::vector<VAL_TYPE> in_vals;
+
+    using this_t = DataNodeModule<VAL_TYPE, data::Pull, MODS...>;
+    using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
+    using base_t = DataNodeModule<VAL_TYPE>;
+
+    using base_t::val_count;
+  public:
+    void PullData_impl() {
+      in_vals = pull_funs.Run();
+      const emp::vector< emp::vector<VAL_TYPE> > & pull_sets = pull_set_funs.Run();
+      for (const auto & x : pull_sets) {
+        in_vals.insert(in_vals.end(), x.begin(), x.end());
+      }
+      // @CAO do something with in_vals?
+    }
+    void AddPull();
   };
 
   template <typename VAL_TYPE, typename... MODS>
