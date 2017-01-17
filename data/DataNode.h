@@ -60,7 +60,8 @@ namespace emp {
   template <typename VAL_TYPE>
   class DataNodeModule<VAL_TYPE> {
   protected:
-    size_t val_count;
+    size_t val_count;               // How many values have been loaded?
+    emp::vector<VAL_TYPE> in_vals;  // What values are waiting to be included?
   public:
     DataNodeModule() : val_count(0) { ; }
 
@@ -160,13 +161,12 @@ namespace emp {
   protected:
     emp::FunctionSet<VAL_TYPE> pull_funs;
     emp::FunctionSet<emp::vector<VAL_TYPE>> pull_set_funs;
-    emp::vector<VAL_TYPE> in_vals;
 
     using this_t = DataNodeModule<VAL_TYPE, data::Pull, MODS...>;
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
     using base_t = DataNodeModule<VAL_TYPE>;
 
-    using base_t::val_count;
+    using base_t::in_vals;
   public:
     void PullData_impl() {
       in_vals = pull_funs.Run();
