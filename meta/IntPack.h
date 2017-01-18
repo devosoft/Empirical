@@ -34,14 +34,14 @@ namespace emp {
     };
 
     template <int V, typename T_IN, typename T_OUT >
-    struct ip_remove {
+    struct ip_scan {
       using in_pop = typename T_IN::pop;
-      using out_push = typename T_OUT::template push_back_if_not<T_IN::first, V>;
-      using result = typename ip_remove< V, in_pop, out_push >::result;
+      using out_pbin = typename T_OUT::template push_back_if_not<T_IN::first, V>;
+      using remove = typename ip_scan< V, in_pop, out_pbin >::remove;
     };
     template <int V, typename T_OUT >
-    struct ip_remove <V, IntPack<>, T_OUT> {
-      using result = T_OUT;
+    struct ip_scan <V, IntPack<>, T_OUT> {
+      using remove = T_OUT;
     };
 
     template <int V, int X, typename T>
@@ -71,7 +71,7 @@ namespace emp {
     template <int V> using push_back = IntPack<V1, Vs..., V>;
     template <int V, int X> using push_if_not = typename ip_push_if_not<V,X,this_t>::result;
     template <int V, int X> using push_back_if_not = typename ip_push_if_not<V,X,this_t>::back;
-    template <int V> using remove = typename ip_remove<V, this_t, IntPack<>>::result;
+    template <int V> using remove = typename ip_scan<V, this_t, IntPack<>>::remove;
 
     template <int V> constexpr static bool Has() { return (V==V1) | pop::template Has<V>(); }
     constexpr static bool Has(int V) { return (V==V1) | pop::Has(V); }
