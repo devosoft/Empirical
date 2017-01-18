@@ -30,6 +30,26 @@ namespace emp {
     struct ip_range <true, START, END, STEP, VALS...> {
       using type = IntPack<VALS...>;
     };
+
+    template <int V, typename T_IN, typename T_OUT >
+    struct ip_remove {
+      using in_pop = typename T_IN::pop;
+      using out_push = typename T_OUT::template push_if_not<typename T_IN::first, V>;
+      using result = typename ip_remove< V, in_pop, out_push >::result;
+    };
+    template <int V, typename T_OUT >
+    struct ip_remove <V, IntPack<>, T_OUT> {
+      using result = T_OUT;
+    };
+
+    template <int V, int X, typename T>
+    struct ip_push_if_not {
+      using result = typename T::template push<V>;
+    };
+    template <int V, typename T>
+    struct ip_push_if_not<V,V,T> {
+      using result = T;
+    };
   }
 
   template <int START, int END, int STEP=1>
@@ -40,10 +60,13 @@ namespace emp {
   struct IntPack<V1,Vs...> {
     static constexpr int first = V1;
 
+    using this_t = IntPack<V1,Vs...>;
     using pop = IntPack<Vs...>;
 
     template <int V> using push = IntPack<V, V1, Vs...>;
     template <int V> using push_back = IntPack<V1, Vs..., V>;
+    template <int V, int X> using push_if_not = typename ip_push_if_not<V,X,this_t>::result;
+    template <int V> using remove = typename ip_remove<V, this_t, IntPack<>>::result;
 
     template <int V> constexpr static bool Has() { return (V==V1) | pop::template Has<V>(); }
     constexpr static bool Has(int V) { return (V==V1) | pop::Has(V); }
@@ -74,6 +97,7 @@ namespace emp {
   template <> struct IntPack<> {
     template <int V> using push = IntPack<V>;
     template <int V> using push_back = IntPack<V>;
+    template <int V> using remove = IntPack<>;
 
     template <int V> constexpr static bool Has() { return false; }
     constexpr static bool Has(int) { return false; }
