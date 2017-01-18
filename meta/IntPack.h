@@ -15,6 +15,8 @@
 
 #include "meta.h"
 
+#include <iostream>
+
 namespace emp {
 
   // Pre-declaration of IntPack
@@ -34,7 +36,7 @@ namespace emp {
     template <int V, typename T_IN, typename T_OUT >
     struct ip_remove {
       using in_pop = typename T_IN::pop;
-      using out_push = typename T_OUT::template push_if_not<typename T_IN::first, V>;
+      using out_push = typename T_OUT::template push_back_if_not<T_IN::first, V>;
       using result = typename ip_remove< V, in_pop, out_push >::result;
     };
     template <int V, typename T_OUT >
@@ -45,10 +47,12 @@ namespace emp {
     template <int V, int X, typename T>
     struct ip_push_if_not {
       using result = typename T::template push<V>;
+      using back = typename T::template push_back<V>;
     };
     template <int V, typename T>
     struct ip_push_if_not<V,V,T> {
       using result = T;
+      using back = T;
     };
   }
 
@@ -66,6 +70,7 @@ namespace emp {
     template <int V> using push = IntPack<V, V1, Vs...>;
     template <int V> using push_back = IntPack<V1, Vs..., V>;
     template <int V, int X> using push_if_not = typename ip_push_if_not<V,X,this_t>::result;
+    template <int V, int X> using push_back_if_not = typename ip_push_if_not<V,X,this_t>::back;
     template <int V> using remove = typename ip_remove<V, this_t, IntPack<>>::result;
 
     template <int V> constexpr static bool Has() { return (V==V1) | pop::template Has<V>(); }
@@ -91,6 +96,12 @@ namespace emp {
     constexpr static int Min() { return pop::Min(V1); }
     constexpr static int Max(int floor) { return floor > pop::Max(V1) ? floor : pop::Max(V1); }
     constexpr static int Max() { return pop::Max(V1); }
+
+    static void PrintInts(std::ostream & os=std::cout) {
+      os << V1;
+      if (GetSize() > 1) os << ',';
+      pop::PrintInts(os);
+    }
   };
 
   // IntPack with no values.
@@ -99,6 +110,7 @@ namespace emp {
     template <int V> using push = IntPack<V>;
     template <int V> using push_back = IntPack<V>;
     template <int V, int X> using push_if_not = typename ip_push_if_not<V,X,IntPack<>>::result;
+    template <int V, int X> using push_back_if_not = typename ip_push_if_not<V,X,IntPack<>>::back;
     template <int V> using remove = IntPack<>;
 
     template <int V> constexpr static bool Has() { return false; }
@@ -122,6 +134,8 @@ namespace emp {
     constexpr static int Product() { return 1; }
     constexpr static int Min(int cap) { return cap; }
     constexpr static int Max(int floor) { return floor; }
+
+    static void PrintInts(std::ostream & os=std::cout) { ; }
   };
 }
 
