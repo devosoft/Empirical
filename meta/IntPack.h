@@ -95,8 +95,10 @@ namespace emp {
 
   // IntPack with no values.
   template <> struct IntPack<> {
+    using this_t = IntPack<>;
     template <int V> using push = IntPack<V>;
     template <int V> using push_back = IntPack<V>;
+    template <int V, int X> using push_if_not = typename ip_push_if_not<V,X,IntPack<>>::result;
     template <int V> using remove = IntPack<>;
 
     template <int V> constexpr static bool Has() { return false; }
