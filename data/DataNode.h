@@ -34,7 +34,6 @@ namespace emp {
     Current,      // Track most recent value
 
     Log,          // Track all values since last Reset()
-    // Prev,         // Track Log + values from previous Reset().
     // Archive,      // Track Log + ALL values over time (with purge options)
 
     Range,        // Track min, max, mean, total
@@ -55,7 +54,8 @@ namespace emp {
 
   // Generic form of DataNodeModule (should never be used; trigger error!)
   template <typename VAL_TYPE, emp::data... MODS> class DataNodeModule {
-  public:  DataNodeModule() { emp_assert(false, "Unknown module used in DataNode!"); }
+  public:
+    DataNodeModule() { emp_assert(false, "Unknown module used in DataNode!"); }
   };
 
   // Base form of DataNodeModule (available in ALL data nodes.)
@@ -64,6 +64,8 @@ namespace emp {
   protected:
     size_t val_count;               // How many values have been loaded?
     emp::vector<VAL_TYPE> in_vals;  // What values are waiting to be included?
+
+    void PullData_impl() { ; }
   public:
     DataNodeModule() : val_count(0) { ; }
 
@@ -72,7 +74,6 @@ namespace emp {
     size_t GetCount() const { return val_count; }
 
     void AddDatum(const VAL_TYPE & val) { val_count++; }
-    void PullData_impl() { ; }
 
     void Reset() { val_count = 0; }
   };
@@ -170,7 +171,7 @@ namespace emp {
     using base_t = DataNodeModule<VAL_TYPE>;
 
     using base_t::in_vals;
-  public:
+
     void PullData_impl() {
       in_vals = pull_funs.Run();
       const emp::vector< emp::vector<VAL_TYPE> > & pull_sets = pull_set_funs.Run();
@@ -178,6 +179,8 @@ namespace emp {
         in_vals.insert(in_vals.end(), x.begin(), x.end());
       }
     }
+
+  public:
     void AddPull(const std::function<VAL_TYPE()> & fun) { pull_funs.Add(fun); }
     void AddPullSet(const std::function<emp::vector<VAL_TYPE>()> & fun) { pull_set_funs.Add(fun); }
   };
