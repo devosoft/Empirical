@@ -64,6 +64,10 @@ namespace emp {
 
     constexpr static int Sum() { return V1 + pop::Sum(); }
     constexpr static int Product() { return V1 * pop::Product(); }
+    constexpr static int Min(int cap) { return cap < pop::Min(V1) ? cap : pop::Min(V1); }
+    constexpr static int Min() { return pop::Min(V1); }
+    constexpr static int Max(int floor) { return floor > pop::Max(V1) ? floor : pop::Max(V1); }
+    constexpr static int Max() { return pop::Max(V1); }
   };
 
   // IntPack with no values.
@@ -90,6 +94,8 @@ namespace emp {
 
     constexpr static int Sum() { return 0; }
     constexpr static int Product() { return 1; }
+    constexpr static int Min(int cap) { return cap; }
+    constexpr static int Max(int floor) { return floor; }
   };
 }
 
