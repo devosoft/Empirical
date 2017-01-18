@@ -37,11 +37,14 @@ namespace emp {
     struct ip_scan {
       using in_pop = typename T_IN::pop;
       using out_pbin = typename T_OUT::template push_back_if_not<T_IN::first, V>;
+
       using remove = typename ip_scan< V, in_pop, out_pbin >::remove;
+      using uniq = typename ip_scan< T_IN::first, in_pop, out_pbin>::uniq;
     };
     template <int V, typename T_OUT >
     struct ip_scan <V, IntPack<>, T_OUT> {
       using remove = T_OUT;
+      using uniq = T_OUT;
     };
 
     template <int V, int X, typename T>
@@ -72,6 +75,7 @@ namespace emp {
     template <int V, int X> using push_if_not = typename ip_push_if_not<V,X,this_t>::result;
     template <int V, int X> using push_back_if_not = typename ip_push_if_not<V,X,this_t>::back;
     template <int V> using remove = typename ip_scan<V, this_t, IntPack<>>::remove;
+    using uniq = typename ip_scan<V1+1, this_t, IntPack<>>::uniq;
 
     template <int V> constexpr static bool Has() { return (V==V1) | pop::template Has<V>(); }
     constexpr static bool Has(int V) { return (V==V1) | pop::Has(V); }
@@ -112,6 +116,7 @@ namespace emp {
     template <int V, int X> using push_if_not = typename ip_push_if_not<V,X,IntPack<>>::result;
     template <int V, int X> using push_back_if_not = typename ip_push_if_not<V,X,IntPack<>>::back;
     template <int V> using remove = IntPack<>;
+    using uniq = IntPack<>;
 
     template <int V> constexpr static bool Has() { return false; }
     constexpr static bool Has(int) { return false; }
