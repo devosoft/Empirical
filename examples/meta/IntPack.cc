@@ -56,11 +56,13 @@ int main()
   EMP_PRINT_VAL(test_t::Max());
   EMP_PRINT_PACK(test_t);
   EMP_PRINT_PACK(test_t::remove<1>);
-  EMP_PRINT_PACK(test_t::reverse);
-  EMP_PRINT_PACK(test_t::uniq);
+  EMP_PRINT_PACK(emp::pack::reverse<test_t>);
+  EMP_PRINT_PACK(emp::pack::uniq<test_t>);
   EMP_PRINT_PACK(test_t::pop_val<1>);
-  //EMP_PRINT_PACK(test_t::append<fib_t>);
+  EMP_PRINT_PACK(test_t::append<fib_t>);
 
   using t1 = emp::IntPack<1,2,3,4,5,6,7,8,9,10,11>;
   EMP_PRINT_PACK(t1::append<t1>);
+
+  emp::IntPack<1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25>::PrintInts();
 }
