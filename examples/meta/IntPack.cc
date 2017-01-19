@@ -50,10 +50,17 @@ int main()
   EMP_PRINT_VAL(fib_t::Product());
 
   std::cout << "\nTesting sorting and removing.\n";
-  using test_t = emp::IntPack<0,1,2,1,3,4,1,5,6,1,-1,0>;
+  using test_t = emp::IntPack<0,1,2,1,3,4,1,4,5,6,1,1,-1,-1,0>;
   std::cout << "Starting pack: ";  test_t::PrintInts(); std::cout << std::endl;
   EMP_PRINT_VAL(test_t::Min());
   EMP_PRINT_VAL(test_t::Max());
   EMP_PRINT_PACK(test_t);
   EMP_PRINT_PACK(test_t::remove<1>);
+  EMP_PRINT_PACK(test_t::reverse);
+  EMP_PRINT_PACK(test_t::uniq);
+  EMP_PRINT_PACK(test_t::pop_val<1>);
+  //EMP_PRINT_PACK(test_t::append<fib_t>);
+
+  using t1 = emp::IntPack<1,2,3,4,5,6,7,8,9,10,11>;
+  EMP_PRINT_PACK(t1::append<t1>);
 }
