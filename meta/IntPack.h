@@ -38,12 +38,10 @@ namespace emp {
       using in_pop = typename T_IN::pop;
       using out_pbin = typename T_OUT::template push_back_if_not<T_IN::first, V>;
 
-      using remove = typename ip_scan< V, in_pop, out_pbin >::remove;
       using uniq = typename ip_scan< T_IN::first, in_pop, out_pbin>::uniq;
     };
     template <int V, typename T_OUT >
     struct ip_scan <V, IntPack<>, T_OUT> {
-      using remove = T_OUT;
       using uniq = T_OUT;
     };
 
@@ -62,6 +60,8 @@ namespace emp {
 
       template <int V>
       using pop_val = typename ip_while< in_pop, out_pbin<V>, T_IN::first == V >::template pop_val<V>;
+      template <int V>
+      using remove = typename ip_while< in_pop, out_pbin<V> >::template remove<V>;
       // @CAO
     };
     template <typename T_IN, typename T_OUT>
@@ -71,7 +71,8 @@ namespace emp {
     };
     template <typename T_OUT>
     struct ip_while<IntPack<>, T_OUT, false> {
-      template <int V> using pop_val = T_OUT;  // Nothing to pop!
+      template <int V> using pop_val = T_OUT;  // Nothing to pop! (error?)
+      template <int V> using remove = T_OUT;   // Nothing left to remove!
       // @CAO
     };
 
@@ -121,26 +122,16 @@ namespace emp {
     using this_t = IntPack<V1,Vs...>;
     using pop = IntPack<Vs...>;
 
-    // using reverse = typename IntPack<Vs...>::reverse::template push_back<V1>;
-    // using uniq = typename ip_scan<V1+1, this_t, IntPack<>>::uniq;
-
     template <int V> using push = IntPack<V, V1, Vs...>;
     template <int V> using push_back = IntPack<V1, Vs..., V>;
     template <int V, int X> using push_if_not = typename ip_push_if_not<V,X,this_t>::result;
     template <int V, int X> using push_back_if_not = typename ip_push_if_not<V,X,this_t>::back;
     template <int V> using pop_val = typename ip_while<this_t, IntPack<>>::template pop_val<V>;
-    template <int V> using remove = typename ip_scan<V, this_t, IntPack<>>::remove;
+    template <int V> using remove = typename ip_while<this_t, IntPack<>>::template remove<V>;
     template <typename T> using append = typename ip_concat<this_t,T>::result;
 
-    template <int V> constexpr static bool Has() { return (V==V1) | pop::template Has<V>(); }
     constexpr static bool Has(int V) { return (V==V1) | pop::Has(V); }
-    template <int V> constexpr static int Count() { return pop::template Count<V>() + (V==V1); }
     constexpr static int Count(int V) { return pop::Count(V) + (V==V1); }
-
-    // Type ID's can be retrieved with
-    //   GetID<my_type>() to get the ID associated with specific type my_type
-    //   GetID(owner) to get the ID associated with the type of 'owner'
-    template <int V> constexpr static int GetID() { return (V==V1) ? 0 : (1+pop::template GetID<V>()); }
     constexpr static int GetID(int V) { return (V==V1) ? 0 : (1+pop::GetID(V)); }
 
     constexpr static int SIZE = 1+sizeof...(Vs);
@@ -177,15 +168,8 @@ namespace emp {
     template <int V> using remove = IntPack<>;
     template <typename T> using append = T;
 
-    template <int V> constexpr static bool Has() { return false; }
     constexpr static bool Has(int) { return false; }
-    template <int V> constexpr static int Count() { return 0; }
     constexpr static int Count(int) { return 0; }
-
-    // Type ID's can be retrieved with
-    //   GetID<my_type>() to get the ID associated with specific type my_type
-    //   GetID(owner) to get the ID associated with the type of 'owner'
-    template <int V> constexpr static int GetID() { return -100000; }
     constexpr static int GetID(int V) { return -100000; }
 
     constexpr static int SIZE = 0;
