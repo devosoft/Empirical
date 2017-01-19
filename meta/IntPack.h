@@ -33,18 +33,6 @@ namespace emp {
       using type = IntPack<VALS...>;
     };
 
-    template <int V, typename T_IN, typename T_OUT >
-    struct ip_scan {
-      using in_pop = typename T_IN::pop;
-      using out_pbin = typename T_OUT::template push_back_if_not<T_IN::first, V>;
-
-      using uniq = typename ip_scan< T_IN::first, in_pop, out_pbin>::uniq;
-    };
-    template <int V, typename T_OUT >
-    struct ip_scan <V, IntPack<>, T_OUT> {
-      using uniq = T_OUT;
-    };
-
     template <typename T1, typename T2> struct ip_concat;
     template <int... T1s, int... T2s>
     struct ip_concat<IntPack<T1s...>, IntPack<T2s...>> {
@@ -52,27 +40,28 @@ namespace emp {
     };
 
     template <typename T_IN, typename T_OUT, bool DONE=false>
-    struct ip_while {
+    struct ip_loop {
+      // Helpers...
       using in_pop = typename T_IN::pop;
-      template <int V>
-      using out_pbin = typename T_OUT::template push_back_if_not<T_IN::first, V>;
-      using out_shift = typename T_OUT::template push<T_IN::first>;
+      template <int V> using out_pbin = typename T_OUT::template push_back_if_not<T_IN::first, V>;
+      template <int V, bool D=false> using pnext = ip_loop< in_pop, out_pbin<V>, D >;  // Prune
 
-      template <int V>
-      using pop_val = typename ip_while< in_pop, out_pbin<V>, T_IN::first == V >::template pop_val<V>;
-      template <int V>
-      using remove = typename ip_while< in_pop, out_pbin<V> >::template remove<V>;
+      // Main operations...
+      template <int V> using pop_val = typename pnext<V, T_IN::first==V>::template pop_val<V>;
+      template <int V> using remove = typename pnext<V>::template remove<V>;
+      template <int V> using uniq = typename pnext<V>::template uniq<T_IN::first>;
       // @CAO
     };
     template <typename T_IN, typename T_OUT>
-    struct ip_while<T_IN, T_OUT, true> {
+    struct ip_loop<T_IN, T_OUT, true> {
       template <int V> using pop_val = typename T_OUT::template append<T_IN>; // Pop done!
       // @CAO
     };
     template <typename T_OUT>
-    struct ip_while<IntPack<>, T_OUT, false> {
+    struct ip_loop<IntPack<>, T_OUT, false> {
       template <int V> using pop_val = T_OUT;  // Nothing to pop! (error?)
       template <int V> using remove = T_OUT;   // Nothing left to remove!
+      template <int V> using uniq = T_OUT;     // Nothing left to check!
       // @CAO
     };
 
@@ -103,7 +92,7 @@ namespace emp {
     template <typename T> struct ip_uniq;
     template <int V1, int... Vs>
     struct ip_uniq<IntPack<V1, Vs...>> {
-      using result = typename ip_scan<V1+1, IntPack<V1, Vs...>, IntPack<>>::uniq;
+      using result = typename ip_loop<IntPack<V1, Vs...>, IntPack<>>::template uniq<V1+1>;
     };
     template <>
     struct ip_uniq<IntPack<>> {
@@ -126,8 +115,8 @@ namespace emp {
     template <int V> using push_back = IntPack<V1, Vs..., V>;
     template <int V, int X> using push_if_not = typename ip_push_if_not<V,X,this_t>::result;
     template <int V, int X> using push_back_if_not = typename ip_push_if_not<V,X,this_t>::back;
-    template <int V> using pop_val = typename ip_while<this_t, IntPack<>>::template pop_val<V>;
-    template <int V> using remove = typename ip_while<this_t, IntPack<>>::template remove<V>;
+    template <int V> using pop_val = typename ip_loop<this_t, IntPack<>>::template pop_val<V>;
+    template <int V> using remove = typename ip_loop<this_t, IntPack<>>::template remove<V>;
     template <typename T> using append = typename ip_concat<this_t,T>::result;
 
     constexpr static bool Has(int V) { return (V==V1) | pop::Has(V); }
