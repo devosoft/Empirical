@@ -86,6 +86,28 @@ namespace emp {
       using result = T;
       using back = T;
     };
+
+    // Setup ==reverse== operation.
+    template <typename T> struct ip_reverse;
+    template <int V1, int... Vs>
+    struct ip_reverse<IntPack<V1, Vs...>> {
+      using result = typename ip_reverse< IntPack<Vs...> >::result::template push_back<V1>;
+    };
+    template <>
+    struct ip_reverse<IntPack<>> {
+      using result = IntPack<>;
+    };
+
+    // Setup ==uniq== operation.
+    template <typename T> struct ip_uniq;
+    template <int V1, int... Vs>
+    struct ip_uniq<IntPack<V1, Vs...>> {
+      using result = typename ip_scan<V1+1, IntPack<V1, Vs...>, IntPack<>>::uniq;
+    };
+    template <>
+    struct ip_uniq<IntPack<>> {
+      using result = IntPack<>;
+    };
   }
 
   template <int START, int END, int STEP=1>
@@ -99,8 +121,8 @@ namespace emp {
     using this_t = IntPack<V1,Vs...>;
     using pop = IntPack<Vs...>;
 
-    using reverse = typename IntPack<Vs...>::reverse::template push_back<V1>;
-    using uniq = typename ip_scan<V1+1, this_t, IntPack<>>::uniq;
+    // using reverse = typename IntPack<Vs...>::reverse::template push_back<V1>;
+    // using uniq = typename ip_scan<V1+1, this_t, IntPack<>>::uniq;
 
     template <int V> using push = IntPack<V, V1, Vs...>;
     template <int V> using push_back = IntPack<V1, Vs..., V>;
@@ -145,8 +167,8 @@ namespace emp {
   template <> struct IntPack<> {
     using this_t = IntPack<>;
 
-    using reverse = IntPack<>;
-    using uniq = IntPack<>;
+    // using reverse = IntPack<>;
+    // using uniq = IntPack<>;
 
     template <int V> using push = IntPack<V>;
     template <int V> using push_back = IntPack<V>;
@@ -179,6 +201,11 @@ namespace emp {
 
     static void PrintInts(std::ostream & os=std::cout) { ; }
   };
+
+  namespace pack {
+    template <typename T> using reverse = typename ip_reverse<T>::result;
+    template <typename T> using uniq = typename ip_uniq<T>::result;
+  }
 }
 
 #endif
