@@ -47,6 +47,35 @@ namespace emp {
       using uniq = T_OUT;
     };
 
+    template <typename T1, typename T2> struct ip_concat;
+    template <int... T1s, int... T2s>
+    struct ip_concat<IntPack<T1s...>, IntPack<T2s...>> {
+      using result = IntPack<T1s..., T2s...>;
+    };
+
+    template <typename T_IN, typename T_OUT, bool DONE=false>
+    struct ip_while {
+      using in_pop = typename T_IN::pop;
+      template <int V>
+      using out_pbin = typename T_OUT::template push_back_if_not<T_IN::first, V>;
+      using out_shift = typename T_OUT::template push<T_IN::first>;
+
+      template <int V>
+      using pop_val = typename ip_while< in_pop, out_pbin<V>, T_IN::first == V >::template pop_val<V>;
+      // @CAO
+    };
+    template <typename T_IN, typename T_OUT>
+    struct ip_while<T_IN, T_OUT, true> {
+      template <int V> using pop_val = typename T_OUT::template append<T_IN>; // Pop done!
+      // @CAO
+    };
+    template <typename T_OUT>
+    struct ip_while<IntPack<>, T_OUT, false> {
+      template <int V> using pop_val = T_OUT;  // Nothing to pop!
+      // @CAO
+    };
+
+
     template <int V, int X, typename T>
     struct ip_push_if_not {
       using result = typename T::template push<V>;
@@ -77,7 +106,9 @@ namespace emp {
     template <int V> using push_back = IntPack<V1, Vs..., V>;
     template <int V, int X> using push_if_not = typename ip_push_if_not<V,X,this_t>::result;
     template <int V, int X> using push_back_if_not = typename ip_push_if_not<V,X,this_t>::back;
+    template <int V> using pop_val = typename ip_while<this_t, IntPack<>>::template pop_val<V>;
     template <int V> using remove = typename ip_scan<V, this_t, IntPack<>>::remove;
+    template <typename T> using append = typename ip_concat<this_t,T>::result;
 
     template <int V> constexpr static bool Has() { return (V==V1) | pop::template Has<V>(); }
     constexpr static bool Has(int V) { return (V==V1) | pop::Has(V); }
@@ -122,6 +153,7 @@ namespace emp {
     template <int V, int X> using push_if_not = typename ip_push_if_not<V,X,IntPack<>>::result;
     template <int V, int X> using push_back_if_not = typename ip_push_if_not<V,X,IntPack<>>::back;
     template <int V> using remove = IntPack<>;
+    template <typename T> using append = T;
 
     template <int V> constexpr static bool Has() { return false; }
     constexpr static bool Has(int) { return false; }
