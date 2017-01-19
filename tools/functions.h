@@ -9,7 +9,6 @@
 
 #include <ctime>
 #include <functional>
-#include <initializer_list>
 #include <iostream>
 #include <type_traits>
 #include <sstream>
@@ -40,45 +39,10 @@ namespace emp {
   // Toggle an input bool.
   inline bool Toggle(bool & in_bool) { return (in_bool = !in_bool); }
 
-  /// % is actually remainder; this is a proper modulus command that handles negative #'s correctly
-  inline constexpr int Mod(int in_val, int mod_val) {
-    return (in_val < 0) ? (in_val % mod_val + mod_val) : (in_val % mod_val);
-  }
-
-  // A fast (O(log p)) integer-power command.
-  static constexpr int Pow(int base, int p) {
-    return (p <= 0) ? 1 : base * Pow(base, p-1);
-  }
-
-
   // Run both min and max on a value to put it into a desired range.
   template <typename TYPE> constexpr TYPE ToRange(const TYPE & value, const TYPE & in_min, const TYPE & in_max) {
     return (value < in_min) ? in_min : ((value > in_max) ? in_max : value);
   }
-
-  template <typename T> constexpr const T & Min(const T& in1, const T& in2, const T& in3) {
-    return std::min(std::min(in1,in2), in3);
-  }
-
-  // Build a min and max that allows a variable number of inputs to be compared.
-  template <typename T> const T & Min(std::initializer_list<const T&> lst) {
-    emp_assert(lst.size > 0); // Nothing to return if nothing in the list!
-    auto min_found = lst.begin();
-    for (auto it = lst.begin()+1; it < lst.end(); it++) {
-      if (*it < *min_found) min_found = it;
-    }
-    return *min_found;
-  }
-
-  template <typename T> const T & Max(std::initializer_list<const T&> lst) {
-    emp_assert(lst.size > 0); // Nothing to return if nothing in the list!
-    auto max_found = lst.begin();
-    for (auto it = lst.begin()+1; it < lst.end(); it++) {
-      if (*it > *max_found) max_found = it;
-    }
-    return *max_found;
-  }
-
 
   static inline std::vector<int> BuildRange(int min, int max, int step=1) {
     int size = (max-min) / step;

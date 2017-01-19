@@ -9,6 +9,8 @@
 #ifndef EMP_MATH_H
 #define EMP_MATH_H
 
+#include <initializer_list>
+#include <algorithm>
 #include "const.h"
 
 namespace emp {
@@ -57,6 +59,11 @@ namespace emp {
     }
   }
 
+  // A fast (O(log p)) integer-power command.
+  static constexpr int Pow(int base, int p) {
+    return (p <= 0) ? 1 : base * Pow(base, p-1);
+  }
+
   static constexpr double Pow2(double exp) {
     return (exp < 0.0) ? (1.0/Pow2_impl(-exp)) : Pow2_impl(exp);
   }
@@ -85,13 +92,41 @@ namespace emp {
 
   /// Quick bit-mask generators...
   template <typename TYPE>
-  static constexpr TYPE MaskLow(size_t num_bits) {
+  static constexpr TYPE MaskLow(std::size_t num_bits) {
     return (num_bits == 8*sizeof(TYPE)) ? ((TYPE)-1) : ((((TYPE)1) << num_bits) - 1);
   }
 
   template <typename TYPE>
-  static constexpr TYPE MaskHigh(size_t num_bits) {
+  static constexpr TYPE MaskHigh(std::size_t num_bits) {
     return MaskLow<TYPE>(num_bits) << (8*sizeof(TYPE)-num_bits);
+  }
+
+  /// % is actually remainder; this is a proper modulus command that handles negative #'s correctly
+  inline constexpr int Mod(int in_val, int mod_val) {
+    return (in_val < 0) ? (in_val % mod_val + mod_val) : (in_val % mod_val);
+  }
+
+  template <typename T> constexpr const T & Min(const T& in1, const T& in2, const T& in3) {
+    return std::min(std::min(in1,in2), in3);
+  }
+
+  // Build a min and max that allows a variable number of inputs to be compared.
+  template <typename T> const T & Min(std::initializer_list<const T&> lst) {
+    emp_assert(lst.size > 0); // Nothing to return if nothing in the list!
+    auto min_found = lst.begin();
+    for (auto it = lst.begin()+1; it < lst.end(); it++) {
+      if (*it < *min_found) min_found = it;
+    }
+    return *min_found;
+  }
+
+  template <typename T> const T & Max(std::initializer_list<const T&> lst) {
+    emp_assert(lst.size > 0); // Nothing to return if nothing in the list!
+    auto max_found = lst.begin();
+    for (auto it = lst.begin()+1; it < lst.end(); it++) {
+      if (*it > *max_found) max_found = it;
+    }
+    return *max_found;
   }
 
 
