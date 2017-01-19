@@ -683,7 +683,7 @@ public:
 
   void DrawTree() {
     D3::Selection nodeEnter = tree.GenerateNodesAndLinks(*GetSVG())[0];
-    nodeEnter.Append("circle").SetAttr("r", 2).AddToolTip(*tip);
+    nodeEnter.Append("circle").SetAttr("r", 2).On("click", GetID()+"node_mouseover").AddToolTip(*tip);
     GetSVG()->SelectAll("g.node").SelectAll("circle").SetStyle("fill", GetID()+"color_fun_node");
     GetSVG()->SelectAll(".link").SetStyle("stroke", GetID()+"color_fun_link");
     CallDrawCallback();
@@ -770,6 +770,7 @@ protected:
   using TREE_TYPE<NODE>::InitializeVariables;
   using TREE_TYPE<NODE>::DrawTree;
   using TREE_TYPE<NODE>::tip;
+  using TREE_TYPE<NODE>::data;
 
 public:
 
@@ -788,6 +789,53 @@ public:
     EMP_BUILD_INTROSPECTIVE_TUPLE( int, loc)
   };
 
+  std::function<void(NODE, int)> node_mouseover = [this](NODE d, int i){
+    EM_ASM_ARGS({
+
+      var trace_lineage = function(root, id) {
+        if (root.name == id){
+          return [root.loc];
+        }
+        if (root.children) {
+          for (var k in root.children) {
+            if (root.children[k].name == id) {
+              return [root.children[k].loc];
+            }
+            else if (root.children[k].children) {
+              result = trace_lineage(root.children[k], id);
+              if (result) {
+                console.log(root.children[k]);
+                result.push(root.children[k].loc);
+                return result;
+              }
+            }
+          }
+        }
+      };
+    //   console.log("about to trace");
+      var result = trace_lineage(js.objects[$0][0], $1);
+      var paths = ([[[result[0]%10, Math.floor(result[0]/10)]]]);
+      for (i=1; i <result.length; i++) {
+        var old_point = paths[paths.length-1][paths[paths.length-1].length-1];
+        var new_point = ([result[i]%100, Math.floor(result[i]/100)]);
+        if (Math.abs(new_point[0]-old_point[0]) > 1 || Math.abs(new_point[1]-old_point[1]) > 1) {
+          paths.push([new_point]);
+        } else {
+          paths[paths.length-1].push(new_point);
+        }
+      }
+      var scale = d3.scale.linear().domain([0,100]).range([0,500]);
+      var l = d3.svg.line().x(function(d){return scale(d[0]);}).y(function(d){return scale(d[1]);});
+      var svg = d3.select("body").append("svg");
+      svg.attr("width", 500).attr("height",500);
+      svg.selectAll("path").data(paths).enter().append("path").attr("d", function(d){console.log(l(d)); return l(d);}).attr("stroke", "white").attr("stroke-width", 1).attr("fill","none");
+    //   console.log(path.length);
+    //   console.log(l(path));
+
+
+  }, data->GetID(), d.name());
+  };
+
   std::function<std::string(NODE, int)> color_fun_node = [this](NODE d, int i){
     if (d.loc() < 0) {
       return std::string("black");
@@ -796,7 +844,7 @@ public:
     double x = (d.loc() % grid_width) - grid_width/2;
     double y = (d.loc() / grid_width) - grid_height/2;
 
-    double r = sqrt(emp::Pow(x,2.0)+emp::Pow(y,2.0)) / sqrt(emp::Pow(grid_width,2.0)+emp::Pow(grid_height,2.0));
+    double r = sqrt(emp::Pow((int)x,2)+emp::Pow((int)y,2)) / sqrt(emp::Pow(grid_width,2)+emp::Pow(grid_height,2));
     (void) r;
 
     //atan2 takes sign into account
@@ -823,7 +871,7 @@ public:
     double x = (d.loc() % grid_width) - grid_width/2;
     double y = (d.loc() / grid_width) - grid_height/2;
 
-    double r = sqrt(emp::Pow(x,2.0)+emp::Pow(y,2.0)) / sqrt(emp::Pow(grid_width,2.0)+emp::Pow(grid_height,2.0));
+    double r = sqrt(emp::Pow((int)x,2)+emp::Pow((int)y,2)) / sqrt(emp::Pow(grid_width,2)+emp::Pow(grid_height,2));
     (void) r;
 
     //atan2 takes sign into account
@@ -875,6 +923,7 @@ public:
     JSWrap(color_fun_link, GetID()+"color_fun_link");
     JSWrap(legend_mouseover, GetID()+"legend_mouseover");
     JSWrap(legend_mouseout, GetID()+"legend_mouseout");
+    JSWrap(node_mouseover, GetID()+"node_mouseover");
 
     tip->SetHtml([this](NODE d){
                     return "ID: " + to_string(d.name()) + ", Pos: ("
@@ -893,7 +942,10 @@ public:
                             .SetStyle("stroke", GetID()+"color_fun_node")
                             .On("mouseover", GetID()+"legend_mouseover")
                             .On("mouseout", GetID()+"legend_mouseout");
+
   }
+
+
 
 };
 
