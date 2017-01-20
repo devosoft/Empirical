@@ -19,7 +19,7 @@ CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../web/lib
 CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
-TARGETS := array BitSet BitVector ce_array ce_string DFA errors flex_function info_theory Lexer lexer_utils macros math memo_function NFA Parser Ptr Random RegEx signal tuple_utils TypeTracker vector WeightedSet
+TARGETS := array BitSet BitVector ce_array ce_string DFA errors flex_function info_theory Lexer lexer_utils macros math memo_function NFA Parser Ptr Random RegEx tuple_utils TypeTracker vector WeightedSet
 
 TOOLS := ../../tools
 TOOL_DEPEND := $(TOOLS)/assert.h
