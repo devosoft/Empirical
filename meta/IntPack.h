@@ -80,25 +80,17 @@ namespace emp {
 
     // Setup ==reverse== operation.
     template <typename T> struct ip_reverse;
-    template <int V1, int... Vs>
-    struct ip_reverse<IntPack<V1, Vs...>> {
+    template <int V1, int... Vs> struct ip_reverse<IntPack<V1, Vs...>> {
       using result = typename ip_reverse< IntPack<Vs...> >::result::template push_back<V1>;
     };
-    template <>
-    struct ip_reverse<IntPack<>> {
-      using result = IntPack<>;
-    };
+    template <> struct ip_reverse<IntPack<>> { using result = IntPack<>; };
 
     // Setup ==uniq== operation.
     template <typename T> struct ip_uniq;
-    template <int V1, int... Vs>
-    struct ip_uniq<IntPack<V1, Vs...>> {
+    template <int V1, int... Vs> struct ip_uniq<IntPack<V1, Vs...>> {
       using result = typename ip_loop<IntPack<V1, Vs...>, IntPack<>>::template uniq<V1+1>;
     };
-    template <>
-    struct ip_uniq<IntPack<>> {
-      using result = IntPack<>;
-    };
+    template <> struct ip_uniq<IntPack<>> { using result = IntPack<>; };
 
     // Setup ==sort== operation.
     template <typename T_IN, typename T_OUT>
@@ -113,15 +105,11 @@ namespace emp {
     };
 
     template <typename T> struct ip_sort;
-    template <int V1, int... Vs>
-    struct ip_sort<IntPack<V1, Vs...>> {
+    template <int V1, int... Vs> struct ip_sort<IntPack<V1, Vs...>> {
       using ip = IntPack<V1, Vs...>;
       using result = typename ip_sort_impl<ip, IntPack<>>::template sort<ip::Min()>;
     };
-    template <>
-    struct ip_sort<IntPack<>> {
-      using result = IntPack<>;
-    };
+    template <> struct ip_sort<IntPack<>> { using result = IntPack<>; };
   }
 
   template <int START, int END, int STEP=1>
@@ -202,8 +190,12 @@ namespace emp {
 
   namespace pack {
     template <typename T> using reverse = typename ip_reverse<T>::result;
-    template <typename T> using sort = typename ip_sort<T>::result;
     template <typename T> using uniq = typename ip_uniq<T>::result;
+
+    template <typename T> using sort = typename ip_sort<T>::result;
+    template <typename T> using Rsort = reverse< sort<T> >;
+    template <typename T> using Usort = uniq< sort<T> >;
+    template <typename T> using RUsort = reverse< Usort<T> >;
   }
 }
 
