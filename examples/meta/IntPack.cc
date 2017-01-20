@@ -68,4 +68,7 @@ int main()
   EMP_PRINT_PACK(emp::pack::reverse<test_t>);
   EMP_PRINT_PACK(emp::pack::uniq<test_t>);
   EMP_PRINT_PACK(emp::pack::sort<test_t>);
+  EMP_PRINT_PACK(emp::pack::Usort<test_t>);
+  EMP_PRINT_PACK(emp::pack::Rsort<test_t>);
+  EMP_PRINT_PACK(emp::pack::RUsort<test_t>);
 }
