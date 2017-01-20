@@ -199,7 +199,7 @@ namespace evo{
     // using world_type = World<ORG, MANAGERS...>;
     using fit_fun_type = std::function<double(org_ptr)>;
     // Stats calculated on the world
-    FunctionSet<double> stats;
+    FunctionSet<double()> stats;
 
     // Pointer to the world object on which we're calculating stats
     POP_MANAGER * pop;

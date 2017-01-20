@@ -102,7 +102,7 @@ public:
   std::string GetID() {return Info()->id;}
 
   emp::vector<std::string> variables;
-  FunctionSet<void> pending_funcs;
+  FunctionSet<void()> pending_funcs;
   bool init = false;
 
   /// Callback function for drawing data after rescale animation

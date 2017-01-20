@@ -163,8 +163,8 @@ namespace emp {
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Pull, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
-    emp::FunctionSet<VAL_TYPE> pull_funs;
-    emp::FunctionSet<emp::vector<VAL_TYPE>> pull_set_funs;
+    emp::FunctionSet<VAL_TYPE()> pull_funs;
+    emp::FunctionSet<emp::vector<VAL_TYPE>()> pull_set_funs;
 
     using this_t = DataNodeModule<VAL_TYPE, data::Pull, MODS...>;
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;

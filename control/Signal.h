@@ -131,7 +131,7 @@ namespace emp {
   class Signal : public SignalBase {
   protected:
     using this_t = Signal<ARGS...>;
-    FunctionSet<void, ARGS...> actions;
+    FunctionSet<void(ARGS...)> actions;
   public:
     Signal(const std::string & name="", internal::SignalManager_Base * manager=nullptr)
      : SignalBase(name, manager) { ; }
