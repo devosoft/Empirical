@@ -22,6 +22,7 @@ namespace emp {
   // Pre-declaration of IntPack
   template <int... Ts> struct IntPack;
 
+  // Anonymous implementations of IntPack interface.
   namespace {
     template <bool DONE, int START, int END, int STEP, int... VALS>
     struct ip_range {
@@ -43,7 +44,6 @@ namespace emp {
     struct ip_loop {
       // Helpers...
       using in_pop = typename T_IN::pop;
-
       template <int V> using out_pbin = typename T_OUT::template push_back_if_not<T_IN::first, V>;
       template <int V, bool D=false> using pnext = ip_loop< in_pop, out_pbin<V>, D >;  // Prune
 
@@ -51,22 +51,19 @@ namespace emp {
       template <int V> using pop_val = typename pnext<V, T_IN::first==V>::template pop_val<V>;
       template <int V> using remove = typename pnext<V>::template remove<V>;
       template <int V> using uniq = typename pnext<V>::template uniq<T_IN::first>;
-      // @CAO
     };
     template <typename T_IN, typename T_OUT>
     struct ip_loop<T_IN, T_OUT, true> {
       template <int V> using pop_val = typename T_OUT::template append<T_IN>; // Pop done!
-      // @CAO
     };
     template <typename T_OUT>
     struct ip_loop<IntPack<>, T_OUT, false> {
       template <int V> using pop_val = T_OUT;  // Nothing to pop! (error?)
       template <int V> using remove = T_OUT;   // Nothing left to remove!
       template <int V> using uniq = T_OUT;     // Nothing left to check!
-      // @CAO
     };
 
-
+    // Implement == ip_push_if_not ==
     template <int V, int X, typename T>
     struct ip_push_if_not {
       using result = typename T::template push<V>;
@@ -112,6 +109,7 @@ namespace emp {
     template <> struct ip_sort<IntPack<>> { using result = IntPack<>; };
   }
 
+  // Generate an IntPack with a specified range of values.
   template <int START, int END, int STEP=1>
   using IntPackRange = typename ip_range<(START >= END), START, END, STEP>::type;
 
@@ -158,9 +156,6 @@ namespace emp {
   // IntPack with no values.
   template <> struct IntPack<> {
     using this_t = IntPack<>;
-
-    // using reverse = IntPack<>;
-    // using uniq = IntPack<>;
 
     template <int V> using push = IntPack<V>;
     template <int V> using push_back = IntPack<V>;
