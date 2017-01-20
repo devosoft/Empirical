@@ -466,7 +466,7 @@ double fun7(double input) { return input * input * input; }
 TEST_CASE("Test FunctionSet", "[tools]")
 {
   // TEST 1: Functions with VOID returns.
-  emp::FunctionSet<void, int,int> fun_set;
+  emp::FunctionSet<void(int,int)> fun_set;
   fun_set.Add(&fun1);
   fun_set.Add(&fun2);
   fun_set.Add(&fun3);
@@ -489,7 +489,7 @@ TEST_CASE("Test FunctionSet", "[tools]")
   REQUIRE(global_var4 == 4);
 
   // Test 2: Functions with non-void returns.
-  emp::FunctionSet<double, double> fun_set2;
+  emp::FunctionSet<double(double)> fun_set2;
   fun_set2.Add(&fun5);
   fun_set2.Add(&fun6);
   fun_set2.Add(&fun7);
