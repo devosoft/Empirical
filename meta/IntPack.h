@@ -43,6 +43,7 @@ namespace emp {
     struct ip_loop {
       // Helpers...
       using in_pop = typename T_IN::pop;
+
       template <int V> using out_pbin = typename T_OUT::template push_back_if_not<T_IN::first, V>;
       template <int V, bool D=false> using pnext = ip_loop< in_pop, out_pbin<V>, D >;  // Prune
 
@@ -96,6 +97,29 @@ namespace emp {
     };
     template <>
     struct ip_uniq<IntPack<>> {
+      using result = IntPack<>;
+    };
+
+    // Setup ==sort== operation.
+    template <typename T_IN, typename T_OUT>
+    struct ip_sort_impl {
+      template <int V> using spop = typename T_IN::template pop_val<V>;
+      template <int V> using snext = ip_sort_impl< spop<V>, typename T_OUT::template push_back<V> >;
+      template <int V> using sort = typename snext<V>::template sort< spop<V>::Min(T_IN::first) >;
+    };
+    template <typename T_OUT>
+    struct ip_sort_impl<IntPack<>, T_OUT> {
+      template <int V> using sort = T_OUT;     // Nothing left to sort!
+    };
+
+    template <typename T> struct ip_sort;
+    template <int V1, int... Vs>
+    struct ip_sort<IntPack<V1, Vs...>> {
+      using ip = IntPack<V1, Vs...>;
+      using result = typename ip_sort_impl<ip, IntPack<>>::template sort<ip::Min()>;
+    };
+    template <>
+    struct ip_sort<IntPack<>> {
       using result = IntPack<>;
     };
   }
@@ -154,6 +178,7 @@ namespace emp {
     template <int V> using push_back = IntPack<V>;
     template <int V, int X> using push_if_not = typename ip_push_if_not<V,X,IntPack<>>::result;
     template <int V, int X> using push_back_if_not = typename ip_push_if_not<V,X,IntPack<>>::back;
+    template <int V> using pop_val = IntPack<>;  // No value to pop!  Faulure?
     template <int V> using remove = IntPack<>;
     template <typename T> using append = T;
 
@@ -177,6 +202,7 @@ namespace emp {
 
   namespace pack {
     template <typename T> using reverse = typename ip_reverse<T>::result;
+    template <typename T> using sort = typename ip_sort<T>::result;
     template <typename T> using uniq = typename ip_uniq<T>::result;
   }
 }
