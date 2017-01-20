@@ -23,11 +23,11 @@ int main()
   rise_t::PrintInts();
   std::cout << '>' << std::endl;
   EMP_PRINT_VAL(rise_t::GetSize());
-  EMP_PRINT_VAL(rise_t::Has<0>());
-  EMP_PRINT_VAL(rise_t::Has<13>());
+  EMP_PRINT_VAL(rise_t::Has(0));
   EMP_PRINT_VAL(rise_t::Has(10));
-  EMP_PRINT_VAL(rise_t::Count<1>());
-  EMP_PRINT_VAL(rise_t::GetID<5>());
+  EMP_PRINT_VAL(rise_t::Has(13));
+  EMP_PRINT_VAL(rise_t::Count(1));
+  EMP_PRINT_VAL(rise_t::GetID(5));
   EMP_PRINT_VAL(rise_t::GetID(8));
   EMP_PRINT_VAL(rise_t::IsUnique());
   EMP_PRINT_VAL(rise_t::Sum());
@@ -39,11 +39,11 @@ int main()
   fib_t::PrintInts();
   std::cout << '>' << std::endl;
   EMP_PRINT_VAL(fib_t::GetSize());
-  EMP_PRINT_VAL(fib_t::Has<0>());
-  EMP_PRINT_VAL(fib_t::Has<13>());
+  EMP_PRINT_VAL(fib_t::Has(0));
   EMP_PRINT_VAL(fib_t::Has(10));
-  EMP_PRINT_VAL(fib_t::Count<1>());
-  EMP_PRINT_VAL(fib_t::GetID<5>());
+  EMP_PRINT_VAL(fib_t::Has(13));
+  EMP_PRINT_VAL(fib_t::Count(1));
+  EMP_PRINT_VAL(fib_t::GetID(5));
   EMP_PRINT_VAL(fib_t::GetID(8));
   EMP_PRINT_VAL(fib_t::IsUnique());
   EMP_PRINT_VAL(fib_t::Sum());
@@ -56,8 +56,6 @@ int main()
   EMP_PRINT_VAL(test_t::Max());
   EMP_PRINT_PACK(test_t);
   EMP_PRINT_PACK(test_t::remove<1>);
-  EMP_PRINT_PACK(emp::pack::reverse<test_t>);
-  EMP_PRINT_PACK(emp::pack::uniq<test_t>);
   EMP_PRINT_PACK(test_t::pop_val<1>);
   EMP_PRINT_PACK(test_t::append<fib_t>);
 
@@ -65,4 +63,9 @@ int main()
   EMP_PRINT_PACK(t1::append<t1>);
 
   emp::IntPack<1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25>::PrintInts();
+  std::cout << std::endl;
+
+  EMP_PRINT_PACK(emp::pack::reverse<test_t>);
+  EMP_PRINT_PACK(emp::pack::uniq<test_t>);
+  EMP_PRINT_PACK(emp::pack::sort<test_t>);
 }
