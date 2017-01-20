@@ -13,8 +13,10 @@
 
 namespace emp {
 
+  template <typename T> class FunctionSet;
+
   template <typename RETURN_T, typename... ARGS>
-  class FunctionSet : public emp::vector<std::function<RETURN_T(ARGS...)>> {
+  class FunctionSet<RETURN_T(ARGS...)> : public emp::vector<std::function<RETURN_T(ARGS...)>> {
   protected:
     mutable emp::vector<RETURN_T> return_vals;
 
@@ -74,7 +76,7 @@ namespace emp {
   // A specialized version for void functions.
 
   template <typename... ARGS>
-  class FunctionSet<void, ARGS...> : public emp::vector<std::function<void(ARGS...)>> {
+  class FunctionSet<void(ARGS...)> : public emp::vector<std::function<void(ARGS...)>> {
   public:
     FunctionSet() { ; }
     ~FunctionSet() { ; }
