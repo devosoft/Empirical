@@ -54,7 +54,7 @@ namespace emp {
     }
 
     template <typename... ARGS>
-    auto & AddSignal(Signal<ARGS...> & signal) {
+    auto & AddSignal(Signal<void(ARGS...)> & signal) {
       return signal_m.Add<ARGS...>(signal);
     }
 
@@ -78,7 +78,7 @@ namespace emp {
     template <typename... ARGS>
     void Trigger(const std::string & name, ARGS... args) {
       auto & base_signal = signal_m[name];
-      auto * signal = dynamic_cast< Signal<ARGS...>* >(&base_signal);
+      auto * signal = dynamic_cast< Signal<void(ARGS...)>* >(&base_signal);
       emp_assert( signal != nullptr && "invalid signal conversion!" );
       signal->Trigger(std::forward<ARGS>(args)...);
     }
