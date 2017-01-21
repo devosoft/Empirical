@@ -127,10 +127,14 @@ namespace emp {
     bool Has(SignalKey key) const { return emp::Has(link_key_map, key); }
   };
 
+  // Generic version of Signals.
+  template <typename... ARGS> class Signal;
+
+  // Signals with void return.
   template <typename... ARGS>
-  class Signal : public SignalBase {
+  class Signal<void(ARGS...)> : public SignalBase {
   protected:
-    using this_t = Signal<ARGS...>;
+    using this_t = Signal<void(ARGS...)>;
     FunctionSet<void(ARGS...)> actions;
   public:
     Signal(const std::string & name="", internal::SignalManager_Base * manager=nullptr)
@@ -220,15 +224,15 @@ namespace emp {
   inline void SignalBase::BaseTrigger(ARGS... args) {
     // Make sure this base class is really of the correct derrived type (but do so in an
     // assert since triggers may be called frequently and should be fast!)
-    emp_assert(dynamic_cast< Signal<ARGS...> * >(this));
-    ((Signal<ARGS...> *) this)->Trigger(args...);
+    emp_assert(dynamic_cast< Signal<void(ARGS...)> * >(this));
+    ((Signal<void(ARGS...)> *) this)->Trigger(args...);
   }
 
   template <typename... ARGS>
   inline SignalKey SignalBase::AddAction(const std::function<void(ARGS...)> & in_fun) {
     // @CAO: Assert for now; ideally try to find solution with fewer args.
-    emp_assert(dynamic_cast< Signal<ARGS...> * >(this));
-    return ((Signal<ARGS...> *) this)->AddAction(in_fun);
+    emp_assert(dynamic_cast< Signal<void(ARGS...)> * >(this));
+    return ((Signal<void(ARGS...)> *) this)->AddAction(in_fun);
   }
 
 }
