@@ -18,7 +18,7 @@ int main()
 {
   // A simple signal that sends an int.
   emp::SignalControl control;
-  emp::Signal<int> & test_sig = control.AddSignal<int>("test");
+  emp::Signal<void(int)> & test_sig = control.AddSignal<void(int)>("test");
   test_sig.AddAction(PrintInt);
   test_sig.AddAction(PrintVoid);
   test_sig.AddAction([](int x){ std::cout << "---:" << x << "\n\n"; });
@@ -30,7 +30,7 @@ int main()
 
   // Signals dont need to take arguments or have names.
   std::cout << "Phase 2: Create and trigger a signal with no args; added action to print ***\n";
-  emp::Signal<> test_sig2;
+  emp::Signal<void()> test_sig2;
   test_sig2.AddAction(PrintVoid);
   test_sig2.Trigger();
 
@@ -42,7 +42,7 @@ int main()
   emp::Action<int> act2(PrintInt, "iprint");
   emp::Action<int,int> act_mint(MultInt, "mint");
 
-  auto & test_sig3 = control.AddSignal<int>("test3");
+  auto & test_sig3 = control.AddSignal<void(int)>("test3");
   test_sig3.AddAction(act1);
 
   control.AddAction(act2);
@@ -62,7 +62,7 @@ int main()
 
   // Build a signal setup to provide many arguments.
   std::cout << "Phase 6: Sum 1,2,3,4!\n";
-  emp::Signal<int,int,int,int,int&> sum4_sig;
+  emp::Signal<void(int,int,int,int,int&)> sum4_sig;
   sum4_sig.AddAction(Sum4);
   int result=0;
   sum4_sig.Trigger(1,2,3,4,result);
