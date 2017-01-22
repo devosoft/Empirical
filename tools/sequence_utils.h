@@ -16,17 +16,17 @@ namespace emp {
 
   // Hamming distance is a simple count of substitutions needed to convert on array to another.
   template <typename TYPE>
-  int calc_hamming_distance(const TYPE & in1, const TYPE & in2, int offset=0) {
+  size_t calc_hamming_distance(const TYPE & in1, const TYPE & in2, int offset=0) {
     if (offset < 0) return calc_hamming_distance(in2, in1, -offset);
 
     const auto size1 = in1.size();
     const auto size2 = in2.size();
 
     // Calculate by how much the strings overlap.
-    int overlap = std::min( size1 - offset,  size2 );
+    size_t overlap = std::min( size1 - offset,  size2 );
 
     // Initialize the distance to that part of the strings which do not overlap.
-    int num_diffs = size1 + size2 - 2 * overlap;
+    size_t num_diffs = size1 + size2 - 2 * overlap;
 
     // Step through the overlapped section and add on additional differences.
     for (size_t i = 0; i < overlap; i++) {
@@ -39,7 +39,7 @@ namespace emp {
   // Edit distance is the minimum number of insertions, deletions and substitutions to convert
   // one array to another.
   template <typename TYPE>
-  int calc_edit_distance(const TYPE & in1, const TYPE & in2) {
+  size_t calc_edit_distance(const TYPE & in1, const TYPE & in2) {
     const auto size1 = in1.size();
     const auto size2 = in2.size();
 
@@ -47,20 +47,20 @@ namespace emp {
     if (size1 == 0) return size2;
     if (size2 == 0) return size1;
 
-    emp::vector<int> cur_row(size1);   // The row we are calculating
-    emp::vector<int> prev_row(size1);  // The previous row we calculated
+    emp::vector<size_t> cur_row(size1);   // The row we are calculating
+    emp::vector<size_t> prev_row(size1);  // The previous row we calculated
 
     // Initialize the previous row to record the differece from nothing.
-    for (int i = 0; i < size1; i++) prev_row[i] = i + 1;
+    for (size_t i = 0; i < size1; i++) prev_row[i] = i + 1;
 
     // Loop through all other rows
-    for (int row = 0; row < (int) size2; row++) {
+    for (size_t row = 0; row < size2; row++) {
       // Initialize the first entry in the current row.
       if (in1[0] == in2[row]) cur_row[0] = row;
       else cur_row[0] = std::min(row, prev_row[0]) + 1;
 
       // Move through the cur_row and fill it in.
-      for (int col = 1; col < (int) size1; col++) {
+      for (size_t col = 1; col < size1; col++) {
         // If the values are equal, keep the value in the upper left.
         if (in1[col] == in2[row]) cur_row[col] = prev_row[col-1];
 
@@ -82,7 +82,7 @@ namespace emp {
   // Use edit distance to find the minimum number of insertions, deletions and substitutions
   // to convert one array to another, and then insert gaps into the arrays appropriately.
   template <typename TYPE, typename GAP_TYPE>
-  int align(TYPE & in1, TYPE & in2, GAP_TYPE gap) {
+  size_t align(TYPE & in1, TYPE & in2, GAP_TYPE gap) {
     const auto size1 = in1.size();
     const auto size2 = in2.size();
 
@@ -90,24 +90,24 @@ namespace emp {
     if (size1 == 0) return size2;
     if (size2 == 0) return size1;
 
-    emp::vector<int> cur_row(size1);   // The row we are calculating
-    emp::vector<int> prev_row(size1);  // The previous row we calculated
+    emp::vector<size_t> cur_row(size1);   // The row we are calculating
+    emp::vector<size_t> prev_row(size1);  // The previous row we calculated
     emp::vector<emp::vector<char> > edit_info(size2, emp::vector<char>(size1));
 
     // Initialize the previous row to record the differece from nothing.
-    for (int i = 0; i < size1; i++) {
+    for (size_t i = 0; i < size1; i++) {
       prev_row[i] = i + 1;
       edit_info[0][i] = 'i';
     }
 
     // Loop through all other rows
-    for (int row = 0; row < (int) size2; row++) {
+    for (size_t row = 0; row < size2; row++) {
       // Initialize the first entry in the current row.
       if (in1[0] == in2[row]) { cur_row[0] = row; edit_info[row][0] = 's'; }
       else { cur_row[0] = prev_row[0] + 1; edit_info[row][0] = 'd'; }
 
       // Move through the cur_row and fill it in.
-      for (int col = 1; col < (int) size1; col++) {
+      for (size_t col = 1; col < size1; col++) {
         // If the values are equal, keep the value in the upper left.
         if (in1[col] == in2[row]) { cur_row[col] = prev_row[col-1]; edit_info[row][col] = 's'; }
 
@@ -127,9 +127,9 @@ namespace emp {
 
     // Fill in gaps in the sequences to make them align!
 
-    int c = size1-1;
-    int r = size2-1;
-    int length = 0;
+    int c = (int) size1 - 1;
+    int r = (int) size2 - 1;
+    size_t length = 0;
 
     while (c >= 0 || r >= 0) {
       if (c < 0) { ++length; --r; continue; }
@@ -143,13 +143,13 @@ namespace emp {
       };
     }
 
-    c = size1-1;
-    r = size2-1;
+    c = (int) size1-1;
+    r = (int) size2-1;
 
     TYPE out1(length, gap);
     TYPE out2(length, gap);
 
-    int pos = length - 1;
+    size_t pos = length - 1;
 
     while (c >= 0 && r >= 0) {
       switch(edit_info[r][c]) {
