@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  These functions focus on dealing with generic sequence types.
@@ -135,7 +135,7 @@ namespace emp {
       if (c < 0) { ++length; --r; continue; }
       else if (r < 0) { ++length; --c; continue; }
 
-      char cur_move = edit_info[r][c];
+      char cur_move = edit_info[(size_t)r][(size_t)c];
       switch(cur_move) {
       case 's': --c; --r; ++length; break;
       case 'd': --r; ++length; break;
@@ -152,15 +152,15 @@ namespace emp {
     size_t pos = length - 1;
 
     while (c >= 0 && r >= 0) {
-      switch(edit_info[r][c]) {
-      case 's': out1[pos] = in1[c]; out2[pos] = in2[r]; --c; --r; break;
-      case 'd': out1[pos] = gap;    out2[pos] = in2[r];      --r; break;
-      case 'i': out1[pos] = in1[c]; out2[pos] = gap;    --c;      break;
+      switch(edit_info[(size_t)r][(size_t)c]) {
+      case 's': out1[pos] = in1[(size_t)c]; out2[pos] = in2[(size_t)r]; --c; --r; break;
+      case 'd': out1[pos] = gap;    out2[pos] = in2[(size_t)r];      --r; break;
+      case 'i': out1[pos] = in1[(size_t)c]; out2[pos] = gap;    --c;      break;
       };
       --pos;
     }
-    while (c >= 0) { out1[pos] = in1[c]; --c; --pos; }
-    while (r >= 0) { out2[pos] = in2[r]; --r; --pos; }
+    while (c >= 0) { out1[pos] = in1[(size_t)c]; --c; --pos; }
+    while (r >= 0) { out2[pos] = in2[(size_t)r]; --r; --pos; }
 
     in1 = out1;
     in2 = out2;
