@@ -134,9 +134,11 @@ namespace emp {
   template <typename... ARGS>
   class Signal<void(ARGS...)> : public SignalBase {
   protected:
-    using this_t = Signal<void(ARGS...)>;
     FunctionSet<void(ARGS...)> actions;
   public:
+    using fun_t = void(ARGS...);
+    using this_t = Signal<fun_t>;
+
     Signal(const std::string & name="", internal::SignalManager_Base * manager=nullptr)
      : SignalBase(name, manager) { ; }
      Signal(const std::string & name, internal::SignalControl_Base & control)
@@ -161,7 +163,7 @@ namespace emp {
     }
 
     SignalKey AddAction(ActionBase & in_action) {
-      Action<ARGS...> * a = dynamic_cast< Action<ARGS...>* >(&in_action);
+      Action<fun_t> * a = dynamic_cast< Action<fun_t>* >(&in_action);
       emp_assert( a != nullptr && "action type must match signal type." );
       return AddAction(a->GetFun());
     }
@@ -253,7 +255,7 @@ namespace emp {
     }
 
     SignalKey AddAction(ActionBase & in_action) {
-      Action<ARGS...> * a = dynamic_cast< Action<ARGS...>* >(&in_action);
+      Action<fun_t> * a = dynamic_cast< Action<fun_t>* >(&in_action);
       emp_assert( a != nullptr && "action type must match signal type." );
       return AddAction(a->GetFun());
     }
