@@ -51,12 +51,14 @@ namespace emp {
     int GetArgCount() const { return ARG_COUNT; }
   };
 
+  template <typename... ARGS> class Action;
+
   template <typename... ARGS>
-  class Action : public ActionSize<sizeof...(ARGS)> {
+  class Action<void(ARGS...)> : public ActionSize<sizeof...(ARGS)> {
   protected:
     std::function<void(ARGS...)> fun;
   public:
-    using this_t = Action<ARGS...>;
+    using this_t = Action<void(ARGS...)>;
     using parent_t = ActionSize<sizeof...(ARGS)>;
 
     Action(const std::function<void(ARGS...)> & in_fun, const std::string & in_name="")
@@ -80,7 +82,7 @@ namespace emp {
 
   template <typename RETURN, typename... ARGS>
   auto make_action(const std::function<RETURN(ARGS...)> & in_fun, const std::string & name="") {
-    return Action<ARGS...>(in_fun, name);
+    return Action<RETURN(ARGS...)>(in_fun, name);
   }
 }
 
