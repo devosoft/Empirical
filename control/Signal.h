@@ -127,12 +127,18 @@ namespace emp {
     bool Has(SignalKey key) const { return emp::Has(link_key_map, key); }
   };
 
+  // Generic version of Signals.
+  template <typename... ARGS> class Signal;
+
+  // Signals with void return.
   template <typename... ARGS>
-  class Signal : public SignalBase {
+  class Signal<void(ARGS...)> : public SignalBase {
   protected:
-    using this_t = Signal<ARGS...>;
     FunctionSet<void(ARGS...)> actions;
   public:
+    using fun_t = void(ARGS...);
+    using this_t = Signal<fun_t>;
+
     Signal(const std::string & name="", internal::SignalManager_Base * manager=nullptr)
      : SignalBase(name, manager) { ; }
      Signal(const std::string & name, internal::SignalControl_Base & control)
@@ -157,7 +163,7 @@ namespace emp {
     }
 
     SignalKey AddAction(ActionBase & in_action) {
-      Action<ARGS...> * a = dynamic_cast< Action<ARGS...>* >(&in_action);
+      Action<fun_t> * a = dynamic_cast< Action<fun_t>* >(&in_action);
       emp_assert( a != nullptr && "action type must match signal type." );
       return AddAction(a->GetFun());
     }
@@ -216,19 +222,111 @@ namespace emp {
 
   };
 
+  // Signals with NON-void return.
+  template <typename RETURN, typename... ARGS>
+  class Signal<RETURN(ARGS...)> : public SignalBase {
+  protected:
+    FunctionSet<RETURN(ARGS...)> actions;
+  public:
+    using fun_t = RETURN(ARGS...);
+    using this_t = Signal<fun_t>;
+
+    Signal(const std::string & name="", internal::SignalManager_Base * manager=nullptr)
+     : SignalBase(name, manager) { ; }
+     Signal(const std::string & name, internal::SignalControl_Base & control)
+      : this_t(name, &(control.GetSignalManager())) { ; }
+    virtual this_t * Clone() const {
+      this_t * new_copy = new this_t(name);
+      // @CAO: Make sure to copy over actions into new copy.
+      return new_copy;
+    }
+
+    size_t GetNumArgs() const { return sizeof...(ARGS); }
+    size_t GetNumActions() const { return actions.GetSize(); }
+
+    const emp::vector<RETURN> & Trigger(ARGS... args) { return actions.Run(args...); }
+
+    // Add an action that takes the proper arguments.
+    SignalKey AddAction(const std::function<fun_t> & in_fun) {
+      const SignalKey link_id = NextSignalKey();
+      link_key_map[link_id] = actions.size();
+      actions.Add(in_fun);
+      return link_id;
+    }
+
+    SignalKey AddAction(ActionBase & in_action) {
+      Action<fun_t> * a = dynamic_cast< Action<fun_t>* >(&in_action);
+      emp_assert( a != nullptr && "action type must match signal type." );
+      return AddAction(a->GetFun());
+    }
+
+    // Add an action that takes too few arguments... but provide specific padding info.
+    template <typename... FUN_ARGS, typename... EXTRA_ARGS>
+    SignalKey AddAction(const std::function<RETURN(FUN_ARGS...)> & in_fun, TypePack<EXTRA_ARGS...>)
+    {
+      // If we made it here, we have isolated the extra arguments that we need to throw away to
+      // call this function correctly.
+      const SignalKey link_id = NextSignalKey();
+      link_key_map[link_id] = actions.size();
+      std::function<fun_t> expand_fun =
+        [in_fun](FUN_ARGS... args, EXTRA_ARGS...){ in_fun(std::forward<FUN_ARGS>(args)...); };
+      actions.Add(expand_fun);
+      return link_id;
+    }
+
+    // Add an std::function that takes the wrong number of arguments.  For now, we will assume
+    // that there are too few and we need to figure out how to pad it out.
+    template <typename... FUN_ARGS>
+    SignalKey AddAction(const std::function<RETURN(FUN_ARGS...)> & in_fun) {
+      // Identify the extra arguments by removing the ones that we know about.
+      using extra_type = typename TypePack<ARGS...>::template popN<sizeof...(FUN_ARGS)>;
+      return AddAction(in_fun, extra_type());
+    }
+
+    // Add a regular function that takes the wrong number of arguments.  For now, we will assume
+    // that there are too few and we need to figure out how to pad it out.
+    template <typename... FUN_ARGS>
+    SignalKey AddAction(RETURN in_fun(FUN_ARGS...)) {
+      // Identify the extra arguments by removing the ones that we know about.
+      using extra_type = typename TypePack<ARGS...>::template popN<sizeof...(FUN_ARGS)>;
+      return AddAction(std::function<RETURN(FUN_ARGS...)>(in_fun), extra_type());
+    }
+
+    void Remove(SignalKey key) {
+      // Find the action associate with this key.
+      emp_assert(emp::Has(link_key_map, key));
+      size_t pos = link_key_map[key];
+
+      // Remove the action
+      actions.Remove(pos);
+      link_key_map.erase(key);
+
+      // Adjust all of the positions of the actions that came after this one.
+      for (auto & x : link_key_map) {
+        if (x.second > pos) x.second = x.second - 1;
+      }
+    }
+
+    size_t GetPriority(SignalKey key) {
+      emp_assert(emp::Has(link_key_map, key));
+      return link_key_map[key];
+    }
+
+  };
+
   template<typename... ARGS>
   inline void SignalBase::BaseTrigger(ARGS... args) {
     // Make sure this base class is really of the correct derrived type (but do so in an
     // assert since triggers may be called frequently and should be fast!)
-    emp_assert(dynamic_cast< Signal<ARGS...> * >(this));
-    ((Signal<ARGS...> *) this)->Trigger(args...);
+    emp_assert(dynamic_cast< Signal<void(ARGS...)> * >(this));
+    ((Signal<void(ARGS...)> *) this)->Trigger(args...);
   }
 
   template <typename... ARGS>
   inline SignalKey SignalBase::AddAction(const std::function<void(ARGS...)> & in_fun) {
     // @CAO: Assert for now; ideally try to find solution with fewer args.
-    emp_assert(dynamic_cast< Signal<ARGS...> * >(this));
-    return ((Signal<ARGS...> *) this)->AddAction(in_fun);
+    emp_assert(dynamic_cast< Signal<void(ARGS...)> * >(this));
+    return ((Signal<void(ARGS...)> *) this)->AddAction(in_fun);
   }
 
 }

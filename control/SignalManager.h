@@ -53,9 +53,10 @@ namespace emp {
       return *(it->second);
     }
 
-    template <typename... ARGS>
+//    template <typename... ARGS>
+    template <typename FUN_T>
     auto & Add(const std::string & name) {
-      auto * new_signal = new Signal<ARGS...>(name);
+      auto * new_signal = new Signal<FUN_T>(name);
       signal_map[name] = new_signal;
       new_signal->signal_id = next_id++;
       new_signal->managers.push_back(this);
@@ -63,8 +64,8 @@ namespace emp {
       return *new_signal;
     }
 
-    template <typename... ARGS>
-    auto & Add(Signal<ARGS...> & signal) {
+    template <typename FUN_T>
+    auto & Add(Signal<FUN_T> & signal) {
       signal_map[signal.name] = &signal;
       signal.signal_id = next_id++;       // @CAO: Who should control the signal id?
       signal.managers.push_back(this);

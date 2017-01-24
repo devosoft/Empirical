@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  A collection of broadly-useful functions.
@@ -79,13 +79,13 @@ namespace emp {
     return *max_found;
   }
 
-
-  static inline std::vector<int> BuildRange(int min, int max, int step=1) {
-    int size = (max-min) / step;
+  template <typename T>
+  static inline std::vector<T> BuildRange(T min, T max, T step=1) {
+    size_t size = (size_t) ((max-min) / step);
     emp_assert(size >= 0);
-    std::vector<int> out_v((size_t) size);
+    std::vector<T> out_v((size_t) size);
     size_t pos = 0;
-    for (int i = min; i < max; i += step) {
+    for (T i = min; i < max; i += step) {
       out_v[pos++] = i;
     }
     return out_v;

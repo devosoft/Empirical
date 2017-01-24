@@ -229,10 +229,10 @@ namespace evo {
     // Most of the key functions in the population manager can be interfaced with symbols.  If you
     // need to modify the more complex behaviors (such as Execute) you need to create a new
     // derrived class from PopulationManager_Base, which is also legal in a plugin.
-    Signal<> sig_clear;
-    Signal<> sig_update;
-    Signal<ORG*, size_t&> sig_add_org;               // args: new org, return: offspring pos
-    Signal<ORG*, size_t, size_t&> sig_add_org_birth; // args: new org, parent pos, return: offspring pos
+    Signal<void()> sig_clear;
+    Signal<void()> sig_update;
+    Signal<void(ORG*, size_t&)> sig_add_org;               // args: new org, return: offspring pos
+    Signal<void(ORG*, size_t, size_t&)> sig_add_org_birth; // args: new org, parent pos, return: offspring pos
 
   public:
     PopulationManager_Plugin(const std::string & _w_name, FIT_MANAGER & _fm)
