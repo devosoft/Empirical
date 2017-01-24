@@ -35,25 +35,25 @@ namespace evo {
     using callback_t = OrgSignals_Eco;
   private:
     // Fixed members
-    callback_t * callbacks; // Callbacks to population
-    size_t id;            // Organism ID
+    callback_t * callbacks;   ///< Callbacks to population
+    size_t id;                ///< Organism ID
 
-    BitVector host;         // Current host genome
-    BitVector symbiont;     // Current symbiont genome
+    BitVector host;         ///< Current host genome
+    BitVector symbiont;     ///< Current symbiont genome
 
-    uint32_t host_cost;     // Score needed for host to replicate.
-    uint32_t symb_cost;     // Score needed for symbiont to replicate.
+    uint32_t host_cost;     ///< Score needed for host to replicate.
+    uint32_t symb_cost;     ///< Score needed for symbiont to replicate.
 
     // Active members
-    uint32_t host_pos;      // What bit position to execute next in the host?
-    uint32_t symb_pos;      // What bit position to execute next in the symbiont?
+    uint32_t host_pos;      ///< What bit position to execute next in the host?
+    uint32_t symb_pos;      ///< What bit position to execute next in the symbiont?
 
-    uint32_t host_score;    // Current host score, toward replication
-    uint32_t symb_score;    // Current symbiont score, toward horizontal transmission
+    uint32_t host_score;    ///< Current host score, toward replication
+    uint32_t symb_score;    ///< Current symbiont score, toward horizontal transmission
 
-    uint32_t streak_00;     // Number of consecutive zeros executed by symbiont.
-    uint32_t streak_01;     // Number of consecutive zeros executed by symbiont.
-    uint32_t streak_1;      // Number of consecutive ones executed by symbiont.
+    uint32_t streak_00;     ///< Number of consecutive zeros executed by symbiont.
+    uint32_t streak_01;     ///< Number of consecutive zeros executed by symbiont.
+    uint32_t streak_1;      ///< Number of consecutive ones executed by symbiont.
 
   public:
     SymbulationOrg(const BitVector & genome, uint32_t h_cost, uint32_t s_cost=0)
@@ -106,7 +106,7 @@ namespace evo {
       symb_pos = symb_score = streak_00 = streak_01 = streak_1 = 0;
     }
 
-    // Try to inject a symbiont, but it might fail if another symbiont is already there.
+    /// Try to inject a symbiont, but it might fail if another symbiont is already there.
     bool InjectSymbiont(const BitVector & in_symb, Random & random, double displace_prob=0.5) {
       // For a symbiont to be injectected successfully, there either has to be no symbiont
       // in the current cell -or- the existing symbiont must be displaced.
@@ -117,18 +117,19 @@ namespace evo {
       return false;
     }
 
+
+    /// Trigger host reproduction if score is high enough.
     void TestHostRepro() {
       emp_assert(host_cost > 0);
-      // Trigger reproduction if score is high enough.
       if (host_score >= host_cost) {
         Reset();                          // Reset before replication.
         callbacks->repro_sig.Trigger(id); // Trigger replication call.
       }
     }
 
+    /// Trigger symbiont reproduction if score is high enough.
     void TestSymbiontRepro() {
       emp_assert(symb_cost > 0);
-      // Trigger reproduction if score is high enough.
       if (symb_score >= symb_cost) {
         symb_pos = symb_score = 0;                 // Reset Symbiont stats only.
         streak_00 = streak_01 = streak_1 = 0;
