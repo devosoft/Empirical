@@ -18,4 +18,9 @@ int main()
   int result;
   sum_action.Call(5,6,result);
   std::cout << "5+6 = " << result << std::endl;
+
+  // Test actions with return values...
+  std::function<int(int,int)> mult_fun = [](int x, int y){ return x*y; };
+  emp::Action<int(int,int)> mult_action(mult_fun, "mult");
+  std::cout << "5*6 = " << mult_action.Call(5,6) << std::endl;
 }
