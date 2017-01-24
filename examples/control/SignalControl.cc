@@ -38,9 +38,9 @@ int main()
   std::cout << "Phase 3: Create action objects in SignalControl and link them to signals by name.\n"
             << "...setup three actions (print val three times while tracking sum of vals so far)\n";
   int total=0;
-  emp::Action<int> act1([&total](int inc){total+=inc;}, "sum");
-  emp::Action<int> act2(PrintInt, "iprint");
-  emp::Action<int,int> act_mint(MultInt, "mint");
+  emp::Action<void(int)> act1([&total](int inc){total+=inc;}, "sum");
+  emp::Action<void(int)> act2(PrintInt, "iprint");
+  emp::Action<void(int,int)> act_mint(MultInt, "mint");
 
   auto & test_sig3 = control.AddSignal<void(int)>("test3");
   test_sig3.AddAction(act1);
