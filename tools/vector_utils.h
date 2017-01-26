@@ -70,6 +70,18 @@ namespace emp {
     Heapify(v,0);
     return out;
   }
+
+  // Insert a new element into a heap.
+  template <typename T>
+  void HeapInsert(emp::vector<T> & v, T val) {
+    size_t pos = v.size();
+    v.push_back(val);
+    while (pos > 0) {
+      pos = tree_parent(pos);
+      Heapify(v,pos);
+    }
+  }
+
 }
 
 #endif
