@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  This file contains a set of simple functions to manipulate strings.
@@ -10,6 +10,14 @@
 #include "vector.h"
 
 namespace emp {
+
+  template <typename T>
+  void Print(const emp::vector<T> & v, std::ostream & os=std::cout, const std::string & spacer=" ") {
+    for (size_t id = 0; id < v.size(); id++) {
+      if (id) os << spacer; // Put a space before second element and beyond.
+      os << v[id];
+    }
+  }
 
   // Tree manipulation in vectors.
   constexpr size_t tree_left(size_t id) { return id*2+1; }
@@ -30,16 +38,18 @@ namespace emp {
       const T val_right = v[id_right];
       if (val_right > val_left && val_right > val) {
         v[id] = val_right;
-        v[right_id] = val;
-        Heapify(v, right_id);
+        v[id_right] = val;
+        Heapify(v, id_right);
         return;
       }
     }
 
     if (val_left > val) {
       v[id] = val_left;
-      v[left_id] = val;
-      Heapify(v, left_id);
+      v[id_left] = val;
+      Heapify(v, id_left);
     }
   }
 }
+
+#endif
