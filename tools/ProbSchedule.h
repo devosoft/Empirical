@@ -1,17 +1,20 @@
-
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016-17.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 // A simple class to choose items with a probability proportional to their weight.
 //
 // Constructor:
-// ProbSchedule(int num_items, int random_seed=-1)
+// ProbSchedule(size_t num_items, int random_seed=-1)
 //     num_items is the maximum number of items that can be placed into the data structure.
 //     random_seed is the seed for the random number generator used; values < 0 base seed on time.
 //
-// void Adjust(int id, double weight)
+// void Adjust(size_t id, double weight)
 //     id is the identification number of the item whose weight is being adjusted.
 //     weight is the new weight for that entry.
 //
-// int NextID() returns a random id based on the weights provided.
+// size_t NextID() returns a random id based on the weights provided.
 //
 //
 // Development NOTES:
@@ -33,7 +36,7 @@ namespace emp {
   /// A simple class to choose items with a probability proportional to their weight.
   class ProbSchedule {
   private:
-    const int num_items;
+    const size_t num_items;
     emp::vector<double> weights;
     emp::vector<double> tree_weights;
     Random m_rng;
@@ -41,14 +44,14 @@ namespace emp {
     ProbSchedule(const ProbSchedule&); // @not_implemented
     ProbSchedule& operator=(const ProbSchedule&); // @not_implemented
 
-    int CalcID(double rand_pos, int cur_id) {
+    size_t CalcID(double rand_pos, size_t cur_id) {
       // If our target is in the current node, return it!
       const double cur_weight = weights[cur_id];
       if (rand_pos < cur_weight) return cur_id;
 
       // Otherwise determine if we need to recurse left or right.
       rand_pos -= cur_weight;
-      const int left_id = cur_id*2 + 1;
+      const size_t left_id = cur_id*2 + 1;
       const double left_weight = tree_weights[left_id];
 
       return (rand_pos < left_weight) ? CalcID(rand_pos, left_id) : CalcID(rand_pos-left_weight, left_id+1);
@@ -58,26 +61,26 @@ namespace emp {
 
     /// num_items is the maximum number of items that can be placed into the data structure.
     /// random_seed is the seed for the random number generator used; values < 0 base seed on time.
-    ProbSchedule(int _items, int seed=-1) : num_items(_items), weights(_items+1), tree_weights(_items+1), m_rng(seed) {
-      for (int i = 0; i < (int) weights.size(); i++)  weights[i] = tree_weights[i] = 0.0;
+    ProbSchedule(size_t _items, int seed=-1) : num_items(_items), weights(_items+1), tree_weights(_items+1), m_rng(seed) {
+      for (size_t i = 0; i < weights.size(); i++)  weights[i] = tree_weights[i] = 0.0;
     }
     ~ProbSchedule() { ; }
 
-    int GetSize() const { return num_items; }
+    size_t GetSize() const { return num_items; }
 
     // Standard library compatibility
-    int size() const { return num_items; }
+    size_t size() const { return num_items; }
 
-    double GetWeight(int id) const { return weights[id]; }
-    double GetSubtreeWeight(int id) const { return tree_weights[id]; }
+    double GetWeight(size_t id) const { return weights[id]; }
+    double GetSubtreeWeight(size_t id) const { return tree_weights[id]; }
 
 
-    void Adjust(int id, const double _weight) {
+    void Adjust(size_t id, const double _weight) {
       weights[id] = _weight;
 
       // Determine the child ids to adjust subtree weight.
-      const int left_id = 2*id + 1;
-      const int right_id = 2*id + 2;
+      const size_t left_id = 2*id + 1;
+      const size_t right_id = 2*id + 2;
 
       // Make sure the subtrees looked for haven't fallen off the end of this tree.
       const double st1_weight = (left_id < num_items) ? tree_weights[left_id] : 0.0;
