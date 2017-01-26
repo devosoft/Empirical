@@ -24,7 +24,9 @@ namespace emp {
   constexpr size_t tree_right(size_t id) { return id*2+2; }
   constexpr size_t tree_parent(size_t id) { return (id-1)/2; }
 
-  // Heap manipulation.
+  // == Heap manipulation ==
+
+  // Heapify an individual node.
   template <typename T>
   void Heapify(emp::vector<T> & v, size_t id) {
     const size_t id_left = tree_left(id);
@@ -49,6 +51,13 @@ namespace emp {
       v[id_left] = val;
       Heapify(v, id_left);
     }
+  }
+
+  // Heapify all elements in a vector.
+  template <typename T>
+  void Heapify(emp::vector<T> & v) {
+    size_t id = v.size();
+    while (id-- > 0) emp::Heapify(v, id);
   }
 }
 
