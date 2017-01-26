@@ -59,6 +59,17 @@ namespace emp {
     size_t id = v.size();
     while (id-- > 0) emp::Heapify(v, id);
   }
+
+  // Extraxt maximum element from a heap.
+  template <typename T>
+  T HeapExtract(emp::vector<T> & v) {
+    T out = v[0];
+    const size_t last_pos = v.size() - 1;
+    v[0] = v[last_pos];
+    v.resize(last_pos);
+    Heapify(v,0);
+    return out;
+  }
 }
 
 #endif
