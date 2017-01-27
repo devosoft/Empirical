@@ -24,6 +24,7 @@
 #define EMP_DATA_NODE_H
 
 #include "../base/vector.h"
+#include "../meta/IntPack.h"
 #include "../tools/assert.h"
 #include "../tools/FunctionSet.h"
 
@@ -76,6 +77,10 @@ namespace emp {
     void AddDatum(const VAL_TYPE & val) { val_count++; }
 
     void Reset() { val_count = 0; }
+
+    void PrintDebug(std::ostream & os=std::cout) {
+      os << "BASE DataNodeModule.\n";
+    }
   };
 
   // Specialized forms of DataNodeModule
@@ -183,13 +188,27 @@ namespace emp {
   public:
     void AddPull(const std::function<VAL_TYPE()> & fun) { pull_funs.Add(fun); }
     void AddPullSet(const std::function<emp::vector<VAL_TYPE>()> & fun) { pull_set_funs.Add(fun); }
+
+    void PrintDebug(std::ostream & os=std::cout) {
+      os << "DataNodeModule for data::Pull. (level " << (int) data::Pull << ")\n";
+      parent_t::PrintDebug(os);
+    }
+  };
+
+  template <typename VAL_TYPE, typename MOD_PACK> class DataNode_Interface;
+
+  template <typename VAL_TYPE, int... IMODS>
+  class DataNode_Interface<VAL_TYPE, IntPack<IMODS...>>
+    : public DataNodeModule<VAL_TYPE, (emp::data) IMODS...> {
+    using parent_t = DataNodeModule<VAL_TYPE, (emp::data) IMODS...>;
   };
 
   template <typename VAL_TYPE, emp::data... MODS>
-  class DataNode : public DataNodeModule<VAL_TYPE, MODS...> {
+  class DataNode : public DataNode_Interface< VAL_TYPE, pack::sort<IntPack<(int) MODS...>> > {
   private:
-    using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
+    using parent_t = DataNode_Interface< VAL_TYPE, pack::sort<IntPack<(int) MODS...>> >;
     using parent_t::in_vals;
+    using test = IntPack<(int)MODS...>;
 
   public:
 
@@ -208,6 +227,12 @@ namespace emp {
 
     // Methods to reset data.
     void Reset() { parent_t::Reset(); }
+
+    // Methods to debug.
+    void PrintDebug(std::ostream & os=std::cout) {
+      os << "Main DataNode.\n";
+      parent_t::PrintDebug(os);
+    }
   };
 
 }
