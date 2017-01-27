@@ -81,7 +81,7 @@ namespace emp {
     v.push_back(val);
     while (pos > 0) {
       pos = tree_parent(pos);
-      Heapify(v,pos);
+      if (!Heapify(v,pos)) break;
     }
   }
 
