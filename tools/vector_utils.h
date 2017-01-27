@@ -28,9 +28,9 @@ namespace emp {
 
   // Heapify an individual node.
   template <typename T>
-  void Heapify(emp::vector<T> & v, size_t id) {
+  bool Heapify(emp::vector<T> & v, size_t id) {
     const size_t id_left = tree_left(id);
-    if (id_left >= v.size()) return;  // Nothing left to heapify.
+    if (id_left >= v.size()) return false;  // Nothing left to heapify.
 
     const T val = v[id];
     const T val_left = v[id_left];
@@ -42,7 +42,7 @@ namespace emp {
         v[id] = val_right;
         v[id_right] = val;
         Heapify(v, id_right);
-        return;
+        return true;
       }
     }
 
@@ -50,7 +50,10 @@ namespace emp {
       v[id] = val_left;
       v[id_left] = val;
       Heapify(v, id_left);
+      return true;
     }
+
+    return false;  // No changes need to be made.
   }
 
   // Heapify all elements in a vector.
