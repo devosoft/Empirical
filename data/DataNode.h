@@ -100,6 +100,11 @@ namespace emp {
     const VAL_TYPE & GetCurrent() const { return cur_val; }
 
     void AddDatum(const VAL_TYPE & val) { cur_val = val; parent_t::AddDatum(val); }
+
+    void PrintDebug(std::ostream & os=std::cout) {
+      os << "DataNodeModule for data::Current. (level " << (int) data::Current << ")\n";
+      parent_t::PrintDebug(os);
+    }
   };
 
 
@@ -125,6 +130,11 @@ namespace emp {
     void Reset() {
       val_set.resize(0);
       parent_t::Reset();
+    }
+
+    void PrintDebug(std::ostream & os=std::cout) {
+      os << "DataNodeModule for data::Log. (level " << (int) data::Log << ")\n";
+      parent_t::PrintDebug(os);
     }
   };
 
@@ -161,6 +171,11 @@ namespace emp {
       min = 0.0;
       max = 0.0;
       parent_t::Reset();
+    }
+
+    void PrintDebug(std::ostream & os=std::cout) {
+      os << "DataNodeModule for data::Range. (level " << (int) data::Range << ")\n";
+      parent_t::PrintDebug(os);
     }
   };
 
@@ -204,9 +219,9 @@ namespace emp {
   };
 
   template <typename VAL_TYPE, emp::data... MODS>
-  class DataNode : public DataNode_Interface< VAL_TYPE, pack::sort<IntPack<(int) MODS...>> > {
+  class DataNode : public DataNode_Interface< VAL_TYPE, pack::RUsort<IntPack<(int) MODS...>> > {
   private:
-    using parent_t = DataNode_Interface< VAL_TYPE, pack::sort<IntPack<(int) MODS...>> >;
+    using parent_t = DataNode_Interface< VAL_TYPE, pack::RUsort<IntPack<(int) MODS...>> >;
     using parent_t::in_vals;
     using test = IntPack<(int)MODS...>;
 
