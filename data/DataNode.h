@@ -35,7 +35,7 @@ namespace emp {
     Current,      // Track most recent value
 
     Log,          // Track all values since last Reset()
-    // Archive,      // Track Log + ALL values over time (with purge options)
+    Archive,      // Track Log + ALL values over time (with purge options)
 
     Range,        // Track min, max, mean, total
     // Stats,        // Track Range + variance, standard deviation, skew, kertosis
@@ -134,6 +134,36 @@ namespace emp {
 
     void PrintDebug(std::ostream & os=std::cout) {
       os << "DataNodeModule for data::Log. (level " << (int) data::Log << ")\n";
+      parent_t::PrintDebug(os);
+    }
+  };
+
+  // == data::Archive ==
+  template <typename VAL_TYPE, emp::data... MODS>
+  class DataNodeModule<VAL_TYPE, data::Archive, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  protected:
+    emp::vector<emp::vector<VAL_TYPE>> archive;
+
+    using this_t = DataNodeModule<VAL_TYPE, data::Archive, MODS...>;
+    using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
+    using base_t = DataNodeModule<VAL_TYPE>;
+
+    using base_t::val_count;
+  public:
+    DataNodeModule() : archive(1) { ; }
+
+    void AddDatum(const VAL_TYPE & val) {
+      archive.back().push_back(val);
+      parent_t::AddDatum(val);
+    }
+
+    void Reset() {
+      archive.resize(archive.size()+1);
+      parent_t::Reset();
+    }
+
+    void PrintDebug(std::ostream & os=std::cout) {
+      os << "DataNodeModule for data::Archive. (level " << (int) data::Archive << ")\n";
       parent_t::PrintDebug(os);
     }
   };
