@@ -40,24 +40,24 @@ namespace emp {
       using result = IntPack<T1s..., T2s...>;
     };
 
-    template <typename T_IN, typename T_OUT, bool DONE=false>
+    template <typename T_IN, typename T_OUT=IntPack<>, bool DONE=false, int VERSION=0>
     struct ip_loop {
       // Helpers...
       using in_pop = typename T_IN::pop;
       template <int V> using out_pbin = typename T_OUT::template push_back_if_not<T_IN::first, V>;
-      template <int V, bool D=false> using pnext = ip_loop< in_pop, out_pbin<V>, D >;  // Prune
+      template <int V, bool D=false> using pnext = ip_loop< in_pop, out_pbin<V>, D, VERSION >;  // Prune
 
       // Main operations...
       template <int V> using pop_val = typename pnext<V, T_IN::first==V>::template pop_val<V>;
       template <int V> using remove = typename pnext<V>::template remove<V>;
       template <int V> using uniq = typename pnext<V>::template uniq<T_IN::first>;
     };
-    template <typename T_IN, typename T_OUT>
-    struct ip_loop<T_IN, T_OUT, true> {
+    template <typename T_IN, typename T_OUT, int VERSION>
+    struct ip_loop<T_IN, T_OUT, true, VERSION> {
       template <int V> using pop_val = typename T_OUT::template append<T_IN>; // Pop done!
     };
-    template <typename T_OUT>
-    struct ip_loop<IntPack<>, T_OUT, false> {
+    template <typename T_OUT, int VERSION>
+    struct ip_loop<IntPack<>, T_OUT, false, VERSION> {
       template <int V> using pop_val = T_OUT;  // Nothing to pop! (error?)
       template <int V> using remove = T_OUT;   // Nothing left to remove!
       template <int V> using uniq = T_OUT;     // Nothing left to check!
@@ -85,7 +85,7 @@ namespace emp {
     // Setup ==uniq== operation.
     template <typename T> struct ip_uniq;
     template <int V1, int... Vs> struct ip_uniq<IntPack<V1, Vs...>> {
-      using result = typename ip_loop<IntPack<V1, Vs...>, IntPack<>>::template uniq<V1+1>;
+      using result = typename ip_loop<IntPack<V1, Vs...>, IntPack<>, false, 1>::template uniq<V1+1>;
     };
     template <> struct ip_uniq<IntPack<>> { using result = IntPack<>; };
 
@@ -125,8 +125,8 @@ namespace emp {
     template <int V> using push_back = IntPack<V1, Vs..., V>;
     template <int V, int X> using push_if_not = typename ip_push_if_not<V,X,this_t>::result;
     template <int V, int X> using push_back_if_not = typename ip_push_if_not<V,X,this_t>::back;
-    template <int V> using pop_val = typename ip_loop<this_t, IntPack<>>::template pop_val<V>;
-    template <int V> using remove = typename ip_loop<this_t, IntPack<>>::template remove<V>;
+    template <int V> using pop_val = typename ip_loop<this_t, IntPack<>, false, 2>::template pop_val<V>;
+    template <int V> using remove = typename ip_loop<this_t, IntPack<>, false, 3>::template remove<V>;
     template <typename T> using append = typename ip_concat<this_t,T>::result;
 
     constexpr static bool Has(int V) { return (V==V1) | pop::Has(V); }
