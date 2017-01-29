@@ -153,6 +153,10 @@ namespace emp {
   public:
     DataNodeModule() : archive(1) { ; }
 
+    const auto & GetArchive() const { return archive; }
+    const emp::vector<VAL_TYPE> & GetData(size_t update) const { return archive[update]; }
+    const emp::vector<VAL_TYPE> & GetData() const { return archive.back(); }
+
     size_t GetResetCount() const { return archive.size(); }
 
     void AddDatum(const VAL_TYPE & val) {
@@ -234,6 +238,12 @@ namespace emp {
     double GetMean() const { return total_vals.back() / (double) num_vals.back(); }
     double GetMin() const { return min_vals.back(); }
     double GetMax() const { return max_vals.back(); }
+
+    double GetTotal(size_t update) const { return total_vals[update]; }
+    double GetMean(size_t update) const { return total_vals[update] / (double) num_vals[update]; }
+    double GetMin(size_t update) const { return min_vals[update]; }
+    double GetMax(size_t update) const { return max_vals[update]; }
+
     size_t GetResetCount() const { return total_vals.size(); }
 
     void AddDatum(const VAL_TYPE & val) {
