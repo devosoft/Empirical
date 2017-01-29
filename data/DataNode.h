@@ -1,18 +1,14 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
 //  DataNode objects track a specific type of data over the course of a run.
 //
-//  @CAO: Pehaps each of the functions below can be part of an add-on module?
 //
 //  Collection: New data can be pushed or pulled.
 //   Add(VAL... v) pushes data to a node
 //   AddDatum(VAL v) pushes just one datum, but can be used as an action for a signal.
-//   @CAO: Should Add trigger a signal to inform others that a datum has been collected?
-
-//   @CAO: PullData() triggers a signal that can be monitored to collect data.
 //
 //  Process: What should happen on Reset() ?
 //   * Trigger an action to process the prior update's data stored.
