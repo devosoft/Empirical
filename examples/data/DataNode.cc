@@ -11,7 +11,8 @@
 
 int main()
 {
-  emp::DataNode<int, emp::data::Current, emp::data::Range, emp::data::Pull> data;
+  emp::DataNode<int, emp::data::Current, emp::data::Range, emp::data::Pull, emp::data::Log> data;
+  emp::DataNode<int, emp::data::Archive, emp::data::Current, emp::data::FullRange, emp::data::Pull> data2;
   data.Add(27, 28, 29);
 
   std::cout << "=> Added 27, 28, and 29" << std::endl;
@@ -63,4 +64,19 @@ int main()
   std::cout << "Mean    = " << data.GetMean() << std::endl;
   std::cout << "Min     = " << data.GetMin() << std::endl;
   std::cout << "Max     = " << data.GetMax() << std::endl;
+
+  std::cout << std::endl;
+  data.PrintDebug();
+
+  std::cout << std::endl;
+  data2.PrintDebug();
+
+  data2.Add(1,2,3,4,5,6,7,8,9);
+  std::cout << "\nSetup data2 with values 1 through 9" << std::endl;
+  std::cout << "Current = " << data2.GetCurrent() << std::endl;
+  std::cout << "Total   = " << data2.GetTotal() << std::endl;
+  std::cout << "Mean    = " << data2.GetMean() << std::endl;
+  std::cout << "Min     = " << data2.GetMin() << std::endl;
+  std::cout << "Max     = " << data2.GetMax() << std::endl;
+
 }
