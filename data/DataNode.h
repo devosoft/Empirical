@@ -38,6 +38,7 @@ namespace emp {
     Archive,      // Track Log + ALL values over time (with purge options)
 
     Range,        // Track min, max, mean, total
+    FullRange,    // Track Range data over time.
     // Stats,        // Track Range + variance, standard deviation, skew, kertosis
     // FullStats,    // Track States + ALL values over time (with purge/merge options)
 
@@ -205,6 +206,50 @@ namespace emp {
 
     void PrintDebug(std::ostream & os=std::cout) {
       os << "DataNodeModule for data::Range. (level " << (int) data::Range << ")\n";
+      parent_t::PrintDebug(os);
+    }
+  };
+
+  // == data::FullRange ==
+  template <typename VAL_TYPE, emp::data... MODS>
+  class DataNodeModule<VAL_TYPE, data::FullRange, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  protected:
+    emp::vector<double> total_vals;
+    emp::vector<size_t> num_vals;
+    emp::vector<double> min_vals;
+    emp::vector<double> max_vals;
+
+    using this_t = DataNodeModule<VAL_TYPE, data::FullRange, MODS...>;
+    using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
+    using base_t = DataNodeModule<VAL_TYPE>;
+
+    using base_t::val_count;
+  public:
+    DataNodeModule() : total_vals(1,0.0), num_vals(1,0), min_vals(1,0.0), max_vals(1,0.0) { ; }
+
+    double GetTotal() const { return total_vals.back(); }
+    double GetMean() const { return total_vals.back() / (double) num_vals.back(); }
+    double GetMin() const { return min_vals.back(); }
+    double GetMax() const { return max_vals.back(); }
+
+    void AddDatum(const VAL_TYPE & val) {
+      total_vals.back() += val;
+      num_vals.back() += 1;
+      if (!val_count || val < min_vals.back()) min_vals.back() = val;
+      if (!val_count || val > max_vals.back()) max_vals.back() = val;
+      parent_t::AddDatum(val);
+    }
+
+    void Reset() {
+      total_vals.push_back(0.0);
+      num_vals.push_back(0);
+      min_vals.push_back(0.0);
+      max_vals.push_back(0.0);
+      parent_t::Reset();
+    }
+
+    void PrintDebug(std::ostream & os=std::cout) {
+      os << "DataNodeModule for data::FullRange. (level " << (int) data::FullRange << ")\n";
       parent_t::PrintDebug(os);
     }
   };
