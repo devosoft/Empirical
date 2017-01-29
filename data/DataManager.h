@@ -8,11 +8,14 @@
 #ifndef EMP_DATA_MANAGER_H
 #define EMP_DATA_MANAGER_H
 
+#include <map>
+#include <string>
+
 #include "DataNode.h"
 
 namespace emp {
 
-  template <typename VAL_TYPE, typename... MODS>
+  template <typename VAL_TYPE, emp::data... MODS>
   class DataManager {
   private:
     using data_t = VAL_TYPE;
@@ -28,3 +31,5 @@ namespace emp {
   };
 
 }
+
+#endif
