@@ -153,6 +153,8 @@ namespace emp {
   public:
     DataNodeModule() : archive(1) { ; }
 
+    size_t GetResetCount() const { return archive.size(); }
+
     void AddDatum(const VAL_TYPE & val) {
       archive.back().push_back(val);
       parent_t::AddDatum(val);
@@ -225,12 +227,14 @@ namespace emp {
 
     using base_t::val_count;
   public:
-    DataNodeModule() : total_vals(1,0.0), num_vals(1,0), min_vals(1,0.0), max_vals(1,0.0) { ; }
+    DataNodeModule()
+      : total_vals(1,0.0), num_vals(1,0), min_vals(1,0.0), max_vals(1,0.0) { ; }
 
     double GetTotal() const { return total_vals.back(); }
     double GetMean() const { return total_vals.back() / (double) num_vals.back(); }
     double GetMin() const { return min_vals.back(); }
     double GetMax() const { return max_vals.back(); }
+    size_t GetResetCount() const { return total_vals.size(); }
 
     void AddDatum(const VAL_TYPE & val) {
       total_vals.back() += val;
