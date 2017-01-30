@@ -11,6 +11,9 @@
 #include <map>
 #include <string>
 
+#include "../base/assert.h"
+#include "../tools/map_utils.h"
+
 #include "DataNode.h"
 
 namespace emp {
@@ -27,6 +30,40 @@ namespace emp {
     DataManager() = default;
     ~DataManager() {
       for (auto & x : node_map) delete x.second;
+    }
+
+    size_t GetSize() const { return node_map.size(); }
+
+    node_t & New(const std::string & name) {
+      emp_assert(!Has(node_map, name), name);
+      node_map[name] = new node_t;
+      return *(node_map[name]);
+    }
+
+    void Delete(const std::string & name) {
+      emp_assert(Has(node_map, name), name);
+      node_map.erase(name);
+    }
+
+    const node_t & Get(const std::string & name) const {
+      emp_assert(Has(node_map, name), name);
+      return *(node_map[name]);
+    }
+
+    node_t & Get(const std::string & name) {
+      emp_assert(Has(node_map, name), name);
+      return *(node_map[name]);
+    }
+
+    // == Operations that forward to DataNode objects ==
+    template <typename... Ts>
+    void AddData(const std::string & name, Ts... extra) {
+      emp_assert(Has(node_map, name), name);
+      node_map[name]->Add(extra...);
+    }
+
+    void ResetAll() {
+      for (auto & x : node_map) x.second->Reset();
     }
   };
 
