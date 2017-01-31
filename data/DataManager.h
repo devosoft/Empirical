@@ -33,6 +33,7 @@ namespace emp {
     }
 
     size_t GetSize() const { return node_map.size(); }
+    auto & GetNodes() const { return node_map; }
 
     node_t & New(const std::string & name) {
       emp_assert(!Has(node_map, name), name);
