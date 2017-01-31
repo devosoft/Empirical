@@ -70,6 +70,7 @@ namespace emp {
     using value_t = VAL_TYPE;
 
     size_t GetCount() const { return val_count; }
+    size_t GetResetCount() const { return 0; }    // If reset count not tracked, always return 0.
 
     void AddDatum(const VAL_TYPE & val) { val_count++; }
 
@@ -118,6 +119,8 @@ namespace emp {
     using base_t::val_count;
   public:
     DataNodeModule() { ; }
+
+    const emp::vector<VAL_TYPE> & GetData() const { return val_set; }
 
     void AddDatum(const VAL_TYPE & val) {
       val_set.push_back(val);
@@ -327,6 +330,19 @@ namespace emp {
 
     // Methods to reset data.
     void Reset() { parent_t::Reset(); }
+
+    // Methods to Print the templated values that a DataNode can produce.
+    void PrintCurrent(std::ostream & os=std::cout) const { os << parent_t::GetCurrent(); }
+    void PrintLog(std::ostream & os=std::cout,
+                 const std::string & spacer=", ",
+                 const std::string & eol="\n") const {
+      const emp::vector<VAL_TYPE> & data = parent_t::GetData();
+      for (size_t i=0; i < data.size(); i++) {
+        if (i>0) os << spacer;
+        os << data[i];
+      }
+      os << eol;
+    }
 
     // Methods to debug.
     void PrintDebug(std::ostream & os=std::cout) {
