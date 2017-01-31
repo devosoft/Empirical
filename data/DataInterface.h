@@ -14,15 +14,31 @@
 namespace emp {
 
   class DataInterface {
+  private:
+  public:
+    virtual ~DataInterface() { ; }
   };
 
   template <typename VAL_TYPE, typename... EXTRA>
   class DataInterface_Impl : public DataInterface {
+  public:
+    using node_t = DataNode<VAL_TYPE, EXTRA...>;
+
+  private:
+    node_t * node;
+    bool owner;
+
+  public:
+    DataInterface_Impl() : node(new node_t), owner(true) { ; }
+    DataInterface_Impl(node_t * n) : node(n), owner(false) { ; }
+    ~DataInterface_Impl() { if (owner) delete node; }
   };
 
-  
+
   template <typename VAL_TYPE, typename... EXTRA>
-  DataInterface * MakeDataInterface() { return nullptr; }
+  DataInterface * MakeDataInterface() {
+    return new DataInterface_Impl<VAL_TYPE, EXTRA...>();
+  }
 
 }
 
