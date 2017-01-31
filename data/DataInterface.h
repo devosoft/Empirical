@@ -19,7 +19,7 @@ namespace emp {
     virtual ~DataInterface() { ; }
   };
 
-  template <typename VAL_TYPE, typename... EXTRA>
+  template <typename VAL_TYPE, emp::data... EXTRA>
   class DataInterface_Impl : public DataInterface {
   public:
     using node_t = DataNode<VAL_TYPE, EXTRA...>;
@@ -35,7 +35,7 @@ namespace emp {
   };
 
 
-  template <typename VAL_TYPE, typename... EXTRA>
+  template <typename VAL_TYPE, emp::data... EXTRA>
   DataInterface * MakeDataInterface() {
     return new DataInterface_Impl<VAL_TYPE, EXTRA...>();
   }
