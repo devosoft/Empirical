@@ -23,12 +23,15 @@
 #include "../meta/IntPack.h"
 #include "../tools/assert.h"
 #include "../tools/FunctionSet.h"
+#include "../tools/string_utils.h"
 
 namespace emp {
 
   // A set of modifiers are available do describe DataNode
   enum class data {
     Current,      // Track most recent value
+
+    Info,         // Include information (name, keyword, description) for each instance.
 
     Log,          // Track all values since last Reset()
     Archive,      // Track Log + ALL values over time (with purge options)
@@ -72,6 +75,19 @@ namespace emp {
     size_t GetCount() const { return val_count; }
     size_t GetResetCount() const { return 0; }    // If reset count not tracked, always return 0.
 
+    const std::string & GetName() const { return emp::empty_string(); }
+    const std::string & GetDescription() const { return emp::empty_string(); }
+    const std::string & GetKeyword() const { return emp::empty_string(); }
+
+    void SetName(const std::string &) { emp_assert(false, "Invalid call for DataNode config."); }
+    void SetDescription(const std::string &) { emp_assert(false, "Invalid call for DataNode config."); }
+    void SetKeyword(const std::string &) { emp_assert(false, "Invalid call for DataNode config."); }
+
+    void SetInfo(const std::string &, const std::string & _d="", const std::string & _k="") {
+      (void) _d; (void) _k;
+      emp_assert(false, "Invalid call for DataNode config.");
+    }
+
     void AddDatum(const VAL_TYPE & val) { val_count++; }
 
     void Reset() { val_count = 0; }
@@ -101,6 +117,37 @@ namespace emp {
 
     void PrintDebug(std::ostream & os=std::cout) {
       os << "DataNodeModule for data::Current. (level " << (int) data::Current << ")\n";
+      parent_t::PrintDebug(os);
+    }
+  };
+
+
+  // == data::Info ==
+  template <typename VAL_TYPE, emp::data... MODS>
+  class DataNodeModule<VAL_TYPE, data::Info, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  protected:
+    std::string name;
+    std::string desc;
+    std::string keyword;
+
+    using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
+  public:
+    DataNodeModule() { ; }
+
+    const std::string & GetName() const { return name; }
+    const std::string & GetDescription() const { return desc; }
+    const std::string & GetKeyword() const { return keyword; }
+
+    void SetName(const std::string & _in) { name = _in; }
+    void SetDescription(const std::string & _in) { desc = _in; }
+    void SetKeyword(const std::string & _in) { keyword = _in; }
+
+    void SetInfo(const std::string & _n, const std::string & _d="", const std::string & _k="") {
+      name = _n;  desc = _d;  keyword = _k;
+    }
+
+    void PrintDebug(std::ostream & os=std::cout) {
+      os << "DataNodeModule for data::Info. (level " << (int) data::Info << ")\n";
       parent_t::PrintDebug(os);
     }
   };
