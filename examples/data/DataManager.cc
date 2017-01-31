@@ -28,4 +28,15 @@ int main()
   merit_node.Add(300, 650, 500);
 
   dataM.AddData("fidelity", 1.0, 0.8, 0.9);
+
+  for (auto & x : dataM.GetNodes()) {
+    auto & node = *(x.second);
+    std::cout << x.first
+              << " cur=" << node.GetCurrent()
+              << " ave=" << node.GetMean()
+              << " min=" << node.GetMin()
+              << " max=" << node.GetMax()
+              << " tot=" << node.GetTotal()
+              << std::endl;
+  }
 }
