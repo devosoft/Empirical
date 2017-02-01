@@ -34,10 +34,10 @@ namespace emp {
 
   public:
     DataFile(const std::string & filename, const std::string & s=", ", const std::string & e="\n")
-      : os(new std::ofstream(filename)) { ; }
+      : os(new std::ofstream(filename)), spacer(s), eol(e) { ; }
     DataFile(std::ostream & in_os, const std::string & s=", ", const std::string & e="\n")
-      : os(&in_os) { ; }
-    ~DataFile() { ; }
+      : os(&in_os), spacer(s), eol(e) { ; }
+    ~DataFile() { os->flush(); }
 
     void Update() {
       for (size_t i = 0; i < funs.size(); i++) {
@@ -58,27 +58,27 @@ namespace emp {
 
     // Add various types of data from DataNodes
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddDataCurrent(DataNode<VAL_TYPE, MODS...> & node) {
+    void AddCurrent(DataNode<VAL_TYPE, MODS...> & node) {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetCurrent(); };
       funs.Add(in_fun);
     }
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddDataAve(DataNode<VAL_TYPE, MODS...> & node) {
-      std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetAverage(); };
+    void AddMean(DataNode<VAL_TYPE, MODS...> & node) {
+      std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMean(); };
       funs.Add(in_fun);
     }
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddDataTotal(DataNode<VAL_TYPE, MODS...> & node) {
+    void AddTotal(DataNode<VAL_TYPE, MODS...> & node) {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetTotal(); };
       funs.Add(in_fun);
     }
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddDataMin(DataNode<VAL_TYPE, MODS...> & node) {
+    void AddMin(DataNode<VAL_TYPE, MODS...> & node) {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMin(); };
       funs.Add(in_fun);
     }
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddDataMax(DataNode<VAL_TYPE, MODS...> & node) {
+    void AddMax(DataNode<VAL_TYPE, MODS...> & node) {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMax(); };
       funs.Add(in_fun);
     }
