@@ -398,6 +398,14 @@ namespace emp {
     }
   };
 
+  // Shortcuts for common types of data nodes...
+  
+  template <typename T, emp::data... MODS>
+  using DataMonitor = DataNode<T, data::Current, data::Info, data::Range, MODS...>;
+  template <typename T, emp::data... MODS>
+  using DataLog = DataNode<T, data::Current, data::Info, data::Log, MODS...>;
+  template <typename T, emp::data... MODS>
+  using DataArchive = DataNode<T, data::Info, data::Archive, data::FullRange, MODS...>;
 }
 
 #endif
