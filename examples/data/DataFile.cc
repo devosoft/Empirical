@@ -11,6 +11,11 @@
 
 using data = emp::data;
 
+int test_fun() {
+  static int val = 10;
+  return val += 3;
+}
+
 int main()
 {
   emp::DataFile dfile("test_file.dat");
@@ -26,6 +31,7 @@ int main()
   dfile.AddTotal(data_cubes);
   dfile.AddMin(data_cubes);
   dfile.AddMax(data_cubes);
+  dfile.Add<int>(test_fun);
 
   double frac = 0.0;
   for (size_t i = 0; i < 10; i++) {
