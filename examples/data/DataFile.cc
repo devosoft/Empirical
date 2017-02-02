@@ -36,4 +36,14 @@ int main()
 
     std::cout << i << std::endl;
   }
+
+  dfile.SetupLine("[[",":", "]]\n");
+  for (size_t i = 10; i < 20; i++) {
+    data_fracs.Add(frac += 0.01);
+    data_squares.Add((int)i*i);
+    data_cubes.Add(i*i*i);
+    dfile.Update();
+
+    std::cout << i << std::endl;
+  }
 }
