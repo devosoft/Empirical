@@ -29,22 +29,39 @@ namespace emp {
     std::ostream * os;
     FunctionSet<fun_t> funs;
 
-    std::string spacer;  // What should we print between entries?
-    std::string eol;     // What should we print at the end of each line?
+    std::string line_begin; // What should we print at the start of each line?
+    std::string line_spacer;     // What should we print between entries?
+    std::string line_end;   // What should we print at the end of each line?
 
   public:
-    DataFile(const std::string & filename, const std::string & s=", ", const std::string & e="\n")
-      : os(new std::ofstream(filename)), spacer(s), eol(e) { ; }
-    DataFile(std::ostream & in_os, const std::string & s=", ", const std::string & e="\n")
-      : os(&in_os), spacer(s), eol(e) { ; }
+    DataFile(const std::string & filename,
+             const std::string & b="", const std::string & s=", ", const std::string & e="\n")
+      : os(new std::ofstream(filename)), line_begin(b), line_spacer(s), line_end(e) { ; }
+    DataFile(std::ostream & in_os,
+             const std::string & b="", const std::string & s=", ", const std::string & e="\n")
+      : os(&in_os), line_begin(b), line_spacer(s), line_end(e) { ; }
     ~DataFile() { os->flush(); }
 
+    const std::string & GetLineBegin() const { return line_begin; }
+    const std::string & GetSpacer() const { return line_spacer; }
+    const std::string & GetLineEnd() const { return line_end; }
+
+    void SetLineBegin(const std::string & _in) { line_begin = _in; }
+    void SetSpacer(const std::string & _in) { line_spacer = _in; }
+    void SetLineEnd(const std::string & _in) { line_end = _in; }
+    void SetupLine(const std::string & b, const std::string & s, const std::string & e) {
+      line_begin = b;
+      line_spacer = s;
+      line_end = e;
+    }
+
     void Update() {
+      *os << line_begin;
       for (size_t i = 0; i < funs.size(); i++) {
-        if (i > 0) *os << spacer;
+        if (i > 0) *os << line_spacer;
         funs[i](*os);
       }
-      *os << eol;
+      *os << line_end;
     }
 
     // If a function takes an ostream, pass in the correct one.
