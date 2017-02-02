@@ -65,10 +65,10 @@ namespace emp {
     }
 
     // If a function takes an ostream, pass in the correct one.
-    void AddInput(const std::function<fun_t> & fun) { funs.Add(fun); }
+    void Add(const std::function<fun_t> & fun) { funs.Add(fun); }
 
     // If a function writes to a file directly, let it do so.
-    template <typename T> void AddInput(const std::function<T()> & fun) {
+    template <typename T> void Add(const std::function<T()> & fun) {
       std::function<fun_t> in_fun = [fun](std::ostream & os){ os << fun(); };
       funs.Add(in_fun);
     }
