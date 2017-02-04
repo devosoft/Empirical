@@ -24,7 +24,7 @@
 #include "../tools/BitSet.h"
 #include "../tools/BitVector.h"
 #include "../tools/DFA.h"
-#include "../tools/DynamicStringSet.h"
+#include "../tools/DynamicString.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/Graph.h"
 #include "../tools/Lexer.h"
@@ -356,9 +356,9 @@ TEST_CASE("Test DFA", "[tools]")
   REQUIRE(dfa.Next(0, "b")  == 3);
 }
 
-TEST_CASE("Test DynamicStringSet", "[tools]")
+TEST_CASE("Test DynamicString", "[tools]")
 {
-  emp::DynamicStringSet test_set;
+  emp::DynamicString test_set;
 
   test_set.Append("Line Zero");  // Test regular append
   test_set << "Line One";        // Test stream append
