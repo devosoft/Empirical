@@ -14,7 +14,7 @@
 #include <unordered_map>
 
 #include "../tools/memo_function.h"
-#include "../tools/WeightedSet.h"
+#include "../tools/IndexMap.h"
 
 namespace emp {
 namespace evo {
@@ -98,11 +98,11 @@ namespace evo {
   // FitnessManager_Proportion requires the user to maintain fitness.
   class FitnessManager_Tracker : public FitnessManager_Base {
   protected:
-    WeightedSet weight_info; // Data structure to use for roulette selection.
+    IndexMap index_info; // Data structure to use for roulette selection.
 
   public:
-    double GetCache(size_t id) const { return weight_info[id]; }
-    size_t GetSize() const { return weight_info.size(); }
+    double GetCache(size_t id) const { return index_info[id]; }
+    size_t GetSize() const { return index_info.size(); }
 
     template <typename ORG>
     double CalcFitness(size_t id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
@@ -110,27 +110,27 @@ namespace evo {
       if (!org) return 0.0;
 
       // If we don't have a fitness cached calculate it an PUT IT IN THE CACHE.
-      if (weight_info.GetWeight(id) == 0.0) {
-        weight_info[id] = fit_fun(org);
+      if (index_info.GetWeight(id) == 0.0) {
+        index_info[id] = fit_fun(org);
       }
 
       // Return the fitness in the cache.
-      return weight_info.GetWeight(id);
+      return index_info.GetWeight(id);
     }
 
-    bool Set(const emp::vector<double> & in_cache) { weight_info.Adjust(in_cache); return true; }
-    bool SetID(size_t id, double fitness) { weight_info.Adjust(id,fitness); return true; }
-    bool Clear() { weight_info.Clear(); return true; }
-    bool ClearAt(size_t id) { weight_info.Adjust(id, 0.0); return true; }
-    bool ClearPop() { weight_info.Clear(); return true; }
-    bool Resize(size_t new_size) { weight_info.Resize(new_size); return true; }
-    bool Resize(size_t new_size, double def_val) { weight_info.Resize(new_size, def_val); return true; }
+    bool Set(const emp::vector<double> & in_cache) { index_info.Adjust(in_cache); return true; }
+    bool SetID(size_t id, double fitness) { index_info.Adjust(id,fitness); return true; }
+    bool Clear() { index_info.Clear(); return true; }
+    bool ClearAt(size_t id) { index_info.Adjust(id, 0.0); return true; }
+    bool ClearPop() { index_info.Clear(); return true; }
+    bool Resize(size_t new_size) { index_info.Resize(new_size); return true; }
+    bool Resize(size_t new_size, double def_val) { index_info.Resize(new_size, def_val); return true; }
 
     static constexpr bool IsCached() { return true; } // Is this FitnessManager_Cached or Tracker?
     static constexpr bool IsTracked() { return true; } // Is this FitnessManager_Tracker?
 
-    double GetTotalFitness() const { return weight_info.GetWeight(); }
-    size_t At(double index) const { return weight_info.Index(index); }
+    double GetTotalFitness() const { return index_info.GetWeight(); }
+    size_t At(double index) const { return index_info.Index(index); }
   };
 
 
