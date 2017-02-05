@@ -17,13 +17,6 @@
 #include "../tools/Random.h"
 #include "../tools/vector.h"
 
-#include "FitnessManager.h"
-#include "OrgSignals.h"
-#include "OrgManager.h"
-#include "PopulationManager.h"
-#include "StatsManager.h"
-#include "LineageTracker.h"
-
 
 namespace emp {
 namespace evo {

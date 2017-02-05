@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  This file defines built-in fitness managers for use with emp::evo::World; a fitness manager
@@ -16,6 +16,8 @@
 #include "../tools/memo_function.h"
 #include "../tools/WeightedSet.h"
 
+#include "World_Base.h"
+
 namespace emp {
 namespace evo {
 
@@ -30,11 +32,9 @@ namespace evo {
     static constexpr double GetCache(size_t id) { return 0.0; }
     static constexpr size_t GetCacheSize() { return 0; }
 
-    template <typename ORG>
     static double CalcFitness(size_t id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
       return org ? fit_fun(org) : 0.0;
     }
-    template <typename ORG>
     static double CalcFitness(size_t id, ORG* org, emp::memo_function<double(ORG*)> & fit_fun) {
       return org ? fit_fun(org) : 0.0;
     }
