@@ -1,39 +1,26 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-// A simple class to weight items differently within a container.
+// A simple class to weight items differently within a container and return the correct index.
 //
 // Constructor:
-// WeightedSet(size_t num_items)
+// IndexMap(size_t num_items)
 //     num_items is the maximum number of items that can be placed into the data structure.
 //
 // void Adjust(size_t id, double weight)
 //     id is the identification number of the item whose weight is being adjusted.
 //     weight is the new weight for that entry.
-//
-//
-// Development NOTES:
-//   * We are now using lazy evaluation for refreshing tree weights.  When a Refresh is run,
-//     it just sets needs_refresh to true.  Any time a tree weight is requested, the refreshing
-//     will actually be performed.
-//
-//   * We should probably change the name to something like WeightedRandom since it does not
-//     have to be used just for scheduling.
-//   * We could easily convert this structure to a template that acts as a glorified vector
-//     giving the ability to perform a weighted random choice.
-//   * We should allow the structure to be resized, either dynamically or through a Resize()
-//     method.
 
-#ifndef EMP_WEIGHTED_SET_H
-#define EMP_WEIGHTED_SET_H
+#ifndef EMP_INDEX_MAP_H
+#define EMP_INDEX_MAP_H
 
 #include "vector.h"
 
 namespace emp {
 
-  class WeightedSet {
+  class IndexMap {
   private:
     emp::vector<double> item_weight;
     mutable emp::vector<double> tree_weight;
@@ -46,12 +33,12 @@ namespace emp {
 
     class Proxy {
     private:
-      WeightedSet & ws;   // Which set is this proxy from?
+      IndexMap & index_map;  // Which index map is this proxy from?
       size_t id;             // Which id does it represent?
     public:
-      Proxy(WeightedSet & _ws, size_t _id) : ws(_ws), id(_id) { ; }
-      operator double() const { return ws.GetWeight(id); }
-      Proxy & operator=(double new_weight) { ws.Adjust(id, new_weight); return *this; }
+      Proxy(IndexMap & _im, size_t _id) : index_map(_im), id(_id) { ; }
+      operator double() const { return index_map.GetWeight(id); }
+      Proxy & operator=(double new_weight) { index_map.Adjust(id, new_weight); return *this; }
     };
 
     // Check if we need to do a refresh, and if so do it!
@@ -75,13 +62,13 @@ namespace emp {
     }
 
   public:
-    WeightedSet(size_t num_items=0)
+    IndexMap(size_t num_items=0)
       : item_weight(num_items), tree_weight(num_items), needs_refresh(false) {;}
-    WeightedSet(const WeightedSet &) = default;
-    WeightedSet(WeightedSet &&) = default;
-    ~WeightedSet() = default;
-    WeightedSet & operator=(const WeightedSet &) = default;
-    WeightedSet & operator=(WeightedSet &&) = default;
+    IndexMap(const IndexMap &) = default;
+    IndexMap(IndexMap &&) = default;
+    ~IndexMap() = default;
+    IndexMap & operator=(const IndexMap &) = default;
+    IndexMap & operator=(IndexMap &&) = default;
 
     size_t GetSize() const { return item_weight.size(); }
     double GetWeight() const { ResolveRefresh(); return tree_weight[0]; }
@@ -150,7 +137,7 @@ namespace emp {
     size_t Index(double index, size_t cur_id=0) const {
       ResolveRefresh();
 
-      // Make sure we don't try to index beyond end of set.
+      // Make sure we don't try to index beyond end of map.
       emp_assert(index < tree_weight[0], index, tree_weight.size(), tree_weight[0]);
 
       // If our target is in the current node, return it!
@@ -169,18 +156,18 @@ namespace emp {
     Proxy operator[](size_t id) { return Proxy(*this,id); }
     double operator[](size_t id) const { return item_weight[id]; }
 
-    WeightedSet & operator+=(WeightedSet & in_set) {
-      emp_assert(size() == in_set.size());
-      for (size_t i = 0; i < in_set.size(); i++) {
-        item_weight[i] += in_set.item_weight[i];
+    IndexMap & operator+=(IndexMap & in_map) {
+      emp_assert(size() == in_map.size());
+      for (size_t i = 0; i < in_map.size(); i++) {
+        item_weight[i] += in_map.item_weight[i];
       }
       needs_refresh = true;
       return *this;
     }
-    WeightedSet & operator-=(WeightedSet & in_set) {
-      emp_assert(size() == in_set.size());
-      for (size_t i = 0; i < in_set.size(); i++) {
-        item_weight[i] -= in_set.item_weight[i];
+    IndexMap & operator-=(IndexMap & in_map) {
+      emp_assert(size() == in_map.size());
+      for (size_t i = 0; i < in_map.size(); i++) {
+        item_weight[i] -= in_map.item_weight[i];
       }
       needs_refresh = true;
       return *this;
