@@ -1,5 +1,5 @@
 # Project-specific settings
-PROJECT := gplix
+PROJECT := project_name
 EMP_DIR := ../../Empirical
 
 # Flags to use regardless of compiler
@@ -37,8 +37,8 @@ $(PROJECT):	source/command_line.cc
 	$(CXX_nat) $(CFLAGS_nat) source/command_line.cc -o $(PROJECT)
 	@echo To build the web version use: make web
 
-$(PROJECT).js: source/$(PROJECT).cc
-	$(CXX_web) $(CFLAGS_web) source/$(PROJECT).cc -o web/$(PROJECT).js
+$(PROJECT).js: web/$(PROJECT)-web.cc
+	$(CXX_web) $(CFLAGS_web) web/$(PROJECT)-web.cc -o web/$(PROJECT).js
 
 clean:
 	rm -f $(PROJECT) web/$(PROJECT).js *.js.map *~ source/*.o
