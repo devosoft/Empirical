@@ -33,12 +33,12 @@ debug-web:	$(PROJECT).js
 
 web-debug:	debug_web
 
-$(PROJECT):	source/command_line.cc
-	$(CXX_nat) $(CFLAGS_nat) source/command_line.cc -o $(PROJECT)
+$(PROJECT):	source/native/$(PROJECT).cc
+	$(CXX_nat) $(CFLAGS_nat) source/native/$(PROJECT).cc -o $(PROJECT)
 	@echo To build the web version use: make web
 
-$(PROJECT).js: web/$(PROJECT)-web.cc
-	$(CXX_web) $(CFLAGS_web) web/$(PROJECT)-web.cc -o web/$(PROJECT).js
+$(PROJECT).js: source/web/$(PROJECT)-web.cc
+	$(CXX_web) $(CFLAGS_web) source/web/$(PROJECT)-web.cc -o web/$(PROJECT).js
 
 clean:
 	rm -f $(PROJECT) web/$(PROJECT).js *.js.map *~ source/*.o
