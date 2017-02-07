@@ -20,6 +20,8 @@
 #include <sstream>
 #include <string>
 
+#include "../base/Ptr.h"
+
 #include "../tools/BitMatrix.h"
 #include "../tools/BitSet.h"
 #include "../tools/BitVector.h"
@@ -29,7 +31,6 @@
 #include "../tools/Graph.h"
 #include "../tools/Lexer.h"
 #include "../tools/NFA.h"
-#include "../tools/Ptr.h"
 #include "../tools/RegEx.h"
 #include "../tools/Random.h"
 // #include "../tools/Trait.h"
