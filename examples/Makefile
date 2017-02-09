@@ -1,4 +1,5 @@
 default:
+	$(MAKE) -C base/
 	$(MAKE) -C control/
 	$(MAKE) -C data/
 	$(MAKE) -C evo/
@@ -7,6 +8,7 @@ default:
 	$(MAKE) -C web/
 
 clean:
+	$(MAKE) clean -C base/
 	$(MAKE) clean -C control/
 	$(MAKE) clean -C data/
 	$(MAKE) clean -C evo/
@@ -15,6 +17,7 @@ clean:
 	$(MAKE) clean -C web/
 
 debug:
+	$(MAKE) debug -C base/
 	$(MAKE) debug -C control/
 	$(MAKE) debug -C data/
 	$(MAKE) debug -C evo/
