@@ -1,8 +1,10 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-17.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  Setup a collection of functions, all with the same signature, that can be run as a group.
+//
 //  Derived from emp::vector, hence with all of the same methods as vector.
 
 #ifndef EMP_FUNCTION_SET_H
