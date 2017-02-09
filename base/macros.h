@@ -1,10 +1,10 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
 //  Generally useful macros that can perform cools tricks.  As with all macros, use only
-//  after careful exclusion of alternative approaches!
+//  after careful exclusion of alternative approaches.
 //
 //  The Macros to highlight here are:
 //

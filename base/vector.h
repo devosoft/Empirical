@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  This class is a drop-in wrapper for std::vector, adding on bounds checking.
@@ -24,9 +24,9 @@
 
 #ifdef EMP_NDEBUG
 
+// Seemlessly translate emp::vector to std::vector
 namespace emp {
-  template <typename... Ts>
-    using vector = std::vector<Ts...>;
+  template <typename... Ts> using vector = std::vector<Ts...>;
 }
 
 
@@ -34,6 +34,7 @@ namespace emp {
 
 namespace emp {
 
+  // Build a debug wrapper emp::vector around std::vector.
   template <typename T, typename... Ts>
   class vector {
   private:
