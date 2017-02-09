@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -53,10 +53,10 @@
 #include "../web/web_init.h"
 #include "../meta/meta.h"
 
-#include "../tools/assert.h"
+#include "../base/assert.h"
+#include "../base/vector.h"
 #include "../tools/functions.h"
 #include "../tools/mem_track.h"
-#include "../tools/vector.h"
 #include "../tools/tuple_struct.h"
 #include "../tools/tuple_utils.h"
 #include "js_utils.h"

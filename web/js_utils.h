@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -12,10 +12,11 @@
 #include <string>
 #include <typeinfo>
 
+#include "../base/assert.h"
+#include "../base/vector.h"
+#include "../base/array.h"
+
 #include "init.h"
-#include "../tools/assert.h"
-#include "../tools/vector.h"
-#include "../tools/array.h"
 
 
 namespace emp {

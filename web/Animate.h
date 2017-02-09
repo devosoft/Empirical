@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-16.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -44,8 +44,8 @@
 
 #include <functional>
 
-#include "../tools/assert.h"
-#include "../tools/vector.h"
+#include "../base/assert.h"
+#include "../base/vector.h"
 
 #include "emfunctions.h"
 #include "JSWrap.h"

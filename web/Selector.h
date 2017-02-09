@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -23,9 +23,9 @@
 #define EMP_WEB_SELECTOR_H
 
 
-#include "../tools/vector.h"
-#include "JSWrap.h"
+#include "../base/vector.h"
 
+#include "JSWrap.h"
 #include "Widget.h"
 
 namespace emp {
