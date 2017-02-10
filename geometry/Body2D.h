@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -21,11 +21,12 @@
 #ifndef EMP_BODY_2D_H
 #define EMP_BODY_2D_H
 
-#include "../tools/assert.h"
+#include "../base/assert.h"
+#include "../base/Ptr.h"
+#include "../base/vector.h"
+
 #include "../tools/alert.h"
 #include "../tools/mem_track.h"
-#include "../tools/Ptr.h"
-#include "../tools/vector.h"
 
 #include "Angle2D.h"
 #include "Circle2D.h"
