@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -42,10 +42,10 @@
 #include <sstream>
 #include <unordered_set>
 
+#include "../base/vector.h"
 #include "../tools/errors.h"
 #include "../tools/functions.h"
 #include "../tools/string_utils.h"
-#include "../tools/vector.h"
 #include "ConfigManager.h"
 
 using namespace std::placeholders;
