@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  TypeTracker is attached to other classes to easily convert them to their derived version
@@ -15,10 +15,9 @@
 #ifndef EMP_TYPE_TRACKER_H
 #define EMP_TYPE_TRACKER_H
 
+#include "../base/array.h"
+#include "../base/assert.h"
 #include "../meta/meta.h"
-
-#include "assert.h"
-#include "array.h"
 
 namespace emp {
 

@@ -9,9 +9,10 @@
 
 #include <iostream>
 
+#include "../base/vector.h"
+
 #include "assert.h"
 #include "BitVector.h"
-#include "vector.h"
 
 namespace emp {
 

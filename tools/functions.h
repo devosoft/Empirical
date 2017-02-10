@@ -13,9 +13,10 @@
 #include <iostream>
 #include <type_traits>
 #include <sstream>
-#include <vector>
 
-#include "assert.h"
+#include "../base/vector.h"
+#include "../base/assert.h"
+
 #include "const.h"
 
 #define EMP_FUNCTION_TIMER(TEST_FUN) {                                       \
@@ -80,10 +81,10 @@ namespace emp {
   }
 
   template <typename T>
-  static inline std::vector<T> BuildRange(T min, T max, T step=1) {
+  static inline emp::vector<T> BuildRange(T min, T max, T step=1) {
     size_t size = (size_t) ((max-min) / step);
     emp_assert(size >= 0);
-    std::vector<T> out_v((size_t) size);
+    emp::vector<T> out_v((size_t) size);
     size_t pos = 0;
     for (T i = min; i < max; i += step) {
       out_v[pos++] = i;

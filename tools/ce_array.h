@@ -12,7 +12,7 @@
 
 #include <type_traits>
 
-#include "assert.h"
+#include "../base/assert.h"
 
 namespace emp {
 

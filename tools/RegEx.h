@@ -36,13 +36,13 @@
 #include <sstream>
 #include <string>
 
+#include "../base/vector.h"
 #include "../base/Ptr.h"
 
 #include "BitSet.h"
 #include "lexer_utils.h"
 #include "NFA.h"
 #include "string_utils.h"
-#include "vector.h"
 
 
 namespace emp {

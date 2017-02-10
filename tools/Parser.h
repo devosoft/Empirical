@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  A general-purpose, fast parser.
@@ -23,9 +23,10 @@
 #ifndef EMP_PARSER_H
 #define EMP_PARSER_H
 
+#include "../base/vector.h"
+
 #include "BitVector.h"
 #include "Lexer.h"
-#include "vector.h"
 
 namespace emp {
 

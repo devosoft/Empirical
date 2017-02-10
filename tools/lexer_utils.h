@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  A set of utilities to convert between NFAs and DFAs
@@ -26,10 +26,11 @@
 #include <map>
 #include <utility> // std::pair
 
+#include "../base/vector.h"
+
 #include "BitVector.h"
 #include "DFA.h"
 #include "NFA.h"
-#include "vector.h"
 
 namespace emp {
 

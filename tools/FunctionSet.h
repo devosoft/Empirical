@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-17.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -11,7 +11,7 @@
 #define EMP_FUNCTION_SET_H
 
 #include <functional>
-#include "vector.h"
+#include "../base/vector.h"
 
 namespace emp {
 

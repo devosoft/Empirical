@@ -7,7 +7,7 @@
 #ifndef EMP_VECTOR_UTILS_H
 #define EMP_VECTOR_UTILS_H
 
-#include "vector.h"
+#include "../base/vector.h"
 
 namespace emp {
 

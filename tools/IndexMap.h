@@ -16,7 +16,7 @@
 #ifndef EMP_INDEX_MAP_H
 #define EMP_INDEX_MAP_H
 
-#include "vector.h"
+#include "../base/vector.h"
 
 namespace emp {
 
