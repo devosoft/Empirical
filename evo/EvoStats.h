@@ -1,10 +1,10 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical/
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
-
+//
 //  This file contains functions for calculating various statistics about
 //  a population.
-//
+
 
 #ifndef EMP_EVO_STATS_H
 #define EMP_EVO_STATS_H
@@ -12,30 +12,30 @@
 #include <type_traits>
 #include <map>
 #include <cmath>
-#include <vector>
 #include <set>
 #include <map>
 
-#include "../tools/vector.h"
+#include "../base/vector.h"
 
-struct MLandscape{
-    double benefit_avg;
-    double neutral_avg;
-    double det_avg;
-    double max_ben = 0;
-    double max_det = 0;
+struct MLandscape {
+  double benefit_avg;
+  double neutral_avg;
+  double det_avg;
+  double max_ben = 0;
+  double max_det = 0;
 
-    MLandscape() { benefit_avg = 0; neutral_avg = 0; det_avg = 0;} };
+  MLandscape() { benefit_avg = 0; neutral_avg = 0; det_avg = 0; }
+};
 
-namespace emp{
-namespace evo{
+namespace emp {
+namespace evo {
 
 
   // Calculates the Non-Inferiority of a given container
   template <typename ORG, typename WORLD>
   double NonInf(std::function<double(ORG * org)> fit_fun, WORLD & orgs) {
     double fittest = fit_fun((*(orgs.begin())));
-    vector<double> org_fit;
+    emp::vector<double> org_fit;
 
     for (auto org : orgs) {
       double fitness = fit_fun(org);

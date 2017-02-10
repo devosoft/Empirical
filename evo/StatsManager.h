@@ -13,10 +13,11 @@
 #include <sstream>
 #include <cstdarg>
 
-#include "../tools/FunctionSet.h"
-#include "../tools/vector.h"
-#include "../tools/stats.h"
+#include "../base/vector.h"
 #include "../config/config.h"
+#include "../tools/FunctionSet.h"
+#include "../tools/stats.h"
+
 #include "PopulationManager.h"
 #include "EvoStats.h"
 #include "LineageTracker.h"

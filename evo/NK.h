@@ -10,11 +10,11 @@
 
 #include <array>
 
+#include "../base/vector.h"
 #include "../tools/BitVector.h"
 #include "../tools/math.h"
 #include "../tools/memo_function.h"
 #include "../tools/Random.h"
-#include "../tools/vector.h"
 
 namespace emp {
 namespace evo {

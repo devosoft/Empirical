@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical/
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
 //This file defines an object that will listen to the signals given by a World
@@ -20,9 +20,10 @@
 #include <iterator>
 #include <functional>
 
+#include "../base/array.h"
 #include "../tools/vector.h"
-#include "../tools/array.h"
 #include "../tools/stats.h"
+
 #include "LineageTracker.h"
 #include "StatsManager.h"
 

@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -32,53 +32,53 @@
 //      ::do-repro(size_t org_id)              Trigger to initiate reproduction
 //      ::do-symbiont_repro(size_t host_id)    Trigger to initiate symbiont reproduction
 //
-// Constructors:
-//  World(const std::string & world_name="emp::evo::World")
-//  World(int random_seed, const std::string & world_name="emp::evo::World")
-//  World(emp::Random & random, const std::string & world_name="emp::evo::World")
-//     world_name is prepended before all signal names.
-//     random is used as a random number generator.
+//  Constructors:
+//   World(const std::string & world_name="emp::evo::World")
+//   World(int random_seed, const std::string & world_name="emp::evo::World")
+//   World(emp::Random & random, const std::string & world_name="emp::evo::World")
+//      world_name is prepended before all signal names.
+//      random is used as a random number generator.
 //
-// Accessors
-//  size_t GetSize() const
-//  ORG & operator[](size_t i)
-//  const std::function<double(ORG*)> & GetDefaultFitnessFun() const
-//  const std::function<bool(ORG*)> & GetDefaultMutationFun() const
-//  void SetDefaultFitnessFun(const std::function<double(ORG*)> & f)
-//  void SetDefaultMutationFun(const std::function<bool(ORG*)> & f)
+//  Accessors
+//   size_t GetSize() const
+//   ORG & operator[](size_t i)
+//   const std::function<double(ORG*)> & GetDefaultFitnessFun() const
+//   const std::function<bool(ORG*)> & GetDefaultMutationFun() const
+//   void SetDefaultFitnessFun(const std::function<double(ORG*)> & f)
+//   void SetDefaultMutationFun(const std::function<bool(ORG*)> & f)
 //
-// Population Building
-//  void Clear()                                        - Clear all organisms in population
-//  void Insert(const ORG & mem, size_t copy_count=1)   - Insert a copy of an individual
-//  void InsertAt(const ORG & mem, size_t pos)          - Insert an individual at specified pos
-//  void Insert(Random & random, ARGS... args)          - Insert a random organism
-//  void InsertRandomOrg(ARGS... args)
-//  void InsertNext(const ORG & mem, size_t copy_count=1) - Insert into NEXT GENERATION of pop
+//  Population Building
+//   void Clear()                                        - Clear all organisms in population
+//   void Insert(const ORG & mem, size_t copy_count=1)   - Insert a copy of an individual
+//   void InsertAt(const ORG & mem, size_t pos)          - Insert an individual at specified pos
+//   void Insert(Random & random, ARGS... args)          - Insert a random organism
+//   void InsertRandomOrg(ARGS... args)
+//   void InsertNext(const ORG & mem, size_t copy_count=1) - Insert into NEXT GENERATION of pop
 //
-// Organism Variation
-//  int MutatePop(std::function<bool(ORG*)> mut_fun, int first_mut=0, int last_mut=-1)
-//  int MutatePop(int first_mut=0, int last_mut=-1)
+//  Organism Variation
+//   int MutatePop(std::function<bool(ORG*)> mut_fun, int first_mut=0, int last_mut=-1)
+//   int MutatePop(int first_mut=0, int last_mut=-1)
 //
-// Selection Mechanisms
-//  void EliteSelect(std::function<double(ORG*)> fit_fun, int e_count=1, int copy_count=1)
-//  void EliteSelect(int e_count=1, int copy_count=1)
+//  Selection Mechanisms
+//   void EliteSelect(std::function<double(ORG*)> fit_fun, int e_count=1, int copy_count=1)
+//   void EliteSelect(int e_count=1, int copy_count=1)
 //
-//  void TournamentSelect(std::function<double(ORG*)> fit_fun, int t_size, int tourny_count=1)
-//  void TournamentSelect(int t_size, int tourny_count=1)
-//  void RunTournament(emp::vector<double> fitness, int t_size, int tourny_count=1)
+//   void TournamentSelect(std::function<double(ORG*)> fit_fun, int t_size, int tourny_count=1)
+//   void TournamentSelect(int t_size, int tourny_count=1)
+//   void RunTournament(emp::vector<double> fitness, int t_size, int tourny_count=1)
 //
-//  void FitnessSharingTournamentSelect(std::function<double(ORG*)> fit_fun,
-//          std::function<double(ORG*, ORG*)> dist_fun,
-//          double sharing_threshhold, double alpha,
-//          int t_size, int tourny_count=1)
-//  void FitnessSharingTournamentSelect(std::function<double(ORG*, ORG*)>
-//          dist_fun, double sharing_threshold,
-//          double alpha, int t_size,
-//          int tourny_count=1)
+//   void FitnessSharingTournamentSelect(std::function<double(ORG*)> fit_fun,
+//           std::function<double(ORG*, ORG*)> dist_fun,
+//           double sharing_threshhold, double alpha,
+//           int t_size, int tourny_count=1)
+//   void FitnessSharingTournamentSelect(std::function<double(ORG*, ORG*)>
+//           dist_fun, double sharing_threshold,
+//           double alpha, int t_size,
+//           int tourny_count=1)
 //
-// Advancing Time
-//  void Update()                  -- Shift to the next generation.
-//  void Execute(ARGS... args)     -- Execute each organism in the population.
+//  Advancing Time
+//   void Update()                  -- Shift to the next generation.
+//   void Execute(ARGS... args)     -- Execute each organism in the population.
 
 
 #ifndef EMP_EVO_WORLD_H
@@ -87,11 +87,11 @@
 #include <functional>
 #include <map>
 
+#include "../base/assert.h"
+#include "../base/vector.h"
 #include "../control/SignalControl.h"
 #include "../meta/reflection.h"
-#include "../tools/assert.h"
 #include "../tools/Random.h"
-#include "../tools/vector.h"
 
 #include "FitnessManager.h"
 #include "OrgSignals.h"

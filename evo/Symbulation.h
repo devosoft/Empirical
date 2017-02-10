@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -20,7 +20,7 @@
 #ifndef SYMBULATION_H
 #define SYMBULATION_H
 
-#include "../tools/assert.h"
+#include "../base/assert.h"
 #include "../tools/BitVector.h"
 #include "../tools/Random.h"
 #include "../tools/random_utils.h"
