@@ -20,7 +20,12 @@
 #include <sstream>
 #include <string>
 
+#include "../base/array.h"
 #include "../base/Ptr.h"
+#include "../base/assert.h"
+#include "../base/macro_math.h"
+#include "../base/macros.h"
+#include "../base/vector.h"
 
 #include "../tools/BitMatrix.h"
 #include "../tools/BitSet.h"
@@ -35,8 +40,6 @@
 #include "../tools/Random.h"
 // #include "../tools/Trait.h"
 
-#include "../tools/array.h"
-#include "../tools/assert.h"
 #include "../tools/ce_string.h"
 #include "../tools/errors.h"
 #include "../tools/flex_function.h"
@@ -45,8 +48,6 @@
 //#include "../tools/grid.h"
 #include "../tools/info_theory.h"
 #include "../tools/lexer_utils.h"
-#include "../tools/macro_math.h"
-#include "../tools/macros.h"
 #include "../tools/map_utils.h"
 #include "../tools/math.h"
 #include "../tools/mem_track.h"
@@ -56,7 +57,6 @@
 #include "../tools/string_utils.h"
 #include "../tools/tuple_struct.h"
 #include "../tools/unit_tests.h"
-#include "../tools/vector.h"
 
 // currently these have no coveage; we include them so we get metrics on them
 // this doesn't actually work--TODO: figure out why this doesn't work

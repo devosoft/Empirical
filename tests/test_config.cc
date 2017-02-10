@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../tools/assert.h"
+#include "../base/assert.h"
 #include "../config/command_line.h"
 #include "../config/config.h"
 #include "config/config_setup.h"
