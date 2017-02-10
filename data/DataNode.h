@@ -20,8 +20,8 @@
 #define EMP_DATA_NODE_H
 
 #include "../base/vector.h"
+#include "../base/assert.h"
 #include "../meta/IntPack.h"
-#include "../tools/assert.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/string_utils.h"
 
@@ -399,7 +399,7 @@ namespace emp {
   };
 
   // Shortcuts for common types of data nodes...
-  
+
   template <typename T, emp::data... MODS>
   using DataMonitor = DataNode<T, data::Current, data::Info, data::Range, MODS...>;
   template <typename T, emp::data... MODS>

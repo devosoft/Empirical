@@ -14,7 +14,7 @@
 #include <string>
 
 #include "../base/vector.h"
-#include "../tools/assert.h"
+#include "../base/assert.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/string_utils.h"
 
