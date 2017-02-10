@@ -23,7 +23,6 @@ CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../web/library
 TARGETS := Action ActionManager Signal SignalControl
 
 CONTROL := ../../control
-CONTROL_DEPEND := ../../tools/assert.h
 
 default: native
 
@@ -45,16 +44,16 @@ native: all
 
 all: $(TARGETS)
 
-$(TARGETS): % : %.cc $(CONTROL_DEPEND) $(CONTROL)/%.h
+$(TARGETS): % : %.cc $(CONTROL)/%.h
 	$(CXX) $(CFLAGS_version) $(CFLAGS) $< -o $@
 
-opt-%: %.cc $(CONTROL_DEPEND) $(CONTROL)/%.h
+opt-%: %.cc $(CONTROL)/%.h
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_opt) $< -o $@
 
-debug-%: %.cc $(CONTROL_DEPEND) $(CONTROL)/%.h
+debug-%: %.cc $(CONTROL)/%.h
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
 
-cpp14-%: %.cc $(CONTROL_DEPEND) $(CONTROL)/%.h
+cpp14-%: %.cc $(CONTROL)/%.h
 	$(CXX) -std=c++14 $(CFLAGS_native_debug) $< -o $@
 
 clean:
