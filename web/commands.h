@@ -46,6 +46,9 @@ namespace web {
     const std::string & GetStr() const { return str; }
   };
 
+  // Pre-defined static commands to be used in appends...
+  static const PrintStr endl("<br>");
+
 }
 }
 
