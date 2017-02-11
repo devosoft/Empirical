@@ -32,6 +32,20 @@ namespace web {
     const std::string & GetID() const { return close_id; }
   };
 
+  class PrintStr : public internal::WidgetCommand {
+  private:
+    std::string str;
+  public:
+    PrintStr(const std::string & _s) : str(_s) { ; }
+
+    bool Trigger(internal::WidgetInfo & w) const override {
+      w.Append(str);
+      return true;
+    }
+
+    const std::string & GetStr() const { return str; }
+  };
+
 }
 }
 
