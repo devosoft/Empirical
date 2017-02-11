@@ -25,13 +25,13 @@ native: $(PROJECT)
 web: $(PROJECT).js
 all: $(PROJECT) $(PROJECT).js
 
-debug:	CFLAGS_nat := CFLAGS_nat_debug
+debug:	CFLAGS_nat := $(CFLAGS_nat_debug)
 debug:	$(PROJECT)
 
 debug-web:	CFLAGS_web := $(CFLAGS_web_debug)
 debug-web:	$(PROJECT).js
 
-web-debug:	debug_web
+web-debug:	debug-web
 
 $(PROJECT):	source/native/$(PROJECT).cc
 	$(CXX_nat) $(CFLAGS_nat) source/native/$(PROJECT).cc -o $(PROJECT)
