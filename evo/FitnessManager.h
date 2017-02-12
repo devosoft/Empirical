@@ -109,7 +109,7 @@ namespace evo {
       // Organisms that don't exist should have a zero fitness.
       if (!org) return 0.0;
 
-      // If we don't have a fitness cached calculate it an PUT IT IN THE CACHE.
+      // If we don't have a fitness cached calculate it and PUT IT IN THE CACHE.
       if (index_info.GetWeight(id) == 0.0) {
         index_info[id] = fit_fun(org);
       }
@@ -133,10 +133,127 @@ namespace evo {
     size_t At(double index) const { return index_info.Index(index); }
   };
 
+  // FitnessManager_Proportion requires the user to maintain fitness.
+  class FitnessManager_Dynamic : public FitnessManager_Base {
+  protected:
+    enum CacheType { CACHE_OFF, CACHE_ON, TRACK_ON };
+    CacheType cache_type = CACHE_OFF;
+
+    emp::vector<double> fit_cache;  // vector size == 0 when not caching; invalid values == 0.
+    IndexMap index_info;            // Data structure to use for roulette selection.
+
+  public:
+    double GetCache(size_t id) const {
+      switch (cache_type) {
+      case CACHE_OFF: return 0.0;
+      case CACHE_ON:  return (id < fit_cache.size()) ? fit_cache[id] : 0.0;
+      case TRACK_ON:  return index_info[id];
+      }
+    }
+    size_t GetSize() const {
+      switch (cache_type) {
+      case CACHE_OFF: return 0;
+      case CACHE_ON:  return fit_cache.size();
+      case TRACK_ON:  return index_info.size();
+      }
+    }
+
+    template <typename ORG>
+    double CalcFitness(size_t id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
+      // Organisms that don't exist should have a zero fitness.
+      if (!org) return 0.0;
+
+      // If we don't have a fitness cached calculate it and cache if needed.
+      switch (cache_type) {
+      case CACHE_OFF:
+        return fit_fun(org);;
+      case CACHE_ON:
+        if (!GetCache(id)) {                // If no cached fitness, calculate it!
+          if (id >= fit_cache.size()) fit_cache.resize(id+1, 0.0);
+          fit_cache[id] = fit_fun(org);
+        }
+        return GetCache(id);
+      case TRACK_ON:
+        if (index_info.GetWeight(id) == 0.0) { index_info[id] = fit_fun(org); }
+        return index_info.GetWeight(id);
+      }
+    }
+
+
+    bool Set(const emp::vector<double> & in_cache) {
+      switch (cache_type) {
+        case CACHE_OFF: return false;
+        case CACHE_ON:  fit_cache = in_cache; return true;
+        case TRACK_ON:  index_info.Adjust(in_cache); return true;
+      }
+    }
+
+    bool SetID(size_t id, double fitness) {
+      switch (cache_type) {
+        case CACHE_OFF: return false;
+        case CACHE_ON:  fit_cache[id] = fitness; return true;
+        case TRACK_ON:  index_info.Adjust(id,fitness); return true;
+      }
+    }
+
+    bool Clear() {
+      switch (cache_type) {
+        case CACHE_OFF: return false;
+        case CACHE_ON:  fit_cache.resize(0); return true;
+        case TRACK_ON:  index_info.Clear(); return true;
+      }
+    }
+
+    bool ClearAt(size_t id) {
+      switch (cache_type) {
+        case CACHE_OFF: return false;
+        case CACHE_ON:  if (id < fit_cache.size()) fit_cache[id] = 0.0; return true;
+        case TRACK_ON:  index_info.Adjust(id, 0.0); return true;
+      }
+    }
+
+    bool ClearPop() {
+      switch (cache_type) {
+        case CACHE_OFF: return false;
+        case CACHE_ON:  fit_cache.resize(0); return true;
+        case TRACK_ON:  index_info.Clear(); return true;
+      }
+    }
+
+    bool Resize(size_t new_size) {
+      switch (cache_type) {
+        case CACHE_OFF: return false;
+        case CACHE_ON:  fit_cache.resize(new_size); return true;
+        case TRACK_ON:  index_info.Resize(new_size); return true;
+      }
+    }
+
+    bool Resize(size_t new_size, double def_val) {
+      switch (cache_type) {
+        case CACHE_OFF: return false;
+        case CACHE_ON:  fit_cache.resize(new_size, def_val); return true;
+        case TRACK_ON:  index_info.Resize(new_size, def_val); return true;
+      }
+    }
+
+
+    bool IsCached() { return cache_type == CACHE_ON || cache_type == TRACK_ON; }
+    bool IsTracked() { return cache_type == TRACK_ON; }
+
+    double GetTotalFitness() const {
+      emp_assert(cache_type == TRACK_ON);
+      return index_info.GetWeight();
+    }
+    size_t At(double index) const {
+      emp_assert(cache_type == TRACK_ON);
+      return index_info.Index(index);
+    }
+  };
 
   using FitCacheOff = FitnessManager_Base;
   using FitCacheOn = FitnessManager_CacheOrg;
   using FitTrack = FitnessManager_Tracker;
+  using FitDynamic = FitnessManager_Dynamic;
 }
 }
 
