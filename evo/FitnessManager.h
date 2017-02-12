@@ -1,12 +1,14 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  This file defines built-in fitness managers for use with emp::evo::World; a fitness manager
 //  is in charge of determining when and how to store fitness values.
 //  - Can fitness values be maintained for an organism DURING a set of selection steps?
 //  - Are fitness values consistant across an entire genotype for a run?
-//  - Do we need to maintain fitness values for roulette selection?
+//  - Do we need to maintain fitness values for all organisms (e.g., for roulette selection)?
+//
+//  Note: FitnessManagers can also take memo_functions for a different type of caching.
 
 #ifndef EMP_EVO_FITNESS_MANAGER_H
 #define EMP_EVO_FITNESS_MANAGER_H
