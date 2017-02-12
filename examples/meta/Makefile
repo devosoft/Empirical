@@ -23,7 +23,7 @@ CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../web/library
 TARGETS := IntPack meta reflection TypePack
 
 META := ../../meta
-META_DEPEND := ../../tools/assert.h
+META_DEPEND := ../../base/assert.h
 
 default: native
 
