@@ -248,6 +248,10 @@ namespace evo {
       emp_assert(cache_type == TRACK_ON);
       return index_info.Index(index);
     }
+
+    void CacheOff() { cache_type = CACHE_OFF; Resize(0, 0.0); }
+    void CacheOn() { cache_type = CACHE_ON; Resize(0, 0.0); }
+    void TrackOn() { cache_type = TRACK_ON; Resize(0, 0.0); }
   };
 
   using FitCacheOff = FitnessManager_Base;
