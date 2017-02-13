@@ -2,12 +2,12 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
-//This file defines an object that will listen to the signals given by a World
-//object, calculate metrics of open-ended evolution, and print them out.
+//  This file defines an object that will listen to the signals given by a World
+//  object, calculate metrics of open-ended evolution, and print them out.
 
-//Developer notes:
-// * Currently assumes BitOrgs
-// * Currently incompatible with pruned lineage tracker
+//  Developer notes:
+//  * Currently assumes BitOrgs
+//  * Currently incompatible with pruned lineage tracker
 
 #ifndef EMP_OEE_H
 #define EMP_OEE_H
@@ -21,7 +21,7 @@
 #include <functional>
 
 #include "../base/array.h"
-#include "../tools/vector.h"
+#include "../base/vector.h"
 #include "../tools/stats.h"
 
 #include "LineageTracker.h"
