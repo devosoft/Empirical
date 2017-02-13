@@ -19,10 +19,16 @@ int main() {
   UI::Initialize();
 
   doc << "<h2>This is a second-level header!</h2>"
-               << "<p>And here is some regular text."
-               << "<p>Here is a variable: " << myvar;
+      << "<p>And here is some regular text."
+      << "<p>Here is a variable: " << myvar;
 
   doc << "<br>Cur val = " << UI::Live(select_val);
+
+  doc << emp::web::endl; // PrintStr("abc");
+  doc << emp::web::endl; // PrintStr("abc");
+  doc << emp::web::PrintStr("abc");
+  doc << emp::web::endl; // PrintStr("abc");
+  doc << emp::web::endl; // PrintStr("abc");
 
   auto test_select = doc.AddSelector("test_select");
   test_select.SetOption("Option 1");
