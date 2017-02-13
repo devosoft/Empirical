@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -16,7 +16,7 @@
 #ifndef EMP_HARDWARE_CPU_BASE_H
 #define EMP_HARDWARE_CPU_BASE_H
 
-#include <vector>
+#include "../base/vector.h"
 
 namespace emp {
 
@@ -74,7 +74,7 @@ namespace emp {
     // they must also track *which* memory they are currently working in.
     class CPUHead {
     private:
-      std::vector<INST_TYPE> * memory;
+      emp::vector<INST_TYPE> * memory;
       int position;
 
       void Adjust() {
@@ -85,11 +85,11 @@ namespace emp {
       }
     public:
       CPUHead() : memory(NULL), position(0) { ; }
-      CPUHead(std::vector<INST_TYPE> & _mem, int _pos=0) : memory(&_mem), position(_pos) { ; }
+      CPUHead(emp::vector<INST_TYPE> & _mem, int _pos=0) : memory(&_mem), position(_pos) { ; }
       CPUHead(const CPUHead & _in) : memory(_in.memory), position(_in.position) { ; }
       ~CPUHead() { ; }
 
-      std::vector<INST_TYPE> & GetMemory() { return *memory; }
+      emp::vector<INST_TYPE> & GetMemory() { return *memory; }
       int GetPosition() const { return position; }
 
       const INST_TYPE & GetInst() const { return (*memory)[position]; }
@@ -107,7 +107,7 @@ namespace emp {
       bool operator!=(const CPUHead & _in) const { return !operator==(_in); }
 
       CPUHead & Set(int _pos) { position = _pos; return *this; }
-      CPUHead & Set(std::vector<INST_TYPE> & _mem, int _pos=0) {
+      CPUHead & Set(emp::vector<INST_TYPE> & _mem, int _pos=0) {
         memory = &_mem; position = _pos; return *this;
       }
 

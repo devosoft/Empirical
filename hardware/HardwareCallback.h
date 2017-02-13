@@ -1,15 +1,13 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_HARDWARE_CALLBACK_H
-#define EMP_HARDWARE_CALLBACK_H
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2017.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  This class collects the callback functions that the hardware will use to interact with the
 //  external world.
-//
+
+#ifndef EMP_HARDWARE_CALLBACK_H
+#define EMP_HARDWARE_CALLBACK_H
 
 #include <functional>
 

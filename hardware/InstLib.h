@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -18,9 +18,9 @@
 #include <map>
 #include <sstream>
 #include <string>
-#include <vector>
 
-#include "../tools/assert.h"
+#include "../base/assert.h"
+#include "../base/vector.h"
 #include "../tools/errors.h"
 #include "../tools/functions.h"
 #include "../tools/string_utils.h"
@@ -123,8 +123,8 @@ namespace emp {
   private:
     // Information of the Instructions associated with this InstLib
     // Instruction function pointers are separated out for improved (?) cache performance.
-    std::vector< std::function<bool(HARDWARE_TYPE&)> > inst_calls;
-    std::vector<InstInfo<INST_TYPE> > inst_info;
+    emp::vector< std::function<bool(HARDWARE_TYPE&)> > inst_calls;
+    emp::vector<InstInfo<INST_TYPE> > inst_info;
 
     std::map<std::string, int> name_map;
     std::map<char, int> short_name_map;
@@ -204,7 +204,7 @@ namespace emp {
     char AsChar(const INST_TYPE & inst) const { return inst_info[inst.GetID()].short_name; }
 
     //Convert an instruction vector into a series of characters.
-    std::string AsString(const std::vector<INST_TYPE> & inst_vector) const {
+    std::string AsString(const emp::vector<INST_TYPE> & inst_vector) const {
       const int vector_size = inst_vector.GetSize();
       std::string out_string(vector_size, ' ');
       for (int i = 0; i < vector_size; i++) {

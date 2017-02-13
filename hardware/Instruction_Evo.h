@@ -1,28 +1,27 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2017.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  This class represents a single instruction in a program, with no arguments.
+//  It holds the information about which operation it is associated with as well as any
+//  relevant flags about that operation.
+//
+//  The entire instruction is stored in a 32-bit unsgined int.  The first 10 bits are set
+//  aside for the instruction ID (max 1024 distinct instructions).  The next 6 are for
+//  quick-check information about the instruction (such as can it be used as an argument
+//  for other instructions?), and the final 16 bits are for tracking run-time information
+//  (has this site been mutated?  If recombined, which parent is it from, etc.)
+//
+//  Since this instruction type was designed for use in genomes in large populations of
+//  evolving computer programs, the main goals were to keep it small and allow for rapid
+//  execution.
+
 
 #ifndef EMP_INSTRUCTION_EVO_H
 #define EMP_INSTRUCTION_EVO_H
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-// This class represents a single instruction in a program, with no arguments.
-// It holds the information about which operation it is associated with as well as any
-// relevant flags about that operation.
-//
-// The entire instruction is stored in a 32-bit unsgined int.  The first 10 bits are set
-// aside for the instruction ID (max 1024 distinct instructions).  The next 6 are for
-// quick-check information about the instruction (such as can it be used as an argument
-// for other instructions?), and the final 16 bits are for tracking run-time information
-// (has this site been mutated?  If recombined, which parent is it from, etc.)
-//
-// Since this instruction type was designed for use in genomes in large populations of
-// evolving computer programs, the main goals were to keep it small and allow for rapid
-// execution.
-//
-
-#include "../tools/assert.h"
+#include "../base/assert.h"
 
 namespace emp {
 

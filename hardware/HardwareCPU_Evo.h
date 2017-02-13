@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -15,10 +15,12 @@
 #include <functional>
 using namespace std::placeholders;
 
+#include "../base/assert.h"
+#include "../base/vector.h"
+
 #include "HardwareCPU_Base.h"
 #include "Instruction_Evo.h"
 #include "InstLib.h"
-#include "../tools/assert.h"
 
 namespace emp {
 
@@ -26,7 +28,7 @@ namespace emp {
     : public HardwareCPU_Base<Instruction_Evo> {
   protected:
     // Hardware components...
-    using memory_t = std::vector<emp::Instruction_Evo>;
+    using memory_t = emp::vector<emp::Instruction_Evo>;
     using hardware_t = HardwareCPU_Evo<CPU_SCALE, STACK_SIZE>;
 
     memory_t memory[CPU_SCALE];
@@ -79,7 +81,7 @@ namespace emp {
 
     memory_t & GetMemory(int mem_id=0) { return memory[mem_id]; }
     
-    void LoadMemory(const std::vector<emp::Instruction_Evo> & in_memory) { memory[0] = in_memory; }
+    void LoadMemory(const emp::vector<emp::Instruction_Evo> & in_memory) { memory[0] = in_memory; }
 
     // Examines the nops following the IP to test if they override the default arguments.
     int ChooseTarget(int default_target) {
@@ -317,10 +319,10 @@ namespace emp {
 
     // The following function returns a list of default instruction names.
 
-    static const std::vector<std::string> & GetDefaultInstructions()
+    static const emp::vector<std::string> & GetDefaultInstructions()
     {
       // If we've already generated this list, just return it.
-      static std::vector<std::string> default_insts;
+      static emp::vector<std::string> default_insts;
       if (default_insts.size() > 0) return default_insts;
 
       // Include as many nops as we need.  These will be called Nop-0, Nop-1, Nop-2, etc.
