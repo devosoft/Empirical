@@ -49,36 +49,21 @@
 //    bool InStateCell() const
 //      Return true/false to identify what state the table is currently in.
 //
-//    Table & GetCell(size_t r, size_t c)
-//      Make the specified row and column active and the table state CELL.
-//      All further manipulations of the table object will focus on that cell until
-//      the state is changed again.
+//  Get table widget that affect specified cell, row, etc.
+//    Table GetCell(size_t r, size_t c)
+//    Table GetRow(size_t r)
+//    Table GetCol(size_t c)
+//    Table GetRowGroup(size_t r)
+//    Table GetColGroup(size_t c)
+//    Table GetTable()
 //
-//    Table & GetRow(size_t r)
-//      Make the specified row active, column zero, and the table state ROW
-//      All further manipulations of the table object will focus on that row until
-//      the state is changed again.
-//
-//    Table & GetCol(size_t c)
-//      Make the specified column active, row zero, and the table state COL
-//      All further manipulations of the table object will focus on that column until
-//      the state is changed again.
-//
-//    Table & GetRowGroup(size_t r)
-//      Select a group of rows starting at the specified row, make it active, and
-//      set the table state to ROW_GROUP.  All further manipulations of the table object
-//      will focus on that row group until the state is changed again.
-//
-//    Table & GetColGroup(size_t c)
-//      Select a group of columns starting at the specified column, make it active, and
-//      set the table state to COL_GROUP.  All further manipulations of the table object
-//      will focus on that column group until the state is changed again.
-//
-//    Table & GetTable()
-//      Leave the active row and column, but set the table state to TABLE
-//      All further manipulations of the table object will focus on the whole table
-//      until the state is changed again.
-//
+//  Make subsequent calls to *this* widget affect specified cell, row, etc.
+//    Table & SetCellActive(size_t r, size_t c)
+//    Table & SetRowActive(size_t r)
+//    Table & SetColActive(size_t c)
+//    Table & SetRowGroupActive(size_t r)
+//    Table & SetColGroupActive(size_t c)
+//    Table & SetTableActive()
 //
 //  Modifying data in table
 //
