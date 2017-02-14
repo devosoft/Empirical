@@ -1,15 +1,15 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include <iostream>
 
+#include "../../base/assert.h"
+#include "../../base/vector.h"
 #include "../../config/command_line.h"
-#include "../../tools/assert.h"
 #include "../../tools/Graph.h"
 #include "../../tools/graph_utils.h"
 #include "../../tools/string_utils.h"
-#include "../../tools/vector.h"
 
 int GetValue(const std::string & query,
 	     emp::vector<std::string> & args,

@@ -1,12 +1,13 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include <iostream>
 #include <map>
 
+#include "../../base/assert.h"
+#include "../../base/vector.h"
 #include "../../config/command_line.h"
-#include "../../tools/assert.h"
 #include "../../tools/Graph.h"
 #include "../../tools/graph_utils.h"
 #include "../../tools/string_utils.h"
@@ -131,7 +132,7 @@ void Solve(const emp::SolveState & in_state, int depth=0)
 int main(int argc, char* argv[])
 {
   // Use some emp tools to check which args were set on the command line.
-  std::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
+  emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
   verbose = emp::cl::use_flag(args, "-v");
   debug = emp::cl::use_flag(args, "-d");
   bool off_by_1 = emp::cl::use_flag(args, "-1");   // Are nodes numbered 1 to N instead of 0 to N-1?
