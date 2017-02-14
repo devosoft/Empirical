@@ -816,6 +816,49 @@ namespace web {
       return Table(Info(), cur_row, cur_col, TABLE);
     }
 
+    // Update the current table object to change the active cell.
+    Table & SetCellActive(size_t r, size_t c) {
+      emp_assert(Info() != nullptr);
+      emp_assert(r < Info()->row_count && c < Info()->col_count,
+                 r, c, Info()->row_count, Info()->col_count, GetID());
+      cur_row = r; cur_col = c;
+      state = CELL;
+      return *this;
+    }
+    Table & SetRowActive(size_t r) {
+      emp_assert(r < Info()->row_count,
+                 r, Info()->row_count, GetID());
+      cur_row = r; cur_col = 0;
+      state = ROW;
+      return *this;
+    }
+    Table & SetColActive(size_t c) {
+      emp_assert(c < Info()->col_count,
+                 c, Info()->col_count, GetID());
+      cur_col = c; cur_row = 0;
+      state = COL;
+      return *this;
+    }
+    Table & SetRowGroupActive(size_t r) {
+      emp_assert(r < Info()->row_count,
+                 r, Info()->row_count, GetID());
+      cur_row = r; cur_col = 0;
+      state = ROW_GROUP;
+      return *this;
+    }
+    Table & SetColGroupActive(size_t c) {
+      emp_assert(c < Info()->col_count,
+                 c, Info()->col_count, GetID());
+      cur_col = c; cur_row = 0;
+      state = COL_GROUP;
+      return *this;
+    }
+    Table & SetTableActive() {
+      // Leave row and col where they are.
+      state = TABLE;
+      return *this;
+    }
+
 
     Table & SetHeader(bool _h=true) {
       emp_assert(state == CELL);
