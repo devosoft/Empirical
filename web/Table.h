@@ -667,7 +667,8 @@ namespace web {
     internal::TableInfo * Info() { return (internal::TableInfo *) info; }
     const internal::TableInfo * Info() const { return (internal::TableInfo *) info; }
 
-    Table(internal::TableInfo * in_info) : WidgetFacet(in_info) { ; }
+    Table(internal::TableInfo * in_info, size_t _row=0, size_t _col=0, state_t _state=TABLE)
+     : WidgetFacet(in_info), cur_row(_row), cur_col(_col), state(_state) { ; }
 
     // Apply to appropriate component based on current state.
     void DoCSS(const std::string & setting, const std::string & value) override {
@@ -714,8 +715,7 @@ namespace web {
       Info()->Resize(r, c);
     }
     Table(const Table & in)
-      : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col), state(in.state)
-    {
+      : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col), state(in.state) {
       emp_assert(state == TABLE || state == ROW || state == CELL
                  || state == COL || state == COL_GROUP || state == ROW_GROUP, state);
     }
