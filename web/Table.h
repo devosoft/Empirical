@@ -786,46 +786,34 @@ namespace web {
       return *this;
     }
 
-    Table & GetCell(size_t r, size_t c) {
+    Table GetCell(size_t r, size_t c) {
       emp_assert(Info() != nullptr);
       emp_assert(r < Info()->row_count && c < Info()->col_count,
                  r, c, Info()->row_count, Info()->col_count, GetID());
-      cur_row = r; cur_col = c;
-      state = CELL;
-      return *this;
+      return Table(Info(), r, c, CELL);
     }
-    Table & GetRow(size_t r) {
+    Table GetRow(size_t r) {
       emp_assert(r < Info()->row_count,
                  r, Info()->row_count, GetID());
-      cur_row = r; cur_col = 0;
-      state = ROW;
-      return *this;
+      return Table(Info(), r, 0, ROW);
     }
-    Table & GetCol(size_t c) {
+    Table GetCol(size_t c) {
       emp_assert(c < Info()->col_count,
                  c, Info()->col_count, GetID());
-      cur_col = c; cur_row = 0;
-      state = COL;
-      return *this;
+      return Table(Info(), 0, c, COL);
     }
-    Table & GetRowGroup(size_t r) {
+    Table GetRowGroup(size_t r) {
       emp_assert(r < Info()->row_count,
                  r, Info()->row_count, GetID());
-      cur_row = r; cur_col = 0;
-      state = ROW_GROUP;
-      return *this;
+      return Table(Info(), r, 0, ROW_GROUP);
     }
-    Table & GetColGroup(size_t c) {
+    Table GetColGroup(size_t c) {
       emp_assert(c < Info()->col_count,
                  c, Info()->col_count, GetID());
-      cur_col = c; cur_row = 0;
-      state = COL_GROUP;
-      return *this;
+      return Table(Info(), 0, c, COL_GROUP);
     }
-    Table & GetTable() {
-      // Leave row and col where they are.
-      state = TABLE;
-      return *this;
+    Table GetTable() {
+      return Table(Info(), cur_row, cur_col, TABLE);
     }
 
 
