@@ -14,10 +14,11 @@
 #include <string>
 #include <tuple>
 
+#include "../base/vector.h"
+
 #include "Graph.h"
 #include "Random.h"
 #include "random_utils.h"
-#include "vector.h"
 
 namespace emp {
 

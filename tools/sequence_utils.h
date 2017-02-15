@@ -7,8 +7,9 @@
 #ifndef EMP_SEQUENCE_UTILS_H
 #define EMP_SEQUENCE_UTILS_H
 
+#include "../base/vector.h"
+
 #include "functions.h"
-#include "vector.h"
 
 namespace emp {
 

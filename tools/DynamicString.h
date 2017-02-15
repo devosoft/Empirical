@@ -10,7 +10,8 @@
 
 #include <functional>
 #include <string>
-#include <vector>
+
+#include "../base/vector.h"
 
 namespace emp {
 
@@ -18,7 +19,7 @@ namespace emp {
   public:
     using value_t = std::function<std::string()>;
   private:
-    std::vector<value_t> fun_set;  // Functions to update strings.
+    emp::vector<value_t> fun_set;  // Functions to update strings.
 
   public:
     DynamicString() { ; }
