@@ -1,12 +1,13 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
-// Copyright (C) Michigan State University, 2015. It is licensed
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2017.
+//  Released under the MIT Software license; see doc/LICENSE
 
-#include "../../web/init.h"
-#include "../../tools/assert.h"
-#include "../../tools/unit_tests.h"
-#include "../../web/JSWrap.h"
 #include <functional>
+
+#include "../../base/assert.h"
+#include "../../tools/unit_tests.h"
+#include "../../web/init.h"
+#include "../../web/JSWrap.h"
 
 struct JSDataObject {
     EMP_BUILD_INTROSPECTIVE_TUPLE(
