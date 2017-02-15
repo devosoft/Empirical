@@ -1,3 +1,7 @@
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016-2017.
+//  Released under the MIT Software license; see doc/LICENSE
+
 #ifndef __SELECTION_H__
 #define __SELECTION_H__
 
@@ -11,7 +15,7 @@
 #include <map>
 #include <array>
 
-#include "../../tools/assert.h"
+#include "../../base/assert.h"
 #include "../../web/js_utils.h"
 #include "../../web/JSWrap.h"
 
