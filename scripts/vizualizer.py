@@ -187,10 +187,9 @@ def main():
     print("Symbols to map: {}".format(needed_mappings)) 
     print("For each symbol enter RGB mapping, e.g. '255, 0, 0'")
 
-    gradient_begin = (0, 255, 0)
-    gradient_step = (255/100, -255/100, 0)
+    gradient_begin = (255, 0, 0)
     print("Step is {}".format(gradient_step))
-    gradient_end = (255, 0, 0)
+    gradient_end = (0, 255, 0)
 
     for symbol in needed_mappings:
         if int(symbol) < 0 or int(symbol) > 100:
