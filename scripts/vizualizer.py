@@ -95,8 +95,16 @@ def file_to_frames(gridfname, prefix, mapping, pixwidth, grid = None):
     if grid == None:
         grid, _ = parse_map_file(gridfname)
 
+    print("Estimating {} frames to process....".format(len(grid)))
+    length_to_run = len(grid)
+
     framenum = 0
     for snapshot in grid:
+        print("\rOn frame {} / {} ({}%)".format(
+            framenum, 
+            length_to_run, 
+            int((framenum / length_to_run) * 100)), 
+            end="")
         img = gen_image(snapshot, mapping, pixwidth)
         img.save(prefix + "%05d.png" % framenum)
         framenum += 1
@@ -188,7 +196,6 @@ def main():
     print("For each symbol enter RGB mapping, e.g. '255, 0, 0'")
 
     gradient_begin = (255, 0, 0)
-    print("Step is {}".format(gradient_step))
     gradient_end = (0, 255, 0)
 
     for symbol in needed_mappings:
