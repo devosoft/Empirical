@@ -7,6 +7,8 @@
 #ifndef EMP_SOLVE_STATE_H
 #define EMP_SOLVE_STATE_H
 
+#include "../base/assert.h"
+
 #include "BitVector.h"
 
 namespace emp {
@@ -50,13 +52,13 @@ namespace emp {
     }
 
     void Include(size_t id) {
-      assert(id >= 0 && id < in_items.size());
+      emp_assert(id >= 0 && id < in_items.size());
       unk_items.Set(id, false);
       in_items.Set(id, true);
     }
 
     void Exclude(size_t id) {
-      assert(id >= 0 && id < in_items.size());
+      emp_assert(id >= 0 && id < in_items.size());
       unk_items.Set(id, false);
     }
 
@@ -67,13 +69,13 @@ namespace emp {
     }
 
     void IncludeSet(const BitVector & inc_set) {
-      assert(inc_set.GetSize() == in_items.GetSize());
+      emp_assert(inc_set.GetSize() == in_items.GetSize());
       in_items |= inc_set;
       unk_items &= ~inc_set;
     }
 
     void ExcludeSet(const BitVector & inc_set) {
-      assert(inc_set.GetSize() == in_items.GetSize());
+      emp_assert(inc_set.GetSize() == in_items.GetSize());
       unk_items &= ~inc_set;
     }
   };
