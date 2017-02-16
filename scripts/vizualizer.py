@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from PIL import Image
-
+import argparse
 
 """
 Simple module to take a CSV file of grid states and generate images for them, to later be stitched
@@ -141,6 +141,22 @@ def load_config_from_file(fname):
         return config
 
 
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--auto-color", "-a",
+                        help="The script will automatically determine colors for the needed "
+                        "values", action="store_true")
+
+    return parser.parse_args()
+
+
+def tuple_tween(begin, end, ratio):
+    result = []
+    for index, element in enumerate(begin):
+        result.append(begin[index] + int(ratio * (end[index] - element)))
+
+    return result
+
 def main():
     """
     Driver function for when this is called on the command line.
@@ -156,6 +172,8 @@ def main():
     This is useful for when you have more complex mappings that you need to generate, and passing
     it as an object is much much faster than manually entering it on the command line.
     """
+
+    args = get_args()
     print("Enter name of map file: ", end="")
     fname = input().strip()
     grid, needed_mappings = parse_map_file(fname)
@@ -169,14 +187,27 @@ def main():
     print("Symbols to map: {}".format(needed_mappings)) 
     print("For each symbol enter RGB mapping, e.g. '255, 0, 0'")
 
+    gradient_begin = (0, 255, 0)
+    gradient_step = (255/100, -255/100, 0)
+    print("Step is {}".format(gradient_step))
+    gradient_end = (255, 0, 0)
+
     for symbol in needed_mappings:
-        print("{} -> Mapping: ".format(symbol), end = "")
-        line = input().strip()
-        if len(line) == 0:
-            break
-        line = line.split(',')
-        
-        mapping[symbol] = (int(line[0]), int(line[1]), int(line[2]))
+        if int(symbol) < 0 or int(symbol) > 100:
+            print("{} -> Mapping: ".format(symbol), end = "")
+            line = input().strip()
+            if len(line) == 0:
+                break
+            line = line.split(',')
+            
+            mapping[symbol] = (int(line[0]), int(line[1]), int(line[2]))
+        else:
+            mapping[symbol] = tuple_tween(gradient_begin, gradient_end, int(symbol) / 100)
+            print("Auto-mapping {} -> ({})".format(
+                symbol,
+                mapping[symbol]))
+
+
 
     print("Building frames....")
     file_to_frames(fname, 'frame', mapping, int(width))
