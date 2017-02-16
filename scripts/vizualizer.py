@@ -155,7 +155,7 @@ def tuple_tween(begin, end, ratio):
     for index, element in enumerate(begin):
         result.append(begin[index] + int(ratio * (end[index] - element)))
 
-    return result
+    return tuple(result)
 
 def main():
     """
