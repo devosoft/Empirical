@@ -8,12 +8,12 @@
 #ifndef EMP_GRAPH_UTILS_H
 #define EMP_GRAPH_UTILS_H
 
-#include <assert.h>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <tuple>
 
+#include "../base/assert.h"
 #include "../base/vector.h"
 
 #include "Graph.h"
@@ -59,15 +59,15 @@ namespace emp {
     const size_t max_edges = v_count * (v_count-1) / 2;
     (void) max_edges;
 
-    assert(v_count >= 2 && e_count > 0); // We need at least two vertices to support an edge.
-    assert(e_count <= max_edges); // Shouldn't have more edges than can fit!
+    emp_assert(v_count >= 2 && e_count > 0); // We need at least two vertices to support an edge.
+    emp_assert(e_count <= max_edges); // Shouldn't have more edges than can fit!
 
     Graph graph(v_count);
     size_t e_cur = 0;           // How many edges have we added?
 
     // If the graph should be connected, start by building a tree.
     if (connected) {
-      assert(e_count >= v_count - 1);  // We need enough edges to build a connected graph.
+      emp_assert(e_count >= v_count - 1);  // We need enough edges to build a connected graph.
       graph = build_graph_tree(v_count, random);
       e_cur = v_count - 1;
     }
@@ -88,7 +88,7 @@ namespace emp {
   }
 
   Graph build_graph_grid(size_t width, size_t height, Random & random, double prob_use=1.0) {
-    assert(width > 0 && height > 0);
+    emp_assert(width > 0 && height > 0);
 
     const size_t v_count = width * height;
     // const size_t e_count = (width-1)*height + width*(height-1);
@@ -117,7 +117,7 @@ namespace emp {
   // of an independent set) and then links them together
   Graph build_graph_clique_set(size_t clique_size, size_t clique_count, Random & random,
                                double extra_prob=0.5) {
-    assert(clique_size > 0 && clique_count > 0);
+    emp_assert(clique_size > 0 && clique_count > 0);
 
     const size_t v_count = clique_size * clique_count;
     Graph graph(v_count);
