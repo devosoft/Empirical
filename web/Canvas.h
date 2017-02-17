@@ -147,6 +147,11 @@ namespace web {
       Info()->AddAction( new CanvasRect(x, y, w, h, fc, lc) );
       return *this;
     }
+    Canvas & Draw(const emp::Circle<> & circle,
+                    const std::string & fc="", const std::string & lc="") {
+      Info()->AddAction( new CanvasCircle(circle, fc, lc) );
+      return *this;
+    }
     Canvas & StrokeColor(std::string c) {
       Info()->AddAction( new CanvasStrokeColor(c) );
       return *this;
