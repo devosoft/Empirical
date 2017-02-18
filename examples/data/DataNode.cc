@@ -12,7 +12,8 @@
 int main()
 {
   emp::DataNode<int, emp::data::Current, emp::data::Range, emp::data::Pull, emp::data::Log> data;
-  emp::DataNode<int, emp::data::Archive, emp::data::Current, emp::data::FullRange, emp::data::Pull> data2;
+  emp::DataNode<int, emp::data::Archive, emp::data::Current, emp::data::FullRange, emp::data::Info> data2;
+  emp::DataNode<double> data_empty; // Build an empty DataNode to make sure no modules are required.
   data.Add(27, 28, 29);
 
   std::cout << "=> Added 27, 28, and 29" << std::endl;
@@ -79,4 +80,5 @@ int main()
   std::cout << "Min     = " << data2.GetMin() << std::endl;
   std::cout << "Max     = " << data2.GetMax() << std::endl;
 
+  data2.SetInfo("Best Data", "This is the best of all possible data.", "best_data");
 }
