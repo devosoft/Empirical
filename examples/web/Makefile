@@ -26,8 +26,12 @@ TARGETS := debug-Animate debug-keypress debug-Slate debug-web
 
 default: web
 
-CXX := $(CXX_native)
-CFLAGS := $(CFLAGS_native_opt)
+WEB := ../../web
+
+# CXX := $(CXX_native)
+# CFLAGS := $(CFLAGS_native_opt)
+CXX := $(CXX_web)
+CFLAGS := $(CFLAGS_web_opt)
 
 debug: CFLAGS_web := $(CFLAGS_web_debug)
 debug: $(JS_TARGETS)
@@ -44,7 +48,7 @@ native: all
 
 all: $(TARGETS)
 
-$(JS_TARGETS): %.js : %.cc
+$(JS_TARGETS): %.js : %.cc # $(WEB)/%.h
 	$(CXX_web) $(CFLAGS_web) $< -o $@
 
 
