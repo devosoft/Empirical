@@ -36,19 +36,17 @@ namespace emp {
   template <typename BODY_TYPE>
   class Surface2D {
   private:
-    const Point2D<double> max_pos;     // Lower-left corner of the surface.
+    const Point max_pos;     // Lower-left corner of the surface.
     std::vector<BODY_TYPE *> body_set;  // Set of all bodies on surface
 
   public:
     Surface2D(double _width, double _height)
-      : max_pos(_width, _height)
-    {
-    }
+      : max_pos(_width, _height) { ; }
     ~Surface2D() { Clear(); }
 
     double GetWidth() const { return max_pos.GetX(); }
     double GetHeight() const { return max_pos.GetY(); }
-    const Point2D<double> & GetMaxPosition() const { return max_pos; }
+    const Point & GetMaxPosition() const { return max_pos; }
 
     std::vector<BODY_TYPE *> & GetBodySet() { return body_set; }
     const std::vector<BODY_TYPE *> & GetConstBodySet() const { return body_set; }

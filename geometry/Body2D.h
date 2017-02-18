@@ -58,17 +58,17 @@ namespace emp {
       ~BodyLink() { ; }
     };
 
-    double birth_time;        // At what time point was this organism born?
-    Angle orientation;        // Which way is body facing?
-    Point2D<double> velocity; // Speed and direction of movement
-    double mass;              // "Weight" of this object (@CAO not used yet..)
-    uint32_t color_id;        // Which color should this body appear?
-    int repro_count;          // Number of offspring currently being produced.
+    double birth_time;      // At what time point was this organism born?
+    Angle orientation;      // Which way is body facing?
+    Point velocity;         // Speed and direction of movement
+    double mass;            // "Weight" of this object (@CAO not used yet..)
+    uint32_t color_id;      // Which color should this body appear?
+    int repro_count;        // Number of offspring currently being produced.
 
-    Point2D<double> shift;            // How should this body be updated to minimize overlap.
-    Point2D<double> cum_shift;        // Build up of shift not yet acted upon.
-    Point2D<double> total_abs_shift;  // Total absolute-value of shifts (to calculate pressure)
-    double pressure;                  // Current pressure on this body.
+    Point shift;            // How should this body be updated to minimize overlap.
+    Point cum_shift;        // Build up of shift not yet acted upon.
+    Point total_abs_shift;  // Total absolute-value of shifts (to calculate pressure)
+    double pressure;        // Current pressure on this body.
 
   public:
     Body2D_Base() : birth_time(0.0), mass(1.0), color_id(0), repro_count(0), pressure(0) { ; }
@@ -76,12 +76,12 @@ namespace emp {
 
     double GetBirthTime() const { return birth_time; }
     const Angle & GetOrientation() const { return orientation; }
-    const Point2D<double> & GetVelocity() const { return velocity; }
+    const Point & GetVelocity() const { return velocity; }
     double GetMass() const { return mass; }
     uint32_t GetColorID() const { return color_id; }
     bool IsReproducing() const { return repro_count; }
     int GetReproCount() const { return repro_count; }
-    Point2D<double> GetShift() const { return shift; }
+    Point GetShift() const { return shift; }
     double GetPressure() const { return pressure; }
 
 
@@ -93,14 +93,14 @@ namespace emp {
     void TurnRight(int steps=1) { orientation.RotateDegrees(-45); }
 
     // Velocity control...
-    void IncSpeed(const Point2D<double> & offset) { velocity += offset; }
+    void IncSpeed(const Point & offset) { velocity += offset; }
     void IncSpeed() { velocity += orientation.GetPoint<double>(); }
     void DecSpeed() { velocity -= orientation.GetPoint<double>(); }
     void SetVelocity(double x, double y) { velocity.Set(x, y); }
-    void SetVelocity(const Point2D<double> & v) { velocity = v; }
+    void SetVelocity(const Point & v) { velocity = v; }
 
     // Shift to apply next update.
-    void AddShift(const Point2D<double> & s) { shift += s; total_abs_shift += s.Abs(); }
+    void AddShift(const Point & s) { shift += s; total_abs_shift += s.Abs(); }
   };
 
   class CircleBody2D : public Body2D_Base {
@@ -138,17 +138,17 @@ namespace emp {
     }
 
     const Circle<double> & GetPerimeter() const { return perimeter; }
-    const Point2D<double> & GetAnchor() const { return perimeter.GetCenter(); }
-    const Point2D<double> & GetCenter() const { return perimeter.GetCenter(); }
+    const Point & GetAnchor() const { return perimeter.GetCenter(); }
+    const Point & GetCenter() const { return perimeter.GetCenter(); }
     double GetRadius() const { return perimeter.GetRadius(); }
     double GetTargetRadius() const { return target_radius; }
 
-    void SetPosition(const Point2D<double> & p) { perimeter.SetCenter(p); }
+    void SetPosition(const Point & p) { perimeter.SetCenter(p); }
     void SetRadius(double r) { perimeter.SetRadius(r); }
     void SetTargetRadius(double t) { target_radius = t; }
 
     // Translate immediately (ignoring physics)
-    void Translate(const Point2D<double> & t) { perimeter.Translate(t); }
+    void Translate(const Point & t) { perimeter.Translate(t); }
 
     // Creating, testing, and unlinking other organisms
     bool IsLinkedFrom(const CircleBody2D & link_org) const {
@@ -217,7 +217,7 @@ namespace emp {
       link.cur_dist += change;
     }
 
-    CircleBody2D * BuildOffspring(Point2D<double> offset) {
+    CircleBody2D * BuildOffspring(Point offset) {
       // Offspring cannot be right on top of parent.
       emp_assert(offset.GetX() != 0 || offset.GetY() != 0);
 
@@ -279,7 +279,7 @@ namespace emp {
 
 
     // Determine where the circle will end up and force it to be within a bounding box.
-    void FinalizePosition(const Point2D<double> & max_coords) {
+    void FinalizePosition(const Point & max_coords) {
       const double max_x = max_coords.GetX() - GetRadius();
       const double max_y = max_coords.GetY() - GetRadius();
 
@@ -299,7 +299,7 @@ namespace emp {
       for (auto * link : from_links) {
         if (GetAnchor() == link->to->GetAnchor()) {
           // If two organisms are on top of each other... shift one.
-          Translate(Point2D<double>(0.01, 0.01));
+          Translate(Point(0.01, 0.01));
         }
 
         // Figure out how much each oragnism should move so that they will be properly spaced.
@@ -307,7 +307,7 @@ namespace emp {
         const double link_dist = link->cur_dist;
         const double frac_change = (1.0 - ((double) link_dist) / ((double) start_dist)) / 2.0;
 
-        Point2D<double> dist_move = (GetAnchor() - link->to->GetAnchor()) * frac_change;
+        Point dist_move = (GetAnchor() - link->to->GetAnchor()) * frac_change;
 
         perimeter.Translate(-dist_move);
         link->to->perimeter.Translate(dist_move);
