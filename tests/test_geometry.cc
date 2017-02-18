@@ -15,8 +15,8 @@ TEST_CASE("Test Body2d", "[geometry]")
 
   // Test to make sure shifts and pressure are being calculated correctly.
 
-  emp::Point<double> shift1(5.0, 6.0);
-  emp::Point<double> shift2(-2.0, -2.0);
+  emp::Point2D<double> shift1(5.0, 6.0);
+  emp::Point2D<double> shift2(-2.0, -2.0);
 
   body1.AddShift(shift1);
 
@@ -47,7 +47,7 @@ TEST_CASE("Test Body2d", "[geometry]")
 TEST_CASE("Test Circle2D", "[geometry]")
 {
 
-  emp::Point<double> test_point(4.0,3.0);
+  emp::Point2D<double> test_point(4.0,3.0);
 
   emp::Circle<double> circle0(7.0);
   emp::Circle<double> circle_small(test_point, 1.5);
@@ -56,8 +56,8 @@ TEST_CASE("Test Circle2D", "[geometry]")
   REQUIRE(circle0.Contains(circle_small) == true);
   REQUIRE(circle0.Contains(circle_big) == false);
   //BAD TEST: REQUIRE(circle0.HasOverlap(circle_big) == false);
-  
-  emp::Point<double> test_point2(6.0,5.0);
+
+  emp::Point2D<double> test_point2(6.0,5.0);
   REQUIRE(circle_small.Contains(test_point2) == false);
   REQUIRE(circle_big.Contains(test_point2) == true);
 }
@@ -66,11 +66,11 @@ TEST_CASE("Test Circle2D", "[geometry]")
 TEST_CASE("Test Point2D", "[geometry]")
 {
   // Test constructors...
-  emp::Point<double> point_base;              // (0,0)
-  emp::Point<double> point_set(1.5, 2.0);
-  emp::Point<double> point_copy(point_set);
-  emp::Point<double> point_scale(point_set, 5.0);
-  emp::Point<double> point_list({3.0, 4.0});
+  emp::Point2D<double> point_base;              // (0,0)
+  emp::Point2D<double> point_set(1.5, 2.0);
+  emp::Point2D<double> point_copy(point_set);
+  emp::Point2D<double> point_scale(point_set, 5.0);
+  emp::Point2D<double> point_list({3.0, 4.0});
 
   REQUIRE(point_base.Magnitude() == 0.0);
   REQUIRE(point_set.Magnitude() == 2.5);
@@ -83,7 +83,7 @@ TEST_CASE("Test Point2D", "[geometry]")
   REQUIRE(point_scale == point_list);
 
   // Test setting points
-  std::vector<emp::Point<double> > points(10);
+  std::vector<emp::Point2D<double> > points(10);
   points[0].SetX(13);
   points[1].SetY(13);
   points[2].Set(5, 12);
@@ -98,7 +98,7 @@ TEST_CASE("Test Point2D", "[geometry]")
   REQUIRE(points[1].AtOrigin() == false);
   REQUIRE(points[2].AtOrigin() == false);
   REQUIRE(points[3].AtOrigin() == true);
-  
+
   REQUIRE(points[0].NonZero() == true);
   REQUIRE(points[1].NonZero() == true);
   REQUIRE(points[2].NonZero() == true);
@@ -109,8 +109,8 @@ TEST_CASE("Test Point2D", "[geometry]")
   points[4].Set(4,4);
   points[5].Set(5,5);
 
-  REQUIRE(points[4].GetMidpoint(points[5]) == emp::Point<double>(4.5,4.5));
-  REQUIRE(points[5].GetMidpoint(points[4]) == emp::Point<double>(4.5,4.5));
+  REQUIRE(points[4].GetMidpoint(points[5]) == emp::Point2D<double>(4.5,4.5));
+  REQUIRE(points[5].GetMidpoint(points[4]) == emp::Point2D<double>(4.5,4.5));
   REQUIRE(points[2].GetRot90().Magnitude() == 13);
   REQUIRE(points[2].GetRot180().Magnitude() == 13);
   REQUIRE(points[2].GetRot270().Magnitude() == 13);
