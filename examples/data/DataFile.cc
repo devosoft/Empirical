@@ -36,7 +36,7 @@ int main()
   double frac = 0.0;
   for (size_t i = 0; i < 10; i++) {
     data_fracs.Add(frac += 0.01);
-    data_squares.Add((int)i*i);
+    data_squares.Add((int)(i*i));
     data_cubes.Add(i*i*i);
     dfile.Update();
 
@@ -46,7 +46,7 @@ int main()
   dfile.SetupLine("[[",":", "]]\n");
   for (size_t i = 10; i < 20; i++) {
     data_fracs.Add(frac += 0.01);
-    data_squares.Add((int)i*i);
+    data_squares.Add((int)(i*i));
     data_cubes.Add(i*i*i);
     dfile.Update();
 
