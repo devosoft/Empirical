@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -12,7 +12,7 @@
 //
 //  Member functions include:
 //   Surface2D(double _width, double _height);
-//   const Point<double> & GetMaxPosition() const;
+//   const Point & GetMaxPosition() const;
 //   std::vector<BODY_TYPE *> & GetBodySet();
 //   const std::vector<BODY_TYPE *> & GetConstBodySet() const;
 //   Surface2D<BODY_TYPE, BODY_INFO> & AddBody(BODY_TYPE * new_body);
@@ -36,7 +36,7 @@ namespace emp {
   template <typename BODY_TYPE>
   class Surface2D {
   private:
-    const Point<double> max_pos;     // Lower-left corner of the surface.
+    const Point2D<double> max_pos;     // Lower-left corner of the surface.
     std::vector<BODY_TYPE *> body_set;  // Set of all bodies on surface
 
   public:
@@ -48,7 +48,7 @@ namespace emp {
 
     double GetWidth() const { return max_pos.GetX(); }
     double GetHeight() const { return max_pos.GetY(); }
-    const Point<double> & GetMaxPosition() const { return max_pos; }
+    const Point2D<double> & GetMaxPosition() const { return max_pos; }
 
     std::vector<BODY_TYPE *> & GetBodySet() { return body_set; }
     const std::vector<BODY_TYPE *> & GetConstBodySet() const { return body_set; }

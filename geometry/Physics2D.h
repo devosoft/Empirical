@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -41,7 +41,7 @@ namespace emp {
     bool GetDetach() const { return detach_on_birth; }
 
     Physics2D & SetDetach(bool _in) { detach_on_birth = _in; return *this; }
-    
+
     Physics2D & AddBody(BODY_TYPE * in_body) { surface.AddBody(in_body); return *this; }
     Physics2D & AddBackground(BODY_TYPE * in_body) { background.AddBody(in_body); return *this; }
 
@@ -84,7 +84,7 @@ namespace emp {
       }
 
       // @CAO If objects can phase or explode, identify that here.
-      
+
       // Re-adjust position to remove overlap.
       const double true_dist = sqrt(sq_pair_dist);
       const double overlap_dist = ((double) radius_sum) - true_dist;
@@ -95,10 +95,10 @@ namespace emp {
 
       // @CAO if we have inelastic collisions, we just take the weighted average of velocites
       // and let the move together.
-      
+
       // Assume elastic: Re-adjust velocity to reflect bounce.
       double x1, y1, x2, y2;
-  
+
       if (dist.GetX() == 0) {
         x1 = body1.GetVelocity().GetX();  y1 = body2.GetVelocity().GetY();
         x2 = body2.GetVelocity().GetX();  y2 = body1.GetVelocity().GetY();
@@ -125,9 +125,9 @@ namespace emp {
         body2.SetVelocity(body1.GetVelocity() + Point<double>(x2, y2));
         body1.SetVelocity(body1.GetVelocity() + Point<double>(x1, y1));
       }
-  
 
-      return true;      
+
+      return true;
     }
 
     void Update() {
