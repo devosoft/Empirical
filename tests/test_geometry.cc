@@ -9,7 +9,7 @@
 
 TEST_CASE("Test Body2d", "[geometry]")
 {
-  emp::Circle<double> body_outline(10.0);
+  emp::Circle body_outline(10.0);
   emp::CircleBody2D body1(body_outline);
 
 
@@ -49,9 +49,9 @@ TEST_CASE("Test Circle2D", "[geometry]")
 
   emp::Point test_point(4.0,3.0);
 
-  emp::Circle<double> circle0(7.0);
-  emp::Circle<double> circle_small(test_point, 1.5);
-  emp::Circle<double> circle_big(test_point, 5.0);
+  emp::Circle circle0(7.0);
+  emp::Circle circle_small(test_point, 1.5);
+  emp::Circle circle_big(test_point, 5.0);
 
   REQUIRE(circle0.Contains(circle_small) == true);
   REQUIRE(circle0.Contains(circle_big) == false);

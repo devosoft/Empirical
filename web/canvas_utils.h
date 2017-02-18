@@ -25,7 +25,7 @@ namespace emp {
 namespace web {
 
   // Draw a Circle!
-  void Draw(Canvas canvas, const emp::Circle<> & circle,
+  void Draw(Canvas canvas, const emp::Circle & circle,
             const std::string & fill="",
             const std::string & line="")
   {

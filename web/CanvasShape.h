@@ -37,8 +37,7 @@ namespace web {
                  const std::string & fc="", const std::string & lc="")
       : CanvasShape(_x, _y, fc, lc), radius(_r) { ; }
 
-    CanvasCircle(emp::Circle<> circle,
-                 const std::string & fc="", const std::string & lc="")
+    CanvasCircle(emp::Circle circle, const std::string & fc="", const std::string & lc="")
       : CanvasShape(circle.GetCenterX(), circle.GetCenterY(), fc, lc)
       , radius(circle.GetRadius()) { ; }
 

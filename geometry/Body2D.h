@@ -105,7 +105,7 @@ namespace emp {
 
   class CircleBody2D : public Body2D_Base {
   private:
-    Circle<double> perimeter;  // Includes position and size.
+    Circle2D<double> perimeter;  // Includes position and size.
     double target_radius;      // For growing/shrinking
 
     // Information about other bodies that this one is linked to.
@@ -124,7 +124,7 @@ namespace emp {
     }
 
   public:
-    CircleBody2D(const Circle<double> & _p)
+    CircleBody2D(const Circle2D<double> & _p)
       : perimeter(_p), target_radius(_p.GetRadius())
     {
       EMP_TRACK_CONSTRUCT(CircleBody2D);
@@ -137,7 +137,7 @@ namespace emp {
       EMP_TRACK_DESTRUCT(CircleBody2D);
     }
 
-    const Circle<double> & GetPerimeter() const { return perimeter; }
+    const Circle2D<double> & GetPerimeter() const { return perimeter; }
     const Point & GetAnchor() const { return perimeter.GetCenter(); }
     const Point & GetCenter() const { return perimeter.GetCenter(); }
     double GetRadius() const { return perimeter.GetRadius(); }
