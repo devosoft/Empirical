@@ -24,9 +24,31 @@ namespace emp {
   }
 
   /// Min of only one element is that element itself!
-  template <typename T> constexpr const T & Min(const T& in1) { return in1; }
+  template <typename T> constexpr T Min(T in1) { return in1; }
 
   /// Min of multiple elements is solved recursively.
+  template <typename T, typename... Ts>
+  constexpr T Min(T in1, T in2, Ts... extras) {
+    T cur_result = Min(in2, extras...);
+    return (in1 < cur_result) ? in1 : cur_result;
+  }
+
+
+  /// Max of only one element is that element itself!
+  template <typename T> constexpr T Max(T in1) { return in1; }
+
+  /// Max of multiple elements is solved recursively.
+  template <typename T, typename... Ts>
+  constexpr T Max(T in1, T in2, Ts... extras) {
+    T cur_result = Max(in2, extras...);
+    return (in1 < cur_result) ? cur_result : in1;
+  }
+
+  /// MinRef works like Min, but never copies any inputs; always treats as references.
+  /// MinRef of only one element returns reference to that element itself!
+  template <typename T> constexpr const T & Min(const T& in1) { return in1; }
+
+  /// MinRef of multiple elements returns reference to minimum value.
   template <typename T, typename... Ts>
   constexpr const T & Min(const T& in1, const T& in2, const Ts&... extras) {
     const T & cur_result = Min(in2, extras...);
@@ -34,15 +56,17 @@ namespace emp {
   }
 
 
-  /// Max of only one element is that element itself!
+  /// MaxRef works like Max, but never copies any inputs; always treats as references.
+  /// MaxRef of only one element returns reference to that element itself!
   template <typename T> constexpr const T & Max(const T& in1) { return in1; }
 
-  /// Max of multiple elements is solved recursively.
+  /// MaxRef of multiple elements returns reference to maximum value.
   template <typename T, typename... Ts>
   constexpr const T & Max(const T& in1, const T& in2, const Ts&... extras) {
     const T & cur_result = Max(in2, extras...);
     return (in1 < cur_result) ? cur_result : in1;
   }
+
 
   namespace {
     // A compile-time log calculator for values [1,2)
