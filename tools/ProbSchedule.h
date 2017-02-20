@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-17.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -103,7 +103,7 @@ namespace emp {
 
       // If so, choose a random number to use for the scheduling.
       double rand_pos = m_rng.GetDouble(total_weight);
-      return CalcID(rand_pos, 0);
+      return (int) CalcID(rand_pos, 0);
     }
   };
 };

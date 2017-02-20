@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-17.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -92,8 +92,8 @@ namespace emp {
     void Flip(size_t id) { bits.flip(id); }
 
     void SetAll() { bits.SetAll(); }
-    void SetCol(size_t col) { bits |= MaskCol<0>() << (int) col;}
-    void SetRow(size_t row) { bits |= (MaskRow<0>() << (int) (row * COLS)); }
+    void SetCol(size_t col) { bits |= MaskCol<0>() << col;}
+    void SetRow(size_t row) { bits |= (MaskRow<0>() << (row * COLS)); }
     void Clear() { bits.Clear(); }
     void ClearCol(size_t col) { bits &= ~(MaskCol<0>() << col); }
     void ClearRow(size_t row) { bits &= ~(MaskRow<0>() << (row * COLS)); }
@@ -104,7 +104,7 @@ namespace emp {
     // Find the position of the first non-zero bit.
     // size_t FindBit() const { return (~bits & (bits - 1)).count(); }
 
-    size_t FindBit() const { return bits.FindBit(); }
+    int FindBit() const { return bits.FindBit(); }
 
     // Shift the whole matrix in the specified direction.
     BitMatrix LeftShift() const { return ((bits & ~MaskCol<0>()) >> 1); }
@@ -137,7 +137,7 @@ namespace emp {
     BitMatrix GetRegion(size_t col, size_t row) const { return GetRegion(GetID(col,row)); }
 
     // Does this bit matrix represent a connected set of ones?
-    bool IsConnected() const { return GetRegion(FindBit()) == *this; }
+    bool IsConnected() const { return GetRegion((size_t)FindBit()) == *this; }
 
     // Does this bit matrix have any 2x2 square of ones in it?
     bool Has2x2() const { return (*this & UpShift() & LeftShift() & ULShift()).Any(); }

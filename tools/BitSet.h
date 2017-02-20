@@ -398,7 +398,7 @@ namespace emp {
       while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
       if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
 
-      const int pos_found = find_bit(bit_set[field_id]);
+      const int pos_found = (int) find_bit(bit_set[field_id]);
       bit_set[field_id] &= ~(1U << pos_found);
       return pos_found + (int)(field_id << 5);
     }
@@ -519,8 +519,8 @@ namespace emp {
     }
 
     BitSet & SHIFT_SELF(const int shift_size) {
-      if (shift_size > 0) ShiftRight(shift_size);
-      else if (shift_size < 0) ShiftLeft(-shift_size);
+      if (shift_size > 0) ShiftRight((uint32_t) shift_size);
+      else if (shift_size < 0) ShiftLeft((uint32_t) -shift_size);
       return *this;
     }
 
@@ -530,13 +530,13 @@ namespace emp {
     BitSet operator&(const BitSet & ar2) const { return AND(ar2); }
     BitSet operator|(const BitSet & ar2) const { return OR(ar2); }
     BitSet operator^(const BitSet & ar2) const { return XOR(ar2); }
-    BitSet operator<<(const int shift_size) const { return SHIFT(-shift_size); }
-    BitSet operator>>(const int shift_size) const { return SHIFT(shift_size); }
+    BitSet operator<<(const size_t shift_size) const { return SHIFT(-(int)shift_size); }
+    BitSet operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
     const BitSet & operator&=(const BitSet & ar2) { return AND_SELF(ar2); }
     const BitSet & operator|=(const BitSet & ar2) { return OR_SELF(ar2); }
     const BitSet & operator^=(const BitSet & ar2) { return XOR_SELF(ar2); }
-    const BitSet & operator<<=(const int shift_size) { return SHIFT_SELF(-shift_size); }
-    const BitSet & operator>>=(const int shift_size) { return SHIFT_SELF(shift_size); }
+    const BitSet & operator<<=(const size_t shift_size) { return SHIFT_SELF(-(int)shift_size); }
+    const BitSet & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
     // For compatability with std::bitset.
     constexpr static size_t size() { return NUM_BITS; }

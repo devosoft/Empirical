@@ -556,13 +556,13 @@ namespace emp {
     BitVector operator&(const BitVector & ar2) const { return AND(ar2); }
     BitVector operator|(const BitVector & ar2) const { return OR(ar2); }
     BitVector operator^(const BitVector & ar2) const { return XOR(ar2); }
-    inline BitVector operator<<(const int shift_size) const { return SHIFT(-shift_size); }
-    inline BitVector operator>>(const int shift_size) const { return SHIFT(shift_size); }
+    inline BitVector operator<<(const size_t shift_size) const { return SHIFT(-(int)shift_size); }
+    inline BitVector operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
     const BitVector & operator&=(const BitVector & ar2) { return AND_SELF(ar2); }
     const BitVector & operator|=(const BitVector & ar2) { return OR_SELF(ar2); }
     const BitVector & operator^=(const BitVector & ar2) { return XOR_SELF(ar2); }
-    const BitVector & operator<<=(const int shift_size) { return SHIFT_SELF(-shift_size); }
-    const BitVector & operator>>=(const int shift_size) { return SHIFT_SELF(shift_size); }
+    const BitVector & operator<<=(const size_t shift_size) { return SHIFT_SELF(-(int)shift_size); }
+    const BitVector & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
     // For compatability with std::vector<bool>.
     size_t size() const { return num_bits; }
