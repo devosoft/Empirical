@@ -28,6 +28,10 @@ namespace web {
     CanvasShape(double _x, double _y, const std::string & fc="", const std::string & lc="")
       : x(_x), y(_y), fill_color(fc), line_color(lc) { ; }
     virtual ~CanvasShape() { ; }
+
+    void MoveTo(double _x, double _y) { x=_x; y=_y; }
+    void SetFillColor(const std::string & color) { fill_color = color; }
+    void SetLineColor(const std::string & color) { line_color = color; }
   };
 
   class CanvasCircle : public CanvasShape {
@@ -82,6 +86,39 @@ namespace web {
         }, x, y, w, h);  // Draw the rectangle
     }
     CanvasAction * Clone() { return new CanvasClearRect(*this); }
+  };
+
+  class CanvasPolygon : public CanvasShape {
+  private:
+    emp::vector<Point> points;
+  public:
+    CanvasPolygon(const std::string & fc="", const std::string & lc="")
+      : CanvasShape(0, 0, fc, lc) { ; }
+    CanvasPolygon(const emp::vector<Point> & p, const std::string & fc="", const std::string & lc="")
+      : CanvasShape(0, 0, fc, lc), points(p) { ; }
+    CanvasPolygon(double _x, double _y, const std::string & fc="", const std::string & lc="")
+      : CanvasShape(_x, _y, fc, lc) { ; }
+
+    CanvasPolygon & AddPoint(double x, double y) { points.emplace_back(x,y); return *this; }
+    CanvasPolygon & AddPoint(Point p) { points.emplace_back(p); return *this; }
+
+    void Apply() {
+      EM_ASM_ARGS({
+        emp_i.ctx.beginPath();
+        emp_i.ctx.moveTo($2, $3);
+      }, x, y, points[0].GetX(), points[0].GetY());  // Setup the polygon
+      for (size_t i = 1; i < points.size(); i++) {
+        EM_ASM_ARGS({
+          emp_i.ctx.lineTo($0, $1);
+        }, points[i].GetX(), points[i].GetY());  // Draw the lines for the polygon
+      }
+      EM_ASM_ARGS({
+        emp_i.ctx.closePath();
+      }, x, y);  // Close the polygon
+      if (fill_color.size()) Fill(fill_color);
+      if (line_color.size()) Stroke(line_color);
+    }
+    CanvasAction * Clone() { return new CanvasPolygon(*this); }
   };
 
 }
