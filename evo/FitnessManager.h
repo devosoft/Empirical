@@ -170,7 +170,7 @@ namespace evo {
       case CACHE_OFF:
         return fit_fun(org);;
       case CACHE_ON:
-        if (!GetCache(id)) {                // If no cached fitness, calculate it!
+        if (GetCache(id) == 0.0) {                // If no cached fitness, calculate it!
           if (id >= fit_cache.size()) fit_cache.resize(id+1, 0.0);
           fit_cache[id] = fit_fun(org);
         }

@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -102,12 +102,12 @@ namespace evo {
 
       // Use a double-length genome to easily handle wrap-around.
       genome.Resize(N*2);
-      genome |= (genome << (int) N);
+      genome |= (genome << N);
 
       double total = 0.0;
       size_t mask = emp::MaskLow<size_t>(K+1);
       for (size_t i = 0; i < N; i++) {
-        const size_t cur_val = (genome >> (int) i).GetUInt(0) & mask;
+        const size_t cur_val = (genome >> i).GetUInt(0) & mask;
 	      const double cur_fit = GetFitness(i, cur_val);
         total += cur_fit;
       }
