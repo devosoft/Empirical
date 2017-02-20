@@ -17,8 +17,12 @@ test-%: test_%.cc
 test: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
-debug: FLAGS := -std=c++14 -g -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
+debug: FLAGS := -std=c++14 -g -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual
 debug: test-prep $(addprefix test-, $(TEST_NAMES))
+	rm -rf test*.out
+
+cranky: FLAGS := -std=c++14 -g -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
+cranky: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
 test-web:
