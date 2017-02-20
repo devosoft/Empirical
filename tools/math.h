@@ -46,24 +46,24 @@ namespace emp {
 
   /// MinRef works like Min, but never copies any inputs; always treats as references.
   /// MinRef of only one element returns reference to that element itself!
-  template <typename T> constexpr const T & Min(const T& in1) { return in1; }
+  template <typename T> constexpr const T & MinRef(const T& in1) { return in1; }
 
   /// MinRef of multiple elements returns reference to minimum value.
   template <typename T, typename... Ts>
-  constexpr const T & Min(const T& in1, const T& in2, const Ts&... extras) {
-    const T & cur_result = Min(in2, extras...);
+  constexpr const T & MinRef(const T& in1, const T& in2, const Ts&... extras) {
+    const T & cur_result = MinRef(in2, extras...);
     return (in1 < cur_result) ? in1 : cur_result;
   }
 
 
   /// MaxRef works like Max, but never copies any inputs; always treats as references.
   /// MaxRef of only one element returns reference to that element itself!
-  template <typename T> constexpr const T & Max(const T& in1) { return in1; }
+  template <typename T> constexpr const T & MaxRef(const T& in1) { return in1; }
 
   /// MaxRef of multiple elements returns reference to maximum value.
   template <typename T, typename... Ts>
-  constexpr const T & Max(const T& in1, const T& in2, const Ts&... extras) {
-    const T & cur_result = Max(in2, extras...);
+  constexpr const T & MaxRef(const T& in1, const T& in2, const Ts&... extras) {
+    const T & cur_result = MaxRef(in2, extras...);
     return (in1 < cur_result) ? cur_result : in1;
   }
 
