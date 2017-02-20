@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -12,6 +12,37 @@
 #include "const.h"
 
 namespace emp {
+
+  /// % is actually remainder; this is a proper modulus command that handles negative #'s correctly
+  inline constexpr int Mod(int in_val, int mod_val) {
+    return (in_val < 0) ? (in_val % mod_val + mod_val) : (in_val % mod_val);
+  }
+
+  /// Run both min and max on a value to put it into a desired range.
+  template <typename TYPE> constexpr TYPE ToRange(const TYPE & value, const TYPE & in_min, const TYPE & in_max) {
+    return (value < in_min) ? in_min : ((value > in_max) ? in_max : value);
+  }
+
+  /// Min of only one element is that element itself!
+  template <typename T> constexpr const T & Min(const T& in1) { return in1; }
+
+  /// Min of multiple elements is solved recursively.
+  template <typename T, typename... Ts>
+  constexpr const T & Min(const T& in1, const T& in2, const Ts&... extras) {
+    const T & cur_result = Min(in2, extras...);
+    return (in1 < cur_result) ? in1 : cur_result;
+  }
+
+
+  /// Max of only one element is that element itself!
+  template <typename T> constexpr const T & Max(const T& in1) { return in1; }
+
+  /// Max of multiple elements is solved recursively.
+  template <typename T, typename... Ts>
+  constexpr const T & Max(const T& in1, const T& in2, const Ts&... extras) {
+    const T & cur_result = Max(in2, extras...);
+    return (in1 < cur_result) ? cur_result : in1;
+  }
 
   namespace {
     // A compile-time log calculator for values [1,2)
@@ -61,19 +92,26 @@ namespace emp {
     return (exp < 0.0) ? (1.0/Pow2_impl(-exp)) : Pow2_impl(exp);
   }
 
-  static constexpr double Pow(double base, double exp) {
-    return Pow2(Log2(base) * exp);  // convert to a base of 2.
+  template <typename TYPE>
+  static constexpr TYPE IntPow(TYPE base, TYPE exp) {
+    return exp < 1 ? 1 : (base * IntPow(base, exp-1));
   }
+
+  static constexpr double Pow(double base, double exp) {
+    // Normally, convert to a base of 2 and then use Pow2.
+    // If base is negative, we don't want to deal with imaginary numbers, so use IntPow.
+    return (base > 0) ? Pow2(Log2(base) * exp) : IntPow(base,exp);
+  }
+
+  // A fast (O(log p)) integer-power command.
+  // static constexpr int Pow(int base, int p) {
+  //   return (p <= 0) ? 1 : (base * Pow(base, p-1));
+  // }
 
   static constexpr double Exp(double exp) {
     return Pow2(Log2(emp::E) * exp);  // convert to a base of e.
   }
 
-  /// A compile-time exponentiation calculator.
-  template <typename TYPE>
-  static constexpr TYPE IntPow(TYPE base, TYPE exp) {
-    return exp < 1 ? 1 : (base * IntPow(base, exp-1));
-  }
 
   /// A compile-time int-log calculator (aka, significant bits)
   template <typename TYPE>
