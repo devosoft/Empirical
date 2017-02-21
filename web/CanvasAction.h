@@ -55,17 +55,33 @@ namespace web {
 
 
   class CanvasStrokeColor : public CanvasAction {
+  protected:
     std::string color;
   public:
     CanvasStrokeColor(const std::string & c) : color(c) { ; }
 
     void Apply() {
       EM_ASM_ARGS({
-          var color = Pointer_stringify($0);
-          emp_i.ctx.strokeStyle = color;
-        }, color.c_str());
+        var color = Pointer_stringify($0);
+        emp_i.ctx.strokeStyle = color;
+      }, color.c_str());
     }
     CanvasAction * Clone() const { return new CanvasStrokeColor(*this); }
+  };
+
+
+  class CanvasRotate : public CanvasAction {
+  protected:
+    double angle;
+  public:
+    CanvasRotate(double a) : angle(a) { ; }
+
+    void Apply() {
+      EM_ASM_ARGS({
+        emp_i.ctx.rotate($0);
+      }, angle);
+    }
+    CanvasAction * Clone() const { return new CanvasRotate(*this); }
   };
 
 
