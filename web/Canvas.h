@@ -156,8 +156,13 @@ namespace web {
       Info()->AddAction( shape.Clone() );
       return *this;
     }
+
     Canvas & StrokeColor(std::string c) {
       Info()->AddAction( new CanvasStrokeColor(c) );
+      return *this;
+    }
+    Canvas & Rotate(double angle) {
+      Info()->AddAction( new CanvasRotate(angle) );
       return *this;
     }
 
