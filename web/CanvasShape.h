@@ -123,6 +123,25 @@ namespace web {
     CanvasAction * Clone() const { return new CanvasPolygon(*this); }
   };
 
+  class CanvasLine : public CanvasShape {
+  private:
+    double x2; double y2;
+  public:
+    CanvasLine(double _x1, double _y1, double _x2, double _y2,
+               const std::string & lc="")
+      : CanvasShape(_x1, _y1, "", lc), x2(_x2), y2(_y2) { ; }
+
+    void Apply() {
+      EM_ASM_ARGS({
+        emp_i.ctx.beginPath();
+        emp_i.ctx.moveTo($0, $1);
+        emp_i.ctx.lineTo($2, $3);
+        emp_i.ctx.closePath();
+      }, x, y, x2, y2);
+      Stroke(line_color);
+    }
+    CanvasAction * Clone() const { return new CanvasLine(*this); }
+  };
 }
 }
 
