@@ -1,6 +1,6 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
-// Copyright (C) Michigan State University, 2015. It is licensed
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2017.
+//  Released under the MIT Software license; see doc/LICENSE
 
 #include "../../tools/Random.h"
 #include "../../web/Animate.h"
@@ -8,26 +8,36 @@
 #include "../../web/emfunctions.h"
 #include "../../web/web.h"
 
-namespace web = emp::web;
+namespace UI = emp::web;
 
-web::Document doc("emp_base");
+UI::Document doc("emp_base");
+UI::CanvasPolygon poly(200, 300, "red", "black");
 
 size_t cx = 150;
 size_t cy = 150;
 size_t cr = 50;
 size_t can_size = 400;
+double poly_rot = 0.0;
 
 void CanvasAnim(double time) {
   auto mycanvas = doc.Canvas("can");
 
   std::cerr << time << std::endl;
 
+  // Update the circle position.
   cx+=3;
   if (cx >= can_size + cr) cx -= can_size;
 
+  // Draw the new circle.
   mycanvas.Clear();
   mycanvas.Circle(cx, cy, cr, "green", "purple");
   if (cx + cr > can_size) mycanvas.Circle(cx-can_size, cy, cr, "green", "purple");
+
+  // Update the polygon position
+  poly_rot += 0.01;
+  mycanvas.Rotate(poly_rot);
+  mycanvas.Draw(poly);
+  mycanvas.Rotate(-poly_rot);
 
   doc.Text("fps").Redraw();
 };
@@ -44,8 +54,12 @@ int main()
   auto mycanvas = doc.AddCanvas(w, h, "can");
   mycanvas.Circle(cx, cy, cr, "green", "purple");
 
-  web::Animate * anim = new web::Animate(CanvasAnim, mycanvas);
+  UI::Animate * anim = new UI::Animate(CanvasAnim, mycanvas);
   (void) anim;
+
+  // Draw the new polygon.
+  poly.AddPoint(0,0).AddPoint(60,25).AddPoint(50,50).AddPoint(-50,50).AddPoint(25,40);
+  mycanvas.Draw(poly);
 
   doc << "<br>";
   doc.AddButton([anim](){
@@ -55,6 +69,6 @@ int main()
       else but.Label("Start");
     }, "Start", "toggle");
 
-  doc << web::Text("fps") << "FPS = " << web::Live( [anim](){return anim->GetStepTime();} ) ;
+  doc << UI::Text("fps") << "FPS = " << UI::Live( [anim](){return anim->GetStepTime();} ) ;
 
 }
