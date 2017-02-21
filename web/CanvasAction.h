@@ -40,7 +40,7 @@ namespace web {
           }, style.c_str());
       }
       EM_ASM({ emp_i.ctx.stroke(); });
-      
+
     }
 
   public:
@@ -48,9 +48,9 @@ namespace web {
     CanvasAction(const CanvasAction &) { EMP_TRACK_CONSTRUCT(CanvasAction); }
     virtual ~CanvasAction() { EMP_TRACK_DESTRUCT(CanvasAction); }
 
-    
-    virtual void Apply() = 0;            // Apply current action to emp_i.ctx.
-    virtual CanvasAction * Clone() = 0;  // Make a copy of the current action.
+
+    virtual void Apply() = 0;                  // Apply current action to emp_i.ctx.
+    virtual CanvasAction * Clone() const = 0;  // Make a copy of the current action.
   };
 
 
@@ -65,7 +65,7 @@ namespace web {
           emp_i.ctx.strokeStyle = color;
         }, color.c_str());
     }
-    CanvasAction * Clone() { return new CanvasStrokeColor(*this); }
+    CanvasAction * Clone() const { return new CanvasStrokeColor(*this); }
   };
 
 
