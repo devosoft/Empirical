@@ -53,7 +53,7 @@ namespace web {
       if (fill_color.size()) Fill(fill_color);
       if (line_color.size()) Stroke(line_color);
     }
-    CanvasAction * Clone() { return new CanvasCircle(*this); }
+    CanvasAction * Clone() const { return new CanvasCircle(*this); }
   };
 
   class CanvasRect : public CanvasShape {
@@ -71,7 +71,7 @@ namespace web {
       if (fill_color.size()) Fill(fill_color);
       if (line_color.size()) Stroke(line_color);
     }
-    CanvasAction * Clone() { return new CanvasRect(*this); }
+    CanvasAction * Clone() const { return new CanvasRect(*this); }
   };
 
   class CanvasClearRect : public CanvasShape {
@@ -85,7 +85,7 @@ namespace web {
           emp_i.ctx.clearRect($0, $1, $2, $3);
         }, x, y, w, h);  // Draw the rectangle
     }
-    CanvasAction * Clone() { return new CanvasClearRect(*this); }
+    CanvasAction * Clone() const { return new CanvasClearRect(*this); }
   };
 
   class CanvasPolygon : public CanvasShape {
@@ -104,6 +104,7 @@ namespace web {
 
     void Apply() {
       EM_ASM_ARGS({
+        emp_i.ctx.translate($0,$1);
         emp_i.ctx.beginPath();
         emp_i.ctx.moveTo($2, $3);
       }, x, y, points[0].GetX(), points[0].GetY());  // Setup the polygon
@@ -114,11 +115,12 @@ namespace web {
       }
       EM_ASM_ARGS({
         emp_i.ctx.closePath();
-      }, x, y);  // Close the polygon
+        emp_i.ctx.translate($0,$1);
+      }, -x, -y);  // Close the polygon
       if (fill_color.size()) Fill(fill_color);
       if (line_color.size()) Stroke(line_color);
     }
-    CanvasAction * Clone() { return new CanvasPolygon(*this); }
+    CanvasAction * Clone() const { return new CanvasPolygon(*this); }
   };
 
 }
