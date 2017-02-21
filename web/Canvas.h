@@ -152,6 +152,10 @@ namespace web {
       Info()->AddAction( new CanvasCircle(circle, fc, lc) );
       return *this;
     }
+    Canvas & Draw(const CanvasShape & shape) {
+      Info()->AddAction( shape.Clone() );
+      return *this;
+    }
     Canvas & StrokeColor(std::string c) {
       Info()->AddAction( new CanvasStrokeColor(c) );
       return *this;
