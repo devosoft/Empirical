@@ -101,12 +101,16 @@ namespace web {
     }
 
   public:
-    template <typename... W_TYPES>
-    Animate(const anim_fun_t & fun, W_TYPES&... targets)
-      : anim_fun(fun), active(false), do_step(false), run_time(0.0), frame_count(0)
+    Animate() : active(false), do_step(false), run_time(0.0), frame_count(0)
     {
-      LoadTargets(targets...);
       callback_id = JSWrap( std::function<void()>([this](){ this->AdvanceFrame(); }) );
+    }
+
+    template <typename... W_TYPES>
+    Animate(const anim_fun_t & fun, W_TYPES&... targets) : Animate()
+    {
+      anim_fun = fun;
+      LoadTargets(targets...);
     }
 
     template <typename... W_TYPES>
@@ -117,11 +121,6 @@ namespace web {
     Animate(const std::function<void()> & fun, W_TYPES&... targets)
       : Animate([fun](const Animate &){fun();}, targets...) { ; }
 
-    Animate()
-      : active(false), do_step(false), run_time(0.0), frame_count(0)
-    {
-      callback_id = JSWrap( std::function<void()>([this](){ this->AdvanceFrame(); }) );
-    }
     ~Animate() { ; }
 
     // Do not copy animations directly.
