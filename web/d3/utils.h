@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 // This file contains macros used to build Empirical's C++ wrapper for D3
@@ -10,8 +10,8 @@
 #include <map>
 #include <string>
 
+#include "../../base/macros.h"
 #include "../../web/init.h"
-#include "../../tools/macros.h"
 #include "../../web/js_utils.h"
 #include "../../web/JSWrap.h"
 
@@ -23,27 +23,27 @@
 /// Expects func_string to be a pre-defined variable that holds a string that may or may
 /// not be a function and checks to see if it is a function defined within the current window.
 /// If it is, it stores that function in the variable func_string.
-#define CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_WINDOW()				   \
-  do {                                                                 \
-    if IS_JS_FUNCTION(window[func_string]) {			               \
-      func_string = window[func_string];					           \
-    }                                                                  \
+#define CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_WINDOW()          \
+  do {                                                         \
+    if IS_JS_FUNCTION(window[func_string]) {                   \
+      func_string = window[func_string];                       \
+    }                                                          \
   } while (0);
 
 //Check if func_string is in a single namespace
-#define CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_1(A1)		   \
-  if IS_JS_FUNCTION(window[A1][func_string]){				           \
-    func_string = window[A1][func_string];					           \
+#define CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_1(A1)   \
+  if IS_JS_FUNCTION(window[A1][func_string]){                  \
+    func_string = window[A1][func_string];                     \
   }
 
 //Check 2 namespaces
-#define CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_2(A1, A2)	   \
-  CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_1(A1)				   \
+#define CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_2(A1, A2) \
+  CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_1(A1)           \
   else CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_1(A2)
 
 //Check 3 namespaces
 #define CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_3(A1, A2, A3)   \
-  CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_2(A1, A2)			   \
+  CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_2(A1, A2)             \
   else CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_1(A3)
 
 /// Expects func_string to be a pre-defined variable that holds a string that may or may
@@ -59,60 +59,60 @@
 /// variable func_string. Namespaces are checked in the order given and the first function
 /// found is used.
 #define CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_WINDOW(...)  \
-  CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE( __VA_ARGS__)		   \
+  CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE( __VA_ARGS__)         \
   CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_WINDOW()
 
 //Functions that accept callback functions
 
 /// Call a Javascript function that accepts either a string indicating the name of a
 /// callback function or a normal string
-#define D3_CALLBACK_FUNCTION_1_ARG(FUNC, CALLBACK)	         	                 \
-  EM_ASM_ARGS({								                                     \
-      var func_string = Pointer_stringify($0);				                     \
+#define D3_CALLBACK_FUNCTION_1_ARG(FUNC, CALLBACK)                             \
+  EM_ASM_ARGS({                                                                \
+      var func_string = Pointer_stringify($0);                                 \
       CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_WINDOW("d3", "emp");   \
-      emp.__new_object = FUNC(func_string);                                      \
+      emp.__new_object = FUNC(func_string);                                    \
     }, CALLBACK);
 
 /// Same as D3_CALLBACK_FUNCTION_1_ARG, but accepts an additional argument, ARG1, that goes
 /// before the callback function in the call to FUNC
-#define D3_CALLBACK_FUNCTION_2_ARGS(FUNC, CALLBACK, ARG1)		                 \
-  EM_ASM_ARGS({								                                     \
-      var arg1 = Pointer_stringify($0);					                         \
-      var func_string = Pointer_stringify($1);				                     \
+#define D3_CALLBACK_FUNCTION_2_ARGS(FUNC, CALLBACK, ARG1)                      \
+  EM_ASM_ARGS({                                                                \
+      var arg1 = Pointer_stringify($0);                                        \
+      var func_string = Pointer_stringify($1);                                 \
       CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_WINDOW("d3", "emp");   \
-      emp.__new_object = FUNC(arg1, func_string);                                \
+      emp.__new_object = FUNC(arg1, func_string);                              \
     }, ARG1, CALLBACK);
 
 //Methods that accept callback functions (intended to be used within methods for d3 objects)
 
 //Layer of indirection so macro gets expanded
-#define D3_CALLBACK_METHOD_2_ARGS_IMPL(MACRO, FUNC, ARG1, ARG2)                     \
-  EM_ASM_ARGS({							                              	            \
-      var arg1 = Pointer_stringify($1);				                              	\
-      var func_string = Pointer_stringify($2);				                        \
-      MACRO;                                                                        \
-      emp.__new_object = js.objects[$0].FUNC(arg1, func_string);		            \
+#define D3_CALLBACK_METHOD_2_ARGS_IMPL(MACRO, FUNC, ARG1, ARG2)     \
+  EM_ASM_ARGS({                                                     \
+      var arg1 = Pointer_stringify($1);                             \
+      var func_string = Pointer_stringify($2);                      \
+      MACRO;                                                        \
+      emp.__new_object = js.objects[$0].FUNC(arg1, func_string);    \
   }, this->id, ARG1, ARG2);
 
 //This macro finds a function specified by ARG2 in either the d3, emp, or
 //window namespace and feeds it to FUNC, which is called on the current
 //d3 object. ARG1 is the first argument to FUNC. If ARG2 is not found to
 //be a function, it will be passed to FUNC as a string.
-#define D3_CALLBACK_METHOD_2_ARGS(FUNC, ARG1, ARG2)	        \
+#define D3_CALLBACK_METHOD_2_ARGS(FUNC, ARG1, ARG2)          \
   D3_CALLBACK_METHOD_2_ARGS_IMPL(CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_WINDOW("d3", "emp"), FUNC, ARG1, ARG2);
 
 //Layer of indirection so macro gets expanded
-#define D3_CALLBACK_METHOD_1_ARG_IMPL(MACRO, FUNC, ARG1)                     \
-EM_ASM_ARGS({							                              	     \
-    var func_string = Pointer_stringify($1);				                 \
-    MACRO;                                                                   \
-    emp.__new_object = js.objects[$0].FUNC(func_string);		             \
+#define D3_CALLBACK_METHOD_1_ARG_IMPL(MACRO, FUNC, ARG1)    \
+EM_ASM_ARGS({                                               \
+    var func_string = Pointer_stringify($1);                \
+    MACRO;                                                  \
+    emp.__new_object = js.objects[$0].FUNC(func_string);    \
 }, this->id, ARG1);
 
 /// The same as D3_CALLBACK_METHOD_2_ARGS except for FUNCs
 /// that only accept a single argument (the string that might or might not
 /// be a function).
-#define D3_CALLBACK_METHOD_1_ARG(FUNC, ARG1)	        \
+#define D3_CALLBACK_METHOD_1_ARG(FUNC, ARG1)          \
 D3_CALLBACK_METHOD_1_ARG_IMPL(CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_WINDOW("d3", "emp"), FUNC, ARG1);
 
 //Wraps CPP_FUN (a C++ function pointer, std::function object, or lambda) with
