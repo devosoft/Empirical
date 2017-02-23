@@ -10,65 +10,74 @@
 
 namespace UI = emp::web;
 
-UI::Document doc("emp_base");
-UI::CanvasPolygon poly(200, 300, "red", "black");
-
-size_t cx = 150;
-size_t cy = 150;
-size_t cr = 50;
-size_t can_size = 400;
-double poly_rot = 0.0;
-
-void CanvasAnim(double time) {
-  auto mycanvas = doc.Canvas("can");
-
-  std::cerr << time << std::endl;
-
-  // Update the circle position.
-  cx+=3;
-  if (cx >= can_size + cr) cx -= can_size;
-
-  // Draw the new circle.
-  mycanvas.Clear();
-  mycanvas.Circle(cx, cy, cr, "green", "purple");
-  if (cx + cr > can_size) mycanvas.Circle(cx-can_size, cy, cr, "green", "purple");
-
-  // Update the polygon position
-  poly_rot += 0.01;
-  mycanvas.Rotate(poly_rot);
-  mycanvas.Draw(poly);
-  mycanvas.Rotate(-poly_rot);
-
-  doc.Text("fps").Redraw();
-};
-
-int main()
-{
-  // How big should each canvas be?
-  const size_t w = can_size;
-  const size_t h = can_size;
+class MyAnimate : public UI::Animate {
+private:
+  UI::Document doc;
+  UI::CanvasPolygon poly;
+  UI::CanvasLine line;
 
   emp::Random random;
 
-  // Draw a simple circle animation on a canvas
-  auto mycanvas = doc.AddCanvas(w, h, "can");
-  mycanvas.Circle(cx, cy, cr, "green", "purple");
+  size_t cx = 150;
+  size_t cy = 150;
+  size_t cr = 50;
+  size_t can_size = 400;
+  double poly_rot = 0.0;
 
-  UI::Animate * anim = new UI::Animate(CanvasAnim, mycanvas);
-  (void) anim;
+public:
+  MyAnimate() : doc("emp_base"), poly(200, 300, "red", "black"), line(5,5, 395,395, "green") {
+    // How big should each canvas be?
+    const size_t w = can_size;
+    const size_t h = can_size;
 
-  // Draw the new polygon.
-  poly.AddPoint(0,0).AddPoint(60,25).AddPoint(50,50).AddPoint(-50,50).AddPoint(25,40);
-  mycanvas.Draw(poly);
+    // Draw a simple circle animation on a canvas
+    auto mycanvas = doc.AddCanvas(w, h, "can");
+    mycanvas.Circle(cx, cy, cr, "blue", "purple");
+    targets.push_back(mycanvas);
 
-  doc << "<br>";
-  doc.AddButton([anim](){
-      anim->ToggleActive();
-      auto but = doc.Button("toggle");
-      if (anim->GetActive()) but.Label("Pause");
-      else but.Label("Start");
-    }, "Start", "toggle");
+    // Draw the new polygon.
+    poly.AddPoint(0,0).AddPoint(60,25).AddPoint(50,50).AddPoint(-50,50).AddPoint(25,40);
+    mycanvas.Draw(poly);
 
-  doc << UI::Text("fps") << "FPS = " << UI::Live( [anim](){return anim->GetStepTime();} ) ;
+    // Add a button.
+    doc << "<br>";
+    doc.AddButton([this](){
+        ToggleActive();
+        auto but = doc.Button("toggle");
+        if (GetActive()) but.Label("Pause");
+        else but.Label("Start");
+      }, "Start", "toggle");
 
+    doc << UI::Text("fps") << "FPS = " << UI::Live( [this](){return 1000.0 / GetStepTime();} ) ;
+  }
+
+  void DoFrame() {
+    auto mycanvas = doc.Canvas("can");
+
+    // Update the circle position.
+    cx+=3;
+    if (cx >= can_size + cr) cx -= can_size;
+
+    // Draw the new circle.
+    mycanvas.Clear();
+    mycanvas.Circle(cx, cy, cr, "blue", "purple");
+    if (cx + cr > can_size) mycanvas.Circle(cx-can_size, cy, cr, "blue", "purple");
+
+    // Update the polygon position
+    poly_rot += 0.01;
+    mycanvas.Rotate(poly_rot);
+    mycanvas.Draw(poly);
+    mycanvas.Rotate(-poly_rot);
+
+    // Update the line.
+    mycanvas.Draw(line);
+
+    doc.Text("fps").Redraw();
+  }
+};
+
+MyAnimate anim;
+
+int main()
+{
 }
