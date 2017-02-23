@@ -80,14 +80,13 @@ namespace web {
     }
 
     void AdvanceFrame() {
-      emp_assert(anim_fun);
-
       if (!active && !do_step) return;  // If Stop has been called, halt animating.
 
       prev_time = cur_time;             // Update timing.
       cur_time = emp::GetTime();
       do_step = false;                  // Make sure we don't keep advancing by a single step.
-      anim_fun(*this);                  // Call anim function, sending this object.
+      if (anim_fun) anim_fun(*this);    // If anim function exist, call it and send this object.
+      DoFrame();                        // Call DoFrame in this class.
 
       // Loop through all widget targets to be redrawn and do so.
       for (auto & w : targets) { w.Redraw(); }
@@ -99,6 +98,10 @@ namespace web {
 
       frame_count++;
     }
+
+    /// DoFrame() is called by default if no animation function is provided.  As such, an animation
+    /// can be built by deriving a class from Animate and overriding this function.
+    virtual void DoFrame() { ; }
 
   public:
     Animate() : active(false), do_step(false), run_time(0.0), frame_count(0)
@@ -121,7 +124,7 @@ namespace web {
     Animate(const std::function<void()> & fun, W_TYPES&... targets)
       : Animate([fun](const Animate &){fun();}, targets...) { ; }
 
-    ~Animate() { ; }
+    virtual ~Animate() { ; }
 
     // Do not copy animations directly.
     Animate(const Animate &) = delete;
