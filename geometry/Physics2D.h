@@ -166,18 +166,18 @@ namespace emp {
     }
 
     // Access to bodies
-    std::vector<BODY_TYPE *> & GetBodySet() {
+    emp::vector<BODY_TYPE *> & GetBodySet() {
       return surface.GetBodySet();
     }
-    std::vector<BODY_TYPE *> & GetBackgroundSet() {
+    emp::vector<BODY_TYPE *> & GetBackgroundSet() {
       return background.GetBodySet();
     }
 
     // Access to bodies in a const physics...
-    const std::vector<BODY_TYPE *> & GetConstBodySet() const {
+    const emp::vector<BODY_TYPE *> & GetConstBodySet() const {
       return surface.GetConstBodySet();
     }
-    const std::vector<BODY_TYPE *> & GetConstBackgroundSet() const {
+    const emp::vector<BODY_TYPE *> & GetConstBackgroundSet() const {
       return background.GetConstBodySet();
     }
   };
