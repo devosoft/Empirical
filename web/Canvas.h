@@ -172,6 +172,14 @@ namespace web {
       return *this;
     }
 
+    // Clear to a specific color!
+    Canvas & Clear(const std::string & bg_color) {
+      Info()->ClearActions();
+      Info()->AddAction( new CanvasClearRect(0, 0, GetWidth(), GetHeight()) );
+      Info()->AddAction( new CanvasRect(0, 0, GetWidth(), GetHeight(), bg_color, "") );
+      return *this;
+    }
+
   };
 
 
