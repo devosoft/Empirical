@@ -13,8 +13,8 @@
 //  Member functions include:
 //   Surface2D(double _width, double _height);
 //   const Point & GetMaxPosition() const;
-//   std::vector<BODY_TYPE *> & GetBodySet();
-//   const std::vector<BODY_TYPE *> & GetConstBodySet() const;
+//   emp::vector<BODY_TYPE *> & GetBodySet();
+//   const emp::vector<BODY_TYPE *> & GetConstBodySet() const;
 //   Surface2D<BODY_TYPE, BODY_INFO> & AddBody(BODY_TYPE * new_body);
 //   void TestCollisions(std::function<bool(BODY_TYPE &, BODY_TYPE &)> collide_fun);
 //
@@ -37,7 +37,7 @@ namespace emp {
   class Surface2D {
   private:
     const Point max_pos;     // Lower-left corner of the surface.
-    std::vector<BODY_TYPE *> body_set;  // Set of all bodies on surface
+    emp::vector<BODY_TYPE *> body_set;  // Set of all bodies on surface
 
   public:
     Surface2D(double _width, double _height)
@@ -48,8 +48,8 @@ namespace emp {
     double GetHeight() const { return max_pos.GetY(); }
     const Point & GetMaxPosition() const { return max_pos; }
 
-    std::vector<BODY_TYPE *> & GetBodySet() { return body_set; }
-    const std::vector<BODY_TYPE *> & GetConstBodySet() const { return body_set; }
+    emp::vector<BODY_TYPE *> & GetBodySet() { return body_set; }
+    const emp::vector<BODY_TYPE *> & GetConstBodySet() const { return body_set; }
 
     // Add a single body.  Surface now controls this body and must delete it.
     Surface2D & AddBody(BODY_TYPE * new_body) {
@@ -86,7 +86,7 @@ namespace emp {
       const double sector_width = max_pos.GetX() / (double) num_cols;
       const double sector_height = max_pos.GetY() / (double) num_rows;
 
-      std::vector< std::vector<BODY_TYPE *> > sector_set(num_sectors);
+      emp::vector< emp::vector<BODY_TYPE *> > sector_set(num_sectors);
 
 
       int hit_count = 0;
