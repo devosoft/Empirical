@@ -29,10 +29,13 @@ namespace emp {
     constexpr TYPE GetRadius() const { return radius; }
     constexpr TYPE GetSquareRadius() const { return radius * radius; }
 
-    Circle2D<TYPE> & SetCenter(const Point2D<TYPE> & new_center) { center = new_center; return *this; }
-    Circle2D<TYPE> & SetCenterX(TYPE new_x) { center.SetX(new_x); return *this; }
-    Circle2D<TYPE> & SetCenterY(TYPE new_y) { center.SetY(new_y); return *this; }
+    Circle2D<TYPE> & SetCenter(const Point2D<TYPE> & c) { center = c; return *this; }
+    Circle2D<TYPE> & SetCenter(TYPE x, TYPE y) { center.Set(x,y); return *this; }
+    Circle2D<TYPE> & SetCenterX(TYPE x) { center.SetX(x); return *this; }
+    Circle2D<TYPE> & SetCenterY(TYPE y) { center.SetY(y); return *this; }
     Circle2D<TYPE> & SetRadius(TYPE new_radius) { radius = new_radius; return *this; }
+    Circle2D<TYPE> & Set(const Point2D<TYPE> & c, TYPE r) { center = c; radius = r; return *this; }
+    Circle2D<TYPE> & Set(TYPE x, TYPE y, TYPE r) { center.Set(x,y); radius = r; return *this; }
 
     Circle2D<TYPE> & Translate(Point2D<TYPE> shift) { center += shift; return *this; }
 
