@@ -4,7 +4,7 @@
 //
 //
 // Class: emp::BitVector
-// Desc: A customized version of std::vector<bool> with additional bit magic operations
+// Desc: A customized version of emp::vector<bool> with additional bit magic operations
 //
 // To implement: append(), resize()...
 //
@@ -16,8 +16,8 @@
 #define EMP_BIT_VECTOR_H
 
 #include <iostream>
-#include <vector>
 
+#include "../base/vector.h"
 #include "assert.h"
 #include "bitset_utils.h"
 #include "functions.h"
@@ -424,9 +424,9 @@ namespace emp {
       return (field_id < NUM_FIELDS) ?
         (int) (find_bit(bit_set[field_id]) + (field_id * FIELD_BITS)) : -1;
     }
-    std::vector<size_t> GetOnes() const {
+    emp::vector<size_t> GetOnes() const {
       // @CAO -- There are probably better ways to do this with bit tricks.
-      std::vector<size_t> out_set((size_t) CountOnes());
+      emp::vector<size_t> out_set((size_t) CountOnes());
       size_t cur_pos = 0;
       for (size_t i = 0; i < num_bits; i++) {
         if (Get(i)) out_set[cur_pos++] = i;
