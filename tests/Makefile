@@ -1,5 +1,5 @@
 GCOV_FLAGS = -o0 -g --coverage
-
+ 
 TEST_NAMES = evo geometry meta scholar tools
 FLAGS = -std=c++14
 
@@ -15,6 +15,10 @@ test-%: test_%.cc
 	./$@.out
 
 test: test-prep $(addprefix test-, $(TEST_NAMES))
+	rm -rf test*.out
+
+opt: FLAGS := -std=c++14 -DNDEBUG -O3
+opt: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
 debug: FLAGS := -std=c++14 -g -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual
