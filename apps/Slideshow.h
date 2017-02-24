@@ -1,28 +1,26 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2017.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//  This ap maintains a slideshow based on the UI tools.
 
 #ifndef EMP_SLIDESHOW_H
 #define EMP_SLIDESHOW_H
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//
-//  This ap maintains a slideshow based on the UI tools.
-//
 
 #include <string>
-#include <vector>
 
+#include "../base/vector.h"
 #include "../web/emfunctions.h"
-#include "../UI/UI.h"
-#include "../UI/keypress.h"
+#include "../web/web.h"
+#include "../web/KeypressManager.h"
 
 namespace emp {
 
   class Slideshow {
   private:
     std::string div_name;
-    std::vector<UI::Document *> slides;
+    emp::vector<UI::Document *> slides;
     int cur_pos;
 
     // UI Tracking
@@ -39,7 +37,7 @@ namespace emp {
 
     // Show details
     std::string show_title;
-    
+
     // Helper functions
     void OnResize(int new_w, int new_h) {
       // emp::Alert("New size = ", new_w, ", ", new_h);
@@ -143,7 +141,7 @@ namespace emp {
 
     // Presentation Navigation
 
-    void Start(int first_slide=0) { 
+    void Start(int first_slide=0) {
       cur_pos = first_slide;
       Update();
     }
@@ -160,7 +158,7 @@ namespace emp {
       key_manager.AddKeydownCallback(37, std::bind(&Slideshow::PrevSlide, this));
       return *this;
     }
-    
+
     virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
       bool ok = true;
 
@@ -172,7 +170,7 @@ namespace emp {
         ss << "Warning: Must have a div name in SlideShow!" << std::endl;
         ok = false;
       }
-      
+
       // Make sure the current slide position is valid.
       if (cur_pos < 0 || cur_pos >= (int) slides.size()) {
         ss << "Error: Show has " << slides.size() << " slides.  Current slide = "

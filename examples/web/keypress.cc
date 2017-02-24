@@ -1,8 +1,8 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2017.
+//  Released under the MIT Software license; see doc/LICENSE
 
-#include "../../web/keypress.h"
+#include "../../web/KeypressManager.h"
 #include "../../web/web.h"
 
 namespace web = emp::web;
