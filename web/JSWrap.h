@@ -50,7 +50,6 @@
 #include <tuple>
 #include <array>
 
-#include "../web/web_init.h"
 #include "../meta/meta.h"
 
 #include "../base/assert.h"
@@ -59,6 +58,8 @@
 #include "../tools/mem_track.h"
 #include "../tools/tuple_struct.h"
 #include "../tools/tuple_utils.h"
+
+#include "init.h"
 #include "js_utils.h"
 
 #ifdef EMSCRIPTEN
