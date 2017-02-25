@@ -12,7 +12,7 @@ std::string other_str;
 
 int x = 0;
 
-bool OtherKey(const emp::html5::KeyboardEvent & evt)
+bool OtherKey(const emp::web::KeyboardEvent & evt)
 {
   x=0;
   other_str = "Why would you press ";
