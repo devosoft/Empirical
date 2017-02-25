@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -34,8 +34,8 @@
 //      string.
 
 
-#ifndef EMP_WEB_KEYPRESS_H
-#define EMP_WEB_KEYPRESS_H
+#ifndef EMP_WEB_KEYPRESS_MANAGER_H
+#define EMP_WEB_KEYPRESS_MANAGER_H
 
 #include <functional>
 #include <map>
