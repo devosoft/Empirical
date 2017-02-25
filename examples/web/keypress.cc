@@ -2,17 +2,17 @@
 //  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#include "../../web/KeypressManager.h"
-#include "../../web/web.h"
+#include "web/KeypressManager.h"
+#include "web/web.h"
 
-namespace web = emp::web;
-web::Document doc("emp_base");
-web::KeypressManager keypress_manager;
+namespace UI = emp::web;
+UI::Document doc("emp_base");
+UI::KeypressManager keypress_manager;
 std::string other_str;
 
 int x = 0;
 
-bool OtherKey(const emp::web::KeyboardEvent & evt)
+bool OtherKey(const UI::KeyboardEvent & evt)
 {
   x=0;
   other_str = "Why would you press ";
@@ -29,8 +29,8 @@ bool OtherKey(const emp::web::KeyboardEvent & evt)
 
 int main()
 {
-  doc << "Press X or Z!  " << web::Live(x)
-      << "<br>" << web::Live(other_str);
+  doc << "Press X or Z!  " << UI::Live(x)
+      << "<br>" << UI::Live(other_str);
 
   keypress_manager.AddKeydownCallback('X', [](){ x=100; other_str=""; doc.Redraw(); });
   keypress_manager.AddKeydownCallback('Z', [](){ x=5; other_str=""; doc.Redraw(); });

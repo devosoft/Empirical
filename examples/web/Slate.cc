@@ -1,10 +1,10 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2017.
+//  Released under the MIT Software license; see doc/LICENSE
 
-#include "../../web/web.h"
-#include "../../web/commands.h"
-#include "../../web/emfunctions.h"
+#include "web/web.h"
+#include "web/commands.h"
+#include "web/emfunctions.h"
 
 namespace UI = emp::web;
 UI::Document doc("emp_base");
@@ -16,19 +16,17 @@ void IncVar() { myvar++; }
 
 int main() {
 
-  UI::Initialize();
-
   doc << "<h2>This is a second-level header!</h2>"
       << "<p>And here is some regular text."
       << "<p>Here is a variable: " << myvar;
 
   doc << "<br>Cur val = " << UI::Live(select_val);
 
-  doc << emp::web::endl; // PrintStr("abc");
-  doc << emp::web::endl; // PrintStr("abc");
-  doc << emp::web::PrintStr("abc");
-  doc << emp::web::endl; // PrintStr("abc");
-  doc << emp::web::endl; // PrintStr("abc");
+  doc << UI::endl; // PrintStr("abc");
+  doc << UI::endl; // PrintStr("abc");
+  doc << UI::PrintStr("abc");
+  doc << UI::endl; // PrintStr("abc");
+  doc << UI::endl; // PrintStr("abc");
 
   auto test_select = doc.AddSelector("test_select");
   test_select.SetOption("Option 1");
@@ -69,7 +67,7 @@ int main() {
 
   doc.Button("but").SetHeight(50).SetBackground("green").SetCSS("border-radius", "5px")
     .AddDependant(doc.Text("ud_text"));
-  
+
 
   doc.Slate("new_slate")
     << "  And appending some more text onto the new slate.  Let's see how this all works out."
@@ -79,4 +77,3 @@ int main() {
   std::stringstream os;
   doc << "<p>" << emp::text2html(os.str());
 }
-

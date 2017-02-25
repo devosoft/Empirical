@@ -56,7 +56,7 @@ debug-%: $*.cc
 	$(CXX_native) $(CFLAGS_native) $< -o $@
 
 clean:
-	rm -f debug-* $(JS_TARGETS) *.js.map *~ source/*.o source/*/*.o
+	rm -f debug-* $(JS_TARGETS) *.js.map *.js.mem *~ source/*.o source/*/*.o
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
