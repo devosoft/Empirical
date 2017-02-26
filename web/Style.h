@@ -8,7 +8,7 @@
 //  This class maintains a map of setting names to values that can be easily ported
 //  over to JavaScript.  A companial class, Attributes, also exists.
 //
-//  int GetSize() const
+//  size_t GetSize() const
 //    Return a count of the number of settings that have been set.
 //
 //  Style & Set(const std::string & s, SET_TYPE v)
@@ -63,7 +63,7 @@ namespace web {
     Style(const Style &) = default;
     Style & operator=(const Style &) = default;
 
-    int GetSize() const { return (int) settings.size(); }
+    size_t GetSize() const { return settings.size(); }
 
     Style & DoSet(const std::string & in_set, const std::string & in_val) {
       settings[in_set] = in_val;
@@ -80,12 +80,12 @@ namespace web {
       return *this;
     }
 
-    bool Has(const std::string setting) const {
+    bool Has(const std::string & setting) const {
       return settings.find(setting) != settings.end();
     }
 
-    const std::string & Get(const std::string setting) {
-      // Note: if setting did not exist, this does create an empty entry.
+    const std::string & Get(const std::string & setting) {
+      emp_assert(Has(setting));
       return settings[setting];
     }
 
