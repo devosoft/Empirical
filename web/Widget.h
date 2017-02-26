@@ -485,6 +485,12 @@ namespace web {
         info->listen.Set(event_name, fun);
         return (RETURN_TYPE &) *this;
       }
+      RETURN_TYPE & On(const std::string & event_name,
+                       const std::function<void(MouseEvent evt)> & fun) {
+        emp_assert(info != nullptr);
+        info->listen.Set(event_name, fun);
+        return (RETURN_TYPE &) *this;
+      }
 
       // Allow multiple CSS or Attr settings to be grouped.
       template <typename T1, typename T2, typename... OTHER_SETTINGS>
