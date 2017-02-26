@@ -1,12 +1,12 @@
 #ifndef D3_INIT_H
 #define D3_INIT_H
 
-#include "../web_init.h"
-#include "../JSWrap.h"
-#include "../../tools/errors.h"
-#include "utils.h"
-
 #include <iostream>
+
+#include "../../tools/errors.h"
+#include "../init.h"
+#include "../JSWrap.h"
+#include "utils.h"
 
 namespace D3 {
 

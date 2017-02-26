@@ -13,6 +13,7 @@
 #ifdef EMSCRIPTEN
 
 #include <emscripten.h>
+#include "../tools/string_utils.h"
 
 extern "C" {
   extern void EMP_Initialize();
