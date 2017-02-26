@@ -39,6 +39,13 @@ namespace web {
       return *this;
     }
 
+    template <typename T>
+    Listeners & Set(const std::string & name, const std::function<void(T evt)> & in_fun) {
+      emp_assert(!Has(name));
+      listeners[name] = JSWrap(in_fun);
+      return *this;
+    }
+
 
     bool Has(const std::string & event_name) const {
       return listeners.find(event_name) != listeners.end();
@@ -77,7 +84,7 @@ namespace web {
 #ifdef EMSCRIPTEN
         EM_ASM_ARGS({
           var name = Pointer_stringify($0);
-          emp_i.cur_obj.on( name, function() { alert('test!'); emp.Callback($1); } );
+          emp_i.cur_obj.on( name, function(evt) { emp.Callback($1, evt); } );
         }, event_pair.first.c_str(), event_pair.second);
 #else
         std::cout << "Setting '" << widget_id << "' listener '" << event_pair.first
