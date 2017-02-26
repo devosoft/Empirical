@@ -22,7 +22,7 @@
 ///
 ///  You can wrap it with:
 ///
-///     `uint32_t fun_id = emp::JSWrap(AddPair, "AddPair");`
+///     `size_t fun_id = emp::JSWrap(AddPair, "AddPair");`
 ///
 ///  And then in Javascript, you can simply call it as:
 ///
@@ -39,8 +39,7 @@
 //    In order do so, you must define the properties of the object as a tuple
 //    struct in js_object_struct.h. - @ELD
 //  * Made sure JSWrap can take function objects, lambdas, or just function names.
-//
-//
+
 
 #ifndef EMP_JSWRAP_H
 #define EMP_JSWRAP_H
@@ -502,8 +501,8 @@ namespace emp {
 
   template <typename RET_TYPE, typename... ARG_TYPES>
   size_t JSWrap(const std::function<RET_TYPE(ARG_TYPES...)> & in_fun,
-                  const std::string & fun_name="",
-                  bool dispose_on_use=false)
+                const std::string & fun_name="",
+                bool dispose_on_use=false)
   {
     // We should never create disposible functions with names!
     emp_assert(fun_name == "" || dispose_on_use == false);
@@ -535,16 +534,16 @@ namespace emp {
     return out_id;
   }
 
-  // uint32_t JSWrap(const std::function<void()> & in_fun,
-  //                 const std::string & fun_name="",
-  //                 bool dispose_on_use=false)
+  // size_t JSWrap(const std::function<void()> & in_fun,
+  //               const std::string & fun_name="",
+  //               bool dispose_on_use=false)
   // {
   //   return 0;
   // }
 
   template <typename RETURN_TYPE, typename... ARG_TYPES>
-  uint32_t JSWrap( RETURN_TYPE (*in_fun) (ARG_TYPES...),
-                   const std::string & fun_name="", bool dispose_on_use=false)
+  size_t JSWrap( RETURN_TYPE (*in_fun) (ARG_TYPES...),
+                 const std::string & fun_name="", bool dispose_on_use=false )
   {
     std::function<RETURN_TYPE(ARG_TYPES...)> fun_ptr(in_fun);
     return JSWrap(fun_ptr, fun_name, dispose_on_use);
@@ -553,13 +552,13 @@ namespace emp {
   /// @endcond
 
   template <typename FUN_TYPE>
-  uint32_t JSWrap(const FUN_TYPE & in_fun, const std::string & fun_name="", bool dispose_on_use=false)
+  size_t JSWrap(const FUN_TYPE & in_fun, const std::string & fun_name="", bool dispose_on_use=false)
   {
     return JSWrap(to_function(in_fun), fun_name, dispose_on_use);
   }
 
   // template <typename FUN_TYPE>
-  // uint32_t JSWrap(const FUN_TYPE & in_fun, const std::string & fun_name="", bool dispose_on_use=false)
+  // size_t JSWrap(const FUN_TYPE & in_fun, const std::string & fun_name="", bool dispose_on_use=false)
   // {
   //   std::function<FUN_TYPE> fun_ptr(in_fun);
   //   return JSWrap(fun_ptr, fun_name, dispose_on_use);
@@ -569,11 +568,11 @@ namespace emp {
 
   /// If we want a quick, unnammed, disposable function, use JSWrapOnce
   template <typename FUN_TYPE>
-  uint32_t JSWrapOnce(FUN_TYPE && in_fun) { return JSWrap(std::forward<FUN_TYPE>(in_fun), "", true); }
+  size_t JSWrapOnce(FUN_TYPE && in_fun) { return JSWrap(std::forward<FUN_TYPE>(in_fun), "", true); }
 
 
   /// Cleanup a function pointer when finished with it.
-  void JSDelete( uint32_t fun_id ) {
+  void JSDelete( size_t fun_id ) {
     emp_assert(fun_id > 0);  // Make sure this isn't a null pointer!
     // @CAO -- Should make sure to clean up named functions on JS side if they exist.
     auto & callback_array = internal::CallbackArray();
@@ -587,7 +586,7 @@ namespace emp {
 // Once you use JSWrap to create an ID, you can call the wrapped function from Javascript
 // by supplying CPPCallback with the id and all args.
 
-extern "C" void empCppCallback(uint32_t cb_id)
+extern "C" void empCppCallback(size_t cb_id)
 {
   // Convert the uint passed in from 32 bits to 64 and THEN convert it to a pointer.
   auto * cb_obj = emp::internal::CallbackArray()[cb_id];
