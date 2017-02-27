@@ -33,14 +33,8 @@ namespace web {
 
     size_t GetSize() const { return listeners.size(); }
 
-    Listeners & Set(const std::string & name, const std::function<void()> & in_fun) {
-      emp_assert(!Has(name));
-      listeners[name] = JSWrap(in_fun);
-      return *this;
-    }
-
-    template <typename T>
-    Listeners & Set(const std::string & name, const std::function<void(T evt)> & in_fun) {
+    template <typename... Ts>
+    Listeners & Set(const std::string & name, const std::function<void(Ts... args)> & in_fun) {
       emp_assert(!Has(name));
       listeners[name] = JSWrap(in_fun);
       return *this;
