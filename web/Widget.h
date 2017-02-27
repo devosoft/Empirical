@@ -91,6 +91,9 @@ namespace web {
 
     enum ActivityState { INACTIVE, WAITING, FROZEN, ACTIVE };
 
+    // Default name for un-initialized widgets.
+    static const std::string no_name;
+
   public:
     Widget(const std::string & id);
     Widget(WidgetInfo * in_info=nullptr);
@@ -125,7 +128,7 @@ namespace web {
     bool IsTable() const { return TableOK(); }
     bool IsText() const { return TextOK(); }
 
-    std::string GetID() const;
+    const std::string & GetID() const;
 
     // CSS-related options may be overridden in derived classes that have multiple styles.
     virtual std::string GetCSS(const std::string & setting);
@@ -139,6 +142,9 @@ namespace web {
     bool operator!=(const Widget & in) const { return info != in.info; }
 
     operator bool() const { return info != nullptr; }
+
+    int GetXPos();
+    int GetYPos();
 
     // An active widget makes live changes to the webpage (once document is ready)
     // An inactive widget just records changes internally.
@@ -368,7 +374,8 @@ namespace web {
   bool Widget::AppendOK() const { if (!info) return false; return info->AppendOK(); }
   void Widget::PreventAppend() { emp_assert(info); info->PreventAppend(); }
 
-  std::string Widget::GetID() const { return info ? info->id : "(none)"; }
+  const std::string Widget::no_name = "(none)";
+  const std::string & Widget::GetID() const { return info ? info->id : no_name; }
 
   bool Widget::ButtonOK() const { if (!info) return false; return info->IsButtonInfo(); }
   bool Widget::CanvasOK() const { if (!info) return false; return info->IsCanvasInfo(); }
@@ -392,6 +399,25 @@ namespace web {
     return info ? info->attr.Has(setting) : false;
   }
 
+  int Widget::GetXPos() {
+    if (!info) return -1;
+    return EM_ASM_INT({
+      var id = Pointer_stringify($0);
+//      var rect = $('#' + id).getBoundingClientRect();
+      var rect = $('#' + id).position();
+      return rect.left;
+    }, GetID().c_str());
+  }
+
+  int Widget::GetYPos() {
+    if (!info) return -1;
+    return EM_ASM_INT({
+      var id = Pointer_stringify($0);
+//      var rect = $('#' + id).getBoundingClientRect();
+      var rect = $('#' + id).position();
+      return rect.top;
+    }, GetID().c_str());
+  }
 
   void Widget::Activate() {
     auto * cur_info = info;
