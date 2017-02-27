@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -13,8 +13,8 @@
 #include <string>
 #include <tuple>
 
+#include "../base/vector.h"
 #include "../tools/string_utils.h"
-#include "../tools/vector.h"
 
 namespace emp {
 

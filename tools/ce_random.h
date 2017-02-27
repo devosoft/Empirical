@@ -4,7 +4,6 @@
 //
 //
 //  A versatile and non-patterned pseudo-random-number generator.
-//  NOTE: For this version of Random, C++14 is required!
 //
 //  Constructor:
 //    Random(int _seed=-1)
@@ -35,8 +34,8 @@
 //      Draw a value from the given distributions
 //
 
-#ifndef EMP_RANDOM_14_H
-#define EMP_RANDOM_14_H
+#ifndef EMP_CE_RANDOM_H
+#define EMP_CE_RANDOM_H
 
 // #include <algorithm>
 #include <ctime>
@@ -47,7 +46,7 @@
 
 #include "math.h"
 
-namespace emp14 {
+namespace emp {
   class Random {
   protected:
     // Internal members

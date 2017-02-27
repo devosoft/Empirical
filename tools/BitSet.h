@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -99,12 +99,13 @@
 
 #include <iostream>
 
-#include "assert.h"
+#include "../base/assert.h"
+#include "../base/vector.h"
+
 #include "bitset_utils.h"
 #include "functions.h"
 #include "math.h"
 #include "Random.h"
-#include "vector.h"
 
 namespace emp {
 
@@ -397,9 +398,9 @@ namespace emp {
       while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
       if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
 
-      const int pos_found = find_bit(bit_set[field_id]);
+      const int pos_found = (int) find_bit(bit_set[field_id]);
       bit_set[field_id] &= ~(1U << pos_found);
-      return pos_found + (field_id << 5);
+      return pos_found + (int)(field_id << 5);
     }
 
 
@@ -407,7 +408,7 @@ namespace emp {
       // @CAO -- There are better ways to do this with bit tricks
       //         (but start_pos is tricky...)
       for (size_t i = start_pos; i < NUM_BITS; i++) {
-        if (Get(i)) return i;
+        if (Get(i)) return (int) i;
       }
       return -1;
     }
@@ -518,8 +519,8 @@ namespace emp {
     }
 
     BitSet & SHIFT_SELF(const int shift_size) {
-      if (shift_size > 0) ShiftRight(shift_size);
-      else if (shift_size < 0) ShiftLeft(-shift_size);
+      if (shift_size > 0) ShiftRight((uint32_t) shift_size);
+      else if (shift_size < 0) ShiftLeft((uint32_t) -shift_size);
       return *this;
     }
 
@@ -529,13 +530,13 @@ namespace emp {
     BitSet operator&(const BitSet & ar2) const { return AND(ar2); }
     BitSet operator|(const BitSet & ar2) const { return OR(ar2); }
     BitSet operator^(const BitSet & ar2) const { return XOR(ar2); }
-    BitSet operator<<(const int shift_size) const { return SHIFT(-shift_size); }
-    BitSet operator>>(const int shift_size) const { return SHIFT(shift_size); }
+    BitSet operator<<(const size_t shift_size) const { return SHIFT(-(int)shift_size); }
+    BitSet operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
     const BitSet & operator&=(const BitSet & ar2) { return AND_SELF(ar2); }
     const BitSet & operator|=(const BitSet & ar2) { return OR_SELF(ar2); }
     const BitSet & operator^=(const BitSet & ar2) { return XOR_SELF(ar2); }
-    const BitSet & operator<<=(const int shift_size) { return SHIFT_SELF(-shift_size); }
-    const BitSet & operator>>=(const int shift_size) { return SHIFT_SELF(shift_size); }
+    const BitSet & operator<<=(const size_t shift_size) { return SHIFT_SELF(-(int)shift_size); }
+    const BitSet & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
     // For compatability with std::bitset.
     constexpr static size_t size() { return NUM_BITS; }

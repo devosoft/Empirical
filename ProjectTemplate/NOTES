@@ -1,0 +1,9 @@
+In order to customize this template, you must:
+
+* Put these files into the directory for your project.
+* Update the license to one of your choice (and with your copyright)
+* Edit the beginning of Makefile to set the name of the project and the loaction of Empirical.
+* Update the names of source/web/project_name-web.cc and source/native/project_name.cc
+* Edit web/project_name.html to update the project name and associated javascript file name.
+
+Type `make all` and make sure everything compiles!

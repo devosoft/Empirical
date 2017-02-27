@@ -28,6 +28,10 @@ namespace web {
     CanvasShape(double _x, double _y, const std::string & fc="", const std::string & lc="")
       : x(_x), y(_y), fill_color(fc), line_color(lc) { ; }
     virtual ~CanvasShape() { ; }
+
+    void MoveTo(double _x, double _y) { x=_x; y=_y; }
+    void SetFillColor(const std::string & color) { fill_color = color; }
+    void SetLineColor(const std::string & color) { line_color = color; }
   };
 
   class CanvasCircle : public CanvasShape {
@@ -37,8 +41,7 @@ namespace web {
                  const std::string & fc="", const std::string & lc="")
       : CanvasShape(_x, _y, fc, lc), radius(_r) { ; }
 
-    CanvasCircle(emp::Circle<> circle,
-                 const std::string & fc="", const std::string & lc="")
+    CanvasCircle(emp::Circle circle, const std::string & fc="", const std::string & lc="")
       : CanvasShape(circle.GetCenterX(), circle.GetCenterY(), fc, lc)
       , radius(circle.GetRadius()) { ; }
 
@@ -50,7 +53,7 @@ namespace web {
       if (fill_color.size()) Fill(fill_color);
       if (line_color.size()) Stroke(line_color);
     }
-    CanvasAction * Clone() { return new CanvasCircle(*this); }
+    CanvasAction * Clone() const { return new CanvasCircle(*this); }
   };
 
   class CanvasRect : public CanvasShape {
@@ -68,7 +71,7 @@ namespace web {
       if (fill_color.size()) Fill(fill_color);
       if (line_color.size()) Stroke(line_color);
     }
-    CanvasAction * Clone() { return new CanvasRect(*this); }
+    CanvasAction * Clone() const { return new CanvasRect(*this); }
   };
 
   class CanvasClearRect : public CanvasShape {
@@ -82,9 +85,63 @@ namespace web {
           emp_i.ctx.clearRect($0, $1, $2, $3);
         }, x, y, w, h);  // Draw the rectangle
     }
-    CanvasAction * Clone() { return new CanvasClearRect(*this); }
+    CanvasAction * Clone() const { return new CanvasClearRect(*this); }
   };
 
+  class CanvasPolygon : public CanvasShape {
+  private:
+    emp::vector<Point> points;
+  public:
+    CanvasPolygon(const std::string & fc="", const std::string & lc="")
+      : CanvasShape(0, 0, fc, lc) { ; }
+    CanvasPolygon(const emp::vector<Point> & p, const std::string & fc="", const std::string & lc="")
+      : CanvasShape(0, 0, fc, lc), points(p) { ; }
+    CanvasPolygon(double _x, double _y, const std::string & fc="", const std::string & lc="")
+      : CanvasShape(_x, _y, fc, lc) { ; }
+
+    CanvasPolygon & AddPoint(double x, double y) { points.emplace_back(x,y); return *this; }
+    CanvasPolygon & AddPoint(Point p) { points.emplace_back(p); return *this; }
+
+    void Apply() {
+      EM_ASM_ARGS({
+        emp_i.ctx.translate($0,$1);
+        emp_i.ctx.beginPath();
+        emp_i.ctx.moveTo($2, $3);
+      }, x, y, points[0].GetX(), points[0].GetY());  // Setup the polygon
+      for (size_t i = 1; i < points.size(); i++) {
+        EM_ASM_ARGS({
+          emp_i.ctx.lineTo($0, $1);
+        }, points[i].GetX(), points[i].GetY());  // Draw the lines for the polygon
+      }
+      EM_ASM_ARGS({
+        emp_i.ctx.closePath();
+        emp_i.ctx.translate($0,$1);
+      }, -x, -y);  // Close the polygon
+      if (fill_color.size()) Fill(fill_color);
+      if (line_color.size()) Stroke(line_color);
+    }
+    CanvasAction * Clone() const { return new CanvasPolygon(*this); }
+  };
+
+  class CanvasLine : public CanvasShape {
+  private:
+    double x2; double y2;
+  public:
+    CanvasLine(double _x1, double _y1, double _x2, double _y2,
+               const std::string & lc="")
+      : CanvasShape(_x1, _y1, "", lc), x2(_x2), y2(_y2) { ; }
+
+    void Apply() {
+      EM_ASM_ARGS({
+        emp_i.ctx.beginPath();
+        emp_i.ctx.moveTo($0, $1);
+        emp_i.ctx.lineTo($2, $3);
+        emp_i.ctx.closePath();
+      }, x, y, x2, y2);
+      Stroke(line_color);
+    }
+    CanvasAction * Clone() const { return new CanvasLine(*this); }
+  };
 }
 }
 

@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -15,17 +15,17 @@
 
 #include "Canvas.h"
 
+#include "../base/vector.h"
 #include "../geometry/Circle2D.h"
 #include "../geometry/Surface2D.h"
 #include "../tools/BitMatrix.h"
-#include "../tools/vector.h"
 #include "color_map.h"
 
 namespace emp {
 namespace web {
 
   // Draw a Circle!
-  void Draw(Canvas canvas, const emp::Circle<> & circle,
+  void Draw(Canvas canvas, const emp::Circle & circle,
             const std::string & fill="",
             const std::string & line="")
   {

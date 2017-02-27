@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  Some example code for using TypeTracker
@@ -7,8 +7,8 @@
 #include <iostream>
 #include <string>
 
+#include "../../base/vector.h"
 #include "../../tools/TypeTracker.h"
-#include "../../tools/vector.h"
 
 // Build some sample functions that we want called by type.
 void fun_int_int(int x, int y) { std::cout << x << "," << y << " : " << x+y << std::endl; }

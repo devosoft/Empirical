@@ -1,6 +1,6 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is  
-// Copyright (C) Michigan State University, 2015. It is licensed                
-// under the MIT Software license; see doc/LICENSE
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2017.
+//  Released under the MIT Software license; see doc/LICENSE
 
 #ifndef EMP_RAW_IMAGE_H
 #define EMP_RAW_IMAGE_H
@@ -21,8 +21,8 @@ namespace emp {
     int img_id;
     mutable bool has_loaded;
     mutable bool has_error;
-    mutable std::vector<uint32_t> callbacks_on_load;
-    mutable std::vector<uint32_t> callbacks_on_error;
+    mutable emp::vector<uint32_t> callbacks_on_load;
+    mutable emp::vector<uint32_t> callbacks_on_error;
 
     uint32_t loaded_callback;
     uint32_t error_callback;
@@ -87,7 +87,7 @@ namespace emp {
       static std::map<std::string, RawImage *> raw_image_map;
     }
   }
-  
+
   RawImage & LoadRawImage(const std::string & filename,
                           const std::function<void()> & load_callback=NULL,
                           const std::function<void()> & error_callback=NULL)
@@ -115,7 +115,7 @@ namespace emp {
 
     return *raw_image;
   }
-  
+
 };
 
 #endif

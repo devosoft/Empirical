@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -34,13 +34,13 @@
 //      string.
 
 
-#ifndef EMP_WEB_KEYPRESS_H
-#define EMP_WEB_KEYPRESS_H
+#ifndef EMP_WEB_KEYPRESS_MANAGER_H
+#define EMP_WEB_KEYPRESS_MANAGER_H
 
 #include <functional>
 #include <map>
 
-#include "html5_events.h"
+#include "events.h"
 #include "JSWrap.h"
 
 namespace emp {
@@ -50,11 +50,11 @@ namespace web {
 
   class KeypressManager {
   private:
-    std::map<int, std::function<bool(const html5::KeyboardEvent &)> > fun_map;
+    std::map<int, std::function<bool(const KeyboardEvent &)> > fun_map;
     int next_order;  // Ordering to use if not specified (always last)
     uint32_t callback_id;
 
-    bool DoCallback(const html5::KeyboardEvent & evt_info) {
+    bool DoCallback(const KeyboardEvent & evt_info) {
       bool handled = false;
       for (auto fun_entry : fun_map) {
         if (fun_entry.second(evt_info) == true) {
@@ -69,7 +69,7 @@ namespace web {
 
   public:
     KeypressManager() : next_order(0) {
-      std::function<bool(const html5::KeyboardEvent &)> callback_fun =
+      std::function<bool(const KeyboardEvent &)> callback_fun =
         std::bind( &KeypressManager::DoCallback, this, _1 );
       callback_id = JSWrap( callback_fun );
 
@@ -90,7 +90,7 @@ namespace web {
     int GetFunCount() const { return (int) fun_map.size(); }
     int GetNextOrder() const { return next_order; }
 
-    void AddKeydownCallback(std::function<bool(const html5::KeyboardEvent &)> cb_fun, int order=-1)
+    void AddKeydownCallback(std::function<bool(const KeyboardEvent &)> cb_fun, int order=-1)
     {
       if (order == -1) order = next_order;
       if (order >= next_order) next_order = order+1;
@@ -104,7 +104,7 @@ namespace web {
       if (order >= next_order) next_order = order+1;
 
       fun_map[order] =
-        [key, cb_fun](const html5::KeyboardEvent & evt)
+        [key, cb_fun](const KeyboardEvent & evt)
         { if (evt.keyCode == key) { cb_fun(); return true; } return false; };
     }
 
@@ -114,7 +114,7 @@ namespace web {
       if (order >= next_order) next_order = order+1;
 
       fun_map[order] =
-        [key_set, cb_fun](const html5::KeyboardEvent & evt)
+        [key_set, cb_fun](const KeyboardEvent & evt)
         { if (key_set.find((char)evt.keyCode) == std::string::npos) return false; cb_fun(); return true;};
     }
 

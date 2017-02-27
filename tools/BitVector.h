@@ -4,7 +4,7 @@
 //
 //
 // Class: emp::BitVector
-// Desc: A customized version of std::vector<bool> with additional bit magic operations
+// Desc: A customized version of emp::vector<bool> with additional bit magic operations
 //
 // To implement: append(), resize()...
 //
@@ -16,8 +16,8 @@
 #define EMP_BIT_VECTOR_H
 
 #include <iostream>
-#include <vector>
 
+#include "../base/vector.h"
 #include "assert.h"
 #include "bitset_utils.h"
 #include "functions.h"
@@ -33,7 +33,7 @@ namespace emp {
     using field_t = uint64_t;
 #endif
 
-    static constexpr int FIELD_BITS = sizeof(field_t)*8;
+    static constexpr size_t FIELD_BITS = sizeof(field_t)*8;
     size_t num_bits;
     field_t * bit_set;
 
@@ -360,9 +360,9 @@ namespace emp {
 
 
     // Count 1's by looping through once for each bit equal to 1
-    int CountOnes_Sparse() const {
+    size_t CountOnes_Sparse() const {
       const size_t NUM_FIELDS = NumFields();
-      int bit_count = 0;
+      size_t bit_count = 0;
       for (size_t i = 0; i < NUM_FIELDS; i++) {
         field_t cur_field = bit_set[i];
         while (cur_field) {
@@ -374,10 +374,10 @@ namespace emp {
     }
 
     // Count 1's in semi-parallel; fastest for even 0's & 1's
-    int CountOnes_Mixed() const {
+    size_t CountOnes_Mixed() const {
       const size_t NUM_FIELDS = NumFields() * sizeof(field_t)/4;
       uint32_t* uint_bit_set = (uint32_t *) bit_set;
-      int bit_count = 0;
+      size_t bit_count = 0;
       for (size_t i = 0; i < NUM_FIELDS; i++) {
         const uint32_t v = uint_bit_set[i];
         const uint32_t t1 = v - ((v >> 1) & 0x55555555);
@@ -387,7 +387,7 @@ namespace emp {
       return bit_count;
     }
 
-    int CountOnes() const { return CountOnes_Mixed(); }
+    size_t CountOnes() const { return CountOnes_Mixed(); }
 
     int FindBit() const {
       const size_t NUM_FIELDS = NumFields();
@@ -424,9 +424,9 @@ namespace emp {
       return (field_id < NUM_FIELDS) ?
         (int) (find_bit(bit_set[field_id]) + (field_id * FIELD_BITS)) : -1;
     }
-    std::vector<size_t> GetOnes() const {
+    emp::vector<size_t> GetOnes() const {
       // @CAO -- There are probably better ways to do this with bit tricks.
-      std::vector<size_t> out_set((size_t) CountOnes());
+      emp::vector<size_t> out_set((size_t) CountOnes());
       size_t cur_pos = 0;
       for (size_t i = 0; i < num_bits; i++) {
         if (Get(i)) out_set[cur_pos++] = i;
@@ -556,13 +556,13 @@ namespace emp {
     BitVector operator&(const BitVector & ar2) const { return AND(ar2); }
     BitVector operator|(const BitVector & ar2) const { return OR(ar2); }
     BitVector operator^(const BitVector & ar2) const { return XOR(ar2); }
-    inline BitVector operator<<(const int shift_size) const { return SHIFT(-shift_size); }
-    inline BitVector operator>>(const int shift_size) const { return SHIFT(shift_size); }
+    inline BitVector operator<<(const size_t shift_size) const { return SHIFT(-(int)shift_size); }
+    inline BitVector operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
     const BitVector & operator&=(const BitVector & ar2) { return AND_SELF(ar2); }
     const BitVector & operator|=(const BitVector & ar2) { return OR_SELF(ar2); }
     const BitVector & operator^=(const BitVector & ar2) { return XOR_SELF(ar2); }
-    const BitVector & operator<<=(const int shift_size) { return SHIFT_SELF(-shift_size); }
-    const BitVector & operator>>=(const int shift_size) { return SHIFT_SELF(shift_size); }
+    const BitVector & operator<<=(const size_t shift_size) { return SHIFT_SELF(-(int)shift_size); }
+    const BitVector & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
     // For compatability with std::vector<bool>.
     size_t size() const { return num_bits; }

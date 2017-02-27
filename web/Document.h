@@ -30,7 +30,7 @@
 #include "Text.h"
 #include "TextArea.h"
 
-#include "web_init.h"
+#include "init.h"
 
 
 namespace emp {
@@ -42,7 +42,7 @@ namespace web {
 
   public:
     Document(const std::string & doc_id) : web::Slate(doc_id) {
-      emp::web::Initialize();
+      emp::Initialize();
       Activate();
     }
     ~Document() {
@@ -98,7 +98,7 @@ namespace web {
       return new_widget;
     }
 
-    
+
     // Shortcut adders for helpers
     template <class... T> web::Animate & AddAnimation(const std::string & name, T... args){
       web::Animate * new_anim = new web::Animate(std::forward<T>(args)...);
@@ -107,7 +107,7 @@ namespace web {
       return *new_anim;
     }
 
-    
+
     // Setup a quick way to retrieve old widgets by name.
     web::Button Button (const std::string & in_id) { return web::Button(Find(in_id)); }
     web::Canvas Canvas (const std::string & in_id) { return web::Canvas(Find(in_id)); }

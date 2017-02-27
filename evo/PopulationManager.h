@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  This file defines built-in population managers for use with emp::evo::World
@@ -65,6 +65,9 @@ namespace evo {
     double CalcFitness(size_t id, const std::function<double(ORG*)> & fit_fun) const {
       return fitM.CalcFitness(id, pop[id], fit_fun);
     }
+    void CalcFitnessAll(const std::function<double(ORG*)> & fit_fun) const {
+      for (size_t id = 0; id < pop.size(); id++) fitM.CalcFitness(id, pop[id], fit_fun);
+    }
 
     void SetRandom(Random * r) { random_ptr = r; }
     void Setup(Random * r) { SetRandom(r); }
@@ -127,6 +130,7 @@ namespace evo {
       emp_assert(new_size >= 0);
       for (size_t i = new_size; i < pop.size(); i++) ClearOrgAt(i); // Remove orgs out or range.
       pop.resize(new_size, nullptr);  // Initialize new orgs as null.
+      fitM.Resize(new_size);
     }
 
     void Update() { ; } // Basic version of Update() does nothing, but World may trigger actions.
@@ -228,10 +232,10 @@ namespace evo {
     // Most of the key functions in the population manager can be interfaced with symbols.  If you
     // need to modify the more complex behaviors (such as Execute) you need to create a new
     // derrived class from PopulationManager_Base, which is also legal in a plugin.
-    Signal<> sig_clear;
-    Signal<> sig_update;
-    Signal<ORG*, size_t&> sig_add_org;               // args: new org, return: offspring pos
-    Signal<ORG*, size_t, size_t&> sig_add_org_birth; // args: new org, parent pos, return: offspring pos
+    Signal<void()> sig_clear;
+    Signal<void()> sig_update;
+    Signal<void(ORG*, size_t&)> sig_add_org;               // args: new org, return: offspring pos
+    Signal<void(ORG*, size_t, size_t&)> sig_add_org_birth; // args: new org, parent pos, return: offspring pos
 
   public:
     PopulationManager_Plugin(const std::string & _w_name, FIT_MANAGER & _fm)

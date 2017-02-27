@@ -51,7 +51,7 @@ namespace emp {
     template <typename RETURN, typename... ARGS>
     auto & Add(const std::function<RETURN(ARGS...)> & in_fun, const std::string & name) {
       // Create the new action, save it, and return it.
-      auto * new_action = new Action<RETURN, ARGS...>(in_fun, name);
+      auto * new_action = new Action<RETURN(ARGS...)>(in_fun, name);
       action_map[name] = new_action;
       return *new_action;
     }

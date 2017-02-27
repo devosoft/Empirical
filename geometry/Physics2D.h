@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -41,7 +41,7 @@ namespace emp {
     bool GetDetach() const { return detach_on_birth; }
 
     Physics2D & SetDetach(bool _in) { detach_on_birth = _in; return *this; }
-    
+
     Physics2D & AddBody(BODY_TYPE * in_body) { surface.AddBody(in_body); return *this; }
     Physics2D & AddBackground(BODY_TYPE * in_body) { background.AddBody(in_body); return *this; }
 
@@ -70,7 +70,7 @@ namespace emp {
     bool TestPairCollision(BODY_TYPE & body1, BODY_TYPE & body2) {
       if (body1.IsLinked(body2)) return false;  // Linked bodies can overlap.
 
-      const Point<double> dist = body1.GetCenter() - body2.GetCenter();
+      const Point dist = body1.GetCenter() - body2.GetCenter();
       const double sq_pair_dist = dist.SquareMagnitude();
       const double radius_sum = body1.GetRadius() + body2.GetRadius();
       const double sq_min_dist = radius_sum * radius_sum;
@@ -80,41 +80,41 @@ namespace emp {
 
       if (sq_pair_dist == 0.0) {
         // If the shapes are on top of each other, we have a problem.  Shift one!
-        body2.Translate(emp::Point<double>(0.01, 0.01));
+        body2.Translate(Point(0.01, 0.01));
       }
 
       // @CAO If objects can phase or explode, identify that here.
-      
+
       // Re-adjust position to remove overlap.
       const double true_dist = sqrt(sq_pair_dist);
       const double overlap_dist = ((double) radius_sum) - true_dist;
       const double overlap_frac = overlap_dist / true_dist;
-      const Point<double> cur_shift = dist * (overlap_frac / 2.0);
+      const Point cur_shift = dist * (overlap_frac / 2.0);
       body1.AddShift(cur_shift);
       body2.AddShift(-cur_shift);
 
       // @CAO if we have inelastic collisions, we just take the weighted average of velocites
       // and let the move together.
-      
+
       // Assume elastic: Re-adjust velocity to reflect bounce.
       double x1, y1, x2, y2;
-  
+
       if (dist.GetX() == 0) {
         x1 = body1.GetVelocity().GetX();  y1 = body2.GetVelocity().GetY();
         x2 = body2.GetVelocity().GetX();  y2 = body1.GetVelocity().GetY();
 
-        body1.SetVelocity(Point<double>(x1, y1));
-        body2.SetVelocity(Point<double>(x2, y2));
+        body1.SetVelocity(Point(x1, y1));
+        body2.SetVelocity(Point(x2, y2));
       }
       else if (dist.GetY() == 0) {
         x1 = body2.GetVelocity().GetX();  y1 = body1.GetVelocity().GetY();
         x2 = body1.GetVelocity().GetX();  y2 = body2.GetVelocity().GetY();
 
-        body1.SetVelocity(Point<double>(x1, y1));
-        body2.SetVelocity(Point<double>(x2, y2));
+        body1.SetVelocity(Point(x1, y1));
+        body2.SetVelocity(Point(x2, y2));
       }
       else {
-        const Point<double> rel_velocity(body2.GetVelocity() - body1.GetVelocity());
+        const Point rel_velocity(body2.GetVelocity() - body1.GetVelocity());
         double normal_a = dist.GetY() / dist.GetX();
         x1 = ( rel_velocity.GetX() + normal_a * rel_velocity.GetY() )
           / ( normal_a * normal_a + 1 );
@@ -122,12 +122,12 @@ namespace emp {
         x2 = rel_velocity.GetX() - x1;
         y2 = - (1 / normal_a) * x2;
 
-        body2.SetVelocity(body1.GetVelocity() + Point<double>(x2, y2));
-        body1.SetVelocity(body1.GetVelocity() + Point<double>(x1, y1));
+        body2.SetVelocity(body1.GetVelocity() + Point(x2, y2));
+        body1.SetVelocity(body1.GetVelocity() + Point(x1, y1));
       }
-  
 
-      return true;      
+
+      return true;
     }
 
     void Update() {
@@ -166,18 +166,18 @@ namespace emp {
     }
 
     // Access to bodies
-    std::vector<BODY_TYPE *> & GetBodySet() {
+    emp::vector<BODY_TYPE *> & GetBodySet() {
       return surface.GetBodySet();
     }
-    std::vector<BODY_TYPE *> & GetBackgroundSet() {
+    emp::vector<BODY_TYPE *> & GetBackgroundSet() {
       return background.GetBodySet();
     }
 
     // Access to bodies in a const physics...
-    const std::vector<BODY_TYPE *> & GetConstBodySet() const {
+    const emp::vector<BODY_TYPE *> & GetConstBodySet() const {
       return surface.GetConstBodySet();
     }
-    const std::vector<BODY_TYPE *> & GetConstBackgroundSet() const {
+    const emp::vector<BODY_TYPE *> & GetConstBackgroundSet() const {
       return background.GetConstBodySet();
     }
   };

@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -49,36 +49,21 @@
 //    bool InStateCell() const
 //      Return true/false to identify what state the table is currently in.
 //
-//    Table & GetCell(size_t r, size_t c)
-//      Make the specified row and column active and the table state CELL.
-//      All further manipulations of the table object will focus on that cell until
-//      the state is changed again.
+//  Get table widget that affect specified cell, row, etc.
+//    Table GetCell(size_t r, size_t c)
+//    Table GetRow(size_t r)
+//    Table GetCol(size_t c)
+//    Table GetRowGroup(size_t r)
+//    Table GetColGroup(size_t c)
+//    Table GetTable()
 //
-//    Table & GetRow(size_t r)
-//      Make the specified row active, column zero, and the table state ROW
-//      All further manipulations of the table object will focus on that row until
-//      the state is changed again.
-//
-//    Table & GetCol(size_t c)
-//      Make the specified column active, row zero, and the table state COL
-//      All further manipulations of the table object will focus on that column until
-//      the state is changed again.
-//
-//    Table & GetRowGroup(size_t r)
-//      Select a group of rows starting at the specified row, make it active, and
-//      set the table state to ROW_GROUP.  All further manipulations of the table object
-//      will focus on that row group until the state is changed again.
-//
-//    Table & GetColGroup(size_t c)
-//      Select a group of columns starting at the specified column, make it active, and
-//      set the table state to COL_GROUP.  All further manipulations of the table object
-//      will focus on that column group until the state is changed again.
-//
-//    Table & GetTable()
-//      Leave the active row and column, but set the table state to TABLE
-//      All further manipulations of the table object will focus on the whole table
-//      until the state is changed again.
-//
+//  Make subsequent calls to *this* widget affect specified cell, row, etc.
+//    Table & SetCellActive(size_t r, size_t c)
+//    Table & SetRowActive(size_t r)
+//    Table & SetColActive(size_t c)
+//    Table & SetRowGroupActive(size_t r)
+//    Table & SetColGroupActive(size_t c)
+//    Table & SetTableActive()
 //
 //  Modifying data in table
 //
@@ -158,7 +143,7 @@
 #ifndef EMP_WEB_TABLE_H
 #define EMP_WEB_TABLE_H
 
-#include "../tools/vector.h"
+#include "../base/vector.h"
 
 #include "Slate.h"
 #include "Widget.h"
@@ -667,7 +652,8 @@ namespace web {
     internal::TableInfo * Info() { return (internal::TableInfo *) info; }
     const internal::TableInfo * Info() const { return (internal::TableInfo *) info; }
 
-    Table(internal::TableInfo * in_info) : WidgetFacet(in_info) { ; }
+    Table(internal::TableInfo * in_info, size_t _row=0, size_t _col=0, state_t _state=TABLE)
+     : WidgetFacet(in_info), cur_row(_row), cur_col(_col), state(_state) { ; }
 
     // Apply to appropriate component based on current state.
     void DoCSS(const std::string & setting, const std::string & value) override {
@@ -714,8 +700,7 @@ namespace web {
       Info()->Resize(r, c);
     }
     Table(const Table & in)
-      : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col), state(in.state)
-    {
+      : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col), state(in.state) {
       emp_assert(state == TABLE || state == ROW || state == CELL
                  || state == COL || state == COL_GROUP || state == ROW_GROUP, state);
     }
@@ -786,7 +771,38 @@ namespace web {
       return *this;
     }
 
-    Table & GetCell(size_t r, size_t c) {
+    Table GetCell(size_t r, size_t c) {
+      emp_assert(Info() != nullptr);
+      emp_assert(r < Info()->row_count && c < Info()->col_count,
+                 r, c, Info()->row_count, Info()->col_count, GetID());
+      return Table(Info(), r, c, CELL);
+    }
+    Table GetRow(size_t r) {
+      emp_assert(r < Info()->row_count,
+                 r, Info()->row_count, GetID());
+      return Table(Info(), r, 0, ROW);
+    }
+    Table GetCol(size_t c) {
+      emp_assert(c < Info()->col_count,
+                 c, Info()->col_count, GetID());
+      return Table(Info(), 0, c, COL);
+    }
+    Table GetRowGroup(size_t r) {
+      emp_assert(r < Info()->row_count,
+                 r, Info()->row_count, GetID());
+      return Table(Info(), r, 0, ROW_GROUP);
+    }
+    Table GetColGroup(size_t c) {
+      emp_assert(c < Info()->col_count,
+                 c, Info()->col_count, GetID());
+      return Table(Info(), 0, c, COL_GROUP);
+    }
+    Table GetTable() {
+      return Table(Info(), cur_row, cur_col, TABLE);
+    }
+
+    // Update the current table object to change the active cell.
+    Table & SetCellActive(size_t r, size_t c) {
       emp_assert(Info() != nullptr);
       emp_assert(r < Info()->row_count && c < Info()->col_count,
                  r, c, Info()->row_count, Info()->col_count, GetID());
@@ -794,35 +810,35 @@ namespace web {
       state = CELL;
       return *this;
     }
-    Table & GetRow(size_t r) {
+    Table & SetRowActive(size_t r) {
       emp_assert(r < Info()->row_count,
                  r, Info()->row_count, GetID());
       cur_row = r; cur_col = 0;
       state = ROW;
       return *this;
     }
-    Table & GetCol(size_t c) {
+    Table & SetColActive(size_t c) {
       emp_assert(c < Info()->col_count,
                  c, Info()->col_count, GetID());
       cur_col = c; cur_row = 0;
       state = COL;
       return *this;
     }
-    Table & GetRowGroup(size_t r) {
+    Table & SetRowGroupActive(size_t r) {
       emp_assert(r < Info()->row_count,
                  r, Info()->row_count, GetID());
       cur_row = r; cur_col = 0;
       state = ROW_GROUP;
       return *this;
     }
-    Table & GetColGroup(size_t c) {
+    Table & SetColGroupActive(size_t c) {
       emp_assert(c < Info()->col_count,
                  c, Info()->col_count, GetID());
       cur_col = c; cur_row = 0;
       state = COL_GROUP;
       return *this;
     }
-    Table & GetTable() {
+    Table & SetTableActive() {
       // Leave row and col where they are.
       state = TABLE;
       return *this;

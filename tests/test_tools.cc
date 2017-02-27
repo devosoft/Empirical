@@ -1,4 +1,13 @@
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016-2017.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//  Tests for files in the tools/ folder.
+
+#ifndef EMP_TRACK_MEM
 #define EMP_TRACK_MEM
+#endif
+
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]
 #define CATCH_CONFIG_MAIN
@@ -11,22 +20,26 @@
 #include <sstream>
 #include <string>
 
+#include "../base/array.h"
+#include "../base/Ptr.h"
+#include "../base/assert.h"
+#include "../base/macro_math.h"
+#include "../base/macros.h"
+#include "../base/vector.h"
+
 #include "../tools/BitMatrix.h"
 #include "../tools/BitSet.h"
 #include "../tools/BitVector.h"
 #include "../tools/DFA.h"
-#include "../tools/DynamicStringSet.h"
+#include "../tools/DynamicString.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/Graph.h"
 #include "../tools/Lexer.h"
 #include "../tools/NFA.h"
-#include "../tools/Ptr.h"
 #include "../tools/RegEx.h"
 #include "../tools/Random.h"
 // #include "../tools/Trait.h"
 
-#include "../tools/array.h"
-#include "../tools/assert.h"
 #include "../tools/ce_string.h"
 #include "../tools/errors.h"
 #include "../tools/flex_function.h"
@@ -35,8 +48,6 @@
 //#include "../tools/grid.h"
 #include "../tools/info_theory.h"
 #include "../tools/lexer_utils.h"
-#include "../tools/macro_math.h"
-#include "../tools/macros.h"
 #include "../tools/map_utils.h"
 #include "../tools/math.h"
 #include "../tools/mem_track.h"
@@ -46,7 +57,6 @@
 #include "../tools/string_utils.h"
 #include "../tools/tuple_struct.h"
 #include "../tools/unit_tests.h"
-#include "../tools/vector.h"
 
 // currently these have no coveage; we include them so we get metrics on them
 // this doesn't actually work--TODO: figure out why this doesn't work
@@ -73,12 +83,12 @@ TEST_CASE("Test array", "[tools]")
   constexpr int A_SIZE = 50;
   emp::array<int, A_SIZE> test_array;
 
-  for (int i = 0; i < A_SIZE; i++) {
-    test_array[i] = i * i;
+  for (size_t i = 0; i < A_SIZE; i++) {
+    test_array[i] = (int) (i * i);
   }
 
   int sum = 0;
-  for (int i = 0; i < A_SIZE; i++) {
+  for (size_t i = 0; i < A_SIZE; i++) {
     sum += test_array[i];
   }
 
@@ -178,7 +188,7 @@ TEST_CASE("Test BitSet", "[tools]")
   emp::BitSet<80> bs80c(bs80);
   bs80 <<= 1;
 
-  for (int i = 0; i < 75; i++) {
+  for (size_t i = 0; i < 75; i++) {
     emp::BitSet<80> shift_set = bs80 >> i;
     REQUIRE((shift_set.CountOnes() == 1) == (i <= 71));
   }
@@ -187,9 +197,9 @@ TEST_CASE("Test BitSet", "[tools]")
   bs10.flip(2);
   REQUIRE(bs10[2] == true);
 
-  for (int i = 3; i < 8; i++) {REQUIRE(bs10[i] == false);}
+  for (size_t i = 3; i < 8; i++) {REQUIRE(bs10[i] == false);}
   bs10.flip(3, 8);
-  for (int i = 3; i < 8; i++) {REQUIRE(bs10[i] == true);}
+  for (size_t i = 3; i < 8; i++) {REQUIRE(bs10[i] == true);}
 
   // Test importing....
   bs10.Import(bs80 >> 70);
@@ -205,13 +215,13 @@ TEST_CASE("Test BitSet", "[tools]")
 
 TEST_CASE("Test BitSet timing", "[tools]")
 {
-  const int set_size = 100000;
+  const size_t set_size = 100000;
   typedef emp::BitSet<set_size> TEST_TYPE;
 
   TEST_TYPE set1;
   TEST_TYPE set2;
 
-  for (int i = 0; i < set_size; i++) {
+  for (size_t i = 0; i < set_size; i++) {
     if (!(i%2) && (i%5)) set1[i] = 1;
     if (!(i%3) && (i%7)) set2.Set(i, true);
   }
@@ -221,10 +231,10 @@ TEST_CASE("Test BitSet timing", "[tools]")
 
   TEST_TYPE set3(set1 & set2);
   TEST_TYPE set4 = (set1 | set2);
-  int total = 0;
+  size_t total = 0;
 
   // should probably assert that this does what we want it to do...
-  for (int i = 0; i < 100000; i++) {
+  for (size_t i = 0; i < 100000; i++) {
     set3 |= (set4 << 3);
     set4 &= (set3 >> 3);
     auto set5 = set3 & set4;
@@ -252,7 +262,7 @@ TEST_CASE("Test BitVector", "[tools]")
 
   bv80 <<= 1;
 
-  for (int i = 0; i < 75; i += 2) {
+  for (size_t i = 0; i < 75; i += 2) {
     emp::BitVector shift_vector = bv80 >> i;
     REQUIRE((shift_vector.CountOnes() == 1) == (i <= 71));
   }
@@ -272,7 +282,7 @@ TEST_CASE("Test ce_string", "[tools]")
   constexpr emp::ce_string s3 = "abcdef";
   constexpr emp::ce_string s4 = "aba";
   emp::BitSet<s.size()> b1;
-  emp::BitSet<(int) s[0]> b2;
+  emp::BitSet<(size_t) s[0]> b2;
 
   REQUIRE(b2.size() == 97);
   REQUIRE(s.size() == 3);
@@ -347,9 +357,9 @@ TEST_CASE("Test DFA", "[tools]")
   REQUIRE(dfa.Next(0, "b")  == 3);
 }
 
-TEST_CASE("Test DynamicStringSet", "[tools]")
+TEST_CASE("Test DynamicString", "[tools]")
 {
-  emp::DynamicStringSet test_set;
+  emp::DynamicString test_set;
 
   test_set.Append("Line Zero");  // Test regular append
   test_set << "Line One";        // Test stream append
@@ -425,15 +435,6 @@ TEST_CASE("Test functions", "[tools]")
   emp::Toggle(test_bool);
   REQUIRE(test_bool == false);
 
-  REQUIRE(emp::Mod(10, 7) == 3);
-  REQUIRE(emp::Mod(3, 7) == 3);
-  REQUIRE(emp::Mod(-4, 7) == 3);
-  REQUIRE(emp::Mod(-11, 7) == 3);
-
-  REQUIRE(emp::Pow(2,3) == 8);
-  REQUIRE(emp::Pow(-2,2) == 4);
-  REQUIRE(emp::Pow(3,4) == 81);
-
   REQUIRE(emp::ToRange(-10000, 10, 20) == 10);
   REQUIRE(emp::ToRange(9, 10, 20) == 10);
   REQUIRE(emp::ToRange(10, 10, 20) == 10);
@@ -466,7 +467,7 @@ double fun7(double input) { return input * input * input; }
 TEST_CASE("Test FunctionSet", "[tools]")
 {
   // TEST 1: Functions with VOID returns.
-  emp::FunctionSet<void, int,int> fun_set;
+  emp::FunctionSet<void(int,int)> fun_set;
   fun_set.Add(&fun1);
   fun_set.Add(&fun2);
   fun_set.Add(&fun3);
@@ -489,7 +490,7 @@ TEST_CASE("Test FunctionSet", "[tools]")
   REQUIRE(global_var4 == 4);
 
   // Test 2: Functions with non-void returns.
-  emp::FunctionSet<double, double> fun_set2;
+  emp::FunctionSet<double(double)> fun_set2;
   fun_set2.Add(&fun5);
   fun_set2.Add(&fun6);
   fun_set2.Add(&fun7);
@@ -1034,6 +1035,25 @@ TEST_CASE("Test math", "[tools]")
   constexpr auto a6 = emp::Ln(3.33);             REQUIRE( a6 > 1.202 );  REQUIRE( a6 < 1.204 );
   constexpr auto a7 = emp::Pow2(2.345);          REQUIRE( a7 > 5.080 );  REQUIRE( a7 < 5.081 );
   constexpr auto a8 = emp::Pow(emp::PI, emp::E); REQUIRE( a8 > 22.440 ); REQUIRE( a8 < 22.441 );
+
+  REQUIRE(emp::Mod(10, 7) == 3);
+  REQUIRE(emp::Mod(3, 7) == 3);
+  REQUIRE(emp::Mod(-4, 7) == 3);
+  REQUIRE(emp::Mod(-11, 7) == 3);
+
+  REQUIRE(emp::Pow(2,3) == 8);
+  REQUIRE(emp::Pow(-2,2) == 4);
+  REQUIRE(emp::IntPow(3,4) == 81);
+
+  REQUIRE(emp::Min(5) == 5);
+  REQUIRE(emp::Min(5,10) == 5);
+  REQUIRE(emp::Min(10,5) == 5);
+  REQUIRE(emp::Min(40,30,20,10,5,15,25,35) == 5);
+
+  REQUIRE(emp::Max(5) == 5);
+  REQUIRE(emp::Max(5,10) == 10);
+  REQUIRE(emp::Max(10,5) == 10);
+  REQUIRE(emp::Max(40,30,20,10,45,15,25,35) == 45);
 }
 
 
@@ -1069,7 +1089,7 @@ TEST_CASE("Test mem_track", "[tools]")
   REQUIRE(EMP_TRACK_COUNT(TestClass1) == 1000);
 
 
-  for (int i = 500; i < 1000; i++) {
+  for (size_t i = 500; i < 1000; i++) {
     delete test_v[i];
   }
 
@@ -1177,7 +1197,7 @@ TEST_CASE("Test Ptr", "[tools]")
   emp::vector<emp::Ptr<char> *> ptr_set(10);
   ptr_set[0] = new emp::Ptr<char>;
   ptr_set[0]->New(42);
-  for (int i = 1; i < 10; i++) ptr_set[i] = new emp::Ptr<char>(*(ptr_set[0]));
+  for (size_t i = 1; i < 10; i++) ptr_set[i] = new emp::Ptr<char>(*(ptr_set[0]));
 
   // Do we have a proper count of 10?
   REQUIRE(ptr_set[0]->DebugGetCount() == 10);
@@ -1244,16 +1264,16 @@ TEST_CASE("Test random", "[tools]")
 
   // Test GetDouble with the law of large numbers.
   emp::vector<int> val_counts(10);
-  for (int i = 0; i < (int) val_counts.size(); i++) val_counts[i] = 0;
+  for (size_t i = 0; i < val_counts.size(); i++) val_counts[i] = 0;
 
-  const int num_tests = 100000;
+  const size_t num_tests = 100000;
   const double min_value = 2.5;
   const double max_value = 8.7;
   double total = 0.0;
-  for (int i = 0; i < num_tests; i++) {
+  for (size_t i = 0; i < num_tests; i++) {
     const double cur_value = rng.GetDouble(min_value, max_value);
     total += cur_value;
-    val_counts[(int) cur_value]++;
+    val_counts[(size_t) cur_value]++;
   }
 
   {
@@ -1267,11 +1287,11 @@ TEST_CASE("Test random", "[tools]")
   }
 
   // Test GetInt
-  for (int i = 0; i < (int) val_counts.size(); i++) val_counts[i] = 0;
+  for (size_t i = 0; i < val_counts.size(); i++) val_counts[i] = 0;
   total = 0.0;
 
-  for (int i = 0; i < num_tests; i++) {
-    const int cur_value = rng.GetInt((int) min_value, (int) max_value);
+  for (size_t i = 0; i < num_tests; i++) {
+    const size_t cur_value = rng.GetUInt(min_value, max_value);
     total += cur_value;
     val_counts[cur_value]++;
   }
@@ -1289,7 +1309,7 @@ TEST_CASE("Test random", "[tools]")
   // Test P
   double flip_prob = 0.56789;
   int hit_count = 0;
-  for (int i = 0; i < num_tests; i++) {
+  for (size_t i = 0; i < num_tests; i++) {
     if (rng.P(flip_prob)) hit_count++;
   }
 
@@ -1432,8 +1452,8 @@ struct BuiltInTypesTest {
   const int a;
   emp::vector<int> int_v;
 
-  BuiltInTypesTest(int _a, int v_size) : a(_a), int_v(v_size) {
-    for (int i = 0; i < v_size; i++) int_v[i] = i*i;
+  BuiltInTypesTest(int _a, size_t v_size) : a(_a), int_v(v_size) {
+    for (size_t i = 0; i < v_size; i++) int_v[i] = (int)(i*i);
   }
 
   EMP_SETUP_DATAPOD(BuiltInTypesTest, a, int_v);
@@ -1656,14 +1676,12 @@ TEST_CASE("Test vector", "[tools]")
 {
   emp::vector<int> v(20);
 
-  for (int i = 0; i < 20; i++) {
-    v[i] = i * i;
+  for (size_t i = 0; i < 20; i++) {
+    v[i] = (int) (i * i);
   }
 
   int total = 0;
-  for (int i : v) {
-    total += i;
-  }
+  for (int i : v) total += i;
 
   REQUIRE(total == 2470);
 }

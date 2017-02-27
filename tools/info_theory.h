@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -20,8 +20,8 @@
 #ifndef EMP_INFO_THEORY_H
 #define EMP_INFO_THEORY_H
 
+#include "../base/vector.h"
 #include "math.h"
-#include "vector.h"
 
 namespace emp {
 

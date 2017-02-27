@@ -1,9 +1,10 @@
 #ifndef VISUALIZATION_UTILS_H
 #define VISUALIZATION_UTILS_H
 
-#include "../../web/web_init.h"
-#include "../../web/Animate.h"
-#include "../../web/JSWrap.h"
+#include <functional>
+#include <algorithm>
+#include <deque>
+
 #include "../../config/config.h"
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
@@ -12,16 +13,16 @@
 #include "../../tools/FunctionSet.h"
 #include "../../tools/const.h"
 
-#include "../../web/d3/selection.h"
-#include "../../web/d3/scales.h"
-#include "../../web/d3/axis.h"
-#include "../../web/d3/svg_shapes.h"
-#include "../../web/d3/layout.h"
-#include "../../web/d3/visual_elements.h"
+#include "../init.h"
+#include "../Animate.h"
+#include "../JSWrap.h"
 
-#include <functional>
-#include <algorithm>
-#include <deque>
+#include "selection.h"
+#include "scales.h"
+#include "axis.h"
+#include "svg_shapes.h"
+#include "layout.h"
+#include "visual_elements.h"
 
 //Pretty sure D3VisualizationInfo can't be shared among multiple D3Visualizations
 
@@ -105,7 +106,7 @@ public:
   std::string GetID() {return Info()->id;}
 
   emp::vector<std::string> variables;
-  FunctionSet<void> pending_funcs;
+  FunctionSet<void()> pending_funcs;
   bool init = false;
 
   /// Callback function for drawing data after rescale animation

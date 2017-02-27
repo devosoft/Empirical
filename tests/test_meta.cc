@@ -6,9 +6,9 @@
 #include <sstream>
 #include <string>
 
-#include "../tools/array.h"
+#include "../base/array.h"
+#include "../base/vector.h"
 #include "../tools/tuple_utils.h"
-#include "../tools/vector.h"
 
 #include "../meta/meta.h"
 #include "../meta/reflection.h"

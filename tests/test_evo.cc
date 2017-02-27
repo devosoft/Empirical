@@ -47,7 +47,7 @@ TEST_CASE("Test Stats/NK-Grid", "[stats]"){
 
 
   // Setup some types...
-  using fitM_t = emp::evo::FitnessManager_Base;
+  using fitM_t = emp::evo::FitnessManager_Dynamic;
   using popM_t = emp::evo::PopulationManager_Grid<BitOrg, fitM_t>;
 
   // Make a fitness manager.
@@ -142,7 +142,7 @@ TEST_CASE("Test-stats-NK-Mixed","[stats]"){
   mixed_pop.SetDefaultFitnessFun(fit_func);
 
   // Setup some types...
-  using fitM_t = emp::evo::FitnessManager_Base;
+  using fitM_t = emp::evo::FitnessManager_Dynamic;
   using popM_t = emp::evo::PopulationManager_Base<BitOrg, fitM_t>;
 
   // Make a fitness manager.

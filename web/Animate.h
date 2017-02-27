@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-16.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -44,8 +44,8 @@
 
 #include <functional>
 
-#include "../tools/assert.h"
-#include "../tools/vector.h"
+#include "../base/assert.h"
+#include "../base/vector.h"
 
 #include "emfunctions.h"
 #include "JSWrap.h"
@@ -56,19 +56,21 @@ namespace emp {
 namespace web {
 
   class Animate {
-  private:
-    std::function<void(const Animate &)> anim_fun;
-    emp::vector<web::Widget> targets;   // What widgets should be refreshed on each frame?
-    bool active;                        // Is this animation running?
-    bool do_step;                       // Should this animation take a single step?
-    size_t callback_id;
+  protected:
+    using anim_fun_t = std::function<void(const Animate &)>;
 
-    double start_time;                  // At what time did this animation most recently start?
-    double prev_time;                   // What was the time point of the previous frame?
-    double cur_time;                    // What time did the current frame start?
-    double run_time;                    // How much run time has accumulated?
+    anim_fun_t anim_fun;                //< Function to repeatedly run for animation.
+    emp::vector<web::Widget> targets;   //< What widgets should be refreshed after each frame?
+    bool active;                        //< Is this animation currently running?
+    bool do_step;                       //< Should this animation take just a single step?
+    size_t callback_id;                 //< Intenral ID for javascript to call back AdvanceFrame()
 
-    int frame_count;
+    double start_time;                  //< At what time did this animation most recently start?
+    double prev_time;                   //< What was the time point of the previous frame?
+    double cur_time;                    //< What time did the current frame start?
+    double run_time;                    //< How much run time has accumulated?
+
+    int frame_count;                    //< How many animation frames have gone by?
 
     void LoadTargets() { ; }
     template <typename... T>
@@ -78,14 +80,13 @@ namespace web {
     }
 
     void AdvanceFrame() {
-      emp_assert(anim_fun);
-
       if (!active && !do_step) return;  // If Stop has been called, halt animating.
 
       prev_time = cur_time;             // Update timing.
       cur_time = emp::GetTime();
       do_step = false;                  // Make sure we don't keep advancing by a single step.
-      anim_fun(*this);                  // Call anim function, sending this object.
+      if (anim_fun) anim_fun(*this);    // If anim function exist, call it and send this object.
+      DoFrame();                        // Call DoFrame in this class.
 
       // Loop through all widget targets to be redrawn and do so.
       for (auto & w : targets) { w.Redraw(); }
@@ -98,13 +99,21 @@ namespace web {
       frame_count++;
     }
 
+    /// DoFrame() is called by default if no animation function is provided.  As such, an animation
+    /// can be built by deriving a class from Animate and overriding this function.
+    virtual void DoFrame() { ; }
+
   public:
-    template <typename... W_TYPES>
-    Animate(const std::function<void(const Animate &)> & fun, W_TYPES&... targets)
-      : anim_fun(fun), active(false), do_step(false), run_time(0.0), frame_count(0)
+    Animate() : active(false), do_step(false), run_time(0.0), frame_count(0)
     {
-      LoadTargets(targets...);
       callback_id = JSWrap( std::function<void()>([this](){ this->AdvanceFrame(); }) );
+    }
+
+    template <typename... W_TYPES>
+    Animate(const anim_fun_t & fun, W_TYPES&... targets) : Animate()
+    {
+      anim_fun = fun;
+      LoadTargets(targets...);
     }
 
     template <typename... W_TYPES>
@@ -115,12 +124,7 @@ namespace web {
     Animate(const std::function<void()> & fun, W_TYPES&... targets)
       : Animate([fun](const Animate &){fun();}, targets...) { ; }
 
-    Animate()
-      : active(false), do_step(false), run_time(0.0), frame_count(0)
-    {
-      callback_id = JSWrap( std::function<void()>([this](){ this->AdvanceFrame(); }) );
-    }
-    ~Animate() { ; }
+    virtual ~Animate() { ; }
 
     // Do not copy animations directly.
     Animate(const Animate &) = delete;
@@ -156,7 +160,7 @@ namespace web {
 
     int GetFrameCount() const { return frame_count; }
 
-    void SetCallback(const std::function<void(const Animate &)> & fun) { anim_fun = fun; }
+    void SetCallback(const anim_fun_t & fun) { anim_fun = fun; }
 
     void SetCallback(const std::function<void(double)> & fun) {
       anim_fun = [fun, this](const Animate &){fun(GetStepTime());};

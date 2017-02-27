@@ -1,7 +1,7 @@
-#ifndef EMP_INSTRUCTION_TUBECODE_H
-#define EMP_INSTRUCTION_TUBECODE_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2017.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  This class represents a single instruction in a program, with a set of arguments.
 //
@@ -19,9 +19,12 @@
 //
 //  These instructions were originally designed to be used in a simplified, but
 //  semi-realistic virtual CPU for educational goals.
-//
 
-#include "../tools/assert.h"
+
+#ifndef EMP_INSTRUCTION_TUBECODE_H
+#define EMP_INSTRUCTION_TUBECODE_H
+
+#include "../base/assert.h"
 
 namespace emp {
 

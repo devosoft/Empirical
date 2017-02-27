@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -10,7 +10,7 @@
 
 #include <array>
 
-#include "../tools/assert.h"
+#include "../base/assert.h"
 #include "../tools/BitSet.h"
 #include "../tools/math.h"
 #include "../tools/Random.h"
@@ -36,6 +36,7 @@ namespace evo {
   /// Note: Overly large Ns and Ks currently trigger a seg-fault, caused by trying to build a table
   /// that is larger than will fit in memory. You can use larger values of N and K (for slightly
   /// reduced speed) of you use an NKLandscape object instead.
+
   template <size_t N, size_t K>
   class NKLandscapeConst {
   private:

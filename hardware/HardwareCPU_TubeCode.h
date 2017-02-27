@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -13,13 +13,14 @@
 
 #include <functional>
 #include <map>
-#include <vector>
 using namespace std::placeholders;
+
+#include "../base/assert.h"
+#include "../base/vector.h"
 
 #include "HardwareCPU_Base.h"
 #include "Instruction_TubeCode.h"
 #include "InstLib.h"
-#include "../tools/assert.h"
 
 namespace emp {
 
@@ -28,14 +29,14 @@ namespace emp {
     : public HardwareCPU_Base<Instruction_TubeCode> {
   protected:
     // Hardware components...
-    using code_t = std::vector<emp::Instruction_TubeCode>;
+    using code_t = emp::vector<emp::Instruction_TubeCode>;
     using hardware_t = HardwareCPU_TubeCode<NUM_REGS, MEM_SIZE>;
 
     code_t code;
     VAL_T memory[MEM_SIZE];                         // Memory!
     VAL_T regs[NUM_REGS];                           // Registers!
     std::map<int, VAL_T> var_map;                   // Variables!
-    std::map<int, std::vector<VAL_T> > array_map;   // Arrays!
+    std::map<int, emp::vector<VAL_T> > array_map;   // Arrays!
     CPUHead IP;                                     // Instruction Pointer!
 
     const InstLib<HardwareCPU_TubeCode, Instruction_TubeCode> & inst_lib;
@@ -70,7 +71,7 @@ namespace emp {
     int GetNumVars() const { return (int) var_map.size(); }
     int GetNumArrays() const { return (int) array_map.size(); }
 
-    void LoadCode(const std::vector<emp::Instruction_TubeCode> & in_code) { code = in_code; }
+    void LoadCode(const emp::vector<emp::Instruction_TubeCode> & in_code) { code = in_code; }
 
 
     // The following function drives the execution of the virtual hardware -- it executes the
@@ -295,10 +296,10 @@ namespace emp {
 
     // The following function returns a list of default instruction names.
 
-    static const std::vector<std::string> & GetDefaultInstructions()
+    static const emp::vector<std::string> & GetDefaultInstructions()
     {
       // If we've already generated this list, just return it.
-      static std::vector<std::string> default_insts;
+      static emp::vector<std::string> default_insts;
       if (default_insts.size() > 0) return default_insts;
 
       // Include as many nops as we need.  These will be called Nop-0, Nop-1, Nop-2, etc.

@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -12,9 +12,9 @@
 //
 //  Member functions include:
 //   Surface2D(double _width, double _height);
-//   const Point<double> & GetMaxPosition() const;
-//   std::vector<BODY_TYPE *> & GetBodySet();
-//   const std::vector<BODY_TYPE *> & GetConstBodySet() const;
+//   const Point & GetMaxPosition() const;
+//   emp::vector<BODY_TYPE *> & GetBodySet();
+//   const emp::vector<BODY_TYPE *> & GetConstBodySet() const;
 //   Surface2D<BODY_TYPE, BODY_INFO> & AddBody(BODY_TYPE * new_body);
 //   void TestCollisions(std::function<bool(BODY_TYPE &, BODY_TYPE &)> collide_fun);
 //
@@ -36,22 +36,20 @@ namespace emp {
   template <typename BODY_TYPE>
   class Surface2D {
   private:
-    const Point<double> max_pos;     // Lower-left corner of the surface.
-    std::vector<BODY_TYPE *> body_set;  // Set of all bodies on surface
+    const Point max_pos;     // Lower-left corner of the surface.
+    emp::vector<BODY_TYPE *> body_set;  // Set of all bodies on surface
 
   public:
     Surface2D(double _width, double _height)
-      : max_pos(_width, _height)
-    {
-    }
+      : max_pos(_width, _height) { ; }
     ~Surface2D() { Clear(); }
 
     double GetWidth() const { return max_pos.GetX(); }
     double GetHeight() const { return max_pos.GetY(); }
-    const Point<double> & GetMaxPosition() const { return max_pos; }
+    const Point & GetMaxPosition() const { return max_pos; }
 
-    std::vector<BODY_TYPE *> & GetBodySet() { return body_set; }
-    const std::vector<BODY_TYPE *> & GetConstBodySet() const { return body_set; }
+    emp::vector<BODY_TYPE *> & GetBodySet() { return body_set; }
+    const emp::vector<BODY_TYPE *> & GetConstBodySet() const { return body_set; }
 
     // Add a single body.  Surface now controls this body and must delete it.
     Surface2D & AddBody(BODY_TYPE * new_body) {
@@ -88,7 +86,7 @@ namespace emp {
       const double sector_width = max_pos.GetX() / (double) num_cols;
       const double sector_height = max_pos.GetY() / (double) num_rows;
 
-      std::vector< std::vector<BODY_TYPE *> > sector_set(num_sectors);
+      emp::vector< emp::vector<BODY_TYPE *> > sector_set(num_sectors);
 
 
       int hit_count = 0;

@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -35,7 +35,7 @@
 
 #include <string>
 
-#include "../tools/vector.h"
+#include "../base/vector.h"
 
 namespace emp {
   namespace cl {

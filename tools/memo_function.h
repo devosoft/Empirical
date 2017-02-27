@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -11,9 +11,9 @@
 
 #include <unordered_map>
 
+#include "../base/assert.h"
 #include "../meta/meta.h"
 
-#include "assert.h"
 #include "tuple_utils.h"
 
 namespace emp {

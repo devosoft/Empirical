@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -15,7 +15,7 @@
 //
 //    Canvas & Circle(double x, double y, double r,
 //                    const std::string & fc="", const std::string & lc="")
-//    Canvas & Circle(const emp::Circle<> & circle,
+//    Canvas & Circle(const emp::Circle & circle,
 //                    const std::string & fc="", const std::string & lc="")
 //    Canvas & Rect(double x, double y, double w, double h,
 //                    const std::string & fc="", const std::string & lc="")
@@ -31,8 +31,8 @@
 
 #include <string>
 
+#include "../base/vector.h"
 #include "../geometry/Circle2D.h"
-#include "../tools/vector.h"
 
 #include "CanvasAction.h"
 #include "CanvasShape.h"
@@ -137,7 +137,7 @@ namespace web {
       Info()->AddAction( new CanvasCircle(x, y, r, fc, lc) );
       return *this;
     }
-    Canvas & Circle(const emp::Circle<> & circle,
+    Canvas & Circle(const emp::Circle & circle,
                     const std::string & fc="", const std::string & lc="") {
       Info()->AddAction( new CanvasCircle(circle, fc, lc) );
       return *this;
@@ -147,14 +147,36 @@ namespace web {
       Info()->AddAction( new CanvasRect(x, y, w, h, fc, lc) );
       return *this;
     }
+    Canvas & Draw(const emp::Circle & circle,
+                    const std::string & fc="", const std::string & lc="") {
+      Info()->AddAction( new CanvasCircle(circle, fc, lc) );
+      return *this;
+    }
+    Canvas & Draw(const CanvasShape & shape) {
+      Info()->AddAction( shape.Clone() );
+      return *this;
+    }
+
     Canvas & StrokeColor(std::string c) {
       Info()->AddAction( new CanvasStrokeColor(c) );
+      return *this;
+    }
+    Canvas & Rotate(double angle) {
+      Info()->AddAction( new CanvasRotate(angle) );
       return *this;
     }
 
     Canvas & Clear() {
       Info()->ClearActions();
       Info()->AddAction( new CanvasClearRect(0, 0, GetWidth(), GetHeight()) );
+      return *this;
+    }
+
+    // Clear to a specific color!
+    Canvas & Clear(const std::string & bg_color) {
+      Info()->ClearActions();
+      Info()->AddAction( new CanvasClearRect(0, 0, GetWidth(), GetHeight()) );
+      Info()->AddAction( new CanvasRect(0, 0, GetWidth(), GetHeight(), bg_color, "") );
       return *this;
     }
 

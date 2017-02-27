@@ -1,12 +1,8 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is
-// Copyright (C) Michigan State University, 2015. It is licensed
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_TUPLE_STRUCT_H
-#define EMP_TUPLE_STRUCT_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2017.
+//  Released under the MIT Software license; see doc/LICENSE
 //
+
 ///  These macros will build a tuple and accessors to that tuple's members inside of a
 ///  class definintion.
 ///
@@ -64,19 +60,22 @@
 //  * Introspective tuples now also keep track of variable types and maintain an
 //    array of pointers to each element, which is very useful for doing operations on
 //    all memebrs of a tuple.
-//
+
+#ifndef EMP_TUPLE_STRUCT_H
+#define EMP_TUPLE_STRUCT_H
 
 #include <tuple>
-#include "macros.h"
 #include <typeinfo>
 #include <typeindex>
+
+#include "../base/macros.h"
 
 ///@cond SIMPLIFY
 // For each entry, we want to build accessors to easily get and set each value.
 #define EMP_BUILD_TUPLE_ACCESSORS(TUPLE_NAME, POS, TYPE, NAME)     \
   const TYPE & NAME() const { return std::get<POS>(TUPLE_NAME); }  \
   TYPE & NAME() { return std::get<POS>(TUPLE_NAME); }              \
-  TYPE & NAME(const typename std::decay<TYPE>::type & _in) {                \
+  TYPE & NAME(const typename std::decay<TYPE>::type & _in) {       \
     std::get<POS>(TUPLE_NAME) = _in;                               \
     return std::get<POS>(TUPLE_NAME);                              \
   }								   \

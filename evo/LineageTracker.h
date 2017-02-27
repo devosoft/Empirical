@@ -1,18 +1,18 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical/
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
-
-//This file defines objects to track the lineage of organisms in a world.
-//There is a null lineage tracker, a lineage tracker that tracks all organisms
-//that ever existed, and a lineage tracker that prunes out unnecessary organisms.
-//The pruning lineage tracker also sends out signals on coalesence.
-
-//Developer notes:
-// * A lot of this will break once organisms can die other than by being replaced
-// * Not super-well tested with EAWorlds (injecting things into an
-//   EAWorld in the middle of a run rather than at the beggining)
-//   may have strange results. This is also true for pruned lineage trackers,
-//   which assume injection is initialization.
+//
+//  This file defines objects to track the lineage of organisms in a world.
+//  There is a null lineage tracker, a lineage tracker that tracks all organisms
+//  that ever existed, and a lineage tracker that prunes out unnecessary organisms.
+//  The pruning lineage tracker also sends out signals on coalesence.
+//
+//  Developer notes:
+//  * A lot of this will break once organisms can die other than by being replaced
+//  * Not super-well tested with EAWorlds (injecting things into an
+//    EAWorld in the middle of a run rather than at the beggining)
+//    may have strange results. This is also true for pruned lineage trackers,
+//    which assume injection is initialization.
 
 #ifndef EMP_LINEAGE_TRACKER_H
 #define EMP_LINEAGE_TRACKER_H
@@ -23,7 +23,9 @@
 #include <unordered_set>
 #include <algorithm>
 #include <fstream>
-#include "../tools/vector.h"
+
+#include "../base/vector.h"
+
 #include "PopulationManager.h"
 
 template <typename org_ptr>
@@ -36,24 +38,21 @@ struct Node {
   emp::vector<Node*> offspring;
 };
 
-namespace std
-{
-    //from fredoverflow's answer to
-    //http://stackoverflow.com/questions/8026890/c-how-to-insert-array-into-hash-set
-    template<typename T> struct hash<Node<T> >
-    {
-        typedef Node<T> argument_type;
-        typedef std::size_t result_type;
-        result_type operator()(argument_type const& s) const
-        {
-            result_type const h1 ( std::hash<int>()(s.id) );
-            return h1;
-        }
-    };
+namespace std {
+  // from fredoverflow's answer to
+  // http://stackoverflow.com/questions/8026890/c-how-to-insert-array-into-hash-set
+  template<typename T> struct hash<Node<T> > {
+    typedef Node<T> argument_type;
+    typedef std::size_t result_type;
+    result_type operator()(argument_type const& s) const {
+      result_type const h1 ( std::hash<int>()(s.id) );
+      return h1;
+    }
+  };
 }
 
-namespace emp{
-namespace evo{
+namespace emp {
+namespace evo {
 
   template <typename POP_MANAGER = PopulationManager_Base<int> >
   class LineageTracker_Null {

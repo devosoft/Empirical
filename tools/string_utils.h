@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  This file contains a set of simple functions to manipulate strings.
@@ -13,8 +13,8 @@
 #include <sstream>
 #include <string>
 
+#include "../base/vector.h"
 #include "../meta/reflection.h"
-#include "vector.h"
 
 namespace emp {
 

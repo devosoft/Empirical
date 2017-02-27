@@ -1,20 +1,24 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  Setup a collection of functions, all with the same signature, that can be run as a group.
+//
 //  Derived from emp::vector, hence with all of the same methods as vector.
 
 #ifndef EMP_FUNCTION_SET_H
 #define EMP_FUNCTION_SET_H
 
 #include <functional>
-#include "vector.h"
+#include "../base/vector.h"
 
 namespace emp {
 
+  template <typename T> class FunctionSet;
+
   template <typename RETURN_T, typename... ARGS>
-  class FunctionSet : public emp::vector<std::function<RETURN_T(ARGS...)>> {
+  class FunctionSet<RETURN_T(ARGS...)> : public emp::vector<std::function<RETURN_T(ARGS...)>> {
   protected:
     mutable emp::vector<RETURN_T> return_vals;
 
@@ -74,7 +78,7 @@ namespace emp {
   // A specialized version for void functions.
 
   template <typename... ARGS>
-  class FunctionSet<void, ARGS...> : public emp::vector<std::function<void(ARGS...)>> {
+  class FunctionSet<void(ARGS...)> : public emp::vector<std::function<void(ARGS...)>> {
   public:
     FunctionSet() { ; }
     ~FunctionSet() { ; }

@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -14,7 +14,7 @@
 #ifndef EMP_WEB_TEXT_H
 #define EMP_WEB_TEXT_H
 
-#include "../tools/DynamicStringSet.h"
+#include "../tools/DynamicString.h"
 
 #include "Widget.h"
 
@@ -28,7 +28,7 @@ namespace web {
     class TextInfo : public internal::WidgetInfo {
       friend Text;
     protected:
-      DynamicStringSet strings;
+      DynamicString strings;
       bool append_ok;
 
       TextInfo(const std::string & in_id="") : internal::WidgetInfo(in_id), append_ok(true) { ; }

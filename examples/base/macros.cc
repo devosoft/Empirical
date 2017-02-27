@@ -1,7 +1,11 @@
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016-2017.
+//  Released under the MIT Software license; see doc/LICENSE
+
 #include <iostream>
 
 #include "../../meta/reflection.h"
-#include "../../tools/macros.h"
+#include "../../base/macros.h"
 
 void testing(int a) { std::cout << a << std::endl; }
 void testing(int a, int b) { std::cout << a+b << std::endl; }

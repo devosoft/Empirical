@@ -21,4 +21,14 @@ int main()
 
   constexpr double x = emp::Log(10, emp::E);
   std::cout << "x = " << x << std::endl;
+
+  std::cout << "emp::Mod(10, 7) = " << emp::Mod(10, 7) << " (expected 3)" << std::endl;
+  std::cout << "emp::Mod(3, 7) = " << emp::Mod(3, 7) << " (expected 3)" << std::endl;
+  std::cout << "emp::Mod(-4, 7) = " << emp::Mod(-4, 7) << " (expected 3)" << std::endl;
+  std::cout << "emp::Mod(-11, 7) = " << emp::Mod(-11, 7) << " (expected 3)" << std::endl;
+
+  std::cout << "emp::Pow(2,3) = " << emp::Pow(2,3) << " (expected 8)" << std::endl;
+  std::cout << "emp::Pow(-2,2) = " << emp::Pow(-2,2) << " (expected 4)" << std::endl;
+  std::cout << "emp::Pow(3,4) = " << emp::Pow(3,4) << " (expected 81)" << std::endl;
+
 }

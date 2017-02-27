@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -26,12 +26,13 @@
 
 #include <string>
 
+#include "../base/vector.h"
 #include "../tools/mem_track.h"
-#include "../tools/vector.h"
-#include "init.h"
 
 #include "Attributes.h"
 #include "events.h"
+#include "init.h"
+#include "Listeners.h"
 #include "Style.h"
 
 namespace emp {
@@ -176,6 +177,7 @@ namespace web {
       std::string id;                 // ID used for associated DOM element.
       Style style;                    // CSS Style
       Attributes attr;                // HTML Attributes about a class.
+      Listeners listen;               // Listen for web events
 
       // Track hiearchy
       WidgetInfo * parent;            // Which WidgetInfo is this one contained within?
@@ -301,6 +303,7 @@ namespace web {
           // Update the style
           style.Apply(id);
           attr.Apply(id);
+          listen.Apply(id);
 
           // Run associated Javascript code, if any (e.g., to fill out a canvas)
           TriggerJS();
@@ -458,7 +461,7 @@ namespace web {
         info->style.DoSet(setting, value);
         if (IsActive()) Style::Apply(info->id, setting, value);
       }
-      // Attr-related options may be overridden in derived classes that have multiple styles.
+      // Attr-related options may be overridden in derived classes that have multiple attributes.
       virtual void DoAttr(const std::string & setting, const std::string & value) {
         info->attr.DoSet(setting, value);
         if (IsActive()) Attributes::Apply(info->id, setting, value);
@@ -475,6 +478,11 @@ namespace web {
       RETURN_TYPE & SetAttr(const std::string & setting, SETTING_TYPE && value) {
         emp_assert(info != nullptr);
         DoAttr(setting, emp::to_string(value));
+        return (RETURN_TYPE &) *this;
+      }
+      RETURN_TYPE & On(const std::string & event_name, const std::function<void()> & fun) {
+        emp_assert(info != nullptr);
+        info->listen.Set(event_name, fun);
         return (RETURN_TYPE &) *this;
       }
 
@@ -494,7 +502,7 @@ namespace web {
         return SetAttr(setting2, val2, others...);    // Recurse to the others.
       }
 
-      // Allow multiple CSS or Attr settigns as a single object.
+      // Allow multiple CSS or Attr settings as a single object.
       // (still go through DoCSS/DoAttr given need for virtual re-routing.)
       RETURN_TYPE & SetCSS(const Style & in_style) {
         emp_assert(info != nullptr);

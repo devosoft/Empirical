@@ -1,20 +1,20 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include <string>
 #include <array>
 
-#include "../../web/init.h"
 #include "../../config/command_line.h"
+#include "../../base/assert.h"
+#include "../../base/vector.h"
+#include "../../tools/unit_tests.h"
+#include "../../web/init.h"
 #include "../../web/JSWrap.h"
 #include "../../web/js_utils.h"
-#include "../../tools/unit_tests.h"
-#include "../../tools/assert.h"
-#include "../../tools/vector.h"
 
 struct JSDataObject {
-    EMP_BUILD_INTROSPECTIVE_TUPLE(
+  EMP_BUILD_INTROSPECTIVE_TUPLE(
         int, val,
         std::string, word,
         double, val2

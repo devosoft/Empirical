@@ -1,7 +1,7 @@
 #ifndef EVO_ANIMATION_H
 #define EVO_ANIMATION_H
 
-#include "../web/web_init.h"
+#include "../web/init.h"
 #include "../web/Animate.h"
 #include "../web/JSWrap.h"
 #include "../tools/BitSet.h"

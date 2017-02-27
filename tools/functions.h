@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  A collection of broadly-useful functions.
@@ -12,10 +12,12 @@
 #include <iostream>
 #include <type_traits>
 #include <sstream>
-#include <vector>
 
-#include "assert.h"
+#include "../base/assert.h"
+#include "../base/vector.h"
+
 #include "const.h"
+#include "math.h"
 
 #define EMP_FUNCTION_TIMER(TEST_FUN) {                                       \
     std::clock_t emp_start_time = std::clock();                              \
@@ -39,17 +41,14 @@ namespace emp {
   // Toggle an input bool.
   inline bool Toggle(bool & in_bool) { return (in_bool = !in_bool); }
 
-  // Run both min and max on a value to put it into a desired range.
-  template <typename TYPE> constexpr TYPE ToRange(const TYPE & value, const TYPE & in_min, const TYPE & in_max) {
-    return (value < in_min) ? in_min : ((value > in_max) ? in_max : value);
-  }
 
-  static inline std::vector<int> BuildRange(int min, int max, int step=1) {
-    int size = (max-min) / step;
+  template <typename T>
+  static inline emp::vector<T> BuildRange(T min, T max, T step=1) {
+    size_t size = (size_t) ((max-min) / step);
     emp_assert(size >= 0);
-    std::vector<int> out_v((size_t) size);
+    emp::vector<T> out_v((size_t) size);
     size_t pos = 0;
-    for (int i = min; i < max; i += step) {
+    for (T i = min; i < max; i += step) {
       out_v[pos++] = i;
     }
     return out_v;
@@ -59,7 +58,6 @@ namespace emp {
   // Build a function to determine the size of a built-in array.
   template <typename T, size_t N>
   constexpr size_t GetSize(T (&)[N]) { return N; }
-
 
   // Build a function that will always return a unique value (and trip an assert if it can't...)
   static size_t UniqueVal() {

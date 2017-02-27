@@ -40,7 +40,7 @@ namespace web {
           }, style.c_str());
       }
       EM_ASM({ emp_i.ctx.stroke(); });
-      
+
     }
 
   public:
@@ -48,24 +48,40 @@ namespace web {
     CanvasAction(const CanvasAction &) { EMP_TRACK_CONSTRUCT(CanvasAction); }
     virtual ~CanvasAction() { EMP_TRACK_DESTRUCT(CanvasAction); }
 
-    
-    virtual void Apply() = 0;            // Apply current action to emp_i.ctx.
-    virtual CanvasAction * Clone() = 0;  // Make a copy of the current action.
+
+    virtual void Apply() = 0;                  // Apply current action to emp_i.ctx.
+    virtual CanvasAction * Clone() const = 0;  // Make a copy of the current action.
   };
 
 
   class CanvasStrokeColor : public CanvasAction {
+  protected:
     std::string color;
   public:
     CanvasStrokeColor(const std::string & c) : color(c) { ; }
 
     void Apply() {
       EM_ASM_ARGS({
-          var color = Pointer_stringify($0);
-          emp_i.ctx.strokeStyle = color;
-        }, color.c_str());
+        var color = Pointer_stringify($0);
+        emp_i.ctx.strokeStyle = color;
+      }, color.c_str());
     }
-    CanvasAction * Clone() { return new CanvasStrokeColor(*this); }
+    CanvasAction * Clone() const { return new CanvasStrokeColor(*this); }
+  };
+
+
+  class CanvasRotate : public CanvasAction {
+  protected:
+    double angle;
+  public:
+    CanvasRotate(double a) : angle(a) { ; }
+
+    void Apply() {
+      EM_ASM_ARGS({
+        emp_i.ctx.rotate($0);
+      }, angle);
+    }
+    CanvasAction * Clone() const { return new CanvasRotate(*this); }
   };
 
 

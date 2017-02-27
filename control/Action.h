@@ -51,12 +51,14 @@ namespace emp {
     int GetArgCount() const { return ARG_COUNT; }
   };
 
+  template <typename... ARGS> class Action;
+
   template <typename... ARGS>
-  class Action : public ActionSize<sizeof...(ARGS)> {
+  class Action<void(ARGS...)> : public ActionSize<sizeof...(ARGS)> {
   protected:
     std::function<void(ARGS...)> fun;
   public:
-    using this_t = Action<ARGS...>;
+    using this_t = Action<void(ARGS...)>;
     using parent_t = ActionSize<sizeof...(ARGS)>;
 
     Action(const std::function<void(ARGS...)> & in_fun, const std::string & in_name="")
@@ -79,8 +81,33 @@ namespace emp {
 
 
   template <typename RETURN, typename... ARGS>
+  class Action<RETURN(ARGS...)> : public ActionSize<sizeof...(ARGS)> {
+  protected:
+    std::function<RETURN(ARGS...)> fun;
+  public:
+    using fun_t = RETURN(ARGS...);
+    using this_t = Action<fun_t>;
+    using parent_t = ActionSize<sizeof...(ARGS)>;
+
+    Action(const std::function<RETURN(ARGS...)> & in_fun, const std::string & in_name="")
+      : parent_t(in_name), fun(in_fun) { ; }
+    Action(const this_t &) = default;
+    Action(this_t &&) = default;
+
+    this_t & operator=(const this_t &) = default;
+    this_t & operator=(this_t &&) = default;
+
+    const std::function<fun_t> & GetFun() const { return fun; };
+
+    RETURN Call(ARGS... args) { return fun(std::forward<ARGS>(args)...); }
+
+    this_t * Clone() const { return new this_t(*this); }
+  };
+
+
+  template <typename RETURN, typename... ARGS>
   auto make_action(const std::function<RETURN(ARGS...)> & in_fun, const std::string & name="") {
-    return Action<ARGS...>(in_fun, name);
+    return Action<RETURN(ARGS...)>(in_fun, name);
   }
 }
 

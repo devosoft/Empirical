@@ -12,7 +12,7 @@
 #include <map>
 #include <string>
 
-#include "../tools/vector.h"
+#include "../base/vector.h"
 
 #include "ConfigLexer.h"
 

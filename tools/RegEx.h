@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  Basic regular expression handler.
@@ -36,12 +36,13 @@
 #include <sstream>
 #include <string>
 
+#include "../base/vector.h"
+#include "../base/Ptr.h"
+
 #include "BitSet.h"
 #include "lexer_utils.h"
 #include "NFA.h"
-#include "Ptr.h"
 #include "string_utils.h"
-#include "vector.h"
 
 
 namespace emp {
