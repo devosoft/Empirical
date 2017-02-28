@@ -60,7 +60,7 @@ int main()
         break;
       case '*':   // List of options!
         // If we're adding a list of all nine options, use a smaller font.
-        table.GetCell(r,c).SetCSS("font", "15px/15px Calibri, sans-serif")
+        table.GetCell(r,c).SetCSS("font", "15px Calibri, sans-serif")
           << "<center>1 2 3<br>4 5 6<br>7 8 9</center>";
         break;
       default:    // Locked cell!
