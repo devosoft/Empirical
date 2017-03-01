@@ -518,7 +518,15 @@ namespace web {
         return (return_t &) *this;
       }
 
+      // Mouse event listeners
       template <typename T> return_t & OnClick(T && arg) { return On("click", arg); }
+      template <typename T> return_t & OnDoubleClick(T && arg) { return On("dblclick", arg); }
+      template <typename T> return_t & OnMouseDown(T && arg) { return On("mousedown", arg); }
+      template <typename T> return_t & OnMouseUp(T && arg) { return On("mouseup", arg); }
+      template <typename T> return_t & OnMouseMove(T && arg) { return On("mousemove", arg); }
+      template <typename T> return_t & OnMouseOut(T && arg) { return On("mouseout", arg); }
+      template <typename T> return_t & OnMouseOver(T && arg) { return On("mouseover", arg); }
+      template <typename T> return_t & OnMouseWheel(T && arg) { return On("mousewheel", arg); }
 
       // Allow multiple CSS or Attr settings to be grouped.
       template <typename T1, typename T2, typename... OTHER_SETTINGS>
