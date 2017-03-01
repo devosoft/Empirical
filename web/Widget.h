@@ -528,6 +528,16 @@ namespace web {
       template <typename T> return_t & OnMouseOver(T && arg) { return On("mouseover", arg); }
       template <typename T> return_t & OnMouseWheel(T && arg) { return On("mousewheel", arg); }
 
+      // Keyboard event listeners
+      template <typename T> return_t & OnKeydown(T && arg) { return On("keydown", arg); }
+      template <typename T> return_t & OnKeypress(T && arg) { return On("keypress", arg); }
+      template <typename T> return_t & OnKeyup(T && arg) { return On("keyup", arg); }
+
+      // Clipboard event listeners
+      template <typename T> return_t & OnCopy(T && arg) { return On("copy", arg); }
+      template <typename T> return_t & OnCut(T && arg) { return On("cut", arg); }
+      template <typename T> return_t & OnPaste(T && arg) { return On("paste", arg); }
+
       // Allow multiple CSS or Attr settings to be grouped.
       template <typename T1, typename T2, typename... OTHER_SETTINGS>
       return_t & SetCSS(const std::string & setting1, T1 && val1,
