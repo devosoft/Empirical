@@ -181,7 +181,7 @@ namespace evo{
     }
 
     // void SendResultsToViz(int update, emp::vector<double> & results){
-    //   for (int i=0; i < (int)viz_pointers.size(); ++i){
+    //   for (size_t i=0; i < viz_pointers.size(); ++i){
     //     emp::vector<double> values;
     //     for (int el : viz_args[i]) {
     //       if (el == -1){
@@ -214,7 +214,7 @@ namespace evo{
         skeleton_type skeleton(org.size());
         ORG test = ORG(org);
 
-        for (int i = 0; i < org.size(); i++) {
+        for (size_t i = 0; i < org.size(); i++) {
           test[i] = NULL_VAL;
           if (fit_fun(&test) >= fitness){
             skeleton[i] = NULL_VAL;
@@ -234,7 +234,7 @@ namespace evo{
         double fitness = fit_fun(&org);
         skeleton_type skeleton(org.size());
         ORG test = ORG(org);
-        for (int i = 0; i < (int) org.size(); i++) {
+        for (size_t i = 0; i < org.size(); i++) {
           test[i] = NULL_VAL;
           double fit = fit_fun(&test);
           //std::cout << i << " " << fit << " " << fitness << std::endl;
