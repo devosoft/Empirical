@@ -170,6 +170,7 @@ namespace web {
       emp::vector<Widget> children;  // Widgets contained in this cell.
 
       bool IsAnnotated() { return style || attr || listen; }
+      void Apply(const std::string & name) { style.Apply(name); attr.Apply(name); listen.Apply(name); }
 
     public:
       TableData() : colspan(1), rowspan(1), header(false), masked(false) { ; }
@@ -193,6 +194,7 @@ namespace web {
       Listeners listen;  // Listen for web events
 
       bool IsAnnotated() { return style || attr || listen; }
+      void Apply(const std::string & name) { style.Apply(name); attr.Apply(name); listen.Apply(name); }
 
     public:
       TableRow() { ; }
@@ -234,6 +236,7 @@ namespace web {
       Listeners listen;  // Listen for web events
 
       bool IsAnnotated() { return style || attr || listen; }
+      void Apply(const std::string & name) { style.Apply(name); attr.Apply(name); listen.Apply(name); }
 
     public:
       TableCol() { ; }
@@ -251,6 +254,7 @@ namespace web {
       Listeners listen;  // Listen for web events
 
       bool IsAnnotated() { return style || attr || listen; }
+      void Apply(const std::string & name) { style.Apply(name); attr.Apply(name); listen.Apply(name); }
 
     public:
       TableColGroup() : span(1), masked(false) { ; }
@@ -270,6 +274,7 @@ namespace web {
       Listeners listen;  // Listen for web events
 
       bool IsAnnotated() { return style || attr || listen; }
+      void Apply(const std::string & name) { style.Apply(name); attr.Apply(name); listen.Apply(name); }
 
     public:
       TableRowGroup() : span(1), masked(false) { ; }
@@ -620,11 +625,11 @@ namespace web {
 
         // Then replace cells
         for (size_t r = 0; r < row_count; r++) {
-          rows[r].style.Apply(emp::to_string(id, '_', r));
+          rows[r].Apply(emp::to_string(id, '_', r));
           for (size_t c = 0; c < col_count; c++) {
             auto & datum = rows[r][c];
             if (datum.masked) continue;  // If this cell is masked by another, skip it!
-            datum.style.Apply(emp::to_string(id, '_', r, '_', c));
+            datum.Apply(emp::to_string(id, '_', r, '_', c));
 
             // If this widget is active, immediately replace children.
             if (state == Widget::ACTIVE) {
@@ -638,19 +643,19 @@ namespace web {
         if (cols.size()) {
           for (size_t c = 0; c < col_count; c++) {
             if (cols[c].style.GetSize()==0) continue;
-            cols[c].style.Apply(emp::to_string(id, "_c", c));
+            cols[c].Apply(emp::to_string(id, "_c", c));
           }
         }
         if (col_groups.size()) {
           for (size_t c = 0; c < col_count; c++) {
             if (col_groups[c].masked || col_groups[c].style.GetSize()==0) continue;
-            col_groups[c].style.Apply(emp::to_string(id, "_cg", c));
+            col_groups[c].Apply(emp::to_string(id, "_cg", c));
           }
         }
         if (row_groups.size()) {
           for (size_t c = 0; c < col_count; c++) {
             if (row_groups[c].masked || row_groups[c].style.GetSize()==0) continue;
-            row_groups[c].style.Apply(emp::to_string(id, "_rg", c));
+            row_groups[c].Apply(emp::to_string(id, "_rg", c));
           }
         }
       }
