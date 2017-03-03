@@ -152,8 +152,10 @@ namespace web {
 
   namespace internal {
 
-    class TableElement {
-    protected:
+    struct TableRow;
+    class TableInfo;
+
+    struct TableElement {
       Style style;       // CSS Style
       Attributes attr;   // HTML Attributes about a cell.
       Listeners listen;  // Listen for web events
@@ -162,12 +164,7 @@ namespace web {
       void Apply(const std::string & name) { style.Apply(name); attr.Apply(name); listen.Apply(name); }
     };
 
-    class TableRow;
-    class TableInfo;
-
-    class TableData : public TableElement {
-      friend TableRow; friend Table; friend TableInfo;
-    protected:
+    struct TableData : public TableElement {
       size_t colspan;    // How many columns wide is this TableData?
       size_t rowspan;    // How many rows deep is this TableData?
       bool header;       // Is this TableData a header (<th> vs <td>)?
@@ -175,9 +172,7 @@ namespace web {
 
       emp::vector<Widget> children;  // Widgets contained in this cell.
 
-    public:
       TableData() : colspan(1), rowspan(1), header(false), masked(false) { ; }
-      ~TableData() { ; }
 
       bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
         bool ok = true;
@@ -188,20 +183,14 @@ namespace web {
     };  // END: TableData
 
 
-    class TableRow : public TableElement {
-      friend Table; friend TableInfo;
-    protected:
+    struct TableRow : public TableElement {
       emp::vector<TableData> data;  // detail object for each cell in this row.
 
-    public:
-      TableRow() { ; }
-      ~TableRow() { ; }
-
-      size_t GetSize() const { return data.size(); }                     // # of cells in this row
-      TableData & operator[](size_t id) { return data[id]; }             // Get a single cell
-      const TableData & operator[](size_t id) const { return data[id]; } // Get a single const cell
-
-      TableRow & SetCols(size_t c) { data.resize(c); return *this; }
+      // size_t GetSize() const { return data.size(); }                     // # of cells in this row
+      // TableData & operator[](size_t id) { return data[id]; }             // Get a single cell
+      // const TableData & operator[](size_t id) const { return data[id]; } // Get a single const cell
+      //
+      // TableRow & SetCols(size_t c) { data.resize(c); return *this; }
 
       // Apply to all cells in row.
       template <typename SETTING_TYPE>
@@ -281,7 +270,7 @@ namespace web {
         // Resize existing rows
         if (new_cols != col_count) {
           for (size_t r = 0; r < rows.size() && r < new_rows; r++) {
-            rows[r].SetCols(new_cols);
+            rows[r].data.resize(new_cols);
             for (size_t c = col_count; c < new_cols; c++) { AddChild(r, c, Text("")); }
           }
           col_count = new_cols;                    // Store the new column count
@@ -295,7 +284,7 @@ namespace web {
         if (new_rows != row_count) {
           rows.resize(new_rows);
           for (size_t r = row_count; r < new_rows; r++) {
-            rows[r].SetCols(col_count);
+            rows[r].data.resize(col_count);
             for (size_t c = 0; c < col_count; c++) { AddChild(r, c, Text("")); }
           }
           row_count = new_rows;
@@ -310,7 +299,7 @@ namespace web {
         // Activate all of the cell children.
         for (size_t r = 0; r < row_count; r++) {
           for (size_t c = 0; c < col_count; c++) {
-            for (auto & child : rows[r][c].children) child->DoActivate(false);
+            for (auto & child : rows[r].data[c].children) child->DoActivate(false);
           }
         }
 
@@ -323,12 +312,13 @@ namespace web {
       // If the last element is text, use it; otherwise build a new one.
       web::Text & GetTextWidget(size_t r, size_t c) {
         // If the final element is not text, add one.
-        if (rows[r][c].children.size() == 0
-            || rows[r][c].children.back().IsText() == false
-            || rows[r][c].children.back().AppendOK() == false)  {
+        auto & cell_children = rows[r].data[c].children;
+        if (cell_children.size() == 0
+            || cell_children.back().IsText() == false
+            || cell_children.back().AppendOK() == false)  {
           AddChild(Text());
         }
-        return (Text &) rows[r][c].children.back();
+        return (Text &) cell_children.back();
       }
 
       web::Text & GetTextWidget() {
@@ -354,7 +344,7 @@ namespace web {
         emp_assert(in->state != Widget::ACTIVE && "Cannot insert a stand-alone active widget!");
 
         // Setup parent-child relationship in the specified cell.
-        rows[r][c].children.emplace_back(in);
+        rows[r].data[c].children.emplace_back(in);
         in->parent = this;
         Register(in);
 
@@ -389,7 +379,7 @@ namespace web {
       void RegisterChildren(internal::SlateInfo * regestrar) override {
         for (size_t r = 0; r < row_count; r++) {
           for (size_t c = 0; c < col_count; c++) {
-            for (Widget & child : rows[r][c].children) regestrar->Register(child);
+            for (Widget & child : rows[r].data[c].children) regestrar->Register(child);
           }
         }
       }
@@ -397,7 +387,7 @@ namespace web {
       void UnregisterChildren(internal::SlateInfo * regestrar) override {
         for (size_t r = 0; r < row_count; r++) {
           for (size_t c = 0; c < col_count; c++) {
-            for (Widget & child : rows[r][c].children) regestrar->Unregister(child);
+            for (Widget & child : rows[r].data[c].children) regestrar->Unregister(child);
           }
         }
       }
@@ -442,8 +432,8 @@ namespace web {
           HTML << ">";
 
           // Loop through each cell in this row.
-          for (size_t c = 0; c < row.GetSize(); c++) {
-            auto & datum = row[c];
+          for (size_t c = 0; c < row.data.size(); c++) {
+            auto & datum = row.data[c];
             if (datum.masked) continue;  // If this cell is masked by another, skip it!
 
             // Print opening tag.
@@ -563,13 +553,13 @@ namespace web {
         // Recursively call OK on rows and data.
         for (size_t r = 0; r < row_count; r++) {
           ok = ok && rows[r].OK(ss, verbose, prefix+"  ");
-          if (col_count != rows[r].GetSize()) {
+          if (col_count != rows[r].data.size()) {
             ss << prefix << "  Error: col_count = " << col_count
-               << ", but row has " << rows[r].GetSize() << " elements." << std::endl;
+               << ", but row has " << rows[r].data.size() << " elements." << std::endl;
             ok = false;
           }
           for (size_t c = 0; c < col_count; c++) {
-            auto & cell = rows[r][c];
+            auto & cell = rows[r].data[c];
             if (c + cell.colspan > col_count) {
               ss << prefix << "  Error: Cell at row " << r << ", col " << c
                  << " extends past right side of table." << std::endl;
@@ -599,7 +589,7 @@ namespace web {
         for (size_t r = 0; r < row_count; r++) {
           rows[r].Apply(emp::to_string(id, '_', r));
           for (size_t c = 0; c < col_count; c++) {
-            auto & datum = rows[r][c];
+            auto & datum = rows[r].data[c];
             if (datum.masked) continue;  // If this cell is masked by another, skip it!
             datum.Apply(emp::to_string(id, '_', r, '_', c));
 
