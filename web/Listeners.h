@@ -87,6 +87,8 @@ namespace web {
       }
     }
 
+
+    operator bool() const { return (bool) listeners.size(); }
   };
 
 

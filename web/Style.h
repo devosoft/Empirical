@@ -160,6 +160,7 @@ namespace web {
 #endif
     }
 
+    operator bool() const { return (bool) settings.size(); }
   };
 
 
