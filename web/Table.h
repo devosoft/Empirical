@@ -159,13 +159,17 @@ namespace web {
     class TableData {
       friend TableRow; friend Table; friend TableInfo;
     protected:
-      size_t colspan; // How many columns wide is this TableData?
-      size_t rowspan; // How many rows deep is this TableData?
-      bool header;    // Is this TableData a header (<th> vs <td>)?
-      bool masked;    // Is this cell masked by another cell?
-      Style style;    // CSS Style
+      size_t colspan;    // How many columns wide is this TableData?
+      size_t rowspan;    // How many rows deep is this TableData?
+      bool header;       // Is this TableData a header (<th> vs <td>)?
+      bool masked;       // Is this cell masked by another cell?
+      Style style;       // CSS Style
+      Attributes attr;   // HTML Attributes about a cell.
+      Listeners listen;  // Listen for web events
 
       emp::vector<Widget> children;  // Widgets contained in this cell.
+
+      bool IsAnnotated() { return style || attr || listen; }
 
     public:
       TableData() : colspan(1), rowspan(1), header(false), masked(false) { ; }
@@ -184,7 +188,11 @@ namespace web {
       friend Table; friend TableInfo;
     protected:
       emp::vector<TableData> data;  // detail object for each cell in this row.
-      Style style;
+      Style style;       // CSS style for row
+      Attributes attr;   // HTML Attributes about a row
+      Listeners listen;  // Listen for web events
+
+      bool IsAnnotated() { return style || attr || listen; }
 
     public:
       TableRow() { ; }
@@ -221,7 +229,11 @@ namespace web {
     class TableCol {
       friend Table; friend TableInfo;
     protected:
-      Style style;
+      Style style;       // CSS for col
+      Attributes attr;   // HTML Attributes about a col
+      Listeners listen;  // Listen for web events
+
+      bool IsAnnotated() { return style || attr || listen; }
 
     public:
       TableCol() { ; }
@@ -231,9 +243,14 @@ namespace web {
     class TableColGroup {
       friend Table; friend TableInfo;
     protected:
-      Style style;
       size_t span;
       bool masked;
+
+      Style style;       // CSS for a column group
+      Attributes attr;   // HTML Attributes about a col group
+      Listeners listen;  // Listen for web events
+
+      bool IsAnnotated() { return style || attr || listen; }
 
     public:
       TableColGroup() : span(1), masked(false) { ; }
@@ -245,9 +262,14 @@ namespace web {
     class TableRowGroup {
       friend Table; friend TableInfo;
     protected:
-      Style style;
       size_t span;
       bool masked;
+
+      Style style;       // CSS for a row group
+      Attributes attr;   // HTML Attributes about a row group
+      Listeners listen;  // Listen for web events
+
+      bool IsAnnotated() { return style || attr || listen; }
 
     public:
       TableRowGroup() : span(1), masked(false) { ; }
@@ -420,11 +442,11 @@ namespace web {
           for (size_t c = 0; c < col_count; ++c) {
             if (use_colg && col_groups[c].masked == false) {
               HTML << "<colgroup";
-              if (col_groups[c].style.GetSize()) HTML << " id=" << id << "_cg" << c;
+              if (col_groups[c].IsAnnotated()) HTML << " id=" << id << "_cg" << c;
               HTML << ">";
             }
             HTML << "<col";
-            if (use_cols && cols[c].style.GetSize()) HTML << " id=" << id << "_c" << c;
+            if (use_cols && cols[c].IsAnnotated()) HTML << " id=" << id << "_c" << c;
             HTML << ">";
           }
         }
@@ -433,13 +455,13 @@ namespace web {
         for (size_t r = 0; r < rows.size(); r++) {
           if (use_rowg && row_groups[r].masked == false) {
             HTML << "<tbody";
-            if (row_groups[r].style.GetSize()) HTML << " id=" << id << "_rg" << r;
+            if (row_groups[r].IsAnnotated()) HTML << " id=" << id << "_rg" << r;
             HTML << ">";
           }
 
           auto & row = rows[r];
           HTML << "<tr";
-          if (row.style.GetSize()) HTML << " id=" << id << '_' << r;
+          if (row.IsAnnotated()) HTML << " id=" << id << '_' << r;
           HTML << ">";
 
           // Loop through each cell in this row.
@@ -451,7 +473,7 @@ namespace web {
             HTML << (datum.header ? "<th" : "<td");
 
             // Include an id for this cell if we have one.
-            if (datum.style.GetSize()) HTML << " id=" << id << '_' << r << '_' << c;
+            if (datum.IsAnnotated()) HTML << " id=" << id << '_' << r << '_' << c;
 
             // If this cell spans multiple rows or columns, indicate!
             if (datum.colspan > 1) HTML << " colspan=\"" << datum.colspan << "\"";
@@ -663,11 +685,11 @@ namespace web {
         break;
       case ROW:
         Info()->rows[cur_row].style.Set(setting, value);
-        // @CAO need to make change active immediately...
+        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
         break;
       case CELL:
         Info()->rows[cur_row].data[cur_col].style.Set(setting, value);
-        // @CAO need to make change active immediately...
+        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
         break;
       case COL:
         // If we haven't setup columns at all yet, do so.
@@ -801,6 +823,8 @@ namespace web {
       return Table(Info(), cur_row, cur_col, TABLE);
     }
 
+    web::Text GetTextWidget() { return Info()->GetTextWidget(); }
+
     // Update the current table object to change the active cell.
     Table & SetCellActive(size_t r, size_t c) {
       emp_assert(Info() != nullptr);
@@ -863,6 +887,12 @@ namespace web {
       return *this;
     }
 
+    // // Setup functions on events associated with portions of a table.
+    // RETURN_TYPE & OnCell(const std::string & event_name, const std::function<void(int,int)> & fun) {
+    //   emp_assert(info != nullptr);
+    //   info->listen.Set2Index(event_name, fun);
+    //   return (RETURN_TYPE &) *this;
+    // }
 
     // Apply to appropriate component based on current state.
     using WidgetFacet<Table>::SetCSS;
