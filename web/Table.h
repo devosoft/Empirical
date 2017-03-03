@@ -504,6 +504,8 @@ namespace web {
         datum.header = false;
         datum.masked = false;  // @CAO Technically, cell might still be masked!
         datum.style.Clear();
+        datum.attr.Clear();
+        datum.listen.Clear();
 
         // Clear out this cell's children.
         // @CAO: Keep a starting text widget if we can!
@@ -517,6 +519,8 @@ namespace web {
       }
       void ClearRow(size_t row_id) {
         rows[row_id].style.Clear();
+        rows[row_id].attr.Clear();
+        rows[row_id].listen.Clear();
         ClearRowCells(row_id);
       }
       void ClearTableCells() {
@@ -527,6 +531,8 @@ namespace web {
       }
       void ClearTable() {
         style.Clear();
+        attr.Clear();
+        listen.Clear();
         Resize(0,0);
       }
 
