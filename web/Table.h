@@ -165,14 +165,12 @@ namespace web {
     };
 
     struct TableData : public TableElement {
-      size_t colspan;    // How many columns wide is this TableData?
-      size_t rowspan;    // How many rows deep is this TableData?
-      bool header;       // Is this TableData a header (<th> vs <td>)?
-      bool masked;       // Is this cell masked by another cell?
+      size_t colspan=1;    // How many columns wide is this TableData?
+      size_t rowspan=1;    // How many rows deep is this TableData?
+      bool header=false;   // Is this TableData a header (<th> vs <td>)?
+      bool masked=false;   // Is this cell masked by another cell?
 
       emp::vector<Widget> children;  // Widgets contained in this cell.
-
-      TableData() : colspan(1), rowspan(1), header(false), masked(false) { ; }
 
       bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
         bool ok = true;
@@ -185,12 +183,6 @@ namespace web {
 
     struct TableRow : public TableElement {
       emp::vector<TableData> data;  // detail object for each cell in this row.
-
-      // size_t GetSize() const { return data.size(); }                     // # of cells in this row
-      // TableData & operator[](size_t id) { return data[id]; }             // Get a single cell
-      // const TableData & operator[](size_t id) const { return data[id]; } // Get a single const cell
-      //
-      // TableRow & SetCols(size_t c) { data.resize(c); return *this; }
 
       // Apply to all cells in row.
       template <typename SETTING_TYPE>
@@ -214,34 +206,16 @@ namespace web {
       }
     };
 
-    class TableCol : public TableElement {
-      friend Table; friend TableInfo;
+    struct TableCol : public TableElement { };  // Currently no column-specific info!
+
+    struct TableColGroup : public TableElement {
+      size_t span = 1;
+      bool masked = false;
     };
 
-    class TableColGroup : public TableElement {
-      friend Table; friend TableInfo;
-    protected:
-      size_t span;
-      bool masked;
-
-    public:
-      TableColGroup() : span(1), masked(false) { ; }
-      ~TableColGroup() { ; }
-
-      size_t GetSpan() const { return span; }
-    };
-
-    class TableRowGroup : public TableElement {
-      friend Table; friend TableInfo;
-    protected:
-      size_t span;
-      bool masked;
-
-    public:
-      TableRowGroup() : span(1), masked(false) { ; }
-      ~TableRowGroup() { ; }
-
-      size_t GetSpan() const { return span; }
+    struct TableRowGroup : public TableElement {
+      size_t span=1;
+      bool masked=false;
     };
 
     class TableInfo : public internal::WidgetInfo {
@@ -909,7 +883,7 @@ namespace web {
         // If we haven't setup columns at all yet, do so.
         if (Info()->row_groups.size() == 0) Info()->row_groups.resize(GetNumRows());
 
-        const size_t old_span = Info()->row_groups[cur_row].GetSpan();
+        const size_t old_span = Info()->row_groups[cur_row].span;
         Info()->row_groups[cur_row].span = new_span;
 
         if (old_span != new_span) {
@@ -954,7 +928,7 @@ namespace web {
         // If we haven't setup columns at all yet, do so.
         if (Info()->col_groups.size() == 0) Info()->col_groups.resize(GetNumCols());
 
-        const size_t old_span = Info()->col_groups[cur_col].GetSpan();
+        const size_t old_span = Info()->col_groups[cur_col].span;
         Info()->col_groups[cur_col].span = new_span;
 
         if (old_span != new_span) {
