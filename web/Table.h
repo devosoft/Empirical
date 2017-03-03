@@ -13,17 +13,13 @@
 //  TableData may be muliple cells wide/tall, masking other cells.
 //
 //  Constructors:
-//
 //    Table(size_t r, size_t c, const std::string & in_id="")
 //      Create a new r-by-c table with an optional DOM id specified.
 //      State is initialized to TABLE; the first row and first cell are default locations.
-//
 //    Table(const Widget & in)
 //      Point to an existing table (assert that widget IS a table!)
 //
-//
 //  Accessors:
-//
 //    size_t GetNumCols() const
 //    size_t GetNumRows() const
 //    size_t GetNumCells() const
@@ -33,17 +29,13 @@
 //    size_t GetCurCol() const { return cur_col; }
 //      Return information about the focal position on the table.
 //
-//
 //  Adjusting Table size:
-//
 //    Table & Rows(size_t r)
 //    Table & Cols(size_t c)
 //    Table & Resize(size_t r, size_t c)
 //      Set the number of rows, columns, or both in the table.
 //
-//
 //  Setting or identifying the current table state:
-//
 //    bool InStateTable() const
 //    bool InStateRow() const
 //    bool InStateCell() const
@@ -66,16 +58,12 @@
 //    Table & SetTableActive()
 //
 //  Modifying data in table
-//
 //    Table & SetHeader(bool _h=true)
 //      Set the current cell to be a header (or not if false is passed in)
-//
 //    Widget AddText(size_t r, size_t c, const std::string & text)
 //      Add text to the specified table cell.
-//
 //    Widget AddHeader(size_t r, size_t c, const std::string & text)
 //      Add text to the specified table cell AND set the cell to be a header.
-//
 //    Table & SetRowSpan(size_t row_span)
 //    Table & SetColSpan(size_t col_span)
 //    Table & SetSpan(size_t row_span, size_t col_span)
@@ -83,51 +71,39 @@
 //    Table & SetSpan(size_t new_span)
 //      Set the span of a row group or column group to the value provided.
 //
-//
 //  Clearing table contents:
-//
 //    Table & ClearTable()
 //      Clear all style information from table, remove contents from all cells, and
 //      shrink table to no rows and no cells.
-//
 //    Table & ClearRows()
 //      Clear style information from rows and cells and remove contents from cells
 //      (but leave table style information and size.)
-//
 //    Table & ClearRow(size_t r)
 //      Clear style information from the specified row and contents from all cells
 //      in that row (but leave other rows untouched).
-//
 //    Table & ClearCells()
 //      If state is TABLE, clear contents from all cells in entire table.
 //      If state is ROW or COL, clear contents from all cells in that row/column.
 //      If state is ROW_GROUP or COL_GROUP, clear contents of cells in all rows/cols in group
 //      If state is CELL, clear just that single cell.
-//
 //    Table & ClearCell(size_t r, size_t c)
 //      Clear contents of just the specified cell.
-//
 //    Table & Clear()
 //      Dynamically clear the entire active state
 //      (TABLE, ROW, COL, ROW_GROUP, COL_GROUP, or CELL).
 //
-//
 //  Style manipulation
-//
 //    std::string GetCSS(const std::string & setting)
 //    std::string GetCSS(const std::string & setting, SETTING_TYPE && value)
 //      Get or Set the current value of the specified Style setting, based on the state of
 //      the table (i.e., TABLE affects full table style, ROW affects active row style, and
 //      CELL affects active cell style.)
-//
 //    Table & RowCSS(size_t row_id, const std::string & setting, SETTING_TYPE && value)
 //    Table & CellCSS(size_t row_id, size_t col_id, const std::string & setting, SETTING_TYPE && value)
 //      Set the specified row or cell Style to the value indicated.
-//
 //    Table & RowsCSS(const std::string & setting, SETTING_TYPE && value)
 //    Table & CellsCSS(const std::string & setting, SETTING_TYPE && value)
 //      Set the specified Style setting of all rows or all cells to the value indicated.
-//
 //
 //  Developer notes:
 //  * Tables should more directly manage internal slates rather than just adding divs and
@@ -208,25 +184,21 @@ namespace web {
 
     struct TableCol : public TableElement { };  // Currently no column-specific info!
 
-    struct TableColGroup : public TableElement {
-      size_t span = 1;
-      bool masked = false;
-    };
-
-    struct TableRowGroup : public TableElement {
-      size_t span=1;
-      bool masked=false;
+    // Group of rows or columns...
+    struct TableGroup : public TableElement {
+      size_t span = 1;       // How many rows/columns does this group represent?
+      bool masked = false;   // Is the current group masked because of a previous span?
     };
 
     class TableInfo : public internal::WidgetInfo {
       friend Table;
     protected:
-      size_t row_count;                      // How big is this table?
+      size_t row_count;                    // How big is this table?
       size_t col_count;
-      emp::vector<TableRow> rows;            // Detail object for each row
-      emp::vector<TableCol> cols;            // Detail object for each column (if needed)
-      emp::vector<TableColGroup> col_groups; // Detail object for each column group (if needed)
-      emp::vector<TableRowGroup> row_groups; // Detail object for each row group (if needed)
+      emp::vector<TableRow> rows;          // Detail object for each row
+      emp::vector<TableCol> cols;          // Detail object for each column (if needed)
+      emp::vector<TableGroup> col_groups;  // Detail object for each column group (if needed)
+      emp::vector<TableGroup> row_groups;  // Detail object for each row group (if needed)
 
       size_t append_row;               // Which row is triggering an append?
       size_t append_col;               // Which col is triggering an append?
@@ -464,18 +436,9 @@ namespace web {
         rows[row_id].listen.Clear();
         ClearRowCells(row_id);
       }
-      void ClearTableCells() {
-        for (size_t row_id = 0; row_id < row_count; row_id++) ClearRowCells(row_id);
-      }
-      void ClearTableRows() {
-        for (size_t row_id = 0; row_id < row_count; row_id++) ClearRow(row_id);
-      }
-      void ClearTable() {
-        style.Clear();
-        attr.Clear();
-        listen.Clear();
-        Resize(0,0);
-      }
+      void ClearTableCells() { for (size_t r = 0; r < row_count; r++) ClearRowCells(r); }
+      void ClearTableRows() { for (size_t r = 0; r < row_count; r++) ClearRow(r); }
+      void ClearTable() { style.Clear(); attr.Clear(); listen.Clear(); Resize(0,0); }
 
       bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
         bool ok = true;
@@ -942,25 +905,6 @@ namespace web {
 
       return *this;
     }
-
-    // We can control properties of whole columns.
-    // Table & SetColSpan(size_t col_id, size_t new_span) {
-    //   emp_assert(col_id >= 0 && new_span >= 0);
-    //   emp_assert(col_id + new_span <= GetNumCols());
-
-    //   // If we haven't setup columns at all yet, do so.
-    //   if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
-
-    //   const size_t old_span = Info()->cols[col_id].GetSpan();
-    //   Info()->cols[col_id].span = new_span;
-
-    //   if (old_span != new_span) {
-    //     for (size_t i = old_span; i < new_span; i++) { Info()->cols[col_id + i].masked = true; }
-    //     for (size_t i = new_span; i < old_span; i++) { Info()->cols[col_id + i].masked = false; }
-    //   }
-
-    //   return *this;
-    // }
 
     Table & SetSpan(size_t new_span) {
       if (state == ROW_GROUP) return SetRowSpan(new_span);
