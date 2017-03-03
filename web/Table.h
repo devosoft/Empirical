@@ -129,7 +129,6 @@
 //      Set the specified Style setting of all rows or all cells to the value indicated.
 //
 //
-//
 //  Developer notes:
 //  * Tables should more directly manage internal slates rather than just adding divs and
 //    then having them filled in.
@@ -153,24 +152,28 @@ namespace web {
 
   namespace internal {
 
+    class TableElement {
+    protected:
+      Style style;       // CSS Style
+      Attributes attr;   // HTML Attributes about a cell.
+      Listeners listen;  // Listen for web events
+
+      bool IsAnnotated() { return style || attr || listen; }
+      void Apply(const std::string & name) { style.Apply(name); attr.Apply(name); listen.Apply(name); }
+    };
+
     class TableRow;
     class TableInfo;
 
-    class TableData {
+    class TableData : public TableElement {
       friend TableRow; friend Table; friend TableInfo;
     protected:
       size_t colspan;    // How many columns wide is this TableData?
       size_t rowspan;    // How many rows deep is this TableData?
       bool header;       // Is this TableData a header (<th> vs <td>)?
       bool masked;       // Is this cell masked by another cell?
-      Style style;       // CSS Style
-      Attributes attr;   // HTML Attributes about a cell.
-      Listeners listen;  // Listen for web events
 
       emp::vector<Widget> children;  // Widgets contained in this cell.
-
-      bool IsAnnotated() { return style || attr || listen; }
-      void Apply(const std::string & name) { style.Apply(name); attr.Apply(name); listen.Apply(name); }
 
     public:
       TableData() : colspan(1), rowspan(1), header(false), masked(false) { ; }
@@ -185,16 +188,10 @@ namespace web {
     };  // END: TableData
 
 
-    class TableRow {
+    class TableRow : public TableElement {
       friend Table; friend TableInfo;
     protected:
       emp::vector<TableData> data;  // detail object for each cell in this row.
-      Style style;       // CSS style for row
-      Attributes attr;   // HTML Attributes about a row
-      Listeners listen;  // Listen for web events
-
-      bool IsAnnotated() { return style || attr || listen; }
-      void Apply(const std::string & name) { style.Apply(name); attr.Apply(name); listen.Apply(name); }
 
     public:
       TableRow() { ; }
@@ -228,33 +225,15 @@ namespace web {
       }
     };
 
-    class TableCol {
+    class TableCol : public TableElement {
       friend Table; friend TableInfo;
-    protected:
-      Style style;       // CSS for col
-      Attributes attr;   // HTML Attributes about a col
-      Listeners listen;  // Listen for web events
-
-      bool IsAnnotated() { return style || attr || listen; }
-      void Apply(const std::string & name) { style.Apply(name); attr.Apply(name); listen.Apply(name); }
-
-    public:
-      TableCol() { ; }
-      ~TableCol() { ; }
     };
 
-    class TableColGroup {
+    class TableColGroup : public TableElement {
       friend Table; friend TableInfo;
     protected:
       size_t span;
       bool masked;
-
-      Style style;       // CSS for a column group
-      Attributes attr;   // HTML Attributes about a col group
-      Listeners listen;  // Listen for web events
-
-      bool IsAnnotated() { return style || attr || listen; }
-      void Apply(const std::string & name) { style.Apply(name); attr.Apply(name); listen.Apply(name); }
 
     public:
       TableColGroup() : span(1), masked(false) { ; }
@@ -263,18 +242,11 @@ namespace web {
       size_t GetSpan() const { return span; }
     };
 
-    class TableRowGroup {
+    class TableRowGroup : public TableElement {
       friend Table; friend TableInfo;
     protected:
       size_t span;
       bool masked;
-
-      Style style;       // CSS for a row group
-      Attributes attr;   // HTML Attributes about a row group
-      Listeners listen;  // Listen for web events
-
-      bool IsAnnotated() { return style || attr || listen; }
-      void Apply(const std::string & name) { style.Apply(name); attr.Apply(name); listen.Apply(name); }
 
     public:
       TableRowGroup() : span(1), masked(false) { ; }
