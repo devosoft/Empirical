@@ -213,7 +213,7 @@ namespace web {
       virtual bool IsTableInfo() const override { return true; }
 
       void Resize(size_t new_rows, size_t new_cols) {
-        // Resize existing rows
+        // Resize preexisting rows if remaining
         if (new_cols != col_count) {
           for (size_t r = 0; r < rows.size() && r < new_rows; r++) {
             rows[r].data.resize(new_cols);
@@ -221,7 +221,7 @@ namespace web {
           }
           col_count = new_cols;                    // Store the new column count
 
-          // Resize extra column info, only if needed.
+          // Resize extra column info, only if currently in use.
           if (cols.size()) cols.resize(new_cols);
           if (col_groups.size()) col_groups.resize(new_cols);
         }
@@ -254,11 +254,10 @@ namespace web {
       }
 
 
-      // Return a text element for appending into a specific cell.
-      // If the last element is text, use it; otherwise build a new one.
+      // Return a text element for appending into a specific cell (use existing one or build new)
       web::Text & GetTextWidget(size_t r, size_t c) {
-        // If the final element is not text, add one.
         auto & cell_children = rows[r].data[c].children;
+        // If final element in this cell doesn't exists, isn't text, or can't append, but new Text!
         if (cell_children.size() == 0
             || cell_children.back().IsText() == false
             || cell_children.back().AppendOK() == false)  {
@@ -282,8 +281,6 @@ namespace web {
         return GetTextWidget() << in_fun;
       }
 
-
-
       // Add a widget to the specified cell in the current table.
       void AddChild(size_t r, size_t c, Widget in) {
         emp_assert(in->parent == nullptr && "Cannot insert widget if already has parent!", in->id);
@@ -293,7 +290,6 @@ namespace web {
         rows[r].data[c].children.emplace_back(in);
         in->parent = this;
         Register(in);
-
 
         // If this element (as new parent) is active, anchor widget and activate it!
         if (state == Widget::ACTIVE) {
@@ -338,10 +334,9 @@ namespace web {
         }
       }
 
-
       virtual void GetHTML(std::stringstream & HTML) override {
-        emp_assert(cols.size() == 0 || cols.size() == (std::size_t) col_count);
-        emp_assert(col_groups.size() == 0 || col_groups.size() == (std::size_t) col_count);
+        emp_assert(cols.size() == 0 || cols.size() == col_count);
+        emp_assert(col_groups.size() == 0 || col_groups.size() == col_count);
 
         HTML.str("");                                           // Clear the current text.
         HTML << "<table id=\"" << id << "\">";
@@ -409,7 +404,6 @@ namespace web {
         HTML << "</table>";
       }
 
-
       void ClearCell(size_t row_id, size_t col_id) {
         auto & datum = rows[row_id].data[col_id];
         datum.colspan = 1;
@@ -420,11 +414,8 @@ namespace web {
         datum.attr.Clear();
         datum.listen.Clear();
 
-        // Clear out this cell's children.
-        // @CAO: Keep a starting text widget if we can!
-        if (parent) {
-          for (Widget & child : datum.children) parent->Unregister(child);
-        }
+        // Clear out this cell's children.   @CAO: Keep a starting text widget if we can?
+        if (parent) for (Widget & child : datum.children) parent->Unregister(child);
         datum.children.resize(0);
       }
       void ClearRowCells(size_t row_id) {
@@ -513,11 +504,10 @@ namespace web {
         return ok;
       }
 
-
       void ReplaceHTML() override {
-        emp_assert(cols.size() == 0 || cols.size() == (std::size_t) col_count);
-        emp_assert(col_groups.size() == 0 || col_groups.size() == (std::size_t) col_count);
-        emp_assert(row_groups.size() == 0 || row_groups.size() == (std::size_t) row_count);
+        emp_assert(cols.size() == 0 || cols.size() == col_count);
+        emp_assert(col_groups.size() == 0 || col_groups.size() == col_count);
+        emp_assert(row_groups.size() == 0 || row_groups.size() == row_count);
 
         // Replace Table's HTML...
         internal::WidgetInfo::ReplaceHTML();
@@ -534,7 +524,6 @@ namespace web {
             if (state == Widget::ACTIVE) {
               for (auto & child : datum.children) child->ReplaceHTML();
             }
-
           }
         }
 
@@ -559,7 +548,6 @@ namespace web {
         }
       }
 
-
     public:
       virtual std::string GetType() override { return "web::TableInfo"; }
     }; // end TableInfo
@@ -571,14 +559,12 @@ namespace web {
   class Table : public internal::WidgetFacet<Table> {
     friend class internal::TableInfo;
   protected:
-
     size_t cur_row;      // Which row/col is currently active?
     size_t cur_col;
 
     // A table's state determines how some operations work.
     enum state_t { TABLE, ROW, CELL, COL, COL_GROUP, ROW_GROUP };
     state_t state;
-
 
     // Get a properly cast version of indo.
     internal::TableInfo * Info() { return (internal::TableInfo *) info; }
@@ -622,7 +608,6 @@ namespace web {
     }
 
   public:
-
     Table(size_t r, size_t c, const std::string & in_id="")
       : WidgetFacet(in_id), cur_row(0), cur_col(0), state(TABLE)
     {
@@ -685,7 +670,7 @@ namespace web {
     }
     Table & ClearCell(size_t r, size_t c) { Info()->ClearCell(r, c); return *this; }
 
-
+    // Functions to resize the number of rows, columns, or both!
     Table & Rows(size_t r) {
       Info()->Resize(r, Info()->col_count);
       if (cur_row >= r) cur_row = 0;
@@ -710,23 +695,19 @@ namespace web {
       return Table(Info(), r, c, CELL);
     }
     Table GetRow(size_t r) {
-      emp_assert(r < Info()->row_count,
-                 r, Info()->row_count, GetID());
+      emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
       return Table(Info(), r, 0, ROW);
     }
     Table GetCol(size_t c) {
-      emp_assert(c < Info()->col_count,
-                 c, Info()->col_count, GetID());
+      emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
       return Table(Info(), 0, c, COL);
     }
     Table GetRowGroup(size_t r) {
-      emp_assert(r < Info()->row_count,
-                 r, Info()->row_count, GetID());
+      emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
       return Table(Info(), r, 0, ROW_GROUP);
     }
     Table GetColGroup(size_t c) {
-      emp_assert(c < Info()->col_count,
-                 c, Info()->col_count, GetID());
+      emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
       return Table(Info(), 0, c, COL_GROUP);
     }
     Table GetTable() {
@@ -745,39 +726,33 @@ namespace web {
       return *this;
     }
     Table & SetRowActive(size_t r) {
-      emp_assert(r < Info()->row_count,
-                 r, Info()->row_count, GetID());
+      emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
       cur_row = r; cur_col = 0;
       state = ROW;
       return *this;
     }
     Table & SetColActive(size_t c) {
-      emp_assert(c < Info()->col_count,
-                 c, Info()->col_count, GetID());
+      emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
       cur_col = c; cur_row = 0;
       state = COL;
       return *this;
     }
     Table & SetRowGroupActive(size_t r) {
-      emp_assert(r < Info()->row_count,
-                 r, Info()->row_count, GetID());
+      emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
       cur_row = r; cur_col = 0;
       state = ROW_GROUP;
       return *this;
     }
     Table & SetColGroupActive(size_t c) {
-      emp_assert(c < Info()->col_count,
-                 c, Info()->col_count, GetID());
+      emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
       cur_col = c; cur_row = 0;
       state = COL_GROUP;
       return *this;
     }
-    Table & SetTableActive() {
-      // Leave row and col where they are.
+    Table & SetTableActive() { // Set focus to table; leave row and col where they are.
       state = TABLE;
       return *this;
     }
-
 
     Table & SetHeader(bool _h=true) {
       emp_assert(state == CELL);
@@ -920,7 +895,6 @@ namespace web {
       SetColSpan(col_span);
       return *this;
     }
-
 
     // Apply to target row.
     template <typename SETTING_TYPE>
