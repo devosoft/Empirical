@@ -1,0 +1,6 @@
+This folder contains code that can be used without any includes beyond the standard library.
+
+Most files are from the Empirical tools directory, but modified to use the (less safe)
+std:: version of classes and asserts.  Each file will be marked in its header when it was
+last converted.
+
