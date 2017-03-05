@@ -21,29 +21,29 @@ extern "C" {
 
 namespace emp {
 
-  static bool Initialize() {
-
-    // Make sure we only initialize once!
-    static bool init = false;
-    if (init) return false;
+  static void Initialize() {
+    static bool init = false;      // Make sure we only initialize once!
+    if (!init) EMP_Initialize();   // Call JS initializations
     init = true;
+  }
 
-    // Setup everything that needs to be initialized on the JS side...
-    EMP_Initialize();
+  static void InitializeAnim() {
+    static bool init = false;      // Make sure we only initialize once!
+    if (!init) {
+      // Setup the animation callback in Javascript
+      EM_ASM({
+        window.requestAnimFrame = (function(callback) {
+            return window.requestAnimationFrame
+              || window.webkitRequestAnimationFrame
+              || window.mozRequestAnimationFrame
+              || window.oRequestAnimationFrame
+              || window.msRequestAnimationFrame
+              || function(callback) { window.setTimeout(callback, 1000 / 60); };
+          })();
+      });
+    }
 
-    // Setup the animation callback in Javascript
-    EM_ASM({
-      window.requestAnimFrame = (function(callback) {
-          return window.requestAnimationFrame
-            || window.webkitRequestAnimationFrame
-            || window.mozRequestAnimationFrame
-            || window.oRequestAnimationFrame
-            || window.msRequestAnimationFrame
-            || function(callback) { window.setTimeout(callback, 1000 / 60); };
-        })();
-    });
-
-    return true;
+    init = true;
   }
 
   namespace web {
@@ -72,8 +72,7 @@ namespace emp {
 }
 
 
-///////////////////////////////////////////////////////////////////
-//  Initialization for NON emscripten to ignore macros.
+// === Initialization for NON-emscripten to ignore macros ===
 
 #else
 
