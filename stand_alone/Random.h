@@ -2,6 +2,8 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//  Converted to stand-alone: March 4, 2017
+//
 //
 //  A versatile and non-patterned pseudo-random-number generator.
 //
