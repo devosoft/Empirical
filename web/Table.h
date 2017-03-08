@@ -122,6 +122,7 @@
 
 #include "Slate.h"
 #include "Widget.h"
+#include "WidgetExtras.h"
 
 namespace emp {
 namespace web {
@@ -131,16 +132,7 @@ namespace web {
     struct TableRow;
     class TableInfo;
 
-    struct TableElement {
-      Style style;       // CSS Style
-      Attributes attr;   // HTML Attributes about a cell.
-      Listeners listen;  // Listen for web events
-
-      bool IsAnnotated() { return style || attr || listen; }
-      void Apply(const std::string & name) { style.Apply(name); attr.Apply(name); listen.Apply(name); }
-    };
-
-    struct TableData : public TableElement {
+    struct TableData : public WidgetExtras {
       size_t colspan=1;    // How many columns wide is this TableData?
       size_t rowspan=1;    // How many rows deep is this TableData?
       bool header=false;   // Is this TableData a header (<th> vs <td>)?
@@ -157,7 +149,7 @@ namespace web {
     };  // END: TableData
 
 
-    struct TableRow : public TableElement {
+    struct TableRow : public WidgetExtras {
       emp::vector<TableData> data;  // detail object for each cell in this row.
 
       // Apply to all cells in row.
@@ -182,10 +174,10 @@ namespace web {
       }
     };
 
-    struct TableCol : public TableElement { };  // Currently no column-specific info!
+    struct TableCol : public WidgetExtras { };  // Currently no column-specific info!
 
     // Group of rows or columns...
-    struct TableGroup : public TableElement {
+    struct TableGroup : public WidgetExtras {
       size_t span = 1;       // How many rows/columns does this group represent?
       bool masked = false;   // Is the current group masked because of a previous span?
     };
