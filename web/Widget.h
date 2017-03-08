@@ -29,11 +29,9 @@
 #include "../base/vector.h"
 #include "../tools/mem_track.h"
 
-#include "Attributes.h"
 #include "events.h"
 #include "init.h"
-#include "Listeners.h"
-#include "Style.h"
+#include "WidgetExtras.h"
 
 namespace emp {
 namespace web {
@@ -181,9 +179,7 @@ namespace web {
 
       // Basic info about a widget
       std::string id;                 // ID used for associated DOM element.
-      Style style;                    // CSS Style
-      Attributes attr;                // HTML Attributes about a class.
-      Listeners listen;               // Listen for web events
+      WidgetExtras extras;            // HTML attributes, CSS style, and listeners for web events.
 
       // Track hiearchy
       WidgetInfo * parent;            // Which WidgetInfo is this one contained within?
@@ -306,19 +302,13 @@ namespace web {
 
         // If active update style, trigger JS, and recurse to children!
         if (state == Widget::ACTIVE) {
-          // Update the style
-          style.Apply(id);
-          attr.Apply(id);
-          listen.Apply(id);
-
-          // Run associated Javascript code, if any (e.g., to fill out a canvas)
-          TriggerJS();
+          extras.Apply(id); // Update the attributes, style, and listeners.
+          TriggerJS();      // Run associated Javascript code, if any (e.g., to fill out a canvas)
         }
       }
 
     public:
       virtual std::string GetType() { return "web::WidgetInfo"; }
-
     };
 
   }  // end namespaceinternal
@@ -386,17 +376,17 @@ namespace web {
   bool Widget::TextOK() const { if (!info) return false; return info->IsTextInfo(); }
 
   std::string Widget::GetCSS(const std::string & setting) {
-    return info ? info->style.Get(setting) : "";
+    return info ? info->extras.GetStyle(setting) : "";
   }
   bool Widget::HasCSS(const std::string & setting) {
-    return info ? info->style.Has(setting) : false;
+    return info ? info->extras.HasStyle(setting) : false;
   }
 
   std::string Widget::GetAttr(const std::string & setting) {
-    return info ? info->attr.Get(setting) : "";
+    return info ? info->extras.GetAttr(setting) : "";
   }
   bool Widget::HasAttr(const std::string & setting) {
-    return info ? info->attr.Has(setting) : false;
+    return info ? info->extras.HasAttr(setting) : false;
   }
 
   int Widget::GetXPos() {
@@ -482,12 +472,12 @@ namespace web {
 
       // CSS-related options may be overridden in derived classes that have multiple styles.
       virtual void DoCSS(const std::string & setting, const std::string & value) {
-        info->style.DoSet(setting, value);
+        info->extras.style.DoSet(setting, value);
         if (IsActive()) Style::Apply(info->id, setting, value);
       }
       // Attr-related options may be overridden in derived classes that have multiple attributes.
       virtual void DoAttr(const std::string & setting, const std::string & value) {
-        info->attr.DoSet(setting, value);
+        info->extras.attr.DoSet(setting, value);
         if (IsActive()) Attributes::Apply(info->id, setting, value);
       }
 
@@ -508,13 +498,13 @@ namespace web {
       }
       return_t & On(const std::string & event_name, const std::function<void()> & fun) {
         emp_assert(info != nullptr);
-        info->listen.Set(event_name, fun);
+        info->extras.listen.Set(event_name, fun);
         return (return_t &) *this;
       }
       return_t & On(const std::string & event_name,
                        const std::function<void(MouseEvent evt)> & fun) {
         emp_assert(info != nullptr);
-        info->listen.Set(event_name, fun);
+        info->extras.listen.Set(event_name, fun);
         return (return_t &) *this;
       }
 

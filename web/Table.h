@@ -420,7 +420,7 @@ namespace web {
       }
       void ClearTableCells() { for (size_t r = 0; r < row_count; r++) ClearRowCells(r); }
       void ClearTableRows() { for (size_t r = 0; r < row_count; r++) ClearRow(r); }
-      void ClearTable() { style.Clear(); attr.Clear(); listen.Clear(); Resize(0,0); }
+      void ClearTable() { extras.Clear(); Resize(0,0); }
 
       bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
         bool ok = true;
@@ -773,12 +773,12 @@ namespace web {
     // Apply to appropriate component based on current state.
     using WidgetFacet<Table>::SetCSS;
     std::string GetCSS(const std::string & setting) override {
-      if (state == CELL) return Info()->rows[cur_row].data[cur_col].extras.style.Get(setting);
-      if (state == ROW) return Info()->rows[cur_row].extras.style.Get(setting);
-      if (state == COL) return Info()->cols[cur_col].extras.style.Get(setting);
-      if (state == ROW_GROUP) return Info()->row_groups[cur_row].extras.style.Get(setting);
-      if (state == COL_GROUP) return Info()->col_groups[cur_col].extras.style.Get(setting);
-      if (state == TABLE) return Info()->style.Get(setting);
+      if (state == CELL) return Info()->rows[cur_row].data[cur_col].extras.GetStyle(setting);
+      if (state == ROW) return Info()->rows[cur_row].extras.GetStyle(setting);
+      if (state == COL) return Info()->cols[cur_col].extras.GetStyle(setting);
+      if (state == ROW_GROUP) return Info()->row_groups[cur_row].extras.GetStyle(setting);
+      if (state == COL_GROUP) return Info()->col_groups[cur_col].extras.GetStyle(setting);
+      if (state == TABLE) return Info()->extras.GetStyle(setting);
       return "";
     }
 
