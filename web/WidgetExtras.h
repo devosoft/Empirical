@@ -26,17 +26,22 @@ namespace web {
     Attributes attr;   // HTML Attributes about a cell.
     Listeners listen;  // Listen for web events
 
-    bool IsAnnotated() { return style || attr || listen; }
     void Apply(const std::string & name) {
       style.Apply(name);
       attr.Apply(name);
       listen.Apply(name);
     }
+
+    void Clear() {
+      style.Clear();
+      attr.Clear();
+      listen.Clear();
+    }
+
+    operator bool() const { return style || attr || listen; } // Return true if any extras are set.
   };
 
 }
 }
 
 #endif
-
-
