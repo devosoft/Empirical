@@ -89,7 +89,6 @@ namespace web {
 
 
     // Apply a SPECIFIC listener.
-    template <typename... Ts>
     static void Apply(const std::string & widget_id,
                       const std::string event_name,
                       size_t fun_id) {
