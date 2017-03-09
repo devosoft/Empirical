@@ -88,6 +88,24 @@ namespace web {
     }
 
 
+    // Apply a SPECIFIC listener.
+    template <typename... Ts>
+    static void Apply(const std::string & widget_id,
+                      const std::string event_name,
+                      size_t fun_id) {
+#ifdef EMSCRIPTEN
+        EM_ASM_ARGS({
+          var id = Pointer_stringify($0);
+          var name = Pointer_stringify($1);
+          $( '#' + id ).on( name, function(evt) { emp.Callback($2, evt); } );
+        }, widget_id.c_str(), event_name.c_str(), fun_id);
+#else
+        std::cout << "Setting '" << widget_id << "' listener '" << event_name
+                  << "' to function id '" << fun_id << "'.";
+#endif
+    }
+
+
     operator bool() const { return (bool) listeners.size(); }
   };
 
