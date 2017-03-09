@@ -480,6 +480,19 @@ namespace web {
         info->extras.attr.DoSet(setting, value);
         if (IsActive()) Attributes::Apply(info->id, setting, value);
       }
+      // Listener options may be overridden in derived classes that have multiple listen targets.
+      virtual void DoListen(const std::string & event_name,
+                        const std::function<void()> & fun) {
+        info->extras.listen.Set(event_name, fun);
+        size_t fun_id = info->extras.listen.GetID(event_name);
+        if (IsActive()) Listeners::Apply(info->id, event_name, fun_id);
+      }
+      virtual void DoListen(const std::string & event_name,
+                        const std::function<void(MouseEvent evt)> & fun) {
+        info->extras.listen.Set(event_name, fun);
+        size_t fun_id = info->extras.listen.GetID(event_name);
+        if (IsActive()) Listeners::Apply(info->id, event_name, fun_id);
+      }
 
     public:
       using return_t = RETURN_TYPE;
@@ -498,13 +511,13 @@ namespace web {
       }
       return_t & On(const std::string & event_name, const std::function<void()> & fun) {
         emp_assert(info != nullptr);
-        info->extras.listen.Set(event_name, fun);
+        DoListen(event_name, fun);
         return (return_t &) *this;
       }
       return_t & On(const std::string & event_name,
-                       const std::function<void(MouseEvent evt)> & fun) {
+                    const std::function<void(MouseEvent evt)> & fun) {
         emp_assert(info != nullptr);
-        info->extras.listen.Set(event_name, fun);
+        DoListen(event_name, fun);
         return (return_t &) *this;
       }
 
