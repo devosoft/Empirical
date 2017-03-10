@@ -43,8 +43,8 @@ namespace emp {
     // Convert input arguments to a vector of strings for easier processing.
     emp::vector<std::string> args_to_strings(int argc, char* argv[]) {
       emp::vector<std::string> args;
-      for (int i = 0; i < argc; i++) {
-        args.push_back(argv[(size_t)i]);
+      for (size_t i = 0; i < (size_t) argc; i++) {
+        args.push_back(argv[i]);
       }
       return args;
     }
