@@ -632,6 +632,40 @@ namespace web {
       };
     }
 
+    // Apply CSS to appropriate component based on current state.
+    void DoListen(const std::string & event_name, size_t fun_id) override {
+      switch (state) {
+      case TABLE:
+        WidgetFacet<Table>::DoListen(event_name, fun_id);
+        break;
+      case ROW:
+        Info()->rows[cur_row].extras.listen.Set(event_name, fun_id);
+        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
+        break;
+      case CELL:
+        Info()->rows[cur_row].data[cur_col].extras.listen.Set(event_name, fun_id);
+        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
+        break;
+      case COL:
+        // If we haven't setup columns at all yet, do so.
+        if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
+        Info()->cols[cur_col].extras.listen.Set(event_name, fun_id);
+        break;
+      case COL_GROUP:
+        // If we haven't setup column groups at all yet, do so.
+        if (Info()->col_groups.size() == 0) Info()->col_groups.resize(GetNumCols());
+        Info()->col_groups[cur_col].extras.listen.Set(event_name, fun_id);
+        break;
+      case ROW_GROUP:
+        // If we haven't setup row groups at all yet, do so.
+        if (Info()->row_groups.size() == 0) Info()->row_groups.resize(GetNumRows());
+        Info()->row_groups[cur_row].extras.listen.Set(event_name, fun_id);
+        break;
+      default:
+        emp_assert(false && "Table in unknown state!");
+      };
+    }
+
   public:
     Table(size_t r, size_t c, const std::string & in_id="")
       : WidgetFacet(in_id), cur_row(0), cur_col(0), state(TABLE)
