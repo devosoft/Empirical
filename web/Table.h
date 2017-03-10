@@ -564,7 +564,7 @@ namespace web {
     Table(internal::TableInfo * in_info, size_t _row=0, size_t _col=0, state_t _state=TABLE)
      : WidgetFacet(in_info), cur_row(_row), cur_col(_col), state(_state) { ; }
 
-    // Apply to appropriate component based on current state.
+    // Apply CSS to appropriate component based on current state.
     void DoCSS(const std::string & setting, const std::string & value) override {
       switch (state) {
       case TABLE:
@@ -592,6 +592,40 @@ namespace web {
         // If we haven't setup row groups at all yet, do so.
         if (Info()->row_groups.size() == 0) Info()->row_groups.resize(GetNumRows());
         Info()->row_groups[cur_row].extras.style.Set(setting, value);
+        break;
+      default:
+        emp_assert(false && "Table in unknown state!");
+      };
+    }
+
+    // Apply CSS to appropriate component based on current state.
+    void DoAttr(const std::string & setting, const std::string & value) override {
+      switch (state) {
+      case TABLE:
+        WidgetFacet<Table>::DoAttr(setting, value);
+        break;
+      case ROW:
+        Info()->rows[cur_row].extras.attr.Set(setting, value);
+        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
+        break;
+      case CELL:
+        Info()->rows[cur_row].data[cur_col].extras.attr.Set(setting, value);
+        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
+        break;
+      case COL:
+        // If we haven't setup columns at all yet, do so.
+        if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
+        Info()->cols[cur_col].extras.attr.Set(setting, value);
+        break;
+      case COL_GROUP:
+        // If we haven't setup column groups at all yet, do so.
+        if (Info()->col_groups.size() == 0) Info()->col_groups.resize(GetNumCols());
+        Info()->col_groups[cur_col].extras.attr.Set(setting, value);
+        break;
+      case ROW_GROUP:
+        // If we haven't setup row groups at all yet, do so.
+        if (Info()->row_groups.size() == 0) Info()->row_groups.resize(GetNumRows());
+        Info()->row_groups[cur_row].extras.attr.Set(setting, value);
         break;
       default:
         emp_assert(false && "Table in unknown state!");
