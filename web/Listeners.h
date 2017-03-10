@@ -33,6 +33,14 @@ namespace web {
 
     size_t GetSize() const { return listeners.size(); }
 
+    // Use a pre-calculated function ID.
+    Listeners & Set(const std::string & name, size_t fun_id) {
+      emp_assert(!Has(name));
+      listeners[name] = fun_id;
+      return *this;
+    }
+
+    // Calculate its own function ID with JSWrap.
     template <typename... Ts>
     Listeners & Set(const std::string & name, const std::function<void(Ts... args)> & in_fun) {
       emp_assert(!Has(name));
