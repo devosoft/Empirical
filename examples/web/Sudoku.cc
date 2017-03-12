@@ -60,14 +60,17 @@ int main()
       auto cell = table.GetCell(r,c);
       doc.Text("notes") << "Setting up cell at (" << cell.GetCurRow() << "," << cell.GetCurCol() << ")<br>";
       cell.On("mousedown", [cell,r,c]() mutable {
-        cell.SetCSS("BackgroundColor", "grey");
-        doc.Slate("table_bg").SetBackground("grey");
-        doc.Text("notes") << "DOWN! row=" << r << ", col=" << c << "<br>";
+        // doc.Slate("table_bg").SetBackground("red");
+        // cell.SetCSS("BackgroundColor", "grey");
+        // doc.Text("notes") << "DOWN! row=" << r << ", col=" << c << "<br>";
+        cell.Clear();
       });
-      cell.On("mouseup", [cell]() mutable {
-        cell.SetCSS("BackgroundColor", "white");
-        doc.Slate("table_bg").SetBackground("white");
-        doc.Text("notes") << "UP! at (" << cell.GetCurRow() << "," << cell.GetCurCol() << ")<br>";
+      cell.On("mouseup", [cell,r,c]() mutable {
+        // cell.SetCSS("BackgroundColor", "white");
+        // doc.Slate("table_bg").SetBackground("white");
+        // doc.Text("notes") << "UP! at (" << cell.GetCurRow() << "," << cell.GetCurCol() << ")<br>";
+        cell.SetCSS("font", "15px Calibri, sans-serif")
+          << "<center>1 2 3<br>4 5 6<br>7 8 9</center>";        
       });
       // cell.On("mousemove", [cell]() mutable {
       //   cell.SetCSS("BackgroundColor", "pink");
