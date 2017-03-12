@@ -77,10 +77,12 @@ namespace emp {
     void reserve(size_type n) { v.reserve(n); }
     void shrink_to_fit() { v.shrink_to_fit(); }
 
-    this_t & operator=(const emp::vector<T,Ts...> &) = default;
-    this_t & operator=(const stdv_t & x) { v = x; return *this; }
-    this_t & operator=(const std::initializer_list<value_type> & il) {
-      v.operator=(il);
+    this_t & operator=(const this_t &) = default;
+    // this_t & operator=(const stdv_t & x) { v = x; return *this; }
+    // this_t & operator=(const std::initializer_list<value_type> & il) {
+    template <typename IN_T>
+    this_t & operator=(const IN_T && in) {
+      v.operator=(std::forward<IN_T>(in));
       return *this;
     }
 
