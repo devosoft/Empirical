@@ -23,6 +23,7 @@ private:
   std::string name;
   UI::Table table;
   emp::array<CellState, 81> states;
+  emp::array<char,9> symbols;
 
   void UpdateCell(size_t r, size_t c) {
     auto cell = table.GetCell(r, c);
@@ -30,25 +31,20 @@ private:
     cell.SetCSS("width", "45px");             // Make cells all 45px by 45px squares
     cell.SetCSS("height", "45px");
 
-    const char cur_symbol = states[r*9+c].state;
-    switch (cur_symbol) {
-    case '-':   // Empty cell!
-    case ' ':
-      break;
-    case '*':   // List of options!
-      // If we're adding a list of all nine options, use a smaller font.
-      cell.SetCSS("font", "15px Calibri, sans-serif")
-        << "<center>1 2 3<br>4 5 6<br>7 8 9</center>";
-      break;
-    default:    // Locked cell!
-      cell <<  "<center>" << cur_symbol << "</center>";
-    };
+    const char symbol_id = states[r*9+c].state;
+    char cur_symbol = ' ';
+    if (symbol_id >= 0) cur_symbol = symbols[symbol_id];
+    //   // If we're adding a list of all nine options, use a smaller font.
+    //   cell.SetCSS("font", "15px Calibri, sans-serif")
+    //     << "<center>1 2 3<br>4 5 6<br>7 8 9</center>";
+    cell <<  "<center>" << cur_symbol << "</center>";
   }
 public:
   SudokuBoard(const std::string & in_name)
   : UI::Slate(in_name)
   , name(in_name)        // HTML id for the slate
   , table(9,9)           // Build a 9x9 table for actual puzzle
+  , symbols({{'1','2','3','4','5','6','7','8','9'}})
   {
     // Setup background slate to draw board on.
     SetCSS("border", "3px solid black")   // Put a think boarder on the background
@@ -109,16 +105,16 @@ int main()
 
   // Setup some values to go in the puzzle.
   emp::array<int,81> states = {{ -1, 1, 2,   3, 4, 5,   6, 7,-1,
-                                  5, -1, 4,  6, 9, 8,   1, 2, 3,
-                                  3,  8,-1,  1, 7, 2,   9, 5, 4,
+                                  5, -1, 4,  6, 0, 8,   1, 2, 3,
+                                  3,  8,-1,  1, 7, 2,   0, 5, 4,
 
-                                  8, 2, 9,   7, 3, 6,   4, 1, 5,
-                                  1, 5, 3,   8, 2, 4,   7, 6, 9,
-                                  6, 4, 7,   9, 5, 1,   3, 8, 2,
+                                  8, 2, 0,   7, 3, 6,   4, 1, 5,
+                                  1, 5, 3,   8, 2, 4,   7, 6, 0,
+                                  6, 4, 7,   0, 5, 1,   3, 8, 2,
 
-                                  7, 9, 1,   5, 8, 3,   2, 4, 6,
-                                  4, 6, 5,   2, 1, 9,   8,-1, 7,
-                                  2, 3, 8,   4, 6, 7,   5, 9, 1
+                                  7, 0, 1,   5, 8, 3,   2, 4, 6,
+                                  4, 6, 5,   2, 1, 0,   8,-1, 7,
+                                  2, 3, 8,   4, 6, 7,   5, 0, 1
     }};
 
   for (int i = 0 ; i < 81; i++) board[i] = states[i];
