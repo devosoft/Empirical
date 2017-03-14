@@ -25,20 +25,6 @@ private:
   emp::array<CellState, 81> states;
   emp::array<char,9> symbols;
 
-  void UpdateCell(size_t r, size_t c) {
-    auto cell = table.GetCell(r, c);
-    cell.SetCSS("border", "1px solid black"); // Make a think black line between cells
-    cell.SetCSS("width", "45px");             // Make cells all 45px by 45px squares
-    cell.SetCSS("height", "45px");
-
-    const char symbol_id = states[r*9+c].state;
-    char cur_symbol = ' ';
-    if (symbol_id >= 0) cur_symbol = symbols[symbol_id];
-    //   // If we're adding a list of all nine options, use a smaller font.
-    //   cell.SetCSS("font", "15px Calibri, sans-serif")
-    //     << "<center>1 2 3<br>4 5 6<br>7 8 9</center>";
-    cell <<  "<center>" << cur_symbol << "</center>";
-  }
 public:
   SudokuBoard(const std::string & in_name)
   : UI::Slate(in_name)
@@ -66,6 +52,25 @@ public:
     table.GetRowGroup(3).SetSpan(3).SetCSS("border", "3px solid black");
     table.GetRowGroup(6).SetSpan(3).SetCSS("border", "3px solid black");
 
+    Update();
+  }
+
+  void UpdateCell(size_t r, size_t c) {
+    auto cell = table.GetCell(r, c);
+    cell.SetCSS("border", "1px solid black"); // Make a think black line between cells
+    cell.SetCSS("width", "45px");             // Make cells all 45px by 45px squares
+    cell.SetCSS("height", "45px");
+
+    const char symbol_id = states[r*9+c].state;
+    char cur_symbol = ' ';
+    if (symbol_id >= 0) cur_symbol = symbols[symbol_id];
+    //   // If we're adding a list of all nine options, use a smaller font.
+    //   cell.SetCSS("font", "15px Calibri, sans-serif")
+    //     << "<center>1 2 3<br>4 5 6<br>7 8 9</center>";
+    cell <<  "<center>" << cur_symbol << "</center>";
+  }
+
+  void Update() {
     // Add all symbols to the table.
     for (size_t r = 0; r < 9; r++) {
       for (size_t c = 0; c < 9; c++) {
@@ -89,7 +94,6 @@ public:
         UpdateCell(r,c);
       }
     }
-
   }
 
   CellState & operator[](int id) { return states[id]; }
@@ -118,4 +122,5 @@ int main()
     }};
 
   for (int i = 0 ; i < 81; i++) board[i] = states[i];
+  board.Update();
 }
