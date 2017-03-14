@@ -2,18 +2,27 @@
 //  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#include "base/vector.h"
+#include "base/array.h"
 #include "web/web.h"
 
 namespace UI = emp::web;
 
 UI::Document doc("emp_base");
 
+struct CellState {
+  char state;                  // -1 = UNKNOWN; 0-8 is associated value.
+  emp::array<int, 9> options;  // Is each state possible?
+
+  CellState() : state(-1) { options.fill(true); }
+
+  CellState & operator=(int s) { state = s; return *this; }
+};
+
 class SudokuBoard : public UI::Slate {
 private:
   std::string name;
   UI::Table table;
-  emp::vector<char> state;
+  emp::array<CellState, 81> states;
 
   void UpdateCell(size_t r, size_t c) {
     auto cell = table.GetCell(r, c);
@@ -21,8 +30,7 @@ private:
     cell.SetCSS("width", "45px");             // Make cells all 45px by 45px squares
     cell.SetCSS("height", "45px");
 
-    emp_assert(state.size() == 81);
-    const char cur_symbol = state[r*9+c];
+    const char cur_symbol = states[r*9+c].state;
     switch (cur_symbol) {
     case '-':   // Empty cell!
     case ' ':
@@ -54,19 +62,6 @@ public:
     table.SetCSS("border-collapse", "collapse")     // Remove gaps between cells in the puzzle
       .SetCSS("font", "35px Calibri, sans-serif");  // Use a nice 35pt font for numbers in cells
 
-    // Setup some values to go in the puzzle.
-    // Note that '-' is an empty cell, and '*' shows all cell options.
-    state = {{ '-','1','2', '3','4','5', '6','7','8',
-               '5','-','4', '6','9','8', '1','2','3',
-               '3','8','-', '1','7','2', '9','5','4',
-               '8','2','9', '7','3','6', '4','1','5',
-               '1','5','3', '8','2','4', '7','6','9',
-               '6','4','7', '9','5','1', '3','8','2',
-               '7','9','1', '5','8','3', '2','4','6',
-               '4','6','5', '2','1','9', '8','*','7',
-               '2','3','8', '4','6','7', '5','9','1'
-      }};
-
     // Make regions have a dark background.
     table.GetColGroup(0).SetSpan(3).SetCSS("border", "3px solid black");
     table.GetColGroup(3).SetSpan(3).SetCSS("border", "3px solid black");
@@ -87,7 +82,7 @@ public:
         cell.On("mouseup", [this,r,c]() mutable {
           // cell.SetCSS("BackgroundColor", "white");
           // doc.Slate("table_bg").SetBackground("white");
-          state[r*9+c] = '*';
+          // states[r*9+c] = '*';
           UpdateCell(r,c);
         });
         // cell.On("mousemove", [cell]() mutable {
@@ -100,6 +95,9 @@ public:
     }
 
   }
+
+  CellState & operator[](int id) { return states[id]; }
+  const CellState & operator[](int id) const { return states[id]; }
 };
 
 SudokuBoard board("test_board");
@@ -108,4 +106,20 @@ int main()
 {
   doc << "<h1>Sudoku!</h1>";
   doc << board;
+
+  // Setup some values to go in the puzzle.
+  emp::array<int,81> states = {{ -1, 1, 2,   3, 4, 5,   6, 7,-1,
+                                  5, -1, 4,  6, 9, 8,   1, 2, 3,
+                                  3,  8,-1,  1, 7, 2,   9, 5, 4,
+
+                                  8, 2, 9,   7, 3, 6,   4, 1, 5,
+                                  1, 5, 3,   8, 2, 4,   7, 6, 9,
+                                  6, 4, 7,   9, 5, 1,   3, 8, 2,
+
+                                  7, 9, 1,   5, 8, 3,   2, 4, 6,
+                                  4, 6, 5,   2, 1, 9,   8,-1, 7,
+                                  2, 3, 8,   4, 6, 7,   5, 9, 1
+    }};
+
+  for (int i = 0 ; i < 81; i++) board[i] = states[i];
 }
