@@ -6,11 +6,11 @@
 //  The Table widget
 //
 //  TableInfo is the core information for a table and has two helper classes:
-//  TableRow and TableData.  The Table class is a smart pointer to a TableInfo
+//  TableRowInfo and TableDataInfo.  The Table class is a smart pointer to a TableInfo
 //  object.
 //
 //  A Table is composed of a series of rows, each with the same number of columns.
-//  TableData may be muliple cells wide/tall, masking other cells.
+//  TableDataInfo may be muliple cells wide/tall, masking other cells.
 //
 //  Constructors:
 //    Table(size_t r, size_t c, const std::string & in_id="")
@@ -129,10 +129,10 @@ namespace web {
 
   namespace internal {
 
-    struct TableRow;
+    struct TableRowInfo;
     class TableInfo;
 
-    struct TableData  {
+    struct TableDataInfo  {
       size_t colspan=1;    // How many columns wide is this TableData?
       size_t rowspan=1;    // How many rows deep is this TableData?
       bool header=false;   // Is this TableData a header (<th> vs <td>)?
@@ -143,43 +143,43 @@ namespace web {
 
       bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
         bool ok = true;
-        if (verbose) ss << prefix << "Scanning: emp::TableData" << std::endl;
+        if (verbose) ss << prefix << "Scanning: emp::TableDataInfo" << std::endl;
         if (masked) { ss << "Warning: Masked cell may have contents!" << std::endl; ok = false; }
         return ok;
       }
-    };  // END: TableData
+    };  // END: TableDataInfo
 
 
-    struct TableRow {
-      emp::vector<TableData> data;  // detail object for each cell in this row.
+    struct TableRowInfo {
+      emp::vector<TableDataInfo> data;  // detail object for each cell in this row.
       WidgetExtras extras; // Extra annotations (attributes, style, listeners)
 
       // Apply to all cells in row.
       template <typename SETTING_TYPE>
-      TableRow & CellsCSS(const std::string & setting, SETTING_TYPE && value) {
+      TableRowInfo & CellsCSS(const std::string & setting, SETTING_TYPE && value) {
         for (auto & datum : data) datum.extras.style.Set(setting, value);
         return *this;
       }
 
       // Apply to specific cell in row.
       template <typename SETTING_TYPE>
-      TableRow & CellCSS(size_t col_id, const std::string & setting, SETTING_TYPE && value) {
+      TableRowInfo & CellCSS(size_t col_id, const std::string & setting, SETTING_TYPE && value) {
         data[col_id].extras.style.Set(setting, value);
         return *this;
       }
 
       bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
         bool ok = true;
-        if (verbose) { ss << prefix << "Scanning: emp::TableRow" << std::endl; }
+        if (verbose) { ss << prefix << "Scanning: emp::TableRowInfo" << std::endl; }
         for (auto & cell : data) ok = ok && cell.OK(ss, verbose, prefix+"  ");
         return ok;
       }
     };
 
-    struct TableCol { WidgetExtras extras; };  // Currently only need annotations.
+    struct TableColInfo { WidgetExtras extras; };  // Currently only need annotations.
 
     // Group of rows or columns...
-    struct TableGroup : public WidgetExtras {
+    struct TableGroupInfo : public WidgetExtras {
       size_t span = 1;       // How many rows/columns does this group represent?
       bool masked = false;   // Is the current group masked because of a previous span?
       WidgetExtras extras;   // Extra annotations (attributes, style, listeners)
@@ -188,12 +188,12 @@ namespace web {
     class TableInfo : public internal::WidgetInfo {
       friend Table;
     protected:
-      size_t row_count;                    // How big is this table?
+      size_t row_count;                        // How big is this table?
       size_t col_count;
-      emp::vector<TableRow> rows;          // Detail object for each row
-      emp::vector<TableCol> cols;          // Detail object for each column (if needed)
-      emp::vector<TableGroup> col_groups;  // Detail object for each column group (if needed)
-      emp::vector<TableGroup> row_groups;  // Detail object for each row group (if needed)
+      emp::vector<TableRowInfo> rows;          // Detail object for each row
+      emp::vector<TableColInfo> cols;          // Detail object for each column (if needed)
+      emp::vector<TableGroupInfo> col_groups;  // Detail object for each column group (if needed)
+      emp::vector<TableGroupInfo> row_groups;  // Detail object for each row group (if needed)
 
       size_t append_row;               // Which row is triggering an append?
       size_t append_col;               // Which col is triggering an append?
