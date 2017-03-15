@@ -399,6 +399,15 @@ namespace web {
         HTML << "</table>";
       }
 
+      void ClearCellChildren(size_t row_id, size_t col_id) {
+        // Clear out this cell's children.   @CAO: Keep a starting text widget if we can?
+        auto & datum = rows[row_id].data[col_id];
+        if (parent) for (Widget & child : datum.children) parent->Unregister(child);
+        datum.children.resize(0);
+      }
+      void ClearCellStyle(size_t row_id, size_t col_id) {
+        rows[row_id].data[col_id].extras.style.Clear();
+      }
       void ClearCell(size_t row_id, size_t col_id) {
         auto & datum = rows[row_id].data[col_id];
         datum.colspan = 1;
@@ -407,9 +416,7 @@ namespace web {
         datum.masked = false;  // @CAO Technically, cell might still be masked!
         datum.extras.Clear();
 
-        // Clear out this cell's children.   @CAO: Keep a starting text widget if we can?
-        if (parent) for (Widget & child : datum.children) parent->Unregister(child);
-        datum.children.resize(0);
+        ClearCellChildren(row_id, col_id);
       }
       void ClearRowCells(size_t row_id) {
         for (size_t col_id = 0; col_id < col_count; col_id++) ClearCell(row_id, col_id);
@@ -713,6 +720,24 @@ namespace web {
       else if (state == ROW) Info()->ClearRow(cur_row);
       // @CAO Make work for state == COL, COL_GROUP, or ROW_GROUP
       else if (state == CELL) Info()->ClearCell(cur_row, cur_col);
+      else emp_assert(false && "Table in unknown state!", state);
+      return *this;
+    }
+    Table & ClearStyle() {
+      // Clear based on tables current state.
+      // if (state == TABLE) Info()->ClearTable();
+      // else if (state == ROW) Info()->ClearRow(cur_row);
+      // @CAO Make work for state == COL, COL_GROUP, or ROW_GROUP
+      if (state == CELL) Info()->ClearCellStyle(cur_row, cur_col);
+      else emp_assert(false && "Table in unknown state!", state);
+      return *this;
+    }
+    Table & ClearChildren() {
+      // Clear based on tables current state.
+      // if (state == TABLE) Info()->ClearTable();
+      // else if (state == ROW) Info()->ClearRow(cur_row);
+      // @CAO Make work for state == COL, COL_GROUP, or ROW_GROUP
+      if (state == CELL) Info()->ClearCellChildren(cur_row, cur_col);
       else emp_assert(false && "Table in unknown state!", state);
       return *this;
     }
