@@ -24,6 +24,8 @@ private:
   UI::Table table;
   emp::array<CellState, 81> states;
   emp::array<char,9> symbols;
+  int cur_row;
+  int cur_col;
 
 public:
   SudokuBoard(const std::string & in_name)
@@ -31,6 +33,7 @@ public:
   , name(in_name)        // HTML id for the slate
   , table(9,9)           // Build a 9x9 table for actual puzzle
   , symbols({{'1','2','3','4','5','6','7','8','9'}})
+  , cur_row(-1), cur_col(-1)
   {
     // Setup background slate to draw board on.
     SetCSS("border", "3px solid black")   // Put a think boarder on the background
@@ -62,12 +65,16 @@ public:
     cell.SetCSS("height", "45px");
 
     const char symbol_id = states[r*9+c].state;
-    char cur_symbol = ' ';
-    if (symbol_id >= 0) cur_symbol = symbols[symbol_id];
+    if (r == cur_row && c == cur_col) {
+      cell.SetCSS("font", "15px Calibri, sans-serif")
+        << "<center>1 2 3<br>4 5 6<br>7 8 9</center>";
+    }
+    if (symbol_id >= 0) {
+      cell <<  "<center>" << symbols[symbol_id] << "</center>";
+    }
+    else {} // Otherwise leave this cell blank! (for now)
+
     //   // If we're adding a list of all nine options, use a smaller font.
-    //   cell.SetCSS("font", "15px Calibri, sans-serif")
-    //     << "<center>1 2 3<br>4 5 6<br>7 8 9</center>";
-    cell <<  "<center>" << cur_symbol << "</center>";
   }
 
   void Update() {
@@ -75,21 +82,33 @@ public:
     for (size_t r = 0; r < 9; r++) {
       for (size_t c = 0; c < 9; c++) {
         auto cell = table.GetCell(r,c);
-        cell.On("mousedown", [cell,r,c]() mutable {
-          // doc.Slate("table_bg").SetBackground("red");
-          // cell.SetCSS("BackgroundColor", "grey");
-          cell.Clear();
-        });
-        cell.On("mouseup", [this,r,c]() mutable {
-          // cell.SetCSS("BackgroundColor", "white");
-          // doc.Slate("table_bg").SetBackground("white");
-          // states[r*9+c] = '*';
-          UpdateCell(r,c);
-        });
-        // cell.On("mousemove", [cell]() mutable {
-        //   cell.SetCSS("BackgroundColor", "pink");
-        //   doc.Slate("table_bg").SetBackground("pink");
+        // cell.On("mousedown", [cell,r,c]() mutable {
+        //   // doc.Slate("table_bg").SetBackground("red");
+        //   // cell.SetCSS("BackgroundColor", "grey");
+        //   cell.Clear();
         // });
+        // cell.On("mouseup", [this,r,c]() mutable {
+        //   // cell.SetCSS("BackgroundColor", "white");
+        //   // doc.Slate("table_bg").SetBackground("white");
+        //   // states[r*9+c] = '*';
+        //   UpdateCell(r,c);
+        // });
+        cell.On("mousemove", [this,cell,r,c]() mutable {
+          cell.SetCSS("BackgroundColor", "pink");
+          if (r == 0) doc.Slate(name).SetBackground("pink");
+          if (r == 1) doc.Slate(name).SetBackground("red");
+          if (r == 2) doc.Slate(name).SetBackground("orange");
+          if (r == 3) doc.Slate(name).SetBackground("yellow");
+          if (r == 4) doc.Slate(name).SetBackground("green");
+          if (r == 5) doc.Slate(name).SetBackground("blue");
+          if (r == 6) doc.Slate(name).SetBackground("indigo");
+          if (r == 7) doc.Slate(name).SetBackground("violet");
+          if (r == 8) doc.Slate(name).SetBackground("gray");
+          cell.ClearStyle();
+          cell.ClearChildren();
+          UpdateCell(r,c);
+          doc.Slate(name).Redraw();
+        });
 
         UpdateCell(r,c);
       }
