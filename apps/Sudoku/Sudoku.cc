@@ -69,7 +69,7 @@ public:
       cell.SetCSS("font", "15px Calibri, sans-serif")
         << "<center>1 2 3<br>4 5 6<br>7 8 9</center>";
     }
-    if (symbol_id >= 0) {
+    else if (symbol_id >= 0) {
       cell <<  "<center>" << symbols[symbol_id] << "</center>";
     }
     else {} // Otherwise leave this cell blank! (for now)
@@ -94,19 +94,18 @@ public:
         //   UpdateCell(r,c);
         // });
         cell.On("mousemove", [this,cell,r,c]() mutable {
-          cell.SetCSS("BackgroundColor", "pink");
-          if (r == 0) doc.Slate(name).SetBackground("pink");
-          if (r == 1) doc.Slate(name).SetBackground("red");
-          if (r == 2) doc.Slate(name).SetBackground("orange");
-          if (r == 3) doc.Slate(name).SetBackground("yellow");
-          if (r == 4) doc.Slate(name).SetBackground("green");
-          if (r == 5) doc.Slate(name).SetBackground("blue");
-          if (r == 6) doc.Slate(name).SetBackground("indigo");
-          if (r == 7) doc.Slate(name).SetBackground("violet");
-          if (r == 8) doc.Slate(name).SetBackground("gray");
+          if (cur_row == r && cur_col == c) return;
+          int old_row = cur_row;
+          int old_col = cur_col;
+          auto old_cell = cell.GetCell(old_row, old_col);
+          cur_row = r; cur_col = c;
+
           cell.ClearStyle();
           cell.ClearChildren();
+          old_cell.ClearStyle();
+          old_cell.ClearChildren();
           UpdateCell(r,c);
+          UpdateCell(old_row,old_col);
           doc.Slate(name).Redraw();
         });
 
