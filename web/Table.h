@@ -42,7 +42,7 @@
 //      Return true/false to identify what state the table is currently in.
 //
 //  Get table widget that affect specified cell, row, etc.
-//    Table GetCell(size_t r, size_t c)
+//    TableCell GetCell(size_t r, size_t c)
 //    Table GetRow(size_t r)
 //    Table GetCol(size_t c)
 //    Table GetRowGroup(size_t r)
@@ -553,6 +553,7 @@ namespace web {
 
   } // end namespace internal
 
+  class TableCell;
 
   class Table : public internal::WidgetFacet<Table> {
     friend class internal::TableInfo;
@@ -772,12 +773,7 @@ namespace web {
       return *this;
     }
 
-    Table GetCell(size_t r, size_t c) {
-      emp_assert(Info() != nullptr);
-      emp_assert(r < Info()->row_count && c < Info()->col_count,
-                 r, c, Info()->row_count, Info()->col_count, GetID());
-      return Table(Info(), r, c, CELL);
-    }
+    TableCell GetCell(size_t r, size_t c);
     Table GetRow(size_t r) {
       emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
       return Table(Info(), r, 0, ROW);
@@ -845,23 +841,8 @@ namespace web {
       return *this;
     }
 
-    Widget AddText(size_t r, size_t c, const std::string & text) {
-      GetCell(r,c) << text;
-      return *this;
-    }
-
-    Widget AddHeader(size_t r, size_t c, const std::string & text) {
-      GetCell(r,c) << text;
-      SetHeader();
-      return *this;
-    }
-
-    // // Setup functions on events associated with portions of a table.
-    // RETURN_TYPE & OnCell(const std::string & event_name, const std::function<void(int,int)> & fun) {
-    //   emp_assert(info != nullptr);
-    //   info->listen.Set2Index(event_name, fun);
-    //   return (RETURN_TYPE &) *this;
-    // }
+    Widget AddText(size_t r, size_t c, const std::string & text);
+    Widget AddHeader(size_t r, size_t c, const std::string & text);
 
     // Apply to appropriate component based on current state.
     using WidgetFacet<Table>::SetCSS;
@@ -1042,6 +1023,35 @@ namespace web {
     }
   };
 
+  class TableCell : public Table {
+  public:
+    TableCell(size_t r, size_t c, const std::string & in_id="") : Table(r,c,in_id) { ; }
+    TableCell(const Table & in) : Table(in) { ; }
+    TableCell(const Widget & in) : Table(in) { ; }
+    TableCell(internal::TableInfo * in_info, size_t _row=0, size_t _col=0, state_t _state=TABLE)
+      : Table(in_info, _row, _col, _state) { ; }
+  };
+
+
+  // Fill out members of Table that require extra classes...
+
+  TableCell Table::GetCell(size_t r, size_t c) {
+    emp_assert(Info() != nullptr);
+    emp_assert(r < Info()->row_count && c < Info()->col_count,
+               r, c, Info()->row_count, Info()->col_count, GetID());
+    return TableCell(Info(), r, c, CELL);
+  }
+
+  Widget Table::AddText(size_t r, size_t c, const std::string & text) {
+    GetCell(r,c) << text;
+    return *this;
+  }
+
+  Widget Table::AddHeader(size_t r, size_t c, const std::string & text) {
+    GetCell(r,c) << text;
+    SetHeader();
+    return *this;
+  }
 
 }
 }
