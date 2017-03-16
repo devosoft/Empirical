@@ -562,7 +562,7 @@ namespace web {
     size_t cur_col;
 
     // A table's state determines how some operations work.
-    enum state_t { TABLE, ROW, CELL, COL, COL_GROUP, ROW_GROUP };
+    enum state_t { TABLE, ROW, COL, COL_GROUP, ROW_GROUP };
     state_t state;
 
     // Get a properly cast version of indo.
@@ -580,10 +580,6 @@ namespace web {
         break;
       case ROW:
         Info()->rows[cur_row].extras.style.Set(setting, value);
-        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
-        break;
-      case CELL:
-        Info()->rows[cur_row].data[cur_col].extras.style.Set(setting, value);
         if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
         break;
       case COL:
@@ -616,10 +612,6 @@ namespace web {
         Info()->rows[cur_row].extras.attr.Set(setting, value);
         if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
         break;
-      case CELL:
-        Info()->rows[cur_row].data[cur_col].extras.attr.Set(setting, value);
-        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
-        break;
       case COL:
         // If we haven't setup columns at all yet, do so.
         if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
@@ -648,10 +640,6 @@ namespace web {
         break;
       case ROW:
         Info()->rows[cur_row].extras.listen.Set(event_name, fun_id);
-        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
-        break;
-      case CELL:
-        Info()->rows[cur_row].data[cur_col].extras.listen.Set(event_name, fun_id);
         if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
         break;
       case COL:
@@ -685,7 +673,7 @@ namespace web {
     }
     Table(const Table & in)
       : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col), state(in.state) {
-      emp_assert(state == TABLE || state == ROW || state == CELL
+      emp_assert(state == TABLE || state == ROW
                  || state == COL || state == COL_GROUP || state == ROW_GROUP, state);
     }
     Table(const Widget & in) : WidgetFacet(in), cur_row(0), cur_col(0), state(TABLE) {
@@ -713,14 +701,13 @@ namespace web {
     bool InStateColGroup() const { return state == COL_GROUP; }
     bool InStateRow() const { return state == ROW; }
     bool InStateCol() const { return state == COL; }
-    bool InStateCell() const { return state == CELL; }
+    bool InStateCell() const { return false; }
 
     Table & Clear() {
       // Clear based on tables current state.
       if (state == TABLE) Info()->ClearTable();
       else if (state == ROW) Info()->ClearRow(cur_row);
       // @CAO Make work for state == COL, COL_GROUP, or ROW_GROUP
-      else if (state == CELL) Info()->ClearCell(cur_row, cur_col);
       else emp_assert(false && "Table in unknown state!", state);
       return *this;
     }
@@ -729,7 +716,6 @@ namespace web {
       // if (state == TABLE) Info()->ClearTable();
       // else if (state == ROW) Info()->ClearRow(cur_row);
       // @CAO Make work for state == COL, COL_GROUP, or ROW_GROUP
-      if (state == CELL) Info()->ClearCellStyle(cur_row, cur_col);
       else emp_assert(false && "Table in unknown state!", state);
       return *this;
     }
@@ -738,7 +724,6 @@ namespace web {
       // if (state == TABLE) Info()->ClearTable();
       // else if (state == ROW) Info()->ClearRow(cur_row);
       // @CAO Make work for state == COL, COL_GROUP, or ROW_GROUP
-      if (state == CELL) Info()->ClearCellChildren(cur_row, cur_col);
       else emp_assert(false && "Table in unknown state!", state);
       return *this;
     }
@@ -749,7 +734,6 @@ namespace web {
       if (state == TABLE) Info()->ClearTableCells();
       else if (state == ROW) Info()->ClearRowCells(cur_row);
       // @CAO Make work for state == COL, COL_GROUP, or ROW_GROUP
-      else if (state == CELL) Info()->ClearCell(cur_row, cur_col);
       else emp_assert(false && "Unknown State!", state);
       return *this;
     }
@@ -797,14 +781,7 @@ namespace web {
     web::Text GetTextWidget() { return Info()->GetTextWidget(); }
 
     // Update the current table object to change the active cell.
-    Table & SetCellActive(size_t r, size_t c) {
-      emp_assert(Info() != nullptr);
-      emp_assert(r < Info()->row_count && c < Info()->col_count,
-                 r, c, Info()->row_count, Info()->col_count, GetID());
-      cur_row = r; cur_col = c;
-      state = CELL;
-      return *this;
-    }
+    TableCell & SetCellActive(size_t r, size_t c);
     Table & SetRowActive(size_t r) {
       emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
       cur_row = r; cur_col = 0;
@@ -834,20 +811,12 @@ namespace web {
       return *this;
     }
 
-    Table & SetHeader(bool _h=true) {
-      emp_assert(state == CELL);
-      Info()->rows[cur_row].data[cur_col].header = _h;
-      if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
-      return *this;
-    }
-
     Widget AddText(size_t r, size_t c, const std::string & text);
     Widget AddHeader(size_t r, size_t c, const std::string & text);
 
     // Apply to appropriate component based on current state.
     using WidgetFacet<Table>::SetCSS;
     std::string GetCSS(const std::string & setting) override {
-      if (state == CELL) return Info()->rows[cur_row].data[cur_col].extras.GetStyle(setting);
       if (state == ROW) return Info()->rows[cur_row].extras.GetStyle(setting);
       if (state == COL) return Info()->cols[cur_col].extras.GetStyle(setting);
       if (state == ROW_GROUP) return Info()->row_groups[cur_row].extras.GetStyle(setting);
@@ -859,40 +828,17 @@ namespace web {
     // Allow the row and column span of the current cell to be adjusted.
     Table & SetRowSpan(size_t new_span) {
       emp_assert((cur_row + new_span <= GetNumRows()) && "Row span too wide for table!");
-      emp_assert(state == CELL || state == ROW_GROUP);
+      emp_assert(state == ROW_GROUP);
 
-      if (state == CELL) {
-        auto & datum = Info()->rows[cur_row].data[cur_col];
-        const size_t old_span = datum.rowspan;
-        const size_t col_span = datum.colspan;
-        datum.rowspan = new_span;
+      // If we haven't setup columns at all yet, do so.
+      if (Info()->row_groups.size() == 0) Info()->row_groups.resize(GetNumRows());
 
-        // For each col, make sure NEW rows are masked!
-        for (size_t row = cur_row + old_span; row < cur_row + new_span; row++) {
-          for (size_t col = cur_col; col < cur_col + col_span; col++) {
-            Info()->rows[row].data[col].masked = true;
-          }
-        }
+      const size_t old_span = Info()->row_groups[cur_row].span;
+      Info()->row_groups[cur_row].span = new_span;
 
-        // For each row, make sure former columns are unmasked!
-        for (size_t row = cur_row + new_span; row < cur_row + old_span; row++) {
-          for (size_t col = cur_col; col < cur_col + col_span; col++) {
-            Info()->rows[row].data[col].masked = false;
-          }
-        }
-      }
-
-      else if (state == ROW_GROUP) {
-        // If we haven't setup columns at all yet, do so.
-        if (Info()->row_groups.size() == 0) Info()->row_groups.resize(GetNumRows());
-
-        const size_t old_span = Info()->row_groups[cur_row].span;
-        Info()->row_groups[cur_row].span = new_span;
-
-        if (old_span != new_span) {
-          for (size_t i=old_span; i<new_span; i++) { Info()->row_groups[cur_row+i].masked = true; }
-          for (size_t i=new_span; i<old_span; i++) { Info()->row_groups[cur_row+i].masked = false; }
-        }
+      if (old_span != new_span) {
+        for (size_t i=old_span; i<new_span; i++) { Info()->row_groups[cur_row+i].masked = true; }
+        for (size_t i=new_span; i<old_span; i++) { Info()->row_groups[cur_row+i].masked = false; }
       }
 
       // Redraw the entire table to fix row span information.
@@ -904,40 +850,16 @@ namespace web {
     Table & SetColSpan(size_t new_span) {
       emp_assert((cur_col + new_span <= GetNumCols()) && "Col span too wide for table!",
                  cur_col, new_span, GetNumCols(), GetID());
-      emp_assert(state == CELL || state == COL_GROUP);
 
-      if (state == CELL) {
-        auto & datum = Info()->rows[cur_row].data[cur_col];
-        const size_t old_span = datum.colspan;
-        const size_t row_span = datum.rowspan;
-        datum.colspan = new_span;
+      // If we haven't setup columns at all yet, do so.
+      if (Info()->col_groups.size() == 0) Info()->col_groups.resize(GetNumCols());
 
-        // For each row, make sure new columns are masked!
-        for (size_t row = cur_row; row < cur_row + row_span; row++) {
-          for (size_t col = cur_col + old_span; col < cur_col + new_span; col++) {
-            Info()->rows[row].data[col].masked = true;
-          }
-        }
+      const size_t old_span = Info()->col_groups[cur_col].span;
+      Info()->col_groups[cur_col].span = new_span;
 
-        // For each row, make sure former columns are unmasked!
-        for (size_t row = cur_row; row < cur_row + row_span; row++) {
-          for (size_t col = cur_col + new_span; col < cur_col + old_span; col++) {
-            Info()->rows[row].data[col].masked = false;
-          }
-        }
-      }
-
-      else if (state == COL_GROUP) {
-        // If we haven't setup columns at all yet, do so.
-        if (Info()->col_groups.size() == 0) Info()->col_groups.resize(GetNumCols());
-
-        const size_t old_span = Info()->col_groups[cur_col].span;
-        Info()->col_groups[cur_col].span = new_span;
-
-        if (old_span != new_span) {
-          for (size_t i=old_span; i<new_span; i++) { Info()->col_groups[cur_col+i].masked = true; }
-          for (size_t i=new_span; i<old_span; i++) { Info()->col_groups[cur_col+i].masked = false; }
-        }
+      if (old_span != new_span) {
+        for (size_t i=old_span; i<new_span; i++) { Info()->col_groups[cur_col+i].masked = true; }
+        for (size_t i=new_span; i<old_span; i++) { Info()->col_groups[cur_col+i].masked = false; }
       }
 
       // Redraw the entire table to fix col span information.
@@ -950,14 +872,6 @@ namespace web {
       if (state == ROW_GROUP) return SetRowSpan(new_span);
       if (state == COL_GROUP) return SetColSpan(new_span);
       emp_assert(false);  // No other state should be allowd.
-      return *this;
-    }
-
-    Table & SetSpan(size_t row_span, size_t col_span) {
-      emp_assert(state == CELL);
-      // @CAO Can do this more efficiently, but probably not worth it.
-      SetRowSpan(row_span);
-      SetColSpan(col_span);
       return *this;
     }
 
@@ -1030,6 +944,105 @@ namespace web {
     TableCell(const Widget & in) : Table(in) { ; }
     TableCell(internal::TableInfo * in_info, size_t _row=0, size_t _col=0, state_t _state=TABLE)
       : Table(in_info, _row, _col, _state) { ; }
+
+    // Apply CSS to appropriate component based on current state.
+    void DoCSS(const std::string & setting, const std::string & value) override {
+      Info()->rows[cur_row].data[cur_col].extras.style.Set(setting, value);
+      if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
+    }
+
+    void DoAttr(const std::string & setting, const std::string & value) override {
+      Info()->rows[cur_row].data[cur_col].extras.attr.Set(setting, value);
+      if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
+    }
+
+    void DoListen(const std::string & event_name, size_t fun_id) override {
+      Info()->rows[cur_row].data[cur_col].extras.listen.Set(event_name, fun_id);
+      if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
+    }
+
+    bool InStateCell() const { return true; }
+
+    TableCell & Clear() { Info()->ClearCell(cur_row, cur_col); return *this; }
+    TableCell & ClearStyle() { Info()->ClearCellStyle(cur_row, cur_col); return *this; }
+    TableCell & ClearChildren() { Info()->ClearCellChildren(cur_row, cur_col); return *this; }
+    TableCell & ClearCells() { Info()->ClearCell(cur_row, cur_col); return *this; }
+
+    std::string GetCSS(const std::string & setting) override {
+      return Info()->rows[cur_row].data[cur_col].extras.GetStyle(setting);
+    }
+
+    TableCell & SetHeader(bool _h=true) {
+      Info()->rows[cur_row].data[cur_col].header = _h;
+      if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
+      return *this;
+    }
+
+    // Allow the row and column span of the current cell to be adjusted.
+    TableCell & SetRowSpan(size_t new_span) {
+      emp_assert((cur_row + new_span <= GetNumRows()) && "Row span too wide for table!");
+
+      auto & datum = Info()->rows[cur_row].data[cur_col];
+      const size_t old_span = datum.rowspan;
+      const size_t col_span = datum.colspan;
+      datum.rowspan = new_span;
+
+      // For each col, make sure NEW rows are masked!
+      for (size_t row = cur_row + old_span; row < cur_row + new_span; row++) {
+        for (size_t col = cur_col; col < cur_col + col_span; col++) {
+          Info()->rows[row].data[col].masked = true;
+        }
+      }
+
+      // For each row, make sure former columns are unmasked!
+      for (size_t row = cur_row + new_span; row < cur_row + old_span; row++) {
+        for (size_t col = cur_col; col < cur_col + col_span; col++) {
+          Info()->rows[row].data[col].masked = false;
+        }
+      }
+
+      // Redraw the entire table to fix row span information.
+      if (IsActive()) Info()->ReplaceHTML();
+
+      return *this;
+    }
+
+    TableCell & SetColSpan(size_t new_span) {
+      emp_assert((cur_col + new_span <= GetNumCols()) && "Col span too wide for table!",
+                 cur_col, new_span, GetNumCols(), GetID());
+
+      auto & datum = Info()->rows[cur_row].data[cur_col];
+      const size_t old_span = datum.colspan;
+      const size_t row_span = datum.rowspan;
+      datum.colspan = new_span;
+
+      // For each row, make sure new columns are masked!
+      for (size_t row = cur_row; row < cur_row + row_span; row++) {
+        for (size_t col = cur_col + old_span; col < cur_col + new_span; col++) {
+          Info()->rows[row].data[col].masked = true;
+        }
+      }
+
+      // For each row, make sure former columns are unmasked!
+      for (size_t row = cur_row; row < cur_row + row_span; row++) {
+        for (size_t col = cur_col + new_span; col < cur_col + old_span; col++) {
+          Info()->rows[row].data[col].masked = false;
+        }
+      }
+
+      // Redraw the entire table to fix col span information.
+      if (IsActive()) Info()->ReplaceHTML();
+
+      return *this;
+    }
+
+    TableCell & SetSpan(size_t row_span, size_t col_span) {
+      // @CAO Can do this more efficiently, but probably not worth it.
+      SetRowSpan(row_span);
+      SetColSpan(col_span);
+      return *this;
+    }
+
   };
 
 
@@ -1039,7 +1052,15 @@ namespace web {
     emp_assert(Info() != nullptr);
     emp_assert(r < Info()->row_count && c < Info()->col_count,
                r, c, Info()->row_count, Info()->col_count, GetID());
-    return TableCell(Info(), r, c, CELL);
+    return TableCell(Info(), r, c);
+  }
+
+  TableCell & Table::SetCellActive(size_t r, size_t c) {
+    emp_assert(Info() != nullptr);
+    emp_assert(r < Info()->row_count && c < Info()->col_count,
+               r, c, Info()->row_count, Info()->col_count, GetID());
+    cur_row = r; cur_col = c;
+    return *this;
   }
 
   Widget Table::AddText(size_t r, size_t c, const std::string & text) {
@@ -1052,6 +1073,7 @@ namespace web {
     SetHeader();
     return *this;
   }
+
 
 }
 }
