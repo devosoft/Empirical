@@ -127,6 +127,9 @@
 namespace emp {
 namespace web {
 
+  class Table;
+  class TableCell;
+
   namespace internal {
 
     struct TableRowInfo;
@@ -186,7 +189,7 @@ namespace web {
     };
 
     class TableInfo : public internal::WidgetInfo {
-      friend Table;
+      friend Table; friend TableCell;
     protected:
       size_t row_count;                        // How big is this table?
       size_t col_count;
@@ -553,8 +556,6 @@ namespace web {
 
   } // end namespace internal
 
-  class TableCell;
-
   class Table : public internal::WidgetFacet<Table> {
     friend class internal::TableInfo;
   protected:
@@ -716,7 +717,7 @@ namespace web {
       // if (state == TABLE) Info()->ClearTable();
       // else if (state == ROW) Info()->ClearRow(cur_row);
       // @CAO Make work for state == COL, COL_GROUP, or ROW_GROUP
-      else emp_assert(false && "Table in unknown state!", state);
+      emp_assert(false && "Table in unknown state!", state);
       return *this;
     }
     Table & ClearChildren() {
@@ -724,7 +725,7 @@ namespace web {
       // if (state == TABLE) Info()->ClearTable();
       // else if (state == ROW) Info()->ClearRow(cur_row);
       // @CAO Make work for state == COL, COL_GROUP, or ROW_GROUP
-      else emp_assert(false && "Table in unknown state!", state);
+      emp_assert(false && "Table in unknown state!", state);
       return *this;
     }
     Table & ClearTable() { Info()->ClearTable(); return *this; }
@@ -781,7 +782,7 @@ namespace web {
     web::Text GetTextWidget() { return Info()->GetTextWidget(); }
 
     // Update the current table object to change the active cell.
-    TableCell & SetCellActive(size_t r, size_t c);
+    TableCell SetCellActive(size_t r, size_t c);
     Table & SetRowActive(size_t r) {
       emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
       cur_row = r; cur_col = 0;
@@ -1055,7 +1056,7 @@ namespace web {
     return TableCell(Info(), r, c);
   }
 
-  TableCell & Table::SetCellActive(size_t r, size_t c) {
+  TableCell Table::SetCellActive(size_t r, size_t c) {
     emp_assert(Info() != nullptr);
     emp_assert(r < Info()->row_count && c < Info()->col_count,
                r, c, Info()->row_count, Info()->col_count, GetID());
@@ -1069,8 +1070,9 @@ namespace web {
   }
 
   Widget Table::AddHeader(size_t r, size_t c, const std::string & text) {
-    GetCell(r,c) << text;
-    SetHeader();
+    TableCell cell = GetCell(r,c);
+    cell << text;
+    cell.SetHeader();
     return *this;
   }
 
