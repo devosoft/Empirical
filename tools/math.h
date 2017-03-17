@@ -9,6 +9,7 @@
 #ifndef EMP_MATH_H
 #define EMP_MATH_H
 
+#include <cmath>
 #include "const.h"
 
 namespace emp {
@@ -16,6 +17,13 @@ namespace emp {
   /// % is actually remainder; this is a proper modulus command that handles negative #'s correctly
   inline constexpr int Mod(int in_val, int mod_val) {
     return (in_val < 0) ? (in_val % mod_val + mod_val) : (in_val % mod_val);
+  }
+
+  /// Regular Mod doesn't work on doubles.  Build one that does!
+  // @CAO Make constexpr?
+  inline double Mod(double in_val, double mod_val) {
+    const double remain = std::remainder(in_val, mod_val);
+    return (remain < 0.0) ? (remain + mod_val) : remain;
   }
 
   /// Run both min and max on a value to put it into a desired range.
