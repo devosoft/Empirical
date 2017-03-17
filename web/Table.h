@@ -13,17 +13,13 @@
 //  TableData may be muliple cells wide/tall, masking other cells.
 //
 //  Constructors:
-//
 //    Table(size_t r, size_t c, const std::string & in_id="")
 //      Create a new r-by-c table with an optional DOM id specified.
 //      State is initialized to TABLE; the first row and first cell are default locations.
-//
 //    Table(const Widget & in)
 //      Point to an existing table (assert that widget IS a table!)
 //
-//
 //  Accessors:
-//
 //    size_t GetNumCols() const
 //    size_t GetNumRows() const
 //    size_t GetNumCells() const
@@ -33,17 +29,13 @@
 //    size_t GetCurCol() const { return cur_col; }
 //      Return information about the focal position on the table.
 //
-//
 //  Adjusting Table size:
-//
 //    Table & Rows(size_t r)
 //    Table & Cols(size_t c)
 //    Table & Resize(size_t r, size_t c)
 //      Set the number of rows, columns, or both in the table.
 //
-//
 //  Setting or identifying the current table state:
-//
 //    bool InStateTable() const
 //    bool InStateRow() const
 //    bool InStateCell() const
@@ -66,16 +58,12 @@
 //    Table & SetTableActive()
 //
 //  Modifying data in table
-//
 //    Table & SetHeader(bool _h=true)
 //      Set the current cell to be a header (or not if false is passed in)
-//
 //    Widget AddText(size_t r, size_t c, const std::string & text)
 //      Add text to the specified table cell.
-//
 //    Widget AddHeader(size_t r, size_t c, const std::string & text)
 //      Add text to the specified table cell AND set the cell to be a header.
-//
 //    Table & SetRowSpan(size_t row_span)
 //    Table & SetColSpan(size_t col_span)
 //    Table & SetSpan(size_t row_span, size_t col_span)
@@ -83,52 +71,39 @@
 //    Table & SetSpan(size_t new_span)
 //      Set the span of a row group or column group to the value provided.
 //
-//
 //  Clearing table contents:
-//
 //    Table & ClearTable()
 //      Clear all style information from table, remove contents from all cells, and
 //      shrink table to no rows and no cells.
-//
 //    Table & ClearRows()
 //      Clear style information from rows and cells and remove contents from cells
 //      (but leave table style information and size.)
-//
 //    Table & ClearRow(size_t r)
 //      Clear style information from the specified row and contents from all cells
 //      in that row (but leave other rows untouched).
-//
 //    Table & ClearCells()
 //      If state is TABLE, clear contents from all cells in entire table.
 //      If state is ROW or COL, clear contents from all cells in that row/column.
 //      If state is ROW_GROUP or COL_GROUP, clear contents of cells in all rows/cols in group
 //      If state is CELL, clear just that single cell.
-//
 //    Table & ClearCell(size_t r, size_t c)
 //      Clear contents of just the specified cell.
-//
 //    Table & Clear()
 //      Dynamically clear the entire active state
 //      (TABLE, ROW, COL, ROW_GROUP, COL_GROUP, or CELL).
 //
-//
 //  Style manipulation
-//
 //    std::string GetCSS(const std::string & setting)
 //    std::string GetCSS(const std::string & setting, SETTING_TYPE && value)
 //      Get or Set the current value of the specified Style setting, based on the state of
 //      the table (i.e., TABLE affects full table style, ROW affects active row style, and
 //      CELL affects active cell style.)
-//
 //    Table & RowCSS(size_t row_id, const std::string & setting, SETTING_TYPE && value)
 //    Table & CellCSS(size_t row_id, size_t col_id, const std::string & setting, SETTING_TYPE && value)
 //      Set the specified row or cell Style to the value indicated.
-//
 //    Table & RowsCSS(const std::string & setting, SETTING_TYPE && value)
 //    Table & CellsCSS(const std::string & setting, SETTING_TYPE && value)
 //      Set the specified Style setting of all rows or all cells to the value indicated.
-//
-//
 //
 //  Developer notes:
 //  * Tables should more directly manage internal slates rather than just adding divs and
@@ -147,29 +122,24 @@
 
 #include "Slate.h"
 #include "Widget.h"
+#include "WidgetExtras.h"
 
 namespace emp {
 namespace web {
 
   namespace internal {
 
-    class TableRow;
+    struct TableRow;
     class TableInfo;
 
-    class TableData {
-      friend TableRow; friend Table; friend TableInfo;
-    protected:
-      size_t colspan; // How many columns wide is this TableData?
-      size_t rowspan; // How many rows deep is this TableData?
-      bool header;    // Is this TableData a header (<th> vs <td>)?
-      bool masked;    // Is this cell masked by another cell?
-      Style style;    // CSS Style
+    struct TableData  {
+      size_t colspan=1;    // How many columns wide is this TableData?
+      size_t rowspan=1;    // How many rows deep is this TableData?
+      bool header=false;   // Is this TableData a header (<th> vs <td>)?
+      bool masked=false;   // Is this cell masked by another cell?
+      WidgetExtras extras; // Extra annotations (attributes, style, listeners)
 
       emp::vector<Widget> children;  // Widgets contained in this cell.
-
-    public:
-      TableData() : colspan(1), rowspan(1), header(false), masked(false) { ; }
-      ~TableData() { ; }
 
       bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
         bool ok = true;
@@ -180,33 +150,21 @@ namespace web {
     };  // END: TableData
 
 
-    class TableRow {
-      friend Table; friend TableInfo;
-    protected:
+    struct TableRow {
       emp::vector<TableData> data;  // detail object for each cell in this row.
-      Style style;
-
-    public:
-      TableRow() { ; }
-      ~TableRow() { ; }
-
-      size_t GetSize() const { return data.size(); }                     // # of cells in this row
-      TableData & operator[](size_t id) { return data[id]; }             // Get a single cell
-      const TableData & operator[](size_t id) const { return data[id]; } // Get a single const cell
-
-      TableRow & SetCols(size_t c) { data.resize(c); return *this; }
+      WidgetExtras extras; // Extra annotations (attributes, style, listeners)
 
       // Apply to all cells in row.
       template <typename SETTING_TYPE>
       TableRow & CellsCSS(const std::string & setting, SETTING_TYPE && value) {
-        for (auto & datum : data) datum.style.Set(setting, value);
+        for (auto & datum : data) datum.extras.style.Set(setting, value);
         return *this;
       }
 
       // Apply to specific cell in row.
       template <typename SETTING_TYPE>
       TableRow & CellCSS(size_t col_id, const std::string & setting, SETTING_TYPE && value) {
-        data[col_id].style.Set(setting, value);
+        data[col_id].extras.style.Set(setting, value);
         return *this;
       }
 
@@ -218,53 +176,24 @@ namespace web {
       }
     };
 
-    class TableCol {
-      friend Table; friend TableInfo;
-    protected:
-      Style style;
+    struct TableCol { WidgetExtras extras; };  // Currently only need annotations.
 
-    public:
-      TableCol() { ; }
-      ~TableCol() { ; }
-    };
-
-    class TableColGroup {
-      friend Table; friend TableInfo;
-    protected:
-      Style style;
-      size_t span;
-      bool masked;
-
-    public:
-      TableColGroup() : span(1), masked(false) { ; }
-      ~TableColGroup() { ; }
-
-      size_t GetSpan() const { return span; }
-    };
-
-    class TableRowGroup {
-      friend Table; friend TableInfo;
-    protected:
-      Style style;
-      size_t span;
-      bool masked;
-
-    public:
-      TableRowGroup() : span(1), masked(false) { ; }
-      ~TableRowGroup() { ; }
-
-      size_t GetSpan() const { return span; }
+    // Group of rows or columns...
+    struct TableGroup : public WidgetExtras {
+      size_t span = 1;       // How many rows/columns does this group represent?
+      bool masked = false;   // Is the current group masked because of a previous span?
+      WidgetExtras extras;   // Extra annotations (attributes, style, listeners)
     };
 
     class TableInfo : public internal::WidgetInfo {
       friend Table;
     protected:
-      size_t row_count;                      // How big is this table?
+      size_t row_count;                    // How big is this table?
       size_t col_count;
-      emp::vector<TableRow> rows;            // Detail object for each row
-      emp::vector<TableCol> cols;            // Detail object for each column (if needed)
-      emp::vector<TableColGroup> col_groups; // Detail object for each column group (if needed)
-      emp::vector<TableRowGroup> row_groups; // Detail object for each row group (if needed)
+      emp::vector<TableRow> rows;          // Detail object for each row
+      emp::vector<TableCol> cols;          // Detail object for each column (if needed)
+      emp::vector<TableGroup> col_groups;  // Detail object for each column group (if needed)
+      emp::vector<TableGroup> row_groups;  // Detail object for each row group (if needed)
 
       size_t append_row;               // Which row is triggering an append?
       size_t append_col;               // Which col is triggering an append?
@@ -279,15 +208,15 @@ namespace web {
       virtual bool IsTableInfo() const override { return true; }
 
       void Resize(size_t new_rows, size_t new_cols) {
-        // Resize existing rows
+        // Resize preexisting rows if remaining
         if (new_cols != col_count) {
           for (size_t r = 0; r < rows.size() && r < new_rows; r++) {
-            rows[r].SetCols(new_cols);
+            rows[r].data.resize(new_cols);
             for (size_t c = col_count; c < new_cols; c++) { AddChild(r, c, Text("")); }
           }
           col_count = new_cols;                    // Store the new column count
 
-          // Resize extra column info, only if needed.
+          // Resize extra column info, only if currently in use.
           if (cols.size()) cols.resize(new_cols);
           if (col_groups.size()) col_groups.resize(new_cols);
         }
@@ -296,7 +225,7 @@ namespace web {
         if (new_rows != row_count) {
           rows.resize(new_rows);
           for (size_t r = row_count; r < new_rows; r++) {
-            rows[r].SetCols(col_count);
+            rows[r].data.resize(col_count);
             for (size_t c = 0; c < col_count; c++) { AddChild(r, c, Text("")); }
           }
           row_count = new_rows;
@@ -311,7 +240,7 @@ namespace web {
         // Activate all of the cell children.
         for (size_t r = 0; r < row_count; r++) {
           for (size_t c = 0; c < col_count; c++) {
-            for (auto & child : rows[r][c].children) child->DoActivate(false);
+            for (auto & child : rows[r].data[c].children) child->DoActivate(false);
           }
         }
 
@@ -320,16 +249,16 @@ namespace web {
       }
 
 
-      // Return a text element for appending into a specific cell.
-      // If the last element is text, use it; otherwise build a new one.
+      // Return a text element for appending into a specific cell (use existing one or build new)
       web::Text & GetTextWidget(size_t r, size_t c) {
-        // If the final element is not text, add one.
-        if (rows[r][c].children.size() == 0
-            || rows[r][c].children.back().IsText() == false
-            || rows[r][c].children.back().AppendOK() == false)  {
+        auto & cell_children = rows[r].data[c].children;
+        // If final element in this cell doesn't exists, isn't text, or can't append, but new Text!
+        if (cell_children.size() == 0
+            || cell_children.back().IsText() == false
+            || cell_children.back().AppendOK() == false)  {
           AddChild(Text());
         }
-        return (Text &) rows[r][c].children.back();
+        return (Text &) cell_children.back();
       }
 
       web::Text & GetTextWidget() {
@@ -347,18 +276,15 @@ namespace web {
         return GetTextWidget() << in_fun;
       }
 
-
-
       // Add a widget to the specified cell in the current table.
       void AddChild(size_t r, size_t c, Widget in) {
         emp_assert(in->parent == nullptr && "Cannot insert widget if already has parent!", in->id);
         emp_assert(in->state != Widget::ACTIVE && "Cannot insert a stand-alone active widget!");
 
         // Setup parent-child relationship in the specified cell.
-        rows[r][c].children.emplace_back(in);
+        rows[r].data[c].children.emplace_back(in);
         in->parent = this;
         Register(in);
-
 
         // If this element (as new parent) is active, anchor widget and activate it!
         if (state == Widget::ACTIVE) {
@@ -390,7 +316,7 @@ namespace web {
       void RegisterChildren(internal::SlateInfo * regestrar) override {
         for (size_t r = 0; r < row_count; r++) {
           for (size_t c = 0; c < col_count; c++) {
-            for (Widget & child : rows[r][c].children) regestrar->Register(child);
+            for (Widget & child : rows[r].data[c].children) regestrar->Register(child);
           }
         }
       }
@@ -398,15 +324,14 @@ namespace web {
       void UnregisterChildren(internal::SlateInfo * regestrar) override {
         for (size_t r = 0; r < row_count; r++) {
           for (size_t c = 0; c < col_count; c++) {
-            for (Widget & child : rows[r][c].children) regestrar->Unregister(child);
+            for (Widget & child : rows[r].data[c].children) regestrar->Unregister(child);
           }
         }
       }
 
-
       virtual void GetHTML(std::stringstream & HTML) override {
-        emp_assert(cols.size() == 0 || cols.size() == (std::size_t) col_count);
-        emp_assert(col_groups.size() == 0 || col_groups.size() == (std::size_t) col_count);
+        emp_assert(cols.size() == 0 || cols.size() == col_count);
+        emp_assert(col_groups.size() == 0 || col_groups.size() == col_count);
 
         HTML.str("");                                           // Clear the current text.
         HTML << "<table id=\"" << id << "\">";
@@ -420,11 +345,11 @@ namespace web {
           for (size_t c = 0; c < col_count; ++c) {
             if (use_colg && col_groups[c].masked == false) {
               HTML << "<colgroup";
-              if (col_groups[c].style.GetSize()) HTML << " id=" << id << "_cg" << c;
+              if (col_groups[c].extras) HTML << " id=" << id << "_cg" << c;
               HTML << ">";
             }
             HTML << "<col";
-            if (use_cols && cols[c].style.GetSize()) HTML << " id=" << id << "_c" << c;
+            if (use_cols && cols[c].extras) HTML << " id=" << id << "_c" << c;
             HTML << ">";
           }
         }
@@ -433,25 +358,25 @@ namespace web {
         for (size_t r = 0; r < rows.size(); r++) {
           if (use_rowg && row_groups[r].masked == false) {
             HTML << "<tbody";
-            if (row_groups[r].style.GetSize()) HTML << " id=" << id << "_rg" << r;
+            if (row_groups[r].extras) HTML << " id=" << id << "_rg" << r;
             HTML << ">";
           }
 
           auto & row = rows[r];
           HTML << "<tr";
-          if (row.style.GetSize()) HTML << " id=" << id << '_' << r;
+          if (row.extras) HTML << " id=" << id << '_' << r;
           HTML << ">";
 
           // Loop through each cell in this row.
-          for (size_t c = 0; c < row.GetSize(); c++) {
-            auto & datum = row[c];
+          for (size_t c = 0; c < row.data.size(); c++) {
+            auto & datum = row.data[c];
             if (datum.masked) continue;  // If this cell is masked by another, skip it!
 
             // Print opening tag.
             HTML << (datum.header ? "<th" : "<td");
 
             // Include an id for this cell if we have one.
-            if (datum.style.GetSize()) HTML << " id=" << id << '_' << r << '_' << c;
+            if (datum.extras) HTML << " id=" << id << '_' << r << '_' << c;
 
             // If this cell spans multiple rows or columns, indicate!
             if (datum.colspan > 1) HTML << " colspan=\"" << datum.colspan << "\"";
@@ -474,39 +399,28 @@ namespace web {
         HTML << "</table>";
       }
 
-
       void ClearCell(size_t row_id, size_t col_id) {
         auto & datum = rows[row_id].data[col_id];
         datum.colspan = 1;
         datum.rowspan = 1;
         datum.header = false;
         datum.masked = false;  // @CAO Technically, cell might still be masked!
-        datum.style.Clear();
+        datum.extras.Clear();
 
-        // Clear out this cell's children.
-        // @CAO: Keep a starting text widget if we can!
-        if (parent) {
-          for (Widget & child : datum.children) parent->Unregister(child);
-        }
+        // Clear out this cell's children.   @CAO: Keep a starting text widget if we can?
+        if (parent) for (Widget & child : datum.children) parent->Unregister(child);
         datum.children.resize(0);
       }
       void ClearRowCells(size_t row_id) {
         for (size_t col_id = 0; col_id < col_count; col_id++) ClearCell(row_id, col_id);
       }
       void ClearRow(size_t row_id) {
-        rows[row_id].style.Clear();
+        rows[row_id].extras.Clear();
         ClearRowCells(row_id);
       }
-      void ClearTableCells() {
-        for (size_t row_id = 0; row_id < row_count; row_id++) ClearRowCells(row_id);
-      }
-      void ClearTableRows() {
-        for (size_t row_id = 0; row_id < row_count; row_id++) ClearRow(row_id);
-      }
-      void ClearTable() {
-        style.Clear();
-        Resize(0,0);
-      }
+      void ClearTableCells() { for (size_t r = 0; r < row_count; r++) ClearRowCells(r); }
+      void ClearTableRows() { for (size_t r = 0; r < row_count; r++) ClearRow(r); }
+      void ClearTable() { extras.Clear(); Resize(0,0); }
 
       bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
         bool ok = true;
@@ -558,13 +472,13 @@ namespace web {
         // Recursively call OK on rows and data.
         for (size_t r = 0; r < row_count; r++) {
           ok = ok && rows[r].OK(ss, verbose, prefix+"  ");
-          if (col_count != rows[r].GetSize()) {
+          if (col_count != rows[r].data.size()) {
             ss << prefix << "  Error: col_count = " << col_count
-               << ", but row has " << rows[r].GetSize() << " elements." << std::endl;
+               << ", but row has " << rows[r].data.size() << " elements." << std::endl;
             ok = false;
           }
           for (size_t c = 0; c < col_count; c++) {
-            auto & cell = rows[r][c];
+            auto & cell = rows[r].data[c];
             if (c + cell.colspan > col_count) {
               ss << prefix << "  Error: Cell at row " << r << ", col " << c
                  << " extends past right side of table." << std::endl;
@@ -581,52 +495,49 @@ namespace web {
         return ok;
       }
 
-
       void ReplaceHTML() override {
-        emp_assert(cols.size() == 0 || cols.size() == (std::size_t) col_count);
-        emp_assert(col_groups.size() == 0 || col_groups.size() == (std::size_t) col_count);
-        emp_assert(row_groups.size() == 0 || row_groups.size() == (std::size_t) row_count);
+        emp_assert(cols.size() == 0 || cols.size() == col_count);
+        emp_assert(col_groups.size() == 0 || col_groups.size() == col_count);
+        emp_assert(row_groups.size() == 0 || row_groups.size() == row_count);
 
         // Replace Table's HTML...
         internal::WidgetInfo::ReplaceHTML();
 
         // Then replace cells
         for (size_t r = 0; r < row_count; r++) {
-          rows[r].style.Apply(emp::to_string(id, '_', r));
+          rows[r].extras.Apply(emp::to_string(id, '_', r));
           for (size_t c = 0; c < col_count; c++) {
-            auto & datum = rows[r][c];
+            auto & datum = rows[r].data[c];
             if (datum.masked) continue;  // If this cell is masked by another, skip it!
-            datum.style.Apply(emp::to_string(id, '_', r, '_', c));
+            datum.extras.Apply(emp::to_string(id, '_', r, '_', c));
 
             // If this widget is active, immediately replace children.
             if (state == Widget::ACTIVE) {
               for (auto & child : datum.children) child->ReplaceHTML();
             }
-
           }
         }
 
         // And setup columns, column groups, and row groups, as needed.
         if (cols.size()) {
           for (size_t c = 0; c < col_count; c++) {
-            if (cols[c].style.GetSize()==0) continue;
-            cols[c].style.Apply(emp::to_string(id, "_c", c));
+            if (!cols[c].extras) continue;
+            cols[c].extras.Apply(emp::to_string(id, "_c", c));
           }
         }
         if (col_groups.size()) {
           for (size_t c = 0; c < col_count; c++) {
-            if (col_groups[c].masked || col_groups[c].style.GetSize()==0) continue;
-            col_groups[c].style.Apply(emp::to_string(id, "_cg", c));
+            if (col_groups[c].masked || !col_groups[c].extras) continue;
+            col_groups[c].extras.Apply(emp::to_string(id, "_cg", c));
           }
         }
         if (row_groups.size()) {
           for (size_t c = 0; c < col_count; c++) {
-            if (row_groups[c].masked || row_groups[c].style.GetSize()==0) continue;
-            row_groups[c].style.Apply(emp::to_string(id, "_rg", c));
+            if (row_groups[c].masked || !row_groups[c].extras) continue;
+            row_groups[c].extras.Apply(emp::to_string(id, "_rg", c));
           }
         }
       }
-
 
     public:
       virtual std::string GetType() override { return "web::TableInfo"; }
@@ -639,14 +550,12 @@ namespace web {
   class Table : public internal::WidgetFacet<Table> {
     friend class internal::TableInfo;
   protected:
-
     size_t cur_row;      // Which row/col is currently active?
     size_t cur_col;
 
     // A table's state determines how some operations work.
     enum state_t { TABLE, ROW, CELL, COL, COL_GROUP, ROW_GROUP };
     state_t state;
-
 
     // Get a properly cast version of indo.
     internal::TableInfo * Info() { return (internal::TableInfo *) info; }
@@ -655,34 +564,102 @@ namespace web {
     Table(internal::TableInfo * in_info, size_t _row=0, size_t _col=0, state_t _state=TABLE)
      : WidgetFacet(in_info), cur_row(_row), cur_col(_col), state(_state) { ; }
 
-    // Apply to appropriate component based on current state.
+    // Apply CSS to appropriate component based on current state.
     void DoCSS(const std::string & setting, const std::string & value) override {
       switch (state) {
       case TABLE:
         WidgetFacet<Table>::DoCSS(setting, value);
         break;
       case ROW:
-        Info()->rows[cur_row].style.Set(setting, value);
-        // @CAO need to make change active immediately...
+        Info()->rows[cur_row].extras.style.Set(setting, value);
+        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
         break;
       case CELL:
-        Info()->rows[cur_row].data[cur_col].style.Set(setting, value);
-        // @CAO need to make change active immediately...
+        Info()->rows[cur_row].data[cur_col].extras.style.Set(setting, value);
+        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
         break;
       case COL:
         // If we haven't setup columns at all yet, do so.
         if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
-        Info()->cols[cur_col].style.Set(setting, value);
+        Info()->cols[cur_col].extras.style.Set(setting, value);
         break;
       case COL_GROUP:
         // If we haven't setup column groups at all yet, do so.
         if (Info()->col_groups.size() == 0) Info()->col_groups.resize(GetNumCols());
-        Info()->col_groups[cur_col].style.Set(setting, value);
+        Info()->col_groups[cur_col].extras.style.Set(setting, value);
         break;
       case ROW_GROUP:
         // If we haven't setup row groups at all yet, do so.
         if (Info()->row_groups.size() == 0) Info()->row_groups.resize(GetNumRows());
-        Info()->row_groups[cur_row].style.Set(setting, value);
+        Info()->row_groups[cur_row].extras.style.Set(setting, value);
+        break;
+      default:
+        emp_assert(false && "Table in unknown state!");
+      };
+    }
+
+    // Apply CSS to appropriate component based on current state.
+    void DoAttr(const std::string & setting, const std::string & value) override {
+      switch (state) {
+      case TABLE:
+        WidgetFacet<Table>::DoAttr(setting, value);
+        break;
+      case ROW:
+        Info()->rows[cur_row].extras.attr.Set(setting, value);
+        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
+        break;
+      case CELL:
+        Info()->rows[cur_row].data[cur_col].extras.attr.Set(setting, value);
+        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
+        break;
+      case COL:
+        // If we haven't setup columns at all yet, do so.
+        if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
+        Info()->cols[cur_col].extras.attr.Set(setting, value);
+        break;
+      case COL_GROUP:
+        // If we haven't setup column groups at all yet, do so.
+        if (Info()->col_groups.size() == 0) Info()->col_groups.resize(GetNumCols());
+        Info()->col_groups[cur_col].extras.attr.Set(setting, value);
+        break;
+      case ROW_GROUP:
+        // If we haven't setup row groups at all yet, do so.
+        if (Info()->row_groups.size() == 0) Info()->row_groups.resize(GetNumRows());
+        Info()->row_groups[cur_row].extras.attr.Set(setting, value);
+        break;
+      default:
+        emp_assert(false && "Table in unknown state!");
+      };
+    }
+
+    // Apply CSS to appropriate component based on current state.
+    void DoListen(const std::string & event_name, size_t fun_id) override {
+      switch (state) {
+      case TABLE:
+        WidgetFacet<Table>::DoListen(event_name, fun_id);
+        break;
+      case ROW:
+        Info()->rows[cur_row].extras.listen.Set(event_name, fun_id);
+        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
+        break;
+      case CELL:
+        Info()->rows[cur_row].data[cur_col].extras.listen.Set(event_name, fun_id);
+        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
+        break;
+      case COL:
+        // If we haven't setup columns at all yet, do so.
+        if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
+        Info()->cols[cur_col].extras.listen.Set(event_name, fun_id);
+        break;
+      case COL_GROUP:
+        // If we haven't setup column groups at all yet, do so.
+        if (Info()->col_groups.size() == 0) Info()->col_groups.resize(GetNumCols());
+        Info()->col_groups[cur_col].extras.listen.Set(event_name, fun_id);
+        break;
+      case ROW_GROUP:
+        // If we haven't setup row groups at all yet, do so.
+        if (Info()->row_groups.size() == 0) Info()->row_groups.resize(GetNumRows());
+        Info()->row_groups[cur_row].extras.listen.Set(event_name, fun_id);
         break;
       default:
         emp_assert(false && "Table in unknown state!");
@@ -690,7 +667,6 @@ namespace web {
     }
 
   public:
-
     Table(size_t r, size_t c, const std::string & in_id="")
       : WidgetFacet(in_id), cur_row(0), cur_col(0), state(TABLE)
     {
@@ -753,7 +729,7 @@ namespace web {
     }
     Table & ClearCell(size_t r, size_t c) { Info()->ClearCell(r, c); return *this; }
 
-
+    // Functions to resize the number of rows, columns, or both!
     Table & Rows(size_t r) {
       Info()->Resize(r, Info()->col_count);
       if (cur_row >= r) cur_row = 0;
@@ -778,28 +754,26 @@ namespace web {
       return Table(Info(), r, c, CELL);
     }
     Table GetRow(size_t r) {
-      emp_assert(r < Info()->row_count,
-                 r, Info()->row_count, GetID());
+      emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
       return Table(Info(), r, 0, ROW);
     }
     Table GetCol(size_t c) {
-      emp_assert(c < Info()->col_count,
-                 c, Info()->col_count, GetID());
+      emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
       return Table(Info(), 0, c, COL);
     }
     Table GetRowGroup(size_t r) {
-      emp_assert(r < Info()->row_count,
-                 r, Info()->row_count, GetID());
+      emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
       return Table(Info(), r, 0, ROW_GROUP);
     }
     Table GetColGroup(size_t c) {
-      emp_assert(c < Info()->col_count,
-                 c, Info()->col_count, GetID());
+      emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
       return Table(Info(), 0, c, COL_GROUP);
     }
     Table GetTable() {
       return Table(Info(), cur_row, cur_col, TABLE);
     }
+
+    web::Text GetTextWidget() { return Info()->GetTextWidget(); }
 
     // Update the current table object to change the active cell.
     Table & SetCellActive(size_t r, size_t c) {
@@ -811,39 +785,33 @@ namespace web {
       return *this;
     }
     Table & SetRowActive(size_t r) {
-      emp_assert(r < Info()->row_count,
-                 r, Info()->row_count, GetID());
+      emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
       cur_row = r; cur_col = 0;
       state = ROW;
       return *this;
     }
     Table & SetColActive(size_t c) {
-      emp_assert(c < Info()->col_count,
-                 c, Info()->col_count, GetID());
+      emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
       cur_col = c; cur_row = 0;
       state = COL;
       return *this;
     }
     Table & SetRowGroupActive(size_t r) {
-      emp_assert(r < Info()->row_count,
-                 r, Info()->row_count, GetID());
+      emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
       cur_row = r; cur_col = 0;
       state = ROW_GROUP;
       return *this;
     }
     Table & SetColGroupActive(size_t c) {
-      emp_assert(c < Info()->col_count,
-                 c, Info()->col_count, GetID());
+      emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
       cur_col = c; cur_row = 0;
       state = COL_GROUP;
       return *this;
     }
-    Table & SetTableActive() {
-      // Leave row and col where they are.
+    Table & SetTableActive() { // Set focus to table; leave row and col where they are.
       state = TABLE;
       return *this;
     }
-
 
     Table & SetHeader(bool _h=true) {
       emp_assert(state == CELL);
@@ -863,16 +831,22 @@ namespace web {
       return *this;
     }
 
+    // // Setup functions on events associated with portions of a table.
+    // RETURN_TYPE & OnCell(const std::string & event_name, const std::function<void(int,int)> & fun) {
+    //   emp_assert(info != nullptr);
+    //   info->listen.Set2Index(event_name, fun);
+    //   return (RETURN_TYPE &) *this;
+    // }
 
     // Apply to appropriate component based on current state.
     using WidgetFacet<Table>::SetCSS;
     std::string GetCSS(const std::string & setting) override {
-      if (state == CELL) return Info()->rows[cur_row].data[cur_col].style.Get(setting);
-      if (state == ROW) return Info()->rows[cur_row].style.Get(setting);
-      if (state == COL) return Info()->cols[cur_col].style.Get(setting);
-      if (state == ROW_GROUP) return Info()->row_groups[cur_row].style.Get(setting);
-      if (state == COL_GROUP) return Info()->col_groups[cur_col].style.Get(setting);
-      if (state == TABLE) return Info()->style.Get(setting);
+      if (state == CELL) return Info()->rows[cur_row].data[cur_col].extras.GetStyle(setting);
+      if (state == ROW) return Info()->rows[cur_row].extras.GetStyle(setting);
+      if (state == COL) return Info()->cols[cur_col].extras.GetStyle(setting);
+      if (state == ROW_GROUP) return Info()->row_groups[cur_row].extras.GetStyle(setting);
+      if (state == COL_GROUP) return Info()->col_groups[cur_col].extras.GetStyle(setting);
+      if (state == TABLE) return Info()->extras.GetStyle(setting);
       return "";
     }
 
@@ -906,7 +880,7 @@ namespace web {
         // If we haven't setup columns at all yet, do so.
         if (Info()->row_groups.size() == 0) Info()->row_groups.resize(GetNumRows());
 
-        const size_t old_span = Info()->row_groups[cur_row].GetSpan();
+        const size_t old_span = Info()->row_groups[cur_row].span;
         Info()->row_groups[cur_row].span = new_span;
 
         if (old_span != new_span) {
@@ -951,7 +925,7 @@ namespace web {
         // If we haven't setup columns at all yet, do so.
         if (Info()->col_groups.size() == 0) Info()->col_groups.resize(GetNumCols());
 
-        const size_t old_span = Info()->col_groups[cur_col].GetSpan();
+        const size_t old_span = Info()->col_groups[cur_col].span;
         Info()->col_groups[cur_col].span = new_span;
 
         if (old_span != new_span) {
@@ -965,25 +939,6 @@ namespace web {
 
       return *this;
     }
-
-    // We can control properties of whole columns.
-    // Table & SetColSpan(size_t col_id, size_t new_span) {
-    //   emp_assert(col_id >= 0 && new_span >= 0);
-    //   emp_assert(col_id + new_span <= GetNumCols());
-
-    //   // If we haven't setup columns at all yet, do so.
-    //   if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
-
-    //   const size_t old_span = Info()->cols[col_id].GetSpan();
-    //   Info()->cols[col_id].span = new_span;
-
-    //   if (old_span != new_span) {
-    //     for (size_t i = old_span; i < new_span; i++) { Info()->cols[col_id + i].masked = true; }
-    //     for (size_t i = new_span; i < old_span; i++) { Info()->cols[col_id + i].masked = false; }
-    //   }
-
-    //   return *this;
-    // }
 
     Table & SetSpan(size_t new_span) {
       if (state == ROW_GROUP) return SetRowSpan(new_span);
@@ -1000,12 +955,11 @@ namespace web {
       return *this;
     }
 
-
     // Apply to target row.
     template <typename SETTING_TYPE>
     Table & RowCSS(size_t row_id, const std::string & setting, SETTING_TYPE && value) {
       emp_assert(row_id >= 0 && row_id < Info()->row_count);
-      Info()->rows[row_id].style.Set(setting, value);
+      Info()->rows[row_id].extras.style.Set(setting, value);
       if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace row's CSS
       return *this;
     }
@@ -1015,7 +969,7 @@ namespace web {
     Table & CellCSS(size_t row_id, size_t col_id, const std::string & setting, SETTING_TYPE && value) {
       emp_assert(row_id >= 0 && row_id < Info()->row_count);
       emp_assert(col_id >= 0 && col_id < Info()->row_count);
-      Info()->rows[row_id].style.Set(setting, value);
+      Info()->rows[row_id].extras.style.Set(setting, value);
       if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
       return *this;
     }
@@ -1023,7 +977,7 @@ namespace web {
     // Apply to all rows.  (@CAO: Should we use fancier jquery here?)
     template <typename SETTING_TYPE>
     Table & RowsCSS(const std::string & setting, SETTING_TYPE && value) {
-      for (auto & row : Info()->rows) row.style.Set(setting, emp::to_string(value));
+      for (auto & row : Info()->rows) row.extras.style.Set(setting, emp::to_string(value));
       if (IsActive()) Info()->ReplaceHTML();
       return *this;
     }

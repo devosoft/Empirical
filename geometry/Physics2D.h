@@ -51,9 +51,9 @@ namespace emp {
       auto & body_set = surface.GetBodySet();
       if (body_set.size() == 0) return *this;
 
-      int oldest_id = 0;
+      size_t oldest_id = 0;
 
-      for (int i = 1; i < (int) body_set.size(); i++) {
+      for (size_t i = 1; i < body_set.size(); i++) {
         if (body_set[i]->GetBirthTime() < body_set[oldest_id]->GetBirthTime()) {
           oldest_id = i;
         }

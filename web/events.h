@@ -7,6 +7,16 @@
 //
 //  OnDocumentReady(fun)
 //    Runs the specified function when the document is finished loading and being set up.
+//
+//
+//  Developer Notes:
+//  * Events can be further sub-divided and built up (similar to DataNode objects) so that we
+//    save only the information that we're planning to use.  This may be slightly faster (given
+//    how frequently some of these like mouse move might be used), but likely to be more compelx.
+//  * An alternative speed-up might be to save the current event somewhere in emp_i on the
+//    Javascript side, and then just request the information that we might need.  This approach
+//    should be easier to implement, but since everything would be copied anyway in such as case,
+//    it might not actually be a speedup.
 
 #ifndef EMP_WEB_EVENTS_H
 #define EMP_WEB_EVENTS_H

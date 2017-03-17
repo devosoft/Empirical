@@ -96,8 +96,8 @@ namespace web {
         if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
       }
       void UpdateDisabled(bool in_dis) {
-        if (in_dis) attr.Set("disabled", "true");
-        else attr.Remove("disabled");
+        if (in_dis) extras.SetAttr("disabled", "true");
+        else extras.RemoveAttr("disabled");
         if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
       }
 
@@ -146,7 +146,7 @@ namespace web {
     const std::string & GetLabel() const { return Info()->label; }
     const std::string & GetTitle() const { return Info()->title; }
     bool HasAutofocus() const { return Info()->autofocus; }
-    bool IsDisabled() const { return Info()->attr.Has("disabled"); }
+    bool IsDisabled() const { return Info()->extras.HasAttr("disabled"); }
   };
 
 

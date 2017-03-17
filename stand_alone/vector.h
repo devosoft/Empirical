@@ -2,8 +2,11 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//  Converted to stand-alone: March 6, 2017
+//
+//
 //  This class is a drop-in wrapper for std::vector, adding on bounds checking.
-//  If EMP_NDEBUG is set then it reverts back to std::vector.
+//  If NDEBUG is set then it reverts back to std::vector.
 //
 //
 //  Developer Notes:
@@ -14,15 +17,13 @@
 #ifndef EMP_VECTOR_H
 #define EMP_VECTOR_H
 
+#include <assert.h>
 #include <initializer_list>
 #include <utility>
 #include <vector>
 
-#include "assert.h"
-#include "../meta/TypeID.h"
 
-
-#ifdef EMP_NDEBUG
+#ifdef NDEBUG
 
 // Seemlessly translate emp::vector to std::vector
 namespace emp {
@@ -30,7 +31,7 @@ namespace emp {
 }
 
 
-#else // #EMP_NDEBUG *not* set
+#else // NDEBUG *not* set
 
 namespace emp {
 
@@ -55,8 +56,8 @@ namespace emp {
 
     vector() = default;
     vector(const this_t &) = default;
-    vector(size_t size) : v(size) { emp_assert(size < MAX_SIZE, size); }
-    vector(size_t size, const T & val) : v(size, val) { emp_assert(size < MAX_SIZE, size); }
+    vector(size_t size) : v(size) { assert(size < MAX_SIZE); }
+    vector(size_t size, const T & val) : v(size, val) { assert(size < MAX_SIZE); }
     vector(std::initializer_list<T> in_list) : v(in_list) { ; }
     vector(const stdv_t & in) : v(in) { ; }         // Emergency fallback conversion.
     ~vector() = default;
@@ -66,9 +67,9 @@ namespace emp {
 
     size_type size() const noexcept { return v.size(); }
     void clear() { v.clear(); }
-    void resize(size_t new_size) { emp_assert(new_size < MAX_SIZE, new_size); v.resize(new_size); }
+    void resize(size_t new_size) { assert(new_size < MAX_SIZE); v.resize(new_size); }
     void resize(size_t new_size, const T & val) {
-      emp_assert(new_size < MAX_SIZE, new_size);
+      assert(new_size < MAX_SIZE);
       v.resize(new_size, val);
     }
     bool empty() const noexcept { return v.empty(); }
@@ -77,12 +78,10 @@ namespace emp {
     void reserve(size_type n) { v.reserve(n); }
     void shrink_to_fit() { v.shrink_to_fit(); }
 
-    this_t & operator=(const this_t &) = default;
-    // this_t & operator=(const stdv_t & x) { v = x; return *this; }
-    // this_t & operator=(const std::initializer_list<value_type> & il) {
-    template <typename IN_T>
-    this_t & operator=(IN_T && in) {
-      v.operator=(std::forward<IN_T>(in));
+    this_t & operator=(const emp::vector<T,Ts...> &) = default;
+    this_t & operator=(const stdv_t & x) { v = x; return *this; }
+    this_t & operator=(const std::initializer_list<value_type> & il) {
+      v.operator=(il);
       return *this;
     }
 
@@ -97,12 +96,12 @@ namespace emp {
     bool operator>=(const this_t & in) const { return v >= in.v; }
 
     T & operator[](size_t pos) {
-      emp_assert(pos < v.size(), pos, v.size());
+      assert(pos < v.size());
       return v[pos];
     }
 
     const T & operator[](size_t pos) const {
-      emp_assert(pos < v.size(), pos, v.size());
+      assert(pos < v.size());
       return v[pos];
     }
 
@@ -144,13 +143,13 @@ namespace emp {
     template <typename... ARGS>
     iterator insert(ARGS &&... args) { return v.insert(std::forward<ARGS>(args)...); }
 
-    T & back() { emp_assert(size() > 0); return v.back(); }
-    const T & back() const { emp_assert(size() > 0); return v.back(); }
-    T & front() { emp_assert(size() > 0); return v.front(); }
-    const T & front() const { emp_assert(size() > 0); return v.front(); }
+    T & back() { assert(size() > 0); return v.back(); }
+    const T & back() const { assert(size() > 0); return v.back(); }
+    T & front() { assert(size() > 0); return v.front(); }
+    const T & front() const { assert(size() > 0); return v.front(); }
 
     void pop_back() {
-      emp_assert(v.size() > 0, v.size());
+      assert(v.size() > 0);
       v.pop_back();
     }
   };
@@ -170,19 +169,6 @@ std::istream & operator>>(std::istream & is, emp::vector<T,Ts...> & v) {
   return is;
 }
 
-#endif
+#endif  // NDEBUG not defined
 
-namespace emp {
-  template<typename T, typename... Ts> struct TypeID< emp::vector<T,Ts...> > {
-    static std::string GetName() {
-      using simple_vt = emp::vector<T>;
-      using full_vt = emp::vector<T,Ts...>;
-      if (std::is_same<simple_vt,full_vt>::value) {
-        return "emp::vector<" + TypeID<T>::GetName() + ">";
-      }
-      return "emp::vector<" + TypeID<TypePack<T,Ts...>>::GetTypes() + ">";
-    }
-  };
-}
-
-#endif
+#endif  // Include guard

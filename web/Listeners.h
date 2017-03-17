@@ -33,7 +33,16 @@ namespace web {
 
     size_t GetSize() const { return listeners.size(); }
 
-    Listeners & Set(const std::string & name, const std::function<void()> & in_fun) {
+    // Use a pre-calculated function ID.
+    Listeners & Set(const std::string & name, size_t fun_id) {
+      emp_assert(!Has(name));
+      listeners[name] = fun_id;
+      return *this;
+    }
+
+    // Calculate its own function ID with JSWrap.
+    template <typename... Ts>
+    Listeners & Set(const std::string & name, const std::function<void(Ts... args)> & in_fun) {
       emp_assert(!Has(name));
       listeners[name] = JSWrap(in_fun);
       return *this;
@@ -77,7 +86,7 @@ namespace web {
 #ifdef EMSCRIPTEN
         EM_ASM_ARGS({
           var name = Pointer_stringify($0);
-          emp_i.cur_obj.on( name, function() { alert('test!'); emp.Callback($1); } );
+          emp_i.cur_obj.on( name, function(evt) { emp.Callback($1, evt); } );
         }, event_pair.first.c_str(), event_pair.second);
 #else
         std::cout << "Setting '" << widget_id << "' listener '" << event_pair.first
@@ -86,6 +95,25 @@ namespace web {
       }
     }
 
+
+    // Apply a SPECIFIC listener.
+    static void Apply(const std::string & widget_id,
+                      const std::string event_name,
+                      size_t fun_id) {
+#ifdef EMSCRIPTEN
+        EM_ASM_ARGS({
+          var id = Pointer_stringify($0);
+          var name = Pointer_stringify($1);
+          $( '#' + id ).on( name, function(evt) { emp.Callback($2, evt); } );
+        }, widget_id.c_str(), event_name.c_str(), fun_id);
+#else
+        std::cout << "Setting '" << widget_id << "' listener '" << event_name
+                  << "' to function id '" << fun_id << "'.";
+#endif
+    }
+
+
+    operator bool() const { return (bool) listeners.size(); }
   };
 
 

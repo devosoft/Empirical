@@ -29,11 +29,9 @@
 #include "../base/vector.h"
 #include "../tools/mem_track.h"
 
-#include "Attributes.h"
 #include "events.h"
 #include "init.h"
-#include "Listeners.h"
-#include "Style.h"
+#include "WidgetExtras.h"
 
 namespace emp {
 namespace web {
@@ -91,6 +89,9 @@ namespace web {
 
     enum ActivityState { INACTIVE, WAITING, FROZEN, ACTIVE };
 
+    // Default name for un-initialized widgets.
+    static const std::string no_name;
+
   public:
     Widget(const std::string & id);
     Widget(WidgetInfo * in_info=nullptr);
@@ -125,7 +126,7 @@ namespace web {
     bool IsTable() const { return TableOK(); }
     bool IsText() const { return TextOK(); }
 
-    std::string GetID() const;
+    const std::string & GetID() const;
 
     // CSS-related options may be overridden in derived classes that have multiple styles.
     virtual std::string GetCSS(const std::string & setting);
@@ -139,6 +140,9 @@ namespace web {
     bool operator!=(const Widget & in) const { return info != in.info; }
 
     operator bool() const { return info != nullptr; }
+
+    int GetXPos();
+    int GetYPos();
 
     // An active widget makes live changes to the webpage (once document is ready)
     // An inactive widget just records changes internally.
@@ -175,9 +179,7 @@ namespace web {
 
       // Basic info about a widget
       std::string id;                 // ID used for associated DOM element.
-      Style style;                    // CSS Style
-      Attributes attr;                // HTML Attributes about a class.
-      Listeners listen;               // Listen for web events
+      WidgetExtras extras;            // HTML attributes, CSS style, and listeners for web events.
 
       // Track hiearchy
       WidgetInfo * parent;            // Which WidgetInfo is this one contained within?
@@ -300,19 +302,13 @@ namespace web {
 
         // If active update style, trigger JS, and recurse to children!
         if (state == Widget::ACTIVE) {
-          // Update the style
-          style.Apply(id);
-          attr.Apply(id);
-          listen.Apply(id);
-
-          // Run associated Javascript code, if any (e.g., to fill out a canvas)
-          TriggerJS();
+          extras.Apply(id); // Update the attributes, style, and listeners.
+          TriggerJS();      // Run associated Javascript code, if any (e.g., to fill out a canvas)
         }
       }
 
     public:
       virtual std::string GetType() { return "web::WidgetInfo"; }
-
     };
 
   }  // end namespaceinternal
@@ -368,7 +364,8 @@ namespace web {
   bool Widget::AppendOK() const { if (!info) return false; return info->AppendOK(); }
   void Widget::PreventAppend() { emp_assert(info); info->PreventAppend(); }
 
-  std::string Widget::GetID() const { return info ? info->id : "(none)"; }
+  const std::string Widget::no_name = "(none)";
+  const std::string & Widget::GetID() const { return info ? info->id : no_name; }
 
   bool Widget::ButtonOK() const { if (!info) return false; return info->IsButtonInfo(); }
   bool Widget::CanvasOK() const { if (!info) return false; return info->IsCanvasInfo(); }
@@ -379,19 +376,36 @@ namespace web {
   bool Widget::TextOK() const { if (!info) return false; return info->IsTextInfo(); }
 
   std::string Widget::GetCSS(const std::string & setting) {
-    return info ? info->style.Get(setting) : "";
+    return info ? info->extras.GetStyle(setting) : "";
   }
   bool Widget::HasCSS(const std::string & setting) {
-    return info ? info->style.Has(setting) : false;
+    return info ? info->extras.HasStyle(setting) : false;
   }
 
   std::string Widget::GetAttr(const std::string & setting) {
-    return info ? info->attr.Get(setting) : "";
+    return info ? info->extras.GetAttr(setting) : "";
   }
   bool Widget::HasAttr(const std::string & setting) {
-    return info ? info->attr.Has(setting) : false;
+    return info ? info->extras.HasAttr(setting) : false;
   }
 
+  int Widget::GetXPos() {
+    if (!info) return -1;
+    return EM_ASM_INT({
+      var id = Pointer_stringify($0);
+      var rect = $('#' + id).position();
+      return rect.left;
+    }, GetID().c_str());
+  }
+
+  int Widget::GetYPos() {
+    if (!info) return -1;
+    return EM_ASM_INT({
+      var id = Pointer_stringify($0);
+      var rect = $('#' + id).position();
+      return rect.top;
+    }, GetID().c_str());
+  }
 
   void Widget::Activate() {
     auto * cur_info = info;
@@ -458,44 +472,79 @@ namespace web {
 
       // CSS-related options may be overridden in derived classes that have multiple styles.
       virtual void DoCSS(const std::string & setting, const std::string & value) {
-        info->style.DoSet(setting, value);
+        info->extras.style.DoSet(setting, value);
         if (IsActive()) Style::Apply(info->id, setting, value);
       }
       // Attr-related options may be overridden in derived classes that have multiple attributes.
       virtual void DoAttr(const std::string & setting, const std::string & value) {
-        info->attr.DoSet(setting, value);
+        info->extras.attr.DoSet(setting, value);
         if (IsActive()) Attributes::Apply(info->id, setting, value);
+      }
+      // Listener options may be overridden in derived classes that have multiple listen targets.
+      virtual void DoListen(const std::string & event_name, size_t fun_id) {
+        info->extras.listen.Set(event_name, fun_id);
+        if (IsActive()) Listeners::Apply(info->id, event_name, fun_id);
       }
 
     public:
+      using return_t = RETURN_TYPE;
+
       template <typename SETTING_TYPE>
-      RETURN_TYPE & SetCSS(const std::string & setting, SETTING_TYPE && value) {
+      return_t & SetCSS(const std::string & setting, SETTING_TYPE && value) {
         emp_assert(info != nullptr);
         DoCSS(setting, emp::to_string(value));
-        return (RETURN_TYPE &) *this;
+        return (return_t &) *this;
       }
       template <typename SETTING_TYPE>
-      RETURN_TYPE & SetAttr(const std::string & setting, SETTING_TYPE && value) {
+      return_t & SetAttr(const std::string & setting, SETTING_TYPE && value) {
         emp_assert(info != nullptr);
         DoAttr(setting, emp::to_string(value));
-        return (RETURN_TYPE &) *this;
+        return (return_t &) *this;
       }
-      RETURN_TYPE & On(const std::string & event_name, const std::function<void()> & fun) {
+      return_t & On(const std::string & event_name, const std::function<void()> & fun) {
         emp_assert(info != nullptr);
-        info->listen.Set(event_name, fun);
-        return (RETURN_TYPE &) *this;
+        size_t fun_id = JSWrap(fun);
+        DoListen(event_name, fun_id);
+        return (return_t &) *this;
       }
+      return_t & On(const std::string & event_name,
+                    const std::function<void(MouseEvent evt)> & fun) {
+        emp_assert(info != nullptr);
+        size_t fun_id = JSWrap(fun);
+        DoListen(event_name, fun_id);
+        return (return_t &) *this;
+      }
+
+      // Mouse event listeners
+      template <typename T> return_t & OnClick(T && arg) { return On("click", arg); }
+      template <typename T> return_t & OnDoubleClick(T && arg) { return On("dblclick", arg); }
+      template <typename T> return_t & OnMouseDown(T && arg) { return On("mousedown", arg); }
+      template <typename T> return_t & OnMouseUp(T && arg) { return On("mouseup", arg); }
+      template <typename T> return_t & OnMouseMove(T && arg) { return On("mousemove", arg); }
+      template <typename T> return_t & OnMouseOut(T && arg) { return On("mouseout", arg); }
+      template <typename T> return_t & OnMouseOver(T && arg) { return On("mouseover", arg); }
+      template <typename T> return_t & OnMouseWheel(T && arg) { return On("mousewheel", arg); }
+
+      // Keyboard event listeners
+      template <typename T> return_t & OnKeydown(T && arg) { return On("keydown", arg); }
+      template <typename T> return_t & OnKeypress(T && arg) { return On("keypress", arg); }
+      template <typename T> return_t & OnKeyup(T && arg) { return On("keyup", arg); }
+
+      // Clipboard event listeners
+      template <typename T> return_t & OnCopy(T && arg) { return On("copy", arg); }
+      template <typename T> return_t & OnCut(T && arg) { return On("cut", arg); }
+      template <typename T> return_t & OnPaste(T && arg) { return On("paste", arg); }
 
       // Allow multiple CSS or Attr settings to be grouped.
       template <typename T1, typename T2, typename... OTHER_SETTINGS>
-      RETURN_TYPE & SetCSS(const std::string & setting1, T1 && val1,
+      return_t & SetCSS(const std::string & setting1, T1 && val1,
                         const std::string & setting2, T2 && val2,
                         OTHER_SETTINGS... others) {
         SetCSS(setting1, val1);                      // Set the first CSS value.
         return SetCSS(setting2, val2, others...);    // Recurse to the others.
       }
       template <typename T1, typename T2, typename... OTHER_SETTINGS>
-      RETURN_TYPE & SetAttr(const std::string & setting1, T1 && val1,
+      return_t & SetAttr(const std::string & setting1, T1 && val1,
                             const std::string & setting2, T2 && val2,
                             OTHER_SETTINGS... others) {
         SetAttr(setting1, val1);                      // Set the first CSS value.
@@ -504,51 +553,51 @@ namespace web {
 
       // Allow multiple CSS or Attr settings as a single object.
       // (still go through DoCSS/DoAttr given need for virtual re-routing.)
-      RETURN_TYPE & SetCSS(const Style & in_style) {
+      return_t & SetCSS(const Style & in_style) {
         emp_assert(info != nullptr);
         for (const auto & s : in_style.GetMap()) {
           DoCSS(s.first, s.second);
         }
-        return (RETURN_TYPE &) *this;
+        return (return_t &) *this;
       }
-      RETURN_TYPE & SetAttr(const Attributes & in_attr) {
+      return_t & SetAttr(const Attributes & in_attr) {
         emp_assert(info != nullptr);
         for (const auto & a : in_attr.GetMap()) {
           DoAttr(a.first, a.second);
         }
-        return (RETURN_TYPE &) *this;
+        return (return_t &) *this;
       }
 
 
       // Size Manipulation
-      RETURN_TYPE & SetWidth(double w, const std::string & unit="px") {
+      return_t & SetWidth(double w, const std::string & unit="px") {
         return SetCSS("width", emp::to_string(w, unit) );
       }
-      RETURN_TYPE & SetHeight(double h, const std::string & unit="px") {
+      return_t & SetHeight(double h, const std::string & unit="px") {
         return SetCSS("height", emp::to_string(h, unit) );
       }
-      RETURN_TYPE & SetSize(double w, double h, const std::string & unit="px") {
+      return_t & SetSize(double w, double h, const std::string & unit="px") {
         SetWidth(w, unit); return SetHeight(h, unit);
       }
 
       // Position Manipulation
-      RETURN_TYPE & Center() { return SetCSS("margin", "auto"); }
-      RETURN_TYPE & SetPosition(int x, int y, const std::string & unit="px") {
+      return_t & Center() { return SetCSS("margin", "auto"); }
+      return_t & SetPosition(int x, int y, const std::string & unit="px") {
         return SetCSS("position", "fixed",
                       "left", emp::to_string(x, unit),
                       "top", emp::to_string(y, unit));
       }
-      RETURN_TYPE & SetPositionRT(int x, int y, const std::string & unit="px") {
+      return_t & SetPositionRT(int x, int y, const std::string & unit="px") {
         return SetCSS("position", "fixed",
                       "right", emp::to_string(x, unit),
                       "top", emp::to_string(y, unit));
       }
-      RETURN_TYPE & SetPositionRB(int x, int y, const std::string & unit="px") {
+      return_t & SetPositionRB(int x, int y, const std::string & unit="px") {
         return SetCSS("position", "fixed",
                       "right", emp::to_string(x, unit),
                       "bottom", emp::to_string(y, unit));
       }
-      RETURN_TYPE & SetPositionLB(int x, int y, const std::string & unit="px") {
+      return_t & SetPositionLB(int x, int y, const std::string & unit="px") {
         return SetCSS("position", "fixed",
                       "left", emp::to_string(x, unit),
                       "bottom", emp::to_string(y, unit));
@@ -556,25 +605,25 @@ namespace web {
 
 
       // Positioning
-      RETURN_TYPE & SetFloat(const std::string & f) { return SetCSS("float", f); }
-      RETURN_TYPE & SetOverflow(const std::string & o) { return SetCSS("overflow", o); }
+      return_t & SetFloat(const std::string & f) { return SetCSS("float", f); }
+      return_t & SetOverflow(const std::string & o) { return SetCSS("overflow", o); }
 
       // Text Manipulation
-      RETURN_TYPE & SetFont(const std::string & font) { return SetCSS("font-family", font); }
-      RETURN_TYPE & SetFontSize(int s) { return SetCSS("font-size", emp::to_string(s, "px")); }
-      RETURN_TYPE & SetFontSizeVW(double s) { return SetCSS("font-size", emp::to_string(s, "vw")); }
-      RETURN_TYPE & SetCenterText() { return SetCSS("text-align", "center"); }
+      return_t & SetFont(const std::string & font) { return SetCSS("font-family", font); }
+      return_t & SetFontSize(int s) { return SetCSS("font-size", emp::to_string(s, "px")); }
+      return_t & SetFontSizeVW(double s) { return SetCSS("font-size", emp::to_string(s, "vw")); }
+      return_t & SetCenterText() { return SetCSS("text-align", "center"); }
 
       // Color Manipulation
-      RETURN_TYPE & SetBackground(const std::string & v) { return SetCSS("background-color", v); }
-      RETURN_TYPE & SetColor(const std::string & v) { return SetCSS("color", v); }
-      RETURN_TYPE & SetOpacity(double v) { return SetCSS("opacity", v); }
+      return_t & SetBackground(const std::string & v) { return SetCSS("background-color", v); }
+      return_t & SetColor(const std::string & v) { return SetCSS("color", v); }
+      return_t & SetOpacity(double v) { return SetCSS("opacity", v); }
 
       // Tables...
-      RETURN_TYPE & SetBorder(const std::string & border_info) {
+      return_t & SetBorder(const std::string & border_info) {
         return SetCSS("border", border_info);
       }
-      RETURN_TYPE & SetPadding(double p, const std::string & unit="px") {
+      return_t & SetPadding(double p, const std::string & unit="px") {
         return SetCSS("padding", emp::to_string(p, unit));
       }
     };

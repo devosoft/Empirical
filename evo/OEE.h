@@ -180,7 +180,7 @@ namespace evo{
     }
 
     // void SendResultsToViz(int update, emp::vector<double> & results){
-    //   for (int i=0; i < (int)viz_pointers.size(); ++i){
+    //   for (size_t i=0; i < viz_pointers.size(); ++i){
     //     emp::vector<double> values;
     //     for (int el : viz_args[i]) {
     //       if (el == -1){

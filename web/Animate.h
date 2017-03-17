@@ -106,6 +106,7 @@ namespace web {
   public:
     Animate() : active(false), do_step(false), run_time(0.0), frame_count(0)
     {
+      emp::InitializeAnim();  // Make sure JS is intialized for animations.
       callback_id = JSWrap( std::function<void()>([this](){ this->AdvanceFrame(); }) );
     }
 
