@@ -211,6 +211,19 @@ public:
 
 };
 
+class HeatMap : public D3Visualization {
+public:
+
+    int grid_width = 10;
+    int grid_height = 10;
+    int cell_size = 15;
+    D3::TileGrid<> grid;
+
+    virtual void Setup() {
+        grid = D3::TileGrid<>(grid_width, grid_height, cell_size, *GetSVG());
+    }
+};
+
 template <typename DATA_TYPE = std::array<double, 2> >
 class LineGraph : public D3Visualization {
 protected:
