@@ -44,6 +44,7 @@ namespace evo {
               max_fit = pos;
         }
       }
+      std::cout<<max_fit<<std::endl;
     }
     ~NKLandscape() { ; }
     NKLandscape & operator=(const NKLandscape &) = delete;

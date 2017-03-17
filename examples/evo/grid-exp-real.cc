@@ -34,6 +34,12 @@ EMP_BUILD_CONFIG( NKConfig,
 
 using BitOrg = emp::BitVector;
 
+template <typename ORG>
+using GridWorld = emp::evo::World<ORG, emp::evo::StatsManager_AdvancedStats<emp::evo::PopulationManager_Grid<BitOrg> >,
+      emp::evo::PopulationManager_Grid<ORG>, emp::evo::LineagePruned >;
+
+
+
 
 int main(int argc, char* argv[])
 {
@@ -58,5 +64,56 @@ int main(int argc, char* argv[])
   prefix = config.NAME();
   emp::Random random(config.SEED());
   emp::evo::NKLandscape landscape(N, K, random);
+  bool competitive = 1; // Sets population to use competitive selection
+
+
+  // Create the world and set it up
+  GridWorld<BitOrg> grid_pop(random);
+  grid_pop.ConfigPop(std::sqrt(POP_SIZE), std::sqrt(POP_SIZE));
+  std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return landscape.GetFitness(*org);};
+
+  //Configure the world and the statsmanager output
+  grid_pop.SetDefaultFitnessFun(fit_func);
+  grid_pop.statsM.SetOutput(prefix + "grid.csv");
+
+  // Insert default organisms into world
+  for (int i = 0; i < POP_SIZE; i++)
+  {
+    BitOrg next_org(N);
+
+    for (int j = 0; j < N; j++) next_org[j] = random.P(0.5);
+
+    grid_pop.Insert(next_org);
+  }
+
+
+  // mutation function:
+  // for every site in the gnome there is a MUTATION_RATE chance that the 
+  // site will flip it's value.
+  grid_pop.SetDefaultMutateFun( [MUTATION_RATE, N](BitOrg* org, emp::Random& random) 
+    {
+      bool mutated = false;    
+        for (size_t site = 0; site < N; site++)
+        {
+          if (random.P(MUTATION_RATE))
+          {
+            (*org)[site] = !(*org)[site];
+            mutated = true;
+          }
+        }
+        return mutated;
+    } );
+
+
+  // Loop through updates
+  for (int ud = 0; ud < UD_COUNT; ud++)
+  {
+
+    grid_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
+            , TOURNAMENT_SIZE, POP_SIZE, competitive);
+
+    grid_pop.Update();
+    grid_pop.MutatePop();
+  }
 
 }
