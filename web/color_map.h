@@ -79,6 +79,29 @@ namespace emp {
     return cur_map;
   }
 
+  emp::vector<std::string>
+  GetHSLMap(size_t map_size, double min_h=0.0, double max_h=360.0,
+            int min_s=100, int max_s=100,
+            int min_l=50, int max_l=50) {
+
+    // @CAO: Should cache maps!
+    emp::vector<std::string> cur_map(map_size);
+    double h_step = (max_h - min_h) / (double) map_size;
+    double s_step = (max_s - min_s) / (double) map_size;
+    double l_step = (max_l - min_l) / (double) map_size;
+    for (size_t i = 0; i < map_size; ++i) {
+      double h = min_h + h_step * i;
+      double s = min_s + s_step * i;
+      double l = min_l + l_step * i;
+      if (h > 360) h -= 360;
+      if (s > 100) s -= 100;
+      if (l > 100) l -= 100;
+      cur_map[i] = ColorHSL(h, s, l);
+    }
+
+    return cur_map;
+  }
+
 
 }
 
