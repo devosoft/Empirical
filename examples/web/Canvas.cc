@@ -33,12 +33,7 @@ public:
 
     // Draw a simple circle animation on a canvas
     auto mycanvas = doc.AddCanvas(w, h, "can");
-    mycanvas.Circle(cx, cy, cr, "blue", "purple");
     targets.push_back(mycanvas);
-
-    // Draw the new polygon.
-    poly.AddPoint(0,0).AddPoint(60,25).AddPoint(50,50).AddPoint(-50,50).AddPoint(25,40);
-    mycanvas.Draw(poly);
 
     // Add a button.
     doc << "<br>";
