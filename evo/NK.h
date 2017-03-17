@@ -25,6 +25,7 @@ namespace evo {
     const uint32_t state_count;
     const uint32_t total_count;
     emp::vector< emp::vector<double> > landscape;
+    double max_fit = 0;
 
   public:
     NKLandscape() = delete;
@@ -39,8 +40,11 @@ namespace evo {
         ltable.resize(state_count);
         for (double & pos : ltable) {
           pos = random.GetDouble();
+          if (pos > max_fit)
+              max_fit = pos;
         }
       }
+      std::cout<<max_fit<<std::endl;
     }
     ~NKLandscape() { ; }
     NKLandscape & operator=(const NKLandscape &) = delete;
