@@ -29,7 +29,10 @@ namespace emp {
     bool operator==(const Range& _in) const { return lower==_in.lower && upper==_in.upper; }
     bool operator!=(const Range& _in) const { return lower!=_in.lower || upper!=_in.upper; }
 
+    void SetLower(T l) { lower = l; }
+    void SetUpper(T u) { upper = u; }
     void Set(T _l, T _u) { emp_assert(_l < _u); lower = _l; upper = _u; }
+
     bool Valid(T value) { return value >= lower && value <= upper; }
 
     emp::vector<T> Spread(size_t s) {
