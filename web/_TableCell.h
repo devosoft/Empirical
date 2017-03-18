@@ -1,3 +1,12 @@
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2017.
+//  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  The TableCell widget, which behaves like the Table widget, but focuses on a single cell.
+//
+//  DO NOT include directly.  All files begining with '_' are for internal use only.
+
 class TableCell : public Table {
 public:
   TableCell(size_t r, size_t c, const std::string & in_id="") : Table(r,c,in_id) { ; }
