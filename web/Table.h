@@ -49,14 +49,6 @@
 //    Table GetColGroup(size_t c)
 //    Table GetTable()
 //
-//  Make subsequent calls to *this* widget affect specified cell, row, etc.
-//    Table & SetCellActive(size_t r, size_t c)
-//    Table & SetRowActive(size_t r)
-//    Table & SetColActive(size_t c)
-//    Table & SetRowGroupActive(size_t r)
-//    Table & SetColGroupActive(size_t c)
-//    Table & SetTableActive()
-//
 //  Modifying data in table
 //    Table & SetHeader(bool _h=true)
 //      Set the current cell to be a header (or not if false is passed in)
@@ -769,7 +761,6 @@ namespace web {
     web::Text GetTextWidget() { return Info()->GetTextWidget(); }
 
     // Update the current table object to change the active cell.
-    TableCell SetCellActive(size_t r, size_t c);
     TableRow SetRowActive(size_t r);
     Table & SetColActive(size_t c) {
       emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
@@ -934,14 +925,6 @@ namespace web {
   TableRow Table::GetRow(size_t r) {
     emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
     return TableRow(Info(), r);
-  }
-
-  TableCell Table::SetCellActive(size_t r, size_t c) {
-    emp_assert(Info() != nullptr);
-    emp_assert(r < Info()->row_count && c < Info()->col_count,
-               r, c, Info()->row_count, Info()->col_count, GetID());
-    cur_row = r; cur_col = c;
-    return *this;
   }
 
   TableRow Table::SetRowActive(size_t r) {
