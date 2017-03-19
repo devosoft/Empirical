@@ -760,31 +760,6 @@ namespace web {
 
     web::Text GetTextWidget() { return Info()->GetTextWidget(); }
 
-    // Update the current table object to change the active cell.
-    TableRow SetRowActive(size_t r);
-    Table & SetColActive(size_t c) {
-      emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
-      cur_col = c; cur_row = 0;
-      state = COL;
-      return *this;
-    }
-    Table & SetRowGroupActive(size_t r) {
-      emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
-      cur_row = r; cur_col = 0;
-      state = ROW_GROUP;
-      return *this;
-    }
-    Table & SetColGroupActive(size_t c) {
-      emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
-      cur_col = c; cur_row = 0;
-      state = COL_GROUP;
-      return *this;
-    }
-    Table & SetTableActive() { // Set focus to table; leave row and col where they are.
-      state = TABLE;
-      return *this;
-    }
-
     Widget AddText(size_t r, size_t c, const std::string & text);
     Widget AddHeader(size_t r, size_t c, const std::string & text);
 
@@ -925,12 +900,6 @@ namespace web {
   TableRow Table::GetRow(size_t r) {
     emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
     return TableRow(Info(), r);
-  }
-
-  TableRow Table::SetRowActive(size_t r) {
-    emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
-    cur_row = r; cur_col = 0;
-    return *this;
   }
 
   Widget Table::AddText(size_t r, size_t c, const std::string & text) {
