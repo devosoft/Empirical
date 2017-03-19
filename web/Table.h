@@ -129,6 +129,7 @@ namespace web {
 
   class Table;
   class TableCell;
+  class TableRow;
 
   namespace internal {
 
@@ -189,7 +190,7 @@ namespace web {
     };
 
     class TableInfo : public internal::WidgetInfo {
-      friend Table; friend TableCell;
+      friend Table; friend TableCell; friend TableRow;
     protected:
       size_t row_count;                        // How big is this table?
       size_t col_count;
@@ -408,9 +409,13 @@ namespace web {
         if (parent) for (Widget & child : datum.children) parent->Unregister(child);
         datum.children.resize(0);
       }
+      void ClearRowChildren(size_t row_id) {
+        for (size_t col_id = 0; col_id < col_count; col_id++) ClearCellChildren(row_id, col_id);
+      }
       void ClearCellStyle(size_t row_id, size_t col_id) {
         rows[row_id].data[col_id].extras.style.Clear();
       }
+      void ClearRowStyle(size_t row_id) { rows[row_id].extras.style.Clear(); }
       void ClearCell(size_t row_id, size_t col_id) {
         auto & datum = rows[row_id].data[col_id];
         datum.colspan = 1;
@@ -563,7 +568,7 @@ namespace web {
     size_t cur_col;
 
     // A table's state determines how some operations work.
-    enum state_t { TABLE, ROW, COL, COL_GROUP, ROW_GROUP };
+    enum state_t { TABLE, COL, COL_GROUP, ROW_GROUP };
     state_t state;
 
     // Get a properly cast version of indo.
@@ -578,10 +583,6 @@ namespace web {
       switch (state) {
       case TABLE:
         WidgetFacet<Table>::DoCSS(setting, value);
-        break;
-      case ROW:
-        Info()->rows[cur_row].extras.style.Set(setting, value);
-        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
         break;
       case COL:
         // If we haven't setup columns at all yet, do so.
@@ -609,10 +610,6 @@ namespace web {
       case TABLE:
         WidgetFacet<Table>::DoAttr(setting, value);
         break;
-      case ROW:
-        Info()->rows[cur_row].extras.attr.Set(setting, value);
-        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
-        break;
       case COL:
         // If we haven't setup columns at all yet, do so.
         if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
@@ -638,10 +635,6 @@ namespace web {
       switch (state) {
       case TABLE:
         WidgetFacet<Table>::DoListen(event_name, fun_id);
-        break;
-      case ROW:
-        Info()->rows[cur_row].extras.listen.Set(event_name, fun_id);
-        if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
         break;
       case COL:
         // If we haven't setup columns at all yet, do so.
@@ -674,8 +667,7 @@ namespace web {
     }
     Table(const Table & in)
       : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col), state(in.state) {
-      emp_assert(state == TABLE || state == ROW
-                 || state == COL || state == COL_GROUP || state == ROW_GROUP, state);
+      emp_assert(state == TABLE || state == COL || state == COL_GROUP || state == ROW_GROUP, state);
     }
     Table(const Widget & in) : WidgetFacet(in), cur_row(0), cur_col(0), state(TABLE) {
       emp_assert(info->IsTableInfo());
@@ -700,14 +692,13 @@ namespace web {
     bool InStateTable() const { return state == TABLE; }
     bool InStateRowGroup() const { return state == ROW_GROUP; }
     bool InStateColGroup() const { return state == COL_GROUP; }
-    bool InStateRow() const { return state == ROW; }
+    bool InStateRow() const { return false; }
     bool InStateCol() const { return state == COL; }
     bool InStateCell() const { return false; }
 
     Table & Clear() {
       // Clear based on tables current state.
       if (state == TABLE) Info()->ClearTable();
-      else if (state == ROW) Info()->ClearRow(cur_row);
       // @CAO Make work for state == COL, COL_GROUP, or ROW_GROUP
       else emp_assert(false && "Table in unknown state!", state);
       return *this;
@@ -733,7 +724,6 @@ namespace web {
     Table & ClearRow(size_t r) { Info()->ClearRow(r); return *this; }
     Table & ClearCells() {
       if (state == TABLE) Info()->ClearTableCells();
-      else if (state == ROW) Info()->ClearRowCells(cur_row);
       // @CAO Make work for state == COL, COL_GROUP, or ROW_GROUP
       else emp_assert(false && "Unknown State!", state);
       return *this;
@@ -759,10 +749,7 @@ namespace web {
     }
 
     TableCell GetCell(size_t r, size_t c);
-    Table GetRow(size_t r) {
-      emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
-      return Table(Info(), r, 0, ROW);
-    }
+    TableRow GetRow(size_t r);
     Table GetCol(size_t c) {
       emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
       return Table(Info(), 0, c, COL);
@@ -783,12 +770,7 @@ namespace web {
 
     // Update the current table object to change the active cell.
     TableCell SetCellActive(size_t r, size_t c);
-    Table & SetRowActive(size_t r) {
-      emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
-      cur_row = r; cur_col = 0;
-      state = ROW;
-      return *this;
-    }
+    TableRow SetRowActive(size_t r);
     Table & SetColActive(size_t c) {
       emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
       cur_col = c; cur_row = 0;
@@ -818,7 +800,6 @@ namespace web {
     // Apply to appropriate component based on current state.
     using WidgetFacet<Table>::SetCSS;
     std::string GetCSS(const std::string & setting) override {
-      if (state == ROW) return Info()->rows[cur_row].extras.GetStyle(setting);
       if (state == COL) return Info()->cols[cur_col].extras.GetStyle(setting);
       if (state == ROW_GROUP) return Info()->row_groups[cur_row].extras.GetStyle(setting);
       if (state == COL_GROUP) return Info()->col_groups[cur_col].extras.GetStyle(setting);
@@ -939,6 +920,7 @@ namespace web {
   };
 
   #include "_TableCell.h"
+  #include "_TableRow.h"
 
   // Fill out members of Table that require extra classes...
 
@@ -949,11 +931,22 @@ namespace web {
     return TableCell(Info(), r, c);
   }
 
+  TableRow Table::GetRow(size_t r) {
+    emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
+    return TableRow(Info(), r);
+  }
+
   TableCell Table::SetCellActive(size_t r, size_t c) {
     emp_assert(Info() != nullptr);
     emp_assert(r < Info()->row_count && c < Info()->col_count,
                r, c, Info()->row_count, Info()->col_count, GetID());
     cur_row = r; cur_col = c;
+    return *this;
+  }
+
+  TableRow Table::SetRowActive(size_t r) {
+    emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
+    cur_row = r; cur_col = 0;
     return *this;
   }
 
