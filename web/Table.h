@@ -15,7 +15,6 @@
 //  Constructors:
 //    Table(size_t r, size_t c, const std::string & in_id="")
 //      Create a new r-by-c table with an optional DOM id specified.
-//      State is initialized to TABLE; the first row and first cell are default locations.
 //    Table(const Widget & in)
 //      Point to an existing table (assert that widget IS a table!)
 //
@@ -82,7 +81,6 @@
 //      Clear contents of just the specified cell.
 //    Table & Clear()
 //      Dynamically clear the entire active state
-//      (TABLE, ROW, COL, ROW_GROUP, COL_GROUP, or CELL).
 //
 //  Style manipulation
 //    std::string GetCSS(const std::string & setting)
@@ -605,64 +603,39 @@ namespace web {
     size_t cur_row;      // Which row/col is currently active?
     size_t cur_col;
 
-    // A table's state determines how some operations work.
-    enum state_t { TABLE, COL_GROUP, ROW_GROUP };
-    state_t state;
-
     // Get a properly cast version of indo.
     internal::TableInfo * Info() { return (internal::TableInfo *) info; }
     const internal::TableInfo * Info() const { return (internal::TableInfo *) info; }
 
-    Table(internal::TableInfo * in_info, size_t _row=0, size_t _col=0, state_t _state=TABLE)
-     : WidgetFacet(in_info), cur_row(_row), cur_col(_col), state(_state) { ; }
+    Table(internal::TableInfo * in_info, size_t _row=0, size_t _col=0)
+     : WidgetFacet(in_info), cur_row(_row), cur_col(_col) { ; }
 
     // Apply CSS to appropriate component based on current state.
     void DoCSS(const std::string & setting, const std::string & value) override {
-      switch (state) {
-      case TABLE:
-        WidgetFacet<Table>::DoCSS(setting, value);
-        break;
-      default:
-        emp_assert(false && "Table in unknown state!");
-      };
+      WidgetFacet<Table>::DoCSS(setting, value);
     }
 
     // Apply CSS to appropriate component based on current state.
     void DoAttr(const std::string & setting, const std::string & value) override {
-      switch (state) {
-      case TABLE:
-        WidgetFacet<Table>::DoAttr(setting, value);
-        break;
-      default:
-        emp_assert(false && "Table in unknown state!");
-      };
+      WidgetFacet<Table>::DoAttr(setting, value);
     }
 
     // Apply CSS to appropriate component based on current state.
     void DoListen(const std::string & event_name, size_t fun_id) override {
-      switch (state) {
-      case TABLE:
-        WidgetFacet<Table>::DoListen(event_name, fun_id);
-        break;
-      default:
-        emp_assert(false && "Table in unknown state!");
-      };
+      WidgetFacet<Table>::DoListen(event_name, fun_id);
     }
 
   public:
     Table(size_t r, size_t c, const std::string & in_id="")
-      : WidgetFacet(in_id), cur_row(0), cur_col(0), state(TABLE)
+      : WidgetFacet(in_id), cur_row(0), cur_col(0)
     {
       emp_assert(c > 0 && r > 0);              // Ensure that we have rows and columns!
 
       info = new internal::TableInfo(in_id);
       Info()->Resize(r, c);
     }
-    Table(const Table & in)
-      : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col), state(in.state) {
-      emp_assert(state == TABLE, state);
-    }
-    Table(const Widget & in) : WidgetFacet(in), cur_row(0), cur_col(0), state(TABLE) {
+    Table(const Table & in) : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col) { ; }
+    Table(const Widget & in) : WidgetFacet(in), cur_row(0), cur_col(0) {
       emp_assert(info->IsTableInfo());
     }
     virtual ~Table() { ; }
@@ -682,7 +655,7 @@ namespace web {
     size_t GetCurRow() const { return cur_row; }
     size_t GetCurCol() const { return cur_col; }
 
-    bool InStateTable() const { return state == TABLE; }
+    bool InStateTable() const { return true; }
     bool InStateRowGroup() const { return false; }
     bool InStateColGroup() const { return false; }
     bool InStateRow() const { return false; }
@@ -728,7 +701,6 @@ namespace web {
     Widget AddText(size_t r, size_t c, const std::string & text);
     Widget AddHeader(size_t r, size_t c, const std::string & text);
 
-    // Apply to appropriate component based on current state.
     using WidgetFacet<Table>::SetCSS;
     std::string GetCSS(const std::string & setting) override {
       return Info()->extras.GetStyle(setting);

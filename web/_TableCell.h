@@ -12,10 +12,9 @@ public:
   TableCell(size_t r, size_t c, const std::string & in_id="") : Table(r,c,in_id) { ; }
   TableCell(const Table & in) : Table(in) { ; }
   TableCell(const Widget & in) : Table(in) { ; }
-  TableCell(internal::TableInfo * in_info, size_t _row=0, size_t _col=0, state_t _state=TABLE)
-    : Table(in_info, _row, _col, _state) { ; }
+  TableCell(internal::TableInfo * in_info, size_t _row=0, size_t _col=0)
+    : Table(in_info, _row, _col) { ; }
 
-  // Apply CSS to appropriate component based on current state.
   void DoCSS(const std::string & setting, const std::string & value) override {
     Info()->rows[cur_row].data[cur_col].extras.style.Set(setting, value);
     if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
