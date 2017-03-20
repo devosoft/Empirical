@@ -123,6 +123,8 @@ namespace web {
   class TableCell;
   class TableRow;
   class TableCol;
+  class TableRowGroup;
+  class TableColGroup;
 
   namespace internal {
 
@@ -184,6 +186,7 @@ namespace web {
 
     class TableInfo : public internal::WidgetInfo {
       friend Table; friend TableCell; friend TableRow; friend TableCol;
+      friend TableRowGroup; friend TableColGroup;
     protected:
       size_t row_count;                        // How big is this table?
       size_t col_count;
@@ -408,11 +411,33 @@ namespace web {
       void ClearColChildren(size_t col_id) {
         for (size_t row_id = 0; row_id < row_count; row_id++) ClearCellChildren(row_id, col_id);
       }
+      void ClearRowGroupChildren(size_t row_id) {
+        for (size_t offset=0; offset < row_groups[row_id].span; offset++) {
+          ClearRowChildren(row_id+offset);
+        }
+      }
+      void ClearColGroupChildren(size_t col_id) {
+        for (size_t offset=0; offset < col_groups[col_id].span; offset++) {
+          ClearColChildren(col_id+offset);
+        }
+      }
+      void ClearTableChildren() {
+        for (size_t col_id = 0; col_id < col_count; col_id++) {
+          for (size_t row_id = 0; row_id < row_count; row_id++) {
+            ClearCellChildren(row_id, col_id);
+          }
+        }
+      }
+
       void ClearCellStyle(size_t row_id, size_t col_id) {
         rows[row_id].data[col_id].extras.style.Clear();
       }
       void ClearRowStyle(size_t row_id) { rows[row_id].extras.style.Clear(); }
       void ClearColStyle(size_t col_id) { cols[col_id].extras.style.Clear(); }
+      void ClearRowGroupStyle(size_t row_id) { row_groups[row_id].extras.style.Clear(); }
+      void ClearColGroupStyle(size_t col_id) { col_groups[col_id].extras.style.Clear(); }
+      void ClearTableStyle() { extras.style.Clear(); }
+
       void ClearCell(size_t row_id, size_t col_id) {
         auto & datum = rows[row_id].data[col_id];
         datum.colspan = 1;
@@ -437,6 +462,15 @@ namespace web {
         cols[col_id].extras.Clear();
         ClearColCells(col_id);
       }
+      void ClearRowGroup(size_t row_id) {
+        row_groups[row_id].extras.Clear();
+        for (size_t offset=0; offset < row_groups[row_id].span; offset++) ClearRow(row_id+offset);
+      }
+      void ClearColGroup(size_t col_id) {
+        col_groups[col_id].extras.Clear();
+        for (size_t offset=0; offset < col_groups[col_id].span; offset++) ClearCol(col_id+offset);
+      }
+
       void ClearTableCells() { for (size_t r = 0; r < row_count; r++) ClearRowCells(r); }
       void ClearTableRows() { for (size_t r = 0; r < row_count; r++) ClearRow(r); }
       void ClearTable() { extras.Clear(); Resize(0,0); }
@@ -588,16 +622,6 @@ namespace web {
       case TABLE:
         WidgetFacet<Table>::DoCSS(setting, value);
         break;
-      case COL_GROUP:
-        // If we haven't setup column groups at all yet, do so.
-        if (Info()->col_groups.size() == 0) Info()->col_groups.resize(GetNumCols());
-        Info()->col_groups[cur_col].extras.style.Set(setting, value);
-        break;
-      case ROW_GROUP:
-        // If we haven't setup row groups at all yet, do so.
-        if (Info()->row_groups.size() == 0) Info()->row_groups.resize(GetNumRows());
-        Info()->row_groups[cur_row].extras.style.Set(setting, value);
-        break;
       default:
         emp_assert(false && "Table in unknown state!");
       };
@@ -609,16 +633,6 @@ namespace web {
       case TABLE:
         WidgetFacet<Table>::DoAttr(setting, value);
         break;
-      case COL_GROUP:
-        // If we haven't setup column groups at all yet, do so.
-        if (Info()->col_groups.size() == 0) Info()->col_groups.resize(GetNumCols());
-        Info()->col_groups[cur_col].extras.attr.Set(setting, value);
-        break;
-      case ROW_GROUP:
-        // If we haven't setup row groups at all yet, do so.
-        if (Info()->row_groups.size() == 0) Info()->row_groups.resize(GetNumRows());
-        Info()->row_groups[cur_row].extras.attr.Set(setting, value);
-        break;
       default:
         emp_assert(false && "Table in unknown state!");
       };
@@ -629,16 +643,6 @@ namespace web {
       switch (state) {
       case TABLE:
         WidgetFacet<Table>::DoListen(event_name, fun_id);
-        break;
-      case COL_GROUP:
-        // If we haven't setup column groups at all yet, do so.
-        if (Info()->col_groups.size() == 0) Info()->col_groups.resize(GetNumCols());
-        Info()->col_groups[cur_col].extras.listen.Set(event_name, fun_id);
-        break;
-      case ROW_GROUP:
-        // If we haven't setup row groups at all yet, do so.
-        if (Info()->row_groups.size() == 0) Info()->row_groups.resize(GetNumRows());
-        Info()->row_groups[cur_row].extras.listen.Set(event_name, fun_id);
         break;
       default:
         emp_assert(false && "Table in unknown state!");
@@ -656,7 +660,7 @@ namespace web {
     }
     Table(const Table & in)
       : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col), state(in.state) {
-      emp_assert(state == TABLE || state == COL_GROUP || state == ROW_GROUP, state);
+      emp_assert(state == TABLE, state);
     }
     Table(const Widget & in) : WidgetFacet(in), cur_row(0), cur_col(0), state(TABLE) {
       emp_assert(info->IsTableInfo());
@@ -679,44 +683,19 @@ namespace web {
     size_t GetCurCol() const { return cur_col; }
 
     bool InStateTable() const { return state == TABLE; }
-    bool InStateRowGroup() const { return state == ROW_GROUP; }
-    bool InStateColGroup() const { return state == COL_GROUP; }
+    bool InStateRowGroup() const { return false; }
+    bool InStateColGroup() const { return false; }
     bool InStateRow() const { return false; }
     bool InStateCol() const { return false; }
     bool InStateCell() const { return false; }
 
-    Table & Clear() {
-      // Clear based on tables current state.
-      if (state == TABLE) Info()->ClearTable();
-      // @CAO Make work for state == COL, COL_GROUP, or ROW_GROUP
-      else emp_assert(false && "Table in unknown state!", state);
-      return *this;
-    }
-    Table & ClearStyle() {
-      // Clear based on tables current state.
-      // if (state == TABLE) Info()->ClearTable();
-      // else if (state == ROW) Info()->ClearRow(cur_row);
-      // @CAO Make work for state == COL, COL_GROUP, or ROW_GROUP
-      emp_assert(false && "Table in unknown state!", state);
-      return *this;
-    }
-    Table & ClearChildren() {
-      // Clear based on tables current state.
-      // if (state == TABLE) Info()->ClearTable();
-      // else if (state == ROW) Info()->ClearRow(cur_row);
-      // @CAO Make work for state == COL, COL_GROUP, or ROW_GROUP
-      emp_assert(false && "Table in unknown state!", state);
-      return *this;
-    }
+    Table & Clear() { Info()->ClearTable(); return *this; }
+    Table & ClearStyle() { Info()->ClearTableStyle(); return *this; }
+    Table & ClearChildren() { Info()->ClearTableChildren(); return *this; }
     Table & ClearTable() { Info()->ClearTable(); return *this; }
     Table & ClearRows() { Info()->ClearTableRows(); return *this; }
     Table & ClearRow(size_t r) { Info()->ClearRow(r); return *this; }
-    Table & ClearCells() {
-      if (state == TABLE) Info()->ClearTableCells();
-      // @CAO Make work for state == COL, COL_GROUP, or ROW_GROUP
-      else emp_assert(false && "Unknown State!", state);
-      return *this;
-    }
+    Table & ClearCells() { Info()->ClearTableCells(); return *this; }
     Table & ClearCell(size_t r, size_t c) { Info()->ClearCell(r, c); return *this; }
 
     // Functions to resize the number of rows, columns, or both!
@@ -740,18 +719,9 @@ namespace web {
     TableCell GetCell(size_t r, size_t c);
     TableRow GetRow(size_t r);
     TableCol GetCol(size_t c);
-
-    Table GetRowGroup(size_t r) {
-      emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
-      return Table(Info(), r, 0, ROW_GROUP);
-    }
-    Table GetColGroup(size_t c) {
-      emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
-      return Table(Info(), 0, c, COL_GROUP);
-    }
-    Table GetTable() {
-      return Table(Info(), cur_row, cur_col, TABLE);
-    }
+    TableRowGroup GetRowGroup(size_t r);
+    TableColGroup GetColGroup(size_t c);
+    Table GetTable();
 
     web::Text GetTextWidget() { return Info()->GetTextWidget(); }
 
@@ -761,32 +731,7 @@ namespace web {
     // Apply to appropriate component based on current state.
     using WidgetFacet<Table>::SetCSS;
     std::string GetCSS(const std::string & setting) override {
-      if (state == ROW_GROUP) return Info()->row_groups[cur_row].extras.GetStyle(setting);
-      if (state == COL_GROUP) return Info()->col_groups[cur_col].extras.GetStyle(setting);
-      if (state == TABLE) return Info()->extras.GetStyle(setting);
-      return "";
-    }
-
-    // Allow the row and column span of the current cell to be adjusted.
-    Table & SetRowSpan(size_t new_span) {
-      emp_assert((cur_row + new_span <= GetNumRows()) && "Row span too wide for table!");
-      emp_assert(state == ROW_GROUP);
-
-      // If we haven't setup columns at all yet, do so.
-      if (Info()->row_groups.size() == 0) Info()->row_groups.resize(GetNumRows());
-
-      const size_t old_span = Info()->row_groups[cur_row].span;
-      Info()->row_groups[cur_row].span = new_span;
-
-      if (old_span != new_span) {
-        for (size_t i=old_span; i<new_span; i++) { Info()->row_groups[cur_row+i].masked = true; }
-        for (size_t i=new_span; i<old_span; i++) { Info()->row_groups[cur_row+i].masked = false; }
-      }
-
-      // Redraw the entire table to fix row span information.
-      if (IsActive()) Info()->ReplaceHTML();
-
-      return *this;
+      return Info()->extras.GetStyle(setting);
     }
 
     Table & SetColSpan(size_t new_span) {
@@ -807,13 +752,6 @@ namespace web {
       // Redraw the entire table to fix col span information.
       if (IsActive()) Info()->ReplaceHTML();
 
-      return *this;
-    }
-
-    Table & SetSpan(size_t new_span) {
-      if (state == ROW_GROUP) return SetRowSpan(new_span);
-      if (state == COL_GROUP) return SetColSpan(new_span);
-      emp_assert(false);  // No other state should be allowd.
       return *this;
     }
 
@@ -882,6 +820,8 @@ namespace web {
   #include "_TableCell.h"
   #include "_TableRow.h"
   #include "_TableCol.h"
+  #include "_TableRowGroup.h"
+  #include "_TableColGroup.h"
 
   // Fill out members of Table that require extra classes...
 
@@ -902,6 +842,20 @@ namespace web {
     return TableCol(Info(), c);
   }
 
+  TableRowGroup Table::GetRowGroup(size_t r) {
+    emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
+    return TableRowGroup(Info(), r);
+  }
+
+  TableColGroup Table::GetColGroup(size_t c) {
+    emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
+    return TableColGroup(Info(), c);
+  }
+
+  Table Table::GetTable() {
+    return Table(Info(), cur_row, cur_col);
+  }
+
   Widget Table::AddText(size_t r, size_t c, const std::string & text) {
     GetCell(r,c) << text;
     return *this;
@@ -913,7 +867,6 @@ namespace web {
     cell.SetHeader();
     return *this;
   }
-
 
 }
 }
