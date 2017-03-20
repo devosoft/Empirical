@@ -122,6 +122,7 @@ namespace web {
   class Table;
   class TableCell;
   class TableRow;
+  class TableCol;
 
   namespace internal {
 
@@ -182,7 +183,7 @@ namespace web {
     };
 
     class TableInfo : public internal::WidgetInfo {
-      friend Table; friend TableCell; friend TableRow;
+      friend Table; friend TableCell; friend TableRow; friend TableCol;
     protected:
       size_t row_count;                        // How big is this table?
       size_t col_count;
@@ -404,10 +405,14 @@ namespace web {
       void ClearRowChildren(size_t row_id) {
         for (size_t col_id = 0; col_id < col_count; col_id++) ClearCellChildren(row_id, col_id);
       }
+      void ClearColChildren(size_t col_id) {
+        for (size_t row_id = 0; row_id < row_count; row_id++) ClearCellChildren(row_id, col_id);
+      }
       void ClearCellStyle(size_t row_id, size_t col_id) {
         rows[row_id].data[col_id].extras.style.Clear();
       }
       void ClearRowStyle(size_t row_id) { rows[row_id].extras.style.Clear(); }
+      void ClearColStyle(size_t col_id) { cols[col_id].extras.style.Clear(); }
       void ClearCell(size_t row_id, size_t col_id) {
         auto & datum = rows[row_id].data[col_id];
         datum.colspan = 1;
@@ -421,9 +426,16 @@ namespace web {
       void ClearRowCells(size_t row_id) {
         for (size_t col_id = 0; col_id < col_count; col_id++) ClearCell(row_id, col_id);
       }
+      void ClearColCells(size_t col_id) {
+        for (size_t row_id = 0; row_id < row_count; row_id++) ClearCell(row_id, col_id);
+      }
       void ClearRow(size_t row_id) {
         rows[row_id].extras.Clear();
         ClearRowCells(row_id);
+      }
+      void ClearCol(size_t col_id) {
+        cols[col_id].extras.Clear();
+        ClearColCells(col_id);
       }
       void ClearTableCells() { for (size_t r = 0; r < row_count; r++) ClearRowCells(r); }
       void ClearTableRows() { for (size_t r = 0; r < row_count; r++) ClearRow(r); }
@@ -560,7 +572,7 @@ namespace web {
     size_t cur_col;
 
     // A table's state determines how some operations work.
-    enum state_t { TABLE, COL, COL_GROUP, ROW_GROUP };
+    enum state_t { TABLE, COL_GROUP, ROW_GROUP };
     state_t state;
 
     // Get a properly cast version of indo.
@@ -575,11 +587,6 @@ namespace web {
       switch (state) {
       case TABLE:
         WidgetFacet<Table>::DoCSS(setting, value);
-        break;
-      case COL:
-        // If we haven't setup columns at all yet, do so.
-        if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
-        Info()->cols[cur_col].extras.style.Set(setting, value);
         break;
       case COL_GROUP:
         // If we haven't setup column groups at all yet, do so.
@@ -602,11 +609,6 @@ namespace web {
       case TABLE:
         WidgetFacet<Table>::DoAttr(setting, value);
         break;
-      case COL:
-        // If we haven't setup columns at all yet, do so.
-        if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
-        Info()->cols[cur_col].extras.attr.Set(setting, value);
-        break;
       case COL_GROUP:
         // If we haven't setup column groups at all yet, do so.
         if (Info()->col_groups.size() == 0) Info()->col_groups.resize(GetNumCols());
@@ -627,11 +629,6 @@ namespace web {
       switch (state) {
       case TABLE:
         WidgetFacet<Table>::DoListen(event_name, fun_id);
-        break;
-      case COL:
-        // If we haven't setup columns at all yet, do so.
-        if (Info()->cols.size() == 0) Info()->cols.resize(GetNumCols());
-        Info()->cols[cur_col].extras.listen.Set(event_name, fun_id);
         break;
       case COL_GROUP:
         // If we haven't setup column groups at all yet, do so.
@@ -659,7 +656,7 @@ namespace web {
     }
     Table(const Table & in)
       : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col), state(in.state) {
-      emp_assert(state == TABLE || state == COL || state == COL_GROUP || state == ROW_GROUP, state);
+      emp_assert(state == TABLE || state == COL_GROUP || state == ROW_GROUP, state);
     }
     Table(const Widget & in) : WidgetFacet(in), cur_row(0), cur_col(0), state(TABLE) {
       emp_assert(info->IsTableInfo());
@@ -685,7 +682,7 @@ namespace web {
     bool InStateRowGroup() const { return state == ROW_GROUP; }
     bool InStateColGroup() const { return state == COL_GROUP; }
     bool InStateRow() const { return false; }
-    bool InStateCol() const { return state == COL; }
+    bool InStateCol() const { return false; }
     bool InStateCell() const { return false; }
 
     Table & Clear() {
@@ -742,10 +739,8 @@ namespace web {
 
     TableCell GetCell(size_t r, size_t c);
     TableRow GetRow(size_t r);
-    Table GetCol(size_t c) {
-      emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
-      return Table(Info(), 0, c, COL);
-    }
+    TableCol GetCol(size_t c);
+
     Table GetRowGroup(size_t r) {
       emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
       return Table(Info(), r, 0, ROW_GROUP);
@@ -766,7 +761,6 @@ namespace web {
     // Apply to appropriate component based on current state.
     using WidgetFacet<Table>::SetCSS;
     std::string GetCSS(const std::string & setting) override {
-      if (state == COL) return Info()->cols[cur_col].extras.GetStyle(setting);
       if (state == ROW_GROUP) return Info()->row_groups[cur_row].extras.GetStyle(setting);
       if (state == COL_GROUP) return Info()->col_groups[cur_col].extras.GetStyle(setting);
       if (state == TABLE) return Info()->extras.GetStyle(setting);
@@ -887,6 +881,7 @@ namespace web {
 
   #include "_TableCell.h"
   #include "_TableRow.h"
+  #include "_TableCol.h"
 
   // Fill out members of Table that require extra classes...
 
@@ -900,6 +895,11 @@ namespace web {
   TableRow Table::GetRow(size_t r) {
     emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
     return TableRow(Info(), r);
+  }
+
+  TableCol Table::GetCol(size_t c) {
+    emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
+    return TableCol(Info(), c);
   }
 
   Widget Table::AddText(size_t r, size_t c, const std::string & text) {
