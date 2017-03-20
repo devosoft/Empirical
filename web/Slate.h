@@ -110,6 +110,12 @@ namespace web {
         m_children.resize(0);
       }
 
+      void Clear() {
+        ClearChildren();
+        extras.Clear();
+        if (state == Widget::ACTIVE) ReplaceHTML();
+      }
+
       void AddChild(Widget in) {
         // If the inserted widget is already active, remove it from its old position.
         emp_assert(in->parent == nullptr && "Cannot insert widget if already has parent!", in->id);
@@ -245,9 +251,8 @@ namespace web {
     double ScrollTop() const { return Info()->scroll_top; }
     Slate & ScrollTop(double in_top) { Info()->scroll_top = in_top; return *this; }
 
-    void ClearChildren() {
-      if (info) Info()->ClearChildren();
-    }
+    void Clear() { if (info) Info()->Clear(); }
+    void ClearChildren() { if (info) Info()->ClearChildren(); }
 
     bool HasChild(const Widget & test_child) const {
       if (!info) return false;
