@@ -31,7 +31,10 @@ public:
   }
 
   void Clear() { Info()->ClearCell(cur_row, cur_col); }
-  void ClearStyle() { Info()->ClearCellStyle(cur_row, cur_col); }
+  void ClearStyle() { Info()->rows[cur_row].data[cur_col].extras.style.Clear(); }
+  void ClearAttr() { Info()->rows[cur_row].data[cur_col].extras.attr.Clear(); }
+  void ClearListen() { Info()->rows[cur_row].data[cur_col].extras.listen.Clear(); }
+  void ClearExtras() { Info()->rows[cur_row].data[cur_col].extras.Clear(); }
   void ClearChildren() { Info()->ClearCellChildren(cur_row, cur_col); }
   void ClearCells() { Info()->ClearCell(cur_row, cur_col); }
 

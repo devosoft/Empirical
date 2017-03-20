@@ -33,7 +33,10 @@ public:
   bool InStateRow() const { return true; }
 
   void Clear() { Info()->ClearRow(cur_row); }
-  void ClearStyle() { Info()->ClearRowStyle(cur_row); }
+  void ClearStyle() { Info()->rows[cur_row].extras.style.Clear(); }
+  void ClearAttr() { Info()->rows[cur_row].extras.attr.Clear(); }
+  void ClearListen() { Info()->rows[cur_row].extras.listen.Clear(); }
+  void ClearExtras() { Info()->rows[cur_row].extras.Clear(); }
   void ClearChildren() { Info()->ClearRowChildren(cur_row); }
   void ClearCells() { Info()->ClearRow(cur_row); }
 

@@ -34,7 +34,10 @@ public:
   }
 
   void Clear() { Info()->ClearColGroup(cur_col); }
-  void ClearStyle() { Info()->ClearColGroupStyle(cur_col); }
+  void ClearStyle() { Info()->col_groups[cur_col].extras.style.Clear(); }
+  void ClearAttr() { Info()->col_groups[cur_col].extras.attr.Clear(); }
+  void ClearListen() { Info()->col_groups[cur_col].extras.listen.Clear(); }
+  void ClearExtras() { Info()->col_groups[cur_col].extras.Clear(); }
   void ClearChildren() { Info()->ClearColGroupChildren(cur_col); }
   void ClearCells() { Info()->ClearColGroup(cur_col); }
 

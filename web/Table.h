@@ -428,15 +428,6 @@ namespace web {
         }
       }
 
-      void ClearCellStyle(size_t row_id, size_t col_id) {
-        rows[row_id].data[col_id].extras.style.Clear();
-      }
-      void ClearRowStyle(size_t row_id) { rows[row_id].extras.style.Clear(); }
-      void ClearColStyle(size_t col_id) { cols[col_id].extras.style.Clear(); }
-      void ClearRowGroupStyle(size_t row_id) { row_groups[row_id].extras.style.Clear(); }
-      void ClearColGroupStyle(size_t col_id) { col_groups[col_id].extras.style.Clear(); }
-      void ClearTableStyle() { extras.style.Clear(); }
-
       void ClearCell(size_t row_id, size_t col_id) {
         auto & datum = rows[row_id].data[col_id];
         datum.colspan = 1;
@@ -723,7 +714,10 @@ namespace web {
       : TableWidget(in_info, _row, _col) { ; }
 
     void Clear() { Info()->ClearTable(); }
-    void ClearStyle() { Info()->ClearTableStyle(); }
+    void ClearStyle() { Info()->extras.style.Clear(); }
+    void ClearAttr() { Info()->extras.attr.Clear(); }
+    void ClearListen() { Info()->extras.listen.Clear(); }
+    void ClearExtras() { Info()->extras.Clear(); }
     void ClearChildren() { Info()->ClearTableChildren(); }
 
     // Functions to resize the number of rows, columns, or both!
