@@ -117,6 +117,7 @@
 namespace emp {
 namespace web {
 
+  class TableWidget;
   class Table;
   class TableCell;
   class TableRow;
@@ -183,7 +184,7 @@ namespace web {
     };
 
     class TableInfo : public internal::WidgetInfo {
-      friend Table; friend TableCell; friend TableRow; friend TableCol;
+      friend TableWidget; friend Table; friend TableCell; friend TableRow; friend TableCol;
       friend TableRowGroup; friend TableColGroup;
     protected:
       size_t row_count;                        // How big is this table?
@@ -597,47 +598,50 @@ namespace web {
 
   } // end namespace internal
 
-  class Table : public internal::WidgetFacet<Table> {
+  class TableWidget : public internal::WidgetFacet<TableWidget> {
     friend class internal::TableInfo;
   protected:
     size_t cur_row;      // Which row/col is currently active?
     size_t cur_col;
 
+    using parent_t = internal::WidgetFacet<TableWidget>;
+
     // Get a properly cast version of indo.
     internal::TableInfo * Info() { return (internal::TableInfo *) info; }
     const internal::TableInfo * Info() const { return (internal::TableInfo *) info; }
 
-    Table(internal::TableInfo * in_info, size_t _row=0, size_t _col=0)
+    TableWidget(internal::TableInfo * in_info, size_t _row=0, size_t _col=0)
      : WidgetFacet(in_info), cur_row(_row), cur_col(_col) { ; }
 
     // Apply CSS to appropriate component based on current state.
     void DoCSS(const std::string & setting, const std::string & value) override {
-      WidgetFacet<Table>::DoCSS(setting, value);
+      parent_t::DoCSS(setting, value);
     }
 
     // Apply CSS to appropriate component based on current state.
     void DoAttr(const std::string & setting, const std::string & value) override {
-      WidgetFacet<Table>::DoAttr(setting, value);
+      parent_t::DoAttr(setting, value);
     }
 
     // Apply CSS to appropriate component based on current state.
     void DoListen(const std::string & event_name, size_t fun_id) override {
-      WidgetFacet<Table>::DoListen(event_name, fun_id);
+      parent_t::DoListen(event_name, fun_id);
     }
 
   public:
-    Table(size_t r, size_t c, const std::string & in_id="")
+    TableWidget(size_t r, size_t c, const std::string & in_id="")
       : WidgetFacet(in_id), cur_row(0), cur_col(0)
     {
       emp_assert(r > 0 && c > 0);              // Ensure that we have rows and columns!
       info = new internal::TableInfo(in_id);
       Info()->Resize(r, c);
     }
-    Table(const Table & in) : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col) { ; }
-    Table(const Widget & in) : WidgetFacet(in), cur_row(0), cur_col(0) {
+    TableWidget(const TableWidget & in)
+      : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col) { ; }
+    TableWidget(const Widget & in) : WidgetFacet(in), cur_row(0), cur_col(0) {
       emp_assert(info->IsTableInfo());
     }
-    virtual ~Table() { ; }
+    virtual ~TableWidget() { ; }
 
     using INFO_TYPE = internal::TableInfo;
 
@@ -654,14 +658,73 @@ namespace web {
     size_t GetCurRow() const { return cur_row; }
     size_t GetCurCol() const { return cur_col; }
 
-    Table & Clear() { Info()->ClearTable(); return *this; }
-    Table & ClearStyle() { Info()->ClearTableStyle(); return *this; }
-    Table & ClearChildren() { Info()->ClearTableChildren(); return *this; }
-    Table & ClearTable() { Info()->ClearTable(); return *this; }
-    Table & ClearRows() { Info()->ClearTableRows(); return *this; }
-    Table & ClearRow(size_t r) { Info()->ClearRow(r); return *this; }
-    Table & ClearCells() { Info()->ClearTableCells(); return *this; }
-    Table & ClearCell(size_t r, size_t c) { Info()->ClearCell(r, c); return *this; }
+    // Can clear anything from any widget, if properly specified.
+    // Specialized widgets should define Clear(), ClearChildren(), ClearStyle(), ClearAttr(),
+    // and ClearListen() for that table component type.
+    void ClearTable() { Info()->ClearTable(); }
+    void ClearRows() { Info()->ClearTableRows(); }
+    void ClearRow(size_t r) { Info()->ClearRow(r); }
+    void ClearCol(size_t c) { Info()->ClearCol(c); }
+    void ClearRowGroup(size_t r) { Info()->ClearRowGroup(r); }
+    void ClearColGroup(size_t c) { Info()->ClearColGroup(c); }
+    void ClearCells() { Info()->ClearTableCells(); }
+    void ClearCell(size_t r, size_t c) { Info()->ClearCell(r, c); }
+
+    TableCell GetCell(size_t r, size_t c);
+    TableRow GetRow(size_t r);
+    TableCol GetCol(size_t c);
+    TableRowGroup GetRowGroup(size_t r);
+    TableColGroup GetColGroup(size_t c);
+    Table GetTable();
+
+    web::Text GetTextWidget() { return Info()->GetTextWidget(); }
+
+    Widget AddText(size_t r, size_t c, const std::string & text);
+    Widget AddHeader(size_t r, size_t c, const std::string & text);
+
+    using parent_t::SetCSS;
+    std::string GetCSS(const std::string & setting) override {
+      return Info()->extras.GetStyle(setting);
+    }
+
+    virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
+      bool ok = true;
+
+      // Basic info
+      if (verbose) {
+        ss << prefix << "Scanning: emp::Table (rows=" << Info()->row_count
+           << ", cols=" << Info()->col_count << ")." << std::endl;
+      }
+
+      // Make sure current row and col are valid.
+      if (cur_row >= Info()->row_count) {
+        ss << prefix << "Error: cur_row = " << cur_row << "." << std::endl;
+        ok = false;
+      }
+
+      if (cur_col >= Info()->col_count) {
+        ss << prefix << "Error: cur_col = " << cur_col << "." << std::endl;
+        ok = false;
+      }
+
+      // Make sure internal info is okay.
+      ok = ok && Info()->OK(ss, verbose, prefix+"  ");
+
+      return ok;
+    }
+  };
+
+  class Table : public TableWidget {
+  public:
+    Table(size_t r, size_t c, const std::string & in_id="") : TableWidget(r,c,in_id) { ; }
+    Table(const TableWidget & in) : TableWidget(in) { ; }
+    Table(const Widget & in) : TableWidget(in) { ; }
+    Table(internal::TableInfo * in_info, size_t _row, size_t _col)
+      : TableWidget(in_info, _row, _col) { ; }
+
+    void Clear() { Info()->ClearTable(); }
+    void ClearStyle() { Info()->ClearTableStyle(); }
+    void ClearChildren() { Info()->ClearTableChildren(); }
 
     // Functions to resize the number of rows, columns, or both!
     Table & Rows(size_t r) {
@@ -679,23 +742,6 @@ namespace web {
       if (cur_row >= r) cur_row = 0;
       if (cur_col >= c) cur_col = 0;
       return *this;
-    }
-
-    TableCell GetCell(size_t r, size_t c);
-    TableRow GetRow(size_t r);
-    TableCol GetCol(size_t c);
-    TableRowGroup GetRowGroup(size_t r);
-    TableColGroup GetColGroup(size_t c);
-    Table GetTable();
-
-    web::Text GetTextWidget() { return Info()->GetTextWidget(); }
-
-    Widget AddText(size_t r, size_t c, const std::string & text);
-    Widget AddHeader(size_t r, size_t c, const std::string & text);
-
-    using WidgetFacet<Table>::SetCSS;
-    std::string GetCSS(const std::string & setting) override {
-      return Info()->extras.GetStyle(setting);
     }
 
     Table & SetColSpan(size_t new_span) {
@@ -753,32 +799,6 @@ namespace web {
       if (IsActive()) Info()->ReplaceHTML();
       return *this;
     }
-
-    virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
-      bool ok = true;
-
-      // Basic info
-      if (verbose) {
-        ss << prefix << "Scanning: emp::Table (rows=" << Info()->row_count
-           << ", cols=" << Info()->col_count << ")." << std::endl;
-      }
-
-      // Make sure current row and col are valid.
-      if (cur_row >= Info()->row_count) {
-        ss << prefix << "Error: cur_row = " << cur_row << "." << std::endl;
-        ok = false;
-      }
-
-      if (cur_col >= Info()->col_count) {
-        ss << prefix << "Error: cur_col = " << cur_col << "." << std::endl;
-        ok = false;
-      }
-
-      // Make sure internal info is okay.
-      ok = ok && Info()->OK(ss, verbose, prefix+"  ");
-
-      return ok;
-    }
   };
 
   #include "_TableCell.h"
@@ -789,43 +809,43 @@ namespace web {
 
   // Fill out members of Table that require extra classes...
 
-  TableCell Table::GetCell(size_t r, size_t c) {
+  TableCell TableWidget::GetCell(size_t r, size_t c) {
     emp_assert(Info() != nullptr);
     emp_assert(r < Info()->row_count && c < Info()->col_count,
                r, c, Info()->row_count, Info()->col_count, GetID());
     return TableCell(Info(), r, c);
   }
 
-  TableRow Table::GetRow(size_t r) {
+  TableRow TableWidget::GetRow(size_t r) {
     emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
     return TableRow(Info(), r);
   }
 
-  TableCol Table::GetCol(size_t c) {
+  TableCol TableWidget::GetCol(size_t c) {
     emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
     return TableCol(Info(), c);
   }
 
-  TableRowGroup Table::GetRowGroup(size_t r) {
+  TableRowGroup TableWidget::GetRowGroup(size_t r) {
     emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
     return TableRowGroup(Info(), r);
   }
 
-  TableColGroup Table::GetColGroup(size_t c) {
+  TableColGroup TableWidget::GetColGroup(size_t c) {
     emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
     return TableColGroup(Info(), c);
   }
 
-  Table Table::GetTable() {
+  Table TableWidget::GetTable() {
     return Table(Info(), cur_row, cur_col);
   }
 
-  Widget Table::AddText(size_t r, size_t c, const std::string & text) {
+  Widget TableWidget::AddText(size_t r, size_t c, const std::string & text) {
     GetCell(r,c) << text;
     return *this;
   }
 
-  Widget Table::AddHeader(size_t r, size_t c, const std::string & text) {
+  Widget TableWidget::AddHeader(size_t r, size_t c, const std::string & text) {
     TableCell cell = GetCell(r,c);
     cell << text;
     cell.SetHeader();

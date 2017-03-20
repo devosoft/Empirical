@@ -7,12 +7,12 @@
 //
 //  DO NOT include directly.  All files begining with '_' are for internal use only.
 
-class TableRow : public Table {
+class TableRow : public TableWidget {
 public:
-  TableRow(size_t r, size_t c, const std::string & in_id="") : Table(r,c,in_id) { ; }
-  TableRow(const Table & in) : Table(in) { ; }
-  TableRow(const Widget & in) : Table(in) { ; }
-  TableRow(internal::TableInfo * in_info, size_t _row=0) : Table(in_info, _row, 0) { ; }
+  TableRow(size_t r, size_t c, const std::string & in_id="") : TableWidget(r,c,in_id) { ; }
+  TableRow(const TableWidget & in) : TableWidget(in) { ; }
+  TableRow(const Widget & in) : TableWidget(in) { ; }
+  TableRow(internal::TableInfo * in_info, size_t _row=0) : TableWidget(in_info, _row, 0) { ; }
 
   // Apply CSS to appropriate component based on current state.
   void DoCSS(const std::string & setting, const std::string & value) override {
@@ -32,10 +32,10 @@ public:
 
   bool InStateRow() const { return true; }
 
-  TableRow & Clear() { Info()->ClearRow(cur_row); return *this; }
-  TableRow & ClearStyle() { Info()->ClearRowStyle(cur_row); return *this; }
-  TableRow & ClearChildren() { Info()->ClearRowChildren(cur_row); return *this; }
-  TableRow & ClearCells() { Info()->ClearRow(cur_row); return *this; }
+  void Clear() { Info()->ClearRow(cur_row); }
+  void ClearStyle() { Info()->ClearRowStyle(cur_row); }
+  void ClearChildren() { Info()->ClearRowChildren(cur_row); }
+  void ClearCells() { Info()->ClearRow(cur_row); }
 
   std::string GetCSS(const std::string & setting) override {
     return Info()->rows[cur_row].extras.GetStyle(setting);

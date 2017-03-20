@@ -7,12 +7,12 @@
 //
 //  DO NOT include directly.  All files begining with '_' are for internal use only.
 
-class TableColGroup : public Table {
+class TableColGroup : public TableWidget {
 public:
-  TableColGroup(size_t r, size_t c, const std::string & in_id="") : Table(r,c,in_id) { ; }
-  TableColGroup(const Table & in) : Table(in) { ; }
-  TableColGroup(const Widget & in) : Table(in) { ; }
-  TableColGroup(internal::TableInfo * in_info, size_t _col=0) : Table(in_info, 0, _col) { ; }
+  TableColGroup(size_t r, size_t c, const std::string & in_id="") : TableWidget(r,c,in_id) { ; }
+  TableColGroup(const TableWidget & in) : TableWidget(in) { ; }
+  TableColGroup(const Widget & in) : TableWidget(in) { ; }
+  TableColGroup(internal::TableInfo * in_info, size_t _col=0) : TableWidget(in_info, 0, _col) { ; }
 
   // Apply CSS to appropriate component based on current state.
   void DoCSS(const std::string & setting, const std::string & value) override {
@@ -33,10 +33,10 @@ public:
     if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
   }
 
-  TableColGroup Clear() { Info()->ClearColGroup(cur_col); return *this; }
-  TableColGroup ClearStyle() { Info()->ClearColGroupStyle(cur_col); return *this; }
-  TableColGroup ClearChildren() { Info()->ClearColGroupChildren(cur_col); return *this; }
-  TableColGroup ClearCells() { Info()->ClearColGroup(cur_col); return *this; }
+  void Clear() { Info()->ClearColGroup(cur_col); }
+  void ClearStyle() { Info()->ClearColGroupStyle(cur_col); }
+  void ClearChildren() { Info()->ClearColGroupChildren(cur_col); }
+  void ClearCells() { Info()->ClearColGroup(cur_col); }
 
   std::string GetCSS(const std::string & setting) override {
     return Info()->col_groups[cur_col].extras.GetStyle(setting);
