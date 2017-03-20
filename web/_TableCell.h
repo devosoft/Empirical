@@ -30,8 +30,6 @@ public:
     if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
   }
 
-  bool InStateCell() const { return true; }
-
   TableCell & Clear() { Info()->ClearCell(cur_row, cur_col); return *this; }
   TableCell & ClearStyle() { Info()->ClearCellStyle(cur_row, cur_col); return *this; }
   TableCell & ClearChildren() { Info()->ClearCellChildren(cur_row, cur_col); return *this; }

@@ -33,8 +33,6 @@ public:
     if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
   }
 
-  bool InStateColGroup() const { return true; }
-
   TableColGroup Clear() { Info()->ClearColGroup(cur_col); return *this; }
   TableColGroup ClearStyle() { Info()->ClearColGroupStyle(cur_col); return *this; }
   TableColGroup ClearChildren() { Info()->ClearColGroupChildren(cur_col); return *this; }

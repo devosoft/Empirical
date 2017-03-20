@@ -629,8 +629,7 @@ namespace web {
     Table(size_t r, size_t c, const std::string & in_id="")
       : WidgetFacet(in_id), cur_row(0), cur_col(0)
     {
-      emp_assert(c > 0 && r > 0);              // Ensure that we have rows and columns!
-
+      emp_assert(r > 0 && c > 0);              // Ensure that we have rows and columns!
       info = new internal::TableInfo(in_id);
       Info()->Resize(r, c);
     }
@@ -654,13 +653,6 @@ namespace web {
 
     size_t GetCurRow() const { return cur_row; }
     size_t GetCurCol() const { return cur_col; }
-
-    bool InStateTable() const { return true; }
-    bool InStateRowGroup() const { return false; }
-    bool InStateColGroup() const { return false; }
-    bool InStateRow() const { return false; }
-    bool InStateCol() const { return false; }
-    bool InStateCell() const { return false; }
 
     Table & Clear() { Info()->ClearTable(); return *this; }
     Table & ClearStyle() { Info()->ClearTableStyle(); return *this; }
