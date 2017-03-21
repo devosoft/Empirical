@@ -62,7 +62,7 @@ void TextCB(const std::string & in_str) {
     if (keep[i]) result << "</b></big>";
     result << " ";
   }
-  result << "<br><br><br>";
+  result << "<br><br>Best Score = " << score[num_words-1] << "<br><br>";
 
   // Print the results in a table.
   auto table = doc.Table("table");
@@ -79,20 +79,27 @@ void TextCB(const std::string & in_str) {
 
 int main()
 {
+  std::string start_text = "Erase this sentence and type another one that you like better.";
+
   doc << "<h2>Choose Your Words!</h2>";
 
   auto desc = doc.AddSlate("desc");
   desc.SetWidth(400);
-  desc << "<p>Consider the following problem: you have a sentence and may pick any number of words, as long as no two words are consecutive.  Which words should you pick to have the maximum total number of letters?</p>";
-  desc << "<p>Try typing a sentence here to see the results:</p>";
+  desc << "<p>Consider the following problem: you have a sentence and want to select words from that sentence.  If you pick a word, you may not pick either of its neighbors.  Which words should you pick to have the maximum total number of letters?</p>"
+       << "<p>For example, if you had \"This is a sentence\", you could get 12 points by picking the words 'This' and 'sentence'.  You could not pick both 'This' and 'is' because they are next to each other.</p>"
+       << "<p>Try typing a sentence here to see the results:</p>";
   auto ta = doc.AddTextArea(TextCB, "text_area");
   ta.SetSize(400, 80);
+  ta.SetText(start_text);
 
   auto result = doc.AddSlate("result");
   result << "<br><br>";
 
   auto tdesc = doc.AddSlate("tdesc");
   tdesc.SetWidth(400);
+  tdesc << "<p>How did we solve this problem?  Consider the recursive approach.  If we knew the best possible score if we had only the first <i>n</i>-2 words, and we also knew the best possible score for the first <i>n</i>-1 words, do these values help us find the best score for all <i>n</i> words?</p>"
+	<< "<p>Yes!</p>"
+	<< "<p>For word <i>n</i>, we can either exclude the word from the answer (and just use the anser same score as <i>n</i>-1) -or- we can include it.  If we include it, we must exclude <i>n</i>-1, so we take the length of word <i>n</i> and add it to the best score for the first <i>n</i>-2 words.</p>";
   tdesc << "<p>Here is the table that we use to perform this calculation:</p>";
 
   auto table = doc.AddTable(3, 1, "table");
@@ -102,4 +109,6 @@ int main()
   table.SetCSS("border-collapse", "collapse");  
   table.SetCSS("border", "3px solid black");
   table.CellsCSS("border", "1px solid black");
+
+  TextCB(start_text);
 }
