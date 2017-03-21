@@ -30,13 +30,13 @@ public:
     if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
   }
 
-  void Clear() { Info()->ClearCell(cur_row, cur_col); }
-  void ClearStyle() { Info()->rows[cur_row].data[cur_col].extras.style.Clear(); }
-  void ClearAttr() { Info()->rows[cur_row].data[cur_col].extras.attr.Clear(); }
-  void ClearListen() { Info()->rows[cur_row].data[cur_col].extras.listen.Clear(); }
-  void ClearExtras() { Info()->rows[cur_row].data[cur_col].extras.Clear(); }
-  void ClearChildren() { Info()->ClearCellChildren(cur_row, cur_col); }
-  void ClearCells() { Info()->ClearCell(cur_row, cur_col); }
+  TableCell & Clear() { Info()->ClearCell(cur_row, cur_col); return *this; }
+  TableCell & ClearStyle() { Info()->rows[cur_row].data[cur_col].extras.style.Clear(); return *this; }
+  TableCell & ClearAttr() { Info()->rows[cur_row].data[cur_col].extras.attr.Clear(); return *this; }
+  TableCell & ClearListen() { Info()->rows[cur_row].data[cur_col].extras.listen.Clear(); return *this; }
+  TableCell & ClearExtras() { Info()->rows[cur_row].data[cur_col].extras.Clear(); return *this; }
+  TableCell & ClearChildren() { Info()->ClearCellChildren(cur_row, cur_col); return *this; }
+  TableCell & ClearCells() { Info()->ClearCell(cur_row, cur_col); return *this; }
 
   std::string GetCSS(const std::string & setting) override {
     return Info()->rows[cur_row].data[cur_col].extras.GetStyle(setting);
