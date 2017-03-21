@@ -67,7 +67,7 @@ namespace web {
              << " rows=\"" << rows << "\""
              << " cols=\"" << cols << "\"";
         if (max_length >= 0) { HTML << " maxlength=\"" << max_length << "\""; }
-        HTML << ">" << "testing" << "</textarea>";              // Close and label the textarea
+        HTML << ">" << cur_text << "</textarea>";              // Close and label the textarea
       }
 
       void UpdateAutofocus(bool in_af) {
@@ -135,7 +135,11 @@ namespace web {
       return *this;
     }
     TextArea & SetDisabled(bool in_dis) { Info()->UpdateDisabled(in_dis); return *this; }
-    TextArea & SetText(const std::string & in_text) { Info()->UpdateText(in_text); return *this; }
+    TextArea & SetText(const std::string & in_text) {
+      Info()->cur_text = in_text;
+      Info()->UpdateText(in_text);
+      return *this;
+    }
 
     bool HasAutofocus() const { return Info()->autofocus; }
     bool IsDisabled() const { return Info()->disabled; }
