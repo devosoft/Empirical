@@ -33,13 +33,13 @@ public:
     if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
   }
 
-  void Clear() { Info()->ClearCol(cur_col); }
-  void ClearStyle() { Info()->cols[cur_col].extras.style.Clear(); }
-  void ClearAttr() { Info()->cols[cur_col].extras.attr.Clear(); }
-  void ClearListen() { Info()->cols[cur_col].extras.listen.Clear(); }
-  void ClearExtras() { Info()->cols[cur_col].extras.Clear(); }
-  void ClearChildren() { Info()->ClearColChildren(cur_col); }
-  void ClearCells() { Info()->ClearCol(cur_col); }
+  TableCol & Clear() { Info()->ClearCol(cur_col); return *this; }
+  TableCol & ClearStyle() { Info()->cols[cur_col].extras.style.Clear(); return *this; }
+  TableCol & ClearAttr() { Info()->cols[cur_col].extras.attr.Clear(); return *this; }
+  TableCol & ClearListen() { Info()->cols[cur_col].extras.listen.Clear(); return *this; }
+  TableCol & ClearExtras() { Info()->cols[cur_col].extras.Clear(); return *this; }
+  TableCol & ClearChildren() { Info()->ClearColChildren(cur_col); return *this; }
+  TableCol & ClearCells() { Info()->ClearCol(cur_col); return *this; }
 
   std::string GetCSS(const std::string & setting) override {
     return Info()->cols[cur_col].extras.GetStyle(setting);

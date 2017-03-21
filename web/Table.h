@@ -713,12 +713,12 @@ namespace web {
     Table(internal::TableInfo * in_info, size_t _row, size_t _col)
       : TableWidget(in_info, _row, _col) { ; }
 
-    void Clear() { Info()->ClearTable(); }
-    void ClearStyle() { Info()->extras.style.Clear(); }
-    void ClearAttr() { Info()->extras.attr.Clear(); }
-    void ClearListen() { Info()->extras.listen.Clear(); }
-    void ClearExtras() { Info()->extras.Clear(); }
-    void ClearChildren() { Info()->ClearTableChildren(); }
+    Table & Clear() { Info()->ClearTable(); return *this; }
+    Table & ClearStyle() { Info()->extras.style.Clear(); return *this; }
+    Table & ClearAttr() { Info()->extras.attr.Clear(); return *this; }
+    Table & ClearListen() { Info()->extras.listen.Clear(); return *this; }
+    Table & ClearExtras() { Info()->extras.Clear(); return *this; }
+    Table & ClearChildren() { Info()->ClearTableChildren(); return *this; }
 
     // Functions to resize the number of rows, columns, or both!
     Table & Rows(size_t r) {

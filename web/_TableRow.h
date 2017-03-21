@@ -32,13 +32,13 @@ public:
 
   bool InStateRow() const { return true; }
 
-  void Clear() { Info()->ClearRow(cur_row); }
-  void ClearStyle() { Info()->rows[cur_row].extras.style.Clear(); }
-  void ClearAttr() { Info()->rows[cur_row].extras.attr.Clear(); }
-  void ClearListen() { Info()->rows[cur_row].extras.listen.Clear(); }
-  void ClearExtras() { Info()->rows[cur_row].extras.Clear(); }
-  void ClearChildren() { Info()->ClearRowChildren(cur_row); }
-  void ClearCells() { Info()->ClearRow(cur_row); }
+  TableRow & Clear() { Info()->ClearRow(cur_row); return *this; }
+  TableRow & ClearStyle() { Info()->rows[cur_row].extras.style.Clear(); return *this; }
+  TableRow & ClearAttr() { Info()->rows[cur_row].extras.attr.Clear(); return *this; }
+  TableRow & ClearListen() { Info()->rows[cur_row].extras.listen.Clear(); return *this; }
+  TableRow & ClearExtras() { Info()->rows[cur_row].extras.Clear(); return *this; }
+  TableRow & ClearChildren() { Info()->ClearRowChildren(cur_row); return *this; }
+  TableRow & ClearCells() { Info()->ClearRow(cur_row); return *this; }
 
   std::string GetCSS(const std::string & setting) override {
     return Info()->rows[cur_row].extras.GetStyle(setting);

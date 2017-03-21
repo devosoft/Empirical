@@ -33,13 +33,13 @@ public:
     if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
   }
 
-  void Clear() { Info()->ClearRowGroup(cur_row); }
-  void ClearStyle() { Info()->row_groups[cur_row].extras.style.Clear(); }
-  void ClearAttr() { Info()->row_groups[cur_row].extras.attr.Clear(); }
-  void ClearListen() { Info()->row_groups[cur_row].extras.listen.Clear(); }
-  void ClearExtras() { Info()->row_groups[cur_row].extras.Clear(); }
-  void ClearChildren() { Info()->ClearRowGroupChildren(cur_row); }
-  void ClearCells() { Info()->ClearRowGroup(cur_row); }
+  TableRowGroup & Clear() { Info()->ClearRowGroup(cur_row); return *this; }
+  TableRowGroup & ClearStyle() { Info()->row_groups[cur_row].extras.style.Clear(); return *this; }
+  TableRowGroup & ClearAttr() { Info()->row_groups[cur_row].extras.attr.Clear(); return *this; }
+  TableRowGroup & ClearListen() { Info()->row_groups[cur_row].extras.listen.Clear(); return *this; }
+  TableRowGroup & ClearExtras() { Info()->row_groups[cur_row].extras.Clear(); return *this; }
+  TableRowGroup & ClearChildren() { Info()->ClearRowGroupChildren(cur_row); return *this; }
+  TableRowGroup & ClearCells() { Info()->ClearRowGroup(cur_row); return *this; }
 
   std::string GetCSS(const std::string & setting) override {
     return Info()->row_groups[cur_row].extras.GetStyle(setting);
