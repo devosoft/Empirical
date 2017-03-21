@@ -302,6 +302,22 @@ namespace emp {
     in_string.resize(pos);
   }
 
+  /// Remove all characters from a string except letters, numbers, and whitespace.
+  static inline void remove_punctuation(std::string & in_string) {
+    const size_t strlen = in_string.size();
+    size_t pos = 0;
+
+    for (size_t i = 0; i < strlen; i++) {
+      const char cur_char = in_string[i];
+      if (is_alphanumeric(cur_char) || is_whitespace(cur_char)) {
+        in_string[pos++] = cur_char;
+      }
+    }
+
+    in_string.resize(pos);
+  }
+
+
   // Cut up a string based on a deliminator.
   static inline void slice(const std::string & in_string, emp::vector<std::string> & out_set,
                            char delim='\n') {
