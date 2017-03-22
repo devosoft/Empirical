@@ -316,6 +316,7 @@ namespace web {
   // Implementation of Widget methods...
 
   Widget::Widget(const std::string & id) {
+    emp_assert(has_whitespace(id) == false);
     // We are creating a new widget; in derived class, make sure:
     // ... to assign info pointer to new object of proper *Info type
     // ... NOT to increment info->ptr_count since it's initialized to 1.
@@ -501,16 +502,34 @@ namespace web {
         DoAttr(setting, emp::to_string(value));
         return (return_t &) *this;
       }
+
+      // On with NO mouse event.
       return_t & On(const std::string & event_name, const std::function<void()> & fun) {
         emp_assert(info != nullptr);
         size_t fun_id = JSWrap(fun);
         DoListen(event_name, fun_id);
         return (return_t &) *this;
       }
+
+      // On with full mouse event.
       return_t & On(const std::string & event_name,
                     const std::function<void(MouseEvent evt)> & fun) {
         emp_assert(info != nullptr);
         size_t fun_id = JSWrap(fun);
+        DoListen(event_name, fun_id);
+        return (return_t &) *this;
+      }
+
+      // On with mouse coordinates.
+      return_t & On(const std::string & event_name,
+                    const std::function<void(int,int)> & fun) {
+        emp_assert(info != nullptr);
+        auto fun_cb = [this, fun](MouseEvent evt){
+          int x = evt.clientX - GetXPos();
+          int y = evt.clientY - GetYPos();
+          fun(x,y);
+        };
+        size_t fun_id = JSWrap(fun_cb);
         DoListen(event_name, fun_id);
         return (return_t &) *this;
       }
