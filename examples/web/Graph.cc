@@ -42,6 +42,8 @@ private:
   size_t can_h = 400;
   size_t node_r = 15;
 
+  //size_t node_r2 = node_r * node_r;
+
   UI::Document doc;
   UI::Canvas graph_canvas;
   emp::Random random;
@@ -56,13 +58,25 @@ private:
   }
 
   void MouseDown(int x, int y) {
-    active_node = (int) AddNode(x,y);
+    // Test if the mouse is on an existing node.
+    // for (auto & node : nodes) {
+    //
+    // }
+
+    // If we did not find an existing node, make a new one.
+    if (active_node == -1) {
+      active_node = (int) AddNode(x,y);
+    }
   }
   void MouseUp() {
     active_node = -1;
   }
   void MouseMove(int x, int y) {
-
+    if (active_node >= 0) {
+      auto & node = nodes[(size_t) active_node];
+      node.x = x;
+      node.y = y;
+    }
   }
 public:
   GraphDriver() : doc("emp_base"), graph_canvas(doc.AddCanvas(can_w, can_h, "graph_canvas")) {
@@ -70,6 +84,7 @@ public:
 
     graph_canvas.OnMouseDown([this](int x, int y){ MouseDown(x,y); });
     graph_canvas.OnMouseUp([this](){ MouseUp(); });
+    graph_canvas.OnMouseMove([this](int x, int y){ MouseMove(x,y); });
 
     AddNode(50,50);
     AddNode(100,100);
