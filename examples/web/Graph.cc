@@ -47,15 +47,29 @@ private:
   emp::Random random;
   emp::vector<Node> nodes;
 
-  void AddNode(double x, double y) {
+  int active_node = -1;
+
+  size_t AddNode(double x, double y) {
     size_t id = nodes.size();
     nodes.emplace_back(x,y,id);
+    return id;
+  }
+
+  void MouseDown(int x, int y) {
+    active_node = (int) AddNode(x,y);
+  }
+  void MouseUp() {
+    active_node = -1;
+  }
+  void MouseMove(int x, int y) {
+
   }
 public:
   GraphDriver() : doc("emp_base"), graph_canvas(doc.AddCanvas(can_w, can_h, "graph_canvas")) {
     doc << "<h2>Graph Explorer</h2>";
 
-    graph_canvas.OnClick([this](int x, int y){ AddNode(x,y); });
+    graph_canvas.OnMouseDown([this](int x, int y){ MouseDown(x,y); });
+    graph_canvas.OnMouseUp([this](){ MouseUp(); });
 
     AddNode(50,50);
     AddNode(100,100);
@@ -71,7 +85,9 @@ public:
     graph_canvas.Clear("black");
 
     for (auto & node : nodes) {
-      graph_canvas.Circle(node.x, node.y, node_r, "white");
+      std::string color = "white";
+      if (node.id == active_node) color = "yellow";
+      graph_canvas.Circle(node.x, node.y, node_r, color, "blue");
     }
 
     doc.Text("fps").Redraw();
