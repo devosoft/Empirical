@@ -42,7 +42,7 @@ private:
   size_t can_h = 400;
   size_t node_r = 15;
 
-  //size_t node_r2 = node_r * node_r;
+  double node_r_sqr = node_r * node_r;
 
   UI::Document doc;
   UI::Canvas graph_canvas;
@@ -59,9 +59,14 @@ private:
 
   void MouseDown(int x, int y) {
     // Test if the mouse is on an existing node.
-    // for (auto & node : nodes) {
-    //
-    // }
+    for (auto & node : nodes) {
+      double x_dist = node.x - x;
+      double y_dist = node.y - y;
+      double sqr_dist = x_dist * x_dist + y_dist * y_dist;
+      if (sqr_dist < node_r_sqr) {
+        active_node = node.id;
+      }
+    }
 
     // If we did not find an existing node, make a new one.
     if (active_node == -1) {
