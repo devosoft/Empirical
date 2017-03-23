@@ -50,6 +50,9 @@ private:
   emp::vector<Node> nodes;
 
   int active_node = -1;
+  int edge_node = -1;
+  int mouse_x = -1;
+  int mouse_y = -1;
 
   size_t AddNode(double x, double y) {
     size_t id = nodes.size();
@@ -72,15 +75,29 @@ private:
     if (active_node == -1) {
       active_node = (int) AddNode(x,y);
     }
+
+    // If new active node is NOT edge node, draw line.  Else stop edge.
+    if (active_node == edge_node) {
+      edge_node = -1;
+    }
+    else {
+      // @CAO Draw EDGE!
+    }
   }
   void MouseUp() {
+    edge_node = active_node;
     active_node = -1;
   }
   void MouseMove(int x, int y) {
+    mouse_x = mouse_y = -1;
     if (active_node >= 0) {
       auto & node = nodes[(size_t) active_node];
       node.x = x;
       node.y = y;
+    }
+    else if (edge_node >= 0) {
+      mouse_x = x;
+      mouse_y = y;
     }
   }
 public:
@@ -108,6 +125,11 @@ public:
       std::string color = "white";
       if (node.id == active_node) color = "yellow";
       graph_canvas.Circle(node.x, node.y, node_r, color, "blue");
+    }
+
+    if (edge_node >= 0 && mouse_x > 0) {
+      auto & node = nodes[edge_node];
+      graph_canvas.Line(node.x, node.y, mouse_x, mouse_y);
     }
 
     doc.Text("fps").Redraw();
