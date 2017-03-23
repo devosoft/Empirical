@@ -36,6 +36,13 @@ struct Node {
   Node(double _x, double _y, size_t _id) : x(_x), y(_y), id(_id) { ; }
 };
 
+struct Edge {
+  size_t from;
+  size_t to;
+
+  Edge(size_t f, size_t t) : from(f), to(t) { ; }
+};
+
 class GraphDriver : public UI::Animate {
 private:
   size_t can_w = 400;
@@ -48,6 +55,7 @@ private:
   UI::Canvas graph_canvas;
   emp::Random random;
   emp::vector<Node> nodes;
+  emp::vector<Edge> edges;
 
   int active_node = -1;
   int edge_node = -1;
@@ -91,6 +99,7 @@ private:
     }
 
     // If we made it this far, we are tyring to finish an edge!
+    edges.emplace_back(edge_node, active_node);
     edge_node = -1;
   }
 
@@ -136,6 +145,12 @@ public:
       std::string color = "white";
       if (node.id == active_node) color = "yellow";
       graph_canvas.Circle(node.x, node.y, node_r, color, "blue");
+    }
+
+    for (auto & edge : edges) {
+      Node & node1 = nodes[edge.from];
+      Node & node2 = nodes[edge.to];
+      graph_canvas.Line(node1.x, node1.y, node2.x, node2.y, "white");
     }
 
     if (edge_node >= 0 && mouse_x > 0) {
