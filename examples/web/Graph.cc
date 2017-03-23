@@ -114,6 +114,7 @@ private:
       auto & node = nodes[(size_t) active_node];
       node.x = x;
       node.y = y;
+      edge_node = -1;
     }
     else if (edge_node >= 0) {
       mouse_x = x;
