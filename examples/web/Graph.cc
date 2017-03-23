@@ -68,6 +68,12 @@ private:
     return id;
   }
 
+  void AddEdge(size_t from, size_t to) {
+    edges.emplace_back(from, to);
+    edge_node = -1;
+  }
+
+
   void MouseDown(int x, int y) {
     // Test if the mouse is on an existing node.
     for (auto & node : nodes) {
@@ -82,6 +88,7 @@ private:
     // If we did not find an existing node, make a new one and stop.
     if (active_node == -1) {
       active_node = (int) AddNode(x,y);
+      if (edge_node >= 0) AddEdge(edge_node, active_node);
       return;
     }
 
@@ -99,8 +106,7 @@ private:
     }
 
     // If we made it this far, we are tyring to finish an edge!
-    edges.emplace_back(edge_node, active_node);
-    edge_node = -1;
+    AddEdge(edge_node, active_node);
   }
 
   void MouseUp() {
