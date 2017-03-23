@@ -71,23 +71,34 @@ private:
       }
     }
 
-    // If we did not find an existing node, make a new one.
+    // If we did not find an existing node, make a new one and stop.
     if (active_node == -1) {
       active_node = (int) AddNode(x,y);
+      return;
     }
 
-    // If new active node is NOT edge node, draw line.  Else stop edge.
+    // If we are clicking on the same node again, stop trying to make an edge.
     if (active_node == edge_node) {
       edge_node = -1;
+      mouse_x = mouse_y = -1;
+      return;
     }
-    else {
-      // @CAO Draw EDGE!
+
+    // If we are not trying to make an edge, then start a new edge!
+    if (edge_node == -1) {
+      edge_node = active_node;
+      return;
     }
+
+    // If we made it this far, we are tyring to finish an edge!
+    edge_node = -1;
   }
+
   void MouseUp() {
-    edge_node = active_node;
+    // edge_node = active_node;
     active_node = -1;
   }
+
   void MouseMove(int x, int y) {
     mouse_x = mouse_y = -1;
     if (active_node >= 0) {
