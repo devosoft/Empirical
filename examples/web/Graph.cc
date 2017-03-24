@@ -7,6 +7,7 @@
 #include "web/Animate.h"
 #include "web/canvas_utils.h"
 #include "web/emfunctions.h"
+#include "web/Selector.h"
 #include "web/web.h"
 
 namespace UI = emp::web;
@@ -53,6 +54,8 @@ private:
 
   UI::Document doc;
   UI::Canvas graph_canvas;
+  UI::Selector mode_select;
+
   emp::Random random;
   emp::vector<Node> nodes;
   emp::vector<Edge> edges;
@@ -128,12 +131,19 @@ private:
     }
   }
 public:
-  GraphDriver() : doc("emp_base"), graph_canvas(doc.AddCanvas(can_w, can_h, "graph_canvas")) {
+  GraphDriver()
+    : doc("emp_base")
+    , graph_canvas(doc.AddCanvas(can_w, can_h, "graph_canvas"))
+    , mode_select(doc.AddSelector("mode")) {
     doc << "<h2>Graph Explorer</h2>";
 
     graph_canvas.OnMouseDown([this](int x, int y){ MouseDown(x,y); });
     graph_canvas.OnMouseUp([this](){ MouseUp(); });
     graph_canvas.OnMouseMove([this](int x, int y){ MouseMove(x,y); });
+
+    mode_select.SetOption("Adjacency List");
+    mode_select.SetOption("Adjacency Matrix");
+    mode_select.SetOption("Vertex Info");
 
     AddNode(50,50);
     AddNode(100,100);
