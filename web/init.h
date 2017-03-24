@@ -93,6 +93,12 @@ namespace emp {
     return true;
   }
 
+  static bool InitializeAnim() {
+    // Nothing to do here yet...
+    return true;
+  }
+
+
 }
 
 #endif
