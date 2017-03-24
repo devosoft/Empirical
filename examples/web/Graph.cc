@@ -56,6 +56,7 @@ private:
   UI::Document doc;
   UI::Canvas graph_canvas;
   UI::Selector mode_select;
+  UI::Table table_matrix;
 
   emp::Random random;
   emp::vector<Node> nodes;
@@ -140,7 +141,8 @@ public:
   GraphDriver()
     : doc("emp_base")
     , graph_canvas(doc.AddCanvas(can_w, can_h, "graph_canvas"))
-    , mode_select(doc.AddSelector("mode")) {
+    , mode_select(doc.AddSelector("mode"))
+    , table_matrix(doc.AddTable(1,1,"adj_matrix")) {
     doc << "<h2>Graph Explorer</h2>";
 
     graph_canvas.OnMouseDown([this](int x, int y){ MouseDown(x,y); });
@@ -180,6 +182,12 @@ public:
       auto & node = nodes[edge_node];
       graph_canvas.Line(node.x, node.y, mouse_x, mouse_y);
     }
+
+    table_matrix.Clear();
+    table_matrix.Resize(nodes.size(), nodes.size());
+    table_matrix.SetCSS("border-collapse", "collapse");
+    table_matrix.SetCSS("border", "3px solid black");
+    table_matrix.CellsCSS("border", "1px solid black");
 
     doc.Text("fps").Redraw();
   }
