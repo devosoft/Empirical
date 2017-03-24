@@ -26,7 +26,8 @@ struct AdjMatrix {
     vals.emplace_back(start_size+1, false);
   }
 
-  bool operator()(size_t x, size_t y) { return vals[x][y]; }
+  char operator()(size_t x, size_t y) const { return vals[x][y]; }
+  char & operator()(size_t x, size_t y) { return vals[x][y]; }
 };
 
 struct Node {
@@ -60,6 +61,8 @@ private:
   emp::vector<Node> nodes;
   emp::vector<Edge> edges;
 
+  AdjMatrix adj_matrix;
+
   int active_node = -1;
   int edge_node = -1;
   int mouse_x = -1;
@@ -68,11 +71,14 @@ private:
   size_t AddNode(double x, double y) {
     size_t id = nodes.size();
     nodes.emplace_back(x,y,id);
+    adj_matrix.Inc();
     return id;
   }
 
   void AddEdge(size_t from, size_t to) {
     edges.emplace_back(from, to);
+    adj_matrix(from,to) = 1;
+    adj_matrix(to,from) = 1;
     edge_node = -1;
   }
 
