@@ -68,11 +68,13 @@ private:
   int edge_node = -1;
   int mouse_x = -1;
   int mouse_y = -1;
+  bool update_graph = true;
 
   size_t AddNode(double x, double y) {
     size_t id = nodes.size();
     nodes.emplace_back(x,y,id);
     adj_matrix.Inc();
+    update_graph = true;
     return id;
   }
 
@@ -81,6 +83,7 @@ private:
     adj_matrix(from,to) = 1;
     adj_matrix(to,from) = 1;
     edge_node = -1;
+    update_graph = true;
   }
 
 
@@ -183,6 +186,11 @@ public:
       graph_canvas.Line(node.x, node.y, mouse_x, mouse_y);
     }
 
+    // If we don't need to update the graph, stop here.
+    if (update_graph == false) return;
+    update_graph = false;
+
+    // Update the adjacency matrix.
     table_matrix.Clear();
     table_matrix.Resize(nodes.size(), nodes.size());
     for (size_t r = 0; r < nodes.size(); r++) {
