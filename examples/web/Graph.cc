@@ -186,24 +186,25 @@ public:
       graph_canvas.Line(node.x, node.y, mouse_x, mouse_y);
     }
 
-    // If we don't need to update the graph, stop here.
-    if (update_graph == false) return;
-    update_graph = false;
-
-    // Update the adjacency matrix.
-    table_matrix.Clear();
-    table_matrix.Resize(nodes.size(), nodes.size());
-    for (size_t r = 0; r < nodes.size(); r++) {
-      for (size_t c = 0; c < nodes.size(); c++) {
-        table_matrix.GetCell(r,c) << ((int) adj_matrix(r,c));
-      }
-    }
-    table_matrix.SetCSS("border-collapse", "collapse");
-    table_matrix.SetCSS("border", "3px solid black");
-    table_matrix.CellsCSS("border", "1px solid black");
-    table_matrix.Redraw();
-
     doc.Text("fps").Redraw();
+
+    // Only update the graph if we know we need to.
+    if (update_graph) {
+      update_graph = false;  // Don't update again unless there is another change.
+
+      // Update the adjacency matrix.
+      table_matrix.Clear();
+      table_matrix.Resize(nodes.size(), nodes.size());
+      for (size_t r = 0; r < nodes.size(); r++) {
+        for (size_t c = 0; c < nodes.size(); c++) {
+          table_matrix.GetCell(r,c) << ((int) adj_matrix(r,c));
+        }
+      }
+      table_matrix.SetCSS("border-collapse", "collapse");
+      table_matrix.SetCSS("border", "3px solid black");
+      table_matrix.CellsCSS("border", "1px solid black");
+      table_matrix.Redraw();
+    }
   }
 };
 
