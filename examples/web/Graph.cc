@@ -185,9 +185,15 @@ public:
 
     table_matrix.Clear();
     table_matrix.Resize(nodes.size(), nodes.size());
+    for (size_t r = 0; r < nodes.size(); r++) {
+      for (size_t c = 0; c < nodes.size(); c++) {
+        table_matrix.GetCell(r,c) << ((int) adj_matrix(r,c));
+      }
+    }
     table_matrix.SetCSS("border-collapse", "collapse");
     table_matrix.SetCSS("border", "3px solid black");
     table_matrix.CellsCSS("border", "1px solid black");
+    table_matrix.Redraw();
 
     doc.Text("fps").Redraw();
   }
