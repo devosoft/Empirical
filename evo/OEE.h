@@ -165,6 +165,11 @@ namespace evo{
               // std::cout << " Nulls: " << nulls << std::endl;
               return (double)(skel.size() - nulls);
           });
+
+          if (do_skeletonize.size() > 100000) {
+            do_skeletonize.Clear();
+          }
+
         }
 
         emp::vector<double> results = emp::vector<double>({(double)change, (double)novelty, (double)ecology, (double)complexity});
