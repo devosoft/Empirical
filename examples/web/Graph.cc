@@ -194,10 +194,16 @@ public:
 
       // Update the adjacency matrix.
       table_matrix.Clear();
-      table_matrix.Resize(nodes.size(), nodes.size());
+      table_matrix.Resize(nodes.size()+1, nodes.size()+1);
       for (size_t r = 0; r < nodes.size(); r++) {
+        char symbol = '+';
+        if (r < 26) symbol = 'A' + (char) r;
+        else if (r < 52) symbol = 'a' + (char) (r-26);
+        else if (r < 62) symbol = '0' + (char) (r-52);
+        table_matrix.GetCell(r+1,0).SetHeader() << symbol;
+        table_matrix.GetCell(0,r+1).SetHeader() << symbol;
         for (size_t c = 0; c < nodes.size(); c++) {
-          table_matrix.GetCell(r,c) << ((int) adj_matrix(r,c));
+          table_matrix.GetCell(r+1,c+1) << ((int) adj_matrix(r,c));
         }
       }
       table_matrix.SetCSS("border-collapse", "collapse");
