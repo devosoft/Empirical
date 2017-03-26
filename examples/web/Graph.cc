@@ -56,12 +56,14 @@ private:
   UI::Document doc;
   UI::Canvas graph_canvas;
   UI::Selector mode_select;
+  UI::Table table_list;
   UI::Table table_matrix;
 
   emp::Random random;
   emp::vector<Node> nodes;
   emp::vector<Edge> edges;
 
+  emp::vector< emp::vector<int> > adj_list;
   AdjMatrix adj_matrix;
 
   int active_node = -1;
@@ -73,6 +75,7 @@ private:
   size_t AddNode(double x, double y) {
     size_t id = nodes.size();
     nodes.emplace_back(x,y,id);
+    adj_list.emplace_back();
     adj_matrix.Inc();
     update_graph = true;
     return id;
@@ -82,10 +85,19 @@ private:
     edges.emplace_back(from, to);
     adj_matrix(from,to) = 1;
     adj_matrix(to,from) = 1;
+    adj_list[from].push_back(to);
+    adj_list[to].push_back(from);
     edge_node = -1;
     update_graph = true;
   }
 
+  char ID2Symbol(size_t id) {
+    char symbol = '+';
+    if (id < 26) symbol = 'A' + (char) id;
+    else if (id < 52) symbol = 'a' + (char) (id-26);
+    else if (id < 62) symbol = '0' + (char) (id-52);
+    return symbol;
+  }
 
   void MouseDown(int x, int y) {
     // Test if the mouse is on an existing node.
@@ -145,7 +157,9 @@ public:
     : doc("emp_base")
     , graph_canvas(doc.AddCanvas(can_w, can_h, "graph_canvas"))
     , mode_select(doc.AddSelector("mode"))
-    , table_matrix(doc.AddTable(1,1,"adj_matrix")) {
+    , table_list(doc.AddTable(1,1,"adj_list"))
+    , table_matrix(doc.AddTable(1,1,"adj_matrix"))
+  {
     doc << "<h2>Graph Explorer</h2>";
 
     graph_canvas.OnMouseDown([this](int x, int y){ MouseDown(x,y); });
@@ -192,14 +206,26 @@ public:
     if (update_graph) {
       update_graph = false;  // Don't update again unless there is another change.
 
+      // Update the adjacency list.
+      table_list.Clear();
+      table_list.Resize(nodes.size()+1, 2);
+      table_list.GetCell(0,0).SetHeader() << "ID";
+      table_list.GetCell(0,1).SetHeader() << "Connections";
+      for (size_t r = 0; r < nodes.size(); r++) {
+        char symbol = ID2Symbol(r);
+        table_list.GetCell(r+1,0).SetHeader() << symbol;
+        for (size_t s : adj_list[r]) table_list.GetCell(r+1,1) << ID2Symbol(s) << " ";
+      }
+      table_list.SetCSS("border-collapse", "collapse");
+      table_list.SetCSS("border", "3px solid black");
+      table_list.CellsCSS("border", "1px solid black");
+      table_list.Redraw();
+
       // Update the adjacency matrix.
       table_matrix.Clear();
       table_matrix.Resize(nodes.size()+1, nodes.size()+1);
       for (size_t r = 0; r < nodes.size(); r++) {
-        char symbol = '+';
-        if (r < 26) symbol = 'A' + (char) r;
-        else if (r < 52) symbol = 'a' + (char) (r-26);
-        else if (r < 62) symbol = '0' + (char) (r-52);
+        char symbol = ID2Symbol(r);
         table_matrix.GetCell(r+1,0).SetHeader() << symbol;
         table_matrix.GetCell(0,r+1).SetHeader() << symbol;
         for (size_t c = 0; c < nodes.size(); c++) {
