@@ -275,7 +275,7 @@ namespace evo {
       return genome_group;
     }
 
-    std::string node_to_json(Node<org_ptr> * node) {
+    std::string node_to_json(Node<org_ptr> * node, int stop_id = -999) {
       std::stringstream ss;
       ss << "{\"name\":";
       ss << to_string(node->id);
@@ -296,20 +296,22 @@ namespace evo {
     //     ss << "null";
     //   }
       ss << "\", \"children\":[";
-      for (size_t i=0; i < node->offspring.size(); ++i) {
-        ss << node_to_json(node->offspring[i]);
-        if (i < node->offspring.size()-1) {
-          ss << ", ";
-        }
+      if (node->id != stop_id) {
+          for (size_t i=0; i < node->offspring.size(); ++i) {
+            ss << node_to_json(node->offspring[i]);
+            if (i < node->offspring.size()-1) {
+              ss << ", ";
+            }
+          }
       }
       ss << "]}";
       return ss.str();
     }
 
-    void WriteDataToFile(std::string filename) {
+    void WriteDataToFile(std::string filename, int stop_id=-999) {
       std::ofstream output_location;
       output_location.open(filename);
-      std::string output = node_to_json(&nodes[0]);
+      std::string output = node_to_json(&nodes[0], stop_id);
       output_location << "[" << output << "]" << std::endl;
       output_location.close();
     }
@@ -354,6 +356,7 @@ namespace evo {
     using LineageTracker<POP_MANAGER>::next_parent_id;
     int last_coalesence = 0;
     using LineageTracker<POP_MANAGER>::emp_is_lineage_manager;
+    using LineageTracker<POP_MANAGER>::WriteDataToFile;
     // Add WriteDataToFile
     LineageTracker_Pruned() {;}
 
@@ -554,6 +557,27 @@ namespace evo {
         generation_since_update = new_generation;
         new_generation.resize(0);
       }
+
+      if (i % 1000 == 0 && i > 0) {
+        WriteDataToFile("lineage.json");
+      }
+    }
+
+    void ArchiveProgress(std::string filename, int cutoff) {
+        WriteDataToFile(filename, cutoff);
+        Node<org_ptr> * curr = &nodes[cutoff];
+        while (curr->id != 0) {
+            curr = curr->parent_id;
+            genome_counts[*(curr->genome)]--;
+            if (!genome_counts[*(curr->genome)]) {
+              genomes.erase(*(curr->genome));
+            }
+
+            Node<org_ptr>* old = curr;
+            curr = curr->parent;
+            emp_assert(curr->offspring.size() == 1);
+            nodes.erase(old->id);
+        }
     }
 };
 
