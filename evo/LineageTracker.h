@@ -558,7 +558,7 @@ namespace evo {
         new_generation.resize(0);
       }
 
-      if (i % 1000 == 0 && i > 0) {
+      if (i % 10000 == 0 && i > 0) {
         WriteDataToFile("lineage.json");
       }
     }

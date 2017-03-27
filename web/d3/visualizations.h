@@ -696,6 +696,7 @@ public:
   }
 
   void DrawTree() {
+    std::cout << "Vis data id: " << data->GetID() << std::endl;
     D3::Selection nodeEnter = tree.GenerateNodesAndLinks(*GetSVG())[0];
     nodeEnter.Append("circle").SetAttr("r", 2).On("click", GetID()+"node_mouseover").AddToolTip(*tip);
     GetSVG()->SelectAll("g.node").SelectAll("circle").SetStyle("fill", GetID()+"color_fun_node");
@@ -788,9 +789,9 @@ protected:
 
 public:
 
-  const int grid_width = 10;
-  const int grid_height = 10;
-  const int legend_cell_size = 15;
+  int grid_width = 10;
+  int grid_height = 10;
+  int legend_cell_size = 15;
 
   D3::Selection legend;
 
@@ -828,26 +829,23 @@ public:
       };
     //   console.log("about to trace");
       var result = trace_lineage(js.objects[$0][0], $1);
-      var paths = ([[[result[0]%10, Math.floor(result[0]/10)]]]);
+      var paths = ([[result[0]%$2, Math.floor(result[0]/$2)]]);
       for (i=1; i <result.length; i++) {
-        var old_point = paths[paths.length-1][paths[paths.length-1].length-1];
-        var new_point = ([result[i]%100, Math.floor(result[i]/100)]);
-        if (Math.abs(new_point[0]-old_point[0]) > 1 || Math.abs(new_point[1]-old_point[1]) > 1) {
-          paths.push([new_point]);
-        } else {
-          paths[paths.length-1].push(new_point);
-        }
+        var old_point = paths[paths.length-1];
+        var new_point = ([result[i]%$2, Math.floor(result[i]/$2)]);
+        paths.push(new_point);
       }
-      var scale = d3.scale.linear().domain([0,100]).range([0,500]);
+      var scale = d3.scale.linear().domain([0,$2]).range([0,500]);
       var l = d3.svg.line().x(function(d){return scale(d[0]);}).y(function(d){return scale(d[1]);});
       var svg = d3.select("body").append("svg");
       svg.attr("width", 500).attr("height",500);
-      svg.selectAll("path").data(paths).enter().append("path").attr("d", function(d){console.log(l(d)); return l(d);}).attr("stroke", "white").attr("stroke-width", 1).attr("fill","none");
+      console.log(paths);
+      svg.selectAll("path").data([paths]).enter().append("path").attr("d", function(d){console.log(d, l(d)); return l(d);}).attr("stroke", "white").attr("stroke-width", 1).attr("fill","none");
     //   console.log(path.length);
     //   console.log(l(path));
 
 
-  }, data->GetID(), d.name());
+}, data->GetID(), d.name(), grid_width);
   };
 
   std::function<std::string(NODE, int)> color_fun_node = [this](NODE d, int i){
@@ -928,6 +926,25 @@ public:
     GetSVG()->SelectAll(".link").Filter("filter_fun").SetClassed("faded", false);
   };
 
+  emp::vector<int> GetLocHistory(int id) {
+    EM_ASM_ARGS({
+      var org = js.objects[$1](js.objects[$0][0], $2);
+      var loc_history = [];
+      loc_history.push(org.loc);
+      console.log(org);
+      while (+org.name > 0) {
+        org = js.objects[$1](js.objects[$0][0], org.parent);
+        loc_history.push(org.loc);
+      }
+      emp_i.__outgoing_array = loc_history;
+
+    }, data->GetID(), data->FindInHierarchy.GetID(), id);
+
+    emp::vector<int> loc_history;
+    emp::pass_vector_to_cpp(loc_history);
+    return loc_history;
+  }
+
   SpatialGridTreeVisualization(int width, int height) : TreeVisualization<NODE>(width, height){;}
 
   virtual void Setup() {
@@ -956,6 +973,8 @@ public:
                             .SetStyle("stroke", GetID()+"color_fun_node")
                             .On("mouseover", GetID()+"legend_mouseover")
                             .On("mouseout", GetID()+"legend_mouseout");
+
+    GetSVG()->SelectAll(".node").On("click", [this](NODE d){std::cout << emp::to_string(GetLocHistory(d.name())) << std::endl;});
 
   }
 

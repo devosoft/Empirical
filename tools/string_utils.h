@@ -184,6 +184,47 @@ namespace emp {
   }
 
 
+  inline bool has_whitespace(const std::string & test_str) {
+    for (char c : test_str) if (is_whitespace(c)) return true;
+    return false;
+  }
+
+  inline bool has_upper_letter(const std::string & test_str) {
+    for (char c : test_str) if (is_upper_letter(c)) return true;
+    return false;
+  }
+
+  inline bool has_lower_letter(const std::string & test_str) {
+    for (char c : test_str) if (is_lower_letter(c)) return true;
+    return false;
+  }
+
+  inline bool has_letter(const std::string & test_str) {
+    for (char c : test_str) if (is_letter(c)) return true;
+    return false;
+  }
+
+  inline bool has_digit(const std::string & test_str) {
+    for (char c : test_str) if (is_digit(c)) return true;
+    return false;
+  }
+
+  inline bool has_alphanumeric(const std::string & test_str) {
+    for (char c : test_str) if (is_alphanumeric(c)) return true;
+    return false;
+  }
+
+  inline bool has_idchar(const std::string & test_str) {
+    for (char c : test_str) if (is_idchar(c)) return true;
+    return false;
+  }
+
+  static inline bool has_one_of(const std::string & test_str, const std::string & char_set) {
+    for (char c : test_str) if (is_one_of(c, char_set)) return true;
+    return false;
+  }
+
+
   // If no functions are provided to is_value(), always return false as base case.
   inline bool is_valid(char test_char) { return false; }
 
@@ -301,6 +342,22 @@ namespace emp {
 
     in_string.resize(pos);
   }
+
+  /// Remove all characters from a string except letters, numbers, and whitespace.
+  static inline void remove_punctuation(std::string & in_string) {
+    const size_t strlen = in_string.size();
+    size_t pos = 0;
+
+    for (size_t i = 0; i < strlen; i++) {
+      const char cur_char = in_string[i];
+      if (is_alphanumeric(cur_char) || is_whitespace(cur_char)) {
+        in_string[pos++] = cur_char;
+      }
+    }
+
+    in_string.resize(pos);
+  }
+
 
   // Cut up a string based on a deliminator.
   static inline void slice(const std::string & in_string, emp::vector<std::string> & out_set,

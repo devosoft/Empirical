@@ -24,27 +24,16 @@ private:
   UI::Table table;
   emp::array<CellState, 81> states;
   emp::array<char,9> symbols;
+  int cur_row;
+  int cur_col;
 
-  void UpdateCell(size_t r, size_t c) {
-    auto cell = table.GetCell(r, c);
-    cell.SetCSS("border", "1px solid black"); // Make a think black line between cells
-    cell.SetCSS("width", "45px");             // Make cells all 45px by 45px squares
-    cell.SetCSS("height", "45px");
-
-    const char symbol_id = states[r*9+c].state;
-    char cur_symbol = ' ';
-    if (symbol_id >= 0) cur_symbol = symbols[symbol_id];
-    //   // If we're adding a list of all nine options, use a smaller font.
-    //   cell.SetCSS("font", "15px Calibri, sans-serif")
-    //     << "<center>1 2 3<br>4 5 6<br>7 8 9</center>";
-    cell <<  "<center>" << cur_symbol << "</center>";
-  }
 public:
   SudokuBoard(const std::string & in_name)
   : UI::Slate(in_name)
   , name(in_name)        // HTML id for the slate
   , table(9,9)           // Build a 9x9 table for actual puzzle
   , symbols({{'1','2','3','4','5','6','7','8','9'}})
+  , cur_row(-1), cur_col(-1)
   {
     // Setup background slate to draw board on.
     SetCSS("border", "3px solid black")   // Put a think boarder on the background
@@ -66,30 +55,63 @@ public:
     table.GetRowGroup(3).SetSpan(3).SetCSS("border", "3px solid black");
     table.GetRowGroup(6).SetSpan(3).SetCSS("border", "3px solid black");
 
+    Update();
+  }
+
+  void UpdateCell(size_t r, size_t c) {
+    auto cell = table.GetCell(r, c);
+    cell.SetCSS("border", "1px solid black"); // Make a think black line between cells
+    cell.SetCSS("width", "45px");             // Make cells all 45px by 45px squares
+    cell.SetCSS("height", "45px");
+
+    const char symbol_id = states[r*9+c].state;
+    if (r == cur_row && c == cur_col) {
+      cell.SetCSS("font", "15px Calibri, sans-serif")
+        << "<center>1 2 3<br>4 5 6<br>7 8 9</center>";
+    }
+    else if (symbol_id >= 0) {
+      cell <<  "<center>" << symbols[symbol_id] << "</center>";
+    }
+    else {} // Otherwise leave this cell blank! (for now)
+
+    //   // If we're adding a list of all nine options, use a smaller font.
+  }
+
+  void Update() {
     // Add all symbols to the table.
     for (size_t r = 0; r < 9; r++) {
       for (size_t c = 0; c < 9; c++) {
         auto cell = table.GetCell(r,c);
-        cell.On("mousedown", [cell,r,c]() mutable {
-          // doc.Slate("table_bg").SetBackground("red");
-          // cell.SetCSS("BackgroundColor", "grey");
-          cell.Clear();
-        });
-        cell.On("mouseup", [this,r,c]() mutable {
-          // cell.SetCSS("BackgroundColor", "white");
-          // doc.Slate("table_bg").SetBackground("white");
-          // states[r*9+c] = '*';
-          UpdateCell(r,c);
-        });
-        // cell.On("mousemove", [cell]() mutable {
-        //   cell.SetCSS("BackgroundColor", "pink");
-        //   doc.Slate("table_bg").SetBackground("pink");
+        // cell.On("mousedown", [cell,r,c]() mutable {
+        //   // doc.Slate("table_bg").SetBackground("red");
+        //   // cell.SetCSS("BackgroundColor", "grey");
+        //   cell.Clear();
         // });
+        // cell.On("mouseup", [this,r,c]() mutable {
+        //   // cell.SetCSS("BackgroundColor", "white");
+        //   // doc.Slate("table_bg").SetBackground("white");
+        //   // states[r*9+c] = '*';
+        //   UpdateCell(r,c);
+        // });
+        cell.On("mousemove", [this,cell,r,c]() mutable {
+          if (cur_row == r && cur_col == c) return;
+          int old_row = cur_row;
+          int old_col = cur_col;
+          auto old_cell = cell.GetCell(old_row, old_col);
+          cur_row = r; cur_col = c;
+
+          cell.ClearStyle();
+          cell.ClearChildren();
+          old_cell.ClearStyle();
+          old_cell.ClearChildren();
+          UpdateCell(r,c);
+          UpdateCell(old_row,old_col);
+          doc.Slate(name).Redraw();
+        });
 
         UpdateCell(r,c);
       }
     }
-
   }
 
   CellState & operator[](int id) { return states[id]; }
@@ -118,4 +140,5 @@ int main()
     }};
 
   for (int i = 0 ; i < 81; i++) board[i] = states[i];
+  board.Update();
 }

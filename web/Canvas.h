@@ -147,8 +147,12 @@ namespace web {
       Info()->AddAction( new CanvasRect(x, y, w, h, fc, lc) );
       return *this;
     }
+    Canvas & Line(double x1, double y1, double x2, double y2, const std::string & lc="") {
+      Info()->AddAction( new CanvasLine(x1, y1, x2, y2, lc) );
+      return *this;
+    }
     Canvas & Draw(const emp::Circle & circle,
-                    const std::string & fc="", const std::string & lc="") {
+                  const std::string & fc="", const std::string & lc="") {
       Info()->AddAction( new CanvasCircle(circle, fc, lc) );
       return *this;
     }

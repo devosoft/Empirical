@@ -206,7 +206,7 @@ namespace emp {
      * @param range The upper and lower bounds for the random numbers [lower, upper)
      **/
     inline double GetDouble(const Range<double> range) {
-      return GetDouble(range.lower, range.upper);
+      return GetDouble(range.GetLower(), range.GetUpper());
      }
 
     /**
@@ -240,7 +240,9 @@ namespace emp {
      * @param range The upper and lower bounds for the random numbers [lower, upper)
      **/
     template <typename T>
-    inline uint32_t GetUInt(const Range<T> range) { return GetUInt(range.lower, range.upper); }
+    inline uint32_t GetUInt(const Range<T> range) {
+      return GetUInt(range.GetLower(), range.GetUpper());
+    }
 
     /**
      * Generate an int out of an interval.
@@ -251,7 +253,7 @@ namespace emp {
      **/
     inline int GetInt(const int max) { return static_cast<int>(GetUInt((uint32_t) max)); }
     inline int GetInt(const int min, const int max) { return GetInt(max - min) + min; }
-    inline int GetInt(const Range<int> range) { return GetInt(range.lower, range.upper); }
+    inline int GetInt(const Range<int> range) { return GetInt(range.GetLower(), range.GetUpper()); }
 
 
     // Random Event Generation //////////////////////////////////////////////////

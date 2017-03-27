@@ -128,7 +128,7 @@ namespace D3{
       int node_exit = node_enter + 1;
       int link_enter = node_exit + 1;
       int link_exit = link_enter + 1;
-
+      std::cout << "Tree data id: " << data->GetID() << std::endl;
       EM_ASM_ARGS({
 
         // Based on code from http://www.d3noob.org/2014/01/tree-diagrams-in-d3js_11.html

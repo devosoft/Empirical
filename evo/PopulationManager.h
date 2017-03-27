@@ -498,8 +498,8 @@ namespace evo {
 
       // If any pools are empty, choose org from the next pool.
       if (num_orgs < pool_count) {
-        id_range.upper = pool_end[num_orgs];
-        if (num_orgs > 0) { id_range.lower = pool_end[num_orgs-1]; }
+        id_range.SetUpper(pool_end[num_orgs]);
+        if (num_orgs > 0) { id_range.SetLower(pool_end[num_orgs-1]); }
       }
 
       const size_t pos = random_ptr->GetInt(id_range);

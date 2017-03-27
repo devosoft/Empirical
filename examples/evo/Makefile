@@ -18,11 +18,13 @@ CFLAGS_native_opt := $(CFLAGS_all) $(OFLAGS_native_opt)
 CFLAGS_native_debug := $(CFLAGS_all) $(OFLAGS_native_debug)
 CFLAGS_native_grumpy := $(CFLAGS_all) $(OFLAGS_native_grumpy)
 
-CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
-CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
-#CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
+CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../web/library_emp.js --js-library ../../web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../web/library_emp.js --js-library ../../web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../web/library_emp.js -s --js-library ../../web/d3/library_d3.js EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 TARGETS := Fitness_Share_NK Grid link_test NK NK-constexpr NK-const-config NK-Serial Roulette Symbulation World bit_evolve
+
+JS_TARGETS := LineageViz.js
 
 EVO_DEPEND := ../../evo/PopulationManager.h ../../evo/World.h
 
@@ -53,7 +55,7 @@ $(TARGETS): % : %.cc $(EVO_DEPEND)
 	$(CXX) $(CFLAGS_version) $(CFLAGS) $< -o $@
 
 $(JS_TARGETS): %.js : %.cc
-	$(CXX_web) $(CFLAGS_web) $< -o $@
+	$(CXX_web) $(CFLAGS_version) $(CFLAGS_web) $< -o $@
 
 debug-%: $*.cc $(EVO_DEPEND)
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
