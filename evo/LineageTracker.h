@@ -275,44 +275,42 @@ namespace evo {
       return genome_group;
     }
 
-    std::string node_to_json(Node<org_ptr> * node, int stop_id = -999) {
-      std::stringstream ss;
+  std::string node_to_json(Node<org_ptr> * node, std::ofstream& ss) {
       ss << "{\"name\":";
       ss << to_string(node->id);
-      ss << ", \"parent\":";
+      ss << ",\"parent\":";
       ss << to_string(node->parent->id);
-      ss << ", \"alive\":";
+      ss << ",\"alive\":";
       if (node->alive){
         ss << "true";
       } else {
         ss << "false";
       }
-      ss << ", \"loc\":";
+      ss << ",\"loc\":";
       ss << to_string(node->loc);
-      ss << ", \"persist\":false, \"genome\":\"";
+      ss << ",\"persist\":false,\"genome\":\"";
     //   if (node->genome != nullptr) {
     //     ss << to_string(*(node->genome));
     //   } else {
     //     ss << "null";
     //   }
-      ss << "\", \"children\":[";
-      if (node->id != stop_id) {
+      ss << "\",\"children\":[";
+
           for (size_t i=0; i < node->offspring.size(); ++i) {
-            ss << node_to_json(node->offspring[i]);
+            node_to_json(node->offspring[i], ss);
             if (i < node->offspring.size()-1) {
-              ss << ", ";
+              ss << ",";
             }
           }
-      }
       ss << "]}";
-      return ss.str();
     }
 
-    void WriteDataToFile(std::string filename, int stop_id=-999) {
+  void WriteDataToFile(std::string filename, int stop_id=-999) {
       std::ofstream output_location;
       output_location.open(filename);
-      std::string output = node_to_json(&nodes[0], stop_id);
-      output_location << "[" << output << "]" << std::endl;
+      output_location << "[";
+      node_to_json(&nodes[0], output_location);
+      output_location << "]" << std::endl;
       output_location.close();
     }
 
@@ -558,7 +556,7 @@ namespace evo {
         new_generation.resize(0);
       }
 
-      if (i % 1000 == 0 && i > 0) {
+      if (i == 2000) {
         WriteDataToFile("lineage.json");
       }
     }
