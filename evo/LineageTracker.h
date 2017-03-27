@@ -131,7 +131,6 @@ namespace evo {
       };
 
       std::function<void(int)> UpdateFun = [this] (int ud){
-        WriteDataToFile("lineage.json");
         Update(ud);
       };
 
@@ -252,7 +251,18 @@ namespace evo {
         org = org->parent;
       }
       return lineage;
+    }
 
+    //Return a vector containing the IDs of an organism's ancestors
+    emp::vector<int> TraceLineageLocs(int org_id) {
+      emp::vector<int> lineage;
+      emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
+      Node<org_ptr>* org = &(nodes[org_id]);
+      while(org->id) {
+        lineage.push_back(org->loc);
+        org = org->parent;
+      }
+      return lineage;
     }
 
     //Takes a container of ints representing org ids (as assigned by the lineage)
@@ -275,46 +285,93 @@ namespace evo {
       return genome_group;
     }
 
-    std::string node_to_json(Node<org_ptr> * node, int stop_id = -999) {
-      std::stringstream ss;
+    void node_to_json(Node<org_ptr> * node, std::ofstream& ss, bool hierarchical=true) {
       ss << "{\"name\":";
       ss << to_string(node->id);
-      ss << ", \"parent\":";
+      ss << ",\"parent\":";
       ss << to_string(node->parent->id);
-      ss << ", \"alive\":";
+      ss << ",\"alive\":";
       if (node->alive){
         ss << "true";
       } else {
         ss << "false";
       }
-      ss << ", \"loc\":";
+      ss << ",\"loc\":";
       ss << to_string(node->loc);
-      ss << ", \"persist\":false, \"genome\":\"";
+      ss << ",\"persist\":false,\"genome\":\"";
     //   if (node->genome != nullptr) {
     //     ss << to_string(*(node->genome));
     //   } else {
     //     ss << "null";
     //   }
-      ss << "\", \"children\":[";
-      if (node->id != stop_id) {
-          for (size_t i=0; i < node->offspring.size(); ++i) {
-            ss << node_to_json(node->offspring[i]);
-            if (i < node->offspring.size()-1) {
-              ss << ", ";
-            }
+
+        ss << "\"";
+      if (hierarchical) {
+        ss << ",\"children\":[";
+        for (size_t i=0; i < node->offspring.size(); ++i) {
+          node_to_json(node->offspring[i], ss);
+          if (i < node->offspring.size()-1) {
+            ss << ",";
           }
+        }
+        ss << "]}";
+      } else {
+        ss << "}" << std::endl;
+        for (size_t i=0; i < node->offspring.size(); ++i) {
+          node_to_json(node->offspring[i], ss);
+        }
       }
-      ss << "]}";
-      return ss.str();
     }
 
-    void WriteDataToFile(std::string filename, int stop_id=-999) {
+    void node_to_csv(Node<org_ptr> * node, std::ofstream& ss) {
+      ss << to_string(node->id);
+      ss << ",";
+      ss << to_string(node->parent->id);
+      ss << ",";
+      if (node->alive){
+        ss << "true";
+      } else {
+        ss << "false";
+      }
+      ss << ",";
+      ss << to_string(node->loc);
+      ss << ",false,\"";
+    //   if (node->genome != nullptr) {
+    //     ss << to_string(*(node->genome));
+    //   } else {
+    //     ss << "null";
+    //   }
+
+      ss << "\"" << std::endl;
+      for (size_t i=0; i < node->offspring.size(); ++i) {
+        node_to_csv(node->offspring[i], ss);
+      }
+    }
+
+    void WriteDataToFileJSON(std::string filename, int stop_id=-999) {
       std::ofstream output_location;
       output_location.open(filename);
-      std::string output = node_to_json(&nodes[0], stop_id);
-      output_location << "[" << output << "]" << std::endl;
+      output_location << "[";
+      node_to_json(&nodes[0], output_location);
+      output_location << "]" << std::endl;
       output_location.close();
     }
+
+    void WriteDataToFileNodes(std::string filename, int stop_id=-999) {
+      std::ofstream output_location;
+      output_location.open(filename);
+      node_to_json(&nodes[0], output_location);
+      output_location.close();
+    }
+
+    void WriteDataToFileCSV(std::string filename, int stop_id=-999) {
+      std::ofstream output_location;
+      output_location.open(filename);
+      output_location << "name,parent,alive,loc,persist,genome" <<std::endl;
+      node_to_csv(&nodes[0], output_location);
+      output_location.close();
+    }
+
 
   };
 
@@ -356,7 +413,7 @@ namespace evo {
     using LineageTracker<POP_MANAGER>::next_parent_id;
     int last_coalesence = 0;
     using LineageTracker<POP_MANAGER>::emp_is_lineage_manager;
-    using LineageTracker<POP_MANAGER>::WriteDataToFile;
+    using LineageTracker<POP_MANAGER>::WriteDataToFileJSON;
     // Add WriteDataToFile
     LineageTracker_Pruned() {;}
 
@@ -557,14 +614,10 @@ namespace evo {
         generation_since_update = new_generation;
         new_generation.resize(0);
       }
-
-      if (i % 10000 == 0 && i > 0) {
-        WriteDataToFile("lineage.json");
-      }
     }
 
     void ArchiveProgress(std::string filename, int cutoff) {
-        WriteDataToFile(filename, cutoff);
+        WriteDataToFileJSON(filename, cutoff);
         Node<org_ptr> * curr = &nodes[cutoff];
         while (curr->id != 0) {
             curr = curr->parent_id;
