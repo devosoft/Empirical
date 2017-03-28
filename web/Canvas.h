@@ -124,6 +124,7 @@ namespace web {
     }
     Canvas(const Canvas & in) : WidgetFacet(in) { ; }
     Canvas(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsCanvasInfo()); }
+    Canvas() { ; }
     virtual ~Canvas() { ; }
 
     using INFO_TYPE = CanvasInfo;
@@ -151,6 +152,16 @@ namespace web {
       Info()->AddAction( new CanvasLine(x1, y1, x2, y2, lc) );
       return *this;
     }
+    Canvas & Text(double x, double y, const std::string text,
+                  const std::string & fc="", const std::string & lc="") {
+      Info()->AddAction( new CanvasText(x, y, text, fc, lc) );
+      return *this;
+    }
+    Canvas & Font(const std::string font) {
+      Info()->AddAction( new CanvasFont(font) );
+      return *this;
+    }
+
     Canvas & Draw(const emp::Circle & circle,
                   const std::string & fc="", const std::string & lc="") {
       Info()->AddAction( new CanvasCircle(circle, fc, lc) );
