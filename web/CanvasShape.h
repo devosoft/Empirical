@@ -150,18 +150,27 @@ namespace web {
   class CanvasText : public CanvasShape {
   protected:
     std::string text;
+    bool center;
   public:
     CanvasText(double x, double y, const std::string & _text,
                const std::string & fc="", const std::string & lc="")
-      : CanvasShape(x, y, fc, lc), text(_text) { ; }
+      : CanvasShape(x, y, fc, lc), text(_text), center(false) { ; }
 
     void Apply() {
+      if (center) {
+        EM_ASM({ emp_i.ctx.textAlign = "center"; });
+        EM_ASM({ emp_i.ctx.textBaseline = "middle"; });
+      }
       EM_ASM_ARGS({
-        var text = Pointer_stringify($2);
         emp_i.ctx.fillStyle = Pointer_stringify($3);
+        var text = Pointer_stringify($2);
         emp_i.ctx.fillText(text,$0,$1);
       }, x, y, text.c_str(), fill_color.c_str());
     }
+
+    void Center(bool c=true) { center = c; }
+    bool GetCenter() const { return center; }
+
     CanvasAction * Clone() const { return new CanvasText(*this); }
   };
 
