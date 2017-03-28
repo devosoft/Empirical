@@ -153,13 +153,13 @@ private:
     }
   }
 public:
-  GraphDriver()
-    : doc("emp_base")
-    , graph_canvas(doc.AddCanvas(can_w, can_h, "graph_canvas"))
-    , mode_select(doc.AddSelector("mode"))
-    , table_list(doc.AddTable(1,1,"adj_list"))
-    , table_matrix(doc.AddTable(1,1,"adj_matrix"))
+  GraphDriver() : doc("emp_base")
   {
+    doc << (graph_canvas = UI::Canvas(can_w, can_h, "graph_canvas"));
+    doc << (mode_select = UI::Selector("mode"));
+    doc << (table_matrix = UI::Table(1,1,"adj_matrix"));
+    doc << (table_list = UI::Table(1,1,"adj_list"));
+
     doc << "<h2>Graph Explorer</h2>";
 
     graph_canvas.OnMouseDown([this](int x, int y){ MouseDown(x,y); });
@@ -183,10 +183,13 @@ public:
   void DoFrame() {
     graph_canvas.Clear("black");
 
+    graph_canvas.Font("20px Arial");
     for (auto & node : nodes) {
       std::string color = "white";
       if (node.id == active_node) color = "yellow";
       graph_canvas.Circle(node.x, node.y, node_r, color, "blue");
+      std::string symbol = emp::to_string(ID2Symbol(node.id));
+      graph_canvas.Text(node.x-10, node.y+10, symbol, "red", "red");
     }
 
     for (auto & edge : edges) {
