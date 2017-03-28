@@ -157,6 +157,13 @@ namespace web {
       Info()->AddAction( new CanvasText(x, y, text, fc, lc) );
       return *this;
     }
+    Canvas & CenterText(double x, double y, const std::string text,
+                  const std::string & fc="", const std::string & lc="") {
+      auto * ctext = new CanvasText(x, y, text, fc, lc);
+      ctext->Center();
+      Info()->AddAction( ctext );
+      return *this;
+    }
     Canvas & Font(const std::string font) {
       Info()->AddAction( new CanvasFont(font) );
       return *this;
