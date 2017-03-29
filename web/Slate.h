@@ -98,6 +98,8 @@ namespace web {
       void Unregister(Widget & old_widget) override {
         Unregister_recurse(old_widget);          // Unregister this node from all above.
         old_widget->UnregisterChildren( this );  // Unregister all children, if any.
+        old_widget->parent = nullptr;
+        old_widget.Deactivate(false);
       }
 
       void UnregisterChildren(SlateInfo * regestrar) override {
