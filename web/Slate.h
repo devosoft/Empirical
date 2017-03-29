@@ -244,6 +244,7 @@ namespace web {
     }
     Slate(const Slate & in) : WidgetFacet(in) { ; }
     Slate(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsSlateInfo()); }
+    Slate() { ; }
     ~Slate() { ; }
 
     using INFO_TYPE = internal::SlateInfo;
