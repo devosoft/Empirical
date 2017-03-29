@@ -157,13 +157,15 @@ private:
   }
 
   void ActivateAdjMatrix() {
-
+    info_panel.Clear();
+    info_panel << table_matrix;
   }
   void ActivateAdjList() {
-
+    info_panel.Clear();
+    info_panel << table_list;
   }
   void ActivateNodeViewer() {
-
+    info_panel.Clear();
   }
 
 public:
@@ -173,10 +175,11 @@ public:
 
     doc << (main_table = UI::Table(1,2,"main_table"));
     main_table.GetCell(0,0) << (graph_canvas = UI::Canvas(can_w, can_h, "graph_canvas"));
+    main_table.GetCell(0,1) << (mode_select = UI::Selector("mode"));
     main_table.GetCell(0,1) << (info_panel = UI::Slate("info_panel"));
-    info_panel << (mode_select = UI::Selector("mode"));
-    info_panel << (table_matrix = UI::Table(1,1,"adj_matrix"));
     info_panel << (table_list = UI::Table(1,1,"adj_list"));
+
+    table_matrix = UI::Table(1,1,"adj_matrix");
 
     main_table.GetCell(0,1).SetCSS("vertical-align", "top");
 
@@ -248,6 +251,7 @@ public:
       table_list.Redraw();
 
       // Update the adjacency matrix.
+      table_matrix.Freeze();  // About to make major changes; don't update live!
       table_matrix.Clear();
       table_matrix.Resize(nodes.size()+1, nodes.size()+1);
       for (size_t r = 0; r < nodes.size(); r++) {
@@ -261,7 +265,9 @@ public:
       table_matrix.SetCSS("border-collapse", "collapse");
       table_matrix.SetCSS("border", "3px solid black");
       table_matrix.CellsCSS("border", "1px solid black");
-      table_matrix.Redraw();
+      table_matrix.CellsCSS("width", "20px");
+      table_matrix.CellsCSS("height", "20px");
+      table_matrix.Activate();
     }
   }
 };
