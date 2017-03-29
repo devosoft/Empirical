@@ -33,9 +33,9 @@ struct AdjMatrix {
 struct Node {
   double x;
   double y;
-  size_t id;
+  int id;
 
-  Node(double _x, double _y, size_t _id) : x(_x), y(_y), id(_id) { ; }
+  Node(double _x, double _y, int _id) : x(_x), y(_y), id(_id) { ; }
 };
 
 struct Edge {
@@ -54,7 +54,9 @@ private:
   double node_r_sqr = node_r * node_r;
 
   UI::Document doc;
+  UI::Table main_table;
   UI::Canvas graph_canvas;
+  UI::Slate info_panel;
   UI::Selector mode_select;
   UI::Table table_list;
   UI::Table table_matrix;
@@ -81,22 +83,23 @@ private:
     return id;
   }
 
-  void AddEdge(size_t from, size_t to) {
+  void AddEdge(int from, int to) {
     edges.emplace_back(from, to);
-    adj_matrix(from,to) = 1;
-    adj_matrix(to,from) = 1;
-    adj_list[from].push_back(to);
-    adj_list[to].push_back(from);
+    adj_matrix((size_t)from, (size_t)to) = 1;
+    adj_matrix((size_t)to, (size_t)from) = 1;
+    adj_list[(size_t)from].push_back(to);
+    adj_list[(size_t)to].push_back(from);
     edge_node = -1;
     update_graph = true;
   }
 
-  char ID2Symbol(size_t id) {
-    char symbol = '+';
-    if (id < 26) symbol = 'A' + (char) id;
-    else if (id < 52) symbol = 'a' + (char) (id-26);
-    else if (id < 62) symbol = '0' + (char) (id-52);
-    return symbol;
+  template <typename T>
+  char ID2Symbol(T id) {
+    if (id < 0) return '?';
+    if (id < 26) return 'A' + (char) id;
+    if (id < 52) return 'a' + (char) (id-26);
+    if (id < 62) return '0' + (char) (id-52);
+    return '+';
   }
 
   void MouseDown(int x, int y) {
@@ -106,7 +109,7 @@ private:
       double y_dist = node.y - y;
       double sqr_dist = x_dist * x_dist + y_dist * y_dist;
       if (sqr_dist < node_r_sqr) {
-        active_node = node.id;
+        active_node = (int) node.id;
       }
     }
 
@@ -152,23 +155,38 @@ private:
       mouse_y = y;
     }
   }
+
+  void ActivateAdjMatrix() {
+
+  }
+  void ActivateAdjList() {
+
+  }
+  void ActivateNodeViewer() {
+
+  }
+
 public:
   GraphDriver() : doc("emp_base")
   {
-    doc << (graph_canvas = UI::Canvas(can_w, can_h, "graph_canvas"));
-    doc << (mode_select = UI::Selector("mode"));
-    doc << (table_matrix = UI::Table(1,1,"adj_matrix"));
-    doc << (table_list = UI::Table(1,1,"adj_list"));
-
     doc << "<h2>Graph Explorer</h2>";
+
+    doc << (main_table = UI::Table(1,2,"main_table"));
+    main_table.GetCell(0,0) << (graph_canvas = UI::Canvas(can_w, can_h, "graph_canvas"));
+    main_table.GetCell(0,1) << (info_panel = UI::Slate("info_panel"));
+    info_panel << (mode_select = UI::Selector("mode"));
+    info_panel << (table_matrix = UI::Table(1,1,"adj_matrix"));
+    info_panel << (table_list = UI::Table(1,1,"adj_list"));
+
+    main_table.GetCell(0,1).SetCSS("vertical-align", "top");
 
     graph_canvas.OnMouseDown([this](int x, int y){ MouseDown(x,y); });
     graph_canvas.OnMouseUp([this](){ MouseUp(); });
     graph_canvas.OnMouseMove([this](int x, int y){ MouseMove(x,y); });
 
-    mode_select.SetOption("Adjacency List");
-    mode_select.SetOption("Adjacency Matrix");
-    mode_select.SetOption("Vertex Info");
+    mode_select.SetOption("Adjacency List", [this](){ ActivateAdjList(); });
+    mode_select.SetOption("Adjacency Matrix", [this](){ ActivateAdjMatrix(); });
+    mode_select.SetOption("Vertex Info", [this](){ ActivateNodeViewer(); });
 
     AddNode(50,50);
     AddNode(100,100);
@@ -183,24 +201,27 @@ public:
   void DoFrame() {
     graph_canvas.Clear("black");
 
+    // Draw all edges on the canvas.
+    for (auto & edge : edges) {
+      Node & node1 = nodes[edge.from];
+      Node & node2 = nodes[edge.to];
+      graph_canvas.Line(node1.x, node1.y, node2.x, node2.y, "yellow");
+    }
+
+    // If we are in the middle of drawing an edge, place it.
+    if (edge_node >= 0 && mouse_x > 0) {
+      auto & node = nodes[(size_t)edge_node];
+      graph_canvas.Line(node.x, node.y, mouse_x, mouse_y);
+    }
+
+    // Draw all vertices on the canvas.
     graph_canvas.Font("20px Arial");
     for (auto & node : nodes) {
       std::string color = "white";
       if (node.id == active_node) color = "yellow";
       graph_canvas.Circle(node.x, node.y, node_r, color, "blue");
       std::string symbol = emp::to_string(ID2Symbol(node.id));
-      graph_canvas.Text(node.x-10, node.y+10, symbol, "red", "red");
-    }
-
-    for (auto & edge : edges) {
-      Node & node1 = nodes[edge.from];
-      Node & node2 = nodes[edge.to];
-      graph_canvas.Line(node1.x, node1.y, node2.x, node2.y, "white");
-    }
-
-    if (edge_node >= 0 && mouse_x > 0) {
-      auto & node = nodes[edge_node];
-      graph_canvas.Line(node.x, node.y, mouse_x, mouse_y);
+      graph_canvas.CenterText(node.x, node.y, symbol, "black", "red");
     }
 
     doc.Text("fps").Redraw();
@@ -217,7 +238,9 @@ public:
       for (size_t r = 0; r < nodes.size(); r++) {
         char symbol = ID2Symbol(r);
         table_list.GetCell(r+1,0).SetHeader() << symbol;
-        for (size_t s : adj_list[r]) table_list.GetCell(r+1,1) << ID2Symbol(s) << " ";
+        for (int s : adj_list[r]) {
+          table_list.GetCell(r+1,1) << ID2Symbol(s) << " ";
+        }
       }
       table_list.SetCSS("border-collapse", "collapse");
       table_list.SetCSS("border", "3px solid black");
