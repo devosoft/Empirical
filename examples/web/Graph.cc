@@ -47,8 +47,8 @@ struct Edge {
 
 class GraphDriver : public UI::Animate {
 private:
-  size_t can_w = 400;
-  size_t can_h = 400;
+  size_t can_w = 500;
+  size_t can_h = 500;
   size_t node_r = 15;
 
   double node_r_sqr = node_r * node_r;
@@ -177,18 +177,20 @@ public:
     main_table.GetCell(0,0) << (graph_canvas = UI::Canvas(can_w, can_h, "graph_canvas"));
     main_table.GetCell(0,1) << (mode_select = UI::Selector("mode"));
     main_table.GetCell(0,1) << (info_panel = UI::Slate("info_panel"));
-    info_panel << (table_list = UI::Table(1,1,"adj_list"));
 
+    table_list = UI::Table(1,1,"adj_list");
     table_matrix = UI::Table(1,1,"adj_matrix");
+    info_panel << table_matrix;
 
+    main_table.GetCell(0,0).SetCSS("vertical-align", "top");
     main_table.GetCell(0,1).SetCSS("vertical-align", "top");
 
     graph_canvas.OnMouseDown([this](int x, int y){ MouseDown(x,y); });
     graph_canvas.OnMouseUp([this](){ MouseUp(); });
     graph_canvas.OnMouseMove([this](int x, int y){ MouseMove(x,y); });
 
-    mode_select.SetOption("Adjacency List", [this](){ ActivateAdjList(); });
     mode_select.SetOption("Adjacency Matrix", [this](){ ActivateAdjMatrix(); });
+    mode_select.SetOption("Adjacency List", [this](){ ActivateAdjList(); });
     mode_select.SetOption("Vertex Info", [this](){ ActivateNodeViewer(); });
 
     AddNode(50,50);
@@ -214,7 +216,7 @@ public:
     // If we are in the middle of drawing an edge, place it.
     if (edge_node >= 0 && mouse_x > 0) {
       auto & node = nodes[(size_t)edge_node];
-      graph_canvas.Line(node.x, node.y, mouse_x, mouse_y);
+      graph_canvas.Line(node.x, node.y, mouse_x, mouse_y, "red");
     }
 
     // Draw all vertices on the canvas.
