@@ -34,6 +34,7 @@ struct Node {
   double x;
   double y;
   int id;
+  int state = 0;
 
   Node(double _x, double _y, int _id) : x(_x), y(_y), id(_id) { ; }
 };
@@ -224,6 +225,7 @@ public:
     for (auto & node : nodes) {
       std::string color = "white";
       if (node.id == active_node) color = "yellow";
+      if (node.id == edge_node) color = "purple";
       graph_canvas.Circle(node.x, node.y, node_r, color, "blue");
       std::string symbol = emp::to_string(ID2Symbol(node.id));
       graph_canvas.CenterText(node.x, node.y, symbol, "black", "red");
