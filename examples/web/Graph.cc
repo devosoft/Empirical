@@ -225,7 +225,7 @@ public:
     for (auto & node : nodes) {
       std::string color = "white";
       if (node.id == active_node) color = "yellow";
-      if (node.id == edge_node) color = "purple";
+      else if (node.id == edge_node) color = "purple";
       graph_canvas.Circle(node.x, node.y, node_r, color, "blue");
       std::string symbol = emp::to_string(ID2Symbol(node.id));
       graph_canvas.CenterText(node.x, node.y, symbol, "black", "red");
@@ -263,7 +263,9 @@ public:
         table_matrix.GetCell(r+1,0).SetHeader() << symbol;
         table_matrix.GetCell(0,r+1).SetHeader() << symbol;
         for (size_t c = 0; c < nodes.size(); c++) {
-          table_matrix.GetCell(r+1,c+1) << ((int) adj_matrix(r,c));
+          auto cell = table_matrix.GetCell(r+1,c+1);
+          cell << ((int) adj_matrix(r,c));
+          if (r!=c) cell.OnClick([this,r,c](){AddEdge(r,c);});
         }
       }
       table_matrix.SetCSS("border-collapse", "collapse");
