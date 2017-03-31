@@ -12,6 +12,19 @@
 namespace emp {
 
   template <typename T>
+  int FindPos(const emp::vector<T> vec, const T & val) {
+    for (size_t i = 0; i < vec.size(); i++) {
+      if (vec[i] == val) return (int) i;
+    }
+    return -1;
+  }
+
+  template <typename T>
+  bool Has(const emp::vector<T> vec, const T & val) {
+    return FindPos(vec, val) >= 0;
+  }
+
+  template <typename T>
   void Print(const emp::vector<T> & v, std::ostream & os=std::cout, const std::string & spacer=" ") {
     for (size_t id = 0; id < v.size(); id++) {
       if (id) os << spacer; // Put a space before second element and beyond.
