@@ -44,6 +44,18 @@ struct Edge {
   size_t to;
 
   Edge(size_t f, size_t t) : from(f), to(t) { ; }
+
+  bool operator==(const Edge & in) const {
+    return (from == in.from) && (to == in.to);
+  }
+  bool operator<(const Edge & in) const {
+    if (from < in.from) return true;
+    return (from == in.from && to < in.to);
+  }
+  bool operator!=(const Edge & in) const { return !(*this == in); }
+  bool operator>(const Edge & in) const { return in < *this; }
+  bool operator<=(const Edge & in) const { return !(in < *this); }
+  bool operator>=(const Edge & in) const { return !(*this < in); }
 };
 
 class GraphDriver : public UI::Animate {
@@ -85,6 +97,18 @@ private:
   }
 
   void AddEdge(int from, int to) {
+    if (from < to) std::swap(from,to);
+    edges.emplace_back(from, to);
+    adj_matrix((size_t)from, (size_t)to) = 1;
+    adj_matrix((size_t)to, (size_t)from) = 1;
+    adj_list[(size_t)from].push_back(to);
+    adj_list[(size_t)to].push_back(from);
+    edge_node = -1;
+    update_graph = true;
+  }
+
+  void RemoveEdge(int from, int to) {
+    if (from < to) std::swap(from,to);
     edges.emplace_back(from, to);
     adj_matrix((size_t)from, (size_t)to) = 1;
     adj_matrix((size_t)to, (size_t)from) = 1;
