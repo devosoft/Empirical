@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "../../../base/vector.h"
-#include "../../../tools/Random.h"
+#include "../../base/vector.h"
+#include "../../tools/Random.h"
 
 // Parameters
 double r = 0.02;    // Neighborhood radius
