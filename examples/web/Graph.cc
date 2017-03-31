@@ -96,8 +96,24 @@ private:
     return id;
   }
 
+  int EdgeID(int from, int to) {
+    emp_assert(from != to);
+    emp_assert(from >= 0 && from < nodes.size());
+    emp_assert(to >= 0 && to < nodes.size());
+    if (from > to) std::swap(from,to);
+
+    for (size_t i = 0; i < edges.size(); i++) {
+      if (edges[i].from == from && edges[i].to == to) return (int) i;
+    }
+    return -1;
+  }
+
   void AddEdge(int from, int to) {
-    if (from < to) std::swap(from,to);
+    emp_assert(from != to);
+    emp_assert(from >= 0 && from < nodes.size());
+    emp_assert(to >= 0 && to < nodes.size());
+    if (from > to) std::swap(from,to);
+
     edges.emplace_back(from, to);
     adj_matrix((size_t)from, (size_t)to) = 1;
     adj_matrix((size_t)to, (size_t)from) = 1;
@@ -108,16 +124,24 @@ private:
   }
 
   void RemoveEdge(int from, int to) {
-    if (from < to) std::swap(from,to);
-    edges.emplace_back(from, to);
-    adj_matrix((size_t)from, (size_t)to) = 1;
-    adj_matrix((size_t)to, (size_t)from) = 1;
-    adj_list[(size_t)from].push_back(to);
-    adj_list[(size_t)to].push_back(from);
+    emp_assert(from != to);
+    emp_assert(from >= 0 && from < nodes.size());
+    emp_assert(to >= 0 && to < nodes.size());
+    if (from > to) std::swap(from,to);
+
+    edges.erase(edges.begin() + EdgeID(from, to));
+    adj_matrix((size_t)from, (size_t)to) = 0;
+    adj_matrix((size_t)to, (size_t)from) = 0;
+    // adj_list[(size_t)from].push_back(to);
+    // adj_list[(size_t)to].push_back(from);
     edge_node = -1;
     update_graph = true;
   }
 
+  void ToggleEdge(int from, int to) {
+    if (EdgeID(from, to) >= 0) RemoveEdge(from,to);
+    else AddEdge(from,to);
+  }
   template <typename T>
   char ID2Symbol(T id) {
     if (id < 0) return '?';
@@ -289,7 +313,7 @@ public:
         for (size_t c = 0; c < nodes.size(); c++) {
           auto cell = table_matrix.GetCell(r+1,c+1);
           cell << ((int) adj_matrix(r,c));
-          if (r!=c) cell.OnClick([this,r,c](){AddEdge(r,c);});
+          if (r!=c) cell.OnClick([this,r,c](){ToggleEdge(r,c);});
         }
       }
       table_matrix.SetCSS("border-collapse", "collapse");
