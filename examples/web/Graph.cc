@@ -4,6 +4,7 @@
 
 #include "base/vector.h"
 #include "tools/Random.h"
+#include "tools/vector_utils.h"
 #include "web/Animate.h"
 #include "web/canvas_utils.h"
 #include "web/emfunctions.h"
@@ -96,18 +97,6 @@ private:
     return id;
   }
 
-  int EdgeID(int from, int to) {
-    emp_assert(from != to);
-    emp_assert(from >= 0 && from < nodes.size());
-    emp_assert(to >= 0 && to < nodes.size());
-    if (from > to) std::swap(from,to);
-
-    for (size_t i = 0; i < edges.size(); i++) {
-      if (edges[i].from == from && edges[i].to == to) return (int) i;
-    }
-    return -1;
-  }
-
   void AddEdge(int from, int to) {
     emp_assert(from != to);
     emp_assert(from >= 0 && from < nodes.size());
@@ -129,7 +118,7 @@ private:
     emp_assert(to >= 0 && to < nodes.size());
     if (from > to) std::swap(from,to);
 
-    edges.erase(edges.begin() + EdgeID(from, to));
+    edges.erase(edges.begin() + emp::FindPos(edges, Edge(from, to)));
     adj_matrix((size_t)from, (size_t)to) = 0;
     adj_matrix((size_t)to, (size_t)from) = 0;
     // adj_list[(size_t)from].push_back(to);
@@ -139,7 +128,8 @@ private:
   }
 
   void ToggleEdge(int from, int to) {
-    if (EdgeID(from, to) >= 0) RemoveEdge(from,to);
+    if (from > to) std::swap(from,to);
+    if (emp::Has(edges, Edge(from, to))) RemoveEdge(from,to);
     else AddEdge(from,to);
   }
   template <typename T>
