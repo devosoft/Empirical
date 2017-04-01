@@ -14,10 +14,10 @@ struct Org {
 class SimplePDWorld {
  private:
   // Parameters
-  double r = 0.02;    // Neighborhood radius
-  double u = 0.025;   // cost / benefit ratio
-  size_t N = 6400;    // Population size
-  size_t E = 5000;     // How many epochs should a popuilation run for?
+  double r;    // Neighborhood radius
+  double u;    // cost / benefit ratio
+  size_t N;    // Population size
+  size_t E;    // How many epochs should a popuilation run for?
 
   emp::Random random;
 
@@ -34,7 +34,7 @@ class SimplePDWorld {
   void CalcFitness(size_t id);
   void Repro();
  public:
-  SimplePDWorld(double _r=0.02, double _u=0.025, size_t _N=6400, size_t _E=5000, int seed=0)
+  SimplePDWorld(double _r=0.02, double _u=0.175, size_t _N=6400, size_t _E=5000, int seed=0)
     : random(seed)
   {
     Setup(_r, _u, _N, _E);
