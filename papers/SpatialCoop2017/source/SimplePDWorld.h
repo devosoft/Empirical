@@ -40,6 +40,17 @@ class SimplePDWorld {
     Setup(_r, _u, _N, _E);
   }
 
+  const emp::vector<Org> & GetPop() const { return pop; }
+  double GetR() const { return r; }
+  double GetU() const { return u; }
+  size_t GetN() const { return N; }
+  size_t GetE() const { return E; }
+
+  void SetR(double _r) { r = _r; }
+  void SetU(double _u) { u = _u; }
+  void SetN(size_t _N) { N = _N; }
+  void SetE(size_t _E) { E = _E; }
+
   void Setup(double _r=0.02, double _u=0.0025, size_t _N=6400, size_t _E=5000) {
     // Store the input values.
     r = _r;
@@ -87,11 +98,12 @@ class SimplePDWorld {
     }
   }
 
-  void Reset(double r, double u, size_t N, size_t E) { Setup(r,u,N,E); }
+  void Reset() { Setup(r,u,N,E); }
 
-  void Run() {
+  void Run(size_t steps=-1) {
+    if (steps > E) steps = E;
     // Run the organisms!
-    for (size_t epoch = 0; epoch < E; epoch++) {
+    for (size_t epoch = 0; epoch < steps; epoch++) {
       std::cout << "Epoch = " << epoch
 		<< ";  #Coop = " << CountCoop()
 		<< std::endl;
