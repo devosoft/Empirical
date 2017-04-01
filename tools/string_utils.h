@@ -454,6 +454,17 @@ namespace emp {
   inline std::string to_string(ALL_TYPES... all_values) {
     return to_string_impl(true, std::forward<ALL_TYPES>(all_values)...);
   }
+
+  /// This function tries to convert a string into any type you're looking for...  You just
+  /// need to specify the out type as the template argument.
+  template <typename T>
+  inline T from_string(const std::string & str) {
+    std::stringstream ss;
+    ss << str;
+    T out_val;
+    ss >> out_val;
+    return out_val;
+  }
 }
 
 #endif
