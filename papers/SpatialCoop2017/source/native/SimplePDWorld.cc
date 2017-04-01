@@ -1,7 +1,7 @@
 #include <iostream>
-#include "../../config/ArgManager.h"
+#include "config/ArgManager.h"
 
-#include "SimplePDWorld.h"
+#include "../SimplePDWorld.h"
 
 EMP_BUILD_CONFIG( PDWorldConfig,
   GROUP(DEFAULT, "Default settings for SimplePDWorld"),

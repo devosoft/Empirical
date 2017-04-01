@@ -1,5 +1,5 @@
-#include "../../base/vector.h"
-#include "../../tools/Random.h"
+#include "base/vector.h"
+#include "tools/Random.h"
 
 struct Org {
   double x;
@@ -107,7 +107,6 @@ class SimplePDWorld {
 
 void SimplePDWorld::CalcFitness(size_t id) {
   Org & org = pop[id];
-  size_t num_neighbors = org.neighbors.size();
 
   int C_count = 0;
   int D_count = 0;
