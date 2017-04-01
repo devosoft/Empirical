@@ -33,12 +33,20 @@ int main()
   doc.AddCanvas(world_size, world_size, "canvas");
   DrawCanvas();
 
+  auto & anim = doc.AddAnimation("anim_world", [](){ world.Run(1); DrawCanvas(); } );
+
   doc << "<br>";
+  doc.AddButton([&anim](){
+    anim.ToggleActive();
+    auto but = doc.Button("start_but");
+    if (anim.GetActive()) but.Label("Pause");
+    else but.Label("Start");
+  }, "Play", "start_but");
   doc.AddButton([](){ world.Run(1); DrawCanvas(); }, "Step", "step_but");
   doc.AddButton([](){ world.Run(); DrawCanvas(); }, "Run!", "run_but");
   doc.AddButton([](){ world.Reset(); DrawCanvas(); }, "Randomize", "rand_but");
 
-  doc << "<br>Radius = ";
+  doc << "<br>Radius (<i>r</i>) = ";
   doc.AddTextArea([](const std::string & str){
     double r = emp::from_string<double>(str);
     world.SetR(r);
