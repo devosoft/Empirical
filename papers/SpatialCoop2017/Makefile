@@ -41,7 +41,7 @@ $(PROJECT).js: source/web/$(PROJECT)-web.cc
 	$(CXX_web) $(CFLAGS_web) source/web/$(PROJECT)-web.cc -o web/$(PROJECT).js
 
 clean:
-	rm -f $(PROJECT) web/$(PROJECT).js *.js.map *~ source/*.o
+	rm -f $(PROJECT) web/$(PROJECT).js web/$(PROJECT).js.mem *.js.map *~ source/*.o
 
 # Debugging information
 print-%: ; @echo '$(subst ','\'',$*=$($*))'
