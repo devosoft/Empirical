@@ -14,10 +14,11 @@ struct Org {
 class SimplePDWorld {
  private:
   // Parameters
-  double r;    // Neighborhood radius
-  double u;    // cost / benefit ratio
-  size_t N;    // Population size
-  size_t E;    // How many epochs should a popuilation run for?
+  double r;         // Neighborhood radius
+  double u;         // cost / benefit ratio
+  size_t N;         // Population size
+  size_t E;         // How many epochs should a popuilation run for?
+  size_t num_runs;  // How many runs should we do?
 
   emp::Random random;
 
@@ -35,7 +36,7 @@ class SimplePDWorld {
   void Repro();
  public:
   SimplePDWorld(double _r=0.02, double _u=0.175, size_t _N=6400, size_t _E=5000, int seed=0)
-    : random(seed)
+    : num_runs(10), random(seed)
   {
     Setup(_r, _u, _N, _E);
   }
@@ -45,11 +46,13 @@ class SimplePDWorld {
   double GetU() const { return u; }
   size_t GetN() const { return N; }
   size_t GetE() const { return E; }
+  size_t GetNumRuns() const { return num_runs; }
 
   void SetR(double _r) { r = _r; }
   void SetU(double _u) { u = _u; }
   void SetN(size_t _N) { N = _N; }
   void SetE(size_t _E) { E = _E; }
+  void SetNumRuns(size_t n) { num_runs = n; }
 
   void Setup(double _r=0.02, double _u=0.0025, size_t _N=6400, size_t _E=5000) {
     // Store the input values.
