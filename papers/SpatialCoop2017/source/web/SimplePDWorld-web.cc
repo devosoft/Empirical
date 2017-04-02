@@ -40,6 +40,24 @@ void CanvasClick(int x, int y) {
   DrawCanvas();
 }
 
+struct RunInfo {
+  size_t id;
+
+  double r;
+  double u;
+  size_t N;
+  size_t E;
+
+  size_t cur_epoch;
+  size_t num_coop;
+  size_t num_defect;
+
+  RunInfo(size_t _id, double _r, double _u, size_t _N, size_t _E)
+   : id(_id), r(_r), u(_u), N(_N), E(_E)
+   , cur_epoch(0), num_coop(0), num_defect(0)
+  { ; }
+};
+
 int main()
 {
   doc << "<h2>Spatial Prisoner's Dilema</h2>";
