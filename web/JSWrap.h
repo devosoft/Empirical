@@ -39,6 +39,8 @@
 //    In order do so, you must define the properties of the object as a tuple
 //    struct in js_object_struct.h. - @ELD
 //  * Made sure JSWrap can take function objects, lambdas, or just function names.
+//  * A callback ID of 0 will always be associated with a nullptr, and thus can be used to
+//    indicate that a function does not exist.
 
 
 #ifndef EMP_JSWRAP_H
@@ -487,7 +489,7 @@ namespace emp {
     // The following function returns a static callback array; callback ID's all index into
     // this array.
     static emp::vector<JSWrap_Callback_Base *> & CallbackArray() {
-      static emp::vector<JSWrap_Callback_Base *> callback_array;
+      static emp::vector<JSWrap_Callback_Base *> callback_array(1, nullptr);
       return callback_array;
     }
 
