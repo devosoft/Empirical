@@ -103,19 +103,44 @@ int main()
   doc.AddButton([run_input](){
     //size_t num_runs = emp::from_string<size_t>(run_input.GetText());
     size_t num_runs = world.GetNumRuns();
-    emp::Alert(num_runs);
+    auto result_tab = doc.Table("result_tab");
+    for (int run_id = 0; run_id < num_runs; run_id++) {
+      world.Reset();
+      world.Run();
+
+      // Update the table.
+      int line_id = result_tab.GetNumRows();
+      result_tab.Rows(line_id+1);
+      result_tab.GetCell(line_id, 0) << run_id;
+      result_tab.GetCell(line_id, 1) << world.GetR();
+      result_tab.GetCell(line_id, 2) << world.GetU();
+      result_tab.GetCell(line_id, 3) << world.GetN();
+      result_tab.GetCell(line_id, 4) << world.GetE();
+      result_tab.GetCell(line_id, 5) << world.GetE();
+      result_tab.GetCell(line_id, 6) << world.CountCoop();
+      result_tab.GetCell(line_id, 7) << (world.GetN() - world.CountCoop());
+
+      // Draw the new table.
+      result_tab.CellsCSS("border", "1px solid black");
+      result_tab.Redraw();
+      DrawCanvas();
+    }
     // world.Run();
   }, "GO", "go_but");
 
   doc << "<br>";
 
-  auto result_tab = doc.AddTable(1,4, "result_tab");
+  auto result_tab = doc.AddTable(1,8, "result_tab");
   result_tab.SetCSS("border-collapse", "collapse");
   result_tab.SetCSS("border", "3px solid black");
   result_tab.CellsCSS("border", "1px solid black");
 
   result_tab.GetCell(0,0).SetHeader() << "ID";
-  result_tab.GetCell(0,1).SetHeader() << "Epoch";
-  result_tab.GetCell(0,2).SetHeader() << "Num Coop";
-  result_tab.GetCell(0,3).SetHeader() << "Num Defect";
+  result_tab.GetCell(0,1).SetHeader() << "<i>r</i>";
+  result_tab.GetCell(0,2).SetHeader() << "<i>u</i>";
+  result_tab.GetCell(0,3).SetHeader() << "<i>N</i>";
+  result_tab.GetCell(0,4).SetHeader() << "<i>E</i>";
+  result_tab.GetCell(0,5).SetHeader() << "Epoch";
+  result_tab.GetCell(0,6).SetHeader() << "Num Coop";
+  result_tab.GetCell(0,7).SetHeader() << "Num Defect";
 }
