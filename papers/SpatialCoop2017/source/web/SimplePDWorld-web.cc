@@ -94,13 +94,28 @@ int main()
       << "<br>"
       << "How many runs? ";
 
-  auto run_input = doc.AddTextArea("run_count");
-  run_input.SetText("10");
+  auto run_input = doc.AddTextArea([](const std::string & str){
+    size_t num_runs = emp::from_string<size_t>(str);
+    world.SetNumRuns(num_runs);
+  }, "run_count");
+  run_input.SetText(emp::to_string(world.GetNumRuns()));
 
   doc.AddButton([run_input](){
-    size_t num_runs = emp::from_string<size_t>(run_input.GetText());
+    //size_t num_runs = emp::from_string<size_t>(run_input.GetText());
+    size_t num_runs = world.GetNumRuns();
     emp::Alert(num_runs);
     // world.Run();
   }, "GO", "go_but");
 
+  doc << "<br>";
+
+  auto result_tab = doc.AddTable(1,4, "result_tab");
+  result_tab.SetCSS("border-collapse", "collapse");
+  result_tab.SetCSS("border", "3px solid black");
+  result_tab.CellsCSS("border", "1px solid black");
+
+  result_tab.GetCell(0,0).SetHeader() << "ID";
+  result_tab.GetCell(0,1).SetHeader() << "Epoch";
+  result_tab.GetCell(0,2).SetHeader() << "Num Coop";
+  result_tab.GetCell(0,3).SetHeader() << "Num Defect";
 }
