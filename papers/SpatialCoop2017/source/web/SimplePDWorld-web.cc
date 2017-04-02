@@ -12,11 +12,18 @@ const double world_size = 600;
 UI::Document doc("emp_base");
 SimplePDWorld world;
 
+int cur_x = -1;
+int cur_y = -1;
+
 void DrawCanvas() {
   UI::Canvas canvas = doc.Canvas("canvas");
   canvas.Clear("black");
 
   const emp::vector<Org> & pop = world.GetPop();
+
+  if (cur_x >= 0) {
+    canvas.Circle(cur_x, cur_y, world_size*world.GetR(), "pink");
+  }
 
   for (const Org & org : pop) {
     if (org.coop) {
@@ -27,10 +34,17 @@ void DrawCanvas() {
   }
 }
 
+void CanvasClick(int x, int y) {
+  cur_x = x;
+  cur_y = y;
+  DrawCanvas();
+}
+
 int main()
 {
   doc << "<h2>Spatial Prisoner's Dilema</h2>";
-  doc.AddCanvas(world_size, world_size, "canvas");
+  auto canvas = doc.AddCanvas(world_size, world_size, "canvas");
+  // canvas.On("click", CanvasClick);
   DrawCanvas();
 
   auto & anim = doc.AddAnimation("anim_world", [](){ world.Run(1); DrawCanvas(); } );
@@ -72,5 +86,21 @@ int main()
     world.SetE(E);
   }, "E_set").SetText(emp::to_string(world.GetE()));
 
-  doc << "<br>NOTE: You must hit 'Randomize' after changing any parameters for them to take effect.";
+  doc << "<br>"
+      << "NOTE: You must hit 'Randomize' after changing any parameters for them to take effect."
+      << "<hr>"
+      << "<h3>Full Runs</h3>"
+      << "You can perform many runs at once with the same configuration."
+      << "<br>"
+      << "How many runs? ";
+
+  auto run_input = doc.AddTextArea("run_count");
+  run_input.SetText("10");
+
+  doc.AddButton([run_input](){
+    size_t num_runs = emp::from_string<size_t>(run_input.GetText());
+    emp::Alert(num_runs);
+    // world.Run();
+  }, "GO", "go_but");
+
 }
