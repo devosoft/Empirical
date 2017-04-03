@@ -62,12 +62,14 @@ struct RunInfo {
 
 struct RunList {
   emp::vector<RunInfo> runs;
-  int cur_run = 0;
+  size_t cur_run = 0;
 
   void AddRun(double r, double u, size_t N, size_t E) {
     size_t id = runs.size();
     runs.emplace_back(id, r, u, N, E);
   }
+
+  bool Active() const { return cur_run < runs.size(); }
 };
 
 RunList run_list;
@@ -78,7 +80,34 @@ int main()
   doc << "<h2>Spatial Prisoner's Dilema</h2>";
   auto canvas = doc.AddCanvas(world_size, world_size, "canvas");
   // canvas.On("click", CanvasClick);
-  auto & anim = doc.AddAnimation("anim_world", [](){ world.Run(anim_step); DrawCanvas(); } );
+  auto & anim = doc.AddAnimation("anim_world", [](){
+    if (run_list.Active()) {
+      size_t id = run_list.cur_run;
+      if (run_list.runs[id].cur_epoch == 0) {  // Are we starting a new run?
+        world.Reset();
+        DrawCanvas();
+      }
+    }
+    world.Run(anim_step);
+    DrawCanvas();
+    if (run_list.Active()) {
+      size_t id = run_list.cur_run;
+      size_t cur_epoch = world.GetEpoch();
+      if (run_list.runs[id].E <= cur_epoch) {  // Are we done with this run?
+        run_list.cur_run++;
+      }
+      run_list.runs[id].cur_epoch = cur_epoch;
+      run_list.runs[id].num_coop = world.CountCoop();
+      run_list.runs[id].num_defect = run_list.runs[id].N - run_list.runs[id].num_coop;
+
+      auto result_tab = doc.Table("result_tab");
+      result_tab.Freeze();
+      result_tab.GetCell(id+1,5).ClearChildren() << cur_epoch;
+      result_tab.GetCell(id+1,6).ClearChildren() << run_list.runs[id].num_coop;
+      result_tab.GetCell(id+1,7).ClearChildren() << run_list.runs[id].num_defect;
+      result_tab.Activate();
+    }
+  } );
 
   doc << "<br>";
   doc.AddButton([&anim](){
