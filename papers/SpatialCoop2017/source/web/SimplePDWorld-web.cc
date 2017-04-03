@@ -83,8 +83,9 @@ int main()
   auto & anim = doc.AddAnimation("anim_world", [](){
     if (run_list.Active()) {
       size_t id = run_list.cur_run;
-      if (run_list.runs[id].cur_epoch == 0) {  // Are we starting a new run?
-        world.Reset();
+      auto & run = run_list.runs[id];
+      if (run.cur_epoch == 0) {  // Are we starting a new run?
+        world.Setup(run.r, run.u, run.N, run.E);
         DrawCanvas();
       }
     }
