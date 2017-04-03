@@ -12,7 +12,7 @@ struct Org {
 
 // Create a class to maintain a simple Prisoner's Dilema world.
 class SimplePDWorld {
- private:
+public:
   // Parameters
   double r;         // Neighborhood radius
   double u;         // cost / benefit ratio
@@ -21,6 +21,7 @@ class SimplePDWorld {
   size_t num_runs;  // How many runs should we do?
 
   emp::Random random;
+  size_t epoch;
 
   // Calculations we'll need later.
   double r_sqr;          // r squared (for comparisons)
@@ -47,6 +48,7 @@ class SimplePDWorld {
   size_t GetN() const { return N; }
   size_t GetE() const { return E; }
   size_t GetNumRuns() const { return num_runs; }
+  size_t GetEpoch() const { return epoch; }
 
   void SetR(double _r) { r = _r; }
   void SetU(double _u) { u = _u; }
@@ -60,6 +62,7 @@ class SimplePDWorld {
     u = _u;
     N = _N;
     E = _E;
+    epoch = 0;
 
     // Calculations we'll need later.
     r_sqr = r * r;  // r squared (for comparisons)
@@ -106,11 +109,13 @@ class SimplePDWorld {
   void Run(size_t steps=-1) {
     if (steps > E) steps = E;
     // Run the organisms!
-    for (size_t epoch = 0; epoch < steps; epoch++) {
+    size_t end_epoch = epoch + steps;
+    while (epoch < end_epoch) {
       std::cout << "Epoch = " << epoch
-		<< ";  #Coop = " << CountCoop()
-		<< std::endl;
+            		<< ";  #Coop = " << CountCoop()
+            		<< std::endl;
       for (size_t o = 0; o < N; o++) Repro();
+      epoch++;
     }
   }
 
