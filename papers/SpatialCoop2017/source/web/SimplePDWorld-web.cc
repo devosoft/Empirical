@@ -58,6 +58,19 @@ struct RunInfo {
   { ; }
 };
 
+struct RunList {
+  emp::vector<RunInfo> runs;
+  int cur_run = 0;
+
+  void AddRun(double r, double u, size_t N, size_t E) {
+    size_t id = runs.size();
+    runs.emplace_back(id, r, u, N, E);
+  }
+};
+
+RunList run_list;
+int anim_step = 1;
+
 int main()
 {
   doc << "<h2>Spatial Prisoner's Dilema</h2>";
@@ -65,17 +78,24 @@ int main()
   // canvas.On("click", CanvasClick);
   DrawCanvas();
 
-  auto & anim = doc.AddAnimation("anim_world", [](){ world.Run(1); DrawCanvas(); } );
+  auto & anim = doc.AddAnimation("anim_world", [](){ world.Run(anim_step); DrawCanvas(); } );
 
   doc << "<br>";
   doc.AddButton([&anim](){
+    anim_step = 1;
     anim.ToggleActive();
     auto but = doc.Button("start_but");
     if (anim.GetActive()) but.Label("Pause");
     else but.Label("Start");
   }, "Play", "start_but");
   doc.AddButton([](){ world.Run(1); DrawCanvas(); }, "Step", "step_but");
-  doc.AddButton([](){ world.Run(); DrawCanvas(); }, "Run!", "run_but");
+  doc.AddButton([&anim](){
+    anim_step = 100;
+    anim.ToggleActive();
+    auto but = doc.Button("run_but");
+    if (anim.GetActive()) but.Label("Stop Run");
+    else but.Label("Run!");
+  }, "Run!", "run_but");
   doc.AddButton([](){ world.Reset(); DrawCanvas(); }, "Randomize", "rand_but");
 
   doc << "<br>Radius (<i>r</i>) = ";
@@ -123,8 +143,10 @@ int main()
     size_t num_runs = world.GetNumRuns();
     auto result_tab = doc.Table("result_tab");
     for (int run_id = 0; run_id < num_runs; run_id++) {
-      world.Reset();
-      world.Run();
+      run_list.AddRun(world.GetR(), world.GetU(), world.GetN(), world.GetE());
+
+//      world.Reset();
+//      world.Run();
 
       // Update the table.
       int line_id = result_tab.GetNumRows();
@@ -134,17 +156,17 @@ int main()
       result_tab.GetCell(line_id, 2) << world.GetU();
       result_tab.GetCell(line_id, 3) << world.GetN();
       result_tab.GetCell(line_id, 4) << world.GetE();
-      result_tab.GetCell(line_id, 5) << world.GetE();
-      result_tab.GetCell(line_id, 6) << world.CountCoop();
-      result_tab.GetCell(line_id, 7) << (world.GetN() - world.CountCoop());
+      result_tab.GetCell(line_id, 5) << "Waiting..."; // world.GetE();
+      result_tab.GetCell(line_id, 6) << "Waiting..."; // world.CountCoop();
+      result_tab.GetCell(line_id, 7) << "Waiting..."; // (world.GetN() - world.CountCoop());
 
       // Draw the new table.
       result_tab.CellsCSS("border", "1px solid black");
       result_tab.Redraw();
-      DrawCanvas();
+//      DrawCanvas();
     }
     // world.Run();
-  }, "GO", "go_but");
+  }, "Queue", "queue_but");
 
   doc << "<br>";
 
