@@ -32,6 +32,8 @@ void DrawCanvas() {
       canvas.Circle(org.x*world_size, org.y*world_size, 2, "red", "white");
     }
   }
+
+  doc.Text("ud_text").Redraw();
 }
 
 void CanvasClick(int x, int y) {
@@ -76,8 +78,6 @@ int main()
   doc << "<h2>Spatial Prisoner's Dilema</h2>";
   auto canvas = doc.AddCanvas(world_size, world_size, "canvas");
   // canvas.On("click", CanvasClick);
-  DrawCanvas();
-
   auto & anim = doc.AddAnimation("anim_world", [](){ world.Run(anim_step); DrawCanvas(); } );
 
   doc << "<br>";
@@ -93,10 +93,12 @@ int main()
     anim_step = 100;
     anim.ToggleActive();
     auto but = doc.Button("run_but");
-    if (anim.GetActive()) but.Label("Stop Run");
-    else but.Label("Run!");
-  }, "Run!", "run_but");
+    if (anim.GetActive()) but.Label("Stop");
+    else but.Label("Fast Forward!");
+  }, "Fast Forward!", "run_but");
   doc.AddButton([](){ world.Reset(); DrawCanvas(); }, "Randomize", "rand_but");
+  auto ud_text = doc.AddText("ud_text");
+  ud_text << " Epoch = " << UI::Live(world.epoch);
 
   doc << "<br>Radius (<i>r</i>) = ";
   doc.AddTextArea([](const std::string & str){
@@ -183,4 +185,6 @@ int main()
   result_tab.GetCell(0,5).SetHeader() << "Epoch";
   result_tab.GetCell(0,6).SetHeader() << "Num Coop";
   result_tab.GetCell(0,7).SetHeader() << "Num Defect";
+
+  DrawCanvas();
 }
