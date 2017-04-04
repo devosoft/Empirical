@@ -121,6 +121,7 @@ namespace web {
 
     // Setup a quick way to retrieve old helpers by name.
     web::Animate & Animate (const std::string & in_id) { return *(anim_map[in_id]); }
+    web::Animate & Animation (const std::string & in_id) { return *(anim_map[in_id]); }
   };
 
 }
