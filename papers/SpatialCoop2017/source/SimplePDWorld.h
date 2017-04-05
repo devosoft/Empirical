@@ -111,16 +111,13 @@ public:
     // Run the organisms!
     size_t end_epoch = epoch + steps;
     while (epoch < end_epoch) {
-      // std::cout << "Epoch = " << epoch
-      //       		<< ";  #Coop = " << CountCoop()
-      //       		<< std::endl;
       for (size_t o = 0; o < N; o++) Repro();
       epoch++;
     }
   }
 
   size_t CountCoop();
-  void PrintNeighborInfo();
+  void PrintNeighborInfo(std::ostream & os);
 };
 
 
@@ -146,14 +143,6 @@ void SimplePDWorld::CalcFitness(size_t id) {
   double total_C = C_value * (double) C_count;
   double total_D = D_value * (double) D_count;
   org.fitness = total_C + total_D;
-
-  //   std::cout << "total_C = " << total_C
-  //       << "  total_D = " << total_D
-  //       << "  num_neighbors = " << num_neighbors
-  //       << " (" << C_count << " C and " << D_count << " D)"
-  //       << "  self = " << (org.coop ? 'C' : 'D')
-  //     << "  fitness = " << org.fitness
-  //       << std::endl;
 }
 
 
@@ -192,7 +181,7 @@ size_t SimplePDWorld::CountCoop() {
   return count;
 }
 
-void SimplePDWorld::PrintNeighborInfo() {
+void SimplePDWorld::PrintNeighborInfo(std::ostream & os) {
   size_t total = 0;
   size_t max_size = 0;
   size_t min_size = pop[0].neighbors.size();
@@ -208,10 +197,12 @@ void SimplePDWorld::PrintNeighborInfo() {
     hist[cur_size]++;
   }
   double avg_size = ((double) total) / (double) N;
-  std::cout << "Average neighborhood size = " << avg_size << std::endl
-        << "Min size = " << min_size
-	    << "   Max size = " << max_size << std::endl;
-  for (size_t i = 0; i < hist.size(); i++) {
-    std::cout << i << " : " << hist[i] << std::endl;
-  }
+
+  os << "ave_size";
+  for (size_t i = 0; i < hist.size(); i++) os << ',' << i;
+  os << '\n';
+
+  os << avg_size;
+  for (size_t i = 0; i < hist.size(); i++) os << ',' << hist[i];
+  os << '\n';
 }
