@@ -30,20 +30,27 @@ int main(int argc, char * argv[])
   const size_t E = config.E();
   const size_t seed = config.SEED();
 
-  //  std::ofstream f_data(filename_data);
-  //  std::ofstream f_dist(filename_dist);
+  std::string filename_base = emp::to_string(r,'-',u,'-',N,'-',E,'-',seed,".csv");
+  std::string filename_data = std::string("data-") + filename_base;
+  std::string filename_neigh = std::string("neighborhood_sizes-") + filename_base;
 
   SimplePDWorld world(r, u, N, E, seed);
 
+  std::ofstream f_data(filename_data);
+  std::ofstream f_neigh(filename_neigh);
+
+  f_data << "epoch,num_coop,num_defect\n";
+
   for (size_t e = 0; e < E; e += step) {
+    std::cout << "Epoch = " << e << std::endl;
     world.Run(step);
     const size_t num_coop = world.CountCoop();
     const size_t num_defect = N - num_coop;
-    std::cout << e*step << ' ' << num_coop << ' ' << num_defect << '\n';
+    f_data << e << ',' << num_coop << ',' << num_defect << '\n';
   }
 
   // Print extra info?
-  world.PrintNeighborInfo();
+  world.PrintNeighborInfo(f_neigh);
 
   return 0;
 }
