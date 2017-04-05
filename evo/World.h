@@ -195,6 +195,11 @@ namespace evo {
     // Argument: Update number (sequentially increasing)
     Signal<void(size_t)> on_update_sig;
 
+    // Trigger: Location of org about to be killed
+    // Argument: Pointer to organism about to die
+    Signal<void(int)> on_death_sig;
+
+
     // Determine the callback type; by default this will be OrgSignals_NONE, but it can be
     // overridden by setting the type callback_t in the organism class.
     EMP_CHOOSE_MEMBER_TYPE(callback_t, callback_t, OrgSignals_NONE, ORG)
@@ -225,6 +230,7 @@ namespace evo {
       , inject_ready_sig(to_string(w_name,"::inject-ready"), control)
       , org_placement_sig(to_string(w_name,"::org-placement"), control)
       , on_update_sig(to_string(w_name,"::on-update"), control)
+      , on_death_sig(to_string(w_name,"::on-death"), control)
       , callbacks(w_name)
       , world_name(w_name)
     {
@@ -267,6 +273,7 @@ namespace evo {
     SignalKey OnInjectReady(const std::function<void(ORG *)> & fun) { return inject_ready_sig.AddAction(fun); }
     SignalKey OnOrgPlacement(const std::function<void(size_t)> & fun) { return org_placement_sig.AddAction(fun); }
     SignalKey OnUpdate(const std::function<void(size_t)> & fun) { return on_update_sig.AddAction(fun); }
+    SignalKey OnOrgDeath(const std::function<void(int)> & fun) { return on_death_sig.AddAction(fun); }
 
     // Forward any link requests to the SignalControl object.
     template <typename... ARGS>

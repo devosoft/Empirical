@@ -28,21 +28,20 @@
 
 #include "PopulationManager.h"
 
-template <typename org_ptr>
 struct Node {
-  Node* parent;
+  int parent;
   int id;
   int loc;
   bool alive;
-  org_ptr genome;
-  emp::vector<Node*> offspring;
+  int genome;
+  emp::vector<int> offspring;
 };
 
 namespace std {
   // from fredoverflow's answer to
   // http://stackoverflow.com/questions/8026890/c-how-to-insert-array-into-hash-set
-  template<typename T> struct hash<Node<T> > {
-    typedef Node<T> argument_type;
+  template <> struct hash<Node> {
+    typedef Node argument_type;
     typedef std::size_t result_type;
     result_type operator()(argument_type const& s) const {
       result_type const h1 ( std::hash<int>()(s.id) );
@@ -75,15 +74,17 @@ namespace evo {
     static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
 
   public:
-    std::unordered_map<int, Node<org_ptr> > nodes;
+    std::unordered_map<int, Node> nodes;
     static constexpr bool emp_is_lineage_manager = true;
-    std::unordered_set<ORG> genomes;
+    std::map<ORG, int> genomes;
+    std::map<int, ORG> id_to_genome;
     int next = 1; //0 indicates no parent
     int next_parent_id = -1;
     int next_org_id = 1;
     emp::vector<int> generation_since_update;
     emp::vector<int> new_generation;
     bool inject;
+    int next_genome_id = 0;
 
     LineageTracker(){;}
 
@@ -100,9 +101,9 @@ namespace evo {
     template <typename WORLD>
     void Setup(WORLD * w){
 
-      nodes[0] = Node<org_ptr>();
+      nodes[0] = Node();
       nodes[0].id = 0;
-      nodes[0].parent = &nodes[0];
+      nodes[0].parent = 0;
       nodes[0].alive = false;
       nodes[0].loc = -1;
 
@@ -213,42 +214,43 @@ namespace evo {
     // organism you added
     int AddOrganism(ORG org, int parent) {
       int id = this->next++;
-      std::pair<typename std::unordered_set<ORG>::iterator, bool> ret;
-      ret = genomes.insert(org);
-      typename std::unordered_set<ORG>::iterator it = ret.first;
-      org_ptr genome = (org_ptr)&(*it);
+      if (!genomes.count(org)){
+        genomes[org] = next_genome_id;
+        id_to_genome[next_genome_id] = org;
+        next_genome_id++;
+      }
 
-      Node<org_ptr>* curr = &nodes[id];
-      curr->parent = &nodes[parent];
-      curr->parent->offspring.push_back(&nodes[id]);
-      curr->id = id;
-      curr->alive = true;
-      curr->genome = genome;
+      Node& curr = nodes[id];
+      curr.parent = parent;
+      nodes[curr.parent].offspring.push_back(id);
+      curr.id = id;
+      curr.alive = true;
+      curr.genome = genomes[org];
 
       return id;
     }
 
-    // Return a vector containing the genomes of an organism's ancestors
+    // Return a vector containing the IDs of an organism's ancestors
     emp::vector<int> TraceLineageIDs(int org_id) {
       emp::vector<int> lineage;
       emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
-      Node<org_ptr>* org = &(nodes[org_id]);
+      Node* org = &(nodes[org_id]);
       while(org->id) {
         lineage.push_back(org->id);
-        org = org->parent;
+        org = nodes[org->parent];
       }
       return lineage;
 
     }
 
-    //Return a vector containing the IDs of an oraganism's ancestors
+    //Return a vector containing the genomes of an oraganism's ancestors
     emp::vector<ORG> TraceLineage(int org_id) {
       emp::vector<ORG> lineage;
       emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
-      Node<org_ptr>* org = &(nodes[org_id]);
+      Node* org = &(nodes[org_id]);
       while(org->id) {
-        lineage.push_back(*(org->genome));
-        org = org->parent;
+        lineage.push_back(id_to_genome[org->genome]);
+        org = nodes[org->parent];
       }
       return lineage;
     }
@@ -257,10 +259,10 @@ namespace evo {
     emp::vector<int> TraceLineageLocs(int org_id) {
       emp::vector<int> lineage;
       emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
-      Node<org_ptr>* org = &(nodes[org_id]);
+      Node* org = &(nodes[org_id]);
       while(org->id) {
         lineage.push_back(org->loc);
-        org = org->parent;
+        org = nodes[org->parent];
       }
       return lineage;
     }
@@ -285,11 +287,11 @@ namespace evo {
       return genome_group;
     }
 
-    void node_to_json(Node<org_ptr> * node, std::ofstream& ss, bool hierarchical=true) {
+    void node_to_json(Node * node, std::ofstream& ss, bool hierarchical=true) {
       ss << "{\"name\":";
       ss << to_string(node->id);
       ss << ",\"parent\":";
-      ss << to_string(node->parent->id);
+      ss << to_string(node->parent);
       ss << ",\"alive\":";
       if (node->alive){
         ss << "true";
@@ -309,7 +311,7 @@ namespace evo {
       if (hierarchical) {
         ss << ",\"children\":[";
         for (size_t i=0; i < node->offspring.size(); ++i) {
-          node_to_json(node->offspring[i], ss);
+          node_to_json(nodes[node->offspring[i]], ss);
           if (i < node->offspring.size()-1) {
             ss << ",";
           }
@@ -318,15 +320,15 @@ namespace evo {
       } else {
         ss << "}" << std::endl;
         for (size_t i=0; i < node->offspring.size(); ++i) {
-          node_to_json(node->offspring[i], ss);
+          node_to_json(nodes[node->offspring[i]], ss);
         }
       }
     }
 
-    void node_to_csv(Node<org_ptr> * node, std::ofstream& ss) {
+    void node_to_csv(Node * node, std::ofstream& ss) {
       ss << to_string(node->id);
       ss << ",";
-      ss << to_string(node->parent->id);
+      ss << to_string(node->parent);
       ss << ",";
       if (node->alive){
         ss << "true";
@@ -344,7 +346,7 @@ namespace evo {
 
       ss << "\"" << std::endl;
       for (size_t i=0; i < node->offspring.size(); ++i) {
-        node_to_csv(node->offspring[i], ss);
+        node_to_csv(nodes[node->offspring[i]], ss);
       }
     }
 
@@ -404,7 +406,9 @@ namespace evo {
     using LineageTracker<POP_MANAGER>::genomes;
     using LineageTracker<POP_MANAGER>::new_generation;
     using LineageTracker<POP_MANAGER>::nodes;
-    std::map<ORG, int> genome_counts;
+    using LineageTracker<POP_MANAGER>::id_to_genome;
+    using LineageTracker<POP_MANAGER>::next_genome_id;
+    std::map<int, int> genome_counts;
 
   public:
     using LineageTracker<POP_MANAGER>::generation_since_update;
@@ -431,9 +435,9 @@ namespace evo {
     void Setup(WORLD * w){
 
       //Initialize null org to act as parent for inserted orgs
-      nodes[0] = Node<org_ptr>();
+      nodes[0] = Node();
       nodes[0].id = 0;
-      nodes[0].parent = &nodes[0];
+      nodes[0].parent = 0;
       nodes[0].alive = false;
       nodes[0].loc = -1;
 
@@ -450,7 +454,7 @@ namespace evo {
 
       const std::function<void(int)> UpdateFun = [this](int ud) { Update(ud); };
 
-      std::function<void(int)> TrackDeathFun = [this] (int pos){
+      const std::function<void(int)> TrackDeathFun = [this] (int pos){
         TrackDeath(pos);
       };
 
@@ -519,8 +523,9 @@ namespace evo {
       if ( (int) generation_since_update.size() <= pos){
         generation_since_update.resize((size_t)pos+1);
       }
-      Node<org_ptr>* curr = &(nodes[generation_since_update[(size_t)pos]]);
-      curr->alive = false;
+      int curr = generation_since_update[(size_t)pos];
+      int parent = nodes[curr].parent;
+      nodes[curr].alive = false;
 
       //If this org doesn't have any surviving offspring lineages, we can
       //remove it from the records. If it was its parent's last surviving
@@ -529,26 +534,29 @@ namespace evo {
       //only surviving descendant has been removed.
       //If we're injecting something, it can't trigger pruning
 
-      while (curr->offspring.size() == 0 && !curr->alive) {
+      while (nodes[curr].offspring.size() == 0 && !nodes[curr].alive) {
 
         //Remove this organism from its parents list of offspring with
         //surviving descendants
-        curr->parent->offspring.erase(
-                                    std::remove(curr->parent->offspring.begin(),
-                                    curr->parent->offspring.end(), curr ),
-                                    curr->parent->offspring.end() );
+        nodes[parent].offspring.erase(
+                            std::remove(nodes[parent].offspring.begin(),
+                            nodes[parent].offspring.end(), curr ),
+                            nodes[parent].offspring.end() );
 
         //See if we can remove this genome from the record
-        ORG genome = *(curr->genome);
+        int genome = nodes[curr].genome;
         genome_counts[genome]--;
         if (!genome_counts[genome]) {
-          genomes.erase(genome);
+          genomes.erase(id_to_genome[genome]);
+          id_to_genome.erase(genome);
+          genome_counts.erase(genome);
         }
 
         //See if we can remove parent too
-        Node<org_ptr>* old = curr;
-        curr = curr->parent;
-        nodes.erase(old->id);
+        int old = curr;
+        curr = parent;
+        parent = nodes[curr].parent;
+        nodes.erase(old);
       }
 
       //If we unrolled the lineage although back to the current coalesence point
@@ -556,9 +564,9 @@ namespace evo {
       //coalesence point up.
       //!inject is a guard against changing the last_coalesence during initialization.
       //It's imperfect, though
-      while (!inject && curr->id == last_coalesence && curr->offspring.size() == 1 && !curr->alive){
-        curr = curr->offspring[0];
-        last_coalesence = curr->id;
+      while (!inject && curr == last_coalesence && nodes[curr].offspring.size() == 1 && !nodes[curr].alive){
+        curr = nodes[curr].offspring[0];
+        last_coalesence = curr;
       }
     }
 
@@ -577,27 +585,22 @@ namespace evo {
 
       int id = this->next++;
 
+      if (!genomes.count(org)){
+        genomes[org] = next_genome_id;
+        id_to_genome[next_genome_id] = org;
+        genome_counts[next_genome_id] = 1;
+        next_genome_id++;
+      } else {
+        genome_counts[genomes[org]]++;
+      }
       //Create stuct to store info on this organism
       //nodes[id] = Node<org_ptr>();
-      Node<ORG*>* curr = &nodes[id];
-      curr->parent = &nodes[parent];
-      curr->parent->offspring.push_back(&nodes[id]);
-      curr->id = id;
-      curr->alive = true;
-
-      //Store genomes in a set so we don't need to have a bunch
-      //of duplicates lying around
-      std::pair<typename std::unordered_set<ORG>::iterator, bool> ret;
-      ret = genomes.insert(ORG(org));
-      typename std::unordered_set<ORG>::iterator it = ret.first;
-      ORG* genome = (ORG*)&(*it);
-      curr->genome = genome;
-      if (ret.second) {
-        genome_counts[*genome] = 1;
-      } else {
-        genome_counts[*genome]++;
-      }
-
+      Node& curr = nodes[id];
+      curr.parent = parent;
+      nodes[curr.parent].offspring.push_back(id);
+      curr.id = id;
+      curr.alive = true;
+      curr.genome = genomes[org];
 
       return id;
     }
@@ -618,16 +621,16 @@ namespace evo {
 
     void ArchiveProgress(std::string filename, int cutoff) {
         WriteDataToFileJSON(filename, cutoff);
-        Node<org_ptr> * curr = &nodes[cutoff];
+        Node * curr = &nodes[cutoff];
         while (curr->id != 0) {
-            curr = curr->parent_id;
-            genome_counts[*(curr->genome)]--;
-            if (!genome_counts[*(curr->genome)]) {
-              genomes.erase(*(curr->genome));
+            curr = nodes[curr->parent];
+            genome_counts[curr->genome]--;
+            if (!genome_counts[curr->genome]) {
+              genomes.erase(curr->genome);
             }
 
-            Node<org_ptr>* old = curr;
-            curr = curr->parent;
+            Node* old = curr;
+            curr = nodes[curr->parent];
             emp_assert(curr->offspring.size() == 1);
             nodes.erase(old->id);
         }
