@@ -111,9 +111,9 @@ public:
     // Run the organisms!
     size_t end_epoch = epoch + steps;
     while (epoch < end_epoch) {
-      std::cout << "Epoch = " << epoch
-            		<< ";  #Coop = " << CountCoop()
-            		<< std::endl;
+      // std::cout << "Epoch = " << epoch
+      //       		<< ";  #Coop = " << CountCoop()
+      //       		<< std::endl;
       for (size_t o = 0; o < N; o++) Repro();
       epoch++;
     }
