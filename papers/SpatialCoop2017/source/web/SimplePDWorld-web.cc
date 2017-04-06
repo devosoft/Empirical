@@ -167,7 +167,9 @@ int main()
       << "NOTE: You must hit 'Randomize' after changing any parameters for them to take effect."
       << "<hr>"
       << "<h3>Full Runs</h3>"
-      << "You can perform many runs at once with the same configuration."
+      << "You can perform many runs at once with the same configuration. "
+      << "Setup the configuration above, choose the number of runs, and queue them up (as many as you like, even with different parameters). "
+      << "The next time you start (or fast forward) above, it will start working its way through the queued runs. "
       << "<br>"
       << "How many runs? ";
 
