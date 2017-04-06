@@ -27,6 +27,10 @@ int main()
 
   doc.Text("test2").On("click", [](UI::MouseEvent evt){ doc.Text("test2")
     .SetCSS("color", "red") << "You Clicked! " << evt.shiftKey << "<br>"; });
+
+
+  doc.Text("test4").OnCopy( [](){ doc.Text("test1") << "COPY"; } );
+
   UI::Listeners listeners;
   listeners.Set("click", std::function<void()>([](){ doc.Text("test2").SetAttr("color", "red"); }));
   listeners.Apply("test2");

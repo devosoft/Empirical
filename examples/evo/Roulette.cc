@@ -34,12 +34,12 @@ int main()
   grid_world.ConfigPop(side, side);
   emp_assert(grid_world.GetSize() == POP_SIZE); // POP_SIZE needs to be a perfect square.
 
-  grid_world.InsertAt(1, side+1);
+  grid_world.InsertAt(30, side+1);
   grid_world.InsertAt(4, side*(side+1)/2);
   grid_world.Print(print_fun);
 
   auto fit_fun = [](int* org){ return (double) *org; };
-  grid_world.RouletteSelect(fit_fun, 50);
+  grid_world.RouletteSelect(fit_fun, 5000);
 
   std::cout << std::endl;
   grid_world.Print(print_fun);
