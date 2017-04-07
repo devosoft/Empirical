@@ -14,6 +14,7 @@ a.out.js
 *.debug
 *.mp4
 *.csv
+*.cfg
 coverage.xml
 diff_cover.txt
 UTests/tools/tmp*.cc
@@ -29,9 +30,11 @@ tests/html
 tests/*.gcda
 tests/*.gcno
 tests/*cov.info
+tests/web/*.js
 tests/Coverage*
 tests/diff_cover.txt
 third-party/doxygen/build/*
+third-party/node_modules
 Slideshow.js
 incoming/
 */env/*
