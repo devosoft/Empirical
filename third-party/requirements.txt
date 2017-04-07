@@ -1,4 +1,4 @@
 sphinx
+breathe
 gcovr
 diff-cover
-git+https://github.com/michaeljones/breathe
