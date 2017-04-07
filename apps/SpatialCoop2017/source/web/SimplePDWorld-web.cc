@@ -75,6 +75,19 @@ struct RunList {
 RunList run_list;
 int anim_step = 1;
 
+void TogglePlay()
+{
+  auto & anim = doc.Animation("anim_world");
+  anim.ToggleActive();
+  auto but = doc.Button("start_but");
+  if (anim.GetActive()) but.Label("Pause");
+  else but.Label("Start");
+
+  but = doc.Button("run_but");
+  if (anim.GetActive()) but.Label("Stop");
+  else but.Label("Fast Forward!");
+}
+
 int main()
 {
   doc << "<h2>Spatial Prisoner's Dilema</h2>";
@@ -113,18 +126,12 @@ int main()
   doc << "<br>";
   doc.AddButton([&anim](){
     anim_step = 1;
-    anim.ToggleActive();
-    auto but = doc.Button("start_but");
-    if (anim.GetActive()) but.Label("Pause");
-    else but.Label("Start");
+    TogglePlay();
   }, "Play", "start_but");
   doc.AddButton([](){ world.Run(1); DrawCanvas(); }, "Step", "step_but");
   doc.AddButton([&anim](){
     anim_step = 100;
-    anim.ToggleActive();
-    auto but = doc.Button("run_but");
-    if (anim.GetActive()) but.Label("Stop");
-    else but.Label("Fast Forward!");
+    TogglePlay();
   }, "Fast Forward!", "run_but");
   doc.AddButton([](){ world.Reset(); DrawCanvas(); }, "Randomize", "rand_but");
   auto ud_text = doc.AddText("ud_text");
@@ -160,7 +167,9 @@ int main()
       << "NOTE: You must hit 'Randomize' after changing any parameters for them to take effect."
       << "<hr>"
       << "<h3>Full Runs</h3>"
-      << "You can perform many runs at once with the same configuration."
+      << "You can perform many runs at once with the same configuration. "
+      << "Setup the configuration above, choose the number of runs, and queue them up (as many as you like, even with different parameters). "
+      << "The next time you start (or fast forward) above, it will start working its way through the queued runs. "
       << "<br>"
       << "How many runs? ";
 
@@ -177,9 +186,6 @@ int main()
     for (int run_id = 0; run_id < num_runs; run_id++) {
       run_list.AddRun(world.GetR(), world.GetU(), world.GetN(), world.GetE());
 
-//      world.Reset();
-//      world.Run();
-
       // Update the table.
       int line_id = result_tab.GetNumRows();
       result_tab.Rows(line_id+1);
@@ -195,9 +201,7 @@ int main()
       // Draw the new table.
       result_tab.CellsCSS("border", "1px solid black");
       result_tab.Redraw();
-//      DrawCanvas();
     }
-    // world.Run();
   }, "Queue", "queue_but");
 
   doc << "<br>";

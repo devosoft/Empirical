@@ -132,6 +132,7 @@ private:
     if (emp::Has(edges, Edge(from, to))) RemoveEdge(from,to);
     else AddEdge(from,to);
   }
+  
   template <typename T>
   char ID2Symbol(T id) {
     if (id < 0) return '?';
