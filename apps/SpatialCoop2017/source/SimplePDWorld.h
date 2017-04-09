@@ -86,8 +86,10 @@ public:
       for (size_t j = 0; j < i; j++) {
         Org & org1 = pop[i];
         Org & org2 = pop[j];
-        double x_dist = org1.x - org2.x;
-        double y_dist = org1.y - org2.y;
+        double x_dist = emp::Abs(org1.x - org2.x);
+        if (x_dist > (1.0 - x_dist)) x_dist = 1.0 - x_dist;
+        double y_dist = emp::Abs(org1.y - org2.y);
+        if (x_dist > (1.0 - x_dist)) x_dist = 1.0 - x_dist;
         double dist_sqr = x_dist * x_dist + y_dist * y_dist;
 
         // Test if this pair are within neighbor radius...
