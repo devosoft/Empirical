@@ -39,8 +39,10 @@ int main(int argc, char * argv[])
   std::ofstream f_data(filename_data);
   std::ofstream f_neigh(filename_neigh);
 
-  f_data << "epoch,num_coop,num_defect\n";
+  // Print extra info?
+  world.PrintNeighborInfo(f_neigh);
 
+  f_data << "epoch,num_coop,num_defect\n";
   for (size_t e = 0; e < E; e += step) {
     std::cout << "Epoch = " << e << std::endl;
     world.Run(step);
@@ -48,9 +50,6 @@ int main(int argc, char * argv[])
     const size_t num_defect = N - num_coop;
     f_data << e << ',' << num_coop << ',' << num_defect << '\n';
   }
-
-  // Print extra info?
-  world.PrintNeighborInfo(f_neigh);
 
   return 0;
 }
