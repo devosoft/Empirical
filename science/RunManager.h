@@ -10,10 +10,19 @@
 
 namespace emp {
 
-  template <typename T>
+  template <typename RUN_T, CONFIG_T>
   class RunManager {
+  private:
+    struct RunInfo {
+      size_t id;
+      CONFIG_T config;
+    };
+
+  public:
   };
 
+  // If no config type is explicitly provided, pull it from the run type.
+  template <typename RUN_T> using RunManager = RunManager<RUN_T, RUN_T::config_t>;
 }
 
 #endif
