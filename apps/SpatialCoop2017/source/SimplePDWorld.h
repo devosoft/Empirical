@@ -19,6 +19,7 @@ public:
   size_t N;            // Population size
   size_t E;            // How many epochs should a popuilation run for?
   size_t num_runs;     // How many runs should we do?
+  bool use_ave;        // Use the average payoff for fitness instead if the total.
 
   emp::Random random;  // All-purpose random-number generator
   size_t epoch;        // What epoch are we currently on?
@@ -38,7 +39,7 @@ public:
   void Repro();
  public:
   SimplePDWorld(double _r=0.02, double _u=0.175, size_t _N=6400, size_t _E=5000, int seed=0)
-    : num_runs(10), random(seed)
+    : num_runs(10), use_ave(true), random(seed)
   {
     Setup(_r, _u, _N, _E);  // Call Setup since we a starting a new population.
   }
@@ -56,6 +57,8 @@ public:
   void SetN(size_t _N) { N = _N; }
   void SetE(size_t _E) { E = _E; }
   void SetNumRuns(size_t n) { num_runs = n; }
+
+  void UseAve(bool _in=true) { use_ave = _in; }
 
   void Setup(double _r=0.02, double _u=0.0025, size_t _N=6400, size_t _E=5000) {
     // Store the input values.
@@ -146,6 +149,8 @@ void SimplePDWorld::CalcFitness(size_t id) {
   double total_C = C_value * (double) C_count;
   double total_D = D_value * (double) D_count;
   org.fitness = total_C + total_D;
+
+  if (use_ave) org.fitness /= (double) org.neighbors.size();
 }
 
 
@@ -165,8 +170,8 @@ void SimplePDWorld::Repro() {
     double choice = random.GetDouble(total_fitness);
     for (size_t n : org.neighbors) {
       if (choice < pop[n].fitness) {
-	org.coop = pop[n].coop;   // Copy strategy of winner!
-	break;
+      	org.coop = pop[n].coop;   // Copy strategy of winner!
+      	break;
       }
       choice -= pop[n].fitness;
     }
