@@ -14,19 +14,20 @@ struct Org {
 class SimplePDWorld {
 public:
   // Parameters
-  double r;         // Neighborhood radius
-  double u;         // cost / benefit ratio
-  size_t N;         // Population size
-  size_t E;         // How many epochs should a popuilation run for?
-  size_t num_runs;  // How many runs should we do?
+  double r;            // Neighborhood radius
+  double u;            // cost / benefit ratio
+  size_t N;            // Population size
+  size_t E;            // How many epochs should a popuilation run for?
+  size_t num_runs;     // How many runs should we do?
 
-  emp::Random random;
-  size_t epoch;
+  emp::Random random;  // All-purpose random-number generator
+  size_t epoch;        // What epoch are we currently on?
 
   // Calculations we'll need later.
   double r_sqr;          // r squared (for comparisons)
   emp::vector<Org> pop;
 
+  // Prisoner's Dilema payout table...
   double payoff_CC;
   double payoff_CD;
   double payoff_DC;
@@ -39,7 +40,7 @@ public:
   SimplePDWorld(double _r=0.02, double _u=0.175, size_t _N=6400, size_t _E=5000, int seed=0)
     : num_runs(10), random(seed)
   {
-    Setup(_r, _u, _N, _E);
+    Setup(_r, _u, _N, _E);  // Call Setup since we a starting a new population.
   }
 
   const emp::vector<Org> & GetPop() const { return pop; }
@@ -58,16 +59,14 @@ public:
 
   void Setup(double _r=0.02, double _u=0.0025, size_t _N=6400, size_t _E=5000) {
     // Store the input values.
-    r = _r;
-    u = _u;
-    N = _N;
-    E = _E;
+    r = _r;  u = _u;  N = _N;  E = _E;
     epoch = 0;
 
     // Calculations we'll need later.
     r_sqr = r * r;  // r squared (for comparisons)
     pop.resize(N);
 
+    // Setup the payout matric.
     payoff_CC = 1.0;
     payoff_CD = 0.0;
     payoff_DC = 1.0 + u;
@@ -82,6 +81,7 @@ public:
     }
 
     // Determine if pairs of organisms are neighbors;
+    // @CAO: Can speed up by using Surface2D.
     for (size_t i = 1; i < N; i++) {
       for (size_t j = 0; j < i; j++) {
         Org & org1 = pop[i];
@@ -123,7 +123,8 @@ public:
 };
 
 
-
+// To calculate the fitness of an organism, have it play
+// against all its neighbors and take the average payout.
 void SimplePDWorld::CalcFitness(size_t id) {
   Org & org = pop[id];
 
@@ -177,12 +178,15 @@ void SimplePDWorld::Repro() {
 }
 
 
+// Count how many cooperators we currently have in the population.
 size_t SimplePDWorld::CountCoop() {
   size_t count = 0.0;
   for (Org & org : pop) if (org.coop) count++;
   return count;
 }
 
+
+// Print out a histogram of neighborhood sizes.
 void SimplePDWorld::PrintNeighborInfo(std::ostream & os) {
   size_t total = 0;
   size_t max_size = 0;
