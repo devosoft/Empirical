@@ -180,6 +180,10 @@ void SimplePDWorld::Repro() {
   // Now that we have updated the organism, calculate its fitness again
   // (even if no change, since neighbors may have changed).
   CalcFitness(id);
+  // Also update neighbors' fitnesses
+  for (size_t n : org.neighbors) {
+    CalcFitness(n);
+  }
 }
 
 
