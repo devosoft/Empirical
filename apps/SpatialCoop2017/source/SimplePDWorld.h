@@ -200,11 +200,9 @@ void SimplePDWorld::PrintNeighborInfo(std::ostream & os) {
   }
   double avg_size = ((double) total) / (double) N;
 
-  os << "ave_size";
-  for (size_t i = 0; i < hist.size(); i++) os << ',' << i;
-  os << '\n';
-
-  os << avg_size;
-  for (size_t i = 0; i < hist.size(); i++) os << ',' << hist[i];
-  os << '\n';
+  os << "avg_size," << avg_size << '\n';
+  for (size_t i = 0; i < hist.size(); i++) {
+    os << i << ',' << hist[i] << '\n';
+  }
+  os.flush();
 }
