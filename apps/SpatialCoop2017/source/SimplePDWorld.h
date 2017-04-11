@@ -164,8 +164,8 @@ void SimplePDWorld::Repro() {
     double choice = random.GetDouble(total_fitness);
     for (size_t n : org.neighbors) {
       if (choice < pop[n].fitness) {
-	org.coop = pop[n].coop;   // Copy strategy of winner!
-	break;
+        org.coop = pop[n].coop;   // Copy strategy of winner!
+        break;
       }
       choice -= pop[n].fitness;
     }
@@ -174,6 +174,10 @@ void SimplePDWorld::Repro() {
   // Now that we have updated the organism, calculate its fitness again
   // (even if no change, since neighbors may have changed).
   CalcFitness(id);
+  // Also update neighbors' fitnesses
+  for (size_t n : org.neighbors) {
+    CalcFitness(n);
+  }
 }
 
 
