@@ -8,7 +8,13 @@
 #ifndef EMP_RUN_MANAGER_H
 #define EMP_RUN_MANAGER_H
 
+#include "../base/vector.h"
+
 namespace emp {
+
+  /// Class to managae a set of runs:
+  /// RUN_T is the type of the object that contains the run info.
+  /// CONFIG_T is the config object being used.
 
   template <typename RUN_T, CONFIG_T>
   class RunManager {
@@ -17,6 +23,8 @@ namespace emp {
       size_t id;
       CONFIG_T config;
     };
+
+    emp::vector<RunInfo> runs;
 
   public:
   };
