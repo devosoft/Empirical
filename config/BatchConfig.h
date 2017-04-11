@@ -5,8 +5,8 @@
 //
 //  A tool to control a series of runs and keep them updated.
 
-#ifndef EMP_RUN_MANAGER_H
-#define EMP_RUN_MANAGER_H
+#ifndef EMP_BATCH_CONFIG_H
+#define EMP_BATCH_CONFIG_H
 
 #include "../base/vector.h"
 
@@ -17,7 +17,7 @@ namespace emp {
   /// CONFIG_T is the config object being used.
 
   template <typename RUN_T, CONFIG_T>
-  class RunManager {
+  class BatchConfig {
   private:
     struct RunInfo {
       size_t id;
@@ -30,7 +30,7 @@ namespace emp {
   };
 
   // If no config type is explicitly provided, pull it from the run type.
-  template <typename RUN_T> using RunManager = RunManager<RUN_T, RUN_T::config_t>;
+  template <typename RUN_T> using BatchConfig = BatchConfig<RUN_T, RUN_T::config_t>;
 }
 
 #endif
