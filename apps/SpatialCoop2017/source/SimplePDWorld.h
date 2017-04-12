@@ -161,20 +161,25 @@ void SimplePDWorld::Repro() {
   bool start_coop = org.coop;
 
   // Determine the total fitness of neighbors.
-  double total_fitness = 0.0;
+  double total_fitness = 0;
   for (size_t n : org.neighbors) {
     total_fitness += pop[n].fitness;
   }
 
   // If neighbor fitnesses are non-zero, choose one of them.
-  if (total_fitness) {
-    double choice = random.GetDouble(total_fitness);
-    for (size_t n : org.neighbors) {
-      if (choice < pop[n].fitness) {
-      	org.coop = pop[n].coop;   // Copy strategy of winner!
-      	break;
+  if (total_fitness > 0) {
+    // Include the focal organism in the pool
+    double choice = random.GetDouble(total_fitness + org.fitness);
+
+    // If we aren't keeping the focal organism, we have to pick
+    if (choice < total_fitness){
+      for (size_t n : org.neighbors) {
+        if (choice < pop[n].fitness) {
+          org.coop = pop[n].coop;   // Copy strategy of winner!
+          break;
+        }
+        choice -= pop[n].fitness;
       }
-      choice -= pop[n].fitness;
     }
   }
 
