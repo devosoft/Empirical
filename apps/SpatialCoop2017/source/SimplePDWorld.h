@@ -158,6 +158,7 @@ void SimplePDWorld::CalcFitness(size_t id) {
 void SimplePDWorld::Repro() {
   size_t id = random.GetUInt(N);
   Org & org = pop[id];
+  bool start_coop = org.coop;
 
   // Determine the total fitness of neighbors.
   double total_fitness = 0.0;
@@ -176,6 +177,9 @@ void SimplePDWorld::Repro() {
       choice -= pop[n].fitness;
     }
   }
+
+  // If we haven't changed our strategy, no need to continue.
+  if (org.coop == start_coop) return;
 
   // Now that we have updated the organism, calculate its fitness again
   // (even if no change, since neighbors may have changed).
