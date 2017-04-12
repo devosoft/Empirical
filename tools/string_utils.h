@@ -465,6 +465,25 @@ namespace emp {
     ss >> out_val;
     return out_val;
   }
+
+  namespace {
+    void _from_string(std::stringstream &) { ; }
+
+    template <typename T, typename... Ts>
+    void _from_string(std::stringstream & ss, T & arg1, Ts... extra_args) {
+      ss >> arg1;
+      _from_string(ss, extra_args...);
+    }
+  };
+
+  /// The from_string() function can also take multiple args instead of a return.
+  template <typename... Ts>
+  inline void from_string(const std::string & str, Ts &... args) {
+    std::stringstream ss;
+    ss << str;
+    _from_string(ss, args...);
+  }
+
 }
 
 #endif
