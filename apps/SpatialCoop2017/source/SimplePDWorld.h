@@ -38,10 +38,10 @@ public:
   void CalcFitness(size_t id);
   void Repro();
  public:
-  SimplePDWorld(double _r=0.02, double _u=0.175, size_t _N=6400, size_t _E=5000, int seed=0)
-    : num_runs(10), use_ave(true), random(seed)
+  SimplePDWorld(double _r=0.02, double _u=0.175, size_t _N=6400, size_t _E=5000, bool _ave=false, int seed=0)
+    : num_runs(10), random(seed)
   {
-    Setup(_r, _u, _N, _E);  // Call Setup since we a starting a new population.
+    Setup(_r, _u, _N, _E, _ave);  // Call Setup since we a starting a new population.
   }
 
   const emp::vector<Org> & GetPop() const { return pop; }
@@ -60,9 +60,9 @@ public:
 
   void UseAve(bool _in=true) { use_ave = _in; }
 
-  void Setup(double _r=0.02, double _u=0.0025, size_t _N=6400, size_t _E=5000) {
+  void Setup(double _r=0.02, double _u=0.0025, size_t _N=6400, size_t _E=5000, bool _ave=false) {
     // Store the input values.
-    r = _r;  u = _u;  N = _N;  E = _E;
+    r = _r;  u = _u;  N = _N;  E = _E, use_ave = _ave;
     epoch = 0;
 
     // Calculations we'll need later.

@@ -11,6 +11,7 @@ EMP_BUILD_CONFIG( PDWorldConfig,
   VALUE(u, double, 0.0025, "cost / benefit ratio"),
   VALUE(N, size_t, 6400, "Number of organisms in the popoulation."),
   VALUE(E, size_t, 5000, "How many epochs should we process?"),
+  VALUE(AVE_PAYOFF, bool, 0, "Should we use the total payoff (0), or find the average (1)?"),
   VALUE(STEP, size_t, 10, "How often should we update data?"),
 )
 
@@ -23,14 +24,15 @@ int main(int argc, char * argv[])
   if (args.ProcessConfigOptions(config, std::cout, "PDWorld.cfg") == false) exit(1);
   if (args.TestUnknown() == false) exit(2);  // If there are leftover args, throw an error.
 
-  const size_t step = config.STEP();
+  const size_t seed = config.SEED();
   const double r = config.r();
   const double u = config.u();
   const size_t N = config.N();
   const size_t E = config.E();
-  const size_t seed = config.SEED();
+  const bool use_ave = config.AVE_PAYOFF();
+  const size_t step = config.STEP();
 
-  std::string filename_base = emp::to_string(r,'-',u,'-',N,'-',E,'-',seed,".csv");
+  std::string filename_base = emp::to_string(r,'-',u,'-',N,'-',E,'-',use_ave,'-',seed,".csv");
   std::string filename_data = std::string("data-") + filename_base;
   std::string filename_neigh = std::string("neighborhood_sizes-") + filename_base;
 
