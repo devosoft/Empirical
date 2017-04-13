@@ -27,9 +27,9 @@ void DrawCanvas() {
 
   for (const Org & org : pop) {
     if (org.coop) {
-      canvas.Circle(org.x*world_size, org.y*world_size, 2, "blue", "white");
+      canvas.Circle(org.x*world_size, org.y*world_size, 2, "blue", "#8888FF");
     } else {
-      canvas.Circle(org.x*world_size, org.y*world_size, 2, "red", "white");
+      canvas.Circle(org.x*world_size, org.y*world_size, 2, "#FF8888", "red");
     }
   }
 
