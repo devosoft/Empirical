@@ -6,13 +6,7 @@ Contents:
 .. toctree::
    :maxdepth: 1
 
-   config
-   geometry
-   hardware
-   kinetic
-   scholar
-   tools
-   web
+   Doxygen <../../doxydoc/html/index.html#http://>
    d3
 
 * :ref:`genindex`
