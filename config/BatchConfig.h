@@ -22,11 +22,17 @@ namespace emp {
     struct RunInfo {
       size_t id;
       CONFIG_T config;
+
+      RunInfo(size_t & _id, const CONFIG_T & _config) : id(_id), config(_config) { ; }
     };
 
     emp::vector<RunInfo> runs;
 
   public:
+
+    void AddRun(const CONFIG_T & in_config) {
+      runs.emplace_back(runs.size(), in_config);
+    }
   };
 
   // If no config type is explicitly provided, pull it from the run type.
