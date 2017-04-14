@@ -93,7 +93,7 @@ public:
         //   // states[r*9+c] = '*';
         //   UpdateCell(r,c);
         // });
-        cell.On("mousemove", [this,cell,r,c]() mutable {
+        cell.On("mouseenter", [this,cell,r,c]() mutable {
           if (cur_row == r && cur_col == c) return;
           int old_row = cur_row;
           int old_col = cur_col;

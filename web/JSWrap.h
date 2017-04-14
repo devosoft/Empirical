@@ -39,6 +39,8 @@
 //    In order do so, you must define the properties of the object as a tuple
 //    struct in js_object_struct.h. - @ELD
 //  * Made sure JSWrap can take function objects, lambdas, or just function names.
+//  * A callback ID of 0 will always be associated with a nullptr, and thus can be used to
+//    indicate that a function does not exist.
 
 
 #ifndef EMP_JSWRAP_H
@@ -427,7 +429,7 @@ namespace emp {
         // Make sure that we are returning the correct number of arguments.  If this
         // assert fails, it means that we've failed to set the correct number of arguments
         // in emp.cb_args, and need to realign.
-        emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() >= num_args, EMP_GetCBArgCount(), num_args);
+        emp_assert(EMP_GetCBArgCount() < 0 || EMP_GetCBArgCount() >= num_args, EMP_GetCBArgCount(), num_args);
 
         // Collect the values of the arguments in a tuple
         using args_t = std::tuple< typename std::decay<ARG_TYPES>::type... >;
@@ -468,7 +470,7 @@ namespace emp {
         // Make sure that we are returning the correct number of arguments.  If this
         // assert fails, it means that we've failed to set the correct number of arguments
         // in emp.cb_args, and need to realign.
-        emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() >= num_args, EMP_GetCBArgCount(), num_args);
+        emp_assert(EMP_GetCBArgCount() < 0 || EMP_GetCBArgCount() >= num_args, EMP_GetCBArgCount(), num_args);
 
         // Collect the values of the arguments in a tuple
         using args_t = std::tuple< typename std::decay<ARG_TYPES>::type... >;
@@ -487,7 +489,7 @@ namespace emp {
     // The following function returns a static callback array; callback ID's all index into
     // this array.
     static emp::vector<JSWrap_Callback_Base *> & CallbackArray() {
-      static emp::vector<JSWrap_Callback_Base *> callback_array;
+      static emp::vector<JSWrap_Callback_Base *> callback_array(1, nullptr);
       return callback_array;
     }
 

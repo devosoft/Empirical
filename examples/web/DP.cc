@@ -27,7 +27,7 @@ void TextCB(const std::string & in_str) {
 
   // Determine the score contribution for each word.
   emp::vector<size_t> score(num_words);
-  emp::vector<bool> keep_last(num_words);
+  emp::vector<char> keep_last(num_words);
   if (num_words > 0) { score[0] = word_sizes[0]; keep_last[0] = true; }
   if (num_words > 1) {
     if (word_sizes[1] > word_sizes[0]) { score[1] = word_sizes[1]; keep_last[1] = true; }
@@ -47,7 +47,7 @@ void TextCB(const std::string & in_str) {
   }
 
   // Map which words we keep.
-  emp::vector<bool> keep(num_words, false);
+  emp::vector<char> keep(num_words, false);
   for (size_t i = num_words-1; i < num_words; i--) {
     if (keep_last[i]) { keep[i] = true; i--; }
   }
@@ -107,7 +107,7 @@ int main()
   table.GetCell(0,0).SetHeader() << "WORD:";
   table.GetCell(1,0).SetHeader() << "LETTERS:";
   table.GetCell(2,0).SetHeader() << "BEST SCORE:";
-  table.SetCSS("border-collapse", "collapse");  
+  table.SetCSS("border-collapse", "collapse");
   table.SetCSS("border", "3px solid black");
   table.CellsCSS("border", "1px solid black");
 

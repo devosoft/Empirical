@@ -1,9 +1,9 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  Some example code for using emp::Ptr
+//  Some example code for using emp::BitSet
 
 #include <ctime>
 #include <iostream>
