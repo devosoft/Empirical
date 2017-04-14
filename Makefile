@@ -2,7 +2,6 @@ doc: build-doxygen-xml
 	cd doc && make html
 
 build-doxygen-xml:
-	mkdir -p build/doxydoc/source
 	./third-party/doxygen/build/bin/doxygen Doxyfile
 
 travis: 
