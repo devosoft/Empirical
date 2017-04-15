@@ -43,10 +43,12 @@ namespace emp {
 
   public:
     Graph(size_t num_nodes=0) : nodes(num_nodes, num_nodes) { ; }
-    Graph(const Graph & in_graph) : nodes(in_graph.nodes) { ; }
+    Graph(const Graph &) = default;              // Copy constructor
+    Graph(Graph &&) = default;                   // Move constructor
     ~Graph() { ; }
 
-    Graph & operator=(const Graph & in_graph) { nodes = in_graph.nodes; return *this; }
+    Graph & operator=(const Graph &) = default;  // Copy operator
+    Graph & operator=(Graph &&) = default;       // Move operator
 
     size_t GetSize() const { return nodes.size(); }
     size_t GetEdgeCount() const {
@@ -54,6 +56,7 @@ namespace emp {
       for (size_t i = 0; i < nodes.size(); i++) edge_count += nodes[i].GetDegree();
       return edge_count;
     }
+    void Resize(size_t new_size) { nodes.resize(new_size, new_size); }
 
     const BitVector & GetEdgeSet(size_t id) const {
       emp_assert(id < nodes.size());
