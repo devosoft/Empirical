@@ -112,12 +112,13 @@ int main(int argc, char* argv[])
     filename = emp::to_string("cliqueset-", v_count, '-', graph.GetEdgeCount()/2);
   }
   else if (graph_type == 7) {
-    std::cout << "Generating a Ring Graph (with solution)." << std::endl;
+    std::cout << "Generating a Random Graph (with hamiltonian cycle and solution)." << std::endl;
     int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
-    int edges = GetValue("How many extra edges?", args, cur_arg, 1000);
+    int edges = GetValue("How many edges?", args, cur_arg, 1000);
+
+    // Generate the Hamiltonian Cycle
     emp::vector<size_t> v_map = emp::BuildRange<size_t>(0, nodes);
     emp::Shuffle(random, v_map);
-
     graph.Resize(nodes);
     for (size_t i = 1; i < nodes; i++) {
       const size_t from = v_map[i];
@@ -125,7 +126,9 @@ int main(int argc, char* argv[])
       graph.AddEdgePair(from, to);
     }
     graph.AddEdgePair(v_map[0], v_map[nodes-1]);
-    size_t e_cur = 0;
+
+    // Add in extra edges.
+    size_t e_cur = nodes;
     while (e_cur < edges) {
       const size_t from = random.GetUInt(nodes);
       const size_t to = random.GetUInt(nodes);
@@ -133,6 +136,8 @@ int main(int argc, char* argv[])
       graph.AddEdgePair(from, to);
       ++e_cur;
     }
+
+    // Print the file.
     filename = emp::to_string("hcycle-", nodes, '-', nodes+edges);
     std::ofstream of(filename);
     graph.PrintSym(of);
