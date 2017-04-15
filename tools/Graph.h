@@ -34,6 +34,9 @@ namespace emp {
       void SetEdge(size_t to, bool val) { edge_set.Set(to, val); }
       const BitVector & GetEdgeSet() const { return edge_set; }
 
+      void Resize(size_t new_size) { edge_set.Resize(new_size); }
+      void Clear() { edge_set.Clear(); }
+
       size_t GetDegree() const { return edge_set.CountOnes(); }
       size_t GetMaskedDegree(const BitVector & mask) const { return (mask & edge_set).CountOnes(); }
     };
@@ -56,7 +59,13 @@ namespace emp {
       for (size_t i = 0; i < nodes.size(); i++) edge_count += nodes[i].GetDegree();
       return edge_count;
     }
-    void Resize(size_t new_size) { nodes.resize(new_size, new_size); }
+    void Resize(size_t new_size) {
+      nodes.resize(new_size, new_size);
+      for (auto & node : nodes) {
+	node.Resize(new_size);
+	node.Clear();
+      }
+    }
 
     const BitVector & GetEdgeSet(size_t id) const {
       emp_assert(id < nodes.size());
