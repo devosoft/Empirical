@@ -27,11 +27,23 @@ namespace emp {
     };
 
     emp::vector<RunInfo> runs;
+    size_t cur_run;
+
+    using start_fun_t = std::function<void(const CONFIG_T &)>;
+    start_fun_t start_fun;
 
   public:
+    BatchConfig(const start_fun_t & f) : cur_run(0), start_fun(f) { ; }
 
     void AddRun(const CONFIG_T & in_config) {
       runs.emplace_back(runs.size(), in_config);
+    }
+
+    bool Start() {
+      if (cur_run >= runs.size()) return false;
+      start_fun(runs[cur_run].config);
+      cur_run++;
+      return true;
     }
   };
 
