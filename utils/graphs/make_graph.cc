@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
   else if (graph_type == 7) {
     std::cout << "Generating a Random Graph (with hamiltonian cycle and solution)." << std::endl;
     int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
-    int edges = GetValue("How many edges?", args, cur_arg, 1000);
+    int edges = GetValue("How many edges?", args, cur_arg, node*(node-1)/2);
 
     // Generate the Hamiltonian Cycle
     emp::vector<size_t> v_map = emp::BuildRange<size_t>(0, nodes);
@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
     }
 
     // Print the file.
-    filename = emp::to_string("hcycle-", nodes, '-', nodes+edges);
+    filename = emp::to_string("hcycle-", nodes, '-', edges);
     std::ofstream of(filename);
     graph.PrintSym(of);
     for (size_t i = 0; i < nodes; i++) {
