@@ -35,6 +35,11 @@ namespace emp {
   public:
     BatchConfig(const start_fun_t & f) : cur_run(0), start_fun(f) { ; }
 
+    size_t GetSize() const { return runs.size(); }
+    size_t GetCurRun() const { return cur_run; }
+    CONFIG_T & GetConfig(size_t id) { return runs[id].config; }
+    const CONFIG_T & GetConfig(size_t id) const  { return runs[id].config; }
+
     void AddRun(const CONFIG_T & in_config) {
       runs.emplace_back(runs.size(), in_config);
     }
