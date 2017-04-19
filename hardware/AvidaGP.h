@@ -16,7 +16,7 @@
 //    Label, Jump, JumpIf0, JumpIfN0  :  LABEL, TEST
 //    Push, Pop, Input, Output        :  VAL
 //    CopyVal                         :  FROM, TO
-//    VAR                             :  NEW_SCOPE VAR
+//    Var                             :  NEW_SCOPE VAR
 //
 //
 //  Developer Notes:
@@ -41,16 +41,33 @@ namespace emp {
     static constexpr size_t REGS = 16;
     static constexpr size_t INST_ARGS = 3;
 
-    emp::vector< Instruction<INST_ARGS> > genome;
+    using inst_t = Instruction<INST_ARGS>;
+    using genome_t = emp::vector<inst_t>;
+
+    enum class Inst { Inc, Dec, Not, Add, Sub, Mult, Div, Mod,TestEqu, TestNEqu, TestLess, If, While, DoRange, End, Define, Call, Label, Jump, JumpIf0, JumpIfN0, Push, Pop, Input, Output, CopyVal, Var };
+    
+    genome_t genome;
     size_t inst_ptr;
 
     emp::array<double, REGS> regs;
 
+    void SingleProcess();
+
   public:
-    AvidaGP() : inst_ptr(0) { ; }
+    AvidaGP() : inst_ptr(0) {
+      for (size_t i = 0; i < REGS; i++) regs[i] = (double) i; 
+    }
     ~AvidaGP() { ; }
 
+    inst_t GetInst(size_t pos) const { return genome[pos]; }
+    const genome_t & GetGenome() const { return genome; }
+    double GetReg(size_t id) const { return regs[id]; }
+
   };
+
+
+  void AvidaGP::SingleProcess() {
+  }
 
 }
 
