@@ -6,9 +6,22 @@
 
 #include "../../hardware/AvidaGP.h"
 
+void Print(const emp::AvidaGP & cpu) {
+  for (size_t i = 0; i < 16; i++) {
+    std::cout << "regs[" << i << "] = " << cpu.GetReg(i) << "  ";
+  }
+  std::cout << std::endl;
+}
+
 int main()
 {
   std::cout << "Test." << std::endl;
+
+  emp::AvidaGP cpu;
+  Print(cpu);
+  cpu.PushInst( emp::AvidaGP::Inst::Inc, 1);
+  cpu.SingleProcess();
+  Print(cpu);
 
   return 0;
 }

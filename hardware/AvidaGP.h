@@ -59,8 +59,6 @@ namespace emp {
 
     emp::array<double, REGS> regs;
 
-    void SingleProcess();
-
   public:
     AvidaGP() : inst_ptr(0) {
       for (size_t i = 0; i < REGS; i++) regs[i] = (double) i; 
@@ -74,6 +72,8 @@ namespace emp {
     void PushInst(Inst inst, int arg1=0, int arg2=0, int arg3=0) {
       genome.emplace_back(inst, arg1, arg2, arg3);
     }
+
+    void SingleProcess();
   };
 
 
@@ -83,10 +83,10 @@ namespace emp {
     const inst_t inst = genome[inst_ptr];
 
     switch (inst.id) {
-    case Inst::Inc: regs[inst.arg3] = regs[inst.arg1] + regs[inst.arg2]; break;
+    case Inst::Inc: regs[inst.arg1]++; break;
     case Inst::Dec: break;
     case Inst::Not: break;
-    case Inst::Add: break;
+    case Inst::Add: regs[inst.arg3] = regs[inst.arg1] + regs[inst.arg2]; break;
     case Inst::Sub: break;
     case Inst::Mult: break;
     case Inst::Div: break;
