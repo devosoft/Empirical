@@ -39,7 +39,11 @@ namespace emp {
     static constexpr size_t REGS = 16;
     static constexpr size_t INST_ARGS = 3;
 
-    enum class Inst { Inc, Dec, Not, Add, Sub, Mult, Div, Mod,TestEqu, TestNEqu, TestLess, If, While, DoRange, End, Define, Call, Label, Jump, JumpIf0, JumpIfN0, Push, Pop, Input, Output, CopyVal, Var };
+    enum class Inst {
+      Inc, Dec, Not, Add, Sub, Mult, Div, Mod,TestEqu, TestNEqu, TestLess,
+      If, While, DoRange, Break, End, Define, Call, Label, Jump, JumpIf0, JumpIfN0,
+      Push, Pop, Input, Output, CopyVal, Var
+    };
 
     struct Instruction {
       Inst id;
@@ -59,6 +63,10 @@ namespace emp {
     size_t errors;
 
     emp::array<double, REGS> regs;
+
+    bool UpdateScope(int scope) { return true;}
+    void BypassScope(int scope) {;}
+    void EnterWhile(int scope) {;}
 
   public:
     AvidaGP() : inst_ptr(0), errors(0) {
@@ -117,7 +125,7 @@ namespace emp {
     case Inst::While:
       if (UpdateScope(inst.arg2) == false) break;     // If previous scope is unfinished, stop!
       if (!regs[inst.arg1]) BypassScope(inst.arg2);   // If test fails, move to scope end.
-      EnterWhile();                                   // Track to jump back to while start.
+      EnterWhile(inst.arg2);                          // Track to jump back to while start.
       break;
 
     case Inst::Break: BypassScope(inst.arg1); break;
