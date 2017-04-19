@@ -6,7 +6,7 @@
 //  This is a hardcoded CPU for Avida.
 //
 //  Instruction Set:
-//    Inc, Dec, Not                   :  IN1, OUT1
+//    Inc, Dec, Not                   :  REG
 //    Add, Sub, Mult, Div, Mod        :  IN1, IN2, OUT1
 //    TestEqu, TestNEqu, TestLess     :  IN1, IN2, OUT1
 //    If, While                       :  TEST, SCOPE
@@ -40,7 +40,7 @@ namespace emp {
     static constexpr size_t INST_ARGS = 3;
 
     enum class Inst { Inc, Dec, Not, Add, Sub, Mult, Div, Mod,TestEqu, TestNEqu, TestLess, If, While, DoRange, End, Define, Call, Label, Jump, JumpIf0, JumpIfN0, Push, Pop, Input, Output, CopyVal, Var };
-    
+
     struct Instruction {
       Inst id;
       int arg1;  int arg2;  int arg3;
@@ -56,12 +56,13 @@ namespace emp {
   private:
     genome_t genome;
     size_t inst_ptr;
+    size_t errors;
 
     emp::array<double, REGS> regs;
 
   public:
-    AvidaGP() : inst_ptr(0) {
-      for (size_t i = 0; i < REGS; i++) regs[i] = (double) i; 
+    AvidaGP() : inst_ptr(0), errors(0) {
+      for (size_t i = 0; i < REGS; i++) regs[i] = (double) i;
     }
     ~AvidaGP() { ; }
 
@@ -83,21 +84,46 @@ namespace emp {
     const inst_t inst = genome[inst_ptr];
 
     switch (inst.id) {
-    case Inst::Inc: regs[inst.arg1]++; break;
-    case Inst::Dec: break;
-    case Inst::Not: break;
+    case Inst::Inc: ++regs[inst.arg1]; break;
+    case Inst::Dec: --regs[inst.arg1]; break;
+    case Inst::Not: regs[inst.arg1] = !regs[inst.arg1]; break;
     case Inst::Add: regs[inst.arg3] = regs[inst.arg1] + regs[inst.arg2]; break;
-    case Inst::Sub: break;
-    case Inst::Mult: break;
-    case Inst::Div: break;
-    case Inst::Mod: break;
-    case Inst::TestEqu: break;
-    case Inst::TestNEqu: break;
-    case Inst::TestLess: break;
-    case Inst::If: break;
-    case Inst::While: break;
+    case Inst::Sub: regs[inst.arg3] = regs[inst.arg1] - regs[inst.arg2]; break;
+    case Inst::Mult: regs[inst.arg3] = regs[inst.arg1] * regs[inst.arg2]; break;
+
+    case Inst::Div: {
+      const double denom = regs[inst.arg2];
+      if (denom == 0.0) ++errors;
+      else regs[inst.arg3] = regs[inst.arg1] / denom;
+    }
+      break;
+
+    case Inst::Mod: {
+      const double base = regs[inst.arg2];
+      if (base == 0.0) ++errors;
+      else regs[inst.arg3] = regs[inst.arg1] / base;
+    }
+      break;
+
+    case Inst::TestEqu: regs[inst.arg3] = (regs[inst.arg1] == regs[inst.arg2]); break;
+    case Inst::TestNEqu: regs[inst.arg3] = (regs[inst.arg1] != regs[inst.arg2]); break;
+    case Inst::TestLess: regs[inst.arg3] = (regs[inst.arg1] < regs[inst.arg2]); break;
+
+    case Inst::If: // arg1 = test, arg2 = scope
+      if (UpdateScope(inst.arg2) == false) break;     // If previous scope is unfinished, stop!
+      if (!regs[inst.arg1]) BypassScope(inst.arg2);   // If test fails, move to scope end.
+      break;                                          // Continue in current code.
+
+    case Inst::While:
+      if (UpdateScope(inst.arg2) == false) break;     // If previous scope is unfinished, stop!
+      if (!regs[inst.arg1]) BypassScope(inst.arg2);   // If test fails, move to scope end.
+      EnterWhile();                                   // Track to jump back to while start.
+      break;
+
+    case Inst::Break: BypassScope(inst.arg1); break;
+    case Inst::End: UpdateScope(inst.arg1); break;
+
     case Inst::DoRange: break;
-    case Inst::End: break;
     case Inst::Define: break;
     case Inst::Call: break;
     case Inst::Label: break;
