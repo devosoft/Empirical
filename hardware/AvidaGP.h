@@ -10,9 +10,9 @@
 //    Add, Sub, Mult, Div, Mod        :  IN1, IN2, OUT1
 //    TestEqu, TestNEqu, TestLess     :  IN1, IN2, OUT1
 //    If, While                       :  TEST, SCOPE
-//    DoRange                         :  START, END, SCOPE
-//    End                             :  SCOPE
-//    Define, Call                    :  LABEL
+//    DoCount                         :  MAX_VAL, COUNTER, SCOPE
+//    Scope                           :  SCOPE                   (change current scope)
+//    Define, Call                    :  LABEL                   (build a function / call it)
 //    Label, Jump, JumpIf0, JumpIfN0  :  LABEL, TEST
 //    Push, Pop, Input, Output        :  VAL
 //    CopyVal                         :  FROM, TO
@@ -41,7 +41,7 @@ namespace emp {
 
     enum class Inst {
       Inc, Dec, Not, Add, Sub, Mult, Div, Mod,TestEqu, TestNEqu, TestLess,
-      If, While, DoRange, Break, End, Define, Call, Label, Jump, JumpIf0, JumpIfN0,
+      If, While, DoCount, Break, Scope, Define, Call, Label, Jump, JumpIf0, JumpIfN0,
       Push, Pop, Input, Output, CopyVal, Var
     };
 
@@ -64,9 +64,16 @@ namespace emp {
 
     emp::array<double, REGS> regs;
 
-    bool UpdateScope(int scope) { return true;}
-    void BypassScope(int scope) {;}
-    void EnterWhile(int scope) {;}
+    // This function gets run every time scope changed (if, while, scope instructions, etc.)
+    // If we are moving to an outer scope (lower value) we need to close the scope we are in,
+    // potentially continuing with a loop.
+    bool UpdateScope(int scope) { return true; }
+
+    // This function fast-forwards to the end of the current scope.
+    void BypassScope(int scope) { ; }
+
+    // This function indicates that a loop has started and tracks the conditions.
+    void EnterWhile(int scope) { ; }
 
   public:
     AvidaGP() : inst_ptr(0), errors(0) {
@@ -129,9 +136,9 @@ namespace emp {
       break;
 
     case Inst::Break: BypassScope(inst.arg1); break;
-    case Inst::End: UpdateScope(inst.arg1); break;
+    case Inst::Scope: UpdateScope(inst.arg1); break;
 
-    case Inst::DoRange: break;
+    case Inst::DoCount: break;
     case Inst::Define: break;
     case Inst::Call: break;
     case Inst::Label: break;
