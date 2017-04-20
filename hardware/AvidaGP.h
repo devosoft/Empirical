@@ -16,13 +16,13 @@
 //    Label, Jump, JumpIf0, JumpIfN0  :  LABEL, TEST
 //    Push, Pop, Input, Output        :  VAL
 //    CopyVal                         :  FROM, TO
-//    Var                             :  NEW_SCOPE VAR
+//    ScopeVar                        :  VAR                     (move var into current scope)
 //
 //
 //  Developer Notes:
 //  * This implementation is intended to run fast, but not be flexible so that it will
-//    be quick to implement.  It can be used as a baseline comparison for more flexible
-//    implementations later.
+//    be quick to implement.  It can be used as a baseline comparison for timings on more
+//    flexible implementations later.
 
 
 #ifndef EMP_AVIDA_GP_H
@@ -42,7 +42,7 @@ namespace emp {
     enum class Inst {
       Inc, Dec, Not, Add, Sub, Mult, Div, Mod,TestEqu, TestNEqu, TestLess,
       If, While, DoCount, Break, Scope, Define, Call, Label, Jump, JumpIf0, JumpIfN0,
-      Push, Pop, Input, Output, CopyVal, Var
+      Push, Pop, Input, Output, CopyVal, ScopeVar
     };
 
     struct Instruction {
@@ -50,7 +50,7 @@ namespace emp {
       int arg1;  int arg2;  int arg3;
 
       Instruction(Inst _id, int _a1, int _a2, int _a3)
-	: id(_id), arg1(_a1), arg2(_a2), arg3(_a3) { ; }
+	      : id(_id), arg1(_a1), arg2(_a2), arg3(_a3) { ; }
     };
 
 
@@ -77,13 +77,18 @@ namespace emp {
 
   public:
     AvidaGP() : inst_ptr(0), errors(0) {
+      // Initialize registers to their posision.  So Reg0 = 0 and Reg11 = 11.
       for (size_t i = 0; i < REGS; i++) regs[i] = (double) i;
     }
     ~AvidaGP() { ; }
 
+    // Accessors
     inst_t GetInst(size_t pos) const { return genome[pos]; }
     const genome_t & GetGenome() const { return genome; }
     double GetReg(size_t id) const { return regs[id]; }
+
+    void SetInst(size_t pos, const inst_t & inst) { genome[pos] = inst; }
+    void SetGneome(const genome_t & g) { genome = g; }
 
     void PushInst(Inst inst, int arg1=0, int arg2=0, int arg3=0) {
       genome.emplace_back(inst, arg1, arg2, arg3);
@@ -150,7 +155,7 @@ namespace emp {
     case Inst::Input: break;
     case Inst::Output: break;
     case Inst::CopyVal: break;
-    case Inst::Var: break;
+    case Inst::ScopeVar: break;
     };
   }
 
