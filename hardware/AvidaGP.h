@@ -45,6 +45,10 @@ namespace emp {
       Push, Pop, Input, Output, CopyVal, ScopeVar
     };
 
+    // ScopeType is used for scopes that we need to do something special at the end.
+    // Eg: WHILE needs to go back to beginning of loop; FUNCTION needs to return to call.
+    enum class ScopeType { BASIC, WHILE, FUNCTION };
+
     struct Instruction {
       Inst id;
       int arg1;  int arg2;  int arg3;
@@ -58,22 +62,22 @@ namespace emp {
     using genome_t = emp::vector<inst_t>;
 
   private:
+
+    // Virtual CPU Components!
     genome_t genome;
     size_t inst_ptr;
     size_t errors;
 
     emp::array<double, REGS> regs;
 
+
     // This function gets run every time scope changed (if, while, scope instructions, etc.)
     // If we are moving to an outer scope (lower value) we need to close the scope we are in,
     // potentially continuing with a loop.
-    bool UpdateScope(int scope) { return true; }
+    bool UpdateScope(int scope, ScopeType type=ScopeType::BASIC) { return true; }
 
-    // This function fast-forwards to the end of the current scope.
+    // This function fast-forwards to the end of the specified scope.
     void BypassScope(int scope) { ; }
-
-    // This function indicates that a loop has started and tracks the conditions.
-    void EnterWhile(int scope) { ; }
 
   public:
     AvidaGP() : inst_ptr(0), errors(0) {
@@ -135,9 +139,9 @@ namespace emp {
       break;                                          // Continue in current code.
 
     case Inst::While:
-      if (UpdateScope(inst.arg2) == false) break;     // If previous scope is unfinished, stop!
+      // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
+      if (UpdateScope(inst.arg2, ScopeType::WHILE) == false) break;
       if (!regs[inst.arg1]) BypassScope(inst.arg2);   // If test fails, move to scope end.
-      EnterWhile(inst.arg2);                          // Track to jump back to while start.
       break;
 
     case Inst::Break: BypassScope(inst.arg1); break;
