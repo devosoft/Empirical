@@ -99,11 +99,12 @@ namespace emp {
     }
 
     void SingleProcess();
+    void Process(size_t num_inst) { for (size_t i = 0; i < num_inst; i++) SingleProcess(); }
   };
 
 
   void AvidaGP::SingleProcess() {
-    if (inst_ptr > genome.size()) inst_ptr = 0;
+    if (inst_ptr >= genome.size()) inst_ptr = 0;
 
     const inst_t inst = genome[inst_ptr];
 
@@ -161,6 +162,8 @@ namespace emp {
     case Inst::CopyVal: break;
     case Inst::ScopeVar: break;
     };
+
+    inst_ptr++;
   }
 
 }
