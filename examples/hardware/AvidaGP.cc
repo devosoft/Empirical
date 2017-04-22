@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "../../hardware/AvidaGP.h"
+#include "../../hardware/InstLib.h"
 
 void Print(const emp::AvidaGP & cpu) {
   for (size_t i = 0; i < 16; i++) {
@@ -16,6 +17,8 @@ void Print(const emp::AvidaGP & cpu) {
 int main()
 {
   std::cout << "Test." << std::endl;
+
+  emp::InstLib<emp::AvidaGP::Inst> inst_lib;
 
   emp::AvidaGP cpu;
   Print(cpu);
