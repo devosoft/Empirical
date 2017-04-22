@@ -99,16 +99,18 @@ namespace emp {
       genome.emplace_back(inst, arg1, arg2, arg3);
     }
 
+    /// Process a specified instruction, provided by the caller.
+    void ProcessInst(const inst_t & inst);
+
+    /// Process the NEXT instruction pointed to be the instruction pointer
     void SingleProcess();
+
+    /// Process the next SERIES of instructions, directed by the instruction pointer.
     void Process(size_t num_inst) { for (size_t i = 0; i < num_inst; i++) SingleProcess(); }
   };
 
 
-  void AvidaGP::SingleProcess() {
-    if (inst_ptr >= genome.size()) inst_ptr = 0;
-
-    const inst_t inst = genome[inst_ptr];
-
+  void AvidaGP::ProcessInst(const inst_t & inst) {
     switch (inst.id) {
     case Inst::Inc: ++regs[inst.arg1]; break;
     case Inst::Dec: --regs[inst.arg1]; break;
@@ -167,7 +169,11 @@ namespace emp {
       // This case should never happen!
       emp_assert(false, "Unknown instruction being exectuted!");
     };
+  }
 
+  void AvidaGP::SingleProcess() {
+    if (inst_ptr >= genome.size()) inst_ptr = 0;
+    ProcessInst( genome[inst_ptr] );
     inst_ptr++;
   }
 
