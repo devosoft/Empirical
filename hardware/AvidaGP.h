@@ -42,7 +42,8 @@ namespace emp {
     enum class Inst {
       Inc, Dec, Not, Add, Sub, Mult, Div, Mod,TestEqu, TestNEqu, TestLess,
       If, While, DoCount, Break, Scope, Define, Call, Label, Jump, JumpIf0, JumpIfN0,
-      Push, Pop, Input, Output, CopyVal, ScopeVar
+      Push, Pop, Input, Output, CopyVal, ScopeVar,
+      Unknown
     };
 
     // ScopeType is used for scopes that we need to do something special at the end.
@@ -161,6 +162,10 @@ namespace emp {
     case Inst::Output: break;
     case Inst::CopyVal: break;
     case Inst::ScopeVar: break;
+    case Inst::Unknown:
+    default:
+      // This case should never happen!
+      emp_assert(false, "Unknown instruction being exectuted!");
     };
 
     inst_ptr++;
