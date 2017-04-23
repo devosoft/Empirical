@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -29,9 +29,8 @@
 #ifndef EMP_GRID_H
 #define EMP_GRID_H
 
-#include <vector>
-
-#include "assert.h"
+#include "../base/assert.h"
+#include "../base/vector.h"
 #include "BitVector.h"
 
 namespace emp {
@@ -46,7 +45,7 @@ namespace Grid {
   private:
     int width;
     int height;
-    std::vector< std::vector<int> > regions;
+    emp::vector< emp::vector<int> > regions;
   public:
     Layout(int w, int h) : width(w), height(h) { ; }
     Layout(const Layout &) = default;
@@ -56,9 +55,9 @@ namespace Grid {
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
     int GetNumRegions() const { return (int) regions.size(); }
-    const std::vector<int> & GetRegion(int id) { return regions[id]; }
+    const emp::vector<int> & GetRegion(int id) { return regions[id]; }
 
-    void AddRegion(const std::vector<int> & in_region) { regions.push_back(in_region); }
+    void AddRegion(const emp::vector<int> & in_region) { regions.push_back(in_region); }
 
     // Helper functions
     int GetX(int id) const { return id % width; }
@@ -75,7 +74,7 @@ namespace Grid {
   class StateSet {
   private:
     int width;
-    std::vector<STATE_TYPE> states;
+    emp::vector<STATE_TYPE> states;
 
   public:
     StateSet(int _w, int _h) : width(_w), states(_w*_h) { ; }
