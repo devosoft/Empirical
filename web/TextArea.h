@@ -62,9 +62,9 @@ namespace web {
         HTML.str("");                                           // Clear the current text.
         HTML << "<textarea ";                                   // Start the textarea tag.
         if (disabled) { HTML << " disabled=true"; }             // Check if should be disabled
-        HTML << " id=\"" << id << "\""                          // Indicate ID.
-             << " onkeyup=\"emp.Callback(" << callback_id << ", $(this).val())\""
-             << " rows=\"" << rows << "\""
+        HTML << " id=\"" << id << "\"";                         // Indicate ID.
+        HTML << " onkeyup=\"emp.Callback(" << callback_id << ", $(this).val())\"";
+        HTML << " rows=\"" << rows << "\""
              << " cols=\"" << cols << "\"";
         if (max_length >= 0) { HTML << " maxlength=\"" << max_length << "\""; }
         HTML << ">" << cur_text << "</textarea>";              // Close and label the textarea
@@ -104,7 +104,7 @@ namespace web {
     TextArea(TextAreaInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:
-    TextArea(std::function<void(const std::string &)> in_cb, const std::string & in_id="")
+    TextArea(const std::string & in_id="")
       : WidgetFacet(in_id)
     {
       info = new TextAreaInfo(in_id);
@@ -116,9 +116,16 @@ namespace web {
       Info()->autofocus = false;
       Info()->disabled = false;
 
+      Info()->callback_id = 0;
+    }
+    TextArea(std::function<void(const std::string &)> in_cb, const std::string & in_id="")
+      : TextArea(in_id)
+    {
       Info()->callback = in_cb;
       TextAreaInfo * ta_info = Info();
-      Info()->callback_id = JSWrap( std::function<void(std::string)>( [ta_info](std::string in_str){ta_info->DoCallback(in_str);} )  );
+      Info()->callback_id = JSWrap( std::function<void(std::string)>(
+        [ta_info](std::string in_str){ ta_info->DoCallback(in_str); }
+      ));
     }
     TextArea(const TextArea & in) : WidgetFacet(in) { ; }
     TextArea(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsTextAreaInfo()); }

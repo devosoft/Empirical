@@ -24,6 +24,7 @@ namespace web {
     double x; double y;
     std::string fill_color;
     std::string line_color;
+
   public:
     CanvasShape(double _x, double _y, const std::string & fc="", const std::string & lc="")
       : x(_x), y(_y), fill_color(fc), line_color(lc) { ; }
@@ -32,6 +33,11 @@ namespace web {
     void MoveTo(double _x, double _y) { x=_x; y=_y; }
     void SetFillColor(const std::string & color) { fill_color = color; }
     void SetLineColor(const std::string & color) { line_color = color; }
+
+    void ApplyColor() {
+      Fill(fill_color);
+      Stroke(line_color);
+    }
   };
 
   class CanvasCircle : public CanvasShape {
@@ -50,8 +56,7 @@ namespace web {
           emp_i.ctx.beginPath();
           emp_i.ctx.arc($0, $1, $2, 0, Math.PI*2);
         }, x, y, radius);  // Draw the circle
-      if (fill_color.size()) Fill(fill_color);
-      if (line_color.size()) Stroke(line_color);
+        ApplyColor();
     }
     CanvasAction * Clone() const { return new CanvasCircle(*this); }
   };
@@ -68,8 +73,7 @@ namespace web {
           emp_i.ctx.beginPath();
           emp_i.ctx.rect($0, $1, $2, $3);
         }, x, y, w, h);  // Draw the rectangle
-      if (fill_color.size()) Fill(fill_color);
-      if (line_color.size()) Stroke(line_color);
+      ApplyColor();
     }
     CanvasAction * Clone() const { return new CanvasRect(*this); }
   };
@@ -117,8 +121,7 @@ namespace web {
         emp_i.ctx.closePath();
         emp_i.ctx.translate($0,$1);
       }, -x, -y);  // Close the polygon
-      if (fill_color.size()) Fill(fill_color);
-      if (line_color.size()) Stroke(line_color);
+      ApplyColor();
     }
     CanvasAction * Clone() const { return new CanvasPolygon(*this); }
   };
@@ -138,10 +141,39 @@ namespace web {
         emp_i.ctx.lineTo($2, $3);
         emp_i.ctx.closePath();
       }, x, y, x2, y2);
+      // ApplyColor();
       Stroke(line_color);
     }
     CanvasAction * Clone() const { return new CanvasLine(*this); }
   };
+
+  class CanvasText : public CanvasShape {
+  protected:
+    std::string text;
+    bool center;
+  public:
+    CanvasText(double x, double y, const std::string & _text,
+               const std::string & fc="", const std::string & lc="")
+      : CanvasShape(x, y, fc, lc), text(_text), center(false) { ; }
+
+    void Apply() {
+      if (center) {
+        EM_ASM({ emp_i.ctx.textAlign = "center"; });
+        EM_ASM({ emp_i.ctx.textBaseline = "middle"; });
+      }
+      EM_ASM_ARGS({
+        emp_i.ctx.fillStyle = Pointer_stringify($3);
+        var text = Pointer_stringify($2);
+        emp_i.ctx.fillText(text,$0,$1);
+      }, x, y, text.c_str(), fill_color.c_str());
+    }
+
+    void Center(bool c=true) { center = c; }
+    bool GetCenter() const { return center; }
+
+    CanvasAction * Clone() const { return new CanvasText(*this); }
+  };
+
 }
 }
 

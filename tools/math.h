@@ -29,6 +29,9 @@ namespace emp {
     return (remain < 0.0) ? (remain + mod_val) : remain;
   }
 
+  /// Find the absolute value for any variable.
+  template <typename T> constexpr T Abs(T in) { return (in > 0) ? in : (-in); }
+
   /// Run both min and max on a value to put it into a desired range.
   template <typename TYPE> constexpr TYPE ToRange(const TYPE & value, const TYPE & in_min, const TYPE & in_max) {
     return (value < in_min) ? in_min : ((value > in_max) ? in_max : value);

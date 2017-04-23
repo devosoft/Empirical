@@ -632,6 +632,7 @@ namespace web {
     TableWidget(const Widget & in) : WidgetFacet(in), cur_row(0), cur_col(0) {
       emp_assert(info->IsTableInfo());
     }
+    TableWidget() { ; }
     virtual ~TableWidget() { ; }
 
     using INFO_TYPE = internal::TableInfo;
@@ -712,6 +713,7 @@ namespace web {
     Table(const Widget & in) : TableWidget(in) { ; }
     Table(internal::TableInfo * in_info, size_t _row, size_t _col)
       : TableWidget(in_info, _row, _col) { ; }
+    Table() : TableWidget() { ; }
 
     Table & Clear() { Info()->ClearTable(); return *this; }
     Table & ClearStyle() { Info()->extras.style.Clear(); return *this; }

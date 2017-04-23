@@ -85,6 +85,20 @@ namespace web {
   };
 
 
+  class CanvasFont : public CanvasAction {
+  protected:
+    std::string font;
+  public:
+    CanvasFont(const std::string & f) : font(f) { ; }
+
+    void Apply() {
+      EM_ASM_ARGS({
+        emp_i.ctx.font = Pointer_stringify($0);
+      }, font.c_str());
+    }
+    CanvasAction * Clone() const { return new CanvasFont(*this); }
+  };
+
 }
 }
 

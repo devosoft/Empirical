@@ -42,6 +42,9 @@ namespace emp {
     constexpr bool Contains(const Point2D<TYPE> & point) const {
       return center.SquareDistance(point) < GetSquareRadius();
     }
+    constexpr bool Contains(TYPE x, TYPE y) const {
+      return center.SquareDistance(Point2D<TYPE>(x,y)) < GetSquareRadius();
+    }
     constexpr bool Contains(const Circle2D<TYPE> & other) const {
       return (other.center.Distance(center) + other.GetRadius()) < GetRadius();
     }

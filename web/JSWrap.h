@@ -39,6 +39,8 @@
 //    In order do so, you must define the properties of the object as a tuple
 //    struct in js_object_struct.h. - @ELD
 //  * Made sure JSWrap can take function objects, lambdas, or just function names.
+//  * A callback ID of 0 will always be associated with a nullptr, and thus can be used to
+//    indicate that a function does not exist.
 
 
 #ifndef EMP_JSWRAP_H
@@ -47,12 +49,13 @@
 
 #include <functional>
 #include <tuple>
-#include <array>
 
 #include "../meta/meta.h"
 
+#include "../base/array.h"
 #include "../base/assert.h"
 #include "../base/vector.h"
+
 #include "../tools/functions.h"
 #include "../tools/mem_track.h"
 #include "../tools/tuple_struct.h"
@@ -121,7 +124,7 @@ namespace emp {
     arg_var = tmp_var;   // @CAO Do we need to free the memory in tmp_var?
   }
 
-  template <int ARG_ID, size_t SIZE, typename T> static void LoadArg(std::array<T, SIZE> & arg_var){
+  template <int ARG_ID, size_t SIZE, typename T> static void LoadArg(emp::array<T, SIZE> & arg_var){
     EM_ASM_ARGS({emp_i.__outgoing_array = emp_i.cb_args[$0];}, ARG_ID);
     pass_array_to_cpp(arg_var);
   }
@@ -271,7 +274,7 @@ namespace emp {
   }
 
   template <typename T, size_t N>
-  static void StoreReturn(const std::array<T, N> & ret_var) {
+  static void StoreReturn(const emp::array<T, N> & ret_var) {
     pass_array_to_javascript(ret_var);
     EM_ASM({ emp_i.cb_return = emp_i.__incoming_array; });
   }
@@ -299,7 +302,7 @@ namespace emp {
   }
 
   template <typename T, size_t N>
-  static void StoreReturn(const std::array<T, N> & ret_var, std::string var) {
+  static void StoreReturn(const emp::array<T, N> & ret_var, std::string var) {
     pass_array_to_javascript(ret_var);
     EM_ASM_ARGS({ emp_i.curr_obj[Pointer_stringify($0)] = emp_i.__incoming_array;}, var.c_str());
   }
@@ -427,7 +430,7 @@ namespace emp {
         // Make sure that we are returning the correct number of arguments.  If this
         // assert fails, it means that we've failed to set the correct number of arguments
         // in emp.cb_args, and need to realign.
-        emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() >= num_args, EMP_GetCBArgCount(), num_args);
+        emp_assert(EMP_GetCBArgCount() < 0 || EMP_GetCBArgCount() >= num_args, EMP_GetCBArgCount(), num_args);
 
         // Collect the values of the arguments in a tuple
         using args_t = std::tuple< typename std::decay<ARG_TYPES>::type... >;
@@ -468,7 +471,7 @@ namespace emp {
         // Make sure that we are returning the correct number of arguments.  If this
         // assert fails, it means that we've failed to set the correct number of arguments
         // in emp.cb_args, and need to realign.
-        emp_assert(EMP_GetCBArgCount < 0 || EMP_GetCBArgCount() >= num_args, EMP_GetCBArgCount(), num_args);
+        emp_assert(EMP_GetCBArgCount() < 0 || EMP_GetCBArgCount() >= num_args, EMP_GetCBArgCount(), num_args);
 
         // Collect the values of the arguments in a tuple
         using args_t = std::tuple< typename std::decay<ARG_TYPES>::type... >;
@@ -487,7 +490,7 @@ namespace emp {
     // The following function returns a static callback array; callback ID's all index into
     // this array.
     static emp::vector<JSWrap_Callback_Base *> & CallbackArray() {
-      static emp::vector<JSWrap_Callback_Base *> callback_array;
+      static emp::vector<JSWrap_Callback_Base *> callback_array(1, nullptr);
       return callback_array;
     }
 

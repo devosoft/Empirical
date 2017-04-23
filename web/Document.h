@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016
+//  Copyright (C) Michigan State University, 2015-2017
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -121,6 +121,7 @@ namespace web {
 
     // Setup a quick way to retrieve old helpers by name.
     web::Animate & Animate (const std::string & in_id) { return *(anim_map[in_id]); }
+    web::Animate & Animation (const std::string & in_id) { return *(anim_map[in_id]); }
   };
 
 }
