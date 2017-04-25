@@ -5,21 +5,6 @@
 //
 //  This is a hardcoded CPU for Avida.
 //
-//  Instruction Set:
-//    Inc, Dec, Not                   :  REG
-//    Add, Sub, Mult, Div, Mod        :  IN1, IN2, OUT1
-//    TestEqu, TestNEqu, TestLess     :  IN1, IN2, OUT1
-//    If, While                       :  TEST, SCOPE
-//    DoCount                         :  MAX_VAL, COUNTER, SCOPE
-//    Scope                           :  SCOPE                   (change current scope)
-//    Define                          :  LABEL, SCOPE            (build a function / call it)
-//    Call                            :  LABEL                   (build a function / call it)
-//    Label, Jump, JumpIf0, JumpIfN0  :  LABEL, TEST
-//    Push, Pop, Input, Output        :  VAL
-//    CopyVal                         :  FROM, TO
-//    ScopeReg                        :  REG                     (move var into current scope)
-//    ResetReg                        :  REG
-//
 //
 //  Developer Notes:
 //  * This implementation is intended to run fast, but not be flexible so that it will
@@ -33,6 +18,7 @@
 #include "../base/array.h"
 #include "../base/vector.h"
 
+#include "InstLib.h"
 
 namespace emp {
 
@@ -44,7 +30,7 @@ namespace emp {
     enum class InstID {
       Inc, Dec, Not, Add, Sub, Mult, Div, Mod,TestEqu, TestNEqu, TestLess,
       If, While, DoCount, Break, Scope, Define, Call, Label, Jump, JumpIf0, JumpIfN0,
-      Push, Pop, Input, Output, CopyVal, ScopeVar,
+      Push, Pop, Input, Output, CopyVal, ScopeReg, ResetReg,
       Unknown
     };
 
@@ -84,27 +70,6 @@ namespace emp {
     // This function fast-forwards to the end of the specified scope.
     void BypassScope(int scope) { ; }
 
-    int String2Arg(const std::string & str) {
-      if (str == "") return 0;
-      if (str == "RegA") return 0;
-      if (str == "RegB") return 1;
-      if (str == "RegC") return 2;
-      if (str == "RegD") return 3;
-      if (str == "RegE") return 4;
-      if (str == "RegF") return 5;
-      if (str == "RegG") return 6;
-      if (str == "RegH") return 7;
-      if (str == "RegI") return 8;
-      if (str == "RegJ") return 9;
-      if (str == "RegK") return 10;
-      if (str == "RegL") return 11;
-      if (str == "RegM") return 12;
-      if (str == "RegN") return 13;
-      if (str == "RegO") return 14;
-      if (str == "RegP") return 15;
-      emp_assert(false, str);
-    }
-
   public:
     AvidaGP() : inst_ptr(0), errors(0) {
       // Initialize registers to their posision.  So Reg0 = 0 and Reg11 = 11.
@@ -135,6 +100,8 @@ namespace emp {
 
     /// Process the next SERIES of instructions, directed by the instruction pointer.
     void Process(size_t num_inst) { for (size_t i = 0; i < num_inst; i++) SingleProcess(); }
+
+    static const InstLib<Instruction> & GetInstLib();
   };
 
   // // @CAO: This function should be incorporated into standard config functions.
@@ -216,7 +183,8 @@ namespace emp {
     case InstID::Input: break;
     case InstID::Output: break;
     case InstID::CopyVal: break;
-    case InstID::ScopeVar: break;
+    case InstID::ScopeReg: break;
+    case InstID::ResetReg: break;
     case InstID::Unknown:
     default:
       // This case should never happen!
@@ -228,6 +196,65 @@ namespace emp {
     if (inst_ptr >= genome.size()) inst_ptr = 0;
     ProcessInst( genome[inst_ptr] );
     inst_ptr++;
+  }
+
+  /// This static function can be used to access the generic AvidaGP instruction library.
+  const InstLib<AvidaGP::Instruction> & AvidaGP::GetInstLib() {
+    static InstLib<Instruction> inst_lib;
+    static bool init = false;
+
+    if (!init) {
+      inst_lib.AddInst(InstID::Inc, "Inc", "Increment value in register specified by Arg1", 1);
+      inst_lib.AddInst(InstID::Dec, "Dec", "Decrement value in register specified by Arg1", 1);
+      inst_lib.AddInst(InstID::Not, "Not", "Logically toggle value in register specified by Arg1", 1);
+      inst_lib.AddInst(InstID::Add, "Add", "Arg3 = Arg1 + Arg2", 3);
+      inst_lib.AddInst(InstID::Sub, "Sub", "Arg3 = Arg1 - Arg2", 3);
+      inst_lib.AddInst(InstID::Mult, "Mult", "Arg3 = Arg1 * Arg2", 3);
+      inst_lib.AddInst(InstID::Div, "Div", "Arg3 = Arg1 / Arg2", 3);
+      inst_lib.AddInst(InstID::Mod, "Mod", "Arg3 = Arg1 % Arg2", 3);
+      inst_lib.AddInst(InstID::TestEqu, "TestEqu", "Arg3 = (Arg1 == Arg2)", 3);
+      inst_lib.AddInst(InstID::TestNEqu, "TestNEqu", "Arg3 = (Arg1 != Arg2)", 3);
+      inst_lib.AddInst(InstID::TestLess, "TestLess", "Arg3 = (Arg1 < Arg2)", 3);
+      inst_lib.AddInst(InstID::If, "If", "If Arg1 != 0, enter scope Arg2; else skip over scope", 2);
+      inst_lib.AddInst(InstID::While, "While", "Until Arg1 != 0, repeat scope Arg2; else skip over scope", 2);
+      inst_lib.AddInst(InstID::DoCount, "DoCount", "Repeat Arg1 times; set Arg2 to iteration and scope to Arg3", 3);
+      inst_lib.AddInst(InstID::Scope, "Scope", "Set scope to Arg1", 1);
+      inst_lib.AddInst(InstID::Define, "Define", "Build a function called Arg1 in scope Arg2", 2);
+      inst_lib.AddInst(InstID::Call, "Call", "Call previously defined function called Arg1", 1);
+      inst_lib.AddInst(InstID::Label, "Label", "Start a label called Arg1", 1);
+      inst_lib.AddInst(InstID::Jump, "Jump", "Jump to label Arg1", 1);
+      inst_lib.AddInst(InstID::JumpIf0, "JumpIf0", "If Arg2 == 0, jump to label Arg1", 2);
+      inst_lib.AddInst(InstID::JumpIfN0, "JumpIfN0", "If Arg2 != 0, jump to label Arg1", 2);
+      inst_lib.AddInst(InstID::Push, "Push", "Push register Arg1 onto stack Arg2", 2);
+      inst_lib.AddInst(InstID::Pop, "Pop", "Pop stack Arg1 into register Arg2", 2);
+      inst_lib.AddInst(InstID::Input, "Input", "Pull next value from input buffer Arg1 into register Arg2", 2);
+      inst_lib.AddInst(InstID::Output, "Output", "Push reg Arg1 into output buffer Arg2", 2);
+      inst_lib.AddInst(InstID::CopyVal, "CopyVal", "Copy reg Arg1 into reg Arg2", 2);
+      inst_lib.AddInst(InstID::ScopeReg, "ScopeReg", "Backup reg Arg1; restore at end of scope", 1);
+      inst_lib.AddInst(InstID::ResetReg, "ResetReg", "Restore Arg1 to its starting value", 1);
+      inst_lib.AddInst(InstID::Unknown, "Unknown", "Error: Unknown instruction used.", 0);
+
+      inst_lib.AddArg("RegA", 0);
+      inst_lib.AddArg("RegB", 1);
+      inst_lib.AddArg("RegC", 2);
+      inst_lib.AddArg("RegD", 3);
+      inst_lib.AddArg("RegE", 4);
+      inst_lib.AddArg("RegF", 5);
+      inst_lib.AddArg("RegG", 6);
+      inst_lib.AddArg("RegH", 7);
+      inst_lib.AddArg("RegI", 8);
+      inst_lib.AddArg("RegJ", 9);
+      inst_lib.AddArg("RegK", 10);
+      inst_lib.AddArg("RegL", 11);
+      inst_lib.AddArg("RegM", 12);
+      inst_lib.AddArg("RegN", 13);
+      inst_lib.AddArg("RegO", 14);
+      inst_lib.AddArg("RegP", 15);
+
+      init = true;
+    }
+
+    return inst_lib;
   }
 
 }
