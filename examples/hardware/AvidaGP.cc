@@ -18,14 +18,14 @@ int main()
 {
   std::cout << "Test." << std::endl;
 
-  emp::InstLib<emp::AvidaGP::Inst> inst_lib;
+  emp::InstLib<emp::AvidaGP::Instruction> inst_lib;
 
   emp::AvidaGP cpu;
   Print(cpu);
-  cpu.PushInst( emp::AvidaGP::Inst::Inc, 1);
-  cpu.PushInst( emp::AvidaGP::Inst::Inc, 1);
-  cpu.PushInst( emp::AvidaGP::Inst::Mult, 1, 2, 3);
-  cpu.PushInst( emp::AvidaGP::Inst::Add, 3, 4, 5);
+  cpu.PushInst( emp::AvidaGP::InstID::Inc, 1);
+  cpu.PushInst( emp::AvidaGP::InstID::Inc, 1);
+  cpu.PushInst( emp::AvidaGP::InstID::Mult, 1, 2, 3);
+  cpu.PushInst( emp::AvidaGP::InstID::Add, 3, 4, 5);
   cpu.Process(4);
   Print(cpu);
   cpu.Process(4);
