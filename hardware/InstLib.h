@@ -95,6 +95,18 @@ namespace emp {
       }
     }
 
+    void ReadInst(genome_t & genome, std::string info) const {
+      std::string name = emp::string_pop_word(info);
+      inst_id_t id = GetID(name);
+      genome.emplace_back(id);
+      size_t num_args = GetNumArgs(id);
+      for (size_t i = 0; i < num_args; i++) {
+        std::string arg_name = emp::string_pop_word(info);
+        // @CAO: Should check to make sure arg name is real.
+        genome.back().args[i] = arg_map[arg_name];
+      }
+    }
+
   };
 
 }
