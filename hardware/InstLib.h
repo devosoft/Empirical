@@ -19,8 +19,10 @@ namespace emp {
   template <typename INST_TYPE>
   class InstLib {
   protected:
+    using inst_t = INST_TYPE;
     using inst_id_t = typename INST_TYPE::id_t;
     using inst_arg_t = typename INST_TYPE::arg_t;
+    using genome_t = emp::vector<inst_t>;
 
     struct InstDef {
       inst_id_t id;
@@ -42,24 +44,9 @@ namespace emp {
     InstLib() { ; }
     ~InstLib() { ; }
 
-    void AddInst(inst_id_t inst_id, const std::string & name,
-                   const std::string & desc="",
-                   size_t num_args=0)
-    {
-      const size_t id = (size_t) inst_id;
-      if (inst_lib.size() <= id) inst_lib.resize(id+1);
-      inst_lib[id] = InstDef(inst_id, name, desc, num_args);
-      name_map[name] = id;
-    }
-
-    void AddArg(inst_arg_t value, const std::string & name) {
-      emp_assert(!Has(arg_map, name));
-      arg_map[name] = value;
-    }
-
-    const std::string & GetName(inst_id_t id) const { return inst_lib[id].name; }
-    const std::string & GetDesc(inst_id_t id) const { return inst_lib[id].desc; }
-    size_t GetNumArgs(inst_id_t id) const { return inst_lib[id].num_args; }
+    const std::string & GetName(inst_id_t id) const { return inst_lib[(size_t) id].name; }
+    const std::string & GetDesc(inst_id_t id) const { return inst_lib[(size_t) id].desc; }
+    size_t GetNumArgs(inst_id_t id) const { return inst_lib[(size_t) id].num_args; }
     static constexpr char GetSymbol(inst_id_t id) {
       if (id < 26) return ('a' + id);
       if (id < 52) return ('A' + (id - 26));
@@ -80,6 +67,32 @@ namespace emp {
     inst_arg_t GetArg(const std::string & name) {
       emp_assert(Has(arg_map, name));
       return arg_map[name];
+    }
+
+    void AddInst(inst_id_t inst_id, const std::string & name,
+                 size_t num_args=0,
+                 const std::string & desc="")
+    {
+      const size_t id = (size_t) inst_id;
+      if (inst_lib.size() <= id) inst_lib.resize(id+1);
+      inst_lib[id] = InstDef(inst_id, name, desc, num_args);
+      name_map[name] = id;
+    }
+
+    void AddArg(const std::string & name, inst_arg_t value) {
+      emp_assert(!Has(arg_map, name));
+      arg_map[name] = value;
+    }
+
+    void WriteGenome(const genome_t & genome, std::ostream & os=std::cout) const {
+      for (const inst_t & inst : genome) {
+        os << GetName(inst.id);
+        const size_t num_args = GetNumArgs(inst.id);
+        for (size_t i = 0; i < num_args; i++) {
+          os << ' ' << inst.args[i];
+        }
+        os << '\n';
+      }
     }
 
   };
