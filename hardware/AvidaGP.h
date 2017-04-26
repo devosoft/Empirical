@@ -46,7 +46,7 @@ namespace emp {
       id_t id;
       emp::array<arg_t, 3> args;
 
-      Instruction(InstID _id, int _a0, int _a1, int _a2)
+      Instruction(InstID _id, int _a0=0, int _a1=0, int _a2=0)
 	      : id(_id) { args[0] = _a0; args[1] = _a1; args[2] = _a2; }
       Instruction(const Instruction &) = default;
       Instruction(Instruction &&) = default;
@@ -241,7 +241,8 @@ namespace emp {
       inst_lib.AddInst(InstID::Unknown, "Unknown", 0, "Error: Unknown instruction used.");
 
       for (char i = 0; i < AvidaGP::REGS; i++) {
-        inst_lib.AddArg(to_string("Reg", 'A'+i), i);
+        inst_lib.AddArg(to_string(i), i);             // Args can be called by value
+        inst_lib.AddArg(to_string("Reg", 'A'+i), i);  // ...or as a register.
       }
 
       init = true;
