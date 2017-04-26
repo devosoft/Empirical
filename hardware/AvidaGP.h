@@ -29,15 +29,15 @@ namespace emp {
     static constexpr size_t INST_ARGS = 3;
 
     enum class InstID {
-      Inc, Dec, Not, Add, Sub, Mult, Div, Mod,TestEqu, TestNEqu, TestLess,
-      If, While, DoCount, Break, Scope, Define, Call, Label, Jump, JumpIf0, JumpIfN0,
-      Push, Pop, Input, Output, CopyVal, ScopeReg, ResetReg,
+      Inc, Dec, Not, SetReg, Add, Sub, Mult, Div, Mod,TestEqu, TestNEqu, TestLess,
+      If, While, Countdown, Break, Scope, Define, Call, Label, Jump, JumpIf0, JumpIfN0,
+      Push, Pop, Input, Output, CopyVal, ScopeReg,
       Unknown
     };
 
     // ScopeType is used for scopes that we need to do something special at the end.
-    // Eg: WHILE needs to go back to beginning of loop; FUNCTION needs to return to call.
-    enum class ScopeType { BASIC, WHILE, FUNCTION };
+    // Eg: LOOP needs to go back to beginning of loop; FUNCTION needs to return to call.
+    enum class ScopeType { BASIC, LOOP, FUNCTION };
 
     struct Instruction {
       using id_t = InstID;
@@ -55,6 +55,14 @@ namespace emp {
       Instruction & operator=(Instruction &&) = default;
     };
 
+    struct ScopeInfo {
+      size_t scope;
+      ScopeType type;
+      size_t start_pos;
+
+      ScopeInfo(size_t _s, ScopeType _t, size_t _p) : scope(_s), type(_t), start_pos(_p) { ; }
+    };
+
     using inst_t = Instruction;
     using genome_t = emp::vector<inst_t>;
 
@@ -62,24 +70,49 @@ namespace emp {
 
     // Virtual CPU Components!
     genome_t genome;
+    emp::array<double, REGS> regs;
+    emp::vector<ScopeInfo> scope_stack;
     size_t inst_ptr;
+
     size_t errors;
 
-    emp::array<double, REGS> regs;
 
+    size_t CurScope() const { return scope_stack.back().scope; }
+    ScopeType CurScopeType() const { return scope_stack.back().type; }
 
-    // This function gets run every time scope changed (if, while, scope instructions, etc.)
+    // This function is run every time scope changed (if, while, scope instructions, etc.)
     // If we are moving to an outer scope (lower value) we need to close the scope we are in,
     // potentially continuing with a loop.
-    bool UpdateScope(int scope, ScopeType type=ScopeType::BASIC) { return true; }
+    bool UpdateScope(size_t new_scope, ScopeType type=ScopeType::BASIC) {
+      const size_t cur_scope = CurScope();
+      // Test if we are entering a deeper scope.
+      if (new_scope > cur_scope) {
+        scope_stack.emplace_back(new_scope, type, inst_ptr);
+        return true;
+      }
+
+      // Otherwise we are exiting the current scope.  Loop back?
+      if (CurScopeType() == ScopeType::LOOP) {
+        inst_ptr = scope_stack.back().start_pos;  // Move back to the beginning of the loop.
+        scope_stack.pop_back();                   // Clear former scope
+        ProcessInst( genome[inst_ptr] );          // Process the new instruction instead.
+        return false;                             // We did NOT enter the new scope.
+      }
+
+      // If we made it here, we must simply exit the current scope and test again.
+      scope_stack.pop_back();
+
+      return UpdateScope(new_scope, type);
+    }
 
     // This function fast-forwards to the end of the specified scope.
-    void BypassScope(int scope) { ; }
+    void BypassScope(size_t scope) { ; }
 
   public:
     AvidaGP() : inst_ptr(0), errors(0) {
       // Initialize registers to their posision.  So Reg0 = 0 and Reg11 = 11.
       for (size_t i = 0; i < REGS; i++) regs[i] = (double) i;
+      scope_stack.emplace_back(0, ScopeType::BASIC, inst_ptr);
     }
     ~AvidaGP() { ; }
 
@@ -101,6 +134,9 @@ namespace emp {
     /// Process a specified instruction, provided by the caller.
     void ProcessInst(const inst_t & inst);
 
+    /// Determine the scope associated with a particular instruction.
+    size_t InstScope(const inst_t & inst);
+
     /// Process the NEXT instruction pointed to be the instruction pointer
     void SingleProcess();
 
@@ -110,37 +146,12 @@ namespace emp {
     static const InstLib<Instruction> & GetInstLib();
   };
 
-  // // @CAO: This function should be incorporated into standard config functions.
-  // bool AvidaGP::Load(std::istream & input) {
-  //   // Load one line at a time and process each line.
-  //   std::string cur_line;
-  //
-  //   // Loop until eof is hit
-  //   while (!input.eof()) {
-  //     std::getline(input, cur_line);         // Get the current input line.
-  //     ProcessLine(cur_line, extras);         // Clean up line; act on aliases.
-  //
-  //     if (cur_line == "") continue;          // Skip empty lines.
-  //
-  //     std::string inst_name = emp::string_pop_word(cur_line);
-  //     emp::right_justify(cur_line);
-  //
-  //     // Remaining info in cur_line is arguments to instructions.
-  //     int arg1 = String2Arg(emp::string_pop_word(cur_line));
-  //     int arg2 = String2Arg(emp::string_pop_word(cur_line));
-  //     int arg3 = String2Arg(emp::string_pop_word(cur_line));
-  //
-  //     // @CAO Need to load from inst library!
-  //
-  //     return true;
-  //   }
-  // }
-
   void AvidaGP::ProcessInst(const inst_t & inst) {
     switch (inst.id) {
     case InstID::Inc: ++regs[inst.args[0]]; break;
     case InstID::Dec: --regs[inst.args[0]]; break;
     case InstID::Not: regs[inst.args[0]] = !regs[inst.args[0]]; break;
+    case InstID::SetReg: regs[inst.args[0]] = inst.args[1]; break;
     case InstID::Add: regs[inst.args[2]] = regs[inst.args[0]] + regs[inst.args[1]]; break;
     case InstID::Sub: regs[inst.args[2]] = regs[inst.args[0]] - regs[inst.args[1]]; break;
     case InstID::Mult: regs[inst.args[2]] = regs[inst.args[0]] * regs[inst.args[1]]; break;
@@ -170,14 +181,20 @@ namespace emp {
 
     case InstID::While:
       // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
-      if (UpdateScope(inst.args[1], ScopeType::WHILE) == false) break;
+      if (UpdateScope(inst.args[1], ScopeType::LOOP) == false) break;
       if (!regs[inst.args[0]]) BypassScope(inst.args[1]);   // If test fails, move to scope end.
+      break;
+
+    case InstID::Countdown:  // Same as while, but auto-decriments test each loop.
+      // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
+      if (UpdateScope(inst.args[1], ScopeType::LOOP) == false) break;
+      if (!regs[inst.args[0]]) BypassScope(inst.args[1]);   // If test fails, move to scope end.
+      regs[inst.args[0]]--;
       break;
 
     case InstID::Break: BypassScope(inst.args[0]); break;
     case InstID::Scope: UpdateScope(inst.args[0]); break;
 
-    case InstID::DoCount: break;
     case InstID::Define: break;
     case InstID::Call: break;
     case InstID::Label: break;
@@ -190,11 +207,27 @@ namespace emp {
     case InstID::Output: break;
     case InstID::CopyVal: break;
     case InstID::ScopeReg: break;
-    case InstID::ResetReg: break;
+
     case InstID::Unknown:
     default:
       // This case should never happen!
       emp_assert(false, "Unknown instruction being exectuted!");
+    };
+  }
+
+  size_t AvidaGP::InstScope(const inst_t & inst) {
+    switch (inst.id) {
+    case InstID::If:
+    case InstID::While:
+    case InstID::Countdown:  // Same as while, but auto-decriments test each loop.
+    case InstID::Define:
+      return inst.args[1]+1;
+
+    case InstID::Scope:
+      return inst.args[0]+1;
+
+    default:
+      return 0;
     };
   }
 
@@ -213,6 +246,7 @@ namespace emp {
       inst_lib.AddInst(InstID::Inc, "Inc", 1, "Increment value in register specified by Arg1");
       inst_lib.AddInst(InstID::Dec, "Dec", 1, "Decrement value in register specified by Arg1");
       inst_lib.AddInst(InstID::Not, "Not", 1, "Logically toggle value in register specified by Arg1");
+      inst_lib.AddInst(InstID::SetReg, "SetReg", 2, "Set Arg1 to numerical value of Arg2");
       inst_lib.AddInst(InstID::Add, "Add", 3, "Arg3 = Arg1 + Arg2");
       inst_lib.AddInst(InstID::Sub, "Sub", 3, "Arg3 = Arg1 - Arg2");
       inst_lib.AddInst(InstID::Mult, "Mult", 3, "Arg3 = Arg1 * Arg2");
@@ -223,7 +257,7 @@ namespace emp {
       inst_lib.AddInst(InstID::TestLess, "TestLess", 3, "Arg3 = (Arg1 < Arg2)");
       inst_lib.AddInst(InstID::If, "If", 2, "If Arg1 != 0, enter scope Arg2; else skip over scope");
       inst_lib.AddInst(InstID::While, "While", 2, "Until Arg1 != 0, repeat scope Arg2; else skip over scope");
-      inst_lib.AddInst(InstID::DoCount, "DoCount", 3, "Repeat Arg1 times; set Arg2 to iteration and scope to Arg3");
+      inst_lib.AddInst(InstID::Countdown, "Countdown", 3, "Countdown Arg1 to zero; scope to Arg2");
       inst_lib.AddInst(InstID::Scope, "Scope", 1, "Set scope to Arg1");
       inst_lib.AddInst(InstID::Define, "Define", 2, "Build a function called Arg1 in scope Arg2");
       inst_lib.AddInst(InstID::Call, "Call", 1, "Call previously defined function called Arg1");
@@ -237,7 +271,6 @@ namespace emp {
       inst_lib.AddInst(InstID::Output, "Output", 2, "Push reg Arg1 into output buffer Arg2");
       inst_lib.AddInst(InstID::CopyVal, "CopyVal", 2, "Copy reg Arg1 into reg Arg2");
       inst_lib.AddInst(InstID::ScopeReg, "ScopeReg", 1, "Backup reg Arg1; restore at end of scope");
-      inst_lib.AddInst(InstID::ResetReg, "ResetReg", 1, "Restore Arg1 to its starting value");
       inst_lib.AddInst(InstID::Unknown, "Unknown", 0, "Error: Unknown instruction used.");
 
       for (char i = 0; i < AvidaGP::REGS; i++) {
