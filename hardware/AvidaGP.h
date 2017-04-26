@@ -17,6 +17,7 @@
 
 #include "../base/array.h"
 #include "../base/vector.h"
+#include "../tools/Random.h"
 #include "../tools/string_utils.h"
 
 #include "InstLib.h"
@@ -27,6 +28,7 @@ namespace emp {
   public:
     static constexpr size_t REGS = 16;
     static constexpr size_t INST_ARGS = 3;
+    static constexpr size_t STACK_CAP = 16;
 
     enum class InstID {
       Inc, Dec, Not, SetReg, Add, Sub, Mult, Div, Mod,TestEqu, TestNEqu, TestLess,
@@ -71,11 +73,26 @@ namespace emp {
     // Virtual CPU Components!
     genome_t genome;
     emp::array<double, REGS> regs;
-    emp::vector<ScopeInfo> scope_stack;
+    emp::array<double, REGS> inputs;
+    emp::array<double, REGS> outputs;
+    emp::array< emp::vector<double>, REGS > stacks;
+
     size_t inst_ptr;
+    emp::vector<ScopeInfo> scope_stack;
 
     size_t errors;
 
+    double PopStack(size_t id) {
+      if (stacks[id].size() == 0) return 0.0;
+      double out = stacks[id].back();
+      stacks[id].pop_back();
+      return out;
+    }
+
+    void PushStack(size_t id, double value) {
+      if (stacks[id].size() >= STACK_CAP) return;
+      stacks[id].push_back(value);
+    }
 
     size_t CurScope() const { return scope_stack.back().scope; }
     ScopeType CurScopeType() const { return scope_stack.back().type; }
@@ -124,7 +141,11 @@ namespace emp {
   public:
     AvidaGP() : inst_ptr(0), errors(0) {
       // Initialize registers to their posision.  So Reg0 = 0 and Reg11 = 11.
-      for (size_t i = 0; i < REGS; i++) regs[i] = (double) i;
+      for (size_t i = 0; i < REGS; i++) {
+        regs[i] = (double) i;
+        inputs[i] = 0.0;
+        outputs[i] = 0.0;
+      }
       scope_stack.emplace_back(0, ScopeType::BASIC, inst_ptr);
     }
     ~AvidaGP() { ; }
@@ -215,10 +236,10 @@ namespace emp {
     case InstID::Jump: break;
     case InstID::JumpIf0: break;
     case InstID::JumpIfN0: break;
-    case InstID::Push: break;
-    case InstID::Pop: break;
-    case InstID::Input: break;
-    case InstID::Output: break;
+    case InstID::Push: PushStack(inst.args[1], regs[inst.args[0]]); break;
+    case InstID::Pop: regs[inst.args[1]] = PopStack(inst.args[0]); break;
+    case InstID::Input: regs[inst.args[1]] = inputs[inst.args[0]]; break;
+    case InstID::Output: inputs[inst.args[1]] = regs[inst.args[0]]; break;
     case InstID::CopyVal: break;
     case InstID::ScopeReg: break;
 
