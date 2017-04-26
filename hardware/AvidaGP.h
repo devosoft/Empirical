@@ -85,6 +85,7 @@ namespace emp {
     // potentially continuing with a loop.
     bool UpdateScope(size_t new_scope, ScopeType type=ScopeType::BASIC) {
       const size_t cur_scope = CurScope();
+      new_scope++;                           // Scopes are stored as one hire than regs (Outer is 0)
       // Test if we are entering a deeper scope.
       if (new_scope > cur_scope) {
         scope_stack.emplace_back(new_scope, type, inst_ptr);
@@ -106,7 +107,19 @@ namespace emp {
     }
 
     // This function fast-forwards to the end of the specified scope.
-    void BypassScope(size_t scope) { ; }
+    void BypassScope(size_t scope) {
+      scope_stack.pop_back();
+      while (inst_ptr < genome.size()) {
+        inst_ptr++;
+        const size_t test_scope = InstScope(genome[inst_ptr]);
+
+        // If this instruction sets the scope AND it's outside the one we want to end, stop here!
+        if (test_scope && test_scope <= scope) {
+          inst_ptr--;
+          break;
+        }
+      }
+    }
 
   public:
     AvidaGP() : inst_ptr(0), errors(0) {
@@ -120,6 +133,7 @@ namespace emp {
     inst_t GetInst(size_t pos) const { return genome[pos]; }
     const genome_t & GetGenome() const { return genome; }
     double GetReg(size_t id) const { return regs[id]; }
+    size_t GetIP() const { return inst_ptr; }
 
     void SetInst(size_t pos, const inst_t & inst) { genome[pos] = inst; }
     void SetGneome(const genome_t & g) { genome = g; }
@@ -189,7 +203,7 @@ namespace emp {
       // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
       if (UpdateScope(inst.args[1], ScopeType::LOOP) == false) break;
       if (!regs[inst.args[0]]) BypassScope(inst.args[1]);   // If test fails, move to scope end.
-      regs[inst.args[0]]--;
+      else regs[inst.args[0]]--;
       break;
 
     case InstID::Break: BypassScope(inst.args[0]); break;
