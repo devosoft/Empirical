@@ -6,6 +6,7 @@
 
 #include "../../hardware/AvidaGP.h"
 #include "../../hardware/InstLib.h"
+#include "../../tools/Random.h"
 
 void Print(const emp::AvidaGP & cpu) {
   for (size_t i = 0; i < 16; i++) {
@@ -19,6 +20,7 @@ int main()
   std::cout << "Test." << std::endl;
 
   const auto & inst_lib = emp::AvidaGP::GetInstLib();
+  emp::Random random;
 
   emp::AvidaGP cpu;
   Print(cpu);
@@ -31,7 +33,9 @@ int main()
   cpu.PushInst( emp::AvidaGP::InstID::Mult, 1, 2, 3 );
   cpu.PushInst( emp::AvidaGP::InstID::Add, 3, 4, 5 );
 
-  for (size_t i = 0; i < 30; i++) {
+  for (int i = 0; i < 43; i++) cpu.PushRandom(random);
+
+  for (size_t i = 0; i < 100; i++) {
     cpu.Process(1);
     Print(cpu);
   }
