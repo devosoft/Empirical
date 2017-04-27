@@ -39,7 +39,7 @@ namespace emp {
 
     // ScopeType is used for scopes that we need to do something special at the end.
     // Eg: LOOP needs to go back to beginning of loop; FUNCTION needs to return to call.
-    enum class ScopeType { BASIC, LOOP, FUNCTION };
+    enum class ScopeType { ROOT, BASIC, LOOP, FUNCTION };
 
     struct Instruction {
       using id_t = InstID;
@@ -48,7 +48,7 @@ namespace emp {
       id_t id;
       emp::array<arg_t, 3> args;
 
-      Instruction(InstID _id, int _a0=0, int _a1=0, int _a2=0)
+      Instruction(InstID _id=(InstID)0, int _a0=0, int _a1=0, int _a2=0)
 	      : id(_id) { args[0] = _a0; args[1] = _a1; args[2] = _a2; }
       Instruction(const Instruction &) = default;
       Instruction(Instruction &&) = default;
@@ -66,6 +66,7 @@ namespace emp {
       ScopeType type;
       size_t start_pos;
 
+      ScopeInfo() : scope(0), type(ScopeType::BASIC), start_pos(0) { ; }
       ScopeInfo(size_t _s, ScopeType _t, size_t _p) : scope(_s), type(_t), start_pos(_p) { ; }
     };
 
@@ -80,9 +81,11 @@ namespace emp {
     emp::array<double, REGS> inputs;
     emp::array<double, REGS> outputs;
     emp::array< emp::vector<double>, REGS > stacks;
+    emp::array< int, REGS> fun_starts;
 
     size_t inst_ptr;
     emp::vector<ScopeInfo> scope_stack;
+    emp::vector<size_t> call_stack;
 
     size_t errors;
 
@@ -106,7 +109,7 @@ namespace emp {
     // potentially continuing with a loop.
     bool UpdateScope(size_t new_scope, ScopeType type=ScopeType::BASIC) {
       const size_t cur_scope = CurScope();
-      new_scope++;                           // Scopes are stored as one hire than regs (Outer is 0)
+      new_scope++;                           // Scopes are stored as one higher than regs (Outer is 0)
       // Test if we are entering a deeper scope.
       if (new_scope > cur_scope) {
         scope_stack.emplace_back(new_scope, type, inst_ptr);
@@ -121,6 +124,16 @@ namespace emp {
         return false;                             // We did NOT enter the new scope.
       }
 
+      // Or are we exiting a function?
+      if (CurScopeType() == ScopeType::FUNCTION) {
+        inst_ptr = call_stack.back();             // Return from the function call.
+        call_stack.pop_back();                    // Clear the return position from the call stack.
+        scope_stack.pop_back();                   // Clear former scope
+        ProcessInst( genome[inst_ptr] );          // Process the new instruction instead.
+        return false;                             // We did NOT enter the new scope.
+      }
+
+
       // If we made it here, we must simply exit the current scope and test again.
       scope_stack.pop_back();
 
@@ -130,8 +143,10 @@ namespace emp {
     // This function fast-forwards to the end of the specified scope.
     // NOTE: Bypass scope always drops out of the innermost scope no matter the arg provided.
     void BypassScope(size_t scope) {
+      if (CurScope() < scope) return;  // Only continue if break is relevant for current scope.
+
       scope_stack.pop_back();
-      while (inst_ptr < genome.size()) {
+      while (inst_ptr+1 < genome.size()) {
         inst_ptr++;
         const size_t test_scope = InstScope(genome[inst_ptr]);
 
@@ -144,16 +159,28 @@ namespace emp {
     }
 
   public:
-    AvidaGP() : inst_ptr(0), errors(0) {
+    AvidaGP() : inst_ptr(0), errors(0) { Reset(); }
+    ~AvidaGP() { ; }
+
+    void Reset() {
+      // Clear out genome
+      genome.resize(0);
+
       // Initialize registers to their posision.  So Reg0 = 0 and Reg11 = 11.
       for (size_t i = 0; i < REGS; i++) {
         regs[i] = (double) i;
         inputs[i] = 0.0;
         outputs[i] = 0.0;
+        stacks[i].resize(0);
+        fun_starts[i] = -1;
       }
-      scope_stack.emplace_back(0, ScopeType::BASIC, inst_ptr);
+
+      inst_ptr = 0;
+      scope_stack.resize(0);
+      scope_stack.emplace_back(0, ScopeType::ROOT, inst_ptr);
+      call_stack.resize(0);
+      errors = 0;
     }
-    ~AvidaGP() { ; }
 
     // Accessors
     inst_t GetInst(size_t pos) const { return genome[pos]; }
@@ -245,17 +272,34 @@ namespace emp {
     case InstID::Break: BypassScope(inst.args[0]); break;
     case InstID::Scope: UpdateScope(inst.args[0]); break;
 
-    case InstID::Define: break;
-    case InstID::Call: break;
+    case InstID::Define: {
+        if (UpdateScope(inst.args[1]) == false) break;  // Update which scope we are in.
+        fun_starts[inst.args[0]] = inst_ptr;            // Record where function should be exectuted.
+        BypassScope(inst.args[1]);                      // Skip over the function definition for now.
+      }
+      break;
+    case InstID::Call: {
+        size_t def_pos = fun_starts[inst.args[0]];
+        // Make sure function exists and is still in place.
+        if (def_pos >= genome.size() || genome[def_pos].id != InstID::Define) break;
+        // Go back into the function's original scope (call is in that scope)
+        size_t fun_scope = genome[def_pos].args[1];
+        if (UpdateScope(fun_scope, ScopeType::FUNCTION) == false) break;
+        call_stack.push_back(inst_ptr+1);                 // Back up the call position
+        inst_ptr = def_pos;                               // Jump to the function body (will adavance)
+      }
+      break;
     case InstID::Label: break;
     case InstID::Jump: break;
     case InstID::JumpIf0: break;
     case InstID::JumpIfN0: break;
+
     case InstID::Push: PushStack(inst.args[1], regs[inst.args[0]]); break;
     case InstID::Pop: regs[inst.args[1]] = PopStack(inst.args[0]); break;
     case InstID::Input: regs[inst.args[1]] = inputs[inst.args[0]]; break;
     case InstID::Output: inputs[inst.args[1]] = regs[inst.args[0]]; break;
     case InstID::CopyVal: regs[inst.args[1]] = regs[inst.args[0]]; break;
+
     case InstID::ScopeReg: break;
 
     case InstID::Unknown:
