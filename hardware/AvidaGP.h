@@ -10,6 +10,9 @@
 //  * This implementation is intended to run fast, but not be flexible so that it will
 //    be quick to implement.  It can be used as a baseline comparison for timings on more
 //    flexible implementations later.
+//  * We should clean up how we handle scope; the root scope is zero, so the arg-based
+//    scopes are 1-16 (or however many).  Right now we increment the value in various places
+//    and should be more consistent.
 
 
 #ifndef EMP_AVIDA_GP_H
@@ -119,6 +122,7 @@ namespace emp {
       // Otherwise we are exiting the current scope.  Loop back?
       if (CurScopeType() == ScopeType::LOOP) {
         inst_ptr = scope_stack.back().start_pos;  // Move back to the beginning of the loop.
+        emp_assert(scope_stack.size() != 1);
         scope_stack.pop_back();                   // Clear former scope
         ProcessInst( genome[inst_ptr] );          // Process the new instruction instead.
         return false;                             // We did NOT enter the new scope.
@@ -127,7 +131,9 @@ namespace emp {
       // Or are we exiting a function?
       if (CurScopeType() == ScopeType::FUNCTION) {
         inst_ptr = call_stack.back();             // Return from the function call.
+        if (inst_ptr >= genome.size()) inst_ptr=0; // Call may have occured at end of genome.
         call_stack.pop_back();                    // Clear the return position from the call stack.
+        emp_assert(scope_stack.size() != 1);
         scope_stack.pop_back();                   // Clear former scope
         ProcessInst( genome[inst_ptr] );          // Process the new instruction instead.
         return false;                             // We did NOT enter the new scope.
@@ -135,6 +141,7 @@ namespace emp {
 
 
       // If we made it here, we must simply exit the current scope and test again.
+      emp_assert(scope_stack.size() != 1);
       scope_stack.pop_back();
 
       return UpdateScope(new_scope, type);
@@ -143,8 +150,10 @@ namespace emp {
     // This function fast-forwards to the end of the specified scope.
     // NOTE: Bypass scope always drops out of the innermost scope no matter the arg provided.
     void BypassScope(size_t scope) {
-      if (CurScope() < scope) return;  // Only continue if break is relevant for current scope.
+      scope++;                           // Scopes are stored as one higher than regs (Outer is 0)
+      if (CurScope() < scope) return;    // Only continue if break is relevant for current scope.
 
+      emp_assert(scope_stack.size() != 1, CurScope(), scope);
       scope_stack.pop_back();
       while (inst_ptr+1 < genome.size()) {
         inst_ptr++;
@@ -177,7 +186,7 @@ namespace emp {
 
       inst_ptr = 0;
       scope_stack.resize(0);
-      scope_stack.emplace_back(0, ScopeType::ROOT, inst_ptr);
+      scope_stack.emplace_back(0, ScopeType::ROOT, 0);
       call_stack.resize(0);
       errors = 0;
     }
