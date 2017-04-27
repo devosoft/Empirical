@@ -55,6 +55,10 @@ namespace emp {
 
       Instruction & operator=(const Instruction &) = default;
       Instruction & operator=(Instruction &&) = default;
+
+      void Set(InstID _id, int _a0=0, int _a1=0, int _a2=0)
+	      { id = _id; args[0] = _a0; args[1] = _a1; args[2] = _a2; }
+
     };
 
     struct ScopeInfo {
@@ -158,10 +162,20 @@ namespace emp {
     size_t GetIP() const { return inst_ptr; }
 
     void SetInst(size_t pos, const inst_t & inst) { genome[pos] = inst; }
-    void SetGneome(const genome_t & g) { genome = g; }
+    void SetInst(size_t pos, InstID id, int a0=0, int a1=0, int a2=0) {
+      genome[pos].Set(id, a0, a1, a2);
+    }
+    void SetGenome(const genome_t & g) { genome = g; }
+    void RandomizeInst(size_t pos, Random & rand) {
+      SetInst(pos, (InstID) rand.GetUInt((uint32_t) InstID::Unknown),
+              rand.GetInt(REGS), rand.GetInt(REGS), rand.GetInt(REGS) );
+    }
 
-    void PushInst(InstID inst, int arg0=0, int arg1=0, int arg2=0) {
-      genome.emplace_back(inst, arg0, arg1, arg2);
+    void PushInst(InstID id, int a0=0, int a1=0, int a2=0) { genome.emplace_back(id, a0, a1, a2); }
+    void PushInst(const Instruction & inst) { genome.emplace_back(inst); }
+    void PushRandom(Random & rand) {
+      PushInst((InstID) rand.GetUInt((uint32_t) InstID::Unknown),
+               rand.GetInt(REGS), rand.GetInt(REGS), rand.GetInt(REGS) );
     }
 
     // Loading whole genomes.
