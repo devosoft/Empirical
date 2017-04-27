@@ -31,7 +31,7 @@ namespace emp {
     static constexpr size_t STACK_CAP = 16;
 
     enum class InstID {
-      Inc, Dec, Not, SetReg, Add, Sub, Mult, Div, Mod,TestEqu, TestNEqu, TestLess,
+      Inc, Dec, Not, SetReg, Add, Sub, Mult, Div, Mod, TestEqu, TestNEqu, TestLess,
       If, While, Countdown, Break, Scope, Define, Call, Label, Jump, JumpIf0, JumpIfN0,
       Push, Pop, Input, Output, CopyVal, ScopeReg,
       Unknown
@@ -308,6 +308,7 @@ namespace emp {
       inst_lib.AddInst(InstID::If, "If", 2, "If Arg1 != 0, enter scope Arg2; else skip over scope");
       inst_lib.AddInst(InstID::While, "While", 2, "Until Arg1 != 0, repeat scope Arg2; else skip over scope");
       inst_lib.AddInst(InstID::Countdown, "Countdown", 3, "Countdown Arg1 to zero; scope to Arg2");
+      inst_lib.AddInst(InstID::Break, "Break", 1, "Break out of scope Arg1");
       inst_lib.AddInst(InstID::Scope, "Scope", 1, "Set scope to Arg1");
       inst_lib.AddInst(InstID::Define, "Define", 2, "Build a function called Arg1 in scope Arg2");
       inst_lib.AddInst(InstID::Call, "Call", 1, "Call previously defined function called Arg1");
