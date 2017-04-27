@@ -124,6 +124,7 @@ namespace emp {
     }
 
     // This function fast-forwards to the end of the specified scope.
+    // NOTE: Bypass scope always drops out of the innermost scope no matter the arg provided.
     void BypassScope(size_t scope) {
       scope_stack.pop_back();
       while (inst_ptr < genome.size()) {
@@ -240,7 +241,7 @@ namespace emp {
     case InstID::Pop: regs[inst.args[1]] = PopStack(inst.args[0]); break;
     case InstID::Input: regs[inst.args[1]] = inputs[inst.args[0]]; break;
     case InstID::Output: inputs[inst.args[1]] = regs[inst.args[0]]; break;
-    case InstID::CopyVal: break;
+    case InstID::CopyVal: regs[inst.args[1]] = regs[inst.args[0]]; break;
     case InstID::ScopeReg: break;
 
     case InstID::Unknown:
