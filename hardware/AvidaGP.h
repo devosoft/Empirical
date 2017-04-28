@@ -229,6 +229,9 @@ namespace emp {
     /// Process the next SERIES of instructions, directed by the instruction pointer.
     void Process(size_t num_inst) { for (size_t i = 0; i < num_inst; i++) SingleProcess(); }
 
+    /// Print out this program.
+    void PrintGenome(std::ostream & os);
+
     static const InstLib<Instruction> & GetInstLib();
   };
 
@@ -338,6 +341,37 @@ namespace emp {
     if (inst_ptr >= genome.size()) inst_ptr = 0;
     ProcessInst( genome[inst_ptr] );
     inst_ptr++;
+  }
+
+  void AvidaGP::PrintGenome(std::ostream & os=std::cout) {
+    const auto & inst_lib = GetInstLib();
+    size_t cur_scope = 0;
+
+    for (const inst_t & inst : genome) {
+      size_t new_scope = InstScope(inst);
+
+      if (new_scope) {
+        if (new_scope == cur_scope) {
+          for (size_t i = 0; i < cur_scope; i++) os << " ";
+          os << "----\n";
+        }
+        if (new_scope < cur_scope) {
+          cur_scope = new_scope-1;
+        }
+      }
+
+      for (size_t i = 0; i < cur_scope; i++) os << " ";
+      os << inst_lib.GetName(inst.id);
+      const size_t num_args = inst_lib.GetNumArgs(inst.id);
+      for (size_t i = 0; i < num_args; i++) {
+        os << ' ' << inst.args[i];
+      }
+      if (new_scope) {
+        if (new_scope > cur_scope) os << " --> ";
+        cur_scope = new_scope;
+      }
+      os << '\n';
+    }
   }
 
   /// This static function can be used to access the generic AvidaGP instruction library.
