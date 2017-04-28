@@ -35,7 +35,7 @@ namespace emp {
 
     enum class InstID {
       Inc, Dec, Not, SetReg, Add, Sub, Mult, Div, Mod, TestEqu, TestNEqu, TestLess,
-      If, While, Countdown, Break, Scope, Define, Call, Label, Jump, JumpIf0, JumpIfN0,
+      If, While, Countdown, Break, Scope, Define, Call,
       Push, Pop, Input, Output, CopyVal, ScopeReg,
       Unknown
     };
@@ -301,10 +301,6 @@ namespace emp {
         inst_ptr = def_pos;                               // Jump to the function body (will adavance)
       }
       break;
-    case InstID::Label: break;
-    case InstID::Jump: break;
-    case InstID::JumpIf0: break;
-    case InstID::JumpIfN0: break;
 
     case InstID::Push: PushStack(inst.args[1], regs[inst.args[0]]); break;
     case InstID::Pop: regs[inst.args[1]] = PopStack(inst.args[0]); break;
@@ -399,10 +395,6 @@ namespace emp {
       inst_lib.AddInst(InstID::Scope, "Scope", 1, "Set scope to Arg1");
       inst_lib.AddInst(InstID::Define, "Define", 2, "Build a function called Arg1 in scope Arg2");
       inst_lib.AddInst(InstID::Call, "Call", 1, "Call previously defined function called Arg1");
-      inst_lib.AddInst(InstID::Label, "Label", 1, "Start a label called Arg1");
-      inst_lib.AddInst(InstID::Jump, "Jump", 1, "Jump to label Arg1");
-      inst_lib.AddInst(InstID::JumpIf0, "JumpIf0", 2, "If Arg2 == 0, jump to label Arg1");
-      inst_lib.AddInst(InstID::JumpIfN0, "JumpIfN0", 2, "If Arg2 != 0, jump to label Arg1");
       inst_lib.AddInst(InstID::Push, "Push", 2, "Push register Arg1 onto stack Arg2");
       inst_lib.AddInst(InstID::Pop, "Pop", 2, "Pop stack Arg1 into register Arg2");
       inst_lib.AddInst(InstID::Input, "Input", 2, "Pull next value from input buffer Arg1 into register Arg2");
