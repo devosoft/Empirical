@@ -467,7 +467,7 @@ namespace emp {
   }
 
   namespace {
-    void _from_string(std::stringstream &) { ; }
+    static inline void _from_string(std::stringstream &) { ; }
 
     template <typename T, typename... Ts>
     void _from_string(std::stringstream & ss, T & arg1, Ts... extra_args) {
