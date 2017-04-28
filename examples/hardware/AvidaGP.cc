@@ -19,7 +19,7 @@ int main()
 {
   std::cout << "Test." << std::endl;
 
-  const auto & inst_lib = emp::AvidaGP::GetInstLib();
+  // const auto & inst_lib = emp::AvidaGP::GetInstLib();
   emp::Random random;
 
   emp::AvidaGP cpu;
@@ -40,7 +40,15 @@ int main()
     Print(cpu);
   }
 
-  inst_lib.WriteGenome(cpu.GetGenome());
+  cpu.PrintGenome();
+
+  // Run a ton of organisms.
+  for (int t = 0; t < 100000; t++) {
+    //if (t % 10000 == 0) std::cout << t << std::endl;
+    cpu.Reset();
+    for (int i = 0; i < 100; i++) cpu.PushRandom(random);
+    cpu.Process(200);
+  }
 
   return 0;
 }
