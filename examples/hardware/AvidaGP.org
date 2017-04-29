@@ -1,0 +1,12 @@
+# A:0 B:1 C:2 D:3 E:4 F:5 G:6 H:7 I:8 J:9 K:10 L:11 M:12 N:13 O:14 P:15 
+Inc RegD                 # D = 4
+Dec RegF                 # F = 4
+Not RegI                 # I = 0
+Add RegN RegO RegN       # N = 27
+Sub RegJ RegM RegC       # C = -3
+Mult RegD RegF RegP      # P = 16
+Div RegN RegD RegO       # O = 6.75
+Mod RegN RegP RegM       # M = 11
+TestEqu RegD RegF RegE   # E = 1
+TestNEqu RegB RegK RegK  # K = 1
+TestLess RegA RegC RegG  # G = 0
