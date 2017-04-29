@@ -48,8 +48,8 @@ int main(int argc, char* argv[])
   emp::evo::NKLandscape landscape(N, K, random);
   // emp::evo::NKLandscapeMemo landscape(N, K, random);
 
-  // emp::evo::EAWorld<BitOrg, emp::evo::FitCacheOff> pop(random, "NKWorld");
-  emp::evo::EAWorld<BitOrg, emp::evo::FitCacheOn> pop(random, "NKWorld");
+  emp::evo::EAWorld<BitOrg, emp::evo::FitCacheOff> pop(random, "NKWorld");
+  // emp::evo::EAWorld<BitOrg, emp::evo::FitCacheOn> pop(random, "NKWorld");
 
   // Build a random initial population
   for (uint32_t i = 0; i < POP_SIZE; i++) {
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 
   emp::vector<std::function<double(BitOrg*)>> extra_funs(2);
   extra_funs[0] = [](BitOrg * org) { return (double) org->CountOnes(); };
-  extra_funs[1] = [](BitOrg * org) { return (double) org->size() - org->CountOnes(); };
+  extra_funs[1] = [](BitOrg * org) { return (double) (org->size() - org->CountOnes()); };
 
   // Loop through updates
   for (uint32_t ud = 0; ud < MAX_GENS; ud++) {
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
     pop.EliteSelect(fit_fun, 1, 1);
 
     // Run a tournament for the rest...
-    pop.EcoSelect(fit_fun, extra_funs, 100.0, 5, POP_SIZE-1);
+    pop.EcoSelect(fit_fun, extra_funs, 10000.0, 5, POP_SIZE-1);
     pop.Update();
     std::cout << (ud+1) << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
     pop.MutatePop(1);
