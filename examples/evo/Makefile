@@ -22,7 +22,7 @@ CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../web/lib
 CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
-TARGETS := EcoEA Fitness_Share_NK Grid link_test NK NK-constexpr NK-const-config NK-Serial Roulette Symbulation World bit_evolve
+TARGETS := EcoEA Fitness_Share_NK Grid Lexicase link_test NK NK-constexpr NK-const-config NK-Serial Roulette Symbulation World bit_evolve
 
 EVO_DEPEND := ../../evo/PopulationManager.h ../../evo/World.h
 

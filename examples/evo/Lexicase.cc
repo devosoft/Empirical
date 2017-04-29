@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 
   std::cout << 0 << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 
-  emp::vector<std::function<double(BitOrg*)>> fit_funs(2);
+  emp::vector<std::function<double(BitOrg*)>> fit_funs(3);
   fit_funs[0] = [&landscape](BitOrg * org){ return landscape.GetFitness(*org); };
   fit_funs[1] = [](BitOrg * org) { return (double) org->CountOnes(); };
   fit_funs[2] = [](BitOrg * org) { return (double) (org->size() - org->CountOnes()); };
