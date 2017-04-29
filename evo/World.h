@@ -546,7 +546,22 @@ namespace evo {
       }
 
       // Readjust base fitness to reflect extra resources.
-      // @CAO DO THIS!
+      for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
+        if (max_count[ex_id] == 0) continue;  // No one gets this reward...
+
+        // The current bonus is divided up among the organisms that earned it...
+        const double cur_bonus = pool_sizes[ex_id] / max_count[ex_id];
+        std::cout << "Bonus " << ex_id << " = " << cur_bonus
+                  << "   max_extra_fit = " << max_extra_fit[ex_id]
+                  << std::endl;
+
+        for (size_t org_id = 0; org_id < popM.size(); org_id++) {
+          // If this organism is the best at the current resource, git it the bonus!
+          if (extra_fitnesses[ex_id][org_id] == max_extra_fit[ex_id]) {
+            base_fitness[org_id] += cur_bonus;
+          }
+        }
+      }
 
 
       emp::vector<size_t> entries;
