@@ -92,6 +92,7 @@
 #include "../control/SignalControl.h"
 #include "../meta/reflection.h"
 #include "../tools/Random.h"
+#include "../tools/random_utils.h"
 
 #include "FitnessManager.h"
 #include "OrgSignals.h"
@@ -524,7 +525,7 @@ namespace evo {
     {
       emp_assert(fit_fun);
       emp_assert(t_size > 0 && t_size <= popM.size(), t_size, popM.size());
-      emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
+      emp_assert(random_ptr != nullptr && "EcoSelect() requires active random_ptr");
       emp_assert(fitM.IsCached() == false, "Ecologies mean constantly changing fitness!");
 
       // Setup info to track fitnesses.
@@ -599,6 +600,58 @@ namespace evo {
     {
       emp::vector<double> pools(extra_funs.size(), pool_sizes);
       EcoSelect(fit_fun, extra_funs, pools, t_size, tourny_count);
+    }
+
+    // LexicaseSelect runs through multiple fitness functions in a random order for
+    // EACH offspring produced.
+    // NOTE: You must turn off the FitnessCache for this function to work properly.
+    void LexicaseSelect(const emp::vector<fit_fun_t> & fit_funs, size_t repro_count=1)
+    {
+      emp_assert(random_ptr != nullptr && "LexicaseSelect() requires active random_ptr");
+      emp_assert(fitM.IsCached() == false, "Lexicase constantly changes fitness functions!");
+
+      // Collect all fitness info.
+      emp::vector< emp::vector<double> > fitnesses(fit_funs.size());
+      for (size_t fit_id = 0; fit_id < fit_funs.size(); ++fit_id) {
+        fitnesses[fit_id].resize(popM.size());
+        for (size_t org_id = 0; org_id < popM.size(); ++org_id) {
+          fitnesses[fit_id][org_id] = popM.CalcFitness(org_id, fit_funs[fit_id]);
+        }
+      }
+
+      // Go through a new ordering of fitness functions for each selections.
+      // @CAO: Can probably optimize a bit!
+      // std::set<emp::vector<size_t>> permute_set;
+      emp::vector<size_t> all_orgs(popM.size()), cur_orgs, next_orgs;
+      for (size_t org_id = 0; org_id < popM.size(); org_id++) all_orgs[org_id] = org_id;
+
+      for (size_t repro = 0; repro < repro_count; ++repro) {
+        // Determine the current ordering of the functions.
+        emp::vector<size_t> order = GetPermutation(*random_ptr, fit_funs.size());
+
+        // Step through the functions in the proper order.
+        cur_orgs = all_orgs;  // Start with all of the organisms.
+        for (size_t fit_id : order) {
+          next_orgs.resize(0);
+          double max_fit = fitnesses[fit_id][0];
+          for (size_t org_id : cur_orgs) {
+            const double cur_fit = fitnesses[fit_id][org_id];
+            if (cur_fit > max_fit) {
+              max_fit = cur_fit;
+              next_orgs.resize(0);
+              next_orgs.push_back(org_id);
+            }
+            else if (cur_fit == max_fit) {
+              next_orgs.push_back(org_id);
+            }
+          }
+          std::swap(cur_orgs, next_orgs);
+        }
+
+        // Place a random survivor (all equal) into the next generation!
+        size_t repro_id = cur_orgs[ random_ptr->GetUInt(cur_orgs.size()) ];
+        InsertBirth( *(popM[repro_id]), repro_id, 1 );
+      }
     }
 
     // Update() moves the next population to the current position, managing memory as needed.
