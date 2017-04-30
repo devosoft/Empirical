@@ -171,10 +171,14 @@ namespace emp {
     AvidaGP() : inst_ptr(0), errors(0) { Reset(); }
     ~AvidaGP() { ; }
 
+    /// Reset the entire CPU to a starting state, without a genome.
     void Reset() {
-      // Clear out genome
-      genome.resize(0);
+      genome.resize(0);  // Clear out genome
+      ResetHardware();   // Reset the full hardware
+    }
 
+    /// Reset just the CPU hardware, but keep the genome.
+    void ResetHardware() {
       // Initialize registers to their posision.  So Reg0 = 0 and Reg11 = 11.
       for (size_t i = 0; i < REGS; i++) {
         regs[i] = (double) i;
@@ -183,12 +187,16 @@ namespace emp {
         stacks[i].resize(0);
         fun_starts[i] = -1;
       }
+      errors = 0;
+      ResetIP();
+    }
 
+    /// Reset the instruction pointer to the beginning of the genome AND reset scope.
+    void ResetIP() {
       inst_ptr = 0;
       scope_stack.resize(0);
       scope_stack.emplace_back(0, ScopeType::ROOT, 0);
       call_stack.resize(0);
-      errors = 0;
     }
 
     // Accessors
@@ -264,9 +272,9 @@ namespace emp {
     case InstID::TestLess: regs[inst.args[2]] = (regs[inst.args[0]] < regs[inst.args[1]]); break;
 
     case InstID::If: // args[0] = test, args[1] = scope
-      if (UpdateScope(inst.args[1]) == false) break;     // If previous scope is unfinished, stop!
-      if (!regs[inst.args[0]]) BypassScope(inst.args[1]);   // If test fails, move to scope end.
-      break;                                          // Continue in current code.
+      if (UpdateScope(inst.args[1]) == false) break;      // If previous scope is unfinished, stop!
+      if (!regs[inst.args[0]]) BypassScope(inst.args[1]); // If test fails, move to scope end.
+      break;                                              // Continue in current code.
 
     case InstID::While:
       // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
@@ -298,7 +306,7 @@ namespace emp {
         size_t fun_scope = genome[def_pos].args[1];
         if (UpdateScope(fun_scope, ScopeType::FUNCTION) == false) break;
         call_stack.push_back(inst_ptr+1);                 // Back up the call position
-        inst_ptr = def_pos;                               // Jump to the function body (will adavance)
+        inst_ptr = def_pos+1;                             // Jump to the function body (will adavance)
       }
       break;
 
