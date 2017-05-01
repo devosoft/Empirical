@@ -73,6 +73,15 @@ namespace emp {
       ScopeInfo(size_t _s, ScopeType _t, size_t _p) : scope(_s), type(_t), start_pos(_p) { ; }
     };
 
+    struct RegBackup {
+      size_t scope;
+      size_t reg_id;
+      double value;
+
+      RegBackup() : scope(0), reg_id(0), value(0.0) { ; }
+      RegBackup(size_t _s, size_t _r, double _v) : scope(_s), reg_id(_r), value(_v) { ; }
+    };
+
     using inst_t = Instruction;
     using genome_t = emp::vector<inst_t>;
 
@@ -88,6 +97,7 @@ namespace emp {
 
     size_t inst_ptr;
     emp::vector<ScopeInfo> scope_stack;
+    emp::vector<RegBackup> reg_stack;
     emp::vector<size_t> call_stack;
 
     size_t errors;
@@ -107,6 +117,21 @@ namespace emp {
     size_t CurScope() const { return scope_stack.back().scope; }
     ScopeType CurScopeType() const { return scope_stack.back().type; }
 
+    // Run every time we need to exit the current scope.
+    void ExitScope() {
+      emp_assert(scope_stack.size() > 1, CurScope());
+      emp_assert(scope_stack.size() <= REGS, CurScope());
+
+      // Restore any backed-up registers from this scope...
+      while (reg_stack.size() && reg_stack.back().scope == CurScope()) {
+        regs[reg_stack.back().reg_id] = reg_stack.back().value;
+        reg_stack.pop_back();
+      }
+
+      // Remove the inner-most scope.
+      scope_stack.pop_back();
+    }
+
     // This function is run every time scope changed (if, while, scope instructions, etc.)
     // If we are moving to an outer scope (lower value) we need to close the scope we are in,
     // potentially continuing with a loop.
@@ -119,30 +144,27 @@ namespace emp {
         return true;
       }
 
-      // Otherwise we are exiting the current scope.  Loop back?
+      // Otherwise we are potentially exiting the current scope.  Loop back instead?
       if (CurScopeType() == ScopeType::LOOP) {
         inst_ptr = scope_stack.back().start_pos;  // Move back to the beginning of the loop.
-        emp_assert(scope_stack.size() != 1);
-        scope_stack.pop_back();                   // Clear former scope
-        ProcessInst( genome[inst_ptr] );          // Process the new instruction instead.
+        ExitScope();                              // Clear former scope
+        ProcessInst( genome[inst_ptr] );          // Process loops start again.
         return false;                             // We did NOT enter the new scope.
       }
 
       // Or are we exiting a function?
       if (CurScopeType() == ScopeType::FUNCTION) {
+        // @CAO Make sure we exit multiple scopes if needed to close the function...
         inst_ptr = call_stack.back();             // Return from the function call.
         if (inst_ptr >= genome.size()) inst_ptr=0; // Call may have occured at end of genome.
         call_stack.pop_back();                    // Clear the return position from the call stack.
-        emp_assert(scope_stack.size() != 1);
-        scope_stack.pop_back();                   // Clear former scope
+        ExitScope();                              // Leave the function scope.
         ProcessInst( genome[inst_ptr] );          // Process the new instruction instead.
         return false;                             // We did NOT enter the new scope.
       }
 
-
       // If we made it here, we must simply exit the current scope and test again.
-      emp_assert(scope_stack.size() != 1);
-      scope_stack.pop_back();
+      ExitScope();
 
       return UpdateScope(new_scope, type);
     }
@@ -153,8 +175,7 @@ namespace emp {
       scope++;                           // Scopes are stored as one higher than regs (Outer is 0)
       if (CurScope() < scope) return;    // Only continue if break is relevant for current scope.
 
-      emp_assert(scope_stack.size() != 1, CurScope(), scope);
-      scope_stack.pop_back();
+      ExitScope();
       while (inst_ptr+1 < genome.size()) {
         inst_ptr++;
         const size_t test_scope = InstScope(genome[inst_ptr]);
@@ -168,13 +189,20 @@ namespace emp {
     }
 
   public:
-    AvidaGP() : inst_ptr(0), errors(0) { Reset(); }
+    AvidaGP() : inst_ptr(0), errors(0) {
+      scope_stack.emplace_back(0, ScopeType::ROOT, 0);  // Initial scope.
+      Reset();
+    }
     ~AvidaGP() { ; }
 
+    /// Reset the entire CPU to a starting state, without a genome.
     void Reset() {
-      // Clear out genome
-      genome.resize(0);
+      genome.resize(0);  // Clear out genome
+      ResetHardware();   // Reset the full hardware
+    }
 
+    /// Reset just the CPU hardware, but keep the genome.
+    void ResetHardware() {
       // Initialize registers to their posision.  So Reg0 = 0 and Reg11 = 11.
       for (size_t i = 0; i < REGS; i++) {
         regs[i] = (double) i;
@@ -183,12 +211,16 @@ namespace emp {
         stacks[i].resize(0);
         fun_starts[i] = -1;
       }
-
-      inst_ptr = 0;
-      scope_stack.resize(0);
-      scope_stack.emplace_back(0, ScopeType::ROOT, 0);
-      call_stack.resize(0);
       errors = 0;
+      ResetIP();
+    }
+
+    /// Reset the instruction pointer to the beginning of the genome AND reset scope.
+    void ResetIP() {
+      inst_ptr = 0;
+      while (scope_stack.size() > 1) ExitScope();  // Forcibly exit all scopes except root.
+      call_stack.resize(0);
+      // @CAO also restore the register backups.
     }
 
     // Accessors
@@ -264,9 +296,9 @@ namespace emp {
     case InstID::TestLess: regs[inst.args[2]] = (regs[inst.args[0]] < regs[inst.args[1]]); break;
 
     case InstID::If: // args[0] = test, args[1] = scope
-      if (UpdateScope(inst.args[1]) == false) break;     // If previous scope is unfinished, stop!
-      if (!regs[inst.args[0]]) BypassScope(inst.args[1]);   // If test fails, move to scope end.
-      break;                                          // Continue in current code.
+      if (UpdateScope(inst.args[1]) == false) break;      // If previous scope is unfinished, stop!
+      if (!regs[inst.args[0]]) BypassScope(inst.args[1]); // If test fails, move to scope end.
+      break;                                              // Continue in current code.
 
     case InstID::While:
       // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
@@ -298,7 +330,7 @@ namespace emp {
         size_t fun_scope = genome[def_pos].args[1];
         if (UpdateScope(fun_scope, ScopeType::FUNCTION) == false) break;
         call_stack.push_back(inst_ptr+1);                 // Back up the call position
-        inst_ptr = def_pos;                               // Jump to the function body (will adavance)
+        inst_ptr = def_pos+1;                             // Jump to the function body (will adavance)
       }
       break;
 
@@ -308,7 +340,9 @@ namespace emp {
     case InstID::Output: inputs[inst.args[1]] = regs[inst.args[0]]; break;
     case InstID::CopyVal: regs[inst.args[1]] = regs[inst.args[0]]; break;
 
-    case InstID::ScopeReg: break;
+    case InstID::ScopeReg:
+      reg_stack.emplace_back(CurScope(), inst.args[0], regs[inst.args[0]]);
+      break;
 
     case InstID::Unknown:
     default:

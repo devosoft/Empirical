@@ -484,6 +484,17 @@ namespace emp {
     _from_string(ss, args...);
   }
 
+  /// The from_strings() function takes a vector of strings and convets them into a vector
+  /// of the appropriate type.
+  template <typename T>
+  inline emp::vector<T> from_strings(const emp::vector<std::string> & string_v) {
+    emp::vector<T> vals(string_v.size());
+    for (size_t i = 0; i < string_v.size(); i++) {
+      vals[i] = from_string<T>(string_v[i]);
+    }
+    return vals;
+  }
+
 }
 
 #endif
