@@ -600,6 +600,8 @@ namespace evo {
     // NOTE: You must turn off the FitnessCache for this function to work properly.
     void LexicaseSelect(const emp::vector<fit_fun_t> & fit_funs, size_t repro_count=1)
     {
+      emp_assert(popM.size() > 0);
+      emp_assert(fit_funs.size() > 0);
       emp_assert(random_ptr != nullptr && "LexicaseSelect() requires active random_ptr");
       emp_assert(fitM.IsCached() == false, "Lexicase constantly changes fitness functions!");
 
@@ -607,9 +609,12 @@ namespace evo {
       emp::vector< emp::vector<double> > fitnesses(fit_funs.size());
       for (size_t fit_id = 0; fit_id < fit_funs.size(); ++fit_id) {
         fitnesses[fit_id].resize(popM.size());
+//        std::cout << "[[" << fit_id << "]]";
         for (size_t org_id = 0; org_id < popM.size(); ++org_id) {
           fitnesses[fit_id][org_id] = popM.CalcFitness(org_id, fit_funs[fit_id]);
+//          std::cout << " " << fitnesses[fit_id][org_id];
         }
+//        std::cout << std::endl;
       }
 
       // Go through a new ordering of fitness functions for each selections.
@@ -625,23 +630,25 @@ namespace evo {
         // Step through the functions in the proper order.
         cur_orgs = all_orgs;  // Start with all of the organisms.
         for (size_t fit_id : order) {
-          next_orgs.resize(0);
-          double max_fit = fitnesses[fit_id][0];
+          double max_fit = fitnesses[fit_id][cur_orgs[0]];
           for (size_t org_id : cur_orgs) {
             const double cur_fit = fitnesses[fit_id][org_id];
             if (cur_fit > max_fit) {
-              max_fit = cur_fit;
-              next_orgs.resize(0);
-              next_orgs.push_back(org_id);
+              max_fit = cur_fit;             // This is a the NEW maximum fitness for this function
+              next_orgs.resize(0);           // Clear out orgs with former maximum fitness
+              next_orgs.push_back(org_id);   // Add this org as only one with new max fitness
             }
             else if (cur_fit == max_fit) {
-              next_orgs.push_back(org_id);
+              next_orgs.push_back(org_id);   // Same as cur max fitness -- save this org too.
             }
           }
+          // Make next_orgs into new cur_orgs; make cur_orgs allocated space for next_orgs.
           std::swap(cur_orgs, next_orgs);
+          next_orgs.resize(0);
         }
 
         // Place a random survivor (all equal) into the next generation!
+        emp_assert(cur_orgs.size() > 0, cur_orgs.size(), fit_funs.size(), all_orgs.size());
         size_t repro_id = cur_orgs[ random_ptr->GetUInt(cur_orgs.size()) ];
         InsertBirth( *(popM[repro_id]), repro_id, 1 );
       }
