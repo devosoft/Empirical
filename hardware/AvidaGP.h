@@ -156,9 +156,11 @@ namespace emp {
       if (CurScopeType() == ScopeType::FUNCTION) {
         // @CAO Make sure we exit multiple scopes if needed to close the function...
         inst_ptr = call_stack.back();             // Return from the function call.
-        if (inst_ptr >= genome.size()) inst_ptr=0; // Call may have occured at end of genome.
-        call_stack.pop_back();                    // Clear the return position from the call stack.
-        ExitScope();                              // Leave the function scope.
+        if (inst_ptr >= genome.size()) ResetIP(); // Call may have occured at end of genome.
+        else {
+          call_stack.pop_back();                    // Clear the return position from the call stack.
+          ExitScope();                              // Leave the function scope.
+        }
         ProcessInst( genome[inst_ptr] );          // Process the new instruction instead.
         return false;                             // We did NOT enter the new scope.
       }
@@ -220,7 +222,6 @@ namespace emp {
       inst_ptr = 0;
       while (scope_stack.size() > 1) ExitScope();  // Forcibly exit all scopes except root.
       call_stack.resize(0);
-      // @CAO also restore the register backups.
     }
 
     // Accessors
@@ -368,7 +369,7 @@ namespace emp {
   }
 
   void AvidaGP::SingleProcess() {
-    if (inst_ptr >= genome.size()) inst_ptr = 0;
+    if (inst_ptr >= genome.size()) ResetIP();
     ProcessInst( genome[inst_ptr] );
     inst_ptr++;
   }
