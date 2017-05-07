@@ -19,107 +19,39 @@ namespace emp {
 
   class Mancala {
   private:
-    //Should end cells be their own members? For now lets say no.
-    emp::array<int, 14> board;
-    bool over = false;
-    bool record = false;
-    std::ofstream record_file;
-    int record_player = 0;
+    emp::array<int, 14> board;   // Current board state.
+    bool over = false;           // Has the game ended?
+    int curr_player = 0;         // Which player goes next?
 
   public:
 
-    int curr_player = 0;
-
-    void SetRecord(bool r, int player = 0, std::string filename = "mancala_record.csv") {
-      record = r;
-      record_player = player;
-      if (record) {
-        record_file.open(filename);
-        if (!record_file.good()) {
-          std::cout << "Invalid output file. Exiting." << std::endl;
-          exit(0);  // @CAO: We should run this through a proper error-processing system...
-        }
-        record_file << "0,1,2,3,4,5,6,7,8,9,10,11,12,13,move" << std::endl;
-      }
-    }
-
-    Mancala() {
-      Reset();
-    }
-
-    ~Mancala() {
-      record_file.close();
-    }
+    Mancala() { Reset(); }
+    ~Mancala() { ; }
 
     void Reset() {
-      for (int i = 0; i < (int)board.size(); i++) {
-          board[i] = 4;
-      }
-      board[0] = 0;
-      board[7] = 0;
+      for (size_t i = 0; i < board.size(); i++) { board[i] = 4; }
+      board[0] = board[7] = 0;
       over = false;
       curr_player = 0;
     }
 
-    int operator[](int i) const {
-      return board[i];
-    }
+    int operator[](int i) const { return board[i]; }
 
-    emp::array<int, 14>& GetBoard() {
-      return board;
-    }
+    const emp::array<int, 14>& GetBoard() const { return board; }
 
     emp::array<int, 14> GetFlippedBoard() {
-      emp::array<int, 14> flipped;
-      flipped[7] = board[0];
-      flipped[8] = board[1];
-      flipped[9] = board[2];
-      flipped[10] = board[3];
-      flipped[11] = board[4];
-      flipped[12] = board[5];
-      flipped[13] = board[6];
-
-      flipped[0] = board[7];
-      flipped[1] = board[8];
-      flipped[2] = board[9];
-      flipped[3] = board[10];
-      flipped[4] = board[11];
-      flipped[5] = board[12];
-      flipped[6] = board[13];
+      emp::array<int, 14> flipped(board);
+      for (size_t i = 0; i < 7; i++) std::swap(flipped[i], flipped[i+7]);
       return flipped;
     }
 
-    int GetOpposite(int choice) {
-      int opposite = abs(7 - emp::Mod(choice, 7));
-      if (choice < 7) {
-        opposite += 7;
-      }
-      return opposite;
-    }
-
-    int GetCounterpart(int choice) {
-      if (choice < 7) {
-        choice += 7;
-      } else {
-        choice -= 7;
-      }
-      return choice;
-    }
-
-    void UpdateIsOver() {
+    void TestOver() {
       bool side_1_empty = true;
       bool side_2_empty = true;
 
       for (int i = 1; i < 7; i++) {
-        if (board[i] > 0) {
-          side_1_empty = false;
-        }
-      }
-
-      for (int i = 8; i < 14; i++) {
-        if (board[i] > 0) {
-          side_2_empty = false;
-        }
+        if (board[i] > 0) { side_1_empty = false; }
+        if (board[i+7] > 0) { side_2_empty = false; }
       }
 
       over = ( (!curr_player && side_1_empty) || (curr_player && side_2_empty));
@@ -127,56 +59,40 @@ namespace emp {
 
     // Returns bool indicating whether player can go again
     bool ChooseCell(int cell) {
-      emp_assert(cell != 0 && cell != 7); //You can't choose the end cells
+      emp_assert(cell != 0 && cell != 7); // You can't choose the end cells
       emp_assert((cell < 7 && !curr_player) || (cell > 7 && curr_player));
-      int count = board[cell];
-      int curr_cell = cell;
 
-      if (record && curr_player == record_player) {
-        for (int i = 0; i < 14; i++) {
-          record_file << board[i] << ",";
-        }
-        record_file << cell << std::endl;
-      }
+      int stone_count = board[cell];
+      int curr_cell = cell;
+      size_t home_cell = 7 * (size_t) (cell > 7);  // Track own store; base on start.
+      size_t skip_cell = 7 * (size_t) (cell < 7);  // Skip opponent's store; base on start.
 
       board[cell] = 0;
 
-      while (count > 0) {
-        curr_cell++;
-        if (curr_cell > 13) {
-          curr_cell = 0;
-        }
-        if ((curr_cell == 0 && cell < 7) || (curr_cell == 7 && cell > 7)) {
-          curr_cell++;
-        }
+      while (stone_count > 0) {
+        curr_cell = (curr_cell + 1) % 14;
+        if (curr_cell == skip_cell) curr_cell++;
 
         board[curr_cell]++;
-        count--;
+        stone_count--;
       }
 
       // Go again if you ended in your store
-      if (curr_cell == 0 || curr_cell == 7) {
-        UpdateIsOver();
+      if (curr_cell == home_cell) {
+        TestOver();
         return true;
       }
 
       // Capturing
       if (board[curr_cell] == 1 &&
-          ((curr_cell < 7 && cell < 7) || (curr_cell > 7 && cell > 7))) {
-        int opposite = abs(7 - emp::Mod(curr_cell, 7));
-        if (curr_cell < 7) {
-          opposite += 7;
-          board[7] += board[opposite];
-          board[opposite] = 0;
-        } else {
-          board[0] += board[opposite];
-          board[opposite] = 0;
-        }
-
+          ((curr_cell < 7 && home_cell == 0) || (curr_cell > 7 && home_cell == 7))) {
+        size_t opposite = 14 - curr_cell;
+        board[home_cell] += board[opposite];
+        board[opposite] = 0;
       }
 
       curr_player = (int)!curr_player;
-      UpdateIsOver();
+      TestOver();
       return false;
     }
 
