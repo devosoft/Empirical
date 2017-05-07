@@ -1,0 +1,11 @@
+All games should have common function for easy use in templates:
+
+bool DoMove(size_t player, size_t move) - specifies which move is being made by a player.
+ - Return value indicates if player needs to make another decisions (or go again)
+
+bool TestOver() - is the game over?
+
+bool IsMoveValid(size_t player, size_t move) - is a provided move legal? 
+
+double GetScore(size_t player) - How is the specified player doing?
+ - in a binary win/lose game, these scores will be 0/1 at the end of the game.
