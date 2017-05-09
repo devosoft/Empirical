@@ -133,73 +133,27 @@ namespace emp {
       return (int) (player1 > player0);
     }
 
-    int GetCurrPlayer() const {
-      return curr_player;
+    int GetCurrPlayer() const { return curr_player; }
+    bool IsTurnA() const { return curr_player == 0; }
+    bool IsTurnB() const { return curr_player == 1; }
+
+    size_t ScoreA() const {
+      int score = board[7];
+      for (size_t i = 1; i < 7; i++) {
+        score += board[i];
+      }
+      return score;
     }
 
-    bool IsTurnA() const {
-      return curr_player == 0;
-    }
-
-    bool IsTurnB() const {
-      return curr_player == 1;
-    }
-
-
-    int ScoreDiff(int player) const {
-      int player1 = board[0];
-      int player0 = board[7];
-
-      for (int i = 1; i < 7; i++) {
-        player0 += board[i];
+    size_t ScoreB(int player) const {
+      int score = board[0];
+      for (size_t) i = 8; i < 14; i++) {
+        score += board[i];
       }
-
-      for (int i = 8; i < 14; i++) {
-        player1 += board[i];
-      }
-
-      if (player) {
-        return player1 - player0;
-      } else {
-        return player0 - player1;
-      }
-    }
-
-    void Forfeit() {
-      if (curr_player) {
-        for (int i = 0; i < 14; i++) {
-          if (i != 0 && i != 7) {
-            board[7] += board[i];
-            board[i] = 0;
-          }
-        }
-      } else {
-        for (int i = 0; i < 14; i++) {
-          if (i != 0 && i != 7) {
-            board[0] += board[i];
-            board[i] = 0;
-          }
-        }
-      }
-
-      over = true;
+      return score;
     }
 
   };
-
-  bool IsMoveValid(int move, emp::array<int, 14> board, int curr_player) {
-
-    if (move > 13 || move < 0 || !board[move]) {
-      return false;
-    }
-    if (!curr_player && move < 7 && move > 0) {
-      return true;
-    }
-    if (curr_player && move > 7) {
-      return true;
-    }
-    return false;
-  }
 
 }
 
