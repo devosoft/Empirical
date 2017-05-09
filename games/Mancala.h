@@ -97,49 +97,38 @@ namespace emp {
     }
 
     bool IsMoveValid(int move) const {
+      // Exclude never-valid moves or empty pits
+      if (move >= 13 || move <= 0 || !board[move]) { return false; }
 
-      if (move > 13 || move < 0 || !board[move]) {
-        return false;
-      }
-      if (!curr_player && move < 7 && move > 0) {
-        return true;
-      }
-      if (curr_player && move > 7) {
-        return true;
-      }
+      // Check if the current player is allowed to make this move.
+      if (!curr_player && move < 7) { return true; }
+      if (curr_player && move > 7) { return true; }
       return false;
     }
 
-    bool IsOver() const {
-      return over;
-    }
+    bool IsOver() const { return over; }
 
 
-    void PrintBoard() {
-      std::cout << "  ";
+    void PrintBoard(std::ostream & os=std::cout) {
+      os << "  ";
       for (int i = 6; i > 0; i--) {
-        std::cout << board[i] << " ";
+        os << board[i] << " ";
       }
-      std::cout << std::endl;
-      std::cout << board[7] << "              " << board[0] << std::endl;
-      std::cout << "  ";
+      os << std::endl;
+      os << board[7] << "              " << board[0] << std::endl;
+      os << "  ";
       for (int i = 8; i < 14; i++) {
-        std::cout << board[i] << " ";
+        os << board[i] << " ";
       }
-      std::cout << std::endl;
+      os << std::endl;
     }
 
     int GetWinner() {
       int player1 = board[0];
       int player0 = board[7];
 
-      for (int i = 1; i < 7; i++) {
-        player0 += board[i];
-      }
-
-      for (int i = 8; i < 14; i++) {
-        player1 += board[i];
-      }
+      for (int i = 1; i < 7; i++) { player0 += board[i]; }
+      for (int i = 8; i < 14; i++) { player1 += board[i]; }
 
       return (int) (player1 > player0);
     }
