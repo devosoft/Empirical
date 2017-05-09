@@ -1,11 +1,21 @@
 All games should have common function for easy use in templates:
 
-bool DoMove(size_t player, size_t move) - specifies which move is being made by a player.
- - Return value indicates if player needs to make another decisions (or go again)
+void Reset()
+     Restart the game (using the same settings)
 
-bool TestOver() - is the game over?
+bool DoMove(size_t player, size_t move)
+     Specify a move to be made by a player.
+     Return value indicates if player needs to make another decisions (or go again)
 
-bool IsMoveValid(size_t player, size_t move) - is a provided move legal? 
+bool IsDone()
+     Test: is the game finished?
 
-double GetScore(size_t player) - How is the specified player doing?
- - in a binary win/lose game, these scores will be 0/1 at the end of the game.
+bool IsMoveValid(size_t player, size_t move)
+     Test: is a provided move legal? 
+
+double GetScore(size_t player)
+     How is the specified player doing?
+     In a binary win/lose game, these scores will be 0/1 at the end of the game.
+
+void Print(std::ostream & os=std::cout)
+     Print out the current state of the game.
