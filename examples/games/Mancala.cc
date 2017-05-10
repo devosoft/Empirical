@@ -17,11 +17,33 @@ int main()
   mancala.Print();
 
   while (mancala.IsDone() == false) {
-    std::cout << "Move? " << std::endl;
+    size_t player = mancala.GetCurrPlayer();
+    char symbol = 'A' + (char) player;
+    std::cout << symbol << " move? " << std::endl;
     std::cin >> move;
+
+    if (move < 1 || move > 6) {
+      std::cout << "Invalid move!! (choose a value 1 to 6)" <<  std::endl;
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      continue;
+    }
+    move += player * 7;
+
+    if (mancala[move] == 0) {
+      std::cout << "Error: Cannot move from empty pit!" << std::endl;
+      continue;
+    }
 
     mancala.DoMove(move);
 
     mancala.Print();
   }
+
+  const size_t scoreA = mancala.ScoreA();
+  const size_t scoreB = mancala.ScoreB();
+
+  if (scoreA == scoreB) { std::cout << "TIE GAME!!" << std::endl; }
+  else if (scoreA > scoreB) { std::cout << "A Wins!!" << std::endl; }
+  else { std::cout << "B Wins!!" << std::endl; }
 }
