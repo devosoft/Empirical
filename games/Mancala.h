@@ -13,6 +13,7 @@
 
 #include "../base/array.h"
 #include "../base/assert.h"
+#include "../base/vector.h"
 #include "../tools/math.h"
 
 namespace emp {
@@ -21,7 +22,7 @@ namespace emp {
   private:
     emp::array<size_t, 14> board;   // Current board state.
     bool over = false;              // Has the game ended?
-    size_t curr_player = 0;         // Which player goes next?
+    size_t cur_player = 0;         // Which player goes next?
 
     void TestOver() {
       bool side_1_empty = true;
@@ -32,10 +33,11 @@ namespace emp {
         if (board[i+7] > 0) { side_2_empty = false; }
       }
 
-      over = ( (!curr_player && side_1_empty) || (curr_player && side_2_empty));
+      over = ( (!cur_player && side_1_empty) || (cur_player && side_2_empty));
     }
 
   public:
+    using move_t = size_t;
 
     Mancala() { Reset(); }
     ~Mancala() { ; }
@@ -44,7 +46,7 @@ namespace emp {
       for (size_t i = 0; i < board.size(); i++) { board[i] = 4; }
       board[0] = board[7] = 0;
       over = false;
-      curr_player = 0;
+      cur_player = 0;
     }
 
     size_t operator[](size_t i) const { return board[i]; }
@@ -58,46 +60,46 @@ namespace emp {
     }
 
     // Returns bool indicating whether player can go again
-    bool DoMove(size_t cell) {
+    bool DoMove(move_t cell) {
       emp_assert(cell != 0 && cell != 7); // You can't choose the end cells
-      emp_assert((cell < 7 && !curr_player) || (cell > 7 && curr_player));
+      emp_assert((cell < 7 && !cur_player) || (cell > 7 && cur_player), cell, cur_player);
 
       size_t stone_count = board[cell];
-      size_t curr_cell = cell;
+      size_t cur_cell = cell;
       size_t home_cell = 7 * (size_t) (cell < 7);  // Track own store; base on start.
       size_t skip_cell = 7 * (size_t) (cell > 7);  // Skip opponent's store; base on start.
 
       board[cell] = 0;
 
       while (stone_count > 0) {
-        curr_cell = (curr_cell + 1) % 14;
-        if (curr_cell == skip_cell) curr_cell++;
+        cur_cell = (cur_cell + 1) % 14;
+        if (cur_cell == skip_cell) cur_cell++;
 
-        board[curr_cell]++;
+        board[cur_cell]++;
         stone_count--;
       }
 
       // Go again if you ended in your store
-      if (curr_cell == home_cell) {
+      if (cur_cell == home_cell) {
         TestOver();
         return true;
       }
 
       // Capturing
-      if (board[curr_cell] == 1 &&
-          ((curr_cell < 7 && home_cell == 0) || (curr_cell > 7 && home_cell == 7))) {
-        size_t opposite = 14 - curr_cell;
+      if (board[cur_cell] == 1 &&
+          ((cur_cell < 7 && home_cell == 0) || (cur_cell > 7 && home_cell == 7))) {
+        size_t opposite = 14 - cur_cell;
         board[home_cell] += board[opposite];
         board[opposite] = 0;
       }
 
-      curr_player = (size_t)!curr_player;
+      cur_player = (size_t) !cur_player;
       TestOver();
       return false;
     }
 
     // Setup a DoMove from either player's viewpoint.
-    bool DoMove(size_t player, size_t cell) {
+    bool DoMove(size_t player, move_t cell) {
       emp_assert(cell > 0 && cell < 7, cell);  // Moves can only be 1 through 6.
       if (player == 1) cell += 7;
       return DoMove(cell);
@@ -105,16 +107,24 @@ namespace emp {
 
     bool IsDone() const { return over; }
 
-    bool IsMoveValid(size_t move) const {
+    bool IsMoveValid(move_t move) const {
       // Exclude never-valid moves or empty pits
       if (move >= 13 || move <= 0 || !board[move]) { return false; }
 
       // Check if the current player is allowed to make this move.
-      if (!curr_player && move < 7) { return true; }
-      if (curr_player && move > 7) { return true; }
+      if (!cur_player && move < 7) { return true; }
+      if (cur_player && move > 7) { return true; }
       return false;
     }
 
+    // Provide all of the legal
+    emp::vector<move_t> GetMoveOptions() {
+      emp::vector<move_t> out_v;
+      for (size_t i = 1; i <= 6; i++) {
+        if (board[i]) out_v.push_back(i);
+      }
+      return out_v;
+    }
 
     void Print(std::ostream & os=std::cout) {
       os << "  ";
@@ -130,9 +140,9 @@ namespace emp {
       os << std::endl;
     }
 
-    size_t GetCurrPlayer() const { return curr_player; }
-    bool IsTurnA() const { return curr_player == 0; }
-    bool IsTurnB() const { return curr_player == 1; }
+    size_t GetCurrPlayer() const { return cur_player; }
+    bool IsTurnA() const { return cur_player == 0; }
+    bool IsTurnB() const { return cur_player == 1; }
 
     size_t ScoreA() const {
       size_t score = board[7];
@@ -144,7 +154,7 @@ namespace emp {
 
     size_t ScoreB() const {
       size_t score = board[0];
-      for (size_t) i = 8; i < 14; i++) {
+      for (size_t i = 8; i < 14; i++) {
         score += board[i];
       }
       return score;
