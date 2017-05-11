@@ -229,6 +229,7 @@ namespace emp {
     const genome_t & GetGenome() const { return genome; }
     double GetReg(size_t id) const { return regs[id]; }
     size_t GetIP() const { return inst_ptr; }
+    double GetOutput(size_t id) const { return outputs[id]; }
 
     void SetInst(size_t pos, const inst_t & inst) { genome[pos] = inst; }
     void SetInst(size_t pos, InstID id, int a0=0, int a1=0, int a2=0) {
@@ -242,9 +243,11 @@ namespace emp {
 
     void PushInst(InstID id, int a0=0, int a1=0, int a2=0) { genome.emplace_back(id, a0, a1, a2); }
     void PushInst(const Instruction & inst) { genome.emplace_back(inst); }
-    void PushRandom(Random & rand) {
-      PushInst((InstID) rand.GetUInt((uint32_t) InstID::Unknown),
-               rand.GetInt(REGS), rand.GetInt(REGS), rand.GetInt(REGS) );
+    void PushRandom(Random & rand, const size_t count=1) {
+      for (size_t i = 0; i < count; i++) {
+        PushInst((InstID) rand.GetUInt((uint32_t) InstID::Unknown),
+                rand.GetInt(REGS), rand.GetInt(REGS), rand.GetInt(REGS) );
+      }
     }
 
     // Loading whole genomes.
@@ -338,7 +341,7 @@ namespace emp {
     case InstID::Push: PushStack(inst.args[1], regs[inst.args[0]]); break;
     case InstID::Pop: regs[inst.args[1]] = PopStack(inst.args[0]); break;
     case InstID::Input: regs[inst.args[1]] = inputs[inst.args[0]]; break;
-    case InstID::Output: inputs[inst.args[1]] = regs[inst.args[0]]; break;
+    case InstID::Output: outputs[inst.args[1]] = regs[inst.args[0]]; break;
     case InstID::CopyVal: regs[inst.args[1]] = regs[inst.args[0]]; break;
 
     case InstID::ScopeReg:
@@ -383,7 +386,7 @@ namespace emp {
 
       if (new_scope) {
         if (new_scope == cur_scope) {
-          for (size_t i = 0; i < cur_scope; i++) os << " ";
+          for (size_t i = 0; i < cur_scope; i++) os << ' ';
           os << "----\n";
         }
         if (new_scope < cur_scope) {
@@ -391,7 +394,7 @@ namespace emp {
         }
       }
 
-      for (size_t i = 0; i < cur_scope; i++) os << " ";
+      for (size_t i = 0; i < cur_scope; i++) os << ' ';
       os << inst_lib.GetName(inst.id);
       const size_t num_args = inst_lib.GetNumArgs(inst.id);
       for (size_t i = 0; i < num_args; i++) {
