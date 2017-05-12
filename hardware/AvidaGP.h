@@ -267,7 +267,15 @@ namespace emp {
     void Process(size_t num_inst) { for (size_t i = 0; i < num_inst; i++) SingleProcess(); }
 
     /// Print out this program.
-    void PrintGenome(std::ostream & os);
+    void PrintGenome(std::ostream & os=std::cout);
+
+    /// Print out the state of the virtual CPU.
+    void PrintState(std::ostream & os=std::cout);
+
+    /// Trace the instructions being exectured, with full CPU details.
+    void Trace(size_t num_inst) {
+      for (size_t i = 0; i < num_inst; i++) { PrintState(); SingleProcess(); }
+    }
 
     static const InstLib<Instruction> & GetInstLib();
   };
@@ -388,7 +396,7 @@ namespace emp {
     inst_ptr++;
   }
 
-  void AvidaGP::PrintGenome(std::ostream & os=std::cout) {
+  void AvidaGP::PrintGenome(std::ostream & os) {
     const auto & inst_lib = GetInstLib();
     size_t cur_scope = 0;
 
@@ -417,6 +425,28 @@ namespace emp {
       }
       os << '\n';
     }
+  }
+
+  void AvidaGP::PrintState(std::ostream & os) {
+    const auto & inst_lib = GetInstLib();
+
+    os << "IP:" << inst_ptr
+       << " scope:" << CurScope()
+       << " (" << inst_lib.GetName(genome[inst_ptr].id) << ")"
+       << " errors: " << errors
+       << "\n REGS: ";
+    for (size_t i = 0; i < REGS; i++) os << "[" << regs[i] << "] ";
+    os << "\n INPUTS: ";
+    for (size_t i = 0; i < REGS; i++) os << "[" << inputs[i] << "] ";
+    os << "\n OUTPUTS: ";
+    for (size_t i = 0; i < REGS; i++) os << "[" << outputs[i] << "] ";
+    os << std::endl;
+
+    // @CAO Still need:
+    // emp::array< emp::vector<double>, REGS > stacks;
+    // emp::array< int, REGS> fun_starts;
+    // emp::vector<RegBackup> reg_stack;
+    // emp::vector<size_t> call_stack;
   }
 
   /// This static function can be used to access the generic AvidaGP instruction library.
