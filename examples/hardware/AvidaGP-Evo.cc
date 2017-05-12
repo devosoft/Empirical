@@ -16,7 +16,7 @@ void Print(const emp::AvidaGP & cpu) {
   std::cout << " IP=" << cpu.GetIP() << std::endl;
 }
 
-constexpr size_t POP_SIZE = 500;
+constexpr size_t POP_SIZE = 1000;
 constexpr size_t GENOME_SIZE = 50;
 constexpr size_t UPDATES = 500;
 
@@ -45,22 +45,37 @@ int main()
   // Setup the fitness function.
   std::function<double(emp::AvidaGP*)> fit_fun =
     [](emp::AvidaGP * org) {
-      org->Process(200);
       int count = 0;
       for (size_t i = 0; i < 16; i++) {
-        if (org->GetOutput(i) == i) count++;
+        if (org->GetOutput(i) == i*i) count++;
       }
       return (double) count;
     };
 
+  emp::vector< std::function<double(emp::AvidaGP*)> > fit_set(16);
+  for (size_t out_id = 0; out_id < 16; out_id++) {
+    // Setup the fitness function.
+    fit_set[out_id] = [out_id](emp::AvidaGP * org) {
+      return (double) -std::abs(org->GetOutput(out_id) - out_id * out_id);
+    };
+  }
+
 
   // Do the run...
   for (size_t ud = 0; ud < UPDATES; ud++) {
+    // Update the status of all organisms.
+    for (size_t id = 0; id < POP_SIZE; id++) {
+      world[id].ResetHardware();
+      world[id].Process(200);
+    }
+
     // Keep the best individual.
     world.EliteSelect(fit_fun, 1, 1);
 
     // Run a tournament for the rest...
-    world.TournamentSelect(fit_fun, 5, POP_SIZE-1);
+    // world.TournamentSelect(fit_fun, 5, POP_SIZE-1);
+    world.LexicaseSelect(fit_set, POP_SIZE-1);
+    // world.EcoSelect(fit_fun, fit_set, 100, 5, POP_SIZE-1);
     world.Update();
     std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
 
