@@ -39,7 +39,7 @@ namespace emp {
   public:
     using move_t = size_t;
 
-    Mancala() { Reset(); }
+    Mancala(bool first_player=0) { Reset(first_player); }
     ~Mancala() { ; }
 
     void Reset(bool first_player=0) {
@@ -61,7 +61,10 @@ namespace emp {
 
     // Returns bool indicating whether player can go again
     bool DoMove(move_t cell) {
-      emp_assert(cell != 0 && cell != 7); // You can't choose the end cells
+      emp_assert(cell < 14);               // You cannot choose a cell out of bounds.
+      emp_assert(cell != 0 && cell != 7);  // You can't choose the end cells
+      emp_assert(board[cell] != 0);        // You cannot choose an empty cell.
+      // It must be your turn for the cell chosen!
       emp_assert((cell < 7 && !cur_player) || (cell > 7 && cur_player), cell, cur_player);
 
       size_t stone_count = board[cell];
