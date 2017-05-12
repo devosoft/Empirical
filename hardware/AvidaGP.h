@@ -236,6 +236,7 @@ namespace emp {
       genome[pos].Set(id, a0, a1, a2);
     }
     void SetGenome(const genome_t & g) { genome = g; }
+    void SetInput(size_t input_id, double value) { inputs[input_id] = value; }
     void RandomizeInst(size_t pos, Random & rand) {
       SetInst(pos, (InstID) rand.GetUInt((uint32_t) InstID::Unknown),
               rand.GetInt(REGS), rand.GetInt(REGS), rand.GetInt(REGS) );
