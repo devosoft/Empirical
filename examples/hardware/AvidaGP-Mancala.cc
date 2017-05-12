@@ -10,9 +10,57 @@
 #include "../../tools/Random.h"
 #include "../../evo/World.h"
 
-constexpr size_t POP_SIZE = 1000;
+constexpr size_t POP_SIZE = 200;
 constexpr size_t GENOME_SIZE = 50;
-constexpr size_t UPDATES = 500;
+constexpr size_t EVAL_TIME = 200;
+constexpr size_t UPDATES = 2000;
+
+bool verbose = false;
+
+// Setup the fitness function.
+double EvalGame(emp::AvidaGP & org0, emp::AvidaGP & org1, bool cur_player=0) {
+  emp::Mancala game(cur_player);
+  size_t round = 0, errors = 0;
+  while (game.IsDone() == false) {
+    if (verbose) {
+      std::cout << "round = " << round++
+                << "   errors = " << errors
+                << std::endl;
+      game.Print();
+    }
+    if (cur_player == 0) {  // Tested org is cur player.
+      org0.ResetHardware();
+      for (size_t i = 0; i < 14; i++) { org0.SetInput(i, game[i]); }
+      org0.Process(EVAL_TIME);
+      size_t best_move = 1;
+      for (size_t i = 2; i <= 6; i++) {
+        if (org0.GetOutput(best_move) < org0.GetOutput(i)) { best_move = i; }
+      }
+      while (game[best_move] == 0) {  // Cannot make a move into an empty pit!
+        errors++;
+        if (++best_move > 6) best_move = 1;
+      }
+      bool go_again = game.DoMove(0, best_move);
+      if (!go_again) cur_player = 1;
+    }
+    else {
+      org1.ResetHardware();
+      for (size_t i = 0; i < 14; i++) { org1.SetInput((i+7)%14, game[i]); }
+      org1.Process(EVAL_TIME);
+      size_t best_move = 1;
+      for (size_t i = 2; i <= 6; i++) {
+        if (org1.GetOutput(best_move) < org1.GetOutput(i)) { best_move = i; }
+      }
+      while (game[best_move+7] == 0) {  // Cannot make a move in an empty pit!
+        if (++best_move > 6) best_move = 1;
+      }
+      bool go_again = game.DoMove(1, best_move);
+      if (!go_again) cur_player = 0;
+    }
+  }
+  return ((double) game.ScoreA()) - ((double) game.ScoreB());
+};
+
 
 int main()
 {
@@ -40,19 +88,51 @@ int main()
   // Setup the fitness function.
   std::function<double(emp::AvidaGP*)> fit_fun =
     [&game, &random, &world](emp::AvidaGP * org) {
+      // std::cout << "Starting game!" << std::endl;
       emp::AvidaGP & org2 = world.GetRandomOrg();
       bool cur_player = random.P(0.5);
       game.Reset(cur_player);
+      // std::cout << "Starting loop!" << std::endl;
+      int round = 0;
+      size_t errors = 0;
       while (game.IsDone() == false) {
+        if (verbose) {
+          std::cout << "round = " << round++
+                    << "   errors = " << errors
+                    << std::endl;
+          game.Print();
+        }
         if (cur_player == 0) {  // Tested org is cur player.
-          // Setup the hardware.
           org->ResetHardware();
-
-
-          org->Process(200);
+          for (size_t i = 0; i < 14; i++) { org->SetInput(i, game[i]); }
+          org->Process(EVAL_TIME);
+          size_t best_move = 1;
+          for (size_t i = 2; i <= 6; i++) {
+            if (org->GetOutput(best_move) < org->GetOutput(i)) { best_move = i; }
+          }
+          while (game[best_move] == 0) {  // Cannot make a move in an empty pit!
+            errors++;
+            best_move = random.GetUInt(6) + 1;
+          }
+          bool go_again = game.DoMove(0, best_move);
+          if (!go_again) cur_player = 1;
+        }
+        else {
+          org2.ResetHardware();
+          for (size_t i = 0; i < 14; i++) { org2.SetInput((i+7)%14, game[i]); }
+          org2.Process(EVAL_TIME);
+          size_t best_move = 1;
+          for (size_t i = 2; i <= 6; i++) {
+            if (org2.GetOutput(best_move) < org2.GetOutput(i)) { best_move = i; }
+          }
+          while (game[best_move+7] == 0) {  // Cannot make a move in an empty pit!
+            best_move = random.GetUInt(6) + 1;
+          }
+          bool go_again = game.DoMove(1, best_move);
+          if (!go_again) cur_player = 0;
         }
       }
-      return 1.0;
+      return ((double) game.ScoreA()) - ((double) game.ScoreB());
     };
 
   emp::vector< std::function<double(emp::AvidaGP*)> > fit_set(16);
@@ -66,18 +146,12 @@ int main()
 
   // Do the run...
   for (size_t ud = 0; ud < UPDATES; ud++) {
-    // Update the status of all organisms.
-    for (size_t id = 0; id < POP_SIZE; id++) {
-      world[id].ResetHardware();
-      world[id].Process(200);
-    }
-
     // Keep the best individual.
     world.EliteSelect(fit_fun, 1, 1);
 
-    // Run a tournament for the rest...
-    // world.TournamentSelect(fit_fun, 5, POP_SIZE-1);
-    world.LexicaseSelect(fit_set, POP_SIZE-1);
+    // Run a tournament for each spot.
+    world.TournamentSelect(fit_fun, 5, POP_SIZE-1);
+    // world.LexicaseSelect(fit_set, POP_SIZE-1);
     // world.EcoSelect(fit_fun, fit_set, 100, 5, POP_SIZE-1);
     world.Update();
     std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
@@ -85,6 +159,9 @@ int main()
     // Mutate all but the first organism.
     world.MutatePop(1);
   }
+
+  verbose = true;
+  fit_fun(&(world[0]));
 
   std::cout << std::endl;
   world[0].PrintGenome();
