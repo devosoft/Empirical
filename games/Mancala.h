@@ -22,18 +22,18 @@ namespace emp {
   private:
     emp::array<size_t, 14> board;   // Current board state.
     bool over = false;              // Has the game ended?
-    size_t cur_player = 0;         // Which player goes next?
+    size_t cur_player = 0;          // Which player goes next?
 
     void TestOver() {
+      bool side_0_empty = true;
       bool side_1_empty = true;
-      bool side_2_empty = true;
 
       for (size_t i = 1; i < 7; i++) {
-        if (board[i] > 0) { side_1_empty = false; }
-        if (board[i+7] > 0) { side_2_empty = false; }
+        if (board[i] > 0) { side_0_empty = false; }
+        if (board[i+7] > 0) { side_1_empty = false; }
       }
 
-      over = ( (!cur_player && side_1_empty) || (cur_player && side_2_empty));
+      over = ( (!cur_player && side_0_empty) || (cur_player && side_1_empty));
     }
 
   public:
@@ -42,11 +42,11 @@ namespace emp {
     Mancala() { Reset(); }
     ~Mancala() { ; }
 
-    void Reset() {
+    void Reset(bool first_player=0) {
       for (size_t i = 0; i < board.size(); i++) { board[i] = 4; }
       board[0] = board[7] = 0;
       over = false;
-      cur_player = 0;
+      cur_player = first_player;
     }
 
     size_t operator[](size_t i) const { return board[i]; }
@@ -164,6 +164,7 @@ namespace emp {
       if (player == 0) return (double) ScoreA();
       else if (player == 1) return (double) ScoreB();
       emp_assert(false);  // Only a two player game!
+      return 0.0;
     }
 
   };
