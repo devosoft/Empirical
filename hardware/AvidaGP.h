@@ -340,8 +340,18 @@ namespace emp {
 
     case InstID::Push: PushStack(inst.args[1], regs[inst.args[0]]); break;
     case InstID::Pop: regs[inst.args[1]] = PopStack(inst.args[0]); break;
-    case InstID::Input: regs[inst.args[1]] = inputs[inst.args[0]]; break;
-    case InstID::Output: outputs[inst.args[1]] = regs[inst.args[0]]; break;
+    case InstID::Input: {
+        size_t input_id = (size_t) regs[ inst.args[0] ];  // Grab ID from register.
+        input_id = input_id & (REGS-1);                   // Mod ID into range.
+        regs[inst.args[1]] = inputs[input_id];            // Set target reg to appropriate input.
+      }
+      break;
+    case InstID::Output: {
+        size_t output_id = (size_t) regs[ inst.args[1] ]; // Grab ID from register.
+        output_id = output_id & (REGS-1);                 // Mod ID into range.
+        outputs[output_id] = regs[inst.args[0]];          // Copy target reg to appropriate output.
+      }
+      break;
     case InstID::CopyVal: regs[inst.args[1]] = regs[inst.args[0]]; break;
 
     case InstID::ScopeReg:
@@ -414,29 +424,29 @@ namespace emp {
     static bool init = false;
 
     if (!init) {
-      inst_lib.AddInst(InstID::Inc, "Inc", 1, "Increment value in register specified by Arg1");
-      inst_lib.AddInst(InstID::Dec, "Dec", 1, "Decrement value in register specified by Arg1");
-      inst_lib.AddInst(InstID::Not, "Not", 1, "Logically toggle value in register specified by Arg1");
-      inst_lib.AddInst(InstID::SetReg, "SetReg", 2, "Set Arg1 to numerical value of Arg2");
-      inst_lib.AddInst(InstID::Add, "Add", 3, "Arg3 = Arg1 + Arg2");
-      inst_lib.AddInst(InstID::Sub, "Sub", 3, "Arg3 = Arg1 - Arg2");
-      inst_lib.AddInst(InstID::Mult, "Mult", 3, "Arg3 = Arg1 * Arg2");
-      inst_lib.AddInst(InstID::Div, "Div", 3, "Arg3 = Arg1 / Arg2");
-      inst_lib.AddInst(InstID::Mod, "Mod", 3, "Arg3 = Arg1 % Arg2");
-      inst_lib.AddInst(InstID::TestEqu, "TestEqu", 3, "Arg3 = (Arg1 == Arg2)");
-      inst_lib.AddInst(InstID::TestNEqu, "TestNEqu", 3, "Arg3 = (Arg1 != Arg2)");
-      inst_lib.AddInst(InstID::TestLess, "TestLess", 3, "Arg3 = (Arg1 < Arg2)");
-      inst_lib.AddInst(InstID::If, "If", 2, "If Arg1 != 0, enter scope Arg2; else skip over scope");
-      inst_lib.AddInst(InstID::While, "While", 2, "Until Arg1 != 0, repeat scope Arg2; else skip over scope");
-      inst_lib.AddInst(InstID::Countdown, "Countdown", 3, "Countdown Arg1 to zero; scope to Arg2");
+      inst_lib.AddInst(InstID::Inc, "Inc", 1, "Increment value in reg Arg1");
+      inst_lib.AddInst(InstID::Dec, "Dec", 1, "Decrement value in reg Arg1");
+      inst_lib.AddInst(InstID::Not, "Not", 1, "Logically toggle value in reg Arg1");
+      inst_lib.AddInst(InstID::SetReg, "SetReg", 2, "Set reg Arg1 to numerical value Arg2");
+      inst_lib.AddInst(InstID::Add, "Add", 3, "regs: Arg3 = Arg1 + Arg2");
+      inst_lib.AddInst(InstID::Sub, "Sub", 3, "regs: Arg3 = Arg1 - Arg2");
+      inst_lib.AddInst(InstID::Mult, "Mult", 3, "regs: Arg3 = Arg1 * Arg2");
+      inst_lib.AddInst(InstID::Div, "Div", 3, "regs: Arg3 = Arg1 / Arg2");
+      inst_lib.AddInst(InstID::Mod, "Mod", 3, "regs: Arg3 = Arg1 % Arg2");
+      inst_lib.AddInst(InstID::TestEqu, "TestEqu", 3, "regs: Arg3 = (Arg1 == Arg2)");
+      inst_lib.AddInst(InstID::TestNEqu, "TestNEqu", 3, "regs: Arg3 = (Arg1 != Arg2)");
+      inst_lib.AddInst(InstID::TestLess, "TestLess", 3, "regs: Arg3 = (Arg1 < Arg2)");
+      inst_lib.AddInst(InstID::If, "If", 2, "If reg Arg1 != 0, scope -> Arg2; else skip scope");
+      inst_lib.AddInst(InstID::While, "While", 2, "Until reg Arg1 != 0, repeat scope Arg2; else skip");
+      inst_lib.AddInst(InstID::Countdown, "Countdown", 2, "Countdown reg Arg1 to zero; scope to Arg2");
       inst_lib.AddInst(InstID::Break, "Break", 1, "Break out of scope Arg1");
-      inst_lib.AddInst(InstID::Scope, "Scope", 1, "Set scope to Arg1");
-      inst_lib.AddInst(InstID::Define, "Define", 2, "Build a function called Arg1 in scope Arg2");
-      inst_lib.AddInst(InstID::Call, "Call", 1, "Call previously defined function called Arg1");
-      inst_lib.AddInst(InstID::Push, "Push", 2, "Push register Arg1 onto stack Arg2");
-      inst_lib.AddInst(InstID::Pop, "Pop", 2, "Pop stack Arg1 into register Arg2");
-      inst_lib.AddInst(InstID::Input, "Input", 2, "Pull next value from input buffer Arg1 into register Arg2");
-      inst_lib.AddInst(InstID::Output, "Output", 2, "Push reg Arg1 into output buffer Arg2");
+      inst_lib.AddInst(InstID::Scope, "Scope", 1, "Enter scope Arg1");
+      inst_lib.AddInst(InstID::Define, "Define", 2, "Build function Arg1 in scope Arg2");
+      inst_lib.AddInst(InstID::Call, "Call", 1, "Call previously defined function Arg1");
+      inst_lib.AddInst(InstID::Push, "Push", 2, "Push reg Arg1 onto stack Arg2");
+      inst_lib.AddInst(InstID::Pop, "Pop", 2, "Pop stack Arg1 into reg Arg2");
+      inst_lib.AddInst(InstID::Input, "Input", 2, "Pull next value from input Arg1 into reg Arg2");
+      inst_lib.AddInst(InstID::Output, "Output", 2, "Push reg Arg1 into output Arg2");
       inst_lib.AddInst(InstID::CopyVal, "CopyVal", 2, "Copy reg Arg1 into reg Arg2");
       inst_lib.AddInst(InstID::ScopeReg, "ScopeReg", 1, "Backup reg Arg1; restore at end of scope");
       inst_lib.AddInst(InstID::Unknown, "Unknown", 0, "Error: Unknown instruction used.");
