@@ -247,6 +247,11 @@ namespace evo {
     size_t GetNumOrgs() const { return popM.GetNumOrgs(); }
     ORG & operator[](size_t i) { return *(popM[i]); }
     const ORG & operator[](size_t i) const { return *(popM[i]); }
+    ORG & GetRandomOrg() {
+      emp_assert(random_ptr != nullptr && "GetRandomOrg() requires active random_ptr");
+      const size_t org_id = popM.GetRandomOrg();
+      return *(popM[org_id]);
+    }
     bool IsOccupied(size_t i) const { return popM[i] != nullptr; }
     iterator_t begin(){ return iterator_t(&popM, 0); }
     iterator_t end(){ return iterator_t(&popM, popM.size()); }
@@ -552,9 +557,9 @@ namespace evo {
 
         // The current bonus is divided up among the organisms that earned it...
         const double cur_bonus = pool_sizes[ex_id] / max_count[ex_id];
-        std::cout << "Bonus " << ex_id << " = " << cur_bonus
-                  << "   max_extra_fit = " << max_extra_fit[ex_id]
-                  << std::endl;
+        // std::cout << "Bonus " << ex_id << " = " << cur_bonus
+        //           << "   max_extra_fit = " << max_extra_fit[ex_id]
+        //           << std::endl;
 
         for (size_t org_id = 0; org_id < popM.size(); org_id++) {
           // If this organism is the best at the current resource, git it the bonus!
