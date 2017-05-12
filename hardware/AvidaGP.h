@@ -266,8 +266,14 @@ namespace emp {
     /// Process the next SERIES of instructions, directed by the instruction pointer.
     void Process(size_t num_inst) { for (size_t i = 0; i < num_inst; i++) SingleProcess(); }
 
+    /// Print out a single instruction, with its arguments.
+    void PrintInst(const inst_t & inst, std::ostream & os=std::cout);
+
     /// Print out this program.
     void PrintGenome(std::ostream & os=std::cout);
+
+    /// Figure out which instruction is going to actually be run next SingleProcess()
+    size_t PredictNextInst();
 
     /// Print out the state of the virtual CPU.
     void PrintState(std::ostream & os=std::cout);
@@ -396,8 +402,16 @@ namespace emp {
     inst_ptr++;
   }
 
-  void AvidaGP::PrintGenome(std::ostream & os) {
+  void AvidaGP::PrintInst(const inst_t & inst, std::ostream & os) {
     const auto & inst_lib = GetInstLib();
+    os << inst_lib.GetName(inst.id);
+    const size_t num_args = inst_lib.GetNumArgs(inst.id);
+    for (size_t i = 0; i < num_args; i++) {
+      os << ' ' << inst.args[i];
+    }
+  }
+
+  void AvidaGP::PrintGenome(std::ostream & os) {
     size_t cur_scope = 0;
 
     for (const inst_t & inst : genome) {
@@ -414,11 +428,7 @@ namespace emp {
       }
 
       for (size_t i = 0; i < cur_scope; i++) os << ' ';
-      os << inst_lib.GetName(inst.id);
-      const size_t num_args = inst_lib.GetNumArgs(inst.id);
-      for (size_t i = 0; i < num_args; i++) {
-        os << ' ' << inst.args[i];
-      }
+      PrintInst(inst, os);
       if (new_scope) {
         if (new_scope > cur_scope) os << " --> ";
         cur_scope = new_scope;
@@ -427,20 +437,56 @@ namespace emp {
     }
   }
 
-  void AvidaGP::PrintState(std::ostream & os) {
-    const auto & inst_lib = GetInstLib();
+  size_t AvidaGP::PredictNextInst() {
+    // Determine if we are changing scope.
+    int new_scope = -1;
+    if (inst_ptr >= genome.size()) new_scope = 0;
+    else {
+      size_t inst_scope = InstScope(genome[inst_ptr]);
+      if (inst_scope) new_scope = inst_scope;
+    }
 
-    os << "IP:" << inst_ptr
-       << " scope:" << CurScope()
-       << " (" << inst_lib.GetName(genome[inst_ptr].id) << ")"
-       << " errors: " << errors
-       << "\n REGS: ";
+    // If we are not changing scope OR we are going to a deeper scope, execute next!
+    if (new_scope == -1 || new_scope > CurScope()) return inst_ptr;
+
+    // If we are at the end of a loop, assume we will jump back to the beginning.
+    if (CurScopeType() == ScopeType::LOOP) {
+      return scope_stack.back().start_pos;
+    }
+
+    // If we are at the end of a function, assume we will jump back to the call.
+    if (CurScopeType() == ScopeType::FUNCTION) {
+      size_t next_pos = call_stack.back();
+      if (next_pos >= genome.size()) next_pos = 0;
+      return next_pos;
+    }
+
+    // If we have run past the end of the genome, we will start over.
+    if (inst_ptr >= genome.size()) return 0;
+
+    // Otherwise, we exit the scope normally.
+    return inst_ptr;
+  }
+
+  void AvidaGP::PrintState(std::ostream & os) {
+    size_t next_inst = PredictNextInst();
+
+    os << " REGS: ";
     for (size_t i = 0; i < REGS; i++) os << "[" << regs[i] << "] ";
     os << "\n INPUTS: ";
     for (size_t i = 0; i < REGS; i++) os << "[" << inputs[i] << "] ";
     os << "\n OUTPUTS: ";
     for (size_t i = 0; i < REGS; i++) os << "[" << outputs[i] << "] ";
     os << std::endl;
+
+    os << "IP:" << inst_ptr;
+    if (inst_ptr != next_inst) os << "(-> " << next_inst << ")";
+    os << " scope:" << CurScope()
+       << " (";
+    PrintInst(genome[next_inst], os);
+    os << ")"
+       << " errors: " << errors
+       << std::endl;
 
     // @CAO Still need:
     // emp::array< emp::vector<double>, REGS > stacks;
