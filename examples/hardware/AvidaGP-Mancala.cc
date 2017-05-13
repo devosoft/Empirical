@@ -13,37 +13,48 @@
 constexpr size_t POP_SIZE = 100;
 constexpr size_t GENOME_SIZE = 50;
 constexpr size_t EVAL_TIME = 200;
-constexpr size_t UPDATES = 200;
+constexpr size_t UPDATES = 100;
+constexpr size_t TOURNY_SIZE = 3;
 
-bool verbose = false;
+// Determine the next move of a particular player.
+size_t EvalMove(emp::Mancala & game, emp::AvidaGP & org, bool side, bool verbose=false) {
+  // Setup the hardware with proper inputs.
+  org.ResetHardware();
+  const size_t offset = (side == 0) ? 0 : 7;
+  for (size_t i = 0; i < 14; i++) { org.SetInput((i+offset)%14, game[i]); }
 
-// Setup the fitness function.
-double EvalGame(emp::AvidaGP & org0, emp::AvidaGP & org1, bool cur_player=0) {
+  // Run the code.
+  org.Process(EVAL_TIME);
+
+  // Determine the chosen move.
+  size_t best_move = 1;
+  for (size_t i = 2; i <= 6; i++) {
+    if (org.GetOutput(best_move) < org.GetOutput(i)) { best_move = i; }
+  }
+
+  return best_move;
+}
+
+// Setup the fitness function for a whole game.
+double EvalGame(emp::AvidaGP & org0, emp::AvidaGP & org1, bool cur_player=0, bool verbose=false) {
   emp::Mancala game(cur_player);
   size_t round = 0, errors = 0;
   while (game.IsDone() == false) {
-    if (verbose) {
-      std::cout << "round = " << round++
-                << "   errors = " << errors
-                << std::endl;
-      game.Print();
-    }
-
     // Determine the current player.
     emp::AvidaGP & cur_org = (cur_player == 0) ? org0 : org1;
-    size_t offset = (cur_player == 0) ? 0 : 7;
 
-    // Setup the hardware with proper inputs.
-    cur_org.ResetHardware();
-    for (size_t i = 0; i < 14; i++) { cur_org.SetInput((i+offset)%14, game[i]); }
+    size_t best_move = EvalMove(game, cur_org, cur_player, verbose);
 
-    // Run the code.
-    cur_org.Process(EVAL_TIME);
-
-    // Determine the chosen move.
-    size_t best_move = 1;
-    for (size_t i = 2; i <= 6; i++) {
-      if (cur_org.GetOutput(best_move) < cur_org.GetOutput(i)) { best_move = i; }
+    const size_t offset = (cur_player == 0) ? 0 : 7;
+    if (verbose) {
+      std::cout << "round = " << round++ << "   errors = " << errors << std::endl;
+      game.PrintLong();
+      char move_sym = 'A' + (char) (best_move-1);
+      std::cout << "Move = " << move_sym;
+      if (game[best_move+offset] == 0) {
+        std::cout << " (illegal!)";
+      }
+      std::cout << std::endl << std::endl;
     }
 
     // If the chosen move is illegal, shift through other options.
@@ -57,7 +68,7 @@ double EvalGame(emp::AvidaGP & org0, emp::AvidaGP & org1, bool cur_player=0) {
     if (!go_again) cur_player = !cur_player;
   }
 
-  return ((double) game.ScoreA()) - ((double) game.ScoreB());
+  return ((double) game.ScoreA()) - ((double) game.ScoreB()) - ((double) errors * 10.0);
 };
 
 
@@ -107,9 +118,9 @@ int main()
     world.EliteSelect(fit_fun, 1, 1);
 
     // Run a tournament for each spot.
-    world.TournamentSelect(fit_fun, 5, POP_SIZE-1);
+    world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE-1);
     // world.LexicaseSelect(fit_set, POP_SIZE-1);
-    // world.EcoSelect(fit_fun, fit_set, 100, 5, POP_SIZE-1);
+    // world.EcoSelect(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
     world.Update();
     std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
 
@@ -117,16 +128,13 @@ int main()
     world.MutatePop(1);
   }
 
-  verbose = true;
   fit_fun(&(world[0]));
 
   std::cout << std::endl;
   world[0].PrintGenome();
   std::cout << std::endl;
-  for (size_t i = 0; i < 16; i++) {
-    std::cout << i << ":" << world[0].GetOutput(i) << "  ";
-  }
-  std::cout << std::endl;
+
+  EvalGame(world[0], world[1], 0, true);
 
   return 0;
 }
