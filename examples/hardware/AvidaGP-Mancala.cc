@@ -10,10 +10,10 @@
 #include "../../tools/Random.h"
 #include "../../evo/World.h"
 
-constexpr size_t POP_SIZE = 200;
+constexpr size_t POP_SIZE = 100;
 constexpr size_t GENOME_SIZE = 50;
 constexpr size_t EVAL_TIME = 200;
-constexpr size_t UPDATES = 2000;
+constexpr size_t UPDATES = 200;
 
 bool verbose = false;
 
@@ -87,52 +87,10 @@ int main()
 
   // Setup the fitness function.
   std::function<double(emp::AvidaGP*)> fit_fun =
-    [&game, &random, &world](emp::AvidaGP * org) {
-      // std::cout << "Starting game!" << std::endl;
-      emp::AvidaGP & org2 = world.GetRandomOrg();
+    [&random, &world](emp::AvidaGP * org) {
+      emp::AvidaGP & rand_org = world.GetRandomOrg();
       bool cur_player = random.P(0.5);
-      game.Reset(cur_player);
-      // std::cout << "Starting loop!" << std::endl;
-      int round = 0;
-      size_t errors = 0;
-      while (game.IsDone() == false) {
-        if (verbose) {
-          std::cout << "round = " << round++
-                    << "   errors = " << errors
-                    << std::endl;
-          game.Print();
-        }
-        if (cur_player == 0) {  // Tested org is cur player.
-          org->ResetHardware();
-          for (size_t i = 0; i < 14; i++) { org->SetInput(i, game[i]); }
-          org->Process(EVAL_TIME);
-          size_t best_move = 1;
-          for (size_t i = 2; i <= 6; i++) {
-            if (org->GetOutput(best_move) < org->GetOutput(i)) { best_move = i; }
-          }
-          while (game[best_move] == 0) {  // Cannot make a move in an empty pit!
-            errors++;
-            best_move = random.GetUInt(6) + 1;
-          }
-          bool go_again = game.DoMove(0, best_move);
-          if (!go_again) cur_player = 1;
-        }
-        else {
-          org2.ResetHardware();
-          for (size_t i = 0; i < 14; i++) { org2.SetInput((i+7)%14, game[i]); }
-          org2.Process(EVAL_TIME);
-          size_t best_move = 1;
-          for (size_t i = 2; i <= 6; i++) {
-            if (org2.GetOutput(best_move) < org2.GetOutput(i)) { best_move = i; }
-          }
-          while (game[best_move+7] == 0) {  // Cannot make a move in an empty pit!
-            best_move = random.GetUInt(6) + 1;
-          }
-          bool go_again = game.DoMove(1, best_move);
-          if (!go_again) cur_player = 0;
-        }
-      }
-      return ((double) game.ScoreA()) - ((double) game.ScoreB());
+      return EvalGame(*org, rand_org, cur_player);
     };
 
   emp::vector< std::function<double(emp::AvidaGP*)> > fit_set(16);
