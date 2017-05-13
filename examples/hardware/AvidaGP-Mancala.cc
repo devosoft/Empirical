@@ -28,36 +28,35 @@ double EvalGame(emp::AvidaGP & org0, emp::AvidaGP & org1, bool cur_player=0) {
                 << std::endl;
       game.Print();
     }
-    if (cur_player == 0) {  // Tested org is cur player.
-      org0.ResetHardware();
-      for (size_t i = 0; i < 14; i++) { org0.SetInput(i, game[i]); }
-      org0.Process(EVAL_TIME);
-      size_t best_move = 1;
-      for (size_t i = 2; i <= 6; i++) {
-        if (org0.GetOutput(best_move) < org0.GetOutput(i)) { best_move = i; }
-      }
-      while (game[best_move] == 0) {  // Cannot make a move into an empty pit!
-        errors++;
-        if (++best_move > 6) best_move = 1;
-      }
-      bool go_again = game.DoMove(0, best_move);
-      if (!go_again) cur_player = 1;
+
+    // Determine the current player.
+    emp::AvidaGP & cur_org = (cur_player == 0) ? org0 : org1;
+    size_t offset = (cur_player == 0) ? 0 : 7;
+
+    // Setup the hardware with proper inputs.
+    cur_org.ResetHardware();
+    for (size_t i = 0; i < 14; i++) { cur_org.SetInput((i+offset)%14, game[i]); }
+
+    // Run the code.
+    cur_org.Process(EVAL_TIME);
+
+    // Determine the chosen move.
+    size_t best_move = 1;
+    for (size_t i = 2; i <= 6; i++) {
+      if (cur_org.GetOutput(best_move) < cur_org.GetOutput(i)) { best_move = i; }
     }
-    else {
-      org1.ResetHardware();
-      for (size_t i = 0; i < 14; i++) { org1.SetInput((i+7)%14, game[i]); }
-      org1.Process(EVAL_TIME);
-      size_t best_move = 1;
-      for (size_t i = 2; i <= 6; i++) {
-        if (org1.GetOutput(best_move) < org1.GetOutput(i)) { best_move = i; }
-      }
-      while (game[best_move+7] == 0) {  // Cannot make a move in an empty pit!
-        if (++best_move > 6) best_move = 1;
-      }
-      bool go_again = game.DoMove(1, best_move);
-      if (!go_again) cur_player = 0;
+
+    // If the chosen move is illegal, shift through other options.
+    while (game[best_move+offset] == 0) {  // Cannot make a move into an empty pit!
+      if (cur_player == 0) errors++;
+      if (++best_move > 6) best_move = 1;
     }
+
+    // Do the move and determine who goes next.
+    bool go_again = game.DoMove(cur_player, best_move);
+    if (!go_again) cur_player = !cur_player;
   }
+
   return ((double) game.ScoreA()) - ((double) game.ScoreB());
 };
 
