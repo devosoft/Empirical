@@ -145,9 +145,11 @@ namespace emp {
     }
 
     void PrintLong(std::ostream & os=std::cout) {
-      std::cout << "+---<<<---F-----E-----D-----C-----B-----A---<<<---+ Player 2\n"
-                << "|                                                 | " << std::endl;
-      std::cout << "|       (" << std::setw(2) << board[13]
+      std::cout << "+---<<<---F-----E-----D-----C-----B-----A---<<<---+ Player 1";
+      if (cur_player == 1) std::cout << " ***";
+      std::cout << "\n"
+                << "|                                                 | \n"
+                << "|       (" << std::setw(2) << board[13]
                 << " ) (" << std::setw(2) << board[12]
                 << " ) (" << std::setw(2) << board[11]
                 << " ) (" << std::setw(2) << board[10]
@@ -165,8 +167,9 @@ namespace emp {
                 << " ) (" << std::setw(2) << board[6]
                 << " )       |\n";
       std::cout << "|                                                 |\n"
-                << "+--->>>---A-----B-----C-----D-----E-----F--->>>---+ Player 1\n"
-                << std::endl;
+                << "+--->>>---A-----B-----C-----D-----E-----F--->>>---+ Player 0";
+      if (cur_player == 0) std::cout << " ***";
+      std::cout << std::endl << std::endl;
     }
 
     size_t GetCurrPlayer() const { return cur_player; }
