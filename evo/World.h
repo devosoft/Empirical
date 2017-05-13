@@ -602,6 +602,88 @@ namespace evo {
       EcoSelect(fit_fun, extra_funs, pools, t_size, tourny_count);
     }
 
+    // EcoSelect works like Tournament Selection, but also uses a vector of supplimentary fitness
+    // functions.  The best individuals on each supplemental function divide up a resource pool.
+    // NOTE: You must turn off the FitnessCache for this function to work properly.
+    void EcoSelectGradation(fit_fun_t fit_fun, const emp::vector<fit_fun_t> & extra_funs,
+                   const emp::vector<double> & pool_sizes, size_t t_size, size_t tourny_count=1)
+    {
+      emp_assert(fit_fun);
+      emp_assert(t_size > 0 && t_size <= popM.size(), t_size, popM.size());
+      emp_assert(random_ptr != nullptr && "EcoSelect() requires active random_ptr");
+      emp_assert(fitM.IsCached() == false, "Ecologies mean constantly changing fitness!");
+
+      // Setup info to track fitnesses.
+      emp::vector<double> base_fitness(popM.size());
+      emp::vector< emp::vector<double> > extra_fitnesses(extra_funs.size());
+      emp::vector<double> max_extra_fit(extra_funs.size(), 0.0);
+      emp::vector<double> resource_left = pool_sizes;
+      emp::vector<size_t> max_count(extra_funs.size(), 0);
+      for (size_t i=0; i < extra_funs.size(); i++) {
+        extra_fitnesses[i].resize(popM.size());
+      }
+      emp::vector<size_t> ordering(popM.size());
+
+
+      // Collect all fitness info.
+      for (size_t org_id = 0; org_id < popM.size(); org_id++) {
+        base_fitness[org_id] = popM.CalcFitness(org_id, fit_fun);
+        ordering[org_id] = org_id;
+        for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
+          double cur_fit = popM.CalcFitness(org_id, extra_funs[ex_id]);
+          cur_fit = cur_fit;
+          extra_fitnesses[ex_id][org_id] = Pow2(cur_fit/32);
+        }
+      }
+
+      for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
+          std::sort(ordering.begin(), ordering.end(),
+                [&extra_fitnesses, &ex_id](int x, int y){return extra_fitnesses[ex_id][x] > extra_fitnesses[ex_id][y];});
+          for (size_t org_id : ordering) {
+              double bonus = .05 * extra_fitnesses[ex_id][org_id] * resource_left[ex_id];
+              extra_fitnesses[ex_id][org_id] = bonus;
+              resource_left[ex_id] -= bonus;
+              base_fitness[org_id] += bonus;
+          }
+
+      }
+
+    //   for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
+    //     std::cout << "Bonus " << ex_id << " = " << extra_fitnesses[ex_id]
+    //               << std::endl;
+    //   }
+
+
+      emp::vector<size_t> entries;
+      for (size_t T = 0; T < tourny_count; T++) {
+        entries.resize(0);
+        for (size_t i=0; i<t_size; i++) entries.push_back( popM.GetRandomOrg() ); // Allows replacement!
+
+        double best_fit = base_fitness[entries[0]];
+        size_t best_id = entries[0];
+
+        // Search for a higher fit org in the tournament.
+        for (size_t i = 1; i < t_size; i++) {
+          const double cur_fit = base_fitness[entries[i]];
+          if (cur_fit > best_fit) {
+            best_fit = cur_fit;
+            best_id = entries[i];
+          }
+        }
+
+        // Place the highest fitness into the next generation!
+        InsertBirth( *(popM[best_id]), best_id, 1 );
+      }
+    }
+
+    /// EcoSelect can be provided a single value if all pool sizes are identical.
+    void EcoSelectGradation(fit_fun_t fit_fun, const emp::vector<fit_fun_t> & extra_funs,
+                   double pool_sizes, size_t t_size, size_t tourny_count=1)
+    {
+      emp::vector<double> pools(extra_funs.size(), pool_sizes);
+      EcoSelectGradation(fit_fun, extra_funs, pools, t_size, tourny_count);
+    }
+
     // LexicaseSelect runs through multiple fitness functions in a random order for
     // EACH offspring produced.
     // NOTE: You must turn off the FitnessCache for this function to work properly.
