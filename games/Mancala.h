@@ -8,8 +8,9 @@
 #ifndef EMP_GAME_MANCALA_H
 #define EMP_GAME_MANCALA_H
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <iomanip>
 
 #include "../base/array.h"
 #include "../base/assert.h"
@@ -141,6 +142,31 @@ namespace emp {
         os << board[i] << " ";
       }
       os << std::endl;
+    }
+
+    void PrintLong(std::ostream & os=std::cout) {
+      std::cout << "+---<<<---F-----E-----D-----C-----B-----A---<<<---+ Player 2\n"
+                << "|                                                 | " << std::endl;
+      std::cout << "|       (" << std::setw(2) << board[13]
+                << " ) (" << std::setw(2) << board[12]
+                << " ) (" << std::setw(2) << board[11]
+                << " ) (" << std::setw(2) << board[10]
+                << " ) (" << std::setw(2) << board[9]
+                << " ) (" << std::setw(2) << board[8]
+                << " )       |\n";
+      std::cout << "v [" << std::setw(2) << board[7]
+                << " ]                                     ["
+                << std::setw(2) << board[0] << " ] ^\n";
+      std::cout << "|       (" << std::setw(2) << board[1]
+                << " ) (" << std::setw(2) << board[2]
+                << " ) (" << std::setw(2) << board[3]
+                << " ) (" << std::setw(2) << board[4]
+                << " ) (" << std::setw(2) << board[5]
+                << " ) (" << std::setw(2) << board[6]
+                << " )       |\n";
+      std::cout << "|                                                 |\n"
+                << "+--->>>---A-----B-----C-----D-----E-----F--->>>---+ Player 1\n"
+                << std::endl;
     }
 
     size_t GetCurrPlayer() const { return cur_player; }
