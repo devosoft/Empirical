@@ -10,10 +10,10 @@
 #include "../../tools/Random.h"
 #include "../../evo/World.h"
 
-constexpr size_t POP_SIZE = 200;
+constexpr size_t POP_SIZE = 100;
 constexpr size_t GENOME_SIZE = 100;
 constexpr size_t EVAL_TIME = 500;
-constexpr size_t UPDATES = 5000;
+constexpr size_t UPDATES = 2000;
 constexpr size_t TOURNY_SIZE = 5;
 
 // Determine the next move of a human player.
@@ -57,14 +57,17 @@ size_t EvalMove(emp::Mancala & game, emp::AvidaGP & org) {
   return best_move;
 }
 
+using mancala_ai_t = std::function< size_t(emp::Mancala & game) >;
+
 // Setup the fitness function for a whole game.
-double EvalGame(emp::AvidaGP & org0, emp::AvidaGP & org1, bool cur_player=0, bool verbose=false) {
+double EvalGame(mancala_ai_t & player0, mancala_ai_t & player1,
+                bool cur_player=0, bool verbose=false) {
   emp::Mancala game(cur_player==0);
   size_t round = 0, errors = 0;
   while (game.IsDone() == false) {
     // Determine the current player and their move.
-    emp::AvidaGP & cur_org = (cur_player == 0) ? org0 : org1;
-    size_t best_move = EvalMove(game, cur_org);
+    auto & play_fun = (cur_player == 0) ? player0 : player1;
+    size_t best_move = play_fun(game);
 
     if (verbose) {
       std::cout << "round = " << round++ << "   errors = " << errors << std::endl;
@@ -88,7 +91,27 @@ double EvalGame(emp::AvidaGP & org0, emp::AvidaGP & org1, bool cur_player=0, boo
     if (!go_again) cur_player = !cur_player;
   }
 
+  if (verbose) {
+    std::cout << "Final scores -- A: " << game.ScoreA()
+              << "   B: " << game.ScoreB()
+              << std::endl;
+  }
+
   return ((double) game.ScoreA()) - ((double) game.ScoreB()) - ((double) errors * 10.0);
+};
+
+// Build wrappers for AvidaGP
+double EvalGame(emp::AvidaGP & org0, emp::AvidaGP & org1, bool cur_player=0, bool verbose=false) {
+  mancala_ai_t org_fun0 = [&org0](emp::Mancala & game){ return EvalMove(game, org0); };
+  mancala_ai_t org_fun1 = [&org1](emp::Mancala & game){ return EvalMove(game, org1); };
+  return EvalGame(org_fun0, org_fun1, cur_player, verbose);
+};
+
+// Otherwise assume a human opponent!
+double EvalGame(emp::AvidaGP & org, bool cur_player=0) {
+  mancala_ai_t fun0 = [&org](emp::Mancala & game){ return EvalMove(game, org); };
+  mancala_ai_t fun1 = [](emp::Mancala & game){ return EvalMove(game, std::cout, std::cin); };
+  return EvalGame(fun0, fun1, cur_player);
 };
 
 
