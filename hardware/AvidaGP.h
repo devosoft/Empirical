@@ -29,9 +29,9 @@ namespace emp {
 
   class AvidaGP {
   public:
-    static constexpr size_t REGS = 16;
-    static constexpr size_t INST_ARGS = 3;
-    static constexpr size_t STACK_CAP = 16;
+    static constexpr size_t CPU_SIZE = 16;   // Num arg values (for regs, stacks, functions, etc)
+    static constexpr size_t INST_ARGS = 3;   // Max num args per instruction.
+    static constexpr size_t STACK_CAP = 16;  // Max size for stacks.
 
     enum class InstID {
       Inc, Dec, Not, SetReg, Add, Sub, Mult, Div, Mod, TestEqu, TestNEqu, TestLess,
@@ -89,11 +89,11 @@ namespace emp {
 
     // Virtual CPU Components!
     genome_t genome;
-    emp::array<double, REGS> regs;
-    emp::array<double, REGS> inputs;
-    emp::array<double, REGS> outputs;
-    emp::array< emp::vector<double>, REGS > stacks;
-    emp::array< int, REGS> fun_starts;
+    emp::array<double, CPU_SIZE> regs;
+    emp::array<double, CPU_SIZE> inputs;
+    emp::array<double, CPU_SIZE> outputs;
+    emp::array< emp::vector<double>, CPU_SIZE > stacks;
+    emp::array< int, CPU_SIZE> fun_starts;
 
     size_t inst_ptr;
     emp::vector<ScopeInfo> scope_stack;
@@ -120,7 +120,7 @@ namespace emp {
     // Run every time we need to exit the current scope.
     void ExitScope() {
       emp_assert(scope_stack.size() > 1, CurScope());
-      emp_assert(scope_stack.size() <= REGS, CurScope());
+      emp_assert(scope_stack.size() <= CPU_SIZE, CurScope());
 
       // Restore any backed-up registers from this scope...
       while (reg_stack.size() && reg_stack.back().scope == CurScope()) {
@@ -206,7 +206,7 @@ namespace emp {
     /// Reset just the CPU hardware, but keep the genome.
     void ResetHardware() {
       // Initialize registers to their posision.  So Reg0 = 0 and Reg11 = 11.
-      for (size_t i = 0; i < REGS; i++) {
+      for (size_t i = 0; i < CPU_SIZE; i++) {
         regs[i] = (double) i;
         inputs[i] = 0.0;
         outputs[i] = 0.0;
@@ -239,7 +239,7 @@ namespace emp {
     void SetInput(size_t input_id, double value) { inputs[input_id] = value; }
     void RandomizeInst(size_t pos, Random & rand) {
       SetInst(pos, (InstID) rand.GetUInt((uint32_t) InstID::Unknown),
-              rand.GetInt(REGS), rand.GetInt(REGS), rand.GetInt(REGS) );
+              rand.GetInt(CPU_SIZE), rand.GetInt(CPU_SIZE), rand.GetInt(CPU_SIZE) );
     }
 
     void PushInst(InstID id, int a0=0, int a1=0, int a2=0) { genome.emplace_back(id, a0, a1, a2); }
@@ -247,7 +247,7 @@ namespace emp {
     void PushRandom(Random & rand, const size_t count=1) {
       for (size_t i = 0; i < count; i++) {
         PushInst((InstID) rand.GetUInt((uint32_t) InstID::Unknown),
-                rand.GetInt(REGS), rand.GetInt(REGS), rand.GetInt(REGS) );
+                rand.GetInt(CPU_SIZE), rand.GetInt(CPU_SIZE), rand.GetInt(CPU_SIZE) );
       }
     }
 
@@ -357,13 +357,13 @@ namespace emp {
     case InstID::Pop: regs[inst.args[1]] = PopStack(inst.args[0]); break;
     case InstID::Input: {
         size_t input_id = (size_t) regs[ inst.args[0] ];  // Grab ID from register.
-        input_id = input_id & (REGS-1);                   // Mod ID into range.
+        input_id = input_id & (CPU_SIZE-1);               // Mod ID into range.
         regs[inst.args[1]] = inputs[input_id];            // Set target reg to appropriate input.
       }
       break;
     case InstID::Output: {
         size_t output_id = (size_t) regs[ inst.args[1] ]; // Grab ID from register.
-        output_id = output_id & (REGS-1);                 // Mod ID into range.
+        output_id = output_id & (CPU_SIZE-1);             // Mod ID into range.
         outputs[output_id] = regs[inst.args[0]];          // Copy target reg to appropriate output.
       }
       break;
@@ -471,12 +471,12 @@ namespace emp {
   void AvidaGP::PrintState(std::ostream & os) {
     size_t next_inst = PredictNextInst();
 
-    os << " REGS: ";
-    for (size_t i = 0; i < REGS; i++) os << "[" << regs[i] << "] ";
+    os << " CPU_SIZE: ";
+    for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << regs[i] << "] ";
     os << "\n INPUTS: ";
-    for (size_t i = 0; i < REGS; i++) os << "[" << inputs[i] << "] ";
+    for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << inputs[i] << "] ";
     os << "\n OUTPUTS: ";
-    for (size_t i = 0; i < REGS; i++) os << "[" << outputs[i] << "] ";
+    for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << outputs[i] << "] ";
     os << std::endl;
 
     os << "IP:" << inst_ptr;
@@ -489,8 +489,8 @@ namespace emp {
        << std::endl;
 
     // @CAO Still need:
-    // emp::array< emp::vector<double>, REGS > stacks;
-    // emp::array< int, REGS> fun_starts;
+    // emp::array< emp::vector<double>, CPU_SIZE > stacks;
+    // emp::array< int, CPU_SIZE> fun_starts;
     // emp::vector<RegBackup> reg_stack;
     // emp::vector<size_t> call_stack;
   }
@@ -528,7 +528,7 @@ namespace emp {
       inst_lib.AddInst(InstID::ScopeReg, "ScopeReg", 1, "Backup reg Arg1; restore at end of scope");
       inst_lib.AddInst(InstID::Unknown, "Unknown", 0, "Error: Unknown instruction used.");
 
-      for (char i = 0; i < AvidaGP::REGS; i++) {
+      for (char i = 0; i < AvidaGP::CPU_SIZE; i++) {
         inst_lib.AddArg(to_string(i), i);             // Args can be called by value
         inst_lib.AddArg(to_string("Reg", 'A'+i), i);  // ...or as a register.
       }
