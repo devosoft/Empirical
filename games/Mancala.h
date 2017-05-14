@@ -21,173 +21,173 @@ namespace emp {
 
   class Mancala {
   private:
-    emp::array<size_t, 14> board;   // Current board state.
-    bool over = false;              // Has the game ended?
-    size_t cur_player = 0;          // Which player goes next?
+    using side_t = emp::array<size_t, 7>;
+
+    side_t boardA;        // Current board state for side A.
+    side_t boardB;        // Current board state for side B.
+    bool over = false;    // Has the game ended?
+    size_t is_A_turn;     // Which player goes next?
 
     void TestOver() {
-      bool side_0_empty = true;
-      bool side_1_empty = true;
+      bool side_A_empty = true;
+      bool side_B_empty = true;
 
-      for (size_t i = 1; i < 7; i++) {
-        if (board[i] > 0) { side_0_empty = false; }
-        if (board[i+7] > 0) { side_1_empty = false; }
+      for (size_t i = 0; i < 6; i++) {
+        if (boardA[i] > 0) { side_A_empty = false; }
+        if (boardB[i] > 0) { side_B_empty = false; }
       }
 
-      over = ( (!cur_player && side_0_empty) || (cur_player && side_1_empty));
+      over = ( (is_A_turn && side_A_empty) || (!is_A_turn && side_B_empty));
     }
 
   public:
     using move_t = size_t;
 
-    Mancala(bool first_player=0) { Reset(first_player); }
+    Mancala(bool A_first=true) { Reset(A_first); }
     ~Mancala() { ; }
 
-    void Reset(bool first_player=0) {
-      for (size_t i = 0; i < board.size(); i++) { board[i] = 4; }
-      board[0] = board[7] = 0;
+    void Reset(bool A_first=true) {
+      for (size_t i = 0; i < 6; i++) { boardA[i] = 4; boardB[i] = 4; }
+      boardA[6] = boardB[6] = 0;
       over = false;
-      cur_player = first_player;
+      is_A_turn = A_first;
     }
 
-    size_t operator[](size_t i) const { return board[i]; }
+    size_t GetA(size_t i) const { return boardA[i]; }
+    size_t GetB(size_t i) const { return boardB[i]; }
 
-    const emp::array<size_t, 14>& GetBoard() const { return board; }
+    const side_t & GetSideA() const { return boardA; }
+    const side_t & GetSideB() const { return boardB; }
+    const side_t & GetCurSide() const { return is_A_turn ? boardA : boardB; }
+    const side_t & GetOtherSide() const { return is_A_turn ? boardB : boardA; }
+    side_t & GetSideA() { return boardA; }
+    side_t & GetSideB() { return boardB; }
+    side_t & GetCurSide() { return is_A_turn ? boardA : boardB; }
+    side_t & GetOtherSide() { return is_A_turn ? boardB : boardA; }
 
-    emp::array<size_t, 14> GetFlippedBoard() {
-      emp::array<size_t, 14> flipped(board);
-      for (size_t i = 0; i < 7; i++) std::swap(flipped[i], flipped[i+7]);
-      return flipped;
-    }
 
     // Returns bool indicating whether player can go again
     bool DoMove(move_t cell) {
-      emp_assert(cell < 14);               // You cannot choose a cell out of bounds.
-      emp_assert(cell != 0 && cell != 7);  // You can't choose the end cells
-      emp_assert(board[cell] != 0);        // You cannot choose an empty cell.
-      // It must be your turn for the cell chosen!
-      emp_assert((cell < 7 && !cur_player) || (cell > 7 && cur_player), cell, cur_player);
+      emp_assert(cell < 6);                // You cannot choose a cell out of bounds.
 
-      size_t stone_count = board[cell];
+      side_t & cur_board   = GetCurSide();
+      side_t & other_board = GetOtherSide();
+
+      emp_assert(cur_board[cell] != 0);        // You cannot choose an empty cell.
+
+      size_t stone_count = cur_board[cell];
       size_t cur_cell = cell;
-      size_t home_cell = 7 * (size_t) (cell < 7);  // Track own store; base on start.
-      size_t skip_cell = 7 * (size_t) (cell > 7);  // Skip opponent's store; base on start.
 
-      board[cell] = 0;
+      cur_board[cell] = 0;
 
       while (stone_count > 0) {
-        cur_cell = (cur_cell + 1) % 14;
-        if (cur_cell == skip_cell) cur_cell++;
-
-        board[cur_cell]++;
+        cur_cell = (cur_cell+1) % 13;  // 6 pits on either side + 1 allowed home.
+        if (cur_cell < 7) cur_board[cur_cell]++;
+        else other_board[12 - cur_cell]++;
         stone_count--;
       }
 
       // Go again if you ended in your store
-      if (cur_cell == home_cell) {
+      if (cur_cell == 6) {
         TestOver();
         return true;
       }
 
-      // Capturing
-      if (board[cur_cell] == 1 &&
-          ((cur_cell < 7 && home_cell == 0) || (cur_cell > 7 && home_cell == 7))) {
-        size_t opposite = 14 - cur_cell;
-        board[home_cell] += board[opposite];
-        board[opposite] = 0;
+      // If you didn't end in your home, see if you captured!
+      // You must be on your side of the board...
+      //  and the only cell in the last pit is the one you just put there.
+      if (cur_cell < 6 && cur_board[cur_cell] == 1) {
+        size_t clear_pos = 5 - cur_cell;
+        cur_board[6] += other_board[clear_pos];
+        other_board[clear_pos] = 0;
       }
 
-      cur_player = (size_t) !cur_player;
+      is_A_turn = (size_t) !is_A_turn;
       TestOver();
       return false;
     }
 
     // Setup a DoMove from either player's viewpoint.
     bool DoMove(size_t player, move_t cell) {
-      emp_assert(cell > 0 && cell < 7, cell);  // Moves can only be 1 through 6.
-      if (player == 1) cell += 7;
+      emp_assert(player != is_A_turn);  // Verify that we agree on player who goes next!
       return DoMove(cell);
     }
 
     bool IsDone() const { return over; }
 
-    bool IsMoveValid(move_t move) const {
+    bool IsMoveValid(size_t move) const {
       // Exclude never-valid moves or empty pits
-      if (move >= 13 || move <= 0 || !board[move]) { return false; }
-
-      // Check if the current player is allowed to make this move.
-      if (!cur_player && move < 7) { return true; }
-      if (cur_player && move > 7) { return true; }
-      return false;
+      if (move >= 6 || GetCurSide()[move] == 0) { return false; }
+      return true;
     }
 
-    // Provide all of the legal
+    // Provide all of the legal moves.
     emp::vector<move_t> GetMoveOptions() {
       emp::vector<move_t> out_v;
-      for (size_t i = 1; i <= 6; i++) {
-        if (board[i]) out_v.push_back(i);
+      for (size_t i = 0; i < 6; i++) {
+        if (GetCurSide()[i]) out_v.push_back(i);
       }
       return out_v;
     }
 
-    void Print(std::ostream & os=std::cout) {
+    void PrintSmall(std::ostream & os=std::cout) {
       os << "  ";
-      for (size_t i = 6; i > 0; i--) {
-        os << board[i] << " ";
+      for (size_t i = 5; i < 5; i--) {
+        os << boardB[i] << " ";
       }
       os << std::endl;
-      os << board[7] << "              " << board[0] << std::endl;
+      os << boardB[6] << "              " << boardA[6] << std::endl;
       os << "  ";
-      for (size_t i = 8; i < 14; i++) {
-        os << board[i] << " ";
+      for (size_t i = 0; i < 6; i++) {
+        os << boardA[i] << " ";
       }
       os << std::endl;
     }
 
-    void PrintLong(std::ostream & os=std::cout) {
-      std::cout << "+---<<<---F-----E-----D-----C-----B-----A---<<<---+ Player 1";
-      if (cur_player == 1) std::cout << " ***";
+    void Print(std::ostream & os=std::cout) {
+      std::cout << "+---<<<---F-----E-----D-----C-----B-----A---<<<---+ Player B";
+      if (is_A_turn == false) std::cout << " ***";
       std::cout << "\n"
                 << "|                                                 | \n"
-                << "|       (" << std::setw(2) << board[13]
-                << " ) (" << std::setw(2) << board[12]
-                << " ) (" << std::setw(2) << board[11]
-                << " ) (" << std::setw(2) << board[10]
-                << " ) (" << std::setw(2) << board[9]
-                << " ) (" << std::setw(2) << board[8]
+                << "|       (" << std::setw(2) << boardB[5]
+                << " ) (" << std::setw(2) << boardB[4]
+                << " ) (" << std::setw(2) << boardB[3]
+                << " ) (" << std::setw(2) << boardB[2]
+                << " ) (" << std::setw(2) << boardB[1]
+                << " ) (" << std::setw(2) << boardB[0]
                 << " )       |\n";
-      std::cout << "v [" << std::setw(2) << board[7]
+      std::cout << "v [" << std::setw(2) << boardB[6]
                 << " ]                                     ["
-                << std::setw(2) << board[0] << " ] ^\n";
-      std::cout << "|       (" << std::setw(2) << board[1]
-                << " ) (" << std::setw(2) << board[2]
-                << " ) (" << std::setw(2) << board[3]
-                << " ) (" << std::setw(2) << board[4]
-                << " ) (" << std::setw(2) << board[5]
-                << " ) (" << std::setw(2) << board[6]
+                << std::setw(2) << boardA[6] << " ] ^\n";
+      std::cout << "|       (" << std::setw(2) << boardA[0]
+                << " ) (" << std::setw(2) << boardA[1]
+                << " ) (" << std::setw(2) << boardA[2]
+                << " ) (" << std::setw(2) << boardA[3]
+                << " ) (" << std::setw(2) << boardA[4]
+                << " ) (" << std::setw(2) << boardA[5]
                 << " )       |\n";
       std::cout << "|                                                 |\n"
-                << "+--->>>---A-----B-----C-----D-----E-----F--->>>---+ Player 0";
-      if (cur_player == 0) std::cout << " ***";
+                << "+--->>>---A-----B-----C-----D-----E-----F--->>>---+ Player A";
+      if (is_A_turn == true) std::cout << " ***";
       std::cout << std::endl << std::endl;
     }
 
-    size_t GetCurrPlayer() const { return cur_player; }
-    bool IsTurnA() const { return cur_player == 0; }
-    bool IsTurnB() const { return cur_player == 1; }
+    size_t GetCurPlayer() const { return !is_A_turn; }
+    bool IsTurnA() const { return is_A_turn; }
+    bool IsTurnB() const { return !is_A_turn; }
 
     size_t ScoreA() const {
-      size_t score = board[7];
-      for (size_t i = 1; i < 7; i++) {
-        score += board[i];
+      size_t score = 0;
+      for (size_t i = 0; i < 7; i++) {
+        score += boardA[i];
       }
       return score;
     }
 
     size_t ScoreB() const {
-      size_t score = board[0];
-      for (size_t i = 8; i < 14; i++) {
-        score += board[i];
+      size_t score = 0;
+      for (size_t i = 0; i < 7; i++) {
+        score += boardB[i];
       }
       return score;
     }
