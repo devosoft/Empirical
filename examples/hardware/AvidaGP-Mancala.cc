@@ -13,11 +13,14 @@
 constexpr size_t POP_SIZE = 100;
 constexpr size_t GENOME_SIZE = 100;
 constexpr size_t EVAL_TIME = 500;
-constexpr size_t UPDATES = 2000;
+constexpr size_t UPDATES = 200;
 constexpr size_t TOURNY_SIZE = 5;
 
 // Determine the next move of a human player.
 size_t EvalMove(emp::Mancala & game, std::ostream & os=std::cout, std::istream & is=std::cin) {
+  // Present the current board.
+  game.Print();
+
   // Request a move from the human.
   char move;
   os << "Move?" << std::endl;
@@ -111,14 +114,13 @@ double EvalGame(emp::AvidaGP & org0, emp::AvidaGP & org1, bool cur_player=0, boo
 double EvalGame(emp::AvidaGP & org, bool cur_player=0) {
   mancala_ai_t fun0 = [&org](emp::Mancala & game){ return EvalMove(game, org); };
   mancala_ai_t fun1 = [](emp::Mancala & game){ return EvalMove(game, std::cout, std::cin); };
-  return EvalGame(fun0, fun1, cur_player);
+  return EvalGame(fun0, fun1, cur_player, true);
 };
 
 
 int main()
 {
   emp::Random random;
-  emp::Mancala game;
   emp::evo::EAWorld<emp::AvidaGP> world(random, "AvidaWorld");
 
   // Build a random initial popoulation.
@@ -178,6 +180,12 @@ int main()
   std::cout << std::endl;
 
   EvalGame(world[0], world[1], 0, true);
+
+  // And try playing it!
+  while (true) {
+    std::cout << "NEW GAME: Human vs. AI!\n";
+    EvalGame(world[0]);
+  }
 
   return 0;
 }
