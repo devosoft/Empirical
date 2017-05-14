@@ -83,7 +83,7 @@ namespace emp {
       while (stone_count > 0) {
         cur_cell = (cur_cell+1) % 13;  // 6 pits on either side + 1 allowed home.
         if (cur_cell < 7) cur_board[cur_cell]++;
-        else other_board[12 - cur_cell]++;
+        else other_board[cur_cell-7]++;
         stone_count--;
       }
 
