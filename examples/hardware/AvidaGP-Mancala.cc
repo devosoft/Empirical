@@ -10,25 +10,47 @@
 #include "../../tools/Random.h"
 #include "../../evo/World.h"
 
-constexpr size_t POP_SIZE = 100;
-constexpr size_t GENOME_SIZE = 50;
-constexpr size_t EVAL_TIME = 200;
-constexpr size_t UPDATES = 100;
-constexpr size_t TOURNY_SIZE = 3;
+constexpr size_t POP_SIZE = 200;
+constexpr size_t GENOME_SIZE = 100;
+constexpr size_t EVAL_TIME = 500;
+constexpr size_t UPDATES = 5000;
+constexpr size_t TOURNY_SIZE = 5;
 
-// Determine the next move of a particular player.
-size_t EvalMove(emp::Mancala & game, emp::AvidaGP & org, bool side, bool verbose=false) {
+// Determine the next move of a human player.
+size_t EvalMove(emp::Mancala & game, std::ostream & os=std::cout, std::istream & is=std::cin) {
+  // Request a move from the human.
+  char move;
+  os << "Move?" << std::endl;
+  is >> move;
+
+  while (move < 'A' || move > 'F' || game.GetCurSide()[move-'A'] == 0) {
+    os << "Invalid move! (choose a value 'A' to 'F')" <<  std::endl;
+    is.clear();
+    is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    is >> move;
+  }
+
+  return (size_t) (move - 'A');
+}
+
+
+// Determine the next move of an AvidaGP player.
+size_t EvalMove(emp::Mancala & game, emp::AvidaGP & org) {
   // Setup the hardware with proper inputs.
   org.ResetHardware();
-  const size_t offset = (side == 0) ? 0 : 7;
-  for (size_t i = 0; i < 14; i++) { org.SetInput((i+offset)%14, game[i]); }
+  const auto & cur_side = game.GetCurSide();
+  const auto & other_side = game.GetOtherSide();
+  for (size_t i = 0; i < 7; i++) {
+    org.SetInput(i, cur_side[i]);
+    org.SetInput(i+7, other_side[i]);
+  }
 
   // Run the code.
   org.Process(EVAL_TIME);
 
   // Determine the chosen move.
-  size_t best_move = 1;
-  for (size_t i = 2; i <= 6; i++) {
+  size_t best_move = 0;
+  for (size_t i = 1; i < 6; i++) {
     if (org.GetOutput(best_move) < org.GetOutput(i)) { best_move = i; }
   }
 
@@ -37,30 +59,28 @@ size_t EvalMove(emp::Mancala & game, emp::AvidaGP & org, bool side, bool verbose
 
 // Setup the fitness function for a whole game.
 double EvalGame(emp::AvidaGP & org0, emp::AvidaGP & org1, bool cur_player=0, bool verbose=false) {
-  emp::Mancala game(cur_player);
+  emp::Mancala game(cur_player==0);
   size_t round = 0, errors = 0;
   while (game.IsDone() == false) {
-    // Determine the current player.
+    // Determine the current player and their move.
     emp::AvidaGP & cur_org = (cur_player == 0) ? org0 : org1;
+    size_t best_move = EvalMove(game, cur_org);
 
-    size_t best_move = EvalMove(game, cur_org, cur_player, verbose);
-
-    const size_t offset = (cur_player == 0) ? 0 : 7;
     if (verbose) {
       std::cout << "round = " << round++ << "   errors = " << errors << std::endl;
-      game.PrintLong();
-      char move_sym = 'A' + (char) (best_move-1);
+      game.Print();
+      char move_sym = 'A' + (char) best_move;
       std::cout << "Move = " << move_sym;
-      if (game[best_move+offset] == 0) {
+      if (game.GetCurSide()[best_move] == 0) {
         std::cout << " (illegal!)";
       }
       std::cout << std::endl << std::endl;
     }
 
     // If the chosen move is illegal, shift through other options.
-    while (game[best_move+offset] == 0) {  // Cannot make a move into an empty pit!
+    while (game.GetCurSide()[best_move] == 0) {  // Cannot make a move into an empty pit!
       if (cur_player == 0) errors++;
-      if (++best_move > 6) best_move = 1;
+      if (++best_move > 5) best_move = 0;
     }
 
     // Do the move and determine who goes next.
