@@ -88,6 +88,7 @@
 #include <map>
 
 #include "../base/assert.h"
+#include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../control/SignalControl.h"
 #include "../meta/reflection.h"
@@ -169,7 +170,7 @@ namespace evo {
     statsM_t statsM;
     lineageM_t lineageM;
 
-    Random * random_ptr;
+    Ptr<Random> random_ptr;
     bool random_owner;
     size_t update = 0;
 
@@ -220,7 +221,7 @@ namespace evo {
     World(emp::Random * r_ptr, const std::string & w_name=UniqueName("emp::evo::World"))
       : fitM()
       , popM(w_name, fitM)
-      , random_ptr(r_ptr), random_owner(false)
+      , random_ptr(r_ptr, false), random_owner(false)
       , before_repro_sig(to_string(w_name,"::before-repro"), control)
       , offspring_ready_sig(to_string(w_name,"::offspring-ready"), control)
       , inject_ready_sig(to_string(w_name,"::inject-ready"), control)
@@ -240,7 +241,7 @@ namespace evo {
     World(emp::Random & random, const std::string & w_name=UniqueName("emp::evo::World"))
       : World(&random, w_name) { ; }
     World(const World &) = delete;
-    ~World() { Clear(); if (random_owner) delete random_ptr; }
+    ~World() { Clear(); if (random_owner) random_ptr.Delete(); }
     World & operator=(const World &) = delete;
 
     size_t GetSize() const { return popM.GetSize(); }
@@ -259,7 +260,11 @@ namespace evo {
     void Clear() { popM.Clear(); }
 
     Random & GetRandom() { return *random_ptr; }
-    void SetRandom(Random & random) { if (random_owner) delete random_ptr; random_ptr = &random; }
+    void SetRandom(Random & random) {
+      if (random_owner) random_ptr.Delete();
+      random_ptr = &random;
+      random_owner = false;
+    }
     void ResetRandom(int seed=-1) { SetRandom(*(new Random(seed))); }
 
     // Forward function calls to appropriate internal objects
