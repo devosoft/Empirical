@@ -23,7 +23,7 @@
 #include "../base/array.h"
 #include "../base/vector.h"
 #include "../tools/stats.h"
-
+#include "../tools/memo_function.h"
 #include "LineageTracker.h"
 #include "StatsManager.h"
 
@@ -63,7 +63,6 @@ namespace evo{
     using skeleton_type = emp::vector<GENOME_ELEMENT>;
 
     static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
-
     std::unordered_set<skeleton_type > novel;
 
     int generations = OeeConfig.GENERATIONS(); //How far back do we look for persistance?
@@ -81,7 +80,7 @@ namespace evo{
     using StatsManager_Base<POP_MANAGER>::emp_is_stats_manager;
     using lineage_type = LineageTracker<POP_MANAGER>;
     lineage_type * lineage;
-    std::function<double(org_ptr)> fit_fun;
+    std::function<double(const ORG)> fit_fun;
 
     template <typename WORLD>
     OEEStatsManager(WORLD * w,
@@ -123,9 +122,10 @@ namespace evo{
         output_location << delimiter << var_name;
       }
       output_location << std::endl;
+
     }
 
-    void SetDefaultFitnessFun(std::function<double(org_ptr)> fit){
+    void SetDefaultFitnessFun(std::function<double(const ORG)> fit){
         fit_fun = fit;
     }
 
@@ -157,15 +157,19 @@ namespace evo{
 
           ecology = EcologyMetric(persist_skeletons);
 
-          complexity = ComplexityMetric(persist_skeletons,
-                              [this](skeleton_type skel){
-                                // for (auto el : skel) {
-                                //   std::cout << el.GetSymbol();
-                                // }
-                                int nulls = std::count(skel.begin(), skel.end(), NULL_VAL);
-                                // std::cout << " Nulls: " << nulls << std::endl;
-                                return (double)(skel.size() - nulls);
-                              });
+          complexity = ComplexityMetric(persist_skeletons, [this](const skeleton_type skel) {
+              // for (auto el : skel) {
+              //   std::cout << el.GetSymbol();
+              // }
+              int nulls = std::count(skel.begin(), skel.end(), NULL_VAL);
+              // std::cout << " Nulls: " << nulls << std::endl;
+              return (double)(skel.size() - nulls);
+          });
+
+          if (do_skeletonize.size() > 100000) {
+            do_skeletonize.Clear();
+          }
+
         }
 
         emp::vector<double> results = emp::vector<double>({(double)change, (double)novelty, (double)ecology, (double)complexity});
@@ -205,24 +209,36 @@ namespace evo{
     // }
     //
     //Convert a container of orgs to skeletons containing only informative sites
-    //TODO: Currently assumes bit org
+
+
+    emp::memo_function<skeleton_type(const ORG)> do_skeletonize = [this](const ORG org){
+      double fitness = fit_fun(org);
+      skeleton_type skeleton(org.size());
+      ORG test = ORG(org);
+    //   std::cout << "Size: " << org.size() << std::endl;
+      for (int i = 0; i < org.size(); i++) {
+        test[i] = NULL_VAL;
+        // std::cout << "Fitness: " << fit_fun(test) << std::endl;
+        if (fit_fun(test) >= fitness){
+          skeleton[i] = NULL_VAL;
+        } else {
+          skeleton[i] = org[i];
+        }
+        test[i] = org[i];
+        // std::cout << "Skeleton: ";
+        // for (auto el : skeleton) {
+        //   std::cout << " " << el.GetSymbol();
+        // }
+        // std::cout << std::endl;
+      }
+      return skeleton;
+    };
+
     template <template <typename> class C >
     C<skeleton_type> Skeletonize (C<ORG> orgs){
       C<skeleton_type> skeletons;
       for (auto org : orgs) {
-        double fitness = fit_fun(&org);
-        skeleton_type skeleton(org.size());
-        ORG test = ORG(org);
-
-        for (size_t i = 0; i < org.size(); i++) {
-          test[i] = NULL_VAL;
-          if (fit_fun(&test) >= fitness){
-            skeleton[i] = NULL_VAL;
-          } else {
-            skeleton[i] = org[i];
-          }
-          test[i] = org[i];
-        }
+        skeleton_type skeleton = do_skeletonize(org);
         skeletons.insert(skeleton);
       }
       return skeletons;
@@ -231,20 +247,7 @@ namespace evo{
     emp::vector<skeleton_type> Skeletonize (emp::vector<ORG> orgs){
       emp::vector<skeleton_type> skeletons;
       for (auto org : orgs) {
-        double fitness = fit_fun(&org);
-        skeleton_type skeleton(org.size());
-        ORG test = ORG(org);
-        for (size_t i = 0; i < org.size(); i++) {
-          test[i] = NULL_VAL;
-          double fit = fit_fun(&test);
-          //std::cout << i << " " << fit << " " << fitness << std::endl;
-          if (fit >= fitness){
-            skeleton[i] = NULL_VAL;
-          } else {
-            skeleton[i] = org[i];
-          }
-          test[i] = org[i];
-        }
+        skeleton_type skeleton = do_skeletonize(org);
         // std::cout << "skeletonized" << std::endl;
         skeletons.push_back(skeleton);
       }
@@ -253,7 +256,7 @@ namespace evo{
 
     //Find most complex skeleton in the given vector.
     double ComplexityMetric(emp::vector<skeleton_type> & persist,
-                            std::function<double(skeleton_type)> complexity_fun) {
+                            emp::memo_function<double(skeleton_type)> complexity_fun) {
 
       double most_complex = complexity_fun(*(persist.begin()));
 
@@ -369,6 +372,7 @@ namespace evo{
             persist.push_back(id);
             break;
           }
+
           id = lineage->nodes[id].parent->id;
         }
       }

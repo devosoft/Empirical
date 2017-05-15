@@ -2,7 +2,7 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#include "tools/BitSet.h"
+#include "../../tools/BitSet.h"
 #include "tools/Random.h"
 
 #include "web/init.h"
@@ -30,10 +30,13 @@
 #include <functional>
 
 
-emp::web::SpatialGridLineageVisualization lineage_viz(6000, 5000);
+emp::web::SpatialGridTreeVisualization<> lineage_viz(10000, 10000);
 emp::web::Document doc("lineage_viz");
 
 int main() {
+  lineage_viz.grid_width = 60;
+  lineage_viz.grid_height = 60;
+  lineage_viz.legend_cell_size = 5;
   doc << lineage_viz;
-  lineage_viz.LoadDataFromFile("test.json");
+  lineage_viz.LoadDataFromFile("lineage.json");
 }

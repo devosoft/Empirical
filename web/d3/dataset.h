@@ -77,10 +77,12 @@ namespace D3 {
 
     void LoadDataFromFile(std::string filename, std::function<void(void)> fun) {
       emp::JSWrap(fun, "__json_load_fun__"+emp::to_string(id));
-
+      std::cout << filename.c_str() << std::endl;
       EM_ASM_ARGS ({
-        d3.json(Pointer_stringify($1), function(data){
+        var filename = Pointer_stringify($1);
+        d3.json(filename, function(data){
             js.objects[$0]=data;
+            console.log(filename, data);
             emp["__json_load_fun__"+$0]();
         });
       }, id, filename.c_str());

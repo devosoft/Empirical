@@ -9,7 +9,6 @@
 
 #include <ctime>
 #include <functional>
-#include <initializer_list>
 #include <iostream>
 #include <type_traits>
 #include <sstream>
@@ -59,7 +58,6 @@ namespace emp {
   // Build a function to determine the size of a built-in array.
   template <typename T, size_t N>
   constexpr size_t GetSize(T (&)[N]) { return N; }
-
 
   // Build a function that will always return a unique value (and trip an assert if it can't...)
   static size_t UniqueVal() {

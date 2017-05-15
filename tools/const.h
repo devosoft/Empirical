@@ -7,6 +7,8 @@
 #ifndef EMP_CONST_H
 #define EMP_CONST_H
 
+#include <cstdint>
+
 namespace emp {
 
   constexpr const double E      = 2.71828;                // e
