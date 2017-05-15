@@ -92,16 +92,19 @@ namespace emp {
       if (verbose) std::cout << "HasPtr: " << ((uint64_t) ptr) << std::endl;
       return ptr_info.find(ptr) != ptr_info.end();
     }
+
     bool IsActive(void * ptr) const {
       if (verbose) std::cout << "Active: " << ((uint64_t) ptr) << std::endl;
       if (!HasPtr(ptr)) return false;
       return ptr_info.find(ptr)->second.IsActive();
     }
+
     bool IsOwner(void * ptr) const {
       if (verbose) std::cout << "Owner:  " << ((uint64_t) ptr) << std::endl;
       if (!HasPtr(ptr)) return false;
       return ptr_info.find(ptr)->second.IsOwner();
     }
+    
     int GetCount(void * ptr) const {
       if (verbose) std::cout << "Count:  " << ((uint64_t) ptr) << std::endl;
       if (!HasPtr(ptr)) return 0;
@@ -126,18 +129,30 @@ namespace emp {
       if (HasPtr(ptr) && IsActive(ptr)) Inc(ptr);
       else ptr_info[ptr] = PtrInfo(false);
     }
+
+    // Pointer is not currently owned, but should be.
+    void Claim(void *ptr) {
+      if (ptr == nullptr) return;
+      if (verbose) std::cout << "Claim:  " << ((uint64_t) ptr) << std::endl;
+      // Make sure pointer IS already stored BUT is NOT active.
+      emp_assert(HasPtr(ptr) && !IsActive(ptr));
+      ptr_info[ptr].Claim();
+    }
+
     void Inc(void * ptr) {
       if (ptr == nullptr) return;
       if (verbose) std::cout << "Inc:    " << ((uint64_t) ptr) << std::endl;
       emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
       ptr_info[ptr].Inc();
     }
+
     void Dec(void * ptr) {
       if (ptr == nullptr) return;
       if (verbose) std::cout << "Dec:    " << ((uint64_t) ptr) << std::endl;
       emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
       ptr_info[ptr].Dec();
     }
+
     void MarkDeleted(void * ptr) {
       if (verbose) std::cout << "Delete: " << ((uint64_t) ptr) << std::endl;
       emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
@@ -163,7 +178,7 @@ namespace emp {
 #endif
   public:
     Ptr() : ptr(nullptr) { ; }
-    template <typename T2> Ptr(T2 * in_ptr, bool is_new=true) : ptr(in_ptr) {
+    template <typename T2> Ptr(T2 * in_ptr, bool is_new=false) : ptr(in_ptr) {
       (void) is_new;  // Avoid unused parameter error when EMP_IF_MEMTRACK is off.
       EMP_IF_MEMTRACK( if (is_new) Tracker().New(ptr); else Tracker().Old(ptr); );
     }
@@ -209,11 +224,16 @@ namespace emp {
       delete ptr;
     }
 
+    void Claim() {
+      EMP_IF_MEMTRACK(Tracker().Claim(ptr););
+    }
+
     template <typename T2>
     Ptr<TYPE> & operator=(T2 * _in) {
       EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
       ptr = _in;
-      EMP_IF_MEMTRACK(Tracker().New(ptr););
+      // Assume we are not owning a pointer we just assign to.
+      EMP_IF_MEMTRACK(Tracker().Old(ptr););
       return *this;
     }
     template <typename T2>
