@@ -234,10 +234,10 @@ namespace evo {
     emp::vector<int> TraceLineageIDs(int org_id) {
       emp::vector<int> lineage;
       emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
-      Node* org = &(nodes[org_id]);
-      while(org->id) {
-        lineage.push_back(org->id);
-        org = nodes[org->parent];
+      Node & org = nodes[org_id];
+      while(org.id) {
+        lineage.push_back(org.id);
+        org = nodes[org.parent];
       }
       return lineage;
 
@@ -247,10 +247,10 @@ namespace evo {
     emp::vector<ORG> TraceLineage(int org_id) {
       emp::vector<ORG> lineage;
       emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
-      Node* org = &(nodes[org_id]);
-      while(org->id) {
-        lineage.push_back(id_to_genome[org->genome]);
-        org = nodes[org->parent];
+      Node & org = nodes[org_id];
+      while(org.id) {
+        lineage.push_back(id_to_genome[org.genome]);
+        org = nodes[org.parent];
       }
       return lineage;
     }
@@ -259,10 +259,10 @@ namespace evo {
     emp::vector<int> TraceLineageLocs(int org_id) {
       emp::vector<int> lineage;
       emp_assert(nodes.count(org_id) == 1 && "Invalid org_id passed to TraceLineageIDs");
-      Node* org = &(nodes[org_id]);
-      while(org->id) {
-        lineage.push_back(org->loc);
-        org = nodes[org->parent];
+      Node & org = nodes[org_id];
+      while(org.id) {
+        lineage.push_back(org.loc);
+        org = nodes[org.parent];
       }
       return lineage;
     }
