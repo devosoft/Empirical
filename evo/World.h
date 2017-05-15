@@ -291,8 +291,9 @@ namespace evo {
 
     void Insert(const ORG & mem, size_t copy_count=1) {
       for (size_t i = 0; i < copy_count; i++) {
-        ORG * new_org = new ORG(mem);
-        inject_ready_sig.Trigger(new_org);
+        Ptr<ORG> new_org;
+        new_org.New(mem);
+        inject_ready_sig.Trigger(new_org.Raw());
         const size_t pos = popM.AddOrg(new_org);
         SetupOrg(*new_org, &callbacks, pos);
         org_placement_sig.Trigger(pos);
@@ -300,18 +301,20 @@ namespace evo {
     }
 
     void InsertAt(const ORG & mem, const size_t pos) {
-      ORG * new_org = new ORG(mem);
-      inject_ready_sig.Trigger(new_org);
+      Ptr<ORG> new_org;
+      new_org.New(mem);
+      inject_ready_sig.Trigger(new_org.Raw());
       popM.AddOrgAt(new_org, pos);
       SetupOrg(*new_org, &callbacks, pos);
       org_placement_sig.Trigger(pos);
     }
 
     template <typename... ARGS>
-    void InsertRandomOrg(ARGS... args) {
+    void InsertRandomOrg(ARGS &&... args) {
       emp_assert(random_ptr != nullptr && "InsertRandomOrg() requires active random_ptr");
-      ORG * new_org = new ORG(*random_ptr, std::forward<ARGS>(args)...);
-      inject_ready_sig.Trigger(new_org);
+      Ptr<ORG> new_org;
+      new_org.New(*random_ptr, std::forward<ARGS>(args)...);
+      inject_ready_sig.Trigger(new_org.Raw());
       const size_t pos = popM.AddOrg(new_org);
       SetupOrg(*new_org, &callbacks, pos);
       org_placement_sig.Trigger(pos);
@@ -320,8 +323,9 @@ namespace evo {
     void InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count=1) {
       before_repro_sig.Trigger(parent_pos);
       for (size_t i = 0; i < copy_count; i++) {
-        ORG * new_org = new ORG(mem);
-        offspring_ready_sig.Trigger(new_org);
+        Ptr<ORG> new_org;
+        new_org.New(mem);
+        offspring_ready_sig.Trigger(new_org.Raw());
         const size_t pos = popM.AddOrgBirth(new_org, parent_pos);
         SetupOrg(*new_org, &callbacks, pos);
         org_placement_sig.Trigger(pos);
@@ -333,8 +337,9 @@ namespace evo {
                      const fit_fun_t & fit_fun) {
       before_repro_sig.Trigger(parent_pos);
       for (size_t i = 0; i < copy_count; i++) {
-        ORG * new_org = new ORG(mem);
-        offspring_ready_sig.Trigger(new_org);
+        Ptr<ORG> new_org;
+        new_org.New(mem);
+        offspring_ready_sig.Trigger(new_org.Raw());
         const size_t pos = popM.AddOrgBirth(new_org, parent_pos);
         // If we offspring are placed into the same population, recalculate fitness.
         if (popM_t::emp_has_separate_generations == false) popM.CalcFitness(pos, fit_fun);
@@ -417,7 +422,7 @@ namespace evo {
       std::multimap<double, size_t> fit_map;
       for (size_t i = 0; i < popM.size(); i++) {
         if (this->IsOccupied(i)){
-          fit_map.insert( std::make_pair( fitM.CalcFitness(i,(ORG*) popM[i],fit_fun), i) );
+          fit_map.insert( std::make_pair( fitM.CalcFitness(i,popM[i].AsPtr(),fit_fun), i) );
         }
       }
 
@@ -675,7 +680,7 @@ namespace evo {
     // Execute() runs the Execute() method on all organisms in the population, forwarding
     // any arguments.
     template <typename... ARGS>
-    void Execute(ARGS... args) {
+    void Execute(ARGS &&... args) {
       popM.Execute(std::forward<ARGS>(args)...);
     }
 

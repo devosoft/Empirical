@@ -23,12 +23,13 @@ namespace evo {
   template <typename ORG=int, typename FIT_MANAGER=int>
   class PopulationManager_Base {
   protected:
-    using ptr_t = ORG *;
+    using ptr_t = Ptr<ORG>;
     using pop_t = emp::vector<ptr_t>;
+    using fit_fun_t = std::function<double(ORG*)>;
 
     FIT_MANAGER & fitM;
     size_t num_orgs;
-    Random * random_ptr;
+    Ptr<Random> random_ptr;
 
   private:
     pop_t pop;
@@ -40,9 +41,12 @@ namespace evo {
     public:
       Proxy(PopulationManager_Base & _p, size_t _id) : popM(_p), id(_id) { ; }
       operator ORG*() const { return popM.pop[id]; }
+      operator Ptr<ORG>() const { return popM.pop[id]; }
       ORG * operator->() const { return popM.pop[id]; }
       ORG & operator*() const { return *(popM.pop[id]); }
-      Proxy & operator=(ORG * new_org) { popM.AddOrgAt(new_org,id); return *this; }
+      Proxy & operator=(Ptr<ORG> new_org) { popM.AddOrgAt(new_org,id); return *this; }
+
+      Ptr<ORG> AsPtr() const { return popM.pop[id]; }
     };
 
   public:
@@ -59,10 +63,10 @@ namespace evo {
     size_t GetSize() const { return pop.size(); }
     size_t GetNumOrgs() const { return num_orgs; }
     ptr_t GetOrg(size_t id) const { return pop[id]; }
-    double CalcFitness(size_t id, const std::function<double(ORG*)> & fit_fun) const {
+    double CalcFitness(size_t id, const fit_fun_t & fit_fun) const {
       return fitM.CalcFitness(id, pop[id], fit_fun);
     }
-    void CalcFitnessAll(const std::function<double(ORG*)> & fit_fun) const {
+    void CalcFitnessAll(const fit_fun_t & fit_fun) const {
       for (size_t id = 0; id < pop.size(); id++) fitM.CalcFitness(id, pop[id], fit_fun);
     }
 
@@ -72,16 +76,16 @@ namespace evo {
     // AddOrgAt, AddOrgAppend, and SetOrgs are the only ways new organisms come into a population
     // (all others go through these)
 
-    size_t AddOrgAt(ORG * new_org, size_t pos) {
+    size_t AddOrgAt(Ptr<ORG> new_org, size_t pos) {
       emp_assert(pos < pop.size());   // Make sure we are placing into a legal position.
-      if (pop[pos]) { delete pop[pos]; --num_orgs; }
+      if (pop[pos]) { pop[pos].Delete(); --num_orgs; }
       pop[pos] = new_org;
       fitM.ClearAt(pos);
       ++num_orgs;
       return pos;
     }
 
-    size_t AddOrgAppend(ORG * new_org) {
+    size_t AddOrgAppend(Ptr<ORG> new_org) {
       const size_t pos = pop.size();
       pop.push_back(new_org);
       fitM.ClearAt(pos);
@@ -89,7 +93,7 @@ namespace evo {
       return pos;
     }
 
-    void SetOrgs(const emp::vector<ORG*> & new_pop) {
+    void SetOrgs(const pop_t & new_pop) {
       Clear();
       pop = new_pop;
       num_orgs = 0;
@@ -99,7 +103,7 @@ namespace evo {
     // Likewise, Clear and ClearOrgAt are the only ways to remove organisms...
     void Clear() {
       // Delete all organisms.
-      for (ORG * org : pop) if (org) delete org;  // Delete current organisms.
+      for (ptr_t org : pop) if (org) org.Delete();  // Delete current organisms.
       pop.resize(0);                              // Remove deleted organisms.
       fitM.ClearPop();                               // Clear the fitness manager cache.
       num_orgs = 0;
@@ -107,7 +111,7 @@ namespace evo {
 
     void ClearOrgAt(size_t pos) {
       // Delete all organisms.
-      if (pop[pos]) { delete pop[pos]; pop[pos]=nullptr; num_orgs--; }  // Delete current organisms.
+      if (pop[pos]) { pop[pos].Delete(); pop[pos]=nullptr; num_orgs--; }  // Delete current organisms.
       fitM.ClearAt(pos);
     }
 
@@ -116,9 +120,9 @@ namespace evo {
     // AddOrg inserts an organism from OUTSIDE of the population.
     // AddOrgBirth inserts an organism that was born INSIDE the population.
 
-    size_t AddOrg(ORG * new_org) { return AddOrgAppend(new_org); }
+    size_t AddOrg(Ptr<ORG> new_org) { return AddOrgAppend(new_org); }
 
-    size_t AddOrgBirth(ORG * new_org, size_t parent_pos) {
+    size_t AddOrgBirth(Ptr<ORG> new_org, size_t parent_pos) {
       const size_t pos = random_ptr->GetUInt(pop.size());
       return AddOrgAt(new_org, pos);
     }
@@ -134,8 +138,8 @@ namespace evo {
 
     // Execute() redirect to all organisms in the population, forwarding arguments.
     template <typename... ARGS>
-    void Execute(ARGS... args) {
-      for (ORG * org : pop) {
+    void Execute(ARGS &&... args) {
+      for (Ptr<ORG> org : pop) {
         if (org) org->Execute(std::forward<ARGS>(args)...);
       }
     }
@@ -143,13 +147,13 @@ namespace evo {
     // -- Random Access --
 
     // Get any cell, at random
-    size_t GetRandomCell() const { return random_ptr->GetInt(0, pop.size()); }
+    size_t GetRandomCell() { return random_ptr->GetInt(0, pop.size()); }
 
     // By default, assume a well-mixed population so random neighbors can be anyone.
-    size_t GetRandomNeighbor(size_t /*id*/) const { return random_ptr->GetInt(0, pop.size()); }
+    size_t GetRandomNeighbor(size_t /*id*/) { return random_ptr->GetUInt(0, pop.size()); }
 
     // Get random *occupied* cell.
-    size_t GetRandomOrg() const {
+    size_t GetRandomOrg() {
       emp_assert(num_orgs > 0); // Make sure it's possible to find an organism!
       size_t pos = random_ptr->GetUInt(0, pop.size());
       while (pop[pos] == nullptr) pos = random_ptr->GetUInt(0, pop.size());
@@ -188,7 +192,7 @@ namespace evo {
 
     void Print(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout,
               std::string empty="X", std::string spacer=" ") {
-      for (ORG * org : pop) {
+      for (ptr_t org : pop) {
         if (org) os << string_fun(org);
         else os << empty;
         os << spacer;
@@ -199,8 +203,8 @@ namespace evo {
     }
     void PrintOrgCounts(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout) {
       std::map<ORG,size_t> org_counts;
-      for (ORG * org : pop) if (org) org_counts[*org] = 0;  // Initialize needed entries
-      for (ORG * org : pop) if (org) org_counts[*org] += 1; // Count actual types.
+      for (ptr_t org : pop) if (org) org_counts[*org] = 0;  // Initialize needed entries
+      for (ptr_t org : pop) if (org) org_counts[*org] += 1; // Count actual types.
       for (auto x : org_counts) {
         ORG cur_org = x.first;
         os << string_fun(&cur_org) << " : " << x.second << std::endl;
@@ -225,6 +229,7 @@ namespace evo {
   class PopulationManager_Plugin : public PopulationManager_Base<ORG, FIT_MANAGER> {
   protected:
     using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
+    using typename base_t::ptr_t;
 
     // Most of the key functions in the population manager can be interfaced with symbols.  If you
     // need to modify the more complex behaviors (such as Execute) you need to create a new
@@ -264,12 +269,12 @@ namespace evo {
 
     void Update() { sig_update.Trigger(); }
 
-    size_t AddOrg(ORG * new_org) {
+    size_t AddOrg(ptr_t new_org) {
       size_t new_pos;
       sig_add_org.Trigger(new_org, new_pos);
       return new_pos;
     }
-    size_t AddOrgBirth(ORG * new_org, size_t parent_pos) {
+    size_t AddOrgBirth(ptr_t new_org, size_t parent_pos) {
       size_t offspring_pos;
       sig_add_org_birth.Trigger(new_org, parent_pos, offspring_pos);
       return offspring_pos;
@@ -283,9 +288,11 @@ namespace evo {
   class PopulationManager_EA : public PopulationManager_Base<ORG,FIT_MANAGER> {
   protected:
     using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
+    using typename base_t::ptr_t;
+    using typename base_t::pop_t;
     using base_t::fitM;
 
-    emp::vector<ORG *> next_pop;
+    pop_t next_pop;
 
   public:
     PopulationManager_EA(const std::string & _w_name, FIT_MANAGER & _fm)
@@ -294,14 +301,14 @@ namespace evo {
 
     static constexpr bool emp_has_separate_generations = true;
 
-    size_t AddOrgBirth(ORG * new_org, size_t parent_pos) {
+    size_t AddOrgBirth(ptr_t new_org, size_t parent_pos) {
       const size_t pos = next_pop.size();
       next_pop.push_back(new_org);
       return pos;
     }
 
     void ClearNext() {
-      for (ORG * m : next_pop) if (m) delete m;
+      for (ptr_t m : next_pop) if (m) delete m;
       next_pop.resize(0);
     }
 
@@ -320,6 +327,7 @@ namespace evo {
   class PopulationManager_SerialTransfer : public PopulationManager_Base<ORG,FIT_MANAGER> {
   protected:
     using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
+    using typename base_t::ptr_t;
     using base_t::fitM;
 
     size_t max_size;
@@ -340,7 +348,7 @@ namespace evo {
 
     void ConfigPop(size_t m, size_t b) { max_size = m; bottleneck_size = b; }
 
-    size_t AddOrgBirth(ORG * new_org, size_t parent_pos) {
+    size_t AddOrgBirth(ptr_t new_org, size_t parent_pos) {
       if (base_t::GetSize() >= max_size) {
         base_t::DoBottleneck(bottleneck_size);
         ++num_bottlenecks;
@@ -353,6 +361,7 @@ namespace evo {
   class PopulationManager_Grid : public PopulationManager_Base<ORG,FIT_MANAGER> {
   protected:
     using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
+    using typename base_t::ptr_t;
     using base_t::fitM;
     using base_t::random_ptr;
 
@@ -368,7 +377,7 @@ namespace evo {
 
     size_t GetWidth() const { return width; }
     size_t GetHeight() const { return height; }
-    size_t GetRandomNeighbor(size_t id) const {
+    size_t GetRandomNeighbor(size_t id) {
       const int offset = random_ptr->GetInt(9);
       const int rand_x = (int) (id%width) + offset%3 - 1;
       const int rand_y = (int) (id/width) + offset/3 - 1;
@@ -378,7 +387,7 @@ namespace evo {
     void ConfigPop(size_t w, size_t h) { width = w; height = h; base_t::Resize(width*height); }
 
     // Injected orgs go into a random position.
-    size_t AddOrg(ORG * new_org) {
+    size_t AddOrg(ptr_t new_org) {
       emp::vector<size_t> empty_spots = base_t::GetEmptyPopIDs();
       const size_t pos = (empty_spots.size()) ?
         empty_spots[ random_ptr->GetUInt(empty_spots.size()) ] :
@@ -387,7 +396,7 @@ namespace evo {
     }
 
     // Newly born orgs go next to their parents.
-    size_t AddOrgBirth(ORG * new_org, size_t parent_pos) {
+    size_t AddOrgBirth(ptr_t new_org, size_t parent_pos) {
       return base_t::AddOrgAt(new_org, GetRandomNeighbor(parent_pos));
     }
 
@@ -396,7 +405,7 @@ namespace evo {
       emp_assert(string_fun);
       for (size_t y=0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {
-          ORG * org = base_t::GetOrg(x+y*width);
+          ptr_t org = base_t::GetOrg(x+y*width);
           if (org) os << string_fun(org) << spacer;
           else os << empty << spacer;
         }
@@ -413,6 +422,7 @@ namespace evo {
   class PopulationManager_Pools : public PopulationManager_Base<ORG,FIT_MANAGER> {
   public:
     using base_t = PopulationManager_Base<ORG,FIT_MANAGER>;
+    using typename base_t::ptr_t;
     using base_t::pop;
     using base_t::fitM;
     using base_t::random_ptr;
@@ -490,7 +500,7 @@ namespace evo {
     }
 
     // Injected orgs go into a random pool.
-    size_t AddOrg(ORG * new_org) {
+    size_t AddOrg(ptr_t new_org) {
       Range<size_t> id_range(0, pop.size);
 
       // If any pools are empty, choose org from the next pool.
@@ -504,7 +514,7 @@ namespace evo {
     }
 
     // Newly born orgs have a chance to migrate to a connected pool.
-    size_t AddOrgBirth(ORG * new_org, size_t parent_pos) {
+    size_t AddOrgBirth(ptr_t new_org, size_t parent_pos) {
       size_t InsertPool = 0;  // Which pool should new org be born into?
 
       // Test if a migration should happen ; if so, determine new pool.

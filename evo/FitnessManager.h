@@ -32,11 +32,11 @@ namespace evo {
     static constexpr size_t GetSize() { return 0.0; }
 
     template <typename ORG>
-    static double CalcFitness(size_t id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
+    static double CalcFitness(size_t id, Ptr<ORG> org, const std::function<double(ORG*)> & fit_fun) {
       return org ? fit_fun(org) : 0.0;
     }
     template <typename ORG>
-    static double CalcFitness(size_t id, ORG* org, emp::memo_function<double(ORG*)> & fit_fun) {
+    static double CalcFitness(size_t id, Ptr<ORG> org, emp::memo_function<double(ORG*)> & fit_fun) {
       return org ? fit_fun(org) : 0.0;
     }
 
@@ -65,7 +65,7 @@ namespace evo {
     size_t GetSize() const { return fit_cache.size(); }
 
     template <typename ORG>
-    double CalcFitness(size_t id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
+    double CalcFitness(size_t id, Ptr<ORG> org, const std::function<double(ORG*)> & fit_fun) {
       double cur_fit = GetCache(id);
       if (cur_fit == 0.0 && org) {    // If org is non-null, but no cached fitness, calculate it!
         if (id >= fit_cache.size()) fit_cache.resize(id+1, 0.0);
@@ -75,7 +75,7 @@ namespace evo {
       return cur_fit;
     }
     template <typename ORG>
-    double CalcFitness(size_t id, ORG* org, emp::memo_function<double(ORG*)> & fit_fun) {
+    double CalcFitness(size_t id, Ptr<ORG> org, emp::memo_function<double(ORG*)> & fit_fun) {
       double cur_fit = GetCache(id);
       if (!cur_fit && org) {    // If org is non-null, but no cached fitness, calculate it!
         if (id >= fit_cache.size()) fit_cache.resize(id+1, 0.0);
@@ -107,7 +107,7 @@ namespace evo {
     size_t GetSize() const { return index_info.size(); }
 
     template <typename ORG>
-    double CalcFitness(size_t id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
+    double CalcFitness(size_t id, Ptr<ORG> org, const std::function<double(ORG*)> & fit_fun) {
       // Organisms that don't exist should have a zero fitness.
       if (!org) return 0.0;
 
@@ -161,7 +161,7 @@ namespace evo {
     }
 
     template <typename ORG>
-    double CalcFitness(size_t id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
+    double CalcFitness(size_t id, Ptr<ORG> org, const std::function<double(ORG*)> & fit_fun) {
       // Organisms that don't exist should have a zero fitness.
       if (!org) return 0.0;
 
