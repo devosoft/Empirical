@@ -30,11 +30,19 @@ namespace emp {
     double & operator()(size_t A, size_t B) { return payoff[to_index(A,B)]; }
     double operator()(size_t A, size_t B) const { return payoff[to_index(A,B)]; }
 
-    SetupPD(double u) {
+    // Setup a Prisoner's Dilema Payoff Matrix
+    void SetupPD(double u) {
       payoff[to_index(0,0)] = u;         // Both defect
       payoff[to_index(0,1)] = 1.0 + u;   // Player defects, other cooperates
       payoff[to_index(1,0)] = 0.0;       // Player cooperates, other defects
       payoff[to_index(1,1)] = 1.0;       // Both cooperate
+    }
+
+    void SetupSnowdrift(double cost) {
+      payoff[to_index(0,0)] = 0;            // Both defect -- trapped in snowdrift
+      payoff[to_index(0,1)] = 1.0;          // Player defects, other digs out alone.
+      payoff[to_index(1,0)] = 1.0 - cost;   // Player digs out by themself.
+      payoff[to_index(1,1)] = 1.0 - cost/2; // Both dig out together and share cost.
     }
   };
 
