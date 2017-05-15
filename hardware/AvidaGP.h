@@ -271,6 +271,7 @@ namespace emp {
 
     /// Print out this program.
     void PrintGenome(std::ostream & os=std::cout);
+    void PrintGenome(const std::string & filename);
 
     /// Figure out which instruction is going to actually be run next SingleProcess()
     size_t PredictNextInst();
@@ -435,6 +436,12 @@ namespace emp {
       }
       os << '\n';
     }
+  }
+
+  void AvidaGP::PrintGenome(const std::string & filename) {
+    std::ofstream of(filename);
+    PrintGenome(of);
+    of.close();
   }
 
   size_t AvidaGP::PredictNextInst() {
