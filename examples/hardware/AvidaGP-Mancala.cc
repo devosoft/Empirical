@@ -13,8 +13,8 @@
 constexpr size_t POP_SIZE = 100;
 constexpr size_t GENOME_SIZE = 100;
 constexpr size_t EVAL_TIME = 500;
-constexpr size_t UPDATES = 200;
-constexpr size_t TOURNY_SIZE = 5;
+constexpr size_t UPDATES = 100;
+constexpr size_t TOURNY_SIZE = 4;
 
 // Determine the next move of a human player.
 size_t EvalMove(emp::Mancala & game, std::ostream & os=std::cout, std::istream & is=std::cin) {
@@ -176,8 +176,7 @@ int main()
   fit_fun(&(world[0]));
 
   std::cout << std::endl;
-  world[0].PrintGenome();
-  std::cout << std::endl;
+  world[0].PrintGenome("mancala_save.org");
 
   EvalGame(world[0], world[1], 0, true);
 
