@@ -177,7 +177,7 @@ namespace emp {
     static PtrTracker & Tracker() { return PtrTracker::Get(); }
 #endif
   public:
-    using value_type = TYPE;
+    using element_type = TYPE;
 
     Ptr() : ptr(nullptr) { ; }
     template <typename T2> Ptr(T2 * in_ptr, bool is_new=false) : ptr(in_ptr) {

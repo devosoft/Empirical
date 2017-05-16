@@ -19,13 +19,14 @@
 #include <functional>
 
 #include "../base/vector.h"
+#include "../meta/meta.h"
 
 namespace emp {
 namespace evo {
 
   // Calculates Shannon Entropy of the members of the container passed
   template <typename C>
-  typename std::enable_if<!std::is_pointer<typename C::value_type>::value, double>::type
+  typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value, double>::type
   ShannonEntropy(C & elements) {
 
     // Count number of each value present
@@ -51,10 +52,10 @@ namespace evo {
   // Calculates Shannon Entropy of the members of the container when those members
   // are pointers
   template <typename C>
-  typename std::enable_if<std::is_pointer<typename C::value_type>::value, double>::type
+  typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value, double>::type
   ShannonEntropy(C & elements) {
 
-    using pointed_at = typename std::remove_pointer<typename C::value_type>::type;
+    using pointed_at = typename emp::remove_ptr_type<typename C::value_type>::type;
     // Count number of each value present
     std::map<pointed_at, int> counts;
     for (auto element : elements) {
@@ -77,7 +78,7 @@ namespace evo {
 
   // Calculates number of unique elements in the container passed
   template <typename C>
-  typename std::enable_if<!std::is_pointer<typename C::value_type>::value, int>::type
+  typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value, int>::type
   UniqueCount(C & elements) {
     // Converting to a set will remove duplicates leaving only unique values
     std::set<typename C::value_type> unique_elements(elements.begin(),
@@ -87,10 +88,10 @@ namespace evo {
 
   // Calculates number of unique elements in the container of pointers passed
   template <typename C>
-  typename std::enable_if<std::is_pointer<typename C::value_type>::value, int>::type
+  typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value, int>::type
   UniqueCount(C & elements) {
     // Converting to a set will remove duplicates leaving only unique values
-    using pointed_at = typename std::remove_pointer<typename C::value_type>::type;
+    using pointed_at = typename emp::remove_ptr_type<typename C::value_type>::type;
     std::set<pointed_at> unique_elements;
     for (auto element : elements) {
         unique_elements.insert(*element);

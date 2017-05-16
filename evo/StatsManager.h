@@ -110,7 +110,7 @@ namespace evo{
     using base_t::col_map;
   public:
     using org_ptr = typename POP_MANAGER::value_type;
-    using ORG = typename org_ptr::value_type;
+    using ORG = typename org_ptr::element_type;
     using base_t::SetDefaultFitnessFun;
 
     // Constructor for creating a stand-alone stats manager.
@@ -148,7 +148,7 @@ namespace evo{
 
   public:
     using org_ptr = typename POP_MANAGER::value_type;
-    using ORG = typename org_ptr::value_type;
+    using ORG = typename org_ptr::element_type;
     using fun_type = std::function<double(ORG *)>;
     using base_t::SetDefaultFitnessFun;
     fun_type func;
@@ -188,7 +188,7 @@ namespace evo{
   class StatsManager_FunctionsOnUpdate : StatsManager_Base<POP_MANAGER> {
   protected:
     using org_ptr = typename POP_MANAGER::value_type;
-    using ORG = typename org_ptr::value_type;
+    using ORG = typename org_ptr::element_type;
     // using world_type = World<ORG, MANAGERS...>;
     using fit_fun_type = std::function<double(ORG *)>;
     FunctionSet<double()> stats;  // Stats calculated on the world
@@ -261,7 +261,7 @@ namespace evo{
   class StatsManager_DefaultStats : public StatsManager_FunctionsOnUpdate<POP_MANAGER> {
   protected:
     using org_ptr = typename POP_MANAGER::value_type;
-    using ORG = typename org_ptr::value_type;
+    using ORG = typename org_ptr::element_type;
     using fit_fun_type = std::function<double(ORG *)>;
     using fit_stat_type = std::function<double(fit_fun_type, POP_MANAGER*)>;
     using base_t = StatsManager_Base<POP_MANAGER>;
@@ -329,7 +329,7 @@ namespace evo{
   class StatsManager_AdvancedStats : public StatsManager_FunctionsOnUpdate<POP_MANAGER> {
   protected:
       using org_ptr = typename POP_MANAGER::value_type;
-      using ORG = typename org_ptr::value_type;
+      using ORG = typename org_ptr::element_type;
       using fit_fun_type = std::function<double(ORG *)>;
       using fit_stat_type = std::function<double(fit_fun_type, POP_MANAGER*)>;
       using StatsManager_Base<POP_MANAGER>::output_location;
