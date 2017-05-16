@@ -57,7 +57,7 @@ namespace evo{
   private:
     //This prevents compilation under g++
     using org_ptr = typename POP_MANAGER::value_type;
-    using ORG = typename std::remove_pointer<org_ptr>::type;
+    using ORG = typename org_ptr::value_type;
 
     using GENOME_ELEMENT = typename std::remove_reference<decltype(ORG()[0])>::type;
     using skeleton_type = emp::vector<GENOME_ELEMENT>;

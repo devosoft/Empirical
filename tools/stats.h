@@ -101,8 +101,8 @@ namespace evo {
 
   // Takes a function and a container of items that that function can be run on
   // and returns the maximum value
-  template <typename C, typename RET_TYPE>
-  RET_TYPE MaxFunctionReturn(std::function<RET_TYPE(typename C::value_type)> & fun, C & elements){
+  template <typename C, typename RET_TYPE, typename ARG_TYPE>
+  RET_TYPE MaxFunctionReturn(std::function<RET_TYPE(ARG_TYPE)> & fun, C & elements){
     double highest = 0;
     for (auto element : elements){
       double result = fun(element);
@@ -115,8 +115,8 @@ namespace evo {
 
   // Takes a function and a container of items that that function can be run on
   // and returns the average value. Function must return a double.
-  template <typename C>
-  double AverageFunctionReturn(std::function<double(typename C::value_type)> & fun, C & elements){
+  template <typename C, typename ARG_TYPE>
+  double AverageFunctionReturn(std::function<double(ARG_TYPE)> & fun, C & elements){
     double cumulative_value = 0;
     double count = 0;
     for (auto element : elements){
@@ -126,8 +126,8 @@ namespace evo {
     return (cumulative_value / count);
   }
 
-  template <typename C, typename RET_TYPE>
-  emp::vector<RET_TYPE> RunFunctionOnContainer(std::function<RET_TYPE(typename C::value_type)> & fun, C & elements) {
+  template <typename C, typename RET_TYPE, typename ARG_TYPE>
+  emp::vector<RET_TYPE> RunFunctionOnContainer(std::function<RET_TYPE(ARG_TYPE)> & fun, C & elements) {
       emp::vector<RET_TYPE> results;
       for (auto element : elements){
           results.push_back(fun(element));
