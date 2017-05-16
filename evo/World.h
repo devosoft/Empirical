@@ -641,8 +641,7 @@ namespace evo {
         ordering[org_id] = org_id;
         for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
           double cur_fit = popM.CalcFitness(org_id, extra_funs[ex_id]);
-          cur_fit = cur_fit;
-          extra_fitnesses[ex_id][org_id] = Pow2(cur_fit/32);
+          extra_fitnesses[ex_id][org_id] = emp::Pow(cur_fit, 2.0);
         }
       }
 
