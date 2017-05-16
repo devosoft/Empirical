@@ -2,7 +2,7 @@
 #define VISUALIZATION_ELEMENTS_H
 
 #include "selection.h"
-#include "../../tools/vector.h"
+#include "../../base/vector.h"
 #include "../../web/JSWrap.h"
 
 
