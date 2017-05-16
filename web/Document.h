@@ -52,47 +52,47 @@ namespace web {
     // Retrieve specific types of widgets.
 
     // Shortcut adders for Widgets
-    template <class... T> web::Button AddButton(T... args){
+    template <class... T> web::Button AddButton(T &&... args){
       web::Button new_widget(std::forward<T>(args)...);
       info->Append(new_widget);
       return new_widget;
     }
-    template <class... T> web::Canvas AddCanvas(T... args){
+    template <class... T> web::Canvas AddCanvas(T &&... args){
       web::Canvas new_widget(std::forward<T>(args)...);
       info->Append(new_widget);
       return new_widget;
     }
-    template <class... T> web::FileInput AddFileInput(T... args){
+    template <class... T> web::FileInput AddFileInput(T &&... args){
       web::FileInput new_widget(std::forward<T>(args)...);
       info->Append(new_widget);
       return new_widget;
     }
-    template <class... T> web::Image AddImage(T... args) {
+    template <class... T> web::Image AddImage(T &&... args) {
       web::Image new_widget(std::forward<T>(args)...);
       info->Append(new_widget);
       return new_widget;
     }
-    template <class... T> web::Selector AddSelector(T... args){
+    template <class... T> web::Selector AddSelector(T &&... args){
       web::Selector new_widget(std::forward<T>(args)...);
       info->Append(new_widget);
       return new_widget;
     }
-    template <class... T> web::Slate AddSlate(T... args) {
+    template <class... T> web::Slate AddSlate(T &&... args) {
       web::Slate new_widget(std::forward<T>(args)...);
       info->Append(new_widget);
       return new_widget;
     }
-    template <class... T> web::Table AddTable(T... args) {
+    template <class... T> web::Table AddTable(T &&... args) {
       web::Table new_widget(std::forward<T>(args)...);
       info->Append(new_widget);
       return new_widget;
     }
-    template <class... T> web::Text AddText(T... args)  {
+    template <class... T> web::Text AddText(T &&... args)  {
       web::Text new_widget(std::forward<T>(args)...);
       info->Append(new_widget);
       return new_widget;
     }
-    template <class... T> web::TextArea AddTextArea(T... args)  {
+    template <class... T> web::TextArea AddTextArea(T &&... args)  {
       web::TextArea new_widget(std::forward<T>(args)...);
       info->Append(new_widget);
       return new_widget;
@@ -100,7 +100,7 @@ namespace web {
 
 
     // Shortcut adders for helpers
-    template <class... T> web::Animate & AddAnimation(const std::string & name, T... args){
+    template <class... T> web::Animate & AddAnimation(const std::string & name, T &&... args){
       web::Animate * new_anim = new web::Animate(std::forward<T>(args)...);
       emp_assert(anim_map.find(name) == anim_map.end());  // Make sure not in map already!
       anim_map[name] = new_anim;

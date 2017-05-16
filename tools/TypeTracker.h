@@ -67,7 +67,7 @@ namespace emp {
     }
     template <typename REAL_T> wrap_t<REAL_T> * New(REAL_T & val) {
       emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
-      return new wrap_t<REAL_T>(std::forward<REAL_T>(val));
+      return new wrap_t<REAL_T>(val);
     }
     template <typename REAL_T> wrap_t<REAL_T> * New(REAL_T && val) {
       emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.

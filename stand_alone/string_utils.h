@@ -381,7 +381,7 @@ namespace emp {
   /// of arguments and returns a single string containing all of them concatenated. Objects can be
   /// any normal (POD) data type, container, or anything that can be passed into a stringstream.
   template <typename... ALL_TYPES>
-  inline std::string to_string(ALL_TYPES... all_values) {
+  inline std::string to_string(ALL_TYPES &&... all_values) {
     return to_string_impl(true, std::forward<ALL_TYPES>(all_values)...);
   }
 }
