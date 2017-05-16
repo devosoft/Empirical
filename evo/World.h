@@ -223,10 +223,10 @@ namespace evo {
   public:
     std::string world_name;
 
-    World(emp::Random * r_ptr, const std::string & w_name=UniqueName("emp::evo::World"))
+    World(Ptr<Random> r_ptr, const std::string & w_name=UniqueName("emp::evo::World"))
       : fitM()
       , popM(w_name, fitM)
-      , random_ptr(r_ptr, false), random_owner(false)
+      , random_ptr(r_ptr), random_owner(false)
       , before_repro_sig(to_string(w_name,"::before-repro"), control)
       , offspring_ready_sig(to_string(w_name,"::offspring-ready"), control)
       , inject_ready_sig(to_string(w_name,"::inject-ready"), control)
@@ -646,7 +646,6 @@ namespace evo {
         ordering[org_id] = org_id;
         for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
           double cur_fit = popM.CalcFitness(org_id, extra_funs[ex_id]);
-          cur_fit = cur_fit;
           extra_fitnesses[ex_id][org_id] = Pow2(cur_fit/32);
         }
       }
