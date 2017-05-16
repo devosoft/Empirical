@@ -43,9 +43,9 @@ namespace evo {
       size_t id;                                       // Which position does it represent?
     public:
       Proxy(PopulationManager_Base & _p, size_t _id) : popM(_p), id(_id) { ; }
-      operator ORG*() const { return popM.pop[id]; }
+      operator ORG*() const { return popM.pop[id].Raw(); }
       operator Ptr<ORG>() const { return popM.pop[id]; }
-      ORG * operator->() const { return popM.pop[id]; }
+      ORG * operator->() const { return popM.pop[id].Raw(); }
       ORG & operator*() const { return *(popM.pop[id]); }
       Proxy & operator=(Ptr<ORG> new_org) { popM.AddOrgAt(new_org,id); return *this; }
 
@@ -73,8 +73,8 @@ namespace evo {
       for (size_t id = 0; id < pop.size(); id++) fitM.CalcFitness(id, pop[id], fit_fun);
     }
 
-    void SetRandom(Random * r) { random_ptr = r; }
-    void Setup(Random * r) { SetRandom(r); }
+    void SetRandom(Ptr<Random> r) { random_ptr = r; }
+    void Setup(Ptr<Random> r) { SetRandom(r); }
 
     // AddOrgAt, AddOrgAppend, and SetOrgs are the only ways new organisms come into a population
     // (all others go through these)
@@ -168,7 +168,7 @@ namespace evo {
     emp::vector<size_t> FindCellIDs(const std::function<bool(ORG*)> & filter) {
       emp::vector<size_t> valid_IDs(0);
       for (size_t i = 0; i < pop.size(); i++) {
-        if (filter(pop[i])) valid_IDs.push_back(i);
+        if (filter(pop[i].Raw())) valid_IDs.push_back(i);
       }
       return valid_IDs;
     }
@@ -196,7 +196,7 @@ namespace evo {
     void Print(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout,
               std::string empty="X", std::string spacer=" ") {
       for (ptr_t org : pop) {
-        if (org) os << string_fun(org);
+        if (org) os << string_fun(org.Raw());
         else os << empty;
         os << spacer;
       }
@@ -274,12 +274,12 @@ namespace evo {
 
     size_t AddOrg(ptr_t new_org) {
       size_t new_pos;
-      sig_add_org.Trigger(new_org, new_pos);
+      sig_add_org.Trigger(new_org.Raw(), new_pos);
       return new_pos;
     }
     size_t AddOrgBirth(ptr_t new_org, size_t parent_pos) {
       size_t offspring_pos;
-      sig_add_org_birth.Trigger(new_org, parent_pos, offspring_pos);
+      sig_add_org_birth.Trigger(new_org.Raw(), parent_pos, offspring_pos);
       return offspring_pos;
     }
   };
@@ -409,7 +409,7 @@ namespace evo {
       for (size_t y=0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {
           ptr_t org = base_t::GetOrg(x+y*width);
-          if (org) os << string_fun(org) << spacer;
+          if (org) os << string_fun(org.Raw()) << spacer;
           else os << empty << spacer;
         }
         os << std::endl;
@@ -446,7 +446,7 @@ namespace evo {
     size_t GetPoolCount() const { return pool_count; }
     const vector<size_t> & GetSizes() const { return pool_sizes ; }
 
-    void Setup(Random * r) {
+    void Setup(Ptr<Random> r) {
       base_t::SetRandom(r);
       vector<size_t> * temp_sizes = new vector<size_t>;
       std::map<size_t, vector<size_t> > temp_connect;

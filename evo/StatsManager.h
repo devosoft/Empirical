@@ -110,6 +110,7 @@ namespace evo{
     using base_t::col_map;
   public:
     using org_ptr = typename POP_MANAGER::value_type;
+    using ORG = typename org_ptr::value_type;
     using base_t::SetDefaultFitnessFun;
 
     // Constructor for creating a stand-alone stats manager.
@@ -147,7 +148,8 @@ namespace evo{
 
   public:
     using org_ptr = typename POP_MANAGER::value_type;
-    using fun_type = std::function<double(org_ptr)>;
+    using ORG = typename org_ptr::value_type;
+    using fun_type = std::function<double(ORG *)>;
     using base_t::SetDefaultFitnessFun;
     fun_type func;
 
@@ -186,8 +188,9 @@ namespace evo{
   class StatsManager_FunctionsOnUpdate : StatsManager_Base<POP_MANAGER> {
   protected:
     using org_ptr = typename POP_MANAGER::value_type;
+    using ORG = typename org_ptr::value_type;
     // using world_type = World<ORG, MANAGERS...>;
-    using fit_fun_type = std::function<double(org_ptr)>;
+    using fit_fun_type = std::function<double(ORG *)>;
     FunctionSet<double()> stats;  // Stats calculated on the world
 
     // Pointer to the world object on which we're calculating stats
@@ -246,7 +249,7 @@ namespace evo{
       }
     }
 
-    void SetDefaultFitnessFun(const std::function<double(org_ptr)> & fit) {
+    void SetDefaultFitnessFun(const std::function<double(ORG *)> & fit) {
       fit_fun = fit;
     }
 
@@ -258,7 +261,8 @@ namespace evo{
   class StatsManager_DefaultStats : public StatsManager_FunctionsOnUpdate<POP_MANAGER> {
   protected:
     using org_ptr = typename POP_MANAGER::value_type;
-    using fit_fun_type = std::function<double(org_ptr)>;
+    using ORG = typename org_ptr::value_type;
+    using fit_fun_type = std::function<double(ORG *)>;
     using fit_stat_type = std::function<double(fit_fun_type, POP_MANAGER*)>;
     using base_t = StatsManager_Base<POP_MANAGER>;
     using base_t::output_location;
@@ -325,7 +329,8 @@ namespace evo{
   class StatsManager_AdvancedStats : public StatsManager_FunctionsOnUpdate<POP_MANAGER> {
   protected:
       using org_ptr = typename POP_MANAGER::value_type;
-      using fit_fun_type = std::function<double(org_ptr)>;
+      using ORG = typename org_ptr::value_type;
+      using fit_fun_type = std::function<double(ORG *)>;
       using fit_stat_type = std::function<double(fit_fun_type, POP_MANAGER*)>;
       using StatsManager_Base<POP_MANAGER>::output_location;
       using parent_t = StatsManager_FunctionsOnUpdate<POP_MANAGER>;
@@ -358,7 +363,7 @@ namespace evo{
 
       // Create std::function object for all stats
       std::function<double()> diversity=[this](){ return ShannonEntropy(*pop); };
-      std::function<double()> max_fitness=[this](){ return  MaxFunctionReturn(fit_fun, *pop); };
+      std::function<double()> max_fitness=[this](){ return MaxFunctionReturn(fit_fun, *pop); };
       std::function<double()> avg_fitness=[this](){ return AverageFunctionReturn(fit_fun, *pop); };
 
       std::function<double()> non_inf = [this]() { return NonInf(fit_fun, *pop); };

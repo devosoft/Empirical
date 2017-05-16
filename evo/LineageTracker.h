@@ -70,7 +70,7 @@ namespace evo {
   class LineageTracker {
   protected:
     using org_ptr = typename POP_MANAGER::value_type;
-    using ORG = typename std::remove_pointer<org_ptr>::type;
+    using ORG = typename org_ptr::value_type;
     static constexpr bool separate_generations = POP_MANAGER::emp_has_separate_generations;
 
   public:
