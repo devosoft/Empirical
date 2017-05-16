@@ -17,46 +17,46 @@
 // METHOD - name of the member function that should be attempted.
 // FALLBACK - function to call if no such member function exists.
 
-#define EMP_CREATE_METHOD_FALLBACK(NAME, METHOD, FALLBACK)                                   \
-  namespace {                                                                                \
-    template <class T, class... ARGS>    /* T::METHOD exists! */                             \
-    auto EMPCall_ ## NAME(emp::bool_decoy<decltype(&T::METHOD)>, T & target, ARGS... args)   \
-     { return target.METHOD(std::forward<ARGS>(args)...); }                                  \
-    template <class T, class... ARGS>    /* T::METHOD does NOT exist! */                     \
-    auto EMPCall_ ## NAME(int, T & target, ARGS... args)                                     \
-     { return FALLBACK(target, std::forward<ARGS>(args)...); }                               \
-  }                                                                                          \
-  template <class T, class... ARGS> auto NAME(T & target, ARGS... args) {                    \
-    return EMPCall_ ## NAME(true, target, std::forward<ARGS>(args)...);                      \
+#define EMP_CREATE_METHOD_FALLBACK(NAME, METHOD, FALLBACK)                                    \
+  namespace {                                                                                 \
+    template <class T, class... ARGS>    /* T::METHOD exists! */                              \
+    auto EMPCall_ ## NAME(emp::bool_decoy<decltype(&T::METHOD)>, T & target, ARGS &&... args) \
+     { return target.METHOD(std::forward<ARGS>(args)...); }                                   \
+    template <class T, class... ARGS>    /* T::METHOD does NOT exist! */                      \
+    auto EMPCall_ ## NAME(int, T & target, ARGS &&... args)                                   \
+     { return FALLBACK(target, std::forward<ARGS>(args)...); }                                \
+  }                                                                                           \
+  template <class T, class... ARGS> auto NAME(T & target, ARGS &&... args) {                  \
+    return EMPCall_ ## NAME(true, target, std::forward<ARGS>(args)...);                       \
   } int ignore_semicolon_to_follow_ ## NAME = 0
 
 
 // Similar to EMP_CREATE_METHOD_FALLBACK: call method if it exists, otherwise do nothing.
 // @CAO: for some reason can't use namespace or else it breaks...
 
-#define EMP_CREATE_OPTIONAL_METHOD(NAME, METHOD)                                          \
-  template <typename T, typename... ARGS>                                                 \
-  void EMPCall_ ## NAME(emp::bool_decoy<decltype(&T::METHOD)>, T & target, ARGS... args)  \
-   { target.METHOD(std::forward<ARGS>(args)...); }                                        \
-  template <typename T, typename... ARGS>                                                 \
-  void EMPCall_ ## NAME(int, T&, ARGS...) {;}                                             \
-  template <typename T, typename... ARGS> void NAME(T & target, ARGS... args) {           \
-    EMPCall_ ## NAME(true, target, std::forward<ARGS>(args)...);                          \
+#define EMP_CREATE_OPTIONAL_METHOD(NAME, METHOD)                                            \
+  template <typename T, typename... ARGS>                                                   \
+  void EMPCall_ ## NAME(emp::bool_decoy<decltype(&T::METHOD)>, T & target, ARGS &&... args) \
+   { target.METHOD(std::forward<ARGS>(args)...); }                                          \
+  template <typename T, typename... ARGS>                                                   \
+  void EMPCall_ ## NAME(int, T&, ARGS...) {;}                                               \
+  template <typename T, typename... ARGS> void NAME(T & target, ARGS &&... args) {          \
+    EMPCall_ ## NAME(true, target, std::forward<ARGS>(args)...);                            \
   } int ignore_semicolon_to_follow_ ## NAME = 0
 
 
 // Same as above, but a return type and default value are specified.
 
-#define EMP_CREATE_METHOD_FALLBACK_VAL(NAME, METHOD, DEFAULT)	                             \
-namespace {                                                                                \
-  template <class T, class... ARGS>    /* T::METHOD exists! */                             \
-  auto EMPCall_ ## NAME(emp::bool_decoy<decltype(&T::METHOD)>, T & target, ARGS... args)   \
-   { return target.METHOD(std::forward<ARGS>(args)...); }                                  \
-  auto EMPCall_ ## NAME(...)           /* T::METHOD does NOT exist! */                     \
-   { return DEFAULT; }                                                                     \
-}                                                                                          \
-template <class T, class... ARGS> auto NAME(T & target, ARGS... args) {                    \
-  return EMPCall_ ## NAME(true, target, std::forward<ARGS>(args)...);                      \
+#define EMP_CREATE_METHOD_FALLBACK_VAL(NAME, METHOD, DEFAULT)	                              \
+namespace {                                                                                 \
+  template <class T, class... ARGS>    /* T::METHOD exists! */                              \
+  auto EMPCall_ ## NAME(emp::bool_decoy<decltype(&T::METHOD)>, T & target, ARGS &&... args) \
+   { return target.METHOD(std::forward<ARGS>(args)...); }                                   \
+  auto EMPCall_ ## NAME(...)           /* T::METHOD does NOT exist! */                      \
+   { return DEFAULT; }                                                                      \
+}                                                                                           \
+template <class T, class... ARGS> auto NAME(T & target, ARGS &&... args) {                  \
+  return EMPCall_ ## NAME(true, target, std::forward<ARGS>(args)...);                       \
 } int ignore_semicolon_to_follow_ ## NAME = 0
 
 
