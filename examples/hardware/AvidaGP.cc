@@ -41,6 +41,8 @@ int main()
   }
 
   cpu.PrintGenome();
+  cpu.ResetHardware();
+  cpu.Trace(200);
 
   // Run a ton of organisms.
   for (int t = 0; t < 100000; t++) {

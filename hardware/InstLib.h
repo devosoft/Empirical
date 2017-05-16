@@ -86,7 +86,7 @@ namespace emp {
 
     void WriteGenome(const genome_t & genome, std::ostream & os=std::cout) const {
       for (const inst_t & inst : genome) {
-        os << GetName(inst.id);
+        os << ((int) inst.id) << " " << GetName(inst.id);
         const size_t num_args = GetNumArgs(inst.id);
         for (size_t i = 0; i < num_args; i++) {
           os << ' ' << inst.args[i];

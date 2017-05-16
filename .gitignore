@@ -14,7 +14,6 @@ a.out.js
 *.debug
 *.mp4
 *.csv
-*.cfg
 coverage.xml
 diff_cover.txt
 UTests/tools/tmp*.cc

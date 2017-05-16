@@ -88,6 +88,7 @@
 #include <map>
 
 #include "../base/assert.h"
+#include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../control/SignalControl.h"
 #include "../meta/reflection.h"
@@ -169,7 +170,7 @@ namespace evo {
     statsM_t statsM;
     lineageM_t lineageM;
 
-    Random * random_ptr;
+    Ptr<Random> random_ptr;
     bool random_owner;
     size_t update = 0;
 
@@ -225,7 +226,7 @@ namespace evo {
     World(emp::Random * r_ptr, const std::string & w_name=UniqueName("emp::evo::World"))
       : fitM()
       , popM(w_name, fitM)
-      , random_ptr(r_ptr), random_owner(false)
+      , random_ptr(r_ptr, false), random_owner(false)
       , before_repro_sig(to_string(w_name,"::before-repro"), control)
       , offspring_ready_sig(to_string(w_name,"::offspring-ready"), control)
       , inject_ready_sig(to_string(w_name,"::inject-ready"), control)
@@ -246,13 +247,18 @@ namespace evo {
     World(emp::Random & random, const std::string & w_name=UniqueName("emp::evo::World"))
       : World(&random, w_name) { ; }
     World(const World &) = delete;
-    ~World() { Clear(); if (random_owner) delete random_ptr; }
+    ~World() { Clear(); if (random_owner) random_ptr.Delete(); }
     World & operator=(const World &) = delete;
 
     size_t GetSize() const { return popM.GetSize(); }
     size_t GetNumOrgs() const { return popM.GetNumOrgs(); }
     ORG & operator[](size_t i) { return *(popM[i]); }
     const ORG & operator[](size_t i) const { return *(popM[i]); }
+    ORG & GetRandomOrg() {
+      emp_assert(random_ptr != nullptr && "GetRandomOrg() requires active random_ptr");
+      const size_t org_id = popM.GetRandomOrg();
+      return *(popM[org_id]);
+    }
     bool IsOccupied(size_t i) const { return popM[i] != nullptr; }
     iterator_t begin(){ return iterator_t(&popM, 0); }
     iterator_t end(){ return iterator_t(&popM, popM.size()); }
@@ -260,7 +266,11 @@ namespace evo {
     void Clear() { popM.Clear(); }
 
     Random & GetRandom() { return *random_ptr; }
-    void SetRandom(Random & random) { if (random_owner) delete random_ptr; random_ptr = &random; }
+    void SetRandom(Random & random) {
+      if (random_owner) random_ptr.Delete();
+      random_ptr = &random;
+      random_owner = false;
+    }
     void ResetRandom(int seed=-1) { SetRandom(*(new Random(seed))); }
 
     // Forward function calls to appropriate internal objects
@@ -559,9 +569,9 @@ namespace evo {
 
         // The current bonus is divided up among the organisms that earned it...
         const double cur_bonus = pool_sizes[ex_id] / max_count[ex_id];
-        std::cout << "Bonus " << ex_id << " = " << cur_bonus
-                  << "   max_extra_fit = " << max_extra_fit[ex_id]
-                  << std::endl;
+        // std::cout << "Bonus " << ex_id << " = " << cur_bonus
+        //           << "   max_extra_fit = " << max_extra_fit[ex_id]
+        //           << std::endl;
 
         for (size_t org_id = 0; org_id < popM.size(); org_id++) {
           // If this organism is the best at the current resource, git it the bonus!

@@ -47,12 +47,12 @@
 #define EMP_JSWRAP_H
 
 
+#include <array>
 #include <functional>
 #include <tuple>
 
 #include "../meta/meta.h"
 
-#include "../base/array.h"
 #include "../base/assert.h"
 #include "../base/vector.h"
 
@@ -124,7 +124,7 @@ namespace emp {
     arg_var = tmp_var;   // @CAO Do we need to free the memory in tmp_var?
   }
 
-  template <int ARG_ID, size_t SIZE, typename T> static void LoadArg(emp::array<T, SIZE> & arg_var){
+  template <int ARG_ID, size_t SIZE, typename T> static void LoadArg(std::array<T, SIZE> & arg_var){
     EM_ASM_ARGS({emp_i.__outgoing_array = emp_i.cb_args[$0];}, ARG_ID);
     pass_array_to_cpp(arg_var);
   }
@@ -274,7 +274,7 @@ namespace emp {
   }
 
   template <typename T, size_t N>
-  static void StoreReturn(const emp::array<T, N> & ret_var) {
+  static void StoreReturn(const std::array<T, N> & ret_var) {
     pass_array_to_javascript(ret_var);
     EM_ASM({ emp_i.cb_return = emp_i.__incoming_array; });
   }
@@ -302,7 +302,7 @@ namespace emp {
   }
 
   template <typename T, size_t N>
-  static void StoreReturn(const emp::array<T, N> & ret_var, std::string var) {
+  static void StoreReturn(const std::array<T, N> & ret_var, std::string var) {
     pass_array_to_javascript(ret_var);
     EM_ASM_ARGS({ emp_i.curr_obj[Pointer_stringify($0)] = emp_i.__incoming_array;}, var.c_str());
   }

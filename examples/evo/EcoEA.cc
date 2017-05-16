@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -49,7 +49,6 @@ int main(int argc, char* argv[])
   // emp::evo::NKLandscapeMemo landscape(N, K, random);
 
   emp::evo::EAWorld<BitOrg, emp::evo::FitCacheOff> pop(random, "NKWorld");
-  // emp::evo::EAWorld<BitOrg, emp::evo::FitCacheOn> pop(random, "NKWorld");
 
   // Build a random initial population
   for (uint32_t i = 0; i < POP_SIZE; i++) {

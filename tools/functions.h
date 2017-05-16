@@ -66,8 +66,8 @@ namespace emp {
     return val++;
   }
 
-  static std::string UniqueName(const std::string & prefix="",
-                                        const std::string & postfix="") {
+  static inline std::string UniqueName(const std::string & prefix="",
+                                       const std::string & postfix="") {
     std::stringstream ss;
     ss << prefix << UniqueVal() << postfix;
     return ss.str();
