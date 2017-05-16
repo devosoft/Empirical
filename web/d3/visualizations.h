@@ -698,7 +698,7 @@ public:
   void DrawTree() {
     std::cout << "Vis data id: " << data->GetID() << std::endl;
     D3::Selection nodeEnter = tree.GenerateNodesAndLinks(*GetSVG())[0];
-    nodeEnter.Append("circle").SetAttr("r", 2).On("click", GetID()+"node_mouseover").AddToolTip(*tip);
+    nodeEnter.Append("circle").SetAttr("r", 2).AddToolTip(*tip);
     GetSVG()->SelectAll("g.node").SelectAll("circle").SetStyle("fill", GetID()+"color_fun_node");
     GetSVG()->SelectAll(".link").SetStyle("stroke", GetID()+"color_fun_link");
     CallDrawCallback();
