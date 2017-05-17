@@ -15,7 +15,6 @@ constexpr double radius = 0.01;
 constexpr size_t MAX_GENS = 5000;
 constexpr double MUT_SIZE = 0.01;
 constexpr size_t POP_SIZE = 200;
-constexpr double NEUT_RANGE = 0.01;  // How close must two orgs be to be considered the same?
 
 constexpr double radius2 = radius * radius;
 
@@ -96,7 +95,7 @@ int main(int argc, char* argv[])
   // Loop through updates
   for (uint32_t ud = 0; ud < MAX_GENS; ud++) {
     Init(pop);
-    pop.EcocaseSelect(fit_funs, probs, POP_SIZE);
+    pop.EcocaseSelect(fit_funs, probs, 0.6, POP_SIZE);
     pop.Update();
     std::cout << "Gen " << (ud+1) << " : (" << (pop[0].x) << "," << (pop[0].y) << ") : "
 	      << "  Fit_Main() = " << fit_funs[0]( &(pop[0]) )

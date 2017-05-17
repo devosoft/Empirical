@@ -760,10 +760,12 @@ namespace evo {
     // NOTE: You must turn off the FitnessCache for this function to work properly.
     void EcocaseSelect(const emp::vector<fit_fun_t> & fit_funs,
                        const emp::vector<double> & probs,   // Probability of using each function.
+                       double repro_decay,                  // Reduced chance of being used again.
                        size_t repro_count)
     {
       emp_assert(popM.size() > 0);
       emp_assert(fit_funs.size() > 0 && fit_funs.size() == probs.size());
+      emp_assert(repro_decay > 0.0 && repro_decay <= 1.0, repro_decay);
       emp_assert(random_ptr != nullptr && "EcocaseSelect() requires active random_ptr");
       emp_assert(fitM.IsCached() == false, "Ecocase constantly changes fitness functions!");
 
@@ -776,6 +778,9 @@ namespace evo {
         }
       }
 
+      // Determine how eligible each org is for being reproduced.
+      emp::vector<double> repro_prob(popM.size(), 1.0);
+
       // Go through a new ordering of fitness functions for each selection.
       emp::vector<size_t> all_orgs(popM.size()), cur_orgs, next_orgs;
       for (size_t org_id = 0; org_id < popM.size(); org_id++) all_orgs[org_id] = org_id;
@@ -784,8 +789,15 @@ namespace evo {
         // Determine the current ordering of the functions.
         emp::vector<size_t> order = GetPermutation(*random_ptr, fit_funs.size());
 
+        // Determine the starting set of organisms.
+        cur_orgs.resize(0);
+        for (size_t org_id = 0; org_id < popM.size(); org_id++) {
+          if (repro_prob[org_id] == 1.0 || random_ptr->P(repro_prob[org_id])) {
+            cur_orgs.push_back(org_id);
+          }
+        }
+
         // Step through the functions in the proper order.
-        cur_orgs = all_orgs;  // Start with all of the organisms.
         for (size_t fit_id : order) {
           // Determine if we should skip this fitness function.
           if ( random_ptr->P(1.0 - probs[fit_id]) ) continue;
@@ -810,6 +822,9 @@ namespace evo {
         emp_assert(cur_orgs.size() > 0, cur_orgs.size(), fit_funs.size(), all_orgs.size());
         size_t repro_id = cur_orgs[ random_ptr->GetUInt(cur_orgs.size()) ];
         InsertBirth( *(popM[repro_id]), repro_id, 1 );
+
+        // Reduce the probability of this organism reproducing again.
+        repro_prob[repro_id] *= repro_decay;
       }
     }
 
