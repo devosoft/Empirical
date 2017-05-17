@@ -1,0 +1,15 @@
+For AvidaGP, we need to do a lot of fine-tuning.
+
+Things to try:
+* Is 16 the right number of registers / scopes / etc.
+* Regs -as- stacks?
+* Skewed mutations so that lower args are more likely than higher ones?
+* All data can be vectors that can be rotated or merged?
+  (better for lots of data, acted on in parallel and processed on a GPU...)
+* Explore var scoping in functions?  Back up ALL regs but return value?
+* Do jumps add anything?  Do we need both While and Countdown?  Are functions used?
+
+
+And for shifting to regular Avida:
+* Can we get the instruction set to 16 so that everything is the same base?
+* Can we shift to old-style Avida formatting (16 new nops; instruction defaults are nop-modified)
