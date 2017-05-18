@@ -15,10 +15,12 @@
 #define EMP_FILE_H
 
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <string>
 
 #include "../base/vector.h"
+#include "string_utils.h"
 
 namespace emp {
 
@@ -82,6 +84,34 @@ namespace emp {
       std::ofstream file(filename);
       Write(file);
       file.close();
+    }
+
+    /// Apply a string manipulation function to all lines in the file.
+    void Apply(const std::function<void(std::string &)> & fun) {
+      for (std::string & cur_line : lines) {
+        fun(cur_line);
+      }
+    }
+
+    /// Purge functions that don't meet a certain criterion.
+    void KeepIf(const std::function<bool(const std::string &)> & fun) {
+      emp::vector<std::string> new_lines;
+      for (std::string & cur_line : lines) {
+        if (fun(cur_line)) new_lines.emplace_back(cur_line);
+      }
+      std::swap(lines, new_lines);
+    }
+
+    /// Remove all lines that are empty strings.
+    void RemoveEmpty() {
+      KeepIf( [](const std::string & str){ return (bool) str.size(); } );
+    }
+
+    /// Any time multiple whitespaces are next to each other, collapse to a single WS char.
+    /// Prefer '\n' if in whitespace collapsed, otherwise use ' '.
+    void CompressWhitespace() {
+      Apply(compress_whitespace);
+      RemoveEmpty();
     }
   };
 
