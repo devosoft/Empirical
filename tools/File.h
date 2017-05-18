@@ -28,6 +28,8 @@ namespace emp {
 
   public:
     File() { ; }
+    File(std::istream & input) { Load(input); }
+    File(const std::string & filename) { Load(filename); }
     File(const File &) = default;
     File(File &&) = default;
     ~File() { ; }
@@ -40,34 +42,44 @@ namespace emp {
     std::string & operator[](size_t pos) { return lines[pos]; }
     const std::string & operator[](size_t pos) const { return lines[pos]; }
 
+    void Append(const std::string & line) { lines.emplace_back(line); }
+    void Append(const emp::vector<std::string> & in_lines) {
+      size_t start_size = lines.size();
+      lines.resize(start_size + in_lines.size());
+      for (size_t pos = 0; pos < in_lines.size(); pos++) {
+        lines[start_size+pos] = in_lines[pos];
+      }
+    }
+    void Append(const File & in_file) { Append(in_file.lines); }
+
     bool operator==(const File in) { return lines == in.lines; }
     bool operator!=(const File in) { return lines != in.lines; }
 
-    void LoadLine(istream & input) {
+    void LoadLine(std::istream & input) {
       lines.emplace_back("");
       std::getline(input, lines.back());
     }
 
-    void Load(istream & input) {
+    void Load(std::istream & input) {
       while (!input.eof()) {
-	LoadLine(input);
+	      LoadLine(input);
       }
     }
 
     void Load(const std::string & filename) {
-      ifstream file(filename);
+      std::ifstream file(filename);
       Load(file);
       file.close();
     }
 
-    void Write(ostream & output) {
+    void Write(std::ostream & output) {
       for (std::string & cur_line : lines) {
-	output << lines << '\n';
+	      output << cur_line << '\n';
       }
     }
 
     void Write(const std::string & filename) {
-      ofstream file(filename);
+      std::ofstream file(filename);
       Write(file);
       file.close();
     }
