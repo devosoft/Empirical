@@ -10,40 +10,55 @@
 
 int main()
 {
-  emp::Mancala mancala;
+  emp::Othello othello;
+  size_t boardSize = 8;
 
-  size_t move = 0;
+  //std::cout << othello.GetSquare(4,4) <<std::endl;
+  
+  othello.PrintBoard();
+  size_t moveX = 0;
+  size_t moveY = 0;
 
-  mancala.Print();
+  while (othello.IsDone() == false) {
+    //size_t player = mancala.GetCurPlayer();
+    //char symbol = 'B' + (char) player;i
+    //std::cout << symbol << " move? " << std::endl;
+      std::cout<<" Move? " << std::endl;
+      std::cin >> moveX >> moveY;
 
-  while (mancala.IsDone() == false) {
-    size_t player = mancala.GetCurPlayer();
-    char symbol = 'A' + (char) player;
-    std::cout << symbol << " move? " << std::endl;
-    std::cin >> move;
-
-    if (move < 1 || move > 6) {
-      std::cout << "Invalid move!! (choose a value 1 to 6)" <<  std::endl;
+    if (moveX < 1 || moveX > boardSize) {
+      std::cout << "Invalid move!! (choose an X value 1 to " << boardSize<<")" <<  std::endl;
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       continue;
     }
-    move += player * 7;
-/*
-    if (mancala[move] == 0) {
-      std::cout << "Error: Cannot move from empty pit!" << std::endl;
+    if (moveY < 1 || moveY > boardSize) {
+      std::cout << "Invalid move!! (choose an Y value 1 to " << boardSize<<")" <<  std::endl;
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       continue;
     }
-*/
-    mancala.DoMove(move);
+    
 
-    mancala.Print();
+    if (othello.GetSquare(moveX, moveY) != 0) {
+      std::cout << "Error: Cannot move to non-empty tile" << std::endl;
+      continue;
+    }
+
+    bool tryMove = othello.DoMove(moveX, moveY);
+
+    if (!tryMove) { std::cout << "Invalid Move: Must flank at least one opponent disc" <<std::endl; continue; }
+
+    othello.PrintBoard();
+
   }
+  
+  const size_t scoreB = othello.ScoreB();
+  const size_t scoreW = othello.ScoreW();
 
-  const size_t scoreA = mancala.ScoreA();
-  const size_t scoreB = mancala.ScoreB();
+  std::cout<<"Black: "<<scoreB<<" White: "<<scoreW<<std::endl<<std::endl;
 
-  if (scoreA == scoreB) { std::cout << "TIE GAME!!" << std::endl; }
-  else if (scoreA > scoreB) { std::cout << "A Wins!!" << std::endl; }
-  else { std::cout << "B Wins!!" << std::endl; }
+  if (scoreW == scoreB) { std::cout << "TIE GAME!!" << std::endl; }
+  else if (scoreW < scoreB) { std::cout << "Black Wins!!" << std::endl; }
+  else { std::cout << "White Wins!!" << std::endl; }
 }

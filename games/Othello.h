@@ -3,14 +3,15 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  A simple Malcala game state handler.
+//  A simple Othello game state handler.
 
-#ifndef EMP_GAME_MANCALA_H
-#define EMP_GAME_MANCALA_H
+#ifndef EMP_GAME_OTHELLO_H
+#define EMP_GAME_OTHELLO_H
 
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <utility>
 
 #include "../base/array.h"
 #include "../base/assert.h"
@@ -19,51 +20,178 @@
 
 namespace emp {
 
-  class Mancala {
+  class Othello {
   private:
     using side_t = emp::array<size_t, 7>;
 
-    side_t boardA;        // Current board state for side A.
-    side_t boardB;        // Current board state for side B.
+    enum squareState { empty, Black, White };
+    vector<squareState> board;    // Current board state
     bool over = false;    // Has the game ended?
-    size_t is_A_turn;     // Which player goes next?
-
-    void TestOver() {
-      bool side_A_empty = true;
-      bool side_B_empty = true;
-
-      for (size_t i = 0; i < 6; i++) {
-        if (boardA[i] > 0) { side_A_empty = false; }
-        if (boardB[i] > 0) { side_B_empty = false; }
-      }
-
-      over = ( (is_A_turn && side_A_empty) || (!is_A_turn && side_B_empty));
-    }
+    size_t is_B_turn;     // Which player goes next?
+    int boardSize = 8;     // How big is the board? (N x N)
 
   public:
     using move_t = size_t;
 
-    Mancala(bool A_first=true) { Reset(A_first); }
-    ~Mancala() { ; }
+    Othello(bool B_first=true) { Reset(B_first); boardSize = 8; }
+    ~Othello() { ; }
 
-    void Reset(bool A_first=true) {
-      for (size_t i = 0; i < 6; i++) { boardA[i] = 4; boardB[i] = 4; }
-      boardA[6] = boardB[6] = 0;
+    void Reset(bool B_first=true) {
+      for (int i = 0; i < boardSize * boardSize; i++){ board.push_back(empty);}
+
+      AddDisc(boardSize / 2, boardSize / 2, false);
+      AddDisc(boardSize / 2 + 1, boardSize / 2 + 1, false);
+      AddDisc(boardSize / 2, boardSize / 2 + 1, true);
+      AddDisc(boardSize / 2 + 1, boardSize / 2, true);
+
       over = false;
-      is_A_turn = A_first;
+      is_B_turn = B_first;
     }
 
-    size_t GetA(size_t i) const { return boardA[i]; }
-    size_t GetB(size_t i) const { return boardB[i]; }
+    int GetIndex(int x, int y) { return ((y - 1) * boardSize) + (x - 1); }
 
-    const side_t & GetSideA() const { return boardA; }
-    const side_t & GetSideB() const { return boardB; }
-    const side_t & GetCurSide() const { return is_A_turn ? boardA : boardB; }
-    const side_t & GetOtherSide() const { return is_A_turn ? boardB : boardA; }
-    side_t & GetSideA() { return boardA; }
-    side_t & GetSideB() { return boardB; }
-    side_t & GetCurSide() { return is_A_turn ? boardA : boardB; }
-    side_t & GetOtherSide() { return is_A_turn ? boardB : boardA; }
+    squareState GetSquare(int x, int y) { 
+        int idx = GetIndex(x, y);
+        return board[idx]; 
+    }
+
+    void AddDisc(int x, int y, bool is_B){
+        int idx = GetIndex(x, y);
+
+        if (is_B) { board[idx] = Black; }
+        else { board[idx] = White; }
+    }
+
+    void PrintBoard() {
+        std::cout<<std::endl<<"  ";
+        for (int i = 1; i <= boardSize; i++){ std::cout<<i<<" "; }
+        std::cout<<std::endl;
+
+        for (int y = 1; y <= boardSize; y++) {
+            std::cout<< y << " ";
+            for (int x = 1; x <= boardSize; x++) {
+                char piece;
+                int square = GetSquare(x,y);
+                
+                if (square == 0) { piece = '-'; }
+                else if (square == 1) { piece = 'B'; }
+                else { piece = 'W'; }
+
+                std::cout<<piece<<" ";
+            }
+            std::cout<<std::endl;
+        }
+
+        std::cout<<std::endl;
+    }
+
+    bool IsDone() const { return over; }
+
+    bool TestOver() {
+
+    }
+
+    vector<std::pair<int, int>> ValidMove(int x, int y) {
+        vector<std::pair<int,int>> flip_list;
+        for (int j = y - 1; j <= y + 1; j++) {
+            if ( j < 1 || j > boardSize) { continue; }
+
+            for (int i = x - 1; i <= x + 1; i++) {
+                if (i < 1 || i > boardSize) { continue; }
+
+                squareState turn = empty;
+                squareState opponent = empty;
+                if (is_B_turn) {
+                    if (GetSquare(i, j) == White) { turn = Black; opponent = White; }
+                }
+                else{
+                    if (GetSquare(i, j) == Black) { turn = White; opponent = Black; }
+                }
+
+                if (turn != empty) {
+                    std::cout<<"XY: " <<x<<" "<<y<<std::endl;
+                    std::cout<<"IJ: "<<i<<" "<<j<<std::endl;
+                    if (x == i && y > j) {
+                        std::cout<<"XY: " <<x<<" "<<y<<std::endl;
+                        std::cout<<"IJ: "<<i<<" "<<j<<std::endl;
+                        for (int k = 1; k < j; k++) { 
+                            if (GetSquare(x, k) == turn) { flip_list.push_back(std::make_pair(x,k)); } 
+                        }
+                    }
+                    else if (x == i && y < j) {
+                        for (int k = j; k <= boardSize; k++) {
+                            if (GetSquare(x, k) == turn) { flip_list.push_back(std::make_pair(x,k)); }
+                        }
+                    
+                    }
+                    else if (y == j && x > i) {
+                        for (int k = 1; k < i; k++) {
+                            if (GetSquare(k, y) == turn) { flip_list.push_back(std::make_pair(k,y)); }
+                        }
+                    }
+                    else if (y == j && x < i) { 
+                        for (int k = i; k <= boardSize; k++) {
+                            if (GetSquare(k, y) == turn) { flip_list.push_back(std::make_pair(k,y)); }
+                        }
+                    }
+                    else if (x != i && y != j) {
+                        std::cout<<"TODO"<<std::endl; //TODO Add checking for diagonals
+                    }
+                }
+            }
+        }
+        return flip_list;
+    }
+
+    bool DoMove(int x, int y) {
+        // TODO Check to see if game is over
+        
+        vector<std::pair<int, int>> flip_list = ValidMove(x, y);
+
+        //TODO flip tiles
+        
+        if (flip_list.size() != 0) {
+            AddDisc(x, y, is_B_turn);
+            is_B_turn = !(is_B_turn);
+            return true;
+        }
+        else {
+            return false;
+        }
+
+    }
+
+    size_t ScoreB() {
+        size_t bScore = 0;
+
+        for (int x = 1; x <= boardSize; x++) {
+            for (int y = 1; y <= boardSize; y++) {
+                squareState disc = GetSquare(x, y);
+                if (disc == Black) { bScore++; }
+            }
+        }
+
+        return bScore;  
+    }
+
+    size_t ScoreW() {
+        size_t wScore = 0;
+
+        for (int x = 1; x <= boardSize; x++) {
+            for (int y = 1; y <= boardSize; y++) {
+                squareState disc = GetSquare(x, y);
+                if (disc == White) { wScore++; }
+            }
+        }
+        return wScore;
+    }
+    
+
+    /*
+    const vector<int> & GetBoard() const { return board; }
+    vector<int> & GetBoard() { return board; }
+    //side_t & GetCurSide() { return is_A_turn ? boardA : boardB; }
+    //side_t & GetOtherSide() { return is_A_turn ? boardB : boardA; }
 
 
     // Returns bool indicating whether player can go again
@@ -198,7 +326,7 @@ namespace emp {
       emp_assert(false);  // Only a two player game!
       return 0.0;
     }
-
+*/
   };
 
 }
