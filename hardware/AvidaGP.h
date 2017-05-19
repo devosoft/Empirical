@@ -20,9 +20,11 @@
 
 #include <fstream>
 #include <iostream>
+#include <map>
 
 #include "../base/array.h"
 #include "../base/vector.h"
+#include "../tools/map_utils.h"
 #include "../tools/Random.h"
 #include "../tools/string_utils.h"
 
@@ -93,8 +95,8 @@ namespace emp {
     // Virtual CPU Components!
     genome_t genome;
     emp::array<double, CPU_SIZE> regs;
-    emp::array<double, CPU_SIZE> inputs;
-    emp::array<double, CPU_SIZE> outputs;
+    std::unordered_map<int, double> inputs;   // Map of all available inputs (position -> value)
+    std::unordered_map<int, double> outputs;  // Map of all outputs (position -> value)
     emp::array< emp::vector<double>, CPU_SIZE > stacks;
     emp::array< int, CPU_SIZE> fun_starts;
 
@@ -211,8 +213,8 @@ namespace emp {
       // Initialize registers to their posision.  So Reg0 = 0 and Reg11 = 11.
       for (size_t i = 0; i < CPU_SIZE; i++) {
         regs[i] = (double) i;
-        inputs[i] = 0.0;
-        outputs[i] = 0.0;
+        inputs.clear();
+        outputs.clear();
         stacks[i].resize(0);
         fun_starts[i] = -1;
       }
@@ -232,7 +234,7 @@ namespace emp {
     const genome_t & GetGenome() const { return genome; }
     double GetReg(size_t id) const { return regs[id]; }
     size_t GetIP() const { return inst_ptr; }
-    double GetOutput(size_t id) const { return outputs[id]; }
+    double GetOutput(size_t id) const { return Find(outputs, id, 0.0); }
 
     void SetInst(size_t pos, const inst_t & inst) { genome[pos] = inst; }
     void SetInst(size_t pos, InstID id, size_t a0=0, size_t a1=0, size_t a2=0) {
@@ -362,15 +364,15 @@ namespace emp {
     case InstID::Push: PushStack(inst.args[1], regs[inst.args[0]]); break;
     case InstID::Pop: regs[inst.args[1]] = PopStack(inst.args[0]); break;
     case InstID::Input: {
-        size_t input_id = (size_t) regs[ inst.args[0] ];  // Grab ID from register.
-        input_id = input_id & (CPU_SIZE-1);               // Mod ID into range.
-        regs[inst.args[1]] = inputs[input_id];            // Set target reg to appropriate input.
+        // Determine the input ID and grab it if it exists; if not, return 0.0
+        int input_id = (int) regs[ inst.args[0] ];
+        regs[inst.args[1]] = Find(inputs, input_id, 0.0);
       }
       break;
     case InstID::Output: {
-        size_t output_id = (size_t) regs[ inst.args[1] ]; // Grab ID from register.
-        output_id = output_id & (CPU_SIZE-1);             // Mod ID into range.
-        outputs[output_id] = regs[inst.args[0]];          // Copy target reg to appropriate output.
+        // Save the date in the target reg to the specified output position.
+        int output_id = (int) regs[ inst.args[1] ];  // Grab ID from register.
+        outputs[output_id] = regs[inst.args[0]];     // Copy target reg to appropriate output.
       }
       break;
     case InstID::CopyVal: regs[inst.args[1]] = regs[inst.args[0]]; break;
@@ -483,12 +485,12 @@ namespace emp {
   void AvidaGP::PrintState(std::ostream & os) const {
     size_t next_inst = PredictNextInst();
 
-    os << " CPU_SIZE: ";
+    os << " REGS: ";
     for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << regs[i] << "] ";
     os << "\n INPUTS: ";
-    for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << inputs[i] << "] ";
+    for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << Find(inputs, i, 0.0) << "] ";
     os << "\n OUTPUTS: ";
-    for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << outputs[i] << "] ";
+    for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << Find(outputs, i, 0.0) << "] ";
     os << std::endl;
 
     os << "IP:" << inst_ptr;
