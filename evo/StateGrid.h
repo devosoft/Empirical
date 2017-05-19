@@ -69,7 +69,7 @@ namespace evo {
     StateGridInfo & info;
 
   public:
-    StateGrid(StateGridInfo & _i, size_t _w, size_t _h)
+    StateGrid(StateGridInfo & _i, size_t _w=1, size_t _h=1)
       : width(_w), height(_h), states(_w*_h,0), info(_i) { ; }
     StateGrid(const StateGrid &) = default;
     StateGrid(StateGrid &&) = default;
@@ -85,6 +85,18 @@ namespace evo {
     StateGrid & Load(Ts... args) {
       File file(std::forward<Ts>(args)...);
       file.RemoveWhitespace()
+      height = file.GetNumLines();
+      emp_assert(height > 0);
+      width = file[0].size();
+      emp_assert(width > 0);
+
+      for (size_t row = 0; row < height; row++) {
+        emp_assert(file[row].size == width);  // Make sure all rows are the same size.
+        for (size_t col = 0; col < width; col++) {
+          states[row*width+col] = info.GetState(file[row][col]);
+        }
+      }
+
       return *this;
     }
   };
