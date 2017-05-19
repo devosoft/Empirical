@@ -31,8 +31,16 @@ namespace emp {
   }
 
   // A class to retrieve a map element if it exists, otherwise return a default.
-  template <class KEY, class T, class Compare, class Alloc>
-  inline const T & Find( const std::map<KEY,T,Compare,Alloc> & in_map, const KEY & key, const T & dval) {
+  template <class KEY, class T, class Compare, class Alloc, class KEY2>
+  inline const T & Find( const std::map<KEY,T,Compare,Alloc> & in_map, const KEY2 & key, const T & dval) {
+    auto val_it = in_map.find(key);
+    if (val_it == in_map.end()) return dval;
+    return val_it->second;
+  }
+
+  // ... and a version for unordered_map
+  template <class KEY, class T, class Hash, class Pred, class Alloc, class KEY2>
+  inline const T & Find( const std::unordered_map<KEY,T,Hash,Pred,Alloc> & in_map, const KEY2 & key, const T & dval) {
     auto val_it = in_map.find(key);
     if (val_it == in_map.end()) return dval;
     return val_it->second;
