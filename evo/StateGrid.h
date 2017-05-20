@@ -124,6 +124,23 @@ namespace evo {
 
       return *this;
     }
+
+    template <typename... Ts>
+    StateGrid & Write(Ts &&... args) {
+      File file;
+      std::string out;
+      for (size_t i = 0; i < height; i++) {
+        out.resize(0);
+        out += info.GetSymbol( states[i*width] );
+        for (size_t j = 1; j < width; j++) {
+          out += ' ';
+          out +=info.GetSymbol( states[i*width+j] );
+        }
+        file.Append(out);
+      }
+      file.Write(std::forward<Ts>(args)...);
+      return *this;
+    }
   };
 
 }
