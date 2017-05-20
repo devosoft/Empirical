@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -65,7 +65,8 @@ namespace emp {
       : parent_t(in_name), fun(in_fun) { ; }
     template <typename RETURN>
     Action(const std::function<RETURN(ARGS...)> & in_fun, const std::string & in_name="")
-      : parent_t(in_name), fun([in_fun](ARGS... args){in_fun(std::forward<ARGS>(args)...);}) { ; }
+      : parent_t(in_name)
+      , fun([in_fun](ARGS &&... args){in_fun(std::forward<ARGS>(args)...);}) { ; }
     Action(const this_t &) = default;
     Action(this_t &&) = default;
 
@@ -74,7 +75,7 @@ namespace emp {
 
     const std::function<void(ARGS...)> & GetFun() const { return fun; };
 
-    void Call(ARGS... args) { return fun(std::forward<ARGS>(args)...); }
+    void Call(ARGS &&... args) { return fun(std::forward<ARGS>(args)...); }
 
     this_t * Clone() const { return new this_t(*this); }
   };
@@ -99,7 +100,7 @@ namespace emp {
 
     const std::function<fun_t> & GetFun() const { return fun; };
 
-    RETURN Call(ARGS... args) { return fun(std::forward<ARGS>(args)...); }
+    RETURN Call(ARGS &&... args) { return fun(std::forward<ARGS>(args)...); }
 
     this_t * Clone() const { return new this_t(*this); }
   };

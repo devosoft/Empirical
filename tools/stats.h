@@ -19,13 +19,14 @@
 #include <functional>
 
 #include "../base/vector.h"
+#include "../meta/meta.h"
 
 namespace emp {
 namespace evo {
 
   // Calculates Shannon Entropy of the members of the container passed
   template <typename C>
-  typename std::enable_if<!std::is_pointer<typename C::value_type>::value, double>::type
+  typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value, double>::type
   ShannonEntropy(C & elements) {
 
     // Count number of each value present
@@ -51,10 +52,10 @@ namespace evo {
   // Calculates Shannon Entropy of the members of the container when those members
   // are pointers
   template <typename C>
-  typename std::enable_if<std::is_pointer<typename C::value_type>::value, double>::type
+  typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value, double>::type
   ShannonEntropy(C & elements) {
 
-    using pointed_at = typename std::remove_pointer<typename C::value_type>::type;
+    using pointed_at = typename emp::remove_ptr_type<typename C::value_type>::type;
     // Count number of each value present
     std::map<pointed_at, int> counts;
     for (auto element : elements) {
@@ -77,7 +78,7 @@ namespace evo {
 
   // Calculates number of unique elements in the container passed
   template <typename C>
-  typename std::enable_if<!std::is_pointer<typename C::value_type>::value, int>::type
+  typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value, int>::type
   UniqueCount(C & elements) {
     // Converting to a set will remove duplicates leaving only unique values
     std::set<typename C::value_type> unique_elements(elements.begin(),
@@ -87,10 +88,10 @@ namespace evo {
 
   // Calculates number of unique elements in the container of pointers passed
   template <typename C>
-  typename std::enable_if<std::is_pointer<typename C::value_type>::value, int>::type
+  typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value, int>::type
   UniqueCount(C & elements) {
     // Converting to a set will remove duplicates leaving only unique values
-    using pointed_at = typename std::remove_pointer<typename C::value_type>::type;
+    using pointed_at = typename emp::remove_ptr_type<typename C::value_type>::type;
     std::set<pointed_at> unique_elements;
     for (auto element : elements) {
         unique_elements.insert(*element);
@@ -101,8 +102,8 @@ namespace evo {
 
   // Takes a function and a container of items that that function can be run on
   // and returns the maximum value
-  template <typename C, typename RET_TYPE>
-  RET_TYPE MaxFunctionReturn(std::function<RET_TYPE(typename C::value_type)> & fun, C & elements){
+  template <typename C, typename RET_TYPE, typename ARG_TYPE>
+  RET_TYPE MaxFunctionReturn(std::function<RET_TYPE(ARG_TYPE)> & fun, C & elements){
     double highest = 0;
     for (auto element : elements){
       double result = fun(element);
@@ -115,8 +116,8 @@ namespace evo {
 
   // Takes a function and a container of items that that function can be run on
   // and returns the average value. Function must return a double.
-  template <typename C>
-  double AverageFunctionReturn(std::function<double(typename C::value_type)> & fun, C & elements){
+  template <typename C, typename ARG_TYPE>
+  double AverageFunctionReturn(std::function<double(ARG_TYPE)> & fun, C & elements){
     double cumulative_value = 0;
     double count = 0;
     for (auto element : elements){
@@ -126,8 +127,8 @@ namespace evo {
     return (cumulative_value / count);
   }
 
-  template <typename C, typename RET_TYPE>
-  emp::vector<RET_TYPE> RunFunctionOnContainer(std::function<RET_TYPE(typename C::value_type)> & fun, C & elements) {
+  template <typename C, typename RET_TYPE, typename ARG_TYPE>
+  emp::vector<RET_TYPE> RunFunctionOnContainer(std::function<RET_TYPE(ARG_TYPE)> & fun, C & elements) {
       emp::vector<RET_TYPE> results;
       for (auto element : elements){
           results.push_back(fun(element));

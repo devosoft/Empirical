@@ -93,7 +93,7 @@ int main()
 
   pi_world.popM.OnClear( [&pi_world]() {
     pi_world.popM.Resize(0);
-    for (int i=0;i<20;i++) pi_world.popM.AddOrgAppend(new int (i+100));
+    for (int i=0;i<20;i++) pi_world.Insert(i+100);
   });
 
   pi_world.popM.OnAddOrg( [&pi_world](int* org, size_t& pos) {

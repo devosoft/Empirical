@@ -223,10 +223,10 @@ namespace evo {
   public:
     std::string world_name;
 
-    World(emp::Random * r_ptr, const std::string & w_name=UniqueName("emp::evo::World"))
+    World(Ptr<Random> r_ptr, const std::string & w_name=UniqueName("emp::evo::World"))
       : fitM()
       , popM(w_name, fitM)
-      , random_ptr(r_ptr, false), random_owner(false)
+      , random_ptr(r_ptr), random_owner(false)
       , before_repro_sig(to_string(w_name,"::before-repro"), control)
       , offspring_ready_sig(to_string(w_name,"::offspring-ready"), control)
       , inject_ready_sig(to_string(w_name,"::inject-ready"), control)
@@ -298,8 +298,9 @@ namespace evo {
 
     void Insert(const ORG & mem, size_t copy_count=1) {
       for (size_t i = 0; i < copy_count; i++) {
-        ORG * new_org = new ORG(mem);
-        inject_ready_sig.Trigger(new_org);
+        Ptr<ORG> new_org;
+        new_org.New(mem);
+        inject_ready_sig.Trigger(new_org.Raw());
         const size_t pos = popM.AddOrg(new_org);
         SetupOrg(*new_org, &callbacks, pos);
         org_placement_sig.Trigger(pos);
@@ -307,18 +308,20 @@ namespace evo {
     }
 
     void InsertAt(const ORG & mem, const size_t pos) {
-      ORG * new_org = new ORG(mem);
-      inject_ready_sig.Trigger(new_org);
+      Ptr<ORG> new_org;
+      new_org.New(mem);
+      inject_ready_sig.Trigger(new_org.Raw());
       popM.AddOrgAt(new_org, pos);
       SetupOrg(*new_org, &callbacks, pos);
       org_placement_sig.Trigger(pos);
     }
 
     template <typename... ARGS>
-    void InsertRandomOrg(ARGS... args) {
+    void InsertRandomOrg(ARGS &&... args) {
       emp_assert(random_ptr != nullptr && "InsertRandomOrg() requires active random_ptr");
-      ORG * new_org = new ORG(*random_ptr, std::forward<ARGS>(args)...);
-      inject_ready_sig.Trigger(new_org);
+      Ptr<ORG> new_org;
+      new_org.New(*random_ptr, std::forward<ARGS>(args)...);
+      inject_ready_sig.Trigger(new_org.Raw());
       const size_t pos = popM.AddOrg(new_org);
       SetupOrg(*new_org, &callbacks, pos);
       org_placement_sig.Trigger(pos);
@@ -327,8 +330,9 @@ namespace evo {
     void InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count=1) {
       before_repro_sig.Trigger(parent_pos);
       for (size_t i = 0; i < copy_count; i++) {
-        ORG * new_org = new ORG(mem);
-        offspring_ready_sig.Trigger(new_org);
+        Ptr<ORG> new_org;
+        new_org.New(mem);
+        offspring_ready_sig.Trigger(new_org.Raw());
         const size_t pos = popM.AddOrgBirth(new_org, parent_pos);
         SetupOrg(*new_org, &callbacks, pos);
         org_placement_sig.Trigger(pos);
@@ -340,8 +344,9 @@ namespace evo {
                      const fit_fun_t & fit_fun) {
       before_repro_sig.Trigger(parent_pos);
       for (size_t i = 0; i < copy_count; i++) {
-        ORG * new_org = new ORG(mem);
-        offspring_ready_sig.Trigger(new_org);
+        Ptr<ORG> new_org;
+        new_org.New(mem);
+        offspring_ready_sig.Trigger(new_org.Raw());
         const size_t pos = popM.AddOrgBirth(new_org, parent_pos);
         // If we offspring are placed into the same population, recalculate fitness.
         if (popM_t::emp_has_separate_generations == false) popM.CalcFitness(pos, fit_fun);
@@ -424,7 +429,7 @@ namespace evo {
       std::multimap<double, size_t> fit_map;
       for (size_t i = 0; i < popM.size(); i++) {
         if (this->IsOccupied(i)){
-          fit_map.insert( std::make_pair( fitM.CalcFitness(i,(ORG*) popM[i],fit_fun), i) );
+          fit_map.insert( std::make_pair( fitM.CalcFitness(i,popM[i].AsPtr(),fit_fun), i) );
         }
       }
 
@@ -647,7 +652,9 @@ namespace evo {
 
       for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
           std::sort(ordering.begin(), ordering.end(),
-                [&extra_fitnesses, &ex_id](int x, int y){return extra_fitnesses[ex_id][x] > extra_fitnesses[ex_id][y];});
+                [&extra_fitnesses, &ex_id](int x, int y){
+                  return extra_fitnesses[ex_id][(size_t)x] > extra_fitnesses[ex_id][(size_t)y];
+                });
           for (size_t org_id : ordering) {
               double bonus = .05 * extra_fitnesses[ex_id][org_id] * resource_left[ex_id];
               extra_fitnesses[ex_id][org_id] = bonus;
@@ -693,8 +700,8 @@ namespace evo {
       EcoSelectGradation(fit_fun, extra_funs, pools, t_size, tourny_count);
     }
 
-    // LexicaseSelect runs through multiple fitness functions in a random order for
-    // EACH offspring produced.
+    /// LexicaseSelect runs through multiple fitness functions in a random order for
+    /// EACH offspring produced.
     // NOTE: You must turn off the FitnessCache for this function to work properly.
     void LexicaseSelect(const emp::vector<fit_fun_t> & fit_funs, size_t repro_count=1)
     {
@@ -707,12 +714,9 @@ namespace evo {
       emp::vector< emp::vector<double> > fitnesses(fit_funs.size());
       for (size_t fit_id = 0; fit_id < fit_funs.size(); ++fit_id) {
         fitnesses[fit_id].resize(popM.size());
-//        std::cout << "[[" << fit_id << "]]";
         for (size_t org_id = 0; org_id < popM.size(); ++org_id) {
           fitnesses[fit_id][org_id] = popM.CalcFitness(org_id, fit_funs[fit_id]);
-//          std::cout << " " << fitnesses[fit_id][org_id];
         }
-//        std::cout << std::endl;
       }
 
       // Go through a new ordering of fitness functions for each selections.
@@ -752,6 +756,78 @@ namespace evo {
       }
     }
 
+    /// An Ecological version of Lexicase selection.
+    // NOTE: You must turn off the FitnessCache for this function to work properly.
+    void EcocaseSelect(const emp::vector<fit_fun_t> & fit_funs,
+                       const emp::vector<double> & probs,   // Probability of using each function.
+                       double repro_decay,                  // Reduced chance of being used again.
+                       size_t repro_count)
+    {
+      emp_assert(popM.size() > 0);
+      emp_assert(fit_funs.size() > 0 && fit_funs.size() == probs.size());
+      emp_assert(repro_decay > 0.0 && repro_decay <= 1.0, repro_decay);
+      emp_assert(random_ptr != nullptr && "EcocaseSelect() requires active random_ptr");
+      emp_assert(fitM.IsCached() == false, "Ecocase constantly changes fitness functions!");
+
+      // Collect all fitness info.
+      emp::vector< emp::vector<double> > fitnesses(fit_funs.size());
+      for (size_t fit_id = 0; fit_id < fit_funs.size(); ++fit_id) {
+        fitnesses[fit_id].resize(popM.size());
+        for (size_t org_id = 0; org_id < popM.size(); ++org_id) {
+          fitnesses[fit_id][org_id] = popM.CalcFitness(org_id, fit_funs[fit_id]);
+        }
+      }
+
+      // Determine how eligible each org is for being reproduced.
+      emp::vector<double> repro_prob(popM.size(), 1.0);
+
+      // Go through a new ordering of fitness functions for each selection.
+      emp::vector<size_t> all_orgs(popM.size()), cur_orgs, next_orgs;
+      for (size_t org_id = 0; org_id < popM.size(); org_id++) all_orgs[org_id] = org_id;
+
+      for (size_t repro = 0; repro < repro_count; ++repro) {
+        // Determine the current ordering of the functions.
+        emp::vector<size_t> order = GetPermutation(*random_ptr, fit_funs.size());
+
+        // Determine the starting set of organisms.
+        cur_orgs.resize(0);
+        for (size_t org_id = 0; org_id < popM.size(); org_id++) {
+          if (repro_prob[org_id] == 1.0 || random_ptr->P(repro_prob[org_id])) {
+            cur_orgs.push_back(org_id);
+          }
+        }
+
+        // Step through the functions in the proper order.
+        for (size_t fit_id : order) {
+          // Determine if we should skip this fitness function.
+          if ( random_ptr->P(1.0 - probs[fit_id]) ) continue;
+          double max_fit = fitnesses[fit_id][cur_orgs[0]];
+          for (size_t org_id : cur_orgs) {
+            const double cur_fit = fitnesses[fit_id][org_id];
+            if (cur_fit > max_fit) {
+              max_fit = cur_fit;             // This is a the NEW maximum fitness for this function
+              next_orgs.resize(0);           // Clear out orgs with former maximum fitness
+              next_orgs.push_back(org_id);   // Add this org as only one with new max fitness
+            }
+            else if (cur_fit == max_fit) {
+              next_orgs.push_back(org_id);   // Same as cur max fitness -- save this org too.
+            }
+          }
+          // Make next_orgs into new cur_orgs; make cur_orgs allocated space for next_orgs.
+          std::swap(cur_orgs, next_orgs);
+          next_orgs.resize(0);
+        }
+
+        // Place a random survivor (all equal) into the next generation!
+        emp_assert(cur_orgs.size() > 0, cur_orgs.size(), fit_funs.size(), all_orgs.size());
+        size_t repro_id = cur_orgs[ random_ptr->GetUInt(cur_orgs.size()) ];
+        InsertBirth( *(popM[repro_id]), repro_id, 1 );
+
+        // Reduce the probability of this organism reproducing again.
+        repro_prob[repro_id] *= repro_decay;
+      }
+    }
+
     // Update() moves the next population to the current position, managing memory as needed.
     void Update() {
       on_update_sig.Trigger(update);
@@ -763,7 +839,7 @@ namespace evo {
     // Execute() runs the Execute() method on all organisms in the population, forwarding
     // any arguments.
     template <typename... ARGS>
-    void Execute(ARGS... args) {
+    void Execute(ARGS &&... args) {
       popM.Execute(std::forward<ARGS>(args)...);
     }
 

@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -177,7 +177,7 @@ namespace emp {
       const SignalKey link_id = NextSignalKey();
       link_key_map[link_id] = actions.size();
       std::function<void(ARGS...)> expand_fun =
-        [in_fun](FUN_ARGS... args, EXTRA_ARGS...){ in_fun(std::forward<FUN_ARGS>(args)...); };
+        [in_fun](FUN_ARGS &&... args, EXTRA_ARGS...){ in_fun(std::forward<FUN_ARGS>(args)...); };
       actions.Add(expand_fun);
       return link_id;
     }
@@ -269,7 +269,7 @@ namespace emp {
       const SignalKey link_id = NextSignalKey();
       link_key_map[link_id] = actions.size();
       std::function<fun_t> expand_fun =
-        [in_fun](FUN_ARGS... args, EXTRA_ARGS...){ in_fun(std::forward<FUN_ARGS>(args)...); };
+        [in_fun](FUN_ARGS &&... args, EXTRA_ARGS...){ in_fun(std::forward<FUN_ARGS>(args)...); };
       actions.Add(expand_fun);
       return link_id;
     }

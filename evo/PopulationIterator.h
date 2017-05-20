@@ -17,7 +17,7 @@ namespace evo {
   template <typename POP_MANAGER>
   class PopulationIterator {
   private:
-    using ORG = typename POP_MANAGER::value_type;
+    using org_ptr_t = typename POP_MANAGER::value_type;
 
     POP_MANAGER * pop;
     int pos;
@@ -58,7 +58,10 @@ namespace evo {
     bool operator>=(const PopulationIterator<POP_MANAGER>& rhs) const { return pos >= rhs.pos; }
 
     auto operator*() -> decltype((*pop)[(size_t)pos]) { MakeValid(); return (*pop)[(size_t)pos]; }
-    const ORG & operator*() const { MakeValid(); return (ORG)(*pop)[(size_t)pos]; }
+    const org_ptr_t & operator*() const {
+      MakeValid();
+      return (org_ptr_t)(*pop)[(size_t)pos];
+    }
 
     operator bool() const { MakeValid(); return pos < pop->size(); }
 

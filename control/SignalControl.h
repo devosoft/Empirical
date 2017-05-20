@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -76,7 +76,7 @@ namespace emp {
 
 
     template <typename... ARGS>
-    void Trigger(const std::string & name, ARGS... args) {
+    void Trigger(const std::string & name, ARGS &&... args) {
       auto & base_signal = signal_m[name];
       auto * signal = dynamic_cast< Signal<void(ARGS...)>* >(&base_signal);
       emp_assert( signal != nullptr && "invalid signal conversion!" );

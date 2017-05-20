@@ -32,12 +32,12 @@ namespace evo {
     static constexpr size_t GetSize() { return 0.0; }
 
     template <typename ORG>
-    static double CalcFitness(size_t id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
-      return org ? fit_fun(org) : 0.0;
+    static double CalcFitness(size_t id, Ptr<ORG> org, const std::function<double(ORG*)> & fit_fun) {
+      return org ? fit_fun(org.Raw()) : 0.0;
     }
     template <typename ORG>
-    static double CalcFitness(size_t id, ORG* org, emp::memo_function<double(ORG*)> & fit_fun) {
-      return org ? fit_fun(org) : 0.0;
+    static double CalcFitness(size_t id, Ptr<ORG> org, emp::memo_function<double(ORG*)> & fit_fun) {
+      return org ? fit_fun(org.Raw()) : 0.0;
     }
 
     static constexpr bool Set(const emp::vector<double> &) { return false; }
@@ -65,21 +65,21 @@ namespace evo {
     size_t GetSize() const { return fit_cache.size(); }
 
     template <typename ORG>
-    double CalcFitness(size_t id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
+    double CalcFitness(size_t id, Ptr<ORG> org, const std::function<double(ORG*)> & fit_fun) {
       double cur_fit = GetCache(id);
       if (cur_fit == 0.0 && org) {    // If org is non-null, but no cached fitness, calculate it!
         if (id >= fit_cache.size()) fit_cache.resize(id+1, 0.0);
-        cur_fit = fit_fun(org);
+        cur_fit = fit_fun(org.Raw());
         fit_cache[id] = cur_fit;
       }
       return cur_fit;
     }
     template <typename ORG>
-    double CalcFitness(size_t id, ORG* org, emp::memo_function<double(ORG*)> & fit_fun) {
+    double CalcFitness(size_t id, Ptr<ORG> org, emp::memo_function<double(ORG*)> & fit_fun) {
       double cur_fit = GetCache(id);
       if (!cur_fit && org) {    // If org is non-null, but no cached fitness, calculate it!
         if (id >= fit_cache.size()) fit_cache.resize(id+1, 0.0);
-        cur_fit = fit_fun(org);
+        cur_fit = fit_fun(org.Raw());
         fit_cache[id] = cur_fit;
       }
       return cur_fit;
@@ -107,13 +107,13 @@ namespace evo {
     size_t GetSize() const { return index_info.size(); }
 
     template <typename ORG>
-    double CalcFitness(size_t id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
+    double CalcFitness(size_t id, Ptr<ORG> org, const std::function<double(ORG*)> & fit_fun) {
       // Organisms that don't exist should have a zero fitness.
       if (!org) return 0.0;
 
       // If we don't have a fitness cached calculate it and PUT IT IN THE CACHE.
       if (index_info.GetWeight(id) == 0.0) {
-        index_info[id] = fit_fun(org);
+        index_info[id] = fit_fun(org.Raw());
       }
 
       // Return the fitness in the cache.
@@ -161,22 +161,22 @@ namespace evo {
     }
 
     template <typename ORG>
-    double CalcFitness(size_t id, ORG* org, const std::function<double(ORG*)> & fit_fun) {
+    double CalcFitness(size_t id, Ptr<ORG> org, const std::function<double(ORG*)> & fit_fun) {
       // Organisms that don't exist should have a zero fitness.
       if (!org) return 0.0;
 
       // If we don't have a fitness cached calculate it and cache if needed.
       switch (cache_type) {
       case CACHE_OFF:
-        return fit_fun(org);;
+        return fit_fun(org.Raw());;
       case CACHE_ON:
         if (GetCache(id) == 0.0) {                // If no cached fitness, calculate it!
           if (id >= fit_cache.size()) fit_cache.resize(id+1, 0.0);
-          fit_cache[id] = fit_fun(org);
+          fit_cache[id] = fit_fun(org.Raw());
         }
         return GetCache(id);
       case TRACK_ON:
-        if (index_info.GetWeight(id) == 0.0) { index_info[id] = fit_fun(org); }
+        if (index_info.GetWeight(id) == 0.0) { index_info[id] = fit_fun(org.Raw()); }
         return index_info.GetWeight(id);
       }
     }

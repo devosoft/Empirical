@@ -18,8 +18,13 @@
 #ifndef EMP_AVIDA_GP_H
 #define EMP_AVIDA_GP_H
 
+#include <fstream>
+#include <iostream>
+#include <map>
+
 #include "../base/array.h"
 #include "../base/vector.h"
+#include "../tools/map_utils.h"
 #include "../tools/Random.h"
 #include "../tools/string_utils.h"
 
@@ -46,12 +51,12 @@ namespace emp {
 
     struct Instruction {
       using id_t = InstID;
-      using arg_t = int;              // All arguments are non-negative ints (indecies!)
+      using arg_t = size_t;        // All arguments are non-negative ints (indecies!)
 
       id_t id;
       emp::array<arg_t, 3> args;
 
-      Instruction(InstID _id=(InstID)0, int _a0=0, int _a1=0, int _a2=0)
+      Instruction(InstID _id=(InstID)0, size_t _a0=0, size_t _a1=0, size_t _a2=0)
 	      : id(_id) { args[0] = _a0; args[1] = _a1; args[2] = _a2; }
       Instruction(const Instruction &) = default;
       Instruction(Instruction &&) = default;
@@ -59,7 +64,7 @@ namespace emp {
       Instruction & operator=(const Instruction &) = default;
       Instruction & operator=(Instruction &&) = default;
 
-      void Set(InstID _id, int _a0=0, int _a1=0, int _a2=0)
+      void Set(InstID _id, size_t _a0=0, size_t _a1=0, size_t _a2=0)
 	      { id = _id; args[0] = _a0; args[1] = _a1; args[2] = _a2; }
 
     };
@@ -90,8 +95,8 @@ namespace emp {
     // Virtual CPU Components!
     genome_t genome;
     emp::array<double, CPU_SIZE> regs;
-    emp::array<double, CPU_SIZE> inputs;
-    emp::array<double, CPU_SIZE> outputs;
+    std::unordered_map<int, double> inputs;   // Map of all available inputs (position -> value)
+    std::unordered_map<int, double> outputs;  // Map of all outputs (position -> value)
     emp::array< emp::vector<double>, CPU_SIZE > stacks;
     emp::array< int, CPU_SIZE> fun_starts;
 
@@ -208,8 +213,8 @@ namespace emp {
       // Initialize registers to their posision.  So Reg0 = 0 and Reg11 = 11.
       for (size_t i = 0; i < CPU_SIZE; i++) {
         regs[i] = (double) i;
-        inputs[i] = 0.0;
-        outputs[i] = 0.0;
+        inputs.clear();
+        outputs.clear();
         stacks[i].resize(0);
         fun_starts[i] = -1;
       }
@@ -229,25 +234,27 @@ namespace emp {
     const genome_t & GetGenome() const { return genome; }
     double GetReg(size_t id) const { return regs[id]; }
     size_t GetIP() const { return inst_ptr; }
-    double GetOutput(size_t id) const { return outputs[id]; }
+    double GetOutput(size_t id) const { return Find(outputs, id, 0.0); }
 
     void SetInst(size_t pos, const inst_t & inst) { genome[pos] = inst; }
-    void SetInst(size_t pos, InstID id, int a0=0, int a1=0, int a2=0) {
+    void SetInst(size_t pos, InstID id, size_t a0=0, size_t a1=0, size_t a2=0) {
       genome[pos].Set(id, a0, a1, a2);
     }
     void SetGenome(const genome_t & g) { genome = g; }
     void SetInput(size_t input_id, double value) { inputs[input_id] = value; }
     void RandomizeInst(size_t pos, Random & rand) {
       SetInst(pos, (InstID) rand.GetUInt((uint32_t) InstID::Unknown),
-              rand.GetInt(CPU_SIZE), rand.GetInt(CPU_SIZE), rand.GetInt(CPU_SIZE) );
+              rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE) );
     }
 
-    void PushInst(InstID id, int a0=0, int a1=0, int a2=0) { genome.emplace_back(id, a0, a1, a2); }
+    void PushInst(InstID id, size_t a0=0, size_t a1=0, size_t a2=0) {
+      genome.emplace_back(id, a0, a1, a2);
+    }
     void PushInst(const Instruction & inst) { genome.emplace_back(inst); }
     void PushRandom(Random & rand, const size_t count=1) {
       for (size_t i = 0; i < count; i++) {
         PushInst((InstID) rand.GetUInt((uint32_t) InstID::Unknown),
-                rand.GetInt(CPU_SIZE), rand.GetInt(CPU_SIZE), rand.GetInt(CPU_SIZE) );
+                rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE) );
       }
     }
 
@@ -258,7 +265,7 @@ namespace emp {
     void ProcessInst(const inst_t & inst);
 
     /// Determine the scope associated with a particular instruction.
-    size_t InstScope(const inst_t & inst);
+    static size_t InstScope(const inst_t & inst);
 
     /// Process the NEXT instruction pointed to be the instruction pointer
     void SingleProcess();
@@ -267,17 +274,17 @@ namespace emp {
     void Process(size_t num_inst) { for (size_t i = 0; i < num_inst; i++) SingleProcess(); }
 
     /// Print out a single instruction, with its arguments.
-    void PrintInst(const inst_t & inst, std::ostream & os=std::cout);
+    static void PrintInst(const inst_t & inst, std::ostream & os=std::cout);
 
     /// Print out this program.
-    void PrintGenome(std::ostream & os=std::cout);
-    void PrintGenome(const std::string & filename);
+    void PrintGenome(std::ostream & os=std::cout) const;
+    void PrintGenome(const std::string & filename) const;
 
     /// Figure out which instruction is going to actually be run next SingleProcess()
-    size_t PredictNextInst();
+    size_t PredictNextInst() const;
 
     /// Print out the state of the virtual CPU.
-    void PrintState(std::ostream & os=std::cout);
+    void PrintState(std::ostream & os=std::cout) const;
 
     /// Trace the instructions being exectured, with full CPU details.
     void Trace(size_t num_inst) {
@@ -291,7 +298,7 @@ namespace emp {
     switch (inst.id) {
     case InstID::Inc: ++regs[inst.args[0]]; break;
     case InstID::Dec: --regs[inst.args[0]]; break;
-    case InstID::Not: regs[inst.args[0]] = !regs[inst.args[0]]; break;
+    case InstID::Not: regs[inst.args[0]] = (regs[inst.args[0]] == 0.0); break;
     case InstID::SetReg: regs[inst.args[0]] = inst.args[1]; break;
     case InstID::Add: regs[inst.args[2]] = regs[inst.args[0]] + regs[inst.args[1]]; break;
     case InstID::Sub: regs[inst.args[2]] = regs[inst.args[0]] - regs[inst.args[1]]; break;
@@ -317,19 +324,19 @@ namespace emp {
 
     case InstID::If: // args[0] = test, args[1] = scope
       if (UpdateScope(inst.args[1]) == false) break;      // If previous scope is unfinished, stop!
-      if (!regs[inst.args[0]]) BypassScope(inst.args[1]); // If test fails, move to scope end.
+      if (regs[inst.args[0]] == 0.0) BypassScope(inst.args[1]); // If test fails, move to scope end.
       break;                                              // Continue in current code.
 
     case InstID::While:
       // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
       if (UpdateScope(inst.args[1], ScopeType::LOOP) == false) break;
-      if (!regs[inst.args[0]]) BypassScope(inst.args[1]);   // If test fails, move to scope end.
+      if (regs[inst.args[0]] == 0.0) BypassScope(inst.args[1]);   // If test fails, move to scope end.
       break;
 
     case InstID::Countdown:  // Same as while, but auto-decriments test each loop.
       // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
       if (UpdateScope(inst.args[1], ScopeType::LOOP) == false) break;
-      if (!regs[inst.args[0]]) BypassScope(inst.args[1]);   // If test fails, move to scope end.
+      if (regs[inst.args[0]] == 0.0) BypassScope(inst.args[1]);   // If test fails, move to scope end.
       else regs[inst.args[0]]--;
       break;
 
@@ -337,13 +344,13 @@ namespace emp {
     case InstID::Scope: UpdateScope(inst.args[0]); break;
 
     case InstID::Define: {
-        if (UpdateScope(inst.args[1]) == false) break;  // Update which scope we are in.
-        fun_starts[inst.args[0]] = inst_ptr;            // Record where function should be exectuted.
-        BypassScope(inst.args[1]);                      // Skip over the function definition for now.
+        if (UpdateScope(inst.args[1]) == false) break; // Update which scope we are in.
+        fun_starts[inst.args[0]] = (int) inst_ptr;     // Record where function should be exectuted.
+        BypassScope(inst.args[1]);                     // Skip over the function definition for now.
       }
       break;
     case InstID::Call: {
-        size_t def_pos = fun_starts[inst.args[0]];
+        size_t def_pos = (size_t) fun_starts[inst.args[0]];
         // Make sure function exists and is still in place.
         if (def_pos >= genome.size() || genome[def_pos].id != InstID::Define) break;
         // Go back into the function's original scope (call is in that scope)
@@ -357,15 +364,15 @@ namespace emp {
     case InstID::Push: PushStack(inst.args[1], regs[inst.args[0]]); break;
     case InstID::Pop: regs[inst.args[1]] = PopStack(inst.args[0]); break;
     case InstID::Input: {
-        size_t input_id = (size_t) regs[ inst.args[0] ];  // Grab ID from register.
-        input_id = input_id & (CPU_SIZE-1);               // Mod ID into range.
-        regs[inst.args[1]] = inputs[input_id];            // Set target reg to appropriate input.
+        // Determine the input ID and grab it if it exists; if not, return 0.0
+        int input_id = (int) regs[ inst.args[0] ];
+        regs[inst.args[1]] = Find(inputs, input_id, 0.0);
       }
       break;
     case InstID::Output: {
-        size_t output_id = (size_t) regs[ inst.args[1] ]; // Grab ID from register.
-        output_id = output_id & (CPU_SIZE-1);             // Mod ID into range.
-        outputs[output_id] = regs[inst.args[0]];          // Copy target reg to appropriate output.
+        // Save the date in the target reg to the specified output position.
+        int output_id = (int) regs[ inst.args[1] ];  // Grab ID from register.
+        outputs[output_id] = regs[inst.args[0]];     // Copy target reg to appropriate output.
       }
       break;
     case InstID::CopyVal: regs[inst.args[1]] = regs[inst.args[0]]; break;
@@ -412,7 +419,7 @@ namespace emp {
     }
   }
 
-  void AvidaGP::PrintGenome(std::ostream & os) {
+  void AvidaGP::PrintGenome(std::ostream & os) const {
     size_t cur_scope = 0;
 
     for (const inst_t & inst : genome) {
@@ -438,15 +445,15 @@ namespace emp {
     }
   }
 
-  void AvidaGP::PrintGenome(const std::string & filename) {
+  void AvidaGP::PrintGenome(const std::string & filename) const {
     std::ofstream of(filename);
     PrintGenome(of);
     of.close();
   }
 
-  size_t AvidaGP::PredictNextInst() {
+  size_t AvidaGP::PredictNextInst() const {
     // Determine if we are changing scope.
-    int new_scope = -1;
+    size_t new_scope = CPU_SIZE+1;  // Default to invalid scope.
     if (inst_ptr >= genome.size()) new_scope = 0;
     else {
       size_t inst_scope = InstScope(genome[inst_ptr]);
@@ -454,7 +461,7 @@ namespace emp {
     }
 
     // If we are not changing scope OR we are going to a deeper scope, execute next!
-    if (new_scope == -1 || new_scope > CurScope()) return inst_ptr;
+    if (new_scope > CPU_SIZE || new_scope > CurScope()) return inst_ptr;
 
     // If we are at the end of a loop, assume we will jump back to the beginning.
     if (CurScopeType() == ScopeType::LOOP) {
@@ -475,15 +482,15 @@ namespace emp {
     return inst_ptr;
   }
 
-  void AvidaGP::PrintState(std::ostream & os) {
+  void AvidaGP::PrintState(std::ostream & os) const {
     size_t next_inst = PredictNextInst();
 
-    os << " CPU_SIZE: ";
+    os << " REGS: ";
     for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << regs[i] << "] ";
     os << "\n INPUTS: ";
-    for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << inputs[i] << "] ";
+    for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << Find(inputs, i, 0.0) << "] ";
     os << "\n OUTPUTS: ";
-    for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << outputs[i] << "] ";
+    for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << Find(outputs, i, 0.0) << "] ";
     os << std::endl;
 
     os << "IP:" << inst_ptr;
@@ -535,9 +542,9 @@ namespace emp {
       inst_lib.AddInst(InstID::ScopeReg, "ScopeReg", 1, "Backup reg Arg1; restore at end of scope");
       inst_lib.AddInst(InstID::Unknown, "Unknown", 0, "Error: Unknown instruction used.");
 
-      for (char i = 0; i < AvidaGP::CPU_SIZE; i++) {
-        inst_lib.AddArg(to_string(i), i);             // Args can be called by value
-        inst_lib.AddArg(to_string("Reg", 'A'+i), i);  // ...or as a register.
+      for (size_t i = 0; i < AvidaGP::CPU_SIZE; i++) {
+        inst_lib.AddArg(to_string((int)i), i);                   // Args can be called by value
+        inst_lib.AddArg(to_string("Reg", 'A'+(char)i), i);  // ...or as a register.
       }
 
       init = true;

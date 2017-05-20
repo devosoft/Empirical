@@ -104,7 +104,7 @@ namespace emp {
       if (!HasPtr(ptr)) return false;
       return ptr_info.find(ptr)->second.IsOwner();
     }
-    
+
     int GetCount(void * ptr) const {
       if (verbose) std::cout << "Count:  " << ((uint64_t) ptr) << std::endl;
       if (!HasPtr(ptr)) return 0;
@@ -177,6 +177,8 @@ namespace emp {
     static PtrTracker & Tracker() { return PtrTracker::Get(); }
 #endif
   public:
+    using element_type = TYPE;
+
     Ptr() : ptr(nullptr) { ; }
     template <typename T2> Ptr(T2 * in_ptr, bool is_new=false) : ptr(in_ptr) {
       (void) is_new;  // Avoid unused parameter error when EMP_IF_MEMTRACK is off.
@@ -213,7 +215,7 @@ namespace emp {
     }
 
     template <typename... T>
-    void New(T... args) {
+    void New(T &&... args) {
       EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
       ptr = new TYPE(std::forward<T>(args)...);
       EMP_IF_MEMTRACK(Tracker().New(ptr););
@@ -254,10 +256,22 @@ namespace emp {
       _in.ptr = nullptr;
       return *this;
     }
+
+    // Dereference a pointer.
     TYPE & operator*() { return *ptr; }
+    const TYPE & operator*() const { return *ptr; }
+
+    // Follow a pointer.
     TYPE * operator->() { return ptr; }
     const TYPE * const operator->() const { return ptr; }
-    operator TYPE *() { return ptr; }
+
+    // Auto-case to raw pointer type.
+    operator TYPE *() {
+      // We should not automatically convert managed pointers to raw pointers
+      EMP_IF_MEMTRACK( emp_assert(Tracker().IsActive(ptr) == false, typeid(TYPE).name()); );
+      return ptr;
+    }
+
     operator bool() { return ptr != nullptr; }
 
     // Allow Ptr to be treated as an array?

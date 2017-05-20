@@ -61,7 +61,7 @@ namespace emp {
 
     void BuildRule(emp::vector<size_t> & new_pattern) { ; }
     template <typename T, typename... EXTRAS>
-    void BuildRule(emp::vector<size_t> & new_pattern, T && arg, EXTRAS... extras) {
+    void BuildRule(emp::vector<size_t> & new_pattern, T && arg, EXTRAS &&... extras) {
       new_pattern.push_back( GetID((size_t) std::forward<T>(arg)) );
       BuildRule(new_pattern, std::forward<EXTRAS>(extras)...);
     }
@@ -141,7 +141,7 @@ namespace emp {
 
     // Specify the name of the symbol and add a rule to it, returning the symbol id.
     template <typename... STATES>
-    size_t AddRule(const std::string & name, STATES... states) {
+    size_t AddRule(const std::string & name, STATES &&... states) {
       const size_t id = GetID(name);
       active_pos = GetSymbolPos(name);  // @CAO We just did this, so can be faster.
       Rule(std::forward<STATES>(states)...);

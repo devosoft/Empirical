@@ -60,7 +60,7 @@ namespace emp {
     mutable bool dfa_ready;                // Is the dfa ready? (or does it need to be generated?)
 
     template <typename... T>
-    void Error(T... args) {
+    void Error(T &&... args) {
       notes.push_back(emp::to_string(std::forward<T>(args)...));
       valid = false;
     }

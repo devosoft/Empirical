@@ -17,6 +17,8 @@
 #include <tuple>
 #include <utility>
 
+#include "../base/Ptr.h"
+
 namespace emp {
 
   // Effectively create a function (via constructor) where all args are computed, then ignored.
@@ -266,6 +268,21 @@ namespace emp {
     return static_cast<typename function_traits<Function>::function>(lambda);
   }
 
+
+  // Customized type traits
+  template <typename T> struct is_ptr_type           { enum { value = false }; };
+  template <typename T> struct is_ptr_type<T*>       { enum { value = true }; };
+  template <typename T> struct is_ptr_type<T* const> { enum { value = true }; };
+  template <typename T> struct is_ptr_type<Ptr<T>>   { enum { value = true }; };
+  template <typename T>
+  constexpr bool is_ptr_type_v(const T&) { return is_ptr_type<T>::value; }
+
+  template <typename T> struct remove_ptr_type { ; };
+  template <typename T> struct remove_ptr_type<T*>     { using type = T; };
+  template <typename T> struct remove_ptr_type<Ptr<T>> { using type = T; };
+  template <typename T>
+  using remove_ptr_type_t = typename remove_ptr_type<T>::type;
+  // @CAO: Make sure we are dealing with const and volitile pointers correctly.
 }
 
 
