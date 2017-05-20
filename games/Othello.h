@@ -50,6 +50,8 @@ namespace emp {
 
     int GetIndex(int x, int y) { return ((y - 1) * boardSize) + (x - 1); }
 
+    squareState GetCurrPlayer() { if (is_B_turn) { return Black; } else { return White; } }
+
     squareState GetSquare(int x, int y) { 
         int idx = GetIndex(x, y);
         return board[idx]; 
@@ -60,6 +62,13 @@ namespace emp {
 
         if (is_B) { board[idx] = Black; }
         else { board[idx] = White; }
+    }
+
+    void Flip(vector<std::pair<int, int>> flip_list) {
+        for (auto disc : flip_list) {
+            int idx = GetIndex(disc.first, disc.second);
+            board[idx] = GetCurrPlayer();
+        }
     }
 
     void PrintBoard() {
@@ -87,21 +96,17 @@ namespace emp {
 
     bool IsDone() const { return over; }
 
-    bool TestOver() {
-
-    }
-
-    vector<std::pair<int, int>> ValidMove(int x, int y) {
+    vector<std::pair<int, int>> ValidMove(int x, int y, bool is_B) {
         vector<std::pair<int,int>> flip_list;
         for (int j = y - 1; j <= y + 1; j++) {
             if ( j < 1 || j > boardSize) { continue; }
 
             for (int i = x - 1; i <= x + 1; i++) {
-                if (i < 1 || i > boardSize) { continue; }
+                if (i < 1 || i > boardSize) { continue; }           
 
                 squareState turn = empty;
                 squareState opponent = empty;
-                if (is_B_turn) {
+                if (is_B) {
                     if (GetSquare(i, j) == White) { turn = Black; opponent = White; }
                 }
                 else{
@@ -109,49 +114,153 @@ namespace emp {
                 }
 
                 if (turn != empty) {
-                    std::cout<<"XY: " <<x<<" "<<y<<std::endl;
-                    std::cout<<"IJ: "<<i<<" "<<j<<std::endl;
+                    vector<std::pair<int, int>> potential_flips; 
+
+                    //std::cout<<"XY: "<<x<<" "<<y<<std::endl;
+                    //std::cout<<"IJ: "<<i<<" "<<j<<std::endl;
                     if (x == i && y > j) {
-                        std::cout<<"XY: " <<x<<" "<<y<<std::endl;
-                        std::cout<<"IJ: "<<i<<" "<<j<<std::endl;
-                        for (int k = 1; k < j; k++) { 
-                            if (GetSquare(x, k) == turn) { flip_list.push_back(std::make_pair(x,k)); } 
-                        }
+                        for (int k = j; k >= 1; k--) { 
+                            if (GetSquare(x, k) == empty) { break; }
+                            if (GetSquare(x, k) == turn) {
+                                for (auto disc : potential_flips) { flip_list.push_back(disc); } 
+                                break;
+                            }
+                            potential_flips.push_back(std::make_pair(x,k));
+                        } 
                     }
                     else if (x == i && y < j) {
                         for (int k = j; k <= boardSize; k++) {
-                            if (GetSquare(x, k) == turn) { flip_list.push_back(std::make_pair(x,k)); }
+                            if (GetSquare(x, k) == empty) { break; }
+
+                            if (GetSquare(x, k) == turn) { 
+                                for (auto disc : potential_flips) { flip_list.push_back(disc); }
+                                break;
+                            }
+                            potential_flips.push_back(std::make_pair(x,k));
                         }
                     
                     }
                     else if (y == j && x > i) {
-                        for (int k = 1; k < i; k++) {
-                            if (GetSquare(k, y) == turn) { flip_list.push_back(std::make_pair(k,y)); }
+                        for (int k = i; k >= 1; k--) {
+                            if (GetSquare(k, y) == empty) { break; }
+
+                            if (GetSquare(k, y) == turn) { 
+                                for (auto disc : potential_flips) { flip_list.push_back(disc); }
+                                break;
+                            }
+                            potential_flips.push_back(std::make_pair(k, y));
                         }
                     }
                     else if (y == j && x < i) { 
                         for (int k = i; k <= boardSize; k++) {
-                            if (GetSquare(k, y) == turn) { flip_list.push_back(std::make_pair(k,y)); }
+                            if (GetSquare(k, y) == empty) { break; }
+
+                            if (GetSquare(k, y) == turn) { 
+                                for (auto disc : potential_flips) { flip_list.push_back(disc); }
+                                break;
+                            }
+                            potential_flips.push_back(std::make_pair(k, y));
                         }
                     }
-                    else if (x != i && y != j) {
-                        std::cout<<"TODO"<<std::endl; //TODO Add checking for diagonals
+                    else if (x < i && y < j) {
+                        int l = j;
+                        for (int k = i; k <= boardSize; k++) {
+                            if (GetSquare(k, l) == empty) { break; }
+
+                            if (GetSquare(k, l) == turn) {
+                                for (auto disc : potential_flips) { flip_list.push_back(disc); }
+                                break;
+                            }
+                            potential_flips.push_back(std::make_pair(k, l));
+                            l++;
+                            if (l > boardSize) { break; }
+                        }
                     }
+                    else if (x > i && y > j) {
+                        int l = j;
+                        for (int k = i; k >= 1; k--) {
+                            if (GetSquare(k, l) == empty) { break; }
+
+                            if (GetSquare(k, l) == turn) {
+                                for (auto disc : potential_flips) { flip_list.push_back(disc); }
+                                break;
+                            }
+                            potential_flips.push_back(std::make_pair(k, l));
+                            l--;
+                            if (l < 1) { break; }
+                        }
+                    }
+                    else if (x > i && y < j) { // Top Right Diagonal
+                        int l = j;
+                        for (int k = i; k >= 1; k--) {
+                            if (GetSquare(k, l) == empty) { break; }
+
+                            if (GetSquare(k, l) == turn) {
+                                for (auto disc : potential_flips) { flip_list.push_back(disc); }
+                                break;
+                            }
+                            potential_flips.push_back(std::make_pair(k, l));
+                            l++;
+                            if (l > boardSize) { break; }
+                        }
+                    }
+                    else if (x < i && y > j) {
+                        
+                        int l = j;
+                        for (int k = i; k <= boardSize; k++) {
+                            if (GetSquare(k, l) == empty) { break; }
+
+                            if (GetSquare(k, l) == turn) {
+                                for (auto disc : potential_flips) { flip_list.push_back(disc); }
+                                break;
+                            }
+                            potential_flips.push_back(std::make_pair(k, l));
+                            l--;
+                            if (l < 1) { break; }
+                        }
+                    }
+
+                    potential_flips.clear();
                 }
             }
         }
         return flip_list;
     }
 
-    bool DoMove(int x, int y) {
-        // TODO Check to see if game is over
-        
-        vector<std::pair<int, int>> flip_list = ValidMove(x, y);
+    void TestOver() {
+        bool moveW = false;
+        bool moveB = false;
 
-        //TODO flip tiles
+        if (ScoreW() == 0) { over = true; return; }
+        if (ScoreB() == 0) { over = true; return; }
+
+        for (int x = 1; x <= boardSize; x++) {
+            for (int y = 1; y <= boardSize; y++) {
+                squareState square = GetSquare(x, y);
+                if (square == empty) {
+                    bool validB = ValidMove(x, y, true).size();
+                    bool validW = ValidMove(x, y, false).size();
+
+                    if (validB && validW) { moveW = moveB = true; break; }
+                    else if (validB && !validW) { moveB = true; }
+                    else if (!validB && validW) { moveW = true; }
+                }
+            }
+        }
+
+        if (!moveB && !moveW) { over = true; }
+        else if (moveB && !moveW) { std::cout<<"No valid moves for White. Black's Turn"<<std::endl; is_B_turn = true; }
+        else if (!moveB && moveW) { std::cout<<"No valid moves for Black. White's Turn"<<std::endl; is_B_turn = false; }
+
+    }
+
+    bool DoMove(int x, int y) {
+        
+        vector<std::pair<int, int>> flip_list = ValidMove(x, y, is_B_turn);
         
         if (flip_list.size() != 0) {
             AddDisc(x, y, is_B_turn);
+            Flip(flip_list);
             is_B_turn = !(is_B_turn);
             return true;
         }

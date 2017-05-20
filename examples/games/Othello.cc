@@ -18,12 +18,14 @@ int main()
   othello.PrintBoard();
   size_t moveX = 0;
   size_t moveY = 0;
+  othello.TestOver();
 
   while (othello.IsDone() == false) {
     //size_t player = mancala.GetCurPlayer();
     //char symbol = 'B' + (char) player;i
-    //std::cout << symbol << " move? " << std::endl;
-      std::cout<<" Move? " << std::endl;
+      if (othello.GetCurrPlayer() == 1) {std::cout << " Black's "; }
+      else { std::cout<<" White's "; }
+      std::cout<<"Move? " << std::endl;
       std::cin >> moveX >> moveY;
 
     if (moveX < 1 || moveX > boardSize) {
@@ -50,6 +52,8 @@ int main()
     if (!tryMove) { std::cout << "Invalid Move: Must flank at least one opponent disc" <<std::endl; continue; }
 
     othello.PrintBoard();
+
+    othello.TestOver();
 
   }
   
