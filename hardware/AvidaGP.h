@@ -242,6 +242,8 @@ namespace emp {
     }
     void SetGenome(const genome_t & g) { genome = g; }
     void SetInput(size_t input_id, double value) { inputs[input_id] = value; }
+    void SetInputs(const std::unordered_map<int,double> & vals) { inputs = vals; }
+    void SetInputs(std::unordered_map<int,double> && vals) { inputs = std::move(vals); }
     void RandomizeInst(size_t pos, Random & rand) {
       SetInst(pos, (InstID) rand.GetUInt((uint32_t) InstID::Unknown),
               rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE) );
