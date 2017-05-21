@@ -10,10 +10,10 @@
 #include "../../tools/Random.h"
 #include "../../evo/World.h"
 
-constexpr size_t POP_SIZE = 100;
+constexpr size_t POP_SIZE = 200;
 constexpr size_t GENOME_SIZE = 100;
 constexpr size_t EVAL_TIME = 500;
-constexpr size_t UPDATES = 100;
+constexpr size_t UPDATES = 1000;
 constexpr size_t TOURNY_SIZE = 4;
 
 // Determine the next move of a human player.
@@ -41,12 +41,7 @@ size_t EvalMove(emp::Mancala & game, std::ostream & os=std::cout, std::istream &
 size_t EvalMove(emp::Mancala & game, emp::AvidaGP & org) {
   // Setup the hardware with proper inputs.
   org.ResetHardware();
-  const auto & cur_side = game.GetCurSide();
-  const auto & other_side = game.GetOtherSide();
-  for (size_t i = 0; i < 7; i++) {
-    org.SetInput(i, cur_side[i]);
-    org.SetInput(i+7, other_side[i]);
-  }
+  org.SetInputs(game.AsInput(game.GetCurPlayer()));
 
   // Run the code.
   org.Process(EVAL_TIME);
@@ -177,14 +172,17 @@ int main()
 
   std::cout << std::endl;
   world[0].PrintGenome("mancala_save.org");
+  world[0].ResetHardware();
+  world[0].Trace(200);
 
-  EvalGame(world[0], world[1], 0, true);
 
-  // And try playing it!
-  while (true) {
-    std::cout << "NEW GAME: Human vs. AI!\n";
-    EvalGame(world[0]);
-  }
+  // EvalGame(world[0], world[1], 0, true);
+  //
+  // // And try playing it!
+  // while (true) {
+  //   std::cout << "NEW GAME: Human vs. AI!\n";
+  //   EvalGame(world[0]);
+  // }
 
   return 0;
 }
