@@ -6,6 +6,9 @@ using move_t = MOVE_TYPE;
 void Reset()
      Restart the game (using the same settings)
 
+std::unordered_map<int, double> AsInput(size_t player_id) const
+     Store the current state of the game as a map for easy loading.
+
 bool DoMove(size_t player, move_t move)
      Specify a move to be made by a player.
      Return value indicates if player needs to make another decisions (or go again)
