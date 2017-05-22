@@ -30,7 +30,9 @@ namespace evo {
     EcoResource & SetOutflow(double _in) { outflow = _in; return *this; }
     EcoResource & SetLevel(double _in) { level = _in; return *this; }
 
-    void Update(double time) { ; }
+    void Update() {
+      level = level * (1.0 - outflow) + inflow;
+    }
     void Inject(double amt) { level += amt; }
   };
 
