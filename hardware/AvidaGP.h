@@ -13,6 +13,9 @@
 //  * We should clean up how we handle scope; the root scope is zero, so the arg-based
 //    scopes are 1-16 (or however many).  Right now we increment the value in various places
 //    and should be more consistent.
+//  * How should Avida-GP genomes take an action?  Options include sending ALL outputs and
+//    picking the maximum field; sending a single output and using its value; having specialized
+//    commands...
 
 
 #ifndef EMP_AVIDA_GP_H
@@ -234,14 +237,14 @@ namespace emp {
     const genome_t & GetGenome() const { return genome; }
     double GetReg(size_t id) const { return regs[id]; }
     size_t GetIP() const { return inst_ptr; }
-    double GetOutput(size_t id) const { return Find(outputs, id, 0.0); }
+    double GetOutput(int id) const { return Find(outputs, id, 0.0); }
 
     void SetInst(size_t pos, const inst_t & inst) { genome[pos] = inst; }
     void SetInst(size_t pos, InstID id, size_t a0=0, size_t a1=0, size_t a2=0) {
       genome[pos].Set(id, a0, a1, a2);
     }
     void SetGenome(const genome_t & g) { genome = g; }
-    void SetInput(size_t input_id, double value) { inputs[input_id] = value; }
+    void SetInput(int input_id, double value) { inputs[input_id] = value; }
     void SetInputs(const std::unordered_map<int,double> & vals) { inputs = vals; }
     void SetInputs(std::unordered_map<int,double> && vals) { inputs = std::move(vals); }
     void RandomizeInst(size_t pos, Random & rand) {
@@ -490,9 +493,9 @@ namespace emp {
     os << " REGS: ";
     for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << regs[i] << "] ";
     os << "\n INPUTS: ";
-    for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << Find(inputs, i, 0.0) << "] ";
+    for (int i = 0; i < CPU_SIZE; i++) os << "[" << Find(inputs, i, 0.0) << "] ";
     os << "\n OUTPUTS: ";
-    for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << Find(outputs, i, 0.0) << "] ";
+    for (int i = 0; i < CPU_SIZE; i++) os << "[" << Find(outputs, i, 0.0) << "] ";
     os << std::endl;
 
     os << "IP:" << inst_ptr;
