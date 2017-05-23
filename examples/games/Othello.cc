@@ -15,7 +15,7 @@ int main()
 
   //std::cout << othello.GetSquare(4,4) <<std::endl;
   
-  othello.PrintBoard();
+  othello.Print();
   size_t moveX = 0;
   size_t moveY = 0;
   othello.TestOver();
@@ -51,7 +51,7 @@ int main()
 
     if (!tryMove) { std::cout << "Invalid Move: Must flank at least one opponent disc" <<std::endl; continue; }
 
-    othello.PrintBoard();
+    othello.Print();
 
     othello.TestOver();
 

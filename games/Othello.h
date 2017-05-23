@@ -71,13 +71,13 @@ namespace emp {
         }
     }
 
-    void PrintBoard() {
-        std::cout<<std::endl<<"  ";
+    void Print(std::ostream & os=std::cout) {
+        os<<std::endl<<"  ";
         for (int i = 1; i <= boardSize; i++){ std::cout<<i<<" "; }
-        std::cout<<std::endl;
+        os<<std::endl;
 
         for (int y = 1; y <= boardSize; y++) {
-            std::cout<< y << " ";
+            os<< y << " ";
             for (int x = 1; x <= boardSize; x++) {
                 char piece;
                 int square = GetSquare(x,y);
@@ -86,12 +86,12 @@ namespace emp {
                 else if (square == 1) { piece = 'B'; }
                 else { piece = 'W'; }
 
-                std::cout<<piece<<" ";
+                os<<piece<<" ";
             }
-            std::cout<<std::endl;
+            os<<std::endl;
         }
 
-        std::cout<<std::endl;
+        os<<std::endl;
     }
 
     bool IsDone() const { return over; }
