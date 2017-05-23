@@ -110,9 +110,7 @@ namespace web {
       Info()->callback_id = JSWrap( callback_t( [w_info](const std::string & file_body){w_info->DoCallback(file_body);} )  );
     }
     FileInput(const std::function<void(const emp::File &)> & cb, const std::string & in_id="")
-      : FileInput(
-        [cb](const std::string & in){ std::stringstream ss(in); File file(ss); cb(file); }
-      ) { ; }
+      : FileInput( [cb](const std::string & in){ std::stringstream ss(in); File file(ss); cb(file); } ) { ; }
     FileInput(const FileInput & in) : WidgetFacet(in) { ; }
     FileInput(const Widget & in) : WidgetFacet(in) { ; }
     virtual ~FileInput() { ; }
