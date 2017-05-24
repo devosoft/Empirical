@@ -14,14 +14,16 @@
 #include "../../tools/Random.h"
 
 constexpr size_t POP_SIZE = 200;
+constexpr size_t POP_GROUPS = 5;    // How many groups to divide up the population?
 constexpr size_t GENOME_SIZE = 100;
 constexpr size_t EVAL_TIME = 500;
-constexpr size_t UPDATES = 1000;
+constexpr size_t UPDATES = 5000;
 constexpr size_t TOURNY_SIZE = 4;
 
-constexpr size_t SORT_VALS = 10;
+constexpr size_t SORT_VALS = 8;
 
 constexpr size_t sort_pairs = SORT_VALS * (SORT_VALS - 1) / 2;
+constexpr size_t group_size = POP_SIZE / POP_GROUPS;
 
 std::vector<double> rand_inputs;
 
@@ -77,6 +79,9 @@ int main()
           // If either number is missing, ordering fails.
           if (pos1 < 0 || pos2 < 0) { org->PushTrait(0.0); continue; }
 
+          // // If numbers are placed out of range, ordering fails.
+          // if (pos1 >= SORT_VALS || pos2 >= SORT_VALS) { org->PushTrait(0.0); continue; }
+
           // If numbers are in the wrong order, ordering fails.
           if ( (pos1 < pos2) != (val1 < val2) ) { org->PushTrait(0.0); continue; }
 
@@ -100,19 +105,36 @@ int main()
 
   // Do the run...
   for (size_t ud = 0; ud < UPDATES; ud++) {
-    // Keep the best individual. (and initialize all traits)
-    world.EliteSelect(fit_fun, 1, 1);
+    for (size_t group_id = 0; group_id < POP_GROUPS; group_id++) {
 
-    // Run a tournament for each spot.
-    // world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE-1);
-    world.LexicaseSelect(fit_set, POP_SIZE-1);
-    // world.EcoSelect(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
+      // Determine random values to be sorted by this subset of the population.
+      rand_inputs.resize(SORT_VALS);
+      for (size_t i = 0; i < SORT_VALS; i++) rand_inputs[i] = random.GetDouble(-1000.0, 1000.0);
+
+      // Keep the best individual. (and initialize all traits)
+      world.EliteSelect(fit_fun, 1, 1);
+
+      // Run a tournament for each spot.
+      // world.TournamentSelect(fit_fun, TOURNY_SIZE, group_size-1);
+      // world.LexicaseSelect(fit_set, group_size-1);
+      world.EcoSelect(fit_fun, fit_set, 20, TOURNY_SIZE, group_size-1);
+
+    }
+
     world.Update();
     std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
 
     // Mutate all but the first organism.
     world.MutatePop(1);
   }
+
+  world[0].PrintGenome("sorting_save.org");
+  world[0].PrintGenome();
+
+  // Trace the full execution for sorting.
+  world[0].ResetHardware();
+  for (size_t i = 0; i < SORT_VALS; i++) world[0].SetInput((int)i, rand_inputs[i]);
+  world[0].Trace(EVAL_TIME, "sorting_trace.org");
 
   return 0;
 }
