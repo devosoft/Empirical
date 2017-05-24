@@ -93,7 +93,7 @@ namespace emp {
     using inst_t = Instruction;
     using genome_t = emp::vector<inst_t>;
 
-  private:
+  protected:
 
     // Virtual CPU Components!
     genome_t genome;
@@ -109,6 +109,9 @@ namespace emp {
     emp::vector<size_t> call_stack;
 
     size_t errors;
+
+    // A simple way of recording which traits a CPU has demonstrated, and at what qaulity.
+    emp::vector<double> traits;
 
     double PopStack(size_t id) {
       if (stacks[id].size() == 0) return 0.0;
@@ -208,10 +211,11 @@ namespace emp {
     /// Reset the entire CPU to a starting state, without a genome.
     void Reset() {
       genome.resize(0);  // Clear out genome
+      traits.resize(0);  // Clear out traits
       ResetHardware();   // Reset the full hardware
     }
 
-    /// Reset just the CPU hardware, but keep the genome.
+    /// Reset just the CPU hardware, but keep the genome and traits.
     void ResetHardware() {
       // Initialize registers to their posision.  So Reg0 = 0 and Reg11 = 11.
       for (size_t i = 0; i < CPU_SIZE; i++) {
@@ -238,6 +242,11 @@ namespace emp {
     double GetReg(size_t id) const { return regs[id]; }
     size_t GetIP() const { return inst_ptr; }
     double GetOutput(int id) const { return Find(outputs, id, 0.0); }
+    const std::unordered_map<int,double> & GetOutputs() const { return outputs; }
+    size_t GetNumOutputs() const { return outputs.size(); }
+    double GetTrait(size_t id) const { return traits[id]; }
+    const emp::vector<double> &  GetTraits() { return traits; }
+    size_t GetNumTraits() const { return traits.size(); }
 
     void SetInst(size_t pos, const inst_t & inst) { genome[pos] = inst; }
     void SetInst(size_t pos, InstID id, size_t a0=0, size_t a1=0, size_t a2=0) {
@@ -247,6 +256,12 @@ namespace emp {
     void SetInput(int input_id, double value) { inputs[input_id] = value; }
     void SetInputs(const std::unordered_map<int,double> & vals) { inputs = vals; }
     void SetInputs(std::unordered_map<int,double> && vals) { inputs = std::move(vals); }
+    void SetTrait(size_t id, double val) {
+      if (id >= traits.size()) traits.resize(id+1, 0.0);
+      traits[id] = val;
+    }
+    void PushTrait(double val) { traits.push_back(val); }
+
     void RandomizeInst(size_t pos, Random & rand) {
       SetInst(pos, (InstID) rand.GetUInt((uint32_t) InstID::Unknown),
               rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE) );
