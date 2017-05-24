@@ -262,19 +262,21 @@ namespace emp {
     }
     void PushTrait(double val) { traits.push_back(val); }
 
-    void RandomizeInst(size_t pos, Random & rand) {
-      SetInst(pos, (InstID) rand.GetUInt((uint32_t) InstID::Unknown),
-              rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE) );
+    static inst_t GetRandomInst(Random & rand) {
+      return inst_t((InstID) rand.GetUInt((uint32_t) InstID::Unknown),
+              rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE));
     }
+
+    void RandomizeInst(size_t pos, Random & rand) { SetInst(pos, GetRandomInst(rand) ); }
 
     void PushInst(InstID id, size_t a0=0, size_t a1=0, size_t a2=0) {
       genome.emplace_back(id, a0, a1, a2);
     }
     void PushInst(const Instruction & inst) { genome.emplace_back(inst); }
+    void PushInst(Instruction && inst) { genome.emplace_back(inst); }
     void PushRandom(Random & rand, const size_t count=1) {
       for (size_t i = 0; i < count; i++) {
-        PushInst((InstID) rand.GetUInt((uint32_t) InstID::Unknown),
-                rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE) );
+        PushInst(GetRandomInst(rand));
       }
     }
 
@@ -307,8 +309,13 @@ namespace emp {
     void PrintState(std::ostream & os=std::cout) const;
 
     /// Trace the instructions being exectured, with full CPU details.
-    void Trace(size_t num_inst) {
-      for (size_t i = 0; i < num_inst; i++) { PrintState(); SingleProcess(); }
+    void Trace(size_t num_inst, std::ostream & os=std::cout) {
+      for (size_t i = 0; i < num_inst; i++) { PrintState(os); SingleProcess(); }
+    }
+    void Trace(size_t num_inst, const std::string & filename) {
+      std::ofstream of(filename);
+      Trace(num_inst, of);
+      of.close();
     }
 
     static const InstLib<Instruction> & GetInstLib();
