@@ -23,6 +23,8 @@ constexpr size_t SORT_VALS = 10;
 
 constexpr size_t sort_pairs = SORT_VALS * (SORT_VALS - 1) / 2;
 
+std::vector<double> rand_inputs;
+
 int main()
 {
   emp::Random random;
@@ -48,13 +50,47 @@ int main()
   // Setup the fitness function.
   std::function<double(emp::AvidaGP*)> fit_fun =
     [&random, &world](emp::AvidaGP * org) {
-      std::unordered_map<int,double> outputs = org->GetOutputs();
+      emp_assert(rand_inputs.size() == SORT_VALS);
+      org->ResetHardware();
+      for (size_t i = 0; i < SORT_VALS; i++) org->SetInput((int)i, rand_inputs[i]);
+
+      // Let the CPU process the run.
+      org->Process(EVAL_TIME);
+
+      // Collect the outputs...
+      const std::unordered_map<int,double> & outputs = org->GetOutputs();
+
+      // Determine WHERE each input value was moved to; initialize to -1 in case it wasn't output.
+      std::unordered_map<double,int> output_pos;
+      for (double rand_i : rand_inputs) output_pos[rand_i] = -1;
+      for (const auto & out_pair : outputs) output_pos[out_pair.second] = out_pair.first;
+
+      // Now evaluate the outputs.
       double score = 0.0;
+      for (size_t i = 1; i < SORT_VALS; i++) {
+        const double val1 = rand_inputs[i];
+        const int pos1 = output_pos[val1];
+        for (size_t j = 0; j < i; j++) {
+          const double val2 = rand_inputs[j];
+          const int pos2 = output_pos[val2];
+
+          // If either number is missing, ordering fails.
+          if (pos1 < 0 || pos2 < 0) { org->PushTrait(0.0); continue; }
+
+          // If numbers are in the wrong order, ordering fails.
+          if ( (pos1 < pos2) != (val1 < val2) ) { org->PushTrait(0.0); continue; }
+
+          // Ordering must be successful!
+          org->PushTrait(1.0);
+          score += 1.0;
+        }
+      }
       return score;
     };
 
   // Setup the "hint" functions...
   emp::vector< std::function<double(emp::AvidaGP*)> > fit_set;
+  // Create a hint for the ordering of each pair of functions.
   for (size_t i=0; i < sort_pairs; i++) {
     fit_set.push_back( [i](emp::AvidaGP * org) {
       return org->GetTrait(i);
@@ -80,4 +116,3 @@ int main()
 
   return 0;
 }
-
