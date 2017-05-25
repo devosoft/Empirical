@@ -28,10 +28,8 @@ default: web
 
 WEB := ../../web
 
-# CXX := $(CXX_native)
-# CFLAGS := $(CFLAGS_native_opt)
 CXX := $(CXX_web)
-CFLAGS := $(CFLAGS_web_opt)
+CFLAGS_web := $(CFLAGS_web_opt)
 
 debug: CFLAGS_web := $(CFLAGS_web_debug)
 debug: $(JS_TARGETS)
