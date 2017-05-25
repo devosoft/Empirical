@@ -5,6 +5,8 @@
 //
 //  BIT_MATRIX maintains a COL x ROW matrix of bits and provides easy indexing and manipulation.
 //
+//  Status: BETA
+//
 //  Bits are translated to a bitset with 0 in the upper left and moving through bits from
 //  left to right and top to bottom.  For example, the indecies in a 3x3 bit matrix would be
 //  organized as such:

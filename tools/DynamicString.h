@@ -4,6 +4,7 @@
 //
 //
 //  A string handler where sections update dynamically based on functions.
+//  Status: BETA
 
 #ifndef EMP_DYNAMIC_STRING_H
 #define EMP_DYNAMIC_STRING_H

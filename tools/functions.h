@@ -2,7 +2,9 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  A collection of broadly-useful functions.
+//  Status: BETA (though new functions are added frequently)
 
 #ifndef EMP_FUNCTIONS_H
 #define EMP_FUNCTIONS_H

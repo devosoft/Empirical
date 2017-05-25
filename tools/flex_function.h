@@ -5,6 +5,7 @@
 //
 //  A flex_function works identicaly to std::function, but holds default values for
 //  all parameters so any number of paramaters can be used in a call.
+//  Status: ALPHA
 
 #ifndef EMP_FLEX_FUNCTION_H
 #define EMP_FLEX_FUNCTION_H

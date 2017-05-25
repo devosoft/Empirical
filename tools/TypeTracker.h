@@ -2,8 +2,10 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  TypeTracker is attached to other classes to easily convert them to their derived version
 //  to facilitate type-specific operations.
+//  Status: BETA
 //
 //
 //  Developer notes:

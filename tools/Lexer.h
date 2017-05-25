@@ -2,7 +2,9 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  A general-purpose, fast lexer.
+//  Status: BETA
 
 #ifndef EMP_LEXER_H
 #define EMP_LEXER_H

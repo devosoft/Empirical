@@ -5,6 +5,7 @@
 //
 //  A memo_function works identicaly to std::function, but memorizes prior results (caches them)
 //  so that the function doesn't have to process those results again.
+//  Status: BETA
 
 #ifndef EMP_MEMO_FUNCTIONS_H
 #define EMP_MEMO_FUNCTIONS_H

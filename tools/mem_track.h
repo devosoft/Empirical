@@ -1,13 +1,11 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_MEM_TRACK
-#define EMP_MEM_TRACK
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/mercere99/Empirical/
+//  Copyright (C) Michigan State University, 2015-2017.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  This class creates macros to track how many instances of specific classes are made.
+//  Status: BETA
+//
 //
 //  To setup, every constructor for a class must incude EMP_TRACK_CONSTRUCT(CLASS_NAME),
 //  and every destructor must have EMP_TRACK_DESTRUCT(CLASS_NAME).  Make sure to avoid
@@ -21,7 +19,10 @@
 //   Currently having issues with the memory map getting corrupted.  Perhaps it needs to
 //   wait until onload is finished?  Also, can try using JS maps instead?  (only when
 //   using Emscripten.
-//
+
+
+#ifndef EMP_MEM_TRACK
+#define EMP_MEM_TRACK
 
 
 // If EMP_NDEBUG is turned on, turn off mem checks.
@@ -78,7 +79,7 @@ namespace emp {
       }
       mem_map[class_name]++;
     }
-    
+
     static void TrackMem_Dec(const std::string & class_name) {
       (void) class_name;
       auto & mem_map = TrackMem_GetMap();
@@ -105,7 +106,7 @@ namespace emp {
       }
       return mem_map[class_name];
     }
-      
+
   }
 
 }

@@ -2,7 +2,9 @@
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  This file contains a set of simple functions to manipulate maps.
+//  Status: BETA
 
 #ifndef EMP_MAP_UTILS_H
 #define EMP_MAP_UTILS_H

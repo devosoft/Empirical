@@ -5,6 +5,8 @@
 //
 //  A Cache works similar to an unordered_map, but all lookups come with a function to generate
 //  the result if the lookup fails.
+//
+//  Status: BETA
 
 #ifndef EMP_CACHE_H
 #define EMP_CACHE_H

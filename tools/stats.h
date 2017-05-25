@@ -2,8 +2,8 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
-//  This file contains functions for calculating various statistics about
-//  a population.
+//  This file contains functions for calculating various statistics about a population.
+//  Status: BETA
 
 
 #ifndef EMP_STATS_H

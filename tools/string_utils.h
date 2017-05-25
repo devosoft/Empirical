@@ -2,7 +2,9 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  This file contains a set of simple functions to manipulate strings.
+//  Status: RELEASE
 
 #ifndef EMP_STRING_UTILS_H
 #define EMP_STRING_UTILS_H

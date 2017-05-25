@@ -2,10 +2,12 @@
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  ce_string defines a limited array object for use within a constexpr class or function.
 //
-//  Note that this class will be slow if used at run-time without conversion to an
-//  array or vector first.
+//  STATUS: ALPHA
+//
+//  Note: this class will be slow if used at run-time without conversion to an array or vector.
 
 #ifndef EMP_CE_ARRAY_H
 #define EMP_CE_ARRAY_H

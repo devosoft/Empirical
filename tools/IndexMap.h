@@ -3,13 +3,15 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-// A simple class to weight items differently within a container and return the correct index.
+//  A simple class to weight items differently within a container and return the correct index.
+//  Status: BETA
 //
-// Constructor:
-// IndexMap(size_t num_items)
+//
+//  Constructor:
+//  IndexMap(size_t num_items)
 //     num_items is the maximum number of items that can be placed into the data structure.
 //
-// void Adjust(size_t id, double weight)
+//  void Adjust(size_t id, double weight)
 //     id is the identification number of the item whose weight is being adjusted.
 //     weight is the new weight for that entry.
 

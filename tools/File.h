@@ -4,6 +4,7 @@
 //
 //
 //  The File object maintains a simple, in-memory file.
+//  Status: BETA
 //
 //
 //  Developer notes:

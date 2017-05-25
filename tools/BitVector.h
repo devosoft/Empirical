@@ -3,8 +3,9 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-// Class: emp::BitVector
-// Desc: A customized version of emp::vector<bool> with additional bit magic operations
+//  Class: emp::BitVector
+//  Desc: A customized version of emp::vector<bool> with additional bit magic operations
+//  Status: RELEASE
 //
 // To implement: append(), resize()...
 //

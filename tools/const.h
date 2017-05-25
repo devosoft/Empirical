@@ -3,6 +3,7 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  Commonly used values...
+//  Status: RELEASE
 
 #ifndef EMP_CONST_H
 #define EMP_CONST_H

@@ -5,6 +5,8 @@
 //
 //  Tools for building grids that can be easily navigated and have state associated with
 //  grid cells, edges, and/or intersection points.
+//  Status: BETA
+//
 //
 //  Grid::Board objects are templated based on which of the components they work with.
 //  They include three template arguments for the state types associated with cells,
