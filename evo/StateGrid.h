@@ -160,16 +160,48 @@ namespace evo {
 
   class StateGridStatus {
   protected:
-    size_t x_pos;
-    size_t y_pos;
+    size_t x;
+    size_t y;
     size_t facing;  // 0=UL, 1=Up, 2=UR, 3=Right, 4=DR, 5=Down, 6=DL, 7=Left (+=Clockwise)
   public:
-    StateGridStatus() : x_pos(0), y_pos(0), facing(1) { ; }
+    StateGridStatus() : x(0), y(0), facing(1) { ; }
     StateGridStatus(const StateGridStatus &) = default;
     StateGridStatus(StateGridStatus &&) = default;
 
     StateGridStatus & operator=(const StateGridStatus &) = default;
     StateGridStatus & operator=(StateGridStatus &&) = default;
+
+    size_t GetX() const { return x; }
+    size_t GetY() const { return y; }
+    size_t GetFacing() const { return facing; }
+
+    StateGridStatus & SetX(size_t _x) { x = _x; return *this; }
+    StateGridStatus & SetY(size_t _y) { y = _y; return *this; }
+    StateGridStatus & SetPos(size_t _x, size_t _y) { x = _x; y = _y; return *this; }
+    StateGridStatus & SetFacing(size_t _f) { facing = _f; return *this; }
+
+    void MoveX(const StateGrid & grid, int steps=1) {
+      int tmp_x = (steps + (int) x) % grid.GetWidth();
+      x = (size_t) ((tmp_x < 0) ? (tmp_x + grid.GetWidth()) : tmp_x);
+    }
+
+    void MoveY(const StateGrid & grid, int steps=1) {
+      int tmp_y = (steps + (int) y) % grid.GetHeight();
+      x = (size_t) ((tmp_y < 0) ? (tmp_x + grid.GetHeight()) : tmp_x);
+    }
+
+    void Move(const StateGrid & grid, int steps=1) {
+      switch (facing) {
+        case 0; MoveX(grid, -steps); MoveY(grid, -steps); break;
+        case 1;                      MoveY(grid, -steps); break;
+        case 2; MoveX(grid, +steps); MoveY(grid, -steps); break;
+        case 3; MoveX(grid, +steps);                      break;
+        case 4; MoveX(grid, +steps); MoveY(grid, +steps); break;
+        case 5;                      MoveY(grid, +steps); break;
+        case 6; MoveX(grid, -steps); MoveY(grid, +steps); break;
+        case 7; MoveX(grid, -steps);                      break;
+      }
+    }
   };
 
 }
