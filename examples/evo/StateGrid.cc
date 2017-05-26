@@ -14,9 +14,23 @@ int main()
   info.AddState(0, '-', 1.0, "Empty", "Uninteresting position");
   info.AddState(1, '+', 1.1, "Food", "Moving to this position increases fitness (at least once.");
 
-  emp::evo::StateGrid sg(info, "test.sgrid");
-  std::cout << "Created a " << sg.GetWidth() << "x" << sg.GetHeight()
+  emp::evo::StateGrid grid(info, "test.sgrid");
+  std::cout << "Created a " << grid.GetWidth() << "x" << grid.GetHeight()
 	    << " state grid." << std::endl;
 
-  sg.Write(std::cout);
+  grid.Write(std::cout);
+
+  emp::evo::StateGridStatus status;
+  std::cout << "x=" << status.GetX() << " y=" << status.GetY() << " facing=" << status.GetFacing()
+            << "  scan=" << status.Scan(grid) << std::endl;
+  status.Move(grid, 4);
+  std::cout << "x=" << status.GetX() << " y=" << status.GetY() << " facing=" << status.GetFacing()
+            << "  scan=" << status.Scan(grid) << std::endl;
+  status.Rotate();
+  status.Move(grid, 2);
+  std::cout << "x=" << status.GetX() << " y=" << status.GetY() << " facing=" << status.GetFacing()
+            << "  scan=" << status.Scan(grid) << std::endl;
+  status.Move(grid, 2);
+  std::cout << "x=" << status.GetX() << " y=" << status.GetY() << " facing=" << status.GetFacing()
+            << "  scan=" << status.Scan(grid) << std::endl;
 }
