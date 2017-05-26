@@ -24,20 +24,19 @@ namespace emp {
   private:
     using side_t = emp::array<size_t, 7>;
 
-    enum squareState { empty, Black, White };
-    vector<squareState> board;    // Current board state
+    vector<size_t> board;    // Current board state
     bool over = false;    // Has the game ended?
     size_t is_B_turn;     // Which player goes next?
     int boardSize = 8;     // How big is the board? (N x N)
 
   public:
-    using move_t = size_t;
+    using move_t = std::pair<int, int>;
 
     Othello(bool B_first=true) { Reset(B_first); boardSize = 8; }
     ~Othello() { ; }
 
     void Reset(bool B_first=true) {
-      for (int i = 0; i < boardSize * boardSize; i++){ board.push_back(empty);}
+      for (int i = 0; i < boardSize * boardSize; i++){ board.push_back(0);}
 
       AddDisc(boardSize / 2, boardSize / 2, false);
       AddDisc(boardSize / 2 + 1, boardSize / 2 + 1, false);
@@ -50,9 +49,9 @@ namespace emp {
 
     int GetIndex(int x, int y) { return ((y - 1) * boardSize) + (x - 1); }
 
-    squareState GetCurrPlayer() { if (is_B_turn) { return Black; } else { return White; } }
+    size_t GetCurrPlayer() { if (is_B_turn) { return 1; } else { return 2; } }
 
-    squareState GetSquare(int x, int y) { 
+    size_t GetSquare(int x, int y) { 
         int idx = GetIndex(x, y);
         return board[idx]; 
     }
@@ -60,8 +59,8 @@ namespace emp {
     void AddDisc(int x, int y, bool is_B){
         int idx = GetIndex(x, y);
 
-        if (is_B) { board[idx] = Black; }
-        else { board[idx] = White; }
+        if (is_B) { board[idx] = 1; }
+        else { board[idx] = 2; }
     }
 
     void Flip(vector<std::pair<int, int>> flip_list) {
@@ -104,23 +103,21 @@ namespace emp {
             for (int i = x - 1; i <= x + 1; i++) {
                 if (i < 1 || i > boardSize) { continue; }           
 
-                squareState turn = empty;
-                squareState opponent = empty;
+                size_t turn = 0;
+
                 if (is_B) {
-                    if (GetSquare(i, j) == White) { turn = Black; opponent = White; }
+                    if (GetSquare(i, j) == 2) { turn = 1; }
                 }
                 else{
-                    if (GetSquare(i, j) == Black) { turn = White; opponent = Black; }
+                    if (GetSquare(i, j) == 1) { turn = 2; }
                 }
 
-                if (turn != empty) {
+                if (turn != 0) {
                     vector<std::pair<int, int>> potential_flips; 
 
-                    //std::cout<<"XY: "<<x<<" "<<y<<std::endl;
-                    //std::cout<<"IJ: "<<i<<" "<<j<<std::endl;
                     if (x == i && y > j) {
                         for (int k = j; k >= 1; k--) { 
-                            if (GetSquare(x, k) == empty) { break; }
+                            if (GetSquare(x, k) == 0) { break; }
                             if (GetSquare(x, k) == turn) {
                                 for (auto disc : potential_flips) { flip_list.push_back(disc); } 
                                 break;
@@ -130,7 +127,7 @@ namespace emp {
                     }
                     else if (x == i && y < j) {
                         for (int k = j; k <= boardSize; k++) {
-                            if (GetSquare(x, k) == empty) { break; }
+                            if (GetSquare(x, k) == 0) { break; }
 
                             if (GetSquare(x, k) == turn) { 
                                 for (auto disc : potential_flips) { flip_list.push_back(disc); }
@@ -142,7 +139,7 @@ namespace emp {
                     }
                     else if (y == j && x > i) {
                         for (int k = i; k >= 1; k--) {
-                            if (GetSquare(k, y) == empty) { break; }
+                            if (GetSquare(k, y) == 0) { break; }
 
                             if (GetSquare(k, y) == turn) { 
                                 for (auto disc : potential_flips) { flip_list.push_back(disc); }
@@ -153,7 +150,7 @@ namespace emp {
                     }
                     else if (y == j && x < i) { 
                         for (int k = i; k <= boardSize; k++) {
-                            if (GetSquare(k, y) == empty) { break; }
+                            if (GetSquare(k, y) == 0) { break; }
 
                             if (GetSquare(k, y) == turn) { 
                                 for (auto disc : potential_flips) { flip_list.push_back(disc); }
@@ -165,7 +162,7 @@ namespace emp {
                     else if (x < i && y < j) {
                         int l = j;
                         for (int k = i; k <= boardSize; k++) {
-                            if (GetSquare(k, l) == empty) { break; }
+                            if (GetSquare(k, l) == 0) { break; }
 
                             if (GetSquare(k, l) == turn) {
                                 for (auto disc : potential_flips) { flip_list.push_back(disc); }
@@ -179,7 +176,7 @@ namespace emp {
                     else if (x > i && y > j) {
                         int l = j;
                         for (int k = i; k >= 1; k--) {
-                            if (GetSquare(k, l) == empty) { break; }
+                            if (GetSquare(k, l) == 0) { break; }
 
                             if (GetSquare(k, l) == turn) {
                                 for (auto disc : potential_flips) { flip_list.push_back(disc); }
@@ -193,7 +190,7 @@ namespace emp {
                     else if (x > i && y < j) { // Top Right Diagonal
                         int l = j;
                         for (int k = i; k >= 1; k--) {
-                            if (GetSquare(k, l) == empty) { break; }
+                            if (GetSquare(k, l) == 0) { break; }
 
                             if (GetSquare(k, l) == turn) {
                                 for (auto disc : potential_flips) { flip_list.push_back(disc); }
@@ -208,7 +205,7 @@ namespace emp {
                         
                         int l = j;
                         for (int k = i; k <= boardSize; k++) {
-                            if (GetSquare(k, l) == empty) { break; }
+                            if (GetSquare(k, l) == 0) { break; }
 
                             if (GetSquare(k, l) == turn) {
                                 for (auto disc : potential_flips) { flip_list.push_back(disc); }
@@ -236,8 +233,8 @@ namespace emp {
 
         for (int x = 1; x <= boardSize; x++) {
             for (int y = 1; y <= boardSize; y++) {
-                squareState square = GetSquare(x, y);
-                if (square == empty) {
+                size_t square = GetSquare(x, y);
+                if (square == 0) {
                     bool validB = ValidMove(x, y, true).size();
                     bool validW = ValidMove(x, y, false).size();
 
@@ -254,7 +251,10 @@ namespace emp {
 
     }
 
-    bool DoMove(int x, int y) {
+    bool DoMove(size_t player, move_t move) {
+
+        int x = move.first;
+        int y = move.second;
         
         vector<std::pair<int, int>> flip_list = ValidMove(x, y, is_B_turn);
         
@@ -270,172 +270,22 @@ namespace emp {
 
     }
 
-    size_t ScoreB() {
-        size_t bScore = 0;
+    double GetScore(size_t player) {
+        double bScore = 0;
+        double wScore = 0;
 
         for (int x = 1; x <= boardSize; x++) {
             for (int y = 1; y <= boardSize; y++) {
-                squareState disc = GetSquare(x, y);
-                if (disc == Black) { bScore++; }
+                size_t disc = GetSquare(x, y);
+                if (disc == 1) { bScore++; }
+                else if (disc == 2) { wScore++; }
             }
         }
 
-        return bScore;  
-    }
-
-    size_t ScoreW() {
-        size_t wScore = 0;
-
-        for (int x = 1; x <= boardSize; x++) {
-            for (int y = 1; y <= boardSize; y++) {
-                squareState disc = GetSquare(x, y);
-                if (disc == White) { wScore++; }
-            }
-        }
-        return wScore;
+        if (player == 1) { return bScore; }
+        else if (player == 2) { return wScore; }
     }
     
-
-    /*
-    const vector<int> & GetBoard() const { return board; }
-    vector<int> & GetBoard() { return board; }
-    //side_t & GetCurSide() { return is_A_turn ? boardA : boardB; }
-    //side_t & GetOtherSide() { return is_A_turn ? boardB : boardA; }
-
-
-    // Returns bool indicating whether player can go again
-    bool DoMove(move_t cell) {
-      emp_assert(cell < 6);                // You cannot choose a cell out of bounds.
-
-      side_t & cur_board   = GetCurSide();
-      side_t & other_board = GetOtherSide();
-
-      emp_assert(cur_board[cell] != 0);        // You cannot choose an empty cell.
-
-      size_t stone_count = cur_board[cell];
-      size_t cur_cell = cell;
-
-      cur_board[cell] = 0;
-
-      while (stone_count > 0) {
-        cur_cell = (cur_cell+1) % 13;  // 6 pits on either side + 1 allowed home.
-        if (cur_cell < 7) cur_board[cur_cell]++;
-        else other_board[cur_cell-7]++;
-        stone_count--;
-      }
-
-      // Go again if you ended in your store
-      if (cur_cell == 6) {
-        TestOver();
-        return true;
-      }
-
-      // If you didn't end in your home, see if you captured!
-      // You must be on your side of the board...
-      //  and the only cell in the last pit is the one you just put there.
-      if (cur_cell < 6 && cur_board[cur_cell] == 1) {
-        size_t clear_pos = 5 - cur_cell;
-        cur_board[6] += other_board[clear_pos];
-        other_board[clear_pos] = 0;
-      }
-
-      is_A_turn = (size_t) !is_A_turn;
-      TestOver();
-      return false;
-    }
-
-    // Setup a DoMove from either player's viewpoint.
-    bool DoMove(size_t player, move_t cell) {
-      emp_assert(player != is_A_turn);  // Verify that we agree on player who goes next!
-      return DoMove(cell);
-    }
-
-    bool IsDone() const { return over; }
-
-    bool IsMoveValid(size_t move) const {
-      // Exclude never-valid moves or empty pits
-      if (move >= 6 || GetCurSide()[move] == 0) { return false; }
-      return true;
-    }
-
-    // Provide all of the legal moves.
-    emp::vector<move_t> GetMoveOptions() {
-      emp::vector<move_t> out_v;
-      for (size_t i = 0; i < 6; i++) {
-        if (GetCurSide()[i]) out_v.push_back(i);
-      }
-      return out_v;
-    }
-
-    void PrintSmall(std::ostream & os=std::cout) {
-      os << "  ";
-      for (size_t i = 5; i < 5; i--) {
-        os << boardB[i] << " ";
-      }
-      os << std::endl;
-      os << boardB[6] << "              " << boardA[6] << std::endl;
-      os << "  ";
-      for (size_t i = 0; i < 6; i++) {
-        os << boardA[i] << " ";
-      }
-      os << std::endl;
-    }
-
-    void Print(std::ostream & os=std::cout) {
-      std::cout << "+---<<<---F-----E-----D-----C-----B-----A---<<<---+ Player B";
-      if (is_A_turn == false) std::cout << " ***";
-      std::cout << "\n"
-                << "|                                                 | \n"
-                << "|       (" << std::setw(2) << boardB[5]
-                << " ) (" << std::setw(2) << boardB[4]
-                << " ) (" << std::setw(2) << boardB[3]
-                << " ) (" << std::setw(2) << boardB[2]
-                << " ) (" << std::setw(2) << boardB[1]
-                << " ) (" << std::setw(2) << boardB[0]
-                << " )       |\n";
-      std::cout << "v [" << std::setw(2) << boardB[6]
-                << " ]                                     ["
-                << std::setw(2) << boardA[6] << " ] ^\n";
-      std::cout << "|       (" << std::setw(2) << boardA[0]
-                << " ) (" << std::setw(2) << boardA[1]
-                << " ) (" << std::setw(2) << boardA[2]
-                << " ) (" << std::setw(2) << boardA[3]
-                << " ) (" << std::setw(2) << boardA[4]
-                << " ) (" << std::setw(2) << boardA[5]
-                << " )       |\n";
-      std::cout << "|                                                 |\n"
-                << "+--->>>---A-----B-----C-----D-----E-----F--->>>---+ Player A";
-      if (is_A_turn == true) std::cout << " ***";
-      std::cout << std::endl << std::endl;
-    }
-
-    size_t GetCurPlayer() const { return !is_A_turn; }
-    bool IsTurnA() const { return is_A_turn; }
-    bool IsTurnB() const { return !is_A_turn; }
-
-    size_t ScoreA() const {
-      size_t score = 0;
-      for (size_t i = 0; i < 7; i++) {
-        score += boardA[i];
-      }
-      return score;
-    }
-
-    size_t ScoreB() const {
-      size_t score = 0;
-      for (size_t i = 0; i < 7; i++) {
-        score += boardB[i];
-      }
-      return score;
-    }
-
-    double GetScore(size_t player) {
-      if (player == 0) return (double) ScoreA();
-      else if (player == 1) return (double) ScoreB();
-      emp_assert(false);  // Only a two player game!
-      return 0.0;
-    }
-*/
   };
 
 }
