@@ -158,6 +158,20 @@ namespace evo {
     }
   };
 
+  class StateGridStatus {
+  protected:
+    size_t x_pos;
+    size_t y_pos;
+    size_t facing;  // 0=UL, 1=Up, 2=UR, 3=Right, 4=DR, 5=Down, 6=DL, 7=Left (+=Clockwise)
+  public:
+    StateGridStatus() : x_pos(0), y_pos(0), facing(1) { ; }
+    StateGridStatus(const StateGridStatus &) = default;
+    StateGridStatus(StateGridStatus &&) = default;
+
+    StateGridStatus & operator=(const StateGridStatus &) = default;
+    StateGridStatus & operator=(StateGridStatus &&) = default;
+  };
+
 }
 }
 
