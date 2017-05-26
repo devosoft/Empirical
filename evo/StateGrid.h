@@ -187,19 +187,19 @@ namespace evo {
 
     void MoveY(const StateGrid & grid, int steps=1) {
       int tmp_y = (steps + (int) y) % grid.GetHeight();
-      x = (size_t) ((tmp_y < 0) ? (tmp_x + grid.GetHeight()) : tmp_x);
+      x = (size_t) ((tmp_y < 0) ? (tmp_y + grid.GetHeight()) : tmp_y);
     }
 
     void Move(const StateGrid & grid, int steps=1) {
       switch (facing) {
-        case 0; MoveX(grid, -steps); MoveY(grid, -steps); break;
-        case 1;                      MoveY(grid, -steps); break;
-        case 2; MoveX(grid, +steps); MoveY(grid, -steps); break;
-        case 3; MoveX(grid, +steps);                      break;
-        case 4; MoveX(grid, +steps); MoveY(grid, +steps); break;
-        case 5;                      MoveY(grid, +steps); break;
-        case 6; MoveX(grid, -steps); MoveY(grid, +steps); break;
-        case 7; MoveX(grid, -steps);                      break;
+        case 0: MoveX(grid, -steps); MoveY(grid, -steps); break;
+        case 1:                      MoveY(grid, -steps); break;
+        case 2: MoveX(grid, +steps); MoveY(grid, -steps); break;
+        case 3: MoveX(grid, +steps);                      break;
+        case 4: MoveX(grid, +steps); MoveY(grid, +steps); break;
+        case 5:                      MoveY(grid, +steps); break;
+        case 6: MoveX(grid, -steps); MoveY(grid, +steps); break;
+        case 7: MoveX(grid, -steps);                      break;
       }
     }
 
