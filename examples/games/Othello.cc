@@ -26,7 +26,14 @@ int main()
       if (othello.GetCurrPlayer() == 1) {std::cout << " Black's "; }
       else { std::cout<<" White's "; }
       std::cout<<"Move? " << std::endl;
+      emp::vector<std::pair<int, int>> validMoves = othello.GetMoveOptions();
+      for (auto el : validMoves) { std::cout<<el.first<< " " << el.second<<std::endl; }
+      othello.ClearValidMoves();
+      othello.ClearFlips();
+
       std::cin >> moveX >> moveY;
+
+      std::pair<int, int> move = std::make_pair(moveX, moveY);
 
     if (moveX < 1 || moveX > boardSize) {
       std::cout << "Invalid move!! (choose an X value 1 to " << boardSize<<")" <<  std::endl;
@@ -47,18 +54,20 @@ int main()
       continue;
     }
 
-    bool tryMove = othello.DoMove(moveX, moveY);
+    if (othello.IsMoveValid(othello.GetCurrPlayer(), move ) == 0) {
+        std::cout << "Invalid Move: Must flank at least one opponent disc" <<std::endl;
+        continue;
+    }
 
-    if (!tryMove) { std::cout << "Invalid Move: Must flank at least one opponent disc" <<std::endl; continue; }
+    bool tryMove = othello.DoMove(othello.GetCurrPlayer(), move);
+    othello.ClearFlips();
 
     othello.Print();
 
-    othello.TestOver();
-
   }
   
-  const size_t scoreB = othello.ScoreB();
-  const size_t scoreW = othello.ScoreW();
+  const size_t scoreB = othello.GetScore(1);
+  const size_t scoreW = othello.GetScore(2);
 
   std::cout<<"Black: "<<scoreB<<" White: "<<scoreW<<std::endl<<std::endl;
 

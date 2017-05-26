@@ -28,6 +28,9 @@ namespace emp {
     bool over = false;    // Has the game ended?
     size_t is_B_turn;     // Which player goes next?
     int boardSize = 8;     // How big is the board? (N x N)
+    vector<std::pair<int, int>> flip_list;
+    vector<std::pair<int, int>> valid_moves_B;
+    vector<std::pair<int, int>> valid_moves_W;
 
   public:
     using move_t = std::pair<int, int>;
@@ -45,6 +48,15 @@ namespace emp {
 
       over = false;
       is_B_turn = B_first;
+    }
+
+    void ClearFlips() { flip_list.clear(); }
+
+    void ClearValidMoves() { valid_moves_B.clear(); valid_moves_W.clear(); }
+
+    vector<move_t> GetMoveOptions() {
+        if (is_B_turn) { return valid_moves_B; }
+        else { return valid_moves_W; }
     }
 
     int GetIndex(int x, int y) { return ((y - 1) * boardSize) + (x - 1); }
@@ -95,8 +107,12 @@ namespace emp {
 
     bool IsDone() const { return over; }
 
-    vector<std::pair<int, int>> ValidMove(int x, int y, bool is_B) {
-        vector<std::pair<int,int>> flip_list;
+    bool IsMoveValid(size_t player, move_t move) {
+        int x = move.first;
+        int y = move.second;
+        bool is_B = 0;
+        if (player == 1) { is_B = 1; }
+
         for (int j = y - 1; j <= y + 1; j++) {
             if ( j < 1 || j > boardSize) { continue; }
 
@@ -221,26 +237,42 @@ namespace emp {
                 }
             }
         }
-        return flip_list;
+        return flip_list.size();
     }
 
     void TestOver() {
         bool moveW = false;
         bool moveB = false;
 
-        if (ScoreW() == 0) { over = true; return; }
-        if (ScoreB() == 0) { over = true; return; }
+        if (GetScore(1) == 0) { over = true; return; }
+        if (GetScore(2) == 0) { over = true; return; }
+        ClearValidMoves();
 
         for (int x = 1; x <= boardSize; x++) {
             for (int y = 1; y <= boardSize; y++) {
-                size_t square = GetSquare(x, y);
+                move_t move = std::make_pair(x, y);
+                size_t square = GetSquare(move.first, move.second);
                 if (square == 0) {
-                    bool validB = ValidMove(x, y, true).size();
-                    bool validW = ValidMove(x, y, false).size();
+                    ClearFlips();
+                    bool validB = IsMoveValid(1, move);
+                    ClearFlips();
+                    bool validW = IsMoveValid(2, move);
+                    ClearFlips();
 
-                    if (validB && validW) { moveW = moveB = true; break; }
-                    else if (validB && !validW) { moveB = true; }
-                    else if (!validB && validW) { moveW = true; }
+                    if (validB && validW) {
+                        moveW = moveB = true;
+                        valid_moves_B.push_back(move);
+                        valid_moves_W.push_back(move);
+                    }
+                    else if (validB && !validW) { 
+                        moveB = true;
+                        valid_moves_B.push_back(move);
+                    
+                    }
+                    else if (!validB && validW) { 
+                        moveW = true;
+                        valid_moves_W.push_back(move);
+                    }
                 }
             }
         }
@@ -255,18 +287,18 @@ namespace emp {
 
         int x = move.first;
         int y = move.second;
+
+        bool currPlayer;
+        if (player == 1) { currPlayer = 1; }
+        else { currPlayer = 0; }
         
-        vector<std::pair<int, int>> flip_list = ValidMove(x, y, is_B_turn);
-        
-        if (flip_list.size() != 0) {
-            AddDisc(x, y, is_B_turn);
-            Flip(flip_list);
-            is_B_turn = !(is_B_turn);
-            return true;
-        }
-        else {
-            return false;
-        }
+        AddDisc(x, y, is_B_turn);
+        Flip(flip_list);
+        is_B_turn = !(is_B_turn);
+        TestOver();
+
+        if (is_B_turn == currPlayer){ return true; }
+        else { return false; }
 
     }
 
