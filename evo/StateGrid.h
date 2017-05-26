@@ -202,6 +202,14 @@ namespace evo {
         case 7; MoveX(grid, -steps);                      break;
       }
     }
+
+    void Rotate(int turns=1) {
+      facing = (facing + turns % 8 + 8) % 8;
+    }
+
+    int Scan(const StateGrid & grid) {
+      return grid(x,y);
+    }
   };
 
 }
