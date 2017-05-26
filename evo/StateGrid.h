@@ -181,13 +181,13 @@ namespace evo {
     StateGridStatus & SetFacing(size_t _f) { facing = _f; return *this; }
 
     void MoveX(const StateGrid & grid, int steps=1) {
-      int tmp_x = (steps + (int) x) % grid.GetWidth();
-      x = (size_t) ((tmp_x < 0) ? (tmp_x + grid.GetWidth()) : tmp_x);
+      int tmp_x = (steps + (int) x) % (int) grid.GetWidth();
+      x = (size_t) ((tmp_x < 0) ? (tmp_x + (int) grid.GetWidth()) : tmp_x);
     }
 
     void MoveY(const StateGrid & grid, int steps=1) {
-      int tmp_y = (steps + (int) y) % grid.GetHeight();
-      x = (size_t) ((tmp_y < 0) ? (tmp_y + grid.GetHeight()) : tmp_y);
+      int tmp_y = (steps + (int) y) % (int) grid.GetHeight();
+      y = (size_t) ((tmp_y < 0) ? (tmp_y + (int) grid.GetHeight()) : tmp_y);
     }
 
     void Move(const StateGrid & grid, int steps=1) {
