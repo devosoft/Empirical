@@ -55,7 +55,7 @@ namespace emp {
     }
     inst_id_t GetID(const std::string name) const {
       emp_assert(Has(name_map, name), name);
-      return name_map[name];
+      return Find(name_map, name, inst_id_t::Unknown);
     }
     static constexpr inst_id_t GetID(char symbol) {
       if (symbol >= 'a' && symbol <= 'z') return (inst_id_t) (symbol - 'a');
