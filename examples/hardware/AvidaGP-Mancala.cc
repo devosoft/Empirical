@@ -26,7 +26,7 @@ size_t EvalMove(emp::Mancala & game, std::ostream & os=std::cout, std::istream &
   os << "Move?" << std::endl;
   is >> move;
 
-  while (move < 'A' || move > 'F' || game.GetCurSide()[move-'A'] == 0) {
+  while (move < 'A' || move > 'F' || game.GetCurSide()[(size_t)(move-'A')] == 0) {
     os << "Invalid move! (choose a value 'A' to 'F')" <<  std::endl;
     is.clear();
     is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -47,12 +47,12 @@ size_t EvalMove(emp::Mancala & game, emp::AvidaGP & org) {
   org.Process(EVAL_TIME);
 
   // Determine the chosen move.
-  size_t best_move = 0;
-  for (size_t i = 1; i < 6; i++) {
+  int best_move = 0;
+  for (int i = 1; i < 6; i++) {
     if (org.GetOutput(best_move) < org.GetOutput(i)) { best_move = i; }
   }
 
-  return best_move;
+  return (size_t) best_move;
 }
 
 using mancala_ai_t = std::function< size_t(emp::Mancala & game) >;
@@ -147,7 +147,7 @@ int main()
   for (size_t out_id = 0; out_id < 16; out_id++) {
     // Setup the fitness function.
     fit_set[out_id] = [out_id](emp::AvidaGP * org) {
-      return (double) -std::abs(org->GetOutput(out_id) - out_id * out_id);
+      return (double) -std::abs(org->GetOutput((int)out_id) - out_id * out_id);
     };
   }
 
@@ -171,9 +171,18 @@ int main()
   fit_fun(&(world[0]));
 
   std::cout << std::endl;
+  emp::Mancala game(0);
   world[0].PrintGenome("mancala_save.org");
+
+  game.DoMove(0);
   world[0].ResetHardware();
-  world[0].Trace(200);
+  world[0].SetInputs(game.AsInput(game.GetCurPlayer()));
+  world[0].Trace(1);
+
+  game.DoMove(5);
+  world[0].ResetHardware();
+  world[0].SetInputs(game.AsInput(game.GetCurPlayer()));
+  world[0].Trace(1);
 
 
   // EvalGame(world[0], world[1], 0, true);
