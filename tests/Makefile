@@ -21,7 +21,7 @@ opt: FLAGS := -std=c++14 -DNDEBUG -O3
 opt: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
-debug: FLAGS := -std=c++14 -g -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual
+debug: FLAGS := -std=c++14 -g -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0
 debug: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
