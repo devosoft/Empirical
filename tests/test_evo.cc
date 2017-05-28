@@ -58,6 +58,7 @@ TEST_CASE("Test Stats/NK-Grid", "[stats]"){
 
   grid_stats.SetDefaultFitnessFun(fit_func);
 
+
     // Insert default organisms into world
   for (size_t i = 0; i < POP_SIZE; i++) {
     BitOrg next_org(N);
@@ -67,6 +68,7 @@ TEST_CASE("Test Stats/NK-Grid", "[stats]"){
     // doing this. Theoretically...
     grid_pop.Insert(next_org);
   }
+
 
   // mutation function:
   // for every site in the gnome there is a MUTATION_RATE chance that the
@@ -85,14 +87,12 @@ TEST_CASE("Test Stats/NK-Grid", "[stats]"){
 
   // Loop through updates
   for (int ud = 0; ud < UD_COUNT; ud++) {
-
     // Run a tournament
     grid_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
             , TOURNAMENT_SIZE, POP_SIZE);
 
     grid_pop.Update();
     grid_pop.MutatePop();
-
   }
 
   std::ifstream correct, test;
@@ -110,16 +110,19 @@ TEST_CASE("Test Stats/NK-Grid", "[stats]"){
     file2.push_back(line);
   }
 
+
   REQUIRE(file1.size() == file2.size());
   if (file1.size() == file2.size()) {
     for (size_t i = 0; i < file1.size(); i++) {
       REQUIRE(file1[i] == file2[i]);
     }
   }
+
 }
 
 TEST_CASE("Test-stats-NK-Mixed","[stats]"){
- // k controls # of hills in the fitness landscape
+
+  // k controls # of hills in the fitness landscape
   const int K = 0;
   const int N = 30;
   const double MUTATION_RATE = .0001;
