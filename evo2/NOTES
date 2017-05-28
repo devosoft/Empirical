@@ -8,6 +8,8 @@ BASE: Includes a vector of organisms
 
 EA:   Adds vector for next generation + changes "next" pointer to new vector
 
+PopStructure (mixed, grid, pools)
+
 Genotype: Determine genotype of organism; either same as org -OR- defined in org?
 
 CalcFit: Figure out how to calculate fitness (either provided or member function).
@@ -18,7 +20,11 @@ FitCache: Track each organism's fitness so that it needs to be calculated only o
 
 FitTrack: Always calculate fitness on insertion and track it (in relation to others)
 
+Environment
+
 Stats: Add extra features to track what's going on in the world.
        (We probably want multiple versions depending on what type of stats we're collecting)
 
 TrackLineage: calculate the full phylogeny as populations continue.
+
+Signals: Tie signals into any of the above functions to override them in a more dynamic way.
