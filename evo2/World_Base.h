@@ -26,6 +26,10 @@ namespace emp {
     pop_t pop;               // All of the spots in the population.
     size_t num_orgs;         // How many organisms are actually in the population.
 
+    // AddOrgAt & AddOrgAppend are the only ways to add organisms (others must go through these)
+    size_t AddOrgAt(Ptr<ORG> new_org, size_t pos);
+    size_t AddOrgAppend(Ptr<ORG> new_org);
+
   public:
     World_Base() : num_orgs(0) { ; }
     ~World_Base() { Clear(); }
@@ -37,7 +41,43 @@ namespace emp {
     Random & GetRandom() { return *random_ptr; }
 
     void SetRandom(Random & r) { random_ptr = &r; }
+
+    void Clear();
+    void ClearOrgAt(size_t pos);
   };
+
+  
+  size_t World_Base::AddOrgAt(Ptr<ORG> new_org, size_t pos) {
+    emp_assert(pos < pop.size());   // Make sure we are placing into a legal position.
+    if (pop[pos]) { pop[pos].Delete(); --num_orgs; }
+    pop[pos] = new_org;
+    fitM.ClearAt(pos);
+    ++num_orgs;
+    return pos;
+  }
+  
+  size_t World_Base::AddOrgAppend(Ptr<ORG> new_org) {
+    const size_t pos = pop.size();
+    pop.push_back(new_org);
+    fitM.ClearAt(pos);
+    ++num_orgs;
+    return pos;
+  }
+
+  // Delete all organisms.
+  void World_Base::Clear() {
+    for (ptr_t org : pop) if (org) org.Delete();  // Delete current organisms.
+    pop.resize(0);                              // Remove deleted organisms.
+    num_orgs = 0;
+  }
+
+  // Delete organism at a specified position.
+  void World_Base::ClearOrgAt(size_t pos) {
+    if (!pop[pos]) return;  // No organism; no need to do anything.
+    pop[pos].Delete();
+    pop[pos]=nullptr;
+    num_orgs--;
+  }
 
 }
 
