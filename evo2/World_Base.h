@@ -53,6 +53,9 @@ namespace emp {
 
     void SetRandom(Random & r) { random_ptr = &r; }
 
+
+    // -- Control Orgs in Population --
+
     void Clear();
     void ClearOrgAt(size_t pos);
     
@@ -60,6 +63,24 @@ namespace emp {
       for (size_t i = new_size; i < pop.size(); i++) ClearOrgAt(i); // Remove orgs past new size.
       pop.resize(new_size, nullptr);                                // Default new orgs to null.
     }
+
+
+    // -- Random Access
+
+    // Get any cell, at random
+    size_t GetRandomCell() { return random_ptr->GetInt(0, pop.size()); }
+
+    // By default, assume a well-mixed population so random neighbors can be anyone.
+    size_t GetRandomNeighbor(size_t /*id*/) { return random_ptr->GetUInt(0, pop.size()); }
+
+    // Get random *occupied* cell.
+    size_t GetRandomOrg() {
+      emp_assert(num_orgs > 0); // Make sure it's possible to find an organism!
+      size_t pos = random_ptr->GetUInt(0, pop.size());
+      while (pop[pos] == nullptr) pos = random_ptr->GetUInt(0, pop.size());
+      return pos;
+    }
+
   };
 
   
