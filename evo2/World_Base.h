@@ -30,6 +30,17 @@ namespace emp {
     size_t AddOrgAt(Ptr<ORG> new_org, size_t pos);
     size_t AddOrgAppend(Ptr<ORG> new_org);
 
+    // The following functions call focus on context (and will be overridden as needed).
+    // AddOrg inserts an organism from OUTSIDE of the population.
+    // AddOrgBirth inserts an organism that was born INSIDE the population.
+    size_t AddOrg(Ptr<ORG> new_org) { return AddOrgAppend(new_org); }
+
+    size_t AddOrgBirth(Ptr<ORG> new_org, size_t parent_pos) {
+      emp_assert(random_ptr); // Random must be set before being used.
+      const size_t pos = random_ptr->GetUInt(pop.size());
+      return AddOrgAt(new_org, pos);
+    }
+
   public:
     World_Base() : num_orgs(0) { ; }
     ~World_Base() { Clear(); }
@@ -44,6 +55,11 @@ namespace emp {
 
     void Clear();
     void ClearOrgAt(size_t pos);
+    
+    void Resize(size_t new_size) {
+      for (size_t i = new_size; i < pop.size(); i++) ClearOrgAt(i); // Remove orgs past new size.
+      pop.resize(new_size, nullptr);                                // Default new orgs to null.
+    }
   };
 
   
