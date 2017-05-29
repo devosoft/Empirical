@@ -8,7 +8,10 @@
 #ifndef EMP_EVO_WORLD_BASE_H
 #define EMP_EVO_WORLD_BASE_H
 
+#include "../base/assert.h"
 #include "../base/Ptr.h"
+#include "../base/vector.h"
+#include "../tools/Random.h"
 
 namespace emp {
 
@@ -19,13 +22,21 @@ namespace emp {
     using pop_t = emp::vector<ptr_t>;
     using fit_fun_t = std::function<double(ORG*)>;
 
-    Ptr<Random> random_ptr;
-    size_t num_orgs;
-    pop_t pop;
+    Ptr<Random> random_ptr;  // Random object to use.
+    pop_t pop;               // All of the spots in the population.
+    size_t num_orgs;         // How many organisms are actually in the population.
 
   public:
-    World_Base() { ; }
-    ~World_Base() { ; }
+    World_Base() : num_orgs(0) { ; }
+    ~World_Base() { Clear(); }
+
+    using value_type = ORG;
+
+    size_t GetSize() const { return pop.size(); }
+    size_t GetNumOrgs() const { return num_orgs; }
+    Random & GetRandom() { return *random_ptr; }
+
+    void SetRandom(Random & r) { random_ptr = &r; }
   };
 
 }
