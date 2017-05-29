@@ -54,7 +54,7 @@ namespace emp {
     void SetRandom(Random & r) { random_ptr = &r; }
 
 
-    // -- Control Orgs in Population --
+    // --- MANIPULATE ORGS IN POPULATION ---
 
     void Clear();
     void ClearOrgAt(size_t pos);
@@ -65,23 +65,44 @@ namespace emp {
     }
 
 
-    // -- Random Access
+    // --- RANDOM ACCESS ---
 
     // Get any cell, at random
-    size_t GetRandomCell() { return random_ptr->GetInt(0, pop.size()); }
+    size_t GetRandomCellID() { return random_ptr->GetInt(0, pop.size()); }
 
     // By default, assume a well-mixed population so random neighbors can be anyone.
-    size_t GetRandomNeighbor(size_t /*id*/) { return random_ptr->GetUInt(0, pop.size()); }
+    size_t GetRandomNeighborID(size_t /*id*/) { return random_ptr->GetUInt(0, pop.size()); }
 
     // Get random *occupied* cell.
-    size_t GetRandomOrg() {
+    size_t GetRandomOrgID() {
       emp_assert(num_orgs > 0); // Make sure it's possible to find an organism!
       size_t pos = random_ptr->GetUInt(0, pop.size());
       while (pop[pos] == nullptr) pos = random_ptr->GetUInt(0, pop.size());
       return pos;
     }
 
+
+    // --- POPULATION ANALYSIS ---
+
+    emp::vector<size_t> FindCellIDs(const std::function<bool(ORG*)> & filter) {
+      emp::vector<size_t> valid_IDs(0);
+      for (size_t i = 0; i < pop.size(); i++) {
+        if (filter(pop[i].Raw())) valid_IDs.push_back(i);
+      }
+      return valid_IDs;
+    }
+    emp::vector<size_t> GetValidOrgIDs() {
+      return FindCellIDs([](ORG*org){ return org != nullptr; });
+    }
+    emp::vector<size_t> GetEmptyPopIDs() {
+      return FindCellIDs([](ORG*org){ return org == nullptr; });
+    }
+
   };
+
+
+
+  // --- Member functions from above ---
 
   
   size_t World_Base::AddOrgAt(Ptr<ORG> new_org, size_t pos) {
