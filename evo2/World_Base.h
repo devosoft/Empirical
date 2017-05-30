@@ -12,6 +12,8 @@
 #include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../tools/Random.h"
+#include "../tools/random_utils.h"
+#include "../tools/string_utils.h"
 
 namespace emp {
 
@@ -71,7 +73,7 @@ namespace emp {
 
     void Clear();
     void ClearOrgAt(size_t pos);
-    
+
     void Resize(size_t new_size) {
       for (size_t i = new_size; i < pop.size(); i++) ClearOrgAt(i); // Remove orgs past new size.
       pop.resize(new_size, nullptr);                                // Default new orgs to null.
@@ -112,11 +114,11 @@ namespace emp {
     }
 
     // --- POPULATION MANIPULATIONS ---
-    
+
     // Run population through a bottleneck to (potentiall) shrink it.
     void DoBottleneck(const size_t new_size, bool choose_random=true) {
       if (new_size >= pop.size()) return;  // No bottleneck needed!
-      
+
       // If we are supposed to keep only random organisms, shuffle the beginning into place!
       if (choose_random) emp::Shuffle<ptr_t>(*random_ptr, pop, new_size);
 
@@ -162,39 +164,36 @@ namespace emp {
   };
 
 
-  };
-
-
-
   // --- Member functions from above ---
 
-  
-  size_t World_Base::AddOrgAt(Ptr<ORG> new_org, size_t pos) {
+  template<typename ORG>
+  size_t World_Base<ORG>::AddOrgAt(Ptr<ORG> new_org, size_t pos) {
     emp_assert(pos < pop.size());   // Make sure we are placing into a legal position.
     if (pop[pos]) { pop[pos].Delete(); --num_orgs; }
     pop[pos] = new_org;
-    fitM.ClearAt(pos);
     ++num_orgs;
     return pos;
   }
-  
-  size_t World_Base::AddOrgAppend(Ptr<ORG> new_org) {
+
+  template<typename ORG>
+  size_t World_Base<ORG>::AddOrgAppend(Ptr<ORG> new_org) {
     const size_t pos = pop.size();
     pop.push_back(new_org);
-    fitM.ClearAt(pos);
     ++num_orgs;
     return pos;
   }
 
   // Delete all organisms.
-  void World_Base::Clear() {
+  template<typename ORG>
+  void World_Base<ORG>::Clear() {
     for (ptr_t org : pop) if (org) org.Delete();  // Delete current organisms.
     pop.resize(0);                                // Remove deleted organisms.
     num_orgs = 0;
   }
 
   // Delete organism at a specified position.
-  void World_Base::ClearOrgAt(size_t pos) {
+  template<typename ORG>
+  void World_Base<ORG>::ClearOrgAt(size_t pos) {
     if (!pop[pos]) return;  // No organism; no need to do anything.
     pop[pos].Delete();
     pop[pos]=nullptr;
@@ -204,6 +203,3 @@ namespace emp {
 }
 
 #endif
-
-
-
