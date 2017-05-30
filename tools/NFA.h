@@ -2,7 +2,9 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  A Non-deterministic Finite Automata simulator
+//  Status: BETA
 //
 //
 //  To build a standard NFA, use emp::NFA.  If you want to have more symbols or more stop states,

@@ -3,8 +3,8 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-// This file sets up an Alert function that will go to std::cerr in c++ or
-// to Alert() in Javascript.
+// Define an Alert function that goes to std::cerr in c++ or to Alert() in Javascript.
+// Status: RELEASE
 
 #ifndef EMP_ALERT_H
 #define EMP_ALERT_H

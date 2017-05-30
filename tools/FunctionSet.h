@@ -4,6 +4,8 @@
 //
 //
 //  Setup a collection of functions, all with the same signature, that can be run as a group.
+//  Status: BETA
+//
 //
 //  Derived from emp::vector, hence with all of the same methods as vector.
 

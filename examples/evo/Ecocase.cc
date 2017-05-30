@@ -12,7 +12,7 @@
 #include "../../tools/Random.h"
 
 constexpr double radius = 0.01;
-constexpr size_t MAX_GENS = 5000;
+constexpr size_t MAX_GENS = 2000;
 constexpr double MUT_SIZE = 0.01;
 constexpr size_t POP_SIZE = 200;
 
@@ -31,9 +31,9 @@ double Fit_Help(double x, double y) {
   return (diff > -0.01 && diff < 0.01) ? 1.0 : 0.0;
 }
 
-// Promote close to (1,1)
+// Promote close to (1,y)
 double Fit_Hurt(double x, double y) {
-  return x*y;
+  return x;
 }
 
 struct Org {
@@ -70,50 +70,72 @@ void Init(T & pop) {
 int main(int argc, char* argv[])
 {
   emp::Random random;
-  emp::evo::EAWorld<Org, emp::evo::FitCacheOff> pop(random, "EcoWorld");
 
-  // Build a random initial population
-  for (uint32_t i = 0; i < POP_SIZE; i++) {
-    Org org( random.GetDouble(), random.GetDouble() );
-    pop.Insert(org);
-  }
+  int counter = 0;
+  int NUM_RUNS = 100;
 
-  pop.SetDefaultMutateFun( [](Org* org, emp::Random& random) {
-      org->x = emp::ToRange(org->x + random.GetDouble(-MUT_SIZE, MUT_SIZE), 0.0, 1.0);
-      org->y = emp::ToRange(org->y + random.GetDouble(-MUT_SIZE, MUT_SIZE), 0.0, 1.0);
-      return true;
+  for (int n = 0; n < NUM_RUNS; n++) {
+    std::cout << "Run " << n << std::endl;
+
+    emp::evo::EAWorld<Org, emp::evo::FitCacheOff> pop(random, "EcoWorld");
+
+    // Build a random initial population
+    for (uint32_t i = 0; i < POP_SIZE; i++) {
+      Org org( random.GetDouble(), random.GetDouble() );
+      pop.Insert(org);
+    }
+
+    pop.SetDefaultMutateFun( [](Org* org, emp::Random& random) {
+    	org->x = emp::ToRange(org->x + random.GetDouble(-MUT_SIZE, MUT_SIZE), 0.0, 1.0);
+    	org->y = emp::ToRange(org->y + random.GetDouble(-MUT_SIZE, MUT_SIZE), 0.0, 1.0);
+    	return true;
     } );
 
-  emp::vector<std::function<double(Org*)>> fit_funs(4);
-  fit_funs[0] = [](Org* org){ return Fit_Main(org->x, org->y); };
-  fit_funs[1] = [](Org* org){ return Fit_Help(org->x, org->y); };
-  fit_funs[2] = [](Org* org){ return Fit_Hurt(org->x, org->y); };
-  fit_funs[3] = [](Org* org){ return -(org->density); };
+    // emp::vector<std::function<double(Org*)>> fit_funs(4);
+    emp::vector<std::function<double(Org*)>> fit_funs;
+    // fit_funs.push_back( [](Org* org){ return Fit_Main(org->x, org->y); } );
+    fit_funs.push_back( [](Org* org){ return Fit_Help(org->x, org->y); } );
+    fit_funs.push_back( [](Org* org){ return Fit_Hurt(org->x, org->y); } );
+    fit_funs.push_back( [](Org* org){ return -(org->density); } );
 
-  emp::vector<double> probs = { 1.0, 1.0, 0.0, 1.0 };
+    std::function<double(Org*)> main_fun = [](Org* org){ return Fit_Main(org->x, org->y); };
 
-  // Loop through updates
-  for (uint32_t ud = 0; ud < MAX_GENS; ud++) {
-    Init(pop);
-    pop.EcocaseSelect(fit_funs, probs, 0.6, POP_SIZE);
-    pop.Update();
-    std::cout << "Gen " << (ud+1) << " : (" << (pop[0].x) << "," << (pop[0].y) << ") : "
-	      << "  Fit_Main() = " << fit_funs[0]( &(pop[0]) )
-	      << "  Fit_Help() = " << fit_funs[1]( &(pop[0]) )
-	      << "  Fit_Hurt() = " << fit_funs[2]( &(pop[0]) )
-	      << "  Spread = " << fit_funs[3]( &(pop[0]) )
-	      << std::endl;
-    pop.MutatePop(0);
+    emp::vector<double> probs = { 1.0, 1.0, 1.0, 1.0 };
+
+    // Loop through updates
+    for (uint32_t ud = 0; ud < MAX_GENS; ud++) {
+      Init(pop);
+      // pop.EcocaseSelect(fit_funs, probs, 0.6, POP_SIZE);
+      // pop.EcocaseSelect(fit_funs, probs, 1.0, POP_SIZE);
+      pop.EcoSelect(main_fun, fit_funs, 10, 5, POP_SIZE);
+      // pop.TournamentSelect(main_fun, 5, POP_SIZE);
+
+      pop.Update();
+//       std::cout << "Gen " << (ud+1) << " : (" << (pop[0].x) << "," << (pop[0].y) << ") : "
+// 		<< "  Fit_Main() = " << fit_funs[0]( &(pop[0]) )
+// 		<< "  Fit_Help() = " << fit_funs[1]( &(pop[0]) )
+// 		<< "  Fit_Hurt() = " << fit_funs[2]( &(pop[0]) )
+// 		<< "  Spread = " << fit_funs[3]( &(pop[0]) )
+// 		<< std::endl;
+      pop.MutatePop(0);
+    }
+
+
+    // Print out the whole population:
+    for (size_t i = 0; i < POP_SIZE; i++) {
+      if (main_fun( &(pop[i]) )) {
+      	counter++;
+      	break;
+      }
+    }
+//       std::cout << "Org " << i << " : (" << pop[i].x << "," << pop[i].y << ") : "
+// 		<< "  Fit_Main() = " << fit_funs[0]( &(pop[i]) )
+// 		<< "  Fit_Help() = " << fit_funs[1]( &(pop[i]) )
+// 		<< "  Fit_Hurt() = " << fit_funs[2]( &(pop[i]) )
+// 		<< "  Spread = " << fit_funs[3]( &(pop[i]) )
+// 		<< std::endl;
+
   }
 
-
-  // Print out the whole population:
-  for (size_t i = 0; i < POP_SIZE; i++) {
-    std::cout << "Org " << i << " : (" << pop[i].x << "," << pop[i].y << ") : "
-	      << "  Fit_Main() = " << fit_funs[0]( &(pop[i]) )
-	      << "  Fit_Help() = " << fit_funs[1]( &(pop[i]) )
-	      << "  Fit_Hurt() = " << fit_funs[2]( &(pop[i]) )
-	      << "  Spread = " << fit_funs[3]( &(pop[i]) )
-	      << std::endl;
-  }
+  std::cout << "Num successes: " << counter << std::endl;
 }

@@ -2,7 +2,9 @@
 //  Copyright (C) Michigan State University, 2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
-//  This file contains a set of simple functions to manipulate strings.
+//
+//  This file contains a set of simple functions to manipulate vectors.
+//  Status: BETA
 
 #ifndef EMP_VECTOR_UTILS_H
 #define EMP_VECTOR_UTILS_H

@@ -10,10 +10,10 @@
 #include "../../tools/Random.h"
 #include "../../evo/World.h"
 
-constexpr size_t POP_SIZE = 100;
+constexpr size_t POP_SIZE = 200;
 constexpr size_t GENOME_SIZE = 100;
 constexpr size_t EVAL_TIME = 500;
-constexpr size_t UPDATES = 100;
+constexpr size_t UPDATES = 1000;
 constexpr size_t TOURNY_SIZE = 4;
 
 // Determine the next move of a human player.
@@ -26,7 +26,7 @@ size_t EvalMove(emp::Mancala & game, std::ostream & os=std::cout, std::istream &
   os << "Move?" << std::endl;
   is >> move;
 
-  while (move < 'A' || move > 'F' || game.GetCurSide()[move-'A'] == 0) {
+  while (move < 'A' || move > 'F' || game.GetCurSide()[(size_t)(move-'A')] == 0) {
     os << "Invalid move! (choose a value 'A' to 'F')" <<  std::endl;
     is.clear();
     is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -41,23 +41,18 @@ size_t EvalMove(emp::Mancala & game, std::ostream & os=std::cout, std::istream &
 size_t EvalMove(emp::Mancala & game, emp::AvidaGP & org) {
   // Setup the hardware with proper inputs.
   org.ResetHardware();
-  const auto & cur_side = game.GetCurSide();
-  const auto & other_side = game.GetOtherSide();
-  for (size_t i = 0; i < 7; i++) {
-    org.SetInput(i, cur_side[i]);
-    org.SetInput(i+7, other_side[i]);
-  }
+  org.SetInputs(game.AsInput(game.GetCurPlayer()));
 
   // Run the code.
   org.Process(EVAL_TIME);
 
   // Determine the chosen move.
-  size_t best_move = 0;
-  for (size_t i = 1; i < 6; i++) {
+  int best_move = 0;
+  for (int i = 1; i < 6; i++) {
     if (org.GetOutput(best_move) < org.GetOutput(i)) { best_move = i; }
   }
 
-  return best_move;
+  return (size_t) best_move;
 }
 
 using mancala_ai_t = std::function< size_t(emp::Mancala & game) >;
@@ -152,7 +147,7 @@ int main()
   for (size_t out_id = 0; out_id < 16; out_id++) {
     // Setup the fitness function.
     fit_set[out_id] = [out_id](emp::AvidaGP * org) {
-      return (double) -std::abs(org->GetOutput(out_id) - out_id * out_id);
+      return (double) -std::abs(org->GetOutput((int)out_id) - out_id * out_id);
     };
   }
 
@@ -176,15 +171,27 @@ int main()
   fit_fun(&(world[0]));
 
   std::cout << std::endl;
+  emp::Mancala game(0);
   world[0].PrintGenome("mancala_save.org");
 
-  EvalGame(world[0], world[1], 0, true);
+  game.DoMove(0);
+  world[0].ResetHardware();
+  world[0].SetInputs(game.AsInput(game.GetCurPlayer()));
+  world[0].Trace(1);
 
-  // And try playing it!
-  while (true) {
-    std::cout << "NEW GAME: Human vs. AI!\n";
-    EvalGame(world[0]);
-  }
+  game.DoMove(5);
+  world[0].ResetHardware();
+  world[0].SetInputs(game.AsInput(game.GetCurPlayer()));
+  world[0].Trace(1);
+
+
+  // EvalGame(world[0], world[1], 0, true);
+  //
+  // // And try playing it!
+  // while (true) {
+  //   std::cout << "NEW GAME: Human vs. AI!\n";
+  //   EvalGame(world[0]);
+  // }
 
   return 0;
 }

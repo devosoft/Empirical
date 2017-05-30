@@ -1,13 +1,11 @@
-// This file is part of Empirical, https://github.com/mercere99/Empirical/, and is 
-// Copyright (C) Michigan State University, 2015. It is licensed 
-// under the MIT Software license; see doc/LICENSE
-
-#ifndef EMP_UNIT_TESTS_H
-#define EMP_UNIT_TESTS_H
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2015-2017.
+//  Released under the MIT Software license; see doc/LICENSE
+//
 //
 //  Macros to facilitate unit testing.
+//  Status: DEPRECATED (now using Catch, but may revert back)
+//
 //
 //  EMP_TEST_MACRO(MACRO, EXP_RESULT)
 //    Input:  A macro call and an expected result.
@@ -18,10 +16,13 @@
 //    Input:  An expression and an expected evaluation.
 //    Output: Code to evaluate the expression and optionally print it (if either in verbose mode
 //            or the macro does not produce the expected result).
-//
+
+
+#ifndef EMP_UNIT_TESTS_H
+#define EMP_UNIT_TESTS_H
 
 // Take in a macro call and a string representing the expected result; verify that the
-// stringifyied macro result is the expected string AND print this info if -v flag is set. 
+// stringifyied macro result is the expected string AND print this info if -v flag is set.
 #define EMP_TEST_MACRO( MACRO, EXP_RESULT )                             \
   do {                                                                  \
     std::string result = std::string(EMP_STRINGIFY( MACRO ));           \
@@ -37,7 +38,7 @@
   } while (false)
 
 // Take in an expression and a string representing the expected result; verify that the
-// stringifyied result is the expected string AND print this info if -v flag is set. 
+// stringifyied result is the expected string AND print this info if -v flag is set.
 #define EMP_TEST_VALUE( VALUE, EXP_RESULT )                             \
   do {                                                                  \
     std::stringstream ss;                                               \

@@ -74,7 +74,7 @@ namespace emp {
     }
 
     const std::string & GetVal(const std::string & setting) const {
-      return emp::Find(setting_map, setting, emp::empty_string());
+      return emp::FindRef(setting_map, setting, emp::empty_string());
     }
 
     const std::string & GetTitle() const { return GetVal("title"); }

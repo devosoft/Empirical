@@ -2,7 +2,10 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  A set of utilities to convert between NFAs and DFAs
+//  Status: BETA
+//
 //
 //  Available conversions:
 //

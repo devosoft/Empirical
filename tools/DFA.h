@@ -2,7 +2,10 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  A Deterministic Finite Automata simulator
+//  Status: BETA
+//
 //
 //  Member functions:
 //   int GetSize() const

@@ -2,7 +2,9 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  A simple, fast class for managing verticies (nodes) and edges.
+//  Status: BETA
 
 #ifndef EMP_GRAPH_H
 #define EMP_GRAPH_H

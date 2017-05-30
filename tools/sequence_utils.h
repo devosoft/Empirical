@@ -3,6 +3,7 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  These functions focus on dealing with generic sequence types.
+//  Status: BETA
 
 #ifndef EMP_SEQUENCE_UTILS_H
 #define EMP_SEQUENCE_UTILS_H

@@ -12,7 +12,7 @@
 int main()
 {
   std::cout.setf( std::ios::fixed, std::ios::floatfield );
-  for (int i = 1; i <= 20; i++) {
+  for (double i = 1; i <= 20; i += 1.0) {
     std::cout << "Log2(" << i << ") = " << emp::Log2(i)
               << "   Log(10, " << i << ") = " << emp::Log(10, i)
               << "   Pow(" << i << ", 3.0) = " << emp::Pow(i, 3.0)

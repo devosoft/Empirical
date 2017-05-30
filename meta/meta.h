@@ -277,7 +277,7 @@ namespace emp {
   template <typename T>
   constexpr bool is_ptr_type_v(const T&) { return is_ptr_type<T>::value; }
 
-  template <typename T> struct remove_ptr_type { ; };
+  template <typename T> struct remove_ptr_type { };    // Not ponter; should break!
   template <typename T> struct remove_ptr_type<T*>     { using type = T; };
   template <typename T> struct remove_ptr_type<Ptr<T>> { using type = T; };
   template <typename T>

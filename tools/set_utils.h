@@ -3,6 +3,7 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  This file contains a set of simple functions to manipulate std::set objects.
+//  Status: ALPHA (just one function so far..)
 
 #ifndef EMP_SET_UTILS_H
 #define EMP_SET_UTILS_H

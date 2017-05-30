@@ -4,6 +4,8 @@
 //
 //
 //  Tools to save and load data from classes.
+//  Status: ALPHA
+//
 //
 //  All of the important information about a class is stored in a DataPod, which can be
 //  used to restore the class at a later time.

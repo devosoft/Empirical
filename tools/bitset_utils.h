@@ -3,6 +3,8 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  This file contains a set of simple functions to manipulate bitsets.
+//
+//  Status: BETA
 
 #ifndef EMP_BITSET_UTILS_H
 #define EMP_BITSET_UTILS_H

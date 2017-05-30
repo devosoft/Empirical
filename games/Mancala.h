@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <unordered_map>
 
 #include "../base/array.h"
 #include "../base/assert.h"
@@ -65,6 +66,16 @@ namespace emp {
     side_t & GetCurSide() { return is_A_turn ? boardA : boardB; }
     side_t & GetOtherSide() { return is_A_turn ? boardB : boardA; }
 
+    std::unordered_map<int, double> AsInput(size_t player_id) const {
+      std::unordered_map<int, double> input_map;
+      size_t offset = (player_id == 0) ? 0 : 7;
+      for (size_t i = 0; i < 7; i++) {
+        input_map[(int)(i+offset)] = (double) boardA[i];
+        input_map[(int)(i+7-offset)] = (double) boardB[i];
+      }
+
+      return input_map;
+    }
 
     // Returns bool indicating whether player can go again
     bool DoMove(move_t cell) {

@@ -3,15 +3,17 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-// Class: template <int NUM_BITS> emp::BitSet
+//  Class: template <int NUM_BITS> emp::BitSet
 //
-// Desc: This class handles a fixed-sized (but arbitrarily large) array of bits,
-//       and optimizes operations on those bits to be as fast as possible.
+//  Desc: This class handles a fixed-sized (but arbitrarily large) array of bits,
+//        and optimizes operations on those bits to be as fast as possible.
 //
-// Note: emp::BitSet is based on std::bitset, and can be used as a drop-in replacement.
-//       Like std::bitset, bit zero is on the right side.  Unlike std::bitset, emp::BitSet
-//       gives access to bit fields for easy access to different sized chucnk of bits and
-//       implementation new bit-magic tricks.
+//  Note: emp::BitSet is based on std::bitset, and can be used as a drop-in replacement.
+//        Like std::bitset, bit zero is on the right side.  Unlike std::bitset, emp::BitSet
+//        gives access to bit fields for easy access to different sized chucnk of bits and
+//        implementation new bit-magic tricks.
+//
+//  Status: RELEASE
 //
 //
 // Constructors:

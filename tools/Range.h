@@ -4,6 +4,7 @@
 //
 //
 //  A simple way to track value ranges
+//  Status: BETA
 
 #ifndef EMP_RANGE_H
 #define EMP_RANGE_H

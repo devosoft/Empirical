@@ -1,0 +1,17 @@
+Files in Empirical are grouped into meaningful folders.  Most folders are also duplicated
+in examples/ where example code for the associated functionality should be included.
+
+Files should have one of the following statuses:
+
+* DESIGN - Notes are in place, but no (or minimal) working code
+* ALPHA - Some basic functionality works, but more features still need to be added and tested
+* BETA - Basic functionality is all in place, but needs more thorough testing.
+* RELEASE - Well-tested functionality and used in multiple projects, at least by authors.
+* STABLE - Used by many non-authors in assorted projects without fixes for extended period.
+
+* ABANDONED - May have worked, or may not; no longer being developed.
+* BROKEN - Once worked (at least BETA level), but now needs to be repaired (not abandoned!)
+* CLEANUP - At least BETA, but need code cleanup, fixing of warnings, etc.
+* DEPRECATED - Functionality has been replaced and should shift to replacement.
+* EXPLORATORY - Some functionality may work, but needs re-engineering to get right.
+* EXTERNAL - Part of another project (cited above); not developed as part of Empirical.

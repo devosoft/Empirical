@@ -2,7 +2,10 @@
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  These tools help manage various problems for command-line or Emscripten-based applications.
+//  Status: ALPHA
+//
 //
 //  There are three possible recipiants for all errors/warnings.
 //  * The end-user if the problem stems from inputs they provided to the executable.

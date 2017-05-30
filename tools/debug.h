@@ -4,6 +4,7 @@
 //
 //
 //  Basic tools for use in developing high-assurance code.
+//  Status: BETA
 
 #ifndef EMP_DEBUG_DEBUG
 #define EMP_DEBUG_DEBUG

@@ -4,6 +4,8 @@
 //
 //
 //  A versatile and non-patterned pseudo-random-number generator.
+//  Status: RELEASE
+//
 //
 //  Constructor:
 //    Random(int _seed=-1)

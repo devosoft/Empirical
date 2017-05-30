@@ -2,7 +2,10 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  Basic regular expression handler.
+//  Status: BETA
+//
 //
 //  Special chars:
 //   '|'          - or

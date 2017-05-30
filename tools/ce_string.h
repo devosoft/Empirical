@@ -2,8 +2,9 @@
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  ce_string defines a limited string object for use within a constexpr class or function.
-
+//  Status: DESIGN
 
 #ifndef EMP_CE_STRING_H
 #define EMP_CE_STRING_H

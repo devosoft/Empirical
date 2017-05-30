@@ -26,6 +26,10 @@ namespace emp {
       payoff.resize(combos);
     }
 
+    using move_t = size_t;
+
+    void Reset() { ; } // No history...
+
     void SetVal(size_t self, size_t other, double value) { payoff[to_index(self,other)] = value; }
     double & operator()(size_t A, size_t B) { return payoff[to_index(A,B)]; }
     double operator()(size_t A, size_t B) const { return payoff[to_index(A,B)]; }
@@ -44,6 +48,16 @@ namespace emp {
       payoff[to_index(1,0)] = 1.0 - cost;   // Player digs out by themself.
       payoff[to_index(1,1)] = 1.0 - cost/2; // Both dig out together and share cost.
     }
+
+    std::unordered_map<int, double> AsInput(size_t player_id) const {
+      std::unordered_map<int, double> out_map;
+      out_map[-1] = num_moves;
+      for (size_t i = 0; i < payoff.size(); i++) {
+        out_map[i] = payoff[i];
+      }
+      return out_map;
+    }
+
   };
 
 }
