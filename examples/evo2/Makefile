@@ -24,7 +24,7 @@ CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../web/library
 
 TARGETS := NK World
 
-EVO_DEPEND := ../../evo2/World_Base.h
+EVO_DEPEND := ../../evo2/WorldModule.h
 
 default: native
 
