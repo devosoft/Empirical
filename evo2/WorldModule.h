@@ -5,8 +5,8 @@
 //
 //  This file defines the base class for a World template for use in evolutionary algorithms.
 
-#ifndef EMP_EVO_WORLD_BASE_H
-#define EMP_EVO_WORLD_BASE_H
+#ifndef EMP_EVO_WORLD_MODULE_H
+#define EMP_EVO_WORLD_MODULE_H
 
 #include "../base/assert.h"
 #include "../base/Ptr.h"
@@ -40,8 +40,18 @@ namespace emp {
     UNKNOWN   // Unknown modifier; will trigger error.
   };
 
+  // Generic form of WorldModule (should never be used; trigger error!)
+  template <typename VAL_TYPE, emp::data... MODS> class WorldModule {
+  public:
+    WorldModule() { emp_assert(false, "Unknown module used in World!"); }
+  };
+
+  // == World BASE class ==
+  //
+  // This class is always build on for other worlds.
+
   template <typename ORG>
-  class World_Base {
+  class WorldModule {
   protected:
     using ptr_t = Ptr<ORG>;
     using pop_t = emp::vector<ptr_t>;
@@ -68,8 +78,8 @@ namespace emp {
     }
 
   public:
-    World_Base() : random_ptr(nullptr), random_owner(false), num_orgs(0) { ; }
-    ~World_Base() {
+    WorldModule() : random_ptr(nullptr), random_owner(false), num_orgs(0) { ; }
+    ~WorldModule() {
       Clear();
       if (random_owner) random_ptr.Delete();
     }
@@ -190,7 +200,7 @@ namespace emp {
   // --- Member functions from above ---
 
   template<typename ORG>
-  size_t World_Base<ORG>::AddOrgAt(Ptr<ORG> new_org, size_t pos) {
+  size_t WorldModule<ORG>::AddOrgAt(Ptr<ORG> new_org, size_t pos) {
     emp_assert(pos < pop.size());   // Make sure we are placing into a legal position.
     if (pop[pos]) { pop[pos].Delete(); --num_orgs; }
     pop[pos] = new_org;
@@ -199,7 +209,7 @@ namespace emp {
   }
 
   template<typename ORG>
-  size_t World_Base<ORG>::AddOrgAppend(Ptr<ORG> new_org) {
+  size_t WorldModule<ORG>::AddOrgAppend(Ptr<ORG> new_org) {
     const size_t pos = pop.size();
     pop.push_back(new_org);
     ++num_orgs;
@@ -208,7 +218,7 @@ namespace emp {
 
   // Delete all organisms.
   template<typename ORG>
-  void World_Base<ORG>::Clear() {
+  void WorldModule<ORG>::Clear() {
     for (ptr_t org : pop) if (org) org.Delete();  // Delete current organisms.
     pop.resize(0);                                // Remove deleted organisms.
     num_orgs = 0;
@@ -216,7 +226,7 @@ namespace emp {
 
   // Delete organism at a specified position.
   template<typename ORG>
-  void World_Base<ORG>::ClearOrgAt(size_t pos) {
+  void WorldModule<ORG>::ClearOrgAt(size_t pos) {
     if (!pop[pos]) return;  // No organism; no need to do anything.
     pop[pos].Delete();
     pop[pos]=nullptr;
