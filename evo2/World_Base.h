@@ -23,6 +23,7 @@ namespace emp {
     using fit_fun_t = std::function<double(ORG*)>;
 
     Ptr<Random> random_ptr;  // Random object to use.
+    bool random_owner;       // Did we create our own random number generator?
     pop_t pop;               // All of the spots in the population.
     size_t num_orgs;         // How many organisms are actually in the population.
 
@@ -42,8 +43,11 @@ namespace emp {
     }
 
   public:
-    World_Base() : num_orgs(0) { ; }
-    ~World_Base() { Clear(); }
+    World_Base() : random_ptr(nullptr), random_owner(false), num_orgs(0) { ; }
+    ~World_Base() {
+      Clear();
+      if (random_owner) random_ptr.Delete();
+    }
 
     using value_type = ORG;
 
@@ -51,7 +55,16 @@ namespace emp {
     size_t GetNumOrgs() const { return num_orgs; }
     Random & GetRandom() { return *random_ptr; }
 
-    void SetRandom(Random & r) { random_ptr = &r; }
+    void SetRandom(Random & r) {
+      if (random_owner) random_ptr.Delete();
+      random_ptr = &r;
+      random_owner = false;
+    }
+    void NewRandom(int seed=-1) {
+      if (random_owner) random_ptr.Delete();
+      random_ptr.New(seed);
+      random_owner = true;
+    }
 
 
     // --- MANIPULATE ORGS IN POPULATION ---
