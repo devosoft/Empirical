@@ -271,7 +271,7 @@ namespace evo {
       random_ptr = &random;
       random_owner = false;
     }
-    void ResetRandom(int seed=-1) { SetRandom(*(new Random(seed))); }
+    void ResetRandom(int seed=-1) { SetRandom(*(new Random(seed))); random_owner = true; }
 
     // Forward function calls to appropriate internal objects
     EMP_EVO_FORWARD(ConfigPop, popM)
