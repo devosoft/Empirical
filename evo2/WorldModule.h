@@ -41,7 +41,7 @@ namespace emp {
   };
 
   // Generic form of WorldModule (should never be used; trigger error!)
-  template <typename VAL_TYPE, emp::data... MODS> class WorldModule {
+  template <typename VAL_TYPE, emp::evo... MODS> class WorldModule {
   public:
     WorldModule() { emp_assert(false, "Unknown module used in World!"); }
   };
@@ -51,7 +51,7 @@ namespace emp {
   // This class is always build on for other worlds.
 
   template <typename ORG>
-  class WorldModule {
+  class WorldModule<ORG> {
   protected:
     using ptr_t = Ptr<ORG>;
     using pop_t = emp::vector<ptr_t>;
