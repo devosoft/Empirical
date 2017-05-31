@@ -11,6 +11,8 @@ a.out.js
 *.dSYM
 *tmp.*
 *.out
+*.org
+*.cfg
 *.debug
 *.mp4
 *.csv
