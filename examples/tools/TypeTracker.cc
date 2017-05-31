@@ -9,6 +9,7 @@
 
 #include "../../base/vector.h"
 #include "../../tools/TypeTracker.h"
+#include "../../tools/debug.h"
 
 // Build some sample functions that we want called by type.
 void fun_int_int(int x, int y) { std::cout << x << "," << y << " : " << x+y << std::endl; }
@@ -17,7 +18,8 @@ void fun_string_double(std::string x, int y) { std::cout << x << " -> " << y << 
 
 int main()
 {
-  emp::TypeTracker<int, std::string, double> tt;     // Build the tracker.
+  using tt_t = emp::TypeTracker<int, std::string, double>;
+  tt_t tt;     // Build the tracker.
   tt.AddFunction(fun_int_int);                       // Add the functions...
   tt.AddFunction(fun_int_double);
   tt.AddFunction(fun_string_double);
@@ -56,4 +58,24 @@ int main()
   objs.push_back( tt2.New<int*>(int_ptr) );
   objs.push_back( tt2.New<std::string*>(str_ptr) );
   objs.push_back( tt2.New<double*>(double_ptr) );
+
+
+  // Explore IDs and ComboIDs.
+  EMP_DEBUG_PRINT(tt_t::GetID<int>());
+  EMP_DEBUG_PRINT(tt_t::GetID<double>());
+  EMP_DEBUG_PRINT(tt_t::GetID<int,int>());
+  EMP_DEBUG_PRINT(tt_t::GetID<double,int>());
+  EMP_DEBUG_PRINT(tt_t::GetID<std::string,std::string>());
+  EMP_DEBUG_PRINT(tt_t::GetID<int,double>());
+  EMP_DEBUG_PRINT(tt_t::GetID<double,double>());
+
+  std::cout << std::endl;
+  EMP_DEBUG_PRINT(tt_t::GetComboID<int>());
+  EMP_DEBUG_PRINT(tt_t::GetComboID<double>());
+  EMP_DEBUG_PRINT(tt_t::GetComboID<int,int>());
+  EMP_DEBUG_PRINT(tt_t::GetComboID<double,int>());
+  EMP_DEBUG_PRINT(tt_t::GetComboID<std::string,std::string>());
+  EMP_DEBUG_PRINT(tt_t::GetComboID<int,double>());
+  EMP_DEBUG_PRINT(tt_t::GetComboID<double,double>());
+  EMP_DEBUG_PRINT(tt_t::GetComboID<int,double,int,std::string>());
 }
