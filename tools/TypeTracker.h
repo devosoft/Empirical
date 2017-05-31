@@ -53,7 +53,7 @@ namespace emp {
     using wrap_t = TypeTracker_Class< REAL_T, get_type_index<REAL_T,TYPES...>() >;
 
     // How many types are we working with?
-    constexpr static size_t GetNumTypes() { return sizeof...(TYPES)+1; }
+    constexpr static size_t GetNumTypes() { return sizeof...(TYPES); }
 
     // How many combinations of V types are there?
     constexpr static size_t GetNumCombos(size_t vals=2) {
@@ -79,6 +79,23 @@ namespace emp {
     template <typename... Ts>
     constexpr static size_t GetComboID() {
       return GetCumCombos(sizeof...(Ts)-1) + GetID<Ts...>();
+    }
+
+    static size_t GetTrackedID(const TrackedType & tt) { return tt.GetTypeTrackerID(); }
+    template <typename... Ts>
+    static size_t GetTrackedID(const TrackedType & tt1, const TrackedType & tt2, const Ts &... ARGS) {
+      return tt1.GetTypeTrackerID() + GetTrackedID(tt2, ARGS...) * GetNumTypes();
+    }
+
+    static size_t GetTrackedID(TrackedType * tt) { return tt->GetTypeTrackerID(); }
+    template <typename... Ts>
+    static size_t GetTrackedID(TrackedType * tt1, TrackedType * tt2, Ts *... ARGS) {
+      return tt1->GetTypeTrackerID() + GetTrackedID(tt2, ARGS...) * GetNumTypes();
+    }
+
+    template <typename... Ts>
+    constexpr static size_t GetTrackedComboID(Ts... ARGS) {
+      return GetCumCombos(sizeof...(Ts)-1) + GetTrackedID(ARGS...);
     }
 
 
