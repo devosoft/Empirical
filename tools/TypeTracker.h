@@ -17,9 +17,12 @@
 #ifndef EMP_TYPE_TRACKER_H
 #define EMP_TYPE_TRACKER_H
 
+#include <unordered_map>
+
 #include "../base/array.h"
 #include "../base/assert.h"
 #include "../meta/meta.h"
+#include "../tools/map_utils.h"
 
 namespace emp {
 
@@ -51,7 +54,7 @@ namespace emp {
     using this_t = TypeTracker<TYPES...>;
     template <typename REAL_T>
     using wrap_t = TypeTracker_Class< REAL_T, get_type_index<REAL_T,TYPES...>() >;
-
+    using fun2_t = std::function<void(TrackedType*, TrackedType*)>;
 
     // How many types are we working with?
     constexpr static size_t GetNumTypes() { return sizeof...(TYPES); }
@@ -112,7 +115,8 @@ namespace emp {
     }
 
     // The redirects points a function call to the appropriate function, giving the input types.
-    emp::array< std::function<void(TrackedType*, TrackedType*)>, GetNumCombos(2) > redirects;
+    //emp::array< std::function<void(TrackedType*, TrackedType*)>, GetNumCombos(2) > redirects;
+    std::unordered_map<size_t, fun2_t> fun_map;
 
     // Constructors!
     TypeTracker() { ; }
@@ -160,7 +164,7 @@ namespace emp {
     template <typename T1, typename T2>
     this_t & AddFunction( std::function<void(T1,T2)> fun ) {
       constexpr size_t POS = GetID<T1,T2>();
-      redirects[POS] = [fun](TrackedType* b1, TrackedType* b2) {
+      fun_map[POS] = [fun](TrackedType* b1, TrackedType* b2) {
         emp_assert(dynamic_cast<wrap_t<T1> *>(b1) != nullptr);
         emp_assert(dynamic_cast<wrap_t<T2> *>(b2) != nullptr);
         fun( ((wrap_t<T1> *) b1)->value, ((wrap_t<T2> *) b2)->value );
@@ -175,7 +179,7 @@ namespace emp {
 
     void RunFunction( TrackedType * b1, TrackedType * b2 ) {
       const size_t pos = GetTrackedID(b1, b2);
-      if (redirects[pos]) redirects[pos](b1,b2);  // If a redirect exists, use it!
+      if (Has(fun_map, pos)) fun_map[pos](b1,b2);  // If a redirect exists, use it!
     }
     void operator()( TrackedType * b1, TrackedType * b2 ) { RunFunction(b1,b2); }
   };
