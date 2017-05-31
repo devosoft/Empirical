@@ -84,23 +84,19 @@ namespace emp {
       if (random_owner) random_ptr.Delete();
     }
 
+    // --- Publicly available types ---
+
     using value_type = ORG;
+
+
+    // --- Accessing Organisms or info ---
 
     size_t GetSize() const { return pop.size(); }
     size_t GetNumOrgs() const { return num_orgs; }
-    Random & GetRandom() { return *random_ptr; }
+    bool IsOccupied(size_t i) const { return pop[i] != nullptr; }
 
-    void SetRandom(Random & r) {
-      if (random_owner) random_ptr.Delete();
-      random_ptr = &r;
-      random_owner = false;
-    }
-    void NewRandom(int seed=-1) {
-      if (random_owner) random_ptr.Delete();
-      random_ptr.New(seed);
-      random_owner = true;
-    }
-
+    ORG & operator[](size_t pos) { return *(pop[pos]); }
+    const ORG & operator[](size_t pos) const { return *(pop[pos]); }
 
     // --- MANIPULATE ORGS IN POPULATION ---
 
@@ -113,7 +109,20 @@ namespace emp {
     }
 
 
-    // --- RANDOM ACCESS ---
+    // --- RANDOM FUNCTIONS ---
+
+    Random & GetRandom() { return *random_ptr; }
+
+    void SetRandom(Random & r) {
+      if (random_owner) random_ptr.Delete();
+      random_ptr = &r;
+      random_owner = false;
+    }
+    void NewRandom(int seed=-1) {
+      if (random_owner) random_ptr.Delete();
+      random_ptr.New(seed);
+      random_owner = true;
+    }
 
     // Get any cell, at random
     size_t GetRandomCellID() { return random_ptr->GetInt(0, pop.size()); }
@@ -145,6 +154,7 @@ namespace emp {
     emp::vector<size_t> GetEmptyPopIDs() {
       return FindCellIDs([](ORG*org){ return org == nullptr; });
     }
+
 
     // --- POPULATION MANIPULATIONS ---
 
