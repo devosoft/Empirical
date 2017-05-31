@@ -52,6 +52,7 @@ namespace emp {
     template <typename REAL_T>
     using wrap_t = TypeTracker_Class< REAL_T, get_type_index<REAL_T,TYPES...>() >;
 
+
     // How many types are we working with?
     constexpr static size_t GetNumTypes() { return sizeof...(TYPES); }
 
@@ -62,7 +63,7 @@ namespace emp {
       return result;
     }
 
-    // How many combinations are the of the given number of types or fewer?
+    // How many combinations are the of the given number of types OR FEWER?
     constexpr static size_t GetCumCombos(size_t vals=2) {
       size_t cur_result = 1;
       size_t cum_result = 1;
@@ -72,35 +73,48 @@ namespace emp {
       }
       return cum_result;
     }
+
+    // Each type should have a unique ID.
     template <typename T>
     constexpr static size_t GetID() { return get_type_index<T,TYPES...>(); }
+
+    // Each set of types should have an ID unique within that number of types.
     template <typename T1, typename T2, typename... Ts>
     constexpr static size_t GetID() { return GetID<T1>() + GetID<T2,Ts...>() * GetNumTypes(); }
+
+    // A ComboID should be unique *across* all size combinations.
     template <typename... Ts>
     constexpr static size_t GetComboID() {
       return GetCumCombos(sizeof...(Ts)-1) + GetID<Ts...>();
     }
 
+    // A Tracked ID is simply the unique ID of the type being tracked.
     static size_t GetTrackedID(const TrackedType & tt) { return tt.GetTypeTrackerID(); }
     template <typename... Ts>
+
+    // Or set of types being tracked...
     static size_t GetTrackedID(const TrackedType & tt1, const TrackedType & tt2, const Ts &... ARGS) {
       return tt1.GetTypeTrackerID() + GetTrackedID(tt2, ARGS...) * GetNumTypes();
     }
 
+    // We should also about able to use a pointer to access tracked IDs
     static size_t GetTrackedID(TrackedType * tt) { return tt->GetTypeTrackerID(); }
     template <typename... Ts>
     static size_t GetTrackedID(TrackedType * tt1, TrackedType * tt2, Ts *... ARGS) {
       return tt1->GetTypeTrackerID() + GetTrackedID(tt2, ARGS...) * GetNumTypes();
     }
 
+    // A tracked COMBO ID, is an ID for this combination of types, unique among all possible type
+    // combinations.  Consistent with GetComboID with the same underlying types.
     template <typename... Ts>
     constexpr static size_t GetTrackedComboID(Ts... ARGS) {
       return GetCumCombos(sizeof...(Ts)-1) + GetTrackedID(ARGS...);
     }
 
-
+    // The redirects points a function call to the appropriate function, giving the input types.
     emp::array< std::function<void(TrackedType*, TrackedType*)>, GetNumCombos(2) > redirects;
 
+    // Constructors!
     TypeTracker() { ; }
     TypeTracker(const TypeTracker &) = default;
     TypeTracker(TypeTracker &&) = default;
@@ -145,9 +159,7 @@ namespace emp {
 
     template <typename T1, typename T2>
     this_t & AddFunction( std::function<void(T1,T2)> fun ) {
-      constexpr size_t ID1 = get_type_index<T1,TYPES...>();
-      constexpr size_t ID2 = get_type_index<T2,TYPES...>();
-      constexpr size_t POS = ID1 * GetNumTypes() + ID2;
+      constexpr size_t POS = GetID<T1,T2>();
       redirects[POS] = [fun](TrackedType* b1, TrackedType* b2) {
         emp_assert(dynamic_cast<wrap_t<T1> *>(b1) != nullptr);
         emp_assert(dynamic_cast<wrap_t<T2> *>(b2) != nullptr);
@@ -162,11 +174,10 @@ namespace emp {
     }
 
     void RunFunction( TrackedType * b1, TrackedType * b2 ) {
-      const size_t id1 = b1->GetTypeTrackerID();
-      const size_t id2 = b2->GetTypeTrackerID();
-      const size_t pos = id1 * GetNumTypes() + id2;
+      const size_t pos = GetTrackedID(b1, b2);
       if (redirects[pos]) redirects[pos](b1,b2);  // If a redirect exists, use it!
     }
+    void operator()( TrackedType * b1, TrackedType * b2 ) { RunFunction(b1,b2); }
   };
 
 }
