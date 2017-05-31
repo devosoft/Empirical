@@ -74,6 +74,12 @@ namespace emp {
     }
     template <typename T>
     constexpr static size_t GetID() { return get_type_index<T,TYPES...>(); }
+    template <typename T1, typename T2, typename... Ts>
+    constexpr static size_t GetID() { return GetID<T1>() + GetID<T2,Ts...>() * GetNumTypes(); }
+    template <typename... Ts>
+    constexpr static size_t GetComboID() {
+      return GetCumCombos(sizeof...(Ts)-1) + GetID<Ts...>();
+    }
 
 
     emp::array< std::function<void(TrackedType*, TrackedType*)>, GetNumCombos(2) > redirects;
