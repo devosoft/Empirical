@@ -52,10 +52,31 @@ namespace emp {
     template <typename REAL_T>
     using wrap_t = TypeTracker_Class< REAL_T, get_type_index<REAL_T,TYPES...>() >;
 
+    // How many types are we working with?
     constexpr static size_t GetNumTypes() { return sizeof...(TYPES)+1; }
-    constexpr static size_t GetNumCombos() { return GetNumTypes() * GetNumTypes(); }
 
-    emp::array< std::function<void(TrackedType*, TrackedType*)>, GetNumCombos() > redirects;
+    // How many combinations of V types are there?
+    constexpr static size_t GetNumCombos(size_t vals=2) {
+      size_t result = 1;
+      for (size_t v = 0; v < vals; v++) result *= GetNumTypes();
+      return result;
+    }
+
+    // How many combinations are the of the given number of types or fewer?
+    constexpr static size_t GetCumCombos(size_t vals=2) {
+      size_t cur_result = 1;
+      size_t cum_result = 1;
+      for (size_t v = 0; v < vals; v++) {
+        cur_result *= GetNumTypes();
+        cum_result += cur_result;
+      }
+      return cum_result;
+    }
+    template <typename T>
+    constexpr static size_t GetID() { return get_type_index<T,TYPES...>(); }
+
+
+    emp::array< std::function<void(TrackedType*, TrackedType*)>, GetNumCombos(2) > redirects;
 
     TypeTracker() { ; }
     TypeTracker(const TypeTracker &) = default;
@@ -81,7 +102,8 @@ namespace emp {
     bool IsType( TrackedType & tt ) {
       return tt.GetTypeTrackerID() == get_type_index<TEST_T,TYPES...>();
     }
-    template <typename TEST_T> bool IsType( TrackedType * tt ) { return IsType(*tt); }
+    template <typename TEST_T>
+    bool IsType( TrackedType * tt ) { return IsType(*tt); }
 
     // Convert the tracked type back to REAL_T.  Assert that this is type safe!
     template <typename REAL_T>
@@ -89,12 +111,14 @@ namespace emp {
       emp_assert(IsType<REAL_T>(tt));
       return ((wrap_t<REAL_T> *) &tt)->value;
     }
-    template <typename REAL_T> REAL_T ToType( TrackedType * tt ) { return ToType(*tt); }
+    template <typename REAL_T>
+    REAL_T ToType( TrackedType * tt ) { return ToType(*tt); }
 
     // Cast the tracked type to OUT_T.  Try to do so even if NOT original type!
     template <typename OUT_T>
     OUT_T Cast( TrackedType & tt ) { return ((wrap_t<OUT_T> *) &tt)->value; }
-    template <typename OUT_T> OUT_T Cast( TrackedType * tt ) { return Cast(*tt); }
+    template <typename OUT_T>
+    OUT_T Cast( TrackedType * tt ) { return Cast(*tt); }
 
     template <typename T1, typename T2>
     this_t & AddFunction( std::function<void(T1,T2)> fun ) {
