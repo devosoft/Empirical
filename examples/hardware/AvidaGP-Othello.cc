@@ -4,116 +4,174 @@
 
 #include <iostream>
 
-#include "../../games/Mancala.h"
+#include "../../games/Othello.h"
 #include "../../hardware/AvidaGP.h"
 #include "../../hardware/InstLib.h"
 #include "../../tools/Random.h"
 #include "../../evo/World.h"
+#include <stdlib.h>
+#include <utility>
 
-constexpr size_t POP_SIZE = 100;
+constexpr size_t POP_SIZE = 1000;
 constexpr size_t GENOME_SIZE = 100;
-constexpr size_t EVAL_TIME = 500;
+constexpr size_t EVAL_TIME = 1000;
 constexpr size_t UPDATES = 100;
 constexpr size_t TOURNY_SIZE = 4;
 
 // Determine the next move of a human player.
-size_t EvalMove(emp::Mancala & game, std::ostream & os=std::cout, std::istream & is=std::cin) {
+size_t EvalMove(emp::Othello & game, std::ostream & os=std::cout, std::istream & is=std::cin) {
   // Present the current board.
   game.Print();
-
+  std::exit(-1);
   // Request a move from the human.
-  char move;
-  os << "Move?" << std::endl;
-  is >> move;
+  int moveX = 0;
+  int moveY = 0;
 
-  while (move < 'A' || move > 'F' || game.GetCurSide()[move-'A'] == 0) {
-    os << "Invalid move! (choose a value 'A' to 'F')" <<  std::endl;
-    is.clear();
-    is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    is >> move;
+  os << "Move?" << std::endl;
+  is >> moveX;
+  is >> moveY;
+
+  std::pair<int, int> moveXY = std::make_pair(moveX, moveY);
+  bool invalid = true;
+  int boardSize = game.GetBoardSize();
+
+  while (invalid) {
+
+    if (moveX < 1 || moveX > boardSize) {
+      std::cout << "Invalid move!! (choose an X value 1 to " << boardSize<<")" <<  std::endl;
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      continue;
+    }
+    if (moveY < 1 || moveY > boardSize) {
+      std::cout << "Invalid move!! (choose an Y value 1 to " << boardSize<<")" <<  std::endl;
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      continue;
+    }
+    
+
+    if (game.GetSquare(moveX, moveY) != 0) {
+      std::cout << "Error: Cannot move to non-empty tile" << std::endl;
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      continue;
+    }
+
+    if (game.IsMoveValid(game.GetCurrPlayer(), moveXY ) == 0) {
+        std::cout << "Invalid Move: Must flank at least one opponent disc" <<std::endl;
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        continue;
+    }
+
+    invalid = false;
   }
 
-  return (size_t) (move - 'A');
+  size_t move = game.GetIndex(moveX, moveY);
+
+  return move;
 }
 
 
 // Determine the next move of an AvidaGP player.
-size_t EvalMove(emp::Mancala & game, emp::AvidaGP & org) {
+size_t EvalMove(emp::Othello & game, emp::AvidaGP & org) {
   // Setup the hardware with proper inputs.
   org.ResetHardware();
-  const auto & cur_side = game.GetCurSide();
-  const auto & other_side = game.GetOtherSide();
-  for (size_t i = 0; i < 7; i++) {
-    org.SetInput(i, cur_side[i]);
-    org.SetInput(i+7, other_side[i]);
+  int boardSize = game.GetBoardSize();
+
+  for (size_t i = 0; i < boardSize* boardSize; i++) {
+      org.SetInput(i, game.GetSquare(i));
   }
 
   // Run the code.
   org.Process(EVAL_TIME);
 
   // Determine the chosen move.
+  
   size_t best_move = 0;
-  for (size_t i = 1; i < 6; i++) {
-    if (org.GetOutput(best_move) < org.GetOutput(i)) { best_move = i; }
+
+  for (size_t i = 0; i < boardSize * boardSize; i++) {
+      if (org.GetOutput(best_move) < org.GetOutput(i)) { best_move = i; }
+          
   }
 
   return best_move;
 }
 
-using mancala_ai_t = std::function< size_t(emp::Mancala & game) >;
+using othello_ai_t = std::function< size_t(emp::Othello & game) >;
 
 // Setup the fitness function for a whole game.
-double EvalGame(mancala_ai_t & player0, mancala_ai_t & player1,
-                bool cur_player=0, bool verbose=false) {
-  emp::Mancala game(cur_player==0);
-  size_t round = 0, errors = 0;
+double EvalGame(othello_ai_t & player0, othello_ai_t & player1,
+                bool cur_player=0, bool verbose=false) { 
+  emp::Othello game(cur_player==0);
+  int boardSize = game.GetBoardSize();
+  size_t round = 0, errors = 0; 
   while (game.IsDone() == false) {
-    // Determine the current player and their move.
+      // Determine the current player and their move.
+    game.ClearValidMoves();
+    game.ClearFlips();
     auto & play_fun = (cur_player == 0) ? player0 : player1;
     size_t best_move = play_fun(game);
+    std::pair<int, int> best = game.GetCoord(best_move);
 
     if (verbose) {
       std::cout << "round = " << round++ << "   errors = " << errors << std::endl;
       game.Print();
-      char move_sym = 'A' + (char) best_move;
-      std::cout << "Move = " << move_sym;
-      if (game.GetCurSide()[best_move] == 0) {
+      
+      std::cout << "Move = " << best_move << std::endl;//best.first + " " + best.second<<std::endl;
+      if (game.GetSquare(best_move) != 0) {
         std::cout << " (illegal!)";
       }
       std::cout << std::endl << std::endl;
     }
-
     // If the chosen move is illegal, shift through other options.
-    while (game.GetCurSide()[best_move] == 0) {  // Cannot make a move into an empty pit!
+    size_t player = 1;
+    if (cur_player) { player = 2; }
+    while (game.IsMoveValid(player, best) == 0 || game.GetSquare(best.first, best.second) != 0) {  
       if (cur_player == 0) errors++;
-      if (++best_move > 5) best_move = 0;
+      if (++best_move >= boardSize * boardSize) { best_move = 0; }
+      best = game.GetCoord(best_move);
+      game.ClearFlips();
+      game.ClearValidMoves();
+      
     }
-
+    if (verbose){
+        std::cout<<best.first<<" "<<best.second<<std::endl;
+        std::cout<<player<<std::endl;
+        //std::cout<<game.IsMoveValid(player, best)<<std::endl;
+    }
     // Do the move and determine who goes next.
-    bool go_again = game.DoMove(cur_player, best_move);
+    bool go_again = game.DoMove(player, best, verbose);
+    game.ClearFlips();
+    game.ClearValidMoves();
     if (!go_again) cur_player = !cur_player;
+    //else { if (verbose) std::cout<<"AGAIN!!!!!!!!!"<<std::endl; }
   }
 
   if (verbose) {
-    std::cout << "Final scores -- A: " << game.ScoreA()
-              << "   B: " << game.ScoreB()
+    game.Print();
+    std::cout << "Final scores -- Black: " << game.GetScore(1)
+              << "   White: " << game.GetScore(2)
               << std::endl;
   }
 
-  return ((double) game.ScoreA()) - ((double) game.ScoreB()) - ((double) errors * 10.0);
+  return ((double) game.GetScore(1)) - ((double) game.GetScore(2)) - ((double) errors * 10.0);
 };
 
 // Build wrappers for AvidaGP
 double EvalGame(emp::AvidaGP & org0, emp::AvidaGP & org1, bool cur_player=0, bool verbose=false) {
-  mancala_ai_t org_fun0 = [&org0](emp::Mancala & game){ return EvalMove(game, org0); };
-  mancala_ai_t org_fun1 = [&org1](emp::Mancala & game){ return EvalMove(game, org1); };
+  othello_ai_t org_fun0 = [&org0](emp::Othello & game){ return EvalMove(game, org0); };
+  othello_ai_t org_fun1 = [&org1](emp::Othello & game){ return EvalMove(game, org1); };
   return EvalGame(org_fun0, org_fun1, cur_player, verbose);
 };
 
 // Otherwise assume a human opponent!
-double EvalGame(emp::AvidaGP & org, bool cur_player=0) {
-  mancala_ai_t fun0 = [&org](emp::Mancala & game){ return EvalMove(game, org); };
-  mancala_ai_t fun1 = [](emp::Mancala & game){ return EvalMove(game, std::cout, std::cin); };
+double EvalGame(emp::AvidaGP & org, bool cur_player=0) { 
+  othello_ai_t fun0 = [&org](emp::Othello & game){ return EvalMove(game, org); };
+  othello_ai_t fun1 = [](emp::Othello & game){ return EvalMove(game, std::cout, std::cin); };
+  std::cout<<"START"<<std::endl; //TODO
+  std::exit(-1);
   return EvalGame(fun0, fun1, cur_player, true);
 };
 
@@ -161,7 +219,6 @@ int main()
   for (size_t ud = 0; ud < UPDATES; ud++) {
     // Keep the best individual.
     world.EliteSelect(fit_fun, 1, 1);
-
     // Run a tournament for each spot.
     world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE-1);
     // world.LexicaseSelect(fit_set, POP_SIZE-1);
@@ -176,15 +233,17 @@ int main()
   fit_fun(&(world[0]));
 
   std::cout << std::endl;
-  world[0].PrintGenome("mancala_save.org");
+  world[0].PrintGenome("othello_save.org");
 
   EvalGame(world[0], world[1], 0, true);
 
   // And try playing it!
+  /*
   while (true) {
     std::cout << "NEW GAME: Human vs. AI!\n";
     EvalGame(world[0]);
   }
+  */
 
   return 0;
 }

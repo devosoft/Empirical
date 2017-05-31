@@ -61,12 +61,18 @@ namespace emp {
 
     int GetIndex(int x, int y) { return ((y - 1) * boardSize) + (x - 1); }
 
+    move_t GetCoord(int idx) { return std::make_pair((idx % boardSize) + 1, (idx / boardSize) + 1); }
+
     size_t GetCurrPlayer() { if (is_B_turn) { return 1; } else { return 2; } }
 
     size_t GetSquare(int x, int y) { 
         int idx = GetIndex(x, y);
         return board[idx]; 
     }
+
+    size_t GetSquare(int idx) { return board[idx]; }
+
+    int GetBoardSize() { return boardSize; }
 
     void AddDisc(int x, int y, bool is_B){
         int idx = GetIndex(x, y);
@@ -112,6 +118,8 @@ namespace emp {
         int y = move.second;
         bool is_B = 0;
         if (player == 1) { is_B = 1; }
+
+        //if (GetSquare(x, y) != 0) { return 0; }
 
         for (int j = y - 1; j <= y + 1; j++) {
             if ( j < 1 || j > boardSize) { continue; }
@@ -237,15 +245,16 @@ namespace emp {
                 }
             }
         }
+       // if (flip_list.size() > 0) {std::cout<<x<<" "<<y<<std::endl;}
         return flip_list.size();
     }
 
-    void TestOver() {
+    size_t TestOver() {
         bool moveW = false;
         bool moveB = false;
 
-        if (GetScore(1) == 0) { over = true; return; }
-        if (GetScore(2) == 0) { over = true; return; }
+        if (GetScore(1) == 0) { over = true; return 0; }
+        if (GetScore(2) == 0) { over = true; return 0; }
         ClearValidMoves();
 
         for (int x = 1; x <= boardSize; x++) {
@@ -278,26 +287,29 @@ namespace emp {
         }
 
         if (!moveB && !moveW) { over = true; }
-        else if (moveB && !moveW) { std::cout<<"No valid moves for White. Black's Turn"<<std::endl; is_B_turn = true; }
-        else if (!moveB && moveW) { std::cout<<"No valid moves for Black. White's Turn"<<std::endl; is_B_turn = false; }
+        else if (moveB && !moveW) { return 1; }
+        else if (!moveB && moveW) { return 2; }
+        return 0;
 
     }
 
-    bool DoMove(size_t player, move_t move) {
+    bool DoMove(size_t player, move_t move, bool verbose=0) {
 
         int x = move.first;
         int y = move.second;
 
-        bool currPlayer;
-        if (player == 1) { currPlayer = 1; }
-        else { currPlayer = 0; }
+        if (player == 1) { is_B_turn = 1; }
+        else { is_B_turn = 0; }
         
         AddDisc(x, y, is_B_turn);
+        if (verbose) {
+            for (auto el : flip_list) { std::cout<<el.first<<" "<<el.second<<std::endl; }
+        }
         Flip(flip_list);
-        is_B_turn = !(is_B_turn);
-        TestOver();
+        //is_B_turn = !(is_B_turn);
+        size_t test = TestOver();
 
-        if (is_B_turn == currPlayer){ return true; }
+        if (player == test) { return true; }
         else { return false; }
 
     }
