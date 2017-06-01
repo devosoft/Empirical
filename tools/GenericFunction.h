@@ -20,8 +20,12 @@ namespace emp {
   public:
   };
 
+  // Undefined bast type for Function
+  template <typename... Ts> class Function;
+
+  // Specialized form for proper function types.
   template <typename RETURN, typename... PARAMS>
-  class Function : public GenericFunction {
+  class Function<RETURN(PARAMS...)> : public GenericFunction {
   protected:
     std::function<RETURN(PARAMS...)> fun;
   public:
