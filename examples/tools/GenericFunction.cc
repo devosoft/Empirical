@@ -13,7 +13,12 @@ int main()
 {
   emp::Function<int(int,int)> fun( [](int x, int y){ return x+y; } );
   emp::Function<int(int,int)> fun2;
+  emp::GenericFunction * fun_g = &fun;
+  emp::GenericFunction * fun_g2 = new emp::Function<void(double val)>([](double val){
+    std::cout << "Val = " << val << std::endl;
+  });
 
   std::cout << fun(2,3) << std::endl;
+  std::cout << fun_g->Call<int, int,int>(10,12) << std::endl;
+  fun_g2->Call<void, double>(3.14);
 }
-
