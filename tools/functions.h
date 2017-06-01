@@ -51,7 +51,7 @@ namespace emp {
   }
 
   inline constexpr bool AnyTrue() { return false; }
-  templare <typename... Ts>
+  template <typename... Ts>
   inline bool AnyTrue(bool result, Ts... OTHER) {
     return result || AnyTrue(OTHER...);
   }

@@ -131,7 +131,7 @@ namespace evo {
 
       // Load in the specific states.
       for (size_t row = 0; row < height; row++) {
-        emp_assert(file[row].size == width);  // Make sure all rows are the same size.
+        emp_assert(file[row].size() == width);  // Make sure all rows are the same size.
         for (size_t col = 0; col < width; col++) {
           states[row*width+col] = info.GetState(file[row][col]);
         }

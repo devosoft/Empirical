@@ -23,6 +23,7 @@
 #include "../base/assert.h"
 #include "../meta/meta.h"
 
+#include "functions.h"
 #include "GenericFunction.h"
 #include "map_utils.h"
 
