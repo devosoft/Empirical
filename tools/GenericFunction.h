@@ -18,6 +18,13 @@ namespace emp {
   class GenericFunction {
   protected:
   public:
+    virtual ~GenericFunction() { ; }
+
+    // A generic form of the function call operator; use arg types to determine derived form.
+    template <typename RETURN, typename... Ts> auto Call(Ts &&... args);
+    template <typename RETURN, typename... Ts> auto operator()(Ts &&... args) {
+      return Call<RETURN, Ts...>( std::forward<Ts>(args)... );
+    }
   };
 
   // Undefined bast type for Function
@@ -35,9 +42,17 @@ namespace emp {
 
     // Forward all args to std::function call.
     template <typename... Ts>
+    RETURN Call(Ts &&... args) { return fun(std::forward<Ts>(args)...); }
+    template <typename... Ts>
     RETURN operator()(Ts &&... args) { return fun(std::forward<Ts>(args)...); }
   };
 
+  template <typename RETURN, typename... Ts>
+  auto GenericFunction::Call(Ts &&... args) {
+    using fun_t = Function<RETURN(Ts...)>;
+    fun_t * fun = (fun_t *) this;
+    return fun->Call( std::forward<Ts>(args)... );
+  }
 }
 
 #endif
