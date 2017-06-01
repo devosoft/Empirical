@@ -4,14 +4,25 @@
 //
 //
 //  Based on std::function, but with a common base class.
+//  Status: Alpha
+//
+//
+//  The emp::Function templated class behaves almost identically to std::function, but can be
+//  reduced to the emp::GenericFunction base class which is NOT templated.
+//
+//  An emp::GenericFunction object can be converted back into the derived type with the
+//  .Convert<return(args...)>() member function.
+//
 //
 //  Developer notes:
-//  * Deal with function return values.
+//  * Need to setup Call on emp::GenericFunction to just take a function signature as a
+//    template argument, rather than listing all types.
 
 #ifndef EMP_GENERIC_FUNCTION_H
 #define EMP_GENERIC_FUNCTION_H
 
 #include <functional>
+#include "../base/assert.h"
 
 namespace emp {
 
@@ -25,9 +36,10 @@ namespace emp {
     template <typename RETURN, typename... Ts> auto operator()(Ts &&... args) {
       return Call<RETURN, Ts...>( std::forward<Ts>(args)... );
     }
+    template <typename T> auto Convert();
   };
 
-  // Undefined bast type for Function
+  // Undefined base type for Function, to create an error if a function type is not passed in.
   template <typename... Ts> class Function;
 
   // Specialized form for proper function types.
@@ -47,12 +59,21 @@ namespace emp {
     RETURN operator()(Ts &&... args) { return fun(std::forward<Ts>(args)...); }
   };
 
-  template <typename RETURN, typename... Ts>
+  template <typename RETURN=void, typename... Ts>
   auto GenericFunction::Call(Ts &&... args) {
     using fun_t = Function<RETURN(Ts...)>;
+
+    emp_assert(dynamic_cast<fun_t *>(this));  // Make sure this Call cast is legal.
+
     fun_t * fun = (fun_t *) this;
     return fun->Call( std::forward<Ts>(args)... );
   }
+
+  template <typename T> auto GenericFunction::Convert() {
+    emp_assert(dynamic_cast<Function<T> *>(this));
+    return (Function<T> *) this;
+  }
+
 }
 
 #endif
