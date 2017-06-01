@@ -4,6 +4,9 @@
 //
 //
 //  Based on std::function, but with a common base class.
+//
+//  Developer notes:
+//  * Deal with function return values.
 
 #ifndef EMP_GENERIC_FUNCTION_H
 #define EMP_GENERIC_FUNCTION_H
@@ -13,10 +16,22 @@
 namespace emp {
 
   class GenericFunction {
+  protected:
+  public:
   };
 
-  template <typename... Ts>
+  template <typename RETURN, typename... PARAMS>
   class Function : public GenericFunction {
+  protected:
+    std::function<RETURN(PARAMS...)> fun;
+  public:
+    // Forward all args to std::function constructor...
+    template <typename... Ts>
+    Function(Ts &&... args) : fun(std::forward<Ts>(args)...) { ; }
+
+    // Forward all args to std::function call.
+    template <typename... Ts>
+    RETURN operator()(Ts &&... args) { return fun(std::forward<Ts>(args)...); }
   };
 
 }
