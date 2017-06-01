@@ -15,6 +15,13 @@
 void fun_int_int(int x, int y) { std::cout << x << "," << y << " : " << x+y << std::endl; }
 void fun_int_double(int x, double y) { std::cout << x << "," << y << " : " << y * (double) x << std::endl; }
 void fun_string_double(std::string x, int y) { std::cout << x << " -> " << y << std::endl; }
+void fun_string(std::string x) { std::cout << "The lonely string is '" << x << "'" << std::endl; }
+void fun_int(int x) { std::cout << "The lonely int is '" << x << "'" << std::endl; }
+void fun_double(double x) { std::cout << "The lonely double is '" << x << "'" << std::endl; }
+void fun_5ints(int v, int w, int x, int y, int z) {
+  std::cout << "Eval " << v << "+" << w << "+" << x << "+" << y << "+" << z
+            << " = " << (v+w+x+y+z) << std::endl;
+}
 
 int main()
 {
@@ -23,6 +30,10 @@ int main()
   tt.AddFunction(fun_int_int);                       // Add the functions...
   tt.AddFunction(fun_int_double);
   tt.AddFunction(fun_string_double);
+  tt.AddFunction(fun_string);
+  tt.AddFunction(fun_double);
+  tt.AddFunction(fun_int);
+  tt.AddFunction(fun_5ints);
 
   // Crate a vector of objects of the generic, tracked type that will need to be converted back.
   emp::vector<emp::TrackedType *> objs;
@@ -36,6 +47,7 @@ int main()
     if (tt.IsType<int>(*x)) std::cout << "INT" << std::endl;
     if (tt.IsType<double>(*x)) std::cout << "DOUBLE" << std::endl;
     if (tt.IsType<std::string>(*x)) std::cout << "STRING" << std::endl;
+    tt.RunFunction(x);
     for (auto y : objs) {
       tt.RunFunction(x,y);
     }
@@ -79,13 +91,22 @@ int main()
   EMP_DEBUG_PRINT(tt_t::GetComboID<double,double>());
   EMP_DEBUG_PRINT(tt_t::GetComboID<int,double,int,std::string>());
 
-  emp::TrackedType * tval1 = tt.New<int>(1);
-  emp::TrackedType * tval2 = tt.New<std::string>("TWO");
-  emp::TrackedType * tval3 = tt.New<double>(3.5);
+  emp::TrackedType * tval1 = tt.New<int>(3);
+  emp::TrackedType * tval2 = tt.New<std::string>("FOUR");
+  emp::TrackedType * tval3 = tt.New<double>(5.5);
+  emp::TrackedType * tval4 = tt.New<int>(6);
+  emp::TrackedType * tval5 = tt.New<int>(7);
+  emp::TrackedType * tval6 = tt.New<int>(8);
+  emp::TrackedType * tval7 = tt.New<int>(9);
 
   std::cout << std::endl;
   EMP_DEBUG_PRINT(tt_t::GetID<int,std::string,double>());
   EMP_DEBUG_PRINT(tt_t::GetTrackedID(tval1, tval2, tval3));
   EMP_DEBUG_PRINT(tt_t::GetComboID<int,std::string,double>());
-  EMP_DEBUG_PRINT(tt_t::GetTrackedComboID(tval1, tval2, tval3));  
+  EMP_DEBUG_PRINT(tt_t::GetTrackedComboID(tval1, tval2, tval3));
+
+  tt(tval1, tval3);
+
+  tt.RunFunction(tval1, tval4, tval5, tval6, tval7);
+  tt(tval1, tval4, tval5, tval6, tval7);
 }
