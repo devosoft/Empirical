@@ -198,7 +198,7 @@ namespace emp {
       const size_t pos = GetTrackedComboID(args...);
       if (Has(fun_map, pos)) {  // If a redirect exists, use it!
         GenericFunction * gfun = fun_map[pos];
-        gfun->Call(((emp::type_decoy<TrackedType *,Ts>) args)...);
+        gfun->Call<void, emp::type_decoy<TrackedType *,Ts>...>(((emp::type_decoy<TrackedType *,Ts>) args)...);
       }
     }
 
