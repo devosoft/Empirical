@@ -59,7 +59,7 @@ namespace emp {
     RETURN operator()(Ts &&... args) { return fun(std::forward<Ts>(args)...); }
   };
 
-  template <typename RETURN=void, typename... Ts>
+  template <typename RETURN, typename... Ts>
   auto GenericFunction::Call(Ts &&... args) {
     using fun_t = Function<RETURN(Ts...)>;
 
