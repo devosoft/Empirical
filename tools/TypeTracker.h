@@ -193,18 +193,17 @@ namespace emp {
       return AddFunction( std::function<void(Ts...)>(fun) );
     }
 
-    // void RunFunction( TrackedType * b1, TrackedType * b2 ) {
-    //   const size_t pos = GetTrackedID(b1, b2);
-    //   if (Has(fun_map, pos)) fun_map[pos](b1,b2);  // If a redirect exists, use it!
-    // }
     template <typename... Ts>
     void RunFunction( Ts... args ) {                 // args must all be TrackedType pointers!
       const size_t pos = GetTrackedComboID(args...);
-      if (Has(fun_map, pos)) fun_map[pos]->Call(args...);  // If a redirect exists, use it!
+      if (Has(fun_map, pos)) {  // If a redirect exists, use it!
+        GenericFunction * gfun = fun_map[pos];
+        gfun->Call(((emp::type_decoy<TrackedType *,Ts>) args)...);
+      }
     }
 
     template <typename... Ts>
-    void operator()(Ts &&... args) { RunFunction(std::forward<Ts>(args)...); }
+    void operator()(Ts... args) { RunFunction(args...); }
   };
 
 }
