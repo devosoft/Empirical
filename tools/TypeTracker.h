@@ -120,7 +120,7 @@ namespace emp {
     std::unordered_map<size_t, emp::GenericFunction *> fun_map;
 
     // Constructors!
-    TypeTracker() { ; }
+    TypeTracker() : fun_map() { ; }
     TypeTracker(const TypeTracker &) = default;
     TypeTracker(TypeTracker &&) = default;
     TypeTracker & operator=(const TypeTracker &) = default;
