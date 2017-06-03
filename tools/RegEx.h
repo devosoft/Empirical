@@ -89,8 +89,8 @@ namespace emp {
 
     struct re_string : public re_base {  // Series of specific chars
       std::string str;
-      re_string() { ; }
-      re_string(char c) { str.push_back(c); }
+      re_string() : str() { ; }
+      re_string(char c) : str() { str.push_back(c); }
       re_string(const std::string & s) : str(s) { ; }
       void Print(std::ostream & os) const override { os << "STR[" << to_escaped_string(str) << "]"; }
       Ptr<re_string> AsString() override { return to_ptr(this); }
@@ -108,10 +108,15 @@ namespace emp {
 
     struct re_charset : public re_base { // Any char from set.
       opts_t char_set;
-      re_charset() { ; }
-      re_charset(char x, bool neg=false) { char_set[(size_t)x]=true; if (neg) char_set.NOT_SELF(); }
-      re_charset(const std::string & s, bool neg=false)
-        { for (char x : s) char_set[(size_t)x]=true; if (neg) char_set.NOT_SELF(); }
+      re_charset() : char_set() { ; }
+      re_charset(char x, bool neg=false) : char_set() {
+        char_set[(size_t)x]=true;
+        if (neg) char_set.NOT_SELF();
+      }
+      re_charset(const std::string & s, bool neg=false) : char_set() {
+        for (char x : s) char_set[(size_t)x]=true;
+        if (neg) char_set.NOT_SELF();
+      }
       void Print(std::ostream & os) const override {
         auto chars = char_set.GetOnes();
         bool use_not = false;
@@ -133,6 +138,7 @@ namespace emp {
     protected:
       emp::vector<Ptr<re_base>> nodes;
     public:
+      re_parent() : nodes() { }
       ~re_parent() { for (auto x : nodes) x.Delete(); }
       void Clear() { for (auto x : nodes) x.Delete(); nodes.resize(0); }
       virtual void push(Ptr<re_base> x) { emp_assert(x != nullptr); nodes.push_back(x); }
@@ -435,11 +441,13 @@ namespace emp {
 
   public:
     RegEx() = delete;
-    RegEx(const std::string & r) : regex(r), valid(true), pos(0), dfa_ready(false) {
+    RegEx(const std::string & r)
+    : regex(r), notes(), valid(true), pos(0), dfa(), dfa_ready(false), head() {
       Process(to_ptr(head));
       while(head.Simplify());
     }
-    RegEx(const RegEx & r) : regex(r.regex), valid(true), pos(0), dfa_ready(false) {
+    RegEx(const RegEx & r)
+    : regex(r.regex), notes(), valid(true), pos(0), dfa(), dfa_ready(false), head() {
       Process(to_ptr(head));
       while(head.Simplify());
     }
