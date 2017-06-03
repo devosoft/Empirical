@@ -21,6 +21,6 @@ int main()
   std::cout << fun(2,3) << std::endl;
   std::cout << fun_g->Call<int, int,int>(10,12) << std::endl;
   fun_g2->Call<void, double>(3.14);
-  fun_g2->Call<>(20.20);
+  fun_g2->Call<void>(20.20);
   fun_g2->Convert<void(double)>()->Call(11.11);
 }
