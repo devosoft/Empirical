@@ -128,7 +128,7 @@ namespace emp {
 
     void Print(std::ostream & os=std::cout) {
       os << "Num states = " << GetSize() << std::endl << "Stop IDs:";
-      for (int i = 0; i < GetSize(); i++) if(IsStop(i)) os << " " << i;
+      for (size_t i = 0; i < GetSize(); i++) if(IsStop(i)) os << " " << i;
       os << std::endl;
 
       for (size_t i = 0; i < transitions.size(); i++) {
