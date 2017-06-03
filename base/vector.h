@@ -53,7 +53,7 @@ namespace emp {
     using reference = typename stdv_t::reference;
     using const_reference = typename stdv_t::const_reference;
 
-    vector() = default;
+    vector() : v() {};
     vector(const this_t &) = default;
     vector(size_t size) : v(size) { emp_assert(size < MAX_SIZE, size); }
     vector(size_t size, const T & val) : v(size, val) { emp_assert(size < MAX_SIZE, size); }
