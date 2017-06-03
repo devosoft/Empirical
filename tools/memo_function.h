@@ -37,7 +37,7 @@ namespace emp {
 
   public:
     template <typename T>
-    memo_function(T && fun_info) : fun(std::forward<T>(fun_info)) { ; }
+    memo_function(T && fun_info) : cache_map(), fun(std::forward<T>(fun_info)) { ; }
     memo_function(const this_t &) = default;
     memo_function(this_t &&) = default;
     memo_function() { ; }
@@ -93,7 +93,7 @@ namespace emp {
 
   public:
     template <typename... Ts>
-    memo_function(Ts &&... args) : fun(std::forward<Ts>(args)...) { ; }
+    memo_function(Ts &&... args) : cache_map(), fun(std::forward<Ts>(args)...) { ; }
     memo_function(const memo_function &) = default;
     memo_function(memo_function &&) = default;
 
@@ -157,7 +157,7 @@ namespace emp {
 
   public:
     template <typename T>
-    memo_function(T && fun_info) : has_cache(false), fun(std::forward<T>(fun_info)) { ; }
+    memo_function(T && fun_info) : cached_value(), has_cache(false), fun(std::forward<T>(fun_info)) { ; }
     memo_function(const this_t &) = default;
     memo_function(this_t &&) = default;
     memo_function() : has_cache(false) { ; }
