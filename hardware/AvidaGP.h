@@ -515,9 +515,9 @@ namespace emp {
     os << " REGS: ";
     for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << regs[i] << "] ";
     os << "\n INPUTS: ";
-    for (int i = 0; i < CPU_SIZE; i++) os << "[" << Find(inputs, i, 0.0) << "] ";
+    for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << Find(inputs, (int)i, 0.0) << "] ";
     os << "\n OUTPUTS: ";
-    for (int i = 0; i < CPU_SIZE; i++) os << "[" << Find(outputs, i, 0.0) << "] ";
+    for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << Find(outputs, (int)i, 0.0) << "] ";
     os << std::endl;
 
     os << "IP:" << inst_ptr;
