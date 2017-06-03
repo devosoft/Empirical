@@ -29,11 +29,11 @@ namespace emp {
   private:
     ActionManager action_m;
     SignalManager signal_m;
-    // uint32_t next_signal_id;                                 // Give each signal a unique id.
-    std::unordered_map<uint32_t, SignalBase *> id_to_signal; // Map signal ID to associated pointer
+    // uint32_t next_signal_id;                                  // Give each signal a unique id.
+    std::unordered_map<uint32_t, SignalBase *> id_to_signal;     // Map signal ID to associated pointer
 
   public:
-    SignalControl() {;} // : next_signal_id(1) { ; }
+    SignalControl() : action_m(), signal_m(), id_to_signal() {;} // : next_signal_id(1) { ; }
     ~SignalControl() { ; }
 
     size_t GetNumActions() const { return action_m.GetSize(); }

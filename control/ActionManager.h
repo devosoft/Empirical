@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -25,9 +25,9 @@ namespace emp {
     std::string prefix = "emp_action_";
 
   public:
-    ActionManager() = default;
+    ActionManager() : action_map() { ; }
     ActionManager(ActionManager &&) = default;     // Normal juggle is okay for move constructor
-    ActionManager(const ActionManager & in) : next_id(in.next_id), prefix(in.prefix) {
+    ActionManager(const ActionManager & in) : action_map(), next_id(in.next_id), prefix(in.prefix) {
       // Copy all actions from input manager.
       for (const auto & x : in.action_map) {
         action_map[x.first] = x.second->Clone();

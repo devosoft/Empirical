@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -30,9 +30,9 @@ namespace emp {
       return emp::to_string(pre, next_id++);
     }
   public:
-    SignalManager() = default;
+    SignalManager() : signal_map() { ; }
     SignalManager(SignalManager &&) = default;     // Normal juggle is okay for move constructor
-    SignalManager(const SignalManager & in) : next_id(in.next_id), prefix(in.prefix) {
+    SignalManager(const SignalManager & in) : signal_map(), next_id(in.next_id), prefix(in.prefix) {
       // Copy all signals from input manager.
       for (const auto & x : in.signal_map) {
         signal_map[x.first] = x.second->Clone();

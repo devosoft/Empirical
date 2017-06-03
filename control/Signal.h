@@ -96,11 +96,16 @@ namespace emp {
 
     // SignalBase should only be constructable from derrived classes.
     SignalBase(const std::string & n, internal::SignalManager_Base * manager=nullptr)
-    : name(n), signal_id(0), next_link_id(1), prime_manager(nullptr)
+    : name(n), signal_id(0), next_link_id(1), link_key_map(), managers(), prime_manager(nullptr)
     {
       if (manager) manager->NotifyConstruct(this);
     }
   public:
+    SignalBase() = delete;
+    SignalBase(const SignalBase &) = delete;
+    SignalBase(SignalBase &&) = delete;
+    SignalBase & operator=(const SignalBase &) = delete;
+    SignalBase & operator=(SignalBase &&) = delete;
     virtual ~SignalBase() {
       // Let all managers other than prime know about destruction (prime must have triggered it.)
       for (auto * m : managers) if (m != prime_manager) m->NotifyDestruct(this);
@@ -140,7 +145,7 @@ namespace emp {
     using this_t = Signal<fun_t>;
 
     Signal(const std::string & name="", internal::SignalManager_Base * manager=nullptr)
-     : SignalBase(name, manager) { ; }
+     : SignalBase(name, manager), actions() { ; }
      Signal(const std::string & name, internal::SignalControl_Base & control)
       : this_t(name, &(control.GetSignalManager())) { ; }
     virtual this_t * Clone() const {
