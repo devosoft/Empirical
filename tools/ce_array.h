@@ -27,7 +27,6 @@ namespace emp {
     ce_array<T, p2_size> p2;   // Second half of values.
 
   public:
-    using size_t = std::size_t;
     using value_type = T;
 
     constexpr ce_array(const T & default_val) : p1(default_val), p2(default_val) {;}
