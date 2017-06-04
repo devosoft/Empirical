@@ -145,12 +145,15 @@ namespace evo {
     IndexMap index_info;            // Data structure to use for roulette selection.
 
   public:
+    FitnessManager_Dynamic() : fit_cache(), index_info() {;}
+
     double GetCache(size_t id) const {
       switch (cache_type) {
       case CACHE_OFF: return 0.0;
       case CACHE_ON:  return (id < fit_cache.size()) ? fit_cache[id] : 0.0;
       case TRACK_ON:  return index_info[id];
       }
+      return 0.0;
     }
     size_t GetSize() const {
       switch (cache_type) {
@@ -158,6 +161,7 @@ namespace evo {
       case CACHE_ON:  return fit_cache.size();
       case TRACK_ON:  return index_info.size();
       }
+      return 0;
     }
 
     template <typename ORG>
@@ -179,6 +183,7 @@ namespace evo {
         if (index_info.GetWeight(id) == 0.0) { index_info[id] = fit_fun(org.Raw()); }
         return index_info.GetWeight(id);
       }
+      return 0.0;
     }
 
 
@@ -188,6 +193,7 @@ namespace evo {
         case CACHE_ON:  fit_cache = in_cache; return true;
         case TRACK_ON:  index_info.Adjust(in_cache); return true;
       }
+      return false;
     }
 
     bool SetID(size_t id, double fitness) {
@@ -196,6 +202,7 @@ namespace evo {
         case CACHE_ON:  fit_cache[id] = fitness; return true;
         case TRACK_ON:  index_info.Adjust(id,fitness); return true;
       }
+      return false;
     }
 
     bool Clear() {
@@ -204,6 +211,7 @@ namespace evo {
         case CACHE_ON:  fit_cache.resize(0); return true;
         case TRACK_ON:  index_info.Clear(); return true;
       }
+      return false;
     }
 
     bool ClearAt(size_t id) {
@@ -212,6 +220,7 @@ namespace evo {
         case CACHE_ON:  if (id < fit_cache.size()) fit_cache[id] = 0.0; return true;
         case TRACK_ON:  index_info.Adjust(id, 0.0); return true;
       }
+      return false;
     }
 
     bool ClearPop() {
@@ -220,6 +229,7 @@ namespace evo {
         case CACHE_ON:  fit_cache.resize(0); return true;
         case TRACK_ON:  index_info.Clear(); return true;
       }
+      return false;
     }
 
     bool Resize(size_t new_size) {
@@ -228,6 +238,7 @@ namespace evo {
         case CACHE_ON:  fit_cache.resize(new_size); return true;
         case TRACK_ON:  index_info.Resize(new_size); return true;
       }
+      return false;
     }
 
     bool Resize(size_t new_size, double def_val) {
@@ -236,6 +247,7 @@ namespace evo {
         case CACHE_ON:  fit_cache.resize(new_size, def_val); return true;
         case TRACK_ON:  index_info.Resize(new_size, def_val); return true;
       }
+      return false;
     }
 
 
