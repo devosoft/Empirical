@@ -70,7 +70,7 @@ double EvalGame(mancala_ai_t & player0, mancala_ai_t & player1,
     if (verbose) {
       std::cout << "round = " << round++ << "   errors = " << errors << std::endl;
       game.Print();
-      char move_sym = 'A' + (char) best_move;
+      char move_sym = (char) ('A' + best_move);
       std::cout << "Move = " << move_sym;
       if (game.GetCurSide()[best_move] == 0) {
         std::cout << " (illegal!)";
@@ -96,21 +96,21 @@ double EvalGame(mancala_ai_t & player0, mancala_ai_t & player1,
   }
 
   return ((double) game.ScoreA()) - ((double) game.ScoreB()) - ((double) errors * 10.0);
-};
+}
 
 // Build wrappers for AvidaGP
 double EvalGame(emp::AvidaGP & org0, emp::AvidaGP & org1, bool cur_player=0, bool verbose=false) {
   mancala_ai_t org_fun0 = [&org0](emp::Mancala & game){ return EvalMove(game, org0); };
   mancala_ai_t org_fun1 = [&org1](emp::Mancala & game){ return EvalMove(game, org1); };
   return EvalGame(org_fun0, org_fun1, cur_player, verbose);
-};
+}
 
 // Otherwise assume a human opponent!
 double EvalGame(emp::AvidaGP & org, bool cur_player=0) {
   mancala_ai_t fun0 = [&org](emp::Mancala & game){ return EvalMove(game, org); };
   mancala_ai_t fun1 = [](emp::Mancala & game){ return EvalMove(game, std::cout, std::cin); };
   return EvalGame(fun0, fun1, cur_player, true);
-};
+}
 
 
 int main()
@@ -147,7 +147,7 @@ int main()
   for (size_t out_id = 0; out_id < 16; out_id++) {
     // Setup the fitness function.
     fit_set[out_id] = [out_id](emp::AvidaGP * org) {
-      return (double) -std::abs(org->GetOutput((int)out_id) - out_id * out_id);
+      return (double) -std::abs(org->GetOutput((int)out_id) - (double) (out_id * out_id));
     };
   }
 
