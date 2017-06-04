@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -169,6 +169,6 @@ namespace emp {
     Author & AddMiddle(const std::string & str) { middle_names.push_back(str); return *this; }
   };
 
-};
+}
 
 #endif
