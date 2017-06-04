@@ -273,7 +273,7 @@ namespace evo {
     C<ORG> IDsToGenomes(C<int> & ids) {
       C<ORG> genome_group;
       for (int id : ids){
-        genome_group.insert(genome_group.back(), *(this->nodes[id].genome));
+        genome_group.insert(genome_group.back(), this->nodes[id].genome);
       }
       return genome_group;
     }
@@ -282,7 +282,7 @@ namespace evo {
     emp::vector<ORG> IDsToGenomes(emp::vector<int> & ids) {
       emp::vector<ORG> genome_group;
       for (int id : ids){
-        genome_group.push_back(*(this->nodes[id].genome));
+        genome_group.push_back(this->nodes[id].genome);
       }
       return genome_group;
     }

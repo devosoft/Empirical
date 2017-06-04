@@ -110,7 +110,7 @@ namespace evo {
     EMP_SETUP_EVO_DEFAULT_ARGS(default_mut_fun, Mutate, &T::Mutate, org->Mutate(args...), bool, emp::Random &)
 
   public:
-    OrgManager_Dynamic() {
+    OrgManager_Dynamic() : default_fit_fun(), default_mut_fun() {
       Setup_Fitness();
       Setup_Mutate();
     }

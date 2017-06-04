@@ -53,7 +53,8 @@ namespace evo {
     };
 
   public:
-    PopulationManager_Base(const std::string &, FIT_MANAGER & _fm) : fitM(_fm), num_orgs(0) { ; }
+    PopulationManager_Base(const std::string &, FIT_MANAGER & _fm)
+     : fitM(_fm), num_orgs(0), random_ptr(nullptr), pop() { ; }
     ~PopulationManager_Base() { Clear(); }
 
     // Allow this and derived classes to be identified as a population manager.
@@ -298,7 +299,7 @@ namespace evo {
 
   public:
     PopulationManager_EA(const std::string & _w_name, FIT_MANAGER & _fm)
-    : base_t(_w_name, _fm) { ; }
+    : base_t(_w_name, _fm), next_pop() { ; }
     ~PopulationManager_EA() { base_t::Clear(); ClearNext(); }
 
     static constexpr bool emp_has_separate_generations = true;
