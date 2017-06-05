@@ -133,52 +133,24 @@ namespace emp {
     emp::vector<size_t> FindCellIDs(const std::function<bool(ORG*)> & filter);
 
     // Simple techniques for using FindCellIDs()
-    emp::vector<size_t> GetValidOrgIDs() {
-      return FindCellIDs([](ORG*org){ return org != nullptr; });
-    }
-    emp::vector<size_t> GetEmptyPopIDs() {
-      return FindCellIDs([](ORG*org){ return org == nullptr; });
-    }
+    emp::vector<size_t> GetValidOrgIDs() { return FindCellIDs([](ORG*org){ return (bool) org; }); }
+    emp::vector<size_t> GetEmptyPopIDs() { return FindCellIDs([](ORG*org){ return !org; }); }
 
 
     // --- POPULATION MANIPULATIONS ---
 
-    // Run population through a bottleneck to (potentiall) shrink it.
-    void DoBottleneck(const size_t new_size, bool choose_random=true) {
-      if (new_size >= pop.size()) return;  // No bottleneck needed!
+    // Run population through a bottleneck to (potentially) shrink it.
+    void DoBottleneck(const size_t new_size, bool choose_random=true);
 
-      // If we are supposed to keep only random organisms, shuffle the beginning into place!
-      if (choose_random) emp::Shuffle<ptr_t>(*random_ptr, pop, new_size);
-
-      // Clear out all of the organisms we are removing and resize the population.
-      for (size_t i = new_size; i < pop.size(); ++i) ClearOrgAt(i);
-      pop.resize(new_size);
-    }
 
     // --- PRINTING ---
 
-    void Print(std::function<std::string(ORG*)> string_fun,
-	       std::ostream & os = std::cout,
-	       std::string empty="X", std::string spacer=" ") {
-      for (ptr_t org : pop) {
-        if (org) os << string_fun(org.Raw());
-        else os << empty;
-        os << spacer;
-      }
-    }
-    void Print(std::ostream & os = std::cout, std::string empty="X", std::string spacer=" ") {
-      Print( [](ORG * org){return emp::to_string(*org);}, os, empty, spacer);
-    }
+    void Print(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout,
+	       std::string empty="X", std::string spacer=" ");
+    void Print(std::ostream & os = std::cout, std::string empty="X", std::string spacer=" ");
     void PrintOrgCounts(std::function<std::string(ORG*)> string_fun,
-			std::ostream & os = std::cout) {
-      std::map<ORG,size_t> org_counts;
-      for (ptr_t org : pop) if (org) org_counts[*org] = 0;  // Initialize needed entries
-      for (ptr_t org : pop) if (org) org_counts[*org] += 1; // Count actual types.
-      for (auto x : org_counts) {
-        ORG cur_org = x.first;
-        os << string_fun(&cur_org) << " : " << x.second << std::endl;
-      }
-    }
+			std::ostream & os = std::cout);
+
 
     // --- FOR VECTOR COMPATIBILITY ---
     size_t size() const { return pop.size(); }
@@ -192,7 +164,7 @@ namespace emp {
   };
 
 
-  // --- Member functions from above ---
+  // === Out-of-class member function definitions from above ===
 
   template<typename ORG>
   size_t WorldModule<ORG>::AddOrgAt(Ptr<ORG> new_org, size_t pos) {
@@ -260,6 +232,47 @@ namespace emp {
     }
     return valid_IDs;
   }
+
+  // Run population through a bottleneck to (potentially) shrink it.
+  template<typename ORG>
+  void WorldModule<ORG>::DoBottleneck(const size_t new_size, bool choose_random) {
+    if (new_size >= pop.size()) return;  // No bottleneck needed!
+
+    // If we are supposed to keep only random organisms, shuffle the beginning into place!
+    if (choose_random) emp::Shuffle<ptr_t>(*random_ptr, pop, new_size);
+
+    // Clear out all of the organisms we are removing and resize the population.
+    for (size_t i = new_size; i < pop.size(); ++i) ClearOrgAt(i);
+    pop.resize(new_size);
+  }
+
+  template<typename ORG>
+  void WorldModule<ORG>::Print(std::function<std::string(ORG*)> string_fun,
+       std::ostream & os, std::string empty, std::string spacer) {
+    for (ptr_t org : pop) {
+      if (org) os << string_fun(org.Raw());
+      else os << empty;
+      os << spacer;
+    }
+  }
+
+  template<typename ORG>
+  void WorldModule<ORG>::Print(std::ostream & os, std::string empty, std::string spacer) {
+    Print( [](ORG * org){return emp::to_string(*org);}, os, empty, spacer);
+  }
+
+  template<typename ORG>
+  void WorldModule<ORG>::PrintOrgCounts(std::function<std::string(ORG*)> string_fun,
+                                        std::ostream & os) {
+    std::map<ORG,size_t> org_counts;
+    for (ptr_t org : pop) if (org) org_counts[*org] = 0;  // Initialize needed entries
+    for (ptr_t org : pop) if (org) org_counts[*org] += 1; // Count actual types.
+    for (auto x : org_counts) {
+      ORG cur_org = x.first;
+      os << string_fun(&cur_org) << " : " << x.second << std::endl;
+    }
+  }
+
 }
 
 #endif
