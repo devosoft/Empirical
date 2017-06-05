@@ -40,7 +40,7 @@ namespace emp {
     memo_function(T && fun_info) : cache_map(), fun(std::forward<T>(fun_info)) { ; }
     memo_function(const this_t &) = default;
     memo_function(this_t &&) = default;
-    memo_function() { ; }
+    memo_function() : cache_map(), fun() { ; }
 
     this_t & operator=(const this_t &) = default;
     this_t & operator=(this_t &&) = default;
