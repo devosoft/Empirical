@@ -28,3 +28,12 @@ Stats: Add extra features to track what's going on in the world.
 TrackLineage: calculate the full phylogeny as populations continue.
 
 Signals: Tie signals into any of the above functions to override them in a more dynamic way.
+
+
+OTHER NOTES:
+* Right now cannot index to a nullptr position; can setup a default.
+* Should we allow a non const operator[] ?  Would need to make sure it calls other pieces
+  correctly on an assignment.
+* Move selection methods into their own module?  There are many of them BUT extra member functions
+  shouldn't hurt performance, so it might be fine to just keep them in the world.  OR just move
+  into their own file?
