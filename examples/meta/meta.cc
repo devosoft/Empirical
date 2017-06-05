@@ -13,6 +13,7 @@ template <typename A, typename B>
 struct Temp2Type {
   A a;
   B b;
+  Temp2Type() : a(), b() { ; }
 };
 
 int Sum3(int x, int y, int z) { return x+y+z; }

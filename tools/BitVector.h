@@ -134,18 +134,15 @@ namespace emp {
     }
 
   public:
-    BitVector(size_t in_num_bits=0, bool init_val=false) : num_bits(in_num_bits) {
+    BitVector(size_t in_num_bits=0, bool init_val=false) : num_bits(in_num_bits), bit_set(nullptr) {
       if (num_bits) bit_set = new field_t[NumFields()];
-      else bit_set = nullptr;
       if (init_val) SetAll(); else Clear();
     }
-    BitVector(const BitVector & in_set) : num_bits(in_set.num_bits) {
+    BitVector(const BitVector & in_set) : num_bits(in_set.num_bits), bit_set(nullptr) {
       if (num_bits) bit_set = new field_t[NumFields()];
-      else bit_set = nullptr;
       RawCopy(in_set.bit_set);
     }
-    BitVector(BitVector && in_set) : num_bits(in_set.num_bits) {
-      bit_set = in_set.bit_set;
+    BitVector(BitVector && in_set) : num_bits(in_set.num_bits), bit_set(in_set.bit_set) {
       in_set.bit_set = nullptr;
     }
     ~BitVector() {
@@ -315,7 +312,10 @@ namespace emp {
 
     bool Any() const {
       const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) if (bit_set[i]) return true; return false;
+      for (size_t i = 0; i < NUM_FIELDS; i++) {
+        if (bit_set[i]) return true;
+      }
+      return false;
     }
     bool None() const { return !Any(); }
     bool All() const { return (~(*this)).None(); }

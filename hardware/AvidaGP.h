@@ -59,8 +59,8 @@ namespace emp {
       id_t id;
       emp::array<arg_t, 3> args;
 
-      Instruction(InstID _id=(InstID)0, size_t _a0=0, size_t _a1=0, size_t _a2=0)
-	      : id(_id) { args[0] = _a0; args[1] = _a1; args[2] = _a2; }
+      Instruction(InstID _id=(InstID)0, size_t a0=0, size_t a1=0, size_t a2=0)
+	      : id(_id), args() { args[0] = a0; args[1] = a1; args[2] = a2; }
       Instruction(const Instruction &) = default;
       Instruction(Instruction &&) = default;
 
@@ -202,10 +202,13 @@ namespace emp {
     }
 
   public:
-    AvidaGP() : inst_ptr(0), errors(0) {
+    AvidaGP() : genome(), regs(), inputs(), outputs(), stacks(), fun_starts()
+              , inst_ptr(0), scope_stack(), reg_stack(), call_stack(), errors(0), traits() {
       scope_stack.emplace_back(0, ScopeType::ROOT, 0);  // Initial scope.
       Reset();
     }
+    AvidaGP(const AvidaGP &) = default;
+    AvidaGP(AvidaGP &&) = default;
     ~AvidaGP() { ; }
 
     /// Reset the entire CPU to a starting state, without a genome.
@@ -326,7 +329,7 @@ namespace emp {
     case InstID::Inc: ++regs[inst.args[0]]; break;
     case InstID::Dec: --regs[inst.args[0]]; break;
     case InstID::Not: regs[inst.args[0]] = (regs[inst.args[0]] == 0.0); break;
-    case InstID::SetReg: regs[inst.args[0]] = inst.args[1]; break;
+    case InstID::SetReg: regs[inst.args[0]] = (double) inst.args[1]; break;
     case InstID::Add: regs[inst.args[2]] = regs[inst.args[0]] + regs[inst.args[1]]; break;
     case InstID::Sub: regs[inst.args[2]] = regs[inst.args[0]] - regs[inst.args[1]]; break;
     case InstID::Mult: regs[inst.args[2]] = regs[inst.args[0]] * regs[inst.args[1]]; break;
@@ -515,9 +518,9 @@ namespace emp {
     os << " REGS: ";
     for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << regs[i] << "] ";
     os << "\n INPUTS: ";
-    for (int i = 0; i < CPU_SIZE; i++) os << "[" << Find(inputs, i, 0.0) << "] ";
+    for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << Find(inputs, (int)i, 0.0) << "] ";
     os << "\n OUTPUTS: ";
-    for (int i = 0; i < CPU_SIZE; i++) os << "[" << Find(outputs, i, 0.0) << "] ";
+    for (size_t i = 0; i < CPU_SIZE; i++) os << "[" << Find(outputs, (int)i, 0.0) << "] ";
     os << std::endl;
 
     os << "IP:" << inst_ptr;

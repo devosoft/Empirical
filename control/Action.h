@@ -37,18 +37,18 @@ namespace emp {
     virtual ~ActionBase() { ; }
 
     const std::string & GetName() const { return name; }
-    virtual int GetArgCount() const = 0;
+    virtual size_t GetArgCount() const = 0;
 
     // Clone() will produce a pointer to a full copy of an Action, going through derived version.
     virtual ActionBase * Clone() const = 0;
   };
 
-  template <int ARG_COUNT>
+  template <size_t ARG_COUNT>
   class ActionSize : public ActionBase {
   protected:
     ActionSize(const std::string & in_name) : ActionBase(in_name) { ; }
   public:
-    int GetArgCount() const { return ARG_COUNT; }
+    size_t GetArgCount() const { return ARG_COUNT; }
   };
 
   template <typename... ARGS> class Action;

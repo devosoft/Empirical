@@ -30,9 +30,9 @@ namespace emp {
     emp::vector<std::string> lines;
 
   public:
-    File() { ; }
-    File(std::istream & input) { Load(input); }
-    File(const std::string & filename) { Load(filename); }
+    File() : lines() { ; }
+    File(std::istream & input) : lines() { Load(input); }
+    File(const std::string & filename) : lines() { Load(filename); }
     File(const File &) = default;
     File(File &&) = default;
     ~File() { ; }
@@ -61,7 +61,7 @@ namespace emp {
     File & Append(const File & in_file) { return Append(in_file.lines); }
 
     template <typename T>
-    File & operator+=(T && in) { Append( std::forward<T>(in) ); }
+    File & operator+=(T && in) { Append( std::forward<T>(in) ); return *this; }
 
     bool operator==(const File in) { return lines == in.lines; }
     bool operator!=(const File in) { return lines != in.lines; }

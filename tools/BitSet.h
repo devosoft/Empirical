@@ -149,7 +149,7 @@ namespace emp {
     inline static size_t Byte2FieldPos(const size_t index) { return (index & 3) << 3; }
 
     inline void Copy(const uint32_t in_set[NUM_FIELDS]) {
-      for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
+      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
     }
 
     // Helper: call SHIFT with positive number instead
@@ -280,7 +280,7 @@ namespace emp {
       emp_assert(index < NUM_BITS);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
-      const size_t pos_mask = 1 << pos_id;
+      const uint32_t pos_mask = 1 << pos_id;
 
       if (value) bit_set[field_id] |= pos_mask;
       else       bit_set[field_id] &= ~pos_mask;

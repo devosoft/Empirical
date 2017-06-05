@@ -48,7 +48,7 @@ namespace evo {
     NKLandscapeConst() = delete; // { ; }
 
     /// Build a new NKLandscapeConst using the random number generator [random]
-    NKLandscapeConst(emp::Random & random) {
+    NKLandscapeConst(emp::Random & random) : landscape() {
       for ( std::array<double, state_count> & ltable : landscape) {
         for (double & pos : ltable) {
           pos = random.GetDouble();

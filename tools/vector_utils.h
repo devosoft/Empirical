@@ -81,11 +81,15 @@ namespace emp {
   // Extraxt maximum element from a heap.
   template <typename T>
   T HeapExtract(emp::vector<T> & v) {
+    emp_assert(v.size(), "Cannot extract from an empty heap!");
     T out = v[0];
-    const size_t last_pos = v.size() - 1;
-    v[0] = v[last_pos];
-    v.resize(last_pos);
-    Heapify(v,0);
+    if (v.size() > 1) {
+      const size_t last_pos = v.size() - 1;
+      v[0] = v[last_pos];
+      v.resize(last_pos);
+      Heapify(v,0);
+    }
+    else v.resize(0);
     return out;
   }
 

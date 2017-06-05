@@ -172,7 +172,7 @@ namespace evo {
 
     Ptr<Random> random_ptr;
     bool random_owner;
-    size_t update = 0;
+    size_t update;
 
     // We have a set of signals that are triggered by the world.
     SignalControl control;
@@ -224,9 +224,9 @@ namespace evo {
     std::string world_name;
 
     World(Ptr<Random> r_ptr, const std::string & w_name=UniqueName("emp::evo::World"))
-      : fitM()
-      , popM(w_name, fitM)
+      : fitM(), popM(w_name, fitM), orgM(), statsM(), lineageM()
       , random_ptr(r_ptr), random_owner(false)
+      , update(0), control()
       , before_repro_sig(to_string(w_name,"::before-repro"), control)
       , offspring_ready_sig(to_string(w_name,"::offspring-ready"), control)
       , inject_ready_sig(to_string(w_name,"::inject-ready"), control)
@@ -573,7 +573,7 @@ namespace evo {
         if (max_count[ex_id] == 0) continue;  // No one gets this reward...
 
         // The current bonus is divided up among the organisms that earned it...
-        const double cur_bonus = pool_sizes[ex_id] / max_count[ex_id];
+        const double cur_bonus = pool_sizes[ex_id] / (double) max_count[ex_id];
         // std::cout << "Bonus " << ex_id << " = " << cur_bonus
         //           << "   max_extra_fit = " << max_extra_fit[ex_id]
         //           << std::endl;

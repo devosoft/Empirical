@@ -54,7 +54,7 @@ namespace evo {
     size_t GetKey(char symbol) const { return Find(symbol_map, symbol, 0); }
     size_t GetKey(const std::string & name) const { return Find(name_map, name, 0); }
   public:
-    StateGridInfo() { ; }
+    StateGridInfo() : states(), state_map(), symbol_map(), name_map() { ; }
     ~StateGridInfo() { ; }
 
     size_t GetNumStates() const { return states.size(); }
@@ -91,7 +91,7 @@ namespace evo {
     StateGrid(StateGridInfo & _i, size_t _w=1, size_t _h=1, int init_val=0)
       : width(_w), height(_h), states(_w*_h,init_val), info(_i) { ; }
     StateGrid(StateGridInfo & _i, const std::string & filename)
-      : info(_i) { Load(filename); }
+      : width(1), height(1), states(), info(_i) { Load(filename); }
     StateGrid(const StateGrid &) = default;
     StateGrid(StateGrid &&) = default;
     ~StateGrid() { ; }
@@ -131,7 +131,7 @@ namespace evo {
 
       // Load in the specific states.
       for (size_t row = 0; row < height; row++) {
-        emp_assert(file[row].size == width);  // Make sure all rows are the same size.
+        emp_assert(file[row].size() == width);  // Make sure all rows are the same size.
         for (size_t col = 0; col < width; col++) {
           states[row*width+col] = info.GetState(file[row][col]);
         }
