@@ -23,9 +23,9 @@ int main()
   std::function<std::string(int*)> print_fun = [](int * val) {
     char out_char = '+';
     *val %= 63;
-    if (*val < 10) out_char = '0' + (char) *val;
-    else if (*val < 36) out_char = 'a' + (char) (*val - 10);
-    else if (*val < 62) out_char = 'A' + (char) (*val - 36);
+    if (*val < 10) out_char = (char) ('0' + *val);
+    else if (*val < 36) out_char = (char) ('a' + (*val - 10));
+    else if (*val < 62) out_char = (char) ('A' + (*val - 36));
     return emp::to_string(out_char);
   };
 

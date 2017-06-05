@@ -15,8 +15,8 @@ namespace evo = emp::evo;
 struct TestOrg1 {
   int fitness;
 
-  TestOrg1() { fitness = 0; }
-  TestOrg1(int f) { fitness = f; }
+  TestOrg1() : fitness(0) { ; }
+  TestOrg1(int f) : fitness(f) { ; }
   double Fitness() { return (double) fitness; }
   bool Mutate(emp::Random&) { return false; }
 };
