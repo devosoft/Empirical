@@ -11,6 +11,7 @@
 #include "../base/assert.h"
 #include "../base/Ptr.h"
 #include "../base/vector.h"
+#include "../meta/reflection.h"
 #include "../tools/Random.h"
 #include "../tools/random_utils.h"
 #include "../tools/string_utils.h"
@@ -71,11 +72,10 @@ namespace emp {
     // AddOrgBirth inserts an organism that was born INSIDE the population.
     size_t AddOrg(Ptr<ORG> new_org) { return AddOrgAppend(new_org); }
 
-    size_t AddOrgBirth(Ptr<ORG> new_org, size_t parent_pos) {
-      emp_assert(random_ptr); // Random must be set before being used.
-      const size_t pos = random_ptr->GetUInt(pop.size());
-      return AddOrgAt(new_org, pos);
-    }
+    size_t AddOrgBirth(Ptr<ORG> new_org, size_t parent_pos);
+
+    // Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
+    EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
   public:
     WorldModule() : random_ptr(nullptr), random_owner(false), num_orgs(0) { ; }
@@ -112,6 +112,14 @@ namespace emp {
       for (size_t i = new_size; i < pop.size(); i++) ClearOrgAt(i); // Remove orgs past new size.
       pop.resize(new_size, nullptr);                                // Default new orgs to null.
     }
+
+    void InsertAt(const ORG & mem, const size_t pos);
+    template <typename... ARGS> void InsertRandomOrg(ARGS &&... args);
+    void InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count=1);
+
+    // If InsertBirth is provided with a fitness function, immediately calculate fitness of new org.
+    void InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count,
+                     const fit_fun_t & fit_fun);
 
 
     // --- RANDOM FUNCTIONS ---
@@ -186,6 +194,13 @@ namespace emp {
     return pos;
   }
 
+  template<typename ORG>
+  size_t WorldModule<ORG>::AddOrgBirth(Ptr<ORG> new_org, size_t parent_pos) {
+    emp_assert(random_ptr); // Random must be set before being used.
+    const size_t pos = random_ptr->GetUInt(pop.size());
+    return AddOrgAt(new_org, pos);
+  }
+
   // Delete all organisms.
   template<typename ORG>
   void WorldModule<ORG>::Clear() {
@@ -202,6 +217,50 @@ namespace emp {
     pop[pos]=nullptr;
     num_orgs--;
   }
+
+
+  template<typename ORG>
+  void WorldModule<ORG>::InsertAt(const ORG & mem, const size_t pos) {
+    Ptr<ORG> new_org;
+    new_org.New(mem);
+    AddOrgAt(new_org, pos);
+    // SetupOrg(*new_org, &callbacks, pos);
+  }
+
+  template<typename ORG>
+  template<typename... ARGS>
+  void WorldModule<ORG>::InsertRandomOrg(ARGS &&... args) {
+    emp_assert(random_ptr != nullptr && "InsertRandomOrg() requires active random_ptr");
+    Ptr<ORG> new_org;
+    new_org.New(*random_ptr, std::forward<ARGS>(args)...);
+    const size_t pos = AddOrg(new_org);
+    // SetupOrg(*new_org, &callbacks, pos);
+  }
+
+  template<typename ORG>
+  void WorldModule<ORG>::InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count) {
+    for (size_t i = 0; i < copy_count; i++) {
+      Ptr<ORG> new_org;
+      new_org.New(mem);
+      const size_t pos = AddOrgBirth(new_org, parent_pos);
+      // SetupOrg(*new_org, &callbacks, pos);
+    }
+  }
+
+  // If InsertBirth is provided with a fitness function, use it to calculate fitness of new org.
+  template<typename ORG>
+  void WorldModule<ORG>::InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count,
+                   const fit_fun_t & fit_fun) {
+    for (size_t i = 0; i < copy_count; i++) {
+      Ptr<ORG> new_org;
+      new_org.New(mem);
+      const size_t pos = AddOrgBirth(new_org, parent_pos);
+      // If we offspring are placed into the same population, recalculate fitness.
+      // CalcFitness(pos, fit_fun);
+      // SetupOrg(*new_org, &callbacks, pos);
+    }
+  }
+
 
   template<typename ORG>
   void WorldModule<ORG>::SetRandom(Random & r) {
