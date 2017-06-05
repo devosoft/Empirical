@@ -373,7 +373,7 @@ namespace evo {
 
   public:
     PopulationManager_Grid(const std::string & _w_name, FIT_MANAGER & _fm)
-    : base_t(_w_name, _fm) {
+    : base_t(_w_name, _fm), width(0), height(0) {
       ConfigPop(10,10);
     }
     ~PopulationManager_Grid() { ; }

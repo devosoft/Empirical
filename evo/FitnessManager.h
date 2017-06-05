@@ -61,6 +61,8 @@ namespace evo {
     emp::vector<double> fit_cache;  // vector size == 0 when not caching; invalid values == 0.
 
   public:
+    FitnessManager_CacheOrg() : fit_cache() { ; }
+
     double GetCache(size_t id) const { return (id < fit_cache.size()) ? fit_cache[id] : 0.0; }
     size_t GetSize() const { return fit_cache.size(); }
 
@@ -103,6 +105,8 @@ namespace evo {
     IndexMap index_info; // Data structure to use for roulette selection.
 
   public:
+    FitnessManager_Tracker() : index_info() { ; }
+
     double GetCache(size_t id) const { return index_info[id]; }
     size_t GetSize() const { return index_info.size(); }
 
