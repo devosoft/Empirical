@@ -113,6 +113,7 @@ namespace emp {
       pop.resize(new_size, nullptr);                                // Default new orgs to null.
     }
 
+    void Insert(const ORG & mem, size_t copy_count=1);
     void InsertAt(const ORG & mem, const size_t pos);
     template <typename... ARGS> void InsertRandomOrg(ARGS &&... args);
     void InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count=1);
@@ -218,6 +219,17 @@ namespace emp {
     num_orgs--;
   }
 
+
+  template<typename ORG>
+  void WorldModule<ORG>::Insert(const ORG & mem, size_t copy_count) {
+    for (size_t i = 0; i < copy_count; i++) {
+      Ptr<ORG> new_org;
+      new_org.New(mem);
+      //const size_t pos = 
+      AddOrg(new_org);
+      //SetupOrg(*new_org, &callbacks, pos);
+    }
+  }
 
   template<typename ORG>
   void WorldModule<ORG>::InsertAt(const ORG & mem, const size_t pos) {
