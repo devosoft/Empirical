@@ -95,8 +95,13 @@ namespace emp {
     size_t GetNumOrgs() const { return num_orgs; }
     bool IsOccupied(size_t i) const { return pop[i] != nullptr; }
 
-    ORG & operator[](size_t pos) { return *(pop[pos]); }
-    const ORG & operator[](size_t pos) const { return *(pop[pos]); }
+    // We ONLY have a const index operator since manipulations should go through other functions.
+    // ORG & operator[](size_t pos) { return *(pop[pos]); }
+    const ORG & operator[](size_t pos) const {
+      emp_assert(pop[pos] != nullptr);  // Should not index to a null organism!
+      return *(pop[pos]);
+    }
+
 
     // --- MANIPULATE ORGS IN POPULATION ---
 
@@ -157,8 +162,6 @@ namespace emp {
     void resize(size_t new_size) { Resize(new_size); }
     void clear() { Clear(); }
 
-//     Proxy operator[](size_t i) { return Proxy(*this, i); }
-//     const ptr_t operator[](size_t i) const { return pop[i]; }
 //     iterator_t begin() { return iterator_t(this, 0); }
 //     iterator_t end() { return iterator_t(this, (int) pop.size()); }
   };
