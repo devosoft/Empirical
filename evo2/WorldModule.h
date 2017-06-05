@@ -113,41 +113,26 @@ namespace emp {
 
     Random & GetRandom() { return *random_ptr; }
 
-    void SetRandom(Random & r) {
-      if (random_owner) random_ptr.Delete();
-      random_ptr = &r;
-      random_owner = false;
-    }
-    void NewRandom(int seed=-1) {
-      if (random_owner) random_ptr.Delete();
-      random_ptr.New(seed);
-      random_owner = true;
-    }
+    // Set or create a new random number generator.
+    void SetRandom(Random & r);
+    void NewRandom(int seed=-1);
 
-    // Get any cell, at random
+    // Get any cell, at random.
     size_t GetRandomCellID() { return random_ptr->GetInt(0, pop.size()); }
 
     // By default, assume a well-mixed population so random neighbors can be anyone.
     size_t GetRandomNeighborID(size_t /*id*/) { return random_ptr->GetUInt(0, pop.size()); }
 
     // Get random *occupied* cell.
-    size_t GetRandomOrgID() {
-      emp_assert(num_orgs > 0); // Make sure it's possible to find an organism!
-      size_t pos = random_ptr->GetUInt(0, pop.size());
-      while (pop[pos] == nullptr) pos = random_ptr->GetUInt(0, pop.size());
-      return pos;
-    }
+    size_t GetRandomOrgID();
 
 
     // --- POPULATION ANALYSIS ---
 
-    emp::vector<size_t> FindCellIDs(const std::function<bool(ORG*)> & filter) {
-      emp::vector<size_t> valid_IDs(0);
-      for (size_t i = 0; i < pop.size(); i++) {
-        if (filter(pop[i].Raw())) valid_IDs.push_back(i);
-      }
-      return valid_IDs;
-    }
+    // Find ALL cell IDs the return true in the filter.
+    emp::vector<size_t> FindCellIDs(const std::function<bool(ORG*)> & filter);
+
+    // Simple techniques for using FindCellIDs()
     emp::vector<size_t> GetValidOrgIDs() {
       return FindCellIDs([](ORG*org){ return org != nullptr; });
     }
@@ -243,6 +228,38 @@ namespace emp {
     num_orgs--;
   }
 
+  template<typename ORG>
+  void WorldModule<ORG>::SetRandom(Random & r) {
+    if (random_owner) random_ptr.Delete();
+    random_ptr = &r;
+    random_owner = false;
+  }
+
+  template<typename ORG>
+  void WorldModule<ORG>::NewRandom(int seed) {
+    if (random_owner) random_ptr.Delete();
+    random_ptr.New(seed);
+    random_owner = true;
+  }
+
+  // Get random *occupied* cell.
+  template<typename ORG>
+  size_t WorldModule<ORG>::GetRandomOrgID() {
+    emp_assert(num_orgs > 0); // Make sure it's possible to find an organism!
+    size_t pos = random_ptr->GetUInt(0, pop.size());
+    while (pop[pos] == nullptr) pos = random_ptr->GetUInt(0, pop.size());
+    return pos;
+  }
+
+  // Find ALL cell IDs the return true in the filter.
+  template<typename ORG>
+  emp::vector<size_t> WorldModule<ORG>::FindCellIDs(const std::function<bool(ORG*)> & filter) {
+    emp::vector<size_t> valid_IDs(0);
+    for (size_t i = 0; i < pop.size(); i++) {
+      if (filter(pop[i].Raw())) valid_IDs.push_back(i);
+    }
+    return valid_IDs;
+  }
 }
 
 #endif
