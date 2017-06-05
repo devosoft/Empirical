@@ -358,13 +358,10 @@ namespace emp {
     }
 
     ~Config() {
-      // Delete all entries in the var_map
-      for (auto it = var_map.begin(); it != var_map.end(); it++) {
-        delete it->second;
-      }
-      for (auto it = type_manager_map.begin(); it != type_manager_map.end(); it++) {
-        delete it->second;
-      }
+      // Delete all alocated memory!
+      for (auto & x : var_map) delete x.second;
+      for (auto & x : group_set) delete x;
+      for (auto & x : type_manager_map) delete x.second;
     }
 
     ConfigEntry * operator[](const std::string & name) { return var_map[name]; }

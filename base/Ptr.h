@@ -79,7 +79,31 @@ namespace emp {
     PtrTracker & operator=(const PtrTracker &) = delete;
     PtrTracker & operator=(PtrTracker &&) = delete;
   public:
-    ~PtrTracker() { ; }
+    ~PtrTracker() {
+      // Track stats about pointer record.
+      size_t total = 0;
+      size_t owned = 0;
+      size_t remain = 0;
+
+      // Scan through remaining pointers and make sure all have been deleted.
+      for (auto & x : ptr_info) {
+        void * ptr = x.first;
+        const PtrInfo & info = x.second;
+
+        total++;
+        if (info.IsOwner()) owned++;
+        if (info.GetCount()) remain++;
+
+        if (info.IsOwner() == false) continue;
+        //emp_assert(info.GetCount() == 0, ptr, info.GetCount(), info.IsActive(), info.IsOwner());
+        emp_assert(info.IsActive() == false, ptr, info.GetCount(), info.IsActive(), info.IsOwner());
+      }
+      std::cout << "EMP_TRACK_MEM: No memory leaks found!\n "
+                << total << " pointers found; "
+                << owned << " owned and "
+                << remain << " still have pointers to them (after deletion.)"                
+                << std::endl;
+    }
 
     bool GetVerbose() const { return verbose; }
     void SetVerbose(bool v=true) { verbose = v; }
@@ -303,11 +327,14 @@ namespace emp {
   };
 
 
-    // Create a helper to replace & operator.
-    template <typename T> Ptr<T> to_ptr(T & _in) { return Ptr<T>(_in); }
-    template <typename T> Ptr<T> to_ptr(T * _in, bool own=false) { return Ptr<T>(_in, own); }
-    template <typename T> Ptr<T> new_ptr(T * _in, bool own=true) { return Ptr<T>(_in, own); }
+  // Create a helper to replace & operator.
+  template <typename T> Ptr<T> ToPtr(T & _in) { return Ptr<T>(_in); }
+  template <typename T> Ptr<T> ToPtr(T * _in, bool own=false) { return Ptr<T>(_in, own); }
+  template <typename T> Ptr<T> TrackPtr(T * _in, bool own=true) { return Ptr<T>(_in, own); }
 
+  template <typename T, typename... ARGS> Ptr<T> NewPtr(ARGS &&... args) {
+    return Ptr<T>(new T(std::forward<ARGS>(args)...), true);
+  }
 }
 
 #endif // EMP_PTR_H

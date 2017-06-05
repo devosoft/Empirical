@@ -93,7 +93,7 @@ namespace emp {
       re_string(char c) : str() { str.push_back(c); }
       re_string(const std::string & s) : str(s) { ; }
       void Print(std::ostream & os) const override { os << "STR[" << to_escaped_string(str) << "]"; }
-      Ptr<re_string> AsString() override { return to_ptr(this); }
+      Ptr<re_string> AsString() override { return ToPtr(this); }
       size_t GetSize() const override { return str.size(); }
       virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
         size_t prev_id = start;
@@ -126,7 +126,7 @@ namespace emp {
         for (auto c : chars) os << to_escaped_string((char) c);
         os << "]";
       }
-      Ptr<re_charset> AsCharSet() override { return to_ptr(this); }
+      Ptr<re_charset> AsCharSet() override { return ToPtr(this); }
       size_t GetSize() const override { return char_set.CountOnes(); }
       char First() const { return (char) char_set.FindBit(); }
       virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
@@ -144,7 +144,7 @@ namespace emp {
       virtual void push(Ptr<re_base> x) { emp_assert(x != nullptr); nodes.push_back(x); }
       Ptr<re_base> pop() { auto out = nodes.back(); nodes.pop_back(); return out; }
       size_t GetSize() const override { return nodes.size(); }
-      Ptr<re_parent> AsParent() override { return to_ptr(this); }
+      Ptr<re_parent> AsParent() override { return ToPtr(this); }
       bool Simplify() override {
         bool m=false;
         for (auto & x : nodes) {
@@ -167,7 +167,7 @@ namespace emp {
       void Print(std::ostream & os) const override {
         os << "BLOCK["; for (auto x : nodes) x->Print(os); os << "]";
       }
-      Ptr<re_block> AsBlock() override { return to_ptr(this); }
+      Ptr<re_block> AsBlock() override { return ToPtr(this); }
       bool Simplify() override {
         bool modify = false;
         // Loop through block elements, simplifying when possible.
@@ -443,12 +443,12 @@ namespace emp {
     RegEx() = delete;
     RegEx(const std::string & r)
     : regex(r), notes(), valid(true), pos(0), dfa(), dfa_ready(false), head() {
-      Process(to_ptr(head));
+      Process(ToPtr(head));
       while(head.Simplify());
     }
     RegEx(const RegEx & r)
     : regex(r.regex), notes(), valid(true), pos(0), dfa(), dfa_ready(false), head() {
-      Process(to_ptr(head));
+      Process(ToPtr(head));
       while(head.Simplify());
     }
     ~RegEx() { ; }
@@ -459,7 +459,7 @@ namespace emp {
       valid = true;
       pos = 0;
       head.Clear();
-      Process(to_ptr(head));
+      Process(ToPtr(head));
       while (head.Simplify());
       return *this;
     }

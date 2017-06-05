@@ -11,6 +11,7 @@
 #include "../base/assert.h"
 #include "../base/Ptr.h"
 #include "../base/vector.h"
+#include "../meta/reflection.h"
 #include "../tools/Random.h"
 #include "../tools/random_utils.h"
 #include "../tools/string_utils.h"
@@ -71,11 +72,10 @@ namespace emp {
     // AddOrgBirth inserts an organism that was born INSIDE the population.
     size_t AddOrg(Ptr<ORG> new_org) { return AddOrgAppend(new_org); }
 
-    size_t AddOrgBirth(Ptr<ORG> new_org, size_t parent_pos) {
-      emp_assert(random_ptr); // Random must be set before being used.
-      const size_t pos = random_ptr->GetUInt(pop.size());
-      return AddOrgAt(new_org, pos);
-    }
+    size_t AddOrgBirth(Ptr<ORG> new_org, size_t parent_pos);
+
+    // Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
+    EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
   public:
     WorldModule() : random_ptr(nullptr), random_owner(false), num_orgs(0) { ; }
@@ -184,6 +184,13 @@ namespace emp {
     pop.push_back(new_org);
     ++num_orgs;
     return pos;
+  }
+
+  template<typename ORG>
+  size_t WorldModule<ORG>::AddOrgBirth(Ptr<ORG> new_org, size_t parent_pos) {
+    emp_assert(random_ptr); // Random must be set before being used.
+    const size_t pos = random_ptr->GetUInt(pop.size());
+    return AddOrgAt(new_org, pos);
   }
 
   // Delete all organisms.
