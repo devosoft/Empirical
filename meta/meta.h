@@ -93,6 +93,7 @@ namespace emp {
   // sfinae_decoy<X,Y> will always evaluate to X no matter what Y is.
   // X is type you want it to be; Y is a decoy trigger potential substituion failue.
   template <typename REAL_TYPE, typename EVAL_TYPE> using sfinae_decoy = REAL_TYPE;
+  template <typename REAL_TYPE, typename EVAL_TYPE> using type_decoy = REAL_TYPE;
   template <typename EVAL_TYPE>                     using bool_decoy = bool;
   template <typename EVAL_TYPE>                     using int_decoy = int;
 

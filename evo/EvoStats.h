@@ -21,10 +21,10 @@ struct MLandscape {
   double benefit_avg;
   double neutral_avg;
   double det_avg;
-  double max_ben = 0;
-  double max_det = 0;
+  double max_ben;
+  double max_det;
 
-  MLandscape() { benefit_avg = 0; neutral_avg = 0; det_avg = 0; }
+  MLandscape() : benefit_avg(0), neutral_avg(0), det_avg(0), max_ben(0), max_det(0) {}
 };
 
 namespace emp {

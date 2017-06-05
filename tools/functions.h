@@ -43,6 +43,18 @@ namespace emp {
   // Toggle an input bool.
   inline bool Toggle(bool & in_bool) { return (in_bool = !in_bool); }
 
+  // Combine bools...
+  inline constexpr bool AllTrue() { return true; }
+  template <typename... Ts>
+  inline bool AllTrue(bool result, Ts... OTHER) {
+    return result && AllTrue(OTHER...);
+  }
+
+  inline constexpr bool AnyTrue() { return false; }
+  template <typename... Ts>
+  inline bool AnyTrue(bool result, Ts... OTHER) {
+    return result || AnyTrue(OTHER...);
+  }
 
   template <typename T>
   static inline emp::vector<T> BuildRange(T min, T max, T step=1) {

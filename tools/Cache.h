@@ -11,6 +11,7 @@
 #ifndef EMP_CACHE_H
 #define EMP_CACHE_H
 
+#include <functional>
 #include <unordered_map>
 
 namespace emp {
@@ -26,6 +27,12 @@ namespace emp {
     std::unordered_map<Key, T, Hash, Pred, Alloc> cache_map;
 
   public:
+    Cache() : cache_map() { }
+    Cache(const Cache &) = default;
+    Cache(Cache &&) = default;
+    Cache & operator=(const Cache &) = default;
+    Cache & operator=(Cache &&) = default;
+
     using key_type = Key;
     using mapped_type = T;
     using hasher= Hash;

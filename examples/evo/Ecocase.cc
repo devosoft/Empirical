@@ -42,7 +42,7 @@ struct Org {
   double density; // How many neigbors are nearby?
   size_t wins;
 
-  Org(double _x, double _y) : x(_x), y(_y) { ; }
+  Org(double _x, double _y) : x(_x), y(_y), density(0.0), wins(0) { ; }
 };
 
 

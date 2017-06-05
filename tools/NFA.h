@@ -119,11 +119,13 @@ namespace emp {
   private:
     struct Transition {
       opts_t symbols;
+      Transition() : symbols() { }
     };
     struct State {
       std::map<size_t, Transition> trans;   // What symbol transitions are available?
       std::set<size_t> free_to;             // What other states can you move to for free?
       std::set<size_t> free_from;           // What other states can move here for free?
+      State() : trans(), free_to(), free_from() { }
     };
 
     emp::vector<State> states;
@@ -290,7 +292,9 @@ namespace emp {
     const tNFA<NUM_SYMBOLS,STOP_TYPE> & nfa;
     std::set<size_t> state_set;
   public:
-    tNFA_State(const tNFA<NUM_SYMBOLS,STOP_TYPE> & _nfa) : nfa(_nfa) { state_set = nfa.GetStart(); }
+    tNFA_State(const tNFA<NUM_SYMBOLS,STOP_TYPE> & _nfa) : nfa(_nfa), state_set() {
+      state_set = nfa.GetStart();
+    }
     ~tNFA_State() { ; }
 
     const tNFA<NUM_SYMBOLS,STOP_TYPE> & GetNFA() const { return nfa; }

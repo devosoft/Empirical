@@ -38,7 +38,7 @@ namespace emp {
 
   public:
     template <typename T>
-    flex_function(T && fun_info) : fun(std::forward<T>(fun_info)) { ; }
+    flex_function(T && fun_info) : fun(std::forward<T>(fun_info)), default_args() { ; }
     flex_function(const this_t &) = default;
     flex_function(this_t &&) = default;
     flex_function() { ; }

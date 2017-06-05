@@ -39,6 +39,7 @@
 #include "../tools/RegEx.h"
 #include "../tools/Random.h"
 // #include "../tools/Trait.h"
+#include "../tools/TypeTracker.h"
 
 #include "../tools/ce_string.h"
 #include "../tools/errors.h"
@@ -1686,6 +1687,49 @@ TEST_CASE("Test vector", "[tools]")
   REQUIRE(total == 2470);
 }
 
+
+// Build some sample functions that we want called by type.
+std::string tt_result;
+void fun_int_int(int x, int y) { tt_result = emp::to_string(x+y); }
+void fun_int_double(int x, double y) { tt_result = emp::to_string(y * (double) x); }
+void fun_string_int(std::string x, int y) {
+  tt_result = "";
+  for (int i=0; i < y; i++) tt_result += x;
+}
+
+TEST_CASE("Test type tracker (TypeTracker)", "[tools]")
+{
+  using tt_t = emp::TypeTracker<int, std::string, double>;   // Setup the tracker type.
+  tt_t tt;                                                   // Build the tracker.
+
+  // Add some functions.
+  tt.AddFunction(fun_int_int);
+  tt.AddFunction(fun_int_double);
+  tt.AddFunction(fun_string_int);
+
+  emp::TrackedType * tt_int1 = tt.New<int>(1);
+  emp::TrackedType * tt_int2 = tt.New<int>(2);
+  emp::TrackedType * tt_int3 = tt.New<int>(3);
+
+  emp::TrackedType * tt_str  = tt.New<std::string>("FOUR");
+  emp::TrackedType * tt_doub = tt.New<double>(5.5);
+
+  tt.RunFunction(tt_int1, tt_int2);  // An int and another int should add.
+  REQUIRE( tt_result == "3" );
+
+  tt.RunFunction(tt_int3, tt_doub);  // An int and a double should multiply.
+  REQUIRE( tt_result == "16.500000" );
+
+  tt.RunFunction(tt_doub, tt_int2); // A double and an int is unknown; should leave old result.
+  REQUIRE( tt_result == "16.500000" );
+
+  tt.RunFunction(tt_str, tt_int3);    // A string an an int should duplicate the string.
+  REQUIRE( tt_result == "FOURFOURFOUR" );
+
+
+  REQUIRE( (tt_t::GetID<int,std::string,double>()) == (tt_t::GetTrackedID(tt_int1, tt_str, tt_doub)) );
+  REQUIRE( (tt_t::GetComboID<int,std::string,double>()) == (tt_t::GetTrackedComboID(tt_int1, tt_str, tt_doub)) );
+}
 
 
 // no idea what these do, but they're probably necessary

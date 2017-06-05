@@ -63,7 +63,7 @@ namespace emp {
   public:
     ConfigEntry(const std::string _name, const std::string _type,
                  const std::string _d_val, const std::string _desc)
-      : name(_name), type(_type), default_val(_d_val), desc(_desc)
+      : name(_name), type(_type), default_val(_d_val), desc(_desc), alias_set()
     { ; }
     virtual ~ConfigEntry() { ; }
 
@@ -163,7 +163,7 @@ namespace emp {
       emp::vector<ConfigEntry *> entry_set;
     public:
       ConfigGroup(const std::string & _name, const std::string & _desc)
-        : name(_name), desc(_desc)
+        : name(_name), desc(_desc), entry_set()
       { ; }
       ~ConfigGroup() { ; }
 
@@ -341,8 +341,17 @@ namespace emp {
 
   public:
     Config(const std::string & in_version = "")
-      : version_id(in_version)
+      : class_names()
+      , var_map()
+      , version_id(in_version)
+      , group_set()
+      , warnings()
       , delay_warnings(0)
+      , alias_map()
+      , type_manager_map()
+      , command_map()
+      , new_map()
+      , use_map()
       , expand_ok(true)
     {
       class_names.push_back("emp::Config");

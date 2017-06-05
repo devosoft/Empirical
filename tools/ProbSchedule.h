@@ -107,6 +107,6 @@ namespace emp {
       return (int) CalcID(rand_pos, 0);
     }
   };
-};
+}
 
 #endif

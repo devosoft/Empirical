@@ -166,7 +166,7 @@ namespace emp {
     }
   };
 
-};
+}
 
 
 #endif

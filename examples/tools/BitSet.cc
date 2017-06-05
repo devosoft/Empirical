@@ -31,7 +31,7 @@ double BitSetMath() {
     set3 |= (set4 << 3);
     set4 &= (set3 >> 3);
     auto set5 = set3 & set4;
-    total += set5.CountOnes();
+    total += (double) set5.CountOnes();
   }
 
   return total;
@@ -55,7 +55,7 @@ int main()
     set3 |= (set4 << 3);
     set4 &= (set3 >> 3);
     auto set5 = set3 & set4;
-    total += set5.CountOnes();
+    total += (double) set5.CountOnes();
   }
 
   std::cout << "total = " << total << std::endl;

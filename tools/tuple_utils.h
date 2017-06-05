@@ -53,6 +53,6 @@ namespace emp {
     }
   };
 
-};
+}
 
 #endif

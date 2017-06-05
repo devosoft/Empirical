@@ -73,7 +73,7 @@ namespace emp {
     bool verbose;
 
     // Make PtrTracker a singleton.
-    PtrTracker() : verbose(false) { ; }
+    PtrTracker() : ptr_info(), verbose(false) { ; }
     PtrTracker(const PtrTracker &) = delete;
     PtrTracker(PtrTracker &&) = delete;
     PtrTracker & operator=(const PtrTracker &) = delete;

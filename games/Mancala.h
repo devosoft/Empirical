@@ -44,7 +44,9 @@ namespace emp {
   public:
     using move_t = size_t;
 
-    Mancala(bool A_first=true) { Reset(A_first); }
+    Mancala(bool A_first=true) : boardA(), boardB(), over(false), is_A_turn(true) {
+      Reset(A_first);
+    }
     ~Mancala() { ; }
 
     void Reset(bool A_first=true) {

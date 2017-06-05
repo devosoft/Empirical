@@ -82,6 +82,6 @@ namespace emp {
     }
   };
 
-};
+}
 
 #endif
