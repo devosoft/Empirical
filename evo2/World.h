@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -46,8 +46,7 @@ namespace emp {
   template <typename ORG, emp::evo... MODS>
   void World<ORG, MODS...>::Insert(const ORG & mem, size_t copy_count) {
     for (size_t i = 0; i < copy_count; i++) {
-      Ptr<ORG> new_org;
-      new_org.New(mem);
+      Ptr<ORG> new_org = NewPtr<ORG>(mem);
       //const size_t pos =
       AddOrg(new_org);
       //SetupOrg(*new_org, &callbacks, pos);
@@ -56,8 +55,7 @@ namespace emp {
 
   template <typename ORG, emp::evo... MODS>
   void World<ORG, MODS...>::InsertAt(const ORG & mem, const size_t pos) {
-    Ptr<ORG> new_org;
-    new_org.New(mem);
+    Ptr<ORG> new_org = NewPtr<ORG>(mem);
     AddOrgAt(new_org, pos);
     // SetupOrg(*new_org, &callbacks, pos);
   }
@@ -66,8 +64,7 @@ namespace emp {
   template <typename... ARGS>
   void World<ORG, MODS...>::InsertRandomOrg(ARGS &&... args) {
     emp_assert(random_ptr != nullptr && "InsertRandomOrg() requires active random_ptr");
-    Ptr<ORG> new_org;
-    new_org.New(*random_ptr, std::forward<ARGS>(args)...);
+    Ptr<ORG> new_org = NewPtr<ORG>(*random_ptr, std::forward<ARGS>(args)...);
     const size_t pos = AddOrg(new_org);
     // SetupOrg(*new_org, &callbacks, pos);
   }
@@ -75,8 +72,7 @@ namespace emp {
   template <typename ORG, emp::evo... MODS>
   void World<ORG, MODS...>::InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count) {
     for (size_t i = 0; i < copy_count; i++) {
-      Ptr<ORG> new_org;
-      new_org.New(mem);
+      Ptr<ORG> new_org = NewPtr<ORG>(mem);
       const size_t pos = AddOrgBirth(new_org, parent_pos);
       // SetupOrg(*new_org, &callbacks, pos);
     }
@@ -87,8 +83,7 @@ namespace emp {
   void World<ORG, MODS...>::InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count,
                                         const fit_fun_t & fit_fun) {
     for (size_t i = 0; i < copy_count; i++) {
-      Ptr<ORG> new_org;
-      new_org.New(mem);
+      Ptr<ORG> new_org = NewPtr<ORG>(mem);
       const size_t pos = AddOrgBirth(new_org, parent_pos);
       // If we offspring are placed into the same population, recalculate fitness.
       // CalcFitness(pos, fit_fun);
