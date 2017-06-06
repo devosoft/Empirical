@@ -78,7 +78,8 @@ namespace emp {
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
   public:
-    WorldModule() : random_ptr(nullptr), random_owner(false), num_orgs(0) { ; }
+    WorldModule()
+    : random_ptr(nullptr), random_owner(false), pop(), num_orgs(0) { ; }
     ~WorldModule() {
       Clear();
       if (random_owner) random_ptr.Delete();
