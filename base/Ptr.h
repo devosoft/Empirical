@@ -119,11 +119,18 @@ namespace emp {
     }
 
     size_t GetCurID(void * ptr) { emp_assert(HasPtr(ptr)); return ptr_id[ptr]; }
+    size_t GetNumIDs() const { return id_info.size(); }
 
     bool IsDeleted(size_t id) const {
       if (id == (size_t) -1) return false;   // Not tracked!
       if (ptr_debug) std::cout << "IsDeleted: " << id << std::endl;
       return !id_info[id].IsActive();
+    }
+
+    bool IsActive(void * ptr) {
+      if (ptr_debug) std::cout << "IsActive: " << ptr << std::endl;
+      if (ptr_id.find(ptr) == ptr_id.end()) return false; // Not in database.
+      return GetInfo(ptr).IsActive();
     }
 
     int GetIDCount(size_t id) const {
@@ -178,6 +185,7 @@ namespace emp {
   public:
     using element_type = TYPE;
 
+    // Construct a null Ptr by default.
     Ptr() : ptr(nullptr), id((size_t) -1) {
       if (ptr_debug) std::cout << "null construct: " << ptr << std::endl;
     }
@@ -199,9 +207,15 @@ namespace emp {
     Ptr(T2 * in_ptr, bool track=false) : ptr(in_ptr), id((size_t) -1)
     {
       if (ptr_debug) std::cout << "raw construct: " << ptr << ". track=" << track << std::endl;
-      (void) track;            // Avoid unused parameter error when is off.
       emp_assert( (std::is_convertible<T2,TYPE>::value) );
-      if (track) id = Tracker().New(ptr);
+
+      // If this pointer is already active, link to it.
+      if (Tracker().IsActive(ptr)) {
+        id = Tracker().GetCurID(ptr);
+        Tracker().IncID(id);
+      }
+      // If we are not already tracking this pointer, but should be, add it.
+      else if (track) id = Tracker().New(ptr);
     }
 
     // Construct from another Ptr<> object of compatable type.
@@ -242,6 +256,7 @@ namespace emp {
       id = Tracker().New(ptr);                    // And track it!
     }
     void Delete() {
+      emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
       Tracker().MarkDeleted(id);
       if (ptr_debug) std::cout << "Ptr::Delete() : " << ptr << std::endl;
       delete ptr;
@@ -272,9 +287,17 @@ namespace emp {
     Ptr<TYPE> & operator=(T2 * _in) {
       if (ptr_debug) std::cout << "raw assignment" << std::endl;
       emp_assert( dynamic_cast<TYPE*>(_in) );
-      if (ptr) Tracker().DecID(id);
-      ptr = _in;
-      // Note: Since this ptr was passed in as a raw pointer, we do not manage it.
+
+      if (ptr) Tracker().DecID(id);   // Decrement references to former pointer at this position.
+      ptr = _in;                      // Update to new pointer.
+
+      // If this pointer is already active, link to it.
+      if (Tracker().IsActive(ptr)) {
+        id = Tracker().GetCurID(ptr);
+        Tracker().IncID(id);
+      }
+      // Otherwise, since this ptr was passed in as a raw pointer, we do not manage it.
+
       return *this;
     }
 
@@ -368,9 +391,9 @@ namespace emp {
     // Construct using move constructor
     Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr) { ; }
 
-    // Construct from a raw pointer of campatable type.
+    // Construct from a raw pointer of campatable type (bool is unused and optional)
     template <typename T2>
-    Ptr(T2 * in_ptr, bool track=false) : ptr(in_ptr) {
+    Ptr(T2 * in_ptr, bool=false) : ptr(in_ptr) {
       emp_assert( (std::is_convertible<T2,TYPE>::value) );
     }
 
