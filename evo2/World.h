@@ -65,7 +65,8 @@ namespace emp {
   void World<ORG, MODS...>::InsertRandomOrg(ARGS &&... args) {
     emp_assert(random_ptr != nullptr && "InsertRandomOrg() requires active random_ptr");
     Ptr<ORG> new_org = NewPtr<ORG>(*random_ptr, std::forward<ARGS>(args)...);
-    const size_t pos = AddOrg(new_org);
+    // const size_t pos =
+    AddOrg(new_org);
     // SetupOrg(*new_org, &callbacks, pos);
   }
 
@@ -73,7 +74,8 @@ namespace emp {
   void World<ORG, MODS...>::InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count) {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
-      const size_t pos = AddOrgBirth(new_org, parent_pos);
+      // const size_t pos =
+      AddOrgBirth(new_org, parent_pos);
       // SetupOrg(*new_org, &callbacks, pos);
     }
   }
@@ -84,7 +86,8 @@ namespace emp {
                                         const fit_fun_t & fit_fun) {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
-      const size_t pos = AddOrgBirth(new_org, parent_pos);
+      // const size_t pos =
+      AddOrgBirth(new_org, parent_pos);
       // If we offspring are placed into the same population, recalculate fitness.
       // CalcFitness(pos, fit_fun);
       // SetupOrg(*new_org, &callbacks, pos);
