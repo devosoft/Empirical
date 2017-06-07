@@ -212,7 +212,7 @@ namespace emp {
 
     // Construct from another Ptr<> object of compatable type.
     template <typename T2>
-    Ptr(Ptr<T2> _in) : ptr(_in.ptr) EMP_IF_MEMTRACK(, id(_in.id)) {
+    Ptr(Ptr<T2> _in) : ptr(_in.Raw()) EMP_IF_MEMTRACK(, id(_in.GetID())) {
       EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "inexact copy construct: " << ptr << std::endl; )
       emp_assert( (std::is_convertible<T2,TYPE>::value) );
       EMP_IF_MEMTRACK( Tracker().IncID(id); );
@@ -221,14 +221,6 @@ namespace emp {
     // Construct from nullptr.
     Ptr(std::nullptr_t) : Ptr() {
       EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "null construct 2." << std::endl; )
-    }
-
-    // Construct from an r-value Ptr<> object of compatable type.
-    template <typename T2>
-    Ptr(Ptr<T2> && _in) : ptr(_in.ptr) EMP_IF_MEMTRACK(, id(_in.id)) {
-      EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "inexact move construct: " << ptr << std::endl; )
-      emp_assert( (std::is_convertible<T2,TYPE>::value) );
-      EMP_IF_MEMTRACK( _in.id = (size_t) -1; )
     }
 
     // Destructor.
@@ -246,6 +238,7 @@ namespace emp {
       emp_assert(dynamic_cast<T2*>(ptr) != nullptr);
       return (T2*) ptr;
     }
+    EMP_IF_MEMTRACK( size_t GetID() const { return id; } )
 
     template <typename... T>
     void New(T &&... args) {
@@ -297,21 +290,9 @@ namespace emp {
       EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "convert-copy assignment" << std::endl; )
       emp_assert( dynamic_cast<TYPE*>(_in.Raw()) );
       EMP_IF_MEMTRACK( Tracker().DecID(id); );
-      ptr = _in.ptr;
-      EMP_IF_MEMTRACK( id = _in.id; );
+      ptr = _in.Raw();
+      EMP_IF_MEMTRACK( id = _in.GetID(); );
       EMP_IF_MEMTRACK( Tracker().IncID(id); );
-      return *this;
-    }
-
-    // Move from a convertable Ptr
-    template <typename T2>
-    Ptr<TYPE> & operator=(Ptr<T2> && _in) {
-      EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "convert-move assignment" << std::endl; )
-      emp_assert( dynamic_cast<TYPE*>(_in.Raw()) );
-      ptr = _in.ptr;
-      EMP_IF_MEMTRACK( id = _in.id; );
-      _in.ptr = nullptr;
-      EMP_IF_MEMTRACK( _in.id = (size_t) -1; );
       return *this;
     }
 
@@ -376,7 +357,6 @@ namespace emp {
 
 
   // Create a helper to replace & operator.
-  template <typename T> Ptr<T> ToPtr(T & _in) { return Ptr<T>(_in); }
   template <typename T> Ptr<T> ToPtr(T * _in, bool own=false) { return Ptr<T>(_in, own); }
   template <typename T> Ptr<T> TrackPtr(T * _in, bool own=true) { return Ptr<T>(_in, own); }
 
