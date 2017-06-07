@@ -165,68 +165,62 @@ namespace emp {
   };
 
 
-#undef EMP_IF_MEMTRACK
 #ifdef EMP_TRACK_MEM
-#define EMP_IF_MEMTRACK(...) __VA_ARGS__
-#else
-#define EMP_IF_MEMTRACK(...)
-#endif
 
   template <typename TYPE>
   class Ptr {
   private:
     TYPE * ptr;
-
-#ifdef EMP_TRACK_MEM
     size_t id;
+
     static PtrTracker & Tracker() { return PtrTracker::Get(); }
-#endif
+
   public:
     using element_type = TYPE;
 
-    Ptr() : ptr(nullptr) EMP_IF_MEMTRACK(, id((size_t) -1)) {
-      EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "null construct: " << ptr << std::endl; )
+    Ptr() : ptr(nullptr), id((size_t) -1) {
+      if (ptr_debug) std::cout << "null construct: " << ptr << std::endl;
     }
 
     // Construct using copy constructor
-    Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) EMP_IF_MEMTRACK(, id(_in.id)) {
-      EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "copy construct: " << ptr << std::endl; )
-      EMP_IF_MEMTRACK( Tracker().IncID(id); );
+    Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr), id(_in.id) {
+      if (ptr_debug) std::cout << "copy construct: " << ptr << std::endl;
+      Tracker().IncID(id);
     }
 
     // Construct using move constructor
-    Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr) EMP_IF_MEMTRACK(, id(_in.id)) {
-      EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "move construct: " << ptr << std::endl; )
-      EMP_IF_MEMTRACK( _in.id = (size_t) -1; )
+    Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr), id(_in.id) {
+      if (ptr_debug) std::cout << "move construct: " << ptr << std::endl;
+      _in.id = (size_t) -1;
     }
 
     // Construct from a raw pointer of campatable type.
     template <typename T2>
-    Ptr(T2 * in_ptr, bool track=false) : ptr(in_ptr) EMP_IF_MEMTRACK(, id((size_t) -1))
+    Ptr(T2 * in_ptr, bool track=false) : ptr(in_ptr), id((size_t) -1)
     {
-      EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "raw construct: " << ptr << ". track=" << track << std::endl; )
-      (void) track;            // Avoid unused parameter error when EMP_IF_MEMTRACK is off.
+      if (ptr_debug) std::cout << "raw construct: " << ptr << ". track=" << track << std::endl;
+      (void) track;            // Avoid unused parameter error when is off.
       emp_assert( (std::is_convertible<T2,TYPE>::value) );
-      EMP_IF_MEMTRACK( if (track) id = Tracker().New(ptr); )
+      if (track) id = Tracker().New(ptr);
     }
 
     // Construct from another Ptr<> object of compatable type.
     template <typename T2>
-    Ptr(Ptr<T2> _in) : ptr(_in.Raw()) EMP_IF_MEMTRACK(, id(_in.GetID())) {
-      EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "inexact copy construct: " << ptr << std::endl; )
+    Ptr(Ptr<T2> _in) : ptr(_in.Raw()), id(_in.GetID()) {
+      if (ptr_debug) std::cout << "inexact copy construct: " << ptr << std::endl;
       emp_assert( (std::is_convertible<T2,TYPE>::value) );
-      EMP_IF_MEMTRACK( Tracker().IncID(id); );
+      Tracker().IncID(id);
     }
 
     // Construct from nullptr.
     Ptr(std::nullptr_t) : Ptr() {
-      EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "null construct 2." << std::endl; )
+      if (ptr_debug) std::cout << "null construct 2." << std::endl;
     }
 
     // Destructor.
     ~Ptr() {
-      EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "descructing " << id << " (" << ptr << ")" << std::endl; )
-      EMP_IF_MEMTRACK( Tracker().DecID(id); )
+      if (ptr_debug) std::cout << "descructing " << id << " (" << ptr << ")" << std::endl;
+      Tracker().DecID(id);
     }
 
     bool IsNull() const { return ptr == nullptr; }
@@ -238,47 +232,47 @@ namespace emp {
       emp_assert(dynamic_cast<T2*>(ptr) != nullptr);
       return (T2*) ptr;
     }
-    EMP_IF_MEMTRACK( size_t GetID() const { return id; } )
+    size_t GetID() const { return id; }
 
     template <typename... T>
     void New(T &&... args) {
-      EMP_IF_MEMTRACK( Tracker().DecID(id); );       // Remove a pointer to any old memory...
-      ptr = new TYPE(std::forward<T>(args)...);     // Build a new raw pointer.
-      EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "Ptr::New() : " << ptr << std::endl; )
-      EMP_IF_MEMTRACK( id = Tracker().New(ptr); );  // And track it!
+      Tracker().DecID(id);                        // Remove a pointer to any old memory...
+      ptr = new TYPE(std::forward<T>(args)...);   // Build a new raw pointer.
+      if (ptr_debug) std::cout << "Ptr::New() : " << ptr << std::endl;
+      id = Tracker().New(ptr);                    // And track it!
     }
     void Delete() {
-      EMP_IF_MEMTRACK( Tracker().MarkDeleted(id); );
-      EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "Ptr::Delete() : " << ptr << std::endl; )
+      Tracker().MarkDeleted(id);
+      if (ptr_debug) std::cout << "Ptr::Delete() : " << ptr << std::endl;
       delete ptr;
     }
 
     // Copy assignment
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
-      EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "copy assignment" << std::endl; )
-      EMP_IF_MEMTRACK( Tracker().DecID(id); );
+      if (ptr_debug) std::cout << "copy assignment" << std::endl;
+      Tracker().DecID(id);
       ptr = _in.ptr;
-      EMP_IF_MEMTRACK( id = _in.id; );
-      EMP_IF_MEMTRACK( Tracker().IncID(id); );
+      id = _in.id;
+      Tracker().IncID(id);
       return *this;
     }
 
     // Move assignment
     Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
-      EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "move assignment" << std::endl; )
+      if (ptr_debug) std::cout << "move assignment" << std::endl;
       ptr = _in.ptr;
-      EMP_IF_MEMTRACK( id = _in.id; );
+      id = _in.id;
       _in.ptr = nullptr;
-      EMP_IF_MEMTRACK( _in.id = (size_t) -1; );
+      _in.id = (size_t) -1;
       return *this;
     }
 
     // Assign to a pointer of the correct type.
     template <typename T2>
     Ptr<TYPE> & operator=(T2 * _in) {
-      EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "raw assignment" << std::endl; )
+      if (ptr_debug) std::cout << "raw assignment" << std::endl;
       emp_assert( dynamic_cast<TYPE*>(_in) );
-      EMP_IF_MEMTRACK( if (ptr) Tracker().DecID(id); );
+      if (ptr) Tracker().DecID(id);
       ptr = _in;
       // Note: Since this ptr was passed in as a raw pointer, we do not manage it.
       return *this;
@@ -287,46 +281,46 @@ namespace emp {
     // Assign to a convertable Ptr
     template <typename T2>
     Ptr<TYPE> & operator=(Ptr<T2> _in) {
-      EMP_IF_MEMTRACK( if (ptr_debug) std::cout << "convert-copy assignment" << std::endl; )
+      if (ptr_debug) std::cout << "convert-copy assignment" << std::endl;
       emp_assert( dynamic_cast<TYPE*>(_in.Raw()) );
-      EMP_IF_MEMTRACK( Tracker().DecID(id); );
+      Tracker().DecID(id);
       ptr = _in.Raw();
-      EMP_IF_MEMTRACK( id = _in.GetID(); );
-      EMP_IF_MEMTRACK( Tracker().IncID(id); );
+      id = _in.GetID();
+      Tracker().IncID(id);
       return *this;
     }
 
     // Dereference a pointer.
     TYPE & operator*() {
       // Make sure a pointer is active before we dereference it.
-      EMP_IF_MEMTRACK( emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name()); );
+      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
       return *ptr;
     }
     const TYPE & operator*() const {
       // Make sure a pointer is active before we dereference it.
-      EMP_IF_MEMTRACK( emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name()); );
+      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
       return *ptr;
     }
 
     // Follow a pointer.
     TYPE * operator->() {
       // Make sure a pointer is active before we follow it.
-      EMP_IF_MEMTRACK( emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name()); );
+      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
       return ptr;
     }
     const TYPE * const operator->() const {
       // Make sure a pointer is active before we follow it.
-      EMP_IF_MEMTRACK( emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name()); );
+      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
       return ptr;
     }
 
     // Auto-case to raw pointer type.
     operator TYPE *() {
       // Make sure a pointer is active before we convert it.
-      EMP_IF_MEMTRACK( emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name()); );
+      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
 
       // We should not automatically convert managed pointers to raw pointers
-      EMP_IF_MEMTRACK( emp_assert(id == (size_t) -1, typeid(TYPE).name()); );
+      emp_assert(id == (size_t) -1, typeid(TYPE).name());
       return ptr;
     }
 
@@ -349,11 +343,129 @@ namespace emp {
     bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
 
     // Some debug testing functions
-#ifdef EMP_TRACK_MEM
     int DebugGetCount() const { return Tracker().GetIDCount(id); }
-#endif
 
   };
+
+
+
+#else
+
+
+  template <typename TYPE>
+  class Ptr {
+  private:
+    TYPE * ptr;
+
+  public:
+    using element_type = TYPE;
+
+    Ptr() : ptr(nullptr) { ; }
+
+    // Construct using copy constructor
+    Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) { ; }
+
+    // Construct using move constructor
+    Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr) { ; }
+
+    // Construct from a raw pointer of campatable type.
+    template <typename T2>
+    Ptr(T2 * in_ptr, bool track=false) : ptr(in_ptr) {
+      emp_assert( (std::is_convertible<T2,TYPE>::value) );
+    }
+
+    // Construct from another Ptr<> object of compatable type.
+    template <typename T2>
+    Ptr(Ptr<T2> _in) : ptr(_in.Raw()) {
+      emp_assert( (std::is_convertible<T2,TYPE>::value) );
+    }
+
+    // Construct from nullptr.
+    Ptr(std::nullptr_t) : Ptr() { ; }
+
+    // Destructor.
+    ~Ptr() { ; }
+
+    bool IsNull() const { return ptr == nullptr; }
+    TYPE * Raw() { return ptr; }
+    const TYPE * const Raw() const { return ptr; }
+    template <typename T2> T2 * Cast() { return (T2*) ptr; }
+    template <typename T2> const T2 * const Cast() const { return (T2*) ptr; }
+    template <typename T2> T2 * DynamicCast() {
+      emp_assert(dynamic_cast<T2*>(ptr) != nullptr);
+      return (T2*) ptr;
+    }
+
+    template <typename... T>
+    void New(T &&... args) {
+      ptr = new TYPE(std::forward<T>(args)...);     // Build a new raw pointer.
+    }
+    void Delete() { delete ptr; }
+
+    // Copy assignment
+    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
+      ptr = _in.ptr;
+      return *this;
+    }
+
+    // Move assignment
+    Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
+      ptr = _in.ptr;
+      _in.ptr = nullptr;
+      return *this;
+    }
+
+    // Assign to a pointer of the correct type.
+    // Note: Since this ptr was passed in as a raw pointer, we do not manage it.
+    template <typename T2>
+    Ptr<TYPE> & operator=(T2 * _in) {
+      emp_assert( dynamic_cast<TYPE*>(_in) );
+      ptr = _in;
+      return *this;
+    }
+
+    // Assign to a convertable Ptr
+    template <typename T2>
+    Ptr<TYPE> & operator=(Ptr<T2> _in) {
+      emp_assert( dynamic_cast<TYPE*>(_in.Raw()) );
+      ptr = _in.Raw();
+      return *this;
+    }
+
+    // Dereference a pointer.
+    TYPE & operator*() { return *ptr; }
+    const TYPE & operator*() const { return *ptr; }
+
+    // Follow a pointer.
+    TYPE * operator->() { return ptr; }
+    const TYPE * const operator->() const { return ptr; }
+
+    // Auto-case to raw pointer type.
+    operator TYPE *() { return ptr; }
+
+    operator bool() { return ptr != nullptr; }
+
+    // Comparisons to other Ptr objects
+    bool operator==(const Ptr<TYPE> & in_ptr) const { return ptr == in_ptr.ptr; }
+    bool operator!=(const Ptr<TYPE> & in_ptr) const { return ptr != in_ptr.ptr; }
+    bool operator<(const Ptr<TYPE> & in_ptr)  const { return ptr < in_ptr.ptr; }
+    bool operator<=(const Ptr<TYPE> & in_ptr) const { return ptr <= in_ptr.ptr; }
+    bool operator>(const Ptr<TYPE> & in_ptr)  const { return ptr > in_ptr.ptr; }
+    bool operator>=(const Ptr<TYPE> & in_ptr) const { return ptr >= in_ptr.ptr; }
+
+    // Comparisons to raw pointers.
+    bool operator==(const TYPE * in_ptr) const { return ptr == in_ptr; }
+    bool operator!=(const TYPE * in_ptr) const { return ptr != in_ptr; }
+    bool operator<(const TYPE * in_ptr)  const { return ptr < in_ptr; }
+    bool operator<=(const TYPE * in_ptr) const { return ptr <= in_ptr; }
+    bool operator>(const TYPE * in_ptr)  const { return ptr > in_ptr; }
+    bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
+
+  };
+
+#endif
+
+
 
 
   // Create a helper to replace & operator.
