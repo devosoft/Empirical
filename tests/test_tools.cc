@@ -617,61 +617,61 @@ TEST_CASE("Test info_theory", "[tools]")
 
 TEST_CASE("Test lexer_utils", "[tools]")
 {
-    emp::NFA nfa2c(3);  // Must have zero or two c's with any number of a's or b's.
-    nfa2c.AddTransition(0,0,"ab");
-    nfa2c.AddTransition(0,1,"c");
-    nfa2c.AddTransition(1,1,"ab");
-    nfa2c.AddTransition(1,2,"c");
-    nfa2c.AddTransition(2,2,"ab");
-    nfa2c.AddFreeTransition(0,2);
-    nfa2c.SetStop(2);
+  emp::NFA nfa2c(3);  // Must have zero or two c's with any number of a's or b's.
+  nfa2c.AddTransition(0,0,"ab");
+  nfa2c.AddTransition(0,1,"c");
+  nfa2c.AddTransition(1,1,"ab");
+  nfa2c.AddTransition(1,2,"c");
+  nfa2c.AddTransition(2,2,"ab");
+  nfa2c.AddFreeTransition(0,2);
+  nfa2c.SetStop(2);
 
-    emp::RegEx re2f("[de]*f[de]*f[de]*");
-    // emp::RegEx re2f("([de]*)f([de]*)f([de]*)");
-    emp::NFA nfa2f = to_NFA(re2f);
-    emp::DFA dfa2f = to_DFA(nfa2f);
-    REQUIRE( nfa2f.GetSize() == 12 );
-    REQUIRE( dfa2f.GetSize() == 3 );
+  emp::RegEx re2f("[de]*f[de]*f[de]*");
+  // emp::RegEx re2f("([de]*)f([de]*)f([de]*)");
+emp::NFA nfa2f = to_NFA(re2f);
+emp::DFA dfa2f = to_DFA(nfa2f);
+REQUIRE( nfa2f.GetSize() == 12 );
+REQUIRE( dfa2f.GetSize() == 3 );
 
-    int state;
-    state = dfa2f.Next(0, "a");        REQUIRE(state == -1); REQUIRE(dfa2f.IsStop(state) == false);
-    state = dfa2f.Next(0, "d");        REQUIRE(state == 0); REQUIRE(dfa2f.IsStop(state) == false);
-    state = dfa2f.Next(0, "defdef");   REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
-    state = dfa2f.Next(0, "fedfed");   REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
-    state = dfa2f.Next(0, "ffed");     REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
-    state = dfa2f.Next(0, "edffed");   REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
-    state = dfa2f.Next(0, "edffedf");  REQUIRE(state == -1); REQUIRE(dfa2f.IsStop(state) == false);
-    state = dfa2f.Next(0, "defed");    REQUIRE(state == 1); REQUIRE(dfa2f.IsStop(state) == false);
-    state = dfa2f.Next(0, "ff");       REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
+  int state;
+  state = dfa2f.Next(0, "a");        REQUIRE(state == -1); REQUIRE(dfa2f.IsStop(state) == false);
+  state = dfa2f.Next(0, "d");        REQUIRE(state == 0); REQUIRE(dfa2f.IsStop(state) == false);
+  state = dfa2f.Next(0, "defdef");   REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
+  state = dfa2f.Next(0, "fedfed");   REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
+  state = dfa2f.Next(0, "ffed");     REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
+  state = dfa2f.Next(0, "edffed");   REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
+  state = dfa2f.Next(0, "edffedf");  REQUIRE(state == -1); REQUIRE(dfa2f.IsStop(state) == false);
+  state = dfa2f.Next(0, "defed");    REQUIRE(state == 1); REQUIRE(dfa2f.IsStop(state) == false);
+  state = dfa2f.Next(0, "ff");       REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
 
-    emp::RegEx re_lower("[a-z]+");
-    emp::RegEx re_upper("[A-Z]+");
-    emp::RegEx re_inc("[a-z]+[A-Z]+");
-    emp::NFA nfa_lower = to_NFA(re_lower);
-    emp::NFA nfa_upper = to_NFA(re_upper);
-    emp::NFA nfa_inc = to_NFA(re_inc);
-    emp::NFA nfa_all = MergeNFA(nfa_lower, nfa_upper, nfa_inc);
-    emp::DFA dfa_lower = to_DFA(nfa_lower);
-    emp::DFA dfa_upper = to_DFA(nfa_upper);
-    emp::DFA dfa_inc = to_DFA(nfa_inc);
-    emp::DFA dfa_all = to_DFA(nfa_all);
+  emp::RegEx re_lower("[a-z]+");
+  emp::RegEx re_upper("[A-Z]+");
+  emp::RegEx re_inc("[a-z]+[A-Z]+");
+  emp::NFA nfa_lower = to_NFA(re_lower);
+  emp::NFA nfa_upper = to_NFA(re_upper);
+  emp::NFA nfa_inc = to_NFA(re_inc);
+  emp::NFA nfa_all = MergeNFA(nfa_lower, nfa_upper, nfa_inc);
+  emp::DFA dfa_lower = to_DFA(nfa_lower);
+  emp::DFA dfa_upper = to_DFA(nfa_upper);
+  emp::DFA dfa_inc = to_DFA(nfa_inc);
+  emp::DFA dfa_all = to_DFA(nfa_all);
 
-    emp::NFA_State lstate(nfa_lower);
-    lstate.Reset(); lstate.Next("abc");      REQUIRE(lstate.IsActive() == true);
-    lstate.Reset(); lstate.Next("DEF");      REQUIRE(lstate.IsActive() == false);
-    lstate.Reset(); lstate.Next("abcDEF");   REQUIRE(lstate.IsActive() == false);
-    lstate.Reset(); lstate.Next("ABDdef");   REQUIRE(lstate.IsActive() == false);
-    lstate.Reset(); lstate.Next("ABCDEF");   REQUIRE(lstate.IsActive() == false);
-    lstate.Reset(); lstate.Next("abcdefghijklmnopqrstuvwxyz");  REQUIRE(lstate.IsActive() == true);
-    lstate.Reset(); lstate.Next("ABC-DEF");  REQUIRE(lstate.IsActive() == false);
+  emp::NFA_State lstate(nfa_lower);
+  lstate.Reset(); lstate.Next("abc");      REQUIRE(lstate.IsActive() == true);
+  lstate.Reset(); lstate.Next("DEF");      REQUIRE(lstate.IsActive() == false);
+  lstate.Reset(); lstate.Next("abcDEF");   REQUIRE(lstate.IsActive() == false);
+  lstate.Reset(); lstate.Next("ABDdef");   REQUIRE(lstate.IsActive() == false);
+  lstate.Reset(); lstate.Next("ABCDEF");   REQUIRE(lstate.IsActive() == false);
+  lstate.Reset(); lstate.Next("abcdefghijklmnopqrstuvwxyz");  REQUIRE(lstate.IsActive() == true);
+  lstate.Reset(); lstate.Next("ABC-DEF");  REQUIRE(lstate.IsActive() == false);
 
-    REQUIRE( dfa_all.Next(0, "abc") == 2 );
-    REQUIRE( dfa_all.Next(0, "DEF") == 1 );
-    REQUIRE( dfa_all.Next(0, "abcDEF") == 3 );
-    REQUIRE( dfa_all.Next(0, "ABDdef") == -1 );
-    REQUIRE( dfa_all.Next(0, "ABCDEF") == 1 );
-    REQUIRE( dfa_all.Next(0, "abcdefghijklmnopqrstuvwxyz") == 2 );
-    REQUIRE( dfa_all.Next(0, "ABC-DEF") == -1 );
+  REQUIRE( dfa_all.Next(0, "abc") == 2 );
+  REQUIRE( dfa_all.Next(0, "DEF") == 1 );
+  REQUIRE( dfa_all.Next(0, "abcDEF") == 3 );
+  REQUIRE( dfa_all.Next(0, "ABDdef") == -1 );
+  REQUIRE( dfa_all.Next(0, "ABCDEF") == 1 );
+  REQUIRE( dfa_all.Next(0, "abcdefghijklmnopqrstuvwxyz") == 2 );
+  REQUIRE( dfa_all.Next(0, "ABC-DEF") == -1 );
 }
 
 
@@ -706,6 +706,7 @@ TEST_CASE("Test Lexer", "[tools]")
   REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Whitespace");
   REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Lower");
 }
+
 
 TEST_CASE("Test macro_math", "[tools]")
 {
@@ -1178,7 +1179,7 @@ TEST_CASE("Test Ptr", "[tools]")
 
   // Test non-pointer object constructor
   int base_val = 15;
-  emp::Ptr<int> ptr3(base_val);
+  emp::Ptr<int> ptr3(&base_val);
   REQUIRE(*ptr3 == 15);
   base_val = 20;                 // Make sure pointed to value changes with original variable.
   REQUIRE(*ptr3 == 20);
@@ -1212,49 +1213,49 @@ TEST_CASE("Test Ptr", "[tools]")
 
   // std::cout << ptr_set[0]->DebugGetCount() << std::endl;
 
-  // @CAO Make sure we don't delete below 0
-  // @CAO Make sure we don't delete below 1 if we own it
-  // @CAO Make sure we only delete if you own it
-  // @CAO Make sure not to delete twice!
-  // @CAO Make sure we don't add (as owner) a pointer we already own
-
-  // -- Do some direct tests on pointer trackers --
-
-  int * real_ptr1 = new int(1);  // Count of 2 in tracker
-  int * real_ptr2 = new int(2);  // Deleted in tracker
-  int * real_ptr3 = new int(3);  // Unknown to tracker
-  int * real_ptr4 = new int(4);  // Passively known to tracker (marked non-owner)
-  auto & tracker = emp::PtrTracker::Get();
-
-  tracker.New(real_ptr1);
-  tracker.Inc(real_ptr1);
-  tracker.Inc(real_ptr1);
-  tracker.Dec(real_ptr1);
-
-  tracker.New(real_ptr2);
-  tracker.MarkDeleted(real_ptr2);
-
-  tracker.Old(real_ptr4);
-
-  REQUIRE(tracker.HasPtr(real_ptr1) == true);
-  REQUIRE(tracker.HasPtr(real_ptr2) == true);
-//  REQUIRE(tracker.HasPtr(real_ptr3) == false);  // Technically may be previous pointer re-used!
-  REQUIRE(tracker.HasPtr(real_ptr4) == true);
-
-  REQUIRE(tracker.IsActive(real_ptr1) == true);
-  REQUIRE(tracker.IsActive(real_ptr2) == false);
-//  REQUIRE(tracker.IsActive(real_ptr3) == false);
-  REQUIRE(tracker.IsActive(real_ptr4) == true);
-
-  REQUIRE(tracker.IsOwner(real_ptr1) == true);
-  REQUIRE(tracker.IsOwner(real_ptr2) == true);
-//  REQUIRE(tracker.IsOwner(real_ptr3) == false);
-  REQUIRE(tracker.IsOwner(real_ptr4) == false);
-
-  REQUIRE(tracker.GetCount(real_ptr1) == 2);
-  REQUIRE(tracker.GetCount(real_ptr2) == 1);
-//  REQUIRE(tracker.GetCount(real_ptr3) == 0);
-  REQUIRE(tracker.GetCount(real_ptr4) == 1);
+//   // @CAO Make sure we don't delete below 0
+//   // @CAO Make sure we don't delete below 1 if we own it
+//   // @CAO Make sure we only delete if you own it
+//   // @CAO Make sure not to delete twice!
+//   // @CAO Make sure we don't add (as owner) a pointer we already own
+//
+//   // -- Do some direct tests on pointer trackers --
+//
+//   int * real_ptr1 = new int(1);  // Count of 2 in tracker
+//   int * real_ptr2 = new int(2);  // Deleted in tracker
+//   int * real_ptr3 = new int(3);  // Unknown to tracker
+//   int * real_ptr4 = new int(4);  // Passively known to tracker (marked non-owner)
+//   auto & tracker = emp::PtrTracker::Get();
+//
+//   tracker.New(real_ptr1);
+//   tracker.Inc(real_ptr1);
+//   tracker.Inc(real_ptr1);
+//   tracker.Dec(real_ptr1);
+//
+//   tracker.New(real_ptr2);
+//   tracker.MarkDeleted(real_ptr2);
+//
+//   tracker.Old(real_ptr4);
+//
+//   REQUIRE(tracker.HasPtr(real_ptr1) == true);
+//   REQUIRE(tracker.HasPtr(real_ptr2) == true);
+// //  REQUIRE(tracker.HasPtr(real_ptr3) == false);  // Technically may be previous pointer re-used!
+//   REQUIRE(tracker.HasPtr(real_ptr4) == true);
+//
+//   REQUIRE(tracker.IsActive(real_ptr1) == true);
+//   REQUIRE(tracker.IsActive(real_ptr2) == false);
+// //  REQUIRE(tracker.IsActive(real_ptr3) == false);
+//   REQUIRE(tracker.IsActive(real_ptr4) == true);
+//
+//   REQUIRE(tracker.IsOwner(real_ptr1) == true);
+//   REQUIRE(tracker.IsOwner(real_ptr2) == true);
+// //  REQUIRE(tracker.IsOwner(real_ptr3) == false);
+//   REQUIRE(tracker.IsOwner(real_ptr4) == false);
+//
+//   REQUIRE(tracker.GetCount(real_ptr1) == 2);
+//   REQUIRE(tracker.GetCount(real_ptr2) == 1);
+// //  REQUIRE(tracker.GetCount(real_ptr3) == 0);
+//   REQUIRE(tracker.GetCount(real_ptr4) == 1);
 }
 
 
