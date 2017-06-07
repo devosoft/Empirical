@@ -443,12 +443,12 @@ namespace emp {
     RegEx() = delete;
     RegEx(const std::string & r)
     : regex(r), notes(), valid(true), pos(0), dfa(), dfa_ready(false), head() {
-      Process(ToPtr(head));
+      Process(ToPtr(&head));
       while(head.Simplify());
     }
     RegEx(const RegEx & r)
     : regex(r.regex), notes(), valid(true), pos(0), dfa(), dfa_ready(false), head() {
-      Process(ToPtr(head));
+      Process(ToPtr(&head));
       while(head.Simplify());
     }
     ~RegEx() { ; }
@@ -459,7 +459,7 @@ namespace emp {
       valid = true;
       pos = 0;
       head.Clear();
-      Process(ToPtr(head));
+      Process(ToPtr(&head));
       while (head.Simplify());
       return *this;
     }
