@@ -174,7 +174,7 @@ namespace emp {
         for (size_t i = 0; i < nodes.size(); i++) {
           // If node is a charset with one option, replace it with a string.
           if (nodes[i]->AsCharSet() && nodes[i]->GetSize() == 1) {
-            auto new_node = new re_string(nodes[i]->AsCharSet()->First());
+            auto new_node = NewPtr<re_string>(nodes[i]->AsCharSet()->First());
             nodes[i].Delete();
             nodes[i] = new_node;
             modify = true;
@@ -196,7 +196,7 @@ namespace emp {
             nodes.insert(nodes.begin() + (long) i, old_node->nodes.begin(), old_node->nodes.end());
             old_node->nodes.resize(0);  // Don't recurse delete since nodes were moved!
             old_node.Delete();
-            // @CAO do this.
+            // @CAO do this. [Cryptic... not sure what needs to be done...]
             i--;
             modify = true;
             continue;
@@ -280,7 +280,7 @@ namespace emp {
       char c = regex[pos++];
       bool neg = false;
       if (c == '^') { neg = true; c = regex[pos++]; }
-      auto out = new re_charset;
+      auto out = NewPtr<re_charset>();
       char prev_c = -1;
       while (c != ']' && pos < regex.size()) {
         if (c == '-' && prev_c != -1) {
@@ -321,7 +321,7 @@ namespace emp {
 
     Ptr<re_string> ConstructString() {
       char c = regex[pos++];
-      auto out = new re_string;
+      auto out = NewPtr<re_string>();
       while (c != '\"' && pos < regex.size()) {
         // @CAO Error if we run out of chars before close '"'
         if (c == '\\') {
@@ -352,7 +352,7 @@ namespace emp {
       char c = regex[pos++];  // Grab the current character and move pos to next.
       switch (c) {
         case '.':
-          result = new re_charset('\n', true);  // Anything except newline.
+          result = NewPtr<re_charset>('\n', true);  // Anything except newline.
           break;
         case '(':
           result = Process();         // Process the internal contents of parens.
@@ -388,7 +388,7 @@ namespace emp {
             default:
               Error("Unknown escape char for regex: '\\", c, "'.");
           }
-          result = new re_string(c);
+          result = NewPtr<re_string>(c);
           break;
 
         // Error cases
@@ -398,12 +398,12 @@ namespace emp {
         case '?':
         case ')':
           Error("Expected regex segment but got '", c, "' at position ", pos, ".");
-          result = new re_string(c);
+          result = NewPtr<re_string>(c);
           break;
 
         default:
           // Take this char directly.
-          result = new re_string(c);
+          result = NewPtr<re_string>(c);
       }
 
       emp_assert(result != nullptr);
@@ -415,7 +415,7 @@ namespace emp {
       emp_assert(pos >= 0 && pos < regex.size(), pos, regex.size());
 
       // If caller does not provide current block, create one (and return it.)
-      if (cur_block==nullptr) cur_block = new re_block;
+      if (cur_block==nullptr) cur_block = NewPtr<re_block>();
 
       // All blocks need to start with a single token.
       cur_block->push( ConstructSegment() );
@@ -424,10 +424,10 @@ namespace emp {
         const char c = regex[pos++];
         switch (c) {
           // case '|': cur_block->push( new re_or( cur_block->pop(), ConstructSegment() ) ); break;
-          case '|': cur_block->push( new re_or( cur_block->pop(), Process() ) ); break;
-          case '*': cur_block->push( new re_star{ cur_block->pop() } ); break;
-          case '+': cur_block->push( new re_plus{ cur_block->pop() } ); break;
-          case '?': cur_block->push( new re_qm{ cur_block->pop() } ); break;
+          case '|': cur_block->push( NewPtr<re_or>( cur_block->pop(), Process() ) ); break;
+          case '*': cur_block->push( NewPtr<re_star>( cur_block->pop() ) ); break;
+          case '+': cur_block->push( NewPtr<re_plus>( cur_block->pop() ) ); break;
+          case '?': cur_block->push( NewPtr<re_qm>( cur_block->pop() ) ); break;
           case ')': pos--; return cur_block;  // Must be ending segment (restore pos to check on return)
 
           default:     // Must be a regular "segment"
