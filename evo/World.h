@@ -308,8 +308,7 @@ namespace evo {
     }
 
     void InsertAt(const ORG & mem, const size_t pos) {
-      Ptr<ORG> new_org;
-      new_org.New(mem);
+      Ptr<ORG> new_org = NewPtr<ORG>(mem);
       inject_ready_sig.Trigger(new_org.Raw());
       popM.AddOrgAt(new_org, pos);
       SetupOrg(*new_org, &callbacks, pos);
@@ -319,8 +318,7 @@ namespace evo {
     template <typename... ARGS>
     void InsertRandomOrg(ARGS &&... args) {
       emp_assert(random_ptr != nullptr && "InsertRandomOrg() requires active random_ptr");
-      Ptr<ORG> new_org;
-      new_org.New(*random_ptr, std::forward<ARGS>(args)...);
+      Ptr<ORG> new_org = NewPtr<ORG>(*random_ptr, std::forward<ARGS>(args)...);
       inject_ready_sig.Trigger(new_org.Raw());
       const size_t pos = popM.AddOrg(new_org);
       SetupOrg(*new_org, &callbacks, pos);
@@ -330,8 +328,7 @@ namespace evo {
     void InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count=1) {
       before_repro_sig.Trigger(parent_pos);
       for (size_t i = 0; i < copy_count; i++) {
-        Ptr<ORG> new_org;
-        new_org.New(mem);
+        Ptr<ORG> new_org = NewPtr<ORG>(mem);
         offspring_ready_sig.Trigger(new_org.Raw());
         const size_t pos = popM.AddOrgBirth(new_org, parent_pos);
         SetupOrg(*new_org, &callbacks, pos);
