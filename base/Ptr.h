@@ -174,6 +174,13 @@ namespace emp {
 
 #ifdef EMP_TRACK_MEM
 
+  namespace {
+    // @CAO: Build this for real!
+    template <typename FROM, typename TO>
+    bool PtrIsConvertable(FROM * ptr) { return true; }
+    // emp_assert( (std::is_same<TYPE,T2>() || dynamic_cast<TYPE*>(in_ptr)) );
+  }
+
   template <typename TYPE>
   class Ptr {
   private:
@@ -207,7 +214,7 @@ namespace emp {
     Ptr(T2 * in_ptr, bool track=false) : ptr(in_ptr), id((size_t) -1)
     {
       if (ptr_debug) std::cout << "raw construct: " << ptr << ". track=" << track << std::endl;
-      emp_assert( (std::is_convertible<T2,TYPE>::value) );
+      emp_assert( (PtrIsConvertable<T2, TYPE>(in_ptr)) );
 
       // If this pointer is already active, link to it.
       if (Tracker().IsActive(ptr)) {
@@ -222,7 +229,7 @@ namespace emp {
     template <typename T2>
     Ptr(Ptr<T2> _in) : ptr(_in.Raw()), id(_in.GetID()) {
       if (ptr_debug) std::cout << "inexact copy construct: " << ptr << std::endl;
-      emp_assert( (std::is_convertible<T2,TYPE>::value) );
+      emp_assert( (PtrIsConvertable<T2, TYPE>(_in.Raw())) );
       Tracker().IncID(id);
     }
 
@@ -286,7 +293,7 @@ namespace emp {
     template <typename T2>
     Ptr<TYPE> & operator=(T2 * _in) {
       if (ptr_debug) std::cout << "raw assignment" << std::endl;
-      emp_assert( dynamic_cast<TYPE*>(_in) );
+      emp_assert( (PtrIsConvertable<T2, TYPE>(_in)) );
 
       if (ptr) Tracker().DecID(id);   // Decrement references to former pointer at this position.
       ptr = _in;                      // Update to new pointer.
@@ -305,7 +312,7 @@ namespace emp {
     template <typename T2>
     Ptr<TYPE> & operator=(Ptr<T2> _in) {
       if (ptr_debug) std::cout << "convert-copy assignment" << std::endl;
-      emp_assert( dynamic_cast<TYPE*>(_in.Raw()) );
+      emp_assert( (PtrIsConvertable<T2, TYPE>(_in.Raw())) );
       Tracker().DecID(id);
       ptr = _in.Raw();
       id = _in.GetID();
@@ -393,15 +400,11 @@ namespace emp {
 
     // Construct from a raw pointer of campatable type (bool is unused and optional)
     template <typename T2>
-    Ptr(T2 * in_ptr, bool=false) : ptr(in_ptr) {
-      emp_assert( (std::is_convertible<T2,TYPE>::value) );
-    }
+    Ptr(T2 * in_ptr, bool=false) : ptr(in_ptr) { ; }
 
     // Construct from another Ptr<> object of compatable type.
     template <typename T2>
-    Ptr(Ptr<T2> _in) : ptr(_in.Raw()) {
-      emp_assert( (std::is_convertible<T2,TYPE>::value) );
-    }
+    Ptr(Ptr<T2> _in) : ptr(_in.Raw()) { ; }
 
     // Construct from nullptr.
     Ptr(std::nullptr_t) : Ptr() { ; }
