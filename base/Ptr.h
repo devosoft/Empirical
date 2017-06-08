@@ -417,10 +417,7 @@ namespace emp {
     const TYPE * const Raw() const { return ptr; }
     template <typename T2> T2 * Cast() { return (T2*) ptr; }
     template <typename T2> const T2 * const Cast() const { return (T2*) ptr; }
-    template <typename T2> T2 * DynamicCast() {
-      emp_assert(dynamic_cast<T2*>(ptr) != nullptr);
-      return (T2*) ptr;
-    }
+    template <typename T2> T2 * DynamicCast() { return dynamic_cast<T2*>(ptr); }
 
     template <typename... T>
     void New(T &&... args) {
@@ -445,7 +442,6 @@ namespace emp {
     // Note: Since this ptr was passed in as a raw pointer, we do not manage it.
     template <typename T2>
     Ptr<TYPE> & operator=(T2 * _in) {
-      emp_assert( dynamic_cast<TYPE*>(_in) );
       ptr = _in;
       return *this;
     }
@@ -453,7 +449,6 @@ namespace emp {
     // Assign to a convertable Ptr
     template <typename T2>
     Ptr<TYPE> & operator=(Ptr<T2> _in) {
-      emp_assert( dynamic_cast<TYPE*>(_in.Raw()) );
       ptr = _in.Raw();
       return *this;
     }
