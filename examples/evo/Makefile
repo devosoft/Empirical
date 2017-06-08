@@ -4,8 +4,9 @@ CFLAGS_version := -std=c++14
 
 # Emscripten compiler information
 CXX_web := emcc
-CXX_native := g++
-#CXX_native := g++-5
+CXX_native := clang++
+#CXX_native := g++
+
 
 OFLAGS_native_opt := -O3 -DNDEBUG
 OFLAGS_native_debug := -g -pedantic -DEMP_TRACK_MEM  -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual
