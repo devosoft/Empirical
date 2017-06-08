@@ -29,8 +29,6 @@ struct TestDerived : public TestBase {
 
 int main()
 {
-  emp::Ptr<std::string>::SetVerbose();
-
   std::string test_str = "Test String!";
   std::cout << test_str << std::endl;
 
