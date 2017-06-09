@@ -21,8 +21,6 @@ namespace emp {
   enum class evo {
     EA,       // Adds vector for next generation + changes "next" pointer to new vector
 
-    Select,   // Add functions for selection methods.
-      
     Mixed,    // Well-mixed population structure.
     Grid,     // Grid population structure.
     Pools,    // Multiple pools population structure.
@@ -34,6 +32,8 @@ namespace emp {
     CalcFit,  // Calculate fitness whenever it is needed.
     CacheFit, // Cache fitness for each organism.
     TrackFit, // Calculate all fitness at birth; track weighted ratios.
+
+    Select,   // Add functions for selection methods.
 
     Stats,    // Add extra features to track what's going on in the world. @CAO: Multiple versions?
     Lineage,  // Calculate the full phylogeny as populations continue.
