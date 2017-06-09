@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -21,6 +21,8 @@ namespace emp {
   enum class evo {
     EA,       // Adds vector for next generation + changes "next" pointer to new vector
 
+    Select,   // Add functions for selection methods.
+      
     Mixed,    // Well-mixed population structure.
     Grid,     // Grid population structure.
     Pools,    // Multiple pools population structure.
@@ -36,7 +38,7 @@ namespace emp {
     Stats,    // Add extra features to track what's going on in the world. @CAO: Multiple versions?
     Lineage,  // Calculate the full phylogeny as populations continue.
 
-    Signals,  // Tie signals into any of the above functions to override them in a more dynamic way.
+    Signals,  // Tie signals into the above functions to override them in a more dynamic way.
 
     UNKNOWN   // Unknown modifier; will trigger error.
   };
