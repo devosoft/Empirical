@@ -10,8 +10,9 @@
 
 #include "../meta/IntPack.h"
 
-#include "WorldModule.h"
-#include "WorldModule_Select.h"
+#include "WorldModule_levels.h"   // A list of available levels for WorldModules.
+#include "WorldModule.h"          // Base class setting up all modules.
+#include "WorldModule_Select.h"   // Evolutionary algorithm Selection methods.
 
 namespace emp {
 
