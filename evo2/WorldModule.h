@@ -8,6 +8,8 @@
 #ifndef EMP_EVO_WORLD_MODULE_H
 #define EMP_EVO_WORLD_MODULE_H
 
+#include <map>
+
 #include "../base/assert.h"
 #include "../base/Ptr.h"
 #include "../base/vector.h"
@@ -58,7 +60,7 @@ namespace emp {
 
   public:
     WorldModule()
-    : random_ptr(nullptr), random_owner(false), pop(), num_orgs(0) { ; }
+    : random_ptr(NewPtr<Random>()), random_owner(true), pop(), num_orgs(0) { ; }
     ~WorldModule() {
       Clear();
       if (random_owner) random_ptr.Delete();
