@@ -21,6 +21,7 @@ namespace emp {
     using parent_t::pop;
 
     // Parent member functions
+    using parent_t::CalcFitness;
     using parent_t::IsOccupied;
 
   public:
@@ -36,7 +37,7 @@ namespace emp {
       std::multimap<double, size_t> fit_map;
       for (size_t i = 0; i < pop.size(); i++) {
         if (IsOccupied(i)){
-          const double cur_fit = CalcFitness(i, pop[i].AsPtr(), fit_fun);
+          const double cur_fit = CalcFitness(*pop[i], fit_fun);
           fit_map.insert( std::make_pair(cur_fit, i) );
         }
       }
@@ -44,7 +45,7 @@ namespace emp {
       // Grab the top fitnesses and move them into the next generation.
       auto m = fit_map.rbegin();
       for (size_t i = 0; i < e_count; i++) {
-        InsertBirth( *(pop[m->second]), m->second, copy_count);
+        this->InsertBirth( *(pop[m->second]), m->second, copy_count);
         ++m;
       }
     }
