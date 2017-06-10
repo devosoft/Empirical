@@ -21,7 +21,7 @@
 #ifndef EMP_PTR_H
 #define EMP_PTR_H
 
-#include <map>
+#include <unordered_map>
 
 #include "assert.h"
 #include "vector.h"
@@ -29,8 +29,10 @@
 namespace emp {
 
   namespace {
-    constexpr bool ptr_debug = false;
+    bool ptr_debug = false;
   }
+  void SetPtrDebug(bool _d = true) { ptr_debug = _d; }
+  bool GetPtrDebug() { return ptr_debug; }
 
   class PtrInfo {
   private:
@@ -78,7 +80,7 @@ namespace emp {
 
   class PtrTracker {
   private:
-    std::map<void *, size_t> ptr_id;
+    std::unordered_map<void *, size_t> ptr_id;
     emp::vector<PtrInfo> id_info;
 
     // Make PtrTracker a singleton.
