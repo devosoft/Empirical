@@ -94,6 +94,14 @@ namespace emp {
       emp_assert(default_fit_fun);
       return CalcFitness(org, default_fit_fun);
     }
+    double CalcFitnessID(size_t id) { return CalcFitness(pop[id]); }
+    double CalcFitnessID(size_t id, const fit_fun_t & fun) { return CalcFitness(pop[id], fun); }
+
+    void CalcFitnessAll(const fit_fun_t & fit_fun) const {
+      // Calculting fitness of all organisms doesn't have return values, so the only advantage is
+      // if you are caching the results.
+      emp_assert(false, "Trying to calculate fitness of all orgs without caching.");
+    }
 
     // --- MANIPULATE ORGS IN POPULATION ---
 
