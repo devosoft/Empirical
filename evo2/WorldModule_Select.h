@@ -18,6 +18,7 @@ namespace emp {
     using fit_fun_t = typename parent_t::fit_fun_t;
 
     // Parent member vars.
+    using parent_t::default_fit_fun;
     using parent_t::pop;
 
     // Parent member functions
@@ -50,11 +51,11 @@ namespace emp {
       }
     }
 
-  //   // Elite Selection can use the default fitness function.
-  //   void EliteSelect(size_t e_count=1, size_t copy_count=1) {
-  //     EliteSelect(orgM.GetFitFun(), e_count, copy_count);
-  //   }
-  //
+    // Elite Selection can use the default fitness function.
+    void EliteSelect(size_t e_count=1, size_t copy_count=1) {
+      EliteSelect(default_fit_fun, e_count, copy_count);
+    }
+
   //   // Roulette Selection (aka Fitness-Proportional Selection) chooses organisms to
   //   // reproduce based on their current fitness.
   //   void RouletteSelect(const fit_fun_t & fit_fun, size_t count=1) {
