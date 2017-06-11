@@ -24,6 +24,10 @@ namespace emp {
     // Parent member functions
     using parent_t::IsOccupied;
 
+    // Caching-specific members.
+    emp::vector<double> fit_cache;  // vector size == 0 when not caching; invalid values == 0.
+
+    double GetCache(size_t id) const { return (id < fit_cache.size()) ? fit_cache[id] : 0.0; }
   public:
 
     // Override fitness calculation methods
@@ -34,8 +38,20 @@ namespace emp {
       return CalcFitnessOrg(org, default_fit_fun);
     }
 
-    double CalcFitnessID(size_t id) { return CalcFitnessOrg(pop[id]); }
-    double CalcFitnessID(size_t id, const fit_fun_t & fun) { return CalcFitnessOrg(pop[id], fun); }
+    double CalcFitnessID(size_t id, const fit_fun_t & fun) {
+      double cur_fit = GetCache(id);
+      if (cur_fit == 0.0 && pop[id]) {   // If org is non-null, but no cached fitness, calculate it!
+        if (id >= fit_cache.size()) fit_cache.resize(id+1, 0.0);
+        cur_fit = parent_t::CalcFitnessOrg(*pop[id], fun);
+        fit_cache[id] = cur_fit;
+      }
+      return cur_fit;
+    }
+
+    double CalcFitnessID(size_t id) {
+      emp_assert(default_fit_fun);
+      return CalcFitnessID(id, default_fit_fun);
+    }
 
     void CalcFitnessAll(const fit_fun_t & fit_fun) const {
       for (size_t id = 0; id < pop.size(); id++) CalcFitnessID(id, fit_fun);
