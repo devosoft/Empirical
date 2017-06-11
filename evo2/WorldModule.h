@@ -89,13 +89,13 @@ namespace emp {
 
     // When calculating fitness, the three relevant inputs are the organism, the fitness function,
     // and the position in the population.
-    double CalcFitness(ORG & org, const fit_fun_t & fit_fun) { return fit_fun(org); }
-    double CalcFitness(ORG & org) {
+    double CalcFitnessOrg(ORG & org, const fit_fun_t & fit_fun) { return fit_fun(org); }
+    double CalcFitnessOrg(ORG & org) {
       emp_assert(default_fit_fun);
-      return CalcFitness(org, default_fit_fun);
+      return CalcFitnessOrg(org, default_fit_fun);
     }
-    double CalcFitnessID(size_t id) { return CalcFitness(pop[id]); }
-    double CalcFitnessID(size_t id, const fit_fun_t & fun) { return CalcFitness(pop[id], fun); }
+    double CalcFitnessID(size_t id) { return CalcFitnessOrg(*pop[id]); }
+    double CalcFitnessID(size_t id, const fit_fun_t & fun) { return CalcFitnessOrg(*pop[id], fun); }
 
     void CalcFitnessAll(const fit_fun_t & fit_fun) const {
       // Calculting fitness of all organisms doesn't have return values, so the only advantage is

@@ -22,7 +22,7 @@ namespace emp {
     using parent_t::pop;
 
     // Parent member functions
-    using parent_t::CalcFitness;
+    using parent_t::CalcFitnessOrg;
     using parent_t::IsOccupied;
 
   public:
@@ -38,7 +38,7 @@ namespace emp {
       std::multimap<double, size_t> fit_map;
       for (size_t i = 0; i < pop.size(); i++) {
         if (IsOccupied(i)){
-          const double cur_fit = CalcFitness(*pop[i], fit_fun);
+          const double cur_fit = CalcFitnessOrg(*pop[i], fit_fun);
           fit_map.insert( std::make_pair(cur_fit, i) );
         }
       }
@@ -53,25 +53,32 @@ namespace emp {
 
     // Elite Selection can use the default fitness function.
     void EliteSelect(size_t e_count=1, size_t copy_count=1) {
+      emp_assert(default_fit_fun);
       EliteSelect(default_fit_fun, e_count, copy_count);
     }
 
-  //   // Roulette Selection (aka Fitness-Proportional Selection) chooses organisms to
-  //   // reproduce based on their current fitness.
-  //   void RouletteSelect(const fit_fun_t & fit_fun, size_t count=1) {
-  //     emp_assert(fit_fun);
-  //     emp_assert(count > 0);
-  //     emp_assert(random_ptr != nullptr && "RouletteSelect() requires active random_ptr");
+  // // Roulette Selection (aka Fitness-Proportional Selection) chooses organisms to
+  // // reproduce based on their current fitness.
+  // void RouletteSelect(const fit_fun_t & fit_fun, size_t count=1) {
+  //   emp_assert(fit_fun);
+  //   emp_assert(random_ptr != nullptr);
   //
-  //     pop.CalcFitnessAll(fit_fun);
+  //   // Make sure all fitnesses are up-to-date.
+  //   this->CalcFitnessAll(fit_fun);
   //
-  //     for (size_t n = 0; n < count; n++) {
-  //       const double fit_pos = random_ptr->GetDouble(fitM.GetTotalFitness());
-  //       size_t id = fitM.At(fit_pos);
-  //       InsertBirth( *(pop[id]), id, 1, fit_fun );
-  //     }
+  //   for (size_t n = 0; n < count; n++) {
+  //     const double fit_pos = random_ptr->GetDouble(this->GetTotalFitness());
+  //     size_t id = fit_tracker.At(fit_pos);
+  //     InsertBirth( *(pop[id]), id, 1, fit_fun );
   //   }
+  // }
   //
+  // // Elite Selection can use the default fitness function.
+  // void RouletteSelect(size_t count=1) {
+  //   emp_assert(default_fit_fun);
+  //   RouletteSelect(default_fit_fun, count);
+  // }
+
   //   // Tournament Selection creates a tournament with a random sub-set of organisms,
   //   // finds the one with the highest fitness, and moves it to the next generation.
   //   // User provides the fitness function, the tournament size, and (optionally) the

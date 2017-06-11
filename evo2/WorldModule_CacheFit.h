@@ -27,15 +27,15 @@ namespace emp {
   public:
 
     // Override fitness calculation methods
-    double CalcFitness(ORG & org, const fit_fun_t & fit_fun) { return fit_fun(org); }
+    double CalcFitnessOrg(ORG & org, const fit_fun_t & fit_fun) { return fit_fun(org); }
 
-    double CalcFitness(ORG & org) {
+    double CalcFitnessOrg(ORG & org) {
       emp_assert(default_fit_fun);
-      return CalcFitness(org, default_fit_fun);
+      return CalcFitnessOrg(org, default_fit_fun);
     }
 
-    double CalcFitnessID(size_t id) { return CalcFitness(pop[id]); }
-    double CalcFitnessID(size_t id, const fit_fun_t & fun) { return CalcFitness(pop[id], fun); }
+    double CalcFitnessID(size_t id) { return CalcFitnessOrg(pop[id]); }
+    double CalcFitnessID(size_t id, const fit_fun_t & fun) { return CalcFitnessOrg(pop[id], fun); }
 
     void CalcFitnessAll(const fit_fun_t & fit_fun) const {
       for (size_t id = 0; id < pop.size(); id++) CalcFitnessID(id, fit_fun);
