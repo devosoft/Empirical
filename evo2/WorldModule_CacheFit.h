@@ -28,15 +28,14 @@ namespace emp {
     emp::vector<double> fit_cache;  // vector size == 0 when not caching; invalid values == 0.
 
     double GetCache(size_t id) const { return (id < fit_cache.size()) ? fit_cache[id] : 0.0; }
+
   public:
+    void SetCache(const emp::vector<double> & in_cache) { fit_cache = in_cache; }
+    void SetCacheID(size_t id, double fitness) { fit_cache[id] = fitness; }
+    void ClearCache() { fit_cache.resize(0); }
 
     // Override fitness calculation methods
     double CalcFitnessOrg(ORG & org, const fit_fun_t & fit_fun) { return fit_fun(org); }
-
-    double CalcFitnessOrg(ORG & org) {
-      emp_assert(default_fit_fun);
-      return CalcFitnessOrg(org, default_fit_fun);
-    }
 
     double CalcFitnessID(size_t id, const fit_fun_t & fun) {
       double cur_fit = GetCache(id);
@@ -48,15 +47,9 @@ namespace emp {
       return cur_fit;
     }
 
-    double CalcFitnessID(size_t id) {
-      emp_assert(default_fit_fun);
-      return CalcFitnessID(id, default_fit_fun);
-    }
-
     void CalcFitnessAll(const fit_fun_t & fit_fun) const {
       for (size_t id = 0; id < pop.size(); id++) CalcFitnessID(id, fit_fun);
     }
-
   };
 
 
