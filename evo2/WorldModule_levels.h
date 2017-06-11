@@ -22,13 +22,16 @@ namespace emp {
 
 //    Environment, // Setup environmental resources (for use in fitness calculations.)
 
+    Insert,   // Add Insert* functions for putting new organisms into the population. [DEFAULT]
+              // Requires: Updated AddOrg and AddOrgAt (updated in population structures)
+
     // --- FITNESS CACHING METHOS ---
     // Default: Calculate fitness each time it is needed.
 //    CacheFit, // Cache fitness for each organism.
 //    TrackFit, // Calculate all fitness at birth; track weighted ratios.
 
-    Select,   // Add functions for selection methods.
-              // Requires: Insert* to be defined.
+    Select,   // Add functions for selection methods. [DEFAULT?]
+              // Requires: Insert* to be defined (in Insert).
 
 //    Stats,    // Add extra features to track what's going on in the world. @CAO: Multiple versions?
 //    Lineage,  // Calculate the full phylogeny as populations continue.
