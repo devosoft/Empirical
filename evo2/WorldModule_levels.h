@@ -27,7 +27,7 @@ namespace emp {
 
     // --- FITNESS CACHING METHOS ---
     // Default: Calculate fitness each time it is needed.
-//    CacheFit, // Cache fitness for each organism.
+    CacheFit, // Cache fitness for each organism.
 //    TrackFit, // Calculate all fitness at birth; track weighted ratios.
 
     Select,   // Add functions for selection methods. [DEFAULT?]

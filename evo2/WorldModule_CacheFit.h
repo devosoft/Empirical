@@ -18,15 +18,15 @@ namespace emp {
     using fit_fun_t = typename parent_t::fit_fun_t;
 
     // Parent member vars.
+    using parent_t::default_fit_fun;
     using parent_t::pop;
 
     // Parent member functions
-    using parent_t::CalcFitness;
     using parent_t::IsOccupied;
 
   public:
 
-    // Override fitness calculation methods 
+    // Override fitness calculation methods
     double CalcFitness(ORG & org, const fit_fun_t & fit_fun) { return fit_fun(org); }
 
     double CalcFitness(ORG & org) {
@@ -34,10 +34,13 @@ namespace emp {
       return CalcFitness(org, default_fit_fun);
     }
 
+    double CalcFitnessID(size_t id) { return CalcFitness(pop[id]); }
+    double CalcFitnessID(size_t id, const fit_fun_t & fun) { return CalcFitness(pop[id], fun); }
+
     void CalcFitnessAll(const fit_fun_t & fit_fun) const {
-      for (size_t id = 0; id < pop.size(); id++) fitM.CalcFitness(id, pop[id], fit_fun);
+      for (size_t id = 0; id < pop.size(); id++) CalcFitnessID(id, fit_fun);
     }
-    
+
   };
 
 
