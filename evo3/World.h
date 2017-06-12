@@ -157,8 +157,41 @@ namespace emp {
 
     //     iterator_t begin() { return iterator_t(this, 0); }
     //     iterator_t end() { return iterator_t(this, (int) pop.size()); }
-  };
 
+
+    // --- SELECTION MECHANISMS ---
+    // Elite Selection picks a set of the most fit individuals from the population to move to
+    // the next generation.  Find top e_count individuals and make copy_count copies of each.
+    void EliteSelect(const fit_fun_t & fit_fun, size_t e_count=1, size_t copy_count=1) {
+      emp_assert(fit_fun);
+      emp_assert(e_count > 0 && e_count <= pop.size());
+      emp_assert(copy_count > 0);
+      
+      // Load the population into a multimap, sorted by fitness.
+      std::multimap<double, size_t> fit_map;
+      for (size_t i = 0; i < pop.size(); i++) {
+	if (IsOccupied(i)){
+	const double cur_fit = CalcFitnessOrg(*pop[i], fit_fun);
+	fit_map.insert( std::make_pair(cur_fit, i) );
+	}
+      }
+      
+      // Grab the top fitnesses and move them into the next generation.
+      auto m = fit_map.rbegin();
+      for (size_t i = 0; i < e_count; i++) {
+	this->InsertBirth( *(pop[m->second]), m->second, copy_count);
+	++m;
+      }
+    }
+    
+    // Elite Selection can use the default fitness function.
+    void EliteSelect(size_t e_count=1, size_t copy_count=1) {
+      emp_assert(default_fit_fun);
+      EliteSelect(default_fit_fun, e_count, copy_count);
+    }
+    
+  };
+  
 
   // === Out-of-class member function definitions from above ===
 
