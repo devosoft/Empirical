@@ -30,7 +30,7 @@ namespace emp {
   template <typename ORG, emp::evo... MODS>
   class World : public World_Interface<ORG, pack::RUsort<IntPack<(int) MODS...>>> {
   private:
-    using parent_t = WorldModule<ORG, MODS...>;
+    using parent_t = World_Interface<ORG, pack::RUsort<IntPack<(int) MODS...>>>;
     using typename parent_t::fit_fun_t;
     using parent_t::random_ptr;
     using parent_t::AddOrg;
