@@ -5,17 +5,17 @@
 #include <iostream>
 
 #include "../../games/Othello.h"
-#include "../../hardware/AvidaGP.h"
+#include "../../hardware/AvidaGPMem.h"
 #include "../../hardware/InstLib.h"
 #include "../../tools/Random.h"
 #include "../../evo/World.h"
 #include <stdlib.h>
 #include <utility>
 
-constexpr size_t POP_SIZE = 1000;
+constexpr size_t POP_SIZE = 100;
 constexpr size_t GENOME_SIZE = 100;
-constexpr size_t EVAL_TIME = 1000;
-constexpr size_t UPDATES = 100;
+constexpr size_t EVAL_TIME = 500;
+constexpr size_t UPDATES = 500;
 constexpr size_t TOURNY_SIZE = 4;
 
 // Determine the next move of a human player.
