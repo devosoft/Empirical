@@ -221,18 +221,24 @@ namespace emp {
 
   template<typename ORG, typename GENOTYPE>
   size_t World<ORG,GENOTYPE>::AddOrgAt(Ptr<ORG> new_org, size_t pos) {
-    emp_assert(pos < pop.size());   // Make sure we are placing into a legal position.
-    if (pop[pos]) { pop[pos].Delete(); --num_orgs; }
-    pop[pos] = new_org;
+    pop_t & target_pop = synchronous_gen ? next_pop : pop;
+
+    if (target_pop.size() <= pos) target_pop.resize(pos+1, nullptr);  // Make sure we have room.
+    if (target_pop[pos]) { pop[pos].Delete(); --num_orgs; }         // Clear out any old org.
+    target_pop[pos] = new_org;                                      // Place new org.
     ++num_orgs;
+
     return pos;
   }
 
   template<typename ORG, typename GENOTYPE>
   size_t World<ORG,GENOTYPE>::AddOrgAppend(Ptr<ORG> new_org) {
-    const size_t pos = pop.size();
-    pop.push_back(new_org);
+    pop_t & target_pop = synchronous_gen ? next_pop : pop;
+
+    const size_t pos = target_pop.size();
+    target_pop.push_back(new_org);
     ++num_orgs;
+
     return pos;
   }
 
