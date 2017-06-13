@@ -44,7 +44,7 @@ namespace emp {
     enum class InstID {
       Inc, Dec, Not, SetReg, Add, Sub, Mult, Div, Mod, TestEqu, TestNEqu, TestLess,
       If, While, Countdown, Break, Scope, Define, Call,
-      GetMem, Input, Output, CopyVal, ScopeReg,
+      GetMem, SetMem, Input, Output, CopyVal, ScopeReg,
       Unknown
     };
 
@@ -113,18 +113,19 @@ namespace emp {
     // A simple way of recording which traits a CPU has demonstrated, and at what qaulity.
     emp::vector<double> traits;
 
-    double GetMem(size_t block, size_t posReg) {
+    double GetMem(size_t block, double posReg) {
       if (mem[block].size() == 0) return 0.0;
-      bool full = emp::Has(mem[block], int(regs[posReg]));
+      bool full = emp::Has(mem[block], int(posReg));
       if (!full) return 0.0;
-      double out = mem[block][int(regs[posReg])];
+      double out = mem[block][int(posReg)];
+      //std::cout<< "######### GETT Block: " << block << " Pos: " << int(posReg) << " Value: " << int(out) << std::endl;
       return out;
     }
 
-    /*void PushStack(size_t id, double value) {
-      if (stacks[id].size() >= STACK_CAP) return;
-      stacks[id].push_back(value);
-    }*/
+    void SetMem(size_t block, double posReg, double value) {
+      mem[block][int(posReg)] = value;
+      //std::cout<< "SET Block: " << block << " Pos: " << int(posReg) << " Value: " << int(value) << std::endl;
+    }
 
     size_t CurScope() const { return scope_stack.back().scope; }
     ScopeType CurScopeType() const { return scope_stack.back().type; }
@@ -389,8 +390,8 @@ namespace emp {
       }
       break;
 
-    //case InstID::Push: PushStack(inst.args[1], regs[inst.args[0]]); break;
-    case InstID::GetMem: regs[inst.args[2]] = GetMem(inst.args[0], inst.args[1]); break;
+    case InstID::SetMem: SetMem(inst.args[2], regs[inst.args[0]], regs[inst.args[1]]); break;
+    case InstID::GetMem: regs[inst.args[2]] = GetMem(inst.args[0], regs[inst.args[1]]); break;
     case InstID::Input: {
         // Determine the input ID and grab it if it exists; if not, return 0.0
         int input_id = (int) regs[ inst.args[0] ];
@@ -562,7 +563,7 @@ namespace emp {
       inst_lib.AddInst(InstID::Scope, "Scope", 1, "Enter scope Arg1");
       inst_lib.AddInst(InstID::Define, "Define", 2, "Build function Arg1 in scope Arg2");
       inst_lib.AddInst(InstID::Call, "Call", 1, "Call previously defined function Arg1");
-      //inst_lib.AddInst(InstID::Push, "Push", 2, "Push reg Arg1 onto stack Arg2");
+      inst_lib.AddInst(InstID::SetMem, "SetMem", 3, "Put reg Arg3 into mem block Arg1 at position reg Arg2"); //TODO 
       inst_lib.AddInst(InstID::GetMem, "GetMem", 3, "Get from block Arg1 position reg Arg2 into reg Arg3");
       inst_lib.AddInst(InstID::Input, "Input", 2, "Pull next value from input Arg1 into reg Arg2");
       inst_lib.AddInst(InstID::Output, "Output", 2, "Push reg Arg1 into output Arg2");
