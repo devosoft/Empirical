@@ -191,6 +191,11 @@ namespace emp {
     // the next generation.  Find top e_count individuals and make copy_count copies of each.
     void EliteSelect(size_t e_count=1, size_t copy_count=1);
 
+    // Tournament Selection creates a tournament with a random sub-set of organisms,
+    // finds the one with the highest fitness, and moves it to the next generation.
+    // User provides the fitness function, the tournament size, and (optionally) the
+    // number of tournaments to run.
+    void TournamentSelect(size_t t_size, size_t tourny_count=1);
   };
 
 
@@ -359,6 +364,8 @@ namespace emp {
     }
   }
 
+  // Elite Selection picks a set of the most fit individuals from the population to move to
+  // the next generation.  Find top e_count individuals and make copy_count copies of each.
   template<typename ORG, typename GENOTYPE>
   void World<ORG,GENOTYPE>::EliteSelect(size_t e_count, size_t copy_count) {
     emp_assert(fun_calc_fitness);
@@ -377,10 +384,44 @@ namespace emp {
     // Grab the top fitnesses and move them into the next generation.
     auto m = fit_map.rbegin();
     for (size_t i = 0; i < e_count; i++) {
-      this->InsertBirth( *(pop[m->second]), m->second, copy_count);
+      InsertBirth( *(pop[m->second]), m->second, copy_count);
       ++m;
     }
   }
+
+  // Tournament Selection creates a tournament with a random sub-set of organisms,
+  // finds the one with the highest fitness, and moves it to the next generation.
+  // User provides the fitness function, the tournament size, and (optionally) the
+  // number of tournaments to run.
+  template<typename ORG, typename GENOTYPE>
+  void World<ORG,GENOTYPE>::TournamentSelect(size_t t_size, size_t tourny_count) {
+    emp_assert(fun_calc_fitness);
+    emp_assert(t_size > 0 && t_size <= num_orgs, t_size, num_orgs);
+    emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
+
+    emp::vector<size_t> entries;
+    for (size_t T = 0; T < tourny_count; T++) {
+      entries.resize(0);
+      // Choose organisms for this tournament (with replacement!)
+      for (size_t i=0; i<t_size; i++) entries.push_back( GetRandomOrgID() );
+
+      double best_fit = CalcFitnessID(entries[0]);
+      size_t best_id = entries[0];
+
+      // Search for a higher fit org in the tournament.
+      for (size_t i = 1; i < t_size; i++) {
+        const double cur_fit = CalcFitnessID(entries[i]);
+        if (cur_fit > best_fit) {
+          best_fit = cur_fit;
+          best_id = entries[i];
+        }
+      }
+
+      // Place the highest fitness into the next generation!
+      InsertBirth( *(pop[best_id]), best_id, 1 );
+    }
+  }
+
 
 }
 
