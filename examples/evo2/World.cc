@@ -20,12 +20,18 @@ struct TestOrg1 {
 };
 
 int main() {
-  emp::World<int> world;
+  emp::World<int, emp::evo::CacheFit, /* emp::evo::Insert, */ emp::evo::Select> world;
   for (int i = 0; i < 100; i++) {
     world.Insert(i+100,2);
   }
 
   std::cout << "Start Size = " << world.GetSize() << std::endl;
+  for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
+  std::cout << std::endl;
+
+  world.EliteSelect([](int & i){ return (double) i; }, 10, 10);
+
+  std::cout << "\nElite Select(10,10)" << std::endl;
   for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
   std::cout << std::endl;
 
