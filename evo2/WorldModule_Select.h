@@ -15,7 +15,7 @@ namespace emp {
   protected:
     // Parent-related types.
     using parent_t = WorldModule<ORG, MODS...>;
-    using fit_fun_t = typename parent_t::fit_fun_t;
+    using typename parent_t::fit_fun_t;
 
     // Parent member vars.
     using parent_t::default_fit_fun;
