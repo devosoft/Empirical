@@ -33,11 +33,13 @@ namespace emp {
     // Main member variables
     Ptr<Random> random_ptr;         // Random object to use.
     pop_t pop;                      // All of the spots in the population.
+    pop_t next_pop;                 // Population being setup for next generation.
     size_t num_orgs;                // How many organisms are actually in the population.
     emp::vector<double> fit_cache;  // vector size == 0 when not caching; uncached values == 0.
 
     // Boolean values...
     bool random_owner;        // Did we create our own random number generator?
+    bool synchronous_gen;     // Should generations be prefectly synchronous?
     bool cache_on;            // Should we be caching fitness values?
 
     // Configurable functions.
@@ -92,6 +94,17 @@ namespace emp {
     const ORG & operator[](size_t pos) const {
       emp_assert(pop[pos] != nullptr);  // Should not index to a null organism!
       return *(pop[pos]);
+    }
+
+
+    // Updating the world!
+
+    void Update() {
+      // If generations are synchronous, put the next generation in place.
+      if (synchronous_gen) {
+        std::swap(pop, next_pop);
+        next_pop.resize(0);
+      }
     }
 
 
@@ -150,6 +163,11 @@ namespace emp {
 
     // Get random *occupied* cell.
     size_t GetRandomOrgID();
+
+    // --- POPULATION MODES ---
+
+    void ModeBasic() { synchronous_gen = false; }
+    void ModeEA() { synchronous_gen = true; }
 
 
     // --- POPULATION ANALYSIS ---
