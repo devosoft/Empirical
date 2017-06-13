@@ -9,8 +9,14 @@
 #define EMP_EVO_WORLD_H
 
 #include <functional>
+#include <map>
 
+#include "../base/Ptr.h"
 #include "../base/vector.h"
+#include "../meta/reflection.h"
+#include "../tools/Random.h"
+#include "../tools/random_utils.h"
+#include "../tools/string_utils.h"
 
 namespace emp {
 
@@ -44,6 +50,9 @@ namespace emp {
     size_t AddOrgAt(Ptr<ORG> new_org, size_t pos);
     size_t AddOrgAppend(Ptr<ORG> new_org);
 
+    // Default Add functions that will be updated.
+    size_t AddOrgBirth_Default(Ptr<ORG> new_org, size_t parent_pos);
+
     // Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
@@ -55,7 +64,13 @@ namespace emp {
       : random_ptr(NewPtr<Random>()), pop(), num_orgs(0)
       , random_owner(true), cache_on(false)
       , fun_calc_fitness(), fun_add_org(), fun_add_birth()
-    { ; }
+    {
+      fun_add_org = [this](Ptr<ORG> new_org) { return AddOrgAppend(new_org); };
+
+      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_pos) {
+        return AddOrgBirth_Default(new_org, parent_pos);
+      };
+    }
     ~World() {
       Clear();
       if (random_owner) random_ptr.Delete();
@@ -219,19 +234,19 @@ namespace emp {
   }
 
   template<typename ORG, typename GENOTYPE>
-  size_t World<ORG,GENOTYPE>::AddOrgBirth(Ptr<ORG> new_org, size_t parent_pos) {
+  size_t World<ORG,GENOTYPE>::AddOrgBirth_Default(Ptr<ORG> new_org, size_t parent_pos) {
     emp_assert(random_ptr); // Random must be set before being used.
     const size_t pos = random_ptr->GetUInt(pop.size());
     return AddOrgAt(new_org, pos);
   }
 
   template<typename ORG, typename GENOTYPE>
-  double World<ORG,GENOTYPE>::CalcFitnessID(size_t id, const fun_calc_fitness_t & fun) {
-    if (!cache_on) return CalcFitnessOrg(*pop[id], fun);
+  double World<ORG,GENOTYPE>::CalcFitnessID(size_t id) {
+    if (!cache_on) return CalcFitnessOrg(*pop[id]);
     double cur_fit = GetCache(id);
     if (cur_fit == 0.0 && pop[id]) {   // If org is non-null, but no cached fitness, calculate it!
       if (id >= fit_cache.size()) fit_cache.resize(id+1, 0.0);
-      cur_fit = parent_t::CalcFitnessOrg(*pop[id], fun);
+      cur_fit = CalcFitnessOrg(*pop[id]);
       fit_cache[id] = cur_fit;
     }
     return cur_fit;
@@ -254,24 +269,24 @@ namespace emp {
     num_orgs--;
   }
 
-  template <typename ORG>
+  template <typename ORG, typename GENOTYPE>
   void World<ORG,GENOTYPE>::Insert(const ORG & mem, size_t copy_count) {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       //const size_t pos =
-      AddOrg(new_org);
+      fun_add_org(new_org);
       //SetupOrg(*new_org, &callbacks, pos);
     }
   }
 
-  template <typename ORG>
+  template <typename ORG, typename GENOTYPE>
   void World<ORG,GENOTYPE>::InsertAt(const ORG & mem, const size_t pos) {
     Ptr<ORG> new_org = NewPtr<ORG>(mem);
     AddOrgAt(new_org, pos);
     // SetupOrg(*new_org, &callbacks, pos);
   }
 
-  template <typename ORG>
+  template <typename ORG, typename GENOTYPE>
   template <typename... ARGS>
   void World<ORG,GENOTYPE>::InsertRandomOrg(ARGS &&... args) {
     emp_assert(random_ptr != nullptr && "InsertRandomOrg() requires active random_ptr");
@@ -281,25 +296,12 @@ namespace emp {
     // SetupOrg(*new_org, &callbacks, pos);
   }
 
-  template <typename ORG>
+  template <typename ORG, typename GENOTYPE>
   void World<ORG,GENOTYPE>::InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count) {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       // const size_t pos =
-      AddOrgBirth(new_org, parent_pos);
-      // SetupOrg(*new_org, &callbacks, pos);
-    }
-  }
-
-  // If InsertBirth is provided with a fitness function, use it to calculate fitness of new org.
-  template <typename ORG>
-  void World<ORG,GENOTYPE>::InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count) {
-    for (size_t i = 0; i < copy_count; i++) {
-      Ptr<ORG> new_org = NewPtr<ORG>(mem);
-      // const size_t pos =
-      AddOrgBirth(new_org, parent_pos);
-      // If we offspring are placed into the same population, recalculate fitness.
-      // CalcFitness(pos);
+      fun_add_birth(new_org, parent_pos);
       // SetupOrg(*new_org, &callbacks, pos);
     }
   }
