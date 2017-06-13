@@ -19,16 +19,25 @@ namespace emp {
   private:
     using ptr_t = Ptr<ORG>;
     using pop_t = emp::vector<ptr_t>;
-    using fit_fun_t = std::function<double(ORG&)>;
 
-    Ptr<Random> random_ptr;   // Random object to use.
+    using fun_calc_fitness_t = std::function<double(ORG&)>;
+    using fun_add_org_t      = std::function<size_t(Ptr<ORG>)>;
+    using fun_add_birth_t    = std::function<size_t(Ptr<ORG>, size_t)>;
+
+    // Main member variables
+    Ptr<Random> random_ptr;         // Random object to use.
+    pop_t pop;                      // All of the spots in the population.
+    size_t num_orgs;                // How many organisms are actually in the population.
+    emp::vector<double> fit_cache;  // vector size == 0 when not caching; uncached values == 0.
+
+    // Boolean values...
     bool random_owner;        // Did we create our own random number generator?
-    pop_t pop;                // All of the spots in the population.
-    size_t num_orgs;          // How many organisms are actually in the population.
+    bool cache_on;            // Should we be caching fitness values?
 
-    fit_fun_t fun_calc_fitness;                             // Fitness function
-    std::function<size_t(Ptr<ORG>)> fun_add_org;            // Technique to inject a new organism.
-    std::function<size_t(Ptr<ORG>, size_t)> fun_add_birth;  // Technique to add a new offspring.
+    // Configurable functions.
+    fun_calc_fitness_t fun_calc_fitness;  // Fitness function
+    fun_add_org_t      fun_add_org;       // Technique to inject a new organism.
+    fun_add_birth_t    fun_add_birth;     // Technique to add a new offspring.
     
 
     // AddOrgAt & AddOrgAppend are the only ways to add organisms (others must go through these)
@@ -38,10 +47,13 @@ namespace emp {
     // Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
+    // Other private functions:
+    double GetCache(size_t id) const { return (id < fit_cache.size()) ? fit_cache[id] : 0.0; }
 
   public:
     World()
-      : random_ptr(NewPtr<Random>()), random_owner(true), pop(), num_orgs(0)
+      : random_ptr(NewPtr<Random>()), pop(), num_orgs(0)
+      , random_owner(true), cache_on(false)
       , fun_calc_fitness(), fun_add_org(), fun_add_birth()
     { ; }
     ~World() {
@@ -72,14 +84,24 @@ namespace emp {
 
     // When calculating fitness, the three relevant inputs are the organism, the fitness function,
     // and the position in the population.
-    double CalcFitnessOrg(ORG & org, const fit_fun_t & fit_fun) { return fit_fun(org); }
-    double CalcFitnessID(size_t id, const fit_fun_t & fun) { return CalcFitnessOrg(*pop[id], fun); }
-
-    void CalcFitnessAll(const fit_fun_t & fit_fun) const {
-      // Calculting fitness of all organisms doesn't have return values, so the only advantage is
-      // if you are caching the results.
-      emp_assert(false, "Trying to calculate fitness of all orgs without caching.");
+    double CalcFitnessOrg(ORG & org, const fun_calc_fitness_t & fit_fun) { return fit_fun(org); }
+    double CalcFitnessID(size_t id, const fun_calc_fitness_t & fun) {
+      if (cache_on) return CalcFitnessOrg(*pop[id], fun);
+      double cur_fit = GetCache(id);
+      if (cur_fit == 0.0 && pop[id]) {   // If org is non-null, but no cached fitness, calculate it!
+        if (id >= fit_cache.size()) fit_cache.resize(id+1, 0.0);
+        cur_fit = parent_t::CalcFitnessOrg(*pop[id], fun);
+        fit_cache[id] = cur_fit;
+      }
+      return cur_fit;
     }
+
+    void CalcFitnessAll(const fun_calc_fitness_t & fit_fun) const {
+      emp_assert(cache_on, "Trying to calculate fitness of all orgs without caching.");
+      for (size_t id = 0; id < pop.size(); id++) CalcFitnessID(id, fit_fun);
+    }
+
+    void ClearCache() { fit_cache.resize(0); }
 
     // --- MANIPULATE ORGS IN POPULATION ---
 
@@ -105,7 +127,7 @@ namespace emp {
 
     // If InsertBirth is provided with a fitness function, immediately calculate fitness of new org.
     void InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count,
-                     const fit_fun_t & fit_fun);
+                     const fun_calc_fitness_t & fit_fun);
 
     // --- RANDOM FUNCTIONS ---
 
@@ -162,7 +184,7 @@ namespace emp {
     // --- SELECTION MECHANISMS ---
     // Elite Selection picks a set of the most fit individuals from the population to move to
     // the next generation.  Find top e_count individuals and make copy_count copies of each.
-    void EliteSelect(const fit_fun_t & fit_fun, size_t e_count=1, size_t copy_count=1) {
+    void EliteSelect(const fun_calc_fitness_t & fit_fun, size_t e_count=1, size_t copy_count=1) {
       emp_assert(fit_fun);
       emp_assert(e_count > 0 && e_count <= pop.size());
       emp_assert(copy_count > 0);
@@ -276,7 +298,7 @@ namespace emp {
   // If InsertBirth is provided with a fitness function, use it to calculate fitness of new org.
   template <typename ORG>
   void World<ORG,GENOTYPE>::InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count,
-                                     const fit_fun_t & fit_fun) {
+                                     const fun_calc_fitness_t & fit_fun) {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       // const size_t pos =
