@@ -4,6 +4,17 @@
 //
 //
 //  This file defines the base class for a World template for use in evolutionary algorithms.
+//
+//
+//  There are three ways that organisms can enter the population:
+//   * InjectAt(org, pos) - place the organism at the specified position in the population.
+//   * Inject(org) - place the organism using a default postion (given other settings).
+//   * DoBirth(org, parent_pos) - place the organism using current birth settings.
+//
+//  If the population is in EA mode (with synchronous generations), DoBirth will place offspring in
+//  a "next generation" placeholder population.  Update() will move orgs into primary population.
+//
+//  All insertions into the popoulation funnel through private function AddOrgAt(org, pos);
 
 #ifndef EMP_EVO_WORLD_H
 #define EMP_EVO_WORLD_H
@@ -27,24 +38,24 @@ namespace emp {
     using pop_t = emp::vector<ptr_t>;
 
     using fun_calc_fitness_t = std::function<double(ORG&)>;
-    using fun_add_org_t      = std::function<size_t(Ptr<ORG>)>;
+    using fun_add_inject_t   = std::function<size_t(Ptr<ORG>)>;
     using fun_add_birth_t    = std::function<size_t(Ptr<ORG>, size_t)>;
 
-    // Main member variables
+    // Internal state member variables
     Ptr<Random> random_ptr;         // Random object to use.
+    bool random_owner;              // Did we create our own random number generator?
     pop_t pop;                      // All of the spots in the population.
     pop_t next_pop;                 // Population being setup for next generation.
     size_t num_orgs;                // How many organisms are actually in the population.
     emp::vector<double> fit_cache;  // vector size == 0 when not caching; uncached values == 0.
 
-    // Boolean values...
-    bool random_owner;        // Did we create our own random number generator?
+    // Configuration settings
     bool synchronous_gen;     // Should generations be prefectly synchronous?
     bool cache_on;            // Should we be caching fitness values?
 
     // Configurable functions.
     fun_calc_fitness_t fun_calc_fitness;  // Fitness function
-    fun_add_org_t      fun_add_org;       // Technique to inject a new organism.
+    fun_add_inject_t   fun_add_inject;    // Technique to inject a new organism.
     fun_add_birth_t    fun_add_birth;     // Technique to add a new offspring.
 
 
@@ -62,12 +73,12 @@ namespace emp {
 
   public:
     World()
-      : random_ptr(NewPtr<Random>()), pop(), num_orgs(0)
-      , random_owner(true), cache_on(false)
-      , fun_calc_fitness(), fun_add_org(), fun_add_birth()
+      : random_ptr(NewPtr<Random>()), random_owner(true), pop(), num_orgs(0)
+      , synchronous_gen(false), cache_on(false)
+      , fun_calc_fitness(), fun_add_inject(), fun_add_birth()
     {
       // By default, push an org on the end of the population.
-      fun_add_org = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
+      fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
 
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_pos) {
         return AddOrgBirth_Default(new_org, parent_pos);
@@ -147,17 +158,17 @@ namespace emp {
       pop.resize(new_size, nullptr);                                // Default new orgs to null.
     }
 
-    // Insert an organism using the default insertion scheme.
-    void Insert(const ORG & mem, size_t copy_count=1);
+    // Inject an organism using the default injection scheme.
+    void Inject(const ORG & mem, size_t copy_count=1);
 
-    // Inset and organism at a specific position.
-    void InsertAt(const ORG & mem, const size_t pos);
+    // Inject an organism at a specific position.
+    void InjectAt(const ORG & mem, const size_t pos);
 
-    // Insert a random organism (constructor must facilitate!)
-    template <typename... ARGS> void InsertRandomOrg(ARGS &&... args);
+    // Inject a random organism (constructor must facilitate!)
+    template <typename... ARGS> void InjectRandomOrg(ARGS &&... args);
 
-    // Insert a newborn by default rules, with parent information.
-    void InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count=1);
+    // Place a newborn into the population, by default rules and with parent information.
+    void DoBirth(const ORG mem, size_t parent_pos, size_t copy_count=1);
 
     // --- RANDOM FUNCTIONS ---
 
@@ -301,17 +312,17 @@ namespace emp {
   }
 
   template <typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::Insert(const ORG & mem, size_t copy_count) {
+  void World<ORG,GENOTYPE>::Inject(const ORG & mem, size_t copy_count) {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       //const size_t pos =
-      fun_add_org(new_org);
+      fun_add_inject(new_org);
       //SetupOrg(*new_org, &callbacks, pos);
     }
   }
 
   template <typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::InsertAt(const ORG & mem, const size_t pos) {
+  void World<ORG,GENOTYPE>::InjectAt(const ORG & mem, const size_t pos) {
     Ptr<ORG> new_org = NewPtr<ORG>(mem);
     AddOrgAt(new_org, pos);
     // SetupOrg(*new_org, &callbacks, pos);
@@ -319,16 +330,16 @@ namespace emp {
 
   template <typename ORG, typename GENOTYPE>
   template <typename... ARGS>
-  void World<ORG,GENOTYPE>::InsertRandomOrg(ARGS &&... args) {
-    emp_assert(random_ptr != nullptr && "InsertRandomOrg() requires active random_ptr");
+  void World<ORG,GENOTYPE>::InjectRandomOrg(ARGS &&... args) {
+    emp_assert(random_ptr != nullptr && "InjectRandomOrg() requires active random_ptr");
     Ptr<ORG> new_org = NewPtr<ORG>(*random_ptr, std::forward<ARGS>(args)...);
     // const size_t pos =
-    fun_add_org(new_org);
+    fun_add_inject(new_org);
     // SetupOrg(*new_org, &callbacks, pos);
   }
 
   template <typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::InsertBirth(const ORG mem, size_t parent_pos, size_t copy_count) {
+  void World<ORG,GENOTYPE>::DoBirth(const ORG mem, size_t parent_pos, size_t copy_count) {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       // const size_t pos =
@@ -430,7 +441,7 @@ namespace emp {
     // Grab the top fitnesses and move them into the next generation.
     auto m = fit_map.rbegin();
     for (size_t i = 0; i < e_count; i++) {
-      InsertBirth( *(pop[m->second]), m->second, copy_count);
+      DoBirth( *(pop[m->second]), m->second, copy_count);
       ++m;
     }
   }
@@ -464,7 +475,7 @@ namespace emp {
       }
 
       // Place the highest fitness into the next generation!
-      InsertBirth( *(pop[best_id]), best_id, 1 );
+      DoBirth( *(pop[best_id]), best_id, 1 );
     }
   }
 
