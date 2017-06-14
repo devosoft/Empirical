@@ -44,7 +44,7 @@ namespace emp {
     enum class InstID {
       Inc, Dec, Not, SetReg, Add, Sub, Mult, Div, Mod, TestEqu, TestNEqu, TestLess,
       If, While, Countdown, Break, Scope, Define, Call,
-      GetMem, SetMem, Input, Output, CopyVal, ScopeReg,
+      GetMem, SetMem, CopyMem, ShiftMem, Input, Output, CopyVal, ScopeReg,
       Unknown
     };
 
@@ -125,6 +125,20 @@ namespace emp {
     void SetMem(size_t block, double posReg, double value) {
       mem[block][int(posReg)] = value;
       //std::cout<< "SET Block: " << block << " Pos: " << int(posReg) << " Value: " << int(value) << std::endl;
+    }
+
+    void CopyMem(size_t block_from, size_t block_to) {
+      mem[block_to] = mem[block_from];
+      //std::cout<< "COPY Block To: " << block_to << " Block From: " << block_from << std::endl;
+    }
+
+    void ShiftMem(size_t block, size_t shift_amount) {
+      std::unordered_map<int, double> new_map;
+      for (auto el : mem[block]) {
+        new_map[el.first + shift_amount] = el.second;
+        //std::cout<<"Start Location: " << el.first<< " Shift: " << shift_amount << " New Location: " << el.first + shift_amount << std::endl;
+      }
+      mem[block] = new_map;
     }
 
     size_t CurScope() const { return scope_stack.back().scope; }
@@ -392,6 +406,8 @@ namespace emp {
 
     case InstID::SetMem: SetMem(inst.args[2], regs[inst.args[0]], regs[inst.args[1]]); break;
     case InstID::GetMem: regs[inst.args[2]] = GetMem(inst.args[0], regs[inst.args[1]]); break;
+    case InstID::CopyMem: CopyMem(inst.args[0], inst.args[1]); break;
+    case InstID::ShiftMem: ShiftMem(inst.args[0], inst.args[1]); break;
     case InstID::Input: {
         // Determine the input ID and grab it if it exists; if not, return 0.0
         int input_id = (int) regs[ inst.args[0] ];
@@ -412,7 +428,7 @@ namespace emp {
 
     case InstID::Unknown:
     default:
-      // This case should never happen!
+      // This case should never happen
       emp_assert(false, "Unknown instruction being exectuted!");
     };
   }
@@ -565,6 +581,8 @@ namespace emp {
       inst_lib.AddInst(InstID::Call, "Call", 1, "Call previously defined function Arg1");
       inst_lib.AddInst(InstID::SetMem, "SetMem", 3, "Put reg Arg3 into mem block Arg1 at position reg Arg2"); //TODO 
       inst_lib.AddInst(InstID::GetMem, "GetMem", 3, "Get from block Arg1 position reg Arg2 into reg Arg3");
+      inst_lib.AddInst(InstID::CopyMem, "CopyMem", 2, "Copy memory block Arg1 into memory block Arg2");
+      inst_lib.AddInst(InstID::ShiftMem, "ShiftMem", 2, "Shift memory block Arg1 into memory block Arg2");
       inst_lib.AddInst(InstID::Input, "Input", 2, "Pull next value from input Arg1 into reg Arg2");
       inst_lib.AddInst(InstID::Output, "Output", 2, "Push reg Arg1 into output Arg2");
       inst_lib.AddInst(InstID::CopyVal, "CopyVal", 2, "Copy reg Arg1 into reg Arg2");
