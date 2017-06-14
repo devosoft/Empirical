@@ -48,9 +48,8 @@ namespace emp {
     fun_add_birth_t    fun_add_birth;     // Technique to add a new offspring.
 
 
-    // AddOrgAt & AddOrgAppend are the only ways to add organisms (others must go through these)
+    // AddOrgAt is the only way to add organisms (others must go through here)
     size_t AddOrgAt(Ptr<ORG> new_org, size_t pos);
-    size_t AddOrgAppend(Ptr<ORG> new_org);
 
     // Default Add functions that will be updated.
     size_t AddOrgBirth_Default(Ptr<ORG> new_org, size_t parent_pos);
@@ -67,7 +66,7 @@ namespace emp {
       , random_owner(true), cache_on(false)
       , fun_calc_fitness(), fun_add_org(), fun_add_birth()
     {
-      fun_add_org = [this](Ptr<ORG> new_org) { return AddOrgAppend(new_org); };
+      fun_add_org = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, num_orgs); };
 
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_pos) {
         return AddOrgBirth_Default(new_org, parent_pos);
@@ -103,6 +102,7 @@ namespace emp {
       // If generations are synchronous, put the next generation in place.
       if (synchronous_gen) {
         std::swap(pop, next_pop);
+        for (ptr_t x : next_pop) if (x) x.Delete();
         next_pop.resize(0);
       }
     }
@@ -223,21 +223,10 @@ namespace emp {
   size_t World<ORG,GENOTYPE>::AddOrgAt(Ptr<ORG> new_org, size_t pos) {
     pop_t & target_pop = synchronous_gen ? next_pop : pop;
 
-    if (target_pop.size() <= pos) target_pop.resize(pos+1, nullptr);  // Make sure we have room.
-    if (target_pop[pos]) { pop[pos].Delete(); --num_orgs; }         // Clear out any old org.
-    target_pop[pos] = new_org;                                      // Place new org.
-    ++num_orgs;
-
-    return pos;
-  }
-
-  template<typename ORG, typename GENOTYPE>
-  size_t World<ORG,GENOTYPE>::AddOrgAppend(Ptr<ORG> new_org) {
-    pop_t & target_pop = synchronous_gen ? next_pop : pop;
-
-    const size_t pos = target_pop.size();
-    target_pop.push_back(new_org);
-    ++num_orgs;
+    if (target_pop.size() <= pos) target_pop.resize(pos+1, nullptr); // Make sure we have room.
+    if (target_pop[pos]) { pop[pos].Delete(); --num_orgs; }          // Clear out any old org.
+    target_pop[pos] = new_org;                                       // Place new org.
+    ++num_orgs;                                                      // Track number of orgs.
 
     return pos;
   }
