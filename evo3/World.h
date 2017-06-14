@@ -91,7 +91,7 @@ namespace emp {
     // We ONLY have a const index operator since manipulations should go through other functions.
     // No non-const version.
     const ORG & operator[](size_t pos) const {
-      emp_assert(pop[pos] != nullptr);  // Should not index to a null organism!
+      emp_assert(pop[pos] != nullptr, pos);  // Should not index to a null organism!
       return *(pop[pos]);
     }
 
@@ -99,6 +99,9 @@ namespace emp {
     // Updating the world!
 
     void Update() {
+      std::cout << ":: pop.size() = " << pop.size() << std::endl;
+      std::cout << ":: next_pop.size() = " << next_pop.size() << std::endl;
+
       // If generations are synchronous, put the next generation in place.
       if (synchronous_gen) {
         // Add all waiting organisms into the population.
@@ -109,7 +112,8 @@ namespace emp {
         for (size_t i = next_pop.size(); i < pop.size(); i++) {
           if (pop[i]) pop[i].Delete();
         }
-        // Reset next population.
+        // Reset populations.
+        pop.resize(next_pop.size());
         next_pop.resize(0);
       }
     }
@@ -223,33 +227,35 @@ namespace emp {
     void TournamentSelect(size_t t_size, size_t tourny_count=1);
   };
 
-
-  // === Out-of-class member function definitions from above ===
+  // =============================================================
+  // ===                                                       ===
+  // ===  Out-of-class member function definitions from above  ===
+  // ===                                                       ===
+  // =============================================================
 
   template<typename ORG, typename GENOTYPE>
   size_t World<ORG,GENOTYPE>::AddOrgAt(Ptr<ORG> new_org, size_t pos) {
-
-    if (synchronous_gen) {
-      if (next_pop.size() <= pos) next_pop.resize(pos+1, nullptr);  // Make sure we have room.
-      if (next_pop[pos]) { next_pop[pos].Delete(); }                // Clear out any old org.
-      next_pop[pos] = new_org;                                      // Place new org.
-    }
-
-    else {
-      if (pop.size() <= pos) pop.resize(pos+1, nullptr);  // Make sure we have room.
-      if (pop[pos]) { pop[pos].Delete(); --num_orgs; }    // Clear out any old org.
-      pop[pos] = new_org;                                 // Place new org.
-      ++num_orgs;                                         // Track number of orgs.
-    }
+    if (pop.size() <= pos) pop.resize(pos+1, nullptr);   // Make sure we have room.
+    if (pop[pos]) { pop[pos].Delete(); --num_orgs; }     // Clear out any old org.
+    pop[pos] = new_org;                                  // Place new org.
+    ++num_orgs;                                          // Track number of orgs.
 
     return pos;
   }
 
   template<typename ORG, typename GENOTYPE>
   size_t World<ORG,GENOTYPE>::AddOrgBirth_Default(Ptr<ORG> new_org, size_t parent_pos) {
-    emp_assert(random_ptr);                              // Random must be set before being used.
-    const size_t pos = random_ptr->GetUInt(pop.size());  // By default, replace random organism.
-    return AddOrgAt(new_org, pos);                       // Place org in population.
+    emp_assert(random_ptr);                                // Random must be set before being used.
+    const size_t pos = random_ptr->GetUInt(pop.size());    // By default, replace random organism.
+
+    if (synchronous_gen) {
+      if (next_pop.size() <= pos) next_pop.resize(pos+1, nullptr);  // Make sure we have room.
+      if (next_pop[pos]) { next_pop[pos].Delete(); }                // Clear out any old org.
+      next_pop[pos] = new_org;                                      // Place new org.
+    }
+    else AddOrgAt(new_org, pos);                       // Place org in population.
+
+    return pos;
   }
 
   template<typename ORG, typename GENOTYPE>
