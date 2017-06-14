@@ -21,6 +21,8 @@ struct TestOrg1 {
 
 int main() {
   emp::World<int> world;
+  world.ModeEA();
+  
   world.SetFitFun([](int & i){ return (double) i; });
   for (int i = 0; i < 100; i++) {
     world.Insert(i+100,2);
@@ -37,7 +39,7 @@ int main() {
   std::cout << std::endl;
 
   world.TournamentSelect(5, 100);
-//  world.Update();
+  world.Update();
   std::cout << "\nPost-Tourney Size = " << world.GetSize() << std::endl << std::endl;
   for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
   std::cout << std::endl;
