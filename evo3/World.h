@@ -66,7 +66,8 @@ namespace emp {
       , random_owner(true), cache_on(false)
       , fun_calc_fitness(), fun_add_org(), fun_add_birth()
     {
-      fun_add_org = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, num_orgs); };
+      // By default, push an org on the end of the population.
+      fun_add_org = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
 
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_pos) {
         return AddOrgBirth_Default(new_org, parent_pos);
@@ -106,7 +107,7 @@ namespace emp {
       if (synchronous_gen) {
         // Add all waiting organisms into the population.
         for (size_t i = 0; i < next_pop.size(); i++) {
-          AddOrgAt(next_pop[i], i);
+          if (next_pop[i]) AddOrgAt(next_pop[i], i);
         }
         // Remove any remaining organisms in main population.
         for (size_t i = next_pop.size(); i < pop.size(); i++) {
@@ -235,6 +236,8 @@ namespace emp {
 
   template<typename ORG, typename GENOTYPE>
   size_t World<ORG,GENOTYPE>::AddOrgAt(Ptr<ORG> new_org, size_t pos) {
+    emp_assert(new_org, pos);
+
     if (pop.size() <= pos) pop.resize(pos+1, nullptr);   // Make sure we have room.
     if (pop[pos]) { pop[pos].Delete(); --num_orgs; }     // Clear out any old org.
     pop[pos] = new_org;                                  // Place new org.
@@ -245,15 +248,23 @@ namespace emp {
 
   template<typename ORG, typename GENOTYPE>
   size_t World<ORG,GENOTYPE>::AddOrgBirth_Default(Ptr<ORG> new_org, size_t parent_pos) {
-    emp_assert(random_ptr);                                // Random must be set before being used.
-    const size_t pos = random_ptr->GetUInt(pop.size());    // By default, replace random organism.
+    emp_assert(random_ptr);               // Random must be set before being used.
+    emp_assert(new_org);                  // New organism must exist.
+    emp_assert(parent_pos < pop.size());  // Parent must be at a legal position in the population.
+
+    size_t pos = 0;
 
     if (synchronous_gen) {
-      if (next_pop.size() <= pos) next_pop.resize(pos+1, nullptr);  // Make sure we have room.
-      if (next_pop[pos]) { next_pop[pos].Delete(); }                // Clear out any old org.
-      next_pop[pos] = new_org;                                      // Place new org.
+      next_pop.push_back(new_org);
+      // @CAO: Below assumes we might not just be pushing to the back...
+      // if (next_pop.size() <= pos) next_pop.resize(pos+1, nullptr);  // Make sure we have room.
+      // if (next_pop[pos]) { next_pop[pos].Delete(); }                // Clear out any old org.
+      // next_pop[pos] = new_org;                                      // Place new org.
     }
-    else AddOrgAt(new_org, pos);                       // Place org in population.
+    else {
+      pos = random_ptr->GetUInt(pop.size());    // By default, replace random organism.
+      AddOrgAt(new_org, pos);                       // Place org in  existing population.
+    }
 
     return pos;
   }
