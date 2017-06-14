@@ -108,8 +108,8 @@ namespace evo {
     void Clear() {
       // Delete all organisms.
       for (ptr_t org : pop) if (org) org.Delete();  // Delete current organisms.
-      pop.resize(0);                              // Remove deleted organisms.
-      fitM.ClearPop();                               // Clear the fitness manager cache.
+      pop.resize(0);                                // Remove deleted organisms.
+      fitM.ClearPop();                              // Clear the fitness manager cache.
       num_orgs = 0;
     }
 
@@ -311,7 +311,7 @@ namespace evo {
     }
 
     void ClearNext() {
-      for (ptr_t m : next_pop) if (m) delete m;
+      for (ptr_t m : next_pop) if (m) m.Delete();
       next_pop.resize(0);
     }
 

@@ -32,21 +32,24 @@ int main()
   std::string test_str = "Test String!";
   std::cout << test_str << std::endl;
 
-  emp::Ptr<std::string> test_ptr(test_str);   // false -> don't track!
+  emp::Ptr<std::string> test_ptr(&test_str);   // false -> don't track!
   std::cout << "From Ptr: " << *test_ptr << std::endl;
   std::cout << "  with size = " << test_ptr->size() << std::endl;
 
   {
-    emp::Ptr<std::string> test_ptr2(test_str);
+    emp::Ptr<std::string> test_ptr2(&test_str);
   }
 
   emp::Ptr<int> int_ptr;
   int_ptr.New(123456);
   std::cout << "*int_ptr = " << *int_ptr << std::endl;
   int_ptr.Delete();
+  std::cout << "Deleted int_ptr." << std::endl;
 
 
   // Examples with base and derived classes.
   emp::Ptr<TestBase> ptr_base = new TestDerived(5);
   emp::Ptr<TestDerived> ptr_derived(ptr_base.Cast<TestDerived>());
+
+  std::cout << "End of main()." << std::endl;
 }

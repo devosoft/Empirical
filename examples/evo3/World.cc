@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../evo2/World.h"
+#include "../../evo3/World.h"
 #include "../../tools/Random.h"
 
 struct TestOrg1 {
@@ -20,27 +20,30 @@ struct TestOrg1 {
 };
 
 int main() {
-  emp::World<int, emp::evo::CacheFit, /* emp::evo::Insert, */ emp::evo::Select> world;
+  emp::World<int> world;
+  world.ModeEA();
+  
+  world.SetFitFun([](int & i){ return (double) i; });
   for (int i = 0; i < 100; i++) {
     world.Insert(i+100,2);
   }
 
-  std::cout << "Start Size = " << world.GetSize() << std::endl;
+  std::cout << "Start Size = " << world.GetSize() << std::endl << std::endl;
   for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
   std::cout << std::endl;
 
-  world.EliteSelect([](int & i){ return (double) i; }, 10, 10);
+  world.EliteSelect(10, 10);
 
-  std::cout << "\nElite Select(10,10)" << std::endl;
+  std::cout << "\nElite Select(10,10)\n" << std::endl;
   for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
   std::cout << std::endl;
 
-  // world.TournamentSelect([](int * i){ return (double) *i; }, 5, 100);
-  // world.Update();
-  // std::cout << "Post-Tourney Size = " << world.GetSize() << std::endl;
-  // for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
-  // std::cout << std::endl;
-  //
+  world.TournamentSelect(5, 100);
+  world.Update();
+  std::cout << "\nPost-Tourney Size = " << world.GetSize() << std::endl << std::endl;
+  for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
+  std::cout << std::endl;
+
   // // Populations can be supplied a default fitness function so that it doesn't
   // // need to keep being specified.
   // world.SetDefaultFitnessFun([](int * i){ return (double) *i; });

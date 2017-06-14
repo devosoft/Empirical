@@ -16,6 +16,7 @@
 #include <map>
 #include <string>
 
+#include "../meta/TypePack.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/map_utils.h"
 

@@ -15,6 +15,7 @@
 #include <sstream>
 #include <string>
 
+#include "../base/vector.h"
 #include "TypePack.h"
 
 
@@ -97,6 +98,17 @@ namespace emp{
 
   // Standard library templates.
   //  template <typename... Ts> struct TemplateID<std::array<Ts...>> { static std::string GetName() { return "array"; } };
+
+  template<typename T, typename... Ts> struct TypeID< emp::vector<T,Ts...> > {
+    static std::string GetName() {
+      using simple_vt = emp::vector<T>;
+      using full_vt = emp::vector<T,Ts...>;
+      if (std::is_same<simple_vt,full_vt>::value) {
+        return "emp::vector<" + TypeID<T>::GetName() + ">";
+      }
+      return "emp::vector<" + TypeID<TypePack<T,Ts...>>::GetTypes() + ">";
+    }
+  };
 
 }
 
