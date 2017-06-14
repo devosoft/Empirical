@@ -101,8 +101,15 @@ namespace emp {
     void Update() {
       // If generations are synchronous, put the next generation in place.
       if (synchronous_gen) {
-        std::swap(pop, next_pop);
-        for (ptr_t x : next_pop) if (x) x.Delete();
+        // Add all waiting organisms into the population.
+        for (size_t i = 0; i < next_pop.size(); i++) {
+          AddOrgAt(next_pop[i], i);
+        }
+        // Remove any remaining organisms in main population.
+        for (size_t i = next_pop.size(); i < pop.size(); i++) {
+          if (pop[i]) pop[i].Delete();
+        }
+        // Reset next population.
         next_pop.resize(0);
       }
     }
@@ -221,21 +228,28 @@ namespace emp {
 
   template<typename ORG, typename GENOTYPE>
   size_t World<ORG,GENOTYPE>::AddOrgAt(Ptr<ORG> new_org, size_t pos) {
-    pop_t & target_pop = synchronous_gen ? next_pop : pop;
 
-    if (target_pop.size() <= pos) target_pop.resize(pos+1, nullptr); // Make sure we have room.
-    if (target_pop[pos]) { pop[pos].Delete(); --num_orgs; }          // Clear out any old org.
-    target_pop[pos] = new_org;                                       // Place new org.
-    ++num_orgs;                                                      // Track number of orgs.
+    if (synchronous_gen) {
+      if (next_pop.size() <= pos) next_pop.resize(pos+1, nullptr);  // Make sure we have room.
+      if (next_pop[pos]) { next_pop[pos].Delete(); }                // Clear out any old org.
+      next_pop[pos] = new_org;                                      // Place new org.
+    }
+
+    else {
+      if (pop.size() <= pos) pop.resize(pos+1, nullptr);  // Make sure we have room.
+      if (pop[pos]) { pop[pos].Delete(); --num_orgs; }    // Clear out any old org.
+      pop[pos] = new_org;                                 // Place new org.
+      ++num_orgs;                                         // Track number of orgs.
+    }
 
     return pos;
   }
 
   template<typename ORG, typename GENOTYPE>
   size_t World<ORG,GENOTYPE>::AddOrgBirth_Default(Ptr<ORG> new_org, size_t parent_pos) {
-    emp_assert(random_ptr); // Random must be set before being used.
-    const size_t pos = random_ptr->GetUInt(pop.size());
-    return AddOrgAt(new_org, pos);
+    emp_assert(random_ptr);                              // Random must be set before being used.
+    const size_t pos = random_ptr->GetUInt(pop.size());  // By default, replace random organism.
+    return AddOrgAt(new_org, pos);                       // Place org in population.
   }
 
   template<typename ORG, typename GENOTYPE>
@@ -253,8 +267,10 @@ namespace emp {
   // Delete all organisms.
   template<typename ORG, typename GENOTYPE>
   void World<ORG,GENOTYPE>::Clear() {
-    for (ptr_t org : pop) if (org) org.Delete();  // Delete current organisms.
-    pop.resize(0);                                // Remove deleted organisms.
+    for (ptr_t org : pop) if (org) org.Delete();       // Delete current organisms.
+    for (ptr_t org : next_pop) if (org) org.Delete();  // Delete waiting organisms.
+    pop.resize(0);                                     // Remove deleted organisms.
+    next_pop.resize(0);
     num_orgs = 0;
   }
 
@@ -290,7 +306,7 @@ namespace emp {
     emp_assert(random_ptr != nullptr && "InsertRandomOrg() requires active random_ptr");
     Ptr<ORG> new_org = NewPtr<ORG>(*random_ptr, std::forward<ARGS>(args)...);
     // const size_t pos =
-    AddOrg(new_org);
+    fun_add_org(new_org);
     // SetupOrg(*new_org, &callbacks, pos);
   }
 
@@ -382,7 +398,7 @@ namespace emp {
   template<typename ORG, typename GENOTYPE>
   void World<ORG,GENOTYPE>::EliteSelect(size_t e_count, size_t copy_count) {
     emp_assert(fun_calc_fitness);
-    emp_assert(e_count > 0 && e_count <= pop.size());
+    emp_assert(e_count > 0 && e_count <= pop.size(), e_count);
     emp_assert(copy_count > 0);
 
     // Load the population into a multimap, sorted by fitness.
