@@ -66,9 +66,6 @@ namespace emp {
     // AddOrgAt is the only way to add organisms (others must go through here)
     size_t AddOrgAt(Ptr<ORG> new_org, size_t pos);
 
-    // Default Add functions that will be updated.
-    size_t DoBirth_Default(Ptr<ORG> new_org, size_t parent_pos);
-
     // Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
@@ -109,86 +106,14 @@ namespace emp {
 
     // --- Configure ---
 
-    void ConfigFuns() {
-      // Setup AddInject...
-      switch (pop_struct) {
-      case Struct::MIXED:
-        fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
-        break;
-      case Struct::GRID:
-        break;
-      case Struct::POOLS:
-        break;
-      case Struct::EXTERNAL:
-        // Do nothing; these should be set... externally.
-        break;
-      }
-
-      // Setup AddBirth, which may be based on population structure.
-      if (synchronous_gen) {
-      switch (pop_struct) {
-        case Struct::MIXED:
-          fun_add_birth = [this](Ptr<ORG> new_org, size_t) {
-            emp_assert(new_org);                           // New organism must exist.
-            next_pop.push_back(new_org);
-            return next_pop.size() - 1;
-          };
-          break;
-        case Struct::GRID:
-          break;
-        case Struct::POOLS:
-          break;
-        case Struct::EXTERNAL:
-          // Do nothing; these should be set... externally.
-          break;
-        }
-      }
-
-      // Otherwise asynchronous...
-      else {
-        switch (pop_struct) {
-        case Struct::MIXED:
-          fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
-          fun_add_birth = [this](Ptr<ORG> new_org, size_t) {
-            emp_assert(new_org);                           // New organism must exist.
-            size_t pos = random_ptr->GetUInt(pop.size());  // Place in random position.
-            return AddOrgAt(new_org, pos);                 // Place org in  existing population.
-          };
-          break;
-        case Struct::GRID:
-          break;
-        case Struct::POOLS:
-          break;
-        case Struct::EXTERNAL:
-          // Do nothing; these should be set... externally.
-          break;
-        }
-      }
-
-    }
+    void ModeBasic() { synchronous_gen = false; ConfigFuns(); }
+    void ModeEA() { synchronous_gen = true; ConfigFuns(); }
+    void ConfigFuns();
 
 
     // --- Updating the world! ---
 
-    void Update() {
-      std::cout << ":: pop.size() = " << pop.size() << std::endl;
-      std::cout << ":: next_pop.size() = " << next_pop.size() << std::endl;
-
-      // If generations are synchronous, put the next generation in place.
-      if (synchronous_gen) {
-        // Add all waiting organisms into the population.
-        for (size_t i = 0; i < next_pop.size(); i++) {
-          if (next_pop[i]) AddOrgAt(next_pop[i], i);
-        }
-        // Remove any remaining organisms in main population.
-        for (size_t i = next_pop.size(); i < pop.size(); i++) {
-          if (pop[i]) pop[i].Delete();
-        }
-        // Reset populations.
-        pop.resize(next_pop.size());
-        next_pop.resize(0);
-      }
-    }
+    void Update();
 
 
     // --- Calculate Fitness ---
@@ -246,11 +171,6 @@ namespace emp {
 
     // Get random *occupied* cell.
     size_t GetRandomOrgID();
-
-    // --- POPULATION MODES ---
-
-    void ModeBasic() { synchronous_gen = false; ConfigFuns(); }
-    void ModeEA() { synchronous_gen = true; ConfigFuns(); }
 
 
     // --- POPULATION ANALYSIS ---
@@ -318,26 +238,86 @@ namespace emp {
   }
 
   template<typename ORG, typename GENOTYPE>
-  size_t World<ORG,GENOTYPE>::DoBirth_Default(Ptr<ORG> new_org, size_t parent_pos) {
-    emp_assert(random_ptr);               // Random must be set before being used.
-    emp_assert(new_org);                  // New organism must exist.
-    emp_assert(parent_pos < pop.size());  // Parent must be at a legal position in the population.
+  void World<ORG,GENOTYPE>::ConfigFuns() {
+    // Setup AddInject...
+    switch (pop_struct) {
+    case Struct::MIXED:
+      fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
+      break;
+    case Struct::GRID:
+      break;
+    case Struct::POOLS:
+      break;
+    case Struct::EXTERNAL:
+      // Do nothing; these should be set... externally.
+      break;
+    }
 
-    size_t pos = 0;
-
+    // Setup AddBirth, which may be based on population structure.
     if (synchronous_gen) {
-      next_pop.push_back(new_org);
-      // @CAO: Below assumes we might not just be pushing to the back...
-      // if (next_pop.size() <= pos) next_pop.resize(pos+1, nullptr);  // Make sure we have room.
-      // if (next_pop[pos]) { next_pop[pos].Delete(); }                // Clear out any old org.
-      // next_pop[pos] = new_org;                                      // Place new org.
-    }
-    else {
-      pos = random_ptr->GetUInt(pop.size());    // By default, replace random organism.
-      AddOrgAt(new_org, pos);                       // Place org in  existing population.
+    switch (pop_struct) {
+      case Struct::MIXED:
+        fun_add_birth = [this](Ptr<ORG> new_org, size_t) {
+          emp_assert(new_org);                           // New organism must exist.
+          next_pop.push_back(new_org);
+          return next_pop.size() - 1;
+        };
+        break;
+      case Struct::GRID:
+        break;
+      case Struct::POOLS:
+        break;
+      case Struct::EXTERNAL:
+        // Do nothing; these should be set... externally.
+        break;
+      }
     }
 
-    return pos;
+    // Otherwise asynchronous...
+    else {
+      switch (pop_struct) {
+      case Struct::MIXED:
+        fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
+        fun_add_birth = [this](Ptr<ORG> new_org, size_t) {
+          emp_assert(new_org);                           // New organism must exist.
+          size_t pos = random_ptr->GetUInt(pop.size());  // Place in random position.
+          return AddOrgAt(new_org, pos);                 // Place org in  existing population.
+        };
+        break;
+      case Struct::GRID:
+        break;
+      case Struct::POOLS:
+        break;
+      case Struct::EXTERNAL:
+        // Do nothing; these should be set... externally.
+        break;
+      }
+    }
+
+  }
+
+
+  // --- Updating the world! ---
+
+  template<typename ORG, typename GENOTYPE>
+  void World<ORG,GENOTYPE>::Update() {
+    std::cout << ":: pop.size() = " << pop.size() << std::endl;
+    std::cout << ":: next_pop.size() = " << next_pop.size() << std::endl;
+
+    // If generations are synchronous, put the next generation in place.
+    if (synchronous_gen) {
+      // Add all waiting organisms into the population.
+      for (size_t i = 0; i < next_pop.size(); i++) {
+        if (next_pop[i]) AddOrgAt(next_pop[i], i);
+      }
+      // Remove any remaining organisms in main population.
+      for (size_t i = next_pop.size(); i < pop.size(); i++) {
+        if (pop[i]) pop[i].Delete();
+      }
+      // Reset populations.
+      pop.resize(next_pop.size());
+      next_pop.resize(0);
+    }
   }
 
   template<typename ORG, typename GENOTYPE>
