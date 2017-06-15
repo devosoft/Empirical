@@ -41,6 +41,9 @@ namespace emp {
     using fun_add_inject_t   = std::function<size_t(Ptr<ORG>)>;
     using fun_add_birth_t    = std::function<size_t(Ptr<ORG>, size_t)>;
 
+    // Enumerated values
+    enum class Struct { MIXED, GRID, POOLS, EXTERNAL };
+
     // Internal state member variables
     Ptr<Random> random_ptr;         // Random object to use.
     bool random_owner;              // Did we create our own random number generator?
@@ -63,7 +66,7 @@ namespace emp {
     size_t AddOrgAt(Ptr<ORG> new_org, size_t pos);
 
     // Default Add functions that will be updated.
-    size_t AddOrgBirth_Default(Ptr<ORG> new_org, size_t parent_pos);
+    size_t DoBirth_Default(Ptr<ORG> new_org, size_t parent_pos);
 
     // Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
@@ -81,7 +84,7 @@ namespace emp {
       fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
 
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_pos) {
-        return AddOrgBirth_Default(new_org, parent_pos);
+        return DoBirth_Default(new_org, parent_pos);
       };
     }
     ~World() {
@@ -108,7 +111,14 @@ namespace emp {
     }
 
 
-    // Updating the world!
+    // --- Configure ---
+
+    void ConfigFuns() {
+      synchronous_gen;
+    }
+
+
+    // --- Updating the world! ---
 
     void Update() {
       std::cout << ":: pop.size() = " << pop.size() << std::endl;
@@ -258,7 +268,7 @@ namespace emp {
   }
 
   template<typename ORG, typename GENOTYPE>
-  size_t World<ORG,GENOTYPE>::AddOrgBirth_Default(Ptr<ORG> new_org, size_t parent_pos) {
+  size_t World<ORG,GENOTYPE>::DoBirth_Default(Ptr<ORG> new_org, size_t parent_pos) {
     emp_assert(random_ptr);               // Random must be set before being used.
     emp_assert(new_org);                  // New organism must exist.
     emp_assert(parent_pos < pop.size());  // Parent must be at a legal position in the population.
