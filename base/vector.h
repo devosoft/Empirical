@@ -19,8 +19,6 @@
 #include <vector>
 
 #include "assert.h"
-#include "../meta/TypeID.h"
-
 
 #ifdef EMP_NDEBUG
 
@@ -172,17 +170,17 @@ std::istream & operator>>(std::istream & is, emp::vector<T,Ts...> & v) {
 
 #endif
 
-namespace emp {
-  template<typename T, typename... Ts> struct TypeID< emp::vector<T,Ts...> > {
-    static std::string GetName() {
-      using simple_vt = emp::vector<T>;
-      using full_vt = emp::vector<T,Ts...>;
-      if (std::is_same<simple_vt,full_vt>::value) {
-        return "emp::vector<" + TypeID<T>::GetName() + ">";
-      }
-      return "emp::vector<" + TypeID<TypePack<T,Ts...>>::GetTypes() + ">";
-    }
-  };
-}
+// namespace emp {
+//   template<typename T, typename... Ts> struct TypeID< emp::vector<T,Ts...> > {
+//     static std::string GetName() {
+//       using simple_vt = emp::vector<T>;
+//       using full_vt = emp::vector<T,Ts...>;
+//       if (std::is_same<simple_vt,full_vt>::value) {
+//         return "emp::vector<" + TypeID<T>::GetName() + ">";
+//       }
+//       return "emp::vector<" + TypeID<TypePack<T,Ts...>>::GetTypes() + ">";
+//     }
+//   };
+// }
 
 #endif
