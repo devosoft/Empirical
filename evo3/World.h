@@ -53,6 +53,7 @@ namespace emp {
     emp::vector<double> fit_cache;  // vector size == 0 when not caching; uncached values == 0.
 
     // Configuration settings
+    Struct pop_struct;        // What population structure are we using?
     bool synchronous_gen;     // Should generations be prefectly synchronous?
     bool cache_on;            // Should we be caching fitness values?
 
@@ -77,15 +78,10 @@ namespace emp {
   public:
     World()
       : random_ptr(NewPtr<Random>()), random_owner(true), pop(), num_orgs(0)
-      , synchronous_gen(false), cache_on(false)
+      , pop_struct(Struct::MIXED), synchronous_gen(false), cache_on(false)
       , fun_calc_fitness(), fun_add_inject(), fun_add_birth()
     {
-      // By default, push an org on the end of the population.
-      fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
-
-      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_pos) {
-        return DoBirth_Default(new_org, parent_pos);
-      };
+      ConfigFuns();
     }
     ~World() {
       Clear();
@@ -114,7 +110,61 @@ namespace emp {
     // --- Configure ---
 
     void ConfigFuns() {
-      synchronous_gen;
+      // Setup AddInject...
+      switch (pop_struct) {
+      case Struct::MIXED:
+        fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
+        break;
+      case Struct::GRID:
+        break;
+      case Struct::POOLS:
+        break;
+      case Struct::EXTERNAL:
+        // Do nothing; these should be set... externally.
+        break;
+      }
+
+      // Setup AddBirth, which may be based on population structure.
+      if (synchronous_gen) {
+      switch (pop_struct) {
+        case Struct::MIXED:
+          fun_add_birth = [this](Ptr<ORG> new_org, size_t) {
+            emp_assert(new_org);                           // New organism must exist.
+            next_pop.push_back(new_org);
+            return next_pop.size() - 1;
+          };
+          break;
+        case Struct::GRID:
+          break;
+        case Struct::POOLS:
+          break;
+        case Struct::EXTERNAL:
+          // Do nothing; these should be set... externally.
+          break;
+        }
+      }
+
+      // Otherwise asynchronous...
+      else {
+        switch (pop_struct) {
+        case Struct::MIXED:
+          fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
+          fun_add_birth = [this](Ptr<ORG> new_org, size_t) {
+            emp_assert(new_org);                           // New organism must exist.
+            size_t pos = random_ptr->GetUInt(pop.size());  // Place in random position.
+            return AddOrgAt(new_org, pos);                 // Place org in  existing population.
+          };
+          break;
+        case Struct::GRID:
+          break;
+        case Struct::POOLS:
+          break;
+        case Struct::EXTERNAL:
+          // Do nothing; these should be set... externally.
+          break;
+        }
+      }
+
     }
 
 
@@ -199,8 +249,8 @@ namespace emp {
 
     // --- POPULATION MODES ---
 
-    void ModeBasic() { synchronous_gen = false; }
-    void ModeEA() { synchronous_gen = true; }
+    void ModeBasic() { synchronous_gen = false; ConfigFuns(); }
+    void ModeEA() { synchronous_gen = true; ConfigFuns(); }
 
 
     // --- POPULATION ANALYSIS ---
