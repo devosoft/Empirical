@@ -56,6 +56,8 @@ namespace emp {
     Struct pop_struct;        // What population structure are we using?
     bool synchronous_gen;     // Should generations be prefectly synchronous?
     bool cache_on;            // Should we be caching fitness values?
+    size_t width;             // If a grid, track size.
+    size_t height;
 
     // Configurable functions.
     fun_calc_fitness_t fun_calc_fitness;  // Fitness function
@@ -104,19 +106,23 @@ namespace emp {
     }
 
 
-    // --- Configure ---
+    // --- CONFIGURE ---
 
+    void ConfigFuns();
     void ModeBasic() { synchronous_gen = false; ConfigFuns(); }
     void ModeEA() { synchronous_gen = true; ConfigFuns(); }
-    void ConfigFuns();
 
 
-    // --- Updating the world! ---
+    // --- UPDATE THE WORLD! ---
 
     void Update();
+    template <typename... ARGS>
+    void Execute(ARGS &&... args) {   // Redirect to all orgs in the population!
+      for (Ptr<ORG> org : pop) { if (org) org->Execute(std::forward<ARGS>(args)...); }
+    }
 
 
-    // --- Calculate Fitness ---
+    // --- CALCULATE FITNESS ---
 
     void SetFitFun(const fun_calc_fitness_t & fit_fun) { fun_calc_fitness = fit_fun; }
 
