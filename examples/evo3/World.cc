@@ -22,10 +22,10 @@ struct TestOrg1 {
 int main() {
   emp::World<int> world;
   world.ModeEA();
-  
+
   world.SetFitFun([](int & i){ return (double) i; });
   for (int i = 0; i < 100; i++) {
-    world.Insert(i+100,2);
+    world.Inject(i+100,2);
   }
 
   std::cout << "Start Size = " << world.GetSize() << std::endl << std::endl;
@@ -58,7 +58,7 @@ int main() {
   //
   //
   // EAWorld<TestOrg1> ea_world(random);
-  // for (int i = 0; i < 100; i++) ea_world.Insert(i+200);
+  // for (int i = 0; i < 100; i++) ea_world.Inject(i+200);
   //
   // std::cout << "Start Size = " << ea_world.GetSize() << std::endl;
   // for (size_t i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].Fitness() << " ";
@@ -80,12 +80,12 @@ int main() {
   //
   // // Test grid Populations
   // GridWorld<int> grid_world(random);
-  // for (int i = 0; i < 10; i++) grid_world.Insert(i);
+  // for (int i = 0; i < 10; i++) grid_world.Inject(i);
   // grid_world.Print();
   //
   // for (size_t i = 0; i < grid_world.GetSize(); ++i) {
   //   size_t id = random.GetUInt(grid_world.GetSize());
-  //   if (grid_world.IsOccupied(id)) grid_world.InsertBirth(grid_world[id], id);
+  //   if (grid_world.IsOccupied(id)) grid_world.InjectBirth(grid_world[id], id);
   // }
   // std::cout << std::endl;
   // grid_world.Print();
@@ -99,7 +99,7 @@ int main() {
   //
   // pi_world.popM.OnClear( [&pi_world]() {
   //   pi_world.popM.Resize(0);
-  //   for (int i=0;i<20;i++) pi_world.Insert(i+100);
+  //   for (int i=0;i<20;i++) pi_world.Inject(i+100);
   // });
   //
   // pi_world.popM.OnAddOrg( [&pi_world](int* org, size_t& pos) {
