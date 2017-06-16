@@ -203,6 +203,9 @@ namespace emp {
         const int rand_y = (int) (id/width) + offset/3 - 1;
         return (size_t) (emp::Mod(rand_x, (int) width) + emp::Mod(rand_y, (int) height) * (int)width);
       }
+      case Struct::POOLS:
+      case Struct::EXTERNAL:
+        break;
       }
       emp_assert(false);
       return 0;
@@ -319,7 +322,7 @@ namespace emp {
       case Struct::GRID:
         fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
           emp_assert(new_org);                           // New organism must exist.
-          const size_t id = GetRandomNeighbor(parent_id);
+          const size_t id = GetRandomNeighborID(parent_id);
           if (id >= next_pop.size()) next_pop.resize(id+1, nullptr);
           if (next_pop[id]) next_pop[id].Delete();
           next_pop[id] = new_org;
@@ -340,10 +343,10 @@ namespace emp {
       case Struct::MIXED:
       case Struct::GRID:
         fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
-        fun_add_birth = [this](Ptr<ORG> new_org, size_t) {
+        fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
           emp_assert(new_org);                          // New organism must exist.
-          size_t pos = GetRandomNeighbor(parent_pos);   // Place in random position.
-          return AddOrgAt(new_org, pos);                // Place org in  existing population.
+          size_t id = GetRandomNeighborID(parent_id);   // Place in random position.
+          return AddOrgAt(new_org, id);                 // Place org in  existing population.
         };
         break;
       case Struct::POOLS:
