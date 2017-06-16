@@ -75,11 +75,12 @@ namespace emp {
     double GetCache(size_t id) const { return (id < fit_cache.size()) ? fit_cache[id] : 0.0; }
 
   public:
-    World()
-      : random_ptr(NewPtr<Random>()), random_owner(true), pop(), num_orgs(0)
+    World(Ptr<Random> rnd=nullptr)
+      : random_ptr(rnd), random_owner(false), pop(), num_orgs(0)
       , pop_struct(Struct::MIXED), synchronous_gen(false), cache_on(false), width(0), height(0)
       , fun_calc_fitness(), fun_add_inject(), fun_add_birth()
     {
+      if (!rnd) NewRandom();
       ConfigFuns();
     }
     ~World() {
