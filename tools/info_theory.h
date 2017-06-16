@@ -4,6 +4,8 @@
 //
 //
 //  Tools to calculate Information Theory metrics.
+//  Status: ALPHA
+//
 //
 //  Info-theory formulas:
 //    H(X)   = -SUM(X: p[x] log2 p[x])

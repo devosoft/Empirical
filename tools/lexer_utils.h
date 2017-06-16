@@ -2,7 +2,10 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  A set of utilities to convert between NFAs and DFAs
+//  Status: BETA
+//
 //
 //  Available conversions:
 //
@@ -141,7 +144,7 @@ namespace emp {
         if (next_state == -1) continue;                      // Ignore non-transitions
         std::string cur_str(cur_status.sequence);
         cur_str += (char) sym;                               // Figure out current string
-        if (min_size <= (int) cur_str.size() ) {             // If the DFA is big enough...
+        if (min_size <= cur_str.size() ) {             // If the DFA is big enough...
           if (dfa.IsStop(next_state)) return cur_str;        //  return if this is a legal answer
         }
         traverse_set.emplace_back(next_state, cur_str);      // Continue searching from here.

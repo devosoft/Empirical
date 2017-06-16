@@ -30,7 +30,7 @@ namespace emp {
       std::string desc;
       size_t num_args;
 
-      InstDef() : id(inst_id_t::Unknown) { ; }
+      InstDef() : id(inst_id_t::Unknown), name(), desc(), num_args(0) { ; }
       InstDef(inst_id_t _id, const std::string & _n, const std::string & _d, size_t _args)
         : id(_id), name(_n), desc(_d), num_args(_args) { ; }
       InstDef(const InstDef &) = default;
@@ -41,7 +41,7 @@ namespace emp {
     std::map<std::string, inst_arg_t> arg_map;
 
   public:
-    InstLib() { ; }
+    InstLib() : inst_lib(), name_map(), arg_map() { ; }
     ~InstLib() { ; }
 
     const std::string & GetName(inst_id_t id) const { return inst_lib[(size_t) id].name; }
@@ -55,7 +55,7 @@ namespace emp {
     }
     inst_id_t GetID(const std::string name) const {
       emp_assert(Has(name_map, name), name);
-      return name_map[name];
+      return Find(name_map, name, inst_id_t::Unknown);
     }
     static constexpr inst_id_t GetID(char symbol) {
       if (symbol >= 'a' && symbol <= 'z') return (inst_id_t) (symbol - 'a');

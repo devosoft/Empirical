@@ -4,6 +4,7 @@
 //
 //
 //  This file contains useful mathematical functions (that are constexpr when possible.)
+//  Status: BETA (though new functions are added frequently)
 
 
 #ifndef EMP_MATH_H

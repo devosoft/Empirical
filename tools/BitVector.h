@@ -3,8 +3,9 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-// Class: emp::BitVector
-// Desc: A customized version of emp::vector<bool> with additional bit magic operations
+//  Class: emp::BitVector
+//  Desc: A customized version of emp::vector<bool> with additional bit magic operations
+//  Status: RELEASE
 //
 // To implement: append(), resize()...
 //
@@ -43,11 +44,10 @@ namespace emp {
     size_t NumSizeFields() const { return NumFields() * sizeof(field_t) / sizeof(std::size_t); }
 
     // Setup a bit proxy so that we can use operator[] on bit sets as an lvalue.
-    class BitProxy {
-    private:
+    struct BitProxy {
       BitVector & bit_vector;
       size_t index;
-    public:
+
       BitProxy(BitVector & _v, size_t _idx) : bit_vector(_v), index(_idx) {;}
 
       BitProxy & operator=(bool b) {    // lvalue handling...
@@ -58,8 +58,8 @@ namespace emp {
         return bit_vector.Get(index);
       }
     };
-    friend class BitProxy;
 
+    // emp_constexpr means only make constexpr when NDEBUG is set (to otherwise allow asserts)
     emp_constexpr static size_t FieldID(const size_t index)  { return index / FIELD_BITS; }
     emp_constexpr static size_t FieldPos(const size_t index) { return index & (FIELD_BITS-1); }
 
@@ -134,18 +134,15 @@ namespace emp {
     }
 
   public:
-    BitVector(size_t in_num_bits=0, bool init_val=false) : num_bits(in_num_bits) {
+    BitVector(size_t in_num_bits=0, bool init_val=false) : num_bits(in_num_bits), bit_set(nullptr) {
       if (num_bits) bit_set = new field_t[NumFields()];
-      else bit_set = nullptr;
       if (init_val) SetAll(); else Clear();
     }
-    BitVector(const BitVector & in_set) : num_bits(in_set.num_bits) {
+    BitVector(const BitVector & in_set) : num_bits(in_set.num_bits), bit_set(nullptr) {
       if (num_bits) bit_set = new field_t[NumFields()];
-      else bit_set = nullptr;
       RawCopy(in_set.bit_set);
     }
-    BitVector(BitVector && in_set) : num_bits(in_set.num_bits) {
-      bit_set = in_set.bit_set;
+    BitVector(BitVector && in_set) : num_bits(in_set.num_bits), bit_set(in_set.bit_set) {
       in_set.bit_set = nullptr;
     }
     ~BitVector() {
@@ -315,7 +312,10 @@ namespace emp {
 
     bool Any() const {
       const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) if (bit_set[i]) return true; return false;
+      for (size_t i = 0; i < NUM_FIELDS; i++) {
+        if (bit_set[i]) return true;
+      }
+      return false;
     }
     bool None() const { return !Any(); }
     bool All() const { return (~(*this)).None(); }
@@ -426,7 +426,7 @@ namespace emp {
     }
     emp::vector<size_t> GetOnes() const {
       // @CAO -- There are probably better ways to do this with bit tricks.
-      emp::vector<size_t> out_set((size_t) CountOnes());
+      emp::vector<size_t> out_set(CountOnes());
       size_t cur_pos = 0;
       for (size_t i = 0; i < num_bits; i++) {
         if (Get(i)) out_set[cur_pos++] = i;
@@ -570,7 +570,7 @@ namespace emp {
     bool all() const { return All(); }
     bool any() const { return Any(); }
     bool none() const { return !Any(); }
-    size_t count() const { return (size_t) CountOnes_Mixed(); }
+    size_t count() const { return CountOnes_Mixed(); }
   };
 
 }

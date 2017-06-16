@@ -3,21 +3,22 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-// A simple class to choose items with a probability proportional to their weight.
+//  A simple class to choose items with a probability proportional to their weight.
+//  Status: BETA
 //
-// Constructor:
-// ProbSchedule(size_t num_items, int random_seed=-1)
-//     num_items is the maximum number of items that can be placed into the data structure.
-//     random_seed is the seed for the random number generator used; values < 0 base seed on time.
+//  Constructor:
+//  ProbSchedule(size_t num_items, int random_seed=-1)
+//      num_items is the maximum number of items that can be placed into the data structure.
+//      random_seed is the seed for the random number generator used; values < 0 base seed on time.
 //
-// void Adjust(size_t id, double weight)
-//     id is the identification number of the item whose weight is being adjusted.
-//     weight is the new weight for that entry.
+//  void Adjust(size_t id, double weight)
+//      id is the identification number of the item whose weight is being adjusted.
+//      weight is the new weight for that entry.
 //
-// size_t NextID() returns a random id based on the weights provided.
+//  size_t NextID() returns a random id based on the weights provided.
 //
 //
-// Development NOTES:
+//  Development NOTES:
 //   * We should probably change the name to something like WeightedRandom since it does not
 //     have to be used just for scheduling.
 //   * We could easily convert this structure to a template that acts as a glorified vector
@@ -106,6 +107,6 @@ namespace emp {
       return (int) CalcID(rand_pos, 0);
     }
   };
-};
+}
 
 #endif

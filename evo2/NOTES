@@ -1,0 +1,14 @@
+The core idea for evo should be a World class made up of layered modules, specified by a template.
+
+The individual modules are explained, with dependencies (and required ordering)
+in WorldModule_levels.h
+
+OTHER NOTES:
+* Right now cannot index to a nullptr position; can setup a default.
+* Should we allow a non const operator[] ?  Would need to make sure it calls other pieces
+  correctly on an assignment.  As of now, we do NOT.
+* We can add on explicit dependencies for each module -- we just add the user-specified modules
+  and default modules to the requirement list of each (which may be empty for some).  THEN when
+  we do the unique-sort, we'll have exactly what we need.
+
+STATUS: Putting on hold while I test how much of a slow-down a more dynamic approach entails.

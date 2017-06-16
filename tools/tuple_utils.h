@@ -3,6 +3,7 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  This file contains a set of simple functions to work with std::tuple
+//  Status: ALPHA
 
 #ifndef EMP_TUPLE_UTILS_H
 #define EMP_TUPLE_UTILS_H
@@ -52,6 +53,6 @@ namespace emp {
     }
   };
 
-};
+}
 
 #endif

@@ -3,15 +3,17 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-// Class: template <int NUM_BITS> emp::BitSet
+//  Class: template <int NUM_BITS> emp::BitSet
 //
-// Desc: This class handles a fixed-sized (but arbitrarily large) array of bits,
-//       and optimizes operations on those bits to be as fast as possible.
+//  Desc: This class handles a fixed-sized (but arbitrarily large) array of bits,
+//        and optimizes operations on those bits to be as fast as possible.
 //
-// Note: emp::BitSet is based on std::bitset, and can be used as a drop-in replacement.
-//       Like std::bitset, bit zero is on the right side.  Unlike std::bitset, emp::BitSet
-//       gives access to bit fields for easy access to different sized chucnk of bits and
-//       implementation new bit-magic tricks.
+//  Note: emp::BitSet is based on std::bitset, and can be used as a drop-in replacement.
+//        Like std::bitset, bit zero is on the right side.  Unlike std::bitset, emp::BitSet
+//        gives access to bit fields for easy access to different sized chucnk of bits and
+//        implementation new bit-magic tricks.
+//
+//  Status: RELEASE
 //
 //
 // Constructors:
@@ -147,7 +149,7 @@ namespace emp {
     inline static size_t Byte2FieldPos(const size_t index) { return (index & 3) << 3; }
 
     inline void Copy(const uint32_t in_set[NUM_FIELDS]) {
-      for (int i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
+      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
     }
 
     // Helper: call SHIFT with positive number instead
@@ -278,7 +280,7 @@ namespace emp {
       emp_assert(index < NUM_BITS);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
-      const size_t pos_mask = 1 << pos_id;
+      const uint32_t pos_mask = 1 << pos_id;
 
       if (value) bit_set[field_id] |= pos_mask;
       else       bit_set[field_id] &= ~pos_mask;

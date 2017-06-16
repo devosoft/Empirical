@@ -84,7 +84,7 @@ EMP_CREATE_METHOD_FALLBACK(Test1, Test1, Test1_Fallback);
 EMP_CREATE_OPTIONAL_METHOD(Print, Print);
 EMP_CREATE_METHOD_FALLBACK_VAL(Test2, Test1, 888);
 
-EMP_SETUP_TYPE_SELECTOR(auto_type, use_this);
+EMP_SETUP_TYPE_SELECTOR(auto_type, use_this)
 
 int Add3(int x, int y, int z) {
   return x+y+z;

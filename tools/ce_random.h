@@ -5,6 +5,8 @@
 //
 //  A versatile and non-patterned pseudo-random-number generator.
 //
+//  Status: DESIGN
+//
 //  Constructor:
 //    Random(int _seed=-1)
 //      _seed is the random number seed that will produce a unique pseudo-random sequence.

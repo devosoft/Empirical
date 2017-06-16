@@ -2,7 +2,9 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  A general-purpose, fast parser.
+//  Status: BETA
 //
 //
 //  Development notes:
@@ -41,14 +43,15 @@ namespace emp {
     bool nullable;            // Can this symbol be converted to nothing?
 
     ParseSymbol()
-     : first(Lexer::MaxTokenID()), follow(Lexer::MaxTokenID()), nullable(false) { ; }
+     : name(), rule_ids(), id(0)
+     , first(Lexer::MaxTokenID()), follow(Lexer::MaxTokenID()), nullable(false) { ; }
   };
 
   struct ParseRule {
     size_t symbol_id;
     emp::vector<size_t> pattern;
 
-    ParseRule(size_t sid) : symbol_id(sid) { ; }
+    ParseRule(size_t sid) : symbol_id(sid), pattern() { ; }
   };
 
   class Parser {
@@ -56,7 +59,7 @@ namespace emp {
     Lexer & lexer;                     // Default input lexer.
     emp::vector<ParseSymbol> symbols;  // Set of symbols that make up this grammar.
     emp::vector<ParseRule> rules;      // Set of rules that make up the parser.
-    size_t cur_symbol_id;                 // Which id should the next new symbol get?
+    size_t cur_symbol_id;              // Which id should the next new symbol get?
     int active_pos;                    // Which symbol pos is active?
 
     void BuildRule(emp::vector<size_t> & new_pattern) { ; }
@@ -91,7 +94,9 @@ namespace emp {
     }
 
   public:
-    Parser(Lexer & in_lexer) : lexer(in_lexer), cur_symbol_id(in_lexer.MaxTokenID()) { ; }
+    Parser(Lexer & in_lexer)
+    : lexer(in_lexer), symbols(), rules()
+    , cur_symbol_id(in_lexer.MaxTokenID()), active_pos(0) { ; }
     ~Parser() { ; }
 
     Lexer & GetLexer() { return lexer; }

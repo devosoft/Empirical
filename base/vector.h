@@ -19,8 +19,6 @@
 #include <vector>
 
 #include "assert.h"
-#include "../meta/TypeID.h"
-
 
 #ifdef EMP_NDEBUG
 
@@ -53,7 +51,7 @@ namespace emp {
     using reference = typename stdv_t::reference;
     using const_reference = typename stdv_t::const_reference;
 
-    vector() = default;
+    vector() : v() {};
     vector(const this_t &) = default;
     vector(size_t size) : v(size) { emp_assert(size < MAX_SIZE, size); }
     vector(size_t size, const T & val) : v(size, val) { emp_assert(size < MAX_SIZE, size); }
@@ -172,17 +170,17 @@ std::istream & operator>>(std::istream & is, emp::vector<T,Ts...> & v) {
 
 #endif
 
-namespace emp {
-  template<typename T, typename... Ts> struct TypeID< emp::vector<T,Ts...> > {
-    static std::string GetName() {
-      using simple_vt = emp::vector<T>;
-      using full_vt = emp::vector<T,Ts...>;
-      if (std::is_same<simple_vt,full_vt>::value) {
-        return "emp::vector<" + TypeID<T>::GetName() + ">";
-      }
-      return "emp::vector<" + TypeID<TypePack<T,Ts...>>::GetTypes() + ">";
-    }
-  };
-}
+// namespace emp {
+//   template<typename T, typename... Ts> struct TypeID< emp::vector<T,Ts...> > {
+//     static std::string GetName() {
+//       using simple_vt = emp::vector<T>;
+//       using full_vt = emp::vector<T,Ts...>;
+//       if (std::is_same<simple_vt,full_vt>::value) {
+//         return "emp::vector<" + TypeID<T>::GetName() + ">";
+//       }
+//       return "emp::vector<" + TypeID<TypePack<T,Ts...>>::GetTypes() + ">";
+//     }
+//   };
+// }
 
 #endif

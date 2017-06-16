@@ -3,195 +3,249 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
+//  A wrapper for pointers that does careful memory tracking (but only in debug mode).
+//  Status: BETA
+//
 //  This version of pointers act as normal pointers under most conditions.  However,
 //  if a program is compiled with EMP_TRACK_MEM set, then these pointers perform extra
 //  tests to ensure that they point to valid memory and that memory is freed before
 //  pointers are released.
 //
+//
 //  Developer Notes:
-//  * Switch pointer tracking to unordered_map?  (shouild be faster and smaller)
-//  * Add on tracking for arrays (to allow indexing and know when to call delete[])
-//  * Make operator delete (and operator new?) work with Ptr.
+//  * Should we add on tracking for arrays (to allow indexing and know when to call delete[])?
+//    Or just assume that arrays will be handled with emp::array?
+//  * Should we track information about vector and array object to make sure we don't point
+//    into them?
+//  * Make operator delete (and operator new) work with Ptr.
 
 #ifndef EMP_PTR_H
 #define EMP_PTR_H
 
-#include <map>
+#include <unordered_map>
 
 #include "assert.h"
+#include "vector.h"
 
 namespace emp {
 
+  namespace {
+    bool ptr_debug = false;
+  }
+  void SetPtrDebug(bool _d = true) { ptr_debug = _d; }
+  bool GetPtrDebug() { return ptr_debug; }
+
   class PtrInfo {
   private:
-    int count;     // How many of this pointer do we have?
-    bool active;   // Has this pointer been deleted? (i.e., we should no longer access it!)
-    bool owner;    // Are we responsible for deleting this pointer?
-  public:
-    PtrInfo(bool is_owner=false) : count(1), active(true), owner(is_owner) { ; }
-    ~PtrInfo() { ; }
+    void * ptr;       // Which pointer are we keeping data on?
+    int count;        // How many of this pointer do we have?
+    bool active;      // Has this pointer been deleted? (i.e., we should no longer access it!)
 
+  public:
+    PtrInfo(void * _ptr=nullptr) : ptr(_ptr), count(1), active(true) {
+      if (ptr_debug) std::cout << "Created info for pointer " << ptr << std::endl;
+    }
+    PtrInfo(const PtrInfo &) = default;
+    PtrInfo(PtrInfo &&) = default;
+    PtrInfo & operator=(const PtrInfo &) = default;
+    PtrInfo & operator=(PtrInfo &&) = default;
+
+    ~PtrInfo() {
+      if (ptr_debug) std::cout << "Deleted info for pointer " << ptr << std::endl;
+    }
+
+    void * GetPtr() const { return ptr; }
     int GetCount() const { return count; }
     bool IsActive() const { return active; }
-    bool IsOwner() const { return owner; }
 
-    void Inc() { emp_assert(active, "Incrementing deleted pointer!"); count++; }
+    void Inc() {
+      if (ptr_debug) std::cout << "Inc info for pointer " << ptr << std::endl;
+      emp_assert(active, "Incrementing deleted pointer!"); count++;
+    }
     void Dec() {
-      // If this pointer is not active, it doesn't matter how many copies we have.
-      if (active == false) return;
+      if (ptr_debug) std::cout << "Dec info for pointer " << ptr << std::endl;
 
-      emp_assert(count > 0, "Decrementing Ptr count; already zero!");        // Do not decrement more copies than we have!
-
-      // Make sure one of these conditions is true:
-      // * We are not getting rid of the last copy, -or-
-      // * We've already deleted this pointer, -or-
-      // * We're not responsible for deleting this pointer.
-      emp_assert(count > 1 || owner == false, "Removing last reference to owned Ptr!");
+      // Make sure that we have more than one copy, -or- we've already deleted this pointer
+      emp_assert(count > 1 || active == false, "Removing last reference to owned Ptr!");
       count--;
     }
 
     void MarkDeleted() {
+      if (ptr_debug) std::cout << "Marked deleted for pointer " << ptr << std::endl;
       emp_assert(active == true, "Deleting same emp::Ptr a second time!");
-      emp_assert(owner == true, "Deleting emp::Ptr we don't own!");
       active = false;
     }
-    void Claim() {
-      emp_assert(owner == false, "Claiming an emp::Ptr that we already own!");
-      owner = true;
-    }
-    void Surrender() {
-      emp_assert(active == true, "Surrendering emp::Ptr that was deallocated!");
-      emp_assert(owner == true, "Surrendering emp::Ptr that we don't own!");
-      owner = false;
-    }
+
   };
 
 
   class PtrTracker {
   private:
-    std::map<void *, PtrInfo> ptr_info;
-    bool verbose;
+    std::unordered_map<void *, size_t> ptr_id;
+    emp::vector<PtrInfo> id_info;
 
     // Make PtrTracker a singleton.
-    PtrTracker() : verbose(false) { ; }
+    PtrTracker() : ptr_id(), id_info() { ; }
     PtrTracker(const PtrTracker &) = delete;
     PtrTracker(PtrTracker &&) = delete;
     PtrTracker & operator=(const PtrTracker &) = delete;
     PtrTracker & operator=(PtrTracker &&) = delete;
-  public:
-    ~PtrTracker() { ; }
 
-    bool GetVerbose() const { return verbose; }
-    void SetVerbose(bool v=true) { verbose = v; }
+    PtrInfo & GetInfo(void * ptr) { return id_info[ptr_id[ptr]]; }
+  public:
+    ~PtrTracker() {
+      // Track stats about pointer record.
+      size_t total = 0;
+      size_t remain = 0;
+
+      // Scan through live pointers and make sure all have been deleted.
+      for (const auto & info : id_info) {
+        total++;
+        if (info.GetCount()) remain++;
+
+        emp_assert(info.IsActive() == false, info.GetPtr(), info.GetCount(), info.IsActive());
+      }
+
+      std::cout << "EMP_TRACK_MEM: No memory leaks found!\n "
+                << total << " pointers found; "
+                << remain << " still have pointers to them (after deletion.)"
+                << std::endl;
+    }
 
     // Treat this class as a singleton with a single Get() method to retrieve it.
     static PtrTracker & Get() { static PtrTracker tracker; return tracker; }
 
     // Some simple accessors
     bool HasPtr(void * ptr) const {
-      if (verbose) std::cout << "HasPtr: " << ((uint64_t) ptr) << std::endl;
-      return ptr_info.find(ptr) != ptr_info.end();
+      if (ptr_debug) std::cout << "HasPtr: " << ptr << std::endl;
+      return ptr_id.find(ptr) != ptr_id.end();
     }
 
-    bool IsActive(void * ptr) const {
-      if (verbose) std::cout << "Active: " << ((uint64_t) ptr) << std::endl;
-      if (!HasPtr(ptr)) return false;
-      return ptr_info.find(ptr)->second.IsActive();
+    size_t GetCurID(void * ptr) { emp_assert(HasPtr(ptr)); return ptr_id[ptr]; }
+    size_t GetNumIDs() const { return id_info.size(); }
+
+    bool IsDeleted(size_t id) const {
+      if (id == (size_t) -1) return false;   // Not tracked!
+      if (ptr_debug) std::cout << "IsDeleted: " << id << std::endl;
+      return !id_info[id].IsActive();
     }
 
-    bool IsOwner(void * ptr) const {
-      if (verbose) std::cout << "Owner:  " << ((uint64_t) ptr) << std::endl;
-      if (!HasPtr(ptr)) return false;
-      return ptr_info.find(ptr)->second.IsOwner();
+    bool IsActive(void * ptr) {
+      if (ptr_debug) std::cout << "IsActive: " << ptr << std::endl;
+      if (ptr_id.find(ptr) == ptr_id.end()) return false; // Not in database.
+      return GetInfo(ptr).IsActive();
     }
 
-    int GetCount(void * ptr) const {
-      if (verbose) std::cout << "Count:  " << ((uint64_t) ptr) << std::endl;
-      if (!HasPtr(ptr)) return 0;
-      return ptr_info.find(ptr)->second.GetCount();
+    int GetIDCount(size_t id) const {
+      if (ptr_debug) std::cout << "Count:  " << id << std::endl;
+      return id_info[id].GetCount();
     }
 
     // This pointer was just created as a Ptr!
-    void New(void * ptr) {
-      if (ptr == nullptr) return;
-      if (verbose) std::cout << "New:    " << ((uint64_t) ptr) << std::endl;
-      // Make sure pointer is not already stored -OR- if it was stored, that it's been
-      // deleted (since re-use is possible).
-      emp_assert(!HasPtr(ptr) || !IsActive(ptr));
-      ptr_info[ptr] = PtrInfo(true);
+    size_t New(void * ptr) {
+      if (ptr == nullptr) return (size_t) -1;
+      size_t id = id_info.size();
+      if (ptr_debug) std::cout << "New:    " << id << " (" << ptr << ")" << std::endl;
+      // Make sure pointer is not already stored -OR- hase been deleted (since re-use is possible).
+      emp_assert(!HasPtr(ptr) || IsDeleted(GetCurID(ptr)));
+      id_info.emplace_back(ptr);
+      ptr_id[ptr] = id;
+      return id;
     }
 
-    // This pointer was already created, but given to Ptr.
-    void Old(void * ptr) {
-      if (ptr == nullptr) return;
-      if (verbose) std::cout << "Old:    " << ((uint64_t) ptr) << std::endl;
-      // If we already have this pointer, just increment the count.  Otherwise track it now.
-      if (HasPtr(ptr) && IsActive(ptr)) Inc(ptr);
-      else ptr_info[ptr] = PtrInfo(false);
+    void IncID(size_t id) {
+      if (id == (size_t) -1) return;   // Not tracked!
+      if (ptr_debug) std::cout << "Inc:    " << id << std::endl;
+      id_info[id].Inc();
     }
 
-    // Pointer is not currently owned, but should be.
-    void Claim(void *ptr) {
-      if (ptr == nullptr) return;
-      if (verbose) std::cout << "Claim:  " << ((uint64_t) ptr) << std::endl;
-      // Make sure pointer IS already stored BUT is NOT active.
-      emp_assert(HasPtr(ptr) && !IsActive(ptr));
-      ptr_info[ptr].Claim();
+    void DecID(size_t id) {
+      if (id == (size_t) -1) return;   // Not tracked!
+      auto & info = id_info[id];
+      if (ptr_debug) std::cout << "Dec:    " << id << "(" << info.GetPtr() << ")" << std::endl;
+      emp_assert(info.GetCount() > 0, "Decrementing Ptr, but already zero!",
+                 id, info.GetPtr(), info.IsActive());
+      info.Dec();
     }
 
-    void Inc(void * ptr) {
-      if (ptr == nullptr) return;
-      if (verbose) std::cout << "Inc:    " << ((uint64_t) ptr) << std::endl;
-      emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
-      ptr_info[ptr].Inc();
-    }
-
-    void Dec(void * ptr) {
-      if (ptr == nullptr) return;
-      if (verbose) std::cout << "Dec:    " << ((uint64_t) ptr) << std::endl;
-      emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
-      ptr_info[ptr].Dec();
-    }
-
-    void MarkDeleted(void * ptr) {
-      if (verbose) std::cout << "Delete: " << ((uint64_t) ptr) << std::endl;
-      emp_assert(HasPtr(ptr));  // Make sure pointer IS already stored!
-      ptr_info[ptr].MarkDeleted();
+    void MarkDeleted(size_t id) {
+      if (ptr_debug) std::cout << "Delete: " << id << std::endl;
+      id_info[id].MarkDeleted();
     }
   };
 
 
-#undef EMP_IF_MEMTRACK
 #ifdef EMP_TRACK_MEM
-#define EMP_IF_MEMTRACK(...) { __VA_ARGS__ }
-#else
-#define EMP_IF_MEMTRACK(...)
-#endif
+
+  namespace {
+    // @CAO: Build this for real!
+    template <typename FROM, typename TO>
+    bool PtrIsConvertable(FROM * ptr) { return true; }
+    // emp_assert( (std::is_same<TYPE,T2>() || dynamic_cast<TYPE*>(in_ptr)) );
+  }
 
   template <typename TYPE>
   class Ptr {
   private:
     TYPE * ptr;
+    size_t id;
 
-#ifdef EMP_TRACK_MEM
     static PtrTracker & Tracker() { return PtrTracker::Get(); }
-#endif
+
   public:
     using element_type = TYPE;
 
-    Ptr() : ptr(nullptr) { ; }
-    template <typename T2> Ptr(T2 * in_ptr, bool is_new=false) : ptr(in_ptr) {
-      (void) is_new;  // Avoid unused parameter error when EMP_IF_MEMTRACK is off.
-      EMP_IF_MEMTRACK( if (is_new) Tracker().New(ptr); else Tracker().Old(ptr); );
+    // Construct a null Ptr by default.
+    Ptr() : ptr(nullptr), id((size_t) -1) {
+      if (ptr_debug) std::cout << "null construct: " << ptr << std::endl;
     }
-    template <typename T2> Ptr(Ptr<T2> _in) : ptr(_in.Raw()) {
-      EMP_IF_MEMTRACK( Tracker().Inc(ptr); );
+
+    // Construct using copy constructor
+    Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr), id(_in.id) {
+      if (ptr_debug) std::cout << "copy construct: " << ptr << std::endl;
+      Tracker().IncID(id);
     }
-    Ptr(std::nullptr_t) : Ptr() { ; }
-    Ptr(TYPE & obj) : Ptr(&obj, false) {;} // Pre-existing objects NOT tracked
-    Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) { EMP_IF_MEMTRACK( Tracker().Inc(ptr); ); }
-    Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr) { _in.ptr=nullptr; }
-    ~Ptr() { EMP_IF_MEMTRACK( Tracker().Dec(ptr); ); }
+
+    // Construct using move constructor
+    Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr), id(_in.id) {
+      if (ptr_debug) std::cout << "move construct: " << ptr << std::endl;
+      _in.id = (size_t) -1;
+    }
+
+    // Construct from a raw pointer of campatable type.
+    template <typename T2>
+    Ptr(T2 * in_ptr, bool track=false) : ptr(in_ptr), id((size_t) -1)
+    {
+      if (ptr_debug) std::cout << "raw construct: " << ptr << ". track=" << track << std::endl;
+      emp_assert( (PtrIsConvertable<T2, TYPE>(in_ptr)) );
+
+      // If this pointer is already active, link to it.
+      if (Tracker().IsActive(ptr)) {
+        id = Tracker().GetCurID(ptr);
+        Tracker().IncID(id);
+      }
+      // If we are not already tracking this pointer, but should be, add it.
+      else if (track) id = Tracker().New(ptr);
+    }
+
+    // Construct from another Ptr<> object of compatable type.
+    template <typename T2>
+    Ptr(Ptr<T2> _in) : ptr(_in.Raw()), id(_in.GetID()) {
+      if (ptr_debug) std::cout << "inexact copy construct: " << ptr << std::endl;
+      emp_assert( (PtrIsConvertable<T2, TYPE>(_in.Raw())) );
+      Tracker().IncID(id);
+    }
+
+    // Construct from nullptr.
+    Ptr(std::nullptr_t) : Ptr() {
+      if (ptr_debug) std::cout << "null construct 2." << std::endl;
+    }
+
+    // Destructor.
+    ~Ptr() {
+      if (ptr_debug) std::cout << "descructing " << id << " (" << ptr << ")" << std::endl;
+      Tracker().DecID(id);
+    }
 
     bool IsNull() const { return ptr == nullptr; }
     TYPE * Raw() { return ptr; }
@@ -199,85 +253,111 @@ namespace emp {
     template <typename T2> T2 * Cast() { return (T2*) ptr; }
     template <typename T2> const T2 * const Cast() const { return (T2*) ptr; }
     template <typename T2> T2 * DynamicCast() {
-      emp_assert(dynamic_cast<T2>(ptr) != nullptr);
+      emp_assert(dynamic_cast<T2*>(ptr) != nullptr);
       return (T2*) ptr;
     }
-
-    void New() {
-      EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
-      ptr = new TYPE;
-      EMP_IF_MEMTRACK(Tracker().New(ptr););
-    }
-    void New(const TYPE & init_val) {
-      EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
-      ptr = new TYPE(init_val);
-      EMP_IF_MEMTRACK(Tracker().New(ptr););
-    }
+    size_t GetID() const { return id; }
 
     template <typename... T>
     void New(T &&... args) {
-      EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
-      ptr = new TYPE(std::forward<T>(args)...);
-      EMP_IF_MEMTRACK(Tracker().New(ptr););
+      Tracker().DecID(id);                        // Remove a pointer to any old memory...
+      ptr = new TYPE(std::forward<T>(args)...);   // Build a new raw pointer.
+      if (ptr_debug) std::cout << "Ptr::New() : " << ptr << std::endl;
+      id = Tracker().New(ptr);                    // And track it!
     }
     void Delete() {
-      EMP_IF_MEMTRACK( Tracker().MarkDeleted(ptr); );
-      EMP_IF_MEMTRACK( Tracker().Dec(ptr); );
+      emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
+      Tracker().MarkDeleted(id);
+      if (ptr_debug) std::cout << "Ptr::Delete() : " << ptr << std::endl;
       delete ptr;
     }
 
-    void Claim() {
-      EMP_IF_MEMTRACK(Tracker().Claim(ptr););
+    // Copy assignment
+    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
+      if (ptr_debug) std::cout << "copy assignment" << std::endl;
+      Tracker().DecID(id);
+      ptr = _in.ptr;
+      id = _in.id;
+      Tracker().IncID(id);
+      return *this;
     }
 
+    // Move assignment
+    Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
+      if (ptr_debug) std::cout << "move assignment" << std::endl;
+      ptr = _in.ptr;
+      id = _in.id;
+      _in.ptr = nullptr;
+      _in.id = (size_t) -1;
+      return *this;
+    }
+
+    // Assign to a pointer of the correct type.
     template <typename T2>
     Ptr<TYPE> & operator=(T2 * _in) {
-      EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
-      ptr = _in;
-      // Assume we are not owning a pointer we just assign to.
-      EMP_IF_MEMTRACK(Tracker().Old(ptr););
+      if (ptr_debug) std::cout << "raw assignment" << std::endl;
+      emp_assert( (PtrIsConvertable<T2, TYPE>(_in)) );
+
+      if (ptr) Tracker().DecID(id);   // Decrement references to former pointer at this position.
+      ptr = _in;                      // Update to new pointer.
+
+      // If this pointer is already active, link to it.
+      if (Tracker().IsActive(ptr)) {
+        id = Tracker().GetCurID(ptr);
+        Tracker().IncID(id);
+      }
+      // Otherwise, since this ptr was passed in as a raw pointer, we do not manage it.
+
       return *this;
     }
+
+    // Assign to a convertable Ptr
     template <typename T2>
     Ptr<TYPE> & operator=(Ptr<T2> _in) {
-      EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
-      ptr=_in.Raw();
-      EMP_IF_MEMTRACK(Tracker().Inc(ptr););
-      return *this;
-    }
-    Ptr<TYPE> & operator=(Ptr<TYPE> & _in) {
-      EMP_IF_MEMTRACK( if (ptr) Tracker().Dec(ptr); );
-      ptr=_in.Raw();
-      EMP_IF_MEMTRACK(Tracker().Inc(ptr););
-      return *this;
-    }
-    Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
-      ptr = _in.ptr;
-      _in.ptr = nullptr;
+      if (ptr_debug) std::cout << "convert-copy assignment" << std::endl;
+      emp_assert( (PtrIsConvertable<T2, TYPE>(_in.Raw())) );
+      Tracker().DecID(id);
+      ptr = _in.Raw();
+      id = _in.GetID();
+      Tracker().IncID(id);
       return *this;
     }
 
     // Dereference a pointer.
-    TYPE & operator*() { return *ptr; }
-    const TYPE & operator*() const { return *ptr; }
+    TYPE & operator*() {
+      // Make sure a pointer is active before we dereference it.
+      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+      return *ptr;
+    }
+    const TYPE & operator*() const {
+      // Make sure a pointer is active before we dereference it.
+      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+      return *ptr;
+    }
 
     // Follow a pointer.
-    TYPE * operator->() { return ptr; }
-    const TYPE * const operator->() const { return ptr; }
+    TYPE * operator->() {
+      // Make sure a pointer is active before we follow it.
+      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+      return ptr;
+    }
+    const TYPE * const operator->() const {
+      // Make sure a pointer is active before we follow it.
+      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+      return ptr;
+    }
 
     // Auto-case to raw pointer type.
     operator TYPE *() {
+      // Make sure a pointer is active before we convert it.
+      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+
       // We should not automatically convert managed pointers to raw pointers
-      EMP_IF_MEMTRACK( emp_assert(Tracker().IsActive(ptr) == false, typeid(TYPE).name()); );
+      emp_assert(id == (size_t) -1, typeid(TYPE).name());
       return ptr;
     }
 
     operator bool() { return ptr != nullptr; }
-
-    // Allow Ptr to be treated as an array?
-    // @CAO commented out for now; would need to track array status to call delete[]
-    // TYPE & operator[](int pos) { return ptr[pos]; }
-    // const TYPE & operator[](int pos) const { return ptr[pos]; }
 
     // Comparisons to other Ptr objects
     bool operator==(const Ptr<TYPE> & in_ptr) const { return ptr == in_ptr.ptr; }
@@ -296,18 +376,129 @@ namespace emp {
     bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
 
     // Some debug testing functions
-#ifdef EMP_TRACK_MEM
-    int DebugGetCount() const { return Tracker().GetCount(ptr); }
-#endif
+    int DebugGetCount() const { return Tracker().GetIDCount(id); }
 
   };
 
 
-    // Create a helper to replace & operator.
-    template <typename T> Ptr<T> to_ptr(T & _in) { return Ptr<T>(_in); }
-    template <typename T> Ptr<T> to_ptr(T * _in, bool own=false) { return Ptr<T>(_in, own); }
-    template <typename T> Ptr<T> new_ptr(T * _in, bool own=true) { return Ptr<T>(_in, own); }
 
+#else
+
+
+  template <typename TYPE>
+  class Ptr {
+  private:
+    TYPE * ptr;
+
+  public:
+    using element_type = TYPE;
+
+    Ptr() : ptr(nullptr) { ; }
+
+    // Construct using copy constructor
+    Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) { ; }
+
+    // Construct using move constructor
+    Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr) { ; }
+
+    // Construct from a raw pointer of campatable type (bool is unused and optional)
+    template <typename T2>
+    Ptr(T2 * in_ptr, bool=false) : ptr(in_ptr) { ; }
+
+    // Construct from another Ptr<> object of compatable type.
+    template <typename T2>
+    Ptr(Ptr<T2> _in) : ptr(_in.Raw()) { ; }
+
+    // Construct from nullptr.
+    Ptr(std::nullptr_t) : Ptr() { ; }
+
+    // Destructor.
+    ~Ptr() { ; }
+
+    bool IsNull() const { return ptr == nullptr; }
+    TYPE * Raw() { return ptr; }
+    const TYPE * const Raw() const { return ptr; }
+    template <typename T2> T2 * Cast() { return (T2*) ptr; }
+    template <typename T2> const T2 * const Cast() const { return (T2*) ptr; }
+    template <typename T2> T2 * DynamicCast() { return dynamic_cast<T2*>(ptr); }
+
+    template <typename... T>
+    void New(T &&... args) {
+      ptr = new TYPE(std::forward<T>(args)...);     // Build a new raw pointer.
+    }
+    void Delete() { delete ptr; }
+
+    // Copy assignment
+    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
+      ptr = _in.ptr;
+      return *this;
+    }
+
+    // Move assignment
+    Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
+      ptr = _in.ptr;
+      _in.ptr = nullptr;
+      return *this;
+    }
+
+    // Assign to a pointer of the correct type.
+    // Note: Since this ptr was passed in as a raw pointer, we do not manage it.
+    template <typename T2>
+    Ptr<TYPE> & operator=(T2 * _in) {
+      ptr = _in;
+      return *this;
+    }
+
+    // Assign to a convertable Ptr
+    template <typename T2>
+    Ptr<TYPE> & operator=(Ptr<T2> _in) {
+      ptr = _in.Raw();
+      return *this;
+    }
+
+    // Dereference a pointer.
+    TYPE & operator*() { return *ptr; }
+    const TYPE & operator*() const { return *ptr; }
+
+    // Follow a pointer.
+    TYPE * operator->() { return ptr; }
+    const TYPE * const operator->() const { return ptr; }
+
+    // Auto-case to raw pointer type.
+    operator TYPE *() { return ptr; }
+
+    operator bool() { return ptr != nullptr; }
+
+    // Comparisons to other Ptr objects
+    bool operator==(const Ptr<TYPE> & in_ptr) const { return ptr == in_ptr.ptr; }
+    bool operator!=(const Ptr<TYPE> & in_ptr) const { return ptr != in_ptr.ptr; }
+    bool operator<(const Ptr<TYPE> & in_ptr)  const { return ptr < in_ptr.ptr; }
+    bool operator<=(const Ptr<TYPE> & in_ptr) const { return ptr <= in_ptr.ptr; }
+    bool operator>(const Ptr<TYPE> & in_ptr)  const { return ptr > in_ptr.ptr; }
+    bool operator>=(const Ptr<TYPE> & in_ptr) const { return ptr >= in_ptr.ptr; }
+
+    // Comparisons to raw pointers.
+    bool operator==(const TYPE * in_ptr) const { return ptr == in_ptr; }
+    bool operator!=(const TYPE * in_ptr) const { return ptr != in_ptr; }
+    bool operator<(const TYPE * in_ptr)  const { return ptr < in_ptr; }
+    bool operator<=(const TYPE * in_ptr) const { return ptr <= in_ptr; }
+    bool operator>(const TYPE * in_ptr)  const { return ptr > in_ptr; }
+    bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
+
+  };
+
+#endif
+
+
+
+
+  // Create a helper to replace & operator.
+  template <typename T> Ptr<T> ToPtr(T * _in, bool own=false) { return Ptr<T>(_in, own); }
+  template <typename T> Ptr<T> TrackPtr(T * _in, bool own=true) { return Ptr<T>(_in, own); }
+
+  template <typename T, typename... ARGS> Ptr<T> NewPtr(ARGS &&... args) {
+    return Ptr<T>(new T(std::forward<ARGS>(args)...), true);
+  }
 }
 
 #endif // EMP_PTR_H

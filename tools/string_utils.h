@@ -2,7 +2,9 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  This file contains a set of simple functions to manipulate strings.
+//  Status: RELEASE
 
 #ifndef EMP_STRING_UTILS_H
 #define EMP_STRING_UTILS_H
@@ -105,17 +107,17 @@ namespace emp {
   }
 
   static inline std::string to_upper(std::string value) {
-    constexpr auto char_shift = 'a' - 'A';
+    constexpr int char_shift = 'a' - 'A';
     for (auto & x : value) {
-      if (x >= 'a' && x <= 'z') x -= char_shift;
+      if (x >= 'a' && x <= 'z') x = (char) (x - char_shift);
     }
     return value;
   }
 
   static inline std::string to_lower(std::string value) {
-    constexpr auto char_shift = 'a' - 'A';
+    constexpr int char_shift = 'a' - 'A';
     for (auto & x : value) {
-      if (x >= 'A' && x <= 'Z') x += char_shift;
+      if (x >= 'A' && x <= 'Z') x = (char) (x + char_shift);
     }
     return value;
   }
@@ -474,7 +476,7 @@ namespace emp {
       ss >> arg1;
       _from_string(ss, extra_args...);
     }
-  };
+  }
 
   /// The from_string() function can also take multiple args instead of a return.
   template <typename... Ts>

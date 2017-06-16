@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -16,6 +16,10 @@
 #ifndef EMP_WEB_FILE_INPUT_H
 #define EMP_WEB_FILE_INPUT_H
 
+#include <functional>
+#include <string>
+
+#include "../tools/File.h"
 #include "Widget.h"
 
 namespace emp {
@@ -91,8 +95,7 @@ namespace web {
     FileInput(FileInputInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:
-    FileInput(const std::function<void(const std::string &)> & in_cb,
-              const std::string & in_id="")
+    FileInput(const std::function<void(const std::string &)> & in_cb, const std::string & in_id="")
       : WidgetFacet(in_id)
     {
       info = new FileInputInfo(in_id);
@@ -106,6 +109,8 @@ namespace web {
       using callback_t = std::function<void(const std::string & file_body)>;
       Info()->callback_id = JSWrap( callback_t( [w_info](const std::string & file_body){w_info->DoCallback(file_body);} )  );
     }
+    FileInput(const std::function<void(const emp::File &)> & cb, const std::string & in_id="")
+      : FileInput( [cb](const std::string & in){ std::stringstream ss(in); File file(ss); cb(file); } ) { ; }
     FileInput(const FileInput & in) : WidgetFacet(in) { ; }
     FileInput(const Widget & in) : WidgetFacet(in) { ; }
     virtual ~FileInput() { ; }

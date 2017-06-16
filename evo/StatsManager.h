@@ -43,7 +43,7 @@ namespace evo{
     std::ofstream output_location;    // Where does output go?
     emp::vector<std::string> col_map; // Vector for tracking variables
 
-    StatsManager_Base(std::string location = "cout") {
+    StatsManager_Base(std::string location = "cout") : output_location(), col_map() {
       StatsManagerConfig config;
       config.Read("StatsConfig.cfg");
       resolution = config.RESOLUTION();
@@ -53,7 +53,8 @@ namespace evo{
     }
 
     StatsManager_Base(StatsManagerConfig & config, std::string config_location,
-                      std::string location = "cout") {
+                      std::string location = "cout")
+                       : output_location(), col_map()  {
       config.Read(config_location);
       resolution = config.RESOLUTION();
       delimiter = config.DELIMITER();

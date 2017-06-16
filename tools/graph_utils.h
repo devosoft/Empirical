@@ -4,6 +4,7 @@
 //
 //
 //  This file provides a number of tools for manipulating graphs.
+//  Status: BETA
 
 #ifndef EMP_GRAPH_UTILS_H
 #define EMP_GRAPH_UTILS_H

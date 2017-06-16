@@ -2,10 +2,12 @@
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  ce_string defines a limited array object for use within a constexpr class or function.
 //
-//  Note that this class will be slow if used at run-time without conversion to an
-//  array or vector first.
+//  STATUS: ALPHA
+//
+//  Note: this class will be slow if used at run-time without conversion to an array or vector.
 
 #ifndef EMP_CE_ARRAY_H
 #define EMP_CE_ARRAY_H
@@ -25,7 +27,6 @@ namespace emp {
     ce_array<T, p2_size> p2;   // Second half of values.
 
   public:
-    using size_t = std::size_t;
     using value_type = T;
 
     constexpr ce_array(const T & default_val) : p1(default_val), p2(default_val) {;}

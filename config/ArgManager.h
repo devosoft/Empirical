@@ -24,8 +24,9 @@ namespace emp {
       emp::vector<std::string> arg_descs;
 
     public:
-      ArgManager() { ; }
-      ArgManager(int argc, char* argv[]) : args(args_to_strings(argc, argv)) { ; }
+      ArgManager() : args(), arg_names(), arg_descs() { ; }
+      ArgManager(int argc, char* argv[])
+       : args(args_to_strings(argc, argv)), arg_names(), arg_descs() { ; }
       ~ArgManager() { ; }
 
       size_t size() const { return args.size(); }

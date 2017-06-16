@@ -3,6 +3,7 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  Commonly used values...
+//  Status: RELEASE
 
 #ifndef EMP_CONST_H
 #define EMP_CONST_H
@@ -32,7 +33,8 @@ namespace emp {
     T val=1, next=3;
     while (next > val) {
       val = next;
-      next = next*2 + 1;
+      next = (T) (next * 2);
+      next = (T) (next + 1);
     }
     return val;
   }

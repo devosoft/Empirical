@@ -2,7 +2,9 @@
 //  Copyright (C) Michigan State University, 2016-17.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  SolveState is used as part of a branching solver to keep track of the current state.
+//  Status: BETA
 
 #ifndef EMP_SOLVE_STATE_H
 #define EMP_SOLVE_STATE_H
@@ -80,6 +82,6 @@ namespace emp {
     }
   };
 
-};
+}
 
 #endif

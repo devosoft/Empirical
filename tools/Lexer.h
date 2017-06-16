@@ -2,7 +2,9 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  A general-purpose, fast lexer.
+//  Status: BETA
 
 #ifndef EMP_LEXER_H
 #define EMP_LEXER_H
@@ -63,7 +65,8 @@ namespace emp {
     static const size_t ERROR_ID = MAX_TOKEN_ID; // Code for unknown token ID.
     static inline bool TokenOK(size_t id) { return id < MAX_TOKEN_ID; }
 
-    Lexer() : cur_token_id(MAX_TOKEN_ID), generate_lexer(false) { ; }
+    Lexer()
+    : token_set(), cur_token_id(MAX_TOKEN_ID), generate_lexer(false), lexer_dfa(), lexeme() { }
     ~Lexer() { ; }
 
     size_t GetNumTokens() const { return token_set.size(); }

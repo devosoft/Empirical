@@ -36,7 +36,7 @@ namespace emp {
 
     using value_type = T;
 
-    array() = default;
+    array() : a() { ; }
     array(const emp::array<T,N> &) = default;
     array(std::initializer_list<T> in_list) : a(in_list) { ; }
     array(const std::array<T,N> & in) : a(in) { ; }         // Emergency fallback conversion.

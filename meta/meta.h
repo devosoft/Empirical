@@ -93,6 +93,7 @@ namespace emp {
   // sfinae_decoy<X,Y> will always evaluate to X no matter what Y is.
   // X is type you want it to be; Y is a decoy trigger potential substituion failue.
   template <typename REAL_TYPE, typename EVAL_TYPE> using sfinae_decoy = REAL_TYPE;
+  template <typename REAL_TYPE, typename EVAL_TYPE> using type_decoy = REAL_TYPE;
   template <typename EVAL_TYPE>                     using bool_decoy = bool;
   template <typename EVAL_TYPE>                     using int_decoy = int;
 
@@ -277,12 +278,34 @@ namespace emp {
   template <typename T>
   constexpr bool is_ptr_type_v(const T&) { return is_ptr_type<T>::value; }
 
-  template <typename T> struct remove_ptr_type { ; };
+  template <typename T> struct remove_ptr_type { };    // Not ponter; should break!
   template <typename T> struct remove_ptr_type<T*>     { using type = T; };
   template <typename T> struct remove_ptr_type<Ptr<T>> { using type = T; };
   template <typename T>
   using remove_ptr_type_t = typename remove_ptr_type<T>::type;
   // @CAO: Make sure we are dealing with const and volitile pointers correctly.
+
+  // Can we convert the first pointer into the second?
+  template <typename T1, typename T2> struct ptr_pair {
+    static constexpr bool Same() { return false; }
+    static constexpr bool SameBase() { return false; }
+    static bool ConvertOK(T1 * ptr) { return dynamic_cast<T2*>(ptr); }
+  };
+  template <typename T> struct ptr_pair<T,T> {
+    static constexpr bool Same() { return true; }
+    static constexpr bool SameBase() { return true; }
+    static constexpr bool ConvertOK(T *) { return true; }
+  };
+  template <typename T> struct ptr_pair<T, const T> {
+    static constexpr bool Same() { return false; }
+    static constexpr bool SameBase() { return true; }
+    static constexpr bool ConvertOK(T *) { return true; }
+  };
+  template <typename T> struct ptr_pair<const T, T> {
+    static constexpr bool Same() { return false; }
+    static constexpr bool SameBase() { return true; }
+    static constexpr bool ConvertOK(T *) { return false; }
+  };
 }
 
 

@@ -35,44 +35,45 @@ namespace evo {
     using callback_t = OrgSignals_Eco;
   private:
     // Fixed members
-    callback_t * callbacks;   ///< Callbacks to population
-    size_t id;                ///< Organism ID
+    Ptr<callback_t> callbacks; //< Callbacks to population
+    size_t id;                 //< Organism ID
 
-    BitVector host;         ///< Current host genome
-    BitVector symbiont;     ///< Current symbiont genome
+    BitVector host;            //< Current host genome
+    BitVector symbiont;        //< Current symbiont genome
 
-    uint32_t host_cost;     ///< Score needed for host to replicate.
-    uint32_t symb_cost;     ///< Score needed for symbiont to replicate.
+    size_t host_cost;          //< Score needed for host to replicate.
+    size_t symb_cost;          //< Score needed for symbiont to replicate.
 
     // Active members
-    uint32_t host_pos;      ///< What bit position to execute next in the host?
-    uint32_t symb_pos;      ///< What bit position to execute next in the symbiont?
+    size_t host_pos;           //< What bit position to execute next in the host?
+    size_t symb_pos;           //< What bit position to execute next in the symbiont?
 
-    uint32_t host_score;    ///< Current host score, toward replication
-    uint32_t symb_score;    ///< Current symbiont score, toward horizontal transmission
+    size_t host_score;         //< Current host score, toward replication
+    size_t symb_score;         //< Current symbiont score, toward horizontal transmission
 
-    uint32_t streak_00;     ///< Number of consecutive zeros executed by symbiont.
-    uint32_t streak_01;     ///< Number of consecutive zeros executed by symbiont.
-    uint32_t streak_1;      ///< Number of consecutive ones executed by symbiont.
+    size_t streak_00;          //< Number of consecutive zeros executed by symbiont.
+    size_t streak_01;          //< Number of consecutive zeros executed by symbiont.
+    size_t streak_1;           //< Number of consecutive ones executed by symbiont.
 
   public:
-    SymbulationOrg(const BitVector & genome, uint32_t h_cost, uint32_t s_cost=0)
-      : callbacks(nullptr), id(0), host(genome), host_cost(h_cost), symb_cost(s_cost)
+    SymbulationOrg(const BitVector & genome, size_t h_cost, size_t s_cost=0)
+      : callbacks(nullptr), id(0), host(genome), symbiont()
+      , host_cost(h_cost), symb_cost(s_cost)
       , host_pos(0), symb_pos(0), host_score(0), symb_score(0)
       , streak_00(0), streak_01(0), streak_1(0)
     {
       emp_assert(genome.GetSize() > 0);
     }
-    SymbulationOrg(const BitVector & genome) : SymbulationOrg(genome, (uint32_t)genome.size()) { ; }
-    SymbulationOrg(Random & random, size_t size, double p, uint32_t h_cost, uint32_t s_cost)
+    SymbulationOrg(const BitVector & genome) : SymbulationOrg(genome, genome.size()) { ; }
+    SymbulationOrg(Random & random, size_t size, double p, size_t h_cost, size_t s_cost)
       : SymbulationOrg(RandomBitVector(random, size, p), h_cost, s_cost) { ; }
     SymbulationOrg(Random & random, size_t size, double p=0.5)
-      : SymbulationOrg(RandomBitVector(random, size, p), (uint32_t)size, 0) { ; }
+      : SymbulationOrg(RandomBitVector(random, size, p), size, 0) { ; }
     SymbulationOrg() = delete;
     SymbulationOrg(const SymbulationOrg &) = default;
     ~SymbulationOrg() { ; }
 
-    void Setup(callback_t * in_callbacks, size_t in_id) {
+    void Setup(Ptr<callback_t> in_callbacks, size_t in_id) {
       callbacks = in_callbacks;
       id = in_id;
     }
@@ -86,10 +87,10 @@ namespace evo {
     const BitVector & GetHost() const { return host; }
     const BitVector & GetSymbiont() const { return symbiont; }
 
-    uint32_t GetHostCost() const { return host_cost; }
-    uint32_t GetSymbiontCost() const { return symb_cost; }
-    uint32_t GetHostScore() const { return host_score; }
-    uint32_t GetSymbiontScore() const { return symb_score; }
+    size_t GetHostCost() const { return host_cost; }
+    size_t GetSymbiontCost() const { return symb_cost; }
+    size_t GetHostScore() const { return host_score; }
+    size_t GetSymbiontScore() const { return symb_score; }
 
     void SetHost(const BitVector & genome, bool clear_symbiont=true) {
       host = genome;
@@ -138,11 +139,11 @@ namespace evo {
     }
 
     void Execute(bool align_symbiont=false,
-                 const std::function<uint32_t(uint32_t)> & symb_bonus00=[](uint32_t streak){ return streak; },
-                 const std::function<uint32_t(uint32_t)> & host_bonus01=[](uint32_t streak){ return streak; },
-                 const std::function<uint32_t(uint32_t)> & host_bonus1=[](uint32_t streak){ return 1; },
-                 const std::function<uint32_t(uint32_t)> & symb_bonus01=[](uint32_t streak){ return 0; },
-                 const std::function<uint32_t(uint32_t)> & host_bonus00=[](uint32_t streak){ return 0; }
+                 const std::function<size_t(size_t)> & symb_bonus00=[](size_t streak){ return streak; },
+                 const std::function<size_t(size_t)> & host_bonus01=[](size_t streak){ return streak; },
+                 const std::function<size_t(size_t)> & host_bonus1=[](size_t streak){ return 1; },
+                 const std::function<size_t(size_t)> & symb_bonus01=[](size_t streak){ return 0; },
+                 const std::function<size_t(size_t)> & host_bonus00=[](size_t streak){ return 0; }
                )
     {
       emp_assert(callbacks != nullptr);

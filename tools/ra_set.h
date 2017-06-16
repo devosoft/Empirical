@@ -4,12 +4,14 @@
 //
 //
 //  This file defines a Random Access Set template.
+//  Status: ALPHA
+//
 //
 //  This class uses a combination of a hashtable (std::unordered_map) and emp::vector to
 //  lookup insert, lookup, and delete values in constant time, while still being able to
-//  step through values in and arbitrary order.
+//  step through values (in an arbitrary order).
 //
-//  NOTE: the order may change if values are deleted.
+//  NOTE: the arbitrary order of values may change if any values are deleted.
 
 #ifndef EMP_RA_SET_H
 #define EMP_RA_SET_H
@@ -27,19 +29,19 @@ namespace emp {
     emp::vector<T> vals;
 
   public:
-    ra_set() = default;
+    ra_set() : id_map(), vals() { }
     ra_set(const ra_set &) = default;
     ra_set(ra_set &&) = default;
     ra_set<T> & operator=(const ra_set &) = default;
     ra_set<T> & operator=(ra_set &&) = default;
-    
+
     using value_type = T;
 
     bool empty() const { return id_map.size() == 0; }
     size_t size() const { return id_map.size(); }
 
     const T & operator[](size_t pos) const { return vals[pos]; }
-    
+
     void clear() { id_map.clear(); vals.resize(0); }
     void insert(const T & v) {
       if (count(v)) return; // Already in set.

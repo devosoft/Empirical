@@ -1,6 +1,10 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  Helper functions for emp::Random for common random tasks.
+//  Status: RELEASE
 
 #ifndef EMP_RANDOM_UTILS_H
 #define EMP_RANDOM_UTILS_H

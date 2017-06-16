@@ -2,7 +2,10 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  Basic regular expression handler.
+//  Status: BETA
+//
 //
 //  Special chars:
 //   '|'          - or
@@ -86,11 +89,11 @@ namespace emp {
 
     struct re_string : public re_base {  // Series of specific chars
       std::string str;
-      re_string() { ; }
-      re_string(char c) { str.push_back(c); }
+      re_string() : str() { ; }
+      re_string(char c) : str() { str.push_back(c); }
       re_string(const std::string & s) : str(s) { ; }
       void Print(std::ostream & os) const override { os << "STR[" << to_escaped_string(str) << "]"; }
-      Ptr<re_string> AsString() override { return to_ptr(this); }
+      Ptr<re_string> AsString() override { return ToPtr(this); }
       size_t GetSize() const override { return str.size(); }
       virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
         size_t prev_id = start;
@@ -105,10 +108,15 @@ namespace emp {
 
     struct re_charset : public re_base { // Any char from set.
       opts_t char_set;
-      re_charset() { ; }
-      re_charset(char x, bool neg=false) { char_set[(size_t)x]=true; if (neg) char_set.NOT_SELF(); }
-      re_charset(const std::string & s, bool neg=false)
-        { for (char x : s) char_set[(size_t)x]=true; if (neg) char_set.NOT_SELF(); }
+      re_charset() : char_set() { ; }
+      re_charset(char x, bool neg=false) : char_set() {
+        char_set[(size_t)x]=true;
+        if (neg) char_set.NOT_SELF();
+      }
+      re_charset(const std::string & s, bool neg=false) : char_set() {
+        for (char x : s) char_set[(size_t)x]=true;
+        if (neg) char_set.NOT_SELF();
+      }
       void Print(std::ostream & os) const override {
         auto chars = char_set.GetOnes();
         bool use_not = false;
@@ -118,7 +126,7 @@ namespace emp {
         for (auto c : chars) os << to_escaped_string((char) c);
         os << "]";
       }
-      Ptr<re_charset> AsCharSet() override { return to_ptr(this); }
+      Ptr<re_charset> AsCharSet() override { return ToPtr(this); }
       size_t GetSize() const override { return char_set.CountOnes(); }
       char First() const { return (char) char_set.FindBit(); }
       virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
@@ -130,12 +138,13 @@ namespace emp {
     protected:
       emp::vector<Ptr<re_base>> nodes;
     public:
+      re_parent() : nodes() { }
       ~re_parent() { for (auto x : nodes) x.Delete(); }
       void Clear() { for (auto x : nodes) x.Delete(); nodes.resize(0); }
       virtual void push(Ptr<re_base> x) { emp_assert(x != nullptr); nodes.push_back(x); }
       Ptr<re_base> pop() { auto out = nodes.back(); nodes.pop_back(); return out; }
       size_t GetSize() const override { return nodes.size(); }
-      Ptr<re_parent> AsParent() override { return to_ptr(this); }
+      Ptr<re_parent> AsParent() override { return ToPtr(this); }
       bool Simplify() override {
         bool m=false;
         for (auto & x : nodes) {
@@ -158,14 +167,14 @@ namespace emp {
       void Print(std::ostream & os) const override {
         os << "BLOCK["; for (auto x : nodes) x->Print(os); os << "]";
       }
-      Ptr<re_block> AsBlock() override { return to_ptr(this); }
+      Ptr<re_block> AsBlock() override { return ToPtr(this); }
       bool Simplify() override {
         bool modify = false;
         // Loop through block elements, simplifying when possible.
         for (size_t i = 0; i < nodes.size(); i++) {
           // If node is a charset with one option, replace it with a string.
           if (nodes[i]->AsCharSet() && nodes[i]->GetSize() == 1) {
-            auto new_node = new re_string(nodes[i]->AsCharSet()->First());
+            auto new_node = NewPtr<re_string>(nodes[i]->AsCharSet()->First());
             nodes[i].Delete();
             nodes[i] = new_node;
             modify = true;
@@ -187,7 +196,7 @@ namespace emp {
             nodes.insert(nodes.begin() + (long) i, old_node->nodes.begin(), old_node->nodes.end());
             old_node->nodes.resize(0);  // Don't recurse delete since nodes were moved!
             old_node.Delete();
-            // @CAO do this.
+            // @CAO do this. [Cryptic... not sure what needs to be done...]
             i--;
             modify = true;
             continue;
@@ -271,7 +280,7 @@ namespace emp {
       char c = regex[pos++];
       bool neg = false;
       if (c == '^') { neg = true; c = regex[pos++]; }
-      auto out = new re_charset;
+      auto out = NewPtr<re_charset>();
       char prev_c = -1;
       while (c != ']' && pos < regex.size()) {
         if (c == '-' && prev_c != -1) {
@@ -312,7 +321,7 @@ namespace emp {
 
     Ptr<re_string> ConstructString() {
       char c = regex[pos++];
-      auto out = new re_string;
+      auto out = NewPtr<re_string>();
       while (c != '\"' && pos < regex.size()) {
         // @CAO Error if we run out of chars before close '"'
         if (c == '\\') {
@@ -343,7 +352,7 @@ namespace emp {
       char c = regex[pos++];  // Grab the current character and move pos to next.
       switch (c) {
         case '.':
-          result = new re_charset('\n', true);  // Anything except newline.
+          result = NewPtr<re_charset>('\n', true);  // Anything except newline.
           break;
         case '(':
           result = Process();         // Process the internal contents of parens.
@@ -379,7 +388,7 @@ namespace emp {
             default:
               Error("Unknown escape char for regex: '\\", c, "'.");
           }
-          result = new re_string(c);
+          result = NewPtr<re_string>(c);
           break;
 
         // Error cases
@@ -389,12 +398,12 @@ namespace emp {
         case '?':
         case ')':
           Error("Expected regex segment but got '", c, "' at position ", pos, ".");
-          result = new re_string(c);
+          result = NewPtr<re_string>(c);
           break;
 
         default:
           // Take this char directly.
-          result = new re_string(c);
+          result = NewPtr<re_string>(c);
       }
 
       emp_assert(result != nullptr);
@@ -406,7 +415,7 @@ namespace emp {
       emp_assert(pos >= 0 && pos < regex.size(), pos, regex.size());
 
       // If caller does not provide current block, create one (and return it.)
-      if (cur_block==nullptr) cur_block = new re_block;
+      if (cur_block==nullptr) cur_block = NewPtr<re_block>();
 
       // All blocks need to start with a single token.
       cur_block->push( ConstructSegment() );
@@ -415,10 +424,10 @@ namespace emp {
         const char c = regex[pos++];
         switch (c) {
           // case '|': cur_block->push( new re_or( cur_block->pop(), ConstructSegment() ) ); break;
-          case '|': cur_block->push( new re_or( cur_block->pop(), Process() ) ); break;
-          case '*': cur_block->push( new re_star{ cur_block->pop() } ); break;
-          case '+': cur_block->push( new re_plus{ cur_block->pop() } ); break;
-          case '?': cur_block->push( new re_qm{ cur_block->pop() } ); break;
+          case '|': cur_block->push( NewPtr<re_or>( cur_block->pop(), Process() ) ); break;
+          case '*': cur_block->push( NewPtr<re_star>( cur_block->pop() ) ); break;
+          case '+': cur_block->push( NewPtr<re_plus>( cur_block->pop() ) ); break;
+          case '?': cur_block->push( NewPtr<re_qm>( cur_block->pop() ) ); break;
           case ')': pos--; return cur_block;  // Must be ending segment (restore pos to check on return)
 
           default:     // Must be a regular "segment"
@@ -432,12 +441,14 @@ namespace emp {
 
   public:
     RegEx() = delete;
-    RegEx(const std::string & r) : regex(r), valid(true), pos(0), dfa_ready(false) {
-      Process(to_ptr(head));
+    RegEx(const std::string & r)
+    : regex(r), notes(), valid(true), pos(0), dfa(), dfa_ready(false), head() {
+      Process(ToPtr(&head));
       while(head.Simplify());
     }
-    RegEx(const RegEx & r) : regex(r.regex), valid(true), pos(0), dfa_ready(false) {
-      Process(to_ptr(head));
+    RegEx(const RegEx & r)
+    : regex(r.regex), notes(), valid(true), pos(0), dfa(), dfa_ready(false), head() {
+      Process(ToPtr(&head));
       while(head.Simplify());
     }
     ~RegEx() { ; }
@@ -448,7 +459,7 @@ namespace emp {
       valid = true;
       pos = 0;
       head.Clear();
-      Process(to_ptr(head));
+      Process(ToPtr(&head));
       while (head.Simplify());
       return *this;
     }

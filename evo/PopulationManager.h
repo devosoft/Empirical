@@ -53,7 +53,8 @@ namespace evo {
     };
 
   public:
-    PopulationManager_Base(const std::string &, FIT_MANAGER & _fm) : fitM(_fm), num_orgs(0) { ; }
+    PopulationManager_Base(const std::string &, FIT_MANAGER & _fm)
+     : fitM(_fm), num_orgs(0), random_ptr(nullptr), pop() { ; }
     ~PopulationManager_Base() { Clear(); }
 
     // Allow this and derived classes to be identified as a population manager.
@@ -107,8 +108,8 @@ namespace evo {
     void Clear() {
       // Delete all organisms.
       for (ptr_t org : pop) if (org) org.Delete();  // Delete current organisms.
-      pop.resize(0);                              // Remove deleted organisms.
-      fitM.ClearPop();                               // Clear the fitness manager cache.
+      pop.resize(0);                                // Remove deleted organisms.
+      fitM.ClearPop();                              // Clear the fitness manager cache.
       num_orgs = 0;
     }
 
@@ -131,7 +132,6 @@ namespace evo {
     }
 
     void Resize(size_t new_size) {
-      emp_assert(new_size >= 0);
       for (size_t i = new_size; i < pop.size(); i++) ClearOrgAt(i); // Remove orgs out or range.
       pop.resize(new_size, nullptr);  // Initialize new orgs as null.
       fitM.Resize(new_size);
@@ -299,7 +299,7 @@ namespace evo {
 
   public:
     PopulationManager_EA(const std::string & _w_name, FIT_MANAGER & _fm)
-    : base_t(_w_name, _fm) { ; }
+    : base_t(_w_name, _fm), next_pop() { ; }
     ~PopulationManager_EA() { base_t::Clear(); ClearNext(); }
 
     static constexpr bool emp_has_separate_generations = true;
@@ -311,7 +311,7 @@ namespace evo {
     }
 
     void ClearNext() {
-      for (ptr_t m : next_pop) if (m) delete m;
+      for (ptr_t m : next_pop) if (m) m.Delete();
       next_pop.resize(0);
     }
 
@@ -373,7 +373,7 @@ namespace evo {
 
   public:
     PopulationManager_Grid(const std::string & _w_name, FIT_MANAGER & _fm)
-    : base_t(_w_name, _fm) {
+    : base_t(_w_name, _fm), width(0), height(0) {
       ConfigPop(10,10);
     }
     ~PopulationManager_Grid() { ; }

@@ -2,7 +2,9 @@
 //  Copyright (C) Michigan State University, 2015-2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  This file contains macros for simplifying to serialization of objects.
+//  Status: ALPHA
 
 #ifndef EMP_SERIALIZE_MACROS_H
 #define EMP_SERIALIZE_MACROS_H

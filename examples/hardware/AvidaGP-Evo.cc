@@ -46,8 +46,8 @@ int main()
   std::function<double(emp::AvidaGP*)> fit_fun =
     [](emp::AvidaGP * org) {
       int count = 0;
-      for (size_t i = 0; i < 16; i++) {
-        if (org->GetOutput(i) == i*i) count++;
+      for (int i = 0; i < 16; i++) {
+        if (org->GetOutput(i) == (double) (i*i)) count++;
       }
       return (double) count;
     };
@@ -56,7 +56,7 @@ int main()
   for (size_t out_id = 0; out_id < 16; out_id++) {
     // Setup the fitness function.
     fit_set[out_id] = [out_id](emp::AvidaGP * org) {
-      return (double) -std::abs(org->GetOutput(out_id) - out_id * out_id);
+      return (double) -std::abs(org->GetOutput((int)out_id) - (double) (out_id * out_id));
     };
   }
 
@@ -86,7 +86,7 @@ int main()
   std::cout << std::endl;
   world[0].PrintGenome();
   std::cout << std::endl;
-  for (size_t i = 0; i < 16; i++) {
+  for (int i = 0; i < 16; i++) {
     std::cout << i << ":" << world[0].GetOutput(i) << "  ";
   }
   std::cout << std::endl;

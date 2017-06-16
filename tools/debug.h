@@ -4,13 +4,17 @@
 //
 //
 //  Basic tools for use in developing high-assurance code.
+//  Status: BETA
 
-#ifndef EMP_DEBUG_DEBUG
-#define EMP_DEBUG_DEBUG
+#ifndef EMP_DEBUG_H
+#define EMP_DEBUG_H
 
+#include <iostream>
 #include <set>
 #include <string>
 #include <type_traits>
+
+#define EMP_DEBUG_PRINT(...) std::cout << "[" << #__VA_ARGS__ << "] = " << __VA_ARGS__ << std::endl
 
 namespace emp {
 
@@ -39,6 +43,6 @@ namespace emp {
     }
   }
 
-};
+}
 
 #endif

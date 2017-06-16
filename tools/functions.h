@@ -2,7 +2,9 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
+//
 //  A collection of broadly-useful functions.
+//  Status: BETA (though new functions are added frequently)
 
 #ifndef EMP_FUNCTIONS_H
 #define EMP_FUNCTIONS_H
@@ -41,6 +43,18 @@ namespace emp {
   // Toggle an input bool.
   inline bool Toggle(bool & in_bool) { return (in_bool = !in_bool); }
 
+  // Combine bools...
+  inline constexpr bool AllTrue() { return true; }
+  template <typename... Ts>
+  inline bool AllTrue(bool result, Ts... OTHER) {
+    return result && AllTrue(OTHER...);
+  }
+
+  inline constexpr bool AnyTrue() { return false; }
+  template <typename... Ts>
+  inline bool AnyTrue(bool result, Ts... OTHER) {
+    return result || AnyTrue(OTHER...);
+  }
 
   template <typename T>
   static inline emp::vector<T> BuildRange(T min, T max, T step=1) {

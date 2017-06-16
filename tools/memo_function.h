@@ -5,6 +5,7 @@
 //
 //  A memo_function works identicaly to std::function, but memorizes prior results (caches them)
 //  so that the function doesn't have to process those results again.
+//  Status: BETA
 
 #ifndef EMP_MEMO_FUNCTIONS_H
 #define EMP_MEMO_FUNCTIONS_H
@@ -36,10 +37,10 @@ namespace emp {
 
   public:
     template <typename T>
-    memo_function(T && fun_info) : fun(std::forward<T>(fun_info)) { ; }
+    memo_function(T && fun_info) : cache_map(), fun(std::forward<T>(fun_info)) { ; }
     memo_function(const this_t &) = default;
     memo_function(this_t &&) = default;
-    memo_function() { ; }
+    memo_function() : cache_map(), fun() { ; }
 
     this_t & operator=(const this_t &) = default;
     this_t & operator=(this_t &&) = default;
@@ -92,7 +93,7 @@ namespace emp {
 
   public:
     template <typename... Ts>
-    memo_function(Ts &&... args) : fun(std::forward<Ts>(args)...) { ; }
+    memo_function(Ts &&... args) : cache_map(), fun(std::forward<Ts>(args)...) { ; }
     memo_function(const memo_function &) = default;
     memo_function(memo_function &&) = default;
 
@@ -156,7 +157,7 @@ namespace emp {
 
   public:
     template <typename T>
-    memo_function(T && fun_info) : has_cache(false), fun(std::forward<T>(fun_info)) { ; }
+    memo_function(T && fun_info) : cached_value(), has_cache(false), fun(std::forward<T>(fun_info)) { ; }
     memo_function(const this_t &) = default;
     memo_function(this_t &&) = default;
     memo_function() : has_cache(false) { ; }
