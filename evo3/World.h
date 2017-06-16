@@ -77,7 +77,7 @@ namespace emp {
   public:
     World()
       : random_ptr(NewPtr<Random>()), random_owner(true), pop(), num_orgs(0)
-      , pop_struct(Struct::MIXED), synchronous_gen(false), cache_on(false)
+      , pop_struct(Struct::MIXED), synchronous_gen(false), cache_on(false), width(0), height(0)
       , fun_calc_fitness(), fun_add_inject(), fun_add_birth()
     {
       ConfigFuns();
@@ -97,6 +97,11 @@ namespace emp {
     size_t GetSize() const { return pop.size(); }
     size_t GetNumOrgs() const { return num_orgs; }
     bool IsOccupied(size_t i) const { return pop[i] != nullptr; }
+    bool IsSynchronous() const { return synchronous_gen; }
+    bool IsCacheOn() const { return cache_on; }
+    Struct GetPopStruct() const { return pop_struct; }
+    size_t GetWidth() const { return width; }
+    size_t GetHeight() const { return height; }
 
     // We ONLY have a const index operator since manipulations should go through other functions.
     // No non-const version.
