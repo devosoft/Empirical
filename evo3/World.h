@@ -230,7 +230,21 @@ namespace emp {
     void Print(std::ostream & os = std::cout, std::string empty="X", std::string spacer=" ");
     void PrintOrgCounts(std::function<std::string(ORG*)> string_fun,
 			std::ostream & os = std::cout);
-
+    void PrintGrid(std::function<std::string(ORG*)> string_fun, std::ostream& os=std::cout,
+               const std::string & empty="-", const std::string & spacer=" ") {
+      emp_assert(string_fun);
+      for (size_t y=0; y < height; y++) {
+        for (size_t x = 0; x < width; x++) {
+          ptr_t org = base_t::GetOrg(x+y*width);
+          if (org) os << string_fun(org.Raw()) << spacer;
+          else os << empty << spacer;
+        }
+        os << std::endl;
+      }
+    }
+    void PrintGrid(std::ostream& os=std::cout, const std::string & empty="X", std::string spacer=" ") {
+      PrintGrid( [](ORG * org){return emp::to_string(*org);}, os, empty, spacer);
+    }
 
     // --- FOR VECTOR COMPATIBILITY ---
     size_t size() const { return pop.size(); }
