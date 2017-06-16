@@ -44,22 +44,16 @@ int main() {
   for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
   std::cout << std::endl;
 
-  // // Populations can be supplied a default fitness function so that it doesn't
-  // // need to keep being specified.
-  // world.SetDefaultFitnessFun([](int * i){ return (double) *i; });
-  //
-  // // world.EliteSelect([](int * i){ return (double) *i; }, 10, 10);
-  // world.EliteSelect(10, 10);
-  // world.Update();
-  // std::cout << "Post-Elite Size = " << world.GetSize() << std::endl;
-  // for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
-  // std::cout << std::endl << std::endl;
-  //
-  //
-  //
-  // EAWorld<TestOrg1> ea_world(random);
-  // for (int i = 0; i < 100; i++) ea_world.Inject(i+200);
-  //
+  world.EliteSelect(10, 10);
+  world.Update();
+  std::cout << "\nPost-Elite Size = " << world.GetSize() << std::endl << std::endl;
+  for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
+  std::cout << std::endl << std::endl;
+
+
+  emp::World<TestOrg1> ea_world;
+  for (int i = 0; i < 100; i++) ea_world.Inject(i+200);
+
   // std::cout << "Start Size = " << ea_world.GetSize() << std::endl;
   // for (size_t i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].Fitness() << " ";
   // std::cout << std::endl;
