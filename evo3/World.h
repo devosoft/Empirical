@@ -116,6 +116,16 @@ namespace emp {
     void ConfigFuns();
     void ModeBasic() { synchronous_gen = false; ConfigFuns(); }
     void ModeEA() { synchronous_gen = true; ConfigFuns(); }
+    void SetWellMixed() {
+      width = 0; height = 0;
+      pop_struct(Struct::MIXED);
+      ConfigFuns();
+    }
+    void SetGrid(size_t _w, size_t _h) {
+      width = _w;  height = _h;
+      pop_struct(Struct::GRID);
+      ConfigFuns();
+    }
 
 
     // --- UPDATE THE WORLD! ---
@@ -178,7 +188,20 @@ namespace emp {
     size_t GetRandomCellID() { return random_ptr->GetInt(0, pop.size()); }
 
     // By default, assume a well-mixed population so random neighbors can be anyone.
-    size_t GetRandomNeighborID(size_t /*id*/) { return random_ptr->GetUInt(0, pop.size()); }
+    size_t GetRandomNeighborID(size_t id) {
+      // @CAO: Change to a member function pointer?
+      switch (pop_struct) {
+      case Struct::MIXED: return random_ptr->GetUInt(0, pop.size());
+      case Struct::GRID: {
+        const int offset = random_ptr->GetInt(9);
+        const int rand_x = (int) (id%width) + offset%3 - 1;
+        const int rand_y = (int) (id/width) + offset/3 - 1;
+        return (size_t) (emp::Mod(rand_x, (int) width) + emp::Mod(rand_y, (int) height) * (int)width);
+      }
+      }
+      emp_assert(false);
+      return 0;
+    }
 
     // Get random *occupied* cell.
     size_t GetRandomOrgID();
