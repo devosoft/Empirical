@@ -105,10 +105,15 @@ namespace emp {
 
     // We ONLY have a const index operator since manipulations should go through other functions.
     // No non-const version.
-    const ORG & operator[](size_t pos) const {
-      emp_assert(pop[pos] != nullptr, pos);  // Should not index to a null organism!
-      return *(pop[pos]);
+    const ORG & operator[](size_t id) const {
+      emp_assert(pop[id] != nullptr, id);  // Should not index to a null organism!
+      return *(pop[id]);
     }
+    const ORG & GetOrg(size_t id) const {
+      emp_assert(pop[id] != nullptr, id);  // Should not index to a null organism!
+      return *(pop[id]);
+    }
+    const ORG & GetOrg(size_t x, size_t y) { return GetOrg(x+y*width); }
 
 
     // --- CONFIGURE ---
@@ -235,7 +240,7 @@ namespace emp {
       emp_assert(string_fun);
       for (size_t y=0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {
-          ptr_t org = base_t::GetOrg(x+y*width);
+          ptr_t org = GetOrg(x+y*width);
           if (org) os << string_fun(org.Raw()) << spacer;
           else os << empty << spacer;
         }
@@ -312,6 +317,14 @@ namespace emp {
         };
         break;
       case Struct::GRID:
+        fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
+          emp_assert(new_org);                           // New organism must exist.
+          const size_t id = GetRandomNeighbor(parent_id);
+          if (id >= next_pop.size()) next_pop.resize(id+1, nullptr);
+          if (next_pop[id]) next_pop[id].Delete();
+          next_pop[id] = new_org;
+          return id;
+        };
         break;
       case Struct::POOLS:
         break;
@@ -325,14 +338,13 @@ namespace emp {
     else {
       switch (pop_struct) {
       case Struct::MIXED:
+      case Struct::GRID:
         fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
         fun_add_birth = [this](Ptr<ORG> new_org, size_t) {
-          emp_assert(new_org);                           // New organism must exist.
-          size_t pos = random_ptr->GetUInt(pop.size());  // Place in random position.
-          return AddOrgAt(new_org, pos);                 // Place org in  existing population.
+          emp_assert(new_org);                          // New organism must exist.
+          size_t pos = GetRandomNeighbor(parent_pos);   // Place in random position.
+          return AddOrgAt(new_org, pos);                // Place org in  existing population.
         };
-        break;
-      case Struct::GRID:
         break;
       case Struct::POOLS:
         break;
