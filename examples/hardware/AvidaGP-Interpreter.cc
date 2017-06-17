@@ -15,7 +15,7 @@ int main() {
 
     const emp::InstLib<emp::AvidaGP::Instruction> & lib = cpu.GetInstLib();
     std::cout << ">> ";
-    // From http://www.lb-stuff.com/user-input
+
 	std::string line; //stores the most recent line of input
 	while(true) //read entire lines at a time
 	{
