@@ -15,12 +15,10 @@ int main() {
 
     const emp::InstLib<emp::AvidaGP::Instruction> & lib = cpu.GetInstLib();
     std::cout << ">> ";
-
-	std::string line; //stores the most recent line of input
-	while(true) //read entire lines at a time
-	{
+    std::string line; //stores the most recent line of input
+    while(true) {
         std::getline(std::cin, line);
-		if (line == "exit") {
+        if (line == "exit") {
             break;
         }
 
@@ -64,6 +62,5 @@ int main() {
         cpu.Process(1);
         cpu.PrintState(std::cout);
         std::cout << ">> ";
-	}
-
+    }
 }
