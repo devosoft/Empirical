@@ -23,7 +23,7 @@ namespace emp {
     // 3. Start with a fitness function that throws an assert indicating function must be set.
 
     template <typename WORLD, typename ORG>
-    void SetDefaultFitFun_impl(WORLD & world, bool_decoy<decltype(ORG::GetFitness)>) {
+    void SetDefaultFitFun_impl(WORLD & world, bool_decoy<decltype( (*(ORG*)nullptr).GetFitness() )>) {
       world.SetFitFun( [](ORG & org){ return (double) org.GetFitness(); } );
     }
 
