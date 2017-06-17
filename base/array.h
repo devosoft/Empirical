@@ -28,55 +28,29 @@ namespace emp {
 namespace emp {
 
   template <typename T, size_t N>
-  class array {
+  class array : public std::array<T,N> {
   private:
-    std::array<T, N> a;
+    using stda_t = std::array<T,N>;
 
   public:
-
     using value_type = T;
 
     array() : a() { ; }
-    array(const emp::array<T,N> &) = default;
-    array(std::initializer_list<T> in_list) : a(in_list) { ; }
-    array(const std::array<T,N> & in) : a(in) { ; }         // Emergency fallback conversion.
+    array(const emp::array<T,N> & _in) : stda_t(_in) { ; };
+    array(std::initializer_list<T> in_list) : stda_t(in_list) { ; }
+    array(const std::array<T,N> & in) : stda_t(in) { ; }         // Emergency fallback conversion.
     ~array() = default;
-
-    constexpr uint32_t size() const noexcept { return N; }
-
-    emp::array<T,N> & operator=(const emp::array<T,N> &) = default;
-
-    operator std::array<T,N>() const {return a;};
-
-    bool operator==(const emp::array<T,N> & in) const { return a == in.a; }
-    bool operator!=(const emp::array<T,N> & in) const { return a != in.a; }
-    bool operator<(const emp::array<T,N> & in)  const { return a < in.a; }
-    bool operator<=(const emp::array<T,N> & in) const { return a <= in.a; }
-    bool operator>(const emp::array<T,N> & in)  const { return a > in.a; }
-    bool operator>=(const emp::array<T,N> & in) const { return a >= in.a; }
 
     T & operator[](size_t pos) {
       emp_assert(pos < (int) N, pos);
-      return a[pos];
+      return stda_t::operator[](pos);
     }
 
     const T & operator[](size_t pos) const {
       emp_assert(pos < (int) N, pos);
-      return a[pos];
+      return stda_t::operator[](pos);
     }
 
-    auto begin() -> decltype(a.begin()) { return a.begin(); }
-    auto end() -> decltype(a.end()) { return a.end(); }
-    auto begin() const -> const decltype(a.begin()) { return a.begin(); }
-    auto end() const -> const decltype(a.end()) { return a.end(); }
-
-    T & back() { return a.back(); }
-    const T & back() const { return a.back(); }
-
-    template <typename... ARGS>
-    auto fill(ARGS &&... args) -> decltype(a.fill(std::forward<ARGS>(args)...)) {
-      return a.fill(std::forward<ARGS>(args)...);
-    }
   };
 
 }
