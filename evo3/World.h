@@ -119,6 +119,9 @@ namespace emp {
       return *(pop[id]);
     }
     const ORG & GetOrg(size_t x, size_t y) { return GetOrg(x+y*width); }
+    const Ptr<ORG> GetOrgPtr(size_t id) const {
+      return pop[id];
+    }
 
 
     // --- CONFIGURE ---
@@ -128,12 +131,13 @@ namespace emp {
     void ModeEA() { synchronous_gen = true; ConfigFuns(); }
     void SetWellMixed() {
       width = 0; height = 0;
-      pop_struct(Struct::MIXED);
+      pop_struct = Struct::MIXED;
       ConfigFuns();
     }
     void SetGrid(size_t _w, size_t _h) {
       width = _w;  height = _h;
-      pop_struct(Struct::GRID);
+      pop_struct = Struct::GRID;
+      Resize(_w * _h);
       ConfigFuns();
     }
 
@@ -248,7 +252,7 @@ namespace emp {
       emp_assert(string_fun);
       for (size_t y=0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {
-          ptr_t org = GetOrg(x+y*width);
+          ptr_t org = GetOrgPtr(x+y*width);
           if (org) os << string_fun(org.Raw()) << spacer;
           else os << empty << spacer;
         }
