@@ -15,8 +15,8 @@ struct TestOrg1 {
 
   TestOrg1() : fitness(0) { ; }
   TestOrg1(int f) : fitness(f) { ; }
-  double Fitness() { return (double) fitness; }
-  bool Mutate(emp::Random&) { return false; }
+  double GetFitness() const { return (double) fitness; }
+  bool DoMutate(emp::Random&) { return false; }
 };
 
 int main() {
@@ -52,39 +52,40 @@ int main() {
 
 
   emp::World<TestOrg1> ea_world;
+  ea_world.ModeEA();
   for (int i = 0; i < 100; i++) ea_world.Inject(i+200);
 
-  // std::cout << "Start Size = " << ea_world.GetSize() << std::endl;
-  // for (size_t i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].Fitness() << " ";
-  // std::cout << std::endl;
-  //
-  // ea_world.TournamentSelect(5, 100);
-  // ea_world.Update();
-  // std::cout << "Post-Tourney Size = " << ea_world.GetSize() << std::endl;
-  // for (size_t i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].Fitness() << " ";
-  // std::cout << std::endl;
-  //
-  // // world.EliteSelect([](int * i){ return (double) *i; }, 10, 10);
-  // ea_world.EliteSelect(10, 10);
-  // ea_world.Update();
-  // std::cout << "Post-Elite Size = " << ea_world.GetSize() << std::endl;
-  // for (size_t i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].Fitness() << " ";
-  // std::cout << std::endl << std::endl;
-  //
-  //
-  // // Test grid Populations
-  // GridWorld<int> grid_world(random);
-  // for (int i = 0; i < 10; i++) grid_world.Inject(i);
-  // grid_world.Print();
-  //
-  // for (size_t i = 0; i < grid_world.GetSize(); ++i) {
-  //   size_t id = random.GetUInt(grid_world.GetSize());
-  //   if (grid_world.IsOccupied(id)) grid_world.InjectBirth(grid_world[id], id);
-  // }
-  // std::cout << std::endl;
-  // grid_world.Print();
-  // std::cout << "Num orgs=" << grid_world.GetNumOrgs() << std::endl;
-  // std::cout << std::endl;
+  std::cout << "\nStart Size = " << ea_world.GetSize() << std::endl;
+  for (size_t i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].GetFitness() << " ";
+  std::cout << std::endl;
+
+  ea_world.TournamentSelect(5, 100);
+  ea_world.Update();
+  std::cout << "\nPost-Tourney Size = " << ea_world.GetSize() << std::endl;
+  for (size_t i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].GetFitness() << " ";
+  std::cout << std::endl;
+
+  ea_world.EliteSelect(10, 10);
+  ea_world.Update();
+  std::cout << "Post-Elite Size = " << ea_world.GetSize() << std::endl;
+  for (size_t i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].GetFitness() << " ";
+  std::cout << std::endl << std::endl;
+
+  // Test grid Populations
+  emp::Random random;
+  emp::World<int> grid_world(&random);
+  grid_world.SetGrid(10,10);
+  for (int i = 0; i < 10; i++) grid_world.Inject(i);
+  grid_world.PrintGrid();
+
+  for (size_t i = 0; i < grid_world.GetSize(); ++i) {
+    size_t id = random.GetUInt(grid_world.GetSize());
+    if (grid_world.IsOccupied(id)) grid_world.DoBirth(grid_world[id], id);
+  }
+  std::cout << std::endl;
+  grid_world.PrintGrid();
+  std::cout << "Num orgs=" << grid_world.GetNumOrgs() << std::endl;
+  std::cout << std::endl;
   //
   //
   // // Let's try to build a world with a plug-in population manager.
