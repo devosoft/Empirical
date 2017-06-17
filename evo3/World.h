@@ -29,11 +29,14 @@
 #include "../tools/random_utils.h"
 #include "../tools/string_utils.h"
 
+#include "World_reflect.h"  // Handle needed reflection on incoming organism classes.
+
 namespace emp {
 
   template <typename ORG, typename GENOTYPE=ORG>
   class World {
   private:
+    using this_t = World<ORG, GENOTYPE>;
     using ptr_t = Ptr<ORG>;
     using pop_t = emp::vector<ptr_t>;
 
@@ -76,11 +79,12 @@ namespace emp {
 
   public:
     World(Ptr<Random> rnd=nullptr)
-      : random_ptr(rnd), random_owner(false), pop(), num_orgs(0)
+      : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), fit_cache()
       , pop_struct(Struct::MIXED), synchronous_gen(false), cache_on(false), width(0), height(0)
       , fun_calc_fitness(), fun_add_inject(), fun_add_birth()
     {
       if (!rnd) NewRandom();
+      SetDefaultFitFun<this_t, ORG>(*this);
       ConfigFuns();
     }
     ~World() {
@@ -282,7 +286,7 @@ namespace emp {
   // ===                                                       ===
   // =============================================================
 
-  template<typename ORG, typename GENOTYPE>
+  template <typename ORG, typename GENOTYPE>
   size_t World<ORG,GENOTYPE>::AddOrgAt(Ptr<ORG> new_org, size_t pos) {
     emp_assert(new_org, pos);
 
