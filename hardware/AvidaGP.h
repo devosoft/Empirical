@@ -529,7 +529,9 @@ namespace emp {
     if (inst_ptr != next_inst) os << "(-> " << next_inst << ")";
     os << " scope:" << CurScope()
        << " (";
-    PrintInst(genome[next_inst], os);
+    if (next_inst < genome.size()) { // For interpreter mode
+        PrintInst(genome[next_inst], os);
+    }
     os << ")"
        << " errors: " << errors
        << std::endl;

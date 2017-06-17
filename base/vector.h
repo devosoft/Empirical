@@ -56,6 +56,8 @@ namespace emp {
     vector(size_t size) : v(size) { emp_assert(size < MAX_SIZE, size); }
     vector(size_t size, const T & val) : v(size, val) { emp_assert(size < MAX_SIZE, size); }
     vector(std::initializer_list<T> in_list) : v(in_list) { ; }
+    template <typename InputIt>
+    vector(InputIt first, InputIt last) : v(first, last){;}
     vector(const stdv_t & in) : v(in) { ; }         // Emergency fallback conversion.
     ~vector() = default;
 

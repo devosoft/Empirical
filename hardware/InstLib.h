@@ -13,6 +13,7 @@
 
 #include "../base/vector.h"
 #include "../tools/map_utils.h"
+#include "../tools/string_utils.h"
 
 namespace emp {
 
@@ -37,7 +38,7 @@ namespace emp {
     };
 
     emp::vector<InstDef> inst_lib;
-    std::map<std::string, size_t> name_map;
+    std::map<std::string, inst_id_t> name_map;
     std::map<std::string, inst_arg_t> arg_map;
 
   public:
@@ -53,6 +54,11 @@ namespace emp {
       if (id < 62) return ('0' + (id - 52));
       return '+';
     }
+
+    bool IsInst(const std::string name) const {
+        return Has(name_map, name);
+    }
+
     inst_id_t GetID(const std::string name) const {
       emp_assert(Has(name_map, name), name);
       return Find(name_map, name, inst_id_t::Unknown);
@@ -76,7 +82,7 @@ namespace emp {
       const size_t id = (size_t) inst_id;
       if (inst_lib.size() <= id) inst_lib.resize(id+1);
       inst_lib[id] = InstDef(inst_id, name, desc, num_args);
-      name_map[name] = id;
+      name_map[name] = inst_id;
     }
 
     void AddArg(const std::string & name, inst_arg_t value) {
