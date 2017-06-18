@@ -57,6 +57,7 @@ namespace emp {
     emp::vector<double> fit_cache;  // vector size == 0 when not caching; uncached values == 0.
 
     // Configuration settings
+    std::string name;         // Name of this world (for use in configuration.)
     Struct pop_struct;        // What population structure are we using?
     bool synchronous_gen;     // Should generations be prefectly synchronous?
     bool cache_on;            // Should we be caching fitness values?
@@ -80,16 +81,20 @@ namespace emp {
     double GetCache(size_t id) const { return (id < fit_cache.size()) ? fit_cache[id] : 0.0; }
 
   public:
-    World(Ptr<Random> rnd=nullptr)
+    World(Ptr<Random> rnd=nullptr, std::string _name="")
       : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), fit_cache()
-      , pop_struct(Struct::MIXED), synchronous_gen(false), cache_on(false), width(0), height(0)
-      , fun_calc_fitness(), fun_add_inject(), fun_add_birth()
+      , name(_name), pop_struct(Struct::MIXED), synchronous_gen(false)
+      , cache_on(false), width(0), height(0)
+      , fun_calc_fitness(), fun_do_mutations(), fun_add_inject(), fun_add_birth()
     {
       if (!rnd) NewRandom();
       SetDefaultFitFun<this_t, ORG>(*this);
       SetDefaultMutFun<this_t, ORG>(*this);
       ConfigFuns();
     }
+    World(Random & rnd, std::string _name="") : World(&rnd, _name) { ; }
+    World(std::string _name) : World(nullptr, _name) { ; }
+
     ~World() {
       Clear();
       if (random_owner) random_ptr.Delete();
@@ -175,11 +180,15 @@ namespace emp {
 
     void SetMutFun(const fun_do_mutations_t & mut_fun) { fun_do_mutations = mut_fun; }
 
-    void DoMutations(ORG & org) { emp_assert(fun_do_mutations); fun_do_mutations(org); }
+    void DoMutations(ORG & org) {
+      emp_assert(fun_do_mutations);
+      emp_assert(random_ptr);
+      fun_do_mutations(org, *random_ptr);
+    }
     void DoMutationsID(size_t id) { emp_assert(pop[id]); DoMutations(*(pop[id])); }
 
-    void DoMutationsAll() const {
-      for (size_t id = 0; id < pop.size(); id++) { if (pop[id]) DoMutationsID(id); }
+    void MutatePop(size_t start_id=0) {
+      for (size_t id = start_id; id < pop.size(); id++) { if (pop[id]) DoMutationsID(id); }
     }
 
     // --- MANIPULATE ORGS IN POPULATION ---
