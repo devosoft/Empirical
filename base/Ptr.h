@@ -467,7 +467,7 @@ namespace emp {
     // Auto-case to raw pointer type.
     operator TYPE *() { return ptr; }
 
-    operator bool() { return ptr != nullptr; }
+    operator bool() const { return ptr != nullptr; }
 
     // Comparisons to other Ptr objects
     bool operator==(const Ptr<TYPE> & in_ptr) const { return ptr == in_ptr.ptr; }
