@@ -45,9 +45,30 @@ namespace emp {
   template <typename WORLD, typename ORG>
   void SetDefaultFitFun(WORLD & world) { SetDefaultFitFun_impl<WORLD, ORG>(world, true); }
 
-  // Setup Mutation function
-  // 1. DoMutations(random)
-  // 2. Empty, with assert.
+  namespace {
+    // Setup Mutation function
+    // 1. DoMutations(random)
+    // 2. Empty, with assert.
+
+    template <typename WORLD, typename ORG>
+    void SetDefaultMutFun_impl(WORLD & world, bool_decoy<decltype( (*(ORG*)nullptr).DoMutations(Random()) )>) {
+      world.SetMutFun( [](ORG & org, Random & random) {
+        return (double) org.DoMutations(random)();
+      } );
+    }
+
+    template <typename WORLD, typename ORG>
+    void SetDefaultMutFun_impl(WORLD & world, ... ) {
+      world.SetMutFun( [](ORG & org, Random & random){
+        emp_assert(false, "No default DoMutations available");
+        return 0.0;
+      } );
+    }
+
+  }
+
+  template <typename WORLD, typename ORG>
+  void SetDefaultMutFun(WORLD & world) { SetDefaultMutFun_impl<WORLD, ORG>(world, true); }
 
 
   // Setup Print function
