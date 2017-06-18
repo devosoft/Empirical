@@ -79,6 +79,7 @@ namespace emp {
 
     // Other private functions:
     double GetCache(size_t id) const { return (id < fit_cache.size()) ? fit_cache[id] : 0.0; }
+    void ClearCache(size_t id) { if (id < fit_cache.size()) fit_cache[id] = 0.0; }
 
   public:
     World(Ptr<Random> rnd=nullptr, std::string _name="")
@@ -318,7 +319,7 @@ namespace emp {
     emp_assert(new_org, pos);
 
     if (pop.size() <= pos) pop.resize(pos+1, nullptr);   // Make sure we have room.
-    if (pop[pos]) { pop[pos].Delete(); --num_orgs; }     // Clear out any old org.
+    if (pop[pos]) { ClearCache(pos); pop[pos].Delete(); --num_orgs; }     // Clear out any old org.
     pop[pos] = new_org;                                  // Place new org.
     ++num_orgs;                                          // Track number of orgs.
 
@@ -330,9 +331,16 @@ namespace emp {
     // Setup AddInject...
     switch (pop_struct) {
     case Struct::MIXED:
+      // Append at end of population.
       fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
       break;
     case Struct::GRID:
+      // Choose a random position in grid.
+      fun_add_inject = [this](Ptr<ORG> new_org) {
+        emp_assert(random_ptr);
+        const size_t pos = random_ptr->GetUInt(width*height);
+        return AddOrgAt(new_org, pos);
+      };
       break;
     case Struct::POOLS:
       break;
@@ -396,9 +404,6 @@ namespace emp {
 
   template<typename ORG, typename GENOTYPE>
   void World<ORG,GENOTYPE>::Update() {
-    std::cout << ":: pop.size() = " << pop.size() << std::endl;
-    std::cout << ":: next_pop.size() = " << next_pop.size() << std::endl;
-
     // If generations are synchronous, put the next generation in place.
     if (synchronous_gen) {
       // Add all waiting organisms into the population.
@@ -434,6 +439,7 @@ namespace emp {
     for (ptr_t org : next_pop) if (org) org.Delete();  // Delete waiting organisms.
     pop.resize(0);                                     // Remove deleted organisms.
     next_pop.resize(0);
+    fit_cache.resize(0);
     num_orgs = 0;
   }
 
@@ -443,6 +449,7 @@ namespace emp {
     if (!pop[pos]) return;  // No organism; no need to do anything.
     pop[pos].Delete();
     pop[pos]=nullptr;
+    ClearCache(pos);
     num_orgs--;
   }
 
