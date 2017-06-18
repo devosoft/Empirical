@@ -41,6 +41,7 @@ namespace emp {
     using pop_t = emp::vector<ptr_t>;
 
     using fun_calc_fitness_t = std::function<double(ORG&)>;
+    using fun_do_mutations_t = std::function<void(ORG&,Random&)>;
     using fun_add_inject_t   = std::function<size_t(Ptr<ORG>)>;
     using fun_add_birth_t    = std::function<size_t(Ptr<ORG>, size_t)>;
 
@@ -64,6 +65,7 @@ namespace emp {
 
     // Configurable functions.
     fun_calc_fitness_t fun_calc_fitness;  // Fitness function
+    fun_do_mutations_t fun_do_mutations;  // Mutation function
     fun_add_inject_t   fun_add_inject;    // Technique to inject a new organism.
     fun_add_birth_t    fun_add_birth;     // Technique to add a new offspring.
 
@@ -85,6 +87,7 @@ namespace emp {
     {
       if (!rnd) NewRandom();
       SetDefaultFitFun<this_t, ORG>(*this);
+      SetDefaultMutFun<this_t, ORG>(*this);
       ConfigFuns();
     }
     ~World() {
@@ -167,6 +170,17 @@ namespace emp {
 
     void SetCache(bool _in=true) { cache_on = _in; }
     void ClearCache() { fit_cache.resize(0); }
+
+    // --- MUTATIONS! ---
+
+    void SetMutFun(const fun_do_mutations_t & mut_fun) { fun_do_mutations = mut_fun; }
+
+    void DoMutations(ORG & org) { emp_assert(fun_do_mutations); fun_do_mutations(org); }
+    void DoMutationsID(size_t id) { emp_assert(pop[id]); DoMutations(*(pop[id])); }
+
+    void DoMutationsAll() const {
+      for (size_t id = 0; id < pop.size(); id++) { if (pop[id]) DoMutationsID(id); }
+    }
 
     // --- MANIPULATE ORGS IN POPULATION ---
 
