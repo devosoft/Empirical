@@ -44,6 +44,7 @@ namespace emp {
     using fun_do_mutations_t = std::function<void(ORG&,Random&)>;
     using fun_add_inject_t   = std::function<size_t(Ptr<ORG>)>;
     using fun_add_birth_t    = std::function<size_t(Ptr<ORG>, size_t)>;
+    using fun_get_neighbor_t = std::function<size_t(size_t)>;
 
     // Enumerated values
     enum class Struct { MIXED, GRID, POOLS, EXTERNAL };
@@ -69,7 +70,7 @@ namespace emp {
     fun_do_mutations_t fun_do_mutations;  // Mutation function
     fun_add_inject_t   fun_add_inject;    // Technique to inject a new organism.
     fun_add_birth_t    fun_add_birth;     // Technique to add a new offspring.
-
+    fun_get_neighbor_t fun_get_neighbor;  // Choose a random neighbor near specified id.
 
     // AddOrgAt is the only way to add organisms (others must go through here)
     size_t AddOrgAt(Ptr<ORG> new_org, size_t pos);
@@ -86,7 +87,8 @@ namespace emp {
       : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), fit_cache()
       , name(_name), pop_struct(Struct::MIXED), synchronous_gen(false)
       , cache_on(false), width(0), height(0)
-      , fun_calc_fitness(), fun_do_mutations(), fun_add_inject(), fun_add_birth()
+      , fun_calc_fitness(), fun_do_mutations()
+      , fun_add_inject(), fun_add_birth(), fun_get_neighbor()
     {
       if (!rnd) NewRandom();
       SetDefaultFitFun<this_t, ORG>(*this);
@@ -328,11 +330,18 @@ namespace emp {
 
   template<typename ORG, typename GENOTYPE>
   void World<ORG,GENOTYPE>::ConfigFuns() {
-    // Setup AddInject...
+    // If we have an external structure, skip this section (functions must be defined on your own!)
+    if (pop_struct == Struct::EXTERNAL) return;
+
+    // Setup AddInject and GetRandomNeighborID...
     switch (pop_struct) {
     case Struct::MIXED:
       // Append at end of population.
       fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
+      fun_get_neighbor = [this](size_t) {
+        emp_assert(random_ptr);
+        return random_ptr->GetUInt(0, pop.size());
+      };
       break;
     case Struct::GRID:
       // Choose a random position in grid.
@@ -340,6 +349,13 @@ namespace emp {
         emp_assert(random_ptr);
         const size_t pos = random_ptr->GetUInt(width*height);
         return AddOrgAt(new_org, pos);
+      };
+      fun_get_neighbor = [this](size_t id) {
+        emp_assert(random_ptr);
+        const int offset = random_ptr->GetInt(9);
+        const int rand_x = (int) (id%width) + offset%3 - 1;
+        const int rand_y = (int) (id/width) + offset/3 - 1;
+        return (size_t) (emp::Mod(rand_x, (int) width) + emp::Mod(rand_y, (int) height) * (int)width);
       };
       break;
     case Struct::POOLS:
@@ -379,22 +395,11 @@ namespace emp {
 
     // Otherwise asynchronous...
     else {
-      switch (pop_struct) {
-      case Struct::MIXED:
-      case Struct::GRID:
-        fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
-        fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-          emp_assert(new_org);                          // New organism must exist.
-          size_t id = GetRandomNeighborID(parent_id);   // Place in random position.
-          return AddOrgAt(new_org, id);                 // Place org in  existing population.
-        };
-        break;
-      case Struct::POOLS:
-        break;
-      case Struct::EXTERNAL:
-        // Do nothing; these should be set... externally.
-        break;
-      }
+      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
+        emp_assert(new_org);                          // New organism must exist.
+        size_t id = GetRandomNeighborID(parent_id);   // Place in random position.
+        return AddOrgAt(new_org, id);                 // Place org in  existing population.
+      };
     }
 
   }
