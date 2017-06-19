@@ -140,17 +140,8 @@ namespace emp {
     void ConfigFuns();
     void ModeBasic() { synchronous_gen = false; ConfigFuns(); }
     void ModeEA() { synchronous_gen = true; ConfigFuns(); }
-    void SetWellMixed() {
-      width = 0; height = 0;
-      pop_struct = Struct::MIXED;
-      ConfigFuns();
-    }
-    void SetGrid(size_t _w, size_t _h) {
-      width = _w;  height = _h;
-      pop_struct = Struct::GRID;
-      Resize(_w * _h);
-      ConfigFuns();
-    }
+    void SetWellMixed();
+    void SetGrid(size_t _w, size_t _h);
 
 
     // --- UPDATE THE WORLD! ---
@@ -258,17 +249,7 @@ namespace emp {
     void PrintOrgCounts(std::function<std::string(ORG*)> string_fun,
 			std::ostream & os = std::cout);
     void PrintGrid(std::function<std::string(ORG*)> string_fun, std::ostream& os=std::cout,
-               const std::string & empty="-", const std::string & spacer=" ") {
-      emp_assert(string_fun);
-      for (size_t y=0; y < height; y++) {
-        for (size_t x = 0; x < width; x++) {
-          ptr_t org = GetOrgPtr(x+y*width);
-          if (org) os << string_fun(org.Raw()) << spacer;
-          else os << empty << spacer;
-        }
-        os << std::endl;
-      }
-    }
+               const std::string & empty="-", const std::string & spacer=" ");
     void PrintGrid(std::ostream& os=std::cout, const std::string & empty="X", std::string spacer=" ") {
       PrintGrid( [](ORG * org){return emp::to_string(*org);}, os, empty, spacer);
     }
@@ -386,6 +367,21 @@ namespace emp {
       };
     }
 
+  }
+
+  template<typename ORG, typename GENOTYPE>
+  void World<ORG,GENOTYPE>::SetWellMixed() {
+    width = 0; height = 0;
+    pop_struct = Struct::MIXED;
+    ConfigFuns();
+  }
+
+  template<typename ORG, typename GENOTYPE>
+  void World<ORG,GENOTYPE>::SetGrid(size_t _w, size_t _h) {
+    width = _w;  height = _h;
+    pop_struct = Struct::GRID;
+    Resize(_w * _h);
+    ConfigFuns();
   }
 
 
@@ -549,6 +545,21 @@ namespace emp {
     for (auto x : org_counts) {
       ORG cur_org = x.first;
       os << string_fun(&cur_org) << " : " << x.second << std::endl;
+    }
+  }
+
+  template<typename ORG, typename GENOTYPE>
+  void World<ORG,GENOTYPE>::PrintGrid(std::function<std::string(ORG*)> string_fun,
+                                      std::ostream& os,
+                                      const std::string & empty, const std::string & spacer) {
+    emp_assert(string_fun);
+    for (size_t y=0; y < height; y++) {
+      for (size_t x = 0; x < width; x++) {
+        ptr_t org = GetOrgPtr(x+y*width);
+        if (org) os << string_fun(org.Raw()) << spacer;
+        else os << empty << spacer;
+      }
+      os << std::endl;
     }
   }
 
