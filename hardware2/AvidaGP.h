@@ -7,9 +7,6 @@
 //
 //
 //  Developer Notes:
-//  * This implementation is intended to run fast, but not be flexible so that it will
-//    be quick to implement.  It can be used as a baseline comparison for timings on more
-//    flexible implementations later.
 //  * We should clean up how we handle scope; the root scope is zero, so the arg-based
 //    scopes are 1-16 (or however many).  Right now we increment the value in various places
 //    and should be more consistent.
@@ -319,6 +316,91 @@ namespace emp {
       std::ofstream of(filename);
       Trace(num_inst, of);
       of.close();
+    }
+
+
+    /// Instructions
+    void Inst_Inc() { ++regs[inst.args[0]]; }
+    void Inst_Dec() { --regs[inst.args[0]]; }
+    void Inst_Not() { regs[inst.args[0]] = (regs[inst.args[0]] == 0.0); }
+    void Inst_SetReg() { regs[inst.args[0]] = (double) inst.args[1]; }
+    void Inst_Add() { regs[inst.args[2]] = regs[inst.args[0]] + regs[inst.args[1]]; }
+    void Inst_Sub() { regs[inst.args[2]] = regs[inst.args[0]] - regs[inst.args[1]]; }
+    void Inst_Mult() { regs[inst.args[2]] = regs[inst.args[0]] * regs[inst.args[1]]; }
+
+    void Inst_Div() {
+      const double denom = regs[inst.args[1]];
+      if (denom == 0.0) ++errors;
+      else regs[inst.args[2]] = regs[inst.args[0]] / denom;
+    }
+
+    void Inst_Mod() {
+      const double base = regs[inst.args[1]];
+      if (base == 0.0) ++errors;
+      else regs[inst.args[2]] = regs[inst.args[0]] / base;
+    }
+
+    void Inst_TestEqu() { regs[inst.args[2]] = (regs[inst.args[0]] == regs[inst.args[1]]); }
+    void Inst_TestNEqu() { regs[inst.args[2]] = (regs[inst.args[0]] != regs[inst.args[1]]); }
+    void Inst_TestLess() { regs[inst.args[2]] = (regs[inst.args[0]] < regs[inst.args[1]]); }
+
+    void Inst_If() { // args[0] = test, args[1] = scope
+      if (UpdateScope(inst.args[1]) == false) return;      // If previous scope is unfinished, stop!
+      if (regs[inst.args[0]] == 0.0) BypassScope(inst.args[1]); // If test fails, move to scope end.
+    }
+
+    void Inst_While() {
+      // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
+      if (UpdateScope(inst.args[1], ScopeType::LOOP) == false) return;
+      if (regs[inst.args[0]] == 0.0) BypassScope(inst.args[1]); // If test fails, move to scope end.
+    }
+
+    void Inst_Countdown() {  // Same as while, but auto-decriments test each loop.
+      // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
+      if (UpdateScope(inst.args[1], ScopeType::LOOP) == false) return;
+      if (regs[inst.args[0]] == 0.0) BypassScope(inst.args[1]);   // If test fails, move to scope end.
+      else regs[inst.args[0]]--;
+    }
+
+    void Inst_Break() { BypassScope(inst.args[0]); }
+    void Inst_Scope() { UpdateScope(inst.args[0]); }
+
+    void Inst_Define() {
+      if (UpdateScope(inst.args[1]) == false) return; // Update which scope we are in.
+      fun_starts[inst.args[0]] = (int) inst_ptr;     // Record where function should be exectuted.
+      BypassScope(inst.args[1]);                     // Skip over the function definition for now.
+    }
+
+    void Inst_Call() {
+      size_t def_pos = (size_t) fun_starts[inst.args[0]];
+      // Make sure function exists and is still in place.
+      if (def_pos >= genome.size() || genome[def_pos].id != InstID::Define) return;
+      // Go back into the function's original scope (call is in that scope)
+      size_t fun_scope = genome[def_pos].args[1];
+      if (UpdateScope(fun_scope, ScopeType::FUNCTION) == false) return;
+      call_stack.push_back(inst_ptr+1);                 // Back up the call position
+      inst_ptr = def_pos+1;                             // Jump to the function body (will adavance)
+    }
+
+    void Inst_Push() { PushStack(inst.args[1], regs[inst.args[0]]); }
+    void Inst_Pop() { regs[inst.args[1]] = PopStack(inst.args[0]); }
+
+    void Inst_Input() {
+      // Determine the input ID and grab it if it exists; if not, return 0.0
+      int input_id = (int) regs[ inst.args[0] ];
+      regs[inst.args[1]] = Find(inputs, input_id, 0.0);
+    }
+
+    void Inst_Output() {
+      // Save the date in the target reg to the specified output position.
+      int output_id = (int) regs[ inst.args[1] ];  // Grab ID from register.
+      outputs[output_id] = regs[inst.args[0]];     // Copy target reg to appropriate output.
+    }
+
+    void Inst_CopyVal() { regs[inst.args[1]] = regs[inst.args[0]]; }
+
+    void Inst_ScopeReg() {
+      reg_stack.emplace_back(CurScope(), inst.args[0], regs[inst.args[0]]);
     }
 
     static const InstLib<Instruction> & GetInstLib();
