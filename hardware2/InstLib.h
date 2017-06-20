@@ -18,23 +18,31 @@ namespace emp {
 
   template <typename HARDWARE_T, typename ARG_T=size_t>
   class InstLib {
-  protected:
+  public:
     using hardware_t = HARDWARE_T;
     using arg_t = ARG_T;
     using fun_t = std::function<void(hardware_t &, const emp::vector<arg_t> &)>;
-    constexpr size_t max_args = MAX_ARGS;
+
+    // InstLib::Scope is used for scopes that we need to do something special at the end.
+    // Eg: LOOP needs to go back to beginning of loop; FUNCTION needs to return to call.
+    enum class Scope { NONE, ROOT, BASIC, LOOP, FUNCTION };
 
     struct InstDef {
-      std::string name;
-      fun_t fun_call;
-      size_t num_args;
-      std::string desc;
+      std::string name;    // Name of this instruction.
+      fun_t fun_call;      // Function to call when executing.
+      size_t num_args;     // Number of args needed by function.
+      std::string desc;    // Description of function.
+      size_t scope_type;   // How does this instruction affect scoping?
+      size_t scope_arg;    // Which arg indictes new scope (if any).
 
-      InstDef(const std::string & _n, fun_t _fun, size_t _args, const std::string & _d)
-        : name(_n), fun_call(_fun), num_args(_args), desc(_d) { ; }
+      InstDef(const std::string & _n, fun_t _fun, size_t _args, const std::string & _d,
+              size_t _s_type, size_t _s_arg)
+        : name(_n), fun_call(_fun), num_args(_args), desc(_d)
+        , scope_type(_s_type), scope_arg(_s_arg) { ; }
       InstDef(const InstDef &) = default;
     };
 
+  protected:
     emp::vector<InstDef> inst_lib;              // Full definitions for instructions.
     emp::vector<fun_t> inst_funs;               // Map of instruction IDs to their functions.
     std::map<std::string, size_t> name_map;     // How do names link to instructions?
@@ -44,9 +52,13 @@ namespace emp {
     InstLib() : inst_lib(), inst_funs(), name_map(), arg_map() { ; }
     ~InstLib() { ; }
 
-    const std::string & GetName(size_t id) const { return inst_lib[(size_t) id].name; }
-    const std::string & GetDesc(size_t id) const { return inst_lib[(size_t) id].desc; }
-    size_t GetNumArgs(size_t id) const { return inst_lib[(size_t) id].num_args; }
+    const std::string & GetName(size_t id) const { return inst_lib[id].name; }
+    const fun_t & GetFunction(size_t id) const { return inst_lib[id].fun_call; }
+    size_t GetNumArgs(size_t id) const { return inst_lib[id].num_args; }
+    const std::string & GetDesc(size_t id) const { return inst_lib[id].desc; }
+    size_t GetScopeType(size_t id) const { return inst_lib[id].scope_type; }
+    size_t GetScopeArg(size_t id) const { return inst_lib[id].scope_arg; }
+
     static constexpr char GetSymbol(size_t id) {
       if (id < 26) return ('a' + id);
       if (id < 52) return ('A' + (id - 26));
@@ -72,7 +84,9 @@ namespace emp {
     void AddInst(const std::string & name,
                  fun_t fun_call,
                  size_t num_args=0,
-                 const std::string & desc="")
+                 const std::string & desc="",
+                 size_t scope_type=0,
+                 size_t scope_arg=(size_t) -1)
     {
       const size_t id = inst_lib.size();
       inst_lib.emplace_back(name, desc, fun_call, num_args);
