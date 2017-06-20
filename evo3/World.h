@@ -37,8 +37,6 @@ namespace emp {
   class World {
   private:
     using this_t = World<ORG, GENOTYPE>;
-    using ptr_t = Ptr<ORG>;
-    using pop_t = emp::vector<ptr_t>;
 
     using fun_calc_fitness_t = std::function<double(ORG&)>;
     using fun_do_mutations_t = std::function<void(ORG&,Random&)>;
@@ -52,8 +50,8 @@ namespace emp {
     // Internal state member variables
     Ptr<Random> random_ptr;         // Random object to use.
     bool random_owner;              // Did we create our own random number generator?
-    pop_t pop;                      // All of the spots in the population.
-    pop_t next_pop;                 // Population being setup for next generation.
+    emp::vector<Ptr<ORG>> pop;      // All of the spots in the population.
+    emp::vector<Ptr<ORG>> next_pop; // Population being setup for next generation.
     size_t num_orgs;                // How many organisms are actually in the population.
     emp::vector<double> fit_cache;  // vector size == 0 when not caching; uncached values == 0.
 
@@ -106,6 +104,8 @@ namespace emp {
     // --- Publicly available types ---
 
     using value_type = ORG;
+    using org_t = ORG;
+    using genotype_t = GENOTYPE;
 
 
     // --- Accessing Organisms or info ---
@@ -420,8 +420,8 @@ namespace emp {
   // Delete all organisms.
   template<typename ORG, typename GENOTYPE>
   void World<ORG,GENOTYPE>::Clear() {
-    for (ptr_t org : pop) if (org) org.Delete();       // Delete current organisms.
-    for (ptr_t org : next_pop) if (org) org.Delete();  // Delete waiting organisms.
+    for (Ptr<ORG> org : pop) if (org) org.Delete();       // Delete current organisms.
+    for (Ptr<ORG> org : next_pop) if (org) org.Delete();  // Delete waiting organisms.
     pop.resize(0);                                     // Remove deleted organisms.
     next_pop.resize(0);
     fit_cache.resize(0);
@@ -514,7 +514,7 @@ namespace emp {
     if (new_size >= pop.size()) return;  // No bottleneck needed!
 
     // If we are supposed to keep only random organisms, shuffle the beginning into place!
-    if (choose_random) emp::Shuffle<ptr_t>(*random_ptr, pop, new_size);
+    if (choose_random) emp::Shuffle<Ptr<ORG>>(*random_ptr, pop, new_size);
 
     // Clear out all of the organisms we are removing and resize the population.
     for (size_t i = new_size; i < pop.size(); ++i) ClearOrgAt(i);
@@ -524,7 +524,7 @@ namespace emp {
   template<typename ORG, typename GENOTYPE>
   void World<ORG,GENOTYPE>::Print(std::function<std::string(ORG&)> string_fun,
 			       std::ostream & os, std::string empty, std::string spacer) {
-    for (ptr_t org : pop) {
+    for (Ptr<ORG> org : pop) {
       if (org) os << string_fun(*org);
       else os << empty;
       os << spacer;
@@ -540,8 +540,8 @@ namespace emp {
   void World<ORG,GENOTYPE>::PrintOrgCounts(std::function<std::string(ORG&)> string_fun,
                                         std::ostream & os) {
     std::map<ORG,size_t> org_counts;
-    for (ptr_t org : pop) if (org) org_counts[*org] = 0;  // Initialize needed entries
-    for (ptr_t org : pop) if (org) org_counts[*org] += 1; // Count actual types.
+    for (Ptr<ORG> org : pop) if (org) org_counts[*org] = 0;  // Initialize needed entries
+    for (Ptr<ORG> org : pop) if (org) org_counts[*org] += 1; // Count actual types.
     for (auto x : org_counts) {
       ORG cur_org = x.first;
       os << string_fun(cur_org) << " : " << x.second << std::endl;
@@ -555,7 +555,7 @@ namespace emp {
     emp_assert(string_fun);
     for (size_t y=0; y < height; y++) {
       for (size_t x = 0; x < width; x++) {
-        ptr_t org = GetOrgPtr(x+y*width);
+        Ptr<ORG> org = GetOrgPtr(x+y*width);
         if (org) os << string_fun(*org) << spacer;
         else os << empty << spacer;
       }
