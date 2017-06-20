@@ -16,16 +16,16 @@
 
 namespace emp {
 
-  template <typename INST_TYPE>
+  template <typename HARDWARE_T, typename ARG_T=size_t>
   class InstLib {
   protected:
-    using inst_t = INST_TYPE;
-    using inst_id_t = typename INST_TYPE::id_t;
-    using inst_arg_t = typename INST_TYPE::arg_t;
-    using genome_t = emp::vector<inst_t>;
+    using hardware_t = HARDWARE_T;
+    using arg_t = ARG_T;
+    using fun_t = std::function<void(hardware_t &, const emp::vector<arg_t> &)>;
+    constexpr size_t max_args = MAX_ARGS;
 
     struct InstDef {
-      inst_id_t id;
+      size_t id;
       std::string name;
       std::string desc;
       size_t num_args;
@@ -36,12 +36,13 @@ namespace emp {
       InstDef(const InstDef &) = default;
     };
 
-    emp::vector<InstDef> inst_lib;
-    std::map<std::string, size_t> name_map;
-    std::map<std::string, inst_arg_t> arg_map;
+    emp::vector<InstDef> inst_lib;              // Full definitions for instructions.
+    emp::vector<fun_t> inst_funs;               // Map of instruction IDs to their functions.
+    std::map<std::string, size_t> name_map;     // How do names link to instructions?
+    std::map<std::string, inst_arg_t> arg_map;  // How are different arguments named?
 
   public:
-    InstLib() : inst_lib(), name_map(), arg_map() { ; }
+    InstLib() : inst_lib(), inst_funs(), name_map(), arg_map() { ; }
     ~InstLib() { ; }
 
     const std::string & GetName(inst_id_t id) const { return inst_lib[(size_t) id].name; }
