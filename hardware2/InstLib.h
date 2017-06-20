@@ -16,12 +16,13 @@
 
 namespace emp {
 
-  template <typename HARDWARE_T, typename ARG_T=size_t>
+  template <typename HARDWARE_T, typename ARG_T=size_t, size_t ARG_COUNT=3>
   class InstLib {
   public:
     using hardware_t = HARDWARE_T;
+    using inst_t = hardware_t::Instruction;
     using arg_t = ARG_T;
-    using fun_t = std::function<void(hardware_t &, const emp::vector<arg_t> &)>;
+    using fun_t = std::function<void(hardware_t &, const emp::array<arg_t, ARG_COUNT> &)>;
 
     // InstLib::Scope is used for scopes that we need to do something special at the end.
     // Eg: LOOP needs to go back to beginning of loop; FUNCTION needs to return to call.
@@ -97,6 +98,10 @@ namespace emp {
     void AddArg(const std::string & name, inst_arg_t value) {
       emp_assert(!Has(arg_map, name));
       arg_map[name] = value;
+    }
+
+    ProcessInst(hardware_t & hw, const inst_t & inst) const {
+      inst_funs[inst.id](hw, inst.args);
     }
 
     void WriteGenome(const genome_t & genome, std::ostream & os=std::cout) const {
