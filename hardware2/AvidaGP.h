@@ -394,114 +394,13 @@ namespace emp {
     static const InstLib<Instruction> & GetInstLib();
   };
 
-  void AvidaGP::ProcessInst(const inst_t & inst) {
-    switch (inst.id) {
-    case InstID::Inc: ++regs[inst.args[0]]; break;
-    case InstID::Dec: --regs[inst.args[0]]; break;
-    case InstID::Not: regs[inst.args[0]] = (regs[inst.args[0]] == 0.0); break;
-    case InstID::SetReg: regs[inst.args[0]] = (double) inst.args[1]; break;
-    case InstID::Add: regs[inst.args[2]] = regs[inst.args[0]] + regs[inst.args[1]]; break;
-    case InstID::Sub: regs[inst.args[2]] = regs[inst.args[0]] - regs[inst.args[1]]; break;
-    case InstID::Mult: regs[inst.args[2]] = regs[inst.args[0]] * regs[inst.args[1]]; break;
-
-    case InstID::Div: {
-      const double denom = regs[inst.args[1]];
-      if (denom == 0.0) ++errors;
-      else regs[inst.args[2]] = regs[inst.args[0]] / denom;
-    }
-      break;
-
-    case InstID::Mod: {
-      const double base = regs[inst.args[1]];
-      if (base == 0.0) ++errors;
-      else regs[inst.args[2]] = regs[inst.args[0]] / base;
-    }
-      break;
-
-    case InstID::TestEqu: regs[inst.args[2]] = (regs[inst.args[0]] == regs[inst.args[1]]); break;
-    case InstID::TestNEqu: regs[inst.args[2]] = (regs[inst.args[0]] != regs[inst.args[1]]); break;
-    case InstID::TestLess: regs[inst.args[2]] = (regs[inst.args[0]] < regs[inst.args[1]]); break;
-
-    case InstID::If: // args[0] = test, args[1] = scope
-      if (UpdateScope(inst.args[1]) == false) break;      // If previous scope is unfinished, stop!
-      if (regs[inst.args[0]] == 0.0) BypassScope(inst.args[1]); // If test fails, move to scope end.
-      break;                                              // Continue in current code.
-
-    case InstID::While:
-      // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
-      if (UpdateScope(inst.args[1], InstLib::Scope::LOOP) == false) break;
-      if (regs[inst.args[0]] == 0.0) BypassScope(inst.args[1]);   // If test fails, move to scope end.
-      break;
-
-    case InstID::Countdown:  // Same as while, but auto-decriments test each loop.
-      // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
-      if (UpdateScope(inst.args[1], InstLib::Scope::LOOP) == false) break;
-      if (regs[inst.args[0]] == 0.0) BypassScope(inst.args[1]);   // If test fails, move to scope end.
-      else regs[inst.args[0]]--;
-      break;
-
-    case InstID::Break: BypassScope(inst.args[0]); break;
-    case InstID::Scope: UpdateScope(inst.args[0]); break;
-
-    case InstID::Define: {
-        if (UpdateScope(inst.args[1]) == false) break; // Update which scope we are in.
-        fun_starts[inst.args[0]] = (int) inst_ptr;     // Record where function should be exectuted.
-        BypassScope(inst.args[1]);                     // Skip over the function definition for now.
-      }
-      break;
-    case InstID::Call: {
-        size_t def_pos = (size_t) fun_starts[inst.args[0]];
-        // Make sure function exists and is still in place.
-        if (def_pos >= genome.size() || genome[def_pos].id != InstID::Define) break;
-        // Go back into the function's original scope (call is in that scope)
-        size_t fun_scope = genome[def_pos].args[1];
-        if (UpdateScope(fun_scope, InstLib::Scope::FUNCTION) == false) break;
-        call_stack.push_back(inst_ptr+1);                 // Back up the call position
-        inst_ptr = def_pos+1;                             // Jump to the function body (will adavance)
-      }
-      break;
-
-    case InstID::Push: PushStack(inst.args[1], regs[inst.args[0]]); break;
-    case InstID::Pop: regs[inst.args[1]] = PopStack(inst.args[0]); break;
-    case InstID::Input: {
-        // Determine the input ID and grab it if it exists; if not, return 0.0
-        int input_id = (int) regs[ inst.args[0] ];
-        regs[inst.args[1]] = Find(inputs, input_id, 0.0);
-      }
-      break;
-    case InstID::Output: {
-        // Save the date in the target reg to the specified output position.
-        int output_id = (int) regs[ inst.args[1] ];  // Grab ID from register.
-        outputs[output_id] = regs[inst.args[0]];     // Copy target reg to appropriate output.
-      }
-      break;
-    case InstID::CopyVal: regs[inst.args[1]] = regs[inst.args[0]]; break;
-
-    case InstID::ScopeReg:
-      reg_stack.emplace_back(CurScope(), inst.args[0], regs[inst.args[0]]);
-      break;
-
-    case InstID::Unknown:
-    default:
-      // This case should never happen!
-      emp_assert(false, "Unknown instruction being exectuted!");
-    };
+  size_t AvidaGP::InstScope(const inst_t & inst) {
+    if (GetInstLib().GetScopeType(inst.id) == InstLib::Scope::NONE) return 0;
+    return inst.args[ GetInstLib().GetScopeArg(inst.id) ] + 1;
   }
 
-  size_t AvidaGP::InstScope(const inst_t & inst) {
-    switch (inst.id) {
-    case InstID::If:
-    case InstID::While:
-    case InstID::Countdown:  // Same as while, but auto-decriments test each loop.
-    case InstID::Define:
-      return inst.args[1]+1;
-
-    case InstID::Scope:
-      return inst.args[0]+1;
-
-    default:
-      return 0;
-    };
+  void AvidaGP::ProcessInst(const inst_t & inst) {
+    GetInstLib().ProcessInst(*this, inst);
   }
 
   void AvidaGP::SingleProcess() {
@@ -617,32 +516,32 @@ namespace emp {
     static bool init = false;
 
     if (!init) {
-      inst_lib.AddInst(InstID::Inc, "Inc", 1, "Increment value in reg Arg1");
-      inst_lib.AddInst(InstID::Dec, "Dec", 1, "Decrement value in reg Arg1");
-      inst_lib.AddInst(InstID::Not, "Not", 1, "Logically toggle value in reg Arg1");
-      inst_lib.AddInst(InstID::SetReg, "SetReg", 2, "Set reg Arg1 to numerical value Arg2");
-      inst_lib.AddInst(InstID::Add, "Add", 3, "regs: Arg3 = Arg1 + Arg2");
-      inst_lib.AddInst(InstID::Sub, "Sub", 3, "regs: Arg3 = Arg1 - Arg2");
-      inst_lib.AddInst(InstID::Mult, "Mult", 3, "regs: Arg3 = Arg1 * Arg2");
-      inst_lib.AddInst(InstID::Div, "Div", 3, "regs: Arg3 = Arg1 / Arg2");
-      inst_lib.AddInst(InstID::Mod, "Mod", 3, "regs: Arg3 = Arg1 % Arg2");
-      inst_lib.AddInst(InstID::TestEqu, "TestEqu", 3, "regs: Arg3 = (Arg1 == Arg2)");
-      inst_lib.AddInst(InstID::TestNEqu, "TestNEqu", 3, "regs: Arg3 = (Arg1 != Arg2)");
-      inst_lib.AddInst(InstID::TestLess, "TestLess", 3, "regs: Arg3 = (Arg1 < Arg2)");
-      inst_lib.AddInst(InstID::If, "If", 2, "If reg Arg1 != 0, scope -> Arg2; else skip scope");
-      inst_lib.AddInst(InstID::While, "While", 2, "Until reg Arg1 != 0, repeat scope Arg2; else skip");
-      inst_lib.AddInst(InstID::Countdown, "Countdown", 2, "Countdown reg Arg1 to zero; scope to Arg2");
-      inst_lib.AddInst(InstID::Break, "Break", 1, "Break out of scope Arg1");
-      inst_lib.AddInst(InstID::Scope, "Scope", 1, "Enter scope Arg1");
-      inst_lib.AddInst(InstID::Define, "Define", 2, "Build function Arg1 in scope Arg2");
-      inst_lib.AddInst(InstID::Call, "Call", 1, "Call previously defined function Arg1");
-      inst_lib.AddInst(InstID::Push, "Push", 2, "Push reg Arg1 onto stack Arg2");
-      inst_lib.AddInst(InstID::Pop, "Pop", 2, "Pop stack Arg1 into reg Arg2");
-      inst_lib.AddInst(InstID::Input, "Input", 2, "Pull next value from input Arg1 into reg Arg2");
-      inst_lib.AddInst(InstID::Output, "Output", 2, "Push reg Arg1 into output Arg2");
-      inst_lib.AddInst(InstID::CopyVal, "CopyVal", 2, "Copy reg Arg1 into reg Arg2");
-      inst_lib.AddInst(InstID::ScopeReg, "ScopeReg", 1, "Backup reg Arg1; restore at end of scope");
-      inst_lib.AddInst(InstID::Unknown, "Unknown", 0, "Error: Unknown instruction used.");
+      inst_lib.AddInst("Inc", Inst_Inc, 1, "Increment value in reg Arg1");
+      inst_lib.AddInst("Dec", Inst_Dec, 1, "Decrement value in reg Arg1");
+      inst_lib.AddInst("Not", Inst_Not, 1, "Logically toggle value in reg Arg1");
+      inst_lib.AddInst("SetReg", Inst_SetReg, 2, "Set reg Arg1 to numerical value Arg2");
+      inst_lib.AddInst("Add", Inst_Add, 3, "regs: Arg3 = Arg1 + Arg2");
+      inst_lib.AddInst("Sub", Inst_Sub, 3, "regs: Arg3 = Arg1 - Arg2");
+      inst_lib.AddInst("Mult", Inst_Mult, 3, "regs: Arg3 = Arg1 * Arg2");
+      inst_lib.AddInst("Div", Inst_Div, 3, "regs: Arg3 = Arg1 / Arg2");
+      inst_lib.AddInst("Mod", Inst_Mod, 3, "regs: Arg3 = Arg1 % Arg2");
+      inst_lib.AddInst("TestEqu", Inst_TestEqu, 3, "regs: Arg3 = (Arg1 == Arg2)");
+      inst_lib.AddInst("TestNEqu", Inst_TestNEqu, 3, "regs: Arg3 = (Arg1 != Arg2)");
+      inst_lib.AddInst("TestLess", Inst_TestLess, 3, "regs: Arg3 = (Arg1 < Arg2)");
+      inst_lib.AddInst("If", Inst_If, 2, "If reg Arg1 != 0, scope -> Arg2; else skip scope", InstLib::Scope::BASIC, 1);
+      inst_lib.AddInst("While", Inst_While, 2, "Until reg Arg1 != 0, repeat scope Arg2; else skip", InstLib::Scope::LOOP, 1);
+      inst_lib.AddInst("Countdown", Inst_Countdown, 2, "Countdown reg Arg1 to zero; scope to Arg2", InstLib::Scope::LOOP, 1);
+      inst_lib.AddInst("Break", Inst_Break, 1, "Break out of scope Arg1");
+      inst_lib.AddInst("Scope", Inst_Scope, 1, "Enter scope Arg1", InstLib::Scope::BASIC, 0);
+      inst_lib.AddInst("Define", Inst_Define, 2, "Build function Arg1 in scope Arg2", InstLib::Scope::FUNCTION, 1);
+      inst_lib.AddInst("Call", Inst_Call, 1, "Call previously defined function Arg1");
+      inst_lib.AddInst("Push", Inst_Push, 2, "Push reg Arg1 onto stack Arg2");
+      inst_lib.AddInst("Pop", Inst_Pop, 2, "Pop stack Arg1 into reg Arg2");
+      inst_lib.AddInst("Input", Inst_Input, 2, "Pull next value from input Arg1 into reg Arg2");
+      inst_lib.AddInst("Output", Inst_Output, 2, "Push reg Arg1 into output Arg2");
+      inst_lib.AddInst("CopyVal", Inst_CopyVal, 2, "Copy reg Arg1 into reg Arg2");
+      inst_lib.AddInst("ScopeReg", Inst_ScopeReg, 1, "Backup reg Arg1; restore at end of scope");
+      inst_lib.AddInst("Unknown", Inst_Unknown, 0, "Error: Unknown instruction used.");
 
       for (size_t i = 0; i < AvidaGP::CPU_SIZE; i++) {
         inst_lib.AddArg(to_string((int)i), i);                   // Args can be called by value
