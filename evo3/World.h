@@ -243,15 +243,15 @@ namespace emp {
 
     // --- PRINTING ---
 
-    void Print(std::function<std::string(ORG*)> string_fun, std::ostream & os = std::cout,
+    void Print(std::function<std::string(ORG&)> string_fun, std::ostream & os = std::cout,
 	       std::string empty="X", std::string spacer=" ");
     void Print(std::ostream & os = std::cout, std::string empty="X", std::string spacer=" ");
-    void PrintOrgCounts(std::function<std::string(ORG*)> string_fun,
+    void PrintOrgCounts(std::function<std::string(ORG&)> string_fun,
 			std::ostream & os = std::cout);
-    void PrintGrid(std::function<std::string(ORG*)> string_fun, std::ostream& os=std::cout,
+    void PrintGrid(std::function<std::string(ORG&)> string_fun, std::ostream& os=std::cout,
                const std::string & empty="-", const std::string & spacer=" ");
     void PrintGrid(std::ostream& os=std::cout, const std::string & empty="X", std::string spacer=" ") {
-      PrintGrid( [](ORG * org){return emp::to_string(*org);}, os, empty, spacer);
+      PrintGrid( [](ORG & org){return emp::to_string(org);}, os, empty, spacer);
     }
 
     // --- FOR VECTOR COMPATIBILITY ---
@@ -332,7 +332,7 @@ namespace emp {
 
     // Setup AddBirth, which may be based on population structure.
     if (synchronous_gen) {
-    switch (pop_struct) {
+      switch (pop_struct) {
       case Struct::MIXED:
         fun_add_birth = [this](Ptr<ORG> new_org, size_t) {
           emp_assert(new_org);                           // New organism must exist.
@@ -522,10 +522,10 @@ namespace emp {
   }
 
   template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::Print(std::function<std::string(ORG*)> string_fun,
+  void World<ORG,GENOTYPE>::Print(std::function<std::string(ORG&)> string_fun,
 			       std::ostream & os, std::string empty, std::string spacer) {
     for (ptr_t org : pop) {
-      if (org) os << string_fun(org.Raw());
+      if (org) os << string_fun(*org);
       else os << empty;
       os << spacer;
     }
@@ -533,30 +533,30 @@ namespace emp {
 
   template<typename ORG, typename GENOTYPE>
   void World<ORG,GENOTYPE>::Print(std::ostream & os, std::string empty, std::string spacer) {
-    Print( [](ORG * org){return emp::to_string(*org);}, os, empty, spacer);
+    Print( [](ORG & org){return emp::to_string(org);}, os, empty, spacer);
   }
 
   template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::PrintOrgCounts(std::function<std::string(ORG*)> string_fun,
+  void World<ORG,GENOTYPE>::PrintOrgCounts(std::function<std::string(ORG&)> string_fun,
                                         std::ostream & os) {
     std::map<ORG,size_t> org_counts;
     for (ptr_t org : pop) if (org) org_counts[*org] = 0;  // Initialize needed entries
     for (ptr_t org : pop) if (org) org_counts[*org] += 1; // Count actual types.
     for (auto x : org_counts) {
       ORG cur_org = x.first;
-      os << string_fun(&cur_org) << " : " << x.second << std::endl;
+      os << string_fun(cur_org) << " : " << x.second << std::endl;
     }
   }
 
   template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::PrintGrid(std::function<std::string(ORG*)> string_fun,
+  void World<ORG,GENOTYPE>::PrintGrid(std::function<std::string(ORG&)> string_fun,
                                       std::ostream& os,
                                       const std::string & empty, const std::string & spacer) {
     emp_assert(string_fun);
     for (size_t y=0; y < height; y++) {
       for (size_t x = 0; x < width; x++) {
         ptr_t org = GetOrgPtr(x+y*width);
-        if (org) os << string_fun(org.Raw()) << spacer;
+        if (org) os << string_fun(*org) << spacer;
         else os << empty << spacer;
       }
       os << std::endl;
@@ -602,7 +602,7 @@ namespace emp {
     for (size_t T = 0; T < tourny_count; T++) {
       entries.resize(0);
       // Choose organisms for this tournament (with replacement!)
-      for (size_t i=0; i<t_size; i++) entries.push_back( GetRandomOrgID() );
+      for (size_t i=0; i < t_size; i++) entries.push_back( GetRandomOrgID() );
 
       double best_fit = CalcFitnessID(entries[0]);
       size_t best_id = entries[0];
