@@ -38,22 +38,10 @@ namespace emp {
     static constexpr size_t INST_ARGS = 3;   // Max num args per instruction.
     static constexpr size_t STACK_CAP = 16;  // Max size for stacks.
 
-    enum class InstID {
-      Inc, Dec, Not, SetReg, Add, Sub, Mult, Div, Mod, TestEqu, TestNEqu, TestLess,
-      If, While, Countdown, Break, Scope, Define, Call,
-      Push, Pop, Input, Output, CopyVal, ScopeReg,
-      Unknown
-    };
-
-    // ScopeType is used for scopes that we need to do something special at the end.
-    // Eg: LOOP needs to go back to beginning of loop; FUNCTION needs to return to call.
-    enum class ScopeType { ROOT, BASIC, LOOP, FUNCTION };
-
     struct Instruction {
-      using id_t = InstID;
       using arg_t = size_t;        // All arguments are non-negative ints (indecies!)
 
-      id_t id;
+      size_t id;
       emp::array<arg_t, 3> args;
 
       Instruction(InstID _id=(InstID)0, size_t a0=0, size_t a1=0, size_t a2=0)
@@ -71,11 +59,11 @@ namespace emp {
 
     struct ScopeInfo {
       size_t scope;
-      ScopeType type;
+      InstLib::Scope type;
       size_t start_pos;
 
-      ScopeInfo() : scope(0), type(ScopeType::BASIC), start_pos(0) { ; }
-      ScopeInfo(size_t _s, ScopeType _t, size_t _p) : scope(_s), type(_t), start_pos(_p) { ; }
+      ScopeInfo() : scope(0), type(InstLib::Scope::BASIC), start_pos(0) { ; }
+      ScopeInfo(size_t _s, InstLib::Scope _t, size_t _p) : scope(_s), type(_t), start_pos(_p) { ; }
     };
 
     struct RegBackup {
@@ -123,7 +111,7 @@ namespace emp {
     }
 
     size_t CurScope() const { return scope_stack.back().scope; }
-    ScopeType CurScopeType() const { return scope_stack.back().type; }
+    InstLib::Scope CurScopeType() const { return scope_stack.back().type; }
 
     // Run every time we need to exit the current scope.
     void ExitScope() {
@@ -143,7 +131,7 @@ namespace emp {
     // This function is run every time scope changed (if, while, scope instructions, etc.)
     // If we are moving to an outer scope (lower value) we need to close the scope we are in,
     // potentially continuing with a loop.
-    bool UpdateScope(size_t new_scope, ScopeType type=ScopeType::BASIC) {
+    bool UpdateScope(size_t new_scope, InstLib::Scope type=InstLib::Scope::BASIC) {
       const size_t cur_scope = CurScope();
       new_scope++;                           // Scopes are stored as one higher than regs (Outer is 0)
       // Test if we are entering a deeper scope.
@@ -153,7 +141,7 @@ namespace emp {
       }
 
       // Otherwise we are potentially exiting the current scope.  Loop back instead?
-      if (CurScopeType() == ScopeType::LOOP) {
+      if (CurScopeType() == InstLib::Scope::LOOP) {
         inst_ptr = scope_stack.back().start_pos;  // Move back to the beginning of the loop.
         ExitScope();                              // Clear former scope
         ProcessInst( genome[inst_ptr] );          // Process loops start again.
@@ -161,13 +149,13 @@ namespace emp {
       }
 
       // Or are we exiting a function?
-      if (CurScopeType() == ScopeType::FUNCTION) {
+      if (CurScopeType() == InstLib::Scope::FUNCTION) {
         // @CAO Make sure we exit multiple scopes if needed to close the function...
         inst_ptr = call_stack.back();             // Return from the function call.
         if (inst_ptr >= genome.size()) ResetIP(); // Call may have occured at end of genome.
         else {
-          call_stack.pop_back();                    // Clear the return position from the call stack.
-          ExitScope();                              // Leave the function scope.
+          call_stack.pop_back();                  // Clear the return position from the call stack.
+          ExitScope();                            // Leave the function scope.
         }
         ProcessInst( genome[inst_ptr] );          // Process the new instruction instead.
         return false;                             // We did NOT enter the new scope.
@@ -201,7 +189,7 @@ namespace emp {
   public:
     AvidaGP() : genome(), regs(), inputs(), outputs(), stacks(), fun_starts()
               , inst_ptr(0), scope_stack(), reg_stack(), call_stack(), errors(0), traits() {
-      scope_stack.emplace_back(0, ScopeType::ROOT, 0);  // Initial scope.
+      scope_stack.emplace_back(0, InstLib::Scope::ROOT, 0);  // Initial scope.
       Reset();
     }
     AvidaGP(const AvidaGP &) = default;
@@ -351,13 +339,13 @@ namespace emp {
 
     void Inst_While() {
       // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
-      if (UpdateScope(inst.args[1], ScopeType::LOOP) == false) return;
+      if (UpdateScope(inst.args[1], InstLib::Scope::LOOP) == false) return;
       if (regs[inst.args[0]] == 0.0) BypassScope(inst.args[1]); // If test fails, move to scope end.
     }
 
     void Inst_Countdown() {  // Same as while, but auto-decriments test each loop.
       // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
-      if (UpdateScope(inst.args[1], ScopeType::LOOP) == false) return;
+      if (UpdateScope(inst.args[1], InstLib::Scope::LOOP) == false) return;
       if (regs[inst.args[0]] == 0.0) BypassScope(inst.args[1]);   // If test fails, move to scope end.
       else regs[inst.args[0]]--;
     }
@@ -377,7 +365,7 @@ namespace emp {
       if (def_pos >= genome.size() || genome[def_pos].id != InstID::Define) return;
       // Go back into the function's original scope (call is in that scope)
       size_t fun_scope = genome[def_pos].args[1];
-      if (UpdateScope(fun_scope, ScopeType::FUNCTION) == false) return;
+      if (UpdateScope(fun_scope, InstLib::Scope::FUNCTION) == false) return;
       call_stack.push_back(inst_ptr+1);                 // Back up the call position
       inst_ptr = def_pos+1;                             // Jump to the function body (will adavance)
     }
@@ -441,13 +429,13 @@ namespace emp {
 
     case InstID::While:
       // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
-      if (UpdateScope(inst.args[1], ScopeType::LOOP) == false) break;
+      if (UpdateScope(inst.args[1], InstLib::Scope::LOOP) == false) break;
       if (regs[inst.args[0]] == 0.0) BypassScope(inst.args[1]);   // If test fails, move to scope end.
       break;
 
     case InstID::Countdown:  // Same as while, but auto-decriments test each loop.
       // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
-      if (UpdateScope(inst.args[1], ScopeType::LOOP) == false) break;
+      if (UpdateScope(inst.args[1], InstLib::Scope::LOOP) == false) break;
       if (regs[inst.args[0]] == 0.0) BypassScope(inst.args[1]);   // If test fails, move to scope end.
       else regs[inst.args[0]]--;
       break;
@@ -467,7 +455,7 @@ namespace emp {
         if (def_pos >= genome.size() || genome[def_pos].id != InstID::Define) break;
         // Go back into the function's original scope (call is in that scope)
         size_t fun_scope = genome[def_pos].args[1];
-        if (UpdateScope(fun_scope, ScopeType::FUNCTION) == false) break;
+        if (UpdateScope(fun_scope, InstLib::Scope::FUNCTION) == false) break;
         call_stack.push_back(inst_ptr+1);                 // Back up the call position
         inst_ptr = def_pos+1;                             // Jump to the function body (will adavance)
       }
@@ -576,12 +564,12 @@ namespace emp {
     if (new_scope > CPU_SIZE || new_scope > CurScope()) return inst_ptr;
 
     // If we are at the end of a loop, assume we will jump back to the beginning.
-    if (CurScopeType() == ScopeType::LOOP) {
+    if (CurScopeType() == InstLib::Scope::LOOP) {
       return scope_stack.back().start_pos;
     }
 
     // If we are at the end of a function, assume we will jump back to the call.
-    if (CurScopeType() == ScopeType::FUNCTION) {
+    if (CurScopeType() == InstLib::Scope::FUNCTION) {
       size_t next_pos = call_stack.back();
       if (next_pos >= genome.size()) next_pos = 0;
       return next_pos;
