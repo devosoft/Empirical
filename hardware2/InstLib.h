@@ -68,7 +68,7 @@ namespace emp {
       if (id < 62) return ('0' + (id - 52));
       return '+';
     }
-    size_t GetID(const std::string name) const {
+    size_t GetID(const std::string & name) const {
       emp_assert(Has(name_map, name), name);
       return Find(name_map, name, (size_t) -1);
     }
@@ -85,7 +85,7 @@ namespace emp {
     }
 
     void AddInst(const std::string & name,
-                 fun_t fun_call,
+                 const fun_t & fun_call,
                  size_t num_args=0,
                  const std::string & desc="",
                  ScopeType scope_type=ScopeType::NONE,
