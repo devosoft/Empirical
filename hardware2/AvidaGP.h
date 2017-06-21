@@ -279,13 +279,17 @@ namespace emp {
     bool Load(std::istream & input);
 
     /// Process a specified instruction, provided by the caller.
-    void ProcessInst(const inst_t & inst);
+    void ProcessInst(const inst_t & inst) { GetInstLib().ProcessInst(*this, inst); }
 
     /// Determine the scope associated with a particular instruction.
     static size_t InstScope(const inst_t & inst);
 
     /// Process the NEXT instruction pointed to be the instruction pointer
-    void SingleProcess();
+    void SingleProcess() {
+      if (inst_ptr >= genome.size()) ResetIP();
+      GetInstLib().ProcessInst(*this, genome[inst_ptr]);
+      inst_ptr++;
+    }
 
     /// Process the next SERIES of instructions, directed by the instruction pointer.
     void Process(size_t num_inst) { for (size_t i = 0; i < num_inst; i++) SingleProcess(); }
@@ -405,16 +409,6 @@ namespace emp {
   size_t AvidaGP::InstScope(const inst_t & inst) {
     if (GetInstLib().GetScopeType(inst.id) == ScopeType::NONE) return 0;
     return inst.args[ GetInstLib().GetScopeArg(inst.id) ] + 1;
-  }
-
-  void AvidaGP::ProcessInst(const inst_t & inst) {
-    GetInstLib().ProcessInst(*this, inst);
-  }
-
-  void AvidaGP::SingleProcess() {
-    if (inst_ptr >= genome.size()) ResetIP();
-    ProcessInst( genome[inst_ptr] );
-    inst_ptr++;
   }
 
   void AvidaGP::PrintInst(const inst_t & inst, std::ostream & os) {
