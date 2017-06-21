@@ -18,17 +18,16 @@ namespace emp {
 
   // ScopeType is used for scopes that we need to do something special at the end.
   // Eg: LOOP needs to go back to beginning of loop; FUNCTION needs to return to call.
-  enum class ScopeType { NONE, ROOT, BASIC, LOOP, FUNCTION };
+  enum class ScopeType { NONE=0, ROOT, BASIC, LOOP, FUNCTION };
 
   template <typename HARDWARE_T, typename ARG_T=size_t, size_t ARG_COUNT=3>
   class InstLib {
   public:
     using hardware_t = HARDWARE_T;
-    using inst_t = typename hardware_t::Instruction;
+    using inst_t = typename hardware_t::inst_t;
     using genome_t = emp::vector<inst_t>;
     using arg_t = ARG_T;
     using fun_t = std::function<void(hardware_t &, const emp::array<arg_t, ARG_COUNT> &)>;
-    using method_t = HARDWARE_T::
 
     struct InstDef {
       std::string name;       // Name of this instruction.
@@ -39,7 +38,7 @@ namespace emp {
       size_t scope_arg;       // Which arg indictes new scope (if any).
 
       InstDef(const std::string & _n, fun_t _fun, size_t _args, const std::string & _d,
-              size_t _s_type, size_t _s_arg)
+              ScopeType _s_type, size_t _s_arg)
         : name(_n), fun_call(_fun), num_args(_args), desc(_d)
         , scope_type(_s_type), scope_arg(_s_arg) { ; }
       InstDef(const InstDef &) = default;
@@ -89,11 +88,11 @@ namespace emp {
                  fun_t fun_call,
                  size_t num_args=0,
                  const std::string & desc="",
-                 size_t scope_type=0,
+                 ScopeType scope_type=ScopeType::NONE,
                  size_t scope_arg=(size_t) -1)
     {
       const size_t id = inst_lib.size();
-      inst_lib.emplace_back(name, desc, fun_call, num_args);
+      inst_lib.emplace_back(name, fun_call, num_args, desc, scope_type, scope_arg);
       inst_funs.emplace_back(fun_call);
       name_map[name] = id;
     }
