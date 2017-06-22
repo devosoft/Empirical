@@ -102,23 +102,6 @@ namespace emp {
     // A simple way of recording which traits a CPU has demonstrated, and at what qaulity.
     emp::vector<double> traits;
 
-    double PopStack(size_t id) {
-      if (stacks[id].size() == 0) return 0.0;
-      double out = stacks[id].back();
-      stacks[id].pop_back();
-      return out;
-    }
-
-    void PushStack(size_t id, double value) {
-      if (stacks[id].size() >= STACK_CAP) return;
-      stacks[id].push_back(value);
-    }
-
-    size_t CurScope() const { return scope_stack.back().scope; }
-    ScopeType CurScopeType() const { return scope_stack.back().type; }
-
-    ScopeType GetScopeType(size_t id) { return inst_lib->GetScopeType(id); }
-
     // Run every time we need to exit the current scope.
     void ExitScope() {
       emp_assert(scope_stack.size() > 1, CurScope());
@@ -248,6 +231,9 @@ namespace emp {
     int GetFunStart(size_t id) const { return fun_starts[id]; }
     size_t GetIP() const { return inst_ptr; }
     emp::vector<ScopeInfo> GetScopeStack() const { return scope_stack; }
+    size_t CurScope() const { return scope_stack.back().scope; }
+    ScopeType CurScopeType() const { return scope_stack.back().type; }
+    ScopeType GetScopeType(size_t id) { return inst_lib->GetScopeType(id); }
     emp::vector<RegBackup> GetRegStack() const { return reg_stack; }
     emp::vector<size_t> GetCallStack() const { return call_stack; }
     size_t GetNumErrors() const { return errors; }
@@ -260,9 +246,30 @@ namespace emp {
       genome[pos].Set(id, a0, a1, a2);
     }
     void SetGenome(const genome_t & g) { genome = g; }
+    void SetReg(size_t id, double val) { regs[id] = val; }
     void SetInput(int input_id, double value) { inputs[input_id] = value; }
     void SetInputs(const std::unordered_map<int,double> & vals) { inputs = vals; }
     void SetInputs(std::unordered_map<int,double> && vals) { inputs = std::move(vals); }
+    void SetOutput(int output_id, double value) { outputs[output_id] = value; }
+    void SetOutputs(const std::unordered_map<int,double> & vals) { outputs = vals; }
+    void SetOutputs(std::unordered_map<int,double> && vals) { outputs = std::move(vals); }
+    double PopStack(size_t id) {
+      if (stacks[id].size() == 0) return 0.0;
+      double out = stacks[id].back();
+      stacks[id].pop_back();
+      return out;
+    }
+    void PushStack(size_t id, double value) {
+      if (stacks[id].size() >= STACK_CAP) return;
+      stacks[id].push_back(value);
+    }
+    void SetFunStart(size_t id, int value) { fun_starts[id] = value; }
+    void SetIP(size_t pos) { inst_ptr = pos; }
+    void PushRegInfo(size_t scope_id, size_t reg_id) {
+      reg_stack.emplace_back(scope_id, reg_id, regs[reg_id]);
+    }
+    void PushCallInfo(size_t pos) { call_stack.push_back(pos); }
+    void IncErrors() { errors++; }
     void SetTrait(size_t id, double val) {
       if (id >= traits.size()) traits.resize(id+1, 0.0);
       traits[id] = val;
