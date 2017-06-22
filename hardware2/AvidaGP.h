@@ -78,9 +78,10 @@ namespace emp {
 
     using inst_t = Instruction;
     using genome_t = emp::vector<inst_t>;
+    using inst_lib_t = InstLib<AvidaGP>;
 
   protected:
-    Ptr<InstLib<AvidaGP>> inst_lib;
+    Ptr<inst_lib_t> inst_lib;
 
     // Virtual CPU Components!
     genome_t genome;
@@ -191,11 +192,14 @@ namespace emp {
     }
 
   public:
-    AvidaGP() : inst_lib(GetInstLib()), genome(), regs(), inputs(), outputs(), stacks(), fun_starts()
-              , inst_ptr(0), scope_stack(), reg_stack(), call_stack(), errors(0), traits() {
+    AvidaGP(Ptr<inst_lib_t> _ilib)
+      : inst_lib(_ilib), genome(), regs(), inputs(), outputs(), stacks(), fun_starts()
+      , inst_ptr(0), scope_stack(), reg_stack(), call_stack(), errors(0), traits()
+    {
       scope_stack.emplace_back(0, ScopeType::ROOT, 0);  // Initial scope.
       Reset();
     }
+    AvidaGP() : AvidaGP(DefaultInstLib()) { ; }
     AvidaGP(const AvidaGP &) = default;
     AvidaGP(AvidaGP &&) = default;
     ~AvidaGP() { ; }
@@ -405,7 +409,7 @@ namespace emp {
       hw.reg_stack.emplace_back(hw.CurScope(), args[0], hw.regs[args[0]]);
     }
 
-    static Ptr<InstLib<AvidaGP>> GetInstLib();
+    static Ptr<inst_lib_t> DefaultInstLib();
   };
 
   size_t AvidaGP::InstScope(const inst_t & inst) const {
@@ -514,11 +518,11 @@ namespace emp {
   }
 
   /// This static function can be used to access the generic AvidaGP instruction library.
-  Ptr<InstLib<AvidaGP>> AvidaGP::GetInstLib() {
-    static Ptr<InstLib<AvidaGP>> inst_lib = nullptr;
+  Ptr<InstLib<AvidaGP>> AvidaGP::DefaultInstLib() {
+    static Ptr<inst_lib_t> inst_lib = nullptr;
 
     if (!inst_lib) {
-      inst_lib = NewPtr<InstLib<AvidaGP>>();
+      inst_lib = NewPtr<inst_lib_t>();
       inst_lib->AddInst("Inc", Inst_Inc, 1, "Increment value in reg Arg1");
       inst_lib->AddInst("Dec", Inst_Dec, 1, "Decrement value in reg Arg1");
       inst_lib->AddInst("Not", Inst_Not, 1, "Logically toggle value in reg Arg1");
