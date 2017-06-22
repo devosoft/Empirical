@@ -80,7 +80,7 @@ namespace emp {
     using genome_t = emp::vector<inst_t>;
 
   protected:
-    const InstLib<AvidaGP> & inst_lib;
+    Ptr<InstLib<AvidaGP>> inst_lib;
 
     // Virtual CPU Components!
     genome_t genome;
@@ -115,7 +115,7 @@ namespace emp {
     size_t CurScope() const { return scope_stack.back().scope; }
     ScopeType CurScopeType() const { return scope_stack.back().type; }
 
-    ScopeType GetScopeType(size_t id) { return inst_lib.GetScopeType(id); }
+    ScopeType GetScopeType(size_t id) { return inst_lib->GetScopeType(id); }
 
     // Run every time we need to exit the current scope.
     void ExitScope() {
@@ -255,7 +255,7 @@ namespace emp {
     void PushTrait(double val) { traits.push_back(val); }
 
     inst_t GetRandomInst(Random & rand) {
-      return inst_t(rand.GetUInt(inst_lib.GetSize()),
+      return inst_t(rand.GetUInt(inst_lib->GetSize()),
                     rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE));
     }
 
@@ -265,7 +265,7 @@ namespace emp {
       genome.emplace_back(id, a0, a1, a2);
     }
     void PushInst(const std::string & name, size_t a0=0, size_t a1=0, size_t a2=0) {
-      size_t id = inst_lib.GetID(name);
+      size_t id = inst_lib->GetID(name);
       genome.emplace_back(id, a0, a1, a2);
     }
     void PushInst(const Instruction & inst) { genome.emplace_back(inst); }
@@ -280,7 +280,7 @@ namespace emp {
     bool Load(std::istream & input);
 
     /// Process a specified instruction, provided by the caller.
-    void ProcessInst(const inst_t & inst) { inst_lib.ProcessInst(*this, inst); }
+    void ProcessInst(const inst_t & inst) { inst_lib->ProcessInst(*this, inst); }
 
     /// Determine the scope associated with a particular instruction.
     size_t InstScope(const inst_t & inst) const;
@@ -288,7 +288,7 @@ namespace emp {
     /// Process the NEXT instruction pointed to be the instruction pointer
     void SingleProcess() {
       if (inst_ptr >= genome.size()) ResetIP();
-      inst_lib.ProcessInst(*this, genome[inst_ptr]);
+      inst_lib->ProcessInst(*this, genome[inst_ptr]);
       inst_ptr++;
     }
 
@@ -405,17 +405,17 @@ namespace emp {
       hw.reg_stack.emplace_back(hw.CurScope(), args[0], hw.regs[args[0]]);
     }
 
-    static const InstLib<AvidaGP> & GetInstLib();
+    static Ptr<InstLib<AvidaGP>> GetInstLib();
   };
 
   size_t AvidaGP::InstScope(const inst_t & inst) const {
-    if (inst_lib.GetScopeType(inst.id) == ScopeType::NONE) return 0;
-    return inst.args[ inst_lib.GetScopeArg(inst.id) ] + 1;
+    if (inst_lib->GetScopeType(inst.id) == ScopeType::NONE) return 0;
+    return inst.args[ inst_lib->GetScopeArg(inst.id) ] + 1;
   }
 
   void AvidaGP::PrintInst(const inst_t & inst, std::ostream & os) const {
-    os << inst_lib.GetName(inst.id);
-    const size_t num_args = inst_lib.GetNumArgs(inst.id);
+    os << inst_lib->GetName(inst.id);
+    const size_t num_args = inst_lib->GetNumArgs(inst.id);
     for (size_t i = 0; i < num_args; i++) {
       os << ' ' << inst.args[i];
     }
@@ -514,43 +514,41 @@ namespace emp {
   }
 
   /// This static function can be used to access the generic AvidaGP instruction library.
-  const InstLib<AvidaGP> & AvidaGP::GetInstLib() {
-    static InstLib<AvidaGP> inst_lib;
-    static bool init = false;
+  Ptr<InstLib<AvidaGP>> AvidaGP::GetInstLib() {
+    static Ptr<InstLib<AvidaGP>> inst_lib = nullptr;
 
-    if (!init) {
-      inst_lib.AddInst("Inc", Inst_Inc, 1, "Increment value in reg Arg1");
-      inst_lib.AddInst("Dec", Inst_Dec, 1, "Decrement value in reg Arg1");
-      inst_lib.AddInst("Not", Inst_Not, 1, "Logically toggle value in reg Arg1");
-      inst_lib.AddInst("SetReg", Inst_SetReg, 2, "Set reg Arg1 to numerical value Arg2");
-      inst_lib.AddInst("Add", Inst_Add, 3, "regs: Arg3 = Arg1 + Arg2");
-      inst_lib.AddInst("Sub", Inst_Sub, 3, "regs: Arg3 = Arg1 - Arg2");
-      inst_lib.AddInst("Mult", Inst_Mult, 3, "regs: Arg3 = Arg1 * Arg2");
-      inst_lib.AddInst("Div", Inst_Div, 3, "regs: Arg3 = Arg1 / Arg2");
-      inst_lib.AddInst("Mod", Inst_Mod, 3, "regs: Arg3 = Arg1 % Arg2");
-      inst_lib.AddInst("TestEqu", Inst_TestEqu, 3, "regs: Arg3 = (Arg1 == Arg2)");
-      inst_lib.AddInst("TestNEqu", Inst_TestNEqu, 3, "regs: Arg3 = (Arg1 != Arg2)");
-      inst_lib.AddInst("TestLess", Inst_TestLess, 3, "regs: Arg3 = (Arg1 < Arg2)");
-      inst_lib.AddInst("If", Inst_If, 2, "If reg Arg1 != 0, scope -> Arg2; else skip scope", ScopeType::BASIC, 1);
-      inst_lib.AddInst("While", Inst_While, 2, "Until reg Arg1 != 0, repeat scope Arg2; else skip", ScopeType::LOOP, 1);
-      inst_lib.AddInst("Countdown", Inst_Countdown, 2, "Countdown reg Arg1 to zero; scope to Arg2", ScopeType::LOOP, 1);
-      inst_lib.AddInst("Break", Inst_Break, 1, "Break out of scope Arg1");
-      inst_lib.AddInst("Scope", Inst_Scope, 1, "Enter scope Arg1", ScopeType::BASIC, 0);
-      inst_lib.AddInst("Define", Inst_Define, 2, "Build function Arg1 in scope Arg2", ScopeType::FUNCTION, 1);
-      inst_lib.AddInst("Call", Inst_Call, 1, "Call previously defined function Arg1");
-      inst_lib.AddInst("Push", Inst_Push, 2, "Push reg Arg1 onto stack Arg2");
-      inst_lib.AddInst("Pop", Inst_Pop, 2, "Pop stack Arg1 into reg Arg2");
-      inst_lib.AddInst("Input", Inst_Input, 2, "Pull next value from input Arg1 into reg Arg2");
-      inst_lib.AddInst("Output", Inst_Output, 2, "Push reg Arg1 into output Arg2");
-      inst_lib.AddInst("CopyVal", Inst_CopyVal, 2, "Copy reg Arg1 into reg Arg2");
-      inst_lib.AddInst("ScopeReg", Inst_ScopeReg, 1, "Backup reg Arg1; restore at end of scope");
+    if (!inst_lib) {
+      inst_lib = NewPtr<InstLib<AvidaGP>>();
+      inst_lib->AddInst("Inc", Inst_Inc, 1, "Increment value in reg Arg1");
+      inst_lib->AddInst("Dec", Inst_Dec, 1, "Decrement value in reg Arg1");
+      inst_lib->AddInst("Not", Inst_Not, 1, "Logically toggle value in reg Arg1");
+      inst_lib->AddInst("SetReg", Inst_SetReg, 2, "Set reg Arg1 to numerical value Arg2");
+      inst_lib->AddInst("Add", Inst_Add, 3, "regs: Arg3 = Arg1 + Arg2");
+      inst_lib->AddInst("Sub", Inst_Sub, 3, "regs: Arg3 = Arg1 - Arg2");
+      inst_lib->AddInst("Mult", Inst_Mult, 3, "regs: Arg3 = Arg1 * Arg2");
+      inst_lib->AddInst("Div", Inst_Div, 3, "regs: Arg3 = Arg1 / Arg2");
+      inst_lib->AddInst("Mod", Inst_Mod, 3, "regs: Arg3 = Arg1 % Arg2");
+      inst_lib->AddInst("TestEqu", Inst_TestEqu, 3, "regs: Arg3 = (Arg1 == Arg2)");
+      inst_lib->AddInst("TestNEqu", Inst_TestNEqu, 3, "regs: Arg3 = (Arg1 != Arg2)");
+      inst_lib->AddInst("TestLess", Inst_TestLess, 3, "regs: Arg3 = (Arg1 < Arg2)");
+      inst_lib->AddInst("If", Inst_If, 2, "If reg Arg1 != 0, scope -> Arg2; else skip scope", ScopeType::BASIC, 1);
+      inst_lib->AddInst("While", Inst_While, 2, "Until reg Arg1 != 0, repeat scope Arg2; else skip", ScopeType::LOOP, 1);
+      inst_lib->AddInst("Countdown", Inst_Countdown, 2, "Countdown reg Arg1 to zero; scope to Arg2", ScopeType::LOOP, 1);
+      inst_lib->AddInst("Break", Inst_Break, 1, "Break out of scope Arg1");
+      inst_lib->AddInst("Scope", Inst_Scope, 1, "Enter scope Arg1", ScopeType::BASIC, 0);
+      inst_lib->AddInst("Define", Inst_Define, 2, "Build function Arg1 in scope Arg2", ScopeType::FUNCTION, 1);
+      inst_lib->AddInst("Call", Inst_Call, 1, "Call previously defined function Arg1");
+      inst_lib->AddInst("Push", Inst_Push, 2, "Push reg Arg1 onto stack Arg2");
+      inst_lib->AddInst("Pop", Inst_Pop, 2, "Pop stack Arg1 into reg Arg2");
+      inst_lib->AddInst("Input", Inst_Input, 2, "Pull next value from input Arg1 into reg Arg2");
+      inst_lib->AddInst("Output", Inst_Output, 2, "Push reg Arg1 into output Arg2");
+      inst_lib->AddInst("CopyVal", Inst_CopyVal, 2, "Copy reg Arg1 into reg Arg2");
+      inst_lib->AddInst("ScopeReg", Inst_ScopeReg, 1, "Backup reg Arg1; restore at end of scope");
 
       for (size_t i = 0; i < CPU_SIZE; i++) {
-        inst_lib.AddArg(to_string((int)i), i);                   // Args can be called by value
-        inst_lib.AddArg(to_string("Reg", 'A'+(char)i), i);  // ...or as a register.
+        inst_lib->AddArg(to_string((int)i), i);                   // Args can be called by value
+        inst_lib->AddArg(to_string("Reg", 'A'+(char)i), i);  // ...or as a register.
       }
-
-      init = true;
     }
 
     return inst_lib;
