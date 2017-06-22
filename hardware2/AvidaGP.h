@@ -79,6 +79,7 @@ namespace emp {
     using inst_t = Instruction;
     using genome_t = emp::vector<inst_t>;
     using inst_lib_t = InstLib<AvidaGP>;
+    using stack_t = emp::vector<double>;
 
   protected:
     Ptr<inst_lib_t> inst_lib;
@@ -88,7 +89,7 @@ namespace emp {
     emp::array<double, CPU_SIZE> regs;
     std::unordered_map<int, double> inputs;   // Map of all available inputs (position -> value)
     std::unordered_map<int, double> outputs;  // Map of all outputs (position -> value)
-    emp::array< emp::vector<double>, CPU_SIZE > stacks;
+    emp::array< stack_t, CPU_SIZE > stacks;
     emp::array< int, CPU_SIZE> fun_starts;
 
     size_t inst_ptr;
@@ -233,13 +234,23 @@ namespace emp {
     }
 
     // Accessors
+    Ptr<inst_lib_t> GetInstLib() const { return inst_lib; }
     inst_t GetInst(size_t pos) const { return genome[pos]; }
     const genome_t & GetGenome() const { return genome; }
     double GetReg(size_t id) const { return regs[id]; }
-    size_t GetIP() const { return inst_ptr; }
+    double GetInput(int id) const { return Find(inputs, id, 0.0); }
+    const std::unordered_map<int,double> & GetInputs() const { return inputs; }
+    size_t GetNumInputs() const { return inputs.size(); }
     double GetOutput(int id) const { return Find(outputs, id, 0.0); }
     const std::unordered_map<int,double> & GetOutputs() const { return outputs; }
     size_t GetNumOutputs() const { return outputs.size(); }
+    const stack_t & GetStack(size_t id) const { return stacks[id]; }
+    int GetFunStart(size_t id) const { return fun_starts[id]; }
+    size_t GetIP() const { return inst_ptr; }
+    emp::vector<ScopeInfo> GetScopeStack() const { return scope_stack; }
+    emp::vector<RegBackup> GetRegStack() const { return reg_stack; }
+    emp::vector<size_t> GetCallStack() const { return call_stack; }
+    size_t GetNumErrors() const { return errors; }
     double GetTrait(size_t id) const { return traits[id]; }
     const emp::vector<double> &  GetTraits() { return traits; }
     size_t GetNumTraits() const { return traits.size(); }
