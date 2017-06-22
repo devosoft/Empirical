@@ -53,7 +53,7 @@ namespace emp {
       if (id < 62) return ('0' + (id - 52));
       return '+';
     }
-    inst_id_t GetID(const std::string name) const {
+    inst_id_t GetID(const std::string & name) const {
       emp_assert(Has(name_map, name), name);
       return Find(name_map, name, inst_id_t::Unknown);
     }

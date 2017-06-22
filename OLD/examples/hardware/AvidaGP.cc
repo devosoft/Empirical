@@ -45,12 +45,13 @@ int main()
   cpu.Trace(200);
 
   // Run a ton of organisms.
-  for (int t = 0; t < 100000; t++) {
-    //if (t % 10000 == 0) std::cout << t << std::endl;
+  for (int t = 0; t < 1000000; t++) {
+    if (t % 10000 == 0) std::cout << t << std::endl;
     cpu.Reset();
     for (int i = 0; i < 100; i++) cpu.PushRandom(random);
     cpu.Process(200);
   }
+  std::cout << "CURRENT AvidaGP" << std::endl;
 
   return 0;
 }

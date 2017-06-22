@@ -10,10 +10,10 @@
 #include "../../tools/Random.h"
 #include "../../evo/World.h"
 
-constexpr size_t POP_SIZE = 200;
+constexpr size_t POP_SIZE = 20;
 constexpr size_t GENOME_SIZE = 100;
 constexpr size_t EVAL_TIME = 500;
-constexpr size_t UPDATES = 1000;
+constexpr size_t UPDATES = 100;
 constexpr size_t TOURNY_SIZE = 4;
 
 // Determine the next move of a human player.

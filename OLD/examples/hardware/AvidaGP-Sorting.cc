@@ -17,7 +17,7 @@ constexpr size_t POP_SIZE = 200;
 constexpr size_t POP_GROUPS = 5;    // How many groups to divide up the population?
 constexpr size_t GENOME_SIZE = 100;
 constexpr size_t EVAL_TIME = 500;
-constexpr size_t UPDATES = 5000;
+constexpr size_t UPDATES = 500;
 constexpr size_t TOURNY_SIZE = 4;
 
 constexpr size_t SORT_VALS = 8;
