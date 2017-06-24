@@ -71,10 +71,33 @@ namespace emp {
   void SetDefaultMutFun(WORLD & world) { SetDefaultMutFun_impl<WORLD, ORG>(world, true); }
 
 
-  // Setup Print function
-  // 1. Proper operator<<
-  // 2. Print()
-  // 3. Assert?  Or trivial default?
+  namespace {
+    // Setup Print function
+    // 1. Org Print()
+    // 2. Proper operator<<
+    // 3. Assert?  Or trivial default?
+
+    template <typename WORLD, typename ORG>
+    void SetDefaultPrintFun_impl(WORLD & world, bool_decoy<decltype( (*(ORG*)nullptr).Print(std::cout) )>) {
+      world.SetPrintFun( [](ORG & org, std::ostream & os){ org.Print(os); } );
+    }
+
+    template <typename WORLD, typename ORG>
+    void SetDefaultPrintFun_impl(WORLD & world, int_decoy<decltype( std::cout << (*(ORG*)nullptr) )>) {
+      world.SetPrintFun( [](ORG & org, std::ostream & os){ os << org; } );
+    }
+
+    template <typename WORLD, typename ORG>
+    void SetDefaultPrintFun_impl(WORLD & world, ... ) {
+      world.SetPrintFun( [](ORG & org, std::ostream & os){
+        emp_assert(false, "No default Print function available");
+      } );
+    }
+
+  }
+
+  template <typename WORLD, typename ORG>
+  void SetDefaultPrintFun(WORLD & world) { SetDefaultPrintFun_impl<WORLD, ORG>(world, true); }
 
 }
 
