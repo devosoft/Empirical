@@ -111,7 +111,7 @@ namespace emp {
     using org_t = ORG;
     using value_type = org_t;
     using genotype_t = GENOTYPE;
-    using iterator_t = World_iterator<org_t>;
+    using iterator_t = World_iterator<this_t>;
 
 
     // --- Accessing Organisms or info ---
