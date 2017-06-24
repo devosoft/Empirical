@@ -73,7 +73,7 @@ int main() {
 
   // Test grid Populations
   emp::Random random;
-  emp::World<int> grid_world(&random);
+  emp::World<int> grid_world(random);
   grid_world.SetGrid(10,10);
   for (int i = 0; i < 10; i++) grid_world.Inject(i);
   grid_world.PrintGrid();
