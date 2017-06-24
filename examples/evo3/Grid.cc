@@ -19,20 +19,21 @@ int main()
 
   emp::Random random;
 
-  std::function<std::string(int&)> print_fun = [](int & val) {
+  std::function<void(int&,std::ostream &)> print_fun = [](int & val, std::ostream & os) {
     char out_char = '+';
     val %= 63;
     if (val < 10) out_char = (char) ('0' + val);
     else if (val < 36) out_char = (char) ('a' + (val - 10));
     else if (val < 62) out_char = (char) ('A' + (val - 36));
-    return emp::to_string(out_char);
+    os << out_char;
   };
 
   emp::World<int> grid_world(random);
   grid_world.SetGrid(POP_SIDE, POP_SIDE);
+  grid_world.SetPrintFun(print_fun);
 
   for (size_t i = 0; i < POP_SIZE; i++) grid_world.InjectAt((int)i,i);
-  grid_world.PrintGrid(print_fun);
+  grid_world.PrintGrid();
 
   for (size_t g = 0; g < GENS; g++) {
     for (size_t i = 0; i < grid_world.GetSize(); ++i) {
@@ -43,8 +44,8 @@ int main()
   }
 
   std::cout << std::endl;
-  grid_world.PrintGrid(print_fun);
+  grid_world.PrintGrid();
   std::cout << "Final Org Counts:\n";
-  grid_world.PrintOrgCounts(print_fun);
+  grid_world.PrintOrgCounts();
   std::cout << std::endl;
 }
