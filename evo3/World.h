@@ -245,16 +245,9 @@ namespace emp {
 
     // --- PRINTING ---
 
-    void Print(std::function<std::string(ORG&)> string_fun, std::ostream & os = std::cout,
-	       std::string empty="X", std::string spacer=" ");
-    void Print(std::ostream & os = std::cout, std::string empty="X", std::string spacer=" ");
-    void PrintOrgCounts(std::function<std::string(ORG&)> string_fun,
-			std::ostream & os = std::cout);
-    void PrintGrid(std::function<std::string(ORG&)> string_fun, std::ostream& os=std::cout,
-               const std::string & empty="-", const std::string & spacer=" ");
-    void PrintGrid(std::ostream& os=std::cout, const std::string & empty="X", std::string spacer=" ") {
-      PrintGrid( [](ORG & org){return emp::to_string(org);}, os, empty, spacer);
-    }
+    void Print(std::ostream & os = std::cout, const std::string & empty="X", const std::string & spacer=" ");
+    void PrintOrgCounts(std::ostream & os = std::cout);
+    void PrintGrid(std::ostream& os=std::cout, const std::string & empty="X", const std::string & spacer=" ");
 
     // --- FOR VECTOR COMPATIBILITY ---
     size_t size() const { return pop.size(); }
@@ -524,42 +517,36 @@ namespace emp {
   }
 
   template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::Print(std::function<std::string(ORG&)> string_fun,
-			       std::ostream & os, std::string empty, std::string spacer) {
+  void World<ORG,GENOTYPE>::Print(std::ostream & os, const std::string & empty, const std::string & spacer) {
     for (Ptr<ORG> org : pop) {
-      if (org) os << string_fun(*org);
+      if (org) os << fun_print_org(*org, os);
       else os << empty;
       os << spacer;
     }
   }
 
   template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::Print(std::ostream & os, std::string empty, std::string spacer) {
-    Print( [](ORG & org){return emp::to_string(org);}, os, empty, spacer);
-  }
-
-  template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::PrintOrgCounts(std::function<std::string(ORG&)> string_fun,
-                                        std::ostream & os) {
+  void World<ORG,GENOTYPE>::PrintOrgCounts(std::ostream & os) {
     std::map<ORG,size_t> org_counts;
     for (Ptr<ORG> org : pop) if (org) org_counts[*org] = 0;  // Initialize needed entries
     for (Ptr<ORG> org : pop) if (org) org_counts[*org] += 1; // Count actual types.
     for (auto x : org_counts) {
       ORG cur_org = x.first;
-      os << string_fun(cur_org) << " : " << x.second << std::endl;
+      fun_print_org(cur_org, os);
+      os << " : " << x.second << std::endl;
     }
   }
 
   template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::PrintGrid(std::function<std::string(ORG&)> string_fun,
-                                      std::ostream& os,
+  void World<ORG,GENOTYPE>::PrintGrid(std::ostream& os,
                                       const std::string & empty, const std::string & spacer) {
     emp_assert(string_fun);
     for (size_t y=0; y < height; y++) {
       for (size_t x = 0; x < width; x++) {
         Ptr<ORG> org = GetOrgPtr(x+y*width);
-        if (org) os << string_fun(*org) << spacer;
-        else os << empty << spacer;
+        if (org) fun_print_org(*org, os);
+        else os << empty;
+        os << spacer;
       }
       os << std::endl;
     }
