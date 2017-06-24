@@ -31,12 +31,12 @@ namespace emp {
     // WorldSize() is a shortcut to get the size of the pointed-to world object.
     size_t WorldSize() { emp_assert(world_ptr); return world_ptr->size(); }
 
-    // WorldOrg() is a shortcut to retrieve an organism from the pointed-to world object.
-    Ptr<org_t> WorldOrg(size_t pos) { emp_assert(world_ptr); return world_ptr->pop[pos]; }
+    // OrgPtr() is a shortcut to retrieve an organism from the pointed-to world object.
+    Ptr<org_t> OrgPtr() { emp_assert(world_ptr); return world_ptr->pop[pos]; }
 
     // The MakeValid() function moves an iterator to t next non-null position (or the end)
     void MakeValid() {
-      while ((pos < WorldSize()) && (WorldOrg(pos) == nullptr)) ++pos;
+      while (pos < WorldSize() && OrgPtr() == nullptr) ++pos;
     }
 
   public:
@@ -58,7 +58,7 @@ namespace emp {
 
     this_t & operator--() {
       --pos;
-      while (pos < WorldSize() && (WorldOrg(pos)) == nullptr) --pos;
+      while (pos < WorldSize() && OrgPtr() == nullptr) --pos;
       return *this;
     }
 
@@ -69,8 +69,8 @@ namespace emp {
     bool operator> (const this_t& rhs) const { return pos >  rhs.pos; }
     bool operator>=(const this_t& rhs) const { return pos >= rhs.pos; }
 
-    org_t & operator*() { MakeValid(); return *WorldOrg(pos); }
-    const org_t & operator*() const { MakeValid(); return *WorldOrg(pos); }
+    org_t & operator*() { MakeValid(); return *(OrgPtr()); }
+    const org_t & operator*() const { MakeValid(); return *(OrgPtr()); }
 
     operator bool() const { MakeValid(); return pos < WorldSize(); }
 
