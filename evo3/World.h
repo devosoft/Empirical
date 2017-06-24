@@ -40,6 +40,7 @@ namespace emp {
 
     using fun_calc_fitness_t = std::function<double(ORG&)>;
     using fun_do_mutations_t = std::function<void(ORG&,Random&)>;
+    using fun_print_org_t    = std::function<void(ORG&,std::ostream &)>;
     using fun_add_inject_t   = std::function<size_t(Ptr<ORG>)>;
     using fun_add_birth_t    = std::function<size_t(Ptr<ORG>, size_t)>;
     using fun_get_neighbor_t = std::function<size_t(size_t)>;
@@ -66,6 +67,7 @@ namespace emp {
     // Configurable functions.
     fun_calc_fitness_t fun_calc_fitness;  // Fitness function
     fun_do_mutations_t fun_do_mutations;  // Mutation function
+    fun_print_org_t    fun_print_org;     // Print function
     fun_add_inject_t   fun_add_inject;    // Technique to inject a new organism.
     fun_add_birth_t    fun_add_birth;     // Technique to add a new offspring.
     fun_get_neighbor_t fun_get_neighbor;  // Choose a random neighbor near specified id.
@@ -85,12 +87,13 @@ namespace emp {
       : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), fit_cache()
       , name(_name), pop_struct(Struct::MIXED), synchronous_gen(false)
       , cache_on(false), width(0), height(0)
-      , fun_calc_fitness(), fun_do_mutations()
+      , fun_calc_fitness(), fun_do_mutations(), fun_print_org()
       , fun_add_inject(), fun_add_birth(), fun_get_neighbor()
     {
       if (!rnd) NewRandom();
       SetDefaultFitFun<this_t, ORG>(*this);
       SetDefaultMutFun<this_t, ORG>(*this);
+      SetDefaultPrintFun<this_t, ORG>(*this);
       ConfigFuns();
     }
     World(Random & rnd, std::string _name="") : World(&rnd, _name) { ; }
@@ -143,6 +146,9 @@ namespace emp {
     void SetWellMixed();
     void SetGrid(size_t _w, size_t _h);
 
+    void SetFitFun(const fun_calc_fitness_t & fit_fun) { fun_calc_fitness = fit_fun; }
+    void SetMutFun(const fun_do_mutations_t & mut_fun) { fun_do_mutations = mut_fun; }
+    void SetPrintFun(const fun_print_org_t & print_fun) { fun_print_org = print_fun; }
 
     // --- UPDATE THE WORLD! ---
 
@@ -154,8 +160,6 @@ namespace emp {
 
 
     // --- CALCULATE FITNESS ---
-
-    void SetFitFun(const fun_calc_fitness_t & fit_fun) { fun_calc_fitness = fit_fun; }
 
     // When calculating fitness, the three relevant inputs are the organism, the fitness function,
     // and the position in the population.
@@ -171,8 +175,6 @@ namespace emp {
     void ClearCache() { fit_cache.resize(0); }
 
     // --- MUTATIONS! ---
-
-    void SetMutFun(const fun_do_mutations_t & mut_fun) { fun_do_mutations = mut_fun; }
 
     void DoMutations(ORG & org) {
       emp_assert(fun_do_mutations);
