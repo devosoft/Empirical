@@ -8,6 +8,8 @@
 //
 //  Developer notes:
 //  * It may be worth building a Const interator type to avoid unintended modifications.
+//  * Currently we do MakeValid after every change AND before many accesses.  Pick one?
+//  * operator-- is unsafe; it can go off of the beginnig of the world.
 
 #ifndef EMP_EVO_WORLD_ITER_H
 #define EMP_EVO_WORLD_ITER_H
@@ -16,12 +18,12 @@
 
 namespace emp {
 
-  template <typename ORG>
+  template <typename WORLD>
   class World_iterator {
   private:
-    using org_t = ORG;
-    using world_t = World<org_t>;
-    using this_t = World_iterator<org_t>;
+    using world_t = WORLD;
+    using org_t = typename world_t::org_t;
+    using this_t = World_iterator<world_t>;
 
     Ptr<world_t> world_ptr;
     size_t pos;
@@ -29,13 +31,16 @@ namespace emp {
     // WorldSize() is a shortcut to get the size of the pointed-to world object.
     size_t WorldSize() { emp_assert(world_ptr); return world_ptr->size(); }
 
+    // WorldOrg() is a shortcut to retrieve an organism from the pointed-to world object.
+    Ptr<org_t> WorldOrg(size_t pos) { emp_assert(world_ptr); return world_ptr->pop[pos]; }
+
     // The MakeValid() function moves an iterator to t next non-null position (or the end)
     void MakeValid() {
-      while ((pos < WorldSize()) && (((*world_ptr)[pos]) == nullptr)) ++pos;
+      while ((pos < WorldSize()) && (WorldOrg(pos) == nullptr)) ++pos;
     }
 
   public:
-    World_iterator(world_t * pm, int ind=0) : world_ptr(pm), pos(ind) { MakeValid(); }
+    World_iterator(world_t * _w, size_t _p=0) : world_ptr(_w), pos(_p) { MakeValid(); }
     World_iterator(const World_iterator & _in) : world_ptr(_in.world_ptr), pos(_in.pos) { MakeValid(); }
 
     this_t & operator=(const World_iterator & _in) {
@@ -53,7 +58,7 @@ namespace emp {
 
     this_t & operator--() {
       --pos;
-      while (pos < WorldSize() && (((*world_ptr)[(size_t)pos]) == nullptr)) { --pos; }
+      while (pos < WorldSize() && (WorldOrg(pos)) == nullptr) --pos;
       return *this;
     }
 
@@ -64,28 +69,16 @@ namespace emp {
     bool operator> (const this_t& rhs) const { return pos >  rhs.pos; }
     bool operator>=(const this_t& rhs) const { return pos >= rhs.pos; }
 
-    auto operator*() -> decltype((*world_ptr)[(size_t)pos]) { MakeValid(); return (*world_ptr)[(size_t)pos]; }
-    const org_ptr_t & operator*() const {
-      MakeValid();
-      return (org_ptr_t)(*world_ptr)[(size_t)pos];
-    }
+    org_t & operator*() { MakeValid(); return *WorldOrg(pos); }
+    const org_t & operator*() const { MakeValid(); return *WorldOrg(pos); }
 
     operator bool() const { MakeValid(); return pos < WorldSize(); }
 
-    this_t begin() {
-      return this_t(world_ptr, 0);
-    }
-    const this_t begin() const {
-      return this_t(world_ptr, 0);
-    }
+    this_t begin() { return this_t(world_ptr, 0); }
+    const this_t begin() const { return this_t(world_ptr, 0); }
 
-    this_t end() {
-      return this_t(world_ptr, WorldSize());
-    }
-    const this_t end() const {
-      return this_t(world_ptr, WorldSize());
-    }
-
+    this_t end() { return this_t(world_ptr, WorldSize()); }
+    const this_t end() const { return this_t(world_ptr, WorldSize()); }
   };
 
 }
