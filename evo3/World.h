@@ -30,6 +30,7 @@
 #include "../tools/string_utils.h"
 
 #include "World_reflect.h"  // Handle needed reflection on incoming organism classes.
+#include "World_iterator.h"
 
 namespace emp {
 
@@ -37,6 +38,7 @@ namespace emp {
   class World {
   private:
     using this_t = World<ORG, GENOTYPE>;
+    friend class World_iterator<this_t>;
 
     using fun_calc_fitness_t = std::function<double(ORG&)>;
     using fun_do_mutations_t = std::function<void(ORG&,Random&)>;
@@ -106,9 +108,10 @@ namespace emp {
 
     // --- Publicly available types ---
 
-    using value_type = ORG;
     using org_t = ORG;
+    using value_type = org_t;
     using genotype_t = GENOTYPE;
+    using iterator_t = World_iterator<org_t>;
 
 
     // --- Accessing Organisms or info ---
@@ -254,8 +257,8 @@ namespace emp {
     void resize(size_t new_size) { Resize(new_size); }
     void clear() { Clear(); }
 
-    //     iterator_t begin() { return iterator_t(this, 0); }
-    //     iterator_t end() { return iterator_t(this, (int) pop.size()); }
+    iterator_t begin() { return iterator_t(this, 0); }
+    iterator_t end() { return iterator_t(this, (int) pop.size()); }
 
 
     // --- SELECTION MECHANISMS ---
@@ -540,7 +543,6 @@ namespace emp {
   template<typename ORG, typename GENOTYPE>
   void World<ORG,GENOTYPE>::PrintGrid(std::ostream& os,
                                       const std::string & empty, const std::string & spacer) {
-    emp_assert(string_fun);
     for (size_t y=0; y < height; y++) {
       for (size_t x = 0; x < width; x++) {
         Ptr<ORG> org = GetOrgPtr(x+y*width);
