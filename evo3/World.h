@@ -34,10 +34,10 @@
 
 namespace emp {
 
-  template <typename ORG, typename GENOTYPE=ORG>
+  template <typename ORG>
   class World {
   private:
-    using this_t = World<ORG, GENOTYPE>;
+    using this_t = World<ORG>;
     friend class World_iterator<this_t>;
 
     using fun_calc_fitness_t = std::function<double(ORG&)>;
@@ -110,7 +110,6 @@ namespace emp {
 
     using org_t = ORG;
     using value_type = org_t;
-    using genotype_t = GENOTYPE;
     using iterator_t = World_iterator<this_t>;
 
 
@@ -279,8 +278,8 @@ namespace emp {
   // ===                                                       ===
   // =============================================================
 
-  template <typename ORG, typename GENOTYPE>
-  size_t World<ORG,GENOTYPE>::AddOrgAt(Ptr<ORG> new_org, size_t pos) {
+  template <typename ORG>
+  size_t World<ORG>::AddOrgAt(Ptr<ORG> new_org, size_t pos) {
     emp_assert(new_org, pos);
 
     if (pop.size() <= pos) pop.resize(pos+1, nullptr);   // Make sure we have room.
@@ -291,8 +290,8 @@ namespace emp {
     return pos;
   }
 
-  template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::ConfigFuns() {
+  template<typename ORG>
+  void World<ORG>::ConfigFuns() {
     // If we have an external structure, skip this section (functions must be defined on your own!)
     if (pop_struct == Struct::EXTERNAL) return;
 
@@ -367,15 +366,15 @@ namespace emp {
 
   }
 
-  template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::SetWellMixed() {
+  template<typename ORG>
+  void World<ORG>::SetWellMixed() {
     width = 0; height = 0;
     pop_struct = Struct::MIXED;
     ConfigFuns();
   }
 
-  template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::SetGrid(size_t _w, size_t _h) {
+  template<typename ORG>
+  void World<ORG>::SetGrid(size_t _w, size_t _h) {
     width = _w;  height = _h;
     pop_struct = Struct::GRID;
     Resize(_w * _h);
@@ -385,8 +384,8 @@ namespace emp {
 
   // --- Updating the world! ---
 
-  template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::Update() {
+  template<typename ORG>
+  void World<ORG>::Update() {
     // If generations are synchronous, put the next generation in place.
     if (synchronous_gen) {
       // Add all waiting organisms into the population.
@@ -403,8 +402,8 @@ namespace emp {
     }
   }
 
-  template<typename ORG, typename GENOTYPE>
-  double World<ORG,GENOTYPE>::CalcFitnessID(size_t id) {
+  template<typename ORG>
+  double World<ORG>::CalcFitnessID(size_t id) {
     if (!cache_on) return CalcFitnessOrg(*pop[id]);
     double cur_fit = GetCache(id);
     if (cur_fit == 0.0 && pop[id]) {   // If org is non-null, but no cached fitness, calculate it!
@@ -416,8 +415,8 @@ namespace emp {
   }
 
   // Delete all organisms.
-  template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::Clear() {
+  template<typename ORG>
+  void World<ORG>::Clear() {
     for (Ptr<ORG> org : pop) if (org) org.Delete();       // Delete current organisms.
     for (Ptr<ORG> org : next_pop) if (org) org.Delete();  // Delete waiting organisms.
     pop.resize(0);                                     // Remove deleted organisms.
@@ -427,8 +426,8 @@ namespace emp {
   }
 
   // Delete organism at a specified position.
-  template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::ClearOrgAt(size_t pos) {
+  template<typename ORG>
+  void World<ORG>::ClearOrgAt(size_t pos) {
     if (!pop[pos]) return;  // No organism; no need to do anything.
     pop[pos].Delete();
     pop[pos]=nullptr;
@@ -436,8 +435,8 @@ namespace emp {
     num_orgs--;
   }
 
-  template <typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::Inject(const ORG & mem, size_t copy_count) {
+  template <typename ORG>
+  void World<ORG>::Inject(const ORG & mem, size_t copy_count) {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       //const size_t pos =
@@ -446,16 +445,16 @@ namespace emp {
     }
   }
 
-  template <typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::InjectAt(const ORG & mem, const size_t pos) {
+  template <typename ORG>
+  void World<ORG>::InjectAt(const ORG & mem, const size_t pos) {
     Ptr<ORG> new_org = NewPtr<ORG>(mem);
     AddOrgAt(new_org, pos);
     // SetupOrg(*new_org, &callbacks, pos);
   }
 
-  template <typename ORG, typename GENOTYPE>
+  template <typename ORG>
   template <typename... ARGS>
-  void World<ORG,GENOTYPE>::InjectRandomOrg(ARGS &&... args) {
+  void World<ORG>::InjectRandomOrg(ARGS &&... args) {
     emp_assert(random_ptr != nullptr && "InjectRandomOrg() requires active random_ptr");
     Ptr<ORG> new_org = NewPtr<ORG>(*random_ptr, std::forward<ARGS>(args)...);
     // const size_t pos =
@@ -463,8 +462,8 @@ namespace emp {
     // SetupOrg(*new_org, &callbacks, pos);
   }
 
-  template <typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::DoBirth(const ORG mem, size_t parent_pos, size_t copy_count) {
+  template <typename ORG>
+  void World<ORG>::DoBirth(const ORG mem, size_t parent_pos, size_t copy_count) {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       // const size_t pos =
@@ -473,23 +472,23 @@ namespace emp {
     }
   }
 
-  template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::SetRandom(Random & r) {
+  template<typename ORG>
+  void World<ORG>::SetRandom(Random & r) {
     if (random_owner) random_ptr.Delete();
     random_ptr = &r;
     random_owner = false;
   }
 
-  template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::NewRandom(int seed) {
+  template<typename ORG>
+  void World<ORG>::NewRandom(int seed) {
     if (random_owner) random_ptr.Delete();
     random_ptr.New(seed);
     random_owner = true;
   }
 
   // Get random *occupied* cell.
-  template<typename ORG, typename GENOTYPE>
-  size_t World<ORG,GENOTYPE>::GetRandomOrgID() {
+  template<typename ORG>
+  size_t World<ORG>::GetRandomOrgID() {
     emp_assert(num_orgs > 0); // Make sure it's possible to find an organism!
     size_t pos = random_ptr->GetUInt(0, pop.size());
     while (pop[pos] == nullptr) pos = random_ptr->GetUInt(0, pop.size());
@@ -497,8 +496,8 @@ namespace emp {
   }
 
   // Find ALL cell IDs the return true in the filter.
-  template<typename ORG, typename GENOTYPE>
-  emp::vector<size_t> World<ORG,GENOTYPE>::FindCellIDs(const std::function<bool(ORG*)> & filter) {
+  template<typename ORG>
+  emp::vector<size_t> World<ORG>::FindCellIDs(const std::function<bool(ORG*)> & filter) {
     emp::vector<size_t> valid_IDs(0);
     for (size_t i = 0; i < pop.size(); i++) {
       if (filter(pop[i].Raw())) valid_IDs.push_back(i);
@@ -507,8 +506,8 @@ namespace emp {
   }
 
   // Run population through a bottleneck to (potentially) shrink it.
-  template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::DoBottleneck(const size_t new_size, bool choose_random) {
+  template<typename ORG>
+  void World<ORG>::DoBottleneck(const size_t new_size, bool choose_random) {
     if (new_size >= pop.size()) return;  // No bottleneck needed!
 
     // If we are supposed to keep only random organisms, shuffle the beginning into place!
@@ -519,8 +518,8 @@ namespace emp {
     pop.resize(new_size);
   }
 
-  template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::Print(std::ostream & os, const std::string & empty, const std::string & spacer) {
+  template<typename ORG>
+  void World<ORG>::Print(std::ostream & os, const std::string & empty, const std::string & spacer) {
     for (Ptr<ORG> org : pop) {
       if (org) os << fun_print_org(*org, os);
       else os << empty;
@@ -528,8 +527,8 @@ namespace emp {
     }
   }
 
-  template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::PrintOrgCounts(std::ostream & os) {
+  template<typename ORG>
+  void World<ORG>::PrintOrgCounts(std::ostream & os) {
     std::map<ORG,size_t> org_counts;
     for (Ptr<ORG> org : pop) if (org) org_counts[*org] = 0;  // Initialize needed entries
     for (Ptr<ORG> org : pop) if (org) org_counts[*org] += 1; // Count actual types.
@@ -540,8 +539,8 @@ namespace emp {
     }
   }
 
-  template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::PrintGrid(std::ostream& os,
+  template<typename ORG>
+  void World<ORG>::PrintGrid(std::ostream& os,
                                       const std::string & empty, const std::string & spacer) {
     for (size_t y=0; y < height; y++) {
       for (size_t x = 0; x < width; x++) {
@@ -556,8 +555,8 @@ namespace emp {
 
   // Elite Selection picks a set of the most fit individuals from the population to move to
   // the next generation.  Find top e_count individuals and make copy_count copies of each.
-  template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::EliteSelect(size_t e_count, size_t copy_count) {
+  template<typename ORG>
+  void World<ORG>::EliteSelect(size_t e_count, size_t copy_count) {
     emp_assert(fun_calc_fitness);
     emp_assert(e_count > 0 && e_count <= pop.size(), e_count);
     emp_assert(copy_count > 0);
@@ -583,8 +582,8 @@ namespace emp {
   // finds the one with the highest fitness, and moves it to the next generation.
   // User provides the fitness function, the tournament size, and (optionally) the
   // number of tournaments to run.
-  template<typename ORG, typename GENOTYPE>
-  void World<ORG,GENOTYPE>::TournamentSelect(size_t t_size, size_t tourny_count) {
+  template<typename ORG>
+  void World<ORG>::TournamentSelect(size_t t_size, size_t tourny_count) {
     emp_assert(fun_calc_fitness);
     emp_assert(t_size > 0 && t_size <= num_orgs, t_size, num_orgs);
     emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
