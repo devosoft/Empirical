@@ -12,6 +12,7 @@
 #include <type_traits>
 
 #include "../base/assert.h"
+#include "../meta/reflection.h"
 
 namespace emp {
 
@@ -22,13 +23,15 @@ namespace emp {
     // 2. If an organim can be cast to double, use it!
     // 3. Start with a fitness function that throws an assert indicating function must be set.
 
+    using std::declval;
+
     template <typename WORLD, typename ORG>
-    void SetDefaultFitFun_impl(WORLD & world, bool_decoy<decltype( (*(ORG*)nullptr).GetFitness() )>) {
+    void SetDefaultFitFun_impl(WORLD & world, bool_decoy<decltype( declval<ORG>().GetFitness() )>) {
       world.SetFitFun( [](ORG & org){ return (double) org.GetFitness(); } );
     }
 
     template <typename WORLD, typename ORG>
-    void SetDefaultFitFun_impl(WORLD & world, int_decoy<decltype( (double)(*(ORG*)nullptr) )>) {
+    void SetDefaultFitFun_impl(WORLD & world, int_decoy<decltype( (double) declval<ORG>() )>) {
       world.SetFitFun( [](ORG & org){ return (double) org; } );
     }
 
@@ -51,7 +54,7 @@ namespace emp {
     // 2. Empty, with assert.
 
     template <typename WORLD, typename ORG>
-    void SetDefaultMutFun_impl(WORLD & world, bool_decoy<decltype( (*(ORG*)nullptr).DoMutations(Random()) )>) {
+    void SetDefaultMutFun_impl(WORLD & world, bool_decoy<decltype( declval<ORG>().DoMutations(Random()) )>) {
       world.SetMutFun( [](ORG & org, Random & random) {
         return (double) org.DoMutations(random)();
       } );
@@ -75,15 +78,16 @@ namespace emp {
     // Setup Print function
     // 1. Org Print()
     // 2. Proper operator<<
-    // 3. Assert?  Or trivial default?
+    // 3. Assert
+    // @CAO: Also try emp::to_string ??
 
     template <typename WORLD, typename ORG>
-    void SetDefaultPrintFun_impl(WORLD & world, bool_decoy<decltype( (*(ORG*)nullptr).Print(std::cout) )>) {
+    void SetDefaultPrintFun_impl(WORLD & world, bool_decoy<decltype( declval<ORG>().Print(std::cout) )>) {
       world.SetPrintFun( [](ORG & org, std::ostream & os){ org.Print(os); } );
     }
 
     template <typename WORLD, typename ORG>
-    void SetDefaultPrintFun_impl(WORLD & world, int_decoy<decltype( std::cout << (*(ORG*)nullptr) )>) {
+    void SetDefaultPrintFun_impl(WORLD & world, int_decoy<decltype( std::cout << declval<ORG>() )>) {
       world.SetPrintFun( [](ORG & org, std::ostream & os){ os << org; } );
     }
 
