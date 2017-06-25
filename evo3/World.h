@@ -15,6 +15,10 @@
 //  a "next generation" placeholder population.  Update() will move orgs into primary population.
 //
 //  All insertions into the popoulation funnel through private function AddOrgAt(org, pos);
+//
+//
+//  Developer Notes:
+//  * We should Specialize World so that ANOTHER world can be used with proper delegation.
 
 #ifndef EMP_EVO_WORLD_H
 #define EMP_EVO_WORLD_H
@@ -63,8 +67,8 @@ namespace emp {
     Struct pop_struct;        // What population structure are we using?
     bool synchronous_gen;     // Should generations be prefectly synchronous?
     bool cache_on;            // Should we be caching fitness values?
-    size_t width;             // If a grid, track size.
-    size_t height;
+    size_t size_x;            // If a grid, track width; if pools, track pool size
+    size_t size_y;            // If a grid, track height; if pools, track num pools.
 
     // Configurable functions.
     fun_calc_fitness_t fun_calc_fitness;  // Fitness function
@@ -88,7 +92,7 @@ namespace emp {
     World(Ptr<Random> rnd=nullptr, std::string _name="")
       : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), fit_cache()
       , name(_name), pop_struct(Struct::MIXED), synchronous_gen(false)
-      , cache_on(false), width(0), height(0)
+      , cache_on(false), size_x(0), size_y(0)
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org()
       , fun_add_inject(), fun_add_birth(), fun_get_neighbor()
     {
@@ -121,8 +125,8 @@ namespace emp {
     bool IsSynchronous() const { return synchronous_gen; }
     bool IsCacheOn() const { return cache_on; }
     Struct GetPopStruct() const { return pop_struct; }
-    size_t GetWidth() const { return width; }
-    size_t GetHeight() const { return height; }
+    size_t GetWidth() const { return size_x; }
+    size_t GetHeight() const { return size_y; }
 
     // We ONLY have a const index operator since manipulations should go through other functions.
     // No non-const version.
@@ -134,7 +138,7 @@ namespace emp {
       emp_assert(pop[id] != nullptr, id);  // Should not index to a null organism!
       return *(pop[id]);
     }
-    const ORG & GetOrg(size_t x, size_t y) { return GetOrg(x+y*width); }
+    const ORG & GetOrg(size_t x, size_t y) { return GetOrg(x+y*size_x); }
     const Ptr<ORG> GetOrgPtr(size_t id) const {
       return pop[id];
     }
@@ -146,7 +150,8 @@ namespace emp {
     void ModeBasic() { synchronous_gen = false; ConfigFuns(); }
     void ModeEA() { synchronous_gen = true; ConfigFuns(); }
     void SetWellMixed();
-    void SetGrid(size_t _w, size_t _h);
+    void SetGrid(size_t width, size_t height);
+    void SetPools(size_t num_pools, size_t pool_size);
 
     void SetFitFun(const fun_calc_fitness_t & fit_fun) { fun_calc_fitness = fit_fun; }
     void SetMutFun(const fun_do_mutations_t & mut_fun) { fun_do_mutations = mut_fun; }
@@ -298,29 +303,33 @@ namespace emp {
     // Setup AddInject and GetRandomNeighborID...
     switch (pop_struct) {
     case Struct::MIXED:
-      // Append at end of population.
+      // Append at end of population; neighbors are anywhere in the population.
       fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
-      fun_get_neighbor = [this](size_t) {
-        emp_assert(random_ptr);
-        return random_ptr->GetUInt(0, pop.size());
-      };
+      fun_get_neighbor = [this](size_t) { return GetRandomCellID(); };
       break;
     case Struct::GRID:
-      // Choose a random position in grid.
-      fun_add_inject = [this](Ptr<ORG> new_org) {
-        emp_assert(random_ptr);
-        const size_t pos = random_ptr->GetUInt(width*height);
-        return AddOrgAt(new_org, pos);
-      };
+      // Inject a random position in grid; neighbors are in 9-sized neighborhood.
+      fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, GetRandomCellID()); };
       fun_get_neighbor = [this](size_t id) {
         emp_assert(random_ptr);
         const int offset = random_ptr->GetInt(9);
-        const int rand_x = (int) (id%width) + offset%3 - 1;
-        const int rand_y = (int) (id/width) + offset/3 - 1;
-        return (size_t) (emp::Mod(rand_x, (int) width) + emp::Mod(rand_y, (int) height) * (int)width);
+        const int rand_x = (int) (id%size_x) + offset%3 - 1;
+        const int rand_y = (int) (id/size_x) + offset/3 - 1;
+        return (size_t) (emp::Mod(rand_x, (int) size_x) + emp::Mod(rand_y, (int) size_y) * (int)size_x);
       };
       break;
     case Struct::POOLS:
+      // Inject in a empty pool -or- randomly if none empty; neighbors are everyone in the same pool.
+      fun_add_inject = [this](Ptr<ORG> new_org) {
+        for (size_t id = 0; id < pop.size(); id += size_x) {
+          if (pop[id] == nullptr) return AddOrgAt(new_org, id);
+        }
+        return AddOrgAt(new_org, GetRandomCellID());
+      };
+      fun_get_neighbor = [this](size_t id) {
+        emp_assert(random_ptr);
+        return (id / size_x) * size_x + random_ptr->GetUInt(size_x);
+      };
       break;
     case Struct::EXTERNAL:
       // Do nothing; these should be set... externally.
@@ -331,16 +340,18 @@ namespace emp {
     if (synchronous_gen) {
       switch (pop_struct) {
       case Struct::MIXED:
+        // Append births into the next population.
         fun_add_birth = [this](Ptr<ORG> new_org, size_t) {
-          emp_assert(new_org);                           // New organism must exist.
-          next_pop.push_back(new_org);
-          return next_pop.size() - 1;
+          emp_assert(new_org);          // New organism must exist.
+          next_pop.push_back(new_org);  // Append it to the NEXT population
+          return next_pop.size() - 1;   // Return offspring position.
         };
         break;
       case Struct::GRID:
+        // Place births in a neighboring position in the new grid.
         fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-          emp_assert(new_org);                           // New organism must exist.
-          const size_t id = GetRandomNeighborID(parent_id);
+          emp_assert(new_org);                                  // New organism must exist.
+          const size_t id = GetRandomNeighborID(parent_id);     // Placed near parent, in next pop.
           if (id >= next_pop.size()) next_pop.resize(id+1, nullptr);
           if (next_pop[id]) next_pop[id].Delete();
           next_pop[id] = new_org;
@@ -348,6 +359,24 @@ namespace emp {
         };
         break;
       case Struct::POOLS:
+        // Place births in the next open spot in the new pool (or randomly if full!)
+        fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
+          emp_assert(new_org);                                  // New organism must exist.
+          const size_t pool_id = parent_id / size_x;
+          const size_t start_id = pool_id * size_x;
+          for (size_t id = start_id; id < start_id+size_x; id++) {
+            if (next_pop[id] == nullptr) {
+              if (id >= next_pop.size()) next_pop.resize(id+1, nullptr);
+              next_pop[id] = new_org;
+              return id;
+            }
+          }
+          const size_t id = GetRandomNeighborID(parent_id);     // Placed near parent, in next pop.
+          if (id >= next_pop.size()) next_pop.resize(id+1, nullptr);
+          next_pop[id].Delete(); // If we made it this far, we know position is occupied.
+          next_pop[id] = new_org;
+          return id;
+        };
         break;
       case Struct::EXTERNAL:
         // Do nothing; these should be set... externally.
@@ -355,7 +384,7 @@ namespace emp {
       }
     }
 
-    // Otherwise asynchronous...
+    // Otherwise asynchronous... which always goes to a neigbor in current population.
     else {
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
         emp_assert(new_org);                          // New organism must exist.
@@ -368,19 +397,26 @@ namespace emp {
 
   template<typename ORG>
   void World<ORG>::SetWellMixed() {
-    width = 0; height = 0;
+    size_x = 0; size_y = 0;
     pop_struct = Struct::MIXED;
     ConfigFuns();
   }
 
   template<typename ORG>
-  void World<ORG>::SetGrid(size_t _w, size_t _h) {
-    width = _w;  height = _h;
+  void World<ORG>::SetGrid(size_t width, size_t height) {
+    size_x = width;  size_y = height;
     pop_struct = Struct::GRID;
-    Resize(_w * _h);
+    Resize(size_x * size_y);
     ConfigFuns();
   }
 
+  template<typename ORG>
+  void World<ORG>::SetPools(size_t num_pools, size_t pool_size) {
+    size_x = pool_size;  size_y = num_pools;
+    pop_struct = Struct::POOLS;
+    Resize(size_x * size_y);
+    ConfigFuns();
+  }
 
   // --- Updating the world! ---
 
@@ -542,9 +578,9 @@ namespace emp {
   template<typename ORG>
   void World<ORG>::PrintGrid(std::ostream& os,
                                       const std::string & empty, const std::string & spacer) {
-    for (size_t y=0; y < height; y++) {
-      for (size_t x = 0; x < width; x++) {
-        Ptr<ORG> org = GetOrgPtr(x+y*width);
+    for (size_t y=0; y < size_y; y++) {
+      for (size_t x = 0; x < size_x; x++) {
+        Ptr<ORG> org = GetOrgPtr(x+y*size_x);
         if (org) fun_print_org(*org, os);
         else os << empty;
         os << spacer;
