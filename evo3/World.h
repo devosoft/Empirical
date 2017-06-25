@@ -273,7 +273,7 @@ namespace emp {
 
   template <typename ORG>
   size_t World<ORG>::AddOrgAt(Ptr<ORG> new_org, size_t pos) {
-    emp_assert(new_org, pos);
+    emp_assert(new_org, pos);                            // The new organism must exist.
 
     if (pop.size() <= pos) pop.resize(pos+1, nullptr);   // Make sure we have room.
     if (pop[pos]) { ClearCache(pos); pop[pos].Delete(); --num_orgs; }     // Clear out any old org.
@@ -304,9 +304,7 @@ namespace emp {
     } else {
       // Asynchronous: always go to a neigbor in current population.
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        emp_assert(new_org);                          // New organism must exist.
-        size_t id = GetRandomNeighborID(parent_id);   // Place in random position.
-        return AddOrgAt(new_org, id);                 // Place org in  existing population.
+        return AddOrgAt(new_org, fun_get_neighbor(parent_id)); // Place org in existing population.
       };
     }
   }
@@ -333,7 +331,7 @@ namespace emp {
       // Place births in a neighboring position in the new grid.
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
         emp_assert(new_org);                                  // New organism must exist.
-        const size_t id = GetRandomNeighborID(parent_id);     // Placed near parent, in next pop.
+        const size_t id = fun_get_neighbor(parent_id);     // Placed near parent, in next pop.
         if (id >= next_pop.size()) next_pop.resize(id+1, nullptr);
         if (next_pop[id]) next_pop[id].Delete();
         next_pop[id] = new_org;
@@ -342,9 +340,7 @@ namespace emp {
     } else {
       // Asynchronous: always go to a neigbor in current population.
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        emp_assert(new_org);                          // New organism must exist.
-        size_t id = GetRandomNeighborID(parent_id);   // Place in random position.
-        return AddOrgAt(new_org, id);                 // Place org in  existing population.
+        return AddOrgAt(new_org, fun_get_neighbor(parent_id)); // Place org in existing population.
       };
     }
   }
@@ -382,7 +378,7 @@ namespace emp {
             return id;
           }
         }
-        const size_t id = GetRandomNeighborID(parent_id);     // Placed near parent, in next pop.
+        const size_t id = fun_get_neighbor(parent_id);     // Placed near parent, in next pop.
         if (id >= next_pop.size()) next_pop.resize(id+1, nullptr);
         next_pop[id].Delete(); // If we made it this far, we know position is occupied.
         next_pop[id] = new_org;
@@ -391,9 +387,7 @@ namespace emp {
     } else {
       // Asynchronous: always go to a neigbor in current population.
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        emp_assert(new_org);                          // New organism must exist.
-        size_t id = GetRandomNeighborID(parent_id);   // Place in random position.
-        return AddOrgAt(new_org, id);                 // Place org in  existing population.
+        return AddOrgAt(new_org, fun_get_neighbor(parent_id)); // Place org in existing population.
       };
     }
   }
