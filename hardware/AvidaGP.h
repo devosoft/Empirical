@@ -214,6 +214,11 @@ namespace emp {
     void ResetIP() {
       inst_ptr = 0;
       while (scope_stack.size() > 1) ExitScope();  // Forcibly exit all scopes except root.
+      // Restore all remaining backed-up registers (likely backed up in outer-most scope).
+      while (reg_stack.size()) {
+        regs[reg_stack.back().reg_id] = reg_stack.back().value;
+        reg_stack.pop_back();
+      }
       call_stack.resize(0);
     }
 
