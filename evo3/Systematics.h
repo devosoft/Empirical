@@ -3,16 +3,19 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  Track the lineages of organisms in a world.
+//  Track genotypes, species, clades, and lineages of organisms in a world.
 //
 //
 //  Options include:
+//  * Track lineage yes / no.
+//  * Group genotypes yes / no
+//  * Group clades (provide a function that determines when a new clade should start)
 //  * Prune evolutionary dead-ends (to reduce size of tree).
-//  * Backup to file (anything older than a spcified level)
+//  * Backup to file (anything older than a specified level)
 
 
-#ifndef EMP_LINEAGE_TRACKER_H
-#define EMP_LINEAGE_TRACKER_H
+#ifndef EMP_EVO_SYSTEMATICS_H
+#define EMP_EVO_SYSTEMATICS_H
 
 #include <unordered_map>
 
@@ -21,23 +24,23 @@
 namespace emp {
 
   template <typename ORG>
-  class LineageTracker {
+  class Systematics {
   private:
-    struct Node {
+    struct OrgNode {
       size_t id;
       size_t parent_id;
     };
 
-    unordered_map< size_t, Ptr<Node> > node_map;
+    unordered_map< size_t, Ptr<OrgNode> > node_map;
 
   public:
-    LineageTracker() : node_map() { ; }
-    ~LineageTracker() {
+    Systematics() : node_map() { ; }
+    ~Systematics() {
       for (auto x : node_map) x.second.Delete();
       node_map.clear();
     }
 
-    /// Add information about a new organism; return id for this new entry.
+    /// Add information about a new organism; return an id for this new entry.
     size_t AddOrg(size_t parent_id, ORG & org) {
     }
 
