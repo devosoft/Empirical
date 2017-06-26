@@ -206,9 +206,12 @@ namespace emp {
         stacks[i].resize(0);
         fun_starts[i] = -1;
       }
-      errors = 0;
-      ResetIP();
-    }
+      inst_ptr = 0;           // Move IP back to beginning
+      scope_stack.resize(1);  // Reset to outermost scope.
+      reg_stack.resize(0);    // Clear saved registers.
+      call_stack.resize(0);   // Clear call history.
+      errors = 0;             // Clear all errors.
+     }
 
     /// Reset the instruction pointer to the beginning of the genome AND reset scope.
     void ResetIP() {
