@@ -206,14 +206,22 @@ namespace emp {
         stacks[i].resize(0);
         fun_starts[i] = -1;
       }
-      errors = 0;
-      ResetIP();
-    }
+      inst_ptr = 0;           // Move IP back to beginning
+      scope_stack.resize(1);  // Reset to outermost scope.
+      reg_stack.resize(0);    // Clear saved registers.
+      call_stack.resize(0);   // Clear call history.
+      errors = 0;             // Clear all errors.
+     }
 
     /// Reset the instruction pointer to the beginning of the genome AND reset scope.
     void ResetIP() {
       inst_ptr = 0;
       while (scope_stack.size() > 1) ExitScope();  // Forcibly exit all scopes except root.
+      // Restore all remaining backed-up registers (likely backed up in outer-most scope).
+      while (reg_stack.size()) {
+        regs[reg_stack.back().reg_id] = reg_stack.back().value;
+        reg_stack.pop_back();
+      }
       call_stack.resize(0);
     }
 
