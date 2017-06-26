@@ -17,6 +17,7 @@ a.out.js
 *.mp4
 *.csv
 out
+.vscode
 coverage.xml
 diff_cover.txt
 UTests/tools/tmp*.cc
