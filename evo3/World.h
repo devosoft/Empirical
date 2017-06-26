@@ -73,6 +73,9 @@ namespace emp {
     fun_add_birth_t    fun_add_birth;     // Technique to add a new offspring.
     fun_get_neighbor_t fun_get_neighbor;  // Choose a random neighbor near specified id.
 
+    // Attributes are a dynamic way to track extra characteristics about a world.
+    std::map<std::string, std::string> attributes;
+
     // AddOrgAt is the only way to add organisms (others must go through here)
     size_t AddOrgAt(Ptr<ORG> new_org, size_t pos);
 
@@ -89,6 +92,7 @@ namespace emp {
       , name(_name), cache_on(false), size_x(0), size_y(0)
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org()
       , fun_add_inject(), fun_add_birth(), fun_get_neighbor()
+      , attributes()
     {
       if (!rnd) NewRandom();
       SetDefaultFitFun<this_t, ORG>(*this);
@@ -137,6 +141,7 @@ namespace emp {
 
 
     // --- CONFIGURE ---
+
     void SetWellMixed(bool synchronous_gen=false);
     void SetGrid(size_t width, size_t height, bool synchronous_gen=false);
     void SetPools(size_t num_pools, size_t pool_size, bool synchronous_gen=false);
@@ -144,6 +149,17 @@ namespace emp {
     void SetFitFun(const fun_calc_fitness_t & fit_fun) { fun_calc_fitness = fit_fun; }
     void SetMutFun(const fun_do_mutations_t & mut_fun) { fun_do_mutations = mut_fun; }
     void SetPrintFun(const fun_print_org_t & print_fun) { fun_print_org = print_fun; }
+
+
+    // --- MANAGE ATTRIBUTES ---
+    bool HasAttribute(const std::string & name) const { return Has(attributes, name); }
+    const std::string & GetAttribute(const std::string) const {
+      emp_assert( Has(attributes, name) );
+      return attributes[name];
+    }
+    template <typename T>
+    void SetAttribute(const std::string & name, T && val) { attributes[name] = to_string(val); }
+
 
     // --- UPDATE THE WORLD! ---
 
