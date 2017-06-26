@@ -134,7 +134,7 @@ namespace emp {
 
     void ShiftMem(size_t block, size_t shift_amount) {
       std::unordered_map<int, double> new_map;
-      for (auto el : mem[block]) {
+      for (const auto & el : mem[block]) {
         new_map[el.first + shift_amount] = el.second;
         //std::cout<<"Start Location: " << el.first<< " Shift: " << shift_amount << " New Location: " << el.first + shift_amount << std::endl;
       }
