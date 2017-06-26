@@ -317,12 +317,17 @@ namespace emp {
         next_pop.push_back(new_org);  // Append it to the NEXT population
         return next_pop.size() - 1;   // Return offspring position.
       };
+
+      SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neigbor in current population.
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
         return AddOrgAt(new_org, fun_get_neighbor(parent_id)); // Place org in existing population.
       };
+      SetAttribute("SynchronousGen", "False");
     }
+
+    SetAttribute("PopStruct", "Mixed");
   }
 
   template<typename ORG>
@@ -353,12 +358,16 @@ namespace emp {
         next_pop[id] = new_org;
         return id;
       };
+      SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neigbor in current population.
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
         return AddOrgAt(new_org, fun_get_neighbor(parent_id)); // Place org in existing population.
       };
+      SetAttribute("SynchronousGen", "False");
     }
+
+    SetAttribute("PopStruct", "Grid");
   }
 
   template<typename ORG>
@@ -400,12 +409,16 @@ namespace emp {
         next_pop[id] = new_org;
         return id;
       };
+      SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neigbor in current population.
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
         return AddOrgAt(new_org, fun_get_neighbor(parent_id)); // Place org in existing population.
       };
+      SetAttribute("SynchronousGen", "False");
     }
+
+    SetAttribute("PopStruct", "Pools");
   }
 
   // --- Updating the world! ---
