@@ -229,7 +229,7 @@ namespace emp {
     void NewRandom(int seed=-1);
 
     // Get any cell, at random.
-    size_t GetRandomCellID() { return random_ptr->GetInt(0, pop.size()); }
+    size_t GetRandomCellID() { return random_ptr->GetUInt(pop.size()); }
 
     // By default, assume a well-mixed population so random neighbors can be anyone.
     size_t GetRandomNeighborID(size_t id) { return fun_get_neighbor(id); }
