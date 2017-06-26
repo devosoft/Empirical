@@ -14,8 +14,8 @@
 
 constexpr size_t POP_SIZE = 100;
 constexpr size_t GENOME_SIZE = 100;
-constexpr size_t EVAL_TIME = 500;
-constexpr size_t UPDATES = 500;
+constexpr size_t EVAL_TIME = 1000;
+constexpr size_t UPDATES = 1000;
 constexpr size_t TOURNY_SIZE = 4;
 
 // Determine the next move of a human player.
