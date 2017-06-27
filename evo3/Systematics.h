@@ -23,25 +23,30 @@
 
 namespace emp {
 
-  template <typename ORG>
+  template <typename GENOME>
+  struct Genotype {
+    GENOME genome;            // Details for the genome associated with this genotype.
+    size_t id;                // Unique ID for this genotype.
+    size_t parent_id;         // ID of parent genotype (MAX_ID if injected)
+    size_t org_count;         // How many organisms currently exist of this genotype?
+    size_t tot_count;         // How many organisms have ever existed of this genotype?
+    size_t offspring_count;   // How many direct offspring genotypes exist from this one.
+  };
+
+  template <typename GENOME>
   class Systematics {
   private:
-    struct OrgNode {
-      size_t id;
-      size_t parent_id;
-    };
-
-    unordered_map< size_t, Ptr<OrgNode> > node_map;
+    std::unordered_map< size_t, Ptr<Genotype> > genotype_map;
 
   public:
-    Systematics() : node_map() { ; }
+    Systematics() : genotype_map() { ; }
     ~Systematics() {
-      for (auto x : node_map) x.second.Delete();
-      node_map.clear();
+      for (auto x : genotype_map) x.second.Delete();
+      genotype_map.clear();
     }
 
     /// Add information about a new organism; return an id for this new entry.
-    size_t AddOrg(size_t parent_id, ORG & org) {
+    size_t AddOrg(size_t parent_id, GENOME & genome) {
     }
 
     /// Remove an instance of an organism; track when it's gone.
