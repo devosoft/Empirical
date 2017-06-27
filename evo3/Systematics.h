@@ -76,11 +76,17 @@ namespace emp {
     using genotype_t = Genotype;
 
     std::unordered_map< size_t, Ptr<genotype_t> > genotype_map;
-    size_t next_id;
+    size_t next_genotype_id;
     constexpr size_t null_id = 0;
 
+    size_t NextGenotypeID() { return ++next_genotype_id; }  // Return a unique Genotype ID.
+
+    void Deactivate(Genotype & genotype) {
+      
+    }
+
   public:
-    Systematics() : genotype_map(), next_id(1) { ; }
+    Systematics() : genotype_map(), next_id(0) { ; }
     ~Systematics() {
       for (auto x : genotype_map) x.second.Delete();
       genotype_map.clear();
@@ -88,19 +94,39 @@ namespace emp {
 
     /// Add information about a newly-injected genotype; return unique genotype id.
     size_t InjectOrg(const GENOME & genome) {
-
+      const size_t id = NextGenotypeID();
+      genotype_map.emplace(id, {genome, id});
+      genotype_map[id].AddOrg();
+      return id;
     }
 
     /// Add information about a new organism; return a unique id for the associated genotype.
     size_t AddOrg(size_t parent_id, const GENOME & genome) {
+      emp_assert(Has(genotype_map, parent_id), parent_id);
+      Genotype & p_genotype = genotype_map[parent_id];
+      if (p_genotype.genome == genome) {   // Adding another org of this genotype.
+        p_genotype.AddOrg();
+        return parent_id;
+      }
+      // This is a new genotype.
+      const size_t id = NextGenotypeID();
+      genotype_map.emplace(id, {genome, id, parent_id});
+      genotype_map[id].AddOrg();
+      return id;
     }
 
     /// Remove an instance of an organism; track when it's gone.
-    size_t RemoveOrg(ORG & org) {
+    bool RemoveOrg(size_t id) {
+      emp_assert(Has(genotype_map, id), id);
+      Genotype & genotype = genotype_map[id];
+      const bool active = genotype.RemoveOrg();
+      if (active == false) Deactivate(genotype);
     }
 
     /// Climb up a lineage...
-    size_t ParentID(size_t org_id) {
+    bool ParentID(size_t id) const {
+      emp_assert(Has(genotype_map, id), id);
+      return genotype_map.find(id)->GetParentID();
     }
   };
 
