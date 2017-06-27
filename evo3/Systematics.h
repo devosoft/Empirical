@@ -81,8 +81,12 @@ namespace emp {
 
     size_t NextGenotypeID() { return ++next_genotype_id; }  // Return a unique Genotype ID.
 
-    void Deactivate(Genotype & genotype) {
-      
+    void Deactivate(Ptr<genotype_t> genotype) {
+      genotype_map.remove(genotype->id);   // Remove genotype from map since it's no longer active.
+      Ptr<genotype_t> p_genotype = genotype_map[genotype->parent_id];
+      bool p_active = p_genotype->RemoveOffspring();   // Cascade up
+      if (p_active == false) Deactivate(p_genotype);
+      genotype->Delete();                              // Delete this genotype.
     }
 
   public:
@@ -95,7 +99,7 @@ namespace emp {
     /// Add information about a newly-injected genotype; return unique genotype id.
     size_t InjectOrg(const GENOME & genome) {
       const size_t id = NextGenotypeID();
-      genotype_map.emplace(id, {genome, id});
+      genotype_map.emplace(id, NewPtr<genotype_t>(genome, id));
       genotype_map[id].AddOrg();
       return id;
     }
@@ -110,7 +114,7 @@ namespace emp {
       }
       // This is a new genotype.
       const size_t id = NextGenotypeID();
-      genotype_map.emplace(id, {genome, id, parent_id});
+      genotype_map.emplace(id, NewPtr<genotype_t>(genome, id, parent_id));
       genotype_map[id].AddOrg();
       return id;
     }
