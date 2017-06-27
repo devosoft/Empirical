@@ -20,6 +20,7 @@
 #include <unordered_map>
 
 #include "../base/Ptr.h"
+#include "../tools/map_utils.h"
 
 namespace emp {
 
@@ -73,11 +74,11 @@ namespace emp {
   template <typename GENOME>
   class Systematics {
   private:
-    using genotype_t = Genotype;
+    using genotype_t = Genotype<GENOME>;
 
     std::unordered_map< size_t, Ptr<genotype_t> > genotype_map;
     size_t next_genotype_id;
-    constexpr size_t null_id = 0;
+    constexpr static size_t null_id = 0;
 
     size_t NextGenotypeID() { return ++next_genotype_id; }  // Return a unique Genotype ID.
 
@@ -90,16 +91,18 @@ namespace emp {
     }
 
   public:
-    Systematics() : genotype_map(), next_id(0) { ; }
+    Systematics() : genotype_map(), next_genotype_id(0) { ; }
     ~Systematics() {
       for (auto x : genotype_map) x.second.Delete();
       genotype_map.clear();
     }
 
+    const genotype_t & GetGenotype(size_t id) const { return *genotype_map[id]; }
+
     /// Add information about a newly-injected genotype; return unique genotype id.
     size_t InjectOrg(const GENOME & genome) {
       const size_t id = NextGenotypeID();
-      genotype_map.emplace(id, NewPtr<genotype_t>(genome, id));
+      genotype_map[id] = NewPtr<genotype_t>(genome, id);
       genotype_map[id]->AddOrg();
       return id;
     }
@@ -108,13 +111,13 @@ namespace emp {
     size_t AddOrg(size_t parent_id, const GENOME & genome) {
       emp_assert(Has(genotype_map, parent_id), parent_id);
       Ptr<genotype_t> p_genotype = genotype_map[parent_id];
-      if (p_genotype->genome == genome) {   // Adding another org of this genotype.
+      if (p_genotype->GetGenome() == genome) {   // Adding another org of this genotype.
         p_genotype->AddOrg();
         return parent_id;
       }
       // This is a new genotype.
       const size_t id = NextGenotypeID();
-      genotype_map.emplace(id, NewPtr<genotype_t>(genome, id, parent_id));
+      genotype_map[id] = NewPtr<genotype_t>(genome, id, parent_id);
       genotype_map[id]->AddOrg();
       return id;
     }
