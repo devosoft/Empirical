@@ -26,16 +26,17 @@ namespace emp {
   template <typename GENOME>
   class Genotype {
   private:
-    GENOME genome;            // Details for the genome associated with this genotype.
-    size_t id;                // Unique ID for this genotype.
-    size_t parent_id;         // ID of parent genotype (MAX_ID if injected)
-    size_t org_count;         // How many organisms currently exist of this genotype?
-    size_t tot_count;         // How many organisms have ever existed of this genotype?
-    size_t offspring_count;   // How many direct offspring genotypes exist from this one.
+    const GENOME genome;      // Details for the genome associated with this genotype.
+    const size_t id;          // Unique ID for this genotype.
+    const size_t parent_id;   // ID of parent genotype (MAX_ID if injected)
+    size_t num_orgs;          // How many organisms currently exist of this genotype?
+    size_t tot_orgs;          // How many organisms have ever existed of this genotype?
+    size_t num_offspring;     // How many direct offspring genotypes exist from this one.
+    size_t tot_offspring;     // How many direct offspring have ever existed.
 
   public:
     Genotype(const GENOME & _gen, size_t _id, size_t _pid=0)
-    : genome(_gen), id(_id), parent_id(_pid), org_count(0), tot_count(0), offspring_count(0) { ; }
+    : genome(_gen), id(_id), parent_id(_pid), num_orgs(0), tot_orgs(0), num_offspring(0) { ; }
     Genotype(const Genotype &) = delete;
     Genotype(Genotype &&) = default;
     Genotype & operator=(const Genotype &) = delete;
@@ -44,9 +45,29 @@ namespace emp {
     const GENOME & GetGenome() const { return genome; }
     size_t GetID() const { return id; }
     size_t GetParentID() const { return parent_id; }
-    size_t GetOrgCount() const { return org_count; }
-    size_t GetTotCount() const { return tot_count; }
-    size_t GetOffCount() const { return offspring_count; }
+    size_t GetNumOrgs() const { return num_orgs; }
+    size_t GetTotOrgs() const { return tot_orgs; }
+    size_t GetNumOff() const { return num_offspring; }
+    size_t GetTotOff() const { return tot_offspring; }
+
+    void AddOrg() { ++num_orgs; ++tot_orgs; }
+    void AddOffspring() { ++num_offspring; ++tot_offspring; }
+
+    // Removals must return true if the genotype needs to continue; false if it should deactivate.
+    bool RemoveOrg() {
+      emp_assert(num_orgs > 0, id, num_orgs);
+      --num_orgs;
+
+      // If we are out of organisms and offspring, this Genotype should deactivate.
+      if (num_orgs == 0) return num_offspring;
+    }
+    bool RemoveOffspring() {
+      emp_assert(num_offspring > 0, id);
+      --num_offspring;
+
+      // If we are out of offspring and organisms, this Genotype should deactivate.
+      if (num_offspring == 0) return num_orgs;
+    }
   };
 
   template <typename GENOME>
