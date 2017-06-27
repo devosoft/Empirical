@@ -8,30 +8,31 @@
 
 namespace emp {
   namespace MetaGP {
-    class XFunctionDefinition : public FunctionDefinition_Base {
+    // MachineX and MachineY are dummy machines that exist for testing purposes.
+    class MachineX : public Machine_Base {
     protected:
-      using FunctionDefinition_Base::affinity;
-      using FunctionDefinition_Base::type;
+      using Machine_Base::affinity;
+      using Machine_Base::type;
 
       emp::vector<std::string> sequence;
 
     public:
-      XFunctionDefinition(BitVector _affinity, emp::vector<std::string> _sequence)
-        : FunctionDefinition_Base(_affinity, FunctionType::GP_X), sequence(_sequence)
+      MachineX(BitVector _affinity, emp::vector<std::string> _sequence)
+        : Machine_Base(_affinity, MachineType::GP_X), sequence(_sequence)
       { ; }
 
     };
 
-    class YFunctionDefinition : public FunctionDefinition_Base {
+    class MachineY : public Machine_Base {
     protected:
-      using FunctionDefinition_Base::affinity;
-      using FunctionDefinition_Base::type;
+      using Machine_Base::affinity;
+      using Machine_Base::type;
 
       emp::vector<std::string> sequence;
 
     public:
-      YFunctionDefinition(BitVector _affinity, emp::vector<std::string> _sequence)
-        : FunctionDefinition_Base(_affinity, FunctionType::GP_Y), sequence(_sequence)
+      MachineY(BitVector _affinity, emp::vector<std::string> _sequence)
+        : Machine_Base(_affinity, MachineType::GP_Y), sequence(_sequence)
       { ; }
 
     };
@@ -58,7 +59,7 @@ int main() {
                                   for (auto line : lines) {
                                     seq.push_back(line);
                                   }
-                                  return new emp::MetaGP::XFunctionDefinition(affinity, seq);
+                                  return new emp::MetaGP::MachineX(affinity, seq);
                                 });
 
   reader.RegisterFunctionReader("Y",
@@ -77,7 +78,7 @@ int main() {
                                   for (auto line : lines) {
                                     seq.push_back(line);
                                   }
-                                  return new emp::MetaGP::YFunctionDefinition(affinity, seq);
+                                  return new emp::MetaGP::MachineY(affinity, seq);
                                 });
 
   reader.ParseProgramFromFile(prgm_fname);

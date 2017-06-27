@@ -7,8 +7,6 @@
 namespace emp {
   namespace MetaGP {
 
-    enum class FunctionType { EVENT_DRIVEN_GP=0, RANDO_GP, GP_X, GP_Y };
-
     class MetaHardware {
     public:
 
