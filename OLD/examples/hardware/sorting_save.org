@@ -1,0 +1,102 @@
+Add 3 15 0
+TestEqu 3 5 9
+If 14 9 --> 
+Countdown 10 0 --> 
+ ScopeReg 3
+ CopyVal 15 7
+ SetReg 3 13
+ Input 0 8
+ TestNEqu 13 5 11
+ Output 8 6
+ Inc 0
+ Div 6 5 14
+ TestEqu 3 14 13
+ Inc 1
+ Input 10 15
+ Output 15 2
+ Push 5 9
+ Call 8
+ Scope 12 --> 
+             Sub 2 14 0
+             Mult 6 3 2
+             Break 15
+             Add 5 0 6
+             TestLess 6 15 1
+             Output 15 11
+             Not 3
+     Scope 5 --> 
+      Break 0
+  Countdown 13 2 --> 
+   Div 15 10 13
+   Dec 3
+   ----
+   Scope 2
+   Input 12 3
+   TestLess 12 12 13
+   Call 3
+   While 12 9 --> 
+          Output 11 11
+          TestLess 5 4 9
+          Add 0 6 0
+          Pop 15 6
+          Mult 8 0 7
+          TestLess 3 12 10
+          Input 1 10
+          Mod 14 3 13
+          Push 3 9
+          While 10 15 --> 
+                Dec 3
+                ----
+                Countdown 6 15
+                TestNEqu 7 10 4
+                ScopeReg 7
+                TestNEqu 8 2 8
+                TestLess 9 12 10
+                Mod 7 11 4
+       Scope 7 --> 
+        TestEqu 1 2 1
+        Push 3 2
+        Scope 12 --> 
+  If 12 2 --> 
+   SetReg 1 0
+   TestLess 5 5 3
+   While 14 7 --> 
+        Call 5
+        Mod 5 5 7
+        SetReg 8 11
+        Call 5
+        Mod 11 4 11
+        ScopeReg 9
+        Input 3 4
+        Push 1 3
+        Div 0 13 7
+        Countdown 9 8 --> 
+         TestNEqu 10 11 9
+         Break 2
+       Scope 7 --> 
+        Output 14 9
+        Mod 11 12 1
+        Sub 8 14 12
+        CopyVal 5 8
+        Define 12 11 --> 
+            Push 6 14
+            Call 3
+            Output 7 13
+            Call 11
+            Input 5 12
+      Scope 6 --> 
+       Break 6
+       CopyVal 11 11
+       Define 3 10 --> 
+           Inc 3
+           TestEqu 3 10 12
+           Break 1
+           Inc 8
+           TestLess 11 15 6
+           Output 6 1
+           Call 9
+           Push 13 14
+           Mult 15 14 14
+           Push 12 0
+           CopyVal 6 5
+           Scope 13 --> 

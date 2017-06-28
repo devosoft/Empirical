@@ -10,7 +10,7 @@
 
 #include "../../base/vector.h"
 #include "../../evo/World.h"
-#include "../../hardware/AvidaGPMem.h"
+#include "../../hardware/AvidaGP.h"
 #include "../../tools/Random.h"
 
 constexpr size_t POP_SIZE = 200;
