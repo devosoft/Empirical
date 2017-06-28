@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  This file contains a set of simple functions to manipulate std::set objects.
@@ -17,6 +17,10 @@ namespace emp {
     s1.insert(s2.begin(), s2.end());
   }
 
+  template <typename T>
+  bool Has(const std::set<T> & s, const T & val) {
+    return s.count(val);
+  }
 }
 
 #endif
