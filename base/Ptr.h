@@ -489,7 +489,22 @@ namespace emp {
 
 #endif
 
+  // IO
+  template <typename T>
+  std::ostream & operator<<(std::ostream & out, const emp::Ptr<T> & ptr) {
+    out << ptr.Raw();
+    return out;
+  }
 
+  // @CAO: Reading a pointer from a stream seems like a terrible idea in most situations, but I
+  // can imagine limited circumstances where it would be needed.
+  template <typename T, typename... Ts>
+  std::istream & operator>>(std::istream & is, emp::Ptr<T> & ptr) {
+    T * val;
+    is >> val;
+    ptr = val;
+    return is;
+  }
 
 
   // Create a helper to replace & operator.
