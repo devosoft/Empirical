@@ -12,7 +12,9 @@
 #include <string>
 
 #include "../base/vector.h"
+#include "../base/array.h"
 #include "../tools/map_utils.h"
+#include "../tools/string_utils.h"
 
 namespace emp {
 
