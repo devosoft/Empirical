@@ -1,5 +1,5 @@
-#ifndef EMP_META_GP_MACHINES_H
-#define EMP_META_GP_MACHINES_H
+#ifndef EMP_META_GP_MACHINE_H
+#define EMP_META_GP_MACHINE_H
 
 #include <iostream>
 #include <unordered_map>
@@ -10,7 +10,7 @@
 namespace emp {
   namespace MetaGP {
 
-    enum class MachineType { EVENT_DRIVEN_GP=0, RANDO_GP, GP_X, GP_Y, UNKNOWN };
+    enum class MachineType { SIMPLE_GP=0, RANDO_GP, GP_X, GP_Y, UNKNOWN };
 
     // Base class for machine states.
     // Machine state should indicate corresponding machine type.
@@ -21,19 +21,27 @@ namespace emp {
     //  * output buffer
     class MachineState_Base {
     protected:
+      using memory_t = std::unordered_map<int, double>;
+
       MachineType type;
-      std::unordered_map<int, double> * shared_memory_ptr;
-      std::unordered_map<int, double> local_memory;
-      std::unordered_map<int, double> input_buffer;
-      std::unordered_map<int, double> output_buffer;
+      Ptr<memory_t> shared_memory_ptr;
+      memory_t local_memory;
+      memory_t input_buffer;
+      memory_t output_buffer;
 
     public:
       MachineState_Base()
       : type(MachineType::UNKNOWN), shared_memory_ptr(nullptr), local_memory(), input_buffer(), output_buffer()
       { ; }
 
-      // @amlalejini - TODO: Getter/setter for type
-      // @amlalejini - TODO: shared/local memory & input/output buffer manipulation.
+      MachineType GetType() const { return type; }
+      Ptr<memory_t> GetSharedMemoryPtr() { return shared_memory_ptr; }
+      memory_t & GetLocalMemory() { return local_memory; }
+      memory_t & GetInputBuffer() { return input_buffer; }
+      memory_t & GetOutputBuffer() { return output_buffer; }
+
+      void SetType(MachineType _type) { type = _type; }
+      void SetSharedMemory(Ptr<memory_t> _shared_memory_ptr) { shared_memory_ptr = _shared_memory_ptr; }
 
     };
 
@@ -44,7 +52,7 @@ namespace emp {
       MachineType type;
 
     public:
-      Machine_Base(BitVector _affinity, MachineType _type)
+      Machine_Base(BitVector & _affinity, MachineType _type)
         : affinity(_affinity), type(_type) { ; }
 
       virtual ~Machine_Base() { ; }
@@ -64,18 +72,6 @@ namespace emp {
         return pretty_str.str();
       }
     };
-
-    enum class BlockType { NONE=0, BASIC, LOOP };
-
-    struct Block {
-      size_t begin;
-      size_t end;
-      BlockType type;
-
-      Block(size_t _begin = 0, size_t _end = 0, BlockType _type = BlockType::BASIC)
-        : begin(_begin), end(_end), type(_type) { ; }
-    };
-
   }
 }
 

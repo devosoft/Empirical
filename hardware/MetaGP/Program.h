@@ -6,7 +6,7 @@
 #include <functional>
 
 #include "Hardware.h"
-#include "Machines.h"
+#include "Machine.h"
 #include "../../tools/string_utils.h"
 #include "../../tools/BitVector.h"
 #include "../../tools/Lexer.h"
@@ -57,6 +57,7 @@ namespace emp {
     };
 
     // Utility class to read & generate programs from strings/files.
+    // This class is in flux until I settle on a text representation for written programs.
     class ProgramReader {
     protected:
       using reader_func_t = std::function<Ptr<Machine_Base>(std::string)>;

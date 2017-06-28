@@ -3,7 +3,8 @@
 #include <functional>
 #include <string>
 #include "../../hardware/MetaGP/Program.h"
-#include "../../hardware/MetaGP/Machines.h"
+#include "../../hardware/MetaGP/Machine.h"
+#include "../../hardware/MetaGP/Machine_SimpleGP.h"
 #include "../../base/Ptr.h"
 
 namespace emp {
@@ -42,7 +43,6 @@ namespace emp {
 int main() {
   std::string prgm_fname = "./MetaPrograms/meta_program.txt";
   emp::MetaGP::ProgramReader reader;
-
   reader.RegisterFunctionReader("X",
                                 [](std::string fun_def_str) {
                                   // Parse function definition.
@@ -81,5 +81,12 @@ int main() {
                                   return new emp::MetaGP::MachineY(affinity, seq);
                                 });
 
-  reader.ParseProgramFromFile(prgm_fname);
+  // reader.ParseProgramFromFile(prgm_fname);
+  emp::BitVector aff(4);
+  aff[0] = 0; aff[1] = 1; aff[2] = 0; aff[3] = 1;
+  emp::MetaGP::Machine_SimpleGP simple_machine(aff);
+
+  std::cout << "Affinity: " << simple_machine.GetAffinity() << std::endl;
+
+  //
 }
