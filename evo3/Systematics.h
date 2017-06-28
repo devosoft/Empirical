@@ -24,6 +24,7 @@
 #define EMP_EVO_SYSTEMATICS_H
 
 #include <unordered_set>
+#include <set>
 
 #include "../base/Ptr.h"
 #include "../tools/map_utils.h"
@@ -81,7 +82,8 @@ namespace emp {
   private:
     using taxon_t = TaxaGroup<ORG_INFO>;
 
-    std::unordered_set< Ptr<taxon_t> > active_taxa;
+//    std::unordered_set< Ptr<taxon_t> > active_taxa;
+    std::set< Ptr<taxon_t> > active_taxa;
     // @CAO: Save deactiated taxa pointers?
 
     // Deactivate a taxon when there are not living members AND no living descendents.
