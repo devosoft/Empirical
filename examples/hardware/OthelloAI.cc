@@ -31,22 +31,34 @@ int main()
     cpu.SetInput(i, input);
   }
 
-  //Print(cpu);
+  // Get Input and set it in memory
   cpu.PushInst("SetReg", 0, 64);
   cpu.PushInst("SetReg", 2, 0);
+  cpu.PushInst("SetReg", 1, 1);
   cpu.PushInst("While", 1, 1 );
   cpu.PushInst("Input", 2, 3);
+  cpu.PushInst("SetMem", 0, 2, 3);
   cpu.PushInst("Inc", 2);
   cpu.PushInst("TestNEqu", 2, 0, 1);
   cpu.PushInst("Scope", 0);
-/*  cpu.PushInst( "Scope", 0 );
 
-  cpu.PushInst( "Inc", 1 );
-  cpu.PushInst( "Inc", 1 );
-  cpu.PushInst( "Mult", 1, 2, 3 );
-  cpu.PushInst( "Add", 3, 4, 5 );*/
+  // Find one of your own pieces, put pos in reg 5
+  cpu.PushInst("SetReg", 0, 64);
+  cpu.PushInst("SetReg", 2, 0);
+  cpu.PushInst("SetReg", 1, 1);
+  cpu.PushInst("While", 1, 1 );
+  cpu.PushInst("GetMem", 0, 2, 3);
+  cpu.PushInst("SetReg", 4, 0);
+  cpu.PushInst("TestEqu", 3, 1, 4);
+  cpu.PushInst("If", 4, 2);
+  cpu.PushInst("CopyVal", 2, 5);
+  cpu.PushInst("SetReg", 1, 0);
+  cpu.PushInst("Break", 0);
+  cpu.PushInst("Scope", 2);
+  cpu.PushInst("Inc", 2);
+  cpu.PushInst("TestNEqu", 2, 0, 1);
+  cpu.PushInst("Scope", 0);
 
-  //for (int i = 0; i < 43; i++) cpu.PushRandom(random);
 
   /*for (size_t i = 0; i < 100; i++) {
     cpu.Process(1);
@@ -55,7 +67,7 @@ int main()
 
   cpu.PrintGenome();
 //  cpu.ResetHardware();
-  cpu.Trace(200);
+  cpu.Trace(555);
 
   // Run a ton of organisms.
   /*for (int t = 0; t < 1000000; t++) {
