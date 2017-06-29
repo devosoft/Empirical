@@ -38,11 +38,12 @@ namespace emp {
       std::string desc;       // Description of function.
       ScopeType scope_type;   // How does this instruction affect scoping?
       size_t scope_arg;       // Which arg indictes new scope (if any).
+      int block_def;          // Does this instruction define a new block?
 
       InstDef(const std::string & _n, fun_t _fun, size_t _args, const std::string & _d,
-              ScopeType _s_type, size_t _s_arg)
+              ScopeType _s_type, size_t _s_arg, bool _block_def=false)
         : name(_n), fun_call(_fun), num_args(_args), desc(_d)
-        , scope_type(_s_type), scope_arg(_s_arg) { ; }
+        , scope_type(_s_type), scope_arg(_s_arg), block_def(_block_def) { ; }
       InstDef(const InstDef &) = default;
     };
 
@@ -63,6 +64,7 @@ namespace emp {
     ScopeType GetScopeType(size_t id) const { return inst_lib[id].scope_type; }
     size_t GetScopeArg(size_t id) const { return inst_lib[id].scope_arg; }
     size_t GetSize() const { return inst_lib.size(); }
+    bool IsBlockDef(size_t id) const { return inst_lib[id].block_def; }
 
     static constexpr char GetSymbol(size_t id) {
       if (id < 26) return ('a' + id);

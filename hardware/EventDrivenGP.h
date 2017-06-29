@@ -20,6 +20,9 @@
 //  * input_buffer
 //  * output_buffer
 
+// @amlalejini - TODO's:
+//   [ ] Go through and make convenient/obvious accessors for structs (Event, State, Block, etc.)
+
 namespace emp {
   class EventDrivenGP {
   public:
@@ -59,10 +62,11 @@ namespace emp {
       size_t func_ptr;
       size_t inst_ptr;
       emp::vector<Block> block_stack;
+      bool is_main;
 
-      State(Ptr<memory_t> _shared_mem_ptr)
+      State(Ptr<memory_t> _shared_mem_ptr, bool _is_main=false)
         : shared_mem_ptr(_shared_mem_ptr), local_mem(), input_mem(), output_mem(),
-          func_ptr(0), inst_ptr(0), block_stack() { ; }
+          func_ptr(0), inst_ptr(0), block_stack(), is_main(_is_main) { ; }
 
       void Reset() {
         local_mem.clear();
@@ -76,17 +80,18 @@ namespace emp {
     struct Instruction {
       size_t id;
       arg_set_t args;
+      BitVector affinity;
 
-      Instruction(size_t _id=0, size_t a0=0, size_t a1=0, size_t a2=0)
-        : id(_id), args() { args[0] = a0; args[1] = a1; args[2] = a2; }
+      Instruction(size_t _id=0, size_t a0=0, size_t a1=0, size_t a2=0, const BitVector & _aff=BitVector())
+        : id(_id), args(), affinity(_aff) { args[0] = a0; args[1] = a1; args[2] = a2; }
       Instruction(const Instruction &) = default;
       Instruction(Instruction &&) = default;
 
       Instruction & operator=(const Instruction &) = default;
       Instruction & operator=(Instruction &&) = default;
 
-      void Set(size_t _id, size_t _a0=0, size_t _a1=0, size_t _a2=0)
-        { id = _id; args[0] = _a0; args[1] = _a1; args[2] = _a2; }
+      void Set(size_t _id, size_t _a0=0, size_t _a1=0, size_t _a2=0, const BitVector & _aff=BitVector())
+        { id = _id; args[0] = _a0; args[1] = _a1; args[2] = _a2; affinity = _aff; }
 
     };
 
@@ -97,8 +102,9 @@ namespace emp {
       BitVector affinity;
       emp::vector<inst_t> inst_seq;
 
-      Function() : affinity(), inst_seq() { ; }
-      Function(BitVector & _aff) : affinity(_aff), inst_seq() { ; }
+      Function(const BitVector & _aff=BitVector()) : affinity(_aff), inst_seq() { ; }
+
+      size_t GetSize() const { return inst_seq.size(); }
     };
 
     using program_t = emp::vector<Function>;
@@ -110,6 +116,46 @@ namespace emp {
     emp::vector< Ptr< emp::vector<Ptr<State>> > > execution_stacks;
     Ptr<emp::vector<Ptr<State>>> cur_core;
     std::queue<Event> event_queue;
+
+
+    // - Execution -
+    /// Close current block in cur_state if there is one to close. If not, do nothing.
+    /// Handles closure of known, special block types appropriately:
+    ///   * LOOPS - set cur_state's IP to beginning of block.
+    void CloseBlock() {
+      emp_assert(GetCurState());  // Can't have no nullptrs 'round here.
+      Ptr<State> cur_state = GetCurState();
+      // If there aren't any blocks to close, just return.
+      if (cur_state->block_stack.empty()) return;
+      Block & block = cur_state->block_stack.back();
+      // Any special circumstances (e.g. looping) go below:
+      switch (block.type) {
+        case BlockType::LOOP:
+          // Move IP to beginning of block.
+          cur_state->inst_ptr = block.begin;
+          break;
+        default:
+          break;
+      }
+      // Pop the block.
+      cur_state->block_stack.pop_back();
+    }
+
+    /// Return from current function call (cur_state) in current core (cur_core).
+    /// Upon returning, put values in output memory of returning state into local memory of caller state.
+    void ReturnFunction() {
+      emp_assert(GetCurState());
+      // Grab the returning state and then pop it off the call stack.
+      Ptr<State> returning_state = GetCurState();
+      GetCurExecStack()->pop_back();
+      // Is there anything to return to?
+      if (Ptr<State> caller_state = GetCurState()) {
+        // If so, copy returning state's output memory into caller state's local memory.
+        for (auto mem : returning_state->output_mem) {
+          caller_state->local_mem[mem.first] = mem.second;
+        }
+      }
+    }
 
   public:
     // Constructors
@@ -129,6 +175,7 @@ namespace emp {
       delete shared_mem_ptr;
     }
 
+    // -- Control --
     /// Reset everything, including program.
     void Reset() {
       program.resize(0);  // Clear out program.
@@ -150,21 +197,22 @@ namespace emp {
       cur_core = nullptr;
     }
 
-    // Accessors
+    // -- Accessors --
     Ptr<inst_lib_t> GetInstLib() const { return inst_lib; }
     const Function & GetFunction(size_t fID) const { emp_assert(fID < program.size()); return program[fID]; }
     inst_t GetInst(size_t fID, size_t pos) {
-      emp_assert(fID < program.size() && pos < program[fID].inst_seq.size());
+      emp_assert(ValidPosition(fID, pos));
       return program[fID].inst_seq[pos];
     }
     const program_t & GetProgram() const { return program; }
     Ptr<emp::vector<Ptr<State>>> GetCurExecStack() { return cur_core; }
     Ptr<State> GetCurState() {
-      if (cur_core) return cur_core->back();
+      if (cur_core && !cur_core->empty()) return cur_core->back();
       else return nullptr;
     }
+    bool ValidPosition(size_t fID, size_t pos) const { return fID < program.size() && pos < program[fID].GetSize(); }
 
-    // Configuration
+    // -- Configuration --
     void SetInst(size_t fID, size_t pos, const inst_t & inst) {
       emp_assert(fID < program.size() && pos < program[fID].inst_seq.size());
       program[fID].inst_seq[pos] = inst;
@@ -176,10 +224,10 @@ namespace emp {
     void SetProgram(const program_t & _program) { program = _program; } // @amlalejini - TODO: test
     void AddFunction(const Function & _function) { program.emplace_back(_function); } // @amlalejini - TODO: test
 
-    // Execution
+    // -- Execution --
     /// Process a single instruction, provided by the caller.
     void ProcessInst(const inst_t & inst) { inst_lib->ProcessInst(*this, inst); }
-    /// Advance hardware by single unit of computational time.
+    /// Advance hardware by single instruction.
     void SingleProcess() {
       // Distribute 1 unit of computational time to each core.
       size_t core_idx = 0;
@@ -196,16 +244,28 @@ namespace emp {
         // Execute the core.
         //  * What function/instruction am I on?
         Ptr<State> cur_state = cur_core->back();
+        const size_t ip = cur_state->inst_ptr;
+        const size_t fp = cur_state->func_ptr;
+        // fp needs to be valid here (and always, really). Shame shame if it's not.
+        emp_assert(fp < program.size());
         // If instruction pointer hanging off end of function sequence:
-        //    - If there's a block to close, close it.
-        //    - If this is the main function, and we're at the bottom of the call stack, wrap.
-        // If not:
-        //  - Grab instruction.
-        //  - Advance instruction pointer.
-        //  - Run instruction.
-
-        //inst_lib->ProcessInst(*this, program[cur_state->func_ptr].inst_seq[cur_state->inst_ptr]);
-
+        if (ip >= program[fp].GetSize()) {
+          if (!cur_state->block_stack.empty()) {
+            //    - If there's a block to close, close it.
+            CloseBlock();
+          } else if (cur_state->is_main && cur_core->size() == 1) {
+            //    - If this is the main function, and we're at the bottom of the call stack, wrap.
+            cur_state->inst_ptr = 0;
+          } else {
+            //    - Otherwise, return from function call.
+            ReturnFunction();
+          }
+        } else { // If instruction pointer is valid:
+          // First, advance the instruction pointer by 1. This may invalidate the IP, but that's okay.
+          cur_state->inst_ptr += 1;
+          // Run instruction @ fp, ip.
+          inst_lib->ProcessInst(*this, program[fp].inst_seq[ip]);
+        }
         // After processing, is the core still active?
         if (cur_core->empty()) {
           // Free core.
@@ -217,6 +277,89 @@ namespace emp {
       // Update execution stack size to be accurate.
       execution_stacks.resize(core_cnt - adjust);
     }
+    /// Advance hardware by some number instructions.
+    void Process(size_t num_inst) { for (size_t i = 0; i < num_inst; i++) SingleProcess(); }
+
+    // -- Printing --
+    /// Print out a single instruction with its arguments.
+    void PrintInst(const inst_t & inst, std::ostream & os=std::cout) {
+      os << inst_lib->GetName(inst.id);
+      const size_t num_args = inst_lib->GetNumArgs(inst.id);
+      for (size_t i = 0; i < num_args; i++) {
+        os << ' ' << inst.args[i];
+      }
+    }
+
+    /// Print out entire program.
+    void PrintProgram(std::ostream & os=std::cout) {
+      for (size_t fID = 0; fID < program.size(); fID++) {
+        // Print out function name (affinity).
+        os << "Fn-" << fID << " " << program[fID].affinity << ":\n";
+        int depth = 0;
+        for (size_t i = 0; i < program[fID].GetSize(); i++) {
+          const inst_t & inst = program[fID].inst_seq[i];
+          int num_spaces = 2 + (2 * depth);
+          for (int s = 0; s < num_spaces; s++) os << ' ';
+          PrintInst(inst, os);
+          os << '\n';
+          // TODO: increase depth on instructions that define a new code block.
+          if (inst_lib->IsBlockDef(inst.id)) {
+            // is block def?
+            depth++;
+          } else if (inst_lib->GetName(inst.id) == "Close" && depth > 0) { // TODO: make block close determination better.
+            // is block close?
+            depth--;
+          }
+        }
+        os << '\n';
+      }
+    }
+
+    /// Print out current state (full) of virtual hardware.
+    // @amlalejini - TODO: print instruction affinity if instruciton has an affinity.
+    void PrintState(std::ostream & os=std::cout) {
+      // Print format:
+      //  Shared memory: [Key:value, ....]
+      //  Core 0:
+      //    Call Stack (stack size):
+      //      State
+      //      ---
+      //      State
+      //      ---
+      //    ...
+
+      // Print shared memory
+      os << "Shared memory: ";
+      for (auto mem : *shared_mem_ptr) os << '{' << mem.first << ':' << mem.second << '}'; os << '\n';
+      // Print each core.
+      for (size_t i = 0; i < execution_stacks.size(); i++) {
+        const emp::vector<Ptr<State>> & stack = *(execution_stacks[i]);
+        os << "Core " << i << ":\n" << "  Call stack (" << stack.size() << "):\n";
+        for (size_t k = 0; k < stack.size(); k++) {
+          // IP, FP, local mem, input mem, output mem
+          const State & state = *(stack[k]);
+          os << "Inst ptr: " << state.inst_ptr << "(";
+          if (ValidPosition(state.func_ptr, state.inst_ptr))
+            PrintInst(GetInst(state.func_ptr, state.inst_ptr), os);
+          else
+            os << "NONE";
+          os << ")" << "\n";
+          os << "Func ptr: " << state.func_ptr << "\n";
+          os << "Input memory: ";
+          for (auto mem : state.input_mem) os << "{" << mem.first << ":" << mem.second << "}"; os << "\n";
+          os << "Local memory: ";
+          for (auto mem : state.local_mem) os << "{" << mem.first << ":" << mem.second << "}"; os << "\n";
+          os << "Output memory: ";
+          for (auto mem : state.output_mem) os << "{" << mem.first << ":" << mem.second << "}"; os << "\n";
+          os << "---\n";
+        }
+      }
+    }
+
+    // -- Default Instructions --
+
+
+
 
   };
 }
