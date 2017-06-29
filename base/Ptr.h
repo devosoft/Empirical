@@ -428,6 +428,12 @@ namespace emp {
     }
     void Delete() { delete ptr; }
 
+    size_t Hash() {
+      // Chop off useless bits of pointer...
+      static constexpr size_t shift = (size_t) emp::Log2(1 + sizeof(T));
+      return (size_t)(ptr) >> shift;
+    }
+
     // Copy assignment
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
       ptr = _in.ptr;
