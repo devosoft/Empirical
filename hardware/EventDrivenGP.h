@@ -357,7 +357,64 @@ namespace emp {
     }
 
     // -- Default Instructions --
+    // Instructions to implement:
+    //  Mathematical computations:
+    //    [ ] Inc
+    //    [ ] Dec
+    //    [ ] Not
+    //    [ ] Add
+    //    [ ] Sub
+    //    [ ] Mult
+    //    [ ] Div
+    //    [ ] Mod
+    //    [ ] TestEqu
+    //    [ ] TestNEqu
+    //    [ ] TestLess
+    //  Flow control:
+    //    [ ] If
+    //    [ ] While
+    //    [ ] Countdown
+    //    [ ] Break
+    //    [ ] Close
+    //    [ ] Call
+    //    [ ] Return
+    //  Register Manipulation:
+    //    [ ] SetMem
+    //    [ ] CopyMem
+    //    [ ] SwapMem
+    //    [ ] Input  (Input mem => Local mem)
+    //    [ ] Output (Local mem => Output mem)
+    //    [ ] Commit (Local mem => Shared mem)
+    //    [ ] Pull   (Shared mem => local mem)
+    //  Misc.
+    //    [ ] Nop
 
+    static void Inst_Inc(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_Dec(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_Not(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_Add(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_Sub(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_Mult(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_Div(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_Mod(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_TestEqu(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_TestNEqu(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_TestLess(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_If(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_While(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_Countdown(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_Break(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_Close(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_Call(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_Return(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_SetMem(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_CopyMem(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_SwapMem(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_Input(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_Output(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_Commit(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_Pull(EventDrivenGP & hw, const arg_set_t & args) { ; }
+    static void Inst_Nop(EventDrivenGP & hw, const arg_set_t & args) { ; }
 
 
 
