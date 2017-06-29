@@ -27,6 +27,11 @@
 #include "assert.h"
 #include "vector.h"
 
+namespace {
+  /// An anonymous log2 calculator for hashing below.
+  static constexpr size_t Log2(size_t x) { return x <= 1 ? 0 : (Log2(x/2) + 1); }
+}
+
 namespace emp {
 
   namespace {
@@ -272,6 +277,12 @@ namespace emp {
       delete ptr;
     }
 
+    size_t Hash() const {
+      // Chop off useless bits of pointer...
+      static constexpr size_t shift = Log2(1 + sizeof(TYPE));
+      return (size_t)(ptr) >> shift;
+    }
+
     // Copy assignment
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
       if (ptr_debug) std::cout << "copy assignment" << std::endl;
@@ -428,9 +439,9 @@ namespace emp {
     }
     void Delete() { delete ptr; }
 
-    size_t Hash() {
+    size_t Hash() const {
       // Chop off useless bits of pointer...
-      static constexpr size_t shift = (size_t) emp::Log2(1 + sizeof(T));
+      static constexpr size_t shift = Log2(1 + sizeof(T));
       return (size_t)(ptr) >> shift;
     }
 
