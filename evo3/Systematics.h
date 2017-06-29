@@ -27,7 +27,7 @@
 #include <set>
 
 #include "../base/Ptr.h"
-#include "../tools/map_utils.h"
+#include "../tools/set_utils.h"
 
 namespace emp {
 
@@ -82,9 +82,17 @@ namespace emp {
   private:
     using taxon_t = TaxaGroup<ORG_INFO>;
 
-//    std::unordered_set< Ptr<taxon_t> > active_taxa;
-    std::set< Ptr<taxon_t> > active_taxa;
-    // @CAO: Save deactiated taxa pointers?
+    struct Hash {
+      size_t operator()(const Ptr<taxon_t> & t) const { return t.Hash(); }
+    };
+
+    bool store_active;     // Store all of the currently active taxa?
+    bool store_ancestors;  // Store all of the direct ancestors from living taxa?
+    bool store_all;        // Store every taxa that ever existed?
+
+    std::unordered_set< Ptr<taxon_t>, Hash > active_taxa;
+    std::unordered_set< Ptr<taxon_t>, Hash > ancestor_taxa;
+    std::unordered_set< Ptr<taxon_t>, Hash > extinct_taxa;
 
     // Deactivate a taxon when there are not living members AND no living descendents.
     void Deactivate(Ptr<taxon_t> taxon) {
@@ -97,7 +105,11 @@ namespace emp {
     }
 
   public:
-    Systematics() : active_taxa() { ; }
+    Systematics(bool _active=true, bool _anc=false, bool _all=false)
+      : store_active(_active), store_ancestors(_anc), store_all(_all)
+      , active_taxa(), ancestor_taxa(), extinct_taxa() { ; }
+    Systematics(const Systematics &) = delete;
+    Systematics(Systematics &&) = default;
     ~Systematics() {
       for (auto x : active_taxa) x.Delete();
       active_taxa.clear();
