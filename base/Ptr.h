@@ -282,6 +282,7 @@ namespace emp {
       static constexpr size_t shift = Log2(1 + sizeof(TYPE));
       return (size_t)(ptr) >> shift;
     }
+    struct hash_t { size_t operator()(const Ptr<TYPE> & t) const { return t.Hash(); } };
 
     // Copy assignment
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
@@ -444,6 +445,7 @@ namespace emp {
       static constexpr size_t shift = Log2(1 + sizeof(T));
       return (size_t)(ptr) >> shift;
     }
+    struct hash_t { size_t operator()(const Ptr<TYPE> & t) const { return t.Hash(); } };
 
     // Copy assignment
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
