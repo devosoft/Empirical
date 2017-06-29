@@ -9,6 +9,7 @@
 #define EMP_SET_UTILS_H
 
 #include <set>
+#include <unordered_set>
 
 namespace emp {
 
@@ -17,10 +18,14 @@ namespace emp {
     s1.insert(s2.begin(), s2.end());
   }
 
-  template <typename T>
-  bool Has(const std::set<T> & s, const T & val) {
-    return s.count(val);
-  }
+  template <typename T, typename H>
+  bool Has(const std::set<T,H> & s, const T & val) { return s.count(val); }
+  template <typename T, typename H>
+  bool Has(const std::multiset<T,H> & s, const T & val) { return s.count(val); }
+  template <typename T, typename H>
+  bool Has(const std::unordered_set<T,H> & s, const T & val) { return s.count(val); }
+  template <typename T, typename H>
+  bool Has(const std::unordered_multiset<T,H> & s, const T & val) { return s.count(val); }
 }
 
 #endif
