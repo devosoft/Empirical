@@ -10,6 +10,7 @@
 
 #include <map>
 #include <string>
+#include <unordered_set>
 
 #include "../base/vector.h"
 #include "../base/array.h"
@@ -29,21 +30,23 @@ namespace emp {
     using inst_t = typename hardware_t::inst_t;
     using genome_t = emp::vector<inst_t>;
     using arg_t = ARG_T;
-    using fun_t = std::function<void(hardware_t &, const emp::array<arg_t, ARG_COUNT> &)>;
+    using fun_t = std::function<void(hardware_t &, const inst_t &)>;
 
     struct InstDef {
-      std::string name;       // Name of this instruction.
-      fun_t fun_call;         // Function to call when executing.
-      size_t num_args;        // Number of args needed by function.
-      std::string desc;       // Description of function.
-      ScopeType scope_type;   // How does this instruction affect scoping?
-      size_t scope_arg;       // Which arg indictes new scope (if any).
-      int block_def;          // Does this instruction define a new block?
+      using properties_t = std::unordered_set<std::string>;
+      std::string name;        // Name of this instruction.
+      fun_t fun_call;          // Function to call when executing.
+      size_t num_args;         // Number of args needed by function.
+      std::string desc;        // Description of function.
+      ScopeType scope_type;    // How does this instruction affect scoping?
+      size_t scope_arg;        // Which arg indictes new scope (if any).
+      properties_t properties; // Are there any generic properties associated with this inst def?
+
 
       InstDef(const std::string & _n, fun_t _fun, size_t _args, const std::string & _d,
-              ScopeType _s_type, size_t _s_arg, bool _block_def=false)
+              ScopeType _s_type, size_t _s_arg, const properties_t & _properties = properties_t())
         : name(_n), fun_call(_fun), num_args(_args), desc(_d)
-        , scope_type(_s_type), scope_arg(_s_arg), block_def(_block_def) { ; }
+        , scope_type(_s_type), scope_arg(_s_arg), properties(_properties) { ; }
       InstDef(const InstDef &) = default;
     };
 
@@ -107,7 +110,7 @@ namespace emp {
     }
 
     void ProcessInst(hardware_t & hw, const inst_t & inst) const {
-      inst_funs[inst.id](hw, inst.args);
+      inst_funs[inst.id](hw, inst);
     }
 
     void WriteGenome(const genome_t & genome, std::ostream & os=std::cout) const {

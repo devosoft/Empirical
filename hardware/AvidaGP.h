@@ -343,60 +343,60 @@ namespace emp {
 
 
     /// Instructions
-    static void Inst_Inc(AvidaGP & hw, const arg_set_t & args) { ++hw.regs[args[0]]; }
-    static void Inst_Dec(AvidaGP & hw, const arg_set_t & args) { --hw.regs[args[0]]; }
-    static void Inst_Not(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[0]] = (hw.regs[args[0]] == 0.0); }
-    static void Inst_SetReg(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[0]] = (double) args[1]; }
-    static void Inst_Add(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = hw.regs[args[0]] + hw.regs[args[1]]; }
-    static void Inst_Sub(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = hw.regs[args[0]] - hw.regs[args[1]]; }
-    static void Inst_Mult(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = hw.regs[args[0]] * hw.regs[args[1]]; }
+    static void Inst_Inc(AvidaGP & hw, const inst_t & inst) { ++hw.regs[inst.args[0]]; }
+    static void Inst_Dec(AvidaGP & hw, const inst_t & inst) { --hw.regs[inst.args[0]]; }
+    static void Inst_Not(AvidaGP & hw, const inst_t & inst) { hw.regs[inst.args[0]] = (hw.regs[inst.args[0]] == 0.0); }
+    static void Inst_SetReg(AvidaGP & hw, const inst_t & inst) { hw.regs[inst.args[0]] = (double) inst.args[1]; }
+    static void Inst_Add(AvidaGP & hw, const inst_t & inst) { hw.regs[inst.args[2]] = hw.regs[inst.args[0]] + hw.regs[inst.args[1]]; }
+    static void Inst_Sub(AvidaGP & hw, const inst_t & inst) { hw.regs[inst.args[2]] = hw.regs[inst.args[0]] - hw.regs[inst.args[1]]; }
+    static void Inst_Mult(AvidaGP & hw, const inst_t & inst) { hw.regs[inst.args[2]] = hw.regs[inst.args[0]] * hw.regs[inst.args[1]]; }
 
-    static void Inst_Div(AvidaGP & hw, const arg_set_t & args) {
-      const double denom = hw.regs[args[1]];
+    static void Inst_Div(AvidaGP & hw, const inst_t & inst) {
+      const double denom = hw.regs[inst.args[1]];
       if (denom == 0.0) ++hw.errors;
-      else hw.regs[args[2]] = hw.regs[args[0]] / denom;
+      else hw.regs[inst.args[2]] = hw.regs[inst.args[0]] / denom;
     }
 
-    static void Inst_Mod(AvidaGP & hw, const arg_set_t & args) {
-      const double base = hw.regs[args[1]];
+    static void Inst_Mod(AvidaGP & hw, const inst_t & inst) {
+      const double base = hw.regs[inst.args[1]];
       if (base == 0.0) ++hw.errors;
-      else hw.regs[args[2]] = hw.regs[args[0]] / base;
+      else hw.regs[inst.args[2]] = hw.regs[inst.args[0]] / base;
     }
 
-    static void Inst_TestEqu(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = (hw.regs[args[0]] == hw.regs[args[1]]); }
-    static void Inst_TestNEqu(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = (hw.regs[args[0]] != hw.regs[args[1]]); }
-    static void Inst_TestLess(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = (hw.regs[args[0]] < hw.regs[args[1]]); }
+    static void Inst_TestEqu(AvidaGP & hw, const inst_t & inst) { hw.regs[inst.args[2]] = (hw.regs[inst.args[0]] == hw.regs[inst.args[1]]); }
+    static void Inst_TestNEqu(AvidaGP & hw, const inst_t & inst) { hw.regs[inst.args[2]] = (hw.regs[inst.args[0]] != hw.regs[inst.args[1]]); }
+    static void Inst_TestLess(AvidaGP & hw, const inst_t & inst) { hw.regs[inst.args[2]] = (hw.regs[inst.args[0]] < hw.regs[inst.args[1]]); }
 
-    static void Inst_If(AvidaGP & hw, const arg_set_t & args) { // args[0] = test, args[1] = scope
-      if (hw.UpdateScope(args[1]) == false) return;      // If previous scope is unfinished, stop!
-      if (hw.regs[args[0]] == 0.0) hw.BypassScope(args[1]); // If test fails, move to scope end.
+    static void Inst_If(AvidaGP & hw, const inst_t & inst) { // args[0] = test, args[1] = scope
+      if (hw.UpdateScope(inst.args[1]) == false) return;      // If previous scope is unfinished, stop!
+      if (hw.regs[inst.args[0]] == 0.0) hw.BypassScope(inst.args[1]); // If test fails, move to scope end.
     }
 
-    static void Inst_While(AvidaGP & hw, const arg_set_t & args) {
+    static void Inst_While(AvidaGP & hw, const inst_t & inst) {
       // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
-      if (hw.UpdateScope(args[1], ScopeType::LOOP) == false) return;
-      if (hw.regs[args[0]] == 0.0) hw.BypassScope(args[1]); // If test fails, move to scope end.
+      if (hw.UpdateScope(inst.args[1], ScopeType::LOOP) == false) return;
+      if (hw.regs[inst.args[0]] == 0.0) hw.BypassScope(inst.args[1]); // If test fails, move to scope end.
     }
 
-    static void Inst_Countdown(AvidaGP & hw, const arg_set_t & args) {  // Same as while, but auto-decriments test each loop.
+    static void Inst_Countdown(AvidaGP & hw, const inst_t & inst) {  // Same as while, but auto-decriments test each loop.
       // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
-      if (hw.UpdateScope(args[1], ScopeType::LOOP) == false) return;
-      if (hw.regs[args[0]] == 0.0) hw.BypassScope(args[1]);   // If test fails, move to scope end.
-      else hw.regs[args[0]]--;
+      if (hw.UpdateScope(inst.args[1], ScopeType::LOOP) == false) return;
+      if (hw.regs[inst.args[0]] == 0.0) hw.BypassScope(inst.args[1]);   // If test fails, move to scope end.
+      else hw.regs[inst.args[0]]--;
     }
 
-    static void Inst_Break(AvidaGP & hw, const arg_set_t & args) { hw.BypassScope(args[0]); }
-    static void Inst_Scope(AvidaGP & hw, const arg_set_t & args) { hw.UpdateScope(args[0]); }
+    static void Inst_Break(AvidaGP & hw, const inst_t & inst) { hw.BypassScope(inst.args[0]); }
+    static void Inst_Scope(AvidaGP & hw, const inst_t & inst) { hw.UpdateScope(inst.args[0]); }
 
-    static void Inst_Define(AvidaGP & hw, const arg_set_t & args) {
-      if (hw.UpdateScope(args[1]) == false) return; // Update which scope we are in.
-      hw.fun_starts[args[0]] = (int) hw.inst_ptr;     // Record where function should be exectuted.
-      hw.BypassScope(args[1]);                     // Skip over the function definition for now.
+    static void Inst_Define(AvidaGP & hw, const inst_t & inst) {
+      if (hw.UpdateScope(inst.args[1]) == false) return; // Update which scope we are in.
+      hw.fun_starts[inst.args[0]] = (int) hw.inst_ptr;     // Record where function should be exectuted.
+      hw.BypassScope(inst.args[1]);                     // Skip over the function definition for now.
     }
 
-    static void Inst_Call(AvidaGP & hw, const arg_set_t & args) {
+    static void Inst_Call(AvidaGP & hw, const inst_t & inst) {
       // Make sure function exists and is still in place.
-      size_t def_pos = (size_t) hw.fun_starts[args[0]];
+      size_t def_pos = (size_t) hw.fun_starts[inst.args[0]];
       if (def_pos >= hw.genome.size()
           || hw.GetScopeType(hw.genome[def_pos].id) != ScopeType::FUNCTION) return;
 
@@ -407,25 +407,25 @@ namespace emp {
       hw.inst_ptr = def_pos+1;                       // Jump to the function body (will adavance)
     }
 
-    static void Inst_Push(AvidaGP & hw, const arg_set_t & args) { hw.PushStack(args[1], hw.regs[args[0]]); }
-    static void Inst_Pop(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[1]] = hw.PopStack(args[0]); }
+    static void Inst_Push(AvidaGP & hw, const inst_t & inst) { hw.PushStack(inst.args[1], hw.regs[inst.args[0]]); }
+    static void Inst_Pop(AvidaGP & hw, const inst_t & inst) { hw.regs[inst.args[1]] = hw.PopStack(inst.args[0]); }
 
-    static void Inst_Input(AvidaGP & hw, const arg_set_t & args) {
+    static void Inst_Input(AvidaGP & hw, const inst_t & inst) {
       // Determine the input ID and grab it if it exists; if not, return 0.0
-      int input_id = (int) hw.regs[ args[0] ];
-      hw.regs[args[1]] = Find(hw.inputs, input_id, 0.0);
+      int input_id = (int) hw.regs[ inst.args[0] ];
+      hw.regs[inst.args[1]] = Find(hw.inputs, input_id, 0.0);
     }
 
-    static void Inst_Output(AvidaGP & hw, const arg_set_t & args) {
+    static void Inst_Output(AvidaGP & hw, const inst_t & inst) {
       // Save the date in the target reg to the specified output position.
-      int output_id = (int) hw.regs[ args[1] ];  // Grab ID from register.
-      hw.outputs[output_id] = hw.regs[args[0]];     // Copy target reg to appropriate output.
+      int output_id = (int) hw.regs[ inst.args[1] ];  // Grab ID from register.
+      hw.outputs[output_id] = hw.regs[inst.args[0]];     // Copy target reg to appropriate output.
     }
 
-    static void Inst_CopyVal(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[1]] = hw.regs[args[0]]; }
+    static void Inst_CopyVal(AvidaGP & hw, const inst_t & inst) { hw.regs[inst.args[1]] = hw.regs[inst.args[0]]; }
 
-    static void Inst_ScopeReg(AvidaGP & hw, const arg_set_t & args) {
-      hw.reg_stack.emplace_back(hw.CurScope(), args[0], hw.regs[args[0]]);
+    static void Inst_ScopeReg(AvidaGP & hw, const inst_t & inst) {
+      hw.reg_stack.emplace_back(hw.CurScope(), inst.args[0], hw.regs[inst.args[0]]);
     }
 
     static Ptr<inst_lib_t> DefaultInstLib();
