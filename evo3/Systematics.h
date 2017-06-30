@@ -8,16 +8,12 @@
 //
 //  ORG_INFO is usually the genome for an organism, but may have other details like position.
 //
-//  Options include:
-//  * Track lineage yes / no.
-//  * Group genotypes yes / no
-//  * Group clades (provide a function that determines when a new clade should start)
-//  * Prune evolutionary dead-ends (to reduce size of tree).
-//  * Backup to file (anything older than a specified level)
-//
 //
 //  Developer notes
-//  * Return Ptr<taxon_t> rather than ID to streamline?
+//  * Technically, we don't need to keep the ancestors in a set in order to track a lineage...
+//    If we delete all of their descendants they should automaticaly be deleted.
+//  * We should provide an option to back up systematics data to a file so that it doesn't all
+//    need to be kept in memory, especially if we're only doing post-analysis.
 
 
 #ifndef EMP_EVO_SYSTEMATICS_H
