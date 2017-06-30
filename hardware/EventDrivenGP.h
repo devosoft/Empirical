@@ -286,18 +286,62 @@ namespace emp {
       else return nullptr;
     }
     bool ValidPosition(size_t fID, size_t pos) const { return fID < program.size() && pos < program[fID].GetSize(); }
-
+    bool ValidFunction(size_t fID) const { return fID < program.size(); }
     // -- Configuration --
+    // @amlalejini - TODO: add affinity to SetInst
     void SetInst(size_t fID, size_t pos, const inst_t & inst) {
-      emp_assert(fID < program.size() && pos < program[fID].inst_seq.size());
+      emp_assert(ValidPosition(fID, pos));
       program[fID].inst_seq[pos] = inst;
     }
-    void SetInst(size_t fID, size_t pos, size_t id, arg_t a0=0, arg_t a1=0, arg_t a2=0) {
-      emp_assert(fID < program.size() && pos < program[fID].inst_seq.size());
-      program[fID].inst_seq[pos].Set(id, a0, a1, a2);
+    void SetInst(size_t fID, size_t pos, size_t id, arg_t a0=0, arg_t a1=0, arg_t a2=0,
+                 const affinity_t & aff=affinity_t()) {
+      emp_assert(ValidPosition(fID, pos));
+      program[fID].inst_seq[pos].Set(id, a0, a1, a2, aff);
     }
     void SetProgram(const program_t & _program) { program = _program; } // @amlalejini - TODO: test
-    void AddFunction(const Function & _function) { program.emplace_back(_function); } // @amlalejini - TODO: test
+    void PushFunction(const Function & _function) { program.emplace_back(_function); } // @amlalejini - TODO: test
+    //void PushFunction() { ; } // @amlalejini - TODO: make a push function that creates the function struct for you.
+
+    /// Push new instruction to program.
+    /// If no function pointer is provided and no functions exist yet, add new function to
+    /// program and push to that. If no function pointer is provided and functions exist, push to
+    /// last function in program. If function pointer is provided, push to that function.
+    void PushInst(size_t id, arg_t a0=0, arg_t a1=0, arg_t a2=0,
+                  const affinity_t & aff=affinity_t(), int fp=-1)
+    {
+      emp_assert((fp == -1) || (fp >= 0 && ValidFunction((size_t)fp)));
+      if (fp == -1 && !program.size()) { program.emplace_back(); fp = 0; }
+      else if (fp == -1) fp = (int)program.size() - 1;
+      program[(size_t)fp].inst_seq.emplace_back(id, a0, a1, a2, aff);
+    }
+
+    /// Push new instruction to program.
+    /// If no function pointer is provided and no functions exist yet, add new function to
+    /// program and push to that. If no function pointer is provided and functions exist, push to
+    /// last function in program. If function pointer is provided, push to that function.
+    void PushInst(const std::string & name, arg_t a0=0, arg_t a1=0, arg_t a2=0,
+                  const affinity_t & aff=affinity_t(), int fp=-1)
+    {
+      emp_assert((fp == -1) || (fp >= 0 && ValidFunction((size_t)fp)));
+      size_t id = inst_lib->GetID(name);
+      if (fp == -1 && !program.size()) { program.emplace_back(); fp = 0; }
+      else if (fp == -1) fp = (int)program.size() - 1;
+      program[(size_t)fp].inst_seq.emplace_back(id, a0, a1, a2, aff);
+    }
+
+    /// Push new instruction to program.
+    /// If no function pointer is provided and no functions exist yet, add new function to
+    /// program and push to that. If no function pointer is provided and functions exist, push to
+    /// last function in program. If function pointer is provided, push to that function.
+    void PushInst(const inst_t & inst, int fp=-1) {
+      emp_assert((fp == -1) || (fp >= 0 && ValidFunction((size_t)fp)));
+      if (fp == -1 && !program.size()) { program.emplace_back(); fp = 0; }
+      else if (fp == -1) fp = (int)program.size() - 1;
+      program[(size_t)fp].inst_seq.emplace_back(inst);
+    }
+
+    /// Load entire genome from input stream.
+    bool Load(std::istream & input) { ; } // TODO
 
     // -- Execution --
     /// Process a single instruction, provided by the caller.
