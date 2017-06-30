@@ -103,6 +103,18 @@ namespace emp {
   template <typename WORLD, typename ORG>
   void SetDefaultPrintFun(WORLD & world) { SetDefaultPrintFun_impl<WORLD, ORG>(world, true); }
 
+
+  namespace {
+    // Setup genotype identification
+    template <typename ORG_T>
+    auto Org2Genotype( bool_decoy< typename ORG_T::genotype_t > ) -> typename ORG_T::genotype_t;
+
+    template <typename ORG_T>
+    ORG_T Org2Genotype( ... );
+  }
+
+  template <typename ORG>
+  using find_genotype_t = decltype( Org2Genotype<ORG>() );
 }
 
 #endif
