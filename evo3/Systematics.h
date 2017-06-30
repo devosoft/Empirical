@@ -81,20 +81,39 @@ namespace emp {
   class Systematics {
   private:
     using taxon_t = TaxaGroup<ORG_INFO>;
-
-    struct Hash {
-      size_t operator()(const Ptr<taxon_t> & t) const { return t.Hash(); }
-    };
+    using hash_t = typename Ptr<taxon_t>::hash_t;
 
     bool store_active;     // Store all of the currently active taxa?
     bool store_ancestors;  // Store all of the direct ancestors from living taxa?
-    bool store_all;        // Store every taxa that ever existed?
+    bool store_outside;    // Store taxa that are extinct with no living descendants?
+    bool archive;          // Set to true if we are supposed to do any archiving of extinct taxa.
 
-    std::unordered_set< Ptr<taxon_t>, Hash > active_taxa;
-    std::unordered_set< Ptr<taxon_t>, Hash > ancestor_taxa;
-    std::unordered_set< Ptr<taxon_t>, Hash > extinct_taxa;
+    std::unordered_set< Ptr<taxon_t>, hash_t > active_taxa;
+    std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa;
+    std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;
 
-    // Deactivate a taxon when there are not living members AND no living descendents.
+    // Mark a taxon extinct if there are no more living members.  There may be descendants.
+    void MarkExtinct(Ptr<taxon_t> taxon) {
+      emp_assert(taxon);
+      emp_assert(taxon->GetNumOrgs() == 0);
+      if (store_active) active_taxa.remove(taxon);
+      if (!archive) {   // If we don't archive taxa, delete them.
+        taxon.Delete();
+        return;
+      }
+
+      // Otherwise, figure out how we're supposed to store them.
+      if (taxon->GetNumOff()) {
+        // There are offspring taxa, so store as an ancestor (if we're supposed to).
+        if (store_ancestors) ancestor_taxa.insert(taxon);
+      } else {
+        // The are no offspring; store as an outside taxa or delete.
+        if (store_outside) outside_taxa(taxon);
+        else taxon.Delete();
+      }
+    }
+
+    // Deactivate a taxon when there are not living members AND no living descendants.
     void Deactivate(Ptr<taxon_t> taxon) {
       emp_assert(taxon);
       active_taxa.remove(taxon);                    // Remove taxon from active set.
@@ -106,8 +125,9 @@ namespace emp {
 
   public:
     Systematics(bool _active=true, bool _anc=false, bool _all=false)
-      : store_active(_active), store_ancestors(_anc), store_all(_all)
-      , active_taxa(), ancestor_taxa(), extinct_taxa() { ; }
+      : store_active(_active), store_ancestors(_anc), store_outside(_all)
+      , archive(store_ancestors || store_outside)
+      , active_taxa(), ancestor_taxa(), outside_taxa() { ; }
     Systematics(const Systematics &) = delete;
     Systematics(Systematics &&) = default;
     ~Systematics() {
