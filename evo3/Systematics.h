@@ -148,6 +148,12 @@ namespace emp {
     size_t GetTreeSize() const { return GetNumActive() + GetNumAncestors(); }
     size_t GetNumTaxa() const { return GetTreeSize() + GetNumOutside(); }
 
+    void Reset(bool _active=true, bool _anc=true, bool _all=false) {
+      store_active = _active; store_ancestors = _anc; store_outside = _all;
+      archive = store_ancestors || store_outside;
+      active_taxa.clear(); ancestor_taxa.clear(); outside_taxa.clear();
+    }
+
     /// Add information about a newly-injected taxon; return unique taxon pointer.
     Ptr<taxon_t> InjectOrg(const ORG_INFO & info) {
       Ptr<taxon_t> cur_taxon = NewPtr<taxon_t>(info);
@@ -164,8 +170,8 @@ namespace emp {
         parent->AddOrg();
         return parent;
       }
-      // Otherwise, this is a new taxon!
-      Ptr<taxon_t> cur_taxon = NewPtr<taxon_t>(info, parent);
+      // Otherwise, this is a new taxon!  If archiving, save the parent.
+      Ptr<taxon_t> cur_taxon = NewPtr<taxon_t>(info, archive ? parent : nullptr);
       if (store_active) active_taxa.insert(cur_taxon);
       cur_taxon->AddOrg();
       return cur_taxon;
