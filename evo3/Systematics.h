@@ -23,8 +23,9 @@
 #ifndef EMP_EVO_SYSTEMATICS_H
 #define EMP_EVO_SYSTEMATICS_H
 
-#include <unordered_set>
+#include <ostream>
 #include <set>
+#include <unordered_set>
 
 #include "../base/Ptr.h"
 #include "../tools/set_utils.h"
@@ -120,19 +121,8 @@ namespace emp {
       }
     }
 
-    // A taxon is "outside" the tree when there are not living members AND no living descendants.
-    // void MarkOutside(Ptr<taxon_t> taxon) {
-    //   emp_assert(taxon);
-    //   emp_assert(taxon->GetNumOrgs() == 0);
-    //   emp_assert(taxon->GetNumOff() == 0);
-    //   if (store_ancestor) ancestor_taxa.remove(taxon); // Remove taxon from ancestor set.
-    //   RemoveOffspring(taxon->GetParent());             // Recurse to parent.
-    //   if (store_outside) outside_taxa.insert(taxon);   // If we're supposed to store, do so.
-    //   else taxon.Delete();                             // Otherwise delete this taxon.
-    // }
-
   public:
-    Systematics(bool _active=true, bool _anc=false, bool _all=false)
+    Systematics(bool _active=true, bool _anc=true, bool _all=false)
       : store_active(_active), store_ancestors(_anc), store_outside(_all)
       , archive(store_ancestors || store_outside)
       , active_taxa(), ancestor_taxa(), outside_taxa() { ; }
@@ -146,6 +136,17 @@ namespace emp {
       ancestor_taxa.clear();
       outside_taxa.clear();
     }
+
+    bool GetStoreActive() const { return store_active; }
+    bool GetStoreAncestors() const { return store_ancestors; }
+    bool GetStoreOutside() const { return store_outside; }
+    bool GetArchive() const { return archive; }
+
+    size_t GetNumActive() const { return  active_taxa.size(); }
+    size_t GetNumAncestors() const { return  ancestor_taxa.size(); }
+    size_t GetNumOutside() const { return  outside_taxa.size(); }
+    size_t GetTreeSize() const { return GetNumActive() + GetNumAncestors(); }
+    size_t GetNumTaxa() const { return GetTreeSize() + GetNumOutside(); }
 
     /// Add information about a newly-injected taxon; return unique taxon pointer.
     Ptr<taxon_t> InjectOrg(const ORG_INFO & info) {
@@ -183,6 +184,14 @@ namespace emp {
       emp_assert(taxon);
       emp_assert(Has(active_taxa, taxon));
       return taxon->GetParent();
+    }
+
+    /// Print whole lineage.
+    void PrintLineage(Ptr<taxon_t> taxon, std::ostream & os=std::cout) {
+      while (taxon) {
+        os << taxon->GetInfo() << std::endl;
+        taxon = taxon->GetParent();
+      }
     }
   };
 
