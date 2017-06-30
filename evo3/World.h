@@ -85,9 +85,11 @@ namespace emp {
 
     // AddOrgAt is the only way to add organisms (others must go through here)
     size_t AddOrgAt(Ptr<ORG> new_org, size_t pos);
+    size_t AddNextOrgAt(Ptr<ORG> new_org, size_t pos);
 
     // RemoveOrgAt is the only way to remove organism.
     void RemoveOrgAt(size_t pos);
+    void RemoveNextOrgAt(size_t pos);
 
     // Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
@@ -302,16 +304,33 @@ namespace emp {
     emp_assert(new_org, pos);                            // The new organism must exist.
 
     if (pop.size() <= pos) pop.resize(pos+1, nullptr);   // Make sure we have room.
-    if (pop[pos]) { ClearCache(pos); pop[pos].Delete(); --num_orgs; }     // Clear out any old org.
+    if (pop[pos]) { ClearCache(pos); RemoveOrgAt(pos); --num_orgs; }     // Clear out any old org.
     pop[pos] = new_org;                                  // Place new org.
     ++num_orgs;                                          // Track number of orgs.
 
     return pos;
   }
 
+  template <typename ORG>
+  size_t World<ORG>::AddNextOrgAt(Ptr<ORG> new_org, size_t pos) {
+    emp_assert(new_org, pos);                            // The new organism must exist.
+
+    if (next_pop.size() <= pos) next_pop.resize(pos+1, nullptr);   // Make sure we have room.
+    if (next_pop[pos]) { RemoveNextOrgAt(pos); }                   // Clear out any old org.
+    next_pop[pos] = new_org;                                       // Place new org.
+    return pos;
+  }
+
   template<typename ORG>
   void World<ORG>::RemoveOrgAt(size_t pos) {
+    pop[pos].Delete();
+    pop[pos] = nullptr;
+  }
 
+  template<typename ORG>
+  void World<ORG>::RemoveNextOrgAt(size_t pos) {
+    next_pop[pos].Delete();
+    next_pop[pos] = nullptr;
   }
 
   template<typename ORG>
@@ -328,9 +347,8 @@ namespace emp {
     if (synchronous_gen) {
       // Append births into the next population.
       fun_add_birth = [this](Ptr<ORG> new_org, size_t) {
-        emp_assert(new_org);          // New organism must exist.
-        next_pop.push_back(new_org);  // Append it to the NEXT population
-        return next_pop.size() - 1;   // Return offspring position.
+        emp_assert(new_org);                            // New organism must exist.
+        return AddNextOrgAt(new_org, next_pop.size());  // Append it to the NEXT population
       };
 
       SetAttribute("SynchronousGen", "True");
@@ -368,10 +386,7 @@ namespace emp {
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
         emp_assert(new_org);                                  // New organism must exist.
         const size_t id = fun_get_neighbor(parent_id);     // Placed near parent, in next pop.
-        if (id >= next_pop.size()) next_pop.resize(id+1, nullptr);
-        if (next_pop[id]) next_pop[id].Delete();
-        next_pop[id] = new_org;
-        return id;
+        return AddNextOrgAt(new_org, id);
       };
       SetAttribute("SynchronousGen", "True");
     } else {
@@ -412,17 +427,12 @@ namespace emp {
         const size_t pool_id = parent_id / size_x;
         const size_t start_id = pool_id * size_x;
         for (size_t id = start_id; id < start_id+size_x; id++) {
-          if (next_pop[id] == nullptr) {
-            if (id >= next_pop.size()) next_pop.resize(id+1, nullptr);
-            next_pop[id] = new_org;
-            return id;
+          if (next_pop[id] == nullptr) {  // Search for an open positions...
+            return AddNextOrgAt(new_org, id);
           }
         }
         const size_t id = fun_get_neighbor(parent_id);     // Placed near parent, in next pop.
-        if (id >= next_pop.size()) next_pop.resize(id+1, nullptr);
-        next_pop[id].Delete(); // If we made it this far, we know position is occupied.
-        next_pop[id] = new_org;
-        return id;
+        return AddNextOrgAt(new_org, id);
       };
       SetAttribute("SynchronousGen", "True");
     } else {
@@ -442,17 +452,14 @@ namespace emp {
   void World<ORG>::Update() {
     // If generations are synchronous (i.e, next_pop is not empty), put the next generation in place.
     if (next_pop.size()) {
-      // Add all waiting organisms into the population.
-      for (size_t i = 0; i < next_pop.size(); i++) {
-        if (next_pop[i]) AddOrgAt(next_pop[i], i);
-      }
-      // Remove any remaining organisms in main population.
-      for (size_t i = next_pop.size(); i < pop.size(); i++) {
-        if (pop[i]) pop[i].Delete();
-      }
-      // Reset populations.
-      pop.resize(next_pop.size());
-      next_pop.resize(0);
+      // Clear out current pop.
+      for (size_t i = 0; i < pop.size(); i++) if (pop[i]) RemoveOrgAt(i);
+      pop.resize(0);
+
+      std::swap(pop, next_pop); // Move next_pop in place.
+
+      num_orgs = 0;             // Update the organism count.
+      for (size_t i = 0; i < pop.size(); i++) if (pop[i]) ++num_orgs;
     }
   }
 
@@ -471,8 +478,8 @@ namespace emp {
   // Delete all organisms.
   template<typename ORG>
   void World<ORG>::Clear() {
-    for (Ptr<ORG> org : pop) if (org) org.Delete();       // Delete current organisms.
-    for (Ptr<ORG> org : next_pop) if (org) org.Delete();  // Delete waiting organisms.
+    for (size_t i = 0; i < pop.size(); i++) if (pop[i]) RemoveOrgAt(i);
+    for (size_t i = 0; i < next_pop.size(); i++) if (next_pop[i]) RemoveNextOrgAt(i);
     pop.resize(0);                                     // Remove deleted organisms.
     next_pop.resize(0);
     fit_cache.resize(0);
@@ -483,7 +490,7 @@ namespace emp {
   template<typename ORG>
   void World<ORG>::ClearOrgAt(size_t pos) {
     if (!pop[pos]) return;  // No organism; no need to do anything.
-    pop[pos].Delete();
+    RemoveOrgAt(pos);
     pop[pos]=nullptr;
     ClearCache(pos);
     num_orgs--;
