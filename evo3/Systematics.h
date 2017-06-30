@@ -65,14 +65,14 @@ namespace emp {
       emp_assert(num_orgs > 0, num_orgs);
       --num_orgs;
 
-      // If we are out of organisms and offspring, this TaxaGroup should deactivate.
+      // If we are out of BOTH organisms and offspring, this TaxaGroup should deactivate.
       if (num_orgs == 0) return num_offspring;
     }
     bool RemoveOffspring() {
       emp_assert(num_offspring > 0);
       --num_offspring;
 
-      // If we are out of offspring and organisms, this TaxaGroup should deactivate.
+      // If we are out of BOTH offspring and organisms, this TaxaGroup should deactivate.
       if (num_offspring == 0) return num_orgs;
     }
   };
@@ -92,6 +92,12 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa;
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;
 
+    void RemoveOffspring(Ptr<taxon_t> taxon) {
+      if (!taxon) return;                          // Not tracking this taxon.
+      bool p_active = taxon->RemoveOffspring();    // Cascade up
+      if (p_active == false) MarkOutside(taxon);    // If we're out of offspring, now outside.
+    }
+
     // Mark a taxon extinct if there are no more living members.  There may be descendants.
     void MarkExtinct(Ptr<taxon_t> taxon) {
       emp_assert(taxon);
@@ -108,20 +114,22 @@ namespace emp {
         if (store_ancestors) ancestor_taxa.insert(taxon);
       } else {
         // The are no offspring; store as an outside taxa or delete.
-        if (store_outside) outside_taxa(taxon);
-        else taxon.Delete();
+        RemoveOffspring(taxon->GetParent());            // Recurse to parent.
+        if (store_outside) outside_taxa.insert(taxon);  // If we're supposed to store, do so.
+        else taxon.Delete();                            // Otherwise delete this taxon.
       }
     }
 
-    // Deactivate a taxon when there are not living members AND no living descendants.
-    void Deactivate(Ptr<taxon_t> taxon) {
-      emp_assert(taxon);
-      active_taxa.remove(taxon);                    // Remove taxon from active set.
-      Ptr<taxon_t> p_taxon = taxon->GetParent();    // Grab parent taxon to update.
-      bool p_active = p_taxon->RemoveOffspring();   // Cascade up
-      if (p_active == false) Deactivate(p_taxon);
-      taxon->Delete();                              // Delete this taxon.
-    }
+    // A taxon is "outside" the tree when there are not living members AND no living descendants.
+    // void MarkOutside(Ptr<taxon_t> taxon) {
+    //   emp_assert(taxon);
+    //   emp_assert(taxon->GetNumOrgs() == 0);
+    //   emp_assert(taxon->GetNumOff() == 0);
+    //   if (store_ancestor) ancestor_taxa.remove(taxon); // Remove taxon from ancestor set.
+    //   RemoveOffspring(taxon->GetParent());             // Recurse to parent.
+    //   if (store_outside) outside_taxa.insert(taxon);   // If we're supposed to store, do so.
+    //   else taxon.Delete();                             // Otherwise delete this taxon.
+    // }
 
   public:
     Systematics(bool _active=true, bool _anc=false, bool _all=false)
@@ -132,13 +140,17 @@ namespace emp {
     Systematics(Systematics &&) = default;
     ~Systematics() {
       for (auto x : active_taxa) x.Delete();
+      for (auto x : ancestor_taxa) x.Delete();
+      for (auto x : outside_taxa) x.Delete();
       active_taxa.clear();
+      ancestor_taxa.clear();
+      outside_taxa.clear();
     }
 
     /// Add information about a newly-injected taxon; return unique taxon pointer.
     Ptr<taxon_t> InjectOrg(const ORG_INFO & info) {
       Ptr<taxon_t> cur_taxon = NewPtr<taxon_t>(info);
-      active_taxa.insert(cur_taxon);
+      if (store_active) active_taxa.insert(cur_taxon);
       cur_taxon->AddOrg();
       return cur_taxon;
     }
@@ -151,9 +163,9 @@ namespace emp {
         parent->AddOrg();
         return parent;
       }
-      // This is a new taxon.
+      // Otherwise, this is a new taxon!
       Ptr<taxon_t> cur_taxon = NewPtr<taxon_t>(info, parent);
-      active_taxa.insert(cur_taxon);
+      if (store_active) active_taxa.insert(cur_taxon);
       cur_taxon->AddOrg();
       return cur_taxon;
     }
@@ -163,7 +175,7 @@ namespace emp {
       emp_assert(taxon);
       emp_assert(Has(active_taxa, taxon));
       const bool active = taxon->RemoveOrg();
-      if (active == false) Deactivate(taxon);
+      if (active == false) MarkExtinct(taxon);
     }
 
     /// Climb up a lineage...
