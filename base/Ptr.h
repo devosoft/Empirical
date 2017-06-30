@@ -442,7 +442,7 @@ namespace emp {
 
     size_t Hash() const {
       // Chop off useless bits of pointer...
-      static constexpr size_t shift = Log2(1 + sizeof(T));
+      static constexpr size_t shift = Log2(1 + sizeof(TYPE));
       return (size_t)(ptr) >> shift;
     }
     struct hash_t { size_t operator()(const Ptr<TYPE> & t) const { return t.Hash(); } };
