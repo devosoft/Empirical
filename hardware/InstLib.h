@@ -95,10 +95,11 @@ namespace emp {
                  size_t num_args=0,
                  const std::string & desc="",
                  ScopeType scope_type=ScopeType::NONE,
-                 size_t scope_arg=(size_t) -1)
+                 size_t scope_arg=(size_t) -1,
+                 const inst_properties_t & inst_properties=inst_properties_t())
     {
       const size_t id = inst_lib.size();
-      inst_lib.emplace_back(name, fun_call, num_args, desc, scope_type, scope_arg);
+      inst_lib.emplace_back(name, fun_call, num_args, desc, scope_type, scope_arg, inst_properties);
       inst_funs.emplace_back(fun_call);
       name_map[name] = id;
     }
