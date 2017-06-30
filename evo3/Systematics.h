@@ -19,7 +19,6 @@
 //    If we delete all of their descendants they should automaticaly be deleted.
 //  * We should provide an option to back up systematics data to a file so that it doesn't all
 //    need to be kept in memory, especially if we're only doing post-analysis.
-//  * Can we combine active_taxa set and org_taxa vector?
 
 
 #ifndef EMP_EVO_SYSTEMATICS_H
@@ -92,7 +91,6 @@ namespace emp {
     bool store_outside;    //< Store taxa that are extinct with no living descendants?
     bool archive;          //< Set to true if we are supposed to do any archiving of extinct taxa.
 
-    std::vector< Ptr<taxon_t> > org_taxa;                     //< Taxa info by position.
     std::unordered_set< Ptr<taxon_t>, hash_t > active_taxa;   //< A set of all living taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; //< A set of all dead, ancestral taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  //< A set of all dead taxa w/o descendants.
@@ -152,34 +150,24 @@ namespace emp {
     size_t GetTreeSize() const { return GetNumActive() + GetNumAncestors(); }
     size_t GetNumTaxa() const { return GetTreeSize() + GetNumOutside(); }
 
-    Ptr<taxon_t> GetTaxon(size_t id) const {
-      emp_assert(org_taxa.size() > id);
-      return org_taxa[id];
-    }
-
     void Reset(bool _active=true, bool _anc=true, bool _all=false) {
       store_active = _active; store_ancestors = _anc; store_outside = _all;
       archive = store_ancestors || store_outside;
       // @CAO Should actively delete all taxa!
-      org_taxa.resize(0);
       active_taxa.clear(); ancestor_taxa.clear(); outside_taxa.clear();
     }
 
     /// Add information about a newly-injected taxon; return unique taxon pointer.
-    Ptr<taxon_t> InjectOrg(size_t id, const ORG_INFO & info, Ptr<taxon_t> parent=nullptr) {
+    Ptr<taxon_t> InjectOrg(const ORG_INFO & info, Ptr<taxon_t> parent=nullptr) {
       Ptr<taxon_t> cur_taxon = NewPtr<taxon_t>(info, parent);
-      if (store_active) {
-        active_taxa.insert(cur_taxon);
-        if (org_taxa.size() <= id) org_taxa.resize(id+1);
-        org_taxa[id] = cur_taxon;
-      }
+      if (store_active) active_taxa.insert(cur_taxon);
       if (parent) parent->AddOffspring();
       cur_taxon->AddOrg();
       return cur_taxon;
     }
 
     /// Add information about a new organism; return a pointer for the associated taxon.
-    Ptr<taxon_t> AddOrg(Ptr<taxon_t> parent, size_t id, const ORG_INFO & info) {
+    Ptr<taxon_t> AddOrg(Ptr<taxon_t> parent, const ORG_INFO & info) {
       emp_assert(parent);
       emp_assert( Has(active_taxa, parent) );
       if (parent->GetInfo() == info) {   // Adding another org of this taxon.
@@ -187,13 +175,11 @@ namespace emp {
         return parent;
       }
       // Otherwise, this is a new taxon!  If archiving, track the parent.
-      return InjectOrg(id, info, parent);
+      return InjectOrg(info, parent);
     }
 
     /// Remove an instance of an organism; track when it's gone.
-    bool RemoveOrg(size_t id) {
-      Ptr<taxon_t> taxon = org_taxa[id];
-      org_taxa[id] = 0;
+    bool RemoveOrg(Ptr<taxon_t> taxon) {
       emp_assert(taxon);
       emp_assert(Has(active_taxa, taxon));
       const bool active = taxon->RemoveOrg();
