@@ -325,6 +325,10 @@ namespace emp {
   void World<ORG>::RemoveOrgAt(size_t pos) {
     pop[pos].Delete();
     pop[pos] = nullptr;
+    if (cache_on) {
+      emp_assert(fit_cache.size() > pos);
+      fit_cache[pos] = 0.0;
+    }
   }
 
   template<typename ORG>
