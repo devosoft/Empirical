@@ -31,20 +31,19 @@ namespace emp {
     using genome_t = emp::vector<inst_t>;
     using arg_t = ARG_T;
     using fun_t = std::function<void(hardware_t &, const inst_t &)>;
+    using inst_properties_t = std::unordered_set<std::string>;
 
     struct InstDef {
-      using properties_t = std::unordered_set<std::string>;
       std::string name;        // Name of this instruction.
       fun_t fun_call;          // Function to call when executing.
       size_t num_args;         // Number of args needed by function.
       std::string desc;        // Description of function.
       ScopeType scope_type;    // How does this instruction affect scoping?
       size_t scope_arg;        // Which arg indictes new scope (if any).
-      properties_t properties; // Are there any generic properties associated with this inst def?
-
+      inst_properties_t properties; // Are there any generic properties associated with this inst def?
 
       InstDef(const std::string & _n, fun_t _fun, size_t _args, const std::string & _d,
-              ScopeType _s_type, size_t _s_arg, const properties_t & _properties = properties_t())
+              ScopeType _s_type, size_t _s_arg, const inst_properties_t & _properties = inst_properties_t())
         : name(_n), fun_call(_fun), num_args(_args), desc(_d)
         , scope_type(_s_type), scope_arg(_s_arg), properties(_properties) { ; }
       InstDef(const InstDef &) = default;
@@ -66,8 +65,8 @@ namespace emp {
     const std::string & GetDesc(size_t id) const { return inst_lib[id].desc; }
     ScopeType GetScopeType(size_t id) const { return inst_lib[id].scope_type; }
     size_t GetScopeArg(size_t id) const { return inst_lib[id].scope_arg; }
+    const inst_properties_t & GetProperties(size_t id) const { return inst_lib[id].properties; }
     size_t GetSize() const { return inst_lib.size(); }
-    bool IsBlockDef(size_t id) const { return inst_lib[id].block_def; }
 
     static constexpr char GetSymbol(size_t id) {
       if (id < 26) return ('a' + id);
