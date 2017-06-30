@@ -29,10 +29,12 @@
 #include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../meta/reflection.h"
+#include "../tools/map_utils.h"
 #include "../tools/Random.h"
 #include "../tools/random_utils.h"
 #include "../tools/string_utils.h"
 
+#include "Systematics.h"
 #include "World_reflect.h"  // Handle needed reflection on incoming organism classes.
 #include "World_iterator.h"
 
@@ -42,6 +44,8 @@ namespace emp {
   class World {
   private:
     using this_t = World<ORG>;
+    using genome_t = ORG;          // @CAO: Genome and Organism should be able to be different!
+
     friend class World_iterator<this_t>;
 
     using fun_calc_fitness_t = std::function<double(ORG&)>;
@@ -76,8 +80,14 @@ namespace emp {
     // Attributes are a dynamic way to track extra characteristics about a world.
     std::map<std::string, std::string> attributes;
 
+    // Data collection.
+    Systematics<ORG> systematics;
+
     // AddOrgAt is the only way to add organisms (others must go through here)
     size_t AddOrgAt(Ptr<ORG> new_org, size_t pos);
+
+    // RemoveOrgAt is the only way to remove organism.
+    void RemoveOrgAt(size_t pos);
 
     // Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
@@ -155,7 +165,7 @@ namespace emp {
     bool HasAttribute(const std::string & name) const { return Has(attributes, name); }
     const std::string & GetAttribute(const std::string) const {
       emp_assert( Has(attributes, name) );
-      return attributes[name];
+      return Find(attributes, name, "UNKNOWN");
     }
     template <typename T>
     void SetAttribute(const std::string & name, T && val) { attributes[name] = to_string(val); }
@@ -297,6 +307,11 @@ namespace emp {
     ++num_orgs;                                          // Track number of orgs.
 
     return pos;
+  }
+
+  template<typename ORG>
+  void World<ORG>::RemoveOrgAt(size_t pos) {
+
   }
 
   template<typename ORG>
