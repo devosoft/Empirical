@@ -17,9 +17,13 @@ int main()
   auto id2 = sys.AddOrg(id1, -10);
   auto id3 = sys.AddOrg(id1, 25);
   auto id4 = sys.AddOrg(id2, 25);
+  sys.RemoveOrg(id2);
 
   std::cout << "id1 = " << id1 << std::endl;
   std::cout << "id2 = " << id2 << std::endl;
   std::cout << "id3 = " << id3 << std::endl;
   std::cout << "id4 = " << id4 << std::endl;
+
+  std::cout << "\nLineage:\n";
+  sys.PrintLineage(id4);
 }
