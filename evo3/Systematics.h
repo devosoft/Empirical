@@ -69,14 +69,14 @@ namespace emp {
       --num_orgs;
 
       // If we are out of BOTH organisms and offspring, this TaxaGroup should deactivate.
-      if (num_orgs == 0) return num_offspring;
+      return num_orgs || num_offspring;
     }
     bool RemoveOffspring() {
       emp_assert(num_offspring > 0);
       --num_offspring;
 
       // If we are out of BOTH offspring and organisms, this TaxaGroup should deactivate.
-      if (num_offspring == 0) return num_orgs;
+      return num_orgs || num_offspring;
     }
   };
 
@@ -96,16 +96,21 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  //< A set of all dead taxa w/o descendants.
 
     void RemoveOffspring(Ptr<taxon_t> taxon) {
-      if (!taxon) return;                          // Not tracking this taxon.
-      bool p_active = taxon->RemoveOffspring();    // Cascade up
-      if (p_active == false) MarkOutside(taxon);   // If we're out of offspring, now outside.
+      if (!taxon) return;                                // Not tracking this taxon.
+      bool still_active = taxon->RemoveOffspring();      // Taxon still active w/ 1 fewer offspring?
+      if (still_active == false) {                       // If we're out of offspring, now outside.
+        RemoveOffspring( taxon->GetParent() );           // Cascade up to parent taxon.
+        if (store_ancestors) ancestor_taxa.erase(taxon); // Clear from ancestors set (if there)
+        if (store_outside) outside_taxa.insert(taxon);   // Add to outside set (if tracked)
+        else taxon.Delete();                             //  ...or else get rid of it.
+      }
     }
 
     // Mark a taxon extinct if there are no more living members.  There may be descendants.
     void MarkExtinct(Ptr<taxon_t> taxon) {
       emp_assert(taxon);
       emp_assert(taxon->GetNumOrgs() == 0);
-      if (store_active) active_taxa.remove(taxon);
+      if (store_active) active_taxa.erase(taxon);
       if (!archive) {   // If we don't archive taxa, delete them.
         taxon.Delete();
         return;
