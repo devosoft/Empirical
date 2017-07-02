@@ -115,6 +115,28 @@ namespace emp {
 
   template <typename ORG>
   using find_genotype_t = decltype( Org2Genotype<ORG>() );
+
+
+  namespace {
+    // Setup Org -> Genotype function
+    // 1. ToGenotype member function
+    // 2. Return org AS genotype.
+
+    template <typename WORLD, typename ORG>
+    void SetOrgToGenotype_impl(WORLD & world, bool_decoy<decltype( declval<ORG>().DoMutations(Random()) )>) {
+      world.SetToGenotypeFun( [](ORG & org) { return org.ToGenotype(); } );
+    }
+
+    template <typename WORLD, typename ORG>
+    void SetOrgToGenotype_impl(WORLD & world, ... ) {
+      world.SetToGenotypeFun( [](ORG & org){ return org; } );
+    }
+
+  }
+
+  template <typename WORLD, typename ORG>
+  void SetOrgToGenotype(WORLD & world) { SetOrgToGenotype_impl<WORLD, ORG>(world, true); }
+
 }
 
 #endif
