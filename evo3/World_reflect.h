@@ -109,7 +109,7 @@ namespace emp {
     template <typename ORG>
     // auto Org2Genotype( bool_decoy< typename ORG_T::genotype_t > ) -> typename ORG_T::genotype_t;
     auto Org2Genotype( bool_decoy< decltype( declval<ORG>().ToGenotype() ) >)
-      -> decltype( declval<ORG>().ToGenotype() );
+      -> std::decay_t< decltype( declval<ORG>().ToGenotype() ) >;
 
     template <typename ORG>
     ORG Org2Genotype( ... );
@@ -126,12 +126,12 @@ namespace emp {
 
     template <typename WORLD, typename ORG>
     void SetOrgToGenotype_impl(WORLD & world, bool_decoy<decltype( declval<ORG>().ToGenotype() )>) {
-      world.SetToGenotypeFun( [](ORG & org) -> auto & { return org.ToGenotype(); } );
+      world.SetToGenotypeFun( [](ORG & org) -> const auto & { return org.ToGenotype(); } );
     }
 
     template <typename WORLD, typename ORG>
     void SetOrgToGenotype_impl(WORLD & world, ... ) {
-      world.SetToGenotypeFun( [](ORG & org) -> ORG & { return org; } );
+      world.SetToGenotypeFun( [](ORG & org) -> const ORG & { return org; } );
     }
 
   }
