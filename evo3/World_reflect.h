@@ -124,12 +124,12 @@ namespace emp {
 
     template <typename WORLD, typename ORG>
     void SetOrgToGenotype_impl(WORLD & world, bool_decoy<decltype( declval<ORG>().DoMutations(Random()) )>) {
-      world.SetToGenotypeFun( [](ORG & org) { return org.ToGenotype(); } );
+      world.SetToGenotypeFun( [](ORG & org) -> auto & { return org.ToGenotype(); } );
     }
 
     template <typename WORLD, typename ORG>
     void SetOrgToGenotype_impl(WORLD & world, ... ) {
-      world.SetToGenotypeFun( [](ORG & org){ return org; } );
+      world.SetToGenotypeFun( [](ORG & org) -> auto & { return org; } );
     }
 
   }
