@@ -106,11 +106,13 @@ namespace emp {
 
   namespace {
     // Setup genotype identification
-    template <typename ORG_T>
-    auto Org2Genotype( bool_decoy< typename ORG_T::genotype_t > ) -> typename ORG_T::genotype_t;
+    template <typename ORG>
+    // auto Org2Genotype( bool_decoy< typename ORG_T::genotype_t > ) -> typename ORG_T::genotype_t;
+    auto Org2Genotype( bool_decoy< decltype( declval<ORG>().ToGenotype() ) >)
+      -> decltype( declval<ORG>().ToGenotype() );
 
-    template <typename ORG_T>
-    ORG_T Org2Genotype( ... );
+    template <typename ORG>
+    ORG Org2Genotype( ... );
   }
 
   template <typename ORG>
@@ -123,13 +125,13 @@ namespace emp {
     // 2. Return org AS genotype.
 
     template <typename WORLD, typename ORG>
-    void SetOrgToGenotype_impl(WORLD & world, bool_decoy<decltype( declval<ORG>().DoMutations(Random()) )>) {
+    void SetOrgToGenotype_impl(WORLD & world, bool_decoy<decltype( declval<ORG>().ToGenotype() )>) {
       world.SetToGenotypeFun( [](ORG & org) -> auto & { return org.ToGenotype(); } );
     }
 
     template <typename WORLD, typename ORG>
     void SetOrgToGenotype_impl(WORLD & world, ... ) {
-      world.SetToGenotypeFun( [](ORG & org) -> auto & { return org; } );
+      world.SetToGenotypeFun( [](ORG & org) -> ORG & { return org; } );
     }
 
   }
