@@ -526,7 +526,6 @@ namespace emp {
       return *this;
     }
 
-
     // Operator overloads...
     BitSet operator~() const { return NOT(); }
     BitSet operator&(const BitSet & ar2) const { return AND(ar2); }
@@ -556,12 +555,19 @@ namespace emp {
     out_bits |= in2.template Export<NUM_BITS1+NUM_BITS2>();
   }
 
+  template <size_t NUM_BITS>
+  double SimpleMatchCoeff(const BitSet<NUM_BITS> & in1, const BitSet<NUM_BITS> & in2) {
+    emp_assert(NUM_BITS > 0);
+    return (double)((in1 & in2).CountOnes() + (~in1 & ~in2).CountOnes()) / (double)NUM_BITS;
+  }
+
 }
 
 template <size_t NUM_BITS> std::ostream & operator<<(std::ostream & out, const emp::BitSet<NUM_BITS> & _bit_set) {
   _bit_set.Print(out);
   return out;
 }
+
 
 
 #endif

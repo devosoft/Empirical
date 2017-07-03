@@ -66,6 +66,7 @@ namespace emp {
     ScopeType GetScopeType(size_t id) const { return inst_lib[id].scope_type; }
     size_t GetScopeArg(size_t id) const { return inst_lib[id].scope_arg; }
     const inst_properties_t & GetProperties(size_t id) const { return inst_lib[id].properties; }
+    bool HasProperty(size_t id, std::string property) const { return inst_lib[id].properties.count(property); }
     size_t GetSize() const { return inst_lib.size(); }
 
     static constexpr char GetSymbol(size_t id) {

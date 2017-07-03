@@ -6,6 +6,7 @@
 #include "InstLib.h"
 #include "../tools/BitSet.h"
 #include "../tools/map_utils.h"
+#include "../tools/Random.h"
 #include "../base/vector.h"
 #include "../base/Ptr.h"
 #include "../base/array.h"
@@ -29,6 +30,7 @@
 // @amlalejini - TODO's:
 //  [ ] Go through and make convenient/obvious accessors for structs (Event, State, Block, etc.)
 //  [x] Switch from BitVector affinities -> BitSet affinities (affinity_t)
+//  [ ] Completely switch to using Ptr.h's .New()/.Delete()? Or, wait until Charles gets the new/delete operators working.
 
 namespace emp {
   class EventDrivenGP {
@@ -39,6 +41,7 @@ namespace emp {
     static constexpr size_t MAX_CORES = 64;         // Maximum number of parallel execution stacks that can be spawned.
     static constexpr size_t MAX_CALL_DEPTH = 128;   // Maximum depth of calls per execution stack.
     static constexpr double DEFAULT_MEM_VALUE = 0.0;
+    static constexpr double MIN_BIND_THRESH = 0.5;
 
     using mem_key_t = int;
     using mem_val_t = double;
@@ -92,6 +95,7 @@ namespace emp {
       size_t GetIP() const { return inst_ptr; }
       void SetIP(size_t ip) { inst_ptr = ip; }
       void SetFP(size_t fp) { func_ptr = fp; }
+      void AdvanceIP(size_t inc = 1) { inst_ptr += inc; }
       bool IsMain() const { return is_main; }
 
       memory_t & GetLocalMemory() { return local_mem; }
@@ -172,6 +176,7 @@ namespace emp {
       Function(const affinity_t & _aff=affinity_t()) : affinity(_aff), inst_seq() { ; }
 
       size_t GetSize() const { return inst_seq.size(); }
+
     };
 
     using program_t = emp::vector<Function>;
@@ -184,68 +189,33 @@ namespace emp {
     Ptr<emp::vector<Ptr<State>>> cur_core;
     std::queue<Event> event_queue;  // @amlalejini TODO - incorporate event queue into single process.
     size_t errors;
-
-
-    // - Execution -
-    /// Close current block in cur_state if there is one to close. If not, do nothing.
-    /// Handles closure of known, special block types appropriately:
-    ///   * LOOPS - set cur_state's IP to beginning of block.
-    void CloseBlock() {
-      emp_assert(GetCurState());  // Can't have no nullptrs 'round here.
-      Ptr<State> cur_state = GetCurState();
-      // If there aren't any blocks to close, just return.
-      if (cur_state->block_stack.empty()) return;
-      Block & block = cur_state->block_stack.back();
-      // Any special circumstances (e.g. looping) go below:
-      switch (block.type) {
-        case BlockType::LOOP:
-          // Move IP to beginning of block.
-          cur_state->inst_ptr = block.begin;
-          break;
-        default:
-          break;
-      }
-      // Pop the block.
-      cur_state->block_stack.pop_back();
-    }
-
-    /// Return from current function call (cur_state) in current core (cur_core).
-    /// Upon returning, put values in output memory of returning state into local memory of caller state.
-    void ReturnFunction() {
-      emp_assert(GetCurState());
-      // Grab the returning state and then pop it off the call stack.
-      Ptr<State> returning_state = GetCurState();
-      GetCurExecStack()->pop_back();
-      // Is there anything to return to?
-      if (Ptr<State> caller_state = GetCurState()) {
-        // If so, copy returning state's output memory into caller state's local memory.
-        for (auto mem : returning_state->output_mem) {
-          caller_state->local_mem[mem.first] = mem.second;
-        }
-      }
-    }
+    Ptr<Random> random_ptr;
+    bool random_owner;
 
   public:
     // Constructors
-    EventDrivenGP(Ptr<inst_lib_t> _ilib)
-      : inst_lib(_ilib), shared_mem_ptr(new memory_t()), program(), execution_stacks(),
-        cur_core(nullptr), event_queue(), errors(0)
+    EventDrivenGP(Ptr<inst_lib_t> _ilib, Ptr<Random> rnd=nullptr)
+      : inst_lib(_ilib), shared_mem_ptr(), program(), execution_stacks(),
+        cur_core(nullptr), event_queue(), errors(0), random_ptr(rnd), random_owner(false)
     {
+      if (!rnd) NewRandom();
+      shared_mem_ptr.New();
       // Spin up main core.
       execution_stacks.emplace_back(new emp::vector<Ptr<State>>());
       cur_core = execution_stacks[0];
       // Initialize/push main program state onto main execution core call stack.
       cur_core->emplace_back(new State(shared_mem_ptr, true));
     }
-    EventDrivenGP(inst_lib_t & _ilib) : EventDrivenGP(&_ilib) { ; }
-    EventDrivenGP() : EventDrivenGP(DefaultInstLib()) { ; }
+    EventDrivenGP(inst_lib_t & _ilib, Ptr<Random> rnd=nullptr) : EventDrivenGP(&_ilib, rnd) { ; }
+    EventDrivenGP(Ptr<Random> rnd=nullptr) : EventDrivenGP(DefaultInstLib(), rnd) { ; }
     EventDrivenGP(const EventDrivenGP &) = default;
     EventDrivenGP(EventDrivenGP &&) = default;
 
     /// Destructor - clean up: execution stacks, shared memory.
     ~EventDrivenGP() {
       Reset();
-      delete shared_mem_ptr;
+      if (random_owner) random_ptr.Delete();
+      shared_mem_ptr.Delete();
     }
 
     // -- Control --
@@ -287,6 +257,8 @@ namespace emp {
     }
     bool ValidPosition(size_t fID, size_t pos) const { return fID < program.size() && pos < program[fID].GetSize(); }
     bool ValidFunction(size_t fID) const { return fID < program.size(); }
+    double GetMinBindThresh() const { return MIN_BIND_THRESH; }
+
     // -- Configuration --
     // @amlalejini - TODO: add affinity to SetInst
     void SetInst(size_t fID, size_t pos, const inst_t & inst) {
@@ -307,12 +279,13 @@ namespace emp {
     /// program and push to that. If no function pointer is provided and functions exist, push to
     /// last function in program. If function pointer is provided, push to that function.
     void PushInst(size_t id, arg_t a0=0, arg_t a1=0, arg_t a2=0,
-                  const affinity_t & aff=affinity_t(), int fp=-1)
+                  const affinity_t & aff=affinity_t(), int fID=-1)
     {
-      emp_assert((fp == -1) || (fp >= 0 && ValidFunction((size_t)fp)));
-      if (fp == -1 && !program.size()) { program.emplace_back(); fp = 0; }
-      else if (fp == -1) fp = (int)program.size() - 1;
-      program[(size_t)fp].inst_seq.emplace_back(id, a0, a1, a2, aff);
+      size_t fp;
+      if (fID == -1 && !program.size()) { program.emplace_back(); fp = 0; }
+      else if (fID == -1 || (fID < 0 && fID >= (int)program.size())) { fp = program.size() - 1; }
+      else fp = (size_t)fID;
+      program[fp].inst_seq.emplace_back(id, a0, a1, a2, aff);
     }
 
     /// Push new instruction to program.
@@ -320,28 +293,156 @@ namespace emp {
     /// program and push to that. If no function pointer is provided and functions exist, push to
     /// last function in program. If function pointer is provided, push to that function.
     void PushInst(const std::string & name, arg_t a0=0, arg_t a1=0, arg_t a2=0,
-                  const affinity_t & aff=affinity_t(), int fp=-1)
+                  const affinity_t & aff=affinity_t(), int fID=-1)
     {
-      emp_assert((fp == -1) || (fp >= 0 && ValidFunction((size_t)fp)));
+      size_t fp;
       size_t id = inst_lib->GetID(name);
-      if (fp == -1 && !program.size()) { program.emplace_back(); fp = 0; }
-      else if (fp == -1) fp = (int)program.size() - 1;
-      program[(size_t)fp].inst_seq.emplace_back(id, a0, a1, a2, aff);
+      if (fID == -1 && !program.size()) { program.emplace_back(); fp = 0; }
+      else if (fID == -1 || (fID < 0 && fID >= (int)program.size())) { fp = program.size() - 1; }
+      else fp = (size_t)fID;
+      program[fp].inst_seq.emplace_back(id, a0, a1, a2, aff);
     }
 
     /// Push new instruction to program.
     /// If no function pointer is provided and no functions exist yet, add new function to
     /// program and push to that. If no function pointer is provided and functions exist, push to
     /// last function in program. If function pointer is provided, push to that function.
-    void PushInst(const inst_t & inst, int fp=-1) {
-      emp_assert((fp == -1) || (fp >= 0 && ValidFunction((size_t)fp)));
-      if (fp == -1 && !program.size()) { program.emplace_back(); fp = 0; }
-      else if (fp == -1) fp = (int)program.size() - 1;
-      program[(size_t)fp].inst_seq.emplace_back(inst);
+    void PushInst(const inst_t & inst, int fID=-1) {
+      size_t fp;
+      if (fID == -1 && !program.size()) { program.emplace_back(); fp = 0; }
+      else if (fID == -1 || (fID < 0 && fID >= (int)program.size())) { fp = program.size() - 1; }
+      else fp = (size_t)fID;
+      program[fp].inst_seq.emplace_back(inst);
     }
 
     /// Load entire genome from input stream.
     bool Load(std::istream & input) { ; } // TODO
+
+    void NewRandom(int seed=-1) {
+      if (random_owner) random_ptr.Delete();
+      random_ptr.New(seed);
+      random_owner = true;
+    }
+    // -- Utilities --
+    /// Given valid function pointer and instruction pointer, find next end of block (at current block level).
+    /// This is not guaranteed to return a valid IP. At worst, it'll return an IP == function.inst_seq.size().
+    size_t FindEndOfBlock(size_t fp, size_t ip) {
+      emp_assert(ValidPosition(fp, ip));
+      int depth_counter = 1;
+      while (true) {
+        if (!ValidPosition(fp, ip)) break;
+        const inst_t inst = GetInst(fp, ip);
+        if (inst_lib->HasProperty(inst.id, "block_def")) {
+          ++depth_counter;
+        } else if (inst_lib->HasProperty(inst.id, "block_close")) {
+          --depth_counter;
+          // If depth is ever 0 after subtracting, we've found the close for initial block.
+          if (depth_counter == 0) break;
+        }
+        ++ip;
+      }
+      return ip;
+    }
+
+    /// Close current block in cur_state if there is one to close. If not, do nothing.
+    /// Handles closure of known, special block types appropriately:
+    ///   * LOOPS - set cur_state's IP to beginning of block.
+    void CloseBlock() {
+      emp_assert(GetCurState());  // Can't have no nullptrs 'round here.
+      State & state = *GetCurState();
+      // If there aren't any blocks to close, just return.
+      if (state.block_stack.empty()) return;
+      Block & block = state.block_stack.back();
+      // Any special circumstances (e.g. looping) go below:
+      switch (block.type) {
+        case BlockType::LOOP:
+          // Move IP to beginning of block.
+          state.SetIP(block.begin);
+          break;
+        default:
+          break;
+      }
+      // Pop the block.
+      state.block_stack.pop_back();
+    }
+
+    void OpenBlock(size_t begin, size_t end, BlockType type) {
+      emp_assert(GetCurState());
+      State & state = *GetCurState();
+      state.block_stack.emplace_back(begin, end, type);
+    }
+
+    /// If there's a block to break out of, break out (to eob).
+    /// Otherwise, do nothing.
+    void BreakBlock() {
+      emp_assert(GetCurState());
+      State & state = *GetCurState();
+      if (!state.block_stack.empty()) {
+        state.SetIP(state.block_stack.back().end);
+        state.block_stack.pop_back();
+        if (ValidPosition(state.GetFP(), state.GetIP())) state.AdvanceIP();
+      }
+    }
+
+    /// Call function with best affinity match above threshold.
+    /// If not candidate functions found, do nothing.
+    void CallFunction(affinity_t affinity, double threshold) {
+      emp_assert(GetCurState());
+      // @amlalejini - TODO: memoize this function.
+      size_t fID;
+      double max_bind = -1;
+      emp::vector<size_t> best_matches;
+      for (size_t i=0; i < program.size(); i++) {
+        double bind = SimpleMatchCoeff(program[i].affinity, affinity);
+        if (bind == max_bind) best_matches.push_back(i);
+        else if (bind > max_bind && bind >= threshold) {
+          best_matches.resize(0);
+          best_matches.push_back(i);
+          max_bind = bind;
+        }
+      }
+      if (best_matches.empty()) return;
+      if (best_matches.size() == 1.0) fID = best_matches[0];
+      else fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
+      CallFunction(fID);
+    }
+
+    /// Call function specified by fID.
+    void CallFunction(size_t fID) {
+      emp_assert(GetCurState() && ValidPosition(fID, 0));
+      // Are we at max call depth? -- If so, call fails.
+      if (GetCurExecStack()->size() >= MAX_CALL_DEPTH) return;
+      // Grab pointer to caller.
+      Ptr<State> caller_state = GetCurState();
+      // Make a new state, push onto call stack.
+      GetCurExecStack()->emplace_back(new State(shared_mem_ptr));
+      Ptr<State> new_state = GetCurState();
+      // Configure new state.
+      new_state->SetFP(fID);
+      new_state->SetIP(0);
+      for (auto mem : caller_state->local_mem) {
+        new_state->SetInput(mem.first, mem.second);
+      }
+    }
+
+    /// Return from current function call (cur_state) in current core (cur_core).
+    /// Upon returning, put values in output memory of returning state into local memory of caller state.
+    void ReturnFunction() {
+      emp_assert(GetCurState());
+      // Grab the returning state and then pop it off the call stack.
+      Ptr<State> returning_state = GetCurState();
+      // No returning from main.
+      if (returning_state->IsMain()) return;
+      GetCurExecStack()->pop_back();
+      // Is there anything to return to?
+      if (Ptr<State> caller_state = GetCurState()) {
+        // If so, copy returning state's output memory into caller state's local memory.
+        for (auto mem : returning_state->output_mem) {
+          caller_state->SetLocal(mem.first, mem.second);
+        }
+      }
+      delete returning_state;
+    }
 
     // -- Execution --
     /// Process a single instruction, provided by the caller.
@@ -393,6 +494,7 @@ namespace emp {
           execution_stacks[core_idx - adjust] = nullptr;
           adjust += 1;
         }
+        ++core_idx;
       }
       // Update execution stack size to be accurate.
       execution_stacks.resize(core_cnt - adjust);
@@ -404,6 +506,9 @@ namespace emp {
     /// Print out a single instruction with its arguments.
     void PrintInst(const inst_t & inst, std::ostream & os=std::cout) {
       os << inst_lib->GetName(inst.id);
+      if (inst_lib->HasProperty(inst.id, "affinity")) {
+        os << ' '; inst.affinity.Print(os);
+      }
       const size_t num_args = inst_lib->GetNumArgs(inst.id);
       for (size_t i = 0; i < num_args; i++) {
         os << ' ' << inst.args[i];
@@ -424,22 +529,19 @@ namespace emp {
           for (int s = 0; s < num_spaces; s++) os << ' ';
           PrintInst(inst, os);
           os << '\n';
-          //if ()
-          // TODO: increase depth on instructions that define a new code block.
-          // if (inst_lib->IsBlockDef(inst.id)) {
-          //   // is block def?
-          //   depth++;
-          // } else if (inst_lib->GetName(inst.id) == "Close" && depth > 0) { // TODO: make block close determination better.
-          //   // is block close?
-          //   depth--;
-          // }
+          if (inst_lib->HasProperty(inst.id, "block_def")) {
+            // is block def?
+            depth++;
+          } else if (inst_lib->HasProperty(inst.id, "block_close") && depth > 0) {
+            // is block close?
+            depth--;
+          }
         }
         os << '\n';
       }
     }
 
     /// Print out current state (full) of virtual hardware.
-    // @amlalejini - TODO: print instruction affinity if instruciton has an affinity.
     void PrintState(std::ostream & os=std::cout) {
       // Print format:
       //  Shared memory: [Key:value, ....]
@@ -454,11 +556,13 @@ namespace emp {
       // Print shared memory
       os << "Shared memory: ";
       for (auto mem : *shared_mem_ptr) os << '{' << mem.first << ':' << mem.second << '}'; os << '\n';
+      os << "Errors: " << errors << "\n";
       // Print each core.
-      for (size_t i = 0; i < execution_stacks.size(); i++) {
+      for (size_t i = 0; i < execution_stacks.size(); ++i) {
         const emp::vector<Ptr<State>> & stack = *(execution_stacks[i]);
         os << "Core " << i << ":\n" << "  Call stack (" << stack.size() << "):\n    --TOP--\n";
-        for (size_t k = 0; k < stack.size(); k++) {
+        for (size_t k = stack.size() - 1; k < stack.size(); --k) {
+          emp_assert(stack.size() != (size_t)-1);
           // IP, FP, local mem, input mem, output mem
           const State & state = *(stack[k]);
           os << "    Inst ptr: " << state.inst_ptr << " (";
@@ -494,17 +598,17 @@ namespace emp {
     //    [x] Mult
     //    [x] Div
     //    [x] Mod
-    //    [ ] TestEqu
-    //    [ ] TestNEqu
-    //    [ ] TestLess
+    //    [x] TestEqu
+    //    [x] TestNEqu
+    //    [x] TestLess
     //  Flow control:
-    //    [ ] If
-    //    [ ] While
-    //    [ ] Countdown
-    //    [ ] Break
-    //    [ ] Close
-    //    [ ] Call
-    //    [ ] Return
+    //    [x] If
+    //    [x] While
+    //    [x] Countdown
+    //    [x] Break
+    //    [x] Close
+    //    [x] Call
+    //    [x] Return
     //  Register Manipulation:
     //    [ ] SetMem
     //    [ ] CopyMem
@@ -560,16 +664,82 @@ namespace emp {
       else state.SetLocal(inst.args[2], (int)state.AccessLocal(inst.args[0]) % base);
     }
 
-    static void Inst_TestEqu(EventDrivenGP & hw, const inst_t & inst) { ; }
-    static void Inst_TestNEqu(EventDrivenGP & hw, const inst_t & inst) { ; }
-    static void Inst_TestLess(EventDrivenGP & hw, const inst_t & inst) { ; }
-    static void Inst_If(EventDrivenGP & hw, const inst_t & inst) { ; }
-    static void Inst_While(EventDrivenGP & hw, const inst_t & inst) { ; }
-    static void Inst_Countdown(EventDrivenGP & hw, const inst_t & inst) { ; }
-    static void Inst_Break(EventDrivenGP & hw, const inst_t & inst) { ; }
-    static void Inst_Close(EventDrivenGP & hw, const inst_t & inst) { ; }
-    static void Inst_Call(EventDrivenGP & hw, const inst_t & inst) { ; }
-    static void Inst_Return(EventDrivenGP & hw, const inst_t & inst) { ; }
+    static void Inst_TestEqu(EventDrivenGP & hw, const inst_t & inst) {
+      State & state = *hw.GetCurState();
+      state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) == state.AccessLocal(inst.args[1]));
+    }
+
+    static void Inst_TestNEqu(EventDrivenGP & hw, const inst_t & inst) {
+      State & state = *hw.GetCurState();
+      state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) != state.AccessLocal(inst.args[1]));
+    }
+
+    static void Inst_TestLess(EventDrivenGP & hw, const inst_t & inst) {
+      State & state = *hw.GetCurState();
+      state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) < state.AccessLocal(inst.args[1]));
+    }
+
+    static void Inst_If(EventDrivenGP & hw, const inst_t & inst) {
+      State & state = *hw.GetCurState();
+      // Find EOBLK.
+      size_t eob = hw.FindEndOfBlock(state.GetFP(), state.GetIP());
+      if (state.AccessLocal(inst.args[0]) == 0.0) {
+        // Skip to EOBLK.
+        state.SetIP(eob);
+        // Advance past the block close if not at eofun.
+        if (hw.ValidPosition(state.GetFP(), eob)) state.AdvanceIP();
+      } else {
+        // Open BLK
+        hw.OpenBlock(state.GetIP() - 1, eob, BlockType::BASIC);
+      }
+    }
+
+    static void Inst_While(EventDrivenGP & hw, const inst_t & inst) {
+      State & state = *hw.GetCurState();
+      size_t eob = hw.FindEndOfBlock(state.GetFP(), state.GetIP());
+      if (state.AccessLocal(inst.args[0]) == 0.0) {
+        // Skip to EOBLK.
+        state.SetIP(eob);
+        // Advance past the block close if not at eofun.
+        if (hw.ValidPosition(state.GetFP(), eob)) state.AdvanceIP();
+      } else {
+        // Open blk.
+        hw.OpenBlock(state.GetIP() - 1, eob, BlockType::LOOP);
+      }
+    }
+
+    static void Inst_Countdown(EventDrivenGP & hw, const inst_t & inst) {
+      State & state = *hw.GetCurState();
+      size_t eob = hw.FindEndOfBlock(state.GetFP(), state.GetIP());
+      if (state.AccessLocal(inst.args[0]) == 0.0) {
+        // Skip to EOBLK.
+        state.SetIP(eob);
+        // Advance past the block close if not at eofun.
+        if (hw.ValidPosition(state.GetFP(), eob)) state.AdvanceIP();
+      } else {
+        // Decrement Arg1
+        --state.AccessLocal(inst.args[0]);
+        // Open blk.
+        hw.OpenBlock(state.GetIP() - 1, eob, BlockType::LOOP);
+      }
+    }
+
+    static void Inst_Break(EventDrivenGP & hw, const inst_t & inst) {
+      hw.BreakBlock();
+    }
+
+    static void Inst_Close(EventDrivenGP & hw, const inst_t & inst) {
+      hw.CloseBlock();
+    }
+
+    static void Inst_Call(EventDrivenGP & hw, const inst_t & inst) {
+      hw.CallFunction(inst.affinity, hw.GetMinBindThresh());
+    }
+
+    static void Inst_Return(EventDrivenGP & hw, const inst_t & inst) {
+      hw.ReturnFunction();
+    }
+
     static void Inst_SetMem(EventDrivenGP & hw, const inst_t & inst) { ; }
     static void Inst_CopyMem(EventDrivenGP & hw, const inst_t & inst) { ; }
     static void Inst_SwapMem(EventDrivenGP & hw, const inst_t & inst) { ; }
@@ -591,6 +761,17 @@ namespace emp {
         inst_lib.AddInst("Mult", Inst_Mult, 3, "Local memory: Arg3 = Arg1 * Arg2");
         inst_lib.AddInst("Div", Inst_Div, 3, "Local memory: Arg3 = Arg1 / Arg2");
         inst_lib.AddInst("Mod", Inst_Mod, 3, "Local memory: Arg3 = Arg1 % Arg2");
+        inst_lib.AddInst("TestEqu", Inst_TestEqu, 3, "Local memory: Arg3 = (Arg1 == Arg2)");
+        inst_lib.AddInst("TestNEqu", Inst_TestNEqu, 3, "Local memory: Arg3 = (Arg1 != Arg2)");
+        inst_lib.AddInst("TestLess", Inst_TestLess, 3, "Local memory: Arg3 = (Arg1 < Arg2)");
+        inst_lib.AddInst("If", Inst_If, 1, "Local memory: If Arg1 != 0, proceed; else, skip block.", ScopeType::BASIC, 0, {"block_def"});
+        inst_lib.AddInst("While", Inst_While, 1, "Local memory: If Arg1 != 0, loop; else, skip block.", ScopeType::BASIC, 0, {"block_def"});
+        inst_lib.AddInst("Countdown", Inst_Countdown, 1, "Local memory: Countdown Arg1 to zero.", ScopeType::BASIC, 0, {"block_def"});
+        inst_lib.AddInst("Close", Inst_Close, 0, "Close current block if there is a block to close.", ScopeType::BASIC, 0, {"block_close"});
+        inst_lib.AddInst("Break", Inst_Break, 0, "Break out of current block.");
+        inst_lib.AddInst("Call", Inst_Call, 0, "Call function that best matches call affinity.", ScopeType::BASIC, 0, {"affinity"});
+        inst_lib.AddInst("Return", Inst_Return, 0, "Return from current function if possible.");
+        inst_lib.AddInst("Nop", Inst_Nop, 0, "No operation.");
       }
 
       return &inst_lib;
