@@ -42,22 +42,36 @@ int main()
   cpu.PushInst("TestNEqu", 2, 0, 1);
   cpu.PushInst("Scope", 0);
 
-  // Find one of your own pieces, put pos in reg 5
+  // Check each spot on board for valid move 9
   cpu.PushInst("SetReg", 0, 64);
   cpu.PushInst("SetReg", 2, 0);
   cpu.PushInst("SetReg", 1, 1);
-  cpu.PushInst("While", 1, 1 );
-  cpu.PushInst("GetMem", 0, 2, 3);
   cpu.PushInst("SetReg", 4, 0);
-  cpu.PushInst("TestEqu", 3, 1, 4);
-  cpu.PushInst("If", 4, 2);
-  cpu.PushInst("CopyVal", 2, 5);
-  cpu.PushInst("SetReg", 1, 0);
+  cpu.PushInst("While", 1, 1 ); // START WHILE 1
+  cpu.PushInst("GetMem", 0, 2, 3);
+  // Check if space is empty
+  cpu.PushInst("TestNEqu", 3, 4, 5);
+  cpu.PushInst("If", 5, 2);
+  cpu.PushInst("Inc", 2);
   cpu.PushInst("Break", 0);
-  cpu.PushInst("Scope", 2);
+  cpu.PushInst("Scope", 2); //TODO Fix scopes
+  // Check if there is a valid move above current position
+  cpu.PushInst("SetReg", 6, 0);
+  cpu.PushInst("SetReg", 7, 0);
+  cpu.PushInst("Dec", 7);
+  cpu.PushInst("SetReg", 8, 8);
+  cpu.PushInst("Sub", 2, 8, 9);
+  cpu.PushInst("TestLess", 9, 4, 10);
+  cpu.PushInst("Not", 10);
+  cpu.PushInst("While", 10, 2); // START WHILE 2
+  cpu.PushInst("Sub", 9, 8, 9);
+  cpu.PushInst("TestLess", 9, 4, 10);
+  cpu.PushInst("Not", 10);
+  cpu.PushInst("Scope", 2); // END WHILE 2
+
   cpu.PushInst("Inc", 2);
   cpu.PushInst("TestNEqu", 2, 0, 1);
-  cpu.PushInst("Scope", 0);
+  cpu.PushInst("Scope", 0); // END WHILE 1
 
 
   /*for (size_t i = 0; i < 100; i++) {
