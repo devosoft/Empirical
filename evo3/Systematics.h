@@ -69,7 +69,7 @@ namespace emp {
       --num_orgs;
 
       // If we are out of BOTH organisms and offspring, this TaxaGroup should deactivate.
-      return num_orgs || num_offspring;
+      return num_orgs;
     }
     bool RemoveOffspring() {
       emp_assert(num_offspring > 0);
@@ -168,6 +168,9 @@ namespace emp {
       if (store_active) active_taxa.insert(cur_taxon);
       if (parent) parent->AddOffspring();
       cur_taxon->AddOrg();
+
+std::cout << "Inject Org!  "; PrintStatus();
+
       return cur_taxon;
     }
 
@@ -177,9 +180,11 @@ namespace emp {
       emp_assert( Has(active_taxa, parent) );
       if (parent->GetInfo() == info) {   // Adding another org of this taxon.
         parent->AddOrg();
+std::cout << "Birth Org added TO parent!  "; PrintStatus();
         return parent;
       }
       // Otherwise, this is a new taxon!  If archiving, track the parent.
+std::cout << "Birth Org on its own!  "; PrintStatus();
       return InjectOrg(info, parent);
     }
 
@@ -189,6 +194,7 @@ namespace emp {
       emp_assert(Has(active_taxa, taxon));
       const bool active = taxon->RemoveOrg();
       if (!active) MarkExtinct(taxon);
+std::cout << "Remove Org!  "; PrintStatus();
       return active;
     }
 
