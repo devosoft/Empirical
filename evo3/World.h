@@ -44,7 +44,6 @@ namespace emp {
   class World {
   private:
     using this_t = World<ORG>;
-//    using genome_t = ORG;          // @CAO: Genome and Organism should be able to be different!
     using genotype_t = typename emp::find_genotype_t<ORG>;
 
     friend class World_iterator<this_t>;
@@ -164,6 +163,7 @@ namespace emp {
     void SetFitFun(const fun_calc_fitness_t & fit_fun) { fun_calc_fitness = fit_fun; }
     void SetMutFun(const fun_do_mutations_t & mut_fun) { fun_do_mutations = mut_fun; }
     void SetPrintFun(const fun_print_org_t & print_fun) { fun_print_org = print_fun; }
+    void SetToGenotypeFun(const fun_to_genotype_t & gen_fun) { fun_to_genotype = gen_fun; }
 
 
     // --- MANAGE ATTRIBUTES ---
