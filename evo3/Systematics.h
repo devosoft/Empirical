@@ -206,6 +206,14 @@ namespace emp {
         taxon = taxon->GetParent();
       }
     }
+
+    // Print details about the Systematics manager.
+    void PrintStatus(std::ostream & os=std::cout) {
+      os << "Systematics Status:\n";
+      os << "Active count:   " << active_taxa.size() << std::endl;
+      os << "Ancestor count: " << ancestor_taxa.size() << std::endl;
+      os << "Outside count:  " << outside_taxa.size() << std::endl;
+    }
   };
 
 }
