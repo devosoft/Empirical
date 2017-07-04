@@ -15,11 +15,12 @@ int main() {
   cpu.PrintState();
   std::cout << "-- Print empty program. --" << std::endl;
   cpu.PrintProgram(); std::cout << std::endl;
-
+  /*
   emp::EventDrivenGP::Function fun0;
   fun0.affinity.Randomize(*random, 0.5);
   cpu.PushFunction(fun0);
   cpu.PushInst("Nop");
+  cpu.PushInst("Return");
   cpu.PushInst("Nop");
   cpu.PushInst("Call", 0, 0, 0, emp::BitSet<4>(*random, 0.5));
   cpu.PushInst("Nop");
@@ -48,9 +49,17 @@ int main() {
   cpu.PushFunction(fun3);
   cpu.PushInst("Nop");
   cpu.PushInst("Nop");
+  cpu.PushInst("Return");
   cpu.PushInst("Nop");
   cpu.PushInst("Nop");
   cpu.PushInst("Nop");
+  */
+
+
+  cpu.PushInst("SetMem", 1, 99);
+  cpu.PushInst("CopyMem", 1, 2);
+  cpu.PushInst("Inc", 2);
+  cpu.PushInst("SwapMem", 1, 2);
 
   std::cout << "-- Print simple program. --" << std::endl;
   cpu.PrintProgram(); std::cout << std::endl;

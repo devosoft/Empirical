@@ -1,6 +1,7 @@
 #ifndef EMP_EVENT_DRIVEN_GP_H
 #define EMP_EVENT_DRIVEN_GP_H
 
+#include <functional>
 #include <unordered_map>
 #include <queue>
 #include "InstLib.h"
@@ -10,6 +11,8 @@
 #include "../base/vector.h"
 #include "../base/Ptr.h"
 #include "../base/array.h"
+#include "../control/SignalControl.h"
+#include "../control/Signal.h"
 
 // EventDrivenGP -- Event handling, core management, interprets instruction sequences.
 //  * CPU responsibilities
@@ -51,6 +54,8 @@ namespace emp {
     using affinity_t = BitSet<AFFINITY_WIDTH>;
 
     enum class EventType { NONE=0, MSG, SIGNAL };
+    // @amlalejini Design question: Should I change types to std::string's?
+    //  - Argument for: super flexible. Just add an instruction that broadcasts that type of event without needing to edit this file.
     struct Event {
       memory_t msg;
       EventType type;
@@ -180,6 +185,7 @@ namespace emp {
     };
 
     using program_t = emp::vector<Function>;
+    using fun_event_handler_t = std::function<void(EventDrivenGP &, const Event &)>;
 
   protected:
     Ptr<inst_lib_t> inst_lib;      // Instruction library.
@@ -192,11 +198,23 @@ namespace emp {
     Ptr<Random> random_ptr;
     bool random_owner;
 
+    // emp::Signals
+    // SignalControl sig_control;
+    //  - Signals for Outgoing interactions.
+    Signal<void(EventDrivenGP &, const Event &)> on_event_broadcast_sig;
+    Signal<void(EventDrivenGP &, const Event &)> on_event_send_sig;
+
+    // Configurable functions.
+    //  - Functions for handling events.
+    fun_event_handler_t default_signal_event_handler;
+    fun_event_handler_t default_msg_event_handler;
+
   public:
     // Constructors
     EventDrivenGP(Ptr<inst_lib_t> _ilib, Ptr<Random> rnd=nullptr)
       : inst_lib(_ilib), shared_mem_ptr(), program(), execution_stacks(),
-        cur_core(nullptr), event_queue(), errors(0), random_ptr(rnd), random_owner(false)
+        cur_core(nullptr), event_queue(), errors(0), random_ptr(rnd), random_owner(false),
+        on_event_broadcast_sig("on-event-broadcast"), on_event_send_sig("on-event-send")
     {
       if (!rnd) NewRandom();
       shared_mem_ptr.New();
@@ -208,8 +226,25 @@ namespace emp {
     }
     EventDrivenGP(inst_lib_t & _ilib, Ptr<Random> rnd=nullptr) : EventDrivenGP(&_ilib, rnd) { ; }
     EventDrivenGP(Ptr<Random> rnd=nullptr) : EventDrivenGP(DefaultInstLib(), rnd) { ; }
-    EventDrivenGP(const EventDrivenGP &) = default;
-    EventDrivenGP(EventDrivenGP &&) = default;
+    // EventDrivenGP(const EventDrivenGP &) = default;
+    // EventDrivenGP(EventDrivenGP &&) = default; // @amlalejini - TODO: implement move constructor.
+    EventDrivenGP(const EventDrivenGP & in)
+      : inst_lib(in.inst_lib), shared_mem_ptr(), program(in.program),
+        execution_stacks(), cur_core(nullptr), event_queue(), errors(0), random_ptr(nullptr),
+        random_owner(false), on_event_broadcast_sig("on-event-broadcast"), on_event_send_sig("on-event-send")
+    {
+      if (in.random_owner) NewRandom(); // New random number generator.
+      else random_ptr = in.random_ptr;
+      shared_mem_ptr.New(); // New shared memory.
+      // Spin up main core.
+      execution_stacks.emplace_back(new emp::vector<Ptr<State>>());
+      cur_core = execution_stacks[0];
+      // Initialize/push main program state onto main execution core call stack.
+      Ptr<State> state = new State(shared_mem_ptr, true);
+      state->SetIP(0);  // Main will start at first instruction of first function (designated as main function).
+      state->SetFP(0);
+      cur_core->push_back(state);
+    }
 
     /// Destructor - clean up: execution stacks, shared memory.
     ~EventDrivenGP() {
@@ -260,7 +295,6 @@ namespace emp {
     double GetMinBindThresh() const { return MIN_BIND_THRESH; }
 
     // -- Configuration --
-    // @amlalejini - TODO: add affinity to SetInst
     void SetInst(size_t fID, size_t pos, const inst_t & inst) {
       emp_assert(ValidPosition(fID, pos));
       program[fID].inst_seq[pos] = inst;
@@ -323,6 +357,17 @@ namespace emp {
       random_ptr.New(seed);
       random_owner = true;
     }
+
+    /// Register OnEventBroadcast function.
+    SignalKey OnEventBroadcast(const std::function<void(EventDrivenGP &, const Event &)> & fun) {
+      return on_event_broadcast_sig.AddAction(fun);
+    }
+
+    /// Register OnEventSend function.
+    SignalKey OnEventSend(const std::function<void(EventDrivenGP &, const Event &)> & fun) {
+      return on_event_send_sig.AddAction(fun);
+    }
+
     // -- Utilities --
     /// Given valid function pointer and instruction pointer, find next end of block (at current block level).
     /// This is not guaranteed to return a valid IP. At worst, it'll return an IP == function.inst_seq.size().
@@ -583,6 +628,11 @@ namespace emp {
       }
     }
 
+    // -- Event handlers --
+    // @amlalejini - TODO: the below functions.
+    static void OnMessageEvent(EventDrivenGP & hw, const Event & event) { ; } // hw: event recipient
+    static void OnSignalEvent(EventDrivenGP & hw, const Event & event) { ; }  // hw: event recipient
+
     // -- Default Instructions --
     // For all instructions: because memory is implemented as unordered_maps, instructions should
     //  gracefully handle the case where a particular memory position has yet to be used (doesn't
@@ -610,15 +660,18 @@ namespace emp {
     //    [x] Call
     //    [x] Return
     //  Register Manipulation:
-    //    [ ] SetMem
-    //    [ ] CopyMem
-    //    [ ] SwapMem
-    //    [ ] Input  (Input mem => Local mem)
-    //    [ ] Output (Local mem => Output mem)
-    //    [ ] Commit (Local mem => Shared mem)
-    //    [ ] Pull   (Shared mem => local mem)
+    //    [x] SetMem
+    //    [x] CopyMem
+    //    [x] SwapMem
+    //    [x] Input  (Input mem => Local mem)
+    //    [x] Output (Local mem => Output mem)
+    //    [x] Commit (Local mem => Shared mem)
+    //    [x] Pull   (Shared mem => local mem)
     //  Misc.
-    //    [ ] Nop
+    //    [x] Nop
+    //  Interaction
+    //    [ ] Broadcast
+    //    [ ] Send
 
     static void Inst_Inc(EventDrivenGP & hw, const inst_t & inst) {
       State & state = *hw.GetCurState();
@@ -740,13 +793,43 @@ namespace emp {
       hw.ReturnFunction();
     }
 
-    static void Inst_SetMem(EventDrivenGP & hw, const inst_t & inst) { ; }
-    static void Inst_CopyMem(EventDrivenGP & hw, const inst_t & inst) { ; }
-    static void Inst_SwapMem(EventDrivenGP & hw, const inst_t & inst) { ; }
-    static void Inst_Input(EventDrivenGP & hw, const inst_t & inst) { ; }
-    static void Inst_Output(EventDrivenGP & hw, const inst_t & inst) { ; }
-    static void Inst_Commit(EventDrivenGP & hw, const inst_t & inst) { ; }
-    static void Inst_Pull(EventDrivenGP & hw, const inst_t & inst) { ; }
+    static void Inst_SetMem(EventDrivenGP & hw, const inst_t & inst) {
+      State & state = *hw.GetCurState();
+      state.SetLocal(inst.args[0], (double)inst.args[1]);
+    }
+
+    static void Inst_CopyMem(EventDrivenGP & hw, const inst_t & inst) {
+      State & state = *hw.GetCurState();
+      state.SetLocal(inst.args[1], state.AccessLocal(inst.args[0]));
+    }
+
+    static void Inst_SwapMem(EventDrivenGP & hw, const inst_t & inst) {
+      State & state = *hw.GetCurState();
+      double val0 = state.AccessLocal(inst.args[0]);
+      state.SetLocal(inst.args[0], state.GetLocal(inst.args[1]));
+      state.SetLocal(inst.args[1], val0);
+    }
+
+    static void Inst_Input(EventDrivenGP & hw, const inst_t & inst) {
+      State & state = *hw.GetCurState();
+      state.SetLocal(inst.args[1], state.AccessInput(inst.args[0]));
+    }
+
+    static void Inst_Output(EventDrivenGP & hw, const inst_t & inst) {
+      State & state = *hw.GetCurState();
+      state.SetOutput(inst.args[1], state.AccessLocal(inst.args[0]));
+    }
+
+    static void Inst_Commit(EventDrivenGP & hw, const inst_t & inst) {
+      State & state = *hw.GetCurState();
+      state.SetShared(inst.args[1], state.AccessLocal(inst.args[0]));
+    }
+
+    static void Inst_Pull(EventDrivenGP & hw, const inst_t & inst) {
+      State & state = *hw.GetCurState();
+      state.SetLocal(inst.args[1], state.AccessShared(inst.args[0]));
+    }
+
     static void Inst_Nop(EventDrivenGP & hw, const inst_t & inst) { ; }
 
     Ptr<InstLib<EventDrivenGP>> DefaultInstLib() {
@@ -771,6 +854,13 @@ namespace emp {
         inst_lib.AddInst("Break", Inst_Break, 0, "Break out of current block.");
         inst_lib.AddInst("Call", Inst_Call, 0, "Call function that best matches call affinity.", ScopeType::BASIC, 0, {"affinity"});
         inst_lib.AddInst("Return", Inst_Return, 0, "Return from current function if possible.");
+        inst_lib.AddInst("SetMem", Inst_SetMem, 2, "Local memory: Arg1 = numerical value of Arg2");
+        inst_lib.AddInst("CopyMem", Inst_CopyMem, 2, "Local memory: Arg1 = Arg2");
+        inst_lib.AddInst("SwapMem", Inst_SwapMem, 2, "Local memory: Swap values of Arg1 and Arg2.");
+        inst_lib.AddInst("Input", Inst_Input, 2, "Input memory Arg1 => Local memory Arg2.");
+        inst_lib.AddInst("Output", Inst_Output, 2, "Local memory Arg1 => Output memory Arg2.");
+        inst_lib.AddInst("Commit", Inst_Commit, 2, "Local memory Arg1 => Shared memory Arg2.");
+        inst_lib.AddInst("Pull", Inst_Pull, 2, "Shared memory Arg1 => Shared memory Arg2.");
         inst_lib.AddInst("Nop", Inst_Nop, 0, "No operation.");
       }
 
