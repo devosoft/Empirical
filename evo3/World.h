@@ -18,7 +18,10 @@
 //
 //
 //  Developer Notes:
-//  * We should Specialize World so that ANOTHER world can be used with proper delegation.
+//  * We should Specialize World so that ANOTHER world can be used with proper delegation to
+//    facilitate demes, pools, islands, etc.
+//  * With DoMutations, should we update genotypes?  Or just assume that it will be handled
+//    properly when the organisms move to the next generation.
 
 #ifndef EMP_EVO_WORLD_H
 #define EMP_EVO_WORLD_H
@@ -57,12 +60,14 @@ namespace emp {
     using fun_get_neighbor_t = std::function<size_t(size_t)>;
 
     // Internal state member variables
-    Ptr<Random> random_ptr;         // Random object to use.
-    bool random_owner;              // Did we create our own random number generator?
-    emp::vector<Ptr<ORG>> pop;      // All of the spots in the population.
-    emp::vector<Ptr<ORG>> next_pop; // Population being setup for next generation.
-    size_t num_orgs;                // How many organisms are actually in the population.
-    emp::vector<double> fit_cache;  // vector size == 0 when not caching; uncached values == 0.
+    Ptr<Random> random_ptr;         //< Random object to use.
+    bool random_owner;              //< Did we create our own random number generator?
+    emp::vector<Ptr<ORG>> pop;      //< All of the spots in the population.
+    emp::vector<Ptr<ORG>> next_pop; //< Population being setup for next generation.
+    size_t num_orgs;                //< How many organisms are actually in the population.
+    emp::vector<double> fit_cache;  //< vector size == 0 when not caching; uncached values == 0.
+    emp::vector<Ptr<genotype_t>> genotypes;      //< Genotypes for the corresponding orgs.
+    emp::vector<Ptr<genotype_t>> next_genotypes; //< Fenotypes for corresponding orgs in next_pop.
 
     // Configuration settings
     std::string name;         // Name of this world (for use in configuration.)
@@ -103,6 +108,7 @@ namespace emp {
   public:
     World(Ptr<Random> rnd=nullptr, std::string _name="")
       : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), fit_cache()
+      , genotypes(), next_genotypes()
       , name(_name), cache_on(false), size_x(0), size_y(0)
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_to_genotype()
       , fun_add_inject(), fun_add_birth(), fun_get_neighbor()
@@ -154,7 +160,8 @@ namespace emp {
       return pop[id];
     }
 
-    const genotype_t & GetGenotype(ORG & org) { return fun_to_genotype(org); }
+    const genotype_t & ToGenotype(ORG & org) { return fun_to_genotype(org); }
+    const genotype_t & GetGenotype(size_t id) { return fun_to_genotype(GetOrg(id)); }
 
     // --- CONFIGURE ---
 
@@ -209,7 +216,10 @@ namespace emp {
       emp_assert(random_ptr);
       fun_do_mutations(org, *random_ptr);
     }
-    void DoMutationsID(size_t id) { emp_assert(pop[id]); DoMutations(*(pop[id])); }
+    void DoMutationsID(size_t id) {
+      emp_assert(pop[id]);
+      DoMutations(*(pop[id]));
+    }
 
     void MutatePop(size_t start_id=0) {
       for (size_t id = start_id; id < pop.size(); id++) { if (pop[id]) DoMutationsID(id); }
@@ -348,7 +358,9 @@ namespace emp {
 
     // -- Setup functions --
     // Append at end of population
-    fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, pop.size()); };
+    fun_add_inject = [this](Ptr<ORG> new_org) {
+      return AddOrgAt(new_org, pop.size());
+    };
 
     // neighbors are anywhere in the population.
     fun_get_neighbor = [this](size_t) { return GetRandomCellID(); };
@@ -379,7 +391,9 @@ namespace emp {
 
     // -- Setup functions --
     // Inject a random position in grid
-    fun_add_inject = [this](Ptr<ORG> new_org) { return AddOrgAt(new_org, GetRandomCellID()); };
+    fun_add_inject = [this](Ptr<ORG> new_org) {
+      return AddOrgAt(new_org, GetRandomCellID());
+    };
 
     // neighbors are in 9-sized neighborhood.
     fun_get_neighbor = [this](size_t id) {
