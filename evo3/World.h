@@ -112,6 +112,7 @@ namespace emp {
       SetDefaultFitFun<this_t, ORG>(*this);
       SetDefaultMutFun<this_t, ORG>(*this);
       SetDefaultPrintFun<this_t, ORG>(*this);
+      SetDefaultToGenotypeFun<this_t, ORG>(*this);
       SetWellMixed();  // World default structure is well-mixed.
     }
     World(Random & rnd, std::string _name="") : World(&rnd, _name) { ; }
@@ -153,6 +154,7 @@ namespace emp {
       return pop[id];
     }
 
+    const genotype_t & GetGenotype(ORG & org) { return fun_to_genotype(org); }
 
     // --- CONFIGURE ---
 
