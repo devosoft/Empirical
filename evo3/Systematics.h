@@ -162,26 +162,20 @@ namespace emp {
       active_taxa.clear(); ancestor_taxa.clear(); outside_taxa.clear();
     }
 
-    /// Add information about a newly-injected taxon; return unique taxon pointer.
-    Ptr<taxon_t> InjectOrg(const ORG_INFO & info, Ptr<taxon_t> parent=nullptr) {
+    /// Add information about a new organism; return a pointer for the associated taxon.
+    Ptr<taxon_t> AddOrg(const ORG_INFO & info, Ptr<taxon_t> parent=nullptr) {
+      if (parent && parent->GetInfo() == info) {   // Adding another org of this taxon.
+        emp_assert( Has(active_taxa, parent) );
+        parent->AddOrg();
+        return parent;
+      }
+      // Otherwise, this is a new taxon!  If archiving, track the parent.
       Ptr<taxon_t> cur_taxon = NewPtr<taxon_t>(info, parent);
       if (store_active) active_taxa.insert(cur_taxon);
       if (parent) parent->AddOffspring();
       cur_taxon->AddOrg();
 
       return cur_taxon;
-    }
-
-    /// Add information about a new organism; return a pointer for the associated taxon.
-    Ptr<taxon_t> AddOrg(Ptr<taxon_t> parent, const ORG_INFO & info) {
-      emp_assert(parent);
-      emp_assert( Has(active_taxa, parent) );
-      if (parent->GetInfo() == info) {   // Adding another org of this taxon.
-        parent->AddOrg();
-        return parent;
-      }
-      // Otherwise, this is a new taxon!  If archiving, track the parent.
-      return InjectOrg(info, parent);
     }
 
     /// Remove an instance of an organism; track when it's gone.
