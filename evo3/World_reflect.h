@@ -137,7 +137,7 @@ namespace emp {
   }
 
   template <typename WORLD, typename ORG>
-  void SetOrgToGenotype(WORLD & world) { SetOrgToGenotype_impl<WORLD, ORG>(world, true); }
+  void SetDefaultToGenotypeFun(WORLD & world) { SetOrgToGenotype_impl<WORLD, ORG>(world, true); }
 
 }
 
