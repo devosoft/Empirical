@@ -3,10 +3,11 @@
 
 #include <functional>
 #include <unordered_map>
-#include <queue>
+#include <deque>
 #include "InstLib.h"
 #include "../tools/BitSet.h"
 #include "../tools/map_utils.h"
+#include "../tools/string_utils.h"
 #include "../tools/Random.h"
 #include "../base/vector.h"
 #include "../base/Ptr.h"
@@ -53,15 +54,16 @@ namespace emp {
     using arg_set_t = emp::array<arg_t, MAX_INST_ARGS>;
     using affinity_t = BitSet<AFFINITY_WIDTH>;
 
-    enum class EventType { NONE=0, MSG, SIGNAL };
-    // @amlalejini Design question: Should I change types to std::string's?
+    // @amlalejini Should event types be of type std::string?
     //  - Argument for: super flexible. Just add an instruction that broadcasts that type of event without needing to edit this file.
     struct Event {
       memory_t msg;
-      EventType type;
+      std::string type;
       affinity_t affinity;
-      Event(EventType _type=EventType::NONE) : msg(), type(_type) { ; }
-      Event(memory_t & _msg, EventType _type=EventType::NONE) : msg(_msg), type(_type) { ; }
+      Event(std::string _type="default", const affinity_t & aff=affinity_t())
+      : msg(), type(to_lower(_type)), affinity(aff) { ; }
+      Event(const memory_t & _msg, std::string _type="default", const affinity_t & aff=affinity_t())
+      : msg(_msg), type(to_lower(_type)), affinity(aff) { ; }
     };
 
     enum class BlockType { NONE=0, BASIC, LOOP };
@@ -192,58 +194,46 @@ namespace emp {
     Ptr<memory_t> shared_mem_ptr;  // Pointer to shared memory.
     program_t program; // Program (set of functions).
     emp::vector< Ptr< emp::vector<Ptr<State>> > > execution_stacks;
+    std::deque<Ptr<emp::vector<Ptr<State>> > > core_spawn_queue; // We don't want to spawn cores while processing the execution stacks during single process. Cores spawned during this time will be put into the queue to be spawned later.
     Ptr<emp::vector<Ptr<State>>> cur_core;
-    std::queue<Event> event_queue;  // @amlalejini TODO - incorporate event queue into single process.
+    std::deque<Event> event_queue;
+    // @amlalejini TODO - roll event handling/signal transmission into an 'EventLib' class.
+    std::unordered_map<std::string, fun_event_handler_t> event_handler_map;
+    // std::unordered_map<std::string, Signal<void(EventDrivenGP &, const Event &)>> event_transmission_signal_map;
     size_t errors;
     Ptr<Random> random_ptr;
     bool random_owner;
-
-    // emp::Signals
-    // SignalControl sig_control;
-    //  - Signals for Outgoing interactions.
-    Signal<void(EventDrivenGP &, const Event &)> on_event_broadcast_sig;
-    Signal<void(EventDrivenGP &, const Event &)> on_event_send_sig;
-
-    // Configurable functions.
-    //  - Functions for handling events.
-    fun_event_handler_t default_signal_event_handler;
-    fun_event_handler_t default_msg_event_handler;
+    bool is_executing;    // This is true only when executing the execution stacks.
 
   public:
     // Constructors
     EventDrivenGP(Ptr<inst_lib_t> _ilib, Ptr<Random> rnd=nullptr)
-      : inst_lib(_ilib), shared_mem_ptr(), program(), execution_stacks(),
-        cur_core(nullptr), event_queue(), errors(0), random_ptr(rnd), random_owner(false),
-        on_event_broadcast_sig("on-event-broadcast"), on_event_send_sig("on-event-send")
+      : inst_lib(_ilib), shared_mem_ptr(), program(), execution_stacks(), core_spawn_queue(),
+        cur_core(nullptr), event_queue(), event_handler_map(*DefaultEventHandlers()),
+        errors(0), random_ptr(rnd), random_owner(false), is_executing(false)
     {
       if (!rnd) NewRandom();
       shared_mem_ptr.New();
+
       // Spin up main core.
-      execution_stacks.emplace_back(new emp::vector<Ptr<State>>());
+      SpawnCore(0, memory_t(), true);
       cur_core = execution_stacks[0];
-      // Initialize/push main program state onto main execution core call stack.
-      cur_core->emplace_back(new State(shared_mem_ptr, true));
     }
     EventDrivenGP(inst_lib_t & _ilib, Ptr<Random> rnd=nullptr) : EventDrivenGP(&_ilib, rnd) { ; }
     EventDrivenGP(Ptr<Random> rnd=nullptr) : EventDrivenGP(DefaultInstLib(), rnd) { ; }
     // EventDrivenGP(const EventDrivenGP &) = default;
     // EventDrivenGP(EventDrivenGP &&) = default; // @amlalejini - TODO: implement move constructor.
     EventDrivenGP(const EventDrivenGP & in)
-      : inst_lib(in.inst_lib), shared_mem_ptr(), program(in.program),
-        execution_stacks(), cur_core(nullptr), event_queue(), errors(0), random_ptr(nullptr),
-        random_owner(false), on_event_broadcast_sig("on-event-broadcast"), on_event_send_sig("on-event-send")
+      : inst_lib(in.inst_lib), shared_mem_ptr(), program(in.program), execution_stacks(),
+        core_spawn_queue(), cur_core(nullptr), event_queue(), event_handler_map(in.event_handler_map),
+        errors(0), random_ptr(nullptr), random_owner(false), is_executing(false)
     {
       if (in.random_owner) NewRandom(); // New random number generator.
       else random_ptr = in.random_ptr;
       shared_mem_ptr.New(); // New shared memory.
       // Spin up main core.
-      execution_stacks.emplace_back(new emp::vector<Ptr<State>>());
+      SpawnCore(0, memory_t(), true);
       cur_core = execution_stacks[0];
-      // Initialize/push main program state onto main execution core call stack.
-      Ptr<State> state = new State(shared_mem_ptr, true);
-      state->SetIP(0);  // Main will start at first instruction of first function (designated as main function).
-      state->SetFP(0);
-      cur_core->push_back(state);
     }
 
     /// Destructor - clean up: execution stacks, shared memory.
@@ -256,6 +246,7 @@ namespace emp {
     // -- Control --
     /// Reset everything, including program.
     void Reset() {
+      program.clear();
       program.resize(0);  // Clear out program.
       ResetHardware();
     }
@@ -264,14 +255,23 @@ namespace emp {
     void ResetHardware() {
       shared_mem_ptr->clear();
       // Clear event queue
-      while (!event_queue.empty()) event_queue.pop();
+      event_queue.clear();
+      event_queue.resize(0);
       // Clear out execution stacks.
       for (size_t i = 0; i < execution_stacks.size(); i++) {
         for (size_t k = 0; k < execution_stacks[i]->size(); k++) {
-          delete execution_stacks[i]->at(k);
-        } delete execution_stacks[i];
+          execution_stacks[i]->at(k).Delete();
+        } execution_stacks[i].Delete();
       }
       execution_stacks.resize(0);
+      // Clear out spawn core queue.
+      for (size_t i = 0; i < core_spawn_queue.size(); i++) {
+        for (size_t k = 0; k < core_spawn_queue[i]->size(); k++) {
+          core_spawn_queue[i]->at(k).Delete();
+        } core_spawn_queue[i].Delete();
+      }
+      core_spawn_queue.resize(0);
+
       cur_core = nullptr;
       errors = 0;
     }
@@ -358,16 +358,6 @@ namespace emp {
       random_owner = true;
     }
 
-    /// Register OnEventBroadcast function.
-    SignalKey OnEventBroadcast(const std::function<void(EventDrivenGP &, const Event &)> & fun) {
-      return on_event_broadcast_sig.AddAction(fun);
-    }
-
-    /// Register OnEventSend function.
-    SignalKey OnEventSend(const std::function<void(EventDrivenGP &, const Event &)> & fun) {
-      return on_event_send_sig.AddAction(fun);
-    }
-
     // -- Utilities --
     /// Given valid function pointer and instruction pointer, find next end of block (at current block level).
     /// This is not guaranteed to return a valid IP. At worst, it'll return an IP == function.inst_seq.size().
@@ -429,11 +419,52 @@ namespace emp {
       }
     }
 
+    /// Spawn core with function that has best match to provided affinity. Do nothing if no
+    /// functions match above the provided threshold.
+    /// Initialize function state with provided input memory.
+    void SpawnCore(const affinity_t & affinity, double threshold, const memory_t & input_mem=memory_t(), bool is_main=false) {
+      size_t fID;
+      double max_bind = -1;
+      emp::vector<size_t> best_matches;
+      for (size_t i=0; i < program.size(); i++) {
+        double bind = SimpleMatchCoeff(program[i].affinity, affinity);
+        if (bind == max_bind) best_matches.push_back(i);
+        else if (bind > max_bind && bind >= threshold) {
+          best_matches.resize(0);
+          best_matches.push_back(i);
+          max_bind = bind;
+        }
+      }
+      if (best_matches.empty()) return;
+      if (best_matches.size() == 1.0) fID = best_matches[0];
+      else fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
+      SpawnCore(fID, input_mem, is_main);
+    }
+
+    /// Spawn core with function specified by fID.
+    /// Initialize function state with provided input memory.
+    void SpawnCore(size_t fID, const memory_t & input_mem=memory_t(), bool is_main=false) {
+      Ptr<emp::vector<Ptr<State>>> stack;
+      stack.New();
+      Ptr<State> state;
+      state.New(shared_mem_ptr, is_main);
+      state->input_mem = input_mem;
+      state->SetIP(0);
+      state->SetFP(fID);
+      stack->push_back(state);
+      // Spin up new core (queue it if executing current cores).
+      if (is_executing)
+        core_spawn_queue.push_back(stack);
+      else
+        execution_stacks.push_back(stack);
+    }
+
     /// Call function with best affinity match above threshold.
     /// If not candidate functions found, do nothing.
-    void CallFunction(affinity_t affinity, double threshold) {
+    void CallFunction(const affinity_t & affinity, double threshold) {
       emp_assert(GetCurState());
       // @amlalejini - TODO: memoize this function.
+      // @amlalejini - TODO: move function finding to its own function.
       size_t fID;
       double max_bind = -1;
       emp::vector<size_t> best_matches;
@@ -460,8 +491,9 @@ namespace emp {
       // Grab pointer to caller.
       Ptr<State> caller_state = GetCurState();
       // Make a new state, push onto call stack.
-      GetCurExecStack()->emplace_back(new State(shared_mem_ptr));
-      Ptr<State> new_state = GetCurState();
+      Ptr<State> new_state;
+      new_state.New(shared_mem_ptr);
+      GetCurExecStack()->push_back(new_state);
       // Configure new state.
       new_state->SetFP(fID);
       new_state->SetIP(0);
@@ -486,7 +518,7 @@ namespace emp {
           caller_state->SetLocal(mem.first, mem.second);
         }
       }
-      delete returning_state;
+      returning_state.Delete();
     }
 
     // -- Execution --
@@ -495,10 +527,16 @@ namespace emp {
     /// Advance hardware by single instruction.
     void SingleProcess() {
       emp_assert(program.size()); // Must have a program before this is allowed.
+      // Handle events.
+      while (!event_queue.empty()) {
+        HandleEvent(event_queue.front());
+        event_queue.pop_front();
+      }
       // Distribute 1 unit of computational time to each core.
       size_t core_idx = 0;
       size_t core_cnt = execution_stacks.size();
       size_t adjust = 0;
+      is_executing = true;
       while (core_idx < core_cnt) {
         // Set the current core to core at core_idx.
         cur_core = execution_stacks[core_idx];
@@ -535,19 +573,43 @@ namespace emp {
         // After processing, is the core still active?
         if (cur_core->empty()) {
           // Free core.
-          delete execution_stacks[core_idx - adjust];
+          execution_stacks[core_idx - adjust].Delete();
           execution_stacks[core_idx - adjust] = nullptr;
           adjust += 1;
         }
         ++core_idx;
       }
+      is_executing = false;
       // Update execution stack size to be accurate.
       execution_stacks.resize(core_cnt - adjust);
+      // Set cur core to be first execution stack (which should always be main).
+      if (execution_stacks.size()) cur_core = execution_stacks[0];
+      // Spawn any cores that happened during execution.
+      while (!core_spawn_queue.empty()) {
+        execution_stacks.push_back(core_spawn_queue.front());
+        core_spawn_queue.pop_front();
+      }
     }
     /// Advance hardware by some number instructions.
     void Process(size_t num_inst) { for (size_t i = 0; i < num_inst; i++) SingleProcess(); }
 
+    /// Queue an event.
+    void QueueEvent(const Event & event) { event_queue.emplace_back(event); }
+
+    /// Handle an event.
+    void HandleEvent(const Event & event) {
+      // @amlalejini - TODO: make informative error handling for no event handler found.
+      emp_assert(Has(event_handler_map, event.type));
+      if (Has(event_handler_map, event.type)) event_handler_map[event.type](*this, event);
+    }
+
     // -- Printing --
+    void PrintEvent(const Event & event, std::ostream & os=std::cout) {
+      os << "[" << event.type << ","; event.affinity.Print(os); os << ",(";
+      for (auto mem : event.msg) std::cout << "{" << mem.first << ":" << mem.second << "}";
+      os << ")]";
+    }
+
     /// Print out a single instruction with its arguments.
     void PrintInst(const inst_t & inst, std::ostream & os=std::cout) {
       os << inst_lib->GetName(inst.id);
@@ -602,6 +664,10 @@ namespace emp {
       os << "Shared memory: ";
       for (auto mem : *shared_mem_ptr) os << '{' << mem.first << ':' << mem.second << '}'; os << '\n';
       os << "Errors: " << errors << "\n";
+      // Print events.
+      os << "Event queue: ";
+      for (auto event : event_queue) { PrintEvent(event, os); os << " "; }
+      os << "\n";
       // Print each core.
       for (size_t i = 0; i < execution_stacks.size(); ++i) {
         const emp::vector<Ptr<State>> & stack = *(execution_stacks[i]);
@@ -627,11 +693,6 @@ namespace emp {
         }
       }
     }
-
-    // -- Event handlers --
-    // @amlalejini - TODO: the below functions.
-    static void OnMessageEvent(EventDrivenGP & hw, const Event & event) { ; } // hw: event recipient
-    static void OnSignalEvent(EventDrivenGP & hw, const Event & event) { ; }  // hw: event recipient
 
     // -- Default Instructions --
     // For all instructions: because memory is implemented as unordered_maps, instructions should
@@ -865,6 +926,21 @@ namespace emp {
       }
 
       return &inst_lib;
+    }
+
+    // Default event handlers.
+    static void HandleEvent_Message(EventDrivenGP & hw, const Event & event) {
+      // Spawn new core.
+      hw.SpawnCore(event.affinity, MIN_BIND_THRESH, event.msg);
+    }
+
+    Ptr<std::unordered_map<std::string, fun_event_handler_t>> DefaultEventHandlers() {
+      static std::unordered_map<std::string, fun_event_handler_t> handler_map;
+      if (handler_map.size() == 0) {
+        handler_map["default"] = [](EventDrivenGP &, const Event &) { ; }; // Does nothing.
+        handler_map["message"] = HandleEvent_Message;
+      }
+      return &handler_map;
     }
 
   };

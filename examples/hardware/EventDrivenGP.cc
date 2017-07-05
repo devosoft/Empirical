@@ -64,14 +64,22 @@ int main() {
   std::cout << "-- Print simple program. --" << std::endl;
   cpu.PrintProgram(); std::cout << std::endl;
 
+  // Create some random events.
+  using event_t = emp::EventDrivenGP::Event;
+
+  event_t e1({{1,2.0},{2,4.0},{5,10.0}}, "message", emp::BitSet<4>(*random, 0.5));
+  event_t e2({{1,0.5},{4,2.0},{10,5.0}}, "message", emp::BitSet<4>(*random, 0.5));
+  event_t e3({{1,0.5},{4,2.0},{10,5.0}}, "message", emp::BitSet<4>(*random, 0.5));
+  cpu.QueueEvent(e1);
+  cpu.QueueEvent(e2);
+  cpu.QueueEvent(e3);
   // Run program
   std::cout << "-- Running simple program. --" << std::endl;
   cpu.PrintState();
-  for (size_t i = 0; i < 30; i++) {
+  for (size_t i = 0; i < 5; i++) {
     std::cout << "==== Update: " << i << " ====" << std::endl;
     cpu.Process(1);
     cpu.PrintState();
   }
-
   return 0;
 }
