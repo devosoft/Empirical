@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <deque>
 #include "InstLib.h"
+#include "EventLib.h"
 #include "../tools/BitSet.h"
 #include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
@@ -48,17 +49,24 @@ namespace emp {
     using arg_t = int;
     using arg_set_t = emp::array<arg_t, MAX_INST_ARGS>;
     using affinity_t = BitSet<AFFINITY_WIDTH>;
+    using properties_t = std::unordered_set<std::string>;
 
     // @amlalejini Should event types be of type std::string?
     //  - Argument for: super flexible. Just add an instruction that broadcasts that type of event without needing to edit this file.
     struct Event {
-      memory_t msg;
-      std::string type;
+      size_t id;
       affinity_t affinity;
-      Event(std::string _type="default", const affinity_t & aff=affinity_t())
-      : msg(), type(to_lower(_type)), affinity(aff) { ; }
-      Event(const memory_t & _msg, std::string _type="default", const affinity_t & aff=affinity_t())
-      : msg(_msg), type(to_lower(_type)), affinity(aff) { ; }
+      memory_t msg;
+      properties_t properties; // Event-instance properties (properties of this instance of an event).
+
+      Event(size_t _id=0, const affinity_t & aff=affinity_t(), const memory_t & _msg=memory_t(),
+            const properties_t & _properties=properties_t())
+      : id(_id), affinity(aff), msg(_msg), properties(_properties) { ; }
+      Event(const Event &) = default;
+      Event(Event &&) = default;
+
+      Event & operator=(const Event &) = default;
+      Event & operator=(Event &&) = default;
     };
 
     enum class BlockType { NONE=0, BASIC, LOOP };
@@ -171,6 +179,7 @@ namespace emp {
     using inst_t = Instruction;
     using event_t = Event;  // @amlalejini - TODO: change Event to event_t throughout.
     using inst_lib_t = InstLib<EventDrivenGP>;
+    using event_lib_t = EventLib<EventDrivenGP>;
 
     struct Function {
       affinity_t affinity;
@@ -183,46 +192,53 @@ namespace emp {
     };
 
     using program_t = emp::vector<Function>;
-    using fun_event_handler_t = std::function<void(EventDrivenGP &, const Event &)>;
+    using fun_event_handler_t = std::function<void(EventDrivenGP &, const event_t &)>;
 
   protected:
     Ptr<inst_lib_t> inst_lib;      // Instruction library.
-    Ptr<memory_t> shared_mem_ptr;  // Pointer to shared memory.
-    program_t program; // Program (set of functions).
+    Ptr<event_lib_t> event_lib;    // Event library.
+
+    Ptr<Random> random_ptr;
+    bool random_owner;
+
+    program_t program;              // Program (set of functions).
+    Ptr<memory_t> shared_mem_ptr;   // Pointer to shared memory.
     emp::vector< Ptr< emp::vector<Ptr<State>> > > execution_stacks;
     std::deque<Ptr<emp::vector<Ptr<State>> > > core_spawn_queue; // We don't want to spawn cores while processing the execution stacks during single process. Cores spawned during this time will be put into the queue to be spawned later.
     Ptr<emp::vector<Ptr<State>>> cur_core;
-    std::deque<Event> event_queue;
-    // @amlalejini TODO - roll event handling/signal transmission into an 'EventLib' class.
-    std::unordered_map<std::string, fun_event_handler_t> event_handler_map;
-    // std::unordered_map<std::string, Signal<void(EventDrivenGP &, const Event &)>> event_trans_map;
+    std::deque<event_t> event_queue;
+
     size_t errors;
-    Ptr<Random> random_ptr;
-    bool random_owner;
+
     bool is_executing;    // This is true only when executing the execution stacks.
 
   public:
-    // Constructors
-    EventDrivenGP(Ptr<inst_lib_t> _ilib, Ptr<Random> rnd=nullptr)
-      : inst_lib(_ilib), shared_mem_ptr(), program(), execution_stacks(), core_spawn_queue(),
-        cur_core(nullptr), event_queue(), event_handler_map(*DefaultEventHandlers()),
-        errors(0), random_ptr(rnd), random_owner(false), is_executing(false)
+    EventDrivenGP(Ptr<inst_lib_t> _ilib, Ptr<event_lib_t> _elib, Ptr<Random> rnd=nullptr)
+      : inst_lib(_ilib), event_lib(_elib), random_ptr(rnd), random_owner(false), program(),
+        shared_mem_ptr(nullptr), execution_stacks(), core_spawn_queue(), cur_core(nullptr),
+        event_queue(), errors(0), is_executing(false)
     {
       if (!rnd) NewRandom();
       shared_mem_ptr.New();
-      // event_trans_map["message"] = Signal<void(EventDrivenGP &, const Event &)>
       // Spin up main core.
       SpawnCore(0, memory_t(), true);
       cur_core = execution_stacks[0];
     }
-    EventDrivenGP(inst_lib_t & _ilib, Ptr<Random> rnd=nullptr) : EventDrivenGP(&_ilib, rnd) { ; }
-    EventDrivenGP(Ptr<Random> rnd=nullptr) : EventDrivenGP(DefaultInstLib(), rnd) { ; }
-    // EventDrivenGP(const EventDrivenGP &) = default;
+
+    EventDrivenGP(inst_lib_t & _ilib, event_lib_t & _elib, Ptr<Random> rnd=nullptr)
+      : EventDrivenGP(&_ilib, &_elib, rnd) { ; }
+
+    EventDrivenGP(Ptr<event_lib_t> _elib, Ptr<Random> rnd=nullptr)
+      : EventDrivenGP(DefaultInstLib(), _elib, rnd) { ; }
+
+    EventDrivenGP(Ptr<Random> rnd=nullptr)
+      : EventDrivenGP(DefaultInstLib(), DefaultEventLib(), rnd) { ; }
     // EventDrivenGP(EventDrivenGP &&) = default; // @amlalejini - TODO: implement move constructor.
+
     EventDrivenGP(const EventDrivenGP & in)
-      : inst_lib(in.inst_lib), shared_mem_ptr(), program(in.program), execution_stacks(),
-        core_spawn_queue(), cur_core(nullptr), event_queue(), event_handler_map(in.event_handler_map),
-        errors(0), random_ptr(nullptr), random_owner(false), is_executing(false)
+      : inst_lib(in.inst_lib), event_lib(in.event_lib), random_ptr(nullptr), random_owner(false),
+        program(in.program), shared_mem_ptr(nullptr), execution_stacks(), core_spawn_queue(),
+        cur_core(nullptr), event_queue(), errors(0), is_executing(false)
     {
       if (in.random_owner) NewRandom(); // New random number generator.
       else random_ptr = in.random_ptr;
@@ -274,13 +290,16 @@ namespace emp {
 
     // -- Accessors --
     Ptr<inst_lib_t> GetInstLib() const { return inst_lib; }
+    Ptr<event_lib_t> GetEventLib() const { return event_lib; }
     const Function & GetFunction(size_t fID) const { emp_assert(fID < program.size()); return program[fID]; }
     size_t GetNumErrors() const { return errors; }
-    inst_t GetInst(size_t fID, size_t pos) {
+    const inst_t & GetInst(size_t fID, size_t pos) const {
       emp_assert(ValidPosition(fID, pos));
       return program[fID].inst_seq[pos];
     }
     const program_t & GetProgram() const { return program; }
+
+    /// Get current execution core (call stack). Will be nullptr if no active cores.
     Ptr<emp::vector<Ptr<State>>> GetCurExecStack() { return cur_core; }
     Ptr<State> GetCurState() {
       if (cur_core && !cur_core->empty()) return cur_core->back();
@@ -362,7 +381,7 @@ namespace emp {
       int depth_counter = 1;
       while (true) {
         if (!ValidPosition(fp, ip)) break;
-        const inst_t inst = GetInst(fp, ip);
+        const inst_t & inst = GetInst(fp, ip);
         if (inst_lib->HasProperty(inst.id, "block_def")) {
           ++depth_counter;
         } else if (inst_lib->HasProperty(inst.id, "block_close")) {
@@ -520,6 +539,37 @@ namespace emp {
     // -- Execution --
     /// Process a single instruction, provided by the caller.
     void ProcessInst(const inst_t & inst) { emp_assert(GetCurState()); inst_lib->ProcessInst(*this, inst); }
+    /// Handle an event (on this hardware).
+    void HandleEvent(const event_t & event) { emp_assert(GetCurState()); event_lib->HandleEvent(*this, event); }
+    /// Trigger an event (from this hardware).
+    void TriggerEvent(const event_t & event) { emp_assert(GetCurState()); event_lib->TriggerEvent(*this, event); }
+    /// Trigger an event (from this hardware).
+    void TriggerEvent(const std::string & name, const affinity_t & affinity=affinity_t(),
+                      const memory_t & msg=memory_t(), const properties_t & properties=properties_t()) {
+      const size_t id = event_lib->GetID(name);
+      event_t event(id, affinity, msg, properties);
+      event_lib->TriggerEvent(*this, event);
+    }
+    /// Trigger an event (from this hardware).
+    void TriggerEvent(size_t id, const affinity_t & affinity=affinity_t(),
+                      const memory_t & msg=memory_t(), const properties_t & properties=properties_t()) {
+      event_t event(id, affinity, msg, properties);
+      event_lib->TriggerEvent(*this, event);
+    }
+    /// Queue an event (to be handled by this hardware).
+    void QueueEvent(const event_t & event) { event_queue.emplace_back(event); }
+    /// Queue event by name.
+    void QueueEvent(const std::string & name, const affinity_t & affinity=affinity_t(),
+                    const memory_t & msg=memory_t(), const properties_t & properties=properties_t()) {
+      const size_t id = event_lib->GetID(name);
+      event_queue.emplace_back(id, affinity, msg, properties);
+    }
+    /// Queue event by id.
+    void QueueEvent(size_t id, const affinity_t & affinity=affinity_t(),
+                    const memory_t & msg=memory_t(), const properties_t & properties=properties_t()) {
+      event_queue.emplace_back(id, affinity, msg, properties);
+    }
+
     /// Advance hardware by single instruction.
     void SingleProcess() {
       emp_assert(program.size()); // Must have a program before this is allowed.
@@ -589,20 +639,12 @@ namespace emp {
     /// Advance hardware by some number instructions.
     void Process(size_t num_inst) { for (size_t i = 0; i < num_inst; i++) SingleProcess(); }
 
-    /// Queue an event.
-    void QueueEvent(const Event & event) { event_queue.emplace_back(event); }
-
-    /// Handle an event.
-    void HandleEvent(const Event & event) {
-      // @amlalejini - TODO: make informative error handling for no event handler found.
-      emp_assert(Has(event_handler_map, event.type));
-      if (Has(event_handler_map, event.type)) event_handler_map[event.type](*this, event);
-    }
-
     // -- Printing --
-    void PrintEvent(const Event & event, std::ostream & os=std::cout) {
-      os << "[" << event.type << ","; event.affinity.Print(os); os << ",(";
-      for (auto mem : event.msg) std::cout << "{" << mem.first << ":" << mem.second << "}";
+    void PrintEvent(const event_t & event, std::ostream & os=std::cout) {
+      os << "[" << event_lib->GetName(event.id) << ","; event.affinity.Print(os); os << ",(";
+      for (const auto & mem : event.msg) std::cout << "{" << mem.first << ":" << mem.second << "}";
+      os << "),(Properties:";
+      for (const auto & property : event.properties) std::cout << " " << property;
       os << ")]";
     }
 
@@ -655,7 +697,6 @@ namespace emp {
       //      State
       //      ---
       //    ...
-
       // Print shared memory
       os << "Shared memory: ";
       for (auto mem : *shared_mem_ptr) os << '{' << mem.first << ':' << mem.second << '}'; os << '\n';
@@ -727,8 +768,8 @@ namespace emp {
     //  Misc.
     //    [x] Nop
     //  Interaction
-    //    [ ] Broadcast
-    //    [ ] Send
+    //    [x] Broadcast
+    //    [x] Send
 
     static void Inst_Inc(EventDrivenGP & hw, const inst_t & inst) {
       State & state = *hw.GetCurState();
@@ -889,6 +930,16 @@ namespace emp {
 
     static void Inst_Nop(EventDrivenGP & hw, const inst_t & inst) { ; }
 
+    static void Inst_BroadcastMsg(EventDrivenGP & hw, const inst_t & inst) {
+      State & state = *hw.GetCurState();
+      hw.TriggerEvent("Message", inst.affinity, state.output_mem, {"broadcast"});
+    }
+
+    static void Inst_SendMsg(EventDrivenGP & hw, const inst_t & inst) {
+      State & state = *hw.GetCurState();
+      hw.TriggerEvent("Message", inst.affinity, state.output_mem, {"send"});
+    }
+
     Ptr<InstLib<EventDrivenGP>> DefaultInstLib() {
       static inst_lib_t inst_lib;
 
@@ -918,27 +969,27 @@ namespace emp {
         inst_lib.AddInst("Output", Inst_Output, 2, "Local memory Arg1 => Output memory Arg2.");
         inst_lib.AddInst("Commit", Inst_Commit, 2, "Local memory Arg1 => Shared memory Arg2.");
         inst_lib.AddInst("Pull", Inst_Pull, 2, "Shared memory Arg1 => Shared memory Arg2.");
+        inst_lib.AddInst("BroadcastMsg", Inst_BroadcastMsg, 0, "Broadcast output memory as message event.", ScopeType::BASIC, 0, {"affinity"});
+        inst_lib.AddInst("SendMsg", Inst_SendMsg, 0, "Send output memory as message event.");
         inst_lib.AddInst("Nop", Inst_Nop, 0, "No operation.");
       }
-
       return &inst_lib;
     }
 
     // Default event handlers.
-    static void HandleEvent_Message(EventDrivenGP & hw, const Event & event) {
+    static void HandleEvent_Message(EventDrivenGP & hw, const event_t & event) {
       // Spawn new core.
       hw.SpawnCore(event.affinity, MIN_BIND_THRESH, event.msg);
     }
 
-    Ptr<std::unordered_map<std::string, fun_event_handler_t>> DefaultEventHandlers() {
-      static std::unordered_map<std::string, fun_event_handler_t> handler_map;
-      if (handler_map.size() == 0) {
-        handler_map["default"] = [](EventDrivenGP &, const Event &) { ; }; // Does nothing.
-        handler_map["message"] = HandleEvent_Message;
+    /// Define default events. NOTE: default events have no registered dispatch functions.
+    Ptr<EventLib<EventDrivenGP>> DefaultEventLib() {
+      static event_lib_t event_lib;
+      if (event_lib.GetSize() == 0) {
+        event_lib.AddEvent("Message", HandleEvent_Message, "Event for exchanging messages (agent-agent, world-agent, etc.)");
       }
-      return &handler_map;
+      return &event_lib;
     }
-
   };
 }
 

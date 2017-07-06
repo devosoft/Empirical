@@ -32,10 +32,10 @@ namespace emp {
       properties_t properties;  // Any properties that should be associated with this type of event.
       fun_set_t dispatch_funs;     // Functions to call when this type of event is triggered.
 
-      EventDef(const std::string & _n, fun_t _handler, const fun_set_t & _dispatch_funs,
-        const std::string & _d, const properties_t & _properties)
+      EventDef(const std::string & _n, fun_t _handler, const std::string & _d,
+        const properties_t & _properties)
         : name(_n), handler(_handler), desc(_d), properties(_properties),
-          dispatch_funs(_dispatch_funs) { ; }
+          dispatch_funs() { ; }
       EventDef(const EventDef &) = default;
     };
 
@@ -64,18 +64,20 @@ namespace emp {
     /// Add a new event to the event library.
     void AddEvent(const std::string & name,
                   const fun_t & handler_fun,
-                  const fun_set_t & dispatch_funs=fun_set_t(),
                   const std::string & desc="",
                   const properties_t & event_properties=properties_t())
     {
       const size_t id = event_lib.size();
-      event_lib.emplace_back(name, handler_fun, dispatch_funs, desc, event_properties);
+      event_lib.emplace_back(name, handler_fun, desc, event_properties);
       name_map[name] = id;
     }
 
     /// Register a dispatch function for event specified by id.
     void RegisterDispatchFun(size_t id, fun_t dispatch_fun) {
       event_lib[id].dispatch_funs.Add(dispatch_fun);
+    }
+    void RegisterDispatchFun(const std::string & name, fun_t dispatch_fun) {
+      event_lib[GetID(name)].dispatch_funs.Add(dispatch_fun);
     }
 
     /// Trigger event.
