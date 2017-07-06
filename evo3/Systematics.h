@@ -35,9 +35,9 @@
 namespace emp {
 
   template <typename ORG_INFO>
-  class TaxaGroup {
+  class Taxon {
   private:
-    using this_t = TaxaGroup<ORG_INFO>;
+    using this_t = Taxon<ORG_INFO>;
     using info_t = ORG_INFO;
 
     const info_t info;        // Details for the organims associated within this taxanomic group.
@@ -47,12 +47,12 @@ namespace emp {
     size_t num_offspring;     // How many direct offspring groups exist from this one.
 
   public:
-    TaxaGroup(const info_t & _info, Ptr<this_t> _parent=nullptr)
+    Taxon(const info_t & _info, Ptr<this_t> _parent=nullptr)
     : info(_info), parent(_parent), num_orgs(0), tot_orgs(0), num_offspring(0) { ; }
-    TaxaGroup(const TaxaGroup &) = delete;
-    TaxaGroup(TaxaGroup &&) = default;
-    TaxaGroup & operator=(const TaxaGroup &) = delete;
-    TaxaGroup & operator=(TaxaGroup &&) = default;
+    Taxon(const Taxon &) = delete;
+    Taxon(Taxon &&) = default;
+    Taxon & operator=(const Taxon &) = delete;
+    Taxon & operator=(Taxon &&) = default;
 
     const info_t & GetInfo() const { return info; }
     Ptr<this_t> GetParent() const { return parent; }
@@ -68,14 +68,14 @@ namespace emp {
       emp_assert(num_orgs > 0, num_orgs);
       --num_orgs;
 
-      // If we are out of BOTH organisms and offspring, this TaxaGroup should deactivate.
+      // If we are out of BOTH organisms and offspring, this Taxon should deactivate.
       return num_orgs;
     }
     bool RemoveOffspring() {
       emp_assert(num_offspring > 0);
       --num_offspring;
 
-      // If we are out of BOTH offspring and organisms, this TaxaGroup should deactivate.
+      // If we are out of BOTH offspring and organisms, this Taxon should deactivate.
       return num_orgs || num_offspring;
     }
   };
@@ -83,7 +83,7 @@ namespace emp {
   template <typename ORG_INFO>
   class Systematics {
   private:
-    using taxon_t = TaxaGroup<ORG_INFO>;
+    using taxon_t = Taxon<ORG_INFO>;
     using hash_t = typename Ptr<taxon_t>::hash_t;
 
     bool store_active;     //< Store all of the currently active taxa?
