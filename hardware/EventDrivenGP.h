@@ -31,11 +31,6 @@
 //    * The first function will be main (unless the fp on the initially created state is otherwise manipulated).
 //    * Main state behaves differently than any other state.
 
-// @amlalejini - TODO's:
-//  [ ] Go through and make convenient/obvious accessors for structs (Event, State, Block, etc.)
-//  [x] Switch from BitVector affinities -> BitSet affinities (affinity_t)
-//  [ ] Completely switch to using Ptr.h's .New()/.Delete()? Or, wait until Charles gets the new/delete operators working.
-
 namespace emp {
   class EventDrivenGP {
   public:
@@ -174,6 +169,7 @@ namespace emp {
     };
 
     using inst_t = Instruction;
+    using event_t = Event;  // @amlalejini - TODO: change Event to event_t throughout.
     using inst_lib_t = InstLib<EventDrivenGP>;
 
     struct Function {
@@ -199,7 +195,7 @@ namespace emp {
     std::deque<Event> event_queue;
     // @amlalejini TODO - roll event handling/signal transmission into an 'EventLib' class.
     std::unordered_map<std::string, fun_event_handler_t> event_handler_map;
-    // std::unordered_map<std::string, Signal<void(EventDrivenGP &, const Event &)>> event_transmission_signal_map;
+    // std::unordered_map<std::string, Signal<void(EventDrivenGP &, const Event &)>> event_trans_map;
     size_t errors;
     Ptr<Random> random_ptr;
     bool random_owner;
@@ -214,7 +210,7 @@ namespace emp {
     {
       if (!rnd) NewRandom();
       shared_mem_ptr.New();
-
+      // event_trans_map["message"] = Signal<void(EventDrivenGP &, const Event &)>
       // Spin up main core.
       SpawnCore(0, memory_t(), true);
       cur_core = execution_stacks[0];
