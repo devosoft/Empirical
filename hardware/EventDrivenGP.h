@@ -36,7 +36,7 @@ namespace emp {
   class EventDrivenGP {
   public:
     static constexpr size_t CPU_SIZE = 8;
-    static constexpr size_t AFFINITY_WIDTH = 4;
+    static constexpr size_t AFFINITY_WIDTH = 8;
     static constexpr size_t MAX_INST_ARGS = 3;
     static constexpr size_t MAX_CORES = 64;         // Maximum number of parallel execution stacks that can be spawned.
     static constexpr size_t MAX_CALL_DEPTH = 128;   // Maximum depth of calls per execution stack.
