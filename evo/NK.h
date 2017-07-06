@@ -38,13 +38,17 @@ namespace evo {
     {
       for ( auto & ltable : landscape) {
         ltable.resize(state_count);
+        //std::cout<<state_count<<std::endl;
+        double max_pos = 0;
+
         for (double & pos : ltable) {
           pos = random.GetDouble();
-          if (pos > max_fit)
-              max_fit = pos;
+          if (pos > max_pos) { max_pos = pos; }
         }
+        max_fit += max_pos;
       }
       std::cout<<max_fit<<std::endl;
+
     }
     ~NKLandscape() { ; }
     NKLandscape & operator=(const NKLandscape &) = delete;

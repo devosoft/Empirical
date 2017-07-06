@@ -294,6 +294,20 @@ namespace evo {
       }
     }
 
+    void InsertBirth(const ORG mem, int parent_pos, vector<int> positions, int copy_count=1) {
+      before_repro_sig.Trigger(parent_pos);
+      for (int i = 0; i < copy_count; i++) {
+        ORG * new_org = new ORG(mem);
+        offspring_ready_sig.Trigger(new_org);
+        int index = random_ptr->GetInt(0, positions.size());
+        const int pos = positions[index];
+        popM.AddOrgAt(new_org, pos);
+        //const int pos = popM.AddOrgBirth(new_org, parent_pos);
+        SetupOrg(*new_org, &callbacks, pos);
+        org_placement_sig.Trigger(pos);
+      }
+    }
+
     void DoRepro(int id) {
       emp_assert(random_ptr != nullptr && "DoRepro() requires a random number generator.");
       // std::cout << "Repro " << id << std::endl;
@@ -421,7 +435,7 @@ namespace evo {
         }
 
         // Place the highest fitness into the next generation!
-        InsertBirth( *(popM[best_id]), best_id, 1 );
+        InsertBirth( *(popM[best_id]), best_id, entries, 1 );
       }
     }
 

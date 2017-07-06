@@ -19,12 +19,12 @@
 
 EMP_BUILD_CONFIG( NKConfig,
   GROUP(DEFAULT, "Default settings for NK model"),
-  VALUE(K, int, 10, "Level of epistasis in the NK model"),
-  VALUE(N, int, 50, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
-  VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
-  VALUE(POP_SIZE, int, 100, "Number of organisms in the popoulation."),
-  VALUE(MAX_GENS, int, 2000, "How many generations should we process?"),
-  VALUE(MUT_COUNT, double, 0.005, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
+  VALUE(K, int, 0, "Level of epistasis in the NK model"),
+  VALUE(N, int, 100, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
+  VALUE(SEED, int, 123, "Random number seed (0 for based on time)"),
+  VALUE(POP_SIZE, int, 1000, "Number of organisms in the popoulation."),
+  VALUE(MAX_GENS, int, 10000, "How many generations should we process?"),
+  VALUE(MUT_COUNT, double, 0.0001, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
   VALUE(TOUR_SIZE, int, 20, "How many organisms should be picked in each Tournament?"),
   VALUE(NAME, std::string, "Result-", "Name of file printed to"),
 )
