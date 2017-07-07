@@ -208,6 +208,8 @@ namespace emp {
     Ptr<emp::vector<Ptr<State>>> cur_core;
     std::deque<event_t> event_queue;
 
+    emp::vector<double> traits;
+
     size_t errors;
 
     bool is_executing;    // This is true only when executing the execution stacks.
@@ -216,7 +218,7 @@ namespace emp {
     EventDrivenGP(Ptr<inst_lib_t> _ilib, Ptr<event_lib_t> _elib, Ptr<Random> rnd=nullptr)
       : inst_lib(_ilib), event_lib(_elib), random_ptr(rnd), random_owner(false), program(),
         shared_mem_ptr(nullptr), execution_stacks(), core_spawn_queue(), cur_core(nullptr),
-        event_queue(), errors(0), is_executing(false)
+        event_queue(), traits(), errors(0), is_executing(false)
     {
       if (!rnd) NewRandom();
       shared_mem_ptr.New();
@@ -258,7 +260,7 @@ namespace emp {
     // -- Control --
     /// Reset everything, including program.
     void Reset() {
-      program.clear();
+      traits.resize(0);
       program.resize(0);  // Clear out program.
       ResetHardware();
     }
@@ -308,8 +310,14 @@ namespace emp {
     bool ValidPosition(size_t fID, size_t pos) const { return fID < program.size() && pos < program[fID].GetSize(); }
     bool ValidFunction(size_t fID) const { return fID < program.size(); }
     double GetMinBindThresh() const { return MIN_BIND_THRESH; }
+    double GetTrait(size_t id) const { return traits[id]; }
 
     // -- Configuration --
+    void SetTrait(size_t id, double val) {
+      if (id >= traits.size()) traits.resize(id+1, 0.0);
+      traits[id] = val;
+    }
+    void PushTrait(double val) { traits.push_back(val); }
     void SetInst(size_t fID, size_t pos, const inst_t & inst) {
       emp_assert(ValidPosition(fID, pos));
       program[fID].inst_seq[pos] = inst;
