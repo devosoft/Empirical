@@ -51,8 +51,6 @@ namespace emp {
     using affinity_t = BitSet<AFFINITY_WIDTH>;
     using properties_t = std::unordered_set<std::string>;
 
-    // @amlalejini Should event types be of type std::string?
-    //  - Argument for: super flexible. Just add an instruction that broadcasts that type of event without needing to edit this file.
     struct Event {
       size_t id;
       affinity_t affinity;
@@ -67,6 +65,8 @@ namespace emp {
 
       Event & operator=(const Event &) = default;
       Event & operator=(Event &&) = default;
+
+      bool HasProperty(std::string property) const { return properties.count(property); }
     };
 
     enum class BlockType { NONE=0, BASIC, LOOP };
@@ -185,13 +185,88 @@ namespace emp {
       affinity_t affinity;
       emp::vector<inst_t> inst_seq;
 
-      Function(const affinity_t & _aff=affinity_t()) : affinity(_aff), inst_seq() { ; }
+      Function(const affinity_t & _aff=affinity_t(), const emp::vector<inst_t> & _seq=emp::vector<inst_t>()) : affinity(_aff), inst_seq(_seq) { ; }
 
       size_t GetSize() const { return inst_seq.size(); }
 
     };
 
-    using program_t = emp::vector<Function>;
+    struct Program {
+      using program_t = emp::vector<Function>;
+
+      Ptr<inst_lib_t> inst_lib;
+      emp::vector<Function> program;
+
+      Program(Ptr<inst_lib_t> _ilib, const emp::vector<Function> & _prgm=emp::vector<Function>())
+      : inst_lib(_ilib), program(_prgm) { ; }
+      Program(const Program &) = default;
+
+      void Clear() { program.clear(); program.resize(0); }
+
+      Function & operator[](size_t id) { return program[id]; }
+      const Function & operator[](size_t id) const { return program[id]; }
+
+      size_t GetSize() const { return program.size(); }
+
+      bool ValidPosition(size_t fID, size_t pos) const {
+        return fID < program.size() && pos < program[fID].GetSize();
+      }
+      bool ValidFunction(size_t fID) const { return fID < program.size(); }
+
+      void SetProgram(const program_t & _program) { program = _program; }
+      void PushFunction(const Function & _function) { program.emplace_back(_function); }
+
+      /// Push new instruction to program.
+      /// If no function pointer is provided and no functions exist yet, add new function to
+      /// program and push to that. If no function pointer is provided and functions exist, push to
+      /// last function in program. If function pointer is provided, push to that function.
+      void PushInst(size_t id, arg_t a0=0, arg_t a1=0, arg_t a2=0,
+                    const affinity_t & aff=affinity_t(), int fID=-1)
+      {
+        size_t fp;
+        if (fID == -1 && !program.size()) { program.emplace_back(); fp = 0; }
+        else if (fID == -1 || (fID < 0 && fID >= (int)program.size())) { fp = program.size() - 1; }
+        else fp = (size_t)fID;
+        program[fp].inst_seq.emplace_back(id, a0, a1, a2, aff);
+      }
+
+      /// Push new instruction to program.
+      /// If no function pointer is provided and no functions exist yet, add new function to
+      /// program and push to that. If no function pointer is provided and functions exist, push to
+      /// last function in program. If function pointer is provided, push to that function.
+      void PushInst(const std::string & name, arg_t a0=0, arg_t a1=0, arg_t a2=0,
+                    const affinity_t & aff=affinity_t(), int fID=-1)
+      {
+        size_t fp;
+        size_t id = inst_lib->GetID(name);
+        if (fID == -1 && !program.size()) { program.emplace_back(); fp = 0; }
+        else if (fID == -1 || (fID < 0 && fID >= (int)program.size())) { fp = program.size() - 1; }
+        else fp = (size_t)fID;
+        program[fp].inst_seq.emplace_back(id, a0, a1, a2, aff);
+      }
+
+      /// Push new instruction to program.
+      /// If no function pointer is provided and no functions exist yet, add new function to
+      /// program and push to that. If no function pointer is provided and functions exist, push to
+      /// last function in program. If function pointer is provided, push to that function.
+      void PushInst(const inst_t & inst, int fID=-1) {
+        size_t fp;
+        if (fID == -1 && !program.size()) { program.emplace_back(); fp = 0; }
+        else if (fID == -1 || (fID < 0 && fID >= (int)program.size())) { fp = program.size() - 1; }
+        else fp = (size_t)fID;
+        program[fp].inst_seq.emplace_back(inst);
+      }
+
+      void SetInst(size_t fID, size_t pos, size_t id, arg_t a0=0, arg_t a1=0, arg_t a2=0,
+                   const affinity_t & aff=affinity_t()) {
+        emp_assert(ValidPosition(fID, pos));
+        program[fID].inst_seq[pos].Set(id, a0, a1, a2, aff);
+      }
+
+    };
+
+    using program_t = Program;
+    //using program_t = emp::vector<Function>;
     using fun_event_handler_t = std::function<void(EventDrivenGP &, const event_t &)>;
 
   protected:
@@ -216,7 +291,7 @@ namespace emp {
 
   public:
     EventDrivenGP(Ptr<inst_lib_t> _ilib, Ptr<event_lib_t> _elib, Ptr<Random> rnd=nullptr)
-      : inst_lib(_ilib), event_lib(_elib), random_ptr(rnd), random_owner(false), program(),
+      : inst_lib(_ilib), event_lib(_elib), random_ptr(rnd), random_owner(false), program(_ilib),
         shared_mem_ptr(nullptr), execution_stacks(), core_spawn_queue(), cur_core(nullptr),
         event_queue(), traits(), errors(0), is_executing(false)
     {
@@ -240,7 +315,7 @@ namespace emp {
     EventDrivenGP(const EventDrivenGP & in)
       : inst_lib(in.inst_lib), event_lib(in.event_lib), random_ptr(nullptr), random_owner(false),
         program(in.program), shared_mem_ptr(nullptr), execution_stacks(), core_spawn_queue(),
-        cur_core(nullptr), event_queue(), errors(0), is_executing(false)
+        cur_core(nullptr), event_queue(), traits(), errors(0), is_executing(false)
     {
       if (in.random_owner) NewRandom(); // New random number generator.
       else random_ptr = in.random_ptr;
@@ -261,7 +336,8 @@ namespace emp {
     /// Reset everything, including program.
     void Reset() {
       traits.resize(0);
-      program.resize(0);  // Clear out program.
+      //program.resize(0);  // Clear out program.
+      program.Clear();
       ResetHardware();
     }
 
@@ -293,7 +369,7 @@ namespace emp {
     // -- Accessors --
     Ptr<inst_lib_t> GetInstLib() const { return inst_lib; }
     Ptr<event_lib_t> GetEventLib() const { return event_lib; }
-    const Function & GetFunction(size_t fID) const { emp_assert(fID < program.size()); return program[fID]; }
+    const Function & GetFunction(size_t fID) const { emp_assert(ValidFunction(fID)); return program[fID]; }
     size_t GetNumErrors() const { return errors; }
     const inst_t & GetInst(size_t fID, size_t pos) const {
       emp_assert(ValidPosition(fID, pos));
@@ -307,8 +383,8 @@ namespace emp {
       if (cur_core && !cur_core->empty()) return cur_core->back();
       else return nullptr;
     }
-    bool ValidPosition(size_t fID, size_t pos) const { return fID < program.size() && pos < program[fID].GetSize(); }
-    bool ValidFunction(size_t fID) const { return fID < program.size(); }
+    bool ValidPosition(size_t fID, size_t pos) const { return program.ValidPosition(fID, pos); }
+    bool ValidFunction(size_t fID) const { return program.ValidFunction(fID); }
     double GetMinBindThresh() const { return MIN_BIND_THRESH; }
     double GetTrait(size_t id) const { return traits[id]; }
 
@@ -327,9 +403,8 @@ namespace emp {
       emp_assert(ValidPosition(fID, pos));
       program[fID].inst_seq[pos].Set(id, a0, a1, a2, aff);
     }
-    void SetProgram(const program_t & _program) { program = _program; } // @amlalejini - TODO: test
-    void PushFunction(const Function & _function) { program.emplace_back(_function); } // @amlalejini - TODO: test
-    //void PushFunction() { ; } // @amlalejini - TODO: make a push function that creates the function struct for you.
+    void SetProgram(const program_t & _program) { program = _program; }
+    void PushFunction(const Function & _function) { program.PushFunction(_function); }
 
     /// Push new instruction to program.
     /// If no function pointer is provided and no functions exist yet, add new function to
@@ -337,13 +412,7 @@ namespace emp {
     /// last function in program. If function pointer is provided, push to that function.
     void PushInst(size_t id, arg_t a0=0, arg_t a1=0, arg_t a2=0,
                   const affinity_t & aff=affinity_t(), int fID=-1)
-    {
-      size_t fp;
-      if (fID == -1 && !program.size()) { program.emplace_back(); fp = 0; }
-      else if (fID == -1 || (fID < 0 && fID >= (int)program.size())) { fp = program.size() - 1; }
-      else fp = (size_t)fID;
-      program[fp].inst_seq.emplace_back(id, a0, a1, a2, aff);
-    }
+    { program.PushInst(id, a0, a1, a2, aff, fID); }
 
     /// Push new instruction to program.
     /// If no function pointer is provided and no functions exist yet, add new function to
@@ -351,26 +420,13 @@ namespace emp {
     /// last function in program. If function pointer is provided, push to that function.
     void PushInst(const std::string & name, arg_t a0=0, arg_t a1=0, arg_t a2=0,
                   const affinity_t & aff=affinity_t(), int fID=-1)
-    {
-      size_t fp;
-      size_t id = inst_lib->GetID(name);
-      if (fID == -1 && !program.size()) { program.emplace_back(); fp = 0; }
-      else if (fID == -1 || (fID < 0 && fID >= (int)program.size())) { fp = program.size() - 1; }
-      else fp = (size_t)fID;
-      program[fp].inst_seq.emplace_back(id, a0, a1, a2, aff);
-    }
+    { program.PushInst(name, a0, a1, a2, aff, fID); }
 
     /// Push new instruction to program.
     /// If no function pointer is provided and no functions exist yet, add new function to
     /// program and push to that. If no function pointer is provided and functions exist, push to
     /// last function in program. If function pointer is provided, push to that function.
-    void PushInst(const inst_t & inst, int fID=-1) {
-      size_t fp;
-      if (fID == -1 && !program.size()) { program.emplace_back(); fp = 0; }
-      else if (fID == -1 || (fID < 0 && fID >= (int)program.size())) { fp = program.size() - 1; }
-      else fp = (size_t)fID;
-      program[fp].inst_seq.emplace_back(inst);
-    }
+    void PushInst(const inst_t & inst, int fID=-1) { program.PushInst(inst, fID); }
 
     /// Load entire genome from input stream.
     bool Load(std::istream & input) { ; } // TODO
@@ -449,7 +505,7 @@ namespace emp {
       size_t fID;
       double max_bind = -1;
       emp::vector<size_t> best_matches;
-      for (size_t i=0; i < program.size(); i++) {
+      for (size_t i=0; i < program.GetSize(); i++) {
         double bind = SimpleMatchCoeff(program[i].affinity, affinity);
         if (bind == max_bind) best_matches.push_back(i);
         else if (bind > max_bind && bind >= threshold) {
@@ -491,7 +547,7 @@ namespace emp {
       size_t fID;
       double max_bind = -1;
       emp::vector<size_t> best_matches;
-      for (size_t i=0; i < program.size(); i++) {
+      for (size_t i=0; i < program.GetSize(); i++) {
         double bind = SimpleMatchCoeff(program[i].affinity, affinity);
         if (bind == max_bind) best_matches.push_back(i);
         else if (bind > max_bind && bind >= threshold) {
@@ -580,7 +636,7 @@ namespace emp {
 
     /// Advance hardware by single instruction.
     void SingleProcess() {
-      emp_assert(program.size()); // Must have a program before this is allowed.
+      emp_assert(program.GetSize()); // Must have a program before this is allowed.
       // Handle events.
       while (!event_queue.empty()) {
         HandleEvent(event_queue.front());
@@ -605,7 +661,7 @@ namespace emp {
         const size_t ip = cur_state->inst_ptr;
         const size_t fp = cur_state->func_ptr;
         // fp needs to be valid here (and always, really). Shame shame if it's not.
-        emp_assert(fp < program.size());
+        emp_assert(ValidFunction(fp));
         // If instruction pointer hanging off end of function sequence:
         if (ip >= program[fp].GetSize()) {
           if (!cur_state->block_stack.empty()) {
@@ -668,9 +724,18 @@ namespace emp {
       }
     }
 
+    /// Print out hardware traits.
+    void PrintTraits(std::ostream & os=std::cout) {
+      if (traits.size() == 0) { os << "[]"; return; }
+      os << "[";
+      for (size_t i = 0; i < traits.size() - 1; ++i) {
+        os << traits[i] << ", ";
+      } os << traits[traits.size() - 1] << "]";
+    }
+
     /// Print out entire program.
     void PrintProgram(std::ostream & os=std::cout) {
-      for (size_t fID = 0; fID < program.size(); fID++) {
+      for (size_t fID = 0; fID < program.GetSize(); fID++) {
         // Print out function name (affinity).
         os << "Fn-" << fID << " ";
         program[fID].affinity.Print(os);
@@ -708,6 +773,7 @@ namespace emp {
       // Print shared memory
       os << "Shared memory: ";
       for (auto mem : *shared_mem_ptr) os << '{' << mem.first << ':' << mem.second << '}'; os << '\n';
+      os << "Traits: "; PrintTraits(os); os << "\n";
       os << "Errors: " << errors << "\n";
       // Print events.
       os << "Event queue: ";

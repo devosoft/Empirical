@@ -9,6 +9,7 @@
 #include <unordered_set>
 #include <map>
 #include <string>
+#include <iostream>
 
 #include "../tools/FunctionSet.h"
 #include "../tools/map_utils.h"
@@ -78,6 +79,7 @@ namespace emp {
     }
     void RegisterDispatchFun(const std::string & name, fun_t dispatch_fun) {
       event_lib[GetID(name)].dispatch_funs.Add(dispatch_fun);
+      std::cout << event_lib[GetID(name)].dispatch_funs.GetSize() << std::endl;
     }
 
     /// Trigger event.
