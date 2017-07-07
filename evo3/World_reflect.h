@@ -105,39 +105,38 @@ namespace emp {
 
 
   namespace {
-    // Setup genotype identification
+    // Setup genome type identification
     template <typename ORG>
-    // auto Org2Genotype( bool_decoy< typename ORG_T::genotype_t > ) -> typename ORG_T::genotype_t;
-    auto Org2Genotype( bool_decoy< decltype( declval<ORG>().ToGenotype() ) >)
-      -> std::decay_t< decltype( declval<ORG>().ToGenotype() ) >;
+    auto Org2Genome( bool_decoy< decltype( declval<ORG>().GetGenome() ) >)
+      -> std::decay_t< decltype( declval<ORG>().GetGenome() ) >;
 
     template <typename ORG>
-    ORG Org2Genotype( ... );
+    ORG Org2Genome( ... );
   }
 
   template <typename ORG>
-  using find_genotype_t = decltype( Org2Genotype<ORG>() );
+  using find_genome_t = decltype( Org2Genome<ORG>() );
 
 
   namespace {
-    // Setup Org -> Genotype function
-    // 1. ToGenotype member function
-    // 2. Return org AS genotype.
+    // Setup Org -> Genome function
+    // 1. GetGenome member function
+    // 2. Return org AS genome.
 
     template <typename WORLD, typename ORG>
-    void SetOrgToGenotype_impl(WORLD & world, bool_decoy<decltype( declval<ORG>().ToGenotype() )>) {
-      world.SetToGenotypeFun( [](ORG & org) -> const auto & { return org.ToGenotype(); } );
+    void SetOrgGetGenome_impl(WORLD & world, bool_decoy<decltype( declval<ORG>().GetGenome() )>) {
+      world.SetGetGenomeFun( [](ORG & org) -> const auto & { return org.GetGenome(); } );
     }
 
     template <typename WORLD, typename ORG>
-    void SetOrgToGenotype_impl(WORLD & world, ... ) {
-      world.SetToGenotypeFun( [](ORG & org) -> const ORG & { return org; } );
+    void SetOrgGetGenome_impl(WORLD & world, ... ) {
+      world.SetGetGenomeFun( [](ORG & org) -> const ORG & { return org; } );
     }
 
   }
 
   template <typename WORLD, typename ORG>
-  void SetDefaultToGenotypeFun(WORLD & world) { SetOrgToGenotype_impl<WORLD, ORG>(world, true); }
+  void SetDefaultGetGenomeFun(WORLD & world) { SetOrgGetGenome_impl<WORLD, ORG>(world, true); }
 
 }
 
