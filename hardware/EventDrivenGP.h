@@ -177,7 +177,7 @@ namespace emp {
     };
 
     using inst_t = Instruction;
-    using event_t = Event;  // @amlalejini - TODO: change Event to event_t throughout.
+    using event_t = Event;
     using inst_lib_t = InstLib<EventDrivenGP>;
     using event_lib_t = EventLib<EventDrivenGP>;
 
