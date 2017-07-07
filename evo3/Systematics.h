@@ -40,20 +40,22 @@ namespace emp {
     using this_t = Taxon<ORG_INFO>;
     using info_t = ORG_INFO;
 
-    const info_t info;        // Details for the organims associated within this taxanomic group.
-    const Ptr<this_t> parent; // Pointer to parent group (nullptr if injected)
-    size_t num_orgs;          // How many organisms currently exist of this group?
-    size_t tot_orgs;          // How many organisms have ever existed of this group?
-    size_t num_offspring;     // How many direct offspring groups exist from this one.
+    size_t id;                //<  ID for this Taxon (Unique within this Systematics)
+    const info_t info;        //<  Details for the organims associated within this taxanomic group.
+    const Ptr<this_t> parent; //<  Pointer to parent group (nullptr if injected)
+    size_t num_orgs;          //<  How many organisms currently exist of this group?
+    size_t tot_orgs;          //<  How many organisms have ever existed of this group?
+    size_t num_offspring;     //<  How many direct offspring groups exist from this one.
 
   public:
-    Taxon(const info_t & _info, Ptr<this_t> _parent=nullptr)
-    : info(_info), parent(_parent), num_orgs(0), tot_orgs(0), num_offspring(0) { ; }
+    Taxon(size_t _id, const info_t & _info, Ptr<this_t> _parent=nullptr)
+    : id (_id), info(_info), parent(_parent), num_orgs(0), tot_orgs(0), num_offspring(0) { ; }
     Taxon(const Taxon &) = delete;
     Taxon(Taxon &&) = default;
     Taxon & operator=(const Taxon &) = delete;
     Taxon & operator=(Taxon &&) = default;
 
+    size_t GetID() const { return id; }
     const info_t & GetInfo() const { return info; }
     Ptr<this_t> GetParent() const { return parent; }
     size_t GetNumOrgs() const { return num_orgs; }
@@ -86,6 +88,8 @@ namespace emp {
     using taxon_t = Taxon<ORG_INFO>;
     using hash_t = typename Ptr<taxon_t>::hash_t;
 
+    static constexpr bool verbose = true;
+
     bool store_active;     //< Store all of the currently active taxa?
     bool store_ancestors;  //< Store all of the direct ancestors from living taxa?
     bool store_outside;    //< Store taxa that are extinct with no living descendants?
@@ -94,6 +98,8 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > active_taxa;   //< A set of all living taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; //< A set of all dead, ancestral taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  //< A set of all dead taxa w/o descendants.
+
+    size_t next_id;
 
     void RemoveOffspring(Ptr<taxon_t> taxon) {
       if (!taxon) return;                                // Not tracking this taxon.
@@ -132,7 +138,8 @@ namespace emp {
     Systematics(bool _active=true, bool _anc=true, bool _all=false)
       : store_active(_active), store_ancestors(_anc), store_outside(_all)
       , archive(store_ancestors || store_outside)
-      , active_taxa(), ancestor_taxa(), outside_taxa() { ; }
+      , active_taxa(), ancestor_taxa(), outside_taxa()
+      , next_id(0) { ; }
     Systematics(const Systematics &) = delete;
     Systematics(Systematics &&) = default;
     ~Systematics() {
@@ -155,13 +162,6 @@ namespace emp {
     size_t GetTreeSize() const { return GetNumActive() + GetNumAncestors(); }
     size_t GetNumTaxa() const { return GetTreeSize() + GetNumOutside(); }
 
-    void Reset(bool _active=true, bool _anc=true, bool _all=false) {
-      store_active = _active; store_ancestors = _anc; store_outside = _all;
-      archive = store_ancestors || store_outside;
-      // @CAO Should actively delete all taxa!
-      active_taxa.clear(); ancestor_taxa.clear(); outside_taxa.clear();
-    }
-
     /// Add information about a new organism; return a pointer for the associated taxon.
     Ptr<taxon_t> AddOrg(const ORG_INFO & info, Ptr<taxon_t> parent=nullptr) {
       if (parent && parent->GetInfo() == info) {   // Adding another org of this taxon.
@@ -170,7 +170,7 @@ namespace emp {
         return parent;
       }
       // Otherwise, this is a new taxon!  If archiving, track the parent.
-      Ptr<taxon_t> cur_taxon = NewPtr<taxon_t>(info, parent);
+      Ptr<taxon_t> cur_taxon = NewPtr<taxon_t>(++next_id, info, parent);
       if (store_active) active_taxa.insert(cur_taxon);
       if (parent) parent->AddOffspring();
       cur_taxon->AddOrg();
@@ -181,7 +181,7 @@ namespace emp {
     /// Remove an instance of an organism; track when it's gone.
     bool RemoveOrg(Ptr<taxon_t> taxon) {
       emp_assert(taxon);
-      emp_assert(Has(active_taxa, taxon));
+      // emp_assert(Has(active_taxa, taxon));
       const bool active = taxon->RemoveOrg();
       if (!active) MarkExtinct(taxon);
       return active;
@@ -194,21 +194,23 @@ namespace emp {
       return taxon->GetParent();
     }
 
+    /// Print details about the Systematics manager.
+    void PrintStatus(std::ostream & os=std::cout) const {
+      os << "Systematics Status:\n";
+      os << "Active count:   " << active_taxa.size() << std::endl;
+      os << "Ancestor count: " << ancestor_taxa.size() << std::endl;
+      os << "Outside count:  " << outside_taxa.size() << std::endl;
+    }
+
     /// Print whole lineage.
-    void PrintLineage(Ptr<taxon_t> taxon, std::ostream & os=std::cout) {
+    void PrintLineage(Ptr<taxon_t> taxon, std::ostream & os=std::cout) const {
+      os << "Lineage:\n";
       while (taxon) {
         os << taxon->GetInfo() << std::endl;
         taxon = taxon->GetParent();
       }
     }
 
-    // Print details about the Systematics manager.
-    void PrintStatus(std::ostream & os=std::cout) {
-      os << "Systematics Status:\n";
-      os << "Active count:   " << active_taxa.size() << std::endl;
-      os << "Ancestor count: " << ancestor_taxa.size() << std::endl;
-      os << "Outside count:  " << outside_taxa.size() << std::endl;
-    }
   };
 
 }
