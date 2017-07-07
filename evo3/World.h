@@ -113,7 +113,7 @@ namespace emp {
       , name(_name), cache_on(false), size_x(0), size_y(0)
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_get_genome()
       , fun_add_inject(), fun_add_birth(), fun_get_neighbor()
-      , attributes()
+      , attributes(), systematics()
     {
       if (!rnd) NewRandom();
       SetDefaultFitFun<this_t, ORG>(*this);
@@ -163,6 +163,11 @@ namespace emp {
 
     const genome_t & GetGenome(ORG & org) { return fun_get_genome(org); }
     const genome_t & GetGenomeAt(size_t id) { return fun_get_genome(GetOrg(id)); }
+
+    const Systematics<genome_t> & GetSystematics() const { return systematics; }
+    void PrintLineage(size_t id, std::ostream & os=std::cout) const {
+      return systematics.PrintLineage(genotypes[id], os);
+    }
 
     // --- CONFIGURE ---
 
