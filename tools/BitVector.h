@@ -582,11 +582,11 @@ namespace std {
       return b.Hash();
     }
   };
-}
 
-inline std::ostream & operator<<(std::ostream & out, const emp::BitVector & _bit_set) {
-  _bit_set.Print(out);
-  return out;
+  inline std::ostream & operator<<(std::ostream & out, const emp::BitVector & bit_v) {
+    bit_v.Print(out);
+    return out;
+  }
 }
 
 #endif
