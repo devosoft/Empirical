@@ -20,7 +20,7 @@
 //  Developer Notes:
 //  * We should Specialize World so that ANOTHER world can be used with proper delegation to
 //    facilitate demes, pools, islands, etc.
-//  * With DoMutations, should we update genotypes?  Or just assume that it will be handled
+//  * With DoMutations, should we update taxa?  Or just assume that it will be handled
 //    properly when the organisms move to the next generation.
 
 #ifndef EMP_EVO_WORLD_H
@@ -47,14 +47,15 @@ namespace emp {
   class World {
   private:
     using this_t = World<ORG>;
-    using genotype_t = typename emp::find_genotype_t<ORG>;
+    using genome_t = typename emp::find_genome_t<ORG>;
+    using genotype_t = emp::Taxon<genome_t>;
 
     friend class World_iterator<this_t>;
 
     using fun_calc_fitness_t = std::function<double(ORG&)>;
     using fun_do_mutations_t = std::function<void(ORG&,Random&)>;
     using fun_print_org_t    = std::function<void(ORG&,std::ostream &)>;
-    using fun_to_genotype_t  = std::function<const genotype_t & (ORG &)>;
+    using fun_get_genome_t  = std::function<const genome_t & (ORG &)>;
     using fun_add_inject_t   = std::function<size_t(Ptr<ORG>)>;
     using fun_add_birth_t    = std::function<size_t(Ptr<ORG>, size_t)>;
     using fun_get_neighbor_t = std::function<size_t(size_t)>;
@@ -67,7 +68,7 @@ namespace emp {
     size_t num_orgs;                //< How many organisms are actually in the population.
     emp::vector<double> fit_cache;  //< vector size == 0 when not caching; uncached values == 0.
     emp::vector<Ptr<genotype_t>> genotypes;      //< Genotypes for the corresponding orgs.
-    emp::vector<Ptr<genotype_t>> next_genotypes; //< Fenotypes for corresponding orgs in next_pop.
+    emp::vector<Ptr<genotype_t>> next_genotypes; //< Genotypes for corresponding orgs in next_pop.
 
     // Configuration settings
     std::string name;         // Name of this world (for use in configuration.)
@@ -79,7 +80,7 @@ namespace emp {
     fun_calc_fitness_t fun_calc_fitness;  // Fitness function
     fun_do_mutations_t fun_do_mutations;  // Mutation function
     fun_print_org_t    fun_print_org;     // Print function
-    fun_to_genotype_t  fun_to_genotype;   // Fun to convert org to genotype.
+    fun_get_genome_t   fun_get_genome;    // Determine the genome object of an organism.
     fun_add_inject_t   fun_add_inject;    // Technique to inject a new organism.
     fun_add_birth_t    fun_add_birth;     // Technique to add a new offspring.
     fun_get_neighbor_t fun_get_neighbor;  // Choose a random neighbor near specified id.
@@ -88,11 +89,11 @@ namespace emp {
     std::map<std::string, std::string> attributes;
 
     // Data collection.
-    Systematics<genotype_t> systematics;
+    Systematics<genome_t> systematics;
 
     // AddOrgAt is the only way to add organisms (others must go through here)
-    size_t AddOrgAt(Ptr<ORG> new_org, size_t pos);
-    size_t AddNextOrgAt(Ptr<ORG> new_org, size_t pos);
+    size_t AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
+    size_t AddNextOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
 
     // RemoveOrgAt is the only way to remove organism.
     void RemoveOrgAt(size_t pos);
@@ -110,7 +111,7 @@ namespace emp {
       : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), fit_cache()
       , genotypes(), next_genotypes()
       , name(_name), cache_on(false), size_x(0), size_y(0)
-      , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_to_genotype()
+      , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_get_genome()
       , fun_add_inject(), fun_add_birth(), fun_get_neighbor()
       , attributes()
     {
@@ -118,7 +119,7 @@ namespace emp {
       SetDefaultFitFun<this_t, ORG>(*this);
       SetDefaultMutFun<this_t, ORG>(*this);
       SetDefaultPrintFun<this_t, ORG>(*this);
-      SetDefaultToGenotypeFun<this_t, ORG>(*this);
+      SetDefaultGetGenomeFun<this_t, ORG>(*this);
       SetWellMixed();  // World default structure is well-mixed.
     }
     World(Random & rnd, std::string _name="") : World(&rnd, _name) { ; }
@@ -160,8 +161,8 @@ namespace emp {
       return pop[id];
     }
 
-    const genotype_t & ToGenotype(ORG & org) { return fun_to_genotype(org); }
-    const genotype_t & GetGenotype(size_t id) { return fun_to_genotype(GetOrg(id)); }
+    const genome_t & GetGenome(ORG & org) { return fun_get_genome(org); }
+    const genome_t & GetGenomeAt(size_t id) { return fun_get_genome(GetOrg(id)); }
 
     // --- CONFIGURE ---
 
@@ -172,7 +173,7 @@ namespace emp {
     void SetFitFun(const fun_calc_fitness_t & fit_fun) { fun_calc_fitness = fit_fun; }
     void SetMutFun(const fun_do_mutations_t & mut_fun) { fun_do_mutations = mut_fun; }
     void SetPrintFun(const fun_print_org_t & print_fun) { fun_print_org = print_fun; }
-    void SetToGenotypeFun(const fun_to_genotype_t & gen_fun) { fun_to_genotype = gen_fun; }
+    void SetGetGenomeFun(const fun_get_genome_t & gen_fun) { fun_get_genome = gen_fun; }
 
 
     // --- MANAGE ATTRIBUTES ---
@@ -315,24 +316,37 @@ namespace emp {
   // =============================================================
 
   template <typename ORG>
-  size_t World<ORG>::AddOrgAt(Ptr<ORG> new_org, size_t pos) {
+  size_t World<ORG>::AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype) {
     emp_assert(new_org, pos);                            // The new organism must exist.
 
-    if (pop.size() <= pos) pop.resize(pos+1, nullptr);   // Make sure we have room.
-    if (pop[pos]) { ClearCache(pos); RemoveOrgAt(pos); --num_orgs; }     // Clear out any old org.
-    pop[pos] = new_org;                                  // Place new org.
-    ++num_orgs;                                          // Track number of orgs.
+    // Determine new organism's genotype.
+    Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype);
+    if (pop.size() <= pos) pop.resize(pos+1, nullptr);               // Make sure we have room.
+    if (pop[pos]) { ClearCache(pos); RemoveOrgAt(pos); --num_orgs; } // Clear out any old org.
+    pop[pos] = new_org;                                              // Place new org.
+    ++num_orgs;                                                      // Track number of orgs.
+
+    // Track the new genotype.
+    if (genotypes.size() <= pos) genotypes.resize(pos+1, nullptr);   // Make sure we fit genotypes.
+    genotypes[pos] = new_genotype;
 
     return pos;
   }
 
   template <typename ORG>
-  size_t World<ORG>::AddNextOrgAt(Ptr<ORG> new_org, size_t pos) {
+  size_t World<ORG>::AddNextOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype) {
     emp_assert(new_org, pos);                            // The new organism must exist.
 
+    // Determine new organism's genotype.
+    Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype);
     if (next_pop.size() <= pos) next_pop.resize(pos+1, nullptr);   // Make sure we have room.
     if (next_pop[pos]) { RemoveNextOrgAt(pos); }                   // Clear out any old org.
     next_pop[pos] = new_org;                                       // Place new org.
+
+    // Track the new genotype.
+    if (next_genotypes.size() <= pos) next_genotypes.resize(pos+1, nullptr);  // Make sure we fit genotypes.
+    next_genotypes[pos] = new_genotype;
+
     return pos;
   }
 
@@ -344,12 +358,16 @@ namespace emp {
       emp_assert(fit_cache.size() > pos);
       fit_cache[pos] = 0.0;
     }
+    systematics.RemoveOrg( genotypes[pos] );
+    genotypes[pos] = nullptr;
   }
 
   template<typename ORG>
   void World<ORG>::RemoveNextOrgAt(size_t pos) {
     next_pop[pos].Delete();
     next_pop[pos] = nullptr;
+    systematics.RemoveOrg( next_genotypes[pos] );
+    next_genotypes[pos] = nullptr;
   }
 
   template<typename ORG>
@@ -479,7 +497,8 @@ namespace emp {
       for (size_t i = 0; i < pop.size(); i++) if (pop[i]) RemoveOrgAt(i);
       pop.resize(0);
 
-      std::swap(pop, next_pop); // Move next_pop in place.
+      std::swap(pop, next_pop);               // Move next_pop into place.
+      std::swap(genotypes, next_genotypes);   // Move next_genotypes into place.
 
       num_orgs = 0;             // Update the organism count.
       for (size_t i = 0; i < pop.size(); i++) if (pop[i]) ++num_orgs;
