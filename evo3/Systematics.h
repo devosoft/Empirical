@@ -103,6 +103,10 @@ namespace emp {
 
     void RemoveOffspring(Ptr<taxon_t> taxon) {
       if (!taxon) return;                                // Not tracking this taxon.
+      if (verbose) {
+        std::cout << "RemoveOffspring on taxon " << taxon->GetID()
+                  << "; now has " << (taxon->GetNumOff()-1) << " offspring.\n";
+      }
       bool still_active = taxon->RemoveOffspring();      // Taxon still active w/ 1 fewer offspring?
       if (still_active == false) {                       // If we're out of offspring, now outside.
         RemoveOffspring( taxon->GetParent() );           // Cascade up to parent taxon.
@@ -116,6 +120,9 @@ namespace emp {
     void MarkExtinct(Ptr<taxon_t> taxon) {
       emp_assert(taxon);
       emp_assert(taxon->GetNumOrgs() == 0);
+      if (verbose) {
+        std::cout << "MarkExtinct on taxon " << taxon->GetID() << std::endl;
+      }
       if (store_active) active_taxa.erase(taxon);
       if (!archive) {   // If we don't archive taxa, delete them.
         taxon.Delete();
@@ -165,12 +172,27 @@ namespace emp {
     /// Add information about a new organism; return a pointer for the associated taxon.
     Ptr<taxon_t> AddOrg(const ORG_INFO & info, Ptr<taxon_t> parent=nullptr) {
       if (parent && parent->GetInfo() == info) {   // Adding another org of this taxon.
+        if (verbose) {
+          std::cout << "AddOrg to existing taxon " << parent->GetID()
+                    << "; now has " << (parent->GetNumOrgs()+1) << " orgs.\n";
+        }
         emp_assert( Has(active_taxa, parent) );
         parent->AddOrg();
         return parent;
       }
       // Otherwise, this is a new taxon!  If archiving, track the parent.
       Ptr<taxon_t> cur_taxon = NewPtr<taxon_t>(++next_id, info, parent);
+
+      if (verbose) {
+        std::cout << "AddOrg created new taxon " << cur_taxon->GetID();
+        if (parent) {
+          std::cout <<  "; parent is " << parent->GetID()
+                    << " with " << parent->GetNumOff() << " child taxa.\n";
+        } else {
+          std::cout << "; no parent.\n";
+        }
+      }
+
       if (store_active) active_taxa.insert(cur_taxon);
       if (parent) parent->AddOffspring();
       cur_taxon->AddOrg();
@@ -181,6 +203,10 @@ namespace emp {
     /// Remove an instance of an organism; track when it's gone.
     bool RemoveOrg(Ptr<taxon_t> taxon) {
       emp_assert(taxon);
+      if (verbose) {
+        std::cout << "RemoveOrg on taxon " << taxon->GetID()
+                  << "; now has " << (taxon->GetNumOrgs()-1) << " orgs.\n";
+      }
       // emp_assert(Has(active_taxa, taxon));
       const bool active = taxon->RemoveOrg();
       if (!active) MarkExtinct(taxon);
