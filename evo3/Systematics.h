@@ -229,9 +229,26 @@ namespace emp {
          << " archive=" << archive
          << " next_id=" << next_id
          << std::endl;
-      os << "Active count:   " << active_taxa.size() << std::endl;
-      os << "Ancestor count: " << ancestor_taxa.size() << std::endl;
-      os << "Outside count:  " << outside_taxa.size() << std::endl;
+      os << "Active count:   " << active_taxa.size();
+      for (const auto & x : active_taxa) {
+        os << " [" << x->GetID() << "|" << x->GetNumOrgs() << "," << x->GetNumOff() << "|"
+           << ((bool) x->GetParent()) << "]";
+      }
+      os << std::endl;
+
+      os << "Ancestor count: " << ancestor_taxa.size();
+      for (const auto & x : ancestor_taxa) {
+        os << " [" << x->GetID() << "|" << x->GetNumOrgs() << "," << x->GetNumOff() << "|"
+           << ((bool) x->GetParent()) << "]";
+      }
+      os << std::endl;
+
+      os << "Outside count:  " << outside_taxa.size();
+      for (const auto & x : outside_taxa) {
+        os << " [" << x->GetID() << "|" << x->GetNumOrgs() << "," << x->GetNumOff() << "|"
+           << ((bool) x->GetParent()) << "]";
+      }
+      os << std::endl;
     }
 
     /// Print whole lineage.
