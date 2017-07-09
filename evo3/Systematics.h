@@ -223,6 +223,12 @@ namespace emp {
     /// Print details about the Systematics manager.
     void PrintStatus(std::ostream & os=std::cout) const {
       os << "Systematics Status:\n";
+      os << " store_active=" << store_active
+         << " store_ancestors=" << store_ancestors
+         << " store_outside=" << store_outside
+         << " archive=" << archive
+         << " next_id=" << next_id
+         << std::endl;
       os << "Active count:   " << active_taxa.size() << std::endl;
       os << "Ancestor count: " << ancestor_taxa.size() << std::endl;
       os << "Outside count:  " << outside_taxa.size() << std::endl;
