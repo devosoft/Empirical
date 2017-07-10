@@ -82,7 +82,7 @@ namespace emp {
     using stack_t = emp::vector<double>;
 
   protected:
-    Ptr<inst_lib_t> inst_lib;
+    Ptr<const inst_lib_t> inst_lib;
 
     // Virtual CPU Components!
     genome_t genome;
@@ -176,7 +176,7 @@ namespace emp {
     }
 
   public:
-    AvidaGP(Ptr<inst_lib_t> _ilib)
+    AvidaGP(Ptr<const inst_lib_t> _ilib)
       : inst_lib(_ilib), genome(), regs(), inputs(), outputs(), stacks(), fun_starts()
       , inst_ptr(0), scope_stack(), reg_stack(), call_stack(), errors(0), traits()
     {
@@ -226,7 +226,7 @@ namespace emp {
     }
 
     // Accessors
-    Ptr<inst_lib_t> GetInstLib() const { return inst_lib; }
+    Ptr<const inst_lib_t> GetInstLib() const { return inst_lib; }
     inst_t GetInst(size_t pos) const { return genome[pos]; }
     const genome_t & GetGenome() const { return genome; }
     double GetReg(size_t id) const { return regs[id]; }
@@ -436,7 +436,7 @@ namespace emp {
       hw.reg_stack.emplace_back(hw.CurScope(), inst.args[0], hw.regs[inst.args[0]]);
     }
 
-    static Ptr<inst_lib_t> DefaultInstLib();
+    static Ptr<const inst_lib_t> DefaultInstLib();
   };
 
   size_t AvidaGP::InstScope(const inst_t & inst) const {
@@ -545,7 +545,7 @@ namespace emp {
   }
 
   /// This static function can be used to access the generic AvidaGP instruction library.
-  Ptr<InstLib<AvidaGP>> AvidaGP::DefaultInstLib() {
+  Ptr<const InstLib<AvidaGP>> AvidaGP::DefaultInstLib() {
     static inst_lib_t inst_lib;
 
     if (inst_lib.GetSize() == 0) {

@@ -194,10 +194,10 @@ namespace emp {
     struct Program {
       using program_t = emp::vector<Function>;
 
-      Ptr<inst_lib_t> inst_lib;
+      Ptr<const inst_lib_t> inst_lib;
       emp::vector<Function> program;
 
-      Program(Ptr<inst_lib_t> _ilib, const emp::vector<Function> & _prgm=emp::vector<Function>())
+      Program(Ptr<const inst_lib_t> _ilib, const emp::vector<Function> & _prgm=emp::vector<Function>())
       : inst_lib(_ilib), program(_prgm) { ; }
       Program(const Program &) = default;
 
@@ -207,6 +207,7 @@ namespace emp {
       const Function & operator[](size_t id) const { return program[id]; }
 
       size_t GetSize() const { return program.size(); }
+      Ptr<const inst_lib_t> GetInstLib() const { return inst_lib; }
 
       bool ValidPosition(size_t fID, size_t pos) const {
         return fID < program.size() && pos < program[fID].GetSize();
@@ -270,8 +271,7 @@ namespace emp {
     using fun_event_handler_t = std::function<void(EventDrivenGP &, const event_t &)>;
 
   protected:
-    Ptr<inst_lib_t> inst_lib;      // Instruction library.
-    Ptr<event_lib_t> event_lib;    // Event library.
+    Ptr<const event_lib_t> event_lib;    // Event library.
 
     Ptr<Random> random_ptr;
     bool random_owner;
@@ -290,8 +290,8 @@ namespace emp {
     bool is_executing;    // This is true only when executing the execution stacks.
 
   public:
-    EventDrivenGP(Ptr<inst_lib_t> _ilib, Ptr<event_lib_t> _elib, Ptr<Random> rnd=nullptr)
-      : inst_lib(_ilib), event_lib(_elib), random_ptr(rnd), random_owner(false), program(_ilib),
+    EventDrivenGP(Ptr<const inst_lib_t> _ilib, Ptr<const event_lib_t> _elib, Ptr<Random> rnd=nullptr)
+      : event_lib(_elib), random_ptr(rnd), random_owner(false), program(_ilib),
         shared_mem_ptr(nullptr), execution_stacks(), core_spawn_queue(), cur_core(nullptr),
         event_queue(), traits(), errors(0), is_executing(false)
     {
@@ -305,28 +305,35 @@ namespace emp {
     EventDrivenGP(inst_lib_t & _ilib, event_lib_t & _elib, Ptr<Random> rnd=nullptr)
       : EventDrivenGP(&_ilib, &_elib, rnd) { ; }
 
-    EventDrivenGP(Ptr<event_lib_t> _elib, Ptr<Random> rnd=nullptr)
+    EventDrivenGP(Ptr<const event_lib_t> _elib, Ptr<Random> rnd=nullptr)
       : EventDrivenGP(DefaultInstLib(), _elib, rnd) { ; }
 
     EventDrivenGP(Ptr<Random> rnd=nullptr)
       : EventDrivenGP(DefaultInstLib(), DefaultEventLib(), rnd) { ; }
-    // EventDrivenGP(EventDrivenGP &&) = default; // @amlalejini - TODO: implement move constructor.
 
-    EventDrivenGP(const EventDrivenGP & in)
-      : inst_lib(in.inst_lib), event_lib(in.event_lib), random_ptr(nullptr), random_owner(false),
-        program(in.program), shared_mem_ptr(nullptr), execution_stacks(), core_spawn_queue(),
-        cur_core(nullptr), event_queue(), traits(), errors(0), is_executing(false)
-    {
-      if (in.random_owner) NewRandom(); // New random number generator.
-      else random_ptr = in.random_ptr;
-      shared_mem_ptr.New(); // New shared memory.
-      // Spin up main core.
-      SpawnCore(0, memory_t(), true);
-      cur_core = execution_stacks[0];
-    }
+    // TODO - Write proper custom move and copy constructors. Defaults don't work properly.
+    //EventDrivenGP(EventDrivenGP &&) = default; // @amlalejini - TODO: implement move constructor.
+
+    // @amlalejini - TODO: This copy constructor fucks up putting this hardware into containers that
+    // dynamically resize. Fix it.
+    //EventDrivenGP(const EventDrivenGP &) = default;
+    // EventDrivenGP(const EventDrivenGP & in)
+    //   : inst_lib(in.inst_lib), event_lib(in.event_lib), random_ptr(nullptr), random_owner(false),
+    //     program(in.program), shared_mem_ptr(nullptr), execution_stacks(), core_spawn_queue(),
+    //     cur_core(nullptr), event_queue(), traits(), errors(0), is_executing(false)
+    // {
+    //   std::cout << "Copy construct!" << std::endl;
+    //   if (in.random_owner) NewRandom(); // New random number generator.
+    //   else random_ptr = in.random_ptr;
+    //   shared_mem_ptr.New(); // New shared memory.
+    //   // Spin up main core.
+    //   SpawnCore(0, memory_t(), true);
+    //   cur_core = execution_stacks[0];
+    // }
 
     /// Destructor - clean up: execution stacks, shared memory.
     ~EventDrivenGP() {
+      std::cout << "EventDrivenGP Destructor!" << std::endl;
       Reset();
       if (random_owner) random_ptr.Delete();
       shared_mem_ptr.Delete();
@@ -367,8 +374,8 @@ namespace emp {
     }
 
     // -- Accessors --
-    Ptr<inst_lib_t> GetInstLib() const { return inst_lib; }
-    Ptr<event_lib_t> GetEventLib() const { return event_lib; }
+    Ptr<const inst_lib_t> GetInstLib() const { return program.GetInstLib(); }
+    Ptr<const event_lib_t> GetEventLib() const { return event_lib; }
     const Function & GetFunction(size_t fID) const { emp_assert(ValidFunction(fID)); return program[fID]; }
     size_t GetNumErrors() const { return errors; }
     const inst_t & GetInst(size_t fID, size_t pos) const {
@@ -442,6 +449,7 @@ namespace emp {
     /// This is not guaranteed to return a valid IP. At worst, it'll return an IP == function.inst_seq.size().
     size_t FindEndOfBlock(size_t fp, size_t ip) {
       emp_assert(ValidPosition(fp, ip));
+      Ptr<const inst_lib_t> inst_lib = program.inst_lib;
       int depth_counter = 1;
       while (true) {
         if (!ValidPosition(fp, ip)) break;
@@ -602,7 +610,7 @@ namespace emp {
 
     // -- Execution --
     /// Process a single instruction, provided by the caller.
-    void ProcessInst(const inst_t & inst) { emp_assert(GetCurState()); inst_lib->ProcessInst(*this, inst); }
+    void ProcessInst(const inst_t & inst) { emp_assert(GetCurState()); program.inst_lib->ProcessInst(*this, inst); }
     /// Handle an event (on this hardware).
     void HandleEvent(const event_t & event) { emp_assert(GetCurState()); event_lib->HandleEvent(*this, event); }
     /// Trigger an event (from this hardware).
@@ -678,7 +686,7 @@ namespace emp {
           // First, advance the instruction pointer by 1. This may invalidate the IP, but that's okay.
           cur_state->inst_ptr += 1;
           // Run instruction @ fp, ip.
-          inst_lib->ProcessInst(*this, program[fp].inst_seq[ip]);
+          program.inst_lib->ProcessInst(*this, program[fp].inst_seq[ip]);
         }
         // After processing, is the core still active?
         if (cur_core->empty()) {
@@ -714,11 +722,11 @@ namespace emp {
 
     /// Print out a single instruction with its arguments.
     void PrintInst(const inst_t & inst, std::ostream & os=std::cout) {
-      os << inst_lib->GetName(inst.id);
-      if (inst_lib->HasProperty(inst.id, "affinity")) {
+      os << program.inst_lib->GetName(inst.id);
+      if (program.inst_lib->HasProperty(inst.id, "affinity")) {
         os << ' '; inst.affinity.Print(os);
       }
-      const size_t num_args = inst_lib->GetNumArgs(inst.id);
+      const size_t num_args = program.inst_lib->GetNumArgs(inst.id);
       for (size_t i = 0; i < num_args; i++) {
         os << ' ' << inst.args[i];
       }
@@ -747,10 +755,10 @@ namespace emp {
           for (int s = 0; s < num_spaces; s++) os << ' ';
           PrintInst(inst, os);
           os << '\n';
-          if (inst_lib->HasProperty(inst.id, "block_def")) {
+          if (program.inst_lib->HasProperty(inst.id, "block_def")) {
             // is block def?
             depth++;
-          } else if (inst_lib->HasProperty(inst.id, "block_close") && depth > 0) {
+          } else if (program.inst_lib->HasProperty(inst.id, "block_close") && depth > 0) {
             // is block close?
             depth--;
           }
@@ -1014,9 +1022,12 @@ namespace emp {
       hw.TriggerEvent("Message", inst.affinity, state.output_mem, {"send"});
     }
 
-    Ptr<InstLib<EventDrivenGP>> DefaultInstLib() {
+    // Issue (but also a good thing in some circumstances): This always returns a pointer to the same inst_lib object.
+    //  -- Anytime something gets added to it from elsewhere, it's added everywhere.
+    // Alternatives:
+    //    * Make a new thing everytime.
+    static Ptr<const InstLib<EventDrivenGP>> DefaultInstLib() {
       static inst_lib_t inst_lib;
-
       if (inst_lib.GetSize() == 0) {
         inst_lib.AddInst("Inc", Inst_Inc, 1, "Increment value in local memory Arg1");
         inst_lib.AddInst("Dec", Inst_Dec, 1, "Decrement value in local memory Arg1");
@@ -1057,7 +1068,7 @@ namespace emp {
     }
 
     /// Define default events. NOTE: default events have no registered dispatch functions.
-    Ptr<EventLib<EventDrivenGP>> DefaultEventLib() {
+    static Ptr<const EventLib<EventDrivenGP>> DefaultEventLib() {
       static event_lib_t event_lib;
       if (event_lib.GetSize() == 0) {
         event_lib.AddEvent("Message", HandleEvent_Message, "Event for exchanging messages (agent-agent, world-agent, etc.)");

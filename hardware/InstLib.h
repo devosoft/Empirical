@@ -57,7 +57,11 @@ namespace emp {
 
   public:
     InstLib() : inst_lib(), inst_funs(), name_map(), arg_map() { ; }
+    InstLib(const InstLib &) = default;
     ~InstLib() { ; }
+
+    InstLib & operator=(const InstLib &) = default;
+    InstLib & operator=(InstLib &&) = default;
 
     const std::string & GetName(size_t id) const { return inst_lib[id].name; }
     const fun_t & GetFunction(size_t id) const { return inst_lib[id].fun_call; }

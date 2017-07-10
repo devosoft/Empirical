@@ -19,20 +19,20 @@ int main() {
   emp::EventDrivenGP cpu(random);
 
   // Register some example event dispatchers.
-  cpu.GetEventLib()->RegisterDispatchFun("Message",
-      [](emp::EventDrivenGP & hw, const event_t & event){
-        std::cout << "----------->" << std::endl;
-        std::cout << "From dispatcher 1: Message event!" << std::endl;
-        hw.PrintEvent(event); std::cout << std::endl;
-        std::cout << "<----------" << std::endl;
-      });
-  cpu.GetEventLib()->RegisterDispatchFun("Message",
-      [](emp::EventDrivenGP & hw, const event_t & event) {
-        std::cout << "----------->" << std::endl;
-        std::cout << "From dispatcher 2: Message event!" << std::endl;
-        hw.PrintEvent(event); std::cout << std::endl;
-        std::cout << "<----------" << std::endl;
-      });
+  // cpu.GetEventLib()->RegisterDispatchFun("Message",
+  //     [](emp::EventDrivenGP & hw, const event_t & event){
+  //       std::cout << "----------->" << std::endl;
+  //       std::cout << "From dispatcher 1: Message event!" << std::endl;
+  //       hw.PrintEvent(event); std::cout << std::endl;
+  //       std::cout << "<----------" << std::endl;
+  //     });
+  // cpu.GetEventLib()->RegisterDispatchFun("Message",
+  //     [](emp::EventDrivenGP & hw, const event_t & event) {
+  //       std::cout << "----------->" << std::endl;
+  //       std::cout << "From dispatcher 2: Message event!" << std::endl;
+  //       hw.PrintEvent(event); std::cout << std::endl;
+  //       std::cout << "<----------" << std::endl;
+  //     });
 
   // Making a table of bit set values to make affinity assignment easier.
   emp::vector<affinity_t> bitsets(256);

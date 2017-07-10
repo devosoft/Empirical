@@ -47,7 +47,11 @@ namespace emp {
 
   public:
     EventLib() : event_lib(), name_map() { ; }
+    EventLib(const EventLib &) = default;
     ~EventLib() { ; }
+
+    EventLib & operator=(const EventLib &) = default;
+    EventLib & operator=(EventLib &&) = default;
 
     const std::string & GetName(size_t id) const { return event_lib[id].name; }
     const fun_t & GetHandler(size_t id) const { return event_lib[id].handler; }
@@ -79,7 +83,6 @@ namespace emp {
     }
     void RegisterDispatchFun(const std::string & name, fun_t dispatch_fun) {
       event_lib[GetID(name)].dispatch_funs.Add(dispatch_fun);
-      std::cout << event_lib[GetID(name)].dispatch_funs.GetSize() << std::endl;
     }
 
     /// Trigger event.
