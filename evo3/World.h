@@ -113,7 +113,7 @@ namespace emp {
       , name(_name), cache_on(false), size_x(0), size_y(0)
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_get_genome()
       , fun_add_inject(), fun_add_birth(), fun_get_neighbor()
-      , attributes(), systematics()
+      , attributes(), systematics(true,true,true)
     {
       if (!rnd) NewRandom();
       SetDefaultFitFun<this_t, ORG>(*this);
@@ -166,7 +166,7 @@ namespace emp {
 
     const Systematics<genome_t> & GetSystematics() const { return systematics; }
     void PrintLineage(size_t id, std::ostream & os=std::cout) const {
-      return systematics.PrintLineage(genotypes[id], os);
+      systematics.PrintLineage(genotypes[id], os);
     }
 
     // --- CONFIGURE ---
@@ -390,16 +390,16 @@ namespace emp {
 
     if (synchronous_gen) {
       // Append births into the next population.
-      fun_add_birth = [this](Ptr<ORG> new_org, size_t) {
+      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
         emp_assert(new_org);                            // New organism must exist.
-        return AddNextOrgAt(new_org, next_pop.size());  // Append it to the NEXT population
+        return AddNextOrgAt(new_org, next_pop.size(), genotypes[parent_id]);  // Append it to the NEXT population
       };
 
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neigbor in current population.
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        return AddOrgAt(new_org, fun_get_neighbor(parent_id)); // Place org in existing population.
+        return AddOrgAt(new_org, fun_get_neighbor(parent_id), genotypes[parent_id]); // Place org in existing population.
       };
       SetAttribute("SynchronousGen", "False");
     }
@@ -432,13 +432,13 @@ namespace emp {
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
         emp_assert(new_org);                                  // New organism must exist.
         const size_t id = fun_get_neighbor(parent_id);     // Placed near parent, in next pop.
-        return AddNextOrgAt(new_org, id);
+        return AddNextOrgAt(new_org, id, genotypes[parent_id]);
       };
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neigbor in current population.
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        return AddOrgAt(new_org, fun_get_neighbor(parent_id)); // Place org in existing population.
+        return AddOrgAt(new_org, fun_get_neighbor(parent_id), genotypes[parent_id]); // Place org in existing population.
       };
       SetAttribute("SynchronousGen", "False");
     }
@@ -474,17 +474,17 @@ namespace emp {
         const size_t start_id = pool_id * size_x;
         for (size_t id = start_id; id < start_id+size_x; id++) {
           if (next_pop[id] == nullptr) {  // Search for an open positions...
-            return AddNextOrgAt(new_org, id);
+            return AddNextOrgAt(new_org, id, genotypes[parent_id]);
           }
         }
         const size_t id = fun_get_neighbor(parent_id);     // Placed near parent, in next pop.
-        return AddNextOrgAt(new_org, id);
+        return AddNextOrgAt(new_org, id, genotypes[parent_id]);
       };
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neigbor in current population.
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        return AddOrgAt(new_org, fun_get_neighbor(parent_id)); // Place org in existing population.
+        return AddOrgAt(new_org, fun_get_neighbor(parent_id), genotypes[parent_id]); // Place org in existing population.
       };
       SetAttribute("SynchronousGen", "False");
     }
