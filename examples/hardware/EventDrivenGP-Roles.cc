@@ -12,14 +12,6 @@
 //    [ ] Build a 'deme' and evaluate it.
 //  [ ] Define mutation function.  // Making a table of bit set values to make affinity assignment easier.
 
-// struct Org {
-//   double fitness;
-//   emp::EventDrivenGP hardware;
-//   double GetFitness() const { return fitness; }
-//   bool DoMutate(emp::Random &) { return false; }
-// };
-
-
 using event_t = typename emp::EventDrivenGP::event_t;
 using event_lib_t = typename emp::EventDrivenGP::event_lib_t;
 using affinity_t = emp::BitSet<8>;
@@ -175,27 +167,27 @@ int main() {
   random.New(2);
 
   // Setup the instruction library for this experiment.
-  // emp::Ptr<inst_lib_t> inst_lib;
-  // inst_lib.New(*emp::EventDrivenGP::DefaultInstLib());
-  //
-  // emp::Ptr<inst_lib_t> inst_lib2;
-  // inst_lib2.New(*emp::EventDrivenGP::DefaultInstLib());
-  //
-  // emp::Ptr<event_lib_t> event_lib;
-  // event_lib.New(*emp::EventDrivenGP::DefaultEventLib());
-  //
-  //
-  // inst_lib->AddInst("GetRoleID", Inst_GetRoleID, 1, "Local memory[Arg1] = Trait[RoleID]");
-  // inst_lib->AddInst("SetRoleID", Inst_SetRoleID, 1, "Trait[RoleID] = Local memory[Arg1]");
-  //
-  // std::cout << "Inst lib1: " << std::endl;
-  // for (size_t i = 0; i < inst_lib->GetSize(); ++i) {
-  //   std::cout << i << ": " << inst_lib->GetName(i) << std::endl;
-  // }
-  // std::cout << "Inst lib2: " << std::endl;
-  // for (size_t i = 0; i < inst_lib2->GetSize(); ++i) {
-  //   std::cout << i << ": " << inst_lib2->GetName(i) << std::endl;
-  // }
+  emp::Ptr<inst_lib_t> inst_lib;
+  inst_lib.New(*emp::EventDrivenGP::DefaultInstLib());
+
+  emp::Ptr<inst_lib_t> inst_lib2;
+  inst_lib2.New(*emp::EventDrivenGP::DefaultInstLib());
+
+  emp::Ptr<event_lib_t> event_lib;
+  event_lib.New(*emp::EventDrivenGP::DefaultEventLib());
+
+
+  inst_lib->AddInst("GetRoleID", Inst_GetRoleID, 1, "Local memory[Arg1] = Trait[RoleID]");
+  inst_lib->AddInst("SetRoleID", Inst_SetRoleID, 1, "Trait[RoleID] = Local memory[Arg1]");
+
+  std::cout << "Inst lib1: " << std::endl;
+  for (size_t i = 0; i < inst_lib->GetSize(); ++i) {
+    std::cout << i << ": " << inst_lib->GetName(i) << std::endl;
+  }
+  std::cout << "Inst lib2: " << std::endl;
+  for (size_t i = 0; i < inst_lib2->GetSize(); ++i) {
+    std::cout << i << ": " << inst_lib2->GetName(i) << std::endl;
+  }
 
   // Dummy dispatch function for testing.
   // event_lib->RegisterDispatchFun("Message",
