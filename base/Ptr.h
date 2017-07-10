@@ -272,6 +272,7 @@ namespace emp {
     }
     void Delete() {
       emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
+      emp_assert(ptr, "Deleting null Ptr.");
       Tracker().MarkDeleted(id);
       if (ptr_debug) std::cout << "Ptr::Delete() : " << ptr << std::endl;
       delete ptr;
@@ -282,14 +283,17 @@ namespace emp {
       static constexpr size_t shift = Log2(1 + sizeof(TYPE));
       return (size_t)(ptr) >> shift;
     }
+    struct hash_t { size_t operator()(const Ptr<TYPE> & t) const { return t.Hash(); } };
 
     // Copy assignment
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
       if (ptr_debug) std::cout << "copy assignment" << std::endl;
-      Tracker().DecID(id);
-      ptr = _in.ptr;
-      id = _in.id;
-      Tracker().IncID(id);
+      if (id != _in.id) {        // Assignments only need to happen if ptrs are different.
+        Tracker().DecID(id);
+        ptr = _in.ptr;
+        id = _in.id;
+        Tracker().IncID(id);
+      }
       return *this;
     }
 
@@ -336,13 +340,15 @@ namespace emp {
 
     // Dereference a pointer.
     TYPE & operator*() {
-      // Make sure a pointer is active before we dereference it.
+      // Make sure a pointer is active and non-null before we dereference it.
       emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+      emp_assert(ptr != nullptr, "Cannot dereference a null pointer!");
       return *ptr;
     }
     const TYPE & operator*() const {
       // Make sure a pointer is active before we dereference it.
       emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+      emp_assert(ptr != nullptr, "Cannot dereference a null pointer!");
       return *ptr;
     }
 
@@ -350,11 +356,13 @@ namespace emp {
     TYPE * operator->() {
       // Make sure a pointer is active before we follow it.
       emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+      emp_assert(ptr != nullptr, "Cannot follow a null pointer!");
       return ptr;
     }
     const TYPE * const operator->() const {
       // Make sure a pointer is active before we follow it.
       emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+      emp_assert(ptr != nullptr, "Cannot follow a null pointer!");
       return ptr;
     }
 
@@ -441,9 +449,10 @@ namespace emp {
 
     size_t Hash() const {
       // Chop off useless bits of pointer...
-      static constexpr size_t shift = Log2(1 + sizeof(T));
+      static constexpr size_t shift = Log2(1 + sizeof(TYPE));
       return (size_t)(ptr) >> shift;
     }
+    struct hash_t { size_t operator()(const Ptr<TYPE> & t) const { return t.Hash(); } };
 
     // Copy assignment
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {

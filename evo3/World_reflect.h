@@ -103,6 +103,41 @@ namespace emp {
   template <typename WORLD, typename ORG>
   void SetDefaultPrintFun(WORLD & world) { SetDefaultPrintFun_impl<WORLD, ORG>(world, true); }
 
+
+  namespace {
+    // Setup genome type identification
+    template <typename ORG>
+    auto Org2Genome( bool_decoy< decltype( declval<ORG>().GetGenome() ) >)
+      -> std::decay_t< decltype( declval<ORG>().GetGenome() ) >;
+
+    template <typename ORG>
+    ORG Org2Genome( ... );
+  }
+
+  template <typename ORG>
+  using find_genome_t = decltype( Org2Genome<ORG>() );
+
+
+  namespace {
+    // Setup Org -> Genome function
+    // 1. GetGenome member function
+    // 2. Return org AS genome.
+
+    template <typename WORLD, typename ORG>
+    void SetOrgGetGenome_impl(WORLD & world, bool_decoy<decltype( declval<ORG>().GetGenome() )>) {
+      world.SetGetGenomeFun( [](ORG & org) -> const auto & { return org.GetGenome(); } );
+    }
+
+    template <typename WORLD, typename ORG>
+    void SetOrgGetGenome_impl(WORLD & world, ... ) {
+      world.SetGetGenomeFun( [](ORG & org) -> const ORG & { return org; } );
+    }
+
+  }
+
+  template <typename WORLD, typename ORG>
+  void SetDefaultGetGenomeFun(WORLD & world) { SetOrgGetGenome_impl<WORLD, ORG>(world, true); }
+
 }
 
 #endif
