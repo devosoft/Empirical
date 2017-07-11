@@ -253,12 +253,25 @@ namespace emp {
     }
 
     bool IsNull() const { return ptr == nullptr; }
-    TYPE * Raw() { return ptr; }
-    const TYPE * const Raw() const { return ptr; }
-    template <typename T2> T2 * Cast() { return (T2*) ptr; }
-    template <typename T2> const T2 * const Cast() const { return (T2*) ptr; }
+    TYPE * Raw() {
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to raw.");
+      return ptr;
+    }
+    const TYPE * const Raw() const {
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to raw.");
+      return ptr;
+    }
+    template <typename T2> T2 * Cast() {
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.");
+      return (T2*) ptr;
+    }
+    template <typename T2> const T2 * const Cast() const {
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.");
+      return (T2*) ptr;
+    }
     template <typename T2> T2 * DynamicCast() {
       emp_assert(dynamic_cast<T2*>(ptr) != nullptr);
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.");
       return (T2*) ptr;
     }
     size_t GetID() const { return id; }
@@ -288,6 +301,7 @@ namespace emp {
     // Copy assignment
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
       if (ptr_debug) std::cout << "copy assignment" << std::endl;
+      emp_assert(Tracker().IsDeleted(_in.id) == false, "Do not copy deleted pointers.");
       if (id != _in.id) {        // Assignments only need to happen if ptrs are different.
         Tracker().DecID(id);
         ptr = _in.ptr;
@@ -300,6 +314,7 @@ namespace emp {
     // Move assignment
     Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
       if (ptr_debug) std::cout << "move assignment" << std::endl;
+      emp_assert(Tracker().IsDeleted(_in.id) == false, "Do not copy deleted pointers.");
       ptr = _in.ptr;
       id = _in.id;
       _in.ptr = nullptr;
@@ -331,6 +346,7 @@ namespace emp {
     Ptr<TYPE> & operator=(Ptr<T2> _in) {
       if (ptr_debug) std::cout << "convert-copy assignment" << std::endl;
       emp_assert( (PtrIsConvertable<T2, TYPE>(_in.Raw())) );
+      emp_assert(Tracker().IsDeleted(_in.id) == false, "Do not copy deleted pointers.");
       Tracker().DecID(id);
       ptr = _in.Raw();
       id = _in.GetID();
@@ -342,13 +358,13 @@ namespace emp {
     TYPE & operator*() {
       // Make sure a pointer is active and non-null before we dereference it.
       emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
-      emp_assert(ptr != nullptr, "Cannot dereference a null pointer!");
+      emp_assert(ptr != nullptr, "Do not dereference a null pointer!");
       return *ptr;
     }
     const TYPE & operator*() const {
       // Make sure a pointer is active before we dereference it.
       emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
-      emp_assert(ptr != nullptr, "Cannot dereference a null pointer!");
+      emp_assert(ptr != nullptr, "Do not dereference a null pointer!");
       return *ptr;
     }
 
@@ -356,13 +372,13 @@ namespace emp {
     TYPE * operator->() {
       // Make sure a pointer is active before we follow it.
       emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
-      emp_assert(ptr != nullptr, "Cannot follow a null pointer!");
+      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr;
     }
     const TYPE * const operator->() const {
       // Make sure a pointer is active before we follow it.
       emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
-      emp_assert(ptr != nullptr, "Cannot follow a null pointer!");
+      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr;
     }
 
