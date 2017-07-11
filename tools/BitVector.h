@@ -18,8 +18,10 @@
 
 #include <iostream>
 
-#include "../base/vector.h"
 #include "../base/assert.h"
+#include "../base/Ptr.h"
+#include "../base/vector.h"
+
 #include "bitset_utils.h"
 #include "functions.h"
 #include "math.h"
@@ -146,10 +148,14 @@ namespace emp {
       in_set.bit_set = nullptr;
     }
     ~BitVector() {
-      if (bit_set) delete [] bit_set;  // A move constructor cane make bit_set == nullptr
+      if (bit_set) {        // A move constructor can make bit_set == nullptr
+        delete [] bit_set;
+        bit_set = nullptr;
+      }
     }
 
     BitVector & operator=(const BitVector & in_set) {
+      if (&in_set == this) return *this;
       const size_t in_num_fields = in_set.NumFields();
       const size_t prev_num_fields = NumFields();
       num_bits = in_set.num_bits;
@@ -237,14 +243,14 @@ namespace emp {
     size_t GetSize() const { return num_bits; }
 
     bool Get(size_t index) const {
-      emp_assert(index >= 0 && index < num_bits);
+      emp_assert(index < num_bits, index, num_bits);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
       return (bit_set[field_id] & (static_cast<field_t>(1) << pos_id)) != 0;
     }
 
     void Set(size_t index, bool value) {
-      emp_assert(index >= 0 && index < num_bits);
+      emp_assert(index < num_bits, index, num_bits);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
       const field_t pos_mask = static_cast<field_t>(1) << pos_id;
@@ -263,14 +269,14 @@ namespace emp {
     }
 
     uint8_t GetByte(size_t index) const {
-      emp_assert(index >= 0 && index < NumBytes());
+      emp_assert(index < NumBytes(), index, NumBytes());
       const size_t field_id = Byte2Field(index);
       const size_t pos_id = Byte2FieldPos(index);
       return (bit_set[field_id] >> pos_id) & 255U;
     }
 
     void SetByte(size_t index, uint8_t value) {
-      emp_assert(index >= 0 && index < NumBytes());
+      emp_assert(index < NumBytes(), index, NumBytes());
       const size_t field_id = Byte2Field(index);
       const size_t pos_id = Byte2FieldPos(index);
       const field_t val_uint = value;
@@ -279,19 +285,19 @@ namespace emp {
 
     uint32_t GetUInt(size_t index) const {
       // @CAO Need proper assert for variable bit fields!
-      // emp_assert(index >= 0 && index < NumFields());
+      // emp_assert(index < NumFields());
       return ((uint32_t *) bit_set)[index];
     }
 
     void SetUInt(size_t index, uint32_t value) {
       // @CAO Need proper assert for variable bit fields!
-      // emp_assert(index >= 0 && index < NumFields());
+      // emp_assert(index < NumFields());
       ((uint32_t *) bit_set)[index] = value;
     }
 
     uint32_t GetUIntAtBit(size_t index) {
       // @CAO Need proper assert for non-32-size bit fields!
-      // emp_assert(index >= 0 && index < num_bits);
+      // emp_assert(index < num_bits);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
       if (pos_id == 0) return (uint32_t) bit_set[field_id];
