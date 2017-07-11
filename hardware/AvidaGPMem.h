@@ -89,7 +89,7 @@ namespace emp {
     emp::array<double, CPU_SIZE> regs;
     std::unordered_map<int, double> inputs;   // Map of all available inputs (position -> value)
     std::unordered_map<int, double> outputs;  // Map of all outputs (position -> value)
-    emp::array< stack_t, CPU_SIZE > stacks;
+    emp::array< std::unordered_map<int, double>, CPU_SIZE > mem;
     emp::array< int, CPU_SIZE> fun_starts;
 
     size_t inst_ptr;
@@ -177,7 +177,7 @@ namespace emp {
 
   public:
     AvidaGP(Ptr<inst_lib_t> _ilib)
-      : inst_lib(_ilib), genome(), regs(), inputs(), outputs(), stacks(), fun_starts()
+      : inst_lib(_ilib), genome(), regs(), inputs(), outputs(), mem(), fun_starts()
       , inst_ptr(0), scope_stack(), reg_stack(), call_stack(), errors(0), traits()
     {
       scope_stack.emplace_back(0, ScopeType::ROOT, 0);  // Initial scope.
@@ -203,15 +203,15 @@ namespace emp {
         regs[i] = (double) i;
         inputs.clear();
         outputs.clear();
-        stacks[i].resize(0);
+        mem[i].clear();
         fun_starts[i] = -1;
       }
-      inst_ptr = 0;           // Move IP back to beginning
-      scope_stack.resize(1);  // Reset to outermost scope.
-      reg_stack.resize(0);    // Clear saved registers.
-      call_stack.resize(0);   // Clear call history.
-      errors = 0;             // Clear all errors.
-     }
+      inst_ptr = 0;
+      scope_stack.resize(1);
+      reg_stack.resize(0);
+      call_stack.resize(0);
+      errors = 0;
+    }
 
     /// Reset the instruction pointer to the beginning of the genome AND reset scope.
     void ResetIP() {
@@ -236,7 +236,6 @@ namespace emp {
     double GetOutput(int id) const { return Find(outputs, id, 0.0); }
     const std::unordered_map<int,double> & GetOutputs() const { return outputs; }
     size_t GetNumOutputs() const { return outputs.size(); }
-    const stack_t & GetStack(size_t id) const { return stacks[id]; }
     int GetFunStart(size_t id) const { return fun_starts[id]; }
     size_t GetIP() const { return inst_ptr; }
     emp::vector<ScopeInfo> GetScopeStack() const { return scope_stack; }
@@ -249,6 +248,12 @@ namespace emp {
     double GetTrait(size_t id) const { return traits[id]; }
     const emp::vector<double> &  GetTraits() { return traits; }
     size_t GetNumTraits() const { return traits.size(); }
+    double GetMem(size_t block, int posReg) {
+      if (mem[block].size() == 0) return 0.0;
+      bool full = emp::Has(mem[block], posReg);
+      if (!full) return 0.0;
+      return mem[block][posReg];
+    }
 
     void SetInst(size_t pos, const inst_t & inst) { genome[pos] = inst; }
     void SetInst(size_t pos, size_t id, size_t a0=0, size_t a1=0, size_t a2=0) {
@@ -262,7 +267,17 @@ namespace emp {
     void SetOutput(int output_id, double value) { outputs[output_id] = value; }
     void SetOutputs(const std::unordered_map<int,double> & vals) { outputs = vals; }
     void SetOutputs(std::unordered_map<int,double> && vals) { outputs = std::move(vals); }
-    double PopStack(size_t id) {
+    void SetMem(size_t block, double posReg, double value) { mem[block][int(posReg)] = value; }
+    void CopyMem(size_t block_from, size_t block_to) { mem[block_to] = mem[block_from]; }
+    void ShiftMem(size_t block, size_t shift_amount) { 
+      std::unordered_map<int, double> new_map;
+      for (const auto & el : mem[block]) {
+        new_map[el.first + shift_amount] = el.second;
+        //std::cout<<"Start Location: " << el.first<< " Shift: " << shift_amount << " New Location: " << el.first + shift_amount << std::endl;
+      }
+      mem[block] = new_map; 
+    }
+    /*double PopStack(size_t id) {
       if (stacks[id].size() == 0) return 0.0;
       double out = stacks[id].back();
       stacks[id].pop_back();
@@ -271,7 +286,7 @@ namespace emp {
     void PushStack(size_t id, double value) {
       if (stacks[id].size() >= STACK_CAP) return;
       stacks[id].push_back(value);
-    }
+    }*/
     void SetFunStart(size_t id, int value) { fun_starts[id] = value; }
     void SetIP(size_t pos) { inst_ptr = pos; }
     void PushRegInfo(size_t scope_id, size_t reg_id) {
@@ -415,8 +430,8 @@ namespace emp {
       hw.inst_ptr = def_pos+1;                       // Jump to the function body (will adavance)
     }
 
-    static void Inst_Push(AvidaGP & hw, const arg_set_t & args) { hw.PushStack(args[1], hw.regs[args[0]]); }
-    static void Inst_Pop(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[1]] = hw.PopStack(args[0]); }
+    //static void Inst_Push(AvidaGP & hw, const arg_set_t & args) { hw.PushStack(args[1], hw.regs[args[0]]); }
+    //static void Inst_Pop(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[1]] = hw.PopStack(args[0]); }
 
     static void Inst_Input(AvidaGP & hw, const arg_set_t & args) {
       // Determine the input ID and grab it if it exists; if not, return 0.0
@@ -434,6 +449,26 @@ namespace emp {
 
     static void Inst_ScopeReg(AvidaGP & hw, const arg_set_t & args) {
       hw.reg_stack.emplace_back(hw.CurScope(), args[0], hw.regs[args[0]]);
+    }
+
+    static void Inst_GetMem(AvidaGP & hw, const arg_set_t & args) {
+      double out = hw.GetMem(args[0], int(hw.regs[args[1]]));
+      hw.regs[args[2]] = out;
+      //std::cout<< "######### GETT Block: " << block << " Pos: " << int(posReg) << " Value: " << int(out) << std::endl;
+    }
+
+    static void Inst_SetMem(AvidaGP & hw, const arg_set_t & args) {
+      hw.SetMem(args[0], hw.regs[args[1]], hw.regs[args[2]]);
+      //std::cout<< "SET Block: " << block << " Pos: " << int(posReg) << " Value: " << int(value) << std::endl;
+    }
+
+    static void Inst_CopyMem(AvidaGP & hw, const arg_set_t & args) {
+      hw.CopyMem(args[0], args[1]);
+      //std::cout<< "COPY Block To: " << block_to << " Block From: " << block_from << std::endl;
+    }
+
+    static void Inst_ShiftMem(AvidaGP & hw, const arg_set_t & args) {
+      hw.ShiftMem(args[0], hw.regs[args[1]]);
     }
 
     static Ptr<inst_lib_t> DefaultInstLib();
@@ -568,8 +603,12 @@ namespace emp {
       inst_lib.AddInst("Scope", Inst_Scope, 1, "Enter scope Arg1", ScopeType::BASIC, 0);
       inst_lib.AddInst("Define", Inst_Define, 2, "Build function Arg1 in scope Arg2", ScopeType::FUNCTION, 1);
       inst_lib.AddInst("Call", Inst_Call, 1, "Call previously defined function Arg1");
-      inst_lib.AddInst("Push", Inst_Push, 2, "Push reg Arg1 onto stack Arg2");
-      inst_lib.AddInst("Pop", Inst_Pop, 2, "Pop stack Arg1 into reg Arg2");
+      inst_lib.AddInst("SetMem", Inst_SetMem, 3, "Put reg Arg3 into mem block Arg1 at position reg Arg2"); //TODO 
+      inst_lib.AddInst("GetMem", Inst_GetMem, 3, "Get from block Arg1 position reg Arg2 into reg Arg3");
+      inst_lib.AddInst("CopyMem", Inst_CopyMem, 2, "Copy memory block Arg1 into memory block Arg2");
+      inst_lib.AddInst("ShiftMem", Inst_ShiftMem, 2, "Shift memory block Arg1 into memory block Arg2");
+      //inst_lib.AddInst("Push", Inst_Push, 2, "Push reg Arg1 onto stack Arg2");
+      //inst_lib.AddInst("Pop", Inst_Pop, 2, "Pop stack Arg1 into reg Arg2");
       inst_lib.AddInst("Input", Inst_Input, 2, "Pull next value from input Arg1 into reg Arg2");
       inst_lib.AddInst("Output", Inst_Output, 2, "Push reg Arg1 into output Arg2");
       inst_lib.AddInst("CopyVal", Inst_CopyVal, 2, "Copy reg Arg1 into reg Arg2");

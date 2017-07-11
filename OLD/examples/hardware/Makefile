@@ -4,27 +4,24 @@ CFLAGS_version := -std=c++14
 
 # Emscripten compiler information
 CXX_web := emcc
-CXX_native := clang++ # g++
-#CXX_native := g++-5
+CXX_native := g++
 
+OFLAGS_native_debug := -g -pedantic -DEMP_TRACK_MEM  -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
 OFLAGS_native_opt := -O3 -DNDEBUG
-OFLAGS_native_debug := -g -pedantic -DEMP_TRACK_MEM  -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual
-OFLAGS_native_grumpy := -g -pedantic -DEMP_TRACK_MEM  -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
 
-OFLAGS_web_opt := -Os -DNDEBUG -s TOTAL_MEMORY=67108864
 OFLAGS_web_debug := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864 -s ASSERTIONS=2 -s DEMANGLE_SUPPORT=1 # -s SAFE_HEAP=1
+OFLAGS_web_opt := -Os -DNDEBUG -s TOTAL_MEMORY=67108864
 
-CFLAGS_native_opt := $(CFLAGS_all) $(OFLAGS_native_opt)
 CFLAGS_native_debug := $(CFLAGS_all) $(OFLAGS_native_debug)
-CFLAGS_native_grumpy := $(CFLAGS_all) $(OFLAGS_native_grumpy)
+CFLAGS_native_opt := $(CFLAGS_all) $(OFLAGS_native_opt)
 
 CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
 CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
-TARGETS := World
+TARGETS := AvidaGP AvidaGP-Evo AvidaGP-Mancala AvidaGP-Sorting
 
-EVO_DEPEND := ../../evo2/WorldModule.h
+HARDWARE := ../../hardware/
 
 default: native
 
@@ -33,9 +30,6 @@ CFLAGS := $(CFLAGS_native_opt)
 
 debug: CFLAGS := $(CFLAGS_native_debug)
 debug: all
-
-grumpy: CFLAGS := $(CFLAGS_native_grumpy)
-grumpy: all
 
 web: CXX := $(CXX_web)
 web: CFLAGS := $(CFLAGS_web_opt)
@@ -49,18 +43,17 @@ native: all
 
 all: $(TARGETS)
 
-$(TARGETS): % : %.cc $(EVO_DEPEND)
+$(TARGETS): % : %.cc 
 	$(CXX) $(CFLAGS_version) $(CFLAGS) $< -o $@
 
-$(JS_TARGETS): %.js : %.cc
-	$(CXX_web) $(CFLAGS_web) $< -o $@
+opt-%: %.cc
+	$(CXX) $(CFLAGS_version) $(CFLAGS_native_opt) $< -o $@
 
-debug-%: $*.cc $(EVO_DEPEND)
+debug-%: %.cc
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
 
 clean:
 	rm -rf debug-* *~ *.dSYM $(TARGETS)
-	rm -rf debug-* *~ *.dSYM $(JS_TARGETS)
 
 # Debugging information
 #print-%: ; @echo $*=$($*)

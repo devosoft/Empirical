@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include "../../games/Othello.h"
-#include "../../hardware/AvidaGP.h"
+#include "../../hardware/AvidaGPMem.h"
 #include "../../hardware/InstLib.h"
 #include "../../tools/Random.h"
 #include "../../evo/World.h"
@@ -15,7 +15,7 @@
 constexpr size_t POP_SIZE = 1000;
 constexpr size_t GENOME_SIZE = 100;
 constexpr size_t EVAL_TIME = 1000;
-constexpr size_t UPDATES = 100;
+constexpr size_t UPDATES = 1000;
 constexpr size_t TOURNY_SIZE = 4;
 
 // Determine the next move of a human player.
@@ -79,9 +79,15 @@ size_t EvalMove(emp::Othello & game, emp::AvidaGP & org) {
   // Setup the hardware with proper inputs.
   org.ResetHardware();
   int boardSize = game.GetBoardSize();
-
+  size_t player = game.GetCurrPlayer();
   for (size_t i = 0; i < boardSize* boardSize; i++) {
-      org.SetInput(i, game.GetSquare(i));
+      size_t square = game.GetSquare(i);
+      int conv_square;
+
+      if (square == player) conv_square = 1;
+      else if (square == 0) conv_square = 0;
+      else conv_square = -1;
+      org.SetInput(i, conv_square);
   }
 
   // Run the code.

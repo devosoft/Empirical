@@ -284,6 +284,28 @@ namespace emp {
   template <typename T>
   using remove_ptr_type_t = typename remove_ptr_type<T>::type;
   // @CAO: Make sure we are dealing with const and volitile pointers correctly.
+
+  // Can we convert the first pointer into the second?
+  template <typename T1, typename T2> struct ptr_pair {
+    static constexpr bool Same() { return false; }
+    static constexpr bool SameBase() { return false; }
+    static bool ConvertOK(T1 * ptr) { return dynamic_cast<T2*>(ptr); }
+  };
+  template <typename T> struct ptr_pair<T,T> {
+    static constexpr bool Same() { return true; }
+    static constexpr bool SameBase() { return true; }
+    static constexpr bool ConvertOK(T *) { return true; }
+  };
+  template <typename T> struct ptr_pair<T, const T> {
+    static constexpr bool Same() { return false; }
+    static constexpr bool SameBase() { return true; }
+    static constexpr bool ConvertOK(T *) { return true; }
+  };
+  template <typename T> struct ptr_pair<const T, T> {
+    static constexpr bool Same() { return false; }
+    static constexpr bool SameBase() { return true; }
+    static constexpr bool ConvertOK(T *) { return false; }
+  };
 }
 
 
