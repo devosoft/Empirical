@@ -42,9 +42,9 @@ namespace emp {
 
   class PtrInfo {
   private:
-    const void * ptr;       // Which pointer are we keeping data on?
-    int count;        // How many of this pointer do we have?
-    bool active;      // Has this pointer been deleted? (i.e., we should no longer access it!)
+    const void * ptr;  // Which pointer are we keeping data on?
+    int count;         // How many of this pointer do we have?
+    bool active;       // Has this pointer been deleted? (i.e., we should no longer access it!)
 
   public:
     PtrInfo(const void * _ptr) : ptr(_ptr), count(1), active(true) {
@@ -412,27 +412,13 @@ namespace emp {
   public:
     using element_type = TYPE;
 
-    Ptr() : ptr(nullptr) { ; }
-
-    // Construct using copy constructor
-    Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) { ; }
-
-    // Construct using move constructor
-    Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr) { ; }
-
-    // Construct from a raw pointer of campatable type (bool is unused and optional)
-    template <typename T2>
-    Ptr(T2 * in_ptr, bool=false) : ptr(in_ptr) { ; }
-
-    // Construct from another Ptr<> object of compatable type.
-    template <typename T2>
-    Ptr(Ptr<T2> _in) : ptr(_in.Raw()) { ; }
-
-    // Construct from nullptr.
-    Ptr(std::nullptr_t) : Ptr() { ; }
-
-    // Destructor.
-    ~Ptr() { ; }
+    Ptr() : ptr(nullptr) {}                                               // Default constructor
+    Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) {}                          // Copy constructor
+    Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr) {}                               // Move constructor
+    template <typename T2> Ptr(T2 * in_ptr, bool=false) : ptr(in_ptr) {}  // Construct from raw ptr
+    template <typename T2> Ptr(Ptr<T2> _in) : ptr(_in.Raw()) {}           // From compatible Ptr
+    Ptr(std::nullptr_t) : Ptr() {}                                        // From nullptr
+    ~Ptr() { ; }                                                          // Destructor
 
     bool IsNull() const { return ptr == nullptr; }
     TYPE * Raw() { return ptr; }
@@ -442,45 +428,22 @@ namespace emp {
     template <typename T2> T2 * DynamicCast() { return dynamic_cast<T2*>(ptr); }
 
     template <typename... T>
-    void New(T &&... args) {
-      ptr = new TYPE(std::forward<T>(args)...);     // Build a new raw pointer.
-    }
+    void New(T &&... args) { ptr = new TYPE(std::forward<T>(args)...); }  // New raw pointer.
     void Delete() { delete ptr; }
 
     size_t Hash() const {
-      // Chop off useless bits of pointer...
-      static constexpr size_t shift = Log2(1 + sizeof(TYPE));
+      static constexpr size_t shift = Log2(1 + sizeof(TYPE));  // Chop off useless bits...
       return (size_t)(ptr) >> shift;
     }
     struct hash_t { size_t operator()(const Ptr<TYPE> & t) const { return t.Hash(); } };
 
-    // Copy assignment
-    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
-      ptr = _in.ptr;
-      return *this;
-    }
+    // Copy/Move assignments
+    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) { ptr = _in.ptr; return *this; }
+    Ptr<TYPE> & operator=(Ptr<TYPE> && _in) { ptr = _in.ptr; _in.ptr = nullptr; return *this; }
 
-    // Move assignment
-    Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
-      ptr = _in.ptr;
-      _in.ptr = nullptr;
-      return *this;
-    }
-
-    // Assign to a pointer of the correct type.
-    // Note: Since this ptr was passed in as a raw pointer, we do not manage it.
-    template <typename T2>
-    Ptr<TYPE> & operator=(T2 * _in) {
-      ptr = _in;
-      return *this;
-    }
-
-    // Assign to a convertable Ptr
-    template <typename T2>
-    Ptr<TYPE> & operator=(Ptr<T2> _in) {
-      ptr = _in.Raw();
-      return *this;
-    }
+    // Assign to compatible Ptr or raw (non-managed) pointer.
+    template <typename T2> Ptr<TYPE> & operator=(T2 * _in) { ptr = _in; return *this; }
+    template <typename T2> Ptr<TYPE> & operator=(Ptr<T2> _in) { ptr = _in.Raw(); return *this; }
 
     // Dereference a pointer.
     TYPE & operator*() { return *ptr; }
