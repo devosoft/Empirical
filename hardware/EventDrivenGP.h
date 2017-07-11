@@ -43,7 +43,7 @@ namespace emp {
     static constexpr size_t CPU_SIZE = 8;
     static constexpr size_t AFFINITY_WIDTH = 8;
     static constexpr size_t MAX_INST_ARGS = 3;
-    static constexpr size_t MAX_CORES = 64;         // Maximum number of parallel execution stacks that can be spawned.
+    static constexpr size_t MAX_CORES = 4;         // Maximum number of parallel execution stacks that can be spawned.
     static constexpr size_t MAX_CALL_DEPTH = 128;   // Maximum depth of calls per execution stack.
     static constexpr double DEFAULT_MEM_VALUE = 0.0;
     static constexpr double MIN_BIND_THRESH = 0.5;
@@ -269,6 +269,43 @@ namespace emp {
         program[fID].inst_seq[pos].Set(id, a0, a1, a2, aff);
       }
 
+      /// Print out a single instruction with its arguments.
+      void PrintInst(const inst_t & inst, std::ostream & os=std::cout) {
+        os << inst_lib->GetName(inst.id);
+        if (inst_lib->HasProperty(inst.id, "affinity")) {
+          os << ' '; inst.affinity.Print(os);
+        }
+        const size_t num_args = inst_lib->GetNumArgs(inst.id);
+        for (size_t i = 0; i < num_args; i++) {
+          os << ' ' << inst.args[i];
+        }
+      }
+      /// Print out entire program.
+      void PrintProgram(std::ostream & os=std::cout) {
+        for (size_t fID = 0; fID < GetSize(); fID++) {
+          // Print out function name (affinity).
+          os << "Fn-" << fID << " ";
+          program[fID].affinity.Print(os);
+          os << ":\n";
+          int depth = 0;
+          for (size_t i = 0; i < program[fID].GetSize(); i++) {
+            const inst_t & inst = program[fID].inst_seq[i];
+            int num_spaces = 2 + (2 * depth);
+            for (int s = 0; s < num_spaces; s++) os << ' ';
+            PrintInst(inst, os);
+            os << '\n';
+            if (inst_lib->HasProperty(inst.id, "block_def")) {
+              // is block def?
+              depth++;
+            } else if (inst_lib->HasProperty(inst.id, "block_close") && depth > 0) {
+              // is block close?
+              depth--;
+            }
+          }
+          os << '\n';
+        }
+      }
+
     };
 
     using program_t = Program;
@@ -338,7 +375,6 @@ namespace emp {
 
     /// Destructor - clean up: execution stacks, shared memory.
     ~EventDrivenGP() {
-      std::cout << "EventDrivenGP Destructor!" << std::endl;
       Reset();
       if (random_owner) random_ptr.Delete();
       shared_mem_ptr.Delete();
@@ -515,6 +551,7 @@ namespace emp {
     /// functions match above the provided threshold.
     /// Initialize function state with provided input memory.
     void SpawnCore(const affinity_t & affinity, double threshold, const memory_t & input_mem=memory_t(), bool is_main=false) {
+      if (execution_stacks.size() >= MAX_CORES) return;
       size_t fID;
       double max_bind = -1;
       emp::vector<size_t> best_matches;
@@ -536,6 +573,7 @@ namespace emp {
     /// Spawn core with function specified by fID.
     /// Initialize function state with provided input memory.
     void SpawnCore(size_t fID, const memory_t & input_mem=memory_t(), bool is_main=false) {
+      if (execution_stacks.size() >= MAX_CORES) return;
       Ptr<emp::vector<Ptr<State>>> stack;
       stack.New();
       Ptr<State> state;
@@ -727,14 +765,7 @@ namespace emp {
 
     /// Print out a single instruction with its arguments.
     void PrintInst(const inst_t & inst, std::ostream & os=std::cout) {
-      os << program.inst_lib->GetName(inst.id);
-      if (program.inst_lib->HasProperty(inst.id, "affinity")) {
-        os << ' '; inst.affinity.Print(os);
-      }
-      const size_t num_args = program.inst_lib->GetNumArgs(inst.id);
-      for (size_t i = 0; i < num_args; i++) {
-        os << ' ' << inst.args[i];
-      }
+      program.PrintInst(inst, os);
     }
 
     /// Print out hardware traits.
@@ -748,28 +779,7 @@ namespace emp {
 
     /// Print out entire program.
     void PrintProgram(std::ostream & os=std::cout) {
-      for (size_t fID = 0; fID < program.GetSize(); fID++) {
-        // Print out function name (affinity).
-        os << "Fn-" << fID << " ";
-        program[fID].affinity.Print(os);
-        os << ":\n";
-        int depth = 0;
-        for (size_t i = 0; i < program[fID].GetSize(); i++) {
-          const inst_t & inst = program[fID].inst_seq[i];
-          int num_spaces = 2 + (2 * depth);
-          for (int s = 0; s < num_spaces; s++) os << ' ';
-          PrintInst(inst, os);
-          os << '\n';
-          if (program.inst_lib->HasProperty(inst.id, "block_def")) {
-            // is block def?
-            depth++;
-          } else if (program.inst_lib->HasProperty(inst.id, "block_close") && depth > 0) {
-            // is block close?
-            depth--;
-          }
-        }
-        os << '\n';
-      }
+      program.PrintProgram(os);
     }
 
     /// Print out current state (full) of virtual hardware.
@@ -1060,7 +1070,7 @@ namespace emp {
         inst_lib.AddInst("Commit", Inst_Commit, 2, "Local memory Arg1 => Shared memory Arg2.");
         inst_lib.AddInst("Pull", Inst_Pull, 2, "Shared memory Arg1 => Shared memory Arg2.");
         inst_lib.AddInst("BroadcastMsg", Inst_BroadcastMsg, 0, "Broadcast output memory as message event.", ScopeType::BASIC, 0, {"affinity"});
-        inst_lib.AddInst("SendMsg", Inst_SendMsg, 0, "Send output memory as message event.");
+        inst_lib.AddInst("SendMsg", Inst_SendMsg, 0, "Send output memory as message event.", ScopeType::BASIC, 0, {"affinity"});
         inst_lib.AddInst("Nop", Inst_Nop, 0, "No operation.");
       }
       return &inst_lib;
