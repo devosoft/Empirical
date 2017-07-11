@@ -42,12 +42,12 @@ namespace emp {
 
   class PtrInfo {
   private:
-    void * ptr;       // Which pointer are we keeping data on?
+    const void * ptr;       // Which pointer are we keeping data on?
     int count;        // How many of this pointer do we have?
     bool active;      // Has this pointer been deleted? (i.e., we should no longer access it!)
 
   public:
-    PtrInfo(void * _ptr=nullptr) : ptr(_ptr), count(1), active(true) {
+    PtrInfo(const void * _ptr) : ptr(_ptr), count(1), active(true) {
       if (ptr_debug) std::cout << "Created info for pointer " << ptr << std::endl;
     }
     PtrInfo(const PtrInfo &) = default;
@@ -59,7 +59,7 @@ namespace emp {
       if (ptr_debug) std::cout << "Deleted info for pointer " << ptr << std::endl;
     }
 
-    void * GetPtr() const { return ptr; }
+    const void * GetPtr() const { return ptr; }
     int GetCount() const { return count; }
     bool IsActive() const { return active; }
 
@@ -86,7 +86,7 @@ namespace emp {
 
   class PtrTracker {
   private:
-    std::unordered_map<void *, size_t> ptr_id;
+    std::unordered_map<const void *, size_t> ptr_id;
     emp::vector<PtrInfo> id_info;
 
     // Make PtrTracker a singleton.
@@ -96,7 +96,7 @@ namespace emp {
     PtrTracker & operator=(const PtrTracker &) = delete;
     PtrTracker & operator=(PtrTracker &&) = delete;
 
-    PtrInfo & GetInfo(void * ptr) { return id_info[ptr_id[ptr]]; }
+    PtrInfo & GetInfo(const void * ptr) { return id_info[ptr_id[ptr]]; }
   public:
     ~PtrTracker() {
       // Track stats about pointer record.
@@ -121,12 +121,12 @@ namespace emp {
     static PtrTracker & Get() { static PtrTracker tracker; return tracker; }
 
     // Some simple accessors
-    bool HasPtr(void * ptr) const {
+    bool HasPtr(const void * ptr) const {
       if (ptr_debug) std::cout << "HasPtr: " << ptr << std::endl;
       return ptr_id.find(ptr) != ptr_id.end();
     }
 
-    size_t GetCurID(void * ptr) { emp_assert(HasPtr(ptr)); return ptr_id[ptr]; }
+    size_t GetCurID(const void * ptr) { emp_assert(HasPtr(ptr)); return ptr_id[ptr]; }
     size_t GetNumIDs() const { return id_info.size(); }
 
     bool IsDeleted(size_t id) const {
@@ -135,7 +135,7 @@ namespace emp {
       return !id_info[id].IsActive();
     }
 
-    bool IsActive(void * ptr) {
+    bool IsActive(const void * ptr) {
       if (ptr_debug) std::cout << "IsActive: " << ptr << std::endl;
       if (ptr_id.find(ptr) == ptr_id.end()) return false; // Not in database.
       return GetInfo(ptr).IsActive();
@@ -147,7 +147,7 @@ namespace emp {
     }
 
     // This pointer was just created as a Ptr!
-    size_t New(void * ptr) {
+    size_t New(const void * ptr) {
       if (ptr == nullptr) return (size_t) -1;
       size_t id = id_info.size();
       if (ptr_debug) std::cout << "New:    " << id << " (" << ptr << ")" << std::endl;
