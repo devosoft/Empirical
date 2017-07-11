@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "../../hardware/AvidaGPMem.h"
+#include "../../hardware/AvidaGPOthello.h"
 #include "../../hardware/InstLib.h"
 #include "../../tools/Random.h"
 
@@ -31,7 +31,18 @@ int main()
     cpu.SetInput(i, input);
   }
 
-  // Get Input and set it in memory
+  cpu.PushInst("SetReg", 0, 43);
+  cpu.PushInst("SetReg", 1, 20);
+  cpu.PushInst("SetBoard", 0);
+  cpu.PushInst("GetSquareCurr", 0, 2); // Should be 0 in reg 2
+  cpu.PushInst("GetValidAbove", 0, 3);
+  cpu.PushInst("GetValidBelow", 1, 4);
+
+  cpu.PushInst("GetValidAbove", 1, 3);
+  cpu.PushInst("GetValidBelow", 0, 4);
+
+
+  /*// Get Input and set it in memory
   cpu.PushInst("SetReg", 0, 64);
   cpu.PushInst("SetReg", 2, 0);
   cpu.PushInst("SetReg", 1, 1);
@@ -71,7 +82,7 @@ int main()
 
   cpu.PushInst("Inc", 2);
   cpu.PushInst("TestNEqu", 2, 0, 1);
-  cpu.PushInst("Scope", 0); // END WHILE 1
+  cpu.PushInst("Scope", 0); // END WHILE 1*/
 
 
   /*for (size_t i = 0; i < 100; i++) {
@@ -81,7 +92,7 @@ int main()
 
   cpu.PrintGenome();
 //  cpu.ResetHardware();
-  cpu.Trace(555);
+  cpu.Trace(9);
 
   // Run a ton of organisms.
   /*for (int t = 0; t < 1000000; t++) {
