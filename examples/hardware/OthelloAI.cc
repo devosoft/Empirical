@@ -33,13 +33,19 @@ int main()
 
   cpu.PushInst("SetReg", 0, 43);
   cpu.PushInst("SetReg", 1, 20);
+  cpu.PushInst("SetReg", 5, 29);
+  cpu.PushInst("SetReg", 6, 34);
   cpu.PushInst("SetBoard", 0);
   cpu.PushInst("GetSquareCurr", 0, 2); // Should be 0 in reg 2
   cpu.PushInst("GetValidAbove", 0, 3);
   cpu.PushInst("GetValidBelow", 1, 4);
-
   cpu.PushInst("GetValidAbove", 1, 3);
   cpu.PushInst("GetValidBelow", 0, 4);
+
+  cpu.PushInst("GetValidLeft", 5, 3);
+  cpu.PushInst("GetValidRight", 6, 4);
+  cpu.PushInst("GetValidLeft", 6, 3);
+  cpu.PushInst("GetValidRight", 5, 4);
 
 
   /*// Get Input and set it in memory
@@ -92,7 +98,7 @@ int main()
 
   cpu.PrintGenome();
 //  cpu.ResetHardware();
-  cpu.Trace(9);
+  cpu.Trace(15);
 
   // Run a ton of organisms.
   /*for (int t = 0; t < 1000000; t++) {

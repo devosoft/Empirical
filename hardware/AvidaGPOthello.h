@@ -291,8 +291,32 @@ namespace emp {
       } 
       return 0;
     }
-    //double GetValidLeft(size_t pos) { return board[pos % BOARD_SIZE]; }
-    //double GetValidRight(size_t pos) { return board[pos % BOARD_SIZE]; }
+    double GetValidLeft(size_t pos) {
+      int square = int(pos);
+      if (board[pos] != EMPTY) {return 0;}
+      while (square % 8 != 0){
+        square--;
+        if (board[square] == EMPTY) {return 0;}
+        else if (board[square] == PLAYER) {
+          if (board[square + 1] == OPPONENT) {return 1;}
+          else {return 0;}
+        }
+      } 
+      return 0;
+    }
+    double GetValidRight(size_t pos) {
+      int square = int(pos);
+      if (board[pos] != EMPTY) {return 0;}
+      while (square % 8 != 7){
+        square++;
+        if (board[square] == EMPTY) {return 0;}
+        else if (board[square] == PLAYER) {
+          if (board[square - 1] == OPPONENT) {return 1;}
+          else {return 0;}
+        }
+      } 
+      return 0;
+    }
 
     void SetInst(size_t pos, const inst_t & inst) { genome[pos] = inst; }
     void SetInst(size_t pos, size_t id, size_t a0=0, size_t a1=0, size_t a2=0) {
@@ -507,6 +531,14 @@ namespace emp {
       double out = hw.GetValidBelow(int(hw.regs[args[0]]));
       hw.regs[args[1]] = out;
     }
+    static void Inst_GetValidLeft(AvidaGP & hw, const arg_set_t & args) {
+      double out = hw.GetValidLeft(int(hw.regs[args[0]]));
+      hw.regs[args[1]] = out;
+    }
+    static void Inst_GetValidRight(AvidaGP & hw, const arg_set_t & args) {
+      double out = hw.GetValidRight(int(hw.regs[args[0]]));
+      hw.regs[args[1]] = out;
+    }
 
     static void Inst_GetMem(AvidaGP & hw, const arg_set_t & args) {
       double out = hw.GetMem(args[0], int(hw.regs[args[1]]));
@@ -668,6 +700,8 @@ namespace emp {
       inst_lib.AddInst("GetSquareCurr", Inst_GetSquareCurr, 2, "Gets piece from reg Arg 1 in board and puts it in reg Arg 2");
       inst_lib.AddInst("GetValidAbove", Inst_GetValidAbove, 2, "Check if reg Arg1 flanks a piece above, bool put in reg Arg2");
       inst_lib.AddInst("GetValidBelow", Inst_GetValidBelow, 2, "Check if reg Arg1 flanks a piece below, bool put in reg Arg2");
+      inst_lib.AddInst("GetValidLeft", Inst_GetValidLeft, 2, "Check if reg Arg1 flanks a piece left, bool put in reg Arg2");
+      inst_lib.AddInst("GetValidRight", Inst_GetValidRight, 2, "Check if reg Arg1 flanks a piece right, bool put in reg Arg2");
       //inst_lib.AddInst("Push", Inst_Push, 2, "Push reg Arg1 onto stack Arg2");
       //inst_lib.AddInst("Pop", Inst_Pop, 2, "Pop stack Arg1 into reg Arg2");
       inst_lib.AddInst("Input", Inst_Input, 2, "Pull next value from input Arg1 into reg Arg2");
