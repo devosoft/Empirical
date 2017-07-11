@@ -32,12 +32,24 @@ constexpr size_t TRAIT_ID__FITNESS = 0;
 constexpr size_t TRAIT_ID__X_LOC = 2;
 constexpr size_t TRAIT_ID__Y_LOC = 3;
 
+// This will be the target of evolution (what the world manages/etc.)
+struct Agent {
+  size_t uid_cnt;
+  program_t program;
+
+  Agent(emp::Ptr<inst_lib_t> _ilib)
+  : uid_cnt(0), program(_ilib) { ; }
+
+  Agent(const program_t & _program)
+  : uid_cnt(0), program(_program) { ; }
+
+};
 
 // Deme structure for holding distributed system.
 struct Deme {
-  using agent_t = emp::EventDrivenGP;
+  using hardware_t = emp::EventDrivenGP;
   using memory_t = typename emp::EventDrivenGP::memory_t;
-  using grid_t = emp::vector<emp::Ptr<agent_t>>;
+  using grid_t = emp::vector<emp::Ptr<hardware_t>>;
   using pos_t = std::pair<size_t, size_t>;
 
   grid_t grid;
@@ -47,13 +59,13 @@ struct Deme {
   emp::Ptr<event_lib_t> event_lib;
   emp::Ptr<inst_lib_t> inst_lib;
 
-  program_t program;
-  bool loaded_program;
+  emp::Ptr<Agent> agent_ptr;
+  bool agent_loaded;
 
   Deme(emp::Ptr<emp::Random> _rnd, size_t _w, size_t _h, emp::Ptr<event_lib_t> _elib, emp::Ptr<inst_lib_t> _ilib)
-    : grid(_w * _h), width(_w), height(_h), rnd(_rnd), event_lib(_elib), inst_lib(_ilib), program(_ilib), loaded_program(false) {
+    : grid(_w * _h), width(_w), height(_h), rnd(_rnd), event_lib(_elib), inst_lib(_ilib), agent_ptr(nullptr), agent_loaded(false) {
     // Register dispatch function.
-    event_lib->RegisterDispatchFun("Message", [this](agent_t & hw_src, const event_t & event){ this->DispatchMessage(hw_src, event); });
+    event_lib->RegisterDispatchFun("Message", [this](hardware_t & hw_src, const event_t & event){ this->DispatchMessage(hw_src, event); });
     // Fill out the grid with hardware.
     for (size_t i = 0; i < width * height; ++i) {
       grid[i].New(inst_lib, event_lib, rnd);
@@ -75,19 +87,21 @@ struct Deme {
   }
 
   void Reset() {
-    loaded_program = false;
+    agent_ptr = nullptr;
+    agent_loaded = false;
     for (size_t i = 0; i < grid.size(); ++i) {
       grid[i]->ResetHardware();
     }
   }
 
-  void LoadProgram(const program_t & _program) {
+  void LoadAgent(emp::Ptr<Agent> _agent_ptr) {
     Reset();
+    agent_ptr = _agent_ptr;
     for (size_t i = 0; i < grid.size(); ++i) {
-      grid[i]->SetProgram(_program);
+      grid[i]->SetProgram(agent_ptr->program);
       grid[i]->SpawnCore(0, memory_t(), true);
     }
-    loaded_program = true;
+    agent_loaded = true;
   }
 
   size_t GetWidth() const { return width; }
@@ -104,7 +118,7 @@ struct Deme {
     }
   }
 
-  void DispatchMessage(agent_t & hw_src, const event_t & event) {
+  void DispatchMessage(hardware_t & hw_src, const event_t & event) {
     const size_t x = (size_t)hw_src.GetTrait(TRAIT_ID__X_LOC);
     const size_t y = (size_t)hw_src.GetTrait(TRAIT_ID__Y_LOC);
     emp::vector<size_t> recipients;
@@ -133,7 +147,7 @@ struct Deme {
 
 
   void SingleAdvance() {
-    emp_assert(loaded_program);
+    emp_assert(agent_loaded);
     for (size_t i = 0; i < grid.size(); ++i) {
       grid[i]->SingleProcess();
     }
@@ -183,43 +197,44 @@ int main() {
 
   // // Configure a seed program.
   program_t seed_program(inst_lib);
-
   seed_program.PushFunction(fun_t(affinity_table[0]));
   for (size_t i = 0; i < 47; i++) seed_program.PushInst("Nop");
   seed_program.PushInst("Inc", 0);
   seed_program.PushInst("SetRoleID", 0);  // Set roleID to 1
   seed_program.PushInst("BroadcastMsg", 0, 0, 0, affinity_table[0]);
 
+  Agent seed_agent(seed_program);
+
 
   Deme eval_deme(random, DIST_SYS_WIDTH, DIST_SYS_HEIGHT, event_lib, inst_lib);
-  eval_deme.LoadProgram(seed_program);
+  eval_deme.LoadAgent(&seed_agent);
   // Testing deme.
-  // eval_deme.Print();
-  // for (size_t i = 0; i < 5; ++i) {
-  //   std::cout << "||||||||||||||||DEME UPDATE(" << i << ")||||||||||||||||" << std::endl;
-  //   eval_deme.SingleAdvance();
-  //   eval_deme.Print();
-  // }
+  eval_deme.Print();
+  for (size_t i = 0; i < 5; ++i) {
+    std::cout << "||||||||||||||||DEME UPDATE(" << i << ")||||||||||||||||" << std::endl;
+    eval_deme.SingleAdvance();
+    eval_deme.Print();
+  }
   //
   // @amlalejini: Wishing evo3 worked...
-  emp::evo::EAWorld<program_t> world(random, "Distributed-Role-World");
-  world.Insert(seed_program, POP_SIZE);
-
-  // Setup the mutation function.
-  world.SetDefaultMutateFun( [](program_t *program, emp::Random& random) {
-    uint32_t num_muts = 0;
-    return (num_muts > 0);
-  });
-
-  // Setup the fitness function.
-  std::function<double(program_t*)> fit_fun =
-    [] (program_t *program) {
-      return 0.0;
-    };
+  // emp::evo::EAWorld<Agent> world(random, "Distributed-Role-World");
+  // world.Insert(seed_agent, POP_SIZE);
+  //
+  // // Setup the mutation function.
+  // world.SetDefaultMutateFun( [](program_t *program, emp::Random& random) {
+  //   uint32_t num_muts = 0;
+  //   return (num_muts > 0);
+  // });
+  //
+  // // Setup the fitness function.
+  // std::function<double(program_t*)> fit_fun =
+  //   [] (program_t *program) {
+  //     return 0.0;
+  //   };
 
   // Do the run...
   for (size_t ud = 0; ud < GENERATIONS; ++ud) {
-    
+
   }
 
 
