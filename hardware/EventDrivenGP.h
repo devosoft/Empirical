@@ -32,6 +32,11 @@
 //    * The first function will be main (unless the fp on the initially created state is otherwise manipulated).
 //    * Main state behaves differently than any other state.
 
+// @amlalejini - TODO:
+//  [ ] General code cleanup: have done enough minor refactoring such that things need a little bit of tidying up.
+//  [ ] (HIGH PRIORITY) Write proper copy/move constructors.
+//  [ ] Write some halfway decent documentation.
+
 namespace emp {
   class EventDrivenGP {
   public:

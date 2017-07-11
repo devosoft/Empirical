@@ -25,6 +25,7 @@ constexpr size_t POP_SIZE = 10;
 constexpr size_t EVAL_TIME = 55;
 constexpr size_t DIST_SYS_WIDTH = 3;
 constexpr size_t DIST_SYS_HEIGHT = 3;
+constexpr size_t GENERATIONS = 50;
 
 constexpr size_t TRAIT_ID__ROLE_ID = 1;
 constexpr size_t TRAIT_ID__FITNESS = 0;
@@ -167,46 +168,32 @@ int main() {
   random.New(2);
 
   // Setup the instruction library for this experiment.
-  emp::Ptr<inst_lib_t> inst_lib;
-  inst_lib.New(*emp::EventDrivenGP::DefaultInstLib());
-
-  emp::Ptr<inst_lib_t> inst_lib2;
-  inst_lib2.New(*emp::EventDrivenGP::DefaultInstLib());
-
-  emp::Ptr<event_lib_t> event_lib;
-  event_lib.New(*emp::EventDrivenGP::DefaultEventLib());
-
+  emp::Ptr<inst_lib_t> inst_lib = emp::NewPtr<inst_lib_t>(*emp::EventDrivenGP::DefaultInstLib());
+  emp::Ptr<event_lib_t> event_lib = emp::NewPtr<event_lib_t>(*emp::EventDrivenGP::DefaultEventLib());
 
   inst_lib->AddInst("GetRoleID", Inst_GetRoleID, 1, "Local memory[Arg1] = Trait[RoleID]");
   inst_lib->AddInst("SetRoleID", Inst_SetRoleID, 1, "Trait[RoleID] = Local memory[Arg1]");
 
-  std::cout << "Inst lib1: " << std::endl;
-  for (size_t i = 0; i < inst_lib->GetSize(); ++i) {
-    std::cout << i << ": " << inst_lib->GetName(i) << std::endl;
-  }
-  std::cout << "Inst lib2: " << std::endl;
-  for (size_t i = 0; i < inst_lib2->GetSize(); ++i) {
-    std::cout << i << ": " << inst_lib2->GetName(i) << std::endl;
-  }
 
   // Dummy dispatch function for testing.
-  // event_lib->RegisterDispatchFun("Message",
-  //                               [](emp::EventDrivenGP &, const event_t &) {
-  //                                 std::cout << "Dispatch plz?" << std::endl;
-  //                               });
-  //
+  event_lib->RegisterDispatchFun("Message",
+                                [](emp::EventDrivenGP &, const event_t &) {
+                                  std::cout << "Dispatch plz?" << std::endl;
+                                });
+
   // // Configure a seed program.
-  // program_t seed_program(inst_lib);
-  //
-  // seed_program.PushFunction(fun_t(affinity_table[0]));
-  // for (size_t i = 0; i < 48; i++) seed_program.PushInst("Nop");
-  // seed_program.PushInst("Inc", 0);
-  // seed_program.PushInst("SetRoleID", 0);  // Set roleID to 1
-  // seed_program.PushInst("BroadcastMsg", 0, 0, 0, affinity_table[0]);
-  //
-  // Deme eval_deme(random, DIST_SYS_WIDTH, DIST_SYS_HEIGHT, event_lib, inst_lib);
-  // eval_deme.LoadProgram(seed_program);
-  // // Testing deme.
+  program_t seed_program(inst_lib);
+
+  seed_program.PushFunction(fun_t(affinity_table[0]));
+  for (size_t i = 0; i < 47; i++) seed_program.PushInst("Nop");
+  seed_program.PushInst("Inc", 0);
+  seed_program.PushInst("SetRoleID", 0);  // Set roleID to 1
+  seed_program.PushInst("BroadcastMsg", 0, 0, 0, affinity_table[0]);
+
+
+  Deme eval_deme(random, DIST_SYS_WIDTH, DIST_SYS_HEIGHT, event_lib, inst_lib);
+  eval_deme.LoadProgram(seed_program);
+  // Testing deme.
   // eval_deme.Print();
   // for (size_t i = 0; i < 5; ++i) {
   //   std::cout << "||||||||||||||||DEME UPDATE(" << i << ")||||||||||||||||" << std::endl;
@@ -214,9 +201,26 @@ int main() {
   //   eval_deme.Print();
   // }
   //
-  // // @amlalejini: Wishing evo3 worked...
-  // emp::evo::EAWorld<program_t> world(random, "Distributed-Role-World");
-  // world.Insert(seed_program, POP_SIZE);
+  // @amlalejini: Wishing evo3 worked...
+  emp::evo::EAWorld<program_t> world(random, "Distributed-Role-World");
+  world.Insert(seed_program, POP_SIZE);
+
+  // Setup the mutation function.
+  world.SetDefaultMutateFun( [](program_t *program, emp::Random& random) {
+    uint32_t num_muts = 0;
+    return (num_muts > 0);
+  });
+
+  // Setup the fitness function.
+  std::function<double(program_t*)> fit_fun =
+    [] (program_t *program) {
+      return 0.0;
+    };
+
+  // Do the run...
+  for (size_t ud = 0; ud < GENERATIONS; ++ud) {
+    
+  }
 
 
 
