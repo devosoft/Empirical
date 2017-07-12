@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include "../../games/Othello.h"
-#include "../../hardware/AvidaGPMem.h"
+#include "../../hardware/AvidaGPOthello.h"
 #include "../../hardware/InstLib.h"
 #include "../../tools/Random.h"
 #include "../../evo/World.h"
@@ -14,7 +14,7 @@
 
 constexpr size_t POP_SIZE = 1000;
 constexpr size_t GENOME_SIZE = 100;
-constexpr size_t EVAL_TIME = 1000;
+constexpr size_t EVAL_TIME = 3000;
 constexpr size_t UPDATES = 1000;
 constexpr size_t TOURNY_SIZE = 4;
 
@@ -151,7 +151,7 @@ double EvalGame(othello_ai_t & player0, othello_ai_t & player1,
     bool go_again = game.DoMove(player, best, verbose);
     game.ClearFlips();
     game.ClearValidMoves();
-    if (!go_again) cur_player = !cur_player;
+    if (!go_again) {cur_player = !cur_player; game.ChangeTurn();}
     //else { if (verbose) std::cout<<"AGAIN!!!!!!!!!"<<std::endl; }
   }
 
