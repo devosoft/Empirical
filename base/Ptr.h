@@ -40,14 +40,16 @@ namespace emp {
   void SetPtrDebug(bool _d = true) { ptr_debug = _d; }
   bool GetPtrDebug() { return ptr_debug; }
 
+  enum class PtrStatus { DELETED=0, ACTIVE, ARRAY };
+
   class PtrInfo {
   private:
-    const void * ptr;       // Which pointer are we keeping data on?
-    int count;        // How many of this pointer do we have?
-    bool active;      // Has this pointer been deleted? (i.e., we should no longer access it!)
+    const void * ptr;   // Which pointer are we keeping data on?
+    int count;          // How many of this pointer do we have?
+    PtrStatus active;   // Has this pointer been deleted? (i.e., we should no longer access it!)
 
   public:
-    PtrInfo(const void * _ptr) : ptr(_ptr), count(1), active(true) {
+    PtrInfo(const void * _ptr) : ptr(_ptr), count(1), active(PtrStatus::ACTIVE) {
       if (ptr_debug) std::cout << "Created info for pointer " << ptr << std::endl;
     }
     PtrInfo(const PtrInfo &) = default;
@@ -61,24 +63,24 @@ namespace emp {
 
     const void * GetPtr() const { return ptr; }
     int GetCount() const { return count; }
-    bool IsActive() const { return active; }
+    bool IsActive() const { return (bool) active; }
 
     void Inc() {
       if (ptr_debug) std::cout << "Inc info for pointer " << ptr << std::endl;
-      emp_assert(active, "Incrementing deleted pointer!"); count++;
+      emp_assert(active != PtrStatus::DELETED, "Incrementing deleted pointer!"); count++;
     }
     void Dec() {
       if (ptr_debug) std::cout << "Dec info for pointer " << ptr << std::endl;
 
       // Make sure that we have more than one copy, -or- we've already deleted this pointer
-      emp_assert(count > 1 || active == false, "Removing last reference to owned Ptr!");
+      emp_assert(count > 1 || active == PtrStatus::DELETED, "Removing last reference to owned Ptr!");
       count--;
     }
 
     void MarkDeleted() {
       if (ptr_debug) std::cout << "Marked deleted for pointer " << ptr << std::endl;
-      emp_assert(active == true, "Deleting same emp::Ptr a second time!");
-      active = false;
+      emp_assert(active != PtrStatus::DELETED, "Deleting same emp::Ptr a second time!");
+      active = PtrStatus::DELETED;
     }
 
   };
@@ -253,12 +255,25 @@ namespace emp {
     }
 
     bool IsNull() const { return ptr == nullptr; }
-    TYPE * Raw() { return ptr; }
-    const TYPE * const Raw() const { return ptr; }
-    template <typename T2> T2 * Cast() { return (T2*) ptr; }
-    template <typename T2> const T2 * const Cast() const { return (T2*) ptr; }
+    TYPE * Raw() {
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to raw.");
+      return ptr;
+    }
+    const TYPE * const Raw() const {
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to raw.");
+      return ptr;
+    }
+    template <typename T2> T2 * Cast() {
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.");
+      return (T2*) ptr;
+    }
+    template <typename T2> const T2 * const Cast() const {
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.");
+      return (T2*) ptr;
+    }
     template <typename T2> T2 * DynamicCast() {
       emp_assert(dynamic_cast<T2*>(ptr) != nullptr);
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.");
       return (T2*) ptr;
     }
     size_t GetID() const { return id; }
@@ -288,6 +303,7 @@ namespace emp {
     // Copy assignment
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
       if (ptr_debug) std::cout << "copy assignment" << std::endl;
+      emp_assert(Tracker().IsDeleted(_in.id) == false, "Do not copy deleted pointers.");
       if (id != _in.id) {        // Assignments only need to happen if ptrs are different.
         Tracker().DecID(id);
         ptr = _in.ptr;
@@ -300,6 +316,7 @@ namespace emp {
     // Move assignment
     Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
       if (ptr_debug) std::cout << "move assignment" << std::endl;
+      emp_assert(Tracker().IsDeleted(_in.id) == false, "Do not copy deleted pointers.");
       ptr = _in.ptr;
       id = _in.id;
       _in.ptr = nullptr;
@@ -331,6 +348,7 @@ namespace emp {
     Ptr<TYPE> & operator=(Ptr<T2> _in) {
       if (ptr_debug) std::cout << "convert-copy assignment" << std::endl;
       emp_assert( (PtrIsConvertable<T2, TYPE>(_in.Raw())) );
+      emp_assert(Tracker().IsDeleted(_in.id) == false, "Do not copy deleted pointers.");
       Tracker().DecID(id);
       ptr = _in.Raw();
       id = _in.GetID();
@@ -342,13 +360,13 @@ namespace emp {
     TYPE & operator*() {
       // Make sure a pointer is active and non-null before we dereference it.
       emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
-      emp_assert(ptr != nullptr, "Cannot dereference a null pointer!");
+      emp_assert(ptr != nullptr, "Do not dereference a null pointer!");
       return *ptr;
     }
     const TYPE & operator*() const {
       // Make sure a pointer is active before we dereference it.
       emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
-      emp_assert(ptr != nullptr, "Cannot dereference a null pointer!");
+      emp_assert(ptr != nullptr, "Do not dereference a null pointer!");
       return *ptr;
     }
 
@@ -356,13 +374,13 @@ namespace emp {
     TYPE * operator->() {
       // Make sure a pointer is active before we follow it.
       emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
-      emp_assert(ptr != nullptr, "Cannot follow a null pointer!");
+      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr;
     }
     const TYPE * const operator->() const {
       // Make sure a pointer is active before we follow it.
       emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
-      emp_assert(ptr != nullptr, "Cannot follow a null pointer!");
+      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr;
     }
 
@@ -397,9 +415,24 @@ namespace emp {
     // Some debug testing functions
     int DebugGetCount() const { return Tracker().GetIDCount(id); }
 
+    // Prevent use of new and delete on Ptr
+    static void* operator new(std::size_t) noexcept {
+      emp_assert(false, "No Ptr::operator new; use emp::NewPtr for clarity.");
+      return nullptr;
+    }
+    static void* operator new[](std::size_t sz) noexcept {
+      emp_assert(false, "No Ptr::operator new[]; use emp::NewPtrArray for clarity.");
+      return nullptr;
+    }
+
+    static void operator delete(void* ptr, std::size_t sz) {
+      emp_assert(false, "No Ptr::operator delete; use Delete() member function for clarity.");
+    }
+    static void operator delete[](void* ptr, std::size_t sz) {
+      emp_assert(false, "No Ptr::operator new[]; use DeleteArray() member function for clarity.");
+    }
+
   };
-
-
 
 #else
 
@@ -412,27 +445,13 @@ namespace emp {
   public:
     using element_type = TYPE;
 
-    Ptr() : ptr(nullptr) { ; }
-
-    // Construct using copy constructor
-    Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) { ; }
-
-    // Construct using move constructor
-    Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr) { ; }
-
-    // Construct from a raw pointer of campatable type (bool is unused and optional)
-    template <typename T2>
-    Ptr(T2 * in_ptr, bool=false) : ptr(in_ptr) { ; }
-
-    // Construct from another Ptr<> object of compatable type.
-    template <typename T2>
-    Ptr(Ptr<T2> _in) : ptr(_in.Raw()) { ; }
-
-    // Construct from nullptr.
-    Ptr(std::nullptr_t) : Ptr() { ; }
-
-    // Destructor.
-    ~Ptr() { ; }
+    Ptr() : ptr(nullptr) {}                                               // Default constructor
+    Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) {}                          // Copy constructor
+    Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr) {}                               // Move constructor
+    template <typename T2> Ptr(T2 * in_ptr, bool=false) : ptr(in_ptr) {}  // Construct from raw ptr
+    template <typename T2> Ptr(Ptr<T2> _in) : ptr(_in.Raw()) {}           // From compatible Ptr
+    Ptr(std::nullptr_t) : Ptr() {}                                        // From nullptr
+    ~Ptr() { ; }                                                          // Destructor
 
     bool IsNull() const { return ptr == nullptr; }
     TYPE * Raw() { return ptr; }
@@ -442,45 +461,22 @@ namespace emp {
     template <typename T2> T2 * DynamicCast() { return dynamic_cast<T2*>(ptr); }
 
     template <typename... T>
-    void New(T &&... args) {
-      ptr = new TYPE(std::forward<T>(args)...);     // Build a new raw pointer.
-    }
+    void New(T &&... args) { ptr = new TYPE(std::forward<T>(args)...); }  // New raw pointer.
     void Delete() { delete ptr; }
 
     size_t Hash() const {
-      // Chop off useless bits of pointer...
-      static constexpr size_t shift = Log2(1 + sizeof(TYPE));
+      static constexpr size_t shift = Log2(1 + sizeof(TYPE));  // Chop off useless bits...
       return (size_t)(ptr) >> shift;
     }
     struct hash_t { size_t operator()(const Ptr<TYPE> & t) const { return t.Hash(); } };
 
-    // Copy assignment
-    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
-      ptr = _in.ptr;
-      return *this;
-    }
+    // Copy/Move assignments
+    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) { ptr = _in.ptr; return *this; }
+    Ptr<TYPE> & operator=(Ptr<TYPE> && _in) { ptr = _in.ptr; _in.ptr = nullptr; return *this; }
 
-    // Move assignment
-    Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
-      ptr = _in.ptr;
-      _in.ptr = nullptr;
-      return *this;
-    }
-
-    // Assign to a pointer of the correct type.
-    // Note: Since this ptr was passed in as a raw pointer, we do not manage it.
-    template <typename T2>
-    Ptr<TYPE> & operator=(T2 * _in) {
-      ptr = _in;
-      return *this;
-    }
-
-    // Assign to a convertable Ptr
-    template <typename T2>
-    Ptr<TYPE> & operator=(Ptr<T2> _in) {
-      ptr = _in.Raw();
-      return *this;
-    }
+    // Assign to compatible Ptr or raw (non-managed) pointer.
+    template <typename T2> Ptr<TYPE> & operator=(T2 * _in) { ptr = _in; return *this; }
+    template <typename T2> Ptr<TYPE> & operator=(Ptr<T2> _in) { ptr = _in.Raw(); return *this; }
 
     // Dereference a pointer.
     TYPE & operator*() { return *ptr; }
