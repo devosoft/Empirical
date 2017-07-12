@@ -40,14 +40,16 @@ namespace emp {
   void SetPtrDebug(bool _d = true) { ptr_debug = _d; }
   bool GetPtrDebug() { return ptr_debug; }
 
+  enum class PtrStatus { DELETED=0, ACTIVE, ARRAY };
+
   class PtrInfo {
   private:
-    const void * ptr;  // Which pointer are we keeping data on?
-    int count;         // How many of this pointer do we have?
-    bool active;       // Has this pointer been deleted? (i.e., we should no longer access it!)
+    const void * ptr;   // Which pointer are we keeping data on?
+    int count;          // How many of this pointer do we have?
+    PtrStatus active;   // Has this pointer been deleted? (i.e., we should no longer access it!)
 
   public:
-    PtrInfo(const void * _ptr) : ptr(_ptr), count(1), active(true) {
+    PtrInfo(const void * _ptr) : ptr(_ptr), count(1), active(PtrStatus::ACTIVE) {
       if (ptr_debug) std::cout << "Created info for pointer " << ptr << std::endl;
     }
     PtrInfo(const PtrInfo &) = default;
@@ -61,24 +63,24 @@ namespace emp {
 
     const void * GetPtr() const { return ptr; }
     int GetCount() const { return count; }
-    bool IsActive() const { return active; }
+    bool IsActive() const { return (bool) active; }
 
     void Inc() {
       if (ptr_debug) std::cout << "Inc info for pointer " << ptr << std::endl;
-      emp_assert(active, "Incrementing deleted pointer!"); count++;
+      emp_assert(active != PtrStatus::DELETED, "Incrementing deleted pointer!"); count++;
     }
     void Dec() {
       if (ptr_debug) std::cout << "Dec info for pointer " << ptr << std::endl;
 
       // Make sure that we have more than one copy, -or- we've already deleted this pointer
-      emp_assert(count > 1 || active == false, "Removing last reference to owned Ptr!");
+      emp_assert(count > 1 || active == PtrStatus::DELETED, "Removing last reference to owned Ptr!");
       count--;
     }
 
     void MarkDeleted() {
       if (ptr_debug) std::cout << "Marked deleted for pointer " << ptr << std::endl;
-      emp_assert(active == true, "Deleting same emp::Ptr a second time!");
-      active = false;
+      emp_assert(active != PtrStatus::DELETED, "Deleting same emp::Ptr a second time!");
+      active = PtrStatus::DELETED;
     }
 
   };
