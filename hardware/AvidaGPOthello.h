@@ -199,6 +199,7 @@ namespace emp {
     void Reset() {
       genome.resize(0);  // Clear out genome
       traits.resize(0);  // Clear out traits
+      traits.push_back(0);
       ResetHardware();   // Reset the full hardware
     }
 
@@ -264,11 +265,15 @@ namespace emp {
 
     void SetBoard() { for (int i = 0; i < BOARD_SIZE; i ++){ board[i] = inputs[i]; }}
     double GetSquareCurr(size_t pos) { return board[pos % BOARD_SIZE]; }
+    void EndTurn() { traits[0] = 1; }
 
     double GetValidAbove(size_t pos) {
-      double square = pos - 8;
+      if (pos > 63) {return 0;}
+      //std::cout<<"Board PosA: "<<pos<<" "<<board[pos]<<std::endl;
+      double square = int(pos) - 8;
       if (board[pos] != EMPTY) {return 0;}
       while (square >= 0){
+        //std::cout<<"H: "<<square<< " "<<pos<<std::endl;
         if (board[square] == EMPTY) {return 0;}
         else if (board[square] == PLAYER) {
           if (board[square + 8] == OPPONENT) {return 1;}
@@ -279,9 +284,11 @@ namespace emp {
       return 0;
     }
     double GetValidBelow(size_t pos) {
+      if (pos > 63) {return 0;}
       double square = pos + 8;
       if (board[pos] != EMPTY) {return 0;}
       while (square < 64){
+        //std::cout<<"G: "<<square<<std::endl;
         if (board[square] == EMPTY) {return 0;}
         else if (board[square] == PLAYER) {
           if (board[square - 8] == OPPONENT) {return 1;}
@@ -292,9 +299,11 @@ namespace emp {
       return 0;
     }
     double GetValidLeft(size_t pos) {
+      if (pos > 63) {return 0;}
       int square = int(pos);
       if (board[pos] != EMPTY) {return 0;}
       while (square % 8 != 0){
+        //std::cout<<"F: "<<square<<std::endl;
         square--;
         if (board[square] == EMPTY) {return 0;}
         else if (board[square] == PLAYER) {
@@ -305,13 +314,81 @@ namespace emp {
       return 0;
     }
     double GetValidRight(size_t pos) {
+      if (pos > 63) {return 0;}
       int square = int(pos);
+      //std::cout<<"Board Pos: "<<board[pos]<<std::endl;
       if (board[pos] != EMPTY) {return 0;}
       while (square % 8 != 7){
+        //std::cout<<"E: "<<square<<std::endl;
         square++;
         if (board[square] == EMPTY) {return 0;}
         else if (board[square] == PLAYER) {
           if (board[square - 1] == OPPONENT) {return 1;}
+          else {return 0;}
+        }
+      } 
+      return 0;
+    }
+    double GetValidUL(size_t pos) {
+      if (pos > 63) {return 0;}
+      int square = int(pos);
+      if (board[pos] != EMPTY) {return 0;}
+      while (square % 8 != 0 && square > 7){
+        //std::cout<<"A: "<<square<<std::endl;
+        square--;
+        square -= 8;
+        if (board[square] == EMPTY) {return 0;}
+        else if (board[square] == PLAYER) {
+          if (board[square + 1 + 8] == OPPONENT) {return 1;}
+          else {return 0;}
+        }
+      } 
+      return 0;
+    }
+    double GetValidUR(size_t pos) {
+      if (pos > 63) {return 0;}
+      int square = int(pos);
+      if (board[pos] != EMPTY) {return 0;}
+      while (square % 8 != 7 && square > 7){
+        //std::cout<<"B: "<<square<<std::endl;
+        square++;
+        square -= 8;
+        if (board[square] == EMPTY) {return 0;}
+        else if (board[square] == PLAYER) {
+          if (board[square - 1 + 8] == OPPONENT) {return 1;}
+          else {return 0;}
+        }
+      } 
+      return 0;
+    }
+    double GetValidLL(size_t pos) {
+      if (pos > 63) {return 0;}
+      int square = int(pos);
+      //std::cout<<"Board PosLL: "<<board[pos]<<std::endl;
+      if (board[pos] != EMPTY) {return 0;}
+      while (square % 8 != 0 && square < 56){
+        //std::cout<<"C: "<<square<<std::endl;
+        square--;
+        square += 8;
+        if (board[square] == EMPTY) {return 0;}
+        else if (board[square] == PLAYER) {
+          if (board[square + 1 - 8] == OPPONENT) {return 1;}
+          else {return 0;}
+        }
+      } 
+      return 0;
+    }
+    double GetValidLR(size_t pos) {
+      if (pos > 63) {return 0;}
+      int square = int(pos);
+      if (board[pos] != EMPTY) {return 0;}
+      while (square % 8 != 7 && square < 56){
+        //std::cout<<"D: "<<square<<std::endl;
+        square++;
+        square += 8;
+        if (board[square] == EMPTY) {return 0;}
+        else if (board[square] == PLAYER) {
+          if (board[square - 1 - 8] == OPPONENT) {return 1;}
           else {return 0;}
         }
       } 
@@ -402,7 +479,12 @@ namespace emp {
     }
 
     /// Process the next SERIES of instructions, directed by the instruction pointer.
-    void Process(size_t num_inst) { for (size_t i = 0; i < num_inst; i++) SingleProcess(); }
+    void Process(size_t num_inst) { 
+      for (size_t i = 0; i < num_inst; i++) {
+        if (traits[0] == 1) break;
+        SingleProcess(); 
+      }
+    }
 
     /// Print out a single instruction, with its arguments.
     void PrintInst(const inst_t & inst, std::ostream & os=std::cout) const;
@@ -506,6 +588,7 @@ namespace emp {
       // Save the date in the target reg to the specified output position.
       int output_id = (int) hw.regs[ args[1] ];  // Grab ID from register.
       hw.outputs[output_id] = hw.regs[args[0]];     // Copy target reg to appropriate output.
+      //std::cout<<"Output: "<<hw.regs[args[0]]<<std::endl;
     }
 
     static void Inst_CopyVal(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[1]] = hw.regs[args[0]]; }
@@ -521,22 +604,50 @@ namespace emp {
       double out = hw.GetSquareCurr(int(hw.regs[args[0]]));
       hw.regs[args[1]] = out;
     }
+    static void Inst_EndTurn(AvidaGP & hw, const arg_set_t & args) {
+      hw.EndTurn();
+    }
 
     static void Inst_GetValidAbove(AvidaGP & hw, const arg_set_t & args) {
       double out = hw.GetValidAbove(int(hw.regs[args[0]]));
+      //std::cout << "A: "<<out<<std::endl;
       hw.regs[args[1]] = out;
     }
 
     static void Inst_GetValidBelow(AvidaGP & hw, const arg_set_t & args) {
+      //std::cout<<"HERE"<<std::endl;
       double out = hw.GetValidBelow(int(hw.regs[args[0]]));
       hw.regs[args[1]] = out;
+      //std::cout << "B: "<<out<<std::endl;
     }
     static void Inst_GetValidLeft(AvidaGP & hw, const arg_set_t & args) {
       double out = hw.GetValidLeft(int(hw.regs[args[0]]));
       hw.regs[args[1]] = out;
+      //std::cout << "L: "<<out<<std::endl;
     }
     static void Inst_GetValidRight(AvidaGP & hw, const arg_set_t & args) {
       double out = hw.GetValidRight(int(hw.regs[args[0]]));
+      hw.regs[args[1]] = out;
+      //std::cout << "R: "<<out<<std::endl;
+    }
+    static void Inst_GetValidUL(AvidaGP & hw, const arg_set_t & args) {
+      double out = hw.GetValidUL(int(hw.regs[args[0]]));
+      hw.regs[args[1]] = out;
+      //std::cout << "UL: "<<out<<std::endl;
+    }
+    static void Inst_GetValidUR(AvidaGP & hw, const arg_set_t & args) {
+      double out = hw.GetValidUR(int(hw.regs[args[0]]));
+      hw.regs[args[1]] = out;
+      //std::cout << "UR: "<<out<<std::endl;
+    }
+    static void Inst_GetValidLL(AvidaGP & hw, const arg_set_t & args) {
+      double out = hw.GetValidLL(int(hw.regs[args[0]]));
+      //std::cout << "LL: "<<out<<std::endl;
+      hw.regs[args[1]] = out;
+    }
+    static void Inst_GetValidLR(AvidaGP & hw, const arg_set_t & args) {
+      double out = hw.GetValidLR(int(hw.regs[args[0]]));
+      //std::cout << "LR: "<<out<<std::endl;
       hw.regs[args[1]] = out;
     }
 
@@ -697,11 +808,16 @@ namespace emp {
       inst_lib.AddInst("CopyMem", Inst_CopyMem, 2, "Copy memory block Arg1 into memory block Arg2");
       inst_lib.AddInst("ShiftMem", Inst_ShiftMem, 2, "Shift memory block Arg1 into memory block Arg2");
       inst_lib.AddInst("SetBoard", Inst_SetBoard, 1, "Sets board state in board memory");
+      inst_lib.AddInst("EndTurn", Inst_EndTurn, 1, "Signals that the organism is done with computation");
       inst_lib.AddInst("GetSquareCurr", Inst_GetSquareCurr, 2, "Gets piece from reg Arg 1 in board and puts it in reg Arg 2");
       inst_lib.AddInst("GetValidAbove", Inst_GetValidAbove, 2, "Check if reg Arg1 flanks a piece above, bool put in reg Arg2");
       inst_lib.AddInst("GetValidBelow", Inst_GetValidBelow, 2, "Check if reg Arg1 flanks a piece below, bool put in reg Arg2");
       inst_lib.AddInst("GetValidLeft", Inst_GetValidLeft, 2, "Check if reg Arg1 flanks a piece left, bool put in reg Arg2");
       inst_lib.AddInst("GetValidRight", Inst_GetValidRight, 2, "Check if reg Arg1 flanks a piece right, bool put in reg Arg2");
+      inst_lib.AddInst("GetValidUL", Inst_GetValidUL, 2, "Check if reg Arg1 flanks a piece upper left, bool put in reg Arg2");
+      inst_lib.AddInst("GetValidUR", Inst_GetValidUR, 2, "Check if reg Arg1 flanks a piece upper right, bool put in reg Arg2");
+      inst_lib.AddInst("GetValidLL", Inst_GetValidLL, 2, "Check if reg Arg1 flanks a piece lower left, bool put in reg Arg2");
+      inst_lib.AddInst("GetValidLR", Inst_GetValidLR, 2, "Check if reg Arg1 flanks a piece lower right, bool put in reg Arg2");
       //inst_lib.AddInst("Push", Inst_Push, 2, "Push reg Arg1 onto stack Arg2");
       //inst_lib.AddInst("Pop", Inst_Pop, 2, "Pop stack Arg1 into reg Arg2");
       inst_lib.AddInst("Input", Inst_Input, 2, "Pull next value from input Arg1 into reg Arg2");

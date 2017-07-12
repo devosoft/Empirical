@@ -31,10 +31,11 @@ int main()
     cpu.SetInput(i, input);
   }
 
-  cpu.PushInst("SetReg", 0, 43);
+/*  cpu.PushInst("SetReg", 0, 43);
   cpu.PushInst("SetReg", 1, 20);
   cpu.PushInst("SetReg", 5, 29);
   cpu.PushInst("SetReg", 6, 34);
+  cpu.PushInst("SetReg", 7, 19);
   cpu.PushInst("SetBoard", 0);
   cpu.PushInst("GetSquareCurr", 0, 2); // Should be 0 in reg 2
   cpu.PushInst("GetValidAbove", 0, 3);
@@ -46,9 +47,11 @@ int main()
   cpu.PushInst("GetValidRight", 6, 4);
   cpu.PushInst("GetValidLeft", 6, 3);
   cpu.PushInst("GetValidRight", 5, 4);
+  cpu.PushInst("GetValidLR", 7, 3);
+  cpu.PushInst("GetValidLR", 6, 4);*/
 
 
-  /*// Get Input and set it in memory
+ /* // Get Input and set it in memory
   cpu.PushInst("SetReg", 0, 64);
   cpu.PushInst("SetReg", 2, 0);
   cpu.PushInst("SetReg", 1, 1);
@@ -90,6 +93,58 @@ int main()
   cpu.PushInst("TestNEqu", 2, 0, 1);
   cpu.PushInst("Scope", 0); // END WHILE 1*/
 
+  cpu.PushInst("SetBoard", 0);
+  cpu.PushInst("SetReg", 0, 64);
+  cpu.PushInst("SetReg", 2, 0);
+  cpu.PushInst("SetReg", 1, 1);
+
+  cpu.PushInst("While", 1, 1 );
+    cpu.PushInst("GetValidAbove", 2, 3);
+    cpu.PushInst("If", 3, 2);
+      cpu.PushInst("SetReg", 1, 0);
+      cpu.PushInst("Break", 0);
+    cpu.PushInst("Scope", 2);
+    cpu.PushInst("GetValidBelow", 2, 3);
+    cpu.PushInst("If", 3, 2);
+      cpu.PushInst("SetReg", 1, 0);
+      cpu.PushInst("Break", 0);
+    cpu.PushInst("Scope", 2);
+    cpu.PushInst("GetValidLeft", 2, 3);
+    cpu.PushInst("If", 3, 2);
+      cpu.PushInst("SetReg", 1, 0);
+      cpu.PushInst("Break", 0);
+    cpu.PushInst("Scope", 2);
+    cpu.PushInst("GetValidRight", 2, 3);
+    cpu.PushInst("If", 3, 2);
+      cpu.PushInst("SetReg", 1, 0);
+      cpu.PushInst("Break", 0);
+    cpu.PushInst("Scope", 2);
+    cpu.PushInst("GetValidUL", 2, 3);
+    cpu.PushInst("If", 3, 2);
+      cpu.PushInst("SetReg", 1, 0);
+      cpu.PushInst("Break", 0);
+    cpu.PushInst("Scope", 2);
+    cpu.PushInst("GetValidUR", 2, 3);
+    cpu.PushInst("If", 3, 2);
+      cpu.PushInst("SetReg", 1, 0);
+      cpu.PushInst("Break", 0);
+    cpu.PushInst("Scope", 2);
+    cpu.PushInst("GetValidLL", 2, 3);
+    cpu.PushInst("If", 3, 2);
+      cpu.PushInst("SetReg", 1, 0);
+      cpu.PushInst("Break", 0);
+    cpu.PushInst("Scope", 2);
+    cpu.PushInst("GetValidLR", 2, 3);
+    cpu.PushInst("If", 3, 2);
+      cpu.PushInst("SetReg", 1, 0);
+      cpu.PushInst("Break", 0);
+    cpu.PushInst("Scope", 2);
+    cpu.PushInst("Inc", 2);
+    cpu.PushInst("TestNEqu", 2, 0, 1);
+  cpu.PushInst("Scope", 0);
+  cpu.PushInst("Output", 2, 0);
+
+
 
   /*for (size_t i = 0; i < 100; i++) {
     cpu.Process(1);
@@ -98,7 +153,7 @@ int main()
 
   cpu.PrintGenome();
 //  cpu.ResetHardware();
-  cpu.Trace(15);
+  cpu.Trace(556);
 
   // Run a ton of organisms.
   /*for (int t = 0; t < 1000000; t++) {
