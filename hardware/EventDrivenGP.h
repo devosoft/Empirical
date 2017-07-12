@@ -356,8 +356,6 @@ namespace emp {
     // TODO - Write proper custom move and copy constructors. Defaults don't work properly.
     //EventDrivenGP(EventDrivenGP &&) = default; // @amlalejini - TODO: implement move constructor.
 
-    // @amlalejini - TODO: This copy constructor fucks up putting this hardware into containers that
-    // dynamically resize. Fix it.
     //EventDrivenGP(const EventDrivenGP &) = default;
     // EventDrivenGP(const EventDrivenGP & in)
     //   : inst_lib(in.inst_lib), event_lib(in.event_lib), random_ptr(nullptr), random_owner(false),

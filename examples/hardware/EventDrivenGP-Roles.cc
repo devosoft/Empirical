@@ -197,7 +197,6 @@ void Inst_GetXLoc(emp::EventDrivenGP & hw, const inst_t & inst) {
 void Inst_GetYLoc(emp::EventDrivenGP & hw, const inst_t & inst) {
   state_t & state = *hw.GetCurState();
   state.SetLocal(inst.args[0], hw.GetTrait(TRAIT_ID__Y_LOC));
-
 }
 
 int main() {
