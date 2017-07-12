@@ -23,10 +23,11 @@ using fun_t = emp::EventDrivenGP::Function;
 using program_t = emp::EventDrivenGP::Program;
 
 constexpr size_t POP_SIZE = 100;
-constexpr size_t EVAL_TIME = 1000;
+constexpr size_t EVAL_TIME = 200;
 constexpr size_t DIST_SYS_WIDTH = 5;
 constexpr size_t DIST_SYS_HEIGHT = 5;
-constexpr size_t GENERATIONS = 100;
+constexpr size_t DIST_SYS_SIZE = DIST_SYS_WIDTH * DIST_SYS_HEIGHT;
+constexpr size_t GENERATIONS = 500;
 constexpr int RAND_SEED = 2;
 
 constexpr size_t TRAIT_ID__ROLE_ID = 1;
@@ -34,7 +35,7 @@ constexpr size_t TRAIT_ID__FITNESS = 0;
 constexpr size_t TRAIT_ID__X_LOC = 2;
 constexpr size_t TRAIT_ID__Y_LOC = 3;
 
-constexpr size_t MAX_FUNC_LENGTH = 25;
+constexpr size_t MAX_FUNC_LENGTH = 20;
 constexpr size_t MAX_FUNC_CNT = 3;
 
 // Mutation rates
@@ -58,14 +59,15 @@ constexpr size_t MAX_INST_ARGS = emp::EventDrivenGP::MAX_INST_ARGS;
 
 // This will be the target of evolution (what the world manages/etc.)
 struct Agent {
-  size_t uid_cnt;
+  size_t valid_uid_cnt;
+  size_t valid_id_cnt;
   program_t program;
 
   Agent(emp::Ptr<inst_lib_t> _ilib)
-  : uid_cnt(0), program(_ilib) { ; }
+  : valid_uid_cnt(0), valid_id_cnt(0), program(_ilib) { ; }
 
   Agent(const program_t & _program)
-  : uid_cnt(0), program(_program) { ; }
+  : valid_uid_cnt(0), valid_id_cnt(0), program(_program) { ; }
 
 };
 
@@ -192,10 +194,18 @@ void Inst_SetRoleID(emp::EventDrivenGP & hw, const inst_t & inst) {
   hw.SetTrait(TRAIT_ID__ROLE_ID, (int)state.AccessLocal(inst.args[0]));
 }
 
-int main() {
-  std::cout << "Testing EventDrivenGP." << std::endl;
+void Inst_GetXLoc(emp::EventDrivenGP & hw, const inst_t & inst) {
+  state_t & state = *hw.GetCurState();
+  state.SetLocal(inst.args[0], hw.GetTrait(TRAIT_ID__X_LOC));
+}
 
-  // Some convenient type aliases:
+void Inst_GetYLoc(emp::EventDrivenGP & hw, const inst_t & inst) {
+  state_t & state = *hw.GetCurState();
+  state.SetLocal(inst.args[0], hw.GetTrait(TRAIT_ID__Y_LOC));
+
+}
+
+int main() {
 
   // Define a convenient affinity table.
   emp::vector<affinity_t> affinity_table(256);
@@ -213,38 +223,28 @@ int main() {
 
   inst_lib->AddInst("GetRoleID", Inst_GetRoleID, 1, "Local memory[Arg1] = Trait[RoleID]");
   inst_lib->AddInst("SetRoleID", Inst_SetRoleID, 1, "Trait[RoleID] = Local memory[Arg1]");
-
-
-  // Dummy dispatch function for testing.
-  // event_lib->RegisterDispatchFun("Message",
-  //                               [](emp::EventDrivenGP &, const event_t &) {
-  //                                 std::cout << "Dispatch plz?" << std::endl;
-  //                               });
+  inst_lib->AddInst("GetXLoc", Inst_GetXLoc, 1, "Local memory[Arg1] = Trait[XLoc]");
+  inst_lib->AddInst("GetYLoc", Inst_GetYLoc, 1, "Local memory[Arg1] = Trait[YLoc]");
 
   // // Configure a seed program.
   program_t seed_program(inst_lib);
   seed_program.PushFunction(fun_t(affinity_table[1]));
-  // for (size_t i = 0; i < 3; ++i) seed_program.PushInst(i);
-  for (size_t i = 0; i < 7; i++) seed_program.PushInst("Nop");
-  seed_program.PushInst("Inc", 0);
-  seed_program.PushInst("SetRoleID", 0);  // Set roleID to 1
+  for (size_t i = 0; i < MAX_FUNC_LENGTH; i++) seed_program.PushInst("Nop");
+  // seed_program.PushInst("Inc", 0);
+  // seed_program.PushInst("SetRoleID", 0);  // Set roleID to 1
   // seed_program.PushInst("BroadcastMsg", 0, 0, 0, affinity_table[0]);
   // seed_program.PushFunction(fun_t(affinity_table[255]));
   // for (size_t i = 0; i < 3; ++i) seed_program.PushInst(i);
   // for (size_t i = 0; i < 5; i++) seed_program.PushInst("Nop");
 
-
   Agent seed_agent(seed_program);
-  // emp::Ptr<Agent> seed_agent_ptr = emp::NewPtr<Agent>(seed_program);
 
   Deme eval_deme(random, DIST_SYS_WIDTH, DIST_SYS_HEIGHT, event_lib, inst_lib);
 
-  // @amlalejini: Wishing evo3 worked...
   emp::evo::EAWorld<Agent> world(random, "Distributed-Role-World");
   world.Insert(seed_agent, POP_SIZE);
 
-
-  // Setup super simple mutation function.
+  // Setup simple mutation function.
   std::function<bool(Agent*, emp::Random&)> simple_mut_fun =
     [](Agent *agent, emp::Random& random) {
       program_t & program = agent->program;
@@ -308,10 +308,10 @@ int main() {
     };
 
 
-  // Setup unique role ID fitness function.
+  // Setup unique role ID fitness function. From: (Goldsby et al. 2010).
   std::function<double(Agent*)> fit_fun =
     [](Agent * agent) {
-      return (double)agent->uid_cnt;
+      return (agent->valid_id_cnt >= DIST_SYS_SIZE) ? (agent->valid_id_cnt + agent->valid_uid_cnt) : (agent->valid_id_cnt);
     };
 
   // Agent * agent = new Agent(seed_program);
@@ -323,13 +323,6 @@ int main() {
 
   world.SetDefaultMutateFun(simple_mut_fun);
 
-  //
-  // // Setup the fitness function.
-  // std::function<double(program_t*)> fit_fun =
-  //   [] (program_t *program) {
-  //     return 0.0;
-  //   };
-
   // Do the run...
   for (size_t ud = 0; ud < GENERATIONS; ++ud) {
     std::cout << "Update #" << ud << std::endl;
@@ -337,30 +330,32 @@ int main() {
     for (size_t id = 0; id < POP_SIZE; ++id) {
       eval_deme.LoadAgent(world.popM[id]);
       eval_deme.Advance(EVAL_TIME);
-      std::unordered_set<double> uids;
+      std::unordered_set<double> valid_uids;
+      size_t valid_id_cnt = 0;
       for (size_t i = 0; i < eval_deme.grid.size(); ++i) {
-        uids.insert(eval_deme.grid[i]->GetTrait(TRAIT_ID__ROLE_ID));
+        const double role_id = eval_deme.grid[i]->GetTrait(TRAIT_ID__ROLE_ID);
+        if (role_id > 0 && role_id <= DIST_SYS_SIZE) {
+          ++valid_id_cnt; // Increment valid id cnt.
+          valid_uids.insert(role_id); // Add to set.
+        }
       }
-      world[id].uid_cnt = uids.size();
+      world[id].valid_uid_cnt = valid_uids.size();
+      world[id].valid_id_cnt = valid_id_cnt;
     }
-    // std::cout << "Elite selection." << std::endl;
     // Keep the best agent.
     world.EliteSelect(fit_fun, 1, 1);
-    // std::cout << "Tournament selection." << std::endl;
     // Run a tournament for the rest.
     world.TournamentSelect(fit_fun, 8, POP_SIZE - 1);
-    // std::cout << "World update." << std::endl;
     // Update the world (generational turnover)
     world.Update();
-    // std::cout << "Mutate population" << std::endl;
     // Mutate all but the first agent.
     world.MutatePop(1);
     // First agent is the best of the last generation.
-    std::cout << "  Max score: " << world[0].uid_cnt << std::endl;
+    std::cout << "  Max score: " << fit_fun(world.popM[0]) << std::endl;
   }
 
   std::cout << std::endl;
-  std::cout << "Best program (score: " << world[0].uid_cnt << "): " << std::endl;
+  std::cout << "Best program (valid ids: " << world[0].valid_id_cnt << ", unique valid ids: "<< world[0].valid_uid_cnt <<"): " << std::endl;
   world[0].program.PrintProgram(); std::cout << std::endl;
   std::cout << "--- Evaluating best program. ---" << std::endl;
   eval_deme.LoadAgent(world.popM[0]);
