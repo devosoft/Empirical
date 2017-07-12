@@ -413,9 +413,24 @@ namespace emp {
     // Some debug testing functions
     int DebugGetCount() const { return Tracker().GetIDCount(id); }
 
+    // Prevent use of new and delete on Ptr
+    static void* operator new(std::size_t) noexcept {
+      emp_assert(false, "No Ptr::operator new; use emp::NewPtr for clarity.");
+      return nullptr;
+    }
+    static void* operator new[](std::size_t sz) noexcept {
+      emp_assert(false, "No Ptr::operator new[]; use emp::NewPtrArray for clarity.");
+      return nullptr;
+    }
+
+    static void operator delete(void* ptr, std::size_t sz) {
+      emp_assert(false, "No Ptr::operator delete; use Delete() member function for clarity.");
+    }
+    static void operator delete[](void* ptr, std::size_t sz) {
+      emp_assert(false, "No Ptr::operator new[]; use DeleteArray() member function for clarity.");
+    }
+
   };
-
-
 
 #else
 
