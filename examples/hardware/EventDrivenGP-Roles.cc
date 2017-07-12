@@ -8,11 +8,6 @@
 #include "../../tools/BitSet.h"
 #include "../../evo/World.h"
 
-// Things to do:
-//  [ ] Define fitness function
-//    [ ] Build a 'deme' and evaluate it.
-//  [ ] Define mutation function.  // Making a table of bit set values to make affinity assignment easier.
-
 using event_t = typename emp::EventDrivenGP::event_t;
 using event_lib_t = typename emp::EventDrivenGP::event_lib_t;
 using affinity_t = emp::BitSet<8>;
