@@ -64,6 +64,7 @@ namespace emp {
     move_t GetCoord(int idx) { return std::make_pair((idx % boardSize) + 1, (idx / boardSize) + 1); }
 
     size_t GetCurrPlayer() { if (is_B_turn) { return 1; } else { return 2; } }
+    void ChangeTurn() {is_B_turn = !is_B_turn;}
 
     size_t GetSquare(int x, int y) { 
         int idx = GetIndex(x, y);
@@ -297,9 +298,6 @@ namespace emp {
 
         int x = move.first;
         int y = move.second;
-
-        if (player == 1) { is_B_turn = 1; }
-        else { is_B_turn = 0; }
         
         AddDisc(x, y, is_B_turn);
         if (verbose) {
