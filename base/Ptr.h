@@ -16,8 +16,7 @@
 //  * Should we add on tracking for arrays (to allow indexing and know when to call delete[])?
 //    Or just assume that arrays will be handled with emp::array?
 //  * Should we track information about vector and array object to make sure we don't point
-//    into them?
-//  * Make operator delete (and operator new) work with Ptr.
+//    directly into them? (A resize() could make those pointers invalid!)
 
 #ifndef EMP_PTR_H
 #define EMP_PTR_H
@@ -50,7 +49,15 @@ namespace emp {
 
   public:
     PtrInfo(const void * _ptr) : ptr(_ptr), count(1), active(PtrStatus::ACTIVE) {
-      if (ptr_debug) std::cout << "Created info for pointer " << ptr << std::endl;
+      if (ptr_debug) std::cout << "Created info for pointer: " << ptr << std::endl;
+    }
+    PtrInfo(const void * _ptr, size_t array_size)
+      : ptr(_ptr), count(1), active(PtrStatus::ARRAY)
+    {
+      if (ptr_debug) {
+        std::cout << "Created info for array pointer (size=" << array_size << "): "
+                  << ptr << std::endl;
+      }
     }
     PtrInfo(const PtrInfo &) = default;
     PtrInfo(PtrInfo &&) = default;
@@ -181,6 +188,12 @@ namespace emp {
     }
   };
 
+
+//////////////////////////////////
+//
+//  --- Ptr implementation ---
+//
+//////////////////////////////////
 
 #ifdef EMP_TRACK_MEM
 
