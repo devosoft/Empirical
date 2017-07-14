@@ -13,13 +13,8 @@
 //
 //
 //  Developer Notes:
-//  * Should we add on tracking for arrays (to allow indexing and know when to call delete[])?
-//    Or just assume that arrays will be handled with emp::array?
-//  * Should we track information about vector and array object to make sure we don't point
-//    directly into them? (A resize() could make those pointers invalid!)
-//  * When a pointer is cast, the size of the pointed-to object might change.  As such, if it is
-//    a pointer to an array we need to adjust the maximum allowed index to identify when it is out
-//    of bounds.  One way of doing this is to track bytes, not array size.
+//  * Should we track information about emp::vector and emp::array object to make sure we don't
+//    point directly into them? (A resize() could make those pointers invalid!)
 
 #ifndef EMP_PTR_H
 #define EMP_PTR_H
@@ -49,18 +44,18 @@ namespace emp {
     const void * ptr;   // Which pointer are we keeping data on?
     int count;          // How many of this pointer do we have?
     PtrStatus status;   // Has this pointer been deleted? (i.e., we should no longer access it!)
-    size_t array_size;  // How big is the array pointed to?
+    size_t array_bytes; // How big is the array pointed to (in bytes)?
 
   public:
-    PtrInfo(const void * _ptr) : ptr(_ptr), count(1), status(PtrStatus::ACTIVE), array_size(0) {
+    PtrInfo(const void * _ptr) : ptr(_ptr), count(1), status(PtrStatus::ACTIVE), array_bytes(0) {
       if (ptr_debug) std::cout << "Created info for pointer: " << ptr << std::endl;
     }
-    PtrInfo(const void * _ptr, size_t _array_size)
-      : ptr(_ptr), count(1), status(PtrStatus::ARRAY), array_size(_array_size)
+    PtrInfo(const void * _ptr, size_t _array_bytes)
+      : ptr(_ptr), count(1), status(PtrStatus::ARRAY), array_bytes(_array_bytes)
     {
-      emp_assert(_array_size >= 1);
+      emp_assert(_array_bytes >= 1);
       if (ptr_debug) {
-        std::cout << "Created info for array pointer (size=" << array_size << "): "
+        std::cout << "Created info for array pointer (bytes=" << array_bytes << "): "
                   << ptr << std::endl;
       }
     }
@@ -75,7 +70,7 @@ namespace emp {
 
     const void * GetPtr() const { return ptr; }
     int GetCount() const { return count; }
-    size_t GetArraySize() const { return array_size; }
+    size_t GetArrayBytes() const { return array_bytes; }
     bool IsActive() const { return (bool) status; }
     bool IsArray()  const { return status == PtrStatus::ARRAY; }
 
@@ -144,7 +139,7 @@ namespace emp {
 
     size_t GetCurID(const void * ptr) { emp_assert(HasPtr(ptr)); return ptr_id[ptr]; }
     size_t GetNumIDs() const { return id_info.size(); }
-    size_t GetArraySize(size_t id) const { return id_info[id].GetArraySize(); }
+    size_t GetArrayBytes(size_t id) const { return id_info[id].GetArrayBytes(); }
 
     bool IsDeleted(size_t id) const {
       if (id == (size_t) -1) return false;   // Not tracked!
@@ -181,14 +176,14 @@ namespace emp {
     }
 
     // This pointer was just created as a Ptr ARRAY!
-    size_t NewArray(const void * ptr, size_t array_size) {
+    size_t NewArray(const void * ptr, size_t array_bytes) {
       emp_assert(ptr);     // Cannot track a null pointer.
       // Make sure pointer is not already stored -OR- has been deleted (since re-use is possible).
       emp_assert(!HasPtr(ptr) || IsDeleted(GetCurID(ptr)));
 
       size_t id = id_info.size();
       if (ptr_debug) std::cout << "New Array:    " << id << " (" << ptr << ")" << std::endl;
-      id_info.emplace_back(ptr, array_size);
+      id_info.emplace_back(ptr, array_bytes);
       ptr_id[ptr] = id;
       return id;
     }
@@ -278,19 +273,20 @@ namespace emp {
     template <typename T2>
     Ptr(T2 * _ptr, size_t array_size, bool track) : ptr(_ptr), id((size_t) -1)
     {
+      const size_t array_bytes = array_size * sizeof(T2);
       if (ptr_debug) std::cout << "raw ARRAY construct: " << ptr
-                               << ". size=" << array_size
-                               << "; track=" << track << std::endl;
+                               << ". size=" << array_size << "(" << array_bytes
+                               << " bytes); track=" << track << std::endl;
       emp_assert( (PtrIsConvertable<T2, TYPE>(_ptr)) );
 
       // If this pointer is already active, link to it.
       if (Tracker().IsActive(ptr)) {
         id = Tracker().GetCurID(ptr);
         Tracker().IncID(id);
-        emp_assert(Tracker().GetArraySize(id) == array_size); // Make sure pointer is consistent.
+        emp_assert(Tracker().GetArrayBytes(id) == array_bytes); // Make sure pointer is consistent.
       }
       // If we are not already tracking this pointer, but should be, add it.
-      else if (track) id = Tracker().NewArray(ptr, array_size);
+      else if (track) id = Tracker().NewArray(ptr, array_bytes);
     }
 
     // Construct from another Ptr<> object of compatable type.
@@ -343,12 +339,11 @@ namespace emp {
       if (ptr_debug) std::cout << "Ptr::New() : " << ptr << std::endl;
       id = Tracker().New(ptr);                    // And track it!
     }
-    template <typename... T>
     void NewArray(size_t array_size) {
       Tracker().DecID(id);                        // Remove a pointer to any old memory...
       ptr = new TYPE[array_size];                 // Build a new raw pointer to an array.
       if (ptr_debug) std::cout << "Ptr::NewArray() : " << ptr << std::endl;
-      id = Tracker().NewArray(ptr, array_size);   // And track it!
+      id = Tracker().NewArray(ptr, array_size * sizeof(TYPE));   // And track it!
     }
     void Delete() {
       emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
@@ -462,14 +457,16 @@ namespace emp {
     TYPE & operator[](size_t pos) {
       emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
       emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.");
-      emp_assert(Tracker().GetArraySize(id) > pos, "Indexing out of range.", ptr, pos, Tracker().GetArraySize(id));
+      emp_assert(Tracker().GetArrayBytes(id) > (pos*sizeof(TYPE)),
+        "Indexing out of range.", ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr[pos];
     }
     const TYPE & operator[](size_t pos) const {
       emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
       emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.");
-      emp_assert(Tracker().GetArraySize(id) > pos, "Indexing out of range.", ptr, pos, Tracker().GetArraySize(id));
+      emp_assert(Tracker().GetArrayBytes(id) > (pos*sizeof(TYPE)),
+        "Indexing out of range.", ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr[pos];
     }
