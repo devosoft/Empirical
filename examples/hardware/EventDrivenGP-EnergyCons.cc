@@ -28,19 +28,18 @@ using program_t = emp::EventDrivenGP::Program;
 using hardware_t = emp::EventDrivenGP;
 using memory_t = typename emp::EventDrivenGP::memory_t;
 
-constexpr size_t POP_SIZE = 100;
+constexpr size_t POP_SIZE = 300;
 constexpr size_t EVAL_TIME = 400;
 constexpr size_t DIST_SYS_WIDTH = 5;
 constexpr size_t DIST_SYS_HEIGHT = 5;
-constexpr size_t GENERATIONS = 5000;
+constexpr size_t GENERATIONS = 1000;
 constexpr int RAND_SEED = -1;
-constexpr bool PUNISH_POISON = false;
 
-constexpr double RESOURCE_AVAILABILITY = 0.5;
-constexpr size_t RESOURCE_NUM_TIME_CHUNKS = 8;
+constexpr double RESOURCE_AVAILABILITY = 0.3;
+constexpr size_t RESOURCE_NUM_TIME_CHUNKS = 40;
 
-constexpr size_t SLEEP_TIME = 50; // How many CPU cycles should sleep last?
-constexpr size_t INIT_ENERGY = 100;
+constexpr size_t SLEEP_TIME = 10; // How many CPU cycles should sleep last?
+constexpr size_t INIT_ENERGY = 50;
 
 constexpr size_t MAX_FUNC_LENGTH = 20;
 constexpr size_t MAX_FUNC_CNT = 3;
@@ -53,6 +52,7 @@ constexpr size_t TRAIT_ID__SLEEP_CNT = 3;
 constexpr size_t TRAIT_ID__RES_SENSOR = 4;
 constexpr size_t TRAIT_ID__RES_COLLECTED = 5;
 constexpr size_t TRAIT_ID__POIS_COLLECTED = 6;
+constexpr size_t TRAIT_ID__PROCESSED = 7;
 
 
 // Mutation rates
@@ -143,6 +143,7 @@ struct Deme {
       grid[i]->SetTrait(TRAIT_ID__RES_SENSOR, 0);
       grid[i]->SetTrait(TRAIT_ID__RES_COLLECTED, 0);
       grid[i]->SetTrait(TRAIT_ID__POIS_COLLECTED, 0);
+      grid[i]->SetTrait(TRAIT_ID__PROCESSED, 0);
     }
   }
 
@@ -165,6 +166,7 @@ struct Deme {
       grid[i]->SetTrait(TRAIT_ID__RES_SENSOR, 0);
       grid[i]->SetTrait(TRAIT_ID__RES_COLLECTED, 0);
       grid[i]->SetTrait(TRAIT_ID__POIS_COLLECTED, 0);
+      grid[i]->SetTrait(TRAIT_ID__PROCESSED, 0);
     }
   }
 
@@ -258,7 +260,9 @@ struct Deme {
     // For each agent: (Naive scheduler -- just loop through agents in order)
     deme_active = false;
     for (size_t i = 0; i < grid.size(); ++i) {
-      // 1) Enough energy to execute and not asleep?
+      // Make resources available to this agent. (just 1)
+      grid[i]->SetTrait(TRAIT_ID__PROCESSED, 0);
+      // Enough energy to execute and not asleep?
       const double energy = grid[i]->GetTrait(TRAIT_ID__ENERGY);
       const int sleep_cnt = (int)grid[i]->GetTrait(TRAIT_ID__SLEEP_CNT);
       if (energy > 0 && !sleep_cnt) {
@@ -364,10 +368,13 @@ int main() {
 
   event_lib->RegisterDispatchFun("ProcessResource",
     [&cur_time, &env](hardware_t & hw_src, const event_t & event) {
-      if (env.GetEnvState(cur_time))
-        hw_src.SetTrait(TRAIT_ID__RES_COLLECTED, hw_src.GetTrait(TRAIT_ID__RES_COLLECTED)+1.0);
-      else
-        hw_src.SetTrait(TRAIT_ID__POIS_COLLECTED, hw_src.GetTrait(TRAIT_ID__POIS_COLLECTED)+1.0);
+      if (hw_src.GetTrait(TRAIT_ID__PROCESSED) == 0) {
+        hw_src.SetTrait(TRAIT_ID__PROCESSED, 1);
+        if (env.GetEnvState(cur_time))
+          hw_src.SetTrait(TRAIT_ID__RES_COLLECTED, hw_src.GetTrait(TRAIT_ID__RES_COLLECTED)+1.0);
+        else
+          hw_src.SetTrait(TRAIT_ID__POIS_COLLECTED, hw_src.GetTrait(TRAIT_ID__POIS_COLLECTED)+1.0);
+      }
     });
 
   std::cout << "Environment: " << std::endl;
@@ -470,17 +477,28 @@ int main() {
       return (true);
     };
 
-  // Setup fitness function.
-  std::function<double(Agent*)> fit_fun;
-  if (PUNISH_POISON) {
-    fit_fun = [](Agent * agent) {
-      return (double)agent->resources_collected - (double)agent->poison_collected;
-    };
-  } else {
-    fit_fun = [](Agent * agent) {
+  // Setup fitness function(s).
+  std::function<double(Agent*)> fit_fun__just_res =
+    [](Agent * agent) {
       return (double)agent->resources_collected;
     };
-  }
+  std::function<double(Agent*)> fit_fun__res_pois =
+    [](Agent * agent) {
+      return (double)agent->resources_collected - (double)agent->poison_collected;
+    };
+  std::function<double(Agent*)> fit_fun__time_survived =
+   [](Agent * agent) {
+     return (double)agent->time_survived;
+   };
+   std::function<double(Agent*)> fit_fun__res_pois2 =
+    [](Agent * agent) {
+      return (2*(double)agent->resources_collected) - (double)agent->poison_collected;
+    };
+   emp::vector< std::function<double(Agent*)> > fit_set(3);
+   fit_set[0] = fit_fun__just_res;
+   fit_set[1] = fit_fun__res_pois;
+   fit_set[2] = fit_fun__time_survived;
+
 
   world.SetDefaultMutateFun(simple_mut_fun);
 
@@ -499,21 +517,35 @@ int main() {
       world[id].poison_collected = eval_deme.GetDemePoison();
     }
     // Keep the best agent.
-    world.EliteSelect(fit_fun, 1, 1);
+    world.EliteSelect(fit_fun__res_pois, 1, 1);
     // Run a tournament for the rest.
-    world.TournamentSelect(fit_fun, 8, POP_SIZE - 1);
+    world.TournamentSelect(fit_fun__res_pois2, 8, POP_SIZE - 1);
+    //world.LexicaseSelect(fit_set, POP_SIZE - 1);
     // Update the world (generational turnover).
     world.Update();
     // Mutate all but the first agent.
     world.MutatePop(1);
     // First agent is best of last generation, print fitness.
-    std::cout << "  Max score: " << fit_fun(world.popM[0]) << std::endl;
+    // std::cout << "  RP score: " << fit_fun__res_pois(world.popM[0]) << std::endl;
+    std::cout << "  RP2 score: " << fit_fun__res_pois2(world.popM[0]) << std::endl;
+    std::cout << "  R score: " << world[0].resources_collected << std::endl;
+    std::cout << "  P score: " << world[0].poison_collected << std::endl;
+    std::cout << "  T score: " << world[0].time_survived << std::endl;
   }
 
+
   std::cout << std::endl;
-  std::cout << "Best program (score: " << fit_fun(world.popM[0]) << "): " << std::endl;
+  std::cout << "Best program" << std::endl;
+  std::cout << "  RP2 score: " << fit_fun__res_pois2(world.popM[0]) << std::endl;
+  std::cout << "  R score: " << world[0].resources_collected << std::endl;
+  std::cout << "  P score: " << world[0].poison_collected << std::endl;
+  std::cout << "  T score: " << world[0].time_survived << std::endl;
   world[0].program.PrintProgram(); std::cout << std::endl;
   std::cout << "--- Evaluating best program. ---" << std::endl;
+  std::cout << "Environment: " << std::endl;
+  for (size_t i = 0; i < env.res_availability.size(); ++i)
+    std::cout << env.res_availability[i] << " ";
+  std::cout << std::endl;
   eval_deme.LoadAgent(world.popM[0]);
   for (cur_time = 0; cur_time < EVAL_TIME && eval_deme.IsActive(); ++cur_time) {
     eval_deme.SingleAdvance();
