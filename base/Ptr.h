@@ -124,7 +124,7 @@ namespace emp {
 
       std::cout << "EMP_TRACK_MEM: No memory leaks found!\n "
                 << total << " pointers found; "
-                << remain << " still have pointers to them (after deletion.)"
+                << remain << " still exist with a non-null value (but have been properly deleted)"
                 << std::endl;
     }
 
@@ -227,13 +227,12 @@ namespace emp {
 
   template <typename TYPE>
   class Ptr {
-  private:
+  public:
     TYPE * ptr;
     size_t id;
 
     static PtrTracker & Tracker() { return PtrTracker::Get(); }
 
-  public:
     using element_type = TYPE;
 
     // Construct a null Ptr by default.
@@ -385,7 +384,7 @@ namespace emp {
     // Move assignment
     Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
       if (ptr_debug) std::cout << "move assignment" << std::endl;
-      emp_assert(Tracker().IsDeleted(_in.id) == false, "Do not copy deleted pointers.");
+      emp_assert(Tracker().IsDeleted(_in.id) == false, "Do not move deleted pointers.");
       ptr = _in.ptr;
       id = _in.id;
       _in.ptr = nullptr;
@@ -503,21 +502,21 @@ namespace emp {
     int DebugGetCount() const { return Tracker().GetIDCount(id); }
 
     // Prevent use of new and delete on Ptr
-    static void* operator new(std::size_t) noexcept {
-      emp_assert(false, "No Ptr::operator new; use emp::NewPtr for clarity.");
-      return nullptr;
-    }
-    static void* operator new[](std::size_t sz) noexcept {
-      emp_assert(false, "No Ptr::operator new[]; use emp::NewPtrArray for clarity.");
-      return nullptr;
-    }
-
-    static void operator delete(void* ptr, std::size_t sz) {
-      emp_assert(false, "No Ptr::operator delete; use Delete() member function for clarity.");
-    }
-    static void operator delete[](void* ptr, std::size_t sz) {
-      emp_assert(false, "No Ptr::operator new[]; use DeleteArray() member function for clarity.");
-    }
+    // static void* operator new(std::size_t) noexcept {
+    //   emp_assert(false, "No Ptr::operator new; use emp::NewPtr for clarity.");
+    //   return nullptr;
+    // }
+    // static void* operator new[](std::size_t sz) noexcept {
+    //   emp_assert(false, "No Ptr::operator new[]; use emp::NewPtrArray for clarity.");
+    //   return nullptr;
+    // }
+    //
+    // static void operator delete(void* ptr, std::size_t sz) {
+    //   emp_assert(false, "No Ptr::operator delete; use Delete() member function for clarity.");
+    // }
+    // static void operator delete[](void* ptr, std::size_t sz) {
+    //   emp_assert(false, "No Ptr::operator delete[]; use DeleteArray() member function for clarity.");
+    // }
 
   };
 
