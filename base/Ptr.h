@@ -455,6 +455,22 @@ namespace emp {
       return ptr;
     }
 
+    // Indexing into array
+    TYPE & operator[](size_t pos) {
+      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+      emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.");
+      emp_assert(Tracker().GetArraySize(id) > pos, "Indexing out of range.", ptr, Tracker().GetArraySize(id));
+      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
+      return ptr[pos];
+    }
+    const TYPE & operator[](size_t pos) const {
+      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+      emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.");
+      emp_assert(Tracker().GetArraySize(id) > pos, "Indexing out of range.", ptr, Tracker().GetArraySize(id));
+      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
+      return ptr[pos];
+    }
+
     // Auto-case to raw pointer type.
     operator TYPE *() {
       // Make sure a pointer is active before we convert it.
@@ -559,6 +575,10 @@ namespace emp {
     // Follow a pointer.
     TYPE * operator->() { return ptr; }
     const TYPE * const operator->() const { return ptr; }
+
+    // Indexing into array
+    TYPE & operator[](size_t pos) { return ptr[pos]; }
+    const TYPE & operator[](size_t pos) const { return ptr[pos]; }
 
     // Auto-case to raw pointer type.
     operator TYPE *() { return ptr; }
