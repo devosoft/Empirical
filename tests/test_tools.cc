@@ -1172,7 +1172,7 @@ TEST_CASE("Test Ptr", "[tools]")
 
   // Test pointer constructor
   int * temp_int = new int;
-  emp::Ptr<int> ptr2(temp_int);
+  emp::Ptr<int> ptr2(temp_int, true);
   *ptr2 = 10;
   REQUIRE(*ptr2 == 10);
   ptr2.Delete();
@@ -1210,6 +1210,7 @@ TEST_CASE("Test Ptr", "[tools]")
   REQUIRE(ptr_set[1]->DebugGetCount() == 2);
 
   ptr_set[3]->Delete();
+  ptr_set[1]->Delete();
 
   // std::cout << ptr_set[0]->DebugGetCount() << std::endl;
 
