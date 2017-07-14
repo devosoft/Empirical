@@ -34,7 +34,7 @@ namespace {
 namespace emp {
 
   namespace {
-    bool ptr_debug = false;
+    static bool ptr_debug = false;
   }
   void SetPtrDebug(bool _d = true) { ptr_debug = _d; }
   bool GetPtrDebug() { return ptr_debug; }
@@ -45,15 +45,17 @@ namespace emp {
   private:
     const void * ptr;   // Which pointer are we keeping data on?
     int count;          // How many of this pointer do we have?
-    PtrStatus active;   // Has this pointer been deleted? (i.e., we should no longer access it!)
+    PtrStatus status;   // Has this pointer been deleted? (i.e., we should no longer access it!)
+    size_t array_size;  // How big is the array pointed to?
 
   public:
-    PtrInfo(const void * _ptr) : ptr(_ptr), count(1), active(PtrStatus::ACTIVE) {
+    PtrInfo(const void * _ptr) : ptr(_ptr), count(1), status(PtrStatus::ACTIVE), array_size(0) {
       if (ptr_debug) std::cout << "Created info for pointer: " << ptr << std::endl;
     }
-    PtrInfo(const void * _ptr, size_t array_size)
-      : ptr(_ptr), count(1), active(PtrStatus::ARRAY)
+    PtrInfo(const void * _ptr, size_t _array_size)
+      : ptr(_ptr), count(1), status(PtrStatus::ARRAY), array_size(_array_size)
     {
+      emp_assert(_array_size >= 1);
       if (ptr_debug) {
         std::cout << "Created info for array pointer (size=" << array_size << "): "
                   << ptr << std::endl;
@@ -70,24 +72,26 @@ namespace emp {
 
     const void * GetPtr() const { return ptr; }
     int GetCount() const { return count; }
-    bool IsActive() const { return (bool) active; }
+    size_t GetArraySize() const { return array_size; }
+    bool IsActive() const { return (bool) status; }
+    bool IsArray()  const { return status == PtrStatus::ARRAY; }
 
     void Inc() {
       if (ptr_debug) std::cout << "Inc info for pointer " << ptr << std::endl;
-      emp_assert(active != PtrStatus::DELETED, "Incrementing deleted pointer!"); count++;
+      emp_assert(status != PtrStatus::DELETED, "Incrementing deleted pointer!"); count++;
     }
     void Dec() {
       if (ptr_debug) std::cout << "Dec info for pointer " << ptr << std::endl;
 
       // Make sure that we have more than one copy, -or- we've already deleted this pointer
-      emp_assert(count > 1 || active == PtrStatus::DELETED, "Removing last reference to owned Ptr!");
+      emp_assert(count > 1 || status == PtrStatus::DELETED, "Removing last reference to owned Ptr!");
       count--;
     }
 
     void MarkDeleted() {
       if (ptr_debug) std::cout << "Marked deleted for pointer " << ptr << std::endl;
-      emp_assert(active != PtrStatus::DELETED, "Deleting same emp::Ptr a second time!");
-      active = PtrStatus::DELETED;
+      emp_assert(status != PtrStatus::DELETED, "Deleting same emp::Ptr a second time!");
+      status = PtrStatus::DELETED;
     }
 
   };
@@ -137,6 +141,7 @@ namespace emp {
 
     size_t GetCurID(const void * ptr) { emp_assert(HasPtr(ptr)); return ptr_id[ptr]; }
     size_t GetNumIDs() const { return id_info.size(); }
+    size_t GetArraySize(size_t id) const { return id_info[id].GetArraySize(); }
 
     bool IsDeleted(size_t id) const {
       if (id == (size_t) -1) return false;   // Not tracked!
@@ -150,6 +155,11 @@ namespace emp {
       return GetInfo(ptr).IsActive();
     }
 
+    bool IsArrayID(size_t id) {
+      if (ptr_debug) std::cout << "IsArrayID: " << id << std::endl;
+      return id_info[id].IsArray();
+    }
+
     int GetIDCount(size_t id) const {
       if (ptr_debug) std::cout << "Count:  " << id << std::endl;
       return id_info[id].GetCount();
@@ -157,12 +167,25 @@ namespace emp {
 
     // This pointer was just created as a Ptr!
     size_t New(const void * ptr) {
-      if (ptr == nullptr) return (size_t) -1;
+      emp_assert(ptr);     // Cannot track a null pointer.
       size_t id = id_info.size();
       if (ptr_debug) std::cout << "New:    " << id << " (" << ptr << ")" << std::endl;
       // Make sure pointer is not already stored -OR- hase been deleted (since re-use is possible).
       emp_assert(!HasPtr(ptr) || IsDeleted(GetCurID(ptr)));
       id_info.emplace_back(ptr);
+      ptr_id[ptr] = id;
+      return id;
+    }
+
+    // This pointer was just created as a Ptr ARRAY!
+    size_t NewArray(const void * ptr, size_t array_size) {
+      emp_assert(ptr);     // Cannot track a null pointer.
+      // Make sure pointer is not already stored -OR- has been deleted (since re-use is possible).
+      emp_assert(!HasPtr(ptr) || IsDeleted(GetCurID(ptr)));
+
+      size_t id = id_info.size();
+      if (ptr_debug) std::cout << "New Array:    " << id << " (" << ptr << ")" << std::endl;
+      id_info.emplace_back(ptr, array_size);
       ptr_id[ptr] = id;
       return id;
     }
@@ -248,6 +271,25 @@ namespace emp {
       else if (track) id = Tracker().New(ptr);
     }
 
+    // Construct from a raw pointer of campatable ARRAY type.
+    template <typename T2>
+    Ptr(T2 * _ptr, size_t array_size, bool track) : ptr(_ptr), id((size_t) -1)
+    {
+      if (ptr_debug) std::cout << "raw ARRAY construct: " << ptr
+                               << ". size=" << array_size
+                               << "; track=" << track << std::endl;
+      emp_assert( (PtrIsConvertable<T2, TYPE>(_ptr)) );
+
+      // If this pointer is already active, link to it.
+      if (Tracker().IsActive(ptr)) {
+        id = Tracker().GetCurID(ptr);
+        Tracker().IncID(id);
+        emp_assert(Tracker().GetArraySize(id) == array_size); // Make sure pointer is consistent.
+      }
+      // If we are not already tracking this pointer, but should be, add it.
+      else if (track) id = Tracker().NewArray(ptr, array_size);
+    }
+
     // Construct from another Ptr<> object of compatable type.
     template <typename T2>
     Ptr(Ptr<T2> _in) : ptr(_in.Raw()), id(_in.GetID()) {
@@ -263,7 +305,7 @@ namespace emp {
 
     // Destructor.
     ~Ptr() {
-      if (ptr_debug) std::cout << "descructing " << id << " (" << ptr << ")" << std::endl;
+      if (ptr_debug) std::cout << "destructing " << id << " (" << ptr << ")" << std::endl;
       Tracker().DecID(id);
     }
 
@@ -298,12 +340,28 @@ namespace emp {
       if (ptr_debug) std::cout << "Ptr::New() : " << ptr << std::endl;
       id = Tracker().New(ptr);                    // And track it!
     }
+    template <typename... T>
+    void NewArray(size_t array_size) {
+      Tracker().DecID(id);                        // Remove a pointer to any old memory...
+      ptr = new TYPE[array_size];                 // Build a new raw pointer to an array.
+      if (ptr_debug) std::cout << "Ptr::NewArray() : " << ptr << std::endl;
+      id = Tracker().New(ptr, array_size);        // And track it!
+    }
     void Delete() {
       emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
       emp_assert(ptr, "Deleting null Ptr.");
+      emp_assert(Tracker().IsArrayID(id) == false, "Trying to delete array pointer as non-array.");
       Tracker().MarkDeleted(id);
       if (ptr_debug) std::cout << "Ptr::Delete() : " << ptr << std::endl;
       delete ptr;
+    }
+    void DeleteArray() {
+      emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
+      emp_assert(ptr, "Deleting null Ptr.");
+      emp_assert(Tracker().IsArrayID(id), "Trying to delete non-array pointer as array.");
+      Tracker().MarkDeleted(id);
+      if (ptr_debug) std::cout << "Ptr::DeleteArray() : " << ptr << std::endl;
+      delete [] ptr;
     }
 
     size_t Hash() const {
@@ -475,7 +533,9 @@ namespace emp {
 
     template <typename... T>
     void New(T &&... args) { ptr = new TYPE(std::forward<T>(args)...); }  // New raw pointer.
+    void NewArray(size_t array_size) { ptr = new TYPE[array_size]; }
     void Delete() { delete ptr; }
+    void DeleteArray() { delete [] ptr; }
 
     size_t Hash() const {
       static constexpr size_t shift = Log2(1 + sizeof(TYPE));  // Chop off useless bits...
