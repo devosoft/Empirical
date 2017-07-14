@@ -17,6 +17,9 @@
 //    Or just assume that arrays will be handled with emp::array?
 //  * Should we track information about vector and array object to make sure we don't point
 //    directly into them? (A resize() could make those pointers invalid!)
+//  * When a pointer is cast, the size of the pointed-to object might change.  As such, if it is
+//    a pointer to an array we need to adjust the maximum allowed index to identify when it is out
+//    of bounds.  One way of doing this is to track bytes, not array size.
 
 #ifndef EMP_PTR_H
 #define EMP_PTR_H
@@ -318,15 +321,15 @@ namespace emp {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to raw.");
       return ptr;
     }
-    template <typename T2> T2 * Cast() {
+    template <typename T2> Ptr<T2> Cast() {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.");
       return (T2*) ptr;
     }
-    template <typename T2> const T2 * const Cast() const {
+    template <typename T2> const Ptr<T2> const Cast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.");
       return (T2*) ptr;
     }
-    template <typename T2> T2 * DynamicCast() {
+    template <typename T2> Ptr<T2> DynamicCast() {
       emp_assert(dynamic_cast<T2*>(ptr) != nullptr);
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.");
       return (T2*) ptr;
@@ -459,14 +462,14 @@ namespace emp {
     TYPE & operator[](size_t pos) {
       emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
       emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.");
-      emp_assert(Tracker().GetArraySize(id) > pos, "Indexing out of range.", ptr, Tracker().GetArraySize(id));
+      emp_assert(Tracker().GetArraySize(id) > pos, "Indexing out of range.", ptr, pos, Tracker().GetArraySize(id));
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr[pos];
     }
     const TYPE & operator[](size_t pos) const {
       emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
       emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.");
-      emp_assert(Tracker().GetArraySize(id) > pos, "Indexing out of range.", ptr, Tracker().GetArraySize(id));
+      emp_assert(Tracker().GetArraySize(id) > pos, "Indexing out of range.", ptr, pos, Tracker().GetArraySize(id));
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr[pos];
     }
@@ -544,9 +547,9 @@ namespace emp {
     bool IsNull() const { return ptr == nullptr; }
     TYPE * Raw() { return ptr; }
     const TYPE * const Raw() const { return ptr; }
-    template <typename T2> T2 * Cast() { return (T2*) ptr; }
-    template <typename T2> const T2 * const Cast() const { return (T2*) ptr; }
-    template <typename T2> T2 * DynamicCast() { return dynamic_cast<T2*>(ptr); }
+    template <typename T2> Ptr<T2> Cast() { return (T2*) ptr; }
+    template <typename T2> const Ptr<T2> const Cast() const { return (T2*) ptr; }
+    template <typename T2> Ptr<T2> DynamicCast() { return dynamic_cast<T2*>(ptr); }
 
     template <typename... T>
     void New(T &&... args) { ptr = new TYPE(std::forward<T>(args)...); }  // New raw pointer.
