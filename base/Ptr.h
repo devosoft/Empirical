@@ -345,7 +345,7 @@ namespace emp {
       Tracker().DecID(id);                        // Remove a pointer to any old memory...
       ptr = new TYPE[array_size];                 // Build a new raw pointer to an array.
       if (ptr_debug) std::cout << "Ptr::NewArray() : " << ptr << std::endl;
-      id = Tracker().New(ptr, array_size);        // And track it!
+      id = Tracker().NewArray(ptr, array_size);   // And track it!
     }
     void Delete() {
       emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
@@ -520,6 +520,7 @@ namespace emp {
     Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) {}                          // Copy constructor
     Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr) {}                               // Move constructor
     template <typename T2> Ptr(T2 * in_ptr, bool=false) : ptr(in_ptr) {}  // Construct from raw ptr
+    template <typename T2> Ptr(T2 * _ptr, size_t, bool) : ptr(_ptr) {}    // Construct from array
     template <typename T2> Ptr(Ptr<T2> _in) : ptr(_in.Raw()) {}           // From compatible Ptr
     Ptr(std::nullptr_t) : Ptr() {}                                        // From nullptr
     ~Ptr() { ; }                                                          // Destructor
@@ -608,6 +609,9 @@ namespace emp {
 
   template <typename T, typename... ARGS> Ptr<T> NewPtr(ARGS &&... args) {
     return Ptr<T>(new T(std::forward<ARGS>(args)...), true);
+  }
+  template <typename T, typename... ARGS> Ptr<T> NewArrayPtr(size_t array_size) {
+    return Ptr<T>(new T[array_size], array_size, true);
   }
 }
 
