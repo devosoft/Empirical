@@ -325,7 +325,7 @@ namespace emp {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.");
       return (T2*) ptr;
     }
-    template <typename T2> const Ptr<T2> const Cast() const {
+    template <typename T2> const Ptr<const T2> Cast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.");
       return (T2*) ptr;
     }
@@ -548,7 +548,7 @@ namespace emp {
     TYPE * Raw() { return ptr; }
     const TYPE * const Raw() const { return ptr; }
     template <typename T2> Ptr<T2> Cast() { return (T2*) ptr; }
-    template <typename T2> const Ptr<T2> const Cast() const { return (T2*) ptr; }
+    template <typename T2> const Ptr<const T2> Cast() const { return (T2*) ptr; }
     template <typename T2> Ptr<T2> DynamicCast() { return dynamic_cast<T2*>(ptr); }
 
     template <typename... T>
