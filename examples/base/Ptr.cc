@@ -51,5 +51,19 @@ int main()
   emp::Ptr<TestBase> ptr_base = new TestDerived(5);
   emp::Ptr<TestDerived> ptr_derived(ptr_base.Cast<TestDerived>());
 
+
+
+  // Examples with arrays!
+  int_ptr.NewArray(20);                    // Reuse int_ptr, this time as an array.
+  for (size_t i = 0; i < 20; i++) {
+    int_ptr[i] = i+100;
+  }
+  std::cout << "Array contents:";
+  for (size_t i = 0; i < 20; i++) {
+    std::cout << " " << int_ptr[i];
+  }
+  std::cout << std::endl;
+  int_ptr.DeleteArray();
+
   std::cout << "End of main()." << std::endl;
 }
