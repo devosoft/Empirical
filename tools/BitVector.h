@@ -88,7 +88,7 @@ namespace emp {
       // Loop through each field, from L to R, and update it.
       if (field_shift) {
         for (size_t i = NUM_FIELDS; i > field_shift; --i) {
-          bit_set[i] = bit_set[i - field_shift - 1];
+          bit_set[i-1] = bit_set[i - field_shift - 1];
         }
         for (size_t i = field_shift; i > 0; --i) bit_set[i-1] = 0;
       }
