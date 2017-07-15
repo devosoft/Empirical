@@ -70,7 +70,7 @@ int main()
   for (size_t i = 0; i < 26; i++) {
     ptr_v[i] = emp::NewPtr<char>((char)('A' + (char) i));
   }
-  ptr_v.resize(27);
+  ptr_v.resize(100);
   for (size_t i = 0; i < 26; i++) {
     ptr_v[i].Delete();
   }

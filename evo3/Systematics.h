@@ -29,7 +29,6 @@
 #include <unordered_set>
 
 #include "../base/Ptr.h"
-#include "../base/vector.h"
 #include "../tools/set_utils.h"
 
 namespace emp {
@@ -171,7 +170,8 @@ namespace emp {
 
     /// Add information about a new organism; return a pointer for the associated taxon.
     Ptr<taxon_t> AddOrg(const ORG_INFO & info, Ptr<taxon_t> parent=nullptr) {
-      if (parent && parent->GetInfo() == info) {   // Adding another org of this taxon.
+      // If this organism's info is the same as it's parent's info, add org to parent!
+      if (parent && parent->GetInfo() == info) {
         if (verbose) {
           std::cout << "AddOrg to existing taxon " << parent->GetID()
                     << "; now has " << (parent->GetNumOrgs()+1) << " orgs.\n";
@@ -180,6 +180,7 @@ namespace emp {
         parent->AddOrg();
         return parent;
       }
+
       // Otherwise, this is a new taxon!  If archiving, track the parent.
       Ptr<taxon_t> cur_taxon = NewPtr<taxon_t>(++next_id, info, parent);
 
