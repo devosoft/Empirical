@@ -68,7 +68,7 @@ namespace emp {
 
     void PullData_impl() { ; }
   public:
-    DataNodeModule() : val_count(0) { ; }
+    DataNodeModule() : val_count(0), in_vals() { ; }
 
     using value_t = VAL_TYPE;
 
@@ -109,7 +109,7 @@ namespace emp {
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
     using base_t = DataNodeModule<VAL_TYPE>;
   public:
-    DataNodeModule() { ; }
+    DataNodeModule() : cur_val() { ; }
 
     const VAL_TYPE & GetCurrent() const { return cur_val; }
 
@@ -132,7 +132,7 @@ namespace emp {
 
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
   public:
-    DataNodeModule() { ; }
+    DataNodeModule() : name(), desc(), keyword() { ; }
 
     const std::string & GetName() const { return name; }
     const std::string & GetDescription() const { return desc; }
@@ -165,7 +165,7 @@ namespace emp {
 
     using base_t::val_count;
   public:
-    DataNodeModule() { ; }
+    DataNodeModule() : val_set() { ; }
 
     const emp::vector<VAL_TYPE> & GetData() const { return val_set; }
 
@@ -243,9 +243,9 @@ namespace emp {
     double GetMax() const { return max; }
 
     void AddDatum(const VAL_TYPE & val) {
-      total += val;
-      if (!val_count || val < min) min = val;
-      if (!val_count || val > max) max = val;
+      total += (double) val;
+      if (!val_count || min > (double) val) min = (double) val;
+      if (!val_count || max < (double) val) max = (double) val;
       parent_t::AddDatum(val);
     }
 
@@ -336,6 +336,8 @@ namespace emp {
     }
 
   public:
+    DataNodeModule() : pull_funs(), pull_set_funs() { ; }
+
     void AddPull(const std::function<VAL_TYPE()> & fun) { pull_funs.Add(fun); }
     void AddPullSet(const std::function<emp::vector<VAL_TYPE>()> & fun) { pull_set_funs.Add(fun); }
 
