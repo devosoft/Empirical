@@ -25,7 +25,7 @@ namespace emp {
     mutable emp::vector<RETURN_T> return_vals;
 
   public:
-    FunctionSet() { ; }
+    FunctionSet() : return_vals() { ; }
     ~FunctionSet() { ; }
 
     using base_t = emp::vector<std::function<RETURN_T(ARGS...)>>;
