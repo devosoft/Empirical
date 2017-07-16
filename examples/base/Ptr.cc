@@ -56,7 +56,7 @@ int main()
   // Examples with arrays!
   int_ptr.NewArray(20);                    // Reuse int_ptr, this time as an array.
   for (size_t i = 0; i < 20; i++) {
-    int_ptr[i] = i+100;
+    int_ptr[i] = (int) (i+100);
   }
   std::cout << "Array contents:";
   for (size_t i = 0; i < 20; i++) {
