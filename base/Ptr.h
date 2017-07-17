@@ -229,6 +229,8 @@ namespace emp {
       size_t current;
       size_t total;
       PtrDebug() : current(0), total(0) { ; }
+      void AddPtr() { current++; total++; }
+      void RemovePtr() { current--; }
     };
   }
 
@@ -273,7 +275,10 @@ namespace emp {
         Tracker().IncID(id);
       }
       // If we are not already tracking this pointer, but should be, add it.
-      else if (track) id = Tracker().New(ptr);
+      else if (track) {
+        id = Tracker().New(ptr);
+        DebugInfo().AddPtr();
+      }
     }
 
     // Construct from a raw pointer of campatable ARRAY type.
@@ -293,7 +298,10 @@ namespace emp {
         emp_assert(Tracker().GetArrayBytes(id) == array_bytes); // Make sure pointer is consistent.
       }
       // If we are not already tracking this pointer, but should be, add it.
-      else if (track) id = Tracker().NewArray(ptr, array_bytes);
+      else if (track) {
+        id = Tracker().NewArray(ptr, array_bytes);
+        DebugInfo().AddPtr();
+      }
     }
 
     // Construct from another Ptr<> object of compatable type.
@@ -345,18 +353,21 @@ namespace emp {
       ptr = new TYPE(std::forward<T>(args)...);   // Build a new raw pointer.
       if (ptr_debug) std::cout << "Ptr::New() : " << ptr << std::endl;
       id = Tracker().New(ptr);                    // And track it!
+      DebugInfo().AddPtr();
     }
     void NewArray(size_t array_size) {
       Tracker().DecID(id);                        // Remove a pointer to any old memory...
       ptr = new TYPE[array_size];                 // Build a new raw pointer to an array.
       if (ptr_debug) std::cout << "Ptr::NewArray() : " << ptr << std::endl;
       id = Tracker().NewArray(ptr, array_size * sizeof(TYPE));   // And track it!
+      DebugInfo().AddPtr();
     }
     void Delete() {
       emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
       emp_assert(ptr, "Deleting null Ptr.");
       emp_assert(Tracker().IsArrayID(id) == false, "Trying to delete array pointer as non-array.");
       Tracker().MarkDeleted(id);
+      DebugInfo().RemovePtr();
       if (ptr_debug) std::cout << "Ptr::Delete() : " << ptr << std::endl;
       delete ptr;
     }
@@ -365,6 +376,7 @@ namespace emp {
       emp_assert(ptr, "Deleting null Ptr.");
       emp_assert(Tracker().IsArrayID(id), "Trying to delete non-array pointer as array.");
       Tracker().MarkDeleted(id);
+      DebugInfo().RemovePtr();
       if (ptr_debug) std::cout << "Ptr::DeleteArray() : " << ptr << std::endl;
       delete [] ptr;
     }
