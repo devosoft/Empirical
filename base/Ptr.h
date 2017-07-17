@@ -223,6 +223,13 @@ namespace emp {
     template <typename FROM, typename TO>
     bool PtrIsConvertable(FROM * ptr) { return true; }
     // emp_assert( (std::is_same<TYPE,T2>() || dynamic_cast<TYPE*>(in_ptr)) );
+
+    // Debug information provided for each pointer type.
+    struct PtrDebug {
+      size_t current;
+      size_t total;
+      PtrDebug() : current(0), total(0) { ; }
+    };
   }
 
   template <typename TYPE>
@@ -231,7 +238,8 @@ namespace emp {
     TYPE * ptr;
     size_t id;
 
-    static PtrTracker & Tracker() { return PtrTracker::Get(); }
+    static PtrDebug & DebugInfo() { static PtrDebug info; return info; } // Debug info for each type
+    static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
 
     using element_type = TYPE;
 
