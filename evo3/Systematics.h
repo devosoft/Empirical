@@ -87,7 +87,7 @@ namespace emp {
     using taxon_t = Taxon<ORG_INFO>;
     using hash_t = typename Ptr<taxon_t>::hash_t;
 
-    static constexpr bool verbose = true;
+    static constexpr bool verbose = false;
 
     bool store_active;     //< Store all of the currently active taxa?
     bool store_ancestors;  //< Store all of the direct ancestors from living taxa?
