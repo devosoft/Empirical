@@ -142,20 +142,162 @@ int main()
       return s;
   };
 
-  // // Capturing
-  // std::function<std::set<int>(emp::array<int, 14>)> f2 =
-  //     [](emp::array<int,14> test_case){
-  //     std::set<int> s = std::set<int>();
-  //     for (int i = 0; i < 6; i++) {
-  //         if (test_case[i] == 0 && test_case[i+7] != 0) {
-  //
-  //             s.insert(i);
-  //         }
-  //     }
-  //     return s;
-  // };
+  // Extra move from pit 0
+  std::function<std::set<int>(emp::array<int, 14>)> f2 =
+      [](emp::array<int,14> test_case){
+      std::set<int> s = std::set<int>();
+      if (test_case[0] == 6) {
+          s.insert(0);
+      }
+      return s;
+  };
+
+  // Extra move from pit 1
+  std::function<std::set<int>(emp::array<int, 14>)> f3 =
+      [](emp::array<int,14> test_case){
+      std::set<int> s = std::set<int>();
+      if (test_case[1] == 5) {
+          s.insert(1);
+      }
+      return s;
+  };
+
+  // Extra move from pit 2
+  std::function<std::set<int>(emp::array<int, 14>)> f4 =
+      [](emp::array<int,14> test_case){
+      std::set<int> s = std::set<int>();
+      if (test_case[2] == 4) {
+          s.insert(2);
+      }
+      return s;
+  };
+
+  // Extra move from pit 3
+  std::function<std::set<int>(emp::array<int, 14>)> f5 =
+      [](emp::array<int,14> test_case){
+      std::set<int> s = std::set<int>();
+      if (test_case[3] == 3) {
+          s.insert(3);
+      }
+      return s;
+  };
+
+  // Extra move from pit 4
+  std::function<std::set<int>(emp::array<int, 14>)> f6 =
+      [](emp::array<int,14> test_case){
+      std::set<int> s = std::set<int>();
+      if (test_case[4] == 2) {
+          s.insert(4);
+      }
+      return s;
+  };
+
+  // Extra move from pit 5
+  std::function<std::set<int>(emp::array<int, 14>)> f7 =
+      [](emp::array<int,14> test_case){
+      std::set<int> s = std::set<int>();
+      if (test_case[5] == 1) {
+          s.insert(5);
+      }
+      return s;
+  };
+
+
+  // Capturing
+  std::function<std::set<int>(emp::array<int, 14>)> f8 =
+      [](emp::array<int,14> test_case){
+      std::set<int> s = std::set<int>();
+      for (int i = 0; i < 6; i++) {
+          if (test_case[i] == 0 && test_case[i+7] != 0) {
+              for (int j = 0; j < i; j++) {
+                  if (i-j == test_case[j]) {
+                      s.insert(j);
+                  }
+              }
+          }
+      }
+      return s;
+  };
+
+  // Capturing pit 1
+  std::function<std::set<int>(emp::array<int, 14>)> f9 =
+      [](emp::array<int,14> test_case){
+      std::set<int> s = std::set<int>();
+      if (test_case[1] != 0 && test_case[8] == 0 && test_case[0] == 1) {
+          s.insert(0);
+      }
+      return s;
+  };
+
+  // Capturing pit 2
+  std::function<std::set<int>(emp::array<int, 14>)> f10 =
+      [](emp::array<int,14> test_case){
+      std::set<int> s = std::set<int>();
+      if (test_case[2] != 0 && test_case[9] == 0) {
+          for (int j = 0; j < 2; j++) {
+              if (2-j == test_case[j]) {
+                  s.insert(j);
+              }
+          }
+      }
+      return s;
+  };
+
+  // Capturing pit 3
+  std::function<std::set<int>(emp::array<int, 14>)> f11 =
+      [](emp::array<int,14> test_case){
+      std::set<int> s = std::set<int>();
+      if (test_case[3] != 0 && test_case[10] == 0) {
+          for (int j = 0; j < 3; j++) {
+              if (3-j == test_case[j]) {
+                  s.insert(j);
+              }
+          }
+      }
+      return s;
+  };
+
+  // Capturing pit 4
+  std::function<std::set<int>(emp::array<int, 14>)> f12 =
+      [](emp::array<int,14> test_case){
+      std::set<int> s = std::set<int>();
+      if (test_case[4] != 0 && test_case[11] == 0) {
+          for (int j = 0; j < 4; j++) {
+              if (4-j == test_case[j]) {
+                  s.insert(j);
+              }
+          }
+      }
+      return s;
+  };
+
+  // Capturing pit 5
+  std::function<std::set<int>(emp::array<int, 14>)> f13 =
+      [](emp::array<int,14> test_case){
+      std::set<int> s = std::set<int>();
+      if (test_case[5] != 0 && test_case[12] == 0) {
+          for (int j = 0; j < 5; j++) {
+              if (5-j == test_case[j]) {
+                  s.insert(j);
+              }
+          }
+      }
+      return s;
+  };
 
   t.AddGroup(f1);
+  t.AddGroup(f2);
+  t.AddGroup(f3);
+  t.AddGroup(f4);
+  t.AddGroup(f5);
+  t.AddGroup(f6);
+  t.AddGroup(f7);
+  t.AddGroup(f8);
+  t.AddGroup(f9);
+  t.AddGroup(f10);
+  t.AddGroup(f11);
+  t.AddGroup(f12);
+  t.AddGroup(f13);
 
   // Setup the mutation function.
   world.SetDefaultMutateFun( [](emp::AvidaGP* org, emp::Random& random) {
@@ -242,7 +384,7 @@ int main()
     // Run a tournament for each spot.
     // world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE-1);
     // world.LexicaseSelect(fit_set, POP_SIZE-1);
-    world.EcoSelectGradation(fit_fun, fit_set, 500, TOURNY_SIZE, POP_SIZE-1);
+    world.EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
     world.Update();
     std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
 
