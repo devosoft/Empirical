@@ -181,7 +181,7 @@ namespace emp {
 
     // --- MANAGE ATTRIBUTES ---
     bool HasAttribute(const std::string & name) const { return Has(attributes, name); }
-    const std::string & GetAttribute(const std::string) const {
+    std::string GetAttribute(const std::string) const {
       emp_assert( Has(attributes, name) );
       return Find(attributes, name, "UNKNOWN");
     }
