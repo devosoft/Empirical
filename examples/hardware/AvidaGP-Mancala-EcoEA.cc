@@ -175,16 +175,21 @@ int main()
       return EvalGame(*org, rand_org, cur_player);
     };
 
+  emp::vector<size_t> choices;
+  emp::vector<int> best_possible;
+
+  for (int i = 0; i < t.GetNFuncs(); i++) {
+      best_possible.push_back(i);
+  }
+
   emp::vector< std::function<double(emp::AvidaGP*)> > fit_set(t.GetNFuncs());
   for (size_t fun_id = 0; fun_id < t.GetNFuncs(); fun_id++) {
     // Setup the fitness function.
-    fit_set[fun_id] = [fun_id](emp::AvidaGP * org) {
-      return org->GetTrait(fun_id);
+    fit_set[fun_id] = [fun_id, &best_possible](emp::AvidaGP * org) {
+      return org->GetTrait(fun_id)/best_possible[fun_id];
     };
   }
 
-
-  emp::vector<size_t> choices;
 
   std::function<void(emp::AvidaGP*)> calc_resources = [&choices, &t](emp::AvidaGP * org){
       emp::Mancala game(0);
@@ -225,6 +230,8 @@ int main()
   // Do the run...
   for (size_t ud = 0; ud < UPDATES; ud++) {
     choices = t.GetValidSubset();
+    best_possible = t.GetBestPossible(choices);
+
     for (auto org : world) {
         calc_resources(org);
     }
@@ -235,7 +242,7 @@ int main()
     // Run a tournament for each spot.
     // world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE-1);
     // world.LexicaseSelect(fit_set, POP_SIZE-1);
-    world.EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
+    world.EcoSelectGradation(fit_fun, fit_set, 500, TOURNY_SIZE, POP_SIZE-1);
     world.Update();
     std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
 

@@ -643,6 +643,7 @@ namespace evo {
         ordering[org_id] = org_id;
         for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
           double cur_fit = popM.CalcFitness(org_id, extra_funs[ex_id]);
+        //   std::cout << cur_fit << " ";
           extra_fitnesses[ex_id][org_id] = emp::Pow(cur_fit, 2.0);
         }
       }
@@ -654,7 +655,7 @@ namespace evo {
                 });
           for (size_t org_id : ordering) {
               double bonus = .05 * extra_fitnesses[ex_id][org_id] * resource_left[ex_id];
-              extra_fitnesses[ex_id][org_id] = bonus;
+              extra_fitnesses[ex_id][org_id] = emp::Pow(2.0, bonus);
               resource_left[ex_id] -= bonus;
               base_fitness[org_id] += bonus;
           }
@@ -662,6 +663,7 @@ namespace evo {
       }
 
     //   for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
+      //
     //     std::cout << "Bonus " << ex_id << " = " << extra_fitnesses[ex_id]
     //               << std::endl;
     //   }
