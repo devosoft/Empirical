@@ -5,6 +5,8 @@
 //
 //  This file is an example for using the re-vamped World template.
 
+#define EMP_TRACK_MEM
+
 #include <iostream>
 
 #include "../../evo3/World.h"
@@ -21,12 +23,44 @@ int main() {
   for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
   std::cout << std::endl;
 
-  // world.EliteSelect(10, 10);
-  //
-  // std::cout << "\nElite Select(10,10)\n" << std::endl;
-  // for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
-  // std::cout << std::endl;
-  //
+  std::cout << "Num Ptr<int> = " << emp::Ptr<int>::DebugInfo().current
+            << "  (total = " << emp::Ptr<int>::DebugInfo().total << ")"
+            << std::endl;
+  std::cout << "Num Ptr<emp::Taxon<int>> = " << emp::Ptr<emp::Taxon<int>>::DebugInfo().current
+            << "  (total = " << emp::Ptr<emp::Taxon<int>>::DebugInfo().total << ")"
+            << std::endl;
+
+  for (size_t UD = 0; UD < 2; UD++) {
+
+    std::cout << "UD = " << UD << std::endl;
+
+    world.EliteSelect(50, 4);
+
+    std::cout << "Post EliteSelect(50,4)" << std::endl;
+    for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
+    std::cout << std::endl;
+
+    std::cout << "Num Ptr<int> = " << emp::Ptr<int>::DebugInfo().current
+              << "  (total = " << emp::Ptr<int>::DebugInfo().total << ")"
+              << std::endl;
+    std::cout << "Num Ptr<emp::Taxon<int>> = " << emp::Ptr<emp::Taxon<int>>::DebugInfo().current
+              << "  (total = " << emp::Ptr<emp::Taxon<int>>::DebugInfo().total << ")"
+              << std::endl;
+
+    world.Update();
+
+    std::cout << "Post Update()" << std::endl;
+    for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
+    std::cout << std::endl;
+
+    std::cout << "Num Ptr<int> = " << emp::Ptr<int>::DebugInfo().current
+              << "  (total = " << emp::Ptr<int>::DebugInfo().total << ")"
+              << std::endl;
+    std::cout << "Num Ptr<emp::Taxon<int>> = " << emp::Ptr<emp::Taxon<int>>::DebugInfo().current
+              << "  (total = " << emp::Ptr<emp::Taxon<int>>::DebugInfo().total << ")"
+              << std::endl;
+  }
+
   // world.TournamentSelect(5, 100);
   // world.Update();
   // std::cout << "\nPost-Tourney Size = " << world.GetSize() << std::endl << std::endl;
