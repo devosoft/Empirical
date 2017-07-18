@@ -9,13 +9,14 @@
 #include "../../hardware/InstLib.h"
 #include "../../tools/Random.h"
 #include "../../evo/World.h"
+#include "../../../eco-ea-mancala/source/TestcaseSet.h"
 #include <stdlib.h>
 #include <utility>
 
 constexpr size_t POP_SIZE = 1000;
 constexpr size_t GENOME_SIZE = 100;
-constexpr size_t EVAL_TIME = 3000;
-constexpr size_t UPDATES = 1000;
+constexpr size_t EVAL_TIME = 3500;
+constexpr size_t UPDATES = 250;
 constexpr size_t TOURNY_SIZE = 4;
 
 // Determine the next move of a human player.
@@ -181,12 +182,91 @@ double EvalGame(emp::AvidaGP & org, bool cur_player=0) {
   return EvalGame(fun0, fun1, cur_player, true);
 };
 
+using input_t = emp::array<int, 64>;
+using output_t = std::set<int>;
 
 int main()
 {
   emp::Random random;
   emp::evo::EAWorld<emp::AvidaGP> world(random, "AvidaWorld");
+  auto testcases = TestcaseSet<64>("../games/data/game_0.csv", &random);
+  std::function<std::set<int>(emp::array<int, 64>)> cornerFunc = [](emp::array<int, 64> board){
+    std::set<int> moves;
+    emp::Othello game(0);
+    game.SetBoard(board);
+    game.TestOver();
+    emp::vector<std::pair<int, int> > coords = game.GetMoveOptions(1);
+    for (auto item : coords) {
+      int move = game.GetIndex(item.first, item.second);
+      if (move == 0 || move == 7 || move == 56 || move == 63) moves.insert(move);
+    }
+    return moves;
+  };
 
+  std::function<std::set<int>(emp::array<int, 64>)> edgeFunc = [](emp::array<int, 64> board){
+    std::set<int> moves;
+    emp::Othello game(0);
+    game.SetBoard(board);
+    game.TestOver();
+    emp::vector<std::pair<int, int> > coords = game.GetMoveOptions(1);
+    for (auto item : coords) {
+      int move = game.GetIndex(item.first, item.second);
+      if (move % 8 == 0 || move % 8 == 7 || move >= 56 || move <= 7) moves.insert(move);
+    }
+    return moves;
+  };
+  
+  std::function<std::set<int>(emp::array<int, 64>)> totalColorFunc = [](emp::array<int, 64> board){
+    std::set<int> moves;
+    emp::Othello game(0);
+    game.SetBoard(board);
+    game.TestOver();
+    size_t player = 1;
+    int max_score = game.GetScore(1);
+    int best_move = 0;
+    emp::vector<std::pair<int, int> > coords = game.GetMoveOptions(1);
+    for (auto item : coords) {
+      size_t move = game.GetIndex(item.first, item.second);
+      game.DoMove(player, item, 0);
+      if (game.GetScore(1) > max_score) { max_score = game.GetScore(1); best_move = move; moves.clear();}
+      else if (game.GetScore(1) == max_score) { moves.insert(move);}
+      game.SetBoard(board);
+      game.ClearValidMoves();
+      game.ClearFlips();
+      game.TestOver();
+    }
+    moves.insert(best_move);
+    return moves;
+  };
+
+  std::function<std::set<int>(emp::array<int, 64>)> EnemyMovesFunc = [](emp::array<int, 64> board){
+    std::set<int> moves;
+    emp::Othello game(0);
+    game.SetBoard(board);
+    game.TestOver();
+    size_t player = 1;
+    emp::vector<std::pair<int, int> > coords = game.GetMoveOptions(1);
+    int min_score = game.GetMoveOptions(2).size();
+    int best_move = game.GetIndex(coords[0].first, coords[0].second);
+    for (auto item : coords) {
+      size_t move = game.GetIndex(item.first, item.second);
+      game.DoMove(player, item, 0);
+      if (game.GetMoveOptions(2).size() < min_score) { 
+        min_score = game.GetMoveOptions(2).size(); moves.clear(); moves.insert(move);
+      }
+      else if (game.GetMoveOptions(2).size() == min_score) { moves.insert(move);}
+      game.SetBoard(board);
+      game.ClearValidMoves();
+      game.ClearFlips();
+      game.TestOver();
+    }
+    return moves;
+  };
+  
+  testcases.AddGroup(cornerFunc);
+  testcases.AddGroup(edgeFunc);
+  testcases.AddGroup(totalColorFunc);
+  testcases.AddGroup(EnemyMovesFunc);
   // Build a random initial popoulation.
   for (size_t i = 0; i < POP_SIZE; i++) {
     emp::AvidaGP cpu;
@@ -212,23 +292,45 @@ int main()
       return EvalGame(*org, rand_org, cur_player);
     };
 
-  emp::vector< std::function<double(emp::AvidaGP*)> > fit_set(16);
-  for (size_t out_id = 0; out_id < 16; out_id++) {
+  emp::vector< std::function<double(emp::AvidaGP*)> > fit_set(testcases.GetNFuncs());
+  for (size_t fun_id = 0; fun_id < testcases.GetNFuncs(); fun_id++) {
     // Setup the fitness function.
-    fit_set[out_id] = [out_id](emp::AvidaGP * org) {
-      return (double) -std::abs(org->GetOutput(out_id) - out_id * out_id);
+    fit_set[fun_id] = [fun_id](emp::AvidaGP * org) {
+      return org->GetTrait(fun_id);
     };
   }
-
+  auto correct_choices = testcases.GetCorrectChoices();
+  emp::vector<std::pair<input_t, output_t> > tests = testcases.GetTestcases();
+  emp::vector<int> scores;
+  for (int i = 0; i < correct_choices.size(); i++) {
+          scores.push_back(0);
+      }
 
   // Do the run...
   for (size_t ud = 0; ud < UPDATES; ud++) {
+    emp::vector<size_t> choices = testcases.GetValidSubset();
+    for (auto org : world){
+      emp::Othello game(0);
+      for (size_t choice : choices){
+        game.SetBoard(tests[choice].first);
+        int move = EvalMove(game, *org);
+        for (int i = 0; i < correct_choices.size(); i++) {
+          if (correct_choices[i][choice].find(move) != correct_choices[i][choice].end()){
+            scores[i]++;
+          }
+        }
+      }
+      for (int i = 0; i < correct_choices.size(); i++) {
+          org->SetTrait(i, scores[i]);
+      }
+    }
     // Keep the best individual.
     world.EliteSelect(fit_fun, 1, 1);
     // Run a tournament for each spot.
-    world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE-1);
-    // world.LexicaseSelect(fit_set, POP_SIZE-1);
+    //world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE-1);
+    //world.LexicaseSelect(fit_set, POP_SIZE-1);
     // world.EcoSelect(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
+    world.EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
     world.Update();
     std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
 

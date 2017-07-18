@@ -199,7 +199,7 @@ namespace emp {
     void Reset() {
       genome.resize(0);  // Clear out genome
       traits.resize(0);  // Clear out traits
-      traits.push_back(0);
+      SetTrait(100, 0);
       ResetHardware();   // Reset the full hardware
     }
 
@@ -265,7 +265,6 @@ namespace emp {
 
     void SetBoard() { for (int i = 0; i < BOARD_SIZE; i ++){ board[i] = inputs[i]; }}
     double GetSquareCurr(size_t pos) { return board[pos % BOARD_SIZE]; }
-    void EndTurn() { traits[0] = 1; }
 
     double GetValidAbove(size_t pos) {
       if (pos > 63) {return 0;}
@@ -439,7 +438,7 @@ namespace emp {
       traits[id] = val;
     }
     void PushTrait(double val) { traits.push_back(val); }
-
+    void EndTurn() { SetTrait(100, 1); }
     inst_t GetRandomInst(Random & rand) {
       return inst_t(rand.GetUInt(inst_lib->GetSize()),
                     rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE));
@@ -481,7 +480,7 @@ namespace emp {
     /// Process the next SERIES of instructions, directed by the instruction pointer.
     void Process(size_t num_inst) { 
       for (size_t i = 0; i < num_inst; i++) {
-        if (traits[0] == 1) break;
+        if (GetTrait(100) == 1) break;
         SingleProcess(); 
       }
     }

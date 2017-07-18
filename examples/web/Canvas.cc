@@ -52,11 +52,11 @@ public:
     const size_t buffer = 20;
     const size_t radius = (can_size - 2 * buffer)/(color_map.size()*2);
     for (size_t i = 0; i < color_map.size(); i++) {
-      int x_pos = buffer + (2*i+1) * radius;
+      int x_pos = (int) (buffer + (2*i+1) * radius);
       mycanvas.Circle(x_pos, 300, radius, color_map[i]);
       doc << "<br>" << color_map[i];
     }
-    
+
   }
 
   void DoFrame() {
@@ -82,7 +82,7 @@ public:
 
     doc.Text("fps").Redraw();
 
-    
+
   }
 };
 

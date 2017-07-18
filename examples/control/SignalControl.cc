@@ -52,9 +52,9 @@ int main()
 
   test_sig3.Trigger(10);
 
-  std::cout << "Phase 4: Trigger again from BASE SIGNAL CLASS with 20!\n";
+  std::cout << "Phase 4: Trigger again from BASE SIGNAL CLASS with 25!\n";
   emp::SignalBase * base_sig = &test_sig3;
-  base_sig->BaseTrigger(20);
+  base_sig->BaseTrigger(25);
 
   // Trigger by signal name!
   std::cout << "Phase 5: Trigger original signal from control with sum calculated so far!\n";
