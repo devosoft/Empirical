@@ -42,7 +42,12 @@ namespace emp {
   public:
     DataInterface_Impl() : node(new node_t), owner(true) { ; }
     DataInterface_Impl(node_t * n) : node(n), owner(false) { ; }
+    DataInterface_Impl(const DataInterface_Impl &) = delete;
+    DataInterface_Impl(DataInterface_Impl &&) = delete;
     ~DataInterface_Impl() { if (owner) delete node; }
+
+    DataInterface_Impl & operator=(const DataInterface_Impl &) = delete;
+    DataInterface_Impl & operator=(DataInterface_Impl &&) = delete;
 
     size_t GetResetCount() const { return node->GetResetCount(); }
 

@@ -13,8 +13,8 @@
 #include <iostream>
 #include <string>
 
-#include "../base/vector.h"
 #include "../base/assert.h"
+#include "../base/vector.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/string_utils.h"
 
@@ -36,11 +36,16 @@ namespace emp {
   public:
     DataFile(const std::string & filename,
              const std::string & b="", const std::string & s=", ", const std::string & e="\n")
-      : os(new std::ofstream(filename)), line_begin(b), line_spacer(s), line_end(e) { ; }
+      : os(new std::ofstream(filename)), funs(), line_begin(b), line_spacer(s), line_end(e) { ; }
     DataFile(std::ostream & in_os,
              const std::string & b="", const std::string & s=", ", const std::string & e="\n")
-      : os(&in_os), line_begin(b), line_spacer(s), line_end(e) { ; }
+      : os(&in_os), funs(), line_begin(b), line_spacer(s), line_end(e) { ; }
+    DataFile(const DataFile &) = default;
+    DataFile(DataFile &&) = default;
     ~DataFile() { os->flush(); }
+
+    DataFile & operator=(const DataFile &) = default;
+    DataFile & operator=(DataFile &&) = default;
 
     const std::string & GetLineBegin() const { return line_begin; }
     const std::string & GetSpacer() const { return line_spacer; }

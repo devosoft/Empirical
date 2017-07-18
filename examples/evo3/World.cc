@@ -17,6 +17,8 @@ struct TestOrg1 {
   TestOrg1(int f) : fitness(f) { ; }
   double GetFitness() const { return (double) fitness; }
   bool DoMutate(emp::Random&) { return false; }
+
+  bool operator==(const TestOrg1 & in) const { return fitness == in.fitness; }
 };
 
 int main() {

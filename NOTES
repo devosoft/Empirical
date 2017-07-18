@@ -1,6 +1,5 @@
 -= STEPS to a minimal working Avida 5 =-
 Disentangle genome and organism in evo tools
-Hook Virtual CPUs into evo tools
 Setup dynamic phenotype object
 
 Setup dynamic stats tracker
@@ -18,17 +17,21 @@ Working on Singals/Actions
   At the moment, option 2 makes the most sense since each instance would pass in its own info.
 
 -= Active Projects =-
-TubeCode
 PuzzleEngine (was EvoPuzzler)
 Evoke
 Compiler education tools
+EvoConstructor
+Rock-Paper-Stuff
+Spellcast!
+TubeCode
 
 -= Questions =-
 Best way to convert to a c++ literal independent of type?
 How to dynamically change an include file?
+How to best save a file from Emscripten?
+How to best change a CSS class?
 
 -= Fixes =-
-Make emp_assert handle extra arguments outside of just Emscripten mode.
 Make JSWrap more flexible for different types of functions that can get passed into it.
 
 -= Improvements =-
@@ -36,13 +39,11 @@ Allow default UI::Style overall and for each object type.
 -Create a UI::StyleGroup that elements can be added to and altered as one (use proper CSS class?)
 Allow Signal links to be REMOVED or REPLACED
 Allow Signal triggers to be chained (with a single trigger being able to chain to a series of others)
-Allow Signal links to be named?
+Allow Signal *links* to be named?
+Build a emp::unordered_set and emp::unordered_map?  Can give more control on hashing, performance analysis, and simple extra features (like Has and a simpler Find with a default.)
 
 -= Improvements to Consider =-
 Why are styles applied AFTER GetHTML is run; can't they be done at the same time?
-Try out Ptr class to see if it can catch mis-handled pointers
-InstLib: Can we lock a set of instruction at compile time?  Or at least put them in a fixed array?
-Change HardwareCPU to something like Hardware_SimpleCPU and Instruction to Instruction_SimpleCPU
 
 -= New Elements =-
 Forms
@@ -50,19 +51,12 @@ JQuerryUI Tabs? (or other UI Elements?)
 Span (?) for future manual references
 Dynamic web link? (Easy to change and verify, rather than embeded in text.)
 
--= General tools to build =-
-A data management system that can track data by:
-  - Temporal series (values over time)
-  - Batch (where a batch reset occurs periodically)
-  - Log (tracking particular events when they occur)
-  All output files should have headers that allow them to be read back in more easily.
 
 -= Evolution-specific Tools =-
 Organism Object (Contains Genome and templated on virtual hardware type)
 Genotype manager (for organisms with identical genomes)
 Phenotype summary to include in the genotype
-Phylogeny/lineage manager with multiple modes of purging (and link to phenotypes?)
-Clade manager that will mark into phenotypes which clades they are associated with
+
 
 -= Optimizations to Explore =-
 Should quick-lookup for sin, cos, tan be at higher resolution (now it's 256 entires)?
@@ -79,15 +73,17 @@ Fix how sectors are handled in surfaces to be more dynamic based on sizes of org
 * Auto-generation of config file entries beyond just "set"
 * See about uniting library user config file and end user config file into consistent format.
 
+
 -= Documentation =-
 * Goals of Empirical
 * Overview of web framework with examples.
 * How to use evo tools
 * How to setup and use the config tools.
+* Debug utilities (Ptr, vector, array, memory management, etc.)
 * Geometry
 * Reflection
 * string_utils
-* debugging (emp::vector, etc.)
+
 
 -= Librarys to consider wrapping =-
 D3
