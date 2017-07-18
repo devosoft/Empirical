@@ -55,7 +55,7 @@ namespace emp {
     using fun_calc_fitness_t = std::function<double(ORG&)>;
     using fun_do_mutations_t = std::function<void(ORG&,Random&)>;
     using fun_print_org_t    = std::function<void(ORG&,std::ostream &)>;
-    using fun_get_genome_t  = std::function<const genome_t & (ORG &)>;
+    using fun_get_genome_t   = std::function<const genome_t & (ORG &)>;
     using fun_add_inject_t   = std::function<size_t(Ptr<ORG>)>;
     using fun_add_birth_t    = std::function<size_t(Ptr<ORG>, size_t)>;
     using fun_get_neighbor_t = std::function<size_t(size_t)>;
@@ -77,13 +77,13 @@ namespace emp {
     size_t size_y;            // If a grid, track height; if pools, track num pools.
 
     // Configurable functions.
-    fun_calc_fitness_t fun_calc_fitness;  // Fitness function
-    fun_do_mutations_t fun_do_mutations;  // Mutation function
-    fun_print_org_t    fun_print_org;     // Print function
-    fun_get_genome_t   fun_get_genome;    // Determine the genome object of an organism.
-    fun_add_inject_t   fun_add_inject;    // Technique to inject a new organism.
-    fun_add_birth_t    fun_add_birth;     // Technique to add a new offspring.
-    fun_get_neighbor_t fun_get_neighbor;  // Choose a random neighbor near specified id.
+    fun_calc_fitness_t  fun_calc_fitness;   // Fitness function
+    fun_do_mutations_t  fun_do_mutations;   // Mutation function
+    fun_print_org_t     fun_print_org;      // Print function
+    fun_get_genome_t    fun_get_genome;     // Determine the genome object of an organism.
+    fun_add_inject_t    fun_add_inject;     // Technique to inject a new organism.
+    fun_add_birth_t     fun_add_birth;      // Technique to add a new offspring.
+    fun_get_neighbor_t  fun_get_neighbor;   // Choose a random neighbor near specified id.
 
     // Attributes are a dynamic way to track extra characteristics about a world.
     std::map<std::string, std::string> attributes;
@@ -156,10 +156,8 @@ namespace emp {
       emp_assert(pop[id] != nullptr, id);  // Should not index to a null organism!
       return *(pop[id]);
     }
-    const ORG & GetOrg(size_t x, size_t y) { return GetOrg(x+y*size_x); }
-    const Ptr<ORG> GetOrgPtr(size_t id) const {
-      return pop[id];
-    }
+    const ORG & GetOrg(size_t x, size_t y) const { return GetOrg(x+y*size_x); }
+    const Ptr<ORG> GetOrgPtr(size_t id) const { return pop[id]; }
 
     const genome_t & GetGenome(ORG & org) { return fun_get_genome(org); }
     const genome_t & GetGenomeAt(size_t id) { return fun_get_genome(GetOrg(id)); }
@@ -359,10 +357,7 @@ namespace emp {
   void World<ORG>::RemoveOrgAt(size_t pos) {
     pop[pos].Delete();
     pop[pos] = nullptr;
-    if (cache_on) {
-      emp_assert(fit_cache.size() > pos);
-      fit_cache[pos] = 0.0;
-    }
+    if (cache_on && fit_cache.size() > pos) fit_cache[pos] = 0.0;
     systematics.RemoveOrg( genotypes[pos] );
     genotypes[pos] = nullptr;
   }
@@ -504,8 +499,10 @@ namespace emp {
 
       std::swap(pop, next_pop);               // Move next_pop into place.
       std::swap(genotypes, next_genotypes);   // Move next_genotypes into place.
+      next_genotypes.resize(0);               // Clear out genotype names.
 
-      num_orgs = 0;             // Update the organism count.
+      // Update the organism count.
+      num_orgs = 0;
       for (size_t i = 0; i < pop.size(); i++) if (pop[i]) ++num_orgs;
     }
   }

@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
+//  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -111,7 +111,7 @@ namespace serialize {
 
   // Special standard library types need to have a custom StoreVar method built.
   template <typename T>
-  void StoreVar(DataPod & pod, const std::vector<T> & var, bool) {
+  void StoreVar(DataPod & pod, const emp::vector<T> & var, bool) {
     StoreVar(pod, var.size(), true);
     for (int i = 0; i < (int) var.size(); ++i) {
       StoreVar(pod, var[i], true);
@@ -163,9 +163,9 @@ namespace serialize {
 
   // Use special load for vectors of arbitrary type.
   template <typename T>
-  std::vector<T> SetupLoad(DataPod & pod, std::vector<T> *, bool) {
+  emp::vector<T> SetupLoad(DataPod & pod, emp::vector<T> *, bool) {
     const uint32_t v_size(SetupLoad(pod, &v_size, true));
-    std::vector<T> var;
+    emp::vector<T> var;
 
     // Create vector of correct size and create elements with pod.
     for (int i = 0; i < v_size; i++) {

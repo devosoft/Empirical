@@ -27,7 +27,7 @@ namespace emp {
     std::map<std::string, node_t *> node_map;
 
   public:
-    DataManager() = default;
+    DataManager() : node_map() { ; }
     ~DataManager() {
       for (auto & x : node_map) delete x.second;
     }

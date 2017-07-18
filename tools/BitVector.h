@@ -38,7 +38,7 @@ namespace emp {
 
     static constexpr size_t FIELD_BITS = sizeof(field_t)*8;
     size_t num_bits;
-    field_t * bit_set;
+    Ptr<field_t> bit_set;
 
     size_t LastBitID() const { return num_bits & (FIELD_BITS - 1); }
     size_t NumFields() const { return num_bits ? (1 + ((num_bits - 1) / FIELD_BITS)) : 0; }
@@ -73,7 +73,7 @@ namespace emp {
     // The following function assumes that the size of the bit_set has already been adjusted
     // to be the same as the size of the one being copied and only the fields need to be
     // copied over.
-    void RawCopy(const field_t * in_set) {
+    void RawCopy(const Ptr<field_t> in_set) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
     }
@@ -88,7 +88,7 @@ namespace emp {
       // Loop through each field, from L to R, and update it.
       if (field_shift) {
         for (size_t i = NUM_FIELDS; i > field_shift; --i) {
-          bit_set[i] = bit_set[i - field_shift - 1];
+          bit_set[i-1] = bit_set[i - field_shift - 1];
         }
         for (size_t i = field_shift; i > 0; --i) bit_set[i-1] = 0;
       }
@@ -137,11 +137,11 @@ namespace emp {
 
   public:
     BitVector(size_t in_num_bits=0, bool init_val=false) : num_bits(in_num_bits), bit_set(nullptr) {
-      if (num_bits) bit_set = new field_t[NumFields()];
+      if (num_bits) bit_set = NewArrayPtr<field_t>(NumFields());
       if (init_val) SetAll(); else Clear();
     }
     BitVector(const BitVector & in_set) : num_bits(in_set.num_bits), bit_set(nullptr) {
-      if (num_bits) bit_set = new field_t[NumFields()];
+      if (num_bits) bit_set = NewArrayPtr<field_t>(NumFields());
       RawCopy(in_set.bit_set);
     }
     BitVector(BitVector && in_set) : num_bits(in_set.num_bits), bit_set(in_set.bit_set) {
@@ -149,7 +149,7 @@ namespace emp {
     }
     ~BitVector() {
       if (bit_set) {        // A move constructor can make bit_set == nullptr
-        delete [] bit_set;
+        bit_set.DeleteArray();
         bit_set = nullptr;
       }
     }
@@ -161,8 +161,8 @@ namespace emp {
       num_bits = in_set.num_bits;
 
       if (in_num_fields != prev_num_fields) {
-        delete [] bit_set;
-	      if (num_bits) bit_set = new field_t[NumFields()];
+        bit_set.DeleteArray();
+	      if (num_bits) bit_set = NewArrayPtr<field_t>(NumFields());
         else bit_set = nullptr;
       }
 
@@ -173,7 +173,7 @@ namespace emp {
 
     BitVector & operator=(BitVector && in_set) {
       if (&in_set == this) return *this;
-      delete [] bit_set;
+      bit_set.DeleteArray();
       num_bits = in_set.num_bits;
       bit_set = in_set.bit_set;
       in_set.bit_set = nullptr;
@@ -193,13 +193,13 @@ namespace emp {
       }
 
       else {  // We have to change the number of bitfields.  Resize & copy old info.
-        field_t * old_bit_set = bit_set;
-        if (num_bits > 0) bit_set = new field_t[NUM_FIELDS];
+        Ptr<field_t> old_bit_set = bit_set;
+        if (num_bits > 0) bit_set = NewArrayPtr<field_t>(NUM_FIELDS);
         else bit_set = nullptr;
         const size_t min_fields = std::min(old_num_fields, NUM_FIELDS);
         for (size_t i = 0; i < min_fields; i++) bit_set[i] = old_bit_set[i];
         for (size_t i = min_fields; i < NUM_FIELDS; i++) bit_set[i] = 0U;
-        delete [] old_bit_set;
+        old_bit_set.DeleteArray();
       }
 
       return *this;
@@ -263,7 +263,7 @@ namespace emp {
       const size_t num_sfields = NumSizeFields();
       std::size_t hash_val = 0;
       for (size_t i = 0; i < num_sfields; i++) {
-        hash_val ^= ((std::size_t*) bit_set)[i];
+        hash_val ^= (bit_set.Cast<std::size_t>())[i];
       }
       return hash_val ^ ((97*num_bits) << 8);
     }
@@ -286,13 +286,13 @@ namespace emp {
     uint32_t GetUInt(size_t index) const {
       // @CAO Need proper assert for variable bit fields!
       // emp_assert(index < NumFields());
-      return ((uint32_t *) bit_set)[index];
+      return bit_set.Cast<uint32_t>()[index];
     }
 
     void SetUInt(size_t index, uint32_t value) {
       // @CAO Need proper assert for variable bit fields!
       // emp_assert(index < NumFields());
-      ((uint32_t *) bit_set)[index] = value;
+      bit_set.Cast<uint32_t>()[index] = value;
     }
 
     uint32_t GetUIntAtBit(size_t index) {
@@ -382,7 +382,7 @@ namespace emp {
     // Count 1's in semi-parallel; fastest for even 0's & 1's
     size_t CountOnes_Mixed() const {
       const size_t NUM_FIELDS = NumFields() * sizeof(field_t)/4;
-      uint32_t* uint_bit_set = (uint32_t *) bit_set;
+      Ptr<const uint32_t> uint_bit_set = bit_set.Cast<const uint32_t>();
       size_t bit_count = 0;
       for (size_t i = 0; i < NUM_FIELDS; i++) {
         const uint32_t v = uint_bit_set[i];

@@ -241,7 +241,7 @@ namespace emp {
     // currently operating on
     for (std::size_t i = 0; i<values.size(); i++) {
       emp::vector<int> new_recursive_el (recursive_el);
-      new_recursive_el.push_back(i);
+      new_recursive_el.push_back((int) i);
       pass_array_to_javascript(values[i], new_recursive_el);
     }
   }
@@ -275,7 +275,7 @@ namespace emp {
     // currently operating on
     for (std::size_t i = 0; i<values.size(); i++) {
       emp::vector<int> new_recursive_el (recursive_el);
-      new_recursive_el.push_back(i);
+      new_recursive_el.push_back((int) i);
       pass_array_to_javascript(values[i], new_recursive_el);
     }
   }

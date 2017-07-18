@@ -63,14 +63,14 @@ namespace emp {
 
 }
 
-
-std::ostream & operator<<( std::ostream & os, const emp::DynamicString & strings )
-{
-  for (size_t i = 0; i < strings.GetSize(); ++i) {
-    os << strings[i];
+namespace std {
+  std::ostream & operator<<( std::ostream & os, const emp::DynamicString & strings )
+  {
+    for (size_t i = 0; i < strings.GetSize(); ++i) {
+      os << strings[i];
+    }
+    return os;
   }
-  return os;
 }
-
 
 #endif
