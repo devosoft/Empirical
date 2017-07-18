@@ -260,6 +260,7 @@ namespace emp {
     Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr), id(_in.id) {
       if (ptr_debug) std::cout << "move construct: " << ptr << std::endl;
       _in.id = (size_t) -1;
+      // No IncID or DecID in Tracker since we just move the id.
     }
 
     // Construct from a raw pointer of campatable type.
@@ -319,7 +320,11 @@ namespace emp {
 
     // Destructor.
     ~Ptr() {
-      if (ptr_debug) std::cout << "destructing " << id << " (" << ptr << ")" << std::endl;
+      if (ptr_debug) {
+        std::cout << "destructing Ptr instance ";
+        if (ptr) std::cout << id << " (" << ptr << ")\n";
+        else std::cout << "(nullptr)\n";
+      }
       Tracker().DecID(id);
     }
 
@@ -405,10 +410,13 @@ namespace emp {
     Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
       if (ptr_debug) std::cout << "move assignment" << std::endl;
       emp_assert(Tracker().IsDeleted(_in.id) == false, "Do not move deleted pointers.");
-      ptr = _in.ptr;
-      id = _in.id;
-      _in.ptr = nullptr;
-      _in.id = (size_t) -1;
+      if (id != _in.id) {
+        Tracker().DecID(id);   // Decrement references to former pointer at this position.
+        ptr = _in.ptr;
+        id = _in.id;
+        _in.ptr = nullptr;
+        _in.id = (size_t) -1;
+      }
       return *this;
     }
 
@@ -418,8 +426,8 @@ namespace emp {
       if (ptr_debug) std::cout << "raw assignment" << std::endl;
       emp_assert( (PtrIsConvertable<T2, TYPE>(_in)) );
 
-      if (ptr) Tracker().DecID(id);   // Decrement references to former pointer at this position.
-      ptr = _in;                      // Update to new pointer.
+      Tracker().DecID(id);    // Decrement references to former pointer at this position.
+      ptr = _in;              // Update to new pointer.
 
       // If this pointer is already active, link to it.
       if (Tracker().IsActive(ptr)) {
@@ -427,6 +435,9 @@ namespace emp {
         Tracker().IncID(id);
       }
       // Otherwise, since this ptr was passed in as a raw pointer, we do not manage it.
+      else {
+        id = (size_t) -1;
+      }
 
       return *this;
     }
