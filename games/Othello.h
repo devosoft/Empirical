@@ -12,6 +12,7 @@
 #include <iostream>
 #include <iomanip>
 #include <utility>
+#include <string>
 
 #include "../base/array.h"
 #include "../base/assert.h"
@@ -54,12 +55,12 @@ namespace emp {
 
     void ClearValidMoves() { valid_moves_B.clear(); valid_moves_W.clear(); }
 
-    vector<move_t> GetMoveOptions() {
-        if (is_B_turn) { return valid_moves_B; }
+    vector<move_t> GetMoveOptions(size_t player) {
+        if (player == 1) { return valid_moves_B; }
         else { return valid_moves_W; }
     }
 
-    int GetIndex(int x, int y) { return ((y - 1) * boardSize) + (x - 1); }
+    size_t GetIndex(int x, int y) { return ((y - 1) * boardSize) + (x - 1); }
 
     move_t GetCoord(int idx) { return std::make_pair((idx % boardSize) + 1, (idx / boardSize) + 1); }
 
@@ -75,6 +76,14 @@ namespace emp {
 
     int GetBoardSize() { return boardSize; }
 
+    void SetBoard(emp::array<int, 64> new_board) {
+        for (int i = 0; i < boardSize; i++){
+            int square = new_board[i];
+            if (square == -1) square = 2;
+            board[i] = square;
+        }
+    }
+
     void AddDisc(int x, int y, bool is_B){
         int idx = GetIndex(x, y);
 
@@ -89,6 +98,25 @@ namespace emp {
         }
     }
 
+    void Write(std::ofstream * myfile, size_t player) {
+        
+        for (int y = 1; y <= boardSize; y++) {
+
+            for (int x = 1; x <= boardSize; x++) {
+                int piece;
+                int square = GetSquare(x,y);
+                
+                if (square == 0) { piece = 0; }
+                else if (square == player) { piece = 1; }
+                else { piece = -1; }
+
+                (*myfile)<<piece<<",";
+            }
+        }
+        (*myfile)<<std::endl;
+
+    }
+
     void Print(std::ostream & os=std::cout) {
         os<<std::endl<<"  ";
         for (int i = 1; i <= boardSize; i++){ std::cout<<i<<" "; }
@@ -101,8 +129,8 @@ namespace emp {
                 int square = GetSquare(x,y);
                 
                 if (square == 0) { piece = '-'; }
-                else if (square == 1) { piece = 'B'; }
-                else { piece = 'W'; }
+                else if (square == 1) { piece = 'X'; }
+                else { piece = 'O'; }
 
                 os<<piece<<" ";
             }
