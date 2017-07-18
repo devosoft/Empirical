@@ -628,8 +628,8 @@ namespace evo {
       // Setup info to track fitnesses.
       emp::vector<double> base_fitness(popM.size());
       emp::vector< emp::vector<double> > extra_fitnesses(extra_funs.size());
-      emp::vector<double> max_extra_fit(extra_funs.size(), 0.0);
-      emp::vector<double> resource_left = pool_sizes;
+      emp::vector<double> sum_extra_fit(extra_funs.size(), 0.0);
+    //   emp::vector<double> resource_left = pool_sizes;
       emp::vector<size_t> max_count(extra_funs.size(), 0);
       for (size_t i=0; i < extra_funs.size(); i++) {
         extra_fitnesses[i].resize(popM.size());
@@ -643,26 +643,26 @@ namespace evo {
         ordering[org_id] = org_id;
         for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
           double cur_fit = popM.CalcFitness(org_id, extra_funs[ex_id]);
-          extra_fitnesses[ex_id][org_id] = emp::Pow(cur_fit/32, 2.0);
+        //   std::cout << cur_fit << " ";
+          extra_fitnesses[ex_id][org_id] = emp::Pow(cur_fit, 2.0);
+          sum_extra_fit[ex_id] += emp::Pow(cur_fit, 2.0);
         }
       }
 
       for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
-          std::sort(ordering.begin(), ordering.end(),
-                [&extra_fitnesses, &ex_id](int x, int y){
-                  return extra_fitnesses[ex_id][(size_t)x] > extra_fitnesses[ex_id][(size_t)y];
-                });
+
           for (size_t org_id : ordering) {
-              double bonus = .05 * extra_fitnesses[ex_id][org_id] * resource_left[ex_id];
-              extra_fitnesses[ex_id][org_id] = bonus;
-              resource_left[ex_id] -= bonus;
+              double bonus = (extra_fitnesses[ex_id][org_id] / sum_extra_fit[ex_id]) * pool_sizes[ex_id];
+              extra_fitnesses[ex_id][org_id] = emp::Pow(2.0, bonus)-1;
+              //   resource_left[ex_id] -= bonus;
               base_fitness[org_id] += bonus;
           }
 
       }
 
     //   for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
-    //     std::cout << "Bonus " << ex_id << " = " << extra_fitnesses[ex_id]
+      //
+    //     std::cout << "Bonus " << ex_id << " = " << to_string(extra_fitnesses[ex_id])
     //               << std::endl;
     //   }
 
