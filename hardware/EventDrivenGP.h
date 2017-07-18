@@ -47,6 +47,7 @@ namespace emp {
     static constexpr size_t MAX_CALL_DEPTH = 128;   // Maximum depth of calls per execution stack.
     static constexpr double DEFAULT_MEM_VALUE = 0.0;
     static constexpr double MIN_BIND_THRESH = 0.5;
+    static constexpr bool STOCHASTIC_FUN_CALL = true;
 
     using mem_key_t = int;
     using mem_val_t = double;
@@ -545,26 +546,33 @@ namespace emp {
       }
     }
 
+    /// Find best matching functions (by ID) given affinity.
+    emp::vector<size_t> FindBestFuncMatch(const affinity_t & affinity, double threshold) {
+      double max_bind = -1;
+      emp::vector<size_t> best_matches;
+      for (size_t i=0; i < program.GetSize(); ++i) {
+        double bind = SimpleMatchCoeff(program[i].affinity, affinity);
+        if (bind == max_bind && bind >= threshold) best_matches.push_back(i);
+        else if (bind > max_bind && bind >= threshold) {
+          best_matches.resize(1);
+          best_matches[0] = i;
+          max_bind = bind;
+        }
+      }
+      return best_matches;
+    }
+
     /// Spawn core with function that has best match to provided affinity. Do nothing if no
     /// functions match above the provided threshold.
     /// Initialize function state with provided input memory.
     void SpawnCore(const affinity_t & affinity, double threshold, const memory_t & input_mem=memory_t(), bool is_main=false) {
       if (execution_stacks.size() >= MAX_CORES) return;
       size_t fID;
-      double max_bind = -1;
-      emp::vector<size_t> best_matches;
-      for (size_t i=0; i < program.GetSize(); i++) {
-        double bind = SimpleMatchCoeff(program[i].affinity, affinity);
-        if (bind == max_bind) best_matches.push_back(i);
-        else if (bind > max_bind && bind >= threshold) {
-          best_matches.resize(0);
-          best_matches.push_back(i);
-          max_bind = bind;
-        }
-      }
+      emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, threshold));
       if (best_matches.empty()) return;
       if (best_matches.size() == 1.0) fID = best_matches[0];
-      else fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
+      else if (STOCHASTIC_FUN_CALL) fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
+      else fID = best_matches[0];
       SpawnCore(fID, input_mem, is_main);
     }
 
@@ -594,20 +602,11 @@ namespace emp {
       // @amlalejini - TODO: memoize this function.
       // @amlalejini - TODO: move function finding to its own function.
       size_t fID;
-      double max_bind = -1;
-      emp::vector<size_t> best_matches;
-      for (size_t i=0; i < program.GetSize(); i++) {
-        double bind = SimpleMatchCoeff(program[i].affinity, affinity);
-        if (bind == max_bind) best_matches.push_back(i);
-        else if (bind > max_bind && bind >= threshold) {
-          best_matches.resize(0);
-          best_matches.push_back(i);
-          max_bind = bind;
-        }
-      }
+      emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, threshold));
       if (best_matches.empty()) return;
       if (best_matches.size() == 1.0) fID = best_matches[0];
-      else fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
+      else if (STOCHASTIC_FUN_CALL) fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
+      else fID = best_matches[0];
       CallFunction(fID);
     }
 
