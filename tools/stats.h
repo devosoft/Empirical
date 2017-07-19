@@ -54,7 +54,7 @@ namespace evo {
   template <typename C>
   typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value, double>::type
   ShannonEntropy(C & elements) {
-
+    //   std::cout<< "In se" << std::endl;
     using pointed_at = typename emp::remove_ptr_type<typename C::value_type>::type;
     // Count number of each value present
     std::map<pointed_at, int> counts;
@@ -72,7 +72,7 @@ namespace evo {
       double p = double(element.second)/elements.GetSize();
       result +=  p * log2(p);
     }
-
+    //   std::cout<< "leaving se" << std::endl;
     return -1 * result;
   }
 

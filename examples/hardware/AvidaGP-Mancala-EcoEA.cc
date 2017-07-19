@@ -128,7 +128,7 @@ double EvalGame(emp::AvidaGP & org, bool cur_player=0) {
 int main(int argc, char* argv[])
 {
   emp::Random random;
-  emp::evo::EAWorld<emp::AvidaGP> world(random, "AvidaWorld");
+  emp::evo::EAWorld<emp::AvidaGP, emp::evo::DefaultStats> world(random, "AvidaWorld");
 
   config.Read("Eco.cfg");
 
@@ -401,6 +401,8 @@ int main(int argc, char* argv[])
       return EvalGame(*org, rand_org, cur_player);
     };
 
+  world.SetDefaultFitnessFun(fit_fun);
+
   emp::vector<size_t> choices;
   emp::vector<int> best_possible;
 
@@ -472,15 +474,15 @@ int main(int argc, char* argv[])
     }
 
     // Keep the best individual.
-    // world.EliteSelect(fit_fun, 1, 1);
+    world.EliteSelect(fit_fun, 1, 1);
 
     // Run a tournament for each spot.
     if (config.SELECTION() == "ecogradient") {
-        world.EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE);
+        world.EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
     } else if (config.SELECTION() == "tournament") {
-        world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE);
+        world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE-1);
     } else if (config.SELECTION() == "lexicase") {
-        world.LexicaseSelect(lexicase_fit_set, POP_SIZE);
+        world.LexicaseSelect(lexicase_fit_set, POP_SIZE-1);
     }
     world.Update();
     std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;

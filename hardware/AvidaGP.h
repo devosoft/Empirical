@@ -52,6 +52,9 @@ namespace emp {
 
       Instruction & operator=(const Instruction &) = default;
       Instruction & operator=(Instruction &&) = default;
+      bool operator<(const Instruction & other) const {
+          return id < other.id;
+      }
 
       void Set(size_t _id, size_t _a0=0, size_t _a1=0, size_t _a2=0)
 	      { id = _id; args[0] = _a0; args[1] = _a1; args[2] = _a2; }
@@ -188,6 +191,10 @@ namespace emp {
     AvidaGP(const AvidaGP &) = default;
     AvidaGP(AvidaGP &&) = default;
     ~AvidaGP() { ; }
+
+    bool operator<(const AvidaGP& other) const {
+        return genome < other.genome;
+    }
 
     /// Reset the entire CPU to a starting state, without a genome.
     void Reset() {

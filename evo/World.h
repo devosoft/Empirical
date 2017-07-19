@@ -831,9 +831,11 @@ namespace evo {
 
     // Update() moves the next population to the current position, managing memory as needed.
     void Update() {
+    //   std::cout<< "triggering update" << std::endl;
       on_update_sig.Trigger(update);
       update++;
       popM.Update();
+    //   std::cout<< "done triggering update" << std::endl;
     }
 
 
