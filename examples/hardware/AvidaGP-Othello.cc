@@ -18,6 +18,7 @@ constexpr size_t GENOME_SIZE = 100;
 constexpr size_t EVAL_TIME = 3500;
 constexpr size_t UPDATES = 250;
 constexpr size_t TOURNY_SIZE = 4;
+constexpr bool CACHE = 1;
 
 // Determine the next move of a human player.
 size_t EvalMove(emp::Othello & game, std::ostream & os=std::cout, std::istream & is=std::cin) {
@@ -188,7 +189,8 @@ using output_t = std::set<int>;
 int main()
 {
   emp::Random random;
-  emp::evo::EAWorld<emp::AvidaGP> world(random, "AvidaWorld");
+  //emp::evo::EAWorld<emp::AvidaGP, emp::evo::FitCacheOn> world(random, "AvidaWorld"); // FitCache on
+  emp::evo::EAWorld<emp::AvidaGP> world(random, "AvidaWorld"); //FitCache off
   auto testcases = TestcaseSet<64>("../games/data/game_0.csv", &random);
   std::function<std::set<int>(emp::array<int, 64>)> cornerFunc = [](emp::array<int, 64> board){
     std::set<int> moves;
@@ -328,9 +330,10 @@ int main()
     world.EliteSelect(fit_fun, 1, 1);
     // Run a tournament for each spot.
     //world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE-1);
-    //world.LexicaseSelect(fit_set, POP_SIZE-1);
+    fit_set.push_back(fit_fun);
+    world.LexicaseSelect(fit_set, POP_SIZE-1);
     // world.EcoSelect(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
-    world.EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
+    //world.EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
     world.Update();
     std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
 
