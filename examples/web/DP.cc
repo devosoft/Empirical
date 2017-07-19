@@ -103,7 +103,7 @@ int main()
 	<< "<p>For word <i>n</i>, we can either exclude the word from the answer (and just use the anser same score as <i>n</i>-1) -or- we can include it.  If we include it, we must exclude <i>n</i>-1, so we take the length of word <i>n</i> and add it to the best score for the first <i>n</i>-2 words.</p>";
   tdesc << "<p>Here is the table that we use to perform this calculation:</p>";
 
-  auto table = doc.AddTable(3, 1, "table");
+  auto table = doc.AddTable((size_t)3, (size_t)1, "table");
   table.GetCell(0,0).SetHeader() << "WORD:";
   table.GetCell(1,0).SetHeader() << "LETTERS:";
   table.GetCell(2,0).SetHeader() << "BEST SCORE:";
