@@ -511,7 +511,7 @@ namespace emp {
       return ptr;
     }
 
-    operator bool() { return ptr != nullptr; }
+    operator bool() const { return ptr != nullptr; }
 
     // Comparisons to other Ptr objects
     bool operator==(const Ptr<TYPE> & in_ptr) const { return ptr == in_ptr.ptr; }
