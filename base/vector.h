@@ -34,11 +34,10 @@ namespace emp {
 
   // Build a debug wrapper emp::vector around std::vector.
   template <typename T, typename... Ts>
-  class vector {
+  class vector : public std::vector<T,Ts...> {
   private:
     using this_t = emp::vector<T,Ts...>;
     using stdv_t = std::vector<T,Ts...>;
-    stdv_t v;
 
     // Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
     constexpr static const size_t MAX_SIZE = 2000000001;
@@ -51,107 +50,41 @@ namespace emp {
     using reference = typename stdv_t::reference;
     using const_reference = typename stdv_t::const_reference;
 
-    vector() : v() {};
-    vector(const this_t &) = default;
-    vector(size_t size) : v(size) { emp_assert(size < MAX_SIZE, size); }
-    vector(size_t size, const T & val) : v(size, val) { emp_assert(size < MAX_SIZE, size); }
-    vector(std::initializer_list<T> in_list) : v(in_list) { ; }
-    template <typename InputIt>
-    vector(InputIt first, InputIt last) : v(first, last){;}
-    vector(const stdv_t & in) : v(in) { ; }         // Emergency fallback conversion.
-    ~vector() = default;
+    vector() : stdv_t() {};
+    vector(const this_t & _in) : stdv_t(_in) {};
+    vector(size_t size) : stdv_t(size) { emp_assert(size < MAX_SIZE, size); }
+    vector(size_t size, const T & val) : stdv_t(size, val) { emp_assert(size < MAX_SIZE, size); }
+    vector(std::initializer_list<T> in_list) : stdv_t(in_list) { ; }
+    vector(const stdv_t & in) : stdv_t(in) { ; }         // Emergency fallback conversion.
 
-    operator stdv_t &() { return v; }
-    operator const stdv_t &() const { return v; }
+    // operator stdv_t &() { return v; }
+    // operator const stdv_t &() const { return v; }
 
-    size_type size() const noexcept { return v.size(); }
-    void clear() { v.clear(); }
-    void resize(size_t new_size) { emp_assert(new_size < MAX_SIZE, new_size); v.resize(new_size); }
+    void resize(size_t new_size) { emp_assert(new_size < MAX_SIZE, new_size); stdv_t::resize(new_size); }
     void resize(size_t new_size, const T & val) {
       emp_assert(new_size < MAX_SIZE, new_size);
-      v.resize(new_size, val);
+      stdv_t::resize(new_size, val);
     }
-    bool empty() const noexcept { return v.empty(); }
-    size_type capacity() const noexcept { return v.capacity(); }
-    size_type max_size() const noexcept { return v.max_size(); }
-    void reserve(size_type n) { v.reserve(n); }
-    void shrink_to_fit() { v.shrink_to_fit(); }
-
-    this_t & operator=(const this_t &) = default;
-    // this_t & operator=(const stdv_t & x) { v = x; return *this; }
-    // this_t & operator=(const std::initializer_list<value_type> & il) {
-    template <typename IN_T>
-    this_t & operator=(IN_T && in) {
-      v.operator=(std::forward<IN_T>(in));
-      return *this;
-    }
-
-    void swap(this_t & x) { v.swap(x.v); }
-    void swap(stdv_t & x) { v.swap(x); }
-
-    bool operator==(const this_t & in) const { return v == in.v; }
-    bool operator!=(const this_t & in) const { return v != in.v; }
-    bool operator<(const this_t & in)  const { return v < in.v; }
-    bool operator<=(const this_t & in) const { return v <= in.v; }
-    bool operator>(const this_t & in)  const { return v > in.v; }
-    bool operator>=(const this_t & in) const { return v >= in.v; }
+    // this_t & operator=(const this_t &) = default;
 
     T & operator[](size_t pos) {
-      emp_assert(pos < v.size(), pos, v.size());
-      return v[pos];
+      emp_assert(pos < stdv_t::size(), pos, stdv_t::size());
+      return stdv_t::operator[](pos);
     }
 
     const T & operator[](size_t pos) const {
-      emp_assert(pos < v.size(), pos, v.size());
-      return v[pos];
+      emp_assert(pos < stdv_t::size(), pos, stdv_t::size());
+      return stdv_t::operator[](pos);
     }
 
-    T* data() noexcept { return v.data(); }
-    const T* data() const noexcept { return v.data(); }
-
-    template <typename T2>
-    vector & push_back(T2 && in) { v.push_back(std::forward<T2>(in)); return *this; }
-
-    template <typename... T2>
-    iterator emplace (T2 &&... in) { return v.emplace_back(std::forward<T2>(in)...); }
-    template <typename... T2>
-    void emplace_back(T2 &&... in) { v.emplace_back(std::forward<T2>(in)...); }
-
-    template <typename... T2>
-    iterator erase(T2 &&... in) { return v.erase(std::forward<T2>(in)...); }
-
-    auto begin() -> decltype(v.begin()) { return v.begin(); }
-    auto end() -> decltype(v.end()) { return v.end(); }
-    auto begin() const -> const decltype(v.begin()) { return v.begin(); }
-    auto end() const -> const decltype(v.end()) { return v.end(); }
-
-    auto rbegin() -> decltype(v.rbegin()) { return v.rbegin(); }
-    auto rend() -> decltype(v.rend()) { return v.rend(); }
-    auto rbegin() const -> const decltype(v.rbegin()) { return v.rbegin(); }
-    auto rend() const -> const decltype(v.rend()) { return v.rend(); }
-
-    auto cbegin() const noexcept -> decltype(v.cbegin()) { return v.cbegin(); }
-    auto cend() const noexcept -> decltype(v.cend()) { return v.cend(); }
-    auto crbegin() const noexcept -> const decltype(v.crbegin()) { return v.crbegin(); }
-    auto crend() const noexcept -> const decltype(v.crend()) { return v.crend(); }
-
-    template <typename... ARGS>
-    void assign(ARGS &&... args) { v.assign(std::forward<ARGS>(args)...); }
-
-    reference at(size_type n) { return v.at(n); }
-    const_reference at(size_type n) const { return v.at(n); }
-
-    template <typename... ARGS>
-    iterator insert(ARGS &&... args) { return v.insert(std::forward<ARGS>(args)...); }
-
-    T & back() { emp_assert(size() > 0); return v.back(); }
-    const T & back() const { emp_assert(size() > 0); return v.back(); }
-    T & front() { emp_assert(size() > 0); return v.front(); }
-    const T & front() const { emp_assert(size() > 0); return v.front(); }
+    T & back() { emp_assert(stdv_t::size() > 0); return stdv_t::back(); }
+    const T & back() const { emp_assert(stdv_t::size() > 0); return stdv_t::back(); }
+    T & front() { emp_assert(stdv_t::size() > 0); return stdv_t::front(); }
+    const T & front() const { emp_assert(stdv_t::size() > 0); return stdv_t::front(); }
 
     void pop_back() {
-      emp_assert(v.size() > 0, v.size());
-      v.pop_back();
+      emp_assert(stdv_t::size() > 0, stdv_t::size());
+      stdv_t::pop_back();
     }
   };
 

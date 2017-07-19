@@ -93,11 +93,11 @@ namespace emp {
 
     // Helper Functions
     // @CAO FIX!!!
-    SignalKey NextSignalKey() { return SignalKey(signal_id,next_link_id++); }
+    SignalKey NextSignalKey() { return SignalKey(signal_id,++next_link_id); }
 
     // SignalBase should only be constructable from derrived classes.
     SignalBase(const std::string & n, internal::SignalManager_Base * manager=nullptr)
-    : name(n), signal_id(0), next_link_id(1), link_key_map(), managers(), prime_manager(nullptr)
+    : name(n), signal_id(0), next_link_id(0), link_key_map(), managers(), prime_manager(nullptr)
     {
       if (manager) manager->NotifyConstruct(this);
     }
@@ -146,8 +146,8 @@ namespace emp {
     using this_t = Signal<fun_t>;
 
     Signal(const std::string & name="", internal::SignalManager_Base * manager=nullptr)
-     : SignalBase(name, manager), actions() { ; }
-     Signal(const std::string & name, internal::SignalControl_Base & control)
+      : SignalBase(name, manager), actions() { ; }
+    Signal(const std::string & name, internal::SignalControl_Base & control)
       : this_t(name, &(control.GetSignalManager())) { ; }
     virtual this_t * Clone() const {
       this_t * new_copy = new this_t(name);
@@ -238,8 +238,8 @@ namespace emp {
     using this_t = Signal<fun_t>;
 
     Signal(const std::string & name="", internal::SignalManager_Base * manager=nullptr)
-     : SignalBase(name, manager) { ; }
-     Signal(const std::string & name, internal::SignalControl_Base & control)
+      : SignalBase(name, manager) { ; }
+    Signal(const std::string & name, internal::SignalControl_Base & control)
       : this_t(name, &(control.GetSignalManager())) { ; }
     virtual this_t * Clone() const {
       this_t * new_copy = new this_t(name);

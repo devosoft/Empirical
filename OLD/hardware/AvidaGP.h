@@ -7,6 +7,9 @@
 //
 //
 //  Developer Notes:
+//  * This implementation is intended to run fast, but not be flexible so that it will
+//    be quick to implement.  It can be used as a baseline comparison for timings on more
+//    flexible implementations later.
 //  * We should clean up how we handle scope; the root scope is zero, so the arg-based
 //    scopes are 1-16 (or however many).  Right now we increment the value in various places
 //    and should be more consistent.
@@ -38,14 +41,25 @@ namespace emp {
     static constexpr size_t INST_ARGS = 3;   // Max num args per instruction.
     static constexpr size_t STACK_CAP = 16;  // Max size for stacks.
 
-    using arg_t = size_t;        // All arguments are non-negative ints (indecies!)
-    using arg_set_t = emp::array<arg_t, INST_ARGS>;
+    enum class InstID {
+      Inc, Dec, Not, SetReg, Add, Sub, Mult, Div, Mod, TestEqu, TestNEqu, TestLess,
+      If, While, Countdown, Break, Scope, Define, Call,
+      Push, Pop, Input, Output, CopyVal, ScopeReg,
+      Unknown
+    };
+
+    // ScopeType is used for scopes that we need to do something special at the end.
+    // Eg: LOOP needs to go back to beginning of loop; FUNCTION needs to return to call.
+    enum class ScopeType { ROOT, BASIC, LOOP, FUNCTION };
 
     struct Instruction {
-      size_t id;
-      arg_set_t args;
+      using id_t = InstID;
+      using arg_t = size_t;        // All arguments are non-negative ints (indecies!)
 
-      Instruction(size_t _id=0, size_t a0=0, size_t a1=0, size_t a2=0)
+      id_t id;
+      emp::array<arg_t, 3> args;
+
+      Instruction(InstID _id=(InstID)0, size_t a0=0, size_t a1=0, size_t a2=0)
 	      : id(_id), args() { args[0] = a0; args[1] = a1; args[2] = a2; }
       Instruction(const Instruction &) = default;
       Instruction(Instruction &&) = default;
@@ -53,7 +67,7 @@ namespace emp {
       Instruction & operator=(const Instruction &) = default;
       Instruction & operator=(Instruction &&) = default;
 
-      void Set(size_t _id, size_t _a0=0, size_t _a1=0, size_t _a2=0)
+      void Set(InstID _id, size_t _a0=0, size_t _a1=0, size_t _a2=0)
 	      { id = _id; args[0] = _a0; args[1] = _a1; args[2] = _a2; }
 
     };
@@ -78,18 +92,15 @@ namespace emp {
 
     using inst_t = Instruction;
     using genome_t = emp::vector<inst_t>;
-    using inst_lib_t = InstLib<AvidaGP>;
-    using stack_t = emp::vector<double>;
 
   protected:
-    Ptr<const inst_lib_t> inst_lib;
 
     // Virtual CPU Components!
     genome_t genome;
     emp::array<double, CPU_SIZE> regs;
     std::unordered_map<int, double> inputs;   // Map of all available inputs (position -> value)
     std::unordered_map<int, double> outputs;  // Map of all outputs (position -> value)
-    emp::array< stack_t, CPU_SIZE > stacks;
+    emp::array< emp::vector<double>, CPU_SIZE > stacks;
     emp::array< int, CPU_SIZE> fun_starts;
 
     size_t inst_ptr;
@@ -101,6 +112,21 @@ namespace emp {
 
     // A simple way of recording which traits a CPU has demonstrated, and at what qaulity.
     emp::vector<double> traits;
+
+    double PopStack(size_t id) {
+      if (stacks[id].size() == 0) return 0.0;
+      double out = stacks[id].back();
+      stacks[id].pop_back();
+      return out;
+    }
+
+    void PushStack(size_t id, double value) {
+      if (stacks[id].size() >= STACK_CAP) return;
+      stacks[id].push_back(value);
+    }
+
+    size_t CurScope() const { return scope_stack.back().scope; }
+    ScopeType CurScopeType() const { return scope_stack.back().type; }
 
     // Run every time we need to exit the current scope.
     void ExitScope() {
@@ -143,8 +169,8 @@ namespace emp {
         inst_ptr = call_stack.back();             // Return from the function call.
         if (inst_ptr >= genome.size()) ResetIP(); // Call may have occured at end of genome.
         else {
-          call_stack.pop_back();                  // Clear the return position from the call stack.
-          ExitScope();                            // Leave the function scope.
+          call_stack.pop_back();                    // Clear the return position from the call stack.
+          ExitScope();                              // Leave the function scope.
         }
         ProcessInst( genome[inst_ptr] );          // Process the new instruction instead.
         return false;                             // We did NOT enter the new scope.
@@ -176,15 +202,11 @@ namespace emp {
     }
 
   public:
-    AvidaGP(Ptr<const inst_lib_t> _ilib)
-      : inst_lib(_ilib), genome(), regs(), inputs(), outputs(), stacks(), fun_starts()
-      , inst_ptr(0), scope_stack(), reg_stack(), call_stack(), errors(0), traits()
-    {
+    AvidaGP() : genome(), regs(), inputs(), outputs(), stacks(), fun_starts()
+              , inst_ptr(0), scope_stack(), reg_stack(), call_stack(), errors(0), traits() {
       scope_stack.emplace_back(0, ScopeType::ROOT, 0);  // Initial scope.
       Reset();
     }
-    AvidaGP(inst_lib_t & _ilib) : AvidaGP(&_ilib) { ; }
-    AvidaGP() : AvidaGP(DefaultInstLib()) { ; }
     AvidaGP(const AvidaGP &) = default;
     AvidaGP(AvidaGP &&) = default;
     ~AvidaGP() { ; }
@@ -206,97 +228,51 @@ namespace emp {
         stacks[i].resize(0);
         fun_starts[i] = -1;
       }
-      inst_ptr = 0;           // Move IP back to beginning
-      scope_stack.resize(1);  // Reset to outermost scope.
-      reg_stack.resize(0);    // Clear saved registers.
-      call_stack.resize(0);   // Clear call history.
-      errors = 0;             // Clear all errors.
-     }
+      errors = 0;
+      ResetIP();
+    }
 
     /// Reset the instruction pointer to the beginning of the genome AND reset scope.
     void ResetIP() {
       inst_ptr = 0;
       while (scope_stack.size() > 1) ExitScope();  // Forcibly exit all scopes except root.
-      // Restore all remaining backed-up registers (likely backed up in outer-most scope).
-      while (reg_stack.size()) {
-        regs[reg_stack.back().reg_id] = reg_stack.back().value;
-        reg_stack.pop_back();
-      }
       call_stack.resize(0);
     }
 
     // Accessors
-    Ptr<const inst_lib_t> GetInstLib() const { return inst_lib; }
     inst_t GetInst(size_t pos) const { return genome[pos]; }
     const genome_t & GetGenome() const { return genome; }
     double GetReg(size_t id) const { return regs[id]; }
-    double GetInput(int id) const { return Find(inputs, id, 0.0); }
-    const std::unordered_map<int,double> & GetInputs() const { return inputs; }
-    size_t GetNumInputs() const { return inputs.size(); }
+    size_t GetIP() const { return inst_ptr; }
     double GetOutput(int id) const { return Find(outputs, id, 0.0); }
     const std::unordered_map<int,double> & GetOutputs() const { return outputs; }
     size_t GetNumOutputs() const { return outputs.size(); }
-    const stack_t & GetStack(size_t id) const { return stacks[id]; }
-    int GetFunStart(size_t id) const { return fun_starts[id]; }
-    size_t GetIP() const { return inst_ptr; }
-    emp::vector<ScopeInfo> GetScopeStack() const { return scope_stack; }
-    size_t CurScope() const { return scope_stack.back().scope; }
-    ScopeType CurScopeType() const { return scope_stack.back().type; }
-    ScopeType GetScopeType(size_t id) { return inst_lib->GetScopeType(id); }
-    emp::vector<RegBackup> GetRegStack() const { return reg_stack; }
-    emp::vector<size_t> GetCallStack() const { return call_stack; }
-    size_t GetNumErrors() const { return errors; }
     double GetTrait(size_t id) const { return traits[id]; }
     const emp::vector<double> &  GetTraits() { return traits; }
     size_t GetNumTraits() const { return traits.size(); }
 
     void SetInst(size_t pos, const inst_t & inst) { genome[pos] = inst; }
-    void SetInst(size_t pos, size_t id, size_t a0=0, size_t a1=0, size_t a2=0) {
+    void SetInst(size_t pos, InstID id, size_t a0=0, size_t a1=0, size_t a2=0) {
       genome[pos].Set(id, a0, a1, a2);
     }
     void SetGenome(const genome_t & g) { genome = g; }
-    void SetReg(size_t id, double val) { regs[id] = val; }
     void SetInput(int input_id, double value) { inputs[input_id] = value; }
     void SetInputs(const std::unordered_map<int,double> & vals) { inputs = vals; }
     void SetInputs(std::unordered_map<int,double> && vals) { inputs = std::move(vals); }
-    void SetOutput(int output_id, double value) { outputs[output_id] = value; }
-    void SetOutputs(const std::unordered_map<int,double> & vals) { outputs = vals; }
-    void SetOutputs(std::unordered_map<int,double> && vals) { outputs = std::move(vals); }
-    double PopStack(size_t id) {
-      if (stacks[id].size() == 0) return 0.0;
-      double out = stacks[id].back();
-      stacks[id].pop_back();
-      return out;
-    }
-    void PushStack(size_t id, double value) {
-      if (stacks[id].size() >= STACK_CAP) return;
-      stacks[id].push_back(value);
-    }
-    void SetFunStart(size_t id, int value) { fun_starts[id] = value; }
-    void SetIP(size_t pos) { inst_ptr = pos; }
-    void PushRegInfo(size_t scope_id, size_t reg_id) {
-      reg_stack.emplace_back(scope_id, reg_id, regs[reg_id]);
-    }
-    void PushCallInfo(size_t pos) { call_stack.push_back(pos); }
-    void IncErrors() { errors++; }
     void SetTrait(size_t id, double val) {
       if (id >= traits.size()) traits.resize(id+1, 0.0);
       traits[id] = val;
     }
     void PushTrait(double val) { traits.push_back(val); }
 
-    inst_t GetRandomInst(Random & rand) {
-      return inst_t(rand.GetUInt(inst_lib->GetSize()),
-                    rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE));
+    static inst_t GetRandomInst(Random & rand) {
+      return inst_t((InstID) rand.GetUInt((uint32_t) InstID::Unknown),
+              rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE));
     }
 
     void RandomizeInst(size_t pos, Random & rand) { SetInst(pos, GetRandomInst(rand) ); }
 
-    void PushInst(size_t id, size_t a0=0, size_t a1=0, size_t a2=0) {
-      genome.emplace_back(id, a0, a1, a2);
-    }
-    void PushInst(const std::string & name, size_t a0=0, size_t a1=0, size_t a2=0) {
-      size_t id = inst_lib->GetID(name);
+    void PushInst(InstID id, size_t a0=0, size_t a1=0, size_t a2=0) {
       genome.emplace_back(id, a0, a1, a2);
     }
     void PushInst(const Instruction & inst) { genome.emplace_back(inst); }
@@ -311,23 +287,19 @@ namespace emp {
     bool Load(std::istream & input);
 
     /// Process a specified instruction, provided by the caller.
-    void ProcessInst(const inst_t & inst) { inst_lib->ProcessInst(*this, inst); }
+    void ProcessInst(const inst_t & inst);
 
     /// Determine the scope associated with a particular instruction.
-    size_t InstScope(const inst_t & inst) const;
+    static size_t InstScope(const inst_t & inst);
 
     /// Process the NEXT instruction pointed to be the instruction pointer
-    void SingleProcess() {
-      if (inst_ptr >= genome.size()) ResetIP();
-      inst_lib->ProcessInst(*this, genome[inst_ptr]);
-      inst_ptr++;
-    }
+    void SingleProcess();
 
     /// Process the next SERIES of instructions, directed by the instruction pointer.
     void Process(size_t num_inst) { for (size_t i = 0; i < num_inst; i++) SingleProcess(); }
 
     /// Print out a single instruction, with its arguments.
-    void PrintInst(const inst_t & inst, std::ostream & os=std::cout) const;
+    static void PrintInst(const inst_t & inst, std::ostream & os=std::cout);
 
     /// Print out this program.
     void PrintGenome(std::ostream & os=std::cout) const;
@@ -349,104 +321,129 @@ namespace emp {
       of.close();
     }
 
-
-    /// Instructions
-    static void Inst_Inc(AvidaGP & hw, const arg_set_t & args) { ++hw.regs[args[0]]; }
-    static void Inst_Dec(AvidaGP & hw, const arg_set_t & args) { --hw.regs[args[0]]; }
-    static void Inst_Not(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[0]] = (hw.regs[args[0]] == 0.0); }
-    static void Inst_SetReg(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[0]] = (double) args[1]; }
-    static void Inst_Add(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = hw.regs[args[0]] + hw.regs[args[1]]; }
-    static void Inst_Sub(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = hw.regs[args[0]] - hw.regs[args[1]]; }
-    static void Inst_Mult(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = hw.regs[args[0]] * hw.regs[args[1]]; }
-
-    static void Inst_Div(AvidaGP & hw, const arg_set_t & args) {
-      const double denom = hw.regs[args[1]];
-      if (denom == 0.0) ++hw.errors;
-      else hw.regs[args[2]] = hw.regs[args[0]] / denom;
-    }
-
-    static void Inst_Mod(AvidaGP & hw, const arg_set_t & args) {
-      const double base = hw.regs[args[1]];
-      if (base == 0.0) ++hw.errors;
-      else hw.regs[args[2]] = hw.regs[args[0]] / base;
-    }
-
-    static void Inst_TestEqu(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = (hw.regs[args[0]] == hw.regs[args[1]]); }
-    static void Inst_TestNEqu(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = (hw.regs[args[0]] != hw.regs[args[1]]); }
-    static void Inst_TestLess(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = (hw.regs[args[0]] < hw.regs[args[1]]); }
-
-    static void Inst_If(AvidaGP & hw, const arg_set_t & args) { // args[0] = test, args[1] = scope
-      if (hw.UpdateScope(args[1]) == false) return;      // If previous scope is unfinished, stop!
-      if (hw.regs[args[0]] == 0.0) hw.BypassScope(args[1]); // If test fails, move to scope end.
-    }
-
-    static void Inst_While(AvidaGP & hw, const arg_set_t & args) {
-      // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
-      if (hw.UpdateScope(args[1], ScopeType::LOOP) == false) return;
-      if (hw.regs[args[0]] == 0.0) hw.BypassScope(args[1]); // If test fails, move to scope end.
-    }
-
-    static void Inst_Countdown(AvidaGP & hw, const arg_set_t & args) {  // Same as while, but auto-decriments test each loop.
-      // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
-      if (hw.UpdateScope(args[1], ScopeType::LOOP) == false) return;
-      if (hw.regs[args[0]] == 0.0) hw.BypassScope(args[1]);   // If test fails, move to scope end.
-      else hw.regs[args[0]]--;
-    }
-
-    static void Inst_Break(AvidaGP & hw, const arg_set_t & args) { hw.BypassScope(args[0]); }
-    static void Inst_Scope(AvidaGP & hw, const arg_set_t & args) { hw.UpdateScope(args[0]); }
-
-    static void Inst_Define(AvidaGP & hw, const arg_set_t & args) {
-      if (hw.UpdateScope(args[1]) == false) return; // Update which scope we are in.
-      hw.fun_starts[args[0]] = (int) hw.inst_ptr;     // Record where function should be exectuted.
-      hw.BypassScope(args[1]);                     // Skip over the function definition for now.
-    }
-
-    static void Inst_Call(AvidaGP & hw, const arg_set_t & args) {
-      // Make sure function exists and is still in place.
-      size_t def_pos = (size_t) hw.fun_starts[args[0]];
-      if (def_pos >= hw.genome.size()
-          || hw.GetScopeType(hw.genome[def_pos].id) != ScopeType::FUNCTION) return;
-
-      // Go back into the function's original scope (call is in that scope)
-      size_t fun_scope = hw.genome[def_pos].args[1];
-      if (hw.UpdateScope(fun_scope, ScopeType::FUNCTION) == false) return;
-      hw.call_stack.push_back(hw.inst_ptr+1);        // Back up the call position
-      hw.inst_ptr = def_pos+1;                       // Jump to the function body (will adavance)
-    }
-
-    static void Inst_Push(AvidaGP & hw, const arg_set_t & args) { hw.PushStack(args[1], hw.regs[args[0]]); }
-    static void Inst_Pop(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[1]] = hw.PopStack(args[0]); }
-
-    static void Inst_Input(AvidaGP & hw, const arg_set_t & args) {
-      // Determine the input ID and grab it if it exists; if not, return 0.0
-      int input_id = (int) hw.regs[ args[0] ];
-      hw.regs[args[1]] = Find(hw.inputs, input_id, 0.0);
-    }
-
-    static void Inst_Output(AvidaGP & hw, const arg_set_t & args) {
-      // Save the date in the target reg to the specified output position.
-      int output_id = (int) hw.regs[ args[1] ];  // Grab ID from register.
-      hw.outputs[output_id] = hw.regs[args[0]];     // Copy target reg to appropriate output.
-    }
-
-    static void Inst_CopyVal(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[1]] = hw.regs[args[0]]; }
-
-    static void Inst_ScopeReg(AvidaGP & hw, const arg_set_t & args) {
-      hw.reg_stack.emplace_back(hw.CurScope(), args[0], hw.regs[args[0]]);
-    }
-
-    static Ptr<const inst_lib_t> DefaultInstLib();
+    static const InstLib<Instruction> & GetInstLib();
   };
 
-  size_t AvidaGP::InstScope(const inst_t & inst) const {
-    if (inst_lib->GetScopeType(inst.id) == ScopeType::NONE) return 0;
-    return inst.args[ inst_lib->GetScopeArg(inst.id) ] + 1;
+  void AvidaGP::ProcessInst(const inst_t & inst) {
+    switch (inst.id) {
+    case InstID::Inc: ++regs[inst.args[0]]; break;
+    case InstID::Dec: --regs[inst.args[0]]; break;
+    case InstID::Not: regs[inst.args[0]] = (regs[inst.args[0]] == 0.0); break;
+    case InstID::SetReg: regs[inst.args[0]] = (double) inst.args[1]; break;
+    case InstID::Add: regs[inst.args[2]] = regs[inst.args[0]] + regs[inst.args[1]]; break;
+    case InstID::Sub: regs[inst.args[2]] = regs[inst.args[0]] - regs[inst.args[1]]; break;
+    case InstID::Mult: regs[inst.args[2]] = regs[inst.args[0]] * regs[inst.args[1]]; break;
+
+    case InstID::Div: {
+      const double denom = regs[inst.args[1]];
+      if (denom == 0.0) ++errors;
+      else regs[inst.args[2]] = regs[inst.args[0]] / denom;
+    }
+      break;
+
+    case InstID::Mod: {
+      const double base = regs[inst.args[1]];
+      if (base == 0.0) ++errors;
+      else regs[inst.args[2]] = regs[inst.args[0]] / base;
+    }
+      break;
+
+    case InstID::TestEqu: regs[inst.args[2]] = (regs[inst.args[0]] == regs[inst.args[1]]); break;
+    case InstID::TestNEqu: regs[inst.args[2]] = (regs[inst.args[0]] != regs[inst.args[1]]); break;
+    case InstID::TestLess: regs[inst.args[2]] = (regs[inst.args[0]] < regs[inst.args[1]]); break;
+
+    case InstID::If: // args[0] = test, args[1] = scope
+      if (UpdateScope(inst.args[1]) == false) break;      // If previous scope is unfinished, stop!
+      if (regs[inst.args[0]] == 0.0) BypassScope(inst.args[1]); // If test fails, move to scope end.
+      break;                                              // Continue in current code.
+
+    case InstID::While:
+      // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
+      if (UpdateScope(inst.args[1], ScopeType::LOOP) == false) break;
+      if (regs[inst.args[0]] == 0.0) BypassScope(inst.args[1]);   // If test fails, move to scope end.
+      break;
+
+    case InstID::Countdown:  // Same as while, but auto-decriments test each loop.
+      // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
+      if (UpdateScope(inst.args[1], ScopeType::LOOP) == false) break;
+      if (regs[inst.args[0]] == 0.0) BypassScope(inst.args[1]);   // If test fails, move to scope end.
+      else regs[inst.args[0]]--;
+      break;
+
+    case InstID::Break: BypassScope(inst.args[0]); break;
+    case InstID::Scope: UpdateScope(inst.args[0]); break;
+
+    case InstID::Define: {
+        if (UpdateScope(inst.args[1]) == false) break; // Update which scope we are in.
+        fun_starts[inst.args[0]] = (int) inst_ptr;     // Record where function should be exectuted.
+        BypassScope(inst.args[1]);                     // Skip over the function definition for now.
+      }
+      break;
+    case InstID::Call: {
+        size_t def_pos = (size_t) fun_starts[inst.args[0]];
+        // Make sure function exists and is still in place.
+        if (def_pos >= genome.size() || genome[def_pos].id != InstID::Define) break;
+        // Go back into the function's original scope (call is in that scope)
+        size_t fun_scope = genome[def_pos].args[1];
+        if (UpdateScope(fun_scope, ScopeType::FUNCTION) == false) break;
+        call_stack.push_back(inst_ptr+1);                 // Back up the call position
+        inst_ptr = def_pos+1;                             // Jump to the function body (will adavance)
+      }
+      break;
+
+    case InstID::Push: PushStack(inst.args[1], regs[inst.args[0]]); break;
+    case InstID::Pop: regs[inst.args[1]] = PopStack(inst.args[0]); break;
+    case InstID::Input: {
+        // Determine the input ID and grab it if it exists; if not, return 0.0
+        int input_id = (int) regs[ inst.args[0] ];
+        regs[inst.args[1]] = Find(inputs, input_id, 0.0);
+      }
+      break;
+    case InstID::Output: {
+        // Save the date in the target reg to the specified output position.
+        int output_id = (int) regs[ inst.args[1] ];  // Grab ID from register.
+        outputs[output_id] = regs[inst.args[0]];     // Copy target reg to appropriate output.
+      }
+      break;
+    case InstID::CopyVal: regs[inst.args[1]] = regs[inst.args[0]]; break;
+
+    case InstID::ScopeReg:
+      reg_stack.emplace_back(CurScope(), inst.args[0], regs[inst.args[0]]);
+      break;
+
+    case InstID::Unknown:
+    default:
+      // This case should never happen!
+      emp_assert(false, "Unknown instruction being exectuted!");
+    };
   }
 
-  void AvidaGP::PrintInst(const inst_t & inst, std::ostream & os) const {
-    os << inst_lib->GetName(inst.id);
-    const size_t num_args = inst_lib->GetNumArgs(inst.id);
+  size_t AvidaGP::InstScope(const inst_t & inst) {
+    switch (inst.id) {
+    case InstID::If:
+    case InstID::While:
+    case InstID::Countdown:  // Same as while, but auto-decriments test each loop.
+    case InstID::Define:
+      return inst.args[1]+1;
+
+    case InstID::Scope:
+      return inst.args[0]+1;
+
+    default:
+      return 0;
+    };
+  }
+
+  void AvidaGP::SingleProcess() {
+    if (inst_ptr >= genome.size()) ResetIP();
+    ProcessInst( genome[inst_ptr] );
+    inst_ptr++;
+  }
+
+  void AvidaGP::PrintInst(const inst_t & inst, std::ostream & os) {
+    const auto & inst_lib = GetInstLib();
+    os << inst_lib.GetName(inst.id);
+    const size_t num_args = inst_lib.GetNumArgs(inst.id);
     for (size_t i = 0; i < num_args; i++) {
       os << ' ' << inst.args[i];
     }
@@ -532,9 +529,7 @@ namespace emp {
     if (inst_ptr != next_inst) os << "(-> " << next_inst << ")";
     os << " scope:" << CurScope()
        << " (";
-    if (next_inst < genome.size()) { // For interpreter mode
-        PrintInst(genome[next_inst], os);
-    }
+    PrintInst(genome[next_inst], os);
     os << ")"
        << " errors: " << errors
        << std::endl;
@@ -547,43 +542,47 @@ namespace emp {
   }
 
   /// This static function can be used to access the generic AvidaGP instruction library.
-  Ptr<const InstLib<AvidaGP>> AvidaGP::DefaultInstLib() {
-    static inst_lib_t inst_lib;
+  const InstLib<AvidaGP::Instruction> & AvidaGP::GetInstLib() {
+    static InstLib<Instruction> inst_lib;
+    static bool init = false;
 
-    if (inst_lib.GetSize() == 0) {
-      inst_lib.AddInst("Inc", Inst_Inc, 1, "Increment value in reg Arg1");
-      inst_lib.AddInst("Dec", Inst_Dec, 1, "Decrement value in reg Arg1");
-      inst_lib.AddInst("Not", Inst_Not, 1, "Logically toggle value in reg Arg1");
-      inst_lib.AddInst("SetReg", Inst_SetReg, 2, "Set reg Arg1 to numerical value Arg2");
-      inst_lib.AddInst("Add", Inst_Add, 3, "regs: Arg3 = Arg1 + Arg2");
-      inst_lib.AddInst("Sub", Inst_Sub, 3, "regs: Arg3 = Arg1 - Arg2");
-      inst_lib.AddInst("Mult", Inst_Mult, 3, "regs: Arg3 = Arg1 * Arg2");
-      inst_lib.AddInst("Div", Inst_Div, 3, "regs: Arg3 = Arg1 / Arg2");
-      inst_lib.AddInst("Mod", Inst_Mod, 3, "regs: Arg3 = Arg1 % Arg2");
-      inst_lib.AddInst("TestEqu", Inst_TestEqu, 3, "regs: Arg3 = (Arg1 == Arg2)");
-      inst_lib.AddInst("TestNEqu", Inst_TestNEqu, 3, "regs: Arg3 = (Arg1 != Arg2)");
-      inst_lib.AddInst("TestLess", Inst_TestLess, 3, "regs: Arg3 = (Arg1 < Arg2)");
-      inst_lib.AddInst("If", Inst_If, 2, "If reg Arg1 != 0, scope -> Arg2; else skip scope", ScopeType::BASIC, 1);
-      inst_lib.AddInst("While", Inst_While, 2, "Until reg Arg1 != 0, repeat scope Arg2; else skip", ScopeType::LOOP, 1);
-      inst_lib.AddInst("Countdown", Inst_Countdown, 2, "Countdown reg Arg1 to zero; scope to Arg2", ScopeType::LOOP, 1);
-      inst_lib.AddInst("Break", Inst_Break, 1, "Break out of scope Arg1");
-      inst_lib.AddInst("Scope", Inst_Scope, 1, "Enter scope Arg1", ScopeType::BASIC, 0);
-      inst_lib.AddInst("Define", Inst_Define, 2, "Build function Arg1 in scope Arg2", ScopeType::FUNCTION, 1);
-      inst_lib.AddInst("Call", Inst_Call, 1, "Call previously defined function Arg1");
-      inst_lib.AddInst("Push", Inst_Push, 2, "Push reg Arg1 onto stack Arg2");
-      inst_lib.AddInst("Pop", Inst_Pop, 2, "Pop stack Arg1 into reg Arg2");
-      inst_lib.AddInst("Input", Inst_Input, 2, "Pull next value from input Arg1 into reg Arg2");
-      inst_lib.AddInst("Output", Inst_Output, 2, "Push reg Arg1 into output Arg2");
-      inst_lib.AddInst("CopyVal", Inst_CopyVal, 2, "Copy reg Arg1 into reg Arg2");
-      inst_lib.AddInst("ScopeReg", Inst_ScopeReg, 1, "Backup reg Arg1; restore at end of scope");
+    if (!init) {
+      inst_lib.AddInst(InstID::Inc, "Inc", 1, "Increment value in reg Arg1");
+      inst_lib.AddInst(InstID::Dec, "Dec", 1, "Decrement value in reg Arg1");
+      inst_lib.AddInst(InstID::Not, "Not", 1, "Logically toggle value in reg Arg1");
+      inst_lib.AddInst(InstID::SetReg, "SetReg", 2, "Set reg Arg1 to numerical value Arg2");
+      inst_lib.AddInst(InstID::Add, "Add", 3, "regs: Arg3 = Arg1 + Arg2");
+      inst_lib.AddInst(InstID::Sub, "Sub", 3, "regs: Arg3 = Arg1 - Arg2");
+      inst_lib.AddInst(InstID::Mult, "Mult", 3, "regs: Arg3 = Arg1 * Arg2");
+      inst_lib.AddInst(InstID::Div, "Div", 3, "regs: Arg3 = Arg1 / Arg2");
+      inst_lib.AddInst(InstID::Mod, "Mod", 3, "regs: Arg3 = Arg1 % Arg2");
+      inst_lib.AddInst(InstID::TestEqu, "TestEqu", 3, "regs: Arg3 = (Arg1 == Arg2)");
+      inst_lib.AddInst(InstID::TestNEqu, "TestNEqu", 3, "regs: Arg3 = (Arg1 != Arg2)");
+      inst_lib.AddInst(InstID::TestLess, "TestLess", 3, "regs: Arg3 = (Arg1 < Arg2)");
+      inst_lib.AddInst(InstID::If, "If", 2, "If reg Arg1 != 0, scope -> Arg2; else skip scope");
+      inst_lib.AddInst(InstID::While, "While", 2, "Until reg Arg1 != 0, repeat scope Arg2; else skip");
+      inst_lib.AddInst(InstID::Countdown, "Countdown", 2, "Countdown reg Arg1 to zero; scope to Arg2");
+      inst_lib.AddInst(InstID::Break, "Break", 1, "Break out of scope Arg1");
+      inst_lib.AddInst(InstID::Scope, "Scope", 1, "Enter scope Arg1");
+      inst_lib.AddInst(InstID::Define, "Define", 2, "Build function Arg1 in scope Arg2");
+      inst_lib.AddInst(InstID::Call, "Call", 1, "Call previously defined function Arg1");
+      inst_lib.AddInst(InstID::Push, "Push", 2, "Push reg Arg1 onto stack Arg2");
+      inst_lib.AddInst(InstID::Pop, "Pop", 2, "Pop stack Arg1 into reg Arg2");
+      inst_lib.AddInst(InstID::Input, "Input", 2, "Pull next value from input Arg1 into reg Arg2");
+      inst_lib.AddInst(InstID::Output, "Output", 2, "Push reg Arg1 into output Arg2");
+      inst_lib.AddInst(InstID::CopyVal, "CopyVal", 2, "Copy reg Arg1 into reg Arg2");
+      inst_lib.AddInst(InstID::ScopeReg, "ScopeReg", 1, "Backup reg Arg1; restore at end of scope");
+      inst_lib.AddInst(InstID::Unknown, "Unknown", 0, "Error: Unknown instruction used.");
 
-      for (size_t i = 0; i < CPU_SIZE; i++) {
+      for (size_t i = 0; i < AvidaGP::CPU_SIZE; i++) {
         inst_lib.AddArg(to_string((int)i), i);                   // Args can be called by value
         inst_lib.AddArg(to_string("Reg", 'A'+(char)i), i);  // ...or as a register.
       }
+
+      init = true;
     }
 
-    return &inst_lib;
+    return inst_lib;
   }
 
 }

@@ -96,9 +96,9 @@ namespace evo {
       return total;
     }
 
-    /// Get the fitness of a whole  bitstring
+    /// Get the fitness of a whole bitstring (pass by value so can be modified.)
     double GetFitness(BitVector genome) const {
-      emp_assert(genome.GetSize() == N);
+      emp_assert(genome.GetSize() == N, genome.GetSize(), N);
 
       // Use a double-length genome to easily handle wrap-around.
       genome.Resize(N*2);
