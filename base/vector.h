@@ -56,6 +56,9 @@ namespace emp {
     vector(size_t size, const T & val) : stdv_t(size, val) { emp_assert(size < MAX_SIZE, size); }
     vector(std::initializer_list<T> in_list) : stdv_t(in_list) { ; }
     vector(const stdv_t & in) : stdv_t(in) { ; }         // Emergency fallback conversion.
+    template <typename InputIt>
+    vector(InputIt first, InputIt last) : stdv_t(first, last){;}
+
 
     // operator stdv_t &() { return v; }
     // operator const stdv_t &() const { return v; }

@@ -741,6 +741,10 @@ namespace evo {
               next_orgs.push_back(org_id);   // Same as cur max fitness -- save this org too.
             }
           }
+          if (next_orgs.size() == 0) {
+              next_orgs.resize(0);
+              break;
+          }
           // Make next_orgs into new cur_orgs; make cur_orgs allocated space for next_orgs.
           std::swap(cur_orgs, next_orgs);
           next_orgs.resize(0);

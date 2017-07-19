@@ -13,7 +13,7 @@ int main() {
     emp::AvidaGP cpu;
     cpu.PrintState(std::cout);
 
-    const emp::InstLib<emp::AvidaGP::Instruction> & lib = cpu.GetInstLib();
+    emp::Ptr<const emp::InstLib<emp::AvidaGP> > lib = cpu.GetInstLib();
     std::cout << ">> ";
     std::string line; //stores the most recent line of input
     while(true) {
@@ -24,7 +24,7 @@ int main() {
 
         emp::vector<std::string> command = emp::slice(line, ' ');
 
-        if (!lib.IsInst(command[0])) {
+        if (!lib->IsInst(command[0])) {
             std::cout << "Unknown instruction" << std::endl;
             std::cout << ">> ";
             continue;
@@ -32,9 +32,9 @@ int main() {
 
         emp::vector<std::string> string_args(command.begin()+1, command.end());
         emp::vector<int> args = emp::from_strings<int>(string_args);
-        emp::AvidaGP::Instruction::id_t inst = lib.GetID(command[0]);
+        size_t inst = lib->GetID(command[0]);
 
-        if (lib.GetNumArgs(inst) != args.size()) {
+        if (lib->GetNumArgs(inst) != args.size()) {
             std::cout << "Wrong number of args" << std::endl;
             std::cout << ">> ";
             continue;

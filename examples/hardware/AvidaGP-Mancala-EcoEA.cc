@@ -5,6 +5,7 @@
 #include <iostream>
 #include <valarray>
 
+#include "../../config/ArgManager.h"
 #include "../../games/Mancala.h"
 #include "../../hardware/AvidaGP.h"
 #include "../../hardware/InstLib.h"
@@ -13,11 +14,19 @@
 
 #include "../../../eco-ea-mancala/source/TestcaseSet.h"
 
-constexpr size_t POP_SIZE = 200;
-constexpr size_t GENOME_SIZE = 100;
-constexpr size_t EVAL_TIME = 500;
-constexpr size_t UPDATES = 1000;
-constexpr size_t TOURNY_SIZE = 4;
+
+EMP_BUILD_CONFIG( EcoConfig,
+  GROUP(DEFAULT, "Default settings for NK model"),
+  VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
+  VALUE(POP_SIZE, uint32_t, 200, "Number of organisms in the popoulation."),
+  VALUE(GENOME_SIZE, uint32_t, 100, "Length of genome."),
+  VALUE(UPDATES, uint32_t, 100, "How many generations should we process?"),
+  VALUE(EVAL_TIME, uint32_t, 500, "How many bit positions should be randomized?"),
+  VALUE(TOURNY_SIZE, uint32_t, 4, "How many bit positions should be randomized?"),
+  VALUE(SELECTION, std::string, "ecogradient", "Which selection function?")
+)
+
+EcoConfig config;
 
 // Determine the next move of a human player.
 size_t EvalMove(emp::Mancala & game, std::ostream & os=std::cout, std::istream & is=std::cin) {
@@ -47,7 +56,7 @@ size_t EvalMove(emp::Mancala & game, emp::AvidaGP & org) {
   org.SetInputs(game.AsInput(game.GetCurPlayer()));
 
   // Run the code.
-  org.Process(EVAL_TIME);
+  org.Process(config.EVAL_TIME());
 
   // Determine the chosen move.
   int best_move = 0;
@@ -116,10 +125,24 @@ double EvalGame(emp::AvidaGP & org, bool cur_player=0) {
 }
 
 
-int main()
+int main(int argc, char* argv[])
 {
   emp::Random random;
   emp::evo::EAWorld<emp::AvidaGP> world(random, "AvidaWorld");
+
+  config.Read("Eco.cfg");
+
+  auto args = emp::cl::ArgManager(argc, argv);
+  if (args.ProcessConfigOptions(config, std::cout, "Eco.cfg", "Eco-macros.h") == false) {
+    exit(0);
+  }
+  if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
+
+  const size_t POP_SIZE = config.POP_SIZE();
+  const size_t GENOME_SIZE = config.GENOME_SIZE();
+  const size_t EVAL_TIME = config.EVAL_TIME();
+  const size_t UPDATES = config.UPDATES();
+  const size_t TOURNY_SIZE = config.TOURNY_SIZE();
 
   // Build a random initial popoulation.
   for (size_t i = 0; i < POP_SIZE; i++) {
@@ -128,7 +151,7 @@ int main()
     world.Insert(cpu);
   }
 
-  TestcaseSet<14> t = TestcaseSet<14>("extra_move_testcases.csv", &random);
+  TestcaseSet<14> t = TestcaseSet<14>("all_testcases.csv", &random);
 
   // Extra moves
   std::function<std::set<int>(emp::array<int, 14>)> f1 =
@@ -332,6 +355,17 @@ int main()
       return s;
   };
 
+  // Valid move
+  std::function<std::set<int>(emp::array<int, 14>)> f15 =
+      [](emp::array<int,14> test_case){
+      std::set<int> s = std::set<int>();
+      for (int i = 0; i < 6; i++){
+          if (test_case[i] > 0) {
+              s.insert(i);
+          }
+      }
+      return s;
+  };
 
   t.AddGroup(f1);
   t.AddGroup(f2);
@@ -347,9 +381,10 @@ int main()
   t.AddGroup(f12);
   t.AddGroup(f13);
   t.AddGroup(f14);
+  t.AddGroup(f15);
 
   // Setup the mutation function.
-  world.SetDefaultMutateFun( [](emp::AvidaGP* org, emp::Random& random) {
+  world.SetDefaultMutateFun( [GENOME_SIZE](emp::AvidaGP* org, emp::Random& random) {
       uint32_t num_muts = random.GetUInt(4);  // 0 to 3 mutations.
       for (uint32_t m = 0; m < num_muts; m++) {
         const uint32_t pos = random.GetUInt(GENOME_SIZE);
@@ -381,6 +416,15 @@ int main()
     };
   }
 
+  emp::vector< std::function<double(emp::AvidaGP*)> > lexicase_fit_set(t.GetNFuncs()+1);
+  for (size_t fun_id = 0; fun_id < t.GetNFuncs(); fun_id++) {
+    // Setup the fitness function.
+    lexicase_fit_set[fun_id] = [fun_id, &best_possible](emp::AvidaGP * org) {
+      return org->GetTrait(fun_id)/best_possible[fun_id];
+    };
+  }
+
+  lexicase_fit_set[t.GetNFuncs()] = fit_fun;
 
   std::function<void(emp::AvidaGP*)> calc_resources = [&choices, &t](emp::AvidaGP * org){
       emp::Mancala game(0);
@@ -428,12 +472,16 @@ int main()
     }
 
     // Keep the best individual.
-    world.EliteSelect(fit_fun, 1, 1);
+    // world.EliteSelect(fit_fun, 1, 1);
 
     // Run a tournament for each spot.
-    // world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE-1);
-    // world.LexicaseSelect(fit_set, POP_SIZE-1);
-    world.EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
+    if (config.SELECTION() == "ecogradient") {
+        world.EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE);
+    } else if (config.SELECTION() == "tournament") {
+        world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE);
+    } else if (config.SELECTION() == "lexicase") {
+        world.LexicaseSelect(lexicase_fit_set, POP_SIZE);
+    }
     world.Update();
     std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
 
