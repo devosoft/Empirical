@@ -31,6 +31,7 @@
 
 #include "../base/Ptr.h"
 #include "../base/vector.h"
+#include "../data/DataFile.h"
 #include "../meta/reflection.h"
 #include "../tools/map_utils.h"
 #include "../tools/Random.h"
@@ -71,10 +72,11 @@ namespace emp {
     emp::vector<Ptr<genotype_t>> next_genotypes; //< Genotypes for corresponding orgs in next_pop.
 
     // Configuration settings
-    std::string name;         // Name of this world (for use in configuration.)
-    bool cache_on;            // Should we be caching fitness values?
-    size_t size_x;            // If a grid, track width; if pools, track pool size
-    size_t size_y;            // If a grid, track height; if pools, track num pools.
+    std::string name;             // Name of this world (for use in configuration.)
+    bool cache_on;                // Should we be caching fitness values?
+    size_t size_x;                // If a grid, track width; if pools, track pool size
+    size_t size_y;                // If a grid, track height; if pools, track num pools.
+    emp::vector<DataFile> files;  // Output files.
 
     // Configurable functions.
     fun_calc_fitness_t  fun_calc_fitness;   // Fitness function
