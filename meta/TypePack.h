@@ -1,11 +1,55 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  TypePack represents a collection of types for manipulation (typically for metaprogramming)
 //
 //  TypePacks are static structues that provide a large set of mechanisms to access and adjust
 //  the included types.
+//
+//  To create a typepack, just pass in zero or more types into the TypePack templete.
+//
+//    using my_pack = emp::TypePack<int, std::string, double>
+//
+//  After manipulations, you can apply a type pack using the apply<> member template.  E.g.,
+//
+//    my_pack::resize<5,char>::reverse::apply<std::tuple> my_tuple;
+//
+//  ...would create a tuple type using the types <char, char, double, std::string, int>.
+//
+//
+//  Member functions include (all of which are constexpr):
+//    Has<T>()          - Return true/false: Is T is part of the pack?
+//    Count<T>()        - Return number of times T is in the pack.
+//    GetID<T>()        - Return first position of T in the pack, (or -1 if none).
+//    GetSize()         - Return total number of types in this pack.
+//    IsEmpty()         - Return true/false: Is this pack empty?
+//    IsUnique()        - Return true/false: are all types in pack are distinct?
+//
+//  Type accessors:
+//    get<POS>          - Type at position POS in the pack.
+//    first_t           - Type of first position in the pack.
+//    last_t            - Type of last position in the pack.
+//    select<Ps...>     - Create a new pack with types from selected position.
+//
+//  Type manipulations:
+//    set<POS, T>       - Change types at position POS to T.
+//    push_front<Ts...> - Add any number of types Ts to the front of the pack.
+//    push_back<Ts...>  - Add any number of types Ts to the back of the pack.
+//    pop               - Pack with first type missing.
+//    popN<N>           - Pack with first N types missing.
+//    shrink<N>         - Pack with ONLY first N types.
+//    resize<N,D>       - Resize pack to N types; if N greater than current size, pad with D.
+//    merge<P>          - Append all of pack P to the end of this pack.
+//    reverse           - Reverse the order of types in this pack.
+//    rotate            - Move the first type in pack to the end.
+//
+//  Applications:
+//    apply<T>          - Take teplate T and apply these types as its arguments.
+//    to_function_t<T>  - Convert to a function type, with return type T and arg types from pack.
+//    filter<FILTER>    - Keep only those types that can legally be used as an argument on FILTER
+//    find<FILTER>      - Convert to first type that can legally be used as an argument on FILTER
+//    wrap<WRAPPER>     - Convert to TypePack where all members are run through WRAPPER
 //
 //
 //  Developer notes:
@@ -95,7 +139,7 @@ namespace emp {
   template <typename T1, typename... Ts>
   struct TypePack<T1, Ts...> {
     template <typename T> constexpr static bool Has() { return has_type<T,T1,Ts...>(); }
-    template <typename T> constexpr static int Count() { return count_type<T,T1,Ts...>(); }
+    template <typename T> constexpr static size_t Count() { return count_type<T,T1,Ts...>(); }
 
     // Type ID's can be retrieved with
     //   GetID<my_type>() to get the ID associated with specific type my_type
@@ -153,7 +197,7 @@ namespace emp {
   template <>
   struct TypePack<> {
     template <typename T> constexpr static bool Has() { return false; }
-    template <typename T> constexpr static int Count() { return 0; }
+    template <typename T> constexpr static size_t Count() { return 0; }
 
     // GetID() NOT IMPLEMENTED since no ID's are available.
     constexpr static int SIZE = 0;
