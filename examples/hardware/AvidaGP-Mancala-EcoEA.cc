@@ -135,7 +135,7 @@ int main()
       [](emp::array<int,14> test_case){
       std::set<int> s = std::set<int>();
       for (int i = 0; i < 6; i++) {
-          if (test_case[i] == 6-i) {
+          if (test_case[i]%13 == 6-i) {
               s.insert(i);
           }
       }
@@ -146,7 +146,7 @@ int main()
   std::function<std::set<int>(emp::array<int, 14>)> f2 =
       [](emp::array<int,14> test_case){
       std::set<int> s = std::set<int>();
-      if (test_case[0] == 6) {
+      if (test_case[0]%13 == 6) {
           s.insert(0);
       }
       return s;
@@ -156,7 +156,7 @@ int main()
   std::function<std::set<int>(emp::array<int, 14>)> f3 =
       [](emp::array<int,14> test_case){
       std::set<int> s = std::set<int>();
-      if (test_case[1] == 5) {
+      if (test_case[1]%13 == 5) {
           s.insert(1);
       }
       return s;
@@ -166,7 +166,7 @@ int main()
   std::function<std::set<int>(emp::array<int, 14>)> f4 =
       [](emp::array<int,14> test_case){
       std::set<int> s = std::set<int>();
-      if (test_case[2] == 4) {
+      if (test_case[2]%13 == 4) {
           s.insert(2);
       }
       return s;
@@ -176,7 +176,7 @@ int main()
   std::function<std::set<int>(emp::array<int, 14>)> f5 =
       [](emp::array<int,14> test_case){
       std::set<int> s = std::set<int>();
-      if (test_case[3] == 3) {
+      if (test_case[3]%13 == 3) {
           s.insert(3);
       }
       return s;
@@ -186,7 +186,7 @@ int main()
   std::function<std::set<int>(emp::array<int, 14>)> f6 =
       [](emp::array<int,14> test_case){
       std::set<int> s = std::set<int>();
-      if (test_case[4] == 2) {
+      if (test_case[4]%13 == 2) {
           s.insert(4);
       }
       return s;
@@ -196,7 +196,7 @@ int main()
   std::function<std::set<int>(emp::array<int, 14>)> f7 =
       [](emp::array<int,14> test_case){
       std::set<int> s = std::set<int>();
-      if (test_case[5] == 1) {
+      if (test_case[5]%13 == 1) {
           s.insert(5);
       }
       return s;
@@ -208,9 +208,14 @@ int main()
       [](emp::array<int,14> test_case){
       std::set<int> s = std::set<int>();
       for (int i = 0; i < 6; i++) {
-          if (test_case[i] == 0 && test_case[i+7] != 0) {
-              for (int j = 0; j < i; j++) {
-                  if (i-j == test_case[j]) {
+          if (test_case[i] == 0 && test_case[12-i] != 0) {
+              for (int j = 0; j < i; j++){
+                  if (test_case[j] == i - j) {
+                      s.insert(j);
+                  }
+              }
+              for (int j = i+1; j < 6; j++){
+                  if (test_case[j] == 13 + i - j) {
                       s.insert(j);
                   }
               }
@@ -219,71 +224,114 @@ int main()
       return s;
   };
 
-  // Capturing pit 1
+  // Capturing pit 0
   std::function<std::set<int>(emp::array<int, 14>)> f9 =
       [](emp::array<int,14> test_case){
       std::set<int> s = std::set<int>();
-      if (test_case[1] != 0 && test_case[8] == 0 && test_case[0] == 1) {
-          s.insert(0);
+      if (test_case[0] == 0 && test_case[12] != 0) {
+          for (int i = 1; i < 6; i++){
+              if (test_case[i] == 13 - i) {
+                  s.insert(i);
+              }
+          }
+
+      }
+      return s;
+  };
+
+
+  // Capturing pit 1
+  std::function<std::set<int>(emp::array<int, 14>)> f10 =
+      [](emp::array<int,14> test_case){
+      std::set<int> s = std::set<int>();
+      if (test_case[1] == 0 && test_case[11] != 0) {
+          if (test_case[0] == 1) {
+              s.insert(0);
+          }
+          for (int i = 2; i < 6; i++){
+              if (test_case[i] == 14 - i) {
+                  s.insert(i);
+              }
+          }
+
       }
       return s;
   };
 
   // Capturing pit 2
-  std::function<std::set<int>(emp::array<int, 14>)> f10 =
+  std::function<std::set<int>(emp::array<int, 14>)> f11 =
       [](emp::array<int,14> test_case){
       std::set<int> s = std::set<int>();
-      if (test_case[2] != 0 && test_case[9] == 0) {
-          for (int j = 0; j < 2; j++) {
-              if (2-j == test_case[j]) {
-                  s.insert(j);
+      if (test_case[2] == 0 && test_case[10] != 0) {
+          for (int i = 0; i < 2; i++){
+              if (test_case[i] == 2 - i) {
+                  s.insert(i);
               }
           }
+          for (int i = 3; i < 6; i++){
+              if (test_case[i] == 15 - i) {
+                  s.insert(i);
+              }
+          }
+
       }
       return s;
   };
 
   // Capturing pit 3
-  std::function<std::set<int>(emp::array<int, 14>)> f11 =
+  std::function<std::set<int>(emp::array<int, 14>)> f12 =
       [](emp::array<int,14> test_case){
       std::set<int> s = std::set<int>();
-      if (test_case[3] != 0 && test_case[10] == 0) {
-          for (int j = 0; j < 3; j++) {
-              if (3-j == test_case[j]) {
-                  s.insert(j);
+      if (test_case[3] == 0 && test_case[9] != 0) {
+          for (int i = 0; i < 3; i++){
+              if (test_case[i] == 3 - i) {
+                  s.insert(i);
               }
           }
+          for (int i = 4; i < 6; i++){
+              if (test_case[i] == 16 - i) {
+                  s.insert(i);
+              }
+          }
+
       }
       return s;
   };
 
   // Capturing pit 4
-  std::function<std::set<int>(emp::array<int, 14>)> f12 =
+  std::function<std::set<int>(emp::array<int, 14>)> f13 =
       [](emp::array<int,14> test_case){
       std::set<int> s = std::set<int>();
-      if (test_case[4] != 0 && test_case[11] == 0) {
-          for (int j = 0; j < 4; j++) {
-              if (4-j == test_case[j]) {
-                  s.insert(j);
+      if (test_case[4] == 0 && test_case[8] != 0) {
+          for (int i = 0; i < 4; i++){
+              if (test_case[i] == 4 - i) {
+                  s.insert(i);
+              }
+          }
+          for (int i = 5; i < 6; i++){
+              if (test_case[i] == 17 - i) {
+                  s.insert(i);
+              }
+          }
+
+      }
+      return s;
+  };
+
+  // Capturing pit 5
+  std::function<std::set<int>(emp::array<int, 14>)> f14 =
+      [](emp::array<int,14> test_case){
+      std::set<int> s = std::set<int>();
+      if (test_case[5] == 0 && test_case[7] != 0) {
+          for (int i = 0; i < 5; i++){
+              if (test_case[i] == 5 - i) {
+                  s.insert(i);
               }
           }
       }
       return s;
   };
 
-  // Capturing pit 5
-  std::function<std::set<int>(emp::array<int, 14>)> f13 =
-      [](emp::array<int,14> test_case){
-      std::set<int> s = std::set<int>();
-      if (test_case[5] != 0 && test_case[12] == 0) {
-          for (int j = 0; j < 5; j++) {
-              if (5-j == test_case[j]) {
-                  s.insert(j);
-              }
-          }
-      }
-      return s;
-  };
 
   t.AddGroup(f1);
   t.AddGroup(f2);
@@ -298,6 +346,7 @@ int main()
   t.AddGroup(f11);
   t.AddGroup(f12);
   t.AddGroup(f13);
+  t.AddGroup(f14);
 
   // Setup the mutation function.
   world.SetDefaultMutateFun( [](emp::AvidaGP* org, emp::Random& random) {
