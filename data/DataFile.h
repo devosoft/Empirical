@@ -29,9 +29,9 @@ namespace emp {
     std::ostream * os;
     FunctionSet<fun_t> funs;
 
-    std::string line_begin; // What should we print at the start of each line?
-    std::string line_spacer;     // What should we print between entries?
-    std::string line_end;   // What should we print at the end of each line?
+    std::string line_begin;   // What should we print at the start of each line?
+    std::string line_spacer;  // What should we print between entries?
+    std::string line_end;     // What should we print at the end of each line?
 
   public:
     DataFile(const std::string & filename,
