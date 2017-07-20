@@ -9,13 +9,13 @@
 //
 //  To create a typepack, just pass in zero or more types into the TypePack templete.
 //
-//    using my_pack = emp::TypePack<int, std::string, double>
+//    using my_pack = emp::TypePack<int, std::string, double>;
 //
 //  After manipulations, you can apply a type pack using the apply<> member template.  E.g.,
 //
 //    my_pack::resize<5,char>::reverse::apply<std::tuple> my_tuple;
 //
-//  ...would create a tuple type using the types <char, char, double, std::string, int>.
+//  ...would create a variable of type std::tuple<char, char, double, std::string, int>.
 //
 //
 //  Member functions include (all of which are constexpr):
@@ -47,8 +47,10 @@
 //  Applications:
 //    apply<T>          - Take teplate T and apply these types as its arguments.
 //    to_function_t<T>  - Convert to a function type, with return type T and arg types from pack.
-//    filter<FILTER>    - Keep only those types that can legally be used as an argument on FILTER
-//    find<FILTER>      - Convert to first type that can legally be used as an argument on FILTER
+//    filter<FILTER>    - Keep only those types, T, that can legally form FILTER<T> and does not
+//                        have a FILTER<T>::value == false.
+//    find<FILTER>      - Convert to first type, T, that can legally form FILTER<T> and does not
+//                        have a FILTER<T>::value == false.
 //    wrap<WRAPPER>     - Convert to TypePack where all members are run through WRAPPER
 //
 //
