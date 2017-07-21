@@ -112,7 +112,7 @@ namespace emp {
     World(Ptr<Random> rnd=nullptr, std::string _name="")
       : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), fit_cache()
       , genotypes(), next_genotypes()
-      , name(_name), cache_on(false), size_x(0), size_y(0)
+      , name(_name), cache_on(false), size_x(0), size_y(0), files()
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_get_genome()
       , fun_add_inject(), fun_add_birth(), fun_get_neighbor()
       , attributes(), systematics(true,true,true)
@@ -174,6 +174,8 @@ namespace emp {
     void SetWellMixed(bool synchronous_gen=false);
     void SetGrid(size_t width, size_t height, bool synchronous_gen=false);
     void SetPools(size_t num_pools, size_t pool_size, bool synchronous_gen=false);
+
+    size_t SetupFitnessFile(std::string filename="fitness.csv");
 
     void SetFitFun(const fun_calc_fitness_t & fit_fun) { fun_calc_fitness = fit_fun; }
     void SetMutFun(const fun_do_mutations_t & mut_fun) { fun_do_mutations = mut_fun; }
@@ -488,6 +490,14 @@ namespace emp {
     }
 
     SetAttribute("PopStruct", "Pools");
+  }
+
+  // A fitness file (default="fitness.csv") contains information about the population's fitness.
+  template<typename ORG>
+  size_t World<ORG>::SetupFitnessFile(std::string filename) {
+    size_t id = files.size();
+    files.emplace_back(filename);
+    return id;
   }
 
   // --- Updating the world! ---
