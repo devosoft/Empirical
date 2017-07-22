@@ -78,6 +78,9 @@ namespace emp {
     size_t size_y;                // If a grid, track height; if pools, track num pools.
     emp::vector<DataFile> files;  // Output files.
 
+    // Potential data nodes
+    Ptr<DataMonitor<>> data_node_fitness;
+
     // Configurable functions.
     fun_calc_fitness_t  fun_calc_fitness;   // Fitness function
     fun_do_mutations_t  fun_do_mutations;   // Mutation function
@@ -113,6 +116,7 @@ namespace emp {
       : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), fit_cache()
       , genotypes(), next_genotypes()
       , name(_name), cache_on(false), size_x(0), size_y(0), files()
+      , data_node_fitness(nullptr)
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_get_genome()
       , fun_add_inject(), fun_add_birth(), fun_get_neighbor()
       , attributes(), systematics(true,true,true)
@@ -174,6 +178,14 @@ namespace emp {
     void SetWellMixed(bool synchronous_gen=false);
     void SetGrid(size_t width, size_t height, bool synchronous_gen=false);
     void SetPools(size_t num_pools, size_t pool_size, bool synchronous_gen=false);
+
+    DataMonitor<> & GetFitnessDataNode() {
+      if (!data_node_fitness) {
+        data_node_fitness.New();
+        // @CAO: Make data node actually collect fitness.
+      }
+      return data_node_fitness;
+    }
 
     size_t SetupFitnessFile(std::string filename="fitness.csv");
 
