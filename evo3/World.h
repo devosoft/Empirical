@@ -497,6 +497,11 @@ namespace emp {
   size_t World<ORG>::SetupFitnessFile(std::string filename) {
     size_t id = files.size();
     files.emplace_back(filename);
+    auto & file = files[id];
+    auto & node = GetFitnessDataNode();
+    file.AddMean();
+    file.AddMin();
+    file.AddMax();
     return id;
   }
 
