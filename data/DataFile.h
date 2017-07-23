@@ -70,39 +70,41 @@ namespace emp {
     }
 
     // If a function takes an ostream, pass in the correct one.
-    void Add(const std::function<fun_t> & fun) { funs.Add(fun); }
+    void Add(const std::function<fun_t> & fun, const std::string & key, const std::string & desc) {
+      funs.Add(fun);
+    }
 
     // If a function writes to a file directly, let it do so.
-    template <typename T> void Add(const std::function<T()> & fun) {
+    template <typename T> void Add(const std::function<T()> & fun, const std::string & key, const std::string & desc) {
       std::function<fun_t> in_fun = [fun](std::ostream & os){ os << fun(); };
-      funs.Add(in_fun);
+      funs.Add(in_fun, key, desc);
     }
 
     // Add various types of data from DataNodes
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddCurrent(DataNode<VAL_TYPE, MODS...> & node) {
+    void AddCurrent(DataNode<VAL_TYPE, MODS...> & node, const std::string & key, const std::string & desc) {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetCurrent(); };
-      funs.Add(in_fun);
+      funs.Add(in_fun, key, desc);
     }
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddMean(DataNode<VAL_TYPE, MODS...> & node) {
+    void AddMean(DataNode<VAL_TYPE, MODS...> & node, const std::string & key, const std::string & desc) {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMean(); };
-      funs.Add(in_fun);
+      funs.Add(in_fun, key, desc);
     }
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddTotal(DataNode<VAL_TYPE, MODS...> & node) {
+    void AddTotal(DataNode<VAL_TYPE, MODS...> & nod, const std::string & key, const std::string & desce) {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetTotal(); };
-      funs.Add(in_fun);
+      funs.Add(in_fun, key, desc);
     }
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddMin(DataNode<VAL_TYPE, MODS...> & node) {
+    void AddMin(DataNode<VAL_TYPE, MODS...> & nod, const std::string & key, const std::string & desce) {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMin(); };
-      funs.Add(in_fun);
+      funs.Add(in_fun, key, desc);
     }
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddMax(DataNode<VAL_TYPE, MODS...> & node) {
+    void AddMax(DataNode<VAL_TYPE, MODS...> & node, const std::string & key, const std::string & desc) {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMax(); };
-      funs.Add(in_fun);
+      funs.Add(in_fun, key, desc);
     }
   };
 
