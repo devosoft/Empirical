@@ -82,8 +82,16 @@ namespace emp {
     }
 
     // If a function writes to a file directly, let it do so.
-    template <typename T> size_t Add(const std::function<T()> & fun, const std::string & key, const std::string & desc) {
+    template <typename T>
+    size_t Add(const std::function<T()> & fun, const std::string & key, const std::string & desc) {
       std::function<fun_t> in_fun = [fun](std::ostream & os){ os << fun(); };
+      return Add(in_fun, key, desc);
+    }
+
+    // If a variable is passed in, follow it.
+    template <typename T>
+    size_t AddVar(const T & var, const std::string & key, const std::string & desc) {
+      std::function<fun_t> in_fun = [&var](std::ostream & os){ os << var; };
       return Add(in_fun, key, desc);
     }
 
