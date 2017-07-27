@@ -646,6 +646,7 @@ namespace emp {
 
   template <typename ORG>
   void World<ORG>::DoBirth(const ORG mem, size_t parent_pos, size_t copy_count) {
+    before_repro_sig.Trigger(parent_pos);
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       // const size_t pos =
