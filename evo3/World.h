@@ -621,16 +621,19 @@ namespace emp {
   void World<ORG>::Inject(const ORG & mem, size_t copy_count) {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
-      //const size_t pos =
-      fun_add_inject(new_org);
+      inject_ready_sig.Trigger(*new_org);
+      const size_t pos = fun_add_inject(new_org);
       //SetupOrg(*new_org, &callbacks, pos);
+      org_placement_sig.Trigger(pos);
     }
   }
 
   template <typename ORG>
   void World<ORG>::InjectAt(const ORG & mem, const size_t pos) {
     Ptr<ORG> new_org = NewPtr<ORG>(mem);
+    inject_ready_sig.Trigger(*new_org);
     AddOrgAt(new_org, pos);
+    org_placement_sig.Trigger(pos);
     // SetupOrg(*new_org, &callbacks, pos);
   }
 
@@ -639,8 +642,9 @@ namespace emp {
   void World<ORG>::InjectRandomOrg(ARGS &&... args) {
     emp_assert(random_ptr != nullptr && "InjectRandomOrg() requires active random_ptr");
     Ptr<ORG> new_org = NewPtr<ORG>(*random_ptr, std::forward<ARGS>(args)...);
-    // const size_t pos =
-    fun_add_inject(new_org);
+    inject_ready_sig.Trigger(*new_org);
+    const size_t pos = fun_add_inject(new_org);
+    org_placement_sig.Trigger(pos);
     // SetupOrg(*new_org, &callbacks, pos);
   }
 
@@ -650,8 +654,8 @@ namespace emp {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       offspring_ready_sig.Trigger(*new_org);
-      // const size_t pos =
-      fun_add_birth(new_org, parent_pos);
+      const size_t pos = fun_add_birth(new_org, parent_pos);
+      org_placement_sig.Trigger(pos);
       // SetupOrg(*new_org, &callbacks, pos);
     }
   }
