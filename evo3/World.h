@@ -513,6 +513,7 @@ namespace emp {
     files.emplace_back(filename);
     auto & file = files[id];
     auto & node = GetFitnessDataNode();
+    file.AddVar(update, "update", "Update")
     file.AddMean(node, "mean_fitness", "Average organism fitness in current population.");
     file.AddMin(node, "min_fitness", "Minimum organism fitness in current population.");
     file.AddMax(node, "max_fitness". "Maximum organism fitness in current population.");
@@ -538,7 +539,8 @@ namespace emp {
       for (size_t i = 0; i < pop.size(); i++) if (pop[i]) ++num_orgs;
     }
 
-    update++;  // Keep count of the number of times update has been called.
+    // Keep count of the number of times Update() has been called.
+    update++;
   }
 
   template<typename ORG>
