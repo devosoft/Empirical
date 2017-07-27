@@ -649,6 +649,7 @@ namespace emp {
     before_repro_sig.Trigger(parent_pos);
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
+      offspring_ready_sig.Trigger(*new_org);
       // const size_t pos =
       fun_add_birth(new_org, parent_pos);
       // SetupOrg(*new_org, &callbacks, pos);
