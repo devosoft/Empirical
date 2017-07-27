@@ -67,6 +67,7 @@ namespace emp {
     emp::vector<Ptr<ORG>> pop;      //< All of the spots in the population.
     emp::vector<Ptr<ORG>> next_pop; //< Population being setup for next generation.
     size_t num_orgs;                //< How many organisms are actually in the population.
+    size_t update;                  //< How many times has the Update() method been called?
     emp::vector<double> fit_cache;  //< vector size == 0 when not caching; uncached values == 0.
     emp::vector<Ptr<genotype_t>> genotypes;      //< Genotypes for the corresponding orgs.
     emp::vector<Ptr<genotype_t>> next_genotypes; //< Genotypes for corresponding orgs in next_pop.
@@ -134,6 +135,7 @@ namespace emp {
     ~World() {
       Clear();
       if (random_owner) random_ptr.Delete();
+      if (data_node_fitness) data_node_fitness.Delete();
     }
 
     // --- Publicly available types ---
@@ -535,6 +537,8 @@ namespace emp {
       num_orgs = 0;
       for (size_t i = 0; i < pop.size(); i++) if (pop[i]) ++num_orgs;
     }
+
+    update++;  // Keep count of the number of times update has been called.
   }
 
   template<typename ORG>
