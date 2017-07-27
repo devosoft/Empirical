@@ -31,6 +31,8 @@
 
 #include "../base/Ptr.h"
 #include "../base/vector.h"
+#include "../control/Signal.h"
+#include "../control/SignalControl.h"
 #include "../data/DataFile.h"
 #include "../meta/reflection.h"
 #include "../tools/map_utils.h"
@@ -80,7 +82,7 @@ namespace emp {
     emp::vector<DataFile> files;  // Output files.
 
     // Potential data nodes
-    Ptr<DataMonitor<>> data_node_fitness;
+    Ptr<DataMonitor<double>> data_node_fitness;
 
     // Configurable functions.
     fun_calc_fitness_t  fun_calc_fitness;   // Fitness function
@@ -96,6 +98,35 @@ namespace emp {
 
     // Data collection.
     Systematics<genome_t> systematics;
+
+    // == Signals ==
+
+    SignalControl control;  // Setup the world to control various signals.
+
+    // Trigger:  Immediately prior to parent producing offspring
+    // Argument: Parent position in population
+    Signal<void(size_t)> before_repro_sig;  // TODO!!!!
+
+    // Trigger: Offspring about to enter population
+    // Argument: Reference to organism about to be placed in population.
+    Signal<void(ORG &)> offspring_ready_sig;  // TODO!!!!
+
+    // Trigger: New org about to be added to population from outside
+    // Argument: Reference to organism about to be placed in population.
+    Signal<void(ORG &)> inject_ready_sig;  // TODO!!!!
+
+    // Trigger: Organism has been added to population
+    // Argument: Position of organism placed in the population.
+    Signal<void(size_t)> org_placement_sig;  // TODO!!!!
+
+    // Trigger: New update is starting
+    // Argument: Update number (sequentially increasing)
+    Signal<void(size_t)> on_update_sig;  // TODO!!!!
+
+    // Trigger: Organism is about to be killed
+    // Argument: Position of organism about to die
+    Signal<void(size_t)> on_death_sig;  // TODO!!!!
+
 
     // AddOrgAt is the only way to add organisms (others must go through here)
     size_t AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
@@ -121,6 +152,13 @@ namespace emp {
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_get_genome()
       , fun_add_inject(), fun_add_birth(), fun_get_neighbor()
       , attributes(), systematics(true,true,true)
+      , control()
+      , before_repro_sig(to_string(name,"::before-repro"), control)
+      , offspring_ready_sig(to_string(name,"::offspring-ready"), control)
+      , inject_ready_sig(to_string(name,"::inject-ready"), control)
+      , org_placement_sig(to_string(name,"::org-placement"), control)
+      , on_update_sig(to_string(name,"::on-update"), control)
+      , on_death_sig(to_string(name,"::on-death"), control)
     {
       if (!rnd) NewRandom();
       SetDefaultFitFun<this_t, ORG>(*this);
@@ -181,7 +219,7 @@ namespace emp {
     void SetGrid(size_t width, size_t height, bool synchronous_gen=false);
     void SetPools(size_t num_pools, size_t pool_size, bool synchronous_gen=false);
 
-    DataMonitor<> & GetFitnessDataNode() {
+    DataMonitor<double> & GetFitnessDataNode() {
       if (!data_node_fitness) {
         data_node_fitness.New();
         // @CAO: Make data node actually collect fitness.
@@ -196,6 +234,14 @@ namespace emp {
     void SetPrintFun(const fun_print_org_t & print_fun) { fun_print_org = print_fun; }
     void SetGetGenomeFun(const fun_get_genome_t & gen_fun) { fun_get_genome = gen_fun; }
 
+    // Deal with Signals
+    SignalControl & GetSignalControl() { return control; }  // Access signal controller.
+    SignalKey OnBeforeRepro(const std::function<void(size_t)> & fun) { return before_repro_sig.AddAction(fun); }
+    SignalKey OnOffspringReady(const std::function<void(ORG *)> & fun) { return offspring_ready_sig.AddAction(fun); }
+    SignalKey OnInjectReady(const std::function<void(ORG *)> & fun) { return inject_ready_sig.AddAction(fun); }
+    SignalKey OnOrgPlacement(const std::function<void(size_t)> & fun) { return org_placement_sig.AddAction(fun); }
+    SignalKey OnUpdate(const std::function<void(size_t)> & fun) { return on_update_sig.AddAction(fun); }
+    SignalKey OnOrgDeath(const std::function<void(size_t)> & fun) { return on_death_sig.AddAction(fun); }
 
     // --- MANAGE ATTRIBUTES ---
     bool HasAttribute(const std::string & name) const { return Has(attributes, name); }
@@ -513,10 +559,10 @@ namespace emp {
     files.emplace_back(filename);
     auto & file = files[id];
     auto & node = GetFitnessDataNode();
-    file.AddVar(update, "update", "Update")
+    file.AddVar(update, "update", "Update");
     file.AddMean(node, "mean_fitness", "Average organism fitness in current population.");
     file.AddMin(node, "min_fitness", "Minimum organism fitness in current population.");
-    file.AddMax(node, "max_fitness". "Maximum organism fitness in current population.");
+    file.AddMax(node, "max_fitness", "Maximum organism fitness in current population.");
     return id;
   }
 
