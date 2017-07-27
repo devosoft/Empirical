@@ -74,8 +74,6 @@ int main(int argc, char* argv[])
 
   // Loop through updates
   for (uint32_t ud = 0; ud < MAX_GENS; ud++) {
-    pop.GetSystematics().PrintStatus();
-
     // Print current state.
     // for (uint32_t i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
     // std::cout << std::endl;
@@ -90,7 +88,6 @@ int main(int argc, char* argv[])
     pop.MutatePop(1);
   }
 
-  pop.GetSystematics().PrintStatus();
   pop.PrintLineage(0);
 
 //  std::cout << MAX_GENS << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
