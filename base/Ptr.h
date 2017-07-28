@@ -458,13 +458,13 @@ namespace emp {
     // Dereference a pointer.
     TYPE & operator*() {
       // Make sure a pointer is active and non-null before we dereference it.
-      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
       emp_assert(ptr != nullptr, "Do not dereference a null pointer!");
       return *ptr;
     }
     const TYPE & operator*() const {
       // Make sure a pointer is active before we dereference it.
-      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
       emp_assert(ptr != nullptr, "Do not dereference a null pointer!");
       return *ptr;
     }
@@ -472,20 +472,20 @@ namespace emp {
     // Follow a pointer.
     TYPE * operator->() {
       // Make sure a pointer is active before we follow it.
-      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr;
     }
     const TYPE * const operator->() const {
       // Make sure a pointer is active before we follow it.
-      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr;
     }
 
     // Indexing into array
     TYPE & operator[](size_t pos) {
-      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
       emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.");
       emp_assert(Tracker().GetArrayBytes(id) > (pos*sizeof(TYPE)),
         "Indexing out of range.", ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
@@ -493,7 +493,7 @@ namespace emp {
       return ptr[pos];
     }
     const TYPE & operator[](size_t pos) const {
-      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
       emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.");
       emp_assert(Tracker().GetArrayBytes(id) > (pos*sizeof(TYPE)),
         "Indexing out of range.", ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
@@ -504,10 +504,10 @@ namespace emp {
     // Auto-case to raw pointer type.
     operator TYPE *() {
       // Make sure a pointer is active before we convert it.
-      emp_assert(Tracker().IsDeleted(id) == false, typeid(TYPE).name());
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
 
       // We should not automatically convert managed pointers to raw pointers
-      emp_assert(id == (size_t) -1, typeid(TYPE).name());
+      emp_assert(id == (size_t) -1 /*, typeid(TYPE).name() */);
       return ptr;
     }
 
