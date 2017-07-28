@@ -105,23 +105,23 @@ namespace emp {
 
     // Trigger:  Immediately prior to parent producing offspring
     // Argument: Parent position in population
-    Signal<void(size_t)> before_repro_sig;  // TODO!!!!
+    Signal<void(size_t)> before_repro_sig;
 
     // Trigger: Offspring about to enter population
     // Argument: Reference to organism about to be placed in population.
-    Signal<void(ORG &)> offspring_ready_sig;  // TODO!!!!
+    Signal<void(ORG &)> offspring_ready_sig;
 
     // Trigger: New org about to be added to population from outside
     // Argument: Reference to organism about to be placed in population.
-    Signal<void(ORG &)> inject_ready_sig;  // TODO!!!!
+    Signal<void(ORG &)> inject_ready_sig;
 
     // Trigger: Organism has been added to population
     // Argument: Position of organism placed in the population.
-    Signal<void(size_t)> org_placement_sig;  // TODO!!!!
+    Signal<void(size_t)> org_placement_sig;
 
     // Trigger: New update is starting
     // Argument: Update number (sequentially increasing)
-    Signal<void(size_t)> on_update_sig;  // TODO!!!!
+    Signal<void(size_t)> on_update_sig;
 
     // Trigger: Organism is about to be killed
     // Argument: Position of organism about to die
@@ -570,6 +570,8 @@ namespace emp {
 
   template<typename ORG>
   void World<ORG>::Update() {
+    on_update_sig.Trigger(update);
+
     // If generations are synchronous (i.e, next_pop is not empty), put the next generation in place.
     if (next_pop.size()) {
       // Clear out current pop.
