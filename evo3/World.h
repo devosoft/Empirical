@@ -414,7 +414,7 @@ namespace emp {
     // Determine new organism's genotype.
     Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype);
     if (next_pop.size() <= pos) next_pop.resize(pos+1, nullptr);   // Make sure we have room.
-    if (next_pop[pos]) { RemoveNextOrgAt(pos); }                   // Clear out any old org.
+    RemoveNextOrgAt(pos);                                          // Clear out any old org.
     next_pop[pos] = new_org;                                       // Place new org.
 
     // Track the new genotype.
@@ -617,10 +617,9 @@ namespace emp {
   template<typename ORG>
   void World<ORG>::Clear() {
     for (size_t i = 0; i < pop.size(); i++) RemoveOrgAt(i);
-    for (size_t i = 0; i < next_pop.size(); i++) if (next_pop[i]) RemoveNextOrgAt(i);
-    pop.resize(0);                                     // Remove deleted organisms.
+    for (size_t i = 0; i < next_pop.size(); i++) RemoveNextOrgAt(i);
+    pop.resize(0);
     next_pop.resize(0);
-    fit_cache.resize(0);
   }
 
   template <typename ORG>
