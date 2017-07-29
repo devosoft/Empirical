@@ -506,11 +506,12 @@ namespace emp {
       // Make sure a pointer is active before we convert it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
 
-      // We should not automatically convert managed pointers to raw pointers
+      // We should not automatically convert managed pointers to raw pointers; use .Raw()
       emp_assert(id == (size_t) -1 /*, typeid(TYPE).name() */);
       return ptr;
     }
 
+    operator bool() { return ptr != nullptr; }
     operator bool() const { return ptr != nullptr; }
 
     // Comparisons to other Ptr objects
@@ -613,6 +614,7 @@ namespace emp {
     // Auto-case to raw pointer type.
     operator TYPE *() { return ptr; }
 
+    operator bool() { return ptr != nullptr; }
     operator bool() const { return ptr != nullptr; }
 
     // Comparisons to other Ptr objects
