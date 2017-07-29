@@ -304,11 +304,10 @@ namespace emp {
     // --- MANIPULATE ORGS IN POPULATION ---
 
     void Clear();
-    void ClearOrgAt(size_t pos);
 
     void Resize(size_t new_size) {
-      for (size_t i = new_size; i < pop.size(); i++) ClearOrgAt(i); // Remove orgs past new size.
-      pop.resize(new_size, nullptr);                                // Default new orgs to null.
+      for (size_t i = new_size; i < pop.size(); i++) RemoveOrgAt(i); // Remove orgs past new size.
+      pop.resize(new_size, nullptr);                                 // Default new orgs to null.
     }
 
     // Inject an organism using the default injection scheme.
@@ -623,12 +622,6 @@ namespace emp {
     fit_cache.resize(0);
   }
 
-  // Delete organism at a specified position, only if it exists.
-  template<typename ORG>
-  void World<ORG>::ClearOrgAt(size_t pos) {
-    RemoveOrgAt(pos);  // Remove an org only if it exists.
-  }
-
   template <typename ORG>
   void World<ORG>::Inject(const ORG & mem, size_t copy_count) {
     for (size_t i = 0; i < copy_count; i++) {
@@ -714,7 +707,7 @@ namespace emp {
     if (choose_random) emp::Shuffle<Ptr<ORG>>(*random_ptr, pop, new_size);
 
     // Clear out all of the organisms we are removing and resize the population.
-    for (size_t i = new_size; i < pop.size(); ++i) ClearOrgAt(i);
+    for (size_t i = new_size; i < pop.size(); ++i) RemoveOrgAt(i);
     pop.resize(new_size);
   }
 
