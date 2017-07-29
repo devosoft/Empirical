@@ -232,7 +232,7 @@ namespace emp {
           }
         );
       }
-      return data_node_fitness;
+      return *data_node_fitness;
     }
 
     size_t SetupFitnessFile(std::string filename="fitness.csv");
