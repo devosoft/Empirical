@@ -222,7 +222,15 @@ namespace emp {
     DataMonitor<double> & GetFitnessDataNode() {
       if (!data_node_fitness) {
         data_node_fitness.New();
-        // @CAO: Make data node actually collect fitness.
+        // Collect fitnesses each update...
+        OnUpdate(
+          [this](size_t){
+            data_node_fitness->Reset();
+            for (size_t i = 0; i < pop.size(); i++) {
+              if (IsOccupied(i)) data_node_fitness->AddDatum( CalcFitnessID(i) );
+            }
+          }
+        );
       }
       return data_node_fitness;
     }
