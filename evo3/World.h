@@ -433,15 +433,16 @@ namespace emp {
     --num_orgs;                              // Track one fewer organisms in the population
      if (cache_on) ClearCache(pos);          // Delete any cached info about this organism
     systematics.RemoveOrg( genotypes[pos] ); // Notify systematics about organism removal
-    genotypes[pos] = nullptr;                // No longer tracking a genotype at this position
+    genotypes[pos] = nullptr;                // No longer track a genotype at this position
   }
 
   template<typename ORG>
   void World<ORG>::RemoveNextOrgAt(size_t pos) {
-    next_pop[pos].Delete();
-    next_pop[pos] = nullptr;
-    systematics.RemoveOrg( next_genotypes[pos] );
-    next_genotypes[pos] = nullptr;
+    if (!next_pop[pos]) return;                   // Nothing to remove!
+    next_pop[pos].Delete();                       // Delete the organism...
+    next_pop[pos] = nullptr;                      // ..and reset the pointer to null
+    systematics.RemoveOrg( next_genotypes[pos] ); // Notify systematics manager about removal
+    next_genotypes[pos] = nullptr;                // No longer track a genotype at this position
   }
 
   template<typename ORG>
