@@ -396,10 +396,10 @@ namespace emp {
 
     // Determine new organism's genotype.
     Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype);
-    if (pop.size() <= pos) pop.resize(pos+1, nullptr);        // Make sure we have room.
-    if (pop[pos]) { ClearCache(pos); RemoveOrgAt(pos); }      // Clear out any old org.
-    pop[pos] = new_org;                                       // Place new org.
-    ++num_orgs;                                               // Track number of orgs.
+    if (pop.size() <= pos) pop.resize(pos+1, nullptr);  // Make sure we have room.
+    RemoveOrgAt(pos);                                   // Clear out any old org.
+    pop[pos] = new_org;                                 // Place new org.
+    ++num_orgs;                                         // Track number of orgs.
 
     // Track the new genotype.
     if (genotypes.size() <= pos) genotypes.resize(pos+1, nullptr);   // Make sure we fit genotypes.
@@ -427,12 +427,14 @@ namespace emp {
 
   template<typename ORG>
   void World<ORG>::RemoveOrgAt(size_t pos) {
-    pop[pos].Delete();
-    pop[pos] = nullptr;
-    --num_orgs;
-     if (cache_on) ClearCache(pos);
-    systematics.RemoveOrg( genotypes[pos] );
-    genotypes[pos] = nullptr;
+    if (!pop[pos]) return;                   // Nothing to remove!
+    on_death_sig.Trigger(pos);               // Identify that this position is about to be removed
+    pop[pos].Delete();                       // Delete the organism...
+    pop[pos] = nullptr;                      // ...and reset the pointer to null
+    --num_orgs;                              // Track one fewer organisms in the population
+     if (cache_on) ClearCache(pos);          // Delete any cached info about this organism
+    systematics.RemoveOrg( genotypes[pos] ); // Notify systematics about organism removal
+    genotypes[pos] = nullptr;                // No longer tracking a genotype at this position
   }
 
   template<typename ORG>
@@ -583,7 +585,7 @@ namespace emp {
     // If generations are synchronous (i.e, next_pop is not empty), put the next generation in place.
     if (next_pop.size()) {
       // Clear out current pop.
-      for (size_t i = 0; i < pop.size(); i++) if (pop[i]) RemoveOrgAt(i);
+      for (size_t i = 0; i < pop.size(); i++) RemoveOrgAt(i);
       pop.resize(0);
 
       std::swap(pop, next_pop);               // Move next_pop into place.
@@ -614,7 +616,7 @@ namespace emp {
   // Delete all organisms.
   template<typename ORG>
   void World<ORG>::Clear() {
-    for (size_t i = 0; i < pop.size(); i++) if (pop[i]) RemoveOrgAt(i);
+    for (size_t i = 0; i < pop.size(); i++) RemoveOrgAt(i);
     for (size_t i = 0; i < next_pop.size(); i++) if (next_pop[i]) RemoveNextOrgAt(i);
     pop.resize(0);                                     // Remove deleted organisms.
     next_pop.resize(0);
@@ -624,7 +626,7 @@ namespace emp {
   // Delete organism at a specified position, only if it exists.
   template<typename ORG>
   void World<ORG>::ClearOrgAt(size_t pos) {
-    if (pop[pos]) RemoveOrgAt(pos);  // Remove an org only if it exists.
+    RemoveOrgAt(pos);  // Remove an org only if it exists.
   }
 
   template <typename ORG>
