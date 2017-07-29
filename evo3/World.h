@@ -582,6 +582,9 @@ namespace emp {
   void World<ORG>::Update() {
     on_update_sig.Trigger(update);
 
+    // Print all files.
+    for (auto & file : files) file.Update();
+
     // If generations are synchronous (i.e, next_pop is not empty), put the next generation in place.
     if (next_pop.size()) {
       // Clear out current pop.
