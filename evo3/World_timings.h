@@ -18,6 +18,19 @@ namespace emp {
 
   public:
     World_timings(size_t _f, size_t _s, size_t _l) : first(_f), step(_s), last(_l) { ; }
+    World_timings(const World_timings &) = default;
+    World_timings(World_timings &&) = default;
+
+    operator=(const World_timings &) = default;
+    operator=(World_timings &&) = default;
+
+    size_t GetFirst() const { return first; }
+    size_t GetStep() const { return step; }
+    size_t GetLast() const { return last; }
+
+    World_timings & SetFirst(size_t _in) { first = _in; return *this; }
+    World_timings & SetStep(size_t _in) { step = _in; return *this; }
+    World_timings & SetLast(size_t _in) { last = _in; return *this; }
   };
 
 }
