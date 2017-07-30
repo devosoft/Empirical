@@ -22,8 +22,8 @@ namespace emp {
     World_timings(const World_timings &) = default;
     World_timings(World_timings &&) = default;
 
-    operator=(const World_timings &) = default;
-    operator=(World_timings &&) = default;
+    World_timings & operator=(const World_timings &) = default;
+    World_timings & operator=(World_timings &&) = default;
 
     size_t GetFirst() const { return first; }
     size_t GetStep() const { return step; }
@@ -33,7 +33,7 @@ namespace emp {
     World_timings & SetStep(size_t _in) { step = _in; return *this; }
     World_timings & SetLast(size_t _in) { last = _in; return *this; }
 
-    void TestActive(size_t update) const {
+    bool TestActive(size_t update) const {
       if (update == first) return true;  // ALWAYS trigger on first, no matter other params.
       if (update < first || update > last || step == 0) return false; // Out of range!
       return (update - first) % step == 0;
