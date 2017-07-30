@@ -40,9 +40,10 @@
 #include "../tools/random_utils.h"
 #include "../tools/string_utils.h"
 
-#include "Systematics.h"
+#include "Systematics.h"    // Track relationships among organisms.
+#include "World_iterator.h" // Allow iteration through organisms in a world.
 #include "World_reflect.h"  // Handle needed reflection on incoming organism classes.
-#include "World_iterator.h"
+#include "World_timings.h"  // Helper to determine when specific events should occur.
 
 namespace emp {
 
@@ -235,7 +236,7 @@ namespace emp {
       return *data_node_fitness;
     }
 
-    size_t SetupFitnessFile(std::string filename="fitness.csv");
+    size_t SetupFitnessFile(const std::string & filename="fitness.csv");
 
     void SetFitFun(const fun_calc_fitness_t & fit_fun) { fun_calc_fitness = fit_fun; }
     void SetMutFun(const fun_do_mutations_t & mut_fun) { fun_do_mutations = mut_fun; }
@@ -564,7 +565,7 @@ namespace emp {
 
   // A fitness file (default="fitness.csv") contains information about the population's fitness.
   template<typename ORG>
-  size_t World<ORG>::SetupFitnessFile(std::string filename) {
+  size_t World<ORG>::SetupFitnessFile(const std::string & filename) {
     size_t id = files.size();
     files.emplace_back(filename);
     auto & file = files[id];
