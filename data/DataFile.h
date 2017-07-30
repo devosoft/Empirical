@@ -63,6 +63,23 @@ namespace emp {
       line_end = e;
     }
 
+    void PrintHeaderKeys() {
+      *os << line_begin;
+      for (size_t i = 0; i < keys.size(); i++) {
+        if (i > 0) *os << line_spacer;
+        *os << keys[i];
+      }
+      *os << line_end;
+      os->flush();
+    }
+
+    void PrintHeaderComment(const std::string & cstart = "# ") {
+      for (size_t i = 0; i < keys.size(); i++) {
+        *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")" << std::endl;
+      }
+      os->flush();
+    }
+
     void Update() {
       *os << line_begin;
       for (size_t i = 0; i < funs.size(); i++) {
