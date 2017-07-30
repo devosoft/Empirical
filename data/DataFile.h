@@ -70,6 +70,7 @@ namespace emp {
         funs[i](*os);
       }
       *os << line_end;
+      os->flush();
     }
 
     // If a function takes an ostream, pass in the correct one.
