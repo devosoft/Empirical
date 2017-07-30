@@ -22,26 +22,26 @@ namespace emp {
   public:
     World_file(const std::string & filename)
       : DataFile(filename), timing_fun([](size_t){return true;}) { ; }
-    
+
     void Update(size_t update) {
       if (timing_fun(update)) DataFile::Update();
     }
 
     void SetTiming(time_fun_t fun) { timing_fun = fun; }
     void SetTimingOnce(size_t print_time) {
-      timing_fun = [print_time](size_t update) { return update == print_time; }
+      timing_fun = [print_time](size_t update) { return update == print_time; };
     }
     void SetTimingRepeat(size_t step) {
       emp_assert(step > 0);
-      timing_fun = [step](size_t update) { return update % step == 0; }
+      timing_fun = [step](size_t update) { return update % step == 0; };
     }
     void SetTimingRange(size_t first, size_t step, size_t last) {
       emp_assert(step > 0);
       emp_assert(first < last);
-      timing_fun = [first,step,last](size_t update){
-	if (update < first || update > last) return false;
-	return ((update - first) % step) == 0;
-      }
+      timing_fun = [first,step,last](size_t update) {
+	      if (update < first || update > last) return false;
+	      return ((update - first) % step) == 0;
+      };
     }
   };
 
