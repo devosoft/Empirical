@@ -573,6 +573,7 @@ namespace emp {
     file.AddMean(node, "mean_fitness", "Average organism fitness in current population.");
     file.AddMin(node, "min_fitness", "Minimum organism fitness in current population.");
     file.AddMax(node, "max_fitness", "Maximum organism fitness in current population.");
+    file.PrintHeaderKeys();
     return id;
   }
 
