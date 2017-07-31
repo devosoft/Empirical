@@ -48,6 +48,7 @@ int main(int argc, char* argv[])
 
   // emp::evo::EAWorld<BitOrg, emp::evo::FitCacheOff> pop(random, "NKWorld");
   emp::World<BitOrg> pop(random, "NKWorld");
+  pop.SetupFitnessFile().SetTimingRepeat(10);
   pop.SetWellMixed(true);
   pop.SetCache();
 
