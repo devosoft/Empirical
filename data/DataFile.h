@@ -23,7 +23,7 @@
 namespace emp {
 
   class DataFile {
-  private:
+  protected:
     using fun_t = void(std::ostream &);
 
     std::ostream * os;
