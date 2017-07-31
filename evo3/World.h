@@ -33,7 +33,6 @@
 #include "../base/vector.h"
 #include "../control/Signal.h"
 #include "../control/SignalControl.h"
-#include "../data/DataFile.h"
 #include "../meta/reflection.h"
 #include "../tools/map_utils.h"
 #include "../tools/Random.h"
@@ -43,7 +42,7 @@
 #include "Systematics.h"    // Track relationships among organisms.
 #include "World_iterator.h" // Allow iteration through organisms in a world.
 #include "World_reflect.h"  // Handle needed reflection on incoming organism classes.
-#include "World_timings.h"  // Helper to determine when specific events should occur.
+#include "World_file.h"  // Helper to determine when specific events should occur.
 
 namespace emp {
 
@@ -76,11 +75,11 @@ namespace emp {
     emp::vector<Ptr<genotype_t>> next_genotypes; //< Genotypes for corresponding orgs in next_pop.
 
     // Configuration settings
-    std::string name;             // Name of this world (for use in configuration.)
-    bool cache_on;                // Should we be caching fitness values?
-    size_t size_x;                // If a grid, track width; if pools, track pool size
-    size_t size_y;                // If a grid, track height; if pools, track num pools.
-    emp::vector<DataFile> files;  // Output files.
+    std::string name;               // Name of this world (for use in configuration.)
+    bool cache_on;                  // Should we be caching fitness values?
+    size_t size_x;                  // If a grid, track width; if pools, track pool size
+    size_t size_y;                  // If a grid, track height; if pools, track num pools.
+    emp::vector<World_file> files;  // Output files.
 
     // Potential data nodes
     Ptr<DataMonitor<double>> data_node_fitness;
@@ -236,7 +235,7 @@ namespace emp {
       return *data_node_fitness;
     }
 
-    size_t SetupFitnessFile(const std::string & filename="fitness.csv");
+    World_file & SetupFitnessFile(const std::string & filename="fitness.csv");
 
     void SetFitFun(const fun_calc_fitness_t & fit_fun) { fun_calc_fitness = fit_fun; }
     void SetMutFun(const fun_do_mutations_t & mut_fun) { fun_do_mutations = mut_fun; }
@@ -565,7 +564,7 @@ namespace emp {
 
   // A fitness file (default="fitness.csv") contains information about the population's fitness.
   template<typename ORG>
-  size_t World<ORG>::SetupFitnessFile(const std::string & filename) {
+  World_file & World<ORG>::SetupFitnessFile(const std::string & filename) {
     size_t id = files.size();
     files.emplace_back(filename);
     auto & file = files[id];
@@ -575,7 +574,7 @@ namespace emp {
     file.AddMin(node, "min_fitness", "Minimum organism fitness in current population.");
     file.AddMax(node, "max_fitness", "Maximum organism fitness in current population.");
     file.PrintHeaderKeys();
-    return id;
+    return file;
   }
 
   // --- Updating the world! ---
@@ -585,7 +584,7 @@ namespace emp {
     on_update_sig.Trigger(update);
 
     // Print all files.
-    for (auto & file : files) file.Update();
+    for (auto & file : files) file.Update(update);
 
     // If generations are synchronous (i.e, next_pop is not empty), put the next generation in place.
     if (next_pop.size()) {
