@@ -18,7 +18,7 @@ struct CellState {
   CellState & operator=(int s) { state = s; return *this; }
 };
 
-class SudokuBoard : public UI::Slate {
+class SudokuBoard : public UI::Div {
 private:
   std::string name;
   UI::Table table;
@@ -29,7 +29,7 @@ private:
 
 public:
   SudokuBoard(const std::string & in_name)
-  : UI::Slate(in_name)
+  : UI::Div(in_name)
   , name(in_name)        // HTML id for the slate
   , table(9,9)           // Build a 9x9 table for actual puzzle
   , symbols({{'1','2','3','4','5','6','7','8','9'}})
@@ -83,13 +83,13 @@ public:
       for (size_t c = 0; c < 9; c++) {
         auto cell = table.GetCell(r,c);
         // cell.On("mousedown", [cell,r,c]() mutable {
-        //   // doc.Slate("table_bg").SetBackground("red");
+        //   // doc.Div("table_bg").SetBackground("red");
         //   // cell.SetCSS("BackgroundColor", "grey");
         //   cell.Clear();
         // });
         // cell.On("mouseup", [this,r,c]() mutable {
         //   // cell.SetCSS("BackgroundColor", "white");
-        //   // doc.Slate("table_bg").SetBackground("white");
+        //   // doc.Div("table_bg").SetBackground("white");
         //   // states[r*9+c] = '*';
         //   UpdateCell(r,c);
         // });
@@ -106,7 +106,7 @@ public:
           old_cell.ClearChildren();
           UpdateCell(r,c);
           UpdateCell(old_row,old_col);
-          doc.Slate(name).Redraw();
+          doc.Div(name).Redraw();
         });
 
         UpdateCell(r,c);
