@@ -29,17 +29,13 @@
 #include "Text.h"
 #include "TextArea.h"
 
-#include "init.h"
-
 
 namespace emp {
 namespace web {
 
   class Document : public web::Div {
   public:
-    Document(const std::string & doc_id) : web::Div(doc_id) {
-      Activate();
-    }
+    Document(const std::string & doc_id) : web::Div(doc_id) { Activate(); }
     ~Document() { ; }
 
     // Retrieve specific types of widgets.
@@ -90,8 +86,6 @@ namespace web {
       info->Append(new_widget);
       return new_widget;
     }
-
-
 
 
     // Setup a quick way to retrieve old widgets by name.
