@@ -29,8 +29,11 @@
 #define EMP_WEB_DIV_H
 
 
+#include "Animate.h"
 #include "Text.h"
 #include "Widget.h"
+
+#include "init.h"
 
 namespace emp {
 namespace web {
@@ -48,17 +51,19 @@ namespace web {
     class DivInfo : public internal::WidgetInfo {
       friend Div; friend TableInfo;
     protected:
-      double scroll_top;                         // Where should div scroll to? (0.0 to 1.0)
-      emp::vector<Widget> m_children;            // Widgets contained in this one.
-      bool append_ok;                            // Can we add more children?
-      std::map<std::string, Widget> widget_dict; // By-name lookup for descendent widgets
-
+      double scroll_top;                              // Where should div scroll to? (0.0 to 1.0)
+      emp::vector<Widget> m_children;                 // Widgets contained in this one.
+      bool append_ok;                                 // Can we add more children?
+      std::map<std::string, Widget> widget_dict;      // By-name lookup for descendent widgets
+      std::map<std::string, web::Animate *> anim_map; // Streamline creation of Animate objects.
 
       DivInfo(const std::string & in_id="")
-        : internal::WidgetInfo(in_id), scroll_top(0.0), append_ok(true) { ; }
-      DivInfo(const DivInfo &) = delete;               // No copies of INFO allowed
-      DivInfo & operator=(const DivInfo &) = delete;   // No copies of INFO allowed
-      virtual ~DivInfo() { ; }
+        : internal::WidgetInfo(in_id), scroll_top(0.0), append_ok(true) { emp::Initialize(); }
+      DivInfo(const DivInfo &) = delete;              // No copies of INFO allowed
+      DivInfo & operator=(const DivInfo &) = delete;  // No copies of INFO allowed
+      virtual ~DivInfo() {
+        for (auto & p : anim_map) delete p.second;    // Delete this document's animations.
+      }
 
       std::string TypeName() const override { return "DivInfo"; }
 
@@ -278,6 +283,18 @@ namespace web {
 
     emp::vector<Widget> & Children() { return Info()->m_children; }
 
+    // Shortcut adders for helpers
+    template <class... T> web::Animate & AddAnimation(const std::string & name, T &&... args){
+      web::Animate * new_anim = new web::Animate(std::forward<T>(args)...);
+      emp_assert(Info()->anim_map.find(name) == Info()->anim_map.end());  // Make sure not in map already!
+      Info()->anim_map[name] = new_anim;
+      return *new_anim;
+    }
+
+
+    // Setup a quick way to retrieve old helpers by name.
+    web::Animate & Animate (const std::string & in_id) { return *(Info()->anim_map[in_id]); }
+    web::Animate & Animation (const std::string & in_id) { return *(Info()->anim_map[in_id]); }
   };
 
   // using Slate = Div;    // For backward compatability...
