@@ -3,7 +3,7 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  The Document class is built off of Slate, but initializes the EMP web framework, if
+//  The Document class is built off of Div, but initializes the EMP web framework, if
 //  neeeded, and activates itself.  It also provides quick ways to add and lookup
 //  widgets.
 //
@@ -25,7 +25,7 @@
 #include "FileInput.h"
 #include "Image.h"
 #include "Selector.h"
-#include "Slate.h"
+#include "Div.h"
 #include "Table.h"
 #include "Text.h"
 #include "TextArea.h"
@@ -36,12 +36,12 @@
 namespace emp {
 namespace web {
 
-  class Document : public web::Slate {
+  class Document : public web::Div {
   private:
     std::map<std::string, web::Animate *> anim_map;
 
   public:
-    Document(const std::string & doc_id) : web::Slate(doc_id) {
+    Document(const std::string & doc_id) : web::Div(doc_id) {
       emp::Initialize();
       Activate();
     }
@@ -77,8 +77,8 @@ namespace web {
       info->Append(new_widget);
       return new_widget;
     }
-    template <class... T> web::Slate AddSlate(T &&... args) {
-      web::Slate new_widget(std::forward<T>(args)...);
+    template <class... T> web::Div AddDiv(T &&... args) {
+      web::Div new_widget(std::forward<T>(args)...);
       info->Append(new_widget);
       return new_widget;
     }
@@ -114,7 +114,7 @@ namespace web {
     web::FileInput FileInput (const std::string & in_id) { return web::FileInput(Find(in_id)); }
     web::Image Image (const std::string & in_id) { return web::Image(Find(in_id)); }
     web::Selector Selector (const std::string & in_id) { return web::Selector(Find(in_id)); }
-    web::Slate Slate (const std::string & in_id) { return web::Slate(Find(in_id)); }
+    web::Div Div (const std::string & in_id) { return web::Div(Find(in_id)); }
     web::Table Table (const std::string & in_id) { return web::Table(Find(in_id)); }
     web::Text Text (const std::string & in_id) { return web::Text(Find(in_id)); }
     web::TextArea TextArea (const std::string & in_id) { return web::TextArea(Find(in_id)); }
