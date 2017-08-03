@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -7,11 +7,7 @@
 
 #include <iostream>
 
-#include "../../config/ArgManager.h"
-#include "../../evo/NK.h"
-#include "../../evo3/World.h"
-#include "../../tools/BitVector.h"
-#include "../../tools/Random.h"
+#include "../NKWorld.h"
 
 EMP_BUILD_CONFIG( NKConfig,
   GROUP(DEFAULT, "Default settings for NK model"),
@@ -23,9 +19,6 @@ EMP_BUILD_CONFIG( NKConfig,
   VALUE(MUT_COUNT, uint32_t, 3, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
   VALUE(TEST, std::string, "TestString", "This is a test string.")
 )
-
-
-using BitOrg = emp::BitVector;
 
 int main(int argc, char* argv[])
 {
@@ -74,8 +67,6 @@ int main(int argc, char* argv[])
 
   // Loop through updates
   for (uint32_t ud = 0; ud < MAX_GENS; ud++) {
-    pop.GetSystematics().PrintStatus();
-
     // Print current state.
     // for (uint32_t i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
     // std::cout << std::endl;
@@ -90,7 +81,6 @@ int main(int argc, char* argv[])
     pop.MutatePop(1);
   }
 
-  pop.GetSystematics().PrintStatus();
   pop.PrintLineage(0);
 
 //  std::cout << MAX_GENS << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
