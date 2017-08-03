@@ -67,8 +67,8 @@ namespace evo {
 
     /// Randomize the landscape without changing the landscape size.
     void Reset(emp::Random & random) {
-      emp_assert(_K < 32 _K)
-      emp_assert(_K < _N, _K, _N);
+      emp_assert(K < 32, K);
+      emp_assert(K < N, K, N);
 
       // Build new landscape.
       for ( auto & ltable : landscape) {
