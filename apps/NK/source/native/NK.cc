@@ -19,8 +19,10 @@ int main(int argc, char* argv[])
   if (args.ProcessConfigOptions(world.config, std::cout, "NK.cfg", "NK-macros.h") == false) exit(0);
   if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
 
+  // Setup and run the world.
   world.Setup();
   world.Run();
 
-  world.world.PrintLineage(0);
+  // After finished, print out the lineage to the command line.
+  world.PrintLineage(0);
 }

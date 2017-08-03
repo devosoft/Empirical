@@ -17,10 +17,8 @@ EMP_BUILD_CONFIG( NKConfig,
   VALUE(TEST, std::string, "TestString", "This is a test string.")
 )
 
-struct NKWorld {
-  emp::Random random;
+struct NKWorld : public emp::World<BitOrg> {
   NKConfig config;
-  emp::World<BitOrg> world;
   emp::evo::NKLandscape landscape;
 
   uint32_t N;
@@ -29,14 +27,15 @@ struct NKWorld {
   uint32_t MAX_GENS;
   uint32_t MUT_COUNT;
 
-  NKWorld(const std::string & world_name="NKWorld") : world(random, world_name) {
+  NKWorld(const std::string & world_name="NKWorld")
+  : emp::World<BitOrg>(world_name) {
     config.Read("NK.cfg");
   }
 
   // Run setup after config has been loaded.
   void Setup() {
-    world.SetWellMixed(true);
-    world.SetCache();
+    SetWellMixed(true);
+    SetCache();
 
     // Load in config values for easy access.
     N = config.N();
@@ -45,47 +44,48 @@ struct NKWorld {
     MAX_GENS = config.MAX_GENS();
     MUT_COUNT = config.MUT_COUNT();
 
+    emp::Random & random = GetRandom();
     landscape.Config(N, K, random);
 
     // Build a random initial population
     for (uint32_t i = 0; i < POP_SIZE; i++) {
       BitOrg next_org(N);
       for (uint32_t j = 0; j < N; j++) next_org[j] = random.P(0.5);
-      world.Inject(next_org);
+      Inject(next_org);
     }
 
     // Setup the fitness function.
     std::function<double(BitOrg&)> fit_fun =
       [this](BitOrg & org){ return landscape.GetFitness(org); };
-    world.SetFitFun( fit_fun );
+    SetFitFun( fit_fun );
 
     // Setup the mutation function.
-    world.SetMutFun( [this](BitOrg & org, emp::Random& random) {
-        for (uint32_t m = 0; m < MUT_COUNT; m++) {
-          const uint32_t pos = random.GetUInt(N);
-          org[pos] = random.P(0.5);
-        }
-        return true;
-      } );
+    SetMutFun( [this](BitOrg & org, emp::Random& random) {
+      for (uint32_t m = 0; m < MUT_COUNT; m++) {
+        const uint32_t pos = random.GetUInt(N);
+        org[pos] = random.P(0.5);
+      }
+      return true;
+    } );
   }
 
   void Run() {
-    std::cout << 0 << " : " << world[0] << " : " << landscape.GetFitness(world[0]) << std::endl;
+    std::cout << 0 << " : " << *pop[0] << " : " << landscape.GetFitness(*pop[0]) << std::endl;
 
     // Loop through updates
     for (uint32_t ud = 0; ud < MAX_GENS; ud++) {
       // Print current state.
-      // for (uint32_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << std::endl;
+      // for (uint32_t i = 0; i < GetSize(); i++) std::cout << *pop[i] << std::endl;
       // std::cout << std::endl;
 
       // Keep the best individual.
-      world.EliteSelect(1, 1);
+      EliteSelect(1, 1);
 
       // Run a tournament for the rest...
-      world.TournamentSelect(5, POP_SIZE-1);
-      world.Update();
-      std::cout << (ud+1) << " : " << world[0] << " : " << landscape.GetFitness(world[0]) << std::endl;
-      world.MutatePop(1);
+      TournamentSelect(5, POP_SIZE-1);
+      Update();
+      std::cout << (ud+1) << " : " << *pop[0] << " : " << landscape.GetFitness(*pop[0]) << std::endl;
+      MutatePop(1);
     }
   }
 };
