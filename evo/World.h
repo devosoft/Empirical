@@ -284,7 +284,7 @@ namespace evo {
     SignalKey OnInjectReady(const std::function<void(ORG *)> & fun) { return inject_ready_sig.AddAction(fun); }
     SignalKey OnOrgPlacement(const std::function<void(size_t)> & fun) { return org_placement_sig.AddAction(fun); }
     SignalKey OnUpdate(const std::function<void(size_t)> & fun) { return on_update_sig.AddAction(fun); }
-    SignalKey OnOrgDeath(const std::function<void(int)> & fun) { return on_death_sig.AddAction(fun); }
+    SignalKey OnOrgDeath(const std::function<void(size_t)> & fun) { return on_death_sig.AddAction(fun); }
 
     // Forward any link requests to the SignalControl object.
     template <typename... ARGS>
@@ -341,8 +341,7 @@ namespace evo {
                      const fit_fun_t & fit_fun) {
       before_repro_sig.Trigger(parent_pos);
       for (size_t i = 0; i < copy_count; i++) {
-        Ptr<ORG> new_org;
-        new_org.New(mem);
+        Ptr<ORG> new_org = NewPtr<ORG>(mem);
         offspring_ready_sig.Trigger(new_org.Raw());
         const size_t pos = popM.AddOrgBirth(new_org, parent_pos);
         // If we offspring are placed into the same population, recalculate fitness.
