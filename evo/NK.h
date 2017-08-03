@@ -39,15 +39,15 @@ namespace evo {
 
   class NKLandscape {
   private:
-    const size_t N;
-    const size_t K;
-    const size_t state_count;
-    const size_t total_count;
+    size_t N;
+    size_t K;
+    size_t state_count;
+    size_t total_count;
     emp::vector< emp::vector<double> > landscape;
 
   public:
-    NKLandscape() = delete;
-    NKLandscape(const NKLandscape &) = delete;
+    NKLandscape() : N(0), K(0), state_count(0), total_count(0), landscape() { ; }
+    NKLandscape(const NKLandscape &) = default;
     NKLandscape(NKLandscape &&) = default;
 
     /// N is the length of bitstrings in your population, K is the number of neighboring sites
@@ -59,7 +59,18 @@ namespace evo {
      , total_count(N * state_count)
      , landscape(N)
     {
-      emp_assert(K < 32, K); // Genes will be stored in a 32-bit int; consider using NKLandscape Memo!
+      Reset(random);
+    }
+    ~NKLandscape() { ; }
+    NKLandscape & operator=(const NKLandscape &) = delete;
+    NKLandscape & operator=(NKLandscape &&) = default;
+
+    /// Randomize the landscape without changing the landscape size.
+    void Reset(emp::Random & random) {
+      emp_assert(_K < 32 _K)
+      emp_assert(_K < _N, _K, _N);
+
+      // Build new landscape.
       for ( auto & ltable : landscape) {
         ltable.resize(state_count);
         for (double & pos : ltable) {
@@ -67,9 +78,16 @@ namespace evo {
         }
       }
     }
-    ~NKLandscape() { ; }
-    NKLandscape & operator=(const NKLandscape &) = delete;
-    NKLandscape & operator=(NKLandscape &&) = default;
+
+    /// Configure for new values of N and K.
+    void Config(size_t _N, size_t _K, emp::Random & random) {
+      // Save new values.
+      N = _N;  K = _K;
+      state_count = emp::IntPow<size_t>(2,K+1);
+      total_count = N * state_count;
+      landscape.resize(N);
+      Reset(random);
+    }
 
     /// Returns N
     size_t GetN() const { return N; }
