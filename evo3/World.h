@@ -48,7 +48,7 @@ namespace emp {
 
   template <typename ORG>
   class World {
-  private:
+  protected:
     using this_t = World<ORG>;
     using genome_t = typename emp::find_genome_t<ORG>;
     using genotype_t = emp::Taxon<genome_t>;
@@ -56,7 +56,7 @@ namespace emp {
     friend class World_iterator<this_t>;
 
     using fun_calc_fitness_t = std::function<double(ORG&)>;
-    using fun_do_mutations_t = std::function<void(ORG&,Random&)>;
+    using fun_do_mutations_t = std::function<size_t(ORG&,Random&)>;
     using fun_print_org_t    = std::function<void(ORG&,std::ostream &)>;
     using fun_get_genome_t   = std::function<const genome_t & (ORG &)>;
     using fun_add_inject_t   = std::function<size_t(Ptr<ORG>)>;
