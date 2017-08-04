@@ -79,7 +79,7 @@ namespace emp {
       }
       BitProxy & operator +=(bool b) {
         const bool v = bit_vector.Get(index);
-        bit_vector.Set(index, v + b);
+        bit_vector.Set(index, v || b);
         return *this;
       }
       BitProxy & operator -=(bool b) {
@@ -89,7 +89,7 @@ namespace emp {
       }
       BitProxy & operator *=(bool b) {
         const bool v = bit_vector.Get(index);
-        bit_vector.Set(index, v * b);
+        bit_vector.Set(index, v && b);
         return *this;
       }
       BitProxy & operator /=(bool b) {
