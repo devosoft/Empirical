@@ -4,11 +4,25 @@
 
 #include "web/web.h"
 
+#include "../NKWorld.h"
+
 namespace UI = emp::web;
 
 UI::Document doc("emp_base");
+NKWorld world;
 
 int main()
 {
-  doc << "<h1>Hello, world!</h1>";
+  world.Setup();
+
+  doc << "<h1>NK World</h1>";
+  doc << "Update: " << UI::Live( [](){ return world.GetUpdate(); } ) << "<br>";
+  doc << UI::Button(
+    [](){
+      world.RunStep();
+      doc.Redraw();
+    },
+    "Step",
+    "but_step"
+  );
 }
