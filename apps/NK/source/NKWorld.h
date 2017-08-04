@@ -60,13 +60,19 @@ struct NKWorld : public emp::World<BitOrg> {
     SetFitFun( fit_fun );
 
     // Setup the mutation function.
-    SetMutFun( [this](BitOrg & org, emp::Random& random) {
-      for (uint32_t m = 0; m < MUT_COUNT; m++) {
-        const uint32_t pos = random.GetUInt(N);
-        org[pos] = random.P(0.5);
-      }
-      return true;
-    } );
+    std::function<size_t(BitOrg &, emp::Random &)> mut_fun =
+      [this](BitOrg & org, emp::Random & random) {
+        size_t num_muts = 0;
+        for (uint32_t m = 0; m < MUT_COUNT; m++) {
+          const uint32_t pos = random.GetUInt(N);
+          if (random.P(0.5)) {
+            org[pos] ^= 1;
+            num_muts++;
+          }
+        }
+        return num_muts;
+      };
+    SetMutFun( mut_fun );
   }
 
   void Run() {
