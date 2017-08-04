@@ -12,20 +12,37 @@ struct NKInterface {
   UI::Document doc;
   NKWorld world;
 
-  UI::Canvas canvas;
+  UI::Canvas org_canvas;
 
   NKInterface()
     : doc("emp_base")
-    , canvas(400, 400, "org_canvas")
+    , org_canvas(400, 400, "org_canvas")
   {
     world.Setup();
     doc << "<h1>NK World</h1>";
-    doc << canvas << "<br>Update: " << UI::Live( [this](){ return world.GetUpdate(); } ) << "<br>";
+    doc << org_canvas << "<br>Update: " << UI::Live( [this](){ return world.GetUpdate(); } ) << "<br>";
     doc << UI::Button(
-      [this](){ world.RunStep(); doc.Redraw(); },
+      [this](){ world.RunStep(); Redraw(); },
       "Step",
       "but_step"
     );
+  }
+
+  void DrawOrgs() {
+    org_canvas.Clear("black");
+    for (size_t id = 0; id < world.GetSize() && id < 100; id++) {
+      auto & org = world[id];
+      for (size_t pos = 0; pos < org.GetSize(); pos++) {
+        if (!org[pos]) continue;
+        org_canvas.Rect(pos*4, id*4, 4, 4, "yellow");
+      }
+    }
+  }
+
+  void Redraw() {
+    doc.Freeze();
+    DrawOrgs();
+    doc.Activate();
   }
 };
 
