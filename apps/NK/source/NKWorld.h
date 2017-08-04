@@ -29,7 +29,6 @@ struct NKWorld : public emp::World<BitOrg> {
 
   NKWorld(const std::string & world_name="NKWorld")
   : emp::World<BitOrg>(world_name) {
-    config.Read("NK.cfg");
   }
 
   // Run setup after config has been loaded.
