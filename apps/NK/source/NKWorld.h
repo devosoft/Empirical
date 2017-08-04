@@ -75,23 +75,25 @@ struct NKWorld : public emp::World<BitOrg> {
     SetMutFun( mut_fun );
   }
 
+  void RunStep() {
+    // Do mutations on the population.
+    MutatePop(1);
+
+    // Keep the best individual.
+    EliteSelect(1, 1);
+
+    // Run a tournament for the rest...
+    TournamentSelect(5, POP_SIZE-1);
+    Update();
+  }
+
   void Run() {
     std::cout << 0 << " : " << *pop[0] << " : " << landscape.GetFitness(*pop[0]) << std::endl;
 
     // Loop through updates
     for (uint32_t ud = 0; ud < MAX_GENS; ud++) {
-      // Print current state.
-      // for (uint32_t i = 0; i < GetSize(); i++) std::cout << *pop[i] << std::endl;
-      // std::cout << std::endl;
-
-      // Keep the best individual.
-      EliteSelect(1, 1);
-
-      // Run a tournament for the rest...
-      TournamentSelect(5, POP_SIZE-1);
-      Update();
+      RunStep();
       std::cout << (ud+1) << " : " << *pop[0] << " : " << landscape.GetFitness(*pop[0]) << std::endl;
-      MutatePop(1);
     }
   }
 };
