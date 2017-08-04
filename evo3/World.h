@@ -187,6 +187,7 @@ namespace emp {
 
     size_t GetSize() const { return pop.size(); }
     size_t GetNumOrgs() const { return num_orgs; }
+    size_t GetUpdate() const { return update; }
     bool IsOccupied(size_t i) const { return pop[i] != nullptr; }
     bool IsCacheOn() const { return cache_on; }
     size_t GetWidth() const { return size_x; }
