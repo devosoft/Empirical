@@ -67,6 +67,21 @@ size_t EvalMove(emp::Mancala & game, emp::AvidaGP & org) {
   return (size_t) best_move;
 }
 
+// Determine the next move of a randomw player
+size_t EvalMove(emp::Mancala & game, emp::Random & random) {
+  // Setup the hardware with proper inputs.
+  emp::vector<int> options;
+  emp::array<size_t, 7> side = game.GetCurSide();
+  for (int i = 0; i < 6; i++) {
+    if (side[i] > 0) {
+        options.push_back(i);
+    }
+  }
+  int choice = emp::Choose(random, options.size(), 1)[0];
+  return (size_t) options[choice];
+}
+
+
 using mancala_ai_t = std::function< size_t(emp::Mancala & game) >;
 
 // Setup the fitness function for a whole game.
@@ -112,6 +127,12 @@ double EvalGame(mancala_ai_t & player0, mancala_ai_t & player1,
 
 // Build wrappers for AvidaGP
 double EvalGame(emp::AvidaGP & org0, emp::AvidaGP & org1, bool cur_player=0, bool verbose=false) {
+  mancala_ai_t org_fun0 = [&org0](emp::Mancala & game){ return EvalMove(game, org0); };
+  mancala_ai_t org_fun1 = [&org1](emp::Mancala & game){ return EvalMove(game, org1); };
+  return EvalGame(org_fun0, org_fun1, cur_player, verbose);
+}
+
+double EvalGame(emp::AvidaGP & org0, emp::Random & org1, bool cur_player=0, bool verbose=false) {
   mancala_ai_t org_fun0 = [&org0](emp::Mancala & game){ return EvalMove(game, org0); };
   mancala_ai_t org_fun1 = [&org1](emp::Mancala & game){ return EvalMove(game, org1); };
   return EvalGame(org_fun0, org_fun1, cur_player, verbose);
@@ -398,7 +419,10 @@ int main(int argc, char* argv[])
     [&random, &world](emp::AvidaGP * org) {
       emp::AvidaGP & rand_org = world.GetRandomOrg();
       bool cur_player = random.P(0.5);
-      return EvalGame(*org, rand_org, cur_player);
+      double score = EvalGame(*org, rand_org, cur_player);
+      cur_player = random.P(0.5);
+      score +=  EvalGame(*org, random, cur_player);
+      return score/2;
     };
 
   world.SetDefaultFitnessFun(fit_fun);
