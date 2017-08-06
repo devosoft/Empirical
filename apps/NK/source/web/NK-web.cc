@@ -13,10 +13,12 @@ struct NKInterface {
   NKWorld world;
 
   UI::Canvas org_canvas;
+  UI::Animate anim;
 
   NKInterface()
     : doc("emp_base")
     , org_canvas(400, 400, "org_canvas")
+    , anim( [this](){ DoFrame(); }, org_canvas )
   {
     world.Setup();
     doc << "<h1>NK World</h1>";
@@ -26,6 +28,12 @@ struct NKInterface {
       "Step",
       "but_step"
     );
+    doc.AddButton([this](){
+        anim.ToggleActive();
+        auto but = doc.Button("but_toggle");
+        if (anim.GetActive()) but.Label("Pause");
+        else but.Label("Start");
+      }, "Start", "but_toggle");
   }
 
   void DrawOrgs() {
@@ -43,6 +51,11 @@ struct NKInterface {
     doc.Freeze();
     DrawOrgs();
     doc.Activate();
+  }
+
+  void DoFrame() {
+    world.RunStep();
+    Redraw();
   }
 };
 
