@@ -23,17 +23,14 @@ struct NKInterface {
     world.Setup();
     doc << "<h1>NK World</h1>";
     doc << org_canvas << "<br>Update: " << UI::Live( [this](){ return world.GetUpdate(); } ) << "<br>";
-    doc << UI::Button(
-      [this](){ world.RunStep(); Redraw(); },
-      "Step",
-      "but_step"
-    );
-    doc.AddButton([this](){
-        anim.ToggleActive();
-        auto but = doc.Button("but_toggle");
-        if (anim.GetActive()) but.Label("Pause");
-        else but.Label("Start");
-      }, "Start", "but_toggle");
+    doc.AddButton( [this](){ world.RunStep(); DrawAll(); }, "Step", "but_step" );
+    doc << anim.GetToggleButton("but_toggle");
+    // doc.AddButton( [this](){
+    //     anim.ToggleActive();
+    //     auto but = doc.Button("but_toggle");
+    //     if (anim.GetActive()) but.Label("Pause");
+    //     else but.Label("Start");
+    //   }, "Start", "but_toggle");
   }
 
   void DrawOrgs() {
@@ -47,15 +44,13 @@ struct NKInterface {
     }
   }
 
-  void Redraw() {
-    doc.Freeze();
+  void DrawAll() {
     DrawOrgs();
-    doc.Activate();
   }
 
   void DoFrame() {
     world.RunStep();
-    Redraw();
+    DrawOrgs();
   }
 };
 
