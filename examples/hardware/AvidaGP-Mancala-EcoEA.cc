@@ -486,7 +486,11 @@ int main(int argc, char* argv[])
 
   };
 
-
+  world.OnUpdate([&world](int update){
+      if (update % 1000 == 0) {
+          world[0].PrintGenome("mancala_save.org");
+      }
+  });
 
   // Do the run...
   for (size_t ud = 0; ud < UPDATES; ud++) {
