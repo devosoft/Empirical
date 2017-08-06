@@ -47,6 +47,7 @@
 #include "../base/assert.h"
 #include "../base/vector.h"
 
+#include "Button.h"
 #include "emfunctions.h"
 #include "JSWrap.h"
 #include "Widget.h"
@@ -71,6 +72,8 @@ namespace web {
     double run_time;                    //< How much run time has accumulated?
 
     int frame_count;                    //< How many animation frames have gone by?
+
+    Button toggle_but;                  //< A button to start/stop this animation.
 
     void LoadTargets() { ; }
     template <typename... T>
@@ -169,6 +172,14 @@ namespace web {
 
     void SetCallback(const std::function<void()> & fun) {
       anim_fun = [fun](const Animate &){fun();};
+    }
+
+    Button GetToggleButton(const std::string & but_name, const std::string & start_label="Start", const std::string & stop_label="Stop") {
+      toggle_but = Button( [this, but_name, start_label, stop_label]() {
+          ToggleActive();
+          toggle_but.Label(active ? stop_label : start_label);
+        }, start_label, but_name);
+      return toggle_but;
     }
   };
 
