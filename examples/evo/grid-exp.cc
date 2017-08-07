@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <fstream>
 
 #include "../../config/ArgManager.h"
 #include "../../evo/NK.h"
@@ -115,5 +116,24 @@ int main(int argc, char* argv[])
     grid_pop.Update();
     grid_pop.MutatePop();
   }
+
+  std::ofstream myfile;
+  myfile.open("BEN_MUT_Grid.csv");
+
+  for (auto org : grid_pop){ 
+      auto test = *org;
+      double fitness = fit_func(org);
+
+      for (int i = 0; i < org->size(); i++) {
+          test[i] = !test[i];
+          double fit_num = fit_func(&test);
+          if (fit_num > fitness) {
+              myfile << fit_num - fitness<<",";
+          }
+          test[i] = !test[i];
+      }
+      myfile<<"\n";
+  }
+  myfile.close();
 
 }

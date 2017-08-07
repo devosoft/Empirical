@@ -97,4 +97,24 @@ int main(int argc, char* argv[])
 
   }
 
+  std::ofstream myfile;
+  myfile.open("BEN_MUT_Mixed.csv");
+
+  for (auto org : mixed_pop){ 
+      auto test = *org;
+      double fitness = fit_func(org);
+
+      for (int i = 0; i < org->size(); i++) {
+          test[i] = !test[i];
+          double fit_num = fit_func(&test);
+          if (fit_num > fitness) {
+              myfile << fit_num - fitness<<",";
+          }
+          test[i] = !test[i];
+      }
+      myfile<<"\n";
+  }
+  myfile.close();
+
+
 }
