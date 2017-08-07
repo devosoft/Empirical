@@ -1,7 +1,7 @@
 #ifndef EMP_UI_H
 #define EMP_UI_H
 
-#include "../emtools/init.h"
+#include "../web/init.h"
 
 #include "ElementSlate.h"
 

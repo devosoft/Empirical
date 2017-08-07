@@ -6,8 +6,8 @@
 #define EMP_GRID_H
 
 #include "Kinetic.h"
-#include "../emtools/Color.h"
-#include "../emtools/emfunctions.h"
+#include "../web/Color.h"
+#include "../web/emfunctions.h"
 #include "../tools/ProbSchedule.h"
 
 #include <vector>
