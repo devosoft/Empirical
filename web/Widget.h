@@ -40,7 +40,7 @@ namespace web {
   namespace internal {
     // Pre-declate WidgetInfo so classes can inter-operate.
     class WidgetInfo;
-    class SlateInfo;
+    class DivInfo;
     class TableInfo;
 
     // Quick method for generating unique IDs when not otherwise specified.
@@ -65,7 +65,7 @@ namespace web {
 
   // Widget is a smart pointer to a WidgetInfo object, plus some basic accessors.
   class Widget {
-    friend internal::WidgetInfo; friend internal::SlateInfo; friend internal::TableInfo;
+    friend internal::WidgetInfo; friend internal::DivInfo; friend internal::TableInfo;
   protected:
     using WidgetInfo = internal::WidgetInfo;
     WidgetInfo * info;
@@ -118,11 +118,11 @@ namespace web {
     bool CanvasOK() const;
     bool ImageOK() const;
     bool SelectorOK() const;
-    bool SlateOK() const;
+    bool DivOK() const;
     bool TableOK() const;
     bool TextOK() const;
 
-    bool IsSlate() const { return SlateOK(); }
+    bool IsDiv() const { return DivOK(); }
     bool IsTable() const { return TableOK(); }
     bool IsText() const { return TextOK(); }
 
@@ -210,7 +210,7 @@ namespace web {
       virtual bool IsCanvasInfo() const { return false; }
       virtual bool IsImageInfo() const { return false; }
       virtual bool IsSelectorInfo() const { return false; }
-      virtual bool IsSlateInfo() const { return false; }
+      virtual bool IsDivInfo() const { return false; }
       virtual bool IsTableInfo() const { return false; }
       virtual bool IsTextInfo() const { return false; }
       virtual bool IsTextAreaInfo() const { return false; }
@@ -223,8 +223,8 @@ namespace web {
       virtual void Unregister(Widget & w) { if (parent) parent->Unregister(w); }
 
       // Some nodes can have children and need to be able to recursively register them.
-      virtual void RegisterChildren(SlateInfo * registrar) { ; }   // No children by default.
-      virtual void UnregisterChildren(SlateInfo * regestrar) { ; } // No children by default.
+      virtual void RegisterChildren(DivInfo * registrar) { ; }   // No children by default.
+      virtual void UnregisterChildren(DivInfo * regestrar) { ; } // No children by default.
 
       // Record dependants.  Dependants are only acted upon when this widget's action is
       // triggered (e.g. a button is pressed)
@@ -372,7 +372,7 @@ namespace web {
   bool Widget::CanvasOK() const { if (!info) return false; return info->IsCanvasInfo(); }
   bool Widget::ImageOK() const { if (!info) return false; return info->IsImageInfo(); }
   bool Widget::SelectorOK() const { if (!info) return false; return info->IsSelectorInfo(); }
-  bool Widget::SlateOK() const { if (!info) return false; return info->IsSlateInfo(); }
+  bool Widget::DivOK() const { if (!info) return false; return info->IsDivInfo(); }
   bool Widget::TableOK() const { if (!info) return false; return info->IsTableInfo(); }
   bool Widget::TextOK() const { if (!info) return false; return info->IsTextInfo(); }
 

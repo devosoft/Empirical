@@ -5,7 +5,9 @@
 //
 //  This file is an example for using the re-vamped World template.
 
+#ifndef EMP_TRACK_MEM
 #define EMP_TRACK_MEM
+#endif
 
 #include <iostream>
 

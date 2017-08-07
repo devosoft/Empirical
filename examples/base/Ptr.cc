@@ -15,6 +15,7 @@
 #endif
 
 #include "../../base/Ptr.h"
+#include "../../base/vector.h"
 
 struct TestBase {
   int x;
@@ -74,6 +75,30 @@ int main()
   for (size_t i = 0; i < 26; i++) {
     ptr_v[i].Delete();
   }
+
+
+  // -- Interactions between Ptr and emp::vector --
+
+  // create a vector of pointers
+  emp::vector<emp::Ptr<char>> v_ptr(26);
+  for (size_t i = 0; i < v_ptr.size(); i++) {
+    v_ptr[i] = emp::NewPtr<char>('A' + i);
+  }
+  // print the pointer contents.
+  std::cout << "Chars: ";
+  for (size_t i = 0; i < v_ptr.size(); i++) {
+    std::cout << *v_ptr[i];
+  }
+  std::cout << std::endl;
+
+  emp::vector<emp::Ptr<char>> v_ptr2;
+  std::swap(v_ptr, v_ptr2);
+
+  // and delete the pointers.
+  for (size_t i = 0; i < v_ptr2.size(); i++) {
+    v_ptr2[i].Delete();
+  }
+
 
   std::cout << "End of main()." << std::endl;
 }

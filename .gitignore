@@ -16,6 +16,9 @@ a.out.js
 *.csv
 coverage.xml
 diff_cover.txt
+apps/SpatialCoop2017/SimplePDWorld
+apps/SpatialCoop2017/web/SimplePDWorld.js
+apps/Sudoku/Sudoku.js
 UTests/tools/tmp*.cc
 UTests/web/JSWrap.js
 UTests/OLD/UI/ElementSlate.js
@@ -127,10 +130,10 @@ examples/web/Animate.js
 examples/web/Animate2.js
 examples/web/Attributes.js
 examples/web/Canvas.js
+examples/web/Div.js
 examples/web/DP.js
 examples/web/Example.js
 examples/web/Graph.js
-examples/web/Slate.js
 examples/web/Sudoku.js
 examples/web/Table.js
 examples/web/TextArea.js

@@ -5,9 +5,9 @@
 //
 //  The Text Widget
 //
-//  A representation of text on a web page.  Text Widgets can be included inside of Slates
-//  or Tables to cordon off a section of text (and will be automatically created when text
-//  is streamed into these other widgets).  The primary benefit of explicitly creating your
+//  A representation of text on a web page.  Text Widgets can be included inside of Divs or
+//  Tables to cordon off a section of text (and will be automatically created when text is
+//  streamed into these other widgets).  The primary benefit of explicitly creating your
 //  own text widget is to control the text style.
 
 

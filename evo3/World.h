@@ -31,21 +31,24 @@
 
 #include "../base/Ptr.h"
 #include "../base/vector.h"
+#include "../control/Signal.h"
+#include "../control/SignalControl.h"
 #include "../meta/reflection.h"
 #include "../tools/map_utils.h"
 #include "../tools/Random.h"
 #include "../tools/random_utils.h"
 #include "../tools/string_utils.h"
 
-#include "Systematics.h"
+#include "Systematics.h"    // Track relationships among organisms.
+#include "World_iterator.h" // Allow iteration through organisms in a world.
 #include "World_reflect.h"  // Handle needed reflection on incoming organism classes.
-#include "World_iterator.h"
+#include "World_file.h"  // Helper to determine when specific events should occur.
 
 namespace emp {
 
   template <typename ORG>
   class World {
-  private:
+  protected:
     using this_t = World<ORG>;
     using genome_t = typename emp::find_genome_t<ORG>;
     using genotype_t = emp::Taxon<genome_t>;
@@ -53,7 +56,7 @@ namespace emp {
     friend class World_iterator<this_t>;
 
     using fun_calc_fitness_t = std::function<double(ORG&)>;
-    using fun_do_mutations_t = std::function<void(ORG&,Random&)>;
+    using fun_do_mutations_t = std::function<size_t(ORG&,Random&)>;
     using fun_print_org_t    = std::function<void(ORG&,std::ostream &)>;
     using fun_get_genome_t   = std::function<const genome_t & (ORG &)>;
     using fun_add_inject_t   = std::function<size_t(Ptr<ORG>)>;
@@ -66,15 +69,20 @@ namespace emp {
     emp::vector<Ptr<ORG>> pop;      //< All of the spots in the population.
     emp::vector<Ptr<ORG>> next_pop; //< Population being setup for next generation.
     size_t num_orgs;                //< How many organisms are actually in the population.
+    size_t update;                  //< How many times has the Update() method been called?
     emp::vector<double> fit_cache;  //< vector size == 0 when not caching; uncached values == 0.
     emp::vector<Ptr<genotype_t>> genotypes;      //< Genotypes for the corresponding orgs.
     emp::vector<Ptr<genotype_t>> next_genotypes; //< Genotypes for corresponding orgs in next_pop.
 
     // Configuration settings
-    std::string name;         // Name of this world (for use in configuration.)
-    bool cache_on;            // Should we be caching fitness values?
-    size_t size_x;            // If a grid, track width; if pools, track pool size
-    size_t size_y;            // If a grid, track height; if pools, track num pools.
+    std::string name;               // Name of this world (for use in configuration.)
+    bool cache_on;                  // Should we be caching fitness values?
+    size_t size_x;                  // If a grid, track width; if pools, track pool size
+    size_t size_y;                  // If a grid, track height; if pools, track num pools.
+    emp::vector<World_file> files;  // Output files.
+
+    // Potential data nodes
+    Ptr<DataMonitor<double>> data_node_fitness;
 
     // Configurable functions.
     fun_calc_fitness_t  fun_calc_fitness;   // Fitness function
@@ -90,6 +98,35 @@ namespace emp {
 
     // Data collection.
     Systematics<genome_t> systematics;
+
+    // == Signals ==
+
+    SignalControl control;  // Setup the world to control various signals.
+
+    // Trigger:  Immediately prior to parent producing offspring
+    // Argument: Parent position in population
+    Signal<void(size_t)> before_repro_sig;
+
+    // Trigger: Offspring about to enter population
+    // Argument: Reference to organism about to be placed in population.
+    Signal<void(ORG &)> offspring_ready_sig;
+
+    // Trigger: New org about to be added to population from outside
+    // Argument: Reference to organism about to be placed in population.
+    Signal<void(ORG &)> inject_ready_sig;
+
+    // Trigger: Organism has been added to population
+    // Argument: Position of organism placed in the population.
+    Signal<void(size_t)> org_placement_sig;
+
+    // Trigger: New update is starting
+    // Argument: Update number (sequentially increasing)
+    Signal<void(size_t)> on_update_sig;
+
+    // Trigger: Organism is about to be killed
+    // Argument: Position of organism about to die
+    Signal<void(size_t)> on_death_sig;  // TODO!!!!
+
 
     // AddOrgAt is the only way to add organisms (others must go through here)
     size_t AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
@@ -110,10 +147,18 @@ namespace emp {
     World(Ptr<Random> rnd=nullptr, std::string _name="")
       : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), fit_cache()
       , genotypes(), next_genotypes()
-      , name(_name), cache_on(false), size_x(0), size_y(0)
+      , name(_name), cache_on(false), size_x(0), size_y(0), files()
+      , data_node_fitness(nullptr)
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_get_genome()
       , fun_add_inject(), fun_add_birth(), fun_get_neighbor()
       , attributes(), systematics(true,true,true)
+      , control()
+      , before_repro_sig(to_string(name,"::before-repro"), control)
+      , offspring_ready_sig(to_string(name,"::offspring-ready"), control)
+      , inject_ready_sig(to_string(name,"::inject-ready"), control)
+      , org_placement_sig(to_string(name,"::org-placement"), control)
+      , on_update_sig(to_string(name,"::on-update"), control)
+      , on_death_sig(to_string(name,"::on-death"), control)
     {
       if (!rnd) NewRandom();
       SetDefaultFitFun<this_t, ORG>(*this);
@@ -128,6 +173,7 @@ namespace emp {
     ~World() {
       Clear();
       if (random_owner) random_ptr.Delete();
+      if (data_node_fitness) data_node_fitness.Delete();
     }
 
     // --- Publicly available types ---
@@ -141,6 +187,7 @@ namespace emp {
 
     size_t GetSize() const { return pop.size(); }
     size_t GetNumOrgs() const { return num_orgs; }
+    size_t GetUpdate() const { return update; }
     bool IsOccupied(size_t i) const { return pop[i] != nullptr; }
     bool IsCacheOn() const { return cache_on; }
     size_t GetWidth() const { return size_x; }
@@ -173,15 +220,41 @@ namespace emp {
     void SetGrid(size_t width, size_t height, bool synchronous_gen=false);
     void SetPools(size_t num_pools, size_t pool_size, bool synchronous_gen=false);
 
+    DataMonitor<double> & GetFitnessDataNode() {
+      if (!data_node_fitness) {
+        data_node_fitness.New();
+        // Collect fitnesses each update...
+        OnUpdate(
+          [this](size_t){
+            data_node_fitness->Reset();
+            for (size_t i = 0; i < pop.size(); i++) {
+              if (IsOccupied(i)) data_node_fitness->AddDatum( CalcFitnessID(i) );
+            }
+          }
+        );
+      }
+      return *data_node_fitness;
+    }
+
+    World_file & SetupFitnessFile(const std::string & filename="fitness.csv");
+
     void SetFitFun(const fun_calc_fitness_t & fit_fun) { fun_calc_fitness = fit_fun; }
     void SetMutFun(const fun_do_mutations_t & mut_fun) { fun_do_mutations = mut_fun; }
     void SetPrintFun(const fun_print_org_t & print_fun) { fun_print_org = print_fun; }
     void SetGetGenomeFun(const fun_get_genome_t & gen_fun) { fun_get_genome = gen_fun; }
 
+    // Deal with Signals
+    SignalControl & GetSignalControl() { return control; }  // Access signal controller.
+    SignalKey OnBeforeRepro(const std::function<void(size_t)> & fun) { return before_repro_sig.AddAction(fun); }
+    SignalKey OnOffspringReady(const std::function<void(ORG *)> & fun) { return offspring_ready_sig.AddAction(fun); }
+    SignalKey OnInjectReady(const std::function<void(ORG *)> & fun) { return inject_ready_sig.AddAction(fun); }
+    SignalKey OnOrgPlacement(const std::function<void(size_t)> & fun) { return org_placement_sig.AddAction(fun); }
+    SignalKey OnUpdate(const std::function<void(size_t)> & fun) { return on_update_sig.AddAction(fun); }
+    SignalKey OnOrgDeath(const std::function<void(size_t)> & fun) { return on_death_sig.AddAction(fun); }
 
     // --- MANAGE ATTRIBUTES ---
     bool HasAttribute(const std::string & name) const { return Has(attributes, name); }
-    const std::string & GetAttribute(const std::string) const {
+    std::string GetAttribute(const std::string) const {
       emp_assert( Has(attributes, name) );
       return Find(attributes, name, "UNKNOWN");
     }
@@ -232,11 +305,10 @@ namespace emp {
     // --- MANIPULATE ORGS IN POPULATION ---
 
     void Clear();
-    void ClearOrgAt(size_t pos);
 
     void Resize(size_t new_size) {
-      for (size_t i = new_size; i < pop.size(); i++) ClearOrgAt(i); // Remove orgs past new size.
-      pop.resize(new_size, nullptr);                                // Default new orgs to null.
+      for (size_t i = new_size; i < pop.size(); i++) RemoveOrgAt(i); // Remove orgs past new size.
+      pop.resize(new_size, nullptr);                                 // Default new orgs to null.
     }
 
     // Inject an organism using the default injection scheme.
@@ -324,10 +396,10 @@ namespace emp {
 
     // Determine new organism's genotype.
     Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype);
-    if (pop.size() <= pos) pop.resize(pos+1, nullptr);        // Make sure we have room.
-    if (pop[pos]) { ClearCache(pos); RemoveOrgAt(pos); }      // Clear out any old org.
-    pop[pos] = new_org;                                       // Place new org.
-    ++num_orgs;                                               // Track number of orgs.
+    if (pop.size() <= pos) pop.resize(pos+1, nullptr);  // Make sure we have room.
+    RemoveOrgAt(pos);                                   // Clear out any old org.
+    pop[pos] = new_org;                                 // Place new org.
+    ++num_orgs;                                         // Track number of orgs.
 
     // Track the new genotype.
     if (genotypes.size() <= pos) genotypes.resize(pos+1, nullptr);   // Make sure we fit genotypes.
@@ -343,7 +415,7 @@ namespace emp {
     // Determine new organism's genotype.
     Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype);
     if (next_pop.size() <= pos) next_pop.resize(pos+1, nullptr);   // Make sure we have room.
-    if (next_pop[pos]) { RemoveNextOrgAt(pos); }                   // Clear out any old org.
+    RemoveNextOrgAt(pos);                                          // Clear out any old org.
     next_pop[pos] = new_org;                                       // Place new org.
 
     // Track the new genotype.
@@ -355,20 +427,23 @@ namespace emp {
 
   template<typename ORG>
   void World<ORG>::RemoveOrgAt(size_t pos) {
-    pop[pos].Delete();
-    pop[pos] = nullptr;
-    --num_orgs;
-     if (cache_on) ClearCache(pos);
-    systematics.RemoveOrg( genotypes[pos] );
-    genotypes[pos] = nullptr;
+    if (!pop[pos]) return;                   // Nothing to remove!
+    on_death_sig.Trigger(pos);               // Identify that this position is about to be removed
+    pop[pos].Delete();                       // Delete the organism...
+    pop[pos] = nullptr;                      // ...and reset the pointer to null
+    --num_orgs;                              // Track one fewer organisms in the population
+     if (cache_on) ClearCache(pos);          // Delete any cached info about this organism
+    systematics.RemoveOrg( genotypes[pos] ); // Notify systematics about organism removal
+    genotypes[pos] = nullptr;                // No longer track a genotype at this position
   }
 
   template<typename ORG>
   void World<ORG>::RemoveNextOrgAt(size_t pos) {
-    next_pop[pos].Delete();
-    next_pop[pos] = nullptr;
-    systematics.RemoveOrg( next_genotypes[pos] );
-    next_genotypes[pos] = nullptr;
+    if (!next_pop[pos]) return;                   // Nothing to remove!
+    next_pop[pos].Delete();                       // Delete the organism...
+    next_pop[pos] = nullptr;                      // ..and reset the pointer to null
+    systematics.RemoveOrg( next_genotypes[pos] ); // Notify systematics manager about removal
+    next_genotypes[pos] = nullptr;                // No longer track a genotype at this position
   }
 
   template<typename ORG>
@@ -488,14 +563,34 @@ namespace emp {
     SetAttribute("PopStruct", "Pools");
   }
 
+  // A fitness file (default="fitness.csv") contains information about the population's fitness.
+  template<typename ORG>
+  World_file & World<ORG>::SetupFitnessFile(const std::string & filename) {
+    size_t id = files.size();
+    files.emplace_back(filename);
+    auto & file = files[id];
+    auto & node = GetFitnessDataNode();
+    file.AddVar(update, "update", "Update");
+    file.AddMean(node, "mean_fitness", "Average organism fitness in current population.");
+    file.AddMin(node, "min_fitness", "Minimum organism fitness in current population.");
+    file.AddMax(node, "max_fitness", "Maximum organism fitness in current population.");
+    file.PrintHeaderKeys();
+    return file;
+  }
+
   // --- Updating the world! ---
 
   template<typename ORG>
   void World<ORG>::Update() {
+    on_update_sig.Trigger(update);
+
+    // Print all files.
+    for (auto & file : files) file.Update(update);
+
     // If generations are synchronous (i.e, next_pop is not empty), put the next generation in place.
     if (next_pop.size()) {
       // Clear out current pop.
-      for (size_t i = 0; i < pop.size(); i++) if (pop[i]) RemoveOrgAt(i);
+      for (size_t i = 0; i < pop.size(); i++) RemoveOrgAt(i);
       pop.resize(0);
 
       std::swap(pop, next_pop);               // Move next_pop into place.
@@ -506,6 +601,9 @@ namespace emp {
       num_orgs = 0;
       for (size_t i = 0; i < pop.size(); i++) if (pop[i]) ++num_orgs;
     }
+
+    // Keep count of the number of times Update() has been called.
+    update++;
   }
 
   template<typename ORG>
@@ -523,33 +621,29 @@ namespace emp {
   // Delete all organisms.
   template<typename ORG>
   void World<ORG>::Clear() {
-    for (size_t i = 0; i < pop.size(); i++) if (pop[i]) RemoveOrgAt(i);
-    for (size_t i = 0; i < next_pop.size(); i++) if (next_pop[i]) RemoveNextOrgAt(i);
-    pop.resize(0);                                     // Remove deleted organisms.
+    for (size_t i = 0; i < pop.size(); i++) RemoveOrgAt(i);
+    for (size_t i = 0; i < next_pop.size(); i++) RemoveNextOrgAt(i);
+    pop.resize(0);
     next_pop.resize(0);
-    fit_cache.resize(0);
-  }
-
-  // Delete organism at a specified position, only if it exists.
-  template<typename ORG>
-  void World<ORG>::ClearOrgAt(size_t pos) {
-    if (pop[pos]) RemoveOrgAt(pos);  // Remove an org only if it exists.
   }
 
   template <typename ORG>
   void World<ORG>::Inject(const ORG & mem, size_t copy_count) {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
-      //const size_t pos =
-      fun_add_inject(new_org);
+      inject_ready_sig.Trigger(*new_org);
+      const size_t pos = fun_add_inject(new_org);
       //SetupOrg(*new_org, &callbacks, pos);
+      org_placement_sig.Trigger(pos);
     }
   }
 
   template <typename ORG>
   void World<ORG>::InjectAt(const ORG & mem, const size_t pos) {
     Ptr<ORG> new_org = NewPtr<ORG>(mem);
+    inject_ready_sig.Trigger(*new_org);
     AddOrgAt(new_org, pos);
+    org_placement_sig.Trigger(pos);
     // SetupOrg(*new_org, &callbacks, pos);
   }
 
@@ -558,17 +652,20 @@ namespace emp {
   void World<ORG>::InjectRandomOrg(ARGS &&... args) {
     emp_assert(random_ptr != nullptr && "InjectRandomOrg() requires active random_ptr");
     Ptr<ORG> new_org = NewPtr<ORG>(*random_ptr, std::forward<ARGS>(args)...);
-    // const size_t pos =
-    fun_add_inject(new_org);
+    inject_ready_sig.Trigger(*new_org);
+    const size_t pos = fun_add_inject(new_org);
+    org_placement_sig.Trigger(pos);
     // SetupOrg(*new_org, &callbacks, pos);
   }
 
   template <typename ORG>
   void World<ORG>::DoBirth(const ORG mem, size_t parent_pos, size_t copy_count) {
+    before_repro_sig.Trigger(parent_pos);
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
-      // const size_t pos =
-      fun_add_birth(new_org, parent_pos);
+      offspring_ready_sig.Trigger(*new_org);
+      const size_t pos = fun_add_birth(new_org, parent_pos);
+      org_placement_sig.Trigger(pos);
       // SetupOrg(*new_org, &callbacks, pos);
     }
   }
@@ -615,7 +712,7 @@ namespace emp {
     if (choose_random) emp::Shuffle<Ptr<ORG>>(*random_ptr, pop, new_size);
 
     // Clear out all of the organisms we are removing and resize the population.
-    for (size_t i = new_size; i < pop.size(); ++i) ClearOrgAt(i);
+    for (size_t i = new_size; i < pop.size(); ++i) RemoveOrgAt(i);
     pop.resize(new_size);
   }
 

@@ -59,6 +59,45 @@ namespace emp {
       operator bool() const {            // rvalue handling...
         return bit_vector.Get(index);
       }
+
+      // NOTE: The following functions are implemented in BitProxy since they need to work,
+      // but may not be efficient.
+      BitProxy & operator &=(bool b) {
+        const bool v = bit_vector.Get(index);
+        bit_vector.Set(index, v & b);
+        return *this;
+      }
+      BitProxy & operator |=(bool b) {
+        const bool v = bit_vector.Get(index);
+        bit_vector.Set(index, v | b);
+        return *this;
+      }
+      BitProxy & operator ^=(bool b) {
+        const bool v = bit_vector.Get(index);
+        bit_vector.Set(index, v ^ b);
+        return *this;
+      }
+      BitProxy & operator +=(bool b) {
+        const bool v = bit_vector.Get(index);
+        bit_vector.Set(index, v || b);
+        return *this;
+      }
+      BitProxy & operator -=(bool b) {
+        const bool v = bit_vector.Get(index);
+        bit_vector.Set(index, v - b);
+        return *this;
+      }
+      BitProxy & operator *=(bool b) {
+        const bool v = bit_vector.Get(index);
+        bit_vector.Set(index, v && b);
+        return *this;
+      }
+      BitProxy & operator /=(bool b) {
+        emp_assert(b == true);
+        // Nothing to so since dividing by 1;
+        // Never use this function except for consistency in a template.
+        return *this;
+      }
     };
 
     // emp_constexpr means only make constexpr when NDEBUG is set (to otherwise allow asserts)
