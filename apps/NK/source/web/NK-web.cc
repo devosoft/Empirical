@@ -1,6 +1,9 @@
 //  This file is part of Project Name
 //  Copyright (C) Michigan State University, 2017.
 //  Released under the MIT Software license; see doc/LICENSE
+//
+//  Developer Notes:
+//  * Put update (And other stats) in a Text field.
 
 #include "web/web.h"
 
@@ -25,12 +28,6 @@ struct NKInterface {
     doc << org_canvas << "<br>Update: " << UI::Live( [this](){ return world.GetUpdate(); } ) << "<br>";
     doc.AddButton( [this](){ world.RunStep(); DrawAll(); }, "Step", "but_step" );
     doc << anim.GetToggleButton("but_toggle");
-    // doc.AddButton( [this](){
-    //     anim.ToggleActive();
-    //     auto but = doc.Button("but_toggle");
-    //     if (anim.GetActive()) but.Label("Pause");
-    //     else but.Label("Start");
-    //   }, "Start", "but_toggle");
   }
 
   void DrawOrgs() {
@@ -50,7 +47,7 @@ struct NKInterface {
 
   void DoFrame() {
     world.RunStep();
-    DrawOrgs();
+    DrawAll();
   }
 };
 
