@@ -35,13 +35,15 @@ struct NKInterface {
     div_stats.SetCSS("float", "right");
 
     // Attach the GUI components to the web doc.
-    doc << "<h1>NK World</h1>";
-    doc << div_pop << div_stats;
-    div_pop << org_canvas << "<br>";
     div_pop << UI::Button( [this](){ world.RunStep(); DrawAll(); }, "Step", "but_step" );
     div_pop << anim.GetToggleButton("but_toggle");
+    div_pop << "<br>";
+    div_pop << org_canvas;
 
     div_stats << "<br>Update: " << UI::Live( [this](){ return world.GetUpdate(); } ) << "<br>";
+
+    doc << "<h1>NK World</h1>";
+    doc << div_pop << div_stats;
   }
 
   void DrawOrgs() {
