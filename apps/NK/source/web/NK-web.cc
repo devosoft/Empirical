@@ -2,8 +2,7 @@
 //  Copyright (C) Michigan State University, 2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
-//  Developer Notes:
-//  * Put update (And other stats) in a Text field.
+//  This file contains an easy-to-manipulate NK world.
 
 #include "web/web.h"
 
@@ -40,7 +39,9 @@ struct NKInterface {
     div_pop << "<br>";
     div_pop << org_canvas;
 
+    auto & fit_node = world.GetFitnessDataNode();
     div_stats << "<br>Update: " << UI::Live( [this](){ return world.GetUpdate(); } ) << "<br>";
+    div_stats << "<br>Mean Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMean(); } ) << "<br>";
 
     doc << "<h1>NK World</h1>";
     doc << div_pop << div_stats;
