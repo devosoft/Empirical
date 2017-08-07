@@ -12,22 +12,36 @@
 namespace UI = emp::web;
 
 struct NKInterface {
-  UI::Document doc;
   NKWorld world;
 
+  UI::Document doc;
+  UI::Div div_pop;
+  UI::Div div_stats;
   UI::Canvas org_canvas;
   UI::Animate anim;
 
   NKInterface()
     : doc("emp_base")
+    , div_pop("div_pop")
+    , div_stats("div_stats")
     , org_canvas(400, 400, "org_canvas")
     , anim( [this](){ DoFrame(); }, org_canvas )
   {
+    // Setup the NK World.
     world.Setup();
+
+    // Setup the GUI Components.
+    div_pop.SetCSS("float", "left");
+    div_stats.SetCSS("float", "right");
+
+    // Attach the GUI components to the web doc.
     doc << "<h1>NK World</h1>";
-    doc << org_canvas << "<br>Update: " << UI::Live( [this](){ return world.GetUpdate(); } ) << "<br>";
-    doc.AddButton( [this](){ world.RunStep(); DrawAll(); }, "Step", "but_step" );
-    doc << anim.GetToggleButton("but_toggle");
+    doc << div_pop << div_stats;
+    div_pop << org_canvas << "<br>";
+    div_pop << UI::Button( [this](){ world.RunStep(); DrawAll(); }, "Step", "but_step" );
+    div_pop << anim.GetToggleButton("but_toggle");
+
+    div_stats << "<br>Update: " << UI::Live( [this](){ return world.GetUpdate(); } ) << "<br>";
   }
 
   void DrawOrgs() {
@@ -43,6 +57,7 @@ struct NKInterface {
 
   void DrawAll() {
     DrawOrgs();
+    div_stats.Redraw();
   }
 
   void DoFrame() {
