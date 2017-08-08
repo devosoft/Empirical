@@ -41,7 +41,9 @@ struct NKInterface {
 
     auto & fit_node = world.GetFitnessDataNode();
     div_stats << "<br>Update: " << UI::Live( [this](){ return world.GetUpdate(); } ) << "<br>";
+    div_stats << "<br>Min Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMin(); } ) << "<br>";
     div_stats << "<br>Mean Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMean(); } ) << "<br>";
+    div_stats << "<br>Max Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMax(); } ) << "<br>";
 
     doc << "<h1>NK World</h1>";
     doc << div_pop << div_stats;
