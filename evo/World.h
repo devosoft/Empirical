@@ -265,7 +265,7 @@ namespace evo {
 
     void Clear() { popM.Clear(); }
 
-    Random & GetRandom() { return *random_ptr; }
+    Random & GetRandom() { emp_assert(random_ptr); return *random_ptr; }
     void SetRandom(Random & random) {
       if (random_owner) random_ptr.Delete();
       random_ptr = &random;
