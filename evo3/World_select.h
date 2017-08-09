@@ -14,6 +14,8 @@
 
 namespace emp {
 
+  template<typename ORG> class World;
+
   // Elite Selection picks a set of the most fit individuals from the population to move to
   // the next generation.  Find top e_count individuals and make copy_count copies of each.
   template<typename ORG>
@@ -41,3 +43,5 @@ namespace emp {
 
 
 }
+
+#endif

@@ -40,9 +40,10 @@
 #include "../tools/string_utils.h"
 
 #include "Systematics.h"    // Track relationships among organisms.
+#include "World_file.h"  // Helper to determine when specific events should occur.
 #include "World_iterator.h" // Allow iteration through organisms in a world.
 #include "World_reflect.h"  // Handle needed reflection on incoming organism classes.
-#include "World_file.h"  // Helper to determine when specific events should occur.
+#include "World_select.h"
 
 namespace emp {
 
@@ -373,9 +374,6 @@ namespace emp {
 
 
     // --- SELECTION MECHANISMS ---
-    // Elite Selection picks a set of the most fit individuals from the population to move to
-    // the next generation.  Find top e_count individuals and make copy_count copies of each.
-    void EliteSelect(size_t e_count=1, size_t copy_count=1);
 
     // Tournament Selection creates a tournament with a random sub-set of organisms,
     // finds the one with the highest fitness, and moves it to the next generation.
@@ -751,30 +749,6 @@ namespace emp {
     }
   }
 
-  // Elite Selection picks a set of the most fit individuals from the population to move to
-  // the next generation.  Find top e_count individuals and make copy_count copies of each.
-  template<typename ORG>
-  void World<ORG>::EliteSelect(size_t e_count, size_t copy_count) {
-    emp_assert(fun_calc_fitness);
-    emp_assert(e_count > 0 && e_count <= pop.size(), e_count);
-    emp_assert(copy_count > 0);
-
-    // Load the population into a multimap, sorted by fitness.
-    std::multimap<double, size_t> fit_map;
-    for (size_t i = 0; i < pop.size(); i++) {
-      if (IsOccupied(i)) {
-        const double cur_fit = CalcFitnessID(i);
-        fit_map.insert( std::make_pair(cur_fit, i) );
-      }
-    }
-
-    // Grab the top fitnesses and move them into the next generation.
-    auto m = fit_map.rbegin();
-    for (size_t i = 0; i < e_count; i++) {
-      DoBirth( *(pop[m->second]), m->second, copy_count);
-      ++m;
-    }
-  }
 
   // Tournament Selection creates a tournament with a random sub-set of organisms,
   // finds the one with the highest fitness, and moves it to the next generation.
