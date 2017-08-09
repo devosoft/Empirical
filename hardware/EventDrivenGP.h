@@ -180,6 +180,11 @@ namespace emp {
       void Set(size_t _id, arg_t _a0=0, arg_t _a1=0, arg_t _a2=0, const affinity_t & _aff=affinity_t())
         { id = _id; args[0] = _a0; args[1] = _a1; args[2] = _a2; affinity = _aff; }
 
+      void Set(const Instruction & other) {
+        id = other.id;
+        args[0] = other.args[0]; args[1] = other.args[1]; args[2] = other.args[2];
+        affinity = other.affinity;
+      }
     };
 
     using inst_t = Instruction;
@@ -268,6 +273,11 @@ namespace emp {
                    const affinity_t & aff=affinity_t()) {
         emp_assert(ValidPosition(fID, pos));
         program[fID].inst_seq[pos].Set(id, a0, a1, a2, aff);
+      }
+
+      void SetInst(size_t fID, size_t pos, const inst_t & inst) {
+        emp_assert(ValidPosition(fID, pos));
+        program[fID].inst_seq[pos].Set(inst);
       }
 
       /// Print out a single instruction with its arguments.
