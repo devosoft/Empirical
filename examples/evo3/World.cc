@@ -40,7 +40,7 @@ int main() {
   for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
   std::cout << std::endl;
 
-  world.TournamentSelect(5, 100);
+  TournamentSelect(world, 5, 100);
   world.Update();
   std::cout << "\nPost-Tourney Size = " << world.GetSize() << std::endl << std::endl;
   for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
@@ -61,7 +61,7 @@ int main() {
   for (size_t i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].GetFitness() << " ";
   std::cout << std::endl;
 
-  ea_world.TournamentSelect(5, 100);
+  TournamentSelect(ea_world, 5, 100);
   ea_world.Update();
   std::cout << "\nPost-Tourney Size = " << ea_world.GetSize() << std::endl;
   for (size_t i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].GetFitness() << " ";
