@@ -130,6 +130,7 @@ namespace web {
     }
     Button(const Button & in) : WidgetFacet(in) { ; }
     Button(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsButtonInfo()); }
+    Button() : WidgetFacet("") { info = nullptr; }
     virtual ~Button() { ; }
 
     using INFO_TYPE = ButtonInfo;

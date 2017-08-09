@@ -53,7 +53,7 @@ void TextCB(const std::string & in_str) {
   }
 
   // And print them on the screen.
-  auto result = doc.Slate("result");
+  auto result = doc.Div("result");
   result.Clear();
   result << "<p>Words (without punctuation) with the best selection in bold:</p>";
   for (size_t i = 0; i < num_words; i++) {
@@ -84,7 +84,7 @@ int main()
 
   doc << "<h2>Choose Your Words!</h2>";
 
-  auto desc = doc.AddSlate("desc");
+  auto desc = doc.AddDiv("desc");
   desc.SetWidth(width);
   desc << "<p>Consider the following problem: you have a sentence and want to select words from that sentence.  If you pick a word, you may not pick either of its neighbors.  Which words should you pick to have the maximum total number of letters?</p>"
        << "<p>For example, if you had \"This is a sentence\", you could get 12 points by picking the words 'This' and 'sentence'.  You could not pick both 'This' and 'is' because they are next to each other.</p>"
@@ -93,10 +93,10 @@ int main()
   ta.SetSize(width, 80);
   ta.SetText(start_text);
 
-  auto result = doc.AddSlate("result");
+  auto result = doc.AddDiv("result");
   result << "<br><br>";
 
-  auto tdesc = doc.AddSlate("tdesc");
+  auto tdesc = doc.AddDiv("tdesc");
   tdesc.SetWidth(width);
   tdesc << "<p>How did we solve this problem?  Consider the recursive approach.  If we knew the best possible score if we had only the first <i>n</i>-2 words, and we also knew the best possible score for the first <i>n</i>-1 words, do these values help us find the best score for all <i>n</i> words?</p>"
 	<< "<p>Yes!</p>"

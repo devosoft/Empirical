@@ -59,6 +59,45 @@ namespace emp {
       operator bool() const {            // rvalue handling...
         return bit_vector.Get(index);
       }
+
+      // NOTE: The following functions are implemented in BitProxy since they need to work,
+      // but may not be efficient.
+      BitProxy & operator &=(bool b) {
+        const bool v = bit_vector.Get(index);
+        bit_vector.Set(index, v & b);
+        return *this;
+      }
+      BitProxy & operator |=(bool b) {
+        const bool v = bit_vector.Get(index);
+        bit_vector.Set(index, v | b);
+        return *this;
+      }
+      BitProxy & operator ^=(bool b) {
+        const bool v = bit_vector.Get(index);
+        bit_vector.Set(index, v ^ b);
+        return *this;
+      }
+      BitProxy & operator +=(bool b) {
+        const bool v = bit_vector.Get(index);
+        bit_vector.Set(index, v || b);
+        return *this;
+      }
+      BitProxy & operator -=(bool b) {
+        const bool v = bit_vector.Get(index);
+        bit_vector.Set(index, v - b);
+        return *this;
+      }
+      BitProxy & operator *=(bool b) {
+        const bool v = bit_vector.Get(index);
+        bit_vector.Set(index, v && b);
+        return *this;
+      }
+      BitProxy & operator /=(bool b) {
+        emp_assert(b == true);
+        // Nothing to so since dividing by 1;
+        // Never use this function except for consistency in a template.
+        return *this;
+      }
     };
 
     // emp_constexpr means only make constexpr when NDEBUG is set (to otherwise allow asserts)
@@ -161,7 +200,7 @@ namespace emp {
       num_bits = in_set.num_bits;
 
       if (in_num_fields != prev_num_fields) {
-        bit_set.DeleteArray();
+        if (bit_set) bit_set.DeleteArray();
 	      if (num_bits) bit_set = NewArrayPtr<field_t>(NumFields());
         else bit_set = nullptr;
       }
@@ -173,7 +212,7 @@ namespace emp {
 
     BitVector & operator=(BitVector && in_set) {
       if (&in_set == this) return *this;
-      bit_set.DeleteArray();
+      if (bit_set) bit_set.DeleteArray();
       num_bits = in_set.num_bits;
       bit_set = in_set.bit_set;
       in_set.bit_set = nullptr;
@@ -199,7 +238,7 @@ namespace emp {
         const size_t min_fields = std::min(old_num_fields, NUM_FIELDS);
         for (size_t i = 0; i < min_fields; i++) bit_set[i] = old_bit_set[i];
         for (size_t i = min_fields; i < NUM_FIELDS; i++) bit_set[i] = 0U;
-        old_bit_set.DeleteArray();
+        if (old_bit_set) old_bit_set.DeleteArray();
       }
 
       return *this;

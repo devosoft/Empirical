@@ -34,7 +34,7 @@ int main() {
   for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
   std::cout << std::endl;
 
-  world.EliteSelect(10, 10);
+  EliteSelect(world, 10, 10);
 
   std::cout << "\nElite Select(10,10)\n" << std::endl;
   for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
@@ -46,7 +46,7 @@ int main() {
   for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
   std::cout << std::endl;
 
-  world.EliteSelect(10, 10);
+  EliteSelect(world, 10, 10);
   world.Update();
   std::cout << "\nPost-Elite Size = " << world.GetSize() << std::endl << std::endl;
   for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
@@ -67,7 +67,7 @@ int main() {
   for (size_t i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].GetFitness() << " ";
   std::cout << std::endl;
 
-  ea_world.EliteSelect(10, 10);
+  EliteSelect(ea_world, 10, 10);
   ea_world.Update();
   std::cout << "Post-Elite Size = " << ea_world.GetSize() << std::endl;
   for (size_t i = 0; i < ea_world.GetSize(); i++) std::cout << ea_world[i].GetFitness() << " ";

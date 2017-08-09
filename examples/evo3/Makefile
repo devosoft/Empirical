@@ -4,8 +4,8 @@ CFLAGS_version := -std=c++14
 
 # Emscripten compiler information
 CXX_web := emcc
-CXX_native := clang++
-#CXX_native := g++
+#CXX_native := clang++
+CXX_native := g++
 
 OFLAGS_native_opt := -O3 -DNDEBUG
 OFLAGS_native_debug := -g -pedantic -DEMP_TRACK_MEM  -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual
@@ -24,7 +24,7 @@ CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../web/library
 
 TARGETS := Grid NK Systematics World World2
 
-EVO_DEPEND := ../../evo2/WorldModule.h
+EVO_DEPEND := ../../evo3/World.h
 
 default: native
 
