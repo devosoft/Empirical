@@ -17,7 +17,7 @@
 constexpr size_t POP_SIZE = 200;
 constexpr size_t GENOME_SIZE = 100;
 constexpr size_t EVAL_TIME = 3500;
-constexpr size_t UPDATES = 1000;
+constexpr size_t UPDATES = 1500;
 constexpr size_t TOURNY_SIZE = 4;
 
 // Determine the next move of a human player.
@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
   std::cout<<"SEED: "<<random.GetSeed()<<std::endl;
   //emp::evo::EAWorld<emp::AvidaGP, emp::evo::FitCacheOn> world(random, "AvidaWorld"); // FitCache on
   emp::evo::EAWorld<emp::AvidaGP> world(random, "AvidaWorld"); //FitCache off
-  auto testcases = TestcaseSet<64>("../games/data/game_0.csv", &random);
+  auto testcases = TestcaseSet<64>("../../../games/data/game_0.csv", &random);
   std::function<std::set<int>(emp::array<int, 64>)> cornerFunc = [](emp::array<int, 64> board){
     std::set<int> moves;
     emp::Othello game(0);
