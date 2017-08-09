@@ -11,6 +11,7 @@
 #include <map>
 
 #include "../base/assert.h"
+#include "../tools/IndexMap.h"
 
 namespace emp {
 
@@ -74,6 +75,27 @@ namespace emp {
     }
   }
 
+  /// ==ROULETTE== Selection (aka Fitness-Proportional Selection) chooses organisms to
+  /// reproduce based on their current fitness.
+  // @CAO: Make sure generations are synchnous, OR update the index map each time through.
+  template<typename ORG>
+  void RouletteSelect(World<ORG> & world, size_t count=1) {
+    emp_assert(count > 0);
+
+    Random & random = world.GetRandom();
+
+    // Load fitnesses from current population.
+    IndexMap fitness_index(world.GetSize());
+    for (size_t id = 0; id < world.GetSize(); id++) {
+      fitness_index.Adjust(id, world.CalcFitnessID(id));
+    }
+
+    for (size_t n = 0; n < count; n++) {
+      const double fit_pos = random.GetDouble(fitness_index.GetWeight());
+      size_t id = fitness_index.Index(fit_pos);
+      world.DoBirth( world[id], id, 1 );
+    }
+  }
 
 }
 
