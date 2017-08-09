@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
     // std::cout << std::endl;
 
     // Keep the best individual.
-    pop.EliteSelect(1, 1);
+    emp::EliteSelect(pop, 1, 1);
 
     // Run a tournament for the rest...
     pop.TournamentSelect(5, POP_SIZE-1);
