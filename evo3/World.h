@@ -372,14 +372,6 @@ namespace emp {
     iterator_t begin() { return iterator_t(this, 0); }
     iterator_t end() { return iterator_t(this, (int) pop.size()); }
 
-
-    // --- SELECTION MECHANISMS ---
-
-    // Tournament Selection creates a tournament with a random sub-set of organisms,
-    // finds the one with the highest fitness, and moves it to the next generation.
-    // User provides the fitness function, the tournament size, and (optionally) the
-    // number of tournaments to run.
-    void TournamentSelect(size_t t_size, size_t tourny_count=1);
   };
 
   // =============================================================
@@ -737,7 +729,7 @@ namespace emp {
 
   template<typename ORG>
   void World<ORG>::PrintGrid(std::ostream& os,
-                                      const std::string & empty, const std::string & spacer) {
+                             const std::string & empty, const std::string & spacer) {
     for (size_t y=0; y < size_y; y++) {
       for (size_t x = 0; x < size_x; x++) {
         Ptr<ORG> org = GetOrgPtr(x+y*size_x);
@@ -748,41 +740,6 @@ namespace emp {
       os << std::endl;
     }
   }
-
-
-  // Tournament Selection creates a tournament with a random sub-set of organisms,
-  // finds the one with the highest fitness, and moves it to the next generation.
-  // User provides the fitness function, the tournament size, and (optionally) the
-  // number of tournaments to run.
-  template<typename ORG>
-  void World<ORG>::TournamentSelect(size_t t_size, size_t tourny_count) {
-    emp_assert(fun_calc_fitness);
-    emp_assert(t_size > 0 && t_size <= num_orgs, t_size, num_orgs);
-    emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
-
-    emp::vector<size_t> entries;
-    for (size_t T = 0; T < tourny_count; T++) {
-      entries.resize(0);
-      // Choose organisms for this tournament (with replacement!)
-      for (size_t i=0; i < t_size; i++) entries.push_back( GetRandomOrgID() );
-
-      double best_fit = CalcFitnessID(entries[0]);
-      size_t best_id = entries[0];
-
-      // Search for a higher fit org in the tournament.
-      for (size_t i = 1; i < t_size; i++) {
-        const double cur_fit = CalcFitnessID(entries[i]);
-        if (cur_fit > best_fit) {
-          best_fit = cur_fit;
-          best_id = entries[i];
-        }
-      }
-
-      // Place the highest fitness into the next generation!
-      DoBirth( *(pop[best_id]), best_id, 1 );
-    }
-  }
-
 
 }
 
