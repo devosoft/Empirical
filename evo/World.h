@@ -299,10 +299,10 @@ namespace evo {
       for (int i = 0; i < copy_count; i++) {
         ORG * new_org = new ORG(mem);
         offspring_ready_sig.Trigger(new_org);
-        int index = random_ptr->GetInt(0, positions.size());
-        const int pos = positions[index];
-        popM.AddOrgAt(new_org, pos);
-        //const int pos = popM.AddOrgBirth(new_org, parent_pos);
+        //int index = random_ptr->GetInt(0, positions.size());
+        //const int pos = positions[index];
+        //popM.AddOrgAt(new_org, pos);
+        const int pos = popM.AddOrgBirth(new_org, parent_pos);
         SetupOrg(*new_org, &callbacks, pos);
         org_placement_sig.Trigger(pos);
       }

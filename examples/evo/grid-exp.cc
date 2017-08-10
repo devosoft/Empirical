@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <fstream>
 
 #include "../../config/ArgManager.h"
 #include "../../evo/NK.h"
@@ -25,7 +26,7 @@ EMP_BUILD_CONFIG( NKConfig,
   VALUE(K, int, 0, "Level of epistasis in the NK model"),
   VALUE(N, int, 100, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
   VALUE(SEED, int, 123, "Random number seed (0 for based on time)"),
-  VALUE(POP_SIZE, int, 1000, "Number of organisms in the popoulation."),
+  VALUE(POP_SIZE, int, 3025, "Number of organisms in the popoulation."),
   VALUE(MAX_GENS, int, 10000, "How many generations should we process?"),
   VALUE(MUT_COUNT, double, 0.0001, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
   VALUE(TOUR_SIZE, int, 20, "How many organisms should be picked in each Tournament?"),
@@ -115,5 +116,24 @@ int main(int argc, char* argv[])
     grid_pop.Update();
     grid_pop.MutatePop();
   }
+
+  std::ofstream myfile;
+  myfile.open("BEN_MUT_Grid.csv");
+
+  for (auto org : grid_pop){ 
+      auto test = *org;
+      double fitness = fit_func(org);
+
+      for (int i = 0; i < org->size(); i++) {
+          test[i] = !test[i];
+          double fit_num = fit_func(&test);
+          if (fit_num > fitness) {
+              myfile << fit_num - fitness<<",";
+          }
+          test[i] = !test[i];
+      }
+      myfile<<"\n";
+  }
+  myfile.close();
 
 }
