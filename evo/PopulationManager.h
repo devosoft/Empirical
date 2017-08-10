@@ -161,7 +161,7 @@ namespace evo {
     int GetRandomOrg() const {
       emp_assert(num_orgs > 0); // Make sure it's possible to find an organism!
       int pos = random_ptr->GetInt(0, pop.size());
-      while (pop[pos] == nullptr) pos = random_ptr->GetInt(0, pop.size());
+      //while (pop[pos] == nullptr) pos = random_ptr->GetInt(0, pop.size());
       return pos;
     }
 
@@ -395,8 +395,8 @@ namespace evo {
             int x_pos = emp::mod(id%width + offset%3 - 1, width);
             int y_pos = emp::mod(id/width + offset/3 - 1, height);
             int pos = x_pos + y_pos*width;
-            if(CheckValidOrg(pos))
-                    neighbors.push_back(pos);
+            //if(CheckValidOrg(pos))
+                    //neighbors.push_back(pos);
         }
         return neighbors;
     }
