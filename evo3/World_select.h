@@ -92,8 +92,11 @@ namespace emp {
 
     for (size_t n = 0; n < count; n++) {
       const double fit_pos = random.GetDouble(fitness_index.GetWeight());
-      size_t id = fitness_index.Index(fit_pos);
-      world.DoBirth( world[id], id, 1 );
+      const size_t parent_id = fitness_index.Index(fit_pos);
+      const size_t offspring_id = world.DoBirth( world[parent_id], parent_id );
+      if (world.IsSynchronous() == false) {
+        fitness_index.Adjust(offspring_id, world.CalcFitnessID(offspring_id));
+      }
     }
   }
 
