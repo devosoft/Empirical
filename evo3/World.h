@@ -276,7 +276,7 @@ namespace emp {
 
     // When calculating fitness, the three relevant inputs are the organism, the fitness function,
     // and the position in the population.
-    double CalcFitnessOrg(ORG & org) { emp_assert(fun_calc_fitness); return fun_calc_fitness(org); }
+    double CalcFitnessOrg(ORG & org);
     double CalcFitnessID(size_t id);
 
     void CalcFitnessAll() const {
@@ -597,7 +597,14 @@ namespace emp {
   }
 
   template<typename ORG>
+  double World<ORG>::CalcFitnessOrg(ORG & org) {
+    emp_assert(fun_calc_fitness);
+    return fun_calc_fitness(org);
+  }
+
+  template<typename ORG>
   double World<ORG>::CalcFitnessID(size_t id) {
+    if (!pop[id]) return 0.0;
     if (!cache_on) return CalcFitnessOrg(*pop[id]);
     double cur_fit = GetCache(id);
     if (cur_fit == 0.0 && pop[id]) {   // If org is non-null, but no cached fitness, calculate it!
