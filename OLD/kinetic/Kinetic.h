@@ -27,10 +27,10 @@
 #include "../geometry/Circle2D.h"
 #include "../geometry/Point2D.h"
 
-#include "../emtools/color_map.h"
-#include "../emtools/emfunctions.h"
-#include "../emtools/Font.h"
-#include "../emtools/RawImage.h"
+#include "../web/color_map.h"
+#include "../web/emfunctions.h"
+#include "../web/Font.h"
+#include "../web/RawImage.h"
 
 extern "C" {
   extern void EMP_SETUP(); // @CAO -- This function should be more generic!

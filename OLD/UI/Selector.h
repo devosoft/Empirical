@@ -6,7 +6,7 @@
 //  Specs for the Selector widget.
 //
 
-#include "../emtools/JSWrap.h"
+#include "../web/JSWrap.h"
 #include "../tools/vector.h"
 
 #include "Widget.h"

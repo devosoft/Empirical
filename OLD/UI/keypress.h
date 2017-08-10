@@ -9,8 +9,8 @@
 #include <functional>
 #include <map>
 
-#include "../emtools/html5_events.h"
-#include "../emtools/JSWrap.h"
+#include "../web/html5_events.h"
+#include "../web/JSWrap.h"
 
 namespace emp {
 namespace UI {

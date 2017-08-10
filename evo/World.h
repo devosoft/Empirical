@@ -417,22 +417,27 @@ namespace evo {
             for (int i=0; i<t_size; i++) entries.push_back( popM.GetRandomOrg() ); // Allows replacement!
         else{
             t_size = 9; // neighborhood size
-            if(!popM.CheckValidOrg(T))
-                continue;
+            //if(!popM.CheckValidOrg(T))
+                //continue;
             entries = popM.GetNeighbors(t_size, T);
         }
 
-        double best_fit = popM.CalcFitness(entries[0], fit_fun);
-        int best_id = entries[0];
+        double best_fit = 0.0; //= popM.CalcFitness(entries[0], fit_fun);
+        int best_id = -1;// = entries[0];
+
 
         // Search for a higher fit org in the tournament.
-        for (int i = 1; i < entries.size(); i++) {
-          const double cur_fit = popM.CalcFitness(entries[i], fit_fun);
+        for (int i = 0; i < entries.size(); i++) {
+            double cur_fit = 0.0;
+            if (popM.CheckValidOrg(entries[i])) cur_fit = popM.CalcFitness(entries[i], fit_fun);
+
           if (cur_fit > best_fit) {
             best_fit = cur_fit;
             best_id = entries[i];
           }
         }
+
+        if (best_fit == 0) continue;  // If empty tournament, skip to next cell
 
         // Place the highest fitness into the next generation!
         InsertBirth( *(popM[best_id]), best_id, entries, 1 );
