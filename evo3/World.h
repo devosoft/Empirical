@@ -741,9 +741,10 @@ namespace emp {
   {
     fun_calc_fitness = [this, fit_fun, dist_fun, sharing_threshold, alpha](ORG & org) {
       double niche_count = 0;
-      for (size_t id = 0; id < pop.size(); ++id) {
-       double dist = dist_fun(org, *pop[id]);
-       niche_count += std::max(1.0 - std::pow(dist/sharing_threshold, alpha), 0.0);
+      for (ORG * org2 : pop) {
+        if (!org2) continue;
+        double dist = dist_fun(org, *org2);
+        niche_count += std::max(1.0 - std::pow(dist/sharing_threshold, alpha), 0.0);
       }
       return fit_fun(org)/niche_count;
     };
