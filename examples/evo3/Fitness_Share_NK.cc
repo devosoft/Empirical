@@ -35,13 +35,22 @@ int main()
     pop.Inject(next_org);
   }
 
+  // Setup the (shared) fitness function.
+  pop.SetSharedFitFun( [&landscape](BitOrg &org){ return landscape.GetFitness(org); },
+                       [](BitOrg& org1, BitOrg& org2){ return (double)(org1.XOR(org2)).CountOnes();},
+                       10, 1 );
+
+  pop.SetMutFun( [](BitOrg & org, emp::Random & random){
+    size_t count = 0;
+    if (random.P(0.5)) { org[random.GetUInt(N)] ^= 1; count++; }
+    if (random.P(0.5)) { org[random.GetUInt(N)] ^= 1; count++; }
+    if (random.P(0.5)) { org[random.GetUInt(N)] ^= 1; count++; }
+    return count;
+  } );
+
   // Loop through updates
   for (size_t ud = 0; ud < UD_COUNT; ud++) {
     // Run a tournament...
-    pop.SetSharedFitFun( [&landscape](BitOrg &org){ return landscape.GetFitness(org); },
-                         [](BitOrg& org1, BitOrg& org2){ return (double)(org1->XOR(*org2)).CountOnes();},
-                         10, 1 );
-
     emp::TournamentSelect(pop, 5, POP_SIZE-1);
     pop.Update();
 
