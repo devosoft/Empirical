@@ -57,6 +57,7 @@ namespace emp {
     friend class World_iterator<this_t>;
 
     using fun_calc_fitness_t = std::function<double(ORG&)>;
+    using fun_calc_dist_t         = std::function<double(ORG&,ORG&)>;
     using fun_do_mutations_t = std::function<size_t(ORG&,Random&)>;
     using fun_print_org_t    = std::function<void(ORG&,std::ostream &)>;
     using fun_get_genome_t   = std::function<const genome_t & (ORG &)>;
@@ -251,6 +252,10 @@ namespace emp {
     void SetPrintFun(const fun_print_org_t & print_fun) { fun_print_org = print_fun; }
     void SetGetGenomeFun(const fun_get_genome_t & gen_fun) { fun_get_genome = gen_fun; }
 
+    // Same as setting a fitness function, but uses fitness sharing.
+    void SetSharedFitFun(const fun_calc_fitness_t & fit_fun, const fun_calc_dist_t & dist_fun,
+                         double sharing_threshold, double alpha);
+
     // Deal with Signals
     SignalControl & GetSignalControl() { return control; }  // Access signal controller.
     SignalKey OnBeforeRepro(const std::function<void(size_t)> & fun) { return before_repro_sig.AddAction(fun); }
@@ -371,7 +376,9 @@ namespace emp {
     void PrintOrgCounts(std::ostream & os = std::cout);
     void PrintGrid(std::ostream& os=std::cout, const std::string & empty="-", const std::string & spacer=" ");
 
+
     // --- FOR VECTOR COMPATIBILITY ---
+
     size_t size() const { return pop.size(); }
     void resize(size_t new_size) { Resize(new_size); }
     void clear() { Clear(); }
@@ -579,6 +586,21 @@ namespace emp {
     file.AddMax(node, "max_fitness", "Maximum organism fitness in current population.");
     file.PrintHeaderKeys();
     return file;
+  }
+
+  template<typename ORG>
+  void World<ORG>::SetSharedFitFun(const fun_calc_fitness_t & fit_fun,
+                                   const fun_calc_dist_t & dist_fun,
+                                   double sharing_threshold, double alpha)
+  {
+    fun_calc_fitness = [this, fit_fun, dist_fun, sharing_threshold, alpha](ORG & org) {
+      double niche_count = 0;
+      for (size_t id = 0; id < pop.size(); ++id) {
+       double dist = dist_fun(org, *pop[id]);
+       niche_count += std::max(1.0 - std::pow(dist/sharing_threshold, alpha), 0.0);
+      }
+      return fit_fun(org)/niche_count;
+    };
   }
 
   // --- Updating the world! ---
