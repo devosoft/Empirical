@@ -5,6 +5,7 @@ language: cpp
 branches:
   only:
     - master
+    - travis_testing
 
 notifications:
   email: false
