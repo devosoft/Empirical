@@ -11,17 +11,19 @@
 #include "../../evo3/World.h"
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
+#include "../../tools/string_utils.h"
+
 
 constexpr size_t K = 3;
 constexpr size_t N = 50;
-
-constexpr size_t POP_SIZE = 100;
-constexpr size_t UD_COUNT = 1000;
 
 using BitOrg = emp::BitSet<N>;
 
 int main()
 {
+  size_t POP_SIZE = 100;
+  size_t UD_COUNT = 1000;
+
   emp::Random random;
   emp::evo::NKLandscapeConst<N,K> landscape(random);
   emp::World<BitOrg> pop(random);
@@ -42,9 +44,9 @@ int main()
 
   pop.SetMutFun( [](BitOrg & org, emp::Random & random){
     size_t count = 0;
-    if (random.P(0.5)) { org[random.GetUInt(N)] ^= 1; count++; }
-    if (random.P(0.5)) { org[random.GetUInt(N)] ^= 1; count++; }
-    if (random.P(0.5)) { org[random.GetUInt(N)] ^= 1; count++; }
+    if (random.P(0.5)) { org[random.GetUInt(N)].Toggle(); count++; }
+    if (random.P(0.5)) { org[random.GetUInt(N)].Toggle(); count++; }
+    if (random.P(0.5)) { org[random.GetUInt(N)].Toggle(); count++; }
     return count;
   } );
 
@@ -53,16 +55,46 @@ int main()
     // Run a tournament...
     emp::TournamentSelect(pop, 5, POP_SIZE-1);
     pop.Update();
-
-    // Do mutations...
-    for (size_t i = 1; i < pop.GetSize(); i++) {
-      pop[i][random.GetUInt(N)] = random.P(0.5);
-      pop[i][random.GetUInt(N)] = random.P(0.5);
-      pop[i][random.GetUInt(N)] = random.P(0.5);
-    }
-
+    pop.DoMutations();
   }
 
 
   std::cout << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
+
+
+
+  std::cout << "--- Grid example ---\n";
+
+  POP_SIZE = 400;
+
+  std::function<void(int &, std::ostream &)> print_fun = [](int & val, std::ostream & os) {
+    val %= 63;
+    if (val < 10) os << (char) ('0' + val);
+    else if (val < 36) os << (char) ('a' + (val - 10));
+    else if (val < 62) os << (char) ('A' + (val - 36));
+    else os << '+';
+  };
+
+  emp::World<int> grid_world(random);
+  const size_t side = (size_t) std::sqrt(POP_SIZE);
+  grid_world.SetGrid(side, side);
+  grid_world.SetPrintFun(print_fun);
+
+  emp_assert(grid_world.GetSize() == POP_SIZE); // POP_SIZE needs to be a perfect square.
+
+
+  grid_world.InjectAt(30, side+1);
+  grid_world.InjectAt(4, side*(side+1)/2);
+  grid_world.PrintGrid();
+
+  auto fit_fun = [](int & org){ return (double) org; };
+  grid_world.SetSharedFitFun(fit_fun, [](int & a, int & b){ return (double) (a>b)?(a-b):(b-a); }, 3, 1);
+  RouletteSelect(grid_world, 500);
+
+  std::cout << std::endl;
+  grid_world.PrintGrid();
+  std::cout << "Final Org Counts:\n";
+  //   grid_world.PrintOrgCounts(print_fun);
+  //   std::cout << std::endl;
+
 }
