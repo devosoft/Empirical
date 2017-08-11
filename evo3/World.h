@@ -76,11 +76,14 @@ namespace emp {
     emp::vector<Ptr<genotype_t>> next_genotypes; //< Genotypes for corresponding orgs in next_pop.
 
     // Configuration settings
-    std::string name;               // Name of this world (for use in configuration.)
-    bool cache_on;                  // Should we be caching fitness values?
-    size_t size_x;                  // If a grid, track width; if pools, track pool size
-    size_t size_y;                  // If a grid, track height; if pools, track num pools.
-    emp::vector<World_file> files;  // Output files.
+    std::string name;               //< Name of this world (for use in configuration.)
+    bool cache_on;                  //< Should we be caching fitness values?
+    size_t size_x;                  //< If a grid, track width; if pools, track pool size
+    size_t size_y;                  //< If a grid, track height; if pools, track num pools.
+    emp::vector<World_file> files;  //< Output files.
+
+    bool is_synchronous;            //< Does this world have synchronous generations?
+    bool is_structured;             //< Do we have any structured population? (false=well mixed)
 
     // Potential data nodes
     Ptr<DataMonitor<double>> data_node_fitness;
@@ -149,6 +152,7 @@ namespace emp {
       : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), fit_cache()
       , genotypes(), next_genotypes()
       , name(_name), cache_on(false), size_x(0), size_y(0), files()
+      , is_synchronous(false), is_structured(false)
       , data_node_fitness(nullptr)
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_get_genome()
       , fun_add_inject(), fun_add_birth(), fun_get_neighbor()
@@ -189,10 +193,13 @@ namespace emp {
     size_t GetSize() const { return pop.size(); }
     size_t GetNumOrgs() const { return num_orgs; }
     size_t GetUpdate() const { return update; }
-    bool IsOccupied(size_t i) const { return pop[i] != nullptr; }
-    bool IsCacheOn() const { return cache_on; }
     size_t GetWidth() const { return size_x; }
     size_t GetHeight() const { return size_y; }
+
+    bool IsOccupied(size_t i) const { return pop[i] != nullptr; }
+    bool IsCacheOn() const { return cache_on; }
+    bool IsSynchronous() const { return is_synchronous; }
+    bool IsStructured() const { return is_structured; }
 
     // We ONLY have a const index operator since manipulations should go through other functions.
     // No non-const version.
@@ -290,8 +297,7 @@ namespace emp {
     // --- MUTATIONS! ---
 
     void DoMutations(ORG & org) {
-      emp_assert(fun_do_mutations);
-      emp_assert(random_ptr);
+      emp_assert(fun_do_mutations);  emp_assert(random_ptr);
       fun_do_mutations(org, *random_ptr);
     }
     void DoMutationsID(size_t id) {
@@ -322,7 +328,8 @@ namespace emp {
     template <typename... ARGS> void InjectRandomOrg(ARGS &&... args);
 
     // Place a newborn into the population, by default rules and with parent information.
-    void DoBirth(const ORG mem, size_t parent_pos, size_t copy_count=1);
+    size_t DoBirth(const ORG mem, size_t parent_pos);
+    void DoBirth(const ORG mem, size_t parent_pos, size_t copy_count);
 
     // --- RANDOM FUNCTIONS ---
 
@@ -360,9 +367,9 @@ namespace emp {
 
     // --- PRINTING ---
 
-    void Print(std::ostream & os = std::cout, const std::string & empty="X", const std::string & spacer=" ");
+    void Print(std::ostream & os = std::cout, const std::string & empty="-", const std::string & spacer=" ");
     void PrintOrgCounts(std::ostream & os = std::cout);
-    void PrintGrid(std::ostream& os=std::cout, const std::string & empty="X", const std::string & spacer=" ");
+    void PrintGrid(std::ostream& os=std::cout, const std::string & empty="-", const std::string & spacer=" ");
 
     // --- FOR VECTOR COMPATIBILITY ---
     size_t size() const { return pop.size(); }
@@ -439,6 +446,8 @@ namespace emp {
   template<typename ORG>
   void World<ORG>::SetWellMixed(bool synchronous_gen) {
     size_x = 0; size_y = 0;
+    is_synchronous = synchronous_gen;
+    is_structured = false;
 
     // -- Setup functions --
     // Append at end of population
@@ -472,6 +481,8 @@ namespace emp {
   void World<ORG>::SetGrid(size_t width, size_t height, bool synchronous_gen) {
     size_x = width;  size_y = height;
     Resize(size_x * size_y);
+    is_synchronous = synchronous_gen;
+    is_structured = true;
 
     // -- Setup functions --
     // Inject a random position in grid
@@ -511,6 +522,8 @@ namespace emp {
   void World<ORG>::SetPools(size_t num_pools, size_t pool_size, bool synchronous_gen) {
     size_x = pool_size;  size_y = num_pools;
     Resize(size_x * size_y);
+    is_synchronous = synchronous_gen;
+    is_structured = true;
 
     // -- Setup functions --
     // Inject in a empty pool -or- randomly if none empty
@@ -655,6 +668,19 @@ namespace emp {
     // SetupOrg(*new_org, &callbacks, pos);
   }
 
+  // Give birth to a single offspring; return offspring position.
+  template <typename ORG>
+  size_t World<ORG>::DoBirth(const ORG mem, size_t parent_pos) {
+    before_repro_sig.Trigger(parent_pos);
+    Ptr<ORG> new_org = NewPtr<ORG>(mem);
+    offspring_ready_sig.Trigger(*new_org);
+    const size_t pos = fun_add_birth(new_org, parent_pos);
+    org_placement_sig.Trigger(pos);
+    // SetupOrg(*new_org, &callbacks, pos);
+    return pos;
+  }
+
+  // Give birth to (potentially) multiple offspring; no return, but triggers can be tracked.
   template <typename ORG>
   void World<ORG>::DoBirth(const ORG mem, size_t parent_pos, size_t copy_count) {
     before_repro_sig.Trigger(parent_pos);
