@@ -57,7 +57,7 @@ namespace emp {
     friend class World_iterator<this_t>;
 
     using fun_calc_fitness_t = std::function<double(ORG&)>;
-    using fun_calc_dist_t         = std::function<double(ORG&,ORG&)>;
+    using fun_calc_dist_t    = std::function<double(ORG&,ORG&)>;
     using fun_do_mutations_t = std::function<size_t(ORG&,Random&)>;
     using fun_print_org_t    = std::function<void(ORG&,std::ostream &)>;
     using fun_get_genome_t   = std::function<const genome_t & (ORG &)>;
@@ -149,6 +149,11 @@ namespace emp {
     void ClearCache(size_t id) { if (id < fit_cache.size()) fit_cache[id] = 0.0; }
 
   public:
+    /// The World constructor can take two arguments, both optional:
+    /// * a random number generator (either a pointer or reference)
+    /// * a unique name for the world
+    /// If no random number generator is provided, one is created within the world.
+    /// If no name is provided, the world remains nameless.
     World(Ptr<Random> rnd=nullptr, std::string _name="")
       : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), fit_cache()
       , genotypes(), next_genotypes()
@@ -184,8 +189,13 @@ namespace emp {
 
     // --- Publicly available types ---
 
+    /// The type org_t specifies the type of organisms in this world.
     using org_t = ORG;
+
+    /// value_type is identical to org_t; provides vector compatibility.
     using value_type = org_t;
+
+    /// iterator_t specifies the type for this world's iterators.
     using iterator_t = World_iterator<this_t>;
 
 
@@ -257,7 +267,9 @@ namespace emp {
                          double sharing_threshold, double alpha);
 
     // Deal with Signals
-    SignalControl & GetSignalControl() { return control; }  // Access signal controller.
+
+    /// Access signal controller used for this world.
+    SignalControl & GetSignalControl() { return control; }
     SignalKey OnBeforeRepro(const std::function<void(size_t)> & fun) { return before_repro_sig.AddAction(fun); }
     SignalKey OnOffspringReady(const std::function<void(ORG *)> & fun) { return offspring_ready_sig.AddAction(fun); }
     SignalKey OnInjectReady(const std::function<void(ORG *)> & fun) { return inject_ready_sig.AddAction(fun); }
@@ -277,7 +289,15 @@ namespace emp {
 
     // --- UPDATE THE WORLD! ---
 
+    /// Update the world:
+    /// 1. Send out an update signal for any external functions to trigger.
+    /// 2. Handle any data files that need to be printed this update.
+    /// 3. If synchronous generations, move next population into place as the current popoulation.
+    /// 4. Increment the current update number.
     void Update();
+
+    /// Run the Execute member function on all organisms in the population; forward any args passed
+    /// into this function.
     template <typename... ARGS>
     void Execute(ARGS &&... args) {   // Redirect to all orgs in the population!
       for (Ptr<ORG> org : pop) { if (org) org->Execute(std::forward<ARGS>(args)...); }
@@ -286,104 +306,139 @@ namespace emp {
 
     // --- CALCULATE FITNESS ---
 
-    // When calculating fitness, the three relevant inputs are the organism, the fitness function,
-    // and the position in the population.
+    /// Use the configured fitness function on the specified organism.
     double CalcFitnessOrg(ORG & org);
+
+    /// Use the configured fitness function on the organism at the specified position.
     double CalcFitnessID(size_t id);
 
+    /// Calculate the fitness of all organisms, storing the results in the cache.
     void CalcFitnessAll() const {
       emp_assert(cache_on, "Trying to calculate fitness of all orgs without caching.");
       for (size_t id = 0; id < pop.size(); id++) CalcFitnessID(id);
     }
 
+    /// Turn on (or off) fitness caching for individual organisms.
     void SetCache(bool _in=true) { cache_on = _in; }
+
+    /// Remove all currently cached fitness values (useful with changing environments, etc.)
     void ClearCache() { fit_cache.resize(0); }
+
 
     // --- MUTATIONS! ---
 
-    void DoMutations(ORG & org) {
+    /// Use mutation function on a single, specified organism.
+    void DoMutationsOrg(ORG & org) {
       emp_assert(fun_do_mutations);  emp_assert(random_ptr);
       fun_do_mutations(org, *random_ptr);
     }
+
+    /// Use mutation function on the organism at the specified position in the population.
     void DoMutationsID(size_t id) {
       emp_assert(pop[id]);
-      DoMutations(*(pop[id]));
+      DoMutationsOrg(*(pop[id]));
     }
 
-    void MutatePop(size_t start_id=0) {
+    /// Use mutation function on ALL organisms in the population.
+    void DoMutations(size_t start_id=0) {
       for (size_t id = start_id; id < pop.size(); id++) { if (pop[id]) DoMutationsID(id); }
     }
 
     // --- MANIPULATE ORGS IN POPULATION ---
 
+    /// Remove all organisms from the world.
     void Clear();
 
+    /// Change the size of the world.  If the new size is smaller than the old, remove any
+    /// organisms outside the new range.  If larger, new positions are empty.
     void Resize(size_t new_size) {
       for (size_t i = new_size; i < pop.size(); i++) RemoveOrgAt(i); // Remove orgs past new size.
       pop.resize(new_size, nullptr);                                 // Default new orgs to null.
     }
 
-    // Inject an organism using the default injection scheme.
+    /// Inject an organism using the default injection scheme.
     void Inject(const ORG & mem, size_t copy_count=1);
 
-    // Inject an organism at a specific position.
+    /// Inject an organism at a specific position.
     void InjectAt(const ORG & mem, const size_t pos);
 
-    // Inject a random organism (constructor must facilitate!)
+    /// Inject a random organism (constructor must facilitate!)
     template <typename... ARGS> void InjectRandomOrg(ARGS &&... args);
 
-    // Place a newborn into the population, by default rules and with parent information.
+    /// Place a newborn organism into the population, by default rules and with parent information.
     size_t DoBirth(const ORG mem, size_t parent_pos);
+
+    /// Place multiple copies of a newborn organism into the population.
     void DoBirth(const ORG mem, size_t parent_pos, size_t copy_count);
 
     // --- RANDOM FUNCTIONS ---
 
+    /// Return a reference to the random number generator currently being used by world.
     Random & GetRandom() { return *random_ptr; }
 
-    // Set or create a new random number generator.
+    /// Setup a new random number generator created elsewhere.
     void SetRandom(Random & r);
+
+    /// Create a new random number generator (that World will manage)
     void NewRandom(int seed=-1);
 
-    // Get any cell, at random.
+    /// Get the position any cell, at random.
     size_t GetRandomCellID() { return random_ptr->GetUInt(pop.size()); }
 
-    // By default, assume a well-mixed population so random neighbors can be anyone.
+    /// Use the specified function to get a neighbor (if not set, assume well mixed).
     size_t GetRandomNeighborID(size_t id) { return fun_get_neighbor(id); }
 
-    // Get random *occupied* cell.
+    /// Get the id of a random *occupied* cell.
     size_t GetRandomOrgID();
 
 
     // --- POPULATION ANALYSIS ---
 
-    // Find ALL cell IDs the return true in the filter.
+    /// Find ALL cell IDs that return true in the provided filter.
     emp::vector<size_t> FindCellIDs(const std::function<bool(ORG*)> & filter);
 
     // Simple techniques for using FindCellIDs()
+
+    /// Return IDs of all occupied cells in the population.
     emp::vector<size_t> GetValidOrgIDs() { return FindCellIDs([](ORG*org){ return (bool) org; }); }
+
+    /// Return IDs of all empty cells in the population.
     emp::vector<size_t> GetEmptyPopIDs() { return FindCellIDs([](ORG*org){ return !org; }); }
 
 
     // --- POPULATION MANIPULATIONS ---
 
-    // Run population through a bottleneck to (potentially) shrink it.
+    /// Run population through a bottleneck to (potentially) shrink it.
     void DoBottleneck(const size_t new_size, bool choose_random=true);
 
 
     // --- PRINTING ---
 
+    /// Print all organisms in the population using previously provided print function.
     void Print(std::ostream & os = std::cout, const std::string & empty="-", const std::string & spacer=" ");
+
+    /// Print unique organisms and the number of copies of each that exist.
     void PrintOrgCounts(std::ostream & os = std::cout);
+
+    /// Print the organisms layed out in a grid structure (assumes a grid population.)
     void PrintGrid(std::ostream& os=std::cout, const std::string & empty="-", const std::string & spacer=" ");
 
 
     // --- FOR VECTOR COMPATIBILITY ---
 
+    /// [std::vector compatibility] How big is the world?
     size_t size() const { return pop.size(); }
+
+    /// [std::vector compatibility] Update world size.
     void resize(size_t new_size) { Resize(new_size); }
+
+    /// [std::vector compatibility] Remove all organisms.
     void clear() { Clear(); }
 
+    /// [std::vector compatibility] Return iterator to first organism.
     iterator_t begin() { return iterator_t(this, 0); }
+
+    /// [std::vector compatibility] Return iterator just past last organism.
     iterator_t end() { return iterator_t(this, (int) pop.size()); }
 
   };
