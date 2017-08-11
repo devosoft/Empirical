@@ -40,7 +40,7 @@
 #include "../tools/string_utils.h"
 
 #include "Systematics.h"    // Track relationships among organisms.
-#include "World_file.h"  // Helper to determine when specific events should occur.
+#include "World_file.h"     // Helper to determine when specific events should occur.
 #include "World_iterator.h" // Allow iteration through organisms in a world.
 #include "World_reflect.h"  // Handle needed reflection on incoming organism classes.
 #include "World_select.h"
@@ -61,6 +61,7 @@ namespace emp {
     using fun_do_mutations_t = std::function<size_t(ORG&,Random&)>;
     using fun_print_org_t    = std::function<void(ORG&,std::ostream &)>;
     using fun_get_genome_t   = std::function<const genome_t & (ORG &)>;
+
     using fun_add_inject_t   = std::function<size_t(Ptr<ORG>)>;
     using fun_add_birth_t    = std::function<size_t(Ptr<ORG>, size_t)>;
     using fun_get_neighbor_t = std::function<size_t(size_t)>;
@@ -105,33 +106,13 @@ namespace emp {
     Systematics<genome_t> systematics;
 
     // == Signals ==
-
     SignalControl control;  // Setup the world to control various signals.
-
-    // Trigger:  Immediately prior to parent producing offspring
-    // Argument: Parent position in population
     Signal<void(size_t)> before_repro_sig;
-
-    // Trigger: Offspring about to enter population
-    // Argument: Reference to organism about to be placed in population.
     Signal<void(ORG &)> offspring_ready_sig;
-
-    // Trigger: New org about to be added to population from outside
-    // Argument: Reference to organism about to be placed in population.
     Signal<void(ORG &)> inject_ready_sig;
-
-    // Trigger: Organism has been added to population
-    // Argument: Position of organism placed in the population.
     Signal<void(size_t)> org_placement_sig;
-
-    // Trigger: New update is starting
-    // Argument: Update number (sequentially increasing)
     Signal<void(size_t)> on_update_sig;
-
-    // Trigger: Organism is about to be killed
-    // Argument: Position of organism about to die
     Signal<void(size_t)> on_death_sig;  // TODO!!!!
-
 
     // AddOrgAt is the only way to add organisms (others must go through here)
     size_t AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
@@ -201,44 +182,90 @@ namespace emp {
 
     // --- Accessing Organisms or info ---
 
+    /// How many organisms can fit in the world?
     size_t GetSize() const { return pop.size(); }
+
+    /// How many organisms are currently in the world?
     size_t GetNumOrgs() const { return num_orgs; }
+
+    /// What update number is the world currently on? (assumes Update() is being used)
     size_t GetUpdate() const { return update; }
+
+    /// How many cells wide is the world? (assumes grids are active.)
     size_t GetWidth() const { return size_x; }
+
+    /// How many cells tall is the world? (assumes grids are active.)
     size_t GetHeight() const { return size_y; }
 
+    /// Does the specified cell ID have an organism in it?
     bool IsOccupied(size_t i) const { return pop[i] != nullptr; }
+
+    /// Are we currently caching fitness values?
     bool IsCacheOn() const { return cache_on; }
+
+    /// Are generations being evaluated synchronously?
+    /// (i.e., Update() places all births into the population after removing all current organisms.)
     bool IsSynchronous() const { return is_synchronous; }
+
+    /// Is there some sort of structure to the population?
+    /// (i.e., are some organisms closer together than others; false implies "well-mixed".)
     bool IsStructured() const { return is_structured; }
 
-    // We ONLY have a const index operator since manipulations should go through other functions.
-    // No non-const version.
+    /// Index into a world to obtain a const reference to an organism.  Any manipulations to
+    /// organisms should go through other functions to be tracked appropriately.
+    /// Will trip assert if cell is not occupied.
     const ORG & operator[](size_t id) const {
       emp_assert(pop[id] != nullptr, id);  // Should not index to a null organism!
       return *(pop[id]);
     }
+
+    /// Retrieve a const reference to the organsim as the specified position.
+    /// Same as operator[]; will trip assert if cell is not occupied.
     const ORG & GetOrg(size_t id) const {
       emp_assert(pop[id] != nullptr, id);  // Should not index to a null organism!
       return *(pop[id]);
     }
+
+    /// Retrieve a const reference to the organsim as the specified x,y coordinates.
+    /// (currently used only in a grid world)
     const ORG & GetOrg(size_t x, size_t y) const { return GetOrg(x+y*size_x); }
+
+    /// Retrive a pointer to the contents of a speciefied cell; will be nullptr if the cell is
+    /// not occupied.
     const Ptr<ORG> GetOrgPtr(size_t id) const { return pop[id]; }
 
+    /// Retrieve the genome corresponding to a specified organism.
     const genome_t & GetGenome(ORG & org) { return fun_get_genome(org); }
+
+    /// Retrive the genome corresponding to the organism at the specified position.
     const genome_t & GetGenomeAt(size_t id) { return fun_get_genome(GetOrg(id)); }
 
+    /// Get the systematics manager (which is tracking lineages in the population.)
     const Systematics<genome_t> & GetSystematics() const { return systematics; }
+
+    /// Print the full line-of-descent to the organism at the specified position in the popoulation.
     void PrintLineage(size_t id, std::ostream & os=std::cout) const {
       systematics.PrintLineage(genotypes[id], os);
     }
 
     // --- CONFIGURE ---
 
+    /// Set the population to be well-mixed (with all organisms counting as neighbors.)
+    /// Argument determines if the generations should be synchronous (true) or not (false, default)
     void SetWellMixed(bool synchronous_gen=false);
+
+    /// Set the population to be a grid of cells using the specified dimensions.  The third
+    /// argument determines if the generations should be synchronous (true) or not (false, default)
     void SetGrid(size_t width, size_t height, bool synchronous_gen=false);
+
+    /// Set the population to be a set of pools that are individually well mixed, but with limited
+    /// migtation.  Arguments are the number of pools, the size of each pool, and whether the
+    /// generations should be synchronous (true) or not (false, default).
     void SetPools(size_t num_pools, size_t pool_size, bool synchronous_gen=false);
 
+    /// Access a data node that tracks fitness information in the population.  The fitness will not
+    /// be collected until the first Update() after this function is initially called, signaling
+    /// the need for this information.
     DataMonitor<double> & GetFitnessDataNode() {
       if (!data_node_fitness) {
         data_node_fitness.New();
@@ -255,34 +282,98 @@ namespace emp {
       return *data_node_fitness;
     }
 
+    /// Setup a file to be printed that collects fitness information over time.
     World_file & SetupFitnessFile(const std::string & filename="fitness.csv");
 
+    /// Setup the function to be used when fitness needs to be calculated.  The provided function
+    /// should take a reference to an organism and return a fitness value of type double.
     void SetFitFun(const fun_calc_fitness_t & fit_fun) { fun_calc_fitness = fit_fun; }
+
+    /// Setup the function to be used to mutate an organism.  It should take a reference to an
+    /// organism and return the number of mutations that occurred.
     void SetMutFun(const fun_do_mutations_t & mut_fun) { fun_do_mutations = mut_fun; }
+
+    /// Setup the function to be used to print an organism.  It should take a reference to an
+    /// organism and an std::ostream, with a void return.  The organism should get printed to
+    /// the provided ostream.
     void SetPrintFun(const fun_print_org_t & print_fun) { fun_print_org = print_fun; }
+
+    /// Setup the function to extract or convert an organism to a genome.  It should take an
+    /// organism reference and return a const genome reference.
     void SetGetGenomeFun(const fun_get_genome_t & gen_fun) { fun_get_genome = gen_fun; }
 
-    // Same as setting a fitness function, but uses fitness sharing.
+    /// Same as setting a fitness function, but uses Goldberg and Richardson's fitness sharing
+    /// function (1987) to make similar organisms detract from each other's fitness and prevent
+    /// the population from clustering around a single peak.  In addition to the base fitness
+    /// function, a shared fitness function also requires:
+    ///  * a distance function that takes references to two organisms and returns a double
+    ///    indicating the distance between those organisms,
+    ///  * a sharing threshold (sigma share) that defines the maximum distance at which members
+    ///    should be consdered in the same niche,
+    ///  * and a value of alpha, which controls the shape of the fitness sharing curve.
     void SetSharedFitFun(const fun_calc_fitness_t & fit_fun, const fun_calc_dist_t & dist_fun,
                          double sharing_threshold, double alpha);
 
     // Deal with Signals
 
-    /// Access signal controller used for this world.
+    /// Access signal controller used for this world directly.
     SignalControl & GetSignalControl() { return control; }
+
+
+
+
+    /// Provide a function for World to call each time an organism is about to give birth.
+    /// Trigger:  Immediately prior to parent producing offspring
+    /// Argument: World ID for the parent-to-be
+    /// Return:   Key value needed to make future modifications.
     SignalKey OnBeforeRepro(const std::function<void(size_t)> & fun) { return before_repro_sig.AddAction(fun); }
-    SignalKey OnOffspringReady(const std::function<void(ORG *)> & fun) { return offspring_ready_sig.AddAction(fun); }
-    SignalKey OnInjectReady(const std::function<void(ORG *)> & fun) { return inject_ready_sig.AddAction(fun); }
+
+    /// Provide a function for World to call after an offspring organism has been created, but
+    /// before it is inserted into the World.
+    /// Trigger:  Offspring about to enter population
+    /// Argument: Reference to organism about to be placed in population.
+    /// Return:   Key value needed to make future modifications.
+    SignalKey OnOffspringReady(const std::function<void(ORG &)> & fun) { return offspring_ready_sig.AddAction(fun); }
+
+    /// Provide a function for World to call before an external organim is injected into the World.
+    /// Trigger:  New organism about to be added to population from outside
+    /// Argument: Reference to organism about to be placed in population.
+    /// Return:   Key value needed to make future modifications.
+    SignalKey OnInjectReady(const std::function<void(ORG &)> & fun) { return inject_ready_sig.AddAction(fun); }
+
+    /// Provide a function for World to call immediately after any organism has been added.
+    /// Trigger:  Organism has been added to population (either born or injected)
+    /// Argument: Position of organism placed in the population.
+    /// Return:   Key value needed to make future modifications.
     SignalKey OnOrgPlacement(const std::function<void(size_t)> & fun) { return org_placement_sig.AddAction(fun); }
+
+    /// Privide a function for World to call each time Update() is run.
+    /// Trigger:  New update is starting
+    /// Argument: Update number (sequentially increasing)
+    /// Return:   Key value needed to make future modifications.
     SignalKey OnUpdate(const std::function<void(size_t)> & fun) { return on_update_sig.AddAction(fun); }
+
+    /// Privide a function for World to call each time an organism is about to die.
+    /// Trigger:  Organism is about to be killed
+    /// Argument: Position of organism about to die
+    /// Return:   Key value needed to make future modifications.
     SignalKey OnOrgDeath(const std::function<void(size_t)> & fun) { return on_death_sig.AddAction(fun); }
 
+
     // --- MANAGE ATTRIBUTES ---
+
+    /// Worlds can have arbitrary attributes that can be set and changed dynamically.
+    /// This function determines if an attribute exists, regardless of its value.
     bool HasAttribute(const std::string & name) const { return Has(attributes, name); }
+
+    /// Get the value for an attribute that you know exists.
     std::string GetAttribute(const std::string) const {
       emp_assert( Has(attributes, name) );
       return Find(attributes, name, "UNKNOWN");
     }
+
+    /// Set the value of a new attribute on this world.  If the attribute already exists, it will
+    /// be updated.  If it doesn't exist, it will be added.
     template <typename T>
     void SetAttribute(const std::string & name, T && val) { attributes[name] = to_string(val); }
 
