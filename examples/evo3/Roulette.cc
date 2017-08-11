@@ -40,7 +40,7 @@ int main()
 
   auto fit_fun = [](int & org){ return (double) org; };
   grid_world.SetFitFun(fit_fun);
-  RouletteSelect(grid_world, 5000);
+  RouletteSelect(grid_world, 500);
 
   std::cout << std::endl;
   grid_world.PrintGrid();

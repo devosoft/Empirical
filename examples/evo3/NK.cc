@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
     TournamentSelect(pop, 5, POP_SIZE-1);
     pop.Update();
     std::cout << (ud+1) << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
-    pop.MutatePop(1);
+    pop.DoMutations(1);
   }
 
   pop.PrintLineage(0);
