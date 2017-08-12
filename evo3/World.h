@@ -49,23 +49,42 @@ namespace emp {
 
   template <typename ORG>
   class World {
-  protected:
-    using this_t = World<ORG>;
-    using genome_t = typename emp::find_genome_t<ORG>;
-    using genotype_t = emp::Taxon<genome_t>;
+    friend class World_iterator< World<ORG> >;
+  public:
+    // --- Publicly available types ---
+    using this_t = World<ORG>;                 //< Resolved type of this templated class.
+    using org_t = ORG;                         //< Type of organisms in this world.
+    using value_type = org_t;                  //< Identical to org_t; vector compatibility.
+    using iterator_t = World_iterator<this_t>; //< Type for this world's iterators.
 
-    friend class World_iterator<this_t>;
+    using genome_t = typename emp::find_genome_t<ORG>;  //< Type of underlying genomes.
+    using genotype_t = emp::Taxon<genome_t>;            //< Type of full genome category.
 
+    /// Function type for calculating fitness.
     using fun_calc_fitness_t = std::function<double(ORG&)>;
+
+    /// Function type for calculating the distance between two organisms.
     using fun_calc_dist_t    = std::function<double(ORG&,ORG&)>;
+
+    /// Function type for a mutation operator on an organisms.
     using fun_do_mutations_t = std::function<size_t(ORG&,Random&)>;
+
+    /// Function type for printing an organism's info to an output stream.
     using fun_print_org_t    = std::function<void(ORG&,std::ostream &)>;
+
+    /// Function type for retrieving a genome from an organism.
     using fun_get_genome_t   = std::function<const genome_t & (ORG &)>;
 
+    /// Function type for injecting organisms into a world
     using fun_add_inject_t   = std::function<size_t(Ptr<ORG>)>;
+
+    /// Function type for adding a newly born organism into a world.
     using fun_add_birth_t    = std::function<size_t(Ptr<ORG>, size_t)>;
+
+    /// Function type for identifying an organism's random neighbor.
     using fun_get_neighbor_t = std::function<size_t(size_t)>;
 
+  protected:
     // Internal state member variables
     Ptr<Random> random_ptr;         //< Random object to use.
     bool random_owner;              //< Did we create our own random number generator?
@@ -167,18 +186,6 @@ namespace emp {
       if (random_owner) random_ptr.Delete();
       if (data_node_fitness) data_node_fitness.Delete();
     }
-
-    // --- Publicly available types ---
-
-    /// The type org_t specifies the type of organisms in this world.
-    using org_t = ORG;
-
-    /// value_type is identical to org_t; provides vector compatibility.
-    using value_type = org_t;
-
-    /// iterator_t specifies the type for this world's iterators.
-    using iterator_t = World_iterator<this_t>;
-
 
     // --- Accessing Organisms or info ---
 
@@ -461,7 +468,7 @@ namespace emp {
     void DoBirth(const ORG mem, size_t parent_pos, size_t copy_count);
 
     // Kill off organism at the specified position (same as RemoveOrgAt, but callable externally)
-    void DoDeath(const size_t pos) { RemoveOrgAt(pos) }
+    void DoDeath(const size_t pos) { RemoveOrgAt(pos); }
 
     // --- RANDOM FUNCTIONS ---
 
