@@ -112,7 +112,7 @@ namespace emp {
     Signal<void(ORG &)> inject_ready_sig;
     Signal<void(size_t)> org_placement_sig;
     Signal<void(size_t)> on_update_sig;
-    Signal<void(size_t)> on_death_sig;  // TODO!!!!
+    Signal<void(size_t)> on_death_sig;
 
     // AddOrgAt is the only way to add organisms (others must go through here)
     size_t AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
@@ -320,8 +320,6 @@ namespace emp {
     SignalControl & GetSignalControl() { return control; }
 
 
-
-
     /// Provide a function for World to call each time an organism is about to give birth.
     /// Trigger:  Immediately prior to parent producing offspring
     /// Argument: World ID for the parent-to-be
@@ -461,6 +459,9 @@ namespace emp {
 
     /// Place multiple copies of a newborn organism into the population.
     void DoBirth(const ORG mem, size_t parent_pos, size_t copy_count);
+
+    // Kill off organism at the specified position (same as RemoveOrgAt, but callable externally)
+    void DoDeath(const size_t pos) { RemoveOrgAt(pos) }
 
     // --- RANDOM FUNCTIONS ---
 
