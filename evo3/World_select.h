@@ -11,6 +11,7 @@
 #include <map>
 
 #include "../base/assert.h"
+#include "../base/vector.h"
 #include "../tools/IndexMap.h"
 
 namespace emp {
@@ -77,7 +78,6 @@ namespace emp {
 
   /// ==ROULETTE== Selection (aka Fitness-Proportional Selection) chooses organisms to
   /// reproduce based on their current fitness.
-  // @CAO: Make sure generations are synchnous, OR update the index map each time through.
   template<typename ORG>
   void RouletteSelect(World<ORG> & world, size_t count=1) {
     emp_assert(count > 0);
@@ -97,6 +97,64 @@ namespace emp {
       if (world.IsSynchronous() == false) {
         fitness_index.Adjust(offspring_id, world.CalcFitnessID(offspring_id));
       }
+    }
+  }
+
+
+  /// ==LEXICASE== Selection runs through multiple fitness functions in a random order for
+  /// EACH offspring produced.
+  template<typename ORG>
+  void LexicaseSelect(World<ORG> & world,
+                      const emp::vector< std::function<double(ORG&)> > & fit_funs,
+                      size_t repro_count=1)
+  {
+    emp_assert(pop.size() > 0);
+    emp_assert(fit_funs.size() > 0);
+
+    // Collect all fitness info. (@CAO: Technically only do this is cache is turned on?)
+    emp::vector< emp::vector<double> > fitnesses(fit_funs.size());
+    for (size_t fit_id = 0; fit_id < fit_funs.size(); ++fit_id) {
+      fitnesses[fit_id].resize(world.GetSize());
+      for (size_t org_id = 0; org_id < world.GetSize(); ++org_id) {
+        fitnesses[fit_id][org_id] = fit_funs[fit_id](world[org_id]);
+      }
+    }
+
+    // Go through a new ordering of fitness functions for each selections.
+    // @CAO: Can probably optimize a bit!
+    emp::vector<size_t> all_orgs(world.GetSize()), cur_orgs, next_orgs;
+    for (size_t org_id = 0; org_id < world.GetSize(); org_id++) all_orgs[org_id] = org_id;
+
+    for (size_t repro = 0; repro < repro_count; ++repro) {
+      // Determine the current ordering of the functions.
+      emp::vector<size_t> order = GetPermutation(world.GetRandom(), fit_funs.size());
+
+      // Step through the functions in the proper order.
+      cur_orgs = all_orgs;  // Start with all of the organisms.
+      for (size_t fit_id : order) {
+        double max_fit = fitnesses[fit_id][cur_orgs[0]];
+        for (size_t org_id : cur_orgs) {
+          const double cur_fit = fitnesses[fit_id][org_id];
+          if (cur_fit > max_fit) {
+            max_fit = cur_fit;             // This is a the NEW maximum fitness for this function
+            next_orgs.resize(0);           // Clear out orgs with former maximum fitness
+            next_orgs.push_back(org_id);   // Add this org as only one with new max fitness
+          }
+          else if (cur_fit == max_fit) {
+            next_orgs.push_back(org_id);   // Same as cur max fitness -- save this org too.
+          }
+        }
+        // Make next_orgs into new cur_orgs; make cur_orgs allocated space for next_orgs.
+        std::swap(cur_orgs, next_orgs);
+        next_orgs.resize(0);
+
+        if (cur_orgs.size() == 1) break;  // Stop if we're down to just one organism.
+      }
+
+      // Place a random survivor (all equal) into the next generation!
+      emp_assert(cur_orgs.size() > 0, cur_orgs.size(), fit_funs.size(), all_orgs.size());
+      size_t repro_id = cur_orgs[ world.GetRandom().GetUInt(cur_orgs.size()) ];
+      InsertBirth( world[repro_id], repro_id, 1 );
     }
   }
 
