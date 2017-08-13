@@ -49,10 +49,10 @@ namespace D3 {
 
     /// Make a copy of this scale
     Scale Copy() {
-      int new_id = EM_ASM_INT_V({return js.objects.length});
+      int new_id = EM_ASM_INT_V({return js.objects.next_id++});
       EM_ASM_ARGS({
-	    js.objects.push(js.objects[$0].copy());
-	  }, this->id);
+	    js.objects[$1] = js.objects[$0].copy();
+    }, this->id, new_id);
       return Scale(new_id);
     }
 
@@ -68,7 +68,7 @@ namespace D3 {
 
   class QuantizeScale : public Scale {
   public:
-    QuantizeScale() : Scale(true) {EM_ASM_ARGS({js.objects[$0]=d3.scale.quantize()},this->id);}
+    QuantizeScale() : Scale(true) {EM_ASM_ARGS({js.objects[$0]=d3.scaleQuantize()},this->id);}
     QuantizeScale(bool derived) : Scale(true) {;}
 
     template <typename T>
@@ -80,7 +80,7 @@ namespace D3 {
 
   class QuantileScale : public QuantizeScale {
   public:
-    QuantileScale() : QuantizeScale(true) { EM_ASM_ARGS({js.objects[$0] = d3.scale.quantile();}, this->id);}
+    QuantileScale() : QuantizeScale(true) { EM_ASM_ARGS({js.objects[$0] = d3.scaleQuantile();}, this->id);}
     QuantileScale(bool derived) : QuantizeScale(true) {;}
     //TODO: Quantiles()
   };
@@ -88,7 +88,7 @@ namespace D3 {
   class ThresholdScale : public QuantizeScale {
   public:
     ThresholdScale() : QuantizeScale(true) {
-      EM_ASM_ARGS({js.objects[$0] = d3.scale.threshold()}, this->id);
+      EM_ASM_ARGS({js.objects[$0] = d3.scaleThreshold()}, this->id);
     }
     ThresholdScale(bool derived) : QuantizeScale(true) {;}
   };
@@ -96,7 +96,7 @@ namespace D3 {
   class IdentityScale : public Scale {
   public:
     IdentityScale() : Scale(true) {
-      EM_ASM_ARGS({js.objects[$0] = d3.scale.identity();}, this->id);
+      EM_ASM_ARGS({js.objects[$0] = d3.scaleIdentity();}, this->id);
     }
 
     IdentityScale(bool derived) : Scale(true){;}
@@ -121,7 +121,7 @@ namespace D3 {
   class LinearScale : public IdentityScale {
   public:
     LinearScale() : IdentityScale(true) {
-      EM_ASM_ARGS({js.objects[$0] = d3.scale.linear();}, this->id);
+      EM_ASM_ARGS({js.objects[$0] = d3.scaleLinear();}, this->id);
     }
 
     LinearScale(bool derived) : IdentityScale(true) {;}
@@ -153,7 +153,7 @@ namespace D3 {
   class LogScale : public LinearScale {
   public:
     LogScale() : LinearScale(true) {
-      EM_ASM_ARGS({js.objects[$0] = d3.scale.log();}, this->id);
+      EM_ASM_ARGS({js.objects[$0] = d3.scaleLog();}, this->id);
     }
 
     LogScale(bool derived) : LinearScale(true){;};
@@ -163,19 +163,25 @@ namespace D3 {
   class PowScale : public LinearScale {
   public:
     PowScale() : LinearScale(true) {
-      EM_ASM_ARGS({js.objects[$0] = d3.scale.pow();}, this->id);
+      EM_ASM_ARGS({js.objects[$0] = d3.scalePow();}, this->id);
     }
 
     PowScale(bool derived) : LinearScale(true){;};
 
-    //TODO: Exponent()
-    //TODO Sqrt constructor
+    PowScale Exponent(double ex) {
+        EM_ASM_ARGS({js.objects[$0].exponent($1);}, this->id, ex);
+        return *this;
+    }
   };
+
+  PowScale SqrtScale() {
+      return PowScale().Exponent(.5);
+  }
 
   class TimeScale : public LinearScale {
   public:
     TimeScale() : LinearScale(true) {
-      EM_ASM_ARGS({js.objects[$0] = d3.scale.time();}, this->id);
+      EM_ASM_ARGS({js.objects[$0] = d3.scaleTime();}, this->id);
     }
 
     TimeScale(bool derived) : LinearScale(true){;};
@@ -184,7 +190,7 @@ namespace D3 {
   class OrdinalScale : public QuantizeScale {
   public:
     OrdinalScale() : QuantizeScale(true) {
-      EM_ASM({js.objects[$0]= d3.scale.ordinal();}, this->id);
+      EM_ASM({js.objects[$0]= d3.scaleOrdinal();}, this->id);
     }
 
     OrdinalScale(bool derived) : QuantizeScale(true){;}
@@ -194,21 +200,21 @@ namespace D3 {
   class Category10Scale : D3_Base{
   public:
     Category10Scale() {
-      EM_ASM({js.objects[$0] = d3.scale.category10();}, this->id);
+      EM_ASM({js.objects[$0] = d3.scaleCategory10();}, this->id);
     }
   };
 
   class Category20Scale : D3_Base {
   public:
     Category20Scale() {
-      EM_ASM({js.objects[$0] = d3.scale.category20();}, this->id);
+      EM_ASM({js.objects[$0] = d3.scaleCategory20();}, this->id);
     }
   };
 
   class Category20bScale : D3_Base {
   public:
     Category20bScale() {
-      EM_ASM({js.objects[$0] = d3.scale.category20b();}, this->id);
+      EM_ASM({js.objects[$0] = d3.scaleCategory20b();}, this->id);
     }
   };
 
@@ -217,7 +223,7 @@ namespace D3 {
     int id;
   public:
     Category20cScale() {
-      EM_ASM({js.objects[$0] = d3.scale.category20c();}, this->id);
+      EM_ASM({js.objects[$0] = d3.scaleCategory20c();}, this->id);
     }
   };
 }

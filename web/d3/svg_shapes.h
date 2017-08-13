@@ -82,7 +82,7 @@ namespace D3 {
   public:
     SymbolGenerator() {
       EM_ASM_ARGS({
-  	    var new_line = d3.svg.symbol();
+  	    var new_line = d3.symbol();
   	    js.objects[$0] = new_line;
       }, this->id);
     }
@@ -93,7 +93,7 @@ namespace D3 {
     void SetType(std::string type){
       emp_assert (
         EM_ASM_INT({
-          return d3.svg.symbolTypes.includes(Pointer_stringify($0)) ||
+          return d3.symbolTypes.includes(Pointer_stringify($0)) ||
           window[Pointer_stringify($0)] === "function" ||
           window["d3"][Pointer_stringify($0)] === "function" ||
           window["emp"][Pointer_stringify($0)] === "function";
@@ -144,11 +144,11 @@ namespace D3 {
   public:
     BaseLineGenerator() {;}
 
-    /// Set the method used to interpolate between points in the line.
+    /// Set the method used to interpolate a curve between points in the line.
     /// For allowed options, see the
     /// [d3 documntation](https://github.com/d3/d3-3.x-api-reference/blob/master/SVG-Shapes.md#line_interpolate)
-    void SetInterpolate(std::string interpolate){
-      D3_CALLBACK_METHOD_1_ARG(interpolate,interpolate.c_str())
+    void SetCurve(std::string curve){
+      D3_CALLBACK_METHOD_1_ARG(curve,curve.c_str())
     }
 
     /// If interpolation is "bundle", "cardinal", "cardinal-open", or "cardinal-closed", a tension
@@ -179,7 +179,7 @@ namespace D3 {
   public:
     LineGenerator() {
       EM_ASM_ARGS({
-	    var new_line = d3.svg.line();
+	    var new_line = d3.line();
 	    js.objects[$0] = new_line;
       }, this->id);
     }
@@ -194,10 +194,9 @@ namespace D3 {
       EM_ASM_ARGS({
 	    var scale = js.objects[$1];
 	    var curr_x = js.objects[$0].x();
-        js.objects.push(curr_x);
 
 	    //Apply scale to whatever the current x axis function is
-	    js.objects[$0].x(function(d, i){return scale(js.objects[js.objects.length-1](d, i));});
+	    js.objects[$0].x(function(d, i){return scale(curr_x(d, i));});
 	  }, this->id, scale.GetID());
     }
 
@@ -314,12 +313,71 @@ namespace D3 {
 
   };
 
+  class LinkGenerator : public LineGenerator {
+  public:
+    LinkGenerator(std::string type) {
+        if (type == "vertical") {
+            EM_ASM_ARGS({js.objects[$0] = d3.linkVertical();}, this->id);
+        } else if (type == "horizontal") {
+            EM_ASM_ARGS({js.objects[$0] = d3.linkHorizontal();}, this->id);
+        } else {
+            std::cout << "WARNING: Invalid link type" << std::endl;
+            EM_ASM_ARGS({js.objects[$0] = d3.linkVertical();}, this->id);
+        }
+    }
+
+    // Handles setting source accessor to a function or string
+    void SetSource(std::string source) {
+      D3_CALLBACK_METHOD_1_ARG(source, source.c_str())
+    }
+
+    /// @cond TEMPLATES
+    // Handles setting source to a constant
+    template <typename T>
+    typename std::enable_if<std::is_fundamental<T>::value, void>::type
+    SetSource(T source) {
+      EM_ASM_ARGS({js.objects[$0].source($1);}, this->id, source);
+    }
+
+    // handles C++ functions
+    template <typename T>
+    emp::sfinae_decoy<void, decltype(&T::operator())>
+    SetSource(T source) {
+      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(source, source);
+    }
+
+    /// @endcond
+
+    //Handles setting target accessor to a function or string
+    void SetTarget(std::string target) {
+      D3_CALLBACK_METHOD_1_ARG(target, target.c_str())
+    }
+
+    /// @cond TEMPLATES
+
+    // Handles constants
+    template <typename T>
+    typename std::enable_if<std::is_fundamental<T>::value, void>::type
+    SetY(T target) {
+      EM_ASM_ARGS({js.objects[$0].target($1);}, this->id, target);
+    }
+
+    // handles C++ functions
+    template <typename T>
+    emp::sfinae_decoy<void, decltype(&T::operator())>
+    SetY(T target) {
+      D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(target, target);
+    }
+
+    /// @endcond
+  };
+
   /// An area is defined by two lines, with the area in between shaded
   class AreaGenerator : public LineGenerator {
   public:
     AreaGenerator() {
       EM_ASM_ARGS({
-	    var new_line = d3.svg.area();
+	    var new_line = d3.area();
 	    js.objects[$0] = new_line;
       }, this->id);
     }
@@ -373,7 +431,7 @@ namespace D3 {
   public:
     RadialLineGenerator(){
       EM_ASM_ARGS({
-  	    var new_line = d3.svg.line.radial();
+  	    var new_line = d3.radialLine();
   	    js.objects[$0] = new_line;
       }, this->id);
     }
@@ -399,7 +457,7 @@ namespace D3 {
   public:
     RadialAreaGenerator() {
       EM_ASM_ARGS({
-     	var new_line = d3.svg.area.radial();
+     	var new_line = d3.radialArea();
   	    js.objects[$0] = new_line;
       }, this->id);
     }
@@ -441,7 +499,7 @@ namespace D3 {
   public:
     ChordGenerator()  {
       EM_ASM_ARGS({
-    	var new_line = d3.svg.chord();
+    	var new_line = d3.ribbon();
   	    js.objects[$0] = new_line;
       }, this->id);
     }
@@ -465,37 +523,11 @@ namespace D3 {
     }
   };
 
-  class DiagonalGenerator : public ChordGenerator {
-  public:
-    DiagonalGenerator() {
-      EM_ASM_ARGS({
-  	    var new_line = d3.svg.diagonal();
-  	    js.objects[$0] = new_line;
-      }, this->id);
-    }
-
-   void SetProjection(std::string projection) {
-      D3_CALLBACK_METHOD_1_ARG(projection, projection.c_str())
-    }
-  };
-
-  //There is no documentation on this class in D3 other than that it exists
-  //so I'm just making it exist here too.
-  class DiagonalRadialGenerator : public ChordGenerator {
-  public:
-    DiagonalRadialGenerator() {
-      EM_ASM_ARGS({
-  	    var new_line = d3.svg.area.diagonal.radil();
-  	    js.objects[$0] = new_line;
-      }, this->id);
-    }
-  };
-
   class ArcGenerator : public RadialAreaGenerator {
   public:
     ArcGenerator()  {
       EM_ASM_ARGS({
-  	    var new_line = d3.svg.arc();
+  	    var new_line = d3.arc();
   	    js.objects[$0] = new_line;
       }, this->id);
     }

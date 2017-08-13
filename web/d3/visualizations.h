@@ -168,7 +168,7 @@ public:
 
   void Setup(){
 
-    D3::Selection * svg = GetSVG();
+    const D3::Selection * svg = GetSVG();
 
     double lowest = 10;//*(std::min_element(values.begin(), values.end()));
     double highest = 20;//*(std::max_element(values.begin(), values.end()));
@@ -183,9 +183,8 @@ public:
     x_scale->SetRange(std::array<double, 2>({{axis_width, GetHeight()-margin}}));
 
     //Set up axis
-    ax = new D3::Axis<D3::LinearScale>();
+    ax = new D3::Axis<D3::LinearScale>("right");
     ax->SetScale(*y_scale);
-    ax->SetOrientation("right");
     ax->Draw(*svg);
 
     //Make callback functions
@@ -269,7 +268,7 @@ protected:
   };
 
   std::function<void()> draw_data = [this]() {
-    DrawData(true);
+    this->DrawData(true);
   };
 
 public:
@@ -310,13 +309,16 @@ public:
     x_scale->SetRange(std::array<double, 2>({{axis_width, GetWidth()-x_margin}}));
 
     //Set up axes
-    x_axis = new D3::Axis<D3::LinearScale>(variables[0]);
+    x_axis = new D3::Axis<D3::LinearScale>("bottom", variables[0]);
     x_axis->SetScale(*x_scale);
-    y_axis = new D3::Axis<D3::LinearScale>(variables[1]);
+    y_axis = new D3::Axis<D3::LinearScale>("left", variables[1]);
     y_axis->SetScale(*y_scale);
     D3::DrawAxes(*x_axis, *y_axis, *svg);
 
     line_gen = new D3::LineGenerator();
+    EM_ASM_ARGS({
+        emp_i[Pointer_stringify($0)+"genpath"] = js.objects[$1];
+    }, GetID().c_str(), line_gen->GetID());
 
     // Set up accessors (for retriving coords from data points)
     SetXAccessor(return_x);
@@ -340,6 +342,7 @@ public:
   std::function<double(DATA_TYPE)> GetYAccessor() {return return_y;}
   std::function<double(DATA_TYPE)> GetScaledX() {return x;}
   std::function<double(DATA_TYPE)> GetScaledY() {return y;}
+
 
   void SetXScale(D3::LinearScale * scale) {x_scale = scale;}
   void SetYScale(D3::LinearScale * scale) {y_scale = scale;}
@@ -503,7 +506,6 @@ public:
   /// Smoothly (i.e. with animation) add data_point to the graph
   void AddDataPoint(DATA_TYPE data_point) {
     data.push_back(data_point);
-    D3::Selection * svg = GetSVG();
 
     if (data_point[1] > y_max || data_point[1] < y_min
         || data_point[0] > x_max || data_point[0] < x_min) {
@@ -522,10 +524,10 @@ public:
         x_max += .2;
       }
 
-      D3::Transition t = svg->MakeTransition();
+      D3::Transition t = GetSVG()->MakeTransition();
       y_axis->Rescale(y_max, y_min, t);
       x_axis->Rescale(x_min, x_max, t);
-      t.Each("end", GetID()+"draw_data");
+    //   t.Each("end", GetID()+"draw_data");
       Redraw(t);
 
     } else {
@@ -535,6 +537,25 @@ public:
 
   /// Redraws all data on the given selection or transition, which should contain an SVG canvas.
   /// Useful if you've adjusted scales.
+  // template <typename T>
+  // void Redraw(D3::SelectionOrTransition<T> & s) {
+  //   s.SelectAll(".data-point").Log();
+  //   s.SelectAll(".data-point").SetAttr("cy", GetID()+"y");
+  //   s.SelectAll(".data-point").SetAttr("cx", GetID()+"x");
+  //
+  //   D3::Dataset circle_data = GetSVG()->SelectAll(".data-point").Data();
+  //   circle_data.Log();
+  //   D3::Selection new_segs = GetSVG()->SelectAll(".line-seg").Data(circle_data);
+  //   new_segs.ExitRemove();
+  //   new_segs.EnterAppend("path").SetAttr("class", "line-seg");
+  //   new_segs.SetAttr("d", GetID()+"genpath");
+  //
+  //   // EM_ASM_ARGS({
+  //   //
+  //   //   js.objects[$0].selectAll(".line-seg").attr("d", function(d){console.log("in d", d, $1, js.objects[$1]); return js.objects[$1](d);});
+  //   // }, GetSVG()->GetID(), line_gen->GetID(), s.GetID());
+  //   std::cout << "Done redrawing" << std::endl;
+  // }
   template <typename T>
   void Redraw(D3::SelectionOrTransition<T> & s) {
     s.SelectAll(".data-point").SetAttr("cy", GetID()+"y");
@@ -542,13 +563,20 @@ public:
 
     EM_ASM_ARGS({
       circle_data = js.objects[$0].selectAll(".data-point").data();
-      js.objects[$0].selectAll(".line-seg").data([circle_data]);
-      js.objects[$2].selectAll(".line-seg").attr("d", function(d){return js.objects[$1](d);});
+      console.log(circle_data);
+      ls = js.objects[$2].selectAll(".line-seg");
+      s = js.objects[$0].selectAll(".line-seg").data([circle_data]);
+      t = s.transition();
+      t.attr("d", js.objects[$1]);
+      t.each("end", emp.emp__0draw_data);
+      //s.attr("d", js.objects[$1]);
+      s.exit().remove();
     }, GetSVG()->GetID(), line_gen->GetID(), s.GetID());
+
   }
 
   void DrawData(bool backlog = false) {
-
+      std::cout << "Calling DrawData. Backlog: " << data.size() << " " << backlog << std::endl;
     //If there's a backlog, then we're only allowed to clear it if this
     //was called recursively or from javascript (since javascript handles)
     //using this as a callback to asynchronous stuff)
@@ -572,7 +600,7 @@ public:
 
     // If it isn't nested, D3 will think it's 2 separate points
     std::array<DATA_TYPE, 1> new_point = {{data[0]}};
-
+    GetSVG()->SelectAll(".data-point").Log();
     D3::Selection enter = GetSVG()->SelectAll(".data-point").Data(new_point, GetID()+"return_x").EnterAppend("circle");
     enter.SetAttr("cy", GetID()+"y");
     enter.SetAttr("cx", GetID()+"x");
@@ -581,13 +609,14 @@ public:
     enter.BindToolTipMouseover(*tip);
     prev_data = data[0];
     data.pop_front();
-
+    GetSVG()->SelectAll("circle").Log();
     if (data.size() > 0) {
       DrawData(true);
     }
 
     // Call callback
     if (data.size() == 0) {
+      std::cout << "About to draw callback" << std::endl;
       CallDrawCallback();
     }
   }

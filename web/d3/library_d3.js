@@ -1,5 +1,5 @@
 var D3Library = {
-    $js: {objects:[], charts:[]},
+    $js: {objects:{}, counts:{}, next_id:0},
     n_objects: function(){
 	return js.objects.length;
     },

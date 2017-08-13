@@ -28,7 +28,7 @@ emp::web::LineGraph<std::array<double, 2> > line_graph("x", "y", 500, 250);
 emp::web::TreeVisualization<LineageTreeNode> tree(500, 250);
 D3::Selection example_selection;
 D3::Selection circles;
-D3::Axis<> ax = D3::Axis<>("example axis");
+D3::Axis<> ax = D3::Axis<>("left", "example axis");
 D3::LinearScale scale;
 D3::Selection svg = D3::Select("body").Append("svg");
 
@@ -386,7 +386,6 @@ int main() {
   scale.SetRange(30, 300);
   svg.SetAttr("height", 500);
 
-  emp::JSWrap([](){ax.SetOrientation("left");}, "TestSetOrientation");
   emp::JSWrap([](){ax.SetScale(scale);}, "TestSetScale");
   emp::JSWrap([](){return ax.GetScale().GetID();}, "TestGetScale");
   emp::JSWrap([](){ax.SetTickValues(std::array<int, 3>({{4,5,7}}));}, "TestSetTickValues");
@@ -402,11 +401,6 @@ int main() {
 
   EM_ASM_ARGS({
     describe("axes", function(){
-
-      it("should support setting orientation", function(){
-        emp.TestSetOrientation();
-        chai.assert.equal(js.objects[$0].orient(), "left");
-      });
 
       it("should support setting scale", function(){
         emp.TestSetScale();

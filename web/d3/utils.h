@@ -139,7 +139,11 @@ D3_CALLBACK_METHOD_1_ARG_IMPL(CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_
     emp::JSDelete(fun_id);
 
 //Store return of one of the above functions in js.objects
-void StoreNewObject(){EM_ASM({js.objects.push(emp.__new_object);});}
+void StoreNewObject(int id){
+    EM_ASM_ARGS({
+        js.objects[$0] = emp.__new_object;
+    }, id);
+}
 
 
 #endif

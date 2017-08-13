@@ -19,6 +19,7 @@ namespace D3 {
     std::string label;
     std::string dom_id = "";
     std::string label_offset = "";
+    std::string orientation;
 
   public:
 
@@ -35,10 +36,33 @@ namespace D3 {
     ///
     /// For example, if your label was "Per capita mortality", you could select the axis with:
     /// `D3::Select("#Percapitamortality_axis");`.
-    Axis(std::string label = "") {
+    Axis(std::string type, std::string label = "") {
       //The scale got added to th the list of objects before this one
       this->label = label;
-      EM_ASM_ARGS({js.objects[$0] = d3.svg.axis();}, this->id);
+      this->orientation = type;
+      if (type == "left") {
+          EM_ASM_ARGS({
+              js.objects[$0] = d3.axisLeft(js.objects[$1]);
+          }, this->id, scale.GetID());
+      } else if (type == "right") {
+          EM_ASM_ARGS({
+              js.objects[$0] = d3.axisRight(js.objects[$1]);
+          }, this->id, scale.GetID());
+      } else if (type == "bottom") {
+          EM_ASM_ARGS({
+              js.objects[$0] = d3.axisBottom(js.objects[$1]);
+          }, this->id, scale.GetID());
+      } else if (type == "top") {
+        EM_ASM_ARGS({
+            js.objects[$0] = d3.axisTop(js.objects[$1]);
+        }, this->id, scale.GetID());
+      } else {
+          std::cout << "WARNING: Invalid type given to axis constructor" << std::endl;
+          EM_ASM_ARGS({
+              js.objects[$0] = d3.axisBottom(js.objects[$1]);
+          }, this->id, scale.GetID());
+      }
+
     }
 
     /// Draw axis on [selection] (must contain a single SVG element) with intelligent default
@@ -60,7 +84,7 @@ namespace D3 {
         var canvas_width = js.objects[$1].attr("width");
         var canvas_height = js.objects[$1].attr("height");
 
-        var orient = js.objects[$0].orient();
+        var orient = Pointer_stringify($6);
         var dy = "2em";
         var x_divisor = 2.0;
         var text_orient = 0;
@@ -84,10 +108,6 @@ namespace D3 {
           dy = Pointer_stringify($5);
         }
 
-        js.objects[$3].selectAll("line, .domain")
-             .attr("stroke-width", 1)
-             .attr("fill", "none")
-             .attr("stroke", "black");
         js.objects[$3].append("text")
              .attr("id", "axis_label")
              .attr("transform", "rotate("+text_orient+")")
@@ -95,7 +115,7 @@ namespace D3 {
              .attr("dy", dy).style("text-anchor", "middle")
              .text(Pointer_stringify($4));
       }, this->id, selection.GetID(), dom_id.c_str(), group.GetID(), label.c_str(),
-      label_offset.c_str());
+      label_offset.c_str(), orientation.c_str());
     }
 
     template <typename T>
@@ -135,16 +155,6 @@ namespace D3 {
     /// scoot it over. This method will move the axis to the x,y location specified.
     void Move(int x, int y) {
       group.Move(x,y);
-    }
-
-    /// Set orientation of this axis to [orientation] (must be "bottom", "top", "left", or "right")
-    /// Controls default placement on SVG, whether main line is vertical or horizontal, and which
-    /// side the ticks and label show up on.
-    //Needs to be called before Draw
-    void SetOrientation(std::string orientation) {
-      EM_ASM_ARGS({
-	    js.objects[$0].orient(Pointer_stringify($1));
-      }, this->id, orientation.c_str(), group.GetID());
     }
 
     template <typename T, std::size_t SIZE>
@@ -214,7 +224,6 @@ namespace D3 {
   template <typename SCALE_X_TYPE = D3::LinearScale, typename SCALE_Y_TYPE = D3::LinearScale>
   void DrawAxes(Axis<SCALE_X_TYPE> & x_axis, Axis<SCALE_Y_TYPE> & y_axis, Selection & selection){
     x_axis.Draw(selection);
-    y_axis.SetOrientation("left");
     y_axis.Draw(selection);
 
     EM_ASM_ARGS({

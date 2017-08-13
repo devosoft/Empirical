@@ -40,29 +40,30 @@ namespace D3 {
   public:
       SelectionOrTransition(){;};
       SelectionOrTransition(int id) : D3_Base(id){;};
+      SelectionOrTransition(const SelectionOrTransition<DERIVED> & s) : D3_Base(s){;};
 
       /// Create a new selection/transition containing the first element matching the
       /// [selector] string that are within this current selection/transition
-      DERIVED Select(std::string selector) {
-        int new_id = EM_ASM_INT_V({return js.objects.length});
+      DERIVED Select(std::string selector) const {
+        int new_id = NextD3ID();
 
         EM_ASM_ARGS({
   	      var new_selection = js.objects[$0].select(Pointer_stringify($1));
-  	      js.objects.push(new_selection);
-        }, this->id, selector.c_str());
+  	      js.objects[$2] = new_selection;
+        }, this->id, selector.c_str(), new_id);
 
         return DERIVED(new_id);
       }
 
       /// Create a new selection/transition containing all elements matching the [selector]
       /// string that are within this current selection/transition
-      DERIVED SelectAll(std::string selector) {
-        int new_id = EM_ASM_INT_V({return js.objects.length});
+      DERIVED SelectAll(std::string selector) const {
+        int new_id = NextD3ID();
 
         EM_ASM_ARGS({
   	      var new_selection = js.objects[$0].selectAll(Pointer_stringify($1));
-  	      js.objects.push(new_selection);
-        }, this->id, selector.c_str());
+          js.objects[$2] = new_selection;
+        }, this->id, selector.c_str(), new_id);
 
         return DERIVED(new_id);
       }
@@ -117,11 +118,11 @@ namespace D3 {
       ///
       /// For more information see the
       /// [D3 documentation](https://github.com/d3/d3-3.x-api-reference/blob/master/Selections.md#filter)
-      DERIVED Filter(std::string selector){
+      DERIVED Filter(std::string selector) const {
 
-        int new_id = EM_ASM_INT_V({return js.objects.length});
+        int new_id = NextD3ID();
         D3_CALLBACK_METHOD_1_ARG(filter, selector.c_str())
-        StoreNewObject();
+        StoreNewObject(new_id);
         return DERIVED(new_id);
       }
 
@@ -129,11 +130,11 @@ namespace D3 {
 
       template <typename T>
       emp::sfinae_decoy<DERIVED, decltype(&T::operator())>
-      Filter(T selector){
+      Filter(T selector) const {
 
-        int new_id = EM_ASM_INT_V({return js.objects.length});
+        int new_id = NextD3ID();
         D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(filter, selector)
-        StoreNewObject();
+        StoreNewObject(new_id);
         return DERIVED(new_id);
       }
 
@@ -159,32 +160,19 @@ namespace D3 {
 
       /// @endcond
 
-      /// Call the given function on each element of the selection/transition. [function] can
-      /// either be a C++ function or a string with the name of a Javascript function in the d3,
-      /// emp, or current window namespace. Adding a time argument makes the functions serve as a
-      /// listener for the specified transition event ("start", "end", or "interrupt")
-
-      DERIVED Each(std::string time, std::string function){
-        D3_CALLBACK_METHOD_2_ARGS(each, time.c_str(), function.c_str())
-        return *(static_cast<DERIVED *>(this));
-      }
-
-      /// @cond TEMPLATES
-
-      template <typename T>
-      emp::sfinae_decoy<DERIVED, decltype(&T::operator())>
-      Each(std::string time, T function){
-        D3_CALLBACK_METHOD_CPP_FUNCTION_2_ARGS(each, time.c_str(), function)
-        return *(static_cast<DERIVED *>(this));
-      }
-
-      /// @endcond
-
       /// Remove the elements in this selection/transition from the document
       /// For transitions, this happens at the end of the transition.
       void Remove(){
         EM_ASM_ARGS({js.objects[$0].remove()},
           this->id);
+      }
+
+      DERIVED Merge(DERIVED & other) {
+          int new_id = NextD3ID();
+          EM_ASM_ARGS({
+              js.objects[$2] = js.objects[$0].merge(js.objects[$1]);
+          }, this->id, other.GetID(), new_id);
+          return DERIVED(new_id);
       }
 
       /**************************************************************************//**
@@ -431,7 +419,7 @@ namespace D3 {
       ***********************************************/
 
       /// Get the value of this object's [name] attribute when it's a string
-      std::string GetAttrString(std::string name){
+      std::string GetAttrString(std::string name) const {
         char * buffer = (char *)EM_ASM_INT({
   	      var text = js.objects[$0].attr(Pointer_stringify($1));
   	      var buffer = Module._malloc(text.length+1);
@@ -445,21 +433,21 @@ namespace D3 {
       }
 
       /// Get the value of this object's [name] attribute when it's an int
-      int GetAttrInt(std::string name){
+      int GetAttrInt(std::string name) const {
         return EM_ASM_INT({
   	      return js.objects[$0].attr(Pointer_stringify($1));
         }, this->id, name.c_str());
       }
 
       /// Get the value of this object's [name] attribute when it's a double
-      double GetAttrDouble(std::string name){
+      double GetAttrDouble(std::string name) const {
         return EM_ASM_DOUBLE({
   	      return js.objects[$0].attr(Pointer_stringify($1));
         }, this->id, name.c_str());
       }
 
       /// Get the value of this object's [name] style when it's a string
-      std::string GetStyleString(std::string name){
+      std::string GetStyleString(std::string name) const {
         char * buffer = (char *)EM_ASM_INT({
   	      var text = js.objects[$0].style(Pointer_stringify($1));
   	      var buffer = Module._malloc(text.length+1);
@@ -473,21 +461,21 @@ namespace D3 {
       }
 
       /// Get the value of this object's [name] style when it's an int
-      int GetStyleInt(std::string name){
+      int GetStyleInt(std::string name) const {
         return EM_ASM_INT({
   	      return js.objects[$0].style(Pointer_stringify($1));
         }, this->id, name.c_str());
       }
 
       /// Get the value of this object's [name] style when it's a double
-      double GetStyleDouble(std::string name){
+      double GetStyleDouble(std::string name) const {
         return EM_ASM_DOUBLE({
   	      return js.objects[$0].style(Pointer_stringify($1));
         }, this->id, name.c_str());
       }
 
       /// Get this object's text
-      std::string GetText(){
+      std::string GetText() const {
 
         char * buffer = (char *)EM_ASM_INT({
   	      var text = js.objects[$0].text();
@@ -533,14 +521,14 @@ namespace D3 {
       #endif
 
       /// Returns true if there are no elements in this selection (or all elements are null)
-      bool Empty() {
+      bool Empty() const {
         int empty = EM_ASM_INT({return Number(js.objects[$0].empty())},
              this->id);
         return (bool)empty;
       }
 
       /// Returns number of elements in this selection
-      int Size() {
+      int Size() const {
         return EM_ASM_INT({return js.objects[$0].size()},
              this->id);
       }
@@ -577,12 +565,12 @@ namespace D3 {
     /// Note: In D3.js this method is just called transition(), but in C++ that would cause a
     /// collision with the constructor
     //TODO: D3 supports passing a selection, but it's kind of a weird edge case
-    Transition NewTransition(std::string name=""){
-      int new_id = EM_ASM_INT_V({return js.objects.length});
+    Transition NewTransition(std::string name="") const {
+      int new_id = NextD3ID();
       EM_ASM_ARGS({
  	    var transition = js.objects[$0].transition(Pointer_stringify($1));
-	    js.objects.push(transition);
-  	  }, this->id, name.c_str());
+	    js.objects[$2] = transition;
+    }, this->id, name.c_str(), new_id);
 
       return D3::Transition(new_id);
     }
@@ -813,7 +801,7 @@ namespace D3 {
     ***********************************************/
 
     /// Get this object's html
-    std::string GetHtml(){
+    std::string GetHtml() const {
       char * buffer = (char *)EM_ASM_INT({
         var text = d3.select(js.objects[$0]).html();
         var buffer = Module._malloc(text.length+1);
@@ -827,7 +815,7 @@ namespace D3 {
     }
 
     /// Get the value of this object's [name] property when its a string
-    std::string GetPropertyString(std::string name){
+    std::string GetPropertyString(std::string name) const {
       char * buffer = (char *)EM_ASM_INT({
         var text = d3.select(js.objects[$0]).property(Pointer_stringify($1));
         var buffer = Module._malloc(text.length+1);
@@ -841,14 +829,14 @@ namespace D3 {
     }
 
     /// Get the value of this object's [name] property when it's an int
-    int GetPropertyInt(std::string name){
+    int GetPropertyInt(std::string name) const {
       return EM_ASM_INT({
         return d3.select(js.objects[$0]).property(Pointer_stringify($1));
       }, this->id, name.c_str());
     }
 
     /// Get the value of this object's [name] property when it's a double
-    double GetPropertyDouble(std::string name){
+    double GetPropertyDouble(std::string name) const {
       return EM_ASM_DOUBLE({
         return d3.select(js.objects[$0]).property(Pointer_stringify($1));
       }, this->id, name.c_str());
@@ -868,9 +856,6 @@ namespace D3 {
   /// For a deep dive into how selections work in d3, see
   /// [this article](https://bost.ocks.org/mike/selection/).
   class Selection : public SelectionOrTransition<Selection> {
-  private:
-    bool enter;
-    bool exit;
 
   public:
 
@@ -887,25 +872,29 @@ namespace D3 {
     /// Advanced note: This is useful when creating a Selection object to point to a selection
     // that you already created in Javascript and added to js.objects.
     Selection(int id) : SelectionOrTransition(id){
-      this->enter = false;
-      this->exit = false;
     };
+
+    Selection(const Selection & s) : SelectionOrTransition(s){
+    };
+
+    Selection& operator=(const Selection & s) {
+      return *this;
+    };
+
 
     /// This is the Selection constructor you usually want to use. It takes a string saying what
     /// to select and a bool saying whether to select all elements matching that string [true] or
     /// just the first [false]
     Selection(std::string selector, bool all = false) {
-      this->enter = false;
-      this->exit = false;
       if (all){
         EM_ASM_ARGS({
-  	  js.objects[$0] =
-  	  d3.selectAll(Pointer_stringify($1))}, this->id, selector.c_str());
+  	      js.objects[$0] = d3.selectAll(Pointer_stringify($1));
+        }, this->id, selector.c_str());
       }
       else {
         EM_ASM_ARGS({
-  	  js.objects[$0] =
-  	  d3.select(Pointer_stringify($1))}, this->id, selector.c_str());
+  	      js.objects[$0] = d3.select(Pointer_stringify($1));
+        }, this->id, selector.c_str());
       }
     };
 
@@ -936,7 +925,7 @@ namespace D3 {
 
     //Option to pass loaded dataset stored in Javascript without translating to C++
     Selection Data(Dataset values, std::string key=""){
-      int update_id = EM_ASM_INT_V({return js.objects.length});
+      int update_id = NextD3ID();
 
       EM_ASM_ARGS({
         //We could make this slightly prettier with macros, but would
@@ -955,12 +944,10 @@ namespace D3 {
 	      var update_sel = js.objects[$0].data(js.objects[$2]);
 	    }
 
-	    js.objects.push(update_sel);
-      },this->id, key.c_str(), values.GetID());
+	    js.objects[$3] = update_sel;
+      },this->id, key.c_str(), values.GetID(), update_id);
 
       Selection update = Selection(update_id);
-      update.enter = true;
-      update.exit = true;
       return update;
     }
 
@@ -970,7 +957,7 @@ namespace D3 {
     template<typename T>
     emp::sfinae_decoy<Selection, decltype(&T::operator())>
     Data(Dataset values, T key){
-      int update_id = EM_ASM_INT_V({return js.objects.length});
+      int update_id = NextD3ID();
       uint32_t fun_id = emp::JSWrap(key, "", false);
 
   	  EM_ASM_ARGS({
@@ -978,21 +965,20 @@ namespace D3 {
                                                 function(d,i) {
                                                   return emp.Callback($1, d, i);
                                             });
-	    js.objects.push(update_sel);
-      },this->id, fun_id, values.GetID());
+	    js.objects[$3] = update_sel;
+
+      }, this->id, fun_id, values.GetID(), update_id);
 
       emp::JSDelete(fun_id);
 
       Selection update = Selection(update_id);
-      update.enter = true;
-      update.exit = true;
       return update;
     }
 
     // Accepts string referring to Javascript function
     template<typename C, class = typename C::value_type>
     Selection Data(C values, std::string key=""){
-      int update_id = EM_ASM_INT_V({return js.objects.length});
+      int update_id = NextD3ID();
       emp::pass_array_to_javascript(values);
 
   	  EM_ASM_ARGS({
@@ -1010,12 +996,10 @@ namespace D3 {
 	      var update_sel = js.objects[$0].data(emp_i.__incoming_array);
 	    }
 
-	    js.objects.push(update_sel);
-      },this->id, key.c_str());
+	    js.objects[$2] = update_sel;
+      }, this->id, key.c_str(), update_id);
 
       Selection update = Selection(update_id);
-      update.enter = true;
-      update.exit = true;
       return update;
     }
 
@@ -1023,7 +1007,7 @@ namespace D3 {
     template<typename C, class = typename C::value_type, typename T>
     emp::sfinae_decoy<Selection, decltype(&T::operator())>
     Data(C values, T key){
-      int update_id = EM_ASM_INT_V({return js.objects.length});
+      int update_id = NextD3ID();
       emp::pass_array_to_javascript(values);
       uint32_t fun_id = emp::JSWrap(key, "", false);
 
@@ -1032,18 +1016,24 @@ namespace D3 {
                                                 function(d,i,k) {
                                                   return emp.Callback($1, d, i, k);
                                             });
-	    js.objects.push(update_sel);
-      },this->id, fun_id);
+	    js.objects[$2] = update_sel;
+      }, this->id, fun_id, update_id);
 
       emp::JSDelete(fun_id);
 
       Selection update = Selection(update_id);
-      update.enter = true;
-      update.exit = true;
       return update;
     }
 
     /// @endcond
+
+    Dataset GetData() const {
+        int new_id = NextD3ID();
+        EM_ASM_ARGS({
+            js.objects[$1] = [js.objects[$0].data()];
+        }, this->id, new_id);
+        return Dataset(new_id);
+    }
 
     /// This function appends the specified type of nodes to this
     /// selection's enter selection, which merges the enter selection
@@ -1053,17 +1043,13 @@ namespace D3 {
 
     Selection EnterAppend(std::string type){
 
-      int new_id = EM_ASM_INT_V({return js.objects.length});
-
-      emp_assert(this->enter);
+      int new_id = NextD3ID();
 
       EM_ASM_ARGS({
 	    var append_selection = js.objects[$0].enter()
                                .append(Pointer_stringify($1));
-	    js.objects.push(append_selection);
-      }, this->id, type.c_str());
-
-      this->enter = false;
+	    js.objects[$2] = append_selection;
+      }, this->id, type.c_str(), new_id);
 
       return Selection(new_id);
     }
@@ -1073,23 +1059,21 @@ namespace D3 {
     /// For more information, see the D3 documention on
     /// [insert](https://github.com/d3/d3-3.x-api-reference/blob/master/Selections.md#insert)
     Selection EnterInsert(std::string name, std::string before=NULL){
-      int new_id = EM_ASM_INT_V({return js.objects.length});
-
-      emp_assert(this->enter);
+      int new_id = NextD3ID();
 
       if (before.c_str()){
 	    EM_ASM_ARGS({
-	      var new = js.objects[$0].enter().insert(Pointer_stringify($1),
+	      var new_sel = js.objects[$0].enter().insert(Pointer_stringify($1),
 						  Pointer_stringify($2));
-	      js.objects.push(new);
-	    }, this->id, name.c_str(), before.c_str());
+	      js.objects[$3] = new_sel;
+        }, this->id, name.c_str(), before.c_str(), new_id);
       } else {
 	    EM_ASM_ARGS({
-	      var new = js.objects[$0].enter().insert(Pointer_stringify($1));
-	      js.objects.push(new);
-	    }, this->id, name.c_str());
+	      var new_sel = js.objects[$0].enter().insert(Pointer_stringify($1));
+	      js.objects[$2] = new_sel;
+        }, this->id, name.c_str(), new_id);
       }
-      this->enter = false;
+
       return Selection(new_id);
     }
 
@@ -1100,16 +1084,12 @@ namespace D3 {
     /// Returns a selection object pointing at this selection's enter selection.
     Selection Enter() {
 
-      int new_id = EM_ASM_INT_V({return js.objects.length});
-
-      emp_assert(this->enter);
+      int new_id = NextD3ID();
 
       EM_ASM_ARGS({
 	    var enter_selection = js.objects[$0].enter();
-	    js.objects.push(enter_selection);
-      }, this->id);
-
-      this->enter = false;
+	    js.objects[$1] = enter_selection;
+      }, this->id, new_id);
 
       return Selection(new_id);
     }
@@ -1118,19 +1098,14 @@ namespace D3 {
     /// is remove all of the nodes in it. This function does just that.
 
     ///Selection must have an exit selection (i.e. have just had data bound to it).
-    Selection ExitRemove(){
+    void ExitRemove(){
 
-      int new_id = EM_ASM_INT_V({return js.objects.length});
-
-      emp_assert(this->exit);
-
-      this->exit = false;
+      int new_id = NextD3ID();
 
       EM_ASM_ARGS({
 	    var exit_selection = js.objects[$0].exit().remove();
-	    js.objects.push(exit_selection);
-	  }, this->id);
-      return Selection(new_id);
+	    js.objects[$1] = exit_selection;
+      }, this->id, new_id);
     }
 
     /// Usually the only thing you want to do with the exit selection
@@ -1141,16 +1116,12 @@ namespace D3 {
     /// Returns a selection object pointing at this selection's exit selection.
     Selection Exit(){
 
-      int new_id = EM_ASM_INT_V({return js.objects.length});
-
-      emp_assert(this->exit);
+      int new_id = NextD3ID();
 
       EM_ASM_ARGS({
 	    var exit_selection = js.objects[$0].exit();
-	    js.objects.push(exit_selection);
-      }, this->id);
-
-      this->exit = false;
+	    js.objects[$1] = exit_selection;
+      }, this->id, new_id);
 
       return Selection(new_id);
     }
@@ -1294,7 +1265,7 @@ namespace D3 {
     ***********************************************/
 
     /// Get this object's html
-    std::string GetHtml(){
+    std::string GetHtml() const {
       char * buffer = (char *)EM_ASM_INT({
 	    var text = js.objects[$0].html();
 	    var buffer = Module._malloc(text.length+1);
@@ -1308,7 +1279,7 @@ namespace D3 {
     }
 
     /// Get the value of this object's [name] property when its a string
-    std::string GetPropertyString(std::string name){
+    std::string GetPropertyString(std::string name) const {
       char * buffer = (char *)EM_ASM_INT({
 	    var text = js.objects[$0].property(Pointer_stringify($1));
 	    var buffer = Module._malloc(text.length+1);
@@ -1322,14 +1293,14 @@ namespace D3 {
     }
 
     /// Get the value of this object's [name] property when it's an int
-    int GetPropertyInt(std::string name){
+    int GetPropertyInt(std::string name) const {
       return EM_ASM_INT({
 	    return js.objects[$0].property(Pointer_stringify($1));
       }, this->id, name.c_str());
     }
 
     /// Get the value of this object's [name] property when it's a double
-    double GetPropertyDouble(std::string name){
+    double GetPropertyDouble(std::string name) const {
       return EM_ASM_DOUBLE({
 	    return js.objects[$0].property(Pointer_stringify($1));
       }, this->id, name.c_str());
@@ -1341,12 +1312,12 @@ namespace D3 {
 
     /// Append DOM element(s) of the type specified by [name] to this selection.
     Selection Append(std::string name){
-      int new_id = EM_ASM_INT_V({return js.objects.length});
+      int new_id = NextD3ID();
 
       EM_ASM_ARGS({
 	    var new_selection = js.objects[$0].append(Pointer_stringify($1));
-	    js.objects.push(new_selection);
-      }, this->id, name.c_str());
+	    js.objects[$2] = new_selection;
+      }, this->id, name.c_str(), new_id);
       return Selection(new_id);
     }
 
@@ -1356,19 +1327,19 @@ namespace D3 {
     /// For more information, see the D3 documention on
     /// [insert](https://github.com/d3/d3-3.x-api-reference/blob/master/Selections.md#insert)
     Selection Insert(std::string name, std::string before=NULL){
-      int new_id = EM_ASM_INT_V({return js.objects.length});
+      int new_id = NextD3ID();
 
       if (before.c_str()){
 	    EM_ASM_ARGS({
-	      var new = js.objects[$0].insert(Pointer_stringify($1),
+	      var new_sel = js.objects[$0].insert(Pointer_stringify($1),
 						  Pointer_stringify($2));
-	      js.objects.push(new);
-        }, this->id, name.c_str(), before.c_str());
+	      js.objects[$3] = new_sel;
+        }, this->id, name.c_str(), before.c_str(), new_id);
       } else {
   	    EM_ASM_ARGS({
-	      var new = js.objects[$0].insert(Pointer_stringify($1));
-	      js.objects.push(new);
-	    }, this->id, name.c_str());
+	      var new_sel = js.objects[$0].insert(Pointer_stringify($1));
+	      js.objects[$2] = new_sel;
+        }, this->id, name.c_str(), new_id);
       }
       return Selection(new_id);
     }
@@ -1376,11 +1347,11 @@ namespace D3 {
     /// Create a transition from the current selection. If a [name] is specified
     /// the transition will be given that name
     Transition MakeTransition(std::string name=""){
-      int new_id = EM_ASM_INT_V({return js.objects.length});
+      int new_id = NextD3ID();
       EM_ASM_ARGS({
  	    var transition = js.objects[$0].transition(Pointer_stringify($1));
-	    js.objects.push(transition);
-  	  }, this->id, name.c_str());
+	    js.objects[$2] = transition;
+      }, this->id, name.c_str(), new_id);
 
       return Transition(new_id);
     }
@@ -1419,6 +1390,15 @@ namespace D3 {
 			this->id);
     }
 
+    void Raise() {
+        EM_ASM_ARGS({js.objects[$0].raise();}, this->id);
+    }
+
+    void Lower() {
+        EM_ASM_ARGS({js.objects[$0].lower();}, this->id);
+    }
+
+
     /// Listen for an event of type [type] and call [listener] when it happens
     /// [listener] can be a string containing the name of a Javascript function, or a C++ function
     ///
@@ -1450,6 +1430,7 @@ namespace D3 {
       }, listener.c_str()) \
       && "String passed to On is not s Javascript function or null", listener);
 
+      int new_id = NextD3ID();
 
       EM_ASM_ARGS({
 	    var func_string = Pointer_stringify($2);
@@ -1465,15 +1446,14 @@ namespace D3 {
 	    if (typeof func_string === "function") {
 	      js.objects[$0].on(Pointer_stringify($1),
 		  function(d, i){
-		     var new_id = js.objects.length;
-		     js.objects.push(d3.select(this));
-		     func_string(d, i, new_id);},
+		     js.objects[$4] = d3.select(this);
+		     func_string(d, i, $4);},
           $3);
 	    } else {
 	      js.objects[$0].on(Pointer_stringify($1), null);
 	    }
 
-      }, this->id, type.c_str(), listener.c_str(), capture);
+      }, this->id, type.c_str(), listener.c_str(), capture, new_id);
 
       return (*this);
     }
@@ -1486,14 +1466,14 @@ namespace D3 {
     On(std::string type, T listener, bool capture=false){
 
       uint32_t fun_id = emp::JSWrap(listener, "", false);
+      int new_id = NextD3ID();
 
       EM_ASM_ARGS({
 	      js.objects[$0].on(Pointer_stringify($1),
 		  function(){
-		     var new_id = js.objects.length;
-		     js.objects.push(d3.select(this));
-		     emp.Callback($2, d, i, new_id);}, $3);
-      }, this->id, type.c_str(), fun_id, capture);
+		     js.objects[$4] = d3.select(this);
+		     emp.Callback($2, d, i, $4);}, $3);
+      }, this->id, type.c_str(), fun_id, capture, new_id);
 
       emp::JSDelete(fun_id);
       return (*this);
@@ -1567,13 +1547,13 @@ namespace D3 {
 
   /// Create a selection containing the first DOM element matching [selector]
   /// (convenience function to match D3 syntax - you can also just use the constructor)
-  Selection Select(std::string selector){
+  Selection Select(std::string selector) {
     return Selection(selector);
   }
 
   /// Create a selection containing all DOM elements matching [selector]
   /// (convenience function to match D3 syntax - you can also just use the constructor)
-  Selection SelectAll(std::string selector){
+  Selection SelectAll(std::string selector) {
     return Selection(selector, true);
   }
 
