@@ -604,6 +604,74 @@ namespace D3 {
     * @{
     ***********************************************/
 
+    Transition On(std::string type, std::string listener="null", bool capture=false){
+
+      // Check that the listener is valid
+      emp_assert(EM_ASM_INT({
+        var func_string = Pointer_stringify($0);
+        if (func_string == "null") {
+          return true;
+        }
+        if (typeof window[func_string] === "function") {
+          func_string = window[func_string];
+        }
+        for (name in {d3:"d3", emp:"emp"}) {
+          if (typeof window[name][func_string] === "function") {
+            func_string = window[name][func_string];
+          }
+        }
+        return (typeof func_string === "function");
+      }, listener.c_str()) \
+      && "String passed to On is not s Javascript function or null", listener);
+
+      int new_id = NextD3ID();
+
+      EM_ASM_ARGS({
+	    var func_string = Pointer_stringify($2);
+        if (typeof window[func_string] === "function") {
+          func_string = window[func_string];
+        }
+        for (name in {d3:"d3", emp:"emp"}) {
+          if (typeof window[name][func_string] === "function") {
+            func_string = window[name][func_string];
+          }
+        }
+
+	    if (typeof func_string === "function") {
+	      js.objects[$0].on(Pointer_stringify($1),
+		  func_string,$3);
+	    } else {
+	      js.objects[$0].on(Pointer_stringify($1), null);
+	    }
+
+      }, this->id, type.c_str(), listener.c_str(), capture, new_id);
+
+      return (*this);
+    }
+
+    /// @cond TEMPLATES
+
+    /// Version for C++ functions
+    template <typename T>
+    emp::sfinae_decoy<Transition, decltype(&T::operator())>
+    On(std::string type, T listener, bool capture=false){
+
+      uint32_t fun_id = emp::JSWrap(listener, "", false);
+      int new_id = NextD3ID();
+
+      EM_ASM_ARGS({
+	      js.objects[$0].on(Pointer_stringify($1),
+		  function(d, i){
+		     js.objects[$4] = d3.select(this);
+		     emp.Callback($2, d, i, $4);}, $3);
+      }, this->id, type.c_str(), fun_id, capture, new_id);
+
+      emp::JSDelete(fun_id);
+      return (*this);
+    }
+
+    /// @endcond
+
     /// Sets special properties of DOM elements (e.g. "checked" for checkboxes)
     /// Value can be a number, function, string, or string naming a Javascript function
     /// See the [d3 documentation](https://github.com/d3/d3-selection#selection_property)

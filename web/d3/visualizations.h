@@ -153,7 +153,7 @@ public:
   D3::LinearScale * x_scale;
   D3::LinearScale * y_scale;
   D3::Axis<D3::LinearScale> * ax;
-  D3::Selection * circles;
+  D3::Selection circles;
   D3::ToolTip * tip;
 
   std::function<double(double, int, int)> scaled_d = [&](double d, int i, int k){
@@ -195,17 +195,17 @@ public:
 
   virtual void AddDataPoint(int update, emp::vector<double> values){
       //Draw circles that represent values
-      circles = new D3::Selection(GetSVG()->SelectAll("circle").Data(values));
-      circles->EnterAppend("circle");
-      circles->ExitRemove();
-      circles->SetAttr("r", 5);
-      circles->SetAttr("cx", GetID()+"scaled_i");
-      circles->SetAttr("cy", GetID()+"scaled_d");
+      circles = D3::Selection(GetSVG()->SelectAll("circle").Data(values));
+      circles.ExitRemove();
+      circles = circles.EnterAppend("circle").Merge(circles);
+      circles.SetAttr("r", 5);
+      circles.SetAttr("cx", GetID()+"scaled_i");
+      circles.SetAttr("cy", GetID()+"scaled_d");
 
      // circles->AddToolTip(tip);
 
-      circles = new D3::Selection(circles->Data(values));
-      circles->MakeTransition().SetAttr("cy", GetID()+"scaled_d");
+      circles = D3::Selection(circles.Data(values));
+      circles.MakeTransition().SetAttr("cy", GetID()+"scaled_d");
   }
 
 };
@@ -471,7 +471,7 @@ public:
     // Bind data and update graphics
     D3::Selection update = GetSVG()->SelectAll(".data-point")
                                     .Data(*dataset, GetID()+"return_x");
-    update.EnterAppend("circle");
+    update = update.EnterAppend("circle").Merge(update);
     update.SetAttr("cy", GetID()+"y")
           .SetAttr("cx", GetID()+"x")
           .SetAttr("r", 2)
@@ -527,7 +527,7 @@ public:
       D3::Transition t = GetSVG()->MakeTransition();
       y_axis->Rescale(y_max, y_min, t);
       x_axis->Rescale(x_min, x_max, t);
-    //   t.Each("end", GetID()+"draw_data");
+      t.On("end", GetID()+"draw_data");
       Redraw(t);
 
     } else {
@@ -568,7 +568,7 @@ public:
       s = js.objects[$0].selectAll(".line-seg").data([circle_data]);
       t = s.transition();
       t.attr("d", js.objects[$1]);
-      t.each("end", emp.emp__0draw_data);
+    //   t.each("end", emp.emp__0draw_data);
       //s.attr("d", js.objects[$1]);
       s.exit().remove();
     }, GetSVG()->GetID(), line_gen->GetID(), s.GetID());

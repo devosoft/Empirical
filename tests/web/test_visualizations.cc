@@ -194,9 +194,9 @@ int main() {
 
       it('should have an x and y axis', function() {
         var data_points = d3.select("#line_graph").selectAll(".data-point");
-        chai.assert.equal(d3.select("#x_axis").select("path").attr("d"), "M60,6V0H470V6");
+        chai.assert.equal(d3.select("#x_axis").select("path").attr("d"), "M60.5,6V0.5H470.5V6");
         chai.assert.equal(d3.select("#x_axis").select("#axis_label").text(), "x");
-        chai.assert.equal(d3.select("#y_axis").select("path").attr("d"), "M-6,10H0V190H-6");
+        chai.assert.equal(d3.select("#y_axis").select("path").attr("d"), "M-6,10.5H0.5V190.5H-6");
         chai.assert.equal(d3.select("#y_axis").select("#axis_label").text(), "y");
       });
 
@@ -213,8 +213,8 @@ int main() {
           chai.assert.equal(data_points.size(), 6);
           chai.assert.deepEqual(data_points.data(), [[1, 5], [2, 3], [3, 6], [4, 1], [5, 10], [6,12]]);
           var paths = d3.select("#line_graph").selectAll(".line-seg");
-          chai.assert.equal(paths[0][0].getAttribute("d"), "M60,136.2686567164179L126.12903225806451,163.13432835820896L192.25806451612902,122.83582089552237L258.3870967741936,190L324.5161290322581,69.1044776119403");
-          chai.assert.equal(paths[0][1].getAttribute("d"), "M324.5161290322581,69.1044776119403L390.6451612903226,42.23880597014924");
+          chai.assert.equal(paths.nodes()[0].getAttribute("d"), "M60,136.26865671641792L126.12903225806453,163.13432835820896L192.25806451612905,122.83582089552239L258.38709677419354,190L324.5161290322581,69.10447761194028");
+          chai.assert.equal(paths.nodes()[1].getAttribute("d"), "M324.5161290322581,69.10447761194028L390.6451612903226,42.23880597014926");
         });
 
       });
