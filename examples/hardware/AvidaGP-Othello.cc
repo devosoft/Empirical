@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <utility>
 
-constexpr size_t POP_SIZE = 200;
+constexpr size_t POP_SIZE = 1000;
 constexpr size_t GENOME_SIZE = 100;
 constexpr size_t EVAL_TIME = 3500;
 constexpr size_t UPDATES = 1500;
@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
   std::cout<<"SEED: "<<random.GetSeed()<<std::endl;
   //emp::evo::EAWorld<emp::AvidaGP, emp::evo::FitCacheOn> world(random, "AvidaWorld"); // FitCache on
   emp::evo::EAWorld<emp::AvidaGP> world(random, "AvidaWorld"); //FitCache off
-  auto testcases = TestcaseSet<64>("../../../games/data/game_0.csv", &random);
+  auto testcases = TestcaseSet<64>("../../data/game_0.csv", &random);
   std::function<std::set<int>(emp::array<int, 64>)> cornerFunc = [](emp::array<int, 64> board){
     std::set<int> moves;
     emp::Othello game(0);
@@ -298,7 +298,9 @@ int main(int argc, char* argv[])
       bool cur_player = random.P(0.5);
       double best = EvalGame(*org, rand_org, cur_player);
       for (int i = 0; i < 4; i++){
-        double temp = EvalGame(*org, rand_org, cur_player);
+          cur_player = random.P(0.5);
+          emp::AvidaGP & rand_org1 = world.GetRandomOrg();
+        double temp = EvalGame(*org, rand_org1, cur_player);
         if (temp > best) best = temp;
       }
       return best;
@@ -342,8 +344,8 @@ int main(int argc, char* argv[])
     //world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE-1);
     //fit_set.push_back(fit_fun);
     //world.LexicaseSelect(fit_set, POP_SIZE-1);
-    world.EcoSelect(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
-    //world.EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
+    //world.EcoSelect(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
+    world.EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
     world.Update();
     std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
 
