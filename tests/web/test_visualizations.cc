@@ -31,7 +31,8 @@ D3::Selection circles;
 D3::Axis<> ax = D3::Axis<>("left", "example axis");
 D3::LinearScale scale;
 D3::Selection svg = D3::Select("body").Append("svg");
-
+D3::Selection filtered;
+D3::Selection sub_div;
 
 void MakeLineGraph(std::string callback) {
   doc << line_graph;
@@ -69,7 +70,8 @@ int MakeSVG(){
 }
 
 int BindData() {
-  circles = example_selection.SelectAll("circle").Data(std::array<int, 4>({{8,3,5,2}})).Enter().Append("circle");
+  D3::Selection temp_circles = example_selection.SelectAll("circle").Data(std::array<int, 4>({{8,3,5,2}}));
+  circles = temp_circles.Enter().Append("circle").Merge(temp_circles);
   return circles.GetID();
 }
 
@@ -105,13 +107,13 @@ void TestSetStyleFunc() {
 }
 
 int TestFilterByFunc() {
-  D3::Selection filtered = circles.Filter([](int d){return d > 4;});
+  filtered = circles.Filter([](int d){return d > 4;});
   return filtered.GetID();
 }
 
 int TestFilterBySel() {
   example_selection.Append("div").SetAttr("id", "example_id");
-  D3::Selection filtered = D3::SelectAll("div").Filter("#example_id");
+  filtered = D3::SelectAll("div").Filter("#example_id");
   return filtered.GetID();
 }
 
@@ -125,7 +127,7 @@ int TestSelectionCall() {
 int TestSubSelection() {
   // Make extraneous div
   D3::Select("body").Append("div");
-  D3::Selection sub_div = example_selection.SelectAll("div");
+  sub_div = example_selection.SelectAll("div");
   return sub_div.GetID();
 }
 
@@ -181,7 +183,7 @@ int main() {
 
       it('should have data-points for each piece of test data', function() {
         var data_points = d3.select("#line_graph").selectAll(".data-point");
-        chai.assert.equal(data_points[0].length, 5);
+        chai.assert.equal(data_points.size(), 5);
         chai.assert.deepEqual(data_points.data(), [[1, 5], [2, 3], [3, 6], [4, 1], [5, 10]]);
       });
 
@@ -208,7 +210,7 @@ int main() {
         it('should let you add data and rescale accordingly', function() {
           emp.emp__0draw_data();
           var data_points = d3.select("#line_graph").selectAll(".data-point");
-          chai.assert.equal(data_points[0].length, 6);
+          chai.assert.equal(data_points.size(), 6);
           chai.assert.deepEqual(data_points.data(), [[1, 5], [2, 3], [3, 6], [4, 1], [5, 10], [6,12]]);
           var paths = d3.select("#line_graph").selectAll(".line-seg");
           chai.assert.equal(paths[0][0].getAttribute("d"), "M60,136.2686567164179L126.12903225806451,163.13432835820896L192.25806451612902,122.83582089552237L258.3870967741936,190L324.5161290322581,69.1044776119403");
@@ -236,8 +238,8 @@ int main() {
       it('should have a node and link for each piece of data', function() {
         var data_points = d3.select("#tree_viz").selectAll("circle");
         var links = d3.select("#tree_viz").selectAll(".link");
-        chai.assert.equal(data_points[0].length, 163);
-        chai.assert.equal(links[0].length, 162);
+        chai.assert.equal(data_points.size(), 163);
+        chai.assert.equal(links.size(), 162);
       });
 
       describe('Adding a node', function(){
@@ -294,7 +296,8 @@ int main() {
         });
 
         it('should let you bind data to it', function(){
-            chai.assert.equal(js.objects[emp.id][0].length, 4);
+            console.log("emp.id", emp.id, js.objects[emp.id]);
+            chai.assert.equal(js.objects[emp.id].size(), 4);
         });
 
         it('should correctly set attributes to strings', function(){
@@ -317,7 +320,7 @@ int main() {
 
         it('should correctly set styles to strings', function(){
             emp.TestSetStyleString();
-            chai.assert.equal(js.objects[emp.id].style("fill"), "rgb(128, 0, 128)");
+            chai.assert.equal(js.objects[emp.id].style("fill"), "purple");
         });
 
         it('should correctly set styles to ints', function(){
@@ -327,8 +330,8 @@ int main() {
 
         it('should correctly set styles with callback functions', function(){
             emp.TestSetStyleFunc();
-            chai.assert.equal(js.objects[emp.id].style("stroke"), "rgb(0, 128, 0)");
-            chai.assert.equal(js.objects[emp.id].filter(function(d,i){return i==3}).style("stroke"), "rgb(0, 0, 255)");
+            chai.assert.equal(js.objects[emp.id].style("stroke"), "green");
+            chai.assert.equal(js.objects[emp.id].filter(function(d,i){return i==3}).style("stroke"), "blue");
         });
 
         it('should support filtering by function', function(){
@@ -349,7 +352,7 @@ int main() {
 
         it('should support sub-selections', function(){
             var id = emp.TestSubSelection();
-            chai.assert.equal(js.objects[id][0].length, 1);
+            chai.assert.equal(js.objects[id].size(), 1);
         });
 
         it('should support setting text', function(){
@@ -390,8 +393,8 @@ int main() {
   emp::JSWrap([](){return ax.GetScale().GetID();}, "TestGetScale");
   emp::JSWrap([](){ax.SetTickValues(std::array<int, 3>({{4,5,7}}));}, "TestSetTickValues");
   emp::JSWrap([](){ax.SetTickSize(.2);}, "TestSetTickSize");
-  emp::JSWrap([](){ax.SetInnerTickSize(.7);}, "TestSetInnerTickSize");
-  emp::JSWrap([](){ax.SetOuterTickSize(1.1);}, "TestSetOuterTickSize");
+  emp::JSWrap([](){ax.SetTickSizeInner(.7);}, "TestSetInnerTickSize");
+  emp::JSWrap([](){ax.SetTickSizeOuter(1.1);}, "TestSetOuterTickSize");
   emp::JSWrap([](){ax.SetTicks(7);}, "TestSetTicks");
   emp::JSWrap([](){ax.SetTickPadding(3);}, "TestSetTickPadding");
   emp::JSWrap([](){ax.SetTickFormat(".3f");}, "TestSetTickFormat");
@@ -422,23 +425,23 @@ int main() {
       it("should support setting tick size", function(){
         emp.TestSetTickSize();
         chai.assert.approximately(js.objects[$0].tickSize(), .2, .00001);
-        chai.assert.approximately(js.objects[$0].innerTickSize(), .2, .00001);
-        chai.assert.approximately(js.objects[$0].outerTickSize(), .2, .00001);
+        chai.assert.approximately(js.objects[$0].tickSizeInner(), .2, .00001);
+        chai.assert.approximately(js.objects[$0].tickSizeOuter(), .2, .00001);
       });
 
       it("should support setting tick count", function(){
         emp.TestSetTicks();
-        chai.assert.equal(js.objects[$0].ticks()['0'], 7);
+        chai.assert.equal(js.objects[$0].tickArguments()['0'], 7);
       });
 
       it("should support setting inner tick size", function(){
         emp.TestSetInnerTickSize();
-        chai.assert.approximately(js.objects[$0].innerTickSize(), .7, .00001);
+        chai.assert.approximately(js.objects[$0].tickSizeInner(), .7, .00001);
       });
 
       it("should support setting outer tick size", function(){
         emp.TestSetOuterTickSize();
-        chai.assert.approximately(js.objects[$0].outerTickSize(), 1.1, .00001);
+        chai.assert.approximately(js.objects[$0].tickSizeOuter(), 1.1, .00001);
       });
 
       it("should support setting tick padding", function(){
@@ -461,7 +464,7 @@ int main() {
 
       it("should support rescaling", function(){
         emp.TestRescale();
-        chai.assert.equal(d3.select("#exampleaxis_axis").selectAll("text").text(), "20.000");
+        chai.assert.equal(d3.select("#exampleaxis_axis").select(".tick").text(), "20.000");
       });
 
       it("should support adjusting label offset and moving axis", function(){

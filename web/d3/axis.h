@@ -172,15 +172,15 @@ namespace D3 {
       }, this->id, size);
     }
 
-    void SetInnerTickSize(float size) {
+    void SetTickSizeInner(float size) {
       EM_ASM_ARGS({
-	    js.objects[$0].innerTickSize($1);
+	    js.objects[$0].tickSizeInner($1);
 	  }, this->id, size);
     }
 
-    void SetOuterTickSize(float size) {
+    void SetTickSizeOuter(float size) {
       EM_ASM_ARGS({
-	    js.objects[$0].outerTickSize($1);
+	    js.objects[$0].tickSizeOuter($1);
   	  }, this->id, size);
     }
 

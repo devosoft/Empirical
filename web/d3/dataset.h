@@ -176,7 +176,7 @@ namespace D3 {
           });
         } else {
           d3.text(arg1, function(d){
-            js.objects[$2] = d3.csv.parseRows(d, acc);
+            js.objects[$2] = d3.csvParseRows(d, acc);
             in_string($2);
           });
         }
@@ -184,12 +184,12 @@ namespace D3 {
     }
 
     void Parse(std::string contents, std::string accessor){
-      D3_CALLBACK_FUNCTION_2_ARGS(d3.csv.parse, contents.c_str(),	\
+      D3_CALLBACK_FUNCTION_2_ARGS(d3.csvParse, contents.c_str(),	\
 				  accessor.c_str())
 	}
 
     void ParseRows(std::string contents, std::string accessor){
-      D3_CALLBACK_FUNCTION_2_ARGS(d3.csv.parseRows, contents.c_str(),	\
+      D3_CALLBACK_FUNCTION_2_ARGS(d3.csvParseRows, contents.c_str(),	\
 				  accessor.c_str())
 	}
 

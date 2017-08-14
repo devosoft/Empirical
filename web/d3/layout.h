@@ -132,12 +132,12 @@ namespace D3{
       EM_ASM_ARGS({
 
         // Based on code from http://www.d3noob.org/2014/01/tree-diagrams-in-d3js_11.html
-        var nodes = js.objects[$0].nodes(js.objects[$1][0]).reverse();
-        links = js.objects[$0].links(nodes);
-
+        var root = d3.hierarchy(js.objects[$1][0]);
+        var nodes = root.descendants();
+        var links = root.descendants().slice(1);
         nodes.forEach(function(d) { d.y = d.depth * 20; });
 
-        // Declare the nodesâ€¦
+        // Declare the nodes
         var node = js.objects[$3].selectAll("g.node")
             .data(nodes, function(d) { return d.name; });
 

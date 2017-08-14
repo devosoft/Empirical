@@ -42,6 +42,13 @@ namespace D3 {
       SelectionOrTransition(int id) : D3_Base(id){;};
       SelectionOrTransition(const SelectionOrTransition<DERIVED> & s) : D3_Base(s){;};
 
+    //   SelectionOrTransition<DERIVED>& operator= (const SelectionOrTransition<DERIVED> & other) {
+    //       std::cout << "Calling assingment: " << this->id << " " << other.id << std::endl;
+    //       EM_ASM_ARGS({js.counts[$0]++}, other.id);
+    //       this->id = other.id;
+    //       return (*this);
+    //   }
+
       /// Create a new selection/transition containing the first element matching the
       /// [selector] string that are within this current selection/transition
       DERIVED Select(std::string selector) const {
@@ -61,6 +68,7 @@ namespace D3 {
         int new_id = NextD3ID();
 
         EM_ASM_ARGS({
+          console.log($0, js.objects[$0]);
   	      var new_selection = js.objects[$0].selectAll(Pointer_stringify($1));
           js.objects[$2] = new_selection;
         }, this->id, selector.c_str(), new_id);
@@ -169,8 +177,10 @@ namespace D3 {
 
       DERIVED Merge(DERIVED & other) {
           int new_id = NextD3ID();
+          std::cout << "New id should be: " << new_id << std::endl;
           EM_ASM_ARGS({
               js.objects[$2] = js.objects[$0].merge(js.objects[$1]);
+              console.log("Merged: ", js.objects[$2], $2);
           }, this->id, other.GetID(), new_id);
           return DERIVED(new_id);
       }
@@ -865,7 +875,9 @@ namespace D3 {
     /// @{
 
     /// Default constructor - constructs empty selection
-    Selection(){;};
+    Selection(){
+        EM_ASM_ARGS({js.objects[$0] = d3.selection();}, this->id);
+    };
 
     /// Create Selection object with a specific id.
     ///
@@ -877,10 +889,11 @@ namespace D3 {
     Selection(const Selection & s) : SelectionOrTransition(s){
     };
 
-    Selection& operator=(const Selection & s) {
-      return *this;
-    };
-
+    // Selection& operator= (const Selection & other) {
+    //     std::cout << "Calling assingment: " << this->id << " " << other.id << std::endl;
+    //     this->id = other.id;
+    //     return (*this);
+    // }
 
     /// This is the Selection constructor you usually want to use. It takes a string saying what
     /// to select and a bool saying whether to select all elements matching that string [true] or
