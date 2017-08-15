@@ -30,8 +30,10 @@ struct NKInterface {
     world.Setup();
 
     // Setup the GUI Components.
-    div_pop.SetCSS("float", "left");
-    div_stats.SetCSS("float", "right");
+    // div_pop.SetCSS("float", "left");
+    // div_stats.SetCSS("float", "right");
+    div_pop.SetHeight(200).SetScrollAuto();
+    div_stats.SetPosition(450, 30);
 
     // Attach the GUI components to the web doc.
     div_pop << UI::Button( [this](){ world.RunStep(); DrawAll(); }, "Step", "but_step" );
@@ -40,10 +42,11 @@ struct NKInterface {
     div_pop << org_canvas;
 
     auto & fit_node = world.GetFitnessDataNode();
-    div_stats << "<br>Update: " << UI::Live( [this](){ return world.GetUpdate(); } ) << "<br>";
-    div_stats << "<br>Min Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMin(); } ) << "<br>";
-    div_stats << "<br>Mean Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMean(); } ) << "<br>";
-    div_stats << "<br>Max Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMax(); } ) << "<br>";
+    div_stats << "<b>Stats:</b>";
+    div_stats << "<br>Update: " << UI::Live( [this](){ return world.GetUpdate(); } );
+    div_stats << "<br>Min Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMin(); } );
+    div_stats << "<br>Mean Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMean(); } );
+    div_stats << "<br>Max Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMax(); } );
 
     doc << "<h1>NK World</h1>";
     doc << div_pop << div_stats;
