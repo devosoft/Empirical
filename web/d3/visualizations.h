@@ -650,10 +650,10 @@ protected:
   double y_margin = 10;
   double x_margin = 30;
 
-  struct TreeEdge {
-    EMP_BUILD_INTROSPECTIVE_TUPLE( NODE, source,
-                                   NODE, target)
-  };
+  // struct TreeEdge {
+  //   EMP_BUILD_INTROSPECTIVE_TUPLE( NODE, source,
+  //                                  NODE, target)
+  // };
 
   D3::ToolTip * tip;
 
@@ -672,7 +672,7 @@ protected:
     return "black";
   };
 
-  std::function<std::string(TreeEdge, int)> color_fun_link = [this](TreeEdge d, int i){
+  std::function<std::string(NODE, int)> color_fun_link = [this](NODE d, int i){
     return "black";
   };
 
@@ -727,9 +727,13 @@ public:
   void DrawTree() {
     std::cout << "Vis data id: " << data->GetID() << std::endl;
     D3::Selection nodeEnter = tree.GenerateNodesAndLinks(*GetSVG())[0];
+    std::cout << "Links generated" << std::endl;
     nodeEnter.Append("circle").SetAttr("r", 2).AddToolTip(*tip);
+    std::cout << "Circles appended" << std::endl;
     GetSVG()->SelectAll("g.node").SelectAll("circle").SetStyle("fill", GetID()+"color_fun_node");
+    std::cout << "Circles sstyled" << std::endl;
     GetSVG()->SelectAll(".link").SetStyle("stroke", GetID()+"color_fun_link");
+    std::cout << "links styled" << std::endl;
     CallDrawCallback();
   }
 

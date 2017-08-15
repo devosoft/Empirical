@@ -251,8 +251,8 @@ int main() {
 
         it('should let you add data', function() {
           var data = d3.select("#tree_viz").selectAll("circle").data();
-          var new_data = data.filter(function(d){return d.name==10});
-          chai.assert.equal(new_data[0].parent.name, 0);
+          var new_data = data.filter(function(d){return d.data.name==10});
+          chai.assert.equal(new_data[0].parent.data.name, 0);
         });
 
       });

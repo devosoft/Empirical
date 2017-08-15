@@ -129,10 +129,12 @@ namespace D3{
       int link_enter = NextD3ID();
       int link_exit = NextD3ID();
       std::cout << "Tree data id: " << data->GetID() << std::endl;
+      make_line->Log();
       EM_ASM_ARGS({
 
         // Based on code from http://www.d3noob.org/2014/01/tree-diagrams-in-d3js_11.html
         var root = d3.hierarchy(js.objects[$1][0]);
+        js.objects[$0](root);
         var nodes = root.descendants();
         var links = root.descendants().slice(1);
         nodes.forEach(function(d) { d.y = d.depth * 20; });
@@ -151,25 +153,32 @@ namespace D3{
         		  return "translate(" + d.y + "," + d.x + ")"; });
 
         var link = js.objects[$3].selectAll("path.link")
-      	  .data(links, function(d) { return d.target.name; });
+      	  .data(links, function(d) { return d.name; });
 
         var linkExit = link.exit();
         // Enter the links.
         var linkEnter = link.enter().insert("path", "g")
       	    .attr("class", "link")
-      	    .attr("d", js.objects[$2])
+      	    .attr("d", function(d) {return "M" + d.y + "," + d.x
+            + "C" + (d.parent.y + 100) + "," + d.x
+            + " " + (d.parent.y + 100) + "," + d.parent.x
+            + " " + d.parent.y + "," + d.parent.x;})
             .attr("fill", "none")
             .attr("stroke", "black")
             .attr("stroke-width", 1);
-
+        console.log("about to link");
         link.attr("class", "link")
-            .attr("d", js.objects[$2]);
-
+            .attr("d", function(d) {return "M" + d.y + "," + d.x
+            + "C" + (d.parent.y + 100) + "," + d.x
+            + " " + (d.parent.y + 100) + "," + d.parent.x
+            + " " + d.parent.y + "," + d.parent.x;});
+        console.log("linked");
         js.objects[$4] = nodeEnter;
         js.objects[$5] = nodeExit;
         js.objects[$6] = linkEnter;
         js.objects[$7] = linkExit;
     }, this->id, data->GetID(), make_line->GetID(), svg.GetID(), node_enter, node_exit, link_enter, link_exit);
+      std::cout << "Done generating" << std::endl;
       return std::array<Selection, 4>({{Selection(node_enter), Selection(node_exit),
                                         Selection(link_enter), Selection(link_exit)}});
     }
