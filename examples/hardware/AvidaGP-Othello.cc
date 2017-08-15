@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <utility>
 
-constexpr size_t POP_SIZE = 1000;
+constexpr size_t POP_SIZE = 750;
 constexpr size_t GENOME_SIZE = 100;
 constexpr size_t EVAL_TIME = 3500;
 constexpr size_t UPDATES = 1500;
