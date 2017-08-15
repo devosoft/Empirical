@@ -106,35 +106,37 @@ namespace emp {
     bool is_synchronous;            //< Does this world have synchronous generations?
     bool is_structured;             //< Do we have any structured population? (false=well mixed)
 
-    // Potential data nodes
+    /// Potential data nodes -- these should be activated only if in use.
     Ptr<DataMonitor<double>> data_node_fitness;
 
-    // Configurable functions.
-    fun_calc_fitness_t  fun_calc_fitness;   // Fitness function
-    fun_do_mutations_t  fun_do_mutations;   // Mutation function
-    fun_print_org_t     fun_print_org;      // Print function
-    fun_get_genome_t    fun_get_genome;     // Determine the genome object of an organism.
-    fun_add_inject_t    fun_add_inject;     // Technique to inject a new organism.
-    fun_add_birth_t     fun_add_birth;      // Technique to add a new offspring.
-    fun_get_neighbor_t  fun_get_neighbor;   // Choose a random neighbor near specified id.
+    /// Configurable functions.
+    fun_calc_fitness_t  fun_calc_fitness;   //< Function to evaluate fitness for provided organism.
+    fun_do_mutations_t  fun_do_mutations;   //< Function to mutate an organism.
+    fun_print_org_t     fun_print_org;      //< Function to print an organism.
+    fun_get_genome_t    fun_get_genome;     //< Determine the genome object of an organism.
+    fun_add_inject_t    fun_add_inject;     //< Technique to inject a new, external organism.
+    fun_add_birth_t     fun_add_birth;      //< Technique to add a new offspring organism.
+    fun_get_neighbor_t  fun_get_neighbor;   //< Choose a random neighbor near specified id.
 
-    // Attributes are a dynamic way to track extra characteristics about a world.
+    /// Attributes are a dynamic way to track extra characteristics about a world.
     std::map<std::string, std::string> attributes;
 
-    // Data collection.
+    /// Phylogeny and line-of-descent data collection.
     Systematics<genome_t> systematics;
 
-    // == Signals ==
+    /// == Signals ==
     SignalControl control;  // Setup the world to control various signals.
-    Signal<void(size_t)> before_repro_sig;
-    Signal<void(ORG &)> offspring_ready_sig;
-    Signal<void(ORG &)> inject_ready_sig;
-    Signal<void(size_t)> org_placement_sig;
-    Signal<void(size_t)> on_update_sig;
-    Signal<void(size_t)> on_death_sig;
+    Signal<void(size_t)> before_repro_sig;    //< Trigger signal before organism gives birth.
+    Signal<void(ORG &)> offspring_ready_sig;  //< Trigger signal when offspring organism is built.
+    Signal<void(ORG &)> inject_ready_sig;     //< Trigger when external organism is ready to inject.
+    Signal<void(size_t)> org_placement_sig;   //< Trigger when any organism is placed into world.
+    Signal<void(size_t)> on_update_sig;       //< Trigger at the beginning of Update()
+    Signal<void(size_t)> on_death_sig;        //< Trigger when any organism dies.
 
-    // AddOrgAt is the only way to add organisms (others must go through here)
+    /// AddOrgAt is the only way to add organisms to active population (others must go through here)
     size_t AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
+
+    /// AddNextOrgAt build up the next population during synchronous generations.
     size_t AddNextOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
 
     // RemoveOrgAt is the only way to remove organism.
