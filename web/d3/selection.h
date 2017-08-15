@@ -30,7 +30,7 @@ namespace D3 {
   class Dataset;
 
   /// You probably never want to instantiate this class. Its sole purpose is to hold code for
-  /// methods that are common to selections and transitions
+  /// methods that are common to selections and transitions.
   ///
   /// Developer note: It's also handy if you want to allow a function to accept either a selection
   /// or transition. This is a good idea any time you are only using methods that are applicable to
