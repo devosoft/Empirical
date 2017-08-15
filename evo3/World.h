@@ -139,15 +139,19 @@ namespace emp {
     /// AddNextOrgAt build up the next population during synchronous generations.
     size_t AddNextOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
 
-    // RemoveOrgAt is the only way to remove organism.
+    /// RemoveOrgAt is the only way to remove an active organism.
     void RemoveOrgAt(size_t pos);
+
+    /// RemoveNextOrgAt removes an organism waiting to placed into the next generation.
     void RemoveNextOrgAt(size_t pos);
 
-    // Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
+    /// Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
-    // Other private functions:
+    /// Get the current cached value for the organism at the specified position.
     double GetCache(size_t id) const { return (id < fit_cache.size()) ? fit_cache[id] : 0.0; }
+
+    /// Clear the cache value at the specified position.
     void ClearCache(size_t id) { if (id < fit_cache.size()) fit_cache[id] = 0.0; }
 
   public:
