@@ -295,6 +295,9 @@ namespace emp {
       return *data_node_fitness;
     }
 
+    /// Setup an arbitrary file; no default filename available.
+    World_file & SetupFile(const std::string & filename);
+
     /// Setup a file to be printed that collects fitness information over time.
     World_file & SetupFitnessFile(const std::string & filename="fitness.csv");
 
@@ -733,12 +736,18 @@ namespace emp {
     SetAttribute("PopStruct", "Pools");
   }
 
+  // A new, arbitrary file.
+  template<typename ORG>
+  World_file & World<ORG>::SetupFile(const std::string & filename) {
+    size_t id = files.size();
+    files.emplace_back(filename);
+    return files[id];
+  }
+
   // A fitness file (default="fitness.csv") contains information about the population's fitness.
   template<typename ORG>
   World_file & World<ORG>::SetupFitnessFile(const std::string & filename) {
-    size_t id = files.size();
-    files.emplace_back(filename);
-    auto & file = files[id];
+    auto & file = SetupFile(filename);
     auto & node = GetFitnessDataNode();
     file.AddVar(update, "update", "Update");
     file.AddMean(node, "mean_fitness", "Average organism fitness in current population.");
