@@ -9,7 +9,7 @@ using BitOrg = emp::BitVector;
 EMP_BUILD_CONFIG( NKConfig,
   GROUP(DEFAULT, "Default settings for NK model"),
   VALUE(K, uint32_t, 10, "Level of epistasis in the NK model"),
-  VALUE(N, uint32_t, 200, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
+  VALUE(N, uint32_t, 100, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
   VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
   VALUE(POP_SIZE, uint32_t, 1000, "Number of organisms in the popoulation."),
   VALUE(MAX_GENS, uint32_t, 2000, "How many generations should we process?"),
@@ -76,13 +76,13 @@ struct NKWorld : public emp::World<BitOrg> {
 
   void RunStep() {
     // Do mutations on the population.
-    MutatePop(1);
+    DoMutations(1);
 
     // Keep the best individual.
-    EliteSelect(1, 1);
+    EliteSelect(*this, 1, 1);
 
     // Run a tournament for the rest...
-    TournamentSelect(5, POP_SIZE-1);
+    TournamentSelect(*this, 5, POP_SIZE-1);
     Update();
   }
 
