@@ -14,6 +14,7 @@ a.out.js
 *.debug
 *.mp4
 *.csv
+.vscode/
 coverage.xml
 diff_cover.txt
 UTests/tools/tmp*.cc
@@ -69,8 +70,11 @@ examples/evo/grid-exp
 examples/evo/mixed-exp
 examples/evo/SetGrid.cfg
 examples/evo/StatsConfig.cfg
+examples/hardware/StatsConfig.cfg
 examples/evo/replica.cc
 tests/StatsConfig.cfg
 examples/evo/Grid.cfg
 examples/evo/Mixed.cfg
 examples/evo/pool-exp
+*.org
+examples/hardware/tests
