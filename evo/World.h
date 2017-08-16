@@ -408,7 +408,6 @@ namespace evo {
       emp_assert(fit_fun);
       emp_assert(t_size > 0 && t_size <= (int) popM.size(), t_size, popM.size());
       emp_assert(random_ptr != nullptr && "TournamentSelect() requires active random_ptr");
-
       emp::vector<int> entries;
       for (int T = 0; T < tourny_count; T++) {
         entries.resize(0);
@@ -420,8 +419,8 @@ namespace evo {
             //if(!popM.CheckValidOrg(T))
                 //continue;
             entries = popM.GetNeighbors(t_size, T);
+            //std::cout<<"THERE: "<<entries.size()<<std::endl;
         }
-
         double best_fit = 0.0; //= popM.CalcFitness(entries[0], fit_fun);
         int best_id = -1;// = entries[0];
 
@@ -430,7 +429,7 @@ namespace evo {
         for (int i = 0; i < entries.size(); i++) {
             double cur_fit = 0.0;
             if (popM.CheckValidOrg(entries[i])) cur_fit = popM.CalcFitness(entries[i], fit_fun);
-
+            //std::cout<<cur_fit<<", ";
           if (cur_fit > best_fit) {
             best_fit = cur_fit;
             best_id = entries[i];
@@ -438,9 +437,9 @@ namespace evo {
         }
 
         if (best_fit == 0) continue;  // If empty tournament, skip to next cell
-
+        //std::cout<<"Best: "<<best_fit<<std::endl;
         // Place the highest fitness into the next generation!
-        InsertBirth( *(popM[best_id]), best_id, entries, 1 );
+        InsertBirth( *(popM[best_id]), T, entries, 1 );
       }
     }
 

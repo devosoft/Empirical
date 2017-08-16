@@ -72,6 +72,7 @@ namespace evo {
     // (all others go through these)
 
     int AddOrgAt(ORG * new_org, int pos) {
+      std::cout<<"POS: "<<pos<<std::endl;
       emp_assert(pos < (int) pop.size());   // Make sure we are placing into a legal position.
       if (pop[pos]) { delete pop[pos]; --num_orgs; }
       pop[pos] = new_org;
@@ -397,6 +398,7 @@ namespace evo {
             int pos = x_pos + y_pos*width;
             //if(CheckValidOrg(pos))
                     //neighbors.push_back(pos);
+            neighbors.push_back(pos);
         }
         return neighbors;
     }
@@ -414,7 +416,7 @@ namespace evo {
 
     // Newly born orgs go next to their parents.
     int AddOrgBirth(ORG * new_org, int parent_pos) {
-      return base_t::AddOrgAt(new_org, GetRandomNeighbor(parent_pos));
+      return base_t::AddOrgAt(new_org, parent_pos);
     }
 
     void Print(std::function<std::string(ORG*)> string_fun, std::ostream& os=std::cout,
