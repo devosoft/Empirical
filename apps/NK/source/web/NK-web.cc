@@ -23,16 +23,14 @@ struct NKInterface {
     : doc("emp_base")
     , div_pop("div_pop")
     , div_stats("div_stats")
-    , org_canvas(400, 400, "org_canvas")
+    , org_canvas(800, 800, "org_canvas")
     , anim( [this](){ DoFrame(); }, org_canvas )
   {
     // Setup the NK World.
     world.Setup();
 
     // Setup the GUI Components.
-    // div_pop.SetCSS("float", "left");
-    // div_stats.SetCSS("float", "right");
-    div_pop.SetHeight(200).SetScrollAuto();
+    div_pop.SetSize(400,400).SetScrollAuto();
     div_stats.SetPosition(450, 30);
 
     // Attach the GUI components to the web doc.
