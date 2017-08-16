@@ -17,7 +17,7 @@ module.exports = function(config) {
       {pattern: 'third-party/node_modules/mocha/mocha.js'},
       {pattern: 'third-party/node_modules/chai/chai.js'},
       {pattern: 'web/d3/d3.min.js'},
-      {pattern: 'web/d3/d3-tip.js'},
+      {pattern: 'web/d3/d3-tip.min.js'},
       {pattern: 'tests/web/test_header.js'},
       {pattern: 'tests/test-data/lineage-example.json', included: false},
       {pattern: 'tests/test-data/test-line-graph.csv', included: false},
