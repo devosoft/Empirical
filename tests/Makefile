@@ -3,7 +3,7 @@ GCOV_FLAGS = -o0 -g --coverage
 TEST_NAMES = base evo geometry meta scholar tools
 FLAGS = -std=c++14
 #CXX = clang++
-CXX = g++
+#CXX = g++
 
 default: test
 
