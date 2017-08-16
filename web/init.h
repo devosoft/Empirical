@@ -23,8 +23,10 @@ namespace emp {
 
   static void Initialize() {
     static bool init = false;      // Make sure we only initialize once!
-    if (!init) EMP_Initialize();   // Call JS initializations
-    init = true;
+    if (!init) {
+      EMP_Initialize();   // Call JS initializations
+      init = true;
+    }
   }
 
   static void InitializeAnim() {

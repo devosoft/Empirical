@@ -70,7 +70,7 @@ private:
   UI::Document doc;
   UI::Table main_table;
   UI::Canvas graph_canvas;
-  UI::Slate info_panel;
+  UI::Div info_panel;
   UI::Selector mode_select;
   UI::Table table_list;
   UI::Table table_matrix;
@@ -132,7 +132,7 @@ private:
     if (emp::Has(edges, Edge(from, to))) RemoveEdge(from,to);
     else AddEdge(from,to);
   }
-  
+
   template <typename T>
   char ID2Symbol(T id) {
     if (id < 0) return '?';
@@ -216,7 +216,7 @@ public:
     doc << (main_table = UI::Table(1,2,"main_table"));
     main_table.GetCell(0,0) << (graph_canvas = UI::Canvas(can_w, can_h, "graph_canvas"));
     main_table.GetCell(0,1) << (mode_select = UI::Selector("mode"));
-    main_table.GetCell(0,1) << (info_panel = UI::Slate("info_panel"));
+    main_table.GetCell(0,1) << (info_panel = UI::Div("info_panel"));
 
     table_list = UI::Table(1,1,"adj_list");
     table_matrix = UI::Table(1,1,"adj_matrix");
