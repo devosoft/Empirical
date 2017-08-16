@@ -301,6 +301,12 @@ namespace emp {
     /// Setup a file to be printed that collects fitness information over time.
     World_file & SetupFitnessFile(const std::string & filename="fitness.csv");
 
+    /// Setup a file to be printed that collects systematics information over time.
+    World_file & SetupSystematicsFile(const std::string & filename="systematics.csv");
+
+    /// Setup a file to be printed that collects population information over time.
+    World_file & SetupPopulationFile(const std::string & filename="population.csv");
+
     /// Setup the function to be used when fitness needs to be calculated.  The provided function
     /// should take a reference to an organism and return a fitness value of type double.
     void SetFitFun(const fun_calc_fitness_t & fit_fun) { fun_calc_fitness = fit_fun; }
@@ -396,8 +402,8 @@ namespace emp {
 
     /// Update the world:
     /// 1. Send out an update signal for any external functions to trigger.
-    /// 2. Handle any data files that need to be printed this update.
-    /// 3. If synchronous generations, move next population into place as the current popoulation.
+    /// 2. If synchronous generations, move next population into place as the current popoulation.
+    /// 3. Handle any data files that need to be printed this update.
     /// 4. Increment the current update number.
     void Update();
 
@@ -744,7 +750,7 @@ namespace emp {
     return files[id];
   }
 
-  // A fitness file (default="fitness.csv") contains information about the population's fitness.
+  // A data file (default="fitness.csv") that contains information about the population's fitness.
   template<typename ORG>
   World_file & World<ORG>::SetupFitnessFile(const std::string & filename) {
     auto & file = SetupFile(filename);
@@ -753,6 +759,27 @@ namespace emp {
     file.AddMean(node, "mean_fitness", "Average organism fitness in current population.");
     file.AddMin(node, "min_fitness", "Minimum organism fitness in current population.");
     file.AddMax(node, "max_fitness", "Maximum organism fitness in current population.");
+    file.PrintHeaderKeys();
+    return file;
+  }
+
+  // A data file (default="systematics.csv") that contains information about the population's
+  // phylogeny and lineages.
+  template<typename ORG>
+  World_file & World<ORG>::SetupSystematicsFile(const std::string & filename) {
+    auto & file = SetupFile(filename);
+    file.AddVar(update, "update", "Update");
+    file.template AddFun<size_t>( [this](){ return systematics.GetNumActive(); }, "num_genotypes", "Number of unique genotype groups currently active." );
+    file.PrintHeaderKeys();
+    return file;
+  }
+
+  // A data file (default="population.csv") contains information about the current population.
+  template<typename ORG>
+  World_file & World<ORG>::SetupPopulationFile(const std::string & filename) {
+    auto & file = SetupFile(filename);
+    file.AddVar(update, "update", "Update");
+    file.template AddFun<size_t>( [this](){ return GetNumOrgs(); }, "num_orgs", "Number of organisms currently living in the population." );
     file.PrintHeaderKeys();
     return file;
   }
@@ -777,12 +804,11 @@ namespace emp {
 
   template<typename ORG>
   void World<ORG>::Update() {
+    // 1. Send out an update signal for any external functions to trigger.
     on_update_sig.Trigger(update);
 
-    // Print all files.
-    for (auto & file : files) file.Update(update);
-
-    // If generations are synchronous (i.e, next_pop is not empty), put the next generation in place.
+    // 2. If synchronous generationsm (i.e, next_pop is not empty), move next population into
+    //    place as the current popoulation.
     if (next_pop.size()) {
       // Clear out current pop.
       for (size_t i = 0; i < pop.size(); i++) RemoveOrgAt(i);
@@ -797,7 +823,10 @@ namespace emp {
       for (size_t i = 0; i < pop.size(); i++) if (pop[i]) ++num_orgs;
     }
 
-    // Keep count of the number of times Update() has been called.
+    // 3. Handle any data files that need to be printed this update.
+    for (auto & file : files) file.Update(update);
+
+    // 4. Increment the current update number; i.e., count calls to Update().
     update++;
   }
 
