@@ -40,9 +40,14 @@ namespace emp {
     }
 
   public:
+    /// Create an iterator in the specified world pointing to the first occupied cell after the
+    /// provided start position.
     World_iterator(world_t * _w, size_t _p=0) : world_ptr(_w), pos(_p) { MakeValid(); }
+
+    /// Create an iterator pointing to the same position as another iterator.
     World_iterator(const World_iterator & _in) : world_ptr(_in.world_ptr), pos(_in.pos) { MakeValid(); }
 
+    /// Assign this iterator to the position of another iterator.
     this_t & operator=(const World_iterator & _in) {
       world_ptr = _in.world_ptr;
       pos = _in.pos;
@@ -50,34 +55,57 @@ namespace emp {
       return *this;
     }
 
+    /// Advance iterator to the next non-empty cell in the world.
     this_t & operator++() {
       ++pos;
       MakeValid();
       return *this;
     }
 
+    /// Backup iterator to the previos non-empty cell in the world.
     this_t & operator--() {
       --pos;
       while (pos < WorldSize() && OrgPtr() == nullptr) --pos;
       return *this;
     }
 
+    /// Compare two iterators to determine if they point to identical positions in the world.
     bool operator==(const this_t& rhs) const { return pos == rhs.pos; }
+
+    /// Compare two iterators to determine if they point to different positions in the world.
     bool operator!=(const this_t& rhs) const { return pos != rhs.pos; }
+
+    /// Determine if this iterator points to a position in the world BEFORE another iterator.
     bool operator< (const this_t& rhs) const { return pos <  rhs.pos; }
+
+    /// Determine if this iterator points to a position in the world BEFORE or the SAME AS another iterator.
     bool operator<=(const this_t& rhs) const { return pos <= rhs.pos; }
+
+    /// Determine if this iterator points to a position in the world AFTER another iterator.
     bool operator> (const this_t& rhs) const { return pos >  rhs.pos; }
+
+    /// Determine if this iterator points to a position in the world AFTER or the SAME AS another iterator.
     bool operator>=(const this_t& rhs) const { return pos >= rhs.pos; }
 
+    /// Return a reference to the organism pointed to by this iterator.
     org_t & operator*() { MakeValid(); return *(OrgPtr()); }
+
+    /// Return a const reference to the organism pointed to by this iterator.
     const org_t & operator*() const { MakeValid(); return *(OrgPtr()); }
 
+    /// Is this iterator pointing to a valid cell in the world?
     operator bool() const { MakeValid(); return pos < WorldSize(); }
 
+    /// Return an iterator poit to the first occupied cell in the world.
     this_t begin() { return this_t(world_ptr, 0); }
+
+    /// Return a const iterator poit to the first occupied cell in the world.
     const this_t begin() const { return this_t(world_ptr, 0); }
 
+    /// Return an iterator poit to just past the end of the world.
     this_t end() { return this_t(world_ptr, WorldSize()); }
+
+    /// Return a const iterator poit to just past the end of the world.
     const this_t end() const { return this_t(world_ptr, WorldSize()); }
   };
 

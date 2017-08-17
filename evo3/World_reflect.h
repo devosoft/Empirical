@@ -4,6 +4,11 @@
 //
 //
 //  Handle reflection on organisms to setup reasonable defaults in the World template class.
+//
+//
+//  Developer notes:
+//  * None of the functions defined here should be called from outside the world object; as such
+//    the comments below are not in Doxygen format and should only be used by LIBRARY developers.
 
 #ifndef EMP_EVO_WORLD_REFLECT_H
 #define EMP_EVO_WORLD_REFLECT_H

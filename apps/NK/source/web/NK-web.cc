@@ -2,8 +2,7 @@
 //  Copyright (C) Michigan State University, 2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
-//  Developer Notes:
-//  * Put update (And other stats) in a Text field.
+//  This file contains an easy-to-manipulate NK world.
 
 #include "web/web.h"
 
@@ -24,15 +23,15 @@ struct NKInterface {
     : doc("emp_base")
     , div_pop("div_pop")
     , div_stats("div_stats")
-    , org_canvas(400, 400, "org_canvas")
+    , org_canvas(800, 800, "org_canvas")
     , anim( [this](){ DoFrame(); }, org_canvas )
   {
     // Setup the NK World.
     world.Setup();
 
     // Setup the GUI Components.
-    div_pop.SetCSS("float", "left");
-    div_stats.SetCSS("float", "right");
+    div_pop.SetSize(400,400).SetScrollAuto();
+    div_stats.SetPosition(450, 30);
 
     // Attach the GUI components to the web doc.
     div_pop << UI::Button( [this](){ world.RunStep(); DrawAll(); }, "Step", "but_step" );
@@ -40,7 +39,12 @@ struct NKInterface {
     div_pop << "<br>";
     div_pop << org_canvas;
 
-    div_stats << "<br>Update: " << UI::Live( [this](){ return world.GetUpdate(); } ) << "<br>";
+    auto & fit_node = world.GetFitnessDataNode();
+    div_stats << "<b>Stats:</b>";
+    div_stats << "<br>Update: " << UI::Live( [this](){ return world.GetUpdate(); } );
+    div_stats << "<br>Min Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMin(); } );
+    div_stats << "<br>Mean Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMean(); } );
+    div_stats << "<br>Max Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMax(); } );
 
     doc << "<h1>NK World</h1>";
     doc << div_pop << div_stats;

@@ -76,13 +76,13 @@ struct NKWorld : public emp::World<BitOrg> {
 
   void RunStep() {
     // Do mutations on the population.
-    MutatePop(1);
+    DoMutations(1);
 
     // Keep the best individual.
-    EliteSelect(1, 1);
+    EliteSelect(*this, 1, 1);
 
     // Run a tournament for the rest...
-    TournamentSelect(5, POP_SIZE-1);
+    TournamentSelect(*this, 5, POP_SIZE-1);
     Update();
   }
 

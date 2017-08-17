@@ -37,6 +37,7 @@ TEST_CASE("Test Stats/NK-Grid", "[stats]"){
 
 
   emp::evo::GridWorld<BitOrg, emp::evo::LineagePruned > grid_pop(random);
+  REQUIRE(&(grid_pop.GetRandom()) == &random);
 
   const size_t side_size = (size_t) std::sqrt((double)POP_SIZE);
   grid_pop.ConfigPop(side_size, side_size);
