@@ -770,6 +770,8 @@ namespace emp {
     auto & file = SetupFile(filename);
     file.AddVar(update, "update", "Update");
     file.template AddFun<size_t>( [this](){ return systematics.GetNumActive(); }, "num_genotypes", "Number of unique genotype groups currently active." );
+    file.template AddFun<size_t>( [this](){ return systematics.GetTotalOrgs(); }, "total_orgs", "Number of organisms tracked." );
+    file.template AddFun<double>( [this](){ return systematics.GetAveDepth(); }, "ave_depth", "Average Phylogenetic Depth of Organisms." );
     file.PrintHeaderKeys();
     return file;
   }
