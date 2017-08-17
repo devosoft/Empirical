@@ -83,7 +83,6 @@ public:
   D3Visualization(int w, int h, const std::string & in_id="")
         : WidgetFacet(in_id) {
       #ifdef EMSCRIPTEN
-      Initialize();
       n_objects();
       #endif
 

@@ -8,19 +8,37 @@
 #include "../JSWrap.h"
 #include "utils.h"
 
+// #ifdef EMSCRIPTEN
+// extern "C" {
+//     extern void D3_Initialize();
+// }
+// #endif
+
 namespace D3 {
+
+
+    // #ifdef EMSCRIPTEN
+    // static void InitD3() {
+    //     static bool init = false;
+    //     if (!init) {
+    //         D3_Initialize();
+    //         init = true;
+    //     }
+    // }
+    //
+    // #endif
+
+    int NextD3ID() {
+        return EM_ASM_INT_V({
+            id = js.next_id++;
+            js.counts[id] = 0;
+            js.objects[id] = -1;
+            return id;
+        });
+    }
 
   /// A base object that all D3 objects inherit from. Handles storing the object in Javascript
   /// You probably don't want to instantiate this directly
-
-  int NextD3ID() {
-      return EM_ASM_INT_V({
-          id = js.next_id++;
-          js.counts[id] = 0;
-          js.objects[id] = -1;
-          return id;
-      });
-  }
 
   class D3_Base {
   protected:
