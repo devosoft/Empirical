@@ -101,7 +101,11 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; //< A set of all dead, ancestral taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  //< A set of all dead taxa w/o descendants.
 
-    size_t next_id;
+    // Stats about active taxa...
+    size_t total_orgs;   //< How many organisms are currently active?
+    size_t total_depth;  //< Sum of taxa depths for calculating average.
+
+    size_t next_id;      //< What ID value should the next new taxon have?
 
     void RemoveOffspring(Ptr<taxon_t> taxon) {
       if (!taxon) return;                                // Not tracking this taxon.
@@ -122,6 +126,9 @@ namespace emp {
     void MarkExtinct(Ptr<taxon_t> taxon) {
       emp_assert(taxon);
       emp_assert(taxon->GetNumOrgs() == 0);
+
+      total_depth -= taxon->GetDepth();
+
       if (verbose) {
         std::cout << "MarkExtinct on taxon " << taxon->GetID() << std::endl;
       }
@@ -148,7 +155,7 @@ namespace emp {
       : store_active(_active), store_ancestors(_anc), store_outside(_all)
       , archive(store_ancestors || store_outside)
       , active_taxa(), ancestor_taxa(), outside_taxa()
-      , next_id(0) { ; }
+      , total_orgs(0), total_depth(0), next_id(0) { ; }
     Systematics(const Systematics &) = delete;
     Systematics(Systematics &&) = default;
     ~Systematics() {
@@ -181,6 +188,7 @@ namespace emp {
         }
         emp_assert( Has(active_taxa, parent) );
         parent->AddOrg();
+        total_orgs++;
         return parent;
       }
 
@@ -201,6 +209,9 @@ namespace emp {
       if (parent) parent->AddOffspring();
       cur_taxon->AddOrg();
 
+      total_orgs++;
+      total_depth += cur_taxon->GetDepth();
+
       return cur_taxon;
     }
 
@@ -214,6 +225,9 @@ namespace emp {
       // emp_assert(Has(active_taxa, taxon));
       const bool active = taxon->RemoveOrg();
       if (!active) MarkExtinct(taxon);
+
+      total_orgs--;
+
       return active;
     }
 
