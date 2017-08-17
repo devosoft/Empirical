@@ -101,11 +101,11 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; //< A set of all dead, ancestral taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  //< A set of all dead taxa w/o descendants.
 
-    // Stats about active taxa...
-    size_t total_orgs;   //< How many organisms are currently active?
-    size_t total_depth;  //< Sum of taxa depths for calculating average.
+    // Stats about active taxa... (totals are across orgs, not taxa)
+    size_t total_orgs;     //< How many organisms are currently active?
+    size_t total_depth;    //< Sum of taxa depths for calculating average.
 
-    size_t next_id;      //< What ID value should the next new taxon have?
+    size_t next_id;        //< What ID value should the next new taxon have?
 
     void RemoveOffspring(Ptr<taxon_t> taxon) {
       if (!taxon) return;                                // Not tracking this taxon.
@@ -127,11 +127,7 @@ namespace emp {
       emp_assert(taxon);
       emp_assert(taxon->GetNumOrgs() == 0);
 
-      total_depth -= taxon->GetDepth();
-
-      if (verbose) {
-        std::cout << "MarkExtinct on taxon " << taxon->GetID() << std::endl;
-      }
+      if (verbose) { std::cout << "MarkExtinct on taxon " << taxon->GetID() << std::endl; }
       if (store_active) active_taxa.erase(taxon);
       if (!archive) {   // If we don't archive taxa, delete them.
         taxon.Delete();
@@ -172,14 +168,20 @@ namespace emp {
     bool GetStoreOutside() const { return store_outside; }
     bool GetArchive() const { return archive; }
 
-    size_t GetNumActive() const { return  active_taxa.size(); }
-    size_t GetNumAncestors() const { return  ancestor_taxa.size(); }
-    size_t GetNumOutside() const { return  outside_taxa.size(); }
+    size_t GetNumActive() const { return active_taxa.size(); }
+    size_t GetNumAncestors() const { return ancestor_taxa.size(); }
+    size_t GetNumOutside() const { return outside_taxa.size(); }
     size_t GetTreeSize() const { return GetNumActive() + GetNumAncestors(); }
     size_t GetNumTaxa() const { return GetTreeSize() + GetNumOutside(); }
+    size_t GetTotalOrgs() const { return total_orgs; }
+
+    double GetAveDepth() const { return ((double) total_depth) / (double) total_orgs; }
 
     /// Add information about a new organism; return a pointer for the associated taxon.
     Ptr<taxon_t> AddOrg(const ORG_INFO & info, Ptr<taxon_t> parent=nullptr) {
+      // Update stats
+      total_orgs++;
+
       // If this organism's info is the same as it's parent's info, add org to parent!
       if (parent && parent->GetInfo() == info) {
         if (verbose) {
@@ -188,12 +190,13 @@ namespace emp {
         }
         emp_assert( Has(active_taxa, parent) );
         parent->AddOrg();
-        total_orgs++;
+        total_depth += parent->GetDepth();
         return parent;
       }
 
       // Otherwise, this is a new taxon!  If archiving, track the parent.
       Ptr<taxon_t> cur_taxon = NewPtr<taxon_t>(++next_id, info, parent);
+      total_depth += cur_taxon->GetDepth();
 
       if (verbose) {
         std::cout << "AddOrg created new taxon " << cur_taxon->GetID();
@@ -209,9 +212,6 @@ namespace emp {
       if (parent) parent->AddOffspring();
       cur_taxon->AddOrg();
 
-      total_orgs++;
-      total_depth += cur_taxon->GetDepth();
-
       return cur_taxon;
     }
 
@@ -222,11 +222,14 @@ namespace emp {
         std::cout << "RemoveOrg on taxon " << taxon->GetID()
                   << "; now has " << (taxon->GetNumOrgs()-1) << " orgs.\n";
       }
+
+      // Update stats
+      total_orgs--;
+      total_depth -= taxon->GetDepth();
+
       // emp_assert(Has(active_taxa, taxon));
       const bool active = taxon->RemoveOrg();
       if (!active) MarkExtinct(taxon);
-
-      total_orgs--;
 
       return active;
     }
