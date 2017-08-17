@@ -201,9 +201,9 @@ int main() {
       it('should have an x and y axis', function() {
         var data_points = d3.select("#line_graph").selectAll(".data-point");
         chai.assert.equal(d3.select("#x_axis").select("path").attr("d"), "M60.5,6V0.5H470.5V6");
-        chai.assert.equal(d3.select("#x_axis").select("#axis_label").text(), "x");
+        chai.assert.equal(d3.select("#x_axis").select("#x_axis_label").text(), "x");
         chai.assert.equal(d3.select("#y_axis").select("path").attr("d"), "M-6,10.5H0.5V190.5H-6");
-        chai.assert.equal(d3.select("#y_axis").select("#axis_label").text(), "y");
+        chai.assert.equal(d3.select("#y_axis").select("#y_axis_label").text(), "y");
       });
 
       describe('Adding data', function(){
@@ -463,9 +463,9 @@ int main() {
       it("should support drawing", function(){
         emp.TestDraw();
         chai.assert.equal(d3.select("#exampleaxis_axis")
-                            .select("#axis_label").text(), "example axis");
+                            .select("#exampleaxis_axis_label").text(), "example axis");
         chai.assert(d3.select("#exampleaxis_axis")
-                            .select("#axis_label").attr("transform"), "rotate(-90)");
+                            .select("#exampleaxis_axis_label").attr("transform"), "rotate(-90)");
       });
 
       it("should support rescaling", function(){
@@ -475,7 +475,7 @@ int main() {
 
       it("should support adjusting label offset and moving axis", function(){
         emp.TestAdjustLabelOffset();
-        chai.assert.equal(d3.select("#exampleaxis_axis").select("#axis_label").attr("dy"), "-4em");
+        chai.assert.equal(d3.select("#exampleaxis_axis").select("#exampleaxis_axis_label").attr("dy"), "-4em");
         chai.assert.equal(js.objects[$1].attr("transform"), "translate(100,0)");
       });
 
