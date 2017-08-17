@@ -48,7 +48,7 @@ namespace D3 {
     template <typename T, std::size_t SIZE>
     Selection DrawShape(std::array<std::array<T, 2>, SIZE> data, Selection s) {
       Selection path = s.Append("path");
-      path.SetAttr("d", Generate(data).c_str());
+      path.SetAttr("d", Generate(data));
       return path;
     }
 
@@ -212,7 +212,7 @@ namespace D3 {
 	    var curr_y = js.objects[$0].y();
 
 	    //Apply scale on top of whatever the current y axis function is
-	    js.objects[$0].y(function(d, i){return scale(curr_y(d, i))});
+	    js.objects[$0].y(function(d, i){return scale(curr_y(d, i));});
 	  }, this->id, scale.GetID());
     }
 

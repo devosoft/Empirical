@@ -77,29 +77,30 @@ namespace D3 {
 
       EM_ASM_ARGS({
         var axis_range = js.objects[$0].scale().range();
-	    js.objects[$3] = js.objects[$1].append("g")
-                                  .attr("id", Pointer_stringify($2))
+	    js.objects[$3] = js.objects[$1].append("g");
+
+        js.objects[$3].append("g").attr("id", Pointer_stringify($2))
                                   .call(js.objects[$0]);
 
         var canvas_width = js.objects[$1].attr("width");
         var canvas_height = js.objects[$1].attr("height");
 
         var orient = Pointer_stringify($6);
-        var dy = "2em";
+        var dy = "2.5em";
         var x_divisor = 2.0;
         var text_orient = 0;
         js.objects[$3].attr("transform", "translate(0,"+(canvas_height-60)+")");
         if (orient == "top") {
-          dy = "-2em";
+          dy = "-2.5em";
           x_divisor = 2.0;
           js.objects[$3].attr("transform", "translate(0,60)");
         } else if (orient == "left") {
-          dy = "-2em";
+          dy = "-2.5em";
           x_divisor = -2.0;
           text_orient = -90;
           js.objects[$3].attr("transform", "translate(60,0)");
         } else if(orient == "right") {
-          dy = "2em";
+          dy = "2.5em";
           text_orient = -90;
           js.objects[$3].attr("transform", "translate("+(canvas_width-60)+",0)");
         }
@@ -109,7 +110,7 @@ namespace D3 {
         }
 
         js.objects[$3].append("text")
-             .attr("id", "axis_label")
+             .attr("id", Pointer_stringify($2)+"_label")
              .attr("transform", "rotate("+text_orient+")")
              .attr("x", axis_range[0]+(axis_range[1]-axis_range[0])/x_divisor)
              .attr("dy", dy).style("text-anchor", "middle")
@@ -147,7 +148,7 @@ namespace D3 {
     void AdjustLabelOffset(std::string offset) {
       label_offset = offset;
       if (dom_id != "") { //We've already drawn stuff
-        group.Select("#axis_label").SetAttr("dy", label_offset);
+        group.Select("#"+dom_id+"_label").SetAttr("dy", label_offset);
       }
     }
 

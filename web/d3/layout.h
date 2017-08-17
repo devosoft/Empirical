@@ -129,7 +129,7 @@ namespace D3{
       int link_enter = NextD3ID();
       int link_exit = NextD3ID();
       std::cout << "Tree data id: " << data->GetID() << std::endl;
-      make_line->Log();
+    //   make_line->Log();
       EM_ASM_ARGS({
 
         // Based on code from http://www.d3noob.org/2014/01/tree-diagrams-in-d3js_11.html
@@ -137,7 +137,7 @@ namespace D3{
         js.objects[$0](root);
         var nodes = root.descendants();
         var links = root.descendants().slice(1);
-        nodes.forEach(function(d) { d.y = d.depth * 20; });
+        // nodes.forEach(function(d) { d.y = d.depth * 20; });
 
         // Declare the nodes
         var node = js.objects[$3].selectAll("g.node")
@@ -160,19 +160,19 @@ namespace D3{
         var linkEnter = link.enter().insert("path", "g")
       	    .attr("class", "link")
       	    .attr("d", function(d) {return "M" + d.y + "," + d.x
-            + "C" + (d.parent.y + 100) + "," + d.x
-            + " " + (d.parent.y + 100) + "," + d.parent.x
-            + " " + d.parent.y + "," + d.parent.x;})
+         + "C" + (d.y + d.parent.y) / 2 + "," + d.x
+         + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x
+         + " " + d.parent.y + "," + d.parent.x;})
             .attr("fill", "none")
             .attr("stroke", "black")
             .attr("stroke-width", 1);
-        console.log("about to link");
+
         link.attr("class", "link")
             .attr("d", function(d) {return "M" + d.y + "," + d.x
-            + "C" + (d.parent.y + 100) + "," + d.x
-            + " " + (d.parent.y + 100) + "," + d.parent.x
-            + " " + d.parent.y + "," + d.parent.x;});
-        console.log("linked");
+         + "C" + (d.y + d.parent.y) / 2 + "," + d.x
+         + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x
+         + " " + d.parent.y + "," + d.parent.x;});
+
         js.objects[$4] = nodeEnter;
         js.objects[$5] = nodeExit;
         js.objects[$6] = linkEnter;

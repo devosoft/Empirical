@@ -9,15 +9,21 @@
 #include <iostream>
 #include <functional>
 
-struct LineageTreeNode {
-  EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
-                                 double, y,
+struct LineageTreeDataNode{
+        EMP_BUILD_INTROSPECTIVE_TUPLE(
                                  int, name,
-                                 int, parent,
-                                 int, depth,
                                  int, alive,
                                  int, persist,
                                  std::string, genome
+        )
+};
+
+struct LineageTreeNode {
+  EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
+                                 double, y,
+                                 int, parent,
+                                 int, depth,
+                                 LineageTreeDataNode, data
                               )
 };
 

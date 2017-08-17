@@ -38,7 +38,7 @@ protected:
       int width;
       int height;
       D3Visualization * parent;
-      D3::Selection * svg;
+      D3::Selection svg;
 
       D3VisualizationInfo(D3Visualization * parent, const std::string & in_id="") : internal::WidgetInfo(in_id) {
         this->parent = parent;
@@ -62,7 +62,7 @@ protected:
       // Trigger any JS code needed on re-draw.
       void TriggerJS() override {
         if (state == Widget::ACTIVE) {            // Only draw on active canvases
-          svg = new D3::Selection(D3::Select("#"+id));
+          svg = D3::Selection("#"+id);
           parent->Setup();
         }
       }
@@ -91,7 +91,7 @@ public:
       Info()->width = w;
       Info()->height = h;
       EM_ASM({window["emp"]["__default_draw_data_callback"] =
-              function(){console.log("drawing data");};});
+              function(){;};});
   }
 
   D3Visualization(const D3Visualization & in) : WidgetFacet(in) { ; }
@@ -102,7 +102,7 @@ public:
 
   int GetWidth() const { return Info()->width; }
   int GetHeight() const { return Info()->height; }
-  D3::Selection * GetSVG() {return Info()->svg;}
+  D3::Selection * GetSVG() {return &(Info()->svg);}
   std::string GetID() {return Info()->id;}
 
   emp::vector<std::string> variables;
@@ -267,10 +267,6 @@ protected:
       return x_scale->ApplyScale(this->return_x(d));
   };
 
-  std::function<void()> draw_data = [this]() {
-    this->DrawData(true);
-  };
-
 public:
 
   LineGraph(std::string x_var="", std::string y_var="", int w=800, int h=400) : D3Visualization(w, h){
@@ -294,7 +290,7 @@ public:
     D3::Selection * svg = GetSVG();
 
     //Wrap ncessary callback functions
-    JSWrap(draw_data, GetID()+"draw_data");
+    JSWrap([this](){exit.Remove(); this->DrawData(true);}, GetID()+"draw_data");
 
     //Create tool tip
     tip = new D3::ToolTip([this](DATA_TYPE d) {return D3::FormatFunction(".2f")(return_y(d));});
@@ -316,9 +312,6 @@ public:
     D3::DrawAxes(*x_axis, *y_axis, *svg);
 
     line_gen = new D3::LineGenerator();
-    EM_ASM_ARGS({
-        emp_i[Pointer_stringify($0)+"genpath"] = js.objects[$1];
-    }, GetID().c_str(), line_gen->GetID());
 
     // Set up accessors (for retriving coords from data points)
     SetXAccessor(return_x);
@@ -331,6 +324,7 @@ public:
     this->pending_funcs.Run();
   }
 
+  D3::Selection exit;
   D3::LinearScale * GetXScale() {return x_scale;}
   D3::LinearScale * GetYScale() {return y_scale;}
   D3::Axis<D3::LinearScale> * GetXAxis() {return x_axis;}
@@ -443,7 +437,7 @@ public:
 
   /// Draw points and lines for data in this object's dataset object
   // Needs to be a std::function object or else JSWrap complains
-  std::function<void()> DrawPointsFromDataset = [this]() {
+  void DrawPointsFromDataset() {
 
     // Adjust axes
     x_min = std::min(EM_ASM_DOUBLE({
@@ -462,8 +456,8 @@ public:
         return d3.max(js.objects[$0], window["emp"][Pointer_stringify($1)+"return_y"]);
     }, dataset->GetID(), this->GetID().c_str()), y_max);
 
-    y_scale->SetDomain(std::array<double, 2>({{y_max, y_min}}));
-    x_scale->SetDomain(std::array<double, 2>({{x_min, x_max}}));
+    y_scale->SetDomain(y_max, y_min);
+    x_scale->SetDomain(x_min, x_max);
 
     y_axis->Rescale(y_max, y_min, *GetSVG());
     x_axis->Rescale(x_min, x_max, *GetSVG());
@@ -487,11 +481,11 @@ public:
     // Set prev_data appropriately
     dataset->GetLastRow(prev_data);
     CallDrawCallback();
-  };
+  }
 
   /// Load data from the file at [filename]. Expected to be a CSV dataset
   void LoadDataFromFile(std::string filename) {
-    emp::JSWrap(DrawPointsFromDataset, "draw");
+    emp::JSWrap([this](){DrawPointsFromDataset();}, "draw");
 
     if (this->init) {
       dataset->LoadDataFromFile(filename, "draw", false);
@@ -525,6 +519,7 @@ public:
       }
 
       D3::Transition t = GetSVG()->MakeTransition();
+      EM_ASM_ARGS({js.objects[$0].ease(d3.easeLinear).delay(10).duration(300);}, t.GetID());
       y_axis->Rescale(y_max, y_min, t);
       x_axis->Rescale(x_min, x_max, t);
       t.On("end", GetID()+"draw_data");
@@ -558,40 +553,69 @@ public:
   // }
   template <typename T>
   void Redraw(D3::SelectionOrTransition<T> & s) {
-    s.SelectAll(".data-point").SetAttr("cy", GetID()+"y");
-    s.SelectAll(".data-point").SetAttr("cx", GetID()+"x");
+    // s.SelectAll(".data-point").SetAttr("cy", GetID()+"y");
+    // s.SelectAll(".data-point").SetAttr("cx", GetID()+"x");
+    exit = D3::Selection(D3::NextD3ID());
 
     EM_ASM_ARGS({
-      circle_data = js.objects[$0].selectAll(".data-point").data();
-      console.log(circle_data);
-      ls = js.objects[$2].selectAll(".line-seg");
-      s = js.objects[$0].selectAll(".line-seg").data([circle_data]);
-      t = s.transition();
-      t.attr("d", js.objects[$1]);
-    //   t.each("end", emp.emp__0draw_data);
-      //s.attr("d", js.objects[$1]);
-      s.exit().remove();
-    }, GetSVG()->GetID(), line_gen->GetID(), s.GetID());
+        function pathTween(d1, precision) {
+          return function() {
+            var path0 = this;
+                path1 = path0.cloneNode();
+                n0 = path0.getTotalLength();
+                n1 = (path1.setAttribute("d", d1), path1).getTotalLength();
 
+            // Uniform sampling of distance based on specified precision.
+            var distances = [0];
+            i = 0;
+            dt = precision / Math.max(n0, n1);
+            while ((i += dt) < 1) distances.push(i);
+            distances.push(1);
+
+            // Compute point-interpolators at each distance.
+            var points = distances.map(function(t) {
+              var p0 = path0.getPointAtLength(t * n0);
+                  p1 = path1.getPointAtLength(t * n1);
+              return d3.interpolate([p0.x, p0.y], [p1.x, p1.y]);
+            });
+
+            return function(t) {
+              return t < 1 ? "M" + points.map(function(p) { return p(t); }).join("L") : d1;
+            };
+          };
+      };
+
+      circle_data = js.objects[$0].selectAll(".data-point").data();
+      ls = js.objects[$2].selectAll(".line-seg");
+      var s = js.objects[$0].selectAll(".line-seg").data([circle_data]);
+      js.objects[$3] = s.exit();
+      js.objects[$2].ease(d3.easeLinear).duration(300).selectAll(".data-point")
+                    .attr("cy", emp[Pointer_stringify($4)+"y"])
+                    .attr("cx", emp[Pointer_stringify($4)+"x"]);
+      t = s.transition(js.objects[$2]).duration(300).attrTween("d", pathTween).ease(d3.easeLinear);
+      t.attr("d", js.objects[$1]);
+      js.objects[$3].transition(js.objects[$2]).duration(300).attrTween("d", pathTween).ease(d3.easeLinear).attr("d",js.objects[$1](circle_data.slice(circle_data.length-2, circle_data.length-1)));
+    }, GetSVG()->GetID(), line_gen->GetID(), s.GetID(), exit.GetID(), GetID().c_str());
   }
 
   void DrawData(bool backlog = false) {
-      std::cout << "Calling DrawData. Backlog: " << data.size() << " " << backlog << std::endl;
+
     //If there's a backlog, then we're only allowed to clear it if this
     //was called recursively or from javascript (since javascript handles)
     //using this as a callback to asynchronous stuff)
     if ((!backlog && data.size() > 1) || data.size() == 0){
-      //EM_ASM_ARGS({window["emp"][Pointer_stringify($0)]()}, draw_data_callback.c_str());
       return;
     }
 
-    //We can't draw a line on the first update
+    D3::Selection svg = *GetSVG();
+
+    // //We can't draw a line on the first update
     if (prev_data[0] >= 0 ){
       std::array<DATA_TYPE, 2> line_data;
       line_data[0] = prev_data;
       line_data[1] = data[0];
 
-      D3::Selection line = line_gen->DrawShape(line_data, *GetSVG());
+      D3::Selection line = line_gen->DrawShape(line_data, svg);
       line.SetAttr("fill", "none");
       line.SetAttr("stroke-width", 1);
       line.SetAttr("stroke", "black");
@@ -600,7 +624,7 @@ public:
 
     // If it isn't nested, D3 will think it's 2 separate points
     std::array<DATA_TYPE, 1> new_point = {{data[0]}};
-    GetSVG()->SelectAll(".data-point").Log();
+    // GetSVG()->SelectAll(".data-point").Log();
     D3::Selection enter = GetSVG()->SelectAll(".data-point").Data(new_point, GetID()+"return_x").EnterAppend("circle");
     enter.SetAttr("cy", GetID()+"y");
     enter.SetAttr("cx", GetID()+"x");
@@ -609,14 +633,11 @@ public:
     enter.BindToolTipMouseover(*tip);
     prev_data = data[0];
     data.pop_front();
-    GetSVG()->SelectAll("circle").Log();
+    // GetSVG()->SelectAll("circle").Log();
     if (data.size() > 0) {
       DrawData(true);
-    }
-
-    // Call callback
-    if (data.size() == 0) {
-      std::cout << "About to draw callback" << std::endl;
+    } else if (data.size() == 0) {
+    //   std::cout << "About to draw callback" << std::endl;
       CallDrawCallback();
     }
   }
@@ -635,10 +656,14 @@ public:
   }
 };
 
+struct TreeDataNode {
+    EMP_BUILD_INTROSPECTIVE_TUPLE( int, name)
+};
+
 struct TreeNode {
   EMP_BUILD_INTROSPECTIVE_TUPLE( double, x,
                                  double, y,
-                                 int, name,
+                                 TreeDataNode, data,
                                  int, parent,
                                  int, depth
                               )
@@ -661,7 +686,7 @@ protected:
     JSWrap(color_fun_node, GetID()+"color_fun_node");
     JSWrap(color_fun_link, GetID()+"color_fun_link");
     data = new D3::JSONDataset();
-    tip = new D3::ToolTip([](NODE d, int i){return "Name: " + to_string(d.name());});
+    tip = new D3::ToolTip([](NODE d, int i){return "Name: " + to_string(d.data().name());});
     GetSVG()->Move(0,0);
     data->Append(std::string("{\"name\": 0, \"parent\": \"null\", \"children\" : []}"));
     tree.SetDataset(data);
@@ -725,15 +750,17 @@ public:
   }
 
   void DrawTree() {
-    std::cout << "Vis data id: " << data->GetID() << std::endl;
-    D3::Selection nodeEnter = tree.GenerateNodesAndLinks(*GetSVG())[0];
-    std::cout << "Links generated" << std::endl;
-    nodeEnter.Append("circle").SetAttr("r", 2).AddToolTip(*tip);
-    std::cout << "Circles appended" << std::endl;
+    // std::cout << "Vis data id: " << data->GetID() << std::endl;
+    emp::array<D3::Selection, 4> nodes_links = tree.GenerateNodesAndLinks(*GetSVG());
+    // std::cout << "Links generated" << std::endl;
+    nodes_links[0].Append("circle").SetAttr("r", 2).AddToolTip(*tip);
+    nodes_links[1].Remove();
+    nodes_links[3].Remove();
+    // std::cout << "Circles appended" << std::endl;
     GetSVG()->SelectAll("g.node").SelectAll("circle").SetStyle("fill", GetID()+"color_fun_node");
-    std::cout << "Circles sstyled" << std::endl;
+    // std::cout << "Circles sstyled" << std::endl;
     GetSVG()->SelectAll(".link").SetStyle("stroke", GetID()+"color_fun_link");
-    std::cout << "links styled" << std::endl;
+    // std::cout << "links styled" << std::endl;
     CallDrawCallback();
   }
 
@@ -852,7 +879,6 @@ public:
             else if (root.children[k].children) {
               result = trace_lineage(root.children[k], id);
               if (result) {
-                console.log(root.children[k]);
                 result.push(root.children[k].loc);
                 return result;
               }
@@ -872,7 +898,7 @@ public:
       var l = d3.svg.line().x(function(d){return scale(d[0]);}).y(function(d){return scale(d[1]);});
       var svg = d3.select("body").append("svg");
       svg.attr("width", 500).attr("height",500);
-      console.log(paths);
+    //   console.log(paths);
       svg.selectAll("path").data([paths]).enter().append("path").attr("d", function(d){console.log(d, l(d)); return l(d);}).attr("stroke", "white").attr("stroke-width", 1).attr("fill","none");
     //   console.log(path.length);
     //   console.log(l(path));
@@ -955,7 +981,7 @@ public:
              .Filter([d](LegendNode in_data){return d.loc() != in_data.loc();})
              .SetClassed("faded", false);
 
-    EM_ASM_ARGS({emp.filter_fun = function(d){return d.source.loc != $0}}, d.loc());
+    EM_ASM_ARGS({emp.filter_fun = function(d){return d.source.loc != $0;}}, d.loc());
     GetSVG()->SelectAll(".link").Filter("filter_fun").SetClassed("faded", false);
   };
 
