@@ -108,7 +108,7 @@ namespace emp {
                       const emp::vector< std::function<double(ORG&)> > & fit_funs,
                       size_t repro_count=1)
   {
-    emp_assert(pop.size() > 0);
+    emp_assert(world.GetSize() > 0);
     emp_assert(fit_funs.size() > 0);
 
     // Collect all fitness info. (@CAO: Technically only do this is cache is turned on?)
