@@ -30,7 +30,7 @@ struct NKInterface {
     world.Setup();
 
     // Setup the GUI Components.
-    div_pop.SetSize(400,400).SetScrollAuto();
+    div_pop.SetSize(400,400).SetScrollAuto().SetResizable();
     div_stats.SetPosition(450, 30);
 
     // Attach the GUI components to the web doc.
@@ -51,8 +51,11 @@ struct NKInterface {
   }
 
   void DrawOrgs() {
+    // double width = world.N * 4;
+    // double height = world.GetSize();
+    org_canvas.SetSize(4*world.N, 4 * world.GetSize());
     org_canvas.Clear("black");
-    for (size_t id = 0; id < world.GetSize() && id < 100; id++) {
+    for (size_t id = 0; id < world.GetSize(); id++) {
       auto & org = world[id];
       for (size_t pos = 0; pos < org.GetSize(); pos++) {
         if (!org[pos]) continue;
