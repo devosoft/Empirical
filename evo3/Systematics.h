@@ -90,8 +90,6 @@ namespace emp {
     using taxon_t = Taxon<ORG_INFO>;
     using hash_t = typename Ptr<taxon_t>::hash_t;
 
-    static constexpr bool verbose = false;
-
     bool store_active;     //< Store all of the currently active taxa?
     bool store_ancestors;  //< Store all of the direct ancestors from living taxa?
     bool store_outside;    //< Store taxa that are extinct with no living descendants?
@@ -109,10 +107,6 @@ namespace emp {
 
     void RemoveOffspring(Ptr<taxon_t> taxon) {
       if (!taxon) return;                                // Not tracking this taxon.
-      if (verbose) {
-        std::cout << "RemoveOffspring on taxon " << taxon->GetID()
-                  << "; now has " << (taxon->GetNumOff()-1) << " offspring.\n";
-      }
       bool still_active = taxon->RemoveOffspring();      // Taxon still active w/ 1 fewer offspring?
       if (still_active == false) {                       // If we're out of offspring, now outside.
         RemoveOffspring( taxon->GetParent() );           // Cascade up to parent taxon.
@@ -127,7 +121,6 @@ namespace emp {
       emp_assert(taxon);
       emp_assert(taxon->GetNumOrgs() == 0);
 
-      if (verbose) { std::cout << "MarkExtinct on taxon " << taxon->GetID() << std::endl; }
       if (store_active) active_taxa.erase(taxon);
       if (!archive) {   // If we don't archive taxa, delete them.
         taxon.Delete();
@@ -184,10 +177,6 @@ namespace emp {
 
       // If this organism's info is the same as it's parent's info, add org to parent!
       if (parent && parent->GetInfo() == info) {
-        if (verbose) {
-          std::cout << "AddOrg to existing taxon " << parent->GetID()
-                    << "; now has " << (parent->GetNumOrgs()+1) << " orgs.\n";
-        }
         emp_assert( Has(active_taxa, parent) );
         parent->AddOrg();
         total_depth += parent->GetDepth();
@@ -197,16 +186,6 @@ namespace emp {
       // Otherwise, this is a new taxon!  If archiving, track the parent.
       Ptr<taxon_t> cur_taxon = NewPtr<taxon_t>(++next_id, info, parent);
       total_depth += cur_taxon->GetDepth();
-
-      if (verbose) {
-        std::cout << "AddOrg created new taxon " << cur_taxon->GetID();
-        if (parent) {
-          std::cout <<  "; parent is " << parent->GetID()
-                    << " with " << parent->GetNumOff() << " child taxa.\n";
-        } else {
-          std::cout << "; no parent.\n";
-        }
-      }
 
       if (store_active) active_taxa.insert(cur_taxon);
       if (parent) parent->AddOffspring();
@@ -218,10 +197,6 @@ namespace emp {
     /// Remove an instance of an organism; track when it's gone.
     bool RemoveOrg(Ptr<taxon_t> taxon) {
       emp_assert(taxon);
-      if (verbose) {
-        std::cout << "RemoveOrg on taxon " << taxon->GetID()
-                  << "; now has " << (taxon->GetNumOrgs()-1) << " orgs.\n";
-      }
 
       // Update stats
       total_orgs--;
