@@ -100,20 +100,29 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  //< A set of all dead taxa w/o descendants.
 
     // Stats about active taxa... (totals are across orgs, not taxa)
-    size_t total_orgs;     //< How many organisms are currently active?
-    size_t total_depth;    //< Sum of taxa depths for calculating average.
+    size_t org_count;     //< How many organisms are currently active?
+    size_t total_depth;   //< Sum of taxa depths for calculating average.
+    size_t num_roots;     //< How many distint injected ancestors are currently in population?
 
-    size_t next_id;        //< What ID value should the next new taxon have?
+    size_t next_id;       //< What ID value should the next new taxon have?
+    Ptr<taxon_t> mrca;    //< Most recent common ancestor in the population.
+
+    // Should be called wheneven a taxon has no organisms AND no descendants.
+    void Prune(Ptr<taxon_t> taxon) {
+      RemoveOffspring( taxon->GetParent() );           // Notify parent of the pruning.
+      if (store_ancestors) ancestor_taxa.erase(taxon); // Clear from ancestors set (if there)
+      if (store_outside) outside_taxa.insert(taxon);   // Add to outside set (if tracked)
+      else taxon.Delete();                             //  ...or else get rid of it.
+    }
 
     void RemoveOffspring(Ptr<taxon_t> taxon) {
-      if (!taxon) return;                                // Not tracking this taxon.
+      if (!taxon) { num_roots--; return; }               // Offspring was root; remove and return.
       bool still_active = taxon->RemoveOffspring();      // Taxon still active w/ 1 fewer offspring?
-      if (still_active == false) {                       // If we're out of offspring, now outside.
-        RemoveOffspring( taxon->GetParent() );           // Cascade up to parent taxon.
-        if (store_ancestors) ancestor_taxa.erase(taxon); // Clear from ancestors set (if there)
-        if (store_outside) outside_taxa.insert(taxon);   // Add to outside set (if tracked)
-        else taxon.Delete();                             //  ...or else get rid of it.
-      }
+      if (!still_active) Prune(taxon);                   // If out of offspring, remove from tree.
+
+      // If the taxon is still active AND the is the current mrca AND now has only one offspring,
+      // clear the MRCA for lazy re-evaluation later.
+      else if (taxon == mrca && taxon->GetNumOff() == 1) mrca = nullptr;
     }
 
     // Mark a taxon extinct if there are no more living members.  There may be descendants.
@@ -127,16 +136,8 @@ namespace emp {
         return;
       }
 
-      // Otherwise, figure out how we're supposed to store them.
-      if (taxon->GetNumOff()) {
-        // There are offspring taxa, so store as an ancestor (if we're supposed to).
-        if (store_ancestors) ancestor_taxa.insert(taxon);
-      } else {
-        // The are no offspring; store as an outside taxa or delete.
-        RemoveOffspring(taxon->GetParent());            // Recurse to parent.
-        if (store_outside) outside_taxa.insert(taxon);  // If we're supposed to store, do so.
-        else taxon.Delete();                            // Otherwise delete this taxon.
-      }
+      if (store_ancestors) ancestor_taxa.insert(taxon);  // Move taxon to ancestors...
+      if (taxon->GetNumOff() == 0) Prune(taxon);         // ...and prune from there if needed.
     }
 
   public:
@@ -144,7 +145,8 @@ namespace emp {
       : store_active(_active), store_ancestors(_anc), store_outside(_all)
       , archive(store_ancestors || store_outside)
       , active_taxa(), ancestor_taxa(), outside_taxa()
-      , total_orgs(0), total_depth(0), next_id(0) { ; }
+      , org_count(0), total_depth(0), num_roots(0), next_id(0)
+      , mrca(nullptr) { ; }
     Systematics(const Systematics &) = delete;
     Systematics(Systematics &&) = default;
     ~Systematics() {
@@ -166,21 +168,23 @@ namespace emp {
     size_t GetNumOutside() const { return outside_taxa.size(); }
     size_t GetTreeSize() const { return GetNumActive() + GetNumAncestors(); }
     size_t GetNumTaxa() const { return GetTreeSize() + GetNumOutside(); }
-    size_t GetTotalOrgs() const { return total_orgs; }
+    size_t GetTotalOrgs() const { return org_count; }
+    size_t GetNumRoots() const { return num_roots; }
 
-    double GetAveDepth() const { return ((double) total_depth) / (double) total_orgs; }
+    double GetAveDepth() const { return ((double) total_depth) / (double) org_count; }
 
     /// Add information about a new organism; return a pointer for the associated taxon.
     Ptr<taxon_t> AddOrg(const ORG_INFO & info, Ptr<taxon_t> parent=nullptr) {
       // Update stats
-      total_orgs++;
+      org_count++;               // Keep count of how many organisms are being tracked.
+      if (!parent) num_roots++;  // If this is a NEW organism, it has a new tree root.
 
       // If this organism's info is the same as it's parent's info, add org to parent!
       if (parent && parent->GetInfo() == info) {
-        emp_assert( Has(active_taxa, parent) );
-        parent->AddOrg();
-        total_depth += parent->GetDepth();
-        return parent;
+        emp_assert( Has(active_taxa, parent) );  // Make sure parent is in set of active taxa.
+        parent->AddOrg();                        // Notify parent of new organism added.
+        total_depth += parent->GetDepth();       // Track the total depth of all orgs (for average)
+        return parent;                           // Return parent taxon as the one asigned.
       }
 
       // Otherwise, this is a new taxon!  If archiving, track the parent.
@@ -199,7 +203,7 @@ namespace emp {
       emp_assert(taxon);
 
       // Update stats
-      total_orgs--;
+      org_count--;
       total_depth -= taxon->GetDepth();
 
       // emp_assert(Has(active_taxa, taxon));
