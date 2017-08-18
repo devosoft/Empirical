@@ -173,6 +173,9 @@ namespace emp {
 
     double GetAveDepth() const { return ((double) total_depth) / (double) org_count; }
 
+    /// Request a pointer to the Most-Recent Common Ancestor for the population.
+    Ptr<taxon_t> GetMRCA() const { return mrca; }
+
     /// Add information about a new organism, including its stored info and parent's taxon;
     /// return a pointer for the associated taxon.
     Ptr<taxon_t> AddOrg(const ORG_INFO & info, Ptr<taxon_t> cur_taxon=nullptr) {
@@ -184,7 +187,10 @@ namespace emp {
       // If this organism needs a new taxon, build it!
       if (!cur_taxon || cur_taxon->GetInfo() != info) {
         auto parent_taxon = cur_taxon;                               // Provided taxon is parent.
-        if (!parent_taxon) num_roots++;                              // No parent -> new tree root.
+        if (!parent_taxon) {                                         // No parnet -> NEW tree
+          num_roots++;                                               // ...track extra root.
+          mrca = nullptr;                                            // ...nix old common ancestor
+        }
         cur_taxon = NewPtr<taxon_t>(++next_id, info, parent_taxon);  // Build new taxon.
         if (store_active) active_taxa.insert(cur_taxon);             // Store new taxon.
         if (parent_taxon) parent_taxon->AddOffspring();              // Track tree info.
