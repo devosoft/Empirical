@@ -626,8 +626,14 @@ namespace web {
       // Positioning
       return_t & SetFloat(const std::string & f) { return SetCSS("float", f); }
       return_t & SetOverflow(const std::string & o) { return SetCSS("overflow", o); }
+
+      // Access
       return_t & SetScroll() { return SetCSS("overflow", "scroll"); }     // Always have scrollbars
       return_t & SetScrollAuto() { return SetCSS("overflow", "auto"); }   // Scrollbars if needed
+      return_t & SetResizable() { return SetCSS("resize", "both"); }
+      return_t & SetResizableX() { return SetCSS("resize", "horizontal"); }
+      return_t & SetResizableY() { return SetCSS("resize", "vertical"); }
+      return_t & SetResizableOff() { return SetCSS("resize", "none"); }
 
       // Text Manipulation
       return_t & SetFont(const std::string & font) { return SetCSS("font-family", font); }
