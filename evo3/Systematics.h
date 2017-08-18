@@ -173,29 +173,26 @@ namespace emp {
 
     double GetAveDepth() const { return ((double) total_depth) / (double) org_count; }
 
-    /// Add information about a new organism; return a pointer for the associated taxon.
-    Ptr<taxon_t> AddOrg(const ORG_INFO & info, Ptr<taxon_t> parent=nullptr) {
-      // Update stats
-      org_count++;               // Keep count of how many organisms are being tracked.
-      if (!parent) num_roots++;  // If this is a NEW organism, it has a new tree root.
+    /// Add information about a new organism, including its stored info and parent's taxon;
+    /// return a pointer for the associated taxon.
+    Ptr<taxon_t> AddOrg(const ORG_INFO & info, Ptr<taxon_t> cur_taxon=nullptr) {
+      emp_assert( !cur_taxon || Has(active_taxa, cur_taxon) );
 
-      // If this organism's info is the same as it's parent's info, add org to parent!
-      if (parent && parent->GetInfo() == info) {
-        emp_assert( Has(active_taxa, parent) );  // Make sure parent is in set of active taxa.
-        parent->AddOrg();                        // Notify parent of new organism added.
-        total_depth += parent->GetDepth();       // Track the total depth of all orgs (for average)
-        return parent;                           // Return parent taxon as the one asigned.
+      // Update stats
+      org_count++;                  // Keep count of how many organisms are being tracked.
+
+      // If this organism needs a new taxon, build it!
+      if (!cur_taxon || cur_taxon->GetInfo() != info) {
+        auto parent_taxon = cur_taxon;                               // Provided taxon is parent.
+        if (!parent_taxon) num_roots++;                              // No parent -> new tree root.
+        cur_taxon = NewPtr<taxon_t>(++next_id, info, parent_taxon);  // Build new taxon.
+        if (store_active) active_taxa.insert(cur_taxon);             // Store new taxon.
+        if (parent_taxon) parent_taxon->AddOffspring();              // Track tree info.
       }
 
-      // Otherwise, this is a new taxon!  If archiving, track the parent.
-      Ptr<taxon_t> cur_taxon = NewPtr<taxon_t>(++next_id, info, parent);
-      total_depth += cur_taxon->GetDepth();
-
-      if (store_active) active_taxa.insert(cur_taxon);
-      if (parent) parent->AddOffspring();
-      cur_taxon->AddOrg();
-
-      return cur_taxon;
+      cur_taxon->AddOrg();                    // Record the current organism in its taxon.
+      total_depth += cur_taxon->GetDepth();   // Track the total depth (for averaging)
+      return cur_taxon;                       // Return the taxon used.
     }
 
     /// Remove an instance of an organism; track when it's gone.
