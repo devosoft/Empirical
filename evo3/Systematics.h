@@ -29,6 +29,7 @@
 #include <unordered_set>
 
 #include "../base/Ptr.h"
+#include "../tools/info_theory.h"
 #include "../tools/set_utils.h"
 
 namespace emp {
@@ -171,6 +172,8 @@ namespace emp {
     /// Print whole lineage.
     void PrintLineage(Ptr<taxon_t> taxon, std::ostream & os=std::cout) const;
 
+    /// Calculate the genetic diversity of the population.
+    double CalcDiversity();
   };
 
   // =============================================================
@@ -340,6 +343,11 @@ namespace emp {
     }
   }
 
+  // Calculate the genetic diversity of the population.
+  template <typename ORG_INFO>
+  double Systematics<ORG_INFO>::CalcDiversity() {
+    return emp::Entropy(active_taxa, [](Ptr<taxon_t> x){ return x->GetNumOrgs(); }, org_count);
+  }
 
 }
 
