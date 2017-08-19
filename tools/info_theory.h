@@ -27,8 +27,7 @@
 
 namespace emp {
 
-  // Entropy assumes that you are given a vector of weights, calculates the probability of
-  // each, and returns the entropy.
+  /// Convert a vector of weights to probabilities and return the entropy of the system.
   template<typename CONTAINER>
   double Entropy(const CONTAINER & weights) {
     double total = 0.0;
@@ -41,12 +40,15 @@ namespace emp {
     return entropy;
   }
 
-  // Allow for entropy of arbitrary objects with a converter.
+  /// Calculate the entropy in a container of arbitrary objects.
+  /// Args are a container, a function to extract the weight of each member, and an (optional) total weight.
   template<typename CONTAINER, typename WEIGHT_FUN>
-  double Entropy(const CONTAINER & objs, WEIGHT_FUN fun) {
-    double total = 0.0;
+  double Entropy(const CONTAINER & objs, WEIGHT_FUN fun, double total=0.0) {
+    // If we don't know the total, calculate it.
+    if (total == 0.0) for (auto & o : objs) total += fun(o);
+    emp_assert(total > 0.0);
+
     double entropy = 0.0;
-    for (auto & o : objs) total += fun(o);
     for (auto & o : objs) {
       double p = ((double) fun(o)) / total;
       entropy -= p * Log2(p);
@@ -54,12 +56,13 @@ namespace emp {
     return entropy;
   }
 
+  /// Calculate the entropy when their are two possibile states based on one state's probability.
   constexpr double Entropy2(const double p) {
     return -(p * Log2(p) + (1.0-p)*Log2(1.0-p));
   }
 
-  // Conitional Entropy: H(X|Y)
-  // Allow for entropy of arbitrary objects with a converter.
+  /// Conitional Entropy: H(X|Y)
+  /// Allow for entropy of arbitrary objects with a converter.
   template<typename CONTAINER, typename CAT_FUN_X, typename CAT_FUN_Y, typename WEIGHT_FUN>
   double Entropy(const CONTAINER & objs, CAT_FUN_X funX, CAT_FUN_Y funY, WEIGHT_FUN funW) {
     // @CAO Categorize all XY and all Y (maybe with helper function?) and count each.
