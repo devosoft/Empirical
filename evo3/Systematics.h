@@ -107,38 +107,14 @@ namespace emp {
     size_t next_id;             //< What ID value should the next new taxon have?
     mutable Ptr<taxon_t> mrca;  //< Most recent common ancestor in the population.
 
-    // Should be called wheneven a taxon has no organisms AND no descendants.
-    void Prune(Ptr<taxon_t> taxon) {
-      RemoveOffspring( taxon->GetParent() );           // Notify parent of the pruning.
-      if (store_ancestors) ancestor_taxa.erase(taxon); // Clear from ancestors set (if there)
-      if (store_outside) outside_taxa.insert(taxon);   // Add to outside set (if tracked)
-      else taxon.Delete();                             //  ...or else get rid of it.
-    }
+    /// Called wheneven a taxon has no organisms AND no descendants.
+    void Prune(Ptr<taxon_t> taxon);
 
-    void RemoveOffspring(Ptr<taxon_t> taxon) {
-      if (!taxon) { num_roots--; return; }               // Offspring was root; remove and return.
-      bool still_active = taxon->RemoveOffspring();      // Taxon still active w/ 1 fewer offspring?
-      if (!still_active) Prune(taxon);                   // If out of offspring, remove from tree.
+    /// Called when an offspring taxa has been deleted.
+    void RemoveOffspring(Ptr<taxon_t> taxon);
 
-      // If the taxon is still active AND the is the current mrca AND now has only one offspring,
-      // clear the MRCA for lazy re-evaluation later.
-      else if (taxon == mrca && taxon->GetNumOff() == 1) mrca = nullptr;
-    }
-
-    // Mark a taxon extinct if there are no more living members.  There may be descendants.
-    void MarkExtinct(Ptr<taxon_t> taxon) {
-      emp_assert(taxon);
-      emp_assert(taxon->GetNumOrgs() == 0);
-
-      if (store_active) active_taxa.erase(taxon);
-      if (!archive) {   // If we don't archive taxa, delete them.
-        taxon.Delete();
-        return;
-      }
-
-      if (store_ancestors) ancestor_taxa.insert(taxon);  // Move taxon to ancestors...
-      if (taxon->GetNumOff() == 0) Prune(taxon);         // ...and prune from there if needed.
-    }
+    /// Called when there are no more living members of a taxon.  There may be descendants.
+    void MarkExtinct(Ptr<taxon_t> taxon);
 
   public:
     Systematics(bool _active=true, bool _anc=true, bool _all=false)
@@ -174,123 +150,196 @@ namespace emp {
     double GetAveDepth() const { return ((double) total_depth) / (double) org_count; }
 
     /// Request a pointer to the Most-Recent Common Ancestor for the population.
-    Ptr<taxon_t> GetMRCA() const {
-      if (!mrca && num_roots == 1) {  // Determine if we need to calculate the MRCA.
-        // First, find a candidate among the living taxa.  Only taxa that have one offsrping
-        // can be on the line-of-descent to the MRCA, so anything else is a good start point.
-        // There must be at least one!  Stop as soon as we find a candidate.
-        Ptr<taxon_t> candidate(nullptr);
-        for (auto x : active_taxa) {
-          if (x->GetNumOff() != 1) { candidate = x; break; }
-        }
-
-        // Now, trace the line of descent, updating the candidate as we go.
-        Ptr<taxon_t> test_taxon = candidate->GetParent();
-        while (test_taxon) {
-          emp_assert(test_taxon->GetNumOff() > 1);
-          if (test_taxon->GetNumOff() > 1) candidate = test_taxon;
-          test_taxon = test_taxon->GetParent();
-        }
-        mrca = candidate;
-      }
-      return mrca;
-    }
+    Ptr<taxon_t> GetMRCA() const;
 
     /// Request the depth of the Most-Recent Common Ancestor; return -1 for none.
-    int GetMRCADepth() const {
-      GetMRCA();
-      if (mrca) return mrca->GetDepth();
-      return -1;
-    }
+    int GetMRCADepth() const;
 
     /// Add information about a new organism, including its stored info and parent's taxon;
     /// return a pointer for the associated taxon.
-    Ptr<taxon_t> AddOrg(const ORG_INFO & info, Ptr<taxon_t> cur_taxon=nullptr) {
-      emp_assert( !cur_taxon || Has(active_taxa, cur_taxon) );
-
-      // Update stats
-      org_count++;                  // Keep count of how many organisms are being tracked.
-
-      // If this organism needs a new taxon, build it!
-      if (!cur_taxon || cur_taxon->GetInfo() != info) {
-        auto parent_taxon = cur_taxon;                               // Provided taxon is parent.
-        if (!parent_taxon) {                                         // No parnet -> NEW tree
-          num_roots++;                                               // ...track extra root.
-          mrca = nullptr;                                            // ...nix old common ancestor
-        }
-        cur_taxon = NewPtr<taxon_t>(++next_id, info, parent_taxon);  // Build new taxon.
-        if (store_active) active_taxa.insert(cur_taxon);             // Store new taxon.
-        if (parent_taxon) parent_taxon->AddOffspring();              // Track tree info.
-      }
-
-      cur_taxon->AddOrg();                    // Record the current organism in its taxon.
-      total_depth += cur_taxon->GetDepth();   // Track the total depth (for averaging)
-      return cur_taxon;                       // Return the taxon used.
-    }
+    Ptr<taxon_t> AddOrg(const ORG_INFO & info, Ptr<taxon_t> cur_taxon=nullptr);
 
     /// Remove an instance of an organism; track when it's gone.
-    bool RemoveOrg(Ptr<taxon_t> taxon) {
-      emp_assert(taxon);
-
-      // Update stats
-      org_count--;
-      total_depth -= taxon->GetDepth();
-
-      // emp_assert(Has(active_taxa, taxon));
-      const bool active = taxon->RemoveOrg();
-      if (!active) MarkExtinct(taxon);
-
-      return active;
-    }
+    bool RemoveOrg(Ptr<taxon_t> taxon);
 
     /// Climb up a lineage...
-    Ptr<taxon_t> Parent(Ptr<taxon_t> taxon) const {
-      emp_assert(taxon);
-      emp_assert(Has(active_taxa, taxon));
-      return taxon->GetParent();
-    }
+    Ptr<taxon_t> Parent(Ptr<taxon_t> taxon) const;
 
     /// Print details about the Systematics manager.
-    void PrintStatus(std::ostream & os=std::cout) const {
-      os << "Systematics Status:\n";
-      os << " store_active=" << store_active
-         << " store_ancestors=" << store_ancestors
-         << " store_outside=" << store_outside
-         << " archive=" << archive
-         << " next_id=" << next_id
-         << std::endl;
-      os << "Active count:   " << active_taxa.size();
-      for (const auto & x : active_taxa) {
-        os << " [" << x->GetID() << "|" << x->GetNumOrgs() << "," << x->GetNumOff() << "|"
-           << ((bool) x->GetParent()) << "]";
-      }
-      os << std::endl;
-
-      os << "Ancestor count: " << ancestor_taxa.size();
-      for (const auto & x : ancestor_taxa) {
-        os << " [" << x->GetID() << "|" << x->GetNumOrgs() << "," << x->GetNumOff() << "|"
-           << ((bool) x->GetParent()) << "]";
-      }
-      os << std::endl;
-
-      os << "Outside count:  " << outside_taxa.size();
-      for (const auto & x : outside_taxa) {
-        os << " [" << x->GetID() << "|" << x->GetNumOrgs() << "," << x->GetNumOff() << "|"
-           << ((bool) x->GetParent()) << "]";
-      }
-      os << std::endl;
-    }
+    void PrintStatus(std::ostream & os=std::cout) const;
 
     /// Print whole lineage.
-    void PrintLineage(Ptr<taxon_t> taxon, std::ostream & os=std::cout) const {
-      os << "Lineage:\n";
-      while (taxon) {
-        os << taxon->GetInfo() << std::endl;
-        taxon = taxon->GetParent();
-      }
-    }
+    void PrintLineage(Ptr<taxon_t> taxon, std::ostream & os=std::cout) const;
 
   };
+
+  // =============================================================
+  // ===                                                       ===
+  // ===  Out-of-class member function definitions from above  ===
+  // ===                                                       ===
+  // =============================================================
+
+  // Should be called wheneven a taxon has no organisms AND no descendants.
+  template <typename ORG_INFO>
+  void Systematics<ORG_INFO>::Prune(Ptr<taxon_t> taxon) {
+    RemoveOffspring( taxon->GetParent() );           // Notify parent of the pruning.
+    if (store_ancestors) ancestor_taxa.erase(taxon); // Clear from ancestors set (if there)
+    if (store_outside) outside_taxa.insert(taxon);   // Add to outside set (if tracked)
+    else taxon.Delete();                             //  ...or else get rid of it.
+  }
+
+  template <typename ORG_INFO>
+  void Systematics<ORG_INFO>::RemoveOffspring(Ptr<taxon_t> taxon) {
+    if (!taxon) { num_roots--; return; }               // Offspring was root; remove and return.
+    bool still_active = taxon->RemoveOffspring();      // Taxon still active w/ 1 fewer offspring?
+    if (!still_active) Prune(taxon);                   // If out of offspring, remove from tree.
+
+    // If the taxon is still active AND the is the current mrca AND now has only one offspring,
+    // clear the MRCA for lazy re-evaluation later.
+    else if (taxon == mrca && taxon->GetNumOff() == 1) mrca = nullptr;
+  }
+
+  // Mark a taxon extinct if there are no more living members.  There may be descendants.
+  template <typename ORG_INFO>
+  void Systematics<ORG_INFO>::MarkExtinct(Ptr<taxon_t> taxon) {
+    emp_assert(taxon);
+    emp_assert(taxon->GetNumOrgs() == 0);
+
+    if (store_active) active_taxa.erase(taxon);
+    if (!archive) {   // If we don't archive taxa, delete them.
+      taxon.Delete();
+      return;
+    }
+
+    if (store_ancestors) ancestor_taxa.insert(taxon);  // Move taxon to ancestors...
+    if (taxon->GetNumOff() == 0) Prune(taxon);         // ...and prune from there if needed.
+  }
+
+
+  // Request a pointer to the Most-Recent Common Ancestor for the population.
+  template <typename ORG_INFO>
+  Ptr<Taxon<ORG_INFO>> Systematics<ORG_INFO>::GetMRCA() const {
+    if (!mrca && num_roots == 1) {  // Determine if we need to calculate the MRCA.
+      // First, find a candidate among the living taxa.  Only taxa that have one offsrping
+      // can be on the line-of-descent to the MRCA, so anything else is a good start point.
+      // There must be at least one!  Stop as soon as we find a candidate.
+      Ptr<taxon_t> candidate(nullptr);
+      for (auto x : active_taxa) {
+        if (x->GetNumOff() != 1) { candidate = x; break; }
+      }
+
+      // Now, trace the line of descent, updating the candidate as we go.
+      Ptr<taxon_t> test_taxon = candidate->GetParent();
+      while (test_taxon) {
+        emp_assert(test_taxon->GetNumOff() > 1);
+        if (test_taxon->GetNumOff() > 1) candidate = test_taxon;
+        test_taxon = test_taxon->GetParent();
+      }
+      mrca = candidate;
+    }
+    return mrca;
+  }
+
+  // Request the depth of the Most-Recent Common Ancestor; return -1 for none.
+  template <typename ORG_INFO>
+  int Systematics<ORG_INFO>::GetMRCADepth() const {
+    GetMRCA();
+    if (mrca) return mrca->GetDepth();
+    return -1;
+  }
+
+  // Add information about a new organism, including its stored info and parent's taxon;
+  // return a pointer for the associated taxon.
+  template <typename ORG_INFO>
+  Ptr<Taxon<ORG_INFO>> Systematics<ORG_INFO>::AddOrg(const ORG_INFO & info, Ptr<taxon_t> cur_taxon) {
+    emp_assert( !cur_taxon || Has(active_taxa, cur_taxon) );
+
+    // Update stats
+    org_count++;                  // Keep count of how many organisms are being tracked.
+
+    // If this organism needs a new taxon, build it!
+    if (!cur_taxon || cur_taxon->GetInfo() != info) {
+      auto parent_taxon = cur_taxon;                               // Provided taxon is parent.
+      if (!parent_taxon) {                                         // No parnet -> NEW tree
+        num_roots++;                                               // ...track extra root.
+        mrca = nullptr;                                            // ...nix old common ancestor
+      }
+      cur_taxon = NewPtr<taxon_t>(++next_id, info, parent_taxon);  // Build new taxon.
+      if (store_active) active_taxa.insert(cur_taxon);             // Store new taxon.
+      if (parent_taxon) parent_taxon->AddOffspring();              // Track tree info.
+    }
+
+    cur_taxon->AddOrg();                    // Record the current organism in its taxon.
+    total_depth += cur_taxon->GetDepth();   // Track the total depth (for averaging)
+    return cur_taxon;                       // Return the taxon used.
+  }
+
+  // Remove an instance of an organism; track when it's gone.
+  template <typename ORG_INFO>
+  bool Systematics<ORG_INFO>::RemoveOrg(Ptr<taxon_t> taxon) {
+    emp_assert(taxon);
+
+    // Update stats
+    org_count--;
+    total_depth -= taxon->GetDepth();
+
+    // emp_assert(Has(active_taxa, taxon));
+    const bool active = taxon->RemoveOrg();
+    if (!active) MarkExtinct(taxon);
+
+    return active;
+  }
+
+  // Climb up a lineage...
+  template <typename ORG_INFO>
+  Ptr<Taxon<ORG_INFO>> Systematics<ORG_INFO>::Parent(Ptr<taxon_t> taxon) const {
+    emp_assert(taxon);
+    emp_assert(Has(active_taxa, taxon));
+    return taxon->GetParent();
+  }
+
+  // Print details about the Systematics manager.
+  template <typename ORG_INFO>
+  void Systematics<ORG_INFO>::PrintStatus(std::ostream & os) const {
+    os << "Systematics Status:\n";
+    os << " store_active=" << store_active
+       << " store_ancestors=" << store_ancestors
+       << " store_outside=" << store_outside
+       << " archive=" << archive
+       << " next_id=" << next_id
+       << std::endl;
+    os << "Active count:   " << active_taxa.size();
+    for (const auto & x : active_taxa) {
+      os << " [" << x->GetID() << "|" << x->GetNumOrgs() << "," << x->GetNumOff() << "|"
+         << ((bool) x->GetParent()) << "]";
+    }
+    os << std::endl;
+
+    os << "Ancestor count: " << ancestor_taxa.size();
+    for (const auto & x : ancestor_taxa) {
+      os << " [" << x->GetID() << "|" << x->GetNumOrgs() << "," << x->GetNumOff() << "|"
+         << ((bool) x->GetParent()) << "]";
+    }
+    os << std::endl;
+
+    os << "Outside count:  " << outside_taxa.size();
+    for (const auto & x : outside_taxa) {
+      os << " [" << x->GetID() << "|" << x->GetNumOrgs() << "," << x->GetNumOff() << "|"
+         << ((bool) x->GetParent()) << "]";
+    }
+    os << std::endl;
+  }
+
+  // Print whole lineage.
+  template <typename ORG_INFO>
+  void Systematics<ORG_INFO>::PrintLineage(Ptr<taxon_t> taxon, std::ostream & os) const {
+    os << "Lineage:\n";
+    while (taxon) {
+      os << taxon->GetInfo() << std::endl;
+      taxon = taxon->GetParent();
+    }
+  }
+
 
 }
 
