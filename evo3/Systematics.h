@@ -100,12 +100,12 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  //< A set of all dead taxa w/o descendants.
 
     // Stats about active taxa... (totals are across orgs, not taxa)
-    size_t org_count;     //< How many organisms are currently active?
-    size_t total_depth;   //< Sum of taxa depths for calculating average.
-    size_t num_roots;     //< How many distint injected ancestors are currently in population?
+    size_t org_count;           //< How many organisms are currently active?
+    size_t total_depth;         //< Sum of taxa depths for calculating average.
+    size_t num_roots;           //< How many distint injected ancestors are currently in population?
 
-    size_t next_id;       //< What ID value should the next new taxon have?
-    Ptr<taxon_t> mrca;    //< Most recent common ancestor in the population.
+    size_t next_id;             //< What ID value should the next new taxon have?
+    mutable Ptr<taxon_t> mrca;  //< Most recent common ancestor in the population.
 
     // Should be called wheneven a taxon has no organisms AND no descendants.
     void Prune(Ptr<taxon_t> taxon) {
@@ -174,7 +174,34 @@ namespace emp {
     double GetAveDepth() const { return ((double) total_depth) / (double) org_count; }
 
     /// Request a pointer to the Most-Recent Common Ancestor for the population.
-    Ptr<taxon_t> GetMRCA() const { return mrca; }
+    Ptr<taxon_t> GetMRCA() const {
+      if (!mrca && num_roots == 1) {  // Determine if we need to calculate the MRCA.
+        // First, find a candidate among the living taxa.  Only taxa that have one offsrping
+        // can be on the line-of-descent to the MRCA, so anything else is a good start point.
+        // There must be at least one!  Stop as soon as we find a candidate.
+        Ptr<taxon_t> candidate(nullptr);
+        for (auto x : active_taxa) {
+          if (x->GetNumOff() != 1) { candidate = x; break; }
+        }
+
+        // Now, trace the line of descent, updating the candidate as we go.
+        Ptr<taxon_t> test_taxon = candidate->GetParent();
+        while (test_taxon) {
+          emp_assert(test_taxon->GetNumOff() > 1);
+          if (test_taxon->GetNumOff() > 1) candidate = test_taxon;
+          test_taxon = test_taxon->GetParent();
+        }
+        mrca = candidate;
+      }
+      return mrca;
+    }
+
+    /// Request the depth of the Most-Recent Common Ancestor; return -1 for none.
+    int GetMRCADepth() const {
+      GetMRCA();
+      if (mrca) return mrca->GetDepth();
+      return -1;
+    }
 
     /// Add information about a new organism, including its stored info and parent's taxon;
     /// return a pointer for the associated taxon.
