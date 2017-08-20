@@ -417,43 +417,43 @@ namespace web {
   double Widget::GetWidth(){
     if (!info) return -1.0;
     return EM_ASM_DOUBLE({
-      var id = PointerStringify($0);
-      return $('#' + id).xxx();
+      var id = Pointer_stringify($0);
+      return $('#' + id).width();
     }, GetID().c_str());
   }
   double Widget::GetHeight(){
     if (!info) return -1.0;
     return EM_ASM_DOUBLE({
-      var id = PointerStringify($0);
-      return $('#' + id).xxx();
+      var id = Pointer_stringify($0);
+      return $('#' + id).height();
     }, GetID().c_str());
   }
   double Widget::GetInnerWidth(){
     if (!info) return -1.0;
     return EM_ASM_DOUBLE({
-      var id = PointerStringify($0);
-      return $('#' + id).xxx();
+      var id = Pointer_stringify($0);
+      return $('#' + id).innerWidth();
     }, GetID().c_str());
   }
   double Widget::GetInnerHeight(){
     if (!info) return -1.0;
     return EM_ASM_DOUBLE({
-      var id = PointerStringify($0);
-      return $('#' + id).xxx();
+      var id = Pointer_stringify($0);
+      return $('#' + id).innerHeight();
     }, GetID().c_str());
   }
   double Widget::GetOuterWidth(){
     if (!info) return -1.0;
     return EM_ASM_DOUBLE({
-      var id = PointerStringify($0);
-      return $('#' + id).xxx();
+      var id = Pointer_stringify($0);
+      return $('#' + id).outerWidth();
     }, GetID().c_str());
   }
   double Widget::GetOuterHeight(){
     if (!info) return -1.0;
     return EM_ASM_DOUBLE({
-      var id = PointerStringify($0);
-      return $('#' + id).xxx();
+      var id = Pointer_stringify($0);
+      return $('#' + id).outerHeight();
     }, GetID().c_str());
   }
 
