@@ -571,11 +571,11 @@ namespace web {
 
       // On with mouse coordinates.
       return_t & On(const std::string & event_name,
-                    const std::function<void(int,int)> & fun) {
+                    const std::function<void(double,double)> & fun) {
         emp_assert(info != nullptr);
         auto fun_cb = [this, fun](MouseEvent evt){
-          int x = evt.clientX - GetXPos();
-          int y = evt.clientY - GetYPos();
+          double x = evt.clientX - GetXPos();
+          double y = evt.clientY - GetYPos();
           fun(x,y);
         };
         size_t fun_id = JSWrap(fun_cb);
