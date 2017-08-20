@@ -16,26 +16,32 @@ struct NKInterface {
   UI::Document doc;
   UI::Div div_pop;
   UI::Div div_stats;
+  UI::Div div_controls;
+  UI::Div div_vis;
+
+  UI::Canvas pop_canvas;
   UI::Canvas org_canvas;
   UI::Animate anim;
 
   NKInterface()
     : doc("emp_base")
-    , div_pop("div_pop")
-    , div_stats("div_stats")
-    , org_canvas(800, 800, "org_canvas")
+    , div_pop("div_pop"), div_stats("div_stats"), div_controls("div_controls"), div_vis("div_vis")
+    , pop_canvas(400, 400, "pop_canvas"), org_canvas(800, 800, "org_canvas")
     , anim( [this](){ DoFrame(); }, org_canvas )
   {
     // Setup the NK World.
     world.Setup();
 
-    // Setup the GUI Components.
-    div_pop.SetSize(400,400).SetScrollAuto().SetResizable();
-    div_stats.SetPosition(450, 30);
+    // Setup initial sizes for divs.
+    div_pop.SetSize(400,400); // .SetScrollAuto().SetResizable();
 
     // Attach the GUI components to the web doc.
     div_pop << UI::Button( [this](){ world.RunStep(); DrawAll(); }, "Step", "but_step" );
     div_pop << anim.GetToggleButton("but_toggle");
+    div_pop << UI::Button( [this](){
+        emp::Alert("x=", div_pop.GetXPos(), " y=", div_pop.GetYPos(),
+                   " width=", div_pop.GetWidth(), " height=", div_pop.GetHeight());
+      }, "Alert");
     div_pop << "<br>";
     div_pop << org_canvas;
 
@@ -48,6 +54,14 @@ struct NKInterface {
 
     doc << "<h1>NK World</h1>";
     doc << div_pop << div_stats;
+
+    // Place divs in reasonable positions.
+
+    LayoutDivs();
+  }
+
+  void LayoutDivs() {
+    div_stats.SetPosition(450, 30);
   }
 
   void DrawOrgs() {
