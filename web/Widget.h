@@ -417,43 +417,43 @@ namespace web {
   double Widget::GetWidth(){
     if (!info) return -1.0;
     return EM_ASM_DOUBLE({
-      var id = PointerStringify($0);
-      return $('#' + id).xxx();
+      var id = Pointer_stringify($0);
+      return $('#' + id).width();
     }, GetID().c_str());
   }
   double Widget::GetHeight(){
     if (!info) return -1.0;
     return EM_ASM_DOUBLE({
-      var id = PointerStringify($0);
-      return $('#' + id).xxx();
+      var id = Pointer_stringify($0);
+      return $('#' + id).height();
     }, GetID().c_str());
   }
   double Widget::GetInnerWidth(){
     if (!info) return -1.0;
     return EM_ASM_DOUBLE({
-      var id = PointerStringify($0);
-      return $('#' + id).xxx();
+      var id = Pointer_stringify($0);
+      return $('#' + id).innerWidth();
     }, GetID().c_str());
   }
   double Widget::GetInnerHeight(){
     if (!info) return -1.0;
     return EM_ASM_DOUBLE({
-      var id = PointerStringify($0);
-      return $('#' + id).xxx();
+      var id = Pointer_stringify($0);
+      return $('#' + id).innerHeight();
     }, GetID().c_str());
   }
   double Widget::GetOuterWidth(){
     if (!info) return -1.0;
     return EM_ASM_DOUBLE({
-      var id = PointerStringify($0);
-      return $('#' + id).xxx();
+      var id = Pointer_stringify($0);
+      return $('#' + id).outerWidth();
     }, GetID().c_str());
   }
   double Widget::GetOuterHeight(){
     if (!info) return -1.0;
     return EM_ASM_DOUBLE({
-      var id = PointerStringify($0);
-      return $('#' + id).xxx();
+      var id = Pointer_stringify($0);
+      return $('#' + id).outerHeight();
     }, GetID().c_str());
   }
 
@@ -571,11 +571,11 @@ namespace web {
 
       // On with mouse coordinates.
       return_t & On(const std::string & event_name,
-                    const std::function<void(int,int)> & fun) {
+                    const std::function<void(double,double)> & fun) {
         emp_assert(info != nullptr);
         auto fun_cb = [this, fun](MouseEvent evt){
-          int x = evt.clientX - GetXPos();
-          int y = evt.clientY - GetYPos();
+          double x = evt.clientX - GetXPos();
+          double y = evt.clientY - GetYPos();
           fun(x,y);
         };
         size_t fun_id = JSWrap(fun_cb);
