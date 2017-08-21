@@ -19,6 +19,8 @@
 #ifndef EMP_WEB_DOCUMENT_H
 #define EMP_WEB_DOCUMENT_H
 
+#include "events.h"
+
 #include "Button.h"
 #include "Canvas.h"
 #include "Div.h"
