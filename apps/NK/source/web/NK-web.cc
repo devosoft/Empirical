@@ -53,7 +53,10 @@ struct NKInterface {
     div_stats << "<br>Max Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMax(); } );
 
     doc << "<h1>NK World</h1>";
-    doc << div_pop << div_stats;
+    doc << div_pop;
+    doc << div_stats;
+    doc << div_controls;
+    doc << div_vis;
 
     // Place divs in reasonable positions.
 
