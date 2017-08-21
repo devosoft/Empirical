@@ -60,8 +60,29 @@ struct NKInterface {
     LayoutDivs();
   }
 
+  ///  Restore the proper layout of divs, even once portions change size.
+  ///
+  ///   x1       x2
+  ///   +--------+-----------+ y1
+  ///   |        |  CONTROLS |
+  ///   +   POP  +-----------+ y2
+  ///   |        |   STATS   |
+  ///   +--------+-----------+ y3
+  ///   |                    |
+  ///   |   VISUALIZATIONS   |
+  ///   |                    |
+  ///   +--------------------+
+
   void LayoutDivs() {
-    div_stats.SetPosition(450, 30);
+    const double spacing = 10;
+    const double x1 = div_pop.GetXPos();
+    const double x2 = x1 + div_pop.GetOuterWidth() + spacing;
+    const double y1 = div_pop.GetYPos();
+    const double y2 = y1 + div_controls.GetOuterHeight() + spacing;
+    const double y3a = y1 + div_pop.GetOuterHeight();
+    const double y3b = y2 + div_stats.GetOuterHeight();
+    const double y3 = emp::Max(y3a, y3b) + spacing;
+    div_stats.SetPosition(x2, y1);
   }
 
   void DrawOrgs() {
@@ -81,6 +102,8 @@ struct NKInterface {
   void DrawAll() {
     DrawOrgs();
     div_stats.Redraw();
+
+    LayoutDivs();
   }
 
   void DoFrame() {
