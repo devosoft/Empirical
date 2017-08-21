@@ -218,6 +218,12 @@ namespace emp {
       const Function & operator[](size_t id) const { return program[id]; }
 
       size_t GetSize() const { return program.size(); }
+      size_t GetInstCnt() const {
+        size_t cnt = 0;
+        for (size_t i = 0; i < GetSize(); ++i) cnt += program[i].GetSize();
+        return cnt;
+      }
+
       Ptr<const inst_lib_t> GetInstLib() const { return inst_lib; }
 
       bool ValidPosition(size_t fID, size_t pos) const {
