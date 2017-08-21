@@ -136,6 +136,8 @@ namespace emp {
       operator bool() const {            // rvalue handling...
         return bit_set.Get(index);
       }
+
+      BitProxy & Toggle() { bit_set.Toggle(index); return *this; }
     };
     friend class BitProxy;
 
@@ -286,16 +288,26 @@ namespace emp {
       else       bit_set[field_id] &= ~pos_mask;
     }
 
-    /// Flips all the bits in a range [start, end)
-    void flip(size_t start, size_t end) {
-      emp_assert(start <= end && end <= NUM_BITS);
-      for(size_t index = start; index < end; index++) {
-        Set(index, ~Get(index));
-      }
+    /// Flip all bits in this BitSet
+    BitSet & Toggle() { return NOT_SELF(); }
+
+    /// Flip a single bit
+    BitSet & Toggle(size_t index) {
+      emp_assert(index >= 0 && index < NUM_BITS);
+      const size_t field_id = FieldID(index);
+      const size_t pos_id = FieldPos(index);
+      (bit_set[field_id] ^= (1 << pos_id));
+      return *this;
     }
 
-    /// flip a single bit
-    void flip(size_t index) { Set(index, ~Get(index)); }
+    /// Flips all the bits in a range [start, end)
+    BitSet & Toggle(size_t start, size_t end) {
+      emp_assert(start <= end && end <= NUM_BITS);
+      for(size_t index = start; index < end; index++) {
+        Toggle(index);
+      }
+      return *this;
+    }
 
     uint8_t GetByte(size_t index) const {
       emp_assert(index < NUM_BYTES);
@@ -545,6 +557,9 @@ namespace emp {
     inline bool any() const { return Any(); }
     inline bool none() const { return !Any(); }
     inline size_t count() const { return CountOnes_Mixed(); }
+    inline BitSet & flip() { return Toggle(); }
+    inline BitSet & flip(size_t pos) { return Toggle(pos); }
+    inline BitSet & flip(size_t start, size_t end) { return Toggle(start, end); }
   };
 
   template <size_t NUM_BITS1, size_t NUM_BITS2>

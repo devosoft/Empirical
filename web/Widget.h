@@ -141,8 +141,14 @@ namespace web {
 
     operator bool() const { return info != nullptr; }
 
-    int GetXPos();
-    int GetYPos();
+    double GetXPos();
+    double GetYPos();
+    double GetWidth();
+    double GetHeight();
+    double GetInnerWidth();
+    double GetInnerHeight();
+    double GetOuterWidth();
+    double GetOuterHeight();
 
     // An active widget makes live changes to the webpage (once document is ready)
     // An inactive widget just records changes internally.
@@ -390,21 +396,64 @@ namespace web {
     return info ? info->extras.HasAttr(setting) : false;
   }
 
-  int Widget::GetXPos() {
-    if (!info) return -1;
-    return EM_ASM_INT({
+  double Widget::GetXPos() {
+    if (!info) return -1.0;
+    return EM_ASM_DOUBLE({
       var id = Pointer_stringify($0);
       var rect = $('#' + id).position();
       return rect.left;
     }, GetID().c_str());
   }
 
-  int Widget::GetYPos() {
-    if (!info) return -1;
-    return EM_ASM_INT({
+  double Widget::GetYPos() {
+    if (!info) return -1.0;
+    return EM_ASM_DOUBLE({
       var id = Pointer_stringify($0);
       var rect = $('#' + id).position();
       return rect.top;
+    }, GetID().c_str());
+  }
+
+  double Widget::GetWidth(){
+    if (!info) return -1.0;
+    return EM_ASM_DOUBLE({
+      var id = PointerStringify($0);
+      return $('#' + id).xxx();
+    }, GetID().c_str());
+  }
+  double Widget::GetHeight(){
+    if (!info) return -1.0;
+    return EM_ASM_DOUBLE({
+      var id = PointerStringify($0);
+      return $('#' + id).xxx();
+    }, GetID().c_str());
+  }
+  double Widget::GetInnerWidth(){
+    if (!info) return -1.0;
+    return EM_ASM_DOUBLE({
+      var id = PointerStringify($0);
+      return $('#' + id).xxx();
+    }, GetID().c_str());
+  }
+  double Widget::GetInnerHeight(){
+    if (!info) return -1.0;
+    return EM_ASM_DOUBLE({
+      var id = PointerStringify($0);
+      return $('#' + id).xxx();
+    }, GetID().c_str());
+  }
+  double Widget::GetOuterWidth(){
+    if (!info) return -1.0;
+    return EM_ASM_DOUBLE({
+      var id = PointerStringify($0);
+      return $('#' + id).xxx();
+    }, GetID().c_str());
+  }
+  double Widget::GetOuterHeight(){
+    if (!info) return -1.0;
+    return EM_ASM_DOUBLE({
+      var id = PointerStringify($0);
+      return $('#' + id).xxx();
     }, GetID().c_str());
   }
 
@@ -626,8 +675,14 @@ namespace web {
       // Positioning
       return_t & SetFloat(const std::string & f) { return SetCSS("float", f); }
       return_t & SetOverflow(const std::string & o) { return SetCSS("overflow", o); }
+
+      // Access
       return_t & SetScroll() { return SetCSS("overflow", "scroll"); }     // Always have scrollbars
       return_t & SetScrollAuto() { return SetCSS("overflow", "auto"); }   // Scrollbars if needed
+      return_t & SetResizable() { return SetCSS("resize", "both"); }
+      return_t & SetResizableX() { return SetCSS("resize", "horizontal"); }
+      return_t & SetResizableY() { return SetCSS("resize", "vertical"); }
+      return_t & SetResizableOff() { return SetCSS("resize", "none"); }
 
       // Text Manipulation
       return_t & SetFont(const std::string & font) { return SetCSS("font-family", font); }

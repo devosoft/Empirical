@@ -132,6 +132,10 @@ namespace web {
     size_t GetWidth() const { return Info()->width; }
     size_t GetHeight() const { return Info()->height; }
 
+    void SetWidth(size_t w) { Info()->width=w; }
+    void SetHeight(size_t h) { Info()->height=h; }
+    void SetSize(size_t w, size_t h) { Info()->width=w; Info()->height=h; }
+
     // Setup Canvas Actions
     Canvas & Circle(double x, double y, double r,
                     const std::string & fc="", const std::string & lc="") {
