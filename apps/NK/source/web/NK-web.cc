@@ -33,12 +33,12 @@ struct NKInterface {
     world.Setup();
 
     // Setup initial sizes for divs.
-    div_pop.SetSize(400,400); // .SetScrollAuto().SetResizable();
+    div_pop.SetSize(400,400).SetScrollAuto(); //.SetResizable();
 
     // Attach the GUI components to the web doc.
-    div_pop << UI::Button( [this](){ world.RunStep(); DrawAll(); }, "Step", "but_step" );
-    div_pop << anim.GetToggleButton("but_toggle");
-    div_pop << UI::Button( [this](){
+    div_controls << UI::Button( [this](){ world.RunStep(); DrawAll(); }, "Step", "but_step" );
+    div_controls << anim.GetToggleButton("but_toggle");
+    div_controls << UI::Button( [this](){
         emp::Alert("x=", div_pop.GetXPos(), " y=", div_pop.GetYPos(),
                    " width=", div_pop.GetWidth(), " height=", div_pop.GetHeight());
       }, "Alert");
@@ -57,7 +57,7 @@ struct NKInterface {
 
     // Place divs in reasonable positions.
 
-    LayoutDivs();
+    emp::web::OnDocumentReady( [this](){ LayoutDivs(); } );
   }
 
   ///  Restore the proper layout of divs, even once portions change size.
@@ -82,7 +82,9 @@ struct NKInterface {
     const double y3a = y1 + div_pop.GetOuterHeight();
     const double y3b = y2 + div_stats.GetOuterHeight();
     const double y3 = emp::Max(y3a, y3b) + spacing;
-    div_stats.SetPosition(x2, y1);
+    div_controls.SetPosition(x2, y1);
+    div_stats.SetPosition(x2, y2);
+    div_vis.SetPosition(x1,y3);
   }
 
   void DrawOrgs() {
