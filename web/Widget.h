@@ -583,6 +583,9 @@ namespace web {
         return (return_t &) *this;
       }
 
+      // Window even listeners
+      template <typename T> return_t & OnResize(T && arg) { return On("resize", arg); }
+
       // Mouse event listeners
       template <typename T> return_t & OnClick(T && arg) { return On("click", arg); }
       template <typename T> return_t & OnDoubleClick(T && arg) { return On("dblclick", arg); }
@@ -651,21 +654,42 @@ namespace web {
       // Position Manipulation
       return_t & Center() { return SetCSS("margin", "auto"); }
       return_t & SetPosition(int x, int y, const std::string & unit="px") {
-        return SetCSS("position", "fixed",
+        return SetCSS("position", "absolute",
                       "left", emp::to_string(x, unit),
                       "top", emp::to_string(y, unit));
       }
       return_t & SetPositionRT(int x, int y, const std::string & unit="px") {
-        return SetCSS("position", "fixed",
+        return SetCSS("position", "absolute",
                       "right", emp::to_string(x, unit),
                       "top", emp::to_string(y, unit));
       }
       return_t & SetPositionRB(int x, int y, const std::string & unit="px") {
-        return SetCSS("position", "fixed",
+        return SetCSS("position", "absolute",
                       "right", emp::to_string(x, unit),
                       "bottom", emp::to_string(y, unit));
       }
       return_t & SetPositionLB(int x, int y, const std::string & unit="px") {
+        return SetCSS("position", "absolute",
+                      "left", emp::to_string(x, unit),
+                      "bottom", emp::to_string(y, unit));
+      }
+
+      return_t & SetPositionFixed(int x, int y, const std::string & unit="px") {
+        return SetCSS("position", "fixed",
+                      "left", emp::to_string(x, unit),
+                      "top", emp::to_string(y, unit));
+      }
+      return_t & SetPositionFixedRT(int x, int y, const std::string & unit="px") {
+        return SetCSS("position", "fixed",
+                      "right", emp::to_string(x, unit),
+                      "top", emp::to_string(y, unit));
+      }
+      return_t & SetPositionFixedRB(int x, int y, const std::string & unit="px") {
+        return SetCSS("position", "fixed",
+                      "right", emp::to_string(x, unit),
+                      "bottom", emp::to_string(y, unit));
+      }
+      return_t & SetPositionFixedLB(int x, int y, const std::string & unit="px") {
         return SetCSS("position", "fixed",
                       "left", emp::to_string(x, unit),
                       "bottom", emp::to_string(y, unit));
