@@ -653,47 +653,29 @@ namespace web {
 
       // Position Manipulation
       return_t & Center() { return SetCSS("margin", "auto"); }
-      return_t & SetPosition(int x, int y, const std::string & unit="px") {
-        return SetCSS("position", "absolute",
-                      "left", emp::to_string(x, unit),
-                      "top", emp::to_string(y, unit));
+      return_t & SetPosition(int x, int y, const std::string & unit="px",
+                             const std::string & pos_type="absolute",
+                             const std::string & x_anchor="left",
+                             const std::string & y_anchor="top") {
+        return SetCSS("position", pos_type,
+                      x_anchor, emp::to_string(x, unit),
+                      y_anchor, emp::to_string(y, unit));
       }
-      return_t & SetPositionRT(int x, int y, const std::string & unit="px") {
-        return SetCSS("position", "absolute",
-                      "right", emp::to_string(x, unit),
-                      "top", emp::to_string(y, unit));
-      }
-      return_t & SetPositionRB(int x, int y, const std::string & unit="px") {
-        return SetCSS("position", "absolute",
-                      "right", emp::to_string(x, unit),
-                      "bottom", emp::to_string(y, unit));
-      }
-      return_t & SetPositionLB(int x, int y, const std::string & unit="px") {
-        return SetCSS("position", "absolute",
-                      "left", emp::to_string(x, unit),
-                      "bottom", emp::to_string(y, unit));
-      }
+      return_t & SetPositionRT(int x, int y, const std::string & unit="px")
+        { return SetPosition(x, y, unit, "absolute", "right", "top"); }
+      return_t & SetPositionRB(int x, int y, const std::string & unit="px")
+        { return SetPosition(x, y, unit, "absolute", "right", "bottom"); }
+      return_t & SetPositionLB(int x, int y, const std::string & unit="px")
+        { return SetPosition(x, y, unit, "absolute", "left", "bottom"); }
 
-      return_t & SetPositionFixed(int x, int y, const std::string & unit="px") {
-        return SetCSS("position", "fixed",
-                      "left", emp::to_string(x, unit),
-                      "top", emp::to_string(y, unit));
-      }
-      return_t & SetPositionFixedRT(int x, int y, const std::string & unit="px") {
-        return SetCSS("position", "fixed",
-                      "right", emp::to_string(x, unit),
-                      "top", emp::to_string(y, unit));
-      }
-      return_t & SetPositionFixedRB(int x, int y, const std::string & unit="px") {
-        return SetCSS("position", "fixed",
-                      "right", emp::to_string(x, unit),
-                      "bottom", emp::to_string(y, unit));
-      }
-      return_t & SetPositionFixedLB(int x, int y, const std::string & unit="px") {
-        return SetCSS("position", "fixed",
-                      "left", emp::to_string(x, unit),
-                      "bottom", emp::to_string(y, unit));
-      }
+      return_t & SetPositionFixed(int x, int y, const std::string & unit="px")
+        { return SetPosition(x, y, unit, "fixed", "left", "top"); }
+      return_t & SetPositionFixedRT(int x, int y, const std::string & unit="px")
+        { return SetPosition(x, y, unit, "fixed", "right", "top"); }
+      return_t & SetPositionFixedRB(int x, int y, const std::string & unit="px")
+        { return SetPosition(x, y, unit, "fixed", "right", "bottom"); }
+      return_t & SetPositionFixedLB(int x, int y, const std::string & unit="px")
+        { return SetPosition(x, y, unit, "fixed", "left", "bottom"); }
 
 
       // Positioning
