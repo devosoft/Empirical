@@ -44,19 +44,20 @@ int main()
     } );
 
   // Setup the fitness function.
-  std::function<double(emp::AvidaGP&)> fit_fun =
-    [](emp::AvidaGP & org) {
+  std::function<double(const emp::AvidaGP &)> fit_fun =
+    [](const emp::AvidaGP & org) {
       int count = 0;
       for (int i = 0; i < 16; i++) {
         if (org.GetOutput(i) == (double) (i*i)) count++;
       }
       return (double) count;
     };
+  world.SetFitFun(fit_fun);
 
-  emp::vector< std::function<double(emp::AvidaGP &)> > fit_set(16);
+  emp::vector< std::function<double(const emp::AvidaGP &)> > fit_set(16);
   for (size_t out_id = 0; out_id < 16; out_id++) {
     // Setup the fitness function.
-    fit_set[out_id] = [out_id](emp::AvidaGP & org) {
+    fit_set[out_id] = [out_id](const emp::AvidaGP & org) {
       return (double) -std::abs(org.GetOutput((int)out_id) - (double) (out_id * out_id));
     };
   }
@@ -65,13 +66,11 @@ int main()
   // Do the run...
   for (size_t ud = 0; ud < UPDATES; ud++) {
     // Update the status of all organisms.
-    for (size_t id = 0; id < POP_SIZE; id++) {
-      world[id].ResetHardware();
-    }
+    world.ResetHardware();
     world.Process(200);
 
     // Keep the best individual.
-    EliteSelect(world, fit_fun, 1, 1);
+    EliteSelect(world, 1, 1);
 
     // Run a tournament for the rest...
     // TournamentSelect(world, fit_fun, 5, POP_SIZE-1);
@@ -79,11 +78,11 @@ int main()
     // EcoSelect(world, fit_fun, fit_set, 100, 5, POP_SIZE-1);
     world.Update();
 
-    double fit0 = fit_fun(world[0]);
+    double fit0 = world.CalcFitnessID(0);
     std::cout << (ud+1) << " : " << 0 << " : " << fit0 << std::endl;
 
     // Mutate all but the first organism.
-    world.MutatePop(1);
+    world.DoMutations(1);
   }
 
   std::cout << std::endl;
