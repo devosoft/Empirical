@@ -120,7 +120,7 @@ namespace emp {
   }
 
   template <typename ORG>
-  using find_genome_t = decltype( Org2Genome<ORG>() );
+  using find_genome_t = decltype( Org2Genome<ORG>(true) );
 
 
   namespace {
