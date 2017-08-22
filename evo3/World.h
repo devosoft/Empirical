@@ -443,7 +443,12 @@ namespace emp {
     /// forward any args passed into this function.
     template <typename... ARGS>
     void ProcessID(size_t id, ARGS &&... args) {   // Redirect to all orgs in the population!
-      if (pop[id]) pop[id]->Process(std::forward<ARGS>(args)...); }
+      if (pop[id]) pop[id]->Process(std::forward<ARGS>(args)...);
+    }
+
+    /// Reset the hardware for all organisms.
+    void ResetHardware() {
+      for (Ptr<ORG> org : pop) { if (org) org->ResetHardware(); }      
     }
 
     // --- CALCULATE FITNESS ---
