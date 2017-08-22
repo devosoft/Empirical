@@ -350,6 +350,7 @@ namespace emp {
 
     program_t program;              // Program (set of functions).
     Ptr<memory_t> shared_mem_ptr;   // Pointer to shared memory.
+    // Using ptrs to vectors so I can easily shuffle execution stacks around (when a core dies and I need to keep the stacks vector de-fragmented)
     emp::vector< Ptr< emp::vector<Ptr<State>> > > execution_stacks;
     std::deque<Ptr<emp::vector<Ptr<State>> > > core_spawn_queue; // We don't want to spawn cores while processing the execution stacks during single process. Cores spawned during this time will be put into the queue to be spawned later.
     Ptr<emp::vector<Ptr<State>>> cur_core;
@@ -384,9 +385,25 @@ namespace emp {
       : EventDrivenGP(DefaultInstLib(), DefaultEventLib(), rnd) { ; }
 
     // TODO - Write proper custom move and copy constructors. Defaults don't work properly.
-    //EventDrivenGP(EventDrivenGP &&) = default; // @amlalejini - TODO: implement move constructor.
-
-    //EventDrivenGP(const EventDrivenGP &) = default;
+    //  - Issue: EventDrivenGP has some pointers that can't just be default copied on a copy.
+    //  - Question: But, default move should be fine (duplicating pointers is bad, but moving them?)?
+    EventDrivenGP(EventDrivenGP &&) = default;
+    //
+    // EventDrivenGP(const EventDrivenGP &) = default;
+    /*
+    [x] event_lib --> copy ptr
+    [x] random_ptr --> if in.owner: make new; else copy ptr.
+    [x] random_owner --> set false
+    [x] program --> copy in.program
+    [x] shared_mem_ptr --> create new shared memory that is copy of in.shared_mem
+    [ ] execution_stacks
+    [ ] core_spawn_queue
+    [ ] cur_core
+    [ ] event_queue
+    [ ] traits
+    [ ] errors
+    [ ] is_executing
+    */
     // EventDrivenGP(const EventDrivenGP & in)
     //   : inst_lib(in.inst_lib), event_lib(in.event_lib), random_ptr(nullptr), random_owner(false),
     //     program(in.program), shared_mem_ptr(nullptr), execution_stacks(), core_spawn_queue(),
@@ -395,10 +412,7 @@ namespace emp {
     //   std::cout << "Copy construct!" << std::endl;
     //   if (in.random_owner) NewRandom(); // New random number generator.
     //   else random_ptr = in.random_ptr;
-    //   shared_mem_ptr.New(); // New shared memory.
-    //   // Spin up main core.
-    //   SpawnCore(0, memory_t(), true);
-    //   cur_core = execution_stacks[0];
+    //   shared_mem_ptr.New(*(in.shared_mem_ptr)); // New shared memory.
     // }
 
     /// Destructor - clean up: execution stacks, shared memory.
@@ -716,6 +730,7 @@ namespace emp {
     void SingleProcess() {
       emp_assert(program.GetSize()); // Must have a program before this is allowed.
       // Handle events.
+      std::cout << "Single process." << std::endl;
       while (!event_queue.empty()) {
         HandleEvent(event_queue.front());
         event_queue.pop_front();
@@ -777,9 +792,12 @@ namespace emp {
         execution_stacks.push_back(core_spawn_queue.front());
         core_spawn_queue.pop_front();
       }
+      std::cout << "Done with single process." << std::endl;
     }
     /// Advance hardware by some number instructions.
-    void Process(size_t num_inst) { for (size_t i = 0; i < num_inst; i++) SingleProcess(); }
+    void Process(size_t num_inst) {
+      for (size_t i = 0; i < num_inst; i++) SingleProcess();
+    }
 
     // -- Printing --
     void PrintEvent(const event_t & event, std::ostream & os=std::cout) {
