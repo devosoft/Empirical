@@ -445,6 +445,7 @@ namespace emp {
     // -- Accessors --
     Ptr<const inst_lib_t> GetInstLib() const { return program.GetInstLib(); }
     Ptr<const event_lib_t> GetEventLib() const { return event_lib; }
+    Random & GetRandom() { return *random_ptr; }
     const Function & GetFunction(size_t fID) const { emp_assert(ValidFunction(fID)); return program[fID]; }
     size_t GetNumErrors() const { return errors; }
     const inst_t & GetInst(size_t fID, size_t pos) const {
