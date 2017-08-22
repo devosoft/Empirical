@@ -14,7 +14,32 @@
 //  If the population is in EA mode (with synchronous generations), DoBirth will place offspring in
 //  a "next generation" placeholder population.  Update() will move orgs into primary population.
 //
-//  All insertions into the popoulation funnel through private function AddOrgAt(org, pos);
+//  Organisms have a series of functions that are called on them that are chosen:
+//
+//  FITNESS: Most selection methods require a fitness function to help determine who should be
+//           replicated.  Other systems merely use fitness as a measured output.
+//   0. If you set the fitness function using SetFitFun(), it will have priority.
+//   1. If the organism type has a "GetFitness()" member function, use it!
+//   2. If the organism type can be cast to double, use it!
+//   3. Start with a fitness function that throws an assert indicating function must be set.
+//
+//  MUTATIONS: The mutation function deteramines a main source of variation for most evolving
+//             systems.
+//   0. If you set the mutation function using SetMutFun(), it will have priority.
+//   1. Or DoMutations(random) member function.
+//   2. Empty, with assert.
+//
+//  PRINTING: How should organisms be printed to the command line?
+//   0. Setting the print function with SetPrintFun() member function.
+//   1. Org Print() member function
+//   2. Proper operator<<
+//   3. Do not print, just Assert
+//
+//  GENOMES: Do organisms have a genome separate from their instantiation?  By default, the full
+//           organism is returned when a genome is requested, but a GetGenome() member function
+//           in the organism type will override this behavior.
+//   1. GetGenome member function
+//   2. Return org AS genome.
 //
 //
 //  Developer Notes:
@@ -407,13 +432,24 @@ namespace emp {
     /// 4. Increment the current update number.
     void Update();
 
-    /// Run the Execute member function on all organisms in the population; forward any args passed
+    /// Run the Process member function on all organisms in the population; forward any args passed
     /// into this function.
     template <typename... ARGS>
-    void Execute(ARGS &&... args) {   // Redirect to all orgs in the population!
-      for (Ptr<ORG> org : pop) { if (org) org->Execute(std::forward<ARGS>(args)...); }
+    void Process(ARGS &&... args) {   // Redirect to all orgs in the population!
+      for (Ptr<ORG> org : pop) { if (org) org->Process(std::forward<ARGS>(args)...); }
     }
 
+    /// Run the Process member function on a single, specified organism in the population;
+    /// forward any args passed into this function.
+    template <typename... ARGS>
+    void ProcessID(size_t id, ARGS &&... args) {   // Redirect to all orgs in the population!
+      if (pop[id]) pop[id]->Process(std::forward<ARGS>(args)...);
+    }
+
+    /// Reset the hardware for all organisms.
+    void ResetHardware() {
+      for (Ptr<ORG> org : pop) { if (org) org->ResetHardware(); }      
+    }
 
     // --- CALCULATE FITNESS ---
 
