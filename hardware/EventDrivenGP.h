@@ -185,6 +185,11 @@ namespace emp {
         args[0] = other.args[0]; args[1] = other.args[1]; args[2] = other.args[2];
         affinity = other.affinity;
       }
+
+      bool operator==(const Instruction & in) const {
+        return id == in.id && args == in.args && affinity == in.affinity;
+      }
+      bool operator!=(const Instruction & in) const { return !(*this == in); }
     };
 
     using inst_t = Instruction;
@@ -199,6 +204,11 @@ namespace emp {
       Function(const affinity_t & _aff=affinity_t(), const emp::vector<inst_t> & _seq=emp::vector<inst_t>()) : affinity(_aff), inst_seq(_seq) { ; }
 
       size_t GetSize() const { return inst_seq.size(); }
+
+      bool operator==(const Function & in) const {
+        return inst_seq == in.inst_seq && affinity == in.affinity;
+      }
+      bool operator!=(const Function & in) const { return !(*this == in); }
 
     };
 
@@ -216,6 +226,9 @@ namespace emp {
 
       Function & operator[](size_t id) { return program[id]; }
       const Function & operator[](size_t id) const { return program[id]; }
+
+      bool operator==(const Program & in) const { return program == in.program; }
+      bool operator!=(const Program & in) const { return !(*this == in); }
 
       size_t GetSize() const { return program.size(); }
       size_t GetInstCnt() const {
