@@ -33,20 +33,19 @@
 //    * Main state behaves differently than any other state.
 
 // @amlalejini - TODO:
-//  [ ] General code cleanup: have done enough minor refactoring such that things need a little bit of tidying up.
-//  [ ] (HIGH PRIORITY) Write proper copy/move constructors.
 //  [ ] Write some halfway decent documentation.
+//  [ ] Parameterize static constexpr variables.
+//  [ ] Make class templated, have a using statement to specify 8 cleanly
 
 namespace emp {
   class EventDrivenGP {
   public:
-    static constexpr size_t CPU_SIZE = 8;
-    static constexpr size_t AFFINITY_WIDTH = 8;
+    static constexpr size_t AFFINITY_WIDTH = 8;     //< Defines the number of bits in funciton/instruction/event affinities.
     static constexpr size_t MAX_INST_ARGS = 3;
-    static constexpr size_t MAX_CORES = 4;         // Maximum number of parallel execution stacks that can be spawned.
-    static constexpr size_t MAX_CALL_DEPTH = 128;   // Maximum depth of calls per execution stack.
+    static constexpr size_t MAX_CORES = 4;          //< Maximum number of parallel execution stacks that can be spawned. Increasing this value drastically slows things down.
+    static constexpr size_t MAX_CALL_DEPTH = 128;   //< Maximum depth of calls per execution stack.
     static constexpr double DEFAULT_MEM_VALUE = 0.0;
-    static constexpr double MIN_BIND_THRESH = 0.5;
+    static constexpr double MIN_BIND_THRESH = 0.5;  //< Minimum bit string match threshold for function calls/event binding, etc.
     static constexpr bool STOCHASTIC_FUN_CALL = true;
 
     using mem_key_t = int;
@@ -85,7 +84,7 @@ namespace emp {
     };
 
     struct State {
-      Ptr<memory_t> shared_mem_ptr;
+      Ptr<memory_t> shared_mem_ptr; // @amlalejini - TODO: can get rid of this pointer, move to instance variable
       memory_t local_mem;
       memory_t input_mem;
       memory_t output_mem;
@@ -122,22 +121,10 @@ namespace emp {
 
       /// GetXMemory functions return value at memory location if memory location exists.
       /// Otherwise, these functions return default memory value.
-      mem_val_t GetLocal(mem_key_t key) {
-        if (!Has(local_mem, key)) return DEFAULT_MEM_VALUE;
-        return local_mem[key];
-      }
-      mem_val_t GetInput(mem_key_t key) {
-        if (!Has(input_mem, key)) return DEFAULT_MEM_VALUE;
-        return input_mem[key];
-      }
-      mem_val_t GetOutput(mem_key_t key) {
-        if (!Has(output_mem, key)) return DEFAULT_MEM_VALUE;
-        return output_mem[key];
-      }
-      mem_val_t GetShared(mem_key_t key) {
-        if (!Has(*shared_mem_ptr, key)) return DEFAULT_MEM_VALUE;
-        return (*shared_mem_ptr)[key];
-      }
+      mem_val_t GetLocal(mem_key_t key) const { return Find(local_mem, key, DEFAULT_MEM_VALUE); }
+      mem_val_t GetInput(mem_key_t key) const { return Find(input_mem, key, DEFAULT_MEM_VALUE); }
+      mem_val_t GetOutput(mem_key_t key) const { return Find(output_mem, key, DEFAULT_MEM_VALUE); }
+      mem_val_t GetShared(mem_key_t key) const { return Find(*shared_mem_ptr, key, DEFAULT_MEM_VALUE); }
 
       /// SetXMemory functions set memory location (specified by key) to value.
       void SetLocal(mem_key_t key, mem_val_t value) { local_mem[key] = value; }
@@ -351,9 +338,9 @@ namespace emp {
     bool random_owner;
 
     program_t program;              // Program (set of functions).
-    Ptr<memory_t> shared_mem_ptr;   // Pointer to shared memory.
+    Ptr<memory_t> shared_mem_ptr;   // Pointer to shared memory. @amlalejini - TODO: make this not a pointer
     // Using ptrs to vectors so I can easily shuffle execution stacks around (when a core dies and I need to keep the stacks vector de-fragmented)
-    emp::vector<Ptr<exec_stk_t>> execution_stacks;
+    emp::vector<Ptr<exec_stk_t>> execution_stacks;  // @amlalejini - TODO: get rid of pointers, just manage an array/vector of size core count
     std::deque<Ptr<exec_stk_t>> core_spawn_queue; // We don't want to spawn cores while processing the execution stacks during single process. Cores spawned during this time will be put into the queue to be spawned later.
     Ptr<exec_stk_t> cur_core;
     std::deque<event_t> event_queue;
@@ -362,6 +349,7 @@ namespace emp {
 
     size_t errors;
 
+    // @amlalejini - TODO: can change to active executing id, can then grab whatever cur state you want.
     bool is_executing;    // This is true only when executing the execution stacks.
 
   public:
@@ -389,7 +377,7 @@ namespace emp {
     // TODO - Write proper custom move and copy constructors. Defaults don't work properly.
     //  - Issue: EventDrivenGP has some pointers that can't just be default copied on a copy.
     //  - Question: But, default move should be fine (duplicating pointers is bad, but moving them?)?
-    EventDrivenGP(EventDrivenGP &&) = default;
+    EventDrivenGP(EventDrivenGP &&) = default; // @amlalejini - TODO: copy pointers, set old to nullptr
     EventDrivenGP(const EventDrivenGP & in)
       : event_lib(in.event_lib), random_ptr(nullptr), random_owner(false),
         program(in.program), shared_mem_ptr(nullptr), execution_stacks(), core_spawn_queue(),
@@ -409,9 +397,11 @@ namespace emp {
       }
     }
 
+    // @amlalejini - TODO: define operator= (move version and copy version)
+
     /// Destructor - clean up: execution stacks, shared memory.
     ~EventDrivenGP() {
-      Reset();
+      ResetHardware(); // NOTE: can get rid post-pointer doom.
       if (random_owner) random_ptr.Delete();
       shared_mem_ptr.Delete();
     }
@@ -571,11 +561,12 @@ namespace emp {
 
     /// Find best matching functions (by ID) given affinity.
     emp::vector<size_t> FindBestFuncMatch(const affinity_t & affinity, double threshold) {
+      // TODO: get rid of max bind, update threshold everytime we find something better.
       double max_bind = -1;
       emp::vector<size_t> best_matches;
       for (size_t i=0; i < program.GetSize(); ++i) {
         double bind = SimpleMatchCoeff(program[i].affinity, affinity);
-        if (bind == max_bind && bind >= threshold) best_matches.push_back(i);
+        if (bind == max_bind) best_matches.push_back(i);
         else if (bind > max_bind && bind >= threshold) {
           best_matches.resize(1);
           best_matches[0] = i;

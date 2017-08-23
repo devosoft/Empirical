@@ -570,9 +570,10 @@ namespace emp {
     out_bits |= in2.template Export<NUM_BITS1+NUM_BITS2>();
   }
 
+  /// Computes simple matching coefficient (https://en.wikipedia.org/wiki/Simple_matching_coefficient).
   template <size_t NUM_BITS>
   double SimpleMatchCoeff(const BitSet<NUM_BITS> & in1, const BitSet<NUM_BITS> & in2) {
-    emp_assert(NUM_BITS > 0);
+    emp_assert(NUM_BITS > 0); // TODO: can be done with XOR
     return (double)((in1 & in2).CountOnes() + (~in1 & ~in2).CountOnes()) / (double)NUM_BITS;
   }
 
