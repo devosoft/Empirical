@@ -98,7 +98,7 @@ struct Environment {
 
 
 void Inst_SenseResource(emp::EventDrivenGP & hw, const inst_t & inst) {
-  state_t & state = *hw.GetCurState();
+  state_t & state = hw.GetCurState();
   hw.TriggerEvent("SenseResource"); // Event dispatch should do the sensing.
   state.SetLocal(inst.args[0], hw.GetTrait(TRAIT_ID__RES_SENSOR));
 }

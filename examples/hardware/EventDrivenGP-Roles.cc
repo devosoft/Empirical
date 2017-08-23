@@ -180,22 +180,22 @@ struct Deme {
 
 // Some extra instructions for this experiment.
 void Inst_GetRoleID(emp::EventDrivenGP & hw, const inst_t & inst) {
-  state_t & state = *hw.GetCurState();
+  state_t & state = hw.GetCurState();
   state.SetLocal(inst.args[0], hw.GetTrait(TRAIT_ID__ROLE_ID));
 }
 
 void Inst_SetRoleID(emp::EventDrivenGP & hw, const inst_t & inst) {
-  state_t & state = *hw.GetCurState();
+  state_t & state = hw.GetCurState();
   hw.SetTrait(TRAIT_ID__ROLE_ID, (int)state.AccessLocal(inst.args[0]));
 }
 
 void Inst_GetXLoc(emp::EventDrivenGP & hw, const inst_t & inst) {
-  state_t & state = *hw.GetCurState();
+  state_t & state = hw.GetCurState();
   state.SetLocal(inst.args[0], hw.GetTrait(TRAIT_ID__X_LOC));
 }
 
 void Inst_GetYLoc(emp::EventDrivenGP & hw, const inst_t & inst) {
-  state_t & state = *hw.GetCurState();
+  state_t & state = hw.GetCurState();
   state.SetLocal(inst.args[0], hw.GetTrait(TRAIT_ID__Y_LOC));
 }
 

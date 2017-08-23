@@ -98,6 +98,8 @@ namespace emp {
       State(Ptr<memory_t> _shared_mem_ptr, bool _is_main=false)
         : shared_mem_ptr(_shared_mem_ptr), local_mem(), input_mem(), output_mem(),
           func_ptr(0), inst_ptr(0), block_stack(), is_main(_is_main) { ; }
+      State(const State &) = default;
+      State(State &&) = default;
 
       void Reset() {
         local_mem.clear();
@@ -339,7 +341,7 @@ namespace emp {
     };
 
     using program_t = Program;
-    //using program_t = emp::vector<Function>;
+    using exec_stk_t = emp::vector<State>;
     using fun_event_handler_t = std::function<void(EventDrivenGP &, const event_t &)>;
 
   protected:
@@ -351,9 +353,9 @@ namespace emp {
     program_t program;              // Program (set of functions).
     Ptr<memory_t> shared_mem_ptr;   // Pointer to shared memory.
     // Using ptrs to vectors so I can easily shuffle execution stacks around (when a core dies and I need to keep the stacks vector de-fragmented)
-    emp::vector< Ptr< emp::vector<Ptr<State>> > > execution_stacks;
-    std::deque<Ptr<emp::vector<Ptr<State>> > > core_spawn_queue; // We don't want to spawn cores while processing the execution stacks during single process. Cores spawned during this time will be put into the queue to be spawned later.
-    Ptr<emp::vector<Ptr<State>>> cur_core;
+    emp::vector<Ptr<exec_stk_t>> execution_stacks;
+    std::deque<Ptr<exec_stk_t>> core_spawn_queue; // We don't want to spawn cores while processing the execution stacks during single process. Cores spawned during this time will be put into the queue to be spawned later.
+    Ptr<exec_stk_t> cur_core;
     std::deque<event_t> event_queue;
 
     emp::vector<double> traits;
@@ -369,7 +371,7 @@ namespace emp {
         event_queue(), traits(), errors(0), is_executing(false)
     {
       if (!rnd) NewRandom();
-      shared_mem_ptr.New();
+      shared_mem_ptr = NewPtr<memory_t>();
       // Spin up main core.
       SpawnCore(0, memory_t(), true);
       cur_core = execution_stacks[0];
@@ -438,18 +440,10 @@ namespace emp {
       event_queue.clear();
       event_queue.resize(0);
       // Clear out execution stacks.
-      for (size_t i = 0; i < execution_stacks.size(); i++) {
-        for (size_t k = 0; k < execution_stacks[i]->size(); k++) {
-          execution_stacks[i]->at(k).Delete();
-        } execution_stacks[i].Delete();
-      }
+      for (size_t i = 0; i < execution_stacks.size(); i++) { execution_stacks[i].Delete(); }
       execution_stacks.resize(0);
       // Clear out spawn core queue.
-      for (size_t i = 0; i < core_spawn_queue.size(); i++) {
-        for (size_t k = 0; k < core_spawn_queue[i]->size(); k++) {
-          core_spawn_queue[i]->at(k).Delete();
-        } core_spawn_queue[i].Delete();
-      }
+      for (size_t i = 0; i < core_spawn_queue.size(); i++) { core_spawn_queue[i].Delete(); }
       core_spawn_queue.resize(0);
 
       cur_core = nullptr;
@@ -469,11 +463,8 @@ namespace emp {
     const program_t & GetProgram() const { return program; }
 
     /// Get current execution core (call stack). Will be nullptr if no active cores.
-    Ptr<emp::vector<Ptr<State>>> GetCurExecStack() { return cur_core; }
-    Ptr<State> GetCurState() {
-      if (cur_core && !cur_core->empty()) return cur_core->back();
-      else return nullptr;
-    }
+    Ptr<exec_stk_t> GetCurExecStackPtr() { return cur_core; }
+    State & GetCurState() { emp_assert(cur_core && !cur_core->empty()); return cur_core->back(); }
     bool ValidPosition(size_t fID, size_t pos) const { return program.ValidPosition(fID, pos); }
     bool ValidFunction(size_t fID) const { return program.ValidFunction(fID); }
     double GetMinBindThresh() const { return MIN_BIND_THRESH; }
@@ -554,8 +545,7 @@ namespace emp {
     /// Handles closure of known, special block types appropriately:
     ///   * LOOPS - set cur_state's IP to beginning of block.
     void CloseBlock() {
-      emp_assert(GetCurState());  // Can't have no nullptrs 'round here.
-      State & state = *GetCurState();
+      State & state = GetCurState();
       // If there aren't any blocks to close, just return.
       if (state.block_stack.empty()) return;
       Block & block = state.block_stack.back();
@@ -573,16 +563,14 @@ namespace emp {
     }
 
     void OpenBlock(size_t begin, size_t end, BlockType type) {
-      emp_assert(GetCurState());
-      State & state = *GetCurState();
+      State & state = GetCurState();
       state.block_stack.emplace_back(begin, end, type);
     }
 
     /// If there's a block to break out of, break out (to eob).
     /// Otherwise, do nothing.
     void BreakBlock() {
-      emp_assert(GetCurState());
-      State & state = *GetCurState();
+      State & state = GetCurState();
       if (!state.block_stack.empty()) {
         state.SetIP(state.block_stack.back().end);
         state.block_stack.pop_back();
@@ -624,14 +612,12 @@ namespace emp {
     /// Initialize function state with provided input memory.
     void SpawnCore(size_t fID, const memory_t & input_mem=memory_t(), bool is_main=false) {
       if (execution_stacks.size() >= MAX_CORES) return;
-      Ptr<emp::vector<Ptr<State>>> stack;
-      stack.New();
-      Ptr<State> state;
-      state.New(shared_mem_ptr, is_main);
-      state->input_mem = input_mem;
-      state->SetIP(0);
-      state->SetFP(fID);
-      stack->push_back(state);
+      Ptr<exec_stk_t> stack = NewPtr<exec_stk_t>();
+      stack->emplace_back(shared_mem_ptr, is_main);
+      State & state = stack->at(stack->size() - 1);
+      state.input_mem = input_mem;
+      state.SetIP(0);
+      state.SetFP(fID);
       // Spin up new core (queue it if executing current cores).
       if (is_executing)
         core_spawn_queue.push_back(stack);
@@ -642,7 +628,6 @@ namespace emp {
     /// Call function with best affinity match above threshold.
     /// If not candidate functions found, do nothing.
     void CallFunction(const affinity_t & affinity, double threshold) {
-      emp_assert(GetCurState());
       // @amlalejini - TODO: memoize this function.
       // @amlalejini - TODO: move function finding to its own function.
       size_t fID;
@@ -656,49 +641,46 @@ namespace emp {
 
     /// Call function specified by fID.
     void CallFunction(size_t fID) {
-      emp_assert(GetCurState() && ValidPosition(fID, 0));
+      emp_assert(ValidPosition(fID, 0));
       // Are we at max call depth? -- If so, call fails.
-      if (GetCurExecStack()->size() >= MAX_CALL_DEPTH) return;
+      if (GetCurExecStackPtr()->size() >= MAX_CALL_DEPTH) return;
       // Grab pointer to caller.
-      Ptr<State> caller_state = GetCurState();
+      State & caller_state = GetCurState();
       // Make a new state, push onto call stack.
-      Ptr<State> new_state;
-      new_state.New(shared_mem_ptr);
-      GetCurExecStack()->push_back(new_state);
+      GetCurExecStackPtr()->emplace_back(shared_mem_ptr);
+      State & new_state = GetCurExecStackPtr()->at(GetCurExecStackPtr()->size() - 1);
       // Configure new state.
-      new_state->SetFP(fID);
-      new_state->SetIP(0);
-      for (auto mem : caller_state->local_mem) {
-        new_state->SetInput(mem.first, mem.second);
+      new_state.SetFP(fID);
+      new_state.SetIP(0);
+      for (auto mem : caller_state.local_mem) {
+        new_state.SetInput(mem.first, mem.second);
       }
     }
 
     /// Return from current function call (cur_state) in current core (cur_core).
     /// Upon returning, put values in output memory of returning state into local memory of caller state.
     void ReturnFunction() {
-      emp_assert(GetCurState());
       // Grab the returning state and then pop it off the call stack.
-      Ptr<State> returning_state = GetCurState();
+      State & returning_state = GetCurState();
       // No returning from main.
-      if (returning_state->IsMain()) return;
-      GetCurExecStack()->pop_back();
+      if (returning_state.IsMain()) return;
       // Is there anything to return to?
-      if (Ptr<State> caller_state = GetCurState()) {
+      if (GetCurExecStackPtr()->size() > 1) {
         // If so, copy returning state's output memory into caller state's local memory.
-        for (auto mem : returning_state->output_mem) {
-          caller_state->SetLocal(mem.first, mem.second);
-        }
+        State & caller_state = GetCurExecStackPtr()->at(GetCurExecStackPtr()->size() - 2);
+        for (auto mem : returning_state.output_mem) caller_state.SetLocal(mem.first, mem.second);
       }
-      returning_state.Delete();
+      // Pop returned state.
+      GetCurExecStackPtr()->pop_back();
     }
 
     // -- Execution --
     /// Process a single instruction, provided by the caller.
-    void ProcessInst(const inst_t & inst) { emp_assert(GetCurState()); program.inst_lib->ProcessInst(*this, inst); }
+    void ProcessInst(const inst_t & inst) { program.inst_lib->ProcessInst(*this, inst); }
     /// Handle an event (on this hardware).
-    void HandleEvent(const event_t & event) { emp_assert(GetCurState()); event_lib->HandleEvent(*this, event); }
+    void HandleEvent(const event_t & event) { event_lib->HandleEvent(*this, event); }
     /// Trigger an event (from this hardware).
-    void TriggerEvent(const event_t & event) { emp_assert(GetCurState()); event_lib->TriggerEvent(*this, event); }
+    void TriggerEvent(const event_t & event) { event_lib->TriggerEvent(*this, event); }
     /// Trigger an event (from this hardware).
     void TriggerEvent(const std::string & name, const affinity_t & affinity=affinity_t(),
                       const memory_t & msg=memory_t(), const properties_t & properties=properties_t()) {
@@ -730,7 +712,6 @@ namespace emp {
     void SingleProcess() {
       emp_assert(program.GetSize()); // Must have a program before this is allowed.
       // Handle events.
-      std::cout << "Single process." << std::endl;
       while (!event_queue.empty()) {
         HandleEvent(event_queue.front());
         event_queue.pop_front();
@@ -750,26 +731,26 @@ namespace emp {
         }
         // Execute the core.
         //  * What function/instruction am I on?
-        Ptr<State> cur_state = cur_core->back();
-        const size_t ip = cur_state->inst_ptr;
-        const size_t fp = cur_state->func_ptr;
+        State & cur_state = cur_core->back();
+        const size_t ip = cur_state.inst_ptr;
+        const size_t fp = cur_state.func_ptr;
         // fp needs to be valid here (and always, really). Shame shame if it's not.
         emp_assert(ValidFunction(fp));
         // If instruction pointer hanging off end of function sequence:
         if (ip >= program[fp].GetSize()) {
-          if (!cur_state->block_stack.empty()) {
+          if (!cur_state.block_stack.empty()) {
             //    - If there's a block to close, close it.
             CloseBlock();
-          } else if (cur_state->is_main && cur_core->size() == 1) {
+          } else if (cur_state.is_main && cur_core->size() == 1) {
             //    - If this is the main function, and we're at the bottom of the call stack, wrap.
-            cur_state->inst_ptr = 0;
+            cur_state.inst_ptr = 0;
           } else {
             //    - Otherwise, return from function call.
             ReturnFunction();
           }
         } else { // If instruction pointer is valid:
           // First, advance the instruction pointer by 1. This may invalidate the IP, but that's okay.
-          cur_state->inst_ptr += 1;
+          cur_state.inst_ptr += 1;
           // Run instruction @ fp, ip.
           program.inst_lib->ProcessInst(*this, program[fp].inst_seq[ip]);
         }
@@ -792,7 +773,6 @@ namespace emp {
         execution_stacks.push_back(core_spawn_queue.front());
         core_spawn_queue.pop_front();
       }
-      std::cout << "Done with single process." << std::endl;
     }
     /// Advance hardware by some number instructions.
     void Process(size_t num_inst) {
@@ -849,12 +829,12 @@ namespace emp {
       os << "\n";
       // Print each core.
       for (size_t i = 0; i < execution_stacks.size(); ++i) {
-        const emp::vector<Ptr<State>> & stack = *(execution_stacks[i]);
+        const exec_stk_t & stack = *(execution_stacks[i]);
         os << "Core " << i << ":\n" << "  Call stack (" << stack.size() << "):\n    --TOP--\n";
         for (size_t k = stack.size() - 1; k < stack.size(); --k) {
           emp_assert(stack.size() != (size_t)-1);
           // IP, FP, local mem, input mem, output mem
-          const State & state = *(stack[k]);
+          const State & state = stack[k];
           os << "    Inst ptr: " << state.inst_ptr << " (";
           if (ValidPosition(state.func_ptr, state.inst_ptr))
             PrintInst(GetInst(state.func_ptr, state.inst_ptr), os);
@@ -914,66 +894,66 @@ namespace emp {
     //    [x] Send
 
     static void Inst_Inc(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       ++state.AccessLocal(inst.args[0]);
     }
 
     static void Inst_Dec(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       --state.AccessLocal(inst.args[0]);
     }
 
     static void Inst_Not(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       state.SetLocal(inst.args[0], state.GetLocal(inst.args[0]) == 0.0);
     }
 
     static void Inst_Add(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) + state.AccessLocal(inst.args[1]));
     }
 
     static void Inst_Sub(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) - state.AccessLocal(inst.args[1]));
     }
 
     static void Inst_Mult(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) * state.AccessLocal(inst.args[1]));
     }
 
     static void Inst_Div(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       const double denom = state.AccessLocal(inst.args[1]);
       if (denom == 0.0) ++hw.errors;
       else state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) / denom);
     }
 
     static void Inst_Mod(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       const int base = (int)state.AccessLocal(inst.args[1]);
       if (base == 0) ++hw.errors;
       else state.SetLocal(inst.args[2], (int)state.AccessLocal(inst.args[0]) % base);
     }
 
     static void Inst_TestEqu(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) == state.AccessLocal(inst.args[1]));
     }
 
     static void Inst_TestNEqu(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) != state.AccessLocal(inst.args[1]));
     }
 
     static void Inst_TestLess(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) < state.AccessLocal(inst.args[1]));
     }
 
     static void Inst_If(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       // Find EOBLK.
       size_t eob = hw.FindEndOfBlock(state.GetFP(), state.GetIP());
       if (state.AccessLocal(inst.args[0]) == 0.0) {
@@ -988,7 +968,7 @@ namespace emp {
     }
 
     static void Inst_While(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       size_t eob = hw.FindEndOfBlock(state.GetFP(), state.GetIP());
       if (state.AccessLocal(inst.args[0]) == 0.0) {
         // Skip to EOBLK.
@@ -1002,7 +982,7 @@ namespace emp {
     }
 
     static void Inst_Countdown(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       size_t eob = hw.FindEndOfBlock(state.GetFP(), state.GetIP());
       if (state.AccessLocal(inst.args[0]) == 0.0) {
         // Skip to EOBLK.
@@ -1034,51 +1014,51 @@ namespace emp {
     }
 
     static void Inst_SetMem(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       state.SetLocal(inst.args[0], (double)inst.args[1]);
     }
 
     static void Inst_CopyMem(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       state.SetLocal(inst.args[1], state.AccessLocal(inst.args[0]));
     }
 
     static void Inst_SwapMem(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       double val0 = state.AccessLocal(inst.args[0]);
       state.SetLocal(inst.args[0], state.GetLocal(inst.args[1]));
       state.SetLocal(inst.args[1], val0);
     }
 
     static void Inst_Input(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       state.SetLocal(inst.args[1], state.AccessInput(inst.args[0]));
     }
 
     static void Inst_Output(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       state.SetOutput(inst.args[1], state.AccessLocal(inst.args[0]));
     }
 
     static void Inst_Commit(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       state.SetShared(inst.args[1], state.AccessLocal(inst.args[0]));
     }
 
     static void Inst_Pull(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       state.SetLocal(inst.args[1], state.AccessShared(inst.args[0]));
     }
 
     static void Inst_Nop(EventDrivenGP & hw, const inst_t & inst) { ; }
 
     static void Inst_BroadcastMsg(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       hw.TriggerEvent("Message", inst.affinity, state.output_mem, {"broadcast"});
     }
 
     static void Inst_SendMsg(EventDrivenGP & hw, const inst_t & inst) {
-      State & state = *hw.GetCurState();
+      State & state = hw.GetCurState();
       hw.TriggerEvent("Message", inst.affinity, state.output_mem, {"send"});
     }
 
