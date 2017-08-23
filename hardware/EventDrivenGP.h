@@ -397,7 +397,6 @@ namespace emp {
         is_executing(in.is_executing)
     {
       // This seems so nasty...
-      std::cout << "Copy construct!" << std::endl;
       if (in.random_owner) NewRandom(); // New random number generator.
       else random_ptr = in.random_ptr;
       shared_mem_ptr.New(*(in.shared_mem_ptr)); // New shared memory.
@@ -621,7 +620,6 @@ namespace emp {
     /// If not candidate functions found, do nothing.
     void CallFunction(const affinity_t & affinity, double threshold) {
       // @amlalejini - TODO: memoize this function.
-      // @amlalejini - TODO: move function finding to its own function.
       size_t fID;
       emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, threshold));
       if (best_matches.empty()) return;
