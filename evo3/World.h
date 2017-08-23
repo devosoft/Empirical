@@ -259,14 +259,14 @@ namespace emp {
 
     /// Retrieve a const reference to the organsim as the specified position.
     /// Same as operator[]; will trip assert if cell is not occupied.
-    const ORG & GetOrg(size_t id) const {
+    ORG & GetOrg(size_t id) {
       emp_assert(pop[id] != nullptr, id);  // Should not index to a null organism!
       return *(pop[id]);
     }
 
     /// Retrieve a const reference to the organsim as the specified x,y coordinates.
     /// (currently used only in a grid world)
-    const ORG & GetOrg(size_t x, size_t y) const { return GetOrg(x+y*size_x); }
+    ORG & GetOrg(size_t x, size_t y) { return GetOrg(x+y*size_x); }
 
     /// Retrive a pointer to the contents of a speciefied cell; will be nullptr if the cell is
     /// not occupied.
@@ -448,7 +448,7 @@ namespace emp {
 
     /// Reset the hardware for all organisms.
     void ResetHardware() {
-      for (Ptr<ORG> org : pop) { if (org) org->ResetHardware(); }      
+      for (Ptr<ORG> org : pop) { if (org) org->ResetHardware(); }
     }
 
     // --- CALCULATE FITNESS ---
@@ -541,6 +541,8 @@ namespace emp {
     /// Get the id of a random *occupied* cell.
     size_t GetRandomOrgID();
 
+    /// Get an organism from a random occupied cell.
+    ORG & GetRandomOrg() { return *pop[GetRandomOrgID()]; }
 
     // --- POPULATION ANALYSIS ---
 

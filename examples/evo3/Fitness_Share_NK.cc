@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../evo/NK-const.h"
+#include "../../evo3/NK-const.h"
 #include "../../evo3/World.h"
 #include "../../tools/BitSet.h"
 #include "../../tools/Random.h"
