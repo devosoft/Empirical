@@ -10,7 +10,7 @@
 #include <string>
 #include <unordered_set>
 
-#include "../../tools/BitSet.h"
+#include "tools/BitSet.h"
 
 constexpr int set_size = 100000;
 

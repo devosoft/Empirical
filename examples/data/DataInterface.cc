@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../data/DataInterface.h"
+#include "data/DataInterface.h"
 
 using data = emp::data;
 

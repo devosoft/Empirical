@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../evo3/Systematics.h"
+#include "evo3/Systematics.h"
 
 int main()
 {

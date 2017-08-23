@@ -11,8 +11,8 @@
 
 #include <iostream>
 
-#include "../../evo3/World.h"
-#include "../../tools/Random.h"
+#include "evo3/World.h"
+#include "tools/Random.h"
 
 int main() {
   emp::World<int> world;
