@@ -115,6 +115,7 @@ double EvalGame(othello_ai_t & player0, othello_ai_t & player1,
   emp::Othello game(cur_player==0); // Check to see if Black's turn
   int boardSize = game.GetBoardSize();
   size_t round = 0, errors = 0; 
+  double score = 0;
   while (game.IsDone() == false) {
       // Determine the current player and their move.
     game.ClearValidMoves();
@@ -122,7 +123,7 @@ double EvalGame(othello_ai_t & player0, othello_ai_t & player1,
     auto & play_fun = (cur_player == 0) ? player0 : player1;
     size_t best_move = play_fun(game);
     std::pair<int, int> best = game.GetCoord(best_move);
-
+    score++;
     if (verbose) {
       std::cout << "round = " << round++ << "   errors = " << errors << std::endl;
       game.Print();
@@ -136,12 +137,8 @@ double EvalGame(othello_ai_t & player0, othello_ai_t & player1,
     // If the chosen move is illegal, shift through other options.
     size_t player = 1;
     if (cur_player) { player = 2; }
-    while (game.IsMoveValid(player, best) == 0 || game.GetSquare(best.first, best.second) != 0) {  
-      if (cur_player == 0) errors++;
-      if (++best_move >= boardSize * boardSize) { best_move = 0; }
-      best = game.GetCoord(best_move);
-      game.ClearFlips();
-      game.ClearValidMoves();
+    if (game.IsMoveValid(player, best) == 0 || game.GetSquare(best.first, best.second) != 0) {  
+      break; //TODO Does this make sense?
       
     }
     if (verbose){
@@ -157,6 +154,11 @@ double EvalGame(othello_ai_t & player0, othello_ai_t & player1,
     //else { if (verbose) std::cout<<"AGAIN!!!!!!!!!"<<std::endl; }
   }
 
+  if (game.IsDone()){
+    score += 100; // Reward for completion of a game TODO Does below make sense?
+    score += ((double) game.GetScore(1)) - ((double) game.GetScore(2));
+  }
+
   if (verbose) {
     game.Print();
     std::cout << "Final scores -- Black: " << game.GetScore(1)
@@ -164,7 +166,7 @@ double EvalGame(othello_ai_t & player0, othello_ai_t & player1,
               << std::endl;
   }
 
-  return ((double) game.GetScore(1)) - ((double) game.GetScore(2)) - ((double) errors * 10.0);
+  return score;
 };
 
 // Build wrappers for AvidaGP
@@ -194,9 +196,9 @@ int main(int argc, char* argv[])
   emp::Random random;
   random.ResetSeed(seed);
   std::cout<<"SEED: "<<random.GetSeed()<<std::endl;
-  //emp::evo::EAWorld<emp::AvidaGP, emp::evo::FitCacheOn> world(random, "AvidaWorld"); // FitCache on
-  emp::evo::EAWorld<emp::AvidaGP> world(random, "AvidaWorld"); //FitCache off
-  auto testcases = TestcaseSet<64>("../../data/game_0.csv", &random);
+  emp::evo::EAWorld<emp::AvidaGP, emp::evo::FitCacheOn> world(random, "AvidaWorld"); // FitCache on
+  //emp::evo::EAWorld<emp::AvidaGP> world(random, "AvidaWorld"); //FitCache off
+  auto testcases = TestcaseSet<64>("../games/data/game_0.csv", &random);
   std::function<std::set<int>(emp::array<int, 64>)> cornerFunc = [](emp::array<int, 64> board){
     std::set<int> moves;
     emp::Othello game(0);
@@ -341,14 +343,20 @@ int main(int argc, char* argv[])
     // Keep the best individual.
     world.EliteSelect(fit_fun, 1, 1);
     // Run a tournament for each spot.
-    //world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE-1);
+    world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE-1);
     //fit_set.push_back(fit_fun);
     //world.LexicaseSelect(fit_set, POP_SIZE-1);
     //world.EcoSelect(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
-    world.EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
+    //world.EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
+    fit_fun.Clear();
     world.Update();
     std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
-
+    if (ud % 100 == 0){
+      for (int i = 0; i < POP_SIZE; i++){
+        std::cout<<fit_fun(&(world[i]))<< " ";
+      }
+      std::cout<<std::endl;
+    }
     // Mutate all but the first organism.
     world.MutatePop(1);
   }
