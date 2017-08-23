@@ -1,5 +1,5 @@
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -Wno-unused-function -std=c++14 -I../../
+CFLAGS_all := -Wall -Wno-unused-function -std=c++14 -I../../source/
 
 # Emscripten compiler information
 CXX_web := emcc
@@ -13,7 +13,7 @@ OFLAGS_web_braces := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_
 #OFLAGS_web := -O3 -Werror -DNDEBUG -s TOTAL_MEMORY=67108864
 
 
-CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../web/library_emp.js --js-library ../../web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
+CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../source/web/library_emp.js --js-library ../../source/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 default: all
 all: JSWrap.js js_utils.js test_visualizations.js
