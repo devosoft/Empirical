@@ -19,6 +19,7 @@ struct TestOrg1 {
   bool DoMutate(emp::Random&) { return false; }
 
   bool operator==(const TestOrg1 & in) const { return fitness == in.fitness; }
+  bool operator!=(const TestOrg1 & in) const { return fitness != in.fitness; }
 };
 
 int main() {
