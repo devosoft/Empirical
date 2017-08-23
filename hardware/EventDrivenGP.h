@@ -345,7 +345,7 @@ namespace emp {
     using fun_event_handler_t = std::function<void(EventDrivenGP &, const event_t &)>;
 
   protected:
-    Ptr<const event_lib_t> event_lib;    // Event library.
+    Ptr<const event_lib_t> event_lib;     // Event library.
 
     Ptr<Random> random_ptr;
     bool random_owner;
@@ -390,32 +390,25 @@ namespace emp {
     //  - Issue: EventDrivenGP has some pointers that can't just be default copied on a copy.
     //  - Question: But, default move should be fine (duplicating pointers is bad, but moving them?)?
     EventDrivenGP(EventDrivenGP &&) = default;
-    //
-    // EventDrivenGP(const EventDrivenGP &) = default;
-    /*
-    [x] event_lib --> copy ptr
-    [x] random_ptr --> if in.owner: make new; else copy ptr.
-    [x] random_owner --> set false
-    [x] program --> copy in.program
-    [x] shared_mem_ptr --> create new shared memory that is copy of in.shared_mem
-    [ ] execution_stacks
-    [ ] core_spawn_queue
-    [ ] cur_core
-    [ ] event_queue
-    [ ] traits
-    [ ] errors
-    [ ] is_executing
-    */
-    // EventDrivenGP(const EventDrivenGP & in)
-    //   : inst_lib(in.inst_lib), event_lib(in.event_lib), random_ptr(nullptr), random_owner(false),
-    //     program(in.program), shared_mem_ptr(nullptr), execution_stacks(), core_spawn_queue(),
-    //     cur_core(nullptr), event_queue(), traits(), errors(0), is_executing(false)
-    // {
-    //   std::cout << "Copy construct!" << std::endl;
-    //   if (in.random_owner) NewRandom(); // New random number generator.
-    //   else random_ptr = in.random_ptr;
-    //   shared_mem_ptr.New(*(in.shared_mem_ptr)); // New shared memory.
-    // }
+    EventDrivenGP(const EventDrivenGP & in)
+      : event_lib(in.event_lib), random_ptr(nullptr), random_owner(false),
+        program(in.program), shared_mem_ptr(nullptr), execution_stacks(), core_spawn_queue(),
+        cur_core(nullptr), event_queue(in.event_queue), traits(in.traits), errors(in.errors),
+        is_executing(in.is_executing)
+    {
+      // This seems so nasty...
+      std::cout << "Copy construct!" << std::endl;
+      if (in.random_owner) NewRandom(); // New random number generator.
+      else random_ptr = in.random_ptr;
+      shared_mem_ptr.New(*(in.shared_mem_ptr)); // New shared memory.
+      for (size_t i = 0; i < in.execution_stacks.size(); ++i) {
+        execution_stacks.emplace_back(NewPtr<exec_stk_t>(*in.execution_stacks[i]));
+        if (in.cur_core == execution_stacks[i]) cur_core = execution_stacks[execution_stacks.size() - 1];
+      }
+      for (size_t i = 0; i < in.core_spawn_queue.size(); ++i) {
+        core_spawn_queue.emplace_back(NewPtr<exec_stk_t>(*in.core_spawn_queue[i]));
+      }
+    }
 
     /// Destructor - clean up: execution stacks, shared memory.
     ~EventDrivenGP() {
@@ -428,7 +421,6 @@ namespace emp {
     /// Reset everything, including program.
     void Reset() {
       traits.resize(0);
-      //program.resize(0);  // Clear out program.
       program.Clear();
       ResetHardware();
     }
