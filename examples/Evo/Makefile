@@ -24,7 +24,7 @@ CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../source/web/
 
 TARGETS := AvidaGP-Evo AvidaGP-Mancala Fitness_Share_NK Grid NK Roulette Systematics World World2
 
-EVO_DEPEND := ../../source/evo3/World.h
+EVO_DEPEND := ../../source/Evo/World.h
 
 default: native
 

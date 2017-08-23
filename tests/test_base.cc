@@ -19,12 +19,12 @@
 #include <sstream>
 #include <string>
 
-#include "../base/array.h"
-#include "../base/Ptr.h"
-#include "../base/assert.h"
-#include "../base/macro_math.h"
-#include "../base/macros.h"
-#include "../base/vector.h"
+#include "base/array.h"
+#include "base/Ptr.h"
+#include "base/assert.h"
+#include "base/macro_math.h"
+#include "base/macros.h"
+#include "base/vector.h"
 
 
 // "Macros testing macros...Oh dear..."

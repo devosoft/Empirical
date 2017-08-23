@@ -7,8 +7,8 @@
 
 #include <iostream>
 
-#include "evo3/NK-const.h"
-#include "evo3/World.h"
+#include "Evo/NK-const.h"
+#include "Evo/World.h"
 #include "tools/BitSet.h"
 #include "tools/Random.h"
 #include "tools/string_utils.h"

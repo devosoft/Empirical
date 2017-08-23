@@ -8,7 +8,7 @@
 #include "hardware/AvidaGP.h"
 #include "hardware/InstLib.h"
 #include "tools/Random.h"
-#include "evo3/World.h"
+#include "Evo/World.h"
 
 constexpr size_t POP_SIZE = 20;
 constexpr size_t GENOME_SIZE = 100;

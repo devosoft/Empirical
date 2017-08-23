@@ -8,8 +8,8 @@
 #include <iostream>
 
 #include "config/ArgManager.h"
-#include "evo3/NK.h"
-#include "evo3/World.h"
+#include "Evo/NK.h"
+#include "Evo/World.h"
 #include "tools/BitVector.h"
 #include "tools/Random.h"
 
