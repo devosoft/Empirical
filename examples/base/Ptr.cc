@@ -82,7 +82,7 @@ int main()
   // create a vector of pointers
   emp::vector<emp::Ptr<char>> v_ptr(26);
   for (size_t i = 0; i < v_ptr.size(); i++) {
-    v_ptr[i] = emp::NewPtr<char>('A' + i);
+    v_ptr[i] = emp::NewPtr<char>((char)('A' + i));
   }
   // print the pointer contents.
   std::cout << "Chars: ";
