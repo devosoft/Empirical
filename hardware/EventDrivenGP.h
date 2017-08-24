@@ -16,17 +16,6 @@
 #include "../control/SignalControl.h"
 #include "../control/Signal.h"
 
-// EventDrivenGP -- Event handling, core management, interprets instruction sequences.
-//  * CPU responsibilities
-//  * vector<vector<CPU_State*>*> execution_stacks;
-//  * cur_core
-//  * memory_t* shared_memory (responsible)
-//  * vector<Function> program
-// State (internal struct)
-//  * local_memory
-//  * input_buffer
-//  * output_buffer
-
 // Notes:
 //  * Important concept: Main state (bottom-most call state on core 0's call stack).
 //    * The first function will be main (unless the fp on the initially created state is otherwise manipulated).
@@ -34,6 +23,7 @@
 
 // @amlalejini - TODO:
 //  [ ] Write some halfway decent documentation. --> Use doxygen notation. Every instance variable, every function.
+//  [ ] Write up a nice description.
 //  [x] Parameterize static constexpr variables.
 //  [ ] Make class templated, have a using statement to specify 8 cleanly
 
@@ -79,8 +69,8 @@ namespace emp {
         : begin(_begin), end(_end), type(_type) { ; }
     };
 
+    /// Struct to maintain local program state for a given function call.
     struct State {
-      Ptr<memory_t> shared_mem_ptr; // @amlalejini - TODO: can get rid of this pointer, move to instance variable
       memory_t local_mem;
       memory_t input_mem;
       memory_t output_mem;
@@ -91,10 +81,9 @@ namespace emp {
       emp::vector<Block> block_stack;
       bool is_main;
 
-      State(Ptr<memory_t> _shared_mem_ptr, mem_val_t _default_mem_val = 0.0, bool _is_main=false)
-        : shared_mem_ptr(_shared_mem_ptr), local_mem(), input_mem(), output_mem(),
-          default_mem_val(_default_mem_val), func_ptr(0), inst_ptr(0), block_stack(),
-          is_main(_is_main) { ; }
+      State(mem_val_t _default_mem_val = 0.0, bool _is_main=false)
+        : local_mem(), input_mem(), output_mem(), default_mem_val(_default_mem_val),
+          func_ptr(0), inst_ptr(0), block_stack(), is_main(_is_main) { ; }
       State(const State &) = default;
       State(State &&) = default;
 
@@ -124,13 +113,11 @@ namespace emp {
       mem_val_t GetLocal(mem_key_t key) const { return Find(local_mem, key, default_mem_val); }
       mem_val_t GetInput(mem_key_t key) const { return Find(input_mem, key, default_mem_val); }
       mem_val_t GetOutput(mem_key_t key) const { return Find(output_mem, key, default_mem_val); }
-      mem_val_t GetShared(mem_key_t key) const { return Find(*shared_mem_ptr, key, default_mem_val); }
 
       /// SetXMemory functions set memory location (specified by key) to value.
       void SetLocal(mem_key_t key, mem_val_t value) { local_mem[key] = value; }
       void SetInput(mem_key_t key, mem_val_t value) { input_mem[key] = value; }
       void SetOutput(mem_key_t key, mem_val_t value) { output_mem[key] = value; }
-      void SetShared(mem_key_t key, mem_val_t value) { (*shared_mem_ptr)[key] = value; }
 
       /// AccessXMemory functions return reference to memory location value if that location exists.
       /// If the location does not exist, set to default memory value and return reference to memory location value.
@@ -146,11 +133,6 @@ namespace emp {
         if (!Has(output_mem, key)) output_mem[key] = default_mem_val;
         return output_mem[key];
       }
-      mem_val_t & AccessShared(mem_key_t key) {
-        if (!Has(*shared_mem_ptr, key)) (*shared_mem_ptr)[key] = default_mem_val;
-        return (*shared_mem_ptr)[key];
-      }
-
     };
 
     struct Instruction {
@@ -198,7 +180,6 @@ namespace emp {
         return inst_seq == in.inst_seq && affinity == in.affinity;
       }
       bool operator!=(const Function & in) const { return !(*this == in); }
-
     };
 
     struct Program {
@@ -338,7 +319,7 @@ namespace emp {
     bool random_owner;
 
     program_t program;              // Program (set of functions).
-    Ptr<memory_t> shared_mem_ptr;   // Pointer to shared memory. @amlalejini - TODO: make this not a pointer
+    memory_t shared_mem;
     // Using ptrs to vectors so I can easily shuffle execution stacks around (when a core dies and I need to keep the stacks vector de-fragmented)
     emp::vector<Ptr<exec_stk_t>> execution_stacks;  // @amlalejini - TODO: get rid of pointers, just manage an array/vector of size core count
     std::deque<Ptr<exec_stk_t>> core_spawn_queue; // We don't want to spawn cores while processing the execution stacks during single process. Cores spawned during this time will be put into the queue to be spawned later.
@@ -363,13 +344,12 @@ namespace emp {
     /// post-construction.
     EventDrivenGP_AW(Ptr<const inst_lib_t> _ilib, Ptr<const event_lib_t> _elib, Ptr<Random> rnd=nullptr)
       : event_lib(_elib), random_ptr(rnd), random_owner(false), program(_ilib),
-        shared_mem_ptr(nullptr), execution_stacks(), core_spawn_queue(), cur_core(nullptr),
+        shared_mem(), execution_stacks(), core_spawn_queue(), cur_core(nullptr),
         event_queue(), traits(), errors(0), max_cores(8), max_call_depth(128),
         default_mem_value(0.0), min_bind_thresh(0.5),
         stochastic_fun_call(true), is_executing(false)
     {
       if (!rnd) NewRandom();
-      shared_mem_ptr = NewPtr<memory_t>();
       // Spin up main core.
       SpawnCore(0, memory_t(), true);
       cur_core = execution_stacks[0];
@@ -390,14 +370,13 @@ namespace emp {
     EventDrivenGP_AW(EventDrivenGP_t &&) = default; // @amlalejini - TODO: copy pointers, set old to nullptr
     EventDrivenGP_AW(const EventDrivenGP_t & in)
       : event_lib(in.event_lib), random_ptr(nullptr), random_owner(false),
-        program(in.program), shared_mem_ptr(nullptr), execution_stacks(), core_spawn_queue(),
+        program(in.program), shared_mem(in.shared_mem), execution_stacks(), core_spawn_queue(),
         cur_core(nullptr), event_queue(in.event_queue), traits(in.traits), errors(in.errors),
         is_executing(in.is_executing)
     {
       // This seems so nasty...
       if (in.random_owner) NewRandom(); // New random number generator.
       else random_ptr = in.random_ptr;
-      shared_mem_ptr.New(*(in.shared_mem_ptr)); // New shared memory.
       for (size_t i = 0; i < in.execution_stacks.size(); ++i) {
         execution_stacks.emplace_back(NewPtr<exec_stk_t>(*in.execution_stacks[i]));
         if (in.cur_core == execution_stacks[i]) cur_core = execution_stacks[execution_stacks.size() - 1];
@@ -413,7 +392,6 @@ namespace emp {
     ~EventDrivenGP_AW() {
       ResetHardware(); // NOTE: can get rid post-pointer doom.
       if (random_owner) random_ptr.Delete();
-      shared_mem_ptr.Delete();
     }
 
     // -- Control --
@@ -426,7 +404,7 @@ namespace emp {
 
     /// Reset only CPU hardware stuff, not program.
     void ResetHardware() {
-      shared_mem_ptr->clear();
+      shared_mem.clear();
       // Clear event queue
       event_queue.clear();
       event_queue.resize(0);
@@ -453,7 +431,6 @@ namespace emp {
     }
     const program_t & GetProgram() const { return program; }
 
-
     /// Get current execution core (call stack). Will be nullptr if no active cores.
     Ptr<exec_stk_t> GetCurExecStackPtr() { return cur_core; }
     State & GetCurState() { emp_assert(cur_core && !cur_core->empty()); return cur_core->back(); }
@@ -466,7 +443,16 @@ namespace emp {
     bool IsStochasticFunCall() const { return stochastic_fun_call; }
     double GetTrait(size_t id) const { return traits[id]; }
 
-    // -- Configuration --
+    memory_t & GetSharedMem() { return shared_mem; }
+    mem_val_t GetShared(mem_key_t key) const { return Find(shared_mem, key, default_mem_value); }
+    void SetShared(mem_key_t key, mem_val_t value) { shared_mem[key] = value; }
+    mem_val_t & AccessShared(mem_key_t key) {
+      if (!Has(shared_mem, key)) shared_mem[key] = default_mem_value;
+      return (shared_mem)[key];
+    }
+
+    // ------- Configuration -------
+
     /// Set minimum binding threshold.
     /// REQ: val >= 0
     void SetMinBindThresh(double val) { emp_assert(val >= 0.0); min_bind_thresh = val; }
@@ -625,7 +611,7 @@ namespace emp {
     void SpawnCore(size_t fID, const memory_t & input_mem=memory_t(), bool is_main=false) {
       if (execution_stacks.size() >= max_cores) return;
       Ptr<exec_stk_t> stack = NewPtr<exec_stk_t>();
-      stack->emplace_back(shared_mem_ptr, is_main);
+      stack->emplace_back(is_main);
       State & state = stack->at(stack->size() - 1);
       state.input_mem = input_mem;
       state.SetIP(0);
@@ -658,7 +644,7 @@ namespace emp {
       // Grab pointer to caller.
       State & caller_state = GetCurState();
       // Make a new state, push onto call stack.
-      GetCurExecStackPtr()->emplace_back(shared_mem_ptr);
+      GetCurExecStackPtr()->emplace_back();
       State & new_state = GetCurExecStackPtr()->at(GetCurExecStackPtr()->size() - 1);
       // Configure new state.
       new_state.SetFP(fID);
@@ -831,7 +817,7 @@ namespace emp {
       //    ...
       // Print shared memory
       os << "Shared memory: ";
-      for (auto mem : *shared_mem_ptr) os << '{' << mem.first << ':' << mem.second << '}'; os << '\n';
+      for (auto mem : shared_mem) os << '{' << mem.first << ':' << mem.second << '}'; os << '\n';
       os << "Traits: "; PrintTraits(os); os << "\n";
       os << "Errors: " << errors << "\n";
       // Print events.
@@ -1053,12 +1039,12 @@ namespace emp {
 
     static void Inst_Commit(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
-      state.SetShared(inst.args[1], state.AccessLocal(inst.args[0]));
+      hw.SetShared(inst.args[1], state.AccessLocal(inst.args[0]));
     }
 
     static void Inst_Pull(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
-      state.SetLocal(inst.args[1], state.AccessShared(inst.args[0]));
+      state.SetLocal(inst.args[1], hw.AccessShared(inst.args[0]));
     }
 
     static void Inst_Nop(EventDrivenGP_t & hw, const inst_t & inst) { ; }
