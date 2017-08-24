@@ -7,6 +7,7 @@
 //
 //
 //  Developer Notes:
+//  * Should we save a copy of the original genome?  (or create a new "memory" member)
 //  * We should clean up how we handle scope; the root scope is zero, so the arg-based
 //    scopes are 1-16 (or however many).  Right now we increment the value in various places
 //    and should be more consistent.
@@ -57,6 +58,7 @@ namespace emp {
       void Set(size_t _id, size_t _a0=0, size_t _a1=0, size_t _a2=0)
 	      { id = _id; args[0] = _a0; args[1] = _a1; args[2] = _a2; }
 
+      bool operator==(const Instruction & in) const { return id == in.id && args == in.args; }
     };
 
     struct ScopeInfo {

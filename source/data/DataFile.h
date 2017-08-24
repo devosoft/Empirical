@@ -91,7 +91,7 @@ namespace emp {
     }
 
     // If a function takes an ostream, pass in the correct one.
-    size_t Add(const std::function<fun_t> & fun, const std::string & key, const std::string & desc) {
+    size_t Add(const std::function<void(std::ostream &)> & fun, const std::string & key, const std::string & desc) {
       size_t id = funs.GetSize();
       funs.Add(fun);
       keys.emplace_back(key);
@@ -99,9 +99,9 @@ namespace emp {
       return id;
     }
 
-    // If a function writes to a file directly, let it do so.
+    // Allow functions to be added whose output should be written to the file.
     template <typename T>
-    size_t Add(const std::function<T()> & fun, const std::string & key="", const std::string & desc="") {
+    size_t AddFun(const std::function<T()> & fun, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [fun](std::ostream & os){ os << fun(); };
       return Add(in_fun, key, desc);
     }
@@ -137,6 +137,14 @@ namespace emp {
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddMax(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMax(); };
+      return Add(in_fun, key, desc);
+    }
+    template <typename VAL_TYPE, emp::data... MODS>
+    size_t AddInferiority(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
+      std::function<fun_t> in_fun = [&node](std::ostream & os){
+        VAL_TYPE inf = (node.GetMax() == 0) ? 0 : (node.GetMean() / node.GetMax());
+        os << inf;
+      };
       return Add(in_fun, key, desc);
     }
   };

@@ -141,8 +141,14 @@ namespace web {
 
     operator bool() const { return info != nullptr; }
 
-    int GetXPos();
-    int GetYPos();
+    double GetXPos();
+    double GetYPos();
+    double GetWidth();
+    double GetHeight();
+    double GetInnerWidth();
+    double GetInnerHeight();
+    double GetOuterWidth();
+    double GetOuterHeight();
 
     // An active widget makes live changes to the webpage (once document is ready)
     // An inactive widget just records changes internally.
@@ -390,21 +396,64 @@ namespace web {
     return info ? info->extras.HasAttr(setting) : false;
   }
 
-  int Widget::GetXPos() {
-    if (!info) return -1;
-    return EM_ASM_INT({
+  double Widget::GetXPos() {
+    if (!info) return -1.0;
+    return EM_ASM_DOUBLE({
       var id = Pointer_stringify($0);
       var rect = $('#' + id).position();
       return rect.left;
     }, GetID().c_str());
   }
 
-  int Widget::GetYPos() {
-    if (!info) return -1;
-    return EM_ASM_INT({
+  double Widget::GetYPos() {
+    if (!info) return -1.0;
+    return EM_ASM_DOUBLE({
       var id = Pointer_stringify($0);
       var rect = $('#' + id).position();
       return rect.top;
+    }, GetID().c_str());
+  }
+
+  double Widget::GetWidth(){
+    if (!info) return -1.0;
+    return EM_ASM_DOUBLE({
+      var id = Pointer_stringify($0);
+      return $('#' + id).width();
+    }, GetID().c_str());
+  }
+  double Widget::GetHeight(){
+    if (!info) return -1.0;
+    return EM_ASM_DOUBLE({
+      var id = Pointer_stringify($0);
+      return $('#' + id).height();
+    }, GetID().c_str());
+  }
+  double Widget::GetInnerWidth(){
+    if (!info) return -1.0;
+    return EM_ASM_DOUBLE({
+      var id = Pointer_stringify($0);
+      return $('#' + id).innerWidth();
+    }, GetID().c_str());
+  }
+  double Widget::GetInnerHeight(){
+    if (!info) return -1.0;
+    return EM_ASM_DOUBLE({
+      var id = Pointer_stringify($0);
+      return $('#' + id).innerHeight();
+    }, GetID().c_str());
+  }
+  double Widget::GetOuterWidth(){
+    if (!info) return -1.0;
+    return EM_ASM_DOUBLE({
+      var id = Pointer_stringify($0);
+      return $('#' + id).outerWidth();
+    }, GetID().c_str());
+  }
+  double Widget::GetOuterHeight(){
+    if (!info) return -1.0;
+    return EM_ASM_DOUBLE({
+      var id = Pointer_stringify($0);
+      return $('#' + id).outerHeight();
     }, GetID().c_str());
   }
 
@@ -522,17 +571,20 @@ namespace web {
 
       // On with mouse coordinates.
       return_t & On(const std::string & event_name,
-                    const std::function<void(int,int)> & fun) {
+                    const std::function<void(double,double)> & fun) {
         emp_assert(info != nullptr);
         auto fun_cb = [this, fun](MouseEvent evt){
-          int x = evt.clientX - GetXPos();
-          int y = evt.clientY - GetYPos();
+          double x = evt.clientX - GetXPos();
+          double y = evt.clientY - GetYPos();
           fun(x,y);
         };
         size_t fun_id = JSWrap(fun_cb);
         DoListen(event_name, fun_id);
         return (return_t &) *this;
       }
+
+      // Window even listeners
+      template <typename T> return_t & OnResize(T && arg) { return On("resize", arg); }
 
       // Mouse event listeners
       template <typename T> return_t & OnClick(T && arg) { return On("click", arg); }
@@ -601,33 +653,42 @@ namespace web {
 
       // Position Manipulation
       return_t & Center() { return SetCSS("margin", "auto"); }
-      return_t & SetPosition(int x, int y, const std::string & unit="px") {
-        return SetCSS("position", "fixed",
-                      "left", emp::to_string(x, unit),
-                      "top", emp::to_string(y, unit));
+      return_t & SetPosition(int x, int y, const std::string & unit="px",
+                             const std::string & pos_type="absolute",
+                             const std::string & x_anchor="left",
+                             const std::string & y_anchor="top") {
+        return SetCSS("position", pos_type,
+                      x_anchor, emp::to_string(x, unit),
+                      y_anchor, emp::to_string(y, unit));
       }
-      return_t & SetPositionRT(int x, int y, const std::string & unit="px") {
-        return SetCSS("position", "fixed",
-                      "right", emp::to_string(x, unit),
-                      "top", emp::to_string(y, unit));
-      }
-      return_t & SetPositionRB(int x, int y, const std::string & unit="px") {
-        return SetCSS("position", "fixed",
-                      "right", emp::to_string(x, unit),
-                      "bottom", emp::to_string(y, unit));
-      }
-      return_t & SetPositionLB(int x, int y, const std::string & unit="px") {
-        return SetCSS("position", "fixed",
-                      "left", emp::to_string(x, unit),
-                      "bottom", emp::to_string(y, unit));
-      }
+      return_t & SetPositionRT(int x, int y, const std::string & unit="px")
+        { return SetPosition(x, y, unit, "absolute", "right", "top"); }
+      return_t & SetPositionRB(int x, int y, const std::string & unit="px")
+        { return SetPosition(x, y, unit, "absolute", "right", "bottom"); }
+      return_t & SetPositionLB(int x, int y, const std::string & unit="px")
+        { return SetPosition(x, y, unit, "absolute", "left", "bottom"); }
+
+      return_t & SetPositionFixed(int x, int y, const std::string & unit="px")
+        { return SetPosition(x, y, unit, "fixed", "left", "top"); }
+      return_t & SetPositionFixedRT(int x, int y, const std::string & unit="px")
+        { return SetPosition(x, y, unit, "fixed", "right", "top"); }
+      return_t & SetPositionFixedRB(int x, int y, const std::string & unit="px")
+        { return SetPosition(x, y, unit, "fixed", "right", "bottom"); }
+      return_t & SetPositionFixedLB(int x, int y, const std::string & unit="px")
+        { return SetPosition(x, y, unit, "fixed", "left", "bottom"); }
 
 
       // Positioning
       return_t & SetFloat(const std::string & f) { return SetCSS("float", f); }
       return_t & SetOverflow(const std::string & o) { return SetCSS("overflow", o); }
+
+      // Access
       return_t & SetScroll() { return SetCSS("overflow", "scroll"); }     // Always have scrollbars
       return_t & SetScrollAuto() { return SetCSS("overflow", "auto"); }   // Scrollbars if needed
+      return_t & SetResizable() { return SetCSS("resize", "both"); }
+      return_t & SetResizableX() { return SetCSS("resize", "horizontal"); }
+      return_t & SetResizableY() { return SetCSS("resize", "vertical"); }
+      return_t & SetResizableOff() { return SetCSS("resize", "none"); }
 
       // Text Manipulation
       return_t & SetFont(const std::string & font) { return SetCSS("font-family", font); }

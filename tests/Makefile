@@ -1,7 +1,7 @@
 GCOV_FLAGS = -o0 -g --coverage
  
-TEST_NAMES = base evo geometry meta scholar tools
-FLAGS = -std=c++14
+TEST_NAMES = base geometry meta scholar tools
+FLAGS = -std=c++14 -Wall -Wno-unused-function -I../source/ -I../
 #CXX = clang++
 #CXX = g++
 

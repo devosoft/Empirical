@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../tools/ce_array.h"
+#include "tools/ce_array.h"
 
 constexpr int CETest() {
   emp::ce_array<int, 20> test_array(0);

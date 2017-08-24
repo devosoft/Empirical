@@ -16,26 +16,32 @@ struct NKInterface {
   UI::Document doc;
   UI::Div div_pop;
   UI::Div div_stats;
+  UI::Div div_controls;
+  UI::Div div_vis;
+
+  UI::Canvas pop_canvas;
   UI::Canvas org_canvas;
   UI::Animate anim;
 
   NKInterface()
     : doc("emp_base")
-    , div_pop("div_pop")
-    , div_stats("div_stats")
-    , org_canvas(800, 800, "org_canvas")
+    , div_pop("div_pop"), div_stats("div_stats"), div_controls("div_controls"), div_vis("div_vis")
+    , pop_canvas(400, 400, "pop_canvas"), org_canvas(800, 800, "org_canvas")
     , anim( [this](){ DoFrame(); }, org_canvas )
   {
     // Setup the NK World.
     world.Setup();
 
-    // Setup the GUI Components.
-    div_pop.SetSize(400,400).SetScrollAuto();
-    div_stats.SetPosition(450, 30);
+    // Setup initial sizes for divs.
+    div_pop.SetSize(400,400).SetScrollAuto(); //.SetResizable();
 
     // Attach the GUI components to the web doc.
-    div_pop << UI::Button( [this](){ world.RunStep(); DrawAll(); }, "Step", "but_step" );
-    div_pop << anim.GetToggleButton("but_toggle");
+    div_controls << UI::Button( [this](){ world.RunStep(); DrawAll(); }, "Step", "but_step" );
+    div_controls << anim.GetToggleButton("but_toggle");
+    div_controls << UI::Button( [this](){
+        emp::Alert("x=", div_pop.GetXPos(), " y=", div_pop.GetYPos(),
+                   " width=", div_pop.GetWidth(), " height=", div_pop.GetHeight());
+      }, "Alert");
     div_pop << "<br>";
     div_pop << org_canvas;
 
@@ -47,12 +53,49 @@ struct NKInterface {
     div_stats << "<br>Max Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMax(); } );
 
     doc << "<h1>NK World</h1>";
-    doc << div_pop << div_stats;
+    doc << div_pop;
+    doc << div_stats;
+    doc << div_controls;
+    doc << div_vis;
+
+    // Place divs in reasonable positions.
+
+    emp::web::OnDocumentReady( [this](){ LayoutDivs(); } );
+  }
+
+  ///  Restore the proper layout of divs, even once portions change size.
+  ///
+  ///   x1       x2
+  ///   +--------+-----------+ y1
+  ///   |        |  CONTROLS |
+  ///   +   POP  +-----------+ y2
+  ///   |        |   STATS   |
+  ///   +--------+-----------+ y3
+  ///   |                    |
+  ///   |   VISUALIZATIONS   |
+  ///   |                    |
+  ///   +--------------------+
+
+  void LayoutDivs() {
+    const double spacing = 10;
+    const double x1 = div_pop.GetXPos();
+    const double x2 = x1 + div_pop.GetOuterWidth() + spacing;
+    const double y1 = div_pop.GetYPos();
+    const double y2 = y1 + div_controls.GetOuterHeight() + spacing;
+    const double y3a = y1 + div_pop.GetOuterHeight();
+    const double y3b = y2 + div_stats.GetOuterHeight();
+    const double y3 = emp::Max(y3a, y3b) + spacing;
+    div_controls.SetPosition(x2, y1);
+    div_stats.SetPosition(x2, y2);
+    div_vis.SetPosition(x1,y3);
   }
 
   void DrawOrgs() {
+    // double width = world.N * 4;
+    // double height = world.GetSize();
+    org_canvas.SetSize(4*world.N, 4 * world.GetSize());
     org_canvas.Clear("black");
-    for (size_t id = 0; id < world.GetSize() && id < 100; id++) {
+    for (size_t id = 0; id < world.GetSize(); id++) {
       auto & org = world[id];
       for (size_t pos = 0; pos < org.GetSize(); pos++) {
         if (!org[pos]) continue;
@@ -64,6 +107,8 @@ struct NKInterface {
   void DrawAll() {
     DrawOrgs();
     div_stats.Redraw();
+
+    LayoutDivs();
   }
 
   void DoFrame() {

@@ -9,8 +9,8 @@
 #include <string>
 #include <vector>
 
-#include "../../meta/TypeID.h"
-#include "../../meta/TypePack.h"
+#include "meta/TypeID.h"
+#include "meta/TypePack.h"
 
 int Sum4(int a, int b, int c, int d) { return a+b+c+d; }
 

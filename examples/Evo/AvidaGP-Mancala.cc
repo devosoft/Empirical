@@ -8,7 +8,7 @@
 #include "hardware/AvidaGP.h"
 #include "hardware/InstLib.h"
 #include "tools/Random.h"
-#include "evo/World.h"
+#include "Evo/World.h"
 
 constexpr size_t POP_SIZE = 20;
 constexpr size_t GENOME_SIZE = 100;
@@ -116,38 +116,40 @@ double EvalGame(emp::AvidaGP & org, bool cur_player=0) {
 int main()
 {
   emp::Random random;
-  emp::evo::EAWorld<emp::AvidaGP> world(random, "AvidaWorld");
+  emp::World<emp::AvidaGP> world(random, "AvidaWorld");
+  world.SetWellMixed(true);
 
   // Build a random initial popoulation.
   for (size_t i = 0; i < POP_SIZE; i++) {
     emp::AvidaGP cpu;
     cpu.PushRandom(random, GENOME_SIZE);
-    world.Insert(cpu);
+    world.Inject(cpu);
   }
 
   // Setup the mutation function.
-  world.SetDefaultMutateFun( [](emp::AvidaGP* org, emp::Random& random) {
+  world.SetMutFun( [](emp::AvidaGP & org, emp::Random& random) {
       uint32_t num_muts = random.GetUInt(4);  // 0 to 3 mutations.
       for (uint32_t m = 0; m < num_muts; m++) {
         const uint32_t pos = random.GetUInt(GENOME_SIZE);
-        org->RandomizeInst(pos, random);
+        org.RandomizeInst(pos, random);
       }
       return (num_muts > 0);
     } );
 
   // Setup the fitness function.
-  std::function<double(emp::AvidaGP*)> fit_fun =
-    [&random, &world](emp::AvidaGP * org) {
+  std::function<double(emp::AvidaGP &)> fit_fun =
+    [&random, &world](emp::AvidaGP & org) {
       emp::AvidaGP & rand_org = world.GetRandomOrg();
       bool cur_player = random.P(0.5);
-      return EvalGame(*org, rand_org, cur_player);
+      return EvalGame(org, rand_org, cur_player);
     };
+  world.SetFitFun(fit_fun);
 
-  emp::vector< std::function<double(emp::AvidaGP*)> > fit_set(16);
+  emp::vector< std::function<double(emp::AvidaGP &)> > fit_set(16);
   for (size_t out_id = 0; out_id < 16; out_id++) {
     // Setup the fitness function.
-    fit_set[out_id] = [out_id](emp::AvidaGP * org) {
-      return (double) -std::abs(org->GetOutput((int)out_id) - (double) (out_id * out_id));
+    fit_set[out_id] = [out_id](emp::AvidaGP & org) {
+      return (double) -std::abs(org.GetOutput((int)out_id) - (double) (out_id * out_id));
     };
   }
 
@@ -155,34 +157,34 @@ int main()
   // Do the run...
   for (size_t ud = 0; ud < UPDATES; ud++) {
     // Keep the best individual.
-    world.EliteSelect(fit_fun, 1, 1);
+    EliteSelect(world, 1, 1);
 
     // Run a tournament for each spot.
-    world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE-1);
-    // world.LexicaseSelect(fit_set, POP_SIZE-1);
-    // world.EcoSelect(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
+    TournamentSelect(world, TOURNY_SIZE, POP_SIZE-1);
+    // LexicaseSelect(world, POP_SIZE-1);
+    // EcoSelect(world, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
     world.Update();
-    std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
+    std::cout << (ud+1) << " : " << 0 << " : " << world.CalcFitnessID(0) << std::endl;
 
     // Mutate all but the first organism.
-    world.MutatePop(1);
+    world.DoMutations(1);
   }
 
-  fit_fun(&(world[0]));
+  world.CalcFitnessID(0);
 
   std::cout << std::endl;
   emp::Mancala game(0);
   world[0].PrintGenome("mancala_save.org");
 
   game.DoMove(0);
-  world[0].ResetHardware();
-  world[0].SetInputs(game.AsInput(game.GetCurPlayer()));
-  world[0].Trace(1);
+  world.GetOrg(0).ResetHardware();
+  world.GetOrg(0).SetInputs(game.AsInput(game.GetCurPlayer()));
+  world.GetOrg(0).Trace(1);
 
   game.DoMove(5);
-  world[0].ResetHardware();
-  world[0].SetInputs(game.AsInput(game.GetCurPlayer()));
-  world[0].Trace(1);
+  world.GetOrg(0).ResetHardware();
+  world.GetOrg(0).SetInputs(game.AsInput(game.GetCurPlayer()));
+  world.GetOrg(0).Trace(1);
 
 
   // EvalGame(world[0], world[1], 0, true);

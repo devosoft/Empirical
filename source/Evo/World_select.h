@@ -105,10 +105,10 @@ namespace emp {
   /// EACH offspring produced.
   template<typename ORG>
   void LexicaseSelect(World<ORG> & world,
-                      const emp::vector< std::function<double(ORG&)> > & fit_funs,
+                      const emp::vector< std::function<double(const ORG &)> > & fit_funs,
                       size_t repro_count=1)
   {
-    emp_assert(pop.size() > 0);
+    emp_assert(world.GetSize() > 0);
     emp_assert(fit_funs.size() > 0);
 
     // Collect all fitness info. (@CAO: Technically only do this is cache is turned on?)
@@ -154,7 +154,7 @@ namespace emp {
       // Place a random survivor (all equal) into the next generation!
       emp_assert(cur_orgs.size() > 0, cur_orgs.size(), fit_funs.size(), all_orgs.size());
       size_t repro_id = cur_orgs[ world.GetRandom().GetUInt(cur_orgs.size()) ];
-      InsertBirth( world[repro_id], repro_id, 1 );
+      world.DoBirth( world[repro_id], repro_id );
     }
   }
 

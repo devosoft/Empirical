@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -7,11 +7,11 @@
 
 #include <iostream>
 
-#include "../../config/ArgManager.h"
-#include "../../evo/NK.h"
-#include "../../evo3/World.h"
-#include "../../tools/BitVector.h"
-#include "../../tools/Random.h"
+#include "config/ArgManager.h"
+#include "Evo/NK.h"
+#include "Evo/World.h"
+#include "tools/BitVector.h"
+#include "tools/Random.h"
 
 EMP_BUILD_CONFIG( NKConfig,
   GROUP(DEFAULT, "Default settings for NK model"),
@@ -49,6 +49,8 @@ int main(int argc, char* argv[])
   // emp::evo::EAWorld<BitOrg, emp::evo::FitCacheOff> pop(random, "NKWorld");
   emp::World<BitOrg> pop(random, "NKWorld");
   pop.SetupFitnessFile().SetTimingRepeat(10);
+  pop.SetupSystematicsFile().SetTimingRepeat(10);
+  pop.SetupPopulationFile().SetTimingRepeat(10);
   pop.SetWellMixed(true);
   pop.SetCache();
 
@@ -59,13 +61,20 @@ int main(int argc, char* argv[])
     pop.Inject(next_org);
   }
 
-  pop.SetMutFun( [MUT_COUNT, N](BitOrg & org, emp::Random& random) {
+  // Setup the mutation function.
+  std::function<size_t(BitOrg &, emp::Random &)> mut_fun =
+    [MUT_COUNT, N](BitOrg & org, emp::Random & random) {
+      size_t num_muts = 0;
       for (uint32_t m = 0; m < MUT_COUNT; m++) {
         const uint32_t pos = random.GetUInt(N);
-        org[pos] = random.P(0.5);
+        if (random.P(0.5)) {
+          org[pos] ^= 1;
+          num_muts++;
+        }
       }
-      return true;
-    } );
+      return num_muts;
+    };
+  pop.SetMutFun( mut_fun );
 
   std::cout << 0 << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 

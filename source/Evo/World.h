@@ -14,7 +14,32 @@
 //  If the population is in EA mode (with synchronous generations), DoBirth will place offspring in
 //  a "next generation" placeholder population.  Update() will move orgs into primary population.
 //
-//  All insertions into the popoulation funnel through private function AddOrgAt(org, pos);
+//  Organisms have a series of functions that are called on them that are chosen:
+//
+//  FITNESS: Most selection methods require a fitness function to help determine who should be
+//           replicated.  Other systems merely use fitness as a measured output.
+//   0. If you set the fitness function using SetFitFun(), it will have priority.
+//   1. If the organism type has a "GetFitness()" member function, use it!
+//   2. If the organism type can be cast to double, use it!
+//   3. Start with a fitness function that throws an assert indicating function must be set.
+//
+//  MUTATIONS: The mutation function deteramines a main source of variation for most evolving
+//             systems.
+//   0. If you set the mutation function using SetMutFun(), it will have priority.
+//   1. Or DoMutations(random) member function.
+//   2. Empty, with assert.
+//
+//  PRINTING: How should organisms be printed to the command line?
+//   0. Setting the print function with SetPrintFun() member function.
+//   1. Org Print() member function
+//   2. Proper operator<<
+//   3. Do not print, just Assert
+//
+//  GENOMES: Do organisms have a genome separate from their instantiation?  By default, the full
+//           organism is returned when a genome is requested, but a GetGenome() member function
+//           in the organism type will override this behavior.
+//   1. GetGenome member function
+//   2. Return org AS genome.
 //
 //
 //  Developer Notes:
@@ -234,14 +259,14 @@ namespace emp {
 
     /// Retrieve a const reference to the organsim as the specified position.
     /// Same as operator[]; will trip assert if cell is not occupied.
-    const ORG & GetOrg(size_t id) const {
+    ORG & GetOrg(size_t id) {
       emp_assert(pop[id] != nullptr, id);  // Should not index to a null organism!
       return *(pop[id]);
     }
 
     /// Retrieve a const reference to the organsim as the specified x,y coordinates.
     /// (currently used only in a grid world)
-    const ORG & GetOrg(size_t x, size_t y) const { return GetOrg(x+y*size_x); }
+    ORG & GetOrg(size_t x, size_t y) { return GetOrg(x+y*size_x); }
 
     /// Retrive a pointer to the contents of a speciefied cell; will be nullptr if the cell is
     /// not occupied.
@@ -300,6 +325,12 @@ namespace emp {
 
     /// Setup a file to be printed that collects fitness information over time.
     World_file & SetupFitnessFile(const std::string & filename="fitness.csv");
+
+    /// Setup a file to be printed that collects systematics information over time.
+    World_file & SetupSystematicsFile(const std::string & filename="systematics.csv");
+
+    /// Setup a file to be printed that collects population information over time.
+    World_file & SetupPopulationFile(const std::string & filename="population.csv");
 
     /// Setup the function to be used when fitness needs to be calculated.  The provided function
     /// should take a reference to an organism and return a fitness value of type double.
@@ -396,18 +427,29 @@ namespace emp {
 
     /// Update the world:
     /// 1. Send out an update signal for any external functions to trigger.
-    /// 2. Handle any data files that need to be printed this update.
-    /// 3. If synchronous generations, move next population into place as the current popoulation.
+    /// 2. If synchronous generations, move next population into place as the current popoulation.
+    /// 3. Handle any data files that need to be printed this update.
     /// 4. Increment the current update number.
     void Update();
 
-    /// Run the Execute member function on all organisms in the population; forward any args passed
+    /// Run the Process member function on all organisms in the population; forward any args passed
     /// into this function.
     template <typename... ARGS>
-    void Execute(ARGS &&... args) {   // Redirect to all orgs in the population!
-      for (Ptr<ORG> org : pop) { if (org) org->Execute(std::forward<ARGS>(args)...); }
+    void Process(ARGS &&... args) {   // Redirect to all orgs in the population!
+      for (Ptr<ORG> org : pop) { if (org) org->Process(std::forward<ARGS>(args)...); }
     }
 
+    /// Run the Process member function on a single, specified organism in the population;
+    /// forward any args passed into this function.
+    template <typename... ARGS>
+    void ProcessID(size_t id, ARGS &&... args) {   // Redirect to all orgs in the population!
+      if (pop[id]) pop[id]->Process(std::forward<ARGS>(args)...);
+    }
+
+    /// Reset the hardware for all organisms.
+    void ResetHardware() {
+      for (Ptr<ORG> org : pop) { if (org) org->ResetHardware(); }
+    }
 
     // --- CALCULATE FITNESS ---
 
@@ -499,6 +541,8 @@ namespace emp {
     /// Get the id of a random *occupied* cell.
     size_t GetRandomOrgID();
 
+    /// Get an organism from a random occupied cell.
+    ORG & GetRandomOrg() { return *pop[GetRandomOrgID()]; }
 
     // --- POPULATION ANALYSIS ---
 
@@ -744,7 +788,7 @@ namespace emp {
     return files[id];
   }
 
-  // A fitness file (default="fitness.csv") contains information about the population's fitness.
+  // A data file (default="fitness.csv") that contains information about the population's fitness.
   template<typename ORG>
   World_file & World<ORG>::SetupFitnessFile(const std::string & filename) {
     auto & file = SetupFile(filename);
@@ -753,6 +797,33 @@ namespace emp {
     file.AddMean(node, "mean_fitness", "Average organism fitness in current population.");
     file.AddMin(node, "min_fitness", "Minimum organism fitness in current population.");
     file.AddMax(node, "max_fitness", "Maximum organism fitness in current population.");
+    file.AddInferiority(node, "inferiority", "Average fitness / maximum fitness in current population.");
+    file.PrintHeaderKeys();
+    return file;
+  }
+
+  // A data file (default="systematics.csv") that contains information about the population's
+  // phylogeny and lineages.
+  template<typename ORG>
+  World_file & World<ORG>::SetupSystematicsFile(const std::string & filename) {
+    auto & file = SetupFile(filename);
+    file.AddVar(update, "update", "Update");
+    file.template AddFun<size_t>( [this](){ return systematics.GetNumActive(); }, "num_genotypes", "Number of unique genotype groups currently active." );
+    file.template AddFun<size_t>( [this](){ return systematics.GetTotalOrgs(); }, "total_orgs", "Number of organisms tracked." );
+    file.template AddFun<double>( [this](){ return systematics.GetAveDepth(); }, "ave_depth", "Average Phylogenetic Depth of Organisms." );
+    file.template AddFun<size_t>( [this](){ return systematics.GetNumRoots(); }, "num_roots", "Number of independent roots for phlogenies." );
+    file.template AddFun<int>( [this](){ return systematics.GetMRCADepth(); }, "mrca_depth", "Phylogenetic Depth of the Most Recent Common Ancestor (-1=none)." );
+    file.template AddFun<double>( [this](){ return systematics.CalcDiversity(); }, "diversity", "Genotypic Diversity (entropy of genotypes in population)." );
+    file.PrintHeaderKeys();
+    return file;
+  }
+
+  // A data file (default="population.csv") contains information about the current population.
+  template<typename ORG>
+  World_file & World<ORG>::SetupPopulationFile(const std::string & filename) {
+    auto & file = SetupFile(filename);
+    file.AddVar(update, "update", "Update");
+    file.template AddFun<size_t>( [this](){ return GetNumOrgs(); }, "num_orgs", "Number of organisms currently living in the population." );
     file.PrintHeaderKeys();
     return file;
   }
@@ -777,12 +848,11 @@ namespace emp {
 
   template<typename ORG>
   void World<ORG>::Update() {
+    // 1. Send out an update signal for any external functions to trigger.
     on_update_sig.Trigger(update);
 
-    // Print all files.
-    for (auto & file : files) file.Update(update);
-
-    // If generations are synchronous (i.e, next_pop is not empty), put the next generation in place.
+    // 2. If synchronous generationsm (i.e, next_pop is not empty), move next population into
+    //    place as the current popoulation.
     if (next_pop.size()) {
       // Clear out current pop.
       for (size_t i = 0; i < pop.size(); i++) RemoveOrgAt(i);
@@ -797,7 +867,10 @@ namespace emp {
       for (size_t i = 0; i < pop.size(); i++) if (pop[i]) ++num_orgs;
     }
 
-    // Keep count of the number of times Update() has been called.
+    // 3. Handle any data files that need to be printed this update.
+    for (auto & file : files) file.Update(update);
+
+    // 4. Increment the current update number; i.e., count calls to Update().
     update++;
   }
 

@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../data/DataNode.h"
+#include "data/DataNode.h"
 
 int main()
 {
