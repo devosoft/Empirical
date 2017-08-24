@@ -33,21 +33,17 @@
 //    * Main state behaves differently than any other state.
 
 // @amlalejini - TODO:
-//  [ ] Write some halfway decent documentation.
-//  [ ] Parameterize static constexpr variables.
+//  [ ] Write some halfway decent documentation. --> Use doxygen notation. Every instance variable, every function.
+//  [x] Parameterize static constexpr variables.
 //  [ ] Make class templated, have a using statement to specify 8 cleanly
 
 namespace emp {
-  class EventDrivenGP {
+  template<size_t AFFINITY_WIDTH>
+  class EventDrivenGP_AW {
   public:
-    static constexpr size_t AFFINITY_WIDTH = 8;     //< Defines the number of bits in funciton/instruction/event affinities.
-    static constexpr size_t MAX_INST_ARGS = 3;
-    static constexpr size_t MAX_CORES = 4;          //< Maximum number of parallel execution stacks that can be spawned. Increasing this value drastically slows things down.
-    static constexpr size_t MAX_CALL_DEPTH = 128;   //< Maximum depth of calls per execution stack.
-    static constexpr double DEFAULT_MEM_VALUE = 0.0;
-    static constexpr double MIN_BIND_THRESH = 0.5;  //< Minimum bit string match threshold for function calls/event binding, etc.
-    static constexpr bool STOCHASTIC_FUN_CALL = true;
+    static constexpr size_t MAX_INST_ARGS = 3;      //< Maximum number of instruction arguments. Currently hardcoded. At some point, will make flexible.
 
+    using EventDrivenGP_t = EventDrivenGP_AW<AFFINITY_WIDTH>;
     using mem_key_t = int;
     using mem_val_t = double;
     using memory_t = std::unordered_map<mem_key_t, mem_val_t>;
@@ -88,15 +84,17 @@ namespace emp {
       memory_t local_mem;
       memory_t input_mem;
       memory_t output_mem;
+      double default_mem_val;
 
       size_t func_ptr;
       size_t inst_ptr;
       emp::vector<Block> block_stack;
       bool is_main;
 
-      State(Ptr<memory_t> _shared_mem_ptr, bool _is_main=false)
+      State(Ptr<memory_t> _shared_mem_ptr, mem_val_t _default_mem_val = 0.0, bool _is_main=false)
         : shared_mem_ptr(_shared_mem_ptr), local_mem(), input_mem(), output_mem(),
-          func_ptr(0), inst_ptr(0), block_stack(), is_main(_is_main) { ; }
+          default_mem_val(_default_mem_val), func_ptr(0), inst_ptr(0), block_stack(),
+          is_main(_is_main) { ; }
       State(const State &) = default;
       State(State &&) = default;
 
@@ -110,8 +108,10 @@ namespace emp {
 
       size_t GetFP() const { return func_ptr; }
       size_t GetIP() const { return inst_ptr; }
+      mem_val_t GetDefaultMemValue() const { return default_mem_val; }
       void SetIP(size_t ip) { inst_ptr = ip; }
       void SetFP(size_t fp) { func_ptr = fp; }
+      void SetDefaultMemValue(mem_val_t val) { default_mem_val = val; }
       void AdvanceIP(size_t inc = 1) { inst_ptr += inc; }
       bool IsMain() const { return is_main; }
 
@@ -121,10 +121,10 @@ namespace emp {
 
       /// GetXMemory functions return value at memory location if memory location exists.
       /// Otherwise, these functions return default memory value.
-      mem_val_t GetLocal(mem_key_t key) const { return Find(local_mem, key, DEFAULT_MEM_VALUE); }
-      mem_val_t GetInput(mem_key_t key) const { return Find(input_mem, key, DEFAULT_MEM_VALUE); }
-      mem_val_t GetOutput(mem_key_t key) const { return Find(output_mem, key, DEFAULT_MEM_VALUE); }
-      mem_val_t GetShared(mem_key_t key) const { return Find(*shared_mem_ptr, key, DEFAULT_MEM_VALUE); }
+      mem_val_t GetLocal(mem_key_t key) const { return Find(local_mem, key, default_mem_val); }
+      mem_val_t GetInput(mem_key_t key) const { return Find(input_mem, key, default_mem_val); }
+      mem_val_t GetOutput(mem_key_t key) const { return Find(output_mem, key, default_mem_val); }
+      mem_val_t GetShared(mem_key_t key) const { return Find(*shared_mem_ptr, key, default_mem_val); }
 
       /// SetXMemory functions set memory location (specified by key) to value.
       void SetLocal(mem_key_t key, mem_val_t value) { local_mem[key] = value; }
@@ -135,19 +135,19 @@ namespace emp {
       /// AccessXMemory functions return reference to memory location value if that location exists.
       /// If the location does not exist, set to default memory value and return reference to memory location value.
       mem_val_t & AccessLocal(mem_key_t key) {
-        if (!Has(local_mem, key)) local_mem[key] = DEFAULT_MEM_VALUE;
+        if (!Has(local_mem, key)) local_mem[key] = default_mem_val;
         return local_mem[key];
       }
       mem_val_t & AccessInput(mem_key_t key) {
-        if (!Has(input_mem, key)) input_mem[key] = DEFAULT_MEM_VALUE;
+        if (!Has(input_mem, key)) input_mem[key] = default_mem_val;
         return input_mem[key];
       }
       mem_val_t & AccessOutput(mem_key_t key) {
-        if (!Has(output_mem, key)) output_mem[key] = DEFAULT_MEM_VALUE;
+        if (!Has(output_mem, key)) output_mem[key] = default_mem_val;
         return output_mem[key];
       }
       mem_val_t & AccessShared(mem_key_t key) {
-        if (!Has(*shared_mem_ptr, key)) (*shared_mem_ptr)[key] = DEFAULT_MEM_VALUE;
+        if (!Has(*shared_mem_ptr, key)) (*shared_mem_ptr)[key] = default_mem_val;
         return (*shared_mem_ptr)[key];
       }
 
@@ -183,8 +183,8 @@ namespace emp {
 
     using inst_t = Instruction;
     using event_t = Event;
-    using inst_lib_t = InstLib<EventDrivenGP>;
-    using event_lib_t = EventLib<EventDrivenGP>;
+    using inst_lib_t = InstLib<EventDrivenGP_t>;
+    using event_lib_t = EventLib<EventDrivenGP_t>;
 
     struct Function {
       affinity_t affinity;
@@ -329,7 +329,7 @@ namespace emp {
 
     using program_t = Program;
     using exec_stk_t = emp::vector<State>;
-    using fun_event_handler_t = std::function<void(EventDrivenGP &, const event_t &)>;
+    using fun_event_handler_t = std::function<void(EventDrivenGP_t &, const event_t &)>;
 
   protected:
     Ptr<const event_lib_t> event_lib;     // Event library.
@@ -349,14 +349,24 @@ namespace emp {
 
     size_t errors;
 
+    size_t max_cores;           //< Maximum number of parallel execution stacks that can be spawned. Increasing this value drastically slows things down.
+    size_t max_call_depth;      //< Maximum depth of calls per execution stack.
+    double default_mem_value;   //< Default value for memory access.
+    double min_bind_thresh;     //< Minimum bit string match threshold for function calls/event binding, etc.
+    bool stochastic_fun_call;   //< Are candidate function calls with == binding strength chosen stochastically?
+
     // @amlalejini - TODO: can change to active executing id, can then grab whatever cur state you want.
     bool is_executing;    // This is true only when executing the execution stacks.
 
   public:
-    EventDrivenGP(Ptr<const inst_lib_t> _ilib, Ptr<const event_lib_t> _elib, Ptr<Random> rnd=nullptr)
+    /// EventDrivenGP constructor. Give instance variables reasonable defaults. Allow for configuration
+    /// post-construction.
+    EventDrivenGP_AW(Ptr<const inst_lib_t> _ilib, Ptr<const event_lib_t> _elib, Ptr<Random> rnd=nullptr)
       : event_lib(_elib), random_ptr(rnd), random_owner(false), program(_ilib),
         shared_mem_ptr(nullptr), execution_stacks(), core_spawn_queue(), cur_core(nullptr),
-        event_queue(), traits(), errors(0), is_executing(false)
+        event_queue(), traits(), errors(0), max_cores(8), max_call_depth(128),
+        default_mem_value(0.0), min_bind_thresh(0.5),
+        stochastic_fun_call(true), is_executing(false)
     {
       if (!rnd) NewRandom();
       shared_mem_ptr = NewPtr<memory_t>();
@@ -365,20 +375,20 @@ namespace emp {
       cur_core = execution_stacks[0];
     }
 
-    EventDrivenGP(inst_lib_t & _ilib, event_lib_t & _elib, Ptr<Random> rnd=nullptr)
-      : EventDrivenGP(&_ilib, &_elib, rnd) { ; }
+    EventDrivenGP_AW(inst_lib_t & _ilib, event_lib_t & _elib, Ptr<Random> rnd=nullptr)
+      : EventDrivenGP_AW(&_ilib, &_elib, rnd) { ; }
 
-    EventDrivenGP(Ptr<const event_lib_t> _elib, Ptr<Random> rnd=nullptr)
-      : EventDrivenGP(DefaultInstLib(), _elib, rnd) { ; }
+    EventDrivenGP_AW(Ptr<const event_lib_t> _elib, Ptr<Random> rnd=nullptr)
+      : EventDrivenGP_AW(DefaultInstLib(), _elib, rnd) { ; }
 
-    EventDrivenGP(Ptr<Random> rnd=nullptr)
-      : EventDrivenGP(DefaultInstLib(), DefaultEventLib(), rnd) { ; }
+    EventDrivenGP_AW(Ptr<Random> rnd=nullptr)
+      : EventDrivenGP_AW(DefaultInstLib(), DefaultEventLib(), rnd) { ; }
 
     // TODO - Write proper custom move and copy constructors. Defaults don't work properly.
     //  - Issue: EventDrivenGP has some pointers that can't just be default copied on a copy.
     //  - Question: But, default move should be fine (duplicating pointers is bad, but moving them?)?
-    EventDrivenGP(EventDrivenGP &&) = default; // @amlalejini - TODO: copy pointers, set old to nullptr
-    EventDrivenGP(const EventDrivenGP & in)
+    EventDrivenGP_AW(EventDrivenGP_t &&) = default; // @amlalejini - TODO: copy pointers, set old to nullptr
+    EventDrivenGP_AW(const EventDrivenGP_t & in)
       : event_lib(in.event_lib), random_ptr(nullptr), random_owner(false),
         program(in.program), shared_mem_ptr(nullptr), execution_stacks(), core_spawn_queue(),
         cur_core(nullptr), event_queue(in.event_queue), traits(in.traits), errors(in.errors),
@@ -400,7 +410,7 @@ namespace emp {
     // @amlalejini - TODO: define operator= (move version and copy version)
 
     /// Destructor - clean up: execution stacks, shared memory.
-    ~EventDrivenGP() {
+    ~EventDrivenGP_AW() {
       ResetHardware(); // NOTE: can get rid post-pointer doom.
       if (random_owner) random_ptr.Delete();
       shared_mem_ptr.Delete();
@@ -443,15 +453,35 @@ namespace emp {
     }
     const program_t & GetProgram() const { return program; }
 
+
     /// Get current execution core (call stack). Will be nullptr if no active cores.
     Ptr<exec_stk_t> GetCurExecStackPtr() { return cur_core; }
     State & GetCurState() { emp_assert(cur_core && !cur_core->empty()); return cur_core->back(); }
     bool ValidPosition(size_t fID, size_t pos) const { return program.ValidPosition(fID, pos); }
     bool ValidFunction(size_t fID) const { return program.ValidFunction(fID); }
-    double GetMinBindThresh() const { return MIN_BIND_THRESH; }
+    double GetMinBindThresh() const { return min_bind_thresh; }
+    size_t GetMaxCores() const { return max_cores; }
+    size_t GetMaxCallDepth() const { return max_call_depth; }
+    mem_val_t GetDefaultMemValue() const { return default_mem_value; }
+    bool IsStochasticFunCall() const { return stochastic_fun_call; }
     double GetTrait(size_t id) const { return traits[id]; }
 
     // -- Configuration --
+    /// Set minimum binding threshold.
+    /// REQ: val >= 0
+    void SetMinBindThresh(double val) { emp_assert(val >= 0.0); min_bind_thresh = val; }
+    void SetMaxCores(size_t val) { max_cores = val; } // TODO: think about reprocussions of changing mid-execution.
+    void SetMaxCallDepth(size_t val) { max_call_depth = val; }
+    void SetDefaultMemValue(mem_val_t val) {
+      default_mem_value = val;
+      // Propagate default mem value through execution stacks.
+      for (size_t i = 0; i < execution_stacks.size(); ++i)
+        for (size_t k = 0; k < execution_stacks[i]->size(); ++k)
+          execution_stacks[i]->at(k).SetDefaultMemValue(val);
+    }
+    void SetStochasticFunCall(bool val) { stochastic_fun_call = val; }
+
+
     void SetTrait(size_t id, double val) {
       if (id >= traits.size()) traits.resize(id+1, 0.0);
       traits[id] = val;
@@ -580,12 +610,12 @@ namespace emp {
     /// functions match above the provided threshold.
     /// Initialize function state with provided input memory.
     void SpawnCore(const affinity_t & affinity, double threshold, const memory_t & input_mem=memory_t(), bool is_main=false) {
-      if (execution_stacks.size() >= MAX_CORES) return;
+      if (execution_stacks.size() >= max_cores) return;
       size_t fID;
       emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, threshold));
       if (best_matches.empty()) return;
       if (best_matches.size() == 1.0) fID = best_matches[0];
-      else if (STOCHASTIC_FUN_CALL) fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
+      else if (stochastic_fun_call) fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
       else fID = best_matches[0];
       SpawnCore(fID, input_mem, is_main);
     }
@@ -593,7 +623,7 @@ namespace emp {
     /// Spawn core with function specified by fID.
     /// Initialize function state with provided input memory.
     void SpawnCore(size_t fID, const memory_t & input_mem=memory_t(), bool is_main=false) {
-      if (execution_stacks.size() >= MAX_CORES) return;
+      if (execution_stacks.size() >= max_cores) return;
       Ptr<exec_stk_t> stack = NewPtr<exec_stk_t>();
       stack->emplace_back(shared_mem_ptr, is_main);
       State & state = stack->at(stack->size() - 1);
@@ -615,7 +645,7 @@ namespace emp {
       emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, threshold));
       if (best_matches.empty()) return;
       if (best_matches.size() == 1.0) fID = best_matches[0];
-      else if (STOCHASTIC_FUN_CALL) fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
+      else if (stochastic_fun_call) fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
       else fID = best_matches[0];
       CallFunction(fID);
     }
@@ -624,7 +654,7 @@ namespace emp {
     void CallFunction(size_t fID) {
       emp_assert(ValidPosition(fID, 0));
       // Are we at max call depth? -- If so, call fails.
-      if (GetCurExecStackPtr()->size() >= MAX_CALL_DEPTH) return;
+      if (GetCurExecStackPtr()->size() >= max_call_depth) return;
       // Grab pointer to caller.
       State & caller_state = GetCurState();
       // Make a new state, push onto call stack.
@@ -874,66 +904,66 @@ namespace emp {
     //    [x] Broadcast
     //    [x] Send
 
-    static void Inst_Inc(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_Inc(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       ++state.AccessLocal(inst.args[0]);
     }
 
-    static void Inst_Dec(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_Dec(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       --state.AccessLocal(inst.args[0]);
     }
 
-    static void Inst_Not(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_Not(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[0], state.GetLocal(inst.args[0]) == 0.0);
     }
 
-    static void Inst_Add(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_Add(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) + state.AccessLocal(inst.args[1]));
     }
 
-    static void Inst_Sub(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_Sub(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) - state.AccessLocal(inst.args[1]));
     }
 
-    static void Inst_Mult(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_Mult(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) * state.AccessLocal(inst.args[1]));
     }
 
-    static void Inst_Div(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_Div(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       const double denom = state.AccessLocal(inst.args[1]);
       if (denom == 0.0) ++hw.errors;
       else state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) / denom);
     }
 
-    static void Inst_Mod(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_Mod(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       const int base = (int)state.AccessLocal(inst.args[1]);
       if (base == 0) ++hw.errors;
       else state.SetLocal(inst.args[2], (int)state.AccessLocal(inst.args[0]) % base);
     }
 
-    static void Inst_TestEqu(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_TestEqu(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) == state.AccessLocal(inst.args[1]));
     }
 
-    static void Inst_TestNEqu(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_TestNEqu(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) != state.AccessLocal(inst.args[1]));
     }
 
-    static void Inst_TestLess(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_TestLess(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) < state.AccessLocal(inst.args[1]));
     }
 
-    static void Inst_If(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_If(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       // Find EOBLK.
       size_t eob = hw.FindEndOfBlock(state.GetFP(), state.GetIP());
@@ -948,7 +978,7 @@ namespace emp {
       }
     }
 
-    static void Inst_While(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_While(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       size_t eob = hw.FindEndOfBlock(state.GetFP(), state.GetIP());
       if (state.AccessLocal(inst.args[0]) == 0.0) {
@@ -962,7 +992,7 @@ namespace emp {
       }
     }
 
-    static void Inst_Countdown(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_Countdown(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       size_t eob = hw.FindEndOfBlock(state.GetFP(), state.GetIP());
       if (state.AccessLocal(inst.args[0]) == 0.0) {
@@ -978,67 +1008,67 @@ namespace emp {
       }
     }
 
-    static void Inst_Break(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_Break(EventDrivenGP_t & hw, const inst_t & inst) {
       hw.BreakBlock();
     }
 
-    static void Inst_Close(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_Close(EventDrivenGP_t & hw, const inst_t & inst) {
       hw.CloseBlock();
     }
 
-    static void Inst_Call(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_Call(EventDrivenGP_t & hw, const inst_t & inst) {
       hw.CallFunction(inst.affinity, hw.GetMinBindThresh());
     }
 
-    static void Inst_Return(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_Return(EventDrivenGP_t & hw, const inst_t & inst) {
       hw.ReturnFunction();
     }
 
-    static void Inst_SetMem(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_SetMem(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[0], (double)inst.args[1]);
     }
 
-    static void Inst_CopyMem(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_CopyMem(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[1], state.AccessLocal(inst.args[0]));
     }
 
-    static void Inst_SwapMem(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_SwapMem(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       double val0 = state.AccessLocal(inst.args[0]);
       state.SetLocal(inst.args[0], state.GetLocal(inst.args[1]));
       state.SetLocal(inst.args[1], val0);
     }
 
-    static void Inst_Input(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_Input(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[1], state.AccessInput(inst.args[0]));
     }
 
-    static void Inst_Output(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_Output(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetOutput(inst.args[1], state.AccessLocal(inst.args[0]));
     }
 
-    static void Inst_Commit(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_Commit(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetShared(inst.args[1], state.AccessLocal(inst.args[0]));
     }
 
-    static void Inst_Pull(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_Pull(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[1], state.AccessShared(inst.args[0]));
     }
 
-    static void Inst_Nop(EventDrivenGP & hw, const inst_t & inst) { ; }
+    static void Inst_Nop(EventDrivenGP_t & hw, const inst_t & inst) { ; }
 
-    static void Inst_BroadcastMsg(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_BroadcastMsg(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       hw.TriggerEvent("Message", inst.affinity, state.output_mem, {"broadcast"});
     }
 
-    static void Inst_SendMsg(EventDrivenGP & hw, const inst_t & inst) {
+    static void Inst_SendMsg(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       hw.TriggerEvent("Message", inst.affinity, state.output_mem, {"send"});
     }
@@ -1047,7 +1077,7 @@ namespace emp {
     //  -- Anytime something gets added to it from elsewhere, it's added everywhere.
     // Alternatives:
     //    * Make a new thing everytime.
-    static Ptr<const InstLib<EventDrivenGP>> DefaultInstLib() {
+    static Ptr<const InstLib<EventDrivenGP_t>> DefaultInstLib() {
       static inst_lib_t inst_lib;
       if (inst_lib.GetSize() == 0) {
         inst_lib.AddInst("Inc", Inst_Inc, 1, "Increment value in local memory Arg1");
@@ -1083,13 +1113,13 @@ namespace emp {
     }
 
     // Default event handlers.
-    static void HandleEvent_Message(EventDrivenGP & hw, const event_t & event) {
+    static void HandleEvent_Message(EventDrivenGP_t & hw, const event_t & event) {
       // Spawn new core.
-      hw.SpawnCore(event.affinity, MIN_BIND_THRESH, event.msg);
+      hw.SpawnCore(event.affinity, hw.GetMinBindThresh(), event.msg);
     }
 
     /// Define default events. NOTE: default events have no registered dispatch functions.
-    static Ptr<const EventLib<EventDrivenGP>> DefaultEventLib() {
+    static Ptr<const EventLib<EventDrivenGP_t>> DefaultEventLib() {
       static event_lib_t event_lib;
       if (event_lib.GetSize() == 0) {
         event_lib.AddEvent("Message", HandleEvent_Message, "Event for exchanging messages (agent-agent, world-agent, etc.)");
@@ -1097,6 +1127,8 @@ namespace emp {
       return &event_lib;
     }
   };
+
+  using EventDrivenGP = EventDrivenGP_AW<8>;
 }
 
 #endif
