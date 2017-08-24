@@ -1,6 +1,9 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
+//
+//  This file takes in one or more CSV files with values and, for each, calculates the mnimium,
+//  maximum, and average values found in each column.
 
 #include <fstream>
 #include <iostream>
@@ -79,7 +82,7 @@ int main(int argc, char* argv[])
   emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
   const bool verbose = emp::cl::use_flag(args, "-v");
 
-  if (args.size() < 2) { 
+  if (args.size() < 2) {
     std::cerr << "Must provide at least one filename!" << std::endl;
     exit(1);
   }
