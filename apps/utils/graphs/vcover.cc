@@ -1,6 +1,9 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  Determine the minimum vertex cover for a graph provided on standard input.
 
 #include <iostream>
 #include <map>

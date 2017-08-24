@@ -1,6 +1,10 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  Load input from standard in that begins with a value "N" and then contains N pairs of strings.
+//  output will be the edit distances between each string pair.
 
 #include <iostream>
 #include <string>

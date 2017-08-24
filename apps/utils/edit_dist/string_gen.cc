@@ -1,6 +1,9 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
+//
+//
+//  Generate a series of string pairs with a prescribed number of changes between them.
 
 #include <iostream>
 #include <string>
