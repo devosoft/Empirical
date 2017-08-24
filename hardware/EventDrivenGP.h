@@ -4,6 +4,7 @@
 #include <functional>
 #include <unordered_map>
 #include <deque>
+#include <utility>
 #include "InstLib.h"
 #include "EventLib.h"
 #include "../tools/BitSet.h"
@@ -409,11 +410,17 @@ namespace emp {
     /// EventDrivenGP constructor. Give instance variables reasonable defaults. Allow for configuration
     /// post-construction.
     EventDrivenGP_AW(Ptr<const inst_lib_t> _ilib, Ptr<const event_lib_t> _elib, Ptr<Random> rnd=nullptr)
-      : event_lib(_elib), random_ptr(rnd), random_owner(false), program(_ilib), shared_mem(),
-        event_queue(), traits(), errors(0), max_cores(DEFAULT_MAX_CORES),
-        max_call_depth(DEFAULT_MAX_CALL_DEPTH), default_mem_value(DEFAULT_MEM_VALUE),
-        min_bind_thresh(DEFAULT_MIN_BIND_THRESH), stochastic_fun_call(true), cores(max_cores),
-        active_cores(), inactive_cores(max_cores), pending_cores(), exec_core_id(0), is_executing(false)
+      : event_lib(_elib),
+        random_ptr(rnd), random_owner(false),
+        program(_ilib),
+        shared_mem(),
+        event_queue(),
+        traits(), errors(0),
+        max_cores(DEFAULT_MAX_CORES), max_call_depth(DEFAULT_MAX_CALL_DEPTH),
+        default_mem_value(DEFAULT_MEM_VALUE), min_bind_thresh(DEFAULT_MIN_BIND_THRESH),
+        stochastic_fun_call(true),
+        cores(max_cores), active_cores(), inactive_cores(max_cores), pending_cores(),
+        exec_core_id(0), is_executing(false)
     {
       // If no random provided, create one.
       if (!rnd) NewRandom();
@@ -433,27 +440,44 @@ namespace emp {
     EventDrivenGP_AW(Ptr<Random> rnd=nullptr)
       : EventDrivenGP_AW(DefaultInstLib(), DefaultEventLib(), rnd) { ; }
 
-    // TODO - Write proper custom move and copy constructors. Defaults don't work properly.
-    //  - Issue: EventDrivenGP has some pointers that can't just be default copied on a copy.
-    //  - Question: But, default move should be fine (duplicating pointers is bad, but moving them?)?
-    EventDrivenGP_AW(EventDrivenGP_t &&) = default; // @amlalejini - TODO: copy pointers, set old to nullptr
-    // EventDrivenGP_AW(const EventDrivenGP_t & in)
-    //   : event_lib(in.event_lib), random_ptr(nullptr), random_owner(false),
-    //     program(in.program), shared_mem(in.shared_mem), execution_stacks(), core_spawn_queue(),
-    //     cur_core(nullptr), event_queue(in.event_queue), traits(in.traits), errors(in.errors),
-    //     is_executing(in.is_executing)
-    // {
-    //   // This seems so nasty...
-    //   if (in.random_owner) NewRandom(); // New random number generator.
-    //   else random_ptr = in.random_ptr;
-    //   for (size_t i = 0; i < in.execution_stacks.size(); ++i) {
-    //     execution_stacks.emplace_back(NewPtr<exec_stk_t>(*in.execution_stacks[i]));
-    //     if (in.cur_core == execution_stacks[i]) cur_core = execution_stacks[execution_stacks.size() - 1];
-    //   }
-    //   for (size_t i = 0; i < in.core_spawn_queue.size(); ++i) {
-    //     core_spawn_queue.emplace_back(NewPtr<exec_stk_t>(*in.core_spawn_queue[i]));
-    //   }
-    // }
+    EventDrivenGP_AW(EventDrivenGP_t && in)
+      : event_lib(in.event_lib),
+        random_ptr(in.random_ptr), random_owner(in.random_owner),
+        program(in.program),
+        shared_mem(in.shared_mem),
+        event_queue(in.event_queue),
+        traits(in.traits), errors(in.errors),
+        max_cores(in.max_cores), max_call_depth(in.max_call_depth),
+        default_mem_value(in.default_mem_value), min_bind_thresh(in.min_bind_thresh),
+        stochastic_fun_call(in.stochastic_fun_call),
+        cores(in.cores),
+        active_cores(in.active_cores), inactive_cores(in.inactive_cores),
+        pending_cores(in.pending_cores),
+        exec_core_id(in.exec_core_id), is_executing(in.is_executing)
+    {
+      in.random_ptr = nullptr;
+      in.event_lib = nullptr;
+      in.program.inst_lib = nullptr;
+    }
+
+    EventDrivenGP_AW(const EventDrivenGP_t & in)
+      : event_lib(in.event_lib),
+        random_ptr(nullptr), random_owner(false),
+        program(in.program),
+        shared_mem(in.shared_mem),
+        event_queue(in.event_queue),
+        traits(in.traits), errors(in.errors),
+        max_cores(in.max_cores), max_call_depth(in.max_call_depth),
+        default_mem_value(in.default_mem_value), min_bind_thresh(in.min_bind_thresh),
+        stochastic_fun_call(in.stochastic_fun_call),
+        cores(in.cores),
+        active_cores(in.active_cores), inactive_cores(in.inactive_cores),
+        pending_cores(in.pending_cores),
+        exec_core_id(in.exec_core_id), is_executing(in.is_executing)
+    {
+      if (in.random_owner) NewRandom();
+      else random_ptr = in.random_ptr;
+    }
 
     // @amlalejini - TODO: define operator= (move version and copy version)
 
