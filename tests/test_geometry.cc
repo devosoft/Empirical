@@ -1,10 +1,10 @@
 #include <vector>
 #define CATCH_CONFIG_MAIN
-#include "../third-party/Catch/single_include/catch.hpp"
+#include "third-party/Catch/single_include/catch.hpp"
 
-#include "../geometry/Body2D.h"
-#include "../geometry/Circle2D.h"
-#include "../geometry/Point2D.h"
+#include "geometry/Body2D.h"
+#include "geometry/Circle2D.h"
+#include "geometry/Point2D.h"
 
 
 TEST_CASE("Test Body2d", "[geometry]")

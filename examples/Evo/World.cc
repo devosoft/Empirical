@@ -7,8 +7,8 @@
 
 #include <iostream>
 
-#include "../../evo3/World.h"
-#include "../../tools/Random.h"
+#include "Evo/World.h"
+#include "tools/Random.h"
 
 struct TestOrg1 {
   int fitness;

@@ -14,8 +14,8 @@
 #define EMP_TRACK_MEM
 #endif
 
-#include "../../base/Ptr.h"
-#include "../../base/vector.h"
+#include "base/Ptr.h"
+#include "base/vector.h"
 
 struct TestBase {
   int x;

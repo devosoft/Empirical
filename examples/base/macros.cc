@@ -4,8 +4,8 @@
 
 #include <iostream>
 
-#include "../../meta/reflection.h"
-#include "../../base/macros.h"
+#include "meta/reflection.h"
+#include "base/macros.h"
 
 void testing(int a) { std::cout << a << std::endl; }
 void testing(int a, int b) { std::cout << a+b << std::endl; }

@@ -2,7 +2,7 @@ default:
 	$(MAKE) -C base/
 	$(MAKE) -C control/
 	$(MAKE) -C data/
-	$(MAKE) -C evo/
+	$(MAKE) -C Evo/
 	$(MAKE) -C hardware/
 	$(MAKE) -C meta/
 	$(MAKE) -C tools/
@@ -12,7 +12,7 @@ clean:
 	$(MAKE) clean -C base/
 	$(MAKE) clean -C control/
 	$(MAKE) clean -C data/
-	$(MAKE) clean -C evo/
+	$(MAKE) clean -C Evo/
 	$(MAKE) clean -C hardware/
 	$(MAKE) clean -C meta/
 	$(MAKE) clean -C tools/
@@ -22,7 +22,7 @@ debug:
 	$(MAKE) debug -C base/
 	$(MAKE) debug -C control/
 	$(MAKE) debug -C data/
-	$(MAKE) debug -C evo/
+	$(MAKE) debug -C Evo/
 	$(MAKE) debug -C hardware/
 	$(MAKE) debug -C meta/
 	$(MAKE) debug -C tools/

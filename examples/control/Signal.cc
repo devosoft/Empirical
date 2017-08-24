@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../control/Signal.h"
+#include "control/Signal.h"
 
 int main()
 {

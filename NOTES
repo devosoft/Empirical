@@ -1,7 +1,8 @@
--= STEPS to a minimal working Avida 5 =-
-Disentangle genome and organism in evo tools
-Setup dynamic phenotype object
+Developer notes are below (Should move over to GitHub tracking?)
 
+-= STEPS to a minimal working Avida 5 =-
+
+Setup dynamic phenotype object?
 Setup dynamic stats tracker
 Setup configuration object
 Setup proper event system

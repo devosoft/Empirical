@@ -1,5 +1,5 @@
 # Flags to use regardless of compiler
-CFLAGS_all := -std=c++14 -Wall -Wno-unused-function -I../../
+CFLAGS_all := -std=c++14 -Wall -Wno-unused-function -I../../source/
 
 # Emscripten compiler information
 CXX_web := emcc
@@ -16,8 +16,8 @@ CFLAGS_native_debug := $(CFLAGS_all) $(OFLAGS_native_debug)
 CFLAGS_native_opt := $(CFLAGS_all) $(OFLAGS_native_opt)
 CFLAGS_native := $(CFLAGS_native_opt)
 
-CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
-CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
 
 
 JS_TARGETS := Animate.js Animate2.js Attributes.js Canvas.js Div.js DP.js Example.js Graph.js keypress.js Sudoku.js Table.js TextArea.js Tween.js Web.js
@@ -26,7 +26,7 @@ TARGETS := debug-Animate debug-keypress debug-Slate debug-web
 
 default: web
 
-WEB := ../../web
+WEB := ../../source/web
 
 CXX := $(CXX_web)
 CFLAGS_web := $(CFLAGS_web_opt)
