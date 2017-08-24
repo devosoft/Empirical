@@ -25,29 +25,36 @@
 // @amlalejini - TODO:
 //  [ ] Write some halfway decent documentation. --> Use doxygen notation. Every instance variable, every function.
 //  [ ] Write up a nice description.
-//  [x] Parameterize static constexpr variables.
-//  [x] Make class templated, have a using statement to specify 8 cleanly
 
 namespace emp {
   template<size_t AFFINITY_WIDTH>
   class EventDrivenGP_AW {
   public:
-    static constexpr size_t MAX_INST_ARGS = 3;      //< Maximum number of instruction arguments. Currently hardcoded. At some point, will make flexible.
+    /// Maximum number of instruction arguments. Currently hardcoded. At some point, will make flexible.
+    static constexpr size_t MAX_INST_ARGS = 3;
 
-    using EventDrivenGP_t = EventDrivenGP_AW<AFFINITY_WIDTH>;
-    using mem_key_t = int;
-    using mem_val_t = double;
-    using memory_t = std::unordered_map<mem_key_t, mem_val_t>;
-    using arg_t = int;
-    using arg_set_t = emp::array<arg_t, MAX_INST_ARGS>;
-    using affinity_t = BitSet<AFFINITY_WIDTH>;
-    using properties_t = std::unordered_set<std::string>;
+    using EventDrivenGP_t = EventDrivenGP_AW<AFFINITY_WIDTH>;  //< Resolved type for this templated class.
+    using mem_key_t = int;                                     //< Hardware memory map key type.
+    using mem_val_t = double;                                  //< Hardware memory map value type.
+    using memory_t = std::unordered_map<mem_key_t, mem_val_t>; //< Hardware memory map type.
+    using arg_t = int;                                         //< Instruction argument type.
+    using arg_set_t = emp::array<arg_t, MAX_INST_ARGS>;        //< Instruction argument set type.
+    using affinity_t = BitSet<AFFINITY_WIDTH>;                 //< Affinity type alias.
+    using properties_t = std::unordered_set<std::string>;      //< Event/Instruction properties type.
 
+    // A few default values. WARNING: I have no actual reason to believe these are the best defaults.
+    static constexpr size_t DEFAULT_MAX_CORES = 8;
+    static constexpr size_t DEFAULT_MAX_CALL_DEPTH = 128;
+    static constexpr mem_val_t DEFAULT_MEM_VALUE = 0.0;
+    static constexpr double DEFAULT_MIN_BIND_THRESH = 0.5;
+
+    /// Struct to represent an instance of an Event.
+    /// Events have an associated ID, affinity, message, and set of properties.
     struct Event {
-      size_t id;
-      affinity_t affinity;
-      memory_t msg;
-      properties_t properties; // Event-instance properties (properties of this instance of an event).
+      size_t id;               //< Event ID. Used to lookup event type in event library.
+      affinity_t affinity;     //< Event affinity. Used to match what function this event should bind to.
+      memory_t msg;            //< Event message. Packet of information associated with event.
+      properties_t properties; //< Event properties. Properties of this instance of an event.
 
       Event(size_t _id=0, const affinity_t & aff=affinity_t(), const memory_t & _msg=memory_t(),
             const properties_t & _properties=properties_t())
@@ -61,26 +68,35 @@ namespace emp {
       bool HasProperty(std::string property) const { return properties.count(property); }
     };
 
+    /// Currently only 3 Block types:
+    ///   * NONE:  Not a block.
+    ///   * BASIC: Anything that's not a loop. Once closed/@end of block, execution can just continue.
+    ///   * LOOP:  Once closed/@end of block, execution needs to jump back to beginning of block.
     enum class BlockType { NONE=0, BASIC, LOOP };
+    /// Struct to store information relevant to a 'code block' (e.g. if statements, while loops, etc).
+    /// Maintains the beginning, end, and type of block.
     struct Block {
-      size_t begin;
-      size_t end;
-      BlockType type;
+      size_t begin;    //< Instruction position where block begins.
+      size_t end;      //< Instruction position where block ends.
+      BlockType type;  //< Block type.
+
       Block(size_t _begin=0, size_t _end=0, BlockType _type=BlockType::BASIC)
         : begin(_begin), end(_end), type(_type) { ; }
     };
 
     /// Struct to maintain local program state for a given function call.
+    /// A local program state has an associated: local memory map, input memory map, output memory map,
+    /// function pointer, instruction pointer, and block stack.
     struct State {
-      memory_t local_mem;
-      memory_t input_mem;
-      memory_t output_mem;
-      double default_mem_val;
+      memory_t local_mem;     //< Local memory map. By default, most instructions operate on local memory.
+      memory_t input_mem;     //< Input memory map.
+      memory_t output_mem;    //< Output memory map.
+      double default_mem_val; //< Default memory value. If memory map is accessed using key that doesn't exist in the map, the default memory value is returned.
 
-      size_t func_ptr;
-      size_t inst_ptr;
-      emp::vector<Block> block_stack;
-      bool is_main;
+      size_t func_ptr;                  //< Function pointer.
+      size_t inst_ptr;                  //< Instruction pointer.
+      emp::vector<Block> block_stack;   //< Stack of blocks (top is current block status).
+      bool is_main;                     //< Indicates if this state is main or not.
 
       State(mem_val_t _default_mem_val = 0.0, bool _is_main=false)
         : local_mem(), input_mem(), output_mem(), default_mem_val(_default_mem_val),
@@ -136,10 +152,15 @@ namespace emp {
       }
     };
 
+    /// Struct to maintain EventDrivenGP Instruction information.
+    /// Each instruction has an associated:
+    ///   * id: Instruction ID. Used to lookup instruction type using an instruction library.
+    ///   * args: Instruction arguments. Currently hardcoded maximum of 3.
+    ///   * affinity: Instruction affinity.
     struct Instruction {
-      size_t id;
-      arg_set_t args;
-      affinity_t affinity;
+      size_t id;            //< Instruction ID. Used to lookup instruction type using an instruction library.
+      arg_set_t args;       //< Instruction arguments. Currently hardcoded maximum of 3.
+      affinity_t affinity;  //< Instruction affinity.
 
       Instruction(size_t _id=0, arg_t a0=0, arg_t a1=0, arg_t a2=0, const affinity_t & _aff=affinity_t())
         : id(_id), args(), affinity(_aff) { args[0] = a0; args[1] = a1; args[2] = a2; }
@@ -164,36 +185,69 @@ namespace emp {
       bool operator!=(const Instruction & in) const { return !(*this == in); }
     };
 
-    using inst_t = Instruction;
-    using event_t = Event;
-    using inst_lib_t = InstLib<EventDrivenGP_t>;
-    using event_lib_t = EventLib<EventDrivenGP_t>;
+    using inst_t = Instruction;                    //< Convenient Instruction type alias.
+    using event_t = Event;                         //< Event type alias.
+    using inst_lib_t = InstLib<EventDrivenGP_t>;   //< Instruction library type alias.
+    using event_lib_t = EventLib<EventDrivenGP_t>; //< Event library type alias.
 
+    /// Function struct. Defines an EventDrivenGP function.
+    /// Each function has an associated:
+    ///   * affinity: Function affinity. Analogous to the function's name.
+    ///   * inst_seq: Instruction sequence. Sequence of instructions that make up the function.
     struct Function {
-      affinity_t affinity;
-      emp::vector<inst_t> inst_seq;
+      using inst_seq_t = emp::vector<inst_t>; //< Convenient type alias for instruction sequence.
 
-      Function(const affinity_t & _aff=affinity_t(), const emp::vector<inst_t> & _seq=emp::vector<inst_t>()) : affinity(_aff), inst_seq(_seq) { ; }
+      affinity_t affinity;          //< Function affinity. Analogous to the function's name.
+      inst_seq_t inst_seq;          //< Instruction sequence. Sequence of instructions that make up the function.
+
+      Function(const affinity_t & _aff=affinity_t(), const inst_seq_t & _seq=inst_seq_t())
+        : affinity(_aff), inst_seq(_seq) { ; }
 
       size_t GetSize() const { return inst_seq.size(); }
+
+      inst_t & operator[](size_t id) { return inst_seq[id]; }
+      const inst_t & operator[](size_t id) const { return inst_seq[id]; }
 
       bool operator==(const Function & in) const {
         return inst_seq == in.inst_seq && affinity == in.affinity;
       }
       bool operator!=(const Function & in) const { return !(*this == in); }
+
+      void PushInst(size_t id, arg_t a0, arg_t a1, arg_t a2, const affinity_t & aff) {
+        inst_seq.emplace_back(id, a0, a1, a2, aff);
+      }
+
+      void PushInst(const inst_t & inst) {
+        inst_seq.emplace_back(inst);
+      }
+
+      void SetInst(size_t pos, size_t id, arg_t a0, arg_t a1, arg_t a2, const affinity_t & aff) {
+        inst_seq[pos].Set(id, a0, a1, a2);
+      }
+
+      void SetInst(size_t pos, const inst_t & inst) {
+        inst_seq[pos].Set(inst);
+      }
+
     };
 
+    /// Program struct. Defines an EventDrivenGP program.
+    /// A programs consists of a set of functions where each function is a named sequence of instructions.
+    /// Function names are bit strings (stored as a BitSet).
+    /// Programs require an associated instruction library to give meaning to the instructions that make up
+    /// their functions.
     struct Program {
-      using program_t = emp::vector<Function>;
+      using program_t = emp::vector<Function>;  //< Convenient type alias for sequence of functions.
+      using inst_seq_t = typename Function::inst_seq_t;
 
-      Ptr<const inst_lib_t> inst_lib;
-      emp::vector<Function> program;
+      Ptr<const inst_lib_t> inst_lib;  //< Pointer to const instruction library associated with this program.
+      program_t program;               //< Sequence of functions that make up this program.
 
-      Program(Ptr<const inst_lib_t> _ilib, const emp::vector<Function> & _prgm=emp::vector<Function>())
+      Program(Ptr<const inst_lib_t> _ilib, const program_t & _prgm=program_t())
       : inst_lib(_ilib), program(_prgm) { ; }
       Program(const Program &) = default;
 
-      void Clear() { program.clear(); program.resize(0); }
+      void Clear() { program.clear(); }
 
       Function & operator[](size_t id) { return program[id]; }
       const Function & operator[](size_t id) const { return program[id]; }
@@ -202,6 +256,7 @@ namespace emp {
       bool operator!=(const Program & in) const { return !(*this == in); }
 
       size_t GetSize() const { return program.size(); }
+
       size_t GetInstCnt() const {
         size_t cnt = 0;
         for (size_t i = 0; i < GetSize(); ++i) cnt += program[i].GetSize();
@@ -216,8 +271,11 @@ namespace emp {
       bool ValidFunction(size_t fID) const { return fID < program.size(); }
 
       void SetProgram(const program_t & _program) { program = _program; }
-      void PushFunction(const Function & _function) { program.emplace_back(_function); }
 
+      void PushFunction(const Function & _function) { program.emplace_back(_function); }
+      void PushFunction(const affinity_t & _aff=affinity_t(), const inst_seq_t & _seq=inst_seq_t()) {
+        program.emplace_back(_aff, _seq);
+      }
       /// Push new instruction to program.
       /// If no function pointer is provided and no functions exist yet, add new function to
       /// program and push to that. If no function pointer is provided and functions exist, push to
@@ -226,10 +284,10 @@ namespace emp {
                     const affinity_t & aff=affinity_t(), int fID=-1)
       {
         size_t fp;
-        if (fID == -1 && !program.size()) { program.emplace_back(); fp = 0; }
-        else if (fID == -1 || (fID < 0 && fID >= (int)program.size())) { fp = program.size() - 1; }
+        if (program.empty()) { program.emplace_back(); fp = 0; }
+        else if (fID < 0 || fID >= (int)program.size()) { fp = program.size() - 1; }
         else fp = (size_t)fID;
-        program[fp].inst_seq.emplace_back(id, a0, a1, a2, aff);
+        program[fp].PushInst(id, a0, a1, a2, aff);
       }
 
       /// Push new instruction to program.
@@ -241,10 +299,10 @@ namespace emp {
       {
         size_t fp;
         size_t id = inst_lib->GetID(name);
-        if (fID == -1 && !program.size()) { program.emplace_back(); fp = 0; }
-        else if (fID == -1 || (fID < 0 && fID >= (int)program.size())) { fp = program.size() - 1; }
+        if (program.empty()) { program.emplace_back(); fp = 0; }
+        else if (fID < 0 || fID >= (int)program.size()) { fp = program.size() - 1; }
         else fp = (size_t)fID;
-        program[fp].inst_seq.emplace_back(id, a0, a1, a2, aff);
+        program[fp].PushInst(id, a0, a1, a2, aff);
       }
 
       /// Push new instruction to program.
@@ -253,21 +311,21 @@ namespace emp {
       /// last function in program. If function pointer is provided, push to that function.
       void PushInst(const inst_t & inst, int fID=-1) {
         size_t fp;
-        if (fID == -1 && !program.size()) { program.emplace_back(); fp = 0; }
-        else if (fID == -1 || (fID < 0 && fID >= (int)program.size())) { fp = program.size() - 1; }
+        if (program.empty()) { program.emplace_back(); fp = 0; }
+        else if (fID < 0 || fID >= (int)program.size()) { fp = program.size() - 1; }
         else fp = (size_t)fID;
-        program[fp].inst_seq.emplace_back(inst);
+        program[fp].PushInst(inst);
       }
 
       void SetInst(size_t fID, size_t pos, size_t id, arg_t a0=0, arg_t a1=0, arg_t a2=0,
                    const affinity_t & aff=affinity_t()) {
         emp_assert(ValidPosition(fID, pos));
-        program[fID].inst_seq[pos].Set(id, a0, a1, a2, aff);
+        program[fID].SetInst(pos, id, a0, a1, a2, aff);
       }
 
       void SetInst(size_t fID, size_t pos, const inst_t & inst) {
         emp_assert(ValidPosition(fID, pos));
-        program[fID].inst_seq[pos].Set(inst);
+        program[fID].SetInst(pos, inst);
       }
 
       /// Print out a single instruction with its arguments.
@@ -281,6 +339,7 @@ namespace emp {
           os << ' ' << inst.args[i];
         }
       }
+
       /// Print out entire program.
       void PrintProgram(std::ostream & os=std::cout) {
         for (size_t fID = 0; fID < GetSize(); fID++) {
@@ -309,37 +368,32 @@ namespace emp {
 
     };
 
-    using program_t = Program;
-    using exec_stk_t = emp::vector<State>;
+    using program_t = Program;              //< Program type alias.
+    using exec_stk_t = emp::vector<State>;  //< Execution Stack/Core type alias.
+    /// Event handler function type alias.
     using fun_event_handler_t = std::function<void(EventDrivenGP_t &, const event_t &)>;
 
   protected:
-    Ptr<const event_lib_t> event_lib;     // Event library.
+    Ptr<const event_lib_t> event_lib;     //< Pointer to const event library associated with this hardware.
+    Ptr<Random> random_ptr;               //< Pointer to random object to use.
+    bool random_owner;                    //< Does this hardware own it's random object? (necessary for cleanup responsibility resolution)
+    program_t program;                    //< Hardware's associated program (set of functions).
+    memory_t shared_mem;                  //< Hardware's shared memory map. All cores have access to the same shared memory.
+    std::deque<event_t> event_queue;      //< Hardware's event queue. Where events go to be handled (in order of reception).
+    emp::vector<double> traits;           //< Generic traits vector. Whatever uses the hardware must define/keep track of what traits mean.
+    size_t errors;                        //< Errors committed by hardware while executing. (e.g. divide by 0, etc.)
+    size_t max_cores;                     //< Maximum number of parallel execution stacks that can be spawned. Increasing this value drastically slows things down.
+    size_t max_call_depth;                //< Maximum depth of calls per execution stack.
+    double default_mem_value;             //< Default value for memory access.
+    double min_bind_thresh;               //< Minimum bit string match threshold for function calls/event binding, etc.
+    bool stochastic_fun_call;             //< Are candidate function calls with == binding strength chosen stochastically?
+    emp::vector<exec_stk_t> cores;        //< Vector of cores. Not all will be active at all given points in time.
+    emp::vector<size_t> active_cores;     //< Vector of active core IDs. Maintains relative ordering or active cores.
+    emp::vector<size_t> inactive_cores;   //< Vector of inactive core IDs.
+    std::deque<size_t> pending_cores;     //< Queue of core IDs pending activation.
+    size_t exec_core_id;                  //< core ID of the currently executing core.
+    bool is_executing;                    //< True when mid-execution of all cores. (On every CPU cycle: execute all cores).
 
-    Ptr<Random> random_ptr;
-    bool random_owner;
-
-    program_t program;              // Program (set of functions).
-    memory_t shared_mem;
-
-    std::deque<event_t> event_queue;
-
-    emp::vector<double> traits;
-
-    size_t errors;
-
-    size_t max_cores;           //< Maximum number of parallel execution stacks that can be spawned. Increasing this value drastically slows things down.
-    size_t max_call_depth;      //< Maximum depth of calls per execution stack.
-    double default_mem_value;   //< Default value for memory access.
-    double min_bind_thresh;     //< Minimum bit string match threshold for function calls/event binding, etc.
-    bool stochastic_fun_call;   //< Are candidate function calls with == binding strength chosen stochastically?
-
-    emp::vector<exec_stk_t> cores;      //< Vector of cores. Not all will be active at all given points in time.
-    emp::vector<size_t> active_cores;   //< Vector of active core IDs. Maintains relative ordering or active cores.
-    emp::vector<size_t> inactive_cores; //< Vector of inactive core IDs.
-    std::deque<size_t> pending_cores;  //< Vector of core IDs pending activation.
-    size_t exec_core_id;                //< core ID of the currently executing core.
-    bool is_executing;                  //< True when mid-execution of all cores. (On every CPU cycle: execute all cores).
     // TODO: disallow configuration of hardware while executing. (and any other functions that could sent things into a bad state)
     /// Garbage function for debugging.
     void PrintCoreStates() {
@@ -356,9 +410,10 @@ namespace emp {
     /// post-construction.
     EventDrivenGP_AW(Ptr<const inst_lib_t> _ilib, Ptr<const event_lib_t> _elib, Ptr<Random> rnd=nullptr)
       : event_lib(_elib), random_ptr(rnd), random_owner(false), program(_ilib), shared_mem(),
-        event_queue(), traits(), errors(0), max_cores(8), max_call_depth(128), default_mem_value(0.0),
-        min_bind_thresh(0.5), stochastic_fun_call(true), cores(max_cores), active_cores(),
-        inactive_cores(max_cores), pending_cores(), exec_core_id(0), is_executing(false)
+        event_queue(), traits(), errors(0), max_cores(DEFAULT_MAX_CORES),
+        max_call_depth(DEFAULT_MAX_CALL_DEPTH), default_mem_value(DEFAULT_MEM_VALUE),
+        min_bind_thresh(DEFAULT_MIN_BIND_THRESH), stochastic_fun_call(true), cores(max_cores),
+        active_cores(), inactive_cores(max_cores), pending_cores(), exec_core_id(0), is_executing(false)
     {
       // If no random provided, create one.
       if (!rnd) NewRandom();
