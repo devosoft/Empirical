@@ -31,7 +31,7 @@ namespace emp {
       fun_t handler;            // Function to call to handle this event.
       std::string desc;         // Description of event.
       properties_t properties;  // Any properties that should be associated with this type of event.
-      fun_set_t dispatch_funs;     // Functions to call when this type of event is triggered.
+      fun_set_t dispatch_funs;  // Functions to call when this type of event is triggered.
 
       EventDef(const std::string & _n, fun_t _handler, const std::string & _d,
         const properties_t & _properties)

@@ -7,6 +7,7 @@
 #include "InstLib.h"
 #include "EventLib.h"
 #include "../tools/BitSet.h"
+#include "../tools/BitVector.h"
 #include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
 #include "../tools/Random.h"
@@ -25,7 +26,7 @@
 //  [ ] Write some halfway decent documentation. --> Use doxygen notation. Every instance variable, every function.
 //  [ ] Write up a nice description.
 //  [x] Parameterize static constexpr variables.
-//  [ ] Make class templated, have a using statement to specify 8 cleanly
+//  [x] Make class templated, have a using statement to specify 8 cleanly
 
 namespace emp {
   template<size_t AFFINITY_WIDTH>
@@ -320,10 +321,7 @@ namespace emp {
 
     program_t program;              // Program (set of functions).
     memory_t shared_mem;
-    // Using ptrs to vectors so I can easily shuffle execution stacks around (when a core dies and I need to keep the stacks vector de-fragmented)
-    emp::vector<Ptr<exec_stk_t>> execution_stacks;  // @amlalejini - TODO: get rid of pointers, just manage an array/vector of size core count
-    std::deque<Ptr<exec_stk_t>> core_spawn_queue; // We don't want to spawn cores while processing the execution stacks during single process. Cores spawned during this time will be put into the queue to be spawned later.
-    Ptr<exec_stk_t> cur_core;
+
     std::deque<event_t> event_queue;
 
     emp::vector<double> traits;
@@ -336,23 +334,39 @@ namespace emp {
     double min_bind_thresh;     //< Minimum bit string match threshold for function calls/event binding, etc.
     bool stochastic_fun_call;   //< Are candidate function calls with == binding strength chosen stochastically?
 
-    // @amlalejini - TODO: can change to active executing id, can then grab whatever cur state you want.
-    bool is_executing;    // This is true only when executing the execution stacks.
+    emp::vector<exec_stk_t> cores;      //< Vector of cores. Not all will be active at all given points in time.
+    emp::vector<size_t> active_cores;   //< Vector of active core IDs. Maintains relative ordering or active cores.
+    emp::vector<size_t> inactive_cores; //< Vector of inactive core IDs.
+    std::deque<size_t> pending_cores;  //< Vector of core IDs pending activation.
+    size_t exec_core_id;                //< core ID of the currently executing core.
+    bool is_executing;                  //< True when mid-execution of all cores. (On every CPU cycle: execute all cores).
+    // TODO: disallow configuration of hardware while executing. (and any other functions that could sent things into a bad state)
+    /// Garbage function for debugging.
+    void PrintCoreStates() {
+      std::cout << "Active core ids:" << std::endl;
+      for (size_t i = 0; i < active_cores.size(); ++i) std::cout << " " << active_cores[i];
+      std::cout << "Inactive core ids: " << std::endl;
+      for (size_t i = 0; i < inactive_cores.size(); ++i) std::cout << " " << inactive_cores[i];
+      std::cout << "Pending core ids: " << std::endl;
+      for (size_t i = 0; i < pending_cores.size(); ++i) std::cout << " " << pending_cores[i];
+    }
 
   public:
     /// EventDrivenGP constructor. Give instance variables reasonable defaults. Allow for configuration
     /// post-construction.
     EventDrivenGP_AW(Ptr<const inst_lib_t> _ilib, Ptr<const event_lib_t> _elib, Ptr<Random> rnd=nullptr)
-      : event_lib(_elib), random_ptr(rnd), random_owner(false), program(_ilib),
-        shared_mem(), execution_stacks(), core_spawn_queue(), cur_core(nullptr),
-        event_queue(), traits(), errors(0), max_cores(8), max_call_depth(128),
-        default_mem_value(0.0), min_bind_thresh(0.5),
-        stochastic_fun_call(true), is_executing(false)
+      : event_lib(_elib), random_ptr(rnd), random_owner(false), program(_ilib), shared_mem(),
+        event_queue(), traits(), errors(0), max_cores(8), max_call_depth(128), default_mem_value(0.0),
+        min_bind_thresh(0.5), stochastic_fun_call(true), cores(max_cores), active_cores(),
+        inactive_cores(max_cores), pending_cores(), exec_core_id(0), is_executing(false)
     {
+      // If no random provided, create one.
       if (!rnd) NewRandom();
-      // Spin up main core.
+      // Add all available cores to inactive.
+      for (size_t i = 0; i < inactive_cores.size(); ++i)
+        inactive_cores[i] = (inactive_cores.size() - 1) - i;
+      // Spin up main core (will spin up on function ID = 0).
       SpawnCore(0, memory_t(), true);
-      cur_core = execution_stacks[0];
     }
 
     EventDrivenGP_AW(inst_lib_t & _ilib, event_lib_t & _elib, Ptr<Random> rnd=nullptr)
@@ -368,83 +382,92 @@ namespace emp {
     //  - Issue: EventDrivenGP has some pointers that can't just be default copied on a copy.
     //  - Question: But, default move should be fine (duplicating pointers is bad, but moving them?)?
     EventDrivenGP_AW(EventDrivenGP_t &&) = default; // @amlalejini - TODO: copy pointers, set old to nullptr
-    EventDrivenGP_AW(const EventDrivenGP_t & in)
-      : event_lib(in.event_lib), random_ptr(nullptr), random_owner(false),
-        program(in.program), shared_mem(in.shared_mem), execution_stacks(), core_spawn_queue(),
-        cur_core(nullptr), event_queue(in.event_queue), traits(in.traits), errors(in.errors),
-        is_executing(in.is_executing)
-    {
-      // This seems so nasty...
-      if (in.random_owner) NewRandom(); // New random number generator.
-      else random_ptr = in.random_ptr;
-      for (size_t i = 0; i < in.execution_stacks.size(); ++i) {
-        execution_stacks.emplace_back(NewPtr<exec_stk_t>(*in.execution_stacks[i]));
-        if (in.cur_core == execution_stacks[i]) cur_core = execution_stacks[execution_stacks.size() - 1];
-      }
-      for (size_t i = 0; i < in.core_spawn_queue.size(); ++i) {
-        core_spawn_queue.emplace_back(NewPtr<exec_stk_t>(*in.core_spawn_queue[i]));
-      }
-    }
+    // EventDrivenGP_AW(const EventDrivenGP_t & in)
+    //   : event_lib(in.event_lib), random_ptr(nullptr), random_owner(false),
+    //     program(in.program), shared_mem(in.shared_mem), execution_stacks(), core_spawn_queue(),
+    //     cur_core(nullptr), event_queue(in.event_queue), traits(in.traits), errors(in.errors),
+    //     is_executing(in.is_executing)
+    // {
+    //   // This seems so nasty...
+    //   if (in.random_owner) NewRandom(); // New random number generator.
+    //   else random_ptr = in.random_ptr;
+    //   for (size_t i = 0; i < in.execution_stacks.size(); ++i) {
+    //     execution_stacks.emplace_back(NewPtr<exec_stk_t>(*in.execution_stacks[i]));
+    //     if (in.cur_core == execution_stacks[i]) cur_core = execution_stacks[execution_stacks.size() - 1];
+    //   }
+    //   for (size_t i = 0; i < in.core_spawn_queue.size(); ++i) {
+    //     core_spawn_queue.emplace_back(NewPtr<exec_stk_t>(*in.core_spawn_queue[i]));
+    //   }
+    // }
 
     // @amlalejini - TODO: define operator= (move version and copy version)
 
     /// Destructor - clean up: execution stacks, shared memory.
     ~EventDrivenGP_AW() {
-      ResetHardware(); // NOTE: can get rid post-pointer doom.
       if (random_owner) random_ptr.Delete();
     }
 
     // -- Control --
     /// Reset everything, including program.
     void Reset() {
-      traits.resize(0);
-      program.Clear();
       ResetHardware();
+      traits.clear();
+      program.Clear();
     }
 
     /// Reset only CPU hardware stuff, not program.
     void ResetHardware() {
       shared_mem.clear();
-      // Clear event queue
       event_queue.clear();
-      event_queue.resize(0);
-      // Clear out execution stacks.
-      for (size_t i = 0; i < execution_stacks.size(); i++) { execution_stacks[i].Delete(); }
-      execution_stacks.resize(0);
-      // Clear out spawn core queue.
-      for (size_t i = 0; i < core_spawn_queue.size(); i++) { core_spawn_queue[i].Delete(); }
-      core_spawn_queue.resize(0);
-
-      cur_core = nullptr;
+      for (size_t i = 0; i < cores.size(); ++i) cores[i].clear();
+      active_cores.clear();
+      pending_cores.clear();
+      inactive_cores.resize(max_cores);
+      // Add all available cores to inactive.
+      for (size_t i = 0; i < inactive_cores.size(); ++i)
+        inactive_cores[i] = (inactive_cores.size() - 1) - i;
+      exec_core_id = -1;
       errors = 0;
+      is_executing = false;
     }
 
     // -- Accessors --
     Ptr<const inst_lib_t> GetInstLib() const { return program.GetInstLib(); }
     Ptr<const event_lib_t> GetEventLib() const { return event_lib; }
+
     Random & GetRandom() { return *random_ptr; }
-    const Function & GetFunction(size_t fID) const { emp_assert(ValidFunction(fID)); return program[fID]; }
-    size_t GetNumErrors() const { return errors; }
+    Ptr<Random> GetRandomPtr() { return random_ptr; }
+
+    const program_t & GetProgram() const { return program; }
+    const Function & GetFunction(size_t fID) const {
+      emp_assert(ValidFunction(fID));
+      return program[fID];
+    }
     const inst_t & GetInst(size_t fID, size_t pos) const {
       emp_assert(ValidPosition(fID, pos));
       return program[fID].inst_seq[pos];
     }
-    const program_t & GetProgram() const { return program; }
 
-    /// Get current execution core (call stack). Will be nullptr if no active cores.
-    Ptr<exec_stk_t> GetCurExecStackPtr() { return cur_core; }
-    State & GetCurState() { emp_assert(cur_core && !cur_core->empty()); return cur_core->back(); }
-    bool ValidPosition(size_t fID, size_t pos) const { return program.ValidPosition(fID, pos); }
-    bool ValidFunction(size_t fID) const { return program.ValidFunction(fID); }
+    double GetTrait(size_t id) const { return traits[id]; }
+
+    size_t GetNumErrors() const { return errors; }
+
     double GetMinBindThresh() const { return min_bind_thresh; }
     size_t GetMaxCores() const { return max_cores; }
     size_t GetMaxCallDepth() const { return max_call_depth; }
     mem_val_t GetDefaultMemValue() const { return default_mem_value; }
     bool IsStochasticFunCall() const { return stochastic_fun_call; }
-    double GetTrait(size_t id) const { return traits[id]; }
+
+    size_t GetCurCoreID() { return exec_core_id; }
+    exec_stk_t & GetCurCore() { return cores[exec_core_id]; }
+    State & GetCurState() { emp_assert(!cores[exec_core_id].size()); return cores[exec_core_id].back(); }
+
+    bool ValidPosition(size_t fID, size_t pos) const { return program.ValidPosition(fID, pos); }
+    bool ValidFunction(size_t fID) const { return program.ValidFunction(fID); }
 
     memory_t & GetSharedMem() { return shared_mem; }
     mem_val_t GetShared(mem_key_t key) const { return Find(shared_mem, key, default_mem_value); }
+
     void SetShared(mem_key_t key, mem_val_t value) { shared_mem[key] = value; }
     mem_val_t & AccessShared(mem_key_t key) {
       if (!Has(shared_mem, key)) shared_mem[key] = default_mem_value;
@@ -452,37 +475,44 @@ namespace emp {
     }
 
     // ------- Configuration -------
-
+    // TODO: disallow while executing.
     /// Set minimum binding threshold.
     /// REQ: val >= 0
     void SetMinBindThresh(double val) { emp_assert(val >= 0.0); min_bind_thresh = val; }
+    /// WARNING: If you decrease max cores, you may kill actively running cores.
+    /// We make no guarantees about which particular cores will not be killed.
+    /// Exception: ...
     void SetMaxCores(size_t val) { max_cores = val; } // TODO: think about reprocussions of changing mid-execution.
     void SetMaxCallDepth(size_t val) { max_call_depth = val; }
     void SetDefaultMemValue(mem_val_t val) {
       default_mem_value = val;
       // Propagate default mem value through execution stacks.
-      for (size_t i = 0; i < execution_stacks.size(); ++i)
-        for (size_t k = 0; k < execution_stacks[i]->size(); ++k)
-          execution_stacks[i]->at(k).SetDefaultMemValue(val);
+      for (size_t i = 0; i < cores.size(); ++i)
+        for (size_t k = 0; k < cores[i].size(); ++k)
+          cores[i][k].SetDefaultMemValue(val);
     }
     void SetStochasticFunCall(bool val) { stochastic_fun_call = val; }
-
 
     void SetTrait(size_t id, double val) {
       if (id >= traits.size()) traits.resize(id+1, 0.0);
       traits[id] = val;
     }
+
     void PushTrait(double val) { traits.push_back(val); }
+
     void SetInst(size_t fID, size_t pos, const inst_t & inst) {
       emp_assert(ValidPosition(fID, pos));
       program[fID].inst_seq[pos] = inst;
     }
+
     void SetInst(size_t fID, size_t pos, size_t id, arg_t a0=0, arg_t a1=0, arg_t a2=0,
                  const affinity_t & aff=affinity_t()) {
       emp_assert(ValidPosition(fID, pos));
       program[fID].inst_seq[pos].Set(id, a0, a1, a2, aff);
     }
+
     void SetProgram(const program_t & _program) { program = _program; }
+
     void PushFunction(const Function & _function) { program.PushFunction(_function); }
 
     /// Push new instruction to program.
@@ -577,16 +607,14 @@ namespace emp {
 
     /// Find best matching functions (by ID) given affinity.
     emp::vector<size_t> FindBestFuncMatch(const affinity_t & affinity, double threshold) {
-      // TODO: get rid of max bind, update threshold everytime we find something better.
-      double max_bind = -1;
       emp::vector<size_t> best_matches;
       for (size_t i=0; i < program.GetSize(); ++i) {
         double bind = SimpleMatchCoeff(program[i].affinity, affinity);
-        if (bind == max_bind) best_matches.push_back(i);
-        else if (bind > max_bind && bind >= threshold) {
+        if (bind == threshold) best_matches.push_back(i);
+        else if (bind > threshold) {
           best_matches.resize(1);
           best_matches[0] = i;
-          max_bind = bind;
+          threshold = bind;
         }
       }
       return best_matches;
@@ -595,8 +623,9 @@ namespace emp {
     /// Spawn core with function that has best match to provided affinity. Do nothing if no
     /// functions match above the provided threshold.
     /// Initialize function state with provided input memory.
+    /// Will fail if no inactive cores to claim.
     void SpawnCore(const affinity_t & affinity, double threshold, const memory_t & input_mem=memory_t(), bool is_main=false) {
-      if (execution_stacks.size() >= max_cores) return;
+      if (!inactive_cores.size()) return; // If there are no unclaimed cores, just return.
       size_t fID;
       emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, threshold));
       if (best_matches.empty()) return;
@@ -608,25 +637,30 @@ namespace emp {
 
     /// Spawn core with function specified by fID.
     /// Initialize function state with provided input memory.
+    /// Will fail if no inactive cores to claim.
     void SpawnCore(size_t fID, const memory_t & input_mem=memory_t(), bool is_main=false) {
-      if (execution_stacks.size() >= max_cores) return;
-      Ptr<exec_stk_t> stack = NewPtr<exec_stk_t>();
-      stack->emplace_back(is_main);
-      State & state = stack->at(stack->size() - 1);
+      if (!inactive_cores.size()) return; // If there are no unclaimed cores, just return.
+      // Which core should we spin up?
+      size_t core_id = inactive_cores.back();
+      inactive_cores.pop_back(); // Claim that core!
+      exec_stk_t & exec_stk = cores[core_id];
+      exec_stk.clear(); // Make sure we clear out the core (in case anyone left behind their dirty laundry).
+      exec_stk.emplace_back(default_mem_value, is_main);
+      State & state = exec_stk.back();
       state.input_mem = input_mem;
       state.SetIP(0);
       state.SetFP(fID);
-      // Spin up new core (queue it if executing current cores).
-      if (is_executing)
-        core_spawn_queue.push_back(stack);
-      else
-        execution_stacks.push_back(stack);
+      // Spin up new core.
+      // Mark core as pending if currently executing; otherwise, mark it as active.
+      if (is_executing) pending_cores.push_back(core_id);
+      else active_cores.push_back(core_id);
     }
 
     /// Call function with best affinity match above threshold.
     /// If not candidate functions found, do nothing.
     void CallFunction(const affinity_t & affinity, double threshold) {
-      // @amlalejini - TODO: memoize this function.
+      // Are we at max call depth? -- If so, call fails.
+      if (GetCurCore().size() >= max_call_depth) return;
       size_t fID;
       emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, threshold));
       if (best_matches.empty()) return;
@@ -637,15 +671,16 @@ namespace emp {
     }
 
     /// Call function specified by fID.
+    /// REQ: core must be active (must have a local state on execution stack).
     void CallFunction(size_t fID) {
       emp_assert(ValidPosition(fID, 0));
+      exec_stk_t & core = GetCurCore();
       // Are we at max call depth? -- If so, call fails.
-      if (GetCurExecStackPtr()->size() >= max_call_depth) return;
-      // Grab pointer to caller.
-      State & caller_state = GetCurState();
-      // Make a new state, push onto call stack.
-      GetCurExecStackPtr()->emplace_back();
-      State & new_state = GetCurExecStackPtr()->at(GetCurExecStackPtr()->size() - 1);
+      if (core.size() >= max_call_depth) return;
+      // Push new state onto stack.
+      core.emplace_back();
+      State & new_state = core.back();
+      State & caller_state = core[core.size() - 2];
       // Configure new state.
       new_state.SetFP(fID);
       new_state.SetIP(0);
@@ -662,13 +697,14 @@ namespace emp {
       // No returning from main.
       if (returning_state.IsMain()) return;
       // Is there anything to return to?
-      if (GetCurExecStackPtr()->size() > 1) {
+      exec_stk_t & core = GetCurCore();
+      if (core.size() > 1) {
         // If so, copy returning state's output memory into caller state's local memory.
-        State & caller_state = GetCurExecStackPtr()->at(GetCurExecStackPtr()->size() - 2);
+        State & caller_state = core[core.size() - 2];
         for (auto mem : returning_state.output_mem) caller_state.SetLocal(mem.first, mem.second);
       }
       // Pop returned state.
-      GetCurExecStackPtr()->pop_back();
+      core.pop_back();
     }
 
     // -- Execution --
@@ -714,21 +750,22 @@ namespace emp {
         event_queue.pop_front();
       }
       // Distribute 1 unit of computational time to each core.
-      size_t core_idx = 0;
-      size_t core_cnt = execution_stacks.size();
+      size_t active_core_idx = 0;
+      // size_t core_cnt = execution_stacks.size();
+      size_t core_cnt = active_cores.size();
       size_t adjust = 0;
       is_executing = true;
-      while (core_idx < core_cnt) {
+      while (active_core_idx < core_cnt) {
         // Set the current core to core at core_idx.
-        cur_core = execution_stacks[core_idx];
+        exec_core_id = active_cores[active_core_idx]; // Here's the core we're about to execute.
         // Do we need to move current core over in the execution core vector to make it contiguous?
         if (adjust) {
-          execution_stacks[core_idx] = nullptr;
-          execution_stacks[core_idx - adjust] = cur_core;
+          active_cores[active_core_idx] = -1;
+          active_cores[active_core_idx - adjust] = exec_core_id;
         }
         // Execute the core.
         //  * What function/instruction am I on?
-        State & cur_state = cur_core->back();
+        State & cur_state = GetCurState();
         const size_t ip = cur_state.inst_ptr;
         const size_t fp = cur_state.func_ptr;
         // fp needs to be valid here (and always, really). Shame shame if it's not.
@@ -738,12 +775,12 @@ namespace emp {
           if (!cur_state.block_stack.empty()) {
             //    - If there's a block to close, close it.
             CloseBlock();
-          } else if (cur_state.is_main && cur_core->size() == 1) {
+          } else if (cur_state.is_main && GetCurCore().size() == 1) {
             //    - If this is the main function, and we're at the bottom of the call stack, wrap.
             cur_state.inst_ptr = 0;
           } else {
             //    - Otherwise, return from function call.
-            ReturnFunction();
+            ReturnFunction(); // NOTE: This might invalidate our cur_state reference.
           }
         } else { // If instruction pointer is valid:
           // First, advance the instruction pointer by 1. This may invalidate the IP, but that's okay.
@@ -752,25 +789,26 @@ namespace emp {
           program.inst_lib->ProcessInst(*this, program[fp].inst_seq[ip]);
         }
         // After processing, is the core still active?
-        if (cur_core->empty()) {
-          // Free core.
-          execution_stacks[core_idx - adjust].Delete();
-          execution_stacks[core_idx - adjust] = nullptr;
+        if (GetCurCore().empty()) {
+          // Free core. Mark as inactive.
+          active_cores[active_core_idx - adjust] = -1;
+          inactive_cores.emplace_back(exec_core_id);
           adjust += 1;
         }
-        ++core_idx;
+        ++active_core_idx;
       }
       is_executing = false;
       // Update execution stack size to be accurate.
-      execution_stacks.resize(core_cnt - adjust);
+      active_cores.resize(core_cnt - adjust);
       // Set cur core to be first execution stack (which should always be main).
-      if (execution_stacks.size()) cur_core = execution_stacks[0];
+      if (active_cores.size()) exec_core_id = active_cores[0];
       // Spawn any cores that happened during execution.
-      while (!core_spawn_queue.empty()) {
-        execution_stacks.push_back(core_spawn_queue.front());
-        core_spawn_queue.pop_front();
+      while (pending_cores.size()) {
+        active_cores.emplace_back(pending_cores.front());
+        pending_cores.pop_front();
       }
     }
+
     /// Advance hardware by some number instructions.
     void Process(size_t num_inst) {
       for (size_t i = 0; i < num_inst; i++) SingleProcess();
@@ -824,14 +862,15 @@ namespace emp {
       os << "Event queue: ";
       for (auto event : event_queue) { PrintEvent(event, os); os << " "; }
       os << "\n";
-      // Print each core.
-      for (size_t i = 0; i < execution_stacks.size(); ++i) {
-        const exec_stk_t & stack = *(execution_stacks[i]);
-        os << "Core " << i << ":\n" << "  Call stack (" << stack.size() << "):\n    --TOP--\n";
-        for (size_t k = stack.size() - 1; k < stack.size(); --k) {
-          emp_assert(stack.size() != (size_t)-1);
+      // Print each active core.
+      for (size_t i = 0; i < active_cores.size(); ++i) {
+        size_t core_id = active_cores[i];
+        const exec_stk_t & core = cores[core_id];
+        os << "Core " << i << "(CID=" << core_id << "):\n" << "  Call stack (" << core.size() << "):\n    --TOP--\n";
+        for (size_t k = core.size() - 1; k < core.size(); --k) {
+          emp_assert(core.size() != (size_t)-1);
           // IP, FP, local mem, input mem, output mem
-          const State & state = stack[k];
+          const State & state = core[k];
           os << "    Inst ptr: " << state.inst_ptr << " (";
           if (ValidPosition(state.func_ptr, state.inst_ptr))
             PrintInst(GetInst(state.func_ptr, state.inst_ptr), os);
@@ -851,45 +890,6 @@ namespace emp {
     }
 
     // -- Default Instructions --
-    // For all instructions: because memory is implemented as unordered_maps, instructions should
-    //  gracefully handle the case where a particular memory position has yet to be used (doesn't
-    //  exist in map yet).
-
-    // Instructions to implement:
-    //  Mathematical computations:
-    //    [x] Inc
-    //    [x] Dec
-    //    [x] Not
-    //    [x] Add
-    //    [x] Sub
-    //    [x] Mult
-    //    [x] Div
-    //    [x] Mod
-    //    [x] TestEqu
-    //    [x] TestNEqu
-    //    [x] TestLess
-    //  Flow control:
-    //    [x] If
-    //    [x] While
-    //    [x] Countdown
-    //    [x] Break
-    //    [x] Close
-    //    [x] Call
-    //    [x] Return
-    //  Register Manipulation:
-    //    [x] SetMem
-    //    [x] CopyMem
-    //    [x] SwapMem
-    //    [x] Input  (Input mem => Local mem)
-    //    [x] Output (Local mem => Output mem)
-    //    [x] Commit (Local mem => Shared mem)
-    //    [x] Pull   (Shared mem => local mem)
-    //  Misc.
-    //    [x] Nop
-    //  Interaction
-    //    [x] Broadcast
-    //    [x] Send
-
     static void Inst_Inc(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       ++state.AccessLocal(inst.args[0]);
@@ -1059,10 +1059,6 @@ namespace emp {
       hw.TriggerEvent("Message", inst.affinity, state.output_mem, {"send"});
     }
 
-    // Issue (but also a good thing in some circumstances): This always returns a pointer to the same inst_lib object.
-    //  -- Anytime something gets added to it from elsewhere, it's added everywhere.
-    // Alternatives:
-    //    * Make a new thing everytime.
     static Ptr<const InstLib<EventDrivenGP_t>> DefaultInstLib() {
       static inst_lib_t inst_lib;
       if (inst_lib.GetSize() == 0) {
