@@ -6,7 +6,7 @@ Contents:
 .. toctree::
    :maxdepth: 1
 
-   Doxygen <doxydoc/html/index.html>
+   Doxygen <doxygen/html/index.html>
    d3
 
 * :ref:`genindex`
