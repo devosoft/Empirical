@@ -6,42 +6,6 @@
 //  This file defines the base class for a World template for use in evolutionary algorithms.
 //
 //
-//  There are three ways that organisms can enter the population:
-//   * InjectAt(org, pos) - place the organism at the specified position in the population.
-//   * Inject(org) - place the organism using a default postion (given other settings).
-//   * DoBirth(org, parent_pos) - place the organism using current birth settings.
-//
-//  If the population is in EA mode (with synchronous generations), DoBirth will place offspring in
-//  a "next generation" placeholder population.  Update() will move orgs into primary population.
-//
-//  Organisms have a series of functions that are called on them that are chosen:
-//
-//  FITNESS: Most selection methods require a fitness function to help determine who should be
-//           replicated.  Other systems merely use fitness as a measured output.
-//   0. If you set the fitness function using SetFitFun(), it will have priority.
-//   1. If the organism type has a "GetFitness()" member function, use it!
-//   2. If the organism type can be cast to double, use it!
-//   3. Start with a fitness function that throws an assert indicating function must be set.
-//
-//  MUTATIONS: The mutation function deteramines a main source of variation for most evolving
-//             systems.
-//   0. If you set the mutation function using SetMutFun(), it will have priority.
-//   1. Or DoMutations(random) member function.
-//   2. Empty, with assert.
-//
-//  PRINTING: How should organisms be printed to the command line?
-//   0. Setting the print function with SetPrintFun() member function.
-//   1. Org Print() member function
-//   2. Proper operator<<
-//   3. Do not print, just Assert
-//
-//  GENOMES: Do organisms have a genome separate from their instantiation?  By default, the full
-//           organism is returned when a genome is requested, but a GetGenome() member function
-//           in the organism type will override this behavior.
-//   1. GetGenome member function
-//   2. Return org AS genome.
-//
-//
 //  Developer Notes:
 //  * We should Specialize World so that ANOTHER world can be used with proper delegation to
 //    facilitate demes, pools, islands, etc.
@@ -71,6 +35,43 @@
 #include "World_select.h"
 
 namespace emp {
+
+  ///  Setup a World with a population of organisms that can evolve or deal with ecological effects.
+  ///
+  ///  There are three ways that organisms can enter the population:
+  ///   * InjectAt(org, pos) - place the organism at the specified position in the population.
+  ///   * Inject(org) - place the organism using a default postion (given other settings).
+  ///   * DoBirth(org, parent_pos) - place the organism using current birth settings.
+  ///
+  ///  If the population is in EA mode (with synchronous generations), DoBirth will place offspring in
+  ///  a "next generation" placeholder population.  Update() will move orgs into primary population.
+  ///
+  ///  Organisms have a series of functions that are called on them that are chosen:
+  ///
+  ///  FITNESS: Most selection methods require a fitness function to help determine who should be
+  ///           replicated.  Other systems merely use fitness as a measured output.
+  ///   0. If you set the fitness function using SetFitFun(), it will have priority.
+  ///   1. If the organism type has a "GetFitness()" member function, use it!
+  ///   2. If the organism type can be cast to double, use it!
+  ///   3. Start with a fitness function that throws an assert indicating function must be set.
+  ///
+  ///  MUTATIONS: The mutation function deteramines a main source of variation for most evolving
+  ///             systems.
+  ///   0. If you set the mutation function using SetMutFun(), it will have priority.
+  ///   1. Or DoMutations(random) member function.
+  ///   2. Empty, with assert.
+  ///
+  ///  PRINTING: How should organisms be printed to the command line?
+  ///   0. Setting the print function with SetPrintFun() member function.
+  ///   1. Org Print() member function
+  ///   2. Proper operator<<
+  ///   3. Do not print, just Assert
+  ///
+  ///  GENOMES: Do organisms have a genome separate from their instantiation?  By default, the full
+  ///           organism is returned when a genome is requested, but a GetGenome() member function
+  ///           in the organism type will override this behavior.
+  ///   1. GetGenome member function
+  ///   2. Return org AS genome.
 
   template <typename ORG>
   class World {
@@ -134,7 +135,7 @@ namespace emp {
     /// Potential data nodes -- these should be activated only if in use.
     Ptr<DataMonitor<double>> data_node_fitness;
 
-    /// Configurable functions.
+    // Configurable functions.
     fun_calc_fitness_t  fun_calc_fitness;   //< Function to evaluate fitness for provided organism.
     fun_do_mutations_t  fun_do_mutations;   //< Function to mutate an organism.
     fun_print_org_t     fun_print_org;      //< Function to print an organism.
@@ -149,7 +150,7 @@ namespace emp {
     /// Phylogeny and line-of-descent data collection.
     Systematics<genome_t> systematics;
 
-    /// == Signals ==
+    // == Signals ==
     SignalControl control;  // Setup the world to control various signals.
     Signal<void(size_t)> before_repro_sig;    //< Trigger signal before organism gives birth.
     Signal<void(ORG &)> offspring_ready_sig;  //< Trigger signal when offspring organism is built.
