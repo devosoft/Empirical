@@ -18,7 +18,7 @@
 #include "../control/SignalControl.h"
 #include "../control/Signal.h"
 
-// Notes:
+// Developer Notes:
 //  * Important concept: Main state (bottom-most call state on core 0's call stack).
 //    * The first function will be main (unless the fp on the initially created state is otherwise manipulated).
 //    * Main state behaves differently than any other state.
@@ -30,6 +30,10 @@
 //  [ ] Implement a load function.
 
 namespace emp {
+
+  /**
+  <general description here.>
+  */
   template<size_t AFFINITY_WIDTH>
   class EventDrivenGP_AW {
   public:
@@ -805,8 +809,89 @@ namespace emp {
     /// last function in program. If function pointer is provided, push to that function.
     void PushInst(const inst_t & inst, int fID=-1) { program.PushInst(inst, fID); }
 
-    /// Load entire genome from input stream.
-    bool Load(std::istream & input) { ; } // TODO
+    /// Load entire program from input stream.
+    /// Program format:
+    /// Fn-AFFINITY:
+    ///   INST_NAME[AFFINITY](arg_0, ..., arg_max)
+    ///   ...
+    /// Fn-AFFINITY:
+    ///   ...
+    void Load(std::istream & input) {
+      // Clear current program.
+      program.Clear();
+      std::string cur_line;
+      emp::vector<std::string> line_components;
+      while (!input.eof()) {
+        std::getline(input, cur_line);
+        remove_whitespace(cur_line); // Clear out whitespace.
+        if (cur_line == empty_string()) continue; // Skip empty lines.
+        // Are we looking the beginning of a function?
+        slice(cur_line, line_components, '-');
+        if (line_components[0] == "Fn" && line_components.size() > 1) {
+          // Extract function affinity.
+          std::string & aff_str = line_components[1];
+          affinity_t fun_aff;
+          for (size_t i = 0; i < aff_str.size(); ++i) {
+            if (i >= fun_aff.GetSize()) break;
+            if (aff_str[i] == '1') fun_aff.Set(fun_aff.GetSize() - i - 1, true);
+          }
+          program.PushFunction(fun_aff);
+        } else {
+          std::cout << "- Instruction -" << std::endl;
+          // We must be looking at an instruction.
+          affinity_t inst_aff;
+          int a0 = 0; int a1 = 0; int a2 = 0;
+          // Is there an affinity?
+          size_t aff_begin = cur_line.find_first_of('[');
+          size_t aff_end = cur_line.find_first_of(']');
+          if ((aff_begin != std::string::npos) && (aff_end != std::string::npos)) {
+            // Found affinity.
+            std::string aff_str = string_get_range(cur_line, aff_begin+1, aff_end);
+            std::cout << "Affinity str: " << aff_str << std::endl;
+            for (size_t i = 0; i < aff_str.size(); ++i) {
+              if (i >= inst_aff.GetSize()) break;
+              if (aff_str[i] == '1') inst_aff.Set(inst_aff.GetSize() - i - 1, true);
+            }
+            // Pop affinity from cur_line.
+            cur_line = string_get_range(cur_line, 0, aff_begin) + string_get_word(cur_line, aff_end+1);
+            std::cout << "After popping affinity from cur line: " << cur_line << std::endl;
+          }
+          // Are there arguments?
+          size_t args_begin = cur_line.find_first_of('(');
+          size_t args_end = cur_line.find_first_of(')');
+          size_t args_cnt = 0;
+          if ((args_begin != std::string::npos) && (args_end != std::string::npos)) {
+            // Found some arguments.
+            std::string args_str = string_get_range(cur_line, args_begin+1, args_end);
+            std::cout << "Args str: " << args_str << std::endl;
+            line_components.clear();
+            // Extract arguments from arg str.
+            slice(args_str, line_components, ',');
+            if (args_cnt < line_components.size()) {
+              emp_assert(is_valid(line_components[args_cnt], [](char c){ return is_digit(c); }));
+              a0 = std::stoi(line_components[args_cnt]); ++args_cnt;
+            }
+            if (args_cnt < line_components.size()) {
+              emp_assert(is_valid(line_components[args_cnt], [](char c){ return is_digit(c); }));
+              a1 = std::stoi(line_components[args_cnt]); ++args_cnt;
+            }
+            if (args_cnt < line_components.size()) {
+              emp_assert(is_valid(line_components[args_cnt], [](char c){ return is_digit(c); }));
+              a2 = std::stoi(line_components[args_cnt]); ++args_cnt;
+            }
+            // Pop arguments from current line.
+            cur_line = string_get_range(cur_line, 0, args_begin) + string_get_word(cur_line, args_end+1);
+            std::cout << "After popping args from cur line: " << cur_line << std::endl;
+          }
+          // All that's left should be the instruction name.
+          emp_assert(program.inst_lib->GetID(cur_line) != (size_t)-1);
+          // Push instruction to program.
+          program.PushInst(cur_line, a0, a1, a2, inst_aff);
+        }
+      }
+      std::cout << "Successfully loaded program!" << std::endl;
+      program.PrintProgram();
+    }
 
     // ---------- Hardware Utilities ----------
     /// Generate new random number generator for this hardware object with the given seed value.
