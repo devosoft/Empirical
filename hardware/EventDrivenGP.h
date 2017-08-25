@@ -190,6 +190,7 @@ namespace emp {
     };
 
     using inst_t = Instruction;                    //< Convenient Instruction type alias.
+    using inst_seq_t = emp::vector<inst_t>;        //< Convenient type alias for instruction sequence.
     using event_t = Event;                         //< Event type alias.
     using inst_lib_t = InstLib<EventDrivenGP_t>;   //< Instruction library type alias.
     using event_lib_t = EventLib<EventDrivenGP_t>; //< Event library type alias.
@@ -199,8 +200,6 @@ namespace emp {
     ///   * affinity: Function affinity. Analogous to the function's name.
     ///   * inst_seq: Instruction sequence. Sequence of instructions that make up the function.
     struct Function {
-      using inst_seq_t = emp::vector<inst_t>; //< Convenient type alias for instruction sequence.
-
       affinity_t affinity;          //< Function affinity. Analogous to the function's name.
       inst_seq_t inst_seq;          //< Instruction sequence. Sequence of instructions that make up the function.
 
@@ -242,7 +241,6 @@ namespace emp {
     /// their functions.
     struct Program {
       using program_t = emp::vector<Function>;  //< Convenient type alias for sequence of functions.
-      using inst_seq_t = typename Function::inst_seq_t;
 
       Ptr<const inst_lib_t> inst_lib;  //< Pointer to const instruction library associated with this program.
       program_t program;               //< Sequence of functions that make up this program.
@@ -510,6 +508,41 @@ namespace emp {
       is_executing = false;
     }
 
+    /// Spawn core with function that has best match to provided affinity. Do nothing if no
+    /// functions match above the provided threshold.
+    /// Initialize function state with provided input memory.
+    /// Will fail if no inactive cores to claim.
+    void SpawnCore(const affinity_t & affinity, double threshold, const memory_t & input_mem=memory_t(), bool is_main=false) {
+      if (!inactive_cores.size()) return; // If there are no unclaimed cores, just return.
+      size_t fID;
+      emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, threshold));
+      if (best_matches.empty()) return;
+      if (best_matches.size() == 1.0) fID = best_matches[0];
+      else if (stochastic_fun_call) fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
+      else fID = best_matches[0];
+      SpawnCore(fID, input_mem, is_main);
+    }
+
+    /// Spawn core with function specified by fID.
+    /// Initialize function state with provided input memory.
+    /// Will fail if no inactive cores to claim.
+    void SpawnCore(size_t fID, const memory_t & input_mem=memory_t(), bool is_main=false) {
+      if (!inactive_cores.size()) return; // If there are no unclaimed cores, just return.
+      // Which core should we spin up?
+      size_t core_id = inactive_cores.back();
+      inactive_cores.pop_back(); // Claim that core!
+      exec_stk_t & exec_stk = cores[core_id];
+      exec_stk.clear(); // Make sure we clear out the core (in case anyone left behind their dirty laundry).
+      exec_stk.emplace_back(default_mem_value, is_main);
+      State & state = exec_stk.back();
+      state.input_mem = input_mem;
+      state.SetIP(0);
+      state.SetFP(fID);
+      // Spin up new core.
+      // Mark core as pending if currently executing; otherwise, mark it as active.
+      if (is_executing) pending_cores.push_back(core_id);
+      else active_cores.push_back(core_id);
+    }
 
     // ---------- Accessors ----------
     /// Get instruction library associated with hardware's program.
@@ -583,30 +616,87 @@ namespace emp {
     /// If key cannot be found, return the default memory value.
     mem_val_t GetShared(mem_key_t key) const { return Find(shared_mem, key, default_mem_value); }
 
-    // ---------- Hardware Utilities ----------
-    /// Is program prosition defined by the given function ID (fID) and instruction position (pos)
-    /// a valid position in this hardware object's program?
-    bool ValidPosition(size_t fID, size_t pos) const { return program.ValidPosition(fID, pos); }
-
-
-    bool ValidFunction(size_t fID) const { return program.ValidFunction(fID); }
-
-    void SetShared(mem_key_t key, mem_val_t value) { shared_mem[key] = value; }
+    /// Get a reference to a location in the shared memory map as indicated by key.
+    /// If key cannot be found, add key:default_mem_value to map and return newly added location.
     mem_val_t & AccessShared(mem_key_t key) {
       if (!Has(shared_mem, key)) shared_mem[key] = default_mem_value;
       return (shared_mem)[key];
     }
 
     // ------- Configuration -------
-    // TODO: disallow while executing.
     /// Set minimum binding threshold.
-    /// REQ: val >= 0
-    void SetMinBindThresh(double val) { emp_assert(val >= 0.0); min_bind_thresh = val; }
-    /// WARNING: If you decrease max cores, you may kill actively running cores.
-    /// We make no guarantees about which particular cores will not be killed.
-    /// Exception: ...
-    void SetMaxCores(size_t val) { max_cores = val; } // TODO: think about reprocussions of changing mid-execution.
-    void SetMaxCallDepth(size_t val) { max_call_depth = val; }
+    /// Requirement: minimum binding threshold >= 0.0
+    void SetMinBindThresh(double val) {
+      emp_assert(val >= 0.0);
+      min_bind_thresh = emp::Max(val, 0.0);
+    }
+
+    /// Set the maximum number of cores that are allowed to be running/active simultaneously on
+    /// this hardware object.
+    /// Warning: If you decrease max cores, you may kill actively running cores.
+    /// Warning: If you decrease max cores, we make no guarantees about which particular cores are killed. This could have adverse effects.
+    /// Requirement: Must have max cores > 0 and cannot set max cores while executing (while in SingleProcess function).
+    /// To sum up, be careful if you're going to decreasing max cores after you've run the hardware.
+    void SetMaxCores(size_t val) {
+      emp_assert(val > 0 && !is_executing);
+      // Resize cores to max_cores.
+      cores.resize(val);
+      if (val > max_cores) {
+        // Increasing total available cores, add new cores to inactive_cores vector.
+        // To decrease risk of unexpected behavior, maintain reverse ordering of inactive_cores.
+        //  - Because this is a configuration function, it's fine for it to be pretty slow. As such, I'll take the easy way out here.
+        for (size_t i = max_cores; i < val; i++)
+          inactive_cores.insert(inactive_cores.begin(), i);
+      } else if (val < max_cores) {
+        // Decreasing total available cores, adjust active and inactive core vectors (maintain relative ordering in each).
+        //  - No need to worry about pending core queue as SetMaxCores is ill-defined/not allowed when is_executing is true.
+        // Fix active_cores (maintain relative ordering).
+        size_t ac_idx = 0;
+        size_t ac_cnt = active_cores.size();
+        size_t ac_adjust = 0;
+        while (ac_idx < ac_cnt) {
+          size_t core_id = active_cores[ac_idx];
+          if (core_id >= val) { // Do we need to eliminate this core_id from active cores?
+            // If yes, set to -1 and increment adjust.
+            active_cores[ac_idx - ac_adjust] = -1;
+            ++ac_adjust;
+          } else if (ac_adjust) { // Still valid core ID, so do we need to defragment?
+            active_cores[ac_idx] = -1;
+            active_cores[ac_idx - ac_adjust] = core_id;
+          }
+          ++ac_idx;
+        }
+        active_cores.resize(ac_cnt - ac_adjust);
+        // Fix inactive cores (maintain relative ordering).
+        size_t ic_idx = 0;
+        size_t ic_cnt = inactive_cores.size();
+        size_t ic_adjust = 0;
+        while (ic_idx < ic_cnt) {
+          size_t core_id = inactive_cores[ic_idx];
+          if (core_id >= val) { // Do we need to eliminate this core_id from inactive cores?
+            // If yes, set to -1 and increment adjust.
+            inactive_cores[ic_idx - ic_adjust] = -1;
+            ++ic_adjust;
+          } else if (ic_adjust) { // Still valid core ID, so do we need to defragment?
+            inactive_cores[ic_idx] = -1;
+            inactive_cores[ic_idx - ic_adjust] = core_id;
+          }
+          ++ic_idx;
+        }
+        inactive_cores.resize(ic_cnt - ic_adjust);
+        // Make sure exec_core_id is still valid.
+        if (active_cores.size()) exec_core_id = active_cores[0];
+      } // No need to do anything if val == max_cores.
+
+      max_cores = val; // Update max_cores.
+    }
+
+    /// Configure max call depth.
+    /// Warning: will not retroactively enforce new max call depth.
+    /// Requirement: max call depth must be > 0.
+    void SetMaxCallDepth(size_t val) { emp_assert(val > 0); max_call_depth = val; }
+
+    /// Configure the default memory value.
     void SetDefaultMemValue(mem_val_t val) {
       default_mem_value = val;
       // Propagate default mem value through execution stacks.
@@ -614,29 +704,44 @@ namespace emp {
         for (size_t k = 0; k < cores[i].size(); ++k)
           cores[i][k].SetDefaultMemValue(val);
     }
+
+    /// Configure whether or not function calls should be stochastic if we have two or more matches
+    /// that are equidistant from caller/event affinity.
     void SetStochasticFunCall(bool val) { stochastic_fun_call = val; }
 
+    /// Set trait in traints vector given by id to value given by val.
+    /// Will resize traits vector if given id is greater than current traits vector size.
     void SetTrait(size_t id, double val) {
       if (id >= traits.size()) traits.resize(id+1, 0.0);
       traits[id] = val;
     }
 
-    void PushTrait(double val) { traits.push_back(val); }
+    /// Push a trait onto end of traits vector.
+    void PushTrait(double val) { traits.emplace_back(val); }
 
+    /// Shortcut to this hardware object's program's SetInst function of the same signature.
     void SetInst(size_t fID, size_t pos, const inst_t & inst) {
       emp_assert(ValidPosition(fID, pos));
-      program[fID].inst_seq[pos] = inst;
+      program.SetInst(fID, pos, inst);
     }
 
+    /// Shortcut to this hardware object's program's SetInst function of the same signature.
     void SetInst(size_t fID, size_t pos, size_t id, arg_t a0=0, arg_t a1=0, arg_t a2=0,
                  const affinity_t & aff=affinity_t()) {
       emp_assert(ValidPosition(fID, pos));
-      program[fID].inst_seq[pos].Set(id, a0, a1, a2, aff);
+      program.SetInst(fID, pos, id, a0, a1, a2, aff);
     }
 
+    /// Set program for this hardware object.
     void SetProgram(const program_t & _program) { program = _program; }
 
+    /// Shortcut to this hardware object's program's PushFunction operation of the same signature.
     void PushFunction(const Function & _function) { program.PushFunction(_function); }
+
+    /// Shortcut to this hardware object's program's PushFunction operation of the same signature.
+    void PushFunction(const affinity_t & _aff=affinity_t(), const inst_seq_t & _seq=inst_seq_t()) {
+      program.PushFunction(_aff, _seq);
+    }
 
     /// Push new instruction to program.
     /// If no function pointer is provided and no functions exist yet, add new function to
@@ -663,13 +768,25 @@ namespace emp {
     /// Load entire genome from input stream.
     bool Load(std::istream & input) { ; } // TODO
 
+    // ---------- Hardware Utilities ----------
+    /// Generate new random number generator for this hardware object with the given seed value.
     void NewRandom(int seed=-1) {
       if (random_owner) random_ptr.Delete();
+      else random_ptr = nullptr;
       random_ptr.New(seed);
       random_owner = true;
     }
 
-    // -- Utilities --
+    /// Is program position defined by the given function ID (fID) and instruction position (pos)
+    /// a valid position in this hardware object's program?
+    bool ValidPosition(size_t fID, size_t pos) const { return program.ValidPosition(fID, pos); }
+
+    /// Is the function given by function ID (fID) a valid function in this hardware object's program?
+    bool ValidFunction(size_t fID) const { return program.ValidFunction(fID); }
+
+    /// Set given shared memory map location (key) to given value.
+    void SetShared(mem_key_t key, mem_val_t value) { shared_mem[key] = value; }
+
     /// Given valid function pointer and instruction pointer, find next end of block (at current block level).
     /// This is not guaranteed to return a valid IP. At worst, it'll return an IP == function.inst_seq.size().
     size_t FindEndOfBlock(size_t fp, size_t ip) {
@@ -691,7 +808,8 @@ namespace emp {
       return ip;
     }
 
-    /// Close current block in cur_state if there is one to close. If not, do nothing.
+    /// Close current block in the current local program state if there is one to close.
+    /// If not, do nothing.
     /// Handles closure of known, special block types appropriately:
     ///   * LOOPS - set cur_state's IP to beginning of block.
     void CloseBlock() {
@@ -712,12 +830,13 @@ namespace emp {
       state.block_stack.pop_back();
     }
 
+    /// Open a block in the current local program state as specified by begin, end, and type.
     void OpenBlock(size_t begin, size_t end, BlockType type) {
       State & state = GetCurState();
       state.block_stack.emplace_back(begin, end, type);
     }
 
-    /// If there's a block to break out of, break out (to eob).
+    /// If there's a block to break out of in current local program state, break out (to eob).
     /// Otherwise, do nothing.
     void BreakBlock() {
       State & state = GetCurState();
@@ -741,42 +860,6 @@ namespace emp {
         }
       }
       return best_matches;
-    }
-
-    /// Spawn core with function that has best match to provided affinity. Do nothing if no
-    /// functions match above the provided threshold.
-    /// Initialize function state with provided input memory.
-    /// Will fail if no inactive cores to claim.
-    void SpawnCore(const affinity_t & affinity, double threshold, const memory_t & input_mem=memory_t(), bool is_main=false) {
-      if (!inactive_cores.size()) return; // If there are no unclaimed cores, just return.
-      size_t fID;
-      emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, threshold));
-      if (best_matches.empty()) return;
-      if (best_matches.size() == 1.0) fID = best_matches[0];
-      else if (stochastic_fun_call) fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
-      else fID = best_matches[0];
-      SpawnCore(fID, input_mem, is_main);
-    }
-
-    /// Spawn core with function specified by fID.
-    /// Initialize function state with provided input memory.
-    /// Will fail if no inactive cores to claim.
-    void SpawnCore(size_t fID, const memory_t & input_mem=memory_t(), bool is_main=false) {
-      if (!inactive_cores.size()) return; // If there are no unclaimed cores, just return.
-      // Which core should we spin up?
-      size_t core_id = inactive_cores.back();
-      inactive_cores.pop_back(); // Claim that core!
-      exec_stk_t & exec_stk = cores[core_id];
-      exec_stk.clear(); // Make sure we clear out the core (in case anyone left behind their dirty laundry).
-      exec_stk.emplace_back(default_mem_value, is_main);
-      State & state = exec_stk.back();
-      state.input_mem = input_mem;
-      state.SetIP(0);
-      state.SetFP(fID);
-      // Spin up new core.
-      // Mark core as pending if currently executing; otherwise, mark it as active.
-      if (is_executing) pending_cores.push_back(core_id);
-      else active_cores.push_back(core_id);
     }
 
     /// Call function with best affinity match above threshold.
@@ -830,13 +913,16 @@ namespace emp {
       core.pop_back();
     }
 
-    // -- Execution --
+    // ---------- Hardware Execution ----------
     /// Process a single instruction, provided by the caller.
     void ProcessInst(const inst_t & inst) { program.inst_lib->ProcessInst(*this, inst); }
+
     /// Handle an event (on this hardware).
     void HandleEvent(const event_t & event) { event_lib->HandleEvent(*this, event); }
+
     /// Trigger an event (from this hardware).
     void TriggerEvent(const event_t & event) { event_lib->TriggerEvent(*this, event); }
+
     /// Trigger an event (from this hardware).
     void TriggerEvent(const std::string & name, const affinity_t & affinity=affinity_t(),
                       const memory_t & msg=memory_t(), const properties_t & properties=properties_t()) {
@@ -844,20 +930,24 @@ namespace emp {
       event_t event(id, affinity, msg, properties);
       event_lib->TriggerEvent(*this, event);
     }
+
     /// Trigger an event (from this hardware).
     void TriggerEvent(size_t id, const affinity_t & affinity=affinity_t(),
                       const memory_t & msg=memory_t(), const properties_t & properties=properties_t()) {
       event_t event(id, affinity, msg, properties);
       event_lib->TriggerEvent(*this, event);
     }
+
     /// Queue an event (to be handled by this hardware).
     void QueueEvent(const event_t & event) { event_queue.emplace_back(event); }
+
     /// Queue event by name.
     void QueueEvent(const std::string & name, const affinity_t & affinity=affinity_t(),
                     const memory_t & msg=memory_t(), const properties_t & properties=properties_t()) {
       const size_t id = event_lib->GetID(name);
       event_queue.emplace_back(id, affinity, msg, properties);
     }
+
     /// Queue event by id.
     void QueueEvent(size_t id, const affinity_t & affinity=affinity_t(),
                     const memory_t & msg=memory_t(), const properties_t & properties=properties_t()) {
@@ -874,7 +964,6 @@ namespace emp {
       }
       // Distribute 1 unit of computational time to each core.
       size_t active_core_idx = 0;
-      // size_t core_cnt = execution_stacks.size();
       size_t core_cnt = active_cores.size();
       size_t adjust = 0;
       is_executing = true;
@@ -916,7 +1005,7 @@ namespace emp {
           // Free core. Mark as inactive.
           active_cores[active_core_idx - adjust] = -1;
           inactive_cores.emplace_back(exec_core_id);
-          adjust += 1;
+          ++adjust;
         }
         ++active_core_idx;
       }
@@ -932,12 +1021,13 @@ namespace emp {
       }
     }
 
-    /// Advance hardware by some number instructions.
+    /// Advance hardware by some arbitrary number instructions.
     void Process(size_t num_inst) {
       for (size_t i = 0; i < num_inst; i++) SingleProcess();
     }
 
-    // -- Printing --
+    // ---------- Printing ----------
+    /// Print given event using given output stream (default = std::cout).
     void PrintEvent(const event_t & event, std::ostream & os=std::cout) {
       os << "[" << event_lib->GetName(event.id) << ","; event.affinity.Print(os); os << ",(";
       for (const auto & mem : event.msg) std::cout << "{" << mem.first << ":" << mem.second << "}";
@@ -946,12 +1036,12 @@ namespace emp {
       os << ")]";
     }
 
-    /// Print out a single instruction with its arguments.
+    /// Print given instruction using given output stream (default = std::cout).
     void PrintInst(const inst_t & inst, std::ostream & os=std::cout) {
       program.PrintInst(inst, os);
     }
 
-    /// Print out hardware traits.
+    /// Print hardware traits using given output stream (default = std::cout).
     void PrintTraits(std::ostream & os=std::cout) {
       if (traits.size() == 0) { os << "[]"; return; }
       os << "[";
@@ -960,12 +1050,12 @@ namespace emp {
       } os << traits[traits.size() - 1] << "]";
     }
 
-    /// Print out entire program.
+    /// Print out entire program using given output stream (default = std::cout).
     void PrintProgram(std::ostream & os=std::cout) {
       program.PrintProgram(os);
     }
 
-    /// Print out current state (full) of virtual hardware.
+    /// Print out current state (full) of virtual hardware using given output stream (default = std::cout).
     void PrintState(std::ostream & os=std::cout) {
       // Print format:
       //  Shared memory: [Key:value, ....]
@@ -1013,6 +1103,7 @@ namespace emp {
     }
 
     // -- Default Instructions --
+
     static void Inst_Inc(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       ++state.AccessLocal(inst.args[0]);
