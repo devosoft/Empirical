@@ -25,7 +25,6 @@
 //    * define binding
 //    * cores = execution stacks. Used interchangeably.
 // @amlalejini - TODO:
-//  [ ] Write some halfway decent documentation. --> Use doxygen notation. Every instance variable, every function.
 //  [ ] Write up a nice description.
 //  [ ] operator= overrides.
 //  [ ] Implement a load function.
@@ -69,7 +68,9 @@ namespace emp {
       Event & operator=(const Event &) = default;
       Event & operator=(Event &&) = default;
 
+      /// Does event object have given property?
       bool HasProperty(std::string property) const { return properties.count(property); }
+
     };
 
     /// Currently only 3 Block types:
@@ -108,6 +109,7 @@ namespace emp {
       State(const State &) = default;
       State(State &&) = default;
 
+      /// Reset state object.
       void Reset() {
         local_mem.clear();
         input_mem.clear();
@@ -116,40 +118,76 @@ namespace emp {
         block_stack.clear();
       }
 
+      /// Get function pointer.
       size_t GetFP() const { return func_ptr; }
+
+      /// Get instruction pointer.
       size_t GetIP() const { return inst_ptr; }
+
+      /// Get default memory value.
       mem_val_t GetDefaultMemValue() const { return default_mem_val; }
+
+      /// Set instruction pointer to given value, ip.
       void SetIP(size_t ip) { inst_ptr = ip; }
+
+      /// Set function pointer to given value, fp.
       void SetFP(size_t fp) { func_ptr = fp; }
+
+      /// Set default memory value to given value, val.
       void SetDefaultMemValue(mem_val_t val) { default_mem_val = val; }
+
+      /// Advance instruction pointer by amount given by inc.
       void AdvanceIP(size_t inc = 1) { inst_ptr += inc; }
+
+      /// Is this a main state?
       bool IsMain() const { return is_main; }
 
+      /// Get a reference to the local memory map for this state.
       memory_t & GetLocalMemory() { return local_mem; }
+
+      /// Get a reference to the input memory map for this state.
       memory_t & GetInputMemory() { return input_mem; }
+
+      /// Get a reference to the output memory map for this state.
       memory_t & GetOutputMemory() { return output_mem; }
 
-      /// GetXMemory functions return value at memory location if memory location exists.
-      /// Otherwise, these functions return default memory value.
+      /// Get value at requested local memory location (key) if that memory location exists.
+      /// Otherwise, return default memory value.
       mem_val_t GetLocal(mem_key_t key) const { return Find(local_mem, key, default_mem_val); }
+
+      /// Get value at requested input memory location (key) if that memory location exists.
+      /// Otherwise, return default memory value.
       mem_val_t GetInput(mem_key_t key) const { return Find(input_mem, key, default_mem_val); }
+
+      /// Get value at requested output memory location (key) if that memory location exists.
+      /// Otherwise, return default memory value.
       mem_val_t GetOutput(mem_key_t key) const { return Find(output_mem, key, default_mem_val); }
 
-      /// SetXMemory functions set memory location (specified by key) to value.
+      /// Set local memory specified by key to value.
       void SetLocal(mem_key_t key, mem_val_t value) { local_mem[key] = value; }
+
+      /// Set input memory specified by key to value.
       void SetInput(mem_key_t key, mem_val_t value) { input_mem[key] = value; }
+
+      /// Set output memory specified by key to value.
       void SetOutput(mem_key_t key, mem_val_t value) { output_mem[key] = value; }
 
-      /// AccessXMemory functions return reference to memory location value if that location exists.
+      /// Access local memory. This function returns a reference to memory location value if that location exists.
       /// If the location does not exist, set to default memory value and return reference to memory location value.
       mem_val_t & AccessLocal(mem_key_t key) {
         if (!Has(local_mem, key)) local_mem[key] = default_mem_val;
         return local_mem[key];
       }
+
+      /// Access input memory. This function returns a reference to memory location value if that location exists.
+      /// If the location does not exist, set to default memory value and return reference to memory location value.
       mem_val_t & AccessInput(mem_key_t key) {
         if (!Has(input_mem, key)) input_mem[key] = default_mem_val;
         return input_mem[key];
       }
+
+      /// Access output memory. This function returns a reference to memory location value if that location exists.
+      /// If the location does not exist, set to default memory value and return reference to memory location value.
       mem_val_t & AccessOutput(mem_key_t key) {
         if (!Has(output_mem, key)) output_mem[key] = default_mem_val;
         return output_mem[key];
@@ -257,8 +295,10 @@ namespace emp {
       bool operator==(const Program & in) const { return program == in.program; }
       bool operator!=(const Program & in) const { return !(*this == in); }
 
+      /// Get number of functions that make up this program.
       size_t GetSize() const { return program.size(); }
 
+      /// Get the total number of instructions across all functions that make up this program.
       size_t GetInstCnt() const {
         size_t cnt = 0;
         for (size_t i = 0; i < GetSize(); ++i) cnt += program[i].GetSize();
