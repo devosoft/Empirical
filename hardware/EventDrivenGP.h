@@ -1103,37 +1103,58 @@ namespace emp {
     }
 
     // -- Default Instructions --
-
+    /// Default instruction: Inc
+    /// Number arguments: 1
+    /// Description: Increment value in local memory[Arg1].
     static void Inst_Inc(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       ++state.AccessLocal(inst.args[0]);
     }
 
+    /// Default instruction: Dec
+    /// Number of arguments: 1
+    /// Description: Decrement value in local memory[Arg1].
     static void Inst_Dec(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       --state.AccessLocal(inst.args[0]);
     }
 
+    /// Default instruction: Not
+    /// Number of arguments: 1
+    /// Description: Logically toggle value in Local[Arg1].
     static void Inst_Not(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[0], state.GetLocal(inst.args[0]) == 0.0);
     }
 
+    /// Default instruction: Add
+    /// Number of arguments: 3
+    /// Description: Local[Arg3] = Local[Arg1] + Local[Arg2]
     static void Inst_Add(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) + state.AccessLocal(inst.args[1]));
     }
 
+    /// Default instruction: Sub
+    /// Number of arguments: 3
+    /// Description: Local[Arg3] = Local[Arg1] - Local[Arg2]
     static void Inst_Sub(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) - state.AccessLocal(inst.args[1]));
     }
 
+    /// Default instruction: Mult
+    /// Number of arguments: 3
+    /// Description: Local[Arg3] = Local[Arg1] * Local[Arg2]
     static void Inst_Mult(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) * state.AccessLocal(inst.args[1]));
     }
 
+    /// Default instruction: Div
+    /// Number of arguments: 3
+    /// Description: Local[Arg3] = Local[Arg1] / Local[Arg2]
+    /// If Local[Arg2] == 0, division fails and increment hardware errors.
     static void Inst_Div(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       const double denom = state.AccessLocal(inst.args[1]);
@@ -1141,6 +1162,10 @@ namespace emp {
       else state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) / denom);
     }
 
+    /// Default instruction: Mod
+    /// Number of arguments: 3
+    /// Description: Local[Arg3] = Local[Arg1] % Local[Arg2]
+    /// If Local[Arg2] == 0, modulus fails and increment hardware errors.
     static void Inst_Mod(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       const int base = (int)state.AccessLocal(inst.args[1]);
@@ -1148,21 +1173,33 @@ namespace emp {
       else state.SetLocal(inst.args[2], (int)state.AccessLocal(inst.args[0]) % base);
     }
 
+    /// Default instruction: TestEqu
+    /// Number of arguments: 3
+    /// Description: Local[Arg3] = Local[Arg1] == Local[Arg2]
     static void Inst_TestEqu(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) == state.AccessLocal(inst.args[1]));
     }
 
+    /// Default instruction: TestNEqu
+    /// Number of arguments: 3
+    /// Description: Local[Arg3] = Local[Arg1] != Local[Arg2]
     static void Inst_TestNEqu(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) != state.AccessLocal(inst.args[1]));
     }
 
+    /// Default instruction: TestLess
+    /// Number of arguments: 3
+    /// Description: Local[Arg3] = Local[Arg1] < Local[Arg2]
     static void Inst_TestLess(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[2], state.AccessLocal(inst.args[0]) < state.AccessLocal(inst.args[1]));
     }
 
+    /// Default instruction: If
+    /// Number of arguments: 1
+    /// Description: If (Local[Arg1] != 0) { execute block } else { skip block }
     static void Inst_If(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       // Find EOBLK.
@@ -1178,6 +1215,9 @@ namespace emp {
       }
     }
 
+    /// Default instruction: While
+    /// Number of arguments: 1
+    /// Description: While (Local[Arg1] != 0) { execute block }
     static void Inst_While(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       size_t eob = hw.FindEndOfBlock(state.GetFP(), state.GetIP());
@@ -1192,6 +1232,9 @@ namespace emp {
       }
     }
 
+    /// Default instruction: Countdown
+    /// Number of arguments: 1
+    /// Description: While (Local[Arg1] != 0) { Local[Arg1]-- then execute block }
     static void Inst_Countdown(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       size_t eob = hw.FindEndOfBlock(state.GetFP(), state.GetIP());
@@ -1208,32 +1251,53 @@ namespace emp {
       }
     }
 
+    /// Default instruction: Break
+    /// Number of arguments: 0
+    /// Description: Break out of current block if there's a block to close.
     static void Inst_Break(EventDrivenGP_t & hw, const inst_t & inst) {
       hw.BreakBlock();
     }
 
+    /// Default instruction: Close
+    /// Number of arguments: 0
+    /// Description: Marks the end of a block.
     static void Inst_Close(EventDrivenGP_t & hw, const inst_t & inst) {
       hw.CloseBlock();
     }
 
+    /// Default instruction: Call
+    /// Number of arguments: 0
+    /// Description: Call function with the strongest affinity match to call affinity.
     static void Inst_Call(EventDrivenGP_t & hw, const inst_t & inst) {
       hw.CallFunction(inst.affinity, hw.GetMinBindThresh());
     }
 
+    /// Default instruction: Return
+    /// Number of arguments: 0
+    /// Description: Return from current function call unless in main function call.
     static void Inst_Return(EventDrivenGP_t & hw, const inst_t & inst) {
       hw.ReturnFunction();
     }
 
+    /// Default instruction: SetMem
+    /// Number of arguments: 2
+    /// Description: Local[Arg1] = ValueOf(Arg2)
     static void Inst_SetMem(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[0], (double)inst.args[1]);
     }
 
+    /// Default instruction: CopyMem
+    /// Number of arguments: 2
+    /// Description: Local[Arg2] = Local[Arg1]
     static void Inst_CopyMem(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[1], state.AccessLocal(inst.args[0]));
     }
 
+    /// Default instruction: SwapMem
+    /// Number of arguments: 2
+    /// Description: Swap(Local[Arg1], Local[Arg2])
     static void Inst_SwapMem(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       double val0 = state.AccessLocal(inst.args[0]);
@@ -1241,38 +1305,64 @@ namespace emp {
       state.SetLocal(inst.args[1], val0);
     }
 
+    /// Default instruction: Input
+    /// Number of arguments: 2
+    /// Description: Local[Arg2] = Input[Arg1]
     static void Inst_Input(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[1], state.AccessInput(inst.args[0]));
     }
 
+    /// Default instruction: Output
+    /// Number of arguments: 2
+    /// Description: Output[Arg2] = Local[Arg1]
     static void Inst_Output(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetOutput(inst.args[1], state.AccessLocal(inst.args[0]));
     }
 
+    /// Default instruction: Commit
+    /// Number of arguments: 2
+    /// Description: Shared[Arg2] = Local[Arg1]
     static void Inst_Commit(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       hw.SetShared(inst.args[1], state.AccessLocal(inst.args[0]));
     }
 
+    /// Default instruction: Pull
+    /// Number of arguments: 2
+    /// Description: Local[Arg2] = Shared[Arg1]
     static void Inst_Pull(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[1], hw.AccessShared(inst.args[0]));
     }
 
+    /// Default instruction: Nop
+    /// Number of arguments: 0
+    /// Description: No operation.
     static void Inst_Nop(EventDrivenGP_t & hw, const inst_t & inst) { ; }
 
+    /// Default instruction: BroadcastMsg
+    /// Number of arguments: 0
+    /// Description: Trigger a Message event where the event's affinity is equal to this instructions
+    /// affinity and the event's message payload is equal to the current local program state output buffer.
+    /// Event properties will indicate that this is a broadcast.
     static void Inst_BroadcastMsg(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       hw.TriggerEvent("Message", inst.affinity, state.output_mem, {"broadcast"});
     }
 
+    /// Default instruction: SendMsg
+    /// Number of arguments: 0
+    /// Description: Trigger a Message event where the event's affinity is equal to this instructions
+    /// affinity and the event's message payload is equal to the current local program state output buffer.
+    /// Event properties will indicate that this is a send.
     static void Inst_SendMsg(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       hw.TriggerEvent("Message", inst.affinity, state.output_mem, {"send"});
     }
 
+    /// Get a pointer to const default instruction library. Will only construct the default instruction library once.
     static Ptr<const InstLib<EventDrivenGP_t>> DefaultInstLib() {
       static inst_lib_t inst_lib;
       if (inst_lib.GetSize() == 0) {
@@ -1308,13 +1398,18 @@ namespace emp {
       return &inst_lib;
     }
 
-    // Default event handlers.
+    /// Default event handler: Message
+    /// Description: Handle a message by spawning a new core (if we're not already maxed out)
+    /// with the function that best matches the messages affinity. Set the function's input buffer
+    /// to be equal to the contents of the message event's message contents.
     static void HandleEvent_Message(EventDrivenGP_t & hw, const event_t & event) {
       // Spawn new core.
       hw.SpawnCore(event.affinity, hw.GetMinBindThresh(), event.msg);
     }
 
-    /// Define default events. NOTE: default events have no registered dispatch functions.
+    /// Get a pointer to const default event library. Will only construct the default event library once.
+    /// Note: the default event library does not construct any default dispatch functions. This is
+    /// the responsibility of whatever is using the EventDrivenGP hardware.
     static Ptr<const EventLib<EventDrivenGP_t>> DefaultEventLib() {
       static event_lib_t event_lib;
       if (event_lib.GetSize() == 0) {
@@ -1324,6 +1419,7 @@ namespace emp {
     }
   };
 
+  /// A convenient shortcut for using EventDrivenGP_AW class with affinity width set to a default of 8.
   using EventDrivenGP = EventDrivenGP_AW<8>;
 }
 
