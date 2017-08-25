@@ -1,5 +1,5 @@
-
 #include <iostream>
+#include <fstream>
 #include "hardware/EventDrivenGP.h"
 #include "base/Ptr.h"
 #include "tools/Random.h"
@@ -9,74 +9,69 @@ int main() {
   std::cout << "Testing EventDrivenGP." << std::endl;
 
   // Some convenient type aliases:
+  using inst_t = typename emp::EventDrivenGP::inst_t;
+  using inst_lib_t = typename emp::EventDrivenGP::inst_lib_t;
   using event_t = typename emp::EventDrivenGP::event_t;
-  using affinity_t = emp::BitSet<8>;
+  using event_lib_t = typename emp::EventDrivenGP::event_lib_t;
+  using affinity_t = typename emp::EventDrivenGP::affinity_t;
 
+  // Define a convenient affinity table.
+  emp::vector<affinity_t> affinity_table(256);
+  for (size_t i = 0; i < affinity_table.size(); ++i) {
+    affinity_table[i].SetByte(0, (uint8_t)i);
+  }
 
   // Setup random number generator.
-  emp::Ptr<emp::Random> random = new emp::Random(2);
+  emp::Ptr<emp::Random> random = emp::NewPtr<emp::Random>();
+  emp::Ptr<inst_lib_t> inst_lib = emp::NewPtr<inst_lib_t>(*emp::EventDrivenGP::DefaultInstLib());
+  emp::Ptr<event_lib_t> event_lib = emp::NewPtr<event_lib_t>(*emp::EventDrivenGP::DefaultEventLib());
 
-  emp::EventDrivenGP cpu(random);
+  emp::EventDrivenGP cpu0(inst_lib, event_lib, random);
+  emp::EventDrivenGP cpu1(cpu0);
 
-  // Register some example event dispatchers.
-  // cpu.GetEventLib()->RegisterDispatchFun("Message",
-  //     [](emp::EventDrivenGP & hw, const event_t & event){
-  //       std::cout << "----------->" << std::endl;
-  //       std::cout << "From dispatcher 1: Message event!" << std::endl;
-  //       hw.PrintEvent(event); std::cout << std::endl;
-  //       std::cout << "<----------" << std::endl;
-  //     });
-  // cpu.GetEventLib()->RegisterDispatchFun("Message",
-  //     [](emp::EventDrivenGP & hw, const event_t & event) {
-  //       std::cout << "----------->" << std::endl;
-  //       std::cout << "From dispatcher 2: Message event!" << std::endl;
-  //       hw.PrintEvent(event); std::cout << std::endl;
-  //       std::cout << "<----------" << std::endl;
-  //     });
+  // Test Load function.
+  std::ifstream prog_fstream("EventDrivenGP.program");
+  cpu0.Load(prog_fstream);
+  std::ifstream prog2_fstream("EventDrivenGP2.program");
+  cpu1.Load(prog2_fstream);
 
-  // Making a table of bit set values to make affinity assignment easier.
-  emp::vector<affinity_t> bitsets(256);
-  for (size_t i = 0; i < bitsets.size(); ++i) {
-    bitsets[i].SetByte(0, (uint8_t)i);
+  std::cout << "=====================================" << std::endl;
+  std::cout << "CPU 0's PROGRAM: " << std::endl;
+  cpu0.PrintProgram();
+  std::cout << "=====================================" << std::endl;
+
+  std::cout << "=====================================" << std::endl;
+  std::cout << "CPU 1's PROGRAM: " << std::endl;
+  cpu1.PrintProgram();
+  std::cout << "=====================================" << std::endl;
+
+  // Configure hardware.
+  cpu0.SetMinBindThresh(1.0);
+  cpu0.SetMaxCores(7);
+  cpu0.SetMaxCallDepth(64);
+  cpu0.SetDefaultMemValue(1.0);
+  cpu1.SetMaxCores(16);
+
+  cpu0.TriggerEvent("Message"); // Trigger event w/no dispatch function (should do nothing).
+  cpu0.QueueEvent("Message", affinity_t(), {{42, 48}}, {"send"});
+  cpu0.CallFunction(0);
+  // Spawn a bunch of cores (1 too many).
+  for (size_t i = 0; i < cpu0.GetMaxCores(); ++i) {
+    cpu0.SpawnCore(random->GetUInt(cpu0.GetProgram().GetSize()));
   }
+  cpu0.PrintState();
 
-  emp::EventDrivenGP::Function fun0(bitsets[0]);
-  emp::EventDrivenGP::Function fun1(bitsets[255]);
-  emp::EventDrivenGP::Function fun2(bitsets[219]);
-  emp::EventDrivenGP::Function fun3(bitsets[240]);
+  // Run for a bit.
+  cpu0.Process(100);
+  cpu0.PrintState();
 
-  cpu.PushFunction(fun0);
-  cpu.PushInst("Inc", 0);
-  cpu.PushInst("Call", 0, 0, 0, bitsets[240]);
-  cpu.PushFunction(fun1);
-  cpu.PushInst("Pull", 0, 0);
-  cpu.PushInst("Inc", 0);
-  cpu.PushInst("Commit", 0);
-  cpu.PushFunction(fun2);
-  cpu.PushInst("Nop");
-  cpu.PushInst("Call", 0, 0, 0, bitsets[255]);
-  cpu.PushInst("Nop");
-  cpu.PushFunction(fun3);
-  cpu.PushInst("SetMem", 0, 10);
-  cpu.PushInst("Countdown", 0);
-  cpu.PushInst("Pull", 0, 1);
-  cpu.PushInst("Output", 1, 0);
-  cpu.PushInst("BroadcastMsg", 0, 0, 0, bitsets[1]);
-  cpu.PushInst("Close");
+  // Kill some cores (reduce max cores)
+  cpu0.SetMaxCores(2);
+  cpu0.PrintState();
 
-  std::cout << "-- Print CPU's program. --" << std::endl;
-  cpu.PrintProgram(); std::cout << std::endl;
-
-  // Run program
-  std::cout << "-- Running simple program. --" << std::endl;
-  cpu.PrintState();
-  for (size_t i = 0; i < 100; i++) {
-    std::cout << "==== Update: " << i << " ====" << std::endl;
-    // Every 10 updates, Queue up an event.
-    if (i % 10 == 0)
-      cpu.QueueEvent("Message", bitsets[219], {{0,1.0},{1,2.0},{2,4.0}});
-    cpu.Process(1);
-    cpu.PrintState();
-  }
+  // Clean up dynamically allocated memory.
+  inst_lib.Delete();
+  event_lib.Delete();
+  random.Delete();
   return 0;
 }
