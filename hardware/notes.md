@@ -1,5 +1,0 @@
-# Hardware notes
-
-## MetaGP
-
-## EventDrivenGP

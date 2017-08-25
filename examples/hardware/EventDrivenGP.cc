@@ -1,9 +1,9 @@
 
 #include <iostream>
-#include "../../hardware/EventDrivenGP.h"
-#include "../../base/Ptr.h"
-#include "../../tools/Random.h"
-#include "../../tools/BitSet.h"
+#include "hardware/EventDrivenGP.h"
+#include "base/Ptr.h"
+#include "tools/Random.h"
+#include "tools/BitSet.h"
 
 int main() {
   std::cout << "Testing EventDrivenGP." << std::endl;

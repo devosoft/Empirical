@@ -2,11 +2,11 @@
 #include <iostream>
 #include <unordered_set>
 #include <utility>
-#include "../../hardware/EventDrivenGP.h"
-#include "../../base/Ptr.h"
-#include "../../tools/Random.h"
-#include "../../tools/BitSet.h"
-#include "../../evo/World.h"
+#include "hardware/EventDrivenGP.h"
+#include "base/Ptr.h"
+#include "tools/Random.h"
+#include "tools/BitSet.h"
+#include "evo/World.h"
 
 using event_t = typename emp::EventDrivenGP::event_t;
 using event_lib_t = typename emp::EventDrivenGP::event_lib_t;
