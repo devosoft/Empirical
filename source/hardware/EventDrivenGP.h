@@ -708,10 +708,10 @@ namespace emp {
           size_t core_id = active_cores[ac_idx];
           if (core_id >= val) { // Do we need to eliminate this core_id from active cores?
             // If yes, set to -1 and increment adjust.
-            active_cores[ac_idx - ac_adjust] = -1;
+            active_cores[ac_idx - ac_adjust] = (size_t)-1;
             ++ac_adjust;
           } else if (ac_adjust) { // Still valid core ID, so do we need to defragment?
-            active_cores[ac_idx] = -1;
+            active_cores[ac_idx] = (size_t)-1;
             active_cores[ac_idx - ac_adjust] = core_id;
           }
           ++ac_idx;
@@ -725,10 +725,10 @@ namespace emp {
           size_t core_id = inactive_cores[ic_idx];
           if (core_id >= val) { // Do we need to eliminate this core_id from inactive cores?
             // If yes, set to -1 and increment adjust.
-            inactive_cores[ic_idx - ic_adjust] = -1;
+            inactive_cores[ic_idx - ic_adjust] = (size_t)-1;
             ++ic_adjust;
           } else if (ic_adjust) { // Still valid core ID, so do we need to defragment?
-            inactive_cores[ic_idx] = -1;
+            inactive_cores[ic_idx] = (size_t)-1;
             inactive_cores[ic_idx - ic_adjust] = core_id;
           }
           ++ic_idx;
@@ -1098,7 +1098,7 @@ namespace emp {
         exec_core_id = active_cores[active_core_idx]; // Here's the core we're about to execute.
         // Do we need to move current core over in the execution core vector to make it contiguous?
         if (adjust) {
-          active_cores[active_core_idx] = -1;
+          active_cores[active_core_idx] = (size_t)-1;
           active_cores[active_core_idx - adjust] = exec_core_id;
         }
         // Execute the core.
@@ -1129,7 +1129,7 @@ namespace emp {
         // After processing, is the core still active?
         if (GetCurCore().empty()) {
           // Free core. Mark as inactive.
-          active_cores[active_core_idx - adjust] = -1;
+          active_cores[active_core_idx - adjust] = (size_t)-1;
           inactive_cores.emplace_back(exec_core_id);
           ++adjust;
         }
