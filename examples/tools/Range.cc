@@ -7,8 +7,8 @@
 
 #include <iostream>
 
-#include "../../tools/Range.h"
-#include "../../tools/string_utils.h"
+#include "tools/Range.h"
+#include "tools/string_utils.h"
 
 int main()
 {

@@ -21,7 +21,11 @@ read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 if read_the_docs_build:
     subprocess.call('cd ../; doxygen Doxyfile', shell=True)
     subprocess.call('pwd')
-    subprocess.call('ls')
+    subprocess.call(['ls', '-lah'])
+    subprocess.call(['echo', 'this is a delimiter'])
+    subprocess.call(['ls', './doxygen'])
+    subprocess.call(['echo', 'this is a delimiter'])
+    subprocess.call(['ls', './doxygen/html'])
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -159,7 +163,7 @@ html_static_path = ['_static']
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
 # directly to the root of the documentation.
-#html_extra_path = []
+html_extra_path = ["./doxygen"]
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.

@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../tools/DFA.h"
+#include "tools/DFA.h"
 
 emp::DFA dfa(10);
 

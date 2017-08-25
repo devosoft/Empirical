@@ -5,9 +5,9 @@
 #include <iostream>
 #include <string>
 
-#include "../../base/assert.h"
-#include "../../config/command_line.h"
-#include "../../web/color_map.h"
+#include "base/assert.h"
+#include "config/command_line.h"
+#include "web/color_map.h"
 
 int main(int argc, char* argv[])
 {

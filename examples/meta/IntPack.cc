@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#include "../../meta/IntPack.h"
+#include "meta/IntPack.h"
 
 #define EMP_PRINT_VAL(X) std::cout << #X << " = " << X << std::endl
 #define EMP_PRINT_PACK(X) std::cout << #X << " = "; X::PrintInts(); std::cout << std::endl

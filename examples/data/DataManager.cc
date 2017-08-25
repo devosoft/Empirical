@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../data/DataManager.h"
+#include "data/DataManager.h"
 
 using data = emp::data;
 

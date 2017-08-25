@@ -6,8 +6,8 @@
 //  Some examples code for using emp::memo_function
 
 #include <iostream>
-#include "../../tools/memo_function.h"
-#include "../../tools/Random.h"
+#include "tools/memo_function.h"
+#include "tools/Random.h"
 
 double F(int N) {
   double PI = 3.14159;

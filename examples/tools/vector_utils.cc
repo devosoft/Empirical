@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../tools/vector_utils.h"
+#include "tools/vector_utils.h"
 
 int main()
 {

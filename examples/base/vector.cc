@@ -2,7 +2,7 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#include "../../base/vector.h"
+#include "base/vector.h"
 
 int main()
 {
