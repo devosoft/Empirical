@@ -17,7 +17,6 @@
 #include "../tools/Random.h"
 
 namespace emp {
-namespace evo {
 
   /// An NK Landscape is a popular tool for studying theoretical questions about evolutionary
   /// dynamics. It is a randomly generated fitness landscape on which bitstrings can evolve.
@@ -183,7 +182,6 @@ namespace evo {
     }
   };
 
-}
 }
 
 #endif

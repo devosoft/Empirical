@@ -25,7 +25,6 @@
 #include "../tools/map_utils.h"
 
 namespace emp {
-namespace evo {
 
   /// Full information about a state grid and meanings of each state.
   class StateGridInfo {
@@ -212,7 +211,6 @@ namespace evo {
     }
   };
 
-}
 }
 
 #endif
