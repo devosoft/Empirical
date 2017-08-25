@@ -22,10 +22,13 @@
 //  * Important concept: Main state (bottom-most call state on core 0's call stack).
 //    * The first function will be main (unless the fp on the initially created state is otherwise manipulated).
 //    * Main state behaves differently than any other state.
-
+//    * define binding
+//    * cores = execution stacks. Used interchangeably.
 // @amlalejini - TODO:
 //  [ ] Write some halfway decent documentation. --> Use doxygen notation. Every instance variable, every function.
 //  [ ] Write up a nice description.
+//  [ ] operator= overrides.
+//  [ ] Implement a load function.
 
 namespace emp {
   template<size_t AFFINITY_WIDTH>
@@ -479,14 +482,11 @@ namespace emp {
       else random_ptr = in.random_ptr;
     }
 
-    // @amlalejini - TODO: define operator= (move version and copy version)
-
-    /// Destructor - clean up: execution stacks, shared memory.
     ~EventDrivenGP_AW() {
       if (random_owner) random_ptr.Delete();
     }
 
-    // -- Control --
+    // ---------- Hardware Control ----------
     /// Reset everything, including program.
     void Reset() {
       ResetHardware();
@@ -494,7 +494,7 @@ namespace emp {
       program.Clear();
     }
 
-    /// Reset only CPU hardware stuff, not program.
+    /// Reset only hardware, not program.
     void ResetHardware() {
       shared_mem.clear();
       event_queue.clear();
@@ -510,42 +510,86 @@ namespace emp {
       is_executing = false;
     }
 
-    // -- Accessors --
+
+    // ---------- Accessors ----------
+    /// Get instruction library associated with hardware's program.
     Ptr<const inst_lib_t> GetInstLib() const { return program.GetInstLib(); }
+
+    /// Get event library associated with hardware.
     Ptr<const event_lib_t> GetEventLib() const { return event_lib; }
 
+    /// Get reference to random number generator used by this hardware.
     Random & GetRandom() { return *random_ptr; }
+
+    /// Get pointer to random number generator used by this hardware.
     Ptr<Random> GetRandomPtr() { return random_ptr; }
 
+    /// Get program loaded on this hardware.
     const program_t & GetProgram() const { return program; }
+
+    /// Get reference to a particular function in hardware's program.
     const Function & GetFunction(size_t fID) const {
       emp_assert(ValidFunction(fID));
       return program[fID];
     }
+
+    /// Get reference to particular instruction in hardware's program given function ID and instruction position.
     const inst_t & GetInst(size_t fID, size_t pos) const {
       emp_assert(ValidPosition(fID, pos));
       return program[fID].inst_seq[pos];
     }
 
-    double GetTrait(size_t id) const { return traits[id]; }
+    /// Get a particular trait given its ID.
+    double GetTrait(size_t id) const { emp_assert(id < traits.size()); return traits[id]; }
 
+    /// Get current number of errors committed by this hardware.
     size_t GetNumErrors() const { return errors; }
 
+    /// Get hardware's minimum binding threshold (threshold used to determine if two affinities are
+    /// close enough to bind).
     double GetMinBindThresh() const { return min_bind_thresh; }
+
+    /// Get the maximum number of cores allowed to run simultaneously on this hardware object.
     size_t GetMaxCores() const { return max_cores; }
+
+    /// Get the maximum call depth allowed on this hardware object (max call states allowed on a single core's call stack at a time).
     size_t GetMaxCallDepth() const { return max_call_depth; }
+
+    /// Get the default memory value for local/shared/input/output memory maps.
     mem_val_t GetDefaultMemValue() const { return default_mem_value; }
+
+    /// Is this hardware object configured to allow stochasticity in function calling?
+    /// Hardware is only stochastic when calling/event affinity is equidistant from two or more functions.
     bool IsStochasticFunCall() const { return stochastic_fun_call; }
 
+    /// Get the currently executing core ID. If hardware is not in the middle of an execution cycle
+    /// (the SingleProcess function), this will return the first core ID in active_cores, which will
+    /// typically be the core on which main is running.
     size_t GetCurCoreID() { return exec_core_id; }
-    exec_stk_t & GetCurCore() { return cores[exec_core_id]; }
-    State & GetCurState() { emp_assert(!cores[exec_core_id].size()); return cores[exec_core_id].back(); }
 
-    bool ValidPosition(size_t fID, size_t pos) const { return program.ValidPosition(fID, pos); }
-    bool ValidFunction(size_t fID) const { return program.ValidFunction(fID); }
+    /// Get a reference to the current core/execution stack.
+    exec_stk_t & GetCurCore() { emp_assert(exec_core_id < cores.size()); return cores[exec_core_id]; }
 
+    /// Get a reference to the current local call state.
+    State & GetCurState() {
+      emp_assert(exec_core_id < cores.size() && cores[exec_core_id].size());
+      return cores[exec_core_id].back();
+    }
+
+    /// Get a reference to hardware's shared memory map.
     memory_t & GetSharedMem() { return shared_mem; }
+
+    /// Get a particular value in shared memory map stored @ location indicated by key.
+    /// If key cannot be found, return the default memory value.
     mem_val_t GetShared(mem_key_t key) const { return Find(shared_mem, key, default_mem_value); }
+
+    // ---------- Hardware Utilities ----------
+    /// Is program prosition defined by the given function ID (fID) and instruction position (pos)
+    /// a valid position in this hardware object's program?
+    bool ValidPosition(size_t fID, size_t pos) const { return program.ValidPosition(fID, pos); }
+
+
+    bool ValidFunction(size_t fID) const { return program.ValidFunction(fID); }
 
     void SetShared(mem_key_t key, mem_val_t value) { shared_mem[key] = value; }
     mem_val_t & AccessShared(mem_key_t key) {
