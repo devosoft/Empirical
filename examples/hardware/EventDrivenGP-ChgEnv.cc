@@ -150,7 +150,7 @@ std::function<bool(Agent&, emp::Random&)> simple_mut_fun =
         if (random.P(sub_rate)) inst.id = random.GetUInt(program.inst_lib->GetSize());
         // Mutate arguments (even if they aren't relevent to instruction).
         for (size_t k = 0; k < MAX_INST_ARGS; ++k) {
-          if (random.P(sub_rate)) inst.args[k] = random.GetUInt(MAX_ARG_VAL);
+          if (random.P(sub_rate)) inst.args[k] = random.GetInt(MAX_ARG_VAL);
         }
       }
     }
@@ -245,12 +245,16 @@ int main() {
   hardware.SetMaxCores(MAX_HW_CORES);
 
   // Do the run...
+  double max_score = 0;
+  double best_score = 0;
   for (size_t ud = 0; ud < GENERATIONS; ++ud) {
     // Generate an environment for this generation to experience.
     // env[0] = 1;
-    env.at(0) = 1;
+    env.at(0) = 1;  // Max score guaranteed to be at least 1.
+    max_score = 0;
     for (size_t t = 1; t < EVAL_TIME; ++t) {
       ((emp::Mod((int)t, (int)ENV_CHG_CHECK) == 0) && (random->P(ENV_CHG_PERCENT))) ? (env.at(t) = !env.at(t-1)) : (env.at(t) = env.at(t-1));
+      if (env.at(t)) ++max_score;
     }
     // Evaluate each agent.
     for (size_t id = 0; id < POP_SIZE; ++id) {
@@ -265,8 +269,8 @@ int main() {
       for (cur_time = 0; cur_time < EVAL_TIME; ++cur_time) {
         hardware.SingleProcess();
       }
-      world.GetOrg(id).resources_collected = hardware.GetTrait(TRAIT_ID__RES_COLLECTED);
-      world.GetOrg(id).poison_collected = hardware.GetTrait(TRAIT_ID__POIS_COLLECTED);
+      world.GetOrg(id).resources_collected = (size_t)hardware.GetTrait(TRAIT_ID__RES_COLLECTED);
+      world.GetOrg(id).poison_collected = (size_t)hardware.GetTrait(TRAIT_ID__POIS_COLLECTED);
     }
     // Selection!
     // Keep the best agent.
@@ -278,50 +282,25 @@ int main() {
     // Mutate all but the first agent.
     world.DoMutations(1);
     // First agent is best of last generation, print fitness.
+    best_score = fit_fun(world.GetOrg(0));
     std::cout << "Update # " << ud;
-    std::cout << ", Max score: " << fit_fun(world.GetOrg(0)) << std::endl;
+    std::cout << ", Max agent score: " << best_score << "(" << best_score/max_score << ")"<< std::endl;
   }
-  //   // Evaluate each agent.
-  //   for (size_t id = 0; id < POP_SIZE; ++id) {
-  //     // Configure hardware to run agent.
-  //     hardware.ResetHardware();
-  //     hardware.SetProgram(world[id].program);
-  //     hardware.SetTrait(TRAIT_ID__RES_SENSOR, 0);
-  //     hardware.SetTrait(TRAIT_ID__RES_COLLECTED, 0);
-  //     hardware.SetTrait(TRAIT_ID__POIS_COLLECTED, 0);
-  //     hardware.SpawnCore(0, memory_t(), true);
-  //     for (cur_time = 0; cur_time < EVAL_TIME; ++cur_time) {
-  //       hardware.SingleProcess();
-  //     }
-  //     world[id].resources_collected = hardware.GetTrait(TRAIT_ID__RES_COLLECTED);
-  //     world[id].poison_collected = hardware.GetTrait(TRAIT_ID__POIS_COLLECTED);
-  //   }
-  //   // Keep the best agent.
-  //   world.EliteSelect(fit_fun, 1, 1);
-  //   // Run a tournament for the rest.
-  //   world.TournamentSelect(fit_fun, 8, POP_SIZE-1);
-  //   // Update the world (generational turnover)
-  //   world.Update();
-  //   // Mutate all but the first agent.
-  //   world.MutatePop(1);
-  //   // First agent is best of last generation, print fitness.
-  //   std::cout << "  Max score: " << fit_fun(world.popM[0]) << std::endl;
-  // }
-  //
-  // std::cout << std::endl;
-  // std::cout << "Best program (score: "<< fit_fun(world.popM[0]) << "):" << std::endl;
-  // std::cout << "--- Evaluating the best program. ---" << std::endl;
-  // hardware.ResetHardware();
-  // hardware.SetProgram(world[0].program);
-  // hardware.SetTrait(TRAIT_ID__RES_SENSOR, 0);
-  // hardware.SetTrait(TRAIT_ID__RES_COLLECTED, 0);
-  // hardware.SetTrait(TRAIT_ID__POIS_COLLECTED, 0);
-  // hardware.SpawnCore(0, memory_t(), true);
-  // for (cur_time = 0; cur_time < EVAL_TIME; ++cur_time) {
-  //   hardware.SingleProcess();
-  // }
-  // hardware.PrintProgram(); std::cout << std::endl;
-  // hardware.PrintState(); std::cout << std::endl;
+  // Run and print out best agent from last generation:
+  std::cout << std::endl;
+  std::cout << "Best program (score: "<< fit_fun(world.GetOrg(0)) << "):" << std::endl;
+  std::cout << "--- Evaluating the best program. ---" << std::endl;
+  hardware.ResetHardware();
+  hardware.SetProgram(world[0].program);
+  hardware.SetTrait(TRAIT_ID__RES_SENSOR, 0);
+  hardware.SetTrait(TRAIT_ID__RES_COLLECTED, 0);
+  hardware.SetTrait(TRAIT_ID__POIS_COLLECTED, 0);
+  hardware.SpawnCore(0, memory_t(), true);
+  for (cur_time = 0; cur_time < EVAL_TIME; ++cur_time) {
+    hardware.SingleProcess();
+  }
+  hardware.PrintProgram(); std::cout << std::endl;
+  hardware.PrintState(); std::cout << std::endl;
 
   return 0;
 }
