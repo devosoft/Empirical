@@ -821,8 +821,10 @@ EXCLUDE_SYMLINKS       = NO
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = */third-party/*
-EXCLUDE_PATTERNS       += apps/*
+EXCLUDE_PATTERNS        = */apps/*
+EXCLUDE_PATTERNS       += */examples/*
+EXCLUDE_PATTERNS       += */tests/config/*
+EXCLUDE_PATTERNS       += */third-party/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
@@ -833,7 +835,8 @@ EXCLUDE_PATTERNS       += apps/*
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories use the pattern */test/*
 
-EXCLUDE_SYMBOLS        =
+EXCLUDE_SYMBOLS        = EMP_*
+EXCLUDE_SYMBOLS        += EM_*
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or directories
 # that contain example code fragments that are included (see the \include
@@ -1011,7 +1014,7 @@ ALPHABETICAL_INDEX     = YES
 # Minimum value: 1, maximum value: 20, default value: 5.
 # This tag requires that the tag ALPHABETICAL_INDEX is set to YES.
 
-COLS_IN_ALPHA_INDEX    = 5
+COLS_IN_ALPHA_INDEX    = 4
 
 # In case all classes in a project start with a common prefix, all classes will
 # be put under the same header in the alphabetical index. The IGNORE_PREFIX tag
