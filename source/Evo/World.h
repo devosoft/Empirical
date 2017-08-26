@@ -3,10 +3,13 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  This file defines the base class for a World template for use in evolutionary algorithms.
+///  This file defines the base class for a World template for use in evolutionary algorithms.
 //
 //
 //  Developer Notes:
+//  * Mutations are currently not interacting properly with lineages.  Organisms are born, added
+//    to the lineage and THEN mutated.  Ideally, all mutations should occur on birth (via a
+//    signal?), but we have to make sure things like elite selection can still turn off mutations.
 //  * We should Specialize World so that ANOTHER world can be used with proper delegation to
 //    facilitate demes, pools, islands, etc.
 //  * With DoMutations, should we update taxa?  Or just assume that it will be handled
@@ -28,11 +31,12 @@
 #include "../tools/random_utils.h"
 #include "../tools/string_utils.h"
 
+// World-specific includes.
 #include "Systematics.h"    // Track relationships among organisms.
 #include "World_file.h"     // Helper to determine when specific events should occur.
 #include "World_iterator.h" // Allow iteration through organisms in a world.
 #include "World_reflect.h"  // Handle needed reflection on incoming organism classes.
-#include "World_select.h"
+#include "World_select.h"   // Include all built-in selection functions for World.
 
 namespace emp {
 
