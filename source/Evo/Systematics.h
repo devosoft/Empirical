@@ -1,24 +1,17 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical/
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Track genotypes, species, clades, or lineages of organisms in a world.
-//
-//
-//  The three arguments to Systematics are:
-//    store_active     - Should living organisms' taxa be tracked? (typically yes!)
-//    store_ancestors  - Should ancestral organims' taxa be maintained?  (yes for lineages!)
-//    store_outside    - Should all dead taxa be maintained? (typically no; it gets BIG!)
-//
-//  ORG_INFO is usually the genome for an organism, but may have other details like position.
-//
-//
-//  Developer notes
-//  * Technically, we don't need to keep the ancestors in a set in order to track a lineage...
-//    If we delete all of their descendants they should automaticaly be deleted.
-//  * We should provide an option to back up systematics data to a file so that it doesn't all
-//    need to be kept in memory, especially if we're only doing post-analysis.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  Systematics.h
+ *  @brief Track genotypes, species, clades, or lineages of organisms in a world.
+ *
+ *
+ *  @todo Technically, we don't need to keep the ancestors in a set in order to track a lineage...
+ *    If we delete all of their descendants they should automaticaly be deleted.
+ *  @todo We should provide an option to back up systematics data to a file so that it doesn't all
+ *    need to be kept in memory, especially if we're only doing post-analysis.
+ */
 
 
 #ifndef EMP_EVO_SYSTEMATICS_H
@@ -34,7 +27,13 @@
 
 namespace emp {
 
-  /// A Taxon represents a common group in a phylogeny.  Genotypes are the most commonly used Taxon
+  /// @brief A Taxon represents a type of organism in a phylogeny.
+  /// @param ORG_INFO The information type associated with an organism, used to categorize it.
+  ///
+  /// Genotypes are the most commonly used Taxon; in general taxa can be anything from a shared
+  /// genome sequence, a phenotypic trait, or a even a position in the world (if you want to
+  /// track an evolutionary pathway)
+
   template <typename ORG_INFO>
   class Taxon {
   private:
@@ -86,6 +85,14 @@ namespace emp {
     }
   };
 
+  /// @brief A tool to track phylogenetic relationships among organisms.
+  /// The systematics class tracks the relationships among all organisms based on the INFO_TYPE
+  /// provided.  If an offspring has the same value for INFO_TYPE as its parent, it is grouped into
+  /// the same taxon.  Otherwise a new Taxon is created and the old one is used as its parent in
+  /// the phylogeny.  If the provided INFO_TYPE is the organsism's genome, a traditional phylogeny
+  /// is formed, with genotypes.  If the organism's behavior/task set is used, then organisms are
+  /// grouped by phenotypes.  If the organsims's position is used, the evolutionary path through
+  /// space is tracked.  Any other aspect of organisms can be tracked this way as well.
   template <typename ORG_INFO>
   class Systematics {
   private:
@@ -119,6 +126,9 @@ namespace emp {
     void MarkExtinct(Ptr<taxon_t> taxon);
 
   public:
+    /// @param store_active     Should living organisms' taxa be tracked? (typically yes!)
+    /// @param store_ancestors  Should ancestral organims' taxa be maintained?  (yes for lineages!)
+    /// @param store_outside    Should all dead taxa be maintained? (typically no; it gets BIG!)
     Systematics(bool _active=true, bool _anc=true, bool _all=false)
       : store_active(_active), store_ancestors(_anc), store_outside(_all)
       , archive(store_ancestors || store_outside)
