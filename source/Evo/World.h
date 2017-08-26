@@ -1,23 +1,24 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-
 /**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
  *  @file  World.h
  *  @brief Definition of a base class for a World template for use in evolutionary algorithms.
  *
  *  A definition of the emp::World template, linking in specialized file handling, iterators,
  *  and selection techniques for evolutionary computation applications.
+ *
+ *
+ *  @todo Mutations are currently not interacting properly with lineages.  Organisms are born,
+ *        added to the lineage and THEN mutated.  Ideally, all mutations should occur on birth
+ *        (via a signal?), but we have to make sure things like elite selection can still turn
+ *        off mutations.
+ *  @todo We should Specialize World so that ANOTHER world can be used with proper delegation to
+ *        facilitate demes, pools, islands, etc.
+ *  @todo With DoMutations, should we update taxa?  Or just assume that it will be handled
+ *        properly when the organisms move to the next generation.
  */
-
-//  Developer Notes:
-//  * Mutations are currently not interacting properly with lineages.  Organisms are born, added
-//    to the lineage and THEN mutated.  Ideally, all mutations should occur on birth (via a
-//    signal?), but we have to make sure things like elite selection can still turn off mutations.
-//  * We should Specialize World so that ANOTHER world can be used with proper delegation to
-//    facilitate demes, pools, islands, etc.
-//  * With DoMutations, should we update taxa?  Or just assume that it will be handled
-//    properly when the organisms move to the next generation.
 
 #ifndef EMP_EVO_WORLD_H
 #define EMP_EVO_WORLD_H
@@ -44,7 +45,7 @@
 
 namespace emp {
 
-  ///  Setup a World with a population of organisms that can evolve or deal with ecological effects.
+  ///  @brief Setup a World with a population of organisms that can evolve or deal with ecological effects.
   ///
   ///  There are three ways that organisms can enter the population:
   ///   * InjectAt(org, pos) - place the organism at the specified position in the population.
@@ -125,7 +126,7 @@ namespace emp {
     emp::vector<Ptr<ORG>> pop;      ///< All of the spots in the population.
     emp::vector<Ptr<ORG>> next_pop; ///< Population being setup for next generation.
     size_t num_orgs;                ///< How many organisms are actually in the population.
-    size_t update;                  ///< How many times has the Update() method been called?
+    size_t update;                  ///< How many times has Update() been called?
     emp::vector<double> fit_cache;  ///< vector size == 0 when not caching; uncached values == 0.
     emp::vector<Ptr<genotype_t>> genotypes;      ///< Genotypes for the corresponding orgs.
     emp::vector<Ptr<genotype_t>> next_genotypes; ///< Genotypes for corresponding orgs in next_pop.
