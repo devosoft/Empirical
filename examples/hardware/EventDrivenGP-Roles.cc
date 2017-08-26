@@ -36,8 +36,8 @@ constexpr size_t EVAL_TIME = 200;     // How long are we evaluating demes for?
 constexpr size_t DIST_SYS_WIDTH = 5;  // Deme width.
 constexpr size_t DIST_SYS_HEIGHT = 5; // Deme height.
 constexpr size_t DIST_SYS_SIZE = DIST_SYS_WIDTH * DIST_SYS_HEIGHT;
-constexpr size_t GENERATIONS = 500;
-constexpr int RAND_SEED = 2;
+constexpr size_t GENERATIONS = 2000;
+constexpr int RAND_SEED = 3;
 
 constexpr size_t TRAIT_ID__FITNESS = 0;
 constexpr size_t TRAIT_ID__ROLE_ID = 1;
@@ -48,6 +48,8 @@ constexpr size_t MAX_FUNC_LENGTH = 32;
 constexpr size_t MAX_FUNC_CNT = 4;
 constexpr size_t MAX_INST_ARGS = emp::EventDrivenGP::MAX_INST_ARGS;
 constexpr size_t MAX_ARG_VAL = 16;
+constexpr size_t MAX_CORES = 4;
+constexpr double MIN_BIND_THRESH = 0.5;
 
 // Mutation rates
 //  * Affinity Mutations    -- per-bit flips
@@ -81,12 +83,13 @@ struct Agent {
 
 // Deme structure for holding distributed system.
 struct Deme {
-  using grid_t = emp::vector<emp::Ptr<hardware_t>>;
+  using grid_t = emp::vector<hardware_t>;
   using pos_t = std::pair<size_t, size_t>;
 
   grid_t grid;
   size_t width;
   size_t height;
+
   emp::Ptr<emp::Random> rnd;
   emp::Ptr<event_lib_t> event_lib;
   emp::Ptr<inst_lib_t> inst_lib;
@@ -94,35 +97,36 @@ struct Deme {
   emp::Ptr<Agent> agent_ptr;
   bool agent_loaded;
 
+  // TODO: configure hardware
   Deme(emp::Ptr<emp::Random> _rnd, size_t _w, size_t _h, emp::Ptr<event_lib_t> _elib, emp::Ptr<inst_lib_t> _ilib)
-    : grid(_w * _h), width(_w), height(_h), rnd(_rnd), event_lib(_elib), inst_lib(_ilib), agent_ptr(nullptr), agent_loaded(false) {
+    : grid(), width(_w), height(_h), rnd(_rnd), event_lib(_elib), inst_lib(_ilib), agent_ptr(nullptr), agent_loaded(false) {
     // Register dispatch function.
     event_lib->RegisterDispatchFun("Message", [this](hardware_t & hw_src, const event_t & event){ this->DispatchMessage(hw_src, event); });
     // Fill out the grid with hardware.
     for (size_t i = 0; i < width * height; ++i) {
-      grid[i].New(inst_lib, event_lib, rnd);
+      grid.emplace_back(inst_lib, event_lib, rnd);
+      hardware_t & cpu = grid.back();
       pos_t pos = GetPos(i);
-      grid[i]->SetTrait(TRAIT_ID__ROLE_ID, 0);
-      grid[i]->SetTrait(TRAIT_ID__FITNESS, 0);
-      grid[i]->SetTrait(TRAIT_ID__X_LOC, pos.first);
-      grid[i]->SetTrait(TRAIT_ID__Y_LOC, pos.second);
+      cpu.SetTrait(TRAIT_ID__ROLE_ID, 0);
+      cpu.SetTrait(TRAIT_ID__FITNESS, 0);
+      cpu.SetTrait(TRAIT_ID__X_LOC, pos.first);
+      cpu.SetTrait(TRAIT_ID__Y_LOC, pos.second);
+      cpu.SetMinBindThresh(MIN_BIND_THRESH);
+      cpu.SetMaxCores(MAX_CORES);
     }
   }
 
   ~Deme() {
     Reset();
-    for (size_t i = 0; i < grid.size(); ++i) {
-      grid[i].Delete();
-    }
-    grid.resize(0);
+    grid.clear();
   }
 
   void Reset() {
     agent_ptr = nullptr;
     agent_loaded = false;
     for (size_t i = 0; i < grid.size(); ++i) {
-      grid[i]->ResetHardware();
-      grid[i]->SetTrait(TRAIT_ID__ROLE_ID, 0);
+      grid[i].ResetHardware();
+      grid[i].SetTrait(TRAIT_ID__ROLE_ID, 0);
     }
   }
 
@@ -130,8 +134,8 @@ struct Deme {
     Reset();
     agent_ptr = _agent_ptr;
     for (size_t i = 0; i < grid.size(); ++i) {
-      grid[i]->SetProgram(agent_ptr->program);
-      grid[i]->SpawnCore(0, memory_t(), true);
+      grid[i].SetProgram(agent_ptr->program);
+      grid[i].SpawnCore(0, memory_t(), true);
     }
     agent_loaded = true;
   }
@@ -146,7 +150,7 @@ struct Deme {
     os << "=============DEME=============\n";
     for (size_t i = 0; i < grid.size(); ++i) {
       os << "--- Agent @ (" << GetPos(i).first << ", " << GetPos(i).second << ") ---\n";
-      grid[i]->PrintState(os); os << "\n";
+      grid[i].PrintState(os); os << "\n";
     }
   }
 
@@ -166,7 +170,7 @@ struct Deme {
     }
     // Dispatch event to recipients.
     for (size_t i = 0; i < recipients.size(); ++i)
-      grid[recipients[i]]->QueueEvent(event);
+      grid[recipients[i]].QueueEvent(event);
   }
 
   // Pulled this function from PopMng_Grid.
@@ -182,7 +186,7 @@ struct Deme {
   void SingleAdvance() {
     emp_assert(agent_loaded);
     for (size_t i = 0; i < grid.size(); ++i) {
-      grid[i]->SingleProcess();
+      grid[i].SingleProcess();
     }
   }
 };
@@ -264,7 +268,7 @@ std::function<bool(Agent&, emp::Random&)> simple_mut_fun =
         if (random.P(sub_rate)) inst.id = random.GetUInt(program.inst_lib->GetSize());
         // Mutate arguments (even if they aren't relevent to instruction).
         for (size_t k = 0; k < MAX_INST_ARGS; ++k) {
-          if (random.P(sub_rate)) inst.args[k] = random.GetUInt(MAX_INST_ARGS);
+          if (random.P(sub_rate)) inst.args[k] = random.GetInt(MAX_ARG_VAL);
         }
       }
     }
@@ -307,44 +311,44 @@ int main() {
   world.Inject(seed_agent, POP_SIZE);
   world.SetMutFun(simple_mut_fun);
   world.SetFitFun(fit_fun);
+  world.SetWellMixed(true);
 
   // Do the run...
   for (size_t ud = 0; ud < GENERATIONS; ++ud) {
-
     // Evaluate each agent.
     for (size_t id = 0; id < POP_SIZE; ++id) {
-      eval_deme.LoadAgent(world.popM[id]);
+      eval_deme.LoadAgent(&world.GetOrg(id));
       eval_deme.Advance(EVAL_TIME);
       std::unordered_set<double> valid_uids;
       size_t valid_id_cnt = 0;
       for (size_t i = 0; i < eval_deme.grid.size(); ++i) {
-        const double role_id = eval_deme.grid[i]->GetTrait(TRAIT_ID__ROLE_ID);
+        const double role_id = eval_deme.grid[i].GetTrait(TRAIT_ID__ROLE_ID);
         if (role_id > 0 && role_id <= DIST_SYS_SIZE) {
           ++valid_id_cnt; // Increment valid id cnt.
           valid_uids.insert(role_id); // Add to set.
         }
       }
-      world[id].valid_uid_cnt = valid_uids.size();
-      world[id].valid_id_cnt = valid_id_cnt;
+      world.GetOrg(id).valid_uid_cnt = valid_uids.size();
+      world.GetOrg(id).valid_id_cnt = valid_id_cnt;
     }
     // Keep the best agent.
-    world.EliteSelect(fit_fun, 1, 1);
+    emp::EliteSelect(world, 1, 1);
     // Run a tournament for the rest.
-    world.TournamentSelect(fit_fun, 8, POP_SIZE - 1);
+    emp::TournamentSelect(world, 8, POP_SIZE - 1);
     // Update the world (generational turnover)
     world.Update();
     // Mutate all but the first agent.
-    world.MutatePop(1);
+    world.DoMutations(1);
     // First agent is the best of the last generation.
-    std::cout << "Update #" << ud << std::endl;
-    std::cout << "  Max score: " << fit_fun(world.popM[0]) << std::endl;
+    std::cout << "Update #" << ud;
+    std::cout << ", Max score: " << fit_fun(world.GetOrg(0)) << std::endl;
   }
 
   std::cout << std::endl;
-  std::cout << "Best program (valid ids: " << world[0].valid_id_cnt << ", unique valid ids: "<< world[0].valid_uid_cnt <<"): " << std::endl;
-  world[0].program.PrintProgram(); std::cout << std::endl;
+  std::cout << "Best program (valid ids: " << world.GetOrg(0).valid_id_cnt << ", unique valid ids: "<< world.GetOrg(0).valid_uid_cnt <<"): " << std::endl;
+  world.GetOrg(0).GetGenome().PrintProgram(); std::cout << std::endl;
   std::cout << "--- Evaluating best program. ---" << std::endl;
-  eval_deme.LoadAgent(world.popM[0]);
+  eval_deme.LoadAgent(&world.GetOrg(0));
   eval_deme.Advance(EVAL_TIME);
   eval_deme.Print(); std::cout << std::endl;
 
