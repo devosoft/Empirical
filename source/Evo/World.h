@@ -1,11 +1,15 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2017.
 //  Released under the MIT Software license; see doc/LICENSE
-//
-//
-///  This file defines the base class for a World template for use in evolutionary algorithms.
-//
-//
+
+/**
+ *  @file  World.h
+ *  @brief Definition of a base class for a World template for use in evolutionary algorithms.
+ *
+ *  A definition of the emp::World template, linking in specialized file handling, iterators,
+ *  and selection techniques for evolutionary computation applications.
+ */
+
 //  Developer Notes:
 //  * Mutations are currently not interacting properly with lineages.  Organisms are born, added
 //    to the lineage and THEN mutated.  Ideally, all mutations should occur on birth (via a
@@ -116,7 +120,7 @@ namespace emp {
 
   protected:
     // Internal state member variables
-    Ptr<Random> random_ptr;         ///< Random object to use.
+    Ptr<Random> random_ptr;         ///< @brief Random object to use.
     bool random_owner;              ///< Did we create our own random number generator?
     emp::vector<Ptr<ORG>> pop;      ///< All of the spots in the population.
     emp::vector<Ptr<ORG>> next_pop; ///< Population being setup for next generation.
