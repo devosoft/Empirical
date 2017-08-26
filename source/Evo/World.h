@@ -82,13 +82,13 @@ namespace emp {
     friend class World_iterator< World<ORG> >;
   public:
     // --- Publicly available types ---
-    using this_t = World<ORG>;                 //< Resolved type of this templated class.
-    using org_t = ORG;                         //< Type of organisms in this world.
-    using value_type = org_t;                  //< Identical to org_t; vector compatibility.
-    using iterator_t = World_iterator<this_t>; //< Type for this world's iterators.
+    using this_t = World<ORG>;                 ///< Resolved type of this templated class.
+    using org_t = ORG;                         ///< Type of organisms in this world.
+    using value_type = org_t;                  ///< Identical to org_t; vector compatibility.
+    using iterator_t = World_iterator<this_t>; ///< Type for this world's iterators.
 
-    using genome_t = typename emp::find_genome_t<ORG>;  //< Type of underlying genomes.
-    using genotype_t = emp::Taxon<genome_t>;            //< Type of full genome category.
+    using genome_t = typename emp::find_genome_t<ORG>;  ///< Type of underlying genomes.
+    using genotype_t = emp::Taxon<genome_t>;            ///< Type of full genome category.
 
     /// Function type for calculating fitness.
     using fun_calc_fitness_t = std::function<double(ORG&)>;
@@ -116,37 +116,37 @@ namespace emp {
 
   protected:
     // Internal state member variables
-    Ptr<Random> random_ptr;         //< Random object to use.
-    bool random_owner;              //< Did we create our own random number generator?
-    emp::vector<Ptr<ORG>> pop;      //< All of the spots in the population.
-    emp::vector<Ptr<ORG>> next_pop; //< Population being setup for next generation.
-    size_t num_orgs;                //< How many organisms are actually in the population.
-    size_t update;                  //< How many times has the Update() method been called?
-    emp::vector<double> fit_cache;  //< vector size == 0 when not caching; uncached values == 0.
-    emp::vector<Ptr<genotype_t>> genotypes;      //< Genotypes for the corresponding orgs.
-    emp::vector<Ptr<genotype_t>> next_genotypes; //< Genotypes for corresponding orgs in next_pop.
+    Ptr<Random> random_ptr;         ///< Random object to use.
+    bool random_owner;              ///< Did we create our own random number generator?
+    emp::vector<Ptr<ORG>> pop;      ///< All of the spots in the population.
+    emp::vector<Ptr<ORG>> next_pop; ///< Population being setup for next generation.
+    size_t num_orgs;                ///< How many organisms are actually in the population.
+    size_t update;                  ///< How many times has the Update() method been called?
+    emp::vector<double> fit_cache;  ///< vector size == 0 when not caching; uncached values == 0.
+    emp::vector<Ptr<genotype_t>> genotypes;      ///< Genotypes for the corresponding orgs.
+    emp::vector<Ptr<genotype_t>> next_genotypes; ///< Genotypes for corresponding orgs in next_pop.
 
     // Configuration settings
-    std::string name;               //< Name of this world (for use in configuration.)
-    bool cache_on;                  //< Should we be caching fitness values?
-    size_t size_x;                  //< If a grid, track width; if pools, track pool size
-    size_t size_y;                  //< If a grid, track height; if pools, track num pools.
-    emp::vector<World_file> files;  //< Output files.
+    std::string name;               ///< Name of this world (for use in configuration.)
+    bool cache_on;                  ///< Should we be caching fitness values?
+    size_t size_x;                  ///< If a grid, track width; if pools, track pool size
+    size_t size_y;                  ///< If a grid, track height; if pools, track num pools.
+    emp::vector<World_file> files;  ///< Output files.
 
-    bool is_synchronous;            //< Does this world have synchronous generations?
-    bool is_structured;             //< Do we have any structured population? (false=well mixed)
+    bool is_synchronous;            ///< Does this world have synchronous generations?
+    bool is_structured;             ///< Do we have any structured population? (false=well mixed)
 
     /// Potential data nodes -- these should be activated only if in use.
     Ptr<DataMonitor<double>> data_node_fitness;
 
     // Configurable functions.
-    fun_calc_fitness_t  fun_calc_fitness;   //< Function to evaluate fitness for provided organism.
-    fun_do_mutations_t  fun_do_mutations;   //< Function to mutate an organism.
-    fun_print_org_t     fun_print_org;      //< Function to print an organism.
-    fun_get_genome_t    fun_get_genome;     //< Determine the genome object of an organism.
-    fun_add_inject_t    fun_add_inject;     //< Technique to inject a new, external organism.
-    fun_add_birth_t     fun_add_birth;      //< Technique to add a new offspring organism.
-    fun_get_neighbor_t  fun_get_neighbor;   //< Choose a random neighbor near specified id.
+    fun_calc_fitness_t  fun_calc_fitness;   ///< Function to evaluate fitness for provided organism.
+    fun_do_mutations_t  fun_do_mutations;   ///< Function to mutate an organism.
+    fun_print_org_t     fun_print_org;      ///< Function to print an organism.
+    fun_get_genome_t    fun_get_genome;     ///< Determine the genome object of an organism.
+    fun_add_inject_t    fun_add_inject;     ///< Technique to inject a new, external organism.
+    fun_add_birth_t     fun_add_birth;      ///< Technique to add a new offspring organism.
+    fun_get_neighbor_t  fun_get_neighbor;   ///< Choose a random neighbor near specified id.
 
     /// Attributes are a dynamic way to track extra characteristics about a world.
     std::map<std::string, std::string> attributes;
@@ -156,12 +156,12 @@ namespace emp {
 
     // == Signals ==
     SignalControl control;  // Setup the world to control various signals.
-    Signal<void(size_t)> before_repro_sig;    //< Trigger signal before organism gives birth.
-    Signal<void(ORG &)> offspring_ready_sig;  //< Trigger signal when offspring organism is built.
-    Signal<void(ORG &)> inject_ready_sig;     //< Trigger when external organism is ready to inject.
-    Signal<void(size_t)> org_placement_sig;   //< Trigger when any organism is placed into world.
-    Signal<void(size_t)> on_update_sig;       //< Trigger at the beginning of Update()
-    Signal<void(size_t)> on_death_sig;        //< Trigger when any organism dies.
+    Signal<void(size_t)> before_repro_sig;    ///< Trigger signal before organism gives birth.
+    Signal<void(ORG &)> offspring_ready_sig;  ///< Trigger signal when offspring organism is built.
+    Signal<void(ORG &)> inject_ready_sig;     ///< Trigger when external organism is ready to inject.
+    Signal<void(size_t)> org_placement_sig;   ///< Trigger when any organism is placed into world.
+    Signal<void(size_t)> on_update_sig;       ///< Trigger at the beginning of Update()
+    Signal<void(size_t)> on_death_sig;        ///< Trigger when any organism dies.
 
     /// AddOrgAt is the only way to add organisms to active population (others must go through here)
     size_t AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
