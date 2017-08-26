@@ -34,19 +34,20 @@
 
 namespace emp {
 
+  /// A Taxon represents a common group in a phylogeny.  Genotypes are the most commonly used Taxon
   template <typename ORG_INFO>
   class Taxon {
   private:
     using this_t = Taxon<ORG_INFO>;
     using info_t = ORG_INFO;
 
-    size_t id;                //<  ID for this Taxon (Unique within this Systematics)
-    const info_t info;        //<  Details for the organims associated within this taxanomic group.
-    const Ptr<this_t> parent; //<  Pointer to parent group (nullptr if injected)
-    size_t num_orgs;          //<  How many organisms currently exist of this group?
-    size_t tot_orgs;          //<  How many organisms have ever existed of this group?
-    size_t num_offspring;     //<  How many direct offspring groups exist from this one.
-    size_t depth;             //<  How deep in tree is this node? (Root is 0)
+    size_t id;                ///<  ID for this Taxon (Unique within this Systematics)
+    const info_t info;        ///<  Details for the organims associated within this taxanomic group.
+    const Ptr<this_t> parent; ///<  Pointer to parent group (nullptr if injected)
+    size_t num_orgs;          ///<  How many organisms currently exist of this group?
+    size_t tot_orgs;          ///<  How many organisms have ever existed of this group?
+    size_t num_offspring;     ///<  How many direct offspring groups exist from this one.
+    size_t depth;             ///<  How deep in tree is this node? (Root is 0)
 
   public:
     Taxon(size_t _id, const info_t & _info, Ptr<this_t> _parent=nullptr)
@@ -91,22 +92,22 @@ namespace emp {
     using taxon_t = Taxon<ORG_INFO>;
     using hash_t = typename Ptr<taxon_t>::hash_t;
 
-    bool store_active;     //< Store all of the currently active taxa?
-    bool store_ancestors;  //< Store all of the direct ancestors from living taxa?
-    bool store_outside;    //< Store taxa that are extinct with no living descendants?
-    bool archive;          //< Set to true if we are supposed to do any archiving of extinct taxa.
+    bool store_active;     ///< Store all of the currently active taxa?
+    bool store_ancestors;  ///< Store all of the direct ancestors from living taxa?
+    bool store_outside;    ///< Store taxa that are extinct with no living descendants?
+    bool archive;          ///< Set to true if we are supposed to do any archiving of extinct taxa.
 
-    std::unordered_set< Ptr<taxon_t>, hash_t > active_taxa;   //< A set of all living taxa.
-    std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; //< A set of all dead, ancestral taxa.
-    std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  //< A set of all dead taxa w/o descendants.
+    std::unordered_set< Ptr<taxon_t>, hash_t > active_taxa;   ///< A set of all living taxa.
+    std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
+    std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
 
     // Stats about active taxa... (totals are across orgs, not taxa)
-    size_t org_count;           //< How many organisms are currently active?
-    size_t total_depth;         //< Sum of taxa depths for calculating average.
-    size_t num_roots;           //< How many distint injected ancestors are currently in population?
+    size_t org_count;           ///< How many organisms are currently active?
+    size_t total_depth;         ///< Sum of taxa depths for calculating average.
+    size_t num_roots;           ///< How many distint injected ancestors are currently in population?
 
-    size_t next_id;             //< What ID value should the next new taxon have?
-    mutable Ptr<taxon_t> mrca;  //< Most recent common ancestor in the population.
+    size_t next_id;             ///< What ID value should the next new taxon have?
+    mutable Ptr<taxon_t> mrca;  ///< Most recent common ancestor in the population.
 
     /// Called wheneven a taxon has no organisms AND no descendants.
     void Prune(Ptr<taxon_t> taxon);
