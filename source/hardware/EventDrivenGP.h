@@ -34,6 +34,7 @@
 //  [ ] Write up a nice description.
 //  [ ] operator= overrides.
 //  [ ] Implement a load function.
+//  [ ] Add in warnings about 'no actively running core' if active_cores.size() == 0 (can happen post-ResetHardware())
 
 namespace emp {
 
@@ -553,7 +554,7 @@ namespace emp {
       // Add all available cores to inactive.
       for (size_t i = 0; i < inactive_cores.size(); ++i)
         inactive_cores[i] = (inactive_cores.size() - 1) - i;
-      exec_core_id = -1;
+      exec_core_id = (size_t)-1;
       errors = 0;
       is_executing = false;
     }
@@ -916,7 +917,7 @@ namespace emp {
     /// Given valid function pointer and instruction pointer, find next end of block (at current block level).
     /// This is not guaranteed to return a valid IP. At worst, it'll return an IP == function.inst_seq.size().
     size_t FindEndOfBlock(size_t fp, size_t ip) {
-      emp_assert(ValidPosition(fp, ip));
+      emp_assert(ValidFunction(fp));
       Ptr<const inst_lib_t> inst_lib = program.inst_lib;
       int depth_counter = 1;
       while (true) {
