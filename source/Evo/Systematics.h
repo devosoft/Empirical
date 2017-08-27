@@ -126,9 +126,12 @@ namespace emp {
     void MarkExtinct(Ptr<taxon_t> taxon);
 
   public:
-    /// @param store_active     Should living organisms' taxa be tracked? (typically yes!)
-    /// @param store_ancestors  Should ancestral organims' taxa be maintained?  (yes for lineages!)
-    /// @param store_outside    Should all dead taxa be maintained? (typically no; it gets BIG!)
+    /**
+     * Contructor for Systematics; controls what information should be stored.
+     * @param store_active     Should living organisms' taxa be tracked? (typically yes!)
+     * @param store_ancestors  Should ancestral organims' taxa be maintained?  (yes for lineages!)
+     * @param store_outside    Should all dead taxa be maintained? (typically no; it gets BIG!)
+     */
     Systematics(bool _active=true, bool _anc=true, bool _all=false)
       : store_active(_active), store_ancestors(_anc), store_outside(_all)
       , archive(store_ancestors || store_outside)
@@ -146,19 +149,40 @@ namespace emp {
       outside_taxa.clear();
     }
 
+    /// Are we storing all taxa that are still alive in the population?
     bool GetStoreActive() const { return store_active; }
+
+    /// Are we storing all taxa that are the ancestors of living organims in the population?
     bool GetStoreAncestors() const { return store_ancestors; }
+
+    /// Are we storing all taxa that have died out, as have all of their descendants.
     bool GetStoreOutside() const { return store_outside; }
+
+    /// Are we storing any taxa types that have died out?
     bool GetArchive() const { return archive; }
 
+    /// How many taxa are still active in the population?
     size_t GetNumActive() const { return active_taxa.size(); }
+
+    /// How many taxa are ancestors of living organisms (but have died out themselves)?
     size_t GetNumAncestors() const { return ancestor_taxa.size(); }
+
+    /// How many taxa are stored that have died out, as have their descendents?
     size_t GetNumOutside() const { return outside_taxa.size(); }
+
+    /// How many taxa are in the current phylogeny?
     size_t GetTreeSize() const { return GetNumActive() + GetNumAncestors(); }
+
+    /// How many taxa are stored in total?
     size_t GetNumTaxa() const { return GetTreeSize() + GetNumOutside(); }
+
+    /// How many living organisms are currently being tracked?
     size_t GetTotalOrgs() const { return org_count; }
+
+    /// How many independent trees are being tracked?
     size_t GetNumRoots() const { return num_roots; }
 
+    /// What is the average phylogenetic depth of organisms in the population?
     double GetAveDepth() const { return ((double) total_depth) / (double) org_count; }
 
     /// Request a pointer to the Most-Recent Common Ancestor for the population.
