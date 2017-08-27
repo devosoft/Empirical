@@ -57,18 +57,35 @@ namespace emp {
     Taxon & operator=(const Taxon &) = delete;
     Taxon & operator=(Taxon &&) = default;
 
+    /// Get a unique ID for this taxon; IDs are assigned sequentially, so newer taxa have higher IDs.
     size_t GetID() const { return id; }
+
+    /// Retrieve the tracked info associated with this Taxon.
     const info_t & GetInfo() const { return info; }
+
+    /// Retrieve a pointer to the parent Taxon.
     Ptr<this_t> GetParent() const { return parent; }
+
+    /// Get the number of living organisms currently associated with this Taxon.
     size_t GetNumOrgs() const { return num_orgs; }
+
+    /// Get the total number of organisms that have ever lived associated with this Taxon
     size_t GetTotOrgs() const { return tot_orgs; }
+
+    /// Get the number of taxa that were produced by organisms from this Taxon.
     size_t GetNumOff() const { return num_offspring; }
+
+    /// Get the number of taxanomic steps since the ancestral organism was injected into the World.
     size_t GetDepth() const { return depth; }
 
+    /// Add a new organism to this Taxon.
     void AddOrg() { ++num_orgs; ++tot_orgs; }
+
+    /// Add a new offspring Taxon to this one.
     void AddOffspring() { ++num_offspring; }
 
-    // Removals must return true if the taxon needs to continue; false if it should deactivate.
+    /// Remove an organism from this Taxon (after it dies).
+    /// Removals must return true if the taxon needs to continue; false if it should deactivate.
     bool RemoveOrg() {
       emp_assert(num_orgs > 0, num_orgs);
       --num_orgs;
@@ -76,6 +93,8 @@ namespace emp {
       // If we are out of BOTH organisms and offspring, this Taxon should deactivate.
       return num_orgs;
     }
+
+    /// Remove and offspring taxa after its entire sub-tree has died out (pruning)
     bool RemoveOffspring() {
       emp_assert(num_offspring > 0);
       --num_offspring;
