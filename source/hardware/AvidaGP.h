@@ -1,19 +1,20 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This is a hardcoded CPU for Avida.
-//
-//
-//  Developer Notes:
-//  * Should we save a copy of the original genome?  (or create a new "memory" member)
-//  * We should clean up how we handle scope; the root scope is zero, so the arg-based
-//    scopes are 1-16 (or however many).  Right now we increment the value in various places
-//    and should be more consistent.
-//  * How should Avida-GP genomes take an action?  Options include sending ALL outputs and
-//    picking the maximum field; sending a single output and using its value; having specialized
-//    commands...
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  Systematics.h
+ *  @brief This is a simple, efficient CPU for Avida.
+ *
+ *
+ *  @todo Should we save a copy of the original genome?  (or create a new "memory" member)
+ *  @todo We should clean up how we handle scope; the root scope is zero, so the arg-based
+ *    scopes are 1-16 (or however many).  Right now we increment the value in various places
+ *    and should be more consistent.
+ *  @todo How should Avida-GP genomes take an action?  Options include sending ALL outputs and
+ *    picking the maximum field; sending a single output and using its value; having specialized
+ *    commands...
+ */
 
 
 #ifndef EMP_AVIDA_GP_H
