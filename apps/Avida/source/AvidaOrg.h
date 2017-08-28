@@ -1,6 +1,6 @@
 #include "hardware/AvidaGP.h"
 
-class AvidaOrg : public AvidaGP {
+class AvidaOrg : public emp::AvidaGP {
 private:
 public:
 };
