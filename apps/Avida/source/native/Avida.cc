@@ -2,7 +2,11 @@
 
 #include <iostream>
 
+#include "../AvidaWorld.h"
+
 int main()
 {
+  AvidaWorld world;
+
   std::cout << "Hello World!" << std::endl;
 }
