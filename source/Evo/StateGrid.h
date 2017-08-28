@@ -27,7 +27,7 @@
 
 namespace emp {
 
-  /// Full information about a state grid and meanings of each state.
+  /// Full information about the states available in a state grid and meanings of each state.
   class StateGridInfo {
   protected:
 
@@ -81,11 +81,11 @@ namespace emp {
   /// A StateGrid describes a map of grid positions to the current state of each position.
   class StateGrid {
   protected:
-    size_t width;
-    size_t height;
-    emp::vector<int> states;
+    size_t width;              ///< Width of the overall grid
+    size_t height;             ///< Height of the overall grid
+    emp::vector<int> states;   ///< Specific states at each position in the grid.
 
-    StateGridInfo & info;
+    StateGridInfo & info;      ///< Information about the set of states used in this grid.
 
   public:
     StateGrid(StateGridInfo & _i, size_t _w=1, size_t _h=1, int init_val=0)
