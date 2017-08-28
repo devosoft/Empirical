@@ -1,9 +1,19 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file provides code to build NK-based algorithms.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  NK.h
+ *  @brief This file provides code to build NK-based algorithms.
+ *
+ *  Two version of landscapes are provided.  NKLandscape pre-calculates the entire landscape, for
+ *  easy lookup.  NKLandscapeMemo does lazy evaluation, memorizing values when they're first used.
+ *  NKLandscape is faster, but goes up in memory size exponentially with K.  NKLandscapeMemo is
+ *  slightly slower, but can handle arbitrarily large landscapes.
+ *
+ *  @todo Right now we make the library user decide between NKLandscape and NKLandscapeMemo.
+ *    Based on K value, we should be able to do this automatically, so we could merge the two.
+ */
 
 #ifndef EMP_EVO_NK_H
 #define EMP_EVO_NK_H
@@ -38,11 +48,11 @@ namespace emp {
 
   class NKLandscape {
   private:
-    size_t N;
-    size_t K;
-    size_t state_count;
-    size_t total_count;
-    emp::vector< emp::vector<double> > landscape;
+    size_t N;             ///< The number of bits in each genome.
+    size_t K;             ///< The number of OTHER bits with which each bit is epistatic.
+    size_t state_count;   ///< The total number of states associated with each bit table.
+    size_t total_count;   ///< The total number of states in the entire landscape space.
+    emp::vector< emp::vector<double> > landscape;  ///< The actual values in the landscape.
 
   public:
     NKLandscape() : N(0), K(0), state_count(0), total_count(0), landscape() { ; }
