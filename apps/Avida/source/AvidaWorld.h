@@ -5,7 +5,7 @@
 
 class AvidaWorld : public emp::World<AvidaOrg> {
 private:
-  emp::InstLib<emp::AvidaOrg> inst_lib;
+  emp::InstLib<AvidaOrg> inst_lib;
 
 public:
   AvidaWorld() : inst_lib() {
