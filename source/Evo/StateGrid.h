@@ -1,18 +1,19 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical/
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  StateGrid maintains a rectilinear grid that agents can traverse.
-//
-//
-//  Developer Notes:
-//  * Functions such as Load() should throw exceptions (or equilv.), not use asserts.
-//  * Need to figure out a default mapping for how outputs translate to moves around a state grid.
-//    -1 = Back up
-//     0 = Turn left
-//     1 = Move fast-forwards
-//     2 = Turn right
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  StateGrid.h
+ *  @brief StateGrid maintains a rectilinear grid that agents can traverse.
+ *
+ *  State grids are a matrix of values, representing states of a 2D environment that an organism
+ *  can traverse.
+ *
+ *  @todo Functions such as Load() should throw exceptions (or equilv.), not use asserts.
+ *  @todo Need to figure out a default mapping for how outputs translate to moves around a
+ *    state grid.  -1 = Back up ; 0 = Turn left ; 1 = Move fast-forwards ; 2 = Turn right
+ */
+
 
 #ifndef EMP_EVO_STATE_GRID_H
 #define EMP_EVO_STATE_GRID_H
@@ -32,22 +33,22 @@ namespace emp {
 
     /// Information about what a particular state type means in a state grid.
     struct StateInfo {
-      int state_id;       // Ordinal id for this state.
-      char symbol;        // Symbol for printing this state.
-      double score_mult;  // Change factor for organism score by stepping on this squre.
-      std::string name;   // Name of this state.
-      std::string desc;   // Explanation of this state.
+      int state_id;       ///< Ordinal id for this state.
+      char symbol;        ///< Symbol for printing this state.
+      double score_mult;  ///< Change factor for organism score by stepping on this squre.
+      std::string name;   ///< Name of this state.
+      std::string desc;   ///< Explanation of this state.
 
       StateInfo(int _id, char _sym, double _mult,
                 const std::string & _name, const std::string & _desc)
       : state_id(_id), symbol(_sym), score_mult(_mult), name(_name), desc(_desc) { ; }
     };
 
-    emp::vector<StateInfo> states;         // All available states.  Position is key ID
+    emp::vector<StateInfo> states;           ///< All available states.  Position is key ID
 
-    std::map<int, size_t> state_map;          // Map of state_id to key ID (state_id can be < 0)
-    std::map<char, size_t> symbol_map;        // Map of symbols to associated key ID
-    std::map<std::string, size_t> name_map;   // Map of names to associated key ID
+    std::map<int, size_t> state_map;         ///< Map of state_id to key ID (state_id can be < 0)
+    std::map<char, size_t> symbol_map;       ///< Map of symbols to associated key ID
+    std::map<std::string, size_t> name_map;  ///< Map of names to associated key ID
 
     size_t GetKey(int state_id) const { return Find(state_map, state_id, 0); }
     size_t GetKey(char symbol) const { return Find(symbol_map, symbol, 0); }
