@@ -131,15 +131,18 @@ namespace emp {
       name_map[name] = id;
     }
 
+    /// Specify a keyword and arg value.
     void AddArg(const std::string & name, arg_t value) {
       emp_assert(!Has(arg_map, name));
       arg_map[name] = value;
     }
 
+    /// Precess a specified instruction in the provided hardware.
     void ProcessInst(hardware_t & hw, const inst_t & inst) const {
       inst_funs[inst.id](hw, inst.args);
     }
 
+    /// Write out a full genome to the provided ostream.
     void WriteGenome(const genome_t & genome, std::ostream & os=std::cout) const {
       for (const inst_t & inst : genome) {
         os << inst.id << " " << GetName(inst.id);
@@ -151,6 +154,7 @@ namespace emp {
       }
     }
 
+    /// Read the instruction in the provided info and append it to the provided genome.
     void ReadInst(genome_t & genome, std::string info) const {
       std::string name = emp::string_pop_word(info);
       size_t id = GetID(name);
