@@ -1,9 +1,14 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file provides code to build NK-based algorithms.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  NK.h
+ *  @brief This file provides code to build NK landscapes, setup at compile time..
+ *
+ *  Knowing the size of N and K at compile time allow for slightly more optimized code, at the
+ *  expense of flexibility.
+ */
 
 #ifndef EMP_EVO_NK_CONST_H
 #define EMP_EVO_NK_CONST_H
