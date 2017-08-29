@@ -97,7 +97,6 @@ struct Deme {
   emp::Ptr<Agent> agent_ptr;
   bool agent_loaded;
 
-  // TODO: configure hardware
   Deme(emp::Ptr<emp::Random> _rnd, size_t _w, size_t _h, emp::Ptr<event_lib_t> _elib, emp::Ptr<inst_lib_t> _ilib)
     : grid(), width(_w), height(_h), rnd(_rnd), event_lib(_elib), inst_lib(_ilib), agent_ptr(nullptr), agent_loaded(false) {
     // Register dispatch function.

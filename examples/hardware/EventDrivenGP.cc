@@ -30,9 +30,9 @@ int main() {
   emp::EventDrivenGP cpu1(cpu0);
 
   // Test Load function.
-  std::ifstream prog_fstream("EventDrivenGP.program");
+  std::ifstream prog_fstream("EventDrivenGP_1.gp");
   cpu0.Load(prog_fstream);
-  std::ifstream prog2_fstream("EventDrivenGP2.program");
+  std::ifstream prog2_fstream("EventDrivenGP_2.gp");
   cpu1.Load(prog2_fstream);
 
   std::cout << "=====================================" << std::endl;
