@@ -527,12 +527,12 @@ namespace web {
 
 
   namespace internal {
-    // WidgetFacet is a template that provides accessors into Widget with a derived return type.
 
+    /// WidgetFacet is a template that provides accessors into Widget with a derived return type.
     template <typename RETURN_TYPE>
     class WidgetFacet : public Widget {
     protected:
-      // WidgetFacet cannot be built unless within derived class, so constructors are protected
+      /// WidgetFacet cannot be built unless within derived class, so constructors are protected
       WidgetFacet(const std::string & in_id="") : Widget(in_id) { ; }
       WidgetFacet(const WidgetFacet & in) : Widget(in) { ; }
       WidgetFacet(const Widget & in) : Widget(in) {
@@ -544,17 +544,20 @@ namespace web {
       WidgetFacet & operator=(const WidgetFacet & in) { Widget::operator=(in); return *this; }
       virtual ~WidgetFacet() { ; }
 
-      // CSS-related options may be overridden in derived classes that have multiple styles.
+      /// CSS-related options may be overridden in derived classes that have multiple styles.
+      /// By default DoCSS will track the new information and apply it (if active) to the widget.
       virtual void DoCSS(const std::string & setting, const std::string & value) {
         info->extras.style.DoSet(setting, value);
         if (IsActive()) Style::Apply(info->id, setting, value);
       }
-      // Attr-related options may be overridden in derived classes that have multiple attributes.
+      /// Attr-related options may be overridden in derived classes that have multiple attributes.
+      /// By default DoAttr will track the new information and apply it (if active) to the widget.
       virtual void DoAttr(const std::string & setting, const std::string & value) {
         info->extras.attr.DoSet(setting, value);
         if (IsActive()) Attributes::Apply(info->id, setting, value);
       }
-      // Listener options may be overridden in derived classes that have multiple listen targets.
+      /// Listener options may be overridden in derived classes that have multiple listen targets.
+      /// By default DoListen will track new listens and set them up immediately, if active.
       virtual void DoListen(const std::string & event_name, size_t fun_id) {
         info->extras.listen.Set(event_name, fun_id);
         if (IsActive()) Listeners::Apply(info->id, event_name, fun_id);
@@ -563,12 +566,15 @@ namespace web {
     public:
       using return_t = RETURN_TYPE;
 
+      /// Set a specific CSS value for this widget.
       template <typename SETTING_TYPE>
       return_t & SetCSS(const std::string & setting, SETTING_TYPE && value) {
         emp_assert(info != nullptr);
         DoCSS(setting, emp::to_string(value));
         return (return_t &) *this;
       }
+
+      /// Set a specific Attribute value for this widget.
       template <typename SETTING_TYPE>
       return_t & SetAttr(const std::string & setting, SETTING_TYPE && value) {
         emp_assert(info != nullptr);
@@ -576,7 +582,46 @@ namespace web {
         return (return_t &) *this;
       }
 
-      // On with NO mouse event.
+      /// Multiple CSS settings can be provided simultaneously.
+      template <typename T1, typename T2, typename... OTHER_SETTINGS>
+      return_t & SetCSS(const std::string & setting1, T1 && val1,
+                        const std::string & setting2, T2 && val2,
+                        OTHER_SETTINGS... others) {
+        SetCSS(setting1, val1);                      // Set the first CSS value.
+        return SetCSS(setting2, val2, others...);    // Recurse to the others.
+      }
+
+      /// Multiple Attributes can be provided simultaneously.
+      template <typename T1, typename T2, typename... OTHER_SETTINGS>
+      return_t & SetAttr(const std::string & setting1, T1 && val1,
+                            const std::string & setting2, T2 && val2,
+                            OTHER_SETTINGS... others) {
+        SetAttr(setting1, val1);                      // Set the first CSS value.
+        return SetAttr(setting2, val2, others...);    // Recurse to the others.
+      }
+
+      /// Allow multiple CSS settings to be provided as a single object.
+      /// (still go through DoCSS given need for virtual re-routing.)
+      return_t & SetCSS(const Style & in_style) {
+        emp_assert(info != nullptr);
+        for (const auto & s : in_style.GetMap()) {
+          DoCSS(s.first, s.second);
+        }
+        return (return_t &) *this;
+      }
+
+      /// Allow multiple Attr settings to be provided as a single object.
+      /// (still go through DoAttr given need for virtual re-routing.)
+      return_t & SetAttr(const Attributes & in_attr) {
+        emp_assert(info != nullptr);
+        for (const auto & a : in_attr.GetMap()) {
+          DoAttr(a.first, a.second);
+        }
+        return (return_t &) *this;
+      }
+
+      /// Provide an event and a function that will be called when that event is triggered.
+      /// In this case, the function as no arguments.
       return_t & On(const std::string & event_name, const std::function<void()> & fun) {
         emp_assert(info != nullptr);
         size_t fun_id = JSWrap(fun);
@@ -584,7 +629,8 @@ namespace web {
         return (return_t &) *this;
       }
 
-      // On with full mouse event.
+      /// Provide an event and a function that will be called when that event is triggered.
+      /// In this case, the function takes a mouse event as an argument, with full info about mouse.
       return_t & On(const std::string & event_name,
                     const std::function<void(MouseEvent evt)> & fun) {
         emp_assert(info != nullptr);
@@ -593,7 +639,8 @@ namespace web {
         return (return_t &) *this;
       }
 
-      // On with mouse coordinates.
+      /// Provide an event and a function that will be called when that event is triggered.
+      /// In this case, the function takes two doubles which will be filled in with mouse coordinates.
       return_t & On(const std::string & event_name,
                     const std::function<void(double,double)> & fun) {
         emp_assert(info != nullptr);
@@ -607,76 +654,74 @@ namespace web {
         return (return_t &) *this;
       }
 
-      // Window even listeners
+      /// Provide a function to be called when the window is resized.
       template <typename T> return_t & OnResize(T && arg) { return On("resize", arg); }
 
-      // Mouse event listeners
+      /// Provide a function to be called when the mouse button is clicked in this Widget.
       template <typename T> return_t & OnClick(T && arg) { return On("click", arg); }
+
+      /// Provide a function to be called when the mouse button is double clicked in this Widget.
       template <typename T> return_t & OnDoubleClick(T && arg) { return On("dblclick", arg); }
+
+      /// Provide a function to be called when the mouse button is pushed down in this Widget.
       template <typename T> return_t & OnMouseDown(T && arg) { return On("mousedown", arg); }
+
+      /// Provide a function to be called when the mouse button is released in this Widget.
       template <typename T> return_t & OnMouseUp(T && arg) { return On("mouseup", arg); }
+
+      /// Provide a function to be called whenever the mouse moves in this Widget.
       template <typename T> return_t & OnMouseMove(T && arg) { return On("mousemove", arg); }
+
+      /// Provide a function to be called whenever the mouse leaves the Widget.
       template <typename T> return_t & OnMouseOut(T && arg) { return On("mouseout", arg); }
+
+      /// Provide a function to be called whenever the mouse moves over the Widget.
       template <typename T> return_t & OnMouseOver(T && arg) { return On("mouseover", arg); }
+
+      /// Provide a function to be called whenever the mouse wheel moves in this Widget.
       template <typename T> return_t & OnMouseWheel(T && arg) { return On("mousewheel", arg); }
 
-      // Keyboard event listeners
+      /// Provide a function to be called whenever a key is pressed down in this Widget.
       template <typename T> return_t & OnKeydown(T && arg) { return On("keydown", arg); }
+
+      /// Provide a function to be called whenever a key is pressed down and released in this Widget.
       template <typename T> return_t & OnKeypress(T && arg) { return On("keypress", arg); }
+
+      /// Provide a function to be called whenever a key is pressed released in this Widget.
       template <typename T> return_t & OnKeyup(T && arg) { return On("keyup", arg); }
 
-      // Clipboard event listeners
+      /// Provide a function to be called whenever text is copied in this Widget.
       template <typename T> return_t & OnCopy(T && arg) { return On("copy", arg); }
+
+      /// Provide a function to be called whenever text is cut in this Widget.
       template <typename T> return_t & OnCut(T && arg) { return On("cut", arg); }
+
+      /// Provide a function to be called whenever text is pasted in this Widget.
       template <typename T> return_t & OnPaste(T && arg) { return On("paste", arg); }
 
-      // Allow multiple CSS or Attr settings to be grouped.
-      template <typename T1, typename T2, typename... OTHER_SETTINGS>
-      return_t & SetCSS(const std::string & setting1, T1 && val1,
-                        const std::string & setting2, T2 && val2,
-                        OTHER_SETTINGS... others) {
-        SetCSS(setting1, val1);                      // Set the first CSS value.
-        return SetCSS(setting2, val2, others...);    // Recurse to the others.
-      }
-      template <typename T1, typename T2, typename... OTHER_SETTINGS>
-      return_t & SetAttr(const std::string & setting1, T1 && val1,
-                            const std::string & setting2, T2 && val2,
-                            OTHER_SETTINGS... others) {
-        SetAttr(setting1, val1);                      // Set the first CSS value.
-        return SetAttr(setting2, val2, others...);    // Recurse to the others.
-      }
 
-      // Allow multiple CSS or Attr settings as a single object.
-      // (still go through DoCSS/DoAttr given need for virtual re-routing.)
-      return_t & SetCSS(const Style & in_style) {
-        emp_assert(info != nullptr);
-        for (const auto & s : in_style.GetMap()) {
-          DoCSS(s.first, s.second);
-        }
-        return (return_t &) *this;
-      }
-      return_t & SetAttr(const Attributes & in_attr) {
-        emp_assert(info != nullptr);
-        for (const auto & a : in_attr.GetMap()) {
-          DoAttr(a.first, a.second);
-        }
-        return (return_t &) *this;
-      }
-
-
-      // Size Manipulation
+      /// Update the width of this Widget.
+      /// @param unit defaults to pixels ("px"), but can also be a measured distance (e.g, "inches") or a percentage("%")
       return_t & SetWidth(double w, const std::string & unit="px") {
         return SetCSS("width", emp::to_string(w, unit) );
       }
+
+      /// Update the height of this Widget.
+      /// @param unit defaults to pixels ("px"), but can also be a measured distance (e.g, "inches") or a percentage("%")
       return_t & SetHeight(double h, const std::string & unit="px") {
         return SetCSS("height", emp::to_string(h, unit) );
       }
+
+      /// Update the size (width and height) of this widget.
+      /// @param unit defaults to pixels ("px"), but can also be a measured distance (e.g, "inches") or a percentage("%")
       return_t & SetSize(double w, double h, const std::string & unit="px") {
         SetWidth(w, unit); return SetHeight(h, unit);
       }
 
-      // Position Manipulation
+      /// Move this widget to the center of its container.
       return_t & Center() { return SetCSS("margin", "auto"); }
+
+      /// Set the x-y position of this widget within its container.
       return_t & SetPosition(int x, int y, const std::string & unit="px",
                              const std::string & pos_type="absolute",
                              const std::string & x_anchor="left",
@@ -685,50 +730,87 @@ namespace web {
                       x_anchor, emp::to_string(x, unit),
                       y_anchor, emp::to_string(y, unit));
       }
+
+      /// Set the x-y position of this Widget within its container, using the TOP-RIGHT as an anchor.
       return_t & SetPositionRT(int x, int y, const std::string & unit="px")
         { return SetPosition(x, y, unit, "absolute", "right", "top"); }
+
+      /// Set the x-y position of this Widget within its container, using the BOTTOM-RIGHT as an anchor.
       return_t & SetPositionRB(int x, int y, const std::string & unit="px")
         { return SetPosition(x, y, unit, "absolute", "right", "bottom"); }
+
+      /// Set the x-y position of this Widget within its container, using the BOTTOM-LEFT as an anchor.
       return_t & SetPositionLB(int x, int y, const std::string & unit="px")
         { return SetPosition(x, y, unit, "absolute", "left", "bottom"); }
 
+      /// Set the x-y position of this Widget, fixed within the browser window.
       return_t & SetPositionFixed(int x, int y, const std::string & unit="px")
         { return SetPosition(x, y, unit, "fixed", "left", "top"); }
+
+      /// Set the x-y position of the top-right corner this Widget, fixed within the browser window.
       return_t & SetPositionFixedRT(int x, int y, const std::string & unit="px")
         { return SetPosition(x, y, unit, "fixed", "right", "top"); }
+
+      /// Set the x-y position of the bottom-right corner this Widget, fixed within the browser window.
       return_t & SetPositionFixedRB(int x, int y, const std::string & unit="px")
         { return SetPosition(x, y, unit, "fixed", "right", "bottom"); }
+
+      /// Set the x-y position of the bottom-left corner this Widget, fixed within the browser window.
       return_t & SetPositionFixedLB(int x, int y, const std::string & unit="px")
         { return SetPosition(x, y, unit, "fixed", "left", "bottom"); }
 
 
-      // Positioning
-      return_t & SetFloat(const std::string & f) { return SetCSS("float", f); }
-      return_t & SetOverflow(const std::string & o) { return SetCSS("overflow", o); }
+      /// Set this Widget to float appropriately within its containter.
+      return_t & SetFloat(const std::string & f="left") { return SetCSS("float", f); }
 
-      // Access
-      return_t & SetScroll() { return SetCSS("overflow", "scroll"); }     // Always have scrollbars
-      return_t & SetScrollAuto() { return SetCSS("overflow", "auto"); }   // Scrollbars if needed
+      /// Setup how this Widget should handle overflow.
+      return_t & SetOverflow(const std::string & o="auto") { return SetCSS("overflow", o); }
+
+      /// Setup how this Widget to always have scrollbars.
+      return_t & SetScroll() { return SetCSS("overflow", "scroll"); }
+
+      /// Setup how this Widget to have scrollbars if needed for overflow.
+      return_t & SetScrollAuto() { return SetCSS("overflow", "auto"); }
+
+      /// Setup how this Widget to be user-resizable.
       return_t & SetResizable() { return SetCSS("resize", "both"); }
+
+      /// Setup how this Widget for the x only to be user-resizable.
       return_t & SetResizableX() { return SetCSS("resize", "horizontal"); }
+
+      /// Setup how this Widget for the y only to be user-resizable.
       return_t & SetResizableY() { return SetCSS("resize", "vertical"); }
+
+      /// Setup how this Widget to NOT be resizable.
       return_t & SetResizableOff() { return SetCSS("resize", "none"); }
 
-      // Text Manipulation
+      /// Setup the Font to be used in this Widget.
       return_t & SetFont(const std::string & font) { return SetCSS("font-family", font); }
+
+      /// Setup the size of the Font to be used in this Widget.
       return_t & SetFontSize(int s) { return SetCSS("font-size", emp::to_string(s, "px")); }
+
+      /// Setup the size of the Font to be used in this Widget in units of % of viewport width.
       return_t & SetFontSizeVW(double s) { return SetCSS("font-size", emp::to_string(s, "vw")); }
+
+      /// Align text to be centered.
       return_t & SetCenterText() { return SetCSS("text-align", "center"); }
 
-      // Color Manipulation
+      /// Set the background color of this Widget.
       return_t & SetBackground(const std::string & v) { return SetCSS("background-color", v); }
+
+      /// Set the foreground color of this Widget.
       return_t & SetColor(const std::string & v) { return SetCSS("color", v); }
+
+      /// Set the opacity level of this Widget.
       return_t & SetOpacity(double v) { return SetCSS("opacity", v); }
 
-      // Tables...
+      /// Set information about the Widget board.
       return_t & SetBorder(const std::string & border_info) {
         return SetCSS("border", border_info);
       }
+
+      /// The the number of pixels (or alternate unit) for the padding around cells (used with Tables)
       return_t & SetPadding(double p, const std::string & unit="px") {
         return SetCSS("padding", emp::to_string(p, unit));
       }
