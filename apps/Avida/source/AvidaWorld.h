@@ -21,6 +21,7 @@ private:
 
   double energy_threshold;  ///< Base energy requirement for an organism to replicate.
   double energy_inflow;     ///< Base amount of energy collected per update for each organism.
+
 public:
   AvidaWorld() : inst_lib() {
     // Build the instruction library...
@@ -59,4 +60,12 @@ public:
   double GetEnergyThreshold() const { return energy_threshold; }
   double GetEnergyInflow() const { return energy_inflow; }
 
+  bool DoReplicate(size_t repro_id) {
+    emp_assert(IsOccupied(repro_id));
+    AvidaOrg & org = GetOrg(repro_id);                     // Retrieve the organism to replicate.
+    if (org.GetEnergy() < energy_threshold) return false;  // Not enough energy?  Stop!
+    org.AdjustEnergy(-energy_threshold);                   // Pay the energy cost.
+    DoBirth( org, repro_id );                              // Trigger the birth.
+    return true;
+  }
 };
