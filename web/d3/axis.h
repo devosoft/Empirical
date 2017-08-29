@@ -109,10 +109,15 @@ namespace D3 {
           dy = Pointer_stringify($5);
         }
 
+        var label_x = axis_range[0]+(axis_range[1]-axis_range[0])/x_divisor;
+        if (axis_range[0] > axis_range[1]) {
+            label_x = axis_range[1]+(axis_range[0]-axis_range[1])/x_divisor;
+        }
+
         js.objects[$3].append("text")
              .attr("id", Pointer_stringify($2)+"_label")
              .attr("transform", "rotate("+text_orient+")")
-             .attr("x", axis_range[0]+(axis_range[1]-axis_range[0])/x_divisor)
+             .attr("x", label_x)
              .attr("dy", dy).style("text-anchor", "middle")
              .text(Pointer_stringify($4));
       }, this->id, selection.GetID(), dom_id.c_str(), group.GetID(), label.c_str(),
@@ -213,6 +218,7 @@ namespace D3 {
     template <typename T>
     void Rescale(double new_min, double new_max, D3::SelectionOrTransition<T> & svg){
       this->scale.SetDomain(std::array<double, 2>({{new_min, new_max}}));
+      std::cout << dom_id << std::endl;
       ApplyAxis(svg.Select("#"+dom_id));
     }
 
@@ -231,7 +237,7 @@ namespace D3 {
       x_range = js.objects[$0].scale().range();
       y_range = js.objects[$1].scale().range();
 
-      js.objects[$2].attr("transform", "translate(0,"+y_range[1]+")");
+      js.objects[$2].attr("transform", "translate(0,"+d3.max(y_range)+")");
       js.objects[$3].attr("transform", "translate("+x_range[0]+",0)");
     }, x_axis.GetID(), y_axis.GetID(), x_axis.group.GetID(), y_axis.group.GetID());
   }

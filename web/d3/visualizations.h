@@ -23,6 +23,7 @@
 #include "svg_shapes.h"
 #include "layout.h"
 #include "visual_elements.h"
+#include "histogram.h"
 
 //Pretty sure D3VisualizationInfo can't be shared among multiple D3Visualizations
 
@@ -77,6 +78,10 @@ protected:
   const D3VisualizationInfo * Info() const { return (D3VisualizationInfo *) info; }
 
   D3Visualization(D3VisualizationInfo * in_info) : WidgetFacet(in_info) { ; }
+
+  double axis_width = 60;
+  double y_margin = 10;
+  double x_margin = 30;
 
 public:
 
@@ -222,23 +227,111 @@ public:
     }
 };
 
-template <typename DATA_TYPE = std::array<double, 2> >
+template <typename DATA_TYPE = int, typename X_SCALE_TYPE = D3::LinearScale, typename Y_SCALE_TYPE = D3::LinearScale>
+class HistogramChart : public D3Visualization {
+protected:
+
+    D3::Axis<X_SCALE_TYPE> x_ax;
+    D3::Axis<Y_SCALE_TYPE> y_ax;
+
+    D3::Histogram h;
+
+    DATA_TYPE x_min = 100;
+    DATA_TYPE x_max = 0;
+    DATA_TYPE y_max = 10;
+
+
+public:
+    HistogramChart(std::string x_var, int w=800, int h=400) :
+            D3Visualization(w, h),
+            x_ax("bottom", x_var),
+            y_ax("left", "Frequency"){;}
+
+    virtual void Setup() {
+        x_ax.GetScale().SetRangeRound(axis_width, GetWidth()-x_margin);
+        x_ax.GetScale().SetDomain(x_min, x_max);
+        h.SetDomain(x_min, x_max);
+        y_ax.GetScale().SetRange(GetHeight() - axis_width, y_margin);
+        y_ax.GetScale().SetDomain(0, y_max);
+        D3::DrawAxes(x_ax, y_ax, *GetSVG());
+    }
+
+
+    void DrawData(emp::vector<DATA_TYPE> data) {
+        X_SCALE_TYPE& x = x_ax.GetScale();
+        Y_SCALE_TYPE& y = y_ax.GetScale();
+        double new_x_min = *std::min_element(data.begin(), data.end());
+        double new_x_max = *std::max_element(data.begin(), data.end());
+        bool rescale = false;
+
+        if (new_x_min < x_min || (new_x_min - x_min) > .5*(new_x_max - new_x_min)) {
+            x_min = new_x_min - (new_x_max-new_x_min)*.05;
+            rescale = true;
+        }
+        if (new_x_max > x_max || (x_max - new_x_max) > .5*(new_x_max - new_x_min)) {
+            x_max = new_x_max + (new_x_max-new_x_min)*.05;
+            rescale = true;
+        }
+
+        D3::Transition t = GetSVG()->MakeTransition();
+        t.SetDuration(500);
+        if (rescale) {
+            x.SetDomain(x_min, x_max);
+            h.Domain(x_min, x_max);
+            x_ax.Rescale(x_min, x_max, t);
+        }
+
+        D3::Dataset bin_data = h.Call(data);
+
+        double new_y_max = bin_data.Max([](D3::HistogramBin d){return d.length();});
+
+        if (new_y_max > y_max) {
+            y_max = new_y_max * 1.2;
+            y_ax.Rescale(0, y_max, t);
+        }
+
+        D3::Selection bins = GetSVG()->SelectAll(".bar").Data(bin_data);
+        D3::Selection enter = bins.Enter().Append("rect")
+                                          .SetAttr("class", "bar")
+                                          .SetAttr("x", (GetWidth() - axis_width)/2)
+                                          .SetAttr("y", GetHeight() - axis_width);
+        bins.ExitRemove();
+        bins.Merge(enter).MakeTransition(t).SetAttr("x", [this, &x](D3::HistogramBin d){
+                                      return x.ApplyScale(d.x0());
+                          })
+                         .SetAttr("y", [this, &y](D3::HistogramBin d){
+                                                        return y.ApplyScale(d.length());
+                          })
+                          .SetAttr("width", [this, &x](D3::HistogramBin d){
+                               return x.ApplyScale(d.x1()) - x.ApplyScale(d.x0()) - 1;
+                          })
+                          .SetAttr("height", [this, &y](D3::HistogramBin d){
+                               return GetHeight() - y.ApplyScale(d.length()) - axis_width;
+                          });
+
+    }
+
+    // void Clear() {
+    //     GetSVG()->SelectAll(".bar").Remove();
+    // }
+};
+
+template <typename DATA_TYPE = std::array<double, 2>,
+          typename  X_SCALE_TYPE = D3::LinearScale,
+          typename  Y_SCALE_TYPE = D3::LinearScale >
 class LineGraph : public D3Visualization {
 protected:
   // Formatting constants
-  double y_margin = 10;
-  double x_margin = 30;
-  double axis_width = 60;
   double y_min = 1000;
   double y_max = 0;
   double x_min = 1000;
   double x_max = 0;
 
   // Components of the graph
-  D3::LinearScale * x_scale;
-  D3::LinearScale * y_scale;
-  D3::Axis<D3::LinearScale> * x_axis;
-  D3::Axis<D3::LinearScale> * y_axis;
+  X_SCALE_TYPE * x_scale;
+  Y_SCALE_TYPE * y_scale;
+  D3::Axis<X_SCALE_TYPE> * x_axis;
+  D3::Axis<Y_SCALE_TYPE> * y_axis;
   D3::LineGenerator * line_gen;
   D3::ToolTip * tip;
   // In case we need to store a dataset
@@ -296,17 +389,17 @@ public:
     GetSVG()->SetupToolTip(*tip);
 
     //Set up scales
-    y_scale = new D3::LinearScale();
-    x_scale = new D3::LinearScale();
+    y_scale = new Y_SCALE_TYPE();
+    x_scale = new X_SCALE_TYPE();
     y_scale->SetDomain(std::array<double, 2>({{y_max, y_min}}));
     y_scale->SetRange(std::array<double, 2>({{y_margin, (double)GetHeight() - axis_width}}));
     x_scale->SetDomain(std::array<double, 2>({{x_min,x_max}}));
     x_scale->SetRange(std::array<double, 2>({{axis_width, GetWidth()-x_margin}}));
 
     //Set up axes
-    x_axis = new D3::Axis<D3::LinearScale>("bottom", variables[0]);
+    x_axis = new D3::Axis<X_SCALE_TYPE>("bottom", variables[0]);
     x_axis->SetScale(*x_scale);
-    y_axis = new D3::Axis<D3::LinearScale>("left", variables[1]);
+    y_axis = new D3::Axis<Y_SCALE_TYPE>("left", variables[1]);
     y_axis->SetScale(*y_scale);
     D3::DrawAxes(*x_axis, *y_axis, *svg);
 
@@ -324,10 +417,10 @@ public:
   }
 
   D3::Selection exit;
-  D3::LinearScale * GetXScale() {return x_scale;}
-  D3::LinearScale * GetYScale() {return y_scale;}
-  D3::Axis<D3::LinearScale> * GetXAxis() {return x_axis;}
-  D3::Axis<D3::LinearScale> * GetYAxis() {return y_axis;}
+  X_SCALE_TYPE * GetXScale() {return x_scale;}
+  Y_SCALE_TYPE * GetYScale() {return y_scale;}
+  D3::Axis<X_SCALE_TYPE> * GetXAxis() {return x_axis;}
+  D3::Axis<Y_SCALE_TYPE> * GetYAxis() {return y_axis;}
   D3::LineGenerator * GetLineGenerator() {return line_gen;}
   D3::CSVDataset * GetDataset() {return dataset;}
   D3::ToolTip * GetToolTip() {return tip;}
@@ -337,10 +430,10 @@ public:
   std::function<double(DATA_TYPE)> GetScaledY() {return y;}
 
 
-  void SetXScale(D3::LinearScale * scale) {x_scale = scale;}
-  void SetYScale(D3::LinearScale * scale) {y_scale = scale;}
-  void SetXAxis(D3::Axis<D3::LinearScale> * ax) {x_axis = ax;}
-  void SetYAxis(D3::Axis<D3::LinearScale> * ax) {y_axis = ax;}
+  void SetXScale(X_SCALE_TYPE * scale) {x_scale = scale;}
+  void SetYScale(Y_SCALE_TYPE * scale) {y_scale = scale;}
+  void SetXAxis(D3::Axis<X_SCALE_TYPE> * ax) {x_axis = ax;}
+  void SetYAxis(D3::Axis<Y_SCALE_TYPE> * ax) {y_axis = ax;}
   void SetLineGenerator(D3::LineGenerator * line) {line_gen = line;}
   void SetDataset(D3::CSVDataset * d) {dataset = d;}
 
@@ -704,7 +797,7 @@ public:
   D3::TreeLayout<NODE> tree;
   D3::JSONDataset * data;
 
-  TreeVisualization(int width, int height) : D3Visualization(width, height){variables.push_back("Persist");}
+  TreeVisualization(int width=800, int height=400) : D3Visualization(width, height){variables.push_back("Persist");}
 
   virtual void Setup() {
     InitializeVariables();

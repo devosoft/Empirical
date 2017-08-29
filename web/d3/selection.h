@@ -672,6 +672,13 @@ namespace D3 {
 
     /// @endcond
 
+    Transition SetDuration(double time) {
+        EM_ASM_ARGS({
+            js.objects[$0].duration($1);
+        }, this->id, time);
+        return (*this);
+    }
+
     /// Sets special properties of DOM elements (e.g. "checked" for checkboxes)
     /// Value can be a number, function, string, or string naming a Javascript function
     /// See the [d3 documentation](https://github.com/d3/d3-selection#selection_property)
@@ -1056,10 +1063,32 @@ namespace D3 {
       return update;
     }
 
+    // template<typename C>
+    // emp::sfinae_decoy<Selection, decltype(C::value_type::n_fields)>
+    // Data(C values){
+    //     std::cout << "using the right one" << std::endl;
+    //   int update_id = NextD3ID();
+    //   emp::pass_array_to_javascript(values);
+    //
+    //   EM_ASM_ARGS({
+    //     var update_sel = js.objects[$0].data(emp_i.__incoming_array);
+	//     js.objects[$1] = update_sel;
+    //
+    //   }, this->id, update_id);
+    //
+    //   Selection update = Selection(update_id);
+    //   return update;
+    // }
+
+
     // Accepts string referring to Javascript function
     template<typename C, class = typename C::value_type>
+    // typename std::enable_if<std::is_pod<typename C::value_type>::value, Selection>::type
     Selection Data(C values, std::string key=""){
       int update_id = NextD3ID();
+
+
+        //   std::cout << "In bind data: " << values[0].x0() << std::endl;
       emp::pass_array_to_javascript(values);
 
   	  EM_ASM_ARGS({
@@ -1436,6 +1465,17 @@ namespace D3 {
 
       return Transition(new_id);
     }
+
+    Transition MakeTransition(Transition t){
+      int new_id = NextD3ID();
+      EM_ASM_ARGS({
+ 	    var transition = js.objects[$0].transition(js.objects[$1]);
+	    js.objects[$2] = transition;
+    }, this->id, t.GetID(), new_id);
+
+      return Transition(new_id);
+    }
+
 
     /// Interrupt the transition with the name [name] on the current selection
     void Interrupt(std::string name=""){

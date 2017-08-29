@@ -61,6 +61,12 @@ namespace D3 {
       //TODO: make this work for other types
       return EM_ASM_DOUBLE({return js.objects[$0]($1);},this->id, input);
     }
+
+    int ApplyScale(int input) {
+      return EM_ASM_INT({return js.objects[$0]($1);},this->id, input);
+    }
+
+
     //TODO:Getters
 
   };
@@ -131,6 +137,11 @@ namespace D3 {
       emp::pass_array_to_javascript(values);
       EM_ASM_ARGS({js.objects[$0].rangeRound(emp.__incoming_array);}, this->id);
     }
+
+    void SetRangeRound(double min, double max) {
+      EM_ASM_ARGS({js.objects[$0].rangeRound([$1, $2]);}, this->id, min, max);
+    }
+
 
     void SetInterpolate(std::string factory) {
       D3_CALLBACK_METHOD_1_ARG(interpolate, factory.c_str())
