@@ -59,8 +59,13 @@ namespace emp {
     std::map<std::string, arg_t> arg_map;    ///< How are different arguments named?
 
   public:
-    InstLib() : inst_lib(), inst_funs(), name_map(), arg_map() { ; }
-    ~InstLib() { ; }
+    InstLib() : inst_lib(), inst_funs(), name_map(), arg_map() { ; }  ///< Default Constructor
+    InstLib(const InstLib &) = default;                               ///< Copy Constructor
+    InstLib(InstLib &&) = default;                                    ///< Move Constructor
+    ~InstLib() { ; }                                                  ///< Destructor
+
+    InstLib & operator=(const InstLib &) = default;                   ///< Copy Operator
+    InstLib & operator=(InstLib &&) = default;                        ///< Move Operator
 
     /// Return the name associated with the specified instruction ID.
     const std::string & GetName(size_t id) const { return inst_lib[id].name; }
