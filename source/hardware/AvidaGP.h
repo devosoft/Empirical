@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  Systematics.h
+ *  @file  AvidaGP.h
  *  @brief This is a simple, efficient CPU for Avida.
  *
  *
@@ -187,7 +187,7 @@ namespace emp {
       scope_stack.emplace_back(0, ScopeType::ROOT, 0);  // Initial scope.
       Reset();
     }
-    AvidaGP(inst_lib_t & _ilib) : AvidaGP(&_ilib) { ; }
+    AvidaGP(const inst_lib_t & _ilib) : AvidaGP(&_ilib) { ; }
     AvidaGP() : AvidaGP(DefaultInstLib()) { ; }
     AvidaGP(const AvidaGP &) = default;
     AvidaGP(AvidaGP &&) = default;
@@ -440,7 +440,7 @@ namespace emp {
       hw.reg_stack.emplace_back(hw.CurScope(), args[0], hw.regs[args[0]]);
     }
 
-    static Ptr<const inst_lib_t> DefaultInstLib();
+    static const inst_lib_t & DefaultInstLib();
   };
 
   size_t AvidaGP::InstScope(const inst_t & inst) const {
@@ -549,7 +549,7 @@ namespace emp {
   }
 
   /// This static function can be used to access the generic AvidaGP instruction library.
-  Ptr<const InstLib<AvidaGP>> AvidaGP::DefaultInstLib() {
+  const InstLib<AvidaGP> & AvidaGP::DefaultInstLib() {
     static inst_lib_t inst_lib;
 
     if (inst_lib.GetSize() == 0) {
@@ -585,7 +585,7 @@ namespace emp {
       }
     }
 
-    return &inst_lib;
+    return inst_lib;
   }
 
 }
