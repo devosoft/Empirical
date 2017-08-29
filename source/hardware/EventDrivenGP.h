@@ -23,24 +23,76 @@
 //    is not currently acceptable for input into EventDrivenGP's Load function.
 //    * Will remedy this by adding another PrintProgram function to print in a format acceptable by EventDrivenGP's
 //      Load function. This PrintProgram will be less readable, but will more fully describe the program (it won't hide anything).
-//  *
-
-//  * Important concept: Main state (bottom-most call state on core 0's call stack).
-//    * The first function will be main (unless the fp on the initially created state is otherwise manipulated).
-//    * Main state behaves differently than any other state.
-//    * define binding
-//    * cores = execution stacks. Used interchangeably.
-// @amlalejini - TODO:
-//  [ ] Write up a nice description.
-//  [ ] operator= overrides.
-//  [ ] Implement a load function.
-//  [ ] Add in warnings about 'no actively running core' if active_cores.size() == 0 (can happen post-ResetHardware())
+//  * @amlalejini - TODO:
+//   [ ] operator= overrides.
+//   [ ] Add in warnings about 'no actively running core' if active_cores.size() == 0 (can happen post-ResetHardware())
 
 namespace emp {
 
   /**
-  <general description here.>
-  */
+   *  @brief A linear GP (inspired by AvidaGP) virtual hardware CPU that supports an event-driven programming paradigm.
+   *
+   *  @details
+   *  The EventDrivenGP virtual hardware runs programs where each program is a set of named functions.
+   *  Function names are mutable bit strings, or affinities, and each function consists of a sequence
+   *  of instructions. Functions are called by name, and can be called from within the hardware (via Call
+   *  instructions) or from outside the hardware (via Events).
+   *
+   *  The EventDrivenGP virtual hardware CPU is capable of multi-core/parallel processing. This hardware
+   *  maintains a (bounded) set of cores. Each core maintains its own program call stack that stores
+   *  information about the active functions on that core. Cores execute in simulated parallel. For
+   *  every single CPU cycle (see SingleProcess function) given to the virtual hardware, each core is
+   *  given the opportunity to advance by a single cycle.
+   *
+   *  When functions are called from within the hardware (via Call instructions), a new call state is
+   *  pushed onto the program call stack on the core from which the function was called. No new core
+   *  is spawned (unless using a non-standard Call instruction). When functions are called from outside
+   *  the hardware (via Events), if there is an available inactive core, an inactive core will be made
+   *  active with the called function.
+   *
+   *  Affinity matching/binding is used to determine which functions should be called by events or by
+   *  Call instructions. The hardware looks at the event/instruction's associated affinity and finds
+   *  the best match (using a simple matching coefficient) among function affinities in the hardware's
+   *  program. The best match must be better than a given minimum threshold (min_bind_thresh) for
+   *  that function to be called. If there are not functions that meet the minimum threshold, no function
+   *  is called. If two or more functions are tied for best match and are above the minimum threshold,
+   *  one is selected randomly to be called; otherwise, if there is no tie, the best matching function
+   *  is called.
+   *
+   *  Terminology:
+   *    * Programs
+   *      * The EventDrivenGP virtual hardware runs programs of type EventDrivenGP::Program. These programs
+   *        are a set of named functions.
+   *    * Functions
+   *      * Functions in EventDrivenGP programs are named and consist of a sequence of instructions.
+   *        Function names, or affinities, are bit strings whose length are defined by AFFINITY_WIDTH.
+   *    * Instructions
+   *      * EventDrivenGP hardware instructions are managed by an instruction library (InstLib.h).
+   *      * Instructions have IDs, affinities, arguments, and properties.
+   *    * Affinity
+   *      * An affinity is a sequence of bits whose length is determined by AFFINITY_WIDTH (by default, 8).
+   *    * Core
+   *      * A core is a single program call stack where the call stack stores information about the
+   *        active functions running on the core.
+   *    * Call State
+   *      * Local state information relative to a particular function call. Each call state consists
+   *        of: Local memory, Input memory, Output memory, a Code Block Stack, a function pointer,
+   *        and an instruction pointer.
+   *    * Events
+   *      * Events are defined and managed through the an event library (EventLib.h). Events are flexible
+   *        packages of information that can be used to interact with EventDrivenGP hardware. Events
+   *        are minimally defined by default as they are heavily dependent on the context of where/how
+   *        the EventDrivenGP hardware is being used.
+   *      * Events have an associated ID (managed by the event library), an affinity, a memory map,
+   *        and a set of properties (string set).
+   *      * When an event is triggered the set of dispatcher functions that are registered to that
+   *        particular event's type (managed by the event library) are called. Events
+   *        events are often triggered by instructions or by external processes. For example, the
+   *        default SendMsg instruction triggers a Message type event which causes all of the Message
+   *        event dispatchers registered to the hardware's event library to be called.
+   *      * Each event type has a registered event handler that gets called to handle a dispatched
+   *        event.
+   */
   template<size_t AFFINITY_WIDTH>
   class EventDrivenGP_AW {
   public:
