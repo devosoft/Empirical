@@ -12,10 +12,15 @@
 class AvidaOrg : public emp::AvidaGP {
 private:
   double energy;
+
 public:
   AvidaOrg() : energy(0) { ; }
 
   double GetEnergy() const { return energy; }
 
   void AdjustEnergy(double shift) { energy += shift; }
+
+  static void Inst_Replicate(AvidaOrg & hw, const arg_set_t & args) {
+    hw.regs[args[1]] = hw.regs[args[0]];
+  }
 };
