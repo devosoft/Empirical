@@ -1,18 +1,19 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical/
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  StateGrid maintains a rectilinear grid that agents can traverse.
-//
-//
-//  Developer Notes:
-//  * Functions such as Load() should throw exceptions (or equilv.), not use asserts.
-//  * Need to figure out a default mapping for how outputs translate to moves around a state grid.
-//    -1 = Back up
-//     0 = Turn left
-//     1 = Move fast-forwards
-//     2 = Turn right
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  StateGrid.h
+ *  @brief StateGrid maintains a rectilinear grid that agents can traverse.
+ *
+ *  State grids are a matrix of values, representing states of a 2D environment that an organism
+ *  can traverse.
+ *
+ *  @todo Functions such as Load() should throw exceptions (or equilv.), not use asserts.
+ *  @todo Need to figure out a default mapping for how outputs translate to moves around a
+ *    state grid.  -1 = Back up ; 0 = Turn left ; 1 = Move fast-forwards ; 2 = Turn right
+ */
+
 
 #ifndef EMP_EVO_STATE_GRID_H
 #define EMP_EVO_STATE_GRID_H
@@ -25,30 +26,29 @@
 #include "../tools/map_utils.h"
 
 namespace emp {
-namespace evo {
 
-  /// Full information about a state grid and meanings of each state.
+  /// Full information about the states available in a state grid and meanings of each state.
   class StateGridInfo {
   protected:
 
     /// Information about what a particular state type means in a state grid.
     struct StateInfo {
-      int state_id;       // Ordinal id for this state.
-      char symbol;        // Symbol for printing this state.
-      double score_mult;  // Change factor for organism score by stepping on this squre.
-      std::string name;   // Name of this state.
-      std::string desc;   // Explanation of this state.
+      int state_id;       ///< Ordinal id for this state.
+      char symbol;        ///< Symbol for printing this state.
+      double score_mult;  ///< Change factor for organism score by stepping on this squre.
+      std::string name;   ///< Name of this state.
+      std::string desc;   ///< Explanation of this state.
 
       StateInfo(int _id, char _sym, double _mult,
                 const std::string & _name, const std::string & _desc)
       : state_id(_id), symbol(_sym), score_mult(_mult), name(_name), desc(_desc) { ; }
     };
 
-    emp::vector<StateInfo> states;         // All available states.  Position is key ID
+    emp::vector<StateInfo> states;           ///< All available states.  Position is key ID
 
-    std::map<int, size_t> state_map;          // Map of state_id to key ID (state_id can be < 0)
-    std::map<char, size_t> symbol_map;        // Map of symbols to associated key ID
-    std::map<std::string, size_t> name_map;   // Map of names to associated key ID
+    std::map<int, size_t> state_map;         ///< Map of state_id to key ID (state_id can be < 0)
+    std::map<char, size_t> symbol_map;       ///< Map of symbols to associated key ID
+    std::map<std::string, size_t> name_map;  ///< Map of names to associated key ID
 
     size_t GetKey(int state_id) const { return Find(state_map, state_id, 0); }
     size_t GetKey(char symbol) const { return Find(symbol_map, symbol, 0); }
@@ -81,11 +81,11 @@ namespace evo {
   /// A StateGrid describes a map of grid positions to the current state of each position.
   class StateGrid {
   protected:
-    size_t width;
-    size_t height;
-    emp::vector<int> states;
+    size_t width;              ///< Width of the overall grid
+    size_t height;             ///< Height of the overall grid
+    emp::vector<int> states;   ///< Specific states at each position in the grid.
 
-    StateGridInfo & info;
+    StateGridInfo & info;      ///< Information about the set of states used in this grid.
 
   public:
     StateGrid(StateGridInfo & _i, size_t _w=1, size_t _h=1, int init_val=0)
@@ -212,7 +212,6 @@ namespace evo {
     }
   };
 
-}
 }
 
 #endif

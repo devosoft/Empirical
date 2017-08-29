@@ -60,20 +60,20 @@ namespace web {
   protected:
     using anim_fun_t = std::function<void(const Animate &)>;
 
-    anim_fun_t anim_fun;                //< Function to repeatedly run for animation.
-    emp::vector<web::Widget> targets;   //< What widgets should be refreshed after each frame?
-    bool active;                        //< Is this animation currently running?
-    bool do_step;                       //< Should this animation take just a single step?
-    size_t callback_id;                 //< Intenral ID for javascript to call back AdvanceFrame()
+    anim_fun_t anim_fun;                ///< Function to repeatedly run for animation.
+    emp::vector<web::Widget> targets;   ///< What widgets should be refreshed after each frame?
+    bool active;                        ///< Is this animation currently running?
+    bool do_step;                       ///< Should this animation take just a single step?
+    size_t callback_id;                 ///< Intenral ID for javascript to call back AdvanceFrame()
 
-    double start_time;                  //< At what time did this animation most recently start?
-    double prev_time;                   //< What was the time point of the previous frame?
-    double cur_time;                    //< What time did the current frame start?
-    double run_time;                    //< How much run time has accumulated?
+    double start_time;                  ///< At what time did this animation most recently start?
+    double prev_time;                   ///< What was the time point of the previous frame?
+    double cur_time;                    ///< What time did the current frame start?
+    double run_time;                    ///< How much run time has accumulated?
 
-    int frame_count;                    //< How many animation frames have gone by?
+    int frame_count;                    ///< How many animation frames have gone by?
 
-    Button toggle_but;                  //< A button to start/stop this animation.
+    Button toggle_but;                  ///< A button to start/stop this animation.
 
     void LoadTargets() { ; }
     template <typename... T>

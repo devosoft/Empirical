@@ -1,24 +1,17 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical/
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Track genotypes, species, clades, or lineages of organisms in a world.
-//
-//
-//  The three arguments to Systematics are:
-//    store_active     - Should living organisms' taxa be tracked? (typically yes!)
-//    store_ancestors  - Should ancestral organims' taxa be maintained?  (yes for lineages!)
-//    store_outside    - Should all dead taxa be maintained? (typically no; it gets BIG!)
-//
-//  ORG_INFO is usually the genome for an organism, but may have other details like position.
-//
-//
-//  Developer notes
-//  * Technically, we don't need to keep the ancestors in a set in order to track a lineage...
-//    If we delete all of their descendants they should automaticaly be deleted.
-//  * We should provide an option to back up systematics data to a file so that it doesn't all
-//    need to be kept in memory, especially if we're only doing post-analysis.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  Systematics.h
+ *  @brief Track genotypes, species, clades, or lineages of organisms in a world.
+ *
+ *
+ *  @todo Technically, we don't need to keep the ancestors in a set in order to track a lineage...
+ *    If we delete all of their descendants they should automaticaly be deleted.
+ *  @todo We should provide an option to back up systematics data to a file so that it doesn't all
+ *    need to be kept in memory, especially if we're only doing post-analysis.
+ */
 
 
 #ifndef EMP_EVO_SYSTEMATICS_H
@@ -34,19 +27,26 @@
 
 namespace emp {
 
+  /// @brief A Taxon represents a type of organism in a phylogeny.
+  /// @param ORG_INFO The information type associated with an organism, used to categorize it.
+  ///
+  /// Genotypes are the most commonly used Taxon; in general taxa can be anything from a shared
+  /// genome sequence, a phenotypic trait, or a even a position in the world (if you want to
+  /// track an evolutionary pathway)
+
   template <typename ORG_INFO>
   class Taxon {
   private:
     using this_t = Taxon<ORG_INFO>;
     using info_t = ORG_INFO;
 
-    size_t id;                //<  ID for this Taxon (Unique within this Systematics)
-    const info_t info;        //<  Details for the organims associated within this taxanomic group.
-    const Ptr<this_t> parent; //<  Pointer to parent group (nullptr if injected)
-    size_t num_orgs;          //<  How many organisms currently exist of this group?
-    size_t tot_orgs;          //<  How many organisms have ever existed of this group?
-    size_t num_offspring;     //<  How many direct offspring groups exist from this one.
-    size_t depth;             //<  How deep in tree is this node? (Root is 0)
+    size_t id;                ///<  ID for this Taxon (Unique within this Systematics)
+    const info_t info;        ///<  Details for the organims associated within this taxanomic group.
+    const Ptr<this_t> parent; ///<  Pointer to parent group (nullptr if injected)
+    size_t num_orgs;          ///<  How many organisms currently exist of this group?
+    size_t tot_orgs;          ///<  How many organisms have ever existed of this group?
+    size_t num_offspring;     ///<  How many direct offspring groups exist from this one.
+    size_t depth;             ///<  How deep in tree is this node? (Root is 0)
 
   public:
     Taxon(size_t _id, const info_t & _info, Ptr<this_t> _parent=nullptr)
@@ -57,18 +57,35 @@ namespace emp {
     Taxon & operator=(const Taxon &) = delete;
     Taxon & operator=(Taxon &&) = default;
 
+    /// Get a unique ID for this taxon; IDs are assigned sequentially, so newer taxa have higher IDs.
     size_t GetID() const { return id; }
+
+    /// Retrieve the tracked info associated with this Taxon.
     const info_t & GetInfo() const { return info; }
+
+    /// Retrieve a pointer to the parent Taxon.
     Ptr<this_t> GetParent() const { return parent; }
+
+    /// Get the number of living organisms currently associated with this Taxon.
     size_t GetNumOrgs() const { return num_orgs; }
+
+    /// Get the total number of organisms that have ever lived associated with this Taxon
     size_t GetTotOrgs() const { return tot_orgs; }
+
+    /// Get the number of taxa that were produced by organisms from this Taxon.
     size_t GetNumOff() const { return num_offspring; }
+
+    /// Get the number of taxanomic steps since the ancestral organism was injected into the World.
     size_t GetDepth() const { return depth; }
 
+    /// Add a new organism to this Taxon.
     void AddOrg() { ++num_orgs; ++tot_orgs; }
+
+    /// Add a new offspring Taxon to this one.
     void AddOffspring() { ++num_offspring; }
 
-    // Removals must return true if the taxon needs to continue; false if it should deactivate.
+    /// Remove an organism from this Taxon (after it dies).
+    /// Removals must return true if the taxon needs to continue; false if it should deactivate.
     bool RemoveOrg() {
       emp_assert(num_orgs > 0, num_orgs);
       --num_orgs;
@@ -76,6 +93,8 @@ namespace emp {
       // If we are out of BOTH organisms and offspring, this Taxon should deactivate.
       return num_orgs;
     }
+
+    /// Remove and offspring taxa after its entire sub-tree has died out (pruning)
     bool RemoveOffspring() {
       emp_assert(num_offspring > 0);
       --num_offspring;
@@ -85,28 +104,36 @@ namespace emp {
     }
   };
 
+  /// @brief A tool to track phylogenetic relationships among organisms.
+  /// The systematics class tracks the relationships among all organisms based on the INFO_TYPE
+  /// provided.  If an offspring has the same value for INFO_TYPE as its parent, it is grouped into
+  /// the same taxon.  Otherwise a new Taxon is created and the old one is used as its parent in
+  /// the phylogeny.  If the provided INFO_TYPE is the organsism's genome, a traditional phylogeny
+  /// is formed, with genotypes.  If the organism's behavior/task set is used, then organisms are
+  /// grouped by phenotypes.  If the organsims's position is used, the evolutionary path through
+  /// space is tracked.  Any other aspect of organisms can be tracked this way as well.
   template <typename ORG_INFO>
   class Systematics {
   private:
     using taxon_t = Taxon<ORG_INFO>;
     using hash_t = typename Ptr<taxon_t>::hash_t;
 
-    bool store_active;     //< Store all of the currently active taxa?
-    bool store_ancestors;  //< Store all of the direct ancestors from living taxa?
-    bool store_outside;    //< Store taxa that are extinct with no living descendants?
-    bool archive;          //< Set to true if we are supposed to do any archiving of extinct taxa.
+    bool store_active;     ///< Store all of the currently active taxa?
+    bool store_ancestors;  ///< Store all of the direct ancestors from living taxa?
+    bool store_outside;    ///< Store taxa that are extinct with no living descendants?
+    bool archive;          ///< Set to true if we are supposed to do any archiving of extinct taxa.
 
-    std::unordered_set< Ptr<taxon_t>, hash_t > active_taxa;   //< A set of all living taxa.
-    std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; //< A set of all dead, ancestral taxa.
-    std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  //< A set of all dead taxa w/o descendants.
+    std::unordered_set< Ptr<taxon_t>, hash_t > active_taxa;   ///< A set of all living taxa.
+    std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
+    std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
 
     // Stats about active taxa... (totals are across orgs, not taxa)
-    size_t org_count;           //< How many organisms are currently active?
-    size_t total_depth;         //< Sum of taxa depths for calculating average.
-    size_t num_roots;           //< How many distint injected ancestors are currently in population?
+    size_t org_count;           ///< How many organisms are currently active?
+    size_t total_depth;         ///< Sum of taxa depths for calculating average.
+    size_t num_roots;           ///< How many distint injected ancestors are currently in population?
 
-    size_t next_id;             //< What ID value should the next new taxon have?
-    mutable Ptr<taxon_t> mrca;  //< Most recent common ancestor in the population.
+    size_t next_id;             ///< What ID value should the next new taxon have?
+    mutable Ptr<taxon_t> mrca;  ///< Most recent common ancestor in the population.
 
     /// Called wheneven a taxon has no organisms AND no descendants.
     void Prune(Ptr<taxon_t> taxon);
@@ -118,6 +145,12 @@ namespace emp {
     void MarkExtinct(Ptr<taxon_t> taxon);
 
   public:
+    /**
+     * Contructor for Systematics; controls what information should be stored.
+     * @param store_active     Should living organisms' taxa be tracked? (typically yes!)
+     * @param store_ancestors  Should ancestral organims' taxa be maintained?  (yes for lineages!)
+     * @param store_outside    Should all dead taxa be maintained? (typically no; it gets BIG!)
+     */
     Systematics(bool _active=true, bool _anc=true, bool _all=false)
       : store_active(_active), store_ancestors(_anc), store_outside(_all)
       , archive(store_ancestors || store_outside)
@@ -135,19 +168,40 @@ namespace emp {
       outside_taxa.clear();
     }
 
+    /// Are we storing all taxa that are still alive in the population?
     bool GetStoreActive() const { return store_active; }
+
+    /// Are we storing all taxa that are the ancestors of living organims in the population?
     bool GetStoreAncestors() const { return store_ancestors; }
+
+    /// Are we storing all taxa that have died out, as have all of their descendants.
     bool GetStoreOutside() const { return store_outside; }
+
+    /// Are we storing any taxa types that have died out?
     bool GetArchive() const { return archive; }
 
+    /// How many taxa are still active in the population?
     size_t GetNumActive() const { return active_taxa.size(); }
+
+    /// How many taxa are ancestors of living organisms (but have died out themselves)?
     size_t GetNumAncestors() const { return ancestor_taxa.size(); }
+
+    /// How many taxa are stored that have died out, as have their descendents?
     size_t GetNumOutside() const { return outside_taxa.size(); }
+
+    /// How many taxa are in the current phylogeny?
     size_t GetTreeSize() const { return GetNumActive() + GetNumAncestors(); }
+
+    /// How many taxa are stored in total?
     size_t GetNumTaxa() const { return GetTreeSize() + GetNumOutside(); }
+
+    /// How many living organisms are currently being tracked?
     size_t GetTotalOrgs() const { return org_count; }
+
+    /// How many independent trees are being tracked?
     size_t GetNumRoots() const { return num_roots; }
 
+    /// What is the average phylogenetic depth of organisms in the population?
     double GetAveDepth() const { return ((double) total_depth) / (double) org_count; }
 
     /// Request a pointer to the Most-Recent Common Ancestor for the population.

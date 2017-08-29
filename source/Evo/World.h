@@ -1,16 +1,24 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file defines the base class for a World template for use in evolutionary algorithms.
-//
-//
-//  Developer Notes:
-//  * We should Specialize World so that ANOTHER world can be used with proper delegation to
-//    facilitate demes, pools, islands, etc.
-//  * With DoMutations, should we update taxa?  Or just assume that it will be handled
-//    properly when the organisms move to the next generation.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  World.h
+ *  @brief Definition of a base class for a World template for use in evolutionary algorithms.
+ *
+ *  A definition of the emp::World template, linking in specialized file handling, iterators,
+ *  and selection techniques for evolutionary computation applications.
+ *
+ *
+ *  @todo Mutations are currently not interacting properly with lineages.  Organisms are born,
+ *        added to the lineage and THEN mutated.  Ideally, all mutations should occur on birth
+ *        (via a signal?), but we have to make sure things like elite selection can still turn
+ *        off mutations.
+ *  @todo We should Specialize World so that ANOTHER world can be used with proper delegation to
+ *        facilitate demes, pools, islands, etc.
+ *  @todo With DoMutations, should we update taxa?  Or just assume that it will be handled
+ *        properly when the organisms move to the next generation.
+ */
 
 #ifndef EMP_EVO_WORLD_H
 #define EMP_EVO_WORLD_H
@@ -28,15 +36,16 @@
 #include "../tools/random_utils.h"
 #include "../tools/string_utils.h"
 
+// World-specific includes.
 #include "Systematics.h"    // Track relationships among organisms.
 #include "World_file.h"     // Helper to determine when specific events should occur.
 #include "World_iterator.h" // Allow iteration through organisms in a world.
 #include "World_reflect.h"  // Handle needed reflection on incoming organism classes.
-#include "World_select.h"
+#include "World_select.h"   // Include all built-in selection functions for World.
 
 namespace emp {
 
-  ///  Setup a World with a population of organisms that can evolve or deal with ecological effects.
+  ///  @brief Setup a World with a population of organisms that can evolve or deal with ecological effects.
   ///
   ///  There are three ways that organisms can enter the population:
   ///   * InjectAt(org, pos) - place the organism at the specified position in the population.
@@ -78,13 +87,13 @@ namespace emp {
     friend class World_iterator< World<ORG> >;
   public:
     // --- Publicly available types ---
-    using this_t = World<ORG>;                 //< Resolved type of this templated class.
-    using org_t = ORG;                         //< Type of organisms in this world.
-    using value_type = org_t;                  //< Identical to org_t; vector compatibility.
-    using iterator_t = World_iterator<this_t>; //< Type for this world's iterators.
+    using this_t = World<ORG>;                 ///< Resolved type of this templated class.
+    using org_t = ORG;                         ///< Type of organisms in this world.
+    using value_type = org_t;                  ///< Identical to org_t; vector compatibility.
+    using iterator_t = World_iterator<this_t>; ///< Type for this world's iterators.
 
-    using genome_t = typename emp::find_genome_t<ORG>;  //< Type of underlying genomes.
-    using genotype_t = emp::Taxon<genome_t>;            //< Type of full genome category.
+    using genome_t = typename emp::find_genome_t<ORG>;  ///< Type of underlying genomes.
+    using genotype_t = emp::Taxon<genome_t>;            ///< Type of full genome category.
 
     /// Function type for calculating fitness.
     using fun_calc_fitness_t = std::function<double(ORG&)>;
@@ -112,37 +121,37 @@ namespace emp {
 
   protected:
     // Internal state member variables
-    Ptr<Random> random_ptr;         //< Random object to use.
-    bool random_owner;              //< Did we create our own random number generator?
-    emp::vector<Ptr<ORG>> pop;      //< All of the spots in the population.
-    emp::vector<Ptr<ORG>> next_pop; //< Population being setup for next generation.
-    size_t num_orgs;                //< How many organisms are actually in the population.
-    size_t update;                  //< How many times has the Update() method been called?
-    emp::vector<double> fit_cache;  //< vector size == 0 when not caching; uncached values == 0.
-    emp::vector<Ptr<genotype_t>> genotypes;      //< Genotypes for the corresponding orgs.
-    emp::vector<Ptr<genotype_t>> next_genotypes; //< Genotypes for corresponding orgs in next_pop.
+    Ptr<Random> random_ptr;         ///< @brief Random object to use.
+    bool random_owner;              ///< Did we create our own random number generator?
+    emp::vector<Ptr<ORG>> pop;      ///< All of the spots in the population.
+    emp::vector<Ptr<ORG>> next_pop; ///< Population being setup for next generation.
+    size_t num_orgs;                ///< How many organisms are actually in the population.
+    size_t update;                  ///< How many times has Update() been called?
+    emp::vector<double> fit_cache;  ///< vector size == 0 when not caching; uncached values == 0.
+    emp::vector<Ptr<genotype_t>> genotypes;      ///< Genotypes for the corresponding orgs.
+    emp::vector<Ptr<genotype_t>> next_genotypes; ///< Genotypes for corresponding orgs in next_pop.
 
     // Configuration settings
-    std::string name;               //< Name of this world (for use in configuration.)
-    bool cache_on;                  //< Should we be caching fitness values?
-    size_t size_x;                  //< If a grid, track width; if pools, track pool size
-    size_t size_y;                  //< If a grid, track height; if pools, track num pools.
-    emp::vector<World_file> files;  //< Output files.
+    std::string name;               ///< Name of this world (for use in configuration.)
+    bool cache_on;                  ///< Should we be caching fitness values?
+    size_t size_x;                  ///< If a grid, track width; if pools, track pool size
+    size_t size_y;                  ///< If a grid, track height; if pools, track num pools.
+    emp::vector<World_file> files;  ///< Output files.
 
-    bool is_synchronous;            //< Does this world have synchronous generations?
-    bool is_structured;             //< Do we have any structured population? (false=well mixed)
+    bool is_synchronous;            ///< Does this world have synchronous generations?
+    bool is_structured;             ///< Do we have any structured population? (false=well mixed)
 
     /// Potential data nodes -- these should be activated only if in use.
     Ptr<DataMonitor<double>> data_node_fitness;
 
     // Configurable functions.
-    fun_calc_fitness_t  fun_calc_fitness;   //< Function to evaluate fitness for provided organism.
-    fun_do_mutations_t  fun_do_mutations;   //< Function to mutate an organism.
-    fun_print_org_t     fun_print_org;      //< Function to print an organism.
-    fun_get_genome_t    fun_get_genome;     //< Determine the genome object of an organism.
-    fun_add_inject_t    fun_add_inject;     //< Technique to inject a new, external organism.
-    fun_add_birth_t     fun_add_birth;      //< Technique to add a new offspring organism.
-    fun_get_neighbor_t  fun_get_neighbor;   //< Choose a random neighbor near specified id.
+    fun_calc_fitness_t  fun_calc_fitness;   ///< Function to evaluate fitness for provided organism.
+    fun_do_mutations_t  fun_do_mutations;   ///< Function to mutate an organism.
+    fun_print_org_t     fun_print_org;      ///< Function to print an organism.
+    fun_get_genome_t    fun_get_genome;     ///< Determine the genome object of an organism.
+    fun_add_inject_t    fun_add_inject;     ///< Technique to inject a new, external organism.
+    fun_add_birth_t     fun_add_birth;      ///< Technique to add a new offspring organism.
+    fun_get_neighbor_t  fun_get_neighbor;   ///< Choose a random neighbor near specified id.
 
     /// Attributes are a dynamic way to track extra characteristics about a world.
     std::map<std::string, std::string> attributes;
@@ -152,12 +161,12 @@ namespace emp {
 
     // == Signals ==
     SignalControl control;  // Setup the world to control various signals.
-    Signal<void(size_t)> before_repro_sig;    //< Trigger signal before organism gives birth.
-    Signal<void(ORG &)> offspring_ready_sig;  //< Trigger signal when offspring organism is built.
-    Signal<void(ORG &)> inject_ready_sig;     //< Trigger when external organism is ready to inject.
-    Signal<void(size_t)> org_placement_sig;   //< Trigger when any organism is placed into world.
-    Signal<void(size_t)> on_update_sig;       //< Trigger at the beginning of Update()
-    Signal<void(size_t)> on_death_sig;        //< Trigger when any organism dies.
+    Signal<void(size_t)> before_repro_sig;    ///< Trigger signal before organism gives birth.
+    Signal<void(ORG &)> offspring_ready_sig;  ///< Trigger signal when offspring organism is built.
+    Signal<void(ORG &)> inject_ready_sig;     ///< Trigger when external organism is ready to inject.
+    Signal<void(size_t)> org_placement_sig;   ///< Trigger when any organism is placed into world.
+    Signal<void(size_t)> on_update_sig;       ///< Trigger at the beginning of Update()
+    Signal<void(size_t)> on_death_sig;        ///< Trigger when any organism dies.
 
     /// AddOrgAt is the only way to add organisms to active population (others must go through here)
     size_t AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);

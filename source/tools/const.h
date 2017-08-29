@@ -323,29 +323,13 @@ namespace emp {
     2.0
   };
 
-  namespace internal {
-    /// The following function takes a table and a position [0.0, 1.0) and intepolates a value.
-    template <typename T>
+  /// The following function takes a table and a position [0.0, 1.0) and intepolates a value.
+  template <typename T>
     constexpr double InterpolateTable(T && table, double pos, double tsize) {
-      // auto p1 = (int)(pos*tsize);
-      // auto w1 = 1.0-pos+((double)((int)(pos*tsize)))/tsize;
-      // auto p2 = (int)(pos*tsize)+1;
-      // auto w2 = pos-((double)((int)(pos*tsize)))/tsize;
-      // std::cout << "[[ "
-      //           << "pos=" << pos
-      //           << " p1=" << p1
-      //           << " v1=" << table[p1]
-      //           << " w1=" << w1
-      //           << " p2=" << p2
-      //           << " v2=" << table[p2]
-      //           << " w2=" << w2
-      //           << " ]]";
-      // return table[p1] * w1 + table[p2] * w2;
-      return table[(int)(pos*tsize)] * (1.0-pos+((double)((int)(pos*tsize)))/tsize)
+    return table[(int)(pos*tsize)] * (1.0-pos+((double)((int)(pos*tsize)))/tsize)
       + table[(int)(pos*tsize)+1] * (pos-((double)((int)(pos*tsize)))/tsize);
-    }
   }
-
+  
 }
 
 #endif
