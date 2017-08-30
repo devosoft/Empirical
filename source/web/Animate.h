@@ -1,16 +1,17 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This class manages animations in a web page.
-//
-//  To build an animation, you must provide a function to be run repeatedly.  When Start()
-//  is triggered, the function will be called 60 time per second (or as close as possible),
-//  until Stop() is caled.
-//
-//  Inputs to the constructor include the function to run each animation step, and
-//  zero or more UI elements that should be updated after each frame.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  Animate.h
+ *  @brief Manage animations on a web site.
+ *
+ *  To build an animation, you must provide a function to be run repeatedly.  When Start()
+ *  is triggered, the function will be called 60 time per second (or as close as possible),
+ *  until Stop() is caled.
+ *
+ */
+
 //
 //  Parameters to the animation function can be:
 //    * double (representing time since the last frame)
@@ -107,12 +108,17 @@ namespace web {
     virtual void DoFrame() { ; }
 
   public:
+    /// Setup an Animate object to call an anim_fun as fast as possible, at most 60 times a second.
+    /// Call virtual function DoFrame() if no other functon is provided (which can be overridden
+    /// if you derive a new class from Animate)
     Animate() : active(false), do_step(false), run_time(0.0), frame_count(0)
     {
       emp::InitializeAnim();  // Make sure JS is intialized for animations.
       callback_id = JSWrap( std::function<void()>([this](){ this->AdvanceFrame(); }) );
     }
 
+    /// Construct an Animate object with the function to run each animation step and
+    /// zero or more UI elements that should be updated after each frame.
     template <typename... W_TYPES>
     Animate(const anim_fun_t & fun, W_TYPES&... targets) : Animate()
     {
@@ -130,10 +136,11 @@ namespace web {
 
     virtual ~Animate() { ; }
 
-    // Do not copy animations directly.
+    /// Do not copy animations directly.
     Animate(const Animate &) = delete;
     Animate & operator=(const Animate &) = delete;
 
+    /// Start this animation running.
     void Start() {
       if (active) return;          // If animation is already active, ignore start.
       active=true;                 // Mark active.
@@ -142,38 +149,66 @@ namespace web {
       cur_time = start_time;       // Initialize cur_time to now.
       AdvanceFrame();              // Take the first animation step to get going.
     }
+
+    /// Halt this animation for now.
     void Stop() {
       run_time += emp::GetTime() - start_time;
       active = false;
     }
+
+    /// Take a single step in this animation.
     void Step() {
       do_step = true;
       AdvanceFrame();
       // @CAO modify run time?
     }
+
+    /// Toggle whether this animation is running or paused.
     void ToggleActive() { if (active) Stop(); else Start(); }
 
+    /// Determine if this animation is currently running.
     bool GetActive() const { return active; }
+
+    /// Determine if this animation is currently in the process of running a single step.
     bool GetDoStep() const { return do_step; }
+
+    /// Return the time point that this animation start MOST RECENTLY.
     double GetStartTime() const { return start_time; }
+
+    /// Determine the time point when this animation last updated a frame.
     double GetPrevTime() const { return prev_time; }
+
+    /// Get the current time of the animation.
     double GetCurTime() const { return cur_time; }
 
+    /// Determine how long the last step between frames took.
     double GetStepTime() const { return cur_time - prev_time; }
+
+    /// Determine the total amount of time that this animation has run.
     double GetRunTime() const { return run_time + cur_time - start_time; }
 
+    /// Determine how many total frames have existed thus far in this animation.
     int GetFrameCount() const { return frame_count; }
 
+    /// Set a new function for this animation to call when running that takes a const reference to
+    /// the Animation object as an argument.
     void SetCallback(const anim_fun_t & fun) { anim_fun = fun; }
 
+    /// Set a new function for this animation to call when running that takes the amount of time
+    /// since the last frame (a double) as an argument.
     void SetCallback(const std::function<void(double)> & fun) {
       anim_fun = [fun, this](const Animate &){fun(GetStepTime());};
     }
 
+    /// Set a new function for this animation to call when running that takes no arguments.
     void SetCallback(const std::function<void()> & fun) {
       anim_fun = [fun](const Animate &){fun();};
     }
 
+    /// Get a toggle button that will start/stop this animation.
+    /// @param but_name The HTML identifier used for this button.
+    /// @param start_label The name on the button when it will start the animation (default="Start")
+    /// @param stop_label The name on the button when it will halt the animation (default="Stop")
     Button GetToggleButton(const std::string & but_name, const std::string & start_label="Start", const std::string & stop_label="Stop") {
       toggle_but = Button( [this, but_name, start_label, stop_label]() {
           ToggleActive();
