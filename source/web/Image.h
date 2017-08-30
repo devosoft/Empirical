@@ -1,13 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  The Image widget will load an image from a specified URL.  For example, you can use
-//  emp::web::Image("http://kripken.github.io/emscripten-site/_static/Emscripten_logo_full.png")
-//  to load the emscripten logo from its website.
-//
-//  You can also set the Alt-text with the Alt() function.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  Image.h
+ *  @brief Easily load an image and place it in a document.
+ */
+
 
 #ifndef EMP_WEB_IMAGE_H
 #define EMP_WEB_IMAGE_H
@@ -16,6 +15,13 @@
 
 namespace emp {
 namespace web {
+
+  ///  The Image widget will load an image from a specified URL.  For example, you can use
+  ///  emp::web::Image("http://kripken.github.io/emscripten-site/_static/Emscripten_logo_full.png")
+  ///  to load the emscripten logo from its website.  These can be easily inserted into a web
+  ///  document using << and all JS callbacks (after loading) will be handled automatically.
+  ///
+  ///  You can also set the Alt-text with the Alt() function.
 
   class Image : public internal::WidgetFacet<Image> {
     friend class ImageInfo;
@@ -64,21 +70,25 @@ namespace web {
     Image(ImageInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:
+    /// Create a new image, indicating the URL to load from.
     Image(const std::string & in_url, const std::string & in_id="")
       : WidgetFacet(in_id)
     {
       info = new ImageInfo(in_id);
       Info()->url = in_url;
     }
+
+    /// Link to an existing Image widget.
     Image(const Image & in) : WidgetFacet(in) { ; }
     Image(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsImageInfo()); }
     virtual ~Image() { ; }
 
     using INFO_TYPE = ImageInfo;
 
-
-  public:
+    /// Update the URL for this image.
     Image & URL(const std::string & in_url) { Info()->UpdateURL(in_url); return *this; }
+
+    /// Add Alt-text for this image.
     Image & Alt(const std::string & in_alt) { Info()->UpdateAlt(in_alt); return *this; }
   };
 
