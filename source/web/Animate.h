@@ -12,33 +12,6 @@
  *
  */
 
-//
-//  Parameters to the animation function can be:
-//    * double (representing time since the last frame)
-//    * a const reference to the animation object itself
-//    * nothing
-//
-//  Control methods:
-//    void Start()
-//    void Stop()
-//    void Step()
-//    void ToggleActive()
-//
-//  Access methods:
-//    bool GetActive() const
-//    bool GetDoStep() const
-//    double GetStartTime() const
-//    double GetPrevTime() const
-//    double GetCurTime() const
-//    double GetStepTime() const
-//    double GetRunTime() const
-//    int GetFrameCount() const
-//
-//  Config methods:
-//    void SetCallback(const std::function<void(const Animate &)> & fun)
-//    void SetCallback(const std::function<void(double)> & fun)
-//    void SetCallback(const std::function<void()> & fun)
-
 
 #ifndef EMP_WEB_ANIMATE_H
 #define EMP_WEB_ANIMATE_H
@@ -57,8 +30,39 @@
 namespace emp {
 namespace web {
 
+  ///  An Animation object that, when started, calls a function as fast as possible, to a maximum
+  ///  of 60 frames per second.
+  ///
+  ///  Parameters to the animation function can be:
+  ///    * double (representing time since the last frame)
+  ///    * a const reference to the animation object itself
+  ///    * nothing
+  ///
+  ///  Control methods:
+  ///    void Start()
+  ///    void Stop()
+  ///    void Step()
+  ///    void ToggleActive()
+  ///
+  ///  Access methods:
+  ///    bool GetActive() const
+  ///    bool GetDoStep() const
+  ///    double GetStartTime() const
+  ///    double GetPrevTime() const
+  ///    double GetCurTime() const
+  ///    double GetStepTime() const
+  ///    double GetRunTime() const
+  ///    int GetFrameCount() const
+  ///
+  ///  Config methods:
+  ///    void SetCallback(const std::function<void(const Animate &)> & fun)
+  ///    void SetCallback(const std::function<void(double)> & fun)
+  ///    void SetCallback(const std::function<void()> & fun)
+
   class Animate {
   protected:
+
+    /// The full version of the animate function takes a const reference to the animate object.
     using anim_fun_t = std::function<void(const Animate &)>;
 
     anim_fun_t anim_fun;                ///< Function to repeatedly run for animation.
