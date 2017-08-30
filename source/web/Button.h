@@ -144,18 +144,34 @@ namespace web {
 
     using INFO_TYPE = ButtonInfo;
 
+    /// Set a new callback function to trigger when the button is clicked.
     Button & Callback(const std::function<void()> & in_cb) {
       Info()->UpdateCallback(in_cb);
       return *this;
     }
-    Button & Label(const std::string & in_label) { Info()->UpdateLabel(in_label); return *this; }
-    Button & Title(const std::string & in_t) { Info()->UpdateTitle(in_t); return *this; }
-    Button & Autofocus(bool in_af) { Info()->UpdateAutofocus(in_af); return *this; }
-    Button & Disabled(bool in_dis) { Info()->UpdateDisabled(in_dis); return *this; }
 
+    /// Set a new label to appear on this Button.
+    Button & Label(const std::string & in_label) { Info()->UpdateLabel(in_label); return *this; }
+
+    /// Create a tooltip for this Button.
+    Button & Title(const std::string & in_t) { Info()->UpdateTitle(in_t); return *this; }
+
+    /// Setup this button to have autofocus (or remove it!)
+    Button & Autofocus(bool in_af=true) { Info()->UpdateAutofocus(in_af); return *this; }
+
+    /// Setup this button to be disabled (or re-enable it!)
+    Button & Disabled(bool in_dis=true) { Info()->UpdateDisabled(in_dis); return *this; }
+
+    /// Get the current label on this button.
     const std::string & GetLabel() const { return Info()->label; }
+
+    /// Get the current tooltip on this button.
     const std::string & GetTitle() const { return Info()->title; }
+
+    /// Determine if this button currently has autofocus.
     bool HasAutofocus() const { return Info()->autofocus; }
+
+    /// Determine if this button is currently disabled.
     bool IsDisabled() const { return Info()->extras.HasAttr("disabled"); }
   };
 
