@@ -517,24 +517,24 @@ namespace web {
 
     using parent_t = internal::WidgetFacet<TableWidget>;
 
-    // Get a properly cast version of indo.
+    /// Get a properly cast version of info.
     internal::TableInfo * Info() { return (internal::TableInfo *) info; }
     const internal::TableInfo * Info() const { return (internal::TableInfo *) info; }
 
     TableWidget(internal::TableInfo * in_info, size_t _row=0, size_t _col=0)
      : WidgetFacet(in_info), cur_row(_row), cur_col(_col) { ; }
 
-    // Apply CSS to appropriate component based on current state.
+    /// Apply CSS to appropriate component based on current state.
     void DoCSS(const std::string & setting, const std::string & value) override {
       parent_t::DoCSS(setting, value);
     }
 
-    // Apply CSS to appropriate component based on current state.
+    /// Apply CSS to appropriate component based on current state.
     void DoAttr(const std::string & setting, const std::string & value) override {
       parent_t::DoAttr(setting, value);
     }
 
-    // Apply CSS to appropriate component based on current state.
+    /// Apply CSS to appropriate component based on current state.
     void DoListen(const std::string & event_name, size_t fun_id) override {
       parent_t::DoListen(event_name, fun_id);
     }
@@ -567,8 +567,9 @@ namespace web {
       Info()->append_col = cur_col;
     }
 
-    size_t GetCurRow() const { return cur_row; }
-    size_t GetCurCol() const { return cur_col; }
+
+    size_t GetCurRow() const { return cur_row; }  ///< Determine which row currnetly has focus.
+    size_t GetCurCol() const { return cur_col; }  ///< Determine which column currently has focus.
 
     // Can clear anything from any widget, if properly specified.
     // Specialized widgets should define Clear(), ClearChildren(), ClearStyle(), ClearAttr(),
@@ -582,23 +583,30 @@ namespace web {
     void ClearCells() { Info()->ClearTableCells(); }
     void ClearCell(size_t r, size_t c) { Info()->ClearCell(r, c); }
 
-    TableCell GetCell(size_t r, size_t c);
-    TableRow GetRow(size_t r);
-    TableCol GetCol(size_t c);
-    TableRowGroup GetRowGroup(size_t r);
-    TableColGroup GetColGroup(size_t c);
-    Table GetTable();
+    TableCell GetCell(size_t r, size_t c);  ///< Focus on a specifc cell in the table.
+    TableRow GetRow(size_t r);              ///< Focus on a specifc row in the table.
+    TableCol GetCol(size_t c);              ///< Focus on a specifc column in the table.
+    TableRowGroup GetRowGroup(size_t r);    ///< Focus on a specifc group of rows in the table.
+    TableColGroup GetColGroup(size_t c);    ///< Focus on a specifc group of columns in the table.
+    Table GetTable();                       ///< Focus on a the entire table.
 
+    /// Get the TExt widget assoited with the currently active cell.
     web::Text GetTextWidget() { return Info()->GetTextWidget(); }
 
+    /// Add text to a specified cell in the table.
     Widget AddText(size_t r, size_t c, const std::string & text);
+
+    /// Set a specified cell to be a table header.
     Widget AddHeader(size_t r, size_t c, const std::string & text);
 
     using parent_t::SetCSS;
+
+    /// Get a CSS value for the currently active cell.
     std::string GetCSS(const std::string & setting) override {
       return Info()->extras.GetStyle(setting);
     }
 
+    /// Debugging function.
     virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
       bool ok = true;
 
@@ -642,17 +650,21 @@ namespace web {
     Table & ClearExtras() { Info()->extras.Clear(); return *this; }
     Table & ClearChildren() { Info()->ClearTableChildren(); return *this; }
 
-    // Functions to resize the number of rows, columns, or both!
+    /// Resize the number of rows in the table.
     Table & Rows(size_t r) {
       Info()->Resize(r, Info()->col_count);
       if (cur_row >= r) cur_row = 0;
       return *this;
     }
+
+    /// Resize the number of columns in the table.
     Table & Cols(size_t c) {
       Info()->Resize(Info()->row_count, c);
       if (cur_col >= c) cur_col = 0;
       return *this;
     }
+
+    /// Fully resize the table (both rows and columns)
     Table & Resize(size_t r, size_t c) {
       Info()->Resize(r, c);
       if (cur_row >= r) cur_row = 0;
@@ -660,6 +672,7 @@ namespace web {
       return *this;
     }
 
+    /// Setup the number of columns the current column group.
     Table & SetColSpan(size_t new_span) {
       emp_assert((cur_col + new_span <= GetNumCols()) && "Col span too wide for table!",
                  cur_col, new_span, GetNumCols(), GetID());
@@ -681,7 +694,7 @@ namespace web {
       return *this;
     }
 
-    // Apply to target row.
+    /// Apply CSS to target row.
     template <typename SETTING_TYPE>
     Table & RowCSS(size_t row_id, const std::string & setting, SETTING_TYPE && value) {
       emp_assert(row_id >= 0 && row_id < Info()->row_count);
@@ -690,7 +703,7 @@ namespace web {
       return *this;
     }
 
-    // Apply to target cell.
+    /// Apply CSS to target cell.
     template <typename SETTING_TYPE>
     Table & CellCSS(size_t row_id, size_t col_id, const std::string & setting, SETTING_TYPE && value) {
       emp_assert(row_id >= 0 && row_id < Info()->row_count);
@@ -700,7 +713,7 @@ namespace web {
       return *this;
     }
 
-    // Apply to all rows.  (@CAO: Should we use fancier jquery here?)
+    /// Apply CSS to all rows.  (@CAO: Should we use fancier jquery here?)
     template <typename SETTING_TYPE>
     Table & RowsCSS(const std::string & setting, SETTING_TYPE && value) {
       for (auto & row : Info()->rows) row.extras.style.Set(setting, emp::to_string(value));
@@ -708,7 +721,7 @@ namespace web {
       return *this;
     }
 
-    // Apply to all rows.  (@CAO: Should we use fancier jquery here?)
+    /// Apply CSS to all cells
     template <typename SETTING_TYPE>
     Table & CellsCSS(const std::string & setting, SETTING_TYPE && value) {
       for (auto & row : Info()->rows) row.CellsCSS(setting, emp::to_string(value));
