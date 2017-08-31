@@ -1,23 +1,25 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Specs for the Selector widget.
-//
-//  A Selector widget provides the user with a pull-down menu.  It can be
-//  examined at any time (via GetSelectID()) or else alerts call a designated
-//  function when a particular option is chosen.
-//
-//     UI::Selector sel("sel");
-//
-//     sel.SetOption("Option 1");
-//     sel.SetOption("Option B", TriggerB) ;
-//     sel.SetOption("Option the Third", [](){ emp::Alert("3 chosen!"} );
-//     sel.SetOption("Option IV");
-//
-//  In this example, the second option will call TriggerB when it is chosen,
-//  while the third option will call the provided lambda function.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  Selector.h
+ *  @brief Specs for the Selector widget.
+ *
+ *  A Selector widget provides the user with a pull-down menu.  It can be
+ *  examined at any time (via GetSelectID()) or else alerts call a designated
+ *  function when a particular option is chosen.
+ *
+ *     UI::Selector sel("sel");
+ *
+ *     sel.SetOption("Option 1");
+ *     sel.SetOption("Option B", TriggerB) ;
+ *     sel.SetOption("Option the Third", [](){ emp::Alert("3 chosen!"} );
+ *     sel.SetOption("Option IV");
+ *
+ *  In this example, the second option will call TriggerB when it is chosen,
+ *  while the third option will call the provided lambda function.
+ */
 
 #ifndef EMP_WEB_SELECTOR_H
 #define EMP_WEB_SELECTOR_H
@@ -38,9 +40,9 @@ namespace web {
     class SelectorInfo : public internal::WidgetInfo {
       friend Selector;
     protected:
-      emp::vector<std::string> options;               // What are the options to choose from?
-      emp::vector<std::function<void()> > callbacks;  // Which funtion to run for each option?
-      size_t select_id;                               // Which index is currently selected?
+      emp::vector<std::string> options;               ///< What are the options to choose from?
+      emp::vector<std::function<void()> > callbacks;  ///< Which funtion to run for each option?
+      size_t select_id;                               ///< Which index is currently selected?
 
       bool autofocus;
       bool disabled;
@@ -132,20 +134,33 @@ namespace web {
 
     using INFO_TYPE = SelectorInfo;
 
-
+    /// Get the ID of the currently active selection.
     size_t GetSelectID() const { return Info()->select_id; }
+
+    /// Get the total number of options setup in the selector.
     size_t GetNumOptions() const { return Info()->options.size(); }
+
+    /// Get the label associated with a specific option ID.
     const std::string & GetOption(size_t id) const { return Info()->options[id]; }
+
+    /// Determine if the selector has autofocus.
     bool HasAutofocus() const { return Info()->autofocus; }
+
+    /// Is the selector currently disabled?
     bool IsDisabled() const { return Info()->disabled; }
 
+    /// Set a specific ID as currently active.
     Selector & SelectID(size_t id) { Info()->select_id = id; return *this; }
 
+    /// Add a new option to the selector and the function to be called if it is chosen.
     Selector & SetOption(const std::string & in_option,
                          const std::function<void()> & in_cb) {
       Info()->SetOption(in_option, in_cb);
       return *this;
     }
+
+    /// Add an option to the selector associated with a specific ID (and the function to be
+    /// called if it is chosen)
     Selector & SetOption(const std::string & in_option,
                          const std::function<void()> & in_cb,
                          size_t opt_id) {
@@ -153,14 +168,20 @@ namespace web {
       return *this;
     }
 
+    /// Set a selector option name, but no function to be called.
     Selector & SetOption(const std::string & in_option) {
       return SetOption(in_option, std::function<void()>([](){}));
     }
+
+    /// Set a specific selection option name, determined by the ID, but no function to call.
     Selector & SetOption(const std::string & in_option, size_t opt_id) {
       return SetOption(in_option, std::function<void()>([](){}), opt_id);
     }
 
+    /// Update autofocus setting.
     Selector & Autofocus(bool in_af) { Info()->UpdateAutofocus(in_af); return *this; }
+
+    /// Update disabled status.
     Selector & Disabled(bool in_dis) { Info()->UpdateDisabled(in_dis); return *this; }
   };
 
