@@ -1,12 +1,15 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  The TableRow widget, which behaves like the Table widget, but focuses on a single row.
-//
-//  DO NOT include directly.  All files begining with '_' are for internal use only.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  _TableRow.h
+ *  @brief The TableRow widget, which behaves like the Table widget, but focuses on a single row.
+ *
+ *  DO NOT include this file directly.  All files begining with '_' are for internal use only.
+ */
 
+/// An object that focuses on a single column in a specified table.
 class TableRow : public TableWidget {
 public:
   TableRow(size_t r, size_t c, const std::string & in_id="") : TableWidget(r,c,in_id) { ; }
