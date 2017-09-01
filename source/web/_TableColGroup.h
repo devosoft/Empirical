@@ -1,12 +1,15 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  The TableColGroup widget, which behaves like the Table widget, but focuses on a column group.
-//
-//  DO NOT include directly.  All files begining with '_' are for internal use only.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  _TableColGroup.h
+ *  @brief The TableColGoup widget, which behaves like the Table widget, but focuses on a group of columns.
+ *
+ *  DO NOT include this file directly.  All files begining with '_' are for internal use only.
+ */
 
+/// An object that focuses on a group of columns in a specified table.
 class TableColGroup : public TableWidget {
 public:
   TableColGroup(size_t r, size_t c, const std::string & in_id="") : TableWidget(r,c,in_id) { ; }
@@ -45,6 +48,7 @@ public:
     return Info()->col_groups[cur_col].extras.GetStyle(setting);
   }
 
+  /// Set the width of this column group.
   TableColGroup SetColSpan(size_t new_span) {
     emp_assert((cur_col + new_span <= GetNumCols()) && "Col span too wide for table!",
                cur_col, new_span, GetNumCols(), GetID());
@@ -66,5 +70,6 @@ public:
     return *this;
   }
 
+  /// Since only number of columns is relevant, this function also sets the width of this column group.
   TableColGroup SetSpan(size_t new_span) { SetColSpan(new_span); return *this; }
 };
