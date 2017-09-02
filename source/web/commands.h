@@ -1,20 +1,22 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file defines a set of command-defining classes that can be fed into widgets
-//  using the << operator.
-//
-//  Currently Close is the only command available; it will prevent the specified
-//  DOM id from being added to further.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  commands.h
+ *  @brief A set of command-defining classes that can be fed into widgets using the << operator.
+ */
 
 #ifndef EMP_WEB_COMMANDS_H
 #define EMP_WEB_COMMANDS_H
 
+#include "Widget.h"
+
 namespace emp {
 namespace web {
 
+  /// The Close command will prevent the specified widget from accepting further appends
+  /// (and instead revert to trying parents)
   class Close : public internal::WidgetCommand {
   private:
     std::string close_id;
@@ -32,6 +34,7 @@ namespace web {
     const std::string & GetID() const { return close_id; }
   };
 
+  /// The PrintStr command will print a pre-specified string to a widget.
   class PrintStr : public internal::WidgetCommand {
   private:
     std::string str;
@@ -46,7 +49,7 @@ namespace web {
     const std::string & GetStr() const { return str; }
   };
 
-  // Pre-defined static commands to be used in appends...
+  /// Pre-define emp::endl to insert a "<br>" and thus acting like a newline.
   static const PrintStr endl("<br>");
 
 }
