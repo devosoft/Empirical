@@ -1,110 +1,27 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  The Table widget
-//
-//  TableInfo is the core information for a table and has two helper classes:
-//  TableRowInfo and TableDataInfo.  The Table class is a smart pointer to a TableInfo
-//  object.
-//
-//  A Table is composed of a series of rows, each with the same number of columns.
-//  TableDataInfo may be muliple cells wide/tall, masking other cells.
-//
-//  Constructors:
-//    Table(size_t r, size_t c, const std::string & in_id="")
-//      Create a new r-by-c table with an optional DOM id specified.
-//    Table(const Widget & in)
-//      Point to an existing table (assert that widget IS a table!)
-//
-//  Accessors:
-//    size_t GetNumCols() const
-//    size_t GetNumRows() const
-//    size_t GetNumCells() const
-//      Return associated information about the table size.
-//
-//    size_t GetCurRow() const { return cur_row; }
-//    size_t GetCurCol() const { return cur_col; }
-//      Return information about the focal position on the table.
-//
-//  Adjusting Table size:
-//    Table & Rows(size_t r)
-//    Table & Cols(size_t c)
-//    Table & Resize(size_t r, size_t c)
-//      Set the number of rows, columns, or both in the table.
-//
-//  Setting or identifying the current table state:
-//    bool InStateTable() const
-//    bool InStateRow() const
-//    bool InStateCell() const
-//      Return true/false to identify what state the table is currently in.
-//
-//  Get table widget that affect specified cell, row, etc.
-//    TableCell GetCell(size_t r, size_t c)
-//    Table GetRow(size_t r)
-//    Table GetCol(size_t c)
-//    Table GetRowGroup(size_t r)
-//    Table GetColGroup(size_t c)
-//    Table GetTable()
-//
-//  Modifying data in table
-//    Table & SetHeader(bool _h=true)
-//      Set the current cell to be a header (or not if false is passed in)
-//    Widget AddText(size_t r, size_t c, const std::string & text)
-//      Add text to the specified table cell.
-//    Widget AddHeader(size_t r, size_t c, const std::string & text)
-//      Add text to the specified table cell AND set the cell to be a header.
-//    Table & SetRowSpan(size_t row_span)
-//    Table & SetColSpan(size_t col_span)
-//    Table & SetSpan(size_t row_span, size_t col_span)
-//      Allow the row and/or column span of the current cell to be adjusted.
-//    Table & SetSpan(size_t new_span)
-//      Set the span of a row group or column group to the value provided.
-//
-//  Clearing table contents:
-//    Table & ClearTable()
-//      Clear all style information from table, remove contents from all cells, and
-//      shrink table to no rows and no cells.
-//    Table & ClearRows()
-//      Clear style information from rows and cells and remove contents from cells
-//      (but leave table style information and size.)
-//    Table & ClearRow(size_t r)
-//      Clear style information from the specified row and contents from all cells
-//      in that row (but leave other rows untouched).
-//    Table & ClearCells()
-//      If state is TABLE, clear contents from all cells in entire table.
-//      If state is ROW or COL, clear contents from all cells in that row/column.
-//      If state is ROW_GROUP or COL_GROUP, clear contents of cells in all rows/cols in group
-//      If state is CELL, clear just that single cell.
-//    Table & ClearCell(size_t r, size_t c)
-//      Clear contents of just the specified cell.
-//    Table & Clear()
-//      Dynamically clear the entire active state
-//
-//  Style manipulation
-//    std::string GetCSS(const std::string & setting)
-//    std::string GetCSS(const std::string & setting, SETTING_TYPE && value)
-//      Get or Set the current value of the specified Style setting, based on the state of
-//      the table (i.e., TABLE affects full table style, ROW affects active row style, and
-//      CELL affects active cell style.)
-//    Table & RowCSS(size_t row_id, const std::string & setting, SETTING_TYPE && value)
-//    Table & CellCSS(size_t row_id, size_t col_id, const std::string & setting, SETTING_TYPE && value)
-//      Set the specified row or cell Style to the value indicated.
-//    Table & RowsCSS(const std::string & setting, SETTING_TYPE && value)
-//    Table & CellsCSS(const std::string & setting, SETTING_TYPE && value)
-//      Set the specified Style setting of all rows or all cells to the value indicated.
-//
-//
-//  Developer notes:
-//   * Tables should more directly manage internal slates rather than just adding divs and
-//     then having them filled in.
-//   * TextTables should be created that simply use text in cells, radically speeding up
-//     printing of such tables (and covering 80% of use cases).
-//   * IDEALLY: Make a single table that will look at what each cell is pointing to (table
-//     or text) and write out what it needs to, in place.
-//   * Add a ClearColumn method, as well as other column functionality.
-
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  Table.h
+ *  @brief Specs for the Table widget.
+ *
+ *  TableInfo is the core information for a table and has two helper classes:
+ *  TableRowInfo and TableDataInfo.  The Table class is a smart pointer to a TableInfo
+ *  object.
+ *
+ *  A Table is composed of a series of rows, each with the same number of columns.
+ *  TableDataInfo may be muliple cells wide/tall, masking other cells.
+ *
+ *
+ *  @todo Tables should more directly manage internal slates rather than just adding divs and
+ *     then having them filled in.
+ *  @todo TextTables should be created that simply use text in cells, radically speeding up
+ *     printing of such tables (and covering 80% of use cases).
+ *  @todo IDEALLY: Make a single table that will look at what each cell is pointing to (table
+ *     or text) and write out what it needs to, in place.
+ *  @todo Add a ClearColumn method, as well as other column functionality.
+ */
 
 #ifndef EMP_WEB_TABLE_H
 #define EMP_WEB_TABLE_H
@@ -132,14 +49,15 @@ namespace web {
     class TableInfo;
 
     struct TableDataInfo  {
-      size_t colspan=1;    // How many columns wide is this TableData?
-      size_t rowspan=1;    // How many rows deep is this TableData?
-      bool header=false;   // Is this TableData a header (<th> vs <td>)?
-      bool masked=false;   // Is this cell masked by another cell?
-      WidgetExtras extras; // Extra annotations (attributes, style, listeners)
+      size_t colspan=1;    ///< How many columns wide is this TableData?
+      size_t rowspan=1;    ///< How many rows deep is this TableData?
+      bool header=false;   ///< Is this TableData a header (<th> vs <td>)?
+      bool masked=false;   ///< Is this cell masked by another cell?
+      WidgetExtras extras; ///< Extra annotations (attributes, style, listeners)
 
-      emp::vector<Widget> children;  // Widgets contained in this cell.
+      emp::vector<Widget> children;  ///< Widgets contained in this cell.
 
+      /// Debug function to determine if this datum is structually consistent.
       bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
         bool ok = true;
         if (verbose) ss << prefix << "Scanning: emp::TableDataInfo" << std::endl;
@@ -150,23 +68,24 @@ namespace web {
 
 
     struct TableRowInfo {
-      emp::vector<TableDataInfo> data;  // detail object for each cell in this row.
-      WidgetExtras extras; // Extra annotations (attributes, style, listeners)
+      emp::vector<TableDataInfo> data;  ///< detail object for each cell in this row.
+      WidgetExtras extras; ///< Extra annotations (attributes, style, listeners)
 
-      // Apply to all cells in row.
+      /// Apply CSS to all cells in row.
       template <typename SETTING_TYPE>
       TableRowInfo & CellsCSS(const std::string & setting, SETTING_TYPE && value) {
         for (auto & datum : data) datum.extras.style.Set(setting, value);
         return *this;
       }
 
-      // Apply to specific cell in row.
+      /// Apply CSS to specific cell in row.
       template <typename SETTING_TYPE>
       TableRowInfo & CellCSS(size_t col_id, const std::string & setting, SETTING_TYPE && value) {
         data[col_id].extras.style.Set(setting, value);
         return *this;
       }
 
+      /// Debug function to determine if this row is structually consistent.
       bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
         bool ok = true;
         if (verbose) { ss << prefix << "Scanning: emp::TableRowInfo" << std::endl; }
@@ -179,24 +98,24 @@ namespace web {
 
     // Group of rows or columns...
     struct TableGroupInfo : public WidgetExtras {
-      size_t span = 1;       // How many rows/columns does this group represent?
-      bool masked = false;   // Is the current group masked because of a previous span?
-      WidgetExtras extras;   // Extra annotations (attributes, style, listeners)
+      size_t span = 1;       /// How many rows/columns does this group represent?
+      bool masked = false;   /// Is the current group masked because of a previous span?
+      WidgetExtras extras;   /// Extra annotations (attributes, style, listeners)
     };
 
     class TableInfo : public internal::WidgetInfo {
       friend TableWidget; friend Table; friend TableCell; friend TableRow; friend TableCol;
       friend TableRowGroup; friend TableColGroup;
     protected:
-      size_t row_count;                        // How big is this table?
+      size_t row_count;                        /// How big is this table?
       size_t col_count;
-      emp::vector<TableRowInfo> rows;          // Detail object for each row
-      emp::vector<TableColInfo> cols;          // Detail object for each column (if needed)
-      emp::vector<TableGroupInfo> col_groups;  // Detail object for each column group (if needed)
-      emp::vector<TableGroupInfo> row_groups;  // Detail object for each row group (if needed)
+      emp::vector<TableRowInfo> rows;          /// Detail object for each row
+      emp::vector<TableColInfo> cols;          /// Detail object for each column (if needed)
+      emp::vector<TableGroupInfo> col_groups;  /// Detail object for each column group (if needed)
+      emp::vector<TableGroupInfo> row_groups;  /// Detail object for each row group (if needed)
 
-      size_t append_row;               // Which row is triggering an append?
-      size_t append_col;               // Which col is triggering an append?
+      size_t append_row;                       /// Which row is triggering an append?
+      size_t append_col;                       /// Which col is triggering an append?
 
       TableInfo(const std::string & in_id="")
         : internal::WidgetInfo(in_id), row_count(0), col_count(0), append_row(0), append_col(0) { ; }
@@ -598,24 +517,24 @@ namespace web {
 
     using parent_t = internal::WidgetFacet<TableWidget>;
 
-    // Get a properly cast version of indo.
+    /// Get a properly cast version of info.
     internal::TableInfo * Info() { return (internal::TableInfo *) info; }
     const internal::TableInfo * Info() const { return (internal::TableInfo *) info; }
 
     TableWidget(internal::TableInfo * in_info, size_t _row=0, size_t _col=0)
      : WidgetFacet(in_info), cur_row(_row), cur_col(_col) { ; }
 
-    // Apply CSS to appropriate component based on current state.
+    /// Apply CSS to appropriate component based on current state.
     void DoCSS(const std::string & setting, const std::string & value) override {
       parent_t::DoCSS(setting, value);
     }
 
-    // Apply CSS to appropriate component based on current state.
+    /// Apply CSS to appropriate component based on current state.
     void DoAttr(const std::string & setting, const std::string & value) override {
       parent_t::DoAttr(setting, value);
     }
 
-    // Apply CSS to appropriate component based on current state.
+    /// Apply CSS to appropriate component based on current state.
     void DoListen(const std::string & event_name, size_t fun_id) override {
       parent_t::DoListen(event_name, fun_id);
     }
@@ -648,8 +567,9 @@ namespace web {
       Info()->append_col = cur_col;
     }
 
-    size_t GetCurRow() const { return cur_row; }
-    size_t GetCurCol() const { return cur_col; }
+
+    size_t GetCurRow() const { return cur_row; }  ///< Determine which row currnetly has focus.
+    size_t GetCurCol() const { return cur_col; }  ///< Determine which column currently has focus.
 
     // Can clear anything from any widget, if properly specified.
     // Specialized widgets should define Clear(), ClearChildren(), ClearStyle(), ClearAttr(),
@@ -663,23 +583,30 @@ namespace web {
     void ClearCells() { Info()->ClearTableCells(); }
     void ClearCell(size_t r, size_t c) { Info()->ClearCell(r, c); }
 
-    TableCell GetCell(size_t r, size_t c);
-    TableRow GetRow(size_t r);
-    TableCol GetCol(size_t c);
-    TableRowGroup GetRowGroup(size_t r);
-    TableColGroup GetColGroup(size_t c);
-    Table GetTable();
+    TableCell GetCell(size_t r, size_t c);  ///< Focus on a specifc cell in the table.
+    TableRow GetRow(size_t r);              ///< Focus on a specifc row in the table.
+    TableCol GetCol(size_t c);              ///< Focus on a specifc column in the table.
+    TableRowGroup GetRowGroup(size_t r);    ///< Focus on a specifc group of rows in the table.
+    TableColGroup GetColGroup(size_t c);    ///< Focus on a specifc group of columns in the table.
+    Table GetTable();                       ///< Focus on a the entire table.
 
+    /// Get the TExt widget assoited with the currently active cell.
     web::Text GetTextWidget() { return Info()->GetTextWidget(); }
 
+    /// Add text to a specified cell in the table.
     Widget AddText(size_t r, size_t c, const std::string & text);
+
+    /// Set a specified cell to be a table header.
     Widget AddHeader(size_t r, size_t c, const std::string & text);
 
     using parent_t::SetCSS;
+
+    /// Get a CSS value for the currently active cell.
     std::string GetCSS(const std::string & setting) override {
       return Info()->extras.GetStyle(setting);
     }
 
+    /// Debugging function.
     virtual bool OK(std::stringstream & ss, bool verbose=false, const std::string & prefix="") {
       bool ok = true;
 
@@ -723,17 +650,21 @@ namespace web {
     Table & ClearExtras() { Info()->extras.Clear(); return *this; }
     Table & ClearChildren() { Info()->ClearTableChildren(); return *this; }
 
-    // Functions to resize the number of rows, columns, or both!
+    /// Resize the number of rows in the table.
     Table & Rows(size_t r) {
       Info()->Resize(r, Info()->col_count);
       if (cur_row >= r) cur_row = 0;
       return *this;
     }
+
+    /// Resize the number of columns in the table.
     Table & Cols(size_t c) {
       Info()->Resize(Info()->row_count, c);
       if (cur_col >= c) cur_col = 0;
       return *this;
     }
+
+    /// Fully resize the table (both rows and columns)
     Table & Resize(size_t r, size_t c) {
       Info()->Resize(r, c);
       if (cur_row >= r) cur_row = 0;
@@ -741,6 +672,7 @@ namespace web {
       return *this;
     }
 
+    /// Setup the number of columns the current column group.
     Table & SetColSpan(size_t new_span) {
       emp_assert((cur_col + new_span <= GetNumCols()) && "Col span too wide for table!",
                  cur_col, new_span, GetNumCols(), GetID());
@@ -762,7 +694,7 @@ namespace web {
       return *this;
     }
 
-    // Apply to target row.
+    /// Apply CSS to target row.
     template <typename SETTING_TYPE>
     Table & RowCSS(size_t row_id, const std::string & setting, SETTING_TYPE && value) {
       emp_assert(row_id >= 0 && row_id < Info()->row_count);
@@ -771,7 +703,7 @@ namespace web {
       return *this;
     }
 
-    // Apply to target cell.
+    /// Apply CSS to target cell.
     template <typename SETTING_TYPE>
     Table & CellCSS(size_t row_id, size_t col_id, const std::string & setting, SETTING_TYPE && value) {
       emp_assert(row_id >= 0 && row_id < Info()->row_count);
@@ -781,7 +713,7 @@ namespace web {
       return *this;
     }
 
-    // Apply to all rows.  (@CAO: Should we use fancier jquery here?)
+    /// Apply CSS to all rows.  (@CAO: Should we use fancier jquery here?)
     template <typename SETTING_TYPE>
     Table & RowsCSS(const std::string & setting, SETTING_TYPE && value) {
       for (auto & row : Info()->rows) row.extras.style.Set(setting, emp::to_string(value));
@@ -789,7 +721,7 @@ namespace web {
       return *this;
     }
 
-    // Apply to all rows.  (@CAO: Should we use fancier jquery here?)
+    /// Apply CSS to all cells
     template <typename SETTING_TYPE>
     Table & CellsCSS(const std::string & setting, SETTING_TYPE && value) {
       for (auto & row : Info()->rows) row.CellsCSS(setting, emp::to_string(value));

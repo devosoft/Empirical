@@ -1,12 +1,15 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  The TableRowGroup widget, which behaves like the Table widget, but focuses on a row group.
-//
-//  DO NOT include directly.  All files begining with '_' are for internal use only.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  _TableRowGroup.h
+ *  @brief The TableRowGoup widget, which behaves like the Table widget, but focuses on a group of rows.
+ *
+ *  DO NOT include this file directly.  All files begining with '_' are for internal use only.
+ */
 
+/// An object that focuses on a group of rows in a specified table.
 class TableRowGroup : public TableWidget {
 public:
   TableRowGroup(size_t r, size_t c, const std::string & in_id="") : TableWidget(r,c,in_id) { ; }
@@ -48,7 +51,7 @@ public:
   TableRowGroup & SetRowSpan(size_t new_span) {
     emp_assert((cur_row + new_span <= GetNumRows()) && "Row span too wide for table!");
 
-    // If we haven't setup columns at all yet, do so.
+    // If we haven't setup rows at all yet, do so.
     if (Info()->row_groups.size() == 0) Info()->row_groups.resize(GetNumRows());
 
     const size_t old_span = Info()->row_groups[cur_row].span;

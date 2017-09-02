@@ -1,20 +1,23 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  The Document class is built off of Div, but initializes the EMP web framework, if
-//  neeeded, and activates itself.  It also provides quick ways to add and lookup
-//  widgets.
-//
-//  For example, you can use doc.AddButon(...) to add a new button to the document,
-//  where the ... can be any of the mechanisms to build a new button.  This technique
-//  works for any widget type.
-//
-//  You can also look up any widget by name.  For example, if you previously created a
-//  Canvas widget with the HTML id "my_canvas", you can look it up later by using
-//  doc.Canvas("my_canvas")
-
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  Document.h
+ *  @brief Manage an entire document.
+ *
+ *  The Document class is built off of Div, but initializes the EMP web framework, if
+ *  neeeded, and activates itself.  It also provides quick ways to add and lookup
+ *  widgets.
+ *
+ *  For example, you can use doc.AddButon(...) to add a new button to the document,
+ *  where the ... can be any of the mechanisms to build a new button.  This technique
+ *  works for any widget type.
+ *
+ *  You can also look up any widget by name.  For example, if you previously created a
+ *  Canvas widget with the HTML id "my_canvas", you can look it up later by using
+ *  doc.Canvas("my_canvas")
+ */
 
 #ifndef EMP_WEB_DOCUMENT_H
 #define EMP_WEB_DOCUMENT_H

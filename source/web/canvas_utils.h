@@ -1,14 +1,14 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A collection of Draw() functions that convert objects to visualizations in canvas.
-//
-//  Current list of values that can be drawn with Draw():
-//  * BitMatrix
-//  * Circle
-//  * Surface2D
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  canvas_utils.h
+ *  @brief Various versions of the Draw() function to draw images onto a canvas.
+ *
+ *  Each version of Draw() takes a canvas widget and some form of data to be drawn on the widget,
+ *  such as a circle, a bit matrix, or a geometric surface.
+ */
 
 #ifndef EMP_WEB_CANVAS_UTILS_H
 #define EMP_WEB_CANVAS_UTILS_H
@@ -24,7 +24,7 @@
 namespace emp {
 namespace web {
 
-  // Draw a Circle!
+  /// Draw a Circle onto the canvas.
   void Draw(Canvas canvas, const emp::Circle & circle,
             const std::string & fill="",
             const std::string & line="")
@@ -34,7 +34,7 @@ namespace web {
   }
 
 
-  // Draw a BitMatrix!
+  /// Draw a BitMatrix onto a canvas using black and white squares (can specify cell width and height)
   template <size_t COLS, size_t ROWS>
   void Draw(Canvas canvas, const BitMatrix<COLS,ROWS> & matrix, double w, double h)
   {
@@ -53,7 +53,8 @@ namespace web {
   }
 
 
-  // Draw a Surface2D, specifying the full colormap to be used.
+  /// Draw a Surface2D, specifying the full colormap to be used.  The surface has a range of circle
+  /// bodies, each with a color id.
   template <typename BODY_TYPE>
   void Draw(Canvas canvas,
             const Surface2D<BODY_TYPE> & surface,
@@ -76,7 +77,8 @@ namespace web {
     }
   }
 
-  // Draw a Surface2D, just specifying the number of colors.
+  /// Draw a Surface2D, just specifying the number of colors (and using a generated hue map).
+  /// The surface has a range of circle bodies, each with a color id.
   template <typename BODY_TYPE>
   void Draw(Canvas canvas, const Surface2D<BODY_TYPE> & surface, size_t num_colors)
   {
@@ -84,7 +86,14 @@ namespace web {
   }
 
 
-  // Draw a grid.
+  /// Draw a grid onto a canvas.
+  /// @param canvas The Canvas to draw on.
+  /// @param grid A vector of vectors of color IDs.
+  /// @param line_color The background line color for the grid.
+  /// @param cell_width How many pixels wide is each cell to draw?
+  /// @param cell_height How many pixels tall is each cell to draw?
+  /// @param offset_x How far should we shift the grid reletive to the left side of the canvas.
+  /// @param offset_y How far should we shift the grid reletive to the top of the canvas.
   void Draw(Canvas canvas,
             const emp::vector<emp::vector<size_t>> & grid,
             const emp::vector<std::string> & color_map,
@@ -110,7 +119,12 @@ namespace web {
     }
   }
 
-  // If offset is not provided for Draw, calculate it to CENTER the grid.
+  /// Draw a grid onto a canvas.  Without offsets provided, the grid is centered.
+  /// @param canvas The Canvas to draw on.
+  /// @param grid A vector of vectors of color IDs.
+  /// @param line_color The background line color for the grid.
+  /// @param cell_width How many pixels wide is each cell to draw?
+  /// @param cell_height How many pixels tall is each cell to draw?
   void Draw(Canvas canvas,
             const emp::vector<emp::vector<size_t>> & grid,
             const emp::vector<std::string> & color_map,
@@ -130,7 +144,10 @@ namespace web {
     Draw(canvas, grid, color_map, line_color, cell_w, cell_h, offset_x, offset_y);
   }
 
-  // If cell width and height are not provided for grid Draw, calculate largest possible.
+  /// Draw a grid onto a canvas.  Without cell size provided, maximize to fill the canvas!
+  /// @param canvas The Canvas to draw on.
+  /// @param grid A vector of vectors of color IDs.
+  /// @param line_color The background line color for the grid.
   void Draw(Canvas canvas,
             const emp::vector<emp::vector<size_t>> & grid,
             const emp::vector<std::string> & color_map,

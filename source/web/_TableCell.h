@@ -1,12 +1,15 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  The TableCell widget, which behaves like the Table widget, but focuses on a single cell.
-//
-//  DO NOT include directly.  All files begining with '_' are for internal use only.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  _TableCell.h
+ *  @brief The TableCell widget, which behaves like the Table widget, but focuses on a single cell.
+ *
+ *  DO NOT include this file directly.  All files begining with '_' are for internal use only.
+ */
 
+/// An object that focuses on a single cell in a specified table.
 class TableCell : public TableWidget {
 public:
   TableCell(size_t r, size_t c, const std::string & in_id="") : TableWidget(r,c,in_id) { ; }
@@ -15,16 +18,19 @@ public:
   TableCell(internal::TableInfo * in_info, size_t _row=0, size_t _col=0)
     : TableWidget(in_info, _row, _col) { ; }
 
+  /// Update the CSS for this cell. (override default Table)
   void DoCSS(const std::string & setting, const std::string & value) override {
     Info()->rows[cur_row].data[cur_col].extras.style.Set(setting, value);
     if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
   }
 
+  /// Udpate the attributes for this cell (override default Table)
   void DoAttr(const std::string & setting, const std::string & value) override {
     Info()->rows[cur_row].data[cur_col].extras.attr.Set(setting, value);
     if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
   }
 
+  /// Update a listener for this cell (override default Table)
   void DoListen(const std::string & event_name, size_t fun_id) override {
     Info()->rows[cur_row].data[cur_col].extras.listen.Set(event_name, fun_id);
     if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
@@ -38,6 +44,7 @@ public:
   TableCell & ClearChildren() { Info()->ClearCellChildren(cur_row, cur_col); return *this; }
   TableCell & ClearCells() { Info()->ClearCell(cur_row, cur_col); return *this; }
 
+  /// Get the current CSS value for the specified setting of this Cell.
   std::string GetCSS(const std::string & setting) override {
     return Info()->rows[cur_row].data[cur_col].extras.GetStyle(setting);
   }
@@ -48,7 +55,7 @@ public:
     return *this;
   }
 
-  // Allow the row and column span of the current cell to be adjusted.
+  /// Adjust the row span of the current cell.
   TableCell & SetRowSpan(size_t new_span) {
     emp_assert((cur_row + new_span <= GetNumRows()) && "Row span too wide for table!");
 
@@ -77,6 +84,7 @@ public:
     return *this;
   }
 
+  /// Adjust the column span of the current cell.
   TableCell & SetColSpan(size_t new_span) {
     emp_assert((cur_col + new_span <= GetNumCols()) && "Col span too wide for table!",
                cur_col, new_span, GetNumCols(), GetID());
@@ -106,6 +114,7 @@ public:
     return *this;
   }
 
+  /// Update both row and column span for this cell.
   TableCell & SetSpan(size_t row_span, size_t col_span) {
     // @CAO Can do this more efficiently, but probably not worth it.
     SetRowSpan(row_span);
