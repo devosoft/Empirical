@@ -45,8 +45,7 @@ Here is the Example.cc file:
 
   UI::Document doc("emp_base");
 
-  int main()
-  {
+  int main() {
     doc << "<h1>Hello World!</h1>";
   }
 
@@ -90,15 +89,98 @@ To test the results, open "Example.html" in your web browser!
 
 === Controlling a web page: The Basics ===
 
+To understand how most of the HTML widgets work we need only change the main code file; the
+current HTML file and compiler options can be left the same.
 
-6: Live variables and updating.
-7: Working with Widgets
-8: The Text Widget
-9: Buttons
-10: Images
+As indicated by our starting point, text can be streamed into an HTML document in a similar
+way to an output stream in the standard library.  For example, we can update our main function
+to mix text and variables:
+
+  int main() {
+    int x = 5;
+    doc << "<h1>Hello World!</h1>";
+    doc << "x = " << x << ".<br>";
+  }
+
+In additional to regular variables, emp::Document (and other Empirical web containers) can also
+take a range of Empirical Widgets.
+
+  void Ping() { doc << "Ping! "; }
+  int main() {
+    int x = 5;
+    doc << "<h1>Hello World!</h1>";
+    doc << "x = " << x << ".<br>";
+    
+    // Insert an image (in place)
+    doc << UI::Image("url.goes.here") << "<br>";
+
+    // Create a button and then insert it.
+    UI::Button my_button( Ping, "Click me!" );
+    doc << my_button;
+  }
+
+Notice now that you not only have a pretty picture, but you also have a button that will add
+new text on to the screen each time it's clicked.
+
+But what if we want to update existing content?  We can do this in two ways: either by marking
+a variable (or function) as "Live" or by simply changing a widget that is already on the
+screen.
+
+
+=== "Live" Variables and Functions ===
+
+Anything sent to a webpage that is inside a UI::Live( ) function will always have its most current
+value used whenever that portion of the page is redrawn.  For example, let's make our button
+modify the value of x and redraw it.
+
+  int x = 5;
+  int main() {
+    doc << "<h1>Hello World!</h1>";
+    doc << "Original x = " << x << ".<br>";
+    doc << "Current x = " << UI::Live(x) << ".<br>";
+    
+    // Create a button to modify x.
+    UI::Button my_button( [](){ x+=5; doc.Redraw(); }, "Click me!" );
+    doc << my_button;
+  }
+
+Notice that we also moved x to be a global variable.  This is because if it were local to main()
+it would be freed as soon as main ended.  We're also using a labda this time instead of a
+previously defined function.  Either optioin is fine.
+
+Try clicking on the button -- you'll see that x will be updated, and then the document is
+signaled that it needs to redraw, so the change is reflected on the screen.  Note that we didn't
+actually need to redraw the entire document to update x, just the Text widget it is in; we'll
+talk more about how to do that below.
+
+Of course, we can put a function in the UI::Live() and that function will be called each time
+the containing Widget is redrawn.
+
+  int x = 5;
+  int main() {
+    doc << "<h1>Hello World!</h1>";
+    doc << "Original x = " << x << ".<br>";
+    doc << "Current x = " << UI::Live(x) << ".<br>";
+    doc << "x/5 = " << UI::Live( [](){ return x/5; } ) << ".<br>";
+    
+    // Create a button to modify x.
+    UI::Button my_button( [](){ x+=5; doc.Redraw(); }, "Click me!" );
+    doc << my_button;
+  }
+
+Of course, we need to be able to modify Widgets in addition to variables; fortunately this is
+easy as well.
+
+
+
+
+?: Re-attaching to a previously defined widget.
+
+10: Controling CSS
 11: Tables
 12: Canvas
 13: TextAreas
+14: The Text Widget extras (specifying, closing, modifying, etc.)
 
 
 ?: Listeners and Capturing input events
