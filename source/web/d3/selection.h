@@ -1005,7 +1005,7 @@ namespace D3 {
     /// std::function object, or lambda.
 
     //Option to pass loaded dataset stored in Javascript without translating to C++
-    Selection Data(Dataset values, std::string key=""){
+    Selection Data(Dataset & values, std::string key=""){
       int update_id = NextD3ID();
 
       EM_ASM_ARGS({
@@ -1077,7 +1077,7 @@ namespace D3 {
     // Accepts string referring to Javascript function
     template<typename C, class = typename C::value_type>
     // typename std::enable_if<std::is_pod<typename C::value_type>::value, Selection>::type
-    Selection Data(C & values, std::string key=""){
+    Selection Data(C values, std::string key=""){
       int update_id = NextD3ID();
 
 
@@ -1109,7 +1109,7 @@ namespace D3 {
     // Accepts C++ function as key
     template<typename C, class = typename C::value_type, typename T>
     emp::sfinae_decoy<Selection, decltype(&T::operator())>
-    Data(C & values, T key){
+    Data(C values, T key){
       int update_id = NextD3ID();
       emp::pass_array_to_javascript(values);
       uint32_t fun_id = emp::JSWrap(key, "", false);

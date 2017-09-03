@@ -740,8 +740,8 @@ public:
 
   void Clear() {
     data.clear();
-    GetSVG()->SelectAll(".data-point").Data({}).ExitRemove();
-    GetSVG()->SelectAll(".line-seg").Data({}).ExitRemove();
+    GetSVG()->SelectAll(".data-point").Remove();
+    GetSVG()->SelectAll(".line-seg").Remove();
     y_axis->Rescale(0, 1000, *(GetSVG()));
     x_axis->Rescale(0, 0, *(GetSVG()));
     y_min = 1000;
@@ -861,8 +861,8 @@ public:
   }
 
   void Clear() {
-    GetSVG()->SelectAll(".node").Data({}).ExitRemove();
-    GetSVG()->SelectAll(".link").Data({}).ExitRemove();
+    GetSVG()->SelectAll(".node").Remove();
+    GetSVG()->SelectAll(".link").Remove();
   }
 
 };
