@@ -1,0 +1,113 @@
+The web tools in Empirical are stuctured to allow the developer to fully control components of
+a web page from C++.  Note that you must have the Emscripten compiler installed for web utilities
+to function properly.
+
+Empirical web Widgets include Text, Buttons, Images, Tables, or many other HTML components.
+All widgets are derived from emp::Widget and structured such that multiple widgets can
+properly refer to and modify the same component.  
+
+=== A Simple Example ===
+
+In order to get a simple example working, we need:
+* An HTML file (the default version is effective in most cases)
+* The C++ code file to actually control the web page
+* The necessary flags to compile (again, the default version should work.
+
+These can be found in examples/web/ in the files Example.html, Example.cc and Makefile.
+
+Here is Example.html:
+
+  <!doctype html>
+  <html>
+  <head>
+  <meta charset="utf-8">
+  <title>Example</title>
+  </head>
+  <body>
+  <div id="emp_base"></div>
+  <script src="jquery-1.11.2.min.js"></script>
+  <script type="text/javascript" src="Example.js"></script>
+
+  </body>
+  </html>
+
+The only portions of this file that need to be customized for your project are the title (what
+Title do you want your web page to have?) and change Example.js to the name of the js file that
+you want to generate.  The div (named "emp_base") is where we will hook Empirical to this web
+page.  You MAY add more divs to control or customize any aspects of this file's CSS as well, but
+none of this is required for developing an interface, and most of it can be controlled via C++.
+
+Here is the Example.cc file:
+
+  #include "web/web.h"
+
+  namespace UI = emp::web;
+
+  UI::Document doc("emp_base");
+
+  int main()
+  {
+    doc << "<h1>Hello World!</h1>";
+  }
+
+This setup will create a web page the says "Hello World!" in large letters.  Manipulations to
+doc will allow us to control many portions of the web page.  To break down what's going on,
+including "web/web.h" pulls in Empirical's web framework.  Setting the namesapce to "UI"
+provides a shorter prefix for accessing widgets.  Creating the "doc" Document object attaches
+to the div by the same "emp_base" name in the HTML file.  Note the doc is global because we
+want the web page to keep functioning after main() finishes.  In Emscripten, main() is like any
+other function and does not force the termination of the execution.
+
+Now that we have the two files we need, the only other thing we need to do is compile.  The
+provided Makefile can be run by typing "make Example.js".  This will trigger:
+
+  emcc -std=c++14 -Wall -Wno-unused-function -I../../source/ -Os -DNDEBUG
+  -s TOTAL_MEMORY=67108864 --js-library ../../source/web/library_emp.js
+  -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+  Example.cc -o Example.js
+
+Emscripten uses the emcc compiler (or "em++", since we are using C++).
+ -std=c++14 : Empirical requires c++14
+ -Wall -Wno-unused-function : turn on all warnings by default except for unused functions,
+    since not all library functions are going to be used.
+ -I../../source/ : The compiled file is two directories up in the Empiricial library, so 
+    this flag properly includes the source files.
+ -Os : optimize for size, though -O3 may perform better in some situations
+ -DNDEBUG : turn off debugging for a faster executable
+ -s TOTAL_MEMORY=67108864 : Make sure we have enough memory; in this case reserve 64 MB
+ --js-library ../../source/web/library_emp.js : Load Empirical JS functions that we might need.
+ -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" : Make sure we can run the C++ functions
+    main() and _empCppCallback() from Javascript, to facilitate two-way communication.
+ -s NO_EXIT_RUNTIME=1 : In most cases, we don't want our program to stop when main() finishes.
+
+...finally we list the source file we are compiling ("Example.cc") and the output file that we
+want to produce ("Example.js").  The majority of these flags shouldn't change from one
+compilation to the next, other than chaning optimization to debugging options, which we'll
+cover in the debugging guide.
+
+To test the results, open "Example.html" in your web browser!
+
+
+=== Controlling a web page: The Basics ===
+
+
+6: Live variables and updating.
+7: Working with Widgets
+8: The Text Widget
+9: Buttons
+10: Images
+11: Tables
+12: Canvas
+13: TextAreas
+
+
+?: Listeners and Capturing input events
+?: Working with keypresses
+
+12: Customized Divs
+14: Uploading files
+?: Interfacing between HTML and Empirical
+?: Using JSWrap
+
+?: Freezing and Activating Widgets
+?: Animations
