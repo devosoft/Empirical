@@ -1,5 +1,8 @@
 Empirical is a library of tools for developing efficient, reliable, and accessible scientific
-software.
+software.  The provided code is all header-only and encapsulated into the emp namespace, so it
+is simple to incorporate into existing projects.
+
+See the doc/QuickStartGuides/ folder to start using the library.
 
 Tools in Empirical include:
 * Web-enabled elements to facilitate compiling to JavaScript and with a full web interfaces,
