@@ -172,11 +172,69 @@ Of course, we need to be able to modify Widgets in addition to variables; fortun
 easy as well.
 
 
+=== Finding and Modifying existing Widgets ===
+
+There are two ways to keep track of Widgets in Empirical.  One is to simply hold on to a
+variable associated with the Widget, such as my_button in our previous examples.  At any
+point we can still modify something about my_button.  For example, if we added a line at the
+end of main:
+
+    my_button.Label("PLEASE Click Me!");
+
+We will see that the button label updates to the new string.
+
+The other option we have to keep track of a widget is to specify its HTML identifier so that
+we can look it up again later.  Foe example, if when we first declared my_button we had given
+it an extra string argument, that string would be used as its identifier.
+
+    UI::Button my_button( [](){ x+=5; doc.Redraw(); }, "Click me!", "my_button" );
+
+At any point after we insert the button into a container (such as doc), we are able to request
+it back from the container again.  So, for example instead of
+
+    my_button.Label("PLEASE Click Me!");
+
+we could have said
+
+    doc.Button("my_button").Label("PLEASE Click Me!");
+
+and doc will properly look up the correct button for us (or trip an assert if the required
+button cannot be found.)  In practice, allowing containers to track Widgets is much easier
+than juggling links to all of them yourself.
 
 
-?: Re-attaching to a previously defined widget.
+=== Controlling CSS ===
 
-10: Controling CSS
+Web page aestetics are controlled by adjusting the CSS of the widgets, and Empirical is no
+different.  You have two options for controlling CSS -- you can do it the traditional way by
+modifying the HTML file (often with the help of other packages) or else you can control
+specific CSS settings with the .CSS member function associated with all Widgets.
+
+For example, if we wanted our button to be green with red text, we could add to the end of
+main the statement
+
+    my_button.SetCSS("background-color", "green").SetCSS("color", "red");
+
+Note the chainging of modifiers.
+
+Most common settings are directly defined as member functions, so the above could also be
+expressed as
+
+    my_button.SetBackground("green").SetColor("red");
+
+which can be cleaner.  See the class documentation for a full list of available functions to
+modify each Widget type.
+
+
+=== Empirical Tables ===
+
+Tables are one of the features in Empirical that differs most in style from the underlying
+HTML it modifies, preferring a more exact form where the user sets the number of rows and
+columns to be used.
+
+
+
+
 11: Tables
 12: Canvas
 13: TextAreas
