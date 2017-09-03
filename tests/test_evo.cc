@@ -1,17 +1,18 @@
 #define CATCH_CONFIG_MAIN
-#include "../third-party/Catch/single_include/catch.hpp"
+#include "third-party/Catch/single_include/catch.hpp"
 
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <vector>
 
-#include "../evo/NK.h"
-#include "../evo/World.h"
-#include "../tools/BitSet.h"
-#include "../tools/Random.h"
-#include "../evo/EvoStats.h"
-#include "../evo/StatsManager.h"
+#include "Evo/EvoStats.h"
+#include "Evo/NK.h"
+#include "Evo/StatsManager.h"
+#include "Evo/World.h"
+
+#include "tools/BitSet.h"
+#include "tools/Random.h"
 
 using BitOrg = emp::BitVector;
 

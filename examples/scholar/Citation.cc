@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "../../scholar/Citation.h"
+#include "scholar/Citation.h"
 
 int main()
 {

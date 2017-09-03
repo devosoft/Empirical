@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../tools/RegEx.h"
+#include "tools/RegEx.h"
 
 int main()
 {

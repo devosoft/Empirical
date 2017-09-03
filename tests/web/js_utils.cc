@@ -5,13 +5,13 @@
 #include <string>
 #include <array>
 
-#include "../../config/command_line.h"
-#include "../../base/assert.h"
-#include "../../base/vector.h"
-#include "../../tools/unit_tests.h"
-#include "../../web/init.h"
-#include "../../web/JSWrap.h"
-#include "../../web/js_utils.h"
+#include "config/command_line.h"
+#include "base/assert.h"
+#include "base/vector.h"
+#include "tools/unit_tests.h"
+#include "web/init.h"
+#include "web/JSWrap.h"
+#include "web/js_utils.h"
 
 struct JSDataObject {
   EMP_BUILD_INTROSPECTIVE_TUPLE(

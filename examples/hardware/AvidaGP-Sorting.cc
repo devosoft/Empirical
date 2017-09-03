@@ -8,10 +8,10 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "../../base/vector.h"
-#include "../../evo/World.h"
-#include "../../hardware/AvidaGP.h"
-#include "../../tools/Random.h"
+#include "base/vector.h"
+#include "evo/World.h"
+#include "hardware/AvidaGP.h"
+#include "tools/Random.h"
 
 constexpr size_t POP_SIZE = 200;
 constexpr size_t POP_GROUPS = 5;    // How many groups to divide up the population?

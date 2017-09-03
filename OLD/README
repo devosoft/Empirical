@@ -1,4 +1,0 @@
-This directory contains tools and files that are no longer needed.
-
-emp::BitSet is surpassed by std::bitset
-emp::BitArray is surpassed by std::vector<bool>

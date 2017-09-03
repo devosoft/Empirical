@@ -1,6 +1,6 @@
 # Project-specific settings
 PROJECT := NK
-EMP_DIR := ../..
+EMP_DIR := ../../source
 
 # Flags to use regardless of compiler
 CFLAGS_all := -Wall -Wno-unused-function -std=c++14 -I$(EMP_DIR)/

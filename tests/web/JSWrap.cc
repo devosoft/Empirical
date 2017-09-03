@@ -4,10 +4,10 @@
 
 #include <functional>
 
-#include "../../base/assert.h"
-#include "../../tools/unit_tests.h"
-#include "../../web/init.h"
-#include "../../web/JSWrap.h"
+#include "base/assert.h"
+#include "tools/unit_tests.h"
+#include "web/init.h"
+#include "web/JSWrap.h"
 
 struct JSDataObject {
     EMP_BUILD_INTROSPECTIVE_TUPLE(

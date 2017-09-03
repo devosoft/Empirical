@@ -1,0 +1,105 @@
+Developer notes are below (Should move over to GitHub tracking?)
+
+-= STEPS to a minimal working Avida 5 =-
+
+Setup dynamic phenotype object?
+Setup dynamic stats tracker
+Setup configuration object
+Setup proper event system
+Setup environments
+
+
+-= NEXT STEPS =-
+Working on Singals/Actions
+* In the case of physics, each body shouldn't need its own signal.
+  - Do we have the physics manage this?
+  - Or should signals be static to a class?
+  - Or should they all go through the global manager?
+  At the moment, option 2 makes the most sense since each instance would pass in its own info.
+
+-= Active Projects =-
+PuzzleEngine (was EvoPuzzler)
+Evoke
+Compiler education tools
+EvoConstructor
+Rock-Paper-Stuff
+Spellcast!
+TubeCode
+
+-= Questions =-
+Best way to convert to a c++ literal independent of type?
+How to dynamically change an include file?
+How to best save a file from Emscripten?
+How to best change a CSS class?
+
+-= Fixes =-
+Make JSWrap more flexible for different types of functions that can get passed into it.
+
+-= Improvements =-
+Allow default UI::Style overall and for each object type.
+-Create a UI::StyleGroup that elements can be added to and altered as one (use proper CSS class?)
+Allow Signal links to be REMOVED or REPLACED
+Allow Signal triggers to be chained (with a single trigger being able to chain to a series of others)
+Allow Signal *links* to be named?
+Build a emp::unordered_set and emp::unordered_map?  Can give more control on hashing, performance analysis, and simple extra features (like Has and a simpler Find with a default.)
+
+-= Improvements to Consider =-
+Why are styles applied AFTER GetHTML is run; can't they be done at the same time?
+
+-= New Elements =-
+Forms
+JQuerryUI Tabs? (or other UI Elements?)
+Span (?) for future manual references
+Dynamic web link? (Easy to change and verify, rather than embeded in text.)
+
+
+-= Evolution-specific Tools =-
+Organism Object (Contains Genome and templated on virtual hardware type)
+Genotype manager (for organisms with identical genomes)
+Phenotype summary to include in the genotype
+
+
+-= Optimizations to Explore =-
+Should quick-lookup for sin, cos, tan be at higher resolution (now it's 256 entires)?
+Fix how sectors are handled in surfaces to be more dynamic based on sizes of organisms.
+- Consider sorting organisms by size and processing smallest first?
+  Then any particular comparison is only up against as small or smaller.
+- Test only objects that have moved (against all objects)
+- Sort all objects within bands?
+
+
+-= Specific ideas for Configurtion tools =-
+* Build an HTML object to automatically allow adjustment of settings in a running ap.
+* Allow other commands to redirect the rest of the line to a specific object for processing.
+* Auto-generation of config file entries beyond just "set"
+* See about uniting library user config file and end user config file into consistent format.
+
+
+-= Documentation =-
+* Goals of Empirical
+* Overview of web framework with examples.
+* How to use evo tools
+* How to setup and use the config tools.
+* Debug utilities (Ptr, vector, array, memory management, etc.)
+* Geometry
+* Reflection
+* string_utils
+
+
+-= Librarys to consider wrapping =-
+D3
+FabricJS
+PaperJS -- VERY impressive demos!!  (PLUS best benchmarks next to native canvas)
+oCanvas
+
+http://www.graphdracula.net/  - build vertices & edges easily!
+Box2D
+Processing.JS
+ChartJS
+jqPlot
+JQuery Sparklines -- Inline graphs
+
+
+-= Frameworks to consider wrapping =-
+Ionic
+Ember -- read strong arguments from developer; built to be practical in getting good aps fast.

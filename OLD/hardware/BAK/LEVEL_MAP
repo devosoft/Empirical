@@ -1,8 +1,0 @@
-== Level 0 (No dependencies) ==
-Instruction.h
-HardwareCPU_Base.h (templated on an instruction type)
-InstLib.h  (also templated on an instruction type and hardware type)
-
-== Level 1 ==
-HardwareCPU.h (uses Instruction, HardwareCPU_Base, and InstLib)
-

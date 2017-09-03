@@ -79,7 +79,7 @@ private:
   emp::vector<Node> nodes;
   emp::vector<Edge> edges;
 
-  emp::vector< emp::vector<int> > adj_list;
+  emp::vector< emp::vector<size_t> > adj_list;
   AdjMatrix adj_matrix;
 
   int active_node = -1;
@@ -97,37 +97,37 @@ private:
     return id;
   }
 
-  void AddEdge(int from, int to) {
+  void AddEdge(size_t from, size_t to) {
     emp_assert(from != to);
-    emp_assert(from >= 0 && from < nodes.size());
-    emp_assert(to >= 0 && to < nodes.size());
+    emp_assert(from < nodes.size());
+    emp_assert(to < nodes.size());
     if (from > to) std::swap(from,to);
 
     edges.emplace_back(from, to);
-    adj_matrix((size_t)from, (size_t)to) = 1;
-    adj_matrix((size_t)to, (size_t)from) = 1;
-    adj_list[(size_t)from].push_back(to);
-    adj_list[(size_t)to].push_back(from);
+    adj_matrix(from, to) = 1;
+    adj_matrix(to, from) = 1;
+    adj_list[from].push_back(to);
+    adj_list[to].push_back(from);
     edge_node = -1;
     update_graph = true;
   }
 
-  void RemoveEdge(int from, int to) {
+  void RemoveEdge(size_t from, size_t to) {
     emp_assert(from != to);
-    emp_assert(from >= 0 && from < nodes.size());
-    emp_assert(to >= 0 && to < nodes.size());
+    emp_assert(from < nodes.size());
+    emp_assert(to < nodes.size());
     if (from > to) std::swap(from,to);
 
     edges.erase(edges.begin() + emp::FindPos(edges, Edge(from, to)));
-    adj_matrix((size_t)from, (size_t)to) = 0;
-    adj_matrix((size_t)to, (size_t)from) = 0;
-    // adj_list[(size_t)from].push_back(to);
-    // adj_list[(size_t)to].push_back(from);
+    adj_matrix(from, to) = 0;
+    adj_matrix(to, from) = 0;
+    // adj_list[from].push_back(to);
+    // adj_list[to].push_back(from);
     edge_node = -1;
     update_graph = true;
   }
 
-  void ToggleEdge(int from, int to) {
+  void ToggleEdge(size_t from, size_t to) {
     if (from > to) std::swap(from,to);
     if (emp::Has(edges, Edge(from, to))) RemoveEdge(from,to);
     else AddEdge(from,to);
@@ -156,7 +156,7 @@ private:
     // If we did not find an existing node, make a new one and stop.
     if (active_node == -1) {
       active_node = (int) AddNode(x,y);
-      if (edge_node >= 0) AddEdge(edge_node, active_node);
+      if (edge_node >= 0) AddEdge((size_t) edge_node, (size_t) active_node);
       return;
     }
 
@@ -174,7 +174,7 @@ private:
     }
 
     // If we made it this far, we are tyring to finish an edge!
-    AddEdge(edge_node, active_node);
+    AddEdge((size_t) edge_node, (size_t) active_node);
   }
 
   void MouseUp() {
@@ -284,8 +284,8 @@ public:
       for (size_t r = 0; r < nodes.size(); r++) {
         char symbol = ID2Symbol(r);
         table_list.GetCell(r+1,0).SetHeader() << symbol;
-        for (int s : adj_list[r]) {
-          table_list.GetCell(r+1,1) << ID2Symbol(s) << " ";
+        for (size_t s : adj_list[r]) {
+          table_list.GetCell(r+1,1) << ID2Symbol((int)s) << " ";
         }
       }
       table_list.SetCSS("border-collapse", "collapse");

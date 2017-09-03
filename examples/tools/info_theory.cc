@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../tools/info_theory.h"
+#include "tools/info_theory.h"
 
 int main()
 {

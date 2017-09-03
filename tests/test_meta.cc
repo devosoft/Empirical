@@ -1,19 +1,19 @@
 #define CATCH_CONFIG_MAIN
 #undef NDEBUG
 
-#include "../third-party/Catch/single_include/catch.hpp"
+#include "third-party/Catch/single_include/catch.hpp"
 
 #include <sstream>
 #include <string>
 
-#include "../base/array.h"
-#include "../base/vector.h"
-#include "../tools/tuple_utils.h"
+#include "base/array.h"
+#include "base/vector.h"
+#include "tools/tuple_utils.h"
 
-#include "../meta/meta.h"
-#include "../meta/reflection.h"
-#include "../meta/TypeID.h"
-#include "../meta/TypePack.h"
+#include "meta/meta.h"
+#include "meta/reflection.h"
+#include "meta/TypeID.h"
+#include "meta/TypePack.h"
 
 
 char result_char;

@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../tools/GenericFunction.h"
+#include "tools/GenericFunction.h"
 
 int main()
 {
