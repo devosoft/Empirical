@@ -67,7 +67,7 @@ namespace D3 {
 
     /// Draw axis on [selection] (must contain a single SVG element) with intelligent default
     /// positioning
-    void Draw(Selection selection){
+    Axis& Draw(Selection & selection){
       //this->SetTickFormat("g");
 
       //Dom ids can't contain whitespace
@@ -122,24 +122,29 @@ namespace D3 {
              .text(Pointer_stringify($4));
       }, this->id, selection.GetID(), dom_id.c_str(), group.GetID(), label.c_str(),
       label_offset.c_str(), orientation.c_str());
+      return *this;
     }
 
+    // selection needs to be const for this to compile, but it feels wrong since
+    // technically the contents of the selection are changed
     template <typename T>
-    void ApplyAxis(SelectionOrTransition<T> selection) {
+    Axis& ApplyAxis(const SelectionOrTransition<T> & selection) {
       EM_ASM_ARGS({
 	    js.objects[$1].call(js.objects[$0]);
 	  }, this->id, selection.GetID());
+      return *this;
     }
 
     /// An axis must have a scale. By default, a scale of SCALE_TYPE will be constructed, but
     /// usually you want an axis to depict a specific scale. This method points this object's
     /// scale member variable at [scale].
-    void SetScale(SCALE_TYPE & scale) {
+    Axis& SetScale(SCALE_TYPE & scale) {
       this->scale = scale;
 
       EM_ASM_ARGS({
 	    js.objects[$0].scale(js.objects[$1]);
 	  }, this->id, scale.GetID());
+      return *this;
     }
 
     /// Get a reference to this object's scale.
@@ -150,76 +155,85 @@ namespace D3 {
     /// Adjust the location of the label text relative to the axis
     /// (helpful if numbers are overlapping it). Can be negative.
     /// Use "em" (e.g. "2em") to specify distance relative to font size.
-    void AdjustLabelOffset(std::string offset) {
+    Axis& AdjustLabelOffset(std::string offset) {
       label_offset = offset;
       if (dom_id != "") { //We've already drawn stuff
         group.Select("#"+dom_id+"_label").SetAttr("dy", label_offset);
       }
+      return *this;
     }
 
     /// Draw tries to make a good guess about where to place the axis, but sometimes you want to
     /// scoot it over. This method will move the axis to the x,y location specified.
-    void Move(int x, int y) {
+    Axis& Move(int x, int y) {
       group.Move(x,y);
+      return *this;
     }
 
     template <typename T, std::size_t SIZE>
-    void SetTickValues(std::array<T, SIZE> values) {
+    Axis& SetTickValues(std::array<T, SIZE> values) {
       emp::pass_array_to_javascript(values);
 
       EM_ASM_ARGS({
   	    js.objects[$0].tickValues(emp_i.__incoming_array);
 	  }, this->id);
+      return *this;
     }
 
-    void SetTickSize(float size) {
+    Axis& SetTickSize(float size) {
       EM_ASM_ARGS({
 	    js.objects[$0].tickSize($1);
       }, this->id, size);
+      return *this;
     }
 
-    void SetTickSizeInner(float size) {
+    Axis& SetTickSizeInner(float size) {
       EM_ASM_ARGS({
 	    js.objects[$0].tickSizeInner($1);
 	  }, this->id, size);
+      return *this;
     }
 
-    void SetTickSizeOuter(float size) {
+    Axis& SetTickSizeOuter(float size) {
       EM_ASM_ARGS({
 	    js.objects[$0].tickSizeOuter($1);
   	  }, this->id, size);
+      return *this;
     }
 
-    void SetTickPadding(int padding) {
+    Axis& SetTickPadding(int padding) {
       EM_ASM_ARGS({
 	    js.objects[$0].tickPadding($1);
 	  }, this->id, padding);
+      return *this;
     }
 
     /// Set the number of ticks along the axis
-    void SetTicks(int count){
+    Axis& SetTicks(int count){
       EM_ASM_ARGS({
 	    js.objects[$0].ticks($1);
 	  }, this->id, count);
+      return *this;
     }
 
     /// Set the format for displaying numbers assoiated with ticks. [format] should be a format
     /// following
     /// [the rules for d3.format()](https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format)
-    void SetTickFormat(std::string format) {
+    Axis& SetTickFormat(std::string format) {
       EM_ASM_ARGS({
         js.objects[$0].tickFormat(d3.format(Pointer_stringify($1)));
       }, this->id, format.c_str());
+      return *this;
     }
 
     /// Adjust scale and axis to accomodate the new range of data specified by [new_min],
     /// and [new_max]. [svg] is a Selection or Transition containing the current axis. If it's a
     /// transition, then the rescaling will be animated.
     template <typename T>
-    void Rescale(double new_min, double new_max, D3::SelectionOrTransition<T> & svg){
+    Axis& Rescale(double new_min, double new_max, const D3::SelectionOrTransition<T> & svg){
       this->scale.SetDomain(std::array<double, 2>({{new_min, new_max}}));
-      std::cout << dom_id << std::endl;
       ApplyAxis(svg.Select("#"+dom_id));
+      return *this;
     }
 
     //TODO:  ticks

@@ -172,7 +172,7 @@ public:
 
   void Setup(){
 
-    const D3::Selection * svg = GetSVG();
+    D3::Selection * svg = GetSVG();
 
     double lowest = 10;//*(std::min_element(values.begin(), values.end()));
     double highest = 20;//*(std::max_element(values.begin(), values.end()));
@@ -197,7 +197,7 @@ public:
     this->pending_funcs.Run();
   }
 
-  virtual void AddDataPoint(int update, emp::vector<double> values){
+  virtual void AddDataPoint(int update, emp::vector<double> & values){
       //Draw circles that represent values
       circles = D3::Selection(GetSVG()->SelectAll("circle").Data(values));
       circles.ExitRemove();
@@ -257,7 +257,7 @@ public:
     }
 
 
-    void DrawData(emp::vector<DATA_TYPE> data) {
+    void DrawData(emp::vector<DATA_TYPE> & data) {
         X_SCALE_TYPE& x = x_ax.GetScale();
         Y_SCALE_TYPE& y = y_ax.GetScale();
         double new_x_min = *std::min_element(data.begin(), data.end());
@@ -647,7 +647,6 @@ public:
   void Redraw(D3::SelectionOrTransition<T> & s) {
     // s.SelectAll(".data-point").SetAttr("cy", GetID()+"y");
     // s.SelectAll(".data-point").SetAttr("cx", GetID()+"x");
-    exit = D3::Selection(D3::NextD3ID());
 
     EM_ASM_ARGS({
         function pathTween(d1, precision) {
@@ -686,7 +685,12 @@ public:
                     .attr("cx", emp[Pointer_stringify($4)+"x"]);
       t = s.transition(js.objects[$2]).duration(300).attrTween("d", pathTween).ease(d3.easeLinear);
       t.attr("d", js.objects[$1]);
-      js.objects[$3].transition(js.objects[$2]).duration(300).attrTween("d", pathTween).ease(d3.easeLinear).attr("d",js.objects[$1](circle_data.slice(circle_data.length-2, circle_data.length-1)));
+      js.objects[$3]
+        .transition(js.objects[$2])
+        .duration(300)
+        .attrTween("d", pathTween)
+        .ease(d3.easeLinear)
+        .attr("d",js.objects[$1](circle_data.slice(circle_data.length-2, circle_data.length-1)));
     }, GetSVG()->GetID(), line_gen->GetID(), s.GetID(), exit.GetID(), GetID().c_str());
   }
 
@@ -699,30 +703,30 @@ public:
       return;
     }
 
-    D3::Selection svg = *GetSVG();
-
     // //We can't draw a line on the first update
     if (prev_data[0] >= 0 ){
       std::array<DATA_TYPE, 2> line_data;
       line_data[0] = prev_data;
       line_data[1] = data[0];
 
-      D3::Selection line = line_gen->DrawShape(line_data, svg);
-      line.SetAttr("fill", "none");
-      line.SetAttr("stroke-width", 1);
-      line.SetAttr("stroke", "black");
-      line.SetAttr("class", "line-seg");
+      line_gen->DrawShape(line_data, *GetSVG())
+               .SetAttr("fill", "none")
+               .SetAttr("stroke-width", 1)
+               .SetAttr("stroke", "black")
+               .SetAttr("class", "line-seg");
     }
 
     // If it isn't nested, D3 will think it's 2 separate points
     std::array<DATA_TYPE, 1> new_point = {{data[0]}};
     // GetSVG()->SelectAll(".data-point").Log();
-    D3::Selection enter = GetSVG()->SelectAll(".data-point").Data(new_point, GetID()+"return_x").EnterAppend("circle");
-    enter.SetAttr("cy", GetID()+"y");
-    enter.SetAttr("cx", GetID()+"x");
-    enter.SetAttr("r", 2);
-    enter.SetAttr("class", "data-point");
-    enter.BindToolTipMouseover(*tip);
+    GetSVG()->SelectAll(".data-point")
+            .Data(new_point, GetID()+"return_x")
+            .EnterAppend("circle")
+            .SetAttr("cy", GetID()+"y")
+            .SetAttr("cx", GetID()+"x")
+            .SetAttr("r", 2)
+            .SetAttr("class", "data-point")
+            .BindToolTipMouseover(*tip);
     prev_data = data[0];
     data.pop_front();
     // GetSVG()->SelectAll("circle").Log();

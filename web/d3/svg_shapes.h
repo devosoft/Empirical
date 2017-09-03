@@ -28,7 +28,7 @@ namespace D3 {
     /// Assumes [data] is an array of 2-element arrays describing (x,y) coordinates and makes
     /// the line that connects them
     template <typename T, size_t SIZE>
-    std::string Generate(std::array<std::array<T, 2>, SIZE> data){
+    std::string Generate(std::array<std::array<T, 2>, SIZE> & data){
       emp::pass_array_to_javascript(data);
 
       char * buffer = (char *)EM_ASM_INT({
@@ -46,7 +46,7 @@ namespace D3 {
     /// Draws the path associated with [data] onto the [s] selection (must contain a single SVG)
     /// element).
     template <typename T, std::size_t SIZE>
-    Selection DrawShape(std::array<std::array<T, 2>, SIZE> data, Selection s) {
+    Selection DrawShape(std::array<std::array<T, 2>, SIZE> & data, Selection & s) {
       Selection path = s.Append("path");
       path.SetAttr("d", Generate(data));
       return path;
@@ -66,7 +66,7 @@ namespace D3 {
    /// If you pass a triple-nested array, it will be treated as an array of paths
     template <typename T, std::size_t SIZE, std::size_t SIZE2>
     Selection DrawShape(std::array<std::array<std::array<T, 2>, SIZE>,\
-			 SIZE2>  data) {
+			 SIZE2> & data) {
       Selection group = Select("svg").Append("g");
       for (auto arr: data) {
 	    Selection path = group.Append("path");

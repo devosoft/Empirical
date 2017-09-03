@@ -42,13 +42,6 @@ namespace D3 {
       SelectionOrTransition(int id) : D3_Base(id){;};
       SelectionOrTransition(const SelectionOrTransition<DERIVED> & s) : D3_Base(s){;};
 
-    //   SelectionOrTransition<DERIVED>& operator= (const SelectionOrTransition<DERIVED> & other) {
-    //       std::cout << "Calling assingment: " << this->id << " " << other.id << std::endl;
-    //       EM_ASM_ARGS({js.counts[$0]++}, other.id);
-    //       this->id = other.id;
-    //       return (*this);
-    //   }
-
       /// Create a new selection/transition containing the first element matching the
       /// [selector] string that are within this current selection/transition
       DERIVED Select(std::string selector) const {
@@ -68,7 +61,7 @@ namespace D3 {
         int new_id = NextD3ID();
 
         EM_ASM_ARGS({
-          console.log($0, js.objects[$0]);
+        //   console.log($0, js.objects[$0]);
   	      var new_selection = js.objects[$0].selectAll(Pointer_stringify($1));
           js.objects[$2] = new_selection;
         }, this->id, selector.c_str(), new_id);
@@ -84,7 +77,7 @@ namespace D3 {
       /// selection to be operated on (which you can then convert to a selection object with
       /// `D3::Selection(i)`).
       // TODO: Allow arguments
-      DERIVED Call(std::string function){
+      DERIVED& Call(std::string function){
         EM_ASM_ARGS({
           var func_string = Pointer_stringify($1);
           if (typeof window[func_string] === "function") {
@@ -104,7 +97,7 @@ namespace D3 {
       /// @cond TEMPLATES
 
       template <typename T>
-      emp::sfinae_decoy<DERIVED, decltype(&T::operator())>
+      emp::sfinae_decoy<DERIVED&, decltype(&T::operator())>
       Call(T function){
         uint32_t fun_id = emp::JSWrap(function, "", false);
         EM_ASM_ARGS({
@@ -152,7 +145,7 @@ namespace D3 {
       /// either be a C++ function or a string with the name of a Javascript function in the d3,
       /// emp, or current window namespace.
 
-      DERIVED Each(std::string function){
+      DERIVED& Each(std::string function){
         D3_CALLBACK_METHOD_1_ARG(each, function.c_str())
         return *(static_cast<DERIVED *>(this));
       }
@@ -160,7 +153,7 @@ namespace D3 {
       /// @cond TEMPLATES
 
       template <typename T>
-      emp::sfinae_decoy<DERIVED, decltype(&T::operator())>
+      emp::sfinae_decoy<DERIVED&, decltype(&T::operator())>
       Each(T function){
         D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(each, function)
         return *(static_cast<DERIVED *>(this));
@@ -177,10 +170,10 @@ namespace D3 {
 
       DERIVED Merge(DERIVED & other) {
           int new_id = NextD3ID();
-          std::cout << "New id should be: " << new_id << std::endl;
+        //   std::cout << "New id should be: " << new_id << std::endl;
           EM_ASM_ARGS({
               js.objects[$2] = js.objects[$0].merge(js.objects[$1]);
-              console.log("Merged: ", js.objects[$2], $2);
+            //   console.log("Merged: ", js.objects[$2], $2);
           }, this->id, other.GetID(), new_id);
           return DERIVED(new_id);
       }
@@ -212,7 +205,7 @@ namespace D3 {
       is identical to a function name
       */
 
-      DERIVED SetAttr(std::string name, std::string value) {
+      DERIVED& SetAttr(std::string name, std::string value) {
 
         D3_CALLBACK_METHOD_2_ARGS(attr, name.c_str(), value.c_str())
         return *(static_cast<DERIVED *>(this));
@@ -223,7 +216,7 @@ namespace D3 {
       //This version handles values that are not functions or strings
       //is_fundamental safely excludes lambdas
       template <typename T>
-      typename std::enable_if<std::is_fundamental<T>::value, DERIVED>::type
+      typename std::enable_if<std::is_fundamental<T>::value, DERIVED&>::type
       SetAttr(std::string name, T value) {
 
         EM_ASM_ARGS({js.objects[$0].attr(Pointer_stringify($1), $2)},
@@ -235,7 +228,7 @@ namespace D3 {
       //If a function is being used repeatedly, it may be more efficient to wrap it
       //once and then pass the name as a string.
       template <typename T>
-      emp::sfinae_decoy<DERIVED, decltype(&T::operator())>
+      emp::sfinae_decoy<DERIVED&, decltype(&T::operator())>
       SetAttr(std::string name, T value) {
 
         //This should probably be JSWrapOnce, but that breaks the visualization
@@ -256,7 +249,7 @@ namespace D3 {
       better match for raw strings than the std::string version
       */
 
-      DERIVED SetAttr(std::string name, const char * value) {
+      DERIVED& SetAttr(std::string name, const char * value) {
 
         D3_CALLBACK_METHOD_2_ARGS(attr, name.c_str(), value)
         return *(static_cast<DERIVED *>(this));
@@ -264,7 +257,7 @@ namespace D3 {
 
       /* Version for containers */
       template <typename T>
-      typename std::enable_if<T::value_type != "", DERIVED>::type
+      typename std::enable_if<T::value_type != "", DERIVED&>::type
       SetAttr(std::string name, T value) {
         emp::pass_array_to_javascript(value);
 
@@ -288,7 +281,7 @@ namespace D3 {
       */
 
       //std::string version because std::strings are better
-      DERIVED SetStyle(std::string name, std::string value, bool priority=false){
+      DERIVED& SetStyle(std::string name, std::string value, bool priority=false){
         if (priority){
     	    EM_ASM_ARGS({
             var func_string = Pointer_stringify($2);
@@ -312,7 +305,7 @@ namespace D3 {
 
       //Const char * version so the generic template doesn't get greedy with
       //string literals
-      DERIVED SetStyle(std::string name, const char* value, bool priority=false){
+      DERIVED& SetStyle(std::string name, const char* value, bool priority=false){
         if (priority){
     	    EM_ASM_ARGS({
     	      var func_string = Pointer_stringify($2);
@@ -336,7 +329,7 @@ namespace D3 {
       //If a function is being used repeatedly, it may be more efficient to wrap it
       //once and then pass the name as a string.
       template <typename T>
-      emp::sfinae_decoy<DERIVED, decltype(&T::operator())>
+      emp::sfinae_decoy<DERIVED&, decltype(&T::operator())>
       SetStyle(std::string name, T value) {
         D3_CALLBACK_METHOD_CPP_FUNCTION_2_ARGS(style, name.c_str(), value);
         return *(static_cast<DERIVED *>(this));
@@ -344,7 +337,7 @@ namespace D3 {
 
       //Generic template version
       template <typename T>
-      typename std::enable_if<std::is_fundamental<T>::value, DERIVED>::type
+      typename std::enable_if<std::is_fundamental<T>::value, DERIVED&>::type
       SetStyle(std::string name, T value, bool priority=false){
         if (priority){
     	    EM_ASM_ARGS({js.objects[$0].style(Pointer_stringify($1), $2, "important")},
@@ -361,7 +354,7 @@ namespace D3 {
 
       /// Sets this selection's text to the specified string, or the string returned by running the
       /// specified function on the element's bound data
-      DERIVED SetText(std::string text){
+      DERIVED& SetText(std::string text){
         D3_CALLBACK_METHOD_1_ARG(text, text.c_str())
         return *(static_cast<DERIVED *>(this));
       }
@@ -369,7 +362,7 @@ namespace D3 {
       /// @cond TEMPLATES
 
       template <typename T>
-      emp::sfinae_decoy<DERIVED, decltype(&T::operator())>
+      emp::sfinae_decoy<DERIVED&, decltype(&T::operator())>
       SetText(T func){
         D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(text, func)
         return *(static_cast<DERIVED *>(this));
@@ -389,14 +382,14 @@ namespace D3 {
       /// Advanced note: This is implemented differently for selection vs transitions. As such,
       /// calling it on a SelectionOrTransition object directly is not supported.
       // std::string verison
-      DERIVED SetProperty(std::string name, std::string value) {return *(static_cast<DERIVED *>(this));}
+      DERIVED& SetProperty(std::string name, std::string value) {return *(static_cast<DERIVED *>(this));}
 
       /// Sets this selection's inner html to the specified string, or the string returned by running the
       /// specified function on the element's bound data
       ///
       /// Advanced note: This is implemented differently for selection vs transitions. As such,
       /// calling it on a SelectionOrTransition object directly is not supported.
-      DERIVED SetHtml(std::string value) {return *(static_cast<DERIVED *>(this));}
+      DERIVED& SetHtml(std::string value) {return *(static_cast<DERIVED *>(this));}
 
       /// Change whether or not element in this selection have the [classname] class.
       /// Example: Add the data-point class with selection.SetClassed("data-point", true);
@@ -404,7 +397,7 @@ namespace D3 {
       ///
       /// Advanced note: This is implemented differently for selection vs transitions. As such,
       /// calling it on a SelectionOrTransition object directly is not supported.
-      DERIVED SetClassed(std::string classname, bool value) {return *(static_cast<DERIVED *>(this));}
+      DERIVED& SetClassed(std::string classname, bool value) {return *(static_cast<DERIVED *>(this));}
 
       #endif
 
@@ -604,7 +597,7 @@ namespace D3 {
     * @{
     ***********************************************/
 
-    Transition On(std::string type, std::string listener="null", bool capture=false){
+    Transition& On(std::string type, std::string listener="null", bool capture=false){
 
       // Check that the listener is valid
       emp_assert(EM_ASM_INT({
@@ -653,7 +646,7 @@ namespace D3 {
 
     /// Version for C++ functions
     template <typename T>
-    emp::sfinae_decoy<Transition, decltype(&T::operator())>
+    emp::sfinae_decoy<Transition&, decltype(&T::operator())>
     On(std::string type, T listener, bool capture=false){
 
       uint32_t fun_id = emp::JSWrap(listener, "", false);
@@ -672,7 +665,7 @@ namespace D3 {
 
     /// @endcond
 
-    Transition SetDuration(double time) {
+    Transition& SetDuration(double time) {
         EM_ASM_ARGS({
             js.objects[$0].duration($1);
         }, this->id, time);
@@ -684,7 +677,7 @@ namespace D3 {
     /// See the [d3 documentation](https://github.com/d3/d3-selection#selection_property)
     /// for more information.
     // std::string verison
-    Transition SetProperty(std::string name, std::string value){
+    Transition& SetProperty(std::string name, std::string value){
       EM_ASM_ARGS({
         var arg1 = Pointer_stringify($1);				                              	\
         var func_string = Pointer_stringify($2);
@@ -706,7 +699,7 @@ namespace D3 {
     /// @cond TEMPLATES
 
     // Const char * version so raw strings work
-    Transition SetProperty(std::string name, const char* value){
+    Transition& SetProperty(std::string name, const char* value){
       EM_ASM_ARGS({
         var arg1 = Pointer_stringify($1);				                              	\
         var func_string = Pointer_stringify($2);
@@ -727,7 +720,7 @@ namespace D3 {
 
     //Generic template version
     template <typename T>
-    typename std::enable_if<std::is_fundamental<T>::value, Transition>::type
+    typename std::enable_if<std::is_fundamental<T>::value, Transition&>::type
     SetProperty(std::string name, T value){
       EM_ASM_ARGS({
           js.objects[$0].each("end", function() {
@@ -741,7 +734,7 @@ namespace D3 {
     //If a function is being used repeatedly, it may be more efficient to wrap it
     //once and then pass the name as a string.
     template <typename T>
-    emp::sfinae_decoy<Transition, decltype(&T::operator())>
+    emp::sfinae_decoy<Transition&, decltype(&T::operator())>
     SetProperty(std::string name, T value) {
       uint32_t fun_id = emp::JSWrap(value, "", false);
       EM_ASM_ARGS({
@@ -760,7 +753,7 @@ namespace D3 {
 
     /// Sets this selection's inner html to the specified string, or the string returned by running the
     /// specified function on the element's bound data
-    Transition SetHtml(std::string value){
+    Transition& SetHtml(std::string value){
       EM_ASM_ARGS({
         var func_string = Pointer_stringify($1);
         if (typeof window[func_string] === "function") {
@@ -781,7 +774,7 @@ namespace D3 {
     /// @cond TEMPLATES
 
     template <typename T>
-    emp::sfinae_decoy<Transition, decltype(&T::operator())>
+    emp::sfinae_decoy<Transition&, decltype(&T::operator())>
     SetHtml(T func){
       uint32_t fun_id = emp::JSWrap(func, "", false);
       EM_ASM_ARGS({
@@ -800,7 +793,7 @@ namespace D3 {
     /// Change whether or not element in this selection have the [classname] class.
     /// Example: Add the data-point class with selection.SetClassed("data-point", true);
     // Value can also be a function that takes bound data and returns a bool
-    Transition SetClassed(std::string classname, bool value) {
+    Transition& SetClassed(std::string classname, bool value) {
       EM_ASM_ARGS({
         js.objects[$0].each("end", function(){
             d3.select(this).classed(Pointer_stringify($1), $2);
@@ -813,7 +806,7 @@ namespace D3 {
 
     // Version for C++ function
     template <typename T>
-    emp::sfinae_decoy<Transition, decltype(&T::operator())>
+    emp::sfinae_decoy<Transition&, decltype(&T::operator())>
     SetClassed(std::string, std::string classname, T func){
       uint32_t fun_id = emp::JSWrap(func, "", false);
       EM_ASM_ARGS({
@@ -830,7 +823,7 @@ namespace D3 {
     }
 
     // Version that allows strings containing function names but warns on other strings
-    Transition SetClassed(std::string classname, std::string value){
+    Transition& SetClassed(std::string classname, std::string value){
       emp_assert(EM_ASM_INT({
         var func_string = Pointer_stringify($0);
         if (typeof window[func_string] === "function") {
@@ -1044,7 +1037,7 @@ namespace D3 {
     // Accepts Dataset and C++ function as key
     template<typename T>
     emp::sfinae_decoy<Selection, decltype(&T::operator())>
-    Data(Dataset values, T key){
+    Data(Dataset & values, T key){
       int update_id = NextD3ID();
       uint32_t fun_id = emp::JSWrap(key, "", false);
 
@@ -1084,7 +1077,7 @@ namespace D3 {
     // Accepts string referring to Javascript function
     template<typename C, class = typename C::value_type>
     // typename std::enable_if<std::is_pod<typename C::value_type>::value, Selection>::type
-    Selection Data(C values, std::string key=""){
+    Selection Data(C & values, std::string key=""){
       int update_id = NextD3ID();
 
 
@@ -1116,7 +1109,7 @@ namespace D3 {
     // Accepts C++ function as key
     template<typename C, class = typename C::value_type, typename T>
     emp::sfinae_decoy<Selection, decltype(&T::operator())>
-    Data(C values, T key){
+    Data(C & values, T key){
       int update_id = NextD3ID();
       emp::pass_array_to_javascript(values);
       uint32_t fun_id = emp::JSWrap(key, "", false);
@@ -1262,7 +1255,7 @@ namespace D3 {
     /// See the [d3 documentation](https://github.com/d3/d3-selection#selection_property)
     /// for more information.
     // std::string verison
-    Selection SetProperty(std::string name, std::string value){
+    Selection& SetProperty(std::string name, std::string value){
       D3_CALLBACK_METHOD_2_ARGS(property, name.c_str(), value.c_str())
       return *this;
     }
@@ -1270,14 +1263,14 @@ namespace D3 {
     /// @cond TEMPLATES
 
     // Const char * version so raw strings work
-    Selection SetProperty(std::string name, const char* value){
+    Selection& SetProperty(std::string name, const char* value){
       D3_CALLBACK_METHOD_2_ARGS(property, name.c_str(), value)
       return *this;
     }
 
     //Generic template version
     template <typename T>
-    typename std::enable_if<std::is_fundamental<T>::value, Selection>::type
+    typename std::enable_if<std::is_fundamental<T>::value, Selection&>::type
     SetProperty(std::string name, T value){
       EM_ASM_ARGS({js.objects[$0].property(Pointer_stringify($1),
 					   $2)}, this->id, name.c_str());
@@ -1288,7 +1281,7 @@ namespace D3 {
     //If a function is being used repeatedly, it may be more efficient to wrap it
     //once and then pass the name as a string.
     template <typename T>
-    emp::sfinae_decoy<Selection, decltype(&T::operator())>
+    emp::sfinae_decoy<Selection&, decltype(&T::operator())>
     SetProperty(std::string name, T value) {
       D3_CALLBACK_METHOD_CPP_FUNCTION_2_ARGS(property, name.c_str(), value);
       return *this;
@@ -1298,7 +1291,7 @@ namespace D3 {
 
     /// Sets this selection's inner html to the specified string, or the string returned by running the
     /// specified function on the element's bound data
-    Selection SetHtml(std::string value){
+    Selection& SetHtml(std::string value){
       D3_CALLBACK_METHOD_1_ARG(html, value.c_str())
       return *this;
     }
@@ -1306,7 +1299,7 @@ namespace D3 {
     /// @cond TEMPLATES
 
     template <typename T>
-    emp::sfinae_decoy<Selection, decltype(&T::operator())>
+    emp::sfinae_decoy<Selection&, decltype(&T::operator())>
     SetHtml(T func){
       D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(html, func)
       return *this;
@@ -1317,7 +1310,7 @@ namespace D3 {
     /// Change whether or not element in this selection have the [classname] class.
     /// Example: Add the data-point class with selection.SetClassed("data-point", true);
     // Value can also be a function that takes bound data and returns a bool
-    Selection SetClassed(std::string classname, bool value) {
+    Selection& SetClassed(std::string classname, bool value) {
       EM_ASM_ARGS({
         js.objects[$0].classed(Pointer_stringify($1), $2);
       }, this->id, classname.c_str(), value);
@@ -1328,14 +1321,14 @@ namespace D3 {
 
     // Version for C++ function
     template <typename T>
-    emp::sfinae_decoy<Selection, decltype(&T::operator())>
+    emp::sfinae_decoy<Selection&, decltype(&T::operator())>
     SetClassed(std::string, std::string classname, T func){
       D3_CALLBACK_METHOD_CPP_FUNCTION_2_ARGS(classed, classname.c_str(), func)
       return *this;
     }
 
     // Version that allows strings containing function names but warns on other strings
-    Selection SetClassed(std::string classname, std::string value){
+    Selection& SetClassed(std::string classname, std::string value){
       emp_assert(EM_ASM_INT({
         var func_string = Pointer_stringify($0);
         if (typeof window[func_string] === "function") {
@@ -1466,7 +1459,7 @@ namespace D3 {
       return Transition(new_id);
     }
 
-    Transition MakeTransition(Transition t){
+    Transition MakeTransition(Transition & t){
       int new_id = NextD3ID();
       EM_ASM_ARGS({
  	    var transition = js.objects[$0].transition(js.objects[$1]);
@@ -1478,10 +1471,11 @@ namespace D3 {
 
 
     /// Interrupt the transition with the name [name] on the current selection
-    void Interrupt(std::string name=""){
+    Selection& Interrupt(std::string name=""){
       EM_ASM_ARGS({
 	    js.objects[$0].interrupt(Pointer_stringify($1));
  	  }, this->id, name.c_str());
+      return *this;
     }
 
     /// Move the elements in this selection by [x] in the x direction and [y]
@@ -1489,34 +1483,39 @@ namespace D3 {
     /// Note for advanced users: this method is just a shortcut for setting the
     /// "transform" attribute to "translate(x, y)", because doing that is a pain
     /// in C++ (even more so than in Javascript)
-    void Move(int x, int y) {
+    Selection& Move(int x, int y) {
       EM_ASM_ARGS({
         js.objects[$0].attr("transform", "translate("+$1+","+$2+")");
       }, this->id, x, y);
+      return *this;
     }
 
     /// Rotate the elements in this selection by [degrees].
     /// Note for advanced users: this method is just a shortcut for setting the
     /// "transform" attribute to "rotate(degrees)", because doing that is a pain
     /// in C++ (even more so than in Javascript)
-    void Rotate(int degrees) {
+    Selection& Rotate(int degrees) {
       EM_ASM_ARGS({
         js.objects[$0].attr("transform", "rotate("+$1+")");
       }, this->id, degrees);
+      return *this;
     }
 
     /// Change the order of elements in the document to match their order in this selection
-    void Order(){
+    Selection& Order(){
       EM_ASM_ARGS({js.objects[$0].order()},
 			this->id);
+      return *this;
     }
 
-    void Raise() {
-        EM_ASM_ARGS({js.objects[$0].raise();}, this->id);
+    Selection& Raise() {
+      EM_ASM_ARGS({js.objects[$0].raise();}, this->id);
+      return *this;
     }
 
-    void Lower() {
-        EM_ASM_ARGS({js.objects[$0].lower();}, this->id);
+    Selection& Lower() {
+      EM_ASM_ARGS({js.objects[$0].lower();}, this->id);
+      return *this;
     }
 
 
@@ -1531,7 +1530,7 @@ namespace D3 {
     /// Advanced note: the optional capture flag invokes Javascript's
     /// [useCapture](https://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-registration)
     /// option
-    Selection On(std::string type, std::string listener="null", bool capture=false){
+    Selection& On(std::string type, std::string listener="null", bool capture=false){
 
       // Check that the listener is valid
       emp_assert(EM_ASM_INT({
@@ -1583,7 +1582,7 @@ namespace D3 {
 
     /// Version for C++ functions
     template <typename T>
-    emp::sfinae_decoy<Selection, decltype(&T::operator())>
+    emp::sfinae_decoy<Selection&, decltype(&T::operator())>
     On(std::string type, T listener, bool capture=false){
 
       uint32_t fun_id = emp::JSWrap(listener, "", false);
@@ -1611,7 +1610,7 @@ namespace D3 {
     window will be overriden by a JSWrapped function with the same name.
     */
 
-    Selection Sort(std::string comparator = "ascending"){
+    Selection& Sort(std::string comparator = "ascending"){
       D3_CALLBACK_METHOD_1_ARG(sort, comparator.c_str())
       return (*this);
     }
@@ -1619,7 +1618,7 @@ namespace D3 {
     /// @cond TEMPLATES
 
     template <typename T>
-    emp::sfinae_decoy<Selection, decltype(&T::operator())>
+    emp::sfinae_decoy<Selection&, decltype(&T::operator())>
     Sort(T comparator){
       D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(sort, comparator)
       return (*this);
@@ -1691,7 +1690,7 @@ namespace D3 {
   /// containing an SVG canvas.
   /// Values can be a D3::Dataset, an array, or a vector.
   template<typename T>
-  Selection ShapesFromData(T values, std::string shape, Selection svg){
+  Selection ShapesFromData(T values, std::string shape, Selection & svg){
     Selection s = svg.SelectAll(shape).Data(values);
     s.EnterAppend(shape);
     return s;
