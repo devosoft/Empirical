@@ -43,7 +43,7 @@ native: all
 
 all: $(TARGETS)
 
-$(TARGETS): % : %.cc 
+$(TARGETS): % : %.cc
 	$(CXX) $(CFLAGS_version) $(CFLAGS) $< -o $@
 
 opt-%: %.cc

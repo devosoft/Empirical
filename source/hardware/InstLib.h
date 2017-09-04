@@ -15,6 +15,7 @@
 
 #include "../base/array.h"
 #include "../base/vector.h"
+#include "../base/array.h"
 #include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
 
@@ -94,6 +95,10 @@ namespace emp {
       if (id < 52) return ('A' + (id - 26));
       if (id < 62) return ('0' + (id - 52));
       return '+';
+    }
+
+    bool IsInst(const std::string name) const {
+        return Has(name_map, name);
     }
 
     /// Return the ID of the instruction that has the specified name.
