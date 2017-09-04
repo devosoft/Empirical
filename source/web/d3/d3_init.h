@@ -8,29 +8,97 @@
 #include "../JSWrap.h"
 #include "utils.h"
 
+// #ifdef EMSCRIPTEN
+// extern "C" {
+//     extern void D3_Initialize();
+// }
+// #endif
+
 namespace D3 {
+
+
+    // #ifdef EMSCRIPTEN
+    // static void InitD3() {
+    //     static bool init = false;
+    //     if (!init) {
+    //         D3_Initialize();
+    //         init = true;
+    //     }
+    // }
+    //
+    // #endif
+
+    int NextD3ID() {
+        return EM_ASM_INT_V({
+            id = js.next_id++;
+            js.counts[id] = 0;
+            js.objects[id] = -1;
+            return id;
+        });
+    }
 
   /// A base object that all D3 objects inherit from. Handles storing the object in Javascript
   /// You probably don't want to instantiate this directly
+
   class D3_Base {
   protected:
     int id;
 
     /// Default constructor - adds placeholder to js.objects array in Javascript
     D3_Base(){
-      this->id = EM_ASM_INT_V({return js.objects.length});
-      EM_ASM({js.objects.push(-1);});
+      this->id = NextD3ID();
+    //   std::cout << "Default constructor: " << this->id << std::endl;
+      EM_ASM_ARGS({
+          js.counts[$0] = 1;
+      }, this->id);
     }
 
     /// Construct an object pointing to a pre-determined location in js.objects.
+    /// Warning: This trusts that you know what you're doing in choosing an id.
     D3_Base(int id){
       this->id = id;
+    //   std::cout << "Int constructor: " << id << std::endl;
+      emp_assert(EM_ASM_INT({return $0 in js.counts;}, this->id));
+
+      EM_ASM_ARGS({
+          js.counts[$0]++;
+      }, this->id);
+    }
+
+    D3_Base(const D3_Base & other) {
+        //TODO: Make this a deep copy
+        // std::cout << "Copying: " << other.id << std::endl;
+        this->id = other.id;
+        EM_ASM_ARGS({js.counts[$0]++;}, this->id);
+    }
+
+    D3_Base& operator= (const D3_Base & other) {
+        // std::cout << "Calling assingment: " << this->id << " " << other.id << std::endl;
+        this->id = other.id;
+        EM_ASM_ARGS({js.counts[$0]++;}, this->id);
+        return (*this);
+    }
+
+    ~D3_Base() {
+        // std::cout << "Destructing: " <<this->id << std::endl;
+        EM_ASM_ARGS({
+            js.counts[$0]--;
+            if (js.counts[$0] == 0) {
+                // console.log("Deleting: ", $0);
+                delete js.objects[$0];
+                delete js.counts[$0];
+            }
+        }, this->id);
     }
 
   public:
     // Get this object's ID (i.e. it's location in the js.objects array in Javascript)
-    int GetID() {
+    int GetID() const {
       return this->id;
+    }
+
+    void Log() const {
+        EM_ASM_ARGS({console.log($0+":", js.objects[$0]);}, id);
     }
   };
 
