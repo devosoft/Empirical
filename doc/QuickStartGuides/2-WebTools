@@ -247,37 +247,54 @@ we want to fill the table with data, we might do something like
 
 To make the table pretty, we probably want to add some CSS.
 
-   my_table.SetCSS("border-collapse", "collapse");
-   my_table.SetCSS("border", "3px solid");
-   my_table.CellsCSS("border", "1px solid");
-   my_table.CellsCSS("padding", "3px");
+    my_table.SetCSS("border-collapse", "collapse");
+    my_table.SetCSS("border", "3px solid");
+    my_table.CellsCSS("border", "1px solid");
+    my_table.CellsCSS("padding", "3px");
 
 Note that we are able to target the CSS of all TableCells at once.
 
 We can target individual cells using GetCell(), as well as using GetRow(), GetCol(),
-GetRowGroup(), and GetColGroup().
+GetRowGroup(), and GetColGroup().  Each of these returns a TableWidget with the appropriate
+component in focus, so additional modifications are handled correctly.
+
+Finally, of course, make sure to insert the table into the document.
+
+    doc << my_table;
 
 
-And, of course, make sure to insert the table into the document.
+=== Canvas ===
 
-  doc << my_table;
+Canvas widgets in Empirical are a slightly streamlined version of canvases in HTML.  To build
+one, you simply need to create an emp::Canvas object (with the appropriate size) and place it
+into the document.  For example
+
+    UI::Canvas my_canvas(300, 400, "my_canvas");
+
+would create a 300x400 canvas.  We can then use member functions to draw lines, circles, and
+rectangles on the Canvas.  For example:
+
+    my_canvas.Circle(100, 100, 40, "red", "black");
+
+would draw a circle at (100,100) with a radius of 40, a face color of red, and an outline of
+black.
+
+Note also that a number of Draw() function exist for Canvas that will allow more complex
+structures to be drawn easily, such as grids where the colors of each position are
+specified.  Several other Empirical tools hook into canvas.  For example if you are building
+a world with emp::Surface, that surface can be handded to canvas to have all of the shapes
+on it (currently just circles) drawn for you.
 
 
 
-
-11: Tables
-12: Canvas
-13: TextAreas
-14: The Text Widget extras (specifying, closing, modifying, etc.)
-
-
-?: Listeners and Capturing input events
-?: Working with keypresses
-
-12: Customized Divs
-14: Uploading files
-?: Interfacing between HTML and Empirical
-?: Using JSWrap
-
-?: Freezing and Activating Widgets
-?: Animations
+Other topics, coming Soon!
+* TextAreas
+* The Text Widget extras (specifying, closing, modifying, etc.)
+* Listeners and Capturing input events
+* Working with keypresses
+* Customized Divs
+* Uploading files
+* Interfacing between HTML and Empirical
+* Using JSWrap
+* Freezing and Activating Widgets
+* Animations
