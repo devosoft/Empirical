@@ -11,13 +11,18 @@
 
 class AvidaOrg : public emp::AvidaGP {
 private:
+  size_t world_id;
   double energy;
 
 public:
-  AvidaOrg() : energy(0) { ; }
+  AvidaOrg() : world_id((size_t) -1), energy(0) { ; }
+  AvidaOrg(const AvidaOrg &) = default;
+  AvidaOrg(AvidaOrg &&) = default;
 
+  size_t GetWorldID() const { return world_id; }
   double GetEnergy() const { return energy; }
 
+  void SetWorldID(size_t _id) { world_id = _id; }
   void AdjustEnergy(double shift) { energy += shift; }
 
   static void Inst_Replicate(AvidaOrg & hw, const arg_set_t & args) {
