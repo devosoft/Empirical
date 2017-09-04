@@ -38,10 +38,10 @@ struct NKInterface {
     // Attach the GUI components to the web doc.
     div_controls << UI::Button( [this](){ world.RunStep(); DrawAll(); }, "Step", "but_step" );
     div_controls << anim.GetToggleButton("but_toggle");
-    div_controls << UI::Button( [this](){
-        emp::Alert("x=", div_pop.GetXPos(), " y=", div_pop.GetYPos(),
-                   " width=", div_pop.GetWidth(), " height=", div_pop.GetHeight());
-      }, "Alert");
+    // div_controls << UI::Button( [this](){
+    //     emp::Alert("x=", div_pop.GetXPos(), " y=", div_pop.GetYPos(),
+    //                " width=", div_pop.GetWidth(), " height=", div_pop.GetHeight());
+    //   }, "Alert");
     div_pop << "<br>";
     div_pop << org_canvas;
 
