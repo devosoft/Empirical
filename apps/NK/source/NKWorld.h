@@ -74,20 +74,34 @@ struct NKWorld : public emp::World<BitOrg> {
     SetMutFun( mut_fun );
   }
 
-  void Reset() {
-    Clear();
-    Setup();
-  }
-
   void RunStep() {
     // Do mutations on the population.
     DoMutations(1);
 
     // Keep the best individual.
-    EliteSelect(*this, 1, 1);
+    emp::EliteSelect(*this, 1, 1);
 
     // Run a tournament for the rest...
-    TournamentSelect(*this, 5, POP_SIZE-1);
+    emp::TournamentSelect(*this, 5, POP_SIZE-1);
+    //emp::TournamentSelect(*this, 10, 10);
+
+    // Run a lexicase selection mechanism
+    // emp::vector< std::function<double(const BitOrg &)> > lexi_funs(N);
+    // for (size_t n = 0; n < N; n++) {
+    //   if (n+K < N) {
+    //     lexi_funs[n] = [this,n](const BitOrg & org){
+    //       const size_t cur_val = (org >> n).GetUInt(0) & emp::MaskLow<size_t>(K+1);
+	  //       return landscape.GetFitness(n, cur_val);
+    //     };
+    //   } else {
+    //     lexi_funs[n] = [this,n](const BitOrg & org){
+    //       const size_t cur_val = ((org >> n) | (org << (N-n))).GetUInt(0) & emp::MaskLow<size_t>(K+1);
+    //       return landscape.GetFitness(n, cur_val);
+    //     };
+    //   }
+    // }
+    // emp::LexicaseSelect<BitOrg>(*this, lexi_funs, POP_SIZE - 11);
+
     Update();
   }
 
