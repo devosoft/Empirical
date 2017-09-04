@@ -506,6 +506,9 @@ namespace emp {
     /// Remove all organisms from the world.
     void Clear();
 
+    /// Clear all of the orgs and reset stats.
+    void Reset() { Clear(); update = 0; }
+
     /// Change the size of the world.  If the new size is smaller than the old, remove any
     /// organisms outside the new range.  If larger, new positions are empty.
     void Resize(size_t new_size) {
@@ -523,10 +526,10 @@ namespace emp {
     template <typename... ARGS> void InjectRandomOrg(ARGS &&... args);
 
     /// Place a newborn organism into the population, by default rules and with parent information.
-    size_t DoBirth(const ORG mem, size_t parent_pos);
+    size_t DoBirth(const ORG & mem, size_t parent_pos);
 
     /// Place multiple copies of a newborn organism into the population.
-    void DoBirth(const ORG mem, size_t parent_pos, size_t copy_count);
+    void DoBirth(const ORG & mem, size_t parent_pos, size_t copy_count);
 
     // Kill off organism at the specified position (same as RemoveOrgAt, but callable externally)
     void DoDeath(const size_t pos) { RemoveOrgAt(pos); }
@@ -945,7 +948,7 @@ namespace emp {
 
   // Give birth to a single offspring; return offspring position.
   template <typename ORG>
-  size_t World<ORG>::DoBirth(const ORG mem, size_t parent_pos) {
+  size_t World<ORG>::DoBirth(const ORG & mem, size_t parent_pos) {
     before_repro_sig.Trigger(parent_pos);
     Ptr<ORG> new_org = NewPtr<ORG>(mem);
     offspring_ready_sig.Trigger(*new_org);
@@ -957,7 +960,7 @@ namespace emp {
 
   // Give birth to (potentially) multiple offspring; no return, but triggers can be tracked.
   template <typename ORG>
-  void World<ORG>::DoBirth(const ORG mem, size_t parent_pos, size_t copy_count) {
+  void World<ORG>::DoBirth(const ORG & mem, size_t parent_pos, size_t copy_count) {
     before_repro_sig.Trigger(parent_pos);
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
