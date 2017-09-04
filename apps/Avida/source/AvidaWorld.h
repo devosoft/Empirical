@@ -51,8 +51,11 @@ public:
     inst_lib.AddInst("CopyVal", emp::AvidaGP::Inst_CopyVal, 2, "Copy reg Arg1 into reg Arg2");
     inst_lib.AddInst("ScopeReg", emp::AvidaGP::Inst_ScopeReg, 1, "Backup reg Arg1; restore at end of scope");
 
-    inst_lib.AddInst("Replicate", AvidaOrg::Inst_Replicate, 0,
-                     "Spend energy needed to reproduce Organism.");
+    inst_lib.AddInst("Replicate", AvidaOrg::Inst_Replicate, 0, "Spend energy needed to reproduce Organism.");
+
+    OnOrgPlacement( [this](size_t world_id){
+      pop[world_id]->SetWorldID(world_id);  // Tell organisms their position in environment.
+    } );
   }
   ~AvidaWorld() { ; }
 
