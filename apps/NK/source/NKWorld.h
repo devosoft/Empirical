@@ -74,6 +74,11 @@ struct NKWorld : public emp::World<BitOrg> {
     SetMutFun( mut_fun );
   }
 
+  void Reset() {
+    Clear();
+    Setup();
+  }
+
   void RunStep() {
     // Do mutations on the population.
     DoMutations(1);
