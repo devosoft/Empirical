@@ -19,7 +19,7 @@ EMP_BUILD_CONFIG( NKConfig,
 
 struct NKWorld : public emp::World<BitOrg> {
   NKConfig config;
-  emp::evo::NKLandscape landscape;
+  emp::NKLandscape landscape;
 
   uint32_t N;
   uint32_t K;
