@@ -9,9 +9,9 @@ using BitOrg = emp::BitVector;
 EMP_BUILD_CONFIG( NKConfig,
   GROUP(DEFAULT, "Default settings for NK model"),
   VALUE(K, uint32_t, 10, "Level of epistasis in the NK model"),
-  VALUE(N, uint32_t, 200, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
+  VALUE(N, uint32_t, 100, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
   VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
-  VALUE(POP_SIZE, uint32_t, 1000, "Number of organisms in the popoulation."),
+  VALUE(POP_SIZE, uint32_t, 100, "Number of organisms in the popoulation."),
   VALUE(MAX_GENS, uint32_t, 2000, "How many generations should we process?"),
   VALUE(MUT_COUNT, uint32_t, 3, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
   VALUE(TEST, std::string, "TestString", "This is a test string.")
@@ -19,7 +19,7 @@ EMP_BUILD_CONFIG( NKConfig,
 
 struct NKWorld : public emp::World<BitOrg> {
   NKConfig config;
-  emp::evo::NKLandscape landscape;
+  emp::NKLandscape landscape;
 
   uint32_t N;
   uint32_t K;
@@ -72,6 +72,11 @@ struct NKWorld : public emp::World<BitOrg> {
         return num_muts;
       };
     SetMutFun( mut_fun );
+  }
+
+  void Reset() {
+    Clear();
+    Setup();
   }
 
   void RunStep() {
