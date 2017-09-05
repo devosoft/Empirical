@@ -128,7 +128,7 @@ namespace evo {
   }
 
   template <typename C, typename RET_TYPE, typename ARG_TYPE>
-  emp::vector<RET_TYPE> RunFunctionOnContainer(std::function<RET_TYPE(ARG_TYPE)> & fun, C & elements) {
+  emp::vector<RET_TYPE> RunFunctionOnContainer(std::function<RET_TYPE(ARG_TYPE)> fun, C & elements) {
       emp::vector<RET_TYPE> results;
       for (auto element : elements){
           results.push_back(fun(element));
