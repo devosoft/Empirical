@@ -730,12 +730,17 @@ namespace web {
       return *this;
     }
   };
+}
+}
 
-  #include "_TableCell.h"
-  #include "_TableRow.h"
-  #include "_TableCol.h"
-  #include "_TableRowGroup.h"
-  #include "_TableColGroup.h"
+#include "_TableCell.h"
+#include "_TableRow.h"
+#include "_TableCol.h"
+#include "_TableRowGroup.h"
+#include "_TableColGroup.h"
+
+namespace emp {
+namespace web {
 
   // Fill out members of Table that require extra classes...
 
