@@ -9,6 +9,9 @@
  *  DO NOT include this file directly.  All files begining with '_' are for internal use only.
  */
 
+#ifndef EMP_WEB_TABLE_COL_H
+#define EMP_WEB_TABLE_COL_H
+
 namespace emp {
 namespace web {
 
@@ -56,3 +59,5 @@ namespace web {
 
 }
 }
+
+#endif
