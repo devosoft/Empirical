@@ -1,14 +1,16 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  The Signal class allows functions to be bundled and triggered enmasse.
-//
-//
-//  Developer notes:
-//  * Setup easier mechanism to control the order in which actions are triggered.
-//  * Signals should have default parameters so not all need be supplied when triggered.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  Action.h
+ *  @brief Allow functions to be bundled (as Actions) and triggered enmasse.
+ *  @note Status: Beta
+ *
+ *  @todo Setup easier mechanism to control the order in which actions are triggered.
+ *  @todo Signals should have default parameters so not all need be supplied when triggered.
+ */
+
 
 #ifndef EMP_CONTROL_SIGNAL
 #define EMP_CONTROL_SIGNAL
@@ -24,12 +26,13 @@
 
 namespace emp {
 
-  // SignalKey tracks a specific function triggered by a signal. For now, its just an integer.
+  /// SignalKey tracks a specific function triggered by a signal. For now, its just a value pair.
   class SignalKey {
   private:
-    uint32_t signal_id;
-    uint32_t key_id;
+    uint32_t signal_id;   ///< Which signal is this key associated with?
+    uint32_t key_id;      ///< Which key id is this.
 
+    // Internal function to compare two signal kays.
     int Compare(const SignalKey& in) const {
       if (signal_id < in.signal_id) return -1;
       if (signal_id > in.signal_id) return 1;
@@ -43,18 +46,30 @@ namespace emp {
     SignalKey & operator=(const SignalKey &) = default;
     ~SignalKey() { ; }
 
+    /// Are two signal keys identical?
     bool operator==(const SignalKey& in) const { return Compare(in) == 0; }
+
+    /// Are two signal keys different?
     bool operator!=(const SignalKey& in) const { return Compare(in) != 0; }
+
     bool operator<(const SignalKey& in)  const { return Compare(in) < 0; }
     bool operator>(const SignalKey& in)  const { return Compare(in) > 0; }
     bool operator<=(const SignalKey& in) const { return Compare(in) <= 0; }
     bool operator>=(const SignalKey& in) const { return Compare(in) >= 0; }
 
+    /// What is the KeyID associated with this signal key.
     uint32_t GetID() const { return key_id; }
+
+    /// What is the ID of the signal that this key is associated with.
     uint32_t GetSignalID() const { return signal_id; }
+
+    /// Is this key currently pointing to a signal action?
     bool IsActive() const { return key_id > 0; }
 
+    /// Set this key to specified values.
     void Set(uint32_t _kid=0, uint32_t _sid=0) { signal_id = _sid; key_id = _kid; }
+
+    /// Clear this key.
     void Clear() { signal_id = 0; key_id = 0; }
 
     operator bool() { return key_id > 0; }
@@ -78,18 +93,18 @@ namespace emp {
     };
   }
 
-  // Base class for all signals.
+  /// Base class for all signals.
   class SignalBase {
     friend class SignalManager;  // Allow SignalManager to alter internals of a signal.
   protected:
     using man_t = internal::SignalManager_Base;
 
-    std::string name;                          // What is the unique name of this signal?
-    uint32_t signal_id;                        // What is the unique ID of this signal?
-    uint32_t next_link_id;                     // What ID shouild the next link have?
-    std::map<SignalKey, size_t> link_key_map;  // Map unique link keys to link index for actions.
-    emp::vector<man_t *> managers;             // What manager is handling this signal?
-    man_t * prime_manager;                     // Which manager leads deletion? (nullptr for self)
+    std::string name;                          ///< What is the unique name of this signal?
+    uint32_t signal_id;                        ///< What is the unique ID of this signal?
+    uint32_t next_link_id;                     ///< What ID shouild the next link have?
+    std::map<SignalKey, size_t> link_key_map;  ///< Map unique link keys to link index for actions.
+    emp::vector<man_t *> managers;             ///< What manager is handling this signal?
+    man_t * prime_manager;                     ///< Which manager leads deletion? (nullptr for self)
 
     // Helper Functions
     // @CAO FIX!!!
@@ -133,14 +148,14 @@ namespace emp {
     bool Has(SignalKey key) const { return emp::Has(link_key_map, key); }
   };
 
-  // Generic version of Signals.
+  /// Generic version of Signals; needs specialization to a function type..
   template <typename... ARGS> class Signal;
 
-  // Signals with void return.
+  /// Signals with void return.
   template <typename... ARGS>
   class Signal<void(ARGS...)> : public SignalBase {
   protected:
-    FunctionSet<void(ARGS...)> actions;
+    FunctionSet<void(ARGS...)> actions;  ///< Set of functions (actions) to be triggered with this signal.
   public:
     using fun_t = void(ARGS...);
     using this_t = Signal<fun_t>;
