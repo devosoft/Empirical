@@ -1,18 +1,15 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  The Action class provides a simple mechanism to abstract functions from their
-//  underlying type and provide run-time names.
-//
-//  Actions can be a bit heavyweight, but can easily be converted to more lightweight
-//  std:function objects.
-//
-//
-//  Developer notes:
-//  * Create an ActionDefaults class that can take fewer args than expected and fill in rest.
-//  * Allow for named arguments?
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  Action.h
+ *  @brief A mechanism to abstract functions from their underlying type and provide run-time names.
+ *  @note Status: Beta
+ *
+ *  @todo Create an ActionDefaults class that can take fewer args than expected and fill in rest.
+ *  @todo Allow for named arguments to facilite intepreted functions.
+ */
 
 #ifndef EMP_CONTROL_ACTION
 #define EMP_CONTROL_ACTION
@@ -22,9 +19,15 @@
 
 namespace emp {
 
+  /// BaseActions abstract functions and allow for signals to be setup at runtime; they can be
+  /// called with types specified in the call.
+  ///
+  /// Actions can be a bit heavyweight, but can easily be converted to more lightweight
+  /// std:function objects.
+
   class ActionBase {
   protected:
-    std::string name;
+    std::string name;  //< A unique name for this action so it can be called at runtime.
 
     ActionBase(const std::string & in_name) : name(in_name) { ; }
 
@@ -39,10 +42,12 @@ namespace emp {
     const std::string & GetName() const { return name; }
     virtual size_t GetArgCount() const = 0;
 
-    // Clone() will produce a pointer to a full copy of an Action, going through derived version.
+    /// Clone() will produce a pointer to a full copy of an Action, going through derived version.
     virtual ActionBase * Clone() const = 0;
   };
 
+  /// ActionSize is a second layer of abstract actions that know the number of arguments used at compile
+  /// time to facilitate easy type-checking.
   template <size_t ARG_COUNT>
   class ActionSize : public ActionBase {
   protected:
@@ -51,12 +56,16 @@ namespace emp {
     size_t GetArgCount() const { return ARG_COUNT; }
   };
 
+  /// The declaration for Action has any template types; the only definined specilizations require
+  /// a function type to be specified (with void and non-void return type variants.)
   template <typename... ARGS> class Action;
 
+  /// This Action class specialization takes a function with a void return tyime and builds it off
+  /// of the action base classes.
   template <typename... ARGS>
   class Action<void(ARGS...)> : public ActionSize<sizeof...(ARGS)> {
   protected:
-    std::function<void(ARGS...)> fun;
+    std::function<void(ARGS...)> fun;  //< The specific function associated with this action.
   public:
     using this_t = Action<void(ARGS...)>;
     using parent_t = ActionSize<sizeof...(ARGS)>;
@@ -81,10 +90,12 @@ namespace emp {
   };
 
 
+  /// This Action class specialization takes a function with any non-void return tyime and builds it
+  /// off of the action base classes.
   template <typename RETURN, typename... ARGS>
   class Action<RETURN(ARGS...)> : public ActionSize<sizeof...(ARGS)> {
   protected:
-    std::function<RETURN(ARGS...)> fun;
+    std::function<RETURN(ARGS...)> fun;  //< The specific function associated with this action.
   public:
     using fun_t = RETURN(ARGS...);
     using this_t = Action<fun_t>;
