@@ -1,10 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file defines the ActionManager class, which collects sets of Actions to be looked up
-//  or manipulated later.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  Action.h
+ *  @brief ActionManager collects sets of Actions to be looked up or manipulated later.
+ *  @note Status: Beta
+ */
 
 #ifndef EMP_CONTROL_ACTION_MANAGER
 #define EMP_CONTROL_ACTION_MANAGER
@@ -20,9 +22,9 @@ namespace emp {
 
   class ActionManager {
   private:
-    std::unordered_map<std::string, ActionBase *> action_map;
-    int next_id=1;
-    std::string prefix = "emp_action_";
+    std::unordered_map<std::string, ActionBase *> action_map;  ///< A set of all actions handled by manager.
+    int next_id=1;                                             ///< Unique ID for next new function.
+    std::string prefix = "emp_action_";                        ///< Prefix for function names to keep unique.
 
   public:
     ActionManager() : action_map() { ; }
@@ -35,19 +37,26 @@ namespace emp {
     }
     ~ActionManager() { for (auto & x : action_map) delete x.second; }
 
+    /// Get the ID to be used for the next new function.
     int GetNextID() const { return next_id; }
+
+    /// How many actions are in this manager?
     size_t GetSize() const { return action_map.size(); }
 
+    /// Look up an action with the specified name
     ActionBase & operator[](const std::string & name) {
       emp_assert(action_map.find(name) != action_map.end());
       return *(action_map[name]);
     }
+
+    /// Look up an action with the specified name (const version)
     const ActionBase & operator[](const std::string & name) const {
       auto it = action_map.find(name);
       emp_assert(it != action_map.end());
       return *(it->second);
     }
 
+    /// Add a functon to this manager with a pre-specified name.
     template <typename RETURN, typename... ARGS>
     auto & Add(const std::function<RETURN(ARGS...)> & in_fun, const std::string & name) {
       // Create the new action, save it, and return it.
@@ -56,6 +65,7 @@ namespace emp {
       return *new_action;
     }
 
+    /// Add a function to this manager with an auto-generated name.
     template <typename RETURN, typename... ARGS>
     auto & Add(const std::function<RETURN(ARGS...)> & in_fun) {
       std::string name(prefix);
@@ -63,12 +73,14 @@ namespace emp {
       return Add(in_fun, name);
     }
 
+    /// Add an action to this manager.
     auto & Add(const ActionBase & action) {
       auto * new_action = action.Clone();
       action_map[action.GetName()] = new_action;
       return *new_action;
     }
 
+    /// Print out the name of all actions maintained by this manager.
     void PrintNames(std::ostream & os=std::cout) {
       os << action_map.size() << " actions found:\n";
       for (auto & x : action_map) os << "  " << x.first << std::endl;
