@@ -27,7 +27,7 @@ namespace emp {
 
   class ActionBase {
   protected:
-    std::string name;  //< A unique name for this action so it can be called at runtime.
+    std::string name;  ///< A unique name for this action so it can be called at runtime.
 
     ActionBase(const std::string & in_name) : name(in_name) { ; }
 
@@ -39,7 +39,10 @@ namespace emp {
   public:
     virtual ~ActionBase() { ; }
 
+    /// Get the name of this action.
     const std::string & GetName() const { return name; }
+
+    /// Get number of arguments this action takes.
     virtual size_t GetArgCount() const = 0;
 
     /// Clone() will produce a pointer to a full copy of an Action, going through derived version.
@@ -65,7 +68,7 @@ namespace emp {
   template <typename... ARGS>
   class Action<void(ARGS...)> : public ActionSize<sizeof...(ARGS)> {
   protected:
-    std::function<void(ARGS...)> fun;  //< The specific function associated with this action.
+    std::function<void(ARGS...)> fun;  ///< The specific function associated with this action.
   public:
     using this_t = Action<void(ARGS...)>;
     using parent_t = ActionSize<sizeof...(ARGS)>;
@@ -84,8 +87,10 @@ namespace emp {
 
     const std::function<void(ARGS...)> & GetFun() const { return fun; };
 
+    /// Call the function associated with this action.
     void Call(ARGS &&... args) { return fun(std::forward<ARGS>(args)...); }
 
+    /// Build a copy of this Action.
     this_t * Clone() const { return new this_t(*this); }
   };
 
@@ -95,7 +100,7 @@ namespace emp {
   template <typename RETURN, typename... ARGS>
   class Action<RETURN(ARGS...)> : public ActionSize<sizeof...(ARGS)> {
   protected:
-    std::function<RETURN(ARGS...)> fun;  //< The specific function associated with this action.
+    std::function<RETURN(ARGS...)> fun;  ///< The specific function associated with this action.
   public:
     using fun_t = RETURN(ARGS...);
     using this_t = Action<fun_t>;
@@ -111,12 +116,14 @@ namespace emp {
 
     const std::function<fun_t> & GetFun() const { return fun; };
 
+    /// Call the function associated with this action.
     RETURN Call(ARGS &&... args) { return fun(std::forward<ARGS>(args)...); }
 
+    /// Build a copy of this Action.
     this_t * Clone() const { return new this_t(*this); }
   };
 
-
+  /// Build an action object using this function.
   template <typename RETURN, typename... ARGS>
   auto make_action(const std::function<RETURN(ARGS...)> & in_fun, const std::string & name="") {
     return Action<RETURN(ARGS...)>(in_fun, name);
