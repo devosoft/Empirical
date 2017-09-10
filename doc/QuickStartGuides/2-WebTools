@@ -8,12 +8,12 @@ properly refer to and modify the same component.
 
 === A Simple Example ===
 
-In order to get a simple example working, we need:
+In order to get a simple example working, you need:
 * An HTML file (the default version is effective in most cases)
 * The C++ code file to actually control the web page
-* The necessary flags to compile (again, the default version should work.
+* The necessary flags to compile (again, the default version should work.)
 
-These can be found in examples/web/ in the files Example.html, Example.cc and Makefile.
+The required files are all in examples/web/ called Example.html, Example.cc and Makefile.
 
 Here is Example.html:
 
@@ -31,11 +31,11 @@ Here is Example.html:
   </body>
   </html>
 
-The only portions of this file that need to be customized for your project are the title (what
-Title do you want your web page to have?) and change Example.js to the name of the js file that
-you want to generate.  The div (named "emp_base") is where we will hook Empirical to this web
-page.  You MAY add more divs to control or customize any aspects of this file's CSS as well, but
-none of this is required for developing an interface, and most of it can be controlled via C++.
+The only portions of this file that should be customized for your project are the title (in
+the "<title>" tags) and the JavaScript file (change Example.js to the name of the js file that
+you want to generate).  The div, named "emp_base", is where we will hook Empirical to this web
+page.  You MAY add more divs to control or customize any aspects of this file's CSS, but none
+of this is required for developing an interface, and most of it can be controlled via C++.
 
 Here is the Example.cc file:
 
@@ -60,7 +60,7 @@ other function and does not force the termination of the execution.
 Now that we have the two files we need, the only other thing we need to do is compile.  The
 provided Makefile can be run by typing "make Example.js".  This will trigger:
 
-  emcc -std=c++14 -Wall -Wno-unused-function -I../../source/ -Os -DNDEBUG
+  emcc -std=c++14 -Wall -Wno-unused-function -I../../source/ -Os
   -s TOTAL_MEMORY=67108864 --js-library ../../source/web/library_emp.js
   -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
   Example.cc -o Example.js
@@ -72,7 +72,6 @@ Emscripten uses the emcc compiler (or "em++", since we are using C++).
  -I../../source/ : The compiled file is two directories up in the Empiricial library, so 
     this flag properly includes the source files.
  -Os : optimize for size, though -O3 may perform better in some situations
- -DNDEBUG : turn off debugging for a faster executable
  -s TOTAL_MEMORY=67108864 : Make sure we have enough memory; in this case reserve 64 MB
  --js-library ../../source/web/library_emp.js : Load Empirical JS functions that we might need.
  -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" : Make sure we can run the C++ functions
@@ -83,6 +82,10 @@ Emscripten uses the emcc compiler (or "em++", since we are using C++).
 want to produce ("Example.js").  The majority of these flags shouldn't change from one
 compilation to the next, other than chaning optimization to debugging options, which we'll
 cover in the debugging guide.
+
+If you want to speed things up further, you may also want to add the compiler option
+
+ -DNDEBUG : turn off debugging for a faster executable
 
 To test the results, open "Example.html" in your web browser!
 
