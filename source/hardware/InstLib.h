@@ -106,6 +106,10 @@ namespace emp {
       return '+';
     }
 
+    bool IsInst(const std::string name) const {
+        return Has(name_map, name);
+    }
+
     /// Return the ID of the instruction that has the specified name.
     size_t GetID(const std::string & name) const {
       emp_assert(Has(name_map, name), name);

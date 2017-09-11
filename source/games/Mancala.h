@@ -126,6 +126,11 @@ namespace emp {
       return DoMove(cell);
     }
 
+    void SetBoard(side_t a, side_t b) {
+        boardA = a;
+        boardB = b;
+    }
+
     bool IsDone() const { return over; }
 
     bool IsMoveValid(size_t move) const {

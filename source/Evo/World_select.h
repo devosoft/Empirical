@@ -13,6 +13,7 @@
 #include "../base/assert.h"
 #include "../base/vector.h"
 #include "../tools/IndexMap.h"
+#include "../tools/Random.h"
 
 namespace emp {
 
@@ -103,6 +104,9 @@ namespace emp {
 
   /// ==LEXICASE== Selection runs through multiple fitness functions in a random order for
   /// EACH offspring produced.
+  /// @param world The emp::World object with the organisms to be selected.
+  /// @param fit_funs The set of fitness functions to shuffle for each organism reproduced.
+  /// @param repro_count How many rounds of repliction should we do.
   template<typename ORG>
   void LexicaseSelect(World<ORG> & world,
                       const emp::vector< std::function<double(const ORG &)> > & fit_funs,
