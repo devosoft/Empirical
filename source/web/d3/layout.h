@@ -7,7 +7,7 @@
 #include "svg_shapes.h"
 
 #include "../../tools/tuple_struct.h"
-#include "../../web/JSWrap.h"
+#include "../JSWrap.h"
 
 #include <functional>
 #include <array>

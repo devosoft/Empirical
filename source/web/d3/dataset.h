@@ -5,8 +5,8 @@
 
 #include "d3_init.h"
 
-#include "../../web/JSWrap.h"
-#include "../../web/js_utils.h"
+#include "../JSWrap.h"
+#include "../js_utils.h"
 #include "../../tools/string_utils.h"
 
 namespace D3 {
