@@ -22,7 +22,6 @@
 #include "../meta/type_traits.h"
 
 namespace emp {
-namespace evo {
 
   // Calculates Shannon Entropy of the members of the container passed
   template <typename C>
@@ -150,7 +149,6 @@ namespace evo {
       return results;
   } */
 
-}
 }
 
 #endif
