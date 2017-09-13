@@ -23,7 +23,7 @@
 
 namespace emp {
 
-  // Calculates Shannon Entropy of the members of the container passed
+  /// Calculates Shannon Entropy of the members of the container passed
   template <typename C>
   typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value, double>::type
   ShannonEntropy(C & elements) {
@@ -48,8 +48,8 @@ namespace emp {
     return -1 * result;
   }
 
-  // Calculates Shannon Entropy of the members of the container when those members
-  // are pointers
+  /// Calculates Shannon Entropy of the members of the container when those members
+  /// are pointers
   template <typename C>
   typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value, double>::type
   ShannonEntropy(C & elements) {
@@ -75,7 +75,7 @@ namespace emp {
     return -1 * result;
   }
 
-  // Calculates number of unique elements in the container passed
+  /// Calculates number of unique elements in the container passed
   template <typename C>
   typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value, int>::type
   UniqueCount(C & elements) {
@@ -85,7 +85,7 @@ namespace emp {
     return unique_elements.size();
   }
 
-  // Calculates number of unique elements in the container of pointers passed
+  /// Calculates number of unique elements in the container of pointers passed
   template <typename C>
   typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value, int>::type
   UniqueCount(C & elements) {
@@ -99,8 +99,8 @@ namespace emp {
     return unique_elements.size();
   }
 
-  // Takes a function and a container of items that that function can be run on
-  // and returns the maximum value
+  /// Takes a function and a container of items that that function can be run on
+  /// and returns the maximum value
   template <typename C, typename RET_TYPE, typename ARG_TYPE>
   RET_TYPE MaxFunctionReturn(std::function<RET_TYPE(ARG_TYPE)> & fun, C & elements){
     double highest = 0;
@@ -113,8 +113,8 @@ namespace emp {
     return highest;
   }
 
-  // Takes a function and a container of items that that function can be run on
-  // and returns the average value. Function must return a double.
+  /// Takes a function and a container of items that that function can be run on
+  /// and returns the average value. Function must return a double.
   template <typename C, typename ARG_TYPE>
   double AverageFunctionReturn(std::function<double(ARG_TYPE)> & fun, C & elements){
     double cumulative_value = 0;
@@ -126,6 +126,7 @@ namespace emp {
     return (cumulative_value / count);
   }
 
+  /// Run a function on all elements of a container and return the vector of results.
   template <typename C, typename RET_TYPE, typename ARG_TYPE>
   emp::vector<RET_TYPE> RunFunctionOnContainer(std::function<RET_TYPE(ARG_TYPE)> & fun, C & elements) {
       emp::vector<RET_TYPE> results;
