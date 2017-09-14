@@ -15,12 +15,14 @@
 #include <sstream>
 
 #include "color_map.h"
+#include "Style.h"
 
 namespace emp {
+namespace web {
 
   /// Maintain information about an HTML font.
   class Font {
-  private:
+  protected:
     std::string family;     ///< Font family to use.
     int size;               ///< Font size (in px) to use.
     std::string color;      ///< Font color.
@@ -69,6 +71,24 @@ namespace emp {
     Font & SetStrikethrough(bool _in = true) { is_linethrough = _in; return *this; }
     Font & SetWavyLine(bool _in = true) { is_wavy_line = _in; return *this; }
 
+    /// Take a Style object an fill it out based on this font information.
+    void ConfigStyle(Style & style) const {
+      style.Set("color", color)
+           .Set("font-family", family)
+           .Set("font-size", size);
+      if (is_bold) style.Set("font-weight", "bold");
+      if (is_italic) style.Set("font-style", "italic");
+      if (HasLine()) {
+        std::string decoration("");
+        if (is_underlined) decoration += " underline";
+        if (is_overlined) decoration += " overline";
+        if (is_linethrough) decoration += " line-through";
+        if (line_color != "") { decoration += " "; decoration += line_color; }
+        if (is_wavy_line) decoration += " wavy";
+        style.Set("text-decoration", decoration);
+      }
+    }
+
     std::string GetHTMLStart() {
       std::stringstream ss;
       ss << "<span style=\"color:" << color
@@ -104,6 +124,8 @@ namespace emp {
     }
     bool operator!=(const Font & _in) const { return !operator==(_in); }
   };
-};
+
+}
+}
 
 #endif
