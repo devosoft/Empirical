@@ -12,6 +12,7 @@
 
 #include <map>
 #include <string>
+#include <unordered_set>
 
 #include "../base/array.h"
 #include "../base/vector.h"
@@ -36,20 +37,22 @@ namespace emp {
     using inst_t = typename hardware_t::inst_t;
     using genome_t = emp::vector<inst_t>;
     using arg_t = ARG_T;
-    using fun_t = std::function<void(hardware_t &, const emp::array<arg_t, ARG_COUNT> &)>;
+    using fun_t = std::function<void(hardware_t &, const inst_t &)>;
+    using inst_properties_t = std::unordered_set<std::string>;
 
     struct InstDef {
-      std::string name;       ///< Name of this instruction.
-      fun_t fun_call;         ///< Function to call when executing.
-      size_t num_args;        ///< Number of args needed by function.
-      std::string desc;       ///< Description of function.
-      ScopeType scope_type;   ///< How does this instruction affect scoping?
-      size_t scope_arg;       ///< Which arg indictes new scope (if any).
+      std::string name;             ///< Name of this instruction.
+      fun_t fun_call;               ///< Function to call when executing.
+      size_t num_args;              ///< Number of args needed by function.
+      std::string desc;             ///< Description of function.
+      ScopeType scope_type;         ///< How does this instruction affect scoping?
+      size_t scope_arg;             ///< Which arg indictes new scope (if any).
+      inst_properties_t properties; ///< Are there any generic properties associated with this inst def?
 
       InstDef(const std::string & _n, fun_t _fun, size_t _args, const std::string & _d,
-              ScopeType _s_type, size_t _s_arg)
+              ScopeType _s_type, size_t _s_arg, const inst_properties_t & _properties = inst_properties_t())
         : name(_n), fun_call(_fun), num_args(_args), desc(_d)
-        , scope_type(_s_type), scope_arg(_s_arg) { ; }
+        , scope_type(_s_type), scope_arg(_s_arg), properties(_properties) { ; }
       InstDef(const InstDef &) = default;
     };
 
@@ -85,6 +88,12 @@ namespace emp {
 
     /// If this instruction alters scope, identify which argument does so.
     size_t GetScopeArg(size_t id) const { return inst_lib[id].scope_arg; }
+
+    /// Return the set of properties for the provided instruction ID.
+    const inst_properties_t & GetProperties(size_t id) const { return inst_lib[id].properties; }
+
+    /// Does the given instruction ID have the given property value?
+    bool HasProperty(size_t id, std::string property) const { return inst_lib[id].properties.count(property); }
 
     /// Get the number of instructions in this set.
     size_t GetSize() const { return inst_lib.size(); }
@@ -133,10 +142,11 @@ namespace emp {
                  size_t num_args=0,
                  const std::string & desc="",
                  ScopeType scope_type=ScopeType::NONE,
-                 size_t scope_arg=(size_t) -1)
+                 size_t scope_arg=(size_t) -1,
+                 const inst_properties_t & inst_properties=inst_properties_t())
     {
       const size_t id = inst_lib.size();
-      inst_lib.emplace_back(name, fun_call, num_args, desc, scope_type, scope_arg);
+      inst_lib.emplace_back(name, fun_call, num_args, desc, scope_type, scope_arg, inst_properties);
       inst_funs.emplace_back(fun_call);
       name_map[name] = id;
     }
@@ -149,7 +159,7 @@ namespace emp {
 
     /// Precess a specified instruction in the provided hardware.
     void ProcessInst(hardware_t & hw, const inst_t & inst) const {
-      inst_funs[inst.id](hw, inst.args);
+      inst_funs[inst.id](hw, inst);
     }
 
     /// Write out a full genome to the provided ostream.
