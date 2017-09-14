@@ -1,9 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Maintains basic information about a font to be used in HTML.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  Font.h
+ *  @brief Maintains basic information about a font to be used in HTML.
+ */
+
 
 #ifndef EMP_FONT_H
 #define EMP_FONT_H
@@ -15,14 +18,15 @@
 
 namespace emp {
 
+  /// Maintain information about an HTML font.
   class Font {
   private:
-    std::string family;
-    int size;
-    std::string color;
-    
-    bool is_bold;
-    bool is_italic;
+    std::string family;  ///< Font family to use.
+    int size;            ///< Font size (in px) to use.
+    std::string color;   ///< Font color.
+
+    bool is_bold;        ///< Is this font bold?
+    bool is_italic;      ///< Is this font itaic?
 
   public:
     Font(const Font &) = default;
@@ -34,8 +38,8 @@ namespace emp {
       : family("Helvetica"), size(_size), color(_color), is_bold(_bold), is_italic(_italic)  { ; }
     ~Font() { ; }
 
-    const Font & operator=(const Font &) = default;
-    const Font & operator=(Font &&) = default;
+    Font & operator=(const Font &) = default;
+    Font & operator=(Font &&) = default;
 
     const std::string & GetFamily() const { return family; }
     int GetSize() const { return size; }
