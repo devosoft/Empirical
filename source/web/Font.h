@@ -21,21 +21,28 @@ namespace emp {
   /// Maintain information about an HTML font.
   class Font {
   private:
-    std::string family;  ///< Font family to use.
-    int size;            ///< Font size (in px) to use.
-    std::string color;   ///< Font color.
+    std::string family;     ///< Font family to use.
+    int size;               ///< Font size (in px) to use.
+    std::string color;      ///< Font color.
+    std::string line_color; ///< Color of lines through the text (underline, linethrough, etc.)
 
-    bool is_bold;        ///< Is this font bold?
-    bool is_italic;      ///< Is this font itaic?
+    bool is_bold;           ///< Is this font bold?
+    bool is_italic;         ///< Is this font itaic?
+    bool is_underlined;     ///< Should this text be underlined?
+    bool is_overlined;      ///< Should this text have a line above it?
+    bool is_linethrough;    ///< Should this text have a line through it?
+    bool is_wavy_line;      ///< Should lines be made wavy?
 
   public:
     Font(const Font &) = default;
     Font(Font &&) = default;
     Font(const std::string & _family="Helvetica", int _size=30,
-	 const std::string & _color="black", bool _bold=false, bool _italic=false)
-      : family(_family), size(_size), color(_color), is_bold(_bold), is_italic(_italic)  { ; }
+	       const std::string & _color="black", bool _bold=false, bool _italic=false)
+      : family(_family), size(_size), color(_color)
+      , is_bold(_bold), is_italic(_italic)
+      , is_underlined(false), is_overlined(false), is_linethrough(false), is_wavy_line(false)  { ; }
     Font(int _size, const std::string & _color="black", bool _bold=false, bool _italic=false)
-      : family("Helvetica"), size(_size), color(_color), is_bold(_bold), is_italic(_italic)  { ; }
+      : Font("Helvetica", _size, _color, _bold, _italic)  { ; }
     ~Font() { ; }
 
     Font & operator=(const Font &) = default;
@@ -46,12 +53,21 @@ namespace emp {
     const std::string & GetColor() const { return color; }
     bool IsBold() const { return is_bold; }
     bool IsItalic() const { return is_italic; }
+    bool IsUnderlined() const { return is_underlined; }
+    bool IsOverlined() const { return is_overlined; }
+    bool IsStrikethrough() const { return is_linethrough; }
+    bool IsWavyLine() const { return is_wavy_line; }
+    bool HasLine() const { return is_underlined || is_overlined || is_linethrough; }
 
     Font & SetFamily(const std::string & _family) { family = _family; return *this; }
     Font & SetSize(int _size) { size = _size; return *this; }
     Font & SetColor(const std::string & _color) { color = _color; return *this; }
     Font & SetBold(bool _in=true) { is_bold = _in; return *this; }
     Font & SetItalic(bool _in=true) { is_italic = _in; return *this; }
+    Font & SetUnderlined(bool _in = true) { is_underlined = _in; return *this; }
+    Font & SetOverlined(bool _in = true) { is_overlined = _in; return *this; }
+    Font & SetStrikethrough(bool _in = true) { is_linethrough = _in; return *this; }
+    Font & SetWavyLine(bool _in = true) { is_wavy_line = _in; return *this; }
 
     std::string GetHTMLStart() {
       std::stringstream ss;
@@ -60,14 +76,31 @@ namespace emp {
          << "; font-size:" << size;
       if (is_bold) ss << "; font-weight:bold";
       if (is_italic) ss << "; font-style:italic";
+      if (HasLine()) {
+        ss << "; text-decoration:";
+        if (is_underlined) ss << " underline";
+        if (is_overlined) ss << " overline";
+        if (is_linethrough) ss << " line-through";
+        if (line_color != "") ss << " " << line_color;
+        if (is_wavy_line) ss << " wavy";
+      }
       ss << "\">";
       return ss.str();
     }
     std::string GetHTMLEnd() { return "</span>"; }
 
     bool operator==(const Font & _in) const {
-      return (family == _in.family) && (size == _in.size) && (color == _in.color)
-      && (is_bold == _in.is_bold) && (is_italic == _in.is_italic);
+      return (family == _in.family)
+        && (size == _in.size)
+        && (color == _in.color)
+        && (line_color == _in.line_color)
+        && (is_bold == _in.is_bold)
+        && (is_italic == _in.is_italic)
+        && (is_underlined == _in.is_underlined)
+        && (is_overlined == _in.is_overlined)
+        && (is_linethrough == _in.is_linethrough)
+        && (is_wavy_line == _in.is_wavy_line)
+        ;
     }
     bool operator!=(const Font & _in) const { return !operator==(_in); }
   };
