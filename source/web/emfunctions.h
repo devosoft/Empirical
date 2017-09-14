@@ -1,6 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  emfunctions.h
+ *  @brief Specialized, useful function for Empirical.
+ */
 
 #ifndef EMP_EM_FUNCTIONS_H
 #define EMP_EM_FUNCTIONS_H
@@ -15,6 +20,7 @@ namespace emp {
 
 #define AlertVar(VAR) emp::Alert(std::string(#VAR) + std::string("=") + std::to_string(VAR))
 
+  /// Call a function after a specified amount of time.
   static void DelayCall(const std::function<void()> & in_fun, int delay) {
     uint32_t callback_id = JSWrapOnce(in_fun); // Wrap and dispose when called.
     (void)callback_id;
@@ -23,8 +29,7 @@ namespace emp {
       }, callback_id, delay);
   }
 
-  // Two versions of OnResize depending on whether the new size is desired as inputs.
-
+  /// Provide a function to call whenever a window's size changes (no arguments).
   static void OnResize(const std::function<void()> & in_fun) {
     uint32_t callback_id = JSWrap(in_fun);
     (void)callback_id;
@@ -33,6 +38,7 @@ namespace emp {
       }, callback_id);
   }
 
+  /// Provide a function to call whenever a window's size changes (new size as arguments)
   static void OnResize(const std::function<void(int,int)> & in_fun) {
     uint32_t callback_id = JSWrap(in_fun);
     (void)callback_id;
@@ -43,11 +49,16 @@ namespace emp {
       }, callback_id);
   }
 
+  /// Get the current time, as provided by the web browser.
   inline double GetTime() { return EM_ASM_DOUBLE_V({ return (new Date()).getTime(); }); }
 
+  /// Determine with width of the current window.
   inline int GetWindowInnerWidth() { return EM_ASM_INT_V({ return window.innerWidth; }); }
+
+  /// Determine with height of the current window.
   inline int GetWindowInnerHeight() { return EM_ASM_INT_V({ return window.innerHeight; }); }
 
+  /// Set the background color of this web page.
   static void SetBackgroundColor(const std::string color) {
     EM_ASM_ARGS({
         var color = Pointer_stringify($0);
