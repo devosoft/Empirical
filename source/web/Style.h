@@ -61,7 +61,9 @@ namespace web {
   public:
     Style() { ; }
     Style(const Style &) = default;
+    Style(Style &&) = default;
     Style & operator=(const Style &) = default;
+    Style & operator=(Style &&) = default;
 
     size_t GetSize() const { return settings.size(); }
 
