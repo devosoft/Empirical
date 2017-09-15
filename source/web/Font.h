@@ -53,6 +53,7 @@ namespace web {
     const std::string & GetFamily() const { return family; }
     int GetSize() const { return size; }
     const std::string & GetColor() const { return color; }
+    const std::string & GetLineColor() const { return line_color; }
     bool IsBold() const { return is_bold; }
     bool IsItalic() const { return is_italic; }
     bool IsUnderlined() const { return is_underlined; }
@@ -64,6 +65,7 @@ namespace web {
     Font & SetFamily(const std::string & _family) { family = _family; return *this; }
     Font & SetSize(int _size) { size = _size; return *this; }
     Font & SetColor(const std::string & _color) { color = _color; return *this; }
+    Font & SetLineColor(const std::string & _color) { line_color = _color; return *this; }
     Font & SetBold(bool _in=true) { is_bold = _in; return *this; }
     Font & SetItalic(bool _in=true) { is_italic = _in; return *this; }
     Font & SetUnderlined(bool _in = true) { is_underlined = _in; return *this; }
@@ -73,9 +75,9 @@ namespace web {
 
     /// Take a Style object an fill it out based on this font information.
     void ConfigStyle(Style & style) const {
-      style.Set("color", color)
-           .Set("font-family", family)
-           .Set("font-size", size);
+      style.Set("color", color);
+      style.Set("font-family", family);
+      style.Set("font-size", to_string(size,"px"));
       if (is_bold) style.Set("font-weight", "bold");
       if (is_italic) style.Set("font-style", "italic");
       if (HasLine()) {
@@ -87,6 +89,12 @@ namespace web {
         if (is_wavy_line) decoration += " wavy";
         style.Set("text-decoration", decoration);
       }
+    }
+
+    Style AsStyle() const {
+      Style style;
+      ConfigStyle(style);
+      return style;
     }
 
     std::string GetHTMLStart() {
