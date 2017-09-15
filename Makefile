@@ -1,4 +1,5 @@
 doc: build-doxygen-xml
+	doxygen
 	cd doc && make html
 
 build-doxygen-xml:
