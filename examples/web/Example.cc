@@ -10,4 +10,5 @@ UI::Document doc("emp_base");
 
 int main()
 {
+  doc << "<h1>Hello World!</h1>";
 }

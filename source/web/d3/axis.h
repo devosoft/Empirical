@@ -1,7 +1,7 @@
 #ifndef __AXIS_H__
 #define __AXIS_H__
 
-#include "../../web/js_utils.h"
+#include "../js_utils.h"
 #include "../../tools/string_utils.h"
 
 #include "d3_init.h"
@@ -19,6 +19,7 @@ namespace D3 {
     std::string label;
     std::string dom_id = "";
     std::string label_offset = "";
+    std::string orientation;
 
   public:
 
@@ -35,15 +36,38 @@ namespace D3 {
     ///
     /// For example, if your label was "Per capita mortality", you could select the axis with:
     /// `D3::Select("#Percapitamortality_axis");`.
-    Axis(std::string label = "") {
+    Axis(std::string type, std::string label = "") {
       //The scale got added to th the list of objects before this one
       this->label = label;
-      EM_ASM_ARGS({js.objects[$0] = d3.svg.axis();}, this->id);
+      this->orientation = type;
+      if (type == "left") {
+          EM_ASM_ARGS({
+              js.objects[$0] = d3.axisLeft(js.objects[$1]);
+          }, this->id, scale.GetID());
+      } else if (type == "right") {
+          EM_ASM_ARGS({
+              js.objects[$0] = d3.axisRight(js.objects[$1]);
+          }, this->id, scale.GetID());
+      } else if (type == "bottom") {
+          EM_ASM_ARGS({
+              js.objects[$0] = d3.axisBottom(js.objects[$1]);
+          }, this->id, scale.GetID());
+      } else if (type == "top") {
+        EM_ASM_ARGS({
+            js.objects[$0] = d3.axisTop(js.objects[$1]);
+        }, this->id, scale.GetID());
+      } else {
+          std::cout << "WARNING: Invalid type given to axis constructor" << std::endl;
+          EM_ASM_ARGS({
+              js.objects[$0] = d3.axisBottom(js.objects[$1]);
+          }, this->id, scale.GetID());
+      }
+
     }
 
     /// Draw axis on [selection] (must contain a single SVG element) with intelligent default
     /// positioning
-    void Draw(Selection selection){
+    Axis& Draw(Selection & selection){
       //this->SetTickFormat("g");
 
       //Dom ids can't contain whitespace
@@ -53,29 +77,30 @@ namespace D3 {
 
       EM_ASM_ARGS({
         var axis_range = js.objects[$0].scale().range();
-	    js.objects[$3] = js.objects[$1].append("g")
-                                  .attr("id", Pointer_stringify($2))
+	    js.objects[$3] = js.objects[$1].append("g");
+
+        js.objects[$3].append("g").attr("id", Pointer_stringify($2))
                                   .call(js.objects[$0]);
 
         var canvas_width = js.objects[$1].attr("width");
         var canvas_height = js.objects[$1].attr("height");
 
-        var orient = js.objects[$0].orient();
-        var dy = "2em";
+        var orient = Pointer_stringify($6);
+        var dy = "2.5em";
         var x_divisor = 2.0;
         var text_orient = 0;
         js.objects[$3].attr("transform", "translate(0,"+(canvas_height-60)+")");
         if (orient == "top") {
-          dy = "-2em";
+          dy = "-2.5em";
           x_divisor = 2.0;
           js.objects[$3].attr("transform", "translate(0,60)");
         } else if (orient == "left") {
-          dy = "-2em";
+          dy = "-2.5em";
           x_divisor = -2.0;
           text_orient = -90;
           js.objects[$3].attr("transform", "translate(60,0)");
         } else if(orient == "right") {
-          dy = "2em";
+          dy = "2.5em";
           text_orient = -90;
           js.objects[$3].attr("transform", "translate("+(canvas_width-60)+",0)");
         }
@@ -84,36 +109,42 @@ namespace D3 {
           dy = Pointer_stringify($5);
         }
 
-        js.objects[$3].selectAll("line, .domain")
-             .attr("stroke-width", 1)
-             .attr("fill", "none")
-             .attr("stroke", "black");
+        var label_x = axis_range[0]+(axis_range[1]-axis_range[0])/x_divisor;
+        if (axis_range[0] > axis_range[1]) {
+            label_x = axis_range[1]+(axis_range[0]-axis_range[1])/x_divisor;
+        }
+
         js.objects[$3].append("text")
-             .attr("id", "axis_label")
+             .attr("id", Pointer_stringify($2)+"_label")
              .attr("transform", "rotate("+text_orient+")")
-             .attr("x", axis_range[0]+(axis_range[1]-axis_range[0])/x_divisor)
+             .attr("x", label_x)
              .attr("dy", dy).style("text-anchor", "middle")
              .text(Pointer_stringify($4));
       }, this->id, selection.GetID(), dom_id.c_str(), group.GetID(), label.c_str(),
-      label_offset.c_str());
+      label_offset.c_str(), orientation.c_str());
+      return *this;
     }
 
+    // selection needs to be const for this to compile, but it feels wrong since
+    // technically the contents of the selection are changed
     template <typename T>
-    void ApplyAxis(SelectionOrTransition<T> selection) {
+    Axis& ApplyAxis(const SelectionOrTransition<T> & selection) {
       EM_ASM_ARGS({
 	    js.objects[$1].call(js.objects[$0]);
 	  }, this->id, selection.GetID());
+      return *this;
     }
 
     /// An axis must have a scale. By default, a scale of SCALE_TYPE will be constructed, but
     /// usually you want an axis to depict a specific scale. This method points this object's
     /// scale member variable at [scale].
-    void SetScale(SCALE_TYPE & scale) {
+    Axis& SetScale(SCALE_TYPE & scale) {
       this->scale = scale;
 
       EM_ASM_ARGS({
 	    js.objects[$0].scale(js.objects[$1]);
 	  }, this->id, scale.GetID());
+      return *this;
     }
 
     /// Get a reference to this object's scale.
@@ -124,85 +155,85 @@ namespace D3 {
     /// Adjust the location of the label text relative to the axis
     /// (helpful if numbers are overlapping it). Can be negative.
     /// Use "em" (e.g. "2em") to specify distance relative to font size.
-    void AdjustLabelOffset(std::string offset) {
+    Axis& AdjustLabelOffset(std::string offset) {
       label_offset = offset;
       if (dom_id != "") { //We've already drawn stuff
-        group.Select("#axis_label").SetAttr("dy", label_offset);
+        group.Select("#"+dom_id+"_label").SetAttr("dy", label_offset);
       }
+      return *this;
     }
 
     /// Draw tries to make a good guess about where to place the axis, but sometimes you want to
     /// scoot it over. This method will move the axis to the x,y location specified.
-    void Move(int x, int y) {
+    Axis& Move(int x, int y) {
       group.Move(x,y);
-    }
-
-    /// Set orientation of this axis to [orientation] (must be "bottom", "top", "left", or "right")
-    /// Controls default placement on SVG, whether main line is vertical or horizontal, and which
-    /// side the ticks and label show up on.
-    //Needs to be called before Draw
-    void SetOrientation(std::string orientation) {
-      EM_ASM_ARGS({
-	    js.objects[$0].orient(Pointer_stringify($1));
-      }, this->id, orientation.c_str(), group.GetID());
+      return *this;
     }
 
     template <typename T, std::size_t SIZE>
-    void SetTickValues(std::array<T, SIZE> values) {
+    Axis& SetTickValues(std::array<T, SIZE> values) {
       emp::pass_array_to_javascript(values);
 
       EM_ASM_ARGS({
   	    js.objects[$0].tickValues(emp_i.__incoming_array);
 	  }, this->id);
+      return *this;
     }
 
-    void SetTickSize(float size) {
+    Axis& SetTickSize(float size) {
       EM_ASM_ARGS({
 	    js.objects[$0].tickSize($1);
       }, this->id, size);
+      return *this;
     }
 
-    void SetInnerTickSize(float size) {
+    Axis& SetTickSizeInner(float size) {
       EM_ASM_ARGS({
-	    js.objects[$0].innerTickSize($1);
+	    js.objects[$0].tickSizeInner($1);
 	  }, this->id, size);
+      return *this;
     }
 
-    void SetOuterTickSize(float size) {
+    Axis& SetTickSizeOuter(float size) {
       EM_ASM_ARGS({
-	    js.objects[$0].outerTickSize($1);
+	    js.objects[$0].tickSizeOuter($1);
   	  }, this->id, size);
+      return *this;
     }
 
-    void SetTickPadding(int padding) {
+    Axis& SetTickPadding(int padding) {
       EM_ASM_ARGS({
 	    js.objects[$0].tickPadding($1);
 	  }, this->id, padding);
+      return *this;
     }
 
     /// Set the number of ticks along the axis
-    void SetTicks(int count){
+    Axis& SetTicks(int count){
       EM_ASM_ARGS({
 	    js.objects[$0].ticks($1);
 	  }, this->id, count);
+      return *this;
     }
 
     /// Set the format for displaying numbers assoiated with ticks. [format] should be a format
     /// following
     /// [the rules for d3.format()](https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format)
-    void SetTickFormat(std::string format) {
+    Axis& SetTickFormat(std::string format) {
       EM_ASM_ARGS({
         js.objects[$0].tickFormat(d3.format(Pointer_stringify($1)));
       }, this->id, format.c_str());
+      return *this;
     }
 
     /// Adjust scale and axis to accomodate the new range of data specified by [new_min],
     /// and [new_max]. [svg] is a Selection or Transition containing the current axis. If it's a
     /// transition, then the rescaling will be animated.
     template <typename T>
-    void Rescale(double new_min, double new_max, D3::SelectionOrTransition<T> & svg){
+    Axis& Rescale(double new_min, double new_max, const D3::SelectionOrTransition<T> & svg){
       this->scale.SetDomain(std::array<double, 2>({{new_min, new_max}}));
       ApplyAxis(svg.Select("#"+dom_id));
+      return *this;
     }
 
     //TODO:  ticks
@@ -214,14 +245,13 @@ namespace D3 {
   template <typename SCALE_X_TYPE = D3::LinearScale, typename SCALE_Y_TYPE = D3::LinearScale>
   void DrawAxes(Axis<SCALE_X_TYPE> & x_axis, Axis<SCALE_Y_TYPE> & y_axis, Selection & selection){
     x_axis.Draw(selection);
-    y_axis.SetOrientation("left");
     y_axis.Draw(selection);
 
     EM_ASM_ARGS({
       x_range = js.objects[$0].scale().range();
       y_range = js.objects[$1].scale().range();
 
-      js.objects[$2].attr("transform", "translate(0,"+y_range[1]+")");
+      js.objects[$2].attr("transform", "translate(0,"+d3.max(y_range)+")");
       js.objects[$3].attr("transform", "translate("+x_range[0]+",0)");
     }, x_axis.GetID(), y_axis.GetID(), x_axis.group.GetID(), y_axis.group.GetID());
   }

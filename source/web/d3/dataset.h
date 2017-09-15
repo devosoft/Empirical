@@ -5,8 +5,8 @@
 
 #include "d3_init.h"
 
-#include "../../web/JSWrap.h"
-#include "../../web/js_utils.h"
+#include "../JSWrap.h"
+#include "../js_utils.h"
 #include "../../tools/string_utils.h"
 
 namespace D3 {
@@ -19,6 +19,36 @@ namespace D3 {
     void CaptureIncoming(){
         EM_ASM({js.objects[$0] = emp.__incoming_data;}, this->id);
     };
+
+    template <typename T>
+    emp::sfinae_decoy<double, decltype(&T::operator())>
+    Min(T comp) {
+        uint32_t fun_id = emp::JSWrap(comp, "", false);
+
+        double min = EM_ASM_DOUBLE({
+          return d3.min(js.objects[$0], function(d) {return emp.Callback($1, d);});
+        }, this->id, fun_id);
+
+        emp::JSDelete(fun_id);
+
+        return min;
+    }
+
+    template <typename T>
+    emp::sfinae_decoy<double, decltype(&T::operator())>
+    Max(T comp) {
+        uint32_t fun_id = emp::JSWrap(comp, "", false);
+
+        double max = EM_ASM_DOUBLE({
+          return d3.max(js.objects[$0], function(d) {return emp.Callback($1, d);});
+        }, this->id, fun_id);
+
+        emp::JSDelete(fun_id);
+
+        return max;
+    }
+
+
   };
 
 
@@ -176,7 +206,7 @@ namespace D3 {
           });
         } else {
           d3.text(arg1, function(d){
-            js.objects[$2] = d3.csv.parseRows(d, acc);
+            js.objects[$2] = d3.csvParseRows(d, acc);
             in_string($2);
           });
         }
@@ -184,12 +214,12 @@ namespace D3 {
     }
 
     void Parse(std::string contents, std::string accessor){
-      D3_CALLBACK_FUNCTION_2_ARGS(d3.csv.parse, contents.c_str(),	\
+      D3_CALLBACK_FUNCTION_2_ARGS(d3.csvParse, contents.c_str(),	\
 				  accessor.c_str())
 	}
 
     void ParseRows(std::string contents, std::string accessor){
-      D3_CALLBACK_FUNCTION_2_ARGS(d3.csv.parseRows, contents.c_str(),	\
+      D3_CALLBACK_FUNCTION_2_ARGS(d3.csvParseRows, contents.c_str(),	\
 				  accessor.c_str())
 	}
 

@@ -7,7 +7,7 @@
 #include "svg_shapes.h"
 
 #include "../../tools/tuple_struct.h"
-#include "../../web/JSWrap.h"
+#include "../JSWrap.h"
 
 #include <functional>
 #include <array>
@@ -70,38 +70,38 @@ namespace D3{
     JSONDataset * data;
 
     /// Function used to make the lines for the edges in the tree
-    DiagonalGenerator * make_line;
+    D3::LinkGenerator * make_line;
 
     /// Constructor - handles creating a default DiagonalGenerator and links the specified dataset
     /// up to this object's data pointer.
     TreeLayout(JSONDataset * dataset){
         //Create layout object
-        EM_ASM_ARGS({js.objects[$0] = d3.layout.tree();}, this->id);
+        EM_ASM_ARGS({js.objects[$0] = d3.tree();}, this->id);
 
-        make_line = new D3::DiagonalGenerator();
+        make_line = new D3::LinkGenerator("horizontal");
 
-        std::function<std::array<double, 2>(NODE_TYPE, int, int)> projection = [](NODE_TYPE n, int i, int k){
-          return std::array<double, 2>({n.y(), n.x()});
-        };
-
-        emp::JSWrap(projection, "projection");
-        make_line->SetProjection("projection");
+        // std::function<std::array<double, 2>(NODE_TYPE, int, int)> projection = [](NODE_TYPE n, int i, int k){
+        //   return std::array<double, 2>({n.y(), n.x()});
+        // };
+        //
+        // emp::JSWrap(projection, "projection");
+        // make_line->SetProjection("projection");
         SetDataset(dataset);
     };
 
     /// Default constructor - if you use this you need connect a dataset with SetDataset
     TreeLayout(){
         //Create layout object
-        EM_ASM_ARGS({js.objects[$0] = d3.layout.tree();}, this->id);
+        EM_ASM_ARGS({js.objects[$0] = d3.tree();}, this->id);
 
-        make_line = new D3::DiagonalGenerator();
+        make_line = new D3::LinkGenerator("horizontal");
 
-        std::function<std::array<double, 2>(NODE_TYPE, int, int)> projection = [](NODE_TYPE n, int i, int k){
-          return std::array<double, 2>({{n.y(), n.x()}});
-        };
-
-        emp::JSWrap(projection, "projection");
-        make_line->SetProjection("projection");
+        // std::function<std::array<double, 2>(NODE_TYPE, int, int)> projection = [](NODE_TYPE n, int i, int k){
+        //   return std::array<double, 2>({{n.y(), n.x()}});
+        // };
+        //
+        // emp::JSWrap(projection, "projection");
+        // make_line->SetProjection("projection");
     };
 
 
@@ -124,20 +124,22 @@ namespace D3{
     //links too, but C++ makes that super cumbersome, and it's definitely the less
     //common use case
     std::array<Selection, 4> GenerateNodesAndLinks(Selection svg) {
-      int node_enter = EM_ASM_INT_V({return js.objects.length});
-      int node_exit = node_enter + 1;
-      int link_enter = node_exit + 1;
-      int link_exit = link_enter + 1;
+      int node_enter = NextD3ID();
+      int node_exit = NextD3ID();
+      int link_enter = NextD3ID();
+      int link_exit = NextD3ID();
       std::cout << "Tree data id: " << data->GetID() << std::endl;
+    //   make_line->Log();
       EM_ASM_ARGS({
 
         // Based on code from http://www.d3noob.org/2014/01/tree-diagrams-in-d3js_11.html
-        var nodes = js.objects[$0].nodes(js.objects[$1][0]).reverse();
-        links = js.objects[$0].links(nodes);
+        var root = d3.hierarchy(js.objects[$1][0]);
+        js.objects[$0](root);
+        var nodes = root.descendants();
+        var links = root.descendants().slice(1);
+        // nodes.forEach(function(d) { d.y = d.depth * 20; });
 
-        nodes.forEach(function(d) { d.y = d.depth * 20; });
-
-        // Declare the nodesâ€¦
+        // Declare the nodes
         var node = js.objects[$3].selectAll("g.node")
             .data(nodes, function(d) { return d.name; });
 
@@ -151,25 +153,32 @@ namespace D3{
         		  return "translate(" + d.y + "," + d.x + ")"; });
 
         var link = js.objects[$3].selectAll("path.link")
-      	  .data(links, function(d) { return d.target.name; });
+      	  .data(links, function(d) { return d.name; });
 
         var linkExit = link.exit();
         // Enter the links.
         var linkEnter = link.enter().insert("path", "g")
       	    .attr("class", "link")
-      	    .attr("d", js.objects[$2])
+      	    .attr("d", function(d) {return "M" + d.y + "," + d.x
+         + "C" + (d.y + d.parent.y) / 2 + "," + d.x
+         + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x
+         + " " + d.parent.y + "," + d.parent.x;})
             .attr("fill", "none")
             .attr("stroke", "black")
             .attr("stroke-width", 1);
 
         link.attr("class", "link")
-            .attr("d", js.objects[$2]);
+            .attr("d", function(d) {return "M" + d.y + "," + d.x
+         + "C" + (d.y + d.parent.y) / 2 + "," + d.x
+         + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x
+         + " " + d.parent.y + "," + d.parent.x;});
 
-        js.objects.push(nodeEnter);
-        js.objects.push(nodeExit);
-        js.objects.push(linkEnter);
-        js.objects.push(linkExit);
-      }, this->id, data->GetID(), make_line->GetID(), svg.GetID());
+        js.objects[$4] = nodeEnter;
+        js.objects[$5] = nodeExit;
+        js.objects[$6] = linkEnter;
+        js.objects[$7] = linkExit;
+    }, this->id, data->GetID(), make_line->GetID(), svg.GetID(), node_enter, node_exit, link_enter, link_exit);
+      std::cout << "Done generating" << std::endl;
       return std::array<Selection, 4>({{Selection(node_enter), Selection(node_exit),
                                         Selection(link_enter), Selection(link_exit)}});
     }

@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Handle selection methods for worlds.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  World_select.h
+ *  @brief Functions for popular selection methods applied to worlds.
+ */
 
 #ifndef EMP_EVO_WORLD_SELECT_H
 #define EMP_EVO_WORLD_SELECT_H
@@ -13,6 +15,7 @@
 #include "../base/assert.h"
 #include "../base/vector.h"
 #include "../tools/IndexMap.h"
+#include "../tools/Random.h"
 
 namespace emp {
 
@@ -20,6 +23,9 @@ namespace emp {
 
   /// ==ELITE== Selection picks a set of the most fit individuals from the population to move to
   /// the next generation.  Find top e_count individuals and make copy_count copies of each.
+  /// @param world The emp::World object with the organisms to be selected.
+  /// @param e_count How many distinct organisms should be chosen, starting from the most fit.
+  /// @param copy_count How many copies should be made of each elite organism?
   template<typename ORG>
   void EliteSelect(World<ORG> & world, size_t e_count, size_t copy_count) {
     emp_assert(e_count > 0 && e_count <= world.GetNumOrgs(), e_count);
@@ -48,6 +54,9 @@ namespace emp {
   /// finds the one with the highest fitness, and moves it to the next generation.
   /// User provides the fitness function, the tournament size, and (optionally) the
   /// number of tournaments to run.
+  /// @param world The emp::World object with the organisms to be selected.
+  /// @param t_size How many organisms should be placed in each tournament?
+  /// @param tourny_count How many tournaments should be run? (with replacement of organisms)
   template<typename ORG>
   void TournamentSelect(World<ORG> & world, size_t t_size, size_t tourny_count) {
     emp_assert(t_size > 0 && t_size <= world.GetNumOrgs(), t_size, world.GetNumOrgs());
@@ -78,6 +87,8 @@ namespace emp {
 
   /// ==ROULETTE== Selection (aka Fitness-Proportional Selection) chooses organisms to
   /// reproduce based on their current fitness.
+  /// @param world The emp::World object with the organisms to be selected.
+  /// @param count How many organims should be selected for replication? (with replacement)
   template<typename ORG>
   void RouletteSelect(World<ORG> & world, size_t count=1) {
     emp_assert(count > 0);
@@ -103,6 +114,9 @@ namespace emp {
 
   /// ==LEXICASE== Selection runs through multiple fitness functions in a random order for
   /// EACH offspring produced.
+  /// @param world The emp::World object with the organisms to be selected.
+  /// @param fit_funs The set of fitness functions to shuffle for each organism reproduced.
+  /// @param repro_count How many rounds of repliction should we do.
   template<typename ORG>
   void LexicaseSelect(World<ORG> & world,
                       const emp::vector< std::function<double(const ORG &)> > & fit_funs,

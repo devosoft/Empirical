@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Tools to dynamically build (and cache) color maps.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  color_map.h
+ *  @brief Tools to dynamically build (and cache) color maps.
+ */
 
 #ifndef EMP_COLOR_MAP_H
 #define EMP_COLOR_MAP_H
@@ -25,7 +27,7 @@ namespace emp {
     dHueMap hue_maps;
   }
 
-  // Generate a string to describe a JS color out of HSL values.
+  /// Generate a string to describe a JS color out of HSL values.
   std::string ColorHSL(double h, double s, double l) {
     emp_assert(h >= 0 && h <= 360);
     emp_assert(s >= 0 && s <= 100);
@@ -35,7 +37,7 @@ namespace emp {
     return ss.str();
   }
 
-  // Generate a string to describe a JS color out of RGB values.
+  /// Generate a string to describe a JS color out of RGB values.
   std::string ColorRGB(int r, int g, int b) {
     emp_assert(r >= 0 && r < 255);
     emp_assert(g >= 0 && g < 255);
@@ -47,7 +49,7 @@ namespace emp {
     return ss.str();
   }
 
-  // Generate a string to describe a JS color with an alpha channel.
+  /// Generate a string to describe a JS color with an alpha channel.
   std::string ColorRGB(int r, int g, int b, double a) {
     emp_assert(r >= 0 && r < 255);
     emp_assert(g >= 0 && g < 255);
@@ -57,6 +59,8 @@ namespace emp {
     return ss.str();
   }
 
+  /// Generate a vector of color strings with a specified range of hues, and fixed satuation and
+  /// luminosity,
   const emp::vector<std::string> &
   GetHueMap(size_t map_size, double min_h=0.0, double max_h=360.0, int s=100, int l=50) {
     dHueMapKey map_key = std::make_tuple(map_size, min_h, max_h, s, l);
@@ -79,6 +83,7 @@ namespace emp {
     return cur_map;
   }
 
+  /// Generate a vector of color strings providing ranges of all of hue, satuation and luminosity.
   emp::vector<std::string>
   GetHSLMap(size_t map_size, double min_h=0.0, double max_h=360.0,
             int min_s=100, int max_s=100,

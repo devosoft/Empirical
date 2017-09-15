@@ -1,32 +1,33 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  The Button widget will create a button and call a specified function when
-//  that button is clicked.
-//
-//  Use example:
-//
-//    emp::web::Button my_button(MyFun, "Button Name", "html_id");
-//
-//  Where my_button is the C++ object linking to the button, MyFun is the
-//  function you want to call on clicks, "Button Name" is the label on the
-//  button itself, and "html_id" is the optional id you want it to use in the
-//  HTML code (otherwise it will generate a unique name on it's own.)
-//
-//  Member functions to set state:
-//    Button & Callback(const std::function<void()> & in_callback)
-//    Button & Label(const std::string & in_label)
-//    Button & Title(const std::string & in_t)
-//    Button & Autofocus(bool in_af)
-//    Button & Disabled(bool in_dis)
-//
-//  Retriving current state:
-//    const std::string & GetLabel() const
-//    const std::string & GetTitle() const
-//    bool HasAutofocus() const
-//    bool IsDisabled() const
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  Button.h
+ *  @brief Create/control an HTML button and call a specified function when that button is clicked.
+ *
+ *  Use example:
+ *
+ *    emp::web::Button my_button(MyFun, "Button Name", "html_id");
+ *
+ *  Where my_button is the C++ object linking to the button, MyFun is the
+ *  function you want to call on clicks, "Button Name" is the label on the
+ *  button itself, and "html_id" is the optional id you want it to use in the
+ *  HTML code (otherwise it will generate a unique name on it's own.)
+ *
+ *  Member functions to set state:
+ *    Button & Callback(const std::function<void()> & in_callback)
+ *    Button & Label(const std::string & in_label)
+ *    Button & Title(const std::string & in_t)
+ *    Button & Autofocus(bool in_af)
+ *    Button & Disabled(bool in_dis)
+ *
+ *  Retriving current state:
+ *    const std::string & GetLabel() const
+ *    const std::string & GetTitle() const
+ *    bool HasAutofocus() const
+ *    bool IsDisabled() const
+ */
 
 #ifndef EMP_WEB_BUTTON_H
 #define EMP_WEB_BUTTON_H
@@ -37,6 +38,7 @@
 namespace emp {
 namespace web {
 
+  /// Create or control and HTML Button object that you can manipulate and update as needed.
   class Button : public internal::WidgetFacet<Button> {
     friend class ButtonInfo;
   protected:
@@ -113,6 +115,11 @@ namespace web {
     Button(ButtonInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:
+
+    /// Create a new button.
+    /// @param in_cb The function to call when the button is clicked.
+    /// @param in_label The label that should appear on the button.
+    /// @param in_id The HTML ID to use for this button (leave blank for auto-generated)
     Button(const std::function<void()> & in_cb, const std::string & in_label,
            const std::string & in_id="")
       : WidgetFacet(in_id)
@@ -128,6 +135,8 @@ namespace web {
       Info()->callback_id = JSWrap( std::function<void()>( [b_info](){b_info->DoCallback();} )  );
       Info()->onclick_info = emp::to_string("emp.Callback(", Info()->callback_id, ")");
     }
+
+    /// Link to an existing button.
     Button(const Button & in) : WidgetFacet(in) { ; }
     Button(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsButtonInfo()); }
     Button() : WidgetFacet("") { info = nullptr; }
@@ -135,18 +144,34 @@ namespace web {
 
     using INFO_TYPE = ButtonInfo;
 
+    /// Set a new callback function to trigger when the button is clicked.
     Button & Callback(const std::function<void()> & in_cb) {
       Info()->UpdateCallback(in_cb);
       return *this;
     }
-    Button & Label(const std::string & in_label) { Info()->UpdateLabel(in_label); return *this; }
-    Button & Title(const std::string & in_t) { Info()->UpdateTitle(in_t); return *this; }
-    Button & Autofocus(bool in_af) { Info()->UpdateAutofocus(in_af); return *this; }
-    Button & Disabled(bool in_dis) { Info()->UpdateDisabled(in_dis); return *this; }
 
+    /// Set a new label to appear on this Button.
+    Button & Label(const std::string & in_label) { Info()->UpdateLabel(in_label); return *this; }
+
+    /// Create a tooltip for this Button.
+    Button & Title(const std::string & in_t) { Info()->UpdateTitle(in_t); return *this; }
+
+    /// Setup this button to have autofocus (or remove it!)
+    Button & Autofocus(bool in_af=true) { Info()->UpdateAutofocus(in_af); return *this; }
+
+    /// Setup this button to be disabled (or re-enable it!)
+    Button & Disabled(bool in_dis=true) { Info()->UpdateDisabled(in_dis); return *this; }
+
+    /// Get the current label on this button.
     const std::string & GetLabel() const { return Info()->label; }
+
+    /// Get the current tooltip on this button.
     const std::string & GetTitle() const { return Info()->title; }
+
+    /// Determine if this button currently has autofocus.
     bool HasAutofocus() const { return Info()->autofocus; }
+
+    /// Determine if this button is currently disabled.
     bool IsDisabled() const { return Info()->extras.HasAttr("disabled"); }
   };
 

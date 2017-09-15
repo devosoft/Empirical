@@ -1,8 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  This file defines extra details needed for world data files.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  World_file.h
+ *  @brief This file defines extra details needed for world data files.
+ */
 
 
 #ifndef EMP_EVO_WORLD_FILE_H
@@ -13,6 +16,10 @@
 #include "../data/DataFile.h"
 
 namespace emp {
+
+  /// @brief A DataFile that will print only at specified updates.
+  /// World_file is a World-specific DataFile.  In addition to normal DataFile functionality, it
+  /// also allows printing of files to be controled by the current update in the world.
 
   class World_file : public DataFile {
   public:

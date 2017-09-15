@@ -3,7 +3,7 @@
 
 #include "selection.h"
 #include "../../base/vector.h"
-#include "../../web/JSWrap.h"
+#include "../JSWrap.h"
 
 
 namespace D3 {

@@ -1,29 +1,30 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//  Formerly: Slate.h
-//
-//
-//  Div Widgets maintain an ordered collection of other widgets.  When printed to the
-//  web page, these internal widgets are presented in order.
-//
-//  To create a Div:
-//
-//    emp::web::Div my_div("name");
-//
-//  To use a Div:
-//
-//    my_div << "Add this text!"
-//           << emp::web::Image("my_image.png")
-//           << "<br>";
-//
-//  To register a Div in a Document:
-//
-//    my_doc << my_div;
-//
-//
-//  Development Notes:
-//  * Should we move all widget_dict info into Document?
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  Div.h
+ *  @note Formerly called Slate.h
+ *  @brief Div Widgets maintain an ordered collection of other widgets in an HTML div.
+ *
+ *  When printed to the web page, these internal widgets are presented in order.
+ *
+ *  To create a Div:
+ *
+ *    emp::web::Div my_div("name");
+ *
+ *  To use a Div:
+ *
+ *    my_div << "Add this text!"
+ *           << emp::web::Image("my_image.png")
+ *           << "<br>";
+ *
+ *  To register a Div in a Document:
+ *
+ *    my_doc << my_div;
+ *
+ *  @todo Should we move all widget_dict info into Document?
+ */
 
 #ifndef EMP_WEB_DIV_H
 #define EMP_WEB_DIV_H
@@ -51,11 +52,11 @@ namespace web {
     class DivInfo : public internal::WidgetInfo {
       friend Div; friend TableInfo;
     protected:
-      double scroll_top;                              // Where should div scroll to? (0.0 to 1.0)
-      emp::vector<Widget> m_children;                 // Widgets contained in this one.
-      bool append_ok;                                 // Can we add more children?
-      std::map<std::string, Widget> widget_dict;      // By-name lookup for descendent widgets
-      std::map<std::string, web::Animate *> anim_map; // Streamline creation of Animate objects.
+      double scroll_top;                              ///< Where should div scroll to? (0.0 to 1.0)
+      emp::vector<Widget> m_children;                 ///< Widgets contained in this one.
+      bool append_ok;                                 ///< Can we add more children?
+      std::map<std::string, Widget> widget_dict;      ///< By-name lookup for descendent widgets
+      std::map<std::string, web::Animate *> anim_map; ///< Streamline creation of Animate objects.
 
       DivInfo(const std::string & in_id="")
         : internal::WidgetInfo(in_id), scroll_top(0.0), append_ok(true) { emp::Initialize(); }
@@ -186,6 +187,14 @@ namespace web {
         return info;
       }
 
+      Widget Append(const Font & font) override {
+        if (!append_ok) return ForwardAppend(font);
+        Text new_text;
+        new_text.SetFont(font);
+        AddChild(new_text);
+        return new_text;
+      }
+
       // All derived widgets must suply a mechanism for providing associated HTML code.
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");       // Clear the current text.
@@ -240,6 +249,7 @@ namespace web {
     };
   }
 
+  /// A widget to track a div in an HTML file, and all of its contents.
   class Div : public internal::WidgetFacet<Div> {
   protected:
     // Get a properly cast version of indo.
@@ -258,32 +268,42 @@ namespace web {
 
     using INFO_TYPE = internal::DivInfo;
 
+    /// Where is the top of the scroll region?
     double ScrollTop() const { return Info()->scroll_top; }
+
+    /// Set the scroll position.
     Div & ScrollTop(double in_top) { Info()->scroll_top = in_top; return *this; }
 
+    /// Clear the contents of this div.
     void Clear() { if (info) Info()->Clear(); }
+
+    /// Remove all child widgets from this div.
     void ClearChildren() { if (info) Info()->ClearChildren(); }
 
+    /// Determine if a specified widget is internal to this one.
     bool HasChild(const Widget & test_child) const {
       if (!info) return false;
       for (const Widget & c : Info()->m_children) if (c == test_child) return true;
       return false;
     }
 
+    /// Remove this widget from the current document.
     void Deactivate(bool top_level) override {
       // Deactivate children before this node.
       for (auto & child : Info()->m_children) child.Deactivate(false);
       Widget::Deactivate(top_level);
     }
 
+    /// Get an internal widget to this div, by the specified name.
     Widget & Find(const std::string & test_name) {
       emp_assert(info);
       return Info()->GetRegistered(test_name);
     }
 
+    /// Get all direct child widgets to this div.
     emp::vector<Widget> & Children() { return Info()->m_children; }
 
-    // Shortcut adders for helpers
+    /// Shortcut adder for animations.
     template <class... T> web::Animate & AddAnimation(const std::string & name, T &&... args){
       web::Animate * new_anim = new web::Animate(std::forward<T>(args)...);
       emp_assert(Info()->anim_map.find(name) == Info()->anim_map.end());  // Make sure not in map already!
@@ -291,10 +311,8 @@ namespace web {
       return *new_anim;
     }
 
-
-    // Setup a quick way to retrieve old helpers by name.
+    // A quick way to retrieve Animate widgets by name.
     web::Animate & Animate (const std::string & in_id) { return *(Info()->anim_map[in_id]); }
-    web::Animate & Animation (const std::string & in_id) { return *(Info()->anim_map[in_id]); }
   };
 
   // using Slate = Div;    // For backward compatability...

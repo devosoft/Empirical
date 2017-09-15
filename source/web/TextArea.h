@@ -1,18 +1,14 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  The TextArea Widget
-//
-//  An input field for text data.  A function provided at creation time will be called
-//  each time the contents of the TextWidget are changed.  The current text contents
-//  can also always be accessed with the GetText() member function.
-//
-//
-//  Developer notes:
-//  * Callback does a lot of string-copies at the moment; should be streamlined.
-//
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  TextArea.h
+ *  @brief Specs for the TextArea widget.
+ *
+ *
+ * @todo Callback does a lot of string-copies at the moment; should be streamlined.
+ */
 
 #ifndef EMP_WEB_TEXT_AREA_H
 #define EMP_WEB_TEXT_AREA_H
@@ -22,6 +18,10 @@
 namespace emp {
 namespace web {
 
+  /// An input field for text data.  A function provided at creation time will be called
+  /// each time the contents of the TextWidget are changed.  The current text contents
+  /// can also always be accessed with the GetText() member function.
+
   class TextArea : public internal::WidgetFacet<TextArea> {
     friend class TextAreaInfo;
   protected:
@@ -30,11 +30,11 @@ namespace web {
     class TextAreaInfo : public internal::WidgetInfo {
       friend TextArea;
     protected:
-      int cols;                 // How many columns of text in the area?
-      int rows;                 // How many rows of text in the area?
-      int max_length;           // Maximum number of total characters allowed.
+      int cols;                 ///< How many columns of text in the area?
+      int rows;                 ///< How many rows of text in the area?
+      int max_length;           ///< Maximum number of total characters allowed.
 
-      std::string cur_text;     // Text that should currently be in the box.
+      std::string cur_text;     ///< Text that should currently be in the box.
 
       bool autofocus;
       bool disabled;
@@ -104,6 +104,7 @@ namespace web {
     TextArea(TextAreaInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:
+    /// Build a text area with a specified HTML identifier.
     TextArea(const std::string & in_id="")
       : WidgetFacet(in_id)
     {
@@ -118,6 +119,8 @@ namespace web {
 
       Info()->callback_id = 0;
     }
+
+    /// Build a text area with a specified function to call with every change.
     TextArea(std::function<void(const std::string &)> in_cb, const std::string & in_id="")
       : TextArea(in_id)
     {
@@ -127,6 +130,8 @@ namespace web {
         [ta_info](std::string in_str){ ta_info->DoCallback(in_str); }
       ));
     }
+
+    /// Connect to an existing TextArea
     TextArea(const TextArea & in) : WidgetFacet(in) { ; }
     TextArea(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsTextAreaInfo()); }
     virtual ~TextArea() { ; }
@@ -134,14 +139,20 @@ namespace web {
     using INFO_TYPE = TextAreaInfo;
 
     bool GetDisabled() const { return Info()->disabled; }
+
+    /// Get the current text in this TextArea.
     const std::string & GetText() const { return Info()->cur_text; }
 
     TextArea & SetAutofocus(bool in_af) { Info()->UpdateAutofocus(in_af); return *this; }
+
+    /// Change the callback function for this TextArea.
     TextArea & SetCallback(const std::function<void(const std::string &)> & in_cb) {
       Info()->UpdateCallback(in_cb);
       return *this;
     }
     TextArea & SetDisabled(bool in_dis) { Info()->UpdateDisabled(in_dis); return *this; }
+
+    /// Set the text contained in the text area.
     TextArea & SetText(const std::string & in_text) {
       Info()->cur_text = in_text;
       Info()->UpdateText(in_text);

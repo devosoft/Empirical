@@ -1,29 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This class manages canvases on the web
-//
-//  To build a Canvas object, a width and height (in pixels, by default) need to be
-//  supplied, along with an optional HTML id.
-//
-//  As of now, only circles and rectangles are supported, but more soon:
-//
-//    size_t GetWidth() const
-//    size_t GetHeight() const
-//
-//    Canvas & Circle(double x, double y, double r,
-//                    const std::string & fc="", const std::string & lc="")
-//    Canvas & Circle(const emp::Circle & circle,
-//                    const std::string & fc="", const std::string & lc="")
-//    Canvas & Rect(double x, double y, double w, double h,
-//                    const std::string & fc="", const std::string & lc="")
-//    Canvas & StrokeColor(std::string c)
-//    Canvas & Clear()
-//
-//  For each, x and y are the anchor coordinates; r is the radius of a circle;
-//  fc is the foreground color, and lc is the line color.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  Canvas.h
+ *  @brief Manage an HTML canvas object.
+ *
+ */
 
 
 #ifndef EMP_WEB_CANVAS_H
@@ -40,6 +23,11 @@
 namespace emp {
 namespace web {
 
+  ///  To build a Canvas object, a width and height (in pixels, by default) need to be
+  ///  supplied, along with an optional HTML id.
+  ///
+  ///  As of now, only circles, rectangles lines, and text are supported, but more soon.
+
   class Canvas : public internal::WidgetFacet<Canvas> {
     friend class CanvasInfo;
   protected:
@@ -48,8 +36,8 @@ namespace web {
       friend Canvas;
 
     protected:
-      size_t width;
-      size_t height;
+      size_t width;   ///< pixel width of the canvas.
+      size_t height;  ///< pixel height of the canvas.
 
       emp::vector<CanvasAction *> actions;
 
@@ -115,6 +103,7 @@ namespace web {
     Canvas(CanvasInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:
+    /// Create a new canvas with the specified size and option HTML identifier.
     Canvas(size_t w, size_t h, const std::string & in_id="")
       : WidgetFacet(in_id)
     {
@@ -122,6 +111,8 @@ namespace web {
       Info()->width = w;
       Info()->height = h;
     }
+
+    /// Link to an existing canvas.
     Canvas(const Canvas & in) : WidgetFacet(in) { ; }
     Canvas(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsCanvasInfo()); }
     Canvas() { ; }
@@ -129,38 +120,54 @@ namespace web {
 
     using INFO_TYPE = CanvasInfo;
 
-    size_t GetWidth() const { return Info()->width; }
-    size_t GetHeight() const { return Info()->height; }
+    size_t GetWidth() const { return Info()->width; }    ///< Get the pixel width of this Canvas.
+    size_t GetHeight() const { return Info()->height; }  ///< Get the pixel height of this Canvas.
 
-    void SetWidth(size_t w) { Info()->width=w; }
-    void SetHeight(size_t h) { Info()->height=h; }
+    void SetWidth(size_t w) { Info()->width=w; }         ///< Set a new width for this Canvas.
+    void SetHeight(size_t h) { Info()->height=h; }       ///< Set a new height for this Canvas.
+
+    /// Set Canvas size.
     void SetSize(size_t w, size_t h) { Info()->width=w; Info()->height=h; }
 
-    // Setup Canvas Actions
+    /// Add a Circle to this canvas centered at x,y with radius r.  Optional face color and
+    /// line color.
     Canvas & Circle(double x, double y, double r,
                     const std::string & fc="", const std::string & lc="") {
       Info()->AddAction( new CanvasCircle(x, y, r, fc, lc) );
       return *this;
     }
+
+    /// Add a Circle specified with a Circle object.  Optional face color and line color.
     Canvas & Circle(const emp::Circle & circle,
                     const std::string & fc="", const std::string & lc="") {
       Info()->AddAction( new CanvasCircle(circle, fc, lc) );
       return *this;
     }
+
+    /// Add a Rectangle to this canvas at x,y with width w and heigh h.  Optional face color and
+    /// line color.
     Canvas & Rect(double x, double y, double w, double h,
                   const std::string & fc="", const std::string & lc="") {
       Info()->AddAction( new CanvasRect(x, y, w, h, fc, lc) );
       return *this;
     }
+
+    /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
     Canvas & Line(double x1, double y1, double x2, double y2, const std::string & lc="") {
       Info()->AddAction( new CanvasLine(x1, y1, x2, y2, lc) );
       return *this;
     }
+
+    /// Add a string to this canvas at x,y with specified text.  Optional face color and
+    /// line color.
     Canvas & Text(double x, double y, const std::string text,
                   const std::string & fc="", const std::string & lc="") {
       Info()->AddAction( new CanvasText(x, y, text, fc, lc) );
       return *this;
     }
+
+    /// Add a string to this canvas centered at x,y with specified text.  Optional face color and
+    /// line color.
     Canvas & CenterText(double x, double y, const std::string text,
                   const std::string & fc="", const std::string & lc="") {
       auto * ctext = new CanvasText(x, y, text, fc, lc);
@@ -168,37 +175,46 @@ namespace web {
       Info()->AddAction( ctext );
       return *this;
     }
+
+    /// Update the default font for text.
     Canvas & Font(const std::string font) {
       Info()->AddAction( new CanvasFont(font) );
       return *this;
     }
 
+    /// Draw a circle onto this canvas.
     Canvas & Draw(const emp::Circle & circle,
                   const std::string & fc="", const std::string & lc="") {
       Info()->AddAction( new CanvasCircle(circle, fc, lc) );
       return *this;
     }
+
+    /// Draw an arbitrary shape onto this canvas.
     Canvas & Draw(const CanvasShape & shape) {
       Info()->AddAction( shape.Clone() );
       return *this;
     }
 
+    /// Change the default stroke color.
     Canvas & StrokeColor(std::string c) {
       Info()->AddAction( new CanvasStrokeColor(c) );
       return *this;
     }
+
+    /// Rotate the entire canvas.
     Canvas & Rotate(double angle) {
       Info()->AddAction( new CanvasRotate(angle) );
       return *this;
     }
 
+    /// Clear everything off of this canvas.
     Canvas & Clear() {
       Info()->ClearActions();
       Info()->AddAction( new CanvasClearRect(0, 0, GetWidth(), GetHeight()) );
       return *this;
     }
 
-    // Clear to a specific color!
+    /// Clear to a specific background color.
     Canvas & Clear(const std::string & bg_color) {
       Info()->ClearActions();
       Info()->AddAction( new CanvasClearRect(0, 0, GetWidth(), GetHeight()) );

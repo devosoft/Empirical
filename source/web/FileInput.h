@@ -1,17 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Specs for the FileInput widget (click on to upload a file)
-//
-//  FileInput will convert the file to a std::string and pass the result to a
-//  designated function.
-//
-//  To create a new file input, you must pass it a void function that takes a
-//  const std::string & as its only argument.  When a file is loaded, the
-//  specified function is called and the body of the file is passed in as the
-//  string.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  FuleInput.h
+ *  @brief Specs for the FileInput widget (click on to upload a file)
+ */
 
 #ifndef EMP_WEB_FILE_INPUT_H
 #define EMP_WEB_FILE_INPUT_H
@@ -24,6 +18,14 @@
 
 namespace emp {
 namespace web {
+
+  ///  FileInput will convert the file to a std::string and pass the result to a
+  ///  designated function.
+  ///
+  ///  To create a new file input, you must pass it a void function that takes a
+  ///  const std::string & as its only argument.  When a file is loaded, the
+  ///  specified function is called and the body of the file is passed in as the
+  ///  string.
 
   class FileInput : public internal::WidgetFacet<FileInput> {
     friend class FileInputInfo;
@@ -95,6 +97,8 @@ namespace web {
     FileInput(FileInputInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:
+    /// Create a new Fileinput; supply the function to call with the file contents as a string.
+    /// (and optionally the HTML identifier to be used.)
     FileInput(const std::function<void(const std::string &)> & in_cb, const std::string & in_id="")
       : WidgetFacet(in_id)
     {
@@ -109,24 +113,41 @@ namespace web {
       using callback_t = std::function<void(const std::string & file_body)>;
       Info()->callback_id = JSWrap( callback_t( [w_info](const std::string & file_body){w_info->DoCallback(file_body);} )  );
     }
+
+    /// Create a new Fileinput; supply the function to call with the file contents as a File obejct.
+    /// (and optionally the HTML identifier to be used.)
     FileInput(const std::function<void(const emp::File &)> & cb, const std::string & in_id="")
       : FileInput( [cb](const std::string & in){ std::stringstream ss(in); File file(ss); cb(file); } ) { ; }
+
+    /// Load a pre-existing FileInput object.
     FileInput(const FileInput & in) : WidgetFacet(in) { ; }
     FileInput(const Widget & in) : WidgetFacet(in) { ; }
     virtual ~FileInput() { ; }
 
     using INFO_TYPE = FileInputInfo;
 
+    /// Change the callback function to use when a new file is loaded.
     FileInput & Callback(const std::function<void(const std::string &)> & in_cb) {
       Info()->UpdateCallback(in_cb);
       return *this;
     }
+
+    /// Set a ToolTip for this FileInput object.
     FileInput & Title(const std::string & in_t) { Info()->UpdateTitle(in_t); return *this; }
+
+    /// Set this FileInput object to have autofocus (or not)
     FileInput & Autofocus(bool in_af) { Info()->UpdateAutofocus(in_af); return *this; }
+
+    /// Set this FileInput object to be disabled (or renable it.)
     FileInput & Disabled(bool in_dis) { Info()->UpdateDisabled(in_dis); return *this; }
 
+    /// Get the current tooltip.
     const std::string & GetTitle() const { return Info()->title; }
+
+    /// Determine if this object currently has autofocus.
     bool HasAutofocus() const { return Info()->autofocus; }
+
+    /// Determine if this object is currently disabled.
     bool IsDisabled() const { return Info()->disabled; }
   };
 

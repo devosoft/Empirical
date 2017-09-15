@@ -1,9 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file is the main file to include the entire Empirical web framework.
-//  For the moment, it is just an alias for Document.h
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  web.h
+ *  @brief Main file to include the entire Empirical web framework; for now, just an alias for Document.h
+ *
+ */
 
 #include "Document.h"

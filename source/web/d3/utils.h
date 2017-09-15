@@ -11,9 +11,9 @@
 #include <string>
 
 #include "../../base/macros.h"
-#include "../../web/init.h"
-#include "../../web/js_utils.h"
-#include "../../web/JSWrap.h"
+#include "../init.h"
+#include "../js_utils.h"
+#include "../JSWrap.h"
 
 // Helper macros
 
@@ -51,7 +51,7 @@
 /// given namespaces. If it is, it stores that function in the variable func_string.
 /// Namespaces are checked in the order given and the first function found is used.
 #define CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE(...)            \
-    do {EMP_ASSEMBLE_MACRO(CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_, __VA_ARGS__);} while (0)
+    do {EMP_ASSEMBLE_MACRO(CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_, __VA_ARGS__);} while (0);
 
 /// Expects func_string to be a pre-defined variable that holds a string that may or may
 /// not be a function and checks to see if it is a function defined within and of the
@@ -139,7 +139,12 @@ D3_CALLBACK_METHOD_1_ARG_IMPL(CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_
     emp::JSDelete(fun_id);
 
 //Store return of one of the above functions in js.objects
-void StoreNewObject(){EM_ASM({js.objects.push(emp.__new_object);});}
+void StoreNewObject(int id){
+    EM_ASM_ARGS({
+        js.objects[$0] = emp.__new_object;
+
+    }, id);
+}
 
 
 #endif
