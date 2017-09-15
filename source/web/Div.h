@@ -187,6 +187,14 @@ namespace web {
         return info;
       }
 
+      Widget Append(const Font & font) override {
+        if (!append_ok) return ForwardAppend(font);
+        Text new_text;
+        new_text.SetFont(font);
+        AddChild(new_text);
+        return new_text;
+      }
+
       // All derived widgets must suply a mechanism for providing associated HTML code.
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");       // Clear the current text.
