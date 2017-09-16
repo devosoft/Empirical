@@ -38,7 +38,7 @@ namespace web {
   public:
     Font(const Font &) = default;
     Font(Font &&) = default;
-    Font(const std::string & _family="Helvetica", int _size=30,
+    Font(const std::string & _family="Helvetica", int _size=15,
 	       const std::string & _color="black", bool _bold=false, bool _italic=false)
       : family(_family), size(_size), color(_color)
       , is_bold(_bold), is_italic(_italic)
