@@ -4,7 +4,7 @@
  *  @date 2015-2017
  *
  *  @file  init.h
- *  @brief Define emp::Initialize(), which sets up Empirical to build an Emscripten project.
+ *  @brief Define Initialize() and other functions to set up Empirical to build Emscripten projects.
  */
 
 #ifndef EMP_INIT_H
