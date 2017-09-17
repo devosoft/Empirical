@@ -1,9 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Tools for passing data between C++ and Javascript.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  js_utils.h
+ *  @brief Tools for passing data between C++ and Javascript.
+ */
+
 
 #ifndef EMP_JS_UTILS_H
 #define EMP_JS_UTILS_H
@@ -394,7 +397,7 @@ namespace emp {
   // Chars aren't one of the types supported by setValue, but by treating them
   // as strings in Javascript we can pass them out to a C++ array
   template <std::size_t SIZE>
-    void pass_array_to_cpp(std::array<char, SIZE> & arr, bool recurse = false) {
+  void pass_array_to_cpp(std::array<char, SIZE> & arr, bool recurse = false) {
 
     emp_assert(arr.size() == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
 
@@ -512,7 +515,7 @@ namespace emp {
 
   // We can handle nested arrays through recursive calls on chunks of them
   template <std::size_t SIZE, std::size_t SIZE2, typename T>
-    void pass_array_to_cpp(std::array<std::array<T, SIZE2>, SIZE> & arr, bool recurse = false) {
+  void pass_array_to_cpp(std::array<std::array<T, SIZE2>, SIZE> & arr, bool recurse = false) {
 
     emp_assert(arr.size() == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
 
@@ -537,9 +540,9 @@ namespace emp {
     else { EM_ASM({emp_i.__temp_array.pop();}); }
   }
 
-  // We can handle nested arrays through recursive calls on chunks of them
+  /// We can handle nested arrays through recursive calls on chunks of them
   template <typename T>
-    void pass_vector_to_cpp(emp::vector<emp::vector<T> > & arr, bool recurse = false) {
+  void pass_vector_to_cpp(emp::vector<emp::vector<T> > & arr, bool recurse = false) {
 
     // Create temp array to hold whole array while pieces are passed in
     int size = EM_ASM_INT_V({return emp_i.__outgoing_array.length});
