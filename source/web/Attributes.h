@@ -23,8 +23,8 @@
 namespace emp {
 namespace web {
 
-  ///  This class maintains a map of attribute names to values that can be easily ported
-  ///  over to JavaScript.  It is closely related to Style.h, which is for CSS-values.
+  ///  @brief Maintains a map of attribute names to values for use in JavaScript
+  ///  Closely related to Style.h, which is for CSS-values.
 
   class Attributes {
   private:
