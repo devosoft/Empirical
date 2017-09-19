@@ -36,11 +36,11 @@ namespace web {
 
       std::string cur_text;     ///< Text that should currently be in the box.
 
-      bool autofocus;
-      bool disabled;
+      bool autofocus;           ///< Should this TextArea be set as Autofocus?
+      bool disabled;            ///< Should this TextArea be disabled?
 
-      std::function<void(const std::string &)> callback;
-      uint32_t callback_id;
+      std::function<void(const std::string &)> callback; ///< Function to call with each keypress.
+      uint32_t callback_id;     ///< Callback ID the built-in function for this text area.
 
       TextAreaInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
       TextAreaInfo(const TextAreaInfo &) = delete;               // No copies of INFO allowed
@@ -117,7 +117,10 @@ namespace web {
       Info()->autofocus = false;
       Info()->disabled = false;
 
-      Info()->callback_id = 0;
+      TextAreaInfo * ta_info = Info();
+      Info()->callback_id = JSWrap( std::function<void(std::string)>(
+        [ta_info](std::string in_str){ ta_info->DoCallback(in_str); }
+      ));
     }
 
     /// Build a text area with a specified function to call with every change.
@@ -125,10 +128,6 @@ namespace web {
       : TextArea(in_id)
     {
       Info()->callback = in_cb;
-      TextAreaInfo * ta_info = Info();
-      Info()->callback_id = JSWrap( std::function<void(std::string)>(
-        [ta_info](std::string in_str){ ta_info->DoCallback(in_str); }
-      ));
     }
 
     /// Connect to an existing TextArea
