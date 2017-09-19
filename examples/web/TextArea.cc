@@ -8,6 +8,8 @@ namespace UI = emp::web;
 UI::Document doc("emp_base");
 
 UI::TextArea text_area([](const std::string &){ });
+UI::TextArea text_area2([](const std::string &){ });
+UI::Text text_reflect;
 
 int main()
 {
@@ -17,5 +19,9 @@ int main()
       text_area.SetText("Changed!");
     });
 
-  doc << text_area.SetSize(300,300);
+  doc << text_area.SetSize(300,300)
+      << text_area2.SetText("Starting text!").SetSize(300,200);
+
+  doc << "<br>" << UI::Button([](){ text_reflect.Clear(); text_reflect << text_area2.GetText(); }, "Update" )
+      << "<br>" << text_reflect;
 }
