@@ -138,11 +138,10 @@ namespace web {
 
     using INFO_TYPE = TextAreaInfo;
 
-    bool GetDisabled() const { return Info()->disabled; }
-
     /// Get the current text in this TextArea.
     const std::string & GetText() const { return Info()->cur_text; }
 
+    /// Make this text area have focus by default.
     TextArea & SetAutofocus(bool in_af) { Info()->UpdateAutofocus(in_af); return *this; }
 
     /// Change the callback function for this TextArea.
@@ -150,6 +149,8 @@ namespace web {
       Info()->UpdateCallback(in_cb);
       return *this;
     }
+
+    /// Gray out this text area.
     TextArea & SetDisabled(bool in_dis) { Info()->UpdateDisabled(in_dis); return *this; }
 
     /// Set the text contained in the text area.
@@ -159,7 +160,10 @@ namespace web {
       return *this;
     }
 
+    /// Does this widget have auto focus set?
     bool HasAutofocus() const { return Info()->autofocus; }
+
+    /// Is this widget currently disabled?
     bool IsDisabled() const { return Info()->disabled; }
   };
 
