@@ -820,6 +820,20 @@ namespace emp {
       traits[id] = val;
     }
 
+    /// Utility function to increment trait id by value given by inc.
+    /// Will resize traits vector if given id is greater than current traits vector size.
+    void IncTrait(size_t id, double inc) {
+      if (id >= traits.size()) traits.resize(id+1, 0.0);
+      traits[id] += inc;
+    }
+
+    /// Utility function to decrement trait id by value given by dec.
+    /// Will resize traits vector if given id is greater than current traits vector size.
+    void DecTrait(size_t id, double dec) {
+      if (id >= traits.size()) traits.resize(id+1, 0.0);
+      traits[id] -= dec;
+    }
+
     /// Push a trait onto end of traits vector.
     void PushTrait(double val) { traits.emplace_back(val); }
 
