@@ -560,6 +560,7 @@ namespace emp {
         exec_core_id(in.exec_core_id), is_executing(in.is_executing)
     {
       in.random_ptr = nullptr;
+      in.random_owner = false;
       in.event_lib = nullptr;
       in.program.inst_lib = nullptr;
     }
