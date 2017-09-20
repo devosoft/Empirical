@@ -307,8 +307,6 @@ namespace emp {
       Function(const affinity_t & _aff=affinity_t(), const inst_seq_t & _seq=inst_seq_t())
         : affinity(_aff), inst_seq(_seq) { ; }
 
-      size_t GetSize() const { return inst_seq.size(); }
-
       inst_t & operator[](size_t id) { return inst_seq[id]; }
       const inst_t & operator[](size_t id) const { return inst_seq[id]; }
 
@@ -316,6 +314,10 @@ namespace emp {
         return inst_seq == in.inst_seq && affinity == in.affinity;
       }
       bool operator!=(const Function & in) const { return !(*this == in); }
+
+      size_t GetSize() const { return inst_seq.size(); }
+
+      affinity_t & GetAffinity() { return affinity; }
 
       void PushInst(size_t id, arg_t a0, arg_t a1, arg_t a2, const affinity_t & aff) {
         inst_seq.emplace_back(id, a0, a1, a2, aff);
