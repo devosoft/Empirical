@@ -98,14 +98,14 @@ namespace emp {
     bool None() const { return bits.none(); }
     bool All() const { return bits.all(); }
 
-    bool Get(size_t col, size_t row) const { return bits[GetID(col,row)]; }
+    bool Get(size_t col, size_t row) const { return bits[ToID(col,row)]; }
     bool Get(size_t id) const { return bits[id]; }
 
-    void Set(size_t col, size_t row, bool val=true) { bits[GetID(col, row)] = val; }
+    void Set(size_t col, size_t row, bool val=true) { bits[ToID(col, row)] = val; }
     void Set(size_t id) { bits[id] = true; }
-    void Unset(size_t col, size_t row) { bits[GetID(col, row)] = false; }
+    void Unset(size_t col, size_t row) { bits[ToID(col, row)] = false; }
     void Unset(size_t id) { bits[id] = false; }
-    void Flip(size_t col, size_t row) { bits.flip(GetID(col, row)); }
+    void Flip(size_t col, size_t row) { bits.flip(ToID(col, row)); }
     void Flip(size_t id) { bits.flip(id); }
 
     void SetAll() { bits.SetAll(); }
@@ -151,7 +151,7 @@ namespace emp {
 
       return cur_region;
     }
-    BitMatrix GetRegion(size_t col, size_t row) const { return GetRegion(GetID(col,row)); }
+    BitMatrix GetRegion(size_t col, size_t row) const { return GetRegion(ToID(col,row)); }
 
     // Does this bit matrix represent a connected set of ones?
     bool IsConnected() const { return GetRegion((size_t)FindBit()) == *this; }
@@ -162,7 +162,7 @@ namespace emp {
     void Print(std::ostream & os = std::cout) const {
       for (size_t y = 0; y < ROWS; y++) {
         for (size_t x = 0; x < COLS; x++) {
-          os << bits[GetID(x,y)];
+          os << bits[ToID(x,y)];
         }
         os << std::endl;
       }
