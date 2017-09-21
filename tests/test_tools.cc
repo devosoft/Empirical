@@ -91,7 +91,7 @@ TEST_CASE("Test BitMatrix", "[tools]")
   REQUIRE(bm45.Get(1,1) == 0);
   REQUIRE(bm45.Get(1,2) == 1);
   REQUIRE(bm45.CountOnes() == 1);
-  REQUIRE(bm45.FindBit() == bm45.GetID(1,2));
+  REQUIRE(bm45.FindBit() == bm45.ToID(1,2));
 
   bm45.SetAll();
   REQUIRE(bm45.All() == true);
