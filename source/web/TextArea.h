@@ -36,11 +36,11 @@ namespace web {
 
       std::string cur_text;     ///< Text that should currently be in the box.
 
-      bool autofocus;
-      bool disabled;
+      bool autofocus;           ///< Should this TextArea be set as Autofocus?
+      bool disabled;            ///< Should this TextArea be disabled?
 
-      std::function<void(const std::string &)> callback;
-      uint32_t callback_id;
+      std::function<void(const std::string &)> callback; ///< Function to call with each keypress.
+      uint32_t callback_id;     ///< Callback ID the built-in function for this text area.
 
       TextAreaInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
       TextAreaInfo(const TextAreaInfo &) = delete;               // No copies of INFO allowed
@@ -117,7 +117,10 @@ namespace web {
       Info()->autofocus = false;
       Info()->disabled = false;
 
-      Info()->callback_id = 0;
+      TextAreaInfo * ta_info = Info();
+      Info()->callback_id = JSWrap( std::function<void(std::string)>(
+        [ta_info](std::string in_str){ ta_info->DoCallback(in_str); }
+      ));
     }
 
     /// Build a text area with a specified function to call with every change.
@@ -125,10 +128,6 @@ namespace web {
       : TextArea(in_id)
     {
       Info()->callback = in_cb;
-      TextAreaInfo * ta_info = Info();
-      Info()->callback_id = JSWrap( std::function<void(std::string)>(
-        [ta_info](std::string in_str){ ta_info->DoCallback(in_str); }
-      ));
     }
 
     /// Connect to an existing TextArea
@@ -138,11 +137,10 @@ namespace web {
 
     using INFO_TYPE = TextAreaInfo;
 
-    bool GetDisabled() const { return Info()->disabled; }
-
     /// Get the current text in this TextArea.
     const std::string & GetText() const { return Info()->cur_text; }
 
+    /// Make this text area have focus by default.
     TextArea & SetAutofocus(bool in_af) { Info()->UpdateAutofocus(in_af); return *this; }
 
     /// Change the callback function for this TextArea.
@@ -150,6 +148,8 @@ namespace web {
       Info()->UpdateCallback(in_cb);
       return *this;
     }
+
+    /// Gray out this text area.
     TextArea & SetDisabled(bool in_dis) { Info()->UpdateDisabled(in_dis); return *this; }
 
     /// Set the text contained in the text area.
@@ -159,7 +159,10 @@ namespace web {
       return *this;
     }
 
+    /// Does this widget have auto focus set?
     bool HasAutofocus() const { return Info()->autofocus; }
+
+    /// Is this widget currently disabled?
     bool IsDisabled() const { return Info()->disabled; }
   };
 

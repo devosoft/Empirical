@@ -1,20 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  BIT_MATRIX maintains a COL x ROW matrix of bits and provides easy indexing and manipulation.
-//
-//  Status: BETA
-//
-//  Bits are translated to a bitset with 0 in the upper left and moving through bits from
-//  left to right and top to bottom.  For example, the indecies in a 3x3 bit matrix would be
-//  organized as such:
-//
-//    0 1 2
-//    3 4 5
-//    6 7 8
-//
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  BitMatrix.h
+ *  @brief A COL x ROW matrix of bits and provides easy indexing and manipulation
+ *  @note Status: BETA
+ */
 
 #ifndef EMP_BIT_MATRIX_H
 #define EMP_BIT_MATRIX_H
@@ -31,10 +23,21 @@
 #include "bitset_utils.h"
 
 namespace emp {
+
+  /// @brief A simple class to manage a COLS x ROWS matrix of bits.
+  ///
+  ///  Bits are translated to a bitset with 0 in the upper left and moving through bits from
+  ///  left to right and top to bottom.  For example, the indecies in a 3x3 bit matrix would be
+  ///  organized as such:
+  ///
+  ///    0 1 2
+  ///    3 4 5
+  ///    6 7 8
+
   template <size_t COLS, size_t ROWS>
   class BitMatrix {
   private:
-    BitSet<COLS*ROWS> bits;
+    BitSet<COLS*ROWS> bits;   ///< Actual bits in matrix.
 
   public:
     template <size_t START_POS, size_t STEP_POS, size_t END_POS>
@@ -42,6 +45,7 @@ namespace emp {
       return BitSet<COLS*ROWS>();
     }
 
+    /// Keep only a single column of values, reducing all others to zeros.
     template <size_t COL_ID>
     static const BitSet<COLS*ROWS> & MaskCol() {
       static bool init = false;
@@ -54,6 +58,7 @@ namespace emp {
       // return mask_pattern<COLS*ROWS, COL_ID, COLS, COLS*ROWS-1>();
     }
 
+    /// Keep only a single row of values, reducing all others to zeros.
     template <size_t ROW_ID>
     static const BitSet<COLS*ROWS> & MaskRow() {
       static bool init = false;
@@ -71,26 +76,36 @@ namespace emp {
     BitMatrix(const BitMatrix & in_matrix) : bits(in_matrix.bits) { ; }
     ~BitMatrix() { ; }
 
+    /// How many rows are in this matrix?
     constexpr size_t NumRows() const { return ROWS; }
+
+    /// How many columns are in this matrix?
     constexpr size_t NumCols() const { return COLS; }
+
+    /// How many total cells are in this matrix?
     constexpr size_t GetSize() const { return ROWS * COLS; }
 
-    inline static size_t GetCol(size_t id) { return id % COLS; }
-    inline static size_t GetRow(size_t id) { return id / COLS; }
-    inline static size_t GetID(size_t col, size_t row) { return row * COLS + col; }
+    /// Identify which column a specific ID is part of.
+    inline static size_t ToCol(size_t id) { return id % COLS; }
+
+    /// Identify which row a specific ID is part of.
+    inline static size_t ToRow(size_t id) { return id / COLS; }
+
+    /// Identify the ID associated with a specified row and column.
+    inline static size_t ToID(size_t col, size_t row) { return row * COLS + col; }
 
     bool Any() const { return bits.any(); }
     bool None() const { return bits.none(); }
     bool All() const { return bits.all(); }
 
-    bool Get(size_t col, size_t row) const { return bits[GetID(col,row)]; }
+    bool Get(size_t col, size_t row) const { return bits[ToID(col,row)]; }
     bool Get(size_t id) const { return bits[id]; }
 
-    void Set(size_t col, size_t row, bool val=true) { bits[GetID(col, row)] = val; }
+    void Set(size_t col, size_t row, bool val=true) { bits[ToID(col, row)] = val; }
     void Set(size_t id) { bits[id] = true; }
-    void Unset(size_t col, size_t row) { bits[GetID(col, row)] = false; }
+    void Unset(size_t col, size_t row) { bits[ToID(col, row)] = false; }
     void Unset(size_t id) { bits[id] = false; }
-    void Flip(size_t col, size_t row) { bits.flip(GetID(col, row)); }
+    void Flip(size_t col, size_t row) { bits.flip(ToID(col, row)); }
     void Flip(size_t id) { bits.flip(id); }
 
     void SetAll() { bits.SetAll(); }
@@ -136,7 +151,7 @@ namespace emp {
 
       return cur_region;
     }
-    BitMatrix GetRegion(size_t col, size_t row) const { return GetRegion(GetID(col,row)); }
+    BitMatrix GetRegion(size_t col, size_t row) const { return GetRegion(ToID(col,row)); }
 
     // Does this bit matrix represent a connected set of ones?
     bool IsConnected() const { return GetRegion((size_t)FindBit()) == *this; }
@@ -147,7 +162,7 @@ namespace emp {
     void Print(std::ostream & os = std::cout) const {
       for (size_t y = 0; y < ROWS; y++) {
         for (size_t x = 0; x < COLS; x++) {
-          os << bits[GetID(x,y)];
+          os << bits[ToID(x,y)];
         }
         os << std::endl;
       }

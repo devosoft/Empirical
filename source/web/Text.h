@@ -22,8 +22,7 @@
 namespace emp {
 namespace web {
 
-  /// A Text widget handles putting text on a web page that can be controlled and modified at a
-  /// later time.
+  /// A Text widget handles putting text on a web page that can be controlled and modified.
 
   class Text : public internal::WidgetFacet<Text> {
     friend class TextInfo;
@@ -32,8 +31,8 @@ namespace web {
     class TextInfo : public internal::WidgetInfo {
       friend Text;
     protected:
-      DynamicString strings;
-      bool append_ok;
+      DynamicString strings;    ///< All string (and functions returning strings) in Text widget.
+      bool append_ok;           ///< Can this Text widget be extended?
 
       TextInfo(const std::string & in_id="") : internal::WidgetInfo(in_id), append_ok(true) { ; }
       TextInfo(const TextInfo &) = delete;               // No copies of INFO allowed
@@ -78,6 +77,7 @@ namespace web {
 
     using INFO_TYPE = TextInfo;
 
+    /// Erase current text.
     Text & Clear() { Info()->strings.Clear(); return *this; }
   };
 
