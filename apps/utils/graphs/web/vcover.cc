@@ -2,12 +2,12 @@
 #include <map>
 #include <string>
 
-#include "../../../tools/assert.h"
-#include "../../../tools/command_line.h"
-#include "../../../tools/Graph.h"
-#include "../../../tools/graph_utils.h"
-#include "../../../tools/string_utils.h"
-#include "../../../tools/SolveState.h"
+#include "base/assert.h"
+#include "config/command_line.h"
+#include "tools/Graph.h"
+#include "tools/graph_utils.h"
+#include "tools/string_utils.h"
+#include "tools/SolveState.h"
 
 #include <emscripten.h>
 
