@@ -41,21 +41,25 @@ namespace emp {
     // Setup a bit proxy so that we can use operator[] on bit sets as a lvalue.
     class BitProxy {
     private:
-      BitSet<NUM_BITS> & bit_set;
-      size_t index;
+      BitSet<NUM_BITS> & bit_set;  ///< BitSet object that this proxy refers to.
+      size_t index;                ///< Position in BitSet the this proxy refers to.
     public:
       BitProxy(BitSet<NUM_BITS> & _set, size_t _idx) : bit_set(_set), index(_idx) {
         emp_assert(_idx < bit_set.size());
       }
 
+      /// Set the bit value that this proxy refers to.
       BitProxy & operator=(bool b) {    // lvalue handling...
         bit_set.Set(index, b);
         return *this;
       }
+
+      /// Convert BitProxy to a regular boolean value.
       operator bool() const {            // rvalue handling...
         return bit_set.Get(index);
       }
 
+      /// Flip this bit.
       BitProxy & Toggle() { bit_set.Toggle(index); return *this; }
     };
     friend class BitProxy;
