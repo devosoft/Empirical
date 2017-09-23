@@ -135,23 +135,29 @@ namespace emp {
     };
 
     // emp_constexpr means only make constexpr when NDEBUG is set (to otherwise allow asserts)
+
+    /// Identify the field that a specified bit is in.
     emp_constexpr static size_t FieldID(const size_t index)  { return index / FIELD_BITS; }
+
+    /// Identify the position in a field where a specified bit is.
     emp_constexpr static size_t FieldPos(const size_t index) { return index & (FIELD_BITS-1); }
 
+    /// Identify which field a specified byte position would be in.
     static constexpr size_t Byte2Field(const size_t index) { return index/sizeof(field_t); }
+
+    /// Convert a byte position in BitVector to a byte position in the target field.
     static constexpr size_t Byte2FieldPos(const size_t index) {
       return (index & (sizeof(field_t)-1)) << 3;
     }
 
-    // The following function assumes that the size of the bit_set has already been adjusted
-    // to be the same as the size of the one being copied and only the fields need to be
-    // copied over.
+    /// Assume that the size of the bit_set has already been adjusted to be the size of the one
+    /// being copied and only the fields need to be copied over.
     void RawCopy(const Ptr<field_t> in_set) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
     }
 
-    // Helper: call SHIFT with positive number
+    /// Helper: call SHIFT with positive number
     void ShiftLeft(const size_t shift_size) {
       const size_t field_shift = shift_size / FIELD_BITS;
       const size_t bit_shift = shift_size % FIELD_BITS;
@@ -182,7 +188,7 @@ namespace emp {
     }
 
 
-    // Helper for calling SHIFT with negative number
+    /// Helper for calling SHIFT with negative number
     void ShiftRight(const size_t shift_size) {
       const size_t field_shift = shift_size / FIELD_BITS;
       const size_t bit_shift = shift_size % FIELD_BITS;
