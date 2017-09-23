@@ -1,17 +1,17 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Class: emp::BitVector
-//  Desc: A customized version of emp::vector<bool> with additional bit magic operations
-//  Status: RELEASE
-//
-// To implement: append(), resize()...
-//
-// Note, this class is about 15-20% slower than emp::BitSet, but is not fixed size and does
-// not require knowledge of the size at compile time.
-//
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  BitVector.h
+ *  @brief A drop-in replacement for std::vector<bool>, with additional bitwise logic features.
+ *  @note Status: RELEASE
+ *
+ *  @todo Implement append(), resize()...
+ *
+ *  @note This class is 15-20% slower than emp::BitSet, but more flexible & run-time configurable.
+ */
+
 
 #ifndef EMP_BIT_VECTOR_H
 #define EMP_BIT_VECTOR_H
@@ -28,24 +28,37 @@
 
 namespace emp {
 
+  /// @brief A drop-in replacement for std::vector<bool>, but with extra bitwise logic features.
+  ///
+  /// This class stores an arbirary number of bits in a set of "fields" (either 32-bit or 64-bit,
+  /// depending on which should be faster.)  Individual bits can be extracted, -or- bitwise logic
+  /// (or bit magic) can be used on the groups of bits,
+
   class BitVector {
   private:
 #ifdef EMSCRIPTEN
-    using field_t = uint32_t;
+    using field_t = uint32_t;  ///< Field sizes are 32 bits in Emscripten (max directly handled)
 #else
-    using field_t = uint64_t;
+    using field_t = uint64_t;  ///< Field sizes are 64 bits in native.
 #endif
 
-    static constexpr size_t FIELD_BITS = sizeof(field_t)*8;
-    size_t num_bits;
-    Ptr<field_t> bit_set;
+    static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< How many bits are in a field?
+    size_t num_bits;                                        ///< How many total bits are we using?
+    Ptr<field_t> bit_set;                                   ///< What is the status of each bit?
 
+    /// End position of the stored bits in the last field; 0 if perfect fit.
     size_t LastBitID() const { return num_bits & (FIELD_BITS - 1); }
+
+    /// How many feilds do we need?
     size_t NumFields() const { return num_bits ? (1 + ((num_bits - 1) / FIELD_BITS)) : 0; }
+
+    /// How many bytes are used in the current vector (round up to whole bytes.)
     size_t NumBytes()  const { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
+
+    /// How many fields would we need if they had the same number of bits as size_t?
     size_t NumSizeFields() const { return NumFields() * sizeof(field_t) / sizeof(std::size_t); }
 
-    // Setup a bit proxy so that we can use operator[] on bit sets as an lvalue.
+    /// BitProxy lets us use operator[] on with BitVector as an lvalue.
     struct BitProxy {
       BitVector & bit_vector;
       size_t index;
