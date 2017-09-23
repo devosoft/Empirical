@@ -139,11 +139,12 @@ namespace emp {
       return *this;
     }
 
+    /// Set all bits randomly, with a given probability of being a 1.
     void Randomize(Random & random, const double p1=0.5) {
       for (size_t i = 0; i < NUM_BITS; i++) Set(i, random.P(p1));
     }
 
-    // Assign from a BitSet of a different size.
+    /// Assign from a BitSet of a different size.
     template <size_t NUM_BITS2>
     BitSet & Import(const BitSet<NUM_BITS2> & in_set) {
       static const size_t NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> 5);
@@ -153,7 +154,7 @@ namespace emp {
       return *this;
     }
 
-    // Convert to a Bitset of a different size.
+    /// Convert to a Bitset of a different size.
     template <size_t NUM_BITS2>
     BitSet<NUM_BITS2> Export() const {
       static const size_t NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> 5);
@@ -164,12 +165,15 @@ namespace emp {
       return out_bits;
     }
 
+    /// Test if two BitSet objects are identical.
     bool operator==(const BitSet & in_set) const {
       for (size_t i = 0; i < NUM_FIELDS; ++i) {
         if (bit_set[i] != in_set.bit_set[i]) return false;
       }
       return true;
     }
+
+    /// Compare two BitSet objects, based on the associated binary value.
     bool operator<(const BitSet & in_set) const {
       for (int i = NUM_FIELDS-1; i >= 0; --i) {         // Start loop at the largest field.
         if (bit_set[i] == in_set.bit_set[i]) continue;  // If same, keep looking!
@@ -177,6 +181,8 @@ namespace emp {
       }
       return false;
     }
+
+    /// Compare two BitSet objects, based on the associated binary value.
     bool operator<=(const BitSet & in_set) const {
       for (int i = NUM_FIELDS-1; i >= 0; --i) {         // Start loop at the largest field.
         if (bit_set[i] == in_set.bit_set[i]) continue;  // If same, keep looking!
@@ -184,12 +190,20 @@ namespace emp {
       }
       return true;
     }
+
+    /// Test if two BitSet objects are different.
     bool operator!=(const BitSet & in_set) const { return !operator==(in_set); }
+
+    /// Compare two BitSet objects, based on the associated binary value.
     bool operator>(const BitSet & in_set) const { return !operator<=(in_set); }
+
+    /// Compare two BitSet objects, based on the associated binary value.
     bool operator>=(const BitSet & in_set) const { return !operator<(in_set); }
 
+    /// How many bits are in this BitSet?
     constexpr static size_t GetSize() { return NUM_BITS; }
 
+    /// Retrieve the bit as a specified index.
     bool Get(size_t index) const {
       emp_assert(index >= 0 && index < NUM_BITS);
       const size_t field_id = FieldID(index);
@@ -197,6 +211,7 @@ namespace emp {
       return (bit_set[field_id] & (1 << pos_id)) != 0;
     }
 
+    /// Set the bit as a specified index.
     void Set(size_t index, bool value) {
       emp_assert(index < NUM_BITS);
       const size_t field_id = FieldID(index);
@@ -228,6 +243,7 @@ namespace emp {
       return *this;
     }
 
+    /// Get the full byte starting from the bit at a specified index.
     uint8_t GetByte(size_t index) const {
       emp_assert(index < NUM_BYTES);
       const size_t field_id = Byte2Field(index);
@@ -235,6 +251,7 @@ namespace emp {
       return (bit_set[field_id] >> pos_id) & 255;
     }
 
+    /// Set the full byte starting at the bit at the specified index.
     void SetByte(size_t index, uint8_t value) {
       emp_assert(index < NUM_BYTES);
       const size_t field_id = Byte2Field(index);
@@ -243,16 +260,19 @@ namespace emp {
       bit_set[field_id] = (bit_set[field_id] & ~(255U << pos_id)) | (val_uint << pos_id);
     }
 
+    /// Get the 32-bit unsigned int; index in in 32-bit jumps (i.e., this is a field ID not bit id)
     uint32_t GetUInt(size_t index) const {
       emp_assert(index < NUM_FIELDS);
       return bit_set[index];
     }
 
+    /// Set the 32-bit unsigned int; index in in 32-bit jumps (i.e., this is a field ID not bit id)
     void SetUInt(size_t index, uint32_t value) {
       emp_assert(index < NUM_FIELDS);
       bit_set[index] = value;
     }
 
+    /// Get the full 32-bit unsigned int starting from the bit at a specified index.
     uint32_t GetUIntAtBit(size_t index) {
       emp_assert(index < NUM_BITS);
       const size_t field_id = FieldID(index);
@@ -262,15 +282,20 @@ namespace emp {
         ((field_id+1 < NUM_FIELDS) ? bit_set[field_id+1] << (32-pos_id) : 0);
     }
 
+    /// Get OUT_BITS bits starting from the bit at a specified index (max 32)
     template <size_t OUT_BITS>
     uint32_t GetValueAtBit(size_t index) {
       static_assert(OUT_BITS <= 32, "Requesting too many bits to fit in a UInt");
       return GetUIntAtBit(index) & MaskLow<uint32_t>(OUT_BITS);
     }
 
-
+    /// Return true if ANY bits in the BitSet are one, else return false.
     bool Any() const { for (auto i : bit_set) if (i) return true; return false; }
+
+    /// Return true if NO bits in the BitSet are one, else return false.
     bool None() const { return !Any(); }
+
+    /// Return true if ALL bits in the BitSet are one, else return false.
     bool All() const { return (~(*this)).None(); }
 
 
