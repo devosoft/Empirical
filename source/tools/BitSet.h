@@ -32,13 +32,18 @@ namespace emp {
   ///  to be as fast as possible.
   template <size_t NUM_BITS> class BitSet {
   private:
+    /// Fields hold bits in groups of 32 (as uint32_t); how many feilds do we need?
     static const uint32_t NUM_FIELDS = 1 + ((NUM_BITS - 1) >> 5);
+
+    /// End position of the stored bits in the last field; 0 if perfect fit.
     static const uint32_t LAST_BIT = NUM_BITS & 31;
+
+    /// How many total bytes are needed to represent these bits? (rounded up to full bytes)
     static const uint32_t NUM_BYTES = 1 + ((NUM_BITS - 1) >> 3);
 
-    uint32_t bit_set[NUM_FIELDS];
+    uint32_t bit_set[NUM_FIELDS];  ///< Fields to hold the actual bits for this BitSet.
 
-    // Setup a bit proxy so that we can use operator[] on bit sets as a lvalue.
+    /// BitProxy lets us use operator[] on with BitSet as an lvalue.
     class BitProxy {
     private:
       BitSet<NUM_BITS> & bit_set;  ///< BitSet object that this proxy refers to.
@@ -77,7 +82,7 @@ namespace emp {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
     }
 
-    // Helper: call SHIFT with positive number instead
+    /// Helper: call SHIFT with positive number instead
     void ShiftLeft(const uint32_t shift_size) {
       const int field_shift = shift_size / 32;
       const int bit_shift = shift_size % 32;
@@ -106,7 +111,7 @@ namespace emp {
     }
 
 
-    // Helper for calling SHIFT with negative number
+    /// Helper for calling SHIFT with negative number
     void ShiftRight(const uint32_t shift_size) {
       emp_assert(shift_size > 0);
       const uint32_t field_shift = shift_size / 32;
@@ -134,10 +139,17 @@ namespace emp {
   public:
     /// Constructor: Assume all zeroes in set
     BitSet() { Clear(); }
+
+    /// Copy constructor from another BitSet
     BitSet(const BitSet & in_set) { Copy(in_set.bit_set); }
+
+    /// Constructor to generate a random BitSet.
     BitSet(Random & random, const double p1=0.5) { Randomize(random, p1); }
+
+    /// Destructor.
     ~BitSet() = default;
 
+    /// Assignment operator.
     BitSet & operator=(const BitSet<NUM_BITS> & in_set) {
       Copy(in_set.bit_set);
       return *this;
