@@ -508,27 +508,61 @@ namespace emp {
       return *this;
     }
 
-    // Operator overloads...
+    /// Operator bitwise NOT...
     BitSet operator~() const { return NOT(); }
+
+    /// Operator bitwise AND...
     BitSet operator&(const BitSet & ar2) const { return AND(ar2); }
+
+    /// Operator bitwise OR...
     BitSet operator|(const BitSet & ar2) const { return OR(ar2); }
+
+    /// Operator bitwise XOR...
     BitSet operator^(const BitSet & ar2) const { return XOR(ar2); }
+
+    /// Operator shift left...
     BitSet operator<<(const size_t shift_size) const { return SHIFT(-(int)shift_size); }
+
+    /// Operator shift right...
     BitSet operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
+
+    /// Compound operator bitwise AND...
     const BitSet & operator&=(const BitSet & ar2) { return AND_SELF(ar2); }
+
+    /// Compound operator bitwise OR...
     const BitSet & operator|=(const BitSet & ar2) { return OR_SELF(ar2); }
+
+    /// Compound operator bitwise XOR...
     const BitSet & operator^=(const BitSet & ar2) { return XOR_SELF(ar2); }
+
+    /// Compound operator shift left...
     const BitSet & operator<<=(const size_t shift_size) { return SHIFT_SELF(-(int)shift_size); }
+
+    /// Compound operator shift right...
     const BitSet & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
-    // For compatability with std::bitset.
+    /// Function to allow drop-in replacement with std::bitset.
     constexpr static size_t size() { return NUM_BITS; }
+
+    /// Function to allow drop-in replacement with std::bitset.
     inline bool all() const { return All(); }
+
+    /// Function to allow drop-in replacement with std::bitset.
     inline bool any() const { return Any(); }
+
+    /// Function to allow drop-in replacement with std::bitset.
     inline bool none() const { return !Any(); }
+
+    /// Function to allow drop-in replacement with std::bitset.
     inline size_t count() const { return CountOnes_Mixed(); }
+
+    /// Function to allow drop-in replacement with std::bitset.
     inline BitSet & flip() { return Toggle(); }
+
+    /// Function to allow drop-in replacement with std::bitset.
     inline BitSet & flip(size_t pos) { return Toggle(pos); }
+
+    /// Function to allow drop-in replacement with std::bitset.
     inline BitSet & flip(size_t start, size_t end) { return Toggle(start, end); }
   };
 
