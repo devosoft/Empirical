@@ -1,99 +1,16 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Class: template <int NUM_BITS> emp::BitSet
-//
-//  Desc: This class handles a fixed-sized (but arbitrarily large) array of bits,
-//        and optimizes operations on those bits to be as fast as possible.
-//
-//  Note: emp::BitSet is based on std::bitset, and can be used as a drop-in replacement.
-//        Like std::bitset, bit zero is on the right side.  Unlike std::bitset, emp::BitSet
-//        gives access to bit fields for easy access to different sized chucnk of bits and
-//        implementation new bit-magic tricks.
-//
-//  Status: RELEASE
-//
-//
-// Constructors:
-//  BitSet()                                     -- Assume all zeroes in set
-//  BitSet(const BitSet & in_set)                -- Copy Constructor
-//  BitSet(emp::Random & random, double p1=0.5)  -- Build a random bitset.
-//
-// Assignment helpers:
-//  BitSet & operator=(const BitSet & in_set)           -- Copy over a BitSet of the same size
-//  void Randomize(emp::Random & random, double p1=0.5) -- Randomize all bits.
-//  BitSet & Import(const BitSet & in_set)              -- Copy over a BitSet of a different size
-//  BitSet Export<NEW_SIZE>()                           -- Convert this BitSet a different size
-//
-// Comparisons:
-//  bool operator==(const BitSet & in_set) const  -- Test if all bits are identical
-//  bool operator<(const BitSet & in_set) const   -- Ordering to facilitate sorting, etc.
-//  bool operator<=(const BitSet & in_set) const  -- ...filling out remaining Boolean comparisons
-//  bool operator>(const BitSet & in_set) const   --
-//  bool operator>=(const BitSet & in_set) const  --
-//  bool operator!=(const BitSet & in_set) const  --
-//
-// Sizing:
-//  size_t GetSize() const
-//
-// Accessors for bits:
-//  void Set(size_t index, bool value)
-//  bool Get(size_t index) const
-//  bool operator[](size_t index) const
-//  BitProxy operator[](size_t index)
-//
-// Accessors for larger chunks:
-//  void Clear()                                  -- Set all bits to zero
-//  void SetAll()                                 -- Set all bits to one
-//  uint8_t GetByte(size_t byte_id) const            -- Read a full byte of bits
-//  void SetByte(size_t byte_id, uint8_t value)      -- Set a full byte of bits
-//  uint32_t GetUInt(size_t uint_id) const           -- Read 32 bits at once
-//  void SetUInt(size_t uint_id, uint32_t value)     -- Set 32 bits at once
-//
-// Printing:
-//  void Print(ostream & out=cout) const          -- Print BitSet (least significant on right)
-//  void PrintArray(ostream & out=cout) const     -- Print as array (index zero on left)
-//  void PrintOneIDs(ostream & out=cout) const    -- Just print the IDs of the set bits.
-//
-// Bit analysis:
-//  size_t CountOnes()
-//  int FindBit(size_t start_bit)  -- Return pos of first 1 after start_bit
-//  emp::vector<size_t> GetOnes()  -- Return pos of ALL ones.
-//
-// Boolean math functions:
-//  BitSet NOT() const
-//  BitSet AND(const BitSet & set2) const
-//  BitSet OR(const BitSet & set2) const
-//  BitSet NAND(const BitSet & set2) const
-//  BitSet NOR(const BitSet & set2) const
-//  BitSet XOR(const BitSet & set2) const
-//  BitSet EQU(const BitSet & set2) const
-//
-//  const BitSet & NOT_SELF()
-//  const BitSet & AND_SELF(const BitSet & set2)
-//  const BitSet & OR_SELF(const BitSet & set2)
-//  const BitSet & NAND_SELF(const BitSet & set2)
-//  const BitSet & NOR_SELF(const BitSet & set2)
-//  const BitSet & XOR_SELF(const BitSet & set2)
-//  const BitSet & EQU_SELF(const BitSet & set2)
-//
-//  BitSet SHIFT(const int shift_size) const   -- positive for left shift, negative for right shift
-//  const BitSet & SHIFT_SELF(const int shift_size) const
-//
-// Operator overloads:
-//  BitSet operator~() const
-//  BitSet operator&(const BitSet & ar2) const
-//  BitSet operator|(const BitSet & ar2) const
-//  BitSet operator^(const BitSet & ar2) const
-//  BitSet operator>>(const size_t) const
-//  BitSet operator<<(const size_t) const
-//  const BitSet & operator&=(const BitSet & ar2)
-//  const BitSet & operator|=(const BitSet & ar2)
-//  const BitSet & operator^=(const BitSet & ar2)
-//  const BitSet & operator>>=(const size_t)
-//  const BitSet & operator<<=(const size_t)
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  BitSet.h
+ *  @brief A drop-in replacement for std::bitset, with additional bit magic features.
+ *  @note Status: RELEASE
+ *
+ *  @note Like std::bitset, bit zero is on the right side.  Unlike std::bitset, emp::BitSet
+ *       gives access to bit fields for easy access to different sized chucnk of bits and
+ *       implementation new bit-magic tricks.
+ */
 
 
 #ifndef EMP_BIT_SET_H
@@ -111,6 +28,8 @@
 
 namespace emp {
 
+  ///  A fixed-sized (but arbitrarily large) array of bits, and optimizes operations on those bits
+  ///  to be as fast as possible.
   template <size_t NUM_BITS> class BitSet {
   private:
     static const uint32_t NUM_FIELDS = 1 + ((NUM_BITS - 1) >> 5);
