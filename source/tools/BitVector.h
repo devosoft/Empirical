@@ -215,17 +215,24 @@ namespace emp {
     }
 
   public:
+    /// Build a new BitVector with specified bit count (default 0) and initialization (default 0)
     BitVector(size_t in_num_bits=0, bool init_val=false) : num_bits(in_num_bits), bit_set(nullptr) {
       if (num_bits) bit_set = NewArrayPtr<field_t>(NumFields());
       if (init_val) SetAll(); else Clear();
     }
+
+    /// Copy constructor of existing bit field.
     BitVector(const BitVector & in_set) : num_bits(in_set.num_bits), bit_set(nullptr) {
       if (num_bits) bit_set = NewArrayPtr<field_t>(NumFields());
       RawCopy(in_set.bit_set);
     }
+
+    /// Move constructor of existing bit field.
     BitVector(BitVector && in_set) : num_bits(in_set.num_bits), bit_set(in_set.bit_set) {
       in_set.bit_set = nullptr;
     }
+
+    /// Destructor
     ~BitVector() {
       if (bit_set) {        // A move constructor can make bit_set == nullptr
         bit_set.DeleteArray();
@@ -233,6 +240,7 @@ namespace emp {
       }
     }
 
+    /// Assignment operator.
     BitVector & operator=(const BitVector & in_set) {
       if (&in_set == this) return *this;
       const size_t in_num_fields = in_set.NumFields();
@@ -250,6 +258,7 @@ namespace emp {
       return *this;
     }
 
+    /// Move operator.
     BitVector & operator=(BitVector && in_set) {
       if (&in_set == this) return *this;
       if (bit_set) bit_set.DeleteArray();
@@ -260,6 +269,7 @@ namespace emp {
       return *this;
     }
 
+    /// Resize this BitVector to have the specified number of bits.
     BitVector & Resize(size_t new_bits) {
       const size_t old_num_fields = NumFields();
       num_bits = new_bits;
@@ -284,6 +294,7 @@ namespace emp {
       return *this;
     }
 
+    /// Test if two bit vectors are identical.
     bool operator==(const BitVector & in_set) const {
       if (num_bits != in_set.num_bits) return false;
 
@@ -293,6 +304,8 @@ namespace emp {
       }
       return true;
     }
+
+    /// Compare the would-be numerical values of two bit vectors.
     bool operator<(const BitVector & in_set) const {
       if (num_bits != in_set.num_bits) return num_bits < in_set.num_bits;
 
@@ -304,6 +317,8 @@ namespace emp {
       }
       return false;
     }
+
+    /// Compare the would-be numerical values of two bit vectors.
     bool operator<=(const BitVector & in_set) const {
       if (num_bits != in_set.num_bits) return num_bits <= in_set.num_bits;
 
@@ -315,12 +330,20 @@ namespace emp {
       }
       return true;
     }
+
+    /// Determine if two bit vectors are different.
     bool operator!=(const BitVector & in_set) const { return !operator==(in_set); }
+
+    /// Compare the would-be numerical values of two bit vectors.
     bool operator>(const BitVector & in_set) const { return !operator<=(in_set); }
+
+    /// Compare the would-be numerical values of two bit vectors.
     bool operator>=(const BitVector & in_set) const { return !operator<(in_set); }
 
+    /// How many bits do we currently have?
     size_t GetSize() const { return num_bits; }
 
+    /// Retrive the bit value from the specified index.
     bool Get(size_t index) const {
       emp_assert(index < num_bits, index, num_bits);
       const size_t field_id = FieldID(index);
@@ -328,6 +351,7 @@ namespace emp {
       return (bit_set[field_id] & (static_cast<field_t>(1) << pos_id)) != 0;
     }
 
+    /// Update the bit value at the specified index.
     void Set(size_t index, bool value) {
       emp_assert(index < num_bits, index, num_bits);
       const size_t field_id = FieldID(index);
@@ -338,6 +362,7 @@ namespace emp {
       else       bit_set[field_id] &= ~pos_mask;
     }
 
+    /// A simple hash function for bit vectors.
     std::size_t Hash() const {
       const size_t num_sfields = NumSizeFields();
       std::size_t hash_val = 0;
@@ -347,6 +372,7 @@ namespace emp {
       return hash_val ^ ((97*num_bits) << 8);
     }
 
+    /// Retrive the byte at the specified byte index.
     uint8_t GetByte(size_t index) const {
       emp_assert(index < NumBytes(), index, NumBytes());
       const size_t field_id = Byte2Field(index);
@@ -354,6 +380,7 @@ namespace emp {
       return (bit_set[field_id] >> pos_id) & 255U;
     }
 
+    /// Update the byte at the specified byte index.
     void SetByte(size_t index, uint8_t value) {
       emp_assert(index < NumBytes(), index, NumBytes());
       const size_t field_id = Byte2Field(index);
@@ -362,18 +389,21 @@ namespace emp {
       bit_set[field_id] = (bit_set[field_id] & ~(static_cast<field_t>(255) << pos_id)) | (val_uint << pos_id);
     }
 
+    /// Retrive the 32-bit uint from the specifeid uint index.
     uint32_t GetUInt(size_t index) const {
       // @CAO Need proper assert for variable bit fields!
       // emp_assert(index < NumFields());
       return bit_set.Cast<uint32_t>()[index];
     }
 
+    /// Update the 32-bit uint at the specified uint index.
     void SetUInt(size_t index, uint32_t value) {
       // @CAO Need proper assert for variable bit fields!
       // emp_assert(index < NumFields());
       bit_set.Cast<uint32_t>()[index] = value;
     }
 
+    /// Retrive the 32-bit uint at the specified BIT index.
     uint32_t GetUIntAtBit(size_t index) {
       // @CAO Need proper assert for non-32-size bit fields!
       // emp_assert(index < num_bits);
@@ -387,6 +417,7 @@ namespace emp {
       return part1 | part2;
     }
 
+    /// Retrieve the specified number of bits (stored in the field type) at the target bit index.
     template <size_t OUT_BITS>
     field_t GetValueAtBit(size_t index) {
       // @CAO This function needs to be generalized to return more then sizeof(field_t)*8 bits.
