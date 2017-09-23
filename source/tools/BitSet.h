@@ -447,47 +447,53 @@ namespace emp {
     }
 
 
-    // Boolean math functions...
+    /// Perform a Boolean NOT on this BitSet, store result here, and return this object.
     BitSet & NOT_SELF() {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
       if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
       return *this;
     }
 
+    /// Perform a Boolean AND with a second BitSet, store result here, and return this object.
     BitSet & AND_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] & set2.bit_set[i];
       return *this;
     }
 
+    /// Perform a Boolean OR with a second BitSet, store result here, and return this object.
     BitSet & OR_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] | set2.bit_set[i];
       return *this;
     }
 
+    /// Perform a Boolean NAND with a second BitSet, store result here, and return this object.
     BitSet & NAND_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
       if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
       return *this;
     }
 
+    /// Perform a Boolean NOR with a second BitSet, store result here, and return this object.
     BitSet & NOR_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
       if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
       return *this;
     }
 
+    /// Perform a Boolean XOR with a second BitSet, store result here, and return this object.
     BitSet & XOR_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] ^ set2.bit_set[i];
       return *this;
     }
 
+    /// Perform a Boolean EQU with a second BitSet, store result here, and return this object.
     BitSet & EQU_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
       if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
       return *this;
     }
 
-    // Positive shifts go left and negative go right (0 does nothing)
+    /// Positive shifts go left and negative go right (0 does nothing); return result.
     BitSet SHIFT(const int shift_size) const {
       BitSet out_set(*this);
       if (shift_size > 0) out_set.ShiftRight((uint32_t) shift_size);
@@ -495,6 +501,7 @@ namespace emp {
       return out_set;
     }
 
+    /// Positive shifts go left and negative go right; store result here, and return this object.
     BitSet & SHIFT_SELF(const int shift_size) {
       if (shift_size > 0) ShiftRight((uint32_t) shift_size);
       else if (shift_size < 0) ShiftLeft((uint32_t) -shift_size);
