@@ -298,29 +298,37 @@ namespace emp {
     /// Return true if ALL bits in the BitSet are one, else return false.
     bool All() const { return (~(*this)).None(); }
 
-
+    /// Index into a const BitSet (i.e., cannot be set this way.)
     bool operator[](size_t index) const { return Get(index); }
+
+    /// Index into a BitSet, returning a proxy that will allow bit assignment to work.
     BitProxy operator[](size_t index) { return BitProxy(*this, index); }
 
+    /// Set all bits to zero.
     void Clear() { for (auto & i : bit_set) i = 0U; }
+
+    /// Set all bits to one.
     void SetAll() {
       for (auto & i : bit_set) i = ~0U;
       if (LAST_BIT > 0) { bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT); }
     }
 
-
+    /// Print all bits to the provided output stream.
     void Print(std::ostream & out=std::cout) const {
       for (size_t i = NUM_BITS; i > 0; i--) { out << Get(i-1); }
     }
+
+    /// Print all bits from smallest to largest, as if this were an array, not a bit representation.
     void PrintArray(std::ostream & out=std::cout) const {
       for (size_t i = 0; i < NUM_BITS; i++) out << Get(i);
     }
+
+    /// Print the locations of all one bits, using the provided spacer (default is a single space)
     void PrintOneIDs(std::ostream & out=std::cout, char spacer=' ') const {
       for (size_t i = 0; i < NUM_BITS; i++) { if (Get(i)) out << i << spacer; }
     }
 
-
-    // Count 1's by looping through once for each bit equal to 1
+    /// Count 1's by looping through once for each bit equal to 1
     size_t CountOnes_Sparse() const {
       size_t bit_count = 0;
       for (auto i : bit_set) {
@@ -332,7 +340,7 @@ namespace emp {
       return bit_count;
     }
 
-    // Count 1's in semi-parallel; fastest for even 0's & 1's
+    /// Count 1's in semi-parallel; fastest for even 0's & 1's
     size_t CountOnes_Mixed() const {
       size_t bit_count = 0;
       for (const auto v : bit_set) {
@@ -343,14 +351,17 @@ namespace emp {
       return bit_count;
     }
 
+    /// Count the number of ones in the BitSet using bit tricks for a speedup.
     size_t CountOnes() const { return CountOnes_Mixed(); }
 
+    /// Return the index of the first one in the sequence; return -1 if no ones are available.
     int FindBit() const {
       size_t field_id = 0;
       while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
       return (field_id < NUM_FIELDS) ? (int) (find_bit(bit_set[field_id]) + (field_id << 5)) : -1;
     }
 
+    /// Return index of first one in sequence (or -1 if no ones); change this position to zero.
     int PopBit() {
       size_t field_id = 0;
       while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
@@ -361,7 +372,7 @@ namespace emp {
       return pos_found + (int)(field_id << 5);
     }
 
-
+    /// Return index of first one in sequence AFTER start_pos (or -1 if no ones)
     int FindBit(const size_t start_pos) const {
       // @CAO -- There are better ways to do this with bit tricks
       //         (but start_pos is tricky...)
@@ -370,6 +381,8 @@ namespace emp {
       }
       return -1;
     }
+
+    /// Return a vector indicating the posistions of all ones in the BitSet.
     emp::vector<size_t> GetOnes() const {
       // @CAO -- There are better ways to do this with bit tricks.
       emp::vector<size_t> out_set(CountOnes());
@@ -380,7 +393,7 @@ namespace emp {
       return out_set;
     }
 
-    // Boolean math functions...
+    /// Perform a Boolean NOT on this BitSet and return the result.
     BitSet NOT() const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~bit_set[i];
@@ -388,18 +401,21 @@ namespace emp {
       return out_set;
     }
 
+    /// Perform a Boolean AND with a second BitSet and return the result.
     BitSet AND(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] & set2.bit_set[i];
       return out_set;
     }
 
+    /// Perform a Boolean OR with a second BitSet and return the result.
     BitSet OR(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] | set2.bit_set[i];
       return out_set;
     }
 
+    /// Perform a Boolean NAND with a second BitSet and return the result.
     BitSet NAND(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
@@ -407,6 +423,7 @@ namespace emp {
       return out_set;
     }
 
+    /// Perform a Boolean NOR with a second BitSet and return the result.
     BitSet NOR(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
@@ -414,12 +431,14 @@ namespace emp {
       return out_set;
     }
 
+    /// Perform a Boolean XOR with a second BitSet and return the result.
     BitSet XOR(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] ^ set2.bit_set[i];
       return out_set;
     }
 
+    /// Perform a Boolean EQU with a second BitSet and return the result.
     BitSet EQU(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
