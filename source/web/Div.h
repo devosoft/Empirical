@@ -55,11 +55,16 @@ namespace web {
       double scroll_top;                              ///< Where should div scroll to? (0.0 to 1.0)
       emp::vector<Widget> m_children;                 ///< Widgets contained in this one.
       bool append_ok;                                 ///< Can we add more children?
+      bool text_append;                               ///< Can we append to a current text widget?
       std::map<std::string, Widget> widget_dict;      ///< By-name lookup for descendent widgets
       std::map<std::string, web::Animate *> anim_map; ///< Streamline creation of Animate objects.
 
       DivInfo(const std::string & in_id="")
-        : internal::WidgetInfo(in_id), scroll_top(0.0), append_ok(true) { emp::Initialize(); }
+        : internal::WidgetInfo(in_id), scroll_top(0.0), append_ok(true), text_append(false)
+        , widget_dict(), anim_map()
+      {
+        emp::Initialize();
+      }
       DivInfo(const DivInfo &) = delete;              // No copies of INFO allowed
       DivInfo & operator=(const DivInfo &) = delete;  // No copies of INFO allowed
       virtual ~DivInfo() {
@@ -159,11 +164,13 @@ namespace web {
       // Return a text element for appending.  Use the last element unless there are no elements,
       // the last element is not text, or it is not appendable (instead, build a new one).
       web::Text & GetTextWidget() {
-        // If the final element is not text, add one.
+        // If the final element is not appendable text, add a new Text widget.
         if (m_children.size() == 0
             || m_children.back().IsText() == false
-            || m_children.back().AppendOK() == false)  {
+            || m_children.back().AppendOK() == false
+            || text_append == false)  {
           AddChild(Text());
+          text_append = true;
         }
         return (Text &) m_children.back();
       }
@@ -184,14 +191,17 @@ namespace web {
       Widget Append(Widget info) override {
         if (!append_ok) return ForwardAppend(info);
         AddChild(info);
+        text_append = false;   // A widget is being passed in, so don't all text appends.
         return info;
       }
 
+      /// Start a new set of Text with this font (even if one already exists.)
       Widget Append(const Font & font) override {
         if (!append_ok) return ForwardAppend(font);
-        Text new_text;
-        new_text.SetFont(font);
-        AddChild(new_text);
+        Text new_text;          // Build a new text widget for this font.
+        new_text.SetFont(font); // Setup the new text widget with the provided font.
+        AddChild(new_text);     // Add this new text widget to this div.
+        text_append = true;     // Since we added a Text widget with this font, it can be extended.
         return new_text;
       }
 
