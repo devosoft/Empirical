@@ -425,7 +425,7 @@ namespace emp {
       return GetUIntAtBit(index) & MaskLow<field_t>(OUT_BITS);
     }
 
-
+    /// Return true if ANY bits are set to 1, otherwise return false.
     bool Any() const {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) {
@@ -433,49 +433,57 @@ namespace emp {
       }
       return false;
     }
+
+    /// Return true if NO bits are set to 1, otherwise return false.
     bool None() const { return !Any(); }
+
+    /// Return true if ALL bits are set to 1, otherwise return false.
     bool All() const { return (~(*this)).None(); }
 
-
+    /// Const index operator -- return the bit at the specified position.
     bool operator[](size_t index) const { return Get(index); }
+
+    /// Index operator -- return a proxy to the bit at the specified position so it can be an lvalue.
     BitProxy operator[](size_t index) { return BitProxy(*this, index); }
 
+    /// Set all bits to 0.
     void Clear() {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = 0U;
     }
+
+    // Set all bits to 1.
     void SetAll() {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(0U);
       if (LastBitID() > 0) { bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID()); }
     }
 
-
-    // Regular print function (from most significant bit to least)
+    /// Regular print function (from most significant bit to least)
     void Print(std::ostream & out=std::cout) const {
       for (size_t i = num_bits; i > 0; --i) out << Get(i-1);
     }
 
-    // Print a space between each field
-    void PrintFields(std::ostream & out=std::cout) const {
+    /// Print a space between each field (or other provided spacer)
+    void PrintFields(std::ostream & out=std::cout, const std::string spacer=" ") const {
       for (size_t i = num_bits; i > 0; i--) {
         out << Get(i-1);
-        if (i % FIELD_BITS == 0) out << ' ';
+        if (i % FIELD_BITS == 0) out << spacer;
       }
     }
 
-    // Print from smallest bit position to largest.
+    /// Print from smallest bit position to largest.
     void PrintArray(std::ostream & out=std::cout) const {
       for (size_t i = 0; i < num_bits; i++) out << Get(i);
     }
 
-    // Print the positions of all one bits.
-    void PrintOneIDs(std::ostream & out=std::cout, char spacer=' ') const {
+    /// Print the positions of all one bits, spaces are the default separator.
+    void PrintOneIDs(std::ostream & out=std::cout, std::string spacer=" ") const {
       for (size_t i = 0; i < num_bits; i++) { if (Get(i)) out << i << spacer; }
     }
 
 
-    // Count 1's by looping through once for each bit equal to 1
+    /// Count 1's by looping through once for each bit equal to 1
     size_t CountOnes_Sparse() const {
       const size_t NUM_FIELDS = NumFields();
       size_t bit_count = 0;
@@ -489,7 +497,7 @@ namespace emp {
       return bit_count;
     }
 
-    // Count 1's in semi-parallel; fastest for even 0's & 1's
+    /// Count 1's in semi-parallel; fastest for even 0's & 1's
     size_t CountOnes_Mixed() const {
       const size_t NUM_FIELDS = NumFields() * sizeof(field_t)/4;
       Ptr<const uint32_t> uint_bit_set = bit_set.Cast<const uint32_t>();
@@ -503,8 +511,10 @@ namespace emp {
       return bit_count;
     }
 
+    /// Count the number of ones in the BitVector.
     size_t CountOnes() const { return CountOnes_Mixed(); }
 
+    /// Return the position of the first one; return -1 if no ones in vector.
     int FindBit() const {
       const size_t NUM_FIELDS = NumFields();
       size_t field_id = 0;
@@ -513,6 +523,7 @@ namespace emp {
         (int) (find_bit(bit_set[field_id]) + (field_id * FIELD_BITS))  :  -1;
     }
 
+    /// Return the position of the first one and chang it to a zero.  Return -1 if no ones.
     int PopBit() {
       const size_t NUM_FIELDS = NumFields();
       size_t field_id = 0;
@@ -524,6 +535,7 @@ namespace emp {
       return (int) (pos_found + (field_id * FIELD_BITS));
     }
 
+    /// Return the position of the first one after start_pos; return -1 if no ones in vector.
     int FindBit(const size_t start_pos) const {
       if (start_pos >= num_bits) return -1;
       size_t field_id  = FieldID(start_pos);     // What field do we start in?
@@ -540,6 +552,8 @@ namespace emp {
       return (field_id < NUM_FIELDS) ?
         (int) (find_bit(bit_set[field_id]) + (field_id * FIELD_BITS)) : -1;
     }
+
+    /// Return positions of all ones.
     emp::vector<size_t> GetOnes() const {
       // @CAO -- There are probably better ways to do this with bit tricks.
       emp::vector<size_t> out_set(CountOnes());
@@ -550,7 +564,7 @@ namespace emp {
       return out_set;
     }
 
-    // Boolean math functions...
+    /// Perform a Boolean NOT on this BitSet and return the result.
     BitVector NOT() const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
@@ -559,6 +573,7 @@ namespace emp {
       return out_set;
     }
 
+    /// Perform a Boolean AND on this BitSet and return the result.
     BitVector AND(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
@@ -566,6 +581,7 @@ namespace emp {
       return out_set;
     }
 
+    /// Perform a Boolean OR on this BitSet and return the result.
     BitVector OR(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
@@ -573,6 +589,7 @@ namespace emp {
       return out_set;
     }
 
+    /// Perform a Boolean NAND on this BitSet and return the result.
     BitVector NAND(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
@@ -581,6 +598,7 @@ namespace emp {
       return out_set;
     }
 
+    /// Perform a Boolean NOR on this BitSet and return the result.
     BitVector NOR(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
@@ -589,6 +607,7 @@ namespace emp {
       return out_set;
     }
 
+    /// Perform a Boolean XOR on this BitSet and return the result.
     BitVector XOR(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
@@ -596,6 +615,7 @@ namespace emp {
       return out_set;
     }
 
+    /// Perform a Boolean EQU on this BitSet and return the result.
     BitVector EQU(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
@@ -605,7 +625,7 @@ namespace emp {
     }
 
 
-    // Boolean math functions...
+    /// Perform a Boolean NOT with this BitSet, store result here, and return this object.
     BitVector & NOT_SELF() {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
@@ -613,18 +633,21 @@ namespace emp {
       return *this;
     }
 
+    /// Perform a Boolean AND with this BitSet, store result here, and return this object.
     BitVector & AND_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] & set2.bit_set[i];
       return *this;
     }
 
+    /// Perform a Boolean OR with this BitSet, store result here, and return this object.
     BitVector & OR_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] | set2.bit_set[i];
       return *this;
     }
 
+    /// Perform a Boolean NAND with this BitSet, store result here, and return this object.
     BitVector & NAND_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
@@ -632,6 +655,7 @@ namespace emp {
       return *this;
     }
 
+    /// Perform a Boolean NOR with this BitSet, store result here, and return this object.
     BitVector & NOR_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
@@ -639,12 +663,14 @@ namespace emp {
       return *this;
     }
 
+    /// Perform a Boolean XOR with this BitSet, store result here, and return this object.
     BitVector & XOR_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] ^ set2.bit_set[i];
       return *this;
     }
 
+    /// Perform a Boolean EQU with this BitSet, store result here, and return this object.
     BitVector & EQU_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
@@ -652,7 +678,7 @@ namespace emp {
       return *this;
     }
 
-    // Positive shifts go left and negative go right (0 does nothing)
+    /// Positive shifts go left and negative go right (0 does nothing); return result.
     BitVector SHIFT(const int shift_size) const {
       BitVector out_set(*this);
       if (shift_size > 0) out_set.ShiftRight((size_t) shift_size);
@@ -660,6 +686,7 @@ namespace emp {
       return out_set;
     }
 
+    /// Positive shifts go left and negative go right; store result here, and return this object.
     BitVector & SHIFT_SELF(const int shift_size) {
       if (shift_size > 0) ShiftRight((size_t) shift_size);
       else if (shift_size < 0) ShiftLeft((size_t) -shift_size);
