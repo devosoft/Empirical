@@ -694,31 +694,62 @@ namespace emp {
     }
 
 
-    // Operator overloads...
+    /// Operator bitwise NOT...
     BitVector operator~() const { return NOT(); }
+
+    /// Operator bitwise AND...
     BitVector operator&(const BitVector & ar2) const { return AND(ar2); }
+
+    /// Operator bitwise OR...
     BitVector operator|(const BitVector & ar2) const { return OR(ar2); }
+
+    /// Operator bitwise XOR...
     BitVector operator^(const BitVector & ar2) const { return XOR(ar2); }
+
+    /// Operator shift left...
     inline BitVector operator<<(const size_t shift_size) const { return SHIFT(-(int)shift_size); }
+
+    /// Operator shift right...
     inline BitVector operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
+
+    /// Compound operator bitwise AND...
     const BitVector & operator&=(const BitVector & ar2) { return AND_SELF(ar2); }
+
+    /// Compound operator bitwise OR...
     const BitVector & operator|=(const BitVector & ar2) { return OR_SELF(ar2); }
+
+    /// Compound operator bitwise XOR...
     const BitVector & operator^=(const BitVector & ar2) { return XOR_SELF(ar2); }
+
+    /// Compound operator for shift left...
     const BitVector & operator<<=(const size_t shift_size) { return SHIFT_SELF(-(int)shift_size); }
+
+    /// Compound operator for shift right...
     const BitVector & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
-    // For compatability with std::vector<bool>.
+    /// Function to allow drop-in replacement with std::vector<bool>.
     size_t size() const { return num_bits; }
+
+    /// Function to allow drop-in replacement with std::vector<bool>.
     void resize(std::size_t new_size) { Resize(new_size); }
+
+    /// Function to allow drop-in replacement with std::vector<bool>.
     bool all() const { return All(); }
+
+    /// Function to allow drop-in replacement with std::vector<bool>.
     bool any() const { return Any(); }
+
+    /// Function to allow drop-in replacement with std::vector<bool>.
     bool none() const { return !Any(); }
+
+    /// Function to allow drop-in replacement with std::vector<bool>.
     size_t count() const { return CountOnes_Mixed(); }
   };
 
 }
 
 namespace std {
+  /// Hash function to allow BitVector to be used with maps and sets (must be in std).
   template <>
   struct hash<emp::BitVector> {
     std::size_t operator()(const emp::BitVector & b) const {
@@ -726,6 +757,7 @@ namespace std {
     }
   };
 
+  /// operator<< to work with ostream (must be in std to work)
   inline std::ostream & operator<<(std::ostream & out, const emp::BitVector & bit_v) {
     bit_v.Print(out);
     return out;
