@@ -224,6 +224,24 @@ namespace emp {
     }
 
     /**
+     * Generate an uint64_t.
+     *
+     * @return The pseudo random number.
+     * @param max The upper bound for the random numbers (will never be returned).
+     * @todo this function needs to be tested and refined.
+     **/
+    template <typename T>
+    inline uint64_t GetUInt64(const T max) {
+      if (max <= (T) _RAND_MBIG) return (uint64_t) GetUInt(max);  // Don't need extra precision.
+      const double max2 = ((double) max) / (double) _RAND_MBIG;
+      emp_assert(max2 <= (T) _RAND_MBIG, max);  // Precision will be too low past this point...
+
+      return static_cast<uint64_t>(GetDouble() * static_cast<double>(max))
+           + static_cast<uint64_t>(GetDouble() * static_cast<double>(max2) * _RAND_MBIG);
+    }
+
+
+    /**
      * Generate an uint32_t out of an interval.
      *
      * @return The pseudo random number.
