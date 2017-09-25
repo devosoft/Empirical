@@ -1195,6 +1195,8 @@ namespace emp {
           cur_state.inst_ptr += 1;
           // Run instruction @ fp, ip.
           program.inst_lib->ProcessInst(*this, program[fp].inst_seq[ip]);
+          // If instruction resets the hardware or does anything to set is_executing to false, break from execution loop.
+          if (!is_executing) break;
         }
         // After processing, is the core still active?
         if (GetCurCore().empty()) {
@@ -1208,13 +1210,13 @@ namespace emp {
       is_executing = false;
       // Update execution stack size to be accurate.
       active_cores.resize(core_cnt - adjust);
-      // Set cur core to be first execution stack (which should always be main).
-      if (active_cores.size()) exec_core_id = active_cores[0];
       // Spawn any cores that happened during execution.
       while (pending_cores.size()) {
         active_cores.emplace_back(pending_cores.front());
         pending_cores.pop_front();
       }
+      // Set cur core to be first execution stack (which should always be main).
+      if (active_cores.size()) exec_core_id = active_cores[0];
     }
 
     /// Advance hardware by some arbitrary number instructions.
