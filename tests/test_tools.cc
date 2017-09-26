@@ -887,8 +887,8 @@ TEST_CASE("Test random", "[tools]")
 
   double actual_prob = ((double) hit_count) / (double) num_tests;
 
-  REQUIRE(actual_prob < flip_prob + 0.005);
-  REQUIRE(actual_prob > flip_prob - 0.005);
+  REQUIRE(actual_prob < flip_prob + 0.01);
+  REQUIRE(actual_prob > flip_prob - 0.01);
 
 
   // Mimimal test of Choose()
