@@ -88,12 +88,14 @@ namespace emp {
     /// Test if two files are different.
     bool operator!=(const File in) { return lines != in.lines; }
 
+    /// Load a line from an input stream into a file.
     File & LoadLine(std::istream & input) {
       lines.emplace_back("");
       std::getline(input, lines.back());
       return *this;
     }
 
+    /// Load an entire input stream into a file.
     File & Load(std::istream & input) {
       while (!input.eof()) {
 	      LoadLine(input);
@@ -101,6 +103,7 @@ namespace emp {
       return *this;
     }
 
+    /// Load a file from disk using the provided name.
     File & Load(const std::string & filename) {
       std::ifstream file(filename);
       Load(file);
@@ -108,6 +111,7 @@ namespace emp {
       return *this;
     }
 
+    /// Write this file to a provided output stream.
     File & Write(std::ostream & output) {
       for (std::string & cur_line : lines) {
 	      output << cur_line << '\n';
@@ -115,6 +119,7 @@ namespace emp {
       return *this;
     }
 
+    /// Write this file to a file of the provided name.
     File & Write(const std::string & filename) {
       std::ofstream file(filename);
       Write(file);
