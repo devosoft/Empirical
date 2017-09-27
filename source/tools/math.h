@@ -20,7 +20,8 @@ namespace emp {
 
   /// % is actually remainder; this is a proper modulus command that handles negative #'s correctly
   inline constexpr int Mod(int in_val, int mod_val) {
-    return (in_val < 0) ? (in_val % mod_val + mod_val) : (in_val % mod_val);
+    in_val %= mod_val;
+    return (in_val < 0) ? (in_val + mod_val) : in_val;
   }
 
   /// Regular Mod doesn't work on doubles.  Build one that does!
