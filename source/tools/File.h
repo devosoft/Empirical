@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  errors.h
+ *  @file  File.h
  *  @brief The File object maintains a simple, in-memory file.
  *  @note Status: BETA
  *
