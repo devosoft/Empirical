@@ -710,6 +710,10 @@ TEST_CASE("Test math", "[tools]")
   REQUIRE(emp::Mod(-4, 7) == 3);
   REQUIRE(emp::Mod(-11, 7) == 3);
 
+  REQUIRE(emp::Mod(-11, 11) == 0);
+  REQUIRE(emp::Mod(0, 11) == 0);
+  REQUIRE(emp::Mod(11, 11) == 0);
+
   REQUIRE(emp::Pow(2,3) == 8);
   REQUIRE(emp::Pow(-2,2) == 4);
   REQUIRE(emp::IntPow(3,4) == 81);
