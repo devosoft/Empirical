@@ -502,15 +502,6 @@ namespace emp {
     bool is_executing;                    //< True when mid-execution of all cores. (On every CPU cycle: execute all cores).
 
     // TODO: disallow configuration of hardware while executing. (and any other functions that could sent things into a bad state)
-    /// Garbage function for debugging.
-    void PrintCoreStates() {
-      std::cout << "Active core ids:" << std::endl;
-      for (size_t i = 0; i < active_cores.size(); ++i) std::cout << " " << active_cores[i];
-      std::cout << "Inactive core ids: " << std::endl;
-      for (size_t i = 0; i < inactive_cores.size(); ++i) std::cout << " " << inactive_cores[i];
-      std::cout << "Pending core ids: " << std::endl;
-      for (size_t i = 0; i < pending_cores.size(); ++i) std::cout << " " << pending_cores[i];
-    }
 
   public:
     /// EventDrivenGP constructor. Give instance variables reasonable defaults. Allow for configuration
@@ -592,14 +583,18 @@ namespace emp {
 
     // ---------- Hardware Control ----------
     /// Reset everything, including program.
+    /// Not allowed to Reset during execution.
     void Reset() {
+      emp_assert(!is_executing);
       ResetHardware();
       traits.clear();
       program.Clear();
     }
 
     /// Reset only hardware, not program.
+    /// Not allowed to reset hardware during execution.
     void ResetHardware() {
+      emp_assert(!is_executing);
       shared_mem.clear();
       event_queue.clear();
       for (size_t i = 0; i < cores.size(); ++i) cores[i].clear();
@@ -1195,8 +1190,6 @@ namespace emp {
           cur_state.inst_ptr += 1;
           // Run instruction @ fp, ip.
           program.inst_lib->ProcessInst(*this, program[fp].inst_seq[ip]);
-          // If instruction resets the hardware or does anything to set is_executing to false, break from execution loop.
-          if (!is_executing) break;
         }
         // After processing, is the core still active?
         if (GetCurCore().empty()) {
