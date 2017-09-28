@@ -1,10 +1,13 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A collection of broadly-useful functions.
-//  Status: BETA (though new functions are added frequently)
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  flex_function.h
+ *  @brief A collection of broadly-useful functions (that don't fit elsewhere)
+ *  @note Status: BETA (though new functions are added frequently)
+ */
+
 
 #ifndef EMP_FUNCTIONS_H
 #define EMP_FUNCTIONS_H
@@ -21,6 +24,7 @@
 #include "const.h"
 #include "math.h"
 
+/// A simple macro to time how long it takes for a function to complete.
 #define EMP_FUNCTION_TIMER(TEST_FUN) {                                       \
     std::clock_t emp_start_time = std::clock();                              \
     auto emp_result = TEST_FUN;                                              \
@@ -33,6 +37,7 @@
 
 namespace emp {
 
+  /// A function timer that takes a functor an identifies how long it takes to complete when run.
   static inline double TimeFun(std::function<void()> test_fun) {
     std::clock_t start_time = std::clock();
     test_fun();
@@ -40,22 +45,24 @@ namespace emp {
     return 1000.0 * ((double) tot_time) / (double) CLOCKS_PER_SEC;
   }
 
-  // Toggle an input bool.
+  /// Toggle an input bool.
   inline bool Toggle(bool & in_bool) { return (in_bool = !in_bool); }
 
-  // Combine bools...
+  /// Combine bools to AND them all together.
   inline constexpr bool AllTrue() { return true; }
   template <typename... Ts>
   inline bool AllTrue(bool result, Ts... OTHER) {
     return result && AllTrue(OTHER...);
   }
 
+  /// Combine bools to OR them all together.
   inline constexpr bool AnyTrue() { return false; }
   template <typename... Ts>
   inline bool AnyTrue(bool result, Ts... OTHER) {
     return result || AnyTrue(OTHER...);
   }
 
+  /// Build a vector with a range of values from min to max at the provided step size.
   template <typename T>
   static inline emp::vector<T> BuildRange(T min, T max, T step=1) {
     size_t size = (size_t) ((max-min) / step);
@@ -69,17 +76,19 @@ namespace emp {
   }
 
 
-  // Build a function to determine the size of a built-in array.
+  /// Determine the size of a built-in array.
   template <typename T, size_t N>
   constexpr size_t GetSize(T (&)[N]) { return N; }
 
-  // Build a function that will always return a unique value (and trip an assert if it can't...)
+  /// A function that will always return a unique value (and trip an assert if it can't...)
   static size_t UniqueVal() {
     static size_t val = 0;
     emp_assert(val < MaxValue<size_t>() && "Ran out of unique values in size_t!");
     return val++;
   }
 
+  /// A function that will always return a unique stringname (using UniqVal) with provided
+  /// prefix and postfix.)
   static inline std::string UniqueName(const std::string & prefix="",
                                        const std::string & postfix="") {
     std::stringstream ss;

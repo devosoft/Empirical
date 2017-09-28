@@ -1,99 +1,16 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Class: template <int NUM_BITS> emp::BitSet
-//
-//  Desc: This class handles a fixed-sized (but arbitrarily large) array of bits,
-//        and optimizes operations on those bits to be as fast as possible.
-//
-//  Note: emp::BitSet is based on std::bitset, and can be used as a drop-in replacement.
-//        Like std::bitset, bit zero is on the right side.  Unlike std::bitset, emp::BitSet
-//        gives access to bit fields for easy access to different sized chucnk of bits and
-//        implementation new bit-magic tricks.
-//
-//  Status: RELEASE
-//
-//
-// Constructors:
-//  BitSet()                                     -- Assume all zeroes in set
-//  BitSet(const BitSet & in_set)                -- Copy Constructor
-//  BitSet(emp::Random & random, double p1=0.5)  -- Build a random bitset.
-//
-// Assignment helpers:
-//  BitSet & operator=(const BitSet & in_set)           -- Copy over a BitSet of the same size
-//  void Randomize(emp::Random & random, double p1=0.5) -- Randomize all bits.
-//  BitSet & Import(const BitSet & in_set)              -- Copy over a BitSet of a different size
-//  BitSet Export<NEW_SIZE>()                           -- Convert this BitSet a different size
-//
-// Comparisons:
-//  bool operator==(const BitSet & in_set) const  -- Test if all bits are identical
-//  bool operator<(const BitSet & in_set) const   -- Ordering to facilitate sorting, etc.
-//  bool operator<=(const BitSet & in_set) const  -- ...filling out remaining Boolean comparisons
-//  bool operator>(const BitSet & in_set) const   --
-//  bool operator>=(const BitSet & in_set) const  --
-//  bool operator!=(const BitSet & in_set) const  --
-//
-// Sizing:
-//  size_t GetSize() const
-//
-// Accessors for bits:
-//  void Set(size_t index, bool value)
-//  bool Get(size_t index) const
-//  bool operator[](size_t index) const
-//  BitProxy operator[](size_t index)
-//
-// Accessors for larger chunks:
-//  void Clear()                                  -- Set all bits to zero
-//  void SetAll()                                 -- Set all bits to one
-//  uint8_t GetByte(size_t byte_id) const            -- Read a full byte of bits
-//  void SetByte(size_t byte_id, uint8_t value)      -- Set a full byte of bits
-//  uint32_t GetUInt(size_t uint_id) const           -- Read 32 bits at once
-//  void SetUInt(size_t uint_id, uint32_t value)     -- Set 32 bits at once
-//
-// Printing:
-//  void Print(ostream & out=cout) const          -- Print BitSet (least significant on right)
-//  void PrintArray(ostream & out=cout) const     -- Print as array (index zero on left)
-//  void PrintOneIDs(ostream & out=cout) const    -- Just print the IDs of the set bits.
-//
-// Bit analysis:
-//  size_t CountOnes()
-//  int FindBit(size_t start_bit)  -- Return pos of first 1 after start_bit
-//  emp::vector<size_t> GetOnes()  -- Return pos of ALL ones.
-//
-// Boolean math functions:
-//  BitSet NOT() const
-//  BitSet AND(const BitSet & set2) const
-//  BitSet OR(const BitSet & set2) const
-//  BitSet NAND(const BitSet & set2) const
-//  BitSet NOR(const BitSet & set2) const
-//  BitSet XOR(const BitSet & set2) const
-//  BitSet EQU(const BitSet & set2) const
-//
-//  const BitSet & NOT_SELF()
-//  const BitSet & AND_SELF(const BitSet & set2)
-//  const BitSet & OR_SELF(const BitSet & set2)
-//  const BitSet & NAND_SELF(const BitSet & set2)
-//  const BitSet & NOR_SELF(const BitSet & set2)
-//  const BitSet & XOR_SELF(const BitSet & set2)
-//  const BitSet & EQU_SELF(const BitSet & set2)
-//
-//  BitSet SHIFT(const int shift_size) const   -- positive for left shift, negative for right shift
-//  const BitSet & SHIFT_SELF(const int shift_size) const
-//
-// Operator overloads:
-//  BitSet operator~() const
-//  BitSet operator&(const BitSet & ar2) const
-//  BitSet operator|(const BitSet & ar2) const
-//  BitSet operator^(const BitSet & ar2) const
-//  BitSet operator>>(const size_t) const
-//  BitSet operator<<(const size_t) const
-//  const BitSet & operator&=(const BitSet & ar2)
-//  const BitSet & operator|=(const BitSet & ar2)
-//  const BitSet & operator^=(const BitSet & ar2)
-//  const BitSet & operator>>=(const size_t)
-//  const BitSet & operator<<=(const size_t)
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  BitSet.h
+ *  @brief A drop-in replacement for std::bitset, with additional bit magic features.
+ *  @note Status: RELEASE
+ *
+ *  @note Like std::bitset, bit zero is on the right side.  Unlike std::bitset, emp::BitSet
+ *       gives access to bit fields for easy access to different sized chucnk of bits and
+ *       implementation new bit-magic tricks.
+ */
 
 
 #ifndef EMP_BIT_SET_H
@@ -111,32 +28,43 @@
 
 namespace emp {
 
+  ///  A fixed-sized (but arbitrarily large) array of bits, and optimizes operations on those bits
+  ///  to be as fast as possible.
   template <size_t NUM_BITS> class BitSet {
   private:
+    /// Fields hold bits in groups of 32 (as uint32_t); how many feilds do we need?
     static const uint32_t NUM_FIELDS = 1 + ((NUM_BITS - 1) >> 5);
+
+    /// End position of the stored bits in the last field; 0 if perfect fit.
     static const uint32_t LAST_BIT = NUM_BITS & 31;
+
+    /// How many total bytes are needed to represent these bits? (rounded up to full bytes)
     static const uint32_t NUM_BYTES = 1 + ((NUM_BITS - 1) >> 3);
 
-    uint32_t bit_set[NUM_FIELDS];
+    uint32_t bit_set[NUM_FIELDS];  ///< Fields to hold the actual bits for this BitSet.
 
-    // Setup a bit proxy so that we can use operator[] on bit sets as a lvalue.
+    /// BitProxy lets us use operator[] on with BitSet as an lvalue.
     class BitProxy {
     private:
-      BitSet<NUM_BITS> & bit_set;
-      size_t index;
+      BitSet<NUM_BITS> & bit_set;  ///< BitSet object that this proxy refers to.
+      size_t index;                ///< Position in BitSet the this proxy refers to.
     public:
       BitProxy(BitSet<NUM_BITS> & _set, size_t _idx) : bit_set(_set), index(_idx) {
         emp_assert(_idx < bit_set.size());
       }
 
+      /// Set the bit value that this proxy refers to.
       BitProxy & operator=(bool b) {    // lvalue handling...
         bit_set.Set(index, b);
         return *this;
       }
+
+      /// Convert BitProxy to a regular boolean value.
       operator bool() const {            // rvalue handling...
         return bit_set.Get(index);
       }
 
+      /// Flip this bit.
       BitProxy & Toggle() { bit_set.Toggle(index); return *this; }
     };
     friend class BitProxy;
@@ -154,7 +82,7 @@ namespace emp {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
     }
 
-    // Helper: call SHIFT with positive number instead
+    /// Helper: call SHIFT with positive number instead
     void ShiftLeft(const uint32_t shift_size) {
       const int field_shift = shift_size / 32;
       const int bit_shift = shift_size % 32;
@@ -183,7 +111,7 @@ namespace emp {
     }
 
 
-    // Helper for calling SHIFT with negative number
+    /// Helper for calling SHIFT with negative number
     void ShiftRight(const uint32_t shift_size) {
       emp_assert(shift_size > 0);
       const uint32_t field_shift = shift_size / 32;
@@ -211,20 +139,28 @@ namespace emp {
   public:
     /// Constructor: Assume all zeroes in set
     BitSet() { Clear(); }
+
+    /// Copy constructor from another BitSet
     BitSet(const BitSet & in_set) { Copy(in_set.bit_set); }
+
+    /// Constructor to generate a random BitSet.
     BitSet(Random & random, const double p1=0.5) { Randomize(random, p1); }
+
+    /// Destructor.
     ~BitSet() = default;
 
+    /// Assignment operator.
     BitSet & operator=(const BitSet<NUM_BITS> & in_set) {
       Copy(in_set.bit_set);
       return *this;
     }
 
+    /// Set all bits randomly, with a given probability of being a 1.
     void Randomize(Random & random, const double p1=0.5) {
       for (size_t i = 0; i < NUM_BITS; i++) Set(i, random.P(p1));
     }
 
-    // Assign from a BitSet of a different size.
+    /// Assign from a BitSet of a different size.
     template <size_t NUM_BITS2>
     BitSet & Import(const BitSet<NUM_BITS2> & in_set) {
       static const size_t NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> 5);
@@ -234,7 +170,7 @@ namespace emp {
       return *this;
     }
 
-    // Convert to a Bitset of a different size.
+    /// Convert to a Bitset of a different size.
     template <size_t NUM_BITS2>
     BitSet<NUM_BITS2> Export() const {
       static const size_t NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> 5);
@@ -245,12 +181,15 @@ namespace emp {
       return out_bits;
     }
 
+    /// Test if two BitSet objects are identical.
     bool operator==(const BitSet & in_set) const {
       for (size_t i = 0; i < NUM_FIELDS; ++i) {
         if (bit_set[i] != in_set.bit_set[i]) return false;
       }
       return true;
     }
+
+    /// Compare two BitSet objects, based on the associated binary value.
     bool operator<(const BitSet & in_set) const {
       for (int i = NUM_FIELDS-1; i >= 0; --i) {         // Start loop at the largest field.
         if (bit_set[i] == in_set.bit_set[i]) continue;  // If same, keep looking!
@@ -258,6 +197,8 @@ namespace emp {
       }
       return false;
     }
+
+    /// Compare two BitSet objects, based on the associated binary value.
     bool operator<=(const BitSet & in_set) const {
       for (int i = NUM_FIELDS-1; i >= 0; --i) {         // Start loop at the largest field.
         if (bit_set[i] == in_set.bit_set[i]) continue;  // If same, keep looking!
@@ -265,12 +206,20 @@ namespace emp {
       }
       return true;
     }
+
+    /// Test if two BitSet objects are different.
     bool operator!=(const BitSet & in_set) const { return !operator==(in_set); }
+
+    /// Compare two BitSet objects, based on the associated binary value.
     bool operator>(const BitSet & in_set) const { return !operator<=(in_set); }
+
+    /// Compare two BitSet objects, based on the associated binary value.
     bool operator>=(const BitSet & in_set) const { return !operator<(in_set); }
 
+    /// How many bits are in this BitSet?
     constexpr static size_t GetSize() { return NUM_BITS; }
 
+    /// Retrieve the bit as a specified index.
     bool Get(size_t index) const {
       emp_assert(index >= 0 && index < NUM_BITS);
       const size_t field_id = FieldID(index);
@@ -278,6 +227,7 @@ namespace emp {
       return (bit_set[field_id] & (1 << pos_id)) != 0;
     }
 
+    /// Set the bit as a specified index.
     void Set(size_t index, bool value) {
       emp_assert(index < NUM_BITS);
       const size_t field_id = FieldID(index);
@@ -309,6 +259,7 @@ namespace emp {
       return *this;
     }
 
+    /// Get the full byte starting from the bit at a specified index.
     uint8_t GetByte(size_t index) const {
       emp_assert(index < NUM_BYTES);
       const size_t field_id = Byte2Field(index);
@@ -316,6 +267,7 @@ namespace emp {
       return (bit_set[field_id] >> pos_id) & 255;
     }
 
+    /// Set the full byte starting at the bit at the specified index.
     void SetByte(size_t index, uint8_t value) {
       emp_assert(index < NUM_BYTES);
       const size_t field_id = Byte2Field(index);
@@ -324,16 +276,19 @@ namespace emp {
       bit_set[field_id] = (bit_set[field_id] & ~(255U << pos_id)) | (val_uint << pos_id);
     }
 
+    /// Get the 32-bit unsigned int; index in in 32-bit jumps (i.e., this is a field ID not bit id)
     uint32_t GetUInt(size_t index) const {
       emp_assert(index < NUM_FIELDS);
       return bit_set[index];
     }
 
+    /// Set the 32-bit unsigned int; index in in 32-bit jumps (i.e., this is a field ID not bit id)
     void SetUInt(size_t index, uint32_t value) {
       emp_assert(index < NUM_FIELDS);
       bit_set[index] = value;
     }
 
+    /// Get the full 32-bit unsigned int starting from the bit at a specified index.
     uint32_t GetUIntAtBit(size_t index) {
       emp_assert(index < NUM_BITS);
       const size_t field_id = FieldID(index);
@@ -343,40 +298,53 @@ namespace emp {
         ((field_id+1 < NUM_FIELDS) ? bit_set[field_id+1] << (32-pos_id) : 0);
     }
 
+    /// Get OUT_BITS bits starting from the bit at a specified index (max 32)
     template <size_t OUT_BITS>
     uint32_t GetValueAtBit(size_t index) {
       static_assert(OUT_BITS <= 32, "Requesting too many bits to fit in a UInt");
       return GetUIntAtBit(index) & MaskLow<uint32_t>(OUT_BITS);
     }
 
-
+    /// Return true if ANY bits in the BitSet are one, else return false.
     bool Any() const { for (auto i : bit_set) if (i) return true; return false; }
+
+    /// Return true if NO bits in the BitSet are one, else return false.
     bool None() const { return !Any(); }
+
+    /// Return true if ALL bits in the BitSet are one, else return false.
     bool All() const { return (~(*this)).None(); }
 
-
+    /// Index into a const BitSet (i.e., cannot be set this way.)
     bool operator[](size_t index) const { return Get(index); }
+
+    /// Index into a BitSet, returning a proxy that will allow bit assignment to work.
     BitProxy operator[](size_t index) { return BitProxy(*this, index); }
 
+    /// Set all bits to zero.
     void Clear() { for (auto & i : bit_set) i = 0U; }
+
+    /// Set all bits to one.
     void SetAll() {
       for (auto & i : bit_set) i = ~0U;
       if (LAST_BIT > 0) { bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT); }
     }
 
-
+    /// Print all bits to the provided output stream.
     void Print(std::ostream & out=std::cout) const {
       for (size_t i = NUM_BITS; i > 0; i--) { out << Get(i-1); }
     }
+
+    /// Print all bits from smallest to largest, as if this were an array, not a bit representation.
     void PrintArray(std::ostream & out=std::cout) const {
       for (size_t i = 0; i < NUM_BITS; i++) out << Get(i);
     }
+
+    /// Print the locations of all one bits, using the provided spacer (default is a single space)
     void PrintOneIDs(std::ostream & out=std::cout, char spacer=' ') const {
       for (size_t i = 0; i < NUM_BITS; i++) { if (Get(i)) out << i << spacer; }
     }
 
-
-    // Count 1's by looping through once for each bit equal to 1
+    /// Count 1's by looping through once for each bit equal to 1
     size_t CountOnes_Sparse() const {
       size_t bit_count = 0;
       for (auto i : bit_set) {
@@ -388,7 +356,7 @@ namespace emp {
       return bit_count;
     }
 
-    // Count 1's in semi-parallel; fastest for even 0's & 1's
+    /// Count 1's in semi-parallel; fastest for even 0's & 1's
     size_t CountOnes_Mixed() const {
       size_t bit_count = 0;
       for (const auto v : bit_set) {
@@ -399,14 +367,17 @@ namespace emp {
       return bit_count;
     }
 
+    /// Count the number of ones in the BitSet using bit tricks for a speedup.
     size_t CountOnes() const { return CountOnes_Mixed(); }
 
+    /// Return the index of the first one in the sequence; return -1 if no ones are available.
     int FindBit() const {
       size_t field_id = 0;
       while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
       return (field_id < NUM_FIELDS) ? (int) (find_bit(bit_set[field_id]) + (field_id << 5)) : -1;
     }
 
+    /// Return index of first one in sequence (or -1 if no ones); change this position to zero.
     int PopBit() {
       size_t field_id = 0;
       while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
@@ -417,7 +388,7 @@ namespace emp {
       return pos_found + (int)(field_id << 5);
     }
 
-
+    /// Return index of first one in sequence AFTER start_pos (or -1 if no ones)
     int FindBit(const size_t start_pos) const {
       // @CAO -- There are better ways to do this with bit tricks
       //         (but start_pos is tricky...)
@@ -426,6 +397,8 @@ namespace emp {
       }
       return -1;
     }
+
+    /// Return a vector indicating the posistions of all ones in the BitSet.
     emp::vector<size_t> GetOnes() const {
       // @CAO -- There are better ways to do this with bit tricks.
       emp::vector<size_t> out_set(CountOnes());
@@ -436,7 +409,7 @@ namespace emp {
       return out_set;
     }
 
-    // Boolean math functions...
+    /// Perform a Boolean NOT on this BitSet and return the result.
     BitSet NOT() const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~bit_set[i];
@@ -444,18 +417,21 @@ namespace emp {
       return out_set;
     }
 
+    /// Perform a Boolean AND with a second BitSet and return the result.
     BitSet AND(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] & set2.bit_set[i];
       return out_set;
     }
 
+    /// Perform a Boolean OR with a second BitSet and return the result.
     BitSet OR(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] | set2.bit_set[i];
       return out_set;
     }
 
+    /// Perform a Boolean NAND with a second BitSet and return the result.
     BitSet NAND(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
@@ -463,6 +439,7 @@ namespace emp {
       return out_set;
     }
 
+    /// Perform a Boolean NOR with a second BitSet and return the result.
     BitSet NOR(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
@@ -470,12 +447,14 @@ namespace emp {
       return out_set;
     }
 
+    /// Perform a Boolean XOR with a second BitSet and return the result.
     BitSet XOR(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] ^ set2.bit_set[i];
       return out_set;
     }
 
+    /// Perform a Boolean EQU with a second BitSet and return the result.
     BitSet EQU(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
@@ -484,47 +463,53 @@ namespace emp {
     }
 
 
-    // Boolean math functions...
+    /// Perform a Boolean NOT on this BitSet, store result here, and return this object.
     BitSet & NOT_SELF() {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
       if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
       return *this;
     }
 
+    /// Perform a Boolean AND with a second BitSet, store result here, and return this object.
     BitSet & AND_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] & set2.bit_set[i];
       return *this;
     }
 
+    /// Perform a Boolean OR with a second BitSet, store result here, and return this object.
     BitSet & OR_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] | set2.bit_set[i];
       return *this;
     }
 
+    /// Perform a Boolean NAND with a second BitSet, store result here, and return this object.
     BitSet & NAND_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
       if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
       return *this;
     }
 
+    /// Perform a Boolean NOR with a second BitSet, store result here, and return this object.
     BitSet & NOR_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
       if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
       return *this;
     }
 
+    /// Perform a Boolean XOR with a second BitSet, store result here, and return this object.
     BitSet & XOR_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] ^ set2.bit_set[i];
       return *this;
     }
 
+    /// Perform a Boolean EQU with a second BitSet, store result here, and return this object.
     BitSet & EQU_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
       if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
       return *this;
     }
 
-    // Positive shifts go left and negative go right (0 does nothing)
+    /// Positive shifts go left and negative go right (0 does nothing); return result.
     BitSet SHIFT(const int shift_size) const {
       BitSet out_set(*this);
       if (shift_size > 0) out_set.ShiftRight((uint32_t) shift_size);
@@ -532,33 +517,68 @@ namespace emp {
       return out_set;
     }
 
+    /// Positive shifts go left and negative go right; store result here, and return this object.
     BitSet & SHIFT_SELF(const int shift_size) {
       if (shift_size > 0) ShiftRight((uint32_t) shift_size);
       else if (shift_size < 0) ShiftLeft((uint32_t) -shift_size);
       return *this;
     }
 
-    // Operator overloads...
+    /// Operator bitwise NOT...
     BitSet operator~() const { return NOT(); }
+
+    /// Operator bitwise AND...
     BitSet operator&(const BitSet & ar2) const { return AND(ar2); }
+
+    /// Operator bitwise OR...
     BitSet operator|(const BitSet & ar2) const { return OR(ar2); }
+
+    /// Operator bitwise XOR...
     BitSet operator^(const BitSet & ar2) const { return XOR(ar2); }
+
+    /// Operator shift left...
     BitSet operator<<(const size_t shift_size) const { return SHIFT(-(int)shift_size); }
+
+    /// Operator shift right...
     BitSet operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
+
+    /// Compound operator bitwise AND...
     const BitSet & operator&=(const BitSet & ar2) { return AND_SELF(ar2); }
+
+    /// Compound operator bitwise OR...
     const BitSet & operator|=(const BitSet & ar2) { return OR_SELF(ar2); }
+
+    /// Compound operator bitwise XOR...
     const BitSet & operator^=(const BitSet & ar2) { return XOR_SELF(ar2); }
+
+    /// Compound operator shift left...
     const BitSet & operator<<=(const size_t shift_size) { return SHIFT_SELF(-(int)shift_size); }
+
+    /// Compound operator shift right...
     const BitSet & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
-    // For compatability with std::bitset.
+    /// Function to allow drop-in replacement with std::bitset.
     constexpr static size_t size() { return NUM_BITS; }
+
+    /// Function to allow drop-in replacement with std::bitset.
     inline bool all() const { return All(); }
+
+    /// Function to allow drop-in replacement with std::bitset.
     inline bool any() const { return Any(); }
+
+    /// Function to allow drop-in replacement with std::bitset.
     inline bool none() const { return !Any(); }
+
+    /// Function to allow drop-in replacement with std::bitset.
     inline size_t count() const { return CountOnes_Mixed(); }
+
+    /// Function to allow drop-in replacement with std::bitset.
     inline BitSet & flip() { return Toggle(); }
+
+    /// Function to allow drop-in replacement with std::bitset.
     inline BitSet & flip(size_t pos) { return Toggle(pos); }
+
+    /// Function to allow drop-in replacement with std::bitset.
     inline BitSet & flip(size_t start, size_t end) { return Toggle(start, end); }
   };
 

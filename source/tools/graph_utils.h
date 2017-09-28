@@ -1,10 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file provides a number of tools for manipulating graphs.
-//  Status: BETA
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  graph_utils.h
+ *  @brief This file provides a number of tools for manipulating graphs.
+ *  @note Status: BETA
+ */
 
 #ifndef EMP_GRAPH_UTILS_H
 #define EMP_GRAPH_UTILS_H
@@ -23,6 +25,7 @@
 
 namespace emp {
 
+  /// Construct a graph where all vertics are degree two and form a single ring.
   Graph build_graph_ring(size_t v_count, Random & random) {
     Graph graph(v_count);
 
@@ -40,6 +43,8 @@ namespace emp {
     return graph;
   }
 
+  /// Construct a random tree graph (new vertices are repeatedly attached to a random position
+  /// in a treee as it is constructed.)
   Graph build_graph_tree(size_t v_count, Random & random) {
     Graph graph(v_count);
 
@@ -55,6 +60,9 @@ namespace emp {
     return graph;
   }
 
+  /// Construct a random, graph with the specified number of vertices and edges.  If connected is
+  /// set, start by building a tree.  Then connect random (unconnected) pairs of vertices until
+  /// the proper number of edges are included.
   Graph build_graph_random(size_t v_count, size_t e_count, Random & random, bool connected=true)
   {
     const size_t max_edges = v_count * (v_count-1) / 2;
@@ -88,6 +96,7 @@ namespace emp {
     return graph;
   }
 
+  /// Construct a graph with width x height vertices setup into a grid structure.
   Graph build_graph_grid(size_t width, size_t height, Random & random, double prob_use=1.0) {
     emp_assert(width > 0 && height > 0);
 
@@ -114,8 +123,8 @@ namespace emp {
     return graph;
   }
 
-  // The following method builds a set of cliques (such that one member of each can be part
-  // of an independent set) and then links them together
+  /// Build a set of cliques (such that one member of each can be part of an independent set)
+  /// and then links them together
   Graph build_graph_clique_set(size_t clique_size, size_t clique_count, Random & random,
                                double extra_prob=0.5) {
     emp_assert(clique_size > 0 && clique_count > 0);
@@ -154,8 +163,8 @@ namespace emp {
   }
 
 
-  // Helper function for loading symetric graphs from an input stream.
-  // sub1 indicates that verticies are numbered 1 to N instead of 0 to N-1.
+  /// Helper function for loading symetric graphs from an input stream.
+  /// sub1 indicates that verticies are numbered 1 to N instead of 0 to N-1.
   // @CAO Need some error checking here...
   Graph load_graph_sym(std::istream & is, bool sub1=false) {
     size_t n_vert, n_edge;
@@ -172,12 +181,14 @@ namespace emp {
     return out_graph;
   }
 
+  /// Load a graph with a specified filename.
   Graph load_graph_sym(std::string filename, bool sub1=false) {
     std::ifstream ifile(filename);
     return load_graph_sym(ifile, sub1);
   }
 
-  // Format: #vertices followed by v^2 0's or 1's
+  /// Load a graph from a connection matrix.
+  /// Format: #vertices followed by v^2 0's or 1's
   Graph load_graph_table(std::istream & is) {
     size_t n_vert;
     is >> n_vert;
@@ -194,6 +205,7 @@ namespace emp {
     return out_graph;
   }
 
+  /// Load a graph from a connection matrix in a file by the specified name.
   Graph load_graph_table(std::string filename) {
     std::ifstream ifile(filename);
     return load_graph_table(ifile);
