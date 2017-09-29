@@ -1,10 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file contains a set of simple functions to manipulate maps.
-//  Status: BETA
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  map_utils.h
+ *  @brief A set of simple functions to manipulate maps.
+ *  @note Status: BETA
+ */
 
 #ifndef EMP_MAP_UTILS_H
 #define EMP_MAP_UTILS_H
@@ -14,25 +16,25 @@
 
 namespace emp {
 
-  // A common test it to determine if an element is present in a map.
+  /// Test if an element is present in an std::map.
   template <class KEY, class T, class Compare, class Alloc>
   inline bool Has( const std::map<KEY,T,Compare,Alloc> & in_map, const KEY & key ) {
     return in_map.find(key) != in_map.end();
   }
 
-  // Setup Has() for multimap as well.
+  /// Test if an element is present in an std::multimap.
   template <class KEY, class T, class Compare, class Alloc>
   inline bool Has( const std::multimap<KEY,T,Compare,Alloc> & in_map, const KEY & key ) {
     return in_map.find(key) != in_map.end();
   }
 
-  // ...and an unordered_map
+  /// Test if an element is present in an std::unordered_map.
   template <class KEY, class T, class Compare, class Alloc>
   inline bool Has( const std::unordered_map<KEY,T,Compare,Alloc> & in_map, const KEY & key ) {
     return in_map.find(key) != in_map.end();
   }
 
-  // A class to retrieve a map element if it exists, otherwise return a default.
+  /// Retrieve an std::map element if it exists, otherwise return a default.
   template <class KEY, class T, class Compare, class Alloc, class KEY2, class T2>
   inline T Find( const std::map<KEY,T,Compare,Alloc> & in_map, const KEY2 & key, const T2 & dval) {
     auto val_it = in_map.find(key);
@@ -40,7 +42,7 @@ namespace emp {
     return val_it->second;
   }
 
-  // ... and a version for unordered_map
+  /// Retrieve an std::unordered_map element if it exists, otherwise return a default.
   template <class KEY, class T, class Hash, class Pred, class Alloc, class KEY2, class T2>
   inline T Find( const std::unordered_map<KEY,T,Hash,Pred,Alloc> & in_map, const KEY2 & key, const T2 & dval) {
     auto val_it = in_map.find(key);
@@ -49,7 +51,7 @@ namespace emp {
   }
 
 
-  // A class to retrieve a map element if it exists, otherwise return a default.
+  /// Retrieve an std::map element if it exists, otherwise return a default.
   template <class KEY, class T, class Compare, class Alloc, class KEY2, class T2>
   inline const T & FindRef( const std::map<KEY,T,Compare,Alloc> & in_map, const KEY2 & key, const T2 & dval) {
     auto val_it = in_map.find(key);
@@ -57,7 +59,7 @@ namespace emp {
     return val_it->second;
   }
 
-  // ... and a version for unordered_map
+  /// Retrieve an std::unordered_map element if it exists, otherwise return a default.
   template <class KEY, class T, class Hash, class Pred, class Alloc, class KEY2, class T2>
   inline const T & FindRef( const std::unordered_map<KEY,T,Hash,Pred,Alloc> & in_map, const KEY2 & key, const T2 & dval) {
     auto val_it = in_map.find(key);
@@ -68,11 +70,14 @@ namespace emp {
 
   // The following two functions are from:
   // http://stackoverflow.com/questions/5056645/sorting-stdmap-using-value
+
+  /// Take an std::pair<A,B> and return the flipped pair std::pair<B,A>
   template<typename A, typename B> constexpr std::pair<B,A> flip_pair(const std::pair<A,B> &p)
   {
     return std::pair<B,A>(p.second, p.first);
   }
 
+  /// Take an std::map<A,B> and return the flipped map (now multimap to be safe): std::multimap<B,A>
   template<typename A, typename B> std::multimap<B,A> flip_map(const std::map<A,B> &src)
   {
     std::multimap<B,A> dst;
