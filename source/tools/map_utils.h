@@ -16,52 +16,27 @@
 
 namespace emp {
 
-  /// Test if an element is present in an std::map.
-  template <class KEY, class T, class Compare, class Alloc>
-  inline bool Has( const std::map<KEY,T,Compare,Alloc> & in_map, const KEY & key ) {
+  /// Take any map type, and run find to determine if a key is present.
+  template <class MAP_T, class KEY_T>
+  inline bool Has( const MAP_T & in_map, const KEY_T & key ) {
     return in_map.find(key) != in_map.end();
   }
 
-  /// Test if an element is present in an std::multimap.
-  template <class KEY, class T, class Compare, class Alloc>
-  inline bool Has( const std::multimap<KEY,T,Compare,Alloc> & in_map, const KEY & key ) {
-    return in_map.find(key) != in_map.end();
-  }
 
-  /// Test if an element is present in an std::unordered_map.
-  template <class KEY, class T, class Compare, class Alloc>
-  inline bool Has( const std::unordered_map<KEY,T,Compare,Alloc> & in_map, const KEY & key ) {
-    return in_map.find(key) != in_map.end();
-  }
-
-  /// Retrieve an std::map element if it exists, otherwise return a default.
-  template <class KEY, class T, class Compare, class Alloc, class KEY2, class T2>
-  inline T Find( const std::map<KEY,T,Compare,Alloc> & in_map, const KEY2 & key, const T2 & dval) {
-    auto val_it = in_map.find(key);
-    if (val_it == in_map.end()) return dval;
-    return val_it->second;
-  }
-
-  /// Retrieve an std::unordered_map element if it exists, otherwise return a default.
-  template <class KEY, class T, class Hash, class Pred, class Alloc, class KEY2, class T2>
-  inline T Find( const std::unordered_map<KEY,T,Hash,Pred,Alloc> & in_map, const KEY2 & key, const T2 & dval) {
+  /// Take any map, run find() member function, and return the result found
+  /// (or default value if no results found).
+  template <class MAP_T, class KEY_T, class DEFAULT_T>
+  inline auto Find( const MAP_T & in_map, const KEY_T & key, const DEFAULT_T & dval) {
     auto val_it = in_map.find(key);
     if (val_it == in_map.end()) return dval;
     return val_it->second;
   }
 
 
-  /// Retrieve an std::map element if it exists, otherwise return a default.
-  template <class KEY, class T, class Compare, class Alloc, class KEY2, class T2>
-  inline const T & FindRef( const std::map<KEY,T,Compare,Alloc> & in_map, const KEY2 & key, const T2 & dval) {
-    auto val_it = in_map.find(key);
-    if (val_it == in_map.end()) return dval;
-    return val_it->second;
-  }
-
-  /// Retrieve an std::unordered_map element if it exists, otherwise return a default.
-  template <class KEY, class T, class Hash, class Pred, class Alloc, class KEY2, class T2>
-  inline const T & FindRef( const std::unordered_map<KEY,T,Hash,Pred,Alloc> & in_map, const KEY2 & key, const T2 & dval) {
+  /// Take any map and element, run find() member function, and return a reference to
+  /// the result found (or default value if no results found).
+  template <class MAP_T, class KEY_T, class DEFAULT_T>
+  inline const auto & FindRef( const MAP_T & in_map, const KEY_T & key, const DEFAULT_T & dval) {
     auto val_it = in_map.find(key);
     if (val_it == in_map.end()) return dval;
     return val_it->second;
