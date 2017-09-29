@@ -1,15 +1,16 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file contains useful mathematical functions (that are constexpr when possible.)
-//  Status: BETA (though new functions are added frequently)
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  math.h
+ *  @brief Useful mathematical functions (that are constexpr when possible.)
+ *  @note Status: BETA (though new functions are added frequently)
+ */
 
 
 #ifndef EMP_MATH_H
 #define EMP_MATH_H
-
 
 #include <initializer_list>
 #include <algorithm>
@@ -18,7 +19,7 @@
 
 namespace emp {
 
-  /// % is actually remainder; this is a proper modulus command that handles negative #'s correctly
+  /// % is actually remainder; Mod is a proper modulus command that handles negative #'s correctly
   inline constexpr int Mod(int in_val, int mod_val) {
     in_val %= mod_val;
     return (in_val < 0) ? (in_val + mod_val) : in_val;
@@ -128,20 +129,23 @@ namespace emp {
     }
   }
 
-  // A fast (O(log p)) integer-power command.
+  /// A fast (O(log p)) integer-power command.
   static constexpr int Pow(int base, int p) {
     return (p <= 0) ? 1 : base * Pow(base, p-1);
   }
 
+  /// A fast 2^x command.
   static constexpr double Pow2(double exp) {
     return (exp < 0.0) ? (1.0/Pow2_impl(-exp)) : Pow2_impl(exp);
   }
 
+  /// A fast method for calculating exponents for int types.
   template <typename TYPE>
   static constexpr TYPE IntPow(TYPE base, TYPE exp) {
     return exp < 1 ? 1 : (base * IntPow(base, exp-1));
   }
 
+  /// A fast method for calculating exponents on doubles.
   static constexpr double Pow(double base, double exp) {
     // Normally, convert to a base of 2 and then use Pow2.
     // If base is negative, we don't want to deal with imaginary numbers, so use IntPow.
@@ -153,6 +157,7 @@ namespace emp {
   //   return (p <= 0) ? 1 : (base * Pow(base, p-1));
   // }
 
+  /// A fast method of calculating e^x
   static constexpr double Exp(double exp) {
     return Pow2(Log2(emp::E) * exp);  // convert to a base of e.
   }
@@ -166,22 +171,24 @@ namespace emp {
   template <typename TYPE>
   static constexpr int CountOnes(TYPE x) { return x == 0 ? 0 : (CountOnes(x/2) + (x&1)); }
 
-  /// Quick bit-mask generators...
+  /// Quick bit-mask generator for low bits.
   template <typename TYPE>
   static constexpr TYPE MaskLow(std::size_t num_bits) {
     return (num_bits == 8*sizeof(TYPE)) ? ((TYPE)-1) : ((((TYPE)1) << num_bits) - 1);
   }
 
+  /// Quick bit-mask generator for high bits.
   template <typename TYPE>
   static constexpr TYPE MaskHigh(std::size_t num_bits) {
     return MaskLow<TYPE>(num_bits) << (8*sizeof(TYPE)-num_bits);
   }
 
+  /// Return the minimum of three values.
   template <typename T> constexpr const T & Min(const T& in1, const T& in2, const T& in3) {
     return std::min(std::min(in1,in2), in3);
   }
 
-  // Build a min and max that allows a variable number of inputs to be compared.
+  /// A version of Min that allows a variable number of inputs to be compared.
   template <typename T> const T & Min(std::initializer_list<const T&> lst) {
     emp_assert(lst.size > 0); // Nothing to return if nothing in the list!
     auto min_found = lst.begin();
@@ -191,6 +198,7 @@ namespace emp {
     return *min_found;
   }
 
+  /// A version of Max that allows a variable number of inputs to be compared.
   template <typename T> const T & Max(std::initializer_list<const T&> lst) {
     emp_assert(lst.size > 0); // Nothing to return if nothing in the list!
     auto max_found = lst.begin();
