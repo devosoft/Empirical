@@ -19,7 +19,7 @@ using move_t = size_t;
 constexpr size_t POP_SIZE = 1000;
 constexpr size_t GENOME_SIZE = 100;
 constexpr size_t EVAL_TIME = 3500;
-constexpr size_t UPDATES = 1;
+constexpr size_t UPDATES = 1000;
 constexpr size_t TOURNY_SIZE = 4;
 constexpr size_t BOARD_SIZE = 8;
 
@@ -96,6 +96,7 @@ size_t EvalMove(emp::Othello & game, emp::AvidaGP & org) {
   org.ResetHardware();
 
   size_t player = game.GetCurrPlayer();
+  //std::cout<<std::endl;
 
   for (size_t i = 0; i < BOARD_SIZE* BOARD_SIZE; i++) {
     size_t tile = game.GetTile(i);
@@ -104,6 +105,8 @@ size_t EvalMove(emp::Othello & game, emp::AvidaGP & org) {
     if (tile == player) conv_tile = 1;
     else if (tile == 0) conv_tile = 0;
     else conv_tile = -1;
+    //if (i % BOARD_SIZE == 0){std::cout<<std::endl;}
+    //std::cout<<conv_tile<<" ";
     org.SetInput(i, conv_tile);
   }
 
@@ -138,7 +141,7 @@ double EvalGame(othello_ai_t & player0, othello_ai_t & player1,
 
     if (verbose) {
       std::cout<<"player: "<<player<<std::endl;
-      std::cout << "round = " << round++ << std::endl;
+      std::cout << "round = " << round << std::endl;
       game.Print();
       std::cout << "Move = " << best_move << std::endl;//best.first + " " + best.second<<std::endl;
       if (game.GetTile(best_move) != 0) {
@@ -149,6 +152,7 @@ double EvalGame(othello_ai_t & player0, othello_ai_t & player1,
 
     // If the chosen move is illegal, end the game
     if (player == 1){
+      //std::cout<<"best move: "<<best_move<<std::endl;
       if (game.IsMoveValid(player, best_move) == 0 || game.GetTile(best_move) != 0){
         if (verbose){std::cout<<"break"<<std::endl;}
         break;
@@ -165,6 +169,7 @@ double EvalGame(othello_ai_t & player0, othello_ai_t & player1,
     // Do the move and determine who goes next.
     bool go_again = game.DoMove(player, best_move);
     if (!go_again) {game.SetTurn(game.GetOpponent(player));}
+    round++;
   }
 
   score = round; // Score based on total rounds without mistake
@@ -352,23 +357,23 @@ int main(int argc, char* argv[])
   for (size_t ud = 0; ud < UPDATES; ud++) {
     emp::vector<size_t> choices = testcases.GetValidSubset();
 
-    for (auto org : world){
-      emp::Othello game(BOARD_SIZE, 1); //TODO: should it be random player first?
-
-      for (size_t choice : choices){
-        game.SetBoard(tests[choice].first);
-        int move = EvalMove(game, *org);
-
-        for (int i = 0; i < correct_choices.size(); i++) {
-          if (correct_choices[i][choice].find(move) != correct_choices[i][choice].end()){
-            scores[i]++;
-          }
-        }
-      }
-      for (int i = 0; i < correct_choices.size(); i++) {
-          org->SetTrait(i, scores[i]);
-      }
-    }
+    // for (auto org : world){
+    //   emp::Othello game(BOARD_SIZE, 1); //TODO: should it be random player first?
+    //
+    //   for (size_t choice : choices){
+    //     game.SetBoard(tests[choice].first);
+    //     int move = EvalMove(game, *org);
+    //
+    //     for (int i = 0; i < correct_choices.size(); i++) {
+    //       if (correct_choices[i][choice].find(move) != correct_choices[i][choice].end()){
+    //         scores[i]++;
+    //       }
+    //     }
+    //   }
+    //   for (int i = 0; i < correct_choices.size(); i++) {
+    //       org->SetTrait(i, scores[i]);
+    //   }
+    // }
 
     // Keep the best individual.
     world.EliteSelect(fit_fun, 1, 1);
@@ -384,11 +389,12 @@ int main(int argc, char* argv[])
     world.Update();
 
     std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
-    if (ud % 100 == 0){
+    if (ud % 10 == 0){
       for (int i = 0; i < POP_SIZE; i++){
         std::cout<<fit_fun(&(world[i]))<< " ";
       }
       std::cout<<std::endl;
+      EvalGame(world[0], world[1], 1, true);
     }
 
     // Mutate all but the first organism.
@@ -400,7 +406,7 @@ int main(int argc, char* argv[])
   std::cout << std::endl;
   world[0].PrintGenome("othello_save.org");
 
-  EvalGame(world[0], world[1], 0, true);
+  EvalGame(world[0], world[1], 1, true);
 
   // And try playing it!
   /*
