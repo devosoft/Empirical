@@ -1,11 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A memo_function works identicaly to std::function, but memorizes prior results (caches them)
-//  so that the function doesn't have to process those results again.
-//  Status: BETA
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  memo_function.h
+ *  @brief A function that memorizes previous results to speed up any repeated calls.
+ *  @note Status: BETA (though new functions are added frequently)
+ */
 
 #ifndef EMP_MEMO_FUNCTIONS_H
 #define EMP_MEMO_FUNCTIONS_H
@@ -19,6 +20,9 @@
 
 namespace emp {
 
+  /// Identical to std::function, but memorizes prior results (caches them) so that the function
+  /// doesn't have to process those results again.  (note: Genetic version is undefinined; must have
+  /// a function signature.)
   template <class T> class memo_function;    // Not defined.
 
   // Single argument functions don't need a tuple...
@@ -32,8 +36,8 @@ namespace emp {
     using this_t = memo_function<R(ARG)>;
 
   private:
-    mutable std::unordered_map<index_t, return_t> cache_map;
-    fun_t fun;
+    mutable std::unordered_map<index_t, return_t> cache_map; ///< Cached results.
+    fun_t fun;                                               ///< Function to call.
 
   public:
     template <typename T>
@@ -42,19 +46,35 @@ namespace emp {
     memo_function(this_t &&) = default;
     memo_function() : cache_map(), fun() { ; }
 
+    /// Copy another memo_function of the same type.
     this_t & operator=(const this_t &) = default;
+
+    /// Move to here another memo function of the same type.
     this_t & operator=(this_t &&) = default;
+
+    /// Set a new std::function of the appropriate type.
     this_t & operator=(const fun_t & _f) { cache_map.clear(); fun=_f; return *this; }
+
+    /// Move to here an std::function of the appropriate type.
     this_t & operator=(fun_t && _f) { cache_map.clear(); fun=std::move(_f); return *this; }
     template <typename T>
+
+    /// A universal copy/move for other combinations that work with std::function.
     this_t & operator=(T && arg) { cache_map.clear(); fun = std::forward<T>(arg); return *this; }
 
+    /// How many values have been cached?
     size_t size() const { return cache_map.size(); }
 
+    /// Test if a certain input has been cached.
     bool Has(const ARG & k) const { return cache_map.find(k) != cache_map.end(); }
+
+    /// Clear out the cache.
     void Clear() { cache_map.clear(); }
+
+    /// Erase a specific entry from the cache.
     void Erase(const ARG & k) { cache_map.erase(k); }
 
+    /// Call the memo_function.
     template <class KEY>
     return_t operator()(KEY && k) const {
       emp_assert(fun);
@@ -64,12 +84,15 @@ namespace emp {
       return cache_map.emplace(std::forward<KEY>(k), result).first->second;
     }
 
+    /// Identify if the memo_function has been set.
     operator bool() const { return (bool) fun; }
 
-    // A memo_function can be converted to a regular std::function for function calls.
+    /// Convert a memo_function to a regular std::function for function calls.
     operator std::function<R(ARG)>() {
       return [this](const ARG & arg){ return operator()(arg); };
     }
+
+    /// Convert a memo_function to a regular std::function for function calls.
     std::function<R(ARG)> to_function() {
       return [this](const ARG & arg){ return operator()(arg); };
     }
