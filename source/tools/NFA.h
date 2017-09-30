@@ -1,68 +1,20 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A Non-deterministic Finite Automata simulator
-//  Status: BETA
-//
-//
-//  To build a standard NFA, use emp::NFA.  If you want to have more symbols or more stop states,
-//  use emp::tNFA<S,T> where S is the number of symbols and T is the type used for stop.
-//  (defaults are 128 for ASCII-128 and uint8_t respectively.)
-//
-//  The constructor can take as parameters the number of states and the id of the start state (both
-//  default to 0)
-//
-//  size_t GetSize() const
-//    return the current number of states.
-//
-//  std::set<size_t> GetStart() const
-//    return start state and all others reachable through empty transitions.
-//
-//  std::set<size_t> GetNext(size_t sym, size_t from_id=0) const
-//  std::set<size_t> GetNext(size_t sym, const std::set<size_t> from_set) const
-//    return the states reachable from the current state or set of state given the provided symbol.
-//
-//  bool HasFreeTransitions(size_t id) const
-//  bool HasSymTransitions(size_t id) const
-//    Does the provided state has free transitions or symbol-transitions (respecitvely)?
-//
-//  opts_t GetSymbolOptions(const std::set<size_t> & test_set) const
-//    Return an emp::BitSet indicating the symbols available from the provided set of states.
-//
-//  void Resize(size_t new_size)
-//    Change the number of available states.
-//
-//  size_t AddNewState()
-//    Add a new state into the NFA and return its id.
-//
-//  void AddTransition(size_t from, size_t to, size_t sym)
-//  void AddTransition(size_t from, size_t to, const std::string & sym_set)
-//  void AddTransition(size_t from, size_t to, const BitSet<NUM_SYMBOLS> & sym_set)
-//    Add a transition between states 'from' and 'to' that can be taken with the provided symbols.
-//
-//  void AddFreeTransition(size_t from, size_t to)
-//    Create a free transition between 'from' and 'to'.
-//
-//  void SetStop(size_t state, stop_t stop_val=1)
-//    Set the specified state to be a stop state (with an optional stop value.)
-//
-//  stop_t GetStop(size_t state) const
-//     Return the stop value associated with the specified state.
-//
-//  bool IsStart(size_t state) const
-//  bool IsStop(size_t state) const
-//  bool IsEmpty(size_t state) const
-//    Testing types of states:
-//    START -> This is where the NFA begins (may have free transitions to other states)
-//    STOP -> A legal endpoint for the NFA.
-//    EMPTY -> A state with only empty transitions from it, and not stop state.
-//
-//  void Print() const
-//    Output the structure of this NFA.
-//
-//
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  NFA.h
+ *  @brief A Non-deterministic Finite Automata simulator
+ *  @note Status: BETA
+ *
+ *  To build a standard NFA, use emp::NFA.  If you want to have more symbols or more stop states,
+ *  use emp::tNFA<S,T> where S is the number of symbols and T is the type used for stop.
+ *  (defaults are 128 for ASCII-128 and uint8_t respectively.)
+ *
+ *  The constructor can take as parameters the number of states and the id of the start state (both
+ *  default to 0)
+ */
+
 //  NFAs can also be manipulated using emp::NFA_State objects (or emp::tNFA_State).  Its
 //  constructor must be provided with the NFA it should track and it will being in the start state.
 //
@@ -141,11 +93,16 @@ namespace emp {
     ~tNFA() { ; }
     tNFA<S,STOP_TYPE> & operator=(const tNFA<S,STOP_TYPE> &) = default;
 
+    /// Return the current number of states.
     size_t GetSize() const { return states.size(); }
+
+    /// Return start state and all others reachable through empty transitions.
     const std::set<size_t> & GetStart() const {
       emp_assert(start < states.size());
       return states[start].free_to;
     }
+
+    /// Return the states reachable from the current state given the provided symbol.
     std::set<size_t> GetNext(size_t sym, size_t from_id=0) const {
       std::set<size_t> to_set;
       for (auto & t : states[from_id].trans) {
@@ -156,6 +113,8 @@ namespace emp {
       }
       return to_set;
     }
+
+    /// return the states reachable from the current set of states given the provided symbol.
     std::set<size_t> GetNext(size_t sym, const std::set<size_t> from_set) const {
       std::set<size_t> to_set;
       for (size_t from_id : from_set) {
@@ -169,9 +128,13 @@ namespace emp {
       return to_set;
     }
 
+    /// Does the provided state have free transitions?
     bool HasFreeTransitions(size_t id) const { return states[id].free_to.size(); }
+
+    /// Does the provided state have symbol-transitions?
     bool HasSymTransitions(size_t id) const { return states[id].trans.size(); }
 
+    /// Return an emp::BitSet indicating the symbols available from the provided set of states.
     opts_t GetSymbolOptions(const std::set<size_t> & test_set) const {
       opts_t options;
       for (size_t id : test_set) {
@@ -182,27 +145,38 @@ namespace emp {
       return options;
     }
 
+    /// Change the number of available states.
     void Resize(size_t new_size) {
       states.resize(new_size);
       is_stop.resize(new_size, 0);
       if (new_size > start) states[start].free_to.insert(start);
     }
+
+    /// Add a new state into the NFA and return its id.
     size_t AddNewState() { size_t new_state = GetSize(); Resize(new_state+1); return new_state; }
+
+    /// Add a transition between states 'from' and 'to' that can be taken with the provided symbol.
     void AddTransition(size_t from, size_t to, size_t sym) {
       emp_assert(from < states.size(), from, states.size());
       emp_assert(to < states.size(), to, states.size());
 
       states[from].trans[to].symbols[sym] = true;
     }
+
+    /// Add a transition between states 'from' and 'to' that can be taken with the provided symbols.
     void AddTransition(size_t from, size_t to, const std::string & sym_set) {
       for (char x : sym_set) AddTransition(from, to, (size_t) x);
     }
+
+    /// Add a transition between states 'from' and 'to' that can be taken with the provided symbols.
     void AddTransition(size_t from, size_t to, const BitSet<NUM_SYMBOLS> & sym_set) {
       emp_assert(from < states.size(), from, states.size());
       emp_assert(to < states.size(), to, states.size());
 
       states[from].trans[to].symbols |= sym_set;
     }
+
+    /// Create a free transition between 'from' and 'to'.
     void AddFreeTransition(size_t from, size_t to) {
       emp_assert(from < states.size(), from, states.size());
       emp_assert(to < states.size(), to, states.size());
@@ -223,18 +197,23 @@ namespace emp {
 
     }
 
+    /// Set the specified state to be a stop state (with an optional stop value.)
     template <typename T=stop_t>
     void SetStop(size_t state, T stop_val=1) { is_stop[state] = (stop_t) stop_val; }
+
+    /// Get any stop value associated with the provided state.
     stop_t GetStop(size_t state) const { return is_stop[state]; }
 
-    // Testing types of states:
-    //  START -> This is where the NFA begins (may have free transitions to other states)
-    //  STOP -> A legal endpoint for the NFA.
-    //  EMPTY -> A state with only empty transitions from it, and not stop state.
+    /// Test if NFA begins at provided state (may have free transitions to other states)
     bool IsStart(size_t state) const { return state == start; }
+
+    ///  Test if this state is a legal endpoint for the NFA.
     bool IsStop(size_t state) const { return is_stop[state]; }
+
+    ///  Test if this state has only empty transitions from it, and not stop state.
     bool IsEmpty(size_t state) const { return !HasSymTransitions(state) && !IsStop(state); }
 
+    /// Merge another NFA into this one.
     void Merge(const tNFA<NUM_SYMBOLS,STOP_TYPE> & nfa2) {
       const size_t offset = GetSize();                  // How far should we offset new NFA states?
       const size_t new_start = offset + nfa2.GetSize(); // Locate the new start node.
@@ -256,6 +235,7 @@ namespace emp {
       }
     }
 
+    /// Print information about this NFA (for debugging)
     void Print() const {
       std::cout << states.size() << " States:" << std::endl;
       for (size_t i = 0; i < states.size(); i++) {
