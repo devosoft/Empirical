@@ -268,39 +268,56 @@ namespace emp {
     }
   };
 
+  /// Information about the current full state (i.e., set of legal states) of an NFA.
   template <size_t NUM_SYMBOLS=128, typename STOP_TYPE=uint8_t>
   class tNFA_State {
   private:
-    const tNFA<NUM_SYMBOLS,STOP_TYPE> & nfa;
-    std::set<size_t> state_set;
+    const tNFA<NUM_SYMBOLS,STOP_TYPE> & nfa;  ///< Which NFA is this state set associated with?
+    std::set<size_t> state_set;               ///< Which states are currently legal?
   public:
     tNFA_State(const tNFA<NUM_SYMBOLS,STOP_TYPE> & _nfa) : nfa(_nfa), state_set() {
       state_set = nfa.GetStart();
     }
     ~tNFA_State() { ; }
 
+    /// Get the NFA associated with this state.
     const tNFA<NUM_SYMBOLS,STOP_TYPE> & GetNFA() const { return nfa; }
+
+    /// Get a set of states that are currently active.
     const std::set<size_t> & GetStateSet() const { return state_set; }
 
+    /// Are there currently any legal NFA states?
     bool IsActive() const { return state_set.size(); }
+
+    /// Can we legally stop in any of the current states?
     bool IsStop() const {
       for (auto s : state_set) if (nfa.IsStop(s)) return true;
       return false;
     }
+
+    /// Is a particular NFA state currently included?
     bool HasState(size_t id) { return state_set.count(id); }
+
+    /// How many states are currently included?
     size_t GetSize() { return state_set.size(); }
 
+    /// Set the current states.
     void SetStateSet(const std::set<size_t> & in) { state_set = in; }
+
+    /// Change current states to start + free transitions from start.
     void Reset() { state_set = nfa.GetStart(); }
 
+    /// Update states given a new input symbol.
     void Next(size_t sym) {
       state_set = nfa.GetNext(sym, state_set);
     }
 
+    /// Update states given a new series of input symbols (as a string)
     void Next(const std::string & sym_set) {
       for (char x : sym_set) Next((size_t) x);
     }
 
+    /// Print out current information about this NFA State (for debugging)
     void Print() {
       std::cout << "cur states:";
       for (auto s : state_set) {
@@ -310,8 +327,10 @@ namespace emp {
     }
   };
 
-
+  /// NFA is the most standard tNFA setup.
   using NFA = tNFA<128, uint8_t>;
+
+  /// NFA_State is the most standard tNFA_State setup.
   using NFA_State = tNFA_State<128, uint8_t>;
 }
 
