@@ -61,6 +61,7 @@
 
 namespace emp {
 
+  /// A dynamic NFA class, for easily building non-determanistic finite automata.
   template <size_t S=128, typename STOP_TYPE=uint8_t>
   class tNFA {
   public:
@@ -74,15 +75,15 @@ namespace emp {
       Transition() : symbols() { }
     };
     struct State {
-      std::map<size_t, Transition> trans;   // What symbol transitions are available?
-      std::set<size_t> free_to;             // What other states can you move to for free?
-      std::set<size_t> free_from;           // What other states can move here for free?
+      std::map<size_t, Transition> trans;   ///< What symbol transitions are available?
+      std::set<size_t> free_to;             ///< What other states can you move to for free?
+      std::set<size_t> free_from;           ///< What other states can move here for free?
       State() : trans(), free_to(), free_from() { }
     };
 
-    emp::vector<State> states;
-    size_t start;
-    emp::vector< STOP_TYPE > is_stop;         // 0=no 1=yes (char instead of bool for speed)
+    emp::vector<State> states;           ///< Information about available states.
+    size_t start;                        ///< Main start state (others might be reached for free.)
+    emp::vector< STOP_TYPE > is_stop;    ///< 0=no 1=yes (char instead of bool for speed)
 
   public:
     tNFA(size_t num_states=1, size_t start_state=0)
@@ -254,6 +255,7 @@ namespace emp {
       }
     }
 
+    /// Identify free moves in NFA (for debugging)
     void PrintFreeMoves() {
       for (int i = 0; i < states.size(); i++) {
         std::cout << "Free from ( ";
