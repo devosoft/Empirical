@@ -5,7 +5,7 @@
  *
  *  @file  Parser.h
  *  @brief A general-purpose, fast parser.
- *  @note Status: BETA
+ *  @note Status: DEVELOPMENT
  *
  *  @todo Patterns should include functions that are called when that point of rule is triggered.
  *  @todo Make sure to warn if a symbol has no patterns associated with it.
@@ -126,18 +126,20 @@ namespace emp {
       return symbols[spos].name;
     }
 
+    /// Provide a symbol to the compiler and set it as active.
     Parser & operator()(const std::string & name) {
       active_pos = GetSymbolPos(name);
       if (active_pos == -1) active_pos = (int) AddSymbol(name);
       return *this;
     }
 
+    /// Get the parser symbol information associated with a provided name.
     ParseSymbol & GetParseSymbol(const std::string & name) {
       size_t pos = (size_t) GetSymbolPos( name );
       return symbols[pos];
     }
 
-    // Use the currently active symbol and attach a rule to it.
+    /// Use the currently active symbol and attach a rule to it.
     template <typename... STATES>
     Parser & Rule(STATES... states) {
       emp_assert(active_pos >= 0 && active_pos < (int) symbols.size(), active_pos);
@@ -150,7 +152,7 @@ namespace emp {
       return *this;
     }
 
-    // Specify the name of the symbol and add a rule to it, returning the symbol id.
+    /// Specify the name of the symbol and add a rule to it, returning the symbol id.
     template <typename... STATES>
     size_t AddRule(const std::string & name, STATES &&... states) {
       const size_t id = GetID(name);
@@ -159,6 +161,7 @@ namespace emp {
       return id;
     }
 
+    /// Convert an input stream into a parse tree (TO FINISH!)
     void Process(std::istream & is, bool test_valid=true) {
       // Scan through the current grammar and try to spot any problems.
       if (test_valid) {
@@ -195,6 +198,7 @@ namespace emp {
       }
     }
 
+    /// Print the current status of this parser (for debugging)
     void Print(std::ostream & os=std::cout) const {
       os << symbols.size() << " parser symbols available." << std::endl;
       for (const auto & s : symbols) {
