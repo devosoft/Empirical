@@ -13,41 +13,12 @@
  *
  *  The constructor can take as parameters the number of states and the id of the start state (both
  *  default to 0)
- */
+ *
+ *  @note DFA's use SetTransition(), but NFA's use AddTransition.  This distinction is intentional
+ *        since in a DFA a second SetTransition with the same start state and symbol will override
+ *        first, while in an NFA a second AddTransition will always add a new option.
+*/
 
-//  NFAs can also be manipulated using emp::NFA_State objects (or emp::tNFA_State).  Its
-//  constructor must be provided with the NFA it should track and it will being in the start state.
-//
-//  const tNFA<NUM_SYMBOLS,STOP_TYPE> & GetNFA() const
-//    Return the NFA being used.
-//
-//  const std::set<size_t> & GetStateSet() const
-//    Return the current set of states accessible with the symbols provided.
-//
-//  bool IsActive() const
-//    Are the current set of states "active" (that is, legal)
-//
-//  bool IsStop() const
-//    Are any of the current states STOP states?
-//
-//  void SetStateSet(const std::set<size_t> & in)
-//    Change the current set of state to the ones specified.
-//
-//  void Reset()
-//    Reset to the start state.
-//
-//  void Next(size_t sym)
-//  void Next(const std::string & sym_set)
-//    From the current set of states advance to the next set of states that would be possible
-//    given the symbols provided.
-//
-//  void Print()
-//    Output the current set of states being used.
-//
-//
-//  Note: DFA's use SetTransition(), but NFA's use AddTransition.  This distinction is intentional
-//        since in a DFA a second SetTransition with the same start state and symbol will override
-//        first, while in an NFA a second AddTransition will always add a new option.
 
 #ifndef EMP_NFA_H
 #define EMP_NFA_H
