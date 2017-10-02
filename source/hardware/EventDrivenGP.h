@@ -435,6 +435,85 @@ namespace emp {
         program[fID].SetInst(pos, inst);
       }
 
+      /// Load entire program from input stream.
+      /// Warning: This function accepts a slightly different than what the Program's PrintProgram
+      /// function prints out (for now, will add a PrintProgram variant that prints in this load function's accepted format).
+      /// Program format:
+      /// Fn-AFFINITY:
+      ///   INST_NAME[AFFINITY](arg_0, ..., arg_max)
+      ///   ...
+      /// Fn-AFFINITY:
+      ///   ...
+      void Load(std::istream & input) {
+        // Clear current program.
+        Clear();
+        std::string cur_line;
+        emp::vector<std::string> line_components;
+        while (!input.eof()) {
+          std::getline(input, cur_line);
+          remove_whitespace(cur_line); // Clear out whitespace.
+          if (cur_line == empty_string()) continue; // Skip empty lines.
+          // Are we looking the beginning of a function?
+          slice(cur_line, line_components, '-');
+          if (to_lower(line_components[0]) == "fn" && line_components.size() > 1) {
+            // Extract function affinity.
+            std::string & aff_str = line_components[1];
+            affinity_t fun_aff;
+            for (size_t i = 0; i < aff_str.size(); ++i) {
+              if (i >= fun_aff.GetSize()) break;
+              if (aff_str[i] == '1') fun_aff.Set(fun_aff.GetSize() - i - 1, true);
+            }
+            PushFunction(fun_aff);
+          } else {
+            // We must be looking at an instruction.
+            affinity_t inst_aff;
+            int a0 = 0; int a1 = 0; int a2 = 0;
+            // Is there an affinity?
+            size_t aff_begin = cur_line.find_first_of('[');
+            size_t aff_end = cur_line.find_first_of(']');
+            if ((aff_begin != std::string::npos) && (aff_end != std::string::npos) && (aff_begin < aff_end)) {
+              // Found affinity.
+              std::string aff_str = string_get_range(cur_line, aff_begin+1, aff_end-(aff_begin+1));
+              for (size_t i = 0; i < aff_str.size(); ++i) {
+                if (i >= inst_aff.GetSize()) break;
+                if (aff_str[i] == '1') inst_aff.Set(inst_aff.GetSize() - i - 1, true);
+              }
+              // Pop affinity from cur_line.
+              cur_line = string_get_range(cur_line, 0, aff_begin) + string_get_word(cur_line, aff_end+1);
+            }
+            // Are there arguments?
+            size_t args_begin = cur_line.find_first_of('(');
+            size_t args_end = cur_line.find_first_of(')');
+            size_t args_cnt = 0;
+            if ((args_begin != std::string::npos) && (args_end != std::string::npos) && (args_begin < args_end)) {
+              // Found some arguments.
+              std::string args_str = string_get_range(cur_line, args_begin+1, args_end-(args_begin+1));
+              line_components.clear();
+              // Extract arguments from arg str.
+              slice(args_str, line_components, ',');
+              if (args_cnt < line_components.size()) {
+                emp_assert(is_valid(line_components[args_cnt], [](char c){ return is_digit(c) || c=='-'; })); // Yes yes, this doesn't catch case when '-' is in middle of the number...oh well.
+                a0 = std::stoi(line_components[args_cnt]); ++args_cnt;
+              }
+              if (args_cnt < line_components.size()) {
+                emp_assert(is_valid(line_components[args_cnt], [](char c){ return is_digit(c) || c=='-'; }));
+                a1 = std::stoi(line_components[args_cnt]); ++args_cnt;
+              }
+              if (args_cnt < line_components.size()) {
+                emp_assert(is_valid(line_components[args_cnt], [](char c){ return is_digit(c) || c=='-'; }));
+                a2 = std::stoi(line_components[args_cnt]); ++args_cnt;
+              }
+              // Pop arguments from current line.
+              cur_line = string_get_range(cur_line, 0, args_begin) + string_get_word(cur_line, args_end+1);
+            }
+            // All that's left should be the instruction name.
+            emp_assert(inst_lib->GetID(cur_line) != (size_t)-1);
+            // Push instruction to program.
+            PushInst(cur_line, a0, a1, a2, inst_aff);
+          }
+        }
+      }
+
       /// Print out a single instruction with its arguments.
       void PrintInst(const inst_t & inst, std::ostream & os=std::cout) {
         os << inst_lib->GetName(inst.id);
@@ -889,75 +968,7 @@ namespace emp {
     ///   ...
     /// Fn-AFFINITY:
     ///   ...
-    void Load(std::istream & input) {
-      // Clear current program.
-      program.Clear();
-      std::string cur_line;
-      emp::vector<std::string> line_components;
-      while (!input.eof()) {
-        std::getline(input, cur_line);
-        remove_whitespace(cur_line); // Clear out whitespace.
-        if (cur_line == empty_string()) continue; // Skip empty lines.
-        // Are we looking the beginning of a function?
-        slice(cur_line, line_components, '-');
-        if (to_lower(line_components[0]) == "fn" && line_components.size() > 1) {
-          // Extract function affinity.
-          std::string & aff_str = line_components[1];
-          affinity_t fun_aff;
-          for (size_t i = 0; i < aff_str.size(); ++i) {
-            if (i >= fun_aff.GetSize()) break;
-            if (aff_str[i] == '1') fun_aff.Set(fun_aff.GetSize() - i - 1, true);
-          }
-          program.PushFunction(fun_aff);
-        } else {
-          // We must be looking at an instruction.
-          affinity_t inst_aff;
-          int a0 = 0; int a1 = 0; int a2 = 0;
-          // Is there an affinity?
-          size_t aff_begin = cur_line.find_first_of('[');
-          size_t aff_end = cur_line.find_first_of(']');
-          if ((aff_begin != std::string::npos) && (aff_end != std::string::npos) && (aff_begin < aff_end)) {
-            // Found affinity.
-            std::string aff_str = string_get_range(cur_line, aff_begin+1, aff_end-(aff_begin+1));
-            for (size_t i = 0; i < aff_str.size(); ++i) {
-              if (i >= inst_aff.GetSize()) break;
-              if (aff_str[i] == '1') inst_aff.Set(inst_aff.GetSize() - i - 1, true);
-            }
-            // Pop affinity from cur_line.
-            cur_line = string_get_range(cur_line, 0, aff_begin) + string_get_word(cur_line, aff_end+1);
-          }
-          // Are there arguments?
-          size_t args_begin = cur_line.find_first_of('(');
-          size_t args_end = cur_line.find_first_of(')');
-          size_t args_cnt = 0;
-          if ((args_begin != std::string::npos) && (args_end != std::string::npos) && (args_begin < args_end)) {
-            // Found some arguments.
-            std::string args_str = string_get_range(cur_line, args_begin+1, args_end-(args_begin+1));
-            line_components.clear();
-            // Extract arguments from arg str.
-            slice(args_str, line_components, ',');
-            if (args_cnt < line_components.size()) {
-              emp_assert(is_valid(line_components[args_cnt], [](char c){ return is_digit(c) || c=='-'; })); // Yes yes, this doesn't catch case when '-' is in middle of the number...oh well.
-              a0 = std::stoi(line_components[args_cnt]); ++args_cnt;
-            }
-            if (args_cnt < line_components.size()) {
-              emp_assert(is_valid(line_components[args_cnt], [](char c){ return is_digit(c) || c=='-'; }));
-              a1 = std::stoi(line_components[args_cnt]); ++args_cnt;
-            }
-            if (args_cnt < line_components.size()) {
-              emp_assert(is_valid(line_components[args_cnt], [](char c){ return is_digit(c) || c=='-'; }));
-              a2 = std::stoi(line_components[args_cnt]); ++args_cnt;
-            }
-            // Pop arguments from current line.
-            cur_line = string_get_range(cur_line, 0, args_begin) + string_get_word(cur_line, args_end+1);
-          }
-          // All that's left should be the instruction name.
-          emp_assert(program.inst_lib->GetID(cur_line) != (size_t)-1);
-          // Push instruction to program.
-          program.PushInst(cur_line, a0, a1, a2, inst_aff);
-        }
-      }
-    }
+    void Load(std::istream & input) { program.Load(input); }
 
     // ---------- Hardware Utilities ----------
     /// Generate new random number generator for this hardware object with the given seed value.
