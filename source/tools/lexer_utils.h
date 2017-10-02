@@ -1,26 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A set of utilities to convert between NFAs and DFAs
-//  Status: BETA
-//
-//
-//  Available conversions:
-//
-//   static const DFA & to_DFA(const DFA & dfa)
-//   static DFA to_DFA(const NFA & nfa, int keep_invalid=false)
-//
-//   static NFA to_NFA(const DFA & dfa)
-//   static const NFA & to_NFA(const NFA & nfa)}
-//
-//   (additional to_NFA and to_DFA functions are defined in RegEx.h)
-//
-//  Available merges:
-//
-//   static NFA MergeNFA( ... )  - Convert two or more (DFA, NFA or RegEx) to a single NFA.
-//   static DFA MergeDFA( ... )  - Convert two or more (DFA, NFA or RegEx) to a single DFA.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  lexer_utils.h
+ *  @brief A set of utilities to convert between NFAs and DFAs
+ *  @note Status: BETA
+ */
 
 
 #ifndef EMP_LEXER_UTILS_H
@@ -37,11 +23,13 @@
 
 namespace emp {
 
-  // Simple echo's
+  /// Converting DFA to DFA -- no change needed.
   static inline const DFA & to_DFA(const DFA & dfa) { return dfa; }
+
+  /// Converting NFA to MFA -- no change needed.
   static inline const NFA & to_NFA(const NFA & nfa) { return nfa; }
 
-  // Systematic conversion of NFA to DFA...
+  /// Systematic conversion of NFA to DFA...
   static inline DFA to_DFA(const NFA & nfa, int keep_invalid=false) {
     DFA dfa(1);                                  // Setup zero to be the start state.
     std::map<std::set<size_t>, size_t> id_map;   // How do nfa state sets map to dfa states?
@@ -88,7 +76,7 @@ namespace emp {
     return dfa;
   }
 
-  // Systematic up-conversion of DFA to NFA...
+  /// Systematic up-conversion of DFA to NFA...
   static inline NFA to_NFA(const DFA & dfa) {
     NFA nfa(dfa.GetSize());
     for (size_t from = 0; from < dfa.GetSize(); from++) {
@@ -103,12 +91,13 @@ namespace emp {
   }
 
 
-  // Merge multiple NFAs into one.
+  /// Merge multiple automata into one NFA (base case, single converstion)
   template <typename T1>
   static NFA MergeNFA(T1 && in) {
     return to_NFA(std::forward<T1>(in));
   }
 
+  /// Merge multiple automata (DFA, NFA, RegEx) into one NFA.
   template <typename T1, typename T2, typename... Ts>
   static NFA MergeNFA(T1 && in1, T2 && in2, Ts &&... others ) {
     NFA nfa_out( to_NFA(std::forward<T1>(in1)) );   // Start out identical to nfa1.
@@ -117,19 +106,20 @@ namespace emp {
   }
 
 
+  /// Merge multiple automata (DFA, NFA, RegEx) into one DFA.
   template <typename T1, typename T2, typename... Ts>
   static DFA MergeDFA(T1 && in1, T2 && in2, Ts &&... others ) {
     return to_DFA( MergeNFA(in1, in2, others...) );
   }
 
-
+  /// Structure to track the current status of a DFA.
   struct DFAStatus {
     size_t state;
     std::string sequence;
     DFAStatus(size_t _state, const std::string & _seq) : state(_state), sequence(_seq) { ; }
   };
 
-  // Method to find an example string that satisfies a DFA.
+  /// Method to find an example string that satisfies a DFA.
   std::string FindExample(const DFA & dfa, const size_t min_size=1) {
     emp::vector< DFAStatus > traverse_set;
     traverse_set.emplace_back(0, "");
