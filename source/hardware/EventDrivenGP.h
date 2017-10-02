@@ -526,6 +526,17 @@ namespace emp {
         }
       }
 
+      /// Fully print out a single instruction with its arguments/affinity.
+      void PrintInstFull(const inst_t & inst, std::ostream & os=std::cout) {
+        os << inst_lib->GetName(inst.id);
+        os << '['; inst.affinity.Print(os); os << ']';
+        os << '(';
+        for (size_t i = 0; i < MAX_INST_ARGS - 1; i++) {
+          os << inst.args[i] << ',';
+        } if (MAX_INST_ARGS > 0) { os << inst.args[MAX_INST_ARGS-1]; }
+        os << ')';
+      }
+
       /// Print out entire program.
       void PrintProgram(std::ostream & os=std::cout) {
         for (size_t fID = 0; fID < GetSize(); fID++) {
@@ -539,6 +550,32 @@ namespace emp {
             int num_spaces = 2 + (2 * depth);
             for (int s = 0; s < num_spaces; s++) os << ' ';
             PrintInst(inst, os);
+            os << '\n';
+            if (inst_lib->HasProperty(inst.id, "block_def")) {
+              // is block def?
+              depth++;
+            } else if (inst_lib->HasProperty(inst.id, "block_close") && depth > 0) {
+              // is block close?
+              depth--;
+            }
+          }
+          os << '\n';
+        }
+      }
+
+      /// Print out entire program.
+      void PrintProgramFull(std::ostream & os=std::cout) {
+        for (size_t fID = 0; fID < GetSize(); fID++) {
+          // Print out function name (affinity).
+          os << "Fn-";
+          program[fID].affinity.Print(os);
+          os << ":\n";
+          int depth = 0;
+          for (size_t i = 0; i < program[fID].GetSize(); i++) {
+            const inst_t & inst = program[fID][i];
+            int num_spaces = 2 + (2 * depth);
+            for (int s = 0; s < num_spaces; s++) os << ' ';
+            PrintInstFull(inst, os);
             os << '\n';
             if (inst_lib->HasProperty(inst.id, "block_def")) {
               // is block def?
@@ -1255,6 +1292,11 @@ namespace emp {
     /// Print out entire program using given output stream (default = std::cout).
     void PrintProgram(std::ostream & os=std::cout) {
       program.PrintProgram(os);
+    }
+
+    /// Print out entire program using given output stream (default = std::cout).
+    void PrintProgramFull(std::ostream & os=std::cout) {
+      program.PrintProgramFull(os);
     }
 
     /// Print out current state (full) of virtual hardware using given output stream (default = std::cout).
