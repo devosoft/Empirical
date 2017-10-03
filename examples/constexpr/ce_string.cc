@@ -8,7 +8,7 @@
 #include <iostream>
 
 #include "base/array.h"
-#include "tools/ce_string.h"
+#include "constexpr/ce_string.h"
 #include "tools/BitSet.h"
 
 int main()
