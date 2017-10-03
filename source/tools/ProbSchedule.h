@@ -1,36 +1,22 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A simple class to choose items with a probability proportional to their weight.
-//  Status: BETA
-//
-//  Constructor:
-//  ProbSchedule(size_t num_items, int random_seed=-1)
-//      num_items is the maximum number of items that can be placed into the data structure.
-//      random_seed is the seed for the random number generator used; values < 0 base seed on time.
-//
-//  void Adjust(size_t id, double weight)
-//      id is the identification number of the item whose weight is being adjusted.
-//      weight is the new weight for that entry.
-//
-//  size_t NextID() returns a random id based on the weights provided.
-//
-//
-//  Development NOTES:
-//   * We should probably change the name to something like WeightedRandom since it does not
-//     have to be used just for scheduling.
-//   * We could easily convert this structure to a template that acts as a glorified vector
-//     giving the ability to perform a weighted random choice.
-//   * We should allow the structure to be resized, either dynamically or through a Resize()
-//     method.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  ProbSchedule.h
+ *  @brief A simple class to choose items with a probability proportional to their weight.
+ *  @note Status: BETA
+ *
+ *  @todo Depricate in favor of IndexMap?
+ *  @todo Add Resize()?
+ *  @todo Allow random number generator to be created externally and provided.
+*/
 
 #ifndef EMP_PROB_SCHEDULE_H
 #define EMP_PROB_SCHEDULE_H
 
 #include "Random.h"
-#include "vector"
+#include "../base/vector.h"
 
 namespace emp {
 
@@ -60,8 +46,8 @@ namespace emp {
 
   public:
 
-    /// num_items is the maximum number of items that can be placed into the data structure.
-    /// random_seed is the seed for the random number generator used; values < 0 base seed on time.
+    /// @param num_items The maximum number of items that can be placed into the data structure.
+    /// @param random_seed The seed for the random number generator; values < 0 base seed on time.
     ProbSchedule(size_t _items, int seed=-1) : num_items(_items), weights(_items+1), tree_weights(_items+1), m_rng(seed) {
       for (size_t i = 0; i < weights.size(); i++)  weights[i] = tree_weights[i] = 0.0;
     }
@@ -76,6 +62,8 @@ namespace emp {
     double GetSubtreeWeight(size_t id) const { return tree_weights[id]; }
 
 
+    /// @param id The identification number of the item whose weight is being adjusted.
+    /// @param weight The new weight for that entry.
     void Adjust(size_t id, const double _weight) {
       weights[id] = _weight;
 
@@ -95,7 +83,7 @@ namespace emp {
       }
     }
 
-    /// Returns a random id based on the weights provided.
+    /// Return a random id based on the weights provided.
     int NextID() {
       const double total_weight = tree_weights[0];
 
