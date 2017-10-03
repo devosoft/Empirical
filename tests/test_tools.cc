@@ -30,10 +30,8 @@
 #include "tools/NFA.h"
 #include "tools/RegEx.h"
 #include "tools/Random.h"
-// #include "tools/Trait.h"
 #include "tools/TypeTracker.h"
 
-#include "tools/ce_string.h"
 #include "tools/errors.h"
 #include "tools/flex_function.h"
 #include "tools/functions.h"
@@ -55,10 +53,7 @@
 // this doesn't actually work--TODO: figure out why this doesn't work
 #include "tools/alert.h"
 #include "tools/const.h"
-// #include "tools/class.h"
-// #include "tools/fixed.h"
 #include "tools/SolveState.h"
-#include "tools/ProbSchedule.h"
 #include "tools/serialize_macros.h"
 
 
@@ -240,61 +235,6 @@ TEST_CASE("Test BitVector", "[tools]")
   bv80[65] = 1;
   REQUIRE(bv80.GetUIntAtBit(64) == 130);
   REQUIRE(bv80.GetValueAtBit<5>(64) == 2);
-}
-
-TEST_CASE("Test ce_string", "[tools]")
-{
-  constexpr emp::ce_string s = "abc";
-  constexpr emp::ce_string s2 = "abc";
-  constexpr emp::ce_string s3 = "abcdef";
-  constexpr emp::ce_string s4 = "aba";
-  emp::BitSet<s.size()> b1;
-  emp::BitSet<(size_t) s[0]> b2;
-
-  REQUIRE(b2.size() == 97);
-  REQUIRE(s.size() == 3);
-
-  constexpr bool x1 = (s == s2);
-  constexpr bool x2 = (s != s2);
-  constexpr bool x3 = (s < s2);
-  constexpr bool x4 = (s > s2);
-  constexpr bool x5 = (s <= s2);
-  constexpr bool x6 = (s >= s2);
-
-  REQUIRE(x1 == true);
-  REQUIRE(x2 == false);
-  REQUIRE(x3 == false);
-  REQUIRE(x4 == false);
-  REQUIRE(x5 == true);
-  REQUIRE(x6 == true);
-
-  constexpr bool y1 = (s == s3);
-  constexpr bool y2 = (s != s3);
-  constexpr bool y3 = (s < s3);
-  constexpr bool y4 = (s > s3);
-  constexpr bool y5 = (s <= s3);
-  constexpr bool y6 = (s >= s3);
-
-  REQUIRE(y1 == false);
-  REQUIRE(y2 == true);
-  REQUIRE(y3 == true);
-  REQUIRE(y4 == false);
-  REQUIRE(y5 == true);
-  REQUIRE(y6 == false);
-
-  constexpr bool z1 = (s == s4);
-  constexpr bool z2 = (s != s4);
-  constexpr bool z3 = (s < s4);
-  constexpr bool z4 = (s > s4);
-  constexpr bool z5 = (s <= s4);
-  constexpr bool z6 = (s >= s4);
-
-  REQUIRE(z1 == false);
-  REQUIRE(z2 == true);
-  REQUIRE(z3 == false);
-  REQUIRE(z4 == true);
-  REQUIRE(z5 == false);
-  REQUIRE(z6 == true);
 }
 
 
