@@ -6,6 +6,9 @@
  *  @file  IndexMap.h
  *  @brief A simple class to weight items differently within a container and return the correct index.
  *  @note Status: BETA
+ *
+ *  @todo Convert to a template that acts as a glorified vector, simplifying random selection?
+ *  @todo Should operator[] index by element count or by weight?
  */
 
 #ifndef EMP_INDEX_MAP_H
@@ -68,7 +71,7 @@ namespace emp {
 
   public:
     /// Construct an IndexMap where num_items is the maximum number of items that can be placed
-    /// into the data structure.
+    /// into the data structure.  All item weigths default to zero.
     IndexMap(size_t num_items=0)
       : item_weight(num_items), tree_weight(num_items), needs_refresh(false) {;}
     IndexMap(const IndexMap &) = default;
