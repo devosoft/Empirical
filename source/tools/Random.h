@@ -1,45 +1,16 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A versatile and non-patterned pseudo-random-number generator.
-//  Status: RELEASE
-//
-//
-//  Constructor:
-//    Random(int _seed=-1)
-//      _seed is the random number seed that will produce a unique pseudo-random sequence.
-//      (a value of -1 indicates that the seed should be bassed off of a combination of time
-//      and the memory position of the random number generator, in case multiple generators
-//      start at the same time.)
-//
-//  Other useful functions:
-//    double GetDouble()
-//    double GetDouble(double max)
-//    double GetDouble(double min, double max)
-//      Retrive a random double in the range [min, max).  By default, min=0.0 and max=1.0.
-//
-//    int GetInt(int max)
-//    int GetInt(int min, int max)
-//    uint32_t GetUInt(uint32_t max)
-//    uint32_t GetUInt(uint32_t min, uint32_t max)
-//      Retrive a random int or uint in the range [min, max).  By default, min=0.
-//
-//    bool P(double p)
-//      Tests a random value [0,1) against a given probability p, and returns true of false.
-//
-//    double GetRandNormal(const double mean, const double std)
-//    uint32_t GetRandPoisson(const double n, double p)
-//    uint32_t GetRandPoisson(const double mean)
-//    uint32_t GetRandBinomial(const double n, const double p)
-//      Draw a value from the given distributions
-//
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  Random.h
+ *  @brief A versatile and non-patterned pseudo-random-number generator.
+ *  @note Status: RELEASE
+ */
 
 #ifndef EMP_RANDOM_H
 #define EMP_RANDOM_H
 
-// #include <algorithm>
 #include <ctime>
 #include <climits>
 #include <cmath>
@@ -51,15 +22,14 @@
 
 namespace emp {
 
-  //  A versatile and non-patterned pseudo-random-number generator.
+  ///  A versatile and non-patterned pseudo-random-number generator (Mersenne Twister).
   class Random {
   protected:
-    // Internal members
-    int seed;
-    int original_seed;
-    int inext;
-    int inextp;
-    int ma[56];
+    int seed;           ///< Current random number seed.
+    int original_seed;  ///< Orignal random number seed when object was first created.
+    int inext;          ///< First position in use in internal state.
+    int inextp;         ///< Second position in use in internal state.
+    int ma[56];         ///< Internal state of RNG
 
     // Members & functions for stat functions
     double expRV; // Exponential Random Variable for the randNormal function
@@ -122,9 +92,9 @@ namespace emp {
   public:
     /**
      * Set up the random generator object.
-     * @param _seed The seed of the random number generator.
-     * A negative seed means that the random number generator gets its
-     * seed from the actual system time.
+     * @param _seed The seed of the random number generator.  A negative seed means that the
+     * random number generator gets its seed from a combination of the actual system time and
+     * the memory position of the random number generator.
      **/
     Random(const int _seed = -1) : seed(0), original_seed(0), inext(0), inextp(0), expRV(0) {
       for (int i = 0; i < 56; ++i) ma[i] = 0;
@@ -278,7 +248,8 @@ namespace emp {
 
     // Random Event Generation //////////////////////////////////////////////////
 
-    // P(p) => if p < [0,1) random variable
+    /// Tests a random value [0,1) against a given probability p, and returns true of false.
+    /// @param p The probability of the result being "true".
     inline bool P(const double p) {
       emp_assert(p >= 0.0 && p <= 1.0, p);
       return (Get() < (p * _RAND_MBIG));
@@ -382,9 +353,7 @@ namespace emp {
   };
 
 
-  /*! This is an adaptor to make Random behave like a proper STL random number
-    generator.
-  */
+  /// This is an adaptor to make Random behave like a proper STL random number generator.
   struct RandomStdAdaptor {
     typedef int argument_type;
     typedef int result_type;
@@ -396,8 +365,7 @@ namespace emp {
   };
 
 
-  /*! Draw a sample (with replacement) from an input range, copying to the output range.
-   */
+  /// Draw a sample (with replacement) from an input range, copying to the output range.
   template <typename ForwardIterator, typename OutputIterator, typename RNG>
   void sample_with_replacement(ForwardIterator first, ForwardIterator last, OutputIterator ofirst, OutputIterator olast, RNG rng) {
     std::size_t range = std::distance(first, last);
