@@ -2,23 +2,38 @@
 //  Copyright (C) Michigan State University, 2016-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 //
-//
-//  Some examples code for using emp::ce_string
+//  Tests for files in the tools/ folder.
 
-#include <iostream>
+#ifndef EMP_TRACK_MEM
+#define EMP_TRACK_MEM
+#endif
 
-#include "base/array.h"
-#include "tools/ce_string.h"
+#define EMP_DECORATE(X) [X]
+#define EMP_DECORATE_PAIR(X,Y) [X-Y]
+#define CATCH_CONFIG_MAIN
+#undef NDEBUG
+#define TDEBUG 1
+
+#include "third-party/Catch/single_include/catch.hpp"
+
+#include <sstream>
+#include <string>
+
+#include "constexpr/ce_string.h"
+
 #include "tools/BitSet.h"
 
-int main()
+TEST_CASE("Test ce_string", "[constexpr]")
 {
   constexpr emp::ce_string s = "abc";
   constexpr emp::ce_string s2 = "abc";
   constexpr emp::ce_string s3 = "abcdef";
   constexpr emp::ce_string s4 = "aba";
   emp::BitSet<s.size()> b1;
-  emp::BitSet<(int) s[0]> b2;
+  emp::BitSet<(size_t) s[0]> b2;
+
+  REQUIRE(b2.size() == 97);
+  REQUIRE(s.size() == 3);
 
   constexpr bool x1 = (s == s2);
   constexpr bool x2 = (s != s2);
@@ -27,7 +42,12 @@ int main()
   constexpr bool x5 = (s <= s2);
   constexpr bool x6 = (s >= s2);
 
-  std::cout << x1 << x2 << x3 << x4 << x5 << x6 << std::endl;
+  REQUIRE(x1 == true);
+  REQUIRE(x2 == false);
+  REQUIRE(x3 == false);
+  REQUIRE(x4 == false);
+  REQUIRE(x5 == true);
+  REQUIRE(x6 == true);
 
   constexpr bool y1 = (s == s3);
   constexpr bool y2 = (s != s3);
@@ -36,7 +56,12 @@ int main()
   constexpr bool y5 = (s <= s3);
   constexpr bool y6 = (s >= s3);
 
-  std::cout << y1 << y2 << y3 << y4 << y5 << y6 << std::endl;
+  REQUIRE(y1 == false);
+  REQUIRE(y2 == true);
+  REQUIRE(y3 == true);
+  REQUIRE(y4 == false);
+  REQUIRE(y5 == true);
+  REQUIRE(y6 == false);
 
   constexpr bool z1 = (s == s4);
   constexpr bool z2 = (s != s4);
@@ -45,16 +70,10 @@ int main()
   constexpr bool z5 = (s <= s4);
   constexpr bool z6 = (s >= s4);
 
-  std::cout << z1 << z2 << z3 << z4 << z5 << z6 << std::endl;
-
-  std::cout << "Test..."
-            << "b2 size=" << b2.size()
-            << std::endl;
-
-  std::cout << "Test2..."
-            << "new size=" << s.size()
-            << std::endl;
-
-  //  constexpr std::array<emp::ce_string, 3> test_array = {{ "abc", "def", "ghijkl" }};
-  //  std::cout << test_array[1].ToString() << std::endl;
+  REQUIRE(z1 == false);
+  REQUIRE(z2 == true);
+  REQUIRE(z3 == false);
+  REQUIRE(z4 == true);
+  REQUIRE(z5 == false);
+  REQUIRE(z6 == true);
 }

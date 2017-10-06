@@ -15,5 +15,7 @@ int main()
   doc << UI::Font(100, "green").SetUnderlined().SetOverlined().SetWavyLine().SetLineColor("red")
       << "Testing!<br>"
       << UI::Font(15, "black")
-      << "<br>Back to normal?";
+      << "<br>Back to normal?"
+      << UI::Font().SetSmallcaps()
+      << "<br>And now THIS should be SmallCaps....";
 }

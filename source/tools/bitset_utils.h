@@ -1,10 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  This file contains a set of simple functions to manipulate bitsets.
-//
-//  Status: BETA
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  bitset_utils.h
+ *  @brief A set of simple functions to manipulate bitsets.
+ *  @note Status: BETA
+ */
 
 #ifndef EMP_BITSET_UTILS_H
 #define EMP_BITSET_UTILS_H
@@ -13,13 +15,15 @@
 
 namespace emp {
 
+  /// Create a series of a specified number of ones (at compile time) in a uint.
   template <int NUM_BITS>
   constexpr uint32_t UIntMaskFirst() { return (UIntMaskFirst<NUM_BITS-1> << 1) | 1; }
 
+  /// Create an empty bit mask (all zeros)
   template <>
   constexpr uint32_t UIntMaskFirst<0>() { return 0; }
 
-  // Dealing with bits in uint64_t variables
+  /// How many bits are set to one in each possible byte?
   constexpr size_t ByteCount[256] = {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
@@ -31,6 +35,7 @@ namespace emp {
     3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
   };
 
+  /// Count the number of bits in a 64-bit unsigned integer.
   inline constexpr size_t count_bits(uint64_t val) {
     return
       ByteCount[  val >> 56         ] +
@@ -43,6 +48,7 @@ namespace emp {
       ByteCount[  val        & 0xFF ];
   }
 
+  /// Count the number of bits in a 32-bit unsigned integer.
   inline constexpr size_t count_bits(uint32_t val) {
     return
       ByteCount[  val >> 24         ] +
@@ -51,7 +57,10 @@ namespace emp {
       ByteCount[  val        & 0xFF ];
   }
 
+  /// Return the position of the first one bit (in a 64-bit unsigned int)
   inline constexpr size_t find_bit(const uint64_t & val) { return count_bits( (~val) & (val-1) ); }
+
+  /// Return the position of the first one bit (in a 32-bit unsigned int)
   inline constexpr size_t find_bit(const uint32_t & val) { return count_bits( (~val) & (val-1) ); }
 
   /*

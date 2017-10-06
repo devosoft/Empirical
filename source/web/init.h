@@ -1,15 +1,16 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file contains the emp::Initialize() function, which should usually be run when
-//  the Empirical library is in use to build an Emscripten project.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  init.h
+ *  @brief Define Initialize() and other functions to set up Empirical to build Emscripten projects.
+ */
 
 #ifndef EMP_INIT_H
 #define EMP_INIT_H
 
-// If EMSCRIPTEN is defined, initialize everything.  Otherwise create useful stubs.
+/// If EMSCRIPTEN is defined, initialize everything.  Otherwise create useful stubs.
 #ifdef EMSCRIPTEN
 
 #include <emscripten.h>
@@ -21,6 +22,7 @@ extern "C" {
 
 namespace emp {
 
+  /// Do all initializations for using EMP tricks with Emscripten.
   static void Initialize() {
     static bool init = false;      // Make sure we only initialize once!
     if (!init) {
@@ -29,6 +31,7 @@ namespace emp {
     }
   }
 
+  /// Setup timings on animations through Emscripten.
   static void InitializeAnim() {
     static bool init = false;      // Make sure we only initialize once!
     if (!init) {
@@ -52,19 +55,20 @@ namespace emp {
     // Some helper functions.
     // Live keyword means that whatever is passed in needs to be re-evaluated every update.
     namespace {
-      // If a variable is passed in to live, construct a function to look up its current value.
+      /// If a variable is passed in to Live(), construct a function to look up its current value.
       template <typename VAR_TYPE>
       std::function<std::string()> Live_impl(VAR_TYPE & var, bool) {
         return [&var](){ return emp::to_string(var); };
       }
 
-      // If anything else is passed in, assume it is a function!
+      /// If a non-variable is passed in to Live(), assume it is a function and print it each redraw.
       template <typename IN_TYPE>
       std::function<std::string()> Live_impl(IN_TYPE && fun, int) {
         return [fun](){ return emp::to_string(fun()); };
       }
     }
 
+    /// Take a function or variable and set it up so that it can update each time a text box is redrawn.
     template <typename T>
     std::function<std::string()> Live(T && val) {
       return Live_impl(std::forward<T>(val), true);
@@ -90,11 +94,13 @@ namespace emp {
 namespace emp {
   std::ofstream debug_file("debug_file");
 
+  /// Stub for when Emscripten is not in use.
   static bool Initialize() {
     // Nothing to do here yet...
     return true;
   }
 
+  /// Stub for when Emscripten is not in use.
   static bool InitializeAnim() {
     // Nothing to do here yet...
     return true;

@@ -1,17 +1,17 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  The File object maintains a simple, in-memory file.
-//  Status: BETA
-//
-//
-//  Developer notes:
-//   We need to modify this code to make sure File can also work with Emscripten, appropriately.
-//   Alternatively, we might want to have a more flexible file class that wraps this one.
-//
-//   File should have an iterator that can handle operators << and >> to read and write.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  File.h
+ *  @brief The File object maintains a simple, in-memory file.
+ *  @note Status: BETA
+ *
+ *  @todo We need to modify this code to make sure File can also work with Emscripten, appropriately.
+ *   Alternatively, we might want to have a more flexible file class that wraps this one.
+ *
+ *  @todo File should have an iterator that can handle operators << and >> to read and write.
+*/
 
 
 #ifndef EMP_FILE_H
@@ -27,6 +27,7 @@
 
 namespace emp {
 
+  /// A class to maintin files for loading, writing, storing, and easy access to components.
   class File {
   protected:
     emp::vector<std::string> lines;
@@ -42,16 +43,31 @@ namespace emp {
     File & operator=(const File &) = default;
     File & operator=(File &&) = default;
 
+    /// How many lines are in this file?
     size_t GetNumLines() { return lines.size(); }
 
+    /// Index into a specific line in this file.
     std::string & operator[](size_t pos) { return lines[pos]; }
+
+    /// Const index into a specific line in this file.
     const std::string & operator[](size_t pos) const { return lines[pos]; }
+
+    /// Return the first line in the file.
     std::string & front() { return lines.front(); }
+
+    /// Return a const reference to to the first line in the file.
     const std::string & front() const { return lines.front(); }
+
+    /// Return the last line in the file.
     std::string & back() { return lines.back(); }
+
+    /// Return a const reference to the last line in the file.
     const std::string & back() const { return lines.back(); }
 
+    /// Append a new line to the end of the file.
     File & Append(const std::string & line) { lines.emplace_back(line); return *this; }
+
+    /// Append a vector of lines to the end of the file.
     File & Append(const emp::vector<std::string> & in_lines) {
       size_t start_size = lines.size();
       lines.resize(start_size + in_lines.size());
@@ -62,18 +78,24 @@ namespace emp {
     }
     File & Append(const File & in_file) { return Append(in_file.lines); }
 
+    /// Append to the end of a file.
     template <typename T>
     File & operator+=(T && in) { Append( std::forward<T>(in) ); return *this; }
 
+    /// Test if two files are identical.
     bool operator==(const File in) { return lines == in.lines; }
+
+    /// Test if two files are different.
     bool operator!=(const File in) { return lines != in.lines; }
 
+    /// Load a line from an input stream into a file.
     File & LoadLine(std::istream & input) {
       lines.emplace_back("");
       std::getline(input, lines.back());
       return *this;
     }
 
+    /// Load an entire input stream into a file.
     File & Load(std::istream & input) {
       while (!input.eof()) {
 	      LoadLine(input);
@@ -81,6 +103,7 @@ namespace emp {
       return *this;
     }
 
+    /// Load a file from disk using the provided name.
     File & Load(const std::string & filename) {
       std::ifstream file(filename);
       Load(file);
@@ -88,6 +111,7 @@ namespace emp {
       return *this;
     }
 
+    /// Write this file to a provided output stream.
     File & Write(std::ostream & output) {
       for (std::string & cur_line : lines) {
 	      output << cur_line << '\n';
@@ -95,6 +119,7 @@ namespace emp {
       return *this;
     }
 
+    /// Write this file to a file of the provided name.
     File & Write(const std::string & filename) {
       std::ofstream file(filename);
       Write(file);

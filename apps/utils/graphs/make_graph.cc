@@ -8,12 +8,12 @@
 
 #include <iostream>
 
-#include "../../base/assert.h"
-#include "../../base/vector.h"
-#include "../../config/command_line.h"
-#include "../../tools/Graph.h"
-#include "../../tools/graph_utils.h"
-#include "../../tools/string_utils.h"
+#include "../../../source/base/assert.h"
+#include "../../../source/base/vector.h"
+#include "../../../source/config/command_line.h"
+#include "../../../source/tools/Graph.h"
+#include "../../../source/tools/graph_utils.h"
+#include "../../../source/tools/string_utils.h"
 
 int GetValue(const std::string & query,
 	     emp::vector<std::string> & args,
@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
   else if (graph_type == 7) {
     std::cout << "Generating a Random Graph (with hamiltonian cycle and solution)." << std::endl;
     int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
-    int edges = GetValue("How many edges?", args, cur_arg, node*(node-1)/2);
+    int edges = GetValue("How many edges?", args, cur_arg, nodes*(nodes-1)/2);
 
     // Generate the Hamiltonian Cycle
     emp::vector<size_t> v_map = emp::BuildRange<size_t>(0, nodes);

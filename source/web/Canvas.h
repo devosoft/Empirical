@@ -23,11 +23,7 @@
 namespace emp {
 namespace web {
 
-  ///  To build a Canvas object, a width and height (in pixels, by default) need to be
-  ///  supplied, along with an optional HTML id.
-  ///
-  ///  As of now, only circles, rectangles lines, and text are supported, but more soon.
-
+  /// Manage an HTML Canvas object.
   class Canvas : public internal::WidgetFacet<Canvas> {
     friend class CanvasInfo;
   protected:

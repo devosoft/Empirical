@@ -1,25 +1,27 @@
-//  This file is part of Empirical, https://github.com/mercere99/Empirical/
-//  Copyright (C) Michigan State University, 2015-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This class creates macros to track how many instances of specific classes are made.
-//  Status: BETA
-//
-//
-//  To setup, every constructor for a class must incude EMP_TRACK_CONSTRUCT(CLASS_NAME),
-//  and every destructor must have EMP_TRACK_DESTRUCT(CLASS_NAME).  Make sure to avoid
-//  implicit constructors/destructors or counts will be off.
-//
-//  To collect information, EMP_TRACK_COUNT(CLASS_NAME) will provide the current count
-//  for a specific class, and EMP_TRACK_STATUS will translate into a string providing
-//  information about all available classes.
-//
-//  Developer notes:
-//   Currently having issues with the memory map getting corrupted.  Perhaps it needs to
-//   wait until onload is finished?  Also, can try using JS maps instead?  (only when
-//   using Emscripten.
-
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  mem_track.h
+ *  @brief A set of macros to track how many instances of specific classes are made.
+ *  @note Status: BETA
+ *
+ *  One way of tracking memory leaks is to simply count instances of classes.  The macros here
+ *  simplify this process.
+ *
+ *  To setup, every constructor for a class must incude EMP_TRACK_CONSTRUCT(CLASS_NAME),
+ *  and every destructor must have EMP_TRACK_DESTRUCT(CLASS_NAME).  Make sure to avoid
+ *  implicit constructors/destructors or counts will be off.
+ *
+ *  To collect information, EMP_TRACK_COUNT(CLASS_NAME) will provide the current count
+ *  for a specific class, and EMP_TRACK_STATUS will translate into a string providing
+ *  information about all available classes.
+ *
+ *  Developer notes:
+ *  @todo Currently having issues with the memory map corruption.  Perhaps it needs to use onload?
+ *   Also, can try using JS maps instead?  (only when using Emscripten.)
+ */
 
 #ifndef EMP_MEM_TRACK
 #define EMP_MEM_TRACK

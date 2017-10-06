@@ -1,9 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  Commonly used values...
-//  Status: RELEASE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  const.h
+ *  @brief Commonly used constant values.
+ *  @note Status: RELEASE
+ */
 
 #ifndef EMP_CONST_H
 #define EMP_CONST_H
@@ -12,21 +15,21 @@
 
 namespace emp {
 
-  constexpr const double E      = 2.71828;                // e
-  constexpr const double PHI    = 1.61803398874;          // Golden ratio
-  constexpr const double PI     = 3.14159265358979;       // pi
-  constexpr const double SQRT2  = 1.41421356237310;       // sqrt(2)
+  constexpr const double E      = 2.71828;                ///< e
+  constexpr const double PHI    = 1.61803398874;          ///< Golden ratio
+  constexpr const double PI     = 3.14159265358979;       ///< pi
+  constexpr const double SQRT2  = 1.41421356237310;       ///< sqrt(2)
 
-  constexpr const uint32_t MAX_BYTE  = 255;           // (2^8 - 1)
-  constexpr const uint32_t MAX_2BYTE = 65535;         // (2^16 - 1)
-  constexpr const uint32_t MAX_WORD  = 65535;         // (2^16 - 1)
-  constexpr const uint32_t MAX_3BYTE = 16777215;      // (2^24 - 1)
-  constexpr const uint32_t MAX_UINT  = 4294967295;    // (2^32 - 1)
-  constexpr const uint32_t MAX_4BYTE = 4294967295;    // (2^32 - 1)
+  constexpr const uint32_t MAX_BYTE  = 255;           ///< (2^8 - 1)
+  constexpr const uint32_t MAX_2BYTE = 65535;         ///< (2^16 - 1)
+  constexpr const uint32_t MAX_WORD  = 65535;         ///< (2^16 - 1)
+  constexpr const uint32_t MAX_3BYTE = 16777215;      ///< (2^24 - 1)
+  constexpr const uint32_t MAX_UINT  = 4294967295;    ///< (2^32 - 1)
+  constexpr const uint32_t MAX_4BYTE = 4294967295;    ///< (2^32 - 1)
 
-  constexpr const int32_t MIN_INT = -2147483648;      // (- 2^31)
+  constexpr const int32_t MIN_INT = -2147483648;      ///< (- 2^31)
 
-  // Determine the maximum value for any type.
+  /// Determine the maximum value for any type.
   // @CAO: Prevent inf to get more realistic numbers for double/float?
   template <typename T>
   constexpr T MaxValue() {
@@ -39,8 +42,7 @@ namespace emp {
     return val;
   }
 
-  // Some constant tables...
-
+  /// Large table to log base-2 results.
   constexpr const double log2_chart_1_2[] =
   {
     0, 0.00140819, 0.00281502, 0.00422047, 0.00562455, 0.00702727, 0.00842862, 0.00982862,
@@ -178,6 +180,7 @@ namespace emp {
   // { 1.414214, 1.189207, 1.090508, 1.044274, 1.021897, 1.010889, 1.005430, 1.002711,
   //   1.001355, 1.000677, 1.000339, 1.000169, 1.000085, 1.000042, 1.000021, 1.000011 };
 
+  /// Table to provide results of Pow2 for values of bits (0.1, 0.01, 0.001, etc, in binary)
   constexpr const double pow2_chart_bits[] =
   {
     1.4142135623730951, 1.1892071150027210, 1.0905077326652577, 1.0442737824274138,
@@ -190,6 +193,7 @@ namespace emp {
     1.0000000012910872, 1.0000000006455436, 1.0000000003227718, 1.0000000001613858
   };
 
+  /// Table to provide results of Pow2 from 0 to 1
   constexpr const double pow2_chart_0_1[] =
   {
     1.0, 1.00068, 1.00135, 1.00203, 1.00271, 1.00339, 1.00407, 1.00475,
@@ -329,7 +333,7 @@ namespace emp {
     return table[(int)(pos*tsize)] * (1.0-pos+((double)((int)(pos*tsize)))/tsize)
       + table[(int)(pos*tsize)+1] * (pos-((double)((int)(pos*tsize)))/tsize);
   }
-  
+
 }
 
 #endif

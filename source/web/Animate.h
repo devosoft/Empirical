@@ -30,8 +30,8 @@
 namespace emp {
 namespace web {
 
-  ///  An Animation object that, when started, calls a function as fast as possible, to a maximum
-  ///  of 60 frames per second.
+  ///  @brief An object that, when active, repeatedly calls a function as fast as possible,
+  ///  to a maximum of 60 frames per second.
   ///
   ///  Parameters to the animation function can be:
   ///    * double (representing time since the last frame)

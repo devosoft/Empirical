@@ -9,11 +9,11 @@
 #include <iostream>
 #include <string>
 
-#include "../../base/assert.h"
-#include "../../base/vector.h"
-#include "../../config/command_line.h"
-#include "../../tools/functions.h"
-#include "../../tools/sequence_utils.h"
+#include "../../../source/base/assert.h"
+#include "../../../source/base/vector.h"
+#include "../../../source/config/command_line.h"
+#include "../../../source/tools/functions.h"
+#include "../../../source/tools/sequence_utils.h"
 
 int main(int argc, char* argv[])
 {
