@@ -1,35 +1,36 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Basic regular expression handler.
-//  Status: BETA
-//
-//
-//  Special chars:
-//   '|'          - or
-//   '*'          - zero or more of previous
-//   '+'          - one or more of previous
-//   '?'          - previous is optional
-//   '.'          - Match any character except \n
-//
-//  Pluse the following group contents (and change may translation rules)
-//   '(' and ')'  - group contents
-//   '"'          - Ignore special characters in contents (quotes still need to be escaped)
-//   '[' and ']'  - character set -- choose ONE character
-//                  ^ as first char negates contents ; - indicates range UNLESS first or last.
-//
-//
-//  Additional overloads for functions in lexer_utils.h:
-//
-//    static NFA to_NFA(const RegEx & regex, int stop_id=1);
-//    static DFA to_DFA(const RegEx & regex);
-//
-//
-//  Developer Notes:
-//   * Need to implement  ^ and $ (beginning and end of line)
-//   * Need to implement {n}, {n,} and {n,m} (exactly n, at least n, and n-m copies, respecitvely)
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  RegEx.h
+ *  @brief Basic regular expression handler.
+ *  @note Status: BETA
+ *
+ *  A fully (well, mostly) functional regular expression processor.
+ *
+ *  Special chars:
+ *   '|'          - or
+ *   '*'          - zero or more of previous
+ *   '+'          - one or more of previous
+ *   '?'          - previous is optional
+ *   '.'          - Match any character except \n
+ *
+ *  Pluse the following group contents (and change may translation rules)
+ *   '(' and ')'  - group contents
+ *   '"'          - Ignore special characters in contents (quotes still need to be escaped)
+ *   '[' and ']'  - character set -- choose ONE character
+ *                  ^ as first char negates contents ; - indicates range UNLESS first or last.
+ *
+ *  Additional overloads for functions in lexer_utils.h:
+ *
+ *    static NFA to_NFA(const RegEx & regex, int stop_id=1);
+ *    static DFA to_DFA(const RegEx & regex);
+ *
+ *
+ *  @todo Need to implement  ^ and $ (beginning and end of line)
+ *  @todo Need to implement {n}, {n,} and {n,m} (exactly n, at least n, and n-m copies, respecitvely)
+*/
 
 #ifndef EMP_REGEX_H
 #define EMP_REGEX_H
@@ -50,17 +51,18 @@
 
 namespace emp {
 
+  /// A basic regular expression handler.
   class RegEx {
   private:
-    constexpr static size_t NUM_SYMBOLS = 128;
+    constexpr static size_t NUM_SYMBOLS = 128; ///< Maximum number of symbol the RegEx can handle.
     using opts_t = BitSet<NUM_SYMBOLS>;
-    std::string regex;                     // Original string to define this RegEx.
-    emp::vector<std::string> notes;        // Any warnings or errors would be provided here.
-    bool valid;                            // Set to false if regex cannot be processed.
-    size_t pos;                               // Position being read in regex.
+    std::string regex;                         ///< Original string to define this RegEx.
+    emp::vector<std::string> notes;            ///< Any warnings or errors would be provided here.
+    bool valid;                                ///< Set to false if regex cannot be processed.
+    size_t pos;                                ///< Position being read in regex.
 
-    mutable DFA dfa;                       // DFA that this RegEx translates to.
-    mutable bool dfa_ready;                // Is the dfa ready? (or does it need to be generated?)
+    mutable DFA dfa;                           ///< DFA that this RegEx translates to.
+    mutable bool dfa_ready;                    ///< Is the dfa ready? (or does it need to be generated?)
 
     template <typename... T>
     void Error(T &&... args) {
@@ -74,7 +76,7 @@ namespace emp {
     struct re_parent;
     struct re_string;
 
-    // Internal representation of regex
+    /// Internal base representation of a portion of a regex
     struct re_base {                     // Also used for empty regex
       virtual ~re_base() { ; }
       virtual void Print(std::ostream & os) const { os << "[]"; }
@@ -87,6 +89,7 @@ namespace emp {
       virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const { nfa.AddFreeTransition(start, stop); }
     };
 
+    /// Representation of strings stored in a RegEx.
     struct re_string : public re_base {  // Series of specific chars
       std::string str;
       re_string() : str() { ; }
@@ -106,6 +109,7 @@ namespace emp {
       }
     };
 
+    /// Representation of a character set e.g., [abc]
     struct re_charset : public re_base { // Any char from set.
       opts_t char_set;
       re_charset() : char_set() { ; }
@@ -134,6 +138,7 @@ namespace emp {
       }
     };
 
+    /// Intermediate base class for RegEx components that have children (such as "and" and "or")
     struct re_parent : public re_base {
     protected:
       emp::vector<Ptr<re_base>> nodes;
@@ -163,6 +168,7 @@ namespace emp {
       }
     };
 
+    /// Representation of a series of components...
     struct re_block : public re_parent {   // Series of re's
       void Print(std::ostream & os) const override {
         os << "BLOCK["; for (auto x : nodes) x->Print(os); os << "]";
@@ -219,6 +225,7 @@ namespace emp {
       }
     };
 
+    /// Representation of two options in a regex, e.g., a|b
     struct re_or : public re_parent {      // lhs -or- rhs
       re_or(Ptr<re_base> l, Ptr<re_base> r) { push(l); push(r); }
       void Print(std::ostream & os) const override {
@@ -233,6 +240,7 @@ namespace emp {
       }
     };
 
+    /// Representations of zero-or-more instances of a component.  e.g., a*
     struct re_star : public re_parent {    // zero-or-more
       re_star(Ptr<re_base> c) { push(c); }
       void Print(std::ostream & os) const override { os << "*["; nodes[0]->Print(os); os << "]"; }
@@ -245,6 +253,7 @@ namespace emp {
       }
     };
 
+    /// Representations of one-or-more instances of a component.  e.g., a+
     struct re_plus : public re_parent {    // one-or-more
       re_plus(Ptr<re_base> c) { push(c); }
       void Print(std::ostream & os) const override { os << "+["; nodes[0]->Print(os); os << "]"; }
@@ -257,6 +266,7 @@ namespace emp {
       }
     };
 
+    /// Representations of zero-or-one instances of a component.  e.g., a?
     struct re_qm : public re_parent {      // zero-or-one
       re_qm(Ptr<re_base> c) { push(c); }
       void Print(std::ostream & os) const override { os << "?["; nodes[0]->Print(os); os << "]"; }
@@ -268,6 +278,8 @@ namespace emp {
 
     re_block head;
 
+    /// Make sure that there is another element in the RegEx (e.g., after an '|') or else
+    /// trigger and error to report the problem.
     bool EnsureNext(char x) {
       if (pos >= regex.size()) Error("Expected ", x, " before end.");
       else if (regex[pos] != x) Error("Expected ", x, " at position ", pos,
@@ -276,6 +288,7 @@ namespace emp {
       return valid;
     }
 
+    /// Construct a character range.
     Ptr<re_charset> ConstructSet() {
       char c = regex[pos++];
       bool neg = false;
@@ -319,6 +332,7 @@ namespace emp {
       return out;
     }
 
+    /// Construct a string, loading everything needed.
     Ptr<re_string> ConstructString() {
       char c = regex[pos++];
       auto out = NewPtr<re_string>();
@@ -346,7 +360,7 @@ namespace emp {
       return out;
     }
 
-    // Should only be called when we know we have a single unit to produce.  Build and return it.
+    /// Should only be called when we know we have a single unit to produce.  Build and return it.
     Ptr<re_base> ConstructSegment() {
       Ptr<re_base> result;
       char c = regex[pos++];  // Grab the current character and move pos to next.
@@ -410,7 +424,7 @@ namespace emp {
       return result;
     }
 
-    // Process the input regex into a tree representaion.
+    /// Process the input regex into a tree representaion.
     Ptr<re_block> Process(Ptr<re_block> cur_block=nullptr) {
       emp_assert(pos >= 0 && pos < regex.size(), pos, regex.size());
 
@@ -453,6 +467,7 @@ namespace emp {
     }
     ~RegEx() { ; }
 
+    /// Set this RegEx equal to another.
     RegEx & operator=(const RegEx & r) {
       regex = r.regex;
       notes.resize(0);
@@ -464,24 +479,32 @@ namespace emp {
       return *this;
     }
 
+    /// Convert the RegEx to an standard string, readable from outsite this class.
     std::string AsString() const { return to_literal(regex); }
 
+    /// Add this regex to an NFA being built.
     void AddToNFA(NFA & nfa, size_t start, size_t stop) const { head.AddToNFA(nfa, start, stop); }
 
+    /// Assume the RegEx is ready and setup processing for it.
     void Generate() const;
 
+    /// Test if a string statisfies this regex.
     bool Test(const std::string & str) const {
       if (!dfa_ready) Generate();
       return dfa.Test(str);
     }
 
-    // For debugging: print the internal representation of the regex.
+    /// For debugging: print the internal representation of the regex.
     void PrintInternal() { head.Print(std::cout); std::cout << std::endl; }
+
+    /// For debugging: print any internal notes generated about this regex.
     void PrintNotes() {
       for (const std::string & n : notes) {
         std::cout << n << std::endl;
       }
     }
+
+    /// Print general debuging information about this regex.
     void PrintDebug() {
       if (notes.size()) {
         std::cout << "NOTES:" << std::endl;
@@ -494,7 +517,7 @@ namespace emp {
   };
 
 
-  // Simple conversion of RegEx to NFA (mostly implemented in RegEx)
+  /// Simple conversion of RegEx to NFA (mostly implemented in RegEx)
   static NFA to_NFA(const RegEx & regex, size_t stop_id=1) {
     NFA nfa(2);  // State 0 = start, state 1 = stop.
     nfa.SetStop(1, stop_id);
@@ -502,7 +525,7 @@ namespace emp {
     return nfa;
   }
 
-  // Conversion of RegEx to DFA, via NFA intermediate.
+  /// Conversion of RegEx to DFA, via NFA intermediate.
   static DFA to_DFA(const RegEx & regex) {
     return to_DFA( to_NFA(regex) );
   }
