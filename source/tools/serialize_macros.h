@@ -1,10 +1,13 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file contains macros for simplifying to serialization of objects.
-//  Status: ALPHA
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file serialize_macros.h
+ *  @brief Macros for simplifying to serialization of objects.
+ *  @note Status: ALPHA
+ */
+
 
 #ifndef EMP_SERIALIZE_MACROS_H
 #define EMP_SERIALIZE_MACROS_H
@@ -13,7 +16,7 @@
 
 #define EMP_SERIALIZE_INIT_VAR(VAR) VAR(emp::serialize::SetupLoad(pod, &VAR, true))
 
-// Use this macro to automatically build methods in a class to save and load data.
+/// Use this macro to automatically build methods in a class to save and load data.
 #define EMP_SETUP_DATAPOD_BASEINFO(CLASS_NAME, BASE_LOAD, BASE_STORE, ...) \
   using emp_load_return_type = emp::serialize::DataPod;                 \
   void EMP_Store(emp::serialize::DataPod & pod) const {                 \
@@ -26,18 +29,18 @@
 
 
 
-// Version to use in stand-alone classes.
+/// Version to use in stand-alone classes.
 #define EMP_SETUP_DATAPOD(CLASS_NAME, ...) \
   EMP_SETUP_DATAPOD_BASEINFO(CLASS_NAME, , , __VA_ARGS__)
 
-// Version to use in derived classes (with a base that also needs to be serialized).
+/// Version to use in derived classes (with a base that also needs to be serialized).
 #define EMP_SETUP_DATAPOD_D(CLASS_NAME, BASE_CLASS, ...)    \
   EMP_SETUP_DATAPOD_BASEINFO(CLASS_NAME,                    \
                              EMP_CALL_BASE_1(BASE_CLASS),   \
                              BASE_CLASS::EMP_Store(pod),    \
                              __VA_ARGS__)
 
-// Version to use in derived classes (with TWO bases that need to be serialized).
+/// Version to use in derived classes (with TWO bases that need to be serialized).
 
 #define EMP_SETUP_DATAPOD_D2(CLASS_NAME, BASE_CLASS1, BASE_CLASS2, ...) \
   EMP_SETUP_DATAPOD_BASEINFO(CLASS_NAME,                                \
