@@ -1,64 +1,66 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Tools to save and load data from classes.
-//  Status: ALPHA
-//
-//
-//  All of the important information about a class is stored in a DataPod, which can be
-//  used to restore the class at a later time.
-//
-//  Why is this better than other serialization techniques?
-//  * Only one line of code is added to a custom class to make it serializable.
-//  * Serialized objects do not need a default constructor (a DataPod constructor is added)
-//  * Serialized objects can be const since they get rebuilt during construction.
-//  * Synergistic interactions with other EMP classes, such as config and tuple_struct
-//
-//  In order to setup a target class to be able to be serialized into a pod, you must
-//  add a macro to include the needed functionality.  For a basic class, use:
-//
-//   EMP_SETUP_DATAPOD(ClassName, var1, var2, ...)
-//
-//  Where ClassName is the target class' name and var1, var2, etc are the names of the
-//  member variables that also need to be stored.  Note that member variables can either
-//  be either built-in types or custom types that have also had DataPods setup in them.
-//
-//  If the target class is a derived class, you must use either:
-//
-//   EMP_SETUP_DATAPOD_D(ClassName, BassClassName, var1, var2, ...)
-//
-//     -or-
-//
-//   EMP_SETUP_DATAPOD_D2(ClassName, BassClass1Name, BaseClass2Name, var1, var2, ...)
-//
-//  ...depending on how many base classes it was derived from (currently max 2).
-//
-//  Note also that this macro must either go in the public section of the target class
-//  definition, or the target class must be made a friend to the emp::serialize::DataPod
-//  class.
-//
-//
-//  Development Notes:
-//  * Build custom load/store function for more STL objects (especially containers)
-//  * To deal with pointers we should recurse, but keep map to new pointer locations.
-//  * Setup a more robust method for dealing with arbitrary strings so we don't have
-//    to worry about collisions in streams (JSon format??)
-//  * Setup a (compressed) binary save formmat in DataPods in addition to JSon.
-//  * Setup promised synergistic interactions with config and tuple_struct to auto
-//    store and load without any additional effort on the part of the library user.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file serialize.h
+ *  @brief Tools to save and load data from classes.
+ *  @note Status: ALPHA
+ *
+ *  All of the important information about a class is stored in a DataPod, which can be
+ *  used to restore the class at a later time.
+ *
+ *  Why is this better than other serialization techniques?
+ *  1. Only one line of code is added to a custom class to make it serializable.
+ *  2. Serialized objects do not need a default constructor (a DataPod constructor is added)
+ *  3. Serialized objects can be const since they get rebuilt during construction.
+ *  4. Synergistic interactions with other EMP classes, such as config and tuple_struct
+ *
+ *  In order to setup a target class to be able to be serialized into a pod, you must
+ *  add a macro to include the needed functionality.  For a basic class, use:
+ *
+ *   EMP_SETUP_DATAPOD(ClassName, var1, var2, ...)
+ *
+ *  Where ClassName is the target class' name and var1, var2, etc are the names of the
+ *  member variables that also need to be stored.  Note that member variables can either
+ *  be either built-in types or custom types that have also had DataPods setup in them.
+ *
+ *  If the target class is a derived class, you must use either:
+ *
+ *   EMP_SETUP_DATAPOD_D(ClassName, BassClassName, var1, var2, ...)
+ *
+ *     -or-
+ *
+ *   EMP_SETUP_DATAPOD_D2(ClassName, BassClass1Name, BaseClass2Name, var1, var2, ...)
+ *
+ *  ...depending on how many base classes it was derived from (currently max 2).
+ *
+ *  Note also that this macro must either go in the public section of the target class
+ *  definition, or the target class must be made a friend to the emp::serialize::DataPod
+ *  class.
+ *
+ *
+ *  @todo Build custom load/store function for more STL objects (especially containers)
+ *  @todo To deal with pointers we should recurse, but keep map to new pointer locations.
+ *  @todo Setup a more robust method for dealing with arbitrary strings so we don't have
+ *        to worry about collisions in streams (JSon format??)
+ *  @todo Setup a (compressed) binary save formmat in DataPods in addition to JSon.
+ *  @todo Setup promised synergistic interactions with config and tuple_struct to auto
+ *        store and load without any additional effort on the part of the library user.
+ */
 
 #ifndef EMP_SERIALIZE_H
 #define EMP_SERIALIZE_H
 
 #include <iostream>
 
+#include "../base/vector.h"
 #include "serialize_macros.h"
 
 namespace emp {
 namespace serialize {
 
+  /// A DataPod managed information about another class for serialization.
   class DataPod {
   protected:
     std::ostream * os;
@@ -97,10 +99,10 @@ namespace serialize {
   };
 
 
-  // The StoreVar function takes a DataPod and a variable and stores that vatiable to
-  // the pod.  The third argument (bool vs. int) will receive a bool, and thus bool versions
-  // are preferred in the case of a tie.  Specialized versions of this function can be
-  //included elsewhere, as needed, and should take a bool as the third argument.
+  /// StoreVar() takes a DataPod and a variable and stores that variable to the pod.
+  /// The third argument (bool vs. int) will receive a bool, and thus bool versions
+  /// are preferred in the case of a tie.  Specialized versions of this function can be
+  /// included elsewhere, as needed, and should take a bool as the third argument.
 
   // Custom classes should run their built-in EMP_Store member function.
   template <typename T>
