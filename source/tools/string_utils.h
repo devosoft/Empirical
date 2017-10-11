@@ -1,10 +1,13 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file contains a set of simple functions to manipulate strings.
-//  Status: RELEASE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file SolveState.h
+ *  @brief Simple functions to manipulate strings.
+ *  @note Status: RELEASE
+ */
+
 
 #ifndef EMP_STRING_UTILS_H
 #define EMP_STRING_UTILS_H
@@ -20,15 +23,20 @@
 
 namespace emp {
 
+  /// Return a const reference to an empty string.  This function is useful to implement other
+  /// functions that need to return a const reference for efficiency, but also need a null response.
+
   static inline const std::string & empty_string() {
     static std::string empty = "";
     return empty;
   }
 
+
+  /// Convert a chararcter to one that uses a proper escape sequence (in a string) if needed.
   static inline std::string to_escaped_string(char value) {
     // Start by quickly returning a string if it's easy.
     std::stringstream ss;
-    if ( (value >= 40 && value < 91) || value > 96) {
+    if ( (value >= 40 && value < 91) || value > 96 && value < 127) {
       ss << value;
       return ss.str();
     }
