@@ -31,7 +31,11 @@ TEST_CASE("Test Matrices", "[math]") {
   REQUIRE(rowVec(0, 0) == 1);
   REQUIRE(rowVec(0, 1) == 2);
   REQUIRE(rowVec * colVec == 1 + 2 * 2 + 3 * 3);
-  REQUIRE(colVec * ident[0] == 1);
-  REQUIRE(colVec * ident[1] == 2);
-  REQUIRE(colVec * ident[2] == 3);
+  REQUIRE(ident.row(0) * ident.col(0) == 1);
+  REQUIRE(ident.row(1) * ident.col(1) == 1);
+  REQUIRE(ident.row(2) * ident.col(2) == 1);
+
+  REQUIRE(colVec * ident.row(0) == 1);
+  REQUIRE(colVec * ident.row(1) == 2);
+  REQUIRE(colVec * ident.row(2) == 3);
 }

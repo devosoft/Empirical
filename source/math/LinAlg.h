@@ -14,7 +14,7 @@ namespace emp {
 
     namespace internal {
       template <typename A, typename B, std::size_t I>
-      constexpr decltype(auto) dotProductImpl(A a, B b,
+      constexpr decltype(auto) dotProductImpl(const A& a, const B& b,
                                               const std::index_sequence<I>&) {
         return a[I] * b[I];
       }
@@ -22,13 +22,13 @@ namespace emp {
       template <typename A, typename B, std::size_t H, std::size_t H2,
                 std::size_t... T>
       constexpr decltype(auto) dotProductImpl(
-        A a, B b, const std::index_sequence<H, H2, T...>&) {
+        const A& a, const B& b, const std::index_sequence<H, H2, T...>&) {
         return (a[H] * b[H]) +
                dotProductImpl(a, b, std::index_sequence<H2, T...>{});
       }
 
       template <std::size_t N, typename A, typename B>
-      constexpr decltype(auto) dotProduct(A a, B b) {
+      constexpr decltype(auto) dotProduct(const A& a, const B& b) {
         return dotProductImpl(a, b, std::make_index_sequence<N>{});
       }
     }  // namespace internal
@@ -84,6 +84,57 @@ namespace emp {
       constexpr const F* data() const noexcept { return ref; }
     };
 
+    template <typename F, std::size_t D>
+    class Col {
+      public:
+      using value_type = F;
+      static constexpr auto rows = D;
+      static constexpr auto columns = 1;
+
+      protected:
+      F* ref;
+
+      public:
+      constexpr Col(F* ref) : ref(ref) {}
+      constexpr Col(const Col&) = default;
+      constexpr Col(Col&&) = default;
+      Col& operator=(const Col&) = default;
+      Col& operator=(Col&&) = default;
+
+      template <typename G>
+      constexpr bool operator==(const Col<G, D>& other) const {
+        for (std::size_t i = 0; i < rows * columns; ++i) {
+          if (ref[i] != other.ref[i]) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      template <typename G>
+      constexpr bool operator==(const Mat<G, D, 1>& other) const {
+        for (std::size_t i = 0; i < rows * columns; ++i) {
+          if (ref[i] != other.data[i]) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      constexpr decltype(auto) operator[](std::size_t i) const {
+        return ref[i * rows];
+      }
+      constexpr decltype(auto) operator()(std::size_t i) const {
+        return (*this)[i];
+      }
+
+      F& operator[](std::size_t i) { return ref[i * rows]; }
+      decltype(auto) operator()(std::size_t i) { return (*this)[i]; }
+
+      constexpr F* data() noexcept { return ref; }
+      constexpr const F* data() const noexcept { return ref; }
+    };
+
     template <typename F, std::size_t R, std::size_t C>
     class Mat {
       public:
@@ -125,14 +176,24 @@ namespace emp {
         return arrayData[r * columns + c];
       }
 
-      constexpr Row<const F, C> operator()(std::size_t r) const {
+      constexpr Row<const F, C> row(std::size_t r) const {
         emp_assert(r < rows, "rows out of bounds");
         return Row<const F, C>(&arrayData[r * columns]);
       }
 
-      constexpr Row<const F, C> operator[](std::size_t r) const {
+      constexpr Row<F, C> row(std::size_t r) {
         emp_assert(r < rows, "rows out of bounds");
-        return Row<const F, C>(&arrayData[r * columns]);
+        return Row<F, C>(&arrayData[r * columns]);
+      }
+
+      constexpr Col<const F, R> col(std::size_t c) const {
+        emp_assert(c < columns, "columns out of bounds");
+        return Col<const F, R>(&arrayData[c]);
+      }
+
+      constexpr Col<F, R> col(std::size_t c) {
+        emp_assert(c < columns, "columns out of bounds");
+        return Col<F, R>(&arrayData[c]);
       }
 
       constexpr F* data() noexcept { return arrayData.data(); }
@@ -166,16 +227,17 @@ namespace emp {
     }
 
     // Define the dot product with rows
-    // template <typename F1, typename F2, std::size_t D>
-    // constexpr auto operator*(const Row<F1, D>& v1, const Row<F2, D>& v2) {
-    //   decltype(F{} + (F{} * F{})) result{0};
-    //
-    //   for (std::size_t i = 0; i < D; ++i) {
-    //     result += v1(i) * v2(i, 0);
-    //   }
-    //
-    //   return result;
-    // }
+    template <typename F1, typename F2, std::size_t D>
+    constexpr decltype(auto) operator*(const Row<F1, D>& v1,
+                                       const Row<F2, D>& v2) {
+      return internal::dotProduct<D>(v1, v2);
+    }
+
+    template <typename F1, typename F2, std::size_t D>
+    constexpr decltype(auto) operator*(const Row<F1, D>& v1,
+                                       const Col<F2, D>& v2) {
+      return internal::dotProduct<D>(v1, v2);
+    }
 
     template <typename F>
     using Mat2x2 = Mat<F, 2, 2>;
