@@ -1,9 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  This file contains a set of simple functions to work with std::tuple
-//  Status: ALPHA
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file SolveState.h
+ *  @brief Simple functions to manipulate strings.
+ *  @note Status: RELEASE
+ */
 
 #ifndef EMP_TUPLE_UTILS_H
 #define EMP_TUPLE_UTILS_H
