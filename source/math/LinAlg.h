@@ -12,6 +12,34 @@ namespace emp {
     template <typename F, std::size_t R, std::size_t C>
     class Mat;
 
+    template <std::size_t R, std::size_t C>
+    class MatUtils {
+      private:
+      template <std::size_t... S, typename G>
+      constexpr static auto genMatImpl(const std::index_sequence<S...>&,
+                                       G&& generator)
+        -> Mat<decltype(generator(std::declval<std::size_t>(),
+                                  std::declval<std::size_t>())),
+               R, C> {
+        return {generator(S / C, S % C)...};
+      }
+
+      template <typename T>
+      static constexpr T identGenerator(std::size_t r, std::size_t c) {
+        return r == c ? T{1} : T{0};
+      }
+
+      public:
+      template <typename G>
+      constexpr static decltype(auto) generate(G&& generator) {
+        return genMatImpl(std::make_index_sequence<R * C>{},
+                          std::forward<G>(generator));
+      }
+
+      template <typename T>
+      constexpr static auto identity{generate(&identGenerator<T>)};
+    };
+
     namespace internal {
       template <typename A, typename B, std::size_t I>
       constexpr decltype(auto) dotProductImpl(const A& a, const B& b,
@@ -199,35 +227,12 @@ namespace emp {
 
       constexpr F* data() noexcept { return arrayData.data(); }
       constexpr const F* data() const noexcept { return arrayData.data(); }
+
+      constexpr auto transpose() const {
+        return MatUtils<C, R>::generate(
+          [this](std::size_t r, std::size_t c) { return (*this)(c, r); });
+      }
     };  // class Mat
-
-    template <std::size_t R, std::size_t C>
-    class MatUtils {
-      private:
-      template <std::size_t... S, typename G>
-      constexpr static auto genMatImpl(const std::index_sequence<S...>&,
-                                       G&& generator)
-        -> Mat<decltype(generator(std::declval<std::size_t>(),
-                                  std::declval<std::size_t>())),
-               R, C> {
-        return {generator(S / C, S % C)...};
-      }
-
-      template <typename T>
-      static constexpr T identGenerator(std::size_t r, std::size_t c) {
-        return r == c ? T{1} : T{0};
-      }
-
-      public:
-      template <typename G>
-      constexpr static decltype(auto) generate(G&& generator) {
-        return genMatImpl(std::make_index_sequence<R * C>{},
-                          std::forward<G>(generator));
-      }
-
-      template <typename T>
-      constexpr static auto identity{generate(&identGenerator<T>)};
-    };
 
     // Define the dot product
     template <typename F1, typename F2, std::size_t D>
@@ -280,6 +285,30 @@ namespace emp {
 
     template <typename F>
     using Mat4x4 = Mat<F, 4, 4>;
+
+    namespace proj {
+      Mat<float, 4, 4> ortho(float left, float right, float bottom float top,
+                             float near, float far) {
+        return Mat<T, 4, 4>{
+          2 / (right - left),
+          0,
+          0,
+          -(right + left) / (right - left),  // row 1
+          0,
+          2 / (top - bottom),
+          0,
+          -(top + bottom) / (top - bottom),  // row 2
+          0,
+          0,
+          -2 / (far - near),
+          -(far + near) / (far - near),  // row 3
+          0,
+          0,
+          0,
+          1  // row 4
+        };
+      }
+    }  // namespace proj
 
   }  // namespace math
 }  // namespace emp

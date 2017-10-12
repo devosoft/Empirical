@@ -47,4 +47,9 @@ TEST_CASE("Test Matrices", "[math]") {
                                       12u, 12u, 12u,  // row 2
                                       18u, 18u, 18u   // row 3
                                     }));
+  REQUIRE((rowsCheck.transpose() == emp::math::Mat3x3<std::size_t>{
+                                      1u, 2u, 3u,  // row 1
+                                      1u, 2u, 3u,  // row 2
+                                      1u, 2u, 3u   // row 3
+                                    }));
 }
