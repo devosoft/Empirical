@@ -286,31 +286,32 @@ namespace emp {
     template <typename F>
     using Mat4x4 = Mat<F, 4, 4>;
 
-    namespace proj {
-      Mat<float, 4, 4> ortho(float left, float right, float bottom float top,
+    namespace gl {
+      Mat<float, 4, 4> ortho(float left, float right, float bottom, float top,
                              float near, float far) {
-        return Mat<T, 4, 4>{
-          2 / (right - left),
-          0,
-          0,
+        return Mat<float, 4, 4>{
+          2.0f / (right - left),
+          0.0f,
+          0.0f,
           -(right + left) / (right - left),  // row 1
-          0,
-          2 / (top - bottom),
-          0,
+          0.0f,
+          2.0f / (top - bottom),
+          0.0f,
           -(top + bottom) / (top - bottom),  // row 2
-          0,
-          0,
-          -2 / (far - near),
+          0.0f,
+          0.0f,
+          -2.0f / (far - near),
           -(far + near) / (far - near),  // row 3
-          0,
-          0,
-          0,
-          1  // row 4
+          0.0f,
+          0.0f,
+          0.0f,
+          1.0f  // row 4
         };
       }
-    }  // namespace proj
 
-  }  // namespace math
+    }  // namespace gl
+  }    // namespace math
+
 }  // namespace emp
 
 #endif  // LIN_ALG_H
