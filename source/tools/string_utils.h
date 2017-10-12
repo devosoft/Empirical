@@ -298,51 +298,64 @@ namespace emp {
     return in_string.substr(start_pos, end_pos);
   }
 
-
+  /// Remove a prefix of the input string (up to a specified delimeter) and return it.  If the
+  /// delimeter is not found, return the entire input string and clear it.
   inline std::string string_pop(std::string & in_string, const char delim) {
     return string_pop_fixed(in_string, in_string.find(delim), 1);
   }
 
+  /// Return a prefix of the input string (up to a specified delimeter), but do not modify it.
+  /// If the delimeter is not found, return the entire input string.
   inline std::string string_get(const std::string & in_string, const char delim, size_t start_pos=0) {
     return string_get_range(in_string, start_pos, in_string.find(delim, start_pos));
   }
 
+  /// Remove a prefix of the input string (up to any of a specified set of delimeters) and
+  /// return it.  If the delimeter is not found, return the entire input string and clear it.
   inline std::string string_pop(std::string & in_string, const std::string & delim_set) {
     return string_pop_fixed(in_string, in_string.find_first_of(delim_set), 1);
   }
 
+  /// Return a prefix of the input string (up to any of a specified set of delimeters), but do not
+  /// modify it. If the delimeter is not found, return the entire input string.
   inline std::string string_get(const std::string & in_string, const std::string & delim_set, size_t start_pos=0) {
     return string_get_range(in_string, start_pos, in_string.find_first_of(delim_set, start_pos));
   }
 
+  /// Remove a prefix of a string, up to the first whitespace, and return it.
   inline std::string string_pop_word(std::string & in_string) {
     // Whitespace = ' ' '\n' '\r' or '\t'
     return string_pop(in_string, " \n\r\t");
   }
 
+  /// Return a prefix of a string, up to the first whitespace (do not modify the original string)
   inline std::string string_get_word(const std::string & in_string, size_t start_pos=0) {
     // Whitespace = ' ' '\n' '\r' or '\t'
     return string_get(in_string, " \n\r\t", start_pos);
   }
 
+  /// Remove a prefix of a string, up to the first newline, and return it.
   inline std::string string_pop_line(std::string & in_string) {
     return string_pop(in_string, '\n');
   }
 
+  /// Return a prefix of a string, up to the first newline (do not modify the original string)
   inline std::string string_get_line(const std::string & in_string, size_t start_pos=0) {
     return string_get(in_string, '\n', start_pos);
   }
 
-  // Tricks for dealing with whitespace.
+  /// Remove all whitespace at the beginning of a string.  Return the whitespace removed.
   inline std::string left_justify(std::string & in_string) {
     return string_pop_fixed(in_string, in_string.find_first_not_of(" \n\r\t"));
   }
 
+  /// Remove all whitespace at the end of a string.
   inline void right_justify(std::string & in_string) {
     // @CAO *very* inefficient at the moment.
     while (is_whitespace(in_string.back())) in_string.pop_back();
   }
 
+  /// Every time one or more whitespace characters appear replace them with a single space.
   static inline void compress_whitespace(std::string & in_string) {
     const size_t strlen = in_string.size();
     bool last_whitespace = true;
@@ -363,6 +376,7 @@ namespace emp {
     in_string.resize(pos);
   }
 
+  /// Remove all whitespace from anywhere within a string.
   static inline void remove_whitespace(std::string & in_string) {
     const size_t strlen = in_string.size();
     size_t pos = 0;
@@ -391,7 +405,7 @@ namespace emp {
   }
 
 
-  // Cut up a string based on a deliminator.
+  /// Cut up a string based on the provided delimitor; fill them in to the provided vector.
   static inline void slice(const std::string & in_string, emp::vector<std::string> & out_set,
                            char delim='\n') {
     const size_t test_size = in_string.size();
@@ -421,7 +435,7 @@ namespace emp {
 
   }
 
-  // A simple way to slice a string without passing in result vector (may be less efficient).
+  /// Slice a string without passing in result vector (may be less efficient).
   static inline emp::vector<std::string> slice(const std::string & in_string, char delim='\n') {
     emp::vector<std::string> result;
     slice(in_string, result, delim);
