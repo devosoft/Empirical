@@ -1,0 +1,220 @@
+#ifndef LIN_ALG_H
+#define LIN_ALG_H
+
+#include <algorithm>
+#include <array>
+
+#include "base/assert.h"
+
+namespace emp {
+
+  namespace math {
+    template <typename F, std::size_t R, std::size_t C>
+    class Mat;
+
+    namespace internal {
+      template <typename A, typename B, std::size_t I>
+      constexpr decltype(auto) dotProductImpl(A a, B b,
+                                              const std::index_sequence<I>&) {
+        return a[I] * b[I];
+      }
+
+      template <typename A, typename B, std::size_t H, std::size_t H2,
+                std::size_t... T>
+      constexpr decltype(auto) dotProductImpl(
+        A a, B b, const std::index_sequence<H, H2, T...>&) {
+        return (a[H] * b[H]) +
+               dotProductImpl(a, b, std::index_sequence<H2, T...>{});
+      }
+
+      template <std::size_t N, typename A, typename B>
+      constexpr decltype(auto) dotProduct(A a, B b) {
+        return dotProductImpl(a, b, std::make_index_sequence<N>{});
+      }
+    }  // namespace internal
+
+    template <typename F, std::size_t D>
+    class Row {
+      public:
+      using value_type = F;
+      static constexpr auto rows = 1;
+      static constexpr auto columns = D;
+
+      protected:
+      F* ref;
+
+      public:
+      constexpr Row(F* ref) : ref(ref) {}
+      constexpr Row(const Row&) = default;
+      constexpr Row(Row&&) = default;
+      Row& operator=(const Row&) = default;
+      Row& operator=(Row&&) = default;
+
+      template <typename G>
+      constexpr bool operator==(const Row<G, D>& other) const {
+        for (std::size_t i = 0; i < rows * columns; ++i) {
+          if (ref[i] != other.ref[i]) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      template <typename G>
+      constexpr bool operator==(const Mat<G, 1, D>& other) const {
+        for (std::size_t i = 0; i < rows * columns; ++i) {
+          if (ref[i] != other.data[i]) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      constexpr decltype(auto) operator[](std::size_t i) const {
+        return ref[i];
+      }
+      constexpr decltype(auto) operator()(std::size_t i) const {
+        return (*this)[i];
+      }
+
+      F& operator[](std::size_t i) { return ref[i]; }
+      decltype(auto) operator()(std::size_t i) { return (*this)[i]; }
+
+      constexpr F* data() noexcept { return ref; }
+      constexpr const F* data() const noexcept { return ref; }
+    };
+
+    template <typename F, std::size_t R, std::size_t C>
+    class Mat {
+      public:
+      using value_type = F;
+      static constexpr auto rows = R;
+      static constexpr auto columns = C;
+
+      protected:
+      std::array<F, rows * columns> arrayData;
+
+      public:
+      template <typename... Args>
+      constexpr Mat(Args&&... args) : arrayData{{std::forward<Args>(args)...}} {
+        static_assert(
+          sizeof...(Args) == rows * columns,
+          "Invalid number of arguments for a matrix of the given size");
+      }
+
+      constexpr Mat(const Mat&) = default;
+      constexpr Mat(Mat&&) = default;
+      Mat& operator=(const Mat&) = default;
+      Mat& operator=(Mat&&) = default;
+
+      template <typename G>
+      constexpr bool operator==(const Mat<G, R, C>& other) const {
+        for (std::size_t i = 0; i < rows * columns; ++i) {
+          if (arrayData[i] != other.arrayData[i]) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      // Why do (i, j) and not [i][j]? See
+      // https://isocpp.org/wiki/faq/operator-overloading#matrix-subscript-op
+      constexpr decltype(auto) operator()(std::size_t r, std::size_t c) const {
+        emp_assert(r < rows, "rows out of bounds");
+        emp_assert(c < columns, "columns out of bounds");
+        return arrayData[r * columns + c];
+      }
+
+      constexpr Row<const F, C> operator()(std::size_t r) const {
+        emp_assert(r < rows, "rows out of bounds");
+        return Row<const F, C>(&arrayData[r * columns]);
+      }
+
+      constexpr Row<const F, C> operator[](std::size_t r) const {
+        emp_assert(r < rows, "rows out of bounds");
+        return Row<const F, C>(&arrayData[r * columns]);
+      }
+
+      constexpr F* data() noexcept { return arrayData.data(); }
+      constexpr const F* data() const noexcept { return arrayData.data(); }
+    };  // class Mat
+
+    // Define the dot product
+    template <typename F1, typename F2, std::size_t D>
+    constexpr decltype(auto) operator*(const Mat<F1, 1, D>& v1,
+                                       const Mat<F2, D, 1>& v2) {
+      return internal::dotProduct<D>(v1.data(), v2.data());
+    }
+
+    template <typename F1, typename F2, std::size_t D>
+    constexpr decltype(auto) operator*(const Mat<F1, D, 1>& v1,
+                                       const Mat<F2, 1, D>& v2) {
+      // Who says this is a communative field?
+      return internal::dotProduct<D>(v1.data(), v2.data());
+    }
+
+    template <typename F1, typename F2, std::size_t D>
+    constexpr decltype(auto) operator*(const Mat<F1, D, 1>& v1,
+                                       const Row<F2, D>& v2) {
+      return internal::dotProduct<D>(v1.data(), v2);
+    }
+
+    template <typename F1, typename F2, std::size_t D>
+    constexpr decltype(auto) operator*(const Row<F1, D>& v1,
+                                       const Mat<F2, 1, D>& v2) {
+      return internal::dotProduct<D>(v1, v2.data());
+    }
+
+    // Define the dot product with rows
+    // template <typename F1, typename F2, std::size_t D>
+    // constexpr auto operator*(const Row<F1, D>& v1, const Row<F2, D>& v2) {
+    //   decltype(F{} + (F{} * F{})) result{0};
+    //
+    //   for (std::size_t i = 0; i < D; ++i) {
+    //     result += v1(i) * v2(i, 0);
+    //   }
+    //
+    //   return result;
+    // }
+
+    template <typename F>
+    using Mat2x2 = Mat<F, 2, 2>;
+
+    template <typename F>
+    using Mat3x3 = Mat<F, 3, 3>;
+
+    template <typename F>
+    using Mat4x4 = Mat<F, 4, 4>;
+
+    template <std::size_t R, std::size_t C>
+    class MatUtils {
+      private:
+      template <std::size_t... S, typename G>
+      constexpr static auto genMatImpl(const std::index_sequence<S...>&,
+                                       G&& generator)
+        -> Mat<decltype(generator(std::declval<std::size_t>(),
+                                  std::declval<std::size_t>())),
+               R, C> {
+        return {generator(S / C, S % C)...};
+      }
+
+      template <typename T>
+      static constexpr T identGenerator(std::size_t r, std::size_t c) {
+        return r == c ? T{1} : T{0};
+      }
+
+      public:
+      template <typename G>
+      constexpr static decltype(auto) generate(G&& generator) {
+        return genMatImpl(std::make_index_sequence<R * C>{},
+                          std::forward<G>(generator));
+      }
+
+      template <typename T>
+      constexpr static auto identity{generate(&identGenerator<T>)};
+    };
+
+  }  // namespace math
+}  // namespace emp
+
+#endif  // LIN_ALG_H
