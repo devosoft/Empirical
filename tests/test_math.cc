@@ -4,7 +4,7 @@
 #include "math/LinAlg.h"
 
 constexpr std::size_t rowsCheckGenerator(std::size_t r, std::size_t) {
-  return r;
+  return r + 1;
 }
 
 TEST_CASE("Test Matrices", "[math]") {
@@ -12,9 +12,9 @@ TEST_CASE("Test Matrices", "[math]") {
     emp::math::MatUtils<3, 3>::generate(&rowsCheckGenerator);
 
   REQUIRE((rowsCheck == emp::math::Mat3x3<std::size_t>{
-                          0u, 0u, 0u,  // row 1
-                          1u, 1u, 1u,  // row 2
-                          2u, 2u, 2u   // row 3
+                          1u, 1u, 1u,  // row 1
+                          2u, 2u, 2u,  // row 2
+                          3u, 3u, 3u   // row 3
                         }));
 
   constexpr auto ident = emp::math::MatUtils<3, 3>::identity<float>;
@@ -38,4 +38,13 @@ TEST_CASE("Test Matrices", "[math]") {
   REQUIRE(colVec * ident.row(0) == 1);
   REQUIRE(colVec * ident.row(1) == 2);
   REQUIRE(colVec * ident.row(2) == 3);
+
+  REQUIRE(ident * rowsCheck == rowsCheck);
+  REQUIRE(rowsCheck * ident == rowsCheck);
+
+  REQUIRE((rowsCheck * rowsCheck == emp::math::Mat3x3<std::size_t>{
+                                      6u, 6u, 6u,     // row 1
+                                      12u, 12u, 12u,  // row 2
+                                      18u, 18u, 18u   // row 3
+                                    }));
 }

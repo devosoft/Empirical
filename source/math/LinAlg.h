@@ -31,6 +31,7 @@ namespace emp {
       constexpr decltype(auto) dotProduct(const A& a, const B& b) {
         return dotProductImpl(a, b, std::make_index_sequence<N>{});
       }
+
     }  // namespace internal
 
     template <typename F, std::size_t D>
@@ -161,7 +162,7 @@ namespace emp {
       template <typename G>
       constexpr bool operator==(const Mat<G, R, C>& other) const {
         for (std::size_t i = 0; i < rows * columns; ++i) {
-          if (arrayData[i] != other.arrayData[i]) {
+          if (arrayData[i] != other.data()[i]) {
             return false;
           }
         }
@@ -200,54 +201,6 @@ namespace emp {
       constexpr const F* data() const noexcept { return arrayData.data(); }
     };  // class Mat
 
-    // Define the dot product
-    template <typename F1, typename F2, std::size_t D>
-    constexpr decltype(auto) operator*(const Mat<F1, 1, D>& v1,
-                                       const Mat<F2, D, 1>& v2) {
-      return internal::dotProduct<D>(v1.data(), v2.data());
-    }
-
-    template <typename F1, typename F2, std::size_t D>
-    constexpr decltype(auto) operator*(const Mat<F1, D, 1>& v1,
-                                       const Mat<F2, 1, D>& v2) {
-      // Who says this is a communative field?
-      return internal::dotProduct<D>(v1.data(), v2.data());
-    }
-
-    template <typename F1, typename F2, std::size_t D>
-    constexpr decltype(auto) operator*(const Mat<F1, D, 1>& v1,
-                                       const Row<F2, D>& v2) {
-      return internal::dotProduct<D>(v1.data(), v2);
-    }
-
-    template <typename F1, typename F2, std::size_t D>
-    constexpr decltype(auto) operator*(const Row<F1, D>& v1,
-                                       const Mat<F2, 1, D>& v2) {
-      return internal::dotProduct<D>(v1, v2.data());
-    }
-
-    // Define the dot product with rows
-    template <typename F1, typename F2, std::size_t D>
-    constexpr decltype(auto) operator*(const Row<F1, D>& v1,
-                                       const Row<F2, D>& v2) {
-      return internal::dotProduct<D>(v1, v2);
-    }
-
-    template <typename F1, typename F2, std::size_t D>
-    constexpr decltype(auto) operator*(const Row<F1, D>& v1,
-                                       const Col<F2, D>& v2) {
-      return internal::dotProduct<D>(v1, v2);
-    }
-
-    template <typename F>
-    using Mat2x2 = Mat<F, 2, 2>;
-
-    template <typename F>
-    using Mat3x3 = Mat<F, 3, 3>;
-
-    template <typename F>
-    using Mat4x4 = Mat<F, 4, 4>;
-
     template <std::size_t R, std::size_t C>
     class MatUtils {
       private:
@@ -275,6 +228,58 @@ namespace emp {
       template <typename T>
       constexpr static auto identity{generate(&identGenerator<T>)};
     };
+
+    // Define the dot product
+    template <typename F1, typename F2, std::size_t D>
+    constexpr decltype(auto) operator*(const Mat<F1, 1, D>& v1,
+                                       const Mat<F2, D, 1>& v2) {
+      return internal::dotProduct<D>(v1.data(), v2.data());
+    }
+
+    template <typename F1, typename F2, std::size_t D>
+    constexpr decltype(auto) operator*(const Mat<F1, D, 1>& v1,
+                                       const Row<F2, D>& v2) {
+      return internal::dotProduct<D>(v1.data(), v2);
+    }
+
+    template <typename F1, typename F2, std::size_t D>
+    constexpr decltype(auto) operator*(const Row<F1, D>& v1,
+                                       const Mat<F2, 1, D>& v2) {
+      return internal::dotProduct<D>(v1, v2.data());
+    }
+
+    template <typename F1, typename F2, std::size_t D>
+    constexpr decltype(auto) operator*(const Mat<F1, 1, D>& v1,
+                                       const Col<F2, D>& v2) {
+      return internal::dotProduct<D>(v1.data(), v2);
+    }
+
+    template <typename F1, typename F2, std::size_t D>
+    constexpr decltype(auto) operator*(const Col<F1, D>& v1,
+                                       const Mat<F2, D, 1>& v2) {
+      return internal::dotProduct<D>(v1, v2.data());
+    }
+
+    template <typename F1, typename F2, std::size_t D>
+    constexpr decltype(auto) operator*(const Row<F1, D>& v1,
+                                       const Col<F2, D>& v2) {
+      return internal::dotProduct<D>(v1, v2);
+    }
+    template <typename F1, typename F2, std::size_t R, std::size_t C,
+              std::size_t M>
+    constexpr auto operator*(const Mat<F1, R, M>& a, const Mat<F2, M, C>& b) {
+      return MatUtils<R, C>::generate(
+        [a, b](std::size_t r, std::size_t c) { return a.row(r) * b.col(c); });
+    }
+
+    template <typename F>
+    using Mat2x2 = Mat<F, 2, 2>;
+
+    template <typename F>
+    using Mat3x3 = Mat<F, 3, 3>;
+
+    template <typename F>
+    using Mat4x4 = Mat<F, 4, 4>;
 
   }  // namespace math
 }  // namespace emp
