@@ -47,7 +47,6 @@ const char* vertexSource = R"glsl(
 )glsl";
 
 const char* fragmentSource = R"glsl(
-    precision mediump float;
     varying vec4 fcolor;
 
     void main()
@@ -97,36 +96,38 @@ const char* fragmentSource = R"glsl(
 //
 // Test test;
 
+namespace gl = emp::opengl;
+
 int main(int argc, char* argv[]) {
-  emp::opengl::GLCanvas canvas;
+  gl::GLCanvas canvas;
 
   auto shaderProgram = canvas.makeShaderProgram(vertexSource, fragmentSource);
   shaderProgram.use();
 
-  VertexArrayObject vao =
+  gl::VertexArrayObject vao =
     canvas.makeVAO()
-      .with(BufferType::Array,
+      .with(gl::BufferType::Array,
             shaderProgram.attribute<float[2]>("position", false,
                                               6 * sizeof(float), (void*)0),
             shaderProgram.attribute<float[4]>("color", false, 6 * sizeof(float),
                                               (void*)(2 * sizeof(float))))
-      .with(BufferType::ElementArray);
+      .with(gl::BufferType::ElementArray);
 
   vao.bind();
-  vao.getBuffer<BufferType::Array>().push(
+  vao.getBuffer<gl::BufferType::Array>().push(
     {
       -50.5f,  100.5f,  1.0f, 1.0f, 1.0f, 1.0f,  // Vertex 1 (X, Y)
       100.5f,  100.5f,  1.0f, 0.0f, 1.0f, 1.0f,  // Vertex 2 (X, Y)
       100.5f,  -100.5f, 1.0f, 1.0f, 0.0f, 1.0f,  // Vertex 3 (X, Y)
       -100.5f, -100.5f, 1.0f, 1.0f, 1.0f, 1.0f,  // Vertex 3 (X, Y)
     },
-    BufferUsage::StaticDraw);
-  vao.getBuffer<BufferType::ElementArray>().push(
+    gl::BufferUsage::StaticDraw);
+  vao.getBuffer<gl::BufferType::ElementArray>().push(
     {
       0, 1, 2,  // First Triangle
       2, 3, 0   // Second Triangle
     },
-    BufferUsage::StaticDraw);
+    gl::BufferUsage::StaticDraw);
 
   canvas.runForever([](auto&&) {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
