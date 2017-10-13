@@ -4,7 +4,7 @@
  *  @date 2016-2017
  *
  *  @file sequence_utils.h
- *  @brief These functions focus on dealing with generic sequence types.
+ *  @brief Functions for analyzing with generic sequence types.
  *  @note Status: BETA
  *
  *  A set of functions for analyzing sequences, including distance metrics (Hamming and

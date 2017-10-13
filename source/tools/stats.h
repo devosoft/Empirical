@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file SolveState.h
+ *  @file stats.h
  *  @brief Functions for calculating various statistics about an ensemble.
  *  @note Status: BETA
  */

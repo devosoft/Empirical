@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file SolveState.h
+ *  @file string_utils.h
  *  @brief Simple functions to manipulate strings.
  *  @note Status: RELEASE
  */
