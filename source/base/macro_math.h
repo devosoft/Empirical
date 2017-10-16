@@ -1,46 +1,48 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  These macros build a pre-processor calculator system.
-//
-//  Working macros include:
-//   EMP_INC(A)    : converts to result of A+1
-//   EMP_DEC(A)    : converts to result of A-1
-//   EMP_SHIFTL(A) : converts to result of A*2
-//   EMP_SHIFTR(A) : converts to result of A/2
-//
-//   EMP_ADD(A,B)  : converts to result of A+B
-//   EMP_SUB(A,B)  : converts to result of A-B
-//   EMP_MULT(A,B) : converts to result of A*B
-//   EMP_DIV(A,B)  : converts to result of A/B
-//   EMP_MOD(A,B)  : converts to result of A%B
-//   EMP_LOG2(A)   : converts to (int) log2(A)
-//
-//   EMP_NOT(X)     : Logical NOT
-//   EMP_AND(X, Y)  : Logical AND
-//   EMP_OR(X, Y)   : Logical OR
-//   EMP_NAND(X, Y) : Logical NAND
-//   EMP_NOR(X, Y)  : Logical NOR
-//   EMP_XOR(X, Y)  : Logical XOR
-//
-//   EMP_COUNT_ONES(A) : count the number of ones in the binary representation of A
-//
-//   EMP_IF(TEST, T, F) examines the first argument; if it's 0, it resolves to the third
-//   argument, otherwise it resolves to the second argument.
-//
-//  The core idea behind these macros is that we can use brute-force to convert numbers
-//  to binary, but once there we can easily perform math on them, or convert them to
-//  yet other forms.
-//
-//  Representations include:
-//   DEC - Standard decimal values (e.g., 91)
-//   BIN - Binary numbers, with bits separated by commas (e.g.  0, 0, 0,  1, 0,  1, 1, 0, 1, 1 )
-//   SUM - Like BIN, but stored as zero or magnitude.    (e.g., 0, 0, 0, 64, 0, 16, 8, 0, 2, 1 )
-//   PACK - Like SUM, but without zeros and in parens    (e.g., (64,16,8,2,1) )
-//   HEX - Hexidecimal representation (e.g., 0x5B)  [todo]
-
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file macro_math.h
+ *  @brief Macros to build a pre-processor calculator system.
+ *  @note Status: RELEASE
+ *
+ *  Working macros include:
+ *   EMP_INC(A)    : converts to result of A+1
+ *   EMP_DEC(A)    : converts to result of A-1
+ *   EMP_SHIFTL(A) : converts to result of A*2
+ *   EMP_SHIFTR(A) : converts to result of A/2
+ *
+ *   EMP_ADD(A,B)  : converts to result of A+B
+ *   EMP_SUB(A,B)  : converts to result of A-B
+ *   EMP_MULT(A,B) : converts to result of A*B
+ *   EMP_DIV(A,B)  : converts to result of A/B
+ *   EMP_MOD(A,B)  : converts to result of A%B
+ *   EMP_LOG2(A)   : converts to (int) log2(A)
+ *
+ *   EMP_NOT(X)     : Logical NOT
+ *   EMP_AND(X, Y)  : Logical AND
+ *   EMP_OR(X, Y)   : Logical OR
+ *   EMP_NAND(X, Y) : Logical NAND
+ *   EMP_NOR(X, Y)  : Logical NOR
+ *   EMP_XOR(X, Y)  : Logical XOR
+ *
+ *   EMP_COUNT_ONES(A) : count the number of ones in the binary representation of A
+ *
+ *   EMP_IF(TEST, T, F) examines the first argument; if it's 0, it resolves to the third
+ *   argument, otherwise it resolves to the second argument.
+ *
+ *  The core idea behind these macros is that we can use brute-force to convert numbers
+ *  to binary, but once there we can easily perform math on them, or convert them to
+ *  yet other forms.
+ *
+ *  Representations include:
+ *   DEC - Standard decimal values (e.g., 91)
+ *   BIN - Binary numbers, with bits separated by commas (e.g.  0, 0, 0,  1, 0,  1, 1, 0, 1, 1 )
+ *   SUM - Like BIN, but stored as zero or magnitude.    (e.g., 0, 0, 0, 64, 0, 16, 8, 0, 2, 1 )
+ *   PACK - Like SUM, but without zeros and in parens    (e.g., (64,16,8,2,1) )
+ *   HEX - Hexidecimal representation (e.g., 0x5B)  [todo]
+ */
 
 #ifndef EMP_MACRO_MATH_H
 #define EMP_MACRO_MATH_H
