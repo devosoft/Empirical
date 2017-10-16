@@ -10,6 +10,9 @@
  *  If EMP_NDEBUG is set, emp::array is just an alias for std::array.
  *  Otherwise, every time an array is accessed, tests are done to make sure that the
  *  access is legal.
+ *
+ *  @todo Add tests in array::front and array::back to ensure not empty.
+ *  @todo Add tests for get.
  */
 
 
