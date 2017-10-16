@@ -1,14 +1,19 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  This class is a drop-in wrapper for std::vector, adding on bounds checking.
-//  If EMP_NDEBUG is set then it reverts back to std::vector.
-//
-//
-//  Developer Notes:
-//   * Need an automatic conversion from emp::vector to std::vector and back to interface with
-//     non-empirical code.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file Ptr.h
+ *  @brief A drop-in wrapper for std::vector; adds on bounds checking in debug mode.
+ *  @note Status: BETA
+ *
+ *  This class is a drop-in wrapper for std::vector, adding on bounds checking.
+ *  If EMP_NDEBUG is set then it reverts back to std::vector.
+ *
+ *  @todo Need an automatic conversion from emp::vector to std::vector and back to interface with
+ *     non-empirical code.
+ *  @todo Need emp::vector<bool> to function properly.
+ */
 
 
 #ifndef EMP_VECTOR_H
@@ -32,14 +37,14 @@ namespace emp {
 
 namespace emp {
 
-  // Build a debug wrapper emp::vector around std::vector.
+  /// Build a debug wrapper emp::vector around std::vector.
   template <typename T, typename... Ts>
   class vector : public std::vector<T,Ts...> {
   private:
     using this_t = emp::vector<T,Ts...>;
     using stdv_t = std::vector<T,Ts...>;
 
-    // Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
+    /// Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
     constexpr static const size_t MAX_SIZE = 2000000001;
 
   public:
