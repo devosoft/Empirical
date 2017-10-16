@@ -389,6 +389,7 @@ namespace emp {
     /// Get the unique ID associated with this pointer.
     size_t GetID() const { return id; }
 
+    /// Reallocate this Ptr to a newly allocated value using arguments passed in.
     template <typename... T>
     void New(T &&... args) {
       Tracker().DecID(id);                        // Remove a pointer to any old memory...
@@ -397,6 +398,8 @@ namespace emp {
       id = Tracker().New(ptr);                    // And track it!
       DebugInfo().AddPtr();
     }
+
+    /// Reallocate this Ptr to a newly allocated array using the size passed in.
     void NewArray(size_t array_size) {
       Tracker().DecID(id);                        // Remove a pointer to any old memory...
       ptr = new TYPE[array_size];                 // Build a new raw pointer to an array.
@@ -404,6 +407,8 @@ namespace emp {
       id = Tracker().NewArray(ptr, array_size * sizeof(TYPE));   // And track it!
       DebugInfo().AddPtr();
     }
+
+    /// Delete this pointer (ust NOT be an array).
     void Delete() {
       emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
       emp_assert(ptr, "Deleting null Ptr.");
@@ -413,6 +418,8 @@ namespace emp {
       if (ptr_debug) std::cout << "Ptr::Delete() : " << ptr << std::endl;
       delete ptr;
     }
+
+    /// Delete this pointer to an array (must be an array).
     void DeleteArray() {
       emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
       emp_assert(ptr, "Deleting null Ptr.");
@@ -423,6 +430,7 @@ namespace emp {
       delete [] ptr;
     }
 
+    /// Convert this pointer to a hash value.
     size_t Hash() const {
       // Chop off useless bits of pointer...
       static constexpr size_t shift = Log2(1 + sizeof(TYPE));
@@ -430,7 +438,7 @@ namespace emp {
     }
     struct hash_t { size_t operator()(const Ptr<TYPE> & t) const { return t.Hash(); } };
 
-    // Copy assignment
+    /// Copy assignment
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
       if (ptr_debug) std::cout << "copy assignment" << std::endl;
       emp_assert(Tracker().IsDeleted(_in.id) == false, "Do not copy deleted pointers.");
@@ -443,7 +451,7 @@ namespace emp {
       return *this;
     }
 
-    // Move assignment
+    /// Move assignment
     Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
       if (ptr_debug) std::cout << "move assignment" << std::endl;
       emp_assert(Tracker().IsDeleted(_in.id) == false, "Do not move deleted pointers.");
@@ -457,7 +465,8 @@ namespace emp {
       return *this;
     }
 
-    // Assign to a pointer of the correct type.
+    /// Assign to a raw pointer of the correct type; if this is already tracked, hooked in
+    /// correctly, otherwise don't track.
     template <typename T2>
     Ptr<TYPE> & operator=(T2 * _in) {
       if (ptr_debug) std::cout << "raw assignment" << std::endl;
@@ -479,7 +488,7 @@ namespace emp {
       return *this;
     }
 
-    // Assign to a convertable Ptr
+    /// Assign to a convertable Ptr
     template <typename T2>
     Ptr<TYPE> & operator=(Ptr<T2> _in) {
       if (ptr_debug) std::cout << "convert-copy assignment" << std::endl;
@@ -492,13 +501,15 @@ namespace emp {
       return *this;
     }
 
-    // Dereference a pointer.
+    /// Dereference a pointer.
     TYPE & operator*() {
       // Make sure a pointer is active and non-null before we dereference it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
       emp_assert(ptr != nullptr, "Do not dereference a null pointer!");
       return *ptr;
     }
+
+    /// Dereference a pointer to a const type.
     const TYPE & operator*() const {
       // Make sure a pointer is active before we dereference it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
@@ -506,13 +517,15 @@ namespace emp {
       return *ptr;
     }
 
-    // Follow a pointer.
+    /// Follow a pointer.
     TYPE * operator->() {
       // Make sure a pointer is active before we follow it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr;
     }
+
+    /// Follow a pointer to a const target.
     const TYPE * const operator->() const {
       // Make sure a pointer is active before we follow it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
@@ -520,7 +533,7 @@ namespace emp {
       return ptr;
     }
 
-    // Indexing into array
+    /// Indexing into array
     TYPE & operator[](size_t pos) {
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
       emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.");
@@ -529,6 +542,8 @@ namespace emp {
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr[pos];
     }
+
+    /// Indexing into const array
     const TYPE & operator[](size_t pos) const {
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
       emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.");
@@ -538,7 +553,7 @@ namespace emp {
       return ptr[pos];
     }
 
-    // Auto-case to raw pointer type.
+    /// Auto-case to raw pointer type.
     operator TYPE *() {
       // Make sure a pointer is active before we convert it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
@@ -548,26 +563,51 @@ namespace emp {
       return ptr;
     }
 
+    /// Does this pointer exist?
     operator bool() { return ptr != nullptr; }
+
+    /// Does this const pointer exist?
     operator bool() const { return ptr != nullptr; }
 
-    // Comparisons to other Ptr objects
+    /// Does this Ptr point to the same memory position?
     bool operator==(const Ptr<TYPE> & in_ptr) const { return ptr == in_ptr.ptr; }
+
+    /// Does this Ptr point to different memory positions?
     bool operator!=(const Ptr<TYPE> & in_ptr) const { return ptr != in_ptr.ptr; }
+
+    /// Does this Ptr point to a memory position before another?
     bool operator<(const Ptr<TYPE> & in_ptr)  const { return ptr < in_ptr.ptr; }
+
+    /// Does this Ptr point to a memory position before or equal to another?
     bool operator<=(const Ptr<TYPE> & in_ptr) const { return ptr <= in_ptr.ptr; }
+
+    /// Does this Ptr point to a memory position after another?
     bool operator>(const Ptr<TYPE> & in_ptr)  const { return ptr > in_ptr.ptr; }
+
+    /// Does this Ptr point to a memory position after or equal to another?
     bool operator>=(const Ptr<TYPE> & in_ptr) const { return ptr >= in_ptr.ptr; }
 
-    // Comparisons to raw pointers.
+
+    /// Does this Ptr point to the same memory position as a raw pointer?
     bool operator==(const TYPE * in_ptr) const { return ptr == in_ptr; }
+
+    /// Does this Ptr point to different memory positions as a raw pointer?
     bool operator!=(const TYPE * in_ptr) const { return ptr != in_ptr; }
+
+    /// Does this Ptr point to a memory position before a raw pointer?
     bool operator<(const TYPE * in_ptr)  const { return ptr < in_ptr; }
+
+    /// Does this Ptr point to a memory position before or equal to a raw pointer?
     bool operator<=(const TYPE * in_ptr) const { return ptr <= in_ptr; }
+
+    /// Does this Ptr point to a memory position after a raw pointer?
     bool operator>(const TYPE * in_ptr)  const { return ptr > in_ptr; }
+
+    /// Does this Ptr point to a memory position after or equal to a raw pointer?
     bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
 
-    // Some debug testing functions
+
+    /// Some debug testing functions
     int DebugGetCount() const { return Tracker().GetIDCount(id); }
 
     // Prevent use of new and delete on Ptr
@@ -600,14 +640,14 @@ namespace emp {
   public:
     using element_type = TYPE;
 
-    Ptr() : ptr(nullptr) {}                                               // Default constructor
-    Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) {}                          // Copy constructor
-    Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr) {}                               // Move constructor
-    template <typename T2> Ptr(T2 * in_ptr, bool=false) : ptr(in_ptr) {}  // Construct from raw ptr
-    template <typename T2> Ptr(T2 * _ptr, size_t, bool) : ptr(_ptr) {}    // Construct from array
-    template <typename T2> Ptr(Ptr<T2> _in) : ptr(_in.Raw()) {}           // From compatible Ptr
-    Ptr(std::nullptr_t) : Ptr() {}                                        // From nullptr
-    ~Ptr() { ; }                                                          // Destructor
+    Ptr() : ptr(nullptr) {}                                              ///< Default constructor
+    Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) {}                         ///< Copy constructor
+    Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr) {}                              ///< Move constructor
+    template <typename T2> Ptr(T2 * in_ptr, bool=false) : ptr(in_ptr) {} ///< Construct from raw ptr
+    template <typename T2> Ptr(T2 * _ptr, size_t, bool) : ptr(_ptr) {}   ///< Construct from array
+    template <typename T2> Ptr(Ptr<T2> _in) : ptr(_in.Raw()) {}          ///< From compatible Ptr
+    Ptr(std::nullptr_t) : Ptr() {}                                       ///< From nullptr
+    ~Ptr() { ; }                                                         ///< Destructor
 
     bool IsNull() const { return ptr == nullptr; }
     TYPE * Raw() { return ptr; }
