@@ -4,7 +4,7 @@
  *  @date 2016-2017
  *
  *  @file array.h
- *  @brief A drop-in wrapper for std::array, adding on bounds checking.
+ *  @brief A drop-in wrapper for std::array; adds on bounds checking in debug mode.
  *  @note Status: RELEASE
  *
  *  If EMP_NDEBUG is set, emp::array is just an alias for std::array.

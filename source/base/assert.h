@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file array.h
+ *  @file assert.h
  *  @brief A more dynamic replacement for standard library asserts.
  *  @note Status: RELEASE
  *
