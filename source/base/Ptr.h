@@ -1,20 +1,19 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A wrapper for pointers that does careful memory tracking (but only in debug mode).
-//  Status: BETA
-//
-//  This version of pointers act as normal pointers under most conditions.  However,
-//  if a program is compiled with EMP_TRACK_MEM set, then these pointers perform extra
-//  tests to ensure that they point to valid memory and that memory is freed before
-//  pointers are released.
-//
-//
-//  Developer Notes:
-//  * Should we track information about emp::vector and emp::array object to make sure we don't
-//    point directly into them? (A resize() could make those pointers invalid!)
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file Ptr.h
+ *  @brief A wrapper for pointers that does careful memory tracking (but only in debug mode).
+ *  @note Status: BETA
+ *
+ *  Ptr objects behave as normal pointers under most conditions.  However, if a program is
+ *  compiled with EMP_TRACK_MEM set, then these pointers perform extra tests to ensure that
+ *  they point to valid memory and that memory is freed before pointers are released.
+ *
+ *  @todo Track information about emp::vector and emp::array objects to make sure we don't
+ *    point directly into them? (A resize() could make such pointers invalid!)
+ */
 
 #ifndef EMP_PTR_H
 #define EMP_PTR_H
@@ -41,10 +40,10 @@ namespace emp {
 
   class PtrInfo {
   private:
-    const void * ptr;   // Which pointer are we keeping data on?
-    int count;          // How many of this pointer do we have?
-    PtrStatus status;   // Has this pointer been deleted? (i.e., we should no longer access it!)
-    size_t array_bytes; // How big is the array pointed to (in bytes)?
+    const void * ptr;   ///< Which pointer are we keeping data on?
+    int count;          ///< How many of this pointer do we have?
+    PtrStatus status;   ///< Has this pointer been deleted? (i.e., we should no longer access it!)
+    size_t array_bytes; ///< How big is the array pointed to (in bytes)?
 
   public:
     PtrInfo(const void * _ptr) : ptr(_ptr), count(1), status(PtrStatus::ACTIVE), array_bytes(0) {
@@ -68,16 +67,28 @@ namespace emp {
       if (ptr_debug) std::cout << "Deleted info for pointer " << ptr << std::endl;
     }
 
+    /// What pointer does this one hold information about?
     const void * GetPtr() const { return ptr; }
+
+    /// How many Ptr objects point to the associated position?
     int GetCount() const { return count; }
+
+    /// If this ptr is to an array, how many bytes large is the array (may be different from size!)
     size_t GetArrayBytes() const { return array_bytes; }
+
+    /// Is this pointer currently valid to access?
     bool IsActive() const { return (bool) status; }
+
+    /// Is this pointer pointing to an array?
     bool IsArray()  const { return status == PtrStatus::ARRAY; }
 
+    /// Add one more pointer.
     void Inc() {
       if (ptr_debug) std::cout << "Inc info for pointer " << ptr << std::endl;
       emp_assert(status != PtrStatus::DELETED, "Incrementing deleted pointer!"); count++;
     }
+
+    /// Remove a pointer.
     void Dec() {
       if (ptr_debug) std::cout << "Dec info for pointer " << ptr << std::endl;
 
@@ -86,6 +97,7 @@ namespace emp {
       count--;
     }
 
+    /// Indicate that the associated position has been deleted.
     void MarkDeleted() {
       if (ptr_debug) std::cout << "Marked deleted for pointer " << ptr << std::endl;
       emp_assert(status != PtrStatus::DELETED, "Deleting same emp::Ptr a second time!");
@@ -95,10 +107,11 @@ namespace emp {
   };
 
 
+  /// Facilitate tracking of all Ptr objects in this run.
   class PtrTracker {
   private:
-    std::unordered_map<const void *, size_t> ptr_id;
-    emp::vector<PtrInfo> id_info;
+    std::unordered_map<const void *, size_t> ptr_id;  ///< Associate raw pointers with unique IDs
+    emp::vector<PtrInfo> id_info;                     ///< Associate IDs with pointer information.
 
     // Make PtrTracker a singleton.
     PtrTracker() : ptr_id(), id_info() { ; }
@@ -128,42 +141,51 @@ namespace emp {
                 << std::endl;
     }
 
-    // Treat this class as a singleton with a single Get() method to retrieve it.
+    /// Treat this class as a singleton with a single Get() method to retrieve it.
     static PtrTracker & Get() { static PtrTracker tracker; return tracker; }
 
-    // Some simple accessors
+    /// Determine if a pointer is being tracked.
     bool HasPtr(const void * ptr) const {
       if (ptr_debug) std::cout << "HasPtr: " << ptr << std::endl;
       return ptr_id.find(ptr) != ptr_id.end();
     }
 
+    /// Retrive the ID associated with a pointer.
     size_t GetCurID(const void * ptr) { emp_assert(HasPtr(ptr)); return ptr_id[ptr]; }
+
+    /// Lookup how many pointers are being tracked.
     size_t GetNumIDs() const { return id_info.size(); }
+
+    /// How big is an array associated with an ID?
     size_t GetArrayBytes(size_t id) const { return id_info[id].GetArrayBytes(); }
 
+    /// Check if an ID is for a pointer that has been deleted.
     bool IsDeleted(size_t id) const {
       if (id == (size_t) -1) return false;   // Not tracked!
       if (ptr_debug) std::cout << "IsDeleted: " << id << std::endl;
       return !id_info[id].IsActive();
     }
 
+    /// If a pointer active and ready to be used?
     bool IsActive(const void * ptr) {
       if (ptr_debug) std::cout << "IsActive: " << ptr << std::endl;
       if (ptr_id.find(ptr) == ptr_id.end()) return false; // Not in database.
       return GetInfo(ptr).IsActive();
     }
 
+    /// Is an ID associated with an array?
     bool IsArrayID(size_t id) {
       if (ptr_debug) std::cout << "IsArrayID: " << id << std::endl;
       return id_info[id].IsArray();
     }
 
+    /// How many Ptr objects are associated with an ID?
     int GetIDCount(size_t id) const {
       if (ptr_debug) std::cout << "Count:  " << id << std::endl;
       return id_info[id].GetCount();
     }
 
-    // This pointer was just created as a Ptr!
+    /// This pointer was just created as a Ptr!
     size_t New(const void * ptr) {
       emp_assert(ptr);     // Cannot track a null pointer.
       size_t id = id_info.size();
@@ -175,7 +197,7 @@ namespace emp {
       return id;
     }
 
-    // This pointer was just created as a Ptr ARRAY!
+    /// This pointer was just created as a Ptr ARRAY!
     size_t NewArray(const void * ptr, size_t array_bytes) {
       emp_assert(ptr);     // Cannot track a null pointer.
       // Make sure pointer is not already stored -OR- has been deleted (since re-use is possible).
@@ -188,12 +210,14 @@ namespace emp {
       return id;
     }
 
+    /// Increment the nuber of Pointers associated with an ID
     void IncID(size_t id) {
       if (id == (size_t) -1) return;   // Not tracked!
       if (ptr_debug) std::cout << "Inc:    " << id << std::endl;
       id_info[id].Inc();
     }
 
+    /// Decrement the nuber of Pointers associated with an ID
     void DecID(size_t id) {
       if (id == (size_t) -1) return;   // Not tracked!
       auto & info = id_info[id];
@@ -203,6 +227,7 @@ namespace emp {
       info.Dec();
     }
 
+    /// Mark the pointers associated with this ID as deleted.
     void MarkDeleted(size_t id) {
       if (ptr_debug) std::cout << "Delete: " << id << std::endl;
       id_info[id].MarkDeleted();
@@ -237,33 +262,32 @@ namespace emp {
   template <typename TYPE>
   class Ptr {
   public:
-    TYPE * ptr;
-    size_t id;
+    TYPE * ptr;                 ///< The raw pointer associated with this Ptr object.
+    size_t id;                  ///< A unique ID for this pointer type.
+    using element_type = TYPE;  ///< Type being pointed at.
 
     static PtrDebug & DebugInfo() { static PtrDebug info; return info; } // Debug info for each type
     static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
 
-    using element_type = TYPE;
-
-    // Construct a null Ptr by default.
+    /// Construct a null Ptr by default.
     Ptr() : ptr(nullptr), id((size_t) -1) {
       if (ptr_debug) std::cout << "null construct: " << ptr << std::endl;
     }
 
-    // Construct using copy constructor
+    /// Construct using copy constructor
     Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr), id(_in.id) {
       if (ptr_debug) std::cout << "copy construct: " << ptr << std::endl;
       Tracker().IncID(id);
     }
 
-    // Construct using move constructor
+    /// Construct using move constructor
     Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr), id(_in.id) {
       if (ptr_debug) std::cout << "move construct: " << ptr << std::endl;
       _in.id = (size_t) -1;
       // No IncID or DecID in Tracker since we just move the id.
     }
 
-    // Construct from a raw pointer of campatable type.
+    /// Construct from a raw pointer of campatable type.
     template <typename T2>
     Ptr(T2 * in_ptr, bool track=false) : ptr(in_ptr), id((size_t) -1)
     {
@@ -282,7 +306,7 @@ namespace emp {
       }
     }
 
-    // Construct from a raw pointer of campatable ARRAY type.
+    /// Construct from a raw pointer of campatable ARRAY type.
     template <typename T2>
     Ptr(T2 * _ptr, size_t array_size, bool track) : ptr(_ptr), id((size_t) -1)
     {
@@ -305,7 +329,7 @@ namespace emp {
       }
     }
 
-    // Construct from another Ptr<> object of compatable type.
+    /// Construct from another Ptr<> object of compatable type.
     template <typename T2>
     Ptr(Ptr<T2> _in) : ptr(_in.Raw()), id(_in.GetID()) {
       if (ptr_debug) std::cout << "inexact copy construct: " << ptr << std::endl;
@@ -313,12 +337,12 @@ namespace emp {
       Tracker().IncID(id);
     }
 
-    // Construct from nullptr.
+    /// Construct from nullptr.
     Ptr(std::nullptr_t) : Ptr() {
       if (ptr_debug) std::cout << "null construct 2." << std::endl;
     }
 
-    // Destructor.
+    /// Destructor.
     ~Ptr() {
       if (ptr_debug) {
         std::cout << "destructing Ptr instance ";
@@ -328,28 +352,41 @@ namespace emp {
       Tracker().DecID(id);
     }
 
+    /// Is this Ptr currently nullptr?
     bool IsNull() const { return ptr == nullptr; }
+
+    /// Convert this Ptr to a raw pointer that isn't going to be tracked.
     TYPE * Raw() {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to raw.");
       return ptr;
     }
+
+    /// Convert this Ptr to a const raw pointer that isn't going to be tracked.
     const TYPE * const Raw() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to raw.");
       return ptr;
     }
+
+    /// Cast this Ptr to a different type.
     template <typename T2> Ptr<T2> Cast() {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.");
       return (T2*) ptr;
     }
+
+    /// Cast this Ptr to a const Ptr of a different type.
     template <typename T2> const Ptr<const T2> Cast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.");
       return (T2*) ptr;
     }
+
+    /// Dynamically cast this Ptr to another type; throw an assert of the cast fails.
     template <typename T2> Ptr<T2> DynamicCast() {
       emp_assert(dynamic_cast<T2*>(ptr) != nullptr);
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.");
       return (T2*) ptr;
     }
+
+    /// Get the unique ID associated with this pointer.
     size_t GetID() const { return id; }
 
     template <typename... T>
