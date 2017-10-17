@@ -6,7 +6,9 @@
  *  @file  combos.h
  *  @brief Tools to step through combinations of items.
  *
- *  Step through all combinations of size K from a set of N values.
+ *  Step through all combinations of size K from a set of N values.  For ComboIDs just return the
+ *  indecies (the specific of the container don't matter).  Other versions will directly wrapper
+ *  containers.
  *
  *  @todo Allow a minimum and maximum combo size, not just a fixed combo size.  If no sizes are
  *        specifed, all sizes should be explored (all possible combinations).
@@ -50,11 +52,14 @@ namespace emp {
     const emp::vector<size_t> & Reset();
     bool NextCombo();
     void ResizeCombos(size_t new_size);
-    ComboIDs & operator++() { NextCombo(); return *this; }
-    ComboIDs & operator++(int) { NextCombo(); return *this; }
 
     // Deal with inversions...
     emp::vector<size_t> GetInverseCombo();
+
+    // Make sure obvious operators also work plus standatd library compatability.
+    ComboIDs & operator++() { NextCombo(); return *this; }
+    ComboIDs & operator++(int) { NextCombo(); return *this; }
+    size_t size() { return num_combos; }
   };
 
   ComboIDs::ComboIDs(size_t in_max, size_t combo_size)
