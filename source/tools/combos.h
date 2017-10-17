@@ -20,9 +20,9 @@
 #ifndef EMP_COMBOS_H
 #define EMP_COMBOS_H
 
-#include <assert.h>
 #include <iostream>
 
+#include "../base/assert.h"
 #include "../base/vector.h"
 
 namespace emp {
@@ -66,7 +66,7 @@ namespace emp {
     : max_count(in_max), cur_combo(combo_size), max_combo(combo_size),
       num_combos(CountCombos(in_max, combo_size))
   {
-    assert(combo_size <= in_max);
+    emp_assert(combo_size <= in_max);
     const size_t diff = in_max - combo_size;
     for (size_t i = 0; i < cur_combo.size(); i++) {
       cur_combo[i] = i;
@@ -109,7 +109,7 @@ namespace emp {
 
   void ComboIDs::ResizeCombos(size_t new_size)
   {
-    assert(new_size < max_count);
+    emp_assert(new_size < max_count);
 
     // Reset internal state...
     cur_combo.resize(new_size);
