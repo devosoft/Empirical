@@ -27,49 +27,51 @@ namespace emp {
 
   class ComboIDs {
   private:
-    int max_count;
-    emp::vector<int> cur_combo;
-    emp::vector<int> max_combo;
-    int num_combos;
+    size_t max_count;
+    emp::vector<size_t> cur_combo;
+    emp::vector<size_t> max_combo;
+    size_t num_combos;
 
-    static int CountCombos(int max_count, int combo_size);
+    static size_t CountCombos(size_t max_count, size_t combo_size);
   public:
-    ComboIDs(int in_max, int combo_size);
+    ComboIDs(size_t in_max, size_t combo_size);
     ~ComboIDs() { ; }
 
     // Accessors
-    const emp::vector<int> & GetCombo() const { return cur_combo; }
-    const emp::vector<int> & GetMaxCombo() const { return max_combo; }
-    int GetComboSize() const { return cur_combo.size(); }
-    int GetNumCombos() const { return num_combos; }
+    const emp::vector<size_t> & GetCombo() const { return cur_combo; }
+    const emp::vector<size_t> & GetMaxCombo() const { return max_combo; }
+    size_t GetComboSize() const { return cur_combo.size(); }
+    size_t GetNumCombos() const { return num_combos; }
 
-    int & operator[](const int index) { return cur_combo[index];  }
-    const int & operator[](const int index) const { return cur_combo[index];  }
+    size_t & operator[](const size_t index) { return cur_combo[index];  }
+    const size_t & operator[](const size_t index) const { return cur_combo[index];  }
 
     // General Use manipulatros
-    const emp::vector<int> & Reset();
+    const emp::vector<size_t> & Reset();
     bool NextCombo();
-    void ResizeCombos(int new_size);
+    void ResizeCombos(size_t new_size);
+    ComboIDs & operator++() { NextCombo(); return *this; }
+    ComboIDs & operator++(int) { NextCombo(); return *this; }
 
     // Deal with inversions...
-    emp::vector<int> GetInverseCombo();
+    emp::vector<size_t> GetInverseCombo();
   };
 
-  ComboIDs::ComboIDs(int in_max, int combo_size)
+  ComboIDs::ComboIDs(size_t in_max, size_t combo_size)
     : max_count(in_max), cur_combo(combo_size), max_combo(combo_size),
       num_combos(CountCombos(in_max, combo_size))
   {
     assert(combo_size <= in_max);
-    const int diff = in_max - combo_size;
-    for (int i = 0; i < cur_combo.size(); i++) {
+    const size_t diff = in_max - combo_size;
+    for (size_t i = 0; i < cur_combo.size(); i++) {
       cur_combo[i] = i;
       max_combo[i] = i+diff;
     }
   }
 
-  const emp::vector<int> & ComboIDs::Reset()
+  const emp::vector<size_t> & ComboIDs::Reset()
   {
-    for (int i = 0; i < cur_combo.size(); i++) {
+    for (size_t i = 0; i < cur_combo.size(); i++) {
       cur_combo[i] = i;
     }
     return cur_combo;
@@ -77,7 +79,7 @@ namespace emp {
 
   bool ComboIDs::NextCombo()
   {
-    int inc_pos = cur_combo.size() - 1;
+    size_t inc_pos = cur_combo.size() - 1;
     cur_combo[inc_pos]++;
 
     // Increase the first position that we can without it going over the max.
@@ -93,14 +95,14 @@ namespace emp {
     }
 
     // Update all of the positions after the current one.
-    for (int i = inc_pos + 1; i < cur_combo.size(); i++) {
+    for (size_t i = inc_pos + 1; i < cur_combo.size(); i++) {
       cur_combo[i] = cur_combo[i-1] + 1;
     }
 
     return true;
   }
 
-  void ComboIDs::ResizeCombos(int new_size)
+  void ComboIDs::ResizeCombos(size_t new_size)
   {
     assert(new_size < max_count);
 
@@ -109,22 +111,22 @@ namespace emp {
     max_combo.resize(new_size);
     num_combos = CountCombos(max_count, new_size);
 
-    const int diff = max_count - new_size;
-    for (int i = 0; i < new_size; i++) {
+    const size_t diff = max_count - new_size;
+    for (size_t i = 0; i < new_size; i++) {
       cur_combo[i] = i;
       max_combo[i] = i+diff;
     }
   }
 
 
-  emp::vector<int> ComboIDs::GetInverseCombo()
+  emp::vector<size_t> ComboIDs::GetInverseCombo()
   {
-    int inverse_size = max_count - cur_combo.size();
-    emp::vector<int> inverse_combo(inverse_size);
+    size_t inverse_size = max_count - cur_combo.size();
+    emp::vector<size_t> inverse_combo(inverse_size);
 
-    int norm_pos = 0;
-    int inv_pos = 0;
-    for (int i = 0; i < max_count; i++) {
+    size_t norm_pos = 0;
+    size_t inv_pos = 0;
+    for (size_t i = 0; i < max_count; i++) {
       if (norm_pos < cur_combo.size() && cur_combo[norm_pos] == i) {
         norm_pos++;  // Found in cur combo...
      } else inverse_combo[inv_pos++] = i;         // Not in cur; put in inverse.
@@ -133,13 +135,13 @@ namespace emp {
   }
 
 
-  int ComboIDs::CountCombos(int max_count, int combo_size)
+  size_t ComboIDs::CountCombos(size_t max_count, size_t combo_size)
   {
     if (combo_size * 2 > max_count) combo_size = max_count - combo_size;
 
-    int choose_product = 1;
-    int total_product = 1;
-    for (int i = 0; i < combo_size; i++) {
+    size_t choose_product = 1;
+    size_t total_product = 1;
+    for (size_t i = 0; i < combo_size; i++) {
       choose_product *= i+1;
       total_product *= max_count - i;
     }
