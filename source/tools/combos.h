@@ -10,7 +10,6 @@
  *
  *  @todo Allow a minimum and maximum combo size, not just a fixed combo size.  If no sizes are
  *        specifed, all sizes should be explored (all possible combinations).
- *  @todo Rename cComboCounter to ComboIDs
  *  @todo Create a ComboGenerator template to take a container and generate all combinations
  *  @todo Create a combos function that will build a ComboGenerator for the container type
  *        passed in.
@@ -26,7 +25,7 @@
 
 namespace emp {
 
-  class cComboCounter {
+  class ComboIDs {
   private:
     int max_count;
     emp::vector<int> cur_combo;
@@ -35,8 +34,8 @@ namespace emp {
 
     static int CountCombos(int max_count, int combo_size);
   public:
-    cComboCounter(int in_max, int combo_size);
-    ~cComboCounter() { ; }
+    ComboIDs(int in_max, int combo_size);
+    ~ComboIDs() { ; }
 
     // Accessors
     const emp::vector<int> & GetCombo() const { return cur_combo; }
@@ -56,7 +55,7 @@ namespace emp {
     emp::vector<int> GetInverseCombo();
   };
 
-  cComboCounter::cComboCounter(int in_max, int combo_size)
+  ComboIDs::ComboIDs(int in_max, int combo_size)
     : max_count(in_max), cur_combo(combo_size), max_combo(combo_size),
       num_combos(CountCombos(in_max, combo_size))
   {
@@ -68,7 +67,7 @@ namespace emp {
     }
   }
 
-  const emp::vector<int> & cComboCounter::Reset()
+  const emp::vector<int> & ComboIDs::Reset()
   {
     for (int i = 0; i < cur_combo.size(); i++) {
       cur_combo[i] = i;
@@ -76,7 +75,7 @@ namespace emp {
     return cur_combo;
   }
 
-  bool cComboCounter::NextCombo()
+  bool ComboIDs::NextCombo()
   {
     int inc_pos = cur_combo.size() - 1;
     cur_combo[inc_pos]++;
@@ -101,7 +100,7 @@ namespace emp {
     return true;
   }
 
-  void cComboCounter::ResizeCombos(int new_size)
+  void ComboIDs::ResizeCombos(int new_size)
   {
     assert(new_size < max_count);
 
@@ -118,7 +117,7 @@ namespace emp {
   }
 
 
-  emp::vector<int> cComboCounter::GetInverseCombo()
+  emp::vector<int> ComboIDs::GetInverseCombo()
   {
     int inverse_size = max_count - cur_combo.size();
     emp::vector<int> inverse_combo(inverse_size);
@@ -134,7 +133,7 @@ namespace emp {
   }
 
 
-  int cComboCounter::CountCombos(int max_count, int combo_size)
+  int ComboIDs::CountCombos(int max_count, int combo_size)
   {
     if (combo_size * 2 > max_count) combo_size = max_count - combo_size;
 
