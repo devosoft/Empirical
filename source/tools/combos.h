@@ -1,16 +1,25 @@
-#ifndef COMBO_COUNTER_H
-#define COMBO_COUNTER_H
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  combos.h
+ *  @brief Tools to step through combinations of items.
+ */
+
+#ifndef EMP_COMBOS_H
+#define EMP_COMBOS_H
 
 #include <assert.h>
 #include <iostream>
 
-#include "tArray.h"
+#include "../base/vector.h"
 
 class cComboCounter {
 private:
   int max_count;
-  tArray<int> cur_combo;
-  tArray<int> max_combo;
+  emp::vector<int> cur_combo;
+  emp::vector<int> max_combo;
   int num_combos;
 
   static int CountCombos(int max_count, int combo_size);
@@ -19,21 +28,21 @@ public:
   ~cComboCounter() { ; }
 
   // Accessors
-  const tArray<int> & GetCombo() const { return cur_combo; }
-  const tArray<int> & GetMaxCombo() const { return max_combo; }
-  int GetComboSize() const { return cur_combo.GetSize(); }
+  const emp::vector<int> & GetCombo() const { return cur_combo; }
+  const emp::vector<int> & GetMaxCombo() const { return max_combo; }
+  int GetComboSize() const { return cur_combo.size(); }
   int GetNumCombos() const { return num_combos; }
 
   int & operator[](const int index) { return cur_combo[index];  }
   const int & operator[](const int index) const { return cur_combo[index];  }
 
   // General Use manipulatros
-  const tArray<int> & Reset();
+  const emp::vector<int> & Reset();
   bool NextCombo();
   void ResizeCombos(int new_size);
 
   // Deal with inversions...
-  tArray<int> GetInverseCombo();
+  emp::vector<int> GetInverseCombo();
 };
 
 cComboCounter::cComboCounter(int in_max, int combo_size)
@@ -42,15 +51,15 @@ cComboCounter::cComboCounter(int in_max, int combo_size)
 {
   assert(combo_size <= in_max);
   const int diff = in_max - combo_size;
-  for (int i = 0; i < cur_combo.GetSize(); i++) {
+  for (int i = 0; i < cur_combo.size(); i++) {
     cur_combo[i] = i;
     max_combo[i] = i+diff;
   }
 }
 
-const tArray<int> & cComboCounter::Reset()
+const emp::vector<int> & cComboCounter::Reset()
 {
-  for (int i = 0; i < cur_combo.GetSize(); i++) {
+  for (int i = 0; i < cur_combo.size(); i++) {
     cur_combo[i] = i;
   }
   return cur_combo;
@@ -58,7 +67,7 @@ const tArray<int> & cComboCounter::Reset()
 
 bool cComboCounter::NextCombo()
 {
-  int inc_pos = cur_combo.GetSize() - 1;
+  int inc_pos = cur_combo.size() - 1;
   cur_combo[inc_pos]++;
 
   // Increase the first position that we can without it going over the max.
@@ -74,7 +83,7 @@ bool cComboCounter::NextCombo()
   }
 
   // Update all of the positions after the current one.
-  for (int i = inc_pos + 1; i < cur_combo.GetSize(); i++) {
+  for (int i = inc_pos + 1; i < cur_combo.size(); i++) {
     cur_combo[i] = cur_combo[i-1] + 1;
   }
 
@@ -86,8 +95,8 @@ void cComboCounter::ResizeCombos(int new_size)
   assert(new_size < max_count);
 
   // Reset internal state...
-  cur_combo.Resize(new_size);
-  max_combo.Resize(new_size);
+  cur_combo.resize(new_size);
+  max_combo.resize(new_size);
   num_combos = CountCombos(max_count, new_size);
 
   const int diff = max_count - new_size;
@@ -98,15 +107,15 @@ void cComboCounter::ResizeCombos(int new_size)
 }
 
 
-tArray<int> cComboCounter::GetInverseCombo()
+emp::vector<int> cComboCounter::GetInverseCombo()
 {
-  int inverse_size = max_count - cur_combo.GetSize();
-  tArray<int> inverse_combo(inverse_size);
+  int inverse_size = max_count - cur_combo.size();
+  emp::vector<int> inverse_combo(inverse_size);
 
   int norm_pos = 0;
   int inv_pos = 0;
   for (int i = 0; i < max_count; i++) {
-    if (norm_pos < cur_combo.GetSize() && cur_combo[norm_pos] == i) {
+    if (norm_pos < cur_combo.size() && cur_combo[norm_pos] == i) {
       norm_pos++;  // Found in cur combo...
    } else inverse_combo[inv_pos++] = i;         // Not in cur; put in inverse.
   }
