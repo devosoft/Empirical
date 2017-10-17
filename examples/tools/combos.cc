@@ -11,15 +11,14 @@
 
 int main()
 {
-  emp::cComboCounter combos(7,4);
+  emp::ComboIDs combos(7,4);
   const size_t num_combos = combos.GetNumCombos();
   std::cout << "Num combos = " << num_combos << std::endl;
 
-  for (int i = 0; i < num_combos; i++) {
-    auto cur_combo = combos.GetCombo();
-    for (int j = 0; j < cur_combo.size(); j++) std::cout << " " << cur_combo[j];
+  for (size_t i = 0; i < num_combos; i++) {
+    for (size_t j = 0; j < combos.GetComboSize(); j++) std::cout << " " << combos[j];
     std::cout << std::endl;
-    combos.NextCombo();
+    ++combos;
   }
 
   std::cout << "Temp." << std::endl;
