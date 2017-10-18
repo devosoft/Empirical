@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file Ptr.h
+ *  @file vector.h
  *  @brief A drop-in wrapper for std::vector; adds on bounds checking in debug mode.
  *  @note Status: BETA
  *
