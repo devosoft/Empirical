@@ -343,7 +343,10 @@ namespace emp {
 
     bool Any() const {
       const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) if (bit_set[i]) return true; return false;
+      for (size_t i = 0; i < NUM_FIELDS; i++) {
+        if (bit_set[i]) return true;
+      }
+      return false;
     }
     bool None() const { return !Any(); }
     bool All() const { return (~(*this)).None(); }
