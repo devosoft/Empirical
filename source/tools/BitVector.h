@@ -452,10 +452,11 @@ namespace emp {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = 0U;
     }
 
-    // Set all bits to 1.
+    /// Set all bits to 1.
     void SetAll() {
       const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(0U);
+      constexpr field_t all0 = 0;
+      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~all0;
       if (LastBitID() > 0) { bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID()); }
     }
 
