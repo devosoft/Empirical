@@ -14,6 +14,7 @@
 #include "tools/BitVector.h"
 #include "tools/Random.h"
 
+#include "math/LinAlg.h"
 #include "opengl/glcanvas.h"
 
 EMP_BUILD_CONFIG(
@@ -26,12 +27,6 @@ EMP_BUILD_CONFIG(
   VALUE(TEST, std::string, "TestString", "This is a test string."))
 
 using BitOrg = emp::BitVector;
-
-// float vertices[] = {
-//     0.0f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f,  // Vertex 1 (X, Y)
-//     0.5f,  -0.5f, 1.0f, 0.0f, 1.0f, 1.0f,  // Vertex 2 (X, Y)
-//     -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f   // Vertex 3 (X, Y)
-// };
 
 const char* vertexSource = R"glsl(
     attribute vec2 position;
@@ -100,6 +95,8 @@ namespace gl = emp::opengl;
 
 int main(int argc, char* argv[]) {
   gl::GLCanvas canvas;
+
+  auto q = emp::math::Quat<float>::rotation(0, 0, 1, 5);
 
   auto shaderProgram = canvas.makeShaderProgram(vertexSource, fragmentSource);
   shaderProgram.use();
