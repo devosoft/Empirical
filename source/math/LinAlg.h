@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <array>
+#include <ostream>
 
 #include "base/assert.h"
 
@@ -11,6 +12,21 @@ namespace emp {
   namespace math {
     template <typename F, std::size_t R, std::size_t C>
     class Mat;
+
+    namespace internal {
+      template <std::size_t R, std::size_t C, typename F, std::size_t... I>
+      constexpr std::array<F, R * C> unfoldArrayImpl(
+        const std::array<std::array<F, C>, R>& data,
+        const std::index_sequence<I...>&) {
+        return {data[I / C, I % C]...};
+      }
+      template <std::size_t R, std::size_t C, typename F>
+      constexpr decltype(auto) unfoldArray(
+        const std::array<std::array<F, C>, R>& data) {
+        return unfoldArrayImpl(data, std::make_index_sequence<R * C>{});
+      }
+
+    }  // namespace internal
 
     template <std::size_t R, std::size_t C>
     class MatUtils {
@@ -111,7 +127,20 @@ namespace emp {
 
       constexpr F* data() noexcept { return ref; }
       constexpr const F* data() const noexcept { return ref; }
+
+      constexpr decltype(auto) begin() const { return ref; }
+      constexpr decltype(auto) end() const { return ref + D; }
     };
+
+    template <typename F, std::size_t D>
+    std::ostream& operator<<(std::ostream& out, const Row<F, D>& row) {
+      out << "{";
+      for (std::size_t i = 0; i < D; ++i) {
+        out << row[i];
+        if (i != D - 1) out << " ";
+      }
+      return out << "}";
+    }
 
     template <typename F, std::size_t D>
     class Col {
@@ -205,6 +234,12 @@ namespace emp {
         return arrayData[r * columns + c];
       }
 
+      constexpr F& operator()(std::size_t r, std::size_t c) {
+        emp_assert(r < rows, "rows out of bounds");
+        emp_assert(c < columns, "columns out of bounds");
+        return arrayData[r * columns + c];
+      }
+
       constexpr Row<const F, C> row(std::size_t r) const {
         emp_assert(r < rows, "rows out of bounds");
         return Row<const F, C>(&arrayData[r * columns]);
@@ -225,6 +260,33 @@ namespace emp {
         return Col<F, R>(&arrayData[c]);
       }
 
+      template <typename I>
+      constexpr auto operator[](I&& r) const ->
+        typename std::enable_if<C != 1,
+                                decltype(this->row(std::forward<I>(r)))>::type {
+        return row(std::forward<I>(r));
+      }
+
+      template <typename I>
+      constexpr auto operator[](I&& r) ->
+        typename std::enable_if<C != 1,
+                                decltype(this->row(std::forward<I>(r)))>::type {
+        return row(std::forward<I>(r));
+      }
+
+      template <typename I>
+      constexpr auto operator[](I&& r) const ->
+        typename std::enable_if<C == 1, decltype((*this)(std::forward<I>(r),
+                                                         0))>::type {
+        return (*this)(std::forward<I>(r), 0);
+      }
+      template <typename I>
+      constexpr auto operator[](I&& r) ->
+        typename std::enable_if<C == 1, decltype((*this)(std::forward<I>(r),
+                                                         0))>::type {
+        return (*this)(std::forward<I>(r), 0);
+      }
+
       constexpr F* data() noexcept { return arrayData.data(); }
       constexpr const F* data() const noexcept { return arrayData.data(); }
 
@@ -232,7 +294,28 @@ namespace emp {
         return MatUtils<C, R>::generate(
           [this](std::size_t r, std::size_t c) { return (*this)(c, r); });
       }
+
+      template <typename G = F>
+      constexpr bool feq(const Mat<G, R, C>& other,
+                         const G& tolerance = 0.0001) const {
+        for (std::size_t i = 0; i < rows * columns; ++i) {
+          if (abs(arrayData[i] - other.data()[i]) > tolerance) {
+            return false;
+          }
+        }
+
+        return true;
+      }
     };  // class Mat
+
+    template <typename F, std::size_t R, std::size_t C>
+    std::ostream& operator<<(std::ostream& out, const Mat<F, R, C>& mat) {
+      out << "{" << std::endl;
+      for (std::size_t i = 0; i < R; ++i) {
+        out << "\t" << mat[i] << "\n";
+      }
+      return out << "}";
+    }
 
     // Define the dot product
     template <typename F1, typename F2, std::size_t D>
