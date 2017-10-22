@@ -25,7 +25,7 @@ CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../source/web/
 
 TARGETS := SimpleWindow
 
-EVO_DEPEND := ../../source/Evo/World.h
+EVO_DEPEND := ../../source/opengl/glcanvas.h ../../source/opengl/glwrap.h ../../source/opengl/shaders.h ../../source/math/consts.h ../../source/math/LinAlg.h
 
 default: native
 
