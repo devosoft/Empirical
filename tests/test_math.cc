@@ -97,10 +97,10 @@ TEST_CASE("Test Quaternions", "[math]") {
     0.f, 1.f, 0.f,  0.f,  // row 3
     0.f, 0.f, 0.f,  1.f,  // row 4
   };
-  std::cout << Quat<float>::rotation(consts::pi<float> / 2,
-                                     Mat<float, 3, 1>{1.f, 0.f, 0.f})
-                 .rotMat()
-            << std::endl;
+  REQUIRE((Quat<float>::rotation(consts::pi<float> / 2,
+                                 Mat<float, 3, 1>{1.f, 0.f, 0.f})
+             .rotMat())
+            .feq(rot));
   auto r = Mat<float, 1, 4>{1.f, 0.f, 0.f, 1.f};
   REQUIRE((r * (Quat<float>::rotation(consts::pi<float> / 2,
                                       Mat<float, 3, 1>{1.f, 0.f, 0.f})

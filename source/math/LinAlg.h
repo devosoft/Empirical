@@ -489,17 +489,17 @@ namespace emp {
 
       constexpr Mat<T, 4, 4> rotMat() const {
         return {
-          x * x + y * y - z * z - w * w,
-          2 * y * z - 2 * x * w,
-          2 * y * w + 2 * x * z,
+          1 - 2 * (y * y + z * z),
+          2 * (x * y - w * z),
+          2 * (x * z + w * y),
           T{0},  // row 1
-          2 * y * z + 2 * x * w,
-          x * x - y * y + z * z - w * w,
-          2 * z * w - 2 * x * y,
+          2 * (x * y + w * z),
+          1 - 2 * (x * x + z * z),
+          2 * (y * z - w * x),
           T{0},  // row 2
-          2 * y * w - 2 * x * z,
-          2 * z * w + 2 * x * y,
-          x * x - y * y - z * z + w * w,
+          2 * (x * z - w * y),
+          2 * (y * z + w * x),
+          1 - 2 * (x * x + y * y),
           T{0},  // row 3
           T{0},
           T{0},
