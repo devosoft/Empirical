@@ -184,7 +184,8 @@ namespace emp {
 
       // Mask out any bits that have left-shifted away
       const size_t last_bit_id = LastBitID();
-      if (last_bit_id) { bit_set[NUM_FIELDS - 1] &= (1U << last_bit_id) - 1U; }
+      constexpr field_t val_one = 1;
+      if (last_bit_id) { bit_set[NUM_FIELDS - 1] &= (val_one << last_bit_id) - val_one; }
     }
 
 
@@ -356,7 +357,8 @@ namespace emp {
       emp_assert(index < num_bits, index, num_bits);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
-      const field_t pos_mask = static_cast<field_t>(1) << pos_id;
+      constexpr field_t val_one = 1;
+      const field_t pos_mask = val_one << pos_id;
 
       if (value) bit_set[field_id] |= pos_mask;
       else       bit_set[field_id] &= ~pos_mask;
@@ -532,7 +534,8 @@ namespace emp {
       if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
 
       const size_t pos_found = find_bit(bit_set[field_id]);
-      bit_set[field_id] &= ~(1U << pos_found);
+      constexpr field_t val_one = 1;
+      bit_set[field_id] &= ~(val_one << pos_found);
       return (int) (pos_found + (field_id * FIELD_BITS));
     }
 
