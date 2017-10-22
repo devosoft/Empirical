@@ -369,7 +369,7 @@ namespace emp {
     template <typename F>
     using Mat4x4 = Mat<F, 4, 4>;
 
-    namespace gl {
+    namespace proj {
       Mat<float, 4, 4> ortho(float left, float right, float bottom, float top,
                              float near, float far) {
         return Mat<float, 4, 4>{
@@ -392,8 +392,151 @@ namespace emp {
         };
       }
 
-    }  // namespace gl
-  }    // namespace math
+    }  // namespace proj
+
+    template <typename T>
+    class Quat {
+      public:
+      using value_type = T;
+
+      T w, x, y, z;
+
+      constexpr Quat() : w(1), x(0), y(0), z(0) {}
+      constexpr Quat(T w, T x, T y, T z) : w(w), x(x), y(y), z(z) {}
+
+      template <typename A, typename Vx, typename Vy, typename Vz>
+      static Quat rotation(const A& angle, const Vx& vx, const Vy& vy,
+                           const Vz& vz) {
+        auto mag = sqrt(vx * vx + vy * vy + vz * vz);
+        auto nvx = vx / mag;
+        auto nvy = vy / mag;
+        auto nvz = vz / mag;
+
+        // TODO: implement constexpr cos, sin
+        auto w = cos(angle / 2);
+        auto b = sin(angle / 2);
+        return {static_cast<T>(w), static_cast<T>(b * nvx),
+                static_cast<T>(b * nvy), static_cast<T>(b * nvz)};
+      }
+
+      template <typename A, typename V = Mat<A, 3, 1>>
+      static decltype(auto) rotation(const A& angle, const V& v) {
+        return rotation(angle, v[0], v[1], v[2]);
+      }
+
+      template <typename A, typename V>
+      static decltype(auto) rotation(const A& angle, const Mat<V, 3, 1>& v) {
+        return rotation(angle, v(0, 0), v(1, 0), v(2, 0));
+      }
+
+      template <typename A, typename V>
+      static decltype(auto) rotation(const A& angle, const Mat<V, 1, 3>& v) {
+        return rotation(angle, v(0, 0), v(0, 1), v(0, 2));
+      }
+
+      constexpr Quat(const Quat&) = default;
+      constexpr Quat(Quat&&) = default;
+      constexpr Quat& operator=(const Quat&) = default;
+      constexpr Quat& operator=(Quat&&) = default;
+
+      template <typename T2>
+      constexpr bool operator==(const Quat<T2>& other) const {
+        return w == other.w && x == other.x && y == other.y && z == other.z;
+      }
+
+      template <typename T2 = T>
+      constexpr bool feq(const Quat<T2>& other,
+                         const T2& tolerance = 0.0001) const {
+        return abs(w - other.w) <= tolerance && abs(x - other.x) <= tolerance &&
+               abs(y - other.y) <= tolerance && abs(z - other.z) <= tolerance;
+      }
+
+      constexpr decltype(auto) operator[](std::size_t i) const {
+        emp_assert(i <= 4, "Index out of bounds");
+
+        if (i == 0) return w;
+        if (i == 1) return x;
+        if (i == 2) return y;
+        if (i == 3) return z;
+      }
+
+      constexpr T& operator[](std::size_t i) {
+        emp_assert(i <= 4, "Index out of bounds");
+
+        if (i == 0) return w;
+        if (i == 1) return x;
+        if (i == 2) return y;
+        if (i == 3) return z;
+      }
+
+      constexpr decltype(auto) operator()(std::size_t i) const {
+        return (*this)[i];
+      }
+
+      constexpr T& operator()(std::size_t i) { return (*this)[i]; }
+
+      template <typename T2>
+      constexpr Quat& operator*=(const Quat<T2>& other) {
+        return *this = *this * other;
+      }
+
+      template <typename T2>
+      constexpr Quat& operator*=(const T2& scalar) {
+        return *this = *this * scalar;
+      }
+
+      constexpr auto magSq() const { return x * x + y * y + z * z + w * w; }
+
+      constexpr Mat<T, 4, 4> rotMat() const {
+        return {
+          x * x + y * y - z * z - w * w,
+          2 * y * z - 2 * x * w,
+          2 * y * w + 2 * x * z,
+          T{0},  // row 1
+          2 * y * z + 2 * x * w,
+          x * x - y * y + z * z - w * w,
+          2 * z * w - 2 * x * y,
+          T{0},  // row 2
+          2 * y * w - 2 * x * z,
+          2 * z * w + 2 * x * y,
+          x * x - y * y - z * z + w * w,
+          T{0},  // row 3
+          T{0},
+          T{0},
+          T{0},
+          T{1}  // row 4};
+        };
+      }
+    };
+
+    template <typename T1, typename T2>
+    constexpr auto operator*(const Quat<T1>& a, const Quat<T2>& b) {
+      auto w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z;
+      auto x = a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y;
+      auto y = a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x;
+      auto z = a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w;
+
+      return Quat<decltype(x)>(w, x, y, z);
+    }
+
+    template <typename T1, typename T2>
+    constexpr auto operator*(const Quat<T1>& a, const T2& scalar) {
+      return Quat<decltype(a.x * scalar)>(a.w * scalar, a.x * scalar,
+                                          a.y * scalar, a.z * scalar);
+    }
+
+    template <typename T1, typename T2>
+    constexpr auto operator*(const T1& scalar, const Quat<T2>& q) {
+      return Quat<decltype(scalar * q.x)>(scalar * q.x, scalar * q.y,
+                                          scalar * q.z, scalar * q.w);
+    }
+
+    template <typename T>
+    std::ostream& operator<<(std::ostream& out, const Quat<T>& q) {
+      return out << q.w << " + " << q.x << "i + " << q.y << "j + " << q.z
+                 << "k";
+    }
+  }  // namespace math
 
 }  // namespace emp
 
