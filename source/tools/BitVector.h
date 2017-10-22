@@ -540,6 +540,10 @@ namespace emp {
     }
 
     /// Return the position of the first one after start_pos; return -1 if no ones in vector.
+    /// You can loop through all 1-bit positions of a BitVector "bv" with:
+    ///
+    ///   for (pos = bv.FindBit(); pos >= 0; pos = bv.FindBit(pos+1)) { ... }
+
     int FindBit(const size_t start_pos) const {
       if (start_pos >= num_bits) return -1;
       size_t field_id  = FieldID(start_pos);     // What field do we start in?
