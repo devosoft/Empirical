@@ -2,6 +2,7 @@
 #include "third-party/Catch/single_include/catch.hpp"
 
 #include "math/LinAlg.h"
+#include "math/consts.h"
 
 constexpr std::size_t rowsCheckGenerator(std::size_t r, std::size_t) {
   return r + 1;
@@ -53,4 +54,55 @@ TEST_CASE("Test Matrices", "[math]") {
                                       1u, 2u, 3u,  // row 2
                                       1u, 2u, 3u   // row 3
                                     }));
+}
+
+TEST_CASE("Test Quaternions", "[math]") {
+  emp::math::Quat<int> a{1, 2, 3, 4};
+
+  REQUIRE(a * a == Quat<int>(-28, 4, 6, 8));
+  REQUIRE((a *= a) == Quat<int>(-28, 4, 6, 8));
+  REQUIRE((a * 0.5) == Quat<double>(-14, 2, 3, 4));
+  REQUIRE((a *= 2) == Quat<double>(-56, 8, 12, 16));
+  REQUIRE(Quat<float>::rotation(1.f, 1.f, 0.f, 0.f)
+            .feq({0.8775826, 0.4794255, 0, 0}));
+
+  REQUIRE(Quat<float>::rotation(consts::pi<float>, {1.f, 0.f, 0.f})
+            .feq({0, 1, 0, 0}));
+  REQUIRE(Quat<float>::rotation(2 * consts::pi<float>, {1.f, 0.f, 0.f})
+            .feq({-1, 0, 0, 0}));
+  REQUIRE(Quat<float>::rotation(consts::pi<float>, {0.f, 1.f, 0.f})
+            .feq({0, 0, 1, 0}));
+
+  REQUIRE(Quat<float>::rotation(consts::pi<float> / 2, {1.f, 1.f, 0.f})
+            .feq({0.7071068f, 0.5f, 0.5f, 0}));
+
+  // std::cout << Quat<float>::rotation(consts::pi<float> / 2,
+  //                                    Mat<float, 3, 1>{1.f, 0.f, 0.f})
+  //                .rotMat()
+  //           << std::endl
+  //           << std::endl;
+
+  // std::cout << Mat4x4<float>{
+  //                          1.f, 0.f, 0.f, 0.f,  // row 1
+  //                          0.f, 0.f, -1.f,
+  //                          0.f,                 // row 2
+  //                          0.f, 1.f, 0.f, 0.f,  // row 3
+  //                          0.f, 0.f, 0.f, 1.f,  // row 4
+  //                        } << std::endl;
+
+  auto rot = Mat4x4<float>{
+    1.f, 0.f, 0.f,  0.f,  // row 1
+    0.f, 0.f, -1.f,
+    0.f,                  // row 2
+    0.f, 1.f, 0.f,  0.f,  // row 3
+    0.f, 0.f, 0.f,  1.f,  // row 4
+  };
+  std::cout << Quat<float>::rotation(consts::pi<float> / 2,
+                                     Mat<float, 3, 1>{1.f, 0.f, 0.f})
+                 .rotMat()
+            << std::endl;
+  auto r = Mat<float, 1, 4>{1.f, 0.f, 0.f, 1.f};
+  REQUIRE((r * (Quat<float>::rotation(consts::pi<float> / 2,
+                                      Mat<float, 3, 1>{1.f, 0.f, 0.f})
+                  .rotMat())) == r);
 }
