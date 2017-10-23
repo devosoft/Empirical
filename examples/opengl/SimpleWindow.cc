@@ -77,23 +77,16 @@ int main(int argc, char* argv[]) {
   vao.bind();
   vao.getBuffer<gl::BufferType::Array>().push(
     {
-      -50.5f,  100.5f,  1.0f, 1.0f, 1.0f, 1.0f,  // Vertex 1 (X, Y)
+      -100.5f, 100.5f,  1.0f, 1.0f, 1.0f, 1.0f,  // Vertex 1 (X, Y)
       100.5f,  100.5f,  1.0f, 0.0f, 1.0f, 1.0f,  // Vertex 2 (X, Y)
       100.5f,  -100.5f, 1.0f, 1.0f, 0.0f, 1.0f,  // Vertex 3 (X, Y)
       -100.5f, -100.5f, 1.0f, 1.0f, 1.0f, 1.0f,  // Vertex 3 (X, Y)
     },
     gl::BufferUsage::StaticDraw);
 
-  auto modelId = glGetUniformLocation(shaderProgram, "model");
-  constexpr auto model = Mat4x4<float>::identity();
-  glUniformMatrix4fv(modelId, 1, GL_FALSE, model.data());
-  auto viewId = glGetUniformLocation(shaderProgram, "view");
-  constexpr auto view = Mat4x4<float>::identity();
-  glUniformMatrix4fv(viewId, 1, GL_FALSE, view.data());
-  auto projId = glGetUniformLocation(shaderProgram, "proj");
-  auto proj = proj::ortho(-200, 200, -200, 200, 0, 1).transpose();
-  std::cout << proj << std::endl;
-  glUniformMatrix4fv(projId, 1, GL_FALSE, proj.data());
+  shaderProgram.uniform("model").set(Mat4x4f::translation(0, 10));
+  shaderProgram.uniform("view").set(Mat4x4f::identity());
+  shaderProgram.uniform("proj").set(proj::ortho(-200, 200, -200, 200, 0, 1));
 
   vao.getBuffer<gl::BufferType::ElementArray>().push(
     {
@@ -102,7 +95,7 @@ int main(int argc, char* argv[]) {
     },
     gl::BufferUsage::StaticDraw);
 
-  canvas.runForever([](auto&&) {
+  canvas.runForever([&](auto&&) {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

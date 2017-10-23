@@ -32,6 +32,22 @@ namespace emp {
         return i == j ? F{1} : F{0};
       };
 
+      template <typename To, typename From>
+      constexpr To convertImpl(From&& from, const std::true_type&) {
+        return std::forward<From>(from);
+      }
+
+      template <typename To, typename From>
+      constexpr To convertImpl(From&& from, const std::false_type&) {
+        return To{std::forward<From>(from)};
+      }
+
+      template <typename To, typename From>
+      constexpr To convert(From&& from) {
+        return convertImpl<To>(std::forward<From>(from),
+                               std::is_convertible<From, To>{});
+      }
+
     }  // namespace internal
 
     namespace internal {
@@ -225,7 +241,7 @@ namespace emp {
 
       public:
       template <typename G, typename... Args>
-      constexpr static Mat fromGenerator(G&& callback, Args&&... args) {
+      constexpr static Mat from(G&& callback, Args&&... args) {
         return gen(std::forward<G>(callback),
                    std::make_index_sequence<rows * columns - 1>{},
                    std::forward<Args>(args)...);
@@ -234,11 +250,24 @@ namespace emp {
       static constexpr Mat identity() {
         static_assert(R == C, "Identity matrices must be square");
 
-        return Mat::fromGenerator(&internal::ident<F>);
+        return Mat::from(&internal::ident<F>);
+      }
+
+      template <typename X = F, typename Y = F, typename Z = F>
+      static constexpr Mat translation(X&& x, Y&& y, Z&& z = Z{0}) {
+        static_assert(R == 4 && C == 4,
+                      "Homogenous coordinate translation matrices must be 4x4");
+        return {
+          1, 0, 0, std::forward<X>(x),  // row 1
+          0, 1, 0, std::forward<Y>(y),  // row 2
+          0, 0, 1, std::forward<Z>(z),  // row 3
+          0, 0, 0, 1,                   // row 4
+        };
       }
 
       template <typename... Args>
-      constexpr Mat(Args&&... args) : arrayData{std::forward<Args>(args)...} {
+      constexpr Mat(Args&&... args)
+        : arrayData{internal::convert<F>(std::forward<Args>(args))...} {
         static_assert(
           sizeof...(Args) == rows * columns,
           "Invalid number of arguments for a matrix of the given size");
@@ -400,22 +429,28 @@ namespace emp {
         return (*this)(std::forward<I>(r), 0);
       }
 
+      /// A pointer to the raw array that this matrix is wrapping
       constexpr F* data() noexcept {
         // Waiting for std::array::data() to get constexpr in c++17
         // return arrayData.data();
         return arrayData;
       }
+
+      /// A pointer to the raw array that this matrix is wrapping
       constexpr const F* data() const noexcept {
         // Waiting for std::array::data() to get constexpr in c++17
         // return arrayData.data();
         return arrayData;
       }
 
+      /// Gets the transpose of this matrix
       constexpr auto transpose() const {
         // TODO: handle constexprs?
-        return Mat<F, C, R>::fromGenerator(internal::MatrixTranspose{}, *this);
+        return Mat<F, C, R>::from(internal::MatrixTranspose{}, *this);
       }
 
+      /// Checks for equality of two matrices with a tolerance. Useful for
+      /// comparing floating point matrices
       template <typename H = F>
       constexpr bool feq(const Mat<H, R, C>& other,
                          const H& tolerance = 0.0001) const {
@@ -428,6 +463,8 @@ namespace emp {
         return true;
       }
 
+      /// Finds the squared magnitude of this row or column vector. Using this
+      /// on a non-vector matrix will result in a compile time error.
       constexpr decltype(auto) magSq() const {
         static_assert(R == 1 || C == 1,
                       "A matrix must be a column matrix or a row matrix to "
@@ -435,11 +472,15 @@ namespace emp {
         return internal::dotProduct<R * C>(arrayData, arrayData);
       }
 
+      /// Finds the magnitude of this row or column vector. Using this on a
+      /// non-vector matrix will result in a compile time error.
       constexpr decltype(auto) mag() const { return sqrt(magSq()); }
 
+      /// Normalizes the row or column vector such that its magnitude is 1.
       constexpr Mat<F, R, C> normalized() const {
         return (F{1} / mag()) * (*this);
       }
+
     };  // class Mat
 
     template <typename F, std::size_t R, std::size_t C>
@@ -493,20 +534,20 @@ namespace emp {
       using Field = decltype(std::declval<F1>() * std::declval<F2>() +
                              std::declval<F1>() * std::declval<F2>());
 
-      // return Mat<Field, R, C>::fromGenerator(
+      // return Mat<Field, R, C>::from(
       //   [a, b](std::size_t r, std::size_t c) { return a.row(r) * b.col(c);
       //   });
-      return Mat<Field, R, C>::fromGenerator(internal::MatrixMult{}, a, b);
+      return Mat<Field, R, C>::from(internal::MatrixMult{}, a, b);
     }
 
     template <typename F, std::size_t R, std::size_t C>
     constexpr auto operator*(const Mat<F, R, C>& mat, const F& s) {
-      return Mat<F, R, C>::fromGenerator(internal::RightScalarMult{}, mat, s);
+      return Mat<F, R, C>::from(internal::RightScalarMult{}, mat, s);
     }
 
     template <typename F, std::size_t R, std::size_t C>
     constexpr auto operator*(const F& s, const Mat<F, R, C>& mat) {
-      return Mat<F, R, C>::fromGenerator(internal::LeftScalarMult{}, mat, s);
+      return Mat<F, R, C>::from(internal::LeftScalarMult{}, mat, s);
     }
 
 #define MAT_SHORT(R, C)                                       \

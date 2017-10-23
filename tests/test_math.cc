@@ -23,7 +23,7 @@ using namespace emp::math;
   }
 
 TEST_CASE("Test Matrices", "[math]") {
-  constexpr auto rowsCheck = Mat3x3s::fromGenerator(&rowsCheckGenerator);
+  constexpr auto rowsCheck = Mat3x3s::from(&rowsCheckGenerator);
 
   CONST_REQUIRE_EQ(rowsCheck, (Mat3x3s{
                                 1u, 1u, 1u,  // row 1

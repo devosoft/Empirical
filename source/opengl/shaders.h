@@ -1,12 +1,26 @@
 #ifndef SHADERS_H
 #define SHADERS_H
 
-#include "shaders.h"
-
 #include <iostream>
+#include "defaultUniforms.h"
 
 namespace emp {
   namespace opengl {
+
+    class Uniform {
+      private:
+      GLint handle;
+
+      public:
+      Uniform(GLint handle) : handle(handle) {}
+      operator GLint() const { return handle; }
+
+      template <typename T>
+      void set(T&& value) {
+        setUniform(handle, std::forward<T>(value));
+      }
+    };
+
     enum class ShaderType : GLenum {
       Vertex = GL_VERTEX_SHADER,
       Fragment = GL_FRAGMENT_SHADER,
@@ -191,6 +205,10 @@ namespace emp {
         using attribs = VertexAttributes<T>;
         return getAttribute(name, attribs::size, attribs::type,
                             std::forward<Args>(args)...);
+      }
+
+      Uniform uniform(const std::string& name) const {
+        return glGetUniformLocation(handle, name.c_str());
       }
     };
   }  // namespace opengl
