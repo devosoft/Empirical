@@ -442,6 +442,9 @@ namespace emp {
     /// Return true if ALL bits are set to 1, otherwise return false.
     bool All() const { return (~(*this)).None(); }
 
+    /// Casting a bit array to bool identifies if ANY bits are set to 1.
+    operator bool() const { return Any(); }
+
     /// Const index operator -- return the bit at the specified position.
     bool operator[](size_t index) const { return Get(index); }
 
@@ -542,7 +545,7 @@ namespace emp {
     /// Return the position of the first one after start_pos; return -1 if no ones in vector.
     /// You can loop through all 1-bit positions of a BitVector "bv" with:
     ///
-    ///   for (pos = bv.FindBit(); pos >= 0; pos = bv.FindBit(pos+1)) { ... }
+    ///   for (int pos = bv.FindBit(); pos >= 0; pos = bv.FindBit(pos+1)) { ... }
 
     int FindBit(const size_t start_pos) const {
       if (start_pos >= num_bits) return -1;
