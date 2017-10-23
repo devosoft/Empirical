@@ -32,11 +32,15 @@ const char* vertexSource = R"glsl(
     attribute vec2 position;
     attribute vec4 color;
 
+    uniform mat4 model;
+    uniform mat4 view;
+    uniform mat4 proj;
+
     varying vec4 fcolor;
 
     void main()
     {
-        gl_Position = vec4(position, 0.0, 1.0);
+        gl_Position = proj * view * model * vec4(position, 0.0, 1.0);
         fcolor = color;
     }
 )glsl";
@@ -50,48 +54,8 @@ const char* fragmentSource = R"glsl(
     }
 )glsl";
 
-// struct Test {
-//   emp::web::Document doc;
-//
-//   Test() : doc("doc") {
-//     std::cout << "Starting up..." << std::endl;
-//     NKConfig config;
-//     // config.Read("NK.cfg");
-//
-//     const uint32_t N = config.N();
-//     const uint32_t K = config.K();
-//
-//     emp::Random random(config.SEED());
-//     emp::NKLandscape landscape(N, K, random);
-//
-//     BitOrg start(N);
-//     for (uint32_t j = 0; j < N; j++) start[j] = random.P(0.5);
-//
-//     auto fitnessLandscape = CreateFitnessLandscape<BitOrg>(
-//       [N, &landscape](const BitOrg& root) {
-//         std::vector<BitOrg> neighbors;
-//         neighbors.reserve(N);
-//
-//         for (size_t i = 0; i < N; ++i) {
-//           auto neighbor = root;
-//           neighbor.Set(i, !root.Get(i));
-//
-//           neighbors.push_back(neighbor);
-//         }
-//         return neighbors;
-//       },
-//       [&](const BitOrg& org) { return landscape.GetFitness(org); });
-//     std::cout << "Displaying fitnessLandscape..." << std::endl;
-//
-//     auto fitnessNeighborhood =
-//     fitnessLandscape.GetFitnessNeighborhood(start); doc <<
-//     SimpleDisplayForFitnessNeighborhood("fn", fitnessNeighborhood);
-//   }
-// };
-//
-// Test test;
-
 namespace gl = emp::opengl;
+using namespace emp::math;
 
 int main(int argc, char* argv[]) {
   gl::GLCanvas canvas;
@@ -119,6 +83,18 @@ int main(int argc, char* argv[]) {
       -100.5f, -100.5f, 1.0f, 1.0f, 1.0f, 1.0f,  // Vertex 3 (X, Y)
     },
     gl::BufferUsage::StaticDraw);
+
+  auto modelId = glGetUniformLocation(shaderProgram, "model");
+  constexpr auto model = Mat4x4<float>::identity();
+  glUniformMatrix4fv(modelId, 1, GL_FALSE, model.data());
+  auto viewId = glGetUniformLocation(shaderProgram, "view");
+  constexpr auto view = Mat4x4<float>::identity();
+  glUniformMatrix4fv(viewId, 1, GL_FALSE, view.data());
+  auto projId = glGetUniformLocation(shaderProgram, "proj");
+  auto proj = proj::ortho(-200, 200, -200, 200, 0, 1).transpose();
+  std::cout << proj << std::endl;
+  glUniformMatrix4fv(projId, 1, GL_FALSE, proj.data());
+
   vao.getBuffer<gl::BufferType::ElementArray>().push(
     {
       0, 1, 2,  // First Triangle
