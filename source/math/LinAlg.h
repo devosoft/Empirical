@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <array>
 #include <ostream>
+#include <stdexcept>
 
 #include "base/assert.h"
 
@@ -18,7 +19,7 @@ namespace emp {
       constexpr std::array<F, R * C> unfoldArrayImpl(
         const std::array<std::array<F, C>, R>& data,
         const std::index_sequence<I...>&) {
-        return {data[I / C, I % C]...};
+        return {data(I / C, I % C)...};
       }
       template <std::size_t R, std::size_t C, typename F>
       constexpr decltype(auto) unfoldArray(
@@ -26,35 +27,12 @@ namespace emp {
         return unfoldArrayImpl(data, std::make_index_sequence<R * C>{});
       }
 
+      template <typename F>
+      constexpr F ident(size_t i, size_t j) {
+        return i == j ? F{1} : F{0};
+      };
+
     }  // namespace internal
-
-    template <std::size_t R, std::size_t C>
-    class MatUtils {
-      private:
-      template <std::size_t... S, typename G>
-      constexpr static auto genMatImpl(const std::index_sequence<S...>&,
-                                       G&& generator)
-        -> Mat<decltype(generator(std::declval<std::size_t>(),
-                                  std::declval<std::size_t>())),
-               R, C> {
-        return {generator(S / C, S % C)...};
-      }
-
-      template <typename T>
-      static constexpr T identGenerator(std::size_t r, std::size_t c) {
-        return r == c ? T{1} : T{0};
-      }
-
-      public:
-      template <typename G>
-      constexpr static decltype(auto) generate(G&& generator) {
-        return genMatImpl(std::make_index_sequence<R * C>{},
-                          std::forward<G>(generator));
-      }
-
-      template <typename T>
-      constexpr static auto identity{generate(&identGenerator<T>)};
-    };
 
     namespace internal {
       template <typename A, typename B, std::size_t I>
@@ -75,6 +53,37 @@ namespace emp {
       constexpr decltype(auto) dotProduct(const A& a, const B& b) {
         return dotProductImpl(a, b, std::make_index_sequence<N>{});
       }
+
+      struct MatrixMult {
+        template <typename A, typename B>
+        constexpr auto operator()(std::size_t r, std::size_t c, A&& a,
+                                  B&& b) const {
+          return std::forward<A>(a).row(r) * std::forward<B>(b).col(c);
+        }
+      };
+
+      struct MatrixTranspose {
+        template <typename M>
+        constexpr auto operator()(std::size_t r, std::size_t c, M&& m) const {
+          return std::forward<M>(m)(c, r);
+        }
+      };
+
+      struct RightScalarMult {
+        template <typename M, typename S>
+        constexpr auto operator()(std::size_t r, std::size_t c, M&& mat,
+                                  S&& s) const {
+          return std::forward<M>(mat)(r, c) * std::forward<S>(s);
+        }
+      };
+
+      struct LeftScalarMult {
+        template <typename M, typename S>
+        constexpr auto operator()(std::size_t r, std::size_t c, M&& mat,
+                                  S&& s) const {
+          return std::forward<S>(s) * std::forward<M>(mat)(r, c);
+        }
+      };
 
     }  // namespace internal
 
@@ -201,11 +210,35 @@ namespace emp {
       static constexpr auto columns = C;
 
       protected:
-      std::array<F, rows * columns> arrayData;
+      // This needs to wait until c++17 so that arrayData.data() is constexpr
+      // std::array<F, rows * columns> arrayData;
+      F arrayData[rows * columns];
+
+      private:
+      template <typename G, typename... Args, std::size_t... I>
+      constexpr static Mat gen(G&& callback, const std::index_sequence<I...>&,
+                               Args&&... args) {
+        return {callback(I / columns, I % columns, args...)...,
+                std::forward<G>(callback)(rows - 1, columns - 1,
+                                          std::forward<Args>(args)...)};
+      }
 
       public:
+      template <typename G, typename... Args>
+      constexpr static Mat fromGenerator(G&& callback, Args&&... args) {
+        return gen(std::forward<G>(callback),
+                   std::make_index_sequence<rows * columns - 1>{},
+                   std::forward<Args>(args)...);
+      }
+
+      static constexpr Mat identity() {
+        static_assert(R == C, "Identity matrices must be square");
+
+        return Mat::fromGenerator(&internal::ident<F>);
+      }
+
       template <typename... Args>
-      constexpr Mat(Args&&... args) : arrayData{{std::forward<Args>(args)...}} {
+      constexpr Mat(Args&&... args) : arrayData{std::forward<Args>(args)...} {
         static_assert(
           sizeof...(Args) == rows * columns,
           "Invalid number of arguments for a matrix of the given size");
@@ -215,6 +248,62 @@ namespace emp {
       constexpr Mat(Mat&&) = default;
       Mat& operator=(const Mat&) = default;
       Mat& operator=(Mat&&) = default;
+
+      constexpr decltype(auto) x() const {
+        static_assert((R >= 1 && C == 1) || (R == 1 && C >= 1),
+                      "A matrix must be a row matrix or a column matrix with "
+                      "at least one entry to have an x component");
+        return arrayData[0];
+      }
+
+      constexpr F& x() {
+        static_assert((R >= 1 && C == 1) || (R == 1 && C >= 1),
+                      "A matrix must be a row matrix or a column matrix with "
+                      "at least one entry to have an x component");
+        return arrayData[0];
+      }
+
+      constexpr decltype(auto) y() const {
+        static_assert((R >= 2 && C == 1) || (R == 1 && C >= 2),
+                      "A matrix must be a row matrix or a column matrix with "
+                      "at least two entries to have an y component");
+        return arrayData[1];
+      }
+
+      constexpr F& y() {
+        static_assert((R >= 2 && C == 1) || (R == 1 && C >= 2),
+                      "A matrix must be a row matrix or a column matrix with "
+                      "at least two entries to have an y component");
+        return arrayData[1];
+      }
+
+      constexpr decltype(auto) z() const {
+        static_assert((R >= 3 && C == 1) || (R == 1 && C >= 3),
+                      "A matrix must be a row matrix or a column matrix with "
+                      "at least three entries to have an z component");
+        return arrayData[2];
+      }
+
+      constexpr F& z() {
+        static_assert((R >= 3 && C == 1) || (R == 1 && C >= 3),
+                      "A matrix must be a row matrix or a column matrix with "
+                      "at least three entries to have an z component");
+        return arrayData[2];
+      }
+
+      constexpr decltype(auto) w() const {
+        static_assert((R >= 4 && C == 1) || (R == 1 && C >= 4),
+                      "A matrix must be a row matrix or a column matrix with "
+                      "at least four entries to have an w component");
+        return arrayData[3];
+      }
+
+      constexpr F& w() {
+        static_assert((R >= 4 && C == 1) || (R == 1 && C >= 4),
+                      "A matrix must be a row matrix or a column matrix with "
+                      "at least four entries to have an w component");
+        return arrayData[3];
+      }
 
       template <typename G>
       constexpr bool operator==(const Mat<G, R, C>& other) const {
@@ -229,34 +318,58 @@ namespace emp {
       // Why do (i, j) and not [i][j]? See
       // https://isocpp.org/wiki/faq/operator-overloading#matrix-subscript-op
       constexpr decltype(auto) operator()(std::size_t r, std::size_t c) const {
-        emp_assert(r < rows, "rows out of bounds");
-        emp_assert(c < columns, "columns out of bounds");
+        if (r >= rows) {
+          throw std::out_of_range("rows out of bounds");
+        }
+        if (c >= columns) {
+          throw std::out_of_range("columns out of bounds");
+        }
+        // emp_assert(r < rows, "rows out of bounds");
+        // emp_assert(c < columns, "columns out of bounds");
         return arrayData[r * columns + c];
       }
 
       constexpr F& operator()(std::size_t r, std::size_t c) {
-        emp_assert(r < rows, "rows out of bounds");
-        emp_assert(c < columns, "columns out of bounds");
+        if (r >= rows) {
+          throw std::out_of_range("rows out of bounds");
+        }
+        if (c >= columns) {
+          throw std::out_of_range("columns out of bounds");
+        }
+        // emp_assert(r < rows, "rows out of bounds");
+        // emp_assert(c < columns, "columns out of bounds");
         return arrayData[r * columns + c];
       }
 
       constexpr Row<const F, C> row(std::size_t r) const {
-        emp_assert(r < rows, "rows out of bounds");
+        if (r >= rows) {
+          throw std::out_of_range("rows out of bounds");
+        }
+        // emp_assert(r < rows, "rows out of bounds");
         return Row<const F, C>(&arrayData[r * columns]);
       }
 
       constexpr Row<F, C> row(std::size_t r) {
-        emp_assert(r < rows, "rows out of bounds");
+        if (r >= rows) {
+          throw std::out_of_range("rows out of bounds");
+        }
+        // emp_assert(r < rows, "rows out of bounds");
         return Row<F, C>(&arrayData[r * columns]);
       }
 
       constexpr Col<const F, R> col(std::size_t c) const {
-        emp_assert(c < columns, "columns out of bounds");
+        if (c >= columns) {
+          throw std::out_of_range("columns out of bounds");
+        }
+        // emp_assert(c < columns, "columns out of bounds");
         return Col<const F, R>(&arrayData[c]);
       }
 
       constexpr Col<F, R> col(std::size_t c) {
-        emp_assert(c < columns, "columns out of bounds");
+        if (c >= columns) {
+          throw std::out_of_range("columns out of bounds");
+        }
+        // emp_assert(c < columns, "columns out of bounds");
         return Col<F, R>(&arrayData[c]);
       }
 
@@ -287,17 +400,25 @@ namespace emp {
         return (*this)(std::forward<I>(r), 0);
       }
 
-      constexpr F* data() noexcept { return arrayData.data(); }
-      constexpr const F* data() const noexcept { return arrayData.data(); }
-
-      constexpr auto transpose() const {
-        return MatUtils<C, R>::generate(
-          [this](std::size_t r, std::size_t c) { return (*this)(c, r); });
+      constexpr F* data() noexcept {
+        // Waiting for std::array::data() to get constexpr in c++17
+        // return arrayData.data();
+        return arrayData;
+      }
+      constexpr const F* data() const noexcept {
+        // Waiting for std::array::data() to get constexpr in c++17
+        // return arrayData.data();
+        return arrayData;
       }
 
-      template <typename G = F>
-      constexpr bool feq(const Mat<G, R, C>& other,
-                         const G& tolerance = 0.0001) const {
+      constexpr auto transpose() const {
+        // TODO: handle constexprs?
+        return Mat<F, C, R>::fromGenerator(internal::MatrixTranspose{}, *this);
+      }
+
+      template <typename H = F>
+      constexpr bool feq(const Mat<H, R, C>& other,
+                         const H& tolerance = 0.0001) const {
         for (std::size_t i = 0; i < rows * columns; ++i) {
           if (abs(arrayData[i] - other.data()[i]) > tolerance) {
             return false;
@@ -305,6 +426,19 @@ namespace emp {
         }
 
         return true;
+      }
+
+      constexpr decltype(auto) magSq() const {
+        static_assert(R == 1 || C == 1,
+                      "A matrix must be a column matrix or a row matrix to "
+                      "have a magnitude");
+        return internal::dotProduct<R * C>(arrayData, arrayData);
+      }
+
+      constexpr decltype(auto) mag() const { return sqrt(magSq()); }
+
+      constexpr Mat<F, R, C> normalized() const {
+        return (F{1} / mag()) * (*this);
       }
     };  // class Mat
 
@@ -356,18 +490,110 @@ namespace emp {
     template <typename F1, typename F2, std::size_t R, std::size_t C,
               std::size_t M>
     constexpr auto operator*(const Mat<F1, R, M>& a, const Mat<F2, M, C>& b) {
-      return MatUtils<R, C>::generate(
-        [a, b](std::size_t r, std::size_t c) { return a.row(r) * b.col(c); });
+      using Field = decltype(std::declval<F1>() * std::declval<F2>() +
+                             std::declval<F1>() * std::declval<F2>());
+
+      // return Mat<Field, R, C>::fromGenerator(
+      //   [a, b](std::size_t r, std::size_t c) { return a.row(r) * b.col(c);
+      //   });
+      return Mat<Field, R, C>::fromGenerator(internal::MatrixMult{}, a, b);
     }
 
-    template <typename F>
-    using Mat2x2 = Mat<F, 2, 2>;
+    template <typename F, std::size_t R, std::size_t C>
+    constexpr auto operator*(const Mat<F, R, C>& mat, const F& s) {
+      return Mat<F, R, C>::fromGenerator(internal::RightScalarMult{}, mat, s);
+    }
 
-    template <typename F>
-    using Mat3x3 = Mat<F, 3, 3>;
+    template <typename F, std::size_t R, std::size_t C>
+    constexpr auto operator*(const F& s, const Mat<F, R, C>& mat) {
+      return Mat<F, R, C>::fromGenerator(internal::LeftScalarMult{}, mat, s);
+    }
 
-    template <typename F>
-    using Mat4x4 = Mat<F, 4, 4>;
+#define MAT_SHORT(R, C)                                       \
+  template <typename F>                                       \
+  using Mat##R##x##C = Mat<F, R, C>;                          \
+  using Mat##R##x##C##f = Mat##R##x##C<float>;                \
+  using Mat##R##x##C##d = Mat##R##x##C<double>;               \
+  using Mat##R##x##C##i = Mat##R##x##C<int>;                  \
+  using Mat##R##x##C##l = Mat##R##x##C<long>;                 \
+  using Mat##R##x##C##ll = Mat##R##x##C<long long>;           \
+  using Mat##R##x##C##u = Mat##R##x##C<unsigned>;             \
+  using Mat##R##x##C##ul = Mat##R##x##C<unsigned long>;       \
+  using Mat##R##x##C##ull = Mat##R##x##C<unsigned long long>; \
+  using Mat##R##x##C##s = Mat##R##x##C<std::size_t>;
+
+#define VEC_SHORT(D)                                    \
+  template <typename F>                                 \
+  using ColVec##D = Mat<F, D, 1>;                       \
+  using ColVec##D##f = ColVec##D<float>;                \
+  using ColVec##D##d = ColVec##D<double>;               \
+  using ColVec##D##i = ColVec##D<int>;                  \
+  using ColVec##D##l = ColVec##D<long>;                 \
+  using ColVec##D##ll = ColVec##D<long long>;           \
+  using ColVec##D##u = ColVec##D<unsigned>;             \
+  using ColVec##D##ul = ColVec##D<unsigned long>;       \
+  using ColVec##D##ull = ColVec##D<unsigned long long>; \
+  using ColVec##D##s = ColVec##D<std::size_t>;          \
+  template <typename F>                                 \
+  using RowVec##D = Mat<F, 1, D>;                       \
+  using RowVec##D##f = RowVec##D<float>;                \
+  using RowVec##D##d = RowVec##D<double>;               \
+  using RowVec##D##i = RowVec##D<int>;                  \
+  using RowVec##D##l = RowVec##D<long>;                 \
+  using RowVec##D##ll = RowVec##D<long long>;           \
+  using RowVec##D##u = RowVec##D<unsigned>;             \
+  using RowVec##D##ul = RowVec##D<unsigned long>;       \
+  using RowVec##D##ull = RowVec##D<unsigned long long>; \
+  using RowVec##D##s = RowVec##D<std::size_t>;          \
+  template <typename F>                                 \
+  using Vec##D = ColVec##D<F>;                          \
+  using Vec##D##f = ColVec##D<float>;                   \
+  using Vec##D##d = ColVec##D<double>;                  \
+  using Vec##D##i = ColVec##D<int>;                     \
+  using Vec##D##l = ColVec##D<long>;                    \
+  using Vec##D##ll = ColVec##D<long long>;              \
+  using Vec##D##u = ColVec##D<unsigned>;                \
+  using Vec##D##ul = ColVec##D<unsigned long>;          \
+  using Vec##D##ull = ColVec##D<unsigned long long>;    \
+  using Vec##D##s = ColVec##D<std::size_t>;
+
+    MAT_SHORT(1, 1);
+    MAT_SHORT(2, 1);
+    MAT_SHORT(3, 1);
+    MAT_SHORT(4, 1);
+
+    MAT_SHORT(1, 2);
+    MAT_SHORT(2, 2);
+    MAT_SHORT(3, 2);
+    MAT_SHORT(4, 2);
+
+    MAT_SHORT(1, 3);
+    MAT_SHORT(2, 3);
+    MAT_SHORT(3, 3);
+    MAT_SHORT(4, 3);
+
+    MAT_SHORT(1, 4);
+    MAT_SHORT(2, 4);
+    MAT_SHORT(3, 4);
+    MAT_SHORT(4, 4);
+
+    VEC_SHORT(1);
+    VEC_SHORT(2);
+    VEC_SHORT(3);
+    VEC_SHORT(4);
+
+    template <typename M1 = Mat<float, 1, 3>, typename M2 = M1>
+    constexpr Mat<decltype(std::declval<typename M1::value_type>() *
+                             std::declval<typename M2::value_type>() -
+                           std::declval<typename M1::value_type>() *
+                             std::declval<typename M2::value_type>()),
+                  3, 1>
+    cross(const M1& v1, const M2& v2) {
+      return {v1.y() * v2.z() - v1.z() * v2.y(),
+              v1.z() * v2.x() - v1.x() * v2.z(),
+              v1.x() * v2.y() - v1.y() * v2.x()};
+    }
+
 
     namespace proj {
       Mat<float, 4, 4> ortho(float left, float right, float bottom, float top,
