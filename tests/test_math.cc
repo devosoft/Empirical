@@ -22,6 +22,19 @@ using namespace emp::math;
     REQUIRE(__x);           \
   }
 
+template <typename... Args>
+constexpr decltype(auto) selfSumTest(Args&&... args) {
+  auto v = Vec2i{std::forward<Args>(args)...};
+  v += v;
+  return v;
+}
+template <typename... Args>
+constexpr decltype(auto) selfMultTest(Args&&... args) {
+  auto v = Vec2i{std::forward<Args>(args)...};
+  v *= 2;
+  return v;
+}
+
 TEST_CASE("Test Matrices", "[math]") {
   constexpr auto rowsCheck = Mat3x3s::from(&rowsCheckGenerator);
 
@@ -61,17 +74,18 @@ TEST_CASE("Test Matrices", "[math]") {
                                             12u, 12u, 12u,  // row 2
                                             18u, 18u, 18u   // row 3
                                           }));
-  CONST_REQUIRE_EQ(rowsCheck.transpose(), (Mat3x3s{
-                                            1u, 2u, 3u,  // row 1
-                                            1u, 2u, 3u,  // row 2
-                                            1u, 2u, 3u   // row 3
-                                          }));
+  CONST_REQUIRE_EQ(rowsCheck.transposed(), (Mat3x3s{
+                                             1u, 2u, 3u,  // row 1
+                                             1u, 2u, 3u,  // row 2
+                                             1u, 2u, 3u   // row 3
+                                           }));
 
   CONST_REQUIRE(cross({1.f, 2.f, 3.f}, {4.f, 5.f, 6.f}).feq({-3.f, 6.f, -3.f}));
   CONST_REQUIRE_EQ((Vec3i{1, 2, 3}).magSq(), 14);
   // TODO: implement constexpr sqrt
   // CONST_REQUIRE_EQ((Vec2i{3, 4}).mag(), 5);
   REQUIRE((Vec2i{3, 4}).mag() == 5);
+  CONST_REQUIRE_EQ(selfSumTest(3, 4), selfMultTest(3, 4));
 }
 
 TEST_CASE("Test Quaternions", "[math]") {

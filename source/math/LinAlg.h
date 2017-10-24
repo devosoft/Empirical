@@ -79,6 +79,14 @@ namespace emp {
         }
       };
 
+      struct MatrixAdd {
+        template <typename A, typename B>
+        constexpr auto operator()(std::size_t r, std::size_t c, A&& a,
+                                  B&& b) const {
+          return std::forward<A>(a)(r, c) + std::forward<B>(b)(r, c);
+        }
+      };
+
       struct MatrixTranspose {
         template <typename M>
         constexpr auto operator()(std::size_t r, std::size_t c, M&& m) const {
@@ -222,6 +230,8 @@ namespace emp {
     template <typename F, std::size_t R, std::size_t C>
     class Mat {
       public:
+      static_assert(R >= 0 && C >= 0 && (R != 1 || C != 1),
+                    "Matrix is too small");
       using value_type = F;
       static constexpr auto rows = R;
       static constexpr auto columns = C;
@@ -266,11 +276,13 @@ namespace emp {
         };
       }
 
-      template <typename... Args>
-      constexpr Mat(Args&&... args)
-        : arrayData{internal::convert<F>(std::forward<Args>(args))...} {
+      template <typename H1, typename H2, typename... Args>
+      constexpr Mat(H1&& h1, H2&& h2, Args&&... args)
+        : arrayData{internal::convert<F>(std::forward<H1>(h1)),
+                    internal::convert<F>(std::forward<H2>(h2)),
+                    internal::convert<F>(std::forward<Args>(args))...} {
         static_assert(
-          sizeof...(Args) == rows * columns,
+          sizeof...(Args) + 2 == rows * columns,
           "Invalid number of arguments for a matrix of the given size");
       }
 
@@ -445,7 +457,7 @@ namespace emp {
       }
 
       /// Gets the transpose of this matrix
-      constexpr auto transpose() const {
+      constexpr auto transposed() const {
         // TODO: handle constexprs?
         return Mat<F, C, R>::from(internal::MatrixTranspose{}, *this);
       }
@@ -479,10 +491,35 @@ namespace emp {
 
       /// Normalizes the row or column vector such that its magnitude is 1.
       constexpr Mat<F, R, C> normalized() const {
-        return (F{1} / mag()) * (*this);
+        return (*this) * (F{1} / mag());
       }
 
-    };  // class Mat
+      /// Applies the given function to all the cells of the matrix
+      template <typename G, typename... Args>
+      constexpr Mat& apply(G&& callback, Args&&... args) {
+        for (std::size_t r = 0; r < rows - 1; ++r) {
+          for (std::size_t c = 0; c < columns; ++c) {
+            (*this)(r, c) = callback(r, c, *this, args...);
+          }
+        }
+        for (std::size_t c = 0; c < columns - 1; ++c) {
+          (*this)(rows - 1, c) = callback(rows - 1, c, *this, args...);
+        }
+        (*this)(rows - 1, columns - 1) = std::forward<G>(callback)(
+          rows - 1, columns - 1, *this, std::forward<Args>(args)...);
+        return *this;
+      }
+
+      template <typename M = Mat<F, R, C>>
+      constexpr Mat& operator+=(M&& other) {
+        return apply(internal::MatrixAdd{}, std::forward<M>(other));
+      }
+
+      constexpr Mat& operator*=(const F& scalar) {
+        return apply(internal::RightScalarMult{}, scalar);
+      }
+
+    };  // namespace math
 
     template <typename F, std::size_t R, std::size_t C>
     std::ostream& operator<<(std::ostream& out, const Mat<F, R, C>& mat) {
@@ -491,6 +528,13 @@ namespace emp {
         out << "\t" << mat[i] << "\n";
       }
       return out << "}";
+    }
+
+    template <typename F1, typename F2, std::size_t R, std::size_t C>
+    constexpr Mat<decltype(std::declval<F1>() + std::declval<F1>()), R, C>
+    operator+(const Mat<F1, R, C>& a, const Mat<F1, R, C>& b) {
+      return Mat<decltype(std::declval<F1>() + std::declval<F1>()), R, C>::from(
+        internal::MatrixAdd{}, a, b);
     }
 
     // Define the dot product
