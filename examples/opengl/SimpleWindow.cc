@@ -3,8 +3,6 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  This file explores the template defined in evo::Population.h with an NK
-//  landscape.
 
 #include <iostream>
 
