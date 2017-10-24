@@ -29,7 +29,7 @@ EMP_BUILD_CONFIG(
 using BitOrg = emp::BitVector;
 
 const char* vertexSource = R"glsl(
-    attribute vec2 position;
+    attribute vec3 position;
     attribute vec4 color;
 
     uniform mat4 model;
@@ -40,7 +40,7 @@ const char* vertexSource = R"glsl(
 
     void main()
     {
-        gl_Position = proj * view * model * vec4(position, 0.0, 1.0);
+        gl_Position = proj * view * model * vec4(position, 1.0);
         fcolor = color;
     }
 )glsl";
@@ -57,6 +57,11 @@ const char* fragmentSource = R"glsl(
 namespace gl = emp::opengl;
 using namespace emp::math;
 
+struct Vert {
+  Vec3f position;
+  float color[4];
+};
+
 int main(int argc, char* argv[]) {
   gl::GLCanvas canvas;
 
@@ -68,19 +73,17 @@ int main(int argc, char* argv[]) {
   gl::VertexArrayObject vao =
     canvas.makeVAO()
       .with(gl::BufferType::Array,
-            shaderProgram.attribute<float[2]>("position", false,
-                                              6 * sizeof(float), (void*)0),
-            shaderProgram.attribute<float[4]>("color", false, 6 * sizeof(float),
-                                              (void*)(2 * sizeof(float))))
+            shaderProgram.attribute("position", &Vert::position),
+            shaderProgram.attribute("color", &Vert::color))
       .with(gl::BufferType::ElementArray);
 
   vao.bind();
-  vao.getBuffer<gl::BufferType::Array>().push(
+  vao.getBuffer<gl::BufferType::Array>().set(
     {
-      -100.5f, 100.5f,  1.0f, 1.0f, 1.0f, 1.0f,  // Vertex 1 (X, Y)
-      100.5f,  100.5f,  1.0f, 0.0f, 1.0f, 1.0f,  // Vertex 2 (X, Y)
-      100.5f,  -100.5f, 1.0f, 1.0f, 0.0f, 1.0f,  // Vertex 3 (X, Y)
-      -100.5f, -100.5f, 1.0f, 1.0f, 1.0f, 1.0f,  // Vertex 3 (X, Y)
+      Vert{{-100, 100, 0}, {1.0f, 1.0f, 1.0f, 1.0f}},   // Vertex 1 (X, Y)
+      Vert{{100, 100, 0}, {1.0f, 0.0f, 1.0f, 1.0f}},    // Vertex 2 (X, Y)
+      Vert{{100, -100, 0}, {1.0f, 1.0f, 0.0f, 1.0f}},   // Vertex 3 (X, Y)
+      Vert{{-100, -100, 0}, {1.0f, 1.0f, 1.0f, 1.0f}},  // Vertex 3 (X, Y)
     },
     gl::BufferUsage::StaticDraw);
 
@@ -88,7 +91,7 @@ int main(int argc, char* argv[]) {
   shaderProgram.uniform("view").set(Mat4x4f::identity());
   shaderProgram.uniform("proj").set(proj::ortho(-200, 200, -200, 200, 0, 1));
 
-  vao.getBuffer<gl::BufferType::ElementArray>().push(
+  vao.getBuffer<gl::BufferType::ElementArray>().set(
     {
       0, 1, 2,  // First Triangle
       2, 3, 0   // Second Triangle

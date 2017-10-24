@@ -179,31 +179,45 @@ namespace emp {
       operator GLuint() const { return handle; }
       operator bool() const { return handle != 0; }
 
-      template <typename... Args>
       VertexAttribute getAttribute(const std::string& name,
                                    VertexAttributeSize size,
-                                   VertexAttributeType type, Args&&... args) {
+                                   VertexAttributeType type, GLsizei stride = 0,
+                                   const void* offset = nullptr) {
         auto loc = glGetAttribLocation(handle, name.c_str());
 
-        return VertexAttribute(loc, size, type, std::forward<Args>(args)...);
+        return VertexAttribute(loc, size, type, stride, offset);
       }
 
-      template <typename... Args>
       FloatingVertexAttribute getAttribute(const std::string& name,
                                            VertexAttributeSize size,
                                            FloatingVertexAttributeType type,
-                                           Args&&... args) {
+                                           GLsizei stride = 0,
+                                           const void* offset = nullptr,
+                                           bool normalized = false) {
         auto loc = glGetAttribLocation(handle, name.c_str());
 
-        return FloatingVertexAttribute(loc, size, type,
-                                       std::forward<Args>(args)...);
+        return FloatingVertexAttribute(loc, size, type, normalized, stride,
+                                       offset);
       }
 
       template <typename T, typename... Args>
-      FloatingVertexAttribute attribute(const std::string& name,
-                                        Args&&... args) {
+      decltype(auto) attribute(const std::string& name, Args&&... args) {
         using attribs = VertexAttributes<T>;
         return getAttribute(name, attribs::size, attribs::type,
+                            std::forward<Args>(args)...);
+      }
+
+      template <typename U, typename T, typename... Args>
+      decltype(auto) attribute(const std::string& name, T U::*member,
+                               Args&&... args) {
+        using attribs = VertexAttributes<T>;
+
+        auto offset =
+          reinterpret_cast<std::uintptr_t>(&(static_cast<U*>(0)->*member)) -
+          reinterpret_cast<std::uintptr_t>(static_cast<U*>(0));
+
+        return getAttribute(name, attribs::size, attribs::type, sizeof(U),
+                            reinterpret_cast<const void*>(offset),
                             std::forward<Args>(args)...);
       }
 

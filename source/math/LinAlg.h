@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 #include "base/assert.h"
+#include "opengl/VertexAttributes.h"
 
 namespace emp {
 
@@ -809,8 +810,40 @@ namespace emp {
       return out << q.w << " + " << q.x << "i + " << q.y << "j + " << q.z
                  << "k";
     }
+
   }  // namespace math
 
+  namespace opengl {
+    template <typename T, std::size_t D>
+    struct VertexAttributes<math::Mat<T, D, 1>> {
+      static_assert(
+        1 <= D && D <= 4,
+        "OpenGL only supports vectors with degrees between 1 and 4");
+
+      static_assert(VertexAttributeTypeOf<T>::supported,
+                    "OpenGL does not support vectors of this type!");
+
+      static constexpr VertexAttributeSize size =
+        static_cast<VertexAttributeSize>(D);
+
+      static constexpr auto type = VertexAttributeTypeOf<T>::type;
+    };
+
+    template <typename T, std::size_t D>
+    struct VertexAttributes<math::Mat<T, 1, D>> {
+      static_assert(
+        1 <= D && D <= 4,
+        "OpenGL only supports vectors with degrees between 1 and 4");
+
+      static_assert(VertexAttributeTypeOf<T>::supported,
+                    "OpenGL does not support vectors of this type!");
+
+      static constexpr VertexAttributeSize size =
+        static_cast<VertexAttributeSize>(D);
+
+      static constexpr auto type = VertexAttributeTypeOf<T>::type;
+    };
+  }  // namespace opengl
 }  // namespace emp
 
 #endif  // LIN_ALG_H
