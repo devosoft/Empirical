@@ -212,6 +212,11 @@ namespace emp {
                                Args&&... args) {
         using attribs = VertexAttributes<T>;
 
+#if !(defined(__clang__) || defined(__GNUC__))
+#pragma message( \
+  "ShaderProgram::attribute([attribute name], &[Class]::[member]) may not be supported on this compiler")
+#endif
+
         auto offset =
           reinterpret_cast<std::uintptr_t>(&(static_cast<U*>(0)->*member)) -
           reinterpret_cast<std::uintptr_t>(static_cast<U*>(0));
