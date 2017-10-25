@@ -688,17 +688,17 @@ namespace emp {
     }  // namespace camera
 
     namespace proj {
-      constexpr Mat<float, 4, 4> ortho(float left, float right, float bottom,
-                                       float top, float near, float far) {
+      constexpr Mat4x4f ortho(float minX, float minY, float maxX, float maxY,
+                              float near = 1, float far = -1) {
         return Mat<float, 4, 4>{
-          2.0f / (right - left),
+          2.0f / (maxX - minX),
           0.0f,
           0.0f,
-          -(right + left) / (right - left),  // row 1
+          -(maxX + minX) / (maxX - minX),  // row 1
           0.0f,
-          2.0f / (top - bottom),
+          2.0f / (maxY - minY),
           0.0f,
-          -(top + bottom) / (top - bottom),  // row 2
+          -(maxY + minY) / (maxY - minY),  // row 2
           0.0f,
           0.0f,
           -2.0f / (far - near),
@@ -708,6 +708,24 @@ namespace emp {
           0.0f,
           1.0f  // row 4
         };
+      }
+
+      template <typename... Args>
+      constexpr Mat4x4f ortho(float viewWidth, float viewHeight, float aspect,
+                              float near = 1, float far = -1) {
+        if (aspect < 1) {
+          viewHeight = viewWidth / aspect;
+        } else {
+          viewWidth = viewHeight * aspect;
+        }
+
+        std::cout << viewWidth << " x " << viewHeight << " " << aspect
+                  << std::endl;
+
+        auto dx = viewWidth / 2;
+        auto dy = viewHeight / 2;
+
+        return ortho(-dx, -dy, dx, dy, near, far);
       }
 
     }  // namespace proj
