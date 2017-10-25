@@ -25,8 +25,8 @@ namespace emp {
 
   /// Take any map, run find() member function, and return the result found
   /// (or default value if no results found).
-  template <class MAP_T, class KEY_T, class DEFAULT_T>
-  inline auto Find( const MAP_T & in_map, const KEY_T & key, const DEFAULT_T & dval) {
+  template <class MAP_T, class KEY_T>
+  inline auto Find( const MAP_T & in_map, const KEY_T & key, const typename MAP_T::mapped_type & dval) {
     auto val_it = in_map.find(key);
     if (val_it == in_map.end()) return dval;
     return val_it->second;
@@ -35,8 +35,8 @@ namespace emp {
 
   /// Take any map and element, run find() member function, and return a reference to
   /// the result found (or default value if no results found).
-  template <class MAP_T, class KEY_T, class DEFAULT_T>
-  inline const auto & FindRef( const MAP_T & in_map, const KEY_T & key, const DEFAULT_T & dval) {
+  template <class MAP_T, class KEY_T>
+  inline const auto & FindRef( const MAP_T & in_map, const KEY_T & key, const typename MAP_T::mapped_type & dval) {
     auto val_it = in_map.find(key);
     if (val_it == in_map.end()) return dval;
     return val_it->second;

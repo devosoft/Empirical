@@ -632,6 +632,15 @@ TEST_CASE("Test map_utils", "[tools]")
   auto flipped = emp::flip_map(test_map);        // Make sure we can reverse the map.
   REQUIRE( emp::Has(flipped, 'u') == true);      // And the reversed map should have proper info.
   REQUIRE( emp::Has(flipped, 'x') == false);
+
+  // Testing for bug #123
+  std::map<std::string, std::string> test_123;
+  test_123["1"] = "1";
+  test_123["12"] = "12";
+
+  REQUIRE( emp::Find(test_123, "0", "nothing") == "nothing" );
+  REQUIRE( emp::Find(test_123, "1", "nothing") == "1" );
+  REQUIRE( emp::FindRef(test_123, "1", "nothing") == "1" );
 }
 
 TEST_CASE("Test math", "[tools]")
