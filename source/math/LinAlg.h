@@ -710,22 +710,57 @@ namespace emp {
         };
       }
 
-      template <typename... Args>
-      constexpr Mat4x4f ortho(float viewWidth, float viewHeight, float aspect,
-                              float near = 1, float far = -1) {
-        if (aspect < 1) {
-          viewHeight = viewWidth / aspect;
+      constexpr Mat4x4f orthoFromScreen(float viewWidth, float viewHeight,
+                                        float screenWidth, float screenHeight,
+                                        float near = -10, float far = 10) {
+        float aspect = screenWidth / screenHeight;
+
+        if (aspect >= 1.0) {
+          viewHeight = viewWidth * aspect;
         } else {
-          viewWidth = viewHeight * aspect;
+          viewWidth = viewHeight / aspect;
         }
 
-        std::cout << viewWidth << " x " << viewHeight << " " << aspect
-                  << std::endl;
+        std::cout << viewWidth << " x " << viewHeight << std::endl;
 
         auto dx = viewWidth / 2;
         auto dy = viewHeight / 2;
 
         return ortho(-dx, -dy, dx, dy, near, far);
+      }
+
+      constexpr Mat4x4f perspective(float minX, float minY, float maxX,
+                                    float maxY, float near = 1,
+                                    float far = -1) {
+        return Mat4x4f{
+          2 * near / (maxX - minX),
+          0,
+          0,
+          -(maxX + minX) / (maxX - minX),  // row 1
+          0,
+          2 * near / (maxY - minY),
+          0,
+          0,  // row 2
+          (maxX + minX) / (maxX - minX),
+          (maxY + minY) / (maxY - minY),
+          -(far + near) / (far - near),
+          -1,  // row 3
+          0,
+          0,
+          -2 * far * near / (far - near),
+          0  // row 4
+        };
+      }
+
+      Mat4x4f perspectiveFOV(float fov, float width, float height, float near,
+                             float far) {
+        auto aspectRato = width / height;
+        auto maxY = std::atan(fov / 2) * near;
+        auto minY = -maxY;
+        auto maxX = maxY * aspectRato;
+        auto minX = -maxX;
+
+        return perspective(minX, minY, maxX, maxY, near, far);
       }
 
     }  // namespace proj
