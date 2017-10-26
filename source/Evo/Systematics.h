@@ -8,9 +8,12 @@
  *
  *
  *  @todo Technically, we don't need to keep the ancestors in a set in order to track a lineage...
- *    If we delete all of their descendants they should automaticaly be deleted.
+ *        If we delete all of their descendants they should automaticaly be deleted.
  *  @todo We should provide an option to back up systematics data to a file so that it doesn't all
- *    need to be kept in memory, especially if we're only doing post-analysis.
+ *        need to be kept in memory, especially if we're only doing post-analysis.
+ *  @todo We should have a systematics interface that will convert organisms into a different
+ *        (internal) type to track.  This would allow us to have an arbitrary number of systematics
+ *        trackers in world, all of which take an organism, but store different types of data.
  */
 
 
