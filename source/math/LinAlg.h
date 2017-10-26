@@ -690,7 +690,7 @@ namespace emp {
     namespace proj {
       constexpr Mat4x4f ortho(float minX, float minY, float maxX, float maxY,
                               float near = 1, float far = -1) {
-        return Mat<float, 4, 4>{
+        return Mat4x4f{
           2.0f / (maxX - minX),
           0.0f,
           0.0f,
