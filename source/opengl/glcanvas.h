@@ -37,6 +37,8 @@ namespace emp {
       GLFWwindow* window = nullptr;
 #endif
 
+      std::vector<std::function<void(int, int)>> onresize;
+
       public:
       GLCanvas(int width, int height, const char* title = "empirical")
         : width(width), height(height) {
@@ -53,6 +55,18 @@ namespace emp {
         glfwWindowHint(GLFW_SAMPLES, 8);
 
         window = glfwCreateWindow(width, height, title, nullptr, nullptr);
+        glfwSetWindowUserPointer(window, this);
+
+        glfwSetFramebufferSizeCallback(
+          window, [](GLFWwindow* window, int width, int height) {
+            GLCanvas* me =
+              static_cast<GLCanvas*>(glfwGetWindowUserPointer(window));
+
+            me->width = width;
+            me->height = height;
+
+            for (auto& callback : me->onresize) callback(width, height);
+          });
 #endif
 
         makeCurrent();
@@ -78,6 +92,11 @@ namespace emp {
         }
         glfwTerminate();
 #endif
+      }
+
+      template <typename F>
+      void onresized(F&& callback) {
+        onresize.push_back(std::forward<F>(callback));
       }
 
       template <typename R>

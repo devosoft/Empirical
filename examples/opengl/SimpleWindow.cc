@@ -13,6 +13,7 @@
 #include "tools/Random.h"
 
 #include "math/LinAlg.h"
+#include "math/consts.h"
 #include "opengl/defaultShaders.h"
 #include "opengl/glcanvas.h"
 
@@ -30,6 +31,9 @@ using BitOrg = emp::BitVector;
 namespace gl = emp::opengl;
 using namespace emp::math;
 
+// DataSet
+// +
+
 template <typename V, typename M>
 V wrap(V v, M&& max) {
   v %= max;
@@ -38,7 +42,7 @@ V wrap(V v, M&& max) {
 }
 
 int main(int argc, char* argv[]) {
-  gl::GLCanvas canvas;
+  gl::GLCanvas canvas(1000, 1000);
   emp::Random random;
 
   auto q = emp::math::Quat<float>::rotation(0, 0, 1, 5);
@@ -51,7 +55,7 @@ int main(int argc, char* argv[]) {
       .with(gl::BufferType::Array, shaderProgram.attribute<Vec3f>("position"))
       .with(gl::BufferType::ElementArray);
 
-  constexpr auto SIZE = 20;
+  constexpr auto SIZE = 10.0;
   vao.bind();
   vao.getBuffer<gl::BufferType::Array>().set(
     {
@@ -66,14 +70,11 @@ int main(int argc, char* argv[]) {
 
   auto model = shaderProgram.uniform("model");
   auto view = shaderProgram.uniform("view");
-  view.set(Mat4x4f::identity());
+  view.set(Mat4x4f::translation(0, 0, 0));
   auto proj = shaderProgram.uniform("proj");
 
-  constexpr auto WIDTH = 500;
-  constexpr auto HEIGHT = 500;
-
-  proj.set(proj::ortho(WIDTH * SIZE, HEIGHT * SIZE,
-                       canvas.getWidth() / (float)canvas.getHeight()));
+  proj.set(
+    proj::orthoFromScreen(1000, 1000, canvas.getWidth(), canvas.getHeight()));
 
   vao.getBuffer<gl::BufferType::ElementArray>().set(
     {
@@ -81,6 +82,9 @@ int main(int argc, char* argv[]) {
       2, 3, 0   // Second Triangle
     },
     gl::BufferUsage::StaticDraw);
+
+  constexpr auto WIDTH = 100;
+  constexpr auto HEIGHT = 100;
 
   std::vector<std::vector<bool>> current(WIDTH, std::vector<bool>(HEIGHT));
   std::vector<std::vector<bool>> next(WIDTH, std::vector<bool>(HEIGHT));
@@ -90,6 +94,11 @@ int main(int argc, char* argv[]) {
       current[x][y] = random.P(0.5);
     }
   }
+
+  canvas.onresized([&](int width, int height) {
+    proj.set(
+      proj::orthoFromScreen(1000, 1000, canvas.getWidth(), canvas.getHeight()));
+  });
 
   canvas.runForever([&](auto&&) {
 
