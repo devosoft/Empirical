@@ -44,7 +44,7 @@ namespace emp {
     auto m = fit_map.rbegin();
     for (size_t i = 0; i < e_count; i++) {
       const size_t repro_id = m->second;
-      world.DoBirth( world[repro_id], repro_id, copy_count);
+      world.DoBirth( world.GetGenomeAt(repro_id), repro_id, copy_count);
       ++m;
     }
   }
@@ -81,7 +81,7 @@ namespace emp {
       }
 
       // Place the highest fitness into the next generation!
-      world.DoBirth( world[best_id], best_id, 1 );
+      world.DoBirth( world.GetGenomeAt(best_id), best_id, 1 );
     }
   }
 
@@ -168,7 +168,7 @@ namespace emp {
       // Place a random survivor (all equal) into the next generation!
       emp_assert(cur_orgs.size() > 0, cur_orgs.size(), fit_funs.size(), all_orgs.size());
       size_t repro_id = cur_orgs[ world.GetRandom().GetUInt(cur_orgs.size()) ];
-      world.DoBirth( world[repro_id], repro_id );
+      world.DoBirth( world.GetGenomeAt(repro_id), repro_id );
     }
   }
 
