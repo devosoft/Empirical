@@ -73,7 +73,7 @@ namespace emp {
       }
 
       /// Conversion of this proxy to Boolean (as an rvalue)
-      explicit operator bool() const {
+      operator bool() const {
         return bit_vector.Get(index);
       }
 
@@ -443,7 +443,7 @@ namespace emp {
     bool All() const { return (~(*this)).None(); }
 
     /// Casting a bit array to bool identifies if ANY bits are set to 1.
-    operator bool() const { return Any(); }
+    explicit operator bool() const { return Any(); }
 
     /// Const index operator -- return the bit at the specified position.
     bool operator[](size_t index) const { return Get(index); }
