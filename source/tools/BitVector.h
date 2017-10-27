@@ -73,7 +73,7 @@ namespace emp {
       }
 
       /// Conversion of this proxy to Boolean (as an rvalue)
-      operator bool() const {
+      explicit operator bool() const {
         return bit_vector.Get(index);
       }
 
