@@ -79,11 +79,16 @@ namespace emp {
       sequence_t sequence;
 
       Genome() = default;
-      Genome(Ptr<const inst_lib_t> _ilib, const sequence_t & _seq=sequence_t(0))
-        : inst_lib(_ilib), sequence(_seq) { ; }
-      Genome(const inst_lib_t & _ilib, const sequence_t & _seq=sequence_t(0))
-        : inst_lib(&_ilib), sequence(_seq) { ; }
+      Genome(Ptr<const inst_lib_t> _inst_lib, const sequence_t & _seq=sequence_t(0))
+        : inst_lib(_inst_lib), sequence(_seq) { ; }
+      Genome(const inst_lib_t & _inst_lib, const sequence_t & _seq=sequence_t(0))
+        : inst_lib(&_inst_lib), sequence(_seq) { ; }
+      Genome(const Genome &) = default;
+      Genome(Genome &&) = default;
       ~Genome() { ; }
+
+      Genome & operator=(const Genome &) = default;
+      Genome & operator=(Genome &&) = default;
 
       bool operator==(const Genome& other) const { return sequence == other.sequence; }
       bool operator!=(const Genome& other) const { return sequence != other.sequence; }
@@ -206,22 +211,36 @@ namespace emp {
     }
 
   public:
-    AvidaGP(Ptr<const inst_lib_t> _ilib)
-      : genome(_ilib), regs(), inputs(), outputs(), stacks(), fun_starts()
+    /// Create a new AvidaGP seeding it with a genome.
+    AvidaGP(const genome_t & in_genome)
+      : genome(in_genome), regs(), inputs(), outputs(), stacks(), fun_starts()
       , inst_ptr(0), scope_stack(), reg_stack(), call_stack(), errors(0), traits()
     {
       scope_stack.emplace_back(0, ScopeType::ROOT, 0);  // Initial scope.
-      Reset();
+      for (size_t i = 0; i < CPU_SIZE; i++) {
+        regs[i] = (double) i;
+        fun_starts[i] = -1;
+      }
     }
-    AvidaGP(const inst_lib_t & _ilib) : AvidaGP(&_ilib) { ; }
-    AvidaGP() : AvidaGP(DefaultInstLib()) { ; }
+
+    /// Create a default AvidaGP (no genome sequence, default instruction set)
+    AvidaGP() : AvidaGP(Genome(DefaultInstLib())) { ; }
+
+    /// Create an AvidaGP with a specified instruction set (but no genome sequence)
+    AvidaGP(Ptr<const inst_lib_t> inst_lib) : AvidaGP(Genome(inst_lib)) { ; }
+    AvidaGP(const inst_lib_t & inst_lib) : AvidaGP(Genome(&inst_lib)) { ; }
+
+    /// Copy constructor
     AvidaGP(const AvidaGP &) = default;
+
+    /// Move constructor
     AvidaGP(AvidaGP &&) = default;
-    AvidaGP(const genome_t & in_genome) : genome(in_genome) { ; }
+
+    /// Destructor
     ~AvidaGP() { ; }
 
     bool operator<(const AvidaGP& other) const {
-        return genome < other.genome;
+      return genome < other.genome;
     }
 
     /// Reset the entire CPU to a starting state, without a genome.
@@ -264,6 +283,7 @@ namespace emp {
     Ptr<const inst_lib_t> GetInstLib() const { return genome.inst_lib; }
     inst_t GetInst(size_t pos) const { return genome.sequence[pos]; }
     const genome_t & GetGenome() const { return genome; }
+    const size_t GetSize() const { return genome.sequence.size(); }
     double GetReg(size_t id) const { return regs[id]; }
     double GetInput(int id) const { return Find(inputs, id, 0.0); }
     const std::unordered_map<int,double> & GetInputs() const { return inputs; }
@@ -353,6 +373,7 @@ namespace emp {
 
     /// Process the NEXT instruction pointed to be the instruction pointer
     void SingleProcess() {
+      emp_assert(genome.sequence.size() > 0);  // A genome must exist to be processed.
       if (inst_ptr >= genome.sequence.size()) ResetIP();
       genome.inst_lib->ProcessInst(*this, genome.sequence[inst_ptr]);
       inst_ptr++;
