@@ -22,6 +22,14 @@
 #include "tools/Random.h"
 #include "Evo/World.h"
 
+void Print(const emp::AvidaGP & cpu) {
+  cpu.PrintGenome();
+  for (size_t i = 0; i < 16; i++) {
+    std::cout << "[" << cpu.GetReg(i) << "] ";
+  }
+  std::cout << " IP=" << cpu.GetIP() << std::endl;
+}
+
 int main()
 {
   emp::Random random;
@@ -43,22 +51,39 @@ int main()
   // Copy genome into cell 1
   world.Inject( world.GetGenomeAt(0) );
 
-  std::cout << "\nGENOME 0\n";
-  world[0].PrintGenome();
+  std::cout << std::endl << "GENOME 0" << std::endl;
+  Print(world[0]);
 
-  std::cout << "\nGENOME 1\n";
-  world[1].PrintGenome();
+  std::cout << std::endl << "GENOME 1" << std::endl;
+  Print(world[1]);
 
   // Mutate cell 1 and see what happens.
   world.DoMutations(1);
 
-  std::cout << "\nGENOME 1 (post mutations)\n";
-  world[1].PrintGenome();
+  std::cout << std::endl << "GENOME 1 (post mutations)" << std::endl;
+  Print(world[1]);
 
   // Copy mutated genome 1 into cell 2
   world.Inject( world.GetGenomeAt(1) );
 
-  std::cout << "\nGENOME 2 (copy of mutant)\n";
-  world[2].PrintGenome();
+  std::cout << std::endl << "GENOME 2 (copy of mutant)" << std::endl;
+  Print(world[2]);
+
+  // Let's do some selection; setup a neutral fitness function.
+  world.SetFitFun( [](const emp::AvidaGP &){ return 0.0; } );
+
+  world.ResetHardware();
+  world.Process(200);
+  EliteSelect(world, 1, 3);
+  TournamentSelect(world, 3, 1);
+
+  std::cout << std::endl << "GENOME 0 (after selection!)" << std::endl;
+  Print(world[0]);
+
+  world.Update();
+  world.DoMutations(1);
+
+  std::cout << std::endl << "GENOME 0 (and DoMutations, but not on this!)" << std::endl;
+  Print(world[0]);
 
 }
