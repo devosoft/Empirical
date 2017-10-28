@@ -27,7 +27,7 @@ namespace emp {
   /// @param e_count How many distinct organisms should be chosen, starting from the most fit.
   /// @param copy_count How many copies should be made of each elite organism?
   template<typename ORG>
-  void EliteSelect(World<ORG> & world, size_t e_count, size_t copy_count) {
+  void EliteSelect(World<ORG> & world, size_t e_count=1, size_t copy_count=1) {
     emp_assert(e_count > 0 && e_count <= world.GetNumOrgs(), e_count);
     emp_assert(copy_count > 0);
 
@@ -52,13 +52,13 @@ namespace emp {
 
   /// ==TOURNAMENT== Selection creates a tournament with a random sub-set of organisms,
   /// finds the one with the highest fitness, and moves it to the next generation.
-  /// User provides the fitness function, the tournament size, and (optionally) the
-  /// number of tournaments to run.
+  /// User provides the world (with a fitness function), the tournament size, and
+  /// (optionally) the number of tournaments to run.
   /// @param world The emp::World object with the organisms to be selected.
   /// @param t_size How many organisms should be placed in each tournament?
   /// @param tourny_count How many tournaments should be run? (with replacement of organisms)
   template<typename ORG>
-  void TournamentSelect(World<ORG> & world, size_t t_size, size_t tourny_count) {
+  void TournamentSelect(World<ORG> & world, size_t t_size, size_t tourny_count=1) {
     emp_assert(t_size > 0 && t_size <= world.GetNumOrgs(), t_size, world.GetNumOrgs());
     emp_assert(tourny_count > 0);
 
