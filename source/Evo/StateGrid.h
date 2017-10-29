@@ -54,14 +54,17 @@ namespace emp {
     std::map<char, size_t> symbol_map;       ///< Map of symbols to associated key ID
     std::map<std::string, size_t> name_map;  ///< Map of names to associated key ID
 
+    size_t grid_count;                       ///< How many grids is this info part of?
+
     size_t GetKey(int state_id) const { return Find(state_map, state_id, 0); }
     size_t GetKey(char symbol) const { return Find(symbol_map, symbol, 0); }
     size_t GetKey(const std::string & name) const { return Find(name_map, name, 0); }
   public:
-    StateGridInfo() : states(), state_map(), symbol_map(), name_map() { ; }
+    StateGridInfo() : states(), state_map(), symbol_map(), name_map(), grid_count(0) { ; }
     ~StateGridInfo() { ; }
 
     size_t GetNumStates() const { return states.size(); }
+    size_t GetGridCount() const { return grid_count; }
 
     // Convert from state ids...
     char GetSymbol(int state_id) const { return states[ GetKey(state_id) ].symbol; }
@@ -80,6 +83,9 @@ namespace emp {
       symbol_map[symbol] = key_id;
       name_map[name] = key_id;
     }
+
+    void IncGridCount() { ++grid_count; }
+    void DecGridCount() { --grid_count; }
   };
 
   /// A StateGrid describes a map of grid positions to the current state of each position.
@@ -93,15 +99,35 @@ namespace emp {
 
   public:
     StateGrid(StateGridInfo & _i, size_t _w=1, size_t _h=1, int init_val=0)
-      : width(_w), height(_h), states(_w*_h,init_val), info(&_i) { ; }
+      : width(_w), height(_h), states(_w*_h,init_val), info(&_i) { info->IncGridCount(); }
     StateGrid(StateGridInfo & _i, const std::string & filename)
-      : width(1), height(1), states(), info(&_i) { Load(filename); }
-    StateGrid(const StateGrid &) = default;
-    StateGrid(StateGrid &&) = default;
-    ~StateGrid() { ; }
+      : width(1), height(1), states(), info(&_i) { Load(filename); info->IncGridCount(); }
+    StateGrid(const StateGrid & in)
+      : width(in.width), height(in.height), states(in.states), info(in.info)
+    { if (info) info->IncGridCount(); }
+    StateGrid(StateGrid && in)
+      : width(in.width), height(in.height), states(std::move(in.states)), info(in.info)
+    { in.info = nullptr; }
+    ~StateGrid() { if (info) info->DecGridCount(); }
 
-    StateGrid & operator=(const StateGrid &) = default;
-    StateGrid & operator=(StateGrid &&) = default;
+    StateGrid & operator=(const StateGrid & in) {
+      width = in.width;
+      height = in.height;
+      states = in.states;
+      if (info) info->DecGridCount();  // Notify previous info that grid no longer using it.
+      info = in.info;                  // Use same info as old grid.
+      if (info) info->IncGridCount();  // Notify new info that another grid is using it.
+      return *this;
+    }
+    StateGrid & operator=(StateGrid && in) {
+      width = in.width;
+      height = in.height;
+      states = in.states;
+      if (info) info->DecGridCount();  // Notify previous info that grid no longer using it.
+      info = in.info;                  // Move info from old grid (no need to change count)
+      in.info = nullptr;               // Old grid (moved from) no longer using info.
+      return *this;
+    }
 
     size_t GetWidth() const { return width; }
     size_t GetHeight() const { return height; }
