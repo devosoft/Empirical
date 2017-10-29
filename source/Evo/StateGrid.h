@@ -12,6 +12,8 @@
  *  @todo Functions such as Load() should throw exceptions (or equilv.), not use asserts.
  *  @todo Need to figure out a default mapping for how outputs translate to moves around a
  *    state grid.  -1 = Back up ; 0 = Turn left ; 1 = Move fast-forwards ; 2 = Turn right
+ *  @todo Allow StateGridInfo to be built inside of StateGrid (change reference to pointer and
+ *    possible ownership)
  */
 
 
@@ -21,6 +23,7 @@
 #include <map>
 #include <string>
 
+#include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../tools/File.h"
 #include "../tools/map_utils.h"
@@ -86,13 +89,13 @@ namespace emp {
     size_t height;             ///< Height of the overall grid
     emp::vector<int> states;   ///< Specific states at each position in the grid.
 
-    StateGridInfo & info;      ///< Information about the set of states used in this grid.
+    Ptr<StateGridInfo> info;   ///< Information about the set of states used in this grid.
 
   public:
     StateGrid(StateGridInfo & _i, size_t _w=1, size_t _h=1, int init_val=0)
-      : width(_w), height(_h), states(_w*_h,init_val), info(_i) { ; }
+      : width(_w), height(_h), states(_w*_h,init_val), info(&_i) { ; }
     StateGrid(StateGridInfo & _i, const std::string & filename)
-      : width(1), height(1), states(), info(_i) { Load(filename); }
+      : width(1), height(1), states(), info(&_i) { Load(filename); }
     StateGrid(const StateGrid &) = default;
     StateGrid(StateGrid &&) = default;
     ~StateGrid() { ; }
@@ -103,16 +106,16 @@ namespace emp {
     size_t GetWidth() const { return width; }
     size_t GetHeight() const { return height; }
     size_t GetSize() const { return states.size(); }
-    const StateGridInfo & GetInfo() const { return info; }
+    const StateGridInfo & GetInfo() const { return *info; }
 
     int & operator()(size_t x, size_t y) { return states[y*width+x]; }
     int operator()(size_t x, size_t y) const { return states[y*width+x]; }
     int GetState(size_t x, size_t y) const { return states[y*width+x]; }
     StateGrid & SetState(size_t x, size_t y, int in) { states[y*width+x] = in; return *this; }
 
-    char GetSymbol(size_t x, size_t y) const { return info.GetSymbol(GetState(x,y)); }
-    double GetScoreMult(size_t x, size_t y) const { return info.GetScoreMult(GetState(x,y)); }
-    const std::string & GetName(size_t x, size_t y) const { return info.GetName(GetState(x,y)); }
+    char GetSymbol(size_t x, size_t y) const { return info->GetSymbol(GetState(x,y)); }
+    double GetScoreMult(size_t x, size_t y) const { return info->GetScoreMult(GetState(x,y)); }
+    const std::string & GetName(size_t x, size_t y) const { return info->GetName(GetState(x,y)); }
 
     template <typename... Ts>
     StateGrid & Load(Ts &&... args) {
@@ -134,7 +137,7 @@ namespace emp {
       for (size_t row = 0; row < height; row++) {
         emp_assert(file[row].size() == width);  // Make sure all rows are the same size.
         for (size_t col = 0; col < width; col++) {
-          states[row*width+col] = info.GetState(file[row][col]);
+          states[row*width+col] = info->GetState(file[row][col]);
         }
       }
 
@@ -147,10 +150,10 @@ namespace emp {
       std::string out;
       for (size_t i = 0; i < height; i++) {
         out.resize(0);
-        out += info.GetSymbol( states[i*width] );
+        out += info->GetSymbol( states[i*width] );
         for (size_t j = 1; j < width; j++) {
           out += ' ';
-          out +=info.GetSymbol( states[i*width+j] );
+          out +=info->GetSymbol( states[i*width+j] );
         }
         file.Append(out);
       }
