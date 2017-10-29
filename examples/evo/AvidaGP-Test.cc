@@ -30,11 +30,20 @@ void Print(const emp::AvidaGP & cpu) {
   std::cout << " IP=" << cpu.GetIP() << std::endl;
 }
 
+constexpr size_t POP_SIZE = 1000;
+constexpr size_t GENOME_SIZE = 50;
+constexpr size_t UPDATES = 50;
+
 int main()
 {
   emp::Random random;
   emp::World<emp::AvidaGP> world(random, "AvidaWorld");
   world.SetWellMixed(true);
+
+  // Add a random organism.
+  emp::AvidaGP cpu;
+  cpu.PushRandom(random, 10);
+  world.Inject(cpu.GetGenome());
 
   // Setup a mutation function that always performs a single mutation.
   world.SetMutFun( [](emp::AvidaGP & org, emp::Random & random) {
@@ -42,11 +51,6 @@ int main()
       org.RandomizeInst(pos, random);
       return 1;
     } );
-
-  // Add a random organism.
-  emp::AvidaGP cpu;
-  cpu.PushRandom(random, 10);
-  world.Inject(cpu.GetGenome());
 
   // Copy genome into cell 1
   world.Inject( world.GetGenomeAt(0) );
@@ -81,6 +85,8 @@ int main()
   Print(world[0]);
 
   world.Update();
+  double fit0 = world.CalcFitnessID(0);
+  std::cout << "Fitness 0 = " << fit0 << std::endl;
   world.DoMutations(1);
 
   std::cout << std::endl << "GENOME 0 (and DoMutations, but not on this!)" << std::endl;
