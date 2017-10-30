@@ -33,6 +33,12 @@ public:
   static void Inst_Move(SGOrg & hw, const emp::AvidaGP::Instruction & inst) {
     hw.sg_status.Move(*(hw.state_grid), hw.regs[inst.args[0]]);
   }
+  static void Inst_Rotate(SGOrg & hw, const emp::AvidaGP::Instruction & inst) {
+    hw.sg_status.Rotate(hw.regs[inst.args[0]]);
+  }
+  static void Inst_Scan(SGOrg & hw, const emp::AvidaGP::Instruction & inst) {
+    hw.regs[inst.args[0]] = hw.sg_status.Scan(*(hw.state_grid));
+  }
 };
 
 class SGWorld : public emp::World<SGOrg> {
@@ -71,7 +77,9 @@ public:
     inst_lib.AddInst("CopyVal", emp::AvidaGP::Inst_CopyVal, 2, "Copy reg Arg1 into reg Arg2");
     inst_lib.AddInst("ScopeReg", emp::AvidaGP::Inst_ScopeReg, 1, "Backup reg Arg1; restore at end of scope");
 
-    inst_lib.AddInst("Move", SGOrg::Inst_Move, 1, "Move forward in state grid.");
+    inst_lib.AddInst("Move",   SGOrg::Inst_Move,   1, "Move forward in state grid.");
+    inst_lib.AddInst("Rotate", SGOrg::Inst_Rotate, 1, "Rotate in place in state grid.");
+    inst_lib.AddInst("Scan",   SGOrg::Inst_Scan,   1, "Idenify state of current position in state grid.");
 
     // OnOrgPlacement( [this](size_t world_id){
     //   pop[world_id]->SetWorldID(world_id);  // Tell organisms their position in environment.
