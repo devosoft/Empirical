@@ -29,9 +29,10 @@ class SGOrg : public emp::AvidaGP {
 protected:
   emp::StateGridStatus sg_status;
   emp::StateGrid state_grid;
+  double score;
 
 public:
-  SGOrg() : sg_status(), state_grid() { ; }
+  SGOrg() : sg_status(), state_grid(), score(0) { ; }
   SGOrg(const SGOrg &) = default;
   SGOrg(SGOrg &&) = default;
 
@@ -44,12 +45,23 @@ public:
   static void Inst_Move(SGOrg & hw, const emp::AvidaGP::Instruction & inst) {
     hw.sg_status.Move(hw.state_grid, hw.regs[inst.args[0]]);
   }
+
   static void Inst_Rotate(SGOrg & hw, const emp::AvidaGP::Instruction & inst) {
     hw.sg_status.Rotate(hw.regs[inst.args[0]]);
   }
+
   static void Inst_Scan(SGOrg & hw, const emp::AvidaGP::Instruction & inst) {
-    hw.regs[inst.args[0]] = hw.sg_status.Scan(hw.state_grid);
+    int val = hw.sg_status.Scan(hw.state_grid);
+    hw.regs[inst.args[0]] = val;
+    switch (val) {
+      case -1: hw.score -= 0.5; break;                                     // Poison
+      case 0: break;                                                       // Eaten food
+      case 1: hw.score += 1.0; hw.sg_status.Set(hw.state_grid, 0); break;  // Food! (being eaten...)
+      case 2: break;                                                       // Empty border
+      case 3: hw.score += 1.0; hw.sg_status.Set(hw.state_grid, 2); break;  // Border with food.
+    }
   }
+
 };
 
 class SGWorld : public emp::World<SGOrg> {
