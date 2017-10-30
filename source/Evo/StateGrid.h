@@ -245,6 +245,11 @@ namespace emp {
     int Scan(const StateGrid & grid) {
       return grid(x,y);
     }
+
+    /// Set the current position in the state grid.
+    void Set(StateGrid & grid, int new_state) {
+      grid.SetState(x,y,new_state);
+    }
   };
 
 }
