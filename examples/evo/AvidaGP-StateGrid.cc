@@ -18,10 +18,10 @@
 class SGOrg : public emp::AvidaGP {
 protected:
   emp::StateGridStatus sg_status;
-  emp::Ptr<emp::StateGrid> state_grid;
+  emp::StateGrid state_grid;
 
 public:
-  SGOrg() : sg_status() { ; }
+  SGOrg() : sg_status(), state_grid() { ; }
   SGOrg(const SGOrg &) = default;
   SGOrg(SGOrg &&) = default;
 
@@ -31,13 +31,13 @@ public:
   void SetFacing(size_t facing) { sg_status.SetFacing(facing); }
 
   static void Inst_Move(SGOrg & hw, const emp::AvidaGP::Instruction & inst) {
-    hw.sg_status.Move(*(hw.state_grid), hw.regs[inst.args[0]]);
+    hw.sg_status.Move(hw.state_grid, hw.regs[inst.args[0]]);
   }
   static void Inst_Rotate(SGOrg & hw, const emp::AvidaGP::Instruction & inst) {
     hw.sg_status.Rotate(hw.regs[inst.args[0]]);
   }
   static void Inst_Scan(SGOrg & hw, const emp::AvidaGP::Instruction & inst) {
-    hw.regs[inst.args[0]] = hw.sg_status.Scan(*(hw.state_grid));
+    hw.regs[inst.args[0]] = hw.sg_status.Scan(hw.state_grid);
   }
 };
 
