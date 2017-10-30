@@ -98,6 +98,7 @@ namespace emp {
     Ptr<StateGridInfo> info;   ///< Information about the set of states used in this grid.
 
   public:
+    StateGrid() : width(0), height(0), states(0), info(nullptr) { ; }
     StateGrid(StateGridInfo & _i, size_t _w=1, size_t _h=1, int init_val=0)
       : width(_w), height(_h), states(_w*_h,init_val), info(&_i) { info->IncGridCount(); }
     StateGrid(StateGridInfo & _i, const std::string & filename)
