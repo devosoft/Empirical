@@ -5,6 +5,16 @@
  *
  *  @file  AvidaGP-StateGrid.cc
  *  @brief A example of using AvidaGP evolving with a StateGrid.
+ *
+ *  Example file of AvidaGP-based organisms (called SGOrg here) moving through a state grid,
+ *  trying to consume as many resources as possible without stepping off patches.
+ *
+ *  States:
+ *   -1 = None (poison)
+ *    0 = Former food, now eaten.
+ *    1 = Current food
+ *    2 = Border, no longer has food.
+ *    3 = Border, with food.
  */
 
 #include <iostream>
@@ -29,6 +39,7 @@ public:
 
   void SetPosition(size_t x, size_t y) { sg_status.SetPos(x,y); }
   void SetFacing(size_t facing) { sg_status.SetFacing(facing); }
+  void SetStateGrid(const emp::StateGrid & in_sg) { state_grid = in_sg; }
 
   static void Inst_Move(SGOrg & hw, const emp::AvidaGP::Instruction & inst) {
     hw.sg_status.Move(hw.state_grid, hw.regs[inst.args[0]]);
