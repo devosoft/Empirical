@@ -27,6 +27,9 @@ public:
 
   emp::StateGridStatus GetSGStatus() const { return sg_status; }
 
+  void SetPosition(size_t x, size_t y) { sg_status.SetPos(x,y); }
+  void SetFacing(size_t facing) { sg_status.SetFacing(facing); }
+
   static void Inst_Move(SGOrg & hw, const emp::AvidaGP::Instruction & inst) {
     hw.sg_status.Move(*(hw.state_grid), hw.regs[inst.args[0]]);
   }
