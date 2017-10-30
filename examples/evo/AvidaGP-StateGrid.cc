@@ -33,6 +33,7 @@ protected:
 
 public:
   SGOrg() : sg_status(), state_grid(), score(0) { ; }
+  SGOrg(const emp::AvidaGP::genome_t & in_genome) : AvidaGP(in_genome), sg_status(), state_grid(), score(0) { ; }
   SGOrg(const SGOrg &) = default;
   SGOrg(SGOrg &&) = default;
 
@@ -72,7 +73,9 @@ protected:
   inst_lib_t inst_lib;
 
 public:
-  SGWorld() : inst_lib() {
+  SGWorld(emp::Random & random, const std::string & name)
+    : emp::World<SGOrg>(random, name), inst_lib()
+  {
     // Build the instruction library...
     inst_lib.AddInst("Inc", emp::AvidaGP::Inst_Inc, 1, "Increment value in reg Arg1");
     inst_lib.AddInst("Dec", emp::AvidaGP::Inst_Dec, 1, "Decrement value in reg Arg1");
@@ -128,18 +131,18 @@ constexpr size_t UPDATES = 500;
 int main()
 {
   emp::Random random;
-  emp::World<emp::AvidaGP> world(random, "AvidaWorld");
+  SGWorld world(random, "AvidaWorld");
   world.SetWellMixed(true);
 
   // Build a random initial popoulation.
   for (size_t i = 0; i < POP_SIZE; i++) {
-    emp::AvidaGP cpu;
+    SGOrg cpu;
     cpu.PushRandom(random, GENOME_SIZE);
     world.Inject(cpu.GetGenome());
   }
 
   // Setup the mutation function.
-  world.SetMutFun( [](emp::AvidaGP & org, emp::Random & random) {
+  world.SetMutFun( [](SGOrg & org, emp::Random & random) {
       uint32_t num_muts = random.GetUInt(4);  // 0 to 3 mutations.
       for (uint32_t m = 0; m < num_muts; m++) {
         const uint32_t pos = random.GetUInt(GENOME_SIZE);
@@ -149,8 +152,8 @@ int main()
     } );
 
   // Setup the fitness function.
-  std::function<double(emp::AvidaGP &)> fit_fun =
-    [](emp::AvidaGP & org) {
+  std::function<double(SGOrg &)> fit_fun =
+    [](SGOrg & org) {
       double resources = 0.0;
       org.ResetHardware();
       org.Process(200);
