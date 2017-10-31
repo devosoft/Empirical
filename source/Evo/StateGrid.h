@@ -60,13 +60,11 @@ namespace emp {
     std::map<char, size_t> symbol_map;       ///< Map of symbols to associated key ID
     std::map<std::string, size_t> name_map;  ///< Map of names to associated key ID
 
-    size_t grid_count;                       ///< How many grids is this info part of?
-
     size_t GetKey(int state_id) const { return Find(state_map, state_id, 0); }
     size_t GetKey(char symbol) const { return Find(symbol_map, symbol, 0); }
     size_t GetKey(const std::string & name) const { return Find(name_map, name, 0); }
   public:
-    StateGridInfo() : states(), state_map(), symbol_map(), name_map(), grid_count(0) { ; }
+    StateGridInfo() : states(), state_map(), symbol_map(), name_map() { ; }
     StateGridInfo(const StateGridInfo &) = default;
     StateGridInfo(StateGridInfo &&) = default;
     ~StateGridInfo() { ; }
@@ -75,7 +73,6 @@ namespace emp {
     StateGridInfo & operator=(StateGridInfo &&) = default;
 
     size_t GetNumStates() const { return states.size(); }
-    size_t GetGridCount() const { return grid_count; }
 
     // Convert from state ids...
     char GetSymbol(int state_id) const { return states[ GetKey(state_id) ].symbol; }
@@ -95,8 +92,6 @@ namespace emp {
       name_map[name] = key_id;
     }
 
-    void IncGridCount() { ++grid_count; }
-    void DecGridCount() { --grid_count; }
   };
 
   /// A StateGrid describes a map of grid positions to the current state of each position.
@@ -105,55 +100,34 @@ namespace emp {
     size_t width;              ///< Width of the overall grid
     size_t height;             ///< Height of the overall grid
     emp::vector<int> states;   ///< Specific states at each position in the grid.
-
-    Ptr<StateGridInfo> info;   ///< Information about the set of states used in this grid.
+    StateGridInfo info;   ///< Information about the set of states used in this grid.
 
   public:
-    StateGrid() : width(0), height(0), states(0), info(nullptr) { ; }
+    StateGrid() : width(0), height(0), states(0), info() { ; }
     StateGrid(StateGridInfo & _i, size_t _w=1, size_t _h=1, int init_val=0)
-      : width(_w), height(_h), states(_w*_h,init_val), info(&_i) { info->IncGridCount(); }
+      : width(_w), height(_h), states(_w*_h,init_val), info(_i) { ; }
     StateGrid(StateGridInfo & _i, const std::string & filename)
-      : width(1), height(1), states(), info(&_i) { Load(filename); info->IncGridCount(); }
-    StateGrid(const StateGrid & in)
-      : width(in.width), height(in.height), states(in.states), info(in.info)
-    { if (info) info->IncGridCount(); }
-    StateGrid(StateGrid && in)
-      : width(in.width), height(in.height), states(std::move(in.states)), info(in.info)
-    { in.info = nullptr; }
-    ~StateGrid() { if (info) info->DecGridCount(); }
+      : width(1), height(1), states(), info(_i) { Load(filename); }
+    StateGrid(const StateGrid &) = default;
+    StateGrid(StateGrid && in) = default;
+    ~StateGrid() { ; }
 
-    StateGrid & operator=(const StateGrid & in) {
-      width = in.width;
-      height = in.height;
-      states = in.states;
-      if (info) info->DecGridCount();  // Notify previous info that grid no longer using it.
-      info = in.info;                  // Use same info as old grid.
-      if (info) info->IncGridCount();  // Notify new info that another grid is using it.
-      return *this;
-    }
-    StateGrid & operator=(StateGrid && in) {
-      width = in.width;
-      height = in.height;
-      states = in.states;
-      if (info) info->DecGridCount();  // Notify previous info that grid no longer using it.
-      info = in.info;                  // Move info from old grid (no need to change count)
-      in.info = nullptr;               // Old grid (moved from) no longer using info.
-      return *this;
-    }
+    StateGrid & operator=(const StateGrid &) = default;
+    StateGrid & operator=(StateGrid &&) = default;
 
     size_t GetWidth() const { return width; }
     size_t GetHeight() const { return height; }
     size_t GetSize() const { return states.size(); }
-    const StateGridInfo & GetInfo() const { return *info; }
+    const StateGridInfo & GetInfo() const { return info; }
 
     int & operator()(size_t x, size_t y) { return states[y*width+x]; }
     int operator()(size_t x, size_t y) const { return states[y*width+x]; }
     int GetState(size_t x, size_t y) const { return states[y*width+x]; }
     StateGrid & SetState(size_t x, size_t y, int in) { states[y*width+x] = in; return *this; }
 
-    char GetSymbol(size_t x, size_t y) const { return info->GetSymbol(GetState(x,y)); }
-    double GetScoreMult(size_t x, size_t y) const { return info->GetScoreMult(GetState(x,y)); }
-    const std::string & GetName(size_t x, size_t y) const { return info->GetName(GetState(x,y)); }
+    char GetSymbol(size_t x, size_t y) const { return info.GetSymbol(GetState(x,y)); }
+    double GetScoreMult(size_t x, size_t y) const { return info.GetScoreMult(GetState(x,y)); }
+    const std::string & GetName(size_t x, size_t y) const { return info.GetName(GetState(x,y)); }
 
     template <typename... Ts>
     StateGrid & Load(Ts &&... args) {
@@ -175,7 +149,7 @@ namespace emp {
       for (size_t row = 0; row < height; row++) {
         emp_assert(file[row].size() == width);  // Make sure all rows are the same size.
         for (size_t col = 0; col < width; col++) {
-          states[row*width+col] = info->GetState(file[row][col]);
+          states[row*width+col] = info.GetState(file[row][col]);
         }
       }
 
@@ -188,10 +162,10 @@ namespace emp {
       std::string out;
       for (size_t i = 0; i < height; i++) {
         out.resize(0);
-        out += info->GetSymbol( states[i*width] );
+        out += info.GetSymbol( states[i*width] );
         for (size_t j = 1; j < width; j++) {
           out += ' ';
-          out +=info->GetSymbol( states[i*width+j] );
+          out +=info.GetSymbol( states[i*width+j] );
         }
         file.Append(out);
       }
