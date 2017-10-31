@@ -46,6 +46,12 @@ namespace emp {
       StateInfo(int _id, char _sym, double _mult,
                 const std::string & _name, const std::string & _desc)
       : state_id(_id), symbol(_sym), score_mult(_mult), name(_name), desc(_desc) { ; }
+      StateInfo(const StateInfo &) = default;
+      StateInfo(StateInfo &&) = default;
+      ~StateInfo() { ; }
+
+      StateInfo & operator=(const StateInfo &) = default;
+      StateInfo & operator=(StateInfo &&) = default;
     };
 
     emp::vector<StateInfo> states;           ///< All available states.  Position is key ID
@@ -61,7 +67,12 @@ namespace emp {
     size_t GetKey(const std::string & name) const { return Find(name_map, name, 0); }
   public:
     StateGridInfo() : states(), state_map(), symbol_map(), name_map(), grid_count(0) { ; }
+    StateGridInfo(const StateGridInfo &) = default;
+    StateGridInfo(StateGridInfo &&) = default;
     ~StateGridInfo() { ; }
+
+    StateGridInfo & operator=(const StateGridInfo &) = default;
+    StateGridInfo & operator=(StateGridInfo &&) = default;
 
     size_t GetNumStates() const { return states.size(); }
     size_t GetGridCount() const { return grid_count; }
