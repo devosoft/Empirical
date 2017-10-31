@@ -43,6 +43,11 @@ public:
   void SetFacing(size_t facing) { sg_status.SetFacing(facing); }
   void SetStateGrid(const emp::StateGrid & in_sg) { state_grid = in_sg; }
 
+  void ResetHardware() {
+    emp::AvidaGP::ResetHardware();
+    score = 0;
+  }
+
   static void Inst_Move(SGOrg & hw, const emp::AvidaGP::Instruction & inst) {
     hw.sg_status.Move(hw.state_grid, hw.regs[inst.args[0]]);
   }
