@@ -43,6 +43,12 @@ public:
   void SetFacing(size_t facing) { sg_status.SetFacing(facing); }
   void SetStateGrid(const emp::StateGrid & in_sg) { state_grid = in_sg; }
 
+  double GetFitness() {  // Setup the fitness function.
+    ResetHardware();
+    Process(200);
+    return score;
+  }
+
   void ResetHardware() {
     emp::AvidaGP::ResetHardware();
     score = 0;
@@ -155,17 +161,6 @@ int main()
       }
       return num_muts;
     } );
-
-  // Setup the fitness function.
-  std::function<double(SGOrg &)> fit_fun =
-    [](SGOrg & org) {
-      double resources = 0.0;
-      org.ResetHardware();
-      org.Process(200);
-      return resources;
-    };
-  world.SetFitFun(fit_fun);
-
 
   // Do the run...
   for (size_t ud = 0; ud < UPDATES; ud++) {
