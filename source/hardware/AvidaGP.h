@@ -237,7 +237,7 @@ namespace emp {
     AvidaGP(AvidaGP &&) = default;
 
     /// Destructor
-    ~AvidaGP() { ; }
+    virtual ~AvidaGP() { ; }
 
     bool operator<(const AvidaGP& other) const {
       return genome < other.genome;
@@ -251,7 +251,7 @@ namespace emp {
     }
 
     /// Reset just the CPU hardware, but keep the genome and traits.
-    void ResetHardware() {
+    virtual void ResetHardware() {
       // Initialize registers to their posision.  So Reg0 = 0 and Reg11 = 11.
       for (size_t i = 0; i < CPU_SIZE; i++) {
         regs[i] = (double) i;
