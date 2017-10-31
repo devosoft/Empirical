@@ -12,6 +12,8 @@
  *  @todo Functions such as Load() should throw exceptions (or equilv.), not use asserts.
  *  @todo Need to figure out a default mapping for how outputs translate to moves around a
  *    state grid.  -1 = Back up ; 0 = Turn left ; 1 = Move fast-forwards ; 2 = Turn right
+ *  @todo Allow StateGridInfo to be built inside of StateGrid (change reference to pointer and
+ *    possible ownership)
  */
 
 
@@ -21,9 +23,11 @@
 #include <map>
 #include <string>
 
+#include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../tools/File.h"
 #include "../tools/map_utils.h"
+#include "../tools/math.h"
 
 namespace emp {
 
@@ -50,14 +54,17 @@ namespace emp {
     std::map<char, size_t> symbol_map;       ///< Map of symbols to associated key ID
     std::map<std::string, size_t> name_map;  ///< Map of names to associated key ID
 
+    size_t grid_count;                       ///< How many grids is this info part of?
+
     size_t GetKey(int state_id) const { return Find(state_map, state_id, 0); }
     size_t GetKey(char symbol) const { return Find(symbol_map, symbol, 0); }
     size_t GetKey(const std::string & name) const { return Find(name_map, name, 0); }
   public:
-    StateGridInfo() : states(), state_map(), symbol_map(), name_map() { ; }
+    StateGridInfo() : states(), state_map(), symbol_map(), name_map(), grid_count(0) { ; }
     ~StateGridInfo() { ; }
 
     size_t GetNumStates() const { return states.size(); }
+    size_t GetGridCount() const { return grid_count; }
 
     // Convert from state ids...
     char GetSymbol(int state_id) const { return states[ GetKey(state_id) ].symbol; }
@@ -76,6 +83,9 @@ namespace emp {
       symbol_map[symbol] = key_id;
       name_map[name] = key_id;
     }
+
+    void IncGridCount() { ++grid_count; }
+    void DecGridCount() { --grid_count; }
   };
 
   /// A StateGrid describes a map of grid positions to the current state of each position.
@@ -85,33 +95,54 @@ namespace emp {
     size_t height;             ///< Height of the overall grid
     emp::vector<int> states;   ///< Specific states at each position in the grid.
 
-    StateGridInfo & info;      ///< Information about the set of states used in this grid.
+    Ptr<StateGridInfo> info;   ///< Information about the set of states used in this grid.
 
   public:
+    StateGrid() : width(0), height(0), states(0), info(nullptr) { ; }
     StateGrid(StateGridInfo & _i, size_t _w=1, size_t _h=1, int init_val=0)
-      : width(_w), height(_h), states(_w*_h,init_val), info(_i) { ; }
+      : width(_w), height(_h), states(_w*_h,init_val), info(&_i) { info->IncGridCount(); }
     StateGrid(StateGridInfo & _i, const std::string & filename)
-      : width(1), height(1), states(), info(_i) { Load(filename); }
-    StateGrid(const StateGrid &) = default;
-    StateGrid(StateGrid &&) = default;
-    ~StateGrid() { ; }
+      : width(1), height(1), states(), info(&_i) { Load(filename); info->IncGridCount(); }
+    StateGrid(const StateGrid & in)
+      : width(in.width), height(in.height), states(in.states), info(in.info)
+    { if (info) info->IncGridCount(); }
+    StateGrid(StateGrid && in)
+      : width(in.width), height(in.height), states(std::move(in.states)), info(in.info)
+    { in.info = nullptr; }
+    ~StateGrid() { if (info) info->DecGridCount(); }
 
-    StateGrid & operator=(const StateGrid &) = default;
-    StateGrid & operator=(StateGrid &&) = default;
+    StateGrid & operator=(const StateGrid & in) {
+      width = in.width;
+      height = in.height;
+      states = in.states;
+      if (info) info->DecGridCount();  // Notify previous info that grid no longer using it.
+      info = in.info;                  // Use same info as old grid.
+      if (info) info->IncGridCount();  // Notify new info that another grid is using it.
+      return *this;
+    }
+    StateGrid & operator=(StateGrid && in) {
+      width = in.width;
+      height = in.height;
+      states = in.states;
+      if (info) info->DecGridCount();  // Notify previous info that grid no longer using it.
+      info = in.info;                  // Move info from old grid (no need to change count)
+      in.info = nullptr;               // Old grid (moved from) no longer using info.
+      return *this;
+    }
 
     size_t GetWidth() const { return width; }
     size_t GetHeight() const { return height; }
     size_t GetSize() const { return states.size(); }
-    const StateGridInfo & GetInfo() const { return info; }
+    const StateGridInfo & GetInfo() const { return *info; }
 
     int & operator()(size_t x, size_t y) { return states[y*width+x]; }
     int operator()(size_t x, size_t y) const { return states[y*width+x]; }
     int GetState(size_t x, size_t y) const { return states[y*width+x]; }
     StateGrid & SetState(size_t x, size_t y, int in) { states[y*width+x] = in; return *this; }
 
-    char GetSymbol(size_t x, size_t y) const { return info.GetSymbol(GetState(x,y)); }
-    double GetScoreMult(size_t x, size_t y) const { return info.GetScoreMult(GetState(x,y)); }
-    const std::string & GetName(size_t x, size_t y) const { return info.GetName(GetState(x,y)); }
+    char GetSymbol(size_t x, size_t y) const { return info->GetSymbol(GetState(x,y)); }
+    double GetScoreMult(size_t x, size_t y) const { return info->GetScoreMult(GetState(x,y)); }
+    const std::string & GetName(size_t x, size_t y) const { return info->GetName(GetState(x,y)); }
 
     template <typename... Ts>
     StateGrid & Load(Ts &&... args) {
@@ -133,7 +164,7 @@ namespace emp {
       for (size_t row = 0; row < height; row++) {
         emp_assert(file[row].size() == width);  // Make sure all rows are the same size.
         for (size_t col = 0; col < width; col++) {
-          states[row*width+col] = info.GetState(file[row][col]);
+          states[row*width+col] = info->GetState(file[row][col]);
         }
       }
 
@@ -146,10 +177,10 @@ namespace emp {
       std::string out;
       for (size_t i = 0; i < height; i++) {
         out.resize(0);
-        out += info.GetSymbol( states[i*width] );
+        out += info->GetSymbol( states[i*width] );
         for (size_t j = 1; j < width; j++) {
           out += ' ';
-          out +=info.GetSymbol( states[i*width+j] );
+          out +=info->GetSymbol( states[i*width+j] );
         }
         file.Append(out);
       }
@@ -158,11 +189,12 @@ namespace emp {
     }
   };
 
+  /// Information about a particular agent on a state grid.
   class StateGridStatus {
   protected:
-    size_t x;
-    size_t y;
-    size_t facing;  // 0=UL, 1=Up, 2=UR, 3=Right, 4=DR, 5=Down, 6=DL, 7=Left (+=Clockwise)
+    size_t x;       ///< X-coordinate of this agent
+    size_t y;       ///< Y-coordinate of this agent.
+    size_t facing;  ///< 0=UL, 1=Up, 2=UR, 3=Right, 4=DR, 5=Down, 6=DL, 7=Left (+=Clockwise)
   public:
     StateGridStatus() : x(0), y(0), facing(1) { ; }
     StateGridStatus(const StateGridStatus &) = default;
@@ -180,16 +212,17 @@ namespace emp {
     StateGridStatus & SetPos(size_t _x, size_t _y) { x = _x; y = _y; return *this; }
     StateGridStatus & SetFacing(size_t _f) { facing = _f; return *this; }
 
+    /// Move explicitly in the x direction (regardless of facing).
     void MoveX(const StateGrid & grid, int steps=1) {
-      int tmp_x = (steps + (int) x) % (int) grid.GetWidth();
-      x = (size_t) ((tmp_x < 0) ? (tmp_x + (int) grid.GetWidth()) : tmp_x);
+      x = (size_t) Mod(steps + (int) x, (int) grid.GetWidth());
     }
 
+    /// Move explicitly in the y direction (regardless of facing).
     void MoveY(const StateGrid & grid, int steps=1) {
-      int tmp_y = (steps + (int) y) % (int) grid.GetHeight();
-      y = (size_t) ((tmp_y < 0) ? (tmp_y + (int) grid.GetHeight()) : tmp_y);
+      y = (size_t) Mod(steps + (int) y, (int) grid.GetHeight());
     }
 
+    /// Move in the direction currently faced.
     void Move(const StateGrid & grid, int steps=1) {
       switch (facing) {
         case 0: MoveX(grid, -steps); MoveY(grid, -steps); break;
@@ -203,12 +236,19 @@ namespace emp {
       }
     }
 
+    /// Rotate starting from current facing.
     void Rotate(int turns=1) {
-      facing = (facing + turns % 8 + 8) % 8;
+      facing = Mod(facing + turns, 8);
     }
 
+    /// Examine state of current position.
     int Scan(const StateGrid & grid) {
       return grid(x,y);
+    }
+
+    /// Set the current position in the state grid.
+    void Set(StateGrid & grid, int new_state) {
+      grid.SetState(x,y,new_state);
     }
   };
 

@@ -1,10 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Helper functions for emp::Random for common random tasks.
-//  Status: RELEASE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  random_utils.h
+ *  @brief Helper functions for emp::Random for common random tasks.
+ *  @note Status: RELEASE
+ */
 
 #ifndef EMP_RANDOM_UTILS_H
 #define EMP_RANDOM_UTILS_H
@@ -15,9 +17,10 @@
 
 namespace emp {
 
-  /// Shuffle all of the elements in a vector.
+  /// Randomly reorder all of the elements in a vector.
   /// If max_count is provided, just make sure that the first max_count entries are randomly
   /// drawn from entire vector.
+
   template <typename T>
   inline void Shuffle(Random & random, emp::vector<T> & v, size_t max_count)
   {
@@ -29,6 +32,7 @@ namespace emp {
   }
   template <typename T>
   inline void Shuffle(Random & random, emp::vector<T> & v) { Shuffle(random, v, v.size()); }
+
 
   /// Return an emp::vector<int> numbered 0 through size-1 in a random order.
 

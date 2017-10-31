@@ -1,19 +1,20 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A general-purpose, fast parser.
-//  Status: BETA
-//
-//
-//  Development notes:
-//  * Patterns should include functions that are called when that point of rule is triggered.
-//  * Make sure to warn if a symbol has no patterns associated with it.
-//  * ...or if a symbol has no path to terminals.
-//  * ...of if a symbol is never use in another pattern (and is not a start state)
-//  * Should we change Parser to a template that takes in the type for the lexer?
-//
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  Parser.h
+ *  @brief A general-purpose, fast parser.
+ *  @note Status: DEVELOPMENT
+ *
+ *  @todo Patterns should include functions that are called when that point of rule is triggered.
+ *  @todo Make sure to warn if a symbol has no patterns associated with it.
+ *  @todo Make sure to warn if a symbol has no path to terminals.
+ *  @todo Make sure to warn if a symbol is never use in another pattern (and is not a start state)
+ *  @todo Should we change Parser to a template that takes in the type for the lexer?
+*/
+
+//  OTHER NOTES:
 //  Setup -> and | and || operators on Parse symbol to all do the same thing: take a pattern of
 //  either string or int (or ideally mixed??) and add a new rule.
 //
@@ -32,35 +33,37 @@
 
 namespace emp {
 
-  // A single symbol in a grammer including the patterns that generate it.
+  /// A single symbol in a grammer including the patterns that generate it.
   struct ParseSymbol {
-    std::string name;
-    emp::vector< size_t > rule_ids;
-    size_t id;
+    std::string name;                 ///< Unique name for this parse symbol.
+    emp::vector< size_t > rule_ids;   ///< Which rules apply to this symbol?
+    size_t id;                        ///< What is the unique ID of this symbol?
 
-    emp::BitVector first;   // What tokens can begin this symbol?
-    emp::BitVector follow;  // What tokens can come after this symbol?
-    bool nullable;            // Can this symbol be converted to nothing?
+    emp::BitVector first;             ///< What tokens can begin this symbol?
+    emp::BitVector follow;            ///< What tokens can come after this symbol?
+    bool nullable;                    ///< Can this symbol be converted to nothing?
 
     ParseSymbol()
      : name(), rule_ids(), id(0)
      , first(Lexer::MaxTokenID()), follow(Lexer::MaxTokenID()), nullable(false) { ; }
   };
 
+  /// A rule for how parsing should work.
   struct ParseRule {
-    size_t symbol_id;
-    emp::vector<size_t> pattern;
+    size_t symbol_id;                ///< The ID of the symbol that this rule should simplify to.
+    emp::vector<size_t> pattern;     ///< The pattern that this rule is triggered by.
 
     ParseRule(size_t sid) : symbol_id(sid), pattern() { ; }
   };
 
+  /// Full information about a parser, including a lexer, symbols, and rules.
   class Parser {
   private:
-    Lexer & lexer;                     // Default input lexer.
-    emp::vector<ParseSymbol> symbols;  // Set of symbols that make up this grammar.
-    emp::vector<ParseRule> rules;      // Set of rules that make up the parser.
-    size_t cur_symbol_id;              // Which id should the next new symbol get?
-    int active_pos;                    // Which symbol pos is active?
+    Lexer & lexer;                     ///< Default input lexer.
+    emp::vector<ParseSymbol> symbols;  ///< Set of symbols that make up this grammar.
+    emp::vector<ParseRule> rules;      ///< Set of rules that make up the parser.
+    size_t cur_symbol_id;              ///< Which id should the next new symbol get?
+    int active_pos;                    ///< Which symbol pos is active?
 
     void BuildRule(emp::vector<size_t> & new_pattern) { ; }
     template <typename T, typename... EXTRAS>
@@ -69,7 +72,7 @@ namespace emp {
       BuildRule(new_pattern, std::forward<EXTRAS>(extras)...);
     }
 
-    // Return the position in the symbols vector where this name is found; else return -1.
+    /// Return the position in the symbols vector where this name is found; else return -1.
     int GetSymbolPos(const std::string & name) const {
       for (size_t i = 0; i < symbols.size(); i++) {
         if (symbols[i].name == name) return (int) i;
@@ -77,13 +80,13 @@ namespace emp {
       return -1;
     }
 
-    // Convert a symbol ID into its position in the symbols[] vector.
+    /// Convert a symbol ID into its position in the symbols[] vector.
     int GetIDPos(size_t id) const {
       if (id < lexer.MaxTokenID()) return -1;
       return (int) (id - lexer.MaxTokenID());
     }
 
-    // Create a new symbol and return its POSITION.
+    /// Create a new symbol and return its POSITION.
     size_t AddSymbol(const std::string & name) {
       ParseSymbol new_symbol;
       new_symbol.name = name;
@@ -101,8 +104,10 @@ namespace emp {
 
     Lexer & GetLexer() { return lexer; }
 
-    // Simple conversions to find an ID...
+    /// Trivial conversions of ID to ID...
     size_t GetID(size_t id) const { return id; }
+
+    /// Converstion of a symbol name to its ID.
     size_t GetID(const std::string & name) {
       int spos = GetSymbolPos(name);                  // First check if parse symbol exists.
       if (spos >= 0) return symbols[(size_t)spos].id; // ...if so, return it.
@@ -114,24 +119,27 @@ namespace emp {
       return symbols[new_spos].id;
     }
 
+    /// Conversion ot a sybol ID to its name.
     std::string GetName(size_t symbol_id) const {
       if (Lexer::TokenOK(symbol_id)) return lexer.GetTokenName(symbol_id);
       const size_t spos = symbol_id - lexer.MaxTokenID();
       return symbols[spos].name;
     }
 
+    /// Provide a symbol to the compiler and set it as active.
     Parser & operator()(const std::string & name) {
       active_pos = GetSymbolPos(name);
       if (active_pos == -1) active_pos = (int) AddSymbol(name);
       return *this;
     }
 
+    /// Get the parser symbol information associated with a provided name.
     ParseSymbol & GetParseSymbol(const std::string & name) {
       size_t pos = (size_t) GetSymbolPos( name );
       return symbols[pos];
     }
 
-    // Use the currently active symbol and attach a rule to it.
+    /// Use the currently active symbol and attach a rule to it.
     template <typename... STATES>
     Parser & Rule(STATES... states) {
       emp_assert(active_pos >= 0 && active_pos < (int) symbols.size(), active_pos);
@@ -144,7 +152,7 @@ namespace emp {
       return *this;
     }
 
-    // Specify the name of the symbol and add a rule to it, returning the symbol id.
+    /// Specify the name of the symbol and add a rule to it, returning the symbol id.
     template <typename... STATES>
     size_t AddRule(const std::string & name, STATES &&... states) {
       const size_t id = GetID(name);
@@ -153,6 +161,7 @@ namespace emp {
       return id;
     }
 
+    /// Convert an input stream into a parse tree (TO FINISH!)
     void Process(std::istream & is, bool test_valid=true) {
       // Scan through the current grammar and try to spot any problems.
       if (test_valid) {
@@ -189,6 +198,7 @@ namespace emp {
       }
     }
 
+    /// Print the current status of this parser (for debugging)
     void Print(std::ostream & os=std::cout) const {
       os << symbols.size() << " parser symbols available." << std::endl;
       for (const auto & s : symbols) {

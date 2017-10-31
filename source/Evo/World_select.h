@@ -27,7 +27,7 @@ namespace emp {
   /// @param e_count How many distinct organisms should be chosen, starting from the most fit.
   /// @param copy_count How many copies should be made of each elite organism?
   template<typename ORG>
-  void EliteSelect(World<ORG> & world, size_t e_count, size_t copy_count) {
+  void EliteSelect(World<ORG> & world, size_t e_count=1, size_t copy_count=1) {
     emp_assert(e_count > 0 && e_count <= world.GetNumOrgs(), e_count);
     emp_assert(copy_count > 0);
 
@@ -44,7 +44,7 @@ namespace emp {
     auto m = fit_map.rbegin();
     for (size_t i = 0; i < e_count; i++) {
       const size_t repro_id = m->second;
-      world.DoBirth( world[repro_id], repro_id, copy_count);
+      world.DoBirth( world.GetGenomeAt(repro_id), repro_id, copy_count);
       ++m;
     }
   }
@@ -52,13 +52,13 @@ namespace emp {
 
   /// ==TOURNAMENT== Selection creates a tournament with a random sub-set of organisms,
   /// finds the one with the highest fitness, and moves it to the next generation.
-  /// User provides the fitness function, the tournament size, and (optionally) the
-  /// number of tournaments to run.
+  /// User provides the world (with a fitness function), the tournament size, and
+  /// (optionally) the number of tournaments to run.
   /// @param world The emp::World object with the organisms to be selected.
   /// @param t_size How many organisms should be placed in each tournament?
   /// @param tourny_count How many tournaments should be run? (with replacement of organisms)
   template<typename ORG>
-  void TournamentSelect(World<ORG> & world, size_t t_size, size_t tourny_count) {
+  void TournamentSelect(World<ORG> & world, size_t t_size, size_t tourny_count=1) {
     emp_assert(t_size > 0 && t_size <= world.GetNumOrgs(), t_size, world.GetNumOrgs());
     emp_assert(tourny_count > 0);
 
@@ -81,7 +81,7 @@ namespace emp {
       }
 
       // Place the highest fitness into the next generation!
-      world.DoBirth( world[best_id], best_id, 1 );
+      world.DoBirth( world.GetGenomeAt(best_id), best_id, 1 );
     }
   }
 
@@ -104,7 +104,7 @@ namespace emp {
     for (size_t n = 0; n < count; n++) {
       const double fit_pos = random.GetDouble(fitness_index.GetWeight());
       const size_t parent_id = fitness_index.Index(fit_pos);
-      const size_t offspring_id = world.DoBirth( world[parent_id], parent_id );
+      const size_t offspring_id = world.DoBirth( world.GetGenomeAt(parent_id), parent_id );
       if (world.IsSynchronous() == false) {
         fitness_index.Adjust(offspring_id, world.CalcFitnessID(offspring_id));
       }
@@ -168,7 +168,7 @@ namespace emp {
       // Place a random survivor (all equal) into the next generation!
       emp_assert(cur_orgs.size() > 0, cur_orgs.size(), fit_funs.size(), all_orgs.size());
       size_t repro_id = cur_orgs[ world.GetRandom().GetUInt(cur_orgs.size()) ];
-      world.DoBirth( world[repro_id], repro_id );
+      world.DoBirth( world.GetGenomeAt(repro_id), repro_id );
     }
   }
 

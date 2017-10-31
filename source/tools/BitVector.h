@@ -184,7 +184,8 @@ namespace emp {
 
       // Mask out any bits that have left-shifted away
       const size_t last_bit_id = LastBitID();
-      if (last_bit_id) { bit_set[NUM_FIELDS - 1] &= (1U << last_bit_id) - 1U; }
+      constexpr field_t val_one = 1;
+      if (last_bit_id) { bit_set[NUM_FIELDS - 1] &= (val_one << last_bit_id) - val_one; }
     }
 
 
@@ -356,7 +357,8 @@ namespace emp {
       emp_assert(index < num_bits, index, num_bits);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
-      const field_t pos_mask = static_cast<field_t>(1) << pos_id;
+      constexpr field_t val_one = 1;
+      const field_t pos_mask = val_one << pos_id;
 
       if (value) bit_set[field_id] |= pos_mask;
       else       bit_set[field_id] &= ~pos_mask;
@@ -440,6 +442,9 @@ namespace emp {
     /// Return true if ALL bits are set to 1, otherwise return false.
     bool All() const { return (~(*this)).None(); }
 
+    /// Casting a bit array to bool identifies if ANY bits are set to 1.
+    explicit operator bool() const { return Any(); }
+
     /// Const index operator -- return the bit at the specified position.
     bool operator[](size_t index) const { return Get(index); }
 
@@ -452,10 +457,11 @@ namespace emp {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = 0U;
     }
 
-    // Set all bits to 1.
+    /// Set all bits to 1.
     void SetAll() {
       const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(0U);
+      constexpr field_t all0 = 0;
+      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~all0;
       if (LastBitID() > 0) { bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID()); }
     }
 
@@ -531,11 +537,16 @@ namespace emp {
       if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
 
       const size_t pos_found = find_bit(bit_set[field_id]);
-      bit_set[field_id] &= ~(1U << pos_found);
+      constexpr field_t val_one = 1;
+      bit_set[field_id] &= ~(val_one << pos_found);
       return (int) (pos_found + (field_id * FIELD_BITS));
     }
 
     /// Return the position of the first one after start_pos; return -1 if no ones in vector.
+    /// You can loop through all 1-bit positions of a BitVector "bv" with:
+    ///
+    ///   for (int pos = bv.FindBit(); pos >= 0; pos = bv.FindBit(pos+1)) { ... }
+
     int FindBit(const size_t start_pos) const {
       if (start_pos >= num_bits) return -1;
       size_t field_id  = FieldID(start_pos);     // What field do we start in?

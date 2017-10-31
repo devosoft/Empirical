@@ -1,10 +1,13 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file contains a set of simple functions to manipulate strings.
-//  Status: RELEASE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file string_utils.h
+ *  @brief Simple functions to manipulate strings.
+ *  @note Status: RELEASE
+ */
+
 
 #ifndef EMP_STRING_UTILS_H
 #define EMP_STRING_UTILS_H
@@ -20,15 +23,20 @@
 
 namespace emp {
 
+  /// Return a const reference to an empty string.  This function is useful to implement other
+  /// functions that need to return a const reference for efficiency, but also need a null response.
+
   static inline const std::string & empty_string() {
     static std::string empty = "";
     return empty;
   }
 
+
+  /// Convert a single chararcter to one that uses a proper escape sequence (in a string) if needed.
   static inline std::string to_escaped_string(char value) {
     // Start by quickly returning a string if it's easy.
     std::stringstream ss;
-    if ( (value >= 40 && value < 91) || value > 96) {
+    if ( (value >= 40 && value < 91) || (value > 96 && value < 127)) {
       ss << value;
       return ss.str();
     }
@@ -77,6 +85,8 @@ namespace emp {
       return ss.str();
     };
   }
+
+  /// Convert a full string to one that uses proper escape sequences, as needed.
   static inline std::string to_escaped_string(const std::string & value) {
     std::stringstream ss;
     for (char c : value) { ss << to_escaped_string(c); }
@@ -84,17 +94,20 @@ namespace emp {
   }
 
 
-
-  // The to_literal function set will take a value and convert it to a C++ literal.
+  /// Take a value and convert it to a C++-style literal.
   template <typename LIT_TYPE>
   inline std::string to_literal(const LIT_TYPE & value) {
     return std::to_string(value);
   }
+
+  /// Take a char and convert it to a C++-style literal.
   static inline std::string to_literal(char value) {
     std::stringstream ss;
     ss << "'" << to_escaped_string(value) << "'";
     return ss.str();
   }
+
+  /// Take a string and convert it to a C++-style literal.
   static inline std::string to_literal(const std::string & value) {
     // Add quotes to the ends and convert each character.
     std::stringstream ss;
@@ -106,6 +119,7 @@ namespace emp {
     return ss.str();
   }
 
+  /// Convert a string to all uppercase.
   static inline std::string to_upper(std::string value) {
     constexpr int char_shift = 'a' - 'A';
     for (auto & x : value) {
@@ -114,6 +128,7 @@ namespace emp {
     return value;
   }
 
+  /// Convert a string to all lowercase.
   static inline std::string to_lower(std::string value) {
     constexpr int char_shift = 'a' - 'A';
     for (auto & x : value) {
@@ -122,7 +137,7 @@ namespace emp {
     return value;
   }
 
-  // Convert to roman numerals
+  // Convert an integer to a roman numeral string.
   static inline std::string to_roman_numeral(int val, const std::string & prefix="") {
     std::string ret_string(prefix);
     if (val < 0) ret_string += to_roman_numeral(-val, "-");
@@ -146,97 +161,112 @@ namespace emp {
   }
 
 
-
+  /// Determine if a character is whitespace.
   inline bool is_whitespace(char test_char) {
     return (test_char == ' ' || test_char == '\n' || test_char == '\r' || test_char == '\t');
   }
 
+  /// Determine if a character is an uppercase letter.
   inline bool is_upper_letter(char test_char) {
     return (test_char >= 'A' && test_char <= 'Z');
   }
 
+  /// Determine if a character is a lowercase letter.
   inline bool is_lower_letter(char test_char) {
     return (test_char >= 'a' && test_char <= 'z');
   }
 
+  /// Determine if a character is a letter of any kind.
   inline bool is_letter(char test_char) {
     return is_upper_letter(test_char) || is_lower_letter(test_char);
   }
 
+  /// Determine if a character is a digit.
   inline bool is_digit(char test_char) {
     return (test_char >= '0' && test_char <= '9');
   }
 
+  /// Determine if a character is a letter or digit.
   inline bool is_alphanumeric(char test_char) {
     return is_letter(test_char) || is_digit(test_char);
   }
 
+  /// Determine if a character is a letter, digit, or underscore.
   inline bool is_idchar(char test_char) {
     return is_alphanumeric(test_char) || test_char == '_';
   }
 
+  /// Determine if a character is in a set of characters (represented as a string)
   static inline bool is_one_of(char test_char, const std::string & char_set) {
     for (char x : char_set) if (test_char == x) return true;
     return false;
   }
 
+  /// Determine if a string is composed only of a set of characters (represented as a string)
   static inline bool is_composed_of(const std::string & test_str, const std::string & char_set) {
     for (char x : test_str) if (!is_one_of(x, char_set)) return false;
     return true;
   }
 
-
+  /// Determine if there is whitespace anywhere in a string.
   inline bool has_whitespace(const std::string & test_str) {
     for (char c : test_str) if (is_whitespace(c)) return true;
     return false;
   }
 
+  /// Determine if there are any uppercase letters in a string.
   inline bool has_upper_letter(const std::string & test_str) {
     for (char c : test_str) if (is_upper_letter(c)) return true;
     return false;
   }
 
+  /// Determine if there are any lowercase letters in a string.
   inline bool has_lower_letter(const std::string & test_str) {
     for (char c : test_str) if (is_lower_letter(c)) return true;
     return false;
   }
 
+  /// Determine if there are any letters in a string.
   inline bool has_letter(const std::string & test_str) {
     for (char c : test_str) if (is_letter(c)) return true;
     return false;
   }
 
+  /// Determine if there are any digits in a string.
   inline bool has_digit(const std::string & test_str) {
     for (char c : test_str) if (is_digit(c)) return true;
     return false;
   }
 
+  /// Determine if there are any letters or digits anywhere in a string.
   inline bool has_alphanumeric(const std::string & test_str) {
     for (char c : test_str) if (is_alphanumeric(c)) return true;
     return false;
   }
 
+  /// Determine if there are any letters, digit, or underscores anywhere in a string.
   inline bool has_idchar(const std::string & test_str) {
     for (char c : test_str) if (is_idchar(c)) return true;
     return false;
   }
 
+  /// Determine if a specified set of characters appears anywhere in a string.
   static inline bool has_one_of(const std::string & test_str, const std::string & char_set) {
     for (char c : test_str) if (is_one_of(c, char_set)) return true;
     return false;
   }
 
 
-  // If no functions are provided to is_value(), always return false as base case.
+  /// If no functions are provided to is_valid(), always return false as base case.
   inline bool is_valid(char test_char) { return false; }
 
-  // A character is valid if it passes any of the test functions provided.
+  /// Determine if a character passes any of the test functions provided.
   template <typename... FUNS>
   inline bool is_valid(char test_char, std::function<bool(char)> fun1, FUNS... funs) {
     return fun1(test_char) || is_valid(test_char, funs...);
   }
 
-  // For a string to be valid, each character must pass at least one provided function.
+  /// For a string to be valid, each character must pass at least one provided function.
   template <typename... FUNS>
   static inline bool is_valid(const std::string & test_str, FUNS... funs) {
     for (char x : test_str) if ( !is_valid(x, funs...) ) return false;
@@ -268,51 +298,64 @@ namespace emp {
     return in_string.substr(start_pos, end_pos);
   }
 
-
+  /// Remove a prefix of the input string (up to a specified delimeter) and return it.  If the
+  /// delimeter is not found, return the entire input string and clear it.
   inline std::string string_pop(std::string & in_string, const char delim) {
     return string_pop_fixed(in_string, in_string.find(delim), 1);
   }
 
+  /// Return a prefix of the input string (up to a specified delimeter), but do not modify it.
+  /// If the delimeter is not found, return the entire input string.
   inline std::string string_get(const std::string & in_string, const char delim, size_t start_pos=0) {
     return string_get_range(in_string, start_pos, in_string.find(delim, start_pos));
   }
 
+  /// Remove a prefix of the input string (up to any of a specified set of delimeters) and
+  /// return it.  If the delimeter is not found, return the entire input string and clear it.
   inline std::string string_pop(std::string & in_string, const std::string & delim_set) {
     return string_pop_fixed(in_string, in_string.find_first_of(delim_set), 1);
   }
 
+  /// Return a prefix of the input string (up to any of a specified set of delimeters), but do not
+  /// modify it. If the delimeter is not found, return the entire input string.
   inline std::string string_get(const std::string & in_string, const std::string & delim_set, size_t start_pos=0) {
     return string_get_range(in_string, start_pos, in_string.find_first_of(delim_set, start_pos));
   }
 
+  /// Remove a prefix of a string, up to the first whitespace, and return it.
   inline std::string string_pop_word(std::string & in_string) {
     // Whitespace = ' ' '\n' '\r' or '\t'
     return string_pop(in_string, " \n\r\t");
   }
 
+  /// Return a prefix of a string, up to the first whitespace (do not modify the original string)
   inline std::string string_get_word(const std::string & in_string, size_t start_pos=0) {
     // Whitespace = ' ' '\n' '\r' or '\t'
     return string_get(in_string, " \n\r\t", start_pos);
   }
 
+  /// Remove a prefix of a string, up to the first newline, and return it.
   inline std::string string_pop_line(std::string & in_string) {
     return string_pop(in_string, '\n');
   }
 
+  /// Return a prefix of a string, up to the first newline (do not modify the original string)
   inline std::string string_get_line(const std::string & in_string, size_t start_pos=0) {
     return string_get(in_string, '\n', start_pos);
   }
 
-  // Tricks for dealing with whitespace.
+  /// Remove all whitespace at the beginning of a string.  Return the whitespace removed.
   inline std::string left_justify(std::string & in_string) {
     return string_pop_fixed(in_string, in_string.find_first_not_of(" \n\r\t"));
   }
 
+  /// Remove all whitespace at the end of a string.
   inline void right_justify(std::string & in_string) {
     // @CAO *very* inefficient at the moment.
     while (is_whitespace(in_string.back())) in_string.pop_back();
   }
 
+  /// Every time one or more whitespace characters appear replace them with a single space.
   static inline void compress_whitespace(std::string & in_string) {
     const size_t strlen = in_string.size();
     bool last_whitespace = true;
@@ -333,6 +376,7 @@ namespace emp {
     in_string.resize(pos);
   }
 
+  /// Remove all whitespace from anywhere within a string.
   static inline void remove_whitespace(std::string & in_string) {
     const size_t strlen = in_string.size();
     size_t pos = 0;
@@ -361,7 +405,7 @@ namespace emp {
   }
 
 
-  // Cut up a string based on a deliminator.
+  /// Cut up a string based on the provided delimitor; fill them in to the provided vector.
   static inline void slice(const std::string & in_string, emp::vector<std::string> & out_set,
                            char delim='\n') {
     const size_t test_size = in_string.size();
@@ -391,7 +435,7 @@ namespace emp {
 
   }
 
-  // A simple way to slice a string without passing in result vector (may be less efficient).
+  /// Slice a string without passing in result vector (may be less efficient).
   static inline emp::vector<std::string> slice(const std::string & in_string, char delim='\n') {
     emp::vector<std::string> result;
     slice(in_string, result, delim);

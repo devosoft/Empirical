@@ -1,10 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A simple way to track value ranges
-//  Status: BETA
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  Range.h
+ *  @brief A simple way to track value ranges
+ *  @note Status: BETA
+ */
 
 #ifndef EMP_RANGE_H
 #define EMP_RANGE_H
@@ -14,11 +16,12 @@
 
 namespace emp {
 
+  /// A range of values from a lower limit to and upper limit, of any provided type.
   template <typename T>
   class Range {
   private:
-    T lower;
-    T upper;
+    T lower;  ///< Beginning of range, inclusive.
+    T upper;  ///< End of range, inclusive.
 
   public:
     Range(T _l, T _u) : lower(_l), upper(_u) { emp_assert(_l < _u); }
@@ -34,8 +37,10 @@ namespace emp {
     void SetUpper(T u) { upper = u; }
     void Set(T _l, T _u) { emp_assert(_l < _u); lower = _l; upper = _u; }
 
+    /// Determine if a provided value is in the range.
     bool Valid(T value) { return value >= lower && value <= upper; }
 
+    /// Produce a vector that spreads values evenly across the range.
     emp::vector<T> Spread(size_t s) {
       emp_assert(s >= 1);
       emp::vector<T> out(s);
@@ -50,8 +55,13 @@ namespace emp {
     }
   };
 
+  /// Build a new range with auto-detected type.
   template <typename T> Range<T> MakeRange(T _l, T _u) { return Range<T>(_l,_u); }
+
+  /// Build a new range of type int.
   inline Range<int> IntRange(int _l, int _u) { return Range<int>(_l,_u); }
+
+  /// Build a new range of type double.
   inline Range<double> DRange(double _l, double _u) { return Range<double>(_l,_u); }
 }
 
