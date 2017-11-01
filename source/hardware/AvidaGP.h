@@ -117,15 +117,14 @@ namespace emp {
       RegBackup(size_t _s, size_t _r, double _v) : scope(_s), reg_id(_r), value(_v) { ; }
     };
 
-  protected:
-
     // Virtual CPU Components!
     genome_t genome;
-    emp::array<double, CPU_SIZE> regs;
-    std::unordered_map<int, double> inputs;   // Map of all available inputs (position -> value)
-    std::unordered_map<int, double> outputs;  // Map of all outputs (position -> value)
-    emp::array< stack_t, CPU_SIZE > stacks;
-    emp::array< int, CPU_SIZE> fun_starts;
+    emp::array<double, CPU_SIZE> regs;       // Registers used in the hardware.
+    std::unordered_map<int, double> inputs;  // Map of all available inputs (position -> value)
+    std::unordered_map<int, double> outputs; // Map of all outputs (position -> value)
+    emp::array< stack_t, CPU_SIZE > stacks;  // Stacks for long-term storage.
+    emp::array< int, CPU_SIZE > fun_starts;  // Postions where functions being in genome.
+    HARDWARE hw;                             // Extra hardware for specialty runs.
 
     size_t inst_ptr;
     emp::vector<ScopeInfo> scope_stack;
