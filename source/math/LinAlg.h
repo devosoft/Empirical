@@ -721,8 +721,6 @@ namespace emp {
           viewWidth = viewHeight / aspect;
         }
 
-        std::cout << viewWidth << " x " << viewHeight << std::endl;
-
         auto dx = viewWidth / 2;
         auto dy = viewHeight / 2;
 
