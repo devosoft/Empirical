@@ -15,6 +15,9 @@
 #include <thread>
 #endif
 
+#include <functional>
+#include <vector>
+
 namespace emp {
   namespace opengl {
 

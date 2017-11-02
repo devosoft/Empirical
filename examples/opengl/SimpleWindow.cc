@@ -45,8 +45,6 @@ int main(int argc, char* argv[]) {
   gl::GLCanvas canvas(1000, 1000);
   emp::Random random;
 
-  auto q = emp::math::Quat<float>::rotation(0, 0, 1, 5);
-
   auto shaderProgram = gl::shaders::simpleSolidColor(canvas);
   shaderProgram.use();
 
