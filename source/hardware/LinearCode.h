@@ -38,8 +38,17 @@ namespace emp {
     bool operator==(const Instruction & in) const { return id == in.id && args == in.args; }
   };
 
+
+  // template <size_t ARG_COUNT=3, typename ARG_TYPE=size_t>
+  // using LinearCode = emp::vector<Instruction<ARG_COUNT, ARG_TYPE>>;
+
   template <size_t ARG_COUNT=3, typename ARG_TYPE=size_t>
-  using LinearCode = emp::vector<Instruction<ARG_COUNT, ARG_TYPE>>;
+  class LinearCode : public emp::vector<Instruction<ARG_COUNT, ARG_TYPE>> {
+  public:
+    void AddInst(size_t id, const emp::array<ARG_TYPE, ARG_COUNT> & in_args={}) {
+      emp::vector<Instruction<ARG_COUNT, ARG_TYPE>>::push_back(Instruction<ARG_COUNT, ARG_TYPE>(id, in_args));
+    }
+  };
 
 }
 
