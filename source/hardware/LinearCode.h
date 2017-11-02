@@ -22,8 +22,7 @@ namespace emp {
     size_t id;
     args_t args;
 
-    Instruction(size_t _id=0) : id(_id), args({}) { ; }
-    Instruction(size_t _id, const args_t & in_args) : id(_id), args(in_args) { ; }
+    Instruction(size_t _id=0, const args_t & in_args={}) : id(_id), args(in_args) { ; }
     Instruction(const Instruction &) = default;
     Instruction(Instruction &&) = default;
 
@@ -34,13 +33,13 @@ namespace emp {
       return id < other.id;
     }
 
-    void Set(size_t _id, size_t _a0=0, size_t _a1=0, size_t _a2=0)
-    { id = _id; args[0] = _a0; args[1] = _a1; args[2] = _a2; }
+    void Set(size_t _id, const args_t & in_args) { id = _id; args = in_args; }
 
     bool operator==(const Instruction & in) const { return id == in.id && args == in.args; }
   };
 
-  using LinearCode = emp::vector<Instruction<3>>;
+  template <size_t ARG_COUNT=3, typename ARG_TYPE=size_t>
+  using LinearCode = emp::vector<Instruction<ARG_COUNT, ARG_TYPE>>;
 
 }
 
