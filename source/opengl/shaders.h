@@ -228,9 +228,7 @@ namespace emp {
       }
 
       Uniform uniform(const std::string& name) const {
-        auto loc = glGetUniformLocation(handle, name.c_str());
-        std::cout << name << " = " << loc << std::endl;
-        return loc;
+        return glGetUniformLocation(handle, name.c_str());
       }
     };
   }  // namespace opengl
