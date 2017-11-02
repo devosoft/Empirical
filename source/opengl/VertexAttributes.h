@@ -2,6 +2,7 @@
 #define VERTEX_ATTRIBUTES
 
 #include <GLES3/gl3.h>
+#include "glutils.h"
 
 namespace emp {
   namespace opengl {

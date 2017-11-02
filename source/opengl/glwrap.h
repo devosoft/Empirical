@@ -8,6 +8,7 @@
 
 #include "VertexAttributes.h"
 #include "base/assert.h"
+#include "glutils.h"
 
 namespace emp {
   namespace opengl {
@@ -48,7 +49,7 @@ namespace emp {
       public:
       BufferObject(BufferType type) : hasValue(true), type(type) {
         glGenBuffers(1, &handle);
-        emp_assert(glGetError() == GL_NO_ERROR);
+        utils::catchGlError();
       }
 
       BufferObject(const BufferObject&) = delete;
@@ -77,7 +78,7 @@ namespace emp {
         if (hasValue) {
           hasValue = false;
           glDeleteBuffers(1, &handle);
-          emp_assert(glGetError() == GL_NO_ERROR);
+          utils::catchGlError();
         }
       }
 
@@ -85,12 +86,12 @@ namespace emp {
       void set(const T (&data)[N], BufferUsage usage) {
         glBufferData(static_cast<GLenum>(type), sizeof(data), data,
                      static_cast<GLenum>(usage));
-        emp_assert(glGetError() == GL_NO_ERROR);
+        utils::catchGlError();
       }
 
       BufferObject& bind() {
         glBindBuffer(static_cast<GLenum>(type), handle);
-        emp_assert(glGetError() == GL_NO_ERROR);
+        utils::catchGlError();
 
         return *this;
       }
@@ -180,10 +181,10 @@ namespace emp {
       void apply() {
         glVertexAttribIPointer(index, static_cast<GLint>(size),
                                static_cast<GLenum>(type), stride, offset);
-        emp_assert(glGetError() == GL_NO_ERROR);
+        utils::catchGlError();
 
         glEnableVertexAttribArray(index);
-        emp_assert(glGetError() == GL_NO_ERROR);
+        utils::catchGlError();
       }
     };
 
@@ -212,10 +213,10 @@ namespace emp {
         glVertexAttribPointer(index, static_cast<GLint>(size),
                               static_cast<GLenum>(type), normalized, stride,
                               offset);
-        emp_assert(glGetError() == GL_NO_ERROR);
+        utils::catchGlError();
 
         glEnableVertexAttribArray(index);
-        emp_assert(glGetError() == GL_NO_ERROR);
+        utils::catchGlError();
       }
     };
 
@@ -242,10 +243,10 @@ namespace emp {
       public:
       VertexArrayObjectConfigurator() {
         glGenVertexArrays(1, &handle);
-        emp_assert(glGetError() == GL_NO_ERROR);
+        utils::catchGlError();
 
         glBindVertexArray(handle);
-        emp_assert(glGetError() == GL_NO_ERROR);
+        utils::catchGlError();
         VertexArrayObject::boundVAO = handle;
       }
 

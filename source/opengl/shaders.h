@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "defaultUniforms.h"
+#include "glutils.h"
 
 namespace emp {
   namespace opengl {
@@ -227,7 +228,9 @@ namespace emp {
       }
 
       Uniform uniform(const std::string& name) const {
-        return glGetUniformLocation(handle, name.c_str());
+        auto loc = glGetUniformLocation(handle, name.c_str());
+        std::cout << name << " = " << loc << std::endl;
+        return loc;
       }
     };
   }  // namespace opengl

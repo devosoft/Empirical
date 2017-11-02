@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <ostream>
 #include <stdexcept>
 
@@ -31,7 +32,7 @@ namespace emp {
       template <typename F>
       constexpr F ident(size_t i, size_t j) {
         return i == j ? F{1} : F{0};
-      };
+      }
 
       template <typename To, typename From>
       constexpr To convertImpl(From&& from, const std::true_type&) {
@@ -643,30 +644,30 @@ namespace emp {
   using Vec##D##ull = ColVec##D<unsigned long long>;    \
   using Vec##D##s = ColVec##D<std::size_t>;
 
-    MAT_SHORT(1, 1);
-    MAT_SHORT(2, 1);
-    MAT_SHORT(3, 1);
-    MAT_SHORT(4, 1);
+    MAT_SHORT(1, 1)
+    MAT_SHORT(2, 1)
+    MAT_SHORT(3, 1)
+    MAT_SHORT(4, 1)
 
-    MAT_SHORT(1, 2);
-    MAT_SHORT(2, 2);
-    MAT_SHORT(3, 2);
-    MAT_SHORT(4, 2);
+    MAT_SHORT(1, 2)
+    MAT_SHORT(2, 2)
+    MAT_SHORT(3, 2)
+    MAT_SHORT(4, 2)
 
-    MAT_SHORT(1, 3);
-    MAT_SHORT(2, 3);
-    MAT_SHORT(3, 3);
-    MAT_SHORT(4, 3);
+    MAT_SHORT(1, 3)
+    MAT_SHORT(2, 3)
+    MAT_SHORT(3, 3)
+    MAT_SHORT(4, 3)
 
-    MAT_SHORT(1, 4);
-    MAT_SHORT(2, 4);
-    MAT_SHORT(3, 4);
-    MAT_SHORT(4, 4);
+    MAT_SHORT(1, 4)
+    MAT_SHORT(2, 4)
+    MAT_SHORT(3, 4)
+    MAT_SHORT(4, 4)
 
-    VEC_SHORT(1);
-    VEC_SHORT(2);
-    VEC_SHORT(3);
-    VEC_SHORT(4);
+    VEC_SHORT(1)
+    VEC_SHORT(2)
+    VEC_SHORT(3)
+    VEC_SHORT(4)
 
     template <typename M1 = Mat<float, 1, 3>, typename M2 = M1>
     constexpr Mat<decltype(std::declval<typename M1::value_type>() *
