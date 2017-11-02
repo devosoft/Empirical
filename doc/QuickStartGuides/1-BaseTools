@@ -20,7 +20,7 @@ if triggered, would print something to the effect of
 Indicating that not only was i not < 10, but it's current value is 1844674.
 
 If compiled as part of a web app (with Emscripten) emp_assert will automatically use the
-JavaScript Alert function to indicate any assert failurs.  Asserts are all disabled (fully
+JavaScript Alert function to indicate any assert failures.  Asserts are all disabled (fully
 removed from compiled code) if compiled using the NDEBUG option (for most compilers, this
 deactivation is accomplished by using the -DNDEBUG flag at compile time.)
 
@@ -29,7 +29,7 @@ deactivation is accomplished by using the -DNDEBUG flag at compile time.)
 === vector.h ===
 
 These files setup the emp::array<...> and emp::vector<...> template objects, which behave
-almost identially to std::array<...> and std::vector<...>, respectively.  The one difference
+almost identically to std::array<...> and std::vector<...>, respectively.  The one difference
 is that they do bounds checking when they are indexed into or specific size matters.  As with
 asserts, these additional bounds checks are removed when compiled with the NDEBUG option.
 
