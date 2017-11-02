@@ -15,18 +15,22 @@
 
 namespace emp {
 
+  template <size_t ARG_COUNT, typename ARG_TYPE=size_t>
   struct Instruction {
-    size_t id;
-    emp::array<size_t, 3> args;
+    using args_t = emp::array<ARG_TYPE, ARG_COUNT>;
 
-    Instruction(size_t _id=0, size_t a0=0, size_t a1=0, size_t a2=0)
-      : id(_id), args() { args[0] = a0; args[1] = a1; args[2] = a2; }
+    size_t id;
+    args_t args;
+
+    Instruction(size_t _id=0) : id(_id), args({}) { ; }
+    Instruction(size_t _id, const args_t & in_args) : id(_id), args(in_args) { ; }
     Instruction(const Instruction &) = default;
     Instruction(Instruction &&) = default;
 
     Instruction & operator=(const Instruction &) = default;
     Instruction & operator=(Instruction &&) = default;
     bool operator<(const Instruction & other) const {
+      if (id == other.id) return args < other.args;
       return id < other.id;
     }
 
@@ -36,7 +40,7 @@ namespace emp {
     bool operator==(const Instruction & in) const { return id == in.id && args == in.args; }
   };
 
-  using LinearCode = emp::vector<Instruction>;
+  using LinearCode = emp::vector<Instruction<3>>;
 
 }
 
