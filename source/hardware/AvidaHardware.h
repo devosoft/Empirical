@@ -12,8 +12,8 @@
  */
 
 
-#ifndef EMP_AVIDA_GP_H
-#define EMP_AVIDA_GP_H
+#ifndef EMP_AVIDA_HARDWARE_H
+#define EMP_AVIDA_HARDWARE_H
 
 #include <fstream>
 #include <iostream>
@@ -28,6 +28,9 @@
 
 namespace emp {
 
+  /// Core hardware for building an avida CPU.
+  /// @param CPU_SIZE determines the number of registers, stacks, etc. to use.
+
   template <size_t CPU_SIZE=16>
   class AvidaHardware {
   public:
@@ -38,39 +41,41 @@ namespace emp {
     /// Eg: LOOP needs to go back to beginning of loop; FUNCTION needs to return to call.
     enum class ScopeType { NONE=0, ROOT, BASIC, LOOP, FUNCTION };
 
+    /// As different scopes are stepped through, this class provides information about each one.
     struct ScopeInfo {
-      size_t scope;
-      ScopeType type;
-      size_t start_pos;
+      size_t scope;        ///< What is the depth of this scope?
+      ScopeType type;      ///< What type is this scope? (ROOT, BASIC, LOOP, or FUNCTION)
+      size_t start_pos;    ///< Where in the code did this scope start?
 
       ScopeInfo() : scope(0), type(ScopeType::BASIC), start_pos(0) { ; }
       ScopeInfo(size_t _s, ScopeType _t, size_t _p) : scope(_s), type(_t), start_pos(_p) { ; }
     };
 
+    /// Information about a register that is backed up, to be restored when current scope is exited.
     struct RegBackup {
-      size_t scope;
-      size_t reg_id;
-      double value;
+      size_t scope;   ///< What scope should this register be restored in?
+      size_t reg_id;  ///< Which register is this?
+      double value;   ///< What value is being backed up?
 
       RegBackup() : scope(0), reg_id(0), value(0.0) { ; }
       RegBackup(size_t _s, size_t _r, double _v) : scope(_s), reg_id(_r), value(_v) { ; }
     };
 
     // Hardware Components
-    emp::array<double, CPU_SIZE> regs;       // Registers used in the hardware.
-    std::unordered_map<int, double> inputs;  // Map of all available inputs (position -> value)
-    std::unordered_map<int, double> outputs; // Map of all outputs (position -> value)
-    emp::array< stack_t, CPU_SIZE > stacks;  // Stacks for long-term storage.
-    emp::array< int, CPU_SIZE > fun_starts;  // Postions where functions being in genome.
+    emp::array<double, CPU_SIZE> regs;       ///< Registers used in the hardware.
+    std::unordered_map<int, double> inputs;  ///< Map of all available inputs (position -> value)
+    std::unordered_map<int, double> outputs; ///< Map of all outputs (position -> value)
+    emp::array< stack_t, CPU_SIZE > stacks;  ///< Stacks for long-term storage.
+    emp::array< int, CPU_SIZE > fun_starts;  ///< Postions where functions being in genome.
 
-    size_t inst_ptr;
-    emp::vector<ScopeInfo> scope_stack;
-    emp::vector<RegBackup> reg_stack;
-    emp::vector<size_t> call_stack;
+    size_t inst_ptr;                         ///< Which code position should be executed next?
+    emp::vector<ScopeInfo> scope_stack;      ///< What scopes are we nested in?
+    emp::vector<RegBackup> reg_stack;        ///< What registers have been backed up?
+    emp::vector<size_t> call_stack;          ///< What function calls have to be returned from?
 
-    size_t error_count;
+    size_t error_count;                      ///< How many errors have occurred?
 
-    // A simple way of recording which traits a CPU has demonstrated, and at what qaulity.
+    /// A simple way of recording which traits a CPU has demonstrated, and at what qaulity.
     emp::vector<double> traits;
 
 
@@ -96,7 +101,7 @@ namespace emp {
     /// Destructor
     virtual ~AvidaHardware<CPU_SIZE>() { ; }
 
-    // Run every time we need to exit the current scope.
+    /// Run every time we need to exit the current scope.
     void ExitScope() {
       emp_assert(scope_stack.size() > 1, CurScope());
       emp_assert(scope_stack.size() <= CPU_SIZE, CurScope());
@@ -111,7 +116,7 @@ namespace emp {
       scope_stack.pop_back();
     }
 
-    /// Reset just the CPU hardware, but keep the genome and traits.
+    //// Reset the CPU hardware to default state.
     virtual void Reset() {
       // Initialize registers to their posision.  So Reg0 = 0 and Reg11 = 11.
       for (size_t i = 0; i < CPU_SIZE; i++) {
@@ -196,7 +201,7 @@ namespace emp {
     void PrintState(std::ostream & os=std::cout) const;
 
 
-    /// Instruction helpers.
+    // Instruction helpers.
     void IncReg(size_t reg_id) { ++regs[reg_id]; }
     void DecReg(size_t reg_id) { --regs[reg_id]; }
     void NotReg(size_t reg_id) { regs[reg_id] = (regs[reg_id] == 0.0); }
