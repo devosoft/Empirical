@@ -11,6 +11,9 @@
 #include "math/consts.h"
 #include "opengl/defaultShaders.h"
 #include "opengl/glcanvas.h"
+
+#include <cstdlib>
+
 namespace gl = emp::opengl;
 using namespace emp::math;
 
@@ -48,13 +51,36 @@ class Scatter {
   }
 
   template <typename P, typename V, typename Iter>
-  void show(P&& proj, V&& view, Iter begin, Iter end) {
+  void show(float minX, float minY, float maxX, float maxY, P&& proj, V&& view,
+            Iter begin, Iter end) {
     shader.shader.use();
     shader.proj.set(std::forward<P>(proj));
     shader.view.set(std::forward<V>(view));
+
+    float dmaxX = std::numeric_limits<float>::lowest();
+    float dmaxY = std::numeric_limits<float>::lowest();
+
+    float dminX = std::numeric_limits<float>::max();
+    float dminY = std::numeric_limits<float>::max();
+
     for (auto iter = begin; iter != end; ++iter) {
-      shader.model.set(Mat4x4f::translation(x(*iter), y(*iter)));
+      float x_value{x(*iter)};
+      float y_value{y(*iter)};
+
+      if (x_value > dmaxX) dmaxX = x_value;
+      if (x_value < dminX) dminX = x_value;
+
+      if (y_value > dmaxY) dmaxY = y_value;
+      if (y_value < dminY) dminY = y_value;
+    }
+
+    for (auto iter = begin; iter != end; ++iter) {
+      float px = ((x(*iter) - dminX) / (dmaxX - dminX)) * (maxX - minX) + minX;
+      float py = ((y(*iter) - dminY) / (dmaxY - dminY)) * (maxY - minY) + minY;
+
+      shader.model.set(Mat4x4f::translation(px, py));
       shader.color.set(color(*iter));
+
       glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
   }
@@ -70,20 +96,27 @@ int main(int argc, char* argv[]) {
                                 },
                                 [](auto&) { return 1.0; });
 
-  std::vector<Vec2f> data{
-    Vec2f{0.1, 0.1}, Vec2f{1, 1},     Vec2f{2, 2},     Vec2f{4, 4},
-    Vec2f{8, 8},     Vec2f{16, 16},   Vec2f{32, 32},   Vec2f{64, 64},
-    Vec2f{128, 128}, Vec2f{256, 256}, Vec2f{512, 512}, Vec2f{1024, 1024},
-  };
+  constexpr auto SIZE{1e5};
+  std::vector<Vec2f> data;
+  data.reserve(SIZE);
+
   auto proj =
     proj::orthoFromScreen(1000, 1000, canvas.getWidth(), canvas.getHeight());
   auto view = Mat4x4f::translation(0, 0, 0);
 
+  std::cout << "[[ STARTING RENDER ]]" << std::endl;
   canvas.runForever([&](auto&&) {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    scatter.show(proj, view, data.begin(), data.end());
+    scatter.show(-500, -500, 500, 500, proj, view, data.begin(), data.end());
+    if (data.size() <= SIZE) {
+      for (std::size_t i = 0; i <= 10; ++i)
+        data.emplace_back(std::rand() / (float)RAND_MAX,
+                          std::rand() / (float)RAND_MAX);
+    } else {
+      std::cout << "DONE" << std::endl;
+    }
   });
 
   return 0;
