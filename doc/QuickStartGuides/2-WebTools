@@ -1,10 +1,10 @@
-The web tools in Empirical are stuctured to allow the developer to fully control components of
+The web tools in Empirical are structured to allow the developer to fully control components of
 a web page from C++.  Note that you must have the Emscripten compiler installed for web utilities
 to function properly.
 
 Empirical web Widgets include Text, Buttons, Images, Tables, or many other HTML components.
 All widgets are derived from emp::Widget and structured such that multiple widgets can
-properly refer to and modify the same component.  
+properly refer to and modify the same component.
 
 === A Simple Example ===
 
@@ -69,7 +69,7 @@ Emscripten uses the emcc compiler (or "em++", since we are using C++).
  -std=c++14 : Empirical requires c++14
  -Wall -Wno-unused-function : turn on all warnings by default except for unused functions,
     since not all library functions are going to be used.
- -I../../source/ : The compiled file is two directories up in the Empiricial library, so 
+ -I../../source/ : The compiled file is two directories up in the Empiricial library, so
     this flag properly includes the source files.
  -Os : optimize for size, though -O3 may perform better in some situations
  -s TOTAL_MEMORY=67108864 : Make sure we have enough memory; in this case reserve 64 MB
@@ -113,7 +113,7 @@ take a range of Empirical Widgets.
     int x = 5;
     doc << "<h1>Hello World!</h1>";
     doc << "x = " << x << ".<br>";
-    
+
     // Insert an image (in place)
     doc << UI::Image("url.goes.here") << "<br>";
 
@@ -141,15 +141,15 @@ modify the value of x and redraw it.
     doc << "<h1>Hello World!</h1>";
     doc << "Original x = " << x << ".<br>";
     doc << "Current x = " << UI::Live(x) << ".<br>";
-    
+
     // Create a button to modify x.
     UI::Button my_button( [](){ x+=5; doc.Redraw(); }, "Click me!" );
     doc << my_button;
   }
 
 Notice that we also moved x to be a global variable.  This is because if it were local to main()
-it would be freed as soon as main ended.  We're also using a labda this time instead of a
-previously defined function.  Either optioin is fine.
+it would be freed as soon as main ended.  We're also using a lambda this time instead of a
+previously defined function.  Either option is fine.
 
 Try clicking on the button -- you'll see that x will be updated, and then the document is
 signaled that it needs to redraw, so the change is reflected on the screen.  Note that we didn't
@@ -165,7 +165,7 @@ the containing Widget is redrawn.
     doc << "Original x = " << x << ".<br>";
     doc << "Current x = " << UI::Live(x) << ".<br>";
     doc << "x/5 = " << UI::Live( [](){ return x/5; } ) << ".<br>";
-    
+
     // Create a button to modify x.
     UI::Button my_button( [](){ x+=5; doc.Redraw(); }, "Click me!" );
     doc << my_button;
@@ -208,7 +208,7 @@ than juggling links to all of them yourself.
 
 === Controlling CSS ===
 
-Web page aestetics are controlled by adjusting the CSS of the widgets, and Empirical is no
+Web page aesthetics are controlled by adjusting the CSS of the widgets, and Empirical is no
 different.  You have two options for controlling CSS -- you can do it the traditional way by
 modifying the HTML file (often with the help of other packages) or else you can control
 specific CSS settings with the .CSS member function associated with all Widgets.
@@ -218,7 +218,7 @@ main the statement
 
     my_button.SetCSS("background-color", "green").SetCSS("color", "red");
 
-Note the chainging of modifiers.
+Note the chaining of modifiers.
 
 Most common settings are directly defined as member functions, so the above could also be
 expressed as
@@ -285,7 +285,7 @@ black.
 Note also that a number of Draw() function exist for Canvas that will allow more complex
 structures to be drawn easily, such as grids where the colors of each position are
 specified.  Several other Empirical tools hook into canvas.  For example if you are building
-a world with emp::Surface, that surface can be handded to canvas to have all of the shapes
+a world with emp::Surface, that surface can be handed to canvas to have all of the shapes
 on it (currently just circles) drawn for you.
 
 
