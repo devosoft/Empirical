@@ -20,6 +20,12 @@ namespace emp {
       void set(T&& value) {
         setUniform(handle, std::forward<T>(value));
       }
+
+      template <typename T>
+      Uniform& operator=(T&& value) {
+        set(std::forward<T>(value));
+        return *this;
+      }
     };
 
     enum class ShaderType : GLenum {
