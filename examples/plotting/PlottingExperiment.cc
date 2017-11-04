@@ -17,13 +17,43 @@
 namespace gl = emp::opengl;
 using namespace emp::math;
 
+template <typename F>
+class Region2D {
+  public:
+  Vec2<F> min;
+  Vec2<F> max;
+
+  constexpr Region2D(F minX, F minY, F maxX, F maxY)
+    : min{minX, minY}, max{maxX, maxY} {}
+  constexpr Region2D(const Vec2<F>& min, const Vec2<F>& max)
+    : min{min}, max{max} {}
+
+  constexpr Region2D(const Region2D&) = default;
+  constexpr Region2D(Region2D&&) = default;
+
+  constexpr Region2D& operator=(const Region2D&) = default;
+  constexpr Region2D& operator=(Region2D&&) = default;
+
+  constexpr decltype(auto) width() const { return max.x - min.x; }
+  constexpr decltype(auto) height() const { return max.y - min.y; }
+  constexpr decltype(auto) size() const { return max - min; }
+
+  Vec2<F> rescale(const Vec2<F>& value,
+                  const Region2D<F>& originalScale) const {
+    return {
+      ((value.x - originalScale.min.x) / originalScale.width()) * width() +
+        min.x,
+      ((value.y - originalScale.min.y) / originalScale.height()) * height() +
+        min.y,
+    };
+  }
+};
+
 template <typename T>
 class Scatter {
   private:
   gl::shaders::SimpleSolidColor shader;
 
-  std::function<float(const T&)> x;
-  std::function<float(const T&)> y;
   std::function<Vec4f(const T&)> color;
   std::function<float(const T&)> weight;
 
@@ -50,29 +80,29 @@ class Scatter {
       gl::BufferUsage::StaticDraw);
   }
 
-  template <typename P, typename V, typename Iter>
-  void show(float minX, float minY, float maxX, float maxY, P&& proj, V&& view,
-            Iter begin, Iter end) {
+  template <typename P, typename Iter>
+  void show(const P& parent, const Region2D<float>& dataRegion,
+            const Region2D<float>& screen, Iter begin, Iter end) {
     shader.shader.use();
-    shader.proj.set(std::forward<P>(proj));
-    shader.view.set(std::forward<V>(view));
+    shader.proj = std::forward<P>(parent.projection());
+    shader.view = std::forward<V>(parent.view());
 
-    float dmaxX = std::numeric_limits<float>::lowest();
-    float dmaxY = std::numeric_limits<float>::lowest();
-
-    float dminX = std::numeric_limits<float>::max();
-    float dminY = std::numeric_limits<float>::max();
-
-    for (auto iter = begin; iter != end; ++iter) {
-      float x_value{x(*iter)};
-      float y_value{y(*iter)};
-
-      if (x_value > dmaxX) dmaxX = x_value;
-      if (x_value < dminX) dminX = x_value;
-
-      if (y_value > dmaxY) dmaxY = y_value;
-      if (y_value < dminY) dminY = y_value;
-    }
+    // float dmaxX = std::numeric_limits<float>::lowest();
+    // float dmaxY = std::numeric_limits<float>::lowest();
+    //
+    // float dminX = std::numeric_limits<float>::max();
+    // float dminY = std::numeric_limits<float>::max();
+    //
+    // for (auto iter = begin; iter != end; ++iter) {
+    //   float x_value{x(*iter)};
+    //   float y_value{y(*iter)};
+    //
+    //   if (x_value > dmaxX) dmaxX = x_value;
+    //   if (x_value < dminX) dminX = x_value;
+    //
+    //   if (y_value > dmaxY) dmaxY = y_value;
+    //   if (y_value < dminY) dminY = y_value;
+    // }
 
     for (auto iter = begin; iter != end; ++iter) {
       float px = ((x(*iter) - dminX) / (dmaxX - dminX)) * (maxX - minX) + minX;
@@ -84,6 +114,20 @@ class Scatter {
       glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
   }
+};
+
+template <typename T>
+class Scales2d {
+  public:
+  std::function<float(const T&)> x;
+  std::function<float(const T&)> y;
+
+  private:
+  template <typename X, typename Y>
+  Scales2d(X&& x, Y&& y) : x(std::forward<X>(x)), y(std::forward<Y>(y)) {}
+
+  template <typename P>
+  void render(const P& parent) {}
 };
 
 int main(int argc, char* argv[]) {
