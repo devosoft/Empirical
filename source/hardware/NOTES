@@ -4,10 +4,8 @@ InstNode - Information about a single instruction in a genome (id and possible a
 
 LinearCode - A vector of InstNode (do we even need a class?)
 
-HardwareState - Current state of an indivual's hardware.  Can have LinearCode for memory.
-
 InstLib - A library that map instruction names to functions (that take the InstNode and 
 	HardwareState to modify.
 
-Processor - Takes an InstLib, a HardwareState, and a LinearCode and runs that code
+Processor - Derived from InstLib; takes a HardwareState, and a LinearCode and runs that code
 	(The code is translated with the InstLib and modified the HardwareState)
