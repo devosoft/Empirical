@@ -1,6 +1,7 @@
+// ------- DEPRECATED -------
 // Example evolving EventDrivenGP.
 // This example is a useful reference for how to use EventDrivenGP, but the fitness landscape is not particularly
-// inspiring. Very harsh/noisy. 
+// inspiring. Very harsh/noisy.
 // Environment: Agents must accumulate resources by processing when resources are available. Any processing
 //              done while resources are not available results in the accumulation of 'poison', which
 //              is detrimental to agent fitness. To be optimal in this environment, agents must be
