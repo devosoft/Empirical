@@ -196,7 +196,7 @@ namespace emp {
     /// If no random number generator is provided, one is created within the world.
     /// If no name is provided, the world remains nameless.
     World(Ptr<Random> rnd=nullptr, std::string _name="")
-      : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), fit_cache()
+      : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), update(0), fit_cache()
       , genotypes(), next_genotypes()
       , name(_name), cache_on(false), size_x(0), size_y(0), files()
       , is_synchronous(false), is_structured(false)
