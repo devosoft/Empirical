@@ -1,3 +1,4 @@
+// ------- DEPRECATED -------
 // Example evolving EventDrivenGP.
 // Environment: Here, we evolve EventDrivenGP programs in a Deme/group setting. Each deme consists of
 //              some number of EventDrivenGP hardware CPUs. For each program evaluation, we load the
