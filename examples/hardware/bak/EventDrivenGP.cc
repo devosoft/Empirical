@@ -1,3 +1,4 @@
+// ------- DEPRECATED -------
 #include <iostream>
 #include <fstream>
 #include "hardware/EventDrivenGP.h"
@@ -37,12 +38,18 @@ int main() {
 
   std::cout << "=====================================" << std::endl;
   std::cout << "CPU 0's PROGRAM: " << std::endl;
+  std::cout << "Abbreviated version:" << std::endl;
   cpu0.PrintProgram();
+  std::cout << "Full version:" << std::endl;
+  cpu0.PrintProgramFull();
   std::cout << "=====================================" << std::endl;
 
   std::cout << "=====================================" << std::endl;
   std::cout << "CPU 1's PROGRAM: " << std::endl;
+  std::cout << "Abbreviated version:" << std::endl;
   cpu1.PrintProgram();
+  std::cout << "Full version:" << std::endl;
+  cpu1.PrintProgramFull();
   std::cout << "=====================================" << std::endl;
 
   // Configure hardware.
