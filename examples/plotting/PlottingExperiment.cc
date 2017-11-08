@@ -48,6 +48,84 @@ class Region2D {
   }
 };
 
+namespace detail {
+  template <typename U, typename T>
+  struct TupleHas : std::false_type {};
+
+  template <typename U, typename... T>
+  struct TupleHas<U, std::tuple<U, T...>> : std::true_type {};
+
+  template <typename U, typename H, typename... T>
+  struct TupleHas<U, std::tuple<H, T...>> : TupleHas<U, std::tuple<T...>> {};
+
+  template <size_t I, typename U, typename T>
+  struct IndexOfImpl;
+
+  template <size_t I, typename U, typename... T>
+  struct IndexOfImpl<I, U, std::tuple<U, T...>>
+    : std::integral_constant<size_t, I> {};
+
+  template <size_t I, typename U, typename H, typename... T>
+  struct IndexOfImpl<I, U, std::tuple<H, T...>>
+    : IndexOfImpl<I + 1, U, std::tuple<T...>> {};
+
+  template <typename U, typename T>
+  struct IndexOf : IndexOfImpl<0, U, T> {};
+
+}  // namespace detail
+
+template <typename K, typename P>
+class Bundle;
+
+template <typename... K, typename... P>
+class Bundle<std::tuple<K...>, std::tuple<P...>> {
+  private:
+  using keys_type = std::tuple<K...>;
+  using properties_type = std::tuple<P...>;
+
+  using decayed_keys_type = std::tuple<std::decay_t<K>...>;
+  using decayed_properties_type = std::tuple<std::decay_t<P>...>;
+
+  properties_type properties;
+
+  public:
+  template <typename U>
+  static constexpr bool has() {
+    return detail::TupleHas<std::decay_t<U>, decayed_keys_type>::value;
+  }
+
+  template <typename U>
+  constexpr decltype(auto) get() const {
+    static_assert(Bundle::has<U>(), "No such property");
+    constexpr auto index =
+      detail::IndexOf<std::decay_t<U>, decayed_keys_type>::value;
+    return std::get<index>(properties);
+  }
+
+  template <typename U>
+  constexpr decltype(auto) get() {
+    static_assert(Bundle::has<U>(), "No such property");
+    constexpr auto index =
+      detail::IndexOf<std::decay_t<U>, decayed_keys_type>::value;
+    return std::get<index>(properties);
+  }
+
+  template <typename U>
+  constexpr auto set(U&& value) -> std::enable_if<Bundle::has<U>(), Bundle> {
+    get<U>() = std::forward<U>(value);
+
+    return std::move(*this);
+  }
+
+  template <typename Key, typename Value>
+  constexpr auto set(Value&& value)
+    -> std::enable_if<!Bundle::has<Key>(),
+                      Bundle<std::tuple<Key, K...>, std::tuple<Value, P...>>> {
+    return std::tuple_cat(std::move(properties),
+                          std::forward_as_tuple<Value>(value));
+  }
+};
+
 template <typename T>
 class Scatter {
   private:
