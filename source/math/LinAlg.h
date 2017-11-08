@@ -522,6 +522,24 @@ namespace emp {
 
     };  // namespace math
 
+    template <typename F, std::size_t R>
+    std::ostream& operator<<(std::ostream& out, const Mat<F, R, 1>& mat) {
+      out << "{ ";
+      for (std::size_t i = 0; i < R; ++i) {
+        out << mat(i, 0) << " ";
+      }
+      return out << "}";
+    }
+
+    template <typename F, std::size_t D>
+    std::ostream& operator<<(std::ostream& out, const Mat<F, 1, D>& mat) {
+      out << "{ ";
+      for (std::size_t i = 0; i < D; ++i) {
+        out << mat(0, i) << " ";
+      }
+      return out << "}";
+    }
+
     template <typename F, std::size_t R, std::size_t C>
     std::ostream& operator<<(std::ostream& out, const Mat<F, R, C>& mat) {
       out << "{" << std::endl;
