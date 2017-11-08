@@ -4,7 +4,9 @@
 //
 //
 
+#include <algorithm>
 #include <iostream>
+#include <iterator>
 #include <limits>
 
 #include "math/LinAlg.h"
@@ -38,13 +40,10 @@ class Region2D {
   constexpr decltype(auto) height() const { return max.y - min.y; }
   constexpr decltype(auto) size() const { return max - min; }
 
-  Vec2<F> rescale(const Vec2<F>& value,
-                  const Region2D<F>& originalScale) const {
+  Vec2<F> rescale(const Vec2<F>& value, const Region2D<F>& from) const {
     return {
-      ((value.x - originalScale.min.x) / originalScale.width()) * width() +
-        min.x,
-      ((value.y - originalScale.min.y) / originalScale.height()) * height() +
-        min.y,
+      ((value.x - from.min.x) / from.width()) * width() + min.x,
+      ((value.y - from.min.y) / from.height()) * height() + min.y,
     };
   }
 };
@@ -55,22 +54,14 @@ class Scatter {
   gl::shaders::SimpleSolidColor shader;
 
   std::function<Vec4f(const T&)> color;
-  std::function<float(const T&)> weight;
 
   public:
-  Scatter(gl::GLCanvas& canvas, std::function<float(const T&)> x,
-          std::function<float(const T&)> y,
-          std::function<Vec4f(const T&)> color,
-          std::function<float(const T&)> weight)
-    : shader(canvas), x(x), y(y), color(color), weight(weight) {
+  Scatter(gl::GLCanvas& canvas, std::function<Vec4f(const T&)> color)
+    : shader(canvas), color(color) {
+    shader.vao.bind();
     shader.shader.use();
     shader.vao.getBuffer<gl::BufferType::Array>().set(
-      {
-        Vec3f{-0.5, +0.5, 0},
-        Vec3f{+0.5, +0.5, 0},
-        Vec3f{+0.5, -0.5, 0},
-        Vec3f{-0.5, -0.5, 0},
-      },
+      {Vec3f{-5, +5, 0}, Vec3f{+5, +5, 0}, Vec3f{+5, -5, 0}, Vec3f{-5, -5, 0}},
       gl::BufferUsage::StaticDraw);
     shader.vao.getBuffer<gl::BufferType::ElementArray>().set(
       {
@@ -80,36 +71,18 @@ class Scatter {
       gl::BufferUsage::StaticDraw);
   }
 
-  template <typename P, typename Iter>
-  void show(const P& parent, const Region2D<float>& dataRegion,
-            const Region2D<float>& screen, Iter begin, Iter end) {
+  template <typename Iter>
+  void show(const Mat4x4f& projection, const Mat4x4f& view, Iter begin,
+            Iter end) {
+    shader.vao.bind();
     shader.shader.use();
-    shader.proj = std::forward<P>(parent.projection());
-    shader.view = std::forward<V>(parent.view());
-
-    // float dmaxX = std::numeric_limits<float>::lowest();
-    // float dmaxY = std::numeric_limits<float>::lowest();
-    //
-    // float dminX = std::numeric_limits<float>::max();
-    // float dminY = std::numeric_limits<float>::max();
-    //
-    // for (auto iter = begin; iter != end; ++iter) {
-    //   float x_value{x(*iter)};
-    //   float y_value{y(*iter)};
-    //
-    //   if (x_value > dmaxX) dmaxX = x_value;
-    //   if (x_value < dminX) dminX = x_value;
-    //
-    //   if (y_value > dmaxY) dmaxY = y_value;
-    //   if (y_value < dminY) dminY = y_value;
-    // }
+    shader.shader.use();
+    shader.proj = projection;
+    shader.view = view;
 
     for (auto iter = begin; iter != end; ++iter) {
-      float px = ((x(*iter) - dminX) / (dmaxX - dminX)) * (maxX - minX) + minX;
-      float py = ((y(*iter) - dminY) / (dmaxY - dminY)) * (maxY - minY) + minY;
-
-      shader.model.set(Mat4x4f::translation(px, py));
-      shader.color.set(color(*iter));
+      shader.model = Mat4x4f::translation(iter->x, iter->y);
+      shader.color = color(iter->value);
 
       glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
@@ -117,50 +90,161 @@ class Scatter {
 };
 
 template <typename T>
-class Scales2d {
+class Line {
+  private:
+  gl::shaders::SimpleSolidColor shader;
+
+  public:
+  Line(gl::GLCanvas& canvas) : shader(canvas) {}
+
+  template <typename Iter>
+  void show(const Mat4x4f& projection, const Mat4x4f& view, Iter begin,
+            Iter end) {
+    if (begin == end) return;
+    Vec2f last{begin->x, begin->y};
+    ++begin;
+    if (begin == end) return;
+
+    shader.vao.bind();
+    shader.shader.use();
+    shader.proj = projection;
+    shader.view = view;
+    shader.color = Vec4f{1, 1, 0, 1};
+    shader.model = Mat4x4f::translation(0, 0);
+
+    std::vector<Vec3f> verts{{last.x(), last.y() + 2, 0},
+                             {last.x(), last.y() - 2, 0}};
+    std::vector<GLuint> triangles;
+    size_t i = 0;
+    for (auto iter = begin; iter != end; ++iter) {
+      verts.emplace_back(iter->x, iter->y + 2, 0);
+      verts.emplace_back(iter->x, iter->y - 2, 0);
+
+      triangles.push_back(i);
+      triangles.push_back(i + 1);
+      triangles.push_back(i + 2);
+
+      triangles.push_back(i + 2);
+      triangles.push_back(i + 3);
+      triangles.push_back(i + 1);
+      i += 2;
+    }
+
+    shader.vao.getBuffer<gl::BufferType::Array>().set(
+      verts, gl::BufferUsage::DynamicDraw);
+    shader.vao.getBuffer<gl::BufferType::ElementArray>().set(
+      triangles, gl::BufferUsage::DynamicDraw);
+
+    glDrawElements(GL_TRIANGLES, triangles.size(), GL_UNSIGNED_INT, 0);
+  }
+};
+
+namespace __impl {
+  template <typename F, typename T>
+  void allDo(F&& callback, T&& tuple, const std::index_sequence<>&) {}
+
+  template <typename F, typename T, size_t H>
+  void allDo(F&& callback, T&& tuple, const std::index_sequence<H>&) {
+    std::forward<F>(callback)(std::get<H>(std::forward<T>(tuple)));
+  }
+
+  template <typename F, typename T, size_t H, size_t H2, size_t... I>
+  void allDo(F&& callback, T&& tuple, const std::index_sequence<H, H2, I...>&) {
+    callback(std::get<H>(tuple));
+    allDo(std::forward<F>(callback), std::forward<T>(tuple),
+          std::index_sequence<H2, I...>{});
+  }
+
+}  // namespace __impl
+
+template <typename F, typename T>
+void allDo(F&& callback, T&& tuple) {
+  __impl::allDo(std::forward<F>(callback), std::forward<T>(tuple),
+                std::make_index_sequence<
+                  std::tuple_size<typename std::decay<T>::type>::value>{});
+}
+
+template <typename T, typename... L>
+class DataSet {
   public:
   std::function<float(const T&)> x;
   std::function<float(const T&)> y;
 
-  private:
-  template <typename X, typename Y>
-  Scales2d(X&& x, Y&& y) : x(std::forward<X>(x)), y(std::forward<Y>(y)) {}
+  struct DataPoint {
+    const T& value;
+    float x;
+    float y;
+  };
 
-  template <typename P>
-  void render(const P& parent) {}
+  std::tuple<L...> layers;
+
+  public:
+  template <typename X, typename Y, typename... L1>
+  DataSet(X&& x, Y&& y, L1&&... layers)
+    : x(std::forward<X>(x)),
+      y(std::forward<Y>(y)),
+      layers(std::forward<L1>(layers)...) {}
+
+  template <typename Iter>
+  void show(const Mat4x4f& projection, const Mat4x4f& view, Iter begin,
+            Iter end) {
+    std::vector<DataPoint> dataPoints;
+    std::transform(begin, end, std::back_inserter(dataPoints),
+                   [this](const T& data) {
+                     return DataPoint{data, this->x(data), this->y(data)};
+                   });
+
+    // float dminX = std::numeric_limits<float>::max();
+    // float dminY = std::numeric_limits<float>::max();
+    //
+    // float dmaxX = std::numeric_limits<float>::lowest();
+    // float dmaxY = std::numeric_limits<float>::lowest();
+    //
+    // for (auto& dp : dataPoints) {
+    //   if (dp.x > dmaxX) dmaxX = dp.x;
+    //   if (dp.x < dminX) dminX = dp.x;
+    //
+    //   if (dp.y > dmaxY) dmaxY = dp.y;
+    //   if (dp.y < dminY) dminY = dp.y;
+    // }
+    allDo(
+      [&](auto&& layer) {
+        std::forward<decltype(layer)>(layer).show(
+          projection, view, dataPoints.begin(), dataPoints.end());
+      },
+      layers);
+  }
 };
+
+template <typename T, typename X, typename Y, typename... L>
+DataSet<T, L...> dataset(X&& x, Y&& y, L&&... layers) {
+  return DataSet<T, L...>(std::forward<X>(x), std::forward<Y>(y),
+                          std::forward<L>(layers)...);
+}
 
 int main(int argc, char* argv[]) {
   gl::GLCanvas canvas(1000, 1000);
 
-  auto scatter = Scatter<Vec2f>(canvas, [](auto& v) { return v.x(); },
-                                [](auto& v) { return v.y(); },
-                                [](auto&) {
-                                  return Vec4f{1.0, 1.0, 1.0, 1.0};
-                                },
-                                [](auto&) { return 1.0; });
+  auto graph = dataset<Vec2f>(
+    [](auto& v) { return v.x(); }, [](auto& v) { return v.y(); },
+    Line<Vec2f>{canvas}, Scatter<Vec2f>{canvas, [](auto&) {
+                                          return Vec4f{1, 0, 1, 1};
+                                        }});
 
-  constexpr auto SIZE{1e5};
   std::vector<Vec2f> data;
-  data.reserve(SIZE);
+  for (int i = 0; i < 100; ++i) {
+    data.emplace_back(i * 10 - 50, 200 * (rand() / (float)RAND_MAX) - 100);
+  }
 
   auto proj =
     proj::orthoFromScreen(1000, 1000, canvas.getWidth(), canvas.getHeight());
   auto view = Mat4x4f::translation(0, 0, 0);
 
-  std::cout << "[[ STARTING RENDER ]]" << std::endl;
   canvas.runForever([&](auto&&) {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    scatter.show(-500, -500, 500, 500, proj, view, data.begin(), data.end());
-    if (data.size() <= SIZE) {
-      for (std::size_t i = 0; i <= 10; ++i)
-        data.emplace_back(std::rand() / (float)RAND_MAX,
-                          std::rand() / (float)RAND_MAX);
-    } else {
-      std::cout << "DONE" << std::endl;
-    }
+    graph.show(proj, view, data.begin(), data.end());
   });
 
   return 0;
