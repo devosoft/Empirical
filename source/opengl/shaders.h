@@ -168,7 +168,7 @@ namespace emp {
         return *this;
       }
 
-      ~ShaderProgram() {}
+      ~ShaderProgram() { destory(); }
 
       void destory() {
         if (handle != 0) {

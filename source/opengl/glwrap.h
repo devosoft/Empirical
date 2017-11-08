@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <vector>
 
 #include "VertexAttributes.h"
 #include "base/assert.h"
@@ -89,6 +90,13 @@ namespace emp {
         utils::catchGlError();
       }
 
+      template <typename T>
+      void set(const std::vector<T>& data, BufferUsage usage) {
+        glBufferData(static_cast<GLenum>(type), sizeof(T) * data.size(),
+                     data.data(), static_cast<GLenum>(usage));
+        utils::catchGlError();
+      }
+
       BufferObject& bind() {
         glBindBuffer(static_cast<GLenum>(type), handle);
         utils::catchGlError();
@@ -112,35 +120,44 @@ namespace emp {
 
       public:
       VertexArrayObject(const VertexArrayObject&) = delete;
-      VertexArrayObject(VertexArrayObject&& other) : handle(other.handle) {
+      VertexArrayObject(VertexArrayObject&& other)
+        : handle(other.handle), buffers(std::move(other.buffers)) {
         other.hasValue = false;
       }
+
       VertexArrayObject& operator=(const VertexArrayObject&) = delete;
       VertexArrayObject& operator=(VertexArrayObject&& other) {
         if (this != &other) {
+          destoy();
+
           hasValue = other.hasValue;
           handle = other.handle;
-
           other.hasValue = false;
+
+          buffers = std::move(other.buffers);
         }
         return *this;
       }
 
-      ~VertexArrayObject() {
+      ~VertexArrayObject() { destoy(); }
+
+      void destoy() {
         if (hasValue) {
+          hasValue = false;
+          unbind();
           glDeleteVertexArrays(1, &handle);
         }
       }
 
       void bind() {
         emp_assert(hasValue);
-        // TODO: EMP warning?
-        // emp_assert(boundVAO != handle);
+        emp_assert(boundVAO == handle);
         glBindVertexArray(handle);
         boundVAO = handle;
       }
 
       void unbind() {
+        emp_assert(hasValue);
         emp_assert(boundVAO == handle);
         glBindVertexArray(0);
         boundVAO = 0;
