@@ -110,6 +110,30 @@ class Bundle<std::tuple<K...>, std::tuple<P...>> {
     return std::get<index>(properties);
   }
 
+  template <typename U, typename D>
+  constexpr decltype(auto) get(
+    D&& defaultCallback, std::enable_if<Bundle::has<U>(), char> = 0) const {
+    return get<U>();
+  }
+
+  template <typename U, typename D>
+  constexpr decltype(auto) get(
+    D&& defaultCallback, std::enable_if<!Bundle::has<U>(), char> = 0) const {
+    return std::forward<D>(defaultCallback)();
+  }
+
+  template <typename U, typename D>
+  constexpr decltype(auto) get(D&& defaultCallback,
+                               std::enable_if<Bundle::has<U>(), char> = 0) {
+    return get<U>();
+  }
+
+  template <typename U, typename D>
+  constexpr decltype(auto) get(D&& defaultCallback,
+                               std::enable_if<!Bundle::has<U>(), char> = 0) {
+    return std::forward<D>(defaultCallback)();
+  }
+
   template <typename U>
   constexpr auto set(U&& value) -> std::enable_if<Bundle::has<U>(), Bundle> {
     get<U>() = std::forward<U>(value);
