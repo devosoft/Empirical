@@ -74,6 +74,15 @@ namespace detail {
 
 }  // namespace detail
 
+namespace properties {
+  struct Fill {};
+  struct Stroke {};
+  struct X {};
+  struct Y {};
+  struct Parent {};
+
+};  // namespace properties
+
 template <typename K, typename P>
 class Bundle;
 
