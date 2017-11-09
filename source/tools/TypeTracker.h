@@ -1,18 +1,15 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  TypeTracker is attached to other classes to easily convert them to their derived version
-//  to facilitate type-specific operations.
-//  Status: BETA
-//
-//
-//  Developer notes:
-//  * Should use std::is_convertible<X,Y>::value to determine if casting on base type is allowed.
-//  * AddFunction and RunFunction should be able to take any number of args.
-//  * Functions should be able to have fixed type values mixed in.
-//  * RunFunction should be able to have the function passed in at call time.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file TypeTracker.h
+ *  @brief Track class types abstractly to dynamically call correct function overloads.
+ *  @note Status: BETA
+ *
+ *  @todo Should use std::is_convertible<X,Y>::value to determine if casting on base type is allowed.
+ *  @todo Functions should be able to have fixed type values mixed in.
+ */
 
 #ifndef EMP_TYPE_TRACKER_H
 #define EMP_TYPE_TRACKER_H
@@ -29,15 +26,15 @@
 
 namespace emp {
 
-  // The base class of the types to be tracked.
+  /// The base class of any type to be tracked.
   struct TrackedType {
     virtual size_t GetTypeTrackerID() const noexcept = 0;
     virtual ~TrackedType() {;}
   };
 
-  // The derived classes to be tracked should inherit from TypeTracker_Class<ID>
-  // where ID is the position in the type list for TypeTracker.  Note that this value can
-  // be obtained dyanmically at compile type by using TypeTracker<...>::GetID<TYPE>()
+  /// The derived classes to be tracked should inherit from TypeTracker_Class<ID>
+  /// where ID is the position in the type list for TypeTracker.  Note: this value can
+  /// be obtained dyanmically at compile type by using TypeTracker<...>::GetID<TYPE>()
   template <typename REAL_T, size_t ID>
   struct TypeTracker_Class : public TrackedType {
     using real_t = REAL_T;
@@ -52,23 +49,25 @@ namespace emp {
     virtual size_t GetTypeTrackerID() const noexcept { return ID; }
   };
 
+  /// Dynamic functions that are indexed by parameter types; calls lookup the correct function
+  /// to forward arguments into.
   template <typename... TYPES>
   struct TypeTracker {
     using this_t = TypeTracker<TYPES...>;
     template <typename REAL_T>
     using wrap_t = TypeTracker_Class< REAL_T, get_type_index<REAL_T,TYPES...>() >;
 
-    // How many types are we working with?
+    /// How many types are we working with?
     constexpr static size_t GetNumTypes() { return sizeof...(TYPES); }
 
-    // How many combinations of V types are there?
+    /// How many combinations of V types are there?
     constexpr static size_t GetNumCombos(size_t vals=2) {
       size_t result = 1;
       for (size_t v = 0; v < vals; v++) result *= GetNumTypes();
       return result;
     }
 
-    // How many combinations are the of the given number of types OR FEWER?
+    /// How many combinations are the of the given number of types OR FEWER?
     constexpr static size_t GetCumCombos(size_t vals=2) {
       size_t cur_result = 1;
       size_t cum_result = 1;
@@ -79,44 +78,46 @@ namespace emp {
       return cum_result;
     }
 
-    // Each type should have a unique ID.
+    /// Each type should have a unique ID.
     template <typename T>
     constexpr static size_t GetID() { return get_type_index<T,TYPES...>(); }
 
-    // Each set of types should have an ID unique within that number of types.
+    /// Each set of types should have an ID unique within that number of types.
     template <typename T1, typename T2, typename... Ts>
     constexpr static size_t GetID() { return GetID<T1>() + GetID<T2,Ts...>() * GetNumTypes(); }
 
-    // A ComboID should be unique *across* all size combinations.
+    /// A ComboID should be unique *across* all size combinations.
     template <typename... Ts>
     constexpr static size_t GetComboID() {
       return GetCumCombos(sizeof...(Ts)-1) + GetID<Ts...>();
     }
 
-    // A Tracked ID is simply the unique ID of the type being tracked.
+    /// A Tracked ID is simply the unique ID of the type being tracked.
     static size_t GetTrackedID(const TrackedType & tt) { return tt.GetTypeTrackerID(); }
     template <typename... Ts>
 
-    // Or set of types being tracked...
+    /// Or set of types being tracked...
     static size_t GetTrackedID(const TrackedType & tt1, const TrackedType & tt2, const Ts &... ARGS) {
       return tt1.GetTypeTrackerID() + GetTrackedID(tt2, ARGS...) * GetNumTypes();
     }
 
-    // We should also about able to use a pointer to access tracked IDs
+    /// We should also about able to use a pointer to access tracked IDs
     static size_t GetTrackedID(TrackedType * tt) { return tt->GetTypeTrackerID(); }
+
+    /// A set of pointers to access tracked IDs
     template <typename... Ts>
     static size_t GetTrackedID(TrackedType * tt1, TrackedType * tt2, Ts *... ARGS) {
       return tt1->GetTypeTrackerID() + GetTrackedID(tt2, ARGS...) * GetNumTypes();
     }
 
-    // A tracked COMBO ID, is an ID for this combination of types, unique among all possible type
-    // combinations.  Consistent with GetComboID with the same underlying types.
+    /// A tracked COMBO ID, is an ID for this combination of types, unique among all possible type
+    /// combinations.  Consistent with GetComboID with the same underlying types.
     template <typename... Ts>
     constexpr static size_t GetTrackedComboID(Ts... ARGS) {
       return GetCumCombos(sizeof...(Ts)-1) + GetTrackedID(ARGS...);
     }
 
-    // fun_map is a hash table that maps a set of inputs to the appropriate function.
+    /// fun_map is a hash table that maps a set of inputs to the appropriate function.
     std::unordered_map<size_t, emp::GenericFunction *> fun_map;
 
     // Constructors!
@@ -131,42 +132,55 @@ namespace emp {
       for (auto x : fun_map) delete x.second;  // Clear out Functions.
     }
 
+    /// Convert an input value into a TypeTracker_Class maintaining the value (universal version)
     template <typename REAL_T> wrap_t<REAL_T> Wrap(REAL_T && val) {
       emp_assert((has_type<REAL_T,TYPES...>()));    // Make sure we're wrapping a legal type.
       return wrap_t<REAL_T>(std::forward<REAL_T>(val));
     }
+
+    /// Create an input value in a TypeTracker_Class maintaining the value (reference version)
     template <typename REAL_T> wrap_t<REAL_T> * New(REAL_T & val) {
       emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
       return new wrap_t<REAL_T>(val);
     }
+
+    /// Create an input value in a TypeTracker_Class maintaining the value (move version)
     template <typename REAL_T> wrap_t<REAL_T> * New(REAL_T && val) {
       emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
       return new wrap_t<REAL_T>(std::forward<REAL_T>(val));
     }
 
-    // Test if the tracked type is TEST_T
+    /// Test if the tracked type is TEST_T
     template <typename TEST_T>
     bool IsType( TrackedType & tt ) {
       return tt.GetTypeTrackerID() == get_type_index<TEST_T,TYPES...>();
     }
+
+    /// Test if the tracked type points to TEST_T
     template <typename TEST_T>
     bool IsType( TrackedType * tt ) { return IsType(*tt); }
 
-    // Convert the tracked type back to REAL_T.  Assert that this is type safe!
+    /// Convert the tracked type back to REAL_T.  Assert that this is type safe!
     template <typename REAL_T>
     REAL_T ToType( TrackedType & tt ) {
       emp_assert(IsType<REAL_T>(tt));
       return ((wrap_t<REAL_T> *) &tt)->value;
     }
+
+    /// Convert the tracked type pointer back to REAL_T.  Assert that this is type safe!
     template <typename REAL_T>
     REAL_T ToType( TrackedType * tt ) { return ToType(*tt); }
 
-    // Cast the tracked type to OUT_T.  Try to do so even if NOT original type!
+    /// Cast the tracked type to OUT_T.  Try to do so even if NOT original type!
     template <typename OUT_T>
     OUT_T Cast( TrackedType & tt ) { return ((wrap_t<OUT_T> *) &tt)->value; }
+
+    /// Cast the tracked type pointer to OUT_T.  Try to do so even if NOT original type!
     template <typename OUT_T>
     OUT_T Cast( TrackedType * tt ) { return Cast(*tt); }
 
+    /// Add a new std::function that this TypeTracker should call if the appropriate types are
+    /// passed in.
     template <typename... Ts>
     this_t & AddFunction( std::function<void(Ts...)> fun ) {
       constexpr size_t ID = GetComboID<Ts...>();
@@ -188,11 +202,14 @@ namespace emp {
       return *this;
     }
 
+    /// Add a new function pointer that this TypeTracker should call if the appropriate types are
+    /// passed in.
     template <typename... Ts>
     this_t & AddFunction( void (*fun)(Ts...) ) {
       return AddFunction( std::function<void(Ts...)>(fun) );
     }
 
+    /// Run the appropriate function based on the argument types received.
     template <typename... Ts>
     void RunFunction( Ts... args ) {                 // args must all be TrackedType pointers!
       const size_t pos = GetTrackedComboID(args...);
@@ -202,6 +219,7 @@ namespace emp {
       }
     }
 
+    /// Call TypeTracker as a function (refers call to RunFunction)
     template <typename... Ts>
     void operator()(Ts... args) { RunFunction(args...); }
   };

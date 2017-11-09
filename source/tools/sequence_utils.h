@@ -1,9 +1,17 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  These functions focus on dealing with generic sequence types.
-//  Status: BETA
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file sequence_utils.h
+ *  @brief Functions for analyzing with generic sequence types.
+ *  @note Status: BETA
+ *
+ *  A set of functions for analyzing sequences, including distance metrics (Hamming and
+ *  Edit/Levenschtein) and alignment.
+ */
+
+
 
 #ifndef EMP_SEQUENCE_UTILS_H
 #define EMP_SEQUENCE_UTILS_H
@@ -16,7 +24,10 @@ namespace emp {
 
   // --- Distance functions for any array-type objects ---
 
-  // Hamming distance is a simple count of substitutions needed to convert on array to another.
+  /// Hamming distance is a simple count of substitutions needed to convert one array to another.
+  /// @param in1 The first sequence to compare.
+  /// @param in2 The second sequence to compare.
+  /// @param offset (optional) Position in the first sequence to start the second sequence.
   template <typename TYPE>
   size_t calc_hamming_distance(const TYPE & in1, const TYPE & in2, int offset=0) {
     if (offset < 0) return calc_hamming_distance(in2, in1, -offset);
@@ -38,8 +49,8 @@ namespace emp {
     return num_diffs;
   }
 
-  // Edit distance is the minimum number of insertions, deletions and substitutions to convert
-  // one array to another.
+  /// Edit distance is the minimum number of insertions, deletions and substitutions to convert
+  /// one array to another.
   template <typename TYPE>
   size_t calc_edit_distance(const TYPE & in1, const TYPE & in2) {
     const auto size1 = in1.size();
@@ -81,8 +92,8 @@ namespace emp {
     return prev_row[size1 - 1];
   }
 
-  // Use edit distance to find the minimum number of insertions, deletions and substitutions
-  // to convert one array to another, and then insert gaps into the arrays appropriately.
+  /// Use edit distance to find the minimum number of insertions, deletions and substitutions
+  /// to convert one array to another, and then insert gaps into the arrays appropriately.
   template <typename TYPE, typename GAP_TYPE>
   size_t align(TYPE & in1, TYPE & in2, GAP_TYPE gap) {
     const auto size1 = in1.size();

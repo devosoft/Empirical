@@ -12,6 +12,8 @@
  *  @todo Functions such as Load() should throw exceptions (or equilv.), not use asserts.
  *  @todo Need to figure out a default mapping for how outputs translate to moves around a
  *    state grid.  -1 = Back up ; 0 = Turn left ; 1 = Move fast-forwards ; 2 = Turn right
+ *  @todo Allow StateGridInfo to be built inside of StateGrid (change reference to pointer and
+ *    possible ownership)
  */
 
 
@@ -21,9 +23,11 @@
 #include <map>
 #include <string>
 
+#include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../tools/File.h"
 #include "../tools/map_utils.h"
+#include "../tools/math.h"
 
 namespace emp {
 
@@ -42,6 +46,12 @@ namespace emp {
       StateInfo(int _id, char _sym, double _mult,
                 const std::string & _name, const std::string & _desc)
       : state_id(_id), symbol(_sym), score_mult(_mult), name(_name), desc(_desc) { ; }
+      StateInfo(const StateInfo &) = default;
+      StateInfo(StateInfo &&) = default;
+      ~StateInfo() { ; }
+
+      StateInfo & operator=(const StateInfo &) = default;
+      StateInfo & operator=(StateInfo &&) = default;
     };
 
     emp::vector<StateInfo> states;           ///< All available states.  Position is key ID
@@ -55,7 +65,12 @@ namespace emp {
     size_t GetKey(const std::string & name) const { return Find(name_map, name, 0); }
   public:
     StateGridInfo() : states(), state_map(), symbol_map(), name_map() { ; }
+    StateGridInfo(const StateGridInfo &) = default;
+    StateGridInfo(StateGridInfo &&) = default;
     ~StateGridInfo() { ; }
+
+    StateGridInfo & operator=(const StateGridInfo &) = default;
+    StateGridInfo & operator=(StateGridInfo &&) = default;
 
     size_t GetNumStates() const { return states.size(); }
 
@@ -76,6 +91,7 @@ namespace emp {
       symbol_map[symbol] = key_id;
       name_map[name] = key_id;
     }
+
   };
 
   /// A StateGrid describes a map of grid positions to the current state of each position.
@@ -84,16 +100,16 @@ namespace emp {
     size_t width;              ///< Width of the overall grid
     size_t height;             ///< Height of the overall grid
     emp::vector<int> states;   ///< Specific states at each position in the grid.
-
-    StateGridInfo & info;      ///< Information about the set of states used in this grid.
+    StateGridInfo info;   ///< Information about the set of states used in this grid.
 
   public:
+    StateGrid() : width(0), height(0), states(0), info() { ; }
     StateGrid(StateGridInfo & _i, size_t _w=1, size_t _h=1, int init_val=0)
       : width(_w), height(_h), states(_w*_h,init_val), info(_i) { ; }
     StateGrid(StateGridInfo & _i, const std::string & filename)
       : width(1), height(1), states(), info(_i) { Load(filename); }
     StateGrid(const StateGrid &) = default;
-    StateGrid(StateGrid &&) = default;
+    StateGrid(StateGrid && in) = default;
     ~StateGrid() { ; }
 
     StateGrid & operator=(const StateGrid &) = default;
@@ -158,11 +174,12 @@ namespace emp {
     }
   };
 
+  /// Information about a particular agent on a state grid.
   class StateGridStatus {
   protected:
-    size_t x;
-    size_t y;
-    size_t facing;  // 0=UL, 1=Up, 2=UR, 3=Right, 4=DR, 5=Down, 6=DL, 7=Left (+=Clockwise)
+    size_t x;       ///< X-coordinate of this agent
+    size_t y;       ///< Y-coordinate of this agent.
+    size_t facing;  ///< 0=UL, 1=Up, 2=UR, 3=Right, 4=DR, 5=Down, 6=DL, 7=Left (+=Clockwise)
   public:
     StateGridStatus() : x(0), y(0), facing(1) { ; }
     StateGridStatus(const StateGridStatus &) = default;
@@ -180,16 +197,17 @@ namespace emp {
     StateGridStatus & SetPos(size_t _x, size_t _y) { x = _x; y = _y; return *this; }
     StateGridStatus & SetFacing(size_t _f) { facing = _f; return *this; }
 
+    /// Move explicitly in the x direction (regardless of facing).
     void MoveX(const StateGrid & grid, int steps=1) {
-      int tmp_x = (steps + (int) x) % (int) grid.GetWidth();
-      x = (size_t) ((tmp_x < 0) ? (tmp_x + (int) grid.GetWidth()) : tmp_x);
+      x = (size_t) Mod(steps + (int) x, (int) grid.GetWidth());
     }
 
+    /// Move explicitly in the y direction (regardless of facing).
     void MoveY(const StateGrid & grid, int steps=1) {
-      int tmp_y = (steps + (int) y) % (int) grid.GetHeight();
-      y = (size_t) ((tmp_y < 0) ? (tmp_y + (int) grid.GetHeight()) : tmp_y);
+      y = (size_t) Mod(steps + (int) y, (int) grid.GetHeight());
     }
 
+    /// Move in the direction currently faced.
     void Move(const StateGrid & grid, int steps=1) {
       switch (facing) {
         case 0: MoveX(grid, -steps); MoveY(grid, -steps); break;
@@ -203,12 +221,19 @@ namespace emp {
       }
     }
 
+    /// Rotate starting from current facing.
     void Rotate(int turns=1) {
-      facing = (facing + turns % 8 + 8) % 8;
+      facing = Mod(facing + turns, 8);
     }
 
+    /// Examine state of current position.
     int Scan(const StateGrid & grid) {
       return grid(x,y);
+    }
+
+    /// Set the current position in the state grid.
+    void Set(StateGrid & grid, int new_state) {
+      grid.SetState(x,y,new_state);
     }
   };
 

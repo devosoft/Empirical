@@ -1,15 +1,22 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Specs for the CanvasAction widget, which is a base class for all available
-//  actions on Canvases.
-//
-//  Other, more specific actions defined here are:
-//    CanvasStrokeColor
-//
-//  See also CanvasShape.h for more actions
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  CanvasAction.h
+ *  @brief Define a base class for all actions that can be done to widgets, plus simple actions.
+ *
+ *  CanvasAction objects modify the appearance of a canvas and can be tracked to reconstruct the
+ *  state of the canvas from scratch.
+ *
+ *  Other, more specific actions defined here are:
+ *    CanvasStrokeColor
+ *    CanvasRotate
+ *    CanvasFont
+ *
+ *  See also CanvasShape.h for more actions.
+ */
+
 
 #ifndef EMP_WEB_CANVAS_ACTION_H
 #define EMP_WEB_CANVAS_ACTION_H
@@ -21,10 +28,10 @@
 namespace emp {
 namespace web {
 
-  // Base class to maintain canvas actions.
+  /// Base class to maintain canvas actions.
   class CanvasAction {
   protected:
-    // Helper functions that may be useful to specific actions.
+    /// Helper function to set the fill status.
     void Fill(const std::string & style="") {
       if (style != "") {
         EM_ASM_ARGS({
@@ -33,6 +40,8 @@ namespace web {
       }
       EM_ASM({ emp_i.ctx.fill(); });
     }
+
+    /// Helper function to set the stroke status.
     void Stroke(const std::string & style="") {
       if (style != "") {
         EM_ASM_ARGS({
@@ -49,14 +58,15 @@ namespace web {
     virtual ~CanvasAction() { EMP_TRACK_DESTRUCT(CanvasAction); }
 
 
-    virtual void Apply() = 0;                  // Apply current action to emp_i.ctx.
-    virtual CanvasAction * Clone() const = 0;  // Make a copy of the current action.
+    virtual void Apply() = 0;                  ///< Apply current action to emp_i.ctx.
+    virtual CanvasAction * Clone() const = 0;  ///< Make a copy of the current action.
   };
 
 
+  /// Set the line color on subsequent draw-related actions.
   class CanvasStrokeColor : public CanvasAction {
   protected:
-    std::string color;
+    std::string color;  ///< Color to use.
   public:
     CanvasStrokeColor(const std::string & c) : color(c) { ; }
 
@@ -69,7 +79,7 @@ namespace web {
     CanvasAction * Clone() const { return new CanvasStrokeColor(*this); }
   };
 
-
+  /// Rotate the entire canvas for subsequent drawings.
   class CanvasRotate : public CanvasAction {
   protected:
     double angle;
@@ -85,6 +95,7 @@ namespace web {
   };
 
 
+  /// Change the default font to be used.
   class CanvasFont : public CanvasAction {
   protected:
     std::string font;

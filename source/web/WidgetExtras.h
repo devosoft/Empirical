@@ -1,14 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Extra details about HTML Widgets.
-//
-//  Includes:
-//  * Widget Attributes
-//  * CSS Style
-//  * Listeners for user interaction
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  WidgetExtras.h
+ *  @brief A collection of extra details about HTML Widgets (attributes, style, listerns)
+ */
 
 #ifndef EMP_WEB_WIDGET_EXTRA_H
 #define EMP_WEB_WIDGET_EXTRA_H
@@ -22,9 +19,9 @@ namespace emp {
 namespace web {
 
   struct WidgetExtras {
-    Style style;       // CSS Style
-    Attributes attr;   // HTML Attributes about a cell.
-    Listeners listen;  // Listen for web events
+    Style style;       ///< CSS Style
+    Attributes attr;   ///< HTML Attributes about a cell.
+    Listeners listen;  ///< Listen for web events
 
     template <typename SET_TYPE>
     void SetStyle(const std::string & s, SET_TYPE v) { style.Set(s, emp::to_string(v)); }
@@ -38,18 +35,21 @@ namespace web {
     const std::string & GetAttr(const std::string & setting) { return attr.Get(setting); }
     void RemoveAttr(const std::string & setting) { attr.Remove(setting); }
 
+    /// Apply all HTML details associated with this widget.
     void Apply(const std::string & name) {
       style.Apply(name);
       attr.Apply(name);
       listen.Apply(name);
     }
 
+    /// Clear all of style, attributes, and listeners.
     void Clear() {
       style.Clear();
       attr.Clear();
       listen.Clear();
     }
 
+    /// Have any details been set?
     operator bool() const { return style || attr || listen; } // Return true if any extras are set.
   };
 

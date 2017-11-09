@@ -16,8 +16,8 @@
 #include <array>
 
 #include "../../base/assert.h"
-#include "../../web/js_utils.h"
-#include "../../web/JSWrap.h"
+#include "../js_utils.h"
+#include "../JSWrap.h"
 
 /// @cond EMSCRIPTEN_STUFF
 extern "C" {

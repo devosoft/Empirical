@@ -38,7 +38,7 @@
 namespace emp {
 namespace web {
 
-  /// Create or control and HTML Button object that you can manipulate and update as needed.
+  /// Create or control an HTML Button object that you can manipulate and update as needed.
   class Button : public internal::WidgetFacet<Button> {
     friend class ButtonInfo;
   protected:

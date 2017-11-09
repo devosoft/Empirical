@@ -1,10 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-// Define an Alert function that goes to std::cerr in c++ or to Alert() in Javascript.
-// Status: RELEASE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  Alert.h
+ *  @brief Define an Alert function that goes to std::cerr in c++ or to Alert() in Javascript.
+ *  @note Status: RELEASE
+ */
 
 #ifndef EMP_ALERT_H
 #define EMP_ALERT_H
@@ -31,8 +33,8 @@ namespace emp {
   void Alert(TYPE_SET... inputs) { Alert(emp::to_string(inputs...)); }
   /// @endcond
 
+  /// A version of Alert that will cap how many times it can go off
   template <typename... TYPE_SET>
-  /** A version of Alert that will cap how many times it can go off */
   static void CappedAlert(int cap, TYPE_SET... inputs) {
     static int cur_count = 0;
     if (cur_count++ < cap) Alert(emp::to_string(inputs...));

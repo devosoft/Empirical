@@ -1,6 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  AvidaGP-Evo.cc
+ *  @brief A test of AvidaGP with World; organisms must find squares of values.
+ */
 
 #include <iostream>
 
@@ -30,7 +35,7 @@ int main()
   for (size_t i = 0; i < POP_SIZE; i++) {
     emp::AvidaGP cpu;
     cpu.PushRandom(random, GENOME_SIZE);
-    world.Inject(cpu);
+    world.Inject(cpu.GetGenome());
   }
 
   // Setup the mutation function.
@@ -68,18 +73,17 @@ int main()
     // Update the status of all organisms.
     world.ResetHardware();
     world.Process(200);
+    double fit0 = world.CalcFitnessID(0);
+    std::cout << (ud+1) << " : " << 0 << " : " << fit0 << std::endl;
 
     // Keep the best individual.
     EliteSelect(world, 1, 1);
 
     // Run a tournament for the rest...
-    // TournamentSelect(world, fit_fun, 5, POP_SIZE-1);
-    LexicaseSelect(world, fit_set, POP_SIZE-1);
+    TournamentSelect(world, 5, POP_SIZE-1);
+    // LexicaseSelect(world, fit_set, POP_SIZE-1);
     // EcoSelect(world, fit_fun, fit_set, 100, 5, POP_SIZE-1);
     world.Update();
-
-    double fit0 = world.CalcFitnessID(0);
-    std::cout << (ud+1) << " : " << 0 << " : " << fit0 << std::endl;
 
     // Mutate all but the first organism.
     world.DoMutations(1);

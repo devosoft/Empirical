@@ -1,22 +1,16 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Based on std::function, but with a common base class.
-//  Status: Alpha
-//
-//
-//  The emp::Function templated class behaves almost identically to std::function, but can be
-//  reduced to the emp::GenericFunction base class which is NOT templated.
-//
-//  An emp::GenericFunction object can be converted back into the derived type with the
-//  .Convert<return(args...)>() member function.
-//
-//
-//  Developer notes:
-//  * Need to setup Call on emp::GenericFunction to just take a function signature as a
-//    template argument, rather than listing all types.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  GenericFunction.h
+ *  @brief Based on std::function, but with a common base class.
+ *  @note Status: ALPHA
+ *
+ *  @todo Need to setup Call on emp::GenericFunction to just take a function signature as a
+ *    template argument, rather than listing all types.
+ */
+
 
 #ifndef EMP_GENERIC_FUNCTION_H
 #define EMP_GENERIC_FUNCTION_H
@@ -26,16 +20,26 @@
 
 namespace emp {
 
+  ///  The emp::Function templated class behaves almost identically to std::function, but can be
+  ///  reduced to the emp::GenericFunction base class which is NOT templated.
+  ///
+  ///  An emp::GenericFunction object can be converted back into the derived type with the
+  ///  .Convert<return(args...)>() member function.
+
   class GenericFunction {
   protected:
   public:
     virtual ~GenericFunction() { ; }
 
-    // A generic form of the function call operator; use arg types to determine derived form.
+    /// A generic form of the function call operator; use arg types to determine derived form.
     template <typename RETURN, typename... Ts> auto Call(Ts &&... args);
+
+    /// A generic form of the function call operator; use arg types to determine derived form.
     template <typename RETURN, typename... Ts> auto operator()(Ts &&... args) {
       return Call<RETURN, Ts...>( std::forward<Ts>(args)... );
     }
+
+    /// Convert this GenericFunction into a derived emp::Function
     template <typename T> auto Convert();
   };
 
@@ -46,15 +50,17 @@ namespace emp {
   template <typename RETURN, typename... PARAMS>
   class Function<RETURN(PARAMS...)> : public GenericFunction {
   protected:
-    std::function<RETURN(PARAMS...)> fun;
+    std::function<RETURN(PARAMS...)> fun;  /// The std::function to be called.
   public:
-    // Forward all args to std::function constructor...
+    /// Forward all args to std::function constructor...
     template <typename... Ts>
     Function(Ts &&... args) : fun(std::forward<Ts>(args)...) { ; }
 
-    // Forward all args to std::function call.
+    /// Forward all args to std::function call.
     template <typename... Ts>
     RETURN Call(Ts &&... args) { return fun(std::forward<Ts>(args)...); }
+
+    /// Forward all args to std::function call.
     template <typename... Ts>
     RETURN operator()(Ts &&... args) { return fun(std::forward<Ts>(args)...); }
   };

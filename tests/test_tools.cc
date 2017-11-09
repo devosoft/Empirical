@@ -30,10 +30,8 @@
 #include "tools/NFA.h"
 #include "tools/RegEx.h"
 #include "tools/Random.h"
-// #include "tools/Trait.h"
 #include "tools/TypeTracker.h"
 
-#include "tools/ce_string.h"
 #include "tools/errors.h"
 #include "tools/flex_function.h"
 #include "tools/functions.h"
@@ -55,10 +53,7 @@
 // this doesn't actually work--TODO: figure out why this doesn't work
 #include "tools/alert.h"
 #include "tools/const.h"
-// #include "tools/class.h"
-// #include "tools/fixed.h"
 #include "tools/SolveState.h"
-#include "tools/ProbSchedule.h"
 #include "tools/serialize_macros.h"
 
 
@@ -91,7 +86,7 @@ TEST_CASE("Test BitMatrix", "[tools]")
   REQUIRE(bm45.Get(1,1) == 0);
   REQUIRE(bm45.Get(1,2) == 1);
   REQUIRE(bm45.CountOnes() == 1);
-  REQUIRE(bm45.FindBit() == bm45.GetID(1,2));
+  REQUIRE(bm45.FindBit() == bm45.ToID(1,2));
 
   bm45.SetAll();
   REQUIRE(bm45.All() == true);
@@ -240,61 +235,6 @@ TEST_CASE("Test BitVector", "[tools]")
   bv80[65] = 1;
   REQUIRE(bv80.GetUIntAtBit(64) == 130);
   REQUIRE(bv80.GetValueAtBit<5>(64) == 2);
-}
-
-TEST_CASE("Test ce_string", "[tools]")
-{
-  constexpr emp::ce_string s = "abc";
-  constexpr emp::ce_string s2 = "abc";
-  constexpr emp::ce_string s3 = "abcdef";
-  constexpr emp::ce_string s4 = "aba";
-  emp::BitSet<s.size()> b1;
-  emp::BitSet<(size_t) s[0]> b2;
-
-  REQUIRE(b2.size() == 97);
-  REQUIRE(s.size() == 3);
-
-  constexpr bool x1 = (s == s2);
-  constexpr bool x2 = (s != s2);
-  constexpr bool x3 = (s < s2);
-  constexpr bool x4 = (s > s2);
-  constexpr bool x5 = (s <= s2);
-  constexpr bool x6 = (s >= s2);
-
-  REQUIRE(x1 == true);
-  REQUIRE(x2 == false);
-  REQUIRE(x3 == false);
-  REQUIRE(x4 == false);
-  REQUIRE(x5 == true);
-  REQUIRE(x6 == true);
-
-  constexpr bool y1 = (s == s3);
-  constexpr bool y2 = (s != s3);
-  constexpr bool y3 = (s < s3);
-  constexpr bool y4 = (s > s3);
-  constexpr bool y5 = (s <= s3);
-  constexpr bool y6 = (s >= s3);
-
-  REQUIRE(y1 == false);
-  REQUIRE(y2 == true);
-  REQUIRE(y3 == true);
-  REQUIRE(y4 == false);
-  REQUIRE(y5 == true);
-  REQUIRE(y6 == false);
-
-  constexpr bool z1 = (s == s4);
-  constexpr bool z2 = (s != s4);
-  constexpr bool z3 = (s < s4);
-  constexpr bool z4 = (s > s4);
-  constexpr bool z5 = (s <= s4);
-  constexpr bool z6 = (s >= s4);
-
-  REQUIRE(z1 == false);
-  REQUIRE(z2 == true);
-  REQUIRE(z3 == false);
-  REQUIRE(z4 == true);
-  REQUIRE(z5 == false);
-  REQUIRE(z6 == true);
 }
 
 
@@ -692,6 +632,15 @@ TEST_CASE("Test map_utils", "[tools]")
   auto flipped = emp::flip_map(test_map);        // Make sure we can reverse the map.
   REQUIRE( emp::Has(flipped, 'u') == true);      // And the reversed map should have proper info.
   REQUIRE( emp::Has(flipped, 'x') == false);
+
+  // Testing for bug #123
+  std::map<std::string, std::string> test_123;
+  test_123["1"] = "1";
+  test_123["12"] = "12";
+
+  REQUIRE( emp::Find(test_123, "0", "nothing") == "nothing" );
+  REQUIRE( emp::Find(test_123, "1", "nothing") == "1" );
+  REQUIRE( emp::FindRef(test_123, "1", "nothing") == "1" );
 }
 
 TEST_CASE("Test math", "[tools]")
@@ -709,6 +658,10 @@ TEST_CASE("Test math", "[tools]")
   REQUIRE(emp::Mod(3, 7) == 3);
   REQUIRE(emp::Mod(-4, 7) == 3);
   REQUIRE(emp::Mod(-11, 7) == 3);
+
+  REQUIRE(emp::Mod(-11, 11) == 0);
+  REQUIRE(emp::Mod(0, 11) == 0);
+  REQUIRE(emp::Mod(11, 11) == 0);
 
   REQUIRE(emp::Pow(2,3) == 8);
   REQUIRE(emp::Pow(-2,2) == 4);
@@ -887,8 +840,8 @@ TEST_CASE("Test random", "[tools]")
 
   double actual_prob = ((double) hit_count) / (double) num_tests;
 
-  REQUIRE(actual_prob < flip_prob + 0.005);
-  REQUIRE(actual_prob > flip_prob - 0.005);
+  REQUIRE(actual_prob < flip_prob + 0.01);
+  REQUIRE(actual_prob > flip_prob - 0.01);
 
 
   // Mimimal test of Choose()

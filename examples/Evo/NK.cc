@@ -43,10 +43,10 @@ int main(int argc, char* argv[])
   const uint32_t MUT_COUNT = config.MUT_COUNT();
 
   emp::Random random(config.SEED());
-  emp::evo::NKLandscape landscape(N, K, random);
-  // emp::evo::NKLandscapeMemo landscape(N, K, random);
+  emp::NKLandscape landscape(N, K, random);
+  // emp::NKLandscapeMemo landscape(N, K, random);
 
-  // emp::evo::EAWorld<BitOrg, emp::evo::FitCacheOff> pop(random, "NKWorld");
+  // emp::EAWorld<BitOrg, emp::FitCacheOff> pop(random, "NKWorld");
   emp::World<BitOrg> pop(random, "NKWorld");
   pop.SetupFitnessFile().SetTimingRepeat(10);
   pop.SetupSystematicsFile().SetTimingRepeat(10);

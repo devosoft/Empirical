@@ -25,7 +25,7 @@ public:
   void SetWorldID(size_t _id) { world_id = _id; }
   void AdjustEnergy(double shift) { energy += shift; }
 
-  static void Inst_Replicate(AvidaOrg & hw, const arg_set_t & args) {
-    hw.regs[args[1]] = hw.regs[args[0]];
+  static void Inst_Replicate(AvidaOrg & hw, const emp::AvidaGP::Instruction & inst) {
+    hw.regs[inst.args[1]] = hw.regs[inst.args[0]];
   }
 };

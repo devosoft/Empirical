@@ -11,9 +11,9 @@
 #include <string>
 
 #include "../../base/macros.h"
-#include "../../web/init.h"
-#include "../../web/js_utils.h"
-#include "../../web/JSWrap.h"
+#include "../init.h"
+#include "../js_utils.h"
+#include "../JSWrap.h"
 
 // Helper macros
 

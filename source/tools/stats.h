@@ -1,9 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical/
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  This file contains functions for calculating various statistics about a population.
-//  Status: BETA
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file stats.h
+ *  @brief Functions for calculating various statistics about an ensemble.
+ *  @note Status: BETA
+ */
 
 
 #ifndef EMP_STATS_H
@@ -22,9 +25,8 @@
 #include "../meta/type_traits.h"
 
 namespace emp {
-namespace evo {
 
-  // Calculates Shannon Entropy of the members of the container passed
+  /// Calculate Shannon Entropy of the members of the container passed
   template <typename C>
   typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value, double>::type
   ShannonEntropy(C & elements) {
@@ -49,8 +51,7 @@ namespace evo {
     return -1 * result;
   }
 
-  // Calculates Shannon Entropy of the members of the container when those members
-  // are pointers
+  /// Calculate Shannon Entropy of the members of the container when those members are pointers
   template <typename C>
   typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value, double>::type
   ShannonEntropy(C & elements) {
@@ -76,7 +77,7 @@ namespace evo {
     return -1 * result;
   }
 
-  // Calculates number of unique elements in the container passed
+  /// Count the number of unique elements in a container
   template <typename C>
   typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value, int>::type
   UniqueCount(C & elements) {
@@ -86,7 +87,8 @@ namespace evo {
     return unique_elements.size();
   }
 
-  // Calculates number of unique elements in the container of pointers passed
+  /// Count the number of unique elements in the container of pointers. (compares objects pointed
+  /// to; pointers do not have to be identical)
   template <typename C>
   typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value, int>::type
   UniqueCount(C & elements) {
@@ -100,24 +102,32 @@ namespace evo {
     return unique_elements.size();
   }
 
-  // Takes a function and a container of items that that function can be run on
-  // and returns the maximum value
+  /// Run the provided function on every member of a container and return the MAXIMUM result.
   template <typename C, typename RET_TYPE, typename ARG_TYPE>
-  RET_TYPE MaxFunctionReturn(std::function<RET_TYPE(ARG_TYPE)> & fun, C & elements){
-    double highest = 0;
+  RET_TYPE MaxResult(std::function<RET_TYPE(ARG_TYPE)> & fun, C & elements){
+    auto best = fun(elements.front());  // @CAO Technically, front is processed twice...
     for (auto element : elements){
-      double result = fun(element);
-      if (result > highest){
-        highest = result;
-      }
+      auto result = fun(element);
+      if (result > best) best = result;
     }
-    return highest;
+    return best;
   }
 
-  // Takes a function and a container of items that that function can be run on
-  // and returns the average value. Function must return a double.
+  /// Run the provided function on every member of a container and return the MINIMUM result.
+  template <typename C, typename RET_TYPE, typename ARG_TYPE>
+  RET_TYPE MinResult(std::function<RET_TYPE(ARG_TYPE)> & fun, C & elements){
+    auto best = fun(elements.front());  // @CAO Technically, front is processed twice...
+    for (auto element : elements){
+      auto result = fun(element);
+      if (result < best) best = result;
+    }
+    return best;
+  }
+
+  /// Run the provided function on every member of a container and return the AVERAGE result.
+  /// Function must return a double.
   template <typename C, typename ARG_TYPE>
-  double AverageFunctionReturn(std::function<double(ARG_TYPE)> & fun, C & elements){
+  double MeanResult(std::function<double(ARG_TYPE)> & fun, C & elements){
     double cumulative_value = 0;
     double count = 0;
     for (auto element : elements){
@@ -127,8 +137,9 @@ namespace evo {
     return (cumulative_value / count);
   }
 
+  /// Run the provided function on every member of a container and return a vector of ALL results.
   template <typename C, typename RET_TYPE, typename ARG_TYPE>
-  emp::vector<RET_TYPE> RunFunctionOnContainer(std::function<RET_TYPE(ARG_TYPE)> fun, C & elements) {
+  emp::vector<RET_TYPE> ApplyFunction(std::function<RET_TYPE(ARG_TYPE)> & fun, C & elements) {
       emp::vector<RET_TYPE> results;
       for (auto element : elements){
           results.push_back(fun(element));
@@ -150,7 +161,6 @@ namespace evo {
       return results;
   } */
 
-}
 }
 
 #endif

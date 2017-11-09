@@ -4,14 +4,13 @@
  *  @date 2017
  *
  *  @file  AvidaGP.h
- *  @brief This is a simple, efficient CPU for Avida.
- *
+ *  @brief This is a simple, efficient CPU for and applied version of Avida.
  *
  *  @todo Should we save a copy of the original genome?  (or create a new "memory" member)
  *  @todo We should clean up how we handle scope; the root scope is zero, so the arg-based
  *    scopes are 1-16 (or however many).  Right now we increment the value in various places
  *    and should be more consistent.
- *  @todo How should Avida-GP genomes take an action?  Options include sending ALL outputs and
+ *  @todo How should Avida-GP organisms take an action?  Options include sending ALL outputs and
  *    picking the maximum field; sending a single output and using its value; having specialized
  *    commands...
  */
@@ -35,12 +34,21 @@
 
 namespace emp {
 
-  class AvidaGP {
+  template <typename HARDWARE>
+  class AvidaGP_Base {
   public:
     static constexpr size_t CPU_SIZE = 16;   // Num arg values (for regs, stacks, functions, etc)
     static constexpr size_t INST_ARGS = 3;   // Max num args per instruction.
     static constexpr size_t STACK_CAP = 16;  // Max size for stacks.
 
+    struct Instruction;
+    struct Genome;
+
+    using this_t = AvidaGP_Base<HARDWARE>;
+    using inst_t = Instruction;
+    using genome_t = Genome;
+    using inst_lib_t = InstLib<this_t>;
+    using stack_t = emp::vector<double>;
     using arg_t = size_t;        // All arguments are non-negative ints (indecies!)
     using arg_set_t = emp::array<arg_t, INST_ARGS>;
 
@@ -65,6 +73,32 @@ namespace emp {
       bool operator==(const Instruction & in) const { return id == in.id && args == in.args; }
     };
 
+    struct Genome {
+      using sequence_t = emp::vector<Instruction>;
+
+      Ptr<const inst_lib_t> inst_lib;
+      sequence_t sequence;
+
+      Genome() = default;
+      Genome(Ptr<const inst_lib_t> _inst_lib, const sequence_t & _seq=sequence_t(0))
+        : inst_lib(_inst_lib), sequence(_seq) { ; }
+      Genome(const inst_lib_t & _inst_lib, const sequence_t & _seq=sequence_t(0))
+        : inst_lib(&_inst_lib), sequence(_seq) { ; }
+      Genome(const Genome &) = default;
+      Genome(Genome &&) = default;
+      ~Genome() { ; }
+
+      Genome & operator=(const Genome &) = default;
+      Genome & operator=(Genome &&) = default;
+
+      bool operator==(const Genome& other) const { return sequence == other.sequence; }
+      bool operator!=(const Genome& other) const { return sequence != other.sequence; }
+      bool operator< (const Genome& other) const { return sequence <  other.sequence; }
+      bool operator<=(const Genome& other) const { return sequence <= other.sequence; }
+      bool operator> (const Genome& other) const { return sequence >  other.sequence; }
+      bool operator>=(const Genome& other) const { return sequence >= other.sequence; }
+    };
+
     struct ScopeInfo {
       size_t scope;
       ScopeType type;
@@ -83,21 +117,14 @@ namespace emp {
       RegBackup(size_t _s, size_t _r, double _v) : scope(_s), reg_id(_r), value(_v) { ; }
     };
 
-    using inst_t = Instruction;
-    using genome_t = emp::vector<inst_t>;
-    using inst_lib_t = InstLib<AvidaGP>;
-    using stack_t = emp::vector<double>;
-
-  protected:
-    Ptr<const inst_lib_t> inst_lib;
-
     // Virtual CPU Components!
     genome_t genome;
-    emp::array<double, CPU_SIZE> regs;
-    std::unordered_map<int, double> inputs;   // Map of all available inputs (position -> value)
-    std::unordered_map<int, double> outputs;  // Map of all outputs (position -> value)
-    emp::array< stack_t, CPU_SIZE > stacks;
-    emp::array< int, CPU_SIZE> fun_starts;
+    emp::array<double, CPU_SIZE> regs;       // Registers used in the hardware.
+    std::unordered_map<int, double> inputs;  // Map of all available inputs (position -> value)
+    std::unordered_map<int, double> outputs; // Map of all outputs (position -> value)
+    emp::array< stack_t, CPU_SIZE > stacks;  // Stacks for long-term storage.
+    emp::array< int, CPU_SIZE > fun_starts;  // Postions where functions being in genome.
+    HARDWARE hw;                             // Extra hardware for specialty runs.
 
     size_t inst_ptr;
     emp::vector<ScopeInfo> scope_stack;
@@ -140,7 +167,7 @@ namespace emp {
       if (CurScopeType() == ScopeType::LOOP) {
         inst_ptr = scope_stack.back().start_pos;  // Move back to the beginning of the loop.
         ExitScope();                              // Clear former scope
-        ProcessInst( genome[inst_ptr] );          // Process loops start again.
+        ProcessInst( genome.sequence[inst_ptr] ); // Process loops start again.
         return false;                             // We did NOT enter the new scope.
       }
 
@@ -148,12 +175,13 @@ namespace emp {
       if (CurScopeType() == ScopeType::FUNCTION) {
         // @CAO Make sure we exit multiple scopes if needed to close the function...
         inst_ptr = call_stack.back();             // Return from the function call.
-        if (inst_ptr >= genome.size()) ResetIP(); // Call may have occured at end of genome.
-        else {
+        if (inst_ptr >= genome.sequence.size()) { // Test if call occured at end of genome.
+          ResetIP();                              // ...and reset to the begnning if so.
+        } else {
           call_stack.pop_back();                  // Clear the return position from the call stack.
           ExitScope();                            // Leave the function scope.
         }
-        ProcessInst( genome[inst_ptr] );          // Process the new instruction instead.
+        ProcessInst( genome.sequence[inst_ptr] ); // Process the new instruction instead.
         return false;                             // We did NOT enter the new scope.
       }
 
@@ -170,9 +198,9 @@ namespace emp {
       if (CurScope() < scope) return;    // Only continue if break is relevant for current scope.
 
       ExitScope();
-      while (inst_ptr+1 < genome.size()) {
+      while (inst_ptr+1 < genome.sequence.size()) {
         inst_ptr++;
-        const size_t test_scope = InstScope(genome[inst_ptr]);
+        const size_t test_scope = InstScope(genome.sequence[inst_ptr]);
 
         // If this instruction sets the scope AND it's outside the one we want to end, stop here!
         if (test_scope && test_scope <= scope) {
@@ -183,32 +211,47 @@ namespace emp {
     }
 
   public:
-    AvidaGP(Ptr<const inst_lib_t> _ilib)
-      : inst_lib(_ilib), genome(), regs(), inputs(), outputs(), stacks(), fun_starts()
+    /// Create a new AvidaGP seeding it with a genome.
+    AvidaGP_Base<HARDWARE>(const genome_t & in_genome)
+      : genome(in_genome), regs(), inputs(), outputs(), stacks(), fun_starts()
       , inst_ptr(0), scope_stack(), reg_stack(), call_stack(), errors(0), traits()
     {
       scope_stack.emplace_back(0, ScopeType::ROOT, 0);  // Initial scope.
-      Reset();
+      for (size_t i = 0; i < CPU_SIZE; i++) {
+        regs[i] = (double) i;
+        fun_starts[i] = -1;
+      }
     }
-    AvidaGP(const inst_lib_t & _ilib) : AvidaGP(&_ilib) { ; }
-    AvidaGP() : AvidaGP(DefaultInstLib()) { ; }
-    AvidaGP(const AvidaGP &) = default;
-    AvidaGP(AvidaGP &&) = default;
-    ~AvidaGP() { ; }
 
-    bool operator<(const AvidaGP& other) const {
-        return genome < other.genome;
+    /// Create a default AvidaGP (no genome sequence, default instruction set)
+    AvidaGP_Base<HARDWARE>() : AvidaGP_Base<HARDWARE>(Genome(DefaultInstLib())) { ; }
+
+    /// Create an AvidaGP with a specified instruction set (but no genome sequence)
+    AvidaGP_Base<HARDWARE>(Ptr<const inst_lib_t> inst_lib) : AvidaGP_Base<HARDWARE>(Genome(inst_lib)) { ; }
+    AvidaGP_Base<HARDWARE>(const inst_lib_t & inst_lib) : AvidaGP_Base<HARDWARE>(Genome(&inst_lib)) { ; }
+
+    /// Copy constructor
+    AvidaGP_Base<HARDWARE>(const AvidaGP_Base<HARDWARE> &) = default;
+
+    /// Move constructor
+    AvidaGP_Base<HARDWARE>(AvidaGP_Base<HARDWARE> &&) = default;
+
+    /// Destructor
+    virtual ~AvidaGP_Base<HARDWARE>() { ; }
+
+    bool operator<(const this_t & other) const {
+      return genome < other.genome;
     }
 
     /// Reset the entire CPU to a starting state, without a genome.
     void Reset() {
-      genome.resize(0);  // Clear out genome
-      traits.resize(0);  // Clear out traits
-      ResetHardware();   // Reset the full hardware
+      genome.sequence.resize(0);  // Clear out genome
+      traits.resize(0);           // Clear out traits
+      ResetHardware();            // Reset the full hardware
     }
 
     /// Reset just the CPU hardware, but keep the genome and traits.
-    void ResetHardware() {
+    virtual void ResetHardware() {
       // Initialize registers to their posision.  So Reg0 = 0 and Reg11 = 11.
       for (size_t i = 0; i < CPU_SIZE; i++) {
         regs[i] = (double) i;
@@ -237,9 +280,10 @@ namespace emp {
     }
 
     // Accessors
-    Ptr<const inst_lib_t> GetInstLib() const { return inst_lib; }
-    inst_t GetInst(size_t pos) const { return genome[pos]; }
+    Ptr<const inst_lib_t> GetInstLib() const { return genome.inst_lib; }
+    inst_t GetInst(size_t pos) const { return genome.sequence[pos]; }
     const genome_t & GetGenome() const { return genome; }
+    const size_t GetSize() const { return genome.sequence.size(); }
     double GetReg(size_t id) const { return regs[id]; }
     double GetInput(int id) const { return Find(inputs, id, 0.0); }
     const std::unordered_map<int,double> & GetInputs() const { return inputs; }
@@ -253,7 +297,7 @@ namespace emp {
     emp::vector<ScopeInfo> GetScopeStack() const { return scope_stack; }
     size_t CurScope() const { return scope_stack.back().scope; }
     ScopeType CurScopeType() const { return scope_stack.back().type; }
-    ScopeType GetScopeType(size_t id) { return inst_lib->GetScopeType(id); }
+    ScopeType GetScopeType(size_t id) { return genome.inst_lib->GetScopeType(id); }
     emp::vector<RegBackup> GetRegStack() const { return reg_stack; }
     emp::vector<size_t> GetCallStack() const { return call_stack; }
     size_t GetNumErrors() const { return errors; }
@@ -261,9 +305,9 @@ namespace emp {
     const emp::vector<double> &  GetTraits() { return traits; }
     size_t GetNumTraits() const { return traits.size(); }
 
-    void SetInst(size_t pos, const inst_t & inst) { genome[pos] = inst; }
+    void SetInst(size_t pos, const inst_t & inst) { genome.sequence[pos] = inst; }
     void SetInst(size_t pos, size_t id, size_t a0=0, size_t a1=0, size_t a2=0) {
-      genome[pos].Set(id, a0, a1, a2);
+      genome.sequence[pos].Set(id, a0, a1, a2);
     }
     void SetGenome(const genome_t & g) { genome = g; }
     void SetReg(size_t id, double val) { regs[id] = val; }
@@ -297,21 +341,21 @@ namespace emp {
     void PushTrait(double val) { traits.push_back(val); }
 
     inst_t GetRandomInst(Random & rand) {
-      return inst_t(rand.GetUInt(inst_lib->GetSize()),
+      return inst_t(rand.GetUInt(genome.inst_lib->GetSize()),
                     rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE), rand.GetUInt(CPU_SIZE));
     }
 
     void RandomizeInst(size_t pos, Random & rand) { SetInst(pos, GetRandomInst(rand) ); }
 
     void PushInst(size_t id, size_t a0=0, size_t a1=0, size_t a2=0) {
-      genome.emplace_back(id, a0, a1, a2);
+      genome.sequence.emplace_back(id, a0, a1, a2);
     }
     void PushInst(const std::string & name, size_t a0=0, size_t a1=0, size_t a2=0) {
-      size_t id = inst_lib->GetID(name);
-      genome.emplace_back(id, a0, a1, a2);
+      size_t id = genome.inst_lib->GetID(name);
+      genome.sequence.emplace_back(id, a0, a1, a2);
     }
-    void PushInst(const Instruction & inst) { genome.emplace_back(inst); }
-    void PushInst(Instruction && inst) { genome.emplace_back(inst); }
+    void PushInst(const Instruction & inst) { genome.sequence.emplace_back(inst); }
+    void PushInst(Instruction && inst) { genome.sequence.emplace_back(inst); }
     void PushRandom(Random & rand, const size_t count=1) {
       for (size_t i = 0; i < count; i++) {
         PushInst(GetRandomInst(rand));
@@ -322,15 +366,16 @@ namespace emp {
     bool Load(std::istream & input);
 
     /// Process a specified instruction, provided by the caller.
-    void ProcessInst(const inst_t & inst) { inst_lib->ProcessInst(*this, inst); }
+    void ProcessInst(const inst_t & inst) { genome.inst_lib->ProcessInst(*this, inst); }
 
     /// Determine the scope associated with a particular instruction.
     size_t InstScope(const inst_t & inst) const;
 
     /// Process the NEXT instruction pointed to be the instruction pointer
     void SingleProcess() {
-      if (inst_ptr >= genome.size()) ResetIP();
-      inst_lib->ProcessInst(*this, genome[inst_ptr]);
+      emp_assert(genome.sequence.size() > 0);  // A genome must exist to be processed.
+      if (inst_ptr >= genome.sequence.size()) ResetIP();
+      genome.inst_lib->ProcessInst(*this, genome.sequence[inst_ptr]);
       inst_ptr++;
     }
 
@@ -362,111 +407,114 @@ namespace emp {
 
 
     /// Instructions
-    static void Inst_Inc(AvidaGP & hw, const arg_set_t & args) { ++hw.regs[args[0]]; }
-    static void Inst_Dec(AvidaGP & hw, const arg_set_t & args) { --hw.regs[args[0]]; }
-    static void Inst_Not(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[0]] = (hw.regs[args[0]] == 0.0); }
-    static void Inst_SetReg(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[0]] = (double) args[1]; }
-    static void Inst_Add(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = hw.regs[args[0]] + hw.regs[args[1]]; }
-    static void Inst_Sub(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = hw.regs[args[0]] - hw.regs[args[1]]; }
-    static void Inst_Mult(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = hw.regs[args[0]] * hw.regs[args[1]]; }
+    static void Inst_Inc(this_t & hw, const inst_t & inst) { ++hw.regs[inst.args[0]]; }
+    static void Inst_Dec(this_t & hw, const inst_t & inst) { --hw.regs[inst.args[0]]; }
+    static void Inst_Not(this_t & hw, const inst_t & inst) { hw.regs[inst.args[0]] = (hw.regs[inst.args[0]] == 0.0); }
+    static void Inst_SetReg(this_t & hw, const inst_t & inst) { hw.regs[inst.args[0]] = (double) inst.args[1]; }
+    static void Inst_Add(this_t & hw, const inst_t & inst) { hw.regs[inst.args[2]] = hw.regs[inst.args[0]] + hw.regs[inst.args[1]]; }
+    static void Inst_Sub(this_t & hw, const inst_t & inst) { hw.regs[inst.args[2]] = hw.regs[inst.args[0]] - hw.regs[inst.args[1]]; }
+    static void Inst_Mult(this_t & hw, const inst_t & inst) { hw.regs[inst.args[2]] = hw.regs[inst.args[0]] * hw.regs[inst.args[1]]; }
 
-    static void Inst_Div(AvidaGP & hw, const arg_set_t & args) {
-      const double denom = hw.regs[args[1]];
+    static void Inst_Div(this_t & hw, const inst_t & inst) {
+      const double denom = hw.regs[inst.args[1]];
       if (denom == 0.0) ++hw.errors;
-      else hw.regs[args[2]] = hw.regs[args[0]] / denom;
+      else hw.regs[inst.args[2]] = hw.regs[inst.args[0]] / denom;
     }
 
-    static void Inst_Mod(AvidaGP & hw, const arg_set_t & args) {
-      const double base = hw.regs[args[1]];
+    static void Inst_Mod(this_t & hw, const inst_t & inst) {
+      const double base = hw.regs[inst.args[1]];
       if (base == 0.0) ++hw.errors;
-      else hw.regs[args[2]] = hw.regs[args[0]] / base;
+      else hw.regs[inst.args[2]] = hw.regs[inst.args[0]] / base;
     }
 
-    static void Inst_TestEqu(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = (hw.regs[args[0]] == hw.regs[args[1]]); }
-    static void Inst_TestNEqu(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = (hw.regs[args[0]] != hw.regs[args[1]]); }
-    static void Inst_TestLess(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[2]] = (hw.regs[args[0]] < hw.regs[args[1]]); }
+    static void Inst_TestEqu(this_t & hw, const inst_t & inst) { hw.regs[inst.args[2]] = (hw.regs[inst.args[0]] == hw.regs[inst.args[1]]); }
+    static void Inst_TestNEqu(this_t & hw, const inst_t & inst) { hw.regs[inst.args[2]] = (hw.regs[inst.args[0]] != hw.regs[inst.args[1]]); }
+    static void Inst_TestLess(this_t & hw, const inst_t & inst) { hw.regs[inst.args[2]] = (hw.regs[inst.args[0]] < hw.regs[inst.args[1]]); }
 
-    static void Inst_If(AvidaGP & hw, const arg_set_t & args) { // args[0] = test, args[1] = scope
-      if (hw.UpdateScope(args[1]) == false) return;      // If previous scope is unfinished, stop!
-      if (hw.regs[args[0]] == 0.0) hw.BypassScope(args[1]); // If test fails, move to scope end.
+    static void Inst_If(this_t & hw, const inst_t & inst) { // args[0] = test, args[1] = scope
+      if (hw.UpdateScope(inst.args[1]) == false) return;      // If previous scope is unfinished, stop!
+      if (hw.regs[inst.args[0]] == 0.0) hw.BypassScope(inst.args[1]); // If test fails, move to scope end.
     }
 
-    static void Inst_While(AvidaGP & hw, const arg_set_t & args) {
+    static void Inst_While(this_t & hw, const inst_t & inst) {
       // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
-      if (hw.UpdateScope(args[1], ScopeType::LOOP) == false) return;
-      if (hw.regs[args[0]] == 0.0) hw.BypassScope(args[1]); // If test fails, move to scope end.
+      if (hw.UpdateScope(inst.args[1], ScopeType::LOOP) == false) return;
+      if (hw.regs[inst.args[0]] == 0.0) hw.BypassScope(inst.args[1]); // If test fails, move to scope end.
     }
 
-    static void Inst_Countdown(AvidaGP & hw, const arg_set_t & args) {  // Same as while, but auto-decriments test each loop.
+    static void Inst_Countdown(this_t & hw, const inst_t & inst) {  // Same as while, but auto-decriments test each loop.
       // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
-      if (hw.UpdateScope(args[1], ScopeType::LOOP) == false) return;
-      if (hw.regs[args[0]] == 0.0) hw.BypassScope(args[1]);   // If test fails, move to scope end.
-      else hw.regs[args[0]]--;
+      if (hw.UpdateScope(inst.args[1], ScopeType::LOOP) == false) return;
+      if (hw.regs[inst.args[0]] == 0.0) hw.BypassScope(inst.args[1]);   // If test fails, move to scope end.
+      else hw.regs[inst.args[0]]--;
     }
 
-    static void Inst_Break(AvidaGP & hw, const arg_set_t & args) { hw.BypassScope(args[0]); }
-    static void Inst_Scope(AvidaGP & hw, const arg_set_t & args) { hw.UpdateScope(args[0]); }
+    static void Inst_Break(this_t & hw, const inst_t & inst) { hw.BypassScope(inst.args[0]); }
+    static void Inst_Scope(this_t & hw, const inst_t & inst) { hw.UpdateScope(inst.args[0]); }
 
-    static void Inst_Define(AvidaGP & hw, const arg_set_t & args) {
-      if (hw.UpdateScope(args[1]) == false) return; // Update which scope we are in.
-      hw.fun_starts[args[0]] = (int) hw.inst_ptr;     // Record where function should be exectuted.
-      hw.BypassScope(args[1]);                     // Skip over the function definition for now.
+    static void Inst_Define(this_t & hw, const inst_t & inst) {
+      if (hw.UpdateScope(inst.args[1]) == false) return; // Update which scope we are in.
+      hw.fun_starts[inst.args[0]] = (int) hw.inst_ptr;     // Record where function should be exectuted.
+      hw.BypassScope(inst.args[1]);                     // Skip over the function definition for now.
     }
 
-    static void Inst_Call(AvidaGP & hw, const arg_set_t & args) {
+    static void Inst_Call(this_t & hw, const inst_t & inst) {
       // Make sure function exists and is still in place.
-      size_t def_pos = (size_t) hw.fun_starts[args[0]];
-      if (def_pos >= hw.genome.size()
-          || hw.GetScopeType(hw.genome[def_pos].id) != ScopeType::FUNCTION) return;
+      size_t def_pos = (size_t) hw.fun_starts[inst.args[0]];
+      if (def_pos >= hw.genome.sequence.size()
+          || hw.GetScopeType(hw.genome.sequence[def_pos].id) != ScopeType::FUNCTION) return;
 
       // Go back into the function's original scope (call is in that scope)
-      size_t fun_scope = hw.genome[def_pos].args[1];
+      size_t fun_scope = hw.genome.sequence[def_pos].args[1];
       if (hw.UpdateScope(fun_scope, ScopeType::FUNCTION) == false) return;
       hw.call_stack.push_back(hw.inst_ptr+1);        // Back up the call position
       hw.inst_ptr = def_pos+1;                       // Jump to the function body (will adavance)
     }
 
-    static void Inst_Push(AvidaGP & hw, const arg_set_t & args) { hw.PushStack(args[1], hw.regs[args[0]]); }
-    static void Inst_Pop(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[1]] = hw.PopStack(args[0]); }
+    static void Inst_Push(this_t & hw, const inst_t & inst) { hw.PushStack(inst.args[1], hw.regs[inst.args[0]]); }
+    static void Inst_Pop(this_t & hw, const inst_t & inst) { hw.regs[inst.args[1]] = hw.PopStack(inst.args[0]); }
 
-    static void Inst_Input(AvidaGP & hw, const arg_set_t & args) {
+    static void Inst_Input(this_t & hw, const inst_t & inst) {
       // Determine the input ID and grab it if it exists; if not, return 0.0
-      int input_id = (int) hw.regs[ args[0] ];
-      hw.regs[args[1]] = Find(hw.inputs, input_id, 0.0);
+      int input_id = (int) hw.regs[ inst.args[0] ];
+      hw.regs[inst.args[1]] = Find(hw.inputs, input_id, 0.0);
     }
 
-    static void Inst_Output(AvidaGP & hw, const arg_set_t & args) {
+    static void Inst_Output(this_t & hw, const inst_t & inst) {
       // Save the date in the target reg to the specified output position.
-      int output_id = (int) hw.regs[ args[1] ];  // Grab ID from register.
-      hw.outputs[output_id] = hw.regs[args[0]];     // Copy target reg to appropriate output.
+      int output_id = (int) hw.regs[ inst.args[1] ];  // Grab ID from register.
+      hw.outputs[output_id] = hw.regs[inst.args[0]];     // Copy target reg to appropriate output.
     }
 
-    static void Inst_CopyVal(AvidaGP & hw, const arg_set_t & args) { hw.regs[args[1]] = hw.regs[args[0]]; }
+    static void Inst_CopyVal(this_t & hw, const inst_t & inst) { hw.regs[inst.args[1]] = hw.regs[inst.args[0]]; }
 
-    static void Inst_ScopeReg(AvidaGP & hw, const arg_set_t & args) {
-      hw.reg_stack.emplace_back(hw.CurScope(), args[0], hw.regs[args[0]]);
+    static void Inst_ScopeReg(this_t & hw, const inst_t & inst) {
+      hw.reg_stack.emplace_back(hw.CurScope(), inst.args[0], hw.regs[inst.args[0]]);
     }
 
     static const inst_lib_t & DefaultInstLib();
   };
 
-  size_t AvidaGP::InstScope(const inst_t & inst) const {
-    if (inst_lib->GetScopeType(inst.id) == ScopeType::NONE) return 0;
-    return inst.args[ inst_lib->GetScopeArg(inst.id) ] + 1;
+  template <typename HARDWARE>
+  size_t AvidaGP_Base<HARDWARE>::InstScope(const inst_t & inst) const {
+    if (genome.inst_lib->GetScopeType(inst.id) == ScopeType::NONE) return 0;
+    return inst.args[ genome.inst_lib->GetScopeArg(inst.id) ] + 1;
   }
 
-  void AvidaGP::PrintInst(const inst_t & inst, std::ostream & os) const {
-    os << inst_lib->GetName(inst.id);
-    const size_t num_args = inst_lib->GetNumArgs(inst.id);
+  template <typename HARDWARE>
+  void AvidaGP_Base<HARDWARE>::PrintInst(const inst_t & inst, std::ostream & os) const {
+    os << genome.inst_lib->GetName(inst.id);
+    const size_t num_args = genome.inst_lib->GetNumArgs(inst.id);
     for (size_t i = 0; i < num_args; i++) {
       os << ' ' << inst.args[i];
     }
   }
 
-  void AvidaGP::PrintGenome(std::ostream & os) const {
+  template <typename HARDWARE>
+  void AvidaGP_Base<HARDWARE>::PrintGenome(std::ostream & os) const {
     size_t cur_scope = 0;
 
-    for (const inst_t & inst : genome) {
+    for (const inst_t & inst : genome.sequence) {
       size_t new_scope = InstScope(inst);
 
       if (new_scope) {
@@ -489,18 +537,20 @@ namespace emp {
     }
   }
 
-  void AvidaGP::PrintGenome(const std::string & filename) const {
+  template <typename HARDWARE>
+  void AvidaGP_Base<HARDWARE>::PrintGenome(const std::string & filename) const {
     std::ofstream of(filename);
     PrintGenome(of);
     of.close();
   }
 
-  size_t AvidaGP::PredictNextInst() const {
+  template <typename HARDWARE>
+  size_t AvidaGP_Base<HARDWARE>::PredictNextInst() const {
     // Determine if we are changing scope.
     size_t new_scope = CPU_SIZE+1;  // Default to invalid scope.
-    if (inst_ptr >= genome.size()) new_scope = 0;
+    if (inst_ptr >= genome.sequence.size()) new_scope = 0;
     else {
-      size_t inst_scope = InstScope(genome[inst_ptr]);
+      size_t inst_scope = InstScope(genome.sequence[inst_ptr]);
       if (inst_scope) new_scope = inst_scope;
     }
 
@@ -515,18 +565,19 @@ namespace emp {
     // If we are at the end of a function, assume we will jump back to the call.
     if (CurScopeType() == ScopeType::FUNCTION) {
       size_t next_pos = call_stack.back();
-      if (next_pos >= genome.size()) next_pos = 0;
+      if (next_pos >= genome.sequence.size()) next_pos = 0;
       return next_pos;
     }
 
     // If we have run past the end of the genome, we will start over.
-    if (inst_ptr >= genome.size()) return 0;
+    if (inst_ptr >= genome.sequence.size()) return 0;
 
     // Otherwise, we exit the scope normally.
     return inst_ptr;
   }
 
-  void AvidaGP::PrintState(std::ostream & os) const {
+  template <typename HARDWARE>
+  void AvidaGP_Base<HARDWARE>::PrintState(std::ostream & os) const {
     size_t next_inst = PredictNextInst();
 
     os << " REGS: ";
@@ -543,8 +594,8 @@ namespace emp {
     if (inst_ptr != next_inst) os << "(-> " << next_inst << ")";
     os << " scope:" << CurScope()
        << " (";
-    if (next_inst < genome.size()) { // For interpreter mode
-        PrintInst(genome[next_inst], os);
+    if (next_inst < genome.sequence.size()) { // For interpreter mode
+        PrintInst(genome.sequence[next_inst], os);
     }
     os << ")"
        << " errors: " << errors
@@ -558,7 +609,8 @@ namespace emp {
   }
 
   /// This static function can be used to access the generic AvidaGP instruction library.
-  const InstLib<AvidaGP> & AvidaGP::DefaultInstLib() {
+  template <typename HARDWARE>
+  const InstLib<AvidaGP_Base<HARDWARE>> & AvidaGP_Base<HARDWARE>::DefaultInstLib() {
     static inst_lib_t inst_lib;
 
     if (inst_lib.GetSize() == 0) {
@@ -597,6 +649,7 @@ namespace emp {
     return inst_lib;
   }
 
+  using AvidaGP = AvidaGP_Base<int>;
 }
 
 

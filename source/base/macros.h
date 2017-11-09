@@ -1,72 +1,78 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Generally useful macros that can perform cools tricks.  As with all macros, use only
-//  after careful exclusion of alternative approaches.
-//
-//  The Macros to highlight here are:
-//
-//  ===== String Handling and Printing =====
-//  EMP_PRINT_RESULT(A) will print to std::cout both the string that was passed into the
-//       macro and what that string evaluates to.
-//
-//  EMP_STRINGIFY(...) converts all arguments into a single string (including commas).
-//  EMP_STRINGIFY_EACH(...) converts each argument into a string (leaving commas).
-//
-//  ===== Managing variadic arguments =====
-//  EMP_COUNT_ARGS(...) returns the number of arguments in the __VA_ARGS__
-//  EMP_GET_ARG(N, ...) return the Nth arg that follows
-//  EMP_POP_ARGS(N, ...) remove the first N args, return the rest.
-//  EMP_PACK_ARGS(...) Group args together in parens so they are treated like one argument.
-//  EMP_DUPLICATE_ARGS(N, ...) makes N collated copies of all args to follow.
-//  EMP_CROP_ARGS_TO(N, ...) reduces N args (must have at least that many)
-//  EMP_FORCE_ARGS_TO(N, P, ...) Crops or pads (with p) args to be exactly N long.
-//  EMP_ROTATE_ARGS(...) Moves the first argument to the end of the arg list.
-//  EMP_SELECT_ARGS(PATTERN, ...) Uses the (repeating) patter to select arguments to keep.
-//    Pattern is an argument pack consisting of i (include) or x (exclude).
-//  EMP_GET_ODD_ARGS(...) will return all arguments at odd positions (1,3,5,7, etc.)
-//  EMP_GET_EVEN_ARGS(...) will return all arguments at odd positions (2,4,6,8, etc.)
-//  EMP_REVERSE_ARGS(...) Reverse the order of arguments passed in.
-//
-//  ===== Argument Manipulation and Formatting =====
-//  EMP_MERGE(...) merge all arguments (after conversion) into a single unit.
-//  EMP_WRAP_EACH(W, ...) will run macro W on each of the other args and concatinate them.
-//  EMP_LAYOUT(W, P, ...) Similar to EMP_WRAP_EACH, but puts a P between each arg pair.
-//  EMP_WRAP_ARGS(W, ...) Similar to EMP_WRAP_EACH, but puts a COMMA between each arg pair.
-//  EMP_WRAP_ARG_PAIRS(W, ...) Similar to EMP_WRAP_ARGS, but passes pairs of args into W.
-//
-//  ===== Macro Building =====
-//  EMP_ASSEMBLE_MACRO takes in a prefix and set of arguments and appends the size of the
-//  number of arguments to the prefix, and passes in all of the arguments.
-//
-//  EMP_ASSEMBLE_MACRO_1ARG assumes the first argument after the prefix should not count
-//  toward the size, but passed in anyway. (*_?ARG  works for more arguments up to 10).
-//
-//  EMP_FAKE_ARG or EMP_FAKE_2ARG behave as a single argument.  If, in manipulating them
-//  You make them become EMP_CONVERT_ARG_EMP_FAKE_ARG(A) or EMP_CONVERT_ARG_EMP_FAKE_2ARG(A)
-//  (i.e., prepend with EMP_CONVERT and provide an argument) it will trigger a conversion.
-//  If you prepend anything else similarly, it wil NOT trigger a conversion.
-//
-//  This is especially useful with _2ARG since anything unconverted will be a single
-//  argument, while anything converted will be two, allowing us to shift arguments
-//  to perform conditional behaviors.
-//
-//
-//  Development Notes:
-//  * We need to standardize how we handle macros that covert inputs to comma-separated
-//    results vs those that merge them together.  One option is to have comma-separated the
-//    default and then have an EMP_REMOVE_COMMAS (or somesuch)
-//  * EMP_TYPES_TO_ARGS (not yet listed above) is poorly named.  Maybe EMP_DECLARE_ARGS?
-//  * It would be useful to have EMP_WRAP_WITH_ID which passes in the position ID as the
-//    second argument.  This would allow us to, for example, streamline EMP_TYPES_TO_ARGS.
-//
-//  * A more generic EMP_WRAP macro that is specified on the fly.  For example:
-//      EMP_WRAP(W,2,4,A,B,a,b,c,d,e,f,g,h,i,j,k,l)
-//    would assume six args in each wrap, A, B, and the rest broken into groups of four. I.e.:
-//      W(A,B,a,b,c,d), W(A,B,e,f,g,h), W(A,B,i,j,k,l)
-
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file macros.h
+ *  @brief Generally useful macros that can perform cools tricks.
+ *  @note Status: RELEASE
+ *
+ *
+ *  Generally useful macros that can perform cools tricks.  As with all macros, use only
+ *  after careful exclusion of alternative approaches.
+ *
+ *  The Macros to highlighted here are:
+ *
+ *  ===== String Handling and Printing =====
+ *  EMP_PRINT_RESULT(A) will print to std::cout both the string that was passed into the
+ *       macro and what that string evaluates to.
+ *
+ *  EMP_STRINGIFY(...) converts all arguments into a single string (including commas).
+ *  EMP_STRINGIFY_EACH(...) converts each argument into a string (leaving commas).
+ *
+ *  ===== Managing variadic arguments =====
+ *  EMP_COUNT_ARGS(...) returns the number of arguments in the __VA_ARGS__
+ *  EMP_GET_ARG(N, ...) return the Nth arg that follows
+ *  EMP_POP_ARGS(N, ...) remove the first N args, return the rest.
+ *  EMP_PACK_ARGS(...) Group args together in parens so they are treated like one argument.
+ *  EMP_DUPLICATE_ARGS(N, ...) makes N collated copies of all args to follow.
+ *  EMP_CROP_ARGS_TO(N, ...) reduces N args (must have at least that many)
+ *  EMP_FORCE_ARGS_TO(N, P, ...) Crops or pads (with p) args to be exactly N long.
+ *  EMP_ROTATE_ARGS(...) Moves the first argument to the end of the arg list.
+ *  EMP_SELECT_ARGS(PATTERN, ...) Uses the (repeating) patter to select arguments to keep.
+ *    Pattern is an argument pack consisting of i (include) or x (exclude).
+ *  EMP_GET_ODD_ARGS(...) will return all arguments at odd positions (1,3,5,7, etc.)
+ *  EMP_GET_EVEN_ARGS(...) will return all arguments at odd positions (2,4,6,8, etc.)
+ *  EMP_REVERSE_ARGS(...) Reverse the order of arguments passed in.
+ *
+ *  ===== Argument Manipulation and Formatting =====
+ *  EMP_MERGE(...) merge all arguments (after conversion) into a single unit.
+ *  EMP_WRAP_EACH(W, ...) will run macro W on each of the other args and concatinate them.
+ *  EMP_LAYOUT(W, P, ...) Similar to EMP_WRAP_EACH, but puts a P between each arg pair.
+ *  EMP_WRAP_ARGS(W, ...) Similar to EMP_WRAP_EACH, but puts a COMMA between each arg pair.
+ *  EMP_WRAP_ARG_PAIRS(W, ...) Similar to EMP_WRAP_ARGS, but passes pairs of args into W.
+ *
+ *  ===== Macro Building =====
+ *  EMP_ASSEMBLE_MACRO takes in a prefix and set of arguments and appends the size of the
+ *  number of arguments to the prefix, and passes in all of the arguments.
+ *
+ *  EMP_ASSEMBLE_MACRO_1ARG assumes the first argument after the prefix should not count
+ *  toward the size, but passed in anyway. (*_?ARG  works for more arguments up to 10).
+ *
+ *  EMP_FAKE_ARG or EMP_FAKE_2ARG behave as a single argument.  If, in manipulating them
+ *  You make them become EMP_CONVERT_ARG_EMP_FAKE_ARG(A) or EMP_CONVERT_ARG_EMP_FAKE_2ARG(A)
+ *  (i.e., prepend with EMP_CONVERT and provide an argument) it will trigger a conversion.
+ *  If you prepend anything else similarly, it wil NOT trigger a conversion.
+ *
+ *  This is especially useful with _2ARG since anything unconverted will be a single
+ *  argument, while anything converted will be two, allowing us to shift arguments
+ *  to perform conditional behaviors.
+ *
+ *
+ *  @todo We need to standardize how we handle macros that covert inputs to comma-separated
+ *    results vs those that merge them together.  One option is to have comma-separated the
+ *    default and then have an EMP_REMOVE_COMMAS (or somesuch)
+ *
+ *  @todo EMP_TYPES_TO_ARGS (not yet listed above) is poorly named.  Maybe EMP_DECLARE_ARGS?
+ *
+ *  @todo It would be useful to have EMP_WRAP_WITH_ID which passes in the position ID as the
+ *    second argument.  This would allow us to, for example, streamline EMP_TYPES_TO_ARGS.
+ *
+ *  @todo A more generic EMP_WRAP macro that is specified on the fly.  For example:
+ *      EMP_WRAP(W,2,4,A,B,a,b,c,d,e,f,g,h,i,j,k,l)
+ *    would assume six args in each wrap, A, B, and the rest broken into groups of four. I.e.:
+ *      W(A,B,a,b,c,d), W(A,B,e,f,g,h), W(A,B,i,j,k,l)
+ */
 
 #ifndef EMP_MACROS_H
 #define EMP_MACROS_H

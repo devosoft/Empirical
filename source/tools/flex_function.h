@@ -1,11 +1,13 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A flex_function works identicaly to std::function, but holds default values for
-//  all parameters so any number of paramaters can be used in a call.
-//  Status: ALPHA
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2017
+ *
+ *  @file  flex_function.h
+ *  @brief Based on std::function, but holds default parameter values for calls with fewer args.
+ *  @note Status: ALPHA
+ */
+
 
 #ifndef EMP_FLEX_FUNCTION_H
 #define EMP_FLEX_FUNCTION_H
@@ -20,7 +22,8 @@ namespace emp {
 
   template <class T> class flex_function;    // Not defined.
 
-  // Single argument functions don't need a tuple...
+  /// A functon class that is almost identical to std::function, but is provided with default values
+  /// for all parameters so that it can be called with fewer arguments, as needed.
   template <class R, class... ARGS>
   class flex_function<R(ARGS...)> {
   public:
@@ -33,8 +36,8 @@ namespace emp {
     static constexpr int num_args = sizeof...(ARGS);
 
   private:
-    fun_t fun;
-    tuple_t default_args;
+    fun_t fun;               ///< Function to be called.
+    tuple_t default_args;    ///< Arguments to be used if not enough are provided in call.
 
   public:
     template <typename T>
@@ -50,18 +53,23 @@ namespace emp {
     template <typename T>
     this_t & operator=(T && arg) { fun = std::forward<T>(arg); return *this; }
 
+    /// Set the default value for a specific parameter.
     template <int ID> void SetDefault(pack_id<ID,ARGS...> & in_default) {
       std::get<ID>(default_args) = in_default;
     }
+
+    /// Set the default values for all parameters.
     void SetDefaults(ARGS... args) {
       default_args = std::make_tuple(args...);
     }
 
+    /// Allow the function to be called with all args.
     return_t operator()(ARGS... k) const {
       emp_assert(fun);
       return fun(k...);
     }
 
+    /// All the function to be called with a subset of arguments (and the rest set to defaults)
     template <class... IN_ARGS>
     return_t operator()(IN_ARGS &&... k) const {
       emp_assert(fun);
@@ -70,6 +78,7 @@ namespace emp {
       return operator()(std::forward<IN_ARGS>(k)..., std::get<in_args>(default_args));
     }
 
+    /// Determine whether this function has been set.
     operator bool() const { return (bool) fun; }
 
   };

@@ -16,8 +16,8 @@
  *        off mutations.
  *  @todo We should Specialize World so that ANOTHER world can be used with proper delegation to
  *        facilitate demes, pools, islands, etc.
- *  @todo With DoMutations, should we update taxa?  Or just assume that it will be handled
- *        properly when the organisms move to the next generation.
+ *  @todo We should be able to have any number of systematics managers, based on various type_trait
+ *        information a that we want to track.
  */
 
 #ifndef EMP_EVO_WORLD_H
@@ -196,7 +196,7 @@ namespace emp {
     /// If no random number generator is provided, one is created within the world.
     /// If no name is provided, the world remains nameless.
     World(Ptr<Random> rnd=nullptr, std::string _name="")
-      : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), fit_cache()
+      : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), update(0), fit_cache()
       , genotypes(), next_genotypes()
       , name(_name), cache_on(false), size_x(0), size_y(0), files()
       , is_synchronous(false), is_structured(false)
@@ -519,19 +519,19 @@ namespace emp {
     }
 
     /// Inject an organism using the default injection scheme.
-    void Inject(const ORG & mem, size_t copy_count=1);
+    void Inject(const genome_t & mem, size_t copy_count=1);
 
     /// Inject an organism at a specific position.
-    void InjectAt(const ORG & mem, const size_t pos);
+    void InjectAt(const genome_t & mem, const size_t pos);
 
     /// Inject a random organism (constructor must facilitate!)
     template <typename... ARGS> void InjectRandomOrg(ARGS &&... args);
 
     /// Place a newborn organism into the population, by default rules and with parent information.
-    size_t DoBirth(const ORG & mem, size_t parent_pos);
+    size_t DoBirth(const genome_t & mem, size_t parent_pos);
 
     /// Place multiple copies of a newborn organism into the population.
-    void DoBirth(const ORG & mem, size_t parent_pos, size_t copy_count);
+    void DoBirth(const genome_t & mem, size_t parent_pos, size_t copy_count);
 
     // Kill off organism at the specified position (same as RemoveOrgAt, but callable externally)
     void DoDeath(const size_t pos) { RemoveOrgAt(pos); }
@@ -918,7 +918,7 @@ namespace emp {
   }
 
   template <typename ORG>
-  void World<ORG>::Inject(const ORG & mem, size_t copy_count) {
+  void World<ORG>::Inject(const genome_t & mem, size_t copy_count) {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       inject_ready_sig.Trigger(*new_org);
@@ -929,7 +929,7 @@ namespace emp {
   }
 
   template <typename ORG>
-  void World<ORG>::InjectAt(const ORG & mem, const size_t pos) {
+  void World<ORG>::InjectAt(const genome_t & mem, const size_t pos) {
     Ptr<ORG> new_org = NewPtr<ORG>(mem);
     inject_ready_sig.Trigger(*new_org);
     AddOrgAt(new_org, pos);
@@ -950,7 +950,7 @@ namespace emp {
 
   // Give birth to a single offspring; return offspring position.
   template <typename ORG>
-  size_t World<ORG>::DoBirth(const ORG & mem, size_t parent_pos) {
+  size_t World<ORG>::DoBirth(const genome_t & mem, size_t parent_pos) {
     before_repro_sig.Trigger(parent_pos);
     Ptr<ORG> new_org = NewPtr<ORG>(mem);
     offspring_ready_sig.Trigger(*new_org);
@@ -962,7 +962,7 @@ namespace emp {
 
   // Give birth to (potentially) multiple offspring; no return, but triggers can be tracked.
   template <typename ORG>
-  void World<ORG>::DoBirth(const ORG & mem, size_t parent_pos, size_t copy_count) {
+  void World<ORG>::DoBirth(const genome_t & mem, size_t parent_pos, size_t copy_count) {
     before_repro_sig.Trigger(parent_pos);
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);

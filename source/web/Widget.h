@@ -39,6 +39,7 @@
 #include "../tools/mem_track.h"
 
 #include "events.h"
+#include "Font.h"
 #include "init.h"
 #include "WidgetExtras.h"
 
@@ -286,6 +287,7 @@ namespace web {
       virtual Widget Append(const std::string & text) { return ForwardAppend(text); }
       virtual Widget Append(const std::function<std::string()> & fn) { return ForwardAppend(fn); }
       virtual Widget Append(Widget info) { return ForwardAppend(info); }
+      virtual Widget Append(const Font & font) { return ForwardAppend(font); }
 
       // Convert arbitrary inputs to a string and try again!
       virtual Widget Append(char in_char) { return Append(emp::to_string(in_char)); }
@@ -783,6 +785,12 @@ namespace web {
 
       /// Setup how this Widget to NOT be resizable.
       return_t & SetResizableOff() { return SetCSS("resize", "none"); }
+
+      /// Provide a Font object to setup the font for this widget.
+      return_t & SetFont(const Font & font) {
+        font.ConfigStyle(info->extras.style);
+        return (return_t &) *this;
+      }
 
       /// Setup the Font to be used in this Widget.
       return_t & SetFont(const std::string & font) { return SetCSS("font-family", font); }

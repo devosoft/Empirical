@@ -61,3 +61,20 @@ following statuses:
 * DEPRECATED - Functionality has been replaced and should shift to replacement.
 * EXPLORATORY - Some functionality may work, but needs re-engineering to get right.
 * EXTERNAL - Part of another project (cited above); not developed as part of Empirical.
+
+
+--== Levelization ==--
+
+The structure of Empirical is levelized to facilitate development and testing.  This means
+that all directories are on a level where dependiences are either internal to that directory
+or on lower levels.  Likewise, within a directory, files have a level and depend only on other
+files at lower levels.
+
+LEVEL 0:  base/
+LEVEL 1:  meta/
+LEVEL 2:  tools/
+LEVEL 3:  config/  control/  data/  games/  geometry/  hardware/  scholar/
+LEVEL 4:  Evo/ (data, control)  web/ (config, control)
+
+
+

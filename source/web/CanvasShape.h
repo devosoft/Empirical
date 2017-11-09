@@ -1,12 +1,17 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Specs for the CanvasShape widget and various specific shapes:
-//
-//    CanvasCircle
-//    CanvasRect
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2015-2017
+ *
+ *  @file  CanvasShape.h
+ *  @brief Define simple shapes to draw on a canvas.
+ *
+ *  Canvas shapes can be definied in detail, describing how they modify a canvas.
+ *
+ *  Other, more specific actions defined here are:
+ *    CanvasCircle
+ *    CanvasRect
+ */
 
 
 #ifndef EMP_WEB_CANVAS_SHAPE_H
@@ -14,34 +19,45 @@
 
 #include <string>
 
+#include "../base/vector.h"
+#include "../geometry/Circle2D.h"
+
 #include "CanvasAction.h"
 
 namespace emp {
 namespace web {
 
+  /// Define an arbitrary shape to draw on a canvas (base clase)
   class CanvasShape : public CanvasAction {
   protected:
-    double x; double y;
-    std::string fill_color;
-    std::string line_color;
+    double x; double y;      ///< Anchor point for this shape.
+    std::string fill_color;  ///< Internal color to fill shape with.
+    std::string line_color;  ///< Border color for shape.
 
   public:
     CanvasShape(double _x, double _y, const std::string & fc="", const std::string & lc="")
       : x(_x), y(_y), fill_color(fc), line_color(lc) { ; }
     virtual ~CanvasShape() { ; }
 
+    /// Shift the position of this shape.
     void MoveTo(double _x, double _y) { x=_x; y=_y; }
+
+    /// Change the fill color of this shape.
     void SetFillColor(const std::string & color) { fill_color = color; }
+
+    /// Change the stroke color of this shape.
     void SetLineColor(const std::string & color) { line_color = color; }
 
+    /// Actually change the color on screen.
     void ApplyColor() {
       Fill(fill_color);
       Stroke(line_color);
     }
   };
 
+  /// Track a circle shape to be drawn on a canvas.
   class CanvasCircle : public CanvasShape {
-    double radius;
+    double radius;  ///< Circle radius
   public:
     CanvasCircle(double _x, double _y, double _r,
                  const std::string & fc="", const std::string & lc="")
@@ -61,8 +77,10 @@ namespace web {
     CanvasAction * Clone() const { return new CanvasCircle(*this); }
   };
 
+  /// Track a rectangle shape to be drawn on a canvas.
   class CanvasRect : public CanvasShape {
-    double w; double h;
+    double w;  ///< Rectangle widgth.
+    double h;  ///< Rectangle height.
   public:
     CanvasRect(double _x, double _y, double _w, double _h,
                const std::string & fc="", const std::string & lc="")
@@ -78,8 +96,10 @@ namespace web {
     CanvasAction * Clone() const { return new CanvasRect(*this); }
   };
 
+  /// Clear a rectangular area in a canvas.
   class CanvasClearRect : public CanvasShape {
-    double w; double h;
+    double w;  ///< Rectangle widgth.
+    double h;  ///< Rectangle height.
   public:
     CanvasClearRect(double _x, double _y, double _w, double _h)
       : CanvasShape(_x, _y), w(_w), h(_h) { ; }
@@ -92,9 +112,10 @@ namespace web {
     CanvasAction * Clone() const { return new CanvasClearRect(*this); }
   };
 
+  /// An arbitrary-sized polygon to be drawn on a canvas.
   class CanvasPolygon : public CanvasShape {
   private:
-    emp::vector<Point> points;
+    emp::vector<Point> points;  ///< Series of points defining the perimiter of the Polygon.
   public:
     CanvasPolygon(const std::string & fc="", const std::string & lc="")
       : CanvasShape(0, 0, fc, lc) { ; }
@@ -126,9 +147,11 @@ namespace web {
     CanvasAction * Clone() const { return new CanvasPolygon(*this); }
   };
 
+  /// A line segment on the canvas.
   class CanvasLine : public CanvasShape {
   private:
-    double x2; double y2;
+    double x2;  /// X-position for second point of line segment.
+    double y2;  /// Y-position for second point of line segment.
   public:
     CanvasLine(double _x1, double _y1, double _x2, double _y2,
                const std::string & lc="")
@@ -147,10 +170,11 @@ namespace web {
     CanvasAction * Clone() const { return new CanvasLine(*this); }
   };
 
+  /// Text to be written on a canvas.
   class CanvasText : public CanvasShape {
   protected:
-    std::string text;
-    bool center;
+    std::string text;  ///< Specific text to be written.
+    bool center;       ///< Should this text be centered (or is anchor on left side)?
   public:
     CanvasText(double x, double y, const std::string & _text,
                const std::string & fc="", const std::string & lc="")
@@ -168,7 +192,10 @@ namespace web {
       }, x, y, text.c_str(), fill_color.c_str());
     }
 
+    /// Center this text.
     void Center(bool c=true) { center = c; }
+
+    /// Identify if text is centered.
     bool GetCenter() const { return center; }
 
     CanvasAction * Clone() const { return new CanvasText(*this); }
