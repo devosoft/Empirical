@@ -220,8 +220,8 @@ namespace emp {
     // @CAO -- we should do something better if we are filling in most of the edges.
 
     while (e_cur < e_count) {
-      const size_t from = random.GetUInt(v_count);
-      const size_t to = random.GetUInt(v_count);
+      size_t from = random.GetUInt(v_count);
+      size_t to = random.GetUInt(v_count);
 
       if (from == to || graph.HasEdge(from,to)) continue;
       if (from > to) std::swap(from, to); // Make sure lower number is first.
