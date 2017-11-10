@@ -97,10 +97,10 @@ namespace emp {
   /// A StateGrid describes a map of grid positions to the current state of each position.
   class StateGrid {
   protected:
-    size_t width;              ///< Width of the overall grid
-    size_t height;             ///< Height of the overall grid
-    emp::vector<int> states;   ///< Specific states at each position in the grid.
-    StateGridInfo info;   ///< Information about the set of states used in this grid.
+    size_t width;             ///< Width of the overall grid
+    size_t height;            ///< Height of the overall grid
+    emp::vector<int> states;  ///< Specific states at each position in the grid.
+    StateGridInfo info;       ///< Information about the set of states used in this grid.
 
   public:
     StateGrid() : width(0), height(0), states(0), info() { ; }
@@ -129,6 +129,7 @@ namespace emp {
     double GetScoreMult(size_t x, size_t y) const { return info.GetScoreMult(GetState(x,y)); }
     const std::string & GetName(size_t x, size_t y) const { return info.GetName(GetState(x,y)); }
 
+    /// Load in the contents of a StateGrid using the file information provided.
     template <typename... Ts>
     StateGrid & Load(Ts &&... args) {
       // Load this data from a stream or a file.
@@ -156,6 +157,7 @@ namespace emp {
       return *this;
     }
 
+    /// Store the current status of the StateGrid to a file.
     template <typename... Ts>
     StateGrid & Write(Ts &&... args) {
       File file;
