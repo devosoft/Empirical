@@ -39,6 +39,7 @@ int main(int argc, char* argv[])
 
   uint32_t cur_arg = 1;
   bool print_file = true;
+  bool is_directed = false;
 
   // First, determine what type of graph we need to make.
   int graph_type = 0;
@@ -54,8 +55,8 @@ int main(int argc, char* argv[])
               << " 4 - Grid" << std::endl
               << " 5 - Lossy Grid" << std::endl
               << " 6 - Linked Cliques" << std::endl
-	      << " 7 - Hamiltonion Cycle (with solution)" << std::endl;
-              << " 8 - Random DAG" << std::endl
+	      << " 7 - Hamiltonion Cycle (with solution)" << std::endl
+              << " 8 - Random DAG" << std::endl;
     std::cin >> graph_type;
   }
 
@@ -158,6 +159,7 @@ int main(int argc, char* argv[])
     int edges = GetValue("How many edges?", args, cur_arg, nodes*(nodes-1)/2);
     graph = build_graph_dag(nodes, edges, random);
     filename = emp::to_string("dag-", nodes, '-', edges);
+    is_directed = true;
   }
   else {
     std::cout << "Unknown Graph type '" << graph_type << "'. Aborting." << std::endl;
@@ -167,7 +169,8 @@ int main(int argc, char* argv[])
 
   if (print_file) {
     std::ofstream of(filename);
-    graph.PrintSym(of);
+    if (is_directed) graph.PrintDirected();
+    else graph.PrintSym(of);
   }
 
   std::cout << "Printed to file '" << filename << "'." << std::endl;
