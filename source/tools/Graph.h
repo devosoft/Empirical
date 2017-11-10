@@ -165,6 +165,7 @@ namespace emp {
       nodes[to].SetEdge(from, val);
     }
 
+
     /// Print the graph to the provided output stream (defaulting to standard out)
     void PrintSym(std::ostream & os=std::cout) {
       os << GetSize() << " " << (GetEdgeCount()/2) << std::endl;

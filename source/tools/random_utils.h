@@ -30,6 +30,7 @@ namespace emp {
       std::swap(v[i], v[pos]);
     }
   }
+  
   template <typename T>
   inline void Shuffle(Random & random, emp::vector<T> & v) { Shuffle(random, v, v.size()); }
 
