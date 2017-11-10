@@ -55,6 +55,7 @@ int main(int argc, char* argv[])
               << " 5 - Lossy Grid" << std::endl
               << " 6 - Linked Cliques" << std::endl
 	      << " 7 - Hamiltonion Cycle (with solution)" << std::endl;
+              << " 8 - Random DAG" << std::endl
     std::cin >> graph_type;
   }
 
@@ -150,6 +151,13 @@ int main(int argc, char* argv[])
       of << v_map[i];
     }
     print_file = false;
+  }
+  else if (graph_type == 8) {
+    std::cout << "Generating a Random DAG." << std::endl;
+    int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
+    int edges = GetValue("How many edges?", args, cur_arg, nodes*(nodes-1)/2);
+    graph = build_graph_dag(nodes, edges, random);
+    filename = emp::to_string("dag-", nodes, '-', edges);
   }
   else {
     std::cout << "Unknown Graph type '" << graph_type << "'. Aborting." << std::endl;
