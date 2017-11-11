@@ -179,6 +179,7 @@ int main(int argc, char* argv[])
       total_nodes += nodes;
       total_edges += edges;
     }
+    graph = shuffle_graph(graph, random);
     filename = emp::to_string("comps-", components, '-', total_nodes, '-', total_edges);
   }
   else {
