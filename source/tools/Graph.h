@@ -41,6 +41,9 @@ namespace emp {
       /// Add a connection between this node and another.
       void AddEdge(size_t to) { edge_set.Set(to, true); }
 
+      /// Add a full set of connections from this node to others.
+      void AddEdgeSet(BitVector in_set) { edge_set |= in_set; }
+
       /// Remove the connection (if there is one) between this node and another one.
       void RemoveEdge(size_t to) { edge_set.Set(to, false); }
 
@@ -165,6 +168,18 @@ namespace emp {
       nodes[to].SetEdge(from, val);
     }
 
+    /// Merge a second graph into this one.
+    void Merge(const Graph & in_graph) {
+      const size_t start_size = nodes.size();
+      const size_t new_size = start_size + in_graph.GetSize();
+      Resize(new_size);
+      for (size_t i = 0; i < in_graph.GetSize(); i++) {
+        BitVector edge_set = in_graph.nodes[i].GetEdgeSet();
+        edge_set.Resize(new_size);
+        edge_set <<= start_size;
+        nodes[start_size + i].AddEdgeSet(edge_set);
+      }
+    }
 
     /// Print a symmetric graph to the provided output stream (defaulting to standard out)
     void PrintSym(std::ostream & os=std::cout) {
