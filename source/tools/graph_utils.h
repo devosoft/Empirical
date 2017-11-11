@@ -24,7 +24,7 @@
 #include "random_utils.h"
 
 namespace emp {
-  
+
   /// Take an existing graph, and build a new one that is isomorphic to it, but with randomized
   /// vertex IDs.
   Graph shuffle_graph(const Graph & in_graph, Random & random) {
@@ -91,7 +91,7 @@ namespace emp {
     (void) max_edges;
 
     emp_assert(v_count >= 2 && e_count > 0); // We need at least two vertices to support an edge.
-    emp_assert(e_count <= max_edges); // Shouldn't have more edges than can fit!
+    emp_assert(e_count <= max_edges, e_count, max_edges); // Shouldn't have more edges than can fit!
 
     Graph graph(v_count);
     size_t e_cur = 0;           // How many edges have we added?
@@ -209,10 +209,10 @@ namespace emp {
 
       // Connect in each vertex to the tree.
       for (size_t i = 1; i < v_count; i++) {
-	size_t from = v_map[i];               // Pick the next node in the shuffle.
-	size_t to = v_map[random.GetUInt(i)]; // Pick node already in the tree.
-	if (from > to) std::swap(from, to);         // Make sure lower number is first.
-	graph.AddEdge(from, to);
+        size_t from = v_map[i];                // Pick the next node in the shuffle.
+        size_t to = v_map[random.GetUInt(i)];  // Pick node already in the tree.
+        if (from > to) std::swap(from, to);    // Make sure lower number is first.
+        graph.AddEdge(from, to);
       }
       e_cur = v_count - 1;
     }
