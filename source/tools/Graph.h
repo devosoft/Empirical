@@ -172,7 +172,11 @@ namespace emp {
     void Merge(const Graph & in_graph) {
       const size_t start_size = nodes.size();
       const size_t new_size = start_size + in_graph.GetSize();
-      Resize(new_size);
+      nodes.resize(new_size, new_size);
+      for (auto & node : nodes) {
+	      node.Resize(new_size);
+      }
+
       for (size_t i = 0; i < in_graph.GetSize(); i++) {
         BitVector edge_set = in_graph.nodes[i].GetEdgeSet();
         edge_set.Resize(new_size);
