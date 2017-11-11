@@ -55,8 +55,9 @@ int main(int argc, char* argv[])
               << " 4 - Grid" << std::endl
               << " 5 - Lossy Grid" << std::endl
               << " 6 - Linked Cliques" << std::endl
-	      << " 7 - Hamiltonion Cycle (with solution)" << std::endl
-              << " 8 - Random DAG" << std::endl;
+	            << " 7 - Hamiltonion Cycle (with solution)" << std::endl
+              << " 8 - Random DAG" << std::endl
+              << " 9 - Multiple Random Components" << std::endl;
     std::cin >> graph_type;
   }
 
@@ -160,6 +161,25 @@ int main(int argc, char* argv[])
     graph = build_graph_dag(nodes, edges, random);
     filename = emp::to_string("dag-", nodes, '-', edges);
     is_directed = true;
+  }
+  else if (graph_type == 9) {
+    std::cout << "Generating a Multiple Random Graph Components." << std::endl;
+    size_t components = GetValue("How many components?", args, cur_arg, 100);
+    size_t min_nodes = GetValue("Minimum number of vertices per component?", args, cur_arg, 100);
+    size_t max_nodes = GetValue("Maximum number of vertices per component?", args, cur_arg, 100);
+    size_t min_edges = GetValue("Minimum number of edges per component?", args, cur_arg, min_nodes*(min_nodes-1)/2);
+    size_t max_edges = GetValue("Maximum number of edges per component?", args, cur_arg, min_nodes*(min_nodes-1)/2);
+
+    size_t total_nodes = 0;
+    size_t total_edges = 0;
+    for (int i = 0; i < components; i++) {
+      size_t nodes = random.GetUInt(min_nodes, max_nodes);
+      size_t edges = random.GetUInt(min_edges, max_edges);
+      graph.Merge( build_graph_random(nodes, edges, random) );
+      total_nodes += nodes;
+      total_edges += edges;
+    }
+    filename = emp::to_string("comps-", components, '-', total_nodes, '-', total_edges);
   }
   else {
     std::cout << "Unknown Graph type '" << graph_type << "'. Aborting." << std::endl;
