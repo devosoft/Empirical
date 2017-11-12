@@ -66,7 +66,7 @@ namespace emp {
       size_t GetMaskedDegree(const BitVector & mask) const { return (mask & edge_set).CountOnes(); }
     };
 
-  private:
+  protected:
     emp::vector<Node> nodes;  ///< Set of vertices in this graph.
 
   public:
@@ -191,7 +191,7 @@ namespace emp {
       for (size_t from = 0; from < nodes.size(); from++) {
         for (size_t to=from+1; to < nodes.size(); to++) {
           if (HasEdge(from, to) == false) continue;
-	  emp_assert(HasEdge(to, from));              // This must be a symmetric graph!
+	        emp_assert(HasEdge(to, from));              // This must be a symmetric graph!
           os << from << " " << to << std::endl;
         }
       }
@@ -210,6 +210,58 @@ namespace emp {
 
   };
 
+  class WeightedGraph : public Graph {
+  protected:
+    emp::vector< emp::vector< double > > weights;
+
+  public:
+    WeightedGraph(size_t num_nodes=0) : Graph(num_nodes), weights() { ; }
+
+    WeightedGraph(const WeightedGraph &) = default;              ///< Copy constructor
+    WeightedGraph(WeightedGraph &&) = default;                   ///< Move constructor
+    ~WeightedGraph() { ; }
+
+    void Resize(size_t new_size) {
+      Graph::Resize(new_size);
+      weights.resize(new_size);
+      for (auto & row : weights) row.resize(new_size,0.0);
+    }
+
+    /// Determine weight of a specific edge in this graph.
+    double GetWeight(size_t from, size_t to) const {
+      emp_assert(from < nodes.size() && to < nodes.size());
+      return weights[from][to];
+    }
+
+    /// When Adding an edge, must also provide a weight.
+    void AddEdge(size_t from, size_t to, double weight) {
+      Graph::AddEdge(from, to);
+      weights[from][to] = weight;
+    }
+
+    /// When Adding an edge pair, must also provide a weight.
+    void AddEdgePair(size_t from, size_t to, double weight) {
+      Graph::AddEdgePair(from, to);
+      weights[from][to] = weight;
+      weights[to][from] = weight;
+    }
+
+    /// Merge two WeightedGraphs into one
+    void Merge(const WeightedGraph & in_graph) {
+      const size_t start_size = nodes.size();
+      Graph::Merge(in_graph);
+      weights.resize(nodes.size());
+      for (auto & row : weights) row.resize(nodes.size(), 0.0);
+
+      // Move the weights over.
+      for (size_t i = 0; i < in_graph.GetSize(); i++) {
+        for (size_t j = 0; j < in_graph.GetSize(); j++) {
+          weights[i+start_size][j+start_size] = in_graph.weights[i][j];
+        }
+      }
+
+    }
+  };
 }
 
 #endif
