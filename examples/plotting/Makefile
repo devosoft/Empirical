@@ -25,7 +25,7 @@ CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../source/web/
 
 TARGETS := PlottingExperiment
 
-EVO_DEPEND := ../../source/opengl/glcanvas.h ../../source/opengl/glwrap.h ../../source/opengl/shaders.h ../../source/math/consts.h ../../source/math/LinAlg.h
+EVO_DEPEND := $(wildcard ../../source/opengl/*.h) $(wildcard ../../source/math/*.h) $(wildcard ../../source/plot/*.h)
 
 default: native
 
