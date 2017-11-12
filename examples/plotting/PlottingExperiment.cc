@@ -198,8 +198,6 @@ class Scatter {
 
   public:
   Scatter(gl::GLCanvas& canvas) : shader(canvas) {
-    shader.vao.bind();
-    shader.shader.use();
     shader.vao.getBuffer<gl::BufferType::Array>().set(
       {Vec3f{-5, +5, 0}, Vec3f{+5, +5, 0}, Vec3f{+5, -5, 0}, Vec3f{-5, -5, 0}},
       gl::BufferUsage::StaticDraw);
@@ -214,16 +212,16 @@ class Scatter {
   template <typename Iter>
   void show(const Mat4x4f& projection, const Mat4x4f& view, Iter begin,
             Iter end) {
+    shader.shader.use();
     shader.vao.bind();
-    shader.shader.use();
-    shader.shader.use();
     shader.proj = projection;
     shader.view = view;
 
+    using namespace properties;
+
     for (auto iter = begin; iter != end; ++iter) {
-      shader.model = Mat4x4f::translation(iter->template get<properties::X>(),
-                                          iter->template get<properties::Y>());
-      shader.color = iter->template get<properties::Fill>();
+      shader.model = Mat4x4f::translation(X::get(*iter), Y::get(*iter));
+      shader.color = Fill::get(*iter);
 
       glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
