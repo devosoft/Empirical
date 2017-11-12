@@ -305,16 +305,16 @@ void allDo(F&& callback, T&& tuple) {
                   std::tuple_size<typename std::decay<T>::type>::value>{});
 }
 
-template <typename T, typename C>
+template <typename C, typename T>
 class Map {
   public:
-  T next;
   C change;
+  T next;
 
   public:
-  template <typename T1, typename C1>
-  Map(T1&& next, C1&& change)
-    : next(std::forward<T1>(next)), change(std::forward<C1>(change)) {}
+  template <typename C1, typename T1>
+  Map(C1&& change, T1&& next)
+    : change(std::forward<C1>(change)), next(std::forward<T1>(next)) {}
 
   template <typename Iter>
   void show(const Mat4x4f& projection, const Mat4x4f& view, Iter begin,
@@ -324,32 +324,12 @@ class Map {
     std::vector<data_point_type> dataPoints;
     std::transform(begin, end, std::back_inserter(dataPoints), change);
     next.show(projection, view, dataPoints.begin(), dataPoints.end());
-
-    // float dminX = std::numeric_limits<float>::max();
-    // float dminY = std::numeric_limits<float>::max();
-    //
-    // float dmaxX = std::numeric_limits<float>::lowest();
-    // float dmaxY = std::numeric_limits<float>::lowest();
-    //
-    // for (auto& dp : dataPoints) {
-    //   if (dp.x > dmaxX) dmaxX = dp.x;
-    //   if (dp.x < dminX) dminX = dp.x;
-    //
-    //   if (dp.y > dmaxY) dmaxY = dp.y;
-    //   if (dp.y < dminY) dminY = dp.y;
-    // }
-    // allDo(
-    //   [&](auto&& layer) {
-    //     std::forward<decltype(layer)>(layer).show(
-    //       projection, view, dataPoints.begin(), dataPoints.end());
-    //   },
-    //   layers);
   }
 };
 
-template <typename T, typename C>
-auto map(T&& next, C&& change) {
-  return Map<T, C>{std::forward<T>(next), std::forward<C>(change)};
+template <typename C, typename T>
+auto map(C&& change, T&& next) {
+  return Map<C, T>{std::forward<C>(change), std::forward<T>(next)};
 }
 
 template <typename T>
@@ -403,13 +383,15 @@ auto graph(T&& next) {
 int main(int argc, char* argv[]) {
   gl::GLCanvas canvas(1000, 1000);
   using namespace properties;
-  auto g = graph(map(Scatter(canvas), [](auto& props) {
-    auto& value = Value::get(props);
+  auto g = graph(map(
+    [](auto& props) {
+      auto& value = Value::get(props);
 
-    return props.template set<X>(value.x())
-      .template set<Y>(value.y())
-      .template set<Fill>(Vec4f{1, 1, 1, 1});
-  }));
+      return props.template set<X>(value.x())
+        .template set<Y>(value.y())
+        .template set<Fill>(Vec4f{1, 1, 1, 1});
+    },
+    Scatter(canvas)));
 
   std::vector<Vec2f> data;
   for (int i = 0; i < 100; ++i) {
