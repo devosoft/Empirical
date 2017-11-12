@@ -207,7 +207,7 @@ int main(int argc, char* argv[])
     size_t min_weight = GetValue("Minimum Weight?", args, cur_arg);
     size_t max_weight = GetValue("Maximum Weight?", args, cur_arg);
     weights = emp::RandomVector<size_t>(random, edges, min_weight, max_weight);
-    emp::Graph graph = build_graph_random(nodes, edges, random);
+    emp::WeightedGraph graph = build_weighted_graph_random(nodes, edges, min_weight, max_weight, random);
     filename = emp::to_string("randw-", nodes, '-', edges);
     std::ofstream of(filename);
     graph.PrintSym(of);
