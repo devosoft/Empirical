@@ -63,7 +63,6 @@ int main(int argc, char* argv[])
     std::cin >> graph_type;
   }
 
-  emp::Graph graph;
   emp::Random random;
   std::string filename;
 
@@ -71,7 +70,7 @@ int main(int argc, char* argv[])
     std::cout << "Generating a Random Graph." << std::endl;
     int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
     int edges = GetValue("How many edges?", args, cur_arg, nodes*(nodes-1)/2);
-    graph = build_graph_random(nodes, edges, random);
+    emp::Graph graph = build_graph_random(nodes, edges, random);
     filename = emp::to_string("rand-", nodes, '-', edges);
     std::ofstream of(filename);
     graph.PrintSym(of);
@@ -79,7 +78,7 @@ int main(int argc, char* argv[])
   else if (graph_type == 1) {
     std::cout << "Generating a Chain Graph." << std::endl;
     int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
-    graph = build_graph_grid(nodes, 1, random);
+    emp::Graph graph = build_graph_grid(nodes, 1, random);
     filename = emp::to_string("chain-", nodes, '-', nodes-1);
     std::ofstream of(filename);
     graph.PrintSym(of);
@@ -87,7 +86,7 @@ int main(int argc, char* argv[])
   else if (graph_type == 2) {
     std::cout << "Generating a Ring Graph." << std::endl;
     int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
-    graph = build_graph_ring(nodes, random);
+    emp::Graph graph = build_graph_ring(nodes, random);
     filename = emp::to_string("ring-", nodes, '-', nodes);
     std::ofstream of(filename);
     graph.PrintSym(of);
@@ -95,7 +94,7 @@ int main(int argc, char* argv[])
   else if (graph_type == 3) {
     std::cout << "Generating a Tree Graph." << std::endl;
     int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
-    graph = build_graph_tree(nodes, random);
+    emp::Graph graph = build_graph_tree(nodes, random);
     filename = emp::to_string("tree-", nodes, '-', nodes-1);
     std::ofstream of(filename);
     graph.PrintSym(of);
@@ -104,7 +103,7 @@ int main(int argc, char* argv[])
     std::cout << "Generating a Grid Graph." << std::endl;
     int rows = GetValue("How many rows?", args, cur_arg, 100);
     int cols = GetValue("How many columns?", args, cur_arg, 100);
-    graph = build_graph_grid(rows, cols, random);
+    emp::Graph graph = build_graph_grid(rows, cols, random);
     filename = emp::to_string("grid-", rows*cols, '-', rows*(cols-1)+cols*(rows-1));
     std::ofstream of(filename);
     graph.PrintSym(of);
@@ -116,7 +115,7 @@ int main(int argc, char* argv[])
     int max_edges = rows*(cols-1) + cols*(rows-1);
     int edges = GetValue("How many active edges?", args, cur_arg, max_edges);
     double edge_frac = ((double) edges) / ((double) max_edges);
-    graph = build_graph_grid(rows, cols, random, edge_frac);
+    emp::Graph graph = build_graph_grid(rows, cols, random, edge_frac);
     filename = emp::to_string("lgrid-", rows*cols, '-', graph.GetEdgeCount()/2);
     std::ofstream of(filename);
     graph.PrintSym(of);
@@ -129,7 +128,7 @@ int main(int argc, char* argv[])
     int max_edges = v_count * (v_count-1) / 2;
     int edges = GetValue("How many extra edges?", args, cur_arg, max_edges);
     double edge_frac = ((double) edges) / ((double) max_edges);
-    graph = build_graph_clique_set(clique_size, clique_count, random, edge_frac);
+    emp::Graph graph = build_graph_clique_set(clique_size, clique_count, random, edge_frac);
     filename = emp::to_string("cliqueset-", v_count, '-', graph.GetEdgeCount()/2);
     std::ofstream of(filename);
     graph.PrintSym(of);
@@ -142,7 +141,7 @@ int main(int argc, char* argv[])
     // Generate the Hamiltonian Cycle
     emp::vector<size_t> v_map = emp::BuildRange<size_t>(0, nodes);
     emp::Shuffle(random, v_map);
-    graph.Resize(nodes);
+    emp::Graph graph(nodes);
     for (size_t i = 1; i < nodes; i++) {
       const size_t from = v_map[i];
       const size_t to = v_map[i-1];
@@ -173,7 +172,7 @@ int main(int argc, char* argv[])
     std::cout << "Generating a Random DAG." << std::endl;
     int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
     int edges = GetValue("How many edges?", args, cur_arg, nodes*(nodes-1)/2);
-    graph = build_graph_dag(nodes, edges, random);
+    emp::Graph graph = build_graph_dag(nodes, edges, random);
     filename = emp::to_string("dag-", nodes, '-', edges);
     std::ofstream of(filename);
     graph.PrintDirected();
@@ -188,6 +187,7 @@ int main(int argc, char* argv[])
 
     size_t total_nodes = 0;
     size_t total_edges = 0;
+    emp::Graph graph;
     for (size_t i = 0; i < components; i++) {
       size_t nodes = random.GetUInt(min_nodes, max_nodes);
       size_t edges = random.GetUInt(min_edges, max_edges);
@@ -207,7 +207,7 @@ int main(int argc, char* argv[])
     size_t min_weight = GetValue("Minimum Weight?", args, cur_arg);
     size_t max_weight = GetValue("Maximum Weight?", args, cur_arg);
     weights = emp::RandomVector<size_t>(random, edges, min_weight, max_weight);
-    graph = build_graph_random(nodes, edges, random);
+    emp::Graph graph = build_graph_random(nodes, edges, random);
     filename = emp::to_string("randw-", nodes, '-', edges);
     std::ofstream of(filename);
     graph.PrintSym(of);
