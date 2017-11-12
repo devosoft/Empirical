@@ -89,6 +89,14 @@ namespace emp {
     for (size_t & v : vals) v = random.GetUInt(min, max);
     return vals;
   }
+
+  /// Generate a random vector in the specified type and range.
+  template <typename T>
+  inline emp::vector<T> RandomVector(Random & random, size_t size, T min, T max) {
+    emp::vector<T> vals(size);
+    for (T & v : vals) v = (T) random.GetDouble((double) min, (double) max);
+    return vals;
+  }
 }
 
 #endif
