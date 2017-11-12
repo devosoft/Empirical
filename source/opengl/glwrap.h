@@ -4,6 +4,8 @@
 #include <GLES3/gl3.h>
 
 #include <cstdint>
+#include <iostream>
+#include <ostream>
 #include <unordered_map>
 #include <vector>
 
@@ -29,6 +31,28 @@ namespace emp {
       Uniform = GL_UNIFORM_BUFFER
     };
 
+    std::ostream& operator<<(std::ostream& out, const BufferType& buffer) {
+      switch (buffer) {
+        case BufferType::Array:
+          return out << "GL_ARRAY_BUFFER";
+        case BufferType::CopyRead:
+          return out << "GL_COPY_READ_BUFFER";
+        case BufferType::CopyWrite:
+          return out << "GL_COPY_WRITE_BUFFER";
+        case BufferType::ElementArray:
+          return out << "GL_ELEMENT_ARRAY_BUFFER";
+        case BufferType::PixelPack:
+          return out << "GL_PIXEL_PACK_BUFFER";
+        case BufferType::PixelUnpack:
+          return out << "GL_PIXEL_UNPACK_BUFFER";
+        case BufferType::TransformFeedback:
+          return out << "GL_TRANSFORM_FEEDBACK_BUFFER";
+        case BufferType::Uniform:
+        default:
+          return out << "GL_UNIFORM_BUFFER";
+      }
+    }
+
     enum class BufferUsage : GLenum {
       StreamDraw = GL_STREAM_DRAW,
       StreamRead = GL_STREAM_READ,
@@ -46,6 +70,7 @@ namespace emp {
       bool hasValue;
       GLuint handle;
       BufferType type;
+      static GLuint boundBuffer;
 
       public:
       BufferObject(BufferType type) : hasValue(true), type(type) {
@@ -79,12 +104,14 @@ namespace emp {
         if (hasValue) {
           hasValue = false;
           glDeleteBuffers(1, &handle);
+          if (boundBuffer == handle) boundBuffer = 0;
           utils::catchGlError();
         }
       }
 
       template <typename T, std::size_t N>
       void set(const T (&data)[N], BufferUsage usage) {
+        bind();
         glBufferData(static_cast<GLenum>(type), sizeof(data), data,
                      static_cast<GLenum>(usage));
         utils::catchGlError();
@@ -92,18 +119,24 @@ namespace emp {
 
       template <typename T>
       void set(const std::vector<T>& data, BufferUsage usage) {
+        bind();
         glBufferData(static_cast<GLenum>(type), sizeof(T) * data.size(),
                      data.data(), static_cast<GLenum>(usage));
         utils::catchGlError();
       }
 
       BufferObject& bind() {
-        glBindBuffer(static_cast<GLenum>(type), handle);
-        utils::catchGlError();
+        if (boundBuffer != handle) {
+          glBindBuffer(static_cast<GLenum>(type), handle);
+          utils::catchGlError();
+          boundBuffer = handle;
+        }
 
         return *this;
       }
     };
+
+    GLuint BufferObject::boundBuffer = 0;
 
     class VertexArrayObject {
       private:
@@ -143,24 +176,26 @@ namespace emp {
 
       void destoy() {
         if (hasValue) {
-          hasValue = false;
           unbind();
           glDeleteVertexArrays(1, &handle);
+          hasValue = false;
         }
       }
 
       void bind() {
         emp_assert(hasValue);
-        emp_assert(boundVAO == handle);
-        glBindVertexArray(handle);
-        boundVAO = handle;
+        if (boundVAO != handle) {
+          glBindVertexArray(handle);
+          boundVAO = handle;
+        }
       }
 
       void unbind() {
         emp_assert(hasValue);
-        emp_assert(boundVAO == handle);
-        glBindVertexArray(0);
-        boundVAO = 0;
+        if (boundVAO == handle) {
+          glBindVertexArray(0);
+          boundVAO = 0;
+        }
       }
 
       operator bool() const { return hasValue; }
