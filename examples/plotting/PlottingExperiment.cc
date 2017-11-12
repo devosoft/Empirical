@@ -24,10 +24,11 @@ int main(int argc, char* argv[]) {
   GLCanvas canvas(1000, 1000);
 
   auto g = graph(map(
-    [](auto& props) {
+    [](auto&& props) {
       auto& value = Value::get(props);
 
-      return props.template set<X>(value.x())
+      return std::forward<decltype(props)>(props)
+        .template set<X>(value.x())
         .template set<Y>(value.y())
         .template set<Fill>(Vec4f{1, 1, 1, 1});
     },
