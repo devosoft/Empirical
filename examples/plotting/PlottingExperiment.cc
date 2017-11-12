@@ -332,6 +332,31 @@ auto map(C&& change, T&& next) {
   return Map<C, T>{std::forward<C>(change), std::forward<T>(next)};
 }
 
+template <typename... T>
+class All {
+  public:
+  std::tuple<T...> children;
+
+  public:
+  template <typename... T1>
+  All(T1&&... children) : children(std::forward<T1>(children)...) {}
+
+  template <typename Iter>
+  void show(const Mat4x4f& projection, const Mat4x4f& view, Iter begin,
+            Iter end) {
+    allDo(
+      [&](auto&& child) {
+        std::forward<decltype(child)>(child).show(projection, view, begin, end);
+      },
+      children);
+  }
+};
+
+template <typename... T>
+auto all(T&&... next) {
+  return All<T...>{std::forward<T>(next)...};
+}
+
 template <typename T>
 class Graph {
   private:
@@ -391,7 +416,7 @@ int main(int argc, char* argv[]) {
         .template set<Y>(value.y())
         .template set<Fill>(Vec4f{1, 1, 1, 1});
     },
-    Scatter(canvas)));
+    all(Scatter(canvas), Line(canvas))));
 
   std::vector<Vec2f> data;
   for (int i = 0; i < 100; ++i) {
