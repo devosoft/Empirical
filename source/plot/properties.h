@@ -6,13 +6,31 @@ namespace emp {
 
     namespace properties {
 
+      namespace detail {
+        template <typename P, typename V>
+        struct PropertySetter {
+          V value;
+        };
+
+        template <typename Props, typename P, typename V>
+        constexpr decltype(auto) operator>>(
+          Props&& props, const PropertySetter<P, V>& setter) {
+          return std::forward<Props>(props).template set<P>(setter.value);
+        }
+
+        template <typename Props, typename P, typename V>
+        constexpr decltype(auto) operator>>(Props&& props,
+                                            PropertySetter<P, V>&& setter) {
+          return std::forward<Props>(props).template set<P>(
+            std::move(setter.value));
+        }
+      }  // namespace detail
+
       template <typename P>
       struct PropertyName {
         template <typename V>
-        static constexpr auto from(V&& map) {
-          return [map = std::forward<V>(map)](auto properties) {
-            return properties.template set<V>(map(properties));
-          };
+        static constexpr auto is(V&& map) {
+          return detail::PropertySetter<P, V>{std::forward<V>(map)};
         }
 
         template <typename Props>

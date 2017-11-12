@@ -27,10 +27,13 @@ int main(int argc, char* argv[]) {
     [](auto&& props) {
       auto& value = Value::get(props);
 
-      return std::forward<decltype(props)>(props)
-        .template set<X>(value.x())
-        .template set<Y>(value.y())
-        .template set<Fill>(Vec4f{1, 1, 1, 1});
+      return std::forward<decltype(props)>(props) >> X::is(value.x()) >>
+             Y::is(value.y()) >> Fill::is(Vec4f{1, 1, 1, 1});
+
+      // return std::forward<decltype(props)>(props)
+      //   .template set<X>(value.x())
+      //   .template set<Y>(value.y())
+      //   .template set<Fill>(Vec4f{1, 1, 1, 1});
     },
     all(Scatter(canvas), Line(canvas))));
 
