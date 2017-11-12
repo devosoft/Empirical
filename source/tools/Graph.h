@@ -215,11 +215,16 @@ namespace emp {
     emp::vector< emp::vector< double > > weights;
 
   public:
-    WeightedGraph(size_t num_nodes=0) : Graph(num_nodes), weights() { ; }
+    WeightedGraph(size_t num_nodes=0) : Graph(num_nodes), weights(num_nodes) {
+      for (auto & row : weights) row.resize(num_nodes, 0.0);
+    }
 
     WeightedGraph(const WeightedGraph &) = default;              ///< Copy constructor
     WeightedGraph(WeightedGraph &&) = default;                   ///< Move constructor
     ~WeightedGraph() { ; }
+
+    WeightedGraph & operator=(const WeightedGraph &) = default;  ///< Copy operator
+    WeightedGraph & operator=(WeightedGraph &&) = default;       ///< Move operator
 
     void Resize(size_t new_size) {
       Graph::Resize(new_size);
