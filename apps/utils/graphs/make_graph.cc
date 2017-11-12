@@ -13,6 +13,8 @@
 #include "../../../source/config/command_line.h"
 #include "../../../source/tools/Graph.h"
 #include "../../../source/tools/graph_utils.h"
+#include "../../../source/tools/Random.h"
+#include "../../../source/tools/random_utils.h"
 #include "../../../source/tools/string_utils.h"
 
 int GetValue(const std::string & query,
@@ -40,6 +42,7 @@ int main(int argc, char* argv[])
   uint32_t cur_arg = 1;
   bool print_file = true;
   bool is_directed = false;
+  emp::vector<size_t> weights;
 
   // First, determine what type of graph we need to make.
   int graph_type = 0;
@@ -48,16 +51,17 @@ int main(int argc, char* argv[])
   }
   else { // No command-line arg; request input from user.
     std::cout << "What type of graph?" << std::endl
-              << " 0 - Random" << std::endl
-              << " 1 - Chain" << std::endl
-              << " 2 - Ring" << std::endl
-              << " 3 - Tree" << std::endl
-              << " 4 - Grid" << std::endl
-              << " 5 - Lossy Grid" << std::endl
-              << " 6 - Linked Cliques" << std::endl
-	            << " 7 - Hamiltonion Cycle (with solution)" << std::endl
-              << " 8 - Random DAG" << std::endl
-              << " 9 - Multiple Random Components" << std::endl;
+              << "  0 - Random" << std::endl
+              << "  1 - Chain" << std::endl
+              << "  2 - Ring" << std::endl
+              << "  3 - Tree" << std::endl
+              << "  4 - Grid" << std::endl
+              << "  5 - Lossy Grid" << std::endl
+              << "  6 - Linked Cliques" << std::endl
+	            << "  7 - Hamiltonion Cycle (with solution)" << std::endl
+              << "  8 - Random DAG" << std::endl
+              << "  9 - Multiple Random Components" << std::endl
+              << " 10 - Random Weighted" << std::endl;
     std::cin >> graph_type;
   }
 
@@ -120,8 +124,8 @@ int main(int argc, char* argv[])
   }
   else if (graph_type == 7) {
     std::cout << "Generating a Random Graph (with hamiltonian cycle and solution)." << std::endl;
-    int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
-    int edges = GetValue("How many edges?", args, cur_arg, nodes*(nodes-1)/2);
+    size_t nodes = GetValue("How many vertices?", args, cur_arg, 1000);
+    size_t edges = GetValue("How many edges?", args, cur_arg, nodes*(nodes-1)/2);
 
     // Generate the Hamiltonian Cycle
     emp::vector<size_t> v_map = emp::BuildRange<size_t>(0, nodes);
@@ -172,7 +176,7 @@ int main(int argc, char* argv[])
 
     size_t total_nodes = 0;
     size_t total_edges = 0;
-    for (int i = 0; i < components; i++) {
+    for (size_t i = 0; i < components; i++) {
       size_t nodes = random.GetUInt(min_nodes, max_nodes);
       size_t edges = random.GetUInt(min_edges, max_edges);
       graph.Merge( build_graph_random(nodes, edges, random) );
@@ -181,6 +185,16 @@ int main(int argc, char* argv[])
     }
     graph = shuffle_graph(graph, random);
     filename = emp::to_string("comps-", components, '-', total_nodes, '-', total_edges);
+  }
+  else if (graph_type == 10) {
+    std::cout << "Generating a Random WEIGHTED Graph." << std::endl;
+    size_t nodes = GetValue("How many vertices?", args, cur_arg, 1000);
+    size_t edges = GetValue("How many edges?", args, cur_arg, nodes*(nodes-1)/2);
+    size_t min_weight = GetValue("Minimum Weight?", args, cur_arg);
+    size_t max_weight = GetValue("Maximum Weight?", args, cur_arg);
+    weights = emp::RandomVector<size_t>(random, edges, min_weight, max_weight);
+    graph = build_graph_random(nodes, edges, random);
+    filename = emp::to_string("randw-", nodes, '-', edges);
   }
   else {
     std::cout << "Unknown Graph type '" << graph_type << "'. Aborting." << std::endl;
