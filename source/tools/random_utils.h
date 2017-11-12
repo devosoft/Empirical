@@ -30,7 +30,7 @@ namespace emp {
       std::swap(v[i], v[pos]);
     }
   }
-  
+
   template <typename T>
   inline void Shuffle(Random & random, emp::vector<T> & v) { Shuffle(random, v, v.size()); }
 
@@ -67,14 +67,27 @@ namespace emp {
   }
 
 
-  /// Generate a random bit vector of the specified size.
-
+  /// Generate a random BitVector of the specified size.
   inline BitVector RandomBitVector(Random & random, size_t size, double p=0.5)
   {
     emp_assert(p >= 0.0 && p <= 1.0);
     BitVector bits(size);
     for (size_t i = 0; i < size; i++) bits[i] = random.P(p);
     return bits;
+  }
+
+  /// Generate a random double vector in the specified range.
+  inline emp::vector<double> RandomDoubleVector(Random & random, size_t size, double min, double max) {
+    emp::vector<double> vals(size);
+    for (double & v : vals) v = random.GetDouble(min, max);
+    return vals;
+  }
+
+  /// Generate a random size_t vector in the specified range.
+  inline emp::vector<size_t> RandomUIntVector(Random & random, size_t size, size_t min, size_t max) {
+    emp::vector<size_t> vals(size);
+    for (size_t & v : vals) v = random.GetUInt(min, max);
+    return vals;
   }
 }
 
