@@ -40,8 +40,6 @@ int main(int argc, char* argv[])
   emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
 
   uint32_t cur_arg = 1;
-  bool print_file = true;
-  bool is_directed = false;
   emp::vector<size_t> weights;
 
   // First, determine what type of graph we need to make.
@@ -75,24 +73,32 @@ int main(int argc, char* argv[])
     int edges = GetValue("How many edges?", args, cur_arg, nodes*(nodes-1)/2);
     graph = build_graph_random(nodes, edges, random);
     filename = emp::to_string("rand-", nodes, '-', edges);
+    std::ofstream of(filename);
+    graph.PrintSym(of);
   }
   else if (graph_type == 1) {
     std::cout << "Generating a Chain Graph." << std::endl;
     int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
     graph = build_graph_grid(nodes, 1, random);
     filename = emp::to_string("chain-", nodes, '-', nodes-1);
+    std::ofstream of(filename);
+    graph.PrintSym(of);
   }
   else if (graph_type == 2) {
     std::cout << "Generating a Ring Graph." << std::endl;
     int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
     graph = build_graph_ring(nodes, random);
     filename = emp::to_string("ring-", nodes, '-', nodes);
+    std::ofstream of(filename);
+    graph.PrintSym(of);
   }
   else if (graph_type == 3) {
     std::cout << "Generating a Tree Graph." << std::endl;
     int nodes = GetValue("How many vertices?", args, cur_arg, 1000);
     graph = build_graph_tree(nodes, random);
     filename = emp::to_string("tree-", nodes, '-', nodes-1);
+    std::ofstream of(filename);
+    graph.PrintSym(of);
   }
   else if (graph_type == 4) {
     std::cout << "Generating a Grid Graph." << std::endl;
@@ -100,6 +106,8 @@ int main(int argc, char* argv[])
     int cols = GetValue("How many columns?", args, cur_arg, 100);
     graph = build_graph_grid(rows, cols, random);
     filename = emp::to_string("grid-", rows*cols, '-', rows*(cols-1)+cols*(rows-1));
+    std::ofstream of(filename);
+    graph.PrintSym(of);
   }
   else if (graph_type == 5) {
     std::cout << "Generating a Lossy Grid Graph." << std::endl;
@@ -110,6 +118,8 @@ int main(int argc, char* argv[])
     double edge_frac = ((double) edges) / ((double) max_edges);
     graph = build_graph_grid(rows, cols, random, edge_frac);
     filename = emp::to_string("lgrid-", rows*cols, '-', graph.GetEdgeCount()/2);
+    std::ofstream of(filename);
+    graph.PrintSym(of);
   }
   else if (graph_type == 6) {
     std::cout << "Generating a Linked Cliques Graph." << std::endl;
@@ -121,6 +131,8 @@ int main(int argc, char* argv[])
     double edge_frac = ((double) edges) / ((double) max_edges);
     graph = build_graph_clique_set(clique_size, clique_count, random, edge_frac);
     filename = emp::to_string("cliqueset-", v_count, '-', graph.GetEdgeCount()/2);
+    std::ofstream of(filename);
+    graph.PrintSym(of);
   }
   else if (graph_type == 7) {
     std::cout << "Generating a Random Graph (with hamiltonian cycle and solution)." << std::endl;
@@ -156,7 +168,6 @@ int main(int argc, char* argv[])
       if (i > 0) of << " ";
       of << v_map[i];
     }
-    print_file = false;
   }
   else if (graph_type == 8) {
     std::cout << "Generating a Random DAG." << std::endl;
@@ -164,7 +175,8 @@ int main(int argc, char* argv[])
     int edges = GetValue("How many edges?", args, cur_arg, nodes*(nodes-1)/2);
     graph = build_graph_dag(nodes, edges, random);
     filename = emp::to_string("dag-", nodes, '-', edges);
-    is_directed = true;
+    std::ofstream of(filename);
+    graph.PrintDirected();
   }
   else if (graph_type == 9) {
     std::cout << "Generating a Multiple Random Graph Components." << std::endl;
@@ -185,6 +197,8 @@ int main(int argc, char* argv[])
     }
     graph = shuffle_graph(graph, random);
     filename = emp::to_string("comps-", components, '-', total_nodes, '-', total_edges);
+    std::ofstream of(filename);
+    graph.PrintSym(of);
   }
   else if (graph_type == 10) {
     std::cout << "Generating a Random WEIGHTED Graph." << std::endl;
@@ -195,18 +209,14 @@ int main(int argc, char* argv[])
     weights = emp::RandomVector<size_t>(random, edges, min_weight, max_weight);
     graph = build_graph_random(nodes, edges, random);
     filename = emp::to_string("randw-", nodes, '-', edges);
+    std::ofstream of(filename);
+    graph.PrintSym(of);
   }
   else {
     std::cout << "Unknown Graph type '" << graph_type << "'. Aborting." << std::endl;
     return 0;
   }
 
-
-  if (print_file) {
-    std::ofstream of(filename);
-    if (is_directed) graph.PrintDirected();
-    else graph.PrintSym(of);
-  }
 
   std::cout << "Printed to file '" << filename << "'." << std::endl;
 }
