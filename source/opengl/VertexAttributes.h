@@ -1,7 +1,7 @@
 #ifndef VERTEX_ATTRIBUTES
 #define VERTEX_ATTRIBUTES
 
-#include <GLES3/gl3.h>
+#include <GLES2/gl2.h>
 #include "glutils.h"
 
 namespace emp {
@@ -29,11 +29,11 @@ namespace emp {
       UnsignedShort = GL_UNSIGNED_SHORT,
       Int = GL_INT,
       UnsignedInt = GL_UNSIGNED_INT,
-      HalfFloat = GL_HALF_FLOAT,
+      // HalfFloat = GL_HALF_FLOAT,
       Float = GL_FLOAT,
       Fixed = GL_FIXED,
-      INT_2_10_10_10_REV = GL_INT_2_10_10_10_REV,
-      UNSIGNED_INT_2_10_10_10_REV = GL_UNSIGNED_INT_2_10_10_10_REV
+      // INT_2_10_10_10_REV = GL_INT_2_10_10_10_REV,
+      // UNSIGNED_INT_2_10_10_10_REV = GL_UNSIGNED_INT_2_10_10_10_REV
     };
 
     template <typename T>

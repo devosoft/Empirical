@@ -1,7 +1,7 @@
 #ifndef GLWRAP_H
 #define GLWRAP_H
 
-#include <GLES3/gl3.h>
+#include <GLES2/gl2.h>
 
 #include <cstdint>
 #include <iostream>
