@@ -10,41 +10,86 @@ namespace emp {
     using namespace emp::math;
 
     void setUniform(GLint uniform, const Mat2x2f& value) {
-      glUniformMatrix2fv(uniform, 1, GL_TRUE, value.data());
+      // The canonical representation of these matricies is transposed relative
+      // to the representation used by OpenGL, so we have to transpose them
+      // before they can be used.
+#ifdef EMSCRIPTEN
+      auto transposed{value.transposed()};
+      glUniformMatrix2fv(
+        uniform, 1, GL_FALSE,  // WebGL does not support transposing the matrix
+                               // on the GPU, so it must be done manually here
+        transposed.data());
+#endif
+      glUniformMatrix2fv(
+        uniform,  // the uniform we want to set
+        1,  // This just needs to be one, since we are only setting one value
+        GL_TRUE,      // Transpose the matrix on the GPU since OpenGL is column
+                      // major
+        value.data()  // handle to the native pointer to the data held by the
+                      // matrix
+      );
       utils::catchGlError();
     }
 
     void setUniform(GLint uniform, const Mat3x3f& value) {
+#ifdef EMSCRIPTEN
+      auto transposed{value.transposed()};
+      glUniformMatrix3fv(uniform, 1, GL_FALSE, transposed.data());
+#endif
       glUniformMatrix3fv(uniform, 1, GL_TRUE, value.data());
       utils::catchGlError();
     }
 
     void setUniform(GLint uniform, const Mat4x4f& value) {
+#ifdef EMSCRIPTEN
+      auto transposed{value.transposed()};
+      glUniformMatrix4fv(uniform, 1, GL_FALSE, transposed.data());
+#endif
       glUniformMatrix4fv(uniform, 1, GL_TRUE, value.data());
       utils::catchGlError();
     }
 
     void setUniform(GLint uniform, const Mat2x3f& value) {
+#ifdef EMSCRIPTEN
+      auto transposed{value.transposed()};
+      glUniformMatrix2x3fv(uniform, 1, GL_FALSE, transposed.data());
+#endif
       glUniformMatrix2x3fv(uniform, 1, GL_TRUE, value.data());
       utils::catchGlError();
     }
 
     void setUniform(GLint uniform, const Mat4x2f& value) {
+#ifdef EMSCRIPTEN
+      auto transposed{value.transposed()};
+      glUniformMatrix4x2fv(uniform, 1, GL_FALSE, transposed.data());
+#endif
       glUniformMatrix4x2fv(uniform, 1, GL_TRUE, value.data());
       utils::catchGlError();
     }
 
     void setUniform(GLint uniform, const Mat2x4f& value) {
+#ifdef EMSCRIPTEN
+      auto transposed{value.transposed()};
+      glUniformMatrix2x4fv(uniform, 1, GL_FALSE, transposed.data());
+#endif
       glUniformMatrix2x4fv(uniform, 1, GL_TRUE, value.data());
       utils::catchGlError();
     }
 
     void setUniform(GLint uniform, const Mat4x3f& value) {
+#ifdef EMSCRIPTEN
+      auto transposed{value.transposed()};
+      glUniformMatrix4x3fv(uniform, 1, GL_FALSE, transposed.data());
+#endif
       glUniformMatrix4x3fv(uniform, 1, GL_TRUE, value.data());
       utils::catchGlError();
     }
 
     void setUniform(GLint uniform, const Mat3x4f& value) {
+#ifdef EMSCRIPTEN
+      auto transposed{value.transposed()};
+      glUniformMatrix3x4fv(uniform, 1, GL_FALSE, transposed.data());
+#endif
       glUniformMatrix3x4fv(uniform, 1, GL_TRUE, value.data());
       utils::catchGlError();
     }
