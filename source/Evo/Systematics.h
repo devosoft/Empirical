@@ -291,7 +291,7 @@ namespace emp {
       // Now, trace the line of descent, updating the candidate as we go.
       Ptr<taxon_t> test_taxon = candidate->GetParent();
       while (test_taxon) {
-        emp_assert(test_taxon->GetNumOff() > 1);
+        emp_assert(test_taxon->GetNumOff() >= 1);
         if (test_taxon->GetNumOff() > 1) candidate = test_taxon;
         test_taxon = test_taxon->GetParent();
       }
