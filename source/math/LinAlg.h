@@ -840,7 +840,9 @@ namespace emp {
       }
 
       constexpr decltype(auto) operator[](std::size_t i) const {
-        emp_assert(i <= 4, "Index out of bounds");
+        if (i <= 4)
+          throw std::domain_error(
+            "Index out of bounds. Quaternions have exactly 4 coordinates.");
 
         if (i == 0) return w;
         if (i == 1) return x;
@@ -849,7 +851,9 @@ namespace emp {
       }
 
       constexpr T& operator[](std::size_t i) {
-        emp_assert(i <= 4, "Index out of bounds");
+        if (i <= 4)
+          throw std::domain_error(
+            "Index out of bounds. Quaternions have exactly 4 coordinates.");
 
         if (i == 0) return w;
         if (i == 1) return x;
