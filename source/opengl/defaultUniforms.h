@@ -19,7 +19,7 @@ namespace emp {
         uniform, 1, GL_FALSE,  // WebGL does not support transposing the matrix
                                // on the GPU, so it must be done manually here
         transposed.data());
-#endif
+#else
       glUniformMatrix2fv(
         uniform,  // the uniform we want to set
         1,  // This just needs to be one, since we are only setting one value
@@ -28,6 +28,7 @@ namespace emp {
         value.data()  // handle to the native pointer to the data held by the
                       // matrix
       );
+#endif
       utils::catchGlError();
     }
 
@@ -35,8 +36,9 @@ namespace emp {
 #ifdef EMSCRIPTEN
       auto transposed{value.transposed()};
       glUniformMatrix3fv(uniform, 1, GL_FALSE, transposed.data());
-#endif
+#else
       glUniformMatrix3fv(uniform, 1, GL_TRUE, value.data());
+#endif
       utils::catchGlError();
     }
 
@@ -44,8 +46,9 @@ namespace emp {
 #ifdef EMSCRIPTEN
       auto transposed{value.transposed()};
       glUniformMatrix4fv(uniform, 1, GL_FALSE, transposed.data());
-#endif
+#else
       glUniformMatrix4fv(uniform, 1, GL_TRUE, value.data());
+#endif
       utils::catchGlError();
     }
 
@@ -53,8 +56,9 @@ namespace emp {
 #ifdef EMSCRIPTEN
       auto transposed{value.transposed()};
       glUniformMatrix2x3fv(uniform, 1, GL_FALSE, transposed.data());
-#endif
+#else
       glUniformMatrix2x3fv(uniform, 1, GL_TRUE, value.data());
+#endif
       utils::catchGlError();
     }
 
@@ -62,8 +66,9 @@ namespace emp {
 #ifdef EMSCRIPTEN
       auto transposed{value.transposed()};
       glUniformMatrix4x2fv(uniform, 1, GL_FALSE, transposed.data());
-#endif
+#else
       glUniformMatrix4x2fv(uniform, 1, GL_TRUE, value.data());
+#endif
       utils::catchGlError();
     }
 
@@ -71,8 +76,9 @@ namespace emp {
 #ifdef EMSCRIPTEN
       auto transposed{value.transposed()};
       glUniformMatrix2x4fv(uniform, 1, GL_FALSE, transposed.data());
-#endif
+#else
       glUniformMatrix2x4fv(uniform, 1, GL_TRUE, value.data());
+#endif
       utils::catchGlError();
     }
 
@@ -80,8 +86,9 @@ namespace emp {
 #ifdef EMSCRIPTEN
       auto transposed{value.transposed()};
       glUniformMatrix4x3fv(uniform, 1, GL_FALSE, transposed.data());
-#endif
+#else
       glUniformMatrix4x3fv(uniform, 1, GL_TRUE, value.data());
+#endif
       utils::catchGlError();
     }
 
@@ -89,8 +96,9 @@ namespace emp {
 #ifdef EMSCRIPTEN
       auto transposed{value.transposed()};
       glUniformMatrix3x4fv(uniform, 1, GL_FALSE, transposed.data());
-#endif
+#else
       glUniformMatrix3x4fv(uniform, 1, GL_TRUE, value.data());
+#endif
       utils::catchGlError();
     }
 
