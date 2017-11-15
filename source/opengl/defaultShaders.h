@@ -7,7 +7,11 @@ namespace emp {
   namespace opengl {
     namespace shaders {
       ShaderProgram simpleColorVertices(GLCanvas& canvas) {
-        const char* vertexSource = R"glsl(
+        const char* vertexSource =
+#ifdef EMSCRIPTEN
+          "precision mediump float;"
+#endif
+          R"glsl(
             attribute vec3 position;
             attribute vec4 color;
 
@@ -24,7 +28,11 @@ namespace emp {
             }
         )glsl";
 
-        const char* fragmentSource = R"glsl(
+        const char* fragmentSource =
+#ifdef EMSCRIPTEN
+          "precision mediump float;"
+#endif
+          R"glsl(
             varying vec4 fcolor;
 
             void main()
@@ -47,7 +55,11 @@ namespace emp {
         VertexArrayObject vao;
 
         SimpleSolidColor(GLCanvas& canvas)
-          : shader(canvas.makeShaderProgram(R"glsl(
+          : shader(canvas.makeShaderProgram(
+#ifdef EMSCRIPTEN
+              "precision mediump float;"
+#endif
+              R"glsl(
                 attribute vec3 position;
                 uniform vec4 color;
 
@@ -63,7 +75,10 @@ namespace emp {
                     fcolor = color;
                 }
             )glsl",
-                                            R"glsl(
+#ifdef EMSCRIPTEN
+              "precision mediump float;"
+#endif
+              R"glsl(
                   varying vec4 fcolor;
 
                   void main()
@@ -77,7 +92,8 @@ namespace emp {
             proj(shader.uniform("proj")),
             vao(canvas.makeVAO()
                   .with(BufferType::Array, shader.attribute<Vec3f>("position"))
-                  .with(BufferType::ElementArray)) {}
+                  .with(BufferType::ElementArray)) {
+        }
       };
 
       // class SimpleSolidColor {
