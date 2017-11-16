@@ -30,7 +30,7 @@
 #include "../tools/Random.h"
 #include "../tools/string_utils.h"
 
-#include "AvidaGP_InstLib.h"
+#include "AvidaCPU_InstLib.h"
 
 namespace emp {
 
@@ -48,7 +48,7 @@ namespace emp {
     using genome_t = Genome;
     using arg_t = size_t;             // All arguments are non-negative ints (indecies!)
 
-    using inst_lib_t = AvidaGP_InstLib<this_t, arg_t, INST_ARGS>;
+    using inst_lib_t = AvidaCPU_InstLib<this_t, arg_t, INST_ARGS>;
     using stack_t = emp::vector<double>;
     using arg_set_t = emp::array<arg_t, INST_ARGS>;
 
@@ -210,7 +210,7 @@ namespace emp {
     }
 
   public:
-    /// Create a new AvidaGP seeding it with a genome.
+    /// Create a new AvidaCPU seeding it with a genome.
     AvidaCPU_Base(const genome_t & in_genome)
       : genome(in_genome), regs(), inputs(), outputs(), stacks(), fun_starts()
       , inst_ptr(0), scope_stack(), reg_stack(), call_stack(), errors(0), traits()
@@ -222,10 +222,10 @@ namespace emp {
       }
     }
 
-    /// Create a default AvidaGP (no genome sequence, default instruction set)
+    /// Create a default AvidaCPU (no genome sequence, default instruction set)
     AvidaCPU_Base() : AvidaCPU_Base(Genome(inst_lib_t::DefaultInstLib())) { ; }
 
-    /// Create an AvidaGP with a specified instruction set (but no genome sequence)
+    /// Create an AvidaCPU with a specified instruction set (but no genome sequence)
     AvidaCPU_Base(Ptr<const inst_lib_t> inst_lib) : AvidaCPU_Base(Genome(inst_lib)) { ; }
     AvidaCPU_Base(const inst_lib_t & inst_lib) : AvidaCPU_Base(Genome(&inst_lib)) { ; }
 
