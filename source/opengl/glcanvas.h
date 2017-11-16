@@ -11,6 +11,7 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <emscripten/html5.h>
+#include <string>
 #else
 #include <thread>
 #endif
@@ -35,20 +36,47 @@ namespace emp {
       private:
       unsigned int width, height;
 #ifdef __EMSCRIPTEN__
+      std::string id;
       EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context;
 #else
       GLFWwindow* window = nullptr;
 #endif
 
-      std::vector<std::function<void(int, int)>> onresize;
+      std::vector<std::function<void(GLCanvas&, int, int)>> onresize;
+
+      void resizeViewport(float width, float height) {
+        auto size = std::max(height, width);
+        glViewport((width - size) / 2, (height - size) / 2, size, size);
+
+#ifdef __EMSCRIPTEN__
+        EM_ASM_(
+          {
+            const id = Module.Pointer_stringify($0);
+            const canvas = document.getElementById(id);
+            canvas.width = $1;
+            canvas.height = $2;
+          },
+          id.c_str(), size, size);
+#endif
+      }
 
       public:
       GLCanvas(int width, int height, const char* title = "empirical")
-        : width(width), height(height) {
+        : width(width),
+          height(height)
+#ifdef __EMSCRIPTEN__
+
+          ,
+          id(title)
+#endif
+      {
 #ifdef __EMSCRIPTEN__
         EmscriptenWebGLContextAttributes attrs;
         emscripten_webgl_init_context_attributes(&attrs);
+        attrs.majorVersion = 2;
+        attrs.minorVersion = 0;
         context = emscripten_webgl_create_context(title, &attrs);
+
 #else
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -67,12 +95,13 @@ namespace emp {
 
             me->width = width;
             me->height = height;
+            me->resizeViewport(width, height);
 
-            for (auto& callback : me->onresize) callback(width, height);
+            for (auto& callback : me->onresize) callback(*me, width, height);
           });
 #endif
-
         makeCurrent();
+        resizeViewport(width, height);
       }
 
 #ifdef __EMSCRIPTEN__
