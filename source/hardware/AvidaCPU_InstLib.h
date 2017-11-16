@@ -3,30 +3,30 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  AvidaGP_InstLib.h
- *  @brief A specialized version of InstLib to handle AvidaGP Instructions.
+ *  @file  AvidaCPU_InstLib.h
+ *  @brief A specialized version of InstLib to handle AvidaCPU Instructions.
  */
 
-#ifndef EMP_AVIDA_GP_INST_LIB_H
-#define EMP_AVIDA_GP_INST_LIB_H
+#ifndef EMP_AVIDA_CPU_INST_LIB_H
+#define EMP_AVIDA_CPU_INST_LIB_H
 
 #include "InstLib.h"
 
 namespace emp {
 
-  // AvidaGP_InstLib defines a series of instructions that can be used with AvidaGP or any of its
-  // derived classes.
+  /// AvidaCPU_InstLib is a pure-virtual class that defines a series of instructions that
+  /// can be used with AvidaCPU_Base or any of its derived classes.
 
   template <typename HARDWARE_T, typename ARG_T=size_t, size_t ARG_COUNT=3>
-  struct AvidaGP_InstLib : public InstLib<HARDWARE_T, ARG_T, ARG_COUNT> {
+  struct AvidaCPU_InstLib : public InstLib<HARDWARE_T, ARG_T, ARG_COUNT> {
     using hardware_t = HARDWARE_T;
     using arg_t = ARG_T;
-    using this_t = AvidaGP_InstLib<HARDWARE_T, ARG_T, ARG_COUNT>;
+    using this_t = AvidaCPU_InstLib<HARDWARE_T, ARG_T, ARG_COUNT>;
     using inst_t = typename hardware_t::inst_t;
 
     static constexpr size_t arg_count = ARG_COUNT;
 
-    /// Instructions
+    // Instructions
     static void Inst_Inc(hardware_t & hw, const inst_t & inst) { ++hw.regs[inst.args[0]]; }
     static void Inst_Dec(hardware_t & hw, const inst_t & inst) { --hw.regs[inst.args[0]]; }
     static void Inst_Not(hardware_t & hw, const inst_t & inst) { hw.regs[inst.args[0]] = (hw.regs[inst.args[0]] == 0.0); }
