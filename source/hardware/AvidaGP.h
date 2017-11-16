@@ -34,7 +34,7 @@
 
 namespace emp {
 
-  class AvidaGP_Base {
+  class AvidaCPU_Base {
   public:
     static constexpr size_t CPU_SIZE = 16;   // Num arg values (for regs, stacks, functions, etc)
     static constexpr size_t INST_ARGS = 3;   // Max num args per instruction.
@@ -43,7 +43,7 @@ namespace emp {
     struct Instruction;
     struct Genome;
 
-    using this_t = AvidaGP_Base;
+    using this_t = AvidaCPU_Base;
     using inst_t = Instruction;
     using genome_t = Genome;
     using arg_t = size_t;             // All arguments are non-negative ints (indecies!)
@@ -211,7 +211,7 @@ namespace emp {
 
   public:
     /// Create a new AvidaGP seeding it with a genome.
-    AvidaGP_Base(const genome_t & in_genome)
+    AvidaCPU_Base(const genome_t & in_genome)
       : genome(in_genome), regs(), inputs(), outputs(), stacks(), fun_starts()
       , inst_ptr(0), scope_stack(), reg_stack(), call_stack(), errors(0), traits()
     {
@@ -223,20 +223,20 @@ namespace emp {
     }
 
     /// Create a default AvidaGP (no genome sequence, default instruction set)
-    AvidaGP_Base() : AvidaGP_Base(Genome(inst_lib_t::DefaultInstLib())) { ; }
+    AvidaCPU_Base() : AvidaCPU_Base(Genome(inst_lib_t::DefaultInstLib())) { ; }
 
     /// Create an AvidaGP with a specified instruction set (but no genome sequence)
-    AvidaGP_Base(Ptr<const inst_lib_t> inst_lib) : AvidaGP_Base(Genome(inst_lib)) { ; }
-    AvidaGP_Base(const inst_lib_t & inst_lib) : AvidaGP_Base(Genome(&inst_lib)) { ; }
+    AvidaCPU_Base(Ptr<const inst_lib_t> inst_lib) : AvidaCPU_Base(Genome(inst_lib)) { ; }
+    AvidaCPU_Base(const inst_lib_t & inst_lib) : AvidaCPU_Base(Genome(&inst_lib)) { ; }
 
     /// Copy constructor
-    AvidaGP_Base(const AvidaGP_Base &) = default;
+    AvidaCPU_Base(const AvidaCPU_Base &) = default;
 
     /// Move constructor
-    AvidaGP_Base(AvidaGP_Base &&) = default;
+    AvidaCPU_Base(AvidaCPU_Base &&) = default;
 
     /// Destructor
-    virtual ~AvidaGP_Base() { ; }
+    virtual ~AvidaCPU_Base() { ; }
 
     bool operator<(const this_t & other) const {
       return genome < other.genome;
@@ -406,12 +406,12 @@ namespace emp {
 
   };
 
-  size_t AvidaGP_Base::InstScope(const inst_t & inst) const {
+  size_t AvidaCPU_Base::InstScope(const inst_t & inst) const {
     if (genome.inst_lib->GetScopeType(inst.id) == ScopeType::NONE) return 0;
     return inst.args[ genome.inst_lib->GetScopeArg(inst.id) ] + 1;
   }
 
-  void AvidaGP_Base::PrintInst(const inst_t & inst, std::ostream & os) const {
+  void AvidaCPU_Base::PrintInst(const inst_t & inst, std::ostream & os) const {
     os << genome.inst_lib->GetName(inst.id);
     const size_t num_args = genome.inst_lib->GetNumArgs(inst.id);
     for (size_t i = 0; i < num_args; i++) {
@@ -419,7 +419,7 @@ namespace emp {
     }
   }
 
-  void AvidaGP_Base::PrintGenome(std::ostream & os) const {
+  void AvidaCPU_Base::PrintGenome(std::ostream & os) const {
     size_t cur_scope = 0;
 
     for (const inst_t & inst : genome.sequence) {
@@ -445,13 +445,13 @@ namespace emp {
     }
   }
 
-  void AvidaGP_Base::PrintGenome(const std::string & filename) const {
+  void AvidaCPU_Base::PrintGenome(const std::string & filename) const {
     std::ofstream of(filename);
     PrintGenome(of);
     of.close();
   }
 
-  size_t AvidaGP_Base::PredictNextInst() const {
+  size_t AvidaCPU_Base::PredictNextInst() const {
     // Determine if we are changing scope.
     size_t new_scope = CPU_SIZE+1;  // Default to invalid scope.
     if (inst_ptr >= genome.sequence.size()) new_scope = 0;
@@ -482,7 +482,7 @@ namespace emp {
     return inst_ptr;
   }
 
-  void AvidaGP_Base::PrintState(std::ostream & os) const {
+  void AvidaCPU_Base::PrintState(std::ostream & os) const {
     size_t next_inst = PredictNextInst();
 
     os << " REGS: ";
@@ -513,7 +513,7 @@ namespace emp {
     // emp::vector<size_t> call_stack;
   }
 
-  using AvidaGP = AvidaGP_Base;
+  using AvidaGP = AvidaCPU_Base;
 }
 
 
