@@ -34,7 +34,6 @@
 
 namespace emp {
 
-  template <typename HARDWARE>
   class AvidaGP_Base {
   public:
     static constexpr size_t CPU_SIZE = 16;   // Num arg values (for regs, stacks, functions, etc)
@@ -44,7 +43,7 @@ namespace emp {
     struct Instruction;
     struct Genome;
 
-    using this_t = AvidaGP_Base<HARDWARE>;
+    using this_t = AvidaGP_Base;
     using inst_t = Instruction;
     using genome_t = Genome;
     using inst_lib_t = InstLib<this_t>;
@@ -124,7 +123,6 @@ namespace emp {
     std::unordered_map<int, double> outputs; // Map of all outputs (position -> value)
     emp::array< stack_t, CPU_SIZE > stacks;  // Stacks for long-term storage.
     emp::array< int, CPU_SIZE > fun_starts;  // Postions where functions being in genome.
-    HARDWARE hw;                             // Extra hardware for specialty runs.
 
     size_t inst_ptr;
     emp::vector<ScopeInfo> scope_stack;
@@ -212,7 +210,7 @@ namespace emp {
 
   public:
     /// Create a new AvidaGP seeding it with a genome.
-    AvidaGP_Base<HARDWARE>(const genome_t & in_genome)
+    AvidaGP_Base(const genome_t & in_genome)
       : genome(in_genome), regs(), inputs(), outputs(), stacks(), fun_starts()
       , inst_ptr(0), scope_stack(), reg_stack(), call_stack(), errors(0), traits()
     {
@@ -224,20 +222,20 @@ namespace emp {
     }
 
     /// Create a default AvidaGP (no genome sequence, default instruction set)
-    AvidaGP_Base<HARDWARE>() : AvidaGP_Base<HARDWARE>(Genome(DefaultInstLib())) { ; }
+    AvidaGP_Base() : AvidaGP_Base(Genome(DefaultInstLib())) { ; }
 
     /// Create an AvidaGP with a specified instruction set (but no genome sequence)
-    AvidaGP_Base<HARDWARE>(Ptr<const inst_lib_t> inst_lib) : AvidaGP_Base<HARDWARE>(Genome(inst_lib)) { ; }
-    AvidaGP_Base<HARDWARE>(const inst_lib_t & inst_lib) : AvidaGP_Base<HARDWARE>(Genome(&inst_lib)) { ; }
+    AvidaGP_Base(Ptr<const inst_lib_t> inst_lib) : AvidaGP_Base(Genome(inst_lib)) { ; }
+    AvidaGP_Base(const inst_lib_t & inst_lib) : AvidaGP_Base(Genome(&inst_lib)) { ; }
 
     /// Copy constructor
-    AvidaGP_Base<HARDWARE>(const AvidaGP_Base<HARDWARE> &) = default;
+    AvidaGP_Base(const AvidaGP_Base &) = default;
 
     /// Move constructor
-    AvidaGP_Base<HARDWARE>(AvidaGP_Base<HARDWARE> &&) = default;
+    AvidaGP_Base(AvidaGP_Base &&) = default;
 
     /// Destructor
-    virtual ~AvidaGP_Base<HARDWARE>() { ; }
+    virtual ~AvidaGP_Base() { ; }
 
     bool operator<(const this_t & other) const {
       return genome < other.genome;
@@ -495,14 +493,12 @@ namespace emp {
     static const inst_lib_t & DefaultInstLib();
   };
 
-  template <typename HARDWARE>
-  size_t AvidaGP_Base<HARDWARE>::InstScope(const inst_t & inst) const {
+  size_t AvidaGP_Base::InstScope(const inst_t & inst) const {
     if (genome.inst_lib->GetScopeType(inst.id) == ScopeType::NONE) return 0;
     return inst.args[ genome.inst_lib->GetScopeArg(inst.id) ] + 1;
   }
 
-  template <typename HARDWARE>
-  void AvidaGP_Base<HARDWARE>::PrintInst(const inst_t & inst, std::ostream & os) const {
+  void AvidaGP_Base::PrintInst(const inst_t & inst, std::ostream & os) const {
     os << genome.inst_lib->GetName(inst.id);
     const size_t num_args = genome.inst_lib->GetNumArgs(inst.id);
     for (size_t i = 0; i < num_args; i++) {
@@ -510,8 +506,7 @@ namespace emp {
     }
   }
 
-  template <typename HARDWARE>
-  void AvidaGP_Base<HARDWARE>::PrintGenome(std::ostream & os) const {
+  void AvidaGP_Base::PrintGenome(std::ostream & os) const {
     size_t cur_scope = 0;
 
     for (const inst_t & inst : genome.sequence) {
@@ -537,15 +532,13 @@ namespace emp {
     }
   }
 
-  template <typename HARDWARE>
-  void AvidaGP_Base<HARDWARE>::PrintGenome(const std::string & filename) const {
+  void AvidaGP_Base::PrintGenome(const std::string & filename) const {
     std::ofstream of(filename);
     PrintGenome(of);
     of.close();
   }
 
-  template <typename HARDWARE>
-  size_t AvidaGP_Base<HARDWARE>::PredictNextInst() const {
+  size_t AvidaGP_Base::PredictNextInst() const {
     // Determine if we are changing scope.
     size_t new_scope = CPU_SIZE+1;  // Default to invalid scope.
     if (inst_ptr >= genome.sequence.size()) new_scope = 0;
@@ -576,8 +569,7 @@ namespace emp {
     return inst_ptr;
   }
 
-  template <typename HARDWARE>
-  void AvidaGP_Base<HARDWARE>::PrintState(std::ostream & os) const {
+  void AvidaGP_Base::PrintState(std::ostream & os) const {
     size_t next_inst = PredictNextInst();
 
     os << " REGS: ";
@@ -609,8 +601,7 @@ namespace emp {
   }
 
   /// This static function can be used to access the generic AvidaGP instruction library.
-  template <typename HARDWARE>
-  const InstLib<AvidaGP_Base<HARDWARE>> & AvidaGP_Base<HARDWARE>::DefaultInstLib() {
+  const InstLib<AvidaGP_Base> & AvidaGP_Base::DefaultInstLib() {
     static inst_lib_t inst_lib;
 
     if (inst_lib.GetSize() == 0) {
@@ -649,7 +640,7 @@ namespace emp {
     return inst_lib;
   }
 
-  using AvidaGP = AvidaGP_Base<int>;
+  using AvidaGP = AvidaGP_Base;
 }
 
 
