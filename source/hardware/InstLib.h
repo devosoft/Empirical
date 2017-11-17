@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  Systematics.h
+ *  @file  InstLib.h
  *  @brief This file maintains information about instructions availabel in virtual hardware.
  */
 
