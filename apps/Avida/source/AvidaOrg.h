@@ -19,16 +19,15 @@ private:
   double energy;
 
 public:
+  using this_t = AvidaOrg;
   using genome_t = typename emp::AvidaCPU_Base::Genome;
+  using inst_lib_t = emp::AvidaCPU_InstLib<AvidaOrg>;
 
-  AvidaOrg() : emp::AvidaCPU_Base(), world_id((size_t) -1), energy(0) { ; }
+  AvidaOrg() : emp::AvidaCPU_Base(&(emp::DefaultInstLib())), world_id((size_t) -1), energy(0) { ; }
   AvidaOrg(const genome_t & genome)
     : emp::AvidaCPU_Base(genome), world_id((size_t) -1), energy(0) { ; }
   AvidaOrg(const AvidaOrg &) = default;
   AvidaOrg(AvidaOrg &&) = default;
-
-  using this_t = AvidaOrg;
-  using inst_lib_t = emp::AvidaCPU_InstLib<AvidaOrg>;
 
   size_t GetWorldID() const { return world_id; }
   double GetEnergy() const { return energy; }
