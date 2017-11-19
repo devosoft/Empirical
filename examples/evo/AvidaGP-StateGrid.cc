@@ -25,38 +25,35 @@
 #include "Evo/StateGrid.h"
 #include "Evo/World.h"
 
-struct SGHardware {
+class SGOrg : public emp::AvidaCPU_Base {
+protected:
   emp::StateGridStatus sg_status;
   emp::StateGrid state_grid;
   double score;
 
-  SGHardware() : sg_status(), state_grid(), score(0)  { ; }
-};
-
-class SGOrg : public emp::AvidaGP_Base<SGHardware> {
 public:
-  using base_t = emp::AvidaGP_Base<SGHardware>;
+  using base_t = emp::AvidaCPU_Base;
 
-  SGOrg() { ; }
-  SGOrg(const base_t::genome_t & in_genome) : base_t(in_genome) { ; }
+  SGOrg() : sg_status(), state_grid(), score(0) { ; }
+  SGOrg(const base_t::genome_t & in_genome) : base_t(in_genome), sg_status(), state_grid(), score(0) { ; }
   SGOrg(const SGOrg &) = default;
   SGOrg(SGOrg &&) = default;
 
-  emp::StateGridStatus GetSGStatus() const { return hw.sg_status; }
+  emp::StateGridStatus GetSGStatus() const { return sg_status; }
 
-  void SetPosition(size_t x, size_t y) { hw.sg_status.SetPos(x,y); }
-  void SetFacing(size_t facing) { hw.sg_status.SetFacing(facing); }
-  void SetStateGrid(const emp::StateGrid & in_sg) { hw.state_grid = in_sg; }
+  void SetPosition(size_t x, size_t y) { sg_status.SetPos(x,y); }
+  void SetFacing(size_t facing) { sg_status.SetFacing(facing); }
+  void SetStateGrid(const emp::StateGrid & in_sg) { state_grid = in_sg; }
 
   double GetFitness() {  // Setup the fitness function.
     ResetHardware();
     Process(200);
-    return hw.score;
+    return score;
   }
 
   void ResetHardware() {
     base_t::ResetHardware();
-    hw.score = 0;
+    score = 0;
   }
 
   static void Inst_Move(base_t & org, const base_t::Instruction & inst) {
