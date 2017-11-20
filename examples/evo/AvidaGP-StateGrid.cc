@@ -56,23 +56,23 @@ public:
     score = 0;
   }
 
-  static void Inst_Move(base_t & org, const base_t::Instruction & inst) {
-    org.hw.sg_status.Move(org.hw.state_grid, org.regs[inst.args[0]]);
+  static void Inst_Move(SGOrg & org, const base_t::Instruction & inst) {
+    org.sg_status.Move(org.state_grid, org.regs[inst.args[0]]);
   }
 
-  static void Inst_Rotate(base_t & org, const base_t::Instruction & inst) {
-    org.hw.sg_status.Rotate(org.regs[inst.args[0]]);
+  static void Inst_Rotate(SGOrg & org, const base_t::Instruction & inst) {
+    org.sg_status.Rotate(org.regs[inst.args[0]]);
   }
 
-  static void Inst_Scan(base_t & org, const base_t::Instruction & inst) {
-    int val = org.hw.sg_status.Scan(org.hw.state_grid);
+  static void Inst_Scan(SGOrg & org, const base_t::Instruction & inst) {
+    int val = org.sg_status.Scan(org.state_grid);
     org.regs[inst.args[0]] = val;
     switch (val) {
-      case -1: org.hw.score -= 0.5; break;                                             // Poison
-      case 0: break;                                                                   // Eaten food
-      case 1: org.hw.score += 1.0; org.hw.sg_status.Set(org.hw.state_grid, 0); break;  // Food! (being eaten...)
-      case 2: break;                                                                   // Empty border
-      case 3: org.hw.score += 1.0; org.hw.sg_status.Set(org.hw.state_grid, 2); break;  // Border with food.
+      case -1: org.score -= 0.5; break;                                       // Poison
+      case 0: break;                                                          // Eaten food
+      case 1: org.score += 1.0; org.sg_status.Set(org.state_grid, 0); break;  // Food! (being eaten...)
+      case 2: break;                                                          // Empty border
+      case 3: org.score += 1.0; org.sg_status.Set(org.state_grid, 2); break;  // Border with food.
     }
   }
 
