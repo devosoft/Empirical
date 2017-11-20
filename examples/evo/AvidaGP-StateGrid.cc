@@ -80,8 +80,8 @@ public:
 
 class SGWorld : public emp::World<SGOrg> {
 public:
-  using org_base_t = emp::AvidaGP_Base<SGHardware>;
-  using inst_lib_t = emp::InstLib<org_base_t>;
+  using lib_base_t = emp::AvidaCPU_InstLib<SGOrg>;
+  using inst_lib_t = emp::InstLib<SGOrg>;
 
   inst_lib_t inst_lib;
 
@@ -90,31 +90,31 @@ public:
     : emp::World<SGOrg>(random, name), inst_lib()
   {
     // Build the instruction library...
-    inst_lib.AddInst("Inc", org_base_t::Inst_Inc, 1, "Increment value in reg Arg1");
-    inst_lib.AddInst("Dec", org_base_t::Inst_Dec, 1, "Decrement value in reg Arg1");
-    inst_lib.AddInst("Not", org_base_t::Inst_Not, 1, "Logically toggle value in reg Arg1");
-    inst_lib.AddInst("SetReg", org_base_t::Inst_SetReg, 2, "Set reg Arg1 to numerical value Arg2");
-    inst_lib.AddInst("Add", org_base_t::Inst_Add, 3, "regs: Arg3 = Arg1 + Arg2");
-    inst_lib.AddInst("Sub", org_base_t::Inst_Sub, 3, "regs: Arg3 = Arg1 - Arg2");
-    inst_lib.AddInst("Mult", org_base_t::Inst_Mult, 3, "regs: Arg3 = Arg1 * Arg2");
-    inst_lib.AddInst("Div", org_base_t::Inst_Div, 3, "regs: Arg3 = Arg1 / Arg2");
-    inst_lib.AddInst("Mod", org_base_t::Inst_Mod, 3, "regs: Arg3 = Arg1 % Arg2");
-    inst_lib.AddInst("TestEqu", org_base_t::Inst_TestEqu, 3, "regs: Arg3 = (Arg1 == Arg2)");
-    inst_lib.AddInst("TestNEqu", org_base_t::Inst_TestNEqu, 3, "regs: Arg3 = (Arg1 != Arg2)");
-    inst_lib.AddInst("TestLess", org_base_t::Inst_TestLess, 3, "regs: Arg3 = (Arg1 < Arg2)");
-    inst_lib.AddInst("If", org_base_t::Inst_If, 2, "If reg Arg1 != 0, scope -> Arg2; else skip scope", emp::ScopeType::BASIC, 1);
-    inst_lib.AddInst("While", org_base_t::Inst_While, 2, "Until reg Arg1 != 0, repeat scope Arg2; else skip", emp::ScopeType::LOOP, 1);
-    inst_lib.AddInst("Countdown", org_base_t::Inst_Countdown, 2, "Countdown reg Arg1 to zero; scope to Arg2", emp::ScopeType::LOOP, 1);
-    inst_lib.AddInst("Break", org_base_t::Inst_Break, 1, "Break out of scope Arg1");
-    inst_lib.AddInst("Scope", org_base_t::Inst_Scope, 1, "Enter scope Arg1", emp::ScopeType::BASIC, 0);
-    inst_lib.AddInst("Define", org_base_t::Inst_Define, 2, "Build function Arg1 in scope Arg2", emp::ScopeType::FUNCTION, 1);
-    inst_lib.AddInst("Call", org_base_t::Inst_Call, 1, "Call previously defined function Arg1");
-    inst_lib.AddInst("Push", org_base_t::Inst_Push, 2, "Push reg Arg1 onto stack Arg2");
-    inst_lib.AddInst("Pop", org_base_t::Inst_Pop, 2, "Pop stack Arg1 into reg Arg2");
-    inst_lib.AddInst("Input", org_base_t::Inst_Input, 2, "Pull next value from input Arg1 into reg Arg2");
-    inst_lib.AddInst("Output", org_base_t::Inst_Output, 2, "Push reg Arg1 into output Arg2");
-    inst_lib.AddInst("CopyVal", org_base_t::Inst_CopyVal, 2, "Copy reg Arg1 into reg Arg2");
-    inst_lib.AddInst("ScopeReg", org_base_t::Inst_ScopeReg, 1, "Backup reg Arg1; restore at end of scope");
+    inst_lib.AddInst("Inc", lib_base_t::Inst_Inc, 1, "Increment value in reg Arg1");
+    inst_lib.AddInst("Dec", lib_base_t::Inst_Dec, 1, "Decrement value in reg Arg1");
+    inst_lib.AddInst("Not", lib_base_t::Inst_Not, 1, "Logically toggle value in reg Arg1");
+    inst_lib.AddInst("SetReg", lib_base_t::Inst_SetReg, 2, "Set reg Arg1 to numerical value Arg2");
+    inst_lib.AddInst("Add", lib_base_t::Inst_Add, 3, "regs: Arg3 = Arg1 + Arg2");
+    inst_lib.AddInst("Sub", lib_base_t::Inst_Sub, 3, "regs: Arg3 = Arg1 - Arg2");
+    inst_lib.AddInst("Mult", lib_base_t::Inst_Mult, 3, "regs: Arg3 = Arg1 * Arg2");
+    inst_lib.AddInst("Div", lib_base_t::Inst_Div, 3, "regs: Arg3 = Arg1 / Arg2");
+    inst_lib.AddInst("Mod", lib_base_t::Inst_Mod, 3, "regs: Arg3 = Arg1 % Arg2");
+    inst_lib.AddInst("TestEqu", lib_base_t::Inst_TestEqu, 3, "regs: Arg3 = (Arg1 == Arg2)");
+    inst_lib.AddInst("TestNEqu", lib_base_t::Inst_TestNEqu, 3, "regs: Arg3 = (Arg1 != Arg2)");
+    inst_lib.AddInst("TestLess", lib_base_t::Inst_TestLess, 3, "regs: Arg3 = (Arg1 < Arg2)");
+    inst_lib.AddInst("If", lib_base_t::Inst_If, 2, "If reg Arg1 != 0, scope -> Arg2; else skip scope", emp::ScopeType::BASIC, 1);
+    inst_lib.AddInst("While", lib_base_t::Inst_While, 2, "Until reg Arg1 != 0, repeat scope Arg2; else skip", emp::ScopeType::LOOP, 1);
+    inst_lib.AddInst("Countdown", lib_base_t::Inst_Countdown, 2, "Countdown reg Arg1 to zero; scope to Arg2", emp::ScopeType::LOOP, 1);
+    inst_lib.AddInst("Break", lib_base_t::Inst_Break, 1, "Break out of scope Arg1");
+    inst_lib.AddInst("Scope", lib_base_t::Inst_Scope, 1, "Enter scope Arg1", emp::ScopeType::BASIC, 0);
+    inst_lib.AddInst("Define", lib_base_t::Inst_Define, 2, "Build function Arg1 in scope Arg2", emp::ScopeType::FUNCTION, 1);
+    inst_lib.AddInst("Call", lib_base_t::Inst_Call, 1, "Call previously defined function Arg1");
+    inst_lib.AddInst("Push", lib_base_t::Inst_Push, 2, "Push reg Arg1 onto stack Arg2");
+    inst_lib.AddInst("Pop", lib_base_t::Inst_Pop, 2, "Pop stack Arg1 into reg Arg2");
+    inst_lib.AddInst("Input", lib_base_t::Inst_Input, 2, "Pull next value from input Arg1 into reg Arg2");
+    inst_lib.AddInst("Output", lib_base_t::Inst_Output, 2, "Push reg Arg1 into output Arg2");
+    inst_lib.AddInst("CopyVal", lib_base_t::Inst_CopyVal, 2, "Copy reg Arg1 into reg Arg2");
+    inst_lib.AddInst("ScopeReg", lib_base_t::Inst_ScopeReg, 1, "Backup reg Arg1; restore at end of scope");
 
     inst_lib.AddInst("Move",   SGOrg::Inst_Move,   1, "Move forward in state grid.");
     inst_lib.AddInst("Rotate", SGOrg::Inst_Rotate, 1, "Rotate in place in state grid.");
