@@ -367,7 +367,7 @@ namespace emp {
     bool Load(std::istream & input);
 
     /// Process a specified instruction, provided by the caller.
-    void ProcessInst(const inst_t & inst) { genome.inst_lib->ProcessInst(*this, inst); }
+    void ProcessInst(const inst_t & inst) { genome.inst_lib->ProcessInst(ToPtr(this), inst); }
 
     /// Determine the scope associated with a particular instruction.
     size_t InstScope(const inst_t & inst) const;
@@ -376,7 +376,7 @@ namespace emp {
     void SingleProcess() {
       emp_assert(genome.sequence.size() > 0);  // A genome must exist to be processed.
       if (inst_ptr >= genome.sequence.size()) ResetIP();
-      genome.inst_lib->ProcessInst(*this, genome.sequence[inst_ptr]);
+      genome.inst_lib->ProcessInst(ToPtr(this), genome.sequence[inst_ptr]);
       inst_ptr++;
     }
 
@@ -522,7 +522,7 @@ namespace emp {
   }
 
   class AvidaGP : public AvidaCPU_Base<AvidaGP> {
-    
+
   };
 }
 
