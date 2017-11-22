@@ -34,6 +34,7 @@
 
 namespace emp {
 
+  template <typename HARDWARE>
   class AvidaCPU_Base {
   public:
     static constexpr size_t CPU_SIZE = 16;   // Num arg values (for regs, stacks, functions, etc)
@@ -43,12 +44,13 @@ namespace emp {
     struct Instruction;
     struct Genome;
 
-    using this_t = AvidaCPU_Base;
+    using this_t = AvidaCPU_Base<HARDWARE>;
+    using hardware_t = HARDWARE;
     using inst_t = Instruction;
     using genome_t = Genome;
     using arg_t = size_t;             // All arguments are non-negative ints (indecies!)
 
-    using inst_lib_t = AvidaCPU_InstLib<this_t, arg_t, INST_ARGS>;
+    using inst_lib_t = AvidaCPU_InstLib<hardware_t, arg_t, INST_ARGS>;
     using stack_t = emp::vector<double>;
     using arg_set_t = emp::array<arg_t, INST_ARGS>;
 
@@ -406,12 +408,14 @@ namespace emp {
 
   };
 
-  size_t AvidaCPU_Base::InstScope(const inst_t & inst) const {
+  template <typename HARDWARE>
+  size_t AvidaCPU_Base<HARDWARE>::InstScope(const typename AvidaCPU_Base<HARDWARE>::inst_t & inst) const {
     if (genome.inst_lib->GetScopeType(inst.id) == ScopeType::NONE) return 0;
     return inst.args[ genome.inst_lib->GetScopeArg(inst.id) ] + 1;
   }
 
-  void AvidaCPU_Base::PrintInst(const inst_t & inst, std::ostream & os) const {
+  template <typename HARDWARE>
+  void AvidaCPU_Base<HARDWARE>::PrintInst(const inst_t & inst, std::ostream & os) const {
     os << genome.inst_lib->GetName(inst.id);
     const size_t num_args = genome.inst_lib->GetNumArgs(inst.id);
     for (size_t i = 0; i < num_args; i++) {
@@ -419,7 +423,8 @@ namespace emp {
     }
   }
 
-  void AvidaCPU_Base::PrintGenome(std::ostream & os) const {
+  template <typename HARDWARE>
+  void AvidaCPU_Base<HARDWARE>::PrintGenome(std::ostream & os) const {
     size_t cur_scope = 0;
 
     for (const inst_t & inst : genome.sequence) {
@@ -445,13 +450,15 @@ namespace emp {
     }
   }
 
-  void AvidaCPU_Base::PrintGenome(const std::string & filename) const {
+  template <typename HARDWARE>
+  void AvidaCPU_Base<HARDWARE>::PrintGenome(const std::string & filename) const {
     std::ofstream of(filename);
     PrintGenome(of);
     of.close();
   }
 
-  size_t AvidaCPU_Base::PredictNextInst() const {
+  template <typename HARDWARE>
+  size_t AvidaCPU_Base<HARDWARE>::PredictNextInst() const {
     // Determine if we are changing scope.
     size_t new_scope = CPU_SIZE+1;  // Default to invalid scope.
     if (inst_ptr >= genome.sequence.size()) new_scope = 0;
@@ -482,7 +489,8 @@ namespace emp {
     return inst_ptr;
   }
 
-  void AvidaCPU_Base::PrintState(std::ostream & os) const {
+  template <typename HARDWARE>
+  void AvidaCPU_Base<HARDWARE>::PrintState(std::ostream & os) const {
     size_t next_inst = PredictNextInst();
 
     os << " REGS: ";
@@ -513,7 +521,9 @@ namespace emp {
     // emp::vector<size_t> call_stack;
   }
 
-  using AvidaGP = AvidaCPU_Base;
+  class AvidaGP : public AvidaCPU_Base<AvidaGP> {
+    
+  };
 }
 
 
