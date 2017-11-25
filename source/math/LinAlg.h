@@ -496,7 +496,9 @@ namespace emp {
 
       /// Finds the magnitude of this row or column vector. Using this on a
       /// non-vector matrix will result in a compile time error.
-      constexpr decltype(auto) mag() const { return sqrt(magSq()); }
+      constexpr decltype(auto) mag() const {
+        return static_cast<F>(sqrt(magSq()));
+      }
 
       /// Normalizes the row or column vector such that its magnitude is 1.
       constexpr Mat<F, R, C> normalized() const {
