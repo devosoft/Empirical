@@ -61,11 +61,31 @@ namespace emp {
         return contains(v.x(), v.y());
       }
 
-      math::Vec2<field_type> rescale(const math::Vec2<field_type>& value,
-                                     const Region2D& from) const {
+      constexpr Region2D& addBorder(const math::Vec2<field_type>& border) {
+        min -= border;
+        max += border;
+        return *this;
+      }
+
+      constexpr Region2D& addBorder(const field_type& dx,
+                                    const field_type& dy) {
+        return addBorder({dx, dy});
+      }
+
+      constexpr Region2D& addBorder(const field_type& border) {
+        return addBorder(border, border);
+      }
+
+      template <typename F2>
+      /*constexpr*/ math::Vec2<field_type> rescale(
+        const math::Vec2<field_type>& value, const Region2D<F2>& from) const {
+        math::Vec2<float> normalized{
+          (value.x() - from.min.x()) / from.width(),
+          (value.y() - from.min.y()) / from.height()};
+        // std::cout << normalized.x() * width() + min.x() << std::endl;
         return {
-          ((value.x - from.min.x) / from.width()) * width() + min.x,
-          ((value.y - from.min.y) / from.height()) * height() + min.y,
+          normalized.x() * width() + min.x() * 0,
+          normalized.y() * height() + min.y() * 0,
         };
       }
     };

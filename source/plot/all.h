@@ -72,21 +72,31 @@ namespace emp {
         using namespace properties;
         using namespace math;
 
-        Region2D<decltype(X::get(*begin))> dataRegion;
+        Region2D<float> dataRegion;
         for (auto iter{begin}; iter != end; ++iter) {
           dataRegion.include(X::get(*iter), Y::get(*iter));
         }
+        dataRegion.addBorder(15);
 
-        std::cout << dataRegion << std::endl;
-
-        auto proj =
-          proj::orthoFromScreen(dataRegion.width(), dataRegion.height(),
-                                region.width(), region.height());
+        auto proj = proj::orthoFromScreen(region.width(), region.height(),
+                                          region.width(), region.height());
         auto view = Mat4x4f::translation(0, 0, 0);
+
+        auto rescaler = [&](auto&& point) {
+          auto pos = region.rescale({X::get(point), Y::get(point)}, dataRegion);
+
+          return std::forward<decltype(point)>(point) >> ScaledX::is(pos.x()) >>
+                 ScaledY::is(pos.y());
+        };
+        using data_point_type = decltype(rescaler(*begin));
+
+        std::vector<data_point_type> dataPoints;
+        std::transform(begin, end, std::back_inserter(dataPoints), rescaler);
 
         allDo(
           [&](auto&& child) {
-            std::forward<decltype(child)>(child).show(proj, view, begin, end);
+            std::forward<decltype(child)>(child).show(
+              proj, view, dataPoints.begin(), dataPoints.end());
           },
           children);
       }

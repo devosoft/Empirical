@@ -41,7 +41,8 @@ namespace emp {
         shader.view = view;
 
         for (auto iter = begin; iter != end; ++iter) {
-          shader.model = Mat4x4f::translation(X::get(*iter), Y::get(*iter));
+          shader.model =
+            Mat4x4f::translation(ScaledX::get(*iter), ScaledY::get(*iter));
           shader.color = Fill::get(*iter);
 
           glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

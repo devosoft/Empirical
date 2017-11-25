@@ -10,19 +10,17 @@ namespace emp {
         template <typename P, typename V>
         struct PropertySetter {
           V value;
+
+          template <typename Props>
+          constexpr decltype(auto) operator()(Props&& props) const {
+            return std::forward<Props>(props).template set<P>(value);
+          }
         };
 
         template <typename Props, typename P, typename V>
         constexpr decltype(auto) operator>>(
           Props&& props, const PropertySetter<P, V>& setter) {
-          return std::forward<Props>(props).template set<P>(setter.value);
-        }
-
-        template <typename Props, typename P, typename V>
-        constexpr decltype(auto) operator>>(Props&& props,
-                                            PropertySetter<P, V>&& setter) {
-          return std::forward<Props>(props).template set<P>(
-            std::move(setter.value));
+          return setter(std::forward<Props>(props));
         }
       }  // namespace detail
 
@@ -46,12 +44,17 @@ namespace emp {
 
       struct Fill : PropertyName<Fill> {};
       struct Stroke : PropertyName<Stroke> {};
-      struct X : PropertyName<X> {};
-      struct Y : PropertyName<Y> {};
       struct FillShader : PropertyName<FillShader> {};
       struct StrokeShader : PropertyName<StrokeShader> {};
-      struct Value : PropertyName<Value> {};
       struct StrokeWeight : PropertyName<StrokeWeight> {};
+
+      struct X : PropertyName<X> {};
+      struct Y : PropertyName<Y> {};
+
+      struct ScaledX : PropertyName<ScaledX> {};
+      struct ScaledY : PropertyName<ScaledY> {};
+
+      struct Value : PropertyName<Value> {};
     };  // namespace properties
 
     namespace detail {

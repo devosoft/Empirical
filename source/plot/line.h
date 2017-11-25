@@ -9,7 +9,7 @@ namespace emp {
   namespace plot {
     class Line {
       private:
-      emp::opengl::shaders::SimpleSolidColor shader;
+      emp::opengl::shaders::SimpleVaryingColor shader;
 
       public:
       Line(emp::opengl::GLCanvas& canvas) : shader(canvas) {}
@@ -20,10 +20,12 @@ namespace emp {
         using namespace properties;
         using namespace emp::math;
         using namespace emp::opengl;
+        using namespace emp::opengl::shaders;
 
         // Check that there are at least two points to draw
         if (begin == end) return;
-        Vec3f start{X::get(*begin), Y::get(*begin), 0};
+        Vec3f start{ScaledX::get(*begin), ScaledY::get(*begin), 0};
+        Vec4f startColor{Stroke::get(*begin)};
         auto firstWeight{StrokeWeight::get(*begin)};
         ++begin;
         if (begin == end) return;
@@ -32,24 +34,27 @@ namespace emp {
         shader.vao.bind();
         shader.proj = projection;
         shader.view = view;
-        shader.color = Vec4f{1, 1, 0, 1};
         shader.model = Mat4x4f::translation(0, 0);
 
-        Vec3f middle{X::get(*begin), Y::get(*begin), 0};
+        Vec3f middle{ScaledX::get(*begin), ScaledY::get(*begin), 0};
+        Vec4f middleColor{Stroke::get(*begin)};
         ++begin;
 
         auto segment = (middle - start).normalized();
         Vec3f normal{-segment.y(), segment.x(), 0};
         auto secondWeight{StrokeWeight::get(*begin)};
 
-        std::vector<Vec3f> verts{
-          start + normal * firstWeight, start - normal * secondWeight,
-          middle + normal * secondWeight, middle - normal * secondWeight};
+        std::vector<SimpleVaryingColor::point_t> verts{
+          {start + normal * firstWeight, startColor},
+          {start - normal * secondWeight, startColor},
+          {middle + normal * secondWeight, middleColor},
+          {middle - normal * secondWeight, middleColor}};
         std::vector<GLuint> triangles{0, 1, 2, 2, 3, 1};
 
         size_t i = 2;
         for (auto iter = begin; iter != end; ++iter) {
-          Vec3f end{X::get(*iter), Y::get(*iter), 0};
+          Vec3f end{ScaledX::get(*iter), ScaledY::get(*iter), 0};
+          Vec4f color{Stroke::get(*iter)};
           auto weight{StrokeWeight::get(*iter)};
 
           auto segment1 = (middle - start).normalized();
@@ -59,8 +64,8 @@ namespace emp {
 
           Vec3f center = (normal1 + normal2).normalized() * weight;
 
-          verts.push_back(middle + center);
-          verts.push_back(middle - center);
+          verts.push_back(SimpleVaryingColor::point_t{middle + center, color});
+          verts.push_back(SimpleVaryingColor::point_t{middle - center, color});
 
           triangles.push_back(i);
           triangles.push_back(i + 1);
