@@ -285,6 +285,22 @@ namespace emp {
         };
       }
 
+      template <typename S>
+      static constexpr Mat scale(S&& scale) {
+        static_assert(R == 4 && C == 4,
+                      "Homogenous coordinate translation matrices must be 4x4");
+        return {
+          scale, 0,     0,
+          0,  // row 1
+          0,     scale, 0,
+          0,  // row 2
+          0,     0,     std::forward<S>(scale),
+          0,  // row 3
+          0,     0,     0,
+          1,  // row 4
+        };
+      }
+
       template <typename H1, typename H2, typename... Args>
       constexpr Mat(H1&& h1, H2&& h2, Args&&... args)
         : arrayData{internal::convert<F>(std::forward<H1>(h1)),
