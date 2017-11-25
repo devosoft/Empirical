@@ -146,6 +146,21 @@ namespace emp {
       glUniform4uiv(uniform, 1, value.data());
       utils::catchGlError();
     }
+
+    void setUniform(GLint uniform, GLfloat value) {
+      glUniform1f(uniform, value);
+      utils::catchGlError();
+    }
+
+    void setUniform(GLint uniform, GLint value) {
+      glUniform1i(uniform, value);
+      utils::catchGlError();
+    }
+
+    void setUniform(GLint uniform, GLuint value) {
+      glUniform1ui(uniform, value);
+      utils::catchGlError();
+    }
   }  // namespace opengl
 }  // namespace emp
 #endif  // DEFAULT_UNIFORMS
