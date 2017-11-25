@@ -147,6 +147,8 @@ int main()
 {
   emp::Random random;
   SGWorld world(random, "AvidaWorld");
+  emp::StateGrid state_grid;
+  state_grid.Load("state_grids/islands_50x50.cfg");
   world.SetWellMixed(true);
 
   // Build a random initial popoulation.
