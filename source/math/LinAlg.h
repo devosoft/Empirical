@@ -756,12 +756,15 @@ namespace emp {
       constexpr Mat4x4f orthoFromScreen(float viewWidth, float viewHeight,
                                         float screenWidth, float screenHeight,
                                         float near = -1, float far = 1) {
-        float aspect = screenWidth / screenHeight;
+        // https://stackoverflow.com/questions/35810782/opengl-view-projections-and-orthographic-aspect-ratio
 
-        if (aspect >= 1.0) {
-          viewHeight = viewWidth * aspect;
+        float screenAspect = screenWidth / screenHeight;
+        float viewAspect = viewWidth / viewHeight;
+
+        if (screenAspect >= viewAspect) {
+          viewWidth = viewHeight * screenAspect / viewAspect;
         } else {
-          viewWidth = viewHeight / aspect;
+          viewHeight = viewWidth * viewAspect / screenAspect;
         }
 
         auto dx = viewWidth / 2;
