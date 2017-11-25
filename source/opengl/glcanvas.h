@@ -36,6 +36,8 @@ namespace emp {
     class GLCanvas {
       private:
       unsigned int width, height;
+      Region2D<int> region;
+
 #ifdef __EMSCRIPTEN__
       std::string id;
       EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context;
@@ -46,8 +48,14 @@ namespace emp {
       std::vector<std::function<void(GLCanvas&, int, int)>> onresize;
 
       void resizeViewport(float width, float height) {
-        auto size = std::max(height, width);
-        glViewport((width - size) / 2, (height - size) / 2, size, size);
+        // auto size = std::max(height, width);
+        // glViewport((width - size) / 2, (height - size) / 2, size, size);
+        // region.min = {0, 0};
+        // region.max = {size, size};
+
+        glViewport(0, 0, width, height);
+        region.min = {0, 0};
+        region.max = {width, height};
 
 #ifdef __EMSCRIPTEN__
         EM_ASM_(
@@ -177,6 +185,8 @@ namespace emp {
 
       auto getWidth() const { return width; }
       auto getHeight() const { return height; }
+
+      auto getRegion() const { return region; }
     };
 
   }  // namespace opengl

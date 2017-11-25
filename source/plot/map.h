@@ -18,14 +18,13 @@ namespace emp {
       Map(C1&& change, T1&& next)
         : change(std::forward<C1>(change)), next(std::forward<T1>(next)) {}
 
-      template <typename Iter>
-      void show(const emp::math::Mat4x4f& projection,
-                const emp::math::Mat4x4f& view, Iter begin, Iter end) {
+      template <typename R, typename Iter>
+      void show(const R& region, Iter begin, Iter end) {
         using data_point_type = decltype(change(*begin));
 
         std::vector<data_point_type> dataPoints;
         std::transform(begin, end, std::back_inserter(dataPoints), change);
-        next.show(projection, view, dataPoints.begin(), dataPoints.end());
+        next.show(region, dataPoints.begin(), dataPoints.end());
       }
     };
 

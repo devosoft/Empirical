@@ -3,6 +3,7 @@
 
 #include "../math/region.h"
 #include "math/LinAlg.h"
+#include "properties.h"
 
 namespace emp {
   namespace plot {
@@ -41,13 +42,12 @@ namespace emp {
       template <typename... T1>
       All(T1&&... children) : children(std::forward<T1>(children)...) {}
 
-      template <typename Iter>
-      void show(const emp::math::Mat4x4f& projection,
+      template <typename R, typename Iter>
+      void show(const R& region, const emp::math::Mat4x4f& projection,
                 const emp::math::Mat4x4f& view, Iter begin, Iter end) {
         allDo(
           [&](auto&& child) {
-            std::forward<decltype(child)>(child).show(projection, view, begin,
-                                                      end);
+            std::forward<decltype(child)>(child).show(region, begin, end);
           },
           children);
       }
@@ -56,6 +56,45 @@ namespace emp {
     template <typename... T>
     auto all(T&&... next) {
       return All<T...>{std::forward<T>(next)...};
+    }
+
+    template <typename... T>
+    class Views {
+      public:
+      std::tuple<T...> children;
+
+      public:
+      template <typename... T1>
+      Views(T1&&... children) : children(std::forward<T1>(children)...) {}
+
+      template <typename R, typename Iter>
+      void show(const R& region, Iter begin, Iter end) {
+        using namespace properties;
+        using namespace math;
+
+        Region2D<decltype(X::get(*begin))> dataRegion;
+        for (auto iter{begin}; iter != end; ++iter) {
+          dataRegion.include(X::get(*iter), Y::get(*iter));
+        }
+
+        std::cout << dataRegion << std::endl;
+
+        auto proj =
+          proj::orthoFromScreen(dataRegion.width(), dataRegion.height(),
+                                region.width(), region.height());
+        auto view = Mat4x4f::translation(0, 0, 0);
+
+        allDo(
+          [&](auto&& child) {
+            std::forward<decltype(child)>(child).show(proj, view, begin, end);
+          },
+          children);
+      }
+    };
+
+    template <typename... T>
+    auto views(T&&... next) {
+      return Views<T...>{std::forward<T>(next)...};
     }
 
   }  // namespace plot

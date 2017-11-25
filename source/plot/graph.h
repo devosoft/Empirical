@@ -18,9 +18,8 @@ namespace emp {
       template <typename T1>
       Graph(T1&& next) : next(std::forward<T1>(next)) {}
 
-      template <typename Iter>
-      void show(const emp::math::Mat4x4f& projection,
-                const emp::math::Mat4x4f& view, Iter begin, Iter end) {
+      template <typename R, typename Iter>
+      void show(const R& view, Iter begin, Iter end) {
         using namespace properties;
         auto map = [](auto&& value) {
           return nullProps().set<properties::Value>(value);
@@ -29,7 +28,7 @@ namespace emp {
 
         std::vector<data_point_type> dataPoints;
         std::transform(begin, end, std::back_inserter(dataPoints), map);
-        next.show(projection, view, dataPoints.begin(), dataPoints.end());
+        next.show(view, dataPoints.begin(), dataPoints.end());
 
         // float dminX = std::numeric_limits<float>::max();
         // float dminY = std::numeric_limits<float>::max();

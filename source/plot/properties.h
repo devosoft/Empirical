@@ -51,6 +51,7 @@ namespace emp {
       struct FillShader : PropertyName<FillShader> {};
       struct StrokeShader : PropertyName<StrokeShader> {};
       struct Value : PropertyName<Value> {};
+      struct StrokeWeight : PropertyName<StrokeWeight> {};
     };  // namespace properties
 
     namespace detail {

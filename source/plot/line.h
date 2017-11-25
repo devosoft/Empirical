@@ -21,8 +21,10 @@ namespace emp {
         using namespace emp::math;
         using namespace emp::opengl;
 
+        // Check that there are at least two points to draw
         if (begin == end) return;
-        Vec2f last{X::get(*begin), Y::get(*begin)};
+        Vec3f start{X::get(*begin), Y::get(*begin), 0};
+        auto firstWeight{StrokeWeight::get(*begin)};
         ++begin;
         if (begin == end) return;
 
@@ -33,13 +35,32 @@ namespace emp {
         shader.color = Vec4f{1, 1, 0, 1};
         shader.model = Mat4x4f::translation(0, 0);
 
-        std::vector<Vec3f> verts{{last.x(), last.y() + 2, 0},
-                                 {last.x(), last.y() - 2, 0}};
-        std::vector<GLuint> triangles;
-        size_t i = 0;
+        Vec3f middle{X::get(*begin), Y::get(*begin), 0};
+        ++begin;
+
+        auto segment = (middle - start).normalized();
+        Vec3f normal{-segment.y(), segment.x(), 0};
+        auto secondWeight{StrokeWeight::get(*begin)};
+
+        std::vector<Vec3f> verts{
+          start + normal * firstWeight, start - normal * secondWeight,
+          middle + normal * secondWeight, middle - normal * secondWeight};
+        std::vector<GLuint> triangles{0, 1, 2, 2, 3, 1};
+
+        size_t i = 2;
         for (auto iter = begin; iter != end; ++iter) {
-          verts.emplace_back(X::get(*iter), Y::get(*iter) + 2, 0);
-          verts.emplace_back(X::get(*iter), Y::get(*iter) - 2, 0);
+          Vec3f end{X::get(*iter), Y::get(*iter), 0};
+          auto weight{StrokeWeight::get(*iter)};
+
+          auto segment1 = (middle - start).normalized();
+          Vec3f normal1{-segment1.y(), segment1.x(), 0};
+          auto segment2 = (end - middle).normalized();
+          Vec3f normal2{-segment2.y(), segment2.x(), 0};
+
+          Vec3f center = (normal1 + normal2).normalized() * weight;
+
+          verts.push_back(middle + center);
+          verts.push_back(middle - center);
 
           triangles.push_back(i);
           triangles.push_back(i + 1);
@@ -49,13 +70,15 @@ namespace emp {
           triangles.push_back(i + 3);
           triangles.push_back(i + 1);
           i += 2;
+
+          start = middle;
+          middle = end;
         }
 
         shader.vao.getBuffer<BufferType::Array>().set(verts,
                                                       BufferUsage::DynamicDraw);
         shader.vao.getBuffer<BufferType::ElementArray>().set(
           triangles, BufferUsage::DynamicDraw);
-
         glDrawElements(GL_TRIANGLES, triangles.size(), GL_UNSIGNED_INT, 0);
       }
     };
