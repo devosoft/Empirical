@@ -88,6 +88,14 @@ namespace emp {
         }
       };
 
+      struct MatrixSub {
+        template <typename A, typename B>
+        constexpr auto operator()(std::size_t r, std::size_t c, A&& a,
+                                  B&& b) const {
+          return std::forward<A>(a)(r, c) - std::forward<B>(b)(r, c);
+        }
+      };
+
       struct MatrixTranspose {
         template <typename M>
         constexpr auto operator()(std::size_t r, std::size_t c, M&& m) const {
@@ -516,6 +524,11 @@ namespace emp {
         return apply(internal::MatrixAdd{}, std::forward<M>(other));
       }
 
+      template <typename M = Mat<F, R, C>>
+      constexpr Mat& operator-=(M&& other) {
+        return apply(internal::MatrixSub{}, std::forward<M>(other));
+      }
+
       constexpr Mat& operator*=(const F& scalar) {
         return apply(internal::RightScalarMult{}, scalar);
       }
@@ -554,6 +567,13 @@ namespace emp {
     operator+(const Mat<F1, R, C>& a, const Mat<F1, R, C>& b) {
       return Mat<decltype(std::declval<F1>() + std::declval<F1>()), R, C>::from(
         internal::MatrixAdd{}, a, b);
+    }
+
+    template <typename F1, typename F2, std::size_t R, std::size_t C>
+    constexpr Mat<decltype(std::declval<F1>() - std::declval<F2>()), R, C>
+    operator-(const Mat<F1, R, C>& a, const Mat<F2, R, C>& b) {
+      return Mat<decltype(std::declval<F1>() - std::declval<F2>()), R, C>::from(
+        internal::MatrixSub{}, a, b);
     }
 
     // Define the dot product
