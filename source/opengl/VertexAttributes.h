@@ -1,7 +1,6 @@
 #ifndef VERTEX_ATTRIBUTES
 #define VERTEX_ATTRIBUTES
 
-#include <GLES2/gl2.h>
 #include "glutils.h"
 
 namespace emp {
