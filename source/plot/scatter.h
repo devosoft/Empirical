@@ -29,8 +29,8 @@ namespace emp {
       }
 
       template <typename Iter>
-      void show(const emp::math::Mat4x4f& projection,
-                const emp::math::Mat4x4f& view, Iter begin, Iter end) {
+      void show(Iter begin, Iter end, const emp::math::Mat4x4f& projection,
+                const emp::math::Mat4x4f& view) {
         using namespace properties;
         using namespace emp::math;
 

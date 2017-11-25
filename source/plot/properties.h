@@ -32,13 +32,8 @@ namespace emp {
         }
 
         template <typename Props>
-        static constexpr auto& get(Props& properties) {
-          return properties.template get<P>();
-        }
-
-        template <typename Props>
-        static constexpr const auto& get(const Props& properties) {
-          return properties.template get<P>();
+        static constexpr decltype(auto) get(Props&& properties) {
+          return std::forward<Props>(properties).template get<P>();
         }
       };
 

@@ -18,8 +18,8 @@ namespace emp {
       template <typename T1>
       Graph(T1&& next) : next(std::forward<T1>(next)) {}
 
-      template <typename R, typename Iter>
-      void show(const R& view, Iter begin, Iter end) {
+      template <typename Iter, typename... Args>
+      void show(Iter begin, Iter end, Args&&... args) {
         using namespace properties;
         auto map = [](auto&& value) {
           return nullProps().set<properties::Value>(value);
@@ -28,27 +28,8 @@ namespace emp {
 
         std::vector<data_point_type> dataPoints;
         std::transform(begin, end, std::back_inserter(dataPoints), map);
-        next.show(view, dataPoints.begin(), dataPoints.end());
-
-        // float dminX = std::numeric_limits<float>::max();
-        // float dminY = std::numeric_limits<float>::max();
-        //
-        // float dmaxX = std::numeric_limits<float>::lowest();
-        // float dmaxY = std::numeric_limits<float>::lowest();
-        //
-        // for (auto& dp : dataPoints) {
-        //   if (dp.x > dmaxX) dmaxX = dp.x;
-        //   if (dp.x < dminX) dminX = dp.x;
-        //
-        //   if (dp.y > dmaxY) dmaxY = dp.y;
-        //   if (dp.y < dminY) dminY = dp.y;
-        // }
-        // allDo(
-        //   [&](auto&& layer) {
-        //     std::forward<decltype(layer)>(layer).show(
-        //       projection, view, dataPoints.begin(), dataPoints.end());
-        //   },
-        //   layers);
+        next.show(dataPoints.begin(), dataPoints.end(),
+                  std::forward<Args>(args)...);
       }
     };
 

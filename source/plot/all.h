@@ -7,49 +7,39 @@
 
 namespace emp {
   namespace plot {
-    namespace detail {
-      template <typename F, typename T>
-      void allDo(F&& callback, T&& tuple, const std::index_sequence<>&) {}
-
-      template <typename F, typename T, size_t H>
-      void allDo(F&& callback, T&& tuple, const std::index_sequence<H>&) {
-        std::forward<F>(callback)(std::get<H>(std::forward<T>(tuple)));
-      }
-
-      template <typename F, typename T, size_t H, size_t H2, size_t... I>
-      void allDo(F&& callback, T&& tuple,
-                 const std::index_sequence<H, H2, I...>&) {
-        callback(std::get<H>(tuple));
-        allDo(std::forward<F>(callback), std::forward<T>(tuple),
-              std::index_sequence<H2, I...>{});
-      }
-
-    }  // namespace detail
-
-    template <typename F, typename T>
-    void allDo(F&& callback, T&& tuple) {
-      detail::allDo(std::forward<F>(callback), std::forward<T>(tuple),
-                    std::make_index_sequence<
-                      std::tuple_size<typename std::decay<T>::type>::value>{});
-    }
 
     template <typename... T>
     class All {
-      public:
+      private:
       std::tuple<T...> children;
+
+      template <size_t H, size_t H2, size_t... I, typename Iter,
+                typename... Args>
+      void showImpl(const std::index_sequence<H, H2, I...>&, Iter begin,
+                    Iter end, Args&&... args) {
+        std::get<H>(children).show(begin, end, args...);
+        showImpl(std::index_sequence<H2, I...>{}, begin, end,
+                 std::forward<Args>(args)...);
+      }
+
+      template <size_t H, size_t... I, typename Iter, typename... Args>
+      void showImpl(const std::index_sequence<H, I...>&, Iter begin, Iter end,
+                    Args&&... args) {
+        std::get<H>(children).show(begin, end, std::forward<Args>(args)...);
+      }
+
+      template <typename Iter, typename... Args>
+      void showImpl(const std::index_sequence<>&, Iter begin, Iter end,
+                    Args&&... args) {}
 
       public:
       template <typename... T1>
       All(T1&&... children) : children(std::forward<T1>(children)...) {}
 
-      template <typename R, typename Iter>
-      void show(const R& region, const emp::math::Mat4x4f& projection,
-                const emp::math::Mat4x4f& view, Iter begin, Iter end) {
-        allDo(
-          [&](auto&& child) {
-            std::forward<decltype(child)>(child).show(region, begin, end);
-          },
-          children);
+      template <typename Iter, typename... Args>
+      void show(Iter begin, Iter end, Args&&... args) {
+        showImpl(std::make_index_sequence<sizeof...(T)>{}, begin, end,
+                 std::forward<Args>(args)...);
       }
     };
 
@@ -59,16 +49,12 @@ namespace emp {
     }
 
     template <typename... T>
-    class Views {
+    class Views : All<T...> {
       public:
-      std::tuple<T...> children;
+      using All<T...>::All;
 
-      public:
-      template <typename... T1>
-      Views(T1&&... children) : children(std::forward<T1>(children)...) {}
-
-      template <typename R, typename Iter>
-      void show(const R& region, Iter begin, Iter end) {
+      template <typename Iter, typename R, typename... Args>
+      void show(Iter begin, Iter end, const R& region, Args&&... args) {
         using namespace properties;
         using namespace math;
 
@@ -93,12 +79,8 @@ namespace emp {
         std::vector<data_point_type> dataPoints;
         std::transform(begin, end, std::back_inserter(dataPoints), rescaler);
 
-        allDo(
-          [&](auto&& child) {
-            std::forward<decltype(child)>(child).show(
-              proj, view, dataPoints.begin(), dataPoints.end());
-          },
-          children);
+        All<T...>::show(dataPoints.begin(), dataPoints.end(), proj, view,
+                        std::forward<Args>(args)...);
       }
     };
 
