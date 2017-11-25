@@ -624,14 +624,16 @@ namespace emp {
       return Mat<Field, R, C>::from(internal::MatrixMult{}, a, b);
     }
 
-    template <typename F, std::size_t R, std::size_t C>
-    constexpr auto operator*(const Mat<F, R, C>& mat, const F& s) {
-      return Mat<F, R, C>::from(internal::RightScalarMult{}, mat, s);
+    template <typename F1, typename F2, std::size_t R, std::size_t C>
+    constexpr auto operator*(const Mat<F1, R, C>& mat, const F2& s) {
+      return Mat<decltype(std::declval<F1>() * std::declval<F2>()), R, C>::from(
+        internal::RightScalarMult{}, mat, s);
     }
 
-    template <typename F, std::size_t R, std::size_t C>
-    constexpr auto operator*(const F& s, const Mat<F, R, C>& mat) {
-      return Mat<F, R, C>::from(internal::LeftScalarMult{}, mat, s);
+    template <typename F1, typename F2, std::size_t R, std::size_t C>
+    constexpr auto operator*(const F1& s, const Mat<F2, R, C>& mat) {
+      return Mat<decltype(std::declval<F1>() * std::declval<F2>()), R, C>::from(
+        internal::LeftScalarMult{}, mat, s);
     }
 
 #define MAT_SHORT(R, C)                                       \
