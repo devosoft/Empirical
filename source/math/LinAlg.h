@@ -563,8 +563,8 @@ namespace emp {
     }
 
     template <typename F1, typename F2, std::size_t R, std::size_t C>
-    constexpr Mat<decltype(std::declval<F1>() + std::declval<F1>()), R, C>
-    operator+(const Mat<F1, R, C>& a, const Mat<F1, R, C>& b) {
+    constexpr Mat<decltype(std::declval<F1>() + std::declval<F2>()), R, C>
+    operator+(const Mat<F1, R, C>& a, const Mat<F2, R, C>& b) {
       return Mat<decltype(std::declval<F1>() + std::declval<F1>()), R, C>::from(
         internal::MatrixAdd{}, a, b);
     }
