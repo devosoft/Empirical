@@ -23,8 +23,10 @@
 #include <map>
 #include <string>
 
+#include "../base/assert.h"
 #include "../base/Ptr.h"
 #include "../base/vector.h"
+
 #include "../tools/File.h"
 #include "../tools/map_utils.h"
 #include "../tools/math.h"
@@ -201,11 +203,13 @@ namespace emp {
 
     /// Move explicitly in the x direction (regardless of facing).
     void MoveX(const StateGrid & grid, int steps=1) {
+      emp_assert(grid.GetWidth(), grid.GetWidth());
       x = (size_t) Mod(steps + (int) x, (int) grid.GetWidth());
     }
 
     /// Move explicitly in the y direction (regardless of facing).
     void MoveY(const StateGrid & grid, int steps=1) {
+      emp_assert(grid.GetHeight(), grid.GetHeight());
       y = (size_t) Mod(steps + (int) y, (int) grid.GetHeight());
     }
 
