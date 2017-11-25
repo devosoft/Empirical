@@ -83,7 +83,10 @@ namespace emp {
     const std::string & GetDesc(int state_id) const { return states[ GetKey(state_id) ].desc; }
 
     // Convert to state ids...
-    int GetState(char symbol) const { return states[ GetKey(symbol) ].state_id; }
+    int GetState(char symbol) const {
+      emp_assert( states.size() > GetKey(symbol), states.size(), symbol, (int) symbol );
+      return states[ GetKey(symbol) ].state_id;
+    }
     int GetState(const std::string & name) const { return states[ GetKey(name) ].state_id; }
 
     void AddState(int id, char symbol, double mult=1.0, std::string name="", std::string desc="") {
