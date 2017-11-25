@@ -755,7 +755,7 @@ namespace emp {
 
       constexpr Mat4x4f orthoFromScreen(float viewWidth, float viewHeight,
                                         float screenWidth, float screenHeight,
-                                        float near = -10, float far = 10) {
+                                        float near = -1, float far = 1) {
         float aspect = screenWidth / screenHeight;
 
         if (aspect >= 1.0) {
