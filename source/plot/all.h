@@ -53,8 +53,9 @@ namespace emp {
       public:
       using All<T...>::All;
 
-      template <typename Iter, typename R, typename... Args>
-      void show(Iter begin, Iter end, const R& region, Args&&... args) {
+      template <typename Iter, typename... Args>
+      void show(Iter begin, Iter end, const math::Region2D<float>& region,
+                Args&&... args) {
         using namespace properties;
         using namespace math;
 

@@ -32,7 +32,7 @@ namespace emp {
     class GLCanvas {
       private:
       unsigned int width, height;
-      Region2D<int> region;
+      Region2D<float> region;
 
 #ifdef __EMSCRIPTEN__
       std::string id;
