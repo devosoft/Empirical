@@ -1,10 +1,6 @@
 #ifndef GLCANVAS_H
 #define GLCANVAS_H
 
-#define GLFW_INCLUDE_ES3
-#include <GLES2/gl2.h>
-
-#include <GLFW/glfw3.h>
 #include "../math/region.h"
 #include "glwrap.h"
 #include "shaders.h"
@@ -48,11 +44,6 @@ namespace emp {
       std::vector<std::function<void(GLCanvas&, int, int)>> onresize;
 
       void resizeViewport(float width, float height) {
-        // auto size = std::max(height, width);
-        // glViewport((width - size) / 2, (height - size) / 2, size, size);
-        // region.min = {0, 0};
-        // region.max = {size, size};
-
         glViewport(0, 0, width, height);
         region.min = {0, 0};
         region.max = {width, height};
@@ -65,7 +56,7 @@ namespace emp {
             canvas.width = $1;
             canvas.height = $2;
           },
-          id.c_str(), size, size);
+          id.c_str(), width, height);
 #endif
       }
 
@@ -111,6 +102,13 @@ namespace emp {
 #endif
         makeCurrent();
         resizeViewport(width, height);
+
+#if !defined(EMSCRIPTEN)
+        glewExperimental = GL_TRUE;
+        if (glewInit() != GLEW_OK) {
+          throw std::runtime_error("Could not initialize GLEW");
+        }
+#endif  // !defined(EMSCRIPTEN)
       }
 
 #ifdef __EMSCRIPTEN__
@@ -156,6 +154,7 @@ namespace emp {
 
         const int frameLength = 1000.f / fps;
         while (!glfwWindowShouldClose(window)) {
+          glEnable(GL_MULTISAMPLE);
           onUpdate(*this);
 
           glfwSwapBuffers(window);
