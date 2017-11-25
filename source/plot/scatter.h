@@ -7,6 +7,9 @@
 
 namespace emp {
   namespace plot {
+
+    struct PointSize : properties::PropertyName<PointSize> {};
+
     class Scatter {
       private:
       emp::opengl::shaders::SimpleSolidColor shader;
@@ -17,8 +20,8 @@ namespace emp {
         using namespace emp::math;
 
         shader.vao.getBuffer<BufferType::Array>().set(
-          {Vec3f{-5, +5, 0}, Vec3f{+5, +5, 0}, Vec3f{+5, -5, 0},
-           Vec3f{-5, -5, 0}},
+          {Vec3f{-1, +1, 0}, Vec3f{+1, +1, 0}, Vec3f{+1, -1, 0},
+           Vec3f{-1, -1, 0}},
           BufferUsage::StaticDraw);
         shader.vao.getBuffer<BufferType::ElementArray>().set(
           {
@@ -41,8 +44,10 @@ namespace emp {
         shader.view = view;
 
         for (auto iter = begin; iter != end; ++iter) {
-          shader.model =
-            Mat4x4f::translation(ScaledX::get(*iter), ScaledY::get(*iter));
+          auto model =
+            Mat4x4f::translation(ScaledX::get(*iter), ScaledY::get(*iter)) *
+            Mat4x4f::scale(PointSize::get(*iter));
+          shader.model = model;
           shader.color = Fill::get(*iter);
 
           glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
