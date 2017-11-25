@@ -5,6 +5,7 @@
 #include <GLES2/gl2.h>
 
 #include <GLFW/glfw3.h>
+#include "../math/region.h"
 #include "glwrap.h"
 #include "shaders.h"
 

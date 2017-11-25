@@ -1,6 +1,7 @@
 #ifndef PLOT_ALL_H
 #define PLOT_ALL_H
 
+#include "../math/region.h"
 #include "math/LinAlg.h"
 
 namespace emp {

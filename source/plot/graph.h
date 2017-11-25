@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "math/LinAlg.h"
+#include "../math/region.h"
 #include "properties.h"
 
 namespace emp {
