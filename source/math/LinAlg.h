@@ -762,15 +762,12 @@ namespace emp {
         float viewAspect = viewWidth / viewHeight;
 
         if (screenAspect >= viewAspect) {
-          viewWidth = viewHeight * screenAspect / viewAspect;
+          viewWidth = viewWidth * screenAspect / screenAspect;
         } else {
-          viewHeight = viewWidth * viewAspect / screenAspect;
+          viewHeight = viewHeight * viewAspect / screenAspect;
         }
 
-        auto dx = viewWidth / 2;
-        auto dy = viewHeight / 2;
-
-        return ortho(-dx, -dy, dx, dy, near, far);
+        return ortho(0, 0, viewWidth, viewHeight, near, far);
       }
 
       constexpr Mat4x4f perspective(float minX, float minY, float maxX,
