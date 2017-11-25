@@ -165,7 +165,7 @@ namespace emp {
     /// Process a specified instruction on hardware that can be converted to the correct type.
     template <typename IN_HW>
     void ProcessInst(emp::Ptr<IN_HW> hw, const inst_t & inst) const {
-      emp_assert( dynamic_cast<hardware_t>(hw.Raw()) );
+      emp_assert( dynamic_cast<hardware_t*>(hw.Raw()) );
       inst_funs[inst.id](*(hw.template Cast<hardware_t>()), inst);
     }
 
