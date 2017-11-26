@@ -92,6 +92,10 @@ namespace emp {
     File & LoadLine(std::istream & input) {
       lines.emplace_back("");
       std::getline(input, lines.back());
+
+      // If the input file is DOS formatted, make sure to remove the \r at the end of each line.
+      if (lines.back().size() && lines.back().back() == '\r') lines.back().pop_back();
+
       return *this;
     }
 
