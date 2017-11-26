@@ -39,15 +39,15 @@ namespace emp {
 
     /// Information about what a particular state type means in a state grid.
     struct StateInfo {
-      int state_id;       ///< Ordinal id for this state.
-      char symbol;        ///< Symbol for printing this state.
-      double score_mult;  ///< Change factor for organism score by stepping on this squre.
-      std::string name;   ///< Name of this state.
-      std::string desc;   ///< Explanation of this state.
+      int state_id;        ///< Ordinal id for this state.
+      char symbol;         ///< Symbol for printing this state.
+      double score_change; ///< Change ammount for organism score by stepping on this squre.
+      std::string name;    ///< Name of this state.
+      std::string desc;    ///< Explanation of this state.
 
-      StateInfo(int _id, char _sym, double _mult,
+      StateInfo(int _id, char _sym, double _change,
                 const std::string & _name, const std::string & _desc)
-      : state_id(_id), symbol(_sym), score_mult(_mult), name(_name), desc(_desc) { ; }
+      : state_id(_id), symbol(_sym), score_change(_change), name(_name), desc(_desc) { ; }
       StateInfo(const StateInfo &) = default;
       StateInfo(StateInfo &&) = default;
       ~StateInfo() { ; }
@@ -78,7 +78,7 @@ namespace emp {
 
     // Convert from state ids...
     char GetSymbol(int state_id) const { return states[ GetKey(state_id) ].symbol; }
-    double GetScoreMult(int state_id) const { return states[ GetKey(state_id) ].score_mult; }
+    double GetScoreChange(int state_id) const { return states[ GetKey(state_id) ].score_change; }
     const std::string & GetName(int state_id) const { return states[ GetKey(state_id) ].name; }
     const std::string & GetDesc(int state_id) const { return states[ GetKey(state_id) ].desc; }
 
@@ -131,7 +131,7 @@ namespace emp {
     StateGrid & SetState(size_t x, size_t y, int in) { states[y*width+x] = in; return *this; }
 
     char GetSymbol(size_t x, size_t y) const { return info.GetSymbol(GetState(x,y)); }
-    double GetScoreMult(size_t x, size_t y) const { return info.GetScoreMult(GetState(x,y)); }
+    double GetScoreChange(size_t x, size_t y) const { return info.GetScoreChange(GetState(x,y)); }
     const std::string & GetName(size_t x, size_t y) const { return info.GetName(GetState(x,y)); }
 
     /// Setup the StateGridInfo with possible states.
@@ -141,6 +141,8 @@ namespace emp {
     /// Load in the contents of a StateGrid using the file information provided.
     template <typename... Ts>
     StateGrid & Load(Ts &&... args) {
+      std::cout << "Loading!" << std::endl;
+
       // Load this data from a stream or a file.
       File file(std::forward<Ts>(args)...);
       file.RemoveWhitespace();
@@ -150,6 +152,12 @@ namespace emp {
       emp_assert(height > 0);
       width = file[0].size();
       emp_assert(width > 0);
+
+      std::cout << "height = " << height << std::endl;
+      std::cout << "width  = " << width << std::endl;
+      for (size_t i = 0; i < width; i++) {
+        std::cout << i << " : " << file[0][i] << " (" << ((size_t)file[0][i])<< ")" << std::endl;
+      }
 
       // Now that we have the new size, resize the state grid.
       size_t size = width * height;
