@@ -134,6 +134,10 @@ namespace emp {
     double GetScoreMult(size_t x, size_t y) const { return info.GetScoreMult(GetState(x,y)); }
     const std::string & GetName(size_t x, size_t y) const { return info.GetName(GetState(x,y)); }
 
+    /// Setup the StateGridInfo with possible states.
+    template <typename... Ts>
+    void AddState(Ts &&... args) { info.AddState(std::forward<Ts>(args)...); }
+
     /// Load in the contents of a StateGrid using the file information provided.
     template <typename... Ts>
     StateGrid & Load(Ts &&... args) {
