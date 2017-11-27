@@ -267,7 +267,7 @@ namespace emp {
       return *(pop[id]);
     }
 
-    /// Retrieve a const reference to the organsim as the specified position.
+    /// Retrieve a reference to the organsim as the specified position.
     /// Same as operator[]; will trip assert if cell is not occupied.
     ORG & GetOrg(size_t id) {
       emp_assert(pop[id] != nullptr, id);  // Should not index to a null organism!
