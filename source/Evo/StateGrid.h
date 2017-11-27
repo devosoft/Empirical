@@ -125,14 +125,42 @@ namespace emp {
     size_t GetSize() const { return states.size(); }
     const StateGridInfo & GetInfo() const { return info; }
 
-    int & operator()(size_t x, size_t y) { return states[y*width+x]; }
-    int operator()(size_t x, size_t y) const { return states[y*width+x]; }
-    int GetState(size_t x, size_t y) const { return states[y*width+x]; }
-    StateGrid & SetState(size_t x, size_t y, int in) { states[y*width+x] = in; return *this; }
-
-    char GetSymbol(size_t x, size_t y) const { return info.GetSymbol(GetState(x,y)); }
-    double GetScoreChange(size_t x, size_t y) const { return info.GetScoreChange(GetState(x,y)); }
-    const std::string & GetName(size_t x, size_t y) const { return info.GetName(GetState(x,y)); }
+    int & operator()(size_t x, size_t y) {
+      emp_assert(x < width);
+      emp_assert(y < height);
+      return states[y*width+x];
+    }
+    int operator()(size_t x, size_t y) const {
+      emp_assert(x < width);
+      emp_assert(y < height);
+      return states[y*width+x];
+    }
+    int GetState(size_t x, size_t y) const {
+      emp_assert(x < width);
+      emp_assert(y < height);
+      return states[y*width+x];
+    }
+    StateGrid & SetState(size_t x, size_t y, int in) {
+      emp_assert(x < width);
+      emp_assert(y < height);
+      states[y*width+x] = in;
+      return *this;
+    }
+    char GetSymbol(size_t x, size_t y) const {
+      emp_assert(x < width);
+      emp_assert(y < height);
+      return info.GetSymbol(GetState(x,y));
+    }
+    double GetScoreChange(size_t x, size_t y) const {
+      emp_assert(x < width);
+      emp_assert(y < height);
+      return info.GetScoreChange(GetState(x,y));
+    }
+    const std::string & GetName(size_t x, size_t y) const {
+      emp_assert(x < width);
+      emp_assert(y < height);
+      return info.GetName(GetState(x,y));
+    }
 
     /// Setup the StateGridInfo with possible states.
     template <typename... Ts>
@@ -152,12 +180,6 @@ namespace emp {
       emp_assert(height > 0);
       width = file[0].size();
       emp_assert(width > 0);
-
-      std::cout << "height = " << height << std::endl;
-      std::cout << "width  = " << width << std::endl;
-      for (size_t i = 0; i < width; i++) {
-        std::cout << i << " : " << file[0][i] << " (" << ((size_t)file[0][i])<< ")" << std::endl;
-      }
 
       // Now that we have the new size, resize the state grid.
       size_t size = width * height;
