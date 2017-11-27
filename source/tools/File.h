@@ -164,7 +164,7 @@ namespace emp {
 
     /// Delete all whitespace; by default keep newlines.
     File & RemoveWhitespace(bool keep_newlines=true) {
-      Apply(compress_whitespace);
+      Apply(remove_whitespace);
       RemoveEmpty();
       if (!keep_newlines) {
         std::string all_lines;
