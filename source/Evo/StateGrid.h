@@ -126,39 +126,39 @@ namespace emp {
     const StateGridInfo & GetInfo() const { return info; }
 
     int & operator()(size_t x, size_t y) {
-      emp_assert(x < width);
-      emp_assert(y < height);
+      emp_assert(x < width, x, width);
+      emp_assert(y < height, y, height);
       return states[y*width+x];
     }
     int operator()(size_t x, size_t y) const {
-      emp_assert(x < width);
-      emp_assert(y < height);
+      emp_assert(x < width, x, width);
+      emp_assert(y < height, y, height);
       return states[y*width+x];
     }
     int GetState(size_t x, size_t y) const {
-      emp_assert(x < width);
-      emp_assert(y < height);
+      emp_assert(x < width, x, width);
+      emp_assert(y < height, y, height);
       return states[y*width+x];
     }
     StateGrid & SetState(size_t x, size_t y, int in) {
-      emp_assert(x < width);
-      emp_assert(y < height);
+      emp_assert(x < width, x, width);
+      emp_assert(y < height, y, height);
       states[y*width+x] = in;
       return *this;
     }
     char GetSymbol(size_t x, size_t y) const {
-      emp_assert(x < width);
-      emp_assert(y < height);
+      emp_assert(x < width, x, width);
+      emp_assert(y < height, y, height);
       return info.GetSymbol(GetState(x,y));
     }
     double GetScoreChange(size_t x, size_t y) const {
-      emp_assert(x < width);
-      emp_assert(y < height);
+      emp_assert(x < width, x, width);
+      emp_assert(y < height, y, height);
       return info.GetScoreChange(GetState(x,y));
     }
     const std::string & GetName(size_t x, size_t y) const {
-      emp_assert(x < width);
-      emp_assert(y < height);
+      emp_assert(x < width, x, width);
+      emp_assert(y < height, y, height);
       return info.GetName(GetState(x,y));
     }
 
