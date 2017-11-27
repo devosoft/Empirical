@@ -53,6 +53,9 @@ public:
     return score;
   }
 
+  emp::StateGrid & GetStateGrid() { return state_grid; }
+  const emp::StateGrid & GetStateGrid() const { return state_grid; }
+
   void ResetHardware() {
     base_t::ResetHardware();
     score = 0;
@@ -157,7 +160,8 @@ int main()
 
   state_grid.Load("state_grids/islands_50x50.cfg");
 
-  std::cout << "Width = " << state_grid.GetWidth() << std::endl;
+  // When an organism is added to the world, supply it with a state grid.
+  world.OnOrgPlacement( [&state_grid, &world](size_t pos){ world.GetOrg(pos).SetStateGrid(state_grid); } );
 
   world.SetWellMixed(true);
 
