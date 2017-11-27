@@ -522,7 +522,20 @@ namespace emp {
   }
 
   class AvidaGP : public AvidaCPU_Base<AvidaGP> {
+  public:
+    using base_t = AvidaCPU_Base<AvidaGP>;
+    using typename base_t::genome_t;
+    using typename base_t::inst_lib_t;
 
+    AvidaGP(const genome_t & in_genome) : AvidaCPU_Base(in_genome) { ; }
+    AvidaGP(Ptr<const inst_lib_t> inst_lib) : AvidaCPU_Base(Genome(inst_lib)) { ; }
+    AvidaGP(const inst_lib_t & inst_lib) : AvidaCPU_Base(Genome(&inst_lib)) { ; }
+
+    AvidaGP() = default;
+    AvidaGP(const AvidaGP &) = default;
+    AvidaGP(AvidaGP &&) = default;
+
+    virtual ~AvidaGP() { ; }
   };
 }
 
