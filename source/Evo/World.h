@@ -86,6 +86,14 @@ namespace emp {
   class World {
     friend class World_iterator< World<ORG> >;
   public:
+    /// A helper struct to keep track of where an organism is in the World.  For the moment,
+    /// the only informaiton beyond index position is active (vs. next) population when
+    /// using synchronous generations.
+    struct OrgPosition {
+      size_t pos;      ///< Index of this organism.
+      bool is_active;  ///< Is this organism in the active population (vs. waiting for Update)
+    };
+
     // --- Publicly available types ---
     using this_t = World<ORG>;                 ///< Resolved type of this templated class.
     using org_t = ORG;                         ///< Type of organisms in this world.
