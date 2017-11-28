@@ -90,8 +90,10 @@ namespace emp {
     /// the only informaiton beyond index position is active (vs. next) population when
     /// using synchronous generations.
     struct OrgPosition {
-      size_t pos;      ///< Index of this organism.
+      size_t index;    ///< Position of this organism in the population.
       bool is_active;  ///< Is this organism in the active population (vs. waiting for Update)
+
+      OrgPosition(size_t _id, bool _active=true) : index(_id), is_active(_active) { ; }
     };
 
     // --- Publicly available types ---
@@ -118,11 +120,11 @@ namespace emp {
     /// Function type for retrieving a genome from an organism.
     using fun_get_genome_t   = std::function<const genome_t & (ORG &)>;
 
-    /// Function type for injecting organisms into a world
-    using fun_add_inject_t   = std::function<size_t(Ptr<ORG>)>;
+    /// Function type for injecting organisms into a world (returns inject position)
+    using fun_add_inject_t   = std::function<OrgPosition(Ptr<ORG>)>;
 
-    /// Function type for adding a newly born organism into a world.
-    using fun_add_birth_t    = std::function<size_t(Ptr<ORG>, size_t)>;
+    /// Function type for adding a newly born organism into a world (returns birth position)
+    using fun_add_birth_t    = std::function<OrgPosition(Ptr<ORG>, size_t)>;
 
     /// Function type for identifying an organism's random neighbor.
     using fun_get_neighbor_t = std::function<size_t(size_t)>;
@@ -177,10 +179,10 @@ namespace emp {
     Signal<void(size_t)> on_death_sig;        ///< Trigger when any organism dies.
 
     /// AddOrgAt is the only way to add organisms to active population (others must go through here)
-    size_t AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
+    OrgPosition AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
 
     /// AddNextOrgAt build up the next population during synchronous generations.
-    size_t AddNextOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
+    OrgPosition AddNextOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
 
     /// RemoveOrgAt is the only way to remove an active organism.
     void RemoveOrgAt(size_t pos);
@@ -415,7 +417,8 @@ namespace emp {
     /// Return:   Key value needed to make future modifications.
     SignalKey OnInjectReady(const std::function<void(ORG &)> & fun) { return inject_ready_sig.AddAction(fun); }
 
-    /// Provide a function for World to call immediately after any organism has been added.
+    /// Provide a function for World to call immediately after any organism has been added to the
+    /// active population.  With synchonous generations, this occurs on Update().
     /// Trigger:  Organism has been added to population (either born or injected)
     /// Argument: Position of organism placed in the population.
     /// Return:   Key value needed to make future modifications.
@@ -634,7 +637,8 @@ namespace emp {
   // =============================================================
 
   template <typename ORG>
-  size_t World<ORG>::AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype) {
+  typename World<ORG>::OrgPosition
+  World<ORG>::AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype) {
     emp_assert(new_org, pos);                            // The new organism must exist.
 
     // Determine new organism's genotype.
@@ -648,11 +652,12 @@ namespace emp {
     if (genotypes.size() <= pos) genotypes.resize(pos+1, nullptr);   // Make sure we fit genotypes.
     genotypes[pos] = new_genotype;
 
-    return pos;
+    return OrgPosition(pos, true);
   }
 
   template <typename ORG>
-  size_t World<ORG>::AddNextOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype) {
+  typename World<ORG>::OrgPosition
+  World<ORG>::AddNextOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype) {
     emp_assert(new_org, pos);                            // The new organism must exist.
 
     // Determine new organism's genotype.
@@ -665,7 +670,7 @@ namespace emp {
     if (next_genotypes.size() <= pos) next_genotypes.resize(pos+1, nullptr);  // Make sure we fit genotypes.
     next_genotypes[pos] = new_genotype;
 
-    return pos;
+    return OrgPosition(pos, false);
   }
 
   template<typename ORG>
@@ -894,9 +899,14 @@ namespace emp {
       std::swap(genotypes, next_genotypes);   // Move next_genotypes into place.
       next_genotypes.resize(0);               // Clear out genotype names.
 
-      // Update the organism count.
+      // Update the active population.
       num_orgs = 0;
-      for (size_t i = 0; i < pop.size(); i++) if (pop[i]) ++num_orgs;
+      for (size_t i = 0; i < pop.size(); i++) {
+        if (pop[i]) {                    // If position is occupied n the newly active population...
+          ++num_orgs;                    // ...keep count of number of organisms
+          org_placement_sig.Trigger(i);  // ...and trigger org placement.
+        }
+      }
     }
 
     // 3. Handle any data files that need to be printed this update.
@@ -939,9 +949,9 @@ namespace emp {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       inject_ready_sig.Trigger(*new_org);
-      const size_t pos = fun_add_inject(new_org);
+      const OrgPosition pos = fun_add_inject(new_org);
       //SetupOrg(*new_org, &callbacks, pos);
-      org_placement_sig.Trigger(pos);
+      if (pos.is_active) org_placement_sig.Trigger(pos.index);
     }
   }
 
@@ -984,8 +994,8 @@ namespace emp {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       offspring_ready_sig.Trigger(*new_org);
-      const size_t pos = fun_add_birth(new_org, parent_pos);
-      org_placement_sig.Trigger(pos);
+      OrgPosition pos = fun_add_birth(new_org, parent_pos);
+      if (pos.is_active) org_placement_sig.Trigger(pos.index);
       // SetupOrg(*new_org, &callbacks, pos);
     }
   }
