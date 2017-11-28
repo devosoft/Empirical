@@ -270,6 +270,7 @@ namespace emp {
     /// Retrieve a reference to the organsim as the specified position.
     /// Same as operator[]; will trip assert if cell is not occupied.
     ORG & GetOrg(size_t id) {
+      emp_assert(id < pop.size());         // Pop must be large enough.
       emp_assert(pop[id] != nullptr, id);  // Should not index to a null organism!
       return *(pop[id]);
     }
@@ -281,6 +282,14 @@ namespace emp {
     /// Retrive a pointer to the contents of a speciefied cell; will be nullptr if the cell is
     /// not occupied.
     const Ptr<ORG> GetOrgPtr(size_t id) const { return pop[id]; }
+
+    /// Retrieve a reference to the organsim as the specified position in the NEXT population.
+    /// Will trip assert if cell is not occupied.
+    ORG & GetNextOrg(size_t id) {
+      emp_assert(id < next_pop.size());         // Next pop must be large enough.
+      emp_assert(next_pop[id] != nullptr, id);  // Should not index to a null organism!
+      return *(next_pop[id]);
+    }
 
     /// Retrieve the genome corresponding to a specified organism.
     const genome_t & GetGenome(ORG & org) { return fun_get_genome(org); }
