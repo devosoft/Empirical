@@ -548,7 +548,7 @@ namespace emp {
     template <typename... ARGS> void InjectRandomOrg(ARGS &&... args);
 
     /// Place a newborn organism into the population, by default rules and with parent information.
-    size_t DoBirth(const genome_t & mem, size_t parent_pos);
+    OrgPosition DoBirth(const genome_t & mem, size_t parent_pos);
 
     /// Place multiple copies of a newborn organism into the population.
     void DoBirth(const genome_t & mem, size_t parent_pos, size_t copy_count);
@@ -977,12 +977,12 @@ namespace emp {
 
   // Give birth to a single offspring; return offspring position.
   template <typename ORG>
-  size_t World<ORG>::DoBirth(const genome_t & mem, size_t parent_pos) {
+  typename World<ORG>::OrgPosition World<ORG>::DoBirth(const genome_t & mem, size_t parent_pos) {
     before_repro_sig.Trigger(parent_pos);
     Ptr<ORG> new_org = NewPtr<ORG>(mem);
     offspring_ready_sig.Trigger(*new_org);
-    const size_t pos = fun_add_birth(new_org, parent_pos);
-    org_placement_sig.Trigger(pos);
+    const OrgPosition pos = fun_add_birth(new_org, parent_pos);
+    if (pos.is_active) org_placement_sig.Trigger(pos.index);
     // SetupOrg(*new_org, &callbacks, pos);
     return pos;
   }
@@ -994,7 +994,7 @@ namespace emp {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       offspring_ready_sig.Trigger(*new_org);
-      OrgPosition pos = fun_add_birth(new_org, parent_pos);
+      const OrgPosition pos = fun_add_birth(new_org, parent_pos);
       if (pos.is_active) org_placement_sig.Trigger(pos.index);
       // SetupOrg(*new_org, &callbacks, pos);
     }
