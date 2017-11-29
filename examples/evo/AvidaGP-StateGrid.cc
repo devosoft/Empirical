@@ -42,6 +42,9 @@ public:
   SGOrg(SGOrg &&) = default;
 
   emp::StateGridStatus GetSGStatus() const { return sg_status; }
+  emp::StateGrid & GetStateGrid() { return state_grid; }
+  const emp::StateGrid & GetStateGrid() const { return state_grid; }
+  double GetScore() const { return score; }
 
   void SetPosition(size_t x, size_t y) { sg_status.SetPos(x,y); }
   void SetFacing(size_t facing) { sg_status.SetFacing(facing); }
@@ -52,9 +55,6 @@ public:
     Process(200);
     return score;
   }
-
-  emp::StateGrid & GetStateGrid() { return state_grid; }
-  const emp::StateGrid & GetStateGrid() const { return state_grid; }
 
   void ResetHardware() {
     base_t::ResetHardware();
@@ -186,10 +186,13 @@ int main()
   // Do the run...
   for (size_t ud = 0; ud < UPDATES; ud++) {
     // Progress output...
-    std::cout << "Update " << ud << std::endl;
+    std::cout << "Update " << ud;
 
     // Keep the best individual.
     EliteSelect(world, 1, 1);
+
+    std::cout << "  fitness[0] = " << world.GetOrg(0).GetScore()
+              << std::endl;
 
     // Run a tournament for the rest...
     TournamentSelect(world, 5, POP_SIZE-1);
