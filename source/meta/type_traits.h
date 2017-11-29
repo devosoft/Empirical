@@ -51,6 +51,31 @@ namespace emp {
     static constexpr bool SameBase() { return true; }
     static constexpr bool ConvertOK(T *) { return false; }
   };
+  
+  namespace detail {
+    template <typename Fn, typename... Args>
+    struct is_invocable_helper {
+     private:
+      // This function will be called iff Fn can be converted to a function which takes Args... as arguments
+      // notice that it deduces its return type with decltype(std::declval<U>()(std::declval<Args>()...)), which does not throw errors
+      // even if U is not callable because of SFINAE
+      template <typename U>
+      static std::true_type check(const std::function<decltype(std::declval<U>()(std::declval<Args>()...))(Args...)>&)
+      { return {}; }
+      
+      // Catchall which handles the cases where U is not callable with Args arguments
+      template <typename U>
+      static std::false_type check(...)
+      { return {}; }
+
+     public:
+      static constexpr decltype(check<Fn>(std::declval<Fn>())) value()
+      { return {}; }
+    };
+  } // namespace detail
+
+  template <typename Fn, typename... Args>
+  struct is_invocable : decltype(detail::is_invocable_helper<Fn, Args...>::value()) {};
 }
 
 
