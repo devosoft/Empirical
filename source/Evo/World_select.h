@@ -172,6 +172,99 @@ namespace emp {
     }
   }
 
+    // EcoSelect works like Tournament Selection, but also uses a vector of supplimentary fitness
+    // functions.  The best individuals on each supplemental function divide up a resource pool.
+    // NOTE: You must turn off the FitnessCache for this function to work properly.
+    template<typename ORG>
+    void EcoSelect(World<ORG> & world, const emp::vector<std::function<double(const ORG &)> > & extra_funs,
+                   const emp::vector<double> & pool_sizes, size_t t_size, size_t tourny_count=1)
+    {
+      emp_assert(world.GetFitFun(), "Must define a base fitness function");
+      emp_assert(world.GetSize() > 0);
+      emp_assert(t_size > 0 && t_size <= world.GetSize(), t_size, world.GetSize());
+      emp_assert(world.IsCacheOn() == false, "Ecologies mean constantly changing fitness!");
+
+    //   if (world.IsCacheOn()) {
+    //       world.ClearCache();
+    //   }
+
+      // Setup info to track fitnesses.
+      emp::vector<double> base_fitness(world.GetSize());
+      emp::vector< emp::vector<double> > extra_fitnesses(extra_funs.size());
+      emp::vector<double> max_extra_fit(extra_funs.size(), 0.0);
+      emp::vector<size_t> max_count(extra_funs.size(), 0);
+      for (size_t i=0; i < extra_funs.size(); i++) {
+        extra_fitnesses[i].resize(world.GetSize());
+      }
+
+      // Collect all fitness info.
+      for (size_t org_id = 0; org_id < world.GetSize(); org_id++) {
+        base_fitness[org_id] = world.CalcFitnessID(org_id);
+        for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
+          double cur_fit = extra_funs[ex_id](world[org_id]);
+          extra_fitnesses[ex_id][org_id] = cur_fit;
+          if (cur_fit > max_extra_fit[ex_id]) {
+            max_extra_fit[ex_id] = cur_fit;
+            max_count[ex_id] = 1;
+          }
+          else if (cur_fit == max_extra_fit[ex_id]) {
+            max_count[ex_id]++;
+          }
+        }
+      }
+
+      // Readjust base fitness to reflect extra resources.
+      for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
+        if (max_count[ex_id] == 0) continue;  // No one gets this reward...
+
+        // The current bonus is divided up among the organisms that earned it...
+        const double cur_bonus = pool_sizes[ex_id] / max_count[ex_id];
+        // std::cout << "Bonus " << ex_id << " = " << cur_bonus
+        //           << "   max_extra_fit = " << max_extra_fit[ex_id]
+        //           << "   max_count = " << max_count[ex_id]
+        //           << std::endl;
+
+        for (size_t org_id = 0; org_id < world.GetSize(); org_id++) {
+          // If this organism is the best at the current resource, git it the bonus!
+          if (extra_fitnesses[ex_id][org_id] == max_extra_fit[ex_id]) {
+            base_fitness[org_id] += cur_bonus;
+          }
+        }
+      }
+
+
+      emp::vector<size_t> entries;
+      for (size_t T = 0; T < tourny_count; T++) {
+        entries.resize(0);
+        for (size_t i=0; i<t_size; i++) entries.push_back( world.GetRandomOrgID() ); // Allows replacement!
+
+        double best_fit = base_fitness[entries[0]];
+        size_t best_id = entries[0];
+
+        // Search for a higher fit org in the tournament.
+        for (size_t i = 1; i < t_size; i++) {
+          const double cur_fit = base_fitness[entries[i]];
+          if (cur_fit > best_fit) {
+            best_fit = cur_fit;
+            best_id = entries[i];
+          }
+        }
+
+        // Place the highest fitness into the next generation!
+        world.DoBirth( world.GetGenomeAt(best_id), best_id, 1 );
+      }
+    }
+
+    /// EcoSelect can be provided a single value if all pool sizes are identical.
+    template<typename ORG>
+    void EcoSelect(World<ORG> & world, const emp::vector<std::function<double(const ORG &)> > & extra_funs,
+                   double pool_sizes, size_t t_size, size_t tourny_count=1)
+    {
+      emp::vector<double> pools(extra_funs.size(), pool_sizes);
+      EcoSelect(world, extra_funs, pools, t_size, tourny_count);
+    }
+
+
 }
 
 #endif
