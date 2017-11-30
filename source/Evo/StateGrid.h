@@ -238,30 +238,30 @@ namespace emp {
     StateGridStatus & operator=(const StateGridStatus &) = default;
     StateGridStatus & operator=(StateGridStatus &&) = default;
 
-    size_t GetX() const { return x; }
-    size_t GetY() const { return y; }
-    size_t GetFacing() const { return facing; }
+    size_t GetX() const { return cur_state.x; }
+    size_t GetY() const { return cur_state.y; }
+    size_t GetFacing() const { return cur_state.facing; }
 
-    StateGridStatus & SetX(size_t _x) { x = _x; return *this; }
-    StateGridStatus & SetY(size_t _y) { y = _y; return *this; }
-    StateGridStatus & SetPos(size_t _x, size_t _y) { x = _x; y = _y; return *this; }
-    StateGridStatus & SetFacing(size_t _f) { facing = _f; return *this; }
+    StateGridStatus & SetX(size_t _x) { cur_state.x = _x; return *this; }
+    StateGridStatus & SetY(size_t _y) { cur_state.y = _y; return *this; }
+    StateGridStatus & SetPos(size_t _x, size_t _y) { cur_state.x = _x; cur_state.y = _y; return *this; }
+    StateGridStatus & SetFacing(size_t _f) { cur_state.facing = _f; return *this; }
 
     /// Move explicitly in the x direction (regardless of facing).
     void MoveX(const StateGrid & grid, int steps=1) {
       emp_assert(grid.GetWidth(), grid.GetWidth());
-      x = (size_t) Mod(steps + (int) x, (int) grid.GetWidth());
+      cur_state.x = (size_t) Mod(steps + (int) cur_state.x, (int) grid.GetWidth());
     }
 
     /// Move explicitly in the y direction (regardless of facing).
     void MoveY(const StateGrid & grid, int steps=1) {
       emp_assert(grid.GetHeight(), grid.GetHeight());
-      y = (size_t) Mod(steps + (int) y, (int) grid.GetHeight());
+      cur_state.y = (size_t) Mod(steps + (int) cur_state.y, (int) grid.GetHeight());
     }
 
     /// Move in the direction currently faced.
     void Move(const StateGrid & grid, int steps=1) {
-      switch (facing) {
+      switch (cur_state.facing) {
         case 0: MoveX(grid, -steps); MoveY(grid, -steps); break;
         case 1:                      MoveY(grid, -steps); break;
         case 2: MoveX(grid, +steps); MoveY(grid, -steps); break;
@@ -275,17 +275,17 @@ namespace emp {
 
     /// Rotate starting from current facing.
     void Rotate(int turns=1) {
-      facing = Mod(facing + turns, 8);
+      cur_state.facing = Mod(cur_state.facing + turns, 8);
     }
 
     /// Examine state of current position.
     int Scan(const StateGrid & grid) {
-      return grid(x,y);
+      return grid(cur_state.x, cur_state.y);
     }
 
     /// Set the current position in the state grid.
     void Set(StateGrid & grid, int new_state) {
-      grid.SetState(x,y,new_state);
+      grid.SetState(cur_state.x, cur_state.y, new_state);
     }
   };
 
