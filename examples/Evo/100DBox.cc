@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 
   using ORG_TYPE = emp::vector<double>;
 
-  emp::Random random;
+  emp::Random random(config.SEED());
   emp::World<ORG_TYPE> world(random, "BoxWorld");
   world.SetWellMixed(true);
 
@@ -103,6 +103,8 @@ int main(int argc, char* argv[])
 
   world.SetFitFun(goal_function);
 
+  world.SetupFitnessFile();
+
   emp::vector< std::function<double(const ORG_TYPE &)> > fit_set;
 
   // Good hints
@@ -128,20 +130,20 @@ int main(int argc, char* argv[])
   // Do the run...
   for (size_t ud = 0; ud < UPDATES; ud++) {
     // Update the status of all organisms.
-    double fit0 = world.CalcFitnessID(0);
-    std::cout << (ud+1) << " : " << emp::to_string(world[0]) << " : " << fit0 << std::endl << std::endl;;
+    // double fit0 = world.CalcFitnessID(0);
+    // std::cout << (ud+1) << " : " << emp::to_string(world[0]) << " : " << fit0 << std::endl << std::endl;;
 
     // Keep the best individual.
-    EliteSelect(world, 1, 1);
+    // EliteSelect(world, 1, 1);
 
     // Run a tournament for the rest...
 
     if (SELECTION == "TOURNAMENT") {
-        TournamentSelect(world, 20, POP_SIZE-1);
+        TournamentSelect(world, 20, POP_SIZE);
     } else if (SELECTION == "LEXICASE") {
-        LexicaseSelect(world, fit_set, POP_SIZE-1);
+        LexicaseSelect(world, fit_set, POP_SIZE);
     } else if (SELECTION == "RESOURCE") {
-        ResourceSelect(world, fit_set, resources, 20, POP_SIZE-1);
+        ResourceSelect(world, fit_set, resources, 20, POP_SIZE);
     } else {
         std::cout << "ERROR: INVALID SELECTION SCHEME: " << SELECTION << std::endl;
         exit(1);
@@ -152,11 +154,11 @@ int main(int argc, char* argv[])
     world.DoMutations(1);
   }
 
-  std::cout << std::endl;
-
-  std::cout << emp::to_string(world[0]) << " " << goal_function(world[0]) << "  ";
-
-  std::cout << std::endl;
+  // std::cout << std::endl;
+  //
+  // std::cout << emp::to_string(world[0]) << " " << goal_function(world[0]) << "  ";
+  //
+  // std::cout << std::endl;
 
   return 0;
 }
