@@ -218,11 +218,20 @@ namespace emp {
   /// Information about a particular agent on a state grid.
   class StateGridStatus {
   protected:
-    size_t x;       ///< X-coordinate of this agent
-    size_t y;       ///< Y-coordinate of this agent.
-    size_t facing;  ///< 0=UL, 1=Up, 2=UR, 3=Right, 4=DR, 5=Down, 6=DL, 7=Left (+=Clockwise)
+    struct State {
+      size_t x;         ///< X-coordinate of this agent
+      size_t y;         ///< Y-coordinate of this agent.
+      size_t facing;    ///< 0=UL, 1=Up, 2=UR, 3=Right, 4=DR, 5=Down, 6=DL, 7=Left (+=Clockwise)
+
+      State(size_t _x=0, size_t _y=0, size_t _f=1) : x(_x), y(_y), facing(_f) { ; }
+    };
+
+    State cur_state;             ///< Position and facing currently used.
+    bool track_moves;            ///< Should we record every move made by this organism?
+    emp::vector<State> history;  ///< All previous positions and facings in this path.
+
   public:
-    StateGridStatus() : x(0), y(0), facing(1) { ; }
+    StateGridStatus() : cur_state(0,0,1), track_moves(false) { ; }
     StateGridStatus(const StateGridStatus &) = default;
     StateGridStatus(StateGridStatus &&) = default;
 
