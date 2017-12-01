@@ -682,7 +682,7 @@ namespace emp {
     pop[pos].Delete();                       // Delete the organism...
     pop[pos] = nullptr;                      // ...and reset the pointer to null
     --num_orgs;                              // Track one fewer organisms in the population
-     if (cache_on) ClearCache(pos);          // Delete any cached info about this organism
+    if (cache_on) ClearCache(pos);           // Delete any cached info about this organism
     systematics.RemoveOrg( genotypes[pos] ); // Notify systematics about organism removal
     genotypes[pos] = nullptr;                // No longer track a genotype at this position
   }
@@ -1050,6 +1050,7 @@ namespace emp {
       // Clear out all of the organisms we are removing and resize the population.
       for (size_t i = new_size; i < pop.size(); ++i) RemoveOrgAt(i);
       pop.resize(new_size);
+      ClearCache();
     }
   }
 
@@ -1062,7 +1063,10 @@ namespace emp {
       // Loop over the current population to clear out anyone who fails to be transferred.
       const double remove_frac = 1.0 - keep_frac;
       for (size_t i = 0; i < pop.size(); ++i) {
-        if (random_ptr->P(remove_frac)) RemoveOrgAt(i);
+        if (random_ptr->P(remove_frac)) {
+          RemoveOrgAt(i);
+          ClearCache(i);
+        }
       }
     }
 
@@ -1082,6 +1086,7 @@ namespace emp {
 
       // Reflect the new population size.
       pop.resize(live_pos);
+      ClearCache();
     }
   }
 
