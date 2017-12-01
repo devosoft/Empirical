@@ -598,6 +598,8 @@ namespace emp {
     /// Run population through a bottleneck to (potentially) shrink it.
     void DoBottleneck(const size_t new_size, bool choose_random=true);
 
+    /// Perform a Serial Transfer where a fixed percentage of current organisms are maintained.
+    void SerialTransfer(const double keep_frac);
 
     // --- PRINTING ---
 
@@ -1036,14 +1038,51 @@ namespace emp {
   // Run population through a bottleneck to (potentially) shrink it.
   template<typename ORG>
   void World<ORG>::DoBottleneck(const size_t new_size, bool choose_random) {
-    if (new_size >= pop.size()) return;  // No bottleneck needed!
+    if (new_size >= num_orgs) return;  // No bottleneck needed!
 
-    // If we are supposed to keep only random organisms, shuffle the beginning into place!
-    if (choose_random) emp::Shuffle<Ptr<ORG>>(*random_ptr, pop, new_size);
+    if (is_structured) {
+      // @CAO: Need to implement bottlenecks for structured populations.
+      emp_assert(false, "Not implemented yet.");
+    } else {
+      // If we are supposed to keep only random organisms, shuffle the beginning into place!
+      if (choose_random) emp::Shuffle<Ptr<ORG>>(*random_ptr, pop, new_size);
 
-    // Clear out all of the organisms we are removing and resize the population.
-    for (size_t i = new_size; i < pop.size(); ++i) RemoveOrgAt(i);
-    pop.resize(new_size);
+      // Clear out all of the organisms we are removing and resize the population.
+      for (size_t i = new_size; i < pop.size(); ++i) RemoveOrgAt(i);
+      pop.resize(new_size);
+    }
+  }
+
+  template<typename ORG>
+  void World<ORG>::SerialTransfer(const double keep_frac) {
+    emp_assert(keep_frac >= 0.0 && keep_frac <= 1.0, keep_frac);
+
+    // For a structured population, test position-by-position.
+    if (is_structured) {
+      // Loop over the current population to clear out anyone who fails to be transferred.
+      const double remove_frac = 1.0 - keep_frac;
+      for (size_t i = 0; i < pop.size(); ++i) {
+        if (random_ptr->P(remove_frac)) RemoveOrgAt(i);
+      }
+    }
+
+    // For an unstructured population, keep all living organisms at the beginning.
+    else {
+      size_t live_pos = 0;
+      for (size_t test_pos = 0; test_pos < pop.size(); test_pos++) {
+        // If this organism is kept, keep it compact with the others.
+        if (random_ptr->P(keep_frac)) {
+          pop[live_pos] = pop[test_pos];
+          live_pos++;
+        }
+
+        // This organism didn't make the cut; kill it.
+        else RemoveOrgAt(test_pos);
+      }
+
+      // Reflect the new population size.
+      pop.resize(live_pos);
+    }
   }
 
   template<typename ORG>
