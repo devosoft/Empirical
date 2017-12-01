@@ -23,6 +23,7 @@ EMP_BUILD_CONFIG( BoxConfig,
   VALUE(N_GOOD, int, 0, "Number of good fitness functions"),
   VALUE(N_BAD, int, 0, "Number of bad fitness functions"),
   VALUE(DISTANCE_CUTOFF, double, 0, "How close to origin does fitness gradient start"),
+  VALUE(RESOURCE_INFLOW, double, 100, "How much resource enters the world each update"),
   VALUE(PROBLEM_DIMENSIONS, int, 10, "How many axes does the box have?")
 )
 
@@ -41,7 +42,8 @@ int main(int argc, char* argv[])
   const int N_GOOD = config.N_GOOD();
   const int N_BAD = config.N_BAD();
   const int PROBLEM_DIMENSIONS = config.PROBLEM_DIMENSIONS();
-  const float DISTANCE_CUTOFF = config.DISTANCE_CUTOFF();
+  const double DISTANCE_CUTOFF = config.DISTANCE_CUTOFF();
+  const double RESOURCE_INFLOW = config.RESOURCE_INFLOW();
   const std::string SELECTION = config.SELECTION();
 
   const int GENOME_SIZE = PROBLEM_DIMENSIONS + N_NEUTRAL;
@@ -55,7 +57,7 @@ int main(int argc, char* argv[])
 
   emp::vector<emp::Resource> resources;
   for (int i=0; i<GENOME_SIZE; i++) {
-      resources.push_back(emp::Resource(100, 100, .01));
+      resources.push_back(emp::Resource(RESOURCE_INFLOW, RESOURCE_INFLOW, .01));
   }
 
   world.OnUpdate([&resources](int ud){
