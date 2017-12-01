@@ -326,7 +326,7 @@ namespace emp {
   // return a pointer for the associated taxon.
   template <typename ORG_INFO>
   Ptr<Taxon<ORG_INFO>> Systematics<ORG_INFO>::AddOrg(const ORG_INFO & info, Ptr<taxon_t> cur_taxon) {
-    emp_assert( !cur_taxon || Has(active_taxa, cur_taxon) );
+    emp_assert( !cur_taxon || Has(active_taxa, cur_taxon));
 
     // Update stats
     org_count++;                  // Keep count of how many organisms are being tracked.

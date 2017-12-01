@@ -1,6 +1,8 @@
 #ifndef EMP_EVO_RESOURCE_H
 #define EMP_EVO_RESOURCE_H
 
+#include "World.h"
+
 namespace emp {
 
     class Resource {

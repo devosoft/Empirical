@@ -11,6 +11,7 @@
 #define EMP_EVO_WORLD_SELECT_H
 
 #include <map>
+#include <functional>
 
 #include "../base/assert.h"
 #include "../base/vector.h"

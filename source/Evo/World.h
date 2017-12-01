@@ -292,7 +292,7 @@ namespace emp {
     const Systematics<genome_t> & GetSystematics() const { return systematics; }
 
     void SystematicsOff() {
-        systematics.SetStoreActive(false);
+        // systematics.SetStoreActive(false);
         systematics.SetStoreOutside(false);
         systematics.SetStoreAncestors(false);
         systematics.SetArchive(false);
