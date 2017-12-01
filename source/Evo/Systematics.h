@@ -231,6 +231,20 @@ namespace emp {
 
     /// Calculate the genetic diversity of the population.
     double CalcDiversity();
+
+    /// Are we storing all taxa that are still alive in the population?
+    void SetStoreActive(bool new_val) { store_active = new_val; }
+
+    /// Are we storing all taxa that are the ancestors of living organims in the population?
+    void SetStoreAncestors(bool new_val) { store_ancestors = new_val; }
+
+    /// Are we storing all taxa that have died out, as have all of their descendants.
+    void SetStoreOutside(bool new_val) { store_outside = new_val; }
+
+    /// Are we storing any taxa types that have died out?
+    void SetArchive(bool new_val) { archive = new_val; }
+
+
   };
 
   // =============================================================

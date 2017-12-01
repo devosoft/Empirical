@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
   emp::Random random(config.SEED());
   emp::World<ORG_TYPE> world(random, "BoxWorld");
   world.SetWellMixed(true);
-
+  world.SystematicsOff();
 
   emp::vector<emp::Resource> resources;
   for (int i=0; i<GENOME_SIZE; i++) {
