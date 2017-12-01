@@ -149,7 +149,9 @@ int main(int argc, char* argv[])
         exit(1);
     }
     world.Update();
-
+    if (isinf(world.GetFitnessDataNode().GetMax())){
+        return 0;
+    }
     // Mutate all but the first organism.
     world.DoMutations(1);
   }
