@@ -230,22 +230,10 @@ namespace emp {
     bool track_moves;            ///< Should we record every move made by this organism?
     emp::vector<State> history;  ///< All previous positions and facings in this path.
 
-  public:
-    StateGridStatus() : cur_state(0,0,1), track_moves(false) { ; }
-    StateGridStatus(const StateGridStatus &) = default;
-    StateGridStatus(StateGridStatus &&) = default;
+    // --- Helper Functions ---
 
-    StateGridStatus & operator=(const StateGridStatus &) = default;
-    StateGridStatus & operator=(StateGridStatus &&) = default;
-
-    size_t GetX() const { return cur_state.x; }
-    size_t GetY() const { return cur_state.y; }
-    size_t GetFacing() const { return cur_state.facing; }
-
-    StateGridStatus & SetX(size_t _x) { cur_state.x = _x; return *this; }
-    StateGridStatus & SetY(size_t _y) { cur_state.y = _y; return *this; }
-    StateGridStatus & SetPos(size_t _x, size_t _y) { cur_state.x = _x; cur_state.y = _y; return *this; }
-    StateGridStatus & SetFacing(size_t _f) { cur_state.facing = _f; return *this; }
+    /// If we are tracking moves, store the current position in the history.
+    void UpdateHistory() { if (track_moves) history.push_back(cur_state); }
 
     /// Move explicitly in the x direction (regardless of facing).
     void MoveX(const StateGrid & grid, int steps=1) {
@@ -259,6 +247,35 @@ namespace emp {
       cur_state.y = (size_t) Mod(steps + (int) cur_state.y, (int) grid.GetHeight());
     }
 
+  public:
+    StateGridStatus() : cur_state(0,0,1), track_moves(false) { ; }
+    StateGridStatus(const StateGridStatus &) = default;
+    StateGridStatus(StateGridStatus &&) = default;
+
+    StateGridStatus & operator=(const StateGridStatus &) = default;
+    StateGridStatus & operator=(StateGridStatus &&) = default;
+
+    size_t GetX() const { return cur_state.x; }
+    size_t GetY() const { return cur_state.y; }
+    size_t GetFacing() const { return cur_state.facing; }
+
+    StateGridStatus & TrackMoves(bool track=true) {
+      track_moves = track;
+      if (track_moves) history.push_back(cur_state);
+      else history.resize(0);
+      return *this;
+    }
+
+    StateGridStatus & SetX(size_t _x) { cur_state.x = _x; UpdateHistory(); return *this; }
+    StateGridStatus & SetY(size_t _y) { cur_state.y = _y; UpdateHistory(); return *this; }
+    StateGridStatus & SetPos(size_t _x, size_t _y) {
+      cur_state.x = _x;
+      cur_state.y = _y;
+      UpdateHistory();
+      return *this;
+    }
+    StateGridStatus & SetFacing(size_t _f) { cur_state.facing = _f; UpdateHistory(); return *this; }
+
     /// Move in the direction currently faced.
     void Move(const StateGrid & grid, int steps=1) {
       switch (cur_state.facing) {
@@ -271,16 +288,19 @@ namespace emp {
         case 6: MoveX(grid, -steps); MoveY(grid, +steps); break;
         case 7: MoveX(grid, -steps);                      break;
       }
+      UpdateHistory();
     }
 
     /// Rotate starting from current facing.
     void Rotate(int turns=1) {
       cur_state.facing = Mod(cur_state.facing + turns, 8);
+      UpdateHistory();
     }
 
     /// Examine state of current position.
     int Scan(const StateGrid & grid) {
       return grid(cur_state.x, cur_state.y);
+      // @CAO: Should we be recording the scan somehow in history?
     }
 
     /// Set the current position in the state grid.
