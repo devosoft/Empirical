@@ -123,6 +123,7 @@ namespace emp {
     size_t GetWidth() const { return width; }
     size_t GetHeight() const { return height; }
     size_t GetSize() const { return states.size(); }
+    const emp::vector<int> GetStates() const { return states; }
     const StateGridInfo & GetInfo() const { return info; }
 
     int & operator()(size_t x, size_t y) {
