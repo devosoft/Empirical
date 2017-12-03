@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
 
     dist = sqrt(dist);
     if (dist > DISTANCE_CUTOFF) {
-        return 0.0;
+        return 0.01;
     }
 
     return 1.0/dist;
@@ -174,6 +174,10 @@ int main(int argc, char* argv[])
     }
     // Mutate all but the first organism.
     world.DoMutations(1);
+    for (auto res : resources) {
+        std::cout << res.GetAmount() << " ";
+    }
+    std::cout << std::endl;
   }
 
   // std::cout << std::endl;
