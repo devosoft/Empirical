@@ -56,6 +56,9 @@ namespace web {
 
   /// Draw a Surface2D, specifying the full colormap to be used.  The surface has a range of circle
   /// bodies, each with a color id.
+  /// @param canvas The Canvas to draw on.
+  /// @param surface A surface containing a set of shapes to draw.
+  /// @param color_map Mapping of values to the colors with which they should be associated.
   template <typename BODY_TYPE>
   void Draw(Canvas canvas,
             const Surface2D<BODY_TYPE> & surface,
@@ -80,6 +83,9 @@ namespace web {
 
   /// Draw a Surface2D, just specifying the number of colors (and using a generated hue map).
   /// The surface has a range of circle bodies, each with a color id.
+  /// @param canvas The Canvas to draw on.
+  /// @param surface A surface containing a set of shapes to draw.
+  /// @param num_colors The number of distinct colors to use in visualization.
   template <typename BODY_TYPE>
   void Draw(Canvas canvas, const Surface2D<BODY_TYPE> & surface, size_t num_colors)
   {
@@ -90,6 +96,7 @@ namespace web {
   /// Draw a grid onto a canvas.
   /// @param canvas The Canvas to draw on.
   /// @param grid A vector of vectors of color IDs.
+  /// @param color_map Mapping of values to the colors with which they should be associated.
   /// @param line_color The background line color for the grid.
   /// @param cell_width How many pixels wide is each cell to draw?
   /// @param cell_height How many pixels tall is each cell to draw?
@@ -123,6 +130,7 @@ namespace web {
   /// Draw a grid onto a canvas, but without offsets provided -- the grid is centered.
   /// @param canvas The Canvas to draw on.
   /// @param grid A vector of vectors of color IDs.
+  /// @param color_map Mapping of values to the colors with which they should be associated.
   /// @param line_color The background line color for the grid.
   /// @param cell_width How many pixels wide is each cell to draw?
   /// @param cell_height How many pixels tall is each cell to draw?
@@ -148,6 +156,7 @@ namespace web {
   /// Draw a grid onto a canvas, but without cell size provided -- maximize to fill the canvas!
   /// @param canvas The Canvas to draw on.
   /// @param grid A vector of vectors of color IDs.
+  /// @param color_map Mapping of values to the colors with which they should be associated.
   /// @param line_color The background line color for the grid.
   void Draw(Canvas canvas,
             const emp::vector<emp::vector<size_t>> & grid,
@@ -165,6 +174,7 @@ namespace web {
   /// @param canvas The Canvas to draw on.
   /// @param grid A vector of vectors of color IDs
   /// @param grid_cols Number of columns in the grid
+  /// @param color_map Mapping of values to the colors with which they should be associated.
   /// @param line_color The background line color for the grid
   /// @param cell_width How many pixels wide is each cell to draw?
   /// @param cell_height How many pixels tall is each cell to draw?
@@ -199,6 +209,7 @@ namespace web {
   /// Draw a state grid onto a canvas.
   /// @param canvas The Canvas to draw on.
   /// @param state_grid A StateGrid object.
+  /// @param color_map Mapping of values to the colors with which they should be associated.
   /// @param line_color The background line color for the grid.
   void Draw(Canvas canvas,
             const StateGrid & state_grid,
