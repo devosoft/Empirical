@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
 
     dist = sqrt(dist);
     if (dist > DISTANCE_CUTOFF) {
-        return 0.01;
+        return 0.00;
     }
 
     return 1.0/dist;

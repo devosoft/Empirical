@@ -61,15 +61,17 @@ namespace emp {
        }
 
        // Collect all fitness info.
+    //    std::cout << extra_funs.size() << std::endl;
        for (size_t org_id = 0; org_id < world.GetSize(); org_id++) {
          base_fitness[org_id] = world.CalcFitnessID(org_id);
          for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
+            //  std::cout << "Test" << std::endl;
            double cur_fit = emp::Pow(extra_funs[ex_id](world[org_id]), 2.0);
            cur_fit *= frac*pools[ex_id].GetAmount();
            cur_fit = std::min(cur_fit, max_bonus);
-           extra_fitnesses[ex_id][org_id] = emp::Pow(2.0,cur_fit);
+           extra_fitnesses[ex_id][org_id] = cur_fit;
         //    std::cout << "Fit before:  = " << base_fitness[org_id] << "   Res: " << pools[ex_id].GetAmount();
-           base_fitness[org_id] *= emp::Pow(2.0,cur_fit);
+           base_fitness[org_id] += cur_fit;
            pools[ex_id].Dec(cur_fit);
         //    std::cout << "   Bonus " << ex_id << " = " << extra_funs[ex_id](world[org_id]) << " "<< emp::Pow(2.0,cur_fit)
         //              << "   fitnes = " << base_fitness[org_id]
@@ -77,6 +79,12 @@ namespace emp {
 
          }
        }
+
+    //    std::cout << "Resource allocations" << std::endl;
+    //    std::cout << emp::to_string(base_fitness) << std::endl;
+    //    for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
+    //
+    //    }
 
        emp::vector<size_t> entries;
        for (size_t T = 0; T < tourny_count; T++) {
