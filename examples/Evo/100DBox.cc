@@ -24,7 +24,8 @@ EMP_BUILD_CONFIG( BoxConfig,
   VALUE(N_BAD, int, 0, "Number of bad fitness functions"),
   VALUE(DISTANCE_CUTOFF, double, 0, "How close to origin does fitness gradient start"),
   VALUE(RESOURCE_INFLOW, double, 100, "How much resource enters the world each update"),
-  VALUE(PROBLEM_DIMENSIONS, int, 10, "How many axes does the box have?")
+  VALUE(PROBLEM_DIMENSIONS, int, 10, "How many axes does the box have?"),
+  VALUE(RECOMBINATION, int, 0, "Does recombination happen?")
 )
 
 int main(int argc, char* argv[])
@@ -45,6 +46,7 @@ int main(int argc, char* argv[])
   const double DISTANCE_CUTOFF = config.DISTANCE_CUTOFF();
   const double RESOURCE_INFLOW = config.RESOURCE_INFLOW();
   const std::string SELECTION = config.SELECTION();
+  const bool RECOMBINATION = config.RECOMBINATION();
 
   const int GENOME_SIZE = PROBLEM_DIMENSIONS + N_NEUTRAL;
 
@@ -76,7 +78,7 @@ int main(int argc, char* argv[])
   }
 
   // Setup the mutation function.
-  world.SetMutFun( [GENOME_SIZE](ORG_TYPE & org, emp::Random & random) {
+  world.SetMutFun( [GENOME_SIZE, RECOMBINATION, &random, &world](ORG_TYPE & org, emp::Random & random) {
     //   uint32_t num_muts = random.GetUInt(4);  // 0 to 3 mutations.
       for (uint32_t pos = 0; pos < GENOME_SIZE; pos++) {
         org[pos] += random.GetRandNormal(0, .01);
@@ -86,6 +88,22 @@ int main(int argc, char* argv[])
             org[pos] = 1;
         }
       }
+
+      if (RECOMBINATION) {
+          int crossover_point = random.GetUInt(GENOME_SIZE);
+          const ORG_TYPE& parent2 = world.GetRandomOrg();
+
+          if (random.P(.5) > .5) {
+              for (int i = crossover_point; i < GENOME_SIZE; i++) {
+                  org[i] = parent2[i];
+              }
+          } else {
+              for (int i = 0; i < crossover_point; i++) {
+                  org[i] = parent2[i];
+              }
+          }
+      }
+
       return GENOME_SIZE;
     } );
 
