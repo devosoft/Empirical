@@ -30,6 +30,7 @@
 #include "../tools/File.h"
 #include "../tools/map_utils.h"
 #include "../tools/math.h"
+#include "../tools/Random.h"
 
 namespace emp {
 
@@ -281,6 +282,13 @@ namespace emp {
       return *this;
     }
 
+    StateGridStatus & Set(size_t _x, size_t _y, size_t _f) {
+      cur_state.x = _x;
+      cur_state.y = _y;
+      cur_state.facing = _f;
+      UpdateHistory();
+      return *this;
+    }
     StateGridStatus & SetX(size_t _x) { cur_state.x = _x; UpdateHistory(); return *this; }
     StateGridStatus & SetY(size_t _y) { cur_state.y = _y; UpdateHistory(); return *this; }
     StateGridStatus & SetPos(size_t _x, size_t _y) {
@@ -310,6 +318,11 @@ namespace emp {
     void Rotate(int turns=1) {
       cur_state.facing = Mod(cur_state.facing + turns, 8);
       UpdateHistory();
+    }
+
+    /// Move the current status to a random position and orientation.
+    void Randomize(const StateGrid & grid, Random & random) {
+      Set(random.GetUInt(grid.GetWidth()), random.GetUInt(grid.GetHeight()), random.GetUInt(8));
     }
 
     /// Examine state of current position.
