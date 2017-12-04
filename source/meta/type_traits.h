@@ -56,14 +56,14 @@ namespace emp {
     template <typename Fn, typename... Args>
     struct is_invocable_helper {
      private:
-      // This function will be called iff Fn can be converted to a function which takes Args... as arguments
-      // notice that it deduces its return type with decltype(std::declval<U>()(std::declval<Args>()...)), which does not throw errors
-      // even if U is not callable because of SFINAE
+      // If U can be invoked with Args... for arguments, then it will have some return value, and we try to create a pointer to it.
+      // Note the use of decay_t. This will remove any references from the return value, which would cause SFINAE to fail, since
+      // C++ does not allow pointers to references
       template <typename U>
-      static std::true_type check(const std::function<decltype(std::declval<U>()(std::declval<Args>()...))(Args...)>&)
+      static std::true_type check(U&&, std::decay_t<decltype(std::declval<U>()(std::declval<Args>()...))>* = nullptr)
       { return {}; }
       
-      // Catchall which handles the cases where U is not callable with Args arguments
+      //Catchall which handles the cases where U is not callable with Args arguments
       template <typename U>
       static std::false_type check(...)
       { return {}; }
