@@ -197,9 +197,23 @@ namespace emp {
       return *this;
     }
 
+    /// Print the current status of the StateGrid to an output stream.
+    template <typename... Ts>
+    const StateGrid & Print(std::ostream & os=std::cout) const {
+      std::string out(width*2-1, ' ');
+      for (size_t i = 0; i < height; i++) {
+        out[0] = info.GetSymbol( states[i*width] );
+        for (size_t j = 1; j < width; j++) {
+          out[j*2] = info.GetSymbol( states[i*width+j] );
+        }
+        os << out << std::endl;
+      }
+      return *this;
+    }
+
     /// Store the current status of the StateGrid to a file.
     template <typename... Ts>
-    StateGrid & Write(Ts &&... args) {
+    const StateGrid & Write(Ts &&... args) const {
       File file;
       std::string out;
       for (size_t i = 0; i < height; i++) {
