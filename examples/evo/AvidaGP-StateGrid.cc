@@ -191,7 +191,7 @@ int main()
     // Keep the best individual.
     EliteSelect(world, 1, 1);
 
-    std::cout << "  fitness[0] = " << world.GetOrg(0).GetScore()
+    std::cout << "  fitness[0] = " << world[0].GetScore()
               << std::endl;
 
     // Run a tournament for the rest...
@@ -203,6 +203,9 @@ int main()
     // Mutate all but the first organism.
     world.DoMutations(1);
   }
+
+  std::cout << "Final Fitness: " << world.CalcFitnessID(0) << std::endl;
+  world[0].GetStateGrid().Print();
 
   std::cout << std::endl;
   world[0].PrintGenome();
