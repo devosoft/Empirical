@@ -41,6 +41,7 @@ public:
   SGOrg(const SGOrg &) = default;
   SGOrg(SGOrg &&) = default;
 
+  emp::StateGridStatus & GetSGStatus() { return sg_status; }
   emp::StateGridStatus GetSGStatus() const { return sg_status; }
   emp::StateGrid & GetStateGrid() { return state_grid; }
   const emp::StateGrid & GetStateGrid() const { return state_grid; }
@@ -144,7 +145,7 @@ void Print(const emp::AvidaGP & cpu) {
 
 constexpr size_t POP_SIZE = 1000;
 constexpr size_t GENOME_SIZE = 50;
-constexpr size_t UPDATES = 500;
+constexpr size_t UPDATES = 10000;
 
 int main()
 {
@@ -161,7 +162,10 @@ int main()
   state_grid.Load("state_grids/islands_50x50.cfg");
 
   // When an organism is added to the world, supply it with a state grid.
-  world.OnOrgPlacement( [&state_grid, &world](size_t pos){ world.GetOrg(pos).SetStateGrid(state_grid); } );
+  world.OnOrgPlacement( [&state_grid, &world, &random](size_t pos){
+    world.GetOrg(pos).SetStateGrid(state_grid);
+    // if (pos && random.P(0.1)) world.GetOrg(pos).GetSGStatus().Randomize(state_grid, random);
+  } );
 
   world.SetWellMixed(true);
 
@@ -195,7 +199,7 @@ int main()
               << std::endl;
 
     // Run a tournament for the rest...
-    TournamentSelect(world, 5, POP_SIZE-1);
+    TournamentSelect(world, 4, POP_SIZE-1);
 
     // Put new organisms is place.
     world.Update();
