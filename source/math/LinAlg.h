@@ -50,6 +50,19 @@ namespace emp {
                                std::is_convertible<From, To>{});
       }
 
+      template <typename M>
+      struct Fill {
+        const M& source;
+
+        constexpr auto operator()(std::size_t R, std::size_t C) const {
+          if (R < M::rows && C < M::columns) {
+            return source(R, C);
+          } else {
+            return 0;
+          }
+        }
+      };
+
     }  // namespace internal
 
     namespace internal {
@@ -299,6 +312,13 @@ namespace emp {
           0,     0,     0,
           1,  // row 4
         };
+      }
+
+      template <typename F_, std::size_t R_, std::size_t C_,
+                std::enable_if<(R_ != R || C_ != C) && (R_ <= R && C_ <= C),
+                               std::nullptr_t> = nullptr>
+      constexpr static Mat fillFrom(const Mat<F_, R_, C_>& other) {
+        return gen(internal::Fill<Mat<F_, R_, C_>>{other});
       }
 
       template <typename H1, typename H2, typename... Args>
