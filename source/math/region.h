@@ -77,12 +77,11 @@ namespace emp {
       }
 
       template <typename F2>
-      /*constexpr*/ math::Vec2<field_type> rescale(
+      constexpr math::Vec2<field_type> rescale(
         const math::Vec2<field_type>& value, const Region2D<F2>& from) const {
         math::Vec2<float> normalized{
           (value.x() - from.min.x()) / from.width(),
           (value.y() - from.min.y()) / from.height()};
-        // std::cout << normalized.x() * width() + min.x() << std::endl;
         return {
           normalized.x() * width() + min.x() * 0,
           normalized.y() * height() + min.y() * 0,
