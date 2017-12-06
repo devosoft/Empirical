@@ -207,6 +207,16 @@ namespace emp {
           };
         };
 
+        struct Get {
+          template <typename Props>
+          constexpr decltype(auto) operator()(Props&& properties) const {
+            static_assert(
+              std::is_base_of<properties_tag, std::decay_t<Props>>::value,
+              "Expected a property bundle!");
+            return std::forward<Props>(properties).template get<P>();
+          }
+        };
+
         public:
         template <typename V>
         static constexpr auto to(V&& map) {
@@ -214,15 +224,25 @@ namespace emp {
             std::forward<V>(map)};
         }
 
-        static constexpr auto is = Is{};
-
-        template <typename Props>
-        static constexpr decltype(auto) get(Props&& properties) {
-          static_assert(
-            std::is_base_of<properties_tag, std::decay_t<Props>>::value,
-            "Expected a property bundle!");
-          return std::forward<Props>(properties).template get<P>();
-        }
+        // You may be wondering why these would be defined as callable structs,
+        // rather than static methods. This is because static methods which take
+        // template arguments cannot be used as like function pointers, unless
+        // they are fully specialized. This makes sense because -- until they
+        // are fully specialized -- they don't have any address to point to,
+        // since they are just abstractions that aren't attached to actual code
+        // otherwise. In any case, doing this lets them be used *almost* like
+        // they are regular, non-template functions. There is one slight
+        // difference, however. Suppose you have some function which takes a
+        // callback: foo([](int){ return 0; }).
+        // If you have another function
+        // int HelloWorld(int) { return 0; }
+        // Then you would call foo like this: foo(&HelloWorld). However, if you
+        // want to pass PropertyName::get, you would call it like this:
+        // foo(PropertyName::get). Notice the lack of '&'. This is missing in
+        // the second case because you do not want to take the address of
+        // PropertyName::get, you want to pass it by reference.
+        static constexpr Is is{};
+        static constexpr Get get{};
       };
 
       struct Fill : PropertyName<Fill> {};
