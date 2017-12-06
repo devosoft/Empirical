@@ -316,49 +316,49 @@ namespace emp {
       Mat& operator=(const Mat&) = default;
       Mat& operator=(Mat&&) = default;
 
-      constexpr auto x() const {
+      constexpr const F& x() const {
         static_assert((R >= 1 && C == 1) || (R == 1 && C >= 1),
                       "A matrix must be a row matrix or a column matrix with "
                       "at least one entry to have an x component");
         return arrayData[0];
       }
 
-      constexpr auto& x() {
+      constexpr F& x() {
         static_assert((R >= 1 && C == 1) || (R == 1 && C >= 1),
                       "A matrix must be a row matrix or a column matrix with "
                       "at least one entry to have an x component");
         return arrayData[0];
       }
 
-      constexpr auto y() const {
+      constexpr const F& y() const {
         static_assert((R >= 2 && C == 1) || (R == 1 && C >= 2),
                       "A matrix must be a row matrix or a column matrix with "
                       "at least two entries to have an y component");
         return arrayData[1];
       }
 
-      constexpr auto& y() {
+      constexpr F& y() {
         static_assert((R >= 2 && C == 1) || (R == 1 && C >= 2),
                       "A matrix must be a row matrix or a column matrix with "
                       "at least two entries to have an y component");
         return arrayData[1];
       }
 
-      constexpr auto z() const {
+      constexpr const F& z() const {
         static_assert((R >= 3 && C == 1) || (R == 1 && C >= 3),
                       "A matrix must be a row matrix or a column matrix with "
                       "at least three entries to have an z component");
         return arrayData[2];
       }
 
-      constexpr auto& z() {
+      constexpr F& z() {
         static_assert((R >= 3 && C == 1) || (R == 1 && C >= 3),
                       "A matrix must be a row matrix or a column matrix with "
                       "at least three entries to have an z component");
         return arrayData[2];
       }
 
-      constexpr auto w() const {
+      constexpr const F& w() const {
         static_assert((R >= 4 && C == 1) || (R == 1 && C >= 4),
                       "A matrix must be a row matrix or a column matrix with "
                       "at least four entries to have an w component");
