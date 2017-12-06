@@ -15,8 +15,9 @@ namespace emp {
       Line(emp::opengl::GLCanvas& canvas) : shader(canvas) {}
 
       template <typename Iter>
-      void show(Iter begin, Iter end, const emp::math::Mat4x4f& projection,
-                const emp::math::Mat4x4f& view) {
+      void operator()(Iter begin, Iter end,
+                      const emp::math::Mat4x4f& projection,
+                      const emp::math::Mat4x4f& view) {
         using namespace properties;
         using namespace emp::math;
         using namespace emp::opengl;

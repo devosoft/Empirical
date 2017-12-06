@@ -32,8 +32,9 @@ namespace emp {
       }
 
       template <typename Iter>
-      void show(Iter begin, Iter end, const emp::math::Mat4x4f& projection,
-                const emp::math::Mat4x4f& view) {
+      void operator()(Iter begin, Iter end,
+                      const emp::math::Mat4x4f& projection,
+                      const emp::math::Mat4x4f& view) {
         using namespace properties;
         using namespace emp::math;
 
@@ -47,6 +48,7 @@ namespace emp {
           auto model =
             Mat4x4f::translation(ScaledX::get(*iter), ScaledY::get(*iter)) *
             Mat4x4f::scale(PointSize::get(*iter));
+
           shader.model = model;
           shader.color = Fill::get(*iter);
 
