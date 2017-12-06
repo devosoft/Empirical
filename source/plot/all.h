@@ -61,7 +61,7 @@ namespace emp {
 
         Region2D<float> dataRegion;
         for (auto iter{begin}; iter != end; ++iter) {
-          dataRegion.include(X::get(*iter), Y::get(*iter));
+          dataRegion.include(CartesianData::get(*iter));
         }
 
         auto proj = proj::orthoFromScreen(region.width(), region.height(),
@@ -69,10 +69,10 @@ namespace emp {
         auto view = Mat4x4f::translation(0, 0, 0);
 
         auto rescaler = [&](auto&& point) {
-          auto pos = region.rescale({X::get(point), Y::get(point)}, dataRegion);
+          auto pos = region.rescale(CartesianData::get(point), dataRegion);
 
-          return (ScaledY::to(pos.y()) and ScaledX::to(pos.x()))
-            .apply(std::forward<decltype(point)>(point));
+          return CartesianScaled::to(pos).apply(
+            std::forward<decltype(point)>(point));
         };
         using data_point_type = decltype(rescaler(*begin));
 

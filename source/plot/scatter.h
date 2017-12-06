@@ -46,7 +46,8 @@ namespace emp {
 
         for (auto iter = begin; iter != end; ++iter) {
           auto model =
-            Mat4x4f::translation(ScaledX::get(*iter), ScaledY::get(*iter)) *
+            Mat4x4f::translation(CartesianScaled::get(*iter).x(),
+                                 CartesianScaled::get(*iter).y(), 0) *
             Mat4x4f::scale(PointSize::get(*iter));
 
           shader.model = model;

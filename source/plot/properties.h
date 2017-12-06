@@ -231,11 +231,8 @@ namespace emp {
       struct StrokeShader : PropertyName<StrokeShader> {};
       struct StrokeWeight : PropertyName<StrokeWeight> {};
 
-      struct X : PropertyName<X> {};
-      struct Y : PropertyName<Y> {};
-
-      struct ScaledX : PropertyName<ScaledX> {};
-      struct ScaledY : PropertyName<ScaledY> {};
+      struct CartesianData : PropertyName<CartesianData> {};
+      struct CartesianScaled : PropertyName<CartesianScaled> {};
 
       struct Value : PropertyName<Value> {};
     };  // namespace properties

@@ -25,7 +25,8 @@ namespace emp {
 
         // Check that there are at least two points to draw
         if (begin == end) return;
-        Vec3f start{ScaledX::get(*begin), ScaledY::get(*begin), 0};
+        Vec3f start{CartesianScaled::get(*begin).x(),
+                    CartesianScaled::get(*begin).y(), 0};
         Vec4f startStroke{Stroke::get(*begin)};
         auto startStrokeWeight{StrokeWeight::get(*begin)};
         ++begin;
@@ -37,7 +38,8 @@ namespace emp {
         shader.view = view;
         shader.model = Mat4x4f::translation(0, 0);
 
-        Vec3f middle{ScaledX::get(*begin), ScaledY::get(*begin), 0};
+        Vec3f middle{CartesianScaled::get(*begin).x(),
+                     CartesianScaled::get(*begin).y(), 0};
         Vec4f middleStroke{Stroke::get(*begin)};
         auto middleStrokeWeight{StrokeWeight::get(*begin)};
         ++begin;
@@ -52,7 +54,8 @@ namespace emp {
 
         size_t i = 0;
         for (auto iter = begin; iter != end; ++iter) {
-          Vec3f end{ScaledX::get(*iter), ScaledY::get(*iter), 0};
+          Vec3f end{CartesianScaled::get(*iter).x(),
+                    CartesianScaled::get(*iter).y(), 0};
           auto stroke{Stroke::get(*iter)};
           auto weight{StrokeWeight::get(*iter)};
 
