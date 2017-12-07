@@ -61,7 +61,7 @@
 == Level 4 ==
 
 	 random_utils.h depends:
-		Random.h, vector.h, BitVector.h, 
+		vector.h, BitVector.h, Random.h, 
 	 string_utils.h depends:
 		vector.h, 
 	 Graph.h depends:

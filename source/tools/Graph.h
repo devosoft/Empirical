@@ -41,6 +41,9 @@ namespace emp {
       /// Add a connection between this node and another.
       void AddEdge(size_t to) { edge_set.Set(to, true); }
 
+      /// Add a full set of connections from this node to others.
+      void AddEdgeSet(BitVector in_set) { edge_set |= in_set; }
+
       /// Remove the connection (if there is one) between this node and another one.
       void RemoveEdge(size_t to) { edge_set.Set(to, false); }
 
@@ -63,7 +66,7 @@ namespace emp {
       size_t GetMaskedDegree(const BitVector & mask) const { return (mask & edge_set).CountOnes(); }
     };
 
-  private:
+  protected:
     emp::vector<Node> nodes;  ///< Set of vertices in this graph.
 
   public:
@@ -165,11 +168,40 @@ namespace emp {
       nodes[to].SetEdge(from, val);
     }
 
-    /// Print the graph to the provided output stream (defaulting to standard out)
+    /// Merge a second graph into this one.
+    void Merge(const Graph & in_graph) {
+      const size_t start_size = nodes.size();
+      const size_t new_size = start_size + in_graph.GetSize();
+      nodes.resize(new_size, new_size);
+      for (auto & node : nodes) {
+	      node.Resize(new_size);
+      }
+
+      for (size_t i = 0; i < in_graph.GetSize(); i++) {
+        BitVector edge_set = in_graph.nodes[i].GetEdgeSet();
+        edge_set.Resize(new_size);
+        edge_set <<= start_size;
+        nodes[start_size + i].AddEdgeSet(edge_set);
+      }
+    }
+
+    /// Print a symmetric graph to the provided output stream (defaulting to standard out)
     void PrintSym(std::ostream & os=std::cout) {
       os << GetSize() << " " << (GetEdgeCount()/2) << std::endl;
       for (size_t from = 0; from < nodes.size(); from++) {
         for (size_t to=from+1; to < nodes.size(); to++) {
+          if (HasEdge(from, to) == false) continue;
+	        emp_assert(HasEdge(to, from));              // This must be a symmetric graph!
+          os << from << " " << to << std::endl;
+        }
+      }
+    }
+
+    /// Print a directed graph to the provided output stream (defaulting to standard out)
+    void PrintDirected(std::ostream & os=std::cout) {
+      os << GetSize() << " " << GetEdgeCount() << std::endl;
+      for (size_t from = 0; from < nodes.size(); from++) {
+        for (size_t to = 0; to < nodes.size(); to++) {
           if (HasEdge(from, to) == false) continue;
           os << from << " " << to << std::endl;
         }
@@ -178,6 +210,86 @@ namespace emp {
 
   };
 
+  class WeightedGraph : public Graph {
+  protected:
+    emp::vector< emp::vector< double > > weights;
+
+  public:
+    WeightedGraph(size_t num_nodes=0) : Graph(num_nodes), weights(num_nodes) {
+      for (auto & row : weights) row.resize(num_nodes, 0.0);
+    }
+
+    WeightedGraph(const WeightedGraph &) = default;              ///< Copy constructor
+    WeightedGraph(WeightedGraph &&) = default;                   ///< Move constructor
+    ~WeightedGraph() { ; }
+
+    WeightedGraph & operator=(const WeightedGraph &) = default;  ///< Copy operator
+    WeightedGraph & operator=(WeightedGraph &&) = default;       ///< Move operator
+
+    void Resize(size_t new_size) {
+      Graph::Resize(new_size);
+      weights.resize(new_size);
+      for (auto & row : weights) row.resize(new_size,0.0);
+    }
+
+    /// Determine weight of a specific edge in this graph.
+    double GetWeight(size_t from, size_t to) const {
+      emp_assert(from < nodes.size() && to < nodes.size());
+      return weights[from][to];
+    }
+
+    /// When Adding an edge, must also provide a weight.
+    void AddEdge(size_t from, size_t to, double weight) {
+      Graph::AddEdge(from, to);
+      weights[from][to] = weight;
+    }
+
+    /// When Adding an edge pair, must also provide a weight.
+    void AddEdgePair(size_t from, size_t to, double weight) {
+      Graph::AddEdgePair(from, to);
+      weights[from][to] = weight;
+      weights[to][from] = weight;
+    }
+
+    /// Merge two WeightedGraphs into one
+    void Merge(const WeightedGraph & in_graph) {
+      const size_t start_size = nodes.size();
+      Graph::Merge(in_graph);
+      weights.resize(nodes.size());
+      for (auto & row : weights) row.resize(nodes.size(), 0.0);
+
+      // Move the weights over.
+      for (size_t i = 0; i < in_graph.GetSize(); i++) {
+        for (size_t j = 0; j < in_graph.GetSize(); j++) {
+          weights[i+start_size][j+start_size] = in_graph.weights[i][j];
+        }
+      }
+    }
+
+    /// Print a symmetric graph to the provided output stream (defaulting to standard out)
+    void PrintSym(std::ostream & os=std::cout) {
+      os << GetSize() << " " << (GetEdgeCount()/2) << std::endl;
+      for (size_t from = 0; from < nodes.size(); from++) {
+        for (size_t to=from+1; to < nodes.size(); to++) {
+          if (HasEdge(from, to) == false) continue;
+	        emp_assert(HasEdge(to, from));              // This must be a symmetric graph!
+          os << from << " " << to << " " << weights[from][to] << std::endl;
+        }
+      }
+    }
+
+    /// Print a directed graph to the provided output stream (defaulting to standard out)
+    void PrintDirected(std::ostream & os=std::cout) {
+      os << GetSize() << " " << GetEdgeCount() << std::endl;
+      for (size_t from = 0; from < nodes.size(); from++) {
+        for (size_t to = 0; to < nodes.size(); to++) {
+          if (HasEdge(from, to) == false) continue;
+          os << from << " " << to << " " << weights[from][to] << std::endl;
+        }
+      }
+    }
+
+  };
 }
 
 #endif

@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  Systematics.h
+ *  @file  InstLib.h
  *  @brief This file maintains information about instructions availabel in virtual hardware.
  */
 
@@ -15,8 +15,8 @@
 #include <unordered_set>
 
 #include "../base/array.h"
+#include "../base/Ptr.h"
 #include "../base/vector.h"
-#include "../base/array.h"
 #include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
 
@@ -157,10 +157,18 @@ namespace emp {
       arg_map[name] = value;
     }
 
-    /// Precess a specified instruction in the provided hardware.
+    /// Process a specified instruction in the provided hardware.
     void ProcessInst(hardware_t & hw, const inst_t & inst) const {
       inst_funs[inst.id](hw, inst);
     }
+
+    /// Process a specified instruction on hardware that can be converted to the correct type.
+    template <typename IN_HW>
+    void ProcessInst(emp::Ptr<IN_HW> hw, const inst_t & inst) const {
+      emp_assert( dynamic_cast<hardware_t*>(hw.Raw()) );
+      inst_funs[inst.id](*(hw.template Cast<hardware_t>()), inst);
+    }
+
 
     /// Write out a full genome to the provided ostream.
     void WriteGenome(const genome_t & genome, std::ostream & os=std::cout) const {

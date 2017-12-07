@@ -358,7 +358,7 @@ namespace emp {
   /// Every time one or more whitespace characters appear replace them with a single space.
   static inline void compress_whitespace(std::string & in_string) {
     const size_t strlen = in_string.size();
-    bool last_whitespace = true;
+    bool last_whitespace = true;          // Remove whitespace from beginning of line.
     size_t pos = 0;
 
     for (size_t i = 0; i < strlen; i++) {
@@ -372,6 +372,8 @@ namespace emp {
         last_whitespace = false;
       }
     }
+
+    if (last_whitespace) pos--;   // If the end of the line is whitespace, remove it.
 
     in_string.resize(pos);
   }

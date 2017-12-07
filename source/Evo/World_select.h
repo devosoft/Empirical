@@ -105,7 +105,7 @@ namespace emp {
     for (size_t n = 0; n < count; n++) {
       const double fit_pos = random.GetDouble(fitness_index.GetWeight());
       const size_t parent_id = fitness_index.Index(fit_pos);
-      const size_t offspring_id = world.DoBirth( world.GetGenomeAt(parent_id), parent_id );
+      const size_t offspring_id = world.DoBirth( world.GetGenomeAt(parent_id), parent_id ).index;
       if (world.IsSynchronous() == false) {
         fitness_index.Adjust(offspring_id, world.CalcFitnessID(offspring_id));
       }

@@ -92,6 +92,10 @@ namespace emp {
     File & LoadLine(std::istream & input) {
       lines.emplace_back("");
       std::getline(input, lines.back());
+
+      // If the input file is DOS formatted, make sure to remove the \r at the end of each line.
+      if (lines.back().size() && lines.back().back() == '\r') lines.back().pop_back();
+
       return *this;
     }
 
@@ -160,7 +164,7 @@ namespace emp {
 
     /// Delete all whitespace; by default keep newlines.
     File & RemoveWhitespace(bool keep_newlines=true) {
-      Apply(compress_whitespace);
+      Apply(remove_whitespace);
       RemoveEmpty();
       if (!keep_newlines) {
         std::string all_lines;
