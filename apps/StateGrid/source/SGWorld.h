@@ -12,12 +12,14 @@
 #include "tools/Random.h"
 
 #include "SGOrg.h"
+#include "SGPatches.h"
 
 class SGWorld : public emp::World<SGOrg> {
  public:
   using inst_lib_t = emp::AvidaCPU_InstLib<SGOrg>;
 
   inst_lib_t inst_lib;
+  SGPatches state_grid;
 
  public:
   SGWorld(emp::Random & random, const std::string & name)
@@ -54,9 +56,12 @@ class SGWorld : public emp::World<SGOrg> {
       inst_lib.AddInst("Rotate", SGOrg::Inst_Rotate, 1, "Rotate in place in state grid.");
       inst_lib.AddInst("Scan",   SGOrg::Inst_Scan,   1, "Idenify state of current position in state grid.");
 
-      // OnOrgPlacement( [this](size_t world_id){
-      //   pop[world_id]->SetWorldID(world_id);  // Tell organisms their position in environment.
-      // } );
+      // When an organism is added to the world, supply it with a state grid.
+      OnOrgPlacement( [this, &random](size_t pos){
+          pop[pos]->SetStateGrid(state_grid);
+          // if (pos && random.P(0.1)) world.GetOrg(pos).GetSGStatus().Randomize(state_grid, random);
+        } );
+
     }
   ~SGWorld() { ; }
 
