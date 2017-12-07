@@ -9,6 +9,9 @@
  *  This file manages StateGrids composed of resource patchs in any topology (to be loaded).
  */
 
+#ifndef STATE_GRID_PATCHES_H
+#define STATE_GRID_PATCHES_H
+
 #include "Evo/StateGrid.h"
 
 class SGPatches : public emp::StateGrid {
@@ -24,3 +27,5 @@ public:
   }
 
 };
+
+#endif
