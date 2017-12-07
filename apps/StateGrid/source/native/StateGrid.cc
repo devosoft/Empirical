@@ -30,16 +30,6 @@ int main()
     world.Inject(cpu.GetGenome());
   }
 
-  // Setup the mutation function.
-  world.SetMutFun( [](SGOrg & org, emp::Random & random) {
-      uint32_t num_muts = random.GetUInt(4);  // 0 to 3 mutations.
-      for (uint32_t m = 0; m < num_muts; m++) {
-        const uint32_t pos = random.GetUInt(GENOME_SIZE);
-        org.RandomizeInst(pos, random);
-      }
-      return num_muts;
-    } );
-
   // Do the run...
   for (size_t ud = 0; ud < UPDATES; ud++) {
     // Progress output...
