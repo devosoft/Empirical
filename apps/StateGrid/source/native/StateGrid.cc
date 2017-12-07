@@ -20,20 +20,12 @@ int main()
 {
   emp::Random random;
   SGWorld world(random, "AvidaWorld");
-  SGPatches state_grid;
-
-  // When an organism is added to the world, supply it with a state grid.
-  world.OnOrgPlacement( [&state_grid, &world, &random](size_t pos){
-      world.GetOrg(pos).SetStateGrid(state_grid);
-      // if (pos && random.P(0.1)) world.GetOrg(pos).GetSGStatus().Randomize(state_grid, random);
-    } );
 
   world.SetWellMixed(true);
 
   // Build a random initial popoulation.
   for (size_t i = 0; i < POP_SIZE; i++) {
     SGOrg cpu(&(world.inst_lib));
-    cpu.SetStateGrid(state_grid);
     cpu.PushRandom(random, GENOME_SIZE);
     world.Inject(cpu.GetGenome());
   }
