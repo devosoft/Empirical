@@ -46,7 +46,7 @@ namespace emp {
 
     template <typename ORG>
     void ResourceSelect(World<ORG> & world, const emp::vector<std::function<double(const ORG &)> > & extra_funs,
-                   emp::vector<emp::Resource> & pools, size_t t_size, size_t tourny_count=1, double frac = .0025, double max_bonus = 5) {
+                   emp::vector<emp::Resource> & pools, size_t t_size, size_t tourny_count=1, double frac = .0025, double max_bonus = 5, double resource_inflow = 100) {
 
        emp_assert(world.GetFitFun(), "Must define a base fitness function");
        emp_assert(world.GetSize() > 0);
@@ -62,19 +62,29 @@ namespace emp {
 
        // Collect all fitness info.
     //    std::cout << extra_funs.size() << std::endl;
+
        for (size_t org_id = 0; org_id < world.GetSize(); org_id++) {
          base_fitness[org_id] = world.CalcFitnessID(org_id);
          for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
             //  std::cout << "Test" << std::endl;
+
+           pools[ex_id].Inc(resource_inflow/world.GetSize());
            double cur_fit = emp::Pow(extra_funs[ex_id](world[org_id]), 2.0);
-           cur_fit *= frac*pools[ex_id].GetAmount();
+           if (cur_fit > 0 and pools[ex_id].GetAmount() < 250) {
+               cur_fit = -.1;
+           } else {
+            //    if (org_id==0) {std::cout << "Allele: " << world[org_id][ex_id] <<" Curr fit: " << extra_funs[ex_id](world[org_id]) << " Curr fit squared: " << cur_fit << " Amount: " << pools[ex_id].GetAmount() << " Frac: " << frac;}
+               cur_fit *= frac*(pools[ex_id].GetAmount());
+           }
+        //    if (org_id==0) {std::cout << " Multiplied out: " << cur_fit;}
            cur_fit = std::min(cur_fit, max_bonus);
-           extra_fitnesses[ex_id][org_id] = emp::Pow(2.0,cur_fit);
+        //    if (org_id==0) {std::cout << " Final: " << cur_fit << std::endl;}
+           extra_fitnesses[ex_id][org_id] = emp::Pow(2.0, cur_fit);
         //    std::cout << "Fit before:  = " << base_fitness[org_id] << "   Res: " << pools[ex_id].GetAmount();
-           base_fitness[org_id] *= emp::Pow(2.0,cur_fit);
-           pools[ex_id].Dec(cur_fit);
-        //    std::cout << "   Bonus " << ex_id << " = " << extra_funs[ex_id](world[org_id]) << " "<< emp::Pow(2.0,cur_fit)
-        //              << "   fitnes = " << base_fitness[org_id]
+           base_fitness[org_id] *= emp::Pow(2.0, cur_fit);
+           pools[ex_id].Dec(std::max(cur_fit, 0.0));
+        //    std::cout << "   Bonus " << ex_id << " = " << extra_funs[ex_id](world[org_id]) << " "<< emp::Pow(2.0,cur_fit) << " " << emp::to_string(world[org_id])
+        // //              << "   fitnes = " << base_fitness[org_id]
         //              << std::endl;
 
          }
@@ -82,30 +92,48 @@ namespace emp {
 
     //    std::cout << "Resource allocations" << std::endl;
     //    std::cout << emp::to_string(base_fitness) << std::endl;
+    //    std::cout << emp::to_string(world[0]) << std::endl;
+    //    std::cout << world.CalcFitnessID(0);
+
     //    for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
-    //
+    //        std::cout << extra_fitnesses[ex_id][0] << " ";
+    //    }
+    //    std::cout << std::endl;
+
+    //    emp::vector<size_t> entries;
+    //    for (size_t T = 0; T < tourny_count; T++) {
+    //      entries.resize(0);
+    //      for (size_t i=0; i<t_size; i++) entries.push_back( world.GetRandomOrgID() ); // Allows replacement!
+       //
+    //      double best_fit = base_fitness[entries[0]];
+    //      size_t best_id = entries[0];
+       //
+    //      // Search for a higher fit org in the tournament.
+    //      for (size_t i = 1; i < t_size; i++) {
+    //        const double cur_fit = base_fitness[entries[i]];
+    //        if (cur_fit > best_fit) {
+    //          best_fit = cur_fit;
+    //          best_id = entries[i];
+    //        }
+    //      }
+       //
+    //      // Place the highest fitness into the next generation!
+    //      world.DoBirth( world.GetGenomeAt(best_id), best_id, 1 );
     //    }
 
-       emp::vector<size_t> entries;
-       for (size_t T = 0; T < tourny_count; T++) {
-         entries.resize(0);
-         for (size_t i=0; i<t_size; i++) entries.push_back( world.GetRandomOrgID() ); // Allows replacement!
+        IndexMap fitness_index(world.GetSize());
+        for (size_t id = 0; id < world.GetSize(); id++) {
+          fitness_index.Adjust(id, base_fitness[id]);
+        }
 
-         double best_fit = base_fitness[entries[0]];
-         size_t best_id = entries[0];
-
-         // Search for a higher fit org in the tournament.
-         for (size_t i = 1; i < t_size; i++) {
-           const double cur_fit = base_fitness[entries[i]];
-           if (cur_fit > best_fit) {
-             best_fit = cur_fit;
-             best_id = entries[i];
-           }
-         }
-
-         // Place the highest fitness into the next generation!
-         world.DoBirth( world.GetGenomeAt(best_id), best_id, 1 );
-       }
+        for (size_t n = 0; n < tourny_count; n++) {
+          const double fit_pos = world.GetRandom().GetDouble(std::min(fitness_index.GetWeight(), 99999.9));
+          const size_t parent_id = fitness_index.Index(fit_pos);
+          const size_t offspring_id = world.DoBirth( world.GetGenomeAt(parent_id), parent_id );
+          if (world.IsSynchronous() == false) {
+            fitness_index.Adjust(offspring_id, world.CalcFitnessID(offspring_id));
+          }
+        }
 
 
     }

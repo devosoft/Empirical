@@ -24,8 +24,10 @@ EMP_BUILD_CONFIG( BoxConfig,
   VALUE(N_BAD, int, 0, "Number of bad fitness functions"),
   VALUE(DISTANCE_CUTOFF, double, 0, "How close to origin does fitness gradient start"),
   VALUE(RESOURCE_INFLOW, double, 100, "How much resource enters the world each update"),
+  VALUE(MUTATION_SIZE, double, .01, "Standard deviation of normal distribution mutations are seelcted from"),
   VALUE(PROBLEM_DIMENSIONS, int, 10, "How many axes does the box have?"),
-  VALUE(RECOMBINATION, int, 0, "Does recombination happen?")
+  VALUE(RECOMBINATION, int, 0, "Does recombination happen?"),
+  VALUE(TOURNAMENT_SIZE, int, 20, "Tournament size")
 )
 
 int main(int argc, char* argv[])
@@ -45,8 +47,10 @@ int main(int argc, char* argv[])
   const int PROBLEM_DIMENSIONS = config.PROBLEM_DIMENSIONS();
   const double DISTANCE_CUTOFF = config.DISTANCE_CUTOFF();
   const double RESOURCE_INFLOW = config.RESOURCE_INFLOW();
+  const double MUTATION_SIZE = config.MUTATION_SIZE();
   const std::string SELECTION = config.SELECTION();
   const bool RECOMBINATION = config.RECOMBINATION();
+  const int TOURNAMENT_SIZE = config.TOURNAMENT_SIZE();
 
   const int GENOME_SIZE = PROBLEM_DIMENSIONS + N_NEUTRAL;
 
@@ -62,11 +66,11 @@ int main(int argc, char* argv[])
       resources.push_back(emp::Resource(RESOURCE_INFLOW, RESOURCE_INFLOW, .01));
   }
 
-  world.OnUpdate([&resources](int ud){
-      for (emp::Resource& res : resources) {
-          res.Update();
-      }
-  });
+  // world.OnUpdate([&resources](int ud){
+  //     for (emp::Resource& res : resources) {
+  //         res.Update();
+  //     }
+  // });
 
   // Build a random initial popoulation.
   for (size_t i = 0; i < POP_SIZE; i++) {
@@ -78,10 +82,10 @@ int main(int argc, char* argv[])
   }
 
   // Setup the mutation function.
-  world.SetMutFun( [GENOME_SIZE, RECOMBINATION, &random, &world](ORG_TYPE & org, emp::Random & random) {
+  world.SetMutFun( [GENOME_SIZE, MUTATION_SIZE, RECOMBINATION, &random, &world](ORG_TYPE & org, emp::Random & random) {
     //   uint32_t num_muts = random.GetUInt(4);  // 0 to 3 mutations.
       for (uint32_t pos = 0; pos < GENOME_SIZE; pos++) {
-        org[pos] += random.GetRandNormal(0, .01);
+        org[pos] += random.GetRandNormal(0, MUTATION_SIZE);
         if (org[pos] < 0) {
             org[pos] = 0;
         } else if (org[pos] > 1) {
@@ -129,12 +133,24 @@ int main(int argc, char* argv[])
 
   // Good hints
   for (int i = 0; i < N_GOOD; i++) {
-      fit_set.push_back([i](const ORG_TYPE & org){return 1 - org[i];});
+      fit_set.push_back([i](const ORG_TYPE & org){
+          double score = 1 - org[i];
+          if (score < .5) {
+              return 0.0;
+          }
+          return score;
+      });
   }
 
   // Bad hints
   for (int i = N_GOOD; i < N_GOOD + N_BAD; i++) {
-      fit_set.push_back([i](const ORG_TYPE & org){return org[i];});
+      fit_set.push_back([i](const ORG_TYPE & org){
+          double score = org[i];
+          if (score < .5) {
+              return 0.0;
+          }
+          return score;
+      });
   }
 
   // Neutral hints (these axes aren't evaluated)
@@ -150,8 +166,8 @@ int main(int argc, char* argv[])
   // Do the run...
   for (size_t ud = 0; ud < UPDATES; ud++) {
     // Update the status of all organisms.
-    // double fit0 = world.CalcFitnessID(0);
-    // std::cout << (ud+1) << " : " << emp::to_string(world[0]) << " : " << fit0 << std::endl << std::endl;;
+    double fit0 = world.CalcFitnessID(0);
+    std::cout << (ud+1) << " : " << emp::to_string(world[0]) << " : " << fit0 << std::endl << std::endl;;
 
     // Keep the best individual.
     // EliteSelect(world, 1, 1);
@@ -159,11 +175,13 @@ int main(int argc, char* argv[])
     // Run a tournament for the rest...
 
     if (SELECTION == "TOURNAMENT") {
-        TournamentSelect(world, 20, POP_SIZE);
+        TournamentSelect(world, TOURNAMENT_SIZE, POP_SIZE);
     } else if (SELECTION == "LEXICASE") {
         LexicaseSelect(world, fit_set, POP_SIZE);
     } else if (SELECTION == "RESOURCE") {
-        ResourceSelect(world, fit_set, resources, 20, POP_SIZE);
+        ResourceSelect(world, fit_set, resources, TOURNAMENT_SIZE, POP_SIZE, .0025, 5, RESOURCE_INFLOW);
+    } else if (SELECTION == "ROULETTE") {
+        RouletteSelect(world, POP_SIZE);
     } else {
         std::cout << "ERROR: INVALID SELECTION SCHEME: " << SELECTION << std::endl;
         exit(1);
@@ -174,10 +192,10 @@ int main(int argc, char* argv[])
     }
     // Mutate all but the first organism.
     world.DoMutations(1);
-    // for (auto res : resources) {
-    //     std::cout << res.GetAmount() << " ";
-    // }
-    // std::cout << std::endl;
+    for (auto res : resources) {
+        std::cout << res.GetAmount() << " ";
+    }
+    std::cout << std::endl;
   }
 
   // std::cout << std::endl;
