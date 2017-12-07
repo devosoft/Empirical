@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "../SGPatches.h"
 #include "../SGWorld.h"
 
 void Print(const emp::AvidaGP & cpu) {
@@ -19,15 +20,7 @@ int main()
 {
   emp::Random random;
   SGWorld world(random, "AvidaWorld");
-  emp::StateGrid state_grid;
-
-  state_grid.AddState(-1, '-', -0.5, "None",          "Empty space; poisonous.");
-  state_grid.AddState( 0, '.',  0.0, "Consumed Food", "Previously had sustanance for an organism.");
-  state_grid.AddState( 1, '#', +1.0, "Food",          "Sustanance to an org.");
-  state_grid.AddState( 2, 'x',  0.0, "Consumed Edge", "Edge marker; previously had food.");
-  state_grid.AddState( 3, 'X', +1.0, "Edge",          "Edge marker with food.");
-
-  state_grid.Load("state_grids/islands_50x50.cfg");
+  SGPatches state_grid;
 
   // When an organism is added to the world, supply it with a state grid.
   world.OnOrgPlacement( [&state_grid, &world, &random](size_t pos){
