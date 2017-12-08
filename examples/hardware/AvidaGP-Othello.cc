@@ -16,10 +16,10 @@
 
 using move_t = size_t;
 
-constexpr size_t POP_SIZE = 1000;
+size_t POP_SIZE = 1000;
 constexpr size_t GENOME_SIZE = 100;
-constexpr size_t EVAL_TIME = 3500;
-constexpr size_t UPDATES = 1000;
+size_t EVAL_TIME = 3500;
+size_t UPDATES = 2000;
 constexpr size_t TOURNY_SIZE = 4;
 constexpr size_t BOARD_SIZE = 8;
 
@@ -212,10 +212,19 @@ using output_t = std::set<int>;
 int main(int argc, char* argv[])
 {
   // Set up initial world
+
+  POP_SIZE = std::atoi( argv[1] );
+  EVAL_TIME = std::atoi( argv[2] );
+  UPDATES = std::atoi( argv[3] );
+
+  std::cout<<"POP_SIZE: "<<POP_SIZE<<" EVAL_TIME: "<<EVAL_TIME
+           <<" UPDATES: "<<UPDATES<<std::endl;
+
   size_t seed = 0;
-  if (argc == 2) seed = std::atoi( argv[1] );
+  if (argc == 5) seed = std::atoi( argv[4] );
   emp::Random random;
   random.ResetSeed(seed);
+
 
   emp::evo::EAWorld<emp::AvidaGP, emp::evo::FitCacheOn> world(random, "AvidaWorld"); // FitCache on
   //emp::evo::EAWorld<emp::AvidaGP> world(random, "AvidaWorld"); //FitCache off
@@ -389,13 +398,13 @@ int main(int argc, char* argv[])
     world.Update();
 
     std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
-    if (ud % 10 == 0){
-      for (int i = 0; i < POP_SIZE; i++){
-        std::cout<<fit_fun(&(world[i]))<< " ";
-      }
-      std::cout<<std::endl;
-      EvalGame(world[0], world[1], 1, true);
-    }
+    // if (ud % 10 == 0){
+    //   for (int i = 0; i < POP_SIZE; i++){
+    //     std::cout<<fit_fun(&(world[i]))<< " ";
+    //   }
+    //   std::cout<<std::endl;
+    //   EvalGame(world[0], world[1], 1, true);
+    // }
 
     // Mutate all but the first organism.
     world.MutatePop(1);
