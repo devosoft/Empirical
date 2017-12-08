@@ -76,4 +76,6 @@ class SGWorld : public emp::World<SGOrg> {
 
   const inst_lib_t & GetInstLib() const { return inst_lib; }
 
+  SGPatches & GetStateGrid() { return state_grid; }
+  const SGPatches & GetStateGrid() const { return state_grid; }
 };
