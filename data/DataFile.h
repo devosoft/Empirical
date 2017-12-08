@@ -23,23 +23,26 @@
 namespace emp {
 
   class DataFile {
-  private:
+  protected:
     using fun_t = void(std::ostream &);
 
     std::ostream * os;
     FunctionSet<fun_t> funs;
+    emp::vector<std::string> keys;
+    emp::vector<std::string> descs;
 
-    std::string line_begin; // What should we print at the start of each line?
-    std::string line_spacer;     // What should we print between entries?
-    std::string line_end;   // What should we print at the end of each line?
+    std::string line_begin;   // What should we print at the start of each line?
+    std::string line_spacer;  // What should we print between entries?
+    std::string line_end;     // What should we print at the end of each line?
 
   public:
     DataFile(const std::string & filename,
              const std::string & b="", const std::string & s=", ", const std::string & e="\n")
-      : os(new std::ofstream(filename)), funs(), line_begin(b), line_spacer(s), line_end(e) { ; }
+      : os(new std::ofstream(filename)), funs(), keys(), descs()
+      , line_begin(b), line_spacer(s), line_end(e) { ; }
     DataFile(std::ostream & in_os,
              const std::string & b="", const std::string & s=", ", const std::string & e="\n")
-      : os(&in_os), funs(), line_begin(b), line_spacer(s), line_end(e) { ; }
+      : os(&in_os), funs(), keys(), descs(), line_begin(b), line_spacer(s), line_end(e) { ; }
     DataFile(const DataFile &) = default;
     DataFile(DataFile &&) = default;
     ~DataFile() { os->flush(); }
@@ -60,6 +63,23 @@ namespace emp {
       line_end = e;
     }
 
+    void PrintHeaderKeys() {
+      *os << line_begin;
+      for (size_t i = 0; i < keys.size(); i++) {
+        if (i > 0) *os << line_spacer;
+        *os << keys[i];
+      }
+      *os << line_end;
+      os->flush();
+    }
+
+    void PrintHeaderComment(const std::string & cstart = "# ") {
+      for (size_t i = 0; i < keys.size(); i++) {
+        *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")" << std::endl;
+      }
+      os->flush();
+    }
+
     void Update() {
       *os << line_begin;
       for (size_t i = 0; i < funs.size(); i++) {
@@ -67,42 +87,57 @@ namespace emp {
         funs[i](*os);
       }
       *os << line_end;
+      os->flush();
     }
 
     // If a function takes an ostream, pass in the correct one.
-    void Add(const std::function<fun_t> & fun) { funs.Add(fun); }
+    size_t Add(const std::function<fun_t> & fun, const std::string & key, const std::string & desc) {
+      size_t id = funs.GetSize();
+      funs.Add(fun);
+      keys.emplace_back(key);
+      descs.emplace_back(desc);
+      return id;
+    }
 
     // If a function writes to a file directly, let it do so.
-    template <typename T> void Add(const std::function<T()> & fun) {
+    template <typename T>
+    size_t Add(const std::function<T()> & fun, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [fun](std::ostream & os){ os << fun(); };
-      funs.Add(in_fun);
+      return Add(in_fun, key, desc);
+    }
+
+    // If a variable is passed in, follow it.
+    template <typename T>
+    size_t AddVar(const T & var, const std::string & key="", const std::string & desc="") {
+      std::function<fun_t> in_fun = [&var](std::ostream & os){ os << var; };
+      return Add(in_fun, key, desc);
     }
 
     // Add various types of data from DataNodes
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddCurrent(DataNode<VAL_TYPE, MODS...> & node) {
+    size_t AddCurrent(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetCurrent(); };
-      funs.Add(in_fun);
+      return Add(in_fun, key, desc);
     }
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddMean(DataNode<VAL_TYPE, MODS...> & node) {
+    size_t AddMean(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMean(); };
-      funs.Add(in_fun);
+      return Add(in_fun, key, desc);
     }
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddTotal(DataNode<VAL_TYPE, MODS...> & node) {
+    size_t AddTotal(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetTotal(); };
-      funs.Add(in_fun);
+      return Add(in_fun, key, desc);
     }
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddMin(DataNode<VAL_TYPE, MODS...> & node) {
+    size_t AddMin(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMin(); };
-      funs.Add(in_fun);
+      return Add(in_fun, key, desc);
     }
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddMax(DataNode<VAL_TYPE, MODS...> & node) {
+    size_t AddMax(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMax(); };
-      funs.Add(in_fun);
+      return Add(in_fun, key, desc);
     }
   };
 

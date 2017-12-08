@@ -54,7 +54,7 @@ int main() {
 
 
 
-  doc << "<p>" << UI::Slate("new_slate")
+  doc << "<p>" << UI::Div("new_slate")
     .SetCSS("border", "5px solid red")
     .SetCSS("padding", "5px")
     .SetCSS("max-width", "200px")
@@ -69,7 +69,7 @@ int main() {
     .AddDependant(doc.Text("ud_text"));
 
 
-  doc.Slate("new_slate")
+  doc.Div("new_slate")
     << "  And appending some more text onto the new slate.  Let's see how this all works out."
     << UI::Close("new_slate")
     << "And let's make sure this isn't in the red border.";

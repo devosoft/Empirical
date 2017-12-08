@@ -27,6 +27,7 @@
 #include "../tools/map_utils.h"
 #include "../tools/Random.h"
 #include "../tools/string_utils.h"
+#include "../base/Ptr.h"
 
 #include "InstLib.h"
 

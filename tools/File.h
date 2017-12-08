@@ -10,6 +10,8 @@
 //  Developer notes:
 //   We need to modify this code to make sure File can also work with Emscripten, appropriately.
 //   Alternatively, we might want to have a more flexible file class that wraps this one.
+//
+//   File should have an iterator that can handle operators << and >> to read and write.
 
 
 #ifndef EMP_FILE_H

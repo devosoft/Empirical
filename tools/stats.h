@@ -19,7 +19,7 @@
 #include <functional>
 
 #include "../base/vector.h"
-#include "../meta/meta.h"
+#include "../meta/type_traits.h"
 
 namespace emp {
 namespace evo {

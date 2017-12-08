@@ -23,6 +23,7 @@
 #include <map>
 
 #include "../base/array.h"
+#include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../tools/map_utils.h"
 #include "../tools/Random.h"

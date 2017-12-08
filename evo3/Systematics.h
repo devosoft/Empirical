@@ -45,10 +45,12 @@ namespace emp {
     size_t num_orgs;          //<  How many organisms currently exist of this group?
     size_t tot_orgs;          //<  How many organisms have ever existed of this group?
     size_t num_offspring;     //<  How many direct offspring groups exist from this one.
+    size_t depth;             //<  How deep in tree is this node? (Root is 0)
 
   public:
     Taxon(size_t _id, const info_t & _info, Ptr<this_t> _parent=nullptr)
-    : id (_id), info(_info), parent(_parent), num_orgs(0), tot_orgs(0), num_offspring(0) { ; }
+     : id (_id), info(_info), parent(_parent), num_orgs(0), tot_orgs(0), num_offspring(0)
+     , depth(parent ? (parent->depth+1) : 0) { ; }
     Taxon(const Taxon &) = delete;
     Taxon(Taxon &&) = default;
     Taxon & operator=(const Taxon &) = delete;
@@ -60,6 +62,7 @@ namespace emp {
     size_t GetNumOrgs() const { return num_orgs; }
     size_t GetTotOrgs() const { return tot_orgs; }
     size_t GetNumOff() const { return num_offspring; }
+    size_t GetDepth() const { return depth; }
 
     void AddOrg() { ++num_orgs; ++tot_orgs; }
     void AddOffspring() { ++num_offspring; }

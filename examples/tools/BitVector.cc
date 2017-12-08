@@ -37,7 +37,7 @@ int main()
   TEST_TYPE set3(set1 & set2);
   TEST_TYPE set4 = (set1 | set2);
   size_t total = 0;
-  for (size_t i = 0; i < 100000; i++) {
+  for (size_t i = 0; i < 10000; i++) {
     set3 |= (set4 << 3);
     set4 &= (set3 >> 3);
     auto set5 = set3 & set4;

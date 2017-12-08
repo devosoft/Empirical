@@ -9,7 +9,7 @@ namespace UI = emp::web;
 
 UI::Document doc("emp_base");
 
-class SudokuBoard : public UI::Slate {
+class SudokuBoard : public UI::Div {
 private:
   std::string name;
   UI::Table table;
@@ -38,7 +38,7 @@ private:
   }
 public:
   SudokuBoard(const std::string & in_name)
-  : UI::Slate(in_name)
+  : UI::Div(in_name)
   , name(in_name)        // HTML id for the slate
   , table(9,9)           // Build a 9x9 table for actual puzzle
   {
@@ -80,19 +80,19 @@ public:
       for (size_t c = 0; c < 9; c++) {
         auto cell = table.GetCell(r,c);
         cell.On("mousedown", [cell,r,c]() mutable {
-          // doc.Slate("table_bg").SetBackground("red");
+          // doc.Div("table_bg").SetBackground("red");
           // cell.SetCSS("BackgroundColor", "grey");
           cell.Clear();
         });
         cell.On("mouseup", [this,r,c]() mutable {
           // cell.SetCSS("BackgroundColor", "white");
-          // doc.Slate("table_bg").SetBackground("white");
+          // doc.Div("table_bg").SetBackground("white");
           state[r*9+c] = '*';
           UpdateCell(r,c);
         });
         // cell.On("mousemove", [cell]() mutable {
         //   cell.SetCSS("BackgroundColor", "pink");
-        //   doc.Slate("table_bg").SetBackground("pink");
+        //   doc.Div("table_bg").SetBackground("pink");
         // });
 
         UpdateCell(r,c);

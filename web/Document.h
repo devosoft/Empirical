@@ -3,7 +3,7 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  The Document class is built off of Slate, but initializes the EMP web framework, if
+//  The Document class is built off of Div, but initializes the EMP web framework, if
 //  neeeded, and activates itself.  It also provides quick ways to add and lookup
 //  widgets.
 //
@@ -19,35 +19,24 @@
 #ifndef EMP_WEB_DOCUMENT_H
 #define EMP_WEB_DOCUMENT_H
 
-#include "Animate.h"
 #include "Button.h"
 #include "Canvas.h"
+#include "Div.h"
 #include "FileInput.h"
 #include "Image.h"
 #include "Selector.h"
-#include "Slate.h"
 #include "Table.h"
 #include "Text.h"
 #include "TextArea.h"
-
-#include "init.h"
 
 
 namespace emp {
 namespace web {
 
-  class Document : public web::Slate {
-  private:
-    std::map<std::string, web::Animate *> anim_map;
-
+  class Document : public web::Div {
   public:
-    Document(const std::string & doc_id) : web::Slate(doc_id) {
-      emp::Initialize();
-      Activate();
-    }
-    ~Document() {
-      for (auto & p : anim_map) delete p.second;  // Delete this document's animations.
-    }
+    Document(const std::string & doc_id) : web::Div(doc_id) { Activate(); }
+    ~Document() { ; }
 
     // Retrieve specific types of widgets.
 
@@ -77,8 +66,8 @@ namespace web {
       info->Append(new_widget);
       return new_widget;
     }
-    template <class... T> web::Slate AddSlate(T &&... args) {
-      web::Slate new_widget(std::forward<T>(args)...);
+    template <class... T> web::Div AddDiv(T &&... args) {
+      web::Div new_widget(std::forward<T>(args)...);
       info->Append(new_widget);
       return new_widget;
     }
@@ -99,29 +88,17 @@ namespace web {
     }
 
 
-    // Shortcut adders for helpers
-    template <class... T> web::Animate & AddAnimation(const std::string & name, T &&... args){
-      web::Animate * new_anim = new web::Animate(std::forward<T>(args)...);
-      emp_assert(anim_map.find(name) == anim_map.end());  // Make sure not in map already!
-      anim_map[name] = new_anim;
-      return *new_anim;
-    }
-
-
     // Setup a quick way to retrieve old widgets by name.
     web::Button Button (const std::string & in_id) { return web::Button(Find(in_id)); }
     web::Canvas Canvas (const std::string & in_id) { return web::Canvas(Find(in_id)); }
     web::FileInput FileInput (const std::string & in_id) { return web::FileInput(Find(in_id)); }
     web::Image Image (const std::string & in_id) { return web::Image(Find(in_id)); }
     web::Selector Selector (const std::string & in_id) { return web::Selector(Find(in_id)); }
-    web::Slate Slate (const std::string & in_id) { return web::Slate(Find(in_id)); }
+    web::Div Div (const std::string & in_id) { return web::Div(Find(in_id)); }
     web::Table Table (const std::string & in_id) { return web::Table(Find(in_id)); }
     web::Text Text (const std::string & in_id) { return web::Text(Find(in_id)); }
     web::TextArea TextArea (const std::string & in_id) { return web::TextArea(Find(in_id)); }
 
-    // Setup a quick way to retrieve old helpers by name.
-    web::Animate & Animate (const std::string & in_id) { return *(anim_map[in_id]); }
-    web::Animate & Animation (const std::string & in_id) { return *(anim_map[in_id]); }
   };
 
 }

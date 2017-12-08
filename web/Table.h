@@ -95,14 +95,15 @@
 //    Table & CellsCSS(const std::string & setting, SETTING_TYPE && value)
 //      Set the specified Style setting of all rows or all cells to the value indicated.
 //
+//
 //  Developer notes:
-//  * Tables should more directly manage internal slates rather than just adding divs and
-//    then having them filled in.
-//  * TextTables should be created that simply use text in cells, radically speeding up
-//    printing of such tables (and covering 80% of use cases).
-//  * IDEALLY: Make a single table that will look at what each cell is pointing to (table
-//    or text) and write out what it needs to, in place.
-//  * Add a ClearColumn method, as well as other column functionality.
+//   * Tables should more directly manage internal slates rather than just adding divs and
+//     then having them filled in.
+//   * TextTables should be created that simply use text in cells, radically speeding up
+//     printing of such tables (and covering 80% of use cases).
+//   * IDEALLY: Make a single table that will look at what each cell is pointing to (table
+//     or text) and write out what it needs to, in place.
+//   * Add a ClearColumn method, as well as other column functionality.
 
 
 #ifndef EMP_WEB_TABLE_H
@@ -110,7 +111,7 @@
 
 #include "../base/vector.h"
 
-#include "Slate.h"
+#include "Div.h"
 #include "Widget.h"
 #include "WidgetExtras.h"
 
@@ -312,7 +313,7 @@ namespace web {
 
       // Tables need to facilitate recursive registrations
 
-      void RegisterChildren(internal::SlateInfo * regestrar) override {
+      void RegisterChildren(internal::DivInfo * regestrar) override {
         for (size_t r = 0; r < row_count; r++) {
           for (size_t c = 0; c < col_count; c++) {
             for (Widget & child : rows[r].data[c].children) regestrar->Register(child);
@@ -320,7 +321,7 @@ namespace web {
         }
       }
 
-      void UnregisterChildren(internal::SlateInfo * regestrar) override {
+      void UnregisterChildren(internal::DivInfo * regestrar) override {
         for (size_t r = 0; r < row_count; r++) {
           for (size_t c = 0; c < col_count; c++) {
             for (Widget & child : rows[r].data[c].children) regestrar->Unregister(child);

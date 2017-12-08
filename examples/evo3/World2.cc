@@ -5,7 +5,9 @@
 //
 //  This file is an example for using the re-vamped World template.
 
+#ifndef EMP_TRACK_MEM
 #define EMP_TRACK_MEM
+#endif
 
 #include <iostream>
 
@@ -34,7 +36,7 @@ int main() {
 
     std::cout << "UD = " << UD << std::endl;
 
-    world.EliteSelect(50, 4);
+    EliteSelect(world, 50, 4);
 
     std::cout << "Post EliteSelect(50,4)" << std::endl;
     for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
@@ -67,7 +69,7 @@ int main() {
   // for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";
   // std::cout << std::endl;
   //
-  // world.EliteSelect(10, 10);
+  // EliteSelect(world, 10, 10);
   // world.Update();
   // std::cout << "\nPost-Elite Size = " << world.GetSize() << std::endl << std::endl;
   // for (size_t i = 0; i < world.GetSize(); i++) std::cout << world[i] << " ";

@@ -11,8 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
-#include <utility>
-#include <string>
+#include <unordered_map>
 
 #include "../base/array.h"
 #include "../base/assert.h"
@@ -23,339 +22,227 @@ namespace emp {
 
   class Othello {
   private:
-    using side_t = emp::array<size_t, 7>;
-
-    vector<size_t> board;    // Current board state
-    bool over = false;    // Has the game ended?
-    size_t is_B_turn;     // Which player goes next?
-    int boardSize = 8;     // How big is the board? (N x N)
-    vector<std::pair<int, int>> flip_list;
-    vector<std::pair<int, int>> valid_moves_B;
-    vector<std::pair<int, int>> valid_moves_W;
+    vector<size_t> game_board;  /// Current board state
+    bool game_over = false;     /// Has the game ended?
+    size_t cur_player = 1;      /// ID of player using board
+    size_t board_size = 8;      /// Length of one side of N x N board
 
   public:
-    using move_t = std::pair<int, int>;
+    using move_t = size_t;
 
-    Othello(bool B_first=true) { Reset(B_first); boardSize = 8; }
+    Othello(size_t side_len, size_t first_player=1) {
+      Reset(first_player);
+      board_size = side_len;
+    }
+
     ~Othello() { ; }
 
-    void Reset(bool B_first=true) {
-      for (int i = 0; i < boardSize * boardSize; i++){ board.push_back(0);}
+    move_t GetIndex(int x, int y) { return ((y - 1) * board_size) + (x - 1); }
 
-      AddDisc(boardSize / 2, boardSize / 2, false);
-      AddDisc(boardSize / 2 + 1, boardSize / 2 + 1, false);
-      AddDisc(boardSize / 2, boardSize / 2 + 1, true);
-      AddDisc(boardSize / 2 + 1, boardSize / 2, true);
-
-      over = false;
-      is_B_turn = B_first;
+    size_t GetOpponent(size_t player) {
+      if (player == 1) { return 2; }
+      else if (player == 2) { return 1; }
+      else { return -1; }
     }
 
-    void ClearFlips() { flip_list.clear(); }
+    size_t GetCurrPlayer() { return cur_player; }
 
-    void ClearValidMoves() { valid_moves_B.clear(); valid_moves_W.clear(); }
+    size_t GetTile(move_t tile) { return game_board[tile]; }
 
-    vector<move_t> GetMoveOptions(size_t player) {
-        if (player == 1) { return valid_moves_B; }
-        else { return valid_moves_W; }
-    }
-
-    size_t GetIndex(int x, int y) { return ((y - 1) * boardSize) + (x - 1); }
-
-    move_t GetCoord(int idx) { return std::make_pair((idx % boardSize) + 1, (idx / boardSize) + 1); }
-
-    size_t GetCurrPlayer() { if (is_B_turn) { return 1; } else { return 2; } }
-    void ChangeTurn() {is_B_turn = !is_B_turn;}
-
-    size_t GetSquare(int x, int y) { 
-        int idx = GetIndex(x, y);
-        return board[idx]; 
-    }
-
-    size_t GetSquare(int idx) { return board[idx]; }
-
-    int GetBoardSize() { return boardSize; }
+    void SetTurn(size_t player) { cur_player = player; }
 
     void SetBoard(emp::array<int, 64> new_board) {
-        for (int i = 0; i < boardSize; i++){
-            int square = new_board[i];
-            if (square == -1) square = 2;
-            board[i] = square;
-        }
+      for (int i = 0; i < board_size; i++){
+        int tile = new_board[i];
+        if (tile == -1) tile = 2;
+        game_board[i] = tile;
+      }
     }
 
-    void AddDisc(int x, int y, bool is_B){
-        int idx = GetIndex(x, y);
-
-        if (is_B) { board[idx] = 1; }
-        else { board[idx] = 2; }
+    bool IsOutOfBounds(int move) {
+      return (move < 0 || move >= board_size * board_size);
     }
 
-    void Flip(vector<std::pair<int, int>> flip_list) {
-        for (auto disc : flip_list) {
-            int idx = GetIndex(disc.first, disc.second);
-            board[idx] = GetCurrPlayer();
-        }
+    bool IsDone() { return game_over; }
+
+    int GetNeighbor(std::string location, move_t move) {
+      int neighbor = -1;
+
+      if (location == "above") {
+        neighbor = int(move) - board_size;
+      }
+      else if (location == "below") {
+        neighbor = int(move) + board_size;
+      }
+      else if (location == "left") {
+        neighbor = int(move) - 1;
+        if (move % board_size == 0) { neighbor = -1; }
+      }
+      else if (location == "right") {
+        neighbor = int(move) + 1;
+        if (move % board_size == (board_size - 1)) { neighbor = -1; }
+      }
+      else if (location == "AboveLeft") {
+        neighbor = int(move) - board_size - 1;
+        if (move % board_size == 0) { neighbor = -1; }
+      }
+      else if (location == "BelowLeft") {
+        neighbor = int(move) + board_size - 1;
+        if (move % board_size == 0) { neighbor = -1; }
+      }
+      else if (location == "AboveRight") {
+        neighbor = int(move) - board_size + 1;
+        if (move % board_size == (board_size - 1)) { neighbor = -1; }
+      }
+      else if (location == "BelowRight") {
+        neighbor = int(move) + board_size + 1;
+        if (move % board_size == (board_size - 1)) { neighbor = -1; }
+      }
+
+      if (IsOutOfBounds(neighbor)) { neighbor = -1; }
+
+      return neighbor;
     }
 
-    void Write(std::ofstream * myfile, size_t player) {
-        
-        for (int y = 1; y <= boardSize; y++) {
+    void Reset(size_t first_player) {
+      for (int i = 0; i < board_size * board_size; i++){
+        game_board.push_back(0);
+      }
 
-            for (int x = 1; x <= boardSize; x++) {
-                int piece;
-                int square = GetSquare(x,y);
-                
-                if (square == 0) { piece = 0; }
-                else if (square == player) { piece = 1; }
-                else { piece = -1; }
+      // Setup initial board for player 1
+      vector<move_t> move_list;
+      move_list.push_back( GetIndex(board_size / 2, board_size / 2 + 1) );
+      move_list.push_back( GetIndex(board_size / 2 + 1, board_size / 2) );
+      SetTiles(move_list, 1);
 
-                (*myfile)<<piece<<",";
-            }
-        }
-        (*myfile)<<std::endl;
+      // Setup initial board for player 2
+      move_list.clear();
+      move_list.push_back( GetIndex(board_size / 2, board_size / 2) );
+      move_list.push_back( GetIndex(board_size / 2 + 1, board_size / 2 + 1) );
+      SetTiles(move_list, 2);
 
+      game_over = false;
+      cur_player = first_player;
     }
 
-    void Print(std::ostream & os=std::cout) {
-        os<<std::endl<<"  ";
-        for (int i = 1; i <= boardSize; i++){ std::cout<<i<<" "; }
-        os<<std::endl;
-
-        for (int y = 1; y <= boardSize; y++) {
-            os<< y << " ";
-            for (int x = 1; x <= boardSize; x++) {
-                char piece;
-                int square = GetSquare(x,y);
-                
-                if (square == 0) { piece = '-'; }
-                else if (square == 1) { piece = 'X'; }
-                else { piece = 'O'; }
-
-                os<<piece<<" ";
-            }
-            os<<std::endl;
-        }
-
-        os<<std::endl;
-    }
-
-    bool IsDone() const { return over; }
+    std::unordered_map<int, double> AsInput(size_t player_id) const {;} // TODO
 
     bool IsMoveValid(size_t player, move_t move) {
-        int x = move.first;
-        int y = move.second;
-        bool is_B = 0;
-        if (player == 1) { is_B = 1; }
+      vector<move_t> flip_list = GetFlipList(player, move, true);
 
-        //if (GetSquare(x, y) != 0) { return 0; }
+      if (GetTile(move) != 0) { return false; } // Tile must be empty
 
-        for (int j = y - 1; j <= y + 1; j++) {
-            if ( j < 1 || j > boardSize) { continue; }
-
-            for (int i = x - 1; i <= x + 1; i++) {
-                if (i < 1 || i > boardSize) { continue; }           
-
-                size_t turn = 0;
-
-                if (is_B) {
-                    if (GetSquare(i, j) == 2) { turn = 1; }
-                }
-                else{
-                    if (GetSquare(i, j) == 1) { turn = 2; }
-                }
-
-                if (turn != 0) {
-                    vector<std::pair<int, int>> potential_flips; 
-
-                    if (x == i && y > j) {
-                        for (int k = j; k >= 1; k--) { 
-                            if (GetSquare(x, k) == 0) { break; }
-                            if (GetSquare(x, k) == turn) {
-                                for (auto disc : potential_flips) { flip_list.push_back(disc); } 
-                                break;
-                            }
-                            potential_flips.push_back(std::make_pair(x,k));
-                        } 
-                    }
-                    else if (x == i && y < j) {
-                        for (int k = j; k <= boardSize; k++) {
-                            if (GetSquare(x, k) == 0) { break; }
-
-                            if (GetSquare(x, k) == turn) { 
-                                for (auto disc : potential_flips) { flip_list.push_back(disc); }
-                                break;
-                            }
-                            potential_flips.push_back(std::make_pair(x,k));
-                        }
-                    
-                    }
-                    else if (y == j && x > i) {
-                        for (int k = i; k >= 1; k--) {
-                            if (GetSquare(k, y) == 0) { break; }
-
-                            if (GetSquare(k, y) == turn) { 
-                                for (auto disc : potential_flips) { flip_list.push_back(disc); }
-                                break;
-                            }
-                            potential_flips.push_back(std::make_pair(k, y));
-                        }
-                    }
-                    else if (y == j && x < i) { 
-                        for (int k = i; k <= boardSize; k++) {
-                            if (GetSquare(k, y) == 0) { break; }
-
-                            if (GetSquare(k, y) == turn) { 
-                                for (auto disc : potential_flips) { flip_list.push_back(disc); }
-                                break;
-                            }
-                            potential_flips.push_back(std::make_pair(k, y));
-                        }
-                    }
-                    else if (x < i && y < j) {
-                        int l = j;
-                        for (int k = i; k <= boardSize; k++) {
-                            if (GetSquare(k, l) == 0) { break; }
-
-                            if (GetSquare(k, l) == turn) {
-                                for (auto disc : potential_flips) { flip_list.push_back(disc); }
-                                break;
-                            }
-                            potential_flips.push_back(std::make_pair(k, l));
-                            l++;
-                            if (l > boardSize) { break; }
-                        }
-                    }
-                    else if (x > i && y > j) {
-                        int l = j;
-                        for (int k = i; k >= 1; k--) {
-                            if (GetSquare(k, l) == 0) { break; }
-
-                            if (GetSquare(k, l) == turn) {
-                                for (auto disc : potential_flips) { flip_list.push_back(disc); }
-                                break;
-                            }
-                            potential_flips.push_back(std::make_pair(k, l));
-                            l--;
-                            if (l < 1) { break; }
-                        }
-                    }
-                    else if (x > i && y < j) { // Top Right Diagonal
-                        int l = j;
-                        for (int k = i; k >= 1; k--) {
-                            if (GetSquare(k, l) == 0) { break; }
-
-                            if (GetSquare(k, l) == turn) {
-                                for (auto disc : potential_flips) { flip_list.push_back(disc); }
-                                break;
-                            }
-                            potential_flips.push_back(std::make_pair(k, l));
-                            l++;
-                            if (l > boardSize) { break; }
-                        }
-                    }
-                    else if (x < i && y > j) {
-                        
-                        int l = j;
-                        for (int k = i; k <= boardSize; k++) {
-                            if (GetSquare(k, l) == 0) { break; }
-
-                            if (GetSquare(k, l) == turn) {
-                                for (auto disc : potential_flips) { flip_list.push_back(disc); }
-                                break;
-                            }
-                            potential_flips.push_back(std::make_pair(k, l));
-                            l--;
-                            if (l < 1) { break; }
-                        }
-                    }
-
-                    potential_flips.clear();
-                }
-            }
-        }
-       // if (flip_list.size() > 0) {std::cout<<x<<" "<<y<<std::endl;}
-        return flip_list.size();
+      return flip_list.size() != 0; // If no tiles flip, not a valid move
     }
 
-    size_t TestOver() {
-        bool moveW = false;
-        bool moveB = false;
+    emp::vector<size_t> GetMoveOptions(size_t player) {
+      vector<size_t> valid_moves;
+      for (size_t i = 0; i < board_size * board_size; i++) {
+        if (IsMoveValid(player, i)) { valid_moves.push_back(i); }
+      }
 
-        if (GetScore(1) == 0) { over = true; return 0; }
-        if (GetScore(2) == 0) { over = true; return 0; }
-        ClearValidMoves();
-
-        for (int x = 1; x <= boardSize; x++) {
-            for (int y = 1; y <= boardSize; y++) {
-                move_t move = std::make_pair(x, y);
-                size_t square = GetSquare(move.first, move.second);
-                if (square == 0) {
-                    ClearFlips();
-                    bool validB = IsMoveValid(1, move);
-                    ClearFlips();
-                    bool validW = IsMoveValid(2, move);
-                    ClearFlips();
-
-                    if (validB && validW) {
-                        moveW = moveB = true;
-                        valid_moves_B.push_back(move);
-                        valid_moves_W.push_back(move);
-                    }
-                    else if (validB && !validW) { 
-                        moveB = true;
-                        valid_moves_B.push_back(move);
-                    
-                    }
-                    else if (!validB && validW) { 
-                        moveW = true;
-                        valid_moves_W.push_back(move);
-                    }
-                }
-            }
-        }
-
-        if (!moveB && !moveW) { over = true; }
-        else if (moveB && !moveW) { return 1; }
-        else if (!moveB && moveW) { return 2; }
-        return 0;
-
+      return valid_moves;
     }
 
-    bool DoMove(size_t player, move_t move, bool verbose=0) {
+    bool DoMove(size_t player, move_t move) {
+      SetTile(move, player);
+      FlipTiles(player, move);
+      return CheckGoAgain(player);
+    }
 
-        int x = move.first;
-        int y = move.second;
-        
-        AddDisc(x, y, is_B_turn);
-        if (verbose) {
-            for (auto el : flip_list) { std::cout<<el.first<<" "<<el.second<<std::endl; }
-        }
-        Flip(flip_list);
-        //is_B_turn = !(is_B_turn);
-        size_t test = TestOver();
+    bool CheckGoAgain(size_t player){
+      vector<size_t> player_moves = GetMoveOptions(player);
+      vector<size_t> opp_moves = GetMoveOptions(GetOpponent(player));
+      bool again = false;
 
-        if (player == test) { return true; }
-        else { return false; }
+      if (player_moves.size() <= 0 && opp_moves.size() <= 0) { game_over = true; }
 
+      // If opponent has no moves, play again
+      else if (opp_moves.size() <= 0) { again = true; }
+
+      return again;
+    }
+
+    void SetTiles(vector<move_t> move_list, size_t player){
+      for (move_t move : move_list){
+        SetTile(move, player);
+      }
+    }
+
+    void SetTile(size_t move, size_t player){
+      game_board[move] = player;
+    }
+
+    void FlipTiles(size_t player, move_t move) {
+      vector<move_t> flip_list = GetFlipList(player, move, false);
+      for (move_t tile : flip_list) { SetTile(tile, player); }
     }
 
     double GetScore(size_t player) {
-        double bScore = 0;
-        double wScore = 0;
+      double score = 0;
 
-        for (int x = 1; x <= boardSize; x++) {
-            for (int y = 1; y <= boardSize; y++) {
-                size_t disc = GetSquare(x, y);
-                if (disc == 1) { bScore++; }
-                else if (disc == 2) { wScore++; }
-            }
+      for (size_t i = 0; i < board_size * board_size; i++){
+        if (GetTile(i) == player) { score++; }
+      }
+
+      return score;
+    }
+
+    void Print(std::ostream & os=std::cout) {
+      os<<std::endl<<"  ";
+      unsigned char letter = 'A';
+      for (int i = 0; i < board_size; i++){ std::cout<<char(letter + i) <<" "; }
+      os<<std::endl;
+
+      for (int y = 1; y <= board_size; y++) {
+        os<< y << " ";
+        for (int x = 1; x <= board_size; x++) {
+          char piece;
+          int tile = GetTile(GetIndex(x,y));
+
+          if (tile == 0) { piece = '-'; }
+          else if (tile == 1) { piece = 'X'; }
+          else { piece = 'O'; }
+
+          os<<piece<<" ";
+        }
+        os<<std::endl;
+      }
+
+      os<<std::endl;
+    }
+
+    vector<move_t> GetFlipList(size_t player, move_t move, bool check_valid=false){
+      vector<std::string> directions = {"above", "below", "left", "right",
+                                        "AboveLeft", "AboveRight",
+                                        "BelowLeft", "BelowRight"};
+      vector<move_t> flip_list;
+
+      for (std::string direction : directions) {
+        int pos = GetNeighbor(direction, move);
+        vector<move_t> temp_list;
+
+        while (pos != -1){
+          if (GetTile(pos) == 0) { break; }
+
+          else if (GetTile(pos) != player) { temp_list.push_back(pos); }
+
+          else {
+            for (move_t move : temp_list) { flip_list.push_back(move); }
+            break;
+          }
+
+          pos = GetNeighbor(direction, pos);
         }
 
-        if (player == 1) { return bScore; }
-        else if (player == 2) { return wScore; }
+        temp_list.clear();
+
+        // If just checking that move is valid, we don't need full flip list
+        if (check_valid && flip_list.size() > 0) { break; }
+      }
+      return flip_list;
     }
-    
+
   };
 
 }

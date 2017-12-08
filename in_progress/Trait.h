@@ -17,9 +17,9 @@
 #include <type_traits>
 #include <vector>
 
-#include "../tools/assert.h"
+#include "../base/assert.h"
 #include "../tools/functions.h"
-#include "../tools/meta.h"
+#include "../meta/meta.h"
 
 namespace emp {
 

@@ -4,8 +4,8 @@ CFLAGS_version := -std=c++14
 
 # Emscripten compiler information
 CXX_web := emcc
-CXX_native := clang++
-#CXX_native := g++
+#CXX_native := clang++
+CXX_native := g++
 
 OFLAGS_native_opt := -O3 -DNDEBUG
 OFLAGS_native_debug := -g -pedantic -DEMP_TRACK_MEM  -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual
@@ -22,9 +22,9 @@ CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../web/lib
 CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
-TARGETS := Grid NK Systematics World World2
+TARGETS := Fitness_Share_NK Grid NK Roulette Systematics World World2
 
-EVO_DEPEND := ../../evo2/WorldModule.h
+EVO_DEPEND := ../../evo3/World.h
 
 default: native
 

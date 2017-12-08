@@ -74,7 +74,10 @@ namespace evo {
       for (size_t id = 0; id < pop.size(); id++) fitM.CalcFitness(id, pop[id], fit_fun);
     }
 
-    void SetRandom(Ptr<Random> r) { random_ptr = r; }
+    void SetRandom(Ptr<Random> r) {
+      emp_assert(r);   // Make sure we are setting a valid random number generator.
+      random_ptr = r;
+    }
     void Setup(Ptr<Random> r) { SetRandom(r); }
 
     // AddOrgAt, AddOrgAppend, and SetOrgs are the only ways new organisms come into a population
@@ -391,6 +394,7 @@ namespace evo {
 
     // Injected orgs go into a random position.
     size_t AddOrg(ptr_t new_org) {
+      emp_assert(random_ptr);  // Random pointer must be set for AddOrg to work.
       emp::vector<size_t> empty_spots = base_t::GetEmptyPopIDs();
       const size_t pos = (empty_spots.size()) ?
         empty_spots[ random_ptr->GetUInt(empty_spots.size()) ] :
