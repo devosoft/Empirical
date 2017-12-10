@@ -66,8 +66,7 @@
 /// Turn off all asserts in EMP_NDEBUG
 #ifdef EMP_NDEBUG
 namespace emp {
-  const bool assert_on = false;
-  const int assert_count = 0;
+  constexpr bool assert_on = false;
 }
 
 /// Ideally, this assert should use the expression (to prevent compiler error), but should not
@@ -79,7 +78,7 @@ namespace emp {
 #elif defined(EMP_TDEBUG)           // EMP_NDEBUG not set, but EMP_TDEBUG is!
 
 namespace emp {
-  const bool assert_on = true;
+  constexpr bool assert_on = true;
   struct AssertFailInfo {
     std::string filename;
     int line_num;
@@ -111,7 +110,7 @@ namespace emp {
 #elif EMSCRIPTEN  // Neither EMP_NDEBUG nor EMP_TDEBUG set, but compiling with Emscripten
 
 namespace emp {
-  const bool assert_on = true;
+  constexpr bool assert_on = true;
   static int TripAssert() {
     static int trip_count = 0;
     return ++trip_count;
@@ -155,7 +154,7 @@ namespace emp {
 #else // We ARE in DEBUG, but NOT in EMSCRIPTEN
 
 namespace emp {
-  const bool assert_on = true;
+  constexpr bool assert_on = true;
 }
 
 // Generating an output to standard error is an assert is tripped.
