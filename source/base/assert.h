@@ -62,6 +62,8 @@
 #define emp_constexpr
 #endif
 
+/// Helper macros used throughout...
+#define emp_assert_TO_PAIR(X) EMP_STRINGIFY(X) , X
 
 /// Turn off all asserts in EMP_NDEBUG
 #ifdef EMP_NDEBUG
@@ -115,39 +117,34 @@ namespace emp {
     static int trip_count = 0;
     return ++trip_count;
   }
+
+  /// Base case for assert_print...
+  void assert_print(std::stringstream &) { ; }
+
+  /// Print out information about the next variable and recurse...
+  template <typename T, typename... EXTRA>
+  void assert_print(std::stringstream & ss, std::string name, T && val, EXTRA &&... extra) {
+    ss << name << ": [" << val << "]" << std::endl;
+    assert_print(ss, std::forward<EXTRA>(extra)...);
+  }
+
+  template <typename... EXTRA>
+  bool assert_trigger(std::string filename, size_t line, std::string expr, bool, EXTRA &&... extra) {
+    std::stringstream ss;
+    ss << "Assert Error (In " << filename << " line " << line << "): " << expr << '\n';
+    assert_print(ss, std::forward<EXTRA>(extra)...);
+    if (emp::TripAssert() <= 3) {
+      EM_ASM_ARGS({ msg = Pointer_stringify($0); alert(msg); }, ss.str().c_str());
+    }
+    return true;
+  }
 }
 
-// Generate a pop-up alert in a web browser if an assert it tripped.
-#define emp_assert_impl_1(EXPR)                                         \
-  if ( !(EXPR) ) {                                                      \
-    std::string msg = std::string("Assert Error (In ")                  \
-      + std::string(__FILE__)                                           \
-      + std::string(" line ") + std::to_string(__LINE__)                \
-      + std::string("): ") + std::string(#EXPR) + "\n"                  \
-      + emp_assert_var_info.str();                                      \
-    if (emp::TripAssert() <= 3)						\
-      EM_ASM_ARGS({ msg = Pointer_stringify($0); alert(msg); }, msg.c_str()); \
-    abort();                                                            \
-  }                                                                     \
 
-#define emp_assert_var(VAR) emp_assert_var_info << #VAR << ": [" << VAR << "]\n";
-
-#define emp_assert_impl_2(EXPR, VAR) emp_assert_var(VAR); emp_assert_impl_1(EXPR)
-#define emp_assert_impl_3(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_2(EXPR,__VA_ARGS__)
-#define emp_assert_impl_4(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_3(EXPR,__VA_ARGS__)
-#define emp_assert_impl_5(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_4(EXPR,__VA_ARGS__)
-#define emp_assert_impl_6(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_5(EXPR,__VA_ARGS__)
-#define emp_assert_impl_7(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_6(EXPR,__VA_ARGS__)
-#define emp_assert_impl_8(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_7(EXPR,__VA_ARGS__)
-#define emp_assert_impl_9(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_8(EXPR,__VA_ARGS__)
-#define emp_assert_impl_10(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_9(EXPR,__VA_ARGS__)
-#define emp_assert_impl_11(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_10(EXPR,__VA_ARGS__)
-#define emp_assert_impl_12(EXPR, VAR, ...) emp_assert_var(VAR); emp_assert_impl_11(EXPR,__VA_ARGS__)
-
-#define emp_assert(...)                                                 \
-  do {                                                                  \
-    std::stringstream emp_assert_var_info;                              \
-    EMP_ASSEMBLE_MACRO(emp_assert_impl_, __VA_ARGS__) \
+#define emp_assert(...)                                                                       \
+  do {                                                                                        \
+    !(EMP_GET_ARG_1(__VA_ARGS__, ~)) &&                                                       \
+    emp::assert_trigger(__FILE__, __LINE__, EMP_WRAP_ARGS(emp_assert_TO_PAIR, __VA_ARGS__) ); \
   } while(0)
 
 
@@ -174,8 +171,6 @@ namespace emp {
     return true;
   }
 }
-
-#define emp_assert_TO_PAIR(X) EMP_STRINGIFY(X) , X
 
 /// @endcond
 
